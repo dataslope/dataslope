@@ -19,6 +19,14 @@ set of *promises* about your data.
 To make a table, you list its columns and each column's type inside
 `CREATE TABLE`:
 
+<SyntaxBreakdown
+  parts={[
+    { text: "CREATE TABLE" },
+    { text: "books", label: "the table's name" },
+    { text: "(id INTEGER, title TEXT, ...);", label: "one name and one type per column" },
+  ]}
+/>
+
 <SqlCodeBlock
   dialect="postgres"
   title="Create a table, then read it"

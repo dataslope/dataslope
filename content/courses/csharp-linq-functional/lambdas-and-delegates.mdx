@@ -77,7 +77,15 @@ for `Func<T, bool>`, LINQ uses `Func<T, bool>`, not `Predicate<T>`.
 ## Lambda syntax
 
 A **lambda** is an inline literal of a delegate type. It is written
-`parameters => body`.
+`parameters => body`, and there are only ever three pieces:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "(x, y)", label: "the parameters" },
+    { text: "=>", label: "reads as goes to" },
+    { text: "x + y", label: "the body, whose value is returned" },
+  ]}
+/>
 
 <Figure
   slug="cs-lambdas-and-delegates-inline-cutout"

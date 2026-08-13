@@ -114,12 +114,10 @@ Spreadsheets often become painful when:
 
 Example problem:
 
-```text
-customer_name | order_id | products
-------------- | -------- | -------------------------
-Maya Chen     | 1001     | Notebook, Pen, Backpack
-Maya Chen     | 1002     | Pen
-```
+| `customer_name` | `order_id` | `products`              |
+| --------------- | ---------- | ----------------------- |
+| Maya Chen       | 1001       | Notebook, Pen, Backpack |
+| Maya Chen       | 1002       | Pen                     |
 
 Is "Maya Chen" the same customer in both rows? What if her name changes? How many pens were sold? The spreadsheet does not naturally separate customers, orders, and products into reliable related facts.
 
@@ -142,13 +140,11 @@ flowchart TD
 
 In a spreadsheet, a column can accidentally become a mixture:
 
-```text
-price
------
-12.99
-free
-$8 maybe
-```
+| price      |
+| ---------- |
+| `12.99`    |
+| `free`     |
+| `$8 maybe` |
 
 A database table can be designed so the `price` column is meant for numeric values. SQLite has flexible typing, so it is more forgiving than some database systems, but column types still communicate the intended shape of the data and help SQLite store and compare values sensibly.
 

@@ -25,20 +25,16 @@ write our own.
 
 ## Anatomy of a function
 
-```cpp
-int add(int a, int b) {     // return type, name, parameter list
-    return a + b;           // body
-}
-```
+<SyntaxBreakdown
+  parts={[
+    { text: "int", label: "what flows back to the caller" },
+    { text: "add", label: "what callers invoke it by" },
+    { text: "(int a, int b)", label: "typed slots for the inputs" },
+    { text: "{ return a + b; }", label: "the code that runs on a call" },
+  ]}
+/>
 
-The parts:
-
-- **Return type** (`int`), what kind of value flows back to the
-  caller. Use `void` if the function returns nothing.
-- **Name** (`add`), what callers will use to invoke it.
-- **Parameter list** (`int a, int b`), typed slots for the inputs.
-- **Body** (between `{` and `}`), the code that runs when the
-  function is called.
+Use `void` as the return type when the function returns nothing.
 
 A function must have one **definition** (the body) and may have many
 **declarations** (signatures without a body, often in a header).

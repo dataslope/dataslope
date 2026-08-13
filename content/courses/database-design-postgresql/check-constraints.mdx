@@ -18,9 +18,17 @@ A **CHECK** constraint lets the schema say those things out loud.
 A CHECK constraint is a boolean expression that must be true for every
 row. If the expression is false, PostgreSQL rejects the write.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "price NUMERIC", label: "the column it guards" },
+    { text: "CONSTRAINT price_non_negative", label: "a name, so the error message says which rule broke" },
+    { text: "CHECK (price >= 0)", label: "the expression every row must satisfy" },
+  ]}
+/>
+
 ```mermaid
 flowchart TD
-    Row["Incoming row"] --> Check{"CHECK expression<br/>is true?"}
+    Row["Incoming row"] --> Check{"<code>CHECK</code> expression<br/>is true?"}
     Check -->|yes| Store["Store row"]
     Check -->|no| Reject["Reject row"]
 ```
@@ -183,7 +191,7 @@ others.
 
 ```mermaid
 flowchart LR
-    Need["What rule are you encoding?"] --> Missing["Value required<br/>NOT NULL"]
+    Need["What rule are you encoding?"] --> Missing["Value required<br/>NOT <code>NULL</code>"]
     Need --> Dup["No duplicates<br/>UNIQUE"]
     Need --> Ref["Must point to existing row<br/>FOREIGN KEY"]
     Need --> Expr["Expression must be true<br/>CHECK"]
@@ -205,8 +213,8 @@ present, say that directly with `NOT NULL`.
 
 ```mermaid
 flowchart TD
-    Required["Required domain value"] --> NN["NOT NULL"]
-    Required --> CH["CHECK rule"]
+    Required["Required domain value"] --> NN["<code>NOT NULL</code>"]
+    Required --> CH["<code>CHECK</code> rule"]
     NN --> Safe["Present and valid"]
     CH --> Safe
 ```

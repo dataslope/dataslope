@@ -56,6 +56,17 @@ vectorized pass.
 
 ### How do you find the top-k scores efficiently?
 
+`argpartition` is O(n) where a full sort is O(n log n); you sort only the k you kept:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "np.argpartition(" },
+    { text: "-scores,", label: "negated, because it partitions ascending" },
+    { text: "k", label: "the boundary, not a sort" },
+    { text: ")[:k]", label: "the top k, in no particular order yet" },
+  ]}
+/>
+
 Sorting the whole array is $O(n \log n)$; when you only need the k largest
 you can do better. `np.argpartition` runs in $O(n)$ and places the k
 largest indices at the end (unordered), then you sort just those k. For
@@ -109,6 +120,17 @@ print("majority class:", counts.most_common(1)[0][0])
 
 ### How do you compute cosine similarity in NumPy?
 
+Three pieces, and the guard on the denominator is the one people forget:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "a @ b", label: "the dot product" },
+    { text: "/", label: "normalised by..." },
+    { text: "(norm(a) * norm(b)", label: "...both magnitudes" },
+    { text: "+ 1e-12)", label: "so a zero vector cannot divide by zero" },
+  ]}
+/>
+
 Cosine similarity is the dot product of two vectors divided by the product
 of their norms, so it measures angle and ignores magnitude:
 
@@ -143,6 +165,17 @@ Normalizing the rows to unit length turns the matrix product `Xn @ Xn.T`
 into a full cosine-similarity matrix in one vectorized operation.
 
 ### How do you implement mini-batching for training?
+
+A batch is a slice, and the two numbers that define it are the only state you need:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "for i in range(0, n," },
+    { text: "bs", label: "the step, which is the batch size" },
+    { text: "):" },
+    { text: "X[i : i + bs]", label: "one slice; the last may be short" },
+  ]}
+/>
 
 Shuffle the row indices once per epoch, then slice fixed-size chunks and
 index the data with them. Shuffling by index (not by copying rows) keeps
@@ -214,6 +247,16 @@ where each count is a boolean-mask sum: `TP = ((y_pred == 1) & (y_true == 1)).su
 Vectorizing the masks keeps it $O(n)$ with no Python loop.
 
 ### How do you decode class predictions from a probability matrix?
+
+`argmax` over the class axis, and getting the axis right is the whole job:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "probs.argmax(" },
+    { text: "axis=1", label: "reduce across classes, one answer per row" },
+    { text: ")", label: "shape (n, k) becomes (n,)" },
+  ]}
+/>
 
 For an `(n_samples, n_classes)` matrix of probabilities, `np.argmax(P, axis=1)`
 returns the predicted class index per row in $O(nk)$. `np.max(P, axis=1)`

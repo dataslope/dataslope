@@ -25,11 +25,27 @@
  * where it claims to. All three are cheap to check and none has a legitimate
  * exception.
  *
+ * **And then the file is actually parsed.** The three rules above are line
+ * shapes, and line shapes have gaps: a component inserted ahead of a paragraph
+ * left `/> A correct decorator preserves…` on one line, which is a JSX element
+ * with prose after it, and every rule here waved it through. `next build`
+ * did not, and it failed at prerender with exactly the message this script
+ * exists to pre-empt. So the last step runs the real MDX parser over every
+ * lesson. It costs about 13 seconds for the whole corpus, which is the point:
+ * the heuristics are what make a *specific* diagnosis, and the parse is what
+ * makes the check honest about whether the file compiles at all.
+ *
  *   node scripts/check-mdx-blocks.mjs
  */
 import { readFileSync } from "node:fs";
 import { relative } from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { unified } from "unified";
+import remarkParse from "remark-parse";
+import remarkMdx from "remark-mdx";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
 
 import { collectFiles } from "./lib/build-cache.mjs";
 import { codeRegions } from "./lib/mdx-regions.mjs";
@@ -116,12 +132,67 @@ for (const file of files) {
   }
 }
 
+// A fence with no language is not highlighted, and nothing says so: it renders
+// as a code block in the right font at the right size, just grey. Four Java
+// snippets in the generics course shipped that way. `text` is always an
+// available answer, so there is no case where leaving it off is what the author
+// meant. Fences carrying meta (```csharp title="x") are openers too, and a
+// closing fence is backticks alone, which is what separates them.
+for (const file of files) {
+  const lines = readFileSync(file, "utf8").split("\n");
+  let open = null;
+  lines.forEach((line, i) => {
+    const close = line.match(/^\s{0,3}(`{3,})\s*$/);
+    const mark = line.match(/^\s{0,3}(`{3,})[ \t]*([^\s`]*)/);
+    if (open) {
+      if (close && close[1].length >= open.ticks) open = null;
+      return;
+    }
+    if (!mark) return;
+    open = { ticks: mark[1].length };
+    if (!mark[2]) {
+      problems.push(
+        `${relative(ROOT, file)}:${i + 1}: fenced block has no language, so it ` +
+          `renders unhighlighted (use \`text\` if it is not code)`,
+      );
+    }
+  });
+}
+
+// The authoritative pass: does the file parse as MDX at all? `remarkMath` is
+// here because `source.config.ts` has it and `$…$` would otherwise be read as
+// ordinary text; `remarkGfm` because tables are, and a table row is where one
+// of these bugs turned up. Frontmatter is blanked rather than stripped so
+// reported line numbers still point at the file.
+const mdx = unified().use(remarkParse).use(remarkMdx).use(remarkGfm).use(remarkMath);
+for (const file of files) {
+  const src = readFileSync(file, "utf8").replace(/^---\n[\s\S]*?\n---\n/, (m) =>
+    m.replace(/[^\n]/g, ""),
+  );
+  try {
+    mdx.runSync(mdx.parse(src));
+  } catch (err) {
+    const at = err.line ? `:${err.line}:${err.column ?? 0}` : "";
+    problems.push(
+      `${relative(ROOT, file)}${at}: does not parse as MDX: ` +
+        String(err.reason ?? err.message).slice(0, 100) +
+        (err.cause ? ` (${String(err.cause.message).slice(0, 60)})` : ""),
+    );
+  }
+}
+
 if (problems.length > 0) {
   console.error(`\n✗ ${problems.length} problem(s):\n   ` + problems.join("\n   ") + "\n");
+  console.error(
+    "A component placed immediately before existing prose must be followed by a\n" +
+      "blank line. `/>` with text after it on the same line is a JSX element with\n" +
+      "trailing content, which is the acorn error above.\n",
+  );
   process.exit(1);
 }
 
 console.log(
   `✓ ${files.length} MDX file(s): component tags all at the top level, ` +
-    `attribute values all closed`,
+    `attribute values all closed, every fence declares a language, ` +
+    `every file parses as MDX`,
 );

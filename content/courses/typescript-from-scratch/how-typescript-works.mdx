@@ -160,7 +160,7 @@ let x: number = 42;
 
 becomes:
 
-```
+```text
 LET_KEYWORD  IDENTIFIER("x")  COLON  IDENTIFIER("number")  EQUALS  NUMERIC_LITERAL(42)  SEMICOLON
 ```
 
@@ -170,13 +170,13 @@ The scanner doesn't understand *meaning* yet. It just recognizes keywords (`let`
 
 The **parser** takes the stream of tokens and builds an **Abstract Syntax Tree (AST)**, a tree structure representing the program's syntactic structure. For the line above, the AST node might look like:
 
-```
-VariableStatement
-  ├─ VariableDeclarationList
-  │   └─ VariableDeclaration
-  │       ├─ Identifier: "x"
-  │       ├─ TypeAnnotation: NumberKeyword
-  │       └─ Initializer: NumericLiteral(42)
+```mermaid
+flowchart TD
+    A[VariableStatement] --> B[VariableDeclarationList]
+    B --> C[VariableDeclaration]
+    C --> D["Identifier: x"]
+    C --> E["TypeAnnotation: NumberKeyword"]
+    C --> F["Initializer: NumericLiteral(42)"]
 ```
 
 The AST captures the *structure* of the code: "This is a variable declaration named `x`, with type `number`, initialized to `42`." The parser checks syntax (no missing semicolons or braces), but it doesn't check *types* yet.

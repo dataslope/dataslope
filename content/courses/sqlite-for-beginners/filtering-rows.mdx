@@ -20,6 +20,16 @@ A `WHERE` clause is a test that SQLite applies to each row. If the test
 is true, the row stays in the result. If the test is false, the row is
 left out.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "SELECT title FROM books" },
+    { text: "WHERE" },
+    { text: "price", label: "the column to test" },
+    { text: "<", label: "the comparison" },
+    { text: "10;", label: "what to compare it against" },
+  ]}
+/>
+
 <Figure
   slug="lite-filtering-rows-inline-cutout"
   alt="A board of rows passing a gate that swings open only for rows carrying a matching notch"
@@ -28,7 +38,7 @@ left out.
 
 ```mermaid
 flowchart TD
-    A["all rows<br/>in books"] --> W{"WHERE condition<br/>is true?"}
+    A["all rows<br/>in books"] --> W{"<code>WHERE</code> condition<br/>is true?"}
     W -->|"true"| K["keep row<br/>in result"]
     W -->|"false"| D["drop row<br/>from result"]
 ```
@@ -433,6 +443,15 @@ WHERE
 
 In SQLite, `LIKE` is case-insensitive for ordinary ASCII letters by
 default. That means `'sql%'` can match `SQL Street`.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "WHERE" },
+    { text: "title", label: "the text column to test" },
+    { text: "LIKE" },
+    { text: "'sql%'", label: "the pattern, where % is any run of characters" },
+  ]}
+/>
 
 <SqlCodeBlock
   dialect="sqlite"

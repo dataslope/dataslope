@@ -135,6 +135,19 @@ or unsafe to evaluate.
 
 ## `switch`: branch on a value
 
+Modern C# writes this as an *expression*, which means it produces a value rather than assigning one in each branch:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "var name =" },
+    { text: "day", label: "the value being matched" },
+    { text: "switch {" },
+    { text: "1 => \"Mon\",", label: "a pattern, then its result" },
+    { text: "_ => \"other\"", label: "the discard pattern, matching anything left" },
+    { text: "};" },
+  ]}
+/>
+
 When you have many possible values for one variable, a chain of
 `if`/`else if` gets noisy. `switch` is cleaner.
 

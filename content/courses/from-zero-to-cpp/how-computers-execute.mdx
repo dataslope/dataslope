@@ -51,11 +51,19 @@ on/off switches called **bits**. Eight bits give you `2^8 = 256`
 possible patterns, which is why one byte can hold a number from 0 to
 255.
 
-```
-Address:  0     1     2     3     4     5     6     7
-Box:     [42]  [13]  [ 0]  [97]  [98]  [99]  [ 0]  [255]
-                              'a'   'b'   'c'
-```
+<MemoryCells
+  cells={[
+    { name: "0", value: "42" },
+    { name: "1", value: "13" },
+    { name: "2", value: "0" },
+    { name: "3", value: "97", note: "'a'" },
+    { name: "4", value: "98", note: "'b'" },
+    { name: "5", value: "99", note: "'c'" },
+    { name: "6", value: "0" },
+    { name: "7", value: "255" },
+  ]}
+  caption="Eight bytes at addresses 0 to 7. The header strip is the address, the box is the byte."
+/>
 
 Letters are just numbers under an agreement called **ASCII** or
 **Unicode**. The letter `a` is the number 97. The letter `b` is 98.

@@ -379,6 +379,17 @@ that point switch to `element="step"`, or give each group its own panel with
 
 ## Counts or density? `stat=`
 
+The `stat` argument decides what the bar heights *mean*, which is what makes groups of different sizes comparable:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "sns.histplot(data=df, x=...," },
+    { text: "stat=\"density\",", label: "area sums to 1, so group sizes stop mattering" },
+    { text: "common_norm=False", label: "normalise each hue separately" },
+    { text: ")" },
+  ]}
+/>
+
 By default each bar's height is a raw **count** of observations
 (`stat="count"`). That is intuitive, but it makes groups of unequal size
 hard to compare, a bigger group has taller bars everywhere simply because

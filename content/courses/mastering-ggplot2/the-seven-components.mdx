@@ -12,6 +12,19 @@ small set of components. ggplot2 stacks them in a fixed order:
 
 **Data → Mappings → Geometries → Statistics → Scales → Coordinates → Facets → Theme → Rendered plot**
 
+Written out, the first three of them are the call you will type most
+often, and each `+` adds the next component to the stack:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "ggplot(" },
+    { text: "mpg,", label: "1. the data" },
+    { text: "aes(x = displ, y = hwy)", label: "2. the mappings" },
+    { text: ") +" },
+    { text: "geom_point()", label: "3. the geometry" },
+  ]}
+/>
+
 Let us meet each one with a single sentence and a concrete example
 using the built-in `mpg` data set (fuel-economy records for 234 cars).
 

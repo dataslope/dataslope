@@ -94,6 +94,17 @@ By convention, single-letter names like `T`, `U`, `V` are used for generic type 
 
 ## Generic functions
 
+The angle brackets declare a placeholder, and the same placeholder used twice is what ties the return type to the argument:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "function identity" },
+    { text: "<T>", label: "declare the placeholder" },
+    { text: "(x: T)", label: "the argument fixes what T is" },
+    { text: ": T", label: "so the return type follows from it" },
+  ]}
+/>
+
 Let's look at more realistic examples. Suppose you want a function that wraps a value in an array:
 
 <CodeBlock

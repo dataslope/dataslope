@@ -244,6 +244,17 @@ int main() {
 
 ## `std::map` vs `std::unordered_map`
 
+The two declarations differ by one word, and that word is the whole trade: ordered iteration against O(1) average lookup.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "std::unordered_map<", label: "hash table, unordered, O(1) average" },
+    { text: "std::string,", label: "the key type, which must be hashable" },
+    { text: "int", label: "the mapped type" },
+    { text: "> counts;" },
+  ]}
+/>
+
 `std::map` is ordered by key and typically implemented as a red-black tree. `std::unordered_map` is a hash table and has unspecified iteration order.
 
 <CodeBlock

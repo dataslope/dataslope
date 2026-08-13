@@ -71,7 +71,7 @@ String s = "hello";
 flowchart LR
     subgraph S[stack frame]
         X["<code>x = 42</code>"]
-        SREF["s = ●─"]
+        SREF["<code>s</code> (a reference)"]
     end
     subgraph H[heap]
         STR["String 'hello'"]
@@ -118,8 +118,8 @@ shows up via `a`.
 ```mermaid
 flowchart LR
     subgraph stack
-        A["a = ●─"]
-        B["b = ●─"]
+        A["<code>a</code> (a reference)"]
+        B["<code>b</code> (a reference)"]
     end
     subgraph heap
         L["ArrayList: first, second"]
@@ -249,7 +249,7 @@ public class Main {
 
 Expected output:
 
-```
+```text
 after bumpPrimitive: n = 5
 after mutate: items = [a, b]
 after replace: items = [a, b]
@@ -270,12 +270,12 @@ letting variables go out of scope, or by reassigning fields).
 ```mermaid
 flowchart LR
     subgraph before
-        V["v = ●─"]
+        V["<code>v</code> (a reference)"]
         O1[Order #1]
         V --> O1
     end
     subgraph after
-        V2["v = ●─"]
+        V2["<code>v</code> (a reference)"]
         O2[Order #2]
         Old[(Order #1<br/>now garbage)]
         V2 --> O2

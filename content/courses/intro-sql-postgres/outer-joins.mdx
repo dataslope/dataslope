@@ -20,6 +20,15 @@ A `LEFT JOIN` keeps **every row from the left (first) table**,
 matched or not. Where a match exists, the right table's columns are
 filled in. Where none exists, those columns come back as `NULL`.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "FROM customers", label: "the left table, every row survives" },
+    { text: "LEFT JOIN" },
+    { text: "orders", label: "the right table, optional" },
+    { text: "ON customers.id = orders.customer_id", label: "no match here means NULLs" },
+  ]}
+/>
+
 ```mermaid
 flowchart TB
     subgraph L["Left table (customers)"]
@@ -27,8 +36,8 @@ flowchart TB
         L2["Linus (no orders)"]
     end
     L1 -->|"matched"| R1["Ada + her orders"]
-    L2 -->|"no match → NULLs"| R2["Linus + NULL order"]
-    R1 --> Out["LEFT JOIN result"]
+    L2 -->|"no match → NULLs"| R2["Linus + <code>NULL</code> order"]
+    R1 --> Out["<code>LEFT JOIN</code> result"]
     R2 --> Out
 ```
 

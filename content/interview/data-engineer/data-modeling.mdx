@@ -76,6 +76,16 @@ grain.
 
 ### How do you preserve history when a dimension attribute changes (SCD)?
 
+A Type 2 dimension answers "what was true then?" by adding rows rather than updating them, which needs three bookkeeping columns:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "customer_key,", label: "the surrogate key, new per version" },
+    { text: "valid_from, valid_to,", label: "the window this version was true" },
+    { text: "is_current", label: "the flag that finds today's row cheaply" },
+  ]}
+/>
+
 Use a **Slowly Changing Dimension (SCD)**:
 
 - **Type 1**, overwrite (no history).
@@ -444,6 +454,18 @@ A **measure** is a raw numeric column on a fact table (e.g., `revenue`, `quantit
 An **auto-increment integer** surrogate key is compact, fast to join, and naturally ordered, ideal for dimension tables in a warehouse. A **UUID** (128-bit) is globally unique across systems and generated client-side without a sequence, making it better for distributed systems where multiple sources insert concurrently. The trade-off: UUIDs are larger, slower to join, and fragment indexes more than integers.
 
 ### How do you model a many-to-many relationship between facts and dimensions?
+
+A bridge table carries the pair, and usually a weight so the fact is not double-counted:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "bridge(" },
+    { text: "fact_key,", label: "the fact side" },
+    { text: "dim_key,", label: "the dimension side" },
+    { text: "weight", label: "the allocation factor, summing to 1 per fact" },
+    { text: ")" },
+  ]}
+/>
 
 Use a **bridge table**: a separate table with one row per (fact, dimension) combination. For example, if an order can be associated with multiple promotions, the bridge table `order_promotion_bridge` holds `(order_key, promo_key)` pairs. The fact table joins to the bridge, which joins to the promotion dimension. A **weighting factor** column on the bridge can distribute additive measures proportionally across the associated dimension members.
 

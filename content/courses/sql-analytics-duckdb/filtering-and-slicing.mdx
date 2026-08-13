@@ -35,6 +35,17 @@ window. `BETWEEN` reads naturally and is **inclusive** on both ends. Here
 we slice the real diamonds file down to a specific shopping bracket:
 one-carat stones priced between \$4,000 and \$5,000.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "WHERE" },
+    { text: "price", label: "the column to bracket" },
+    { text: "BETWEEN" },
+    { text: "4000", label: "low end, included" },
+    { text: "AND" },
+    { text: "5000", label: "high end, also included" },
+  ]}
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Slice a price band and a carat band out of 53,940 diamonds"
@@ -63,6 +74,17 @@ everything in between. If you need to exclude an endpoint, use explicit
 </Callout>
 
 ## Membership with `IN`
+
+`IN` is a shorter `OR`, and the parentheses hold a list rather than a subquery here:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "WHERE" },
+    { text: "cut", label: "the column to test" },
+    { text: "IN", label: "true if it equals any of them" },
+    { text: "('Ideal', 'Premium')", label: "the list of accepted values" },
+  ]}
+/>
 
 When a column must match one of several values, `IN` is cleaner than a
 chain of `OR`s.
@@ -248,7 +270,7 @@ Filtering early is both a performance habit and a clarity habit:
 
 ```mermaid
 flowchart TD
-    Big[("10M rows")] --> W["WHERE early"]
+    Big[("10M rows")] --> W["<code>WHERE</code> early"]
     W --> Small[("10K relevant rows")]
     Small --> Cheap["Cheap, clear<br/>analysis"]
 ```

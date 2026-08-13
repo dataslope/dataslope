@@ -32,6 +32,18 @@ print(penguins.filter(pl.col("island") != "Biscoe").height)
 
 ## Combining conditions
 
+Python's `and` and `or` do not work on expressions. Polars uses the bitwise operators, and they bind tighter than comparison, so each side needs its own parentheses:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "df.filter(" },
+    { text: "(pl.col(\"mass\") > 4000)", label: "parenthesised, always" },
+    { text: "&", label: "and; use | for or, ~ for not" },
+    { text: "(pl.col(\"sex\") == \"male\")" },
+    { text: ")" },
+  ]}
+/>
+
 Several arguments to `filter()` are combined with AND. For anything
 else, use the operators.
 

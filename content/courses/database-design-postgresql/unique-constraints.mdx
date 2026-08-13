@@ -76,6 +76,14 @@ to one account."
 ## Single-column UNIQUE
 
 A **single-column UNIQUE** constraint protects one column by itself.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "email TEXT", label: "the column" },
+    { text: "NOT NULL", label: "it must be provided" },
+    { text: "UNIQUE", label: "and no two rows may share it" },
+  ]}
+/>
 Common examples include:
 
 - account email
@@ -187,8 +195,8 @@ have different jobs.
 
 ```mermaid
 flowchart TB
-    Key["No duplicates"] --> PK["PRIMARY KEY<br/>row identity<br/>not null<br/>one per table"]
-    Key --> UQ["UNIQUE<br/>alternate rule<br/>may be many per table"]
+    Key["No duplicates"] --> PK["<code>PRIMARY KEY</code><br/>row identity<br/>not null<br/>one per table"]
+    Key --> UQ["<code>UNIQUE</code><br/>alternate rule<br/>may be many per table"]
 ```
 
 A **primary key** is the table's official row identity. Other tables

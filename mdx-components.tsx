@@ -35,9 +35,10 @@
  * the route's client entry however it was imported. `lazyWidgets.ts` has the
  * full explanation; read it before moving a widget back into this file.
  *
- * `Figure`, `Chart`, `SvgLabel` and the `<Steps>` pair stay statically
- * imported on purpose: they are Server Components (or render no client code),
- * so they never reach the browser and splitting them would buy nothing.
+ * `Figure`, `Chart`, `SvgLabel`, the diagram primitives and the `<Steps>` pair
+ * stay statically imported on purpose: they are Server Components (or render
+ * no client code), so they never reach the browser and splitting them would
+ * buy nothing.
  */
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import { Step, Steps } from "fumadocs-ui/components/steps";
@@ -45,6 +46,12 @@ import type { MDXComponents } from "mdx/types";
 import { SvgLabel } from "@/app/_components/mdx/SvgLabel";
 import { Figure } from "@/app/_components/mdx/Figure";
 import { Chart } from "@/app/_components/mdx/Chart";
+import {
+  BoxModel,
+  CrcCard,
+  MemoryCells,
+  SyntaxBreakdown,
+} from "@/app/_components/mdx/diagrams";
 import { CalloutWithCodeTitle } from "@/app/_components/mdx/CalloutWithCodeTitle";
 import { reactDemoComponents } from "@/app/_components/mdx/reactDemoComponents";
 import { withSearchAnchor } from "@/app/_components/mdx/withSearchAnchor";
@@ -87,6 +94,13 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     IllustrationPrompt,
     Figure: withSearchAnchor(Figure),
     Chart: withSearchAnchor(Chart),
+    // Lesson diagrams drawn with real elements rather than box-drawing
+    // characters (see app/_components/mdx/diagrams.tsx for why that matters).
+    // Server Components with no client code, so they stay statically imported.
+    BoxModel,
+    MemoryCells,
+    SyntaxBreakdown,
+    CrcCard,
     LoadingAnimationsGallery,
     RuntimeLoadingStates,
     // Live, no-Run lesson widgets: <LivePreview> renders HTML/CSS in a

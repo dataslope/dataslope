@@ -147,6 +147,15 @@ FROM
 Sometimes you only care about the *distinct* values in a column.
 `SELECT DISTINCT` collapses repeated rows into unique ones:
 
+<SyntaxBreakdown
+  parts={[
+    { text: "SELECT" },
+    { text: "DISTINCT", label: "collapse repeats into one" },
+    { text: "dept", label: "the column whose distinct values you want" },
+    { text: "FROM employees;" },
+  ]}
+/>
+
 <SqlCodeBlock
   dialect="postgres"
   title="Unique departments only"

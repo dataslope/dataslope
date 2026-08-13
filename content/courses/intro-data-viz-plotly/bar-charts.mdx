@@ -76,6 +76,18 @@ anything be wrong? If yes, the order is data and sorting deletes it.
 
 ## The simplest bar chart
 
+Every Plotly Express call has the same shape: the data, then which column drives which visual channel.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "px.bar(" },
+    { text: "df,", label: "the data frame" },
+    { text: "x=\"country\",", label: "the categorical axis" },
+    { text: "y=\"pop\"", label: "the measured axis" },
+    { text: ")" },
+  ]}
+/>
+
 Before the code, one thing bars do for free that is easy to spend money on
 instead. When bars fall into groups, the spacing can say so on its own:
 

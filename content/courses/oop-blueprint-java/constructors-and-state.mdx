@@ -20,6 +20,14 @@ A constructor looks like a method but with two differences:
 1. It has the same name as the class.
 2. It has no return type.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "public", label: "who may call it" },
+    { text: "Person", label: "the class's own name, and no return type" },
+    { text: "(String name, int age)", label: "what a caller must supply" },
+  ]}
+/>
+
 When you write `new Person("Ada", 30)`, Java allocates a new `Person`
 on the heap and then *calls* the constructor on that fresh allocation
 to initialize it.

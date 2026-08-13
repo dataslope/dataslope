@@ -11,7 +11,7 @@ A **decorator** is just a function that takes another function and returns a new
 />
 
 <Callout type="info" title="Real-world ubiquity">
-Open any modern Python codebase and you'll see decorators everywhere: \`@app.route("/users")\` in Flask/FastAPI, \`@cache\` for memoization, \`@dataclass\` to auto-generate boilerplate, \`@staticmethod\` and \`@classmethod\` in classes, \`@timing\` and \`@retry\` in production services. Understanding decorators means understanding how most Python frameworks work under the hood.
+Open any modern Python codebase and you'll see decorators everywhere: `@app.route("/users")` in Flask/FastAPI, `@cache` for memoization, `@dataclass` to auto-generate boilerplate, `@staticmethod` and `@classmethod` in classes, `@timing` and `@retry` in production services. Understanding decorators means understanding how most Python frameworks work under the hood.
 </Callout>
 
 ## Closures recap
@@ -143,7 +143,7 @@ print(greet.__doc__)  # 'Return a greeting.' -- preserved!
 />
 
 <Callout type="warn" title="ALWAYS use functools.wraps">
-Tools, debuggers, and stack traces rely on \`__name__\`, \`__doc__\`, and \`__module__\`. Without \`@wraps(fn)\`, your wrapper will show up as "wrapper" in tracebacks, and introspection tools (like \`help()\`) will fail. This is the #1 decorator mistake beginners make.
+Tools, debuggers, and stack traces rely on `__name__`, `__doc__`, and `__module__`. Without `@wraps(fn)`, your wrapper will show up as "wrapper" in tracebacks, and introspection tools (like `help()`) will fail. This is the #1 decorator mistake beginners make.
 </Callout>
 
 ## A useful example: timing
@@ -225,9 +225,9 @@ Let's unpack what happens:
 <Callout type="error" title="Decorator-with-args gotcha">
 A decorator with arguments is a **factory** that returns a decorator. The nesting is:
 
-\`\`\`
+```text
 repeat(times) → decorator → wrapper
-\`\`\`
+```
 
 Forgetting the middle layer is a common mistake. If you see "TypeError: decorator() takes 1 positional argument but 2 were given", you likely forgot the factory pattern.
 </Callout>
@@ -293,7 +293,7 @@ The call stack is: `bracketed wrapper` → `excited wrapper` → original `greet
 />
 
 <Callout type="info" title="Order matters">
-Stacking decorators bottom-up can be counterintuitive. The decorator **closest** to the function definition runs **first** (wraps the original function), and decorators above it wrap the result. If order matters (e.g., a \`@cache\` decorator should wrap \`@retry\`, not the other way around), pay attention to the order.
+Stacking decorators bottom-up can be counterintuitive. The decorator **closest** to the function definition runs **first** (wraps the original function), and decorators above it wrap the result. If order matters (e.g., a `@cache` decorator should wrap `@retry`, not the other way around), pay attention to the order.
 </Callout>
 
 ## Class-based decorators
@@ -366,17 +366,17 @@ print(calc.add(2, 3))
 The decorator sees `self` as the first positional argument in `*args`. This works fine for simple decorators. For more advanced patterns (like caching with `self` awareness), use libraries like `functools.lru_cache` or `cachetools`.
 
 <Callout type="warn" title="@staticmethod and @classmethod order">
-If you stack \`@staticmethod\` or \`@classmethod\` with other decorators, they must be **outermost** (applied last):
+If you stack `@staticmethod` or `@classmethod` with other decorators, they must be **outermost** (applied last):
 
-\`\`\`python
+```python
 class Foo:
     @staticmethod
     @logged
     def bar():
         pass
-\`\`\`
+```
 
-Applying \`@staticmethod\` first (closest to the function) can cause errors because \`@staticmethod\` returns a descriptor, not a callable function.
+Applying `@staticmethod` first (closest to the function) can cause errors because `@staticmethod` returns a descriptor, not a callable function.
 </Callout>
 
 ## Built-in decorators worth knowing

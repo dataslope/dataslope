@@ -90,6 +90,16 @@ flowchart TD
 
 ## ArrayList: growable, generic
 
+The type argument is what removes the casts: the compiler knows what comes out because you said what goes in.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "List", label: "the interface, on the left" },
+    { text: "<String>", label: "what it holds" },
+    { text: "names = new ArrayList<>();", label: "the diamond infers it again" },
+  ]}
+/>
+
 In real code, you almost always reach for an **`ArrayList`**
 instead of a bare array. It can grow and shrink, has a rich set of
 operations, and is part of Java's broader **Collections Framework**.

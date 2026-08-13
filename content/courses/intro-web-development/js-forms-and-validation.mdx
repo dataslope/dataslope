@@ -14,6 +14,17 @@ and responds, all without leaving the page.
 
 ## The submit event and `preventDefault()`
 
+The default action is a full page navigation. Stopping it is what makes the handler worth writing:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "form.addEventListener(\"submit\"," },
+    { text: "(e) => {", label: "the event object carries the default" },
+    { text: "e.preventDefault();", label: "stop the page reloading" },
+    { text: "})" },
+  ]}
+/>
+
 By default, submitting a form reloads the page (a holdover from the
 1990s, when the server did everything). In a modern app you almost
 always stop that and handle the data in JavaScript:

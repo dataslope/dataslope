@@ -14,6 +14,16 @@ surprising behavior than any other single component.
 
 ## What a token is
 
+A tokenizer call is text in, integers out, and the model's vocabulary is what decides where the splits fall:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "encode(", label: "text in" },
+    { text: "\"unbelievable\"", label: "one word to you" },
+    { text: ")", label: "out come several token ids, not characters" },
+  ]}
+/>
+
 A token is a chunk of text that the vocabulary assigns a single id to.
 Not a character, not a word, something in between:
 

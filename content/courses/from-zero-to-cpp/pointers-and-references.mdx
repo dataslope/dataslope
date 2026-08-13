@@ -267,6 +267,17 @@ std::cout << p->x   << "\\n";   // same thing, idiomatic
 
 ## Const + pointers: the four shapes
 
+Read a pointer declaration right to left, and the position of `const` is what decides which half is frozen:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "const int", label: "the pointed-to int is const" },
+    { text: "*", label: "pointer to" },
+    { text: "const", label: "and the pointer itself is const" },
+    { text: "p;" },
+  ]}
+/>
+
 Mixing `const` with pointers trips up everybody at first. Read
 right-to-left:
 

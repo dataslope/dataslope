@@ -11,7 +11,7 @@ A Python install ships with a small standard library. Anything beyond that, NumP
 />
 
 <Callout type="warn" title="Never pip install into system Python">
-Without a virtual environment, \`pip install\` modifies your global Python installation. Two projects that need different versions of the same package cannot coexist. Worse, you risk breaking system tools that depend on specific versions. Every Python developer uses virtual environments. No exceptions.
+Without a virtual environment, `pip install` modifies your global Python installation. Two projects that need different versions of the same package cannot coexist. Worse, you risk breaking system tools that depend on specific versions. Every Python developer uses virtual environments. No exceptions.
 </Callout>
 
 This page is reference material; the commands below are intended to be run in your terminal on your local machine, not in the interactive code blocks.
@@ -74,7 +74,7 @@ flowchart TD
 Each virtual environment has its own Python interpreter copy (symlinked on Unix, copied on Windows) and its own `site-packages` directory. Activating a venv puts it first on your `PATH`, so `python` and `pip` point to that isolated environment.
 
 <Callout type="info" title="Real-world necessity">
-Every Python team uses virtual environments. Whether you're building a web API, a data pipeline, a machine learning model, or a command-line tool, you will create a venv (or use a modern tool like \`uv\` or \`poetry\` that manages venvs for you). Dependency isolation is non-negotiable in professional Python work.
+Every Python team uses virtual environments. Whether you're building a web API, a data pipeline, a machine learning model, or a command-line tool, you will create a venv (or use a modern tool like `uv` or `poetry` that manages venvs for you). Dependency isolation is non-negotiable in professional Python work.
 </Callout>
 
 ## Creating a virtual environment with `venv`
@@ -99,7 +99,7 @@ This creates a `.venv/` directory containing:
 - Activation scripts to modify your shell's `PATH`.
 
 <Callout type="success" title="Why .venv?">
-The name \`.venv\` is a convention. You can name it \`venv\`, \`env\`, or \`my-special-env\`, but \`.venv\` is standard because (1) the leading dot hides it in Unix file listings, and (2) most tools auto-detect it. Stick with \`.venv\` unless you have a reason not to.
+The name `.venv` is a convention. You can name it `venv`, `env`, or `my-special-env`, but `.venv` is standard because (1) the leading dot hides it in Unix file listings, and (2) most tools auto-detect it. Stick with `.venv` unless you have a reason not to.
 </Callout>
 
 ## Activating the environment
@@ -119,7 +119,7 @@ source .venv/bin/activate
 
 Your prompt will change to show the active environment:
 
-```
+```text
 (.venv) user@host:~/project$
 ```
 
@@ -175,7 +175,7 @@ pip freeze > requirements.txt
 
 This writes every installed package with an exact version:
 
-```
+```text
 certifi==2024.8.30
 charset-normalizer==3.4.0
 idna==3.10
@@ -192,14 +192,14 @@ pip install -r requirements.txt
 ```
 
 <Callout type="info" title="requirements.in vs requirements.txt">
-\`pip freeze\` lists **every** dependency, including transitive ones (dependencies of dependencies). Many teams maintain a shorter \`requirements.in\` with only top-level packages:
+`pip freeze` lists **every** dependency, including transitive ones (dependencies of dependencies). Many teams maintain a shorter `requirements.in` with only top-level packages:
 
-\`\`\`
+```text
 requests>=2.31
 flask>=3.0
-\`\`\`
+```
 
-Then use \`pip-tools\` (\`pip-compile requirements.in\`) or \`uv pip compile requirements.in\` to generate a fully locked \`requirements.txt\`. This keeps your source file readable while ensuring reproducibility.
+Then use `pip-tools` (`pip-compile requirements.in`) or `uv pip compile requirements.in` to generate a fully locked `requirements.txt`. This keeps your source file readable while ensuring reproducibility.
 </Callout>
 
 ## `.gitignore` your virtual environment
@@ -208,7 +208,7 @@ Then use \`pip-tools\` (\`pip-compile requirements.in\`) or \`uv pip compile req
 
 Add to `.gitignore`:
 
-```
+```text
 .venv/
 venv/
 env/
@@ -310,14 +310,14 @@ Most modern tools can read this file and install the listed dependencies.
 | Uninstall | `pip uninstall requests` |
 
 <Callout type="warn" title="Avoid --user">
-You may see advice to run \`pip install --user\`. Skip it. The \`--user\` flag installs packages into your home directory's \`site-packages\`, which is still global (shared across all your projects). Always work inside a virtual environment instead, it's cleaner, more portable, and more predictable.
+You may see advice to run `pip install --user`. Skip it. The `--user` flag installs packages into your home directory's `site-packages`, which is still global (shared across all your projects). Always work inside a virtual environment instead, it's cleaner, more portable, and more predictable.
 </Callout>
 
 ## Directory structure example
 
 After creating and activating a venv, your project might look like:
 
-```
+```text
 my-project/
 ├── .venv/                  # virtual environment (in .gitignore)
 │   ├── bin/                # activation scripts, python, pip

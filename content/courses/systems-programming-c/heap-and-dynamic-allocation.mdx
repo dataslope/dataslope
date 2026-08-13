@@ -70,6 +70,21 @@ flowchart TD
 
 ## Your first malloc
 
+Every heap allocation is the same three questions: how much, of what,
+and did it work.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "int *p =" },
+    { text: "malloc(", label: "ask the heap for bytes" },
+    { text: "n * sizeof(int)", label: "how many, never a hard-coded size" },
+    { text: ");" },
+  ]}
+/>
+
+The result is a pointer you own until you `free()` it, and it may be
+`NULL` if the request could not be met.
+
 <CodeBlock
   adapter="c"
   files={[
@@ -193,6 +208,18 @@ Prefer `calloc()` whenever you would otherwise call `malloc()` followed
 by `memset(p, 0, ...)`.
 
 ## `realloc()`: grow or shrink
+
+Never assign `realloc` straight back onto the pointer you passed in: if it fails it returns `NULL` and the original block is still yours to free.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "void *tmp =", label: "a temporary, always" },
+    { text: "realloc(" },
+    { text: "p,", label: "the existing block" },
+    { text: "n * sizeof *p", label: "the new total size, not the delta" },
+    { text: ");" },
+  ]}
+/>
 
 `realloc(p, new_size)` is the resizing primitive. It may:
 

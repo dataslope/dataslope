@@ -22,6 +22,15 @@ the end.
 *requires* an `ORDER BY` inside `OVER`, because numbering only makes sense
 once you have decided the order.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "ROW_NUMBER()", label: "takes no arguments; the OVER clause does the work" },
+    { text: "OVER (" },
+    { text: "ORDER BY amount DESC", label: "what number 1 means" },
+    { text: ") AS rn" },
+  ]}
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Number orders from biggest to smallest"
@@ -133,7 +142,7 @@ ORDER BY
 
 ```mermaid
 flowchart LR
-    P["PARTITION BY region"] --> W["West: 1, 2, 3"]
+    P["<code>PARTITION BY</code> region"] --> W["West: 1, 2, 3"]
     P --> E["East: 1, 2"]
     P --> N["North: 1"]
 ```
@@ -251,7 +260,7 @@ ORDER BY
 ```mermaid
 flowchart TB
     T["Two players tie at 100,<br/>two tie at 80"] --> RN["<code>ROW_NUMBER:<br/>1, 2, 3, 4, 5</code>"]
-    T --> R["RANK:<br/>1, 1, 3, 4, 4"]
+    T --> R["<code>RANK</code>:<br/>1, 1, 3, 4, 4"]
     T --> D["<code>DENSE_RANK:<br/>1, 1, 2, 3, 3</code>"]
 ```
 

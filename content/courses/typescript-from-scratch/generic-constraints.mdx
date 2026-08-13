@@ -68,6 +68,16 @@ graph TD
 
 One of the most useful constraints is `keyof`, which gives you the union of all keys of a type. Combined with `extends keyof`, you can write functions that safely access object properties.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "function getProperty<" },
+    { text: "T,", label: "the object's type, inferred at the call" },
+    { text: "K extends keyof T", label: "a key, but only one T actually has" },
+    { text: ">(obj: T, key: K):" },
+    { text: "T[K]", label: "the type stored under that key" },
+  ]}
+/>
+
 <Figure
   slug="tsx-generic-constraints-keyof-operator-inline-cutout"
   alt="A crate's set of compartment tags lifted off as a separate ring of keys"

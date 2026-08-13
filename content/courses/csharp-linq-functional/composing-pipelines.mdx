@@ -92,6 +92,16 @@ value, sum total." This is the heart of declarative code.
 
 ## Building custom operators with `yield`
 
+`yield return` turns a method into a state machine: it hands back one element and pauses, which is what makes the operator lazy.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "IEnumerable<T>", label: "the return type that makes it possible" },
+    { text: "MyWhere(...)" },
+    { text: "{ ... yield return x; }", label: "produce one element, then pause here" },
+  ]}
+/>
+
 You're not limited to combining existing operators. `yield return`
 lets you implement entirely new ones, and they remain lazy.
 

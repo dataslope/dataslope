@@ -16,6 +16,17 @@ where they belong.
 
 ## useEffect basics
 
+The second argument is the whole of the API: it decides *when* the effect runs again.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "useEffect(" },
+    { text: "() => { ... }", label: "the effect, run after render" },
+    { text: ", [userId]", label: "re-run only when this changes; [] means once" },
+    { text: ")" },
+  ]}
+/>
+
 `useEffect(fn, deps)` runs `fn` *after* the component renders. The
 **dependency array** controls how often:
 

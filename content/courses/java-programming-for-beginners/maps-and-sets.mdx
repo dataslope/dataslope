@@ -22,6 +22,16 @@ Once you have these two in your toolbox, a huge fraction of
 
 ## `Set`: uniqueness and membership
 
+A `Set` is defined by two operations being cheap, and both depend on the element's `equals` and `hashCode`:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "Set<String> seen", label: "no duplicates, by equals" },
+    { text: "= new HashSet<>();" },
+    { text: "seen.contains(x)", label: "O(1) average, which is the point" },
+  ]}
+/>
+
 <CodeBlock
   adapter="java"
   files={[

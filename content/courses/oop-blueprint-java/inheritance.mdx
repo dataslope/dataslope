@@ -19,6 +19,18 @@ is the right tool, not just how to type `extends`.
 
 ## A first family
 
+Inheritance is also one word in the header, and it means something
+different from `implements`: the subclass gets the parent's code, not
+just its shape.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "class Dog", label: "the subclass" },
+    { text: "extends", label: "inherits fields and methods" },
+    { text: "Animal", label: "the one parent Java allows" },
+  ]}
+/>
+
 ```mermaid
 classDiagram
     class Animal {

@@ -16,6 +16,17 @@ sometimes lies about it.
 
 ## The three families of color scales
 
+Which argument you reach for is decided by the column's type, not by taste:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "px.scatter(df, x=..., y=...," },
+    { text: "color=\"depth\",", label: "the column to color by" },
+    { text: "color_continuous_scale=\"Viridis\"", label: "sequential, because depth is continuous" },
+    { text: ")" },
+  ]}
+/>
+
 There are essentially three families. Knowing which family fits
 which kind of data is 80% of the battle.
 

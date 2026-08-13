@@ -18,6 +18,16 @@ them.
 
 ## First, looking backward: `shift()`
 
+`shift` moves the values, not the index, which is what makes it safe: row *t* sees only what was known at *t-1*.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "s.shift(" },
+    { text: "1", label: "positive means backward in time" },
+    { text: ")", label: "row t now holds the value from t-1" },
+  ]}
+/>
+
 Almost every time series operation needs to compare *now* to *then*.
 `shift(k)` moves the data forward by `k` steps, so each row lines up with a
 value from its own past (a **lag**). `shift(-k)` does the reverse (a
@@ -74,6 +84,17 @@ but must never become an input your model uses to predict the present.
 </Callout>
 
 ## The moving average: `rolling()`
+
+`rolling` only describes the window. Nothing is computed until you name the statistic:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "s.rolling(" },
+    { text: "window=7,", label: "how many observations in the window" },
+    { text: "min_periods=7", label: "how many it needs before producing a value" },
+    { text: ").mean()", label: "the statistic; rolling alone computes nothing" },
+  ]}
+/>
 
 A **rolling** (or *moving*) statistic slides a fixed-size window along the
 series and computes a summary at each stop. The **moving average**,

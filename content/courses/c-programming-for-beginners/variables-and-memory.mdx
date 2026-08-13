@@ -64,12 +64,13 @@ Three things happen on the line `int age = 30;`:
 
 After the two declarations above, memory might look like:
 
-```text
-Address      Variable          Value (decimal)
-----------   ---------------   --------------
-0x7ffc...0   age               30
-0x7ffc...4   year_of_birth     1995
-```
+<MemoryCells
+  cells={[
+    { name: "age", value: "30", note: "0x7ffc...0" },
+    { name: "year_of_birth", value: "1995", note: "0x7ffc...4" },
+  ]}
+  caption="Two `int` boxes at consecutive addresses, four bytes apart."
+/>
 
 Each box is 4 bytes. The actual addresses are not predictable across
 runs, they depend on the OS, the architecture, and security
@@ -114,12 +115,14 @@ When `score` appears on the **left** of `=`, you are **writing** to
 it. When it appears on the **right**, or in an expression, you are
 **reading** from it.
 
-```text
-score = score + 5;
-  ^         ^
-  |         +-- read
-  +------------ write
-```
+<SyntaxBreakdown
+  parts={[
+    { text: "score", label: "write" },
+    { text: "=" },
+    { text: "score", label: "read" },
+    { text: "+ 5;" },
+  ]}
+/>
 
 ## Naming variables
 
@@ -148,8 +151,8 @@ int return;           // ERROR: keyword
 ```
 
 <Callout type="info" title="A style note">
-The C ecosystem traditionally uses \`snake_case\` for variable and
-function names (\`player_score\`, \`compute_total\`). Pick a style and
+The C ecosystem traditionally uses `snake_case` for variable and
+function names (`player_score`, `compute_total`). Pick a style and
 stay consistent within a project. Consistency matters more than the
 exact convention.
 </Callout>

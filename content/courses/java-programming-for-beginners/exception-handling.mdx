@@ -150,6 +150,16 @@ silencing it.
 
 ## Declaring with `throws`
 
+`throws` on the signature is a promise to the caller, not an action. It is what makes a checked exception checked:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "void load(String p)" },
+    { text: "throws", label: "callers must handle or re-declare it" },
+    { text: "IOException", label: "which exception may escape" },
+  ]}
+/>
+
 If a method can throw a *checked* exception that it does not
 catch, the method must declare it:
 
@@ -195,6 +205,16 @@ Notice the **wrapping** technique: we catch the standard library's
 details up to callers.
 
 ## try-with-resources
+
+The resource goes in the parentheses, and that is the whole difference: Java closes it for you, even if the block throws.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "try (", label: "the resource block" },
+    { text: "var in = new FileReader(p)", label: "anything AutoCloseable" },
+    { text: ")", label: "closed automatically, in reverse order" },
+  ]}
+/>
 
 Many resources (files, sockets, database connections) must be
 **closed** when you're done with them. The pattern used to look
@@ -307,7 +327,7 @@ a normal end of input, use a `boolean hasNext()` instead.
 
 Expected output:
 
-```
+```text
 parsed 42
 bad input: not a number: oops
 bad input: input was null

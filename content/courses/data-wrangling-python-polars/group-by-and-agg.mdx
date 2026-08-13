@@ -27,6 +27,19 @@ flowchart TD
 
 ## The basic shape
 
+A grouped Polars query is two calls: the keys, then the expressions
+computed inside each group.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "penguins.group_by(" },
+    { text: '"species")', label: "one output row per value here" },
+    { text: ".agg(" },
+    { text: 'pl.col("body_mass_g").mean()', label: "computed inside each group" },
+    { text: ")" },
+  ]}
+/>
+
 <CodeBlock
   adapter="python"
   datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}

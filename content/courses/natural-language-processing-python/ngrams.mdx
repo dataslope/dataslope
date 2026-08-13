@@ -43,6 +43,16 @@ bigrams).
 NLTK gives you `ngrams(tokens, n)`, which yields the windows as tuples. It
 returns a generator, so wrap it in `list(...)` to see or reuse the results.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "list(", label: "the result is a generator, so drain it" },
+    { text: "ngrams(" },
+    { text: "tokens,", label: "the words, already tokenized" },
+    { text: "2", label: "the window width; 2 is a bigram" },
+    { text: "))" },
+  ]}
+/>
+
 <Figure
   slug="nlp-ngrams-inline-cutout"
   alt="A strip of word tiles with a two-tile window sliding along it, each pair it frames dropping into its own tray"

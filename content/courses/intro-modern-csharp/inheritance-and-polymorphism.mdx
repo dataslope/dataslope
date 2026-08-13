@@ -81,6 +81,16 @@ shared parts live at the top.
 
 ## Overriding behavior with `virtual` and `override`
 
+C# makes you say it twice, once on each side, which is what stops an accidental override:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "public virtual", label: "on the parent: this may be replaced" },
+    { text: "string Speak()", label: "the signature both sides share" },
+    { text: "public override", label: "on the child: this replaces it deliberately" },
+  ]}
+/>
+
 Sometimes a derived class needs to **change** how a base method
 works, not just add new methods. The base marks the method
 `virtual`; the derived class marks its replacement `override`.

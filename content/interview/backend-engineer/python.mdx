@@ -174,7 +174,16 @@ Python syntax and built-ins, without inheritance from a special base class.
 
 A decorator is a callable that wraps another function, adding behavior
 before and/or after the call. It is syntactic sugar for
-`fn = decorator(fn)`. A correct decorator preserves the wrapped
+`fn = decorator(fn)`.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "@timer", label: "the decorator, applied last-in first-out" },
+    { text: "def slow(n):", label: "the function it replaces" },
+  ]}
+/>
+
+A correct decorator preserves the wrapped
 function's metadata using `functools.wraps`. The `timer` decorator below
 wraps `fn`, records the elapsed time around the call, and returns the
 original result unchanged.

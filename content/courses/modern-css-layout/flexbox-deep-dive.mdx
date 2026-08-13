@@ -140,7 +140,18 @@ item can shove its siblings to the far end.
 
 ## `flex`: grow, shrink, basis
 
-Each item's `flex` shorthand controls how it resizes:
+Each item's `flex` shorthand is three values in a fixed order:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "flex:" },
+    { text: "1", label: "grow, share of the leftover space" },
+    { text: "1", label: "shrink, how readily it gives space back" },
+    { text: "200px;", label: "basis, its size before either happens" },
+  ]}
+/>
+
+Taken one at a time:
 
 - **`flex-grow`**, how much of the *leftover* space this item takes
   (0 = don't grow).

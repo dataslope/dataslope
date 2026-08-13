@@ -25,6 +25,33 @@ describe("authored prose style", () => {
     expect(violations, `prose violations:\n${report}`).toEqual([]);
   });
 
+  // A callout body is markdown, not a template literal, so the escape that is
+  // required inside `markdown={`…`}` prints the backtick here instead.
+  it("flags an escaped backtick in a callout body", () => {
+    const src = [
+      '<Callout type="info" title="T">',
+      "Flask uses \\`@app.route\\` for this.",
+      "</Callout>",
+    ].join("\n");
+    expect(lintSource(src, "x.mdx", "mdx").map((v: { rule: string }) => v.rule)).toEqual([
+      "escaped-backtick",
+    ]);
+  });
+
+  it("leaves an escaped backtick in a template literal prop alone", () => {
+    const src = "<MultipleChoice\n  markdown={`What does \\`len()\\` return?`}\n/>";
+    expect(lintSource(src, "x.mdx", "mdx")).toEqual([]);
+  });
+
+  it("leaves a plain backtick in a callout body alone", () => {
+    const src = [
+      '<Callout type="info" title="T">',
+      "Flask uses `@app.route` for this.",
+      "</Callout>",
+    ].join("\n");
+    expect(lintSource(src, "x.mdx", "mdx")).toEqual([]);
+  });
+
   // The rules that keep the linter useful rather than noisy.
   it("flags an em dash used as punctuation in prose", () => {
     expect(lintSource("A clause — an aside.", "x.mdx", "mdx")).toHaveLength(1);

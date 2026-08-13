@@ -197,6 +197,18 @@ print(round(3.5))  # 4
 
 ## Comparing floats
 
+Equality is the wrong tool. `isclose` asks the question you actually mean, and it has two tolerances because the right one depends on scale:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "math.isclose(" },
+    { text: "a, b,", label: "the two values" },
+    { text: "rel_tol=1e-9,", label: "relative, which scales with the numbers" },
+    { text: "abs_tol=0.0", label: "absolute, which is what saves you near zero" },
+    { text: ")" },
+  ]}
+/>
+
 You should almost never compare floats with `==`. Use a tolerance
 instead. NumPy ships a helper that lets you specify both *absolute*
 and *relative* tolerance:

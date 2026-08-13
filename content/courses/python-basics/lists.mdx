@@ -156,6 +156,18 @@ except IndexError as e:
 
 Slices let you extract a sublist with `[start:stop:step]`. The `stop` index is **exclusive**.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "xs[" },
+    { text: "1", label: "start here, included" },
+    { text: ":" },
+    { text: "4", label: "stop here, excluded" },
+    { text: ":" },
+    { text: "2", label: "take every nth item" },
+    { text: "]" },
+  ]}
+/>
+
 <CodeBlock
   adapter="python"
   files={[

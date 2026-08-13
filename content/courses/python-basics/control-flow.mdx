@@ -309,6 +309,16 @@ if a < b < c:
 
 ## `match` statement (Python 3.10+)
 
+`match` is structural, not a switch on equality: a case can bind names out of the shape it matched.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "match point:", label: "the subject" },
+    { text: "case (0, y):", label: "a pattern that also binds y" },
+    { text: "case _:", label: "the wildcard, matching anything left" },
+  ]}
+/>
+
 `match` is **structural pattern matching**, not just a `switch`. It matches the *shape* of data and can bind values from inside it.
 
 <Figure

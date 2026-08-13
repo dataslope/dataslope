@@ -49,6 +49,16 @@ A CTE pulls each step out, names it, and stacks the steps **top to
 bottom** in the order you think about them. The same logic becomes a
 readable pipeline:
 
+<SyntaxBreakdown
+  parts={[
+    { text: "WITH" },
+    { text: "paid", label: "name the first step" },
+    { text: "AS (SELECT ... )", label: "the query it stands for" },
+    { text: ", by_region AS (SELECT ... FROM paid)", label: "the next step, reading the one above" },
+    { text: "SELECT * FROM by_region;", label: "the query that finishes the job" },
+  ]}
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="The same analysis as a readable pipeline"
@@ -128,8 +138,8 @@ month later and still understand.
 
 ```mermaid
 flowchart TD
-    A["WITH paid<br/>(filter)"] --> B["<code>per_region</code><br/>(aggregate)"]
-    B --> C["final SELECT<br/>(filter + sort)"]
+    A["<code>WITH</code> paid<br/>(filter)"] --> B["<code>per_region</code><br/>(aggregate)"]
+    B --> C["final <code>SELECT</code><br/>(filter + sort)"]
 ```
 
 ## Why CTEs matter for analysis specifically

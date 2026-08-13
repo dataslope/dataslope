@@ -82,28 +82,28 @@ Let's trace what the stack looks like at each step.
 
 **Just inside `main`, after `x = 4; y = 5;`:**
 
-```
+```text
 [ main: x=4, y=5 ]   <- top of stack
 ```
 
 **Right after the call to `add_then_triple(4, 5)`, before any of
 its code runs:**
 
-```
+```text
 [ add_then_triple: a=4, b=5, sum=?, out=? ]
 [ main:            x=4, y=5,            z=? ]
 ```
 
 **Inside `add_then_triple`, after `int sum = a + b;`:**
 
-```
+```text
 [ add_then_triple: a=4, b=5, sum=9, out=? ]
 [ main:            x=4, y=5,            z=? ]
 ```
 
 **Right after calling `triple(9)`:**
 
-```
+```text
 [ triple:          n=9, t=? ]
 [ add_then_triple: a=4, b=5, sum=9, out=? ]
 [ main:            x=4, y=5,            z=? ]
@@ -111,7 +111,7 @@ its code runs:**
 
 **Inside `triple`, after `int t = n * 3;`:**
 
-```
+```text
 [ triple:          n=9, t=27 ]
 [ add_then_triple: a=4, b=5, sum=9, out=? ]
 [ main:            x=4, y=5,            z=? ]
@@ -120,14 +120,14 @@ its code runs:**
 **After `return t;`** (the `triple` frame is popped, the value `27`
 is delivered to the caller):
 
-```
+```text
 [ add_then_triple: a=4, b=5, sum=9, out=27 ]
 [ main:            x=4, y=5,            z=? ]
 ```
 
 **After `return out;`** (the `add_then_triple` frame is popped):
 
-```
+```text
 [ main: x=4, y=5, z=27 ]
 ```
 

@@ -107,6 +107,18 @@ variable.
 
 ## Conditional columns with `np.where()`
 
+`np.where` is a vectorised if/else: three arrays in, one out, elementwise.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "np.where(" },
+    { text: "df.age >= 18,", label: "the condition, elementwise" },
+    { text: "\"adult\",", label: "value where it is true" },
+    { text: "\"minor\"", label: "value where it is false" },
+    { text: ")" },
+  ]}
+/>
+
 `np.where(condition, value_if_true, value_if_false)` is a
 vectorized ternary.
 

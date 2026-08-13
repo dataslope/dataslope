@@ -153,6 +153,15 @@ On a non-numeric column, it returns count / unique / top / freq.
 `.agg` lets you compute several aggregations in one go, getting
 back a Series or DataFrame of results.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "df.groupby(" },
+    { text: '"department")', label: "one output row per value here" },
+    { text: '["salary"]', label: "the column to summarise" },
+    { text: '.agg(["mean", "max"])', label: "one output column per aggregation" },
+  ]}
+/>
+
 <Figure
   slug="pandas-aggregation-basics-inline-cutout"
   alt="One column of chips tipped into a funnel and leaving as a single block on the tray below"

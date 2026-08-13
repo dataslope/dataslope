@@ -120,6 +120,16 @@ difference it makes.
 
 ## `transform`: move without disturbing layout
 
+Transforms apply in the order written, and the order changes the result: rotating then translating is not translating then rotating.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "transform:" },
+    { text: "translateX(10px)", label: "applied first" },
+    { text: "rotate(45deg);", label: "then this, about the already-moved origin" },
+  ]}
+/>
+
 `transform` (translate, scale, rotate, skew) is the property to
 animate for performance, it doesn't trigger layout, so it stays smooth:
 

@@ -183,9 +183,9 @@ A table has both **structure** and **contents**.
 flowchart LR
     T["Table: pets"] --> S["Schema<br/>column names and declared types"]
     T --> D["Data<br/>actual rows and values"]
-    S --> S1["id INTEGER PRIMARY KEY"]
-    S --> S2["name TEXT"]
-    S --> S3["age INTEGER"]
+    S --> S1["id <code>INTEGER PRIMARY KEY</code>"]
+    S --> S2["name <code>TEXT</code>"]
+    S --> S3["age <code>INTEGER</code>"]
     D --> D1["1, Mochi, cat, 3"]
     D --> D2["2, Pixel, dog, 5"]
 ```
@@ -218,7 +218,7 @@ order unless you ask for an order.
 ```mermaid
 flowchart TD
     TABLE["Table rows<br/>stored without a promised order"] --> QUERY["Need a sorted result?"]
-    QUERY --> ORDER["Use ORDER BY"]
+    QUERY --> ORDER["Use <code>ORDER BY</code>"]
 ```
 
 When order matters, use `ORDER BY`. Otherwise, do not assume the

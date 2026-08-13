@@ -148,6 +148,16 @@ SELECT user_id FROM legacy_users;
 
 `LAG(col, n)` returns the value of `col` from `n` rows **before** the current row within the partition; `LEAD(col, n)` looks `n` rows **ahead**. Both accept an optional default for when the offset falls outside the partition. They are commonly used to compute period-over-period differences without a self-join.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "LAG(" },
+    { text: "revenue,", label: "the column to reach back for" },
+    { text: "1,", label: "how many rows back" },
+    { text: "0", label: "what to use at the partition edge" },
+    { text: ") OVER (ORDER BY order_date)", label: "what before means" },
+  ]}
+/>
+
 The query below pulls the prior day's `revenue` from `daily_revenue` with
 `LAG(revenue, 1, 0)` and subtracts it to produce a `delta` column.
 
@@ -198,6 +208,16 @@ ORDER BY user_id, order_date;`}
 ### How do you compute a 7-day moving average?
 
 Use a bounded window frame covering the 6 preceding rows plus the current one:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "AVG(daily_value)", label: "what to average" },
+    { text: "OVER (ORDER BY event_date", label: "what preceding means" },
+    { text: "ROWS BETWEEN 6 PRECEDING", label: "start of the window" },
+    { text: "AND CURRENT ROW", label: "end of the window" },
+    { text: ")" },
+  ]}
+/>
 
 ```sql
 SELECT

@@ -65,6 +65,17 @@ what makes everything else in this chapter possible.
 
 ## Functions that take functions: the classic combinators
 
+The signature of a higher-order function has a function *inside* one of its parameter types, which is the whole definition:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "map<A, B>(" },
+    { text: "xs: A[],", label: "the data" },
+    { text: "f: (a: A) => B", label: "a parameter that is itself a function" },
+    { text: "): B[]", label: "the element type changes with it" },
+  ]}
+/>
+
 The three you already know:
 
 <CodeBlock

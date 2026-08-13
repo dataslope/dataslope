@@ -20,6 +20,16 @@ interface called `Noisy` because all three can make a sound.
 
 ## A first interface
 
+A class promises to satisfy an interface with one word in its header:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "class Dog", label: "the concrete class" },
+    { text: "implements", label: "the promise" },
+    { text: "Noisy", label: "the contract it must now satisfy in full" },
+  ]}
+/>
+
 ```mermaid
 classDiagram
     class Noisy {

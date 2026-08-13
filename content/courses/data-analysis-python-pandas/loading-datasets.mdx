@@ -102,6 +102,18 @@ where the data is a file on disk, not a URL.
 
 ## Common `read_csv()` options
 
+The defaults are right often enough that the options are what you reach for when they are not:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "pd.read_csv(path," },
+    { text: "parse_dates=[\"day\"],", label: "read these as timestamps, not text" },
+    { text: "na_values=[\"NA\"],", label: "what counts as missing" },
+    { text: "dtype={\"zip\": str}", label: "stop a leading zero being lost" },
+    { text: ")" },
+  ]}
+/>
+
 `pd.read_csv()` has dozens of parameters, but you will use only a
 handful in real life:
 

@@ -126,17 +126,17 @@ Notice three changes:
 
 Every single interface in the framework grew type parameters:
 
-```
-Iterable      → Iterable<E>
-Collection    → Collection<E>
-List          → List<E>
-Set           → Set<E>
-Queue         → Queue<E>
-Map           → Map<K, V>
-Iterator      → Iterator<E>
-Comparable    → Comparable<T>
-Comparator    → Comparator<T>
-```
+| Before Java 5 | After          |
+| ------------- | -------------- |
+| `Iterable`    | `Iterable<E>`  |
+| `Collection`  | `Collection<E>`|
+| `List`        | `List<E>`      |
+| `Set`         | `Set<E>`       |
+| `Queue`       | `Queue<E>`     |
+| `Map`         | `Map<K, V>`    |
+| `Iterator`    | `Iterator<E>`  |
+| `Comparable`  | `Comparable<T>`|
+| `Comparator`  | `Comparator<T>`|
 
 When you write `Map<String, Customer>`, the compiler now knows that
 `map.get("ada")` returns a `Customer`, not an `Object`. That single

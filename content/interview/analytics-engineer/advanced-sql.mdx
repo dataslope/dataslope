@@ -28,9 +28,22 @@ same result set.
 
 `PARTITION BY` splits rows into independent groups, `ORDER BY` sequences rows
 inside each partition, and the **frame** (`ROWS`/`RANGE BETWEEN ...`) bounds
-which rows feed the calculation. Omit `PARTITION BY` and the whole result is one
-partition; omit the frame and ranking functions still work, but running
-aggregates default to the partition-so-far.
+which rows feed the calculation:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "SUM(amount)" },
+    { text: "OVER (" },
+    { text: "PARTITION BY region", label: "independent groups" },
+    { text: "ORDER BY day", label: "sequence inside each group" },
+    { text: "ROWS 6 PRECEDING", label: "the frame that bounds the calculation" },
+    { text: ")" },
+  ]}
+/>
+
+Omit `PARTITION BY` and the whole result is one partition; omit the frame and
+ranking functions still work, but running aggregates default to the
+partition-so-far.
 
 ### Explain `ROW_NUMBER` vs `RANK` vs `DENSE_RANK`.
 
@@ -91,10 +104,29 @@ filters raw rows and `HAVING` filters aggregated groups. Logical order is
 `WHERE` → `GROUP BY`/`HAVING` → window functions → `QUALIFY`. Without it you must
 wrap the window function in a subquery or CTE and filter in an outer query.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "WHERE status = 'paid'", label: "filters raw rows" },
+    { text: "HAVING SUM(amount) > 0", label: "filters aggregated groups" },
+    { text: "QUALIFY rn = 1", label: "filters on the window result" },
+  ]}
+/>
+
 ### What is a CTE, and when do you prefer it over a subquery?
 
 A Common Table Expression (`WITH name AS (...)`) is a named, inline result set
-you reference later in the same statement. Prefer CTEs when logic is reused,
+you reference later in the same statement.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "WITH" },
+    { text: "recent", label: "the name you choose" },
+    { text: "AS (SELECT ... )", label: "the query it stands for" },
+    { text: "SELECT * FROM recent", label: "referenced like a table" },
+  ]}
+/>
+
+Prefer CTEs when logic is reused,
 deeply nested, or benefits from being read top-to-bottom as named steps. A
 scalar or one-off filter is often clearer as a plain subquery. CTEs improve
 readability; they do not guarantee materialization or a performance change.
@@ -162,6 +194,16 @@ peer group and picks up rows that sit *after* the current one:
 
 ### How do you compute a period-over-period change?
 
+`LAG` reaches back within the partition, so the comparison never needs a self-join:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "revenue -" },
+    { text: "LAG(revenue)", label: "the value one period back" },
+    { text: "OVER (PARTITION BY region ORDER BY month)", label: "back within this region, by month" },
+  ]}
+/>
+
 Use `LAG` (previous row) or `LEAD` (next row) to pull the comparison value onto
 the current row, then subtract. Below, month-over-month change is
 `revenue - LAG(revenue) OVER (ORDER BY month)`; the first month is `NULL`
@@ -204,6 +246,18 @@ of daily signups silently skips days that had none, distorting trends and
 moving averages.
 
 ### How do you generate a series of dates in DuckDB?
+
+Three arguments: where to start, where to stop, and the step, given as an interval:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "generate_series(" },
+    { text: "DATE '2024-01-01',", label: "start, inclusive" },
+    { text: "DATE '2024-12-31',", label: "end, inclusive" },
+    { text: "INTERVAL 1 DAY", label: "the step" },
+    { text: ")" },
+  ]}
+/>
 
 `generate_series(start, stop, INTERVAL 1 DAY)` produces every date in the range;
 cast to `DATE` if you seeded from `DATE` bounds. Below it fills the spine from

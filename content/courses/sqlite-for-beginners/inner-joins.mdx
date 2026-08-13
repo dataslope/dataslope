@@ -17,7 +17,7 @@ flowchart LR
         R1["order for Ada"]
         R2["order for missing customer"]
     end
-    L1 -->|"matches"| Out["INNER JOIN result"]
+    L1 -->|"matches"| Out["<code>INNER JOIN</code> result"]
     R1 -->|"matches"| Out
     L2 -.-> X["no result row"]
     R2 -.-> X
@@ -155,6 +155,17 @@ ORDER BY
 You can write `INNER JOIN` when you want to be extra clear, especially near outer joins.
 
 ## Choosing the matching columns
+
+The `ON` clause is where a join is usually got wrong: it must pair the foreign key with the key it references.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "JOIN customers", label: "the second table" },
+    { text: "ON", label: "how rows are paired" },
+    { text: "orders.customer_id", label: "the foreign key" },
+    { text: "= customers.id", label: "the key it points at" },
+  ]}
+/>
 
 The most common inner join condition is:
 

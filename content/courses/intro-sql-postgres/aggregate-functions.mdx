@@ -48,6 +48,16 @@ The five core aggregates cover most needs:
 `COUNT(*)` counts rows. Run it and notice the result is a single row
 with a single number, the whole table collapsed to a count:
 
+<SyntaxBreakdown
+  parts={[
+    { text: "SELECT" },
+    { text: "COUNT", label: "which aggregate" },
+    { text: "(*)", label: "over what; * means the rows themselves" },
+    { text: "AS headcount", label: "name the single number" },
+    { text: "FROM employees;" },
+  ]}
+/>
+
 <SqlCodeBlock
   dialect="postgres"
   title="How many employees are there?"
@@ -172,8 +182,8 @@ WHERE
 
 ```mermaid
 flowchart TD
-    T[("<code>employees</code>")] --> W["WHERE<br/><code>dept = 'Engineering'</code>"]
-    W --> A["AVG(salary)"]
+    T[("<code>employees</code>")] --> W["<code>WHERE</code><br/><code>dept = 'Engineering'</code>"]
+    W --> A["<code>AVG(salary)</code>"]
     A --> R["one number"]
 ```
 

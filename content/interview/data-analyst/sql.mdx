@@ -164,6 +164,15 @@ multiple times**, making complex logic easier to read and debug. Recursive
 CTEs (with `RECURSIVE`) can also traverse hierarchical data, which
 subqueries cannot.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "WITH" },
+    { text: "active_users", label: "the name you choose" },
+    { text: "AS (SELECT ... )", label: "the query it stands for" },
+    { text: "SELECT * FROM active_users", label: "referenced like a table, as often as you like" },
+  ]}
+/>
+
 ```sql
 WITH active_users AS (
   SELECT id, name FROM users WHERE status = 'active'
@@ -209,6 +218,16 @@ FROM employees;
 window calculation for each partition. It is analogous to `GROUP BY` for
 the window frame: rows in different partitions are computed independently.
 Omitting `PARTITION BY` makes the entire result set one window.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "RANK()", label: "the window function" },
+    { text: "OVER (" },
+    { text: "PARTITION BY department", label: "restart the ranking per department" },
+    { text: "ORDER BY salary DESC", label: "what rank 1 means" },
+    { text: ")" },
+  ]}
+/>
 
 ```sql
 SELECT

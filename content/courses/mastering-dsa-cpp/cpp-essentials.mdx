@@ -103,6 +103,18 @@ Both `a` and `b` print as 11 and 21, two roads to the same mutation. Notice that
 
 ## `const` and `const&` parameter passing
 
+Two separate decisions, written next to each other: how the argument travels, and whether the function may change it.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "void print(" },
+    { text: "const", label: "the function will not modify it" },
+    { text: "std::string", label: "the type" },
+    { text: "&", label: "passed by reference, so nothing is copied" },
+    { text: "s)" },
+  ]}
+/>
+
 Use `const` when a value should not change. Pass large objects as `const&` to avoid copying while promising not to modify them. This combination, "give me cheap access, and I swear not to touch it", is the single most common parameter style in this course, so it is worth seeing once in full:
 
 <CodeBlock
@@ -184,6 +196,16 @@ int main() {
 
 ## Function templates
 
+The template header declares the placeholder; everything after it is an ordinary function that uses it:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "template <typename T>", label: "declare the placeholder type" },
+    { text: "T", label: "the return type, using it" },
+    { text: "max(T a, T b)", label: "and the parameters, using it too" },
+  ]}
+/>
+
 Templates let one function work for many types while still being checked and optimized at compile time.
 
 <CodeBlock
@@ -203,6 +225,16 @@ int main() {
 />
 
 ## Lambda expressions
+
+A lambda is three brackets in a row, and each pair means something different:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "[&]", label: "the capture list: what it may see from outside" },
+    { text: "(int x)", label: "the parameters" },
+    { text: "{ return x * k; }", label: "the body" },
+  ]}
+/>
 
 A lambda is an inline function object, a way to hand a tiny rule to an algorithm without naming a separate function. The most common DSA use is custom ordering: `std::sort()` accepts a comparator that answers "should `a` come before `b`?" Below, the lambda `[](int a, int b) { return a > b; }` says "bigger first," flipping the sort to descending order.
 

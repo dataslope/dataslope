@@ -26,7 +26,7 @@ protecting the meaning of your data.
 
 ```mermaid
 flowchart TD
-    W["Write request<br/>INSERT or UPDATE"] --> C{"Constraint<br/>check"}
+    W["Write request<br/>INSERT or <code>UPDATE</code>"] --> C{"Constraint<br/>check"}
     C -->|passes| A["Accept row<br/>store data"]
     C -->|fails| R["Reject write<br/>return error"]
 ```

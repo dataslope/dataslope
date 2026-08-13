@@ -159,6 +159,18 @@ NaN so they are visibly missing instead of quietly gone.
 
 ## Building a timeline from scratch: `date_range()`
 
+You give it any two of start, end and periods, plus the spacing:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "pd.date_range(" },
+    { text: "\"2024-01-01\",", label: "the start" },
+    { text: "periods=52,", label: "how many stamps" },
+    { text: "freq=\"W\"", label: "the spacing between them" },
+    { text: ")" },
+  ]}
+/>
+
 When you need a regular grid of timestamps, for simulated data, for a
 forecast horizon, or to reindex onto a clean calendar, `pd.date_range()`
 generates one. The `freq` argument sets the spacing.

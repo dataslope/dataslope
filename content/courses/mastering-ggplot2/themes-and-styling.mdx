@@ -98,6 +98,17 @@ Other built-ins include `theme_bw()`, `theme_light()`, and
 
 ## Fine control with theme()
 
+`theme()` takes element functions, and which one you use depends on what kind of thing you are styling:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "theme(" },
+    { text: "axis.text.x =", label: "which part of the plot" },
+    { text: "element_text(angle = 45)", label: "an element function matching its kind" },
+    { text: ")" },
+  ]}
+/>
+
 For surgical tweaks, `theme()` exposes hundreds of individual
 **elements**. You target a named element and set it with an
 `element_*()` helper:

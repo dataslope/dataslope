@@ -26,6 +26,17 @@ only construct concrete subclasses of it.
 
 ## A first abstract class
 
+`abstract` on the class means "never instantiate this"; `abstract` on a method means "every concrete subclass must supply it".
+
+<SyntaxBreakdown
+  parts={[
+    { text: "abstract", label: "no new Shape() is possible" },
+    { text: "class Shape {" },
+    { text: "abstract double area();", label: "no body, so subclasses must write one" },
+    { text: "}" },
+  ]}
+/>
+
 ```mermaid
 classDiagram
     class Shape {

@@ -166,6 +166,16 @@ Normal Distribution*).
 
 ## The $n-1$ divisor: why sample spread uses `ddof=1`
 
+The argument is the correction, and its default differs between libraries, which is exactly why it is worth writing out:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "np.std(x," },
+    { text: "ddof=1", label: "divide by n-1, the unbiased sample estimate" },
+    { text: ")", label: "NumPy defaults to 0; pandas defaults to 1" },
+  ]}
+/>
+
 Here is the detail that confuses everyone, so let's make it intuitive
 rather than mathematical. When you compute spread from a **sample**
 (not the whole population), you divide the sum of squared deviations by

@@ -36,8 +36,8 @@ In **wide** form, the quarters become columns, a little report:
 
 ```mermaid
 flowchart LR
-    Long["Long / tidy<br/>(one value per row)"] -- "PIVOT<br/>(spread a category<br/>into columns)" --> Wide["Wide<br/>(category across columns)"]
-    Wide -- "UNPIVOT<br/>(collapse columns<br/>back into rows)" --> Long
+    Long["Long / tidy<br/>(one value per row)"] -- "<code>PIVOT</code><br/>(spread a category<br/>into columns)" --> Wide["Wide<br/>(category across columns)"]
+    Wide -- "<code>UNPIVOT</code><br/>(collapse columns<br/>back into rows)" --> Long
 ```
 
 Neither is "correct", they serve different goals:
@@ -128,6 +128,16 @@ Writing a `FILTER` per column is tedious when there are many categories.
 DuckDB's `PIVOT` does it declaratively, you name the column to spread and
 the aggregate, and DuckDB discovers the distinct values for you.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "PIVOT" },
+    { text: "sales", label: "the table to reshape" },
+    { text: "ON quarter", label: "the column whose values become new columns" },
+    { text: "USING SUM(amount)", label: "what fills each cell" },
+    { text: "GROUP BY region", label: "what stays as rows" },
+  ]}
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="The same pivot with PIVOT syntax"
@@ -174,6 +184,17 @@ matches the manual pivot, with far less typing and no need to know the
 quarters in advance.
 
 ## Going the other way: `UNPIVOT`
+
+`UNPIVOT` turns columns back into rows, so it names the two columns it will create:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "UNPIVOT sales" },
+    { text: "ON q1, q2, q3, q4", label: "the columns to fold away" },
+    { text: "INTO NAME quarter", label: "a column holding the old column names" },
+    { text: "VALUE amount", label: "and one holding their values" },
+  ]}
+/>
 
 Sometimes data arrives wide, a spreadsheet with a column per month, but
 you need it long to compute on it. `UNPIVOT` collapses those columns back

@@ -26,6 +26,17 @@ optional parts: `PARTITION BY` (which rows share a window), `ORDER BY`
 (their order inside it), and a **frame** (which rows around the current
 one are in scope).
 
+<SyntaxBreakdown
+  parts={[
+    { text: "SUM(amount)", label: "what to compute" },
+    { text: "OVER (" },
+    { text: "PARTITION BY region", label: "which rows share a window" },
+    { text: "ORDER BY day", label: "their order inside it" },
+    { text: "ROWS 6 PRECEDING", label: "the frame in scope" },
+    { text: ")" },
+  ]}
+/>
+
 ### How do ROW_NUMBER, RANK, and DENSE_RANK differ?
 
 All three number rows within an ordered window, but they treat ties
@@ -58,6 +69,15 @@ FROM results;`}
 each partition boundary (like `GROUP BY`, but rows are kept). `ORDER BY`
 sequences rows **within** a partition, which is what ranking and running
 calculations need. You can use either, both, or neither.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "RANK() OVER (" },
+    { text: "PARTITION BY department", label: "restart the ranking here" },
+    { text: "ORDER BY salary DESC", label: "what rank 1 means" },
+    { text: ")" },
+  ]}
+/>
 
 ### How do you return the top N rows per group?
 
@@ -92,6 +112,17 @@ partition total, a classic surprise. For a whole-partition total, omit
 FOLLOWING`.
 
 ### How do you compute a running total?
+
+An ordered `SUM` with no explicit frame already means "everything up to this row":
+
+<SyntaxBreakdown
+  parts={[
+    { text: "SUM(amount)" },
+    { text: "OVER (", label: "makes it a window function" },
+    { text: "ORDER BY day", label: "what running means" },
+    { text: ")", label: "the default frame runs to the current row" },
+  ]}
+/>
 
 `SUM` as a window function with `ORDER BY` and the default
 running frame:

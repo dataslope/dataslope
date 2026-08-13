@@ -92,7 +92,21 @@ The comprehension is usually preferable because it states *what* you want rather
 
 ## List comprehensions: with filter
 
-The `if` clause is optional.
+The `if` clause is optional. With it, a comprehension reads as three
+separate jobs on one line:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "[" },
+    { text: "x", label: "what to put in the new list" },
+    { text: "for x in nums", label: "where the items come from" },
+    { text: "if x % 2 == 0", label: "which ones to keep" },
+    { text: "]" },
+  ]}
+/>
+
+Read it in the order it runs: the `for` first, then the `if`, then the
+expression on the left.
 
 <CodeBlock
   adapter="python"

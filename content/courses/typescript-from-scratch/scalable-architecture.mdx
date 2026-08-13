@@ -18,7 +18,7 @@ This chapter introduces **layered architecture**, a pattern for organizing code 
 
 Consider a typical application without layering:
 
-```
+```text
 user-service.ts → database.ts → config.ts → user-service.ts
      ↓                ↓               ↓
 order-service.ts → http-client.ts → logger.ts

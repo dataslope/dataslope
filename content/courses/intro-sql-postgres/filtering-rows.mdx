@@ -117,6 +117,15 @@ ORDER BY
 So `'A%'` means "starts with A," `'%son'` means "ends with son," and
 `'%ar%'` means "contains ar."
 
+<SyntaxBreakdown
+  parts={[
+    { text: "WHERE" },
+    { text: "name", label: "the text column to test" },
+    { text: "LIKE" },
+    { text: "'A%'", label: "the pattern, where % is any run of characters" },
+  ]}
+/>
+
 <SqlCodeBlock
   dialect="postgres"
   title="Names that start with a vowel-ish pattern"

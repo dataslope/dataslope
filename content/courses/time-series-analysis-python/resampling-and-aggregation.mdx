@@ -45,7 +45,16 @@ names the summary.
 ## Downsampling: summarizing to a coarser grid
 
 Let's build a daily series, website visits with a slow upward trend and a
-weekend dip, and roll it up.
+weekend dip, and roll it up. Downsampling is always the same two halves:
+the new grid, then what to do with the rows that land in each bucket.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "visits.resample(" },
+    { text: '"W")', label: "the coarser grid, here one bucket per week" },
+    { text: ".mean()", label: "how to collapse the rows in each bucket" },
+  ]}
+/>
 
 <CodeBlock
   adapter="python"

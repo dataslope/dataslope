@@ -254,6 +254,16 @@ if count == 0:      # explicit
 
 ## Logical operators: `and`, `or`, `not`
 
+Python's `and` and `or` do not return `True` or `False`. They return one of their operands, which is what makes the fallback idiom work:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "name", label: "returned if it is truthy" },
+    { text: "or", label: "otherwise..." },
+    { text: "\"anonymous\"", label: "...this is returned instead" },
+  ]}
+/>
+
 Python's logical operators are written as English words, not symbols (`&&`, `||`, `!` like in C or JavaScript).
 
 <Figure

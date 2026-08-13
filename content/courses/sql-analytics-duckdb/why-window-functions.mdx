@@ -33,7 +33,7 @@ other, never both in the same row.
 
 ```mermaid
 flowchart LR
-    subgraph GB["GROUP BY: rows collapse"]
+    subgraph GB["<code>GROUP BY</code>: rows collapse"]
         G1["5 West orders"] --> G2["1 row: West total"]
     end
     subgraph WF["Window: rows survive"]
@@ -171,7 +171,7 @@ ORDER BY
 
 ```mermaid
 flowchart TD
-    All[("All orders")] --> P["PARTITION BY region"]
+    All[("All orders")] --> P["<code>PARTITION BY</code> region"]
     P --> W["West window"]
     P --> E["East window"]
     P --> N["North window"]
@@ -258,12 +258,15 @@ window function summarizes *alongside* the rows.**
 
 ## Anatomy of a window function
 
-```
-SUM(amount)  OVER ( PARTITION BY region  ORDER BY order_date )
-└────┬────┘        └──────┬──────────┘  └────────┬─────────┘
-  what to            which rows share        order within
-  compute            a window                the window
-```
+<SyntaxBreakdown
+  parts={[
+    { text: "SUM(amount)", label: "what to compute" },
+    { text: "OVER (" },
+    { text: "PARTITION BY region", label: "which rows share a window" },
+    { text: "ORDER BY order_date", label: "order within the window" },
+    { text: ")" },
+  ]}
+/>
 
 - The **function** (`SUM()`, `AVG()`, `COUNT()`, `ROW_NUMBER()`, ...) is what to
   compute.

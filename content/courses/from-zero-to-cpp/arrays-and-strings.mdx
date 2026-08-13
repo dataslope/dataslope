@@ -160,6 +160,17 @@ cost per element stays constant.
 
 ## `std::string`: a vector of characters, basically
 
+`substr` takes a position and a *length*, which is the trap: the second argument is not an end index.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "s.substr(" },
+    { text: "2,", label: "start position" },
+    { text: "3", label: "how many characters, not where to stop" },
+    { text: ")" },
+  ]}
+/>
+
 A `std::string` is to `char` what `std::vector` is to `int`. It owns
 its character storage, knows its length, and resizes as needed.
 

@@ -40,6 +40,16 @@ row to have a **unique, unchanging identity.**
 
 ## What a primary key is
 
+One clause on a column declaration carries both promises at once: unique, and never null.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "id", label: "the column" },
+    { text: "SERIAL", label: "its type, auto-numbered" },
+    { text: "PRIMARY KEY", label: "unique and NOT NULL, in one word" },
+  ]}
+/>
+
 A **primary key** is a column (or set of columns) whose value
 **uniquely identifies each row** in a table. No two rows may share
 the same primary key value, and it is never empty.

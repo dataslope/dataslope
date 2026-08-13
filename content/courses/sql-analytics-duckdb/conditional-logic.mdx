@@ -22,6 +22,17 @@ A `CASE` expression evaluates conditions in order and returns the value
 for the first one that matches. It is SQL's if/else, and it turns a
 continuous or messy column into clean, analysis-ready categories.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "CASE" },
+    { text: "WHEN amount >= 500", label: "tested first" },
+    { text: "THEN 'large'", label: "the value if it matched" },
+    { text: "WHEN amount >= 100 THEN 'medium'", label: "tested only if the first missed" },
+    { text: "ELSE 'small'", label: "when nothing matched" },
+    { text: "END AS size", label: "close it, and name the column" },
+  ]}
+/>
+
 <SqlCodeBlock
   dialect="duckdb"
   title="Bucket amounts into size labels"
@@ -211,8 +222,8 @@ clause, which does the same thing more readably.
 
 ```mermaid
 flowchart TD
-    R[("rows with<br/>status: paid / refunded")] --> C1["SUM(CASE WHEN paid)"]
-    R --> C2["SUM(CASE WHEN refunded)"]
+    R[("rows with<br/>status: paid / refunded")] --> C1["<code>SUM(CASE WHEN paid)</code>"]
+    R --> C2["<code>SUM(CASE WHEN refunded)</code>"]
     C1 --> Out["one row:<br/><code>paid_revenue</code> | <code>refunded_revenue</code>"]
     C2 --> Out
 ```
@@ -222,6 +233,14 @@ flowchart TD
 DuckDB supports the SQL-standard `FILTER (WHERE ...)` clause on aggregates,
 which expresses conditional aggregation more clearly than `CASE` inside
 `SUM()`. Prefer it when available.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "SUM(amount)", label: "the aggregate" },
+    { text: "FILTER (WHERE status = 'paid')", label: "which rows it is allowed to see" },
+    { text: "AS paid_total", label: "name the result" },
+  ]}
+/>
 
 <SqlCodeBlock
   dialect="duckdb"

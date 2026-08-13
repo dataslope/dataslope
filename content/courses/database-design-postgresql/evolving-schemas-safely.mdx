@@ -113,7 +113,7 @@ flowchart TD
     Start["tasks table"] --> Nullable["Add priority as nullable"]
     Nullable --> Fill["Backfill priority"]
     Fill --> Check["Confirm no nulls"]
-    Check --> Required["Set priority NOT NULL"]
+    Check --> Required["Set priority <code>NOT NULL</code>"]
 ```
 
 <SqlCodeBlock

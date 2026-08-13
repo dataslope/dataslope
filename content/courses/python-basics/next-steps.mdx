@@ -45,7 +45,7 @@ mypy myfile.py
 ```
 
 <Callout type="info" title="Modern typing features">
-Python 3.9+ added \`list[int]\` instead of \`List[int]\`, 3.10 added \`X | Y\` union syntax, and 3.12 added [PEP 695 generic syntax](https://peps.python.org/pep-0695/). Type hints keep evolving. Worth exploring: \`typing.Protocol\`, \`typing.TypedDict\`, \`Generic\`, \`Literal\`, \`Final\`, and structural subtyping.
+Python 3.9+ added `list[int]` instead of `List[int]`, 3.10 added `X | Y` union syntax, and 3.12 added [PEP 695 generic syntax](https://peps.python.org/pep-0695/). Type hints keep evolving. Worth exploring: `typing.Protocol`, `typing.TypedDict`, `Generic`, `Literal`, `Final`, and structural subtyping.
 </Callout>
 
 ### Testing with `pytest`
@@ -114,9 +114,9 @@ asyncio.run(main())
 `await asyncio.gather()` runs the three `fetch` calls concurrently, so the total time is ~0.1s, not 0.3s. This pattern scales to thousands of requests.
 
 <Callout type="info" title="Async vs threads vs processes">
-- **Threads** (\`threading\`): Good for I/O-bound concurrency where the GIL (Global Interpreter Lock) is fine. Simple but limited.
-- **Processes** (\`multiprocessing\`, \`concurrent.futures\`): For CPU-bound work. Each process has its own Python interpreter and memory.
-- **Async** (\`asyncio\`): For high-concurrency I/O. One thread, thousands of tasks. Lowest overhead, highest scalability for network-bound work.
+- **Threads** (`threading`): Good for I/O-bound concurrency where the GIL (Global Interpreter Lock) is fine. Simple but limited.
+- **Processes** (`multiprocessing`, `concurrent.futures`): For CPU-bound work. Each process has its own Python interpreter and memory.
+- **Async** (`asyncio`): For high-concurrency I/O. One thread, thousands of tasks. Lowest overhead, highest scalability for network-bound work.
 - **Free-threaded Python (PEP 703)**: Python 3.13+ offers an experimental build without the GIL, enabling true multi-threaded parallelism. This is a space to watch as it matures.
 </Callout>
 
@@ -215,7 +215,7 @@ For self-contained executables (to share with non-Python users), look at:
 - **[shiv](https://shiv.readthedocs.io/)** / **[pex](https://pex.readthedocs.io/)**, Python-based executable zip archives.
 
 <Callout type="info" title="uv makes publishing easy">
-\`uv\` (from Astral) supports \`uv publish\` to push packages to PyPI in one command. As the Python tooling ecosystem modernizes, workflows that used to require multiple tools are converging into single, fast commands.
+`uv` (from Astral) supports `uv publish` to push packages to PyPI in one command. As the Python tooling ecosystem modernizes, workflows that used to require multiple tools are converging into single, fast commands.
 </Callout>
 
 ### Tooling worth installing once

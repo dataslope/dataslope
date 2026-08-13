@@ -46,6 +46,17 @@ The `sizeof` line still works in `main` (20 bytes, five 4-byte ints) because the
 
 ## `std::array<T, N>`
 
+The size is part of the *type*, which is what makes it free of a heap allocation and impossible to resize:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "std::array<" },
+    { text: "int,", label: "the element type" },
+    { text: "5", label: "the length, fixed at compile time" },
+    { text: "> a{};", label: "the braces zero-initialize it" },
+  ]}
+/>
+
 `std::array` is a fixed-size array wrapper. It preserves the size, supports range-for loops, and behaves like a normal value object.
 
 <Figure
@@ -77,6 +88,17 @@ int main() {
 />
 
 ## `std::vector<T>`: the workhorse
+
+A vector's size is a runtime value, so both of its constructor arguments are too:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "std::vector<int> v(" },
+    { text: "n,", label: "how many elements" },
+    { text: "0", label: "what each one starts as" },
+    { text: ");" },
+  ]}
+/>
 
 `std::vector` is a dynamic array. It stores elements contiguously like an array, but it can allocate a larger block and move elements when it needs more capacity.
 

@@ -70,6 +70,14 @@ stage. Watch two things: use `COUNT(DISTINCT user_id)` so repeat events
 don't inflate the numerator, and cast to float (`* 1.0`) so integer
 division doesn't truncate to 0.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "COUNT(DISTINCT CASE WHEN stage = 'purchase' THEN user_id END)", label: "users who converted" },
+    { text: "* 1.0", label: "force float division" },
+    { text: "/ COUNT(DISTINCT user_id)", label: "users at the reference stage" },
+  ]}
+/>
+
 ```sql
 SELECT
   COUNT(DISTINCT CASE WHEN stage = 'purchase' THEN user_id END) * 1.0
@@ -130,6 +138,17 @@ The p-value collapses toward zero; the effect size does not move at all.
 <Chart slug="effect-size-independent-of-n" />
 
 ### How would you explain a confidence interval to a stakeholder?
+
+The interval is the estimate plus a margin, and the margin has three separate drivers:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "estimate", label: "what you measured" },
+    { text: "±", label: "the margin of error" },
+    { text: "1.96", label: "the confidence level, here 95%" },
+    { text: "× SE", label: "the standard error, which shrinks with n" },
+  ]}
+/>
 
 Give a plain-language range instead of a bare point estimate: "we're
 confident the true lift is between about **8% and 16%**." A 95% interval

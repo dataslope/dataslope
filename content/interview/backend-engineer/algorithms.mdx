@@ -75,6 +75,16 @@ amortized $O(1)$ per insert.
 
 ### What are the time complexities of heap operations?
 
+Python's `heapq` is a min-heap over a plain list, and the operations that matter are one call each:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "heappush(h, x)", label: "O(log n), sift up" },
+    { text: "heappop(h)", label: "O(log n), returns the smallest" },
+    { text: "h[0]", label: "O(1), peek without removing" },
+  ]}
+/>
+
 A binary heap supports `insert` in $O(\log n)$ (bubble up), `extract-min`
 or `extract-max` in $O(\log n)$ (sift down), and `peek` in $O(1)$.
 Building a heap from n elements is $O(n)$ via heapify, not

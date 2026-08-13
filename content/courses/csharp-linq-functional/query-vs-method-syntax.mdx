@@ -55,9 +55,21 @@ Console.WriteLine(string.Join(", ", c));
   ]}
 />
 
-All three produce the same result. The compiler treats query syntax
-as **syntactic sugar**: it mechanically rewrites it into method
-calls.
+Query syntax names each step with a keyword, in roughly the order you
+would say the question out loud:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "from p in people", label: "the source" },
+    { text: "where p.Age > 40", label: "keep some of it" },
+    { text: "orderby p.Name", label: "put it in order" },
+    { text: "select p.Name", label: "shape what comes out" },
+  ]}
+/>
+
+All three forms above produce the same result. The compiler treats
+query syntax as **syntactic sugar**: it mechanically rewrites it into
+method calls.
 
 ```mermaid
 flowchart TD

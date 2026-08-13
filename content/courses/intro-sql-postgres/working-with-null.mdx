@@ -27,7 +27,7 @@ same as an empty string `''`:
 flowchart TB
     Z["0<br/>a known number<br/>(zero)"]
     E["''<br/>a known text<br/>(empty string)"]
-    N["NULL<br/>no value at all<br/>(unknown)"]
+    N["<code>NULL</code><br/>no value at all<br/>(unknown)"]
 ```
 
 Imagine a `phone` column. A customer with `phone = ''` told us their
@@ -80,6 +80,14 @@ Since `= NULL` does not work, SQL gives you special tests:
 
 - `IS NULL`, true when the value is missing.
 - `IS NOT NULL`, true when the value is present.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "WHERE" },
+    { text: "phone", label: "the column that may be missing" },
+    { text: "IS NULL", label: "the only test that works on NULL" },
+  ]}
+/>
 
 <SqlCodeBlock
   dialect="postgres"
@@ -143,6 +151,15 @@ this page, you will not.
 Often you want to display a friendly fallback instead of a blank.
 `COALESCE(a, b)` returns the first argument that is not `NULL`:
 
+<SyntaxBreakdown
+  parts={[
+    { text: "COALESCE(" },
+    { text: "phone,", label: "try this first" },
+    { text: "'no phone on file'", label: "fall back to this when it is NULL" },
+    { text: ") AS phone" },
+  ]}
+/>
+
 <SqlCodeBlock
   dialect="postgres"
   title="Show a placeholder for missing phones"
@@ -192,9 +209,9 @@ behavior is the price of that honesty, and `IS NULL` plus
 
 ```mermaid
 flowchart TD
-    M["Missing real data"] --> N["Store NULL<br/>(honest 'unknown')"]
-    N --> T1["Test with IS NULL"]
-    N --> T2["Display with COALESCE"]
+    M["Missing real data"] --> N["Store <code>NULL</code><br/>(honest 'unknown')"]
+    N --> T1["Test with <code>IS NULL</code>"]
+    N --> T2["Display with <code>COALESCE</code>"]
 ```
 
 ## Check your understanding

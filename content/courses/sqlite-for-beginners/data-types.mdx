@@ -58,10 +58,10 @@ SQLite stores values using five storage classes:
 ```mermaid
 flowchart LR
     S["SQLite value storage classes"]
-    S --> N["NULL<br/>missing or unknown"]
-    S --> I["INTEGER<br/>whole number"]
-    S --> R["REAL<br/>floating-point number"]
-    S --> T["TEXT<br/>text string"]
+    S --> N["<code>NULL</code><br/>missing or unknown"]
+    S --> I["<code>INTEGER</code><br/>whole number"]
+    S --> R["<code>REAL</code><br/>floating-point number"]
+    S --> T["<code>TEXT</code><br/>text string"]
     S --> B["BLOB<br/>raw bytes"]
 ```
 
@@ -94,10 +94,10 @@ When you write a column type, SQLite maps it to an affinity. Affinity is the col
 ```mermaid
 flowchart LR
     D["Declared column type"] --> A["SQLite affinity"]
-    A --> AI["INTEGER affinity"]
-    A --> AT["TEXT affinity"]
-    A --> AR["REAL affinity"]
-    A --> AN["NUMERIC affinity"]
+    A --> AI["<code>INTEGER</code> affinity"]
+    A --> AT["<code>TEXT</code> affinity"]
+    A --> AR["<code>REAL</code> affinity"]
+    A --> AN["<code>NUMERIC</code> affinity"]
     A --> AB["BLOB affinity"]
 ```
 
@@ -114,6 +114,16 @@ Here is a beginner-friendly summary:
 SQLite's full mapping rules look at words inside the declared type. For beginners, use clear names like `INTEGER`, `TEXT`, `REAL`, and `NUMERIC`.
 
 ## `typeof()` shows the storage class
+
+SQLite stores a value's own type, not the column's, and `typeof()` is how you see which one it actually used:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "typeof(", label: "the storage class of this value" },
+    { text: "price", label: "not the column's declared type" },
+    { text: ")", label: "one of null, integer, real, text, blob" },
+  ]}
+/>
 
 SQLite has a helpful function named `typeof()` that reports how a value is actually stored.
 
@@ -203,8 +213,8 @@ SQLite does not have a separate boolean storage class. Store true/false values a
 
 ```mermaid
 flowchart LR
-    TRUE["true idea"] --> ONE["store as INTEGER 1"]
-    FALSE["false idea"] --> ZERO["store as INTEGER 0"]
+    TRUE["true idea"] --> ONE["store as <code>INTEGER</code> 1"]
+    FALSE["false idea"] --> ZERO["store as <code>INTEGER</code> 0"]
 ```
 
 Example column:
@@ -227,9 +237,9 @@ SQLite does not have a separate date or timestamp storage class. Common choices 
 
 ```mermaid
 flowchart TB
-    DATE["Date or time value"] --> TEXTD["TEXT<br/>YYYY-MM-DD"]
-    DATE --> INTD["INTEGER<br/>Unix time"]
-    DATE --> REALD["REAL<br/>Julian day number"]
+    DATE["Date or time value"] --> TEXTD["<code>TEXT</code><br/>YYYY-MM-DD"]
+    DATE --> INTD["<code>INTEGER</code><br/>Unix time"]
+    DATE --> REALD["<code>REAL</code><br/>Julian day number"]
 ```
 
 For beginners, storing dates as `TEXT` in ISO format is easiest:

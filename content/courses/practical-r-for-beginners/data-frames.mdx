@@ -126,6 +126,17 @@ trick from the last four pages works.
 
 ## Indexing rows and columns: `[row, col]`
 
+One pair of brackets, two positions separated by a comma. Leaving one blank means "all of them".
+
+<SyntaxBreakdown
+  parts={[
+    { text: "df[" },
+    { text: "1:5,", label: "which rows" },
+    { text: "c(\"name\", \"age\")", label: "which columns; blank means all" },
+    { text: "]" },
+  ]}
+/>
+
 A data frame can also be indexed with two-dimensional `[ ]`
 notation. The convention is `[rows, columns]`. Leave a slot empty
 to mean "all":

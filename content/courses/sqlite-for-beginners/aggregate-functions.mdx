@@ -49,6 +49,16 @@ The five core aggregate functions are:
 
 `COUNT(*)` counts rows. It does not care what values are inside those rows. It simply answers: "How many rows are in this result?"
 
+<SyntaxBreakdown
+  parts={[
+    { text: "SELECT" },
+    { text: "COUNT", label: "which aggregate" },
+    { text: "(*)", label: "over what; * means the rows themselves" },
+    { text: "AS n_books", label: "name the single number" },
+    { text: "FROM books;" },
+  ]}
+/>
+
 <Figure
   slug="lite-aggregate-functions-counting-rows-count-inline-cutout"
   alt="A row of blocks passing a clicking counter, the counter's needle rising with each"
@@ -82,7 +92,7 @@ in, one row comes out.
 
 ```mermaid
 flowchart TB
-    T[("orders table")] --> C["COUNT(*)<br/>count every row"]
+    T[("orders table")] --> C["<code>COUNT(*)</code><br/>count every row"]
     C --> R["<code>order_count = 4</code>"]
 ```
 
@@ -216,10 +226,10 @@ One query gives you a compact report: count, total, average, smallest, and large
 
 ```mermaid
 flowchart LR
-    Data["Order rows"] --> Count["COUNT(*)"]
-    Data --> Sum["SUM(amount)"]
-    Data --> Avg["AVG(amount)"]
-    Data --> MinMax["MIN(amount)<br/>MAX(amount)"]
+    Data["Order rows"] --> Count["<code>COUNT(*)</code>"]
+    Data --> Sum["<code>SUM(amount)</code>"]
+    Data --> Avg["<code>AVG(amount)</code>"]
+    Data --> MinMax["<code>MIN(amount)</code><br/>MAX(amount)"]
     Count --> Report["One report row"]
     Sum --> Report
     Avg --> Report
@@ -263,8 +273,8 @@ Read this as: "Keep only Ada's rows, then add their amounts."
 
 ```mermaid
 flowchart TD
-    T[("orders table")] --> W["WHERE <code>customer = 'Ada'</code>"]
-    W --> S["SUM(amount)"]
+    T[("orders table")] --> W["<code>WHERE customer = 'Ada'</code>"]
+    W --> S["<code>SUM(amount)</code>"]
     S --> R["one total"]
 ```
 

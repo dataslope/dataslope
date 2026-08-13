@@ -16,6 +16,16 @@ comment stores `post_id = 20`, then post `20` must exist. The database
 protects those promises so your design cannot quietly drift into broken
 links.
 
+The whole promise is declared on the child column:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "post_id INTEGER NOT NULL", label: "the pointer itself" },
+    { text: "REFERENCES posts(id)", label: "what it must point at" },
+    { text: "ON DELETE CASCADE", label: "what happens when the parent goes" },
+  ]}
+/>
+
 ## The orphan-row problem
 
 An **orphan row** is a child row that points to a parent row that does
@@ -93,8 +103,8 @@ orders? PostgreSQL can enforce several designs.
 flowchart TB
     D["Delete parent row"] --> Q{"What should happen to child rows?"}
     Q -->|"RESTRICT"| R["Block the delete"]
-    Q -->|"CASCADE"| C["Delete children too"]
-    Q -->|"SET NULL"| N["Keep children<br/>clear the reference"]
+    Q -->|"<code>CASCADE</code>"| C["Delete children too"]
+    Q -->|"<code>SET NULL</code>"| N["Keep children<br/>clear the reference"]
 ```
 
 The right answer depends on the meaning of the relationship.
@@ -140,7 +150,7 @@ whose optional editor was removed.
 
 ```mermaid
 flowchart TD
-    E["Delete employee"] --> T["ticket.<code>assigned_employee_id</code> = NULL"]
+    E["Delete employee"] --> T["ticket.<code>assigned_employee_id</code> = <code>NULL</code>"]
     T --> K["Ticket stays open"]
 ```
 
@@ -238,8 +248,8 @@ key changes.
 flowchart TB
     U["Parent key changes"] --> Q{"How should references respond?"}
     Q -->|"RESTRICT"| A["Block the key change"]
-    Q -->|"CASCADE"| B["Update child keys too"]
-    Q -->|"SET NULL"| C["Clear child references"]
+    Q -->|"<code>CASCADE</code>"| B["Update child keys too"]
+    Q -->|"<code>SET NULL</code>"| C["Clear child references"]
 ```
 
 The design lesson is the same: choose the behavior that matches the
@@ -260,9 +270,9 @@ Use this decision path as a design conversation, not a mechanical rule.
 ```mermaid
 flowchart TB
     S["Parent row is removed"] --> A{"Must child rows remain?"}
-    A -->|"no"| C["CASCADE"]
+    A -->|"no"| C["<code>CASCADE</code>"]
     A -->|"yes"| B{"Can the relationship become unknown or optional?"}
-    B -->|"yes"| N["SET NULL"]
+    B -->|"yes"| N["<code>SET NULL</code>"]
     B -->|"no"| R["RESTRICT"]
 ```
 

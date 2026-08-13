@@ -110,6 +110,17 @@ Three concrete benefits in that small change:
 
 ## Enums are objects too
 
+An enum constant is an object, so it can carry state, which means the constants are really constructor calls:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "RED(\"stop\")", label: "a constant, and its constructor arguments" },
+    { text: ";" },
+    { text: "private final String action;", label: "the state each constant carries" },
+    { text: "Light(String a) { ... }", label: "the constructor, always private" },
+  ]}
+/>
+
 Java enums are not just integer codes with names. **Each enum
 constant is a full object**, and the enum *type* is a class. That
 means each constant can carry its own state and define its own

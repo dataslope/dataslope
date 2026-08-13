@@ -19,6 +19,14 @@ and "most recent" list you have ever seen.
 `ORDER BY` sorts the result by one or more columns. Add `ASC` for
 ascending (the default) or `DESC` for descending:
 
+<SyntaxBreakdown
+  parts={[
+    { text: "ORDER BY" },
+    { text: "salary", label: "sort on this column" },
+    { text: "DESC", label: "largest first; ASC is the default" },
+  ]}
+/>
+
 <SqlCodeBlock
   dialect="postgres"
   title="Highest-paid first"
@@ -99,6 +107,14 @@ flowchart TD
 
 `LIMIT n` keeps only the first `n` rows of the result. Combined with
 `ORDER BY`, it answers "top N" questions:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "ORDER BY salary DESC", label: "decide what top means" },
+    { text: "LIMIT" },
+    { text: "3", label: "then keep only that many rows" },
+  ]}
+/>
 
 <SqlCodeBlock
   dialect="postgres"

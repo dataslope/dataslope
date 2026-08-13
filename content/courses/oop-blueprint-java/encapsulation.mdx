@@ -141,6 +141,17 @@ breaking a single caller, because callers never see it.
 
 ## Access modifiers in Java
 
+Every field and method declaration opens with the answer to "who can see
+this?":
+
+<SyntaxBreakdown
+  parts={[
+    { text: "private", label: "who may touch it" },
+    { text: "double", label: "its type" },
+    { text: "balance;", label: "its name" },
+  ]}
+/>
+
 Java has four access levels that control where a member can be seen
 from. You will spend 95% of your time using `private` and `public`,
 but it is worth knowing all four.

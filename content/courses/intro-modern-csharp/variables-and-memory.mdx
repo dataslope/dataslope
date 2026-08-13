@@ -70,6 +70,16 @@ annoyance, it prevents whole categories of bugs.
 
 ## `var`: let the compiler figure it out
 
+`var` is not a dynamic type. The type is still fixed at compile time, it is just written on the right instead of the left:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "var", label: "infer the type from the initializer" },
+    { text: "count", label: "the variable" },
+    { text: "= 10;", label: "which fixes it as int, permanently" },
+  ]}
+/>
+
 Repeating the type name on both sides can feel noisy:
 
 ```csharp

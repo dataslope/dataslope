@@ -184,6 +184,17 @@ A few things are worth pointing out in `Book`:
 
 ## `this`: the object the method is running on
 
+`this` is what separates the field from the parameter when they share a
+name, which in a constructor they usually do:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "this.name", label: "the field on this object" },
+    { text: "=" },
+    { text: "name;", label: "the parameter, which shadows it" },
+  ]}
+/>
+
 Every non-static method has an implicit parameter called `this`. It is
 **the object the method was called on**. When you write
 `rex.describe()`, inside `describe`, `this` is `rex`. When you write

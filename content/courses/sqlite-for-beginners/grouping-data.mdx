@@ -33,9 +33,9 @@ flowchart TB
     Group --> Eng["Engineering group"]
     Group --> Sales["Sales group"]
     Group --> Mkt["Marketing group"]
-    Eng --> EngAvg["AVG(salary)<br/>for Engineering"]
-    Sales --> SalesAvg["AVG(salary)<br/>for Sales"]
-    Mkt --> MktAvg["AVG(salary)<br/>for Marketing"]
+    Eng --> EngAvg["<code>AVG(salary)</code><br/>for Engineering"]
+    Sales --> SalesAvg["<code>AVG(salary)</code><br/>for Sales"]
+    Mkt --> MktAvg["<code>AVG(salary)</code><br/>for Marketing"]
 ```
 
 The result is not one average salary. It is one average salary **per department**.
@@ -43,6 +43,16 @@ The result is not one average salary. It is one average salary **per department*
 ## Your first GROUP BY query
 
 Start with a small employee table. The query below counts employees and computes average salary for each department.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "SELECT" },
+    { text: "dept,", label: "one output row per value here" },
+    { text: "COUNT(*)", label: "computed once inside each group" },
+    { text: "FROM employees" },
+    { text: "GROUP BY dept;", label: "what makes two rows the same group" },
+  ]}
+/>
 
 <Figure
   slug="lite-grouping-data-one-result-row-per-inline-cutout"
@@ -132,11 +142,11 @@ model you will use for every grouped query you ever write. SQLite
 conceptually sorts all 24 rows into labeled buckets, then runs
 `COUNT(*)` once *inside each bucket*:
 
-```text
-bucket "High":    High, High, High, …    -> COUNT(*) = 6
-bucket "Medium":  Medium, Medium, …      -> COUNT(*) = 7
-bucket "Low":     Low, Low, Low, …       -> COUNT(*) = 11
-```
+| Bucket     | Rows that landed in it | `COUNT(*)` |
+| ---------- | ---------------------- | ---------- |
+| `High`     | High, High, High, …    | 6          |
+| `Medium`   | Medium, Medium, …      | 7          |
+| `Low`      | Low, Low, Low, …       | 11         |
 
 Each bucket then contributes exactly one row to the result: its
 label and its summary. 24 rows in, three rows out. Notice that the
@@ -172,7 +182,7 @@ A grouped result row needs values that make sense for the whole group.
 
 ```mermaid
 flowchart TB
-    Col["Column in SELECT"] --> Ask{"One value<br/>for the whole group?"}
+    Col["Column in <code>SELECT</code>"] --> Ask{"One value<br/>for the whole group?"}
     Ask -->|"yes, grouped column"| Allowed["Allowed as-is"]
     Ask -->|"no, many values"| Aggregate["Use an aggregate<br/>COUNT, SUM, AVG, MIN, MAX"]
 ```
@@ -269,7 +279,7 @@ flowchart TB
     Pair --> W2026["West, 2026"]
     Pair --> E2025["East, 2025"]
     Pair --> E2026["East, 2026"]
-    W2025 --> Total["SUM(amount)<br/>per combination"]
+    W2025 --> Total["<code>SUM(amount)</code><br/>per combination"]
     W2026 --> Total
     E2025 --> Total
     E2026 --> Total
@@ -336,9 +346,9 @@ The intern row is removed first. Then SQLite groups the remaining rows by depart
 
 ```mermaid
 flowchart TD
-    Raw["Raw employee rows"] --> Where["WHERE <code>is_intern</code> = 0<br/>keep full-time rows"]
+    Raw["Raw employee rows"] --> Where["<code>WHERE is_intern</code> = 0<br/>keep full-time rows"]
     Where --> Group["<code>GROUP BY dept</code><br/>make department groups"]
-    Group --> Avg["AVG(salary)<br/>inside each group"]
+    Group --> Avg["<code>AVG(salary)</code><br/>inside each group"]
     Avg --> Result["One row per department"]
 ```
 

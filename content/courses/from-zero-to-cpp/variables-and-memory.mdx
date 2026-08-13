@@ -119,7 +119,7 @@ label; it tells the compiler:
 ```mermaid
 flowchart LR
     subgraph Memory
-        B["4 raw bytes<br/><code>0x2A</code> <code>0x00</code> <code>0x00</code> <code>0x00</code>"]
+        B["4 raw bytes<br/><code>0x2A 0x00 0x00 0x00</code>"]
     end
     B -->|interpreted as int| I[42]
     B -->|interpreted as float| F[5.88e-44]

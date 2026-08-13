@@ -196,14 +196,12 @@ A database does not store information as one giant paragraph.
 
 In a relational database, information is organized into **tables**, **rows**, and **columns**.
 
-```text
-tasks
+A `tasks` table:
 
-id | title        | done | due_date
--- | ------------ | ---- | ----------
-1  | Buy milk     | 0    | 2026-04-15
-2  | Submit form  | 1    | 2026-04-10
-```
+| `id` | `title`     | `done` | `due_date`   |
+| ---- | ----------- | ------ | ------------ |
+| 1    | Buy milk    | 0      | 2026-04-15   |
+| 2    | Submit form | 1      | 2026-04-10   |
 
 A **table** stores one kind of thing. A **row** is one record. A **column** is one piece of information every row is expected to have.
 

@@ -92,6 +92,17 @@ things:
 | `&n`           | expression: *the address of `n`*                                |
 | `int *p = &n;` | declare `p`, initialize it with the address of `n`              |
 
+One line contains both readings, and they are not the same `*`:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "int *", label: "declaration: p is a pointer to int" },
+    { text: "p", label: "the variable being created" },
+    { text: "=" },
+    { text: "&n;", label: "expression: the address of n" },
+  ]}
+/>
+
 Once you internalize that, half of pointer confusion vanishes.
 
 ## Pictures, always pictures
@@ -106,35 +117,29 @@ int *p = &n;
 
 **After line 1**: a box `n` exists, containing `7`.
 
-```text
-+-----+
-|  n  |
-+-----+
-|  7  |
-+-----+
-```
+<MemoryCells cells={[{ name: "n", value: "7" }]} />
 
 **After line 2**: a new box `p` exists, containing the address of
 `n`:
 
-```text
-+-----+        +-----+
-|  p  | ---->  |  n  |
-+-----+        +-----+
-|0x100|        |  7  |
-+-----+        +-----+
-```
+<MemoryCells
+  cells={[
+    { name: "p", value: "0x100", pointsToNext: true },
+    { name: "n", value: "7" },
+  ]}
+  caption="`p` does not hold `7`. It holds `0x100`, the address where `7` lives."
+/>
 
 **After line 3**: `*p` reads the value at `n` (`7`), adds `1`, and
 writes `8` back into the same address:
 
-```text
-+-----+        +-----+
-|  p  | ---->  |  n  |
-+-----+        +-----+
-|0x100|        |  8  |
-+-----+        +-----+
-```
+<MemoryCells
+  cells={[
+    { name: "p", value: "0x100", pointsToNext: true },
+    { name: "n", value: "8" },
+  ]}
+  caption="`p` is unchanged; the value at the address it holds is not."
+/>
 
 The value of `p` itself never changed. Only the value of the *thing
 it pointed at* changed.

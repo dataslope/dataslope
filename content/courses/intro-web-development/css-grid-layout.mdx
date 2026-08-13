@@ -25,6 +25,17 @@ columns:
 
 ## The `fr` unit
 
+`fr` is a share of what is *left* after fixed tracks and gaps are taken out, which is why mixing units works:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "grid-template-columns:" },
+    { text: "200px", label: "a fixed track, taken out first" },
+    { text: "1fr", label: "one share of the remainder" },
+    { text: "2fr;", label: "twice that share" },
+  ]}
+/>
+
 `fr` means "one fraction of the free space". `1fr 1fr 1fr` splits the
 row into three equal columns. `2fr 1fr` makes the first column twice
 as wide as the second. It's like `flex: 1`, but for the whole grid at

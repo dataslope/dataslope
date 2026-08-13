@@ -252,6 +252,16 @@ revenue per day, which also reflects how busy that day was.
 
 ## A second category with `hue`
 
+`hue` is a third column bound to a third channel, and its type decides whether you get a gradient or distinct colors:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "sns.barplot(data=df, x=..., y=...," },
+    { text: "hue=\"sex\"", label: "a second category, split within each bar group" },
+    { text: ")" },
+  ]}
+/>
+
 Map a second categorical variable to **`hue`** and Seaborn splits each
 category into a cluster of side-by-side bars, one per hue level. This is how
 you compare an aggregate across *two* groupings at once.

@@ -16,13 +16,15 @@ The SQL statement for adding rows is `INSERT INTO`.
 
 An `INSERT` statement names the table, names the columns you are filling, and supplies matching values.
 
-```mermaid
-flowchart TD
-    A["<code>INSERT INTO</code>"] --> B["which table"]
-    B --> C["which columns"]
-    C --> D["<code>VALUES</code>"]
-    D --> E["new row data"]
-```
+<SyntaxBreakdown
+  parts={[
+    { text: "INSERT INTO" },
+    { text: "books", label: "which table" },
+    { text: "(title, price)", label: "which columns you are filling" },
+    { text: "VALUES" },
+    { text: "('Dune', 9.99);", label: "one row, in that same order" },
+  ]}
+/>
 
 Here is a complete example: create a table, insert one row, then read it back.
 

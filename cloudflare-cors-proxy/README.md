@@ -15,23 +15,18 @@ Cloudflare Workers are chosen over a Next.js route handler because:
 
 ## How it works
 
-```
-Browser (playground runtime)
-  └─► GET https://dataslope-cors-proxy.<subdomain>.workers.dev/?url=<encoded-url>
-          │
-          ▼
-    Cloudflare Worker (this repo)
-          │  validates Origin, scheme, and hostname
-          │  strips hop-by-hop and credential headers
-          │  forwards request to upstream
-          ▼
-    Third-party API  (e.g. https://api.example.com/data)
-          │
-          ▼
-    Cloudflare Worker
-          │  injects CORS headers
-          ▼
-Browser  ✅ response accepted
+```mermaid
+sequenceDiagram
+    participant B as Browser, the playground runtime
+    participant W as Cloudflare Worker, this repo
+    participant A as Third-party API
+
+    B->>W: GET /?url= the encoded target URL
+    Note over W: validates Origin, scheme and hostname,<br/>strips hop-by-hop and credential headers
+    W->>A: forwards the request upstream
+    A-->>W: response
+    Note over W: injects CORS headers
+    W-->>B: response the browser accepts
 ```
 
 The playground runtime appends the target URL as a query parameter:

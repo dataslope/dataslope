@@ -83,6 +83,18 @@ Two things to notice:
 
 ## `pipe()`: the left-to-right cousin
 
+`pipe` takes the value first and then the steps, which is why it reads in the order the data actually moves:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "pipe(" },
+    { text: "value,", label: "what goes in" },
+    { text: "double,", label: "applied first" },
+    { text: "toString", label: "applied to that result" },
+    { text: ")" },
+  ]}
+/>
+
 In practice, most TypeScript code reads better when the data *flows
 forward*: input on the left, transformations on the right. That's
 what `pipe()` does:
@@ -229,6 +241,17 @@ Both are correct. The second one is *legible*: each step has a name,
 and the pipeline reads like a recipe.
 
 ## Currying: one argument at a time
+
+A curried function's type is the shape of the idea: every arrow returns a function that wants the next argument.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "(a: number)", label: "take one argument" },
+    { text: "=>", label: "and return..." },
+    { text: "(b: number)", label: "...a function wanting the next" },
+    { text: "=> number", label: "until the last one produces the value" },
+  ]}
+/>
 
 **Currying** is the transformation that turns a function of multiple
 arguments into a *chain* of one-argument functions.

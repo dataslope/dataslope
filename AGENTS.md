@@ -769,14 +769,74 @@ version left all 41 chunks as eager `<script src>` tags and added a 42nd. Only
 an `import()` evaluated inside the client graph is a split point.
 
 Server Components are the exception and stay statically imported in
-`mdx-components.tsx`: `Figure`, `Chart` and `SvgLabel` render to markup on the
-server and ship no client code, so splitting them would only add a Suspense
-boundary. The test is whether the component's own module carries
-`"use client"`.
+`mdx-components.tsx`: `Figure`, `Chart`, `SvgLabel` and the diagram primitives
+in `app/_components/mdx/diagrams.tsx` render to markup on the server and ship
+no client code, so splitting them would only add a Suspense boundary. The test
+is whether the component's own module carries `"use client"`.
 
 Server rendering is unaffected either way. `lazyWidget()` leaves SSR on
 (`dynamic()`'s default), so the prerendered HTML still contains every widget
 and search still indexes it.
+
+## Diagrams are drawn with elements, never with characters
+
+**Never build a figure out of `┌─┐│└┘`, out of `+-----+` and `---->`, or out of
+`└──┬──┘` underbraces, and never type a table into a ` ```text ` fence.**
+`npm run check:diagrams` rejects all four and `__tests__/asciiDiagrams.test.ts`
+runs the same linter under `npm test`.
+
+The reason is not taste. Code is set in JetBrains Mono, loaded by
+`next/font/google` with `subsets: ["latin"]` (`app/layout.tsx`), and that subset
+ends long before U+2500. Every box-drawing character therefore falls back to
+whatever monospace the reader's OS supplies, at *that* font's advance width, so
+a line's rendered width depends on how many drawn characters it happens to
+contain and rows that were aligned in the source arrive at different widths.
+The CSS box-model figure on `modern-css-layout/box-model-and-sizing` is what
+surfaced this: four concentric boxes reached readers as a scatter of
+disconnected fragments. Widening the subset would not fix the rest of it. A
+drawn figure is an image made of text, so a screen reader spells the corner
+glyphs out one at a time, nothing reflows on a phone, and the drawing cannot
+take the page's colors or its theme.
+
+A table typed into a fence fails for its own reasons, on top of that one. Its
+columns are held apart by literal spaces rather than by cells, so it will not
+reflow on a phone and a longer value in one row shifts every column after it;
+and it reaches a screen reader as a `<pre>`, not a `<table>` with headers. Five
+lessons had one, including a SQLite page whose fenced pipes-and-dashes block was
+teaching the reader what a table is.
+
+Reach for whichever of these fits:
+
+| The figure is really… | Use |
+| --- | --- |
+| geometry: nesting, adjacency, a span of syntax and what it is called | `<BoxModel>`, `<MemoryCells>`, `<SyntaxBreakdown>`, `<CrcCard>` (`app/_components/mdx/diagrams.tsx`) |
+| a graph: a hierarchy, a pipeline, a state machine | a ` ```mermaid ` fence |
+| a table | a markdown table |
+
+Add a new primitive to `diagrams.tsx` rather than a new one-off component: they
+share one stylesheet, one caption treatment and one `<figure>` wrapper, so they
+stay a family instead of drifting apart one lesson at a time.
+
+**Mermaid labels are words, not pictures.** The edge mermaid draws *is* the
+arrow, so a node labelled `s = ●─` ships a reference dot and a wire as literal
+text inside a box that already has a real arrow leaving it. The linter rejects
+any drawn glyph inside a ` ```mermaid ` fence for that reason.
+
+**Some shapes are allowed to stay drawn.** A directory tree, because it is the
+literal output format of `tree`, universal in READMEs and terminals, and the
+one drawn shape the font fallback does not break: every row at a given depth
+carries the same prefix, so siblings still line up at a different advance
+width. A caret annotation inside a code comment (`//   ^value  ^setter`), which
+is ASCII, is how a developer would write it in their own editor, and is not a
+figure. Verbatim program and compiler output, which is a quotation. And a
+notation the lesson itself defines, such as the linked-list course's
+`head -> [10 | *] -> [20 | NULL]`, where each line stands alone and nothing
+depends on two lines lining up. Anything else that genuinely has to keep its
+frame, such as verbatim `mysql` client output, opts out explicitly:
+
+```mdx
+{/* allow-drawn-diagram: verbatim mysql client output */}
+```
 
 ## Generated files and the build cache
 

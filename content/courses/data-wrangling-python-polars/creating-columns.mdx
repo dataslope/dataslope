@@ -121,6 +121,17 @@ a column named `total sales` or `2024` still needs `alias()`.
 
 ## Conditional logic: when / then / otherwise
 
+Polars spells if/else as a chain, and the chain has to end in `otherwise` or the un-matched rows come back null:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "pl.when(", label: "the condition" },
+    { text: "pl.col(\"mass\") > 4000)" },
+    { text: ".then(pl.lit(\"big\"))", label: "value when it holds" },
+    { text: ".otherwise(pl.lit(\"small\"))", label: "value when it does not" },
+  ]}
+/>
+
 This is Polars' `if`. It chains, and the first matching branch wins.
 
 <CodeBlock

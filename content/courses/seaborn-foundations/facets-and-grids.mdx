@@ -19,6 +19,17 @@ function through two keywords: `col` and `row`.
 
 ## Faceting is just `col` and `row`
 
+Faceting is one more column-to-channel binding, exactly like `hue`. The channel just happens to be "which subplot".
+
+<SyntaxBreakdown
+  parts={[
+    { text: "sns.relplot(data=df, x=..., y=...," },
+    { text: "col=\"species\",", label: "one subplot per value, across" },
+    { text: "row=\"sex\"", label: "and one per value, down" },
+    { text: ")" },
+  ]}
+/>
+
 Before the syntax, the reason. Here is one dataset drawn as a single
 overloaded panel and then split into facets. The lines are identical:
 

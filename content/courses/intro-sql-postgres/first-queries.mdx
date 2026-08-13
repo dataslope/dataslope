@@ -62,15 +62,18 @@ Notice three things that will recur all course long:
 Here is the basic shape you will type thousands of times, with the
 parts named:
 
-```mermaid
-flowchart TD
-    K["<code>SELECT</code>"] --> C["which columns<br/>or values you want"]
-    C --> F["<code>FROM</code>"]
-    F --> T["which table<br/>to read from"]
-```
+<SyntaxBreakdown
+  parts={[
+    { text: "SELECT" },
+    { text: "name, email", label: "what you want back" },
+    { text: "FROM" },
+    { text: "customers", label: "which table to read it from" },
+    { text: ";" },
+  ]}
+/>
 
-- **`SELECT`**, *what* you want back (columns or computed values).
-- **`FROM`**, *where* to get it (which table).
+Two keywords, two questions: `SELECT` answers *what*, `FROM` answers
+*where*.
 
 When you are just computing values, like `SELECT 2 + 2`, you can
 skip `FROM` entirely. The moment you want stored data, you add
@@ -83,8 +86,8 @@ skip `FROM` entirely. The moment you want stored data, you add
 />
 
 <Callout type="info" title="SQL keywords and your style">
-SQL keywords like \`SELECT\` and \`FROM\` are not case-sensitive,
-\`select\`, \`Select\`, and \`SELECT\` all work. By strong
+SQL keywords like `SELECT` and `FROM` are not case-sensitive,
+`select`, `Select`, and `SELECT` all work. By strong
 convention, this course writes keywords in UPPERCASE and names in
 lowercase, because it makes queries far easier to read at a glance.
 </Callout>

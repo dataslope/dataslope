@@ -30,6 +30,16 @@ The **`fr`** unit means "a fraction of the free space." `repeat(3, 1fr)`
 is shorthand for three equal columns; `2fr 1fr` makes the first twice
 the width of the second.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "grid-template-columns:", label: "define the column tracks" },
+    { text: "repeat(" },
+    { text: "3,", label: "how many tracks" },
+    { text: "1fr", label: "each one an equal share of free space" },
+    { text: ");" },
+  ]}
+/>
+
 <Figure
   slug="css-css-grid-inline-cutout"
   alt="A rectangular frame ruled into rows and columns, with three blocks placed to span several cells each, the empty cells left visible"
