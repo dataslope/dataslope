@@ -750,6 +750,47 @@ What changed:
   (a second bare `import()` for preload would put the module straight back
   into the Worker); the fallback backdrop covers the wait.
 
+### 8.7.1 Applied 2026-08-13, round two: the three medium levers
+
+```
+round 1: 9973.19 → 8423.84 KiB gzip   (slug index + ssr:false dialogs)
+round 2: 8423.84 → 7240.41 KiB gzip   (this round)
+```
+
+**Cumulative: −2732.78 KiB (−27.4%) in one day. Headroom: 266.81 →
+2999.59 KiB (29.3%).**
+
+What round two changed:
+
+- **Chart SVG bodies → static assets (§8.6.1 copy A).** `build-charts.mjs`
+  writes one `public/chart-svgs/<slug>.svg` per chart and the manifest keeps
+  metadata only (`svg` → `svgBytes`); `charts.js` fell 5.98 MB → 453 KB on
+  disk, and the remaining Worker copy is 382 KB raw. `<Chart>` is now an
+  async server component reading through `lib/charts/loadChartSvg.ts` →
+  `lib/serverAssets.ts`, which tries `node:fs` first (build machine,
+  `next dev`) and falls back to the `ASSETS` binding (workerd, where unenv's
+  fs throws). The admin gallery loads only its 20-chart page slice; the
+  chart check scripts read the asset files. Verified: prerendered lesson
+  HTML still contains the full inlined markup (checked an actual path string
+  in the built cache), and zero server chunks contain chart path data.
+- **Playground pages `ssr: false` (§8.8).** The 11 language pages now match
+  the SQL pages' existing pattern: `page.tsx` holds
+  `dynamic(() => import("./client"), { ssr: false })` and the new
+  `client.tsx` holds the `Playground` + adapter imports, so the whole graph
+  stays out of the server compile. Verified: zero references to the
+  Playground component graph remain under the playground routes' server
+  output.
+- **Illustrations route reads a JSON asset (§8.8).** `build-images.mjs`
+  additionally emits `public/_gen/illustration-gallery.json` (manifest +
+  created-at timestamps, write-if-changed so no-op runs stay no-ops), and
+  `app/api/admin/illustration-prompts` fetches it per isolate via
+  `readPublicAsset` instead of importing `images.js` + `created-at.js`.
+  Verified: zero manifest references in that route's graph.
+
+Supporting changes: `.gitignore` covers `public/chart-svgs/` and
+`public/_gen/`; `outputFileTracingExcludes` covers both so nft's fs-call
+analysis cannot trace the assets into the server function.
+
 ### 8.8 Remaining levers, traced to their importers
 
 A second pass over what is left (post-fix Worker: 8423.84 KiB, headroom

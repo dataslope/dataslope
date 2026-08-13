@@ -31,7 +31,7 @@
  * Usage:
  *   node scripts/check-chart-overflow.mjs [--verbose]
  */
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -138,11 +138,14 @@ async function main() {
 
   const bad = [];
   for (const [slug, entry] of Object.entries(charts)) {
-    const box = /viewBox="([^"]+)"/.exec(entry.svg)?.[1].split(/\s+/).map(Number);
+    // The markup lives beside the manifest as one asset per chart (see
+    // SVG_DIR in build-charts.mjs); the manifest carries metadata only.
+    const svg = readFileSync(join(ROOT, "public", "chart-svgs", `${slug}.svg`), "utf8");
+    const box = /viewBox="([^"]+)"/.exec(svg)?.[1].split(/\s+/).map(Number);
     const width = box ? box[2] : entry.width;
     const height = box ? box[3] : entry.height;
     if (!width || !height) continue;
-    const { over, culprit } = overflow(entry.svg, width, height);
+    const { over, culprit } = overflow(svg, width, height);
     if (over > TOLERANCE) bad.push({ slug, over, culprit, entry });
   }
 

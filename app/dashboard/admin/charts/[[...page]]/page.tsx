@@ -40,6 +40,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import chartManifest from "@/lib/generated/charts";
+import { loadChartSvg } from "@/lib/charts/loadChartSvg";
 import createdAt from "@/lib/generated/created-at";
 import {
   ORDERINGS,
@@ -194,8 +195,17 @@ export default async function AdminChartsPage(props: {
 
   const ALL = sortedBy(sort);
   const charts = ALL.slice((current - 1) * PER_PAGE, current * PER_PAGE);
-  const bytes = ALL.reduce((n, [, c]) => n + c.svg.length, 0);
+  const bytes = ALL.reduce((n, [, c]) => n + c.svgBytes, 0);
   const placed = ALL.filter(([, c]) => c.usedBy.length > 0).length;
+
+  // The markup lives as one static asset per chart (see SVG_DIR in
+  // build-charts.mjs), not in the manifest — only this page's slice is
+  // loaded, so the gallery reads 20 files instead of holding all 5.7 MB.
+  const svgBySlug = new Map(
+    await Promise.all(
+      charts.map(async ([slug]) => [slug, (await loadChartSvg(slug)) ?? ""] as const),
+    ),
+  );
 
   return (
     <ChartReviewProvider>
@@ -297,7 +307,7 @@ export default async function AdminChartsPage(props: {
                   </div>
                   <span className={styles.dims}>
                     {chart.width}×{chart.height} ·{" "}
-                    {(chart.svg.length / 1024).toFixed(1)} KB
+                    {(chart.svgBytes / 1024).toFixed(1)} KB
                     <span className={styles.created}>
                       {createdAt.charts[slug]
                         ? `Created ${formatCreated(createdAt.charts[slug])}`
@@ -354,8 +364,8 @@ export default async function AdminChartsPage(props: {
                 </div>
 
                 <div className={styles.split}>
-                  <ChartPane theme="light" slug={slug} title={chart.title} svg={chart.svg} />
-                  <ChartPane theme="dark" slug={slug} title={chart.title} svg={chart.svg} />
+                  <ChartPane theme="light" slug={slug} title={chart.title} svg={svgBySlug.get(slug) ?? ""} />
+                  <ChartPane theme="dark" slug={slug} title={chart.title} svg={svgBySlug.get(slug) ?? ""} />
                 </div>
 
                 <details className={styles.details}>

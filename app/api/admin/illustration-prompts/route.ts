@@ -25,8 +25,13 @@
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { requireAdmin } from "@/lib/auth/admin";
-import createdAt from "@/lib/generated/created-at";
-import imageManifest from "@/lib/generated/images";
+// The image manifest and created-at timestamps arrive as a static asset
+// (public/_gen/illustration-gallery.json, emitted by build-images.mjs), not
+// as imports: API routes compile as their own bundler graph, so importing
+// lib/generated/images.js + created-at.js here carried a private copy of
+// both in the deployed Worker for data this admin-only route reads rarely.
+import type { ImageManifestEntry } from "@/lib/generated/images";
+import { readPublicAsset } from "@/lib/serverAssets";
 import {
   getIllustrationPrompts,
   getIllustrationPromptById,
@@ -45,6 +50,29 @@ export const dynamic = "force-dynamic";
 /** Suffix on the background-removed variant's slug, mirroring the pipeline
  *  (`scripts/remove-background-kie.mjs` writes `<id>-cutout`). */
 const CUTOUT_SUFFIX = "-cutout";
+
+/** Shape of public/_gen/illustration-gallery.json (build-images.mjs). */
+interface GalleryData {
+  images: Record<string, ImageManifestEntry>;
+  illustrationsCreatedAt: Record<string, string>;
+}
+
+/** Cached per isolate: the JSON is immutable for the life of a deploy (it is
+ *  a build artifact, same as the module import it replaced). */
+let galleryDataPromise: Promise<GalleryData | null> | null = null;
+function getGalleryData(): Promise<GalleryData | null> {
+  galleryDataPromise ??= readPublicAsset("_gen/illustration-gallery.json").then(
+    (text) => {
+      if (!text) return null;
+      try {
+        return JSON.parse(text) as GalleryData;
+      } catch {
+        return null;
+      }
+    },
+  );
+  return galleryDataPromise;
+}
 
 /** A prompt plus the one image the gallery renders for it: the cut-out. The
  *  original is deliberately not shown, since reviewing is about how the art
@@ -81,9 +109,12 @@ function json(data: unknown, status = 200): Response {
 
 /** The served cut-out for an id, or null when the background-removal step
  *  hasn't produced one (or the art doesn't exist yet). */
-function cutoutFor(id: string): GalleryEntry["cutout"] {
+function cutoutFor(
+  images: Record<string, ImageManifestEntry>,
+  id: string,
+): GalleryEntry["cutout"] {
   const slug = `${id}${CUTOUT_SUFFIX}`;
-  const entry = imageManifest[slug];
+  const entry = images[slug];
   if (!entry) return null;
   // Illustrations are single-format WebP (see AGENTS.md); take whatever the
   // manifest recorded rather than assuming the extension.
@@ -95,6 +126,14 @@ export async function GET(request: Request): Promise<Response> {
   const { env } = getCloudflareContext();
   const gate = await requireAdmin(env, request);
   if (!gate.ok) return json({ error: gate.message }, gate.status);
+
+  // A missing/unparseable asset means a broken deploy (the build chain always
+  // emits it); degrading to a gallery with every image blank would read as
+  // "nothing generated", which is worse than saying what happened.
+  const gallery = await getGalleryData();
+  if (!gallery) {
+    return json({ error: "Illustration gallery data is unavailable." }, 503);
+  }
 
   const data = getIllustrationPrompts();
   const db = env.ILLUSTRATIONS_DB;
@@ -115,9 +154,9 @@ export async function GET(request: Request): Promise<Response> {
   const payload: IllustrationGallery = {
     entries: data.entries.map((e) => ({
       ...e,
-      cutout: cutoutFor(e.id),
-      hasOriginal: Boolean(imageManifest[e.id]),
-      createdAt: createdAt.illustrations[e.id] ?? null,
+      cutout: cutoutFor(gallery.images, e.id),
+      hasOriginal: Boolean(gallery.images[e.id]),
+      createdAt: gallery.illustrationsCreatedAt[e.id] ?? null,
     })),
     totalIllustrations: data.totalIllustrations,
     totalCourses: data.totalCourses,

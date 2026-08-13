@@ -28,6 +28,7 @@
 import type { CSSProperties } from "react";
 import { ChartLine } from "lucide-react";
 import chartManifest from "@/lib/generated/charts";
+import { loadChartSvg } from "@/lib/charts/loadChartSvg";
 import { withInlineMarkup } from "./inlineMarkup";
 import ChartExpand from "./ChartExpand";
 import styles from "./Chart.module.css";
@@ -56,10 +57,15 @@ interface ChartProps {
   maxWidth?: number;
 }
 
-export function Chart({ slug, caption, maxWidth }: ChartProps) {
+export async function Chart({ slug, caption, maxWidth }: ChartProps) {
   const entry = chartManifest[slug];
+  // The markup lives as a static asset, not in the manifest (which would put
+  // the whole SVG corpus back into the Worker bundle) — filesystem at build
+  // time, the ASSETS binding on a cache-miss render. A missing file with a
+  // present entry means the generator half-ran; treat it like a pending spec.
+  const svg = entry ? await loadChartSvg(slug) : null;
 
-  if (!entry) {
+  if (!entry || svg === null) {
     if (process.env.NODE_ENV !== "development") return null;
     return (
       <span className={styles.pending} role="img" aria-label={`Chart pending: ${slug}`}>
@@ -96,7 +102,7 @@ export function Chart({ slug, caption, maxWidth }: ChartProps) {
               : undefined
           }
           // Build-time output from our own spec files, never user input.
-          dangerouslySetInnerHTML={{ __html: entry.svg }}
+          dangerouslySetInnerHTML={{ __html: svg }}
         />
       </ChartExpand>
       {text ? (

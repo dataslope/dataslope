@@ -44,7 +44,7 @@
  * seeded `rng()`/`normalSamples()` helpers in charts/_theme.mjs.
  */
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { pathToFileURL, fileURLToPath } from "node:url";
 
@@ -58,6 +58,13 @@ const OUT_FILE = join(ROOT, "lib", "generated", "charts.js");
 // chart's markup into the deployed Worker (~891 KiB gzipped, measured — see
 // agent-outputs/20260813-1424-git-playground-design.md §8.6.1).
 const SLUGS_FILE = join(ROOT, "lib", "generated", "chart-slugs.js");
+// One static asset per chart's rendered markup. The manifest itself carries
+// metadata only (title, caption, dimensions, svgBytes); the SVG corpus was
+// ~99% of its weight, and as an `import`ed module it sat in the Worker
+// bundle (~887 KiB gzipped) for pages that are all prerendered anyway.
+// `<Chart>` reads these via lib/charts/loadChartSvg.ts — filesystem at
+// build time, the ASSETS binding on a request-time render.
+const SVG_DIR = join(ROOT, "public", "chart-svgs");
 
 /** Content collection → route prefix, mirroring the `baseUrl`s in lib/source.ts.
  *  A collection that isn't listed here simply contributes no links. */
@@ -352,15 +359,23 @@ const specs = files.filter(isSpec);
 const usages = chartUsages();
 const digest = computeDigest(files, usages);
 
-// The slugs file must exist too: a checkout whose charts.js is current but
-// that predates the slugs split would otherwise skip straight past the write
-// and break the admin API route's import.
-if (priorDigest() === digest && existsSync(SLUGS_FILE)) {
+// The sibling outputs must exist too: a checkout whose charts.js is current
+// but that predates the slugs split (or the SVG-asset split) would otherwise
+// skip straight past the writes and break their consumers.
+const svgDirCurrent = () => {
+  try {
+    return readdirSync(SVG_DIR).filter((f) => f.endsWith(".svg")).length === specs.length;
+  } catch {
+    return false;
+  }
+};
+if (priorDigest() === digest && existsSync(SLUGS_FILE) && svgDirCurrent()) {
   console.log(`build-charts: ${specs.length} chart(s) up to date`);
   process.exit(0);
 }
 
 const charts = {};
+const svgBySlug = new Map();
 const problems = [];
 
 for (const file of specs) {
@@ -454,8 +469,11 @@ for (const file of specs) {
     // under the legibility floor, so the common case costs nothing.
     ...(minWidth ? { minWidth } : {}),
     usedBy: usages[slug] ?? [],
-    svg,
+    // The markup itself goes to public/chart-svgs/<slug>.svg (see SVG_DIR);
+    // the manifest keeps only its size, for the admin gallery's stats.
+    svgBytes: svg.length,
   };
+  svgBySlug.set(slug, svg);
 }
 
 if (problems.length > 0) {
@@ -480,7 +498,15 @@ writeFileSync(
     `export default ${JSON.stringify(Object.keys(charts).sort())};\n`,
 );
 
-const bytes = Object.values(charts).reduce((n, c) => n + c.svg.length, 0);
+// Rebuilt from scratch each run so a renamed or deleted spec's file drops
+// out instead of being served forever from the assets store.
+rmSync(SVG_DIR, { recursive: true, force: true });
+mkdirSync(SVG_DIR, { recursive: true });
+for (const [slug, svg] of svgBySlug) {
+  writeFileSync(join(SVG_DIR, `${slug}.svg`), svg);
+}
+
+const bytes = Object.values(charts).reduce((n, c) => n + c.svgBytes, 0);
 const orphans = Object.keys(charts).filter((slug) => charts[slug].usedBy.length === 0);
 console.log(
   `build-charts: ${specs.length} chart(s) rendered ` +

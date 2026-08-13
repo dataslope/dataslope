@@ -81,6 +81,11 @@ script-runner-src/__pycache__/
 /lib/generated/home-stats.js
 /lib/generated/charts.js
 /lib/generated/chart-slugs.js
+# Per-chart SVG assets + the illustration-gallery JSON, emitted by
+# build-charts.mjs / build-images.mjs into public/ so they ship as static
+# assets instead of Worker-bundled modules.
+/public/chart-svgs/
+/public/_gen/
 /lib/generated/created-at.js
 
 # Playground audit output (e2e/playground-audit.spec.ts)
