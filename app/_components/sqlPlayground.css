@@ -265,13 +265,14 @@
   flex-direction: column;
 }
 
+/* Sentence case with normal tracking: the section names are written out in
+   full ("Tables (4)"), so the small-caps treatment was working against the
+   thing it labelled. */
 .sql-tree-label {
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.08em;
   color: var(--text-dim);
   padding: 4px 12px;
-  text-transform: uppercase;
 }
 
 .sql-tree-entity {
@@ -1209,9 +1210,12 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  flex: 0 1 220px;
-  min-width: 120px;
-  max-width: 280px;
+  /* Sized for the placeholder plus a short term, not for the longest thing
+     anyone might filter on; the row count and the pager beside it are what
+     the footer's width is really for. */
+  flex: 0 1 160px;
+  min-width: 110px;
+  max-width: 200px;
   height: 22px;
   padding: 0 4px 0 6px;
   background: var(--bg3);
@@ -1295,11 +1299,11 @@
 }
 
 .sql-result-pager-page-input {
-  width: 3.2em;
+  width: 2.4em;
   padding: 2px 4px;
   text-align: center;
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text);
   background: var(--bg3);
   border: none;
