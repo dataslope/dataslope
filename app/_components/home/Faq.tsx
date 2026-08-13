@@ -21,12 +21,12 @@ const FAQS: { q: string; a: string }[] = [
     a: "Ask AI has a daily allowance that refreshes on a rolling 24-hour basis, so prompts you use free up again over the following day. For now Dataslope only offers free memberships, so there's no paid upgrade for extra prompts, everyone gets the same free allowance. We may add more options in the future.",
   },
   {
-    q: "How does code run without a server?",
-    a: "Each language is compiled to WebAssembly and executed entirely on your own machine. Your code and data never leave the browser, so the playgrounds work even offline once a runtime has loaded.",
+    q: "Why learn the basics when AI can do the heavy lifting?",
+    a: "Because someone still has to judge what comes back. AI is fastest in the hands of people who can read the code it writes, spot the wrong join or the off-by-one, and say precisely what they wanted instead, and that judgment only comes from having written enough of it yourself. The playgrounds are here so you can run things and see the result for yourself rather than take anyone's word for it.",
   },
   {
     q: "Which languages and databases are supported?",
-    a: "Python, R, JavaScript, TypeScript, PHP, C, C++, Java, and C#, plus SQLite, PostgreSQL, and DuckDB for SQL.",
+    a: "Python, R, JavaScript, TypeScript, HTML/CSS, React, PHP, C, C++, Java, and C#, plus PostgreSQL, SQLite, and DuckDB for SQL.",
   },
   {
     q: "Is my work saved?",
