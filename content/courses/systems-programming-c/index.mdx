@@ -6,8 +6,8 @@ description: A hands-on, browser-based tour of systems programming and memory ma
 Welcome to **Systems Programming &amp; Memory Management in C**, a course
 that takes you from your very first `int main(void)` all the way to
 hand-rolled memory allocators, structs with carefully chosen padding,
-and the kinds of memory bugs that have powered half the CVEs of the
-last forty years.
+and the kinds of memory bugs that have powered a large share of the
+CVEs of the last forty years.[^share]
 
 <Figure
   slug="systems-programming-c-thumbnail-cutout"
@@ -161,3 +161,12 @@ A roadmap for what to study after this course: signals and processes,
 threads and synchronization, sockets and protocols, `mmap` and shared
 memory, sanitizers (ASan/UBSan/MSan), Valgrind, custom allocators,
 embedded toolchains, and Rust as a "modern C" alternative.
+
+[^share]:
+    Microsoft's Security Response Center
+    [reported](https://raw.githubusercontent.com/microsoft/MSRC-Security-Research/master/presentations/2019_02_BlueHatIL/2019_01%20-%20BlueHatIL%20-%20Trends%2C%20challenge%2C%20and%20shifts%20in%20software%20vulnerability%20mitigation.pdf)
+    in 2019 that "~70% of the vulnerabilities addressed through a
+    security update each year continue to be memory safety issues", and
+    the Chromium project puts
+    [about 70%](https://www.chromium.org/Home/chromium-security/memory-safety/)
+    of its own serious security bugs in the same category.

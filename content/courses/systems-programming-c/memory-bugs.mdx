@@ -20,8 +20,8 @@ The bug classes we will cover:
 - Type confusion / strict aliasing
 
 These are not "exotic" bugs, they are the source of an enormous
-share of real-world security vulnerabilities (CVEs). Recognizing the
-patterns is half the battle.
+share of real-world security vulnerabilities (CVEs).[^share]
+Recognizing the patterns is half the battle.
 
 <Figure
   slug="sysc-memory-bugs-cutout"
@@ -568,3 +568,14 @@ int main(void) {
 You know the bug classes. Tools like AddressSanitizer and Valgrind
 will be your best friends in real codebases.
 </Callout>
+
+[^share]:
+    Two large C and C++ codebases have counted this independently and
+    landed on the same number. Microsoft's Security Response Center
+    [reported](https://raw.githubusercontent.com/microsoft/MSRC-Security-Research/master/presentations/2019_02_BlueHatIL/2019_01%20-%20BlueHatIL%20-%20Trends%2C%20challenge%2C%20and%20shifts%20in%20software%20vulnerability%20mitigation.pdf)
+    that "~70% of the vulnerabilities addressed through a security
+    update each year continue to be memory safety issues" (BlueHat IL,
+    2019), and the Chromium project puts
+    [about 70%](https://www.chromium.org/Home/chromium-security/memory-safety/)
+    of its own serious security bugs in the same category. Every bug
+    class on this page is in that 70%.

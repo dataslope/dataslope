@@ -5,9 +5,9 @@ description: How memory management bugs in C and C++ have crashed satellites, le
 
 The bug classes from the last page are not academic curiosities.
 They are the root cause of an enormous share of real-world software
-failures, from research-lab incidents to internet-scale security
-catastrophes that affected hundreds of millions of users and cost
-billions of dollars.
+failures,[^share] from research-lab incidents to internet-scale
+security catastrophes that affected hundreds of millions of users and
+cost billions of dollars.
 
 This page is a tour of the most instructive incidents. For each one
 we identify *which* bug class from the previous page caused it, and
@@ -35,9 +35,9 @@ flowchart LR
 In November 1988, a graduate student named Robert Morris released a
 self-replicating program that within hours infected an estimated 10%
 of all computers on the internet, roughly 6,000 machines at the
-time. It was the world's first major internet worm and led directly
-to the creation of CERT/CC, the first computer-emergency response
-team.
+time.[^spafford] It was the world's first major internet worm and led
+directly to the creation of CERT/CC, the first computer-emergency
+response team.[^cert]
 
 One of its key propagation vectors exploited a *stack buffer
 overflow* in the BSD `fingerd` daemon. `fingerd` read a request into
@@ -61,9 +61,10 @@ part of the input.
 
 **Bug class:** stack buffer overflow.
 **Fallout:** Morris received the first conviction under the U.S.
-Computer Fraud and Abuse Act. `gets()` was deprecated in C99 and
-*removed* from C11. Decades later, `-fstack-protector`, ASLR, and
-non-executable stacks are all responses to this attack pattern.
+Computer Fraud and Abuse Act.[^morris-case] `gets()` was deprecated in
+C99 and *removed* from C11.[^c11] Decades later, `-fstack-protector`,
+ASLR, and non-executable stacks are all responses to this attack
+pattern.
 
 <Callout type="warn" title="`gets()` is so dangerous it was removed from the language">
 If you see `gets(buf)` in any code, replace it immediately with
@@ -74,10 +75,10 @@ original.
 ## 2. Code Red (2001), IIS, .ida, and one bad URL
 
 In July 2001, a worm called Code Red infected over 350,000 Microsoft
-IIS web servers in under 14 hours and defaced their home pages with
-the message *"HELLO! Welcome to http://www.worm.com! Hacked by
-Chinese!"*. It also tried to launch a DDoS against the White House
-web server.
+IIS web servers in under 14 hours[^caida-codered] and defaced their
+home pages with the message *"HELLO! Welcome to http://www.worm.com!
+Hacked by Chinese!"*. It also tried to launch a DDoS against the White
+House web server.
 
 <Figure
   slug="sysc-real-world-disasters-2-code-red-inline-cutout"
@@ -92,17 +93,17 @@ copied URL-decoded input with no length check, overwriting the
 return address.
 
 **Bug class:** stack buffer overflow (again).
-**Fallout:** estimated $2.6 billion in cleanup and lost productivity.
-Microsoft turned the Indexing Service off by default and the
-incident became a textbook example used in every secure-coding
-course since.
+**Fallout:** estimated $2.6 billion in cleanup and lost
+productivity.[^codered-cost] Microsoft turned the Indexing Service off
+by default and the incident became a textbook example used in every
+secure-coding course since.
 
 ## 3. SQL Slammer (2003), 376 bytes, the whole internet
 
 Slammer is famous for two things: it was tiny (the entire payload
 fit in a single 376-byte UDP packet) and it was *fast*, it doubled
 the infected population every 8.5 seconds and effectively saturated
-the global internet's routing capacity within ten minutes.
+the global internet's routing capacity within ten minutes.[^slammer]
 
 <Figure
   slug="sysc-disasters-sql-slammer-cutout"
@@ -124,10 +125,10 @@ dark for hours.
 
 ## 4. Heartbleed (2014), a two-byte length field, half a million sites
 
-Heartbleed (CVE-2014-0160) was a vulnerability in OpenSSL's
-implementation of the TLS Heartbeat extension. It did not corrupt
-memory or crash the server, it did something arguably worse: it
-let any attacker read up to ~64 KB of the server's process memory
+Heartbleed (CVE-2014-0160)[^cve-heartbleed] was a vulnerability in
+OpenSSL's implementation of the TLS Heartbeat extension. It did not
+corrupt memory or crash the server, it did something arguably worse:
+it let any attacker read up to ~64 KB of the server's process memory
 *per request*, with no authentication and no log trace.
 
 <Figure
@@ -155,9 +156,12 @@ users' HTTP requests.
 "trust attacker-supplied length" mistake, but reading rather than
 writing).
 **Fallout:** roughly 17% of all "secure" web servers in the world
-were vulnerable on the day of disclosure. Every TLS certificate that
-might have been exposed had to be reissued. The xkcd cartoon
-explaining it became one of the most-shared technical comics ever.
+were vulnerable on the day of disclosure.[^netcraft] The measurement
+study that tracked the disclosure put the initially vulnerable
+population at 24 to 55% of the HTTPS servers in the Alexa Top 1
+Million.[^matter-of-heartbleed] Every TLS certificate that might have
+been exposed had to be reissued. The xkcd cartoon explaining it became
+one of the most-shared technical comics ever.
 
 <Callout type="info" title="Lesson: never trust a length field from the network">
 Always cross-check declared lengths against what you actually
@@ -199,8 +203,8 @@ region.
 **Bug class:** *off-by-one*, leading to a buffer over-read.
 **Fallout:** during the worst stretch, Cloudflare estimated that
 roughly 1 in every 3.3 million HTTP requests passing through its
-edge leaked memory, a tiny rate multiplied by an enormous volume of
-traffic, over a period of months. The fix was a single character;
+edge leaked memory,[^cloudbleed] a tiny rate multiplied by an enormous
+volume of traffic, over a period of months. The fix was a single character;
 the cleanup, hunting down and purging leaked fragments from search
 engine caches across the entire web, took weeks of coordinated
 work with Google, Bing, and others.
@@ -210,8 +214,8 @@ work with Google, Bing, and others.
 Stagefright was a family of vulnerabilities in Android's media
 framework. The headline bug allowed remote code execution on roughly
 **95% of all Android devices** simply by sending a malicious MMS
-message. The phone would parse the attached video automatically, no
-user interaction required.
+message.[^stagefright] The phone would parse the attached video
+automatically, no user interaction required.
 
 The core defect was an *integer overflow* in a 32-bit `size` value
 inside the MP4 parser. When the parser computed `size + something`
@@ -229,7 +233,7 @@ memory-safer languages.
 ## 7. GHOST (2015), `gethostbyname` and a forgotten `+ 1`
 
 CVE-2015-0235 was a buffer overflow in glibc's `__nss_hostname_digits_dots`
-helper, reached via the venerable `gethostbyname` family. The bug:
+helper,[^ghost] reached via the venerable `gethostbyname` family. The bug:
 a length calculation forgot to include one byte for the null
 terminator, allowing a carefully sized hostname to overflow a heap
 buffer by a few bytes, enough to corrupt allocator metadata and
@@ -254,22 +258,22 @@ attacker data spill out of a heap buffer.
 A month later, the WannaCry ransomware worm picked up EternalBlue
 and used it to encrypt files on hundreds of thousands of computers
 in 150+ countries. The UK's National Health Service had to cancel
-operations. FedEx, Renault, Deutsche Bahn, and Telefónica were all
+operations.[^nao] FedEx, Renault, Deutsche Bahn, and Telefónica were all
 disrupted.
 
 **Bug class:** integer truncation / underflow → heap buffer overflow
 in a network service.
-**Fallout:** estimated $4–8 billion in total damages. The episode
-hardened the case for getting old C network services out of the
-trust path entirely.
+**Fallout:** estimated $4–8 billion in total damages.[^wannacry-cost]
+The episode hardened the case for getting old C network services out
+of the trust path entirely.
 
 ## 9. BlueKeep (2019), RDP and use-after-free
 
-CVE-2019-0708, nicknamed BlueKeep, was a *use-after-free* in
-Microsoft's Remote Desktop Protocol. A pre-authentication attacker
-could trigger an RDP channel-rebinding code path that freed a
-structure but kept a dangling pointer to it; subsequent operations
-through that pointer were attacker-controllable.
+CVE-2019-0708, nicknamed BlueKeep,[^cve-bluekeep] was a
+*use-after-free* in Microsoft's Remote Desktop Protocol. A
+pre-authentication attacker could trigger an RDP channel-rebinding
+code path that freed a structure but kept a dangling pointer to it;
+subsequent operations through that pointer were attacker-controllable.
 
 Microsoft considered BlueKeep severe enough to release patches even
 for unsupported operating systems (XP, Server 2003), something it
@@ -285,7 +289,7 @@ a board-level conversation at many enterprises.
 The Therac-25 was a radiation therapy machine produced by Atomic
 Energy of Canada Limited. Between 1985 and 1987 it gave at least six
 patients massive radiation overdoses, hundreds of times the
-intended dose. At least three died as a direct result.
+intended dose. At least three died as a direct result.[^therac]
 
 <Figure
   slug="sysc-disasters-therac-25-cutout"
@@ -318,7 +322,7 @@ removing safety hardware on the assumption that the code is correct.
 
 On its maiden flight, the European Space Agency's Ariane 5 rocket
 self-destructed 37 seconds after launch, taking with it four
-scientific satellites and roughly $370 million.
+scientific satellites and roughly $370 million.[^ariane]
 
 The cause was not, strictly, a memory bug, but it is a textbook
 example of the kind of UB-adjacent disaster C programmers are
@@ -348,7 +352,7 @@ PS3's hypervisor, the privileged layer that kept the console's
 software and a literal hardware glitch: he had Linux ask the
 hypervisor to create and then tear down memory mappings while he
 pulsed a wire on the memory bus at precisely the wrong moment, so
-the hypervisor's *deallocation write was lost in transit*. The
+the hypervisor's *deallocation write was lost in transit*.[^ps3] The
 hypervisor believed a mapping was gone; the page tables still
 contained it. Through that dangling, stale mapping he could read
 and write hypervisor-owned memory, in effect, a use-after-free
@@ -468,3 +472,145 @@ accumulated lessons of decades of expensive failures. Internalize
 them now, and you join a small group of C programmers who do not
 have to learn them the hard way.
 </Callout>
+
+[^share]:
+    Matt Miller, Microsoft Security Response Center,
+    [*Trends, challenges, and strategic shifts in the software
+    vulnerability mitigation landscape*](https://raw.githubusercontent.com/microsoft/MSRC-Security-Research/master/presentations/2019_02_BlueHatIL/2019_01%20-%20BlueHatIL%20-%20Trends%2C%20challenge%2C%20and%20shifts%20in%20software%20vulnerability%20mitigation.pdf)
+    (BlueHat IL, 2019): "~70% of the vulnerabilities addressed through
+    a security update each year continue to be memory safety issues."
+    The Chromium project
+    [reports the same proportion](https://www.chromium.org/Home/chromium-security/memory-safety/)
+    of its own serious security bugs. Two large C and C++ codebases,
+    counted independently, a decade apart, landing on the same number.
+
+[^spafford]:
+    Eugene H. Spafford,
+    [*The Internet Worm Program: An Analysis*](https://docs.lib.purdue.edu/cstech/702/),
+    Purdue University Technical Report CSD-TR-823 (1988). Written
+    weeks after the event by someone who disassembled the worm; the
+    "roughly 6,000 machines" figure is an estimate even in the primary
+    sources, because nobody had an inventory of the 1988 internet.
+
+[^cert]:
+    The CERT Coordination Center was established at Carnegie Mellon's
+    Software Engineering Institute in November 1988, days after the
+    worm, at DARPA's request.
+    [SEI, CERT Division](https://www.sei.cmu.edu/about/divisions/cert/index.cfm).
+
+[^morris-case]:
+    *United States v. Morris*, 928 F.2d 504 (2d Cir. 1991), the appeal
+    that upheld the first conviction under the Computer Fraud and
+    Abuse Act and settled what "intent" means in it.
+
+[^c11]:
+    `gets` was declared obsolescent in C99 TC3 and is absent from the
+    C11 library. See WG14
+    [N1570](https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf),
+    the C11 draft, whose §7.21 has no `gets` and whose Annex K
+    documents `gets_s` as its bounded replacement.
+
+[^caida-codered]:
+    David Moore, Colleen Shannon and Jeffery Brown,
+    [*Code-Red: a case study on the spread and victims of an Internet
+    worm*](https://www.caida.org/catalog/papers/2002_codered/)
+    (IMW 2002). CAIDA watched the spread from a network telescope, so
+    the host count is measured rather than reported.
+
+[^codered-cost]:
+    The widely-quoted $2.6 billion is Computer Economics' estimate of
+    cleanup plus lost productivity. Worm cost figures like this one are
+    commercial modelling rather than audited accounting, and different
+    firms have published estimates that differ by more than a factor of
+    two; treat the order of magnitude as the claim, not the digits.
+
+[^slammer]:
+    David Moore et al.,
+    [*The Spread of the Sapphire/Slammer Worm*](https://www.caida.org/catalog/papers/2003_sapphire/)
+    (CAIDA, 2003), later published in *IEEE Security & Privacy* as
+    "Inside the Slammer Worm". The 8.5-second doubling time and the
+    ten-minute saturation are that paper's measurements.
+
+[^cve-heartbleed]:
+    [CVE-2014-0160](https://www.cve.org/CVERecord?id=CVE-2014-0160).
+    The vulnerability also has its own site,
+    [heartbleed.com](https://heartbleed.com/), written by the
+    Codenomicon engineers who found it independently of Google.
+
+[^netcraft]:
+    Netcraft,
+    [*Half a million widely trusted websites vulnerable to Heartbleed
+    bug*](https://www.netcraft.com/blog/half-a-million-widely-trusted-websites-vulnerable-to-heartbleed-bug/)
+    (April 2014), the survey the 17% figure comes from.
+
+[^matter-of-heartbleed]:
+    Zakir Durumeric et al.,
+    [*The Matter of Heartbleed*](https://jhalderm.com/pub/papers/heartbleed-imc14.pdf)
+    (IMC 2014). The range is wide because it depends on how a site is
+    counted; the paper also tracks how slowly the population patched.
+
+[^cloudbleed]:
+    John Graham-Cumming,
+    [*Incident report on memory leak caused by Cloudflare parser
+    bug*](https://blog.cloudflare.com/incident-report-on-memory-leak-caused-by-cloudflare-parser-bug/)
+    (Cloudflare, February 2017). Unusually candid for a vendor
+    post-mortem: it gives the leak rate, the exact Ragel condition, and
+    the reason the bug had been latent in the code for years.
+
+[^stagefright]:
+    Joshua Drake, Zimperium,
+    [*Experts Found a Unicorn in the Heart of Android*](https://www.zimperium.com/blog/experts-found-a-unicorn-in-the-heart-of-android/)
+    (July 2015). The 95% and 950 million figures are the discovering
+    vendor's own estimates of the affected install base, not a
+    measurement of exploited devices.
+
+[^ghost]:
+    Qualys,
+    [*GHOST: glibc gethostbyname buffer overflow*](https://www.qualys.com/2015/01/27/cve-2015-0235/GHOST-CVE-2015-0235.txt)
+    (January 2015), the disclosure advisory, with the exact
+    off-by-one and a working proof of concept.
+    [CVE-2015-0235](https://www.cve.org/CVERecord?id=CVE-2015-0235).
+
+[^nao]:
+    UK National Audit Office,
+    [*Investigation: WannaCry cyber attack and the NHS*](https://www.nao.org.uk/reports/investigation-wannacry-cyber-attack-and-the-nhs/)
+    (2018). An audited account of one organisation's disruption, which
+    is rarer and more reliable than a global damage total.
+    [CVE-2017-0144](https://www.cve.org/CVERecord?id=CVE-2017-0144) is
+    the underlying SMBv1 flaw.
+
+[^wannacry-cost]:
+    Global damage figures for WannaCry come from commercial
+    cyber-risk modelling rather than audited accounts, and the
+    published estimates span more than a factor of two. The NAO report
+    cited above is the firmer number, for one health service.
+
+[^cve-bluekeep]:
+    [CVE-2019-0708](https://www.cve.org/CVERecord?id=CVE-2019-0708).
+    Microsoft's decision to patch Windows XP and Server 2003, years
+    after their end of life, is the clearest signal of how wormable it
+    judged the bug to be.
+
+[^therac]:
+    Nancy G. Leveson and Clark S. Turner,
+    [*An Investigation of the Therac-25 Accidents*](https://web.mit.edu/6.033/2014/wwwdocs/papers/therac.pdf),
+    *IEEE Computer* 26(7), 1993. The definitive account, and the source
+    of the `Class3` overflow detail; Leveson has since noted that most
+    retellings of Therac-25 get the causes wrong, so prefer this one to
+    any summary of it, including the one above.
+
+[^ariane]:
+    J. L. Lions et al.,
+    [*ARIANE 5: Flight 501 Failure, Report by the Inquiry Board*](https://esamultimedia.esa.int/docs/esa-x-1819eng.pdf)
+    (ESA/CNES, July 1996). Eight pages, and the clearest accident
+    report in software engineering: the conversion, the exception, the
+    redundant computer running identical code, and the decision not to
+    protect the variable because an analysis had shown it could not
+    overflow on Ariane 4.
+
+[^ps3]:
+    Nate Lawson,
+    [*How the PS3 hypervisor was hacked*](https://rdist.root.org/2010/01/27/how-the-ps3-hypervisor-was-hacked/)
+    (January 2010), a technical reconstruction of the attack George
+    Hotz published, written by a cryptography engineer rather than by
+    the attacker.
