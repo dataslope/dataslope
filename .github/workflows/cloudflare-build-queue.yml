@@ -1,0 +1,317 @@
+name: Cloudflare build queue
+
+# Serializes Cloudflare Workers Builds per branch: one build at a time, and a
+# push that arrives while a build is running supersedes any earlier push still
+# waiting.
+#
+# Why this exists: Workers Builds has no per-branch build policy. Its git
+# integration starts a build for EVERY push, and the only throttle is the
+# account-wide concurrency cap that comes with the plan (1 build on Free, 6 on
+# Paid, see https://developers.cloudflare.com/workers/ci-cd/builds/limits-and-pricing/).
+# So four commits pushed three minutes apart to one branch start four builds
+# that run alongside each other, and the first three are dead on arrival: their
+# previews are superseded before they finish, but they still burn build minutes
+# and still each write a ~1-1.4 GB incremental-cache folder to R2 (see
+# r2-cache-cleanup.yml). Cloudflare does skip a QUEUED build when a newer one
+# queues behind the same trigger (changelog 2026-07-24), but that only bites
+# once the account-wide cap is saturated, which is not a per-branch policy.
+#
+# The queue is GitHub's `concurrency` group, one per branch, with
+# cancel-in-progress deliberately left FALSE. GitHub's own semantics are
+# exactly the wanted policy: a run whose group is busy goes `pending`, and a
+# newly queued run cancels the run that was already pending. Commits A/B/C/D
+# pushed three minutes apart with an eight-minute build therefore behave like:
+#
+#   min 0  A pushed -> builds (holds the group)
+#   min 3  B pushed -> pending
+#   min 6  C pushed -> pending; B cancelled before it ever triggered a build
+#   min 8  A done   -> C starts building
+#   min 9  D pushed -> pending
+#   min 16 C done   -> D starts building
+#
+# Only builds that are still the branch head when a slot frees up ever reach
+# Cloudflare. A cancelled pending run has nothing to clean up on Cloudflare's
+# side, because it never got as far as triggering a build.
+#
+# How the build is started: this job holds the queue slot and drives Cloudflare
+# through the Workers Builds API, POST /builds/triggers/{uuid}/builds with the
+# branch and commit, then polls until the build stops. That keeps the build
+# itself on Cloudflare (build caching, the build token's bindings, preview
+# aliases and the check run that cloudflare-build-pr-comments.yml listens for)
+# and moves only the DECISION of when to start it into this workflow.
+#
+# SETUP (this job is inert until all three are done, see README.md
+# "One build at a time per branch"):
+#   1. Cloudflare -> the `dataslope` worker -> Settings -> Build -> Branch
+#      control: UNCHECK "Builds for non-production branches". Otherwise every
+#      push builds twice, once from Cloudflare's push trigger and once from
+#      here, which is strictly worse than doing nothing.
+#   2. Repository secret CLOUDFLARE_API_TOKEN, an API token with Account ->
+#      Workers CI -> Edit. (CLOUDFLARE_ACCOUNT_ID already exists for
+#      r2-cache-cleanup.yml.) This token only orchestrates builds; the build
+#      itself keeps using Cloudflare's own build token.
+#   3. Repository variable CF_BUILD_QUEUE = true.
+#
+# `main` is intentionally NOT queued: production keeps Cloudflare's native push
+# trigger, which the dashboard cannot disable independently of the connection.
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+# The queue. One group per branch (`github.ref` is the full ref, so a branch
+# and a tag of the same name cannot collide). cancel-in-progress: false is the
+# whole point — the RUNNING build is never killed, only the waiting one is
+# replaced. Flip it to true for the opposite policy (always build the newest
+# commit immediately, cancelling whatever is in flight), or add
+# `queue: {max: N}` to build every commit in order instead of superseding.
+concurrency:
+  group: cf-build-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  checks: read
+  pull-requests: write
+
+jobs:
+  build:
+    # `github.event.deleted` is true for the push event a branch deletion
+    # emits; there is nothing to build for a ref that no longer exists.
+    if: ${{ vars.CF_BUILD_QUEUE == 'true' && !github.event.deleted }}
+    runs-on: ubuntu-latest
+    # Cloudflare terminates a build at 20 minutes; the rest of this budget
+    # covers waiting for a free slot on Cloudflare's side. A job that overruns
+    # holds the branch's queue slot, so it is bounded rather than generous.
+    timeout-minutes: 50
+    env:
+      # The APP worker. The CORS proxy (cloudflare-cors-proxy/) is a separate
+      # worker with its own build trigger and is not queued by this workflow.
+      WORKER_NAME: dataslope
+      ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      # Secrets cannot be tested from inside `run:` (an unset one arrives as
+      # empty, indistinguishable from set-but-empty), so resolve it here.
+      CREDS_SET: ${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' }}
+      # Optional escape hatch: pin the build trigger instead of discovering it.
+      # Useful if the worker ever carries more than one active trigger.
+      TRIGGER_UUID_OVERRIDE: ${{ vars.CF_BUILD_TRIGGER_UUID }}
+      BRANCH: ${{ github.ref_name }}
+      SHA: ${{ github.sha }}
+      POLL_SECONDS: "15"
+      POLL_TIMEOUT_SECONDS: "2400"
+      # A manual build names its branch, so Cloudflare should route it down the
+      # non-production path (`npx opennextjs-cloudflare upload`) exactly as a
+      # push to that branch would. The API docs do not spell that out, and the
+      # failure mode if it is ever wrong is severe: a feature branch shipped to
+      # production and, worse, `db:seed:search:remote` overwriting the live
+      # search index with that branch's content (see README "Search"). So the
+      # build's own deploy command is read back before waiting on it, and the
+      # build is cancelled if it carries the production-only tail.
+      PRODUCTION_ONLY_DEPLOY_MARKER: "db:seed:search:remote"
+    steps:
+      - name: Trigger the Cloudflare build and wait for it
+        id: build
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "$CREDS_SET" != "true" ]]; then
+            echo "::error::CF_BUILD_QUEUE is on but repository secrets CLOUDFLARE_API_TOKEN and/or CLOUDFLARE_ACCOUNT_ID are not set. Refusing to run, pushes to this branch would otherwise never build."
+            exit 1
+          fi
+
+          BASE="https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/builds"
+          RESP=""
+
+          # cf <METHOD> <PATH> [JSON_BODY] -> sets RESP to the response body.
+          # Retries transient failures (network, 5xx, 429) a few times; a 4xx
+          # is a configuration problem that will not fix itself, so it fails
+          # immediately rather than sitting on the branch's queue slot.
+          cf() {
+            local method="$1" path="$2" body="${3:-}" attempt out code
+            for attempt in 1 2 3 4 5; do
+              if [[ -n "$body" ]]; then
+                out=$(curl -sS -X "$method" "${BASE}${path}" \
+                  -H "Authorization: Bearer ${CF_API_TOKEN}" \
+                  -H 'Content-Type: application/json' \
+                  --data "$body" -w $'\n%{http_code}') || out=$'\n000'
+              else
+                out=$(curl -sS -X "$method" "${BASE}${path}" \
+                  -H "Authorization: Bearer ${CF_API_TOKEN}" \
+                  -w $'\n%{http_code}') || out=$'\n000'
+              fi
+              code="${out##*$'\n'}"
+              RESP="${out%$'\n'*}"
+              if [[ "$code" == 2* && "$(jq -r 'try .success catch false' <<<"$RESP")" == "true" ]]; then
+                return 0
+              fi
+              if [[ "$code" == 4* && "$code" != "429" ]]; then
+                break
+              fi
+              sleep $(( attempt * 5 ))
+            done
+            echo "::error::Cloudflare API ${method} ${path} failed (HTTP ${code}): $(jq -c 'try .errors catch .' <<<"$RESP" 2>/dev/null || printf '%s' "$RESP")"
+            return 1
+          }
+
+          # 1) Resolve the worker's build trigger (the repo connection). The
+          #    result shape has moved around, so accept both an array and an
+          #    object wrapping one, and ignore triggers that were deleted.
+          TRIGGER_UUID="$TRIGGER_UUID_OVERRIDE"
+          if [[ -z "$TRIGGER_UUID" ]]; then
+            cf GET "/workers/${WORKER_NAME}/triggers"
+            mapfile -t TRIGGERS < <(jq -r '
+              [ (.result // empty)
+                | if type == "array" then .[] else (.triggers // .items // [])[] end
+                | select(.deleted_on == null)
+                | .trigger_uuid ] | .[]' <<<"$RESP")
+            if [[ "${#TRIGGERS[@]}" -eq 0 ]]; then
+              echo "::error::No active build trigger found for worker '${WORKER_NAME}'. Is the git repository still connected under Settings -> Build?"
+              exit 1
+            fi
+            if [[ "${#TRIGGERS[@]}" -gt 1 ]]; then
+              echo "::warning::Worker '${WORKER_NAME}' has ${#TRIGGERS[@]} active build triggers; using the first. Pin one with the CF_BUILD_TRIGGER_UUID repository variable."
+            fi
+            TRIGGER_UUID="${TRIGGERS[0]}"
+          fi
+
+          # 2) Start the build for this exact commit. Reaching this line means
+          #    this run holds the branch's queue slot, so no other build for
+          #    this branch is in flight and every push that landed while an
+          #    earlier build ran has already been superseded by this one.
+          echo "Triggering build for ${BRANCH} @ ${SHA:0:7} (trigger ${TRIGGER_UUID})"
+          cf POST "/triggers/${TRIGGER_UUID}/builds" \
+            "$(jq -nc --arg b "$BRANCH" --arg c "$SHA" '{branch: $b, commit_hash: $c}')"
+          BUILD_UUID=$(jq -r '.result.build_uuid // empty' <<<"$RESP")
+          if [[ -z "$BUILD_UUID" ]]; then
+            echo "::error::Cloudflare accepted the request but returned no build_uuid: $(jq -c . <<<"$RESP")"
+            exit 1
+          fi
+          echo "build_uuid=${BUILD_UUID}" >> "$GITHUB_OUTPUT"
+          echo "Build ${BUILD_UUID} created."
+
+          # 3) Read the build back and refuse to let a non-production branch
+          #    run the production deploy command (see
+          #    PRODUCTION_ONLY_DEPLOY_MARKER above). An empty deploy command
+          #    means the API did not report one, which is not evidence of a
+          #    problem, so it only warns.
+          cf GET "/builds/${BUILD_UUID}"
+          DEPLOY_CMD=$(jq -r '.result.deploy_command // .result.build_trigger_metadata.deploy_command // ""' <<<"$RESP")
+          if [[ -z "$DEPLOY_CMD" ]]; then
+            echo "::warning::Cloudflare reported no deploy command for build ${BUILD_UUID}; cannot verify it is the non-production one."
+          elif [[ "$DEPLOY_CMD" == *"$PRODUCTION_ONLY_DEPLOY_MARKER"* ]]; then
+            cf PUT "/builds/${BUILD_UUID}/cancel" || true
+            echo "::error::Build ${BUILD_UUID} for branch '${BRANCH}' was created with the PRODUCTION deploy command (${DEPLOY_CMD}). Cancelled it. Check Settings -> Build -> Branch control: the production branch must be 'main'."
+            exit 1
+          else
+            echo "Deploy command: ${DEPLOY_CMD}"
+          fi
+
+          # 4) Hold the queue slot until the build stops. Statuses are queued /
+          #    initializing / running / stopped; the verdict is build_outcome.
+          deadline=$(( SECONDS + POLL_TIMEOUT_SECONDS ))
+          status=""
+          outcome=""
+          while :; do
+            cf GET "/builds/${BUILD_UUID}"
+            status=$(jq -r '.result.status // "unknown"' <<<"$RESP")
+            outcome=$(jq -r '.result.build_outcome // ""' <<<"$RESP")
+            if [[ "$status" == "stopped" ]]; then
+              break
+            fi
+            if (( SECONDS > deadline )); then
+              echo "::error::Build ${BUILD_UUID} still '${status}' after $(( POLL_TIMEOUT_SECONDS / 60 )) minutes; giving up on waiting (the build itself is left alone)."
+              echo "outcome=timeout" >> "$GITHUB_OUTPUT"
+              exit 1
+            fi
+            sleep "$POLL_SECONDS"
+          done
+          echo "outcome=${outcome}" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "### Cloudflare build \`${outcome:-unknown}\`"
+            echo
+            echo "| | |"
+            echo "| --- | --- |"
+            echo "| Branch | \`${BRANCH}\` |"
+            echo "| Commit | \`${SHA:0:7}\` |"
+            echo "| Build | \`${BUILD_UUID}\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          case "$outcome" in
+            success)
+              echo "Build succeeded." ;;
+            skipped)
+              # Cloudflare skips a build that a newer queued build supersedes,
+              # or that build watch paths exclude. Neither is a failure.
+              echo "::notice::Cloudflare skipped build ${BUILD_UUID}." ;;
+            cancelled)
+              echo "::notice::Build ${BUILD_UUID} was cancelled." ;;
+            *)
+              echo "::error::Build ${BUILD_UUID} finished with outcome '${outcome:-unknown}'."
+              exit 1 ;;
+          esac
+
+      # If this run is cancelled while it is actually building (a pending run
+      # is cancelled before it ever gets here), the Cloudflare build would
+      # otherwise keep going and deploy a commit nobody is waiting for.
+      - name: Cancel the Cloudflare build if this run was cancelled
+        if: ${{ cancelled() && steps.build.outputs.build_uuid != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -sS -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/builds/builds/${{ steps.build.outputs.build_uuid }}/cancel" \
+            -H "Authorization: Bearer ${CF_API_TOKEN}" >/dev/null || true
+          echo "Requested cancellation of build ${{ steps.build.outputs.build_uuid }}."
+
+      # cloudflare-build-pr-comments.yml comments off the "Workers Builds"
+      # check run. Cloudflare creates that check for push-triggered builds; it
+      # is not documented whether an API-triggered build gets one too. Rather
+      # than assume either way, look: comment here only when no such check run
+      # exists for this commit, so the PR always carries the outcome and never
+      # carries it twice.
+      - name: Comment on the PR if Cloudflare posted no check run
+        if: ${{ always() && steps.build.outputs.build_uuid != '' && github.event_name == 'push' }}
+        uses: actions/github-script@v9
+        env:
+          BUILD_UUID: ${{ steps.build.outputs.build_uuid }}
+          OUTCOME: ${{ steps.build.outputs.outcome }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const sha = process.env.SHA;
+
+            const { data: checks } = await github.rest.checks.listForRef({
+              owner, repo, ref: sha, per_page: 100,
+            });
+            if (checks.check_runs.some((c) => c.name.startsWith('Workers Builds'))) {
+              core.info('Cloudflare posted a Workers Builds check run; cloudflare-build-pr-comments.yml owns the comment.');
+              return;
+            }
+
+            const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner, repo, commit_sha: sha,
+            });
+            const open = prs.filter((p) => p.state === 'open').map((p) => p.number);
+            if (open.length === 0) {
+              core.info('No open PR associated with this commit; nothing to comment.');
+              return;
+            }
+
+            const outcome = process.env.OUTCOME || 'unknown';
+            const short = sha.slice(0, 7);
+            const commitLink = `[\`${short}\`](https://github.com/${owner}/${repo}/commit/${sha})`;
+            const buildsUrl = `https://dash.cloudflare.com/?to=/:account/workers/services/view/${process.env.WORKER_NAME}/production/builds`;
+            const icon = outcome === 'success' ? '✅' : outcome === 'skipped' ? '⏭️' : '❌';
+            const body =
+              `${icon} **Cloudflare build ${outcome}** for ${commitLink}\n\n` +
+              `Queued by [\`cloudflare-build-queue\`](https://github.com/${owner}/${repo}/actions/runs/${context.runId}), build \`${process.env.BUILD_UUID}\`.\n\n` +
+              `[View builds on Cloudflare ↗](${buildsUrl})`;
+
+            for (const issue_number of open) {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+              core.info(`Commented on PR #${issue_number} (${outcome}).`);
+            }

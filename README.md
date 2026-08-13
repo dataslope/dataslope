@@ -81,6 +81,42 @@ The search re-seed is appended to the **production** deploy command only, and th
 
 `db:seed:search:remote` no-ops when no indexed content changed, so the many deploys that touch a component and no lesson cost nothing — see [Search](#search) for how that is decided, and for the **D1 (edit)** permission the build's API token needs before any of this works.
 
+### One build at a time per branch
+
+Workers Builds has no build policy to configure. Its git integration starts a build for **every** push, and the only throttle is the account-wide concurrency cap the plan comes with — [1 build on Free, 6 on Paid](https://developers.cloudflare.com/workers/ci-cd/builds/limits-and-pricing/) — which is shared across every worker and branch in the account, not a per-branch rule. So four commits pushed three minutes apart to one branch start four builds that run alongside each other, and the first three are dead on arrival: their previews are superseded before they finish, yet each still burns build minutes and still writes a ~1–1.4 GB incremental-cache folder to R2 for [the cleanup job](#incremental-cache-cleanup) to prune later.
+
+Cloudflare closes half of the gap on its own: since [2026-07-24](https://developers.cloudflare.com/changelog/post/2026-07-24-skip-superseded-builds/) it automatically skips a **queued** build when a newer build queues behind the same trigger. That is the cancel-the-stale-one half of the policy below, but it only takes effect once builds actually queue, i.e. once the account-wide cap is saturated. Nothing in the product serializes a single branch.
+
+`.github/workflows/cloudflare-build-queue.yml` adds that policy. GitHub's own [`concurrency`](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#concurrency) semantics are exactly what is wanted — a run whose group is busy goes `pending`, and a newly queued run cancels the run that was already pending — so the workflow declares one group per branch with `cancel-in-progress: false` and, once it holds the group, drives Cloudflare through the [Workers Builds API](https://developers.cloudflare.com/api/resources/workers_builds/): `POST /builds/triggers/{uuid}/builds` with the branch and commit, then polls until the build stops. The build itself still runs on Cloudflare (build caching, the build token's bindings, preview aliases, PR check run); only the decision of *when* to start it moves into the workflow. Commits A/B/C/D pushed three minutes apart, with an eight-minute build:
+
+| Minute | Event | A | B | C | D |
+| --- | --- | --- | --- | --- | --- |
+| 0 | A pushed | building | | | |
+| 3 | B pushed | building | queued | | |
+| 6 | C pushed | building | **cancelled** | queued | |
+| 8 | A's build ends | done | cancelled | building | |
+| 9 | D pushed | done | cancelled | building | queued |
+| 16 | C's build ends | done | cancelled | done | building |
+
+A commit that stops being interesting while it waits never reaches Cloudflare at all, so a cancelled queue entry costs nothing — no build minutes, no cache folder, nothing to clean up. Only the runner that holds the slot idles, and this repository is public, so those minutes are free.
+
+Three things switch it on, and it stays inert until all three are done:
+
+| Where | What |
+| --- | --- |
+| Cloudflare → the `dataslope` worker → Settings → Build → Branch control | **Uncheck "Builds for non-production branches"** |
+| GitHub → Settings → Secrets and variables → Actions → Secrets | `CLOUDFLARE_API_TOKEN`, an API token with **Account → Workers CI → Edit** |
+| GitHub → Settings → Secrets and variables → Actions → Variables | `CF_BUILD_QUEUE` = `true` |
+
+The first one is not optional: leave Cloudflare's push trigger enabled and every push builds twice, once from each path, which is strictly worse than doing nothing. `CLOUDFLARE_ACCOUNT_ID` already exists for the cache-cleanup job. The new token only *orchestrates* builds — the build keeps using Cloudflare's own build token, so the D1 (edit) grant described under [Search](#search) still lives there.
+
+`main` deliberately keeps Cloudflare's native trigger. The dashboard cannot disable production-branch builds independently of the repository connection, and merges to `main` arrive one at a time anyway. Two consequences worth knowing: a manual build names its branch, so Cloudflare should route it down the non-production path (`npx opennextjs-cloudflare upload`) exactly as a push would — the API does not document this, so the workflow reads the created build's deploy command back and cancels the build if it carries the production-only `db:seed:search:remote` tail, rather than risk a feature branch overwriting the live search index. And because it is unclear whether an API-triggered build produces a `Workers Builds` check run, the workflow checks for one and posts the outcome to the PR itself only when Cloudflare posted none, so [`cloudflare-build-pr-comments.yml`](.github/workflows/cloudflare-build-pr-comments.yml) keeps its job and the PR never gets two comments for one build.
+
+Two variants are one line away in the workflow's `concurrency` block, if this policy is not the one you want:
+
+- `cancel-in-progress: true` — never wait; a new push kills the running build and starts its own. Cheapest in build minutes, but a branch pushed to every few minutes then never finishes a preview.
+- `queue: {max: N}` — build every commit, in order, instead of superseding the waiting one. Useful if each commit's preview matters (up to 100 runs may be pending).
+
 ### Incremental cache cleanup
 
 OpenNext keys cache objects as `incremental-cache/<buildId>/…`, so **every deploy, production and each preview, writes a fresh copy (~1–1.4 GB: one HTML+RSC `.cache` object per prerendered page, ~1,600 of them) under a new build ID, and nothing is pruned automatically.** Left alone the bucket grows by that much per deploy, at active-development velocity that's tens of GB within days.
