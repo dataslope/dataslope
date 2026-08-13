@@ -2536,6 +2536,21 @@ input[type="range"].fs-slider:disabled {
 .playground-conflict-btn-primary:hover {
   background: color-mix(in srgb, var(--primary) 88%, #000);
 }
+/* Copying a large database takes a moment, and the other two actions would
+   throw the copy away mid-flight, so all three go quiet while it runs. */
+.playground-conflict-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.playground-conflict-btn:disabled:hover {
+  background: var(--bg2);
+}
+.playground-conflict-btn-primary:disabled:hover {
+  background: var(--primary);
+}
+.playground-conflict-error {
+  color: var(--danger, #e35a5a);
+}
 .playground-boot-progress {
   display: flex;
   align-items: center;

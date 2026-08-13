@@ -82,6 +82,17 @@ export interface SqlPlaygroundShellProps {
    *  overlay. The host should create a fresh workspace and switch to it
    *  (a reload is fine, a new workspace id isn't locked elsewhere). */
   onOpenNewWorkspace?: () => void;
+  /** Invoked when the user picks "Open a copy". The host should duplicate the
+   *  conflicted workspace and switch to the duplicate, so this tab gets the
+   *  same data without contending for the original's OPFS handle. Offered
+   *  first: it is the only action that keeps what the user came for. */
+  onOpenCopy?: () => void;
+  /** True while a copy is being made, so the overlay can show it working;
+   *  duplicating a large database is not instant. */
+  copyBusy?: boolean;
+  /** Why a copy attempt failed. Shown in the overlay: an action that quietly
+   *  does nothing is the dead end this overlay exists to remove. */
+  copyError?: string | null;
   /** Main body of the page, typically the top toolbar + sidebar +
    *  editor + results pane structure. Rendered directly inside
    *  `<div className="playground-app">` after the header. */
@@ -115,6 +126,9 @@ export function SqlPlaygroundShell({
   bootFraction,
   workspaceConflict = false,
   onOpenNewWorkspace,
+  onOpenCopy,
+  copyBusy = false,
+  copyError = null,
   children,
 }: SqlPlaygroundShellProps) {
   // Loading-overlay lifecycle (show → fade → unmount) with a minimum
@@ -305,16 +319,36 @@ export function SqlPlaygroundShell({
               </span>
               <div className="playground-boot-hints">
                 <span className="playground-boot-hint">
-                  A workspace can run in only one tab at a time. Keep using it
-                  in the original tab, or open a separate workspace here.
+                  A workspace can run in only one tab at a time. Open a copy to
+                  keep working here with the same data, or keep using the
+                  original in the other tab.
                 </span>
+                {copyError && (
+                  <span
+                    className="playground-boot-hint playground-conflict-error"
+                    role="alert"
+                  >
+                    {copyError}
+                  </span>
+                )}
               </div>
               <div className="playground-conflict-actions">
-                {onOpenNewWorkspace && (
+                {onOpenCopy && (
                   <button
                     type="button"
                     className="playground-conflict-btn playground-conflict-btn-primary"
+                    onClick={onOpenCopy}
+                    disabled={copyBusy}
+                  >
+                    {copyBusy ? "Copying…" : "Open a copy"}
+                  </button>
+                )}
+                {onOpenNewWorkspace && (
+                  <button
+                    type="button"
+                    className={`playground-conflict-btn${onOpenCopy ? "" : " playground-conflict-btn-primary"}`}
                     onClick={onOpenNewWorkspace}
+                    disabled={copyBusy}
                   >
                     Open a new workspace
                   </button>
@@ -323,6 +357,7 @@ export function SqlPlaygroundShell({
                   type="button"
                   className="playground-conflict-btn"
                   onClick={() => window.location.reload()}
+                  disabled={copyBusy}
                 >
                   Try again
                 </button>

@@ -17,6 +17,7 @@ const tabScope = createTabScope(STORAGE_PREFIX, "sqlite");
 export const dbScopedKey = (dbId: string, k: string) =>
   tabScope.scopedKey(dbId, k);
 export const setTabWorkspaceScope = tabScope.setWorkspaceScope;
+export const copyTabWorkspaceKeys = tabScope.copyScopedKeys;
 
 export interface QueryTab {
   /** Stable id used as the React key, generated client-side because

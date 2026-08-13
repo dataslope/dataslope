@@ -14,6 +14,8 @@ export interface TabStorageUtils {
   /** See `createTabScope`: called once the workspace bootstrap resolves. True
    *  when the scope moved, meaning tabs must be read again. */
   setWorkspaceScope: (workspaceId: string) => boolean;
+  /** See `createTabScope`: carries a workspace's tabs onto a duplicate. */
+  copyScopedKeys: (fromWorkspaceId: string, toWorkspaceId: string) => number;
 }
 
 /**
@@ -88,6 +90,7 @@ export function createTabStorage(
     loadTabs,
     saveTabs,
     setWorkspaceScope: scope.setWorkspaceScope,
+    copyScopedKeys: scope.copyScopedKeys,
   };
 }
 

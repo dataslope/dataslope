@@ -35,6 +35,11 @@ export interface TabScope {
    *  from the scope keys were being built under, i.e. anything already read
    *  came from the wrong workspace and should be read again. */
   setWorkspaceScope: (workspaceId: string) => boolean;
+  /** Copy one workspace's tab keys onto another's, for when a workspace is
+   *  duplicated. Without it a copy of a workspace would open on the default
+   *  tabs, since the OPFS copy carries the database and these keys don't
+   *  live there. Returns how many keys were copied. */
+  copyScopedKeys: (fromWorkspaceId: string, toWorkspaceId: string) => number;
 }
 
 /** `undefined` means "not resolved yet", `null` means "resolved, and there is
@@ -111,6 +116,36 @@ export function createTabScope(
       scope = workspaceId;
       migrateUnscopedKeys(workspaceId);
       return true;
+    },
+    copyScopedKeys(fromWorkspaceId, toWorkspaceId) {
+      if (typeof window === "undefined") return 0;
+      if (fromWorkspaceId === toWorkspaceId) return 0;
+      const fromPrefix = `${storagePrefix}ws_${fromWorkspaceId}_`;
+      const toPrefix = `${storagePrefix}ws_${toWorkspaceId}_`;
+      try {
+        // Collected first: writing while walking `key(i)` would shift the
+        // indices out from under the loop.
+        const keys: string[] = [];
+        for (let i = 0; i < window.localStorage.length; i += 1) {
+          const key = window.localStorage.key(i);
+          if (key && key.startsWith(fromPrefix)) keys.push(key);
+        }
+        let copied = 0;
+        for (const key of keys) {
+          const value = window.localStorage.getItem(key);
+          if (value === null) continue;
+          window.localStorage.setItem(
+            `${toPrefix}${key.slice(fromPrefix.length)}`,
+            value,
+          );
+          copied += 1;
+        }
+        return copied;
+      } catch {
+        // Quota / private mode: the copy opens on default tabs, which is a
+        // smaller loss than failing the copy itself.
+        return 0;
+      }
     },
   };
 }

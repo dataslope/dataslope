@@ -101,6 +101,7 @@ import {
   switchActiveWorkspace,
 } from "../opfs/activeWorkspace";
 import { acquireWorkspaceLock, createWorkspace } from "../opfs/workspace";
+import { copyConflictedWorkspace } from "../opfs/copyConflictedWorkspace";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
 import { ShareControls } from "../cloud/ShareControls";
 import {
@@ -185,6 +186,7 @@ import {
 } from "./components/DatabaseSelector";
 import { SqlIconSidebar } from "./components/SqlIconSidebar";
 import {
+  copyTabWorkspaceKeys,
   dbScopedKey,
   loadActiveTabId,
   loadTabs,
@@ -608,6 +610,45 @@ function SqlPlaygroundInner() {
   // True when this workspace is already open (locked) in another tab, so
   // the shell shows a conflict overlay instead of deadlocking on boot.
   const [workspaceConflict, setWorkspaceConflict] = useState(false);
+  // The workspace that conflict was over, so the overlay can offer a copy of
+  // it. A ref because the boot effect records it and only the overlay's
+  // handlers read it, no render depends on the value.
+  const conflictWorkspaceRef = useRef<{ id: string; name: string } | null>(null);
+  const [conflictCopyBusy, setConflictCopyBusy] = useState(false);
+  const [conflictCopyError, setConflictCopyError] = useState<string | null>(
+    null,
+  );
+  // From the conflict overlay: duplicate the workspace another tab is holding
+  // and switch to the duplicate, which is the only action here that keeps the
+  // data the user came for. `copyConflictedWorkspace` reloads on success, so
+  // reaching the end of this callback means it failed.
+  const handleConflictOpenCopy = useCallback(() => {
+    const source = conflictWorkspaceRef.current;
+    if (!source) return;
+    setConflictCopyBusy(true);
+    setConflictCopyError(null);
+    void (async () => {
+      try {
+        const copy = await copyConflictedWorkspace({
+          playgroundId: PLAYGROUND_ID,
+          sourceId: source.id,
+          sourceName: source.name,
+          copyScopedKeys: copyTabWorkspaceKeys,
+        });
+        if (!copy) {
+          setConflictCopyBusy(false);
+          setConflictCopyError(
+            "This workspace's files couldn't be found, so there was nothing to copy.",
+          );
+        }
+      } catch (err) {
+        setConflictCopyBusy(false);
+        setConflictCopyError(
+          `Couldn't copy the workspace: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    })();
+  }, []);
   // From the conflict overlay: create a fresh workspace and switch to it.
   // No engine is open in the conflict case, so a reload is the simplest
   // safe path, the new workspace id isn't locked, so it boots normally.
@@ -1491,6 +1532,12 @@ function SqlPlaygroundInner() {
               // SQLite's exclusive OPFS access handle would deadlock the
               // boot (it hangs at ~90%). Surface a conflict overlay and
               // skip the boot rather than hang.
+              // Remember which workspace it was, so the overlay can offer a
+              // copy of it rather than only a fresh, empty one.
+              conflictWorkspaceRef.current = {
+                id: workspace.id,
+                name: workspace.name,
+              };
               setWorkspaceConflict(true);
               return;
             }
@@ -2348,6 +2395,9 @@ function SqlPlaygroundInner() {
       statusState={statusState}
       workspaceConflict={workspaceConflict}
       onOpenNewWorkspace={handleConflictNewWorkspace}
+      onOpenCopy={handleConflictOpenCopy}
+      copyBusy={conflictCopyBusy}
+      copyError={conflictCopyError}
       loadingHeroRepeat={4}
       loadingCaption={
         statusState === "error" ? loadingMessage : LOADING_QUIPS[quipIndex]

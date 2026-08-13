@@ -333,8 +333,13 @@ export async function duplicateWorkspace(
   sourceId: string,
   newName: string,
 ): Promise<WorkspaceEntry | null> {
-  const registry = getWorkspaceRegistry();
-  const source = registry.find((e) => e.id === sourceId);
+  // The source may be an unsaved draft, which is by definition absent from the
+  // registry, so fall back to its own metadata on disk. That is the case the
+  // "open a copy" conflict action hits most: the workspace another tab is
+  // holding is usually the auto-created default.
+  const source =
+    getWorkspaceRegistry().find((e) => e.id === sourceId) ??
+    (await readOpfsWorkspaceMeta(sourceId));
   if (!source) return null;
 
   const created = await createWorkspace(newName, source.playground);
@@ -417,6 +422,38 @@ export async function listOpfsWorkspaces(): Promise<OpfsWorkspace[]> {
     return out;
   }
   return out;
+}
+
+/**
+ * A workspace's own `meta.json`, for the ones the registry doesn't know about
+ * (an unsaved draft). Returns null when OPFS is unavailable, the directory is
+ * missing, or the metadata is unreadable.
+ */
+export async function readOpfsWorkspaceMeta(
+  id: string,
+): Promise<{ name: string; playground: string; createdAt: number } | null> {
+  if (!isOpfsSupported()) return null;
+  try {
+    const dir = await getWorkspaceDir(id, false);
+    const metaFh = await dir.getFileHandle("meta.json", { create: false });
+    const parsed = JSON.parse(await (await metaFh.getFile()).text()) as
+      | WorkspaceMeta
+      | undefined;
+    if (
+      !parsed ||
+      typeof parsed.name !== "string" ||
+      typeof parsed.playground !== "string"
+    ) {
+      return null;
+    }
+    return {
+      name: parsed.name,
+      playground: parsed.playground,
+      createdAt: typeof parsed.createdAt === "number" ? parsed.createdAt : 0,
+    };
+  } catch {
+    return null;
+  }
 }
 
 /** True when either payload subdirectory holds at least one entry. */
