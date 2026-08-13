@@ -2485,6 +2485,10 @@ input[type="range"].fs-slider:disabled {
   }
 }
 
+/* Explanatory line under a boot-overlay title. The loading screen itself is
+   just diamond + status + bar; this is what the workspace-conflict overlay
+   uses to explain itself, since it asks the user to choose rather than to
+   wait. */
 .playground-boot-hints {
   display: flex;
   flex-direction: column;
@@ -2496,10 +2500,6 @@ input[type="range"].fs-slider:disabled {
   font-size: 15px;
   color: var(--text-muted, #9aa4b2);
   line-height: 1.6;
-}
-.playground-boot-hint-sub {
-  font-size: 13px;
-  opacity: 0.85;
 }
 /* Workspace-conflict overlay, reuses the boot-overlay chrome but offers
    actions instead of a progress bar (shown when the workspace is already
@@ -4089,7 +4089,9 @@ html[data-playground-theme="dark"] .welcome h3 {
   color: var(--text);
   width: 28px;
   height: 28px;
-  margin: auto 4px -1px 4px;
+  /* No left margin: the strip's own 2px gap is enough to separate it, and a
+     wider gap made the button read as detached from the tabs it adds to. */
+  margin: auto 4px -1px 0;
   border-radius: 6px 6px 0 0;
   cursor: pointer;
   flex-shrink: 0;
@@ -5292,11 +5294,25 @@ html[data-playground-theme="dark"] {
   gap: 5px;
   padding: 4px 4px 4px 8px;
 }
-.ph-save-main.ph-saved {
-  cursor: default;
+/* The "Saved" state has no action of its own, so the whole control — cloud,
+   label and chevron — is one menu trigger with one hover/click region,
+   matching Share beside it. (The "Save" state stays a split button: its left
+   half saves, so only `.ph-save-chev` opens the menu.) */
+.ph-save-trigger {
+  gap: 5px;
+  padding: 4px 6px 4px 8px;
 }
-.ph-save-main.ph-saved:hover {
-  background: transparent;
+.ph-save-trigger[data-popup-open] {
+  background: var(--menu-item-hover);
+}
+.ph-save-trigger-chev {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-dim);
+}
+.ph-save-trigger:hover .ph-save-trigger-chev,
+.ph-save-trigger[data-popup-open] .ph-save-trigger-chev {
+  color: var(--text);
 }
 .ph-saved-cloud {
   position: relative;

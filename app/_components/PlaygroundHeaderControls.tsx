@@ -13,7 +13,9 @@
  * - `SaveControl`: one quiet Save action with a chevron menu — an
  *   "auto-saves in this browser" note, "Back up to cloud" (with the last
  *   backup time), "Download copy" (.zip), or a sign-in row for guests.
- *   Reads "Saved" with a green-dotted cloud when there's nothing to save.
+ *   With nothing to save it reads "Saved" with a green-dotted cloud, and
+ *   the whole control opens the menu; only while there IS something to save
+ *   does it split into a Save button plus a chevron.
  * - `MoreMenu`: everything secondary folds into one ⋯ menu — labelled
  *   sections whose items either act directly or slide to a sub-panel
  *   (Examples, Export, Import, Runtime info) with a ‹ back header.
@@ -439,8 +441,10 @@ export function SaveControl(props: SaveControlProps) {
 
   return (
     <Menu.Root open={open} onOpenChange={setOpen}>
-      <span className="ph-save-split">
-        {unsaved ? (
+      {unsaved ? (
+        // A real split button: the left half saves, so only the chevron can
+        // open the menu.
+        <span className="ph-save-split">
           <button
             type="button"
             className="ph-ghost-btn ph-save-main"
@@ -450,27 +454,33 @@ export function SaveControl(props: SaveControlProps) {
             <CloudUpload size={12} aria-hidden="true" />
             <span>Save</span>
           </button>
-        ) : (
-          <button
-            type="button"
-            className="ph-ghost-btn ph-save-main ph-saved"
-            title="All changes saved"
+          <Menu.Trigger
+            className="ph-save-chev"
+            title="Save options"
+            aria-label="Save options"
           >
-            <span className="ph-saved-cloud">
-              <Cloud size={12} aria-hidden="true" />
-              <span className="ph-saved-dot" aria-hidden="true" />
-            </span>
-            <span>Saved</span>
-          </button>
-        )}
+            <HeaderChevron />
+          </Menu.Trigger>
+        </span>
+      ) : (
+        // Nothing to save, so the left half has no action of its own — the
+        // whole control is the menu trigger. Cloud, label and chevron are one
+        // hit target (like Share beside it) rather than a 9px chevron with an
+        // inert button glued to it.
         <Menu.Trigger
-          className="ph-save-chev"
-          title="Save options"
-          aria-label="Save options"
+          className="ph-ghost-btn ph-save-trigger"
+          title="All changes saved, open save options"
         >
-          <HeaderChevron />
+          <span className="ph-saved-cloud">
+            <Cloud size={12} aria-hidden="true" />
+            <span className="ph-saved-dot" aria-hidden="true" />
+          </span>
+          <span>Saved</span>
+          <span className="ph-save-trigger-chev" aria-hidden="true">
+            <HeaderChevron />
+          </span>
         </Menu.Trigger>
-      </span>
+      )}
       <Menu.Portal>
         <Menu.Positioner
           sideOffset={6}
