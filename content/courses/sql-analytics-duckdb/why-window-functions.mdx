@@ -33,7 +33,7 @@ other, never both in the same row.
 
 ```mermaid
 flowchart LR
-    subgraph GB["GROUP BY: rows collapse"]
+    subgraph GB["<code>GROUP BY</code>: rows collapse"]
         G1["5 West orders"] --> G2["1 row: West total"]
     end
     subgraph WF["Window: rows survive"]
@@ -171,7 +171,7 @@ ORDER BY
 
 ```mermaid
 flowchart TD
-    All[("All orders")] --> P["PARTITION BY region"]
+    All[("All orders")] --> P["<code>PARTITION BY</code> region"]
     P --> W["West window"]
     P --> E["East window"]
     P --> N["North window"]

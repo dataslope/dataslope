@@ -22,7 +22,19 @@ button.addEventListener("click", function () {
 ```
 
 Read it as: *on this element, when a `"click"` happens, run this
-function.* The function is called an **event handler**, and it runs
+function.*
+
+<SyntaxBreakdown
+  parts={[
+    { text: "button", label: "which element listens" },
+    { text: ".addEventListener(" },
+    { text: '"click",', label: "which event to listen for" },
+    { text: "handler", label: "what to run each time it fires" },
+    { text: ")" },
+  ]}
+/>
+
+The function is called an **event handler**, and it runs
 every time the event fires, once per click, forever.
 
 <Figure

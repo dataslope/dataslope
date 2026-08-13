@@ -101,7 +101,17 @@ print(from_pairs)
 
 ## Accessing values
 
-Use `[]` to access a value by key.
+Use `[]` to access a value by key. `.get()` is the safe alternative: it
+returns a fallback instead of raising when the key is absent.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "person.get(" },
+    { text: '"name",', label: "the key to look up" },
+    { text: '"unknown"', label: "returned instead of raising if it is missing" },
+    { text: ")" },
+  ]}
+/>
 
 <CodeBlock
   adapter="python"

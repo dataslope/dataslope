@@ -24,7 +24,7 @@ string, zero, or false.
 ```mermaid
 flowchart TB
     V["Column value"] --> Has["Known value<br/>Ada"]
-    V --> Missing["NULL<br/>unknown or absent"]
+    V --> Missing["<code>NULL</code><br/>unknown or absent"]
 ```
 
 Allowing NULL is a real design choice. It says, "this fact is optional
@@ -44,8 +44,8 @@ column empty.
 ```mermaid
 flowchart TD
     Fact["Column fact"] --> Q{"Must every row<br/>know this?"}
-    Q -->|yes| Req["Use NOT NULL"]
-    Q -->|no| Opt["Allow NULL"]
+    Q -->|yes| Req["Use <code>NOT NULL</code>"]
+    Q -->|no| Opt["Allow <code>NULL</code>"]
 ```
 
 Use `NOT NULL` for values the row cannot make sense without: account
@@ -266,7 +266,7 @@ interfaces can show product names without inventing placeholders.
 
 ```mermaid
 flowchart TD
-    NN["NOT NULL"] --> Promise["Every row has<br/>the value"]
+    NN["<code>NOT NULL</code>"] --> Promise["Every row has<br/>the value"]
     Promise --> Trust["Queries and apps<br/>can rely on it"]
 ```
 

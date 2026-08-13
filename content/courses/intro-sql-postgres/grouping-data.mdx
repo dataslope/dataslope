@@ -32,9 +32,9 @@ flowchart TB
     G --> E["Engineering<br/>group"]
     G --> S["Sales<br/>group"]
     G --> M["Marketing<br/>group"]
-    E --> EA["AVG(salary)"]
-    S --> SA["AVG(salary)"]
-    M --> MA["AVG(salary)"]
+    E --> EA["<code>AVG(salary)</code>"]
+    S --> SA["<code>AVG(salary)</code>"]
+    M --> MA["<code>AVG(salary)</code>"]
 ```
 
 Instead of one average salary, you get one average salary *per
@@ -104,9 +104,9 @@ than guess.
 
 ```mermaid
 flowchart TB
-    C["A column in SELECT<br/>alongside GROUP BY"]
+    C["A column in <code>SELECT</code><br/>alongside <code>GROUP BY</code>"]
     C --> Q{"Same value for<br/>the whole group?"}
-    Q -->|"yes: it's the GROUP BY column"| OK["Allowed"]
+    Q -->|"yes: it's the <code>GROUP BY</code> column"| OK["Allowed"]
     Q -->|"no: differs within group"| Need["Must be aggregated<br/>(COUNT, SUM, ...)"]
 ```
 

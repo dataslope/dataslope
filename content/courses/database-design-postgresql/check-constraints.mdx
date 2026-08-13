@@ -28,7 +28,7 @@ row. If the expression is false, PostgreSQL rejects the write.
 
 ```mermaid
 flowchart TD
-    Row["Incoming row"] --> Check{"CHECK expression<br/>is true?"}
+    Row["Incoming row"] --> Check{"<code>CHECK</code> expression<br/>is true?"}
     Check -->|yes| Store["Store row"]
     Check -->|no| Reject["Reject row"]
 ```
@@ -191,7 +191,7 @@ others.
 
 ```mermaid
 flowchart LR
-    Need["What rule are you encoding?"] --> Missing["Value required<br/>NOT NULL"]
+    Need["What rule are you encoding?"] --> Missing["Value required<br/>NOT <code>NULL</code>"]
     Need --> Dup["No duplicates<br/>UNIQUE"]
     Need --> Ref["Must point to existing row<br/>FOREIGN KEY"]
     Need --> Expr["Expression must be true<br/>CHECK"]
@@ -213,8 +213,8 @@ present, say that directly with `NOT NULL`.
 
 ```mermaid
 flowchart TD
-    Required["Required domain value"] --> NN["NOT NULL"]
-    Required --> CH["CHECK rule"]
+    Required["Required domain value"] --> NN["<code>NOT NULL</code>"]
+    Required --> CH["<code>CHECK</code> rule"]
     NN --> Safe["Present and valid"]
     CH --> Safe
 ```

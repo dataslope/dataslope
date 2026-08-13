@@ -36,7 +36,7 @@ different tables; it is one table used in two relationship roles.
 
 ```mermaid
 flowchart TB
-    CEO["Ada<br/>id = 1<br/><code>manager_id</code> = NULL"] --> Eng["Grace<br/>id = 2<br/><code>manager_id</code> = 1"]
+    CEO["Ada<br/>id = 1<br/><code>manager_id</code> = <code>NULL</code>"] --> Eng["Grace<br/>id = 2<br/><code>manager_id</code> = 1"]
     CEO --> Ops["Linus<br/>id = 3<br/><code>manager_id</code> = 1"]
     Eng --> Dev["Mina<br/>id = 4<br/><code>manager_id</code> = 2"]
 ```
@@ -143,7 +143,7 @@ erDiagram
 
 ```mermaid
 flowchart TB
-    Root["Root category<br/><code>parent_id</code> = NULL"] --> Data["Data"]
+    Root["Root category<br/><code>parent_id</code> = <code>NULL</code>"] --> Data["Data"]
     Data --> SQL["SQL"]
     Data --> Modeling["Modeling"]
     Root --> Tools["Tools"]

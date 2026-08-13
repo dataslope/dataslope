@@ -129,6 +129,18 @@ Each occurrence is checked independently, putting a `String` where
 a `B` is expected only works if `B = String` for that particular
 instance.
 
+A generic method declares its own type parameter, before the return type
+and independent of the class:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "static", label: "an ordinary modifier" },
+    { text: "<T>", label: "declare the type parameter first" },
+    { text: "T", label: "the return type, using it" },
+    { text: "firstOf(List<T> xs)", label: "and the parameters, using it too" },
+  ]}
+/>
+
 ## Generic methods (independent of the class)
 
 A method can have its *own* type parameters, independent of the

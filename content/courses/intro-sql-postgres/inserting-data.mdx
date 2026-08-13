@@ -221,7 +221,7 @@ accidentally destroy data.
 
 ```mermaid
 flowchart TB
-    D1["DELETE FROM tasks<br/>WHERE <code>id = 5</code>;"] --> R1["Removes 1 row<br/>(good)"]
+    D1["<code>DELETE FROM</code> tasks<br/>WHERE <code>id = 5</code>;"] --> R1["Removes 1 row<br/>(good)"]
     D2["<code>DELETE FROM tasks;</code>"] --> R2["Removes EVERY row<br/>(usually a disaster)"]
 ```
 

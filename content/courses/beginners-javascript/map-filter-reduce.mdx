@@ -133,6 +133,16 @@ idioms like this make functional code remarkably compact.
 `reduce()` is the most general of the three. It walks the array,
 maintaining an "accumulator", and produces a single final value.
 
+<SyntaxBreakdown
+  parts={[
+    { text: "arr.reduce(" },
+    { text: "(acc, x)", label: "what you have so far, and the item" },
+    { text: "=> acc + x,", label: "the accumulator for the next step" },
+    { text: "0", label: "what acc starts as" },
+    { text: ")" },
+  ]}
+/>
+
 <Figure
   slug="js-map-filter-reduce-inline-cutout"
   alt="A bench of three stations in a row, the first repainting every block, the second dropping some blocks through a grate, the third pressing what remains into one larger block"

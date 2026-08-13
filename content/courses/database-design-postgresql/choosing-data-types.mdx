@@ -218,7 +218,7 @@ set is stable and reused across many tables.
 
 ```mermaid
 flowchart TB
-    Choice["Small allowed set"] --> Check["TEXT plus CHECK<br/>simple and visible"]
+    Choice["Small allowed set"] --> Check["<code>TEXT</code> plus <code>CHECK</code><br/>simple and visible"]
     Choice --> Enum["ENUM type<br/>stable shared set"]
 ```
 
@@ -234,8 +234,8 @@ Types are broad constraints. Other constraints narrow the rule.
 
 ```mermaid
 flowchart TD
-    Broad["NUMERIC<br/>any exact number"] --> Narrow["CHECK (<code>price &gt;= 0</code>)<br/>valid price"]
-    Narrow --> Required["NOT NULL<br/>required valid price"]
+    Broad["<code>NUMERIC</code><br/>any exact number"] --> Narrow["<code>CHECK</code> (<code>price &gt;= 0</code>)<br/>valid price"]
+    Narrow --> Required["<code>NOT NULL</code><br/>required valid price"]
 ```
 
 The strongest designs combine them. A product price might be `NUMERIC`

@@ -26,6 +26,16 @@ default parameters**, **rest parameters**, **function type expressions**,
 The simplest function signature specifies the type of each parameter and
 the return type:
 
+<SyntaxBreakdown
+  parts={[
+    { text: "function add(" },
+    { text: "a: number,", label: "each parameter carries its own type" },
+    { text: "b: number", label: "checked at every call site" },
+    { text: ")" },
+    { text: ": number", label: "what the function hands back" },
+  ]}
+/>
+
 <CodeBlock
   adapter="typescript"
   files={[

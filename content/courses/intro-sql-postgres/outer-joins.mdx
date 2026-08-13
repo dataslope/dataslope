@@ -36,8 +36,8 @@ flowchart TB
         L2["Linus (no orders)"]
     end
     L1 -->|"matched"| R1["Ada + her orders"]
-    L2 -->|"no match → NULLs"| R2["Linus + NULL order"]
-    R1 --> Out["LEFT JOIN result"]
+    L2 -->|"no match → NULLs"| R2["Linus + <code>NULL</code> order"]
+    R1 --> Out["<code>LEFT JOIN</code> result"]
     R2 --> Out
 ```
 

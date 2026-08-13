@@ -268,7 +268,7 @@ the same pairing cannot be duplicated.
 flowchart TB
     Need["Does another table reference<br/>this enrollment row?"] -->|"no"| Composite["Use pair as primary key"]
     Need -->|"yes"| Surrogate["Use enrollment id"]
-    Surrogate --> Unique["Also keep UNIQUE student-course pair"]
+    Surrogate --> Unique["Also keep <code>UNIQUE</code> student-course pair"]
 ```
 
 The design principle is the same either way: one row represents one

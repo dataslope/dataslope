@@ -27,7 +27,7 @@ These three values mean different things:
 flowchart TB
     Z["0<br/>known number<br/>zero"]
     E["''<br/>known text<br/>empty string"]
-    N["NULL<br/>unknown or missing<br/>no value"]
+    N["<code>NULL</code><br/>unknown or missing<br/>no value"]
 ```
 
 For a `phone` column, an empty string could mean someone intentionally
@@ -251,7 +251,7 @@ as a separate test that genuinely answers true or false.
 ```mermaid
 flowchart TD
     A["comparison<br/><code>phone = NULL</code>"] --> U["unknown<br/>not true"]
-    U --> W["WHERE keeps only true rows"]
+    U --> W["<code>WHERE</code> keeps only true rows"]
     W --> D["row is not kept"]
 ```
 
@@ -293,9 +293,9 @@ reward points plus 5.
 
 ```mermaid
 flowchart TB
-    A["known value<br/>5"] --> C["5 + NULL"]
-    B["NULL<br/>unknown"] --> C
-    C --> R["NULL<br/>unknown result"]
+    A["known value<br/>5"] --> C["5 + <code>NULL</code>"]
+    B["<code>NULL</code><br/>unknown"] --> C
+    C --> R["<code>NULL</code><br/>unknown result"]
 ```
 
 <SqlCodeBlock
@@ -506,7 +506,7 @@ and can handle more than two choices.
 
 ```mermaid
 flowchart TD
-    A["possibly NULL value"] --> B{"is it NULL?"}
+    A["possibly <code>NULL</code> value"] --> B{"is it <code>NULL</code>?"}
     B -->|"no"| C["use original value"]
     B -->|"yes"| D["use fallback value"]
 ```

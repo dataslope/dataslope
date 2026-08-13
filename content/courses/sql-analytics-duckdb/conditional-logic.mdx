@@ -222,8 +222,8 @@ clause, which does the same thing more readably.
 
 ```mermaid
 flowchart TD
-    R[("rows with<br/>status: paid / refunded")] --> C1["SUM(CASE WHEN paid)"]
-    R --> C2["SUM(CASE WHEN refunded)"]
+    R[("rows with<br/>status: paid / refunded")] --> C1["<code>SUM(CASE WHEN paid)</code>"]
+    R --> C2["<code>SUM(CASE WHEN refunded)</code>"]
     C1 --> Out["one row:<br/><code>paid_revenue</code> | <code>refunded_revenue</code>"]
     C2 --> Out
 ```

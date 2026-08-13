@@ -38,8 +38,8 @@ flowchart TB
     end
     A -->|"match"| R1["Ada + order columns"]
     G -->|"match"| R2["Grace + order columns"]
-    L0 -->|"no match"| R3["Linus + NULL order columns"]
-    R1 --> Out["LEFT JOIN result"]
+    L0 -->|"no match"| R3["Linus + <code>NULL</code> order columns"]
+    R1 --> Out["<code>LEFT JOIN</code> result"]
     R2 --> Out
     R3 --> Out
 ```
@@ -108,7 +108,7 @@ When SQLite cannot find a matching right-side row, it cannot show a real `orders
 
 ```mermaid
 flowchart TD
-    C["customer<br/>Linus"] -->|"no matching order"| N["<code>order_id</code> = NULL<br/>amount = NULL"]
+    C["customer<br/>Linus"] -->|"no matching order"| N["<code>order_id</code> = <code>NULL</code><br/>amount = <code>NULL</code>"]
 ```
 
 <SqlCodeBlock
@@ -152,7 +152,7 @@ A `LEFT JOIN` plus `WHERE right_table.id IS NULL` is the classic pattern for "sh
 ```mermaid
 flowchart TB
     A["<code>LEFT JOIN</code><br/>keep all customers"] --> B["matched customers<br/>order id present"]
-    A --> C["unmatched customers<br/>order id is NULL"]
+    A --> C["unmatched customers<br/>order id is <code>NULL</code>"]
     C -->|"<code>WHERE o.id IS NULL</code>"| D["customers with no orders"]
     B -->|"filtered out"| X["not returned"]
 ```

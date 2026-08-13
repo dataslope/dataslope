@@ -27,7 +27,7 @@ same as an empty string `''`:
 flowchart TB
     Z["0<br/>a known number<br/>(zero)"]
     E["''<br/>a known text<br/>(empty string)"]
-    N["NULL<br/>no value at all<br/>(unknown)"]
+    N["<code>NULL</code><br/>no value at all<br/>(unknown)"]
 ```
 
 Imagine a `phone` column. A customer with `phone = ''` told us their
@@ -209,9 +209,9 @@ behavior is the price of that honesty, and `IS NULL` plus
 
 ```mermaid
 flowchart TD
-    M["Missing real data"] --> N["Store NULL<br/>(honest 'unknown')"]
-    N --> T1["Test with IS NULL"]
-    N --> T2["Display with COALESCE"]
+    M["Missing real data"] --> N["Store <code>NULL</code><br/>(honest 'unknown')"]
+    N --> T1["Test with <code>IS NULL</code>"]
+    N --> T2["Display with <code>COALESCE</code>"]
 ```
 
 ## Check your understanding

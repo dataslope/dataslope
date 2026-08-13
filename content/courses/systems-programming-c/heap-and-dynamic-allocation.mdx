@@ -70,6 +70,21 @@ flowchart TD
 
 ## Your first malloc
 
+Every heap allocation is the same three questions: how much, of what,
+and did it work.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "int *p =" },
+    { text: "malloc(", label: "ask the heap for bytes" },
+    { text: "n * sizeof(int)", label: "how many, never a hard-coded size" },
+    { text: ");" },
+  ]}
+/>
+
+The result is a pointer you own until you `free()` it, and it may be
+`NULL` if the request could not be met.
+
 <CodeBlock
   adapter="c"
   files={[

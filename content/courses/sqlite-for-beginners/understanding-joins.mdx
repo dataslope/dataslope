@@ -215,7 +215,7 @@ A join creates a result table for the query. The original tables stay separate.
 
 ```mermaid
 flowchart TB
-    C["customers table<br/>stored data"] --> Q["JOIN query"]
+    C["customers table<br/>stored data"] --> Q["<code>JOIN</code> query"]
     O["orders table<br/>stored data"] --> Q
     Q --> R["temporary result<br/>customer + order columns"]
     C -.-> C2["customers still separate"]
@@ -262,9 +262,9 @@ The kind of join determines what happens. A regular `JOIN` is an inner join: it 
 
 ```mermaid
 flowchart LR
-    A["matching pair"] -->|"INNER JOIN keeps"| R["result row"]
-    B["left row with no match"] -->|"INNER JOIN drops"| X["no result row"]
-    C["right row with no match"] -->|"INNER JOIN drops"| X
+    A["matching pair"] -->|"<code>INNER JOIN</code> keeps"| R["result row"]
+    B["left row with no match"] -->|"<code>INNER JOIN</code> drops"| X["no result row"]
+    C["right row with no match"] -->|"<code>INNER JOIN</code> drops"| X
 ```
 
 <MultipleChoice

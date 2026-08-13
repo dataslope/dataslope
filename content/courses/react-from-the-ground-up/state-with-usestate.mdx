@@ -20,10 +20,16 @@ component gets some.
 **setter** function. Calling the setter updates the value *and tells
 React to re-render* the component with the new value.
 
-```tsx
-const [count, setCount] = useState(0);
-//     ^value  ^setter          ^initial value
-```
+<SyntaxBreakdown
+  parts={[
+    { text: "const [" },
+    { text: "count,", label: "the current value" },
+    { text: "setCount", label: "the function that changes it" },
+    { text: "] = useState(" },
+    { text: "0", label: "the value on the first render only" },
+    { text: ");" },
+  ]}
+/>
 
 Click the buttons below, they're live. Each click calls the setter,
 React re-renders the component, and the new `count` shows. You never

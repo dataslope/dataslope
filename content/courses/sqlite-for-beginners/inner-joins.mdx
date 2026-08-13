@@ -17,7 +17,7 @@ flowchart LR
         R1["order for Ada"]
         R2["order for missing customer"]
     end
-    L1 -->|"matches"| Out["INNER JOIN result"]
+    L1 -->|"matches"| Out["<code>INNER JOIN</code> result"]
     R1 -->|"matches"| Out
     L2 -.-> X["no result row"]
     R2 -.-> X

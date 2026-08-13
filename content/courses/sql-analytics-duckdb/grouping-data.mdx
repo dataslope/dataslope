@@ -208,7 +208,7 @@ aggregate, then sort.
 
 ```mermaid
 flowchart TD
-    F["FROM rows"] --> W["<code>WHERE</code><br/>(filter rows)"]
+    F["<code>FROM</code> rows"] --> W["<code>WHERE</code><br/>(filter rows)"]
     W --> G["<code>GROUP BY</code><br/>(form bins)"]
     G --> A["aggregate<br/>(one value per bin)"]
     A --> O["<code>ORDER BY</code><br/>(sort the summary)"]

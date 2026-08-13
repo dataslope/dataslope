@@ -36,8 +36,8 @@ In **wide** form, the quarters become columns, a little report:
 
 ```mermaid
 flowchart LR
-    Long["Long / tidy<br/>(one value per row)"] -- "PIVOT<br/>(spread a category<br/>into columns)" --> Wide["Wide<br/>(category across columns)"]
-    Wide -- "UNPIVOT<br/>(collapse columns<br/>back into rows)" --> Long
+    Long["Long / tidy<br/>(one value per row)"] -- "<code>PIVOT</code><br/>(spread a category<br/>into columns)" --> Wide["Wide<br/>(category across columns)"]
+    Wide -- "<code>UNPIVOT</code><br/>(collapse columns<br/>back into rows)" --> Long
 ```
 
 Neither is "correct", they serve different goals:

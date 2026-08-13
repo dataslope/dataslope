@@ -211,7 +211,7 @@ WHERE
 ```mermaid
 flowchart TD
     T[("orders")] --> W["<code>WHERE amount &gt; 50</code>"]
-    W --> A["AVG(amount),<br/>COUNT(*)"]
+    W --> A["<code>AVG(amount)</code>,<br/>COUNT(*)"]
     A --> R["summary of the<br/>filtered slice"]
 ```
 

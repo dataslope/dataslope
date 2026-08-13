@@ -259,7 +259,7 @@ Filtering early is both a performance habit and a clarity habit:
 
 ```mermaid
 flowchart TD
-    Big[("10M rows")] --> W["WHERE early"]
+    Big[("10M rows")] --> W["<code>WHERE</code> early"]
     W --> Small[("10K relevant rows")]
     Small --> Cheap["Cheap, clear<br/>analysis"]
 ```
