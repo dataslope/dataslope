@@ -47,7 +47,7 @@ The first internal version ran in late 1991. For several years it
 was used only by themselves and their students. Then, in 1993, they
 made a fateful decision: they posted the source code to the
 **StatLib** archive at Carnegie Mellon, freely available, and sent
-a quiet announcement to the `s-news` mailing list.
+a quiet announcement to the `s-news` mailing list.[^ihaka]
 
 People started using it.
 
@@ -95,7 +95,7 @@ write a function, package it up, and share it with the world.
 
 **CRAN.** In 1997, Kurt Hornik and Friedrich Leisch, Austrian
 statisticians collaborating with the R team, launched the
-**Comprehensive R Archive Network**. CRAN was a single, central
+**Comprehensive R Archive Network**.[^cran] CRAN was a single, central
 repository where anyone could submit a package, and where anyone
 could install one with a single command. Combined with R's
 extensibility, this turned R into a *platform*, a place where the
@@ -345,3 +345,16 @@ slope <- unname(coef(model)["height"])
 In the next chapter we will zoom out one more time and answer the
 "so what?" question, why R, specifically, matters in 2025, even in
 a world that also has Python, Julia, and a thousand other tools.
+
+[^ihaka]:
+    Ross Ihaka and Robert Gentleman, "R: A Language for Data Analysis
+    and Graphics", *Journal of Computational and Graphical Statistics*
+    5(3), 1996. Ihaka's later talk "R: Past and Future History" is the
+    candid version, including how close the project came to being
+    abandoned before anyone outside Auckland used it.
+
+[^cran]:
+    The [R FAQ](https://cran.r-project.org/doc/FAQ/R-FAQ.html),
+    maintained by Hornik himself, records CRAN's origins and its
+    submission rules. Those rules, not the archive, are the reason a
+    twenty-year-old package still installs.

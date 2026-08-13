@@ -49,7 +49,7 @@ Hold those two pains in mind. Now for the toasters.
 ## The Green Project
 
 In 1991, a small team inside **Sun Microsystems** set up a secret
-project, code-named **Green**. The goal had nothing to do with
+project, code-named **Green**.[^green] The goal had nothing to do with
 enterprise software or the web, the web barely existed. The goal
 was software for **consumer electronics**: TVs, set-top boxes, the
 "interactive devices" that everyone in Silicon Valley believed were
@@ -230,9 +230,9 @@ what kind of computer would receive it. Sound familiar?
 
 The exact properties Java had grown for toasters, compact,
 portable, sandboxed, safe to run on a stranger's device, were
-precisely what the web needed. In 1995 Sun released Java publicly,
-along with a browser called HotJava that could run small Java
-programs ("applets") embedded in web pages. Netscape, the dominant
+precisely what the web needed. In 1995 Sun released Java
+publicly,[^java-wp] along with a browser called HotJava that could run
+small Java programs ("applets") embedded in web pages. Netscape, the dominant
 browser of the era, licensed Java within months. For the first time
 in history, clicking a link could deliver a running *program*, not
 just a page. People had never seen anything like it.
@@ -263,3 +263,18 @@ You now know *why* Java looks the way it does, why everything lives
 in a class, why there is no `delete`, why there is a virtual machine
 under your code. From here on, we set the history aside and start
 building the thinking skills the rest of the course runs on.
+
+[^green]:
+    The Green Project, the `*7` handheld it produced and the Oak
+    language that became Java are documented in Sun's own retrospective
+    materials and in Patrick Naughton's contemporaneous account. The
+    detail worth carrying forward is that the design targets (portable
+    bytecode, no pointer arithmetic, a sandbox) were chosen for set-top
+    boxes, years before anyone applied them to a browser.
+
+[^java-wp]:
+    James Gosling and Henry McGilton, *The Java Language Environment: A
+    White Paper* (Sun Microsystems, May 1996). The famous list of
+    adjectives, "simple, object-oriented, distributed, interpreted,
+    robust, secure, architecture-neutral, portable, high-performance,
+    multithreaded, dynamic", comes from this document.

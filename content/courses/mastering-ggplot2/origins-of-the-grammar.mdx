@@ -16,10 +16,10 @@ real ggplot.
 
 ## A grammar, by analogy
 
-The phrase **"Grammar of Graphics"** comes from a 1999 book of the same
-name by the statistician **Leland Wilkinson**. The book is dense and
-theoretical, but its central idea is simple enough to change how you
-see every chart for the rest of your life.
+The phrase **"Grammar of Graphics"** comes from a 1999 book of the
+same name by the statistician **Leland Wilkinson**.[^wilkinson] The
+book is dense and theoretical, but its central idea is simple enough
+to change how you see every chart for the rest of your life.
 
 <Figure
   slug="gg-origins-layered-grammar-cutout"
@@ -88,7 +88,8 @@ attempt to implement Wilkinson's grammar in R. A couple of years later
 he rewrote it from scratch with a cleaner, more consistent interface.
 That rewrite is **ggplot2**, first released on CRAN, R's package archive, in 2007, and it is
 the version everyone uses today. In 2010 he described its design in a
-paper with a perfect title: *"A Layered Grammar of Graphics."*
+paper with a perfect title: *"A Layered Grammar of
+Graphics."*[^layered]
 
 So the name decodes literally: **gg** for **g**rammar of **g**raphics,
 and **2** because it is the second version, a full rewrite, not a
@@ -222,3 +223,18 @@ over traditional APIs.`}
 - Its defining trait: you describe *what a chart is*; ggplot2 handles
   *how it is drawn*. The legend is a *consequence* of a mapping, so it
   never falls out of sync.
+
+[^wilkinson]:
+    Leland Wilkinson,
+    [*The Grammar of Graphics*](https://openlibrary.org/works/OL16964990W)
+    (Springer, 1999; second edition 2005). Wilkinson wrote it while
+    building SYSTAT and later nViZn, so the grammar was an
+    implementation specification before it was a book.
+
+[^layered]:
+    Hadley Wickham,
+    ["A Layered Grammar of Graphics"](http://vita.had.co.nz/papers/layered-grammar.pdf),
+    *Journal of Computational and Graphical Statistics* 19(1), 2010.
+    Reading it next to Wilkinson shows what the word "layered" is doing:
+    it is where Wickham departs from the original, not where he restates
+    it.

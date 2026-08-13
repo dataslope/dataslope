@@ -33,12 +33,12 @@ he began building a successor.
 
 He needed a name. He was, at the time, reading the published scripts of *Monty
 Python's Flying Circus*, the British comedy series, and he wanted something
-"short, unique, and slightly mysterious." He called it **Python**. The snake
+"short, unique, and slightly mysterious." He called it **Python**.[^py-name] The snake
 imagery came later, supplied by the community and by book publishers; the name
 itself is a comedy reference, not a reptile one.
 
 The first public release, **Python 0.9.0**, went out to the `alt.sources`
-Usenet newsgroup in **February 1991**. It already had functions, exceptions, and
+Usenet newsgroup in **February 1991**.[^py-090] It already had functions, exceptions, and
 the core data types, lists, dictionaries, strings, that you have spent this
 course learning. The language has grown enormously since, but its character was
 set in that first holiday.
@@ -134,7 +134,7 @@ problem.
 Python's deeper personality comes straight from ABC, the teaching language Guido
 worked on before it. ABC was designed to be learnable, readable, and forgiving,
 and Python inherited those instincts. They were eventually distilled into *The
-Zen of Python* (PEP 20), the 19 aphorisms by **Tim Peters** that you can still
+Zen of Python* (PEP 20),[^pep20] the 19 aphorisms by **Tim Peters** that you can still
 print by running `import this`. Lines like "Readability counts" and "There
 should be one, and preferably only one, obvious way to do it" are not
 decoration; they are the criteria by which Python features are accepted or
@@ -166,7 +166,7 @@ The catch was migration. Because the break was real, the ecosystem took roughly
 a decade to move. Libraries maintained dual Python 2/3 codebases, leaned on the
 `six` compatibility library, or ran the `2to3` converter. The Python core team
 eventually set a hard deadline, and on **January 1, 2020**, Python 2 reached
-official end-of-life: no more security patches, no more fixes. Today there is no
+official end-of-life:[^pep373] no more security patches, no more fixes. Today there is no
 reason to write new code in Python 2, and every example in this course assumes
 Python 3.
 
@@ -262,3 +262,25 @@ worked out in the open.
 
 That is the story behind the syntax. If it left you wanting more, the *Next
 Steps* page points to where the language is heading and what to learn next.
+
+[^py-name]:
+    The naming is confirmed in the
+    [Python General FAQ](https://docs.python.org/3/faq/general.html),
+    which is blunt about it: "Guido van Rossum, the creator of Python,
+    had the scripts from the BBC series Monty Python's Flying Circus."
+
+[^py-090]:
+    Guido van Rossum, "Python 0.9.0", posted to `alt.sources`, February
+    1991. The posting survives in Usenet archives, and the tarball is
+    still distributed by the Python Software Foundation.
+
+[^pep20]:
+    Tim Peters, [PEP 20, *The Zen of Python*](https://peps.python.org/pep-0020/)
+    (2004). Nineteen aphorisms, and Peters' own note that the twentieth
+    was left for Guido to fill in, which he never did.
+
+[^pep373]:
+    [PEP 373, *Python 2.7 Release Schedule*](https://peps.python.org/pep-0373/),
+    the document that fixed the end-of-life date. It was moved twice
+    before it stuck, which is the part of the story worth remembering
+    when a migration deadline is announced.

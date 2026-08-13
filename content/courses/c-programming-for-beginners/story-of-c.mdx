@@ -33,8 +33,8 @@ Babbage** designed mechanical machines, the *Difference Engine* and
 the *Analytical Engine*, that could in principle calculate
 automatically by turning gears, and his collaborator **Ada Lovelace**
 wrote what is widely considered the first algorithm intended for a
-machine. The machines were never fully built in their lifetimes, but
-the idea was planted: one machine, fed a list of instructions, could
+machine.[^lovelace] The machines were never fully built in their
+lifetimes, but the idea was planted: one machine, fed a list of instructions, could
 perform *any* calculation.
 
 Electricity made it real. Machines like **ENIAC** (1945) and the
@@ -164,15 +164,15 @@ Several deliberate decisions made C uniquely well suited to its job:
    different vendors.
 
 In 1973, Ken Thompson and Dennis Ritchie rewrote the UNIX kernel in
-C. This was the first time anyone had written a serious operating
-system in a high-level language. Most experts at the time said it
+C.[^unix] This was the first time anyone had written a serious
+operating system in a high-level language. Most experts at the time said it
 couldn't be done, the result, they predicted, would be too slow and
 too bulky. They were wrong.
 
 <Callout type="info" title="The book that taught the world">
 In 1978, **Brian Kernighan and Dennis Ritchie** published a slim,
 elegant book called *The C Programming Language*, now universally
-known as **K&R**. For more than a decade it served as both the
+known as **K&R**.[^knr] For more than a decade it served as both the
 tutorial and the de-facto specification of C. It is still in print and
 still worth reading after this course.
 </Callout>
@@ -320,3 +320,24 @@ C's first big customer was UNIX itself: rewriting the UNIX kernel in C in 1973 w
 
 C and C++ dominate the layer of software that other software is built on top of: operating systems, databases, browsers, and language runtimes.`}
 />
+
+[^lovelace]:
+    L. F. Menabrea, "Sketch of the Analytical Engine Invented by
+    Charles Babbage", translated with notes by Ada Augusta, Countess of
+    Lovelace, *Scientific Memoirs* vol. 3 (1843). The programme is in
+    Note G, and Lovelace's notes run to roughly three times the length
+    of the paper she was translating.
+
+[^unix]:
+    Dennis M. Ritchie and Ken Thompson, "The UNIX Time-Sharing System",
+    *Communications of the ACM* 17(7), July 1974, the paper that
+    introduced Unix to the world and reports the kernel rewrite. Their
+    own estimate of the cost is worth knowing: the C kernel came out
+    about a third larger than the assembly one.
+
+[^knr]:
+    Brian W. Kernighan and Dennis M. Ritchie,
+    [*The C Programming Language*](https://openlibrary.org/works/OL4617640W)
+    (Prentice Hall, 1978). The first edition doubles as the language's
+    de-facto specification, which is why "K&R C" names a dialect and
+    not just a book.
