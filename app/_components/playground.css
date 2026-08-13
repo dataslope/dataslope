@@ -2555,7 +2555,11 @@ input[type="range"].fs-slider:disabled {
    promoted art keeps its own aspect ratio (a cut-out is trimmed to its
    subject, so it is not square even when generated square). */
 .playground-conflict-mark {
-  width: 120px;
+  /* 160px matches the home bento icons, the other place a promoted cut-out is
+     painted into fixed chrome. The subject only occupies part of that: a
+     cut-out keeps its horizontal margins (`trimAxesFor` trims chrome
+     vertically), so the drawing reads smaller than the box. */
+  width: 160px;
   height: auto;
 }
 .playground-boot-progress {
