@@ -45,10 +45,10 @@ small group of mathematicians began studying games of chance.
 - **John Graunt** published *Natural and Political Observations Made
   upon the Bills of Mortality* in 1662, using parish death records
   to argue, for the first time, that you could learn things about
-  populations by carefully counting them.
+  populations by carefully counting them.[^graunt]
 - **Jakob Bernoulli** proved (around 1700) the **law of large
-  numbers**: if you flip a fair coin enough times, the proportion
-  of heads will reliably approach one half. This sounds obvious now,
+  numbers**:[^bernoulli] if you flip a fair coin enough times, the
+  proportion of heads will reliably approach one half. This sounds obvious now,
   but it was the first mathematical bridge between *probability*
   (a theoretical idea) and *data* (what we actually observe).
 
@@ -109,8 +109,9 @@ For just 40 numbers, this might be:
 
 That is about half a day of careful work to analyze one
 experiment. And Fisher actually did this kind of thing routinely.
-The famous *Statistical Methods for Research Workers* (1925) is
-full of worked examples that were each many hours of arithmetic.
+The famous *Statistical Methods for Research Workers*
+(1925)[^fisher] is full of worked examples that were each many hours
+of arithmetic.
 
 <Callout type="info" title="Why statistical methods are so 'computational'">
 This is why many classical statistical techniques have such
@@ -236,7 +237,8 @@ The constraints of the pre-computer era shaped statistics in ways
 that are still with us:
 
 - **The obsession with *small samples*.** Many classical tests
-  (the t-test, ANOVA) were designed for n=10 or n=30, not n=10,000.
+  (the t-test,[^student] ANOVA) were designed for n=10 or n=30, not
+  n=10,000.
   That is because hand-computing anything bigger was infeasible.
 - **The use of *closed-form formulas*.** A formula is something you
   can compute once and be done. Modern alternatives, bootstrapping,
@@ -355,3 +357,29 @@ In the next chapter, we will see how the arrival of computers
 turned this slow, careful craft into something altogether new, and
 why the most influential of those tools came from an unexpected
 place: **Bell Labs**.
+
+[^graunt]:
+    John Graunt, *Natural and Political Observations Made upon the
+    Bills of Mortality* (London, 1662). Usually counted as the first
+    work of demography and of statistical inference from records
+    collected for another purpose entirely.
+
+[^bernoulli]:
+    Jakob Bernoulli, *Ars Conjectandi* (Basel, 1713), published eight
+    years after his death by his nephew Nicolaus. The theorem in Part
+    IV is what we now call the weak law of large numbers.
+
+[^fisher]:
+    R. A. Fisher,
+    [*Statistical Methods for Research Workers*](https://archive.org/details/statisticalmetho0000fish)
+    (Oliver and Boyd, 1925). The worked examples are the evidence for
+    the claim above: each is sized to what a person with a mechanical
+    calculator could finish.
+
+[^student]:
+    "Student" (William Sealy Gosset),
+    ["The Probable Error of a Mean"](https://www.york.ac.uk/depts/maths/histstat/student.pdf),
+    *Biometrika* 6(1), 1908. Gosset published under a pseudonym
+    because Guinness, his employer, did not allow its brewers to
+    publish; the small-sample problem he was solving was a brewery's,
+    not a university's.
