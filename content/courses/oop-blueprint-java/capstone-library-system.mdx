@@ -130,13 +130,13 @@ sequenceDiagram
     participant M as Member
     participant Loan
 
-    Caller->>L: borrow(member, book)
-    L->>P: mayBorrow(member)
-    P->>M: loanCount()
+    Caller->>L: <code>borrow(member, book)</code>
+    L->>P: <code>mayBorrow(member)</code>
+    P->>M: <code>loanCount()</code>
     M-->>P: 1
     P-->>L: true
-    L->>Loan: new Loan(book, member, due=+14d)
-    L->>M: addLoan(loan)
+    L->>Loan: <code>new Loan(book, member, due=+14d)</code>
+    L->>M: <code>addLoan(loan)</code>
     L-->>Caller: loan
 ```
 

@@ -311,9 +311,9 @@ Treating state as a value gives you:
 
 ```mermaid
 flowchart TD
-    S0["State <code>t=0</code>"] -- "reducer(s, a0)" --> S1["State <code>t=1</code>"]
-    S1 -- "reducer(s, a1)" --> S2["State <code>t=2</code>"]
-    S2 -- "reducer(s, a2)" --> S3["State <code>t=3</code>"]
+    S0["State <code>t=0</code>"] -- "<code>reducer(s, a0)</code>" --> S1["State <code>t=1</code>"]
+    S1 -- "<code>reducer(s, a1)</code>" --> S2["State <code>t=2</code>"]
+    S2 -- "<code>reducer(s, a2)</code>" --> S3["State <code>t=3</code>"]
     H((history)) --> S0 & S1 & S2 & S3
 ```
 

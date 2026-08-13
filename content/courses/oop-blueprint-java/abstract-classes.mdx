@@ -152,8 +152,8 @@ sequenceDiagram
     participant TaxReturn as TaxReturn (abstract)
     participant Concrete as USTaxReturn
 
-    Caller->>Concrete: file()
-    Note over Concrete: file() inherited from TaxReturn:<br/>1. gatherIncome()<br/>2. computeTax()<br/>3. submit()
+    Caller->>Concrete: <code>file()</code>
+    Note over Concrete: <code>file()</code> inherited from TaxReturn:<br/>1. <code>gatherIncome()</code><br/>2. <code>computeTax()</code><br/>3. <code>submit()</code>
     Concrete-->>Caller: receipt
 ```
 

@@ -45,9 +45,9 @@ sequenceDiagram
     participant F2 as factorial 2
     participant F1 as factorial 1
     participant F0 as factorial 0
-    F3->>F2: needs 3 * factorial(2)
-    F2->>F1: needs 2 * factorial(1)
-    F1->>F0: needs 1 * factorial(0)
+    F3->>F2: needs 3 * <code>factorial(2)</code>
+    F2->>F1: needs 2 * <code>factorial(1)</code>
+    F1->>F0: needs 1 * <code>factorial(0)</code>
     F0-->>F1: returns 1
     F1-->>F2: returns 1
     F2-->>F3: returns 2

@@ -56,11 +56,17 @@ on classes soon. For now, all you need to know is that **there is no
 such thing as a "free-standing" function in Java**. Every method
 belongs to some class.
 
-- `public`, this class is visible to any other code.
-- `class`, the keyword that declares a class.
-- `Main`, the *name* of the class. By convention class names use
-  PascalCase (capital letter for every word).
-- `{`, opens the body of the class.
+<SyntaxBreakdown
+  parts={[
+    { text: "public", label: "visible to any other code" },
+    { text: "class", label: "the keyword that declares a class" },
+    { text: "Main", label: "the name, in PascalCase" },
+    { text: "{", label: "opens the class body" },
+  ]}
+/>
+
+PascalCase means a capital letter for every word, so a class holding a
+bank account would be `BankAccount`.
 
 > By convention, the file is named exactly `Main.java`. Java is
 > picky about this: a `public class Main` *must* live in a file
@@ -75,29 +81,44 @@ exactly one method that looks (almost) exactly like this.
 
 Break it down:
 
-- `public`, callable from anywhere (including by the JVM).
-- `static`, belongs to the class itself, not to an instance. This
-  matters because the JVM needs to call `main` *before* it has
-  built any objects. (More on this in the classes chapter.)
-- `void`, returns nothing. When the method ends, the program ends.
-- `main`, the special name the JVM looks for.
-- `(String[] args)`, accepts an array of strings; the command-line
-  arguments. In our browser environment this is empty, but on a real
-  computer running `java Main hello world`, `args` would be
-  `["hello", "world"]`.
+<SyntaxBreakdown
+  parts={[
+    { text: "public", label: "callable from anywhere" },
+    { text: "static", label: "belongs to the class, not to an instance" },
+    { text: "void", label: "hands nothing back" },
+    { text: "main", label: "the name the JVM looks for" },
+    { text: "(String[] args)", label: "the command-line arguments" },
+    { text: "{", label: "opens the method body" },
+  ]}
+/>
+
+`static` is the one worth sitting with. It means the method belongs to
+the class itself rather than to any particular object, which is what
+lets the JVM call `main` *before* it has built a single object. (More
+on this in the classes chapter.) `void` means the method hands nothing
+back, and when it ends, so does the program.
+
+`args` really is filled in: run `java Main hello world` on a real
+computer and it arrives as `["hello", "world"]`. In your browser it is
+empty.
 
 ### `System.out.println("Hello, Java!");`
 
 This is the only line that *does* anything. It prints text.
 
-- `System`, a class from the Java standard library. It exposes
-  things related to the running program.
-- `out`, a field of `System` that is the standard output (the
-  console).
-- `println()`, a method on `out` that prints its argument followed by
-  a newline.
-- `"Hello, Java!"`, a **string literal**, a value of type `String`.
-- `;`, the semicolon that ends every statement in Java.
+<SyntaxBreakdown
+  parts={[
+    { text: "System", label: "a class in the standard library" },
+    { text: ".out", label: "its standard output, the console" },
+    { text: ".println(", label: "print the argument, then a newline" },
+    { text: '"Hello, Java!"', label: "a string literal, of type String" },
+    { text: ");", label: "the semicolon ends every statement" },
+  ]}
+/>
+
+Read left to right, it is a chain of ownership: `System` is a class,
+`out` is a field on it, and `println()` is a method on whatever `out`
+holds. Every dotted name in Java reads the same way.
 
 ### The closing braces
 
@@ -111,9 +132,9 @@ Java does not care about whitespace. But you very much should.
 sequenceDiagram
     participant JVM
     participant Main as Main class
-    participant SO as System.out
-    JVM->>Main: call main(args)
-    Main->>SO: println("Hello, Java!")
+    participant SO as <code>System.out</code>
+    JVM->>Main: call <code>main(args)</code>
+    Main->>SO: <code>println("Hello, Java!")</code>
     SO-->>Main: returns void
     Main-->>JVM: returns void
     Note over JVM: Program ends

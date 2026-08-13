@@ -276,11 +276,11 @@ sequenceDiagram
     participant Code
     participant List
     participant Iter as Iterator
-    Code->>List: iterator()
+    Code->>List: <code>iterator()</code>
     Iter->>List: record modCount = 5
-    Code->>Iter: next()
-    Code->>List: add("x")        # modCount = 6
-    Code->>Iter: next()
+    Code->>Iter: <code>next()</code>
+    Code->>List: <code>add("x")</code>        # modCount = 6
+    Code->>Iter: <code>next()</code>
     Iter-->>Code: ConcurrentModificationException
 ```
 

@@ -130,11 +130,11 @@ from:
 
 ```mermaid
 flowchart LR
-    A["CSV"] --> P["read_csv"]
-    B["Excel .xlsx"] --> P2["read_excel"]
-    C["JSON / API"] --> P3["read_json"]
-    D["Parquet"] --> P4["read_parquet"]
-    E["SQL database"] --> P5["read_sql"]
+    A["CSV"] --> P["<code>read_csv</code>"]
+    B["Excel .xlsx"] --> P2["<code>read_excel</code>"]
+    C["JSON / API"] --> P3["<code>read_json</code>"]
+    D["Parquet"] --> P4["<code>read_parquet</code>"]
+    E["SQL database"] --> P5["<code>read_sql</code>"]
     P --> DF[("DataFrame")]
     P2 --> DF
     P3 --> DF

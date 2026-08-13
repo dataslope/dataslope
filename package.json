@@ -48,6 +48,7 @@
     "check:mdx-tables": "node scripts/check-mdx-tables.mjs",
     "check:prose": "node scripts/check-prose.mjs",
     "check:diagrams": "node scripts/check-ascii-diagrams.mjs",
+    "check:mermaid-code": "node scripts/check-mermaid-code.mjs",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",

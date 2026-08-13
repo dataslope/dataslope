@@ -41,11 +41,11 @@ fulfill the request.
 sequenceDiagram
     participant App
     participant Light as light : Lamp
-    App->>Light: turnOn()
+    App->>Light: <code>turnOn()</code>
     Light-->>App: (returns)
-    App->>Light: brightness()
+    App->>Light: <code>brightness()</code>
     Light-->>App: 0.8
-    App->>Light: setBrightness(0.4)
+    App->>Light: <code>setBrightness(0.4)</code>
     Light-->>App: (returns)
 ```
 

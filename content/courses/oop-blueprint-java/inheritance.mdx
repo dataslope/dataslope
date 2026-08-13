@@ -156,8 +156,8 @@ parent's version for instances of the subclass.
 sequenceDiagram
     participant Caller
     participant Rex as rex : Dog
-    Caller->>Rex: speak()
-    Note over Rex: Rex is a Dog so Dog.speak() runs<br/>not Animal.speak()
+    Caller->>Rex: <code>speak()</code>
+    Note over Rex: Rex is a Dog so <code>Dog.speak()</code> runs<br/>not <code>Animal.speak()</code>
     Rex-->>Caller: "Woof!"
 ```
 

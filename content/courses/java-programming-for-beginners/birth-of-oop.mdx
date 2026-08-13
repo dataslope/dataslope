@@ -255,8 +255,8 @@ flowchart TB
         M2[deposit / withdraw]
         M2 --- D2
     end
-    User[Outside code] -- "deposit(20)" --> M1
-    User -- "withdraw(10)" --> M2
+    User[Outside code] -- "<code>deposit(20)</code>" --> M1
+    User -- "<code>withdraw(10)</code>" --> M2
 ```
 
 Outside code can *ask* an account to deposit or withdraw, but it

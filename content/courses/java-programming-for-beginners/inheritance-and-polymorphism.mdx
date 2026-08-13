@@ -140,13 +140,13 @@ sequenceDiagram
     participant JVM
     participant C as Circle area
     participant R as Rectangle area
-    Iter->>JVM: s.area(), s is a Circle
-    JVM->>C: invoke Circle.area
+    Iter->>JVM: <code>s.area()</code>, s is a Circle
+    JVM->>C: invoke <code>Circle.area</code>
     C-->>JVM: 12.566
     JVM-->>Iter: 12.566
 
-    Iter->>JVM: s.area(), s is a Rectangle
-    JVM->>R: invoke Rectangle.area
+    Iter->>JVM: <code>s.area()</code>, s is a Rectangle
+    JVM->>R: invoke <code>Rectangle.area</code>
     R-->>JVM: 12.0
     JVM-->>Iter: 12.0
 ```

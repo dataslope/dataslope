@@ -105,7 +105,7 @@ names, descriptions, titles, notes. Use `VARCHAR(20)` only when "at most
 ```mermaid
 flowchart LR
     String["String value"] --> Free["No meaningful max<br/>TEXT"]
-    String --> Limited["Real max length rule<br/>VARCHAR(n)"]
+    String --> Limited["Real max length rule<br/><code>VARCHAR(n)</code>"]
 ```
 
 A product description probably does not have a meaningful database-level

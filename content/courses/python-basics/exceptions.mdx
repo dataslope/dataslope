@@ -329,7 +329,7 @@ Every exception inherits from `BaseException`. The ones you usually care about i
 ```mermaid
 flowchart TD
     Base["BaseException"] --> KI["KeyboardInterrupt<br/>(Ctrl+C)"]
-    Base --> SE["SystemExit<br/>(sys.exit())"]
+    Base --> SE["SystemExit<br/>(<code>sys.exit()</code>)"]
     Base --> Exc["Exception"]
     Exc --> VE["ValueError"]
     Exc --> TE["TypeError"]

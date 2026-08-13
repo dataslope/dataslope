@@ -77,9 +77,9 @@ sequenceDiagram
     participant H as Heap + Stack
 
     CLI->>CL: load class "Main"
-    CL->>V: hand over Main.class bytecode
+    CL->>V: hand over <code>Main.class</code> bytecode
     V->>V: check it's well-formed and safe
-    V->>I: ok, run main()
+    V->>I: ok, run <code>main()</code>
     I->>H: allocate, push frames, run instructions
     Note over I: lazily compiles "hot" code<br/>to native via JIT
     I-->>CLI: program exits

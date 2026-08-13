@@ -1425,6 +1425,51 @@ subgraph Hand[ "By hand" ]
 subgraph Hand["By hand"]
 ```
 
+### 8. Code inside a label is wrapped in `<code>`
+
+Code in a diagram label is set in JetBrains Mono, the same face it has in the
+code block on the same page, by wrapping that span of the label in a `<code>`
+tag. Without one it arrives in Inter, which is how `System.out` came to sit in
+an actor box in the prose face three paragraphs below the same name in a code
+block.
+
+```
+<!-- Bad -->
+flowchart LR
+    Doc[report.qmd] --> Render[quarto render]
+
+<!-- Good -->
+flowchart LR
+    Doc["<code>report.qmd</code>"] --> Render[quarto render]
+```
+
+A bracketed label that holds no quotes needs them the moment it holds a tag
+(rule 1): mermaid reads an unquoted `<` as syntax. Labels that are not
+bracketed take the tag as they are:
+
+```
+sequenceDiagram
+    participant SO as <code>System.out</code>
+    JVM->>Main: call <code>main(args)</code>
+```
+
+Class and ER diagrams need none of this: they are code end to end, so the
+renderer sets the whole diagram in mono. Everything else marks its code spans,
+including the kinds whose labels mermaid paints as SVG text rather than HTML
+(sequence, pie, gantt, journey) — those cannot carry the tag through mermaid,
+so `app/_components/mdx/mermaid.tsx` strips it before the render and puts the
+face back on the rendered text afterwards. The authoring rule is the same
+either way.
+
+Mathematical notation is not code and stays in the prose face: mermaid cannot
+typeset it, so `P(A given B)`, `y(t-1)` and `ARIMA(p, d, q)` are prose written
+in symbols.
+
+Enforced by `npm run check:mermaid-code` (`scripts/check-mermaid-code.mjs`) and
+by `__tests__/mermaidCode.test.ts`, which flag a call, a dotted name and a
+snake_case identifier left unmarked. A label that really wants the prose face
+opts out with `{/* allow-unmarked-code: why */}` on a line above the fence.
+
 ### Quick checklist before committing a Mermaid block
 
 - [ ] Every node label with special chars is quoted
@@ -1434,6 +1479,7 @@ subgraph Hand["By hand"]
 - [ ] Participant aliases contain only plain words
 - [ ] Dotted edge labels have spaces: `-. label .->`
 - [ ] `subgraph` labels have no extra spaces inside the brackets
+- [ ] Every code span in a label is wrapped in `<code>`
 
 <!-- BEGIN:nextjs-agent-rules -->
 
