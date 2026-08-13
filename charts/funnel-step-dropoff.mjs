@@ -79,6 +79,8 @@ export function render() {
         fontSize: 10.5,
         textAnchor: "start",
         dx: 8,
+        // The count sits at the bar's end, where its row's gridline runs.
+        ...HALO,
       }),
       // Step conversion as its own right-hand column, headed once. Two marks
       // because `fontWeight` is a constant option in Plot, not a channel.

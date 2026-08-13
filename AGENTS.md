@@ -623,6 +623,25 @@ geometry outside the box; the tolerance is 2px, `<text>` is exempt, and
 ancestor `translate()`s are accumulated so a faceted mark is judged where it
 actually lands.
 
+### Don't write a label at a round number
+
+The band above a faceted frame is the crowded one, and a spec cannot see it.
+Plot lays that band out for its own 10px type: the facet title's baseline 9px
+above the frame, the topmost y tick label centred *on* the frame edge. The
+theme renders at 13px, because an inline `font-size` on the root beats Plot's
+presentation attribute, so both rows grow by a third and the air between them
+goes to nothing. **A wider top margin cannot fix this**: Plot positions both
+from the frame edge, so they move down together, still touching. `plot()`
+therefore lifts the facet titles with `fx.tickPadding` when the topmost tick
+lands on the edge, and grows the margin to follow.
+
+The same hazard on a smaller scale is a label written at a round position that
+happens to be a tick row: a note at `y: 3` on an axis whose ticks start at 0,
+or a two-line block anchored *at* the domain maximum, which Plot centres on the
+anchor so half of it straddles the frame. `npm run check:charts` fails on a
+label printed on top of another one; `--rules` adds an advisory pass for labels
+with a rule through them, which is what `HALO` is for.
+
 ### Determinism
 
 The generated module is diffed on every build, so a spec that uses random data

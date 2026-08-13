@@ -94,7 +94,10 @@ export function render() {
     // labels go; without it they land on the lower row's first line of type.
     fy: { label: null, domain: ROWS, axis: null, padding: 0.22 },
     x: { label: null, domain: [-0.5, VALUES.length - 0.5], ticks: [] },
-    y: { label: "Support tickets", domain: [0, 400], ticks: 4 },
+    // No tick on the domain maximum: the band above the last gridline is
+    // where each panel's verdict goes, and a label at the frame edge would
+    // have to share it with the facet title.
+    y: { label: "Support tickets", domain: [0, 400], ticks: [0, 100, 200, 300] },
     marks: [
       Plot.rect(barCells, {
         fx: "col",
@@ -171,7 +174,9 @@ export function render() {
         fontWeight: 600,
         lineHeight: 1.35,
         textAnchor: "start",
-        dy: 2,
+        // Half the two-line block's height, so it hangs below the frame edge
+        // rather than straddling it.
+        dy: 14,
         ...HALO,
       }),
       Plot.ruleY([0], { stroke: "currentColor", strokeOpacity: 0.35 }),
