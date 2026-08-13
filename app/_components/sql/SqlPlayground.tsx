@@ -48,6 +48,7 @@ import {
   FolderOpen,
   Info,
   Database,
+  DatabasePlus,
   FileCode2,
   FilePlus,
   FileText,
@@ -2277,14 +2278,19 @@ function SqlPlaygroundInner() {
         activeWorkspace ? (
           <>
             <HeaderDivider />
-            <WorkspaceNameControl
-              workspaceId={activeWorkspace.id}
-              name={activeWorkspace.name}
-              onRenamed={(name) =>
-                setActiveWorkspace({ id: activeWorkspace.id, name })
-              }
-            />
-            <NewWorkspaceControl playgroundId={PLAYGROUND_ID} />
+            <span className="ph-name-group">
+              <WorkspaceNameControl
+                workspaceId={activeWorkspace.id}
+                name={activeWorkspace.name}
+                onRenamed={(name) =>
+                  setActiveWorkspace({ id: activeWorkspace.id, name })
+                }
+              />
+              <NewWorkspaceControl
+                playgroundId={PLAYGROUND_ID}
+                icon={DatabasePlus}
+              />
+            </span>
           </>
         ) : null
       }

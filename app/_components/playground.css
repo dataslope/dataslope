@@ -2797,6 +2797,7 @@ input[type="range"].fs-slider:disabled {
      stay on one row without forcing the layout wider than the viewport. */
   .playground-header,
   .logo,
+  .ph-name-group,
   .ph-name-wrap,
   .workspace-badge {
     min-width: 0;
@@ -2812,7 +2813,8 @@ input[type="range"].fs-slider:disabled {
      the base rule, so a cap written at this point loses to it — which is
      how the mobile ceiling ended up dead and a long name kept its 220px
      desktop width on a phone. */
-  .ph-name-wrap > button {
+  .ph-name-wrap > button,
+  .ph-name-group > button {
     flex-shrink: 0;
   }
 
@@ -5162,10 +5164,26 @@ html[data-playground-theme="dark"] {
   background: var(--border);
   flex: none;
 }
+/* The name, its rename pencil and the new-workspace button read as one
+   cluster, so they share a wrapper: sitting directly in the header they'd
+   be spread apart by its 12px inter-control gap, which put the
+   new-workspace button closer to the Save group than to the name it
+   belongs to.
+
+   The two icon buttons butt up against each other (no gap) so they read
+   as one pair of actions on the name; their 20px boxes already hold the
+   glyphs apart. The gap that does exist sits between the name and the
+   pencil, in `.ph-name-wrap` below. */
+.ph-name-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  min-width: 0;
+}
 .ph-name-wrap {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   min-width: 0;
 }
 .ph-name {

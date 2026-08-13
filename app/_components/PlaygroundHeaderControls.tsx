@@ -41,10 +41,10 @@ import {
   Cloud,
   CloudUpload,
   Download,
-  FilePlus2,
   LogIn,
   LogOut,
   Pencil,
+  SquarePlus,
   UserRound,
   type LucideIcon,
 } from "lucide-react";
@@ -203,11 +203,17 @@ export function WorkspaceNameControl({
  * The name field is optional. Left blank it takes the same
  * `Workspace <n>` default the workspace manager's "New" button uses, so
  * the two entry points cannot drift apart.
+ *
+ * `icon` lets each playground name what a workspace *is* there: the code
+ * playgrounds keep the generic square-plus, the SQL ones pass
+ * `DatabasePlus` since their workspace is a database.
  */
 export function NewWorkspaceControl({
   playgroundId,
+  icon: Icon = SquarePlus,
 }: {
   playgroundId: string;
+  icon?: LucideIcon;
 }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
@@ -249,7 +255,7 @@ export function NewWorkspaceControl({
         title="New workspace"
         aria-label="New workspace"
       >
-        <FilePlus2 size={11} aria-hidden="true" />
+        <Icon size={12} aria-hidden="true" />
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Backdrop className="confirm-backdrop" />
