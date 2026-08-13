@@ -60,13 +60,16 @@ import {
   fetchCloudWorkspaceBundle,
   isCloudSupported,
   listCloudWorkspaces,
-  saveCloudWorkspace,
 } from "@/app/_components/cloud/cloudApi";
 import {
   materializeCodeWorkspace,
   setPendingBundleRef,
 } from "@/app/_components/cloud/materialize";
-import { buildCodeBundleFromOpfs } from "@/app/_components/cloud/backupFromOpfs";
+import {
+  backupLocalWorkspaces,
+  pendingBackupCandidates,
+} from "@/app/_components/cloud/backupLocalWorkspaces";
+import { recoverOrphanWorkspaces } from "@/app/_components/opfs/orphanWorkspaces";
 
 const PAGE_SIZE = 8;
 
@@ -201,6 +204,18 @@ export function PlaygroundWorkspaces() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     setLocalEntries(getWorkspaceRegistry());
+    // Then sweep up drafts that exist in OPFS but in no list, so work the
+    // user changed and never saved appears here instead of being unreachable.
+    let cancelled = false;
+    void recoverOrphanWorkspaces(PLAYGROUNDS.map((p) => p.id)).then(
+      (result) => {
+        if (cancelled || result.recovered.length === 0) return;
+        setLocalEntries(getWorkspaceRegistry());
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Signed-in: pull the account's cloud workspaces + usage. 401/503 (session
@@ -228,48 +243,24 @@ export function PlaygroundWorkspaces() {
     };
   }, [session]);
 
-  // Post-sign-in bulk backup: guest work saved in this browser uploads to the
-  // account automatically, so signing in is all it takes. Code workspaces only,
-  // their bundles rebuild from the manifest + OPFS without a live playground;
-  // SQL workspaces need their engine for the dump and stay manual (backed up
-  // from inside the playground). Registry entries are deliberate saves, so no
-  // pristine defaults are uploaded. Runs once per page view.
+  // Post-sign-in bulk backup: work saved in this browser uploads to the
+  // account automatically, so signing in is all it takes. Shared with the
+  // /playground index so it happens wherever the user lands first. Runs once
+  // per page view.
   useEffect(() => {
     if (!session || !cloudLoaded || bulkRanRef.current) return;
     const cloudIds = new Set(cloudMetas.map((m) => m.id));
-    const candidates = localEntries.filter(
-      (e) => !cloudIds.has(e.id) && !isSqlPlayground(e.playground),
-    );
-    if (candidates.length === 0) return;
+    if (pendingBackupCandidates(localEntries, cloudIds).length === 0) return;
     bulkRanRef.current = true;
     let cancelled = false;
     void (async () => {
-      setBackingUp({ done: 0, total: candidates.length });
-      let done = 0;
-      for (const entry of candidates) {
-        try {
-          const bundle = await buildCodeBundleFromOpfs(
-            entry.playground,
-            entry.id,
-            entry.name,
-          );
-          // No manifest/files to rebuild from: skip silently rather than
-          // uploading an empty bundle.
-          if (bundle) await saveCloudWorkspace(entry.id, bundle);
-        } catch (err) {
-          if (!cancelled) {
-            setOpenError(
-              `Couldn't back up “${entry.name}”: ${
-                err instanceof Error ? err.message : String(err)
-              }`,
-            );
-          }
-          break;
-        }
-        done += 1;
-        if (cancelled) return;
-        setBackingUp({ done, total: candidates.length });
-      }
+      await backupLocalWorkspaces({
+        entries: localEntries,
+        cloudIds,
+        onProgress: setBackingUp,
+        onError: setOpenError,
+        isCancelled: () => cancelled,
+      });
       // Re-fetch so the freshly-backed-up rows render as synced.
       try {
         const res = await listCloudWorkspaces();

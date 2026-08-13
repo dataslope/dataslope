@@ -36,6 +36,13 @@ export async function buildCodeBundleFromOpfs(
   if (files.length === 0) return null;
 
   const active = manifest.files.find((f) => f.id === manifest.activeFileId);
+  const openFilenames = manifest.openTabIds
+    .map((id) => manifest.files.find((f) => f.id === id)?.filename)
+    // A file whose content was unreadable above isn't in the bundle, so it
+    // can't be one of its open tabs either.
+    .filter((filename): filename is string =>
+      !!filename && files.some((f) => f.filename === filename),
+    );
   return {
     version: 2,
     kind: "code",
@@ -44,5 +51,6 @@ export async function buildCodeBundleFromOpfs(
     exportedAt: Date.now(),
     files,
     activeFilename: active?.filename,
+    openFilenames,
   };
 }

@@ -811,6 +811,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         bundleFiles.push({ filename: f.filename, content });
       }
       const active = fileList.find((f) => f.id === activeFileIdRef.current);
+      // Which files are *open* is part of the workspace's layout, so a copy
+      // opened elsewhere lands on the same tab strip rather than fanning every
+      // file open. Ids are reallocated on materialize, so send filenames.
+      const openFilenames = openTabIdsRef.current
+        .map((id) => fileList.find((f) => f.id === id)?.filename)
+        .filter((name): name is string => !!name);
       return {
         version: 2,
         kind: "code",
@@ -819,6 +825,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         exportedAt: Date.now(),
         files: bundleFiles,
         activeFilename: active?.filename,
+        openFilenames,
       };
     }, [adapter.id, workspaceName]);
 

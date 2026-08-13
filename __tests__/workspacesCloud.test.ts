@@ -332,6 +332,36 @@ describe("sqlTabsForBundle", () => {
   });
 });
 
+// The tab strip shows a subset of a workspace's files. Without the open list
+// in the bundle, a copy opened on another device fanned every file back open.
+describe("validateBundle, openFilenames", () => {
+  const codeBundleWith = (openFilenames?: unknown): unknown => ({
+    version: 2,
+    kind: "code",
+    playground: "python",
+    name: "W",
+    exportedAt: 1,
+    files: [{ filename: "main.py", content: "" }],
+    openFilenames,
+  });
+
+  it("accepts a bundle without one (written before the field existed)", () => {
+    expect(validateBundle(codeBundleWith())).not.toBeNull();
+  });
+
+  it("accepts a list of filenames", () => {
+    expect(validateBundle(codeBundleWith(["main.py"]))).not.toBeNull();
+  });
+
+  it("rejects a malformed or oversized list", () => {
+    expect(validateBundle(codeBundleWith("main.py"))).toBeNull();
+    expect(validateBundle(codeBundleWith([1, 2]))).toBeNull();
+    expect(
+      validateBundle(codeBundleWith(Array.from({ length: 201 }, () => "a.py"))),
+    ).toBeNull();
+  });
+});
+
 describe("retention policy (isExpired)", () => {
   const iso = (daysAgo: number) => new Date(NOW - daysAgo * DAY_MS).toISOString();
 

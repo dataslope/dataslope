@@ -212,6 +212,13 @@ export interface WorkspaceBundle {
   /** kind === "code" */
   files?: BundleCodeFile[];
   activeFilename?: string;
+  /** kind === "code": the files whose editor tabs are open, in tab order.
+   *  The tab strip shows a subset of the workspace's files, so without this a
+   *  reopened copy fans every file back open. Carried as filenames because
+   *  file ids are reallocated when a bundle is materialized. Absent in
+   *  bundles written before this field existed, which keeps the old
+   *  open-everything behavior. */
+  openFilenames?: string[];
   /** kind === "sql" */
   sql?: BundleSqlState;
   /** kind === "sql": the raw database image. Never part of the JSON header;
@@ -252,6 +259,15 @@ export function validateBundle(value: unknown): WorkspaceBundle | null {
         !file.filename.trim() ||
         file.filename.length > BUNDLE_FILENAME_MAX ||
         typeof file.content !== "string"
+      ) {
+        return null;
+      }
+    }
+    if (b.openFilenames !== undefined) {
+      if (
+        !Array.isArray(b.openFilenames) ||
+        b.openFilenames.length > BUNDLE_MAX_FILES ||
+        b.openFilenames.some((name) => typeof name !== "string")
       ) {
         return null;
       }

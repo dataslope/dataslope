@@ -68,7 +68,19 @@ export async function materializeCodeWorkspace(
 
   const active =
     files.find((f) => f.filename === bundle.activeFilename) ?? files[0];
-  saveManifest(bundle.playground, entry.id, files, active.id);
+  // Reopen the tab strip the bundle recorded. An older bundle has no such
+  // list, and `loadManifest` reads that as "open everything", which is what
+  // materializing has always done.
+  const openTabIds = bundle.openFilenames
+    ?.map((filename) => files.find((f) => f.filename === filename)?.id)
+    .filter((id): id is string => !!id);
+  saveManifest(
+    bundle.playground,
+    entry.id,
+    files,
+    active.id,
+    openTabIds && openTabIds.length > 0 ? openTabIds : undefined,
+  );
   setActiveWorkspaceId(bundle.playground, entry.id);
   return entry;
 }

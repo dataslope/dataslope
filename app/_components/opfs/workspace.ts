@@ -358,6 +358,86 @@ export async function duplicateWorkspace(
   return created;
 }
 
+/** What OPFS itself knows about a workspace directory, independent of the
+ *  localStorage registry. */
+export interface OpfsWorkspace {
+  id: string;
+  name: string;
+  playground: string;
+  createdAt: number;
+  /** True when `files/` or `db/` holds anything at all. False marks an empty
+   *  shell: a directory created for a workspace that never got as far as
+   *  storing a byte, which is the only thing safe to delete unprompted. */
+  hasContent: boolean;
+}
+
+/**
+ * Every workspace directory OPFS holds, read from its own `meta.json` rather
+ * than from the registry, so unregistered drafts are included. Directories
+ * whose metadata can't be read are skipped: an unidentifiable workspace is
+ * not one to make decisions about.
+ *
+ * Returns an empty list when OPFS is unavailable.
+ */
+export async function listOpfsWorkspaces(): Promise<OpfsWorkspace[]> {
+  if (!isOpfsSupported()) return [];
+  type IterableDir = AsyncIterable<[string, FileSystemHandle]>;
+  const out: OpfsWorkspace[] = [];
+  try {
+    const wsDir = await getWorkspacesDir();
+    const ids: string[] = [];
+    for await (const [name] of wsDir as unknown as IterableDir) ids.push(name);
+    for (const id of ids) {
+      try {
+        const dir = await wsDir.getDirectoryHandle(id, { create: false });
+        const metaFh = await dir.getFileHandle("meta.json", { create: false });
+        const parsed = JSON.parse(await (await metaFh.getFile()).text()) as
+          | WorkspaceMeta
+          | undefined;
+        if (
+          !parsed ||
+          typeof parsed.name !== "string" ||
+          typeof parsed.playground !== "string"
+        ) {
+          continue;
+        }
+        out.push({
+          id,
+          name: parsed.name,
+          playground: parsed.playground,
+          createdAt:
+            typeof parsed.createdAt === "number" ? parsed.createdAt : 0,
+          hasContent: await directoryHasContent(dir),
+        });
+      } catch {
+        // Not a workspace directory, or its metadata is unreadable.
+      }
+    }
+  } catch {
+    return out;
+  }
+  return out;
+}
+
+/** True when either payload subdirectory holds at least one entry. */
+async function directoryHasContent(
+  dir: FileSystemDirectoryHandle,
+): Promise<boolean> {
+  type IterableDir = AsyncIterable<[string, FileSystemHandle]>;
+  for (const sub of ["files", "db"]) {
+    try {
+      const child = await dir.getDirectoryHandle(sub, { create: false });
+      for await (const _entry of child as unknown as IterableDir) {
+        void _entry;
+        return true;
+      }
+    } catch {
+      // Subdirectory absent, which counts as empty.
+    }
+  }
+  return false;
+}
+
 /** Recursively copies the contents of `src` into `dst`. Skips `meta.json`
  *  since the destination already has its own. */
 async function copyDirectoryHandle(
