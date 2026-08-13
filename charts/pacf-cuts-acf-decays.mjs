@@ -191,8 +191,8 @@ export function render() {
         ...HALO,
       }),
       Plot.text([{}], {
-        x: A.px(8.4),
-        y: A.py(1.16),
+        x: A.px(9.2),
+        y: A.py(1.3),
         text: () => "the process has no term past lag 2,\nand the correlation still travels\na dozen lags along the chain",
         fill: "currentColor",
         fillOpacity: 0.62,

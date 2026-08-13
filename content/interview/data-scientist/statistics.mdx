@@ -132,6 +132,11 @@ $P(A \cap B) = P(A)\,P(B)$. The two ideas are often confused but are
 nearly opposites: mutually exclusive events with non-zero probability are
 *never* independent, because knowing one occurred rules the other out.
 
+Independence has a shape. Two tables with identical margins, drawn as
+area: under independence every column splits at the same height.
+
+<Chart slug="mosaic-independence" />
+
 ### What is Bayes' theorem?
 
 Bayes' theorem updates a prior belief given new evidence:
@@ -202,6 +207,11 @@ $$
 Its mean and variance are **both** $\lambda$. Common uses: customer
 arrivals per hour, defects per unit, or server requests per second.
 
+One distribution, three rates. Rare-event counts pile up at zero, and by
+a rate of about ten the shape is hard to tell from a normal curve.
+
+<Chart slug="poisson-shapes" />
+
 ### What is a binomial distribution?
 
 The binomial distribution counts the number of successes in $n$
@@ -265,6 +275,12 @@ print(f"Biased variance (n):     {biased_var:.2f}")
     },
   ]}
 />
+
+Unbiasedness is a statement about the average over many samples, which is
+the only way to see it: ten thousand samples at each size, with the two
+divisors for the variance.
+
+<Chart slug="bessel-correction" />
 
 ### What does a 95% confidence interval actually mean?
 
@@ -406,6 +422,11 @@ print(f"chi2={chi2:.3f}, p={p:.4f}, dof={dof}")
     },
   ]}
 />
+
+The reference distribution the test statistic is compared against, at
+three degrees of freedom, each with its 95th percentile marked.
+
+<Chart slug="chi-square-shapes" />
 
 ### What is ANOVA, and when do you use it?
 
@@ -556,6 +577,10 @@ than the null value) and splits $\alpha$ between both tails. A
 missing effects in the other direction. Use two-tailed tests by default
 unless you have a strong directional hypothesis stated before seeing data.
 
+The whole difference, as area: 5% in one tail against 2.5% in each.
+
+<Chart slug="one-vs-two-sided" />
+
 ### What is effect size, and why does it matter alongside p-values?
 
 **Effect size** quantifies the *magnitude* of a difference (Cohen's d for
@@ -564,6 +589,11 @@ result can be statistically significant but practically negligible (large
 $n$, tiny effect), or practically large but not significant (small $n$).
 Always report effect sizes and confidence intervals alongside p-values, so
 the reader sees both "is it real?" and "is it big enough to matter?"
+
+What Cohen's d means as a picture, since the number alone is hard to
+calibrate: two populations at d = 0.2, 0.5 and 0.8.
+
+<Chart slug="effect-size-overlap" />
 
 ### How do you correct for multiple comparisons?
 
@@ -596,6 +626,11 @@ print("Corrected p-values:", [f"{p:.3f}" for p in p_corrected])
   ]}
 />
 
+Why a correction is needed at all: the chance that at least one of k
+independent tests comes back significant, when nothing is going on.
+
+<Chart slug="multiple-comparisons" />
+
 ### What is p-hacking, and why is it dangerous?
 
 P-hacking is trying many analyses, subgroups, or metrics until a
@@ -605,6 +640,12 @@ fact that with enough comparisons some will be significant by chance
 driver of the replication crisis. Remedies: pre-registration, Bonferroni
 or false-discovery-rate correction, and separating exploratory from
 confirmatory analysis.
+
+The version that does not feel like cheating, which is the dangerous one:
+five defensible binary choices, thirty-two analyses of one dataset, and
+no test run twice.
+
+<Chart slug="forking-paths" />
 
 ### What is the difference between frequentist and Bayesian statistics?
 
@@ -616,6 +657,11 @@ updated by data into a posterior. Bayesian inference allows direct
 probability statements about parameters and naturally incorporates prior
 knowledge, but requires specifying priors.
 
+What the Bayesian side actually produces: a distribution over the
+parameter, updated as the data arrives.
+
+<Chart slug="beta-posterior-update" />
+
 ### What is the difference between parametric and non-parametric tests?
 
 **Parametric tests** assume the data follow a specific distribution
@@ -623,6 +669,11 @@ knowledge, but requires specifying priors.
 tests** make fewer distributional assumptions and work on ranks (Wilcoxon,
 Mann-Whitney, Kruskal-Wallis). Non-parametric tests are preferred for
 small samples, ordinal data, or when normality is clearly violated.
+
+The trade, measured by simulation: on normal data the t-test wins
+narrowly, and on heavy-tailed data it loses badly.
+
+<Chart slug="mann-whitney-vs-t" />
 
 ### What is the difference between correlation and causation?
 
@@ -633,6 +684,12 @@ causation: a lurking third variable (a confounder) can drive both, or the
 relationship may be coincidental. Establishing causation requires
 controlled experiments or causal-inference methods.
 
+A confounder strong enough to flip the sign. Within every age band more
+exercise goes with lower blood pressure; one line fitted to the pooled
+points slopes the other way.
+
+<Chart slug="simpsons-paradox-trend" />
+
 ### What is Simpson's paradox?
 
 Simpson's paradox occurs when a trend that appears in several groups
@@ -642,6 +699,11 @@ treatment looks worse overall but is better within every patient subgroup,
 because sicker patients were disproportionately routed to it. Resolving it
 requires analyzing data at the right stratification level and
 understanding the causal structure.
+
+The discrete version, and a real one: treatment A wins in both subgroups
+and loses overall.
+
+<Chart slug="simpsons-paradox" />
 
 ## Concept checks
 

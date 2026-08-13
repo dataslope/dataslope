@@ -24,6 +24,12 @@ revenue), reflects genuine user value (not vanity), and is **movable** by
 the team's work. "Weekly active listeners who hit 30+ minutes" beats "total
 signups" because it tracks retained value, not one-time curiosity.
 
+A north star only aligns teams if it means one thing. Three defensible
+definitions of "active users" over the same events table, drifting apart
+all year while everyone quotes the same metric name.
+
+<Chart slug="metric-definition-drift" />
+
 ### What are guardrail metrics, and why do you need them?
 
 **Guardrail metrics** are health checks you refuse to harm while chasing the
@@ -80,6 +86,12 @@ flowchart TD
   d --> e["Isolate cause, size the impact, propose fix"]
 ```
 
+Start with the instrument, not the business. This is the shape a dropped
+pipeline day makes, and it is indistinguishable from a collapse that
+recovered.
+
+<Chart slug="missing-as-zero" />
+
 ### How do you decide whether a metric change is signal or noise?
 
 Quantify the day-to-day variation first: a metric that swings 3% on a normal
@@ -88,6 +100,11 @@ or control chart, look at the trend over multiple days rather than one
 point, and check whether independent related metrics corroborate it. A real
 shift is persistent, corroborated, and larger than the metric's usual
 volatility.
+
+The calibration worth having first: four series that look like stories
+and contain no trend at all.
+
+<Chart slug="noise-looks-like-a-trend" />
 
 ### How would you design an experiment to test a new recommendation algorithm?
 
@@ -98,6 +115,11 @@ that one user's sessions are correlated. Compute the **sample size** for
 your minimum detectable effect at power 0.8 and $\alpha = 0.05$ **before**
 launching, run for full business cycles to absorb weekly seasonality and
 novelty effects, then read the primary metric and check every guardrail.
+
+What the sizing step is actually trading. Each halving of the lift you
+want to catch roughly quadruples the traffic you need to catch it.
+
+<Chart slug="power-vs-n" />
 
 ### When can you *not* run an A/B test, and what do you do instead?
 
@@ -134,6 +156,11 @@ The test: "If this number doubled, would I know what to *do* differently?"
 Prefer **actionable, ratio, and cohort-based** metrics (activation rate,
 week-4 retention) over raw cumulative counts.
 
+A near relative of the vanity metric: a headline number that is true,
+reported, and cannot tell four very different years apart.
+
+<Chart slug="dashboard-kpi-trend" />
+
 ### Why are ratio metrics tricky, and what should you watch for?
 
 A ratio can move because the numerator changed, because the **denominator**
@@ -142,6 +169,12 @@ rate can fall in every segment yet rise overall if traffic shifts toward
 higher-rate segments. Always look at numerator and denominator separately,
 and be wary of averaging ratios across groups rather than aggregating the
 raw counts.
+
+The failure mode that survives every review, because the arithmetic is
+fine: sort by rate and the top and bottom of the table are just the rows
+with the fewest observations.
+
+<Chart slug="rates-from-small-denominators" />
 
 ### How would you estimate the market size or scale of something on the spot?
 
@@ -167,6 +200,11 @@ results that fade. Detect it by watching the treatment effect **over time**,
 a spike that decays toward zero is novelty; a durable lift is real. Running
 the experiment across full cycles and inspecting the effect's trend (not
 just the pooled average) guards against shipping a fad.
+
+Two changes, eight weeks of measured lift each. Read in week one, the one
+about to evaporate is the one that looks better.
+
+<Chart slug="novelty-effect-fades" />
 
 ## Concept checks
 

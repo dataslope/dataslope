@@ -24,6 +24,12 @@ because counts confound the effect with traffic volume. It should also be
 hard to game: optimizing it shouldn't let you win the metric while losing
 the business.
 
+"Specific" is the word doing the most work there. Three defensible
+definitions of "active users" over the same events table, and by December
+they disagree by a factor of three.
+
+<Chart slug="metric-definition-drift" />
+
 ### What's the difference between a primary, guardrail, and vanity metric?
 
 - **Primary (success) metric**, the one the change is trying to move
@@ -50,6 +56,12 @@ add-to-cart → checkout → purchase). Step conversion is the share of users
 who reach the next step; overall conversion is the share who finish the
 whole thing. Measuring per-step conversion pinpoints **where** users drop
 off.
+
+Why per-step conversion, rather than counting the users lost at each step:
+the top of a funnel always loses the most people, because that is where
+the people are.
+
+<Chart slug="funnel-step-dropoff" />
 
 ### How do you compute a conversion rate in SQL?
 
@@ -85,6 +97,11 @@ makes the groups comparable in expectation, so a difference in the metric
 can be attributed to the change rather than to a confounder, this is how
 you get **causation**, not just correlation.
 
+What randomization buys, measured: ten covariates, and the gap between the
+two arms on each, when users pick their own group and when a coin does.
+
+<Chart slug="randomisation-balances-confounders" />
+
 ### What is a p-value, at an analyst's level?
 
 The probability of seeing a result **at least as extreme** as the one you
@@ -94,6 +111,11 @@ small p-value (commonly < 0.05) means the data would be surprising under
 probability that the null is true, nor the size or importance of the
 effect.
 
+The definition, drawn. The p-value is the shaded area under the null, not
+the height of the curve at the observation.
+
+<Chart slug="p-value-tail-area" />
+
 ### What's the difference between statistical and practical significance?
 
 **Statistical** significance says an effect is unlikely to be noise.
@@ -101,6 +123,11 @@ effect.
 huge sample, a 0.1% lift can be statistically significant yet worthless in
 practice. Always report the **effect size** (and its range) alongside the
 p-value.
+
+One fixed population difference, with nothing varied but the sample size.
+The p-value collapses toward zero; the effect size does not move at all.
+
+<Chart slug="effect-size-independent-of-n" />
 
 ### How would you explain a confidence interval to a stakeholder?
 
@@ -110,6 +137,11 @@ means that if we repeated the experiment many times, about 95% of such
 intervals would contain the true value. A **wide** interval signals you
 don't yet have enough data to be precise.
 
+What "95% of such intervals" looks like: a hundred samples, a hundred
+intervals, one fixed truth, and a handful that miss it.
+
+<Chart slug="ci-coverage" />
+
 ### Why does sample size matter, and what is a minimum detectable effect?
 
 Bigger samples shrink the standard error, so smaller true effects become
@@ -117,6 +149,11 @@ detectable. The **minimum detectable effect (MDE)** is the smallest lift
 you want to be able to catch; you pick it up front, along with power
 (often 80%) and significance (often 5%), to compute the required sample
 size **before** launching. Underpowered tests miss real wins.
+
+The trade you are making when you pick the MDE. Each halving of the lift
+you want to catch roughly quadruples the sample it takes to catch it.
+
+<Chart slug="power-vs-n" />
 
 ### What is "peeking," and why is it a problem?
 
@@ -126,6 +163,12 @@ looks significant. Because the metric fluctuates, early looks cross the
 positives. Fix it by fixing the sample size in advance, or use sequential
 testing methods designed for continuous monitoring.
 
+One experiment where nothing is happening, with the p-value recomputed
+every hundred visitors. It dips under 0.05 on the way to a final reading
+of 0.19.
+
+<Chart slug="ab-test-peeking" />
+
 ### What is a novelty (or primacy) effect?
 
 A temporary change in behavior just because something is **new**, users
@@ -133,6 +176,11 @@ click a redesigned button out of curiosity, then revert. It can make an
 early A/B readout look better (or worse) than the steady state. Guard
 against it by running the test long enough and checking whether the effect
 persists for later-joining users.
+
+Two changes, eight weeks of measured lift each. In week one the one that
+is about to evaporate is the one that looks better.
+
+<Chart slug="novelty-effect-fades" />
 
 ### What is Simpson's paradox?
 
@@ -142,6 +190,11 @@ overall yet be better in each segment if it was applied more to
 harder-to-serve users. The lesson: **segment before you conclude**, and
 watch for confounding in the group sizes.
 
+The textbook case, and it is a real one: kidney stone treatments, where A
+wins in both subgroups and loses overall.
+
+<Chart slug="simpsons-paradox" />
+
 ### What is a cohort analysis, and what does it reveal?
 
 A cohort analysis groups users by a shared start event (e.g., sign-up
@@ -149,6 +202,12 @@ month) and tracks them over time. By holding the starting point fixed, it
 separates genuine behavior changes from shifts in user-base composition,
 making it the standard tool for **retention**, churn, and lifetime-value
 comparisons across acquisition cohorts.
+
+Five signup cohorts, each retaining better than the one before it. A
+single blended retention number cannot show this, because it moves when
+acquisition moves whether or not the product changed.
+
+<Chart slug="cohort-retention" />
 
 ### What is a retention curve?
 
@@ -158,6 +217,11 @@ plateau (a retained core), rather than decaying toward zero. Comparing
 curves across cohorts shows whether product changes actually improved
 stickiness.
 
+The difference between the two shapes, and where it becomes visible. For
+the first fortnight these are the same product.
+
+<Chart slug="retention-curve-plateau" />
+
 ### How do you avoid a misleading ratio metric?
 
 Be deliberate about the **denominator** and its grain. A rising "revenue
@@ -165,6 +229,12 @@ per session" can come from more revenue **or** fewer sessions, so watch
 numerator and denominator together. Averages of ratios differ from the
 ratio of totals; when in doubt, aggregate the numerator and denominator
 separately, then divide.
+
+The specific trap in "averages of ratios differ from the ratio of
+totals": five regional averages averaged again, against the same rows
+averaged once.
+
+<Chart slug="average-of-averages" />
 
 ## Concept checks
 

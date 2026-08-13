@@ -22,6 +22,12 @@ Compute the **sample size** for your minimum detectable effect, power
 (usually 0.8), and α (0.05) **before** running. Run for full business
 cycles, then test for a significant difference and check guardrails.
 
+What randomization is buying you at step one, measured: ten covariates
+and the gap between the arms on each, when users pick their own group and
+when a coin does.
+
+<Chart slug="randomisation-balances-confounders" />
+
 ### What is statistical power, and what drives it?
 
 Power = probability of detecting a real effect ($1 - \beta$). It rises
@@ -74,6 +80,11 @@ enough looks will hand you a small one on luck alone.
 
 <Chart slug="pvalues-under-null" />
 
+And the same thing happening to one experiment: a test where both arms
+are identical, with the p-value recomputed every hundred visitors.
+
+<Chart slug="ab-test-peeking" />
+
 ### What are common A/B testing pitfalls?
 
 - **Novelty / primacy effects**, behavior changes just because something is new; run longer.
@@ -88,6 +99,12 @@ Not "the feature does nothing", only that you **failed to detect** an
 effect at your power. Report the confidence interval: a tight CI around
 zero supports "no meaningful effect," while a wide CI means the test was
 underpowered and inconclusive.
+
+Why "no difference" and "no evidence of a difference" are not the same
+sentence: the miss rate is an area under the alternative, and it is large
+whenever the test is small.
+
+<Chart slug="alpha-power-tradeoff" />
 
 ### What is randomization unit and why does it matter?
 
@@ -128,6 +145,12 @@ print(f"Sample size per variant: {n}")
     },
   ]}
 />
+
+The square root in the formula, drawn: halving the margin of error costs
+four times the sample, and the curve flattens long before most people
+expect it to.
+
+<Chart slug="sample-size-margin-of-error" />
 
 ### What is a sample ratio mismatch and what causes it?
 
@@ -172,6 +195,11 @@ A **novelty effect** is a temporary boost in engagement just because something i
 A **primacy effect** is the opposite: users initially resist change (e.g., a redesign), but usage recovers once they learn the new UI.
 Both cause the early experiment period to be unrepresentative. Run experiments for full business cycles and use longer holdback periods; for major UI changes, consider focusing on new users only.
 
+Two changes, eight weeks of measured lift each. Reading in week one does
+not merely blur the two; it picks the wrong one.
+
+<Chart slug="novelty-effect-fades" />
+
 ### What is the multiple comparisons problem in A/B testing?
 
 When you test many metrics or run many experiments simultaneously, some will appear significant by chance alone (at `alpha = 0.05`, one in 20 true nulls will produce a false positive).
@@ -214,6 +242,12 @@ print(f"CUPED variance:    {Y_adj.var():.2f}")  # should be lower
   ]}
 />
 
+The intuition CUPED generalises. The same measurements as two independent
+groups, where the difference is invisible, and as one difference per
+subject, where it is not.
+
+<Chart slug="pairing-removes-variance" />
+
 ### What is a guardrail metric?
 
 A **guardrail metric** is a metric you must not degrade, even if the primary metric improves.
@@ -243,6 +277,10 @@ DiD assumes the **parallel trends** assumption: in the absence of treatment, tre
 A **two-sided test** detects an effect in either direction (treatment better or worse); significance requires the p-value to be below `alpha/2` in each tail.
 A **one-sided test** tests only the direction stated in advance (treatment is better); it has more power in that direction but misses regressions.
 For product experiments, two-sided tests are generally preferred because you care about detecting both improvements and regressions.
+
+The whole difference, as area: 5% in one tail against 2.5% in each.
+
+<Chart slug="one-vs-two-sided" />
 
 ### How do you handle long-running experiments?
 
@@ -335,6 +373,11 @@ print(f"P(treatment > control) = {p_treatment_wins:.3f}")
   ]}
 />
 
+What the posterior does as the data arrives: a belief about a conversion
+rate updated after ten, a hundred and a thousand visitors.
+
+<Chart slug="beta-posterior-update" />
+
 ### What is the difference between a Type I and Type II error in experiment design?
 
 A **Type I error** (false positive) declares a winner when the treatment has no real effect; controlled by `alpha`.
@@ -354,6 +397,12 @@ You often need both sensitivity (to detect effects) and robustness (to trust the
 A **meta-analysis** combines results from multiple experiments (e.g., across regions, time periods, or replications) to produce a pooled estimate with higher precision.
 It is used when individual experiments are too small to be conclusive but consistent directional evidence accumulates.
 Fixed-effects meta-analysis assumes a single true effect; random-effects allows the true effect to vary across experiments.
+
+Why pooling has to weigh the studies rather than average their headlines:
+at low power, the effects that reach significance are the ones that
+overstated themselves.
+
+<Chart slug="winners-curse" />
 
 ### What is a sequential probability ratio test (SPRT)?
 

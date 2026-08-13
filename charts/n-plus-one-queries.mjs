@@ -75,7 +75,8 @@ export function render() {
       }),
       Plot.text([{}], {
         x: 500,
-        y: 3,
+        // Clear of the axis: at y = 3 the second line landed on the x ticks.
+        y: 16,
         text: () => "One join, or one\nbatched IN (…)",
         fill: PRIMARY,
         fontSize: 10.5,

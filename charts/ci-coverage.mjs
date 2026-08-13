@@ -11,7 +11,7 @@
  * The misses are drawn in the accent color, thicker, *and* labelled, so they
  * are never identified by color alone.
  */
-import { Plot, plot, mean, normalSamples, ACCENT, MUTED, PRIMARY } from "./_theme.mjs";
+import { Plot, plot, mean, normalSamples, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 
 export const title =
   "One hundred 95% confidence intervals, each built from its own sample of the same population. Almost all of them cross the vertical line marking the true mean; a handful, marked with a cross, miss it entirely.";
@@ -76,6 +76,9 @@ export function render() {
         fontWeight: 600,
         textAnchor: "start",
         dx: 8,
+        // The label sits inside the frame, over the x gridlines and beside the
+        // rule it names, so it needs the halo to stay legible.
+        ...HALO,
       }),
       Plot.ruleY(intervals, {
         y: "i",

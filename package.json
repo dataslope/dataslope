@@ -35,7 +35,7 @@
     "db:migrate:illustrations:remote": "wrangler d1 migrations apply dataslope-illustrations --remote",
     "lint": "eslint .",
     "check:challenges": "node scripts/check-challenge-cards.mjs",
-    "check:charts": "node scripts/build-charts.mjs && node scripts/check-chart-overflow.mjs",
+    "check:charts": "node scripts/build-charts.mjs && node scripts/check-chart-overflow.mjs && node scripts/check-chart-labels.mjs",
     "check:code-blocks": "node scripts/check-code-blocks.mjs",
     "check:js": "node scripts/check-js-blocks.mjs",
     "check:polars-scan": "node scripts/check-polars-scan.mjs",

@@ -144,7 +144,8 @@ export function render() {
         fontSize: 10,
         fontWeight: 700,
         textAnchor: "end",
-        dy: 22,
+        // Above the last row, since below it is the axis tick row.
+        dy: -16,
         ...HALO,
       }),
       Plot.text([{ panel: AS_BUILT, at: ORDER.at(-1) }], {
@@ -157,7 +158,9 @@ export function render() {
         fontWeight: 600,
         textAnchor: "start",
         dx: 5,
-        dy: 22,
+        // Above the last row rather than below it: below is where the axis
+        // ticks are, and the note landed on them.
+        dy: -16,
         ...HALO,
       }),
     ],

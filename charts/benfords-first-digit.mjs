@@ -108,7 +108,10 @@ export function render() {
         SERIES.map((s, i) => ({
           ...s,
           chi: CHI[i].chi,
-          y: s.points.at(-1).p + (i === 0 ? 0.02 : -0.02),
+          // Apart, not together: the real ledger's line ends below the
+          // fabricated one, so it takes the downward nudge. Nudging each
+          // toward the other left two two-line blocks sharing a line.
+          y: s.points.at(-1).p + (i === 0 ? -0.028 : 0.028),
         })),
         {
           x: 9.6,

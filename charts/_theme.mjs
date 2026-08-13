@@ -151,20 +151,25 @@ export function plot(options = {}) {
   };
 
   // Draw once to see what actually landed above the frame, then redraw with a
-  // top margin that fits it. Asking Plot is the only reliable test: whether an
-  // axis label exists depends on `y.label`, on the channel Plot can name it
-  // from, and on whether the scale drew an axis at all.
+  // top margin that fits it, and with the facet titles lifted clear of the
+  // topmost tick label if that is where they landed. Asking Plot is the only
+  // reliable test: whether an axis label exists depends on `y.label`, on the
+  // channel Plot can name it from, and on whether the scale drew an axis at
+  // all, and whether a tick sits on the frame edge depends on the data.
   const first = Plot.plot(spec);
-  const needed = topMarginFor(first);
   const marginTop = spec.marginTop ?? 20;
-  if (needed <= marginTop) return first;
+  const lift = spec.fx?.tickPadding ?? facetLiftFor(first, marginTop);
+  const needed = topMarginFor(first, lift);
+  if (needed <= marginTop && lift === FACET_LIFT) return first;
   // Grow the height by the same amount, so the extra band is added *above* the
   // plot rather than taken out of it: every spec's frame keeps the size and
   // aspect its author chose.
+  const top = Math.max(needed, marginTop);
   return Plot.plot({
     ...spec,
-    marginTop: needed,
-    height: (spec.height ?? 320) + (needed - marginTop),
+    fx: lift === FACET_LIFT ? spec.fx : { ...spec.fx, tickPadding: lift },
+    marginTop: top,
+    height: (spec.height ?? 320) + (top - marginTop),
   });
 }
 
@@ -197,13 +202,62 @@ export function plot(options = {}) {
  */
 const LABEL_BAND = 15; // the y-axis label's own box, at 13px type
 const CLEAR_GAP = 7; // air between it and whatever is under it
-const FACET_TITLE_LIFT = 23; // how far a facet title hangs above the frame
-const TOP_TICK_RISE = 8; // how far the topmost tick label rises above it
+const TITLE_ASCENT = 14; // how far a facet title reaches above its own baseline
+const TOP_TICK_RISE = 8; // how far the topmost tick label rises above the frame
 
-function topMarginFor(svg) {
+function topMarginFor(svg, lift = FACET_LIFT) {
   if (!svg.querySelector('[aria-label="y-axis label"]')) return 0;
   const facetTitles = svg.querySelector('[aria-label="fx-axis tick label"]');
-  return LABEL_BAND + CLEAR_GAP + (facetTitles ? FACET_TITLE_LIFT : TOP_TICK_RISE);
+  return LABEL_BAND + CLEAR_GAP + (facetTitles ? lift + TITLE_ASCENT : TOP_TICK_RISE);
+}
+
+/**
+ * How far above the frame a facet title has to hang to clear the tick label
+ * below it, as an `fx.tickPadding`.
+ *
+ * A wider top margin cannot fix this collision, which is the whole reason it
+ * needs its own pass. Plot positions *both* things from the frame edge: the
+ * facet title's baseline `FACET_LIFT` above it, the topmost y tick label
+ * centred on it. Add margin and the pair moves down together, still touching.
+ *
+ * They touch by construction whenever the y scale's last tick lands on the
+ * domain maximum, which is most of the time. Plot lays that band out for its
+ * own 10px default, and this theme renders at 13px (an inline `font-size` on
+ * the root beats Plot's presentation attribute), so a gap of about 4px becomes
+ * a gap of about zero: `line-vs-bar-four-cases` shipped with "As a line" and
+ * "400" sharing a pixel, which is what prompted this.
+ *
+ * So the title moves instead, and the top margin follows it up. When the top
+ * tick sits well inside the frame there is nothing to clear and Plot's own
+ * spacing is returned untouched.
+ */
+const FACET_LIFT = 9; // Plot's own tickPadding for a facet axis
+const TITLE_DESCENT = 3; // below a facet title's baseline, at 13px
+const TICK_ASCENT = 10; // above a tick label's baseline, at 13px
+const TITLE_TICK_GAP = 5; // air we want between the two
+
+function facetLiftFor(svg, marginTop) {
+  if (!svg.querySelector('[aria-label="fx-axis tick label"]')) return FACET_LIFT;
+  const ticks = [...svg.querySelectorAll('[aria-label="y-axis tick label"] text')];
+  if (ticks.length === 0) return FACET_LIFT;
+  // Distance from the frame edge down to the highest tick label's baseline.
+  const drop = Math.min(...ticks.map(baselineY)) - marginTop;
+  const needed = TITLE_TICK_GAP + TITLE_DESCENT + TICK_ASCENT - drop;
+  return Math.max(FACET_LIFT, Math.ceil(needed));
+}
+
+/** A text element's baseline in SVG coordinates: every ancestor `translate()`
+ *  plus its own `y`, which Plot writes in ems. */
+function baselineY(text) {
+  let y = 0;
+  for (let node = text; node; node = node.parentElement) {
+    const move = /translate\(\s*[-\d.e]+[,\s]+([-\d.e]+)\s*\)/.exec(node.getAttribute?.("transform") ?? "");
+    if (move) y += Number(move[1]);
+  }
+  const shift = text.getAttribute("y");
+  if (shift?.endsWith("em")) y += Number.parseFloat(shift) * 13;
+  else if (shift) y += Number.parseFloat(shift) || 0;
+  return y;
 }
 
 /**

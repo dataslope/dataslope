@@ -122,6 +122,12 @@ A learning-rate range test, sweeping the rate and watching the loss, finds
 a good starting magnitude. Adaptive optimizers reduce but don't eliminate
 the need to tune the base rate.
 
+Why the search is over orders of magnitude rather than over a fine grid:
+the same quadratic at three rates, one barely moving, one converging in
+about ten steps, one diverging.
+
+<Chart slug="gradient-descent-lr" />
+
 ### Explain dropout, L2, and early stopping as regularizers.
 
 **Dropout** randomly zeros a fraction $p$ of units each training step so
@@ -131,6 +137,11 @@ to the loss, shrinking weights toward zero and favoring smoother
 functions. **Early stopping** halts training when validation loss stops
 improving and restores the best-epoch weights. All three curb overfitting
 by limiting effective capacity.
+
+What the L2 penalty does to the coefficients, next to L1, which is the
+difference between shrinking weights and deleting them.
+
+<Chart slug="regularization-l1-l2" />
 
 ### What causes vanishing and exploding gradients, and how do you fix them?
 

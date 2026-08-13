@@ -64,11 +64,6 @@ This calls `train_test_split` twice, first carving off a 20% `X_test`
 hold-out, then splitting the remainder so `X_val` is another 20% of the
 original, yielding a 60/20/20 train/validation/test partition.
 
-And why one split is not enough: the same model scores very differently
-depending on which rows happened to land in the test set.
-
-<Chart slug="one-split-is-a-lottery" />
-
 ### L1 vs L2 regularization?
 
 Both penalize large weights to reduce overfitting. **L1 (lasso)** can
@@ -168,6 +163,12 @@ error, high validation error. Remedies include: getting more data,
 reducing model capacity, adding L1/L2 regularization, using dropout or
 batch normalization, applying data augmentation, and using early stopping.
 
+Overfitting and underfitting are two shapes, and the diagnosis is the gap
+between the curves: still open at the right-hand edge means variance;
+met early and flat means bias.
+
+<Chart slug="learning-curve" />
+
 ### What is underfitting?
 
 Underfitting is when a model is too simple to capture the underlying
@@ -234,6 +235,12 @@ cosine annealing), warm-up followed by decay, and adaptive optimizers
 (Adam, RMSProp) that adjust per-parameter rates. Learning rate range
 tests (plotting loss vs. log LR) help find a good starting value.
 
+The same quadratic at three rates. There is a band that works, and both
+ways out of it fail differently: too small barely moves, too large
+climbs away.
+
+<Chart slug="gradient-descent-lr" />
+
 ### What are precision, recall, and F1-score?
 
 **Precision** asks, of all predicted positives, how many are correct.
@@ -282,6 +289,11 @@ The two move against each other as the threshold slides, so a model is a
 curve rather than a number.
 
 <Chart slug="precision-recall-threshold" />
+
+All four of them come out of the same two-by-two table, which is worth
+drawing once and remembering.
+
+<Chart slug="confusion-matrix-grid" />
 
 ### What is ROC-AUC and when does PR-AUC matter more?
 
@@ -436,6 +448,11 @@ Gradient Boosting, XGBoost) trains models sequentially, each correcting
 the errors of the previous one, primarily reduces bias, but can overfit
 if not regularized.
 
+What averaging buys, and its limit: variance falls with the number of
+models onto a floor set by how correlated their errors are.
+
+<Chart slug="ensemble-variance" />
+
 ### How does a Random Forest differ from a single decision tree?
 
 Random Forest builds many decision trees on bootstrap samples of the data,
@@ -443,6 +460,11 @@ and at each split considers only a random subset of features. Predictions
 are averaged (regression) or majority-voted (classification). The
 randomness decorrelates the trees so the ensemble has lower variance than
 any individual tree, while keeping bias comparable.
+
+The single tree's problem, drawn: training accuracy reaches a hundred per
+cent and stays there while validation accuracy peaks and then falls.
+
+<Chart slug="decision-tree-depth" />
 
 ### What is gradient boosting?
 
@@ -492,6 +514,11 @@ print(f"First 5 probabilities: {y_prob[:5].round(3)}")
 `clf.predict_proba(...)[:, 1]` exposes the underlying sigmoid
 probabilities for the positive class, the raw output before thresholding.
 
+Why the linear part lives in log-odds: a quantity pinned between 0 and 1
+cannot be linear in anything, and its log-odds can.
+
+<Chart slug="odds-vs-probability" />
+
 ### What is the difference between a parametric and a non-parametric model?
 
 **Parametric** models (linear regression, logistic regression, neural
@@ -508,6 +535,11 @@ majority class (classification) or mean (regression). It is instance-based
 and non-parametric, no explicit training step. Performance degrades in
 high dimensions (curse of dimensionality) and scales poorly at inference.
 
+What k does to the decision boundary, from jagged at k = 1 to nearly
+straight at k = 75.
+
+<Chart slug="knn-k-boundary" />
+
 ### What is k-means clustering?
 
 k-means partitions unlabeled data into k clusters by iterating two steps:
@@ -515,6 +547,11 @@ k-means partitions unlabeled data into k clusters by iterating two steps:
 as the mean of its assigned points. It converges to a local minimum. You
 choose k via the elbow method or silhouette score; the algorithm assumes
 spherical, equally-sized clusters.
+
+How k gets chosen, and how much judgement that leaves: the within-cluster
+sum of squares always falls, so what you are looking for is a bend.
+
+<Chart slug="kmeans-elbow" />
 
 ### What is PCA and what does it do?
 
@@ -553,6 +590,12 @@ Projecting the scaled features down to two components with
 `PCA(n_components=2)` collapses the 10-feature input to `X_2d`, and
 `explained_variance_ratio_` reports how much of the original variance
 those two components retain.
+
+How many components to keep, read off a scree plot: the bars fall
+steeply and then flatten, and the cumulative line says what has been
+kept.
+
+<Chart slug="pca-scree" />
 
 ### Name common activation functions and their trade-offs.
 

@@ -125,7 +125,9 @@ export function render() {
       }),
       Plot.text([{ at: ORDER.at(-2) }], {
         y: "at",
-        x: 0,
+        // Clear of the axis, because the bars it labels are short and their
+        // own value labels sit just past their ends.
+        x: 34,
         text: () => "and so is every laggard",
         fill: ACCENT,
         fontSize: 10,

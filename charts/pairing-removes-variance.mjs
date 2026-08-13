@@ -171,13 +171,15 @@ export function render() {
         ...HALO,
       }),
       Plot.text([{}], {
-        x: PAIRED.px(0.14),
+        // Inside the panel rather than hanging off its left edge, where an
+        // end-anchored label runs back into the tick labels in the margin.
+        x: PAIRED.px(0.06),
         y: PAIRED.py(0),
         text: () => "no change",
         fill: MUTED,
         fontSize: 10,
         fontWeight: 600,
-        textAnchor: "end",
+        textAnchor: "start",
         ...HALO,
       }),
       Plot.text([{}], {
