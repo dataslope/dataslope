@@ -30,12 +30,39 @@ const NAV_SECTIONS: {
   label: string;
   icon: LucideIcon;
   prefetch?: boolean;
+  /** Pill rendered after the label (see `NavBadge`). */
+  badge?: string;
 }[] = [
   { href: "/courses", label: "Courses", icon: GraduationCap, prefetch: true },
   { href: "/interview-prep", label: "Interview Prep", icon: BriefcaseBusiness },
   { href: "/playground", label: "Playground", icon: SquareTerminal },
-  { href: "/pricing", label: "Pricing", icon: Tag },
+  // The pricing page's own headline is that everything is free; saying so in
+  // the nav is what stops "Pricing" reading as a paywall.
+  { href: "/pricing", label: "Pricing", icon: Tag, badge: "Free" },
 ];
+
+/**
+ * The pill beside a nav label, in the pricing table's "Recommended" badge
+ * style (green fill, white semibold caps-height text, fully rounded) a step
+ * smaller so it sits under a 15px nav item rather than an 18px heading.
+ *
+ * On the section being viewed it turns the same blue as the active label, so
+ * the item still reads as one highlighted unit instead of a blue word with a
+ * green sticker on it.
+ */
+function NavBadge({ children, active }: { children: string; active?: boolean }) {
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold leading-normal text-white transition-colors duration-200 ${
+        active
+          ? "bg-[var(--ds-blue-700)] dark:bg-[var(--ds-blue-400)]"
+          : "bg-[var(--ds-green-500)]"
+      }`}
+    >
+      {children}
+    </span>
+  );
+}
 
 /** Desktop primary-menu link (text-only; the icons in NAV_SECTIONS are for
  *  the mobile drawer). Idle items sit in a muted neutral with a subtle darken
@@ -46,6 +73,7 @@ function NavLink({
   href,
   prefetch,
   compact,
+  badge,
   children,
 }: {
   href: string;
@@ -54,6 +82,7 @@ function NavLink({
    *  with everything else. Half a pixel: the compaction should read as the bar
    *  getting tighter, not as the type changing size. */
   compact?: boolean;
+  badge?: string;
   children: React.ReactNode;
 }) {
   const pathname = usePathname() ?? "";
@@ -65,7 +94,7 @@ function NavLink({
       aria-current={active ? "page" : undefined}
       // font-size is animated alongside the color, so the step down happens
       // with the nav's height rather than snapping a frame ahead of it.
-      className={`rounded-lg px-3 py-2 font-medium transition-[color,font-size] duration-200 ${
+      className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 font-medium transition-[color,font-size] duration-200 ${
         compact ? "text-[14.5px]" : "text-[15px]"
       } ${
         active
@@ -74,6 +103,7 @@ function NavLink({
       }`}
     >
       {children}
+      {badge && <NavBadge active={active}>{badge}</NavBadge>}
     </Link>
   );
 }
@@ -233,7 +263,7 @@ function MobileDrawer() {
               scrollbar on just the playground list). The header above and the
               footer below stay pinned. */}
           <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
-            {NAV_SECTIONS.map(({ href, label, icon: Icon }) => (
+            {NAV_SECTIONS.map(({ href, label, icon: Icon, badge }) => (
               <Dialog.Close
                 key={href}
                 render={<Link href={href} prefetch={false} />}
@@ -241,6 +271,9 @@ function MobileDrawer() {
               >
                 <Icon size={16} aria-hidden="true" />
                 {label}
+                {/* Always green here: drawer rows carry no active state to
+                    match, so there is no blue to pick up. */}
+                {badge && <NavBadge>{badge}</NavBadge>}
               </Dialog.Close>
             ))}
           </div>
@@ -334,8 +367,14 @@ export function HomeNav() {
             hardened `.ds-nav-menu` rule in home.css so a leaked `.hidden`
             from a docs route can't keep it collapsed after a back-navigation). */}
         <div className="ds-nav-menu items-center justify-center gap-4 lg:gap-6">
-          {NAV_SECTIONS.map(({ href, label, prefetch }) => (
-            <NavLink key={href} href={href} prefetch={prefetch} compact={scrolled}>
+          {NAV_SECTIONS.map(({ href, label, prefetch, badge }) => (
+            <NavLink
+              key={href}
+              href={href}
+              prefetch={prefetch}
+              compact={scrolled}
+              badge={badge}
+            >
               {label}
             </NavLink>
           ))}
