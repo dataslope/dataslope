@@ -19,7 +19,8 @@
       "auth-globe-pin": "1024x1024",
       "pricing-plan": "1024x1024",
       "playground-hero": "1536x1024",
-      "playground-mark": "1024x1024"
+      "playground-mark": "1024x1024",
+      "error-illustration": "1536x1024"
     },
     "postgresElephant": "a friendly blue elephant (the PostgreSQL mascot)"
   },
@@ -33299,6 +33300,18 @@
       "title": "Workspace open in another tab",
       "mascot": true,
       "subject": "a polar bear seen from the side standing squarely on all fours on a thick pale blue block of ice, its head snapped around toward the viewer wearing a startled expression, eyes stretched wide and round, brows raised high and jaw dropped open, ears pricked upright, a solid blue laptop closed on the ice behind its hind legs"
+    },
+    {
+      "id": "error-404",
+      "collection": "error",
+      "course": "error",
+      "courseTitle": "Status pages",
+      "lesson": "index",
+      "category": "error-illustration",
+      "style": "isometric illustration",
+      "title": "404: page not found",
+      "mascot": true,
+      "subject": "a chipmunk up on its hind legs peering into a round hollow in the side of a thick tree trunk that rises from a small pale grey platform, both front paws resting on the rim of the hollow, its striped back and raised tail toward the viewer"
     }
   ]
 }
