@@ -77,6 +77,7 @@ import {
   savePersistedCode,
 } from "./codePersistence";
 import { usePrepopulatedOutput } from "./mdx/BlockOutputs";
+import { usePrecompiledBundle } from "./mdx/ReactBundles";
 import { blockOutputKey } from "@/lib/blockOutputKey";
 import { previewStageStyle } from "./previewStage";
 import {
@@ -474,6 +475,12 @@ function CodeBlockInner({
   // keep their per-run random tokens, so the sentinel protocol is
   // untouched. Do not reuse this token for a harnessed document.
   const autoPreviewToken = `${outputKey}-${blockId.replace(/[^a-zA-Z0-9-]/g, "")}`;
+  // A build-time artifact for adapters that cannot compose from source
+  // alone. `web` ignores it; `react` renders nothing without it, because
+  // translating TSX in the reader's browser is the ~3 MB download this
+  // exists to avoid. Keyed by the same content hash as everything else, so
+  // an edited block simply has no bundle until the workflow runs again.
+  const precompiled = usePrecompiledBundle(outputKey);
   const autoPreviewDoc = useMemo(() => {
     if (!autoPreviewEnabled || !adapter.composeStaticPreview) return null;
     const sources = workspaceFiles.map((f) => {
@@ -490,6 +497,7 @@ function CodeBlockInner({
         entryFilename: resolvedEntryFilename,
         token: autoPreviewToken,
         tailwind: tailwind || undefined,
+        bundle: precompiled ?? undefined,
       });
     } catch {
       // A block that can't be composed falls back to the empty slot it
@@ -500,6 +508,7 @@ function CodeBlockInner({
     adapter,
     autoPreviewEnabled,
     autoPreviewToken,
+    precompiled,
     workspaceFiles,
     resolvedEntryFilename,
     tailwind,
@@ -1227,13 +1236,28 @@ function CodeBlockInner({
     [adapter.id],
   );
 
+  // A block that is already showing its result has nothing to warm *for*.
+  //
+  // The warm-ups below exist to move a runtime download off the Run click
+  // and into the time a reader spends on the prose. That trade is only
+  // worth making when the download is the difference between seeing the
+  // result and not. Once the preview is on screen, it inverts: react's
+  // runtime is a ~3 MB esbuild-wasm fetch, and speculatively spending it on
+  // a reader who can already see the answer — and may never press
+  // anything — is precisely the cost the precompiled bundle was built to
+  // remove. It would have quietly cancelled out the whole of phase 4.
+  //
+  // Pressing Run still boots it, on demand, behind the boot notice.
+  const skipSpeculativeWarmup = autoPreviewDoc !== null;
+
   // Warm the shared runtime as soon as the page lands (idle-scheduled,
   // Save-Data-guarded, one boot at a time, see runtime/warmup.ts), so
   // the time a reader spends on the page's prose pays for the runtime
   // download instead of the first Run click.
   useEffect(() => {
+    if (skipSpeculativeWarmup) return;
     warmRuntimeOnRouteLand(RuntimeScope.Fumadocs, adapter);
-  }, [adapter]);
+  }, [adapter, skipSpeculativeWarmup]);
 
   // Warm the shared runtime when the block first scrolls into view, so the
   // learner's first Run reuses an already-initialised runtime instead of
@@ -1244,7 +1268,7 @@ function CodeBlockInner({
   // any failure here is swallowed so an actual Run can retry and report it.
   useEffect(() => {
     const card = cardRef.current;
-    if (!card || warmedRef.current) return;
+    if (!card || warmedRef.current || skipSpeculativeWarmup) return;
     if (typeof IntersectionObserver === "undefined") return;
     const io = new IntersectionObserver(
       (entries) => {
@@ -1276,7 +1300,7 @@ function CodeBlockInner({
     );
     io.observe(card);
     return () => io.disconnect();
-  }, [adapter]);
+  }, [adapter, skipSpeculativeWarmup]);
 
   const reset = useCallback(() => {
     runSeqRef.current++;

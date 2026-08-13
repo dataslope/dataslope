@@ -344,15 +344,44 @@ describe("webAdapter.composeStaticPreview", () => {
 });
 
 describe("auto-preview is opt-in per adapter", () => {
-  it("web renders itself; react does not", () => {
-    // react boots esbuild-wasm and pulls React from esm.sh, which is not
-    // something a page load should spend on the reader's behalf. Wiring
-    // it up is a build-time bundle away, not a flag.
-    expect(webAdapter.outputCapabilities?.autoPreview).toBe(true);
-    expect(typeof webAdapter.composeStaticPreview).toBe("function");
-    expect(reactAdapter.outputCapabilities?.preview).toBe(true);
-    expect(reactAdapter.outputCapabilities?.autoPreview).toBeFalsy();
-    expect(reactAdapter.composeStaticPreview).toBeUndefined();
+  it("both preview adapters render themselves", () => {
+    for (const adapter of [webAdapter, reactAdapter]) {
+      expect(adapter.outputCapabilities?.preview).toBe(true);
+      expect(adapter.outputCapabilities?.autoPreview).toBe(true);
+      expect(typeof adapter.composeStaticPreview).toBe("function");
+    }
+  });
+
+  it("react composes from a precompiled bundle, never from source", () => {
+    // Deriving a second answer from the sources in the browser is exactly
+    // the ~3 MB esbuild-wasm download the build-time bundle exists to
+    // avoid — and a second implementation of the bundler is the drift this
+    // whole design is arranged to prevent. No bundle, no preview.
+    const sources = [{ filename: "main.tsx", source: "export {}" }];
+    expect(
+      reactAdapter.composeStaticPreview!(sources, {
+        entryFilename: "main.tsx",
+        token: "tok",
+      }),
+    ).toBeNull();
+
+    const doc = reactAdapter.composeStaticPreview!(sources, {
+      entryFilename: "main.tsx",
+      token: "tok",
+      bundle: { js: "console.log('compiled')", css: "body{margin:0}" },
+    })!;
+    expect(doc).toContain("console.log('compiled')");
+    expect(doc).toContain("body{margin:0}");
+    expect(doc).toContain(`<div id="root"></div>`);
+    // Bridged and deterministic, exactly like the web one.
+    expect(doc).toContain(PREVIEW_MESSAGE_KEY);
+    expect(doc).toBe(
+      reactAdapter.composeStaticPreview!(sources, {
+        entryFilename: "main.tsx",
+        token: "tok",
+        bundle: { js: "console.log('compiled')", css: "body{margin:0}" },
+      }),
+    );
   });
 });
 

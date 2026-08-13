@@ -848,10 +848,8 @@ generator filled a panel, and neither can the site.
 - **web and react have no prepopulated output at all, and cannot.** Their
   output *is* a live sandboxed iframe, not cells; the capture comes back with
   nothing but "the preview didn't finish within the time limit". There is
-  nothing to store, so those blocks have no manifest entry by nature. **web
-  no longer needs one** — it renders itself instead, see below. react still
-  does not, and its 22 blocks stay blank until its bundle is precomputed
-  (`agent-outputs/20260812-1830-client-side-preview-rendering.md`, phase 4).
+  nothing to store, so those blocks have no entry in *this* manifest by
+  nature — and neither needs one any more. Both render themselves; see below.
 
 Between the two generators, 3,280 of the site's 3,374 runnable blocks show
 their output before the reader presses Run. Of the 94 that do not, 72 are web
@@ -974,12 +972,11 @@ source rather than recorded against it.
 
 The adapter opts in with two fields: `outputCapabilities.autoPreview` and
 `composeStaticPreview` (`runtime/web.tsx`). `<CodeBlock>` reads the first to
-decide and calls the second to compose. `react` sets neither, deliberately —
-it boots esbuild-wasm and pulls React from esm.sh, which is not something a
-page load spends on a reader's behalf. `<ChallengeCard>` doesn't implement any
-of this at all: its buffer is an *unsolved* starter with a test harness
-appended, and auto-rendering would print failing assertions before the learner
-has read the task.
+decide and calls the second to compose. `react` sets both too, but composes
+from a **precompiled bundle** rather than from source — see the section after
+next. `<ChallengeCard>` doesn't implement any of this at all: its buffer is an
+*unsolved* starter with a test harness appended, and auto-rendering would
+print failing assertions before the learner has read the task.
 
 Four things this rests on, none of them optional:
 
@@ -1051,6 +1048,57 @@ that log from a click handler get, and it reads as "output appears here" — and
 the false negative needs a block that reaches the console without naming it.
 Knowing for certain would mean running the code at build time, which is the
 thing this whole approach exists to avoid.
+
+### A react block's bundle is compiled by a workflow, not by the reader
+
+`web` renders itself for free — composing its document is a pure string
+operation, about 8µs a block, 0.36ms for all 47 on the site, which is why it
+happens during SSR and has no generator at all. `react` cannot: TSX has to be
+translated before a browser will take it, and doing that in the reader's
+browser is a **~3 MB esbuild-wasm download** paid by anyone who scrolls past a
+lesson.
+
+So the translation moved to a build machine.
+`scripts/build-react-bundles.mjs` compiles every react block into the ES
+module its preview renders, `.github/workflows/react-bundles.yml` keeps
+`lib/generated/react-bundles.json` current on pushes to `main`, and **neither
+`build` nor `dev` ever runs esbuild**. `<CodeBlock>` looks the bundle up by the
+block's content hash (`ReactBundles.tsx` → `lib/reactBundles.ts`) and hands it
+to `composeStaticPreview`, which only assembles the document around it. No
+bundle, no preview — the block falls back to the empty panel, and Run still
+bundles in the browser as it always has, because the reader can edit the code.
+
+Why the bundles are small enough to commit: the plugin rewrites every bare
+import to a pinned esm.sh URL and marks it **external**, so a bundle carries
+the block's own code and not a copy of React. All 25 together are 73 kB. The
+reader's browser fetches React once and caches it across the course.
+
+Four things hold this together:
+
+- **One bundling contract, two callers.** The resolution rules, loader table
+  and build options live in `runtime/reactBundle.ts`, which the browser worker
+  *and* the Node generator both import — the generator reaching TypeScript
+  through the resolver hook in `scripts/lib/ts-resolve.mjs`. A block's preview
+  and its Run must produce the same bundle, and this is what makes that
+  structural rather than something two files have to remember.
+- **The esbuild version is pinned twice and asserted once.** The worker loads
+  `ESBUILD_WASM_VERSION` from jsDelivr; the generator uses the `esbuild-wasm`
+  devDependency. The generator exits non-zero if they disagree, and
+  `__tests__/reactBundles.test.ts` additionally requires the devDependency to
+  be an **exact** version, not a caret range — `^0.28.1` would let `npm ci`
+  install 0.28.9 on a runner and silently change every bundle on the site.
+  (That test caught exactly that, the first time it ran.)
+- **The generator's app imports must be dynamic.** A static `import`
+  declaration is hoisted and resolved before any statement runs, so the
+  resolver hook would not be installed yet. `await import()` after
+  `enableTsResolution()` is not a style choice there.
+- **A block with an auto-preview does not warm its runtime.** The warm-ups in
+  `<CodeBlock>` exist to move a runtime download off the Run click; once the
+  reader can already see the result, that trade inverts, and for react it
+  would have re-spent the whole 3 MB the precompiled bundle just saved —
+  cancelling out the feature while every test still passed. `<ChallengeCard>`
+  still warms, deliberately: it cannot auto-preview, and the learner is
+  expected to attempt it.
 
 ### The live preview reserves its height before it has one
 

@@ -1,9 +1,9 @@
 # Client-side preview rendering for the web and react blocks
 
 **Date:** 2026-08-12
-**Status:** **Phases 1, 2 and 3 are built** (§8 records what shipped and where
-it departed from the plan). Phase 4 is open. §1–§7 are as written before any of
-it, so the reasoning can be checked against the result.
+**Status:** **All four phases are built** (§8 records what shipped and where it
+departed from the plan). §1–§7 are as written before any of it, so the
+reasoning can be checked against the result.
 **Scope:** The 64 `<CodeBlock adapter="web|react">` instances that
 [`build-block-outputs`](../scripts/build-block-outputs.mjs) cannot prepopulate,
 and what it would take to have them show their result without the reader
@@ -396,14 +396,65 @@ prints at load; the other two print from a click handler, so their reserved
 panel sits empty until the reader interacts — which reads as "output appears
 here", and is the benign direction for the heuristic to be wrong in.
 
-### 8.4 Still open
+### 8.4 Phase 4 — react compiles on a build machine (shipped)
 
-- **Phase 4 (§4.2, B2)** — precompute the react bundle in Node so react can
-  take the same path. Untouched.
-- **§7, the `<LivePreview>` consolidation** — deliberately deferred. Phase 2
-  was built beside it, so the site now has both. Revisit with the two visible
-  side by side, which is the comparison §7 asked for and could not make before.
-- **The `console.` heuristic** could be replaced by an exact answer if the
-  build ever does run these blocks. It is the one place in this design that
-  guesses, and it guesses about layout rather than about content, so the cost
-  of being wrong is bounded.
+B2 as planned, and the plan held: the bundler marks every bare import external
+and rewrites it to a pinned esm.sh URL, so a bundle is a pure function of the
+block's own tabs. All 25 react blocks compile to **73 kB total**, 2–8 kB each.
+
+Built on the `block-outputs.yml` pattern rather than in the build chain, which
+was the explicit ask: `scripts/build-react-bundles.mjs` writes a committed,
+content-hash-keyed manifest; `.github/workflows/react-bundles.yml` runs it on
+pushes to `main`, path-filtered; `build` and `dev` read it and run esbuild
+never. Per-block reuse verified by editing one block and re-running —
+**24 reused, 1 bundled**.
+
+**Verified end to end**, with esm.sh proxied through Node because the sandbox
+blocks the browser's egress (the same asymmetry AGENTS.md records for the
+other runtimes): a react block renders `Count: 0 +1 Reset` on load and the
+button increments it to `Count: 1` — interactive, with no Run pressed. On a
+react page with no challenge card, **0 jsDelivr requests**: the reader
+downloads no esbuild at all.
+
+**Four things worth recording:**
+
+1. **The warm-up nearly cancelled the whole phase.** `<CodeBlock>` warms its
+   runtime on route-land and on scroll-into-view, so a react lesson still
+   fetched 3 MB of esbuild-wasm on load — the exact cost the precompiled
+   bundle exists to remove — while every test passed and the preview looked
+   perfect. Found only by watching the network, not the DOM. A block showing
+   an auto-preview now skips both warm-ups; `<ChallengeCard>` still warms,
+   deliberately, since it cannot auto-preview and the learner is expected to
+   attempt it.
+2. **Sharing the bundler contract needed a resolver hook.** Node 22 strips
+   types, which is why `build-block-outputs.mjs` can import
+   `blockOutputKey.ts` — but it does not do Node-resolution of extensionless
+   ESM specifiers, so any shared module that imports a sibling the way app
+   code always does fails immediately. `scripts/lib/ts-resolve.mjs` closes
+   that one gap, and it is the difference between the generator sharing
+   `reactBundle.ts` and copying it. The generator's app imports must be
+   `await import()`, not static, or the hook is not installed in time.
+3. **The version pin had to be exact, and the test caught it immediately.**
+   `npm install --save-dev` wrote `^0.28.1`. A caret range would let `npm ci`
+   install a different esbuild on a runner and silently change every bundle on
+   the site, with the preview and the reader's Run then disagreeing. The guard
+   failed on its first run, which is the best possible time.
+4. **`loading="lazy"` really does defer.** An off-screen react frame requests
+   nothing at all until it nears the viewport — worth knowing before writing a
+   test that reads one without scrolling to it, which is a false failure that
+   looks exactly like a broken bundle.
+
+### 8.5 Still open
+
+- **§7, the `<LivePreview>` consolidation** — deliberately deferred through
+  all four phases. Both now exist side by side, which is the comparison §7
+  asked for and could not make before.
+- **The `console.` heuristic** (§8.3) could be replaced by an exact answer if
+  the build ever does run these blocks. It is the one place in this design
+  that guesses, and it guesses about layout rather than about content, so the
+  cost of being wrong is bounded.
+- **A react lesson with a challenge card still downloads esbuild**, because
+  the card warms its runtime. That is pre-existing behaviour and defensible —
+  the card is meant to be attempted — but it means phase 4's bandwidth win is
+  whole only on pages without one. Worth revisiting as its own decision rather
+  than folding into this work.

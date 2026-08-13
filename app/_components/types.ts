@@ -442,6 +442,17 @@ export interface LanguageAdapter {
    *  render statically. */
   composeStaticPreview?(
     sources: { filename: string; source: string }[],
-    options: { entryFilename: string; token: string; tailwind?: boolean },
+    options: {
+      entryFilename: string;
+      token: string;
+      tailwind?: boolean;
+      /** A build-time-compiled artifact for this block, when the adapter
+       *  needs one. `web` composes from `sources` alone; `react` cannot —
+       *  TSX has to be translated first, and doing that in the reader's
+       *  browser costs a ~3 MB download, so the bundle is precompiled by
+       *  `scripts/build-react-bundles.mjs` and looked up by content hash.
+       *  An adapter that needs a bundle and doesn't get one returns null. */
+      bundle?: { js: string; css?: string };
+    },
   ): string | null;
 }
