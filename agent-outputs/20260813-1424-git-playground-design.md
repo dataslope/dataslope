@@ -720,6 +720,36 @@ to roughly 6.8 MiB — near the "~5–6 MiB" the June runbook projected.
 two rows are cheap enough to be worth doing regardless, and together they
 recover ~1.4 MiB — about five times the current total headroom.
 
+### 8.7 Applied 2026-08-13: the two direct-basis fixes
+
+Both cheap rows were implemented on this branch and measured:
+
+```
+before: Total Upload: 52159.64 KiB / gzip: 9973.19 KiB
+after:  Total Upload: 43546.90 KiB / gzip: 8423.84 KiB
+```
+
+**−1549.35 KiB gzipped (−15.5%). Headroom: 266.81 → 1816.16 KiB (17.7%).**
+The result beats the ~1370 KiB prediction because dropping `SqlCardDialogs`
+from the server graph also removed its adjacent modules (`DdlViewer`'s second
+CodeMirror configuration, `@xyflow`), not just the elkjs chunk.
+
+What changed:
+
+- `scripts/build-charts.mjs` additionally emits
+  `lib/generated/chart-slugs.js` (9 KB slug array; committed `.d.ts`
+  sibling, gitignored like `charts.js`, and the digest fast-path exits only
+  when the slugs file exists too). `app/api/admin/charts/route.ts` imports
+  that instead of the manifest and checks a `Set`. Verified: zero
+  `lib_generated_charts` references remain in the API route's graph.
+- `SqlCardToolsMenu` loads `SqlCardDialogs` via
+  `dynamic(…, { ssr: false })` with a portaled backdrop-spinner fallback,
+  replacing the bare `import()`. Verified: zero server chunks contain
+  elkjs (`org.eclipse.elk`). Behavior trade: the chunk now starts
+  downloading on the first ER-diagram/DDL click rather than on menu open
+  (a second bare `import()` for preload would put the module straight back
+  into the Worker); the fallback backdrop covers the wait.
+
 ---
 
 ## 9. Spikes and open questions

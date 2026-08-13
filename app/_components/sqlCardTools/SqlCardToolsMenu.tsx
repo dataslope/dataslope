@@ -22,8 +22,12 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import dynamic from "next/dynamic";
 import { Menu } from "@base-ui/react/menu";
 import { FileCode2, FileSpreadsheet, MoreHorizontal, Network } from "lucide-react";
+import { DiamondSpinner } from "../mdx/loadingAnimations";
+import cardStyles from "../ChallengeCard.module.css";
 import type { SqlDialect } from "../sql/sqlCompletion";
 import {
   initXlsxWasm,
@@ -41,11 +45,38 @@ import {
 import type { SqlCardDialogKind } from "./SqlCardDialogs";
 import styles from "./SqlCardToolsMenu.module.css";
 
+/** Shown while the dialogs chunk downloads on first open: the same portaled
+ *  backdrop the dialogs render, with the spinner they show while the engine
+ *  boots, so the handoff from "chunk loading" to "schema loading" is a
+ *  seamless swap of the spinner's owner. */
+function DialogsChunkFallback() {
+  return createPortal(
+    <div
+      className={cardStyles.modalBackdrop}
+      role="status"
+      aria-label="Loading viewer"
+    >
+      <DiamondSpinner size={44} label="Loading viewer…" />
+    </div>,
+    document.body,
+  );
+}
+
 // Loaded on the first ER-diagram / DDL open: it carries @xyflow/react,
 // elkjs and a second CodeMirror setup, none of which a lesson that never
-// opens a dialog should download.
-const loadDialogs = () => import("./SqlCardDialogs");
-type DialogsModule = Awaited<ReturnType<typeof loadDialogs>>;
+// opens a dialog should download. `ssr: false` is load-bearing beyond that:
+// the bare `import()` this used to be still bundles the subtree into every
+// learn route's *server* graph, which put elkjs (~479 KiB gzipped, measured)
+// into the deployed Worker for dialogs that only ever open from a click and
+// are never server-rendered. Only the `dynamic(…, { ssr: false })` form is
+// stripped from the server compile — and for the same reason there must be
+// no other `import("./SqlCardDialogs")` anywhere in server-reachable code
+// (which is also why the old menu-open preload is gone: a second import()
+// would put the module straight back into the Worker).
+const SqlCardDialogs = dynamic(() => import("./SqlCardDialogs"), {
+  ssr: false,
+  loading: DialogsChunkFallback,
+});
 
 export interface SqlCardToolsMenuProps {
   dialect: SqlDialect;
@@ -102,8 +133,6 @@ export function SqlCardToolsMenu({
   const isDark = useIsDark();
   const [exporting, setExporting] = useState(false);
   const [dialog, setDialog] = useState<SqlCardDialogKind | null>(null);
-  const [Dialogs, setDialogs] = useState<DialogsModule["default"] | null>(null);
-  const dialogsPromiseRef = useRef<Promise<DialogsModule> | null>(null);
   const [snapshot, setSnapshot] = useState<SqlSchemaSnapshot | null>(null);
   const [ddl, setDdl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -121,14 +150,6 @@ export function SqlCardToolsMenu({
   const closeDialog = useCallback(() => {
     setDialog(null);
     setError(null);
-  }, []);
-
-  /** Start the dialogs chunk downloading. Called when the menu opens, so
-   *  the click that follows usually finds it already resolved; the open
-   *  handler awaits the same cached promise either way. */
-  const preloadDialogs = useCallback((): Promise<DialogsModule> => {
-    dialogsPromiseRef.current ??= loadDialogs();
-    return dialogsPromiseRef.current;
   }, []);
 
   // ── Export as Excel ────────────────────────────────────────────────
@@ -193,17 +214,10 @@ export function SqlCardToolsMenu({
       setError(null);
       setSnapshot(null);
       if (kind === "ddl") setDdl(null);
-      let mod: DialogsModule;
-      try {
-        mod = await preloadDialogs();
-      } catch {
-        showToast("Couldn't load the viewer. Check your connection.", "warn");
-        return;
-      }
-      // The dialog goes up as soon as it *can* render, showing its own
-      // spinner while the engine boots — on a cold DuckDB that download
-      // is seconds long, and a click that does nothing reads as broken.
-      setDialogs(() => mod.default);
+      // The dialog goes up immediately: next/dynamic shows the backdrop
+      // fallback while the component chunk downloads, then the dialog's own
+      // spinner takes over while the engine boots — on a cold DuckDB that
+      // boot is seconds long, and a click that does nothing reads as broken.
       setDialog(kind);
       try {
         const exec = await ensureExec();
@@ -215,7 +229,7 @@ export function SqlCardToolsMenu({
         setError(`Couldn't read the schema: ${msg}`);
       }
     },
-    [dialect, ensureExec, preloadDialogs, showToast],
+    [dialect, ensureExec],
   );
 
   const copyDdl = useCallback(() => {
@@ -236,11 +250,7 @@ export function SqlCardToolsMenu({
 
   return (
     <>
-      <Menu.Root
-        onOpenChange={(open) => {
-          if (open) void preloadDialogs().catch(() => {});
-        }}
-      >
+      <Menu.Root>
         <Menu.Trigger
           className={styles.trigger}
           disabled={disabled}
@@ -317,8 +327,8 @@ export function SqlCardToolsMenu({
           </Menu.Positioner>
         </Menu.Portal>
       </Menu.Root>
-      {dialog !== null && Dialogs !== null ? (
-        <Dialogs
+      {dialog !== null ? (
+        <SqlCardDialogs
           kind={dialog}
           onClose={closeDialog}
           snapshot={snapshot}
