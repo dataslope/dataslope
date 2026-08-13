@@ -160,9 +160,10 @@ function TrackThumb({ slug, alt }: { slug: string; alt: string }) {
  * One track: thumbnail, name, what it drills, and the two facts a visitor
  * chooses on (how much is in there, and where the link goes).
  *
- * `-mx-3 px-3` with a hover tint gives the row a target that lights up under
- * the pointer without painting a resting surface, so at rest the page is the
- * six thumbnails and the six sentences and nothing else.
+ * Nothing paints a surface, at rest or on hover: the row answers the pointer
+ * through its own content instead, with the thumbnail scaling, the title going
+ * blue and the arrow sliding. `-mx-3 px-3` stays for the click target, which
+ * still reaches past the text on both sides.
  */
 function TrackRow({ track }: { track: InterviewTrack }) {
   const p = PRESENTATION[track.slug];
@@ -176,7 +177,7 @@ function TrackRow({ track }: { track: InterviewTrack }) {
       // copy. Same shape at every breakpoint, and `gap-5` is the space beneath
       // it — enough that the centred art reads as its own block rather than as
       // something the title is crowding.
-      className="group -mx-3 flex flex-col gap-5 rounded-2xl px-3 py-4 transition-colors hover:bg-[var(--ds-gray-50)] dark:hover:bg-white/[0.035]"
+      className="group -mx-3 flex flex-col gap-5 rounded-2xl px-3 py-4"
     >
       {p ? <TrackThumb slug={p.banner} alt={p.bannerAlt} /> : null}
 
@@ -190,12 +191,27 @@ function TrackRow({ track }: { track: InterviewTrack }) {
         </span>
 
         {/* `line-clamp-3` is the guard against a future entry running long and
-            pushing one row taller than the rest of its grid line. */}
+            pushing one row taller than the rest of its grid line.
+
+            This line and the topic count below it step one notch toward the
+            foreground on hover (darker on light, lighter on dark): enough that
+            the whole row answers the pointer as one block, small enough not to
+            compete with the title going blue. */}
         {p ? (
-          <span className="mt-1.5 line-clamp-3 text-[16px] leading-[1.7] text-[#8a8a8a] dark:text-[var(--ds-gray-400)]">
+          <span className="mt-1.5 line-clamp-3 text-[16px] leading-[1.7] text-[#8a8a8a] transition-colors group-hover:text-[#6b6b6b] dark:text-[var(--ds-gray-400)] dark:group-hover:text-[var(--ds-gray-300)]">
             {p.description}
           </span>
         ) : null}
+
+        {/* `Layers` for the topic count: a track's topics are a stack of
+            subject areas, which is the sense this glyph already carries
+            elsewhere in the app (the playgrounds use it for a stack of
+            schemas). On its own line above the link, so the row reads as
+            "what's in it", then "go". */}
+        <span className="mt-2 flex items-center gap-1.5 text-[16px] leading-[1.7] text-[var(--ds-gray-400)] transition-colors group-hover:text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-500)] dark:group-hover:text-[var(--ds-gray-400)]">
+          <Layers size={15} aria-hidden="true" />
+          {track.topics.length} topics
+        </span>
 
         <span className="mt-2.5 flex items-center gap-2.5 text-[16px] leading-[1.7]">
           <span className="font-semibold text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-400)]">
@@ -216,16 +232,6 @@ function TrackRow({ track }: { track: InterviewTrack }) {
             <path d="M5 12h14" />
             <path d="m12 5 7 7-7 7" />
           </svg>
-          {/* `Layers` for the topic count, in place of the middle dot that used
-              to separate the two halves of this line. A track's topics are a
-              stack of subject areas, which is the sense this glyph already
-              carries elsewhere in the app (the playgrounds use it for a stack
-              of schemas). It reads as a label for the number rather than as
-              punctuation between two unrelated facts. */}
-          <span className="inline-flex items-center gap-1.5 text-[var(--ds-gray-400)] dark:text-[var(--ds-gray-500)]">
-            <Layers size={15} aria-hidden="true" />
-            {track.topics.length} topics
-          </span>
         </span>
       </span>
     </Link>
