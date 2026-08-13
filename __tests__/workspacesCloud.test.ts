@@ -21,6 +21,7 @@ import {
   isKnownPlayground,
   manifestForBundle,
   parseManifest,
+  sqlTabsForBundle,
   validateBundle,
   type WorkspaceBundle,
 } from "../lib/workspaces/types";
@@ -279,6 +280,55 @@ describe("manifests", () => {
     );
     expect(sanitized?.files).toEqual([{ name: "a.py", size: 0 }]);
     expect(sanitized?.tabs).toEqual(["ok"]);
+  });
+});
+
+// A SQL bundle is the only thing that crosses to another device, so whichever
+// tabs it carries are the tabs a member finds there. Table tabs used to be
+// filtered out with the transient kinds, which meant opening a cloud save on a
+// second machine silently lost them.
+describe("sqlTabsForBundle", () => {
+  const tab = (id: string, kind?: string) => ({
+    id,
+    title: id,
+    code: `SELECT * FROM ${id};`,
+    kind,
+  });
+
+  it("carries query tabs and table tabs, in order", () => {
+    const { tabs } = sqlTabsForBundle(
+      [tab("a"), tab("orders", "view-data"), tab("b")],
+      "a",
+    );
+    expect(tabs).toEqual([
+      { title: "a", code: "SELECT * FROM a;" },
+      {
+        title: "orders",
+        code: "SELECT * FROM orders;",
+        kind: "view-data",
+      },
+      { title: "b", code: "SELECT * FROM b;" },
+    ]);
+  });
+
+  it("drops the tabs that are views onto live session state", () => {
+    const { tabs } = sqlTabsForBundle(
+      [tab("a"), tab("er", "er-diagram"), tab("hist", "query-history")],
+      "a",
+    );
+    expect(tabs.map((t) => t.title)).toEqual(["a"]);
+  });
+
+  it("points activeTabIndex at the active tab's place in the carried list", () => {
+    const tabs = [tab("er", "er-diagram"), tab("a"), tab("orders", "view-data")];
+    expect(sqlTabsForBundle(tabs, "orders").activeTabIndex).toBe(1);
+    expect(sqlTabsForBundle(tabs, "a").activeTabIndex).toBe(0);
+  });
+
+  it("falls back to the first tab when the active one isn't carried", () => {
+    const tabs = [tab("a"), tab("er", "er-diagram")];
+    expect(sqlTabsForBundle(tabs, "er").activeTabIndex).toBe(0);
+    expect(sqlTabsForBundle([], "gone").activeTabIndex).toBe(0);
   });
 });
 

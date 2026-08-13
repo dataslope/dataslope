@@ -95,6 +95,55 @@ export interface BundleCodeFile {
 export interface BundleSqlTab {
   title: string;
   code: string;
+  /** "view-data" for a table tab: one opened from the sidebar, which shows
+   *  the table's rows with the editor pane hidden. Absent for an ordinary
+   *  query tab, and absent from every bundle written before this field
+   *  existed, so a missing value reads as "ordinary query tab" and old and
+   *  new clients round-trip each other's bundles without a version bump.
+   *  The playgrounds' other tab kinds (er-diagram, query-history) are views
+   *  onto live state rather than saved work, and are not carried. */
+  kind?: "view-data";
+}
+
+/** The playground-side tab fields this module needs to build `BundleSqlTab`.
+ *  Structural on purpose: `lib/` is shared with the Worker and must not reach
+ *  into the app's component tree for `QueryTab`. */
+export interface BundleableSqlTab {
+  id: string;
+  title: string;
+  code: string;
+  kind?: string;
+}
+
+/**
+ * The tabs a SQL bundle carries, plus where the active one lands in that list.
+ *
+ * One place decides which kinds cross the wire, because three playgrounds
+ * build bundles and the rule is easy to get subtly wrong. Query tabs and table
+ * ("view-data") tabs are saved work and travel; er-diagram and query-history
+ * tabs are live views onto the current session, so they are dropped, matching
+ * what `saveTabs` keeps in localStorage.
+ *
+ * The inverse is `bundleTabSeeds` in app/_components/cloud/materialize.ts.
+ */
+export function sqlTabsForBundle(
+  tabs: readonly BundleableSqlTab[],
+  activeTabId: string,
+): { tabs: BundleSqlTab[]; activeTabIndex: number } {
+  const carried = tabs.filter(
+    (tab) => tab.kind === undefined || tab.kind === "view-data",
+  );
+  const activeIndex = carried.findIndex((tab) => tab.id === activeTabId);
+  return {
+    tabs: carried.map((tab) => ({
+      title: tab.title,
+      code: tab.code,
+      ...(tab.kind === "view-data" ? { kind: "view-data" as const } : {}),
+    })),
+    // An active tab that isn't carried (the ER diagram, say) leaves the
+    // reopened workspace on its first tab rather than nowhere.
+    activeTabIndex: Math.max(0, activeIndex),
+  };
 }
 
 export interface BundleSqlState {

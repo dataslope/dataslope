@@ -120,7 +120,10 @@ import {
   fetchBundleByRef,
   takePendingBundleRef,
 } from "../cloud/materialize";
-import type { WorkspaceBundle } from "@/lib/workspaces/types";
+import {
+  sqlTabsForBundle,
+  type WorkspaceBundle,
+} from "@/lib/workspaces/types";
 import { MobileMenuAction, MobileMenuLabel } from "../MobileMenuSheet";
 import {
   type ColumnConstraintInfo,
@@ -1042,9 +1045,9 @@ function SqlPlaygroundInner() {
       const image = await buildDatabaseImage();
       if (image === null) return null;
       const label = await activeDatabaseLabel();
-      const queryTabs = tabsRef.current.filter((t) => !t.kind);
-      const activeIdx = queryTabs.findIndex(
-        (t) => t.id === activeTabIdRef.current,
+      const { tabs: bundleTabs, activeTabIndex } = sqlTabsForBundle(
+        tabsRef.current,
+        activeTabIdRef.current,
       );
       return {
         version: 2,
@@ -1056,8 +1059,8 @@ function SqlPlaygroundInner() {
           dialect: "sqlite",
           dbFormat: "sqlite-image",
           dbBytes: image.byteLength,
-          tabs: queryTabs.map((t) => ({ title: t.title, code: t.code })),
-          activeTabIndex: Math.max(0, activeIdx),
+          tabs: bundleTabs,
+          activeTabIndex,
           databaseLabel: label,
         },
         database: image,

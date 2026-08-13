@@ -393,6 +393,40 @@ interface LockManager {
     options: { mode?: "exclusive" | "shared"; signal?: AbortSignal },
     callback: (lock: unknown) => Promise<unknown> | unknown,
   ) => Promise<unknown>;
+  /** Optional: absent in older browsers that still have `request`. */
+  query?: () => Promise<{ held?: { name?: string }[] }>;
+}
+
+function workspaceLockName(workspaceId: string): string {
+  return `playground_workspace_${workspaceId}`;
+}
+
+/**
+ * Whether some live context in this origin currently holds `workspaceId`'s
+ * lock, i.e. another tab has this workspace open.
+ *
+ * A read-only probe, unlike {@link acquireWorkspaceLock} it never queues for
+ * the lock and never takes it, so it is safe to call before deciding *which*
+ * workspace to open. Best-effort by design: it reports `false` when the Web
+ * Locks API (or its `query` method) is unavailable, and callers treat that as
+ * "go ahead", leaving `acquireWorkspaceLock` as the real enforcement.
+ *
+ * Note this sees locks held by *this* document too. Call it only from a
+ * context that hasn't acquired one yet.
+ */
+export async function isWorkspaceLockHeld(
+  workspaceId: string,
+): Promise<boolean> {
+  if (!hasWebLocks()) return false;
+  const locks = (navigator as unknown as { locks: LockManager }).locks;
+  if (typeof locks.query !== "function") return false;
+  try {
+    const state = await locks.query();
+    const name = workspaceLockName(workspaceId);
+    return (state.held ?? []).some((lock) => lock.name === name);
+  } catch {
+    return false;
+  }
 }
 
 /** Options for {@link acquireWorkspaceLock}. */
@@ -440,7 +474,7 @@ export async function acquireWorkspaceLock(
   if (releaseSignal?.aborted) return false;
 
   const locks = (navigator as unknown as { locks: LockManager }).locks;
-  const lockName = `playground_workspace_${workspaceId}`;
+  const lockName = workspaceLockName(workspaceId);
 
   return new Promise<boolean>((resolve) => {
     // The *wait* is aborted when the grace window elapses or the caller

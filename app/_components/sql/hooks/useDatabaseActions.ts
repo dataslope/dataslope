@@ -361,7 +361,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     async (
       image: Uint8Array,
       label: string,
-      tabSeeds: { title: string; code: string }[],
+      tabSeeds: { title: string; code: string; kind?: "view-data" }[],
     ) => {
       const engine = engineRef.current;
       if (!engine) throw new Error("The SQL engine isn't ready yet.");
@@ -372,6 +372,9 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
         code: seed.code,
         id: newTabId(),
         pristineCode: seed.code,
+        // A table tab reopens as a table tab; `useViewDataTabAutoRun` fills
+        // in its rows once the bundle's database is loaded.
+        kind: seed.kind,
       }));
       tabsRef.current = newTabs;
       activeTabIdRef.current = newTabs[0].id;

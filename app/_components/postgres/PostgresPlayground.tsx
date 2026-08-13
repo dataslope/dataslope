@@ -140,7 +140,10 @@ import {
   fetchBundleByRef,
   takePendingBundleRef,
 } from "../cloud/materialize";
-import type { WorkspaceBundle } from "@/lib/workspaces/types";
+import {
+  sqlTabsForBundle,
+  type WorkspaceBundle,
+} from "@/lib/workspaces/types";
 import { MobileMenuAction, MobileMenuLabel } from "../MobileMenuSheet";
 import { type PostgresEngine } from "../runtime/postgres";
 
@@ -3383,9 +3386,9 @@ function PostgresPlaygroundInner() {
       if (!engine) return null;
       const tarball = await engine.dumpDataDir();
       const image = new Uint8Array(await tarball.arrayBuffer());
-      const queryTabs = tabsRef.current.filter((t) => !t.kind);
-      const activeIdx = queryTabs.findIndex(
-        (t) => t.id === activeTabIdRef.current,
+      const { tabs: bundleTabs, activeTabIndex } = sqlTabsForBundle(
+        tabsRef.current,
+        activeTabIdRef.current,
       );
       return {
         version: 2,
@@ -3397,8 +3400,8 @@ function PostgresPlaygroundInner() {
           dialect: "postgres",
           dbFormat: "pgdata-tar",
           dbBytes: image.byteLength,
-          tabs: queryTabs.map((t) => ({ title: t.title, code: t.code })),
-          activeTabIndex: Math.max(0, activeIdx),
+          tabs: bundleTabs,
+          activeTabIndex,
           databaseLabel: displayFilename,
         },
         database: image,

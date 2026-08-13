@@ -146,7 +146,10 @@ import {
   fetchBundleByRef,
   takePendingBundleRef,
 } from "../cloud/materialize";
-import type { WorkspaceBundle } from "@/lib/workspaces/types";
+import {
+  sqlTabsForBundle,
+  type WorkspaceBundle,
+} from "@/lib/workspaces/types";
 import { MobileMenuAction, MobileMenuLabel } from "../MobileMenuSheet";
 import { useCreepingBootFraction } from "../challengeShared";
 import { type DuckDbEngine, DUCKDB_VERSION } from "../runtime/duckdb";
@@ -3848,9 +3851,9 @@ function DuckDbPlaygroundInner() {
       const engine = engineRef.current;
       if (!engine) return null;
       const image = await engine.exportBinaryImage();
-      const queryTabs = tabsRef.current.filter((t) => !t.kind);
-      const activeIdx = queryTabs.findIndex(
-        (t) => t.id === activeTabIdRef.current,
+      const { tabs: bundleTabs, activeTabIndex } = sqlTabsForBundle(
+        tabsRef.current,
+        activeTabIdRef.current,
       );
       return {
         version: 2,
@@ -3862,8 +3865,8 @@ function DuckDbPlaygroundInner() {
           dialect: "duckdb",
           dbFormat: "duckdb-image",
           dbBytes: image.byteLength,
-          tabs: queryTabs.map((t) => ({ title: t.title, code: t.code })),
-          activeTabIndex: Math.max(0, activeIdx),
+          tabs: bundleTabs,
+          activeTabIndex,
           databaseLabel: displayFilename,
         },
         database: image,

@@ -131,13 +131,21 @@ export async function fetchBundleByRef(
     : fetchCloudWorkspaceBundle(ref.id);
 }
 
-/** Bundle tab seeds → the shape the SQL playgrounds' tab storage expects. */
+/** Bundle tab seeds → the shape the SQL playgrounds' tab storage expects.
+ *  `kind` rides along so a table tab reopens as a table tab (rows, no editor
+ *  pane) rather than degrading to a plain query tab holding its SELECT. */
 export function bundleTabSeeds(
   bundle: WorkspaceBundle,
-): { title: string; code: string }[] {
+): { title: string; code: string; kind?: "view-data" }[] {
   const tabs = bundle.sql?.tabs ?? [];
   if (tabs.length > 0) {
-    return tabs.map((t) => ({ title: t.title || "Query", code: t.code }));
+    return tabs.map((t) => ({
+      title: t.title || "Query",
+      code: t.code,
+      // Normalized rather than passed through: the header is whatever the
+      // writing client put there, and only this one kind is carried.
+      ...(t.kind === "view-data" ? { kind: "view-data" as const } : {}),
+    }));
   }
   return [{ title: "Query 1", code: "" }];
 }
