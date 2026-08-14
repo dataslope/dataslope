@@ -27,12 +27,10 @@ export function toDateOnlyString(v: unknown): string | null {
   return `${y}-${mo}-${da}`;
 }
 
-/** Render a fixed-point DECIMAL from its unscaled integer and scale, e.g.
- *  unscaled `2999` with scale `2` → `"29.99"`. Arrow hands DuckDB
- *  `DECIMAL(p,s)` columns back as the unscaled integer (a `BigInt` in some
- *  builds, a `Decimal` object whose `String()` is the unscaled integer in
- *  duckdb-wasm); without re-applying the scale the cell shows `2999` and an
- *  edit that adds decimals round-trips to the wrong magnitude. */
+/** Render a fixed-point DECIMAL from its unscaled integer and scale
+ *  (2999, 2 → "29.99"). Arrow hands DECIMAL(p,s) back as the unscaled
+ *  integer; without re-applying the scale, cells display and round-trip
+ *  at the wrong magnitude. */
 export function unscaledDecimalToString(unscaled: bigint, scale: number): string {
   if (scale <= 0) return unscaled.toString();
   const neg = unscaled < 0n;
@@ -44,11 +42,9 @@ export function unscaledDecimalToString(unscaled: bigint, scale: number): string
   return `${neg ? "-" : ""}${intPart}.${fracStr}`;
 }
 
-/** Coerce the unscaled integer out of whatever Arrow handed back for a DECIMAL
- *  cell, a `BigInt`, or an object/number whose `String()` is a plain integer.
- *  Returns `null` when the value already looks like a formatted decimal (has a
- *  `.`) or isn't an integer, so the caller leaves it untouched (guards against
- *  double-scaling on Arrow builds that pre-scale). */
+/** Coerce the unscaled integer out of a DECIMAL cell (BigInt, or a value
+ *  whose String() is a plain integer). Returns null for already-formatted
+ *  decimals so pre-scaling Arrow builds aren't double-scaled. */
 export function unscaledIntegerFrom(raw: unknown): bigint | null {
   if (typeof raw === "bigint") return raw;
   if (raw === null || raw === undefined) return null;
