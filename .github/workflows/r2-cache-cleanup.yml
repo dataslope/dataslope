@@ -300,6 +300,27 @@ jobs:
           # attempts converge on an empty folder. Returns non-zero only if the
           # folder still has objects after every attempt (a persistent, not
           # transient, failure), so one flaky delete no longer aborts the run.
+          # Total bytes under a prefix, whether that is the whole cache or one
+          # build folder. The CLI auto-paginates and applies --query per page,
+          # and `Contents[].Size` is a flat list, so each page emits one
+          # tab-separated batch — the same shape the LastModified query in step
+          # 6 relies on. Flatten to one number per line and sum.
+          #
+          # Cheap enough to call freely: a ~17,000-object bucket is ~18 LIST
+          # requests, Class B at $0.36/million, so a whole year of 12 runs a day
+          # costs a fraction of a cent. A missing or empty prefix yields 0.
+          bucket_bytes() {
+            aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$1" \
+              --query 'Contents[].Size' --output text 2>/dev/null \
+              | tr '\t' '\n' | sed '/^$/d' | grep -vxF 'None' \
+              | awk '{ s += $1 } END { printf "%d", s + 0 }'
+          }
+
+          # Bytes are reported in GB (decimal, matching how Cloudflare's R2
+          # dashboard counts) via awk, since bash has no floating point.
+          gb() { awk -v b="${1:-0}" 'BEGIN { printf "%.2f", b / 1e9 }'; }
+          pct() { awk -v a="${1:-0}" -v b="${2:-0}" 'BEGIN { printf "%.0f", (b > 0 ? a * 100 / b : 0) }'; }
+
           delete_folder() {
             local folder="$1" attempt
             for attempt in 1 2 3 4 5; do
@@ -543,6 +564,14 @@ jobs:
             exit 0
           fi
 
+          # What the bucket weighs before this run touches anything. Measured
+          # over the whole prefix rather than summed from the per-folder
+          # listings below, so it counts every object under it — including any
+          # that is not inside a build folder, which a sum of folders would
+          # silently miss.
+          bytes_before="$(bucket_bytes "$PREFIX")"
+          echo "Bucket before: $(gb "$bytes_before") GB across ${#folders[@]} build folders"
+
           # Safety: refuse to proceed unless the production folder is present.
           # (Guards against a prefix/bucket mismatch deleting everything.)
           if ! printf '%s\n' "${folders[@]}" | grep -qxF "$prod_folder"; then
@@ -605,7 +634,7 @@ jobs:
           done
 
           echo "KEEP  $prod_folder (${keep_reason[$prod_id]})"
-          kept=1; deleted=0; failed=0; branches=0
+          kept=1; deleted=0; failed=0; branches=0; freed=0
           while IFS=$'\t' read -r ts populated folder; do
             [[ -z "$folder" ]] && continue
             # Folder name is the commit SHA: strip the prefix and trailing slash.
@@ -639,10 +668,16 @@ jobs:
               echo "DELETE $folder (populated $populated, nothing is serving it and no branch head claims it)"
             fi
 
+            # Weigh it BEFORE removing it — afterwards there is nothing left to
+            # measure. Only folders on their way out are weighed, so this costs
+            # nothing on a run that deletes nothing.
+            folder_size="$(bucket_bytes "$folder")"
+            echo "       ($(gb "$folder_size") GB)"
+
             if [[ "$DRY_RUN" == "true" ]]; then
-              deleted=$((deleted+1))
+              deleted=$((deleted+1)); freed=$((freed + folder_size))
             elif delete_folder "$folder"; then
-              deleted=$((deleted+1))
+              deleted=$((deleted+1)); freed=$((freed + folder_size))
             else
               # Persistent (non-transient) failure: log it, keep sweeping the
               # rest, and fail the job at the end so it's surfaced. The next
@@ -658,8 +693,18 @@ jobs:
           # "false" into the summary on real runs, "folders falsedeleted".)
           if [[ "$DRY_RUN" == "true" ]]; then
             echo "Folders kept: $kept | folders would be deleted: $deleted"
+            # Nothing was removed, so the closing size is arithmetic rather
+            # than a measurement, and says so.
+            echo "Bucket: $(gb "$bytes_before") GB now -> $(gb "$((bytes_before - freed))") GB projected | would free $(gb "$freed") GB ($(pct "$freed" "$bytes_before")%)"
           else
             echo "Folders kept: $kept | folders deleted: $deleted | folders failed: $failed"
+            # Re-measure rather than subtract. R2 is strongly consistent after
+            # a delete, so this is the ground truth of what the run achieved,
+            # and it stays honest when a folder failed to delete or when a
+            # deploy wrote a new one while the sweep was running — both cases
+            # where `before - freed` would quietly overstate the result.
+            bytes_after="$(bucket_bytes "$PREFIX")"
+            echo "Bucket: $(gb "$bytes_before") GB before -> $(gb "$bytes_after") GB after | freed $(gb "$((bytes_before - bytes_after))") GB ($(pct "$((bytes_before - bytes_after))" "$bytes_before")%)"
           fi
 
           # Surface persistent delete failures loudly, but only after every
