@@ -1,23 +1,14 @@
 /// <reference lib="webworker" />
 
-// TypeScript language service in a dedicated Web Worker, the
-// intellisense backend for the JavaScript and TypeScript editors.
-//
-// This is deliberately a *separate* worker from the almostnode execution
-// workers (public/_workers/*.js): analysis must never queue behind a
-// long-running user program, and the execution workers are pre-bundled
-// outside Next's pipeline. Like the Pyodide worker, the heavy dependency
-// (typescript.js, ~2 MB gz) is pulled from the CDN with `importScripts`
-// so the bundler never touches it and nothing lands in the client
-// chunks; the standard-library `lib.*.d.ts` files are fetched from the
-// same pinned package on first use, following their
-// `/// <reference lib="…" />` graph so the set stays correct across
-// TypeScript upgrades.
-//
-// Protocol: a single `complete` request/response pair correlated by id.
-// Requests carry the full workspace snapshot (playground files are a few
-// KB); the worker diffs contents into a versioned script registry so the
-// language service can reuse its incremental program state.
+// TypeScript language service in a dedicated Web Worker — the intellisense
+// backend for the JS/TS editors. Deliberately separate from the almostnode
+// execution workers so analysis never queues behind a running user
+// program. typescript.js comes from the CDN via importScripts (bundler
+// never touches it); lib.*.d.ts files are fetched on first use, following
+// their `/// <reference lib>` graph so the set survives TS upgrades.
+// Protocol: one `complete` request/response pair per id; requests carry
+// the full workspace snapshot, diffed into a versioned script registry so
+// the service reuses incremental state.
 
 import type tsModule from "typescript";
 import {
@@ -100,9 +91,8 @@ async function fetchLibClosure(seed: string[]): Promise<void> {
 
 function ensureLibs(): Promise<void> {
   if (!libsPromise) {
-    // The target-derived default lib (`lib.es2022.full.d.ts`) references
-    // the whole ES chain plus DOM, which supplies console/fetch/timers,
-    // matching what almostnode actually provides at runtime.
+    // The default lib references the whole ES chain plus DOM, matching
+    // what almostnode actually provides at runtime.
     libsPromise = fetchLibClosure([
       ts.getDefaultLibFileName(COMPILER_OPTIONS),
     ]).catch((err) => {
@@ -114,16 +104,10 @@ function ensureLibs(): Promise<void> {
 }
 
 // ─── React type declarations (TSX entries only) ────────────────────────
-//
-// The React playground's completions come through this same worker.
-// When the cursor sits in a .tsx/.jsx file, lazily mount the pinned
-// @types/react graph at node_modules paths so Node10 module resolution
-// finds real typings for `react`, `react/jsx-runtime`, and
-// `react-dom/client`, hook signatures, prop checking, JSX intrinsics.
-// The set is closed (verified against the published packages): the only
-// out-of-package imports are csstype (from @types/react) and react
-// (from @types/react-dom). Best-effort like the libs: a failed fetch
-// answers completions without React typings rather than erroring.
+// For .tsx/.jsx entries, lazily mount the pinned @types/react graph at
+// node_modules paths so Node10 resolution finds real typings. The set is
+// closed: the only out-of-package imports are csstype and react.
+// Best-effort — a failed fetch answers without React typings.
 
 const typeFiles = new Map<string, string>();
 let reactTypesPromise: Promise<void> | null = null;
@@ -197,10 +181,7 @@ const COMPILER_OPTIONS: tsModule.CompilerOptions = {
   allowJs: true,
   esModuleInterop: true,
   allowSyntheticDefaultImports: true,
-  // The React playground shares this worker for .tsx/.jsx entries; the
-  // option only changes how those extensions parse, so the JS/TS
-  // adapters are unaffected. (React's own typings aren't fetched, DOM
-  // and local-workspace completions still work inside components.)
+  // Only changes how .tsx/.jsx parse; the JS/TS adapters are unaffected.
   jsx: ts.JsxEmit.ReactJSX,
   noEmit: true,
 };
@@ -230,9 +211,8 @@ const host: tsModule.LanguageServiceHost = {
 
 const service = ts.createLanguageService(host, ts.createDocumentRegistry());
 
-/** Mirror the request's workspace snapshot into the script registry,
- *  bumping versions only for files whose content actually changed so
- *  the language service reuses its incremental state. */
+/** Mirror the snapshot into the script registry, bumping versions only for
+ *  changed files so the service reuses incremental state. */
 function syncScripts(files: Array<[string, string]>): void {
   const seen = new Set<string>();
   for (const [path, content] of files) {
@@ -254,8 +234,7 @@ const MAX_COMPLETIONS = 300;
 
 async function complete(msg: InMessage): Promise<void> {
   await ensureLibs();
-  // JSX entries additionally get the React typings, best-effort, so a
-  // CDN hiccup degrades to DOM/workspace completions instead of none.
+  // JSX entries also get React typings, best-effort.
   if (/\.(tsx|jsx)$/i.test(msg.entry)) {
     await ensureReactTypes().catch(() => {});
   }
@@ -270,17 +249,15 @@ async function complete(msg: InMessage): Promise<void> {
 
   const completions: CompletionItemMessage[] = [];
   for (const entry of info.entries) {
-    // Entries with bespoke replacement ranges (optional-chain fixups,
-    // string-literal rewrites, …) don't fit the simple prefix-replace
-    // contract of `LanguageRuntime.complete`, drop them.
+    // Entries with bespoke replacement ranges don't fit the simple
+    // prefix-replace contract of `LanguageRuntime.complete`.
     if (entry.replacementSpan) continue;
     if (entry.kind === "warning") continue;
     completions.push({
       label: entry.name,
       type: cmTypeForTsKind(entry.kind),
       apply: entry.insertText,
-      // sortText "11" is the service's own "local / most relevant"
-      // tier; nudge those above the global soup of equal fuzzy matches.
+      // sortText "11" is the service's "local / most relevant" tier.
       boost: entry.sortText === "11" ? 2 : undefined,
     });
     if (completions.length >= MAX_COMPLETIONS) break;

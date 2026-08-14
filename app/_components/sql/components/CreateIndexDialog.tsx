@@ -6,11 +6,8 @@ import { X } from "lucide-react";
 import { buildCreateIndexSql, suggestIndexName } from "../utils/ddl";
 
 /**
- * Shared "Create Index" dialog for the SQLite / Postgres / DuckDB
- * playgrounds. The form, validation and `CREATE INDEX` generation are
- * identical across the three engines (the syntax is standard SQL), so
- * only the `getColumns` / `onSubmit` callbacks, which touch the
- * dialect-specific engine, are supplied by each playground.
+ * Shared "Create Index" dialog: the syntax is standard SQL across all three
+ * engines, so only the `getColumns` / `onSubmit` callbacks are per-dialect.
  */
 export interface CreateIndexDialogProps {
   open: boolean;
@@ -44,10 +41,8 @@ export function CreateIndexDialog({
   const [colError, setColError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // Reset the form during the render that flips `open` to true (React's
-  // "adjust state when a prop changes" pattern, done in render, not an
-  // effect, so there's no cascading-render lint violation). The
-  // column-load effect below then fetches the default table's columns.
+  // Reset the form during the render that flips `open` to true (the
+  // "adjust state when a prop changes" pattern — in render, not an effect).
   const [wasOpen, setWasOpen] = useState(false);
   if (open !== wasOpen) {
     setWasOpen(open);

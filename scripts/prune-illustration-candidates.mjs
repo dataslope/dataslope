@@ -1,47 +1,26 @@
 #!/usr/bin/env node
 /**
- * Delete the superseded illustration candidates from R2.
+ * Delete the superseded illustration candidates from R2: a prompt id
+ * accumulates a run prefix per redraw, and only one of them is the art the
+ * site serves.
  *
- * A prompt id accumulates a run prefix per redraw, and only one of them is the
- * art the site actually serves. The rest — 4-ish GB of a 7 GB bucket — is
- * history that nothing reads: not the site, not the admin gallery (which shows
- * promoted WebP only), not any script.
- *
- * ── The rule, and the rule this deliberately is not ─────────────────────────
- *
- * Keep the run each served illustration was actually made from, delete the
- * others. That sounds like "keep the newest run", and it is emphatically not:
- * a redraw is generated before it is judged, and plenty were never promoted, so
- * a later run prefix routinely sits on top of live art. Measured across 284
- * ids, newest-run disagreed with the truth for 107 — 38%. Pruning that way
- * would delete the live source for a third of the artwork, and the loss would
- * surface much later, as an image that can no longer be re-trimmed or
- * re-promoted.
- *
- * So the live run is never inferred here. It is read from
+ * The rule is "keep the run each served illustration was made from" — NOT
+ * "keep the newest run": redraws are generated before they are judged, so a
+ * later run prefix routinely sits on top of live art (wrong for ~38% of ids
+ * when measured). The live run is never inferred here; it is read from
  * `data/illustration-sources.json`, which `build-illustration-sources.mjs`
- * establishes by comparing pixels. **Run that first** — a stale map is the one
- * input that could make this delete something live, so a map older than the
- * images it describes is refused rather than trusted.
+ * establishes by comparing pixels. Run that first — a stale map is refused
+ * rather than trusted.
  *
- * ── What is never touched ───────────────────────────────────────────────────
+ * Never touched: any object under a live run; every object of an
+ * `unresolved` id (not verified is not the same as not needed); every object
+ * of an id absent from the map, including unserved ids
+ * (`--include-unserved` opts in); anything not shaped like
+ * `illustrations/<run>/<id>/v<n>/<kind>.png` (reported instead); any
+ * `--keep-run` run.
  *
- *   - Any object under a live run, for any mapped id.
- *   - Every object of an id listed as `unresolved`: not verified is not the
- *     same as not needed, and the difference is the whole safety of this.
- *   - Every object of an id absent from the map entirely — including ids in R2
- *     that are not served at all. Those are 6 ids and ~10 MB, and one of them
- *     being an in-flight candidate awaiting review is a much worse outcome than
- *     keeping them. `--include-unserved` opts in.
- *   - Anything not shaped like `illustrations/<run>/<id>/v<n>/<kind>.png`. An
- *     unrecognised object is left alone and reported.
- *   - Any run named with `--keep-run`, for a batch still being reviewed.
- *
- * ── Deleting is opt-in ──────────────────────────────────────────────────────
- *
- * The default is a dry run that prints what would go, grouped by run, with
- * totals. `--delete` is required to act, and R2 has no undelete — the pristine
- * PNGs are the only copies of the candidates that were never promoted.
+ * The default is a dry run; `--delete` is required to act, and R2 has no
+ * undelete — for never-promoted candidates these are the only copies.
  *
  * Usage:
  *   node scripts/prune-illustration-candidates.mjs             # dry run
@@ -106,18 +85,12 @@ function printHelp() {
 }
 
 /**
- * Refuse a map that no longer describes the images on disk.
- *
- * A mapping is a statement about specific bytes: *this* served cut-out was made
- * from *that* run. Re-promote or re-trim an illustration and the statement can
- * silently stop being true, and the failure mode is deleting a live source,
- * which no later run can undo. So each entry carries the sha256 of the file it
- * was established from, and every one is re-checked here.
- *
- * Hashing all 916 costs well under a second. The earlier version of this
- * compared the map file's mtime instead and was quietly broken: the map is
- * byte-stable by design, so re-resolving an unchanged answer never rewrote the
- * file, its timestamp never advanced, and the check could not be satisfied.
+ * Refuse a map that no longer describes the images on disk. A mapping is a
+ * statement about specific bytes, and re-promoting or re-trimming can
+ * silently invalidate it — the failure mode is deleting a live source. Each
+ * entry carries the sha256 of the file it was established from, and every one
+ * is re-checked here (mtime cannot be used: the map is byte-stable, so its
+ * timestamp never advances).
  */
 function assertMapIsCurrent(sources) {
   if (!existsSync(SOURCES_FILE)) {

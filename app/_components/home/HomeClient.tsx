@@ -58,12 +58,10 @@ export function HomeClient({
       {/* overflow-x-clip catches any horizontal overflow (e.g. decorative
             backgrounds) without breaking the sticky nav, which is a sibling. */}
       <main className="overflow-x-clip">
-        {/* ── Hero: marquee + interactive "try it" panel. The pause gate
-              stops the marquee / ripple / shimmer CSS loops once the hero is
-              scrolled out of view. ── */}
+        {/* ── Hero: marquee + interactive "try it" panel. ── */}
         <section className="px-4 pb-12 pt-10 sm:px-6 sm:pt-14">
-          {/* The visible "heading" is the animated marquee; give screen
-                readers and the document outline a real h1 instead. */}
+          {/* The visible "heading" is the marquee; give screen readers a
+                real h1. */}
           <h1 className="sr-only">
             Dataslope, learn Python, SQL, R, JavaScript and more in your browser
           </h1>
@@ -71,18 +69,15 @@ export function HomeClient({
             <BlurFade delay={0.05}>
               <HeroMarquee />
             </BlurFade>
-            {/* One-line "what is this" statement so a first-time visitor
-                  immediately understands the product before the interactive
-                  demo below. */}
+            {/* One-line "what is this" statement above the demo. */}
             <BlurFade delay={0.12}>
               <p className="mx-auto mt-14 max-w-xl text-center [text-wrap:pretty]">
                 <AnimatedShinyText className="max-w-none text-[18px] tracking-tight text-neutral-700/90 dark:text-neutral-300/90">
                   Learn programming and prepare for coding interviews. Access
                   every course and coding playground for free,{" "}
                   <Highlighter action="underline" color="#20C621" isView>
-                    {/* Match the underline color (#20C621 = --ds-green),
-                          forced over the shimmer's clipped gradient fill via
-                          both color and -webkit-text-fill-color. */}
+                    {/* Match the underline color, forced over the shimmer's
+                          clipped gradient fill. */}
                     <span
                       style={{
                         color: "#20C621",
@@ -152,9 +147,7 @@ export function HomeClient({
           <CoursesSection courses={courses} />
         </section>
 
-        {/* ── At-a-glance stats (Magic UI bento grid). The pause gate stops
-              the diamond-loader / cursor CSS loops once the grid is scrolled
-              out of view (the JS-driven backgrounds gate themselves). ── */}
+        {/* ── At-a-glance stats (bento grid) ── */}
         <section className="py-12">
           <AnimationPauseGate>
             <BlurFade inView>
@@ -166,8 +159,7 @@ export function HomeClient({
           </AnimationPauseGate>
         </section>
 
-        {/* ── Embedded playground showcase (heading/link follow the
-              selected language) ── */}
+        {/* ── Embedded playground showcase ── */}
         <section className="py-12">
           <PlaygroundShowcase />
         </section>

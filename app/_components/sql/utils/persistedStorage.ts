@@ -1,13 +1,9 @@
 "use client";
 
-// Coalesced, idle-deferred localStorage writer. Settings toggles like
-// font size / word wrap / clear-before-run fire on user input and the
-// previous implementation wrote to localStorage synchronously, which
-// can contend with rendering on lower-end devices. We instead keep the
-// latest value per key in memory and flush all pending writes inside a
-// `requestIdleCallback` (falling back to `setTimeout`). Writes are
-// still flushed eagerly on `pagehide` / `visibilitychange` via the
-// listener installed below so nothing is lost on tab close.
+// Coalesced, idle-deferred localStorage writer: the latest value per key is
+// kept in memory and flushed inside requestIdleCallback so synchronous
+// writes can't contend with rendering. Writes still flush eagerly on
+// pagehide / visibilitychange so nothing is lost on tab close.
 
 type PendingMap = Map<string, string>;
 

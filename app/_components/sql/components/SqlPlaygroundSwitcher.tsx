@@ -12,13 +12,8 @@ import { PLAYGROUNDS } from "../../playgrounds";
 import { useIsFramed } from "../../useIsFramed";
 
 /**
- * Shared "Dataslope" brand logo + playground switcher rendered in the
- * top-left of every playground's header. The logo is icon-only, the
- * "Dataslope" wordmark is deliberately omitted to keep the header compact.
- *
- * Extracted so that all three SQL playgrounds (and ideally other
- * playgrounds in the future) share a single source of truth for the
- * switcher markup, popup styling, and navigation behaviour.
+ * Shared brand logo + playground switcher in every playground's header.
+ * Icon-only: the wordmark is deliberately omitted to keep the header compact.
  */
 export interface SqlPlaygroundSwitcherProps {
   /** Id of the playground currently being rendered (e.g. `"postgres"`,

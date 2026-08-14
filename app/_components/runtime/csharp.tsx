@@ -10,19 +10,10 @@ import type {
 import { loadDotnet, type DotnetApi } from "./dotnet";
 import { getClangFormat } from "./clangFormat";
 
-// Run C# in the browser via the official .NET WebAssembly runtime
-// (Mono compiled to WASM) + Roslyn's C# scripting engine
-// (Microsoft.CodeAnalysis.CSharp.Scripting). The runtime bundle is
-// fetched from a CDN on first load, same "everything in the
-// browser" approach used by Pyodide (Python), WebR (R), browsercc
-// (C/C++), CheerpJ (Java) and php-wasm (PHP) elsewhere in this
-// repo. No server-side compilation.
-//
-// We accept C# *script* syntax: top-level statements, top-level
-// `using` directives, and records/classes/methods all work without
-// having to wrap the code in `class Program { static void Main(…) }`.
-// This is the same surface the `dotnet-script` CLI exposes and is
-// the natural fit for a single-file playground.
+// C# in the browser via the .NET WebAssembly runtime (Mono) + Roslyn's
+// scripting engine, fetched from a CDN on first load. Accepts C# script
+// syntax (top-level statements/usings, no Main wrapper required) — the
+// same surface as the dotnet-script CLI.
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -194,15 +185,11 @@ function hasCSharpExplicitMain(source: string): boolean {
   return /\bstatic\s+(?:async\s+)?[\w<>?\[\],.\s]*?\bMain\s*\(/.test(cleaned);
 }
 
-/** Returns true if `source` contains C# top-level statements: any
- *  non-blank, non-comment, non-using, non-namespace, non-type-decl
- *  line at file scope. The C# spec restricts top-level statements to
- *  one compilation unit; we report the file as top-level when its
- *  first executable token is at file scope. */
+/** True when `source` contains C# top-level statements, i.e. its first
+ *  executable token is at file scope. */
 function hasCSharpTopLevel(source: string): boolean {
-  // Find the first non-using / non-comment / non-namespace / non-type
-  // line. If it starts with a statement-like token (identifier / `var`
-  // / a literal / a brace block), treat as top-level.
+  // Find the first non-using/non-comment/non-namespace/non-type line; a
+  // statement-like token there means top-level.
   const cleaned = stripCSharpNoise(source);
   // Strip using directives at file scope.
   const lines = cleaned.split("\n");
@@ -211,16 +198,13 @@ function hasCSharpTopLevel(source: string): boolean {
     const line = raw.trim();
     if (!line) continue;
     if (depth > 0) {
-      // Only inspect file-scope text; track brace depth so we skip
-      // bodies of namespaces / types.
+      // Track brace depth to skip namespace/type bodies.
       depth += (line.match(/\{/g) ?? []).length - (line.match(/\}/g) ?? []).length;
       continue;
     }
     if (/^(?:global\s+)?using(?:\s+static)?\s.*;$/.test(line)) continue;
-    // Match either a `namespace` keyword or a type declaration (with
-    // any leading visibility/modifier keywords). Type-decl lines start
-    // a body whose contents we ignore for the purpose of detecting
-    // top-level statements at file scope.
+    // Namespace keyword or type declaration (with any modifier keywords)
+    // starts a body we ignore.
     const NAMESPACE_RE = /^namespace\b/;
     const TYPE_DECL_RE =
       /^(?:public\s+|internal\s+|sealed\s+|abstract\s+|static\s+|partial\s+)*(?:class|struct|record|interface|enum)\b/;
@@ -228,17 +212,14 @@ function hasCSharpTopLevel(source: string): boolean {
       depth += (line.match(/\{/g) ?? []).length - (line.match(/\}/g) ?? []).length;
       continue;
     }
-    // First file-scope executable token. This counts as top-level
-    // statements.
+    // First file-scope executable token = top-level statements.
     return true;
   }
   return false;
 }
 
 const PACKAGES: PackageInfo[] = [
-  // Highlights from the .NET base class library, always available
-  // through Roslyn's scripting host, no install step. Clicking
-  // inserts the corresponding `using` at the top of the editor.
+  // .NET base class library highlights; clicking inserts the `using`.
   {
     cat: "Core", icon: "📦", color: "#34d399", name: "System", ver: ".NET 9",
     desc: "Console, String, Math, primitive types and exceptions.",
@@ -376,17 +357,10 @@ Console.WriteLine($"sum = {sum} ({sw.Elapsed.TotalMilliseconds:F2} ms)");
   },
 ];
 
-/** Strip leading `using` directives (and any preceding blank lines /
- *  single-line comments) from a C# source string so the body can be
- *  appended after the entry-point file without triggering the Roslyn
- *  parse error "A using clause must precede all other elements".
- *
- *  Handles `using Ns;`, `using static Ns.Type;`, `using Alias = Ns;`,
- *  and `global using Ns;`. Only strips directives at the very top of
- *  the file (before any non-using, non-blank, non-comment line), any
- *  using directive that appears after a class or namespace declaration
- *  is intentionally left in place. Multi-line using directives (an
- *  extremely rare formatting style) are not stripped. */
+/** Strip leading `using` directives so the body can be appended after the
+ *  entry file without Roslyn's "A using clause must precede all other
+ *  elements" error. Only top-of-file directives are stripped; later ones
+ *  are intentionally left in place. */
 function stripCSharpUsings(source: string): { usings: string[]; body: string } {
   const lines = source.split("\n");
   const usings: string[] = [];
@@ -407,10 +381,8 @@ function stripCSharpUsings(source: string): { usings: string[]; body: string } {
 }
 
 class CSharpRuntime implements LanguageRuntime {
-  /** All staged workspace .cs files (path → bytes). The Playground
-   *  passes the chosen entry filename to `run()`, and the runtime
-   *  treats every other .cs file as an "extra" appended after the
-   *  entry code. */
+  /** Staged workspace .cs files; every non-entry file is appended after
+   *  the entry code. */
   private stagedFiles: Map<string, Uint8Array> = new Map();
 
   constructor(private api: DotnetApi) {}
@@ -428,21 +400,15 @@ class CSharpRuntime implements LanguageRuntime {
     emit: EmitOutput,
     options?: RunOptions,
   ): Promise<void> {
-    // When there are extra .cs files in the workspace, append their
-    // class/type bodies after the entry-point code. The entry-point's
-    // `using` directives stay at the top of `code`, while using
-    // directives from the extra files are stripped to avoid the Roslyn
-    // error "A using clause must precede all other elements in a
-    // namespace or type declaration". In C# class references are
-    // resolved across the whole compilation unit regardless of
-    // declaration order, so appending the extra bodies last is safe.
+    // Append extra .cs files' bodies after the entry code (safe: C#
+    // resolves class references across the whole compilation unit), with
+    // their using directives stripped to satisfy Roslyn's ordering rule.
     const entry = options?.entryFilename ?? "Program.cs";
     const decoder = new TextDecoder();
     const extraBodies: string[] = [];
     const extraUsings: string[] = [];
     for (const [path, bytes] of this.stagedFiles) {
-      // Skip the entry file, its content is passed directly via
-      // `code` and must not be appended again.
+      // The entry file's content already arrives via `code`.
       if (path === entry) continue;
       const { usings, body } = stripCSharpUsings(decoder.decode(bytes));
       extraUsings.push(...usings);
@@ -450,14 +416,9 @@ class CSharpRuntime implements LanguageRuntime {
     }
     let combined = code;
     if (extraBodies.length > 0) {
-      // A sibling's `using` directives have to be *hoisted*, not discarded.
-      // Dropping them silently broke every multi-file workspace whose sibling
-      // needed an import the entry file did not already have: `Report.cs`
-      // opened with `using System.Globalization;` for `CultureInfo`, that line
-      // was stripped to keep Roslyn happy about ordering, and the script then
-      // failed to resolve the type. Roslyn reported it with exit code 0 and an
-      // empty stderr, so the block produced no output and no error, which is
-      // the hardest possible failure to diagnose from the page.
+      // Sibling `using` directives must be HOISTED, not discarded —
+      // dropping them makes unresolved types fail silently (exit code 0,
+      // empty stderr).
       const hoisted = [...new Set(extraUsings)].filter((u) => !code.includes(u));
       combined =
         (hoisted.length > 0 ? `${hoisted.join("\n")}\n` : "") +
@@ -523,9 +484,8 @@ export const csharpAdapter: LanguageAdapter = {
     const out: EntryFileInfo[] = [];
     for (const f of files) {
       if (!f.filename.endsWith(".cs")) continue;
-      // Prefer top-level classification because top-level statements
-      // imply executable file scope. (A file with both is a compile
-      // error per CS8802 anyway, which we let Roslyn surface.)
+      // Prefer top-level classification (a file with both is a CS8802
+      // compile error, which Roslyn surfaces).
       if (hasCSharpTopLevel(f.content)) {
         out.push({ filename: f.filename, kind: "topLevel" });
       } else if (hasCSharpExplicitMain(f.content)) {

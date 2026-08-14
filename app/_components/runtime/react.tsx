@@ -23,16 +23,12 @@ import {
 import { REACT_VERSION } from "./esmResolve";
 
 // The React playground compiles TSX fully client-side: esbuild-wasm
-// bundles the workspace tabs in a dedicated worker (bare imports rewrite
-// to pinned esm.sh URLs and stay external, see esmResolve.ts), and the
-// resulting ES module runs inside the same sandboxed iframe preview the
-// web adapter uses (runtime/webPreview.ts). React itself is fetched by
-// the preview document from esm.sh as a native ES module.
+// bundles the workspace in a worker (bare imports rewrite to pinned
+// esm.sh URLs, see esmResolve.ts) and the result runs in the same
+// sandboxed iframe preview the web adapter uses (runtime/webPreview.ts).
 
-// The default workspace: a real multi-file project shape. main.tsx
-// mounts, App.tsx is the component the learner edits, styles come from
-// a plain CSS import, the structure every React tutorial and template
-// uses, one tab per file in the playground's tabbed editor.
+// Default workspace: main.tsx mounts, App.tsx is what the learner edits,
+// styles come from a plain CSS import.
 const DEFAULT_MAIN = `import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import "./styles.css";
@@ -287,10 +283,9 @@ createRoot(document.getElementById("root")!).render(<NamePicker />);
   },
 ];
 
-// A curated starter set for the packages drawer. Nothing here is
-// "installed", any bare npm import already resolves through esm.sh,
-// these entries exist for discoverability, each with a runnable
-// example. Versions are what esm.sh serves for the unpinned specifier.
+// Curated starter set for the packages drawer — nothing is "installed";
+// any bare npm import already resolves through esm.sh. Versions are what
+// esm.sh serves for the unpinned specifier.
 const PACKAGES: PackageInfo[] = [
   {
     cat: "UI Effects", icon: "🎉", color: "#f59e0b", name: "canvas-confetti", ver: "latest",
@@ -506,9 +501,9 @@ class ReactPreviewRuntime implements LanguageRuntime {
     options?: RunOptions,
   ): Promise<void> {
     const entry = options?.entryFilename ?? "main.tsx";
-    // Consume-and-clear (see the web adapter for why), overlaying the
-    // entry with the code actually passed to this run, it may carry a
-    // merged init prelude or a challenge harness the staged copy lacks.
+    // Consume-and-clear (see the web adapter). The entry is overlaid with
+    // `code`, which may carry an init prelude or challenge harness the
+    // staged copy lacks.
     const files = this.stagedText;
     this.stagedText = new Map();
     files.set(entry, code);
@@ -517,8 +512,7 @@ class ReactPreviewRuntime implements LanguageRuntime {
     try {
       bundled = await this.bundle(files, entry);
     } catch (err) {
-      // Compile errors report like compiler diagnostics elsewhere: a
-      // stderr cell, no preview swap (the previous page stays live).
+      // Compile errors: stderr cell, no preview swap (previous page stays).
       const message = err instanceof Error ? err.message : String(err);
       emit({ type: "stderr", content: message });
       return;
@@ -541,28 +535,13 @@ class ReactPreviewRuntime implements LanguageRuntime {
   }
 }
 
-/** Entry points are the files that MOUNT the app, the ones calling
- *  `createRoot`/`hydrateRoot` (or legacy `ReactDOM.render`). Running a
- *  component-only file as the entry would bundle fine but render
- *  nothing, so the Run button resolves to the mounting file even while
- *  the user is editing `App.tsx`. */
 /**
- * The document this workspace renders, composed from a bundle that was
- * compiled at build time (see `LanguageAdapter.composeStaticPreview`).
- *
- * Unlike the web adapter's version, this one cannot do the work itself: TSX
- * has to be translated before a browser will take it, and the translator is
- * a ~3 MB esbuild-wasm download that a reader should not pay for scrolling
- * past a lesson. So `scripts/build-react-bundles.mjs` does it on a build
- * machine, `<CodeBlock>` looks the result up by the block's content hash and
- * passes it in, and this function only assembles the document around it.
- *
- * No bundle, no preview — a block whose entry is missing (a lesson edited
- * since the workflow last ran, a route that provides no bundles) falls back
- * to the empty panel react blocks have always shown. `sources` is unused for
- * exactly that reason: the compiled artifact is the input here, and deriving
- * a *second* answer from the sources would be the drift this design exists
- * to avoid.
+ * The document this workspace renders, composed from a bundle compiled at
+ * build time by `scripts/build-react-bundles.mjs` — TSX needs translating
+ * and the translator is a ~3 MB download a reader shouldn't pay for
+ * scrolling past a lesson. No bundle, no preview. `sources` is unused on
+ * purpose: deriving a second answer from them would be the drift this
+ * design exists to avoid.
  */
 function composeStaticReactPreview(
   _sources: { filename: string; source: string }[],
@@ -638,11 +617,9 @@ export const reactAdapter: LanguageAdapter = {
   ],
   exportBaseFilename: "main",
   defaultFileExtension: "tsx",
-  // Fresh workspaces open as the standard main/App/styles project shape
-  // in the regular tabbed editor + files pane layout (like JS/TS): the
-  // mount point stays fixed in main.tsx while the learner works in
-  // App.tsx, and Run always resolves to the mounting file via
-  // findReactEntryFiles below.
+  // Standard main/App/styles project shape; Run always resolves to the
+  // mounting file via findReactEntryFiles (a component-only entry would
+  // bundle fine but render nothing).
   defaultWorkspace: [
     { filename: "main.tsx", content: DEFAULT_MAIN },
     { filename: "App.tsx", content: DEFAULT_APP },
@@ -682,12 +659,9 @@ export const reactAdapter: LanguageAdapter = {
     // arrives via importScripts + WASM streaming inside the worker).
     const worker = new Worker(new URL("./esbuild-worker.ts", import.meta.url));
     return new Promise<LanguageRuntime>((resolve, reject) => {
-      // Deadline backstop: the worker reports its own boot failures via
-      // `init-error`, but if the worker chunk itself dies before the
-      // protocol is up (and the bundler's bootstrap swallows the `error`
-      // event), nothing would ever settle, fail loudly instead of
-      // leaving surfaces stuck on "Loading…" forever. Generous budget:
-      // the ~10 MB WASM download must fit on slow connections.
+      // Deadline backstop: if the worker chunk dies before the protocol is
+      // up, nothing would ever settle — fail loudly instead of hanging on
+      // "Loading…". Generous budget for the ~10 MB WASM on slow links.
       const deadline = window.setTimeout(() => {
         cleanup();
         worker.terminate();

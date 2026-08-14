@@ -682,9 +682,8 @@ export function useSidebarActions(
     });
   }, [setExpandedEntities]);
 
-  // Run a DDL statement (e.g. CREATE INDEX / CREATE VIEW from the schema
-  // tree's "+" dialogs) and refresh the sidebar lists. Mirrors
-  // submitAddTable's run/refresh/toast pattern. Resolves true on success.
+  // Run a DDL statement from the schema tree's "+" dialogs, then refresh
+  // the sidebar. Resolves true on success.
   const createSchemaObject = useCallback(
     async (sql: string, successMessage: string): Promise<boolean> => {
       const engine = engineRef.current;

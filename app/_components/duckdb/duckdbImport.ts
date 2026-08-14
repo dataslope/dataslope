@@ -14,11 +14,9 @@ function quoteIdent(name: string): string {
   return `"${name.replace(/"/g, '""')}"`;
 }
 
-/** Insert a batch of rows into a (new or existing) DuckDB table.
- *  When `createTable` is true a VARCHAR-typed table is created first.
- *  All values are inlined as quoted literals so we don't pay the
- *  per-row prepared-statement round-trip cost (DuckDB-Wasm doesn't
- *  expose a parameter-binding API in its public ESM surface). */
+/** Insert rows into a (new or existing) DuckDB table. Values are inlined as
+ *  quoted literals: DuckDB-Wasm exposes no parameter-binding API in its
+ *  public ESM surface, and per-row prepared statements would be slow. */
 export async function importRowsIntoDuckDb(
   engine: DuckDbEngine,
   tableName: string,
@@ -48,9 +46,8 @@ export async function importRowsIntoDuckDb(
     return `'${String(v).replace(/'/g, "''")}'`;
   };
 
-  // Batch inserts in chunks to keep statement size manageable while
-  // still avoiding O(n) round-trips. 500 rows per INSERT keeps each
-  // statement well under DuckDB's defaults.
+  // 500 rows per INSERT keeps statement size manageable while avoiding
+  // O(n) round-trips.
   const BATCH = 500;
   await engine.exec("BEGIN TRANSACTION");
   try {

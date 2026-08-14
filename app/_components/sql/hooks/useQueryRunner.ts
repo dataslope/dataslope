@@ -241,8 +241,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
           }
           return next;
         });
-        // Keep the running overlay visible long enough for the 180ms CSS
-        // transition to complete and be perceptible to the user.
+        // Keep the running overlay up long enough for its CSS transition.
         const waitMs = MIN_ANIMATION_MS - (performance.now() - t0);
         if (waitMs > 0) await new Promise((resolve) => setTimeout(resolve, waitMs));
         setStatusState("ready");

@@ -1,18 +1,9 @@
 import type { QueryTab } from "../../sqlitePlaygroundTabs";
 
 /**
- * Picks which tab to activate after the tab with `closedId` is removed.
- *
- * Priority:
- *   1. Most-recently-used tab from the history stack that still exists.
- *   2. The tab that occupied the position just before the closed one.
- *   3. The first remaining tab.
- *
- * @param finalTabs   Remaining tabs after the closed tab has been removed.
- * @param closedId    ID of the tab that was just closed.
- * @param originalTabs Tabs array before removal (used for positional fallback).
- * @param history     MRU history stack (oldest → most-recent). Must already
- *                    have `closedId` removed before this call.
+ * Picks which tab to activate after `closedId` is removed. Priority: MRU
+ * history hit → the tab just before the closed one → the first remaining
+ * tab. `history` must already have `closedId` removed.
  */
 export function pickFallbackTab(
   finalTabs: QueryTab[],
@@ -35,12 +26,8 @@ export function pickFallbackTab(
 }
 
 /**
- * Updates the MRU history stack when the user switches from one tab to another.
- *
- * - The tab being left (`fromId`) is pushed onto the top of the stack.
- * - Any existing entry for `fromId` is removed first to avoid duplicates.
- * - The tab being entered (`toId`) is removed from the stack (it is now
- *   "current" and should not appear in the history).
+ * Update the MRU stack on a tab switch: push `fromId` (deduplicated) and
+ * drop `toId`, which is now current and must not appear in history.
  */
 export function pushTabHistory(
   history: string[],

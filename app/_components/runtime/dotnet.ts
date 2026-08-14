@@ -102,8 +102,8 @@ export function loadDotnet(
       })
       .create();
     host.setModuleImports("main.js", {
-      // Expose the CDN _dotnet/ base URL so Runner.cs can fetch metadata
-      // reference DLLs directly from jsDelivr rather than from the app origin.
+      // Lets Runner.cs fetch metadata reference DLLs from jsDelivr, not
+      // the app origin.
       getDotnetBundleBaseUrl: () => RUNTIME_BUNDLE_BASE,
     });
 
@@ -127,17 +127,15 @@ export function loadDotnet(
       },
     };
   })().catch((err) => {
-    // Reset the singleton so a subsequent reload attempt re-runs the
-    // full bootstrap rather than rejecting with the cached error.
+    // Reset the singleton so a retry re-runs the bootstrap.
     dotnetPromise = null;
     throw err;
   });
   return dotnetPromise;
 }
 
-/** Walk a nested `getAssemblyExports` tree by namespace + class +
- *  method names. Returns `undefined` if the path is missing or the
- *  leaf is not callable. */
+/** Walk a `getAssemblyExports` tree; undefined when the path is missing
+ *  or the leaf isn't callable. */
 function lookupExport(
   root: Record<string, AssemblyExportNode>,
   path: string[],
@@ -151,8 +149,7 @@ function lookupExport(
 }
 
 function parseScriptResult(raw: unknown): CSharpScriptResult {
-  // ScriptRunner.RunScript returns a JSON-encoded string so we don't
-  // have to teach Mono's JS interop about a custom struct.
+  // RunScript returns JSON so Mono's JS interop needs no custom struct.
   if (typeof raw === "string") {
     try {
       const parsed = JSON.parse(raw) as Partial<CSharpScriptResult>;

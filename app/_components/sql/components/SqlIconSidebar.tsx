@@ -15,13 +15,9 @@ interface SqlIconSidebarProps {
 }
 
 /**
- * Thin vertical icon sidebar rendered inside `.sql-sidebar`, below
- * `.sql-db-selector-wrap`.  Each button shows a Base UI hover-popover
- * label and highlights when `isActive` is true.
- *
- * Reuses the `.playground-icon-sidebar` / `.playground-icon-sidebar-btn` CSS from
- * `playground.css` so the visual treatment stays consistent with the
- * language playground (Python, R, etc.) activity bars.
+ * Thin vertical icon sidebar inside `.sql-sidebar`; each button shows a
+ * hover-popover label. Reuses `.playground-icon-sidebar*` CSS so it matches
+ * the language playgrounds' activity bars.
  */
 export function SqlIconSidebar({ buttons }: SqlIconSidebarProps) {
   return (

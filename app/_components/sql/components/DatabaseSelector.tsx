@@ -1,14 +1,8 @@
 "use client";
 
-// Sample-database selector rendered in the left sidebar of every SQL
-// playground. The trigger displays the active database filename; the
-// popup lists dialect-specific action items (new / import / rename)
-// followed by the registered sample databases.
-//
-// Extracted as part of Stage 3 of the playground refactor. Each
-// playground supplies its own action list (the import sentinel differs
-// per dialect, the rename copy varies, etc.) and the component renders
-// the Base UI Select markup all three were duplicating identically.
+// Sample-database selector shared by every SQL playground: the trigger shows
+// the active filename; the popup lists dialect-specific action items
+// (new / import / rename) followed by the sample databases.
 
 import { Select } from "@base-ui/react/select";
 import { Database } from "lucide-react";
@@ -40,14 +34,12 @@ export interface DatabaseSelectorProps {
   displayFilename: string;
   /** Sample databases shown beneath the action items. */
   samples: readonly DatabaseSelectorSample[];
-  /** Action items shown at the top of the popup. Each fires
-   *  `onChange(action.id)` when selected; the host decides how to
-   *  handle each sentinel. */
+  /** Action items shown at the top of the popup; each fires
+   *  `onChange(action.id)` and the host handles the sentinel. */
   actions: readonly DatabaseSelectorAction[];
   /** Called with either an `action.id` sentinel or a `sample.id`. */
   onChange: (value: string) => void;
-  /** Override for the chevron icon. Defaults to a 10x10 inline SVG
-   *  matching the SQLite playground's historical rendering. */
+  /** Override for the chevron icon (defaults to a 10x10 inline SVG). */
   chevron?: ReactNode;
 }
 
@@ -90,12 +82,9 @@ export function DatabaseSelector({
         <Select.Icon className="playground-switcher-icon">{chevron}</Select.Icon>
       </Select.Trigger>
       <Select.Portal>
-        {/* The SQL playground is a fixed `overflow:hidden` layout whose
-            scrolling lives in inner panes, not on `body`, so Base UI's
-            modal body-scroll-lock can't stop the panes behind an open
-            dropdown from scrolling on touch. A transparent backdrop with
-            `touch-action: none` (see `.sql-db-backdrop`) swallows those
-            gestures so the background stays put. */}
+        {/* Scrolling lives in inner panes, not `body`, so Base UI's
+            body-scroll-lock can't stop them; a transparent backdrop with
+            `touch-action: none` swallows the touch gestures instead. */}
         <Select.Backdrop className="sql-db-backdrop" />
         <Select.Positioner
           className="sql-db-positioner"

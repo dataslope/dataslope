@@ -1,19 +1,10 @@
 "use client";
 
-// Live schema introspection for the inline learn-page SQL surfaces
-// (`SqlCodeBlock`, `SqlChallengeCard`). The full SQL playgrounds build
-// their completion schemas from their engines' dedicated introspection
-// APIs; the inline blocks only hold a generic `exec(sql)` handle, so
-// this helper derives the same two schema shapes from plain SQL:
-//
-//   - `completion`, the rich `SqlCompletionSchema` consumed by the
-//     bespoke engine in `sqlCompletion.ts` (columns with types, FKs
-//     for join suggestions);
-//   - `langSchema`, the flat `Record<table, columns>` handed to
-//     `@codemirror/lang-sql`'s built-in schema completion.
-//
-// Everything is best-effort: introspection failures resolve to an
-// empty schema (keyword completion still works) rather than throwing.
+// Live schema introspection for the inline learn-page SQL surfaces, which
+// only hold a generic `exec(sql)` handle. Derives two schema shapes from
+// plain SQL: `completion` (SqlCompletionSchema for sqlCompletion.ts) and
+// `langSchema` (flat Record<table, columns> for @codemirror/lang-sql).
+// Best-effort: introspection failures resolve to an empty schema.
 
 import type {
   SqlCompletionEntity,

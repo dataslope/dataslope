@@ -1,9 +1,7 @@
 "use client";
 
-// Concrete DuckDB implementation of `SqlEngineAdapter`. The DuckDB
-// playground imports this and routes its engine factory / identity
-// constants through it so the per-dialect surface lives in one place
-// (Stage 3 scaffolding from the playground refactor plan).
+// Concrete DuckDB implementation of `SqlEngineAdapter`; keeps the
+// per-dialect surface in one place.
 
 import type { SqlEngineAdapter } from "../sql/shared/engineAdapter";
 import { createDuckDbEngine, type DuckDbEngine } from "../runtime/duckdb";

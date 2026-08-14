@@ -1,17 +1,11 @@
 /// <reference lib="webworker" />
 export {};
 
-// PhpWeb is an Emscripten build compiled for ENVIRONMENT=web. It reads
-// `document` and `window` during module evaluation, before any async code
-// runs. Stub them here at module-level, before any imports, so the checks
-// pass in a worker context. Our `locateFile` override makes the fake
-// currentScript irrelevant; PHP execution never touches the real DOM.
-//
-// Simple assignment (`self.window = self`) is unreliable here: browsers may
-// define `window` on WorkerGlobalScope.prototype as non-configurable, making
-// the write a silent no-op. Object.defineProperty on globalThis forces the
-// property onto the own-properties of the global object, where a direct
-// identifier lookup will find it.
+// PhpWeb (ENVIRONMENT=web build) reads `document`/`window` during module
+// evaluation, so stub them before any imports. Object.defineProperty is
+// required: `self.window = self` can be a silent no-op when browsers define
+// `window` non-configurably on WorkerGlobalScope.prototype. PHP execution
+// never touches the real DOM.
 {
   function defineGlobalIfMissing(name: string, value: unknown): void {
     if (typeof (globalThis as Record<string, unknown>)[name] !== "undefined") return;
@@ -47,19 +41,8 @@ export {};
   defineGlobalIfMissing("window", globalThis);
 }
 
-// PHP (via php-wasm) runs inside a dedicated Web Worker so that:
-//   1. PHP execution doesn't block the main thread.
-//   2. The Emscripten module init is isolated from the UI loop.
-//
-// Protocol:
-//   Main → Worker  { kind: "init" }
-//                  { kind: "run"; id: number; code: string }
-//   Worker → Main  { kind: "loading"; message: string }
-//                  { kind: "ready" }
-//                  { kind: "init-error"; message: string }
-//                  { kind: "output"; id: number; cell: OutputCellMessage }
-//                  { kind: "done"; id: number }
-//                  { kind: "error"; id: number; message: string }
+// PHP (php-wasm) runs in a dedicated Web Worker so execution and Emscripten
+// init stay off the main thread. Protocol: see In/OutMessage below.
 
 declare const self: DedicatedWorkerGlobalScope;
 
@@ -69,14 +52,10 @@ const PHP_WASM_VERSION = "0.1.0";
 // no such limit and is the upstream-recommended CDN until that's resolved.
 const PHP_WASM_CDN = `https://unpkg.com/php-wasm@${PHP_WASM_VERSION}/`;
 
-// PhpWeb is loaded from the CDN at runtime rather than bundled. Its
-// constructor uses dynamic `import('./phpX.Y-web.mjs')` to pull in the
-// chosen PHP build, and the bundler can't rewrite those relative specifiers
-// correctly into the worker chunk. Loading the entry point straight from the
-// CDN keeps the whole module graph (and its sibling `.wasm`/`.mjs` files)
-// on unpkg, where `locateFile` and the built-in relative imports agree on
-// the base URL. The webpack/turbopack ignore comments stop the bundler from
-// trying to resolve the URL string.
+// PhpWeb loads from the CDN, not the bundle: its constructor dynamically
+// imports the chosen PHP build via relative specifiers the bundler can't
+// rewrite, so the whole module graph must stay on unpkg where locateFile
+// and the relative imports agree on the base URL.
 const PHP_WASM_ENTRY = `${PHP_WASM_CDN}PhpWeb.mjs`;
 
 interface PhpOutputEvent extends Event {
@@ -152,10 +131,8 @@ async function initPhp(): Promise<void> {
 
   post({ kind: "loading", message: "Initialising PHP runtime…" });
   php = new mod.PhpWeb({
-    // Return undefined for paths php-wasm handles internally, most
-    // importantly `libxml2.so`, which PhpBase suppresses with a data: URL
-    // when no sharedLib supplies it (PhpBase.mjs in v0.1.0). If we resolve
-    // it to a CDN URL the request 404s on every init.
+    // `libxml2.so` must resolve to undefined: PhpBase suppresses it with a
+    // data: URL, and a CDN URL 404s on every init.
     locateFile: (path: string) =>
       path === "libxml2.so" ? undefined : PHP_WASM_CDN + path,
   });
@@ -206,10 +183,8 @@ async function runCode(id: number, code: string): Promise<void> {
     .replace(/\n+$/, "");
 
   if (stdout) {
-    // PHP frequently produces HTML output (e.g. phpinfo(), header tags,
-    // templated pages). Render it as an "html" cell when it looks like a
-    // real HTML document or has multiple HTML elements, to avoid
-    // misclassifying incidental angle brackets (e.g. in error messages).
+    // Render as "html" only when output looks like a real document, so
+    // incidental angle brackets aren't misclassified.
     const looksLikeHtml =
       /<!doctype\s+html/i.test(stdout) ||
       /<html[\s>]/i.test(stdout) ||
@@ -272,9 +247,8 @@ function ensureDirs(FS: PhpFS, absFilePath: string): void {
 
 async function prepareFs(files: Array<[string, Uint8Array]>): Promise<void> {
   if (!php) return;
-  // FS lives on the resolved Emscripten module, not on the PhpWeb instance.
-  // See PhpBase.mjs: `this.binary = phpBinLoader.then(...).then(async php => { ... return php; })`
-  // and PhpWeb.mjs refresh(): `const php = await this.binary; php.FS.syncfs(...)`
+  // FS lives on the resolved Emscripten module (await php.binary), not on
+  // the PhpWeb instance.
   const phpModule = await (php as unknown as { binary: Promise<PhpBinary> }).binary;
   const FS = phpModule.FS;
 

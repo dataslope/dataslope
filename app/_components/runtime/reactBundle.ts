@@ -1,21 +1,12 @@
 /**
- * The React playground's bundling contract, shared by the two things that
- * perform it: `esbuild-worker.ts` in the reader's browser, and
- * `scripts/build-react-bundles.mjs` on a build machine.
- *
- * Both must produce the *same bundle* for the same workspace. A block's
- * auto-rendered preview comes from the generator and its Run comes from the
- * worker, and a preview that disagrees with the reader's own Run is worse
- * than no preview, because nothing tells them which to believe. Keeping the
- * resolution rules, the loader table and the build options in one module is
- * what makes that structural instead of a thing two files have to remember.
- *
- * Everything here is pure and environment-independent — no `self`, no
- * `window`, no filesystem — so the generator can import it under Node
- * through the TypeScript resolver hook in `scripts/lib/ts-resolve.mjs`.
- * The esbuild *instance* is supplied by the caller, because the two sides
- * obtain it differently (importScripts from jsDelivr vs. an npm devDep),
- * while pinning the same version through `ESBUILD_WASM_VERSION`.
+ * The React playground's bundling contract, shared by esbuild-worker.ts
+ * (browser) and scripts/build-react-bundles.mjs (build machine). Both MUST
+ * produce the same bundle for the same workspace — a preview that
+ * disagrees with the reader's own Run is worse than no preview — so the
+ * resolution rules, loader table, and build options live in this one
+ * module. Everything here is pure and environment-independent (no self/
+ * window/filesystem) so Node can import it; the esbuild instance is
+ * supplied by the caller, pinned via ESBUILD_WASM_VERSION on both sides.
  */
 
 import { esmShUrlFor, isBareSpecifier } from "./esmResolve";
@@ -25,9 +16,8 @@ import { esmShUrlFor, isBareSpecifier } from "./esmResolve";
 export const VFS_NAMESPACE = "ds-vfs";
 
 // ─── Minimal esbuild surface ─────────────────────────────────────────────
-// esbuild-wasm is intentionally not a runtime npm dependency of the app —
-// the pin in cdn.ts is the single source of truth — so the types live here
-// rather than coming from @types.
+// esbuild-wasm is intentionally not an npm dependency (cdn.ts pins the
+// version), so the types live here.
 
 export interface EsbuildOutputFile {
   path: string;
@@ -124,11 +114,9 @@ export function resolveInVfs(
 }
 
 /**
- * Resolution rules for one workspace: the block's own tabs come out of the
- * VFS, and every bare specifier rewrites to a pinned esm.sh URL and stays
- * **external** — which is why a precomputed bundle is small and why the
- * reader's browser fetches React itself rather than a copy baked into every
- * block.
+ * Resolution rules: workspace tabs come from the VFS; bare specifiers
+ * rewrite to pinned esm.sh URLs and stay EXTERNAL — which keeps bundles
+ * small and lets the browser fetch React itself.
  */
 export function vfsPlugin(files: Map<string, string>): EsbuildPlugin {
   return {
@@ -175,10 +163,9 @@ export function vfsPlugin(files: Map<string, string>): EsbuildPlugin {
 }
 
 /**
- * Every build option except `entryPoints` and `plugins`, which depend on the
- * workspace. Spread this rather than restating it: an option that differs
- * between the generator and the worker is a bundle that differs between a
- * block's preview and its Run, and nothing downstream would notice.
+ * Every build option except workspace-dependent `entryPoints`/`plugins`.
+ * Spread this rather than restating it: an option that differs between the
+ * generator and the worker silently desyncs preview from Run.
  */
 export const REACT_BUILD_OPTIONS = {
   bundle: true,
@@ -189,11 +176,9 @@ export const REACT_BUILD_OPTIONS = {
   // rewrites to the pinned esm.sh URL like any bare import.
   jsx: "automatic",
   outdir: "/out",
-  // Inline sourcemaps so DevTools stack traces and breakpoints point at the
-  // user's pane sources (main.tsx:12) instead of bundle offsets. Costs
-  // bundle bytes in the srcdoc, fine at snippet scale. (Browser `error`
-  // events don't consume sourcemaps, so the output panel still reports
-  // bundle positions; DevTools maps.)
+  // Inline sourcemaps so DevTools points at pane sources (main.tsx:12).
+  // Browser `error` events don't consume sourcemaps, so the output panel
+  // still reports bundle positions.
   sourcemap: "inline",
   sourceRoot: "dataslope://preview/",
   define: { "process.env.NODE_ENV": '"production"' },

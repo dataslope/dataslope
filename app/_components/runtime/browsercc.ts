@@ -1,33 +1,10 @@
-// Shared browsercc + WASI loader used by both the C and the C++
-// playgrounds.
-//
-// `browsercc` is a precompiled clang/lld toolchain plus a WASI sysroot
-// (libc, libc++, headers) wrapped in a small JavaScript surface:
-//
-//   compile({ source, fileName, flags, extraFiles? })
-//     -> { module: WebAssembly.Module | null, compileOutput: string }
-//   getPrecompiledHeader(flags)
-//     -> ArrayBuffer | null   // returns a prebuilt <bits/stdc++.h> PCH
-//                             //   when `flags` is PCH-compatible
-//                             //   (-O2 -std=c++20 -fno-exceptions)
-//
-// The compiled WebAssembly module is a regular WASI binary, which we
-// run with `@bjorn3/browser_wasi_shim` (the same WASI runtime the
-// upstream browsercc demo uses). Unlike `@wasmer/sdk`, browsercc does
-// NOT use SharedArrayBuffer / a Web Worker threadpool, so the hosting
-// document does not need to be cross-origin-isolated.
-//
-// We load both libraries from a CDN at runtime:
-//   * browsercc pulls its own siblings (`clang.wasm`, `lld.wasm`,
-//     `sysroot.tar`, ...) relative to `import.meta.url`, so importing
-//     `index.js` from jsDelivr is enough, every other artefact is
-//     resolved against the same jsDelivr path automatically.
-//   * `@bjorn3/browser_wasi_shim` is pure JavaScript with no extra
-//     assets, so we just import its ESM bundle from esm.sh.
-//
-// Both loads are page-lifetime singletons so navigating between `/c`
-// and `/cpp` reuses the same already-fetched ~95 MB worth of wasm and
-// sysroot data.
+// Shared browsercc + WASI loader for the C and C++ playgrounds.
+// browsercc is a precompiled clang/lld toolchain + WASI sysroot; compiled
+// modules run under @bjorn3/browser_wasi_shim, which needs no
+// SharedArrayBuffer, so the document needn't be cross-origin-isolated.
+// Both libraries load from a CDN (browsercc resolves its siblings against
+// import.meta.url, so importing index.js from jsDelivr is enough) as
+// page-lifetime singletons, so /c and /cpp share the ~95 MB of assets.
 
 const BROWSERCC_VERSION = "0.1.1";
 const BROWSERCC_URL = `https://cdn.jsdelivr.net/npm/browsercc@${BROWSERCC_VERSION}/dist/index.js`;
@@ -74,12 +51,8 @@ export interface WasiShim {
 
 // ─── CDN loaders (page-lifetime singletons) ────────────────────────────
 
-// `import(<literal-string>)` would be statically rewritten by the
-// bundler (Turbopack in Next.js 16), which then refuses to fetch a
-// remote URL at build time. Wrapping it in `new Function` hides the
-// import from static analysis so the URL is resolved at runtime in the
-// browser, exactly like `pyodide-worker.ts` sidesteps the same issue
-// with `importScripts` inside a Web Worker.
+// `new Function` hides the import from the bundler's static analysis,
+// which would otherwise refuse to fetch a remote URL at build time.
 const dynamicImport = new Function(
   "url",
   "return import(url);",
@@ -107,10 +80,8 @@ export interface WasiRunResult {
   stderr: string;
 }
 
-/** Instantiate a WASI module produced by browsercc and run its
- *  `_start`. Stdin is empty; stdout/stderr are captured and returned
- *  as strings so the caller can emit them as single playground cells
- *  (matching the stdout-then-stderr pattern of every other adapter). */
+/** Instantiate a browsercc-produced WASI module and run `_start`. Stdin is
+ *  empty; stdout/stderr are captured and returned as strings. */
 export async function runWasiModule(
   module: WebAssembly.Module,
   shim: WasiShim,
@@ -139,9 +110,8 @@ export async function runWasiModule(
     const result = wasi.start(instance);
     if (typeof result === "number") exitCode = result;
   } catch (err) {
-    // `wasi.start` throws a `WASIProcExit`-shaped error when the
-    // program calls `_exit(n)`. The shim's error has a `.code` field
-    // with the numeric exit code; treat anything else as a real crash.
+    // `_exit(n)` surfaces as a WASIProcExit-shaped error with a numeric
+    // `.code`; anything else is a real crash.
     const code = (err as { code?: unknown })?.code;
     if (typeof code === "number") {
       exitCode = code;
@@ -156,12 +126,9 @@ export async function runWasiModule(
 }
 
 // ─── Shared C++ PCH cache ──────────────────────────────────────────────
-//
-// `getPrecompiledHeader(flags)` triggers a 19 MB download of
-// `stdc++.h.pch`. browsercc itself doesn't cache the result, so the
-// naive approach would re-download it on every run. We cache the
-// fetched ArrayBuffer here (page lifetime) and hand back a fresh slice
-// each time, since `extraFiles` may be consumed destructively.
+// getPrecompiledHeader triggers a 19 MB download browsercc doesn't cache;
+// cache it here for the page lifetime (callers slice, since extraFiles may
+// be consumed destructively).
 
 let pchPromise: Promise<ArrayBuffer | null> | null = null;
 export function loadCppPch(api: BrowserccApi, flags: string[]): Promise<ArrayBuffer | null> {

@@ -1,25 +1,11 @@
 /// <reference lib="webworker" />
 export {};
 
-// browsercc (clang + lld + WASI sysroot) and the WASI shim run inside a
-// dedicated Web Worker so that C/C++ compilation and execution don't block
-// the main thread. Both the C and C++ playgrounds share this single worker
-// file; the `language` field in each `run` message picks the right path.
-//
-// Singletons here are worker-level, separate from those in browsercc.ts
-// (which is main-thread-only). This means a C and a C++ playground open at
-// the same time each get their own worker with their own browsercc instance,
-// which is fine, the ~95 MB toolchain is cached by the browser across both.
-//
-// Protocol:
-//   Main → Worker  { kind: "init" }
-//                  { kind: "run"; id: number; code: string; language: "c" | "cpp" }
-//   Worker → Main  { kind: "loading"; message: string }
-//                  { kind: "ready" }
-//                  { kind: "init-error"; message: string }
-//                  { kind: "output"; id: number; cell: OutputCellMessage }
-//                  { kind: "done"; id: number }
-//                  { kind: "error"; id: number; message: string }
+// browsercc (clang + lld + WASI sysroot) runs in a dedicated Web Worker so
+// C/C++ compilation doesn't block the main thread; both playgrounds share
+// this worker file, with `language` picking the path. Singletons here are
+// worker-level, separate from browsercc.ts's main-thread ones (the browser
+// caches the ~95 MB toolchain across both). Protocol: see In/OutMessage.
 
 declare const self: DedicatedWorkerGlobalScope;
 
@@ -81,10 +67,8 @@ type InMessage =
       id: number;
       code: string;
       language: "c" | "cpp";
-      /** Extra workspace files (path → text content) to make available
-       *  during compilation. Headers and additional source files from the
-       *  multi-file workspace are passed here so `#include "dog.h"` and
-       *  multi-translation-unit builds work correctly. */
+      /** Extra workspace files (path → text) so `#include "dog.h"` and
+       *  multi-translation-unit builds work. */
       files?: Array<[string, string]>;
     };
 
@@ -128,8 +112,7 @@ async function initRuntime(): Promise<void> {
   browserccApi = api;
   wasiShim = shim;
 
-  // Kick off the 19 MB PCH download in the background so it's ready by the
-  // time the user clicks Run on a C++ file.
+  // Background-download the 19 MB PCH so it's ready by the first C++ Run.
   pchPromise = api
     .getPrecompiledHeader(CPP_COMPILE_FLAGS)
     .catch((err) => {
@@ -204,22 +187,15 @@ async function runCode(
   let fileName: string;
   const extraFiles: Record<string, string | ArrayBuffer> = {};
 
-  // Build a combined source using the "unity build" strategy: all extra
-  // source files are concatenated before the entry point so that symbols
-  // defined in helper files (e.g. dog.c) are available when the entry
-  // point (main.c / main.cpp) is compiled.  Headers are placed in the
-  // compiler VFS via extraFiles so that #include "dog.h" resolves.
-  //
-  // This avoids passing additional source file paths as positional
-  // arguments to clang, which is not supported by browsercc's compile()
-  // API and would cause "Clang driver failed with code 1".
+  // "Unity build": extra source files are concatenated before the entry
+  // point (headers go in the VFS via extraFiles). browsercc's compile()
+  // doesn't accept extra positional source paths — passing them fails with
+  // "Clang driver failed with code 1".
   let extraSource = "";
 
   if (language === "cpp") {
-    // The ~10 MB precompiled header is fetched in the background at boot.
-    // On a fast first C++ run it may still be downloading, surface the
-    // boot notice for the wait (the main thread debounces it, so an
-    // already-cached PCH doesn't flash anything).
+    // The PCH may still be downloading on a fast first run; surface the
+    // boot notice for the wait (debounced upstream).
     post({
       kind: "run-status",
       id,

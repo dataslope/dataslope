@@ -12,13 +12,10 @@ import type {
 } from "../types";
 import { getRuffFmt } from "./ruffFmt";
 
-// Pyodide is loaded inside a dedicated module Web Worker (see
-// `runtime/pyodide-worker.ts`). The worker pulls `pyodide.mjs` from the
-// CDN via a bundler-ignored dynamic `import()`, which keeps the
-// Next.js / Turbopack bundler from ever touching Pyodide's internal
-// `await import(e)` (which would otherwise fail with "Cannot find
-// module as expression is too dynamic") AND keeps Python execution off
-// the main thread so the UI stays responsive while user code runs.
+// Pyodide loads inside a dedicated module Web Worker (see
+// runtime/pyodide-worker.ts): a bundler-ignored CDN import keeps Turbopack
+// away from Pyodide's dynamic imports, and execution stays off the main
+// thread.
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -707,12 +704,9 @@ class PyodideWorkerRuntime implements LanguageRuntime {
     this.worker.terminate();
   }
 
-  /** Fire-and-forget warm hint (see LanguageRuntime.warmPackages): asks
-   *  the worker to pre-install the heavy package set, and any micropip
-   *  drawer packages the sources import, when the authored code (or an
-   *  explicit `packages` list) actually needs it. Explicit module names
-   *  are turned into synthetic `import x` lines so the worker's gate and
-   *  micropip mapping treat them exactly like authored imports. */
+  /** Fire-and-forget warm hint (see LanguageRuntime.warmPackages).
+   *  Explicit module names become synthetic `import x` lines so the
+   *  worker's gate treats them like authored imports. */
   warmPackages(
     sources: string[],
     options?: { packages?: string[]; force?: boolean },

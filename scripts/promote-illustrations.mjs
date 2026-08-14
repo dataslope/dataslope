@@ -61,9 +61,7 @@ import { createR2Client, credentialsFromEnv } from "./lib/r2.mjs";
 import { contentBounds, trimAxesFor, trimPlan } from "./lib/cutouts.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
-// Promotion writes the *served* file directly. There is deliberately no copy
-// under assets/images: that would put every illustration in git twice, and the
-// second encode build-images used to apply cost ~1.8 dB PSNR to save ~3 kB.
+// The served file directly — no copy under assets/images (see header).
 const OUT_DIR = join(ROOT, "public", "images");
 export const CUTOUT_SUFFIX = "-cutout";
 
@@ -125,16 +123,10 @@ export function candidateKey(runId, promptId, variant, kind) {
 
 /**
  * Crop a cut-out's transparent margins away, on the axes its id calls for.
- *
- * Returns the input untouched when there is nothing worth taking — a fully
- * transparent image, or one already tight enough that the crop would fall
- * under `trimPlan`'s minimum gain — so promotion stays idempotent and
- * re-promoting already-trimmed art is a no-op rather than a fresh crop.
- *
- * The geometry lives in `scripts/lib/cutouts.mjs`, shared with the sweep in
- * `trim-cutouts.mjs` that backfilled every image promoted before this step
- * existed. The two must agree, so they call the same functions rather than
- * restating the arithmetic.
+ * Returns the input untouched when there is nothing worth taking, so
+ * re-promoting already-trimmed art is a no-op. The geometry lives in
+ * `scripts/lib/cutouts.mjs`, shared with `trim-cutouts.mjs` so the two cannot
+ * disagree.
  */
 async function trimCutout(buf, axes) {
   const bounds = await contentBounds(buf);
@@ -227,16 +219,9 @@ async function main() {
     process.exit(1);
   }
 
-  // An id with a cut-out promotes the cut-out alone.
-  //
-  // Every surface reads the `-cutout` slug — `<Figure>` in 2,745 places,
-  // `CourseCard` and `InterviewCatalog` build `…-thumbnail-cutout`,
-  // `AuthGlobe` appends the suffix itself, the home icons and playground hero
-  // are cut-out constants. The one place that touches the bare slug is the
-  // admin gallery's `hasOriginal`, and it only uses it to choose between two
-  // *empty* states. So the opaque `<id>.webp` renders nowhere, and promoting
-  // it costs 0.22 MB of git per figure. The pristine PNG stays in R2, so
-  // `--with-original` can bring it back if a page ever wants one.
+  // An id with a cut-out promotes the cut-out alone: every surface reads the
+  // `-cutout` slug, so the opaque `<id>.webp` renders nowhere and promoting
+  // it costs ~0.22 MB of git per figure. `--with-original` overrides.
   const stems = [];
   for (const id of ids) {
     const hasCutout = opts.cutout && (await source.has(`${id}${CUTOUT_SUFFIX}`));
@@ -262,17 +247,8 @@ async function main() {
     }
     const raw = await source.read(stem);
 
-    // Cut-outs are trimmed here rather than by a pass afterwards. Background
-    // removal leaves the subject floating in the frame it was generated in, so
-    // a cut-out is 1536x1024 of layout carrying a median 11% less than that of
-    // drawing, and `<Figure>` renders at full width with `height: auto` — every
-    // transparent row is vertical space a lesson pays for and nobody sees.
-    // Doing it before the one encode below is what makes it free: the crop
-    // costs no quality at all, where a later pass over the promoted WebP would
-    // be a second lossy generation. Which margins go is `trimAxesFor`'s call —
-    // see scripts/trim-cutouts.mjs for why a figure keeps its left/right blank
-    // and a thumbnail does not, and for the backfill that re-trimmed everything
-    // promoted before this existed.
+    // Trim before the one encode below — a later pass over the promoted WebP
+    // would be a second lossy generation (see header).
     const isCutout = stem.endsWith(CUTOUT_SUFFIX);
     const axes = isCutout ? trimAxesFor(stem.slice(0, -CUTOUT_SUFFIX.length)) : null;
     const trimmed = isCutout ? await trimCutout(raw, axes) : raw;

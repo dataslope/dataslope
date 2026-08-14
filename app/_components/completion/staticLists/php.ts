@@ -1,11 +1,9 @@
 import type { Completion } from "@codemirror/autocomplete";
 
-// Static completion tier for the PHP playground surfaces. Intelephense is
-// closed-source with no browser build and phpactor has no wasm port (see
-// the feasibility report in agent-outputs/), so the practical ceiling is
-// keywords + the common builtin-function surface with signatures.
-// `$variable` completion comes from the document scanner in
-// `languageCompletion.ts`.
+// Static completion tier for PHP: no in-browser language server exists
+// (Intelephense is closed-source, phpactor has no wasm port), so the ceiling
+// is keywords + common builtins with signatures. `$variable` completion
+// comes from the document scanner in `languageCompletion.ts`.
 
 const kw = (label: string): Completion => ({ label, type: "keyword" });
 const cn = (label: string): Completion => ({ label, type: "constant" });

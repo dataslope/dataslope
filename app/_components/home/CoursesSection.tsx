@@ -1,15 +1,9 @@
 "use client";
 
 /**
- * Home page Courses section, reuses the `/courses` catalog's course card
- * (app/courses/_components/CourseCard.tsx) so a course reads the same on both
- * surfaces. It takes the card's `preview` layout rather than the catalog's:
- * four rows in two columns inside a page with other things to say want a
- * denser row and a clamped description, where the catalog — which IS its list —
- * gets the larger art and the full sentence. Shows the four most popular
- * courses by default, with topic buttons (the domain tags common enough to
- * carry a filter) that swap in up to four courses per topic, and a browse-all
- * link into the catalog.
+ * Home page Courses section, reusing the /courses catalog's course card in
+ * its denser `preview` layout. Shows the four most popular courses, with
+ * topic buttons swapping in up to four per topic, and a browse-all link.
  */
 import { useMemo, useState } from "react";
 import { Select } from "@base-ui/react/select";
@@ -59,9 +53,8 @@ const MIN_TOPIC_COURSES = 3;
 /** …and we show at most this many topic buttons. */
 const MAX_TOPICS = 6;
 
-/** Leading glyph for each option in the topic dropdown. Domains without a
- *  dedicated icon fall back to a book. Sparkles is intentionally avoided,
- *  it's reserved for AI features. */
+/** Leading glyph per topic option; fallback is a book. Sparkles is avoided —
+ *  reserved for AI features. */
 const DOMAIN_ICONS: Record<string, LucideIcon> = {
   "programming-fundamentals": Code2,
   "computational-thinking": Brain,

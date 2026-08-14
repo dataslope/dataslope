@@ -5,12 +5,8 @@ import { X } from "lucide-react";
 import type { AddRowDialogState } from "../types";
 
 /**
- * Shared "Add Row" drawer used by the Postgres and DuckDB playgrounds.
- *
- * The drawer markup, layout, validation messaging, and "add another"
- * checkbox are byte-identical between the two dialects. Only the
- * `submitAddRow()` handler (which calls the dialect-specific engine
- * `insertRow`) lives in the per-playground module.
+ * Shared "Add Row" drawer for the Postgres and DuckDB playgrounds; only the
+ * dialect-specific `submitAddRow()` lives in the per-playground module.
  */
 export interface AddRowDialogProps {
   /** Current dialog state, or `null` when the drawer is closed. */

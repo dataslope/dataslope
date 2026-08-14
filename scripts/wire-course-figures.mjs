@@ -1,48 +1,24 @@
 #!/usr/bin/env node
 /**
- * Wire a course's MDX pages to their generated illustrations.
+ * Wire a course's MDX pages to their generated illustrations: once
+ * `data/illustration-prompts.json` has one `course-illustration` prompt per
+ * lesson page, this places the matching `<Figure>` on every page (see
+ * "Illustrations" in AGENTS.md). `--collection courses` (default) pairs
+ * content/courses with course-* prompts; `--collection interview` pairs
+ * content/interview with interview-* prompts.
  *
- * Last step of authoring a course's art (see the "Illustrations" section of
- * AGENTS.md and agent-outputs/20260730-1200-illustration-pipeline-handoff.md):
- * once `data/illustration-prompts.json` has one `course-illustration` prompt per
- * lesson page, this places the matching `<Figure>` on every page so nothing is
- * missed by hand across a 30-page course.
+ * Per file, keyed on the prompt whose `lesson` matches the file stem
+ * (`index.mdx` uses the collection's thumbnail prompt):
+ *   - Drops any `<Figure>` pointing at a slug that is not a known prompt id
+ *     (retired art). A `<Figure>` pointing at any *other* known id is left
+ *     alone — the hand-placed `course-inline` bands must survive a re-wire.
+ *   - Replaces the first inline `<svg>…</svg>` with the `<Figure>` and
+ *     deletes any further ones (inline SVG is retired repo-wide).
+ *   - A page with no `<svg>` gets the `<Figure>` after its opening paragraph.
  *
- * Works on either content collection. `--collection courses` (the default)
- * walks `content/courses` and pairs pages with `course-thumbnail` /
- * `course-illustration` prompts; `--collection interview` walks
- * `content/interview` and pairs them with `interview-thumbnail` /
- * `interview-illustration`. Everything else about the two is identical, which
- * is why they share one script rather than diverging into two.
- *
- * What it does per file, keyed on the prompt whose `lesson` matches the file
- * stem (`index.mdx` uses the collection's thumbnail prompt instead):
- *
- *   - Drops any `<Figure>` pointing at a slug that is not a known prompt id.
- *     That is how retired art (one-off slugs, the inline SVGs' replacements) is
- *     cleared. A `<Figure>` already pointing at the right slug is left
- *     untouched, and so is one pointing at any *other* id in the JSON: the
- *     `course-inline` risograph bands are placed by hand beside the paragraph
- *     they illustrate, and a re-wire must not sweep them out or move them.
- *   - Replaces the first inline `<svg>…</svg>` block with the `<Figure>` and
- *     deletes any further ones. Inline SVG is retired repo-wide; a course
- *     authored in the old style is converted in place. Pages that had two or
- *     three diagrams collapse to one figure, which is the ratio every course
- *     uses.
- *   - A page with no `<svg>` gets the `<Figure>` inserted after its opening
- *     prose paragraph.
- *
- * `index.mdx` heroes are placed right after the opening paragraph and carry
- * `priority`, since they are above the fold. Lesson figures are lazy.
- *
- * Alt text is the prompt's `subject`, sentence-cased — the same description the
- * image was generated from, which is what makes it accurate.
- *
- * Idempotent: re-running changes nothing. Always `--dry-run` first; it reports
- * exactly what would change and writes nothing.
- *
- * Fenced code blocks are never touched, so a ```mermaid diagram or an SVG shown
- * as example code is safe.
+ * `index.mdx` heroes carry `priority` (above the fold); lesson figures are
+ * lazy. Alt text is the prompt's `subject`, sentence-cased. Idempotent;
+ * always `--dry-run` first. Fenced code blocks are never touched.
  *
  * Usage:
  *   node scripts/wire-course-figures.mjs <course...> [--dry-run]
