@@ -164,9 +164,13 @@ on:
     # only sets how long a superseded folder lingers before its next
     # reconsideration, and every run reaches the same verdict about it.
     #
-    # The job is cheap to run: it LISTs the bucket (Class B, $0.36/million) and
-    # DELETEs are free, so the cost of 12 runs/day is a couple of minutes of
-    # Actions time.
+    # The job is cheap to run, though not for the reason this comment claimed
+    # until 2026-08-14: ListObjectsV2 is a Class A operation at $4.50/million,
+    # NOT Class B at $0.36/million (Class B is GetObject/HeadObject; DeleteObject
+    # really is free). A quiet run costs ~10 LIST requests and a full sweep
+    # ~100, so 12 runs a day lands near 5,000 a month against R2's 1,000,000
+    # Class A monthly free allowance — a rounding error either way, but the
+    # right rate matters if the folder count ever grows by an order of magnitude.
     - cron: "17 */2 * * *"
   workflow_dispatch:
     inputs:
@@ -306,9 +310,14 @@ jobs:
           # tab-separated batch — the same shape the LastModified query in step
           # 6 relies on. Flatten to one number per line and sum.
           #
-          # Cheap enough to call freely: a ~17,000-object bucket is ~18 LIST
-          # requests, Class B at $0.36/million, so a whole year of 12 runs a day
-          # costs a fraction of a cent. A missing or empty prefix yields 0.
+          # A LIST returns at most 1,000 keys per request, so a pass over the
+          # whole prefix is ~18 requests at 17,000 objects and ~2 over a single
+          # 1,081-object build folder. Weighing roughly doubles the job's LIST
+          # count — a full sweep goes from ~57 requests to ~105 — which is worth
+          # it at Class A's $4.50/million (~$0.0005 a run, inside R2's 1,000,000
+          # free monthly Class A operations) but is not free enough to sprinkle
+          # around: only the whole prefix and folders on their way out are
+          # weighed. A missing or empty prefix yields 0.
           bucket_bytes() {
             aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$1" \
               --query 'Contents[].Size' --output text 2>/dev/null \
