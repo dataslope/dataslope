@@ -161,6 +161,38 @@ export async function generateStaticParams() {
   return courseSource.generateParams();
 }
 
+// Serve ONLY the params enumerated above; anything else 404s without being
+// rendered. The site is fully static (no ISR, nothing revalidates), so a slug
+// outside that set can never become valid between deploys and rendering it is
+// pure waste — but the waste was not the expensive part.
+//
+// With the default (`true`), an unmatched `/courses/*` path was rendered on
+// demand and OpenNext cached the resulting not-found page into whichever build
+// folder was live: ~1.8 MB with `revalidate: false`, i.e. kept forever, for a
+// URL nobody will request twice. The mechanism is unbounded in the number of
+// DISTINCT bad URLs — a crawler working through stale links, or anything
+// hitting `/courses/<random>`, mints a fresh 1.8 MB object and a full SSR
+// render per unique path — and those writes also landed in a folder the
+// cleanup job was dating by its newest object, which held four folders open
+// for hours past their deploy (see .github/workflows/r2-cache-cleanup.yml).
+// Observed volume was low when measured on 2026-08-14 (14 entries over ~2
+// days), so this closed a design hole rather than an incident.
+//
+// Real lessons reached by the flat one-segment URL are redirected to their
+// canonical path a phase earlier, in next.config.ts, so this only ever sees
+// paths that genuinely do not exist (see lib/courseAliasRedirects.ts).
+//
+// Nothing that renders today can be lost to this. The prerendered set is
+// unchanged — `generateStaticParams` already returned exactly
+// `courseSource.generateParams()`, which without i18n configured is literally
+// `getPages().map((page) => ({ slug: page.slugs }))` (fumadocs-core's loader),
+// the same page set `getPage()` resolves against and `app/sitemap.ts`
+// enumerates. So a slug this route can resolve is a slug that was already
+// prerendered, course landing pages (`index.mdx`, one segment) included. All
+// that changes is the fate of params OUTSIDE that set: previously rendered on
+// demand and cached, now 404 outright.
+export const dynamicParams = false;
+
 export async function generateMetadata(
   props: CoursePageProps,
 ): Promise<Metadata> {

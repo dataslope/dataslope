@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 import { createMDX } from "fumadocs-mdx/next";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+import { courseAliasRedirects } from "./lib/courseAliasRedirects";
 
 // Give `next dev` access to the Cloudflare bindings/env declared in
 // wrangler.jsonc when developing against the OpenNext adapter. It's a no-op
@@ -163,8 +164,16 @@ const nextConfig: NextConfig = {
   // the create hub. The create/account/admin sections now live under
   // /dashboard and internal links point there directly; the project is
   // pre-launch, so no redirects from the old top-level paths are kept.
+  //
+  // The flat `/courses/<lesson>` shape 404s even when the lesson exists two
+  // segments deep; see lib/courseAliasRedirects.ts for where those links come
+  // from, why ambiguous slugs are deliberately left 404ing, and why this is
+  // computed from the content tree instead of a generated manifest. Redirects
+  // are the first routing phase, so a flat lesson link never reaches the
+  // catch-all route (which now refuses unknown params outright).
   redirects: async () => [
     { source: "/dashboard", destination: "/dashboard/create", permanent: false },
+    ...courseAliasRedirects(),
   ],
   rewrites: async () => ({
     beforeFiles: [

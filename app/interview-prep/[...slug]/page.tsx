@@ -124,6 +124,15 @@ export async function generateStaticParams() {
   return interviewSource.generateParams();
 }
 
+// Same reasoning as the courses catch-all, and the same reason it is worth
+// setting on both: an unmatched path under either prefix used to be rendered
+// on demand and have its not-found page cached into the live build's R2 folder
+// at ~1.8 MB with `revalidate: false`, unbounded in the number of distinct bad
+// URLs. See app/courses/[...slug]/page.tsx for the full note. No flat-URL
+// redirect is needed here — interview-prep pages are one or two segments deep
+// and both shapes are prerendered.
+export const dynamicParams = false;
+
 export async function generateMetadata(
   props: InterviewPageProps,
 ): Promise<Metadata> {

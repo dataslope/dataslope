@@ -83,11 +83,25 @@ The search re-seed is appended to the **production** deploy command only, and th
 
 ### Incremental cache cleanup
 
-OpenNext keys cache objects as `incremental-cache/<buildId>/…`, so **every deploy, production and each preview, writes a fresh copy (~1–1.4 GB: one HTML+RSC `.cache` object per prerendered page, ~1,600 of them) under a new build ID, and nothing is pruned automatically.** Left alone the bucket grows by that much per deploy, at active-development velocity that's tens of GB within days.
+OpenNext keys cache objects as `incremental-cache/<buildId>/…`, so **every deploy, production and each preview, writes a fresh copy (~2.5 GB: one `.cache` object per prerendered page, ~1,080 of them averaging ~2.3 MB) under a new build ID, and nothing is pruned automatically.** Left alone the bucket grows by that much per deploy; at active-development velocity it reached 78 GB within days.
 
-A scheduled GitHub Action (`.github/workflows/r2-cache-cleanup.yml`) prunes it every 6 hours, **one cache per active branch**. This works because the build ID is the deployed commit SHA, `next.config.ts` sets `generateBuildId` to `WORKERS_CI_COMMIT_SHA` on Workers Builds, so a cache folder's name is the commit it was built from. The job maps each folder to the **open pull request** whose head is that commit (a PR's head SHA is its branch's latest commit), and keeps a folder only while **all** hold: it's the current head of an open PR, younger than 24 hours, and among the 10 most-recently-deployed such branches. Everything else is deleted, superseded commits (an older head of a still-open PR), **merged or closed PR previews**, and anything past 24 hours. The live production build is always kept regardless, a stable site can go weeks without a deploy, and deleting its cache would 500 the home page and `/courses/*` lessons. So the bucket holds the production build plus at most one preview per active branch (worst case 11 builds, ~14 GB; typically well under that). Note the flip side: a PR preview URL stops rendering once its cache folder is pruned, push any commit to the PR (or re-run its build) to regenerate it.
+A scheduled GitHub Action (`.github/workflows/r2-cache-cleanup.yml`) prunes it every 2 hours. It works because the build ID is the deployed commit SHA — `next.config.ts` sets `generateBuildId` to `WORKERS_CI_COMMIT_SHA` on Workers Builds — so a cache folder's name is the commit it was built from, and every folder can be matched against a live deployment.
 
-The job identifies the live build by fetching [`/api/cache-build-id`](app/api/cache-build-id/route.ts) (the running Worker reports the exact `OPEN_NEXT_BUILD_ID` it serves from) and **aborts without deleting anything** if it can't positively identify that folder, or can't list the repo's open PRs (otherwise a transient API error would leave every preview unmatched and delete it). So a transient error can never wipe the bucket. Trigger it manually with `dry_run` to preview deletions.
+The job **asks each deployment what it is serving** rather than inferring it from age. It keeps exactly five things:
+
+| Kept | Why |
+| --- | --- |
+| what production serves *now* | probed at [`/api/cache-build-id`](app/api/cache-build-id/route.ts) on `dataslope.com` |
+| what production is *about to* serve | `head(main)` — the incoming build, during the minutes between "cache populated" and "Worker switched over" |
+| what each branch preview serves *now* | probed at that branch's preview alias, `https://<branch-slug>-dataslope.…workers.dev` |
+| what each branch preview is *about to* serve | that branch's head commit |
+| anything populated in the last 2 hours | safety net for a deploy no probe or branch head can see yet |
+
+Everything else is deleted. Note it enumerates **branches, not open PRs**: Workers Builds builds every branch on every push whether or not a PR exists for it, so a PR-shaped keep set would miss the preview of a branch being worked on before its PR is opened.
+
+Nothing is retained on age alone, so **deploy velocity no longer sets the bucket size — branch count does**: the bucket holds production's two builds plus at most two per active branch, capped by `MAX_BRANCHES`. The flip side is unchanged: a preview URL stops rendering once its folder is pruned (push any commit, or re-run its build, to regenerate it), and there is **no rollback cover** — rolling the Worker back to a build whose cache has been pruned will 500 the site, so revert-and-redeploy (~12 min) is the recovery path.
+
+The job **aborts without deleting anything** if it can't positively identify the live production folder, resolve the default branch, or list the repo's branches — a transient API error must never leave every folder unexplained and therefore deleted. A *preview* probe failing is different: it never aborts the sweep, and that branch alone falls back to keeping its last few commits, so "no answer" is never read as "nothing to keep". Trigger it manually with `dry_run` to preview deletions.
 
 It needs three repository secrets (Settings → Secrets and variables → Actions), from an R2 API token with Object Read & Write:
 
@@ -97,9 +111,9 @@ It needs three repository secrets (Settings → Secrets and variables → Action
 | `R2_INC_CACHE_ACCESS_KEY_ID` | R2 API token access key ID |
 | `R2_INC_CACHE_SECRET_ACCESS_KEY` | R2 API token secret access key |
 
-The `R2_INC_CACHE_*` pair is named for the bucket it belongs to, because a second R2 credential now exists: `.github/workflows/r2-illustrations-lifecycle.yml` needs an **Admin Read & Write** token (`R2_ADMIN_*`) to edit bucket configuration, which is a tier this job deliberately does not get — it deletes objects unattended every six hours, and admin tokens are account-wide, so one here could destroy `dataslope-workspaces` (live user data) or `dataslope-inc-cache` itself. The job aborts rather than running credential-less, so a missing or half-renamed secret fails loudly instead of reporting a green run that pruned nothing.
+The `R2_INC_CACHE_*` pair is named for the bucket it belongs to, because a second R2 credential now exists: `.github/workflows/r2-illustrations-lifecycle.yml` needs an **Admin Read & Write** token (`R2_ADMIN_*`) to edit bucket configuration, which is a tier this job deliberately does not get — it deletes objects unattended every two hours, and admin tokens are account-wide, so one here could destroy `dataslope-workspaces` (live user data) or `dataslope-inc-cache` itself. The job aborts rather than running credential-less, so a missing or half-renamed secret fails loudly instead of reporting a green run that pruned nothing.
 
-To change how long stale/preview cache lingers, edit `THRESHOLD_HOURS` (age limit) and `MAX_BRANCHES` (how many active-branch previews may coexist) in the workflow. At ~1–1.4 GB per retained build, retention is what decides whether the bucket sits near R2's 10 GB free tier or balloons, storage beyond it is cheap ($0.015/GB-month), but there's no reason to pay for dead previews.
+There is little left to tune: `MAX_BRANCHES` caps how many branch previews may coexist, and `GRACE_HOURS` sizes the in-flight-deploy safety net. `THRESHOLD_HOURS`, `MAIN_COMMITS`, `PR_COMMITS` and `MIN_CACHE_OBJECTS` were retired on 2026-08-14 — each approximated something the job now measures directly, and the age threshold in particular was the single largest contributor to the 78 GB peak. At ~2.5 GB per retained build, retention is what decides whether the bucket sits near R2's 10 GB free tier or balloons; storage beyond it is cheap ($0.015/GB-month), but there's no reason to pay for dead previews.
 
 ## Search
 

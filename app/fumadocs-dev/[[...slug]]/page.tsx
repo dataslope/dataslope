@@ -93,6 +93,26 @@ export async function generateStaticParams() {
   return devSource.generateParams();
 }
 
+// Same reasoning as the courses and interview-prep catch-alls (see
+// app/courses/[...slug]/page.tsx for the full note): an unmatched path under
+// this prefix was rendered on demand and had its not-found page written into
+// the live build's R2 folder at ~1.9 MB with `revalidate: false`, once per
+// DISTINCT bad URL, forever.
+//
+// Set here despite the gallery being development-only. `robots.ts` disallows
+// the route and the pages are noindex, but those ask crawlers not to INDEX —
+// the 34 pages still ship in the production build and are publicly reachable,
+// so nothing stops a scanner walking `/fumadocs-dev/<random>` from minting
+// entries exactly as one walking `/courses/<random>` would.
+//
+// The gallery itself is untouched: all 34 pages (including the bare
+// `/fumadocs-dev`, which this optional catch-all also serves) are enumerated by
+// generateParams() and stay prerendered and cached, on previews included. Only
+// URLs that were never real change behavior. Adding a page while `next dev` is
+// running still works, because dev re-runs generateStaticParams per request
+// rather than reading a build-time manifest.
+export const dynamicParams = false;
+
 export async function generateMetadata(
   props: FumadocsDevPageProps,
 ): Promise<Metadata> {
