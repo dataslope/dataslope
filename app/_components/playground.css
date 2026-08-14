@@ -2427,6 +2427,30 @@ input[type="range"].fs-slider:disabled {
   padding: 32px;
   width: min(620px, calc(100vw - 48px));
   text-align: center;
+  /* Fade in the card on mount — the CARD, never the overlay root. The
+     playground pages are ssr:false with no loading fallback (see
+     app/playground/<id>/page.tsx), so easing the loader in makes the blank →
+     loading-screen hop read as a transition rather than a pop. The root must
+     stay opaque from its first frame: its `background: var(--bg)` is what
+     hides the mounting playground UI (and the inline results-pane boot
+     notice) underneath, and animating opacity there let all of it bleed
+     through for 400ms — two loading screens at once. 0.4s mirrors the
+     overlay's fade-OUT (`transition: opacity 0.4s` + `.hidden`), so entry
+     and exit feel like one motion. */
+  animation: playground-boot-fade-in 0.4s ease-out;
+}
+@keyframes playground-boot-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .playground-boot-card {
+    animation: none;
+  }
 }
 .playground-boot-loader {
   display: inline-flex;

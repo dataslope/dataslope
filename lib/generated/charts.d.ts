@@ -55,9 +55,11 @@ export interface GeneratedChart {
   /** Every page that renders this chart. Empty when the spec exists but has
    *  not been placed in a lesson yet. */
   usedBy: ChartUsage[];
-  /** Serialized `<svg>`, colored entirely with `currentColor` and
-   *  `var(--ds-chart-*)` so it reads in both themes when inlined. */
-  svg: string;
+  /** Byte length of the rendered `<svg>` markup. The markup itself lives at
+   *  `public/chart-svgs/<slug>.svg` (read via lib/charts/loadChartSvg.ts) so
+   *  the 5.7 MB corpus stays out of the Worker bundle; the manifest keeps
+   *  only this number, for the admin gallery's size stats. */
+  svgBytes: number;
 }
 
 declare const charts: Record<string, GeneratedChart>;

@@ -76,6 +76,12 @@ const nextConfig: NextConfig = {
       // a subfolder here; as sibling top-level `migrations-*` directories the
       // illustration and search schema were being traced into the deployment.
       "./migrations/**",
+      // Generated static assets read via lib/serverAssets.ts (chart SVGs,
+      // the illustration-gallery JSON). Served by the ASSETS binding at
+      // request time; nft's fs-call analysis must not trace them into the
+      // server function, they'd be dead weight beside the bundle.
+      "./public/chart-svgs/**",
+      "./public/_gen/**",
     ],
   },
   // Tell Next.js to rewrite barrel imports from these icon packages

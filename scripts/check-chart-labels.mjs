@@ -37,7 +37,7 @@
  * Usage:
  *   node scripts/check-chart-labels.mjs [--verbose] [--rules]
  */
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -271,12 +271,15 @@ async function main() {
   const charts = (await import(pathToFileURL(CHARTS).href)).default;
 
   const bad = [];
-  for (const [slug, entry] of Object.entries(charts)) {
+  for (const [slug] of Object.entries(charts)) {
     if (CROWDED_ON_PURPOSE.has(slug)) {
       if (verbose) console.log(`  allowed  ${slug}: ${CROWDED_ON_PURPOSE.get(slug)}`);
       continue;
     }
-    const problems = labelProblems(entry.svg, { rules });
+    // The markup lives beside the manifest as one asset per chart (see
+    // SVG_DIR in build-charts.mjs); the manifest carries metadata only.
+    const svg = readFileSync(join(ROOT, "public", "chart-svgs", `${slug}.svg`), "utf8");
+    const problems = labelProblems(svg, { rules });
     if (problems.length) bad.push([slug, problems]);
     else if (verbose) console.log(`  ok  ${slug}`);
   }

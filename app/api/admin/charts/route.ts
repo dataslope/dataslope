@@ -46,7 +46,11 @@
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { requireAdmin } from "@/lib/auth/admin";
-import chartManifest from "@/lib/generated/charts";
+// The slug index, NOT the full manifest: this route only ever asks "does
+// this slug exist?", and API routes compile as their own bundler graph, so
+// importing charts.js here shipped a second copy of every chart's serialized
+// SVG in the deployed Worker (~891 KiB gzipped of a ~9.7 MiB budget).
+import chartSlugs from "@/lib/generated/chart-slugs";
 import {
   approveRegenMark,
   listRegenMarks,
@@ -57,6 +61,8 @@ import {
 } from "@/lib/charts/regenMarks";
 
 export const dynamic = "force-dynamic";
+
+const knownSlugs = new Set<string>(chartSlugs);
 
 /**
  * Why the queue is read-only, when it is.
@@ -143,7 +149,7 @@ export async function PUT(request: Request): Promise<Response> {
   const slug = typeof body.slug === "string" ? body.slug : "";
   // Only slugs that exist in the generated manifest can be marked, so the queue
   // can never accumulate rows pointing at a chart that was deleted or renamed.
-  if (!slug || !chartManifest[slug]) {
+  if (!slug || !knownSlugs.has(slug)) {
     return json({ error: "Unknown chart slug." }, 400);
   }
 
@@ -191,7 +197,7 @@ export async function DELETE(request: Request): Promise<Response> {
   }
 
   const slug = typeof body.slug === "string" ? body.slug : "";
-  if (!slug || !chartManifest[slug]) {
+  if (!slug || !knownSlugs.has(slug)) {
     return json({ error: "Unknown chart slug." }, 400);
   }
 
