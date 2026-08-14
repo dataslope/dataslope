@@ -1,6 +1,6 @@
 import { defineCloudflareConfig } from "@opennextjs/cloudflare";
-import r2IncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cache/r2-incremental-cache";
 import { withRegionalCache } from "@opennextjs/cloudflare/overrides/incremental-cache/regional-cache";
+import brotliR2IncrementalCache from "./lib/cache/brotliR2IncrementalCache";
 
 // OpenNext (Cloudflare) build configuration.
 //
@@ -108,11 +108,47 @@ import { withRegionalCache } from "@opennextjs/cloudflare/overrides/incremental-
 // the full Next.js handler, which also improves cold starts. No queue or tag
 // cache is configured because nothing here revalidates; add one alongside this
 // only when a server feature that revalidates is introduced.
-export default defineCloudflareConfig({
-  incrementalCache: withRegionalCache(r2IncrementalCache, {
+// The store is `brotliR2IncrementalCache` rather than OpenNext's stock
+// `r2IncrementalCache`: same bucket, same keys (it imports `computeCacheKey`
+// from the same module), but the entries are brotli-framed. See
+// lib/cache/brotliR2IncrementalCache.ts for the read side and
+// scripts/compress-cache.mjs for where the 1,081 objects actually get
+// compressed — the deploy-time populate writes them, not this override.
+//
+// The layering order matters and is the reason users never pay for this.
+// `withRegionalCache` wraps the store: on a colo hit it answers from the Cache
+// API and never calls the store at all, and on a colo miss it calls
+// `store.get()` and puts the *decompressed* value into the colo cache. So
+// decompression is paid once per colo per deploy, on the same request that was
+// already paying an R2 round trip — and that round trip now moves ~17x fewer
+// bytes. Measured on real entries, brotli decompression is also cheaper than
+// the `JSON.parse` this path already does (2.8 ms vs 25.9 ms on a 2.29 MiB
+// entry).
+const config = defineCloudflareConfig({
+  incrementalCache: withRegionalCache(brotliR2IncrementalCache, {
     mode: "long-lived",
     defaultLongLivedTtlSec: 24 * 60 * 60,
     shouldLazilyUpdateOnCacheHit: false,
   }),
   enableCacheInterception: true,
 });
+
+// `node:zlib` has to be external, or the build dies before it starts.
+//
+// The Cloudflare CLI compiles this config twice — once for Node
+// (`platform: "node"`, where `node:zlib` resolves fine) and once for the edge
+// runtime with `platform: "browser"`, where esbuild cannot resolve a `node:`
+// builtin and fails the whole build with `Could not resolve "node:zlib"`.
+// Marking it external leaves the import in place instead of bundling it, and
+// the edge runtime here is workerd with `nodejs_compat` (wrangler.jsonc), which
+// provides `node:zlib` natively — verified against workerd, where
+// `brotliDecompressSync` round-trips.
+//
+// This is the same mechanism `defineCloudflareConfig` already uses for
+// `node:crypto`, which its own config validation *requires* to be listed. So
+// the existing entries are preserved rather than replaced: dropping
+// `node:crypto` here would fail `ensure-cf-config`.
+export default {
+  ...config,
+  edgeExternals: [...(config.edgeExternals ?? []), "node:zlib"],
+};

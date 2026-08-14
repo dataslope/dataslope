@@ -70,12 +70,16 @@ Production and preview deploys run through Cloudflare Workers Builds rather than
 
 | Field | Value |
 | --- | --- |
-| Build command | `npx opennextjs-cloudflare build` |
+| Build command | `npx opennextjs-cloudflare build && node scripts/compress-cache.mjs` |
 | Deploy command | `npx opennextjs-cloudflare deploy --cacheChunkSize 100 && npm run db:seed:search:remote` |
 | Non-production branch deploy command | `npx opennextjs-cloudflare upload --cacheChunkSize 100` |
 | Path | `/` |
 
 Both `deploy` (production) and `upload` (preview versions) populate the R2 cache before shipping, `upload` wraps `wrangler versions upload`, so previews get the same populated cache production does. `Path` is `/` because this Worker lives at the repo root; the CORS proxy under `cloudflare-cors-proxy/` is a separate Worker with its own config.
+
+**`scripts/compress-cache.mjs` is why the build command has a second half.** The populate step uploads the files under `.open-next/cache/` to R2 byte-for-byte, so compressing them on disk is the only place that shrinks what a deploy ships. Brotli takes this cache from **2.340 GiB to 0.135 GiB — 17.4×** — for ~27 s of build time, and the Worker reads them back through `lib/cache/brotliR2IncrementalCache.ts` (wired up in `open-next.config.ts`). Filenames are unchanged, because OpenNext's `getCacheAssets` derives each R2 key from the path and rejects anything not ending in `.cache`.
+
+It is safe to forget. The reader accepts uncompressed entries too, so a deploy that skips this step ships a cache that is merely as large as it used to be, rather than a site that 500s — see the note in `brotliR2IncrementalCache.ts` for why that fallback is load-bearing rather than defensive clutter. Running it twice is a no-op.
 
 **`--cacheChunkSize` is how many cache objects are written to R2 at once, and the default is 25.** That default is not sized for this cache: the populate step ships **1,081 objects / 2.34 GiB on every deploy, production and every preview** (see [Incremental cache cleanup](#incremental-cache-cleanup) for why a full copy goes up each time), and at 25 in flight that is 44 sequential rounds of ~2.2 MB uploads. Both commands accept the flag — it is declared on `deploy` and `upload` alike, and OpenNext's arg parser consumes it rather than forwarding it to `wrangler`, so it cannot confuse the deploy underneath.
 
