@@ -56,6 +56,7 @@ import { IgnorableError } from "@opennextjs/aws/utils/error.js";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import {
   BINDING_NAME,
+  NAME as R2_CACHE_NAME,
   PREFIX_ENV_NAME,
 } from "@opennextjs/cloudflare/overrides/incremental-cache/r2-incremental-cache";
 import { computeCacheKey, debugCache } from "@opennextjs/cloudflare/overrides/internal";
@@ -66,7 +67,38 @@ import {
   hasBrotliCacheMagic,
 } from "./brotliCacheFormat";
 
-export const NAME = "ds-brotli-r2-incremental-cache";
+/**
+ * The label this override logs under. NOT its `name` — see below.
+ */
+export const DEBUG_NAME = "ds-brotli-r2-incremental-cache";
+
+/**
+ * `name` MUST stay equal to the stock R2 cache's, and this is not cosmetic.
+ *
+ * `populateCache` in @opennextjs/cloudflare dispatches on it — literally
+ * `switch (await resolveCacheName(incrementalCache))`, matching against
+ * `R2_CACHE_NAME` / `KV_CACHE_NAME` / `STATIC_ASSETS_CACHE_NAME`, with a
+ * `default:` that logs "Incremental cache does not need populating" and does
+ * nothing. `withRegionalCache` passes the inner store's name straight through
+ * (`this.name = this.store.name`), so this class's name is what that switch
+ * sees.
+ *
+ * Giving it a distinct name therefore does not rename anything, it silently
+ * turns the deploy-time populate OFF. The build stays green, the deploy
+ * succeeds, and the Worker ships with an EMPTY incremental cache — which on
+ * this deployment means the home page and every `/courses/*` lesson 500, since
+ * a miss falls through to a re-render that touches `node:fs` in workerd.
+ *
+ * That is exactly what happened when this override first shipped with its own
+ * name: "Incremental cache does not need populating" in the build log, nothing
+ * else out of place. `__tests__/brotliCache.test.ts` pins it so it cannot
+ * happen twice.
+ *
+ * This is also the honest description of what this class is: the same R2
+ * incremental cache, same bucket, same keys, differing only in how the values
+ * are encoded.
+ */
+export const NAME = R2_CACHE_NAME;
 
 type Entry<T extends CacheEntryType> = { value: CacheValue<T>; lastModified: number };
 
@@ -109,7 +141,7 @@ class BrotliR2IncrementalCache {
       // because "is this deploy actually serving compressed entries?" is
       // otherwise unanswerable from outside — the two formats are designed to
       // be indistinguishable to every caller above this line.
-      debugCache(NAME, `get ${key} (${isCompressed ? "brotli" : "raw"}, ${bytes.length}B)`);
+      debugCache(DEBUG_NAME, `get ${key} (${isCompressed ? "brotli" : "raw"}, ${bytes.length}B)`);
 
       return {
         value: JSON.parse(json) as CacheValue<CacheType>,

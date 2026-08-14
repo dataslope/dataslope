@@ -93,6 +93,36 @@ every preview, uploads all 1,081 objects / 2.34 GiB to R2** under a fresh build-
 is diffed, because the prefix is new every time. Static assets are diffed by wrangler and so are
 nearly free after the first deploy; the R2 populate is not.
 
+### A real Workers Builds log (2026-08-14 18:19 UTC)
+
+The above is a 4-core local box. This is the actual builder, from a full build log, and it settles
+two things the audit had to infer:
+
+| Stage | Duration |
+| --- | ---: |
+| Initialize build environment | 3 s |
+| Clone repository | 39 s |
+| Restore dependency + build-output caches | 28 s |
+| `npm clean-install` | **2 m 02 s** |
+| Build command (`opennextjs-cloudflare build`) | **5 m 52 s** |
+| Deploy command (`opennextjs-cloudflare upload`) | 1 m 09 s |
+| Upload to build output cache | 40 s |
+| **Total** | **10 m 55 s** |
+
+- **Build caching is enabled**, which §3 had inferred from `check-prefetch-hints.mjs` rather than
+  observed: `Success: Dependencies restored from build cache.` and `Success: Build output restored
+  from build cache.` It also *writes* the cache back at the end, which is the 40 s tail — a stage
+  this audit had not accounted for at all.
+- **A warm `.next/cache` is worth what §1 claimed.** `✓ Compiled successfully in 9.3s`, against
+  37.9 s cold locally. That is the ~5-minute swing in §1, visible in one line.
+- **`npm ci` is 2 m 02 s even with the dependency cache restored** — ~19% of the build, and more
+  than this audit assumed for CI. The restored cache saves the downloads, not the extraction and
+  linking of 1,301 packages.
+- The builder runs **Node 24.18.0**, not the 22 the workflows pin.
+
+The deploy figure is an undercount: that build populated nothing (see §5.6), so 1 m 09 s is the
+upload-and-ship cost with the R2 populate missing entirely.
+
 ### Putting it together
 
 | Stage | Local (4-core) | Notes |
@@ -385,3 +415,52 @@ find .open-next/cache -type f -printf '%s\n' |
 
 # real CI durations: pair the 🏗️/✅ comment timestamps on any recent PR
 ```
+
+---
+
+## 5.6 The bug this work shipped, and how it was caught
+
+The brotli override was written with its own `name`:
+
+```ts
+export const NAME = "ds-brotli-r2-incremental-cache";
+```
+
+which reads like a label and is not one. `populateCache` in `@opennextjs/cloudflare` dispatches on
+it:
+
+```js
+switch (await resolveCacheName(incrementalCache)) {
+  case R2_CACHE_NAME:  await populateR2IncrementalCache(...); break;
+  case KV_CACHE_NAME:  ...
+  default:             logger.info("Incremental cache does not need populating");
+}
+```
+
+and `withRegionalCache` forwards the inner store's name (`this.name = this.store.name`), so that
+switch sees this class's name. A distinct name does not rename the cache — **it silently turns the
+deploy-time populate off.**
+
+Nothing failed. The build was green, the deploy succeeded, and the only trace was one line:
+
+```
+Incremental cache does not need populating
+```
+
+The Worker shipped with an empty incremental cache, which on this deployment 500s the home page and
+every `/courses/*` lesson, because a miss falls through to a re-render that touches `node:fs` in
+workerd. It was caught by a human reading the build log and asking whether that line was expected.
+
+**Fixed** by taking the name from upstream — `export const NAME = R2_CACHE_NAME` — which is also
+the honest description of the class: the same R2 cache, same bucket, same keys, differing only in
+how values are encoded. Verified by rebuilding and watching the line change to `Populating local R2
+incremental cache... Successfully populated cache with 1081 entries`, and pinned by a test that
+asserts the name against the upstream constant so an upstream rename fails in CI rather than in a
+deploy.
+
+**The lesson worth keeping.** The local test suite could not have caught this: it tests the cache's
+*behaviour*, and the behaviour was correct. What broke was a build-tool contract expressed as a
+string match, exercised only by a real deploy. Two things follow — the preview deploy is not
+optional for changes to this path (§5.2 said so about prefetching and it was just as true here),
+and anything that reads "does not need doing" in a build log deserves the same question that caught
+this one.

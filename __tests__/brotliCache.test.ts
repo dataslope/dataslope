@@ -58,7 +58,10 @@ vi.mock("@opennextjs/cloudflare", () => ({
   }),
 }));
 
-const { default: cache } = await import("../lib/cache/brotliR2IncrementalCache");
+const { default: cache, NAME } = await import("../lib/cache/brotliR2IncrementalCache");
+const { NAME: R2_CACHE_NAME } = await import(
+  "@opennextjs/cloudflare/overrides/incremental-cache/r2-incremental-cache"
+);
 
 /** A cache entry shaped like the real ones (see any `.open-next/cache/*.cache`). */
 const entry = {
@@ -101,6 +104,27 @@ describe("brotli cache framing", () => {
 });
 
 describe("BrotliR2IncrementalCache", () => {
+  it("keeps the stock R2 cache's name, or the deploy stops populating", async () => {
+    // This one is not a style assertion. `populateCache` in
+    // @opennextjs/cloudflare switches on the override's name against
+    // R2_CACHE_NAME / KV_CACHE_NAME / STATIC_ASSETS_CACHE_NAME, and its
+    // `default:` branch logs "Incremental cache does not need populating" and
+    // populates nothing. `withRegionalCache` forwards the inner store's name
+    // (`this.name = this.store.name`), so this value is what that switch sees.
+    //
+    // A distinct name therefore does not rename the cache, it turns the
+    // deploy-time populate off — silently. Build green, deploy succeeds, and
+    // the Worker ships with an empty incremental cache, which on this
+    // deployment 500s the home page and every lesson (a miss re-renders, and a
+    // re-render touches node:fs in workerd).
+    //
+    // That shipped once. It is pinned against the upstream constant rather
+    // than a string literal so an upstream rename fails here instead of in a
+    // deploy.
+    expect(NAME).toBe(R2_CACHE_NAME);
+    expect(cache.name).toBe(R2_CACHE_NAME);
+  });
+
   it("reads a brotli-compressed entry", async () => {
     stored = frame(entry);
     const result = await cache.get("/courses/x/y");
