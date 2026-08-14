@@ -53,19 +53,13 @@ export function bareTableSelectSources(
   });
 }
 
-/** Rebuild a (possibly multi-statement) query so the statement at `stmtIndex`
- *  is ordered by its primary key, leaving the other statements verbatim. Used
- *  after an inline cell edit so the edited row keeps its place instead of
- *  jumping to the bottom, Postgres and DuckDB move an updated row to the end of
- *  the heap under MVCC, so an unordered re-fetch surfaces it last.
- *
- *  Only a bare `SELECT * FROM <table>` with no existing ORDER BY *and no
- *  LIMIT/OFFSET* is rewritten: appending `ORDER BY <pk>` then returns the same
- *  rows in a stable order. A LIMIT/OFFSET query is left untouched, ordering it
- *  would change *which* rows the window shows (the chosen rows are arbitrary
- *  without an ORDER BY), so that's left as the engine returns it. The rewrite
- *  stays a bare select (ORDER BY included), so the set is still detected as
- *  editable on re-fetch. */
+/** Rebuild a query so the statement at `stmtIndex` is ordered by its PK,
+ *  leaving other statements verbatim — after an inline edit, Postgres/DuckDB
+ *  move the updated row to the end of the heap (MVCC), so an unordered
+ *  re-fetch surfaces it last. Only a bare select with no ORDER BY *and no
+ *  LIMIT/OFFSET* is rewritten: ordering a LIMIT/OFFSET query would change
+ *  *which* rows the window shows. The rewrite stays a bare select, so the
+ *  set is still detected as editable on re-fetch. */
 export function orderEditedStatementByPk(
   querySql: string,
   stmtIndex: number,
@@ -186,13 +180,9 @@ export function statementAtCursor(
   return chosen;
 }
 
-/** Returns true when `sql` already contains a LIMIT keyword (after
- *  stripping comments and single-quoted string literals). When true, lazy
- *  pagination is skipped: appending another LIMIT would produce invalid SQL.
- *  Single-quoted strings are stripped first so a value like `'No limit'`
- *  does not trigger a false positive.
- *  Pass `noComments` (the result of `stripSqlComments(sql)`) when you have
- *  already stripped comments to avoid redundant work. */
+/** True when `sql` already contains a LIMIT keyword — lazy pagination is
+ *  then skipped (a second LIMIT would be invalid SQL). Single-quoted strings
+ *  are stripped first so `'No limit'` isn't a false positive. */
 export function hasLimitClause(sqlOrNoComments: string): boolean {
   const noStrings = sqlOrNoComments.replace(/'(?:''|[^'])*'/g, "''");
   return /\blimit\b/i.test(noStrings);

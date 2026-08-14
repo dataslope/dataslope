@@ -413,9 +413,7 @@ function PackagesDrawer({
             aria-label="Available packages"
           >
             <Drawer.Content className="pkg-drawer-content">
-              {/* Visible drag handle on mobile (matches the other
-                  bottom-sheet drawers); hidden via CSS on desktop where
-                  the panel slides in from the right and isn't dragged. */}
+              {/* Drag handle, mobile-only (hidden via CSS on desktop). */}
               <div className="mobile-menu-handle" aria-hidden="true" />
               <div className="pkg-drawer-header">
                 <div>
@@ -491,9 +489,8 @@ function PackagesDrawer({
                             type="button"
                             className="pkg-example-btn"
                             onClick={(e) => {
-                              // Stop the click from also triggering the
-                              // outer pkg-item onClick (which would import
-                              // the package as a side-effect).
+                              // Don't also trigger the outer pkg-item
+                              // onClick (which would import the package).
                               e.stopPropagation();
                               onPickPackageExample(p);
                             }}
@@ -518,17 +515,8 @@ function PackagesDrawer({
   );
 }
 
-/* The Examples menu, Export menu, and Info popover are rendered inline
-   at their call-sites using Base UI's Menu and Popover primitives.
-   Those primitives portal to the document body, sidestepping the
-   `overflow:hidden` clipping on `.header-actions` that previously hid
-   the legacy custom dropdowns. */
-
-
-
-/** Merge runs of consecutive `stdout` cells (emitted separately by the
- *  JS/TS/PHP workers, one per console.log call) into a single grouped
- *  cell so the output pane shows one block rather than many. */
+/** Merge consecutive `stdout` cells (one per console.log from the
+ *  JS/TS/PHP workers) into a single grouped cell. */
 function mergeConsecutiveStdout<T extends { type: string; content: string }>(
   cells: T[],
 ): T[] {
@@ -553,10 +541,8 @@ export interface PlaygroundProps {
 }
 
 export default function Playground(props: PlaygroundProps) {
-  // The Toast.Provider needs to be a parent of any component that uses
-  // `Toast.useToastManager()`, so the actual playground body lives in
-  // `PlaygroundInner` while this wrapper just sets up the provider /
-  // viewport.
+  // Toast.Provider must be a parent of anything calling
+  // Toast.useToastManager(), so the body lives in `PlaygroundInner`.
   return (
     <Toast.Provider timeout={2400}>
       <PlaygroundInner {...props} />
@@ -620,25 +606,18 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // ─── UI state ───────────────────────────────────────────────────────────
   const [packagesOpen, setPackagesOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  // Tracks where the settings tab is positioned within the file tab strip
-  // so the user can drag it anywhere. Infinity = append at the end (default).
-  // Resets to Infinity when settings is closed so it starts fresh on re-open.
+  // Settings tab's position in the tab strip (draggable); Infinity = append
+  // at the end. Resets when settings closes.
   const [settingsTabIndex, setSettingsTabIndex] = useState<number>(Infinity);
-  // Mobile consolidated-menu drawer (bottom sheet, so its nested sections
-  // can't be cut off the side of a narrow viewport). Sub-sheet exclusivity
-  // lives inside MobileMenuSheet.
+  // Mobile consolidated-menu drawer (bottom sheet).
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  // Full workspace-manager drawer, opened from the mobile hamburger menu
-  // (the header badge that normally opens it is hidden on mobile).
+  // Workspace-manager drawer, opened from the mobile hamburger menu.
   const [workspaceManagerOpen, setWorkspaceManagerOpen] = useState(false);
-  // Confirm dialog shown when picking an example would discard editor
-  // contents the user has already typed.
+  // Confirm dialog when picking an example would discard typed contents.
   const [pendingExample, setPendingExample] = useState<ExampleSnippet | null>(
     null,
   );
-  // Confirmations for the two destructive actions in the Settings
-  // panel, using a Base UI dialog for both rather than the native
-  // window.confirm so they look consistent with the rest of the UI.
+  // Confirmations for the Settings panel's destructive actions.
   const [confirmRestoreOpen, setConfirmRestoreOpen] = useState(false);
   const [confirmClearStorageOpen, setConfirmClearStorageOpen] =
     useState(false);
@@ -663,10 +642,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const [mobileTab, setMobileTab] = useState<"editor" | "output">(
     MOBILE_EDITOR_TAB,
   );
-  // Use useSyncExternalStore so the macOS detection runs only on the
-  // client without triggering a cascading effect on mount. The server
-  // snapshot returns false (Ctrl Enter) so the kbd hint matches what a
-  // freshly hydrated page sees on Windows/Linux.
+  // useSyncExternalStore so macOS detection runs client-only; the server
+  // snapshot (false → Ctrl Enter) matches the freshly hydrated page.
   const isMac = useSyncExternalStore(
     () => () => {},
     () => detectIsMac(),
@@ -679,15 +656,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     "Initializing runtime…",
   );
   const [loaded, setLoaded] = useState(false);
-  // Latest stage-floor fraction reported by the adapter's boot (null
-  // until one arrives); smoothed below to drive a determinate loading
-  // bar instead of the indeterminate sweep.
+  // Latest stage-floor fraction from the adapter's boot (null until one
+  // arrives); smoothed below for a determinate loading bar.
   const [bootFraction, setBootFraction] = useState<number | null>(null);
-  // Loading-overlay lifecycle (show → fade → unmount) with a minimum
-  // on-screen time, so a warm revisit, where the shared runtime is
-  // already booted and `loaded` flips almost immediately, shows a
-  // deliberate loading screen instead of a one-frame "blink". Cold boots
-  // exceed the floor, so they fade the instant boot finishes.
+  // Overlay lifecycle with a minimum on-screen time so a warm revisit
+  // doesn't blink; cold boots exceed the floor and fade immediately.
   const { mounted: showLoadingOverlay, fading: loadingFading } =
     useBootOverlayVisibility(loaded);
   const [statusState, setStatusState] = useState<
@@ -702,19 +675,16 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     statusStateRef.current = statusState;
   }, [statusState]);
 
-  // Smoothed boot fraction for the loading overlay's bar: determinate
-  // once the adapter reports stage fractions, indeterminate sweep
-  // otherwise. Inactive after load / on error so the next boot (e.g.
-  // adapter switch remount) starts clean.
+  // Smoothed boot fraction for the overlay's bar; inactive after load / on
+  // error so the next boot starts clean.
   const bootDisplayFraction = useCreepingBootFraction(
     bootFraction,
     !loaded && statusState === "loading",
   );
 
   // ─── Per-adapter playground store ───────────────────────────────────────
-  // Workspaces, files (tabs), per-file dirty buffers and per-file output
-  // history all live in a Zustand store keyed by adapter id so the state
-  // survives navigation between unrelated UI surfaces.
+  // Workspaces, files, dirty buffers and output history live in a Zustand
+  // store keyed by adapter id so state survives navigation.
   const useStore = getPlaygroundStore(adapter.id);
   const workspaceId = useStore((s) => s.workspaceId);
   const workspaceName = useStore((s) => s.workspaceName);

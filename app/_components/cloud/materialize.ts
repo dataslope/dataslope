@@ -1,17 +1,10 @@
 "use client";
 
 /**
- * Turning a downloaded bundle back into a live playground.
- *
- * Code playgrounds materialize into a real local workspace (OPFS files +
- * localStorage manifest) *before* navigation, so the playground boots it like
- * any other workspace, no playground code involvement at all.
- *
- * SQL playgrounds can't be materialized from the outside: their state lives
- * in the engine (rebuilt by replaying the bundle's SQL dump) and in
- * per-database tab storage. For those we stash a tiny **pending-bundle ref**
- * in sessionStorage and navigate; the playground applies it after its engine
- * boots (fetching the bundle again by reference keeps the marker small,
+ * Turns a downloaded bundle back into a live playground. Code bundles
+ * materialize into a real local workspace before navigation; SQL state lives
+ * in the engine, so those stash a tiny pending-bundle ref in sessionStorage
+ * and the playground applies it after boot (re-fetching by reference —
  * sessionStorage can't hold a multi-MB dump).
  */
 
@@ -68,9 +61,8 @@ export async function materializeCodeWorkspace(
 
   const active =
     files.find((f) => f.filename === bundle.activeFilename) ?? files[0];
-  // Reopen the tab strip the bundle recorded. An older bundle has no such
-  // list, and `loadManifest` reads that as "open everything", which is what
-  // materializing has always done.
+  // Reopen the recorded tab strip; an older bundle has none and `loadManifest`
+  // reads that as "open everything".
   const openTabIds = bundle.openFilenames
     ?.map((filename) => files.find((f) => f.filename === filename)?.id)
     .filter((id): id is string => !!id);
@@ -143,9 +135,8 @@ export async function fetchBundleByRef(
     : fetchCloudWorkspaceBundle(ref.id);
 }
 
-/** Bundle tab seeds → the shape the SQL playgrounds' tab storage expects.
- *  `kind` rides along so a table tab reopens as a table tab (rows, no editor
- *  pane) rather than degrading to a plain query tab holding its SELECT. */
+/** Bundle tab seeds → the SQL playgrounds' tab-storage shape. `kind` rides
+ *  along so a table tab reopens as a table tab, not a plain query tab. */
 export function bundleTabSeeds(
   bundle: WorkspaceBundle,
 ): { title: string; code: string; kind?: "view-data" }[] {
@@ -154,8 +145,7 @@ export function bundleTabSeeds(
     return tabs.map((t) => ({
       title: t.title || "Query",
       code: t.code,
-      // Normalized rather than passed through: the header is whatever the
-      // writing client put there, and only this one kind is carried.
+      // Normalized, not passed through: only this one kind is carried.
       ...(t.kind === "view-data" ? { kind: "view-data" as const } : {}),
     }));
   }

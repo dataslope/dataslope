@@ -1,50 +1,22 @@
 name: Precompiled React bundles
 
 # Compiles every `<CodeBlock adapter="react">` into the ES module its preview
-# renders (`scripts/build-react-bundles.mjs`), and commits the result.
+# renders (scripts/build-react-bundles.mjs) and commits the result. Doing the
+# TSX translation in the reader's browser would cost a ~3 MB esbuild-wasm
+# download per visitor; instead deploys and `dev` just read the committed
+# manifest, and this workflow only compiles changed blocks (entries are keyed
+# by content hash, lib/blockOutputKey.ts, checked against the committed
+# manifest — a local cache stamp wouldn't survive `npm ci`). Bare imports are
+# rewritten to pinned esm.sh URLs and marked external, so bundles stay tiny.
 #
-# ── Why this is a workflow and not part of the deploy ──────────────────────
+# The version pin is load-bearing: the generator asserts the `esbuild-wasm`
+# devDependency matches ESBUILD_WASM_VERSION in app/_components/runtime/cdn.ts
+# (what the browser worker loads) and exits non-zero on mismatch — a
+# different esbuild is a different bundle. Bump both together or not at all.
 #
-# The same reasoning as block-outputs.yml, one order of magnitude down. `web`
-# blocks render themselves for free — composing their document is a pure
-# string operation, about 8µs each — so nothing about them needs a job.
-# `react` cannot: TSX has to be translated before a browser will take it, and
-# doing that in the reader's browser means a ~3 MB esbuild-wasm download paid
-# by anyone who scrolls past a lesson.
-#
-# So the translation happens here, the bundles are committed, and:
-#
-#   • a deploy reads the committed manifest and bundles nothing;
-#   • `dev` likewise — no esbuild, no wasm, no CDN;
-#   • this workflow only compiles the blocks that actually changed, because
-#     entries are keyed by a content hash of the block (lib/blockOutputKey.ts)
-#     and reuse is checked against the committed manifest rather than a local
-#     cache stamp, which would not survive `npm ci` on a runner.
-#
-# The bundles are small — every bare import is rewritten to a pinned esm.sh
-# URL and marked external, so a bundle carries the block's own code and
-# nothing else. All 25 together are ~73 kB, and the reader's browser fetches
-# React itself once and caches it across the course.
-#
-# ── The version pin is load-bearing ───────────────────────────────────────
-#
-# The generator asserts that the `esbuild-wasm` devDependency matches
-# `ESBUILD_WASM_VERSION` in `app/_components/runtime/cdn.ts` — the version the
-# browser worker loads from jsDelivr — and exits non-zero if they disagree. A
-# different esbuild is a different bundle, and the reader would see this one
-# in the preview and produce the other one by pressing Run. Bump both together
-# or not at all.
-#
-# ── What a pull request sees ──────────────────────────────────────────────
-#
-# A block that already existed: its committed bundle, same as production. A
-# block the PR adds or edits: the empty preview panel react blocks showed
-# before this existed, until this workflow regenerates after the merge.
-# Pressing Run is unaffected either way — that path still bundles in the
-# browser, and always will, because the reader can edit the code.
-#
-# Deliberately does not run on pull requests: it would mean a bot commit on
-# every content branch.
+# A PR's new/edited block shows the empty preview panel until this regenerates
+# after merge; pressing Run still bundles in the browser either way.
+# Deliberately not run on PRs — that would mean a bot commit on every branch.
 
 on:
   push:
@@ -78,15 +50,12 @@ permissions:
 jobs:
   regenerate:
     runs-on: ubuntu-latest
-    # 25 workspaces of a few kB each. The timeout is for a cold `--force`
-    # run plus the wasm instantiation, not for the bundling itself.
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
         with:
-          # The commit this job pushes must not re-trigger the workflow; a
-          # push made with the default GITHUB_TOKEN does not fire `push`
-          # events, which is exactly the behaviour wanted here.
+          # Pushes made with the default GITHUB_TOKEN don't fire `push`
+          # events, so this job's commit can't re-trigger the workflow.
           persist-credentials: true
 
       - uses: actions/setup-node@v7
@@ -94,8 +63,8 @@ jobs:
           node-version: "22"
           cache: npm
 
-      # `--ignore-scripts` skips the postinstall codegen: this job needs the
-      # dependencies, not a second pass over 900 lessons.
+      # `--ignore-scripts` skips the postinstall codegen; this job needs the
+      # dependencies only.
       - name: Install dependencies
         run: npm ci --ignore-scripts
 

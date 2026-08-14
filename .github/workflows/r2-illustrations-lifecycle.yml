@@ -178,8 +178,7 @@ jobs:
           fi
 
           # Read back rather than trusting the write: a silently-empty policy
-          # would mean candidates accumulate forever, which is the one failure
-          # this job exists to prevent and the one that shows no symptom.
+          # means candidates accumulate forever, with no symptom.
           echo "---"
           echo "Applied. Current configuration:"
           if ! applied="$(aws s3api get-bucket-lifecycle-configuration --bucket "$BUCKET" 2>&1)"; then

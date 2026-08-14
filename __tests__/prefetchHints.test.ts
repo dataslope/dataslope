@@ -1,12 +1,8 @@
-// Pins the build guard against the prefetch request storm of 2026-08-06.
-//
-// The guard (scripts/check-prefetch-hints.mjs) greps prerendered payloads for
-// PrefetchHint.InliningHintsStale, whose value it hardcodes — Next's flight
-// format is internal, so both the bit value and the two textual shapes the
-// guard matches are asserted here against Next's own shipped code. If an
-// upstream bump renumbers the enum or reshapes the payload, these tests fail
-// loudly instead of the guard quietly checking the wrong thing while a
-// poisoned build sails through green.
+// Pins the build guard against a prefetch request storm: the guard
+// (scripts/check-prefetch-hints.mjs) greps prerendered payloads for
+// PrefetchHint.InliningHintsStale, whose value it hardcodes. Next's flight
+// format is internal, so the bit value and payload shapes are asserted here
+// against Next's shipped code — an upstream renumbering fails loudly.
 import { describe, expect, it } from "vitest";
 
 // @ts-expect-error -- internal Next module, no types exported
