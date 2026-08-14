@@ -24,6 +24,7 @@
 import {
   createWorkspace,
   getWorkspaceRegistry,
+  isWorkspaceLockHeld,
   openWorkspace,
   registerWorkspace,
   workspaceExistsInOpfs,
@@ -38,6 +39,15 @@ const SESSION_KEY_PREFIX = "playground_active_ws_";
 // id) so a reload in the same tab restores the same draft instead of spawning
 // a new one.
 const DRAFT_KEY_PREFIX = "playground_draft_ws_";
+// Durable (localStorage) mirror of the two above: the workspace this device
+// last opened for a playground, and, when that workspace is an unsaved draft,
+// its entry. Sessions end — the browser closes, or the user opens the
+// playground in a new tab — and sessionStorage goes with them, which used to
+// mean a brand-new draft every time: a member's saved workspace was left
+// unselected, and a guest's unsaved database stayed in OPFS with nothing in
+// the UI pointing at it. See `resumeLastWorkspace`.
+const LAST_KEY_PREFIX = "playground_last_ws_";
+const LAST_DRAFT_KEY_PREFIX = "playground_last_draft_ws_";
 
 /** An active workspace plus whether it is a saved (registry) workspace or a
  *  still-unsaved draft. */
@@ -51,6 +61,69 @@ const DEFAULT_NAMES: Record<string, string> = {
 
 function sessionKey(playgroundId: string): string {
   return `${SESSION_KEY_PREFIX}${playgroundId}`;
+}
+
+function lastKey(playgroundId: string): string {
+  return `${LAST_KEY_PREFIX}${playgroundId}`;
+}
+
+function lastDraftKey(playgroundId: string): string {
+  return `${LAST_DRAFT_KEY_PREFIX}${playgroundId}`;
+}
+
+/** Records the workspace this device last opened for a playground. */
+function rememberLastWorkspaceId(
+  playgroundId: string,
+  workspaceId: string,
+): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(lastKey(playgroundId), workspaceId);
+  } catch {
+    /* quota / private mode: resume just won't happen. */
+  }
+}
+
+function readLastWorkspaceId(playgroundId: string): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.localStorage.getItem(lastKey(playgroundId));
+  } catch {
+    return null;
+  }
+}
+
+/** Durable copy of the per-tab draft entry, for the same reason the per-tab
+ *  one exists: a draft isn't in the registry, so its name and creation time
+ *  have nowhere else to live. */
+function rememberLastDraft(playgroundId: string, entry: WorkspaceEntry): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(lastDraftKey(playgroundId), JSON.stringify(entry));
+  } catch {
+    /* ignore */
+  }
+}
+
+function readLastDraft(playgroundId: string): WorkspaceEntry | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(lastDraftKey(playgroundId));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as WorkspaceEntry;
+    return parsed && typeof parsed.id === "string" ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function clearLastDraft(playgroundId: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(lastDraftKey(playgroundId));
+  } catch {
+    /* ignore */
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -106,8 +179,22 @@ export function getActiveWorkspaceId(playgroundId: string): string | null {
   }
 }
 
+/**
+ * The workspace `ensureActiveWorkspace` will resolve to, as far as can be told
+ * synchronously: this tab's pointer, else the one this device last opened.
+ *
+ * For callers that need a workspace id before the async bootstrap has run, and
+ * can correct themselves afterwards if it lands elsewhere (see
+ * `createTabScope`). Returns null when there is nothing to resume, in which
+ * case the bootstrap will create a workspace.
+ */
+export function peekActiveWorkspaceId(playgroundId: string): string | null {
+  return getActiveWorkspaceId(playgroundId) ?? readLastWorkspaceId(playgroundId);
+}
+
 /** Persists the active workspace ID for the given playground into
- *  `sessionStorage`. Silently no-ops outside the browser. */
+ *  `sessionStorage`, and durably into `localStorage` so the next session can
+ *  resume it. Silently no-ops outside the browser. */
 export function setActiveWorkspaceId(
   playgroundId: string,
   workspaceId: string,
@@ -118,6 +205,7 @@ export function setActiveWorkspaceId(
   } catch {
     /* sessionStorage may be unavailable (private mode); ignore. */
   }
+  rememberLastWorkspaceId(playgroundId, workspaceId);
 }
 
 /**
@@ -162,6 +250,7 @@ function setDraftWorkspace(playgroundId: string, entry: WorkspaceEntry): void {
   } catch {
     /* sessionStorage unavailable (private mode); ignore. */
   }
+  rememberLastDraft(playgroundId, entry);
 }
 
 function clearDraftWorkspace(playgroundId: string): void {
@@ -171,6 +260,9 @@ function clearDraftWorkspace(playgroundId: string): void {
   } catch {
     /* ignore */
   }
+  // The workspace is in the registry now, which is where a later resume will
+  // find it; a stale draft copy could only contradict it.
+  clearLastDraft(playgroundId);
 }
 
 // ---------------------------------------------------------------------------
@@ -347,6 +439,52 @@ async function consumeResumeStash(
 }
 
 /**
+ * Re-adopt the workspace this device last opened for the playground, when this
+ * tab has no pointer of its own (a new tab, or a session that ended with the
+ * browser). Returns null when there's nothing to resume, in which case the
+ * caller starts a fresh draft as before.
+ *
+ * Deliberately declines when another tab currently holds the workspace: two
+ * live tabs on one OPFS-backed workspace deadlock PGlite's exclusive access
+ * handle, which is why `acquireWorkspaceLock` exists. Handing the second tab
+ * its own draft is both what it got before this resume existed and better than
+ * sending it to the conflict overlay.
+ */
+async function resumeLastWorkspace(
+  playgroundId: string,
+): Promise<ActiveWorkspace | null> {
+  const lastId = readLastWorkspaceId(playgroundId);
+  if (!lastId) return null;
+  if (await isWorkspaceLockHeld(lastId)) return null;
+
+  const saved = getWorkspaceRegistry().find(
+    (e) => e.id === lastId && e.playground === playgroundId,
+  );
+  if (saved) {
+    setActiveWorkspaceId(playgroundId, saved.id);
+    const opened = await openWorkspace(saved.id);
+    return { ...(opened ?? saved), saved: true };
+  }
+
+  // An unsaved draft: resumable only while its OPFS content is still there,
+  // which is the whole point (that's where an un-saved guest's work lives).
+  // A deleted or never-created workspace falls through to a fresh draft.
+  const draft = readLastDraft(playgroundId);
+  if (
+    draft &&
+    draft.id === lastId &&
+    draft.playground === playgroundId &&
+    (await workspaceExistsInOpfs(lastId))
+  ) {
+    const entry: WorkspaceEntry = { ...draft, lastUsedAt: Date.now() };
+    setActiveWorkspaceId(playgroundId, entry.id);
+    setDraftWorkspace(playgroundId, entry);
+    return { ...entry, saved: false };
+  }
+  return null;
+}
+
+/**
  * Resolve (or create) the active workspace for a playground.
  *
  * Returns the full entry plus a `saved` flag: `true` for a workspace in the
@@ -381,6 +519,10 @@ export async function ensureActiveWorkspace(
     }
     // Stale session pointer, fall through to create a fresh draft.
   }
+
+  // No usable per-tab pointer: pick up where this device left off.
+  const last = await resumeLastWorkspace(playgroundId);
+  if (last) return last;
 
   const defaultName = DEFAULT_NAMES[playgroundId] ?? `Default ${playgroundId}`;
   // Create the default as a draft: OPFS-backed (so edits persist for the

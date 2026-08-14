@@ -5,9 +5,45 @@ import "@/app/tailwind.css";
 import "@/app/home.css";
 import Link from "next/link";
 
+import { GraduationCap, House, SquareTerminal } from "lucide-react";
+
+import imageManifest from "@/lib/generated/images";
 import { HomeNav } from "@/app/_components/home/HomeNav";
 import { HomeFooter } from "@/app/_components/home/HomeFooter";
 import { THEME_BOOTSTRAP } from "@/app/_components/home/themeBootstrap";
+
+/** The chipmunk that shares the band with the number, authored through the
+ *  same pipeline as the course art (`data/illustration-prompts.json`) and
+ *  promoted into `public/images/`. Every surface asks for the `-cutout` slug. */
+const ART_SLUG = "error-404-cutout";
+
+/** Renders nothing when the slug has no manifest entry, so a tree without the
+ *  promoted asset shows the page without art rather than a broken image.
+ *
+ *  Positioned out of flow so it can lap over the number. Note the cutout is
+ *  640x417 but its opaque pixels are only 365x401, centred — 21.6% of the
+ *  width is transparent on each side, so where the box lands and where the
+ *  chipmunk looks like it lands are ~65px apart at full size. The nudges are
+ *  therefore transforms, which resolve against the element's own box and so
+ *  hold that inset at a constant fraction however the art is sized; the
+ *  padding also being symmetric is what lets `left-1/2` centre the visible
+ *  art and not merely the box. */
+function NotFoundArt() {
+  const entry = imageManifest[ART_SLUG];
+  if (!entry) return null;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={`/images/${ART_SLUG}.${entry.formats[entry.formats.length - 1]}`}
+      width={entry.width}
+      height={entry.height}
+      alt=""
+      aria-hidden="true"
+      decoding="async"
+      className="absolute bottom-0 left-1/2 w-[clamp(8rem,44vw,260px)] -translate-x-1/2 translate-y-[32%] md:left-auto md:right-0 md:w-[300px] md:translate-x-[70%] md:translate-y-[14%]"
+    />
+  );
+}
 
 export default function NotFound() {
   return (
@@ -21,13 +57,39 @@ export default function NotFound() {
         <main className="overflow-x-clip">
           <section className="px-4 pb-20 pt-12 sm:px-6 sm:pt-16">
             <div className="mx-auto max-w-2xl">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--ds-green-600)] dark:text-[var(--ds-green-400)]">
-                404
-              </p>
-              <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-4xl dark:text-white">
-                We couldn&apos;t find that page
+              {/* The number and the chipmunk read as one object rather than
+                  two aligned ones, and the two viewports want opposite
+                  compositions: wide enough for the art to sit beside the
+                  number, it laps the bottom-right of the last 4; too narrow
+                  for that, it drops onto the number's own centre instead of
+                  squeezing the digits. That is a real change of arrangement,
+                  not a size tweak, so it switches at `md` rather than
+                  interpolating.
+
+                  The outer box buys back the overhang the out-of-flow art no
+                  longer contributes, as padding rather than a margin: a margin
+                  would collapse with the heading's `mt-6` and the two would
+                  share the larger of them instead of stacking, leaving the
+                  disc resting on the heading. The inner box carries no
+                  padding of its own, so `bottom-0` stays pinned to the digits;
+                  `w-fit` shrink-wraps it to them, which is what makes the
+                  art's offsets read against the number rather than against the
+                  column. */}
+              <div className="pb-[clamp(26px,9.2vw,62px)] md:pb-7">
+                <div className="relative w-fit">
+                  <p className="select-none text-[clamp(2.5rem,45vw,260px)] font-black leading-[0.85] tracking-[-0.049em] text-neutral-200 dark:text-neutral-700">
+                    404
+                  </p>
+                  <NotFoundArt />
+                </div>
+              </div>
+              <h1 className="mt-6 text-3xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-4xl dark:text-white">
+                No page here.
+                {/* Two lines on phones, where the sentence would otherwise
+                    break after "Just" and orphan the payoff word. */}
+                <br className="sm:hidden" /> Just acorns.
               </h1>
-              <p className="mt-4 text-sm leading-relaxed text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+              <p className="mt-4 text-base leading-relaxed text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
                 The address may be mistyped, or the page may have moved.
                 Everything on DataSlope is reachable from the courses catalog
                 and the playgrounds below.
@@ -35,20 +97,25 @@ export default function NotFound() {
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href="/courses"
-                  className="inline-flex items-center rounded-lg bg-[var(--ds-green-600)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--ds-green-700)]"
+                  className="inline-flex items-center gap-2 rounded-lg bg-[var(--ds-green-600)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--ds-green-700)]"
                 >
+                  {/* The icons the home page already uses for these three
+                      destinations, so the same journey looks the same here. */}
+                  <GraduationCap size={16} aria-hidden="true" />
                   Browse courses
                 </Link>
                 <Link
                   href="/playground"
-                  className="inline-flex items-center rounded-lg border border-[var(--ds-gray-200)] px-4 py-2 text-sm font-semibold text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-50)] dark:border-white/10 dark:text-[var(--ds-gray-200)] dark:hover:bg-white/5"
+                  className="inline-flex items-center gap-2 rounded-lg border border-[var(--ds-gray-200)] px-4 py-2 text-sm font-semibold text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-50)] dark:border-white/10 dark:text-[var(--ds-gray-200)] dark:hover:bg-white/5"
                 >
+                  <SquareTerminal size={16} aria-hidden="true" />
                   Open a playground
                 </Link>
                 <Link
                   href="/"
-                  className="inline-flex items-center rounded-lg border border-[var(--ds-gray-200)] px-4 py-2 text-sm font-semibold text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-50)] dark:border-white/10 dark:text-[var(--ds-gray-200)] dark:hover:bg-white/5"
+                  className="inline-flex items-center gap-2 rounded-lg border border-[var(--ds-gray-200)] px-4 py-2 text-sm font-semibold text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-50)] dark:border-white/10 dark:text-[var(--ds-gray-200)] dark:hover:bg-white/5"
                 >
+                  <House size={16} aria-hidden="true" />
                   Home
                 </Link>
               </div>

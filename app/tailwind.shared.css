@@ -58,6 +58,13 @@
    which is otherwise unscanned, so list them explicitly. */
 @source "./_components/SegmentError.tsx";
 @source "./_components/SegmentLoading.tsx";
+/* The site-wide 404. It sits at the app root, which no glob above covers, so
+   until it was listed here it rendered correctly only by coincidence: every
+   class it uses also appears in some scanned file, and the first one that
+   didn't (`max-w-[320px]`, sizing the illustration) was silently dropped and
+   the image drew at its intrinsic width. `app/page.tsx` and `app/error.tsx`
+   sit at the same root and carry the same exposure. */
+@source "./not-found.tsx";
 /* The header's account control lives here; without this glob its Tailwind
    classes (e.g. the avatar's `size-*`) are never generated, so the avatar
    image falls back to its intrinsic ~96px size. */

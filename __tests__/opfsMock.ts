@@ -2,9 +2,9 @@
  * In-memory OPFS mock for unit tests.
  *
  * Simulates the async FileSystem Access API surface used by the OPFS modules:
- *  - FileSystemDirectoryHandle  (getDirectoryHandle, getFileHandle,
+ *  - FileSystemDirectoryHandle  (kind, getDirectoryHandle, getFileHandle,
  *                                removeEntry, asyncIterator)
- *  - FileSystemFileHandle       (getFile, createWritable)
+ *  - FileSystemFileHandle       (kind, getFile, createWritable)
  *  - FileSystemWritableFileStream (write, close)
  *  - File                       (text, arrayBuffer)
  *
@@ -75,6 +75,10 @@ function makeFile(mockFile: MockFile): object {
 
 function makeFileHandle(mockFile: MockFile): object {
   return {
+    // `kind` is part of the real FileSystemHandle interface, and callers
+    // branch on it to tell a file from a directory while walking a tree
+    // (see `copyDirectoryHandle`), so the mock has to carry it too.
+    kind: "file" as const,
     async getFile() {
       return makeFile(mockFile);
     },
@@ -90,6 +94,7 @@ function makeFileHandle(mockFile: MockFile): object {
 
 function makeDirHandle(dir: MockDir): object {
   const handle: object = {
+    kind: "directory" as const,
     async getDirectoryHandle(
       name: string,
       options?: { create?: boolean },

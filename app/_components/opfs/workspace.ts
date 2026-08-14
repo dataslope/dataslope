@@ -333,8 +333,13 @@ export async function duplicateWorkspace(
   sourceId: string,
   newName: string,
 ): Promise<WorkspaceEntry | null> {
-  const registry = getWorkspaceRegistry();
-  const source = registry.find((e) => e.id === sourceId);
+  // The source may be an unsaved draft, which is by definition absent from the
+  // registry, so fall back to its own metadata on disk. That is the case the
+  // "open a copy" conflict action hits most: the workspace another tab is
+  // holding is usually the auto-created default.
+  const source =
+    getWorkspaceRegistry().find((e) => e.id === sourceId) ??
+    (await readOpfsWorkspaceMeta(sourceId));
   if (!source) return null;
 
   const created = await createWorkspace(newName, source.playground);
@@ -356,6 +361,118 @@ export async function duplicateWorkspace(
   }
 
   return created;
+}
+
+/** What OPFS itself knows about a workspace directory, independent of the
+ *  localStorage registry. */
+export interface OpfsWorkspace {
+  id: string;
+  name: string;
+  playground: string;
+  createdAt: number;
+  /** True when `files/` or `db/` holds anything at all. False marks an empty
+   *  shell: a directory created for a workspace that never got as far as
+   *  storing a byte, which is the only thing safe to delete unprompted. */
+  hasContent: boolean;
+}
+
+/**
+ * Every workspace directory OPFS holds, read from its own `meta.json` rather
+ * than from the registry, so unregistered drafts are included. Directories
+ * whose metadata can't be read are skipped: an unidentifiable workspace is
+ * not one to make decisions about.
+ *
+ * Returns an empty list when OPFS is unavailable.
+ */
+export async function listOpfsWorkspaces(): Promise<OpfsWorkspace[]> {
+  if (!isOpfsSupported()) return [];
+  type IterableDir = AsyncIterable<[string, FileSystemHandle]>;
+  const out: OpfsWorkspace[] = [];
+  try {
+    const wsDir = await getWorkspacesDir();
+    const ids: string[] = [];
+    for await (const [name] of wsDir as unknown as IterableDir) ids.push(name);
+    for (const id of ids) {
+      try {
+        const dir = await wsDir.getDirectoryHandle(id, { create: false });
+        const metaFh = await dir.getFileHandle("meta.json", { create: false });
+        const parsed = JSON.parse(await (await metaFh.getFile()).text()) as
+          | WorkspaceMeta
+          | undefined;
+        if (
+          !parsed ||
+          typeof parsed.name !== "string" ||
+          typeof parsed.playground !== "string"
+        ) {
+          continue;
+        }
+        out.push({
+          id,
+          name: parsed.name,
+          playground: parsed.playground,
+          createdAt:
+            typeof parsed.createdAt === "number" ? parsed.createdAt : 0,
+          hasContent: await directoryHasContent(dir),
+        });
+      } catch {
+        // Not a workspace directory, or its metadata is unreadable.
+      }
+    }
+  } catch {
+    return out;
+  }
+  return out;
+}
+
+/**
+ * A workspace's own `meta.json`, for the ones the registry doesn't know about
+ * (an unsaved draft). Returns null when OPFS is unavailable, the directory is
+ * missing, or the metadata is unreadable.
+ */
+export async function readOpfsWorkspaceMeta(
+  id: string,
+): Promise<{ name: string; playground: string; createdAt: number } | null> {
+  if (!isOpfsSupported()) return null;
+  try {
+    const dir = await getWorkspaceDir(id, false);
+    const metaFh = await dir.getFileHandle("meta.json", { create: false });
+    const parsed = JSON.parse(await (await metaFh.getFile()).text()) as
+      | WorkspaceMeta
+      | undefined;
+    if (
+      !parsed ||
+      typeof parsed.name !== "string" ||
+      typeof parsed.playground !== "string"
+    ) {
+      return null;
+    }
+    return {
+      name: parsed.name,
+      playground: parsed.playground,
+      createdAt: typeof parsed.createdAt === "number" ? parsed.createdAt : 0,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/** True when either payload subdirectory holds at least one entry. */
+async function directoryHasContent(
+  dir: FileSystemDirectoryHandle,
+): Promise<boolean> {
+  type IterableDir = AsyncIterable<[string, FileSystemHandle]>;
+  for (const sub of ["files", "db"]) {
+    try {
+      const child = await dir.getDirectoryHandle(sub, { create: false });
+      for await (const _entry of child as unknown as IterableDir) {
+        void _entry;
+        return true;
+      }
+    } catch {
+      // Subdirectory absent, which counts as empty.
+    }
+  }
+  return false;
 }
 
 /** Recursively copies the contents of `src` into `dst`. Skips `meta.json`
@@ -393,6 +510,40 @@ interface LockManager {
     options: { mode?: "exclusive" | "shared"; signal?: AbortSignal },
     callback: (lock: unknown) => Promise<unknown> | unknown,
   ) => Promise<unknown>;
+  /** Optional: absent in older browsers that still have `request`. */
+  query?: () => Promise<{ held?: { name?: string }[] }>;
+}
+
+function workspaceLockName(workspaceId: string): string {
+  return `playground_workspace_${workspaceId}`;
+}
+
+/**
+ * Whether some live context in this origin currently holds `workspaceId`'s
+ * lock, i.e. another tab has this workspace open.
+ *
+ * A read-only probe, unlike {@link acquireWorkspaceLock} it never queues for
+ * the lock and never takes it, so it is safe to call before deciding *which*
+ * workspace to open. Best-effort by design: it reports `false` when the Web
+ * Locks API (or its `query` method) is unavailable, and callers treat that as
+ * "go ahead", leaving `acquireWorkspaceLock` as the real enforcement.
+ *
+ * Note this sees locks held by *this* document too. Call it only from a
+ * context that hasn't acquired one yet.
+ */
+export async function isWorkspaceLockHeld(
+  workspaceId: string,
+): Promise<boolean> {
+  if (!hasWebLocks()) return false;
+  const locks = (navigator as unknown as { locks: LockManager }).locks;
+  if (typeof locks.query !== "function") return false;
+  try {
+    const state = await locks.query();
+    const name = workspaceLockName(workspaceId);
+    return (state.held ?? []).some((lock) => lock.name === name);
+  } catch {
+    return false;
+  }
 }
 
 /** Options for {@link acquireWorkspaceLock}. */
@@ -440,7 +591,7 @@ export async function acquireWorkspaceLock(
   if (releaseSignal?.aborted) return false;
 
   const locks = (navigator as unknown as { locks: LockManager }).locks;
-  const lockName = `playground_workspace_${workspaceId}`;
+  const lockName = workspaceLockName(workspaceId);
 
   return new Promise<boolean>((resolve) => {
     // The *wait* is aborted when the grace window elapses or the caller

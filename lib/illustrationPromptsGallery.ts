@@ -33,7 +33,8 @@ export type Collection =
   | "home"
   | "auth"
   | "pricing"
-  | "playground";
+  | "playground"
+  | "error";
 const URL_BASE: Record<Collection, string> = {
   courses: "/courses",
   interview: "/interview-prep",
@@ -41,6 +42,9 @@ const URL_BASE: Record<Collection, string> = {
   auth: "/sign-in",
   pricing: "/pricing",
   playground: "/playground",
+  // Any unmatched path renders the 404, so this both names the surface and
+  // demonstrates it.
+  error: "/404",
 };
 
 /** Collections that are one page, with nothing addressable beneath them. */
@@ -49,6 +53,7 @@ const SINGLE_PAGE: ReadonlySet<Collection> = new Set<Collection>([
   "auth",
   "pricing",
   "playground",
+  "error",
 ]);
 
 /** Asset categories, in the order they are shown on the gallery page. */
@@ -64,7 +69,12 @@ export type Category =
   | "home-icon"
   | "pricing-plan"
   | "playground-hero"
-  | "auth-globe-pin";
+  /** A small mark painted into the playground chrome (square, and rendered at
+   *  ~88 CSS px), rather than a band across the top of the index page. */
+  | "playground-mark"
+  | "auth-globe-pin"
+  /** Art on a status page (today: the site-wide 404). */
+  | "error-illustration";
 
 const CATEGORY_LABEL: Record<Category, string> = {
   "course-thumbnail": "Course thumbnails",
@@ -75,7 +85,9 @@ const CATEGORY_LABEL: Record<Category, string> = {
   "home-icon": "Home page bento icons",
   "pricing-plan": "Pricing plan icons",
   "playground-hero": "Playground hero band",
+  "playground-mark": "Playground chrome marks",
   "auth-globe-pin": "Auth globe pins",
+  "error-illustration": "Status page illustrations",
 };
 
 const CATEGORY_ORDER: Category[] = [
@@ -87,7 +99,9 @@ const CATEGORY_ORDER: Category[] = [
   "home-icon",
   "pricing-plan",
   "playground-hero",
+  "playground-mark",
   "auth-globe-pin",
+  "error-illustration",
 ];
 
 /** One raw prompt definition, as authored in the JSON. */

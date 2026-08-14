@@ -101,6 +101,7 @@ import {
   switchActiveWorkspace,
 } from "../opfs/activeWorkspace";
 import { acquireWorkspaceLock, createWorkspace } from "../opfs/workspace";
+import { copyConflictedWorkspace } from "../opfs/copyConflictedWorkspace";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
 import { ShareControls } from "../cloud/ShareControls";
 import {
@@ -120,7 +121,10 @@ import {
   fetchBundleByRef,
   takePendingBundleRef,
 } from "../cloud/materialize";
-import type { WorkspaceBundle } from "@/lib/workspaces/types";
+import {
+  sqlTabsForBundle,
+  type BuildBundle,
+} from "@/lib/workspaces/types";
 import { MobileMenuAction, MobileMenuLabel } from "../MobileMenuSheet";
 import {
   type ColumnConstraintInfo,
@@ -157,6 +161,7 @@ import { useTabStore } from "./stores/useTabStore";
 import { useDialogStore } from "./stores/useDialogStore";
 import { useQueryRunner } from "./hooks/useQueryRunner";
 import { useTabManagement } from "./hooks/useTabManagement";
+import { useViewDataTabAutoRun } from "./hooks/useViewDataTabAutoRun";
 import { pushTabHistory } from "./utils/tabUtils";
 import {
   ensurePersistUnloadFlush,
@@ -181,13 +186,17 @@ import {
 } from "./components/DatabaseSelector";
 import { SqlIconSidebar } from "./components/SqlIconSidebar";
 import {
+  copyTabWorkspaceKeys,
   dbScopedKey,
   loadActiveTabId,
   loadTabs,
   saveTabs,
+  setTabWorkspaceScope,
   storageKey,
   type QueryTab,
 } from "../sqlitePlaygroundTabs";
+import { tabsForAdoptedScope } from "./shared/tabScope";
+import { readQueryLog, restoreQueryLog } from "./utils/queryLogBundle";
 import { themeFor } from "../cmExtensions";
 
 const PLAYGROUND_ID = sqliteAdapter.playgroundId;
@@ -601,6 +610,45 @@ function SqlPlaygroundInner() {
   // True when this workspace is already open (locked) in another tab, so
   // the shell shows a conflict overlay instead of deadlocking on boot.
   const [workspaceConflict, setWorkspaceConflict] = useState(false);
+  // The workspace that conflict was over, so the overlay can offer a copy of
+  // it. A ref because the boot effect records it and only the overlay's
+  // handlers read it, no render depends on the value.
+  const conflictWorkspaceRef = useRef<{ id: string; name: string } | null>(null);
+  const [conflictCopyBusy, setConflictCopyBusy] = useState(false);
+  const [conflictCopyError, setConflictCopyError] = useState<string | null>(
+    null,
+  );
+  // From the conflict overlay: duplicate the workspace another tab is holding
+  // and switch to the duplicate, which is the only action here that keeps the
+  // data the user came for. `copyConflictedWorkspace` reloads on success, so
+  // reaching the end of this callback means it failed.
+  const handleConflictOpenCopy = useCallback(() => {
+    const source = conflictWorkspaceRef.current;
+    if (!source) return;
+    setConflictCopyBusy(true);
+    setConflictCopyError(null);
+    void (async () => {
+      try {
+        const copy = await copyConflictedWorkspace({
+          playgroundId: PLAYGROUND_ID,
+          sourceId: source.id,
+          sourceName: source.name,
+          copyScopedKeys: copyTabWorkspaceKeys,
+        });
+        if (!copy) {
+          setConflictCopyBusy(false);
+          setConflictCopyError(
+            "This workspace's files couldn't be found, so there was nothing to copy.",
+          );
+        }
+      } catch (err) {
+        setConflictCopyBusy(false);
+        setConflictCopyError(
+          `Couldn't copy the workspace: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    })();
+  }, []);
   // From the conflict overlay: create a fresh workspace and switch to it.
   // No engine is open in the conflict case, so a reload is the simplest
   // safe path, the new workspace id isn't locked, so it boots normally.
@@ -871,7 +919,17 @@ function SqlPlaygroundInner() {
     history: queryHistory,
     addHistoryEntry,
     clearHistory,
+    replaceHistory,
   } = useQueryHistory(storageKey("query_history"));
+
+  // The query log travels with a cloud save, never with a share link.
+  const queryLogKeys = useMemo(
+    () => ({
+      history: storageKey("query_history"),
+      saved: storageKey("saved_queries"),
+    }),
+    [],
+  );
   const queryRunnerRefs = {
     engineRef,
     editorRef,
@@ -881,6 +939,7 @@ function SqlPlaygroundInner() {
     addHistoryEntry,
   };
   const {
+    runSqlForTab,
     handleLoadPage,
     handleLoadMorePage,
     runActiveTab,
@@ -908,6 +967,46 @@ function SqlPlaygroundInner() {
     if (stmt) runSelection(stmt.text);
     else runActiveTab();
   }, [runActiveTab, runSelection]);
+
+  // Tabs are read on mount, before the workspace bootstrap has resolved, so
+  // they can come from the wrong workspace's keys. Once the real one is known,
+  // move onto its keys and re-read if it moved.
+  const adoptWorkspaceTabScope = useCallback(
+    (workspaceId: string) => {
+      const dbId = activeDbIdRef.current;
+      const adopted = tabsForAdoptedScope({
+        setWorkspaceScope: setTabWorkspaceScope,
+        workspaceId,
+        readTabs: () => loadTabs(dbId, findSampleDatabase(dbId).defaultTabs),
+        readActiveTabId: () => {
+          try {
+            return localStorage.getItem(dbScopedKey(dbId, "active_tab"));
+          } catch {
+            return null;
+          }
+        },
+      });
+      if (!adopted) return;
+      tabsRef.current = adopted.tabs;
+      setTabs(adopted.tabs);
+      saveTabs(dbId, adopted.tabs);
+      activeTabIdRef.current = adopted.activeTabId;
+      setActiveTabId(adopted.activeTabId);
+      setResultsByTab({});
+    },
+    [setTabs, setActiveTabId, setResultsByTab],
+  );
+
+  // Table tabs restored from a previous session have no result until they are
+  // re-queried; this puts their rows back when the tab is shown.
+  useViewDataTabAutoRun({
+    tabs,
+    activeTabId,
+    resultsByTab,
+    statusState,
+    activeDbId,
+    run: runSqlForTab,
+  });
 
   const {
     createSchemaObject,
@@ -1024,15 +1123,19 @@ function SqlPlaygroundInner() {
   // (the codec gzips it) plus the query tabs; reopening loads the image
   // directly instead of replaying a dump.
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  const buildCloudBundle =
-    useCallback(async (): Promise<WorkspaceBundle | null> => {
+  const buildCloudBundle = useCallback<BuildBundle>(
+    async (opts) => {
       const image = await buildDatabaseImage();
       if (image === null) return null;
       const label = await activeDatabaseLabel();
-      const queryTabs = tabsRef.current.filter((t) => !t.kind);
-      const activeIdx = queryTabs.findIndex(
-        (t) => t.id === activeTabIdRef.current,
+      const { tabs: bundleTabs, activeTabIndex } = sqlTabsForBundle(
+        tabsRef.current,
+        activeTabIdRef.current,
       );
+      // Only the cloud-backup path asks for this; a share must not carry it.
+      const personal = opts?.includePersonal
+        ? readQueryLog(queryLogKeys)
+        : undefined;
       return {
         version: 2,
         kind: "sql",
@@ -1043,13 +1146,21 @@ function SqlPlaygroundInner() {
           dialect: "sqlite",
           dbFormat: "sqlite-image",
           dbBytes: image.byteLength,
-          tabs: queryTabs.map((t) => ({ title: t.title, code: t.code })),
-          activeTabIndex: Math.max(0, activeIdx),
+          tabs: bundleTabs,
+          activeTabIndex,
           databaseLabel: label,
+          personal,
         },
         database: image,
       };
-    }, [activeDatabaseLabel, buildDatabaseImage, activeWorkspace?.name]);
+    },
+    [
+      activeDatabaseLabel,
+      buildDatabaseImage,
+      activeWorkspace?.name,
+      queryLogKeys,
+    ],
+  );
 
   // Apply a pending share/cloud bundle once the engine is up (the /s/<id>
   // page and the Cloud dialog leave a ref in sessionStorage and navigate
@@ -1077,6 +1188,13 @@ function SqlPlaygroundInner() {
           bundle.sql.databaseLabel ?? bundle.name,
           bundleTabSeeds(bundle),
         );
+        // A cloud save is the owner's own; a share is someone else's copy,
+        // whose `personal` section (if a future client ever sends one) is not
+        // ours to absorb.
+        if (pendingRef.source === "cloud") {
+          const restored = restoreQueryLog(bundle.sql.personal, queryLogKeys);
+          if (restored) replaceHistory(restored.history);
+        }
         showToast(
           pendingRef.source === "share"
             ? `Opened a copy of “${bundle.name}”.`
@@ -1089,7 +1207,7 @@ function SqlPlaygroundInner() {
         );
       }
     })();
-  }, [loaded, applySqlBundle, showToast]);
+  }, [loaded, applySqlBundle, showToast, queryLogKeys, replaceHistory]);
 
   // ─── Settings setters (persist to localStorage) ──────────────────────
   const setFontSize = useCallback(
@@ -1404,6 +1522,7 @@ function SqlPlaygroundInner() {
           workspaceId = workspace.id;
           setActiveWorkspace({ id: workspace.id, name: workspace.name });
           setWorkspaceSaved(workspace.saved);
+          adoptWorkspaceTabScope(workspace.id);
           try {
             const hasLock = await acquireWorkspaceLock(workspace.id, {
               signal: lockController.signal,
@@ -1413,6 +1532,12 @@ function SqlPlaygroundInner() {
               // SQLite's exclusive OPFS access handle would deadlock the
               // boot (it hangs at ~90%). Surface a conflict overlay and
               // skip the boot rather than hang.
+              // Remember which workspace it was, so the overlay can offer a
+              // copy of it rather than only a fresh, empty one.
+              conflictWorkspaceRef.current = {
+                id: workspace.id,
+                name: workspace.name,
+              };
               setWorkspaceConflict(true);
               return;
             }
@@ -2270,6 +2395,9 @@ function SqlPlaygroundInner() {
       statusState={statusState}
       workspaceConflict={workspaceConflict}
       onOpenNewWorkspace={handleConflictNewWorkspace}
+      onOpenCopy={handleConflictOpenCopy}
+      copyBusy={conflictCopyBusy}
+      copyError={conflictCopyError}
       loadingHeroRepeat={4}
       loadingCaption={
         statusState === "error" ? loadingMessage : LOADING_QUIPS[quipIndex]

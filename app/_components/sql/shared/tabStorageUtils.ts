@@ -2,25 +2,40 @@
 
 import { newTabId } from "../../sqlitePlaygroundTabs";
 import type { QueryTab } from "../../sqlitePlaygroundTabs";
+import { createTabScope } from "./tabScope";
 
 export interface TabStorageUtils {
   dbScopedKey: (dbId: string, k: string) => string;
-  loadTabs: (dbId: string, defaults: { title: string; code: string }[]) => QueryTab[];
+  loadTabs: (
+    dbId: string,
+    defaults: { title: string; code: string; kind?: "view-data" }[],
+  ) => QueryTab[];
   saveTabs: (dbId: string, tabs: QueryTab[]) => void;
+  /** See `createTabScope`: called once the workspace bootstrap resolves. True
+   *  when the scope moved, meaning tabs must be read again. */
+  setWorkspaceScope: (workspaceId: string) => boolean;
+  /** See `createTabScope`: carries a workspace's tabs onto a duplicate. */
+  copyScopedKeys: (fromWorkspaceId: string, toWorkspaceId: string) => number;
 }
 
 /**
  * Creates tab-storage helpers bound to a specific localStorage namespace.
- * Each SQL dialect uses a distinct prefix so their keys never collide.
+ * Each SQL dialect uses a distinct prefix so their keys never collide, and
+ * within a prefix every key is scoped to the active workspace.
  */
-export function createTabStorage(storagePrefix: string): TabStorageUtils {
+export function createTabStorage(
+  storagePrefix: string,
+  playgroundId: string,
+): TabStorageUtils {
+  const scope = createTabScope(storagePrefix, playgroundId);
+
   function dbScopedKey(dbId: string, k: string): string {
-    return `${storagePrefix}db_${dbId}_${k}`;
+    return scope.scopedKey(dbId, k);
   }
 
   function loadTabs(
     dbId: string,
-    defaults: { title: string; code: string }[],
+    defaults: { title: string; code: string; kind?: "view-data" }[],
   ): QueryTab[] {
     const fallback = (): QueryTab[] =>
       defaults.map((seed) => ({
@@ -70,7 +85,13 @@ export function createTabStorage(storagePrefix: string): TabStorageUtils {
     }
   }
 
-  return { dbScopedKey, loadTabs, saveTabs };
+  return {
+    dbScopedKey,
+    loadTabs,
+    saveTabs,
+    setWorkspaceScope: scope.setWorkspaceScope,
+    copyScopedKeys: scope.copyScopedKeys,
+  };
 }
 
 /** Pure helper: true when tabs differ from the defaults (title, code, or count). */

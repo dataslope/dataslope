@@ -93,7 +93,7 @@ html[data-playground-theme="light"] .pyodide-loading {
   scrollbar-color: var(--border) transparent;
 }
 
-/* The sitewide default body letter-spacing (app/globals.css: -0.011em, for
+/* The sitewide default body letter-spacing (app/globals.css: -0.015em, for
    Inter/sans text) would also tighten every monospace surface in this IDE, the
    editor, terminal, output cells and gutters, whose columns should keep their
    natural spacing. Default the whole playground back to `normal`; the chrome's
@@ -2524,6 +2524,11 @@ input[type="range"].fs-slider:disabled {
   font-size: 15px;
   color: var(--text-muted, #9aa4b2);
   line-height: 1.6;
+  /* Slightly tighter than the playground's `normal`, which `.playground-root`
+     sets so monospace surfaces keep their natural spacing. This is UI prose in
+     the sans face, where that reset leaves it looser than the rest of the site
+     (globals.css runs body text at -0.015em, which this now matches). */
+  letter-spacing: -0.015em;
 }
 /* Workspace-conflict overlay, reuses the boot-overlay chrome but offers
    actions instead of a progress bar (shown when the workspace is already
@@ -2536,29 +2541,68 @@ input[type="range"].fs-slider:disabled {
   margin-top: 8px;
 }
 .playground-conflict-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   font-family: var(--font-ui);
   font-size: 14px;
   font-weight: 500;
+  letter-spacing: -0.015em;
   padding: 9px 16px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: var(--bg2);
+  /* 6px rather than the playground-wide --radius (8px): without a border the
+     fill reads a touch rounder than it measures, and these sit under a card
+     whose other corners are the larger radius. */
+  border-radius: 6px;
+  border: none;
+  background: var(--bg3);
   color: var(--text);
   cursor: pointer;
-  transition:
-    background 0.15s,
-    border-color 0.15s;
+  transition: background 0.15s;
 }
+/* The secondary fill *is* --bg3, so hover can't be --bg3 as it was when these
+   had borders and sat on --bg2. Mixing the text color in shifts the surface
+   away from the card in whichever direction the palette runs: darker on
+   light, lighter on dark. Same move as `--menu-item-hover`. */
 .playground-conflict-btn:hover {
-  background: var(--bg3);
+  background: color-mix(in srgb, var(--text) 8%, var(--bg3));
+}
+/* The icon rides at the label's weight rather than competing with it. */
+.playground-conflict-btn svg {
+  flex: none;
+  opacity: 0.85;
 }
 .playground-conflict-btn-primary {
   background: var(--primary);
-  border-color: var(--primary);
   color: #fff;
 }
 .playground-conflict-btn-primary:hover {
   background: color-mix(in srgb, var(--primary) 88%, #000);
+}
+/* Copying a large database takes a moment, and the other two actions would
+   throw the copy away mid-flight, so all three go quiet while it runs. */
+.playground-conflict-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.playground-conflict-btn:disabled:hover {
+  background: var(--bg3);
+}
+.playground-conflict-btn-primary:disabled:hover {
+  background: var(--primary);
+}
+.playground-conflict-error {
+  color: var(--danger, #e35a5a);
+}
+/* The conflict illustration. Width-constrained with height auto so the
+   promoted art keeps its own aspect ratio (a cut-out is trimmed to its
+   subject, so it is not square even when generated square). */
+.playground-conflict-mark {
+  /* Wider than the 160px the home bento icons use, because this illustration
+     has to carry an expression: the bear stands side-on, so its head is about
+     a quarter of the frame, and at 160px the surprise on its face is simply
+     too small to read. Measured at both sizes on the rendered overlay. */
+  width: 240px;
+  height: auto;
 }
 .playground-boot-progress {
   display: flex;
@@ -4100,7 +4144,12 @@ html[data-playground-theme="dark"] .welcome h3 {
 }
 
 .playground-tab-close:hover {
-  background: var(--border);
+  /* A tint rather than the solid --border chip this used to be: at 16px the
+     border color read as a filled button sitting inside the tab. Close to
+     --menu-item-hover (6%), a little stronger because this is a small target
+     that has to show it is hoverable, where a menu row has its whole width to
+     do that. Most of the feedback is the ✕ itself darkening to --text. */
+  background: color-mix(in srgb, var(--text) 10%, transparent);
   color: var(--text);
 }
 

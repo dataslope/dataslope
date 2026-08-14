@@ -22,6 +22,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type CSSProperties,
 } from "react";
@@ -64,6 +65,11 @@ import {
   materializeCodeWorkspace,
   setPendingBundleRef,
 } from "@/app/_components/cloud/materialize";
+import {
+  backupLocalWorkspaces,
+  pendingBackupCandidates,
+} from "@/app/_components/cloud/backupLocalWorkspaces";
+import { recoverOrphanWorkspaces } from "@/app/_components/opfs/orphanWorkspaces";
 
 /** How many of the most-recent workspaces the preview shows. */
 const RECENT_LIMIT = 5;
@@ -177,6 +183,8 @@ export function RecentWorkspaces() {
   const [openingId, setOpeningId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [cloudLoaded, setCloudLoaded] = useState(false);
+  const bulkRanRef = useRef(false);
 
   // Read the localStorage registry only after mount (it's undefined on the
   // server), so the first render matches the server's empty output.
@@ -184,6 +192,18 @@ export function RecentWorkspaces() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     setLocalEntries(getWorkspaceRegistry());
+    // Sweep up drafts that exist in OPFS but in no list, so changed-but-never-
+    // saved work shows up here instead of being unreachable.
+    let cancelled = false;
+    void recoverOrphanWorkspaces(PLAYGROUNDS.map((p) => p.id)).then(
+      (result) => {
+        if (cancelled || result.recovered.length === 0) return;
+        setLocalEntries(getWorkspaceRegistry());
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Signed-in: pull the account's cloud workspaces + usage. 401/503 (session
@@ -210,6 +230,7 @@ export function RecentWorkspaces() {
         if (cancelled) return;
         setCloudMetas(res.workspaces);
         setCloudUsage(res.usage);
+        setCloudLoaded(true);
       } catch {
         // Leave the local list as-is on error.
       }
@@ -218,6 +239,28 @@ export function RecentWorkspaces() {
       cancelled = true;
     };
   }, [session]);
+
+  // Post-sign-in bulk backup, the same sweep the dashboard runs: whichever
+  // surface the user lands on first backs their local work up. Once per page
+  // view, and silent, this page has no progress affordance of its own.
+  useEffect(() => {
+    if (!session || !cloudLoaded || bulkRanRef.current) return;
+    const cloudIds = new Set(cloudMetas.map((m) => m.id));
+    if (pendingBackupCandidates(localEntries, cloudIds).length === 0) return;
+    bulkRanRef.current = true;
+    let cancelled = false;
+    void (async () => {
+      const uploaded = await backupLocalWorkspaces({
+        entries: localEntries,
+        cloudIds,
+        isCancelled: () => cancelled,
+      });
+      if (uploaded > 0 && !cancelled) await refreshCloud();
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [session, cloudLoaded, cloudMetas, localEntries, refreshCloud]);
 
   // Estimate on-device sizes for the browser-only rows (backed-up rows already
   // carry an authoritative cloud size).

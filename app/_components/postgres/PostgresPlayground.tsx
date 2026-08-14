@@ -121,6 +121,7 @@ import {
   switchActiveWorkspace,
 } from "../opfs/activeWorkspace";
 import { acquireWorkspaceLock, createWorkspace } from "../opfs/workspace";
+import { copyConflictedWorkspace } from "../opfs/copyConflictedWorkspace";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
 import { ShareControls } from "../cloud/ShareControls";
 import {
@@ -140,7 +141,10 @@ import {
   fetchBundleByRef,
   takePendingBundleRef,
 } from "../cloud/materialize";
-import type { WorkspaceBundle } from "@/lib/workspaces/types";
+import {
+  sqlTabsForBundle,
+  type BuildBundle,
+} from "@/lib/workspaces/types";
 import { MobileMenuAction, MobileMenuLabel } from "../MobileMenuSheet";
 import { type PostgresEngine } from "../runtime/postgres";
 
@@ -153,6 +157,8 @@ import { newTabId } from "../sqlitePlaygroundTabs";
 import {
   createTabStorage,
 } from "../sql/shared/tabStorageUtils";
+import { tabsForAdoptedScope } from "../sql/shared/tabScope";
+import { readQueryLog, restoreQueryLog } from "../sql/utils/queryLogBundle";
 import { SqlTabBar } from "../sql/components/SqlTabBar";
 import { SETTINGS_TAB_ID } from "../playgroundTabs";
 import type { TabDescriptor } from "../tabs/tabTypes";
@@ -207,6 +213,7 @@ import {
 import { pushTabHistory } from "../sql/utils/tabUtils";
 import { enumHintsFromColumns } from "../sql/utils/cellEditing";
 import { useSqlTabManagement } from "../sql/hooks/useSqlTabManagement";
+import { useViewDataTabAutoRun } from "../sql/hooks/useViewDataTabAutoRun";
 import { useSchemaTree } from "../sql/hooks/useSchemaTree";
 import type {
   AddRowDialogState,
@@ -235,7 +242,8 @@ import { computeVisibleTypeGroups } from "../sql/utils/columnTypeSelector";
 
 const PLAYGROUND_ID = postgresAdapter.playgroundId;
 const STORAGE_PREFIX = postgresAdapter.storagePrefix;
-const { dbScopedKey, loadTabs, saveTabs } = createTabStorage(STORAGE_PREFIX);
+const { dbScopedKey, loadTabs, saveTabs, setWorkspaceScope, copyScopedKeys } =
+  createTabStorage(STORAGE_PREFIX, PLAYGROUND_ID);
 
 const POSTGRES_DB_ACTIONS: readonly DatabaseSelectorAction[] = [
   {
@@ -984,6 +992,14 @@ function PostgresPlaygroundInner() {
   // True when this workspace is already open (locked) in another tab, so
   // the shell shows a conflict overlay instead of deadlocking on boot.
   const [workspaceConflict, setWorkspaceConflict] = useState(false);
+  // The workspace that conflict was over, so the overlay can offer a copy of
+  // it. A ref because the boot effect records it and only the overlay's
+  // handlers read it, no render depends on the value.
+  const conflictWorkspaceRef = useRef<{ id: string; name: string } | null>(null);
+  const [conflictCopyBusy, setConflictCopyBusy] = useState(false);
+  const [conflictCopyError, setConflictCopyError] = useState<string | null>(
+    null,
+  );
   const [statusState, setStatusState] = useState<
     "loading" | "ready" | "running" | "error"
   >("loading");
@@ -1056,7 +1072,17 @@ function PostgresPlaygroundInner() {
     history: queryHistory,
     addHistoryEntry,
     clearHistory,
+    replaceHistory,
   } = useQueryHistory(storageKey("query_history"));
+
+  // The query log travels with a cloud save, never with a share link.
+  const queryLogKeys = useMemo(
+    () => ({
+      history: storageKey("query_history"),
+      saved: storageKey("saved_queries"),
+    }),
+    [],
+  );
 
   // ─── Dialog state ─────────────────────────────────────────────────────
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -1318,6 +1344,34 @@ function PostgresPlaygroundInner() {
       saveTabs(dbId, nextTabs);
     },
     [],
+  );
+
+  // Tabs are read in a `useState` initializer, before the workspace bootstrap
+  // has resolved, so they can come from the wrong workspace's keys. Once the
+  // real one is known, move onto its keys and re-read if it moved.
+  const adoptWorkspaceTabScope = useCallback(
+    (workspaceId: string) => {
+      const dbId = activeDbIdRef.current;
+      const adopted = tabsForAdoptedScope({
+        setWorkspaceScope,
+        workspaceId,
+        readTabs: () =>
+          loadTabs(dbId, findPostgresSampleDatabase(dbId).defaultTabs),
+        readActiveTabId: () => {
+          try {
+            return localStorage.getItem(dbScopedKey(dbId, "active_tab"));
+          } catch {
+            return null;
+          }
+        },
+      });
+      if (!adopted) return;
+      persistTabs(adopted.tabs, dbId);
+      tabHistoryRef.current = [];
+      setActiveTabId(adopted.activeTabId);
+      setResultsByTab({});
+    },
+    [persistTabs],
   );
 
   const refreshSchema = useCallback(async () => {
@@ -1702,6 +1756,17 @@ function PostgresPlaygroundInner() {
     runSqlForTabRef.current = runSqlForTab;
   }, [runActiveTab, runSqlForTab]);
 
+  // Table tabs restored from a previous session have no result until they are
+  // re-queried; this puts their rows back when the tab is shown.
+  useViewDataTabAutoRun({
+    tabs,
+    activeTabId,
+    resultsByTab,
+    statusState,
+    activeDbId,
+    run: runSqlForTab,
+  });
+
   // Focus the newly added column's name input in the View/Edit Structure drawer.
   useEffect(() => {
     if (!viewStructurePendingFocusId) return;
@@ -1875,6 +1940,7 @@ function PostgresPlaygroundInner() {
           workspaceId = workspace.id;
           setActiveWorkspace({ id: workspace.id, name: workspace.name });
           setWorkspaceSaved(workspace.saved);
+          adoptWorkspaceTabScope(workspace.id);
           try {
             const hasLock = await acquireWorkspaceLock(workspace.id, {
               signal: lockController.signal,
@@ -1884,6 +1950,12 @@ function PostgresPlaygroundInner() {
               // PGlite's exclusive OPFS access handle would deadlock the
               // boot (it hangs at ~90%). Surface a conflict overlay and
               // skip the boot rather than hang.
+              // Remember which workspace it was, so the overlay can offer a
+              // copy of it rather than only a fresh, empty one.
+              conflictWorkspaceRef.current = {
+                id: workspace.id,
+                name: workspace.name,
+              };
               setWorkspaceConflict(true);
               return;
             }
@@ -2236,6 +2308,38 @@ function PostgresPlaygroundInner() {
   // workspace and switch to it. No engine is open in the conflict case
   // (the boot was skipped), so a reload is the simplest safe path, the
   // new workspace id isn't locked, so it boots normally.
+  // From the conflict overlay: duplicate the workspace another tab is holding
+  // and switch to the duplicate, which is the only action here that keeps the
+  // data the user came for. `copyConflictedWorkspace` reloads on success, so
+  // reaching the end of this callback means it failed.
+  const handleConflictOpenCopy = useCallback(() => {
+    const source = conflictWorkspaceRef.current;
+    if (!source) return;
+    setConflictCopyBusy(true);
+    setConflictCopyError(null);
+    void (async () => {
+      try {
+        const copy = await copyConflictedWorkspace({
+          playgroundId: PLAYGROUND_ID,
+          sourceId: source.id,
+          sourceName: source.name,
+          copyScopedKeys,
+        });
+        if (!copy) {
+          setConflictCopyBusy(false);
+          setConflictCopyError(
+            "This workspace's files couldn't be found, so there was nothing to copy.",
+          );
+        }
+      } catch (err) {
+        setConflictCopyBusy(false);
+        setConflictCopyError(
+          `Couldn't copy the workspace: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    })();
+  }, []);
+
   const handleConflictNewWorkspace = useCallback(() => {
     void (async () => {
       try {
@@ -3365,16 +3469,20 @@ function PostgresPlaygroundInner() {
   // sequences, functions, and other non-table objects a handwritten dump
   // would miss — and reopening boots straight from the tarball.
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  const buildCloudBundle =
-    useCallback(async (): Promise<WorkspaceBundle | null> => {
+  const buildCloudBundle = useCallback<BuildBundle>(
+    async (opts) => {
       const engine = engineRef.current;
       if (!engine) return null;
       const tarball = await engine.dumpDataDir();
       const image = new Uint8Array(await tarball.arrayBuffer());
-      const queryTabs = tabsRef.current.filter((t) => !t.kind);
-      const activeIdx = queryTabs.findIndex(
-        (t) => t.id === activeTabIdRef.current,
+      const { tabs: bundleTabs, activeTabIndex } = sqlTabsForBundle(
+        tabsRef.current,
+        activeTabIdRef.current,
       );
+      // Only the cloud-backup path asks for this; a share must not carry it.
+      const personal = opts?.includePersonal
+        ? readQueryLog(queryLogKeys)
+        : undefined;
       return {
         version: 2,
         kind: "sql",
@@ -3385,13 +3493,16 @@ function PostgresPlaygroundInner() {
           dialect: "postgres",
           dbFormat: "pgdata-tar",
           dbBytes: image.byteLength,
-          tabs: queryTabs.map((t) => ({ title: t.title, code: t.code })),
-          activeTabIndex: Math.max(0, activeIdx),
+          tabs: bundleTabs,
+          activeTabIndex,
           databaseLabel: displayFilename,
+          personal,
         },
         database: image,
       };
-    }, [activeWorkspace?.name, displayFilename]);
+    },
+    [activeWorkspace?.name, displayFilename, queryLogKeys],
+  );
 
   // Apply a pending share/cloud bundle once the engine is up. The bundle's
   // queries are pre-seeded into the blank database's stored tabs because
@@ -3435,6 +3546,13 @@ function PostgresPlaygroundInner() {
           bundle.database,
           bundle.sql.databaseLabel ?? bundle.name,
         );
+        // A cloud save is the owner's own; a share is someone else's copy,
+        // whose `personal` section (if a future client ever sends one) is not
+        // ours to absorb.
+        if (pendingRef.source === "cloud") {
+          const restored = restoreQueryLog(bundle.sql.personal, queryLogKeys);
+          if (restored) replaceHistory(restored.history);
+        }
       } catch (err) {
         showToast(
           `Couldn't open the playground: ${err instanceof Error ? err.message : String(err)}`,
@@ -3442,7 +3560,7 @@ function PostgresPlaygroundInner() {
         );
       }
     })();
-  }, [loaded, performImportPgDataDir, showToast]);
+  }, [loaded, performImportPgDataDir, showToast, queryLogKeys, replaceHistory]);
 
   const exportPostgresDatabaseToXlsx = useCallback(async () => {
     const engine = engineRef.current;
@@ -3929,6 +4047,9 @@ function PostgresPlaygroundInner() {
       loadingCaption={loadingMessage}
       workspaceConflict={workspaceConflict}
       onOpenNewWorkspace={handleConflictNewWorkspace}
+      onOpenCopy={handleConflictOpenCopy}
+      copyBusy={conflictCopyBusy}
+      copyError={conflictCopyError}
       headerName={
         activeWorkspace ? (
           <>

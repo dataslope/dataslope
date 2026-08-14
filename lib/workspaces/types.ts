@@ -95,7 +95,97 @@ export interface BundleCodeFile {
 export interface BundleSqlTab {
   title: string;
   code: string;
+  /** "view-data" for a table tab: one opened from the sidebar, which shows
+   *  the table's rows with the editor pane hidden. Absent for an ordinary
+   *  query tab, and absent from every bundle written before this field
+   *  existed, so a missing value reads as "ordinary query tab" and old and
+   *  new clients round-trip each other's bundles without a version bump.
+   *  The playgrounds' other tab kinds (er-diagram, query-history) are views
+   *  onto live state rather than saved work, and are not carried. */
+  kind?: "view-data";
 }
+
+/** The playground-side tab fields this module needs to build `BundleSqlTab`.
+ *  Structural on purpose: `lib/` is shared with the Worker and must not reach
+ *  into the app's component tree for `QueryTab`. */
+export interface BundleableSqlTab {
+  id: string;
+  title: string;
+  code: string;
+  kind?: string;
+}
+
+/**
+ * The tabs a SQL bundle carries, plus where the active one lands in that list.
+ *
+ * One place decides which kinds cross the wire, because three playgrounds
+ * build bundles and the rule is easy to get subtly wrong. Query tabs and table
+ * ("view-data") tabs are saved work and travel; er-diagram and query-history
+ * tabs are live views onto the current session, so they are dropped, matching
+ * what `saveTabs` keeps in localStorage.
+ *
+ * The inverse is `bundleTabSeeds` in app/_components/cloud/materialize.ts.
+ */
+export function sqlTabsForBundle(
+  tabs: readonly BundleableSqlTab[],
+  activeTabId: string,
+): { tabs: BundleSqlTab[]; activeTabIndex: number } {
+  const carried = tabs.filter(
+    (tab) => tab.kind === undefined || tab.kind === "view-data",
+  );
+  const activeIndex = carried.findIndex((tab) => tab.id === activeTabId);
+  return {
+    tabs: carried.map((tab) => ({
+      title: tab.title,
+      code: tab.code,
+      ...(tab.kind === "view-data" ? { kind: "view-data" as const } : {}),
+    })),
+    // An active tab that isn't carried (the ER diagram, say) leaves the
+    // reopened workspace on its first tab rather than nowhere.
+    activeTabIndex: Math.max(0, activeIndex),
+  };
+}
+
+/** One run from the query history pane. Mirrors `QueryHistoryEntry` in
+ *  app/_components/sql/types.ts, restated here because `lib/` is shared with
+ *  the Worker and cannot import from the component tree. */
+export interface BundleQueryHistoryEntry {
+  id: string;
+  sql: string;
+  source: string;
+  executedAt: number;
+  elapsedMs: number;
+  success: boolean;
+  error?: string;
+}
+
+/** One starred query. Mirrors `SavedQuery`. */
+export interface BundleSavedQuery {
+  id: string;
+  sql: string;
+  source: string;
+  savedAt: number;
+}
+
+/**
+ * The parts of a workspace that belong to its owner rather than to the
+ * workspace: the query history and the starred queries, which are otherwise
+ * stranded in one browser's localStorage and absent on a second device.
+ *
+ * Never present in a share bundle. A share hands a copy of the workspace to
+ * anyone with the link, and a log of everything the author has run is not
+ * theirs to receive. That is enforced at the source: `buildBundle` omits this
+ * unless asked with `includePersonal`, which only the cloud-backup path
+ * passes, and the reader ignores it for anything opened from a share.
+ */
+export interface BundleSqlPersonal {
+  history?: BundleQueryHistoryEntry[];
+  saved?: BundleSavedQuery[];
+}
+
+/** Cap on personal-log entries carried in a bundle, per list. Matches the
+ *  playgrounds' own localStorage caps. */
+export const BUNDLE_MAX_LOG_ENTRIES = 200;
 
 export interface BundleSqlState {
   dialect: SqlDialect;
@@ -108,6 +198,8 @@ export interface BundleSqlState {
   activeTabIndex?: number;
   /** Display label of the source database, e.g. "chinook.sqlite". */
   databaseLabel?: string;
+  /** Owner-only; absent from share bundles. See `BundleSqlPersonal`. */
+  personal?: BundleSqlPersonal;
 }
 
 export interface WorkspaceBundle {
@@ -120,6 +212,13 @@ export interface WorkspaceBundle {
   /** kind === "code" */
   files?: BundleCodeFile[];
   activeFilename?: string;
+  /** kind === "code": the files whose editor tabs are open, in tab order.
+   *  The tab strip shows a subset of the workspace's files, so without this a
+   *  reopened copy fans every file back open. Carried as filenames because
+   *  file ids are reallocated when a bundle is materialized. Absent in
+   *  bundles written before this field existed, which keeps the old
+   *  open-everything behavior. */
+  openFilenames?: string[];
   /** kind === "sql" */
   sql?: BundleSqlState;
   /** kind === "sql": the raw database image. Never part of the JSON header;
@@ -164,6 +263,15 @@ export function validateBundle(value: unknown): WorkspaceBundle | null {
         return null;
       }
     }
+    if (b.openFilenames !== undefined) {
+      if (
+        !Array.isArray(b.openFilenames) ||
+        b.openFilenames.length > BUNDLE_MAX_FILES ||
+        b.openFilenames.some((name) => typeof name !== "string")
+      ) {
+        return null;
+      }
+    }
     return value as WorkspaceBundle;
   }
 
@@ -187,8 +295,51 @@ export function validateBundle(value: unknown): WorkspaceBundle | null {
       return null;
     }
   }
+  if (sql.personal !== undefined && !validPersonal(sql.personal)) return null;
   return value as WorkspaceBundle;
 }
+
+/** Shape + size check for the owner-only log. Client-supplied like the rest of
+ *  the bundle, and unlike the tabs it is written straight back into the
+ *  reader's own history, so it is checked rather than trusted. */
+function validPersonal(value: unknown): boolean {
+  if (!value || typeof value !== "object") return false;
+  const personal = value as Record<string, unknown>;
+  for (const [key, idField] of [
+    ["history", "executedAt"],
+    ["saved", "savedAt"],
+  ] as const) {
+    const list = personal[key];
+    if (list === undefined) continue;
+    if (!Array.isArray(list) || list.length > BUNDLE_MAX_LOG_ENTRIES) {
+      return false;
+    }
+    for (const e of list as unknown[]) {
+      const entry = e as Record<string, unknown>;
+      if (
+        !entry ||
+        typeof entry.id !== "string" ||
+        typeof entry.sql !== "string" ||
+        typeof entry[idField] !== "number"
+      ) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+/** Options for a host's `buildBundle`. */
+export interface BuildBundleOptions {
+  /** Carry the owner's query history and starred queries. Set by the cloud
+   *  backup path only: a share bundle must never include them. */
+  includePersonal?: boolean;
+}
+
+/** Serializes the live playground into a portable bundle. */
+export type BuildBundle = (
+  opts?: BuildBundleOptions,
+) => Promise<WorkspaceBundle | null>;
 
 // ---------------------------------------------------------------------------
 // Manifest (display-only summary stored in D1 alongside the metadata row)

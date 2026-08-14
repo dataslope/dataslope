@@ -1,7 +1,14 @@
 "use client";
 
 import React, { useEffect, useRef, useState, type ReactNode } from "react";
-import { Database, Code2, Table2 } from "lucide-react";
+import {
+  Database,
+  Code2,
+  Table2,
+  Copy,
+  DatabasePlus,
+  RotateCw,
+} from "lucide-react";
 import "../../playground.css";
 import "../../sqlPlayground.css";
 import { SqlPlaygroundSwitcher } from "./SqlPlaygroundSwitcher";
@@ -12,6 +19,34 @@ import {
   useBootOverlayVisibility,
 } from "../../PlaygroundBootOverlay";
 import { DiamondMark } from "../../mdx/loadingAnimations";
+import imageManifest from "@/lib/generated/images";
+
+/** Illustration shown on the conflict overlay, authored through the same
+ *  pipeline as the course art (`data/illustration-prompts.json`, see the
+ *  Illustrations section of AGENTS.md) and promoted into `public/images/`.
+ *  Every surface asks for the `-cutout` slug. */
+const CONFLICT_MARK_SLUG = "playground-workspace-conflict-cutout";
+
+/** The mark above the conflict message. Falls back to the brand diamond when
+ *  the illustration isn't in the manifest, so a tree without the promoted
+ *  asset shows the old mark rather than an empty space. */
+function ConflictMark() {
+  const entry = imageManifest[CONFLICT_MARK_SLUG];
+  if (!entry) return <DiamondMark size={88} />;
+  const src = `/images/${CONFLICT_MARK_SLUG}.${entry.formats[entry.formats.length - 1]}`;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      width={entry.width}
+      height={entry.height}
+      alt=""
+      aria-hidden="true"
+      decoding="async"
+      className="playground-conflict-mark"
+    />
+  );
+}
 
 /**
  * Re-exported from the pure helper module (`../utils/mobilePane`) so existing
@@ -82,6 +117,17 @@ export interface SqlPlaygroundShellProps {
    *  overlay. The host should create a fresh workspace and switch to it
    *  (a reload is fine, a new workspace id isn't locked elsewhere). */
   onOpenNewWorkspace?: () => void;
+  /** Invoked when the user picks "Open a copy". The host should duplicate the
+   *  conflicted workspace and switch to the duplicate, so this tab gets the
+   *  same data without contending for the original's OPFS handle. Offered
+   *  first: it is the only action that keeps what the user came for. */
+  onOpenCopy?: () => void;
+  /** True while a copy is being made, so the overlay can show it working;
+   *  duplicating a large database is not instant. */
+  copyBusy?: boolean;
+  /** Why a copy attempt failed. Shown in the overlay: an action that quietly
+   *  does nothing is the dead end this overlay exists to remove. */
+  copyError?: string | null;
   /** Main body of the page, typically the top toolbar + sidebar +
    *  editor + results pane structure. Rendered directly inside
    *  `<div className="playground-app">` after the header. */
@@ -115,6 +161,9 @@ export function SqlPlaygroundShell({
   bootFraction,
   workspaceConflict = false,
   onOpenNewWorkspace,
+  onOpenCopy,
+  copyBusy = false,
+  copyError = null,
   children,
 }: SqlPlaygroundShellProps) {
   // Loading-overlay lifecycle (show → fade → unmount) with a minimum
@@ -297,7 +346,7 @@ export function SqlPlaygroundShell({
         >
           <div className="playground-boot-card">
             <span className="playground-boot-loader" aria-hidden="true">
-              <DiamondMark size={88} />
+              <ConflictMark />
             </span>
             <div className="playground-boot-text">
               <span className="playground-boot-title">
@@ -305,17 +354,40 @@ export function SqlPlaygroundShell({
               </span>
               <div className="playground-boot-hints">
                 <span className="playground-boot-hint">
-                  A workspace can run in only one tab at a time. Keep using it
-                  in the original tab, or open a separate workspace here.
+                  A workspace can run in only one tab at a time. Open a copy to
+                  keep working here with the same data, or keep using the
+                  original in the other tab.
                 </span>
+                {copyError && (
+                  <span
+                    className="playground-boot-hint playground-conflict-error"
+                    role="alert"
+                  >
+                    {copyError}
+                  </span>
+                )}
               </div>
               <div className="playground-conflict-actions">
-                {onOpenNewWorkspace && (
+                {onOpenCopy && (
                   <button
                     type="button"
                     className="playground-conflict-btn playground-conflict-btn-primary"
-                    onClick={onOpenNewWorkspace}
+                    onClick={onOpenCopy}
+                    disabled={copyBusy}
                   >
+                    <Copy size={15} aria-hidden="true" />
+                    {copyBusy ? "Copying…" : "Open a copy"}
+                  </button>
+                )}
+                {onOpenNewWorkspace && (
+                  <button
+                    type="button"
+                    className={`playground-conflict-btn${onOpenCopy ? "" : " playground-conflict-btn-primary"}`}
+                    onClick={onOpenNewWorkspace}
+                    disabled={copyBusy}
+                  >
+                    {/* The same icon the header's new-workspace control uses. */}
+                    <DatabasePlus size={15} aria-hidden="true" />
                     Open a new workspace
                   </button>
                 )}
@@ -323,7 +395,9 @@ export function SqlPlaygroundShell({
                   type="button"
                   className="playground-conflict-btn"
                   onClick={() => window.location.reload()}
+                  disabled={copyBusy}
                 >
+                  <RotateCw size={15} aria-hidden="true" />
                   Try again
                 </button>
               </div>

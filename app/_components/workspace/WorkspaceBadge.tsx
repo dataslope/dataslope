@@ -75,7 +75,7 @@ import {
 import {
   isSqlPlayground,
   type CloudWorkspaceMeta,
-  type WorkspaceBundle,
+  type BuildBundle,
 } from "@/lib/workspaces/types";
 import { INACTIVITY_EXPIRY_DAYS } from "@/lib/workspaces/policy";
 import { deleteCloudWorkspace } from "../cloud/cloudApi";
@@ -118,7 +118,7 @@ export interface WorkspaceBadgeProps {
    *  builder the Share dialog uses. Powers "Back up" for the active
    *  workspace; when omitted, the backup action is hidden (cloud rows and
    *  statuses still render). */
-  buildBundle?: () => Promise<WorkspaceBundle | null>;
+  buildBundle?: BuildBundle;
   /** Render no header UI (badge pill, sync status, save menu) — keep only
    *  the auto-sync engine and the workspace-manager drawer mounted. The
    *  simplified header (PlaygroundHeaderControls) owns the visible
