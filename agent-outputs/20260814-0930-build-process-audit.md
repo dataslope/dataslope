@@ -195,19 +195,65 @@ local store's behaviour, not the deploy's. Treat the 2.2× as evidence the machi
 a prediction. The real number is the deploy stage's wall time in the Cloudflare build log; the next
 push to a PR measures the preview (`upload`) path directly.
 
-### 5.2 Halve the R2 populate by dropping the duplicated segment data (est. −40% of 2.34 GiB)
+### 5.2 The segment-cache flag ❌ *attempted; it does not exist. Compression is the real lever.*
 
-`open-next.config.ts` already records the measurement: `segmentData` is ~40% of every cache object,
-and `segmentData["/_full"]` was byte-identical to `rsc` in 40 of 40 sampled objects — so ~20% of
-the bucket is a second copy of bytes stored one key over. Setting
-`experimental.clientSegmentCache: false` takes the bucket to ~60% of its size, cutting the populate
-upload proportionally *and* the R2 storage bill.
+The plan was `experimental.clientSegmentCache: false`, which `open-next.config.ts` and the
+2026-08-14 retention handoff both described as taking the bucket to ~60% of its size, pending a
+preview test of its interaction with `prefetchInlining: false`.
 
-The repo's own note is that it is left on because the segment cache is load-bearing for prefetching
-here and its interaction with `prefetchInlining: false` has not been tested on a preview deploy.
-That test is the work: flip it on a branch, deploy the preview, confirm prefetching still behaves
-and `check-prefetch-hints` stays green. Do not ship it untested — the last prefetch regression on
-this deployment cost 7.5M requests in four days.
+**There is no such option on Next 16.3.0.** The build fails outright:
+
+```
+⚠ Invalid next.config.ts options detected:
+⚠     Unrecognized key(s) in object: 'clientSegmentCache' at "experimental"
+next.config.ts(154,5): error TS2353: … 'clientSegmentCache' does not exist in type 'ExperimentalConfig'.
+```
+
+The name appears nowhere in `next/dist` except inside source maps, and `app-render.js` guards
+`collectSegmentData(...)` on nothing but `renderOpts.isBuildTimePrerendering` — so `segmentData` is
+emitted on every prerender with no flag to stop it. The prefetch-interaction question that was
+holding this back was never the blocker; the option was.
+
+**The measurement held up and got sharper.** Over all 1,081 objects rather than 40
+(`node scripts/analyze-cache.mjs`, added in this branch):
+
+| Field | Size | Share |
+| --- | ---: | ---: |
+| `html` | 0.731 GiB | 31.2% |
+| `rsc` | 0.477 GiB | 20.4% |
+| **`segmentData`** | **1.003 GiB** | **42.8%** |
+| — of which `/_full` | 0.477 GiB | 20.4% |
+
+`/_full` is byte-identical to `rsc` in **1,045 of 1,045** objects.
+
+**And the bigger prize was hiding behind it.** These objects go to R2 *uncompressed*, and they are
+repetitive JSON (`--compress`, sampled over 121 of 1,081):
+
+| Codec | Share of raw | Ratio | 2.340 GiB becomes |
+| --- | ---: | ---: | ---: |
+| gzip -6 | 18.6% | 5.4× | ~0.44 GiB |
+| brotli q5 | 5.9% | **17.0×** | **~0.14 GiB** |
+
+Compressing cache values in a custom `incrementalCache` override — `open-next.config.ts` already
+wraps one with `withRegionalCache` — **subsumes this entire item**, because a byte-identical
+duplicate of `rsc` is precisely what a compressor erases. It would cut the per-deploy populate and
+the per-retained-build storage by the same factor, and unlike the segment cache it is a lever this
+repo actually holds.
+
+The work is the read side: whatever writes compressed must decompress in the Worker, and
+`enableCacheInterception` means the routing layer reads these too. That is a real design task, not
+a flag — which is why it is written up rather than attempted here.
+
+**Shipped from this attempt anyway:**
+
+- `scripts/analyze-cache.mjs`, so the composition and compression claims are one command rather
+  than a paragraph anyone has to trust.
+- `check-prefetch-hints.mjs` now **fails on a scan of fewer than 100 files** instead of reporting
+  "0 prerendered file(s) clean". Its filter is `.rsc` *or* `.segments`, so anything that changes
+  the emitted payload shape silently shrinks its coverage — the exact failure mode a guard against
+  a silent regression must not have.
+- The wrong claim is corrected in `open-next.config.ts` and struck through in the retention
+  handoff, so the next person does not spend the same afternoon on it.
 
 ### 5.3 Move the TypeScript check off the deploy critical path ✅ *half done — the gate exists*
 
@@ -301,7 +347,8 @@ Worth recording so nobody re-does it:
 | --- | --- | --- | --- |
 | Parallelise `build-search-corpus` | −10 s | none (byte-identical, tested) | **shipped here** |
 | `--cacheChunkSize 100` on both deploy commands | 2.2× on the local path; remote TBD | none found — fewer retries, no lost entries | **README updated; needs the dashboard edit** |
-| `experimental.clientSegmentCache: false` | −40% of a 2.34 GiB upload | needs a preview test | `next.config.ts` |
+| ~~`experimental.clientSegmentCache: false`~~ | — | **not a Next 16.3.0 option; build fails** | ❌ |
+| Compress cache values (gzip 5.4× / brotli 17.0×) | 2.34 GiB → 0.14–0.44 GiB per deploy | read side must decompress in the Worker | `open-next.config.ts` |
 | Typecheck/lint/test in Actions | 0 s directly — it is the prerequisite | none (pure addition) | **shipped: `checks.yml`** |
 | …then `ignoreBuildErrors: true` | −29 s | ships type errors to `main` | needs `checks` required first |
 | Generator cache under `.next/cache` | up to −33 s | corrupt-restore surface | `build-cache.mjs` |

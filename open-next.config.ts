@@ -28,16 +28,45 @@ import { withRegionalCache } from "@opennextjs/cloudflare/overrides/incremental-
 // a schedule by .github/workflows/r2-cache-cleanup.yml.
 //
 // That figure read "~1–1.4 GB" until 2026-08-14 and was measured at 2.504 GB.
-// Each entry now carries a `segmentData` map next to `html` and `rsc` — Next
-// 16's client segment cache, on by default, nothing here opts in — and it is
-// ~40% of every object. Half of that is `segmentData["/_full"]`, byte-identical
-// to `rsc` in 40/40 sampled objects, so ~20% of the bucket is a duplicate of
-// bytes already stored one key over. Setting `experimental.clientSegmentCache:
-// false` in next.config.ts would take the bucket to ~60% of its current size;
-// it is left ON because the segment cache is load-bearing for prefetching here
-// and the interaction with `prefetchInlining: false` (see the long note in
-// next.config.ts) has not been tested on a preview deploy. Measure before
-// trusting either number again.
+// Each entry carries a `segmentData` map next to `html` and `rsc` — Next 16's
+// client segment cache, on by default, nothing here opts in. Measured over a
+// whole build rather than a sample (`node scripts/analyze-cache.mjs`):
+//
+//   html         0.731 GiB  31.2%
+//   rsc          0.477 GiB  20.4%
+//   segmentData  1.003 GiB  42.8%
+//     of which `/_full` is 0.477 GiB / 20.4%, and byte-identical to `rsc`
+//     in 1,045 of 1,045 objects
+//
+// So a fifth of the bucket is `rsc` stored a second time under another key.
+//
+// THIS COMMENT USED TO SAY that `experimental.clientSegmentCache: false` would
+// take the bucket to ~60% of its size. That option does not exist. It is not a
+// key Next 16.3.0 accepts: the build warns "Unrecognized key(s) in object:
+// 'clientSegmentCache' at experimental", `tsc` rejects it against
+// `ExperimentalConfig`, and the only occurrences of the name anywhere in
+// `next/dist` are inside source maps. `segmentData` is emitted unconditionally
+// — app-render.js guards `collectSegmentData(...)` on nothing but
+// `renderOpts.isBuildTimePrerendering` — so on this Next version there is no
+// flag that turns it off. Tried on 2026-08-14; the build fails outright.
+//
+// The waste is real and the lever is not here. It also turns out to be the
+// smaller prize. These objects are written to R2 UNCOMPRESSED, and they are
+// repetitive JSON — `node scripts/analyze-cache.mjs --compress`, sampled over
+// 121 of the 1,081 objects:
+//
+//   gzip -6     18.6% of raw   5.4×   2.340 GiB → ~0.44 GiB
+//   brotli q5    5.9% of raw  17.0×   2.340 GiB → ~0.14 GiB
+//
+// Compressing cache values in a custom `incrementalCache` override — this file
+// already wraps one with `withRegionalCache` — subsumes the duplication problem
+// entirely, because a byte-identical copy of `rsc` is exactly what a compressor
+// erases. It would cut the per-deploy populate upload and the per-retained-build
+// storage by the same factor. The work is the read side: whatever writes
+// compressed has to decompress in the Worker, and `enableCacheInterception`
+// means the routing layer reads these too. Not attempted yet; measure again
+// before committing to a codec, and prefer the one whose decompress cost the
+// Worker can absorb on a cache hit.
 //
 // Reads are NOT rare, which this comment used to claim. Next sets
 // `s-maxage=31536000` on the prerendered responses, but a Worker runs *ahead*
