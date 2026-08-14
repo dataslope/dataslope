@@ -489,6 +489,12 @@ jobs:
             fi
 
             if (( rc == 0 )); then
+              # Logged even though remember() may discard it as a duplicate.
+              # It usually IS one — a healthy preview serves its own branch
+              # head — and when the answer is deduped under an earlier claim
+              # the keep-set listing shows that other claim's reason, leaving
+              # no trace that the probe ran at all. A dry run exists to be read.
+              echo "Preview '$branch' is serving ${served:0:12} (probed at $alias_url)"
               remember "$served" live "serving the '$branch' preview, probed at $alias_url"
               continue
             fi
