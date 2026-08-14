@@ -1,22 +1,15 @@
-// Local ambient declarations for runtimes that are loaded from a CDN at
-// runtime and are NOT installed from npm (they were dropped from
-// package.json to keep `npm ci` lean — php-wasm alone is ~190 MB unpacked).
-// Each block declares only the slice of the real package's API that the
-// workers actually touch; the version each CDN URL pins is the compat
-// contract (see cdn.ts / the per-worker *_VERSION constants).
+// Ambient declarations for CDN-loaded runtimes NOT installed from npm
+// (php-wasm alone is ~190 MB unpacked). Each block declares only the API
+// slice the workers touch; the pinned CDN version is the compat contract.
 
-// plotly.js-dist-min has no shipped types; we only use a tiny slice
-// (described in `Playground.tsx` as `PlotlyAPI`).
+// plotly.js-dist-min has no shipped types; only a tiny slice is used.
 declare module "plotly.js-dist-min" {
   const Plotly: unknown;
   export default Plotly;
 }
 
-// pyodide: the runtime module is fetched from jsDelivr inside
-// pyodide-worker.ts (loadPyodideModule); this mirrors the members of the
-// real PyodideInterface the worker calls. PyProxy values cross this
-// boundary as `any`, matching the loosely-typed proxies the real package
-// exposes.
+// pyodide: mirrors the PyodideInterface members the worker calls. PyProxy
+// values cross as `any`, matching the real package's loose proxies.
 declare module "pyodide" {
   interface LoadPackageOptions {
     messageCallback?: (message: string) => void;
@@ -47,10 +40,8 @@ declare module "pyodide" {
   }
 }
 
-// php-wasm: the runtime module is fetched from unpkg inside php-worker.ts
-// (see PHP_WASM_ENTRY); this mirrors the PhpWeb members the worker calls.
-// PhpWeb extends EventTarget ("output"/"error" CustomEvents carry the
-// program's stdout/stderr).
+// php-wasm: mirrors the PhpWeb members the worker calls. PhpWeb extends
+// EventTarget ("output"/"error" CustomEvents carry stdout/stderr).
 declare module "php-wasm/PhpWeb" {
   export class PhpWeb extends EventTarget {
     constructor(options?: {

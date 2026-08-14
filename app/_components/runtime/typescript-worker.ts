@@ -1,13 +1,8 @@
 /// <reference lib="webworker" />
 
-// Web Worker that executes TypeScript code via almostnode. .ts/.tsx
-// files are first transpiled to JavaScript with the official TypeScript
-// compiler (already a build dependency), then staged into almostnode's
-// VirtualFS under .js paths so CommonJS resolution picks them up
-// (almostnode's resolver tries .js/.json/.node, not .ts).
-//
-// Protocol mirrors javascript-worker.ts exactly so the adapter code can
-// share the same message shapes.
+// Web Worker executing TypeScript via almostnode: .ts/.tsx files are
+// transpiled then staged under .js paths (almostnode's resolver tries
+// .js/.json/.node, not .ts). Protocol mirrors javascript-worker.ts.
 
 import { AlmostNodeRunner, normalizeVfsPath } from "./almostnode-worker-shared";
 // Shared with scripts/check-js-blocks.mjs so the sweep transpiles with the
@@ -34,14 +29,11 @@ function post(msg: OutMessage): void {
 }
 
 
-// One runner shared across messages. It hands each run a VirtualFS that
-// reflects only that run's files (see AlmostNodeRunner), so neither the
-// transpiled entry nor the staged modules from one block's run leak into
-// the next on this long-lived worker.
+// One runner shared across messages; each run gets a VFS with only that
+// run's files (see AlmostNodeRunner).
 const runner = new AlmostNodeRunner();
-// Pending diagnostics from the most recent prepare-fs, replayed as
-// stderr on the next run so the user sees compile errors next to the
-// failed execution rather than in a void.
+// Diagnostics from the last prepare-fs, replayed as stderr on the next run
+// so compile errors appear next to the failed execution.
 let pendingDiagnostics: string[] = [];
 
 async function handlePrepareFs(
@@ -59,10 +51,8 @@ async function handlePrepareFs(
       if (diagnostics.length > 0) {
         for (const d of diagnostics) pendingDiagnostics.push(`TS (${path}): ${d}`);
       }
-      // Write the transpiled JS under the .js-suffixed path. Keep the
-      // original .ts file out of the VFS, almostnode's resolver
-      // wouldn't use it anyway, and dropping it avoids two competing
-      // copies of the same module under different extensions.
+      // Only the transpiled .js goes in the VFS; keeping the .ts too would
+      // leave two competing copies of the same module.
       return [[tsToJsPath(path), encoder.encode(outputText)]];
     });
     post({ kind: "prepare-fs-done", id });
@@ -77,14 +67,12 @@ async function handleRun(
   code: string,
   entryPath: string,
 ): Promise<void> {
-  // Translate the workspace-relative entry path (e.g. "index.ts") to
-  // the on-disk VFS path of the transpiled output (e.g. "/index.js").
+  // Entry path ("index.ts") → transpiled VFS path ("/index.js").
   const entryVfsPath = normalizeVfsPath(
     isTsPath(entryPath) ? tsToJsPath(entryPath) : entryPath,
   );
 
-  // Flush any diagnostics gathered during prepare-fs first so the user
-  // sees them alongside (and before) the run's runtime output.
+  // Flush prepare-fs diagnostics before the run's runtime output.
   for (const msg of pendingDiagnostics) {
     post({ kind: "stderr", id, content: msg });
   }
@@ -93,11 +81,9 @@ async function handleRun(
   await runner.run(
     entryVfsPath,
     (vfs) => {
-      // Prefer the staged + transpiled copy of the entry file (multi-
-      // file). Fall back to transpiling `code` inline when this run
-      // wasn't staged (single-file). The runner hands us an empty VFS in
-      // the single-file case, so `existsSync` can't pick up a stale entry
-      // left by a previous block's run.
+      // Prefer the staged transpiled entry (multi-file); fall back to
+      // transpiling `code` inline (single-file, where the runner hands us
+      // an empty VFS so a stale entry can't be picked up).
       if (vfs.existsSync(entryVfsPath)) {
         return new TextDecoder().decode(vfs.readFileSync(entryVfsPath));
       }

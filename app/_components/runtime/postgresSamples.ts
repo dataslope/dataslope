@@ -9,11 +9,9 @@ import {
 export interface PostgresSampleDatabase extends SqlSampleDatabaseBase {
   /** Inline DDL + seed SQL. Ignored when `remoteSql` is set. */
   sql?: string;
-  /** Path (inside the dataslope/datasets GitHub repo) or full URL of a
-   *  SQL script that creates *and* populates the database. Fetched from
-   *  raw.githubusercontent.com when the sample is loaded and prepared
-   *  for PGlite (psql meta-commands and CREATE/DROP DATABASE statements
-   *  stripped), see remoteDatasets.ts and postgres.ts. */
+  /** Repo path or full URL of a SQL script that creates and populates the
+   *  database, prepared for PGlite (psql meta-commands and CREATE/DROP
+   *  DATABASE stripped); see remoteDatasets.ts and postgres.ts. */
   remoteSql?: string;
   defaultTabs: QueryTabSeed[];
 }
@@ -444,11 +442,10 @@ const CREDIT_CARD_TABS: QueryTabSeed[] = [
 ];
 
 // ────────────────────────────────────────────────────────────────────────
-// Sample 2: chinook.pg, the complete Chinook music store database
-// (v1.4.5, auto-increment PKs variant), fetched from the
-// dataslope/datasets GitHub repo at load time. Table names are
-// snake_case singular: album, artist, track, genre, media_type,
-// playlist, playlist_track, customer, employee, invoice, invoice_line.
+// Sample 2: chinook.pg (v1.4.5, auto-increment PKs variant), fetched at
+// load time. snake_case singular tables: album, artist, track, genre,
+// media_type, playlist, playlist_track, customer, employee, invoice,
+// invoice_line.
 // ────────────────────────────────────────────────────────────────────────
 
 const CHINOOK_TABS: QueryTabSeed[] = [
@@ -467,11 +464,9 @@ const CHINOOK_TABS: QueryTabSeed[] = [
 ];
 
 // ────────────────────────────────────────────────────────────────────────
-// Sample 3: northwind.pg, the classic Northwind database (the
-// pgsql-flavoured port), fetched from the dataslope/datasets GitHub
-// repo at load time. Table names are snake_case plural: categories,
-// customers, employees, order_details, orders, products, region,
-// shippers, suppliers, territories, us_states, …
+// Sample 3: northwind.pg (pgsql-flavoured port), fetched at load time.
+// snake_case plural tables: categories, customers, employees,
+// order_details, orders, products, region, shippers, suppliers, …
 // ────────────────────────────────────────────────────────────────────────
 
 const NORTHWIND_TABS: QueryTabSeed[] = [

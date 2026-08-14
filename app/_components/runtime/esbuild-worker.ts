@@ -1,31 +1,15 @@
 /// <reference lib="webworker" />
 
-// esbuild-wasm bundling worker, the transform step behind the React
-// playground. Mirrors the TS language worker's loading strategy: the
-// heavy dependency (esbuild's browser build + its WASM binary) is pulled
-// from the pinned jsDelivr package with `importScripts`, so the bundler
-// never touches it and nothing lands in the client chunks; the download
-// happens once, when a React block/playground first boots.
-//
-// Per bundle request the worker runs esbuild's in-memory `build` over
-// the workspace snapshot with two resolution rules supplied by a plugin:
-//
-//   - relative imports resolve against the virtual file system (the
-//     playground's tabs), trying the usual extension/index candidates;
-//   - bare imports (`react`, `react-dom/client`, any npm package)
-//     rewrite to pinned esm.sh URLs and stay external, the browser
-//     fetches them as native ES modules inside the preview iframe.
-//
-// CSS imported from user code comes back as a separate output file that
-// the adapter inlines into the preview document's <style>.
-//
-// Protocol: `bundle` request / `bundle-done` | `bundle-error` response
-// correlated by id, plus the usual `ready` boot signal.
+// esbuild-wasm bundling worker for the React playground. The heavy
+// dependency comes from jsDelivr via importScripts (never bundled). Per
+// request it runs esbuild's in-memory build with the shared vfsPlugin
+// rules (relative → VFS, bare → external esm.sh URLs); imported CSS comes
+// back as a separate output the adapter inlines. Protocol: bundle /
+// bundle-done | bundle-error by id, plus a ready boot signal.
 
 import { ESBUILD_WASM_CDN_BASE } from "./cdn";
-// The bundling contract itself — resolution rules, loader table and build
-// options — lives in a module the Node-side generator imports too, so a
-// block's precomputed preview and its in-browser Run cannot drift apart.
+// The bundling contract lives in a module the Node-side generator imports
+// too, so precomputed previews and in-browser Runs cannot drift apart.
 import {
   REACT_BUILD_OPTIONS,
   splitBundleOutput,
@@ -33,9 +17,8 @@ import {
   type EsbuildOutputFile,
 } from "./reactBundle";
 
-// The one part of the esbuild surface that stays local: `initialize` is
-// browser-only, and the build signature is loose because the options
-// themselves come from the shared module (REACT_BUILD_OPTIONS).
+// Local esbuild surface: `initialize` is browser-only, and the build
+// signature stays loose (options come from the shared module).
 interface EsbuildMessage {
   text: string;
   location: { file: string; line: number; column: number } | null;
@@ -51,11 +34,9 @@ declare const self: DedicatedWorkerGlobalScope & {
   esbuild: EsbuildApi;
 };
 
-// Boot failures (CDN unreachable, WASM instantiation error) must be
-// reported through the message protocol: a top-level throw here does
-// NOT reliably surface as an `error` event on the page's Worker handle
-// once Turbopack's worker bootstrap wraps this module, so an uncaught
-// throw would leave the adapter waiting on `ready` forever.
+// Boot failures MUST go through the message protocol: a top-level throw
+// doesn't reliably surface as an `error` event once Turbopack's worker
+// bootstrap wraps this module, and would leave the adapter waiting forever.
 const initPromise = (async () => {
   self.importScripts(`${ESBUILD_WASM_CDN_BASE}/lib/browser.min.js`);
   // `worker: false`, we ARE the worker; esbuild would otherwise nest one.
@@ -125,8 +106,8 @@ self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
   void bundle(msg);
 });
 
-// `ready` only once the WASM toolchain is actually usable, so the boot
-// overlay covers the whole download/instantiation wait.
+// `ready` only once the toolchain is actually usable, so the boot overlay
+// covers the whole wait.
 initPromise.then(
   () => post({ kind: "ready" }),
   (err) =>

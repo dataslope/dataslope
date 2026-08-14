@@ -1,12 +1,7 @@
 /**
- * Centralized lookup of the language adapters keyed by their stable
- * id (matching the entries in `playgrounds.ts` and the adapter
- * implementations under `runtime/`).
- *
- * Used by `MdxCodeBlock` so MDX content can reference an adapter by
- * its short id string (e.g. `"python"`) instead of importing the
- * adapter module directly, MDX content has no TypeScript import
- * surface of its own.
+ * Language adapters keyed by stable id (matching playgrounds.ts). Lets
+ * MDX content reference an adapter by id string — MDX has no TypeScript
+ * import surface of its own.
  */
 import type { LanguageAdapter } from "../types";
 import { pythonAdapter } from "./python";

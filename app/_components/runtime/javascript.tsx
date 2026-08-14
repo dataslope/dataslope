@@ -15,12 +15,10 @@ import {
   decodeWorkspaceTextFiles,
 } from "./tsLanguageService";
 
-// JavaScript runs in a dedicated Web Worker backed by almostnode, a
-// browser-native Node.js runtime. The worker stages every open file
-// (code tabs + uploaded data) into almostnode's VirtualFS, then
-// executes the entry file with CommonJS semantics. `require()` works,
-// 40+ Node.js modules are shimmed (`fs`, `path`, `http`, `events`,
-// `crypto`, …), and multi-file imports resolve from VirtualFS.
+// JavaScript runs in a dedicated Web Worker backed by almostnode (a
+// browser-native Node.js runtime): workspace files stage into VirtualFS
+// and the entry executes with CommonJS semantics; 40+ Node modules are
+// shimmed.
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -241,11 +239,8 @@ module.exports = { hello, bye };
 ];
 
 const PACKAGES: PackageInfo[] = [
-  // No installable packages are surfaced yet, npm package install in
-  // the packages drawer is a future feature (see the integration plan
-  // in agent-outputs/). almostnode's bundled Node.js shims (`fs`,
-  // `path`, `crypto`, …) are always available via require() without
-  // any UI plumbing.
+  // npm install via the drawer is a future feature; almostnode's Node
+  // shims are always require()-able.
 ];
 
 type WorkerOutMessage =
@@ -258,22 +253,18 @@ type WorkerOutMessage =
 
 class JavaScriptWorkerRuntime implements LanguageRuntime {
   private nextId = 0;
-  // Text files from the last `prepareFileSystem` snapshot, cross-file
-  // context for the language-service completions (imports of sibling
-  // workspace files resolve against these).
+  // Last snapshot's text files: cross-file context for completions.
   private stagedText = new Map<string, string>();
 
   constructor(private worker: Worker) {}
 
-  /** Free the runtime by terminating its worker. Registry-eviction hook,
-   *  the instance must not be used after this. */
+  /** Terminate the worker (registry-eviction hook; unusable after). */
   dispose(): void {
     this.worker.terminate();
   }
 
-  /** Intellisense via the shared TS language service worker (allowJs
-   *  inference), separate from the execution worker so analysis never
-   *  queues behind a long-running user program. */
+  /** Intellisense via the shared TS language service worker, separate from
+   *  execution so analysis never queues behind a running user program. */
   async complete(request: CompletionRequest): Promise<CompletionResult> {
     return completeWithTsService(
       buildTsCompletionRequest(
@@ -330,9 +321,8 @@ class JavaScriptWorkerRuntime implements LanguageRuntime {
         kind: "run",
         id,
         code,
-        // The Playground passes the active file's path. Falling back
-        // to "index.js" preserves single-file behaviour for callers
-        // that don't supply options (e.g. tests / legacy bootstraps).
+        // "index.js" preserves single-file behaviour for callers that
+        // don't supply options.
         entryPath: options?.entryFilename ?? "index.js",
       });
     });
@@ -382,9 +372,8 @@ export const javascriptAdapter: LanguageAdapter = {
   importSnippet: (name) => `const ${name} = require("${name}");`,
   hasImport(code, name) {
     const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    // Match `require("name")` or `require('name')` anywhere in the file.
-    // We don't require the const/let binding so users who write
-    // `require("x").doThing()` aren't pestered to insert again.
+    // Match bare `require("name")` too, so `require("x").doThing()` users
+    // aren't pestered to insert again.
     const re = new RegExp(`require\\(\\s*["'\`]${escapedName}["'\`]\\s*\\)`);
     return re.test(code);
   },
@@ -394,17 +383,10 @@ export const javascriptAdapter: LanguageAdapter = {
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Starting JavaScript runtime…");
-    // The worker is pre-bundled by `scripts/build-almostnode-workers
-    // .mjs` to `public/_workers/javascript-worker.js`. We point the
-    // Worker constructor at the resulting static URL (not at
-    // `new URL("./javascript-worker.ts", import.meta.url)`) so
-    // Turbopack never sees the import, Turbopack's worker bundler
-    // splits almostnode's ~16 MB tree across many chunks loaded via
-    // `importScripts`, where colliding minified top-level identifiers
-    // throw `Identifier 'e1' has already been declared` at startup.
-    // The pre-bundled file is a single self-contained ES module, so
-    // no chunking, no collision, and `{ type: "module" }` is honoured
-    // by the browser directly.
+    // Pre-bundled by scripts/build-almostnode-workers.mjs and loaded via
+    // static URL so Turbopack never sees the import: its worker bundler
+    // chunks almostnode's ~16 MB tree and colliding minified identifiers
+    // throw "Identifier 'e1' has already been declared" at startup.
     const worker = new Worker("/_workers/javascript-worker.js", {
       type: "module",
     });

@@ -1,14 +1,8 @@
 /**
- * Which R packages a block needs, read off its source.
- *
- * Extracted from `r.tsx` so `scripts/check-r-blocks.mjs` can install the same
- * set the reader's session installs. `r.tsx` is a React component and cannot
- * be imported from a script, and a sweep that guessed at this separately would
- * drift: install too few and lessons fail on a missing package that readers
- * have, install too many and the sweep is slower than it needs to be and stops
- * resembling the session under test.
- *
- * `r.tsx` imports these, so there is one definition.
+ * Which R packages a block needs, read off its source. Extracted from
+ * r.tsx (a React component scripts can't import) so
+ * scripts/check-r-blocks.mjs installs exactly the set a reader's session
+ * installs — one definition, no drift.
  */
 
 /** Shipped with webR's R build; `library()` on these never needs a download. */

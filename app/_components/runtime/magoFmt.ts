@@ -1,9 +1,6 @@
-// Shared mago_fmt WASM loader used by the PHP playground.
-// The singleton pattern means the WASM binary is fetched and compiled
-// only once per page load.
-//
-// The version is pinned to match the installed npm package so the JS
-// and WASM builds always stay in sync, update both together.
+// Shared mago_fmt WASM loader (PHP playground); singleton so the WASM
+// compiles once per page. Keep the version in sync with the installed npm
+// package — update both together.
 const MAGO_FMT_VERSION = "1.44.0";
 
 let magoFmtInitPromise: Promise<{

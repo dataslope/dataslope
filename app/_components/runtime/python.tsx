@@ -681,9 +681,8 @@ type WorkerOutMessage =
     };
 
 /**
- * Resolve the active light/dark mode so the worker can pick a matching Plotly
- * template. Playground pages set `data-playground-theme` on <html>; the Fumadocs-powered
- * `/learn` pages use next-themes, which toggles a `.dark` class instead.
+ * Resolve light/dark mode for the Plotly template. Playground pages set
+ * `data-playground-theme` on <html>; /learn pages toggle a `.dark` class.
  */
 function detectChartTheme(): "light" | "dark" {
   if (typeof document === "undefined") return "dark";
@@ -698,8 +697,7 @@ class PyodideWorkerRuntime implements LanguageRuntime {
 
   constructor(private worker: Worker) {}
 
-  /** Free the Pyodide heap by terminating the worker. Registry-eviction
-   *  hook, the instance must not be used after this. */
+  /** Terminate the worker (registry-eviction hook; unusable after). */
   dispose(): void {
     this.worker.terminate();
   }
