@@ -23,9 +23,21 @@ import { withRegionalCache } from "@opennextjs/cloudflare/overrides/incremental-
 // fall through to a re-render and 500 on exactly those `node:fs` pages. R2 is
 // read from identically on production and preview deployments, so previews
 // render correctly too. Each deploy's populate step writes a full copy of the
-// cache under a new build ID, ~1–1.4 GB (one HTML+RSC `.cache` object per
-// prerendered page), so stale build folders are pruned on a schedule by
-// .github/workflows/r2-cache-cleanup.yml.
+// cache under a new build ID, ~2.5 GB (one `.cache` object per prerendered
+// page, ~1,080 of them averaging ~2.3 MB), so stale build folders are pruned on
+// a schedule by .github/workflows/r2-cache-cleanup.yml.
+//
+// That figure read "~1–1.4 GB" until 2026-08-14 and was measured at 2.504 GB.
+// Each entry now carries a `segmentData` map next to `html` and `rsc` — Next
+// 16's client segment cache, on by default, nothing here opts in — and it is
+// ~40% of every object. Half of that is `segmentData["/_full"]`, byte-identical
+// to `rsc` in 40/40 sampled objects, so ~20% of the bucket is a duplicate of
+// bytes already stored one key over. Setting `experimental.clientSegmentCache:
+// false` in next.config.ts would take the bucket to ~60% of its current size;
+// it is left ON because the segment cache is load-bearing for prefetching here
+// and the interaction with `prefetchInlining: false` (see the long note in
+// next.config.ts) has not been tested on a preview deploy. Measure before
+// trusting either number again.
 //
 // Reads are NOT rare, which this comment used to claim. Next sets
 // `s-maxage=31536000` on the prerendered responses, but a Worker runs *ahead*

@@ -4,11 +4,19 @@ name: R2 incremental-cache cleanup
 #
 # Why this exists: the R2 cache keys every object as
 # `incremental-cache/<buildId>/<hash>.cache` (see open-next.config.ts). Each
-# deploy, production AND every Cloudflare preview, writes a fresh ~1–1.4 GB
-# folder under a new build ID (one HTML+RSC `.cache` object per prerendered
-# page, ~1,600 of them), and OpenNext never deletes old ones. Left alone, the
-# bucket grows by that much per deploy forever; at active-development velocity
-# that reached ~34 GB in a matter of days.
+# deploy, production AND every Cloudflare preview, writes a fresh ~2.5 GB
+# folder under a new build ID (one `.cache` object per prerendered page, ~1,080
+# of them averaging ~2.3 MB), and OpenNext never deletes old ones. Left alone,
+# the bucket grows by that much per deploy forever; at active-development
+# velocity that reached ~34 GB in a matter of days.
+#
+# That per-folder figure read "~1–1.4 GB / ~1,600 objects" until 2026-08-14 and
+# was measured at 2.504 GB / 1,081 objects: fewer, much larger objects. Next 16's
+# client segment cache writes a `segmentData` map into every entry alongside
+# `html` and `rsc`, and it is ~40% of each object — half of that being
+# `segmentData["/_full"]`, which sampling found byte-identical to `rsc` in 40/40
+# objects. Nothing in this repo turns it on; it arrived as a Next default. Assume
+# the number drifts again and re-measure before trusting it.
 #
 # The build ID IS the deployed commit SHA: next.config.ts sets `generateBuildId`
 # to WORKERS_CI_COMMIT_SHA on Cloudflare Workers Builds, so a folder name equals
@@ -20,40 +28,75 @@ name: R2 incremental-cache cleanup
 #   • the live production build (probed from the running Worker), a site that
 #     sits unchanged for months must never lose its cache, which would 500 the
 #     home page and /courses/* (see open-next.config.ts), AND
-#   • any folder written within the last GRACE_HOURS, whatever it matches. A
+#   • any folder POPULATED within the last GRACE_HOURS, whatever it matches
+#     (populated, not "last written" — see step 5; objects also arrive at
+#     request time and must not be mistaken for a deploy). A
 #     deploy populates its cache folder BEFORE the Worker switches to serving
 #     that build, so for some minutes the incoming production folder is
 #     protected by neither the probe (which still reports the outgoing build)
 #     nor the open-PR rule below (a merge commit's PR closed on merge). A
 #     scheduled run that fired inside that window deleted the incoming
 #     production cache mid-deploy and 500'd the site (2026-07-16), AND
-#   • any folder built from one of the MAIN_COMMITS most recent commits on the
-#     default branch. Production builds only ever come from that branch, so
-#     this keeps the incoming/just-switched production build even when a
-#     deploy stalls past the grace window; the THRESHOLD_HOURS age rule still
-#     retires these once they are old enough to be long superseded.
-#
 #   • any folder that a PREVIEW is still serving, i.e. a recent commit of an
 #     open PR whose head build has not populated its cache yet. A push moves
 #     the PR head immediately but the preview Worker keeps serving the previous
-#     commit until the new build lands, so the head-only rule below would
+#     commit until the new build lands, so the open-PR-head rule below would
 #     delete the cache out from under a live preview and 500 it. Production has
 #     been guarded against this since 2026-07-16 by the build-ID probe; this is
-#     the preview equivalent, added 2026-08-05 after a run did exactly that.
+#     the preview equivalent, added 2026-08-05 after a run did exactly that, AND
+#   • any folder whose commit is the current head of an OPEN pull request, i.e.
+#     the live preview of an active branch, for as long as that PR stays open
+#     and among the MAX_BRANCHES most-recently-deployed such branches. Age is
+#     deliberately NOT a factor here (see below). Superseded commits (an older
+#     head of a still-open PR) and merged/closed PR previews do not match, so
+#     they are pruned.
 #
-# Every OTHER folder is kept only while ALL of these hold:
-#   • younger than THRESHOLD_HOURS, AND
-#   • its commit is the current head of an OPEN pull request, i.e. the most
-#     recent commit on an active branch. Superseded commits (an older head of a
-#     still-open PR) and merged/closed PR previews no longer match, so they are
-#     pruned, AND
-#   • its branch is among the MAX_BRANCHES most-recently-deployed such branches.
+# Every OTHER folder is kept only while younger than THRESHOLD_HOURS. Within
+# that window one more rule applies: a folder built from one of the MAIN_COMMITS
+# most recent default-branch commits is kept even though nothing else claims it.
+# Production builds only ever come from that branch, so this covers the incoming
+# build of a deploy that stalls past the grace window. It cannot outlive
+# THRESHOLD_HOURS — deliberately, since a superseded production build has no
+# claim on the bucket and the live one is already protected by the probe.
+#
+# The rules are applied to each folder in a fixed order, and the order carries
+# the policy — see step 5:
+#
+#   1. written within GRACE_HOURS            -> KEEP
+#   2. predecessor of a pending head build   -> KEEP
+#   3. head of an open PR (within the cap)   -> KEEP
+#   4. older than THRESHOLD_HOURS            -> DELETE
+#   5. recent default-branch commit          -> KEEP
+#   6. anything else                         -> DELETE
+#
+# Rule 3 sat BELOW the age check until 2026-08-14, which meant an open PR's
+# preview lost its cache once the folder aged past THRESHOLD_HOURS even though
+# the PR was still open and that commit was still its head — the preview then
+# re-rendered on demand and 500'd every `node:fs` page (see open-next.config.ts).
+# THRESHOLD_HOURS was set to 24 mainly to paper over that ("keeps a preview alive
+# through next-morning review"), which forced a day-deep tail of every OTHER
+# folder too and was the single largest contributor to a 78 GB bucket. Keeping an
+# open PR's head on merit instead of on age decouples the two: previews now live
+# exactly as long as their PR does, and THRESHOLD_HOURS is free to be short.
+#
+# Rule 5 stays BELOW the age check on purpose, for the reason given above. Note
+# the consequence of pairing that with a short THRESHOLD_HOURS: the cover for a
+# stalled production deploy is now GRACE_HOURS..THRESHOLD_HOURS, i.e. 2-4h
+# rather than 2-24h. Populate and switchover are consecutive steps of one
+# `opennextjs-cloudflare deploy`, minutes apart, so 4h is still ~2x the margin
+# the grace window alone was documented as covering — but if that assumption
+# ever stops holding, raise THRESHOLD_HOURS rather than MAIN_COMMITS, which
+# cannot help past the cutoff.
 #
 # Net effect: the live production build, plus at most one preview per active
-# branch, capped at MAX_BRANCHES. Merging a PR (or pushing a newer commit to it)
-# drops the stale preview folder on the next run. Worst case is
-# (MAX_BRANCHES + 1) build folders, plus the transient grace-window and
-# recent-main keeps, which the age rule bounds to a THRESHOLD_HOURS-deep tail.
+# branch capped at MAX_BRANCHES, plus a THRESHOLD_HOURS-deep tail of everything
+# else. Merging a PR (or pushing a newer commit to it) drops the stale preview
+# folder on the next run. Worst case is (MAX_BRANCHES + 1) build folders plus
+# that tail; at the deploy velocity measured on 2026-08-14 (~1.2 deploys/hour)
+# the tail dominates, and its depth is the sweep interval plus THRESHOLD_HOURS,
+# NOT THRESHOLD_HOURS alone — a folder created just after a sweep is not
+# reconsidered until the next one. That is why the schedule below matters as
+# much as the threshold.
 #
 # Safety: the job aborts WITHOUT deleting anything if it cannot (a) positively
 # identify the live production build folder, (b) list the repo's open pull
@@ -79,10 +122,22 @@ name: R2 incremental-cache cleanup
 
 on:
   schedule:
-    # Every 6 hours, off the top of the hour to avoid scheduler congestion.
+    # Every 2 hours, off the top of the hour to avoid scheduler congestion.
     # (GitHub delays scheduled runs by up to a few hours under load; the
     # THRESHOLD_HOURS retention absorbs that jitter.)
-    - cron: "17 */6 * * *"
+    #
+    # Was every 6 hours until 2026-08-14. The sweep interval is an ADDEND to
+    # retention, not a detail: a folder written just after a sweep survives
+    # untouched until the next one, so the worst-case age of a prunable folder
+    # is interval + THRESHOLD_HOURS. At 6h + 24h that was a 30-hour tail, and at
+    # ~1.2 deploys/hour and ~2.5 GB/folder the tail alone accounted for most of
+    # the bucket. Lowering THRESHOLD_HOURS without also sweeping more often
+    # would have left the interval as the binding constraint.
+    #
+    # The job is cheap to run: it LISTs the bucket (Class B, $0.36/million) and
+    # DELETEs are free, so the cost of 12 runs/day over 4 is a couple of minutes
+    # of Actions time.
+    - cron: "17 */2 * * *"
   workflow_dispatch:
     inputs:
       dry_run:
@@ -106,13 +161,25 @@ jobs:
       BUCKET: dataslope-inc-cache
       PREFIX: incremental-cache/
       BUILD_ID_URL: https://dataslope.com/api/cache-build-id
-      # A non-production build survives only while ALL hold: younger than
-      # THRESHOLD_HOURS, the current head commit of an open PR (the latest
-      # commit on an active branch), and among the MAX_BRANCHES most-recently-
-      # deployed such branches. 24 h keeps a PR's preview URL alive through
-      # next-morning review; MAX_BRANCHES bounds the bucket at
-      # (MAX_BRANCHES + 1) build folders total on busy days.
-      THRESHOLD_HOURS: "24"
+      # Blanket expiry for any folder NOT otherwise spoken for: not the live
+      # production build, not inside the grace window, not an open PR's head,
+      # not a predecessor of a pending head build. In practice that is merged
+      # and abandoned previews, plus superseded production builds.
+      #
+      # 4h, down from 24h on 2026-08-14. The 24h figure existed to keep an open
+      # PR's preview alive overnight, which rule 3 now does on merit regardless
+      # of age (see the header), so this no longer has to be generous on a
+      # preview's behalf. What is left is "how long to keep a build nobody is
+      # serving", and the answer is only long enough to absorb the races the
+      # grace window and the pending-head rule already handle explicitly.
+      # Combined with the 2h sweep interval the real worst case is ~6h.
+      THRESHOLD_HOURS: "4"
+      # Caps how many open-PR previews are protected, newest-deployed first.
+      # Now that rule 3 ignores age, this is the ONLY bound on preview
+      # retention: a PR left open for months keeps its head folder for months.
+      # At ~2.5 GB/folder that is a worst case of ~25 GB in previews, which is
+      # the deliberate price of previews that do not rot. Lower it if open-PR
+      # count grows; it has been 1-3 in practice.
       MAX_BRANCHES: "10"
       # Never delete a folder written within the last GRACE_HOURS, no matter
       # what it matches. A deploy populates its R2 folder minutes before the
@@ -126,7 +193,16 @@ jobs:
       # the default branch (production builds only come from there), so a
       # production deploy that stalls past the grace window still can't lose
       # its cache. The THRESHOLD_HOURS age rule retires these eventually.
-      MAIN_COMMITS: "30"
+      #
+      # 10, down from 30 on 2026-08-14, and non-binding either way: this rule
+      # is checked AFTER the age cutoff, so it can only ever protect a build
+      # younger than THRESHOLD_HOURS. The last 10 default-branch commits spanned
+      # 19.2 hours when measured, ~5x the 4h window, so the age rule bites first
+      # and the count is pure headroom. It is expressed as a commit count rather
+      # than a duration because that is what `gh api .../commits` takes; keep it
+      # comfortably above the number of commits the branch sees in
+      # THRESHOLD_HOURS and it does its job.
+      MAIN_COMMITS: "10"
       # A preview branch whose HEAD build has not populated its cache yet is
       # mid-deploy, and its Worker is still serving an EARLIER commit. Keep
       # that many recent commits of such a branch so the build actually being
@@ -135,7 +211,8 @@ jobs:
       # nothing extra. See step 4b.
       PR_COMMITS: "3"
       # How many objects a build folder must hold to count as populated. A
-      # healthy folder held 966-986 objects when this was written; the point is
+      # healthy folder held 1,081 objects when last measured (2026-08-14); the
+      # point is
       # only to tell "a finished deploy" from "absent, or mid-populate, or
       # half-deleted" (the folder this rule was written for had 5 left), so the
       # threshold sits an order of magnitude below a real cache rather than
@@ -344,46 +421,71 @@ jobs:
           now=$(date -u +%s)
           cutoff=$(( now - THRESHOLD_HOURS * 3600 ))
           grace_cutoff=$(( now - GRACE_HOURS * 3600 ))
-          echo "Policy: keep live production + anything written in the last ${GRACE_HOURS}h + recent '$default_branch' builds + the latest commit of up to $MAX_BRANCHES open-PR branches, each younger than ${THRESHOLD_HOURS}h (cutoff $(date -u -d "@$cutoff" '+%Y-%m-%d %H:%M:%SZ'))"
+          echo "Policy: keep live production + anything written in the last ${GRACE_HOURS}h + the head commit of up to $MAX_BRANCHES open-PR branches (any age) + anything younger than ${THRESHOLD_HOURS}h + recent '$default_branch' builds within that window (cutoff $(date -u -d "@$cutoff" '+%Y-%m-%d %H:%M:%SZ'))"
           echo "Dry run: $DRY_RUN"
 
-          # 5) Timestamp every non-production folder so active-branch previews
-          #    can be ranked newest-first, the MAX_BRANCHES cap needs a global
-          #    order, not a per-folder decision.
+          # 5) Date every non-production folder by when it was POPULATED so
+          #    active-branch previews can be ranked newest-first, the
+          #    MAX_BRANCHES cap needs a global order, not a per-folder decision.
           entries=()
           for folder in "${folders[@]}"; do
             [[ "$folder" == "$prod_folder" ]] && continue
 
-            # Newest object in the folder (all written together at deploy time).
-            # The CLI auto-paginates above 1000 objects and applies --query to
-            # each page separately, so a large build folder returns one max
-            # timestamp PER PAGE (multiple lines). Collapse to the overall max,
-            # R2 reports LastModified in a uniform UTC ISO-8601 layout, so a
-            # lexical sort orders them chronologically, and drop the "None" a
-            # genuinely empty page emits, leaving `date` a single value to parse.
-            newest="$(aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$folder" \
-              --query 'sort_by(Contents, &LastModified)[-1].LastModified' --output text 2>/dev/null \
-              | grep -vxF 'None' | sort | tail -n1 || true)"
-            if [[ -z "$newest" ]]; then
+            # When was this folder POPULATED? Use the median object's
+            # LastModified, not the newest.
+            #
+            # A deploy writes the whole folder in one burst (measured 2026-08-14:
+            # median 0.8 min, max 1.8 min for ~1,081 objects), so any object in
+            # the burst dates the folder to within a couple of minutes. The max
+            # does NOT, because objects also arrive at REQUEST time, long after
+            # the deploy: a request for a `/courses/*` path that isn't
+            # prerendered renders the not-found page and OpenNext caches that
+            # 404 (~1.8 MB, `revalidate: false`) into whichever build folder is
+            # live. Every such write reset the folder's apparent age to zero.
+            # Folder 0127baf6 was populated at 17:54 and then took 404 writes at
+            # 18:22, 19:59, 20:46 and 21:07 — gaps of 28, 97, 47 and 21 minutes,
+            # every one inside GRACE_HOURS — so it was held by the grace rule as
+            # "possibly an in-flight deploy" more than three hours after its
+            # deploy finished. 4 of 33 folders were affected. Left unfixed this
+            # gets worse as THRESHOLD_HOURS shrinks, since there is less headroom
+            # for a stray write to erase, and it is unbounded: one crawler
+            # working through stale URLs can pin a folder open indefinitely.
+            #
+            # The median is immune (a burst of ~1,081 objects cannot be moved by
+            # a handful of late ones) and remains correct for the case the grace
+            # window exists to protect: during an in-flight populate the median
+            # of what has landed so far is also seconds old.
+            #
+            # The CLI auto-paginates above 1000 objects and applies --query per
+            # page, so this emits one tab-separated batch PER PAGE. Flatten to
+            # one stamp per line and sort globally: R2 reports LastModified in a
+            # uniform UTC ISO-8601 layout, so a lexical sort is chronological.
+            # Drop the "None" a genuinely empty page emits.
+            mapfile -t stamps < <(
+              aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$folder" \
+                --query 'Contents[].LastModified' --output text 2>/dev/null \
+                | tr '\t' '\n' | sed '/^$/d' | grep -vxF 'None' | sort || true
+            )
+            if [[ ${#stamps[@]} -eq 0 ]]; then
               echo "skip  $folder (empty)"; continue
             fi
-            entries+=("$(printf '%s\t%s\t%s' "$(date -u -d "$newest" +%s)" "$newest" "$folder")")
+            populated="${stamps[$(( ${#stamps[@]} / 2 ))]}"
+            entries+=("$(printf '%s\t%s\t%s' "$(date -u -d "$populated" +%s)" "$populated" "$folder")")
           done
 
           echo "KEEP  $prod_folder (live production)"
           kept=1; deleted=0; failed=0; branches=0
-          while IFS=$'\t' read -r ts newest folder; do
+          while IFS=$'\t' read -r ts populated folder; do
             [[ -z "$folder" ]] && continue
             # Folder name is the commit SHA: strip the prefix and trailing slash.
             sha="${folder#"$PREFIX"}"; sha="${sha%/}"
 
-            # Order matters: the grace window shields everything first (a
-            # freshly written folder may be an in-flight deploy that nothing
-            # else matches), then age retires old folders (the 24h floor
-            # applies even to an open PR's head), then the default-branch and
-            # per-branch keeps, then the cap.
+            # Order matters, and it IS the policy (see the header for the full
+            # ladder): everything a deploy or a preview might still be serving
+            # is settled BEFORE age is consulted, so the age rule only ever
+            # decides the fate of a build nobody is reading from.
             if (( ts >= grace_cutoff )); then
-              echo "KEEP  $folder (last written $newest, inside the ${GRACE_HOURS}h grace window, possibly an in-flight deploy)"
+              echo "KEEP  $folder (populated $populated, inside the ${GRACE_HOURS}h grace window, possibly an in-flight deploy)"
               kept=$((kept+1)); continue
             elif [[ -n "${pr_pending[$sha]+set}" ]]; then
               # Outranks the age rule deliberately: a build that is still being
@@ -392,20 +494,26 @@ jobs:
               # by PR_COMMITS x MAX_BRANCHES, and only while a head is pending.
               echo "KEEP  $folder (${pr_pending[$sha]}, still being served while that branch's head build is pending)"
               kept=$((kept+1)); continue
-            elif (( ts < cutoff )); then
-              echo "DELETE $folder (last written $newest, older than ${THRESHOLD_HOURS}h)"
-            elif [[ -n "${main_sha[$sha]+set}" ]]; then
-              echo "KEEP  $folder (recent '$default_branch' commit, current or recent production build)"
-              kept=$((kept+1)); continue
             elif [[ -n "${pr_branch[$sha]+set}" ]]; then
+              # Moved above the age check on 2026-08-14. An open PR's head is
+              # its live preview; how long ago it was built says nothing about
+              # whether someone is about to open the URL, and expiring it just
+              # 500s the preview (see open-next.config.ts). A PR going stale is
+              # what closing it is for. Still capped by MAX_BRANCHES, evaluated
+              # newest-deployed first, which is the only bound on this rule now.
               branches=$((branches+1))
               if (( branches <= MAX_BRANCHES )); then
                 echo "KEEP  $folder (${pr_branch[$sha]}, latest commit, branch ${branches}/${MAX_BRANCHES})"
                 kept=$((kept+1)); continue
               fi
               echo "DELETE $folder (${pr_branch[$sha]}, beyond the $MAX_BRANCHES most recent branches)"
+            elif (( ts < cutoff )); then
+              echo "DELETE $folder (populated $populated, older than ${THRESHOLD_HOURS}h)"
+            elif [[ -n "${main_sha[$sha]+set}" ]]; then
+              echo "KEEP  $folder (recent '$default_branch' commit, current or recent production build)"
+              kept=$((kept+1)); continue
             else
-              echo "DELETE $folder (last written $newest, not the head of any open PR, merged, closed, or superseded)"
+              echo "DELETE $folder (populated $populated, not the head of any open PR, merged, closed, or superseded)"
             fi
 
             if [[ "$DRY_RUN" == "true" ]]; then
