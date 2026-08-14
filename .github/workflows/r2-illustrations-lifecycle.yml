@@ -103,9 +103,8 @@ jobs:
             exit 1
           fi
 
-          # Turn an AWS CLI failure into an annotation that says what to do.
-          # AccessDenied on a bucket-configuration call means one specific
-          # thing here, and the CLI's one-liner does not hint at it.
+          # Turn an AWS CLI failure into an annotation that says what to do;
+          # AccessDenied on a bucket-configuration call means one specific thing.
           fail_aws() {
             local what="$1" err="$2"
             printf '%s\n' "$err"
@@ -129,10 +128,8 @@ jobs:
             exit 1
           }
 
-          # Confirm the bucket exists before touching its configuration, so a
-          # typo or a not-yet-created bucket fails here with a clear message.
-          # Note this passes with an object-scoped token too — reachability
-          # says nothing about the right to edit the configuration below.
+          # Confirm the bucket exists first. This passes with an object-scoped
+          # token too — reachability says nothing about config-edit rights.
           if ! aws s3api head-bucket --bucket "$BUCKET" 2>/dev/null; then
             echo "::error::Bucket '$BUCKET' is not reachable with these credentials. Create it, or check the R2 token covers it."
             exit 1
@@ -161,11 +158,9 @@ jobs:
           if [[ "$DRY_RUN" == "true" ]]; then
             echo "---"
             echo "Dry run: existing configuration left untouched. Current rules:"
-            # Reading the configuration needs the same admin-tier token the
-            # write does, so this used to be the one path that hid the problem:
-            # `|| echo "(none set)"` reported a *denied read* as an empty
-            # policy, an all-green dry run that proved nothing. Only a genuine
-            # "this bucket has no rules" may print that now.
+            # Reading the config needs the admin-tier token too: a denied read
+            # must not be reported as "(none set)" — only a genuine
+            # NoSuchLifecycleConfiguration may print that.
             if current="$(aws s3api get-bucket-lifecycle-configuration --bucket "$BUCKET" 2>&1)"; then
               printf '%s\n' "$current"
             elif grep -q 'NoSuchLifecycleConfiguration' <<<"$current"; then

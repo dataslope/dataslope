@@ -1,18 +1,8 @@
 /**
- * Ask AI suggested-questions endpoint.
- *
- * POST, three context-grounded questions for the panel's empty state and
- * after each answer. Signed-in only (it spends provider tokens), but tracked
- * on suggestion-specific daily counters (migration 0006) so it never consumes
- * the member's Ask AI chat budget. Always served by the cheapest configured
- * provider (free tier config first) regardless of the member's tier,
- * suggestions are a UI nicety, not the answer itself.
- *
- * Failures return an error status and the client silently hides the section;
- * nothing here should ever surface as a blocking error to the user.
- *
- * `force-dynamic` for the same reason as app/api/ai/chat/route.ts: reads the
- * session, talks to an external API, must run per request.
+ * Ask AI suggested-questions endpoint. Signed-in only, tracked on
+ * suggestion-specific daily counters so it never consumes the chat budget,
+ * and always served by the cheapest configured provider regardless of tier.
+ * Failures return an error status and the client silently hides the section.
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createAuth } from "@/lib/auth/server";
@@ -46,8 +36,7 @@ function json(data: unknown, status = 200): Response {
   });
 }
 
-/** How long we'll wait on the provider. Suggestions that arrive after this
- *  are stale, the user has started typing their own question. */
+/** Provider wait cap; later suggestions are stale. */
 const PROVIDER_TIMEOUT_MS = 10_000;
 
 export async function POST(request: Request): Promise<Response> {
@@ -56,8 +45,7 @@ export async function POST(request: Request): Promise<Response> {
   if (!isSameOrigin(request)) return json({ error: "Forbidden." }, 403);
   const { env, ctx } = getCloudflareContext();
 
-  // --- Auth gate. Cookie cache bypassed: this endpoint spends provider
-  // tokens per request (same posture as /api/ai/chat). ---
+  // Cookie cache bypassed: spends provider tokens (same as /api/ai/chat).
   const auth = await createAuth(env, request);
   const session = await auth.api.getSession({
     headers: request.headers,
@@ -81,23 +69,18 @@ export async function POST(request: Request): Promise<Response> {
   const model = resolveModel("free", env) ?? resolveModel("pro", env);
   if (!model) return json({ error: "Not configured." }, 503);
 
-  // --- Budgets (suggestion-specific per-user counters + global ceiling).
-  // The request slot is reserved atomically up front, this endpoint is
-  // auto-fired by the client, so a deferred count would let concurrent
-  // bursts through the daily cap. ---
+  // The request slot is reserved atomically up front: this endpoint is
+  // auto-fired, so a deferred count would let bursts through the daily cap.
   const day = utcDay(Date.now());
   const decision = await reserveSuggestRequest(env, user.id, SUGGEST_LIMITS, day);
   if (!decision.ok) {
     return json({ error: decision.message }, decision.status ?? 429);
   }
 
-  // --- Context assembly: same pipeline as chat, smaller budget, and the
-  // suggestion instruction takes the place of the user's question. ---
+  // Same context pipeline as chat, smaller budget.
   const surface = context.surface === "playground" ? "playground" : "learn";
-  // Mirror the chat route: only pull the lesson Markdown when the user opted
-  // into it (Full page / Custom). Suggestions are grounded in whatever's on
-  // screen otherwise, and stay cheap in the default "Auto" mode. An absent
-  // field means a pre-redesign client — keep its old always-include behavior.
+  // Mirror the chat route's lesson-text opt-in; an absent includeLessonText
+  // means a pre-redesign client — keep its old always-include behavior.
   const lessonMarkdown =
     surface === "learn" && (context.includeLessonText ?? true)
       ? await fetchLessonMarkdown(context.slug, request.url)

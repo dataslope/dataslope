@@ -10,21 +10,11 @@ import type {
 import { loadCheerpJ, TOOLS_JAR_VFS_PATH, type CheerpJApi } from "./cheerpj";
 import { getClangFormat } from "./clangFormat";
 
-// Run Java in the browser via CheerpJ
-// (https://cheerpj.com/), a full OpenJDK runtime + JIT compiled to
-// WebAssembly. CheerpJ does not ship `tools.jar`, so we fetch a Java 8
-// `tools.jar` from a CDN and mount it in CheerpJ's /str/ filesystem at
-// runtime (see cheerpj.ts); we then drive `javac`
-// (`com.sun.tools.javac.Main`) on user source and run the compiled main
-// class with `cheerpjRunMain`, the JavaFiddle approach
-// (https://github.com/leaningtech/javafiddle).
-//
-// This adapter targets Java 8 because that is what the bundled
-// `tools.jar` compiles against. Java 8 is the lingua franca of
-// online Java tutorials (lambdas, streams, Optional, java.time are
-// all there), so the playground covers what most learners need
-// without pulling in newer-language features (records, var, text
-// blocks) that would fail to compile.
+// Java in the browser via CheerpJ (OpenJDK + JIT in WebAssembly). CheerpJ
+// doesn't ship tools.jar, so a Java 8 tools.jar is fetched from a CDN and
+// mounted in /str/ (see cheerpj.ts); javac compiles user source and
+// cheerpjRunMain runs it — the JavaFiddle approach. Targets Java 8 because
+// that's what the bundled tools.jar compiles against.
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -444,11 +434,8 @@ public class Main {
   },
 ];
 
-// CheerpJ's classpath: tools.jar is fetched from the CDN and mounted in
-// CheerpJ's /str/ FS at TOOLS_JAR_VFS_PATH (see cheerpj.ts), it contains
-// com.sun.tools.javac.Main, and we compile user code into /files/. Both
-// must be on the classpath when running both javac and the user's main
-// class.
+// tools.jar (javac) and /files/ (compiled user code) must both be on the
+// classpath for javac and for running the user's main class.
 const CLASSPATH = `${TOOLS_JAR_VFS_PATH}:/files/`;
 const SOURCE_DIR = "/str/";
 const OUTPUT_DIR = "/files/";

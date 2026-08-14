@@ -137,11 +137,9 @@ for (const c of cards) {
 
     const failed = [];
     for (const test of c.tests) {
-      // `matchesSolution` compares the learner's result against the solution's.
-      // With the solution *as* the buffer the two are the same query, so this
-      // proves the test is well-formed rather than that the solution is right,
-      // which is the same thing the Python sweep gets from a card whose tests
-      // only restate the starter.
+      // With the solution as the buffer, `matchesSolution` compares the query
+      // to itself — this proves the test is well-formed rather than that the
+      // solution is right.
       const verdict = await evaluateSqlTest(test, {
         engine,
         finalResult,

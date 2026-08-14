@@ -248,11 +248,10 @@ interface RunButtonState {
   dropdownItems: RunDropdownItem[];
 }
 
-/** Resolve the Run button's label, primary action, and chevron items
- *  for the current workspace. The logic differs between adapters that
- *  declare `findEntryFiles` (C / C++ / Java / C#: multiple entry
- *  points) and those that don't (Python / R / JS / TS / PHP: any
- *  file runs, the canonical default may show in the dropdown). */
+/** Resolve the Run button's label, primary action, and chevron items.
+ *  Adapters with `findEntryFiles` (C/C++/Java/C#) have multiple entry
+ *  points; the rest run any file, with the canonical default in the
+ *  dropdown. */
 function computeRunButtonState(
   adapter: LanguageAdapter,
   files: PlaygroundFile[],
@@ -307,17 +306,15 @@ function computeRunButtonState(
     // Active file is not an entry point: fall back to primary, then
     // first entry alphabetically.
     if (entries.length === 0) {
-      // No entry points at all in the workspace, keep the button
-      // usable but unlabelled. The runtime will surface a compile
-      // error if the user clicks it.
+      // No entry points at all: keep the button usable but unlabelled; the
+      // runtime surfaces a compile error on click.
       return { primaryLabel: "Run", primaryEntry: null, dropdownItems: [] };
     }
     const primaryEntry =
       entries.find((e) => e.filename === primary) ?? entries[0];
     if (entries.length === 1) {
-      // Only one entry exists and the user isn't on it, show plain
-      // "Run" with no chevron per the spec, but still target that
-      // entry when clicked.
+      // One entry and the user isn't on it: plain "Run", no chevron, but
+      // still target that entry.
       return {
         primaryLabel: "Run",
         primaryEntry: primaryEntry.filename,
@@ -380,9 +377,7 @@ function PackagesDrawer({
 }: PackagesDrawerProps) {
   const [query, setQuery] = useState("");
 
-  // The drawer fully unmounts when closed (Base UI's Dialog handles
-  // mount/unmount via `open`), so internal state naturally resets, no
-  // effect needed to clear it.
+  // The drawer fully unmounts when closed, so internal state resets itself.
 
   const filtered = useMemo(() => {
     const lq = query.toLowerCase();

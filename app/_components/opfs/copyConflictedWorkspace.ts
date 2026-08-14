@@ -1,29 +1,13 @@
 "use client";
 
 /**
- * "Open a copy" from the workspace-conflict overlay.
- *
- * A workspace can only run in one tab at a time: PGlite (and the SQLite /
- * DuckDB workers) take an exclusive OPFS access handle, and a second tab
- * opening the same directory doesn't race, it deadlocks the boot. So the
- * second tab has to do something else, and until now its only options were to
- * start an empty workspace or to go away, both of which lose the thing the
- * user was actually trying to reach: this data, in this tab.
- *
- * Copying gives them that. The duplicate is a real workspace of its own, so
- * both tabs work, neither waits on the other, and nothing is overwritten.
- *
- * Two things worth knowing about the copy:
- *
- *   - it is taken while the other tab has the database open, so a copy made
- *     mid-write can be incomplete. Nothing here can prevent that without the
- *     holding tab's cooperation; what it does mean is that the copy might
- *     fail to open, which surfaces as the playground's ordinary engine-boot
- *     error rather than as silent corruption;
- *   - the tab list lives in localStorage rather than in the workspace
- *     directory, so it is copied separately (`copyScopedKeys`). Without that
- *     the copy would open on default tabs beside a database full of the
- *     user's work.
+ * "Open a copy" from the workspace-conflict overlay. A workspace can only run
+ * in one tab (engines take an exclusive OPFS access handle; a second open
+ * deadlocks the boot), so the second tab gets a real duplicate instead.
+ * Caveats: the copy is taken while the other tab has the database open, so a
+ * mid-write copy can fail to open (ordinary engine-boot error, not silent
+ * corruption); and the tab list lives in localStorage, so it is copied
+ * separately via `copyScopedKeys`.
  */
 
 import {
@@ -53,13 +37,9 @@ export function copyNameFor(name: string): string {
 }
 
 /**
- * Duplicate the conflicted workspace and make the copy this tab's active one.
- * Resolves to the new entry, or null when there was nothing to copy (no OPFS,
- * or the directory is gone).
- *
- * On success this navigates: `switchActiveWorkspace` reloads so the engine
- * boots against the copy from a clean slate, exactly as it does for an
- * ordinary workspace switch.
+ * Duplicates the conflicted workspace and makes the copy this tab's active
+ * one. Null when there was nothing to copy. On success this navigates
+ * (`switchActiveWorkspace` reloads).
  */
 export async function copyConflictedWorkspace({
   playgroundId,

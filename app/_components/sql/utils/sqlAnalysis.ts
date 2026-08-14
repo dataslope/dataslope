@@ -5,11 +5,9 @@ export function stripSqlComments(sql: string): string {
     .replace(/--[^\r\n]*/g, "");
 }
 
-/** Returns true when `sql` appears to be a single SELECT or CTE statement
- *  (no multi-statement semicolons, starts with SELECT or WITH). Used to
- *  decide whether lazy LIMIT/OFFSET pagination is applicable.
- *  Pass `noComments` (the result of `stripSqlComments(sql)`) when you have
- *  already stripped comments to avoid redundant work. */
+/** True when `sql` is a single SELECT/WITH statement (no multi-statement
+ *  semicolons); decides whether lazy LIMIT/OFFSET pagination applies. Pass
+ *  `noComments` when comments are already stripped. */
 export function isSingleSelectSql(sql: string, noComments?: string): boolean {
   const stripped = (noComments ?? stripSqlComments(sql))
     .trim()
@@ -18,14 +16,10 @@ export function isSingleSelectSql(sql: string, noComments?: string): boolean {
   return /^(select|with)\s/i.test(stripped);
 }
 
-/** If `sql` is a bare single-table `SELECT * FROM <table>` (optionally with
- *  a trailing LIMIT / OFFSET, and nothing else, no WHERE, JOIN, ORDER BY,
- *  GROUP BY, comma-joins, subqueries, or multiple statements), return the
- *  unquoted table name. Used to make a hand-typed full-table preview
- *  editable, exactly like opening the table from the sidebar: because the
- *  row order matches the table's natural order, the result maps 1:1 to the
- *  table and edits identify rows safely. Returns null for anything else.
- *  Pass `noComments` (the result of `stripSqlComments(sql)`) when available. */
+/** If `sql` is a bare `SELECT * FROM <table>` (optional trailing ORDER BY /
+ *  LIMIT / OFFSET, nothing else), return the unquoted table name; else null.
+ *  Such a result maps 1:1 to the table, so a hand-typed full-table preview
+ *  can be made editable and edits identify rows safely. */
 export function bareTableSelectSource(
   sql: string,
   noComments?: string,
@@ -45,13 +39,10 @@ export function bareTableSelectSource(
     : table;
 }
 
-/** Per-statement source table for a (possibly multi-statement) query, one
- *  entry per statement in execution order, so it lines up positionally with
- *  the `sets` array a multi-statement run produces (each engine yields one set,
- *  possibly null, per statement). An entry is the bare-selected table name when
- *  that statement is an editable `SELECT * FROM <table>` against a real table
- *  (per `isTable`), otherwise null. Lets each result-set tab be edited against
- *  its own table. */
+/** Per-statement source table, positionally aligned with the `sets` array a
+ *  multi-statement run produces: the bare-selected table name when a
+ *  statement is an editable `SELECT * FROM <table>` (per `isTable`), else
+ *  null. Lets each result-set tab be edited against its own table. */
 export function bareTableSelectSources(
   sql: string,
   isTable: (name: string) => boolean,
