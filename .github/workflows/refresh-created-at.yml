@@ -1,27 +1,15 @@
 name: Refresh creation dates
 
-# Keeps `data/created-at.json` — the committed record of when each chart and
-# illustration entered the repository — in step with the files it describes.
+# Keeps `data/created-at.json` (when each chart/illustration entered the
+# repo) in step with the files it describes. A file's creation date is its
+# add-commit's date, which doesn't exist until the commit does — running here
+# dates new art immediately instead of on someone's next local build. The
+# snapshot exists (rather than reading git at build time) because Workers
+# Builds clones shallow, and a shallow clone reports every file as added at
+# its horizon commit; see scripts/build-created-at.mjs.
 #
-# Why a workflow at all, when `scripts/build-created-at.mjs` already writes it
-# from any local build: a file's creation date is the date of the commit that
-# *added* it, so it cannot exist until that commit does. Left to local runs,
-# art added in one pull request would only get dated by whoever next ran a
-# build — which is to say, in some later pull request, while the newest
-# artwork (exactly what a reviewer opens the gallery to look at) showed no
-# date at all. Running here closes that gap: the add-commit exists by the time
-# this fires.
-#
-# Why the snapshot exists at all, rather than reading git at build time:
-# production is built by Cloudflare Workers Builds, which clones shallow, and
-# a shallow clone reports every file as added at its horizon commit. That is
-# what once stamped the entire gallery with the date of whatever was deployed
-# last. See the header of scripts/build-created-at.mjs.
-#
-# Modelled on optimize-images.yml, including its no-loop property: this
-# triggers on artwork and chart specs, and its own commit only ever touches
-# `data/created-at.json`. A commit pushed with GITHUB_TOKEN cannot retrigger
-# Actions either.
+# No loop: triggers on artwork/chart specs, its commit touches only
+# data/created-at.json, and GITHUB_TOKEN pushes can't retrigger Actions.
 on:
   push:
     paths:

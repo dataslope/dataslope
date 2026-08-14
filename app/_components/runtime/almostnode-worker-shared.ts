@@ -1,25 +1,16 @@
 /// <reference lib="webworker" />
 
-// Helpers shared by the JavaScript and TypeScript almostnode-backed
-// workers. Both spawn their own Worker instance via `new Worker(new
-// URL(...))`, so this file is imported once into each worker bundle.
-//
-// almostnode provides:
-//   - VirtualFS: in-memory POSIX-style filesystem
-//   - Runtime  : CommonJS executor with 40+ shimmed Node.js modules
-//
-// We use almostnode directly (not `createRuntime`) because we're already
-// inside a same-origin Web Worker, the existing security model, so
-// adding another layer of isolation (worker-inside-worker or a cross-
-// origin sandbox) buys nothing here.
+// Helpers shared by the JavaScript and TypeScript almostnode workers
+// (VirtualFS = in-memory POSIX FS, Runtime = CommonJS executor with shimmed
+// Node modules). almostnode is used directly (not `createRuntime`): we're
+// already inside a same-origin Web Worker, so another isolation layer buys
+// nothing.
 
 import { VirtualFS, Runtime } from "almostnode";
 
 // ─── Console arg formatting ─────────────────────────────────────────
-//
-// Mirrors the formatter from the legacy javascript-worker.ts so output
-// in the playground UI is byte-compatible with the previous runtime,
-// no migration surprises for existing snippets.
+// Mirrors javascript-worker.ts so output stays byte-compatible with the
+// previous runtime.
 
 function jsonReplacer(_key: string, value: unknown): unknown {
   if (typeof value === "bigint") return `${value.toString()}n`;

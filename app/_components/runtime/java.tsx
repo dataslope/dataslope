@@ -224,9 +224,7 @@ function hasJavaMain(source: string): boolean {
 }
 
 const PACKAGES: PackageInfo[] = [
-  // Highlights from the Java 8 standard library, always available, no
-  // install step. Clicking inserts the corresponding `import` at the
-  // top of the editor.
+  // Java 8 stdlib highlights; clicking inserts the `import`.
   {
     cat: "Collections",
     icon: "📦",

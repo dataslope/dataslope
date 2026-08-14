@@ -1,19 +1,10 @@
 "use client";
 
 /**
- * Animated backgrounds for the home page's Magic UI bento grid (see
- * StatsBento.tsx). Each one sits behind a card's copy (pointer-events-none,
- * masked so it fades out where the title/description sit) and illustrates the
- * stat that card reports:
- *
- *  1. Runnable code blocks → the brand "diamond assemble + quarter-turn"
- *     loader, large and pinned to the right, recolored black/white.
- *  2. Code challenges → a recreation of the challenge cards' test-results
- *     rail that cycles from a mixed pass/fail run to an all-green run.
- *  3. Interview prep → Magic UI's typing animation cycling through roles and
- *     topics, in a neutral grey.
- *  4. Free courses → an infinite Magic UI animated-list feed of course titles,
- *     each with a topic-appropriate icon.
+ * Animated backgrounds for the home page's bento grid (StatsBento.tsx).
+ * Each sits behind a card's copy (pointer-events-none, masked where the
+ * text sits) and illustrates that card's stat: the brand diamond loader,
+ * a test-results rail, a typing animation, and a course-title feed.
  */
 
 import {

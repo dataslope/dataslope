@@ -55,11 +55,8 @@ for (const [file, rows] of Object.entries(PLACEMENTS)) {
       : ["", `<Chart slug="${slug}" />`];
     lines.splice(end, 0, ...block);
 
-    // Verify against the result rather than the plan. A section that *ends*
-    // with a `<CodeBlock>` is a perfectly good place to append — the closing
-    // `/>` belongs to the block, but the line after it does not — so the
-    // question is only ever whether the tag we just wrote came out at the top
-    // level. Re-scanning answers that directly.
+    // Verify against the result rather than the plan: re-scan and ask whether
+    // the tag just written came out at the top level.
     const tagAt = end + block.length - 1;
     if (codeRegions(lines)[tagAt]) {
       skipped.push(`${file} :: ${slug} :: would land inside a code region`);

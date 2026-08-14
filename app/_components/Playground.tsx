@@ -702,11 +702,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const setOutputsForFile = useStore((s) => s.setOutputsForFile);
   const clearOutputsForFile = useStore((s) => s.clearOutputsForFile);
 
-  // Derived: the active file's outputs (the output pane is per-tab).
-  // Declared below, next to `runButtonState`, the split view derives
-  // the output pane's source from the run-target (entry) file instead
-  // of the focused pane, and that needs the Run button's entry
-  // resolution to exist first.
+  // (The active file's outputs are derived below, next to `runButtonState`,
+  // which the split view's output-source resolution needs first.)
 
   // Refs let stale closures (CodeMirror persist listener, async run loop)
   // read the latest workspace + file ids without being rebuilt.
@@ -744,10 +741,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   );
 
   // ─── Cloud saves + sharing ──────────────────────────────────────────────
-  // Serializes the live workspace (tab manifest + editor buffers, falling
-  // back to OPFS for files not open this session) into the portable bundle
-  // that /api/workspaces and /api/shares store. Dialog state lives here so
-  // the mobile menu can open the dialogs the header buttons own on desktop.
+  // Serializes the live workspace (dirty buffers, falling back to OPFS)
+  // into the portable bundle /api/workspaces and /api/shares store.
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const buildCloudBundle =
     useCallback(async (): Promise<WorkspaceBundle | null> => {
@@ -761,9 +756,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         bundleFiles.push({ filename: f.filename, content });
       }
       const active = fileList.find((f) => f.id === activeFileIdRef.current);
-      // Which files are *open* is part of the workspace's layout, so a copy
-      // opened elsewhere lands on the same tab strip rather than fanning every
-      // file open. Ids are reallocated on materialize, so send filenames.
+      // Open files are part of the workspace's layout; ids are reallocated
+      // on materialize, so send filenames.
       const openFilenames = openTabIdsRef.current
         .map((id) => fileList.find((f) => f.id === id)?.filename)
         .filter((name): name is string => !!name);
@@ -781,8 +775,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   useEffect(() => {
     settingsOpenRef.current = settingsOpen;
-    // Reset tab position when settings is closed so it starts at the end
-    // next time the user opens it.
+    // Reset tab position when settings closes.
     // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional reset synced to the settingsOpen prop
     if (!settingsOpen) setSettingsTabIndex(Infinity);
   }, [settingsOpen]);
@@ -805,10 +798,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     dirtyBuffersRef.current = dirtyBuffers;
   }, [dirtyBuffers]);
 
-  // Suppress the persist listener while we programmatically replace the
-  // editor doc (tab switches, example loads). Without this every doc
-  // replacement would write the *previous* file's content into the
-  // *new* file's dirty buffer.
+  // Suppress the persist listener during programmatic doc replacements;
+  // otherwise a tab switch would write the previous file's content into
+  // the new file's dirty buffer.
   const suppressPersistRef = useRef(false);
 
   const [workspaceReady, setWorkspaceReady] = useState(false);
@@ -821,10 +813,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
   // ─── Open editor tabs ───────────────────────────────────────────────
   // The tab strip shows a SUBSET of the workspace's files: closing a tab
-  // only hides its editor, the file stays in the workspace (Files pane,
-  // OPFS, and the run/bundle staging), so cross-file imports keep
-  // resolving. Deleting a file for real happens in the Files pane or the
-  // tab's "Delete File" menu item. Persisted in the workspace manifest.
+  // only hides its editor, the file stays in the workspace so cross-file
+  // imports keep resolving. Persisted in the workspace manifest.
   const [openTabIds, setOpenTabIdsState] = useState<string[]>([]);
   const openTabIdsRef = useRef<string[]>([]);
   const setOpenTabIds = useCallback(
