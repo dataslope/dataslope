@@ -1,20 +1,11 @@
 "use client";
 
 /**
- * The one Plotly surface every output panel renders charts through.
- *
- * This used to be two hand-copied components, one in `Playground.tsx` and one
- * in `CodeBlock.tsx`, with a comment on each saying they were kept in sync by
- * hand. `ChallengeCard.tsx` had neither: its `OutputCellView` is a trimmed
- * copy of `<CodeBlock>`'s renderer and never grew a `plot` branch, so a
- * `fig.show()` inside a challenge fell through to the text fallback and
- * printed `fig.to_json()` into the output panel as a wall of escaped JSON.
- * Three renderers with a copy each is how that happens, so there is now one.
- *
- * Plotly is ~4 MB and only needed once a chart actually renders, so it is
- * imported from the CDN on demand rather than bundled (see PLOTLY_CDN in
- * runtime/cdn). The dynamic import is marked ignore for both bundlers so it
- * stays out of the client bundle and out of the OpenNext Worker bundle.
+ * The single Plotly renderer every output panel draws charts through, so
+ * the surfaces can't drift apart. Plotly is ~4 MB and only needed once a
+ * chart renders, so it's imported from the CDN on demand (see PLOTLY_CDN);
+ * the dynamic import is marked ignore for both bundlers so it stays out of
+ * the client bundle and the OpenNext Worker bundle.
  */
 import { useEffect, useRef } from "react";
 
@@ -65,11 +56,9 @@ export function PlotlyChart({
         displaylogo: false,
         modeBarButtonsToRemove: ["sendDataToCloud", "lasso2d"],
       });
-      // `animation_frame=` puts the play button and the slider in `layout`
-      // and the thing they animate in `frames`, which newPlot's positional
-      // form has no parameter for. Without this the controls draw, and both
-      // the play button and the slider are inert: their handlers look up
-      // frames by name and find none registered on the graph.
+      // `animation_frame=` figures carry their frames separately from
+      // `layout`; without addFrames the play button and slider draw but
+      // stay inert.
       if (cancelled || !ref.current) return;
       if (figure.frames?.length) await Plotly.addFrames(el, figure.frames);
     })();

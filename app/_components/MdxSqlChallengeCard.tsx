@@ -1,13 +1,9 @@
 "use client";
 
 /**
- * MDX-friendly wrapper around `<SqlChallengeCard>`.
- *
- * The wrapped component already accepts a string `dialect` prop, so
- * there's no adapter resolution to perform here, but keeping the
- * wrapper as a separate module mirrors the `MdxChallengeCard` /
- * `MdxCodeBlock` pattern and gives us a single import surface to
- * register with Fumadocs.
+ * MDX-friendly wrapper around `<SqlChallengeCard>`, mirroring the
+ * `MdxChallengeCard` / `MdxCodeBlock` pattern; guards against unknown
+ * dialects.
  */
 
 import SqlChallengeCard, {

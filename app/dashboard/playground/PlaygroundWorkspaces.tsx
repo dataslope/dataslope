@@ -1,25 +1,10 @@
 "use client";
 
 /**
- * "Your workspaces": the unified workspace list on /dashboard/playground
- * (moved from the old standalone /playground index and restyled with the
- * Studio shell's tokens).
- *
- * One list, deliberately: local (this-browser) workspaces and cloud backups
- * are merged by id into a single set of rows rather than the old
- * device-vs-cloud split (separate filters + per-row status icons). A signed-in
- * user's workspaces are cloud-backed by default and the plumbing that keeps
- * them synced is invisible here; a guest's workspaces live in this browser with
- * a standing "sign in to save them to the cloud" nudge. The section always
- * renders (empty and signed-out states included) so the page never looks
- * broken before any workspace exists.
- *
- * The list is read-and-open only, and paginated (PAGE_SIZE rows per page, the
- * same pagination chrome as the hub tables). Clicking a row opens that
- * workspace in its playground (rename / duplicate / delete / back-up stay in
- * the playground's own workspace manager). On-device rows just set the active
- * workspace and navigate; cloud-only rows (backed up from another device)
- * materialize first via the same helpers the in-playground manager uses.
+ * "Your workspaces" on /dashboard/playground: local workspaces and cloud
+ * backups merged by id into one read-and-open list. On-device rows set the
+ * active workspace and navigate; cloud-only rows materialize first via the
+ * same helpers the in-playground manager uses.
  */
 
 import {
@@ -92,8 +77,7 @@ function formatBytes(bytes: number): string {
   return `${n.toFixed(n >= 10 || i === 0 ? 0 : 1)} ${units[i]}`;
 }
 
-/** Coarse "when" label ("5 min ago", "yesterday", "2 wk ago"). Client-only
- *  (reads the wall clock), so it's kept out of the server render. */
+/** Coarse "when" label ("5 min ago", "yesterday"). Client-only (wall clock). */
 function formatRelative(ts: number): string {
   if (!ts) return "";
   const diff = Math.max(0, Date.now() - ts);
@@ -174,23 +158,21 @@ function UsageDonut({ fraction }: { fraction: number }) {
 export function PlaygroundWorkspaces() {
   const { data: session, isPending } = useSession();
 
-  // Mount latch: the registry + cloud list are client-only, so the first
-  // (server-matching) render shows a skeleton and the real content swaps in
-  // after hydration. Avoids a hydration mismatch on the workspace rows.
+  // Mount latch: registry + cloud list are client-only, so the first render
+  // shows a skeleton to avoid a hydration mismatch.
   const [mounted, setMounted] = useState(false);
   const [localEntries, setLocalEntries] = useState<WorkspaceEntry[]>([]);
   const [cloudMetas, setCloudMetas] = useState<CloudWorkspaceMeta[]>([]);
   const [cloudUsage, setCloudUsage] = useState<CloudUsage | null>(null);
-  // True once a cloud list fetch has succeeded, gates the post-sign-in bulk
-  // backup so it only runs against a real (possibly empty) cloud inventory.
+  // Gates the post-sign-in bulk backup: it must only run against a real
+  // (possibly empty) cloud inventory.
   const [cloudLoaded, setCloudLoaded] = useState(false);
   const [sizes, setSizes] = useState<Map<string, number>>(() => new Map());
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [openingId, setOpeningId] = useState<string | null>(null);
   const [openError, setOpenError] = useState<string | null>(null);
-  // Progress of the post-sign-in bulk backup, shown in the footer while the
-  // user's guest workspaces upload.
+  // Post-sign-in bulk backup progress, shown in the footer.
   const [backingUp, setBackingUp] = useState<{
     done: number;
     total: number;
@@ -198,14 +180,12 @@ export function PlaygroundWorkspaces() {
   const bulkRanRef = useRef(false);
 
   useEffect(() => {
-    // Read the localStorage registry only after mount: it's undefined on the
-    // server, so a first render that matched the server (the skeleton) must
-    // paint before we swap in the real, client-only list.
+    // Read the localStorage registry only after mount (undefined on server).
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     setLocalEntries(getWorkspaceRegistry());
-    // Then sweep up drafts that exist in OPFS but in no list, so work the
-    // user changed and never saved appears here instead of being unreachable.
+    // Sweep up drafts that exist in OPFS but in no list, so unsaved work
+    // appears here instead of being unreachable.
     let cancelled = false;
     void recoverOrphanWorkspaces(PLAYGROUNDS.map((p) => p.id)).then(
       (result) => {
@@ -218,9 +198,8 @@ export function PlaygroundWorkspaces() {
     };
   }, []);
 
-  // Signed-in: pull the account's cloud workspaces + usage. 401/503 (session
-  // expired server-side / cloud not configured) degrade silently to the
-  // local-only view.
+  // Signed-in: pull the account's cloud workspaces + usage. 401/503 degrade
+  // silently to the local-only view.
   useEffect(() => {
     if (!session || !isCloudSupported()) return;
     let cancelled = false;
@@ -243,10 +222,8 @@ export function PlaygroundWorkspaces() {
     };
   }, [session]);
 
-  // Post-sign-in bulk backup: work saved in this browser uploads to the
-  // account automatically, so signing in is all it takes. Shared with the
-  // /playground index so it happens wherever the user lands first. Runs once
-  // per page view.
+  // Post-sign-in bulk backup: browser-saved work uploads to the account
+  // automatically. Shared with the /playground index; runs once per page view.
   useEffect(() => {
     if (!session || !cloudLoaded || bulkRanRef.current) return;
     const cloudIds = new Set(cloudMetas.map((m) => m.id));
@@ -278,8 +255,7 @@ export function PlaygroundWorkspaces() {
     };
   }, [session, cloudLoaded, cloudMetas, localEntries]);
 
-  // Estimate on-device sizes (parallel, streamed in). Backed-up rows already
-  // carry an authoritative cloud size, so only the browser-only ones need it.
+  // Estimate on-device sizes; backed-up rows already carry a cloud size.
   useEffect(() => {
     if (!mounted || localEntries.length === 0) return;
     const cloudIds = new Set(cloudMetas.map((m) => m.id));
@@ -359,9 +335,8 @@ export function PlaygroundWorkspaces() {
       window.location.assign(`/playground/${row.playground}`);
       return;
     }
-    // Cloud-only: pull the backup onto this device, then open it. SQL bundles
-    // replay after the engine boots (pending ref); code bundles materialize
-    // into a local workspace up front.
+    // Cloud-only: SQL bundles replay after the engine boots (pending ref);
+    // code bundles materialize into a local workspace up front.
     setOpeningId(row.id);
     try {
       if (isSqlPlayground(row.playground)) {
@@ -474,8 +449,7 @@ export function PlaygroundWorkspaces() {
                           </span>
                         )}
                         {/* SQL backups are manual (the dump needs the live
-                            engine), so tell a signed-in user this one isn't
-                            in the cloud yet. Code rows sync automatically. */}
+                            engine); code rows sync automatically. */}
                         {row.onDevice &&
                           !row.backedUp &&
                           !signedOut &&
@@ -631,9 +605,7 @@ function WorkspacesSkeleton() {
   );
 }
 
-/** Section body when there are no workspaces yet. No boxed borders, a single
- *  top divider frames the zone (matching the populated list) and the sign-in
- *  nudge sits under its own hairline. */
+/** Section body when there are no workspaces yet. */
 function EmptyState({ signedOut }: { signedOut: boolean }) {
   return (
     <div className="mt-5" style={{ borderTop: "1px solid var(--divider)" }}>
@@ -654,9 +626,8 @@ function EmptyState({ signedOut }: { signedOut: boolean }) {
   );
 }
 
-/** "Sign in to save to the cloud" upsell for guests. `compact` renders the
- *  inline footer variant; otherwise a full-width row separated by a single top
- *  hairline (no boxed border). */
+/** "Sign in to save to the cloud" upsell for guests. `compact` is the inline
+ *  footer variant. */
 function SignInNudge({ compact = false }: { compact?: boolean }) {
   if (compact) {
     return (

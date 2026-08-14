@@ -1,16 +1,10 @@
 "use client";
 
 /**
- * The Studio AI Assist panel: a full-height column beside the builder content.
- * Shows the drafting conversation, per-builder quick actions, and a prompt box.
- * Everything routes through useStudioAi().draft, which fills the active
- * builder's form. Rendered by the shell as a flex sibling of the main column so
- * it sits to the right, matching the design.
- *
- * Drafting spends the member's shared daily Ask AI budget (same counter as the
- * "Ask AI" chat), so the composer shows a "N left today" quota ring for free
- * members: fetched from /api/ai/usage on open and decremented optimistically as
- * drafts are billed.
+ * Studio AI Assist panel beside the builder content; everything routes through
+ * useStudioAi().draft, which fills the active builder's form. Drafting spends
+ * the shared daily Ask AI budget, so the composer shows a quota ring for free
+ * members (fetched from /api/ai/usage, decremented optimistically).
  */
 
 import { useEffect, useState } from "react";

@@ -282,7 +282,6 @@ function ErTableNode({ data }: NodeProps) {
             >
               <div className="ex-title">Copy Name</div>
             </ContextMenu.Item>
-            {/* Export submenu, opens to the side showing all 4 formats */}
             <Menu.Root open={exportOpen} onOpenChange={setExportOpen}>
               <Menu.Trigger
                 className="example-item ctx-export-trigger ctx-export-trigger-bordered"
@@ -622,9 +621,7 @@ async function computeElkLayout(
       "elk.algorithm": "layered",
       "elk.direction": "RIGHT",
       "elk.spacing.nodeNode": "80",
-      // Minimum gap between nodes in adjacent layers (i.e. between two
-      // connected tables laid out left-to-right). The default (20px) is
-      // far too tight for edge labels to render without being clipped.
+      // Gap between adjacent layers; ELK's 20px default clips edge labels.
       "elk.layered.spacing.nodeNodeBetweenLayers": "160",
       "elk.layered.spacing.edgeNodeBetweenLayers": "80",
       "elk.edgeRouting": "ORTHOGONAL",
@@ -719,16 +716,9 @@ export function ErDiagramPane({
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
-  // Four-phase overlay lifecycle, mirrors the pyodide-style fade used by
-  // the R / Python playgrounds:
-  //   "covering"    ELK still computing; opaque background hides the empty
-  //                 ReactFlow canvas.
-  //   "transparent" ELK is done before the minimum animation duration; the
-  //                 background goes clear so the diagram is visible behind
-  //                 the still-running wave animation.
-  //   "hidden"      Minimum duration has elapsed; CSS opacity transitions
-  //                 to 0 (same transition as .pyodide-loading.hidden).
-  //   null          Overlay unmounted after transition ends.
+  // Overlay lifecycle: "covering" (ELK computing, opaque) → "transparent"
+  // (layout done before the minimum duration; diagram shows through the
+  // wave) → "hidden" (CSS opacity fade) → null (unmounted).
   const [overlayPhase, setOverlayPhase] = useState<
     "covering" | "transparent" | "hidden" | null
   >("covering");
@@ -802,18 +792,12 @@ export function ErDiagramPane({
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setOverlayPhase("covering");
 
-    // Called once the diagram data (nodes/edges) is ready, or immediately
-    // for the empty-schema case. When the ELK layout finished before the
-    // minimum duration, `diagramReady` is true and we switch to the
-    // "transparent" phase so the diagram shows through the still-running
-    // wave animation. After the remaining minimum duration we start the
-    // CSS opacity fade ("hidden") that mirrors the pyodide overlay pattern.
+    // Enforce the minimum overlay duration: expose the diagram behind the
+    // overlay early ("transparent"), then fade once the remainder elapses.
     const finishLoading = (diagramReady: boolean) => {
       const elapsed = Date.now() - loadStartRef.current;
       const remaining = MIN_LOADING_MS - elapsed;
       if (remaining > 0) {
-        // Still within the minimum duration window: expose diagram behind
-        // the overlay (if there is one) and wait out the remainder.
         if (diagramReady && !cancelled && layoutGen.current === gen) {
           setOverlayPhase("transparent");
         }
@@ -821,8 +805,6 @@ export function ErDiagramPane({
           if (!cancelled && layoutGen.current === gen) setOverlayPhase("hidden");
         }, remaining);
       } else {
-        // Already past the minimum duration: skip "transparent" and go
-        // straight to the fade-out.
         if (!cancelled && layoutGen.current === gen) setOverlayPhase("hidden");
       }
     };
@@ -868,11 +850,9 @@ export function ErDiagramPane({
             <div
               className={[
                 "er-diagram-loading-overlay",
-                // Keep --transparent during the hidden phase so the background
-                // stays clear while the opacity fades to 0. Without this, the
-                // base background: var(--bg) snaps back opaque the instant the
-                // hidden phase starts, making the diagram flash invisible before
-                // it gradually reappears as the opacity fade completes.
+                // Keep --transparent through the hidden phase: without it the
+                // base background snaps back opaque the instant the fade
+                // starts, flashing the diagram invisible.
                 (overlayPhase === "transparent" || overlayPhase === "hidden") &&
                   "er-diagram-loading-overlay--transparent",
                 overlayPhase === "hidden" && "er-diagram-loading-overlay--hidden",

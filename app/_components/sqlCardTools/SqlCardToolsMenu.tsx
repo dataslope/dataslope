@@ -1,24 +1,10 @@
 "use client";
 
 /**
- * The tools menu in the header of the learn-route SQL surfaces
- * (`SqlCodeBlock`, `SqlChallengeCard`): an ellipsis button to the left
- * of the dialect glyph, opening
- *
- *   - **Export as Excel** — every table in the card's database as one
- *     sheet each, using the same `wasm-xlsxwriter` writer the SQL
- *     playgrounds' "Export database → Excel Workbook" uses;
- *   - **ER Diagram** — the schema graph, in the playgrounds' viewer;
- *   - **View DDL** — the `CREATE` statements behind those tables.
- *
- * All three read the card's live engine, so they describe the database
- * as it stands *now*: a learner who has just run a `CREATE TABLE` sees
- * that table here.
- *
- * The engine is only touched when an item is chosen. Opening the menu
- * boots nothing — on a lesson page with a dozen SQL blocks, eagerly
- * introspecting each one would mean a dozen WASM engines downloaded for
- * a menu nobody opened.
+ * Tools menu for the learn-route SQL surfaces: Export as Excel, ER Diagram,
+ * View DDL. All three read the card's live engine. The engine is only
+ * touched when an item is chosen — opening the menu boots nothing, so a
+ * lesson full of SQL blocks doesn't download a WASM engine per menu.
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -45,10 +31,8 @@ import {
 import type { SqlCardDialogKind } from "./SqlCardDialogs";
 import styles from "./SqlCardToolsMenu.module.css";
 
-/** Shown while the dialogs chunk downloads on first open: the same portaled
- *  backdrop the dialogs render, with the spinner they show while the engine
- *  boots, so the handoff from "chunk loading" to "schema loading" is a
- *  seamless swap of the spinner's owner. */
+/** Shown while the dialogs chunk downloads on first open: same backdrop and
+ *  spinner the dialogs render, so the handoff is seamless. */
 function DialogsChunkFallback() {
   return createPortal(
     <div
@@ -62,17 +46,11 @@ function DialogsChunkFallback() {
   );
 }
 
-// Loaded on the first ER-diagram / DDL open: it carries @xyflow/react,
-// elkjs and a second CodeMirror setup, none of which a lesson that never
-// opens a dialog should download. `ssr: false` is load-bearing beyond that:
-// the bare `import()` this used to be still bundles the subtree into every
-// learn route's *server* graph, which put elkjs (~479 KiB gzipped, measured)
-// into the deployed Worker for dialogs that only ever open from a click and
-// are never server-rendered. Only the `dynamic(…, { ssr: false })` form is
-// stripped from the server compile — and for the same reason there must be
-// no other `import("./SqlCardDialogs")` anywhere in server-reachable code
-// (which is also why the old menu-open preload is gone: a second import()
-// would put the module straight back into the Worker).
+// Loaded on first dialog open (carries @xyflow/react, elkjs, a second
+// CodeMirror). `ssr: false` is load-bearing: only the dynamic(…, {ssr:false})
+// form is stripped from the server compile — a bare `import()` puts elkjs
+// (~479 KiB gzipped) into the deployed Worker. For the same reason there must
+// be no other `import("./SqlCardDialogs")` in server-reachable code.
 const SqlCardDialogs = dynamic(() => import("./SqlCardDialogs"), {
   ssr: false,
   loading: DialogsChunkFallback,
@@ -84,12 +62,9 @@ export interface SqlCardToolsMenuProps {
   ensureExec: () => Promise<SqlExec>;
   /** Disabled while the card is mid-run, so a tool can't race a query. */
   disabled?: boolean;
-  /** Which surface this menu belongs to, the first half of the exported
-   *  workbook's filename. */
+  /** First half of the exported workbook's filename. */
   surface: "sql-code-block" | "sql-challenge";
-  /** Stable per-block id, the second half of that filename. Both cards
-   *  pass the hash out of their `persistKey(...)`, which is already a
-   *  short, deterministic fingerprint of the block. */
+  /** Stable per-block id (the `persistKey(...)` hash), the second half. */
   exportId: string;
   showToast: (message: string, tone?: "info" | "warn") => void;
 }
@@ -108,14 +83,9 @@ function toSheetName(table: string, taken: Set<string>): string {
 }
 
 /**
- * Filename for the exported workbook: `sql-code-block-3f9a2c1d-data.xlsx`.
- *
- * Deliberately not derived from the card's title. A challenge card's title
- * is a sentence ("Find the customers with no orders in the last quarter"),
- * which made for an unwieldy filename and, worse, one whose safe-character
- * mangling differed from what the learner saw on screen. The id is the hash
- * out of `persistKey(...)`, so the same block always exports under the same
- * name and two blocks on one page never collide.
+ * Filename for the exported workbook, e.g. `sql-code-block-3f9a2c1d-data.xlsx`.
+ * Deliberately not derived from the card's title (a sentence-long title made
+ * unwieldy filenames); the persistKey hash is stable and collision-free.
  */
 function exportFilename(surface: string, id: string): string {
   const safeId = id.replace(/[^a-z0-9]/gi, "").slice(0, 12) || "0";
@@ -172,8 +142,7 @@ export function SqlCardToolsMenu({
         try {
           results = await exec(`SELECT * FROM ${quoteIdent(table)}`);
         } catch {
-          // A table the engine can't read (a permissions quirk, a
-          // half-created object) shouldn't sink the other sheets.
+          // An unreadable table shouldn't sink the other sheets.
           continue;
         }
         const set = results.find((r) => r.columns.length > 0);
@@ -214,10 +183,8 @@ export function SqlCardToolsMenu({
       setError(null);
       setSnapshot(null);
       if (kind === "ddl") setDdl(null);
-      // The dialog goes up immediately: next/dynamic shows the backdrop
-      // fallback while the component chunk downloads, then the dialog's own
-      // spinner takes over while the engine boots — on a cold DuckDB that
-      // boot is seconds long, and a click that does nothing reads as broken.
+      // Dialog goes up immediately — a cold DuckDB boot is seconds long, and
+      // a click that does nothing reads as broken.
       setDialog(kind);
       try {
         const exec = await ensureExec();

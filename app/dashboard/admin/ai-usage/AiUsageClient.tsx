@@ -1,23 +1,11 @@
 "use client";
 
 /**
- * AI usage section, how much Ask AI chat, inline completion, and suggested
- * questions the site served over a chosen date window, per user and in total.
- * This is the page to watch while testing the AI features with test users:
- * counters move as completions/chats land (usage is recorded post-response via
- * waitUntil, so allow a beat before refreshing).
- *
- * The window is driven by a range toggle (Day / Week / Month / Total) plus an
- * "as of" date that anchors the end of the window; Total drops the lower bound
- * and always ends today. The date math is done in UTC to match how usage is
- * bucketed server-side (`ai_usage_daily.day` is a UTC 'YYYY-MM-DD').
- *
- * Data comes from `GET /api/admin/ai-usage?start&end` (admin-enforced
- * server-side), which returns per-user rows summed over the window plus the
- * site-wide per-day totals against the configured daily cap. Presentation
- * follows the soft design kit in `_components/shared.tsx`; the numeric tables
- * keep their tabular layout on mobile and scroll horizontally (the ui Table
- * wrapper is already overflow-x-auto).
+ * AI usage per user and site-wide over a chosen window, from
+ * GET /api/admin/ai-usage?start&end (admin-enforced server-side). Date math is
+ * UTC to match server-side bucketing (`ai_usage_daily.day` is a UTC
+ * 'YYYY-MM-DD'). Usage is recorded post-response via waitUntil, so very
+ * recent activity can lag a refresh.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader2, RefreshCw } from "lucide-react";
@@ -67,8 +55,8 @@ const full = new Intl.NumberFormat("en");
 
 type Range = "day" | "week" | "month" | "total";
 
-/** The toggle options, with the trailing span each covers (in days). Total has
- *  no fixed span, it drops the lower bound entirely. */
+/** Toggle options with the trailing span in days; Total (span 0) drops the
+ *  lower bound entirely. */
 const RANGES: { key: Range; label: string; span: number }[] = [
   { key: "day", label: "Day", span: 1 },
   { key: "week", label: "Week", span: 7 },
@@ -137,10 +125,8 @@ function StatTile({
   );
 }
 
-/** Capacity meter: fill severity steps accent → warning → danger as the day
- *  approaches the cap; the unfilled track stays a lighter step of the same
- *  ramp so the state reads across the whole bar. The % is also in the tile's
- *  detail text, so severity is never color-alone. */
+/** Capacity meter stepping accent → warning → danger toward the cap. The % is
+ *  also in the tile's detail text, so severity is never color-alone. */
 function CapMeter({ fraction }: { fraction: number }) {
   const pct = Math.min(100, Math.round(fraction * 100));
   const tone =
@@ -207,16 +193,14 @@ export function AiUsageClient() {
   const { data: session, isPending: sessionPending } = useSession();
   const [report, setReport] = useState<AiUsageReport | null>(null);
   const [range, setRange] = useState<Range>("day");
-  // Empty until the first load resolves, then synced to the server's `end`.
-  // Starting empty avoids an SSR/client `new Date()` hydration mismatch.
+  // Empty until the first load, then synced to the server's `end`; starting
+  // empty avoids an SSR/client `new Date()` hydration mismatch.
   const [anchor, setAnchor] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [denied, setDenied] = useState(false);
 
-  // Monotonic sequence: flipping the range/date quickly fires overlapping
-  // fetches, and a slow stale response must not overwrite the newer report
-  // (or snap the picker back to the stale window).
+  // Monotonic sequence: a slow stale response must not overwrite a newer one.
   const loadSeq = useRef(0);
 
   const load = useCallback(async (nextRange: Range, nextAnchor: string) => {
@@ -242,8 +226,7 @@ export function AiUsageClient() {
         const data = (await res.json()) as AiUsageReport;
         if (seq !== loadSeq.current) return;
         setReport(data);
-        // Keep the picker in sync with the resolved window end (the server is
-        // the source of truth for "today").
+        // The server is the source of truth for "today".
         setAnchor(data.end);
       }
     } catch {
@@ -282,8 +265,7 @@ export function AiUsageClient() {
   }
 
   const isSingleDay = report ? report.start === report.end : range === "day";
-  // Once loaded, describe the window the server actually returned; before the
-  // first response, describe the window the current controls will request.
+  // Describe the returned window once loaded, else the one being requested.
   const pending = windowFor(range, anchor || todayUtc());
   const label = report
     ? windowLabel(report.start, report.end)
@@ -421,8 +403,8 @@ export function AiUsageClient() {
                 <TableBody>
                   {report.users.map((u) => (
                     <TableRow key={u.userId} className={rowClass}>
-                      {/* min/max widths keep the identity column readable
-                          while the wrapper scrolls horizontally on mobile. */}
+                      {/* min/max widths keep identity readable while the
+                          wrapper scrolls horizontally on mobile. */}
                       <TableCell className={`${cellClass} min-w-44 max-w-56`}>
                         <div className="min-w-0">
                           <div className="truncate font-medium">

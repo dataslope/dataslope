@@ -1,15 +1,8 @@
 /**
- * Remote-dataset loading tests.
- *
- * Covers the URL building / caching helpers in runtime/remoteDatasets.ts
- * and the PGlite script preparation in runtime/postgres.ts. The fetch
- * tests stub the global fetch, no network access required.
- *
- * The persistent-cache tests additionally stub a fake `caches` (Cache
- * API) global and use vi.resetModules() to simulate separate JS
- * contexts (main thread vs. workers vs. a later visit): each context
- * gets its own module instance, and so its own in-flight memo, while
- * sharing the origin's cache storage.
+ * Remote-dataset loading: URL/caching helpers in runtime/remoteDatasets.ts
+ * and PGlite script prep in runtime/postgres.ts. fetch is stubbed. The
+ * persistent-cache tests stub a fake Cache API and use vi.resetModules() to
+ * simulate separate JS contexts sharing the origin's cache storage.
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
 

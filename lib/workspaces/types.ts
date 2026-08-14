@@ -1,22 +1,10 @@
 /**
- * Shared types for playground cloud saves + sharing.
- *
- * The unit of persistence is a **bundle**: a self-contained snapshot of a
- * playground workspace, encoded by lib/workspaces/bundleCodec.ts as a gzipped
- * binary container (JSON header + raw database image). Code playgrounds carry
- * their files verbatim in the header; SQL playgrounds carry the engine's
- * native database image (SQLite file image / PGlite data-dir tarball / DuckDB
- * database file) in the binary section plus the query tabs in the header, and
- * are reopened by loading the image straight into the in-browser engine, no
- * dump replay.
- *
- * The bundle bytes live in R2; D1 keeps a metadata row whose `manifest` column
- * is a small display-only summary (file names / tab titles) so lists and the
- * share page never have to download or decompress the payload.
- *
- * Everything here is isomorphic (no DOM, no Workers APIs): the browser builds
- * and consumes bundles, the Worker validates metadata, and tests exercise the
- * validators directly.
+ * Shared types for playground cloud saves + sharing. The unit of persistence
+ * is a **bundle**: a gzipped container (JSON header + raw database image, see
+ * lib/workspaces/bundleCodec.ts). Bundle bytes live in R2; D1 keeps a
+ * metadata row whose `manifest` column is a small display-only summary so
+ * lists never download the payload. Everything here is isomorphic (no DOM,
+ * no Workers APIs).
  */
 
 export const BUNDLE_VERSION = 2;
@@ -36,10 +24,9 @@ export const SQL_PLAYGROUND_IDS: readonly SqlDialect[] = [
   "duckdb",
 ];
 
-/** Per-dialect format of the binary image in a SQL bundle. One valid value
- *  per dialect today; a named format (rather than inferring from the dialect)
- *  keeps room for alternates (e.g. a Parquet export for DuckDB) without
- *  another container change. */
+/** Per-dialect format of the binary image in a SQL bundle. Named rather than
+ *  inferred from the dialect so alternates can be added without a container
+ *  change. */
 export type SqlDbFormat = "sqlite-image" | "pgdata-tar" | "duckdb-image";
 
 export const SQL_DB_FORMATS: Record<SqlDialect, SqlDbFormat> = {
@@ -48,11 +35,9 @@ export const SQL_DB_FORMATS: Record<SqlDialect, SqlDbFormat> = {
   duckdb: "duckdb-image",
 };
 
-/** Code playgrounds (one per `app/playground/<id>` route). Kept as a literal
- *  list, the Worker cannot enumerate the route tree at request time.
- *  Guarded against drift by __tests__/workspacesCloud.test.ts, which compares
- *  this list to the actual `app/playground/<id>` directories: forgetting to
- *  add a new playground here breaks its Save/Share with "Unknown playground". */
+/** Code playgrounds (one per `app/playground/<id>` route). Literal list — the
+ *  Worker cannot enumerate the route tree; kept in sync with the route
+ *  directories by __tests__/workspacesCloud.test.ts. */
 export const CODE_PLAYGROUND_IDS: readonly string[] = [
   "c",
   "cpp",
@@ -95,13 +80,9 @@ export interface BundleCodeFile {
 export interface BundleSqlTab {
   title: string;
   code: string;
-  /** "view-data" for a table tab: one opened from the sidebar, which shows
-   *  the table's rows with the editor pane hidden. Absent for an ordinary
-   *  query tab, and absent from every bundle written before this field
-   *  existed, so a missing value reads as "ordinary query tab" and old and
-   *  new clients round-trip each other's bundles without a version bump.
-   *  The playgrounds' other tab kinds (er-diagram, query-history) are views
-   *  onto live state rather than saved work, and are not carried. */
+  /** "view-data" for a table tab opened from the sidebar. Absent for ordinary
+   *  query tabs and for bundles written before this field existed, so old and
+   *  new clients round-trip each other's bundles without a version bump. */
   kind?: "view-data";
 }
 
@@ -116,15 +97,10 @@ export interface BundleableSqlTab {
 }
 
 /**
- * The tabs a SQL bundle carries, plus where the active one lands in that list.
- *
- * One place decides which kinds cross the wire, because three playgrounds
- * build bundles and the rule is easy to get subtly wrong. Query tabs and table
- * ("view-data") tabs are saved work and travel; er-diagram and query-history
- * tabs are live views onto the current session, so they are dropped, matching
- * what `saveTabs` keeps in localStorage.
- *
- * The inverse is `bundleTabSeeds` in app/_components/cloud/materialize.ts.
+ * The tabs a SQL bundle carries, plus where the active one lands. Query and
+ * "view-data" tabs are saved work and travel; er-diagram and query-history
+ * tabs are live views and are dropped, matching `saveTabs`. Inverse:
+ * `bundleTabSeeds` in app/_components/cloud/materialize.ts.
  */
 export function sqlTabsForBundle(
   tabs: readonly BundleableSqlTab[],
@@ -168,15 +144,10 @@ export interface BundleSavedQuery {
 }
 
 /**
- * The parts of a workspace that belong to its owner rather than to the
- * workspace: the query history and the starred queries, which are otherwise
- * stranded in one browser's localStorage and absent on a second device.
- *
- * Never present in a share bundle. A share hands a copy of the workspace to
- * anyone with the link, and a log of everything the author has run is not
- * theirs to receive. That is enforced at the source: `buildBundle` omits this
- * unless asked with `includePersonal`, which only the cloud-backup path
- * passes, and the reader ignores it for anything opened from a share.
+ * Owner-only parts of a workspace: query history and starred queries. Never
+ * present in a share bundle — the author's run log is not the recipient's to
+ * receive. `buildBundle` omits this unless `includePersonal` is passed
+ * (cloud-backup path only), and readers ignore it for anything from a share.
  */
 export interface BundleSqlPersonal {
   history?: BundleQueryHistoryEntry[];
@@ -212,11 +183,9 @@ export interface WorkspaceBundle {
   /** kind === "code" */
   files?: BundleCodeFile[];
   activeFilename?: string;
-  /** kind === "code": the files whose editor tabs are open, in tab order.
-   *  The tab strip shows a subset of the workspace's files, so without this a
-   *  reopened copy fans every file back open. Carried as filenames because
-   *  file ids are reallocated when a bundle is materialized. Absent in
-   *  bundles written before this field existed, which keeps the old
+  /** kind === "code": files whose editor tabs are open, in tab order (without
+   *  this a reopened copy fans every file open). Filenames, not ids — ids are
+   *  reallocated on materialize. Absent in older bundles, which keeps the old
    *  open-everything behavior. */
   openFilenames?: string[];
   /** kind === "sql" */

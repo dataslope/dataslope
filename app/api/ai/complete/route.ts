@@ -1,20 +1,9 @@
 /**
- * AI inline code completion endpoint (pro members only).
- *
- * POST, one fill-in-the-middle suggestion for the editor's ghost text
- * (app/_components/ai/inlineCompletion.ts). The tier gate is enforced HERE,
- * not just in the client: guests get 401, signed-in free members get 403.
- * Suggestions are non-streaming (a few lines at most), use the same
- * OpenAI-compatible provider as Ask AI (OpenRouter → DeepSeek V4 Flash today;
- * see lib/ai/models.ts + wrangler.jsonc), and bill against completion-specific
- * daily budgets (migration 0004) plus the shared global token ceiling.
- *
- * GET, a cheap capability probe: `{ enabled: boolean }`. The editor extension
- * calls it once per page load to avoid firing doomed POSTs for guests/free
- * members. It's advisory only, POST re-checks the session and tier itself.
- *
- * `force-dynamic` for the same reason as app/api/ai/chat/route.ts: reads the
- * session, talks to an external API, must run per request.
+ * AI inline code completion (pro members only). POST returns one
+ * fill-in-the-middle suggestion; the tier gate is enforced HERE (guests 401,
+ * free members 403), billed against completion-specific daily budgets plus
+ * the global ceiling. GET is a cheap advisory capability probe
+ * (`{ enabled }`); POST re-checks session and tier itself.
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createAuth } from "@/lib/auth/server";
@@ -41,8 +30,7 @@ function json(data: unknown, status = 200): Response {
   });
 }
 
-/** How long we'll wait on the provider. An inline suggestion that arrives
- *  after this is stale anyway, the user has moved on. */
+/** Provider wait cap; a suggestion arriving later is stale anyway. */
 const PROVIDER_TIMEOUT_MS = 12_000;
 
 export async function GET(request: Request): Promise<Response> {
@@ -60,11 +48,9 @@ export async function POST(request: Request): Promise<Response> {
   if (!isSameOrigin(request)) return json({ error: "Forbidden." }, 403);
   const { env, ctx } = getCloudflareContext();
 
-  // --- Auth gate: guests are blocked outright. ---
-  // Cookie cache bypassed: this endpoint spends provider tokens per request,
-  // and the cached session outlives bans/plan changes by up to five minutes.
-  // (The advisory GET probe above stays on the cheap cached path, the POST
-  // re-checks everything anyway.)
+  // Cookie cache bypassed: this endpoint spends provider tokens, and the
+  // cached session outlives bans/plan changes by up to five minutes. (The GET
+  // probe stays on the cheap cached path.)
   const auth = await createAuth(env, request);
   const session = await auth.api.getSession({
     headers: request.headers,
@@ -158,9 +144,8 @@ export async function POST(request: Request): Promise<Response> {
   );
   const inTok = result.inputTokens || approxInput;
   const outTok = result.outputTokens || estimateTokens(result.text);
-  // A failed write undercounts usage against the daily budgets, it must not
-  // fail the response, but log it so undercounting is visible in the Worker
-  // logs rather than silent.
+  // A failed write must not fail the response; log so the undercounting is
+  // visible.
   const write = recordCompletionUsage(env, user.id, day, inTok, outTok).catch(
     (err) => console.error("ai/complete: usage write failed", err),
   );

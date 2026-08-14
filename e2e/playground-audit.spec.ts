@@ -2,33 +2,19 @@ import { test, expect, type Page } from "@playwright/test";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-// ─────────────────────────────────────────────────────────────────────
-// Playground audit: for every non-SQL playground, exercise *all* of the
-// built-in examples (Examples menu) and *all* of the package demos
-// (Packages drawer → "Example" button), running each one and recording
-// whether it produced an error cell. This is the harness behind the
-// "do all examples run?" / "do all package imports work?" checks.
-//
-// One runtime init per playground, then each example/package snippet is
-// loaded into the editor and run in turn (the heavy worker stays warm).
-// Results are written to `audit-results/<lang>.json` and summarised on
-// stdout so failures are easy to triage.
-//
-// Run a single playground:   npx playwright test playground-audit -g "python"
-// ─────────────────────────────────────────────────────────────────────
+// Playground audit: for every non-SQL playground, run all built-in examples
+// and package demos, recording error cells. One runtime init per playground;
+// results go to audit-results/<lang>.json and a stdout summary.
+// Run one playground: npx playwright test playground-audit -g "python"
 
 const RUN_TIMEOUT = 150_000;
 const RESULTS_DIR = path.join(process.cwd(), "audit-results");
 
-// AUDIT_ISOLATE=1 reloads the runtime before every snippet so each runs in
-// a pristine session. This matters for stateful runtimes, e.g. WebR keeps
-// packages attached across runs, so a warm sweep can let one package's
-// functions mask another's (data.table::wday vs lubridate::wday). Slower,
-// but gives accurate per-snippet results.
+// AUDIT_ISOLATE=1 reloads the runtime before every snippet: stateful runtimes
+// (WebR keeps packages attached) can let one package's functions mask
+// another's. Slower, but accurate per-snippet.
 const ISOLATE = !!process.env.AUDIT_ISOLATE;
-// AUDIT_ONLY=<substr> restricts the sweep to snippets whose title/name
-// contains the substring (case-insensitive). Handy for re-checking one
-// failure in isolation: AUDIT_ISOLATE=1 AUDIT_ONLY=lubridate.
+// AUDIT_ONLY=<substr> restricts the sweep to matching snippet titles/names.
 const ONLY = (process.env.AUDIT_ONLY ?? "").toLowerCase();
 
 interface RunResult {
@@ -123,9 +109,6 @@ async function runAndCollect(page: Page): Promise<{ type: string; body: string }
 function classifyError(langId: string, stderr: string): boolean {
   const s = stderr.trim();
   if (!s) return false;
-  // Java/C/C++ toolchains can emit warnings on stderr that don't stop a
-  // successful run. Treat as failure only when there's an explicit error
-  // marker or the program produced *no* other (stdout) output.
   return true; // start strict; refined below via allowlist
 }
 
@@ -286,10 +269,8 @@ const PLAYGROUNDS: { id: string; route: string }[] = [
   { id: "java", route: "/playground/java" },
 ];
 
-// This sweep boots every heavy runtime (Pyodide, WebR, browsercc,
-// CheerpJ, .NET) and runs ~150 snippets, so it's far too slow for the
-// default CI e2e run. It's opt-in: set AUDIT_PLAYGROUNDS=1 to enable.
-//   AUDIT_PLAYGROUNDS=1 npx playwright test playground-audit -g "audit python"
+// Boots every heavy runtime and runs ~150 snippets — too slow for default CI.
+// Opt-in: AUDIT_PLAYGROUNDS=1 npx playwright test playground-audit -g "audit python"
 const auditEnabled = !!process.env.AUDIT_PLAYGROUNDS;
 
 for (const { id, route } of PLAYGROUNDS) {

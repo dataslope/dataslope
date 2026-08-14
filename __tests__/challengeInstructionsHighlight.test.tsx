@@ -1,17 +1,9 @@
 /**
- * Syntax highlighting for fenced code in a challenge card's instructions.
- *
- * The instructions pipeline used to run `remarkGfm` alone, so a card that
- * spelled out a pandas one-liner rendered it as an unstyled grey box while the
- * same snippet in a multiple-choice question — which has always had
- * `rehypeHighlight` — came out colored.
- *
- * The half of this that is easy to get wrong is the *language*. `detect` is
- * off, because auto-detection on a two-line sample is a coin flip, so every
- * fence names its own language and the tests at the bottom hold the corpus to
- * that. An author who forgets gets `text`, which is the safe default: of the
- * 89 fences that once carried no info string, 87 were samples of what the
- * program prints rather than code.
+ * Syntax highlighting for fenced code in a challenge card's instructions
+ * (the pipeline once ran remarkGfm alone, so fences rendered unstyled).
+ * `detect` is off — auto-detection on a two-line sample is a coin flip — so
+ * every fence names its own language and the corpus tests below hold it to
+ * that; a forgotten label falls back to `text`, the safe default.
  */
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -108,12 +100,9 @@ heavy = df[df["body_mass_g"] > 5000][["species", "body_mass_g"]]
 });
 
 /**
- * Every fence in a card's instructions names its language.
- *
- * `labelBareFences` exists for the author who forgets, but it should stay a
- * fallback: it cannot tell an expected-output sample from a code snippet, and
- * only the author can. Labelling in the source says which is which where it
- * can be seen and reviewed.
+ * Every fence in a card's instructions names its language. labelBareFences is
+ * only a fallback: it cannot tell an expected-output sample from a code
+ * snippet — only the author can, in the source.
  */
 describe("challenge card instructions name their fence languages", () => {
   const fences: { file: string; line: number; lang: string }[] = [];

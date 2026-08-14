@@ -1,52 +1,21 @@
 #!/usr/bin/env node
 /**
- * Optimize the raster content images and generate their manifest.
+ * Optimize the raster content images and generate their manifest (slug →
+ * {hash, width, height, formats} in lib/generated/images.js), which is how
+ * `<Image>` reserves layout space without shipping the raw file. Encoding is
+ * expensive, so unlike the cheap text generators this is incremental and its
+ * outputs are committed: a source re-encodes only when its content hash
+ * changes, and an unchanged tree is a true no-op with no git churn.
  *
- * Why this exists:
+ * Two classes of image reach `public/images/`: pre-served WebP written by
+ * `scripts/promote-illustrations.mjs`, which are NOT re-encoded (a second
+ * lossy pass cost ~1.8 dB PSNR to save ~3 kB) and only contribute dimensions;
+ * and raster sources under `assets/images/`, encoded to `.webp` plus a
+ * fallback (currently none exist; the path stays supported and tested).
  *
- * Content images (`assets/images/*`, the Recraft topic art plus any other
- * raster: photos, diagrams, screenshots) must be crushed before they are
- * served, and every page that embeds one needs the image's intrinsic
- * width/height so `<Image>` can reserve layout space (no CLS) without shipping
- * the raw file.
- *
- * Unlike the repo's other generated-asset scripts (search-corpus,
- * brand-fallbacks, cheap text passes that fully regenerate every build), image
- * encoding is expensive, so this script is *incremental and its outputs are
- * committed*:
- *
- *   - For each source it writes an optimized `.webp` plus a raster fallback
- *     (`.png` when the source has transparency, otherwise `.jpg`) to
- *     `public/images/`, and records slug → {hash, width, height, formats} in
- *     `lib/generated/images.js`.
- *   - Both the optimized assets AND the manifest are committed to git (not
- *     gitignored), so a deploy serves them straight from CDN with zero build
- *     re-encoding.
- *   - A source is only re-encoded when its content hash changes (or its output
- *     files are missing). If nothing changed the script is a true no-op, it
- *     doesn't even rewrite the manifest, so it stays cheap on `dev` / `build`
- *     / `postinstall` and produces no git churn.
- *
- * Two classes of image can reach `public/images/`:
- *
- *   1. **Pre-served WebP** written straight into `public/images/` by
- *      `scripts/promote-illustrations.mjs`. These are NOT re-encoded. Promotion
- *      already produced the exact bytes to serve, and running them through a
- *      second lossy pass cost ~1.8 dB PSNR to save ~3 kB — a bad trade. This
- *      script only reads their dimensions for the manifest, so a generated
- *      illustration is encoded once and exists in git once. Today this is
- *      every image in the repo.
- *   2. **Raster sources** under `assets/images/` (a photo, a screenshot, a
- *      scanned diagram — anything not from the illustration pipeline). These
- *      are encoded here into an optimized `.webp` plus a raster fallback. The
- *      folder is currently empty of sources; the path stays supported and
- *      tested for when one is added.
- *
- * Bumping `ENCODER_VERSION` invalidates every cached hash, forcing a one-time
- * re-encode after an encoder-settings change.
- *
- * Idempotent. With no source images it writes an empty manifest so typecheck /
- * lint / build stay green before any image has been added.
+ * Bump `ENCODER_VERSION` after an encoder-settings change to force a one-time
+ * full re-encode. With no sources it writes an empty manifest so
+ * typecheck/lint/build stay green.
  */
 import { createHash } from "node:crypto";
 import {
@@ -67,10 +36,9 @@ const SRC_DIR = join(ROOT, "assets", "images");
 const OUT_DIR = join(ROOT, "public", "images");
 const MANIFEST_FILE = join(ROOT, "lib", "generated", "images.js");
 
-// Raster source formats sharp can decode. SVG is vector and handled inline in
-// the MDX, so it is intentionally excluded. GIF is also excluded: sharp reads
-// only the first frame by default, so an animated GIF would be silently
-// flattened, convert to PNG/WebP first.
+// Raster source formats sharp can decode. SVG is handled inline in MDX. GIF
+// is excluded: sharp reads only the first frame, silently flattening
+// animations — convert to PNG/WebP first.
 const SOURCE_EXTS = new Set([
   ".png",
   ".jpg",
@@ -81,17 +49,14 @@ const SOURCE_EXTS = new Set([
   ".tiff",
 ]);
 
-// Every format the encoder can emit (WebP + the two possible fallbacks).
-// The prune step only touches files with these extensions.
+// Every format the encoder can emit; the prune step only touches these.
 const OUTPUT_EXTS = new Set([".webp", ".png", ".jpg"]);
 
-// Cap the longest edge so an image displayed at ~640px still looks crisp on 2x
-// displays without shipping a 2048px original. `withoutEnlargement` keeps
-// smaller sources untouched.
+// Cap the longest edge: crisp at ~640px display on 2x without shipping a
+// 2048px original. `withoutEnlargement` keeps smaller sources untouched.
 const MAX_EDGE = 1600;
 
-// Bump to invalidate every cached hash after changing the encode settings
-// below (resize cap, webp/png/jpeg options). Forces a one-time full re-encode.
+// Bump after changing the encode settings below to force a full re-encode.
 const ENCODER_VERSION = "2";
 
 /** Lowercase, strip diacritics, and hyphenate to a URL/file-safe slug.
@@ -99,8 +64,7 @@ const ENCODER_VERSION = "2";
 export function slugify(value) {
   return value
     .normalize("NFKD")
-    // Strip the combining-diacritics block (escapes, not literal combining
-    // chars, so an editor/formatter can't silently mangle the range).
+    // Combining-diacritics block, as escapes so a formatter can't mangle it.
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
@@ -122,11 +86,9 @@ function listSources() {
     .sort();
 }
 
-/** Load the previously generated manifest so unchanged images can be skipped.
- *  The file is an ES module (`export default {…}`); rather than `import()` it
- *  (which warns under this package's CommonJS-typed package.json), pull the
- *  JSON literal out of the text, the script writes it, so the shape is known.
- *  Absent/unparseable manifest → treat everything as new. */
+/** Load the prior manifest so unchanged images can be skipped. The JSON
+ *  literal is pulled from the text rather than `import()`ed (which warns
+ *  under the CommonJS-typed package.json); absent/unparseable → all new. */
 function loadPriorManifest() {
   if (!existsSync(MANIFEST_FILE)) return {};
   try {
@@ -158,8 +120,7 @@ async function main() {
   mkdirSync(OUT_DIR, { recursive: true });
   mkdirSync(dirname(MANIFEST_FILE), { recursive: true });
 
-  // Load sharp lazily, only needed when an image actually has to be encoded,
-  // so the "nothing changed" / "no images yet" paths never touch the binary.
+  // Lazy: the "nothing changed" / "no images yet" paths never load sharp.
   let sharp = null;
   const ensureSharp = async () => {
     if (sharp) return sharp;
@@ -174,10 +135,9 @@ async function main() {
     return sharp;
   };
 
-  // Sidecar for the adopt loop below: file → the size/mtime its content hash
-  // was last computed from. Lives in node_modules/.cache rather than beside
-  // the committed manifest, because mtimes are per-clone and would otherwise
-  // put a machine-specific diff in git on every checkout.
+  // Sidecar for the adopt loop: file → size/mtime its hash was computed from.
+  // Lives in node_modules/.cache because mtimes are per-clone and would put a
+  // machine-specific diff in git.
   const statCache = readManifest(ROOT, "images-stat") ?? {};
   const nextStatCache = {};
 
@@ -206,8 +166,7 @@ async function main() {
       .update(input)
       .digest("hex");
 
-    // Reuse the cached encode when the source is unchanged and its outputs are
-    // still on disk. `formats` records which files exist for this slug.
+    // Reuse when the source is unchanged and its outputs are still on disk.
     const priorEntry = prior[slug];
     if (
       priorEntry?.hash === hash &&
@@ -223,8 +182,8 @@ async function main() {
 
     const s = await ensureSharp();
     const meta = await s(input).metadata();
-    // `rotate()` honors any EXIF orientation before we read dimensions.
-    // (sharp's default limitInputPixels already guards decompression bombs.)
+    // `rotate()` honors EXIF orientation; sharp's default limitInputPixels
+    // already guards decompression bombs.
     const base = s(input).rotate().resize({
       width: MAX_EDGE,
       height: MAX_EDGE,
@@ -278,11 +237,9 @@ async function main() {
     );
   }
 
-  // Adopt pre-served WebP: files promotion wrote directly into public/images
-  // with no corresponding source under assets/images. They are already the
-  // bytes we serve, so record dimensions and move on — no decode, no re-encode.
-  // Registering them in the manifest is also what keeps the prune step below
-  // from deleting them.
+  // Adopt pre-served WebP (promotion wrote them; no source under
+  // assets/images): record dimensions only, no re-encode. Registering them is
+  // also what keeps the prune step below from deleting them.
   let adopted = 0;
   for (const file of readdirSync(OUT_DIR)) {
     if (extname(file).toLowerCase() !== ".webp") continue;
@@ -290,13 +247,10 @@ async function main() {
     if (manifest[slug]) continue; // owned by a legacy source
     const priorEntry = prior[slug];
 
-    // Fast path: the committed manifest's hash is the authority on whether a
-    // file is unchanged, but *proving* it meant reading all 1832 images —
-    // ~340 MB, about ten seconds on a cold page cache and worse on Windows,
-    // paid on every `dev` and `build` just to conclude "nothing moved". The
-    // sidecar records the size+mtime each hash was computed from, so an
-    // untouched file is settled by `stat` alone. Content still decides: a
-    // file whose stat moved is read and hashed exactly as before.
+    // Fast path: proving "unchanged" by hashing meant reading ~340 MB of
+    // images on every dev/build. The sidecar records the size+mtime each hash
+    // was computed from, so an untouched file is settled by `stat` alone;
+    // content still decides when the stat moved.
     const st = statSync(join(OUT_DIR, file));
     const seen = statCache[file];
     if (
@@ -354,18 +308,12 @@ async function main() {
     : null;
   if (next !== current) writeFileSync(MANIFEST_FILE, next);
 
-  // Request-time consumers get the manifest as a static asset rather than an
-  // import: app/api/admin/illustration-prompts reads this JSON through
-  // lib/serverAssets.ts (filesystem in dev, the ASSETS binding in the
-  // Worker), so the manifest module and created-at.js stay out of that API
-  // route's bundler graph — API routes compile as their own graph and were
-  // carrying a private copy of both (agent-outputs/
-  // 20260813-1424-git-playground-design.md §8.8). Same write-if-changed
-  // discipline as the manifest, so no-op runs stay no-ops; the file is
-  // gitignored and regenerated by every build chain. created-at.js is
-  // generated earlier in each chain (build-created-at precedes build-images);
-  // it only goes missing on a bare direct run, which degrades to empty
-  // timestamps rather than failing the build.
+  // Request-time consumers get this as a static asset via lib/serverAssets.ts
+  // (filesystem in dev, ASSETS binding in the Worker), keeping the manifest
+  // module and created-at.js out of the API route's own bundler graph. Same
+  // write-if-changed discipline; gitignored. created-at.js is generated
+  // earlier in every build chain and only goes missing on a bare direct run,
+  // which degrades to empty timestamps rather than failing.
   const createdAtFile = join(ROOT, "lib", "generated", "created-at.js");
   let illustrationsCreatedAt = {};
   if (existsSync(createdAtFile)) {
@@ -394,12 +342,10 @@ async function main() {
       `${pruned} pruned (${Object.keys(manifest).length} image(s) total)`,
   );
 
-  // An opaque original sitting beside its own cut-out is git weight nothing
-  // renders: every surface asks for the `-cutout` slug. Two promotions run
-  // before `promote-illustrations` defaulted to cut-out-only left 1,351 of
-  // them, 151 MB. This is the tripwire for the next one — a warning rather
-  // than a failure, because art that is genuinely shown with its background
-  // is a legitimate thing to have, just a deliberate one.
+  // An opaque original beside its own cut-out is git weight nothing renders
+  // (one earlier promotion left 1,351 of them, 151 MB). A warning, not a
+  // failure: art genuinely shown with its background is legitimate, just
+  // deliberate.
   const redundant = Object.keys(manifest).filter(
     (slug) => !slug.endsWith("-cutout") && manifest[`${slug}-cutout`],
   );

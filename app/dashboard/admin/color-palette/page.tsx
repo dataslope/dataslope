@@ -135,11 +135,8 @@ export default function ColorTestPage() {
         description="Every editor theme's resolved palette, plus the brand ramps from app/brand.css. Pick a theme to re-resolve every swatch against it; click a swatch to copy its hex."
       />
 
-      {/* The preview surfaces below paint themselves from the *playground*
-          variables (--bg, --text, --theme-primary …), which is the whole point
-          of the page: they have to show the chosen editor theme, not the
-          dashboard's. `playground-root` is what scopes those variables, so it
-          stays wrapped around this subtree and nothing outside it is touched. */}
+      {/* Previews paint from the *playground* variables (the chosen editor
+          theme, not the dashboard's); `playground-root` scopes them here. */}
       <div className={`playground-root ${styles.root}`}>
         <Section
           title="Editor theme"
@@ -197,11 +194,7 @@ export default function ColorTestPage() {
                   title={hex ? `Copy ${hex}` : undefined}
                   className={`${styles.swatch} ${highlight ? styles.swatchHighlight : ""}`}
                 >
-                  {/* One cell geometry for every token, so the hex, the name
-                      and the label line up in columns down the grid. A text
-                      token shows "Aa" over --bg with a solid band of itself
-                      beneath, rather than claiming a wider cell as it used
-                      to and breaking the alignment for everything after it. */}
+                  {/* One cell geometry for every token, so the columns align. */}
                   <span className={styles.chip} style={{ background: "var(--bg)" }}>
                     {isTextColor ? (
                       <>

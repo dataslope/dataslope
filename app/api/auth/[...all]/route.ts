@@ -1,16 +1,9 @@
 /**
- * Better Auth catch-all handler, serves every `/api/auth/*` endpoint
- * (sign-in, OAuth callbacks, session, sign-out, …).
- *
- * The Better Auth instance is built per request (`createAuth(env, request)`)
- * because the D1 binding only exists at request time and must not be shared
- * across requests on the Workers runtime (see lib/auth/server.ts). The request
- * is passed through so the admin plugin can resolve `ADMIN_EMAILS` → user ids
- * against D1 only on its own endpoints. `getCloudflareContext()` surfaces the
- * binding inside the handler.
- *
- * `force-dynamic` keeps these endpoints off the incremental cache, they set
- * cookies and read D1, so they must run on every request, never be prerendered.
+ * Better Auth catch-all handler for every `/api/auth/*` endpoint. The
+ * instance is built per request (`createAuth(env, request)`): the D1 binding
+ * only exists at request time and must not be shared across requests on the
+ * Workers runtime (see lib/auth/server.ts). `force-dynamic` — these set
+ * cookies and read D1, so they must never be prerendered.
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createAuth } from "@/lib/auth/server";

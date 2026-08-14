@@ -1,27 +1,11 @@
 "use client";
 
 /**
- * "Apply AI suggestions to the editor" plumbing for the Ask AI panel.
- *
- * The playground-surface system prompt (lib/ai/prompt.ts) tells the model:
- * when it proposes an updated version of one of the user's files, emit the
- * COMPLETE new contents in a fenced block whose info string carries a
- * `file=<filename>` tag, e.g.
- *
- *   ```tsx file=App.tsx
- *   …entire updated file…
- *   ```
- *
- * This module has the two halves that make those blocks actionable:
- *
- *  1. `parseAiEditSuggestions`, extract tagged blocks from a completed
- *     assistant message. A plain answer with no tagged block yields [] and
- *     the panel renders it exactly as before; the review UI appears ONLY
- *     when the model actually returned updated code.
- *  2. A tiny registry bridging the globally-mounted Ask AI widget to the
- *     playground component currently on screen: the playground registers a
- *     handler that opens an in-editor diff review (CodeMirror merge view),
- *     and the widget invokes it by adapter id.
+ * "Apply AI suggestions to the editor" plumbing for the Ask AI panel. The
+ * system prompt (lib/ai/prompt.ts) has the model emit complete file contents
+ * in fenced blocks tagged `file=<filename>`; `parseAiEditSuggestions` extracts
+ * them, and a small registry bridges the global widget to the mounted
+ * playground's diff-review handler by adapter id.
  */
 
 export interface AiEditSuggestion {

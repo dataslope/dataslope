@@ -1,18 +1,9 @@
 /**
- * The orderings the two admin review galleries offer, in one place.
- *
- * `/dashboard/admin/charts` and `/dashboard/admin/illustration-prompts` show
- * different artefacts in different ways (one is a static page sliced by route
- * segment, the other a client grid with the ordering in a query parameter),
- * but they sort by the same four things and had better agree on what each one
- * means. Keeping the comparators here rather than in each component is also
- * what makes them testable: neither page can be rendered in this project's
- * Node test environment, and both are behind an admin gate.
- *
- * Callers project their own rows onto `Orderable` — a chart's group is the
- * course or interview track it first appears in, an illustration's is the
- * course its lesson belongs to — so nothing here needs to know about charts or
- * illustrations at all.
+ * The orderings the two admin review galleries offer, in one place so both
+ * agree on what each ordering means (and so the comparators are testable —
+ * neither admin page renders in the Node test environment). Callers project
+ * their own rows onto `Orderable`, so nothing here knows about charts or
+ * illustrations.
  */
 
 /** The minimum an artefact has to expose to be put in order. */
@@ -45,18 +36,12 @@ export function isOrdering(value: unknown): value is Ordering {
 }
 
 /**
- * Compare by creation date, with undated artefacts last and ids ascending.
- *
- * `direction` flips only the date comparison, and that narrowness is the whole
- * point. An artefact with no commit yet is *unknown* rather than old, so it
- * belongs at the end of "oldest first" and at the end of "newest first" alike;
- * and two artefacts committed in the same second should read A→Z in both. The
- * obvious implementations get one of those wrong: negating the result moves
- * the undated rows to the front of one ordering, and swapping the arguments
- * does the same *and* reverses the tie-break. Only the date reverses here.
- *
- * ISO-8601 UTC strings compare correctly as strings, which is why
- * scripts/build-created-at.mjs normalises the committer's local offset away.
+ * Compare by creation date, undated artefacts last, ids ascending.
+ * `direction` flips ONLY the date comparison: undated rows are unknown rather
+ * than old and belong at the end of both orderings, and same-second ties must
+ * read A→Z in both — negating the whole result or swapping the arguments
+ * breaks one of those. ISO-8601 UTC strings compare correctly as strings
+ * (scripts/build-created-at.mjs normalises offsets away).
  */
 export function compareCreated(a: Orderable, b: Orderable, direction: 1 | -1 = 1): number {
   if (a.createdAt && b.createdAt) {

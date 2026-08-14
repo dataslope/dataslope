@@ -1,38 +1,18 @@
 #!/usr/bin/env node
 /**
- * Fail on a chart with one label printed on top of another.
+ * Fail on a chart with one label printed on top of another. The prompting
+ * case is structural and invisible in the spec: the theme's inline 13px root
+ * font-size beats Plot's 10px presentation attribute, so the band above a
+ * faceted frame (facet title + topmost y tick) grows by a third and the two
+ * rows of type collide. `_theme.mjs` lifts titles when the topmost tick lands
+ * on the frame edge; this catches whatever that does not.
  *
- * The collision that prompted this is structural rather than careless, and it
- * is invisible in the spec. Plot lays the band above a faceted frame out for
- * its own 10px default: the facet title's baseline 9px up, the topmost y tick
- * label centred *on* the frame edge. This theme renders at 13px, because an
- * inline `font-size` on the root beats Plot's presentation attribute, so
- * everything in that band grows by a third and the air between the two rows of
- * type goes to nothing. `line-vs-bar-four-cases` shipped with its panel notes
- * inside its facet titles. `_theme.mjs` now lifts the titles when the topmost
- * tick lands on the frame edge; this catches whatever that does not.
- *
- * Six more were found the same way, all of them a label written at a round
- * position that happened to be a tick row: a note at `y: 3` on an axis whose
- * ticks are at 0, two series labels nudged toward each other rather than
- * apart, an annotation hanging off the left edge of a panel and running back
- * into the margin.
- *
- * ── What it can and cannot see ─────────────────────────────────────────────
- *
- * Advance widths are estimated per character, because there is no font here
- * and the page's Inter is not one this process could load. The estimate is
- * deliberately narrow and `MIN_OVERLAP` absorbs the rest, so this reports
- * labels that are genuinely on top of each other rather than merely close.
- * Rotated labels are skipped: an axis-aligned box is the wrong shape for one,
- * and Plot rotates axis labels precisely when they would otherwise collide.
- *
- * `--rules` adds a second pass for labels with a rule through them, which is
- * what `HALO` in `_theme.mjs` exists to fix. It is not on by default and does
- * not fail the build, because it cannot see that a label sits on an opaque
- * mark: every cell label in a heatmap and every letter inside a plotted dot
- * comes back as a hit. It found a real one in `ci-coverage`, so it is worth
- * reading occasionally; it is not worth blocking on.
+ * Advance widths are estimated per character (no font is loaded here); the
+ * estimate is narrow and `MIN_OVERLAP` absorbs the rest, so only genuine
+ * overlaps are reported. Rotated labels are skipped. `--rules` adds a
+ * non-blocking second pass for labels with a rule through them (what `HALO`
+ * in `_theme.mjs` fixes); it cannot see that a label sits on an opaque mark,
+ * so it false-positives on heatmaps — worth reading, not worth blocking on.
  *
  * Usage:
  *   node scripts/check-chart-labels.mjs [--verbose] [--rules]
@@ -44,11 +24,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const CHARTS = join(ROOT, "lib", "generated", "charts.js");
 
-/** How deep two label boxes must interpenetrate before it counts. The widths
- *  here are estimated, so a hairline of overlap is inside the error bars; two
- *  points of it is a label sitting on another label. `line-vs-bar-four-cases`
- *  shipped with a panel note 2.2px inside its facet title, which is the case
- *  this number is set by. */
+/** How deep two label boxes must interpenetrate before it counts: estimated
+ *  widths make a hairline of overlap noise; two points is a label sitting on
+ *  another (set by a real 2.2px collision). */
 const MIN_OVERLAP = 2;
 /** How far inside a label's box a rule must pass to count as through it. */
 const RULE_INSET = 2;
@@ -76,10 +54,9 @@ function textWidth(text, fontSize, bold) {
   return em * fontSize * (bold ? 1.03 : 1);
 }
 
-/** Cap-and-ascender height above the baseline, and descender below it. The
- *  descent is per string rather than per font: a label reading "78" or "n =
- *  10,000" has nothing below the baseline, and charging it a full descender
- *  is what made a big numeral appear to collide with the note under it. */
+/** Cap-and-ascender height above the baseline, descender below. Descent is
+ *  per string, not per font: charging "78" a full descender made numerals
+ *  appear to collide with the note under them. */
 const ASCENT = 0.74;
 const DESCENT = 0.22;
 const FLAT = 0.06;
@@ -87,18 +64,16 @@ const DESCENDERS = /[gjpqyQ()[\]{}_$@]/;
 
 const NUM = "[-\\d.e]+";
 const attrOf = (attrs, key) => new RegExp(`\\b${key}="([^"]*)"`).exec(attrs)?.[1];
-// `transform="translate(82,60) rotate(-40)"` is one attribute with two
-// operations in it, so the translate cannot be matched up to the closing
-// quote: js-equality-grid's rotated column headers were read at the origin,
-// where they collided with everything.
+// `transform="translate(82,60) rotate(-40)"` holds two operations, so the
+// translate cannot be matched up to the closing quote.
 const translateOf = (attrs) => {
   const m = new RegExp(`translate\\(\\s*(${NUM})[,\\s]+(${NUM})\\s*\\)`).exec(
     attrOf(attrs, "transform") ?? "",
   );
   return m ? [Number(m[1]), Number(m[2])] : [0, 0];
 };
-/** Rotated labels are skipped: an axis-aligned box is the wrong shape for one,
- *  and Plot rotates axis labels precisely when they would otherwise collide. */
+/** Rotated labels are skipped: an axis-aligned box is the wrong shape, and
+ *  Plot rotates axis labels precisely to avoid collisions. */
 const isRotated = (attrs) => /rotate\(/.test(attrOf(attrs, "transform") ?? "");
 /** `0.32em` / `-0.24em` / `4` → px, against the element's own font size. */
 const lengthOf = (value, fontSize) => {
@@ -151,9 +126,8 @@ export function readLabels(svg) {
       });
     }
 
-    // A self-closing `<text/>` is an axis tick Plot chose not to label. It has
-    // no content, and scanning forward for a `</text>` would find the *next*
-    // label's and read its lines in at this tick's position.
+    // A self-closing `<text/>` is an unlabelled tick; scanning forward for
+    // `</text>` would read the *next* label at this tick's position.
     if (name === "text" && !selfClosing && !isRotated(attrs)) {
       // The element's own content, or its `<tspan>` children for a multi-line
       // label. Plot writes the first line's offset as `y` and the rest as

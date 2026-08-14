@@ -1,20 +1,12 @@
 /**
  * CSRF origin allow-list + Cloudflare-preview auth (lib/auth/server.ts).
- *
- * Two things are covered:
- *   1. The "Invalid origin" fix for email/password on www.dataslope.com. Better
- *      Auth pins its trusted set to BETTER_AUTH_URL (the apex), but production
- *      also serves www with no canonical redirect, so a sign-up POST from www
- *      was rejected. `isSameSiteHost`/`extraTrustedOrigins` now trust the apex
- *      and its subdomains (and *.workers.dev previews).
- *   2. Google/GitHub sign-in completing on a *.workers.dev preview via the
- *      oAuthProxy plugin, which must engage ONLY on previews — apex and www
- *      keep their exact production flow.
- *
- * Better Auth disables the origin check when NODE_ENV=test (skipOriginCheck),
- * so the end-to-end origin tests build an instance with
- * `advanced.disableOriginCheck: false` to force it on — using the SAME
- * `extraTrustedOrigins` that createAuth wires in.
+ * Covers (1) the "Invalid origin" fix: Better Auth trusts only BETTER_AUTH_URL
+ * (the apex) but production also serves www, so sign-up POSTs from www were
+ * rejected — isSameSiteHost/extraTrustedOrigins trust the apex, its
+ * subdomains, and *.workers.dev previews; (2) oAuthProxy engaging ONLY on
+ * previews, leaving apex/www production flow untouched. Better Auth skips the
+ * origin check under NODE_ENV=test, so the end-to-end tests force
+ * disableOriginCheck: false with the same extraTrustedOrigins.
  */
 import { describe, it, expect } from "vitest";
 import type { D1Database } from "@cloudflare/workers-types";

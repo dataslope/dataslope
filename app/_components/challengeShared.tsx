@@ -452,8 +452,7 @@ export type Status = "idle" | "loading" | "ready" | "running" | "error";
 /** Lifecycle of a single challenge test row. */
 export type TestState = "pending" | "pass" | "fail";
 
-/** One row in the test-results rail, as rendered (name resolved, state
- *  computed, failure detail attached). */
+/** One rendered row in the test-results rail. */
 export interface DisplayedTest {
   id: string;
   name: string;
@@ -469,17 +468,12 @@ export function detectIsMac(): boolean {
   return /Mac|iPhone|iPod/.test(platform) || /Macintosh/.test(ua);
 }
 
-// Minimum time (ms) the "running" overlay is held visible after a run
-// completes. Matches the playground's MIN_ANIMATION_MS so a fast run
-// (e.g. a few-line JS challenge that finishes in 20ms) doesn't blink
-// the wave animation in and back out within a single frame.
+// Minimum ms the "running" overlay stays visible; matches the playground's
+// MIN_ANIMATION_MS so a 20ms run doesn't blink the wave animation.
 export const MIN_RUN_OVERLAY_MS = 300;
 
-// Build a line-numbers extension whose gutter starts after `offset`
-// lines, so the editable region's numbering continues from where a
-// file's read-only init code left off. Stored in a compartment so the
-// offset can be reconfigured when the active file (hence its init)
-// changes, without remounting the editor.
+// Line-numbers gutter starting after `offset` lines, so numbering continues
+// from a file's read-only init code. Held in a compartment for reconfiguration.
 export function lineNumbersWithOffset(offset: number) {
   return lineNumbersExt({
     formatNumber: offset ? (n) => String(n + offset) : undefined,
@@ -501,8 +495,7 @@ export function LanguageGlyph({ adapter }: { adapter: LanguageAdapter }) {
   );
 }
 
-/** Short, stable, human-readable block id ("PythonBlock-3f2a") derived from
- *  React's useId, used to label runtimes/workspaces in the registry. */
+/** Short stable block id ("PythonBlock-3f2a") used to label runtimes/workspaces. */
 export function useBlockId(adapter: LanguageAdapter): string {
   const reactId = useId();
   return useMemo(() => {

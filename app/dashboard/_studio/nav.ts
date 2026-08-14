@@ -1,7 +1,5 @@
-// Navigation model for the /dashboard Studio shell: the routes the sidebar
-// links to, their labels + icons, and how to map the current pathname back to
-// the active entry (for highlight + breadcrumb). Kept data-only so the shell
-// and any future consumer share one source of truth.
+// Data-only navigation model for the /dashboard Studio shell: sidebar routes,
+// labels + icons, and pathname → active-entry mapping.
 import {
   BookOpen,
   ChartSpline,
@@ -38,8 +36,7 @@ export interface StudioNavItem {
   label: string;
   href: string;
   icon: LucideIcon;
-  /** Leaves the Studio shell (its own chrome takes over). Opens in a new tab
-   *  so the dashboard stays put behind it. */
+  /** Leaves the Studio shell; opens in a new tab. */
   external?: boolean;
 }
 
@@ -53,19 +50,11 @@ export const CREATE_ITEMS: StudioNavItem[] = [
 ];
 
 /**
- * The "Admin" group, previously a row of tabs inside the admin pages
- * (`_components/AdminTabs.tsx`). Two bands, separated by a rule in the
- * sidebar:
- *
- *   • `data` — the account tools. Presentation-only, like every admin page:
- *     each one calls a server-authorized endpoint, so a non-admin who opens
- *     one sees an access-denied notice and never receives any data.
- *   • `tools` — the build/design surfaces that used to hang off the site
- *     footer under `next dev`. These are unauthenticated on purpose: they
- *     render generated artifacts from this repo (the brand ramps, the chart
- *     manifest, the auth email designs), not anyone's data. The one
- *     exception, Illustration Prompts, keeps its own admin gate because its
- *     corpus comes from an admin-only endpoint.
+ * The "Admin" group, in two bands: `data` — account tools whose endpoints are
+ * server-authorized, so non-admins never receive data; `tools` — build/design
+ * surfaces that are unauthenticated on purpose (they render generated repo
+ * artifacts, not anyone's data), except Illustration Prompts, whose corpus
+ * comes from an admin-only endpoint.
  */
 export interface AdminNavItem extends StudioNavItem {
   band: "data" | "tools";
@@ -115,9 +104,8 @@ export const ADMIN_ITEMS: AdminNavItem[] = [
     icon: Mail,
     band: "tools",
   },
-  // Fumadocs Dev is a docs collection with its own DocsLayout sidebar, so it
-  // can't nest inside this shell without stacking two navigations. It stays at
-  // its own route and opens in a new tab.
+  // Fumadocs Dev brings its own DocsLayout sidebar, so it opens in a new tab
+  // rather than nesting two navigations.
   {
     key: "admin-fumadocs",
     label: "Fumadocs Dev",
@@ -126,8 +114,6 @@ export const ADMIN_ITEMS: AdminNavItem[] = [
     band: "tools",
     external: true,
   },
-  // Color Palette is the brand-ramp reference rather than a place work gets
-  // done, so it sits last, below the tools that are actually used in a session.
   {
     key: "admin-color-palette",
     label: "Color Palette",

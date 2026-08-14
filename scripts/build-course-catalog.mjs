@@ -1,43 +1,15 @@
 #!/usr/bin/env node
 /**
- * Mirror every course's `meta.json` into an ES module the server can import.
+ * Mirror every course's `meta.json` into an ES module the server can import:
+ * workerd has no filesystem, so a request-time readdir 500s the moment `/` or
+ * `/courses` renders on demand instead of from the incremental cache. Scope
+ * is those two pages only; lessons still read MDX at request time (Fumadocs
+ * `dynamic` mode). The popularity ranking is deliberately NOT emitted here —
+ * it is hand-curated and lives in `lib/courseCatalog.ts`.
  *
- * Why this exists:
- *
- * `lib/courseCatalog.ts` used to `readdir` + `readFile` `content/courses/`
- * *at request time*. That works locally and during prerendering, where there
- * is a filesystem, and it works in production because the home page and
- * `/courses` are prerendered and served from the R2 incremental cache. It
- * fails the moment a page has to be rendered on demand: workerd's Node
- * compatibility layer has no filesystem, so `readdir` throws and the route
- * 500s (see the long comment in `open-next.config.ts`).
- *
- * That is not hypothetical. On 2026-08-05 a scheduled cache cleanup deleted
- * the incremental-cache folder for the build a preview Worker was still
- * serving; with no prerendered pages to serve, `/` and `/courses` fell
- * through to a live render and returned 500 while every page that does not
- * touch `node:fs` kept working. Reading the catalog from a bundled module
- * makes that failure mode a slow page instead of an error page: a cache miss
- * re-renders successfully.
- *
- * Scope: this covers `/` and `/courses` only. Individual `/courses/*` lessons
- * still read their MDX bodies from disk at request time because the Fumadocs
- * collections run in `dynamic` mode (see `source.config.ts`), which is a
- * deliberate trade — bundling ~800 lesson bodies into the route graph is what
- * `dynamic` exists to avoid. Those pages remain cache-dependent.
- *
- * Output: `lib/generated/course-catalog.js` (an `export default [...]` module,
- * gitignored; its committed `.d.ts` sibling types it so typecheck/lint pass on
- * a fresh checkout). Runs from `dev`, `build`, and `postinstall`, so the file
- * exists before typecheck/lint/build.
- *
- * Deliberately NOT emitted here: the popularity ranking. That list is
- * hand-curated editorial judgement and belongs in reviewable TypeScript
- * (`lib/courseCatalog.ts`), not in generated output. This file is a pure
- * mirror of what is on disk.
- *
- * Idempotent. Reflects `content/courses/` at the time it ran, so restart
- * `next dev` (or run `npm run build:course-catalog`) after adding a course.
+ * Output: lib/generated/course-catalog.js (gitignored; committed `.d.ts`
+ * sibling). Runs from dev, build, postinstall. Restart `next dev` after
+ * adding a course.
  */
 import { readdirSync, readFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -71,8 +43,7 @@ export function readCourseCatalog() {
       tags: meta.tags ?? {},
     });
   }
-  // Sort by slug so the output is stable: readdir order is filesystem-defined
-  // and would otherwise churn the file between machines.
+  // Sort by slug: readdir order is filesystem-defined and would churn the file.
   return courses.sort((a, b) => a.slug.localeCompare(b.slug));
 }
 
@@ -81,9 +52,8 @@ export function readCourseCatalog() {
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const courses = readCourseCatalog();
 
-  // A content refactor that stops this finding courses must fail the build
-  // rather than silently ship an empty catalog: the home page and /courses
-  // would render with no cards at all, which looks like a styling bug.
+  // A refactor that stops this finding courses must fail the build, not
+  // silently ship an empty catalog (no cards looks like a styling bug).
   if (courses.length === 0) {
     console.error(
       `build-course-catalog: no courses found under ${SRC_DIR}. ` +

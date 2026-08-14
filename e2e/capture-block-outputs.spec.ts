@@ -1,27 +1,11 @@
 import { test, expect, type Locator } from "@playwright/test";
 import { adapterSelector, pagesForAdapters, requestedAdapters } from "./_adapterFilter";
 
-// Records what every `<CodeBlock>` prints, for the languages a Node process
-// cannot run.
-//
-// `scripts/build-block-outputs.mjs` prepopulates Python, JavaScript,
-// TypeScript, C and C++ headlessly. The rest have no Node runtime — java is
-// CheerpJ, csharp is .NET wasm, php is php-wasm, web and react render into a
-// sandboxed iframe — and R, which *does* run under Node, renders data frames
-// as HTML tables and plots as images through `runtime/r.tsx`, so a stdout-only
-// runner would record a panel missing most of what the reader sees. A real
-// browser has all of it already.
-//
-// This is a *capture*, not a check: `code-blocks-run.spec.ts` is what asserts
-// blocks run cleanly. Here a block that errors is simply not recorded, because
-// an error is not the preview a lesson wants. The two specs share their page
-// selection and their run choreography for the same reason the sweeps do —
-// whatever makes a block start and settle reliably is not worth discovering
-// twice.
-//
-// Driven by `scripts/capture-browser-outputs.mjs`, which reads the `CAPTURE`
-// lines below and merges them into the manifest. Run directly and it prints
-// them and records nothing.
+// Records what every <CodeBlock> prints, for languages a Node process cannot
+// run (java/csharp/php/web/react, plus R whose data-frame tables and plots
+// only render in a browser). A capture, not a check: code-blocks-run.spec.ts
+// asserts blocks run cleanly; an errored block is simply not recorded. Driven
+// by scripts/capture-browser-outputs.mjs, which parses the CAPTURE lines below.
 
 const ADAPTERS = requestedAdapters();
 
@@ -32,9 +16,8 @@ const PAGES = pagesForAdapters(["<CodeBlock"], ADAPTERS).map((p) => ({
 
 const BLOCK_SELECTOR = adapterSelector("code-block", "data-adapter", ADAPTERS);
 
-// web/react bridge a sandboxed iframe's console back as cells, and the run
-// resolves 150 ms after the iframe's `load` — output from a timer or an effect
-// lands after that. Same window `code-blocks-run.spec.ts` waits.
+// web/react output from a timer or effect lands after the run resolves; same
+// settle window code-blocks-run.spec.ts waits.
 const PREVIEW_ADAPTERS = new Set(["web", "react"]);
 const PREVIEW_SETTLE_MS = 1_500;
 
@@ -50,12 +33,8 @@ interface Captured {
 }
 
 /**
- * Click Run and confirm the block actually started.
- *
- * Copied in spirit from `code-blocks-run.spec.ts`: the Run button is
- * server-rendered and looks enabled before React wires its handler, so an
- * early click is swallowed without a trace and the block sits at `idle`
- * forever while the run appears to have finished.
+ * Click Run and confirm the block actually started (see code-blocks-run.spec.ts:
+ * a pre-hydration click is silently swallowed and the block sits at `idle`).
  */
 async function startRun(block: Locator, runBtn: Locator): Promise<boolean> {
   const status = () =>
@@ -77,13 +56,9 @@ test.describe("Capture code block output", () => {
 
   for (const { path, label } of PAGES) {
     test(`capture ${label}`, async ({ page }) => {
-      // Every runtime here downloads itself at run time — CheerpJ, the .NET
-      // wasm bundle, php-wasm, webR, esbuild-wasm — and a sandbox can allow
-      // Node's egress while blocking the browser's, which shows up as
-      // ERR_CONNECTION_RESET on the first CDN request and a page that never
-      // boots. `CAPTURE_RELAY=1` hands those requests to the test process,
-      // which does have a route out. Off by default: where the browser can
-      // reach the network, relaying only adds a hop.
+      // A sandbox can allow Node's egress while blocking the browser's, and
+      // every runtime downloads itself from a CDN. CAPTURE_RELAY=1 routes those
+      // requests through the test process; off by default (an extra hop).
       if (process.env.CAPTURE_RELAY) {
         await page.route(
           (url) => url.hostname !== "localhost" && url.hostname !== "127.0.0.1",
@@ -155,15 +130,13 @@ test.describe("Capture code block output", () => {
         if (PREVIEW_ADAPTERS.has(adapter)) await page.waitForTimeout(PREVIEW_SETTLE_MS);
       }
 
-      // One line per page rather than per block: the driver parses these off
-      // stdout, and a 4 MB plot split across interleaved lines is a parse
-      // failure waiting to happen.
+      // One CAPTURE line per page: the driver parses these off stdout, and a
+      // large plot split across interleaved lines would break the parse.
       const captured = (await page.evaluate(
         () => (window as unknown as { __blockCapture: Captured[] }).__blockCapture,
       )) as Captured[];
 
-      // The seam fires on every state change, so a block that produced cells
-      // in stages appears more than once. The last push for a key is the
+      // The seam fires on every state change; the last push for a key is the
       // complete one.
       const latest = new Map<string, Captured>();
       for (const c of captured) latest.set(c.key, c);

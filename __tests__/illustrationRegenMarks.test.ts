@@ -1,10 +1,7 @@
-// The illustration regeneration queue (lib/illustrations/regenMarks.ts), the
-// D1 layer behind the "mark for regeneration" control on /dashboard/admin/illustration-prompts.
-//
-// D1 is stubbed rather than run: what is worth pinning here is the contract the
-// gallery and a later regeneration run both depend on, namely that a note
-// survives being unmarked, that the queue comes back marked-first, and that a
-// note is reduced to one bounded line before it reaches SQL.
+// The illustration regeneration queue (lib/illustrations/regenMarks.ts)
+// behind the admin gallery's "mark for regeneration" control. D1 is stubbed;
+// pinned: a note survives unmarking, the queue lists marked-first, and a note
+// is reduced to one bounded line before it reaches SQL.
 import { describe, expect, it } from "vitest";
 import type { D1Database } from "@cloudflare/workers-types";
 
@@ -205,9 +202,8 @@ describe("the regeneration queue", () => {
     expect(rows.get("a")?.note).toBe("two lines");
   });
 
-  // The note is optional and has no default in either direction: marking with
-  // nothing typed used to substitute a canned brief, which read back as though
-  // someone had written it.
+  // Marking with nothing typed once substituted a canned brief, which read
+  // back as though someone had written it.
   it("leaves the note empty when marking with nothing typed", async () => {
     const { db } = fakeDb();
     const mark = await upsertRegenMark(db, { promptId: "a", marked: true, note: "" });
@@ -319,9 +315,8 @@ describe("deletion requests", () => {
   });
 
   it("does not disturb an existing redraw mark or its note", async () => {
-    // The two decisions are independent: something queued for a redraw last
-    // month can be judged not worth keeping today, and asking for the deletion
-    // must not quietly clear the review history that explains why.
+    // Redraw and deletion are independent decisions; a deletion request must
+    // not clear the review history that explains the redraw.
     const { db } = fakeDb();
     await upsertRegenMark(db, {
       promptId: "a",

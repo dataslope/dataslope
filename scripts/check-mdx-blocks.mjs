@@ -1,39 +1,15 @@
 /**
- * Guards the MDX mistakes that are invisible until deploy.
+ * Guards the MDX mistakes that are invisible until deploy — the failure
+ * otherwise arrives at prerender as `Could not parse expression with acorn`
+ * pointing into compiled output. Checks: no component tag spliced into
+ * another component's props (it cuts a template literal in half); no double
+ * quote inside a double-quoted attribute (it ends the attribute early — use
+ * single quotes inside, or an expression); every props block closed.
  *
- * **A component tag spliced into another component's props.** `<Chart
- * slug="…" />` dropped inside a `<CodeBlock>`'s `files={[…]}` cuts the template
- * literal in half. The file still looks like markdown, `next build` still
- * compiles, the type checker still passes, and the failure arrives at prerender
- * as `Could not parse expression with acorn` pointing at a line number inside
- * compiled output. That is an expensive way to find out.
- *
- * **A double quote inside a double-quoted attribute.** Same shape of failure,
- * found the same expensive way. A caption written as
- *
- *     caption="the imitation game turned "can machines think?" into a question"
- *
- * ends its attribute at the second quote, and everything after it is read as
- * more attribute names, so the parse dies on the `?` with a column number and
- * no file name. There is no way to write a literal `"` in a quoted JSX
- * attribute: use single quotes inside, or an expression. Sixty hand-written
- * captions produced exactly one of these, and it reached CI because nothing
- * before `next build` parses MDX as JSX.
- *
- * So: every component tag at the start of a line must be at the top level,
- * every props block must be closed, and every quoted attribute value must end
- * where it claims to. All three are cheap to check and none has a legitimate
- * exception.
- *
- * **And then the file is actually parsed.** The three rules above are line
- * shapes, and line shapes have gaps: a component inserted ahead of a paragraph
- * left `/> A correct decorator preserves…` on one line, which is a JSX element
- * with prose after it, and every rule here waved it through. `next build`
- * did not, and it failed at prerender with exactly the message this script
- * exists to pre-empt. So the last step runs the real MDX parser over every
- * lesson. It costs about 13 seconds for the whole corpus, which is the point:
- * the heuristics are what make a *specific* diagnosis, and the parse is what
- * makes the check honest about whether the file compiles at all.
+ * Those are line-shape heuristics with gaps, so the last step runs the real
+ * MDX parser over every lesson (~13s): the heuristics give the specific
+ * diagnosis, the parse makes the check honest about whether the file
+ * compiles.
  *
  *   node scripts/check-mdx-blocks.mjs
  */
@@ -65,18 +41,11 @@ for (const file of files) {
   const where = relative(ROOT, file);
 
   for (let i = 0; i < lines.length; i++) {
-    // A self-closing component on its own line is the shape a stray insertion
-    // takes. Inside a props block it is not a component at all: it is text that
-    // has been dropped into somebody else's JavaScript expression. Inside a
-    // fence it is a code sample, which several lessons legitimately contain.
-    //
-    // Both shapes count. The one-line `<Chart … />` is what a stray insertion
-    // used to look like; a tag that opens a props block of its own is what an
-    // automated placement produces, and for a while only the first was checked.
-    // A `<Figure>` written over four lines went into a runnable React sample and
-    // this rule watched it go past, because the opening line has no `/>` on it.
-    // The opening line of a legitimate top-level block is a props line too, so
-    // what separates them is whether a block was *already* open above.
+    // A component tag inside a props block is text dropped into somebody
+    // else's JavaScript expression (inside a fence it is a legitimate code
+    // sample). Both the one-line `<Chart … />` and a tag opening a props
+    // block of its own count; what separates the latter from a legitimate
+    // top-level opener is whether a block was *already* open above.
     const nested = code[i] === "props" && i > 0 && code[i - 1] === "props";
     if (
       /^<[A-Z]\w*/.test(lines[i]) &&
@@ -86,25 +55,18 @@ for (const file of files) {
     }
 
     // A quoted attribute value that does not end where its closing quote says
-    // it does.
-    //
-    // Only the attributes are checked, which means: from a component tag up to
-    // its first `{`. Past that the props are a JavaScript expression, and the
-    // template literals inside it hold whole Python and R programs whose
-    // `annotation_position="top",` lines are not attributes at all and are not
-    // wrong. `attrsLive` is what keeps those out.
+    // it does. Only real attributes are checked — from a component tag up to
+    // its first `{`; past that the props are a JavaScript expression whose
+    // template literals hold whole programs. `attrsLive` keeps those out.
     if (code[i] !== "props") attrsLive = false;
     else if (i === 0 || code[i - 1] !== "props") attrsLive = true;
     if (attrsLive && lines[i].includes("{")) attrsLive = false;
     const oneLineTag = !code[i] && /^<[A-Z]\w*[^>{]*\/>\s*$/.test(lines[i]);
     if (attrsLive || oneLineTag) {
-      // An attribute that opens a quote and never closes it on the same line.
-      // The value then runs on until the next `"` anywhere below, swallowing
-      // the tag's own `/>` and whatever follows, and the parse dies far from
-      // the real damage. The rule above cannot see this one: it matches
-      // complete `name="…"` pairs, and there is no pair to match. An odd
-      // number of quotes on an attribute line says so directly, and no
-      // legitimate line in `content/` has one.
+      // A quote opened and never closed on the same line swallows the tag's
+      // own `/>`, and the pair-matching rule below cannot see it (no pair to
+      // match). An odd quote count says so directly; no legitimate line in
+      // `content/` has one.
       if (((lines[i].match(/"/g) ?? []).length & 1) === 1) {
         problems.push(
           `${where}:${i + 1}: attribute value opens a quote and never closes it: ` +
@@ -113,8 +75,8 @@ for (const file of files) {
       }
       for (const m of lines[i].matchAll(/(?:\s|^)([A-Za-z_][\w:-]*)="[^"]*"/g)) {
         const after = lines[i][m.index + m[0].length];
-        // Whitespace, `/>` or the end of the line all mean the value really
-        // ended. Anything else is the rest of a value that got cut in half.
+        // Whitespace, `/>` or end-of-line mean the value really ended;
+        // anything else is a value cut in half.
         if (after !== undefined && !/[\s/>]/.test(after)) {
           problems.push(
             `${where}:${i + 1}: quote inside the "${m[1]}" attribute value ` +

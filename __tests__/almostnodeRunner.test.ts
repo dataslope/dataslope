@@ -1,17 +1,9 @@
 /**
- * Per-run isolation for the almostnode-backed JS/TS workers.
- *
- * On a /learn page every `<CodeBlock>` and `<ChallengeCard>` of the same
- * language shares ONE worker instance (via runtimeRegistry), so the
- * worker's filesystem is long-lived. `AlmostNodeRunner` is what keeps one
- * block's run from leaking into the next on that shared worker; these
- * tests pin the contract down by exercising the real runner against the
- * real almostnode runtime (no mocks).
- *
- * Regression: a single-file block used to re-run the PREVIOUS block's
- * entry file, because the run handler preferred whatever sat at the entry
- * path in the shared VFS over the freshly-passed code. Running a counter
- * snippet right after a greeter snippet printed the greeter's output.
+ * Per-run isolation for the almostnode-backed JS/TS workers: all blocks of a
+ * language on a page share ONE worker (runtimeRegistry), so its filesystem is
+ * long-lived. Regression pinned: the run handler once preferred whatever sat
+ * at the entry path in the shared VFS over freshly-passed code, re-running
+ * the previous block's entry file. Real runner, no mocks.
  */
 import { describe, it, expect } from "vitest";
 import {
@@ -56,9 +48,8 @@ describe("AlmostNodeRunner per-run isolation", () => {
     expect(stdout).toBe("Hello, Ada!");
   });
 
-  // The reported bug, distilled: block A defines a greeter and prints
-  // greetings; block B (run next on the SAME runner) defines a counter.
-  // B must print the counter output, never A's greetings.
+  // The reported bug, distilled: run a greeter then a counter on the SAME
+  // runner; the counter must never print the greeter's output.
   it("does not leak the previous block's output into the next", async () => {
     const runner = new AlmostNodeRunner();
 
@@ -159,10 +150,9 @@ describe("AlmostNodeRunner per-run isolation", () => {
     expect(s.stdout()).toBe("5");
   });
 
-  // The TypeScript worker resolves its entry via `vfs.existsSync(...)`
-  // (prefer the staged, transpiled copy; otherwise transpile inline).
-  // That check is only safe because each run gets a fresh VFS, verify a
-  // single-file run never observes a stale entry from the previous run.
+  // The TS worker resolves its entry via vfs.existsSync (prefer staged copy),
+  // which is only safe because each run gets a fresh VFS — verify a
+  // single-file run never observes a stale entry.
   it("hands each un-staged run a VFS with no stale entry file", async () => {
     const runner = new AlmostNodeRunner();
 

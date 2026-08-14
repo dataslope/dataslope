@@ -1,20 +1,8 @@
 /**
- * The `/playground` landing page: the public, indexable entry point to the
- * browser-based playgrounds. A centered hero over the language chooser
- * (`LanguageCategories`) and a preview of the visitor's most recent
- * workspaces (`RecentWorkspaces`), wrapped in the shared home-page chrome
- * (`HomeNav` / `HomeFooter`), matching the "Playground Page" design handoff.
- *
- * Structured like `/courses` and `/interview-prep`: the shared nav/footer wrap
- * a centered title block and the page's content sections. Signed-in state
- * (account menu, cloud usage) and the recent-workspace list are client islands
- * (`AuthMenu` inside `HomeNav`, `RecentWorkspaces`) so the shell stays a static
- * prerender.
- *
- * History: this route used to 308-redirect to `/dashboard/playground`. The
- * dashboard page remains the full, paginated "all workspaces" view (linked
- * from the recent-workspaces preview here); this page is the marketing/landing
- * surface the header's "Playground" link points at.
+ * The `/playground` landing page: hero, language chooser, and a recent-
+ * workspaces preview, wrapped in the shared home chrome. Signed-in state and
+ * the recent list are client islands so the shell stays a static prerender;
+ * the dashboard page holds the full, paginated workspace view.
  */
 import "@/app/tailwind.css";
 import "@/app/home.css";
@@ -34,8 +22,7 @@ const PAGE_DESCRIPTION =
   "Free online coding playgrounds that run entirely in your browser: Python, R, SQL, JavaScript, TypeScript, HTML/CSS, React, PHP, C, C++, Java, and C#. No sign-up, no install, powered by WebAssembly.";
 
 export const metadata: Metadata = {
-  // A bare string lets the root layout's "%s · DataSlope" template render the
-  // tab title as "Playground · DataSlope".
+  // Bare string so the root layout's template renders "Playground · DataSlope".
   title: "Playground",
   description: PAGE_DESCRIPTION,
   alternates: { canonical: "/playground" },
@@ -55,14 +42,13 @@ export const metadata: Metadata = {
   },
 };
 
-// Applies the persisted light/dark choice before first paint (same contract as
-// the home / courses pages) so a returning dark-mode visitor never sees a
-// light flash.
+// Applies the persisted light/dark choice before first paint (same contract
+// as the home page) so returning dark-mode visitors see no light flash.
 const THEME_BOOTSTRAP = `(function(){try{var d=localStorage.getItem('theme')==='dark';var r=document.documentElement;r.classList.toggle('dark',d);r.classList.toggle('light',!d);}catch(e){}})();`;
 
 export default function PlaygroundPage() {
-  // BreadcrumbList + an ItemList of the language playgrounds, the SEO for the
-  // "online <lang> playground" queries these landing pages target.
+  // BreadcrumbList + an ItemList of the language playgrounds, for the
+  // "online <lang> playground" queries these pages target.
   const structuredData = [
     breadcrumbLd([{ name: "Playground", url: absUrl("/playground") }]),
     {
@@ -88,19 +74,13 @@ export default function PlaygroundPage() {
       >
         <HomeNav />
 
-        {/* Two elements, two jobs: <main> clips, the wrapper inside it caps the
-            width. `PlaygroundHero` breaks out of that column with the house
-            `left-1/2` / `w-screen` / `-translate-x-1/2` escape, and `100vw`
-            counts a scrollbar the viewport does not actually offer — so with a
-            classic (non-overlay) scrollbar the band lands ~8px past the content
-            edge and the whole page scrolls sideways. Clipping on the
-            width-capped wrapper would cut the band back to the column and
-            defeat the full-bleed, which is why the clip lives one level up.
-            Same shape as /pricing and the home page. */}
+        {/* <main> clips, the wrapper caps the width. The hero's full-bleed
+            `w-screen` escape counts a classic scrollbar the viewport doesn't
+            offer, which would scroll the page sideways — the clip must live
+            here, one level above the width cap, or it would cut the band back
+            to the column. Same shape as /pricing and the home page. */}
         <main className="overflow-x-clip">
           <div className="mx-auto w-full max-w-6xl px-4 pt-12 sm:px-6 sm:pt-16">
-            {/* Centered heading, matching the /courses + /interview-prep title
-                block. */}
             <div className="mx-auto max-w-2xl text-center">
               <h1 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
                 Playground

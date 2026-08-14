@@ -1,21 +1,12 @@
 "use client";
 
 /**
- * Client-only static syntax highlighter for the small, read-only source
- * panels in <LivePreview> / <ReactPreview> (see PreviewCode.tsx).
- *
- * Deliberately reuses the CodeMirror language packages the app already ships
- * to the browser (the editable code blocks load them via `loadLanguage`):
- * we pull the Lezer parser out of the LanguageSupport, parse the snippet, and
- * walk the tree with `@lezer/highlight`'s `classHighlighter` to emit `tok-*`
- * spans. `livePreview.module.css` colors those classes.
- *
- * Why not Shiki: MDX highlighting runs Shiki at request time INSIDE the
- * Cloudflare Worker, and adding a client Shiki instance (core + grammars)
- * would grow the client bundle. The Lezer parsers are already downloaded for
- * the editors, and every import here is dynamic + effect-only, so nothing
- * lands in the SSR/Worker bundle: these panels highlight purely on the client
- * after mount, with the plain source as the first-paint fallback.
+ * Client-only static syntax highlighter for the read-only source panels in
+ * <LivePreview>/<ReactPreview>. Reuses the CodeMirror/Lezer parsers the app
+ * already ships (not client Shiki, which would grow the bundle), emitting
+ * `tok-*` spans colored by livePreview.module.css. Imports are dynamic +
+ * effect-only so nothing lands in the SSR/Worker bundle; plain source is the
+ * first-paint fallback.
  */
 
 import { highlightTree, classHighlighter } from "@lezer/highlight";

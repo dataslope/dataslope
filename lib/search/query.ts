@@ -1,44 +1,23 @@
 /**
- * Turning a user's search box input into an FTS5 `MATCH` expression.
- *
- * FTS5's query language is not a subset of "whatever the user typed". It has
- * operators (`AND`, `OR`, `NOT`, `NEAR`), column filters (`col : term`), phrase
- * quoting, and prefix stars, and it *throws* on anything it cannot parse rather
- * than degrading. Passing raw input through is therefore both a correctness bug
- * and an injection surface.
- *
- * The correctness half bites immediately and on ordinary queries, not exotic
- * ones. Typing `pre-attentive` makes FTS5 read the hyphen as a column
- * separator, so it looks for a column named `attentive`, does not find one, and
- * the request 500s. Verified against the real corpus before this existed.
- *
- * So the input is reduced to bare word tokens and each is re-quoted. Quoting
- * makes every token a literal phrase, which means no user string can ever
- * become an operator: `x" OR docs MATCH "y` comes out as four quoted words that
- * match nothing, rather than as a second MATCH clause.
- *
- * The last token gets a prefix star so the results keep up with typing: someone
- * three letters into "quantile" should already be seeing quantile pages. Only
- * the last one, because prefix-matching every token makes short queries match
- * far too much.
+ * Turning a user's search box input into an FTS5 `MATCH` expression. FTS5 has
+ * operators, column filters, quoting, and prefix stars, and it *throws* on
+ * anything it cannot parse, so raw input is both a correctness bug (typing
+ * `pre-attentive` reads the hyphen as a column filter and 500s) and an
+ * injection surface. Input is reduced to bare word tokens, each re-quoted as
+ * a literal phrase, so no user string can become an operator (`x" OR docs
+ * MATCH "y` becomes four quoted words). Only the last token gets a prefix
+ * star, so results keep up with typing without short queries over-matching.
  */
 
 /** Word characters in any script, so accented and non-Latin terms survive. */
 const TOKEN = /[\p{L}\p{N}_]+/gu;
 
 /**
- * Words dropped before the tokens are AND-ed together.
- *
- * Not a size optimisation. Because every token becomes an `AND` clause, a
- * natural-language query is only as good as its weakest word: asking "why is a
- * truncated axis misleading" made `is` and `a` carry the same structural weight
- * as `truncated`, and the top hit became a page that happened to repeat "is"
- * near "why" rather than the page about truncated axes. Removing them lets the
- * terms that carry the question decide the ranking.
- *
- * Deliberately short. An aggressive list starts eating words that matter in a
- * programming context, where "not", "in", "is" and "as" are all operators or
- * keywords somewhere.
+ * Words dropped before the tokens are AND-ed. Not a size optimisation: every
+ * token becomes an AND clause, so `is`/`a` would carry the same structural
+ * weight as the terms that carry the question. Deliberately short — an
+ * aggressive list eats words that matter in a programming context ("not",
+ * "in", "is", "as").
  */
 const STOP = new Set([
   "a", "an", "and", "are", "at", "be", "but", "by", "do", "does", "for", "from",

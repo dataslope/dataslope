@@ -1,91 +1,35 @@
 name: Content sweeps
 
-# Runs the sweeps that execute the site's runnable content:
+# Runs the sweeps that execute the site's runnable content: check:challenges
+# and check:code-blocks (Python via Pyodide), check:js (almostnode),
+# check:sql (PGlite + sqlite-wasm, graded by the same evaluateSqlTest a
+# reader's Check Answer runs), check:r (webR), and check:browser (java,
+# csharp, web, react, php — browser-only runtimes, driven via Playwright
+# against a real dev server).
 #
-#   • check:challenges  — every Python <ChallengeCard>'s reference solution
-#                         against that card's own tests.
-#   • check:code-blocks — every Python <CodeBlock> a reader can press Run on.
-#   • check:js          — every JavaScript and TypeScript <CodeBlock> and
-#                         <ChallengeCard>, through the same almostnode runtime
-#                         the browser uses.
-#   • check:sql         — every <SqlCodeBlock> and <SqlChallengeCard> against
-#                         PGlite and sqlite-wasm, graded by the same
-#                         evaluateSqlTest a reader's Check Answer runs.
-#   • check:r           — every R <CodeBlock> and <ChallengeCard> through webR.
-#   • check:browser     — java, csharp, web, react and php, the five languages
-#                         whose runtimes exist only in a browser (CheerpJ, the
-#                         .NET wasm runtime, the sandboxed preview iframe,
-#                         php-wasm), driven through Playwright against a real
-#                         dev server.
+# Blocks carrying `expectError` are asserted in both directions: a block that
+# stops failing has turned its lesson into a lie, and nothing else would
+# notice.
 #
-# All existed as npm scripts that nothing invoked, which is the same as not
-# having them.
+# Scope: a PR that edits lessons sweeps only those lessons (~45 s); a PR that
+# changes the interpreter (runner, harness, extractor, or a Pyodide bump in
+# the lockfile) gets the full sweep, because a partial run proves nothing
+# about a change affecting every block; a PR touching neither runs nothing.
+# The `scope` job decides and says so in the run summary.
 #
-# Twenty blocks across SQL and R teach a failure by triggering it ("A UNIQUE
-# constraint rejects duplicate email"; a misspelled `prnt()`), and they carry
-# `expectError`. The sweeps assert that in both directions, which is the point:
-# a block that stops failing has turned its own lesson into a lie, prose
-# promising an error above output showing success, and nothing else in the repo
-# would notice.
+# The weekly scheduled run exists for inputs NOT in this repo, which can
+# change with no commit: `micropip.install` resolves latest from PyPI
+# unpinned (readers' workers do the same installs), lesson datasets come from
+# dataslope/datasets@main, and sns.load_dataset fetches from
+# mwaskom/seaborn-data. Everything Pyodide ships is pinned and immutable.
+# Weekly bounds a bad upstream release to ~a week unnoticed.
 #
-# ── Scope, and why a pull request does not get the full sweep ───────────────
-#
-# A full sweep costs about 6 minutes of wall-clock on a GitHub runner (Python
-# code blocks ~4-6m, challenge cards ~2m, JS/TS well under 1m, in parallel).
-# Spending even that to prove one edited lesson still works is wasteful, and
-# checking two changed lessons instead takes about 45 seconds, most of it
-# Pyodide booting. So the scope depends on what changed:
-#
-#   • A pull request that edits lessons checks *those lessons* (`--filter`
-#     takes a comma-separated list).
-#   • A pull request that changes the interpreter — the runner, the harness,
-#     the extractor, or the lockfile that pins Pyodide — gets the full sweep,
-#     because a partial run proves nothing about a change that affects every
-#     block. A Pyodide bump is this case, and it is the one that would surface
-#     something like `freq="H"` raising under a new pandas.
-#   • A pull request that touches neither runs nothing at all.
-#
-# The `scope` job below decides which, and says so in the run's summary so a
-# green tick is never ambiguous about how much it covered.
-#
-# ── Why there is still a scheduled run ──────────────────────────────────────
-#
-# Not to re-check content: content only changes through pull requests, and
-# those are swept above. It is there for the inputs that are *not* in this
-# repo and can therefore change with no commit to notice:
-#
-#   • `micropip.install(...)` resolves to the latest release from PyPI at run
-#     time, unpinned, for plotly, pyodide_http, seaborn and openpyxl. The
-#     reader's worker does the same installs (see `loadHeavyPackages` in
-#     pyodide-worker.ts), so a breaking release reaches readers directly.
-#   • Lesson datasets come from `dataslope/datasets@main`, a different repo.
-#   • `sns.load_dataset(...)` fetches from `mwaskom/seaborn-data`, a
-#     third-party one.
-#
-# Everything Pyodide ships (numpy, pandas, scipy, matplotlib) is pinned by
-# version and immutable on the CDN, so it cannot drift on its own. That makes
-# the schedule's job narrow, and weekly rather than nightly is proportionate
-# to it: it bounds how long a bad upstream release can sit unnoticed to about
-# a week, at a seventh of the runner time. Raise the frequency if that window
-# turns out to be too wide, or drop the trigger entirely and accept that a
-# broken upstream release is found by the next pull request.
-#
-# ── Why `browser` is scoped harder than the rest ────────────────────────────
-#
-# The other five sweeps are headless and cheap. `browser` boots a Next dev
-# server and drives a real Chromium, and its cost is dominated by per-page
-# runtime init that no amount of tuning removes: CheerpJ plus an 18 MB
-# tools.jar for Java, a ~35 MB assembly set for C#, once per page because
-# each Playwright context gets its own empty HTTP cache. A full run is about
-# 30 minutes of blocks and 35 of cards, so it is deliberately *not* part of
-# the default pull-request path — only the changed lessons are, which is
-# seconds.
-#
-# It still earns a scheduled run, and for a stronger reason than the Python
-# one. CheerpJ is loaded from `cjrtnc.leaningtech.com/4.3/loader.js`, a
-# mutable path that upstream can republish under the same 4.3 label, and the
-# React preview resolves bare imports through esm.sh at run time. Neither is
-# in `package-lock.json`, so neither can be caught by a lockfile diff.
+# `browser` is scoped harder: per-page runtime init (CheerpJ + 18 MB
+# tools.jar, ~35 MB C# assemblies, per page because each Playwright context
+# has an empty HTTP cache) makes a full run ~65 minutes, so PRs only ever get
+# their changed lessons; schedule/dispatch cover the rest. Its schedule also
+# guards CDN drift a lockfile diff can't catch: CheerpJ's mutable /4.3/
+# loader path and the React preview's esm.sh imports.
 
 on:
   pull_request:
@@ -114,10 +58,9 @@ on:
       - "package-lock.json"
       - ".github/workflows/content-sweeps.yml"
   schedule:
-    # 05:40 UTC on Sundays. Off the hour because the shared runner pool is
-    # busiest exactly on it. Note that GitHub disables scheduled workflows in a
-    # repository with no activity for 60 days, so this stops on its own if the
-    # repo goes quiet.
+    # 05:40 UTC Sundays; off the hour because the shared runner pool is
+    # busiest on it. GitHub disables scheduled workflows after 60 days of repo
+    # inactivity, so this stops on its own if the repo goes quiet.
     - cron: "40 5 * * 0"
   workflow_dispatch:
     inputs:
@@ -177,9 +120,8 @@ jobs:
           changed=$(git diff --name-only --diff-filter=d "$BASE_SHA" "$HEAD_SHA")
           echo "Changed files:"; echo "$changed"
 
-          # Anything that changes the interpreter itself invalidates a partial
-          # run: the same block can start failing without its file being
-          # touched. Those pull requests get everything.
+          # Interpreter changes invalidate a partial run: a block can start
+          # failing without its file being touched.
           if echo "$changed" | grep -qE '^(scripts/(check-(code-blocks|challenge-cards|js-blocks|sql-blocks|r-blocks|browser-blocks)\.mjs|lib/(mdx-blocks|pyodide-runner|sync-http|sql-engines|datasets)\.mjs)|e2e/(_adapterFilter|_discoverPages|code-blocks-run\.spec|challenge-solutions\.spec)\.ts|app/_components/(challengeHarness|sqlChallengeHarness|runtime/almostnode-worker-shared|runtime/tsTranspile|runtime/rPackages)\.ts|\.github/workflows/content-sweeps\.yml)$'; then
             echo "filter=" >> "$GITHUB_OUTPUT"
             echo "run=true" >> "$GITHUB_OUTPUT"
@@ -188,11 +130,9 @@ jobs:
             exit 0
           fi
 
-          # The lockfile only matters for one package. A Pyodide bump swaps the
-          # interpreter under every block at once (a new pandas is exactly how
-          # `freq="H"` broke), so it earns the full sweep. Any other dependency
-          # moving does not, and treating them alike would spend 25 minutes on
-          # every unrelated Dependabot pull request.
+          # In the lockfile only Pyodide matters: a bump swaps the interpreter
+          # under every block, so it earns the full sweep. Other dependency
+          # moves don't — treating them alike would sweep every Dependabot PR.
           if echo "$changed" | grep -qx 'package-lock\.json'; then
             v() { git show "$1:package-lock.json" | jq -r '.packages["node_modules/pyodide"].version // empty'; }
             before=$(v "$BASE_SHA"); after=$(v "$HEAD_SHA")
@@ -235,8 +175,8 @@ jobs:
       needs.scope.outputs.run == 'true' &&
       (github.event_name != 'workflow_dispatch' || contains(fromJSON('["all","challenges"]'), inputs.sweep))
     runs-on: ubuntu-latest
-    # Generous against a cold cache and a slow PyPI, tight enough that a block
-    # which hangs past its own 30s budget cannot burn a runner for six hours.
+    # Generous for a cold cache, tight enough that a hung block can't burn a
+    # runner for six hours.
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
@@ -246,8 +186,7 @@ jobs:
           node-version: "22"
           cache: npm
 
-      # The sweeps need `pyodide` and node built-ins. `--ignore-scripts` skips
-      # the postinstall codegen, which they do not read.
+      # `--ignore-scripts` skips the postinstall codegen the sweeps don't read.
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
@@ -328,8 +267,6 @@ jobs:
       (github.event_name != 'workflow_dispatch' ||
        contains(fromJSON('["all","js"]'), inputs.sweep))
     runs-on: ubuntu-latest
-    # No WASM toolchain to download and no network per block, so this is the
-    # cheapest of the three by a wide margin: 619 items in well under a minute.
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
@@ -443,11 +380,9 @@ jobs:
   browser:
     name: Browser runtimes (${{ needs.scope.outputs.label }})
     needs: scope
-    # The only sweep that opts *out* of the full-sweep pull-request path. A
-    # change to a shared extractor gives the other five everything, and rightly
-    # so — they cost minutes. Giving this one everything costs over an hour, so
-    # a pull request only ever gets the lessons it actually edited. The
-    # scheduled run and an explicit dispatch still cover all of it.
+    # The only sweep that opts out of the full-sweep PR path: a full run costs
+    # over an hour, so PRs only get their edited lessons. Schedule and
+    # dispatch still cover all of it.
     if: >-
       needs.scope.outputs.run == 'true' &&
       (github.event_name != 'workflow_dispatch' ||
@@ -470,14 +405,10 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
-      # `playwright.config.ts` starts the dev server with a bare `next dev`,
-      # which skips the generators `npm run dev` chains ahead of it. Without
-      # these the routes 404 and every page reports "no code block".
-      #
-      # The list is derived from the `dev` script rather than copied, because a
-      # copy goes stale silently: `build-search-index.mjs` was deleted on main
-      # while this branch was open, and a hard-coded list would have failed the
-      # job on a missing file for reasons unrelated to any sweep.
+      # playwright.config.ts starts a bare `next dev`, skipping the generators
+      # `npm run dev` chains ahead of it — without them routes 404 and every
+      # page reports "no code block". The list is derived from the `dev`
+      # script rather than copied, because a copy goes stale silently.
       - name: Generate content sources
         run: |
           node -e "process.stdout.write(require('./package.json').scripts.dev
@@ -492,11 +423,9 @@ jobs:
       - name: Run check:browser
         env:
           FILTER: ${{ needs.scope.outputs.filter }}
-        # One worker on purpose. Measured at three: React cards lost clicks
-        # ("after three clicks the heading should read 'Likes: 3'. Got: Likes:
-        # 2") and web cards measured zero-height elements, none of which
-        # reproduced serially. A sweep that reports contention as broken
-        # content is worse than a slower one.
+        # One worker on purpose: at three, React cards lost clicks and web
+        # cards measured zero-height elements — contention reported as broken
+        # content, none of it reproducible serially.
         run: |
           if [ -n "$FILTER" ]; then
             npm run check:browser -- --json browser-report.json --filter "$FILTER" -- --workers=1

@@ -1,36 +1,16 @@
 /**
- * Loads every Python `<ChallengeCard>`'s reference solution and checks that it
- * passes the card's own tests.
- *
- * This is the other half of the runnable content. `check-code-blocks` proves a
- * lesson's examples still execute; nothing proved that the *answers* still
- * work. A challenge whose solution no longer passes is worse than a broken
- * example, because the reader has no way to tell whether they are wrong or the
- * lesson is: they type a correct answer, the tests go red, and there is
- * nothing to appeal to.
- *
- * ── Why this shares the browser's harness rather than reimplementing it ─────
- *
- * `app/_components/challengeHarness.ts` is imported directly (Node strips the
- * types), so the code that wraps each test, the sentinels it prints, the
- * parser that reads them back, and the stdout-expectation evaluator are all
- * *the same code the reader runs*. A reimplementation would be a second
- * definition of "passing", and the first time the two disagreed this sweep
- * would be reporting on a harness nobody uses.
- *
- * What the browser does on Check Answer, and what this mirrors exactly:
- *
- *   combined = solutionCode + "\n" + buildHarness(adapter, tests)
- *
- * then split the output into user-visible text and `__DSTEST__:` result lines,
- * and evaluate any stdout-based tests against what is left.
+ * Loads every Python `<ChallengeCard>`'s reference solution and checks that
+ * it passes the card's own tests. `app/_components/challengeHarness.ts` is
+ * imported directly (Node strips the types), so the wrapping, sentinels,
+ * parser and stdout-expectation evaluator are the same code the reader runs —
+ * a reimplementation would be a second definition of "passing". Mirrors Check
+ * Answer exactly: `combined = solutionCode + "\n" + buildHarness(adapter,
+ * tests)`, then split output into user-visible text and `__DSTEST__:` result
+ * lines.
  *
  * Usage:
- *   node scripts/check-challenge-cards.mjs [--filter <substr>[,<substr>…]] [--list]
- *                                          [--json <path>]
- *
- * `--filter` takes a comma-separated list, which is how CI checks only the
- * lessons a pull request touched instead of all of them.
+ *   node scripts/check-challenge-cards.mjs [--filter <substr>[,<substr>…]]
+ *                                          [--list] [--json <path>]
  */
 import { writeFileSync } from "node:fs";
 
@@ -57,8 +37,8 @@ const cards = filter
   ? allCards.filter((c) => matchesFilter(filter, c.file, c.title))
   : allCards;
 
-// Same reasoning as check-code-blocks: a filtered run has to say how much it
-// left out, or its green tick claims more than it checked.
+// A filtered run has to say how much it left out, or its green tick claims
+// more than it checked.
 if (filter) {
   console.log(
     `check-challenge-cards: --filter selected ${cards.length} of ${allCards.length} card(s) ` +
@@ -77,8 +57,8 @@ if (args.includes("--list")) {
   process.exit(0);
 }
 
-// Three ways a card can be outside what this can check, each counted rather
-// than dropped. A silently skipped card reads exactly like a passing one.
+// Cards outside what this can check are counted, not dropped — a silently
+// skipped card reads like a passing one.
 const unparsable = cards.filter((c) => c.unparsable);
 const unsolved = cards.filter((c) => !c.unparsable && !c.solution);
 const untested = cards.filter((c) => !c.unparsable && c.solution && c.tests.length === 0);
@@ -109,8 +89,8 @@ for (const [i, card] of runnable.entries()) {
   }
 
   if (truncated) {
-    // The harness prints its results last, so a clipped buffer means the
-    // verdicts are gone and every test would read as "did not run".
+    // The harness prints its results last, so a clipped buffer loses the
+    // verdicts.
     failures.push({ ...card, error: "printed too much output to check" });
     continue;
   }
@@ -126,8 +106,7 @@ for (const [i, card] of runnable.entries()) {
       continue;
     }
     const verdict = byId.get(test.id);
-    // A native test with no result line never ran: the harness stopped early,
-    // which is itself a failure of the card rather than of any one test.
+    // A native test with no result line never ran: the harness stopped early.
     if (!verdict) {
       failed.push(`${test.name}: no result — the harness did not reach this test`);
     } else if (!verdict.pass) {
@@ -165,8 +144,7 @@ console.log(
     `(${slowest.file}:${slowest.line})`,
 );
 
-// Everything this sweep did not check, said out loud. The number that matters
-// is not "how many passed" but "how many were actually asked".
+// Everything this sweep did not check, said out loud.
 for (const [what, list] of [
   ["could not run in Node (polars threads, network)", skipped],
   ["have no reference solution", unsolved],

@@ -1,16 +1,10 @@
 /**
- * Origin allow-list matching for the Dataslope CORS proxy.
- *
- * Kept free of any Cloudflare Workers types so the logic can be unit-tested
- * from the main project's Node/Vitest suite without pulling Workers globals
- * (`ExportedHandler`, etc.) into the app's TypeScript program.
+ * Origin allow-list matching for the Dataslope CORS proxy. Kept free of
+ * Cloudflare Workers types so it can be unit-tested from the main project's
+ * Node/Vitest suite.
  */
 
-/**
- * An allow-list of Origins, split into exact matches and wildcard patterns.
- * Most entries are exact strings (fast Set lookup); entries containing a `*`
- * (e.g. the app worker's preview hostnames) are compiled to anchored RegExps.
- */
+/** Allow-list split into exact strings (Set lookup) and compiled `*` patterns. */
 export interface AllowList {
   /** Exact origin strings (no trailing slash). */
   exact: Set<string>;
@@ -19,19 +13,11 @@ export interface AllowList {
 }
 
 /**
- * Compiles a wildcard origin entry into an anchored RegExp.
- *
- * A `*` matches one or more characters *within a single hostname label*,
- * i.e. it never matches a `.` (a label separator) or `/` (a path separator).
- * That keeps a pattern like `https://*-dataslope.subwaymatch.workers.dev`
- * scoped to the intended host: it can match
- * `staging-dataslope.subwaymatch.workers.dev` but never
- * `staging-dataslope.attacker.workers.dev` or
- * `evil.com/-dataslope.subwaymatch.workers.dev`.
- *
- * Splitting on `*` first, then escaping each literal segment, ensures the
- * regex-escaping and the wildcard substitution can't interfere with one
- * another (e.g. an escaped `.` is never mistaken for the wildcard).
+ * Compiles a wildcard origin entry into an anchored RegExp. `*` matches
+ * within a single hostname label only (never `.` or `/`), so
+ * `https://*-dataslope.subwaymatch.workers.dev` can never match
+ * `staging-dataslope.attacker.workers.dev`. Splitting on `*` before escaping
+ * keeps regex-escaping and wildcard substitution from interfering.
  */
 export function wildcardOriginToRegExp(pattern: string): RegExp {
   const body = pattern
@@ -63,9 +49,8 @@ export function isOriginInAllowList(origin: string, allow: AllowList): boolean {
 }
 
 /**
- * Returns true when the origin is localhost (any port, http or https).
- * Uses URL parsing rather than a regex to avoid potential ReDoS on
- * pathological inputs.
+ * True when the origin is localhost (any port, http or https). URL parsing
+ * rather than a regex, to avoid ReDoS on pathological inputs.
  */
 export function isLocalhostOrigin(origin: string): boolean {
   try {

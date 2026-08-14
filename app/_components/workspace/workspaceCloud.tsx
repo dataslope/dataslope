@@ -1,19 +1,10 @@
 "use client";
 
 /**
- * Cloud-backup state + actions for the unified workspace menu.
- *
- * Cloud saves and local workspaces share the same id, `saveCloudWorkspace`
- * PUTs to /api/workspaces/<local workspace id>, and materializing a cloud
- * save pins the local copy to the cloud id (`createWorkspace({ id })`). So a
- * cloud row whose id matches a local workspace IS that workspace's backup,
- * and cloud rows with no matching local entry are "on your account, not on
- * this device" (saved from another browser, or the local copy was deleted).
- *
- * This hook resolves the signed-in user's cloud saves for one playground
- * into that model so WorkspaceBadge can present ONE list of workspaces with
- * a per-row backup status, instead of the separate "Cloud" dialog that used
- * to show a second, disconnected list.
+ * Cloud-backup state + actions for the unified workspace menu. Cloud saves
+ * and local workspaces share the same id, so a cloud row matching a local
+ * workspace IS its backup, and unmatched cloud rows are "on your account,
+ * not on this device". WorkspaceBadge presents one list with per-row status.
  */
 
 import { useCallback, useEffect, useMemo, useState } from "react";

@@ -1,20 +1,10 @@
 "use client";
 
-// Shared light/dark pill toggle (sun ↔ moon with a sliding knob), used by
-// every surface that lets the visitor flip the color scheme: the home
-// header, the home mobile drawer, the playground Settings panel, and the
-// Fumadocs docs chrome (via `slots.themeSwitch`).
-//
-// Styled with plain CSS (`.ds-theme-pill*` in app/globals.css, imported by the
-// root layout) rather than Tailwind utilities, because the /playground pages
-// don't load a Tailwind root, so a utility-styled pill would render unstyled
-// there. globals.css loads on every route, so the pill looks identical
-// everywhere.
-//
-// Wired directly to the canonical site-theme controller (siteTheme.ts) so the
-// choice is shared across surfaces, same-origin frames, and the
-// next-themes-driven /courses, /interview-prep and /fumadocs-dev routes
-// (subscribeSiteTheme observes the <html> class next-themes toggles there).
+// Shared light/dark pill toggle used by every surface that flips the color
+// scheme. Styled with plain CSS (`.ds-theme-pill*` in globals.css) rather
+// than Tailwind because the /playground pages load no Tailwind root. Wired
+// to the canonical site-theme controller (siteTheme.ts) so the choice is
+// shared across surfaces, frames, and the next-themes-driven docs routes.
 
 import { useSyncExternalStore } from "react";
 import { Moon, Sun } from "lucide-react";
@@ -31,11 +21,9 @@ function getServerTheme(): SiteTheme {
 }
 
 /**
- * The pill toggle. The knob position and glyph are driven purely by the
- * `.dark` class on <html> (applied pre-hydration, read here via the
- * `.dark .ds-theme-pill*` CSS rules), so they never mismatch on hydration;
- * only `aria-checked` reads the live store value, which useSyncExternalStore
- * reconciles without a hydration warning.
+ * Knob position and glyph are driven purely by the `.dark` class on <html>
+ * (applied pre-hydration), so they never mismatch on hydration; only
+ * `aria-checked` reads the live store value.
  */
 export function ThemePillToggle({ className = "" }: { className?: string }) {
   const theme = useSyncExternalStore(
@@ -74,10 +62,8 @@ export function ThemePillToggle({ className = "" }: { className?: string }) {
 }
 
 /**
- * Fumadocs `slots.themeSwitch` adapter. Fumadocs renders the slot with layout
- * classNames meant for its own segmented control (e.g. `rounded-none`); we
- * ignore those and render the pill flush-right in the docs sidebar footer so
- * it keeps its own shape.
+ * Fumadocs `slots.themeSwitch` adapter: ignores the slot's segmented-control
+ * classNames and renders the pill flush-right so it keeps its own shape.
  */
 export function ThemePillToggleSlot() {
   return (

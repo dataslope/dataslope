@@ -1,16 +1,9 @@
 /**
- * Custom items (code challenges, SQL challenges, MCQs).
- *
- * POST /api/custom/items, create an item and mint its /c/<id> link. Works
- *   for BOTH signed-in members and guests, mirroring POST /api/shares:
- *   - members: counts against a per-tier item cap; the row never expires.
- *   - guests: fixed ~30-day expiry + per-IP and global daily creation
- *     budgets (salted-hash counters, no raw IPs stored).
- * GET /api/custom/items, list the signed-in member's items (metadata only,
- *   payloads are fetched per-item by the editor).
- *
- * JSON body: { kind: "code"|"sql"|"mcq", title, payload }, where `payload`
- * is the kind-specific document validated by lib/custom-content/schema.ts.
+ * Custom items (code challenges, SQL challenges, MCQs). POST creates an item
+ * and mints its /c/<id> link — members get a per-tier item cap, guests a
+ * ~30-day expiry plus per-IP and global daily budgets (salted-hash counters,
+ * no raw IPs stored). GET lists the member's items (metadata only). Body:
+ * { kind, title, payload }, validated by lib/custom-content/schema.ts.
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createAuth } from "@/lib/auth/server";

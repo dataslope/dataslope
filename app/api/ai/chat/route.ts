@@ -1,15 +1,8 @@
 /**
- * "Ask AI" streaming chat endpoint.
- *
- * Signed-in only. Selects the model by membership tier (see lib/ai/models.ts
- * for the per-tier provider/model config), assembles page/playground context,
- * enforces per-user + global budgets, then streams the provider's answer
- * straight through as Server-Sent Events.
- *
- * `force-dynamic` keeps it off the incremental cache, it reads the session,
- * calls an external API, and streams, so it must run per request (same posture
- * as app/api/auth/[...all]/route.ts). Streaming works natively on the Workers
- * runtime: we return a ReadableStream and pipe the upstream SSE through it.
+ * "Ask AI" streaming chat endpoint. Signed-in only: picks the model by tier
+ * (lib/ai/models.ts), assembles context, enforces per-user + global budgets,
+ * and streams the provider's answer through as SSE. `force-dynamic` because it
+ * reads the session, calls an external API, and streams.
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createAuth } from "@/lib/auth/server";
@@ -60,11 +53,8 @@ export async function POST(request: Request): Promise<Response> {
   if (!isSameOrigin(request)) return json({ error: "Forbidden." }, 403);
   const { env, ctx } = getCloudflareContext();
 
-  // --- Auth gate: Ask AI is an action, so it requires a session. ---
-  // The cookie cache is bypassed here: this route spends provider tokens per
-  // request, and the cached session outlives bans/plan changes by up to five
-  // minutes (banUser revokes DB sessions, but the signed cookie stays valid
-  // until its maxAge). One extra D1 read is noise next to the model call.
+  // Cookie cache bypassed: this route spends provider tokens, and the cached
+  // session outlives bans/plan changes by up to five minutes.
   const auth = await createAuth(env, request);
   const session = await auth.api.getSession({
     headers: request.headers,
@@ -103,15 +93,9 @@ export async function POST(request: Request): Promise<Response> {
     return json({ error: decision.message }, decision.status ?? 429);
   }
 
-  // --- Context assembly. ---
-  // Lesson text is opt-in: fetch it only when the user's context mode asked
-  // for it (Full page / a Custom "Lesson text" toggle). "Auto" sends only
-  // what's on screen, so we skip the fetch entirely, saving latency + tokens.
-  // The redesigned client ALWAYS sends includeLessonText explicitly
-  // (true/false); an absent field means a pre-redesign bundle still open in a
-  // tab, which expected the lesson to be attached unconditionally — honor
-  // that (now under the 4k hard cap) rather than silently dropping context
-  // across the deploy.
+  // Lesson text is opt-in. The current client always sends includeLessonText
+  // explicitly; an absent field means a pre-redesign bundle still open in a
+  // tab, which expected the lesson attached unconditionally — honor that.
   const surface = context.surface === "playground" ? "playground" : "learn";
   const includeLessonText = context.includeLessonText ?? true;
   const lessonMarkdown =
@@ -132,8 +116,8 @@ export async function POST(request: Request): Promise<Response> {
     Math.round(model.maxTokens * ANSWER_LENGTH_SCALE[answerLength]),
   );
 
-  // --- Call the provider. `upstreamAbort` lets us stop paying for tokens the
-  // moment the client disconnects (Stop button / navigation), see cancel(). ---
+  // `upstreamAbort` stops paying for tokens the moment the client disconnects
+  // (see cancel()).
   const upstreamAbort = new AbortController();
   let upstream: ReadableStream<Uint8Array>;
   try {
@@ -151,7 +135,7 @@ export async function POST(request: Request): Promise<Response> {
     return json({ error: "The assistant is unavailable right now." }, 502);
   }
 
-  // --- Transform upstream OpenAI SSE → our event stream; capture usage. ---
+  // Transform upstream OpenAI SSE → our event stream; capture usage.
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
   let buffer = "";
@@ -164,17 +148,10 @@ export async function POST(request: Request): Promise<Response> {
       const emit = (event: AskAiStreamEvent) =>
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
 
-      // Keepalive. An answer is not a steady drip of bytes: there is a gap
-      // before the first token while the model is queued and loaded, there can
-      // be a gap before the provider's final usage chunk, and OpenRouter's own
-      // waiting-room heartbeats are SSE *comments*, which the transform below
-      // drops rather than forwards. So this connection can sit idle for tens of
-      // seconds with a perfectly healthy answer on the way, and an idle
-      // connection is exactly what an intermediary reaps — the client sees the
-      // socket close mid-answer and can only report that it lost the
-      // connection. A comment line every ten seconds costs nine bytes and
-      // makes the difference unobservable. `:` is the SSE comment prefix, so
-      // conformant clients (and ours) ignore these by construction.
+      // Keepalive: the stream can sit idle for tens of seconds (model queueing,
+      // usage chunk; OpenRouter's own heartbeats are SSE comments the transform
+      // drops), and idle connections get reaped by intermediaries. `:` is the
+      // SSE comment prefix, so clients ignore these pings by construction.
       let alive = true;
       const ping = setInterval(() => {
         if (!alive) return;
@@ -217,9 +194,8 @@ export async function POST(request: Request): Promise<Response> {
             handleLine(line);
           }
         }
-        // Flush the decoder and process any unterminated final line, the
-        // provider's usage chunk may arrive without a trailing newline, and
-        // dropping it would silently fall back to estimated billing.
+        // Flush the decoder: the provider's usage chunk may arrive without a
+        // trailing newline, and dropping it falls back to estimated billing.
         buffer += decoder.decode();
         handleLine(buffer.trim());
         emit({ type: "done", tier: model.tier, model: model.model });
@@ -238,13 +214,11 @@ export async function POST(request: Request): Promise<Response> {
         } catch {
           // already closed
         }
-        // Bill the tokens actually consumed (exact usage if the provider sent
-        // it, else a char/4 estimate of what streamed before any interruption).
+        // Bill exact usage if the provider sent it, else a char/4 estimate.
         const inTok = usageIn || approxInputTokens;
         const outTok = usageOut || estimateTokens(answer);
-        // A failed write undercounts usage against the daily budgets, it
-        // must not fail the (already-streamed) response, but log it so
-        // undercounting is visible in the Worker logs rather than silent.
+        // A failed write must not fail the already-streamed response; log so
+        // the undercounting is visible.
         const write = recordUsage(env, user.id, day, inTok, outTok).catch(
           (err) => console.error("ai/chat: usage write failed", err),
         );
@@ -252,8 +226,7 @@ export async function POST(request: Request): Promise<Response> {
       }
     },
     cancel() {
-      // Client disconnected (Stop button / navigation): abort the provider
-      // fetch so we stop streaming, and stop being billed, immediately.
+      // Client disconnected: abort the provider fetch so billing stops now.
       upstreamAbort.abort();
     },
   });

@@ -1,43 +1,19 @@
 #!/usr/bin/env node
 /**
- * Turn the search corpus into a D1 seed script.
+ * Turn the search corpus into a D1 seed script: `lib/generated/search-seed.sql`
+ * (gitignored), a DELETE followed by multi-row INSERTs. Applied with
+ * `npm run db:seed:search` (local) / `db:seed:search:remote`.
  *
- * Emits `lib/generated/search-seed.sql` (gitignored): a DELETE followed by
- * multi-row INSERTs. Applied with:
+ * Two D1 rules shape it, both failing only on the *remote* seed:
+ * 1. One statement may not exceed 100 KB ("Statement too long"), so batches
+ *    close on a byte budget, not a row count (rows vary ~200 B to ~12 KB),
+ *    and `assertStatementSizes` re-checks the finished file.
+ * 2. The file may not open a transaction: `wrangler d1 execute --file`
+ *    already runs inside one — which is also what makes the leading
+ *    `DELETE FROM docs` safe (delete and inserts land together).
  *
- *   npm run db:seed:search          # local miniflare D1
- *   npm run db:seed:search:remote   # the real database
- *
- * Rows are batched rather than emitted one statement each because D1 charges
- * per statement round trip and 9k individual INSERTs is slow enough to be
- * annoying in a deploy pipeline.
- *
- * ── Two D1 rules this file exists to respect ────────────────────────────────
- *
- * Both were found by measuring the generated file against the documented
- * limits, and both fail only on the *remote* seed, which is the worst place to
- * find out.
- *
- * 1. A single SQL statement may not exceed 100 KB, batched INSERTs included;
- *    D1 answers "Statement too long". Batching a fixed 40 rows per statement
- *    produced two statements of 115 KB and 110 KB, because section rows vary
- *    from ~200 bytes to ~12 KB depending on how much code the lesson carries.
- *    So batches are closed on a byte budget rather than a row count, and
- *    `assertStatementSizes` re-checks the finished file: a build-time failure
- *    here is cheap, a deploy-time one is not.
- *
- * 2. The file may not open a transaction. `wrangler d1 execute --file` runs
- *    inside one already, so a `BEGIN TRANSACTION` earns "cannot start a
- *    transaction within a transaction" and the seed does not apply. That
- *    enclosing transaction is also what makes the leading `DELETE FROM docs`
- *    safe: the delete and the inserts land together, so a failed seed cannot
- *    leave an empty index serving no results.
- *
- * Values are escaped by doubling single quotes, which is the whole of SQL
- * string escaping in SQLite. That is safe here for a reason worth stating: the
- * input is our own `content/` directory at build time, not user input at
- * request time. The request path never builds SQL by concatenation (see
- * app/api/search/route.ts, which binds parameters).
+ * Quote-doubling escaping is safe because the input is our own `content/` at
+ * build time; the request path binds parameters (app/api/search/route.ts).
  */
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
@@ -53,10 +29,8 @@ const OUT_FILE = join(ROOT, "lib", "generated", "search-seed.sql");
 const D1_MAX_STATEMENT_BYTES = 100_000;
 
 /**
- * Byte budget for one INSERT. The headroom under the cap is deliberate and
- * sized against the data: the largest single row is ~12.5 KB, so even if a
- * batch is closed at the budget and the next row is the largest in the corpus,
- * the statement it starts cannot approach 100 KB.
+ * Byte budget for one INSERT. Headroom sized against the data: the largest
+ * row is ~12.5 KB, so a batch closed at the budget cannot approach 100 KB.
  */
 const BATCH_BUDGET_BYTES = 80_000;
 
@@ -65,9 +39,7 @@ if (!existsSync(IN_FILE)) {
   process.exit(1);
 }
 
-// One input, but a 12 MB output written on every `dev`/`build` regardless — on
-// Windows that write is the whole cost of this step, and the corpus above it
-// is now gated, so this would otherwise be the last one still churning.
+// Gated so the 12 MB output is not rewritten on every dev/build.
 const cache = freshness(ROOT, "search-sql", {
   inputs: [fileURLToPath(import.meta.url), IN_FILE],
   outputs: [OUT_FILE],
@@ -83,14 +55,9 @@ const q = (v) => `'${String(v ?? "").replaceAll("'", "''")}'`;
 const bytes = (s) => Buffer.byteLength(s, "utf8");
 
 /**
- * Fingerprint of the corpus, so a deploy that changed no indexed content can
- * skip re-seeding entirely (see scripts/seed-search.mjs).
- *
- * Taken over the *corpus*, not over `content/`, which is the distinction that
- * makes it correct: it changes when a lesson is edited, and equally when the
- * extractor learns to reach something it previously missed. Hashing the source
- * files would have called the chart-manifest fix a no-op and left the old index
- * in place.
+ * Fingerprint so a deploy that changed no indexed content can skip re-seeding
+ * (see scripts/seed-search.mjs). Taken over the *corpus*, not `content/`: it
+ * must also change when the extractor learns to reach something it missed.
  */
 const CONTENT_HASH = createHash("sha256").update(corpusJson).digest("hex");
 
@@ -127,23 +94,21 @@ for (const r of rows) {
 }
 flush();
 
-// A marker so it is possible to tell which build's content is live without
-// exporting the database, which for a database holding a virtual table is not
-// something that can be done anyway.
+// Markers to tell which build's content is live without exporting the
+// database (not possible for one holding a virtual table anyway).
 parts.push(
   `INSERT INTO docs_meta (key, value) VALUES ('seeded_at', ${q(new Date().toISOString())})\n  ON CONFLICT(key) DO UPDATE SET value = excluded.value;`,
   `INSERT INTO docs_meta (key, value) VALUES ('rows', ${q(String(rows.length))})\n  ON CONFLICT(key) DO UPDATE SET value = excluded.value;`,
-  // Written last, and inside the same file, so it can only be current if
-  // everything above it applied. A seed that dies partway leaves the old hash,
-  // and the next deploy therefore retries rather than believing itself current.
+  // Written last, in the same file: it can only be current if everything
+  // above applied, so a partial seed leaves the old hash and the next deploy
+  // retries.
   `INSERT INTO docs_meta (key, value) VALUES ('content_hash', ${q(CONTENT_HASH)})\n  ON CONFLICT(key) DO UPDATE SET value = excluded.value;`,
   "",
 );
 
 /**
- * Re-check the finished file against the cap rather than trusting the budget
- * arithmetic above. The two are independent: the loop reasons about tuples it
- * is about to append, this reads the statements that actually came out.
+ * Re-check the finished file against the cap, independently of the budget
+ * arithmetic above.
  */
 function assertStatementSizes(statements) {
   const oversized = statements

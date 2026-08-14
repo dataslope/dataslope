@@ -1,32 +1,11 @@
 "use client";
 
 /**
- * Brand loading animations built from the Dataslope logo mark.
- *
- * The logo (public/dataslope-logo-blue.svg) is a mountain-shaped curve
- * made of two mirrored "swoosh" paths whose rounded foot caps are
- * centred on the horizontal line y = 546.66 (in the logo's
- * 1087.59 × 682.55 viewBox). Two facts fall out of that geometry and
- * drive every variant below:
- *
- *  - Mirroring the mark vertically across the foot line and stacking
- *    the copies makes both copies' foot caps coincide, forming a
- *    4-point star whose centre opens into a small hollow diamond.
- *    Rendered with the logo's own translucent radial gradients, the
- *    four overlapping swooshes show through as lighter petals around
- *    that hollow, this is the brand spinner shape.
- *
- * All shapes render with `currentColor`; the CSS module sets the brand
- * blue (light/dark aware) on each wrapper unless a `color` prop overrides
- * it, and honours `prefers-reduced-motion` by swapping motion for an
- * opacity pulse.
- *
- * Exported pieces:
- *  - <DiamondMark />, the hollow diamond as a static (non-animated) mark
- *  - <DiamondSpinner />, <DiamondTurnSpinner />, <DiamondAssembleLoader />,
- *    <DiamondAssembleTurnLoader />, <DiamondRippleLoader />, <LogoHopLoader />
- *    (each takes an optional `color` to override the brand-blue tint)
- *  - <LoadingAnimationsGallery section=… />, the /learn demo grid.
+ * Brand loading animations built from the Dataslope logo mark. Mirroring the
+ * mark vertically across its foot line (y = 546.66) and stacking the copies
+ * makes the foot caps coincide, forming the hollow-diamond spinner shape. All
+ * shapes render with `currentColor` (`color` prop overrides the brand blue);
+ * the CSS module honours `prefers-reduced-motion` with an opacity pulse.
  */
 
 import { useId, type CSSProperties, type ReactNode } from "react";
@@ -42,10 +21,7 @@ const LOGO_H = 682.55;
 
 /** y of the foot-cap centres, the mirror axis for the diamond. */
 const FOOT_Y = 546.66;
-/** Exact-mirror stack height (foot caps coinciding): the diamond's height.
- *  The stack reads as a 4-point star whose centre opens into a small hollow
- *  diamond, the translucent gradients let the overlapping swooshes show
- *  through as petals around that hollow. */
+/** Exact-mirror stack height (foot caps coinciding): the diamond's height. */
 const MIRROR_H = FOOT_Y * 2; // 1093.32
 /** Stacked hollow-diamond height (alias for readability at use sites). */
 const DIAMOND_H = MIRROR_H;
@@ -69,11 +45,9 @@ function MarkPaths() {
   );
 }
 
-/** The logo's two radial gradients with currentColor stops. The
- *  varying stop opacities are what make the stacked diamond's
- *  overlapping swooshes visible as lighter petals. gradientUnits is
- *  userSpaceOnUse (as in the source SVG), so the mirrored copy's
- *  group transform flips the gradients along with the paths. */
+/** The logo's radial gradients with currentColor stops; the varying opacities
+ *  make the overlapping swooshes read as petals. gradientUnits is
+ *  userSpaceOnUse, so the mirrored copy's transform flips the gradients too. */
 function MarkGradientDefs({ idPrefix }: { idPrefix: string }) {
   return (
     <defs>
@@ -116,11 +90,8 @@ function GradientMarkPaths({ idPrefix }: { idPrefix: string }) {
   );
 }
 
-/** The hollow diamond: the mark plus its vertical mirror image, with
- *  the rounded foot caps of both copies coinciding at y = FOOT_Y.
- *  Rendered with the logo's translucent gradients so the four
- *  overlapping swooshes read as petals around the small diamond-shaped
- *  hollow at the centre. */
+/** The hollow diamond: the mark plus its vertical mirror image, foot caps
+ *  coinciding at y = FOOT_Y. */
 function GradientDiamond({ idPrefix }: { idPrefix: string }) {
   return (
     <>
@@ -142,12 +113,8 @@ function useSafeId(prefix: string): string {
 
 // ─── Static mark ───────────────────────────────────────────────────────
 
-/** The hollow-diamond brand shape as a plain, static SVG, the same
- *  4-point star the spinners rotate, without any animation. Renders
- *  with `currentColor`, so the parent's CSS `color` sets the tint
- *  (e.g. the playgrounds' welcome empty-states tint it brand blue via
- *  `.welcome-icon`). Decorative by default; pass `label` to expose it
- *  to assistive tech instead. */
+/** The hollow-diamond shape as a static SVG; parent's CSS `color` sets the
+ *  tint. Decorative by default; pass `label` to expose it to assistive tech. */
 export function DiamondMark({
   size = 44,
   label,
@@ -181,13 +148,12 @@ export interface SpinnerProps {
   duration?: number;
   /** Accessible label. */
   label?: string;
-  /** Override the brand-blue tint. Any CSS color, e.g. `"#fff"`,
-   *  `"var(--ds-green-500)"`. The mark draws with `currentColor`, so this
-   *  sets the color on the loader wrapper. */
+  /** Any CSS color overriding the brand-blue tint (set on the wrapper; the
+   *  mark draws with `currentColor`). */
   color?: string;
 }
 
-/** Animation 1 (requested): the hollow diamond rotating continuously. */
+/** The hollow diamond rotating continuously. */
 export function DiamondSpinner({
   size = 44,
   duration = 1.5,
@@ -216,9 +182,8 @@ export function DiamondSpinner({
   );
 }
 
-/** The diamond turning in eased half-turn steps with a brief rest,
- *  calmer than the continuous spin. (The diamond's 2-fold symmetry
- *  makes each 180° step land on an identical pose.) */
+/** The diamond turning in eased half-turn steps with a brief rest; 2-fold
+ *  symmetry makes each 180° step land on an identical pose. */
 export function DiamondTurnSpinner({
   size = 44,
   label = "Loading…",
@@ -245,14 +210,13 @@ export function DiamondTurnSpinner({
   );
 }
 
-/** Extra headroom (in user units) the assemble animation needs above
- *  and below the diamond for the separated halves. Must match the
- *  translateY distance in the CSS keyframes. */
+/** Headroom (user units) for the separated halves; must match the translateY
+ *  distance in the CSS keyframes. */
 const ASSEMBLE_GAP = 170;
 
-/** The two halves drift apart and snap back into the diamond. Both
- *  halves share one keyframe: the bottom half lives inside the flip
- *  group, so the same local translateY moves it the opposite way. */
+/** The two halves drift apart and snap back. Both share one keyframe: the
+ *  bottom half sits inside the flip group, so the same local translateY moves
+ *  it the opposite way. */
 export function DiamondAssembleLoader({
   size = 64,
   label = "Loading…",
@@ -288,10 +252,9 @@ export function DiamondAssembleLoader({
   );
 }
 
-/** Concentric diamond outlines scale outward and fade, a radar ping.
- *  Each copy is a <g> animated with `transform-box: fill-box`, so the
- *  scale runs about the diamond's centre and non-scaling-stroke keeps
- *  the outline weight constant while the ring grows. */
+/** Concentric diamond outlines scale outward and fade (radar ping);
+ *  `transform-box: fill-box` centres the scale, non-scaling-stroke keeps the
+ *  outline weight constant. */
 export function DiamondRippleLoader({
   size = 72,
   label = "Loading…",
@@ -332,18 +295,11 @@ export function DiamondRippleLoader({
   );
 }
 
-/** Combined sequence: the halves drift together (assemble), the
- *  assembled diamond makes an eased QUARTER turn, the halves part
- *  again, and because they always part along the diamond's local
- *  vertical axis, the drift alternates between vertical (at 0°/180°)
- *  and horizontal (at 90°/270°) on screen. One CSS loop contains FOUR
- *  such steps, a full 360° revolution, so it lands back on the exact
- *  same pose AND shading; a half turn would swap the two differently-
- *  gradiented logo halves and the loop would visibly flip. Rotation
- *  lives on the <svg> (whose viewBox is vertically symmetric around the
- *  diamond's centre, so the element centre is the rotation centre)
- *  while the translation lives on the inner half groups, the two
- *  keyframe sets share one 4.8s timeline in the CSS. */
+/** Assemble + eased quarter turn + part again. One CSS loop is FOUR such
+ *  steps (a full 360°) so it lands on the same pose AND shading — a half turn
+ *  would swap the differently-gradiented halves and visibly flip. Rotation
+ *  lives on the <svg> (viewBox symmetric, so element centre = rotation
+ *  centre), translation on the inner half groups; one 4.8s CSS timeline. */
 export function DiamondAssembleTurnLoader({
   size = 64,
   label = "Loading…",

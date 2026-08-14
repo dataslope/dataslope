@@ -1,27 +1,13 @@
 /**
  * Runs every Python `<CodeBlock>` in `content/` and reports the ones that
- * raise.
- *
- * These blocks are the part of a lesson a reader actually executes, and
- * nothing else in the repo checks them: `check-prose` lints the words,
- * `check-mcq` lints the questions, and `check-challenge-cards` covers the
- * other half of the runnable content. A block that stopped working because a
- * library deprecated an argument therefore ships silently and fails in the
- * reader's browser, which is how `freq="H"` survived into pandas 3.
- *
- * The site executes these in Pyodide in a worker; this boots the same Pyodide
- * build once in Node and runs each block in a fresh namespace, which turns a
- * multi-hour browser sweep into a couple of minutes. The interpreter setup
- * that makes it a fair mirror lives in lib/pyodide-runner.mjs, and the MDX
- * parsing in lib/mdx-blocks.mjs; both are shared with the challenge-card
- * sweep.
+ * raise. Boots the same Pyodide build the site serves, once, in Node, and
+ * runs each block in a fresh namespace; the interpreter setup lives in
+ * lib/pyodide-runner.mjs and the MDX parsing in lib/mdx-blocks.mjs, both
+ * shared with the challenge-card sweep.
  *
  * Usage:
- *   node scripts/check-code-blocks.mjs [--filter <substr>[,<substr>…]] [--list]
- *                                      [--json <path>]
- *
- * `--filter` takes a comma-separated list, which is how CI checks only the
- * lessons a pull request touched instead of all of them.
+ *   node scripts/check-code-blocks.mjs [--filter <substr>[,<substr>…]]
+ *                                      [--list] [--json <path>]
  */
 import { writeFileSync } from "node:fs";
 
@@ -38,9 +24,8 @@ const filter = parseFilter(flag("--filter"));
 const allBlocks = extractBlocks();
 const blocks = filter ? allBlocks.filter((b) => matchesFilter(filter, b.file)) : allBlocks;
 
-// Say what was selected and what that leaves out. A filtered run reporting
-// "✓ all blocks pass" without saying it looked at eleven of them is the same
-// false comfort the sweeps exist to remove.
+// A filtered run has to say how much it left out, or its green tick claims
+// more than it checked.
 if (filter) {
   console.log(
     `check-code-blocks: --filter selected ${blocks.length} of ${allBlocks.length} block(s) ` +
@@ -68,9 +53,7 @@ for (const [i, b] of blocks.entries()) {
 
   const { error, full, ms } = await run(b.code);
   // `expectError` asserts in both directions: a block whose lesson is the
-  // failure must fail, and one that stops failing is a regression the prose
-  // would keep hiding. No Python block needs it today; the rule lives here so
-  // the first one that does is handled the same way as SQL and R.
+  // failure must fail, and one that stops failing is a hidden regression.
   if (b.expectError && !error) {
     failures.push({ ...b, error: "expectError is set but the block succeeded" });
   } else if (!b.expectError && error) {
@@ -78,8 +61,7 @@ for (const [i, b] of blocks.entries()) {
   }
 
   if (ms > slowest.ms) slowest = { ms, file: b.file, line: b.line };
-  // Named progress, so a stall points at the block that caused it rather
-  // than at a bare counter.
+  // Named progress, so a stall points at the block that caused it.
   if ((i + 1) % 25 === 0) {
     console.log(`  …${i + 1}/${blocks.length}  (${b.file}:${b.line})`);
   }
@@ -96,8 +78,8 @@ console.log(
     `(${slowest.file}:${slowest.line})`,
 );
 
-// Counted, never hidden: a growing number here means the runner is drifting
-// further from the browser and the sweep is covering less than it claims.
+// Counted, never hidden: growth here means the sweep covers less than it
+// claims.
 if (skipped.length > 0) {
   console.log(
     `check-code-blocks: ${skipped.length} block(s) could not run in Node ` +

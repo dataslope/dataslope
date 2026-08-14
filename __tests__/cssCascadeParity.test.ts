@@ -5,36 +5,17 @@ import postcss from "postcss";
 import tailwindPostcss from "@tailwindcss/postcss";
 
 /**
- * Cross-stylesheet cascade-parity regression test.
- *
- * The app has two Tailwind roots, app/tailwind.css (home, /pricing,
- * /account, /admin, legal) and app/docs.css (/courses lessons, /fumadocs-dev, /interview-prep).
- * After a client-side navigation BOTH stylesheets can be applied to the
- * document at once, and the App Router does not guarantee which <link> ends
- * up later in <head>: the order follows the user's navigation history.
- * Both roots emit into the same cascade layers, and for two same-layer,
- * same-specificity rules the later stylesheet wins.
- *
- * The invariant that makes that ordering harmless: both roots must generate
- * the SAME utility layer (identical class set, identical rule text,
- * identical relative order). Then whichever sheet the router puts last, every
- * base/variant pair (`hidden md:block`, `flex md:hidden`, `block
- * dark:hidden`, …) resolves identically. The invariant is implemented by the
- * shared @source list in app/tailwind.shared.css; this test fails if the two
- * roots ever drift apart (e.g. someone adds an @source glob or a
- * @custom-variant to one root only).
- *
- * Historical bugs in this class: #528 (intermittent black borders on /learn),
- * #541 (mobile navbar leaking onto desktop, slicing the top of /learn), and,
- * before the shared list existed, /admin's desktop tables vanishing after
- * /admin → /learn → back (the learn sheet's later `hidden` copy beat the
- * admin sheet's `md:block`).
- *
- * Allowed divergence: utilities that only compile in the learn root because
- * they depend on Fumadocs's theme/plugins (`bg-fd-*`, `prose`, `fd-steps`, …).
- * Those style Fumadocs-only chrome and never share a CSS property with a
- * generic utility on the same element, so they can't lose a cross-sheet
- * ordering race the way display/spacing pairs can.
+ * Cascade-parity regression: the app has two Tailwind roots (app/tailwind.css
+ * and app/docs.css). After a client-side navigation both stylesheets can be
+ * applied at once and the App Router does not guarantee <link> order, so for
+ * same-layer, same-specificity rules the later sheet wins. The invariant that
+ * makes ordering harmless: both roots must generate the SAME utility layer
+ * (same class set, rule text, and relative order), implemented by the shared
+ * @source list in app/tailwind.shared.css. Past bugs in this class: #528
+ * (black borders), #541 (mobile navbar on desktop), /admin tables vanishing
+ * after /admin → /learn → back. Allowed divergence: Fumadocs-theme utilities
+ * (bg-fd-*, prose, …), which never share a CSS property with a generic
+ * utility on the same element and so can't lose an ordering race.
  */
 
 const ROOT = path.resolve(__dirname, "..");
@@ -68,14 +49,9 @@ function utilityRules(css: string): Array<[string, string]> {
   return rules;
 }
 
-/** Learn-only utilities must be Fumadocs-theme/plugin-dependent.
- *
- * The optional leading `.` is for rules `utilityRules` keys by raw selector
- * rather than by class, i.e. anything that isn't a lone class. fumadocs-ui
- * ≤16.9 wrote `.prose-no-margin { & > :first-child { … } }`, one class-keyed
- * rule; 16.14 emits the same styling desugared into
- * `.prose-no-margin > :first-child` and `… > :last-child`, which arrive here
- * as selectors. Same Fumadocs-only prose rule either way. */
+/** Learn-only utilities must be Fumadocs-theme/plugin-dependent. The optional
+ *  leading `.` covers rules keyed by raw selector: newer fumadocs-ui desugars
+ *  `.prose-no-margin { & > :first-child }` into plain child selectors. */
 const FUMADOCS_ONLY = /fd-|^\.?prose(-|$)|^not-prose$/;
 
 describe("Tailwind root cascade parity (app/tailwind.css vs app/docs.css)", () => {

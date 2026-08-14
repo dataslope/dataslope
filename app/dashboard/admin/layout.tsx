@@ -1,18 +1,7 @@
-// Admin section of the dashboard. All chrome (sidebar, top bar, breadcrumb)
-// comes from the /dashboard layout's Studio shell — including the section
-// navigation, which used to be a row of tabs here (`_components/AdminTabs.tsx`)
-// and is now the Admin group in the sidebar, so a section is one click away
-// from anywhere in the dashboard instead of two.
-//
-// Width is a per-page decision (<AdminNarrow> for the table pages, the full
-// column for the galleries), so this layout caps nothing.
-//
-// Pages stay statically prerendered; all authorization happens server-side on
-// the endpoints each page calls (the codebase's "auth gates actions, not
-// content" rule), and a non-admin who opens an admin *data* page just sees an
-// access-denied notice. The build/design tools in this section (charts, color
-// test, email preview) call no such endpoint: they render generated artifacts
-// from this repo and are deliberately open, see the note in _studio/nav.ts.
+// Admin section of the dashboard. Chrome comes from the Studio shell; width
+// is a per-page decision, so this layout caps nothing. Pages stay statically
+// prerendered — authorization happens server-side on the endpoints each page
+// calls, and the build/design tools are deliberately open (see _studio/nav.ts).
 import "@/app/tailwind.css";
 import type { Metadata } from "next";
 

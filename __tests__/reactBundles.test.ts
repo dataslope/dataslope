@@ -32,9 +32,7 @@ describe("the esbuild pin", () => {
   it("matches the devDependency the generator bundles with", () => {
     // The browser worker loads esbuild from jsDelivr at ESBUILD_WASM_VERSION;
     // the generator bundles with the npm package. A different esbuild is a
-    // different bundle, and the reader would see this one in the preview and
-    // produce the other one by pressing Run. The generator exits non-zero on
-    // a mismatch — this fails the suite before it gets that far.
+    // different bundle — preview and Run would disagree.
     const pkg = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8"));
     const dep: string = pkg.devDependencies["esbuild-wasm"];
     expect(dep, "esbuild-wasm must be a devDependency").toBeTruthy();

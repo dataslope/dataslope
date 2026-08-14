@@ -1,21 +1,10 @@
 "use client";
 
 /**
- * Client-side context registry for "Ask AI".
- *
- * Interactive widgets on a page (challenge cards, code blocks, multiple-choice
- * questions, SQL playground shells) register themselves here on mount. The
- * registry tracks how visible each widget currently is (via one shared
- * IntersectionObserver) so that, at send time, the Ask AI panel can attach:
- *
- *   - widgets the user explicitly pinned in the panel ("referenced"), and
- *   - widgets currently in the viewport, ranked by visibility, the model's
- *     best guess at "what the user is looking at" when the question doesn't
- *     name a target.
- *
- * Snapshots are pulled lazily via each source's `getSnapshot()` (which reads
- * live refs/editor state), so registration is cheap and nothing is serialized
- * until the user actually asks a question.
+ * Client-side context registry for "Ask AI". Interactive widgets register on
+ * mount; one shared IntersectionObserver tracks their visibility so the panel
+ * can attach what the user is looking at. Snapshots are pulled lazily via
+ * `getSnapshot()`, so nothing is serialized until a question is asked.
  */
 
 import { useEffect, useRef } from "react";
@@ -172,10 +161,9 @@ const MAX_WIDGET_CHARS = 8000;
 const MAX_LABEL_CHARS = 160;
 
 /**
- * Collect the widget payload for a question: pinned sources first (marked
- * `referenced`), then visible sources by visibility ratio, capped at
- * `MAX_WIDGETS`. Also returns the database schema from the most relevant
- * SQL source (a pinned one wins over a merely-visible one).
+ * Collect the widget payload for a question: pinned sources first, then
+ * visible ones by ratio, capped at `MAX_WIDGETS`. Schema comes from the most
+ * relevant SQL source (pinned wins over merely-visible).
  */
 export function collectAskAiWidgets(pinnedIds: ReadonlySet<string>): {
   widgets: AskAiWidgetContext[];
@@ -231,24 +219,16 @@ export interface AskAiLiveSource {
   schema?: string;
 }
 
-/** Max widget sources actually PACKED into one question (mirrors the old
- *  collectAskAiWidgets cap). Enumeration below is deliberately uncapped so
- *  the context sheet can show every real candidate; the send path applies
- *  this cap AFTER the user's per-source toggles, ranked by visibility, so
- *  disabling sources frees slots for later ones. */
+/** Max widget sources actually PACKED into one question. Enumeration below is
+ *  deliberately uncapped so the sheet shows every candidate; the send path
+ *  applies this cap AFTER the user's toggles, ranked by visibility. */
 export const MAX_ASKAI_WIDGETS = MAX_WIDGETS;
 
 /**
- * Snapshot the currently-visible sources, keeping each one's registry `id`.
- *
- * Unlike {@link collectAskAiWidgets} (the old pin-aware packer), this drives
- * the redesigned context sheet AND the send path: the panel lists one row per
- * returned source, estimates its tokens from `content`, and — in "Custom"
- * mode — filters by the user's toggles before capping and sending, so the
- * rows shown are exactly the candidates that can be sent. Only on-screen
- * sources are included ("Auto sends only what's on your screen"), in document
- * order. A source whose snapshot is empty/throws is skipped so a broken
- * widget never breaks the panel.
+ * Snapshot the currently-visible sources, keeping each registry `id`. Drives
+ * both the context sheet and the send path, so the rows shown are exactly the
+ * candidates that can be sent. Document order; empty/throwing snapshots are
+ * skipped so a broken widget never breaks the panel.
  */
 export function collectAskAiLiveSources(): AskAiLiveSource[] {
   const ordered = [...sources.values()]

@@ -1,17 +1,10 @@
 "use client";
 
 /**
- * Shared form primitives for the /dashboard/create builders, ported from the
- * Create Studio design handoff: borderless filled inputs, labels with small
- * blue lead-in icons, hairline-separated sections, pill-shaped small actions,
- * and the green primary CTA. Field wrappers keep a small local API
- * (label + value + onChange + hint) so builder code stays terse. Styles come
- * from the `.ds-*` classes in app/dashboard/_studio/studio.css plus the
- * studio's semantic tokens.
- *
- * Also home to the split builder layout (`BuilderSplit`): the form on the
- * left, the live-preview column on the right, driven by the shell's top-bar
- * Live Preview / full-preview controls (StudioPreviewContext).
+ * Shared form primitives for the /dashboard/create builders (styles come from
+ * the `.ds-*` classes in app/dashboard/_studio/studio.css). Also home to the
+ * split builder layout (`BuilderSplit`), driven by the shell's top-bar
+ * preview controls (StudioPreviewContext).
  */
 
 import { useCallback, useId, useState } from "react";
@@ -206,8 +199,7 @@ export function CheckboxField({
   );
 }
 
-/** Hairline-separated form section with a small heading + right-side actions
- *  (the design's stacked groups; replaces the old card Fieldset). */
+/** Hairline-separated form section with a small heading + right-side actions. */
 export function Section({
   icon: Icon,
   title,
@@ -441,14 +433,9 @@ export function SharedLinkPanel({
 // Split builder layout + live preview column
 // ---------------------------------------------------------------------------
 
-/**
- * The design's side-by-side builder layout: the form on the left, the live
- * preview column on the right (sticky on wide viewports, stacked below 900px).
- * Both columns respond to the shell's top-bar controls: the Live Preview
- * switch hides the column, the expand button hides the form instead. The form
- * stays mounted (display:none) in full preview so field state and any running
- * challenge runtime survive the toggle.
- */
+/** Side-by-side builder layout: form left, live preview right. The form stays
+ *  mounted (display:none) in full preview so field state and any running
+ *  challenge runtime survive the toggle. */
 export function BuilderSplit({
   children,
   preview,
@@ -488,8 +475,7 @@ export function BuilderSplit({
   );
 }
 
-/** Pulsing skeleton shown in the preview column before a real preview is
- *  rendered (the design's placeholder panel). */
+/** Pulsing skeleton shown before a real preview is rendered. */
 export function PreviewPlaceholder({ note }: { note: string }) {
   const bars: { h: number; w: string; r: number }[] = [
     { h: 18, w: "45%", r: 5 },

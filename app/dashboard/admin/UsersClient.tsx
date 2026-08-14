@@ -1,26 +1,11 @@
 "use client";
 
 /**
- * Users section of the admin dashboard, list, plan-switch, impersonate,
- * ban, and remove accounts. Presentation follows the soft design kit in
- * `_components/shared.tsx` (borderless panels, hairline dividers, quiet
- * ghost actions); on small screens the table becomes a stacked card list,
- * with the row markup shared between the two layouts via render helpers.
- *
- * Security model (matches the codebase's "auth gates actions, not content"
- * rule): this page is a normal client component reading the session via
- * `useSession()`, so it can stay statically prerendered like /account. The real
- * authorization happens *server-side*, every `authClient.admin.*` call hits a
- * Better Auth endpoint that rejects non-admins (see the `admin` plugin in
- * lib/auth/server.ts). So a non-admin who opens /admin just sees an
- * access-denied notice and can't read or mutate anything.
- *
- * "Remove" is a hard delete: it drops the user row, which cascades to their
- * sessions + accounts (ON DELETE CASCADE in migrations/auth/0001) and frees the
- * unique email, so the person can immediately sign up again with OAuth or
- * email/password. "Ban" is the soft alternative: blocks sign-in but keeps the
- * row (and the email) occupied. "Impersonate" becomes that user in this
- * browser (refused for admins server-side); return to /admin to stop.
+ * Users section of the admin dashboard: list, plan-switch, impersonate, ban,
+ * remove. Authorization is server-side — every `authClient.admin.*` call hits
+ * a Better Auth endpoint that rejects non-admins — so this stays a statically
+ * prerendered client component. "Remove" hard-deletes (cascades to sessions +
+ * accounts, frees the email); "Ban" blocks sign-in but keeps the row.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -82,17 +67,15 @@ interface AdminUser {
   createdAt: string | Date;
 }
 
-/** Page size for the browse list; each search request also caps at this. */
+/** Page size for the browse list and cap per search request. */
 const LIST_LIMIT = 200;
 
-/** How long to sit on keystrokes before firing the server-side search. */
 const SEARCH_DEBOUNCE_MS = 300;
 
 export function UsersClient() {
   const { data: session, isPending: sessionPending } = useSession();
   const [users, setUsers] = useState<AdminUser[]>([]);
-  // Total matching accounts as reported by the server, the table may hold
-  // more rows than one page, so `users.length` alone under-reports.
+  // Server-reported total; `users.length` alone under-reports.
   const [total, setTotal] = useState(0);
   const [searchTruncated, setSearchTruncated] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -100,23 +83,17 @@ export function UsersClient() {
   const [error, setError] = useState<string | null>(null);
   const [denied, setDenied] = useState(false);
   const [query, setQuery] = useState("");
-  // The user-id whose action (remove/ban/plan/impersonate) is mid-flight, and
-  // the user-id with a pending "confirm remove" prompt (inline two-step
-  // delete, no modal needed).
+  // User-id with an action mid-flight / with a pending "confirm remove".
   const [busyId, setBusyId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
 
-  // Monotonic sequence for loads: rapid typing fires overlapping requests,
-  // and a slow stale response must not overwrite a newer result.
+  // Monotonic sequence: a slow stale response must not overwrite a newer one.
   const loadSeq = useRef(0);
 
-  /**
-   * Load the first page (no search) or the search results. Search runs
-   * SERVER-side: filtering the loaded page client-side would silently hide
-   * every account older than the newest LIST_LIMIT, with enough sign-ups an
-   * admin couldn't find (or ban) an old account at all. The endpoint searches
-   * one field per request, so a query fans out to email + name and merges.
-   */
+  /** Load the browse page or search results. Search runs SERVER-side (a
+   *  client-side filter would hide accounts older than the newest LIST_LIMIT).
+   *  The endpoint searches one field per request, so a query fans out to
+   *  email + name and merges. */
   const loadUsers = useCallback(async (search: string) => {
     const seq = ++loadSeq.current;
     setLoading(true);
@@ -193,10 +170,8 @@ export function UsersClient() {
   }, []);
 
   useEffect(() => {
-    // Fetch once a session is confirmed (the admin-gated request is rejected
-    // server-side for non-admins). No session → we fall through to the sign-in
-    // prompt below, which doesn't read `loading`. Search input re-runs this,
-    // debounced; the empty query (initial load, cleared box) fires at once.
+    // Fetch once a session is confirmed. Search input re-runs this, debounced;
+    // the empty query fires at once.
     if (sessionPending || !session) return;
     const timer = setTimeout(
       () => void loadUsers(query),
@@ -389,11 +364,9 @@ export function UsersClient() {
     </div>
   );
 
-  // Role display + toggle. Demoting is the explicit revocation path, the
-  // ADMIN_EMAILS/ADMIN_USER_IDS allowlists only ever *grant* (a listed user
-  // is re-promoted at their next sign-in), so removal from the env list must
-  // be paired with a demotion here. Self is excluded: locking yourself out
-  // of the dashboard you're standing in is never what you meant.
+  // Role display + toggle. The ADMIN_EMAILS/ADMIN_USER_IDS allowlists only
+  // ever *grant* (re-promoted at next sign-in), so revoking means demoting
+  // here AND removing from the env list. Self is excluded to avoid lock-out.
   const renderRole = (user: AdminUser, isSelf: boolean, isBusy: boolean) => (
     <div className="flex items-center gap-1">
       {user.role === "admin" ? (
@@ -608,8 +581,7 @@ export function UsersClient() {
                       const isBusy = busyId === user.id;
                       return (
                         <TableRow key={user.id} className={rowClass}>
-                          {/* w-full + max-w-0: take the leftover table width,
-                              but still truncate instead of stretching it. */}
+                          {/* w-full + max-w-0: take leftover width, still truncate. */}
                           <TableCell className={`${cellClass} w-full max-w-0`}>
                             {renderIdentity(user, isSelf)}
                           </TableCell>
@@ -667,8 +639,7 @@ export function UsersClient() {
                 })}
               </ul>
 
-              {/* Browse mode pages through the full table; search is
-                  single-shot (the server already scoped it). */}
+              {/* Browse mode pages through; search is single-shot. */}
               {!query.trim() && users.length < total && (
                 <Button
                   variant="ghost"

@@ -100,11 +100,9 @@ export async function readBundleUpload(
   request: Request,
   maxBytes: number,
 ): Promise<UploadResult> {
-  // Cheap pre-check before buffering anything. The multipart framing adds a
-  // little overhead on top of the payload, hence the slack. A missing or
-  // non-positive Content-Length is rejected outright, browsers always send
-  // one for FormData bodies, and chunked uploads would otherwise buffer
-  // unbounded bytes into memory before the size check below.
+  // Cheap pre-check before buffering (multipart framing adds overhead, hence
+  // the slack). Missing Content-Length is rejected: browsers always send one
+  // for FormData, and chunked uploads would otherwise buffer unbounded bytes.
   const contentLength = Number(request.headers.get("Content-Length") ?? "0");
   if (!Number.isFinite(contentLength) || contentLength <= 0) {
     return { ok: false, status: 411, message: "Malformed upload." };

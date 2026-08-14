@@ -1,20 +1,14 @@
 // AI inline code completion (pro-only): prompt assembly + response cleanup.
-//
-// Pure functions (no D1, no network) so they unit-test in Node, mirroring
-// lib/ai/context.ts. The endpoint (app/api/ai/complete) does auth/tier/budget
-// enforcement; this module only shapes what goes to and comes back from the
-// model. The provider speaks the OpenAI `/chat/completions` API (OpenRouter →
-// DeepSeek V4 Flash today, see wrangler.jsonc), so fill-in-the-middle is
-// expressed as a chat exchange with an explicit cursor marker rather than a
-// native FIM endpoint, that keeps the one provider adapter working unchanged
-// if the model id ever changes.
+// Pure functions (no D1, no network) so they unit-test in Node; the endpoint
+// (app/api/ai/complete) does auth/tier/budget enforcement. The provider
+// speaks the OpenAI `/chat/completions` API, so fill-in-the-middle is a chat
+// exchange with an explicit cursor marker rather than a native FIM endpoint —
+// the one provider adapter keeps working if the model id changes.
 import type { ChatMessage } from "./types";
 
 /**
- * Non-secret completion limits. Completions are pro-only, so there's a single
- * set (no per-tier table like Ask AI's LIMITS). Values are deliberately small:
- * an inline suggestion is a few lines, not an essay, and the endpoint can fire
- * on every typing pause.
+ * Non-secret completion limits (pro-only, so one set). Deliberately small: an
+ * inline suggestion is a few lines, and the endpoint fires on typing pauses.
  */
 export const COMPLETION_LIMITS = {
   /** Max output tokens per suggestion (~a dozen lines of code at most). */

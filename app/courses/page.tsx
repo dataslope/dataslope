@@ -1,7 +1,5 @@
-// Opt the courses catalog into the same Tailwind + Magic UI bundle the home
-// page uses, and pull in the home-route hardening so the reused HomeNav /
-// HomeFooter (which rely on `.ds-home`-scoped rules in home.css) lay out
-// correctly. Same setup as /pricing.
+// Same Tailwind bundle + home-route hardening as the home page, so the reused
+// HomeNav/HomeFooter (`.ds-home`-scoped rules) lay out correctly.
 import "@/app/tailwind.css";
 import "@/app/home.css";
 import type { Metadata } from "next";
@@ -16,8 +14,7 @@ const PAGE_DESCRIPTION =
   "Hands-on, browser-based tracks across data and engineering. Every lesson runs live, no setup, no sign-up.";
 
 export const metadata: Metadata = {
-  // A bare string here lets the root layout's "%s · DataSlope" template render
-  // the tab title as "Courses · DataSlope".
+  // Bare string so the root template renders "Courses · DataSlope".
   title: "Courses",
   description: PAGE_DESCRIPTION,
   alternates: { canonical: "/courses" },

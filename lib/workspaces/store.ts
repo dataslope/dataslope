@@ -1,14 +1,9 @@
 /**
- * D1 + R2 access for cloud workspaces and share links.
- *
- * Follows the repo's raw-D1 convention (lib/ai/limits.ts): plain
- * `env.DB.prepare(...)` with typed row shapes, no ORM. R2 holds the bundle
- * bytes; every function that removes a row removes its object first, so a
- * crash between the two leaves at worst an unreferenced row (self-heals on the
- * next lazy sweep), never a dangling object reference.
- *
- * Retention is enforced by callers via `isExpired` (lib/workspaces/policy.ts)
- *, this module only provides the primitives (list / purge / touch).
+ * D1 + R2 access for cloud workspaces and share links. Raw D1 with typed row
+ * shapes, no ORM. R2 holds the bundle bytes; every function that removes a
+ * row removes its object first, so a crash leaves at worst an unreferenced
+ * row (self-heals on the next sweep), never a dangling object reference.
+ * Retention is enforced by callers via `isExpired` (lib/workspaces/policy.ts).
  */
 
 import type { R2Bucket } from "@cloudflare/workers-types";
@@ -236,16 +231,11 @@ export async function deleteShares(
 }
 
 /**
- * Drop every R2 object a user owns, their cloud saves *and* their share links,
- * used when the whole account is deleted (Better Auth `deleteUser.beforeDelete`
- * in lib/auth/server.ts). The `cloud_workspaces` / `playground_shares` rows
- * themselves cascade from the `user` row's deletion (ON DELETE CASCADE in
- * migrations/auth/0005), but their R2 payloads do not, so we remove those here
- * *before* the user row goes.
- *
- * Deliberately best-effort, it never throws: orphaned bytes are a storage cost,
- * not a reason to trap a user in an account they asked to delete. R2's
- * multi-delete caps at 1000 keys per call, so keys are chunked.
+ * Drop every R2 object a user owns (cloud saves + shares) before account
+ * deletion: the D1 rows cascade from the `user` row, but the R2 payloads do
+ * not. Best-effort, never throws — orphaned bytes are a storage cost, not a
+ * reason to trap a user. R2 multi-delete caps at 1000 keys, so keys are
+ * chunked.
  */
 export async function deleteAllUserObjects(
   env: CloudflareEnv,

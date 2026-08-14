@@ -1,44 +1,18 @@
 /**
- * Polar billing for the Pro plan (merchant of record, Polar is the seller,
- * handles global VAT/sales tax, and pays out; we never touch card data).
+ * Polar billing for the Pro plan (Polar is merchant of record; we never touch
+ * card data). The Better Auth plugin mounts /api/auth/checkout,
+ * /api/auth/customer/portal, and /api/auth/polar/webhooks; the
+ * signature-verified webhook is the ONLY billing writer of `user.plan`.
+ * Checkout sets `externalCustomerId = user.id`, so webhook customers carry
+ * `externalId = user.id` and plan updates are one indexed D1 UPDATE.
+ * Everything keys off `customer.state_changed`: it fires on every transition
+ * and carries the FULL current state, so plan derivation is a pure function
+ * of the latest event (billing owns paid status; a manual admin plan switch
+ * is overwritten by the next event).
  *
- * Built on the official Better Auth plugin (@polar-sh/better-auth), which
- * mounts three endpoints under the existing /api/auth/* catch-all:
- *
- *   POST /api/auth/checkout, creates a Polar checkout session for
- *                                      the signed-in user (slug "pro") and
- *                                      returns its URL; the client redirects.
- *   GET|POST /api/auth/customer/portal, customer portal URL (invoices,
- *                                      cancel/renew) for the signed-in user.
- *   POST /api/auth/polar/webhooks, Polar → us. Signature-verified
- *                                      (standardwebhooks HMAC, pure-JS crypto
- *                                      → Workers-safe); this is the ONLY
- *                                      writer that flips `user.plan` from
- *                                      billing.
- *
- * The link between the two systems is Better Auth's user id: checkout is
- * created with `externalCustomerId = user.id` (done by the plugin), so every
- * webhook's customer carries `externalId = user.id` and plan updates are one
- * indexed D1 UPDATE. No extra tables, no schema change, `user.plan` +
- * lib/ai/tier.ts already treat the column as the source of truth, exactly as
- * the "future billing webhook" comments in migrations/auth/0003 anticipated.
- *
- * We deliberately key everything off the `customer.state_changed` event: it
- * fires on every subscription transition (created, renewed, canceled at
- * period end, revoked, past-due grace expiry) and carries the FULL current
- * state, so plan derivation is a pure function of the latest event, no
- * event-ordering bookkeeping. An admin's manual plan switch for a paying
- * customer is therefore overwritten by the next state event, which is the
- * correct precedence (billing owns paid status).
- *
- * Config (all optional, billing is inert until set, matching how social
- * login / email / AI degrade):
- *   POLAR_ACCESS_TOKEN   secret, org access token (sandbox or production).
- *   POLAR_WEBHOOK_SECRET secret, from the webhook endpoint you create in
- *                        Polar pointing at /api/auth/polar/webhooks.
- *   POLAR_PRO_PRODUCT_ID var, the Polar product that grants Pro.
- *   POLAR_SERVER         var, "sandbox" while testing; anything else
- *                        (including unset) means production.
+ * Config (all optional; billing is inert until set): POLAR_ACCESS_TOKEN,
+ * POLAR_WEBHOOK_SECRET, POLAR_PRO_PRODUCT_ID, POLAR_SERVER ("sandbox" while
+ * testing, anything else means production).
  */
 import { checkout, polar, portal, webhooks } from "@polar-sh/better-auth";
 import { Polar } from "@polar-sh/sdk";

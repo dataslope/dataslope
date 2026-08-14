@@ -1,28 +1,11 @@
 "use client";
 
 /**
- * The simplified playground header controls, shared by the code playground
- * shell (Playground.tsx) and the SQL playgrounds — ported from the
- * "Playground Header Redesign" handoff (option 1a, quiet toolbar):
- *
- *   logo · switcher │ workspace name + inline rename ─ Save ▾ · Share · ⋯
- *
- * - `WorkspaceNameControl`: the workspace name docked after a divider, with
- *   a pencil that swaps it for an inline rename input (Enter/blur commits,
- *   Escape cancels).
- * - `SaveControl`: one quiet Save action with a chevron menu — an
- *   "auto-saves in this browser" note, "Back up to cloud" (with the last
- *   backup time), "Download copy" (.zip), or a sign-in row for guests.
- *   With nothing to save it reads "Saved" with a green-dotted cloud, and
- *   the whole control opens the menu; only while there IS something to save
- *   does it split into a Save button plus a chevron.
- * - `MoreMenu`: everything secondary folds into one ⋯ menu — labelled
- *   sections whose items either act directly or slide to a sub-panel
- *   (Examples, Export, Import, Runtime info) with a ‹ back header.
- *
- * Styles live in playground.css under the `.ph-*` prefix and follow the
- * handoff's specs exactly (12.5px/500 ghost buttons, 26px boxed menu icons,
- * 10px uppercase section labels, --menu-* palette).
+ * Playground header controls shared by the code playground shell and the
+ * SQL playgrounds: `WorkspaceNameControl` (inline rename),
+ * `SaveControl` (Save split button + chevron menu), and `MoreMenu` (the ⋯
+ * menu with sections and slide-in sub-panels). Styles live in playground.css
+ * under the `.ph-*` prefix.
  */
 
 import {
@@ -192,23 +175,12 @@ export function WorkspaceNameControl({
 // ---------------------------------------------------------------------------
 
 /**
- * The "start a new workspace" button that sits beside the rename pencil,
- * and its confirmation dialog.
- *
- * Creating a workspace swaps the editor over to it (`switchActiveWorkspace`
- * reloads the page), so this is a disruptive-looking action even though it
- * destroys nothing: the current workspace stays in the registry, its files
- * are already in OPFS, and a signed-in user's auto-sync has it on their
- * account. The dialog exists to say so before the editor blanks, because
- * "my code vanished" is the reasonable thing to assume otherwise.
- *
- * The name field is optional. Left blank it takes the same
- * `Workspace <n>` default the workspace manager's "New" button uses, so
- * the two entry points cannot drift apart.
- *
- * `icon` lets each playground name what a workspace *is* there: the code
- * playgrounds keep the generic square-plus, the SQL ones pass
- * `DatabasePlus` since their workspace is a database.
+ * The "start a new workspace" button beside the rename pencil, plus its
+ * confirmation dialog. Creating a workspace reloads the page onto it, so the
+ * dialog says up front that the current workspace is kept, not destroyed. A
+ * blank name takes the same `Workspace <n>` default as the workspace
+ * manager's "New" button; `icon` lets the SQL playgrounds pass
+ * `DatabasePlus`.
  */
 export function NewWorkspaceControl({
   playgroundId,
@@ -327,12 +299,9 @@ export interface SaveControlProps {
 }
 
 /**
- * The three save actions and the copy that describes them, shared by the
- * desktop dropdown (`SaveControl`) and the mobile drawer's sub-sheet
- * (`MobileSaveMenu`) so the two menus can't drift apart.
- *
- * `menuOpen` is the "refresh the cloud list now" signal — pass whether the
- * surface hosting the rows is open.
+ * The three save actions and their copy, shared by the desktop dropdown
+ * (`SaveControl`) and the mobile sub-sheet (`MobileSaveMenu`) so the two
+ * menus can't drift. `open` is the "refresh the cloud list now" signal.
  */
 function useSaveMenu(
   {
@@ -564,14 +533,9 @@ export function SaveControl(props: SaveControlProps) {
 const SAVE_SUBSHEET_ID = "save";
 
 /**
- * Mobile drawer counterpart of `SaveControl`: the Save/Saved row opens a
- * sub-sheet holding the very same items as the desktop chevron menu — the
- * "auto-saves in this browser" note, "Back up to cloud" (or "Sign in to
- * back up" for guests) and "Download copy" — plus the split button's own
- * Save action, which on desktop lives in the button half.
- *
- * The rows and their copy come from `useSaveMenu`, the same hook the
- * desktop menu uses. Must render inside a `MobileMenuSheet`.
+ * Mobile drawer counterpart of `SaveControl`: a sub-sheet with the same
+ * rows as the desktop chevron menu (via `useSaveMenu`) plus the split
+ * button's own Save action. Must render inside a `MobileMenuSheet`.
  */
 export function MobileSaveMenu(props: SaveControlProps) {
   const { unsaved } = props;
@@ -793,15 +757,10 @@ export function MoreMenu({ sections }: { sections: MoreMenuSection[] }) {
 // ---------------------------------------------------------------------------
 
 /**
- * Body of the "Sign out" sub-panel. Signing out is a one-click, silent
- * action everywhere else on the site, but in a playground the obvious
- * thing to fear is that the code goes with it — so this says, before the
- * fact, that it doesn't. (It really doesn't: workspaces live in OPFS in
- * this browser. What stops is the cloud backup sync.)
- *
- * A panel rather than a Dialog because it works unchanged on both
- * surfaces: the desktop ⋯ menu slides to it, the mobile drawer opens it
- * as a nested sheet.
+ * Body of the "Sign out" sub-panel. Says up front that workspaces stay in
+ * this browser (OPFS); only the cloud backup sync stops. A panel rather
+ * than a Dialog so it works unchanged in the desktop ⋯ menu and the mobile
+ * nested sheet.
  */
 function SignOutPanel({
   email,
@@ -860,19 +819,11 @@ function SignOutPanel({
 }
 
 /**
- * The ⋯ menu's Account group, as a `MoreMenuSection` each playground
- * appends to its own sections. Auth had no entry point in the playgrounds
- * at all; it goes here rather than in the header because the header is
- * deliberately down to five controls and has no room on a phone, and
- * because signing in isn't something anyone reaches for mid-session.
- *
- * Returns `null` while the first session fetch is in flight, so a
- * signed-in visitor never sees "Sign in" flash before their account rows
- * resolve (same reasoning as the site header's `AuthMenu` skeleton).
- *
- * Sign-in links to plain `/sign-in`: the root layout's `ReturnToTracker`
- * has already recorded the playground URL, so the flow returns here on
- * its own — a hand-built `?next=` would only lose the query and hash.
+ * The ⋯ menu's Account group, as a `MoreMenuSection` each playground appends
+ * to its own sections. Returns `null` while the first session fetch is in
+ * flight so "Sign in" never flashes for a signed-in visitor. Sign-in links
+ * to plain `/sign-in`: `ReturnToTracker` already recorded the playground
+ * URL, and a hand-built `?next=` would lose the query and hash.
  */
 export function useAccountMenuSection(): MoreMenuSection | null {
   const { data: session, isPending } = useSession();

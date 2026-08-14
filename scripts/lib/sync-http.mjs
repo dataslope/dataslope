@@ -1,50 +1,21 @@
 /**
  * A synchronous `XMLHttpRequest` for Pyodide-in-Node, so `pyodide_http` works
- * here the way it works in the reader's browser.
+ * as it does in the reader's browser. Without it, `patch_all()` "succeeds"
+ * against an XHR that isn't there and HTTP falls through to a raw socket with
+ * no TLS. `urlopen` is synchronous by contract, so nothing short of a
+ * genuinely blocking transport keeps the code under test unchanged.
  *
- * Why this exists
- * ---------------
- * The worker installs `pyodide_http` and calls `patch_all()`, which reroutes
- * `urllib`/`requests` through the browser's XHR. `patch_all()` is not
- * conditional and does not fail in Node — it just patches urllib onto an
- * `XMLHttpRequest` that is not there, and the first call falls through to the
- * real socket layer, where Pyodide has no TLS. The visible result was 53
- * blocks in the Seaborn course (every `sns.load_dataset(...)`) reported as
- * "environmental" and skipped, which is the largest hole the sweep had: those
- * lessons were checked by nothing.
+ * Blocking works by fetching on a worker thread while the caller waits with
+ * `Atomics.wait` (legal on Node's main thread); the payload comes back over a
+ * `MessageChannel` via `receiveMessageOnPort`, which reads a delivered
+ * message without yielding.
  *
- * A flag could not close it. `urlopen` is synchronous by contract — it returns
- * a response object, not a promise — and every HTTP-using lesson is written
- * against that contract, so anything short of a genuinely blocking transport
- * changes the code under test into code no reader runs.
- *
- * How it blocks
- * -------------
- * `fetch` is async, so the fetching happens on a worker thread and the calling
- * thread waits on it with `Atomics.wait`, which Node permits on the main
- * thread (browsers do not; there, sync XHR is the primitive). The response
- * comes back over a `MessageChannel` and is collected with
- * `receiveMessageOnPort`, which reads an already-delivered message without
- * yielding — the standard pairing, and the only way to get an arbitrarily
- * sized payload across without pre-sizing a SharedArrayBuffer.
- *
- * The same reasoning already runs the timeout watchdog in pyodide-runner.mjs:
- * work that must not be blocked by a busy main thread goes on a worker, and
- * the two coordinate through shared memory.
- *
- * What it deliberately mirrors
- * ----------------------------
- * `pyodide_http` branches on whether it is inside a web worker, and takes a
- * different path for the response body in each. The site runs Pyodide in a
- * worker, so `installSyncHttp` presents the worker shape (`importScripts`
- * defined, `responseType = "arraybuffer"`), which is both what readers get and
- * the path that survives binary data: the non-worker branch round-trips the
- * body through ISO-8859-15, which is not byte-transparent and would corrupt
- * any response that is not text.
+ * The shim presents pyodide_http's *worker* shape (`importScripts` defined,
+ * `responseType = "arraybuffer"`) — what readers get, and the only path that
+ * survives binary data: the non-worker branch round-trips the body through
+ * ISO-8859-15, which is not byte-transparent.
  */
 import { createHash } from "node:crypto";
-// The worker below does its own reads and writes; this thread only needs to
-// create the cache directory and (for `httpCacheEntry`) look inside it.
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { MessageChannel, Worker, receiveMessageOnPort } from "node:worker_threads";
@@ -232,30 +203,22 @@ export function installSyncHttp({ cacheDir = join(".dataset-cache", "http") } = 
     crossOriginIsolated: globalThis.crossOriginIsolated,
   };
 
-  // All three of these are read via `from js import …`, and all three have to
-  // exist before `import pyodide_http` — the package decides once, at import
-  // time, whether to patch anything at all (`_SHOULD_PATCH`).
+  // All three globals are read via `from js import …` and must exist before
+  // `import pyodide_http` — the package decides once, at import time, whether
+  // to patch anything (`_SHOULD_PATCH`).
   globalThis.XMLHttpRequest = NodeSyncXMLHttpRequest;
 
-  // Present only so `pyodide_http` takes its in-worker branch, the one readers
-  // get. Never called: Pyodide has finished loading by the time this runs.
+  // Present only so `pyodide_http` takes its in-worker branch, the one
+  // readers get. Never called.
   globalThis.importScripts = () => {
     throw new Error("sync-http: importScripts is a marker, not an implementation");
   };
 
-  // `pyodide_http._streaming` reads this at import, and a missing name is not
-  // a missing feature here — it is an ImportError that propagates up through
-  // `_core` to `_urllib`, where `patch_all(continue_on_import_error=True)`
-  // swallows it and patches nothing. That is why the first version of this
-  // shim changed nothing: XMLHttpRequest was in place and still every request
-  // went to a real socket.
-  //
-  // False is also the honest value. It gates a SharedArrayBuffer streaming
-  // fetcher that needs cross-origin isolation, and the site serves no
-  // COOP/COEP headers, so `crossOriginIsolated` is false in the reader's
-  // worker too. With it false, `send_streaming_request` declines and
-  // everything falls back to the synchronous XHR path above — the same path,
-  // and the same code, that a reader's request takes.
+  // `pyodide_http._streaming` reads this at import; a missing name is an
+  // ImportError that `patch_all(continue_on_import_error=True)` swallows,
+  // leaving nothing patched. False is also the honest value: the site serves
+  // no COOP/COEP headers, so readers' workers are not cross-origin isolated
+  // either, and everything takes the same synchronous XHR path.
   globalThis.crossOriginIsolated = false;
 
   return function uninstallSyncHttp() {

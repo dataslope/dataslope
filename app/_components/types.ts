@@ -5,54 +5,37 @@ export type OutputCellType = "stdout" | "stderr" | "html" | "image" | "plot";
 export interface OutputCell {
   id: number;
   type: OutputCellType;
-  /** Plain text for stdout/stderr, HTML string for html, base64 PNG for image,
-   *  arbitrary value (e.g. Plotly figure JSON) for plot. */
+  /** Plain text (stdout/stderr), HTML string (html), base64 PNG (image),
+   *  or e.g. Plotly figure JSON (plot). */
   content: string;
-  /**
-   * For "image" and "plot" cells: a URL to fetch the picture (or the Plotly
-   * figure JSON) from, instead of carrying it in `content`.
-   *
-   * Set exclusively by prepopulated output (see
-   * `scripts/build-block-outputs.mjs`). A run's own charts stay inline —
-   * they are already in memory and the reader is looking straight at them —
-   * but a prepopulated one is paid for on page load by every reader,
-   * including those who never scroll to it. Measured across the site those
-   * two cell types were essentially the entire weight: base64 PNG was 98%
-   * of the first manifest, and once the images were externalised, figure
-   * JSON was 88% of what remained. Both are files under
-   * `public/block-outputs/` now, fetched lazily and cached apart from the
-   * page.
-   */
+  /** For image/plot cells: URL to fetch the payload from instead of carrying
+   *  it in `content`. Set only by prepopulated output
+   *  (`scripts/build-block-outputs.mjs`) so heavy payloads load lazily;
+   *  a run's own charts stay inline. */
   src?: string;
   /** For "plot" cells, the parsed Plotly figure JSON. */
   plot?: PlotlyFigure;
   elapsed: string;
-  /** Identifies the run that produced this cell, so the UI can render
-   *  one merged output frame per run (cells of one run stack inside a
-   *  single OUTPUT cell, notebook-style). Surfaces that clear outputs
-   *  on every run can omit it. */
+  /** Run that produced this cell, so cells of one run stack in a single
+   *  OUTPUT frame. Surfaces that clear outputs every run can omit it. */
   runId?: number;
-  /** Wall-clock ms when the run that produced this cell finished; the
-   *  stacked run history renders it as the cell's "finish time". */
+  /** Wall-clock ms when the producing run finished. */
   finishedAt?: number;
 }
 
 export interface PlotlyFigure {
   data: unknown[];
   layout?: Record<string, unknown>;
-  /** Animation frames, present whenever the figure was built with
-   *  `animation_frame=`. The play button and the slider live in `layout`
-   *  and are drawn without these, so a figure rendered from `data` and
-   *  `layout` alone looks animated and does nothing when clicked. */
+  /** Animation frames (`animation_frame=`). Without these the play button
+   *  still renders (it lives in `layout`) but does nothing when clicked. */
   frames?: unknown[];
 }
 
 export interface EntryFileInfo {
   /** Workspace-relative filename. */
   filename: string;
-  /** Kind of entry point. `"main"` denotes an explicit `main()` /
-   *  `Main()` function. `"topLevel"` (C# only) denotes top-level
-   *  statements outside of any class. */
+  /** `"main"` = explicit main()/Main(); `"topLevel"` (C# only) = top-level
+   *  statements outside any class. */
   kind: "main" | "topLevel";
 }
 
@@ -61,13 +44,11 @@ export interface ExampleSnippet {
   title: string;
   desc: string;
   code: string;
-  /** Optional additional files for multi-file examples. When present,
-   *  loading the example replaces the entire workspace with `code`
-   *  (used as the entry file's contents) plus these extra files.
-   *  Each file's `filename` should be a workspace-relative path. */
+  /** Extra files for multi-file examples; loading then replaces the whole
+   *  workspace with `code` (entry file) plus these. */
   files?: ExampleFile[];
-  /** Filename for the primary `code` snippet when `files` is set.
-   *  Defaults to the adapter's primary entry filename when omitted. */
+  /** Filename for `code` when `files` is set; defaults to the adapter's
+   *  primary entry filename. */
   entryFilename?: string;
 }
 
@@ -83,10 +64,8 @@ export interface PackageInfo {
   name: string;
   ver: string;
   desc: string;
-  /** Optional short example snippet that demonstrates the package.
-   *  When present, the packages drawer renders an "Example" icon button
-   *  that loads this snippet into the editor (with the standard
-   *  discard-confirm dialog). */
+  /** Example snippet; when present the packages drawer shows an "Example"
+   *  button that loads it into the editor. */
   example?: string;
 }
 
@@ -107,56 +86,34 @@ export interface ExportFormat {
   mimeType: string;
 }
 
-/** Emitter passed to `runtime.run` so the adapter can stream cells as they
- *  become available. */
+/** Emitter passed to `runtime.run` for streaming cells as they arrive. */
 export type EmitOutput = (cell: Omit<OutputCell, "id" | "elapsed">) => void;
 
-/** Optional context passed to `runtime.run` describing which workspace
- *  file the user chose as the entry point for this run. Used by
- *  multi-entry-point adapters (C, C++, Java, C#). */
+/** Per-run context passed to `runtime.run`. */
 export interface RunOptions {
-  /** Workspace-relative path of the chosen entry file. Adapters use
-   *  this to pick the right translation unit / class to compile and
-   *  to exclude that file from the "extra sources" list. */
+  /** Workspace-relative path of the chosen entry file (multi-entry adapters). */
   entryFilename?: string;
-  /** Host element for live page previews (web / react adapters). The
-   *  surface owns this element (an always-mounted slot in its output
-   *  area); the runtime replaces its children with a sandboxed iframe
-   *  on every run, which doubles as the teardown story, swapping the
-   *  document kills the previous run's scripts. Adapters without a
-   *  preview channel ignore it; preview adapters fall back to a hidden
-   *  off-DOM host when the surface doesn't supply one (code still
-   *  runs and console output is still captured, just invisibly). */
+  /** Host element for live page previews (web/react). The surface owns it;
+   *  the runtime replaces its children with a sandboxed iframe each run,
+   *  which doubles as teardown. Preview adapters fall back to a hidden
+   *  off-DOM host when absent (code runs, output captured, invisibly). */
   previewHost?: HTMLElement | null;
-  /** Inject the pinned Tailwind CSS browser compiler
-   *  (`@tailwindcss/browser`) into the preview document before user
-   *  code, so utility classes in the learner's markup compile
-   *  client-side. Only meaningful for preview adapters; see
-   *  `TAILWIND_BROWSER_CDN` in `runtime/cdn.ts` for the pin. */
+  /** Inject the pinned Tailwind browser compiler into the preview before
+   *  user code (see `TAILWIND_BROWSER_CDN` in runtime/cdn.ts). */
   previewTailwind?: boolean;
-  /** Optional transient status line for waits that happen *inside* a
-   *  run, e.g. Python's deferred package set still installing on the
-   *  first run after the two-phase boot, or R installing a `library()`
-   *  on demand. Surfaces in the caller's status text; adapters that
-   *  never wait mid-run simply ignore it.
-   *
-   *  `preparing` marks a *blocking* wait (a download/install before the
-   *  user's code runs) so the surface can show the runtime boot notice
-   *  for the duration and drop it once execution starts. Omit / false
-   *  for ordinary status text. */
+  /** Transient status line for waits *inside* a run (e.g. mid-run package
+   *  installs). `preparing` marks a blocking wait, so the surface shows the
+   *  boot notice until execution starts; omit/false for ordinary status. */
   onStatus?: (message: string, preparing?: boolean) => void;
 }
 
-/** A single completion suggestion with optional editor metadata. Plain
- *  strings are accepted everywhere an item is expected so lightweight
- *  providers can return bare identifiers. */
+/** A completion suggestion. Plain strings are accepted anywhere an item is
+ *  expected, for lightweight providers. */
 export interface CompletionItemDetail {
   label: string;
-  /** CodeMirror completion kind ("function", "variable", "class",
-   *  "keyword", "property", "namespace", …), drives the popup icon. */
+  /** CodeMirror completion kind ("function", "variable", …); drives the icon. */
   type?: string;
-  /** Short annotation rendered after the label (e.g. a type or
-   *  signature), the way desktop IDEs annotate suggestions. */
+  /** Short annotation after the label (e.g. type or signature). */
   detail?: string;
   /** Longer documentation shown in the completion info panel. */
   info?: string;
@@ -168,10 +125,8 @@ export interface CompletionItemDetail {
 
 export type CompletionListItem = string | CompletionItemDetail;
 
-/** Cursor snapshot handed to `LanguageRuntime.complete`. Carries both
- *  the full document (for whole-file analyzers like jedi or the
- *  TypeScript language service) and the line/column pair (for
- *  line-based engines like R's `utils` completion). */
+/** Cursor snapshot for `LanguageRuntime.complete`: full document for
+ *  whole-file analyzers plus line/column for line-based engines. */
 export interface CompletionRequest {
   /** Full text of the editor document. */
   doc: string;
@@ -183,78 +138,43 @@ export interface CompletionRequest {
   column: number;
   /** 1-based line number of the cursor within `doc`. */
   lineNumber: number;
-  /** True when the user explicitly requested completion (Ctrl-Space)
-   *  rather than a trigger character opening it. */
+  /** True for an explicit request (Ctrl-Space) vs a trigger character. */
   explicit: boolean;
-  /** Workspace-relative path of the file being edited, when the
-   *  surface knows it (multi-file playgrounds). */
+  /** Workspace-relative path of the file being edited, when known. */
   filename?: string;
 }
 
 export interface CompletionResult {
-  /** Suggested completions for the current cursor prefix. */
   list: CompletionListItem[];
-  /** Number of characters before the cursor that should be replaced when
-   *  inserting a completion (i.e. the length of the matched prefix). */
+  /** Characters before the cursor to replace (length of the matched prefix). */
   replaceLength: number;
 }
 
 export interface LanguageRuntime {
   run(code: string, emit: EmitOutput, options?: RunOptions): Promise<void>;
-  /** Optional: compute completions for the cursor described by
-   *  `request`. Adapters that don't implement autocomplete simply omit
-   *  this. Implementations should be best-effort: resolve with an empty
-   *  list rather than rejecting on analyzer errors. */
+  /** Best-effort completions; resolve with an empty list rather than
+   *  rejecting on analyzer errors. */
   complete?(request: CompletionRequest): Promise<CompletionResult>;
-  /** Optional: stage workspace files into the runtime's virtual file
-   *  system before `run()` is invoked. Called by the playground with the
-   *  full set of currently-open files (code tabs and uploaded data
-   *  files), keyed by their workspace-relative path
-   *  (e.g. `"utils.py"`, `"data/sales.csv"`).
-   *
-   *  Runtimes that don't support multi-file execution simply omit this
-   *  hook, the playground falls back to single-file `run(code, …)`
-   *  semantics in that case.
-   *
-   *  Implementations should mirror the supplied snapshot exactly: files
-   *  present in `files` should overwrite existing entries, and files
-   *  the runtime created on previous runs that are no longer in `files`
-   *  should be removed so renames and deletions in the UI propagate. */
+  /** Stage workspace files into the runtime's VFS before `run()`, keyed by
+   *  workspace-relative path. Must mirror the snapshot exactly: overwrite
+   *  entries present in `files`, remove previously created ones absent from
+   *  it, so UI renames/deletions propagate. Omit for single-file runtimes. */
   prepareFileSystem?(files: Map<string, Uint8Array>): Promise<void>;
-  /** Optional: after `run()` resolves, return any files the runtime
-   *  created during the run that should be surfaced in the Files pane,
-   *  keyed by their workspace-relative path (e.g. a CSV fetched by R's
-   *  `download.file()`). The playground persists these to OPFS and adds
-   *  them to the Files pane so they survive reloads and are re-staged on
-   *  subsequent runs. Returns an empty map when nothing was created.
-   *
-   *  Called once per run (in both the success and error paths, since a
-   *  file may have been written before user code later threw), so
-   *  implementations must clear their internal tracking after returning
-   *  to avoid reporting the same file twice. */
+  /** After `run()`, return files the run created (persisted to OPFS and shown
+   *  in the Files pane). Called once per run, on both success and error paths,
+   *  so implementations must clear their tracking after returning to avoid
+   *  double-reporting. */
   collectCreatedFiles?(): Promise<Map<string, Uint8Array>>;
-  /** Optional: tear the runtime down and free its resources (terminate
-   *  the backing Web Worker, close the WASM instance). Called by the
-   *  runtime registry when this runtime is evicted to bound how many
-   *  language VMs stay resident at once, after it runs, the instance
-   *  must not be used again. Runtimes that cannot release their
-   *  resources (e.g. CheerpJ's page-level JVM, the .NET runtime) omit
-   *  this hook, which also exempts them from eviction. */
+  /** Tear down and free resources (worker, WASM heap); called on registry
+   *  eviction, after which the instance must not be used. Runtimes that
+   *  can't release resources omit this, which also exempts them from
+   *  eviction. */
   dispose?(): void | Promise<void>;
-  /** Optional: hint that the given authored source snippets may run
-   *  soon, so the runtime can pre-install heavy optional packages while
-   *  the user is still reading (Python's numpy/pandas/scipy/matplotlib/
-   *  plotly set). Fire-and-forget and best-effort: runtimes install
-   *  missing packages on demand at run time regardless, so a missed or
-   *  wrong hint only changes *when* the download happens, never whether
-   *  a run succeeds.
-   *
-   *  `options.packages` adds importable module names (e.g. `"pandas"`,
-   *  `"sklearn"`) to warm even though no source imports them, the
-   *  escape hatch for content whose instructions ask the learner to
-   *  write the import themselves, or for dynamic imports the scan can't
-   *  see. `options.force` skips the needs-analysis and warms the full
-   *  set (used by the playground, whose future code is unknown). */
+  /** Hint that these sources may run soon so heavy packages pre-install.
+   *  Fire-and-forget: a missed hint only changes *when* the download happens,
+   *  never whether a run succeeds. `options.packages` warms modules no source
+   *  imports (learner-writes-the-import content, dynamic imports);
+   *  `options.force` skips the scan and warms the full set. */
   warmPackages?(
     sources: string[],
     options?: { packages?: string[]; force?: boolean },
@@ -272,186 +192,106 @@ export interface LanguageAdapter {
   documentTitle: string;
   /** Status text shown after init succeeds. */
   readyStatus: string;
-  /** Human-readable runtime details shown by the header's info popup
-   *  (e.g. "Python 3.14 via Pyodide", "R 4.4 via WebR"). */
+  /** Runtime details for the header's info popup. */
   runtimeInfo: RuntimeInfo;
   /** CodeMirror language mode (e.g. "python", "r"). */
   codeMirrorMode: string;
-  /** Optional: per-file CodeMirror mode override for adapters whose
-   *  workspaces mix languages (the web adapter edits `.html`, `.css`,
-   *  and `.js` files side by side). Return `undefined` to fall back to
-   *  `codeMirrorMode`. Surfaces re-evaluate this whenever the active
-   *  tab changes and reconfigure the editor's language compartment. */
+  /** Per-file mode override for mixed-language workspaces (web:
+   *  .html/.css/.js); `undefined` falls back to `codeMirrorMode`. */
   codeMirrorModeForFile?(filename: string): string | undefined;
-  /** Number of spaces used for one indentation level. This MUST match
-   *  the indent width produced by the adapter's `formatCode` formatter
-   *  so the editor's Tab key inserts exactly what the formatter emits
-   *  (e.g. Python/ruff = 4, JS/TS/web_fmt = 2, C/C++/Java/clang LLVM = 2,
-   *  C#/clang Microsoft = 4, PHP/mago = 4, R/styler = 2). The editor's
-   *  `tabSize` and `indentUnit` are both derived from this value. */
+  /** Spaces per indent level. MUST match the adapter's `formatCode` output
+   *  so Tab inserts exactly what the formatter emits; drives the editor's
+   *  `tabSize` and `indentUnit`. */
   indentWidth: number;
   examples: ExampleSnippet[];
   packages: PackageInfo[];
-  /** Output channels that this runtime can emit beyond plain text.
-   *  Used by the playground's empty-state blurb so we don't promise
-   *  capabilities the runtime can't deliver (e.g. Java only emits
-   *  text). All runtimes implicitly support text. */
+  /** Output channels beyond plain text, so the empty-state blurb doesn't
+   *  promise capabilities the runtime lacks. Text is implicit. */
   outputCapabilities?: {
     dataframes?: boolean;
     charts?: boolean;
     figures?: boolean;
-    /** The runtime renders a live page preview (sandboxed iframe) in
-     *  addition to console text, the web / react adapters. Surfaces
-     *  use this to mount their preview slot and mention the preview
-     *  in the empty-state blurb. */
+    /** Renders a live page preview (sandboxed iframe) — web/react. */
     preview?: boolean;
-    /** Rendering that preview is cheap enough to do without the reader
-     *  asking for it, so `<CodeBlock>` may show the result before the
-     *  first Run (see `composeStaticPreview`).
-     *
-     *  `web`: yes. There is no runtime download at all — composition is
-     *  a pure string operation and the browser does the rest.
-     *  `react`: no. It boots esbuild-wasm and pulls React from esm.sh,
-     *  which is not something a page should spend on a reader's behalf.
-     *  Precomputing the bundle at build time is what would change that. */
+    /** Preview is cheap enough to render before the first Run (see
+     *  `composeStaticPreview`). web: yes, pure string composition.
+     *  react: no — it boots esbuild-wasm and pulls React from esm.sh. */
     autoPreview?: boolean;
   };
-  /** Formats offered by the "Export" dropdown. The editor's current contents
-   *  are written to a client-side download with the chosen extension. */
+  /** Formats offered by the "Export" dropdown (client-side download). */
   exportFormats: ExportFormat[];
   /** Base filename (without extension) used when exporting, e.g. "script". */
   exportBaseFilename: string;
-  /** Default file extension (no dot) for new tabs in this playground,
-   *  e.g. "py", "js", "cpp". Used to seed the initial workspace file
-   *  and to suggest names for "+" new tabs. */
+  /** Default extension (no dot) for new tabs; seeds the initial file and
+   *  "+" tab names. */
   defaultFileExtension: string;
-  /** Optional: seed fresh playground workspaces with this multi-file
-   *  set instead of a single `<exportBaseFilename>.<ext>` file, the
-   *  web adapter uses it for its CodePen-style HTML/CSS/JS trio. The
-   *  first entry is the initial active file. */
+  /** Seed fresh workspaces with this multi-file set instead of a single
+   *  primary file (web's HTML/CSS/JS trio). First entry is the active file. */
   defaultWorkspace?: ExampleFile[];
-  /** Optional: the playground offers a CodePen-style split view for
-   *  this adapter, every workspace file gets its own always-visible
-   *  editor (stacked in the editor pane) instead of tabs. The user can
-   *  flip between split and tabs; the preference persists per adapter. */
+  /** Offer a CodePen-style split view (one always-visible editor per file);
+   *  the split/tabs preference persists per adapter. */
   splitEditors?: boolean;
-  /** Optional: hide the playground's Files pane (and its sidebar rail /
-   *  mobile sheet) for this adapter. The web playground sets this: its
-   *  split view already shows every file as a pane, so a separate
-   *  file-tree that can't "open" files anywhere would only confuse. */
+  /** Hide the Files pane; the web playground's split view already shows
+   *  every file as a pane. */
   hideFilesPane?: boolean;
-  /** Optional: disable adding new files to the workspace for this
-   *  adapter. The HTML/CSS/JS playground sets this, it's a fixed
-   *  index.html / styles.css / script.js trio, so the "+ New file"
-   *  affordances (the tab strip's "+" and the split view's footer
-   *  button) are hidden. Existing files can still be renamed. */
+  /** Disable adding new files (web's fixed trio). Renames still allowed. */
   disableAddFile?: boolean;
-  /** Optional: the workspace file set is fixed, so no file may be
-   *  closed, removed, duplicated, or renamed. Every per-tab affordance
-   *  is dropped: the tab's ✕, double-click-to-rename, and the whole
-   *  context menu (Rename / Close / Close Others / Delete File /
-   *  Duplicate), which leaves `TabItem` rendering no menu at all.
-   *
-   *  The HTML/CSS/JS playground sets this alongside `disableAddFile` and
-   *  `hideFilesPane`. Those three together are the point: closing a tab
-   *  hides its editor but keeps the file, and the Files pane is what
-   *  reopens it — so an adapter with no Files pane and no way to add a
-   *  file must not let one be closed either, or the file becomes
-   *  unreachable in tabbed mode with nothing to reopen it. Renaming is
-   *  locked for a related reason: the trio is wired together by name
-   *  (`<link href="styles.css">`, `<script src="script.js">`, and
-   *  index.html as the preview entry), so a rename silently breaks the
-   *  page it composes. */
+  /** Workspace file set is fixed: no close/remove/duplicate/rename, and every
+   *  per-tab affordance is dropped. With no Files pane and no add-file, a
+   *  closed tab's file would be unreachable; and the web trio is wired
+   *  together by name, so a rename silently breaks the composed page. */
   lockWorkspaceFiles?: boolean;
-  /** Optional: show a bare "Run" label on the Run button instead of the
-   *  per-entry "Run <file>" chip. The web playground sets this, it runs
-   *  the composed preview (always index.html) rather than a named file,
-   *  so surfacing a filename would only be misleading. */
+  /** Show a bare "Run" label instead of "Run <file>" (web runs the composed
+   *  preview, not a named file). */
   simpleRunLabel?: boolean;
-  /** Optional: classify which workspace files contain entry points
-   *  (i.e. `main()` / `Main()` / top-level statements). Used by the
-   *  Run button to populate a split-button dropdown when multiple
-   *  entry files exist in the workspace. Files passed in are the
-   *  current text contents of every code tab. */
+  /** Classify which files contain entry points, to populate the Run button's
+   *  split dropdown when several exist. Receives every code tab's current text. */
   findEntryFiles?(
     files: { filename: string; content: string }[],
   ): EntryFileInfo[];
-  /** Optional: short label used inside the Run button when this
-   *  filename is the chosen entry. Defaults to the basename without
-   *  extension (e.g. `"main.c"` → `"main"`). */
+  /** Run-button label for a chosen entry file; defaults to basename without
+   *  extension. */
   entryLabel?: (filename: string) => string;
-  /** Approximate compressed download for a cold boot, in MB. Shown in
-   *  the first-run boot copy ("Downloading the Python runtime (~6 MB)…")
-   *  so long waits come with a size expectation. Keep in sync with the
-   *  version pins the adapter maintains; omit for runtimes that boot
-   *  from local/bundled assets in well under a second. */
+  /** Approximate compressed cold-boot download in MB, shown in first-run boot
+   *  copy. Keep in sync with the adapter's version pins; omit for runtimes
+   *  that boot from local assets. */
   coldDownloadMB?: number;
-  /** True for languages that compile on every run (Java, C, C++, C#), so
-   *  the first-run boot copy doesn't promise that "later runs are
-   *  instant", they still pay a per-run compile step even once the
-   *  runtime is warm. Omit (falsy) for interpreted runtimes. */
+  /** True for compile-every-run languages (Java, C, C++, C#), so boot copy
+   *  doesn't promise "later runs are instant". */
   compiled?: boolean;
   /** Render-only: footer note shown at the bottom of the packages drawer. */
   packagesFooter: React.ReactNode;
-  /** Build the snippet inserted at the top of the editor when the user
-   *  clicks a package in the packages drawer. */
+  /** Snippet inserted at the top of the editor when a package is clicked. */
   importSnippet(packageName: string): string;
-  /** Returns true if `code` already imports `packageName`, used to skip
-   *  the insertion (and surface a "already imported" toast) when the
-   *  relevant import statement is present. */
+  /** True if `code` already imports `packageName` (skips insertion). */
   hasImport(code: string, packageName: string): boolean;
-  /** Initialise the runtime. Called once after scripts/stylesheets load.
-   *  `setLoadingMessage` reports boot progress: a human-readable stage
-   *  line plus an optional coarse overall fraction (0..1) where the
-   *  adapter can estimate one, the UI renders a determinate-ish bar
-   *  when fractions arrive and falls back to a spinner when they don't.
-   *  Report stage *floors* (the UI animates within a stage) and never
-   *  report 1, resolving the promise is what means "ready". */
+  /** Initialise the runtime (called once). `setLoadingMessage` reports boot
+   *  progress: stage line + optional coarse fraction (0..1). Report stage
+   *  *floors* (the UI animates within a stage) and never report 1 —
+   *  resolving the promise is what means "ready". */
   init(
     setLoadingMessage: (message: string, fraction?: number) => void,
   ): Promise<LanguageRuntime>;
-  /** Optional: auto-format the given source code and return the formatted
-   *  string. Implemented by adapters that ship a browser-side formatter
-   *  (e.g. the C adapter uses clang-format via WASM). The playground UI
-   *  surfaces a "Format code" icon button when this method is present.
-   *  `filename` is the active workspace file, so adapters whose
-   *  workspaces mix languages (web: .html/.css/.js) can pick the right
-   *  formatter dialect; single-language adapters may ignore it. */
+  /** Auto-format source; presence enables the "Format code" button.
+   *  `filename` lets mixed-language adapters pick the right dialect. */
   formatCode?: (code: string, filename?: string) => Promise<string>;
-  /** Optional: compose the document this workspace would render, from
-   *  its sources alone — no runtime, no network, no browser, no DOM.
-   *  Implemented only by adapters whose preview is a pure function of
-   *  the source, which today means `web`.
-   *
-   *  This is what lets `<CodeBlock>` server-render the preview into the
-   *  page's HTML instead of waiting for a Run, so the result is there at
-   *  first paint. Two constraints follow from that and are not optional:
-   *
-   *  - **It must run under Node**, because SSR is where it is called
-   *    first. No `window`, no `document`, no `btoa` without a fallback.
-   *  - **It must be deterministic.** The server and the browser both
-   *    compose it and React compares the two; anything random or
-   *    clock-derived in the output is a hydration mismatch. That is why
-   *    `options.token` is *passed in* rather than generated here: the
-   *    caller derives it from the block's own content and identity, so
-   *    the same block composes the same document every time.
-   *
-   *  `sources` are the files' *effective* sources (each file's init code
-   *  already merged into its buffer), so the adapter sees exactly what a
-   *  Run would give it. Return `null` when this workspace has nothing to
-   *  render statically. */
+  /** Compose the document this workspace would render from sources alone —
+   *  no runtime/network/DOM — so `<CodeBlock>` can server-render the preview.
+   *  Two hard constraints: it must run under Node (SSR calls it first), and
+   *  it must be deterministic — server and browser both compose it and React
+   *  diffs the two, hence `options.token` is passed in, never generated here.
+   *  `sources` are effective sources (init code merged). Return `null` when
+   *  nothing renders statically. */
   composeStaticPreview?(
     sources: { filename: string; source: string }[],
     options: {
       entryFilename: string;
       token: string;
       tailwind?: boolean;
-      /** A build-time-compiled artifact for this block, when the adapter
-       *  needs one. `web` composes from `sources` alone; `react` cannot —
-       *  TSX has to be translated first, and doing that in the reader's
-       *  browser costs a ~3 MB download, so the bundle is precompiled by
-       *  `scripts/build-react-bundles.mjs` and looked up by content hash.
-       *  An adapter that needs a bundle and doesn't get one returns null. */
+      /** Build-time-compiled artifact, for adapters that need one: react's
+       *  TSX is precompiled by `scripts/build-react-bundles.mjs` (in-browser
+       *  translation would cost a ~3 MB download) and looked up by content
+       *  hash. An adapter that needs a bundle and lacks one returns null. */
       bundle?: { js: string; css?: string };
     },
   ): string | null;

@@ -1,19 +1,8 @@
 /**
- * The playground landing page's language chooser: three categories
- * (Code Editors / Web Sandboxes / SQL Workbench), each a two-column row of a
- * label + blurb beside a grid of language tiles. Implements the "Playground
- * Page" handoff mock's category grid.
- *
- * The three headings name the *workspace*, not the language, which is the axis
- * the blurbs were already written on ("editors", "sandbox", "workbench"). The
- * previous set (Languages / Web / Databases) put one group on a different axis
- * from the other two and implied the others were not languages, when HTML, CSS
- * and SQL are languages too.
- *
- * Server component, the data is static. Each tile links to its
- * `/playground/<id>` route and, on hover, tints its glyph with the language's
- * brand color (`LANGUAGE_ICON_COLORS`) via the `--tile-c` custom property so
- * the whole grid stays in sync with the shared icon registry.
+ * The playground landing page's language chooser: three categories, each a
+ * label + blurb beside a grid of language tiles. Server component, static
+ * data. Tiles tint their glyph on hover with the language's brand color
+ * (`LANGUAGE_ICON_COLORS`) via the `--tile-c` custom property.
  */
 import type { CSSProperties } from "react";
 import Link from "@/app/_components/Link";
@@ -83,8 +72,7 @@ function LanguageTile({ item }: { item: LanguageItem }) {
   const factor = LANGUAGE_ICON_SIZE_FACTOR[item.id] ?? 1;
   const color = LANGUAGE_ICON_COLORS[item.id] ?? "currentColor";
   return (
-    // Dense index grid, don't viewport-prefetch every language route (see the
-    // opt-out note in app/_components/Link.tsx).
+    // Don't viewport-prefetch every language route (see app/_components/Link.tsx).
     <Link
       href={`/playground/${item.id}`}
       prefetch={false}
@@ -117,13 +105,9 @@ export function LanguageCategories() {
           key={cat.name}
           className="grid gap-x-14 gap-y-6 py-8 sm:py-10 md:grid-cols-[minmax(0,264px)_1fr]"
         >
-          {/* `md:pt-5` is the tile's own top padding, borrowed. A tile starts
-              its icon 20px down (`pt-5` in LanguageTile), so at the top of a
-              row the heading sat level with the tile's empty padding rather
-              than with the first glyph, and the label column read as floating
-              above the grid it belongs to. Only from `md`, where the two are
-              side by side; stacked on a phone the heading is the row's top
-              edge and has nothing to align to. */}
+          {/* `md:pt-5` mirrors the tile's own top padding so the heading
+              aligns with the first glyph rather than the tile's empty
+              padding; only from `md`, where the two sit side by side. */}
           <div className="md:pt-5">
             <h2 className="text-[18px] font-medium text-[#121212] dark:text-white">
               {cat.name}

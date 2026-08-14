@@ -13,11 +13,9 @@ import generatedCourses from "@/lib/generated/course-catalog";
 // injection from a tampered client (e.g. "..", "%2e", absolute URLs).
 const SLUG_SEGMENT = /^[a-z0-9][a-z0-9-]*$/;
 
-// The client sends the full path segments (base included); only the docs
-// sections with a raw-Markdown mirror may be fetched (see next.config.ts
-// rewrites), anything else from a tampered client is rejected. Exported so
-// the Ask AI panel offers the "Lesson text" source from the same allowlist
-// instead of a hand-copied mirror.
+// Only docs sections with a raw-Markdown mirror may be fetched (see
+// next.config.ts rewrites); anything else from a tampered client is rejected.
+// Exported so the Ask AI panel offers "Lesson text" from the same allowlist.
 export const LESSON_BASES = new Set(["courses", "fumadocs-dev"]);
 
 /** Hard cap on client-supplied widget blocks (the client sends ≤6). */
@@ -27,10 +25,9 @@ const MAX_WIDGETS = 8;
  *  anything past this is not a heading. */
 const MAX_PAGE_TITLE = 120;
 
-/** Course slug → title, from the build-time catalog. The course name is
- *  resolved here rather than accepted from the client: the client can say what
- *  heading is on its screen, but which course a path belongs to is ours to
- *  state, and this costs a lookup instead of trust. */
+/** Course slug → title, from the build-time catalog. Resolved here rather
+ *  than accepted from the client: which course a path belongs to is ours to
+ *  state. */
 const COURSE_TITLES = new Map(
   (generatedCourses as { slug: string; title: string }[]).map((c) => [
     c.slug,
@@ -49,21 +46,10 @@ function humanizeSlug(segment: string): string {
 }
 
 /**
- * One line saying where the reader is: the page's heading, the course or track
- * around it, and the path.
- *
- * This is the always-on minimum. Everything else in the panel's context is
- * something the reader turns on, and with all of it off the model previously
- * received no indication of the page at all — `slug` never reached the prompt,
- * it only ever resolved the Markdown fetch — so an answer on a scikit-learn
- * lesson could not know it was a scikit-learn lesson. Roughly fifteen tokens
- * buys the difference between a textbook answer and one about this page.
- *
- * Returns null off the learn surface or when there is nothing to say, so the
- * playground (which identifies itself through `adapterId` and the files) does
- * not gain an empty line.
- *
- * Exported for `__tests__/aiContext.test.ts`.
+ * One line saying where the reader is: heading, course/track, path. The
+ * always-on minimum — `slug` never reaches the prompt, so without this the
+ * model has no idea which page is on screen (~15 tokens). Returns null off
+ * the learn surface or when there is nothing to say. Exported for tests.
  */
 export function pageIdentityLine(context: AskAiClientContext): string | null {
   const slug = Array.isArray(context.slug) ? context.slug : [];
@@ -90,29 +76,22 @@ export function pageIdentityLine(context: AskAiClientContext): string | null {
         ? collection
         : "";
   if (!where) return null;
-  // The path is included because it is the one part a model can quote back as
-  // a link, and it is already sent to this server either way.
+  // The path is the one part a model can quote back as a link.
   return `The user is reading ${where} (/${slug.join("/")}).`;
 }
 
 /**
  * Hard cap on lesson-text tokens, independent of the per-tier context budget.
- * Lesson text is opt-in (the "Full page" / Custom context modes) and, even
- * when opted in, is trimmed to fit this ceiling rather than allowed to eat the
- * whole budget, the design's "up to 4k of 12k tokens" rule. Also surfaced to
- * the user in the context sheet, keep the two in sync.
+ * Also surfaced to the user in the context sheet — keep the two in sync.
  */
 export const LESSON_TEXT_MAX_TOKENS = 4_000;
 
 /**
- * Fetch a lesson's raw markdown from our own prerendered `${slug}.md` asset.
- *
- * On Cloudflare the Worker has NO filesystem at request time, so we cannot
- * read the MDX from disk here (that only works at build time, when
- * scripts/build-course-md.mjs emits the `.md` mirrors as static assets).
- * Instead we fetch the asset over HTTP; `global_fetch_strictly_public`
- * (wrangler.jsonc) routes this to the public origin / edge cache. Returns null
- * on any problem, context is best-effort and must never break the request.
+ * Fetch a lesson's raw markdown from the prerendered `${slug}.md` asset. The
+ * Worker has no filesystem at request time, so it fetches over HTTP
+ * (`global_fetch_strictly_public` in wrangler.jsonc routes this to the public
+ * origin / edge cache). Returns null on any problem — context is best-effort
+ * and must never break the request.
  */
 export async function fetchLessonMarkdown(
   slug: string[] | undefined,
@@ -189,12 +168,9 @@ export function buildMessages(args: BuildArgs): {
     { role: "system", content: args.system ?? systemPrompt(surface) },
   ];
 
-  // Where the reader is. First after the system prompt and outside the budget
-  // arithmetic below: it is one short line, it is the same line for every
-  // question asked on a page (so it extends the cache-friendly prefix rather
-  // than breaking it), and it is the last thing that should be dropped when a
-  // context-rich page runs the budget down — an answer without it is an answer
-  // to a stranger.
+  // First after the system prompt and outside the budget arithmetic: one
+  // short line, stable per page (extends the cache-friendly prefix), and the
+  // last thing that should ever be dropped.
   const identity = pageIdentityLine(context);
   if (identity) {
     messages.push({ role: "user", content: `Page context (DATA): ${identity}` });
@@ -208,12 +184,9 @@ export function buildMessages(args: BuildArgs): {
     return clipped;
   };
 
-  // Reserve the two highest-signal blocks off the top so a context-rich page
-  // (long lesson + many files) can never crowd them out. The system prompt
-  // tells the model to resolve "this" as highlighted text → referenced
-  // widgets → most-visible, so those must survive packing. They are still
-  // *emitted* in their usual late positions to keep the stable, cache-friendly
-  // message prefix.
+  // Reserve the two highest-signal blocks (selection, referenced widgets) so
+  // a context-rich page can never crowd them out; they are still emitted in
+  // their usual late positions to keep the cache-friendly prefix stable.
   const selectionText =
     typeof context.selection === "string" && context.selection.trim()
       ? clip(context.selection, Math.floor(contextBudget * 0.1))
@@ -245,10 +218,8 @@ export function buildMessages(args: BuildArgs): {
     .map(renderWidget);
   for (const block of referencedBlocks) budget -= estimateTokens(block);
 
-  // Lesson markdown (learn surface): up to ~40% of the budget, but never more
-  // than LESSON_TEXT_MAX_TOKENS. The client only sends it when the user opted
-  // in (Full page / Custom "Lesson text"); the caller resolves that flag and
-  // passes null here otherwise, so reaching this branch already means opted in.
+  // Lesson markdown (learn surface): up to ~40% of the budget, capped at
+  // LESSON_TEXT_MAX_TOKENS. Non-null only when the user opted in.
   if (lessonMarkdown && budget > 0) {
     const lessonShareTokens = Math.floor(contextBudget * 0.4);
     const lessonCap = Math.min(lessonShareTokens, LESSON_TEXT_MAX_TOKENS, budget);
@@ -306,10 +277,9 @@ export function buildMessages(args: BuildArgs): {
     });
   }
 
-  // On-page widgets (challenge cards, code blocks, quiz questions, playground
-  // shells): up to ~35%, split across widgets. Pinned ("referenced") widgets
-  // come first and were budget-reserved above, so they always make it in;
-  // ambient widgets take whatever share remains.
+  // On-page widgets: up to ~35%, split across widgets. Referenced widgets
+  // were budget-reserved above so they always make it; ambient ones take
+  // whatever remains.
   const ambientBlocks = widgets.filter((w) => !w.referenced).map(renderWidget);
   if (referencedBlocks.length || (ambientBlocks.length && budget > 0)) {
     const blocks = [...referencedBlocks];

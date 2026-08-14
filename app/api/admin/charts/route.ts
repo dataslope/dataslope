@@ -1,55 +1,17 @@
 /**
- * Admin-only read/write endpoint behind the review queue on
- * `/dashboard/admin/charts`.
- *
- * The page itself stays statically prerendered and unauthenticated, because
- * what it renders is a build artefact from this repo rather than anyone's data
- * (see the tools band note in app/dashboard/_studio/nav.ts). Only the *queue*
- * is gated, and it lives here:
- *
- *   GET    → every mark, so the gallery can color its figures and list what
- *            is outstanding.
- *   PUT    → set or clear one chart's mark, with an optional note, or, with
- *            `approve: true`, sign off a redraw so it stops showing as waiting
- *            to be looked at.
- *   DELETE → record (or withdraw) a request to delete a chart from the
- *            repository. It does not delete anything; see below.
- *
- * That split is why this endpoint returns no chart data: the SVG is already on
- * the page. A non-admin gets the gallery and a 403 from this route, which is
- * the correct outcome — they can look at the figures and cannot queue work.
- *
- * Marks live in D1 `dataslope-illustrations`, table `chart_regen_marks`
- * (binding `ILLUSTRATIONS_DB`; see lib/charts/regenMarks.ts). The binding is
- * optional: without it GET answers with `available: false` and PUT answers
- * 503, so a deployment that has not run the migration yet degrades to a
- * read-only gallery instead of erroring.
- *
- * ── What DELETE does, and why it is not a delete ───────────────────────────
- *
- * A chart is not a record. It is `charts/<slug>.mjs`, a source file in this
- * repository, compiled to SVG by scripts/build-charts.mjs and baked into the
- * deployed bundle; the Worker serving this endpoint holds the rendered markup
- * and nothing else. Removing a chart is a commit, and a commit is something a
- * person or a coding agent makes.
- *
- * So DELETE records the *decision* rather than performing it: it stamps
- * `delete_requested_at` on the chart's row, and the repository work reads that
- * back and does the removal. That is the same split `marked` already uses for
- * redraws, and for the same reason: the reviewer is in a browser looking at the
- * figure, and the work happens in a checkout. The SQL for reading the queue and
- * clearing a request once the deletion has landed is in
- * `migrations/illustrations/0004_…`.
- *
- * It is a toggle, so a request made by mistake can be withdrawn from the same
- * button rather than needing a hand-written UPDATE.
+ * Admin-only endpoint behind the chart review queue. GET returns every mark,
+ * PUT sets/clears a mark or (`approve: true`) signs off a redraw, DELETE
+ * toggles `delete_requested_at` — it records the decision, never deletes:
+ * a chart is a source file, so removal happens as a commit in a checkout
+ * (see migrations/illustrations/0004_…). Marks live in D1
+ * `dataslope-illustrations`.`chart_regen_marks` (binding ILLUSTRATIONS_DB);
+ * without the binding GET answers `available: false` and PUT 503, degrading
+ * to a read-only gallery.
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { requireAdmin } from "@/lib/auth/admin";
-// The slug index, NOT the full manifest: this route only ever asks "does
-// this slug exist?", and API routes compile as their own bundler graph, so
-// importing charts.js here shipped a second copy of every chart's serialized
-// SVG in the deployed Worker (~891 KiB gzipped of a ~9.7 MiB budget).
+// The slug index, NOT the full manifest: importing charts.js here would ship
+// a second copy of every chart's SVG in the Worker (~891 KiB gzipped).
 import chartSlugs from "@/lib/generated/chart-slugs";
 import {
   approveRegenMark,
@@ -64,17 +26,9 @@ export const dynamic = "force-dynamic";
 
 const knownSlugs = new Set<string>(chartSlugs);
 
-/**
- * Why the queue is read-only, when it is.
- *
- * These are two different problems with two different fixes and they used to
- * arrive as one boolean, so the gallery reported "not bound" for both. That is
- * the wrong sentence in the commoner case by far: the binding is declared in
- * wrangler.jsonc and is almost always present, while the *table* is missing on
- * any deployment where `db:migrate:illustrations:remote` has not been run since
- * the chart queue landed. Someone reading "not bound" goes looking at bindings
- * and finds nothing wrong.
- */
+/** Why the queue is read-only: `unbound` (missing binding) and `unreadable`
+ *  (usually the migration not applied) have different fixes, so they are
+ *  reported separately. */
 export type ChartQueueState = "ok" | "unbound" | "unreadable";
 
 export interface ChartMarksPayload {
@@ -112,11 +66,8 @@ export async function GET(request: Request): Promise<Response> {
       marks = await listRegenMarks(db);
       state = "ok";
     } catch (err) {
-      // Almost always the migration not having been applied to this database:
-      // `chart_regen_marks` arrived after `dataslope-illustrations` already
-      // existed, so a deployment that never re-ran the migration has a bound
-      // binding and no table. Either way, reviewing the figures is still
-      // useful without the queue, so this degrades rather than throws.
+      // Almost always the `chart_regen_marks` migration not applied to this
+      // database; degrade to read-only rather than throw.
       console.error("chart marks read failed", err);
       state = "unreadable";
     }
@@ -147,15 +98,13 @@ export async function PUT(request: Request): Promise<Response> {
   }
 
   const slug = typeof body.slug === "string" ? body.slug : "";
-  // Only slugs that exist in the generated manifest can be marked, so the queue
-  // can never accumulate rows pointing at a chart that was deleted or renamed.
+  // Only manifest slugs can be marked, so the queue never accumulates rows
+  // for deleted or renamed charts.
   if (!slug || !knownSlugs.has(slug)) {
     return json({ error: "Unknown chart slug." }, 400);
   }
 
   try {
-    // Two writes share this endpoint because they are two halves of one round
-    // trip: `approve: true` signs off a redraw, anything else sets the mark.
     const mark = body.approve
       ? await approveRegenMark(db, { promptId: slug, approvedBy: gate.user.id })
       : await upsertRegenMark(db, {
@@ -171,16 +120,7 @@ export async function PUT(request: Request): Promise<Response> {
   }
 }
 
-/**
- * Record (or withdraw) a request to delete one chart from the repository.
- *
- * Admin-gated and available everywhere, unlike the filesystem delete this
- * replaced: writing a row is something the Worker can actually do, and the
- * decision is worth recording from wherever the reviewer happens to be.
- *
- * The slug still has to be a key of the generated manifest, so the queue can
- * never accumulate requests pointing at a chart that does not exist.
- */
+/** Record (or withdraw) a request to delete one chart from the repository. */
 export async function DELETE(request: Request): Promise<Response> {
   const { env } = getCloudflareContext();
   const gate = await requireAdmin(env, request);
@@ -204,8 +144,7 @@ export async function DELETE(request: Request): Promise<Response> {
   try {
     const mark = await requestDeletion(db, {
       promptId: slug,
-      // Absent means "request it": the button that sends no flag is the one
-      // asking for deletion, and withdrawing is the explicit `false`.
+      // Absent means "request it"; withdrawing is the explicit `false`.
       requested: body.requested !== false,
       reason: typeof body.reason === "string" ? body.reason : "",
       requestedBy: gate.user.id,

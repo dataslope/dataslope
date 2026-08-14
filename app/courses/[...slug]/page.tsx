@@ -1,14 +1,7 @@
 /**
- * Catch-all route for course lessons, renders an MDX page resolved from
- * the Fumadocs `courseSource` loader at `/courses/<course>/<lesson>`.
- *
- * Static params are generated from the source so every MDX file under
- * `content/courses/` becomes a pre-rendered page at build time. Calling
- * `notFound()` for unknown slugs lets Next.js render its standard 404.
- *
- * The catch-all is REQUIRED (`[...slug]`, not `[[...slug]]`) because the
- * bare `/courses` URL is the course-catalog index page
- * (`app/courses/page.tsx`), not a docs page.
+ * Catch-all route for course lessons: renders MDX resolved from the Fumadocs
+ * `courseSource` loader. `[...slug]` (not `[[...slug]]`) is required — the
+ * bare `/courses` URL is the catalog index page.
  */
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -39,8 +32,7 @@ import {
   type BreadcrumbItem,
 } from "@/lib/structuredData";
 
-// Lessons live at `content/courses/<page.path>` on the default branch, so the
-// "Open in GitHub" action links straight to the page source.
+// "Open in GitHub" links straight to the lesson source on the default branch.
 const GITHUB_BLOB_BASE =
   "https://github.com/dataslope/dataslope/blob/main/content/courses";
 
@@ -53,25 +45,18 @@ export default async function CoursePage(props: CoursePageProps) {
   const page = courseSource.getPage(params.slug);
   if (!page) notFound();
 
-  // The docs collection uses `dynamic` mode (see `source.config.ts`), so the
-  // compiled MDX body and TOC are fetched on demand here rather than being
-  // bundled with the route. Frontmatter fields (title, description, full)
-  // remain available directly on `page.data`.
+  // The docs collection uses `dynamic` mode (source.config.ts): compiled MDX
+  // body + TOC are fetched on demand rather than bundled with the route.
   const { body: MDX, toc } = await page.data.load();
 
-  // `markdownUrl` resolves to the lesson's raw-Markdown mirror, a static
-  // asset emitted into `public/courses/` at build time by
-  // `scripts/build-course-md.mjs`. The `MarkdownCopyButton` fetches it for
-  // the clipboard; `ViewOptionsPopover` links to it ("View as Markdown") and
-  // builds the "Open in ChatGPT/Claude" shortcuts, alongside the GitHub
-  // source link.
+  // The lesson's raw-Markdown mirror, emitted into `public/courses/` at build
+  // time by `scripts/build-course-md.mjs`; the copy button and view-options
+  // popover consume it.
   const markdownUrl = `${page.url}.md`;
   const githubUrl = `${GITHUB_BLOB_BASE}/${page.path}`;
 
-  // --- JSON-LD: breadcrumb on every lesson, Course on course landing pages ---
-  // The first slug segment is the course folder; its meta.json carries the
-  // human course name + `root` flag (the index page's own frontmatter title is
-  // usually "Welcome", not the course name).
+  // JSON-LD: breadcrumb on every lesson, Course on landing pages. meta.json
+  // carries the course name (the index page's own title is usually "Welcome").
   const slugs = page.slugs;
   const courseSlug = slugs[0];
   const courseMeta = courseSlug ? await getCourseMeta(courseSlug) : null;
@@ -86,8 +71,7 @@ export default async function CoursePage(props: CoursePageProps) {
       url: absUrl(`/courses/${courseSlug}`),
     });
   }
-  // The course-root crumb above already represents the page itself; only add a
-  // leaf crumb for actual lessons.
+  // The course-root crumb already represents the page; only lessons get a leaf.
   if (!isCourseRoot) {
     crumbs.push({ name: page.data.title, url: absUrl(page.url) });
   }
@@ -104,12 +88,9 @@ export default async function CoursePage(props: CoursePageProps) {
   }
 
   return (
-    // Each course folder's meta.json sets `root: true`, so Fumadocs scopes the
-    // sidebar and breadcrumb tree to that course (the root folder's title is the
-    // course name). `includeRoot: true` adds that root as the breadcrumb's
-    // leading crumb, linking to the course index, which surfaces the course
-    // name on every lesson page. Without it the breadcrumb excludes the root,
-    // and since the course is the only node in scope it would render nothing.
+    // meta.json's `root: true` scopes the sidebar/breadcrumb tree to the
+    // course; `includeRoot` adds the course as the leading crumb — without it
+    // the breadcrumb would render nothing (the course is the only node in scope).
     <DocsPage toc={toc} full={page.data.full} breadcrumb={{ includeRoot: true }}>
       <JsonLd data={structuredData} />
       <DocsTitle>{page.data.title}</DocsTitle>
@@ -118,10 +99,8 @@ export default async function CoursePage(props: CoursePageProps) {
           <MarkdownDescription>{page.data.description}</MarkdownDescription>
         </DocsDescription>
       ) : null}
-      {/* Inline styles (not Tailwind utilities) on purpose: `docs.css` runs
-          Tailwind with `source(none)` and only scans Fumadocs's own dist, so
-          utility classes authored here would never be generated. The buttons
-          themselves are Fumadocs components and keep their compiled styles. */}
+      {/* Inline styles on purpose: `docs.css` runs Tailwind with
+          `source(none)`, so utility classes authored here are never generated. */}
       <div
         style={{
           display: "flex",
@@ -136,16 +115,13 @@ export default async function CoursePage(props: CoursePageProps) {
         <ViewOptionsPopover markdownUrl={markdownUrl} githubUrl={githubUrl} />
       </div>
       <DocsBody>
-        {/* Output this lesson's runnable blocks produced when the site was
-            built, so the page reads end to end before anyone presses Run.
-            Only this lesson's slice crosses to the client; the manifest
-            itself stays on the server. */}
+        {/* Build-time outputs for this lesson's runnable blocks; only this
+            lesson's slice crosses to the client. */}
         <BlockOutputsProvider
           outputs={lessonBlockOutputs(`content/courses/${page.path}`)}
         >
-          {/* React blocks render their result the same way web blocks do,
-              but their bundle is compiled by a workflow rather than derived
-              at render time — see lib/reactBundles.ts. */}
+          {/* React block bundles are compiled by a workflow, see
+              lib/reactBundles.ts. */}
           <ReactBundlesProvider
             bundles={lessonReactBundles(`content/courses/${page.path}`)}
           >
@@ -161,36 +137,12 @@ export async function generateStaticParams() {
   return courseSource.generateParams();
 }
 
-// Serve ONLY the params enumerated above; anything else 404s without being
-// rendered. The site is fully static (no ISR, nothing revalidates), so a slug
-// outside that set can never become valid between deploys and rendering it is
-// pure waste — but the waste was not the expensive part.
-//
-// With the default (`true`), an unmatched `/courses/*` path was rendered on
-// demand and OpenNext cached the resulting not-found page into whichever build
-// folder was live: ~1.8 MB with `revalidate: false`, i.e. kept forever, for a
-// URL nobody will request twice. The mechanism is unbounded in the number of
-// DISTINCT bad URLs — a crawler working through stale links, or anything
-// hitting `/courses/<random>`, mints a fresh 1.8 MB object and a full SSR
-// render per unique path — and those writes also landed in a folder the
-// cleanup job was dating by its newest object, which held four folders open
-// for hours past their deploy (see .github/workflows/r2-cache-cleanup.yml).
-// Observed volume was low when measured on 2026-08-14 (14 entries over ~2
-// days), so this closed a design hole rather than an incident.
-//
-// Real lessons reached by the flat one-segment URL are redirected to their
-// canonical path a phase earlier, in next.config.ts, so this only ever sees
-// paths that genuinely do not exist (see lib/courseAliasRedirects.ts).
-//
-// Nothing that renders today can be lost to this. The prerendered set is
-// unchanged — `generateStaticParams` already returned exactly
-// `courseSource.generateParams()`, which without i18n configured is literally
-// `getPages().map((page) => ({ slug: page.slugs }))` (fumadocs-core's loader),
-// the same page set `getPage()` resolves against and `app/sitemap.ts`
-// enumerates. So a slug this route can resolve is a slug that was already
-// prerendered, course landing pages (`index.mdx`, one segment) included. All
-// that changes is the fate of params OUTSIDE that set: previously rendered on
-// demand and cached, now 404 outright.
+// Serve only the prerendered params; everything else 404s. The site is fully
+// static, so an unknown slug can never become valid between deploys — and with
+// the default (`true`), every distinct bad URL got an on-demand render plus a
+// ~1.8 MB not-found page cached forever by OpenNext. Flat one-segment lesson
+// URLs are redirected earlier in next.config.ts (lib/courseAliasRedirects.ts),
+// so this only sees paths that genuinely don't exist.
 export const dynamicParams = false;
 
 export async function generateMetadata(
@@ -201,8 +153,7 @@ export async function generateMetadata(
   if (!page) return {};
 
   const { title, description } = page.data;
-  // `page.url` is the lesson's canonical path (e.g. /courses/python-basics/loops).
-  // Relative here, Next resolves it against `metadataBase` (app/layout.tsx).
+  // Relative canonical; Next resolves it against `metadataBase` (app/layout.tsx).
   const url = page.url;
 
   return {

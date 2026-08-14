@@ -1,25 +1,11 @@
 "use client";
 
 /**
- * Test users section, create disposable accounts for exercising
- * member-gated features (AI autocomplete is pro-only; Ask AI budgets differ
- * by tier) without touching real accounts or a billing system.
- *
- * How it works: creation goes through Better Auth's admin `create-user`
- * endpoint (server-side admin check included), passing `data: { plan,
- * emailVerified: true }`, so test users are born verified (no email
- * round-trip; their @dataslope.test addresses couldn't receive one anyway)
- * with the chosen membership plan. No verification email is ever sent on
- * this path, unlike normal sign-up.
- *
- * Test accounts are identified purely by the reserved @dataslope.test email
- * domain (see TEST_EMAIL_DOMAIN): that's what this page lists, and what the
- * Users table badges as "Test". Passwords are only shown at creation time,
- * to get into an existing test account, impersonate it (or remove and
- * recreate it).
- *
- * Presentation follows the soft design kit in `_components/shared.tsx`; the
- * account list renders as a table on desktop and stacked cards on mobile.
+ * Test users section: disposable accounts for exercising member-gated
+ * features. Creation goes through Better Auth's admin `create-user` with
+ * `data: { plan, emailVerified: true }` (no verification email; the reserved
+ * @dataslope.test addresses can't receive mail). Test accounts are identified
+ * purely by that domain. Passwords are only shown at creation time.
  */
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -84,14 +70,11 @@ interface CreatedAccount {
 
 const LIST_LIMIT = 200;
 const MAX_BATCH = 10;
-/** Backstop on the pagination loop, 50 pages of 200 is far beyond any
- *  plausible test-account count and keeps a server bug from looping forever. */
+/** Backstop so a server bug can't loop the pagination forever. */
 const MAX_LIST_PAGES = 50;
 
-/** Random base-36 slug from the Web Crypto CSPRNG. These slugs become live
- *  credentials, default passwords and sign-in-able email prefixes on
- *  pre-verified (often Pro) accounts, so Math.random()'s guessable output
- *  isn't good enough. */
+/** Random base-36 slug from the Web Crypto CSPRNG. These become live
+ *  credentials on pre-verified accounts, so Math.random() isn't good enough. */
 function randomSlug(length = 5): string {
   const bytes = crypto.getRandomValues(new Uint8Array(length));
   return Array.from(bytes, (b) => (b % 36).toString(36)).join("");
@@ -103,9 +86,8 @@ export function TestUsersClient() {
   // --- Creation form -------------------------------------------------------
   const [plan, setPlan] = useState<"free" | "pro">("pro");
   const [count, setCount] = useState(1);
-  // Filled client-side after mount: a random default in the prerendered HTML
-  // would mismatch on hydration, and a fixed default password would be public
-  // knowledge (this repo) on live test accounts.
+  // Filled client-side after mount: a random default in prerendered HTML would
+  // mismatch on hydration, and a fixed default would be public in this repo.
   const [password, setPassword] = useState("");
   const [emailPrefix, setEmailPrefix] = useState("");
   const [creating, setCreating] = useState(false);
@@ -132,10 +114,9 @@ export function TestUsersClient() {
     setLoading(true);
     setError(null);
     setDenied(false);
-    // Filter server-side (email ends with the reserved domain) and page
-    // through EVERY match. Filtering one newest-first page client-side would
-    // hide any test account older than the newest LIST_LIMIT sign-ups, and
-    // "Remove all" would silently skip it while claiming the cleanup is done.
+    // Filter server-side and page through EVERY match: a client-side filter
+    // of one page would hide older test accounts, and "Remove all" would
+    // silently skip them.
     try {
       const collected: TestUser[] = [];
       for (let page = 0; page < MAX_LIST_PAGES; page++) {
@@ -167,7 +148,7 @@ export function TestUsersClient() {
         const totalMatches = data?.total ?? collected.length;
         if (batch.length === 0 || collected.length >= totalMatches) break;
       }
-      // isTestEmail is the same domain rule, a belt-and-braces re-check.
+      // Belt-and-braces re-check of the domain rule.
       setUsers(collected.filter((u) => isTestEmail(u.email)));
     } catch {
       setError("Couldn't reach the server. Please try again.");
@@ -213,9 +194,8 @@ export function TestUsersClient() {
           password: pw,
           name: `Test ${label} ${slug}`,
           role: "user",
-          // `emailVerified: true` skips verification (a @dataslope.test address
-          // can't receive mail); `plan` sets the membership tier directly,
-          // exactly what a billing webhook would do.
+          // Skips verification (the address can't receive mail); `plan` sets
+          // the tier directly.
           data: { plan, emailVerified: true },
         });
         if (createErr) {
@@ -620,9 +600,7 @@ export function TestUsersClient() {
                         const isBusy = busyId === user.id;
                         return (
                           <TableRow key={user.id} className={rowClass}>
-                            {/* w-full + max-w-0: take the leftover table
-                                width, but still truncate instead of
-                                stretching it. */}
+                            {/* w-full + max-w-0: take leftover width, still truncate. */}
                             <TableCell className={`${cellClass} w-full max-w-0`}>
                               <div className="min-w-0">
                                 <div className="truncate font-medium">

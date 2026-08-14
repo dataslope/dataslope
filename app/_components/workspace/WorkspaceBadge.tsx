@@ -271,18 +271,14 @@ export function WorkspaceBadge({
     [onManagerOpenChange],
   );
   const [registry, setRegistry] = useState<WorkspaceEntry[]>([]);
-  // Cached byte-size estimates for the recent workspaces, prefetched
-  // whenever the popover opens. State is retained between opens so
-  // subsequent opens render the previous size synchronously and update
-  // in place when the fresh estimate lands.
+  // Byte-size estimates for recent workspaces, prefetched on popover open.
+  // Retained between opens so the previous size renders synchronously.
   const [popoverSizes, setPopoverSizes] = useState<Map<string, number>>(
     () => new Map(),
   );
 
-  // Hydrate registry on the client only, `getWorkspaceRegistry` reads
-  // localStorage which is undefined on the server. Re-read whenever the
-  // popover or manager is opened so we always reflect deletions from
-  // other tabs.
+  // Client-only hydration (localStorage). Re-read on popover/manager open to
+  // reflect deletions from other tabs.
   const refreshRegistry = useCallback(() => {
     setRegistry(getWorkspaceRegistry());
   }, []);
@@ -292,7 +288,6 @@ export function WorkspaceBadge({
     refreshRegistry();
   }, [refreshRegistry, activeWorkspaceId]);
 
-  // Recent = workspaces for this playground sorted by lastUsedAt desc.
   const recent = useMemo(
     () =>
       registry
@@ -302,9 +297,8 @@ export function WorkspaceBadge({
     [registry, playgroundId],
   );
 
-  // Cloud backups for this playground. Cloud saves share ids with local
-  // workspaces, so `cloudById` decorates local rows with their backup and
-  // `cloudOnly` is the remainder, backups with no copy on this device.
+  // Cloud saves share ids with local workspaces: `cloudById` decorates local
+  // rows, `cloudOnly` is backups with no copy on this device.
   const cloud = useCloudBackups(playgroundId, popoverOpen || managerOpen);
   const { refresh: refreshCloud } = cloud;
   const cloudById = useMemo(() => {
@@ -323,11 +317,8 @@ export function WorkspaceBadge({
   );
   const showCloud = cloud.available && !cloud.signedOut;
   // Auto-sync is code-playgrounds-only: a SQL backup carries a full binary
-  // database image, too heavy to push on every change (and sample-database
-  // loads would spam it), so SQL keeps the manual Save/Back-up controls
-  // instead of auto-syncing. (Local OPFS persistence is separate and stays
-  // automatic; identical re-uploads are also skipped via content hash in
-  // saveCloudWorkspace.)
+  // database image, too heavy to push on every change, so SQL keeps the
+  // manual Save/Back-up controls.
   const autoSyncActive = showCloud && !isSqlPlayground(playgroundId);
 
   const [backupBusy, setBackupBusy] = useState(false);
@@ -363,25 +354,21 @@ export function WorkspaceBadge({
     [playgroundId, activeWorkspaceId],
   );
 
-  // Backup state of the ACTIVE workspace, surfaced as a dot on the pill:
-  // gray = in this browser only, green = backed up, amber = opened since
-  // its last backup. No dot for guests (nothing to report).
+  // Backup state of the active workspace, surfaced as a dot on the pill.
+  // No dot for guests.
   const activeEntry = useMemo(
     () => registry.find((e) => e.id === activeWorkspaceId),
     [registry, activeWorkspaceId],
   );
-  // Not in the registry → an unsaved draft. "Save locally" names it; once
-  // registered, local persistence is automatic (OPFS), so the Save menu's
-  // local option flips to a passive "saved" state.
+  // Not in the registry → an unsaved draft.
   const isDraft = !activeEntry;
   const activeMeta = activeWorkspaceId
     ? cloudById.get(activeWorkspaceId)
     : undefined;
   const activeStale =
     !!activeMeta && isBackupStale(activeEntry, activeMeta);
-  // The dot only distinguishes "backed up" from "not backed up". "Opened
-  // since" stays a textual note: the registry tracks opens, not edits, so an
-  // amber dot here fired on every reopen and taught users to ignore it.
+  // Dot only distinguishes backed-up from not; "opened since" stays textual
+  // (an amber dot fired on every reopen and taught users to ignore it).
   let backupDot: "local" | "fresh" | null = null;
   if (showCloud && cloud.loaded && activeWorkspaceId) {
     backupDot = !activeMeta ? "local" : "fresh";
@@ -392,11 +379,9 @@ export function WorkspaceBadge({
       : ""
   }`;
 
-  // Unsynced local work with the user now signed in: a saved workspace with no
-  // cloud backup, or a draft the user actually changed (the persisted dirty
-  // latch, so a pristine default never uploads). Makes signing in sufficient
-  // to get guest work backed up, no fresh edit required. A successful backup
-  // refreshes the cloud list, which flips this off.
+  // Unsynced local work with the user now signed in: a saved workspace with
+  // no backup, or a draft the user actually changed (dirty latch, so a
+  // pristine default never uploads). Signing in alone triggers the backup.
   const needsInitialBackup =
     autoSyncActive &&
     cloud.loaded &&
@@ -404,11 +389,9 @@ export function WorkspaceBadge({
     !activeMeta &&
     (!isDraft || isWorkspaceDirty(activeWorkspaceId));
 
-  // Signed-in playgrounds back up to the cloud automatically, there is no
-  // manual "Back up" button. The first change to an unsaved draft promotes it
-  // (so the backup lands on a stable, listed workspace) and then syncs. OPFS
-  // stays the local source of truth, so an offline or failed sync never loses
-  // work; the hook retries when the connection returns.
+  // Automatic cloud backup. The first change to a draft promotes it, then
+  // syncs; OPFS stays the local source of truth so a failed sync never loses
+  // work.
   const autoSync = useWorkspaceAutoSync({
     enabled: autoSyncActive,
     activeWorkspaceId,
@@ -425,10 +408,8 @@ export function WorkspaceBadge({
     needsInitialBackup,
   });
 
-  // Prefetch sizes when the popover opens. Each `estimateWorkspaceSize`
-  // call is independent so we fire them in parallel and stream results
-  // into the size map as they land, no flicker on subsequent opens
-  // because the previous map is retained between renders.
+  // Prefetch sizes on popover open, in parallel, streaming results into the
+  // retained map (no flicker on subsequent opens).
   useEffect(() => {
     if (!popoverOpen) return;
     let cancelled = false;
@@ -700,9 +681,8 @@ export function WorkspaceBadge({
       </Popover.Root>
       )}
 
-      {/* Code playgrounds auto-sync: a passive status replaces the manual
-          Save/Back-up control. SQL playgrounds and guests keep the Save menu
-          (guests to name a browser-saved draft; SQL to back up on demand). */}
+      {/* Auto-sync playgrounds show a passive status; SQL and guests keep
+          the manual Save menu. */}
       {!hideBadge && autoSyncActive && (
         <WorkspaceSyncStatus
           status={autoSync}
@@ -840,8 +820,7 @@ function SaveWorkspaceDialog({
   onConfirm,
 }: {
   open: boolean;
-  /** True for the Save menu's "Save locally + back up" path, the copy and
-   *  the primary button reflect that a cloud backup follows the save. */
+  /** True for the "Save locally + back up" path (a cloud backup follows). */
   alsoBackUp: boolean;
   defaultName: string;
   onClose: () => void;
@@ -994,9 +973,8 @@ function WorkspaceManagerDrawer({
     [refreshCloud],
   );
 
-  // Recompute byte sizes whenever the drawer opens or the workspace list
-  // changes. We rebuild the full map rather than diffing because the
-  // recalculation is cheap (one async pass per workspace, no UI block).
+  // Recompute byte sizes on drawer open / list change; rebuilding the full
+  // map is cheap.
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
@@ -1238,9 +1216,8 @@ function WorkspaceManagerDrawer({
                           {showCloud &&
                             cloudById.has(ws.id) &&
                             (isSqlPlayground(playgroundId) ? (
-                              // SQL backups replay into the current session
-                              // database, the workspace itself isn't touched,
-                              // so no confirmation is needed.
+                              // SQL backups replay into the session database
+                              // without touching the workspace; no confirmation.
                               <ActionButton
                                 label="Open backup"
                                 onClick={() =>
@@ -1449,9 +1426,7 @@ function WorkspaceManagerDrawer({
 }
 
 /** Confirmation before a code-playground restore: pulling the backup
- *  replaces the workspace's files on this device (the same clobber the old
- *  Cloud dialog guarded with "Replace local copy?", now framed from the
- *  workspace's point of view). */
+ *  replaces the workspace's files on this device. */
 function RestoreBackupDialog({
   target,
   onClose,

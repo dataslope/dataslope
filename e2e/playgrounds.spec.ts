@@ -1,21 +1,12 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// E2E coverage for every playground route. Each test loads the route,
-// waits for the runtime to finish initializing (Run becomes enabled),
-// presses Run on the default Hello World example, and asserts that the
-// expected output snippet shows up in the output pane. This is what
-// catches regressions where the page renders but execution silently
-// fails.
-//
-// The browsercc-, Pyodide- and WebR-backed playgrounds fetch real
-// runtimes from a CDN on first load, so the per-test timeouts in
-// `playwright.config.ts` are intentionally generous.
+// E2E coverage for every playground route: wait for the runtime, run the
+// default example, assert the expected output. Catches pages that render but
+// silently fail to execute. CDN runtime downloads make the timeouts generous.
 
 async function waitForRuntimeReady(page: Page) {
-  // The Run button is disabled until `setLoaded(true)` fires, which
-  // only happens after `adapter.init()` resolves successfully. If
-  // initialization throws, the loading banner shows the error message
-  //, surface that instead of waiting out the timeout.
+  // Run is disabled until adapter.init() resolves; if init throws, the
+  // loading banner shows the error — surface that instead of timing out.
   await page.waitForFunction(
     () => {
       const banner = document.querySelector(".loading-banner, .pg-status");
@@ -62,11 +53,9 @@ async function runAndCollectOutput(page: Page) {
 
 test.describe("Playgrounds (fast)", () => {
   test("JavaScript runs the default example", async ({ page }) => {
-    // Regression guard: almostnode's bundle is large enough that Turbopack
-    // splits the worker into multiple chunks. A classic Worker would load
-    // them via importScripts() and throw "Identifier 'e1' has already been
-    // declared" before our adapter ever wires up. The fix is `type:
-    // "module"` in the Worker constructor, catch any regression here.
+    // Regression guard: Turbopack splits the worker bundle into chunks; a
+    // classic Worker loads them via importScripts() and throws "Identifier
+    // 'e1' has already been declared". Fix is type: "module" on the Worker.
     const initErrors: string[] = [];
     page.on("pageerror", (err) => initErrors.push(err.message));
     page.on("console", (msg) => {
@@ -155,9 +144,8 @@ test.describe("Playgrounds (fast)", () => {
     // First readiness wait covers the esbuild-wasm toolchain download.
     await waitForRuntimeReady(page);
 
-    // The react playground opens as the main/App/styles trio in the
-    // regular tabbed editor (one tab per file), with the Files rail
-    // available like the JS/TS playgrounds.
+    // React opens as the main/App/styles trio in the tabbed editor with the
+    // Files rail, unlike web's split panes.
     await expect(page.locator(".playground-tab")).toHaveCount(3, {
       timeout: 30_000,
     });
@@ -191,10 +179,8 @@ test.describe("Playgrounds (fast)", () => {
     await page.goto("/playground/c");
     await waitForRuntimeReady(page);
     const cells = await runAndCollectOutput(page);
-    // The default Hello World example prints "Hello, C Playground!".
-    // Anything else (in particular a clang error or runtime crash)
-    // means the browsercc toolchain or WASI shim failed to initialize
-    //, exactly the regression this test exists to catch.
+    // Anything but the greeting (a clang error, a WASI crash) means the
+    // browsercc toolchain failed to initialize.
     const stdout = cells.find((c) => c.type === "stdout");
     expect(stdout, "expected a stdout cell").toBeTruthy();
     expect(stdout!.body).toContain("Hello, C Playground!");
@@ -209,7 +195,6 @@ test.describe("Playgrounds (fast)", () => {
     await page.goto("/playground/cpp");
     await waitForRuntimeReady(page);
     const cells = await runAndCollectOutput(page);
-    // The default Hello World example prints "Hello, C++ Playground!".
     const stdout = cells.find((c) => c.type === "stdout");
     expect(stdout, "expected a stdout cell").toBeTruthy();
     expect(stdout!.body).toContain("Hello, C++ Playground!");
@@ -224,9 +209,7 @@ test.describe("Playgrounds (fast)", () => {
     await page.goto("/playground/java");
     await waitForRuntimeReady(page);
     const cells = await runAndCollectOutput(page);
-    // The default Hello World example prints "Hello, Java Playground!".
-    // CheerpJ may emit -Xlint warnings on stderr from javac; we only
-    // assert that stdout includes the greeting.
+    // CheerpJ may emit -Xlint warnings on stderr; only stdout is asserted.
     const stdout = cells.find((c) => c.type === "stdout");
     expect(stdout, "expected a stdout cell").toBeTruthy();
     expect(stdout!.body).toContain("Hello, Java Playground!");
@@ -236,7 +219,6 @@ test.describe("Playgrounds (fast)", () => {
     await page.goto("/playground/csharp");
     await waitForRuntimeReady(page);
     const cells = await runAndCollectOutput(page);
-    // The default Hello World example prints "Hello, C# Playground!".
     const stdout = cells.find((c) => c.type === "stdout");
     expect(stdout, "expected a stdout cell").toBeTruthy();
     expect(stdout!.body).toContain("Hello, C# Playground!");
@@ -252,10 +234,8 @@ test.describe("Packages button visibility", () => {
     // Desktop button: rendered only when packages.length > 0.
     await expect(page.getByRole("button", { name: "Packages" })).toHaveCount(0);
 
-    // Mobile button lives inside the menu drawer, which only exists in
-    // the layout at the mobile breakpoint (≤768px in `playground.css`).
-    // Shrink the viewport so the hamburger becomes visible, then open
-    // it and verify the Packages action is omitted.
+    // The mobile Packages action lives in the menu drawer, which only exists
+    // at the mobile breakpoint (≤768px); shrink the viewport to reach it.
     await page.setViewportSize({ width: 390, height: 844 });
     await page.locator(".mobile-menu-btn").click();
     await expect(

@@ -1,43 +1,11 @@
 /**
- * Renders the markup a reader expects inside a plain-string JSX attribute.
- *
- * Some of what a learner reads arrives as a JSX *attribute* rather than as MDX
- * body text: a callout's `title`, a `<Figure>`'s `caption`, a chart spec's
- * exported `caption`. MDX hands those over as plain strings, so markdown never
- * touches them, and markup that renders one line below in the body arrived on
- * the page as literal punctuation. It reads as a typo in the content, which is
- * why it went unnoticed across 1,117 callouts.
- *
- * Three pieces of markup are honoured, and no more: code spans, strong, and
- * emphasis.
- *
- * ## Code spans win, and they win first
- *
- * `` `scan_*()` `` is a real caption on the Polars reading-and-writing page.
- * Its asterisks are part of an identifier, so the string is split on code
- * spans *before* emphasis is looked for, and only the text between them is
- * scanned. Anything inside backticks is delivered to `<code>` verbatim.
- *
- * ## Emphasis, with markdown's flanking rule
- *
- * The obvious implementation, a bare `/\*(.+?)\*​/`, is wrong, and one existing
- * callout title proves it: `Why *args, **kwargs?`. Those asterisks are Python
- * syntax, and a naive pass would eat them and silently rewrite the heading of
- * a lesson about the very syntax it deleted.
- *
- * Markdown itself does not have that problem, because a closing delimiter has
- * to be *right-flanking*: preceded by something that is not whitespace. In
- * `Why *args, **kwargs?` every asterisk is preceded by a space, so none of
- * them can close, and the whole string stays literal. That rule is what the
- * patterns below encode, which is why the delimited text may neither begin nor
- * end with a space or another asterisk.
- *
- * Underscores are deliberately not emphasis markers here. They are far more
- * often part of an identifier (`was_missing`, `read_csv`) than an author's
- * intent, and an attribute is exactly where such a name appears bare.
- *
- * A value that is already JSX passes through untouched, so an author who needs
- * anything richer can still write it directly.
+ * Renders markdown-ish markup inside plain-string JSX attributes (callout
+ * titles, Figure captions, …), which MDX hands over untouched. Exactly three
+ * forms: code spans, strong, emphasis. Code spans are split out FIRST so
+ * asterisks inside identifiers (`` `scan_*()` ``) stay literal, and emphasis
+ * encodes markdown's flanking rule so `Why *args, **kwargs?` is not rewritten.
+ * Underscores are deliberately not emphasis markers (identifiers appear bare
+ * in attributes). Non-string values pass through untouched.
  */
 import type { ReactNode } from "react";
 

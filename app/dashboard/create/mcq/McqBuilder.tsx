@@ -138,10 +138,8 @@ export default function McqBuilder() {
       : question.trim().length > 0 &&
         choices.filter((c) => c.text.trim().length > 0).length >= 2;
 
-  // Mode switches convert the current draft in place: form → markdown
-  // serializes, markdown → form re-parses through the same parser the
-  // renderer uses, so what the form shows is exactly what the source
-  // means.
+  // Mode switches convert in place: form → markdown serializes, markdown →
+  // form re-parses through the renderer's own parser.
   const switchMode = (next: "form" | "markdown") => {
     if (next === mode) return;
     saveState.clearError();
@@ -200,8 +198,7 @@ export default function McqBuilder() {
     return <ErrorNotice message={loadError} />;
   }
 
-  // The live-preview column renders the real question card and updates as you
-  // type (markdown serialization is cheap). Remount on content change so a
+  // Live preview updates as you type; remount on content change so a
   // submitted preview resets.
   const previewColumn = previewReady ? (
     <div key={markdown}>

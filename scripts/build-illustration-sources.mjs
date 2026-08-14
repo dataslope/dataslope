@@ -1,38 +1,19 @@
 #!/usr/bin/env node
 /**
  * Record which pristine PNG in R2 each served illustration was made from.
- *
  * Writes `data/illustration-sources.json` (committed), mapping every promoted
  * `<id>-cutout.webp` to the run that produced it.
  *
- * ── Why this is written down ────────────────────────────────────────────────
+ * Written down because re-deriving it (pixel comparison via
+ * scripts/lib/cutouts.mjs) costs tens of minutes and gigabytes of egress, and
+ * `prune-illustration-candidates.mjs` cannot decide what is safe to delete
+ * without it. "Newest run" is not a substitute: unpromoted redraws routinely
+ * sort above the art the site serves, so a prune built on recency would
+ * delete live sources. Ids whose source cannot be identified are listed under
+ * `unresolved`; consumers must treat those as "keep everything".
  *
- * The answer is recoverable at any time — `scripts/lib/cutouts.mjs` finds it by
- * comparing pixels — but recovering it costs a download of every candidate for
- * every id, tens of minutes and a couple of gigabytes of egress. Anything that
- * needs to reason about *all* of the bucket at once therefore wants it as data,
- * not as a search: `prune-illustration-candidates.mjs` cannot decide what is
- * safe to delete without it, and a re-promote at a different quality wants to
- * know which run to pull from without guessing.
- *
- * ── Why not just take the newest run ────────────────────────────────────────
- *
- * Because it is wrong for over a third of the artwork. A redraw is generated
- * before it is judged, and plenty were never promoted, so a later run prefix
- * routinely sits on top of the art the site actually serves. Measured across
- * 284 ids, "newest run" disagreed with the pixel-verified answer for 107 of
- * them — `c-functions` serves from `2026-08-batch75` while `2026-08-unify-v1`
- * sorts later. A prune built on run recency would delete live sources.
- *
- * ── What "unresolved" means, and why it is recorded ─────────────────────────
- *
- * An id whose source cannot be identified is listed under `unresolved` with the
- * best score seen, rather than dropped. Consumers must treat those as "keep
- * everything" — the difference between "verified as superseded" and "not
- * verified" is the whole safety of the prune, and silence would erase it.
- *
- * Reads R2. Never writes to it. Byte-stable output (sorted keys, no
- * timestamps), so re-running on an unchanged bucket produces no diff.
+ * Reads R2, never writes to it. Byte-stable output (sorted keys, no
+ * timestamps).
  *
  * Usage:
  *   node scripts/build-illustration-sources.mjs [options]
@@ -114,9 +95,8 @@ async function main() {
   }
 
   const index = createCandidateIndex();
-  // Every candidate key, so the paired original.png can be recorded next to the
-  // cut-out that identified the run — the prune reasons about whole run
-  // directories, not single objects.
+  // Every candidate key, so the paired original.png can be recorded next to
+  // the cut-out that identified the run.
   const allKeys = new Set(await index.allKeys());
 
   // Keep entries for ids outside this run (so --only is a partial update).
@@ -131,13 +111,10 @@ async function main() {
 
   async function resolveOne(id) {
     const served = readFileSync(join(IMAGES_DIR, `${id}${CUTOUT_SUFFIX}.webp`));
-    // The bytes this mapping was established from. Consumers re-hash the
-    // served file and refuse to act when it no longer matches — a re-promote
-    // or a re-trim can move an id to a different run, and acting on a mapping
-    // that predates that is how a live source gets deleted. A hash rather
-    // than the file's mtime: mtime is per-clone, and the map is byte-stable
-    // on purpose, so an unchanged answer never rewrites the file and its
-    // timestamp would stop advancing exactly when it was relied on.
+    // The bytes this mapping was established from: consumers re-hash the
+    // served file and refuse to act on a mapping that predates a re-promote
+    // or re-trim — that is how a live source gets deleted. A hash, not mtime:
+    // mtime is per-clone and the map is byte-stable on purpose.
     const servedSha = createHash("sha256").update(served).digest("hex");
     const { hit, bestDb } = await index.sourceFor(id, await contentSignature(served));
     done++;

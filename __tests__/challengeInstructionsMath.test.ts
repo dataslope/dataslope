@@ -1,18 +1,9 @@
-// Pins math support in a challenge card's `instructions` prop, and guards the
-// content against the one regression that turning it on can cause.
-//
-// The bug: `instructions` is a *prop*, so the MDX compiler hands it to the
-// component as a plain string and none of the pipeline configured in
-// `source.config.ts` ever touches it. `renderMarkdownInstructions` was parsing
-// it with GFM only, so eighteen challenges across the scientific-computing and
-// statistics courses printed their LaTeX source on the page:
-// `Recall that $\int_{-1}^{1} \sqrt{1 - x^2}\,dx = \pi/2$`.
-//
-// The fix adds `remarkMath` + `rehypeKatex`, which is what `<MultipleChoice>`
-// already does. The risk it introduces is the mirror image: a pair of *literal*
-// dollar signs in an instructions string ("$5 off, or $10 for members") would
-// now be read as a math span and swallowed. The second test below is the guard
-// against that, run over the real content rather than over fixtures.
+// Pins math support in a challenge card's `instructions` prop: it is a plain
+// string prop the source.config.ts pipeline never touches, and GFM-only
+// parsing once printed raw LaTeX on the page. The fix (remarkMath +
+// rehypeKatex) risks the mirror image — a pair of literal dollars ("$5 off,
+// or $10 for members") read as a math span — which the content guard below
+// checks against the real content.
 import fs from "node:fs";
 import path from "node:path";
 
@@ -24,18 +15,11 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 
-/** The *math* half of the plugin list `renderMarkdownInstructions` hands to
- *  react-markdown, mirrored by hand: react-markdown itself needs a DOM, and
- *  these tests run in the Node environment.
- *
- *  `rehypeHighlight` and `labelBareFences` are deliberately absent. They are
- *  the subject of `challengeInstructionsHighlight.test.tsx`, and neither one
- *  can affect a math span: highlighting only visits `pre > code`, and the
- *  fence labeller only rewrites fence lines.
- *
- *  The tree is inspected rather than serialised, so the test needs no HTML
- *  stringifier: `rehype-stringify` is not a dependency of this repo and pulling
- *  one in to assert on a class name would be the tail wagging the dog. */
+/** The math half of renderMarkdownInstructions' plugin list, mirrored by hand
+ *  (react-markdown needs a DOM; these tests run under Node). rehypeHighlight
+ *  and labelBareFences are deliberately absent — covered by
+ *  challengeInstructionsHighlight.test.tsx, and neither can affect a math
+ *  span. The tree is inspected directly, so no HTML stringifier is needed. */
 const pipeline = unified()
   .use(remarkParse)
   .use(remarkGfm)
@@ -84,10 +68,8 @@ describe("challenge instructions markdown", () => {
     expect(text).toContain("\u222b");
     expect(text).toContain("\u03c0");
     expect(text).not.toContain("$");
-    // KaTeX also emits an `<annotation encoding="application/x-tex">` holding
-    // the original TeX, which is how a screen reader and a copy-paste get the
-    // formula back. It is inside the `.katex` subtree and is not displayed, so
-    // its presence in the concatenated text is expected rather than a leak.
+    // KaTeX's <annotation> keeps the original TeX inside .katex (for screen
+    // readers/copy), so its presence in the concatenated text is not a leak.
   });
 
   it("renders display LaTeX", () => {
@@ -119,14 +101,9 @@ function mdxFiles(dir: string): string[] {
   });
 }
 
-/** Blank out fenced blocks and inline code, where `$` is never math, so only
- *  dollars in prose are counted.
- *
- *  The value is read out of the MDX *source*, so it is still a template
- *  literal: its backticks arrive escaped as `\``. Un-escaping them first is
- *  what makes the code fences findable. `\$` is left exactly as it is, because
- *  it survives into the runtime string as a Markdown-escaped dollar and is
- *  never math. */
+/** Blank out fenced blocks and inline code, where `$` is never math. The value
+ *  comes from MDX source, so backticks arrive escaped as `\`` — un-escape
+ *  first so fences are findable. `\$` stays: a Markdown-escaped dollar. */
 function stripCode(value: string): string {
   return value
     .replace(/\\`/g, "`")

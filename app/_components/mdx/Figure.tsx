@@ -1,33 +1,9 @@
 /**
- * Renders an optimized raster image (Recraft topic art, a photo, a diagram, a
- * screenshot, anything under `assets/images/`) inside a lesson or landing page:
- *
- * ```mdx
- * <Figure slug="pandas-groupby-cutout" alt="A giant panda directing a stream of mixed cubes into three colored lanes" priority />
- * ```
- *
- * Whichever way the bytes got there, `scripts/build-images.mjs` records slug →
- * intrinsic size + formats in the generated manifest this component imports,
- * which is what lets the `<img>` reserve layout space (no CLS). `formats` is
- * what decides the markup:
- *
- *   - One format (`["webp"]`) — every image in the repo today. These are
- *     pipeline illustrations promoted straight into `public/images/<slug>.webp`
- *     as the exact bytes to serve, so `<picture>` collapses to a plain `<img>`:
- *     no fallback file is generated, and none is needed (WebP has been
- *     universally supported since 2020).
- *   - Two formats — a raster source under `assets/images/` that the build step
- *     crushed into a `.webp` plus a `.png`/`.jpg` fallback. None exist right
- *     now; the `<source>` branch below stays for when one is added.
- *
- * Named `Figure` (not `Image`) to avoid confusion with `next/image`, and
- * because it renders a `<figure>` and covers any raster image, not just
- * illustrations.
- *
- * A slug with no generated image (its source hasn't been added yet) renders a
- * small "pending" hint while developing and nothing at all in production, so a
- * placement can be authored before its artwork exists without shipping a broken
- * or placeholder box to learners.
+ * Renders an optimized raster image inside a lesson or landing page. The
+ * manifest built by `scripts/build-images.mjs` records slug → intrinsic size +
+ * formats, which lets the `<img>` reserve layout space (no CLS); the last
+ * format is the `<img>` fallback, earlier ones become `<source>`s. A slug with
+ * no generated image shows a dev-only "pending" hint and nothing in production.
  */
 import { ImageIcon } from "lucide-react";
 import imageManifest from "@/lib/generated/images";
@@ -37,9 +13,7 @@ import styles from "./Figure.module.css";
 
 const PUBLIC_BASE = "/images";
 
-// The slug printed under each figure is a regeneration handle for authors (see
-// where it's rendered below), not something a learner should see, so it is
-// development-only.
+// The slug printed under each figure is an authoring handle, dev-only.
 const SHOW_ASSET_ID = process.env.NODE_ENV === "development";
 
 // Output extension → MIME type for the <picture> <source>/<img> elements.
@@ -57,24 +31,11 @@ interface FigureProps {
   slug: string;
   /** Alt text. Pass "" only for a purely decorative image. */
   alt: string;
-  /**
-   * Optional caption shown under the image. Backtick spans render as code
-   * chips and `*asterisks*` as emphasis (see `withInlineMarkup`), so a caption
-   * naming an identifier reads the way the same spelling does in the body.
-   */
+  /** Optional caption; backticks and asterisks render via `withInlineMarkup`. */
   caption?: string;
-  /**
-   * Where the image or the data behind it came from, rendered as a credit
-   * line under the caption. The pipeline illustrations are the site's own, so
-   * most figures need none; a photograph, a screenshot of someone else's
-   * software, or a redrawn figure does.
-   */
+  /** Image/data provenance, rendered as a credit line under the caption. */
   sources?: readonly FigureSource[];
-  /**
-   * Optional cap on display width in px. Omitted by default so the figure
-   * fills the full content width; pass a value only to deliberately hold a
-   * single figure narrower than the column.
-   */
+  /** Optional cap on display width in px; omitted = full content width. */
   maxWidth?: number;
   /** Eager-load + high fetch priority for an above-the-fold hero. */
   priority?: boolean;
@@ -147,13 +108,8 @@ export function Figure({
           <FigureSources sources={sources} />
         </figcaption>
       ) : null}
-      {/* Regeneration handle. The prompt id is the slug with the `-cutout`
-          suffix dropped, which is what `data/illustration-prompts.json` is keyed
-          by and what every pipeline script takes as `--only`. Rendered so a
-          reviewer reading the live page can name the exact image to redo
-          without cross-referencing the gallery, which makes it authoring
-          scaffolding: like the `pending` hint above, it shows only under
-          `next dev` and never on a deployed page. */}
+      {/* Regeneration handle (dev-only): the prompt id is the slug minus the
+          `-cutout` suffix, the key in data/illustration-prompts.json. */}
       {SHOW_ASSET_ID ? (
         <figcaption className={styles.assetId}>
           <code>{slug.replace(/-cutout$/, "")}</code>

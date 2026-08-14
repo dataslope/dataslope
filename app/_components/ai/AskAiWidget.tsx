@@ -1,31 +1,12 @@
 "use client";
 
 /**
- * Floating "Ask AI" launcher + chat panel. Shared by the /learn and /playground
- * surfaces, they differ only in the `collectContext` they pass in. Signed-in
- * only: signed-out users get a sign-in CTA (auth gates the *action*, never the
- * page, so the host page stays statically prerendered).
- *
- * Context model (redesign): the full page is no longer always sent. A single
- * "Auto · N sources" chip above the composer opens a bottom sheet where the
- * user picks a preset — Auto / Full page / Custom — and, in Custom, toggles the
- * individual on-screen sources. "Auto" (the default) sends only what's on
- * screen; lesson text is opt-in and hard-capped server-side. The chosen preset
- * is a remembered global preference; the Custom per-source toggles reset per
- * page. Answer length lives in Settings and is also remembered.
- *
- * One source is on before the reader touches anything: "Page you're on", a
- * ~20-token line naming the page and its course. Without it a question asked
- * with every switch off reached the model with no indication of the page at
- * all — `slug` is used server-side only to resolve the Markdown and never
- * reaches the prompt — so answers came back generic. It is a listed, countable,
- * toggleable source like any other, which is what keeps the chip's count an
- * honest description of the request.
- *
- * The sheet's rows, the chip count, and the send payload are all derived from
- * the same enumeration (`collectPanelSources` + `sourceEnabled`), so what the
- * user sees is what is sent: the widget cap is applied AFTER the per-source
- * toggles, ranked by visibility.
+ * Floating "Ask AI" launcher + chat panel, shared by /learn and /playground
+ * (they differ only in `collectContext`). Signed-in only: auth gates the
+ * action, never the page, so the host page stays statically prerendered.
+ * Invariant: the sheet rows, chip count, and send payload all derive from the
+ * same enumeration (`sourceEnabled`), so what the user sees is what is sent;
+ * the widget cap is applied AFTER per-source toggles, ranked by visibility.
  */
 import {
   useCallback,
@@ -42,11 +23,8 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeHighlight from "rehype-highlight";
 import rehypeKatex from "rehype-katex";
-// Token colors for the code blocks rehype-highlight marks up. The panel floats
-// over lessons (which inline the same theme via docs.css) but also over the
-// playground and the dashboard, which do not — so it brings its own rather than
-// relying on whatever page it happens to be open on. KaTeX's stylesheet is here
-// for the same reason: an answer can contain a formula anywhere the panel opens.
+// The panel floats over pages that don't all inline the highlight/KaTeX
+// styles, so it brings its own.
 import "@/app/hljs.css";
 import "katex/dist/katex.min.css";
 import { normalizeMathDelimiters } from "./mathDelimiters";
@@ -118,9 +96,8 @@ import {
 import styles from "./AskAiPanel.module.css";
 import { useDraggablePanel } from "./useDraggablePanel";
 
-/** Where the closed-state launcher sits, chosen from Settings → "Where the
- *  button lives": a slim square tab docked to the right viewport edge (default),
- *  or the floating pill in the bottom-right corner. Persisted in localStorage. */
+/** Closed-state launcher position (Settings → "Where the button lives");
+ *  persisted in localStorage. */
 type LauncherPlacement = "floating" | "tab";
 const LAUNCHER_PLACEMENT_KEY = "dataslope:ask-ai-placement";
 
@@ -132,12 +109,10 @@ const ANSWER_LENGTH_KEY = "dataslope:ask-ai-answer-length";
 
 interface Props {
   surface: AskAiSurface;
-  /** What the user is looking at, for display copy only, "lesson" on course
-   *  pages, "question set" on interview-prep (which mounts as surface
-   *  "learn" but isn't a lesson), "playground" elsewhere. */
+  /** What the user is looking at, for display copy only. */
   subjectNoun?: string;
-  /** Active playground id (e.g. "sqlite") when on a playground surface, so the
-   *  sign-in CTA can preserve the guest's unsaved workspace across auth. */
+  /** Active playground id, so the sign-in CTA can preserve the guest's unsaved
+   *  workspace across auth. */
   playgroundId?: string;
   collectContext: () => AskAiClientContext;
 }
@@ -173,40 +148,30 @@ const MODE_LABELS: Record<ContextMode, string> = {
   custom: "Custom",
 };
 
-/** A source group, drives its icon, default toggle, and where it maps in the
- *  request payload. */
+/** A source group; drives icon, default toggle, and payload mapping. */
 type SourceGroup = "page" | "lesson" | "code" | "output" | "selection";
 
-/** One on-screen context source as shown in the sheet + counted by the chip.
- *  `id` is a STABLE key (group name, `file:<name>`, or `w:<kind>:<label>` for
- *  registry widgets), so Custom toggles survive widget remounts. */
+/** One on-screen context source (sheet row + chip count). `id` is a STABLE key
+ *  (group name, `file:<name>`, or `w:<kind>:<label>`) so Custom toggles survive
+ *  widget remounts. */
 interface PanelSource {
   id: string;
   group: SourceGroup;
   kind?: AskAiSourceKind;
   label: string;
-  /** Char length of the source's content, for the token estimate. Absent for
-   *  lesson text (its length lives server-side; we show the hard cap). */
+  /** Char length for the token estimate; absent for lesson text (server-side,
+   *  we show the hard cap). */
   chars?: number;
 }
 
-/** Stable override key for a registry widget. Registry ids (`s{n}`) are
- *  reminted on every re-registration, so keying user toggles on them would
- *  silently drop an explicit OFF when the widget remounts. */
+/** Stable override key for a registry widget: registry ids are reminted on
+ *  re-registration, so keying toggles on them would drop an explicit OFF on
+ *  remount. */
 const widgetKey = (kind: string, label: string): string => `w:${kind}:${label}`;
 
-/**
- * The page's own heading, as the reader sees it.
- *
- * The rendered `<h1>` rather than `document.title`, which carries the site
- * suffix from the root layout's title template ("Variables · DataSlope") and
- * would put our own brand into the model's context for no reason. Falls back to
- * the document title with that suffix stripped when a page has no heading.
- *
- * The course name is NOT read here: the server resolves it from the slug
- * against the course catalog, so the collection a path belongs to stays our
- * claim rather than the page's.
- */
+/** The rendered <h1> rather than document.title (which carries the site
+ *  suffix); falls back to the stripped title. Course name is resolved
+ *  server-side from the slug, not read here. */
 function readPageTitle(): string {
   const heading = document.querySelector("main h1, article h1, h1");
   const text = heading?.textContent?.trim();
@@ -214,9 +179,8 @@ function readPageTitle(): string {
   return document.title.replace(/\s*·\s*DataSlope\s*$/i, "").trim().slice(0, 120);
 }
 
-/** Group default: everything on screen is in by default; lesson text is the
- *  one opt-in source. Single source of truth for the sheet UI, the payload
- *  filter, and Custom-override seeding. */
+/** Everything on screen is in by default; lesson text is the one opt-in.
+ *  Single source of truth for sheet UI, payload filter, and override seeding. */
 const defaultSourceOn = (group: SourceGroup): boolean => group !== "lesson";
 
 function sourceEnabled(
@@ -230,14 +194,13 @@ function sourceEnabled(
   return overrides[id] ?? defaultSourceOn(group);
 }
 
-/** "0.6k", "1.1k" — the mock's compact token labels, floored at 0.1k so tiny
- *  real sources never read as an empty "0.0k". */
+/** Compact token label ("0.6k"), floored at 0.1k so tiny sources never read
+ *  as an empty "0.0k". */
 const fmtK = (tokens: number): string =>
   `${(Math.max(tokens, 100) / 1000).toFixed(1)}k`;
 
-/** Roughly what `pageIdentityLine` costs: one sentence naming the page, the
- *  course and the path. Fixed rather than measured, because the client does not
- *  build that sentence — the server does (lib/ai/context.ts). */
+/** Approximate cost of the server-built pageIdentityLine (lib/ai/context.ts);
+ *  fixed because the client never builds that sentence. */
 const PAGE_IDENTITY_TOKENS = 20;
 
 /** Tokens a source contributes to the estimate (its content, or the lesson cap). */
@@ -270,8 +233,8 @@ function sourceIconFor(s: PanelSource): typeof CodeXml {
   return s.kind ? (KIND_ICONS[s.kind] ?? CodeXml) : CodeXml;
 }
 
-/** "Reading main.py and your last output…" — status line for an in-flight
- *  question, built from the sources attached to THAT question. */
+/** Status line for an in-flight question, built from the sources attached to
+ *  THAT question. */
 function readingStatusFor(list: PanelSource[]): string {
   const names = list
     .filter((s) => s.group !== "lesson" && s.group !== "page")
@@ -286,8 +249,8 @@ function readingStatusFor(list: PanelSource[]): string {
   return `Reading ${names.slice(0, 2).join(" and ")}…`;
 }
 
-/** Circular quota ring (mirrors the mock's 12px, r=6, circumference 37.7 SVG).
- *  `remaining/total` drives the dash offset; `out` swaps to the red palette. */
+/** Circular quota ring; `remaining/total` drives the dash offset, `out` swaps
+ *  to the red palette. */
 function QuotaRing({
   remaining,
   total,
@@ -403,8 +366,8 @@ export default function AskAiWidget({
   // can't persist (no OPFS / storage blocked).
   const [signInConfirmOpen, setSignInConfirmOpen] = useState(false);
 
-  // Navigate to sign-in. `target="_top"` semantics: break out of the home
-  // page's embedded playground iframe so auth loads in the top-level window.
+  // `target="_top"` semantics: break out of the home page's embedded
+  // playground iframe so auth loads in the top-level window.
   const goToSignIn = useCallback(() => {
     if (typeof window === "undefined") return;
     try {
@@ -414,10 +377,9 @@ export default function AskAiWidget({
     }
   }, []);
 
-  // Intercept the sign-in CTA on playground surfaces: stash the active
-  // workspace so it resumes after auth, or, when it can't be persisted, confirm
-  // before leaving. Learn surfaces (no workspace) fall through to the plain
-  // link, as do modified clicks (open-in-new-tab, etc.).
+  // On playground surfaces: stash the workspace so it resumes after auth, or
+  // confirm when it can't be persisted. Learn surfaces and modified clicks
+  // fall through to the plain link.
   const handleSignInClick = useCallback(
     (e: MouseEvent<HTMLAnchorElement>) => {
       if (!playgroundId) return;
@@ -460,9 +422,8 @@ export default function AskAiWidget({
     writeStored(CONTEXT_MODE_KEY, next);
   };
 
-  // Custom per-source overrides (stable source id → on/off). NOT persisted:
-  // they reset per page (see the route-change adjustment below). Absent id ⇒
-  // the group default.
+  // Custom per-source overrides (stable id → on/off). NOT persisted: reset per
+  // page. Absent id ⇒ the group default.
   const [customOverrides, setCustomOverrides] = useState<
     Record<string, boolean>
   >({});
@@ -478,8 +439,7 @@ export default function AskAiWidget({
 
   // ── Selection capture ──────────────────────────────────────────────
   // Keep the last non-collapsed selection made outside the panel (clicking
-  // into the panel collapses the document selection). Highlight-to-ask stays a
-  // first-class feature; the selection shows up as a source in the sheet.
+  // into the panel collapses the document selection).
   const panelRef = useRef<HTMLDivElement>(null);
   // Desktop-only drag-to-reposition, handled from the panel header.
   const drag = useDraggablePanel(panelRef);
@@ -505,9 +465,8 @@ export default function AskAiWidget({
       document.removeEventListener("selectionchange", onSelectionChange);
   }, []);
 
-  // A stable key for the current page, plus whether the server can actually
-  // fetch lesson text for it (mirrors the LESSON_BASES allowlist, imported
-  // from lib/ai/context so the two can't drift).
+  // Stable page key + whether the server can fetch lesson text for it
+  // (LESSON_BASES imported from lib/ai/context so the two can't drift).
   const routeMeta = useMemo(() => {
     const base = collectContext();
     const hasLessonText =
@@ -519,9 +478,9 @@ export default function AskAiWidget({
     return { key, hasLessonText };
   }, [collectContext]);
 
-  // Route changed: reset the per-page Custom toggles AND drop any captured
-  // highlight — a selection from the previous page must not ride along
-  // invisibly. (React's "adjust state during render" pattern.)
+  // Route changed: reset per-page Custom toggles and drop the captured
+  // highlight — a previous page's selection must not ride along invisibly.
+  // (React's "adjust state during render" pattern.)
   const [prevRouteKey, setPrevRouteKey] = useState(routeMeta.key);
   if (routeMeta.key !== prevRouteKey) {
     setPrevRouteKey(routeMeta.key);
@@ -529,10 +488,9 @@ export default function AskAiWidget({
     setSelection(null);
   }
 
-  // Final per-question context: the SAME enumeration/enablement rules as the
-  // sheet, applied to fresh snapshots at send time. The widget cap is applied
-  // after the user's toggles, ranked by visibility (most-visible survive),
-  // so disabling sources frees slots and the model sees what the user sees.
+  // Per-question context: the SAME enumeration/enablement rules as the sheet,
+  // on fresh snapshots at send time. Widget cap applied after the toggles,
+  // ranked by visibility, so disabling sources frees slots.
   const buildContext = useCallback((): AskAiClientContext => {
       const base = collectContext();
       const on = (id: string, group: SourceGroup) =>
@@ -568,11 +526,8 @@ export default function AskAiWidget({
         base.surface === "learn" &&
         LESSON_BASES.has(base.slug?.[0] ?? "") &&
         on("lesson", "lesson");
-      // Where the reader is. On by default, and the only source that is: with
-      // everything off the model otherwise had nothing identifying the page,
-      // because `slug` never reaches the prompt — it only resolves the Markdown
-      // fetch server-side. Toggleable like any other source, so the chip's count
-      // stays the truth about what is sent.
+      // On by default: with everything off, nothing else identifies the page —
+      // `slug` never reaches the prompt (server-side Markdown fetch only).
       const pageOn =
         base.surface === "learn" && (base.slug?.length ?? 0) > 0 && on("page", "page");
 
@@ -615,8 +570,8 @@ export default function AskAiWidget({
   const sheetOpen = contextSheetOpen && signedIn;
 
   // ── On-screen sources (sheet rows + chip count) ────────────────────
-  // Display snapshot of the registry widgets. Recomputed on registration /
-  // visibility changes; the send path re-snapshots fresh in buildContext.
+  // Display snapshot of the registry widgets; the send path re-snapshots
+  // fresh in buildContext.
   const liveSources = useMemo(
     () => (open && signedIn ? collectAskAiLiveSources() : []),
     // `sources` re-snapshots when the visible set changes.
@@ -624,9 +579,8 @@ export default function AskAiWidget({
     [open, signedIn, sources],
   );
 
-  // Built fresh each render while the panel is open, so playground file edits
-  // and new outputs show up immediately (the old memo went stale — the store
-  // has no change signal the widget can subscribe to).
+  // Built fresh each render while open, so file edits and new outputs show up
+  // immediately (the store has no change signal to subscribe to).
   const panelSources: PanelSource[] = [];
   if (open && signedIn) {
     const seen = new Set<string>();
@@ -637,9 +591,7 @@ export default function AskAiWidget({
       }
     };
     const base = collectContext();
-    // Listed first, because it is the one source that is on before the reader
-    // does anything, and a sheet that did not show it would be describing a
-    // smaller request than the one actually sent.
+    // Listed first: it is the one source on before the reader does anything.
     if (base.surface === "learn" && (base.slug?.length ?? 0) > 0) {
       push({ id: "page", group: "page", label: "Page you're on" });
     }
@@ -693,8 +645,8 @@ export default function AskAiWidget({
     estimateTokens(draft.trim() || "your question");
 
   // Flipping a switch drops into Custom and records the override — except the
-  // highlight, where "off" means dismiss the capture (the old ✕ semantics): a
-  // future highlight should re-attach rather than being silently excluded.
+  // highlight, where "off" dismisses the capture so a future highlight
+  // re-attaches instead of being silently excluded.
   const toggleSource = (s: PanelSource, next: boolean) => {
     if (s.group === "selection" && !next) {
       setSelection(null);
@@ -752,10 +704,9 @@ export default function AskAiWidget({
   const isFreeTier = usage?.tier !== "pro";
   const outOfPrompts = isFreeTier && promptsLeft === 0 && usage !== null;
 
-  // Live "resets in H h M m" countdown to the next UTC midnight (only shown in
-  // the out-of-prompts state). Refreshed on open and once a minute; when the
-  // remaining time WRAPS (midnight passed), the day's quota reset server-side,
-  // so bump usageEpoch to refetch and release any lockout.
+  // Countdown to next UTC midnight (out-of-prompts state). When the remaining
+  // time WRAPS, midnight passed and the quota reset server-side — bump
+  // usageEpoch to refetch and release the lockout.
   const [resetsInMs, setResetsInMs] = useState<number | null>(null);
   const prevResetsMsRef = useRef<number | null>(null);
   useEffect(() => {
@@ -798,10 +749,8 @@ export default function AskAiWidget({
     hasAiEditHandler(collectContext().adapterId);
 
   // ── Suggested follow-ups ("Keep going") ────────────────────────────
-  // Keyed on the id of the answer they would follow, not on `messages.length`:
-  // the count repeats across conversations ("New conversation" resets it to
-  // zero), and the hook fetches at most once per key, so every conversation
-  // after the first was silently left without follow-ups. See the hook.
+  // Keyed on the answered turn's id, not `messages.length`: the count repeats
+  // across conversations and the hook fetches at most once per key.
   const lastTurn = messages[messages.length - 1];
   const answeredTurnId =
     lastTurn?.role === "assistant" && lastTurn.content ? lastTurn.id : "";
@@ -831,8 +780,7 @@ export default function AskAiWidget({
     clearSuggestions();
     setEditStatus(null);
     setContextSheetOpen(false);
-    // The highlighted text answered this question; don't let it leak into
-    // unrelated follow-ups. Re-selecting re-captures it.
+    // Don't let the highlight leak into unrelated follow-ups.
     setSelection(null);
   };
 
@@ -851,8 +799,7 @@ export default function AskAiWidget({
   };
 
   const copyAnswer = (idx: number, text: string) => {
-    // Show the checkmark only once the write actually succeeded; a rejected
-    // promise (permission denied, unfocused document) keeps the button as-is.
+    // Checkmark only once the write actually succeeded.
     navigator.clipboard?.writeText(text).then(
       () => {
         setCopiedIdx(idx);
@@ -864,20 +811,10 @@ export default function AskAiWidget({
     );
   };
   /**
-   * Rate an answer, and store the exchange it refers to.
-   *
-   * Optimistic: the icon fills immediately and stays filled, because a rating
-   * is the user's own opinion and a network hiccup is no reason to appear to
-   * take it back. The write is best-effort for the same reason — a failed
-   * POST is logged, not surfaced, since there is nothing useful to ask of
-   * someone who just told us an answer was bad.
-   *
-   * Clicking the filled thumb withdraws the rating, which deletes the row: an
-   * answer nobody rated and one whose rating was withdrawn are the same thing.
-   *
-   * Rated turns are the ONLY Ask AI content that leaves the browser for our
-   * storage — see app/api/ai/feedback/route.ts and the notice under each
-   * answer, which says exactly this.
+   * Rate an answer and store the exchange. Optimistic + best-effort: the icon
+   * fills immediately and a failed POST is logged, not surfaced. Clicking the
+   * filled thumb withdraws the rating (deletes the row). Rated turns are the
+   * ONLY Ask AI content stored server-side (app/api/ai/feedback/route.ts).
    */
   const react = (idx: number, kind: "up" | "down") => {
     const message = messages[idx];
@@ -902,9 +839,7 @@ export default function AskAiWidget({
         question,
         answer: message.content,
         surface: ctx.surface,
-        // `slug` is the lesson's path *segments* (["courses", "python-basics",
-        // "variables"]); joined here so what is stored is the page a reviewer
-        // can open, not an array.
+        // Slug segments joined so what is stored is an openable path.
         slug:
           ctx.surface === "playground"
             ? (ctx.adapterId ?? "")
@@ -917,7 +852,7 @@ export default function AskAiWidget({
   // ── Context-sheet interactions ─────────────────────────────────────
   // Outside click / Esc close it. The composer is EXCLUDED from outside-close:
   // closing on mousedown would shift Send/Stop before mouseup and swallow the
-  // click (mousedown and mouseup landing on different elements fires no click).
+  // click.
   const sheetRef = useRef<HTMLDivElement>(null);
   const chipRef = useRef<HTMLButtonElement>(null);
   const composerRef = useRef<HTMLDivElement>(null);
@@ -947,17 +882,13 @@ export default function AskAiWidget({
     };
   }, [sheetOpen]);
 
-  // Dialog-style focus management: the chip unmounts while the sheet is open
-  // (per the design), so move focus into the sheet on open and hand it back
-  // to the chip on close.
+  // Dialog-style focus: into the sheet on open, back to the chip on close.
   useEffect(() => {
     if (!sheetOpen) return;
     sheetRef.current?.focus();
     return () => {
-      // Deliberately read at CLEANUP time: the chip is unmounted while the
-      // sheet is open (ref is null during setup) and remounts in the same
-      // commit that closes it — cleanup runs after that DOM update, which is
-      // exactly when the chip exists to receive focus back.
+      // Read at CLEANUP time: the chip is unmounted while the sheet is open
+      // and remounts in the same commit that closes it.
       // eslint-disable-next-line react-hooks/exhaustive-deps
       chipRef.current?.focus();
     };
@@ -1012,11 +943,9 @@ export default function AskAiWidget({
       aria-label="Ask AI"
       ref={panelRef}
     >
-      {/* Resize grips on the two edges that grow away from the docked corner
-          (see useDraggablePanel). Pointer-only affordances — the panel has a
-          sensible default size and every control in it is reachable without
-          resizing — so they are hidden from assistive tech rather than
-          announced as controls that cannot be operated. */}
+      {/* Resize grips on the edges that grow away from the docked corner (see
+          useDraggablePanel). Pointer-only affordances, hidden from assistive
+          tech — nothing requires resizing. */}
       {drag.enabled && (
         <>
           <span
@@ -1037,10 +966,8 @@ export default function AskAiWidget({
         </>
       )}
       <div className={`${styles.chatArea} ${sheetOpen ? styles.dimmed : ""}`}>
-        {/* The header doubles as the drag handle on desktop (see
-            useDraggablePanel); its own buttons are excluded, so only the
-            empty space and the title move the panel. Double-click sends it
-            back to the docked corner. */}
+        {/* Header doubles as the desktop drag handle (buttons excluded);
+            double-click re-docks. */}
         <div
           className={`${styles.header} ${drag.enabled ? styles.headerDraggable : ""}`}
           {...drag.handleProps}
@@ -1095,10 +1022,8 @@ export default function AskAiWidget({
                 <Sparkle size={20} />
               </span>
               <p>Sign in to ask AI about this {subject}.</p>
-              {/* target="_top" breaks out of the home page's embedded
-                  playground iframe so sign-in loads in the top-level window.
-                  On playground surfaces, onClick first preserves the guest's
-                  workspace (or confirms, when it can't be persisted). */}
+              {/* target="_top" breaks out of the embedded playground iframe;
+                  onClick first preserves the guest's workspace. */}
               <a
                 className={styles.signInLink}
                 href="/sign-in"
@@ -1176,19 +1101,11 @@ export default function AskAiWidget({
                       </>
                     ) : (
                       <div className={styles.answer}>
-                        {/* `detect: false` so only fenced blocks that named a
-                            language are highlighted. Auto-detection on a
-                            half-streamed block guesses from whatever few
-                            characters have arrived, and re-guesses per token,
-                            which shows up as code changing color while it is
-                            still being written. */}
-                        {/* Math before highlighting, matching how the MCQ
-                            renderer orders them: KaTeX claims its nodes first,
-                            so a formula is never handed to the code
-                            highlighter. `normalizeMathDelimiters` runs before
-                            Markdown parses, because Markdown reads a model's
-                            `\[` as an escaped bracket and the delimiter is
-                            gone by the time any plugin could see it. */}
+                        {/* detect: false — auto-detection re-guesses per
+                            streamed token, so code changes color mid-stream.
+                            Math before highlighting so KaTeX claims its nodes
+                            first; normalizeMathDelimiters runs before Markdown
+                            parses, which would eat the model's `\[`. */}
                         <ReactMarkdown
                           remarkPlugins={[remarkGfm, remarkMath]}
                           rehypePlugins={[
@@ -1236,9 +1153,8 @@ export default function AskAiWidget({
                             <Copy size={13} />
                           )}
                         </button>
-                        {/* `fill` on the selected glyph: color alone carries
-                            the state otherwise, and a filled vs outlined icon
-                            survives both themes and color-blindness. */}
+                        {/* `fill` on the selected glyph: filled vs outlined
+                            survives themes and color-blindness. */}
                         <button
                           type="button"
                           className={`${styles.actionBtn} ${
@@ -1271,22 +1187,14 @@ export default function AskAiWidget({
                         </button>
                       </div>
                     )}
-                    {/* The disclaimer belongs to the answer, so it sits with
-                        the answer's own controls rather than pinned to the
-                        composer, where it read as a property of the panel. Once
-                        per conversation, under the newest answer: repeating it
-                        under every one turns it into furniture nobody reads.
-                        The second line is directly about the buttons above it —
-                        rating is what causes an exchange to be stored, so the
-                        sentence saying so belongs where the thumbs are, not
-                        only in the Privacy Policy. */}
+                    {/* Shown once, under the newest answer; the storage
+                        sentence sits with the thumbs that trigger it. */}
                     {isLast && m.content && !streamingHere && (
                       <p className={styles.answerNote}>
                         {disclaimer} Rating an answer saves that exchange so we
                         can improve the assistant, handled as described in our{" "}
-                        {/* New tab on purpose: the panel floats over a lesson,
-                            and following a link in place would throw away the
-                            conversation the reader is in the middle of. */}
+                        {/* New tab so the link doesn't discard the
+                            conversation. */}
                         <Link
                           href="/privacy"
                           target="_blank"
@@ -1301,16 +1209,15 @@ export default function AskAiWidget({
                   </div>
                 );
               })}
-              {/* Questions asked while an answer was still streaming. They are
-                  already accepted — showing them as dimmed turns is what makes
-                  that legible, rather than the composer swallowing them. */}
+              {/* Questions queued while an answer streams, shown as dimmed
+                  turns so their acceptance is legible. */}
               {queued.map((q, i) => (
                 <div key={`q${i}`} className={styles.msgQueued}>
                   {q}
                 </div>
               ))}
               {/* Follow-ups: hidden once the quota is spent — clicking one
-                  could only produce a guaranteed 429. */}
+                  would guarantee a 429. */}
               {!streaming &&
                 !outOfPrompts &&
                 messages[messages.length - 1]?.role === "assistant" &&
@@ -1471,11 +1378,8 @@ export default function AskAiWidget({
               >
                 <Eye size={12} aria-hidden />
                 <span className={styles.chipLabel}>
-                  {/* Singular at 0 as well as 1: "0 sources" is the usual
-                      English, but the chip is a running count that ticks
-                      0 → 1 → 2 as toggles change, and holding the noun
-                      singular until it genuinely goes plural keeps the label
-                      from flipping its last letter under the pointer. */}
+                  {/* Singular at 0 as well as 1, so the running count doesn't
+                      flip its last letter under the pointer. */}
                   {MODE_LABELS[contextMode]} · {enabledCount} source
                   {enabledCount <= 1 ? "" : "s"}
                 </span>
@@ -1496,13 +1400,12 @@ export default function AskAiWidget({
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={onKeyDown}
-              // Deliberately NOT disabled while streaming: a question thought
-              // of mid-answer is queued (see useAskAi), so the composer has no
-              // reason to lock the user out of writing it down.
+              // Deliberately NOT disabled while streaming: mid-answer
+              // questions are queued (see useAskAi).
               disabled={outOfPrompts}
             />
-            {/* Stop stays reachable while an answer streams, even mid-typing,
-                so Send appears beside it rather than replacing it. */}
+            {/* Stop stays reachable while streaming, so Send appears beside
+                it rather than replacing it. */}
             {streaming && (
               <button
                 type="button"
@@ -1527,9 +1430,6 @@ export default function AskAiWidget({
           </div>
           {!sheetOpen && (
             <div className={styles.footerLine}>
-              {/* The "AI can make mistakes" line used to live here; it now sits
-                  under the answer it qualifies (see `.answerNote`). What is
-                  left is composer state, which is the composer's own business. */}
               {outOfPrompts && messages.length > 0 && (
                 <span className={styles.disclaimer}>
                   Your conversation is saved.
@@ -1572,9 +1472,8 @@ export default function AskAiWidget({
         </div>
       )}
 
-      {/* Settings: an overlay INSIDE the panel, so the chat (and any
-          in-flight stream, plus the list's scroll position) stays mounted
-          underneath instead of being torn down and reset. */}
+      {/* Settings: an overlay INSIDE the panel, so the chat (and any in-flight
+          stream) stays mounted underneath. */}
       {settingsOpen && (
         <div
           className={styles.settingsOverlay}
@@ -1722,10 +1621,8 @@ export default function AskAiWidget({
       )}
 
       {/* Confirm before signing in when this browser can't persist the guest's
-          work (no OPFS / storage blocked), so it isn't lost without warning.
-          When it *can* be persisted, the CTA stashes + navigates directly and
-          this never opens. Uses the shared confirm-dialog styles from
-          playground.css (loaded on every playground route). */}
+          work (no OPFS / storage blocked). Uses the shared confirm-dialog
+          styles from playground.css. */}
       <Dialog.Root
         open={signInConfirmOpen}
         onOpenChange={setSignInConfirmOpen}
@@ -1758,8 +1655,8 @@ export default function AskAiWidget({
   );
 }
 
-/** SSR-safe localStorage read/write (this widget is client-only, but guard
- *  anyway so a private-mode throw never breaks a render). */
+/** SSR-safe localStorage read/write; a private-mode throw must never break a
+ *  render. */
 function readStored(key: string): string | null {
   if (typeof window === "undefined") return null;
   try {

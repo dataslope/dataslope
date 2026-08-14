@@ -1,30 +1,13 @@
 "use client";
 
 /**
- * `SqlChallengeCard`, the SQL counterpart to `<ChallengeCard>`.
- *
- * Why a separate component? SQL exercises don't fit the
- * "interpreter-with-stdout" model used by Python / JS / R: there is no
- * `print()` to inspect; the natural artefact is a result set returned
- * by the user's SELECT. Tests check that result set's shape (row
- * count, columns, exact values), not stdout.
- *
- * Supported dialects: SQLite (via `@sqlite.org/sqlite-wasm`), DuckDB
- * (via `@duckdb/duckdb-wasm`), and PostgreSQL (via PGlite). All run
- * entirely in the browser, there is no server-side execution.
- *
- * Lifecycle:
- *   1. On first user action, lazy-instantiate the engine for the
- *      requested dialect, then `loadBlankDatabase()` + run `initSql` to
- *      seed the exercise's schema and data.
- *   2. "Run" executes the learner's SQL and renders the last result
- *      set (or affected-row count for DML).
- *   3. "Check Answer" runs the learner's SQL, then evaluates every
- *      `SqlChallengeTest` against the captured result + the live
- *      engine (for follow-up state checks like `runAfterSql`).
- *
- * Visual chrome is shared with `ChallengeCard.module.css` so the two
- * components feel like one product.
+ * `SqlChallengeCard`, the SQL counterpart to `<ChallengeCard>`. Separate
+ * because SQL exercises grade a result set (shape, columns, values), not
+ * stdout. Dialects: SQLite (sqlite-wasm), DuckDB (duckdb-wasm), PostgreSQL
+ * (PGlite) — all entirely in the browser. The engine is lazily booted and
+ * seeded with `initSql`; "Run" renders the last result set, "Check Answer"
+ * additionally evaluates every `SqlChallengeTest` against the captured
+ * result + the live engine. Chrome is shared with ChallengeCard.module.css.
  */
 
 import {
@@ -112,10 +95,9 @@ import styles from "./ChallengeCard.module.css";
 
 // ─── Types ────────────────────────────────────────────────────────────
 
-// The declarative test language and its evaluator live in
-// `sqlChallengeHarness.ts` so the content sweep can grade cards with exactly
-// this code instead of a second copy of it. Re-exported here because these
-// types were part of this module's public surface before the split.
+// The declarative test language and evaluator live in sqlChallengeHarness.ts
+// so the content sweep grades with the same code; re-exported for the
+// module's pre-split public surface.
 import {
   evaluateSqlTest,
   sqlTestChecksSummary,
@@ -138,11 +120,8 @@ export {
  *  the column helper's accessors read. */
 type ResultRow = { __idx: number; row: unknown[] };
 
-/** TanStack Table v9 requires an explicit, tree-shakeable feature set in place
- *  of v8's `get*RowModel()` options — the core row model is always present, so
- *  this preview grid (no sorting, filtering, or pagination) needs no features
- *  at all. Built once at module scope so its identity is stable across
- *  renders. */
+/** TanStack Table v9 wants an explicit feature set; this grid (no sorting/
+ *  filtering/pagination) needs none. Module scope keeps its identity stable. */
 const RESULT_TABLE_FEATURES = tableFeatures({});
 
 
@@ -162,17 +141,12 @@ export interface SqlChallengeCardProps {
    *  markdown string for terser authoring. Strings support paragraphs,
    *  bullet lists, **bold**, *italic*, and `inline code`. */
   instructions: React.ReactNode | string;
-  /** Setup SQL run once before the learner's first execution. Creates
-   *  tables, populates seed data, etc. Replaces DataCamp's
-   *  `pre-exercise-code` block. */
+  /** Setup SQL run once before the learner's first execution (tables,
+   *  seed data). */
   initSql?: string;
-  /** Remote dataset to load before `initSql`: a path inside the
-   *  dataslope/datasets GitHub repo (e.g. `sqlite/chinook_sqlite.sql`)
-   *  or a full URL. The script is downloaded from
-   *  raw.githubusercontent.com and executed against the card's engine,
-   *  so a card can clone a complete sample database (Chinook,
-   *  Northwind, …) without embedding it. `initSql` still runs after it
-   *  for any card-specific extras. */
+  /** Remote dataset script to run before `initSql`: a path inside the
+   *  dataslope/datasets repo or a full URL, so a card can clone a complete
+   *  sample database (Chinook, …) without embedding it. */
   remoteInitSql?: string;
   /** Starter SQL shown in the editor. */
   starterCode: string;
@@ -190,10 +164,8 @@ export interface SqlChallengeCardProps {
   tests: SqlChallengeTest[];
 }
 
-/** One table entry in the viewer panel. Rows are loaded a page at a
- *  time: `result.values` holds everything fetched so far, `hasMore`
- *  records whether another page exists (so the viewer can keep
- *  scroll-loading), and `loadingMore` guards/labels an in-flight fetch. */
+/** One table entry in the viewer panel. Rows load a page at a time:
+ *  `result.values` holds everything fetched so far. */
 export interface TableViewerEntry {
   schema: string | null;
   table: string;
@@ -215,8 +187,7 @@ async function createSqliteChallengeEngine(): Promise<SqlEngineLike> {
   return {
     exec: async (sql: string) => {
       const results = await engine.execAll(sql);
-      // execAll returns null for non-SELECT statements; normalise into
-      // the shared SqlResult shape with empty columns/values.
+      // execAll returns null for non-SELECT statements; normalise.
       return results.map((r) =>
         r === null ? { columns: [], values: [] } : { columns: r.columns, values: r.values },
       );
@@ -278,11 +249,8 @@ export function sqlDialectDisplayName(dialect: SqlDialect): string {
       : "PostgreSQL";
 }
 
-/** Approximate cold-download size (MB) of each dialect's in-browser
- *  WASM engine, feeds the boot notice's "downloads once (~N MB)" hint.
- *  Ballpark figures (SQLite ~1 MB, PGlite ~3 MB, DuckDB ~5–10 MB), in
- *  the same spirit as `LanguageAdapter.coldDownloadMB` for the other
- *  runtimes. */
+/** Approximate cold-download size (MB) of each dialect's WASM engine, for
+ *  the boot notice's "downloads once (~N MB)" hint. */
 export function sqlDialectColdMB(dialect: SqlDialect): number {
   return dialect === "sqlite" ? 1 : dialect === "duckdb" ? 6 : 3;
 }

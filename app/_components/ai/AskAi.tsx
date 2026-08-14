@@ -2,16 +2,9 @@
 
 /**
  * Mount point for the "Ask AI" widget, rendered once from the root layout.
- *
- * It renders NOTHING except on the lesson routes (`/courses/*`,
- * `/interview-prep/*`, `/fumadocs-dev/*`) and `/playground/*`, and the
- * actual widget (which pulls
- * in react-markdown) is dynamically imported so those bytes never load on
- * the home page, pricing, etc. Off-surface this is a bare `usePathname()`
- * check, no session fetch, no widget code.
- *
- * `collectContext` is called at send time (not render), so it reads the live
- * playground store / current slug each time the user asks.
+ * Renders nothing except on lesson and playground routes; the widget itself is
+ * dynamically imported so its bytes never load elsewhere. `collectContext` is
+ * called at send time, so it reads the live store/slug each time.
  */
 import { useCallback } from "react";
 import dynamic from "next/dynamic";
@@ -52,13 +45,8 @@ function collectPlayground(segment: string): AskAiClientContext {
 
 export default function AskAi() {
   const pathname = usePathname() ?? "";
-  // The widget only belongs on surfaces with actual content to ask about:
-  // course lessons, interview-prep pages, and a live playground. Catalog /
-  // index routes are excluded, the bare `/courses` and `/playground` URLs are
-  // just lists of links, nothing to ask about, so require a sub-path on both.
-  // Interview-prep has no raw-Markdown mirror, so its context comes entirely
-  // from the widget registry (the questions on screen), which is what matters
-  // there anyway.
+  // Only surfaces with content to ask about; a sub-path is required so the
+  // bare `/courses` and `/playground` catalog pages are excluded.
   const onInterviewPrep = pathname.startsWith("/interview-prep/");
   const onLesson = pathname.startsWith("/courses/") || onInterviewPrep;
   const onPlayground = pathname.startsWith("/playground/");

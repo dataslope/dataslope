@@ -1,67 +1,24 @@
 #!/usr/bin/env node
 /**
- * Build the full-text search corpus that backs `/api/search`.
+ * Build the full-text search corpus that backs `/api/search` (SQLite FTS5 on
+ * D1; nothing is rebuilt at request time).
  *
- * ── What changed and why ────────────────────────────────────────────────────
+ * Rows are sections, one per (page, heading), so hits carry `#anchor` links
+ * and `snippet()` draws from the section that matched; content before the
+ * first heading becomes a row with a null anchor (the page-level result).
+ * Anchored components (lib/search/anchors.mjs) get a second, narrower row
+ * whose anchor is the component's own DOM id — both sides derive identical
+ * ids from the authored MDX (`remarkComponentAnchors`). The component's
+ * content stays in the section row too; the near-duplicates are collapsed at
+ * query time (lib/search/ranking.ts). An empty `heading` plus a non-empty
+ * anchor identifies a component row.
  *
- * The previous indexer fed an Orama "simple" index that the Worker rebuilt on
- * every cold isolate. That had two problems. The first was cost: parsing a
- * multi-megabyte JSON blob and tokenising every document is CPU paid again in
- * every data centre, after every deploy, forever, and it grows with the
- * content. The second was coverage: it restricted `remark-structure` to
- * `heading`/`paragraph`/`blockquote`/`tableCell`, which excludes
- * `mdxJsxFlowElement` wholesale. That was aimed at keeping code out of the
- * index, but it also threw out the *prose* those components carry, which
- * measured at 37% of everything a learner reads: every `<MultipleChoice>`
- * question and explanation, every `<ChallengeCard>` instruction. It also only
- * ever walked `content/courses`, so the whole interview-prep track was absent.
+ * Prose and code are separate FTS5 columns so `bm25()` can weight them
+ * independently — a match in prose must outrank a match in a code sample.
+ * Component extraction lives in scripts/lib/search-extract.mjs.
  *
- * This script indexes everything, into SQLite FTS5 on D1. Nothing is rebuilt
- * at request time.
- *
- * ── Rows are sections, not pages ────────────────────────────────────────────
- *
- * One row per (page, heading) rather than one per page. On lessons this long a
- * page-level hit tells a reader which of forty screens to start reading, which
- * is barely an answer. Section rows give `#anchor` links straight to the part
- * that matched, and they make `snippet()` useful, because the snippet is drawn
- * from the section that matched instead of from wherever in the page the
- * tokeniser happened to land. FTS5 does not care about the row count: ~11k
- * sections is nothing.
- *
- * Content before the first heading becomes a row with a null anchor, which is
- * the page-level result.
- *
- * ── …and one extra row per anchored component ───────────────────────────────
- *
- * A section row's anchor is its heading, but a `<MultipleChoice>` often sits
- * several screens below its heading, so a hit on quiz text used to land the
- * reader far above the text that matched. Anchored components (the set in
- * lib/search/anchors.mjs) therefore get a second, narrower row whose anchor is
- * the component's own DOM id (injected at render time by
- * `remarkComponentAnchors`; both sides derive identical ids from the authored
- * MDX). The component's content stays in the section row too, so queries whose
- * terms span a paragraph and a component keep matching; the resulting
- * near-duplicate entries are collapsed at query time in favour of the
- * component's anchor (lib/search/ranking.ts). Rows with an empty `heading`
- * column and a non-empty anchor are exactly these component rows.
- *
- * ── Prose and code are separate columns ─────────────────────────────────────
- *
- * Both are indexed, but a match in prose should outrank a match in a code
- * sample, or a search for a common identifier would bury the lesson that
- * explains it under every lesson that merely uses it. Splitting them into two
- * FTS5 columns lets `bm25()` weight them independently at query time, which is
- * the thing a single blob cannot do. It is also why indexing code is safe here
- * where it was not before.
- *
- * ── How component content is reached ────────────────────────────────────────
- *
- * See scripts/lib/search-extract.mjs (split out so the anchor-id contract is
- * testable against the render-side plugin).
- *
- * Output: `lib/generated/search-corpus.json` (gitignored), consumed by
- * `scripts/build-search-sql.mjs` to produce the D1 seed.
+ * Output: lib/generated/search-corpus.json (gitignored), consumed by
+ * scripts/build-search-sql.mjs to produce the D1 seed.
  */
 import { readFileSync, readdirSync, mkdirSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -74,10 +31,8 @@ import { extractComponents } from "./lib/search-extract.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 
-/** Every indexed collection. The previous indexer had only `courses`, which
- *  left 55 interview-prep lessons unsearchable. `fumadocs-dev` stays out: it
- *  is noindex + robots-disallowed, and indexing it leaked component demos into
- *  the learner-facing dialog. */
+/** Every indexed collection. `fumadocs-dev` stays out: it is noindex, and
+ *  indexing it leaked component demos into the learner-facing dialog. */
 const SECTIONS = [
   { dir: join(ROOT, "content", "courses"), base: "/courses", collection: "courses" },
   { dir: join(ROOT, "content", "interview"), base: "/interview-prep", collection: "interview" },
@@ -86,16 +41,11 @@ const SECTIONS = [
 const OUT_FILE = join(ROOT, "lib", "generated", "search-corpus.json");
 
 /**
- * Chart titles and captions live in the generated manifest, not in the MDX, so
- * this step has to run *after* `build:charts` — which is why it sits where it
- * does in the `build` chain rather than up with the other content steps.
- *
- * Getting that order wrong is not fatal and that is exactly the problem: the
- * index simply comes out missing every chart title and caption, which was worth
- * 264 kB of prose across ~250 charts the first time it happened, with nothing
- * in the build log to say so. So an absent or empty manifest warns loudly now.
- * It stays non-fatal because running `build:search-corpus` on its own, before
- * ever rendering charts, is a legitimate thing to do.
+ * Chart titles and captions live in the generated manifest, so this must run
+ * *after* `build:charts`. Getting the order wrong is silently non-fatal — the
+ * index just loses every chart caption — so an absent or empty manifest warns
+ * loudly. Non-fatal because running this standalone before rendering charts
+ * is legitimate.
  */
 function loadChartManifest() {
   const path = join(ROOT, "lib", "generated", "charts.js");
@@ -174,16 +124,13 @@ function sectionTitle(sectionDir, slug) {
   return title;
 }
 
-// Parsing ~900 lessons through remark is the single most expensive step in
-// `dev` and `build` — 26 seconds, every run, for an answer that only changes
-// when a lesson (or the chart manifest it reads captions from) does. The gate
-// costs about 10 ms; see scripts/lib/build-cache.mjs for why it is stat-first.
+// Parsing ~900 lessons through remark is ~26 s, the most expensive step in
+// `dev`/`build`; the gate costs ~10 ms (see scripts/lib/build-cache.mjs).
 const cache = freshness(ROOT, "search-corpus", {
   inputs: [
     fileURLToPath(import.meta.url),
-    // The extractor and the anchor-id scheme are inputs too: a change to
-    // either must rebuild the corpus, or its rows drift from the DOM ids the
-    // render pipeline emits.
+    // The extractor and anchor-id scheme are inputs too, or rows drift from
+    // the DOM ids the render pipeline emits.
     join(ROOT, "scripts", "lib", "search-extract.mjs"),
     join(ROOT, "lib", "search", "anchors.mjs"),
     join(ROOT, "lib", "generated", "charts.js"),
@@ -258,10 +205,9 @@ for (const { dir, base, collection } of SECTIONS) {
       });
     }
 
-    // One narrow row per anchored component: same page metadata, the
-    // component's own id as the anchor, and an empty `heading` column (that
-    // emptiness is how the API recognises these rows, and it keeps the
-    // heading's words from matching once per component under it).
+    // One narrow row per anchored component: the component's own id as the
+    // anchor and an empty `heading` (how the API recognises these rows, and
+    // it keeps heading words from matching once per component under it).
     for (const [anchor, comp] of perComponent) {
       const prose = comp.prose.join("\n");
       const code = comp.code.join("\n");

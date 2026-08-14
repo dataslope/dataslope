@@ -1,11 +1,9 @@
 "use client";
 
 /**
- * MDX-friendly wrapper around `<SqlCodeBlock>`.
- *
- * Mirrors the `MdxSqlChallengeCard` / `MdxCodeBlock` pattern: a single
- * import surface to register with Fumadocs, plus a guard that renders a
- * helpful message for an unknown `dialect` instead of crashing the page.
+ * MDX-friendly wrapper around `<SqlCodeBlock>`, mirroring the
+ * `MdxSqlChallengeCard` / `MdxCodeBlock` pattern; renders a message for an
+ * unknown `dialect` instead of crashing the page.
  */
 
 import SqlCodeBlock, {

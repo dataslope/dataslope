@@ -1,35 +1,15 @@
 name: R2 incremental-cache cleanup
 
 # Prunes stale OpenNext incremental-cache build folders from the R2 bucket.
+# Every deploy (production AND every preview) writes a fresh ~2.5 GB folder
+# under `incremental-cache/<buildId>/` and OpenNext never deletes old ones —
+# left alone the bucket grows unbounded (once reached ~78 GB in days).
 #
-# Why this exists: the R2 cache keys every object as
-# `incremental-cache/<buildId>/<hash>.cache` (see open-next.config.ts). Each
-# deploy, production AND every Cloudflare preview, writes a fresh ~2.5 GB
-# folder under a new build ID (one `.cache` object per prerendered page, ~1,080
-# of them averaging ~2.3 MB), and OpenNext never deletes old ones. Left alone,
-# the bucket grows by that much per deploy forever; at active-development
-# velocity that reached ~78 GB in a matter of days.
+# The build ID IS the deployed commit SHA (next.config.ts generateBuildId =
+# WORKERS_CI_COMMIT_SHA on Workers Builds); that equality is what lets this
+# job reason about folders at all.
 #
-# That per-folder figure read "~1–1.4 GB / ~1,600 objects" until 2026-08-14 and
-# was measured at 2.504 GB / 1,081 objects: fewer, much larger objects. Next 16's
-# client segment cache writes a `segmentData` map into every entry alongside
-# `html` and `rsc`, and it is ~40% of each object — half of that being
-# `segmentData["/_full"]`, which sampling found byte-identical to `rsc` in 40/40
-# objects. Nothing in this repo turns it on; it arrived as a Next default. Assume
-# the number drifts again and re-measure before trusting it.
-#
-# The build ID IS the deployed commit SHA: next.config.ts sets `generateBuildId`
-# to WORKERS_CI_COMMIT_SHA on Cloudflare Workers Builds, so a folder name equals
-# the commit it was built from. That is what lets this job decide anything at
-# all about a folder, and it is impossible with Next's default random build IDs.
-#
-# ---------------------------------------------------------------------------
-# The policy, in full
-# ---------------------------------------------------------------------------
-#
-# Two questions decide every folder: what is each deployment serving RIGHT NOW,
-# and what is it ABOUT TO serve. Both are directly obtainable, so this job asks
-# rather than approximates:
+# Policy — ask each deployment what it serves now and what it's about to serve:
 #
 #   KEEP = { probe(production) }                  what prod serves now
 #        ∪ { probe(preview_b) ∀ branch b }        what each preview serves now
@@ -38,119 +18,55 @@ name: R2 incremental-cache cleanup
 #        ∪ { folders populated < GRACE_HOURS }    catch-all for the unclassifiable
 #   DELETE everything else
 #
-# "probe" means an HTTP GET of /api/cache-build-id on the deployment itself,
-# which reports the running Worker's OPEN_NEXT_BUILD_ID — the exact string the
-# R2 override uses as the folder name, so it cannot drift from reality. The
-# production URL is fixed (BUILD_ID_URL); each branch is probed at its preview
-# ALIAS, the stable per-branch hostname Workers Builds assigns.
+# "probe" = GET /api/cache-build-id on the deployment, which reports the
+# running Worker's OPEN_NEXT_BUILD_ID — the exact R2 folder name, so it can't
+# drift from reality. Branches are probed at their preview ALIAS (the stable
+# per-branch hostname).
 #
-# BRANCHES, not open pull requests. Cloudflare Workers Builds builds every
-# branch on every push, whether or not a pull request exists for it (confirmed
-# 2026-08-14 by pushing to a branch with no PR and watching a build start), so
-# a PR-shaped keep set silently under-covers: a branch being worked on before
-# its PR is opened has a live preview that nothing would have claimed.
+# BRANCHES, not open PRs: Workers Builds builds every branch on every push,
+# PR or not, so a PR-shaped keep set under-covers pre-PR branches. The alias
+# is DERIVED from the branch name, never read out of a check run: check runs
+# hang off a COMMIT, and a commit reachable from two branches carries
+# whichever branch's build ran, so reading it can protect the wrong branch.
 #
-# The alias is DERIVED from the branch name rather than read out of the
-# Cloudflare check run that also advertises it. Reading it looks more
-# authoritative and is not: check runs hang off a COMMIT, and a commit reached
-# by more than one branch carries whichever branch's build ran on it. Measured
-# 2026-08-14 — the Workers Builds check run on 00a0deaa, the head of `main`,
-# advertised `Preview Alias URL: https://test-no-open-pr-001-dataslope…`,
-# because a branch had been cut at that commit and built from there. Probing
-# that URL for `main` would have asked a different deployment what it was
-# serving and recorded the answer under the wrong branch, leaving the branch we
-# meant to protect unprobed. Deriving cannot be misattributed, costs no API
-# calls, and is verified against both live aliases in preview_alias() below.
+# Nothing is retained on age alone: the bucket holds live + incoming
+# production, at most two folders per active branch, plus the GRACE_HOURS
+# window — branch count, not deploy velocity, sets the bucket size.
 #
-# ---------------------------------------------------------------------------
-# What this replaced, and why
-# ---------------------------------------------------------------------------
+# Deliberate consequence: NO rollback cover. Rolling the Worker back to a
+# pruned build 500s the site (the `node:fs` mechanism in open-next.config.ts),
+# and Cloudflare's Deployments tab offers those targets with no warning;
+# revert-and-redeploy (~12 min) is the intended recovery. If rollback cover is
+# ever wanted, add it as an explicit count-bounded rule ("keep last N
+# production builds"), not by lengthening a time window.
 #
-# Until 2026-08-14 the keep set was assembled from six knobs — THRESHOLD_HOURS,
-# MAIN_COMMITS, PR_COMMITS, MIN_CACHE_OBJECTS, GRACE_HOURS, MAX_BRANCHES — that
-# together approximated those same two questions. Approximations leak, and each
-# of these leaked in a way that had already cost an outage or a large fraction
-# of the bucket:
-#
-#   • MIN_CACHE_OBJECTS: 100 stood in for "has this branch's head build landed
-#     yet". A folder crosses 100 of its 1,081 objects seconds into a populate,
-#     minutes before the Worker switches over, so for those minutes the build
-#     actually being served counted as superseded and lost its protection. The
-#     probe has no such window: it reports what is being served, not what looks
-#     finished.
-#   • PR_COMMITS: 3 stood in for "how far behind its branch head can a live
-#     preview be". A preview four commits stale (rapid pushes, or a failed
-#     build) was unprotected. The probe does not care how far behind it is.
-#   • MAIN_COMMITS: 30, then 10, stood in for "the incoming production build".
-#     That build IS head(default_branch): one exact value instead of N guesses,
-#     and unbounded in time, so a stalled deploy can no longer age out mid-flight.
-#   • THRESHOLD_HOURS: 24, then 4, was a blanket expiry for everything the other
-#     rules failed to explain. With the keep set exact there is nothing left for
-#     it to explain, and it was the single largest contributor to the 78 GB peak
-#     (a 24h + 6h-interval tail at ~1.2 deploys/hour IS the bucket).
-#
-# Net effect: the bucket now holds the live production build, the incoming
-# production build, and at most two folders per active branch (what its preview
-# serves now + what it is about to serve), plus whatever landed in the last
-# GRACE_HOURS. Nothing is retained on age alone, so deploy velocity no longer
-# sets the bucket size — branch count does.
-#
-# Deliberate consequence: there is no rollback cover. Rolling the Worker back
-# to a build whose cache has been pruned 500s the site by the `node:fs`
-# mechanism described in open-next.config.ts, and Cloudflare's Deployments tab
-# offers those targets with no warning. Revert-and-redeploy is ~12 minutes
-# end-to-end (measured 2026-08-14), which is the intended recovery path. If
-# rollback cover is ever wanted, add it as its own explicit rule — "keep the
-# last N production builds", count-bounded — rather than by lengthening a time
-# window and letting every unrelated folder ride along, which is exactly the
-# accident this rewrite undid.
-#
-# ---------------------------------------------------------------------------
-# Safety
-# ---------------------------------------------------------------------------
-#
-# Two outages came from this job deleting the folder a deployment was serving
-# (2026-07-16 production, 2026-08-05 preview). Every guard below exists for
-# that, and a rewrite keeps all of them:
-#
-#   • The job aborts WITHOUT deleting anything if it cannot positively identify
-#     the live production build, resolve the default branch and its head, or
-#     list the repo's branches. A transient error must never leave every folder
-#     unexplained and therefore deleted.
-#   • It also aborts if the live production folder is not present in the bucket
-#     at all, which catches a prefix or bucket mismatch before it deletes
-#     everything.
-#   • A PREVIEW probe failure, by contrast, never aborts the sweep and never
-#     widens into a delete: that branch alone falls back to the pre-probe
-#     behaviour of keeping its last FALLBACK_COMMITS commits. One unreachable
-#     preview must not stop the other branches from being swept, and "no
-#     answer" must never be read as "nothing to keep".
-#   • A branch name is attacker-controllable by anyone who can push, and this
-#     job turns one into a URL and fetches it. The slug rule folds everything
-#     outside [a-z0-9-] to '-', so a branch cannot smuggle a host, and the
-#     result is checked against PREVIEW_URL_RE before any request is made.
-#   • GRACE_HOURS survives the rewrite as a safety net rather than as policy: a
-#     folder that landed minutes ago may belong to a deploy no probe can see
-#     yet (the Worker still reports the outgoing build) and no branch head
-#     names (a merge commit's build ID is the merge commit).
+# Safety (two outages came from deleting a folder a deployment was serving:
+# 2026-07-16 production, 2026-08-05 preview):
+#   • Abort WITHOUT deleting if the live production build, default branch +
+#     head, or branch list can't be positively identified — a transient error
+#     must never leave every folder unexplained and therefore deleted.
+#   • Abort if the live production folder isn't in the bucket at all (catches
+#     a prefix/bucket mismatch before it deletes everything).
+#   • A PREVIEW probe failure never aborts the sweep and never widens into a
+#     delete: that branch alone falls back to keeping its last
+#     FALLBACK_COMMITS commits. "No answer" is never "nothing to keep".
+#   • Branch names are attacker-controllable and become fetched URLs: the slug
+#     rule folds everything outside [a-z0-9-] to '-', and the result is
+#     checked against PREVIEW_URL_RE before any request.
+#   • GRACE_HOURS is a safety net, not policy: a minutes-old folder may belong
+#     to an in-flight deploy no probe sees yet and no branch head names.
 #
 # Run manually with dry_run=true to preview deletions.
 #
-# Required repository secrets (Settings → Secrets and variables → Actions):
+# Required repository secrets:
 #   CLOUDFLARE_ACCOUNT_ID           Cloudflare account ID (the R2 S3 endpoint host)
 #   R2_INC_CACHE_ACCESS_KEY_ID      R2 API token access key id (Object Read & Write)
 #   R2_INC_CACHE_SECRET_ACCESS_KEY  R2 API token secret access key
 #
-# The R2_INC_CACHE_* pair is named for the bucket it belongs to. It is an
-# Object Read & Write token, deliberately: this job deletes objects on a
-# schedule and never needs bucket-level rights. Editing bucket configuration
-# needs an Admin Read & Write token, which lives in R2_ADMIN_* and is used only
-# by r2-illustrations-lifecycle.yml — admin tokens are account-wide and cannot
-# be scoped to one bucket, so keeping one out of this unattended delete job is
-# the point of the split. (Renamed 2026-07-30 from R2_ACCESS_KEY_ID /
-# R2_SECRET_ACCESS_KEY, which read as "the" R2 credentials once a second pair
-# existed. Unrelated to the identically-named local env vars the illustration
-# scripts use, see scripts/lib/r2.mjs.)
+# The R2_INC_CACHE_* pair is Object Read & Write on purpose: this unattended
+# delete job never needs bucket-level rights. Admin tokens (R2_ADMIN_*, used
+# only by r2-illustrations-lifecycle.yml) are account-wide and can't be scoped
+# to one bucket — keeping one out of this job is the point of the split.
 
 on:
   schedule:

@@ -1,22 +1,10 @@
 "use client";
 
 /**
- * Client-side building blocks shared by the /admin pages: the dashboard's
- * soft design kit (borderless tinted panels, hairline table styles, quiet
- * actions), the gating states (sign-in prompt, access denied), and the plan
- * + test-user + impersonation helpers used by several sections.
- *
- * Design language: surfaces are flat tinted panels (no borders, no shadows)
- * on the page background, tables separate rows with hairline dividers, and
- * row actions are quiet ghost buttons, the only loud elements are primary
- * CTAs and the Pro badge. Everything is styled for both themes and collapses
- * to single-column layouts on mobile (tables become card lists at the call
- * sites).
- *
- * Security model (unchanged): these are presentation-only, every action
- * hits a server-authorized endpoint (Better Auth `admin.*`, or requireAdmin
- * on our own /api/admin routes), so a non-admin who opens any /admin page
- * just sees an access-denied notice and can't read or mutate anything.
+ * Building blocks shared by the /admin pages: soft design kit, gating states,
+ * and plan/test-user/impersonation helpers. Presentation-only: every action
+ * hits a server-authorized endpoint (Better Auth `admin.*` or requireAdmin),
+ * so a non-admin can't read or mutate anything from these.
  */
 import { useState } from "react";
 import { CircleAlert, Loader2, LogOut } from "lucide-react";
@@ -27,10 +15,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 // ─── Soft design kit ──────────────────────────────────────────────────────
-//
-// zinc-500 at low alpha reads as "a step off the page" on the white light
-// surface and, paired with white-alpha in dark, keeps one visual system in
-// both themes without borders.
 
 /** Flat, borderless card surface. */
 export function Panel({
@@ -175,12 +159,8 @@ export function SignInPrompt() {
   );
 }
 
-/**
- * "You don't have admin access" panel. When the current session is an
- * impersonation session (the admin became a test user and came back here),
- * offer the way out, otherwise an impersonating admin would be locked out
- * of the dashboard until the impersonation session expires.
- */
+/** "You don't have admin access" panel. Impersonation sessions get a
+ *  "stop impersonating" way out so the admin isn't locked out. */
 export function AccessDeniedCard({
   email,
   impersonated,
@@ -231,12 +211,9 @@ export function isImpersonatedSession(session: unknown): boolean {
 
 // ─── Plans + test users ───────────────────────────────────────────────────
 
-/**
- * Domain for admin-created test accounts. `.test` is an RFC 6761 reserved
- * TLD: it can never resolve or receive mail, so these addresses can't
- * collide with a real person or leak verification emails. Test users are
- * recognized (badged, listed, bulk-removed) purely by this suffix.
- */
+/** Domain for admin-created test accounts. `.test` is RFC 6761 reserved (can
+ *  never resolve or receive mail); test users are recognized purely by this
+ *  suffix. */
 export const TEST_EMAIL_DOMAIN = "dataslope.test";
 
 export function isTestEmail(email: string): boolean {
@@ -268,13 +245,9 @@ export function StatusBadge({ banned }: { banned: boolean | null | undefined }) 
   );
 }
 
-/**
- * Flip a user's plan via Better Auth's admin update endpoint (server-side
- * admin check included). Returns an error message, or null on success.
- * Note: an already-signed-in session may keep the old plan for up to five
- * minutes (the session cookie cache), impersonation and fresh sign-ins see
- * the new plan immediately.
- */
+/** Flip a user's plan via Better Auth's admin update endpoint. Returns an
+ *  error message, or null on success. An already-signed-in session may keep
+ *  the old plan for up to five minutes (session cookie cache). */
 export async function setUserPlan(
   userId: string,
   plan: "free" | "pro",
@@ -293,13 +266,9 @@ export async function setUserPlan(
   }
 }
 
-/**
- * Become `userId` in this browser (Better Auth impersonation; server-side
- * admin check, refuses admin targets). On success, hard-navigates to the
- * site root as that user so every AI feature behaves exactly as it would
- * for them. Returning to /admin shows a "Stop impersonating" button.
- * Returns an error message, or navigates away on success.
- */
+/** Become `userId` in this browser (Better Auth impersonation; refuses admin
+ *  targets). Hard-navigates to the site root on success, else returns an
+ *  error message. */
 export async function impersonateUser(userId: string): Promise<string | null> {
   try {
     const { error } = await authClient.admin.impersonateUser({ userId });

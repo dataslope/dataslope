@@ -1,33 +1,14 @@
 /**
- * Remark plugin: insert a <SvgLabel figId="…" /> element after each graphic
- * (inline <svg> block and Mermaid diagram) in an MDX lesson.
- *
- * Why a remark plugin (not an MDX component override):
- * In MDX v3 with fumadocs-mdx dynamic compilation, the `svg` key in the
- * MDX components map does not reliably intercept inline <svg> elements,
- * the compiled output may call React.createElement("svg", …) directly
- * rather than going through `_components.svg`. A remark plugin runs during
- * compilation and injects a new MDAST node, the same approach
- * fumadocs-core/remarkMdxMermaid uses to turn ```mermaid fences into
- * <Mermaid /> elements. This plugin runs AFTER remarkMdxMermaid (see the
- * plugin order in source.config.ts), so those <Mermaid> nodes already
- * exist in the tree and get labelled here too, keeping a single,
- * consistent ID scheme for every graphic on the page.
- *
- * Globally-unique, stable IDs:
- * Each ID is `svg-<page-slug>-<hash>`, where `<page-slug>` is the lesson's
- * path under content/learn/ (slashes and punctuation flattened to dashes)
- * and `<hash>` is a 6-char hex digest derived deterministically from the
- * graphic's own content (the authored <svg> source, or a Mermaid chart's
- * text). Because the page slug includes the course folder, IDs are unique
- * across ALL courses, and any ID decodes back to its source file, so a
- * graphic can be referenced by its ID alone, without also naming the course
- * or page.
- *
- * The hash (not a positional index) makes an ID stable when other graphics
- * on the same page are added, removed, or reordered: a graphic keeps its ID
- * as long as its own content is unchanged. Both inline <svg> blocks and
- * <Mermaid> diagrams are labelled with the same scheme.
+ * Remark plugin: insert a <SvgLabel figId="…" /> after each graphic (inline
+ * <svg> or Mermaid diagram) in an MDX lesson. A remark plugin rather than an
+ * MDX component override because the `svg` components-map key does not
+ * reliably intercept inline <svg> in MDX v3 (compiled output may call
+ * React.createElement("svg", …) directly). Must run AFTER remarkMdxMermaid
+ * (plugin order in source.config.ts) so <Mermaid> nodes exist and are
+ * labelled too. IDs are `svg-<page-slug>-<hash>`: the slug makes them unique
+ * across all courses and decodable back to the source file; the content hash
+ * (not a positional index) keeps an ID stable when other graphics on the
+ * page are added, removed, or reordered.
  */
 
 import type { Root } from "mdast";
@@ -89,13 +70,10 @@ function isGraphic(node: AnyNode): boolean {
   );
 }
 
-// A stable text signature of the graphic's content, used to derive its hash.
-// For Mermaid the chart text lives in the `chart` attribute (the original code
-// fence was already replaced by remarkMdxMermaid). For an inline <svg> we slice
-// the authored source via the node's position offsets, the most faithful
-// representation, falling back to a structural serialization if positions are
-// missing. Whitespace is collapsed so reindenting a graphic doesn't change its
-// ID.
+// A stable text signature of the graphic's content, used to derive its hash:
+// Mermaid's `chart` attribute, else the authored source sliced via position
+// offsets, else a structural serialization. Whitespace is collapsed so
+// reindenting a graphic doesn't change its ID.
 export function graphicSignature(node: AnyNode, source: string): string {
   let raw: string | undefined;
 

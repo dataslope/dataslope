@@ -1,27 +1,10 @@
 /**
- * Build-time lookup into the generated block-output manifest.
- *
- * ── Why this reads a file instead of importing one ──────────────────────
- * It used to `import` the generated module. That is the obvious thing to
- * write and it broke the production deploy: a static import in a server
- * component is bundled into the OpenNext Worker, and Cloudflare caps a
- * Worker at 10 MiB gzipped. The manifest pushed it to 10,375 KiB, 136 KiB
- * over, and the whole upload was rejected.
- *
- * The bundle was never the right home for it either way. Both MDX routes
- * are fully prerendered (`generateStaticParams` covers every lesson), so
- * this runs during `next build` and never at request time — the output it
- * returns is baked into static HTML long before a Worker exists. Reading it
- * with `fs` keeps the bytes at build time, where they belong: esbuild
- * bundles the *path*, not the file, so the Worker carries none of it.
- *
- * The file is read once and memoised, so 303 prerendered lessons pay for
- * one parse rather than 303.
- *
- * A missing or unparseable manifest resolves to empty, which every consumer
- * already treats as "no entries": blocks show the panel they showed before
- * this feature existed. That fallback is deliberate — prepopulated output is
- * a nicety, and it must never be able to fail a build.
+ * Build-time lookup into the generated block-output manifest. Read with `fs`
+ * rather than `import`: a static import bundles the manifest into the
+ * OpenNext Worker and pushes it past Cloudflare's 10 MiB gzipped cap, while
+ * both MDX routes are fully prerendered so this only runs during `next
+ * build`. Read once and memoised. A missing or unparseable manifest resolves
+ * to empty — prepopulated output is a nicety and must never fail a build.
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -31,24 +14,11 @@ import type { LessonBlockOutputs } from "@/app/_components/mdx/BlockOutputs";
 let cache: Record<string, LessonBlockOutputs> | null = null;
 
 /**
- * Read the manifest, or resolve to empty.
- *
- * Everything here is inside the `try`, including working out the path, and
- * that is the whole point. This used to compute
- * `join(process.cwd(), …)` at module scope, one line above a `try` that only
- * covered the read — so on a runtime where `process.cwd` is missing, the
- * module threw while it was being *evaluated*, before any handler could catch
- * anything, and every render that imported it returned a 500.
- *
- * That is exactly the failure this file's fallback exists to prevent, and it
- * only showed up in the one place the fallback matters. Prerendering runs
- * under Node with a real filesystem, so a build never notices; a deployed
- * Worker has no filesystem at all, and on a cache miss it renders the page on
- * demand. Pages served from the incremental cache were fine, and the same
- * page was a 500 whenever it was rendered rather than replayed.
- *
- * Empty is a correct answer here: the reader gets the panel every block had
- * before this feature existed, and Run still works.
+ * Read the manifest, or resolve to empty. Everything — the path computation
+ * included — must stay inside the `try`: on a runtime without `process.cwd`
+ * (a deployed Worker rendering a cache miss) a module-scope `join` threw
+ * during evaluation and 500ed every render. Empty is a correct answer: the
+ * reader gets the pre-feature panel and Run still works.
  */
 function manifest(): Record<string, LessonBlockOutputs> {
   if (cache) return cache;

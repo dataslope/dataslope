@@ -1,20 +1,10 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// ─────────────────────────────────────────────────────────────────────
-// Multi-statement runs produce several result sets ("Set 1", "Set 2", …).
-// Each set must be independently editable against its OWN table: double-click
-// opens the inline editor, and a committed edit targets that set's table, not
-// the query-wide one.
-//
-// Regression this guards: `sourceTable` used to be detected once for the whole
-// query, and `bareTableSelectSource` returns null for anything containing a
-// `;`, so EVERY set of a multi-statement run came back non-editable (a
-// double-click did nothing). The fix detects an editable table per statement,
-// positionally aligned with each engine's per-statement result sets.
-//
-// Verified on all three engines (the result-building lives in each playground;
-// the editing UI is the shared ResultView).
-// ─────────────────────────────────────────────────────────────────────
+// Each result set of a multi-statement run must edit its OWN table.
+// Regression: sourceTable was detected once per query, and
+// bareTableSelectSource returns null for anything with a `;`, so every set of
+// a multi-statement run was non-editable. The fix detects an editable table
+// per statement, aligned with each engine's per-statement result sets.
 
 const S1 = "ZZ_SET1_EDIT";
 const S2 = "ZZ_SET2_EDIT";
@@ -79,30 +69,26 @@ for (const { id, route, t1, t2 } of ENGINES) {
     const row1 = () => grid.locator("tbody tr").first();
     const undoBar = page.locator(".sql-edit-undo-bar");
 
-    // The row-select column only appears once the table's primary key is known
-    //, which is also what enables PK-ordering on the edit re-fetch and fixes
-    // the column offsets (a leading select column). Wait for it before editing.
+    // The row-select column appears once the table's primary key is known,
+    // which also fixes the column offsets — wait for it before editing.
     const waitForPkLoaded = () =>
       grid
         .locator(".sql-result-row-checkbox")
         .first()
         .waitFor({ state: "visible", timeout: 40_000 });
 
-    // Set 1 (t1, a `… LIMIT 10`): editable against its own table. A LIMIT
-    // window's rows are arbitrary without an ORDER BY, so confirm the commit via
-    // the undo bar (which reports the table) rather than pinning positions.
+    // Set 1: a LIMIT window's rows are arbitrary without ORDER BY, so confirm
+    // the commit via the undo bar (which reports the table).
     await waitForPkLoaded();
     await commitCell(page, row1().locator("td:nth-child(3)"), S1);
     await expect(undoBar).toContainText("Updated 1 cell", { timeout: 40_000 });
     await expect(undoBar).toContainText(t1);
 
-    // Set 2 (t2, an unbounded `SELECT *`): the reported case, editing a cell
-    // used to shove the row to the bottom under PG/DuckDB MVCC. Editing it right
-    // after Set 1 also exercises the run queue: Set 2's re-fetch is enqueued
-    // behind Set 1's still-in-flight one instead of being dropped. After the fix
-    // the edit persists AND the grid is stably PK-ordered (row 1 is the smallest
-    // PK, "1"), not heap order with the edited row dumped last. Also proves
-    // per-set targeting (undo bar → t2) and that the view stays on Set 2.
+    // Set 2, the reported case: editing used to shove the row to the bottom
+    // under PG/DuckDB MVCC. Editing right after Set 1 also exercises the run
+    // queue (Set 2's re-fetch enqueues behind Set 1's rather than dropping).
+    // The edit must persist, the grid stay PK-ordered, and the view stay on
+    // Set 2 with the undo bar naming t2.
     await setTabs.getByRole("tab", { name: "Set 2" }).click();
     await waitForPkLoaded();
     await commitCell(page, row1().locator("td:nth-child(4)"), S2);

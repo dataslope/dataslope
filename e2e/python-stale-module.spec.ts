@@ -1,20 +1,10 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// Regression test for the multi-file Python "stale module" bug.
-//
-// A multi-file Python challenge whose helper module is edited between
-// runs (the classic try → fail → fix → retry flow) must pick up the new
-// module source on the second Run. Pyodide caches imported modules in
-// `sys.modules`, and the per-run reset only wipes `globals()`, so without
-// an explicit cache invalidation on file staging the second run re-imports
-// the STALE module, and a correct solution still fails its tests.
-//
-// Reproduced against the live "Implement greet() in utils.py" card on
-// /fumadocs-dev/challenge-cards-python:
-//   1. Submit with the broken starter (greet returns "") → tests fail,
-//      `utils` is now cached in sys.modules.
-//   2. Replace utils.py with the reference solution and submit again.
-//   3. Before the fix the banner stays "fail"; after the fix it is "pass".
+// Regression: multi-file Python "stale module". Pyodide caches imports in
+// sys.modules and the per-run reset only wipes globals(), so without cache
+// invalidation on file staging a second Run re-imports the STALE helper
+// module and a corrected solution still fails. Reproduced against the live
+// "Implement greet() in utils.py" card.
 
 const KEY = "python::Implement greet() in utils.py";
 const SOLUTION = `def greet(name):

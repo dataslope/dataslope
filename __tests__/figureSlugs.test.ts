@@ -1,15 +1,8 @@
-// Guards the `<Figure>` placements across content/ (the optimized raster
-// images pipeline, scripts/build-images.mjs + app/_components/mdx/Figure.tsx).
-//
-// In production a `<Figure>` whose slug has no generated image renders
-// nothing at all (by design, so placements can be authored before artwork
-// lands), which means a typo'd slug ships an invisibly missing image with
-// zero signal. This suite turns that silent failure into a red test: every
-// placed slug must be "known", i.e. present in the generated manifest
-// (lib/generated/images.js) or listed as pending in the assets/images/README
-// table. It also enforces the component contract MDX can't type-check
-// (required alt) and pins the slugify rules that map source filenames to
-// slugs/URLs.
+// Guards <Figure> placements across content/. A <Figure> whose slug has no
+// generated image renders nothing in production (by design, so placements can
+// precede artwork), so a typo'd slug ships an invisibly missing image. Every
+// placed slug must be in the generated manifest or the assets/images/README
+// pending table; also enforces required alt and pins the slugify rules.
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
@@ -40,15 +33,10 @@ async function mdxFiles(dir: string): Promise<string[]> {
   return files;
 }
 
-/** Every `<Figure …>` opening tag across content/, with its slug and whether
- *  an alt attribute is present. JSX attribute blocks contain no `>`, so the
- *  `[^>]*` body matches multi-line tags too.
- *
- *  Read once and shared. Each of the four tests below wants the same list, and
- *  walking content/ per test meant reading every lesson four times over — fine
- *  at 169 figures in 300 files, past the 5 s default at 1,671 in 923 whenever
- *  the rest of the suite was competing for the disk. The content cannot change
- *  mid-run, so there is nothing to invalidate. */
+/** Every `<Figure …>` opening tag across content/ (JSX attribute blocks
+ *  contain no `>`, so `[^>]*` matches multi-line tags). Read once and shared:
+ *  all four tests want the same list, and re-walking content/ per test blew
+ *  the 5 s default timeout under disk contention. */
 let cached: Promise<Placement[]> | null = null;
 function figurePlacements(): Promise<Placement[]> {
   cached ??= (async () => {

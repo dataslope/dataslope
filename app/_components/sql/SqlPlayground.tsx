@@ -1,22 +1,9 @@
 "use client";
 
-// Browser-based SQLite playground. Boots @sqlite.org/sqlite-wasm, renders the schema in
-// a left sidebar (Tables/Views), and gives the user a multi-tab SQL
-// editor whose results land in a top results panel.
-//
-// Differs from `Playground.tsx` (which wraps a single REPL-style
-// adapter) in three significant ways:
-//   1. The engine is persistent across runs and tabs, only the
-//      database-selector causes a teardown/rebuild.
-//   2. The editor is multi-tab, with per-database persistence so
-//      switching databases doesn't blow away your work in the others.
-//   3. The "output" is a tabular result panel, not a stream of
-//      heterogeneous cells.
-//
-// All shared chrome (Settings dialog, runtime-info popover, run-overlay
-// animation, themes) is reused from `playgroundShared`/`playgroundTheme`
-// so this playground retints in lockstep with every other one when the
-// user picks a different editor theme.
+// Browser-based SQLite playground: boots @sqlite.org/sqlite-wasm, schema
+// sidebar, multi-tab SQL editor, tabular results panel. Unlike
+// `Playground.tsx`, the engine persists across runs/tabs and tabs persist
+// per database. Shared chrome comes from playgroundShared/playgroundTheme.
 
 import React, {
   useCallback,
@@ -135,9 +122,8 @@ import {
 const SQLITE_SAMPLE_DATABASES = sqliteAdapter.samples;
 import dynamic from "next/dynamic";
 
-// ErDiagramPane pulls in @xyflow/react and elkjs/lib/elk.bundled.js
-// (~hundreds of KB of layout-algorithm code). It only renders when
-// the user opens the ER-diagram tab, so defer the chunk until then.
+// ErDiagramPane pulls in @xyflow/react + elkjs (~hundreds of KB); defer the
+// chunk until the ER-diagram tab opens.
 const ErDiagramPane = dynamic(
   () => import("../ErDiagramPane").then((m) => m.ErDiagramPane),
   { ssr: false, loading: ErDiagramLoadingFallback },
@@ -242,10 +228,8 @@ const RUNTIME_INFO: RuntimeInfo = {
 // Modify Structure drawer
 // ────────────────────────────────────────────────────────────────────────
 
-/** Hints used by the result-view header to render PK / FK icons next
- *  to columns sourced from a known table. Computed by the parent
- *  whenever the current tab's result was produced by a sidebar
- *  preview, and threaded through `ResultView` → `ResultTableBody`. */
+/** Hints for the result-view header's PK / FK column icons; threaded
+ *  through `ResultView` → `ResultTableBody`. */
 interface ColumnKeyHints {
   pk: Set<string>;
   fk: Map<string, ForeignKeyInfo>;
@@ -253,9 +237,8 @@ interface ColumnKeyHints {
 
 // ─── Pragma settings ─────────────────────────────────────────────────────
 
-/** SQLite pragma defaults that the playground starts with when no saved
- *  preferences are found. `foreignKeys` is ON here because the engine
- *  already enables it via `PRAGMA foreign_keys = ON` in `build()`. */
+/** Pragma defaults when no saved preferences exist. `foreignKeys` is ON
+ *  because the engine already enables it in `build()`. */
 const DEFAULT_PRAGMA_SETTINGS = {
   foreignKeys: true,
   journalMode: "delete",
@@ -278,20 +261,15 @@ type PragmaSettings = {
 const PRAGMA_PAGE_SIZE_MIN = 512;
 const PRAGMA_PAGE_SIZE_MAX = 65536;
 
-/** Maps the human-readable `synchronous` setting names to their
- *  PRAGMA integer values. Kept at module level to avoid re-creating
- *  the object on every `applyPragmasToEngine` call. */
+/** Human-readable `synchronous` names → PRAGMA integer values. */
 const PRAGMA_SYNC_MAP: Record<string, string> = {
   off: "0",
   normal: "1",
   full: "2",
 };
 
-/** Apply a set of pragma settings to an already-initialised SQLite engine.
- *  Called once after the engine boots and again whenever the user saves
- *  changes in the Pragmas settings tab. Errors are swallowed so a single
- *  unsupported pragma (e.g. page_size on an existing database) does not
- *  prevent the other pragmas from being applied. */
+/** Apply pragma settings to an initialised engine (after boot and on save).
+ *  Errors are swallowed so one unsupported pragma doesn't block the rest. */
 async function applyPragmasToEngine(
   engine: import("../runtime/sqlite").SqliteEngine,
   p: PragmaSettings,
@@ -610,18 +588,16 @@ function SqlPlaygroundInner() {
   // True when this workspace is already open (locked) in another tab, so
   // the shell shows a conflict overlay instead of deadlocking on boot.
   const [workspaceConflict, setWorkspaceConflict] = useState(false);
-  // The workspace that conflict was over, so the overlay can offer a copy of
-  // it. A ref because the boot effect records it and only the overlay's
-  // handlers read it, no render depends on the value.
+  // The conflicted workspace, so the overlay can offer a copy of it. A ref:
+  // no render depends on the value.
   const conflictWorkspaceRef = useRef<{ id: string; name: string } | null>(null);
   const [conflictCopyBusy, setConflictCopyBusy] = useState(false);
   const [conflictCopyError, setConflictCopyError] = useState<string | null>(
     null,
   );
   // From the conflict overlay: duplicate the workspace another tab is holding
-  // and switch to the duplicate, which is the only action here that keeps the
-  // data the user came for. `copyConflictedWorkspace` reloads on success, so
-  // reaching the end of this callback means it failed.
+  // and switch to the duplicate. `copyConflictedWorkspace` reloads on
+  // success, so reaching the end of this callback means it failed.
   const handleConflictOpenCopy = useCallback(() => {
     const source = conflictWorkspaceRef.current;
     if (!source) return;
@@ -649,9 +625,9 @@ function SqlPlaygroundInner() {
       }
     })();
   }, []);
-  // From the conflict overlay: create a fresh workspace and switch to it.
-  // No engine is open in the conflict case, so a reload is the simplest
-  // safe path, the new workspace id isn't locked, so it boots normally.
+  // From the conflict overlay: create a fresh workspace and switch to it. No
+  // engine is open in the conflict case, so a reload is safe and the new
+  // workspace id isn't locked.
   const handleConflictNewWorkspace = useCallback(() => {
     void (async () => {
       try {
@@ -882,8 +858,7 @@ function SqlPlaygroundInner() {
     }
   }, [setSettingsOpen, setActiveTabId]);
 
-  /** Close the Settings tab (✕ in its tab strip entry or in the settings
-   *  tab bar) and return focus to the most-recent query tab. */
+  /** Close the Settings tab and return focus to the most-recent query tab. */
   const closeSettingsTab = useCallback(() => {
     setSettingsOpen(false);
     const fallback = tabsRef.current[0]?.id;
@@ -1118,10 +1093,9 @@ function SqlPlaygroundInner() {
     submitParquetImport,
   } = useDatabaseActions({ ...queryRunnerRefs, pragmaSettingsRef });
 
-  // ─── Cloud saves + sharing ────────────────────────────────────────────
-  // A SQL bundle carries the active database as its native SQLite file image
-  // (the codec gzips it) plus the query tabs; reopening loads the image
-  // directly instead of replaying a dump.
+  // Cloud saves + sharing: a SQL bundle carries the database as its native
+  // SQLite file image plus the query tabs; reopening loads the image
+  // instead of replaying a dump.
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const buildCloudBundle = useCallback<BuildBundle>(
     async (opts) => {
@@ -1162,10 +1136,8 @@ function SqlPlaygroundInner() {
     ],
   );
 
-  // Apply a pending share/cloud bundle once the engine is up (the /s/<id>
-  // page and the Cloud dialog leave a ref in sessionStorage and navigate
-  // here; the marker is consumed on the first attempt so a failure can't
-  // loop across reloads).
+  // Apply a pending share/cloud bundle once the engine is up. The marker is
+  // consumed on the first attempt so a failure can't loop across reloads.
   const pendingBundleTriedRef = useRef(false);
   useEffect(() => {
     if (!loaded || pendingBundleTriedRef.current) return;
@@ -1189,8 +1161,7 @@ function SqlPlaygroundInner() {
           bundleTabSeeds(bundle),
         );
         // A cloud save is the owner's own; a share is someone else's copy,
-        // whose `personal` section (if a future client ever sends one) is not
-        // ours to absorb.
+        // whose `personal` section is not ours to absorb.
         if (pendingRef.source === "cloud") {
           const restored = restoreQueryLog(bundle.sql.personal, queryLogKeys);
           if (restored) replaceHistory(restored.history);

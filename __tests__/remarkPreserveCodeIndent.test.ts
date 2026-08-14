@@ -1,18 +1,9 @@
 // Guards the indentation of authored code that reaches a learner's screen.
-//
-// micromark strips a base indentation from the continuation lines of a
-// multi-line JSX attribute expression while tokenizing, so a correctly
-// formatted `.mdx` source compiles to code whose every line sits flush left.
-// `remarkPreserveCodeIndent` undoes that by slicing each template quasi back
-// out of the original source.
-//
-// It only does so for attribute names it knows about, which is the failure
-// this suite exists for: `<LivePreview html={…} css={…}>` and
-// `<ReactPreview code={…}>` were absent from that list until 2026-08, so
-// every CSS rule body in the Modern CSS course and every JSX block in the
-// React course rendered un-indented while the source looked fine. Adding a
-// preview component with a new code-bearing prop reintroduces it silently,
-// so the corpus check below is the real guard.
+// micromark strips base indentation from multi-line JSX attribute expressions,
+// so formatted .mdx compiles to flush-left code; remarkPreserveCodeIndent
+// slices each template quasi back out of the source, but only for attribute
+// names it knows. A preview component with a new code-bearing prop
+// reintroduces the bug silently, so the corpus check below is the real guard.
 import { describe, expect, it } from "vitest";
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";

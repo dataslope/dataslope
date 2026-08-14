@@ -1,19 +1,11 @@
 "use client";
 
 /**
- * RuntimeBootNotice, the first-execution loading affordance shared by
- * <CodeBlock> and <ChallengeCard>.
- *
- * Shown while a runtime is downloading / instantiating on the first Run
- * (or Check Answer), so a multi-second cold start reads as "setting up"
- * rather than "broken". It pairs the brand assemble-and-quarter-turn
- * loader with a staged status line, a first-run size hint, and a
- * determinate progress bar driven by the adapter's coarse boot
- * fractions (see runtimeRegistry's progress hub + useCreepingBootFraction).
- *
- * Presentational and self-contained (it carries its own theme tokens),
- * so it renders identically embedded in a block and standalone in the
- * /learn/runtime-loading-states showcase.
+ * RuntimeBootNotice, the first-run loading affordance shared by <CodeBlock>
+ * and <ChallengeCard>: brand loader, staged status line, first-run size
+ * hint, and a determinate progress bar driven by the adapter's boot
+ * fractions. Presentational and self-contained, so it renders identically
+ * embedded and in the /learn/runtime-loading-states showcase.
  */
 
 import { useEffect, useState, type ReactNode } from "react";
@@ -39,9 +31,7 @@ export interface RuntimeBootNoticeProps {
   cold?: boolean;
   /** Approximate cold download size in MB (adapter.coldDownloadMB). */
   downloadMB?: number;
-  /** Compiled languages (Java, C, C++, C#). No longer changes the boot
-   *  copy, every runtime now reads "much faster", but kept so existing
-   *  call sites still type-check. */
+  /** No longer changes the boot copy; kept so call sites type-check. */
   compiled?: boolean;
   /** Smoothed boot fraction in 0..1, or null for an indeterminate boot
    *  (loader + copy only, no bar). */
@@ -106,12 +96,9 @@ export function RuntimeBootNotice({
 }
 
 // ─── Code-block layout preview ─────────────────────────────────────────
-// A static, non-interactive mock of a <CodeBlock> frozen in its loading
-// state, the real card chrome (header, editor, action bar, output
-// panel) reused via the shared CSS modules, with a faux editor instead
-// of a live CodeMirror instance. Lets the loading display be reviewed in
-// context without booting a runtime (and without the route-land warm-up
-// racing the screenshot).
+// A static mock of a <CodeBlock> frozen in its loading state (real card
+// chrome, faux editor), so the loading display can be reviewed without
+// booting a runtime.
 
 function PreviewLanguageGlyph({
   langId,
@@ -287,10 +274,8 @@ penguins = pd.read_csv("penguins.csv")
 by_species = penguins.groupby("species")["body_mass_g"].mean()
 print(by_species.round(1))`;
 
-/** A live boot simulation: cycles a fraction 0 → ~0.97 across a few
- *  staged messages, then loops, so the moving bar + loader can be seen
- *  in motion inside the real code-block layout. Mirrors exactly what the
- *  components feed the notice during a cold Pyodide boot. */
+/** Live boot simulation: loops a fraction 0 → ~0.97 across staged messages,
+ *  mirroring what a cold Pyodide boot feeds the notice. */
 function SimulatedCodeBlock() {
   const stages: Array<{ at: number; message: string }> = [
     { at: 0.04, message: "Starting Python runtime…" },

@@ -1,20 +1,10 @@
 "use client";
 
 /**
- * A placeholder slot for a custom illustration that hasn't been drawn yet.
- * Authored inline in a lesson by referencing a prompt id defined in
- * `data/illustration-prompts.json`:
- *
- * ```mdx
- * <IllustrationPrompt id="python-basics-hello-world" />
- * ```
- *
- * It renders a dashed "to be illustrated" card carrying the exact GPT Image 2
- * generation prompt (a risograph of the subject, in the four brand colors) plus
- * a copy button, so the prompt can be dropped straight into the image tool or
- * generated in bulk with scripts/generate-illustrations.mjs. Centralising the
- * definitions in the JSON keeps the lesson card, the `/dashboard/admin/illustration-prompts`
- * gallery, and the generator perfectly in sync; authors only supply the id.
+ * Placeholder card for a not-yet-drawn illustration, showing the generation
+ * prompt (defined in data/illustration-prompts.json) with a copy button.
+ * Centralising the definitions in the JSON keeps the lesson card, the admin
+ * gallery, and scripts/generate-illustrations.mjs in sync.
  */
 import { useCallback, useState } from "react";
 import { Check, Copy, ImageIcon } from "lucide-react";

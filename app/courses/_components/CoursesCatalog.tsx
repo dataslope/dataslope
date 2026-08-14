@@ -1,14 +1,9 @@
 "use client";
 
 /**
- * The `/courses` catalog, implements the "2a, Refined sidebar" mockup from
- * the courses-page redesign: a borderless 224px filter sidebar (search,
- * mono language icons, bar-style level meters, counts) next to a hairline-
- * separated course list with single-shade motif art.
- *
- * All filtering/sorting is client-side over the build-time course array the
- * server page passes in; the sidebar counts are totals over the whole
- * catalog (not the filtered list), matching the mockup.
+ * The `/courses` catalog: filter sidebar (search, language, level) next to
+ * the course list. Filtering/sorting is client-side over the build-time
+ * course array; sidebar counts are totals over the whole catalog.
  */
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { Select } from "@base-ui/react/select";
@@ -64,11 +59,9 @@ function subscribeToUrl(onChange: () => void) {
     window.removeEventListener(URL_FILTERS_CHANGED, onChange);
   };
 }
-// A string, so React's identity check on the snapshot is a value comparison and
-// an unchanged URL cannot loop.
+// A string snapshot, so an unchanged URL cannot loop.
 const getSearch = () => window.location.search;
-// Prerendering has no URL. Returning "" makes the static HTML the unfiltered
-// catalog, which is what hydration then matches.
+// Prerendering has no URL; "" makes the static HTML the unfiltered catalog.
 const getServerSearch = () => "";
 
 /** One sidebar filter row: leading glyph, label, trailing count. */
@@ -209,15 +202,13 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
   const [q, setQ] = useState("");
   const [sort, setSort] = useState<Sort>("popular");
 
-  // Single-select per category: clicking the active row clears it, clicking
-  // another replaces the selection. Kept as a 0-or-1-element array so the
-  // filter logic (and the mobile dropdowns) stay unchanged.
+  // Single-select per category: clicking the active row clears it. Kept as a
+  // 0-or-1-element array so the filter logic and mobile dropdowns share it.
   const selectOne = (arr: string[], v: string) =>
     arr[0] === v ? [] : [v];
 
-  // Sidebar rows: fixed mockup order (`COURSE_LANGUAGES`, shared with the
-  // footer's Courses column), restricted to languages that actually occur;
-  // unknown future languages append alphabetically.
+  // Sidebar rows: COURSE_LANGUAGES order, restricted to languages that occur;
+  // unknown languages append alphabetically.
   const languages = useMemo(() => {
     const present = new Set(
       courses.map((c) => c.tags.language?.[0]).filter(Boolean) as string[],
@@ -229,44 +220,27 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
     return [...ordered, ...extras];
   }, [courses]);
 
-  // ── Linkable filters ────────────────────────────────────────────────────
-  //
-  // The language and level selection is not React state: the URL holds it, and
-  // this reads it. That makes /courses?lang=python a link, and it removes the
-  // question of which of the two is right when they disagree, because there is
-  // only one of them.
-  //
-  // `useSyncExternalStore` rather than `useSearchParams`: this page is
-  // statically prerendered, and `useSearchParams` opts the whole route out of
-  // that unless it sits behind a Suspense boundary, in which case the fallback
-  // is what gets prerendered. Nothing is gained by either — the query string is
-  // unknown at build time, so the filtering happens on the client whichever API
-  // reads it — and this keeps the catalog's HTML static exactly as before.
-  //
-  // The server snapshot is "", so prerendered HTML is the unfiltered catalog
-  // and hydration matches it; React then re-renders with the real query string.
-  // This is the sanctioned way to read something that only exists on the
-  // client, as opposed to seeding state in an effect, which is a second copy of
-  // the truth that has to be kept in step with the first.
+  // The language/level selection lives in the URL, not React state, so
+  // /courses?lang=python is a link and there is one source of truth.
+  // `useSyncExternalStore` rather than `useSearchParams`: the latter would opt
+  // this statically prerendered route out (or force a Suspense fallback). The
+  // server snapshot is "", so prerendered HTML is the unfiltered catalog and
+  // hydration matches it.
   const search = useSyncExternalStore(subscribeToUrl, getSearch, getServerSearch);
   const { langs, levels } = useMemo(
     () => readFilters(search, languages, LEVELS),
     [search, languages],
   );
 
-  // Writing goes through the URL too, so a click and a pasted link take exactly
-  // the same path. `replaceState` rather than a router navigation: nothing needs
-  // re-fetching, and pushing an entry per filter click would bury the page the
-  // visitor arrived from under a stack of filter states. It does not notify
-  // anyone by itself, hence the event that wakes the store above.
+  // Writes go through the URL too. `replaceState` (not a router push): nothing
+  // needs re-fetching, and an entry per click would bury the referring page.
+  // It fires no event itself, hence the wake event above.
   const setFilters = (nextLangs: string[], nextLevels: string[]) => {
     const query = writeFilters(window.location.search, nextLangs, nextLevels);
     const { pathname } = window.location;
     window.history.replaceState(null, "", query ? `${pathname}?${query}` : pathname);
     window.dispatchEvent(new Event(URL_FILTERS_CHANGED));
   };
-  // Same signatures the call sites already used, so the sidebar rows and the
-  // mobile dropdowns are unchanged.
   const setLangs = (next: string[]) => setFilters(next, levels);
   const setLevels = (next: string[]) => setFilters(langs, next);
 
@@ -311,19 +285,17 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
   const hasFilters = Boolean(q || langs.length || levels.length);
   const reset = () => {
     setQ("");
-    // Both at once, not setLangs([]) then setLevels([]): each of those writes
-    // the whole query string from the values this render closed over, so the
-    // second call would put the language back.
+    // Both at once: setLangs then setLevels each write the whole query string
+    // from values this render closed over, so the second would undo the first.
     setFilters([], []);
   };
   const countText = list.length === 1 ? "1 course" : `${list.length} courses`;
 
   return (
     <>
-      {/* ── Mobile filter bar ── the sidebar is desktop-only; on mobile the
-          language + difficulty filters collapse to dropdowns that stick to
-          the top (just under the nav) once the page scrolls. Full-bleed
-          background so scrolled rows never show through. */}
+      {/* Mobile filter bar: the sidebar is desktop-only, so filters collapse
+          to sticky dropdowns here. Full-bleed background so scrolled rows
+          never show through. */}
       <div className="sticky top-11 z-30 -mx-4 mt-8 border-b bg-white px-4 py-3 md:hidden dark:bg-[#121212] sm:-mx-6 sm:px-6 border-[var(--ds-gray-100)] dark:border-white/[0.07]">
         <label
           className={`flex items-center gap-[9px] rounded-lg border px-3 py-2 focus-within:border-[var(--ds-blue-400)] dark:focus-within:border-[var(--ds-blue-500)] ${HAIRLINE}`}
@@ -375,18 +347,10 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
       </div>
 
       <div className="mt-8 grid grid-cols-1 items-start gap-10 md:mt-10 md:grid-cols-[224px_1fr] md:gap-14">
-        {/* ── Filter sidebar (desktop only) ──
-            Sticks to the top of the viewport once the page scrolls, so the
-            filters stay reachable next to a long course list. Only from `md`
-            up, below that the sidebar is replaced by the dropdown bar above,
-            which has its own `sticky`.
-
-            `top-[68px]` clears the compacted header (48px) plus its 12px fade
-            (see HomeNav). The `max-h` + `overflow-y-auto` keep the tail of the
-            language list reachable on short viewports rather than letting it
-            run off the bottom of a pinned column; `pr-2 -mr-2` gives the rows'
-            `hover:translate-x-0.5` room inside that scroll box (and parks any
-            scrollbar in the column gap) without narrowing the column. */}
+        {/* Desktop-only sticky sidebar. `top-[68px]` clears the compacted
+            header plus its fade (see HomeNav); `max-h` + `overflow-y-auto`
+            keep the list reachable on short viewports; `pr-2 -mr-2` gives the
+            rows' hover nudge room and parks the scrollbar in the column gap. */}
         <aside className="hidden flex-col gap-7 pt-0.5 md:sticky md:top-[68px] md:flex md:max-h-[calc(100svh-84px)] md:-mr-2 md:overflow-y-auto md:pr-2">
         <label
           className={`flex items-center gap-[9px] border-b px-0.5 pb-2.5 pt-1.5 focus-within:border-[var(--ds-blue-400)] dark:focus-within:border-[var(--ds-blue-500)] ${HAIRLINE}`}

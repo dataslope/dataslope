@@ -1,22 +1,12 @@
 import { test, expect } from "@playwright/test";
 
 /**
- * The shared site footer on the Fumadocs routes (course lessons,
- * interview-prep pages, /fumadocs-dev), and the sidebar behaviour that
- * depends on where it is rendered.
- *
- * The footer is rendered as a SIBLING of `DocsLayout`, below Fumadocs's grid
- * container (`#nd-docs-layout`), not as its child, see
- * app/_components/DocsFooter.tsx. That placement is what makes the sidebar
- * hold still for the length of the page and then let go as the footer arrives:
- * the sidebar is `position: sticky`, one viewport tall, inside a grid area
- * that spans the whole grid, so it unpins exactly when the grid's bottom edge,
- * i.e. the top of the footer, reaches the bottom of the viewport.
- *
- * Move the footer inside `DocsLayout` and it becomes a grid item instead: the
- * sidebar's area spans it and stays pinned right through the footer, and the
- * footer is laid into the grid's columns rather than across the page. Those
- * two are the regression these tests exist to catch.
+ * Shared site footer on Fumadocs routes. The footer must be a SIBLING of
+ * DocsLayout, below #nd-docs-layout (see DocsFooter.tsx): the sticky
+ * one-viewport sidebar spans the whole grid, so it unpins exactly when the
+ * grid's bottom edge — the top of the footer — reaches the viewport bottom.
+ * Moving the footer inside DocsLayout keeps the sidebar pinned over it and
+ * lays the footer into the grid columns; that is the regression caught here.
  */
 
 const DOCS_PAGE = "/fumadocs-dev";

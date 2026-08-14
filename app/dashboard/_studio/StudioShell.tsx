@@ -1,24 +1,11 @@
 "use client";
 
 /**
- * The /dashboard "Studio" shell: a persistent sidebar + top bar that wraps the
- * hub and every builder (rendered by app/dashboard/layout.tsx). Ported from
- * the Create Studio design handoff. The active nav item + breadcrumb come
- * from the pathname, so the shell stays mounted across navigations while the
- * content (children) swaps.
- *
- * Sidebar behavior mirrors the design's breakpoints exactly:
- *   - wide viewports: the full 264px sidebar, collapsible to the icon rail;
- *   - below 900px (or 1240px while a builder shows its live preview): the
- *     rail, with the toggle opening the full sidebar as a drawer overlay;
- *   - below 640px: no rail; a hamburger opens the drawer.
- *
- * The sidebar paints no background of its own (the design's classic variant
- * is transparent over the page) — only the drawer overlay gets the elevated
- * main background + shadow.
- *
- * Theme flips via the site-wide ThemePillToggle (siteTheme.ts); colors resolve
- * from the scoped tokens in studio.css.
+ * The /dashboard "Studio" shell: persistent sidebar + top bar wrapping the hub
+ * and every builder. Active nav/breadcrumb derive from the pathname, so the
+ * shell stays mounted across navigations. Breakpoints: full 264px sidebar on
+ * wide viewports; icon rail below 900px (1240px while a builder previews);
+ * hamburger + drawer below 640px.
  */
 
 import { useState } from "react";
@@ -63,8 +50,7 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
   const { previewOpen } = useStudioPreview();
 
   const winW = useViewportWidth();
-  // While a builder shows its side-by-side preview the content needs more
-  // room, so the sidebar gives way to the rail earlier (design's narrowLimit).
+  // With a side-by-side preview open, the sidebar gives way to the rail earlier.
   const narrowLimit = isBuilder && previewOpen ? 1240 : 900;
   const isPhone = winW < 640;
   const isNarrow = winW < narrowLimit;
@@ -72,15 +58,11 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(true);
-  // Eight entries, only relevant while you're in there: the Admin group starts
-  // open on an admin route and closed everywhere else, where Create is the
-  // group that matters.
+  // The Admin group starts open only on an admin route.
   const [adminOpen, setAdminOpen] = useState(active === "admin");
 
-  // Resizing back to a wide layout dismisses a left-over drawer (the inline
-  // sidebar takes over), mirroring the design's resize handler. Adjusted
-  // during render (not in an effect) per the React "adjust state when a prop
-  // changes" pattern.
+  // Resizing back to a wide layout dismisses a left-over drawer. Adjusted
+  // during render per the React "adjust state when a prop changes" pattern.
   const [wasNarrow, setWasNarrow] = useState(isNarrow);
   if (wasNarrow !== isNarrow) {
     setWasNarrow(isNarrow);
@@ -90,15 +72,11 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
   const showFullSidebar = !isPhone && !isNarrow && !collapsed;
   const showRail = !isPhone && !showFullSidebar;
 
-  // `role`/`plan` are auth additionalFields, not on the inferred client
-  // session type, so read them the way AccountClient does (a cast).
+  // `role` is an auth additionalField, not on the inferred client session type.
   const isAdmin = (session?.user as { role?: string } | undefined)?.role === "admin";
-  // The Admin group also carries the build/design tools that used to hang off
-  // the footer under `next dev` (color ramps, chart gallery, email designs).
-  // Those need no session, so on localhost the group is always reachable —
-  // otherwise moving them here would have hidden them from exactly the people
-  // who use them. Deployed, it stays admin-only. The data pages inside are
-  // gated server-side either way; this only decides what the sidebar offers.
+  // On localhost the Admin group is always reachable (it carries sessionless
+  // build/design tools); deployed it stays admin-only. Data pages inside are
+  // gated server-side either way — this only decides what the sidebar offers.
   const showAdmin = isAdmin || process.env.NODE_ENV === "development";
   const pageItems = PAGE_ITEMS.filter((i) => i.key !== "admin");
 
@@ -309,8 +287,7 @@ function FullSidebar({
               <Shield
                 size={17}
                 style={{
-                  // The parent stays lit while a child is active, so a
-                  // collapsed group still shows where you are.
+                  // Parent stays lit while a child is active.
                   color: active === "admin" ? "var(--green-text)" : "var(--muted)",
                 }}
               />
@@ -333,8 +310,7 @@ function FullSidebar({
                 {ADMIN_ITEMS.map((item, i) => (
                   <div key={item.key} className="contents">
                     {/* Hairline between the account tools and the build/design
-                        tools, which are a different kind of thing (and a
-                        different auth story, see nav.ts). */}
+                        tools (different auth story, see nav.ts). */}
                     {i > 0 && item.band !== ADMIN_ITEMS[i - 1].band ? (
                       <span
                         aria-hidden="true"
@@ -379,8 +355,7 @@ function NavLink({
     <Link
       href={item.href}
       onClick={onNavigate}
-      // An entry that leaves the shell (Fumadocs Dev brings its own docs
-      // chrome) opens beside the dashboard rather than replacing it.
+      // Entries that leave the shell open in a new tab.
       {...(item.external ? { target: "_blank", rel: "noreferrer" } : {})}
       aria-current={active ? "page" : undefined}
       data-active={active || undefined}
@@ -410,9 +385,7 @@ function RailSidebar({
   showAdmin: boolean;
   session: SessionData;
 }) {
-  // The rail is icons only, so the Admin group collapses back to its single
-  // parent entry; opening it lands on Users and the full sidebar takes over
-  // from there.
+  // Icons only, so the Admin group collapses to its single parent entry.
   const railItems = showAdmin
     ? [...pageItems, ...PAGE_ITEMS.filter((i) => i.key === "admin")]
     : pageItems;
@@ -492,9 +465,8 @@ function UserFooter({ session }: { session: SessionData }) {
   const { isPending } = useSession();
   const [signingOut, setSigningOut] = useState(false);
   const user = session?.user;
-  // Signed out: a quiet sign-in row where the account card would sit. Nothing
-  // while the first session read is in flight, so a signed-in visitor doing a
-  // full-page load doesn't see "Sign in" flash before their account appears.
+  // Nothing while the first session read is in flight, so a signed-in visitor
+  // doesn't see "Sign in" flash before their account appears.
   if (!user) {
     if (isPending) return null;
     return (
@@ -572,9 +544,7 @@ function TopBar({
   isPhone: boolean;
 }) {
   const showPrefix = active === "hub" || isBuilder;
-  // Admin sections used to be a tab row inside the page. Now that they're
-  // sidebar children, the breadcrumb is what names the section: "Admin / AI
-  // Usage".
+  // The breadcrumb names the admin section: "Admin / AI Usage".
   const adminCrumb = active === "admin" ? adminCrumbFor(pathname) : null;
   return (
     <div className="flex h-14 flex-shrink-0 items-center gap-3 px-2 sm:px-3.5 min-[900px]:px-6">

@@ -1,13 +1,7 @@
-// Public landing page for a playground share link (/s/<id>).
-//
-// Server-rendered per request (the share row lives in D1 and expiry is
-// enforced at read time, an expired or revoked link 404s here exactly like
-// the API). The page shows only the D1 metadata (name, playground, manifest
-// summary), the bundle payload is fetched from R2 only when the visitor
-// clicks "Open a copy".
-//
-// Shares are user content: `robots` is noindex (and /s/ is disallowed in
-// robots.ts) so links people share privately never end up in search results.
+// Public landing page for a playground share link (/s/<id>). Server-rendered
+// per request: expiry is enforced at read time, so an expired or revoked link
+// 404s. Shows only the D1 metadata; the R2 bundle is fetched only when the
+// visitor clicks "Open a copy". Shares are user content, so noindex.
 import "@/app/tailwind.css";
 import "@/app/home.css";
 import type { Metadata } from "next";

@@ -1,12 +1,8 @@
 "use client";
 
-// Shared CodeMirror v6 helpers used by every editor mount in the app
-// (CodeBlock, Playground, SqlPlayground.DdlViewer). Keeps the per-call-
-// site setup small while leaving v6's compositional API exposed,
-// consumers still hold their own EditorView, manage their own
-// Compartments, and dispatch their own transactions, so adding custom
-// extensions / decorations / annotations later is just appending to the
-// extension list at the call site.
+// Shared CodeMirror v6 helpers for every editor mount in the app. Consumers
+// still hold their own EditorView/Compartments and dispatch their own
+// transactions.
 
 import { EditorView, type KeyBinding } from "@codemirror/view";
 import { redo } from "@codemirror/commands";
@@ -26,30 +22,16 @@ import {
 } from "./playgroundTheme";
 
 // ─── Redo keybinding ─────────────────────────────────────────────────────
-//
-// `@codemirror/commands`' default `historyKeymap` binds redo to Ctrl-y on
-// Windows/Linux and Cmd-Shift-z on macOS, so the near-universal Ctrl-Shift-z
-// redo chord does nothing on Windows/Linux. `Mod-Shift-z` fills that gap:
-// `Mod` resolves to Ctrl on Windows/Linux and Cmd on macOS, so redo now
-// fires on Ctrl-Shift-z (Win/Linux) and Cmd-Shift-z (macOS), alongside the
-// existing Ctrl-y. Append after `historyKeymap` wherever an editable editor
-// is mounted.
+// The default `historyKeymap` lacks Ctrl-Shift-z redo on Windows/Linux;
+// `Mod-Shift-z` fills that gap. Append after `historyKeymap`.
 export const redoKeymap: readonly KeyBinding[] = [
   { key: "Mod-Shift-z", run: redo, preventDefault: true },
 ];
 
 // ─── Language loader ─────────────────────────────────────────────────────
-//
-// Maps the `codeMirrorMode` strings the runtime adapters expose (kept
-// identical to v5 to avoid touching 9 adapter files) to v6 language
-// extensions. Languages without a dedicated v6 package (R, C#) come from
-// `@codemirror/legacy-modes`, which re-runs the v5 stream parser inside
-// v6's framework.
-//
-// Returns `null` for unknown modes, callers should treat that as
-// "render plain text", which is how v5 behaved when a mode wasn't loaded.
-// A failed chunk load (flaky network on a deployed site) resolves `null`
-// too, so callers never see an unhandled rejection for a cosmetic feature.
+// Maps adapters' v5-style `codeMirrorMode` strings to v6 language extensions
+// (R and C# via legacy-modes). Resolves `null` — render plain text — for
+// unknown modes and for failed chunk loads, never an unhandled rejection.
 
 export async function loadLanguage(mode: string): Promise<Extension | null> {
   try {
@@ -98,9 +80,8 @@ async function loadLanguageModule(mode: string): Promise<Extension | null> {
       const { r } = await import("@codemirror/legacy-modes/mode/r");
       return StreamLanguage.define(r);
     }
-    // SQL is intentionally not handled here, SqlPlayground builds the
-    // language extension itself so it can pass a live `schema` for
-    // schema-aware autocompletion.
+    // SQL is intentionally absent: SqlPlayground builds its own extension so
+    // it can pass a live `schema` for autocompletion.
     case "xml": {
       const { xml } = await import("@codemirror/lang-xml");
       return xml();
@@ -119,12 +100,8 @@ async function loadLanguageModule(mode: string): Promise<Extension | null> {
 }
 
 // ─── Theme builder ───────────────────────────────────────────────────────
-//
-// v6 themes are JS objects. Rather than ship 19 hand-written themes (or
-// pull in a fat third-party theme bundle), we synthesise the editor
-// theme + token highlight style from the same `THEME_PALETTES` catalog
-// already used by the surrounding UI chrome. The editor then stays in
-// lockstep with the chrome whenever the user picks a different theme.
+// Synthesises editor theme + highlight style from the same `THEME_PALETTES`
+// catalog the UI chrome uses, so the two stay in lockstep.
 
 function buildTheme(name: string, palette: ThemePalette, isLight: boolean): Extension {
   const selectionBg = isLight
@@ -157,8 +134,7 @@ function buildTheme(name: string, palette: ThemePalette, isLight: boolean): Exte
         border: "none",
         borderRight: `1px solid ${palette.border}`,
       },
-      // `highlightActiveLine()` adds a background to `.cm-activeLine`; keep
-      // it transparent so the current line has no background highlight.
+      // Suppress highlightActiveLine()'s current-line background.
       ".cm-activeLine": { backgroundColor: "transparent !important" },
       ".cm-activeLineGutter": {
         backgroundColor: "transparent !important",
@@ -241,9 +217,8 @@ function buildTheme(name: string, palette: ThemePalette, isLight: boolean): Exte
     { tag: [t.operator], color: palette.kw },
   ]);
 
-  // Stamp the theme name as a class on the editor wrapper so any legacy
-  // theme-scoped CSS (e.g. `.cm-s-tomorrow-night-eighties …`) still has
-  // a selector to attach to.
+  // Stamp the theme name as a class so legacy theme-scoped CSS (`.cm-s-…`)
+  // still has a selector.
   const themeNameClass = EditorView.editorAttributes.of({
     class: `cm-s-${name.replace(/\s+/g, "-")}`,
   });
@@ -257,21 +232,15 @@ function buildTheme(name: string, palette: ThemePalette, isLight: boolean): Exte
 
 const themeCache = new Map<string, Extension>();
 
-/** An extension that suppresses active-line background highlighting.
- *  Add to any editor where the current-line glow is distracting (e.g.
- *  challenge-card read-only init editors, user code editors, and the
- *  GitHub themes, see `themeFor`). */
+/** Suppresses active-line background highlighting. */
 export const noActiveLine: Extension = EditorView.theme({
   ".cm-activeLine": { backgroundColor: "transparent !important" },
   ".cm-activeLineGutter": { backgroundColor: "transparent !important" },
 });
 
-// GitHub Dark with editor/gutter backgrounds overridden to match the
-// Fumadocs page background (`--color-fd-background`). We apply this as
-// a secondary EditorView.theme after githubDark so it wins via ordering
-// (last theme wins when specificity ties). The fallback `#121212` is the
-// site's neutral near-black, used outside the /learn route where the
-// Fumadocs token isn't defined (it replaces GitHub's blue-tinted #0d1117).
+// Override GitHub Dark's editor/gutter backgrounds to match the Fumadocs page
+// background; applied after githubDark so it wins via ordering. The #121212
+// fallback covers routes where the Fumadocs token isn't defined.
 const githubDarkPageBgOverride = EditorView.theme(
   {
     "&": {
@@ -283,9 +252,8 @@ const githubDarkPageBgOverride = EditorView.theme(
   },
   { dark: true },
 );
-// The @uiw GitHub themes paint an active-line background; the rest of our
-// editor themes (built via buildTheme) suppress it, so add `noActiveLine`
-// here to keep the current-line highlight off on the GitHub themes too.
+// The @uiw GitHub themes paint an active-line background; suppress it to
+// match the buildTheme themes.
 const githubDarkCustom: Extension = [
   githubDark,
   githubDarkPageBgOverride,
@@ -294,9 +262,7 @@ const githubDarkCustom: Extension = [
 const githubLightCustom: Extension = [githubLight, noActiveLine];
 
 export function themeFor(name: string): Extension {
-  // GitHub themes come directly from the @uiw package, bypass the
-  // palette-based buildTheme so they use the package's own token
-  // colors instead of our synthetic approximation.
+  // GitHub themes use the @uiw package's own token colors, not buildTheme.
   if (name === "github-dark") return githubDarkCustom;
   if (name === "github-light") return githubLightCustom;
   const cached = themeCache.get(name);

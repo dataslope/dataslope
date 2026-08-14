@@ -1,31 +1,10 @@
 "use client";
 
 /**
- * MDX-friendly wrapper around `<CodeBlock>`.
- *
- * MDX authors can't import TypeScript modules, so this component takes
- * a string `adapter` id (e.g. `"python"`, `"javascript"`) and resolves
- * it to the corresponding `LanguageAdapter` instance from
- * `runtime/adapters`. All other props are forwarded to `<CodeBlock>`
- * unchanged.
- *
- * Usage in MDX (every block passes a `files` array; each file carries
- * its own `initCode` and `starterCode`; an optional `datasets` array
- * stages remote files from the dataslope/datasets repo into the
- * runtime's working directory before each run):
- * ```mdx
- * <CodeBlock
- *   adapter="python"
- *   datasets={[{ path: "csv/penguins.csv", stageAs: "penguins.csv" }]}
- *   files={[
- *     {
- *       filename: "main.py",
- *       initCode: `import pandas as pd\npenguins = pd.read_csv("penguins.csv")`,
- *       starterCode: `penguins.head()`,
- *     },
- *   ]}
- * />
- * ```
+ * MDX-friendly wrapper around `<CodeBlock>`. MDX authors can't import
+ * TypeScript modules, so this takes a string `adapter` id and resolves it to
+ * the `LanguageAdapter` instance from `runtime/adapters`; all other props
+ * forward unchanged.
  */
 
 import CodeBlock, { type CodeBlockFile } from "./CodeBlock";

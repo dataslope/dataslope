@@ -351,8 +351,7 @@ bye <- function(name) {
 ];
 
 const PACKAGES: PackageInfo[] = [
-  // Base R packages (base, stats, graphics, utils) are auto-loaded in
-  // every R session and need no library() call, they are omitted here.
+  // Base R packages (auto-loaded, no library() call) are omitted.
   // Tidyverse
   {
     cat: "Tidyverse", icon: "🧰", color: "#34d399", name: "tidyverse", ver: "2.0",
@@ -595,16 +594,12 @@ async function imageBitmapToPngBase64(bmp: ImageBitmap): Promise<string> {
   return btoa(binary);
 }
 
-// Row-display limits that mirror R notebook behaviour (tibble print defaults).
-// When a data frame has more than MAX rows, only the first HEAD rows and the
-// last TAIL rows are shown, separated by an ellipsis row and followed by a
-// footer that states the total row count.
+// Row-display limits mirroring tibble print defaults: over MAX rows, show
+// HEAD + ellipsis + TAIL with a total-count footer.
 const R_MAX_DISPLAY_ROWS = 20;
 const R_HEAD_ROWS = 10;
 const R_TAIL_ROWS = 5;
-// Column-display limits (Jupyter/pandas-style): a frame wider than MAX
-// columns shows the first HEAD and last TAIL columns with an ellipsis
-// column between, so very wide frames stay scannable.
+// Column-display limits (Jupyter/pandas-style): HEAD + ellipsis + TAIL.
 const R_MAX_DISPLAY_COLS = 20;
 const R_HEAD_COLS = 10;
 const R_TAIL_COLS = 10;
@@ -728,31 +723,16 @@ function rowsFromDataFrame(value: unknown): Record<string, unknown>[] | null {
 // Working directory inside the WebR Emscripten FS (matches `getwd()` output).
 const WEB_USER_HOME = "/home/web_user";
 
-// Newline-separated list of absolute paths created during a run (currently
-// download.file() destinations). Read back by collectCreatedFiles() so
-// downloads appear in the Files pane, then cleared.
+// Newline-separated absolute paths created during a run (download.file()
+// destinations), read back by collectCreatedFiles() then cleared.
 const CREATED_FILES_PATH = "/tmp/.pg_created_files";
 
-// One-time R setup, run once after the runtime initialises and kept on the
-// search path so it survives the per-run wipe of the global environment (and
-// never shows up in the user's ls()).
-//
-// 1. download.file(): WebR's built-in download.file() already works in the
-//    playground (it performs the request synchronously inside the worker). We
-//    wrap it to (a) mirror the destination file into the Files pane and
-//    (b) print its "trying URL" / "downloaded …" progress to stdout instead of
-//    stderr, which the playground styles as an error. The actual fetch is
-//    delegated unchanged to utils::download.file(), so cross-origin hosts still
-//    need permissive CORS headers (or the CORS proxy), exactly like
-//    pandas.read_csv in the Python runtime.
-//
-// 2. print(): base R prints every row of a plain data.frame, which can freeze
-//    the page for large frames. We override the print generic (an ordinary
-//    search-path lookup, unlike an S3 method which UseMethod won't pick up from
-//    an attached env) to show the first 10 and last 5 rows with an ellipsis,
-//    the same Jupyter-style truncation already used for auto-printed frames
-//    (see dataFrameToHtml). Only plain data.frames are affected; tibbles,
-//    data.tables, etc. keep their own already-truncating print methods.
+// One-time R setup, kept on the search path so it survives the per-run wipe
+// of the global environment. 1. download.file() is wrapped to mirror the
+// destination into the Files pane and print progress to stdout (stderr is
+// styled as an error); CORS still applies. 2. print() is overridden (a
+// search-path lookup, not an S3 method) to truncate plain data.frames;
+// tibbles/data.tables keep their own truncating print methods.
 const R_SESSION_SETUP = String.raw`
 suppressWarnings(dir.create("/tmp", showWarnings = FALSE))
 
@@ -809,11 +789,8 @@ local({
 })
 `;
 
-// Backstop against a single run flooding the UI with megabytes of text (e.g.
-// printing a huge vector or matrix), which can freeze the browser. Keep the
-// head and tail so the output stays useful. Large data frames are truncated
-// more nicely by the print.data.frame override above; this catches everything
-// else.
+// Backstop against a run flooding the UI with megabytes of text; keeps head
+// and tail. Data frames are truncated more nicely by the print override.
 const MAX_CELL_TEXT_CHARS = 250_000;
 function capCellText(text: string): string {
   if (text.length <= MAX_CELL_TEXT_CHARS) return text;
@@ -836,31 +813,24 @@ class WebRRuntime implements LanguageRuntime {
 
   constructor(private webR: WebRInstance) {}
 
-  /** Free the R heap by shutting the webR session down. Registry-eviction
-   *  hook, the instance must not be used after this. Also un-registers
-   *  this session from the styler formatter so a later Format click
-   *  starts a fresh session instead of talking to a dead one. */
+  /** Shut the webR session down (registry-eviction hook; unusable after).
+   *  Also un-registers from the styler formatter so a later Format click
+   *  starts fresh instead of talking to a dead session. */
   dispose(): void {
     releaseFormatterSession(this.webR);
     void this.webR.close().catch(() => {});
   }
 
   // ─── Autocomplete via R's own completion engine ───────────────────────
-  //
-  // R ships a readline-oriented completion engine in `utils` (the same
-  // one Rgui/ESS use). WebR exposes it like any other R code, so
-  // completions cover keywords, base functions, user globals from the
-  // previous run, package exports (`::`), list/data.frame components
-  // (`$`), and function arguments (`name=`), with zero extra download.
-  // This mirrors the official webR REPL's CodeMirror wiring.
+  // Uses the readline completion engine in `utils` (zero extra download),
+  // mirroring the official webR REPL's CodeMirror wiring.
 
   private ensureCompletionSetup(): Promise<boolean> {
     if (!this.completionSetup) {
       this.completionSetup = this.webR
         .evalRVoid(
-          // func = TRUE appends "(" to function completions (stripped
-          // below, but it's what tells us the completion IS a function);
-          // fuzzy stays off, CodeMirror does its own fuzzy filtering.
+          // func = TRUE appends "(" to function completions (how we know a
+          // completion IS a function); CodeMirror does its own fuzzy filtering.
           "utils::rc.settings(ops = TRUE, ns = TRUE, args = TRUE, func = TRUE, fuzzy = FALSE)",
         )
         .then(
@@ -878,10 +848,8 @@ class WebRRuntime implements LanguageRuntime {
     const lineToCursor = request.line.slice(0, request.column);
     if (!lineToCursor.trim() && !request.explicit) return empty;
 
-    // Drive the engine exactly like R's own console: assign the line
-    // buffer + cursor, let R guess the token, complete it, and read the
-    // results back joined on a separator no completion can contain.
-    // `JSON.stringify` produces escaping that is also valid in an R
+    // Drive the engine like R's own console; results join on a separator no
+    // completion can contain. JSON.stringify escaping is also valid in an R
     // string literal, so the user's line never breaks the R code.
     const rCode = `local({
   lb <- ${JSON.stringify(lineToCursor)}
@@ -965,8 +933,7 @@ class WebRRuntime implements LanguageRuntime {
       }
     }
 
-    // Remove files staged on a previous run that are no longer present so
-    // renames and deletes in the UI propagate to the R filesystem.
+    // Remove previously staged files so UI renames/deletes propagate.
     for (const prev of this.stagedPaths) {
       if (!nextPaths.has(prev)) {
         try {
@@ -988,8 +955,7 @@ class WebRRuntime implements LanguageRuntime {
     const toInstall = referenced.filter((p) => !this.installedPackages.has(p));
     if (toInstall.length === 0) return "";
     for (const p of toInstall) this.installedPackages.add(p);
-    // A real mid-run download, surface the boot notice for the duration
-    // (the main thread debounces it, so a fast install doesn't flash).
+    // Surface the boot notice during the download (debounced upstream).
     const label = `Installing R package${toInstall.length > 1 ? "s" : ""}: ${toInstall.join(", ")}…`;
     onStatus?.(label, true);
     try {
@@ -1017,16 +983,13 @@ unlink("${CREATED_FILES_PATH}")`,
 
     const shelter: ShelterInstance = await new this.webR.Shelter();
     try {
-      // Write user code to a VFS temp file so we don't need to escape it when
-      // embedding it inside our withVisible() wrapper string.
+      // User code goes in via a VFS temp file so it never needs escaping.
       const tmpPath = `${WEB_USER_HOME}/.pg_run_code.R`;
       await this.webR.FS.writeFile(tmpPath, new TextEncoder().encode(code));
 
-      // Wrap user code with withVisible() so we can determine whether the last
-      // expression should produce output (visible=TRUE) without letting R
-      // auto-print it (which would dump every row of a large data frame).
-      // .pg_last_result and .pg_last_visible are stored in .GlobalEnv for use
-      // in subsequent captureR calls below.
+      // withVisible() tells us whether the last expression should produce
+      // output without letting R auto-print it (which would dump every row
+      // of a large frame). Results are stored in .GlobalEnv for later calls.
       const result = await shelter.captureR(
         `.pg_vr <- withVisible(eval(parse(file = "${tmpPath}"), envir = .GlobalEnv))
 .pg_last_visible <- .pg_vr$visible
@@ -1090,8 +1053,7 @@ unlink("${CREATED_FILES_PATH}")`,
         }
 
         if (!emittedHtml) {
-          // Non-data-frame visible result (vector, list, ggplot, …): print via R
-          // so that print methods such as print.ggplot fire correctly.
+          // Non-data-frame result: print via R so print methods fire.
           try {
             const printCapture = await shelter.captureR(`print(.pg_last_result)`, {
               withAutoprint: false,
@@ -1122,14 +1084,9 @@ unlink("${CREATED_FILES_PATH}")`,
     }
   }
 
-  /**
-   * Returns files created during the run that should appear in the Files
-   * pane, currently the destinations written by our download.file()
-   * override, recorded in CREATED_FILES_PATH. Paths are returned relative
-   * to the WebR home directory (the playground's working directory) so they
-   * line up with the names shown in the Files pane. The tracking list is
-   * cleared after reading so each file is reported at most once.
-   */
+  /** Files created during the run (download.file() destinations), returned
+   *  relative to the WebR home directory to match the Files pane. The
+   *  tracking list is cleared so each file is reported at most once. */
   async collectCreatedFiles(): Promise<Map<string, Uint8Array>> {
     const out = new Map<string, Uint8Array>();
 
@@ -1174,20 +1131,10 @@ unlink("${CREATED_FILES_PATH}")`,
 }
 
 // ─── styler-based code formatter ─────────────────────────────────────────
-//
-// The playground's "Format code" button calls rAdapter.formatCode(), which
-// pretty-prints the buffer with the {styler} package *inside WebR*, so, like
-// everything else here, formatting runs entirely client-side in WebAssembly
-// with no server round-trip. styler and its dependency closure are served as
-// pre-built Wasm binaries from the same WebR CRAN-like repo used for ggplot2,
-// dplyr, etc., and installed on first use.
-//
-// Formatting is a pure text→text transform: it only reads/writes scratch
-// files under /tmp and never touches the user's globals or staged files. That
-// lets it safely reuse whichever WebR session the page already started instead
-// of paying for a second R runtime. init() records that session below; if
-// Format is somehow clicked before any runtime has initialised (an embedded
-// code block that hasn't been Run yet) we lazily start a dedicated session.
+// "Format code" runs {styler} inside WebR, installed on first use. It only
+// touches scratch files under /tmp (never the user's globals or staged
+// files), so it can safely reuse the page's existing WebR session; a click
+// before any runtime exists lazily starts a dedicated session.
 
 let activeWebR: WebRInstance | null = null;
 let dedicatedFormatterWebR: Promise<WebRInstance> | null = null;

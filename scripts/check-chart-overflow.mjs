@@ -1,32 +1,16 @@
 #!/usr/bin/env node
 /**
- * Fail on a chart that draws outside its own box.
+ * Fail on a chart that draws outside its own box. Observable Plot does not
+ * clip a mark unless asked, so data past an explicit domain is drawn out of
+ * the SVG entirely, over whatever the page has beside the figure. The check
+ * reads the rendered SVG rather than the specs, because overflow depends on
+ * the data — run `build-charts.mjs` first (`npm run check:charts` does).
  *
- * Observable Plot does not clip a mark unless the mark asks it to, so data
- * that runs past an explicit domain keeps being drawn: not into the margin,
- * but out of the SVG entirely, over whatever the page has beside the figure.
- * `bonferroni-vs-fdr` built its Benjamini-Hochberg threshold for all 100 ranks
- * against an x domain of 30, and the other 70 left the frame as a diagonal
- * running across the lesson's table of contents. Two more were found the same
- * way: a faceted density whose grid ran to 0.999 under a domain of 0.7, and a
- * rule at a percentile the domain is sized never to reach.
- *
- * The check reads the rendered SVG rather than the specs, because whether a
- * mark overflows depends on the data, and the data is only known once it is
- * drawn. Run `build-charts.mjs` first; `npm run check:charts` does.
- *
- * ── What counts as outside ─────────────────────────────────────────────────
- *
- *   - `<text>` never counts. Axis labels legitimately sit in the margin, and
- *     a label's box is not in its coordinates anyway.
- *   - Anything under a `clip-path` never counts: that is the fix working.
- *   - A `<clipPath>`'s own `<rect>` never counts: it describes the clip.
- *   - Everything else counts, with ancestor `translate()`s accumulated, which
- *     is what catches a mark that only leaves the box once its facet's offset
- *     is applied.
- *
- * A tolerance of 2px absorbs stroke width on a mark sitting exactly on the
- * edge, which is every axis rule.
+ * What counts as outside: `<text>` never (axis labels legitimately sit in the
+ * margin); anything under a `clip-path` never (that is the fix working); a
+ * `<clipPath>`'s own `<rect>` never. Everything else counts, with ancestor
+ * `translate()`s accumulated so facet offsets apply. A 2px tolerance absorbs
+ * stroke width on marks sitting exactly on the edge.
  *
  * Usage:
  *   node scripts/check-chart-overflow.mjs [--verbose]
@@ -43,12 +27,10 @@ const NUM = /-?\d+(?:\.\d+)?(?:e-?\d+)?/g;
 const GEOMETRY = new Set(["path", "circle", "ellipse", "line", "polyline", "polygon", "rect"]);
 
 /**
- * Endpoints of every segment in a path's `d`.
- *
- * Parameters are consumed per command rather than read as a flat list of
- * pairs, because an elliptic arc carries seven of them and only the last two
- * are a point. Reading `A 62 62 0 0 1 624 116` as pairs invents a point at
- * y = 624 and reports every pie chart in the set as overflowing.
+ * Endpoints of every segment in a path's `d`. Parameters are consumed per
+ * command, not as flat pairs: an elliptic arc carries seven and only the last
+ * two are a point — reading it as pairs invents points and flags every pie
+ * chart.
  */
 const ARITY = { m: 2, l: 2, t: 2, h: 1, v: 1, c: 6, s: 4, q: 4, a: 7, z: 0 };
 export function pathPoints(d) {

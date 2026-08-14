@@ -1,22 +1,10 @@
 /**
- * Let a generator `import` the app's own TypeScript modules.
- *
- * Node 22 strips types by itself, so `import { blockOutputKey } from
- * "../lib/blockOutputKey.ts"` already works — which is why
- * `build-block-outputs.mjs` can share that file rather than reimplement it.
- * What Node does *not* do is Node-resolution of extensionless specifiers in
- * ESM, so the moment a shared module imports a sibling the way app code
- * always does (`from "./cdn"`), the import fails.
- *
- * That one gap is the whole reason a generator would otherwise copy logic
- * out of the app and let it drift. `scripts/lib/python-output-capture.mjs`
- * is the standing example of the alternative, and AGENTS.md describes what
- * it costs. So: register a resolve hook that tries the TypeScript
- * extensions before giving up, and the generator gets the real module.
- *
- * Deliberately narrow. It only fires for relative specifiers that have no
- * extension at all and only when a matching file is actually on disk, so it
- * cannot shadow a package, a builtin, or an explicit `.js` import.
+ * Let a generator `import` the app's own TypeScript modules. Node 22 strips
+ * types itself but does not resolve extensionless relative specifiers in ESM
+ * (`from "./cdn"`), so this registers a resolve hook that tries the TS
+ * extensions. Deliberately narrow: fires only for extensionless relative
+ * specifiers with a matching file on disk, so it cannot shadow a package, a
+ * builtin, or an explicit `.js` import.
  */
 
 import { registerHooks } from "node:module";

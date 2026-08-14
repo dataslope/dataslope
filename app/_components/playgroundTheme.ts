@@ -1,19 +1,8 @@
-// Shared CodeMirror editor-theme catalog and helpers used by every
-// playground (Python, R, JS, …, SQLite). Extracted from Playground.tsx
-// so that the SQL playground can re-tint its custom UI with the same
-// CSS custom properties that the rest of the app uses, ensuring the
-// "selecting an editor theme changes the overall feel" behavior is
-// identical across playgrounds.
-//
-// The catalog is intentionally just two themes, GitHub Light and GitHub
-// Dark, which map 1:1 to the site-wide light/dark mode. The playground's
-// light/dark choice is therefore the SAME choice the rest of the site uses
-// (the `theme` localStorage key + `.dark` class); see playgroundThemeSync.ts.
-//
-// Each theme drives both:
-//   1. the CodeMirror editor (via `themeFor(value)`), and
-//   2. the surrounding UI chrome (via the CSS custom properties below
-//      written to `<html>` by `applyThemePalette`).
+// Shared editor-theme catalog and helpers for every playground. Intentionally
+// just GitHub Light/Dark, mapping 1:1 to the site-wide light/dark choice (see
+// playgroundThemeSync.ts). Each theme drives both the CodeMirror editor
+// (`themeFor`) and the UI chrome (CSS custom properties via
+// `applyThemePalette`).
 
 export interface ThemeEntry {
   value: string;
@@ -46,13 +35,9 @@ export interface ThemePalette {
 }
 
 export const THEME_PALETTES: Record<string, ThemePalette> = {
-  // GitHub themes drive the editor from the @uiw/codemirror-theme-github
-  // package (see `themeFor` in cmExtensions.ts), which bypasses the
-  // synthetic `buildTheme`. These palettes therefore only tint the
-  // surrounding UI chrome and the theme-card preview swatch; the token
-  // colors below mirror the @uiw GitHub themes so the two stay in sync.
-  // The dark background is the site's neutral near-black (#121212), not
-  // GitHub's blue-tinted #0d1117.
+  // The editor itself uses the @uiw GitHub themes (see themeFor); these
+  // palettes only tint the UI chrome, with token colors mirroring @uiw so the
+  // two stay in sync. Dark bg is the site's #121212, not GitHub's #0d1117.
   "github-dark": {
     bg: "#121212",
     bg2: "#0a0a0a",
@@ -85,9 +70,7 @@ export const THEME_PALETTES: Record<string, ThemePalette> = {
   },
 };
 
-/** Push the given theme's palette into CSS custom properties on `<html>`
- *  so every surface that consumes `--bg`/`--bg2`/`--text`/etc. retints
- *  in lockstep with the editor. */
+/** Write the theme's palette to CSS custom properties on `<html>`. */
 export function applyThemePalette(theme: string): void {
   const p = THEME_PALETTES[theme] ?? THEME_PALETTES["github-light"];
   const root = document.documentElement;
@@ -118,10 +101,8 @@ export function clearThemePalette(): void {
     "--theme-primary",
     "--accent1",
     "--accent2",
-    // Font-size vars are set on <html> alongside the palette by every
-    // playground's mount effect; clear them here too (this function's only
-    // callers are those playgrounds' unmount cleanups) so they don't leak
-    // onto non-playground routes after client-side navigation.
+    // Also clear the font-size vars playgrounds set on <html>, so they don't
+    // leak onto non-playground routes after client-side navigation.
     "--cm-font-size",
     "--output-font-size",
   ]) {
@@ -154,10 +135,8 @@ export function setStoredEditorTheme(theme: string): void {
   }
 }
 
-/** Toggle `data-playground-theme` on `<html>` so playground-specific light-mode
- *  CSS overrides apply (e.g. inverting the loading overlay for light
- *  themes). Uses a playground-namespaced attribute so it never conflicts
- *  with the docs site's own `data-theme` / class-based dark mode. */
+/** Set `data-playground-theme` on `<html>` for playground light-mode CSS
+ *  overrides; namespaced so it never conflicts with the docs site's dark mode. */
 export function applyMode(theme: string): void {
   const resolved = LIGHT_THEMES.has(theme) ? "light" : "dark";
   document.documentElement.setAttribute("data-playground-theme", resolved);

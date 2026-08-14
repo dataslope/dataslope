@@ -310,10 +310,8 @@ describe("webAdapter.composeStaticPreview", () => {
   });
 
   it("agrees exactly with what a real Run composes", () => {
-    // The anti-drift guard: a preview that disagrees with the reader's
-    // own Run is worse than no preview, because nothing tells them which
-    // to believe. Both paths reach composeWebDocument with the same file
-    // map and the same token, so the documents must be identical.
+    // Anti-drift guard: a preview that disagrees with the reader's own Run is
+    // worse than no preview. Both paths must compose identical documents.
     const textFiles = new Map(sources.map((f) => [f.filename, f.source]));
     const runDoc = composeWebDocument({
       entryHtml: sources[0].source,
@@ -353,10 +351,8 @@ describe("auto-preview is opt-in per adapter", () => {
   });
 
   it("react composes from a precompiled bundle, never from source", () => {
-    // Deriving a second answer from the sources in the browser is exactly
-    // the ~3 MB esbuild-wasm download the build-time bundle exists to
-    // avoid — and a second implementation of the bundler is the drift this
-    // whole design is arranged to prevent. No bundle, no preview.
+    // Bundling in the browser would need the ~3 MB esbuild-wasm download the
+    // build-time bundle exists to avoid. No bundle, no preview.
     const sources = [{ filename: "main.tsx", source: "export {}" }];
     expect(
       reactAdapter.composeStaticPreview!(sources, {
@@ -386,10 +382,9 @@ describe("auto-preview is opt-in per adapter", () => {
 });
 
 describe("bridge replay buffer", () => {
-  // The server-rendered frame runs while the page's JavaScript is still
-  // downloading, so by the time React subscribes the block has usually
-  // already printed everything it will. Without a replay those messages
-  // are lost and the block looks like one that prints nothing.
+  // The server-rendered frame runs while page JS is still downloading, so the
+  // block has usually printed before React subscribes; without a replay those
+  // messages are lost.
   it("buffers what it posts and re-posts on request", () => {
     const js = buildPreviewBridge("tok");
     expect(js).toContain(PREVIEW_REPLAY_KEY);

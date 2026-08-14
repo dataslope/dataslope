@@ -1,19 +1,10 @@
 /**
  * Contract tests for the TanStack Table v9 API the SQL result grids use.
- *
- * `ResultView` and `SqlChallengeCard` were ported from v8, whose
- * `useReactTable` + `get*RowModel()` options no longer exist. Both grids need
- * a live SQL engine (PGlite / sqlite-wasm, loaded from jsDelivr) before they
- * render a single row, which makes them awkward to exercise in a unit test and
- * impossible in a sandbox with no CDN egress. So this file pins the *table*
- * half of that migration instead: the same feature sets, the same column-def
- * shapes, and the row/cell accessors the components call.
- *
- * That is a deliberately narrower claim than "the grids work" — it is a guard
- * against the v9 API drifting under them, not a substitute for exercising the
- * components. What it does catch is every rename that broke the build during
- * the port (`useReactTable`, `getCoreRowModel`, `getSortedRowModel`,
- * one-argument `ColumnDef`, `getVisibleCells`).
+ * ResultView and SqlChallengeCard were ported from v8, but both need a live
+ * SQL engine before rendering a row, so this pins the table half of the
+ * migration instead: the same feature sets, column-def shapes, and row/cell
+ * accessors. A guard against the v9 API drifting under them, not a substitute
+ * for exercising the components.
  */
 import { describe, expect, it } from "vitest";
 import {

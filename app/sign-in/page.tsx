@@ -1,10 +1,6 @@
-// A self-contained, flat auth page (design option "2a"). Unlike /pricing and
-// friends, it does NOT pull in the home route's Tailwind bundle (tailwind.css)
-// or the HomeNav/HomeFooter chrome, the whole screen is a single centered
-// card plus a top-left brand lockup, styled with a local CSS module. Global
-// resets come from app/globals.css (imported in the root layout). The page
-// chrome (theme bootstrap + brand lockup + card) is shared across the auth
-// routes via AuthPageShell.
+// Self-contained flat auth page: no home Tailwind bundle or HomeNav/HomeFooter
+// chrome, just the AuthPageShell (theme bootstrap + brand lockup + card)
+// shared across the auth routes, styled with a local CSS module.
 import type { Metadata } from "next";
 import { SignInClient } from "./SignInClient";
 import { AuthPageShell } from "../_components/auth/AuthPageShell";

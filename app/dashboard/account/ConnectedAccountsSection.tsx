@@ -1,25 +1,10 @@
 "use client";
 
 /**
- * Account-page management for connected sign-in methods (social integrations).
- *
- * Every login method a user has is one row in the `account` table, keyed by
- * `providerId` ("google" / "github" for OAuth, "credential" for email +
- * password). This section reads them back with Better Auth's `listAccounts`
- * and lets the user attach another provider (`linkSocial`, an OAuth redirect)
- * or detach one (`unlinkAccount`). All three are Better Auth's own
- * `/api/auth/*` endpoints, already served by the catch-all handler
- * (app/api/auth/[...all]/route.ts), so no server code is added here.
- *
- * Lockout guard: Better Auth refuses to unlink a user's *only* account (it
- * would leave them with no way back in). We mirror that in the UI, the Remove
- * button is disabled with an explanation when a provider is the last remaining
- * method, rather than firing a call that comes back 400.
- *
- * Provider availability: like the sign-in card (app/sign-in/SignInClient.tsx),
- * both Google and GitHub are always offered. A provider that isn't configured
- * in this environment simply surfaces an error when Connect is pressed, the
- * same behavior as that card, kept deliberately consistent.
+ * Manage connected sign-in methods via Better Auth's listAccounts /
+ * linkSocial / unlinkAccount (all served by the auth catch-all route).
+ * Lockout guard: Better Auth refuses to unlink the *only* method, so the
+ * Remove button is disabled with an explanation instead of firing a 400.
  */
 
 import { useCallback, useEffect, useState } from "react";
@@ -34,9 +19,9 @@ interface LinkedAccount {
   createdAt?: string | Date;
 }
 
-/** The social providers offered here, in display order. `credential` (email +
- *  password) is intentionally not listed, it's counted toward the lockout
- *  guard below but managed via the password/reset flow, not connect/disconnect. */
+/** Social providers offered, in display order. `credential` is intentionally
+ *  not listed: it counts toward the lockout guard but is managed via the
+ *  password/reset flow. */
 const PROVIDERS: {
   id: string;
   label: string;
@@ -78,12 +63,9 @@ export function ConnectedAccountsSection() {
   const handleConnect = useCallback(async (id: string, label: string) => {
     setBusy(id);
     setError(null);
-    // Full-page redirect to the provider on success (the browser leaves this
-    // page, so keeping the button "busy" is right), returning to /account where
-    // the mount re-fetches and shows the newly-linked provider. A server-side
-    // failure resolves with {error} (it does NOT reject), e.g. the provider
-    // isn't configured here, or the OAuth email doesn't match the account, and
-    // must re-enable the button; a rejection is a network failure and must too.
+    // Success is a full-page OAuth redirect (button stays "busy"). A server-
+    // side failure resolves with {error} — it does NOT reject — and must
+    // re-enable the button; a rejection is a network failure and must too.
     try {
       const { error: apiError } = await linkSocial({
         provider: id,
@@ -132,8 +114,7 @@ export function ConnectedAccountsSection() {
     [refresh],
   );
 
-  // Total sign-in methods, including email + password ("credential"). Removing
-  // the last one would lock the user out, so Better Auth blocks it and so do we.
+  // Total sign-in methods, including "credential" (for the lockout guard).
   const methodCount = accounts?.length ?? 0;
   const hasPassword = accounts?.some((a) => a.providerId === "credential");
 
@@ -162,9 +143,6 @@ export function ConnectedAccountsSection() {
         <ul className="mt-3 divide-y divide-[var(--ds-gray-100)] dark:divide-white/5">
           {PROVIDERS.map(({ id, label, Icon }) => {
             const linked = accounts.some((a) => a.providerId === id);
-            // Disconnect is blocked when this is the account's only sign-in
-            // method (Better Auth would reject it), guiding the user to add
-            // another method — or a password — before removing this one.
             const isOnlyMethod = linked && methodCount <= 1;
             return (
               <li

@@ -1,21 +1,8 @@
 /**
- * Workspace export / import as ZIP.
- *
- * Each workspace lives in its own OPFS directory under
- * `workspaces/<id>/` and contains `meta.json` plus arbitrary subtrees
- * (`files/`, `db/`, `data/`, …). The ZIP archive mirrors that directory
- * tree verbatim so users can:
- *
- *   - move a workspace between browsers/devices,
- *   - keep an offline backup,
- *   - share a curated set of files + database state.
- *
- * The archive also carries a top-level `workspace.json` that captures
- * the registry entry (name, playground, createdAt). On import we use
- * `workspace.json` rather than `meta.json` because the playground id is
- * required to register the workspace in the right list, and the rest
- * of the metadata is restored under a fresh workspace id so two
- * imports of the same archive don't clash.
+ * Workspace export / import as ZIP. The archive mirrors the OPFS directory
+ * tree verbatim plus a top-level `workspace.json` header (name, playground,
+ * createdAt). Imports always land under a fresh workspace id so two imports
+ * of the same archive don't clash.
  */
 
 import JSZip from "jszip";
@@ -64,9 +51,8 @@ async function getWorkspaceDir(
 
 type DirIterable = AsyncIterable<[string, FileSystemHandle]>;
 
-/** Recursively writes every file under `dir` into `zipFolder` at the
- *  same relative path. Directory order is unspecified, JSZip handles
- *  that on its end. */
+/** Recursively writes every file under `dir` into `zipFolder` at the same
+ *  relative path. */
 async function addDirToZip(
   dir: FileSystemDirectoryHandle,
   zipFolder: JSZip,
@@ -85,19 +71,16 @@ async function addDirToZip(
   }
 }
 
-/** Recursively writes every entry under `zipFolder` into `dir`. The
- *  destination is assumed to be empty (the caller creates a fresh
- *  workspace directory before calling). */
+/** Recursively extracts `zip` entries under `prefix` into `dir` (assumed
+ *  empty; the caller creates a fresh workspace directory first). */
 async function extractZipIntoDir(
   zip: JSZip,
   dir: FileSystemDirectoryHandle,
   /** Slash-terminated prefix inside the zip we're currently importing. */
   prefix: string,
 ): Promise<void> {
-  // Two passes, once to materialise directories (so out-of-order
-  // entries don't try to write into a not-yet-created folder), once for
-  // files. JSZip flattens nested folders into path-style entries so we
-  // walk the entry table directly rather than relying on its tree.
+  // Two passes: directories first so out-of-order entries don't write into
+  // a not-yet-created folder, then files.
   const entries: Array<{ path: string; entry: JSZip.JSZipObject }> = [];
   zip.forEach((path, entry) => {
     if (!path.startsWith(prefix)) return;
@@ -106,9 +89,8 @@ async function extractZipIntoDir(
     entries.push({ path: rel, entry });
   });
 
-  // Pre-create directories: JSZip emits dir entries with a trailing `/`,
-  // but a file entry like `files/main.py` also implies `files/` must
-  // exist. We compute the set of parent dirs from every entry.
+  // A file entry like `files/main.py` implies `files/` even without a dir
+  // entry, so compute parent dirs from every entry.
   const dirs = new Set<string>();
   for (const { path, entry } of entries) {
     if (entry.dir) {
@@ -118,13 +100,12 @@ async function extractZipIntoDir(
       if (idx > 0) dirs.add(path.slice(0, idx));
     }
   }
-  // Sort shortest-first so parents are created before children.
+  // Shortest-first so parents are created before children.
   const sortedDirs = Array.from(dirs).sort((a, b) => a.length - b.length);
   for (const d of sortedDirs) {
     await ensureDir(dir, d);
   }
 
-  // Now write file entries.
   for (const { path, entry } of entries) {
     if (entry.dir) continue;
     const bytes = await entry.async("uint8array");
@@ -172,10 +153,8 @@ async function writeFileTo(
 // Public API
 // ---------------------------------------------------------------------------
 
-/** Returns the suggested download filename for a workspace export.
- *  Keeps non-alphanumeric characters from the workspace name so users
- *  can recognise the file, but strips path separators / control chars
- *  to avoid producing an invalid Save-As suggestion on Windows. */
+/** Suggested download filename for an export. Strips path separators and
+ *  control chars that make an invalid Save-As suggestion on Windows. */
 export function suggestExportFilename(entry: WorkspaceEntry): string {
   const safe = entry.name
     .replace(/[\\/:*?"<>|\u0000-\u001f]+/g, "_")
@@ -185,9 +164,8 @@ export function suggestExportFilename(entry: WorkspaceEntry): string {
   return `${base}.workspace.zip`;
 }
 
-/** Bundles the workspace's OPFS directory into a ZIP `Blob`.
- *  Returns `null` when OPFS is unavailable or the workspace has no
- *  on-disk representation (registry-only). */
+/** Bundles the workspace's OPFS directory into a ZIP `Blob`. Null when OPFS
+ *  is unavailable or the workspace is registry-only. */
 export async function exportWorkspaceToZip(
   workspaceId: string,
 ): Promise<Blob | null> {
@@ -200,7 +178,7 @@ export async function exportWorkspaceToZip(
   try {
     wsDir = await getWorkspaceDir(workspaceId, false);
   } catch {
-    // Directory missing, nothing to export.
+    // Directory missing; nothing to export.
     return null;
   }
 
@@ -216,9 +194,8 @@ export async function exportWorkspaceToZip(
   };
   zip.file(ARCHIVE_HEADER_FILE, JSON.stringify(header, null, 2));
 
-  // DEFLATE keeps the archive small for SQLite/CSV-heavy workspaces;
-  // mid-level compression avoids pinning the main thread on large
-  // database dumps.
+  // Mid-level DEFLATE: small archives without pinning the main thread on
+  // large database dumps.
   return zip.generateAsync({
     type: "blob",
     compression: "DEFLATE",
@@ -226,8 +203,7 @@ export async function exportWorkspaceToZip(
   });
 }
 
-/** Triggers a browser download for the workspace ZIP. Wraps
- *  `exportWorkspaceToZip` so callers can keep the UI side terse. */
+/** Triggers a browser download for the workspace ZIP. */
 export async function downloadWorkspaceZip(
   workspaceId: string,
 ): Promise<boolean> {
@@ -252,13 +228,10 @@ export async function downloadWorkspaceZip(
 }
 
 export interface ImportWorkspaceOptions {
-  /** Override the registered name. Defaults to the name embedded in
-   *  the archive (or the archive filename when the header is missing). */
+  /** Override the registered name (defaults to the archive's). */
   nameOverride?: string;
-  /** When supplied, the imported workspace is restricted to this
-   *  playground. If the archive's header reports a different
-   *  playground the import is rejected, this protects users from
-   *  loading a SQLite archive into the Python playground by mistake. */
+  /** Reject the import when the archive's playground differs, so a SQLite
+   *  archive can't land in the Python playground by mistake. */
   expectedPlayground?: string;
 }
 
@@ -266,10 +239,8 @@ export interface ImportWorkspaceResult {
   entry: WorkspaceEntry;
 }
 
-/** Reads a workspace archive (produced by `exportWorkspaceToZip`) and
- *  materialises it as a fresh workspace under a new ID. Returns the
- *  newly-registered entry. Throws on unsupported archives or
- *  playground mismatches so the caller can surface a toast. */
+/** Materializes a workspace archive as a fresh workspace under a new ID.
+ *  Throws on unsupported archives or playground mismatches. */
 export async function importWorkspaceFromZip(
   file: File | Blob,
   options: ImportWorkspaceOptions = {},
@@ -280,13 +251,11 @@ export async function importWorkspaceFromZip(
 
   const zip = await JSZip.loadAsync(file);
 
-  // Locate the archive header. We accept it at the root (`workspace.json`)
-  // or nested under a single top-level folder so archives produced by
-  // alternative tooling (e.g. `zip` from a shell) still import.
+  // Header may be at the root or under a single top-level folder (archives
+  // produced by e.g. shell `zip`).
   let prefix = "";
   let headerEntry = zip.file(ARCHIVE_HEADER_FILE);
   if (!headerEntry) {
-    // Search one level deep.
     const candidates = new Set<string>();
     zip.forEach((path) => {
       const idx = path.indexOf("/");
@@ -331,17 +300,12 @@ export async function importWorkspaceFromZip(
   const name = options.nameOverride?.trim() || header.name || "Imported workspace";
   const created = await createWorkspace(name, header.playground);
 
-  // Drop the freshly-created `files/` and `db/` directories before
-  // extraction, `createWorkspace` makes them empty, but JSZip may
-  // restore alternative subtrees (e.g. `data/`) that we don't want
-  // mixed with stale handles.
   let dstDir: FileSystemDirectoryHandle;
   try {
     dstDir = await getWorkspaceDir(created.id, false);
   } catch {
-    // Workspace directory missing, bail out and remove the orphan
-    // registry entry so the user isn't left with a half-imported
-    // workspace.
+    // Remove the orphan registry entry so the user isn't left with a
+    // half-imported workspace.
     const registry = getWorkspaceRegistry().filter((e) => e.id !== created.id);
     updateWorkspaceRegistry(registry);
     throw new Error("Failed to allocate workspace directory.");
@@ -349,9 +313,8 @@ export async function importWorkspaceFromZip(
 
   await extractZipIntoDir(zip, dstDir, prefix);
 
-  // Re-write meta.json so the on-disk name matches the registry entry,
-  // the source archive's meta still carries the original workspace's
-  // name + createdAt which would otherwise be confusing.
+  // Re-write meta.json so the on-disk name matches the registry entry (the
+  // archive's meta still carries the source workspace's name/createdAt).
   try {
     const metaFh = await dstDir.getFileHandle("meta.json", { create: true });
     const writable = await metaFh.createWritable();

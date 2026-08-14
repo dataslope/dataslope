@@ -1,22 +1,11 @@
 // Guards the synchronous XMLHttpRequest shim (scripts/lib/sync-http.mjs) that
-// lets `pyodide_http` work in the Node sweeps.
-//
-// The shim is exercised here without Pyodide, against a local server, because
-// the properties that matter are all on the JS side: that `send()` really
-// blocks (an async transport would return an empty response and every HTTP
-// lesson would "pass" having fetched nothing), that bytes survive the trip
-// intact, and that the globals `pyodide_http` reads at import time are all
-// present. That last one is the bug that made the first version of this shim
-// a no-op: XMLHttpRequest was installed, but `_streaming` also reads
-// `crossOriginIsolated`, and its ImportError was swallowed by
-// `patch_all(continue_on_import_error=True)` — so nothing was patched and
-// every request still went to a real socket.
-//
-// The test server runs on its own thread, and it has to: `send()` blocks the
-// calling thread in `Atomics.wait`, so a server sharing that thread's event
-// loop could never accept the connection. That deadlock is an artifact of
-// putting both ends in one process, not of the shim, but it is the reason
-// this file looks more elaborate than "start a server, make a request".
+// lets pyodide_http work in the Node sweeps. Exercised without Pyodide: what
+// matters is that send() really blocks (an async transport would let every
+// HTTP lesson "pass" having fetched nothing), bytes survive intact, and every
+// global pyodide_http reads at import exists — a missing one makes patch_all
+// swallow the ImportError and patch nothing. The test server runs on its own
+// thread because send() blocks in Atomics.wait; a same-thread server could
+// never accept the connection.
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -120,10 +109,8 @@ function get(url: string): XHRLike {
   return x;
 }
 
-// The probe routes must not be cached, or they answer with a stale count and
-// every cache assertion below passes vacuously. The cache key is the full URL,
-// so a nonce is enough to bypass it — which is also a small demonstration that
-// the cache keys on what it claims to.
+// Probe routes must not be cached or every cache assertion below passes
+// vacuously; the cache keys on the full URL, so a nonce bypasses it.
 let nonce = 0;
 const uncached = (path: string) => `${origin}${path}${path.includes("?") ? "&" : "?"}n=${nonce++}`;
 
@@ -149,9 +136,8 @@ afterAll(async () => {
 
 describe("installSyncHttp globals", () => {
   it("defines everything pyodide_http reads at import time", () => {
-    // All three are read via `from js import …`. A missing one is not a
-    // degraded shim, it is no shim at all: the ImportError propagates to
-    // patch_all(), which swallows it and patches nothing.
+    // All three are read via `from js import …`; a missing one means
+    // patch_all swallows the ImportError and patches nothing.
     expect(typeof globalThis.XMLHttpRequest).toBe("function");
     expect(typeof (globalThis as { importScripts?: unknown }).importScripts).toBe("function");
     expect(globalThis.crossOriginIsolated).toBe(false);
@@ -159,8 +145,7 @@ describe("installSyncHttp globals", () => {
 
   it("reports crossOriginIsolated false, matching the site", () => {
     // The site serves no COOP/COEP headers, so this is false in the reader's
-    // worker too, and pyodide_http falls back to the XHR path implemented
-    // here rather than its SharedArrayBuffer streaming fetcher.
+    // worker too; pyodide_http then takes the XHR path rather than SAB streaming.
     expect(globalThis.crossOriginIsolated).toBe(false);
   });
 });
@@ -214,8 +199,7 @@ describe("synchronous transport", () => {
     x.open("GET", `${origin}/gzipped`, false);
     x.send();
     // fetch inflates the body but leaves the header on; reporting it made
-    // urllib gunzip already-plain bytes, which is how a plain CSV failed with
-    // "BadGzipFile: Not a gzipped file (b'sp')".
+    // urllib gunzip plain bytes ("BadGzipFile: Not a gzipped file").
     const raw = x.getAllResponseHeaders().toLowerCase();
     expect(raw).not.toContain("content-encoding");
     expect(raw).not.toContain("content-length");

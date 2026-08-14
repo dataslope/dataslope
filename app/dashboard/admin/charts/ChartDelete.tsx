@@ -1,28 +1,11 @@
 "use client";
 
 /**
- * The per-figure "request deletion" control on the chart gallery.
- *
- * It does not delete anything, and could not: a chart is `charts/<slug>.mjs`,
- * a file in git compiled into the deployed bundle at build time, so removing
- * one is a commit. What this records is the *decision*, taken by the person
- * actually looking at the figure, into `chart_regen_marks.delete_requested_at`
- * for whoever is next in the repository. Reading the queue back and clearing a
- * request is documented in `migrations/illustrations/0004_…`.
- *
- * Two things make the confirmation worth a dialog rather than a second click:
- *
- *   • It says plainly that nothing is deleted yet, so nobody goes looking for
- *     a file that is still there, and nobody assumes the job is done.
- *   • It lists the lessons the chart is placed in, because that is the work the
- *     request implies. A `<Chart slug="…">` tag whose spec has gone renders the
- *     dev-only "no chart with this slug" notice and fails no build, so deleting
- *     a placed chart without editing its lessons is a job half done. The count
- *     is the difference between "go ahead" and "two lessons to edit first".
- *
- * The request is a toggle: withdrawing is the same button, so a misclick is
- * undone here rather than with a hand-written UPDATE. Withdrawal skips the
- * dialog, because the destructive direction is the one worth interrupting.
+ * Per-figure "request deletion" control. It deletes nothing — a chart is a
+ * git file, so removal is a commit; this records the decision in
+ * `chart_regen_marks.delete_requested_at` (see migrations/illustrations/0004_…).
+ * The request is a toggle; withdrawal skips the confirmation dialog since only
+ * the destructive direction is worth interrupting.
  */
 import { useState } from "react";
 import { Dialog } from "@base-ui/react/dialog";
@@ -38,13 +21,11 @@ interface ChartDeleteProps {
   requested: boolean;
   /** ISO-8601 of the outstanding request, for the "asked for on" line. */
   requestedAt: string | null;
-  /** Whether the queue is reachable at all (ILLUSTRATIONS_DB bound, the table
-   *  migrated, admin session present). Without it the control is inert rather
-   *  than absent, so the page does not silently lose a feature. */
+  /** Whether the queue is reachable; without it the control is inert rather
+   *  than absent. */
   available: boolean;
-  /** What to say when it is not reachable. Passed in rather than written here,
-   *  because this control cannot tell a missing binding from a missing table
-   *  and guessing produced a tooltip that named the wrong one. */
+  /** What to say when unreachable. Passed in: this control cannot tell a
+   *  missing binding from a missing table. */
   unavailableReason: string;
   onChange: (slug: string, requestedAt: string | null) => void;
 }

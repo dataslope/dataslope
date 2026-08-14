@@ -1,30 +1,13 @@
 "use client";
 
 /**
- * Fetch three suggested questions from `/api/ai/suggest` whenever a new
- * "conversation point" is reached: an answer finished streaming, or the
- * conversation was reset. Suggestions are a nicety, any failure resolves to an
- * empty list and the UI hides the section.
- *
- * `turnKey` identifies the conversation point and a fetch happens at most once
- * per key, so the key has to be unique for the life of the panel. The caller
- * passes the **id of the assistant turn** the suggestions would follow.
- *
- * It used to pass `messages.length`, which is not unique: "New conversation"
- * sends the count back to zero, so the second conversation's first answer had
- * key 2 again, the once-per-key guard recognised it, and no suggestions were
- * ever fetched again for the rest of the session. Every conversation after the
- * first silently had no follow-ups. Turn ids are minted per answer and never
- * repeat, so a reset produces new keys by construction.
- *
- * The other half of that bug: a run aborted before it finished (closing the
- * panel mid-fetch — `active` is false while it is shut) used to leave the key
- * marked as done AND `suggestLoading` stuck true, so reopening showed three
- * skeletons that pulsed forever and never resolved. An unfinished run now
- * releases its key so the next activation retries it.
- *
- * Context/history are read through refs at fetch time so selection changes,
- * pinning, and scrolling don't retrigger requests.
+ * Fetch three suggested questions from `/api/ai/suggest` per "conversation
+ * point" (answer finished, or reset). A nicety: any failure resolves to an
+ * empty list and the section hides. One fetch per `turnKey`, so the key must
+ * be unique for the life of the panel — the caller passes the assistant turn's
+ * id (never reused), NOT `messages.length` (repeats across conversations). An
+ * unfinished run releases its key so the next activation retries. Context and
+ * history are read via refs at fetch time so their changes don't retrigger.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import type {
@@ -96,9 +79,7 @@ export function useSuggestedQuestions({
         });
         settled = true;
         if (!res.ok) {
-          // The section just hides — a missing nicety is not worth an error
-          // message. But it hid *silently*, which made "the follow-ups stopped
-          // working" impossible to diagnose from the browser, so say why here.
+          // The section just hides; warn so the silent failure is diagnosable.
           console.warn(`Ask AI: no follow-up suggestions (HTTP ${res.status})`);
           return;
         }
@@ -117,11 +98,9 @@ export function useSuggestedQuestions({
           console.warn("Ask AI: follow-up suggestions failed", err);
         }
       } finally {
-        // Only the CURRENT run owns the flag; a superseded one leaving it
-        // false would hide the newer run's skeletons. Note this no longer
-        // keys off `ac.signal.aborted`: an aborted run with no successor left
-        // `suggestLoading` true forever, which is what made the skeletons
-        // pulse indefinitely after the panel was closed mid-fetch.
+        // Only the CURRENT run owns the flag (a superseded one would hide the
+        // newer run's skeletons). Deliberately not keyed off `aborted`: an
+        // aborted run with no successor must still clear the loading state.
         if (abortRef.current === ac) setSuggestLoading(false);
       }
     })();

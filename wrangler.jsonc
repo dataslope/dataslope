@@ -1,62 +1,45 @@
 {
-  // Cloudflare Workers configuration for the DataSlope Next.js app, deployed
-  // via the OpenNext adapter (@opennextjs/cloudflare). `npm run cf:deploy`
-  // builds `.open-next/` (which runs the full `npm run build` chain) and then
-  // `wrangler deploy` ships the worker + static assets described here.
-  //
-  // This is the APP worker. The standalone CORS proxy worker has its own
-  // config under cloudflare-cors-proxy/wrangler.toml, don't conflate them.
+  // Workers config for the DataSlope Next.js app, deployed via the OpenNext
+  // adapter (`npm run cf:deploy`). This is the APP worker; the standalone
+  // CORS proxy has its own config under cloudflare-cors-proxy/wrangler.toml.
   "$schema": "node_modules/wrangler/config-schema.json",
   "main": ".open-next/worker.js",
   "name": "dataslope",
   "compatibility_date": "2025-05-19",
-  // `nodejs_compat` is required by OpenNext (Next.js internals and the
-  // build-time node:fs reads expect Node APIs). `global_fetch_strictly_public`
-  // makes the worker's own fetch() calls go out over the public internet
-  // rather than looping back into the worker, the OpenNext-recommended flag.
+  // `nodejs_compat` is required by OpenNext; `global_fetch_strictly_public`
+  // sends the worker's own fetch() over the public internet instead of
+  // looping back into the worker (OpenNext-recommended).
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
-  // /_next/static/* and public/ are uploaded as free static assets (unlimited
-  // bandwidth, no per-request meter) and served by this binding before the
-  // worker ever runs, so they cost nothing and they do land in Cloudflare's CDN
-  // (`cf-cache-status: HIT`, measured 2026-08-09).
-  //
-  // Prerendered page HTML is NOT here: OpenNext writes it to the incremental
-  // cache (the R2 bucket below) instead, and the worker runs ahead of the CDN
-  // cache, so every page view costs one worker invocation — page responses come
-  // back with no `cf-cache-status` header at all. `withRegionalCache` in
-  // open-next.config.ts keeps that from also costing an R2 read per visitor;
-  // skipping the invocation itself needs an origin Cache Rule (see
-  // "Recommended: a Cache Rule for lesson HTML" in README.md).
+  // /_next/static/* and public/ are served by this binding before the worker
+  // runs: free, unmetered, CDN-cached. Prerendered page HTML is NOT here —
+  // OpenNext writes it to the R2 incremental cache below, and the worker runs
+  // ahead of the CDN cache, so every page view costs one worker invocation.
+  // `withRegionalCache` (open-next.config.ts) avoids a per-visitor R2 read;
+  // skipping the invocation itself needs an origin Cache Rule (see README.md).
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
-  // Backing store for OpenNext's incremental cache (see open-next.config.ts).
-  // The prerendered home page and ~800 `/courses/*` lessons are written here at
-  // deploy time (the `opennextjs-cloudflare deploy`/`preview` populate step)
-  // and served from here at request time, so the Worker never re-renders them
-  // and never touches `node:fs`. Unlike the static-assets cache this resolves
-  // on preview deployments too, so Workers Builds preview URLs stop 500ing.
-  // Binding name is fixed by OpenNext: `NEXT_INC_CACHE_R2_BUCKET`. Create the
-  // bucket once with: `npx wrangler r2 bucket create dataslope-inc-cache`.
+  // Backing store for OpenNext's incremental cache (see open-next.config.ts):
+  // prerendered pages are written at deploy time and served from here, so the
+  // Worker never re-renders (and never touches `node:fs`). Resolves on
+  // preview deployments too, unlike the static-assets cache. Binding name is
+  // fixed by OpenNext. Create once:
+  // `npx wrangler r2 bucket create dataslope-inc-cache`.
   "r2_buckets": [
     { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "dataslope-inc-cache" },
-    // Cloud-saved playground workspaces + shared playground snapshots (the
-    // gzipped JSON bundles; see lib/workspaces/bundle.ts). D1 holds only the
-    // metadata rows (migrations/auth/0005), the payload bytes live here because
-    // SQL dumps and file sets routinely exceed D1's 2 MB row cap, and R2
-    // reads are egress-free. Create the bucket once with:
+    // Cloud-saved playground workspaces + shared snapshots (gzipped JSON
+    // bundles; lib/workspaces/bundle.ts). D1 holds only metadata rows —
+    // payloads routinely exceed D1's 2 MB row cap, and R2 reads are
+    // egress-free. Create once:
     // `npx wrangler r2 bucket create dataslope-workspaces`.
     { "binding": "WORKSPACES_BUCKET", "bucket_name": "dataslope-workspaces" }
   ],
-  // D1 (edge SQLite) backing user accounts and sessions for Better Auth, the
-  // accounts layer from agent-outputs/20260621-1733-…-auth-membership-….md (Q1).
-  // The binding name `DB` is what lib/auth/server.ts reads via
-  // getCloudflareContext().env.DB. The schema lives in migrations/auth/ and is
-  // applied with `npx wrangler d1 migrations apply dataslope-auth [--remote]`.
-  // Every database gets its own subfolder of migrations/; see migrations/README.md.
-  // Create the database once with: `npx wrangler d1 create dataslope-auth`
-  // and paste the printed `database_id` below (it is not a secret).
+  // D1 backing Better Auth accounts/sessions; `DB` is read by
+  // lib/auth/server.ts. Schema in migrations/auth/, applied with
+  // `npx wrangler d1 migrations apply dataslope-auth [--remote]`. Create once
+  // with `npx wrangler d1 create dataslope-auth` and paste the printed
+  // `database_id` below (not a secret).
   "d1_databases": [
     {
       "binding": "DB",
@@ -64,33 +47,24 @@
       "database_id": "827500a4-7853-4da0-98dd-70ffe6473d41",
       "migrations_dir": "migrations/auth"
     },
-    // Illustration review state: which generated images an admin marked for
-    // regeneration and the extra prompt guidance to redraw them with, written
-    // from /illustration-prompts via /api/admin/illustration-marks. Deliberately
-    // NOT in dataslope-auth: this is authoring data, so a coding agent can read
-    // and wipe the whole queue without touching accounts or sessions. Schema in
-    // migrations/illustrations/, applied with
-    // `npx wrangler d1 migrations apply dataslope-illustrations [--remote]`.
-    // Created once with: `npx wrangler d1 create dataslope-illustrations`.
+    // Illustration review state (admin regeneration marks + prompt guidance).
+    // Deliberately NOT in dataslope-auth: authoring data, so an agent can
+    // wipe the queue without touching accounts or sessions. Schema in
+    // migrations/illustrations/.
     {
       "binding": "ILLUSTRATIONS_DB",
       "database_name": "dataslope-illustrations",
       "database_id": "0ab9f248-58dc-4e0a-a17e-f41badf9f6c0",
       "migrations_dir": "migrations/illustrations"
     },
-    // Full-text search index for the lessons, read by /api/search. Its own
-    // database on purpose, and not merged into either of the two above: it is
-    // the only one holding an FTS5 *virtual table*, and `wrangler d1 export`
-    // refuses to export any database that contains one (a failed attempt has
-    // been reported to wedge the database entirely, cloudflare/workers-sdk#9519).
-    // Every row here is derived from content/ and re-seeded on each deploy, so
-    // that limitation costs nothing; extending it to the auth or illustration
-    // data, which cannot be rebuilt from source, would not be acceptable.
-    //
-    // Schema in migrations/search/, applied with `npm run db:migrate:search
-    // [:remote]`; rows loaded with `npm run db:seed:search[:remote]` from the
-    // SQL that `scripts/build-search-sql.mjs` writes at build time.
-    // Created once with: `npx wrangler d1 create dataslope-search`.
+    // Lesson full-text search index (/api/search). Its own database on
+    // purpose: it holds the only FTS5 virtual table, and `wrangler d1 export`
+    // refuses databases containing one (a failed attempt can wedge the DB,
+    // cloudflare/workers-sdk#9519). Rows are derived from content/ and
+    // re-seeded each deploy, so that's harmless here — but don't move auth or
+    // illustration data (not rebuildable) into it. Schema in
+    // migrations/search/ (`npm run db:migrate:search[:remote]`); rows via
+    // `npm run db:seed:search[:remote]`.
     {
       "binding": "SEARCH_DB",
       "database_name": "dataslope-search",
@@ -98,37 +72,28 @@
       "migrations_dir": "migrations/search"
     }
   ],
-  // Non-secret auth config. The OAuth client secrets and BETTER_AUTH_SECRET are
-  // NOT here, set them with `npx wrangler secret put <NAME>` (see README).
-  // BETTER_AUTH_URL must be the deployed origin so OAuth callbacks resolve; it
-  // defaults to the request origin when unset, so it's only strictly needed if
-  // that ever differs from the canonical site URL.
+  // Non-secret auth config; OAuth client secrets and BETTER_AUTH_SECRET are
+  // set via `npx wrangler secret put <NAME>` (see README). BETTER_AUTH_URL
+  // must be the deployed origin so OAuth callbacks resolve.
   "vars": {
     "BETTER_AUTH_URL": "https://dataslope.com",
-    // From address for transactional auth email (must be a Resend-verified
-    // domain). The RESEND_API_KEY itself is a secret, set it with
-    // `npx wrangler secret put RESEND_API_KEY` (see README). Email verification
-    // and password reset stay off until that key is set.
+    // Must be a Resend-verified domain. RESEND_API_KEY is a secret; email
+    // verification and password reset stay off until it's set.
     "EMAIL_FROM": "Dataslope <no-reply@dataslope.com>",
-    // "Ask AI" + AI inline completion model selection (non-secret). Both
-    // tiers currently point at OpenRouter's DeepSeek V4 Flash model. There's
-    // no hardcoded fallback (see lib/ai/models.ts), change the model ids
-    // here without a code change. The API key is a secret: set it with
-    // `npx wrangler secret put AI_FREE_API_KEY` (one OpenRouter key covers
-    // both tiers via resolveModel's fallback; add AI_PRO_API_KEY too if pro
-    // should use a separate key later). Ask AI stays inert (503) until a
-    // tier has its key + base URL + model all set. AI inline completion
-    // (app/api/ai/complete, pro members only) uses the pro-tier config.
+    // "Ask AI" + inline-completion model selection (non-secret). No hardcoded
+    // fallback (lib/ai/models.ts) — change model ids here without a code
+    // change. Keys are secrets: AI_FREE_API_KEY covers both tiers via
+    // resolveModel's fallback (add AI_PRO_API_KEY for a separate pro key).
+    // Ask AI stays inert (503) until a tier has key + base URL + model set;
+    // inline completion (pro members only) uses the pro-tier config.
     "AI_FREE_BASE_URL": "https://openrouter.ai/api/v1",
     "AI_FREE_MODEL": "deepseek/deepseek-v4-flash",
     "AI_PRO_BASE_URL": "https://openrouter.ai/api/v1",
     "AI_PRO_MODEL": "deepseek/deepseek-v4-flash",
-    // Polar billing for Pro subscriptions (non-secret half; see
-    // lib/billing/polar.ts + README "Pro subscriptions"). Billing stays
-    // inert until POLAR_PRO_PRODUCT_ID (the Polar product that grants Pro)
-    // and the POLAR_ACCESS_TOKEN secret are set; the webhook endpoint also
-    // needs `wrangler secret put POLAR_WEBHOOK_SECRET`. Set POLAR_SERVER to
-    // "sandbox" to test against sandbox.polar.sh.
+    // Polar billing for Pro (non-secret half; lib/billing/polar.ts + README).
+    // Inert until POLAR_PRO_PRODUCT_ID and the POLAR_ACCESS_TOKEN secret are
+    // set; the webhook also needs the POLAR_WEBHOOK_SECRET secret.
+    // POLAR_SERVER="sandbox" targets sandbox.polar.sh.
     "POLAR_PRO_PRODUCT_ID": "",
     "POLAR_PRO_ANNUAL_PRODUCT_ID": "",
     "POLAR_SERVER": ""
@@ -138,10 +103,8 @@
   "services": [
     { "binding": "WORKER_SELF_REFERENCE", "service": "dataslope" }
   ],
-  // Workers Logs: persists console/log output and request metadata for this
-  // worker so it's queryable in the Cloudflare dashboard (Observability).
-  // `invocation_logs` is disabled to avoid a per-request summary log line
-  // (the main driver of log-event volume/cost).
+  // Workers Logs (queryable in the dashboard). `invocation_logs` off to avoid
+  // a per-request summary line — the main driver of log-event volume/cost.
   "observability": {
     "logs": {
       "enabled": true,

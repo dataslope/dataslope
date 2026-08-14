@@ -1,14 +1,7 @@
 /**
- * Catch-all route for `/fumadocs-dev`, renders an MDX page resolved from
- * the Fumadocs `devSource` loader (the development-only component gallery
- * that used to live at `/learn`).
- *
- * Static params are generated from the source so every MDX file under
- * `content/fumadocs-dev/` becomes a pre-rendered page at build time. Calling
- * `notFound()` for unknown slugs lets Next.js render its standard 404.
- *
- * These pages exist purely for development/QA of the MDX components, so the
- * metadata marks them noindex (robots.txt also disallows the route).
+ * Catch-all route for `/fumadocs-dev`, the development-only MDX component
+ * gallery, resolved from the Fumadocs `devSource` loader. Dev/QA only, so the
+ * pages are noindex (robots.txt also disallows the route).
  */
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -26,8 +19,7 @@ import { devSource } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
 import { MarkdownDescription } from "@/app/_components/MarkdownDescription";
 
-// Pages live at `content/fumadocs-dev/<page.path>` on the default branch, so
-// the "Open in GitHub" action links straight to the page source.
+// "Open in GitHub" links straight to the page source on the default branch.
 const GITHUB_BLOB_BASE =
   "https://github.com/dataslope/dataslope/blob/main/content/fumadocs-dev";
 
@@ -40,24 +32,18 @@ export default async function FumadocsDevPage(props: FumadocsDevPageProps) {
   const page = devSource.getPage(params.slug);
   if (!page) notFound();
 
-  // The docs collection uses `dynamic` mode (see `source.config.ts`), so the
-  // compiled MDX body and TOC are fetched on demand here rather than being
-  // bundled with the route. Frontmatter fields (title, description, full)
-  // remain available directly on `page.data`.
+  // The docs collection uses `dynamic` mode (source.config.ts): compiled MDX
+  // body + TOC are fetched on demand rather than bundled with the route.
   const { body: MDX, toc } = await page.data.load();
 
-  // `markdownUrl` is rewritten to the raw-Markdown route handler (see
-  // `next.config.ts` and `app/llms/fumadocs-dev/[[...slug]]/route.ts`). The
-  // `MarkdownCopyButton` fetches it for the clipboard; `ViewOptionsPopover`
-  // links to it ("View as Markdown") and builds the "Open in ChatGPT/Claude"
-  // shortcuts, alongside the GitHub source link.
+  // Rewritten to the raw-Markdown route handler (next.config.ts,
+  // app/llms/fumadocs-dev/[[...slug]]/route.ts); the copy button and
+  // view-options popover consume it.
   const markdownUrl = `${page.url}.md`;
   const githubUrl = `${GITHUB_BLOB_BASE}/${page.path}`;
 
   return (
-    // All pages in this collection are loose top-level demo pages (no `root`
-    // course folders), so there's no breadcrumb or Course JSON-LD here,
-    // this section is a flat, dev-only gallery.
+    // A flat dev-only gallery: no breadcrumb or Course JSON-LD.
     <DocsPage toc={toc} full={page.data.full}>
       <DocsTitle>{page.data.title}</DocsTitle>
       {page.data.description ? (
@@ -65,10 +51,8 @@ export default async function FumadocsDevPage(props: FumadocsDevPageProps) {
           <MarkdownDescription>{page.data.description}</MarkdownDescription>
         </DocsDescription>
       ) : null}
-      {/* Inline styles (not Tailwind utilities) on purpose: `docs.css` runs
-          Tailwind with `source(none)` and only scans Fumadocs's own dist, so
-          utility classes authored here would never be generated. The buttons
-          themselves are Fumadocs components and keep their compiled styles. */}
+      {/* Inline styles on purpose: `docs.css` runs Tailwind with
+          `source(none)`, so utility classes authored here are never generated. */}
       <div
         style={{
           display: "flex",
@@ -93,24 +77,9 @@ export async function generateStaticParams() {
   return devSource.generateParams();
 }
 
-// Same reasoning as the courses and interview-prep catch-alls (see
-// app/courses/[...slug]/page.tsx for the full note): an unmatched path under
-// this prefix was rendered on demand and had its not-found page written into
-// the live build's R2 folder at ~1.9 MB with `revalidate: false`, once per
-// DISTINCT bad URL, forever.
-//
-// Set here despite the gallery being development-only. `robots.ts` disallows
-// the route and the pages are noindex, but those ask crawlers not to INDEX —
-// the 34 pages still ship in the production build and are publicly reachable,
-// so nothing stops a scanner walking `/fumadocs-dev/<random>` from minting
-// entries exactly as one walking `/courses/<random>` would.
-//
-// The gallery itself is untouched: all 34 pages (including the bare
-// `/fumadocs-dev`, which this optional catch-all also serves) are enumerated by
-// generateParams() and stay prerendered and cached, on previews included. Only
-// URLs that were never real change behavior. Adding a page while `next dev` is
-// running still works, because dev re-runs generateStaticParams per request
-// rather than reading a build-time manifest.
+// Unmatched paths 404 instead of minting an on-demand render + a permanently
+// cached not-found page per distinct bad URL (see app/courses/[...slug]/
+// page.tsx). noindex/robots don't stop scanners, so this applies here too.
 export const dynamicParams = false;
 
 export async function generateMetadata(
@@ -124,8 +93,7 @@ export async function generateMetadata(
   return {
     title,
     description,
-    // Dev-only gallery: keep it out of search engines (robots.txt disallows
-    // the whole /fumadocs-dev section too).
+    // Dev-only gallery: keep it out of search engines.
     robots: { index: false },
   };
 }

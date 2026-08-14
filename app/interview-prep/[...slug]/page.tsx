@@ -1,17 +1,9 @@
 /**
- * Catch-all route for interview-prep role/topic pages, renders an MDX page
- * resolved from the Fumadocs `interviewSource` loader (the
- * `content/interview/` collection) at `/interview-prep/<role>[/<topic>]`.
- *
- * Mirrors `app/courses/[...slug]/page.tsx` (same `dynamic`-mode body load,
- * same prerendering via `generateStaticParams`, same canonical/OG metadata
- * and breadcrumb/Course JSON-LD), scoped to the interview collection. The
- * raw-Markdown action buttons are intentionally omitted, the `.md` mirror is
- * a courses/fumadocs-dev feature (see next.config.ts rewrites).
- *
- * The catch-all is REQUIRED (`[...slug]`, not `[[...slug]]`) because the bare
- * `/interview-prep` URL is the custom catalog page (`app/interview-prep/
- * page.tsx`), not a docs page.
+ * Catch-all route for interview-prep role/topic pages, mirroring
+ * app/courses/[...slug]/page.tsx for the `content/interview/` collection.
+ * The raw-Markdown buttons are intentionally omitted (the `.md` mirror is a
+ * courses/fumadocs-dev feature). `[...slug]` (not `[[...slug]]`) is required —
+ * the bare `/interview-prep` URL is the catalog page.
  */
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -49,13 +41,9 @@ export default async function InterviewPage(props: InterviewPageProps) {
 
   const { body: MDX, toc } = await page.data.load();
 
-  // --- JSON-LD: breadcrumb everywhere, Course on each role landing page. ---
-  // The role folders are NOT Fumadocs roots (so the whole /interview-prep tree
-  // is one navigable sidebar), so we derive position from the slug depth:
-  //   ["<role>"]               → a role landing page
-  //   ["<role>", "<topic>"]    → a topic page
-  // The first segment's meta.json carries the human role name. (The bare
-  // /interview-prep index is the catalog page, handled elsewhere.)
+  // JSON-LD: breadcrumb everywhere, Course on role landing pages. Role
+  // folders are NOT Fumadocs roots (the whole tree is one sidebar), so
+  // position is derived from slug depth: one segment = role landing page.
   const slugs = page.slugs;
   const roleSlug = slugs[0];
   const roleMeta = roleSlug
@@ -99,16 +87,13 @@ export default async function InterviewPage(props: InterviewPageProps) {
         </DocsDescription>
       ) : null}
       <DocsBody>
-        {/* Output this lesson's runnable blocks produced when the site was
-            built, so the page reads end to end before anyone presses Run.
-            Only this lesson's slice crosses to the client; the manifest
-            itself stays on the server. */}
+        {/* Build-time outputs for this lesson's runnable blocks; only this
+            lesson's slice crosses to the client. */}
         <BlockOutputsProvider
           outputs={lessonBlockOutputs(`content/interview/${page.path}`)}
         >
-          {/* React blocks render their result the same way web blocks do,
-              but their bundle is compiled by a workflow rather than derived
-              at render time — see lib/reactBundles.ts. */}
+          {/* React block bundles are compiled by a workflow, see
+              lib/reactBundles.ts. */}
           <ReactBundlesProvider
             bundles={lessonReactBundles(`content/interview/${page.path}`)}
           >
@@ -124,13 +109,9 @@ export async function generateStaticParams() {
   return interviewSource.generateParams();
 }
 
-// Same reasoning as the courses catch-all, and the same reason it is worth
-// setting on both: an unmatched path under either prefix used to be rendered
-// on demand and have its not-found page cached into the live build's R2 folder
-// at ~1.8 MB with `revalidate: false`, unbounded in the number of distinct bad
-// URLs. See app/courses/[...slug]/page.tsx for the full note. No flat-URL
-// redirect is needed here — interview-prep pages are one or two segments deep
-// and both shapes are prerendered.
+// Unmatched paths 404 instead of minting an on-demand render + a permanently
+// cached not-found page per distinct bad URL (see app/courses/[...slug]/
+// page.tsx). No flat-URL redirect needed here — both slug shapes prerender.
 export const dynamicParams = false;
 
 export async function generateMetadata(

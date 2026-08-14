@@ -1,20 +1,9 @@
 "use client";
 
-// Reusable mobile "hamburger" bottom-sheet menu, factored out of the
-// language-playground header so the SQL playgrounds (SQLite / Postgres /
-// DuckDB) can surface the same consolidated menu on narrow viewports.
-// Reuses the existing `.mobile-menu-*` CSS so it looks identical to the
-// language playgrounds' menu.
-//
-// Composition:
-//   <MobileMenuSheet open onOpenChange title="Menu">
-//     <MobileMenuAction label="Settings" onClick={openSettings} />
-//     <MobileMenuSubSheet label="Import">…rows…</MobileMenuSubSheet>
-//   </MobileMenuSheet>
-//
-// Any <MobileMenuAction> closes the whole sheet after firing (via the
-// context below) so a tap both runs the action and dismisses the menu,
-// matching the language playgrounds' behaviour.
+// Reusable mobile "hamburger" bottom-sheet menu, shared by the language and
+// SQL playground headers (reuses the `.mobile-menu-*` CSS). Compose with
+// <MobileMenuAction> / <MobileMenuSubSheet>; any action closes the whole
+// sheet after firing so a tap both runs the action and dismisses the menu.
 
 import {
   createContext,

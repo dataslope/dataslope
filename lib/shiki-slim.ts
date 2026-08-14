@@ -1,29 +1,14 @@
 /**
- * Slim stand-in for the `shiki` package, wired in via the `shiki` resolve
- * alias in next.config.ts.
- *
- * Why: the docs collections run in Fumadocs `dynamic` mode, so MDX (and its
- * Shiki highlighting) compiles at REQUEST time inside the Cloudflare Worker.
- * Fumadocs boots its highlighter with `await import("shiki")`, the
- * full bundle, which statically references every grammar in
- * `@shikijs/langs` — ~9.4 MB of regex data (~1.3 MiB gzipped) in a Worker
- * whose hard size ceiling is 10 MiB gzipped. This module exposes the same
- * runtime surface Fumadocs uses (`createHighlighter`,
- * `createJavaScriptRegexEngine`, `createOnigurumaEngine`, plus the core
- * re-exports) with the language registry restricted to the languages the
- * content actually uses.
- *
- * Behavior for a language OUTSIDE this list: Fumadocs's
- * `loadMissingLanguage` skips grammars that aren't in the bundle, so the
- * code block renders unhighlighted instead of crashing. If you fence a new
- * language in content/, add it here (and check `npm run build` output;
- * `scripts/` has no automated guard). ```mermaid``` fences never reach
- * Shiki, `remarkMdxMermaid` converts them to components first.
- *
- * Build-time highlighting (fumadocs-mdx compiling static collections in
- * Node) resolves the REAL `shiki` package, aliasing applies only to the
- * Next.js bundle, so this list only has to cover what request-time
- * compiles (the `dynamic`-mode courses/interview collections) need.
+ * Slim stand-in for the `shiki` package, wired in via the resolve alias in
+ * next.config.ts. Dynamic-mode docs compile MDX at request time in the
+ * Worker, and the full shiki bundle statically references every grammar
+ * (~1.3 MiB gzipped against the Worker's 10 MiB ceiling), so this exposes
+ * the same runtime surface with the registry restricted to what content
+ * actually fences. A language outside the list renders unhighlighted
+ * (Fumadocs skips missing grammars); fence a new language in content/, add
+ * it here. ```mermaid``` fences never reach Shiki. Build-time highlighting
+ * resolves the REAL shiki package — the alias applies only to the Next.js
+ * bundle.
  */
 
 import {

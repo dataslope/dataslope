@@ -1,22 +1,11 @@
 "use client";
 
-// AI inline completion ("ghost text") for CodeMirror v6, the editor-side
-// half of app/api/ai/complete. Appended to the extension list of every
-// language-runtime editor (CodeBlock, ChallengeCard, Playground).
-//
-// Behaviour: after a short typing pause a fill-in-the-middle suggestion is
-// fetched and rendered as dimmed ghost text at the cursor. Tab accepts it,
-// Escape dismisses it, and typing "through" the suggestion consumes it
-// character by character. Everything is best-effort, a slow or failed fetch
-// simply shows nothing.
-//
-// Gating: the feature is pro-only. The extension asks `GET /api/ai/complete`
-// once whether this visitor may use completions and stays inert when not
-// (guests, free members, unconfigured provider), and the server enforces the
-// same rule on every POST regardless, so the probe is purely to avoid firing
-// doomed requests. The probe result is cached module-wide: "enabled" for the
-// page's lifetime, "disabled" with a short TTL so signing in without a full
-// page reload eventually picks the feature up.
+// AI inline completion ("ghost text") for CodeMirror v6, the editor-side half
+// of app/api/ai/complete. After a typing pause a suggestion renders as dimmed
+// ghost text: Tab accepts, Escape dismisses, typing through consumes it.
+// Pro-only: a GET probe (cached module-wide; denied result has a short TTL so
+// mid-page sign-in picks the feature up) avoids firing doomed requests — the
+// server still enforces the rule on every POST.
 
 import {
   Prec,

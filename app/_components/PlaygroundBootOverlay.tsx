@@ -1,16 +1,10 @@
 "use client";
 
-// Full-screen boot overlay shared by every playground (the language
-// playgrounds via <Playground>, the SQL playgrounds via
-// <SqlPlaygroundShell>). It mirrors the <RuntimeBootNotice> used by the
-// embedded code blocks / challenge cards: the brand "assemble + quarter
-// turn" diamond, a status line and a determinate progress bar, so a
-// multi-second cold start reads the same everywhere. Deliberately just
-// those three — a cold boot used to add "this can take a moment" /
-// "downloading … happens once" lines under the status, which made the
-// loading screen read differently depending on the runtime and on whether
-// it had booted here before. Styling lives in playground.css
-// (`.playground-boot-*`).
+// Full-screen boot overlay shared by every playground, mirroring the
+// <RuntimeBootNotice> used by embedded blocks: the brand diamond loader, a
+// status line, and a determinate progress bar — deliberately nothing more,
+// so the loading screen reads the same across runtimes. Styling lives in
+// playground.css (`.playground-boot-*`).
 
 import { useEffect, useState, type ReactNode } from "react";
 import { DiamondAssembleTurnLoader } from "./mdx/loadingAnimations";
@@ -21,13 +15,9 @@ import { DiamondAssembleTurnLoader } from "./mdx/loadingAnimations";
  *  before it unmounts. */
 const BOOT_OVERLAY_FADE_MS = 400;
 
-/** Minimum time (ms) the boot overlay stays fully visible, measured from
- *  mount, before it is allowed to fade out. On a warm revisit the runtime
- *  is already booted and `loaded` flips within a frame or two; without this
- *  floor the overlay would appear for a single frame and vanish, a jarring
- *  "blink". Holding it briefly makes re-entering a playground read as a
- *  deliberate transition. Cold boots take far longer than this, so the floor
- *  is a no-op there (the overlay fades the instant boot finishes). */
+/** Minimum ms the overlay stays fully visible from mount, so a warm revisit
+ *  (where `loaded` flips within a frame) doesn't blink. Cold boots exceed
+ *  this, so the floor is a no-op there. */
 export const MIN_BOOT_OVERLAY_MS = 500;
 
 export interface BootOverlayVisibility {
@@ -37,13 +27,9 @@ export interface BootOverlayVisibility {
   fading: boolean;
 }
 
-/** Drives the boot overlay's show → fade → unmount lifecycle from a single
- *  `loaded` flag, enforcing {@link MIN_BOOT_OVERLAY_MS} of on-screen time so
- *  a warm revisit doesn't blink. Shared by the language playgrounds
- *  (`<Playground>`) and the SQL playgrounds (`<SqlPlaygroundShell>`) so every
- *  loading screen behaves identically. Returns `{ mounted, fading }`: render
- *  the overlay while `mounted` and pass `fading` through as the `.hidden`
- *  class. */
+/** Drives the overlay's show → fade → unmount lifecycle from a single
+ *  `loaded` flag, enforcing {@link MIN_BOOT_OVERLAY_MS} of on-screen time.
+ *  Render the overlay while `mounted`; apply `fading` as the `.hidden` class. */
 export function useBootOverlayVisibility(
   loaded: boolean,
 ): BootOverlayVisibility {

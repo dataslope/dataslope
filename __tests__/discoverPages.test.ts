@@ -1,21 +1,9 @@
-// Guards `e2e/_discoverPages.ts`, the page list behind the opt-in
-// `COURSEWARE=1` e2e sweeps (code-blocks-run, challenge-solutions,
-// sql-code-blocks-run).
-//
-// The failure mode this exists for is silence. `discoverPages` walks a
-// hardcoded list of content directories, and a collection missing from that
-// list does not make the sweep smaller in any visible way — it makes it
-// *green*, over a subset nobody declared. `content/interview` was absent from
-// the list, so the sweep that exists to prove every runnable block on the site
-// still works had never loaded an interview page, and its 138 `<CodeBlock>`s,
-// 16 `<ChallengeCard>`s and 39 `<SqlCodeBlock>`s were checked by nothing at
-// all.
-//
-// So the assertions below are deliberately about *coverage of the
-// declarations* rather than about counts: every MDX collection in
-// `source.config.ts` must appear, and at its real route prefix from
-// `lib/source.ts`. Adding a fourth collection without touching the sweep is
-// then a red test rather than a quietly narrower sweep.
+// Guards e2e/_discoverPages.ts, the page list behind the COURSEWARE=1 sweeps.
+// The failure mode is silence: a collection missing from the hardcoded list
+// makes the sweep green over an undeclared subset (content/interview was
+// absent, so its runnable blocks were checked by nothing). Assertions are
+// therefore about coverage of the declarations: every MDX collection in
+// source.config.ts must appear, at its real route prefix from lib/source.ts.
 import * as fs from "node:fs";
 import * as path from "node:path";
 

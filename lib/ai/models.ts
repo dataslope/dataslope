@@ -84,17 +84,11 @@ function tierConfig(tier: MemberTier, env: CloudflareEnv): ResolvedModel | null 
 }
 
 /**
- * Resolve the model to use for `tier`.
- *
- * Fallback is asymmetric, by cost: a pro member whose provider isn't fully
- * configured (key, base URL, and model all set) degrades to the FREE
- * provider, cheaper, so a half-wired environment still answers, while
- * keeping pro budgets and output cap. A free member never silently upgrades
- * to the pro provider: in an environment with only the expensive AI_PRO_*
- * vars set, that would route every free-tier request to the priciest model,
- * a cost fail-open on misconfiguration. Returns null when the requesting
- * tier can't be served → the caller should 503 ("assistant isn't configured
- * yet").
+ * Resolve the model for `tier`. Fallback is asymmetric, by cost: a
+ * half-configured pro tier degrades to the FREE provider (keeping pro
+ * budgets), while a free member never silently upgrades to the pro provider —
+ * that would be a cost fail-open on misconfiguration. Returns null when the
+ * tier can't be served → the caller should 503.
  */
 export function resolveModel(
   tier: MemberTier,

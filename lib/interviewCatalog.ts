@@ -1,20 +1,9 @@
 /**
- * Build-time data for the `/interview-prep` catalog page.
- *
- * Reads the interview collection's `meta.json` files under `content/interview/`
- * (the same source of truth the Fumadocs sidebar uses) into one array of role
- * "tracks", each with its human title and the ordered list of topics it
- * covers. The role order comes from the root `content/interview/meta.json`
- * `pages` array; each role's title and topic order come from its own
- * `meta.json`; each topic's display title is the topic page's frontmatter
- * title, resolved through `interviewSource` so it always matches what renders
- * on the topic page itself.
- *
- * The per-role presentation (tagline, icon, banner illustration) lives with
- * the catalog UI in `app/interview-prep/_components/InterviewCatalog.tsx`,
- * keyed by the `slug` this returns, so "what exists" (content) stays separate
- * from "how it looks" (design). Mirrors `getCourseCatalog` in
- * `lib/courseCatalog.ts`.
+ * Build-time data for the `/interview-prep` catalog page: reads the interview
+ * collection's `meta.json` files into role "tracks" (role order from the root
+ * meta.json; topic titles resolved through `interviewSource` so they always
+ * match the rendered pages). Per-role presentation lives with the catalog UI,
+ * keyed by the `slug` this returns. Mirrors `getCourseCatalog`.
  */
 import { readFile } from "node:fs/promises";
 import path from "node:path";

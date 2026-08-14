@@ -1,13 +1,7 @@
-// DuckDB engine wrapper for the DuckDB Playground.
-//
-// The `@duckdb/duckdb-wasm` npm package is currently flagged in the
-// GitHub Advisory Database (an overly broad duplicate of GHSA-w62p-hx95-gf2c
-//, only 1.29.2 was actually compromised; 1.30.0+ are clean upstream).
-// To avoid the advisory entirely while still shipping the playground,
-// this module loads DuckDB-Wasm dynamically from jsDelivr at runtime,
-// the same pattern this repo already uses for `parquet-wasm` and
-// `wasm-xlsxwriter`. A minimal local type shim covers the small API
-// surface the engine actually touches.
+// DuckDB engine wrapper for the DuckDB Playground. DuckDB-Wasm is loaded
+// from jsDelivr at runtime (not npm) because the npm package is flagged by
+// an overly broad GitHub advisory (GHSA-w62p-hx95-gf2c; 1.30.0+ are clean).
+// A minimal local type shim covers the API surface the engine touches.
 "use client";
 
 import type { QueryExecResult, SqlValue } from "./sqlite-wasm";
@@ -30,10 +24,7 @@ import {
   unscaledIntegerFrom,
 } from "./valueFormat";
 
-// ─── Local type shim for @duckdb/duckdb-wasm ─────────────────────────
-// Only the small surface area we actually touch is typed. The shim
-// matches the public AsyncDuckDB / AsyncDuckDBConnection API as of
-// duckdb-wasm 1.30+, which is API-stable for these fields.
+// ─── Local type shim for @duckdb/duckdb-wasm (1.30+ API) ────────────
 
 interface DuckDbBundle {
   mainModule: string;
@@ -98,9 +89,8 @@ interface DuckDbModule {
 }
 
 // ─── Module-level lazy initializer ──────────────────────────────────
-// The DuckDB-Wasm bundle (~5–10 MB) is downloaded once per page load
-// and cached by the browser. The promise is memoized so navigating
-// away and back doesn't re-fetch the module.
+// The ~5–10 MB bundle is fetched once; the promise is memoized so
+// navigating away and back doesn't re-fetch.
 
 export const DUCKDB_VERSION = "1.32.0";
 const DUCKDB_CDN = `https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@${DUCKDB_VERSION}/+esm`;
@@ -110,8 +100,7 @@ let _duckdbModulePromise: Promise<DuckDbModule> | null = null;
 async function loadDuckDbModule(): Promise<DuckDbModule> {
   if (!_duckdbModulePromise) {
     _duckdbModulePromise = (async () => {
-      // The magic comments tell webpack/turbopack to leave this URL
-      // alone instead of trying to resolve it at build time.
+      // Magic comments keep webpack/turbopack from resolving the URL at build time.
       const mod = (await import(
         /* webpackIgnore: true */ /* turbopackIgnore: true */ DUCKDB_CDN
       )) as DuckDbModule;
@@ -130,8 +119,7 @@ async function instantiateDuckDb(
   const duckdb = await loadDuckDbModule();
   const bundles = duckdb.getJsDelivrBundles();
   const bundle = await duckdb.selectBundle(bundles);
-  // Bundlers can't always resolve the worker URL, so we wrap the
-  // worker script in a Blob, the standard duckdb-wasm pattern.
+  // Standard duckdb-wasm pattern: wrap the worker script in a Blob.
   const workerUrl = URL.createObjectURL(
     new Blob([`importScripts("${bundle.mainWorker}");`], {
       type: "text/javascript",
@@ -157,22 +145,16 @@ async function instantiateDuckDb(
 let _dbPromise: Promise<{ db: AsyncDuckDB; bundle: DuckDbBundle }> | null =
   null;
 
-// DuckDB-Wasm shares one in-memory catalog across every connection to the
-// same instance. The page-shared singleton is fine for the SQL Playground
-// (one engine per page) but NOT for the /learn route, where several
-// <SqlCodeBlock>/<SqlChallengeCard> each seed their own tables: a second
-// block's bootstrap runs cleanDuckDbSchema() and wipes the first block's
-// tables. Passing `isolated` returns a *fresh* instance (its own worker +
-// catalog) so learn blocks can't clobber one another; the caller is
-// responsible for terminating it (see createDuckDbEngine's destroy()).
+// DuckDB-Wasm shares one catalog across every connection to an instance, so
+// /learn blocks (which each seed their own tables) must pass `isolated` for a
+// fresh instance; the caller must terminate it (see destroy()). The shared
+// singleton is only safe for the one-engine-per-page playground.
 function getDuckDbInstance(
   isolated = false,
   onProgress?: (fraction: number) => void,
 ): Promise<{ db: AsyncDuckDB; bundle: DuckDbBundle }> {
   if (isolated) return instantiateDuckDb(onProgress);
-  // Progress only fires while the singleton is first instantiated, a
-  // later caller that finds the promise already resolved gets no events
-  // (the download is done), which is exactly right.
+  // Progress only fires during the singleton's first instantiation.
   if (!_dbPromise) _dbPromise = instantiateDuckDb(onProgress);
   return _dbPromise;
 }
@@ -216,12 +198,9 @@ function toSqlValue(value: unknown): SqlValue {
   if (value instanceof Date) return value.toISOString();
   if (typeof value === "boolean") return value ? 1 : 0;
   if (typeof value === "number" || typeof value === "string") return value;
-  // Apache Arrow returns DECIMAL values as `Decimal` instances whose
-  // `toString()` produces the canonical numeric string (e.g. "950.00").
-  // Without this branch they fall through to JSON.stringify, which wraps
-  // the result in literal `"` characters, those then leak into the
-  // result table and break re-inserts (e.g. duplicate row → DuckDB sees
-  // '"950"' and can't coerce it to DECIMAL).
+  // Arrow DECIMALs are `Decimal` objects whose toString() is the numeric
+  // string; without this branch JSON.stringify would add literal quotes
+  // that leak into the table and break re-inserts.
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
     const proto = Object.getPrototypeOf(value) as { toString?: () => string } | null;
     if (
@@ -235,9 +214,7 @@ function toSqlValue(value: unknown): SqlValue {
       }
     }
   }
-  // Arrow vector elements for STRUCT/LIST/MAP arrive as plain JS
-  // objects/arrays; serialize them so the table renderer can show them
-  // as text rather than `[object Object]`.
+  // STRUCT/LIST/MAP arrive as plain objects/arrays; serialize to text.
   try {
     return JSON.stringify(value, (_k, v) =>
       typeof v === "bigint" ? v.toString() : v,
@@ -247,18 +224,9 @@ function toSqlValue(value: unknown): SqlValue {
   }
 }
 
-/** Normalize a JS value for binding as a DuckDB prepared-statement parameter
- *  (UX-17). Replaces the old quote-escaped string-concatenation path used by
- *  the row-mutation methods, so values flow to DuckDB as typed parameters that
- *  it casts to the target column, instead of as VARCHAR literals that could
- *  mis-cast (e.g. a numeric column silently receiving text) or, for values
- *  with quotes, require fragile manual escaping.
- *
- *  Cell-edit values are string/number/boolean/null; primary-key values read
- *  back from a result set may also be `bigint` (DuckDB BIGINT) or `Date`. The
- *  binder accepts the scalars and bigint directly; `Date` is sent as an ISO
- *  string DuckDB casts back to a timestamp, and any other object/array (e.g. a
- *  STRUCT/LIST display value) falls back to its string form. */
+/** Normalize a JS value for binding as a DuckDB prepared-statement
+ *  parameter. Scalars and bigint bind directly; `Date` becomes an ISO string
+ *  DuckDB casts to a timestamp; other objects fall back to string form. */
 export function toBindParam(value: unknown): unknown {
   if (value === undefined) return null;
   if (value instanceof Date) return value.toISOString();
@@ -266,12 +234,9 @@ export function toBindParam(value: unknown): unknown {
   return value;
 }
 
-/** Serialize a JS array as a DuckDB list literal (`[1, 2, 'a']`). The array
- *  cell editor uses this for write-back because DuckDB-Wasm can't bind a JS
- *  array as a LIST parameter, so the validated, JSON-parsed array is inlined
- *  as a literal instead, with strings single-quote-escaped. Numbers, booleans
- *  and bigints inline bare; `null` becomes `NULL`; nested arrays recurse;
- *  anything else is quoted as text. */
+/** Serialize a JS array as a DuckDB list literal (`[1, 2, 'a']`). Needed
+ *  because DuckDB-Wasm can't bind a JS array as a LIST parameter; strings
+ *  are single-quote-escaped, nested arrays recurse. */
 export function toDuckDbListLiteral(arr: readonly unknown[]): string {
   const elem = (v: unknown): string => {
     if (v === null || v === undefined) return "NULL";
@@ -284,11 +249,9 @@ export function toDuckDbListLiteral(arr: readonly unknown[]): string {
   return `[${arr.map(elem).join(", ")}]`;
 }
 
-/** Parse the allowed labels out of a DuckDB enum `data_type` string.
- *  `duckdb_columns()` reports an enum column's type as the full inline
- *  definition, e.g. `ENUM('sad', 'ok', 'happy')`. Labels are single-quoted
- *  with `''` escaping an embedded quote. Returns the labels in order, or
- *  `null` when the string isn't an enum definition (the common case). */
+/** Parse the labels out of a DuckDB enum `data_type` string, e.g.
+ *  `ENUM('sad', 'ok', 'happy')` (labels single-quoted, `''` escapes).
+ *  Returns null when the string isn't an enum definition. */
 export function parseDuckDbEnumValues(
   dataType: string | null | undefined,
 ): string[] | null {
@@ -322,12 +285,9 @@ export function parseDuckDbEnumValues(
   return values.length > 0 ? values : null;
 }
 
-/** Map an Arrow result-field type string to the DuckDB SQL type name a SQL
- *  IDE would show. Without this, the raw Arrow `toString()` notation leaks
- *  into the result header: `Decimal[38e+2]` instead of `DECIMAL(38,2)`,
- *  `Int64` instead of `BIGINT`, `Utf8` instead of `VARCHAR`, `Dictionary<…>`
- *  instead of `ENUM`. Unknown notations pass through unchanged so new Arrow
- *  types degrade to their raw name rather than an empty label. */
+/** Map an Arrow type string to the DuckDB SQL type name (`Decimal[38e+2]` →
+ *  `DECIMAL(38,2)`, `Int64` → `BIGINT`). Unknown notations pass through
+ *  unchanged rather than becoming an empty label. */
 export function arrowTypeToSqlName(arrowType: string): string {
   const t = arrowType.trim();
   const lower = t.toLowerCase();
@@ -390,18 +350,15 @@ function arrowToQueryExecResult(
       return "";
     }
   });
-  // Extract decimal scales so DECIMAL values are formatted as proper decimal
-  // strings (e.g. unscaled 2999 with scale=2 → "29.99") instead of the raw
-  // unscaled integer (which would otherwise display as 2999 and round-trip to
-  // the wrong magnitude when the user edits and re-saves a cell).
+  // Decimal scales: unscaled 2999 with scale=2 must render as "29.99", not
+  // the raw integer (which would round-trip to the wrong magnitude on edit).
   const columnScales: (number | null)[] = fields.map((f) => {
     if (typeof f.type.scale === "number" && f.type.scale > 0) {
       return f.type.scale;
     }
     return null;
   });
-  // DATE columns (Arrow `Date32<DAY>`/`Date64`) arrive as an epoch number;
-  // render them as a plain `YYYY-MM-DD` calendar date rather than a raw int.
+  // DATE columns arrive as an epoch number; render as `YYYY-MM-DD`.
   const columnIsDate: boolean[] = fields.map((f) =>
     /^date/i.test(String(f.type)),
   );
@@ -418,9 +375,8 @@ function arrowToQueryExecResult(
       } else if (columnIsDate[c]) {
         row[c] = toDateOnlyString(raw) ?? toSqlValue(raw);
       } else if (scale !== null) {
-        // Arrow stores DECIMAL(p,s) as the unscaled integer, a BigInt in some
-        // builds, a Decimal object whose String() is the unscaled integer in
-        // duckdb-wasm. Re-apply the scale in both cases.
+        // Arrow stores DECIMAL(p,s) as the unscaled integer (BigInt or
+        // Decimal object depending on build); re-apply the scale.
         const unscaled = unscaledIntegerFrom(raw);
         row[c] =
           unscaled !== null
@@ -435,15 +391,9 @@ function arrowToQueryExecResult(
   return { columns, columnTypes, values };
 }
 
-/** Split a multi-statement SQL string into individual statements that
- *  DuckDB can execute one at a time. DuckDB-Wasm's `conn.query()` only
- *  accepts a single statement, so the engine has to do this itself.
- *
- *  The splitter walks the input character by character, tracking string
- *  literals (single-quoted, with `''` escapes), identifier quotes, line
- *  comments (`--` … EOL), block comments (`/* … *\/`), and dollar-quoted
- *  string bodies (`$tag$ … $tag$`). Semicolons inside any of those
- *  contexts are treated as ordinary characters. */
+/** Split a multi-statement SQL string — DuckDB-Wasm's `conn.query()` only
+ *  accepts one statement. Tracks string/identifier quotes, line and block
+ *  comments, and dollar-quoted bodies so semicolons inside them don't split. */
 function splitDuckDbStatements(sql: string): string[] {
   const out: string[] = [];
   let buf = "";
@@ -558,9 +508,8 @@ function renderDuckDbColumnDef(col: ColumnSpec): string {
   const name = quoteIdent(col.name);
   const type = renderDuckDbType(col);
   if (col.generated) {
-    // DuckDB only supports STORED generated columns. The `storageType`
-    // hint from `ColumnSpec` is intentionally ignored so the same form
-    // can drive both engines without producing invalid VIRTUAL DDL.
+    // DuckDB only supports STORED generated columns; `storageType` is
+    // deliberately ignored so shared forms can't produce invalid VIRTUAL DDL.
     return `${name} ${type} GENERATED ALWAYS AS (${col.generated.expression}) STORED`;
   }
   const parts = [name, type];
@@ -588,10 +537,8 @@ function renderDuckDbCreateTable(
   }
   for (const col of columns) {
     if (!col.foreignKey?.table || !col.foreignKey.column) continue;
-    // DuckDB supports REFERENCES but currently ignores ON DELETE /
-    // ON UPDATE actions silently. We still emit them so the playground
-    // UI captures intent and the DDL round-trips through SQLite/Postgres
-    // engines without losing information.
+    // DuckDB silently ignores ON DELETE / ON UPDATE; still emitted so the
+    // DDL round-trips through SQLite/Postgres without losing intent.
     defs.push(
       [
         `  FOREIGN KEY (${quoteIdent(col.name)}) REFERENCES ${quoteIdent(col.foreignKey.table)}(${quoteIdent(col.foreignKey.column)})`,
@@ -622,9 +569,8 @@ export interface DuckDbEngine {
   listTables: (schema?: string) => Promise<string[]>;
   listViews: (schema?: string) => Promise<string[]>;
   listIndexes: (schema?: string) => Promise<string[]>;
-  /** DuckDB has no triggers; this always resolves to an empty array.
-   *  Kept on the interface so the playground's schema-refresh code can
-   *  call `listTriggers()` on either engine without conditional branches. */
+  /** DuckDB has no triggers; always empty. Kept so schema-refresh code can
+   *  call either engine unconditionally. */
   listTriggers: () => Promise<string[]>;
   listSequences: (schema?: string) => Promise<string[]>;
   listColumns: (name: string, schema?: string) => Promise<TableColumnInfo[]>;
@@ -651,8 +597,7 @@ export interface DuckDbEngine {
       rowIndex: number;
       column: string;
       value: unknown;
-      /** When present, identifies the target row by primary-key value(s)
-       *  instead of the rowid offset, robust to display reordering. */
+      /** Identify the row by primary-key value(s) instead of rowid offset. */
       pk?: ReadonlyArray<{ column: string; value: unknown }>;
     }>,
     schema?: string,
@@ -663,56 +608,37 @@ export interface DuckDbEngine {
     values: unknown[],
     schema?: string,
   ) => Promise<void>;
-  /** Register a file's bytes with DuckDB's virtual filesystem so it
-   *  can be queried via `read_csv_auto`, `read_parquet`, `read_json_auto`, … */
+  /** Register a file's bytes with DuckDB's virtual filesystem
+   *  (queryable via `read_csv_auto`, `read_parquet`, …). */
   registerFileBuffer: (name: string, buffer: Uint8Array) => Promise<void>;
-  /** Read the bytes of a previously registered virtual-filesystem file
-   *  (e.g. so the user can download it). Returns null if the file isn't
-   *  registered or the WASM build lacks `copyFileToBuffer`. */
+  /** Bytes of a previously registered file, or null if unregistered or
+   *  the WASM build lacks `copyFileToBuffer`. */
   readFileBuffer: (name: string) => Promise<Uint8Array | null>;
-  /** Remove a file from DuckDB's virtual filesystem. Safe to call on a
-   *  name that wasn't registered. */
+  /** Remove a file from the virtual filesystem. Safe on unregistered names. */
   dropFile: (name: string) => Promise<void>;
-  /** Try to import a SQL dump as a new blank database. If any statement
-   *  fails partway through, restores the previously active sample so the
-   *  user's database is never left in a half-populated state. Throws the
-   *  underlying SQL error after a successful restore. */
+  /** Import a SQL dump as a new blank database. On failure the previous
+   *  sample is restored, then the SQL error is rethrown. */
   importSqlDump: (sql: string) => Promise<DuckDbSampleDatabase>;
-  /** Binary .duckdb image of the whole catalog (ATTACH + COPY FROM
-   *  DATABASE), the same bytes the OPFS snapshot persists. Used as the
-   *  binary payload of cloud/share bundles. */
+  /** Binary .duckdb image of the whole catalog — the same bytes the OPFS
+   *  snapshot persists. Used for cloud/share bundles. */
   exportBinaryImage: () => Promise<Uint8Array>;
-  /** Replace the catalog with the contents of a .duckdb image (cloud/share
-   *  bundle restore). On failure the previously active sample is restored,
-   *  mirroring importSqlDump. */
+  /** Replace the catalog from a .duckdb image. On failure the previous
+   *  sample is restored, mirroring importSqlDump. */
   importBinaryImage: (bytes: Uint8Array) => Promise<DuckDbSampleDatabase>;
-  /** Whole-database export as a portable multi-statement SQL script
-   *  (CREATE TABLE / INSERT statements) that round-trips through any
-   *  DuckDB instance. */
+  /** Whole-database export as a portable SQL script (CREATE TABLE / INSERT). */
   exportDatabase: () => Promise<{ data: Uint8Array; mimeType: string; suggestedExtension: string }>;
   activeSample: () => DuckDbSampleDatabase;
   runtimeVersion: () => string;
-  /** Close the engine's current connection. The shared DuckDB-Wasm module
-   *  is kept alive across navigations on purpose (its WASM bundle is large
-   *  and the browser already cached it), but the per-engine connection
-   *  must be released when the playground component unmounts so its
-   *  schema work cannot interleave with a freshly created engine. */
+  /** Close the engine's connection. The shared module stays alive across
+   *  navigations on purpose; only the per-engine connection is released so
+   *  its schema work can't interleave with a freshly created engine. */
   destroy: () => Promise<void>;
 }
 
-/** Drop all user-defined objects from the main schema.
- *  Called before loading any sample so that revisiting the page or
- *  switching samples never hits "Table with name … already exists!" errors.
- *
- *  Views are dropped first (they may depend on tables). Tables are then
- *  dropped iteratively: each pass attempts to drop every remaining table
- *  and re-queries the catalog to see which are left, looping until either
- *  none remain or no progress is made (in which case the catalog is in an
- *  unexpected state and we surface a clear error). Each drop tries CASCADE
- *  first, DuckDB 1.30+ honours it, and falls back to a plain DROP TABLE
- *  if an older WASM build rejects the keyword, so a table referenced by
- *  FKs from other tables still in the catalog can be dropped without
- *  having to compute a topological order. */
+/** Drop all user objects from the main schema before loading a sample, so
+ *  revisits/switches never hit "already exists" errors. Views first, then
+ *  tables in iterative passes (CASCADE first, plain DROP for older builds
+ *  that reject it) — avoids computing a topological FK order. */
 async function cleanDuckDbSchema(conn: DuckDbConnection): Promise<void> {
   async function listNames(sql: string): Promise<string[]> {
     const t = await conn.query(sql);
@@ -761,10 +687,8 @@ async function cleanDuckDbSchema(conn: DuckDbConnection): Promise<void> {
     }
     remaining = await remainingTables();
     if (remaining.length >= before) {
-      // No progress: either every remaining table has a circular FK
-      // dependency or DROP TABLE is silently leaving them behind. Drop
-      // each table's foreign-key constraints individually and retry one
-      // last time so the next bootstrap doesn't hit a stale catalog.
+      // No progress (circular FKs or silent DROP failures): drop each
+      // table's FK constraints individually and retry once.
       for (const t of remaining) {
         const safe = t.replace(/'/g, "''");
         const fks = await listNames(
@@ -809,14 +733,10 @@ async function cleanDuckDbSchema(conn: DuckDbConnection): Promise<void> {
   }
 }
 
-// All bootstrap operations share the same module-level DuckDB instance, which
-// means their schema-cleanup and CREATE-TABLE statements run against a single
-// catalog. Two concurrent bootstraps, e.g. an in-flight engine load whose
-// component unmounted and a fresh engine load from the next mount, or
-// React StrictMode's double-invoked effect, or two rapid database switches,
-// can interleave their cleanup and create steps and produce
-// "Table with name 'customers' already exists" errors. The promise chain
-// below queues every bootstrap so they execute one at a time.
+// Bootstraps share one module-level catalog, so two concurrent bootstraps
+// (StrictMode double-effects, rapid database switches) can interleave
+// cleanup/create steps and produce "already exists" errors. This promise
+// chain queues them to run one at a time.
 let _bootstrapChain: Promise<unknown> = Promise.resolve();
 
 async function bootstrapDatabase(
@@ -824,10 +744,8 @@ async function bootstrapDatabase(
   db: AsyncDuckDB,
 ): Promise<DuckDbConnection> {
   const run = async (): Promise<DuckDbConnection> => {
-    // Resolve remote payloads first, the seed script and any data
-    // files (parquet/CSV/…) the sample registers. Downloading before
-    // the cleanup step means a failed download leaves the current
-    // catalog intact.
+    // Download remote payloads before the cleanup step so a failed
+    // download leaves the current catalog intact.
     const seedSql = sample.remoteSql
       ? await fetchDatasetText(sample.remoteSql)
       : sample.sql;
@@ -840,13 +758,11 @@ async function bootstrapDatabase(
     const conn = await db.connect();
     // Force consistent timestamp formatting for reproducible output.
     await conn.query("SET TimeZone='UTC'");
-    // Clear any previously loaded sample so that revisiting the page or
-    // switching samples never hits "Table with name … already exists!" errors.
     await cleanDuckDbSchema(conn);
     for (const { name, bytes } of remoteFiles) {
-      // Drop any same-named file from a previous bootstrap (re-register
-      // throws), and hand DuckDB a copy, the buffer is transferred to
-      // its worker, which would detach the module-level bytes cache.
+      // Drop any same-named file first (re-register throws). Hand DuckDB a
+      // copy: the buffer is transferred to its worker, which would detach
+      // the module-level bytes cache.
       try {
         await db.dropFile?.(name);
       } catch {
@@ -863,9 +779,8 @@ async function bootstrapDatabase(
     return conn;
   };
   const next = _bootstrapChain.then(run, run);
-  // Swallow rejection on the chain itself so a single failed bootstrap
-  // doesn't poison every subsequent call. The original error still reaches
-  // the caller via `next`.
+  // Swallow rejection on the chain so one failed bootstrap doesn't poison
+  // subsequent calls; the error still reaches the caller via `next`.
   _bootstrapChain = next.catch(() => undefined);
   return next;
 }
@@ -876,21 +791,17 @@ export async function createDuckDbEngine(
   onProgress?: (fraction: number) => void,
 ): Promise<DuckDbEngine> {
   let sample = findDuckDbSampleDatabase(initialSampleId);
-  // Learn blocks (no workspaceId) get an isolated DuckDB instance so they
-  // can't clobber each other's catalog; the Playground (workspaceId, OPFS
-  // persistence) keeps the page-shared singleton.
+  // Learn blocks (no workspaceId) get an isolated instance so they can't
+  // clobber each other's catalog; the Playground keeps the singleton.
   const isolated = !workspaceId;
   const { db } = await getDuckDbInstance(isolated, onProgress);
   let conn = await bootstrapDatabase(sample, db);
   let destroyed = false;
 
-  // ─── OPFS persistence (Phase 4) ─────────────────────────────────────
-  // DuckDB-Wasm has no native OPFS VFS, so persistence is implemented
-  // via periodic snapshot-and-restore against the workspace's
-  // `db/duckdb.db` file in OPFS. Snapshots are produced by
-  // `exportAsBinaryInternal` (ATTACH + COPY FROM DATABASE) and queued
-  // through `databaseStorage.writeDatabase`, which debounces writes and
-  // flushes on `pagehide` / `visibilitychange`.
+  // ─── OPFS persistence ───────────────────────────────────────────────
+  // DuckDB-Wasm has no native OPFS VFS, so persistence is periodic
+  // snapshot-and-restore against the workspace's OPFS `db/duckdb.db`;
+  // databaseStorage.writeDatabase debounces and flushes on pagehide.
   const DUCKDB_FILE = "duckdb.db";
   let snapshotTimer: ReturnType<typeof setTimeout> | null = null;
   let snapshotInFlight = false;
@@ -929,11 +840,8 @@ export async function createDuckDbEngine(
     }, delayMs);
   }
 
-  /** Inline snapshot helper that doesn't go through the engine surface
-   *  (so it stays available when the engine is being constructed and
-   *  during `destroy`). ATTACHes a temporary virtual-filesystem file,
-   *  copies the whole catalog via `COPY FROM DATABASE`, and reads the
-   *  bytes back out for OPFS persistence. */
+  /** Snapshot helper outside the engine surface (usable during construction
+   *  and destroy): ATTACH a temp VFS file, COPY FROM DATABASE, read bytes. */
   async function exportAsBinaryInternal(): Promise<Uint8Array> {
     if (!db.copyFileToBuffer) {
       throw new Error("This DuckDB-Wasm build does not support binary file export.");
@@ -960,10 +868,8 @@ export async function createDuckDbEngine(
     }
   }
 
-  /** Restore a previously-saved snapshot into the freshly-bootstrapped
-   *  connection. The connection has already had `sample.sql` applied
-   *  by `bootstrapDatabase`; we wipe that and replace it with the
-   *  snapshot's contents. Failure leaves the sample data intact. */
+  /** Restore a saved snapshot, replacing the freshly-bootstrapped sample
+   *  data. Failure leaves the sample data intact. */
   async function restoreFromOpfs(): Promise<boolean> {
     if (!workspaceId) return false;
     try {
@@ -1001,13 +907,10 @@ export async function createDuckDbEngine(
   if (workspaceId) {
     const restored = await restoreFromOpfs();
     if (!restored) {
-      // No snapshot yet (first visit), keep the sample data and take
-      // an initial snapshot so the file exists for next time.
+      // First visit: take an initial snapshot so the file exists next time.
       scheduleSnapshot(0);
     }
-    // Best-effort flush on tab close.  databaseStorage already flushes
-    // pending writes on `pagehide`; we only need to make sure a fresh
-    // snapshot has been *queued* by that point.
+    // Queue a fresh snapshot by pagehide; databaseStorage flushes it.
     if (typeof window !== "undefined") {
       const flushHandler = () => {
         // Fire-and-forget: pagehide doesn't await.
@@ -1021,11 +924,8 @@ export async function createDuckDbEngine(
   async function rowsFor(sql: string, params?: unknown[]): Promise<unknown[][]> {
     let prepared = sql;
     if (params && params.length > 0) {
-      // duckdb-wasm's AsyncDuckDBConnection only exposes positional
-      // parameters via prepared statements; for the small handful of
-      // internal catalog queries we issue, inlining literal values is
-      // acceptable because every call site passes trusted, validated
-      // identifiers (table/column names from the catalog).
+      // Inlining literals is acceptable here: every call site passes
+      // trusted identifiers from the catalog.
       let out = "";
       let pIdx = 0;
       for (let i = 0; i < sql.length; i++) {
@@ -1060,10 +960,8 @@ export async function createDuckDbEngine(
     return result;
   }
 
-  // Run a statement through a DuckDB prepared statement, binding values as
-  // positional `?` parameters (UX-17). Used by the row-mutation methods so
-  // user/result-set values reach DuckDB as typed params it casts to the target
-  // column, never as hand-built SQL literals. Always closes the statement.
+  // Run a statement with positional `?` parameters so user values reach
+  // DuckDB as typed params, never hand-built literals. Closes the statement.
   async function runParams(
     sql: string,
     params: unknown[],
@@ -1085,9 +983,7 @@ export async function createDuckDbEngine(
       const target = findDuckDbSampleDatabase(id);
       const next = await bootstrapDatabase(target, db);
       if (destroyed) {
-        // The component unmounted while this switch was in flight. Don't
-        // adopt the new connection, close it so the orphaned bootstrap
-        // doesn't outlive the engine.
+        // Unmounted mid-switch: close the orphaned connection, don't adopt it.
         try {
           await next.close();
         } catch {
@@ -1126,10 +1022,8 @@ export async function createDuckDbEngine(
     },
 
     async importSqlDump(sql) {
-      // DuckDB-Wasm shares a single underlying instance across connections,
-      // so any "fresh" connection sees the same schema. We can't sandbox
-      // the import; the best we can do is bootstrap a blank schema, try
-      // the SQL there, and restore the previous sample if it fails.
+      // The import can't be sandboxed (connections share one instance):
+      // bootstrap a blank schema, try the SQL, restore the sample on failure.
       const previousSample = sample;
       const next = await bootstrapDatabase(DUCKDB_BLANK_DATABASE, db);
       try {
@@ -1168,10 +1062,7 @@ export async function createDuckDbEngine(
     },
 
     async importBinaryImage(bytes) {
-      // Same sandboxing caveat as importSqlDump: DuckDB-Wasm shares one
-      // instance across connections, so bootstrap a blank catalog, copy the
-      // image's contents into it, and restore the previous sample if
-      // anything fails.
+      // Same sandboxing caveat as importSqlDump.
       const previousSample = sample;
       const importFile = "_playground_bundle_import_tmp.duckdb";
       const alias = "_playground_bundle_import_alias";
@@ -1219,8 +1110,7 @@ export async function createDuckDbEngine(
       }
       conn = next;
       sample = DUCKDB_BLANK_DATABASE;
-      // Persist the restored catalog right away so a reload doesn't
-      // resurrect the pre-restore OPFS snapshot.
+      // Persist now so a reload doesn't resurrect the pre-restore snapshot.
       scheduleSnapshot(0);
       return sample;
     },
@@ -1232,17 +1122,14 @@ export async function createDuckDbEngine(
         const table = await conn.query(stmt);
         out.push(arrowToQueryExecResult(table));
       }
-      // Queue an OPFS snapshot after every user-driven exec. The
-      // helper debounces, so a burst of statements only produces one
-      // write.
+      // Queue an OPFS snapshot (debounced) after every user-driven exec.
       scheduleSnapshot();
       return out;
     },
 
     async execParams(sql, params) {
       const rows = await rowsFor(sql, params);
-      // Re-run via plain query to capture columns / types from the
-      // result set. For pure DML this returns 0 rows, which is fine.
+      // Re-run via plain query to capture columns/types (0 rows for pure DML).
       const table = await conn.query(sql.replace(/\?/g, "NULL"));
       const result = arrowToQueryExecResult(table);
       if (!result) return [];
@@ -1280,16 +1167,15 @@ export async function createDuckDbEngine(
     },
 
     async listSchemas(includeSystem = false) {
-      // Query without NOT internal, in DuckDB-WASM the default "main" schema
-      // has internal = TRUE, so the filter would silently exclude it.
+      // No NOT internal filter: in DuckDB-WASM the default "main" schema has
+      // internal = TRUE and would be silently excluded.
       const rows = await rowsFor(
         `SELECT schema_name FROM duckdb_schemas()
          WHERE database_name = current_database()
          ORDER BY schema_name`,
       );
       const found = rows.map((r) => String(r[0]));
-      // Virtual schemas (information_schema, pg_catalog) have no catalog row
-      // in the WASM in-memory build, add them explicitly.
+      // Virtual schemas have no catalog row in the WASM build; add explicitly.
       const virtualSystemSchemas = ["information_schema", "pg_catalog"];
       if (includeSystem) {
         for (const sys of virtualSystemSchemas) {
@@ -1298,7 +1184,6 @@ export async function createDuckDbEngine(
         found.sort();
         return found;
       }
-      // When hiding system schemas, exclude known system schema names.
       const systemSet = new Set(virtualSystemSchemas);
       return found.filter((s) => !systemSet.has(s) && !s.startsWith("pg_"));
     },
@@ -1317,9 +1202,7 @@ export async function createDuckDbEngine(
 
     async listViews(schema = "main") {
       const safe = schema.replace(/'/g, "''");
-      // System schemas (information_schema, pg_catalog) only contain views
-      // that are marked internal = TRUE. Drop the NOT internal filter so
-      // they appear in the sidebar when the user selects one of those schemas.
+      // System-schema views are all internal = TRUE; drop the filter there.
       const isSystemSchema =
         schema === "information_schema" || schema.startsWith("pg_");
       const rows = await rowsFor(
@@ -1337,8 +1220,7 @@ export async function createDuckDbEngine(
     },
 
     async listTriggers() {
-      // Intentionally empty, DuckDB has no triggers. See module
-      // header comment in DuckDbPlayground.tsx for context.
+      // DuckDB has no triggers.
       return [];
     },
 
@@ -1364,8 +1246,7 @@ export async function createDuckDbEngine(
          WHERE schema_name = '${safeSch}' AND table_name = '${safe}'
          ORDER BY column_index`,
       );
-      // DuckDB exposes PK columns via duckdb_constraints rather than
-      // a per-column flag. Resolve them in a second query and merge.
+      // PK columns come from duckdb_constraints, not a per-column flag.
       const pkRows = await rowsFor(
         `SELECT constraint_column_names
          FROM duckdb_constraints()
@@ -1376,11 +1257,9 @@ export async function createDuckDbEngine(
       );
       const pkCols: string[] = (() => {
         const v = pkRows[0]?.[0];
-        // `constraint_column_names` is a VARCHAR[]. Depending on the WASM
-        // bridge it arrives as a JS array, an Arrow `Vector` (object, iterable
-        //, NOT `Array.isArray`), or a stringified list `["product_id"]` whose
-        // elements keep their quotes. Normalise all three, stripping brackets
-        // and per-element quotes, so names match the column list.
+        // `constraint_column_names` (VARCHAR[]) may arrive as a JS array, an
+        // Arrow Vector (iterable, not Array.isArray), or a stringified list
+        // with quoted elements. Normalise all three.
         let raw: unknown[] = [];
         if (Array.isArray(v)) raw = v;
         else if (typeof v === "string")
@@ -1444,8 +1323,7 @@ export async function createDuckDbEngine(
             from: fromCols[i],
             table: refTable,
             to: toCols[i] ?? toCols[0] ?? "",
-            // DuckDB does not currently expose action info; default
-            // to NO ACTION which matches its runtime behaviour.
+            // DuckDB exposes no action info; NO ACTION matches its runtime.
             onDelete: "NO ACTION",
             onUpdate: "NO ACTION",
           });
@@ -1585,8 +1463,7 @@ export async function createDuckDbEngine(
 
     async dropEntity(name, kind, schema = "main") {
       if (kind === "trigger") {
-        // Defensive, the playground UI never offers this for DuckDB,
-        // but make the call a no-op instead of generating bad DDL.
+        // No-op rather than generating bad DDL (UI never offers this).
         return;
       }
       const keyword =
@@ -1605,8 +1482,8 @@ export async function createDuckDbEngine(
     },
 
     async getDDL(name, schema = "main") {
-      // Try the catalog's own pretty-printed DDL first, it round-trips
-      // generated columns, defaults, and constraints faithfully.
+      // Prefer the catalog's own DDL; it round-trips generated columns,
+      // defaults, and constraints faithfully.
       const safe = name.replace(/'/g, "''");
       const safeSch = schema.replace(/'/g, "''");
       try {
@@ -1695,29 +1572,20 @@ export async function createDuckDbEngine(
     },
 
     async updateRows(tableName, updates, schema = "main") {
-      // DuckDB has no `rowid` and provides no implicit row identifier;
-      // the playground's PK-aware update path is preferred. As a
-      // fallback for PKless tables we use a CTID-style emulation via
-      // ROW_NUMBER() OVER () over a stable ordering of the table.
-      //
-      // Values are bound as prepared-statement parameters (UX-17) rather than
-      // concatenated as SQL literals: DuckDB casts each param to the target
-      // column type (so a numeric column edited via a text input no longer
-      // receives a VARCHAR), and strings with quotes need no manual escaping.
+      // Prefers the PK-aware path; falls back to rowid offset for PK-less
+      // tables. Values are bound as parameters so DuckDB casts them to the
+      // target column type.
       const qualifiedTable = `${quoteIdent(schema)}.${quoteIdent(tableName)}`;
       let count = 0;
       for (const update of updates) {
-        // An edited LIST/array value can't be bound as a parameter in
-        // DuckDB-Wasm, so it's inlined as a list literal; every other value
-        // stays a bound parameter (UX-17). `setExpr` is the right-hand side
-        // and `setParams` the params it consumes (empty for the literal path).
+        // A LIST/array value can't be bound in DuckDB-Wasm; inline it as a
+        // list literal. Everything else stays a bound parameter.
         const isArr = Array.isArray(update.value);
         const setExpr = isArr
           ? `${quoteIdent(update.column)} = ${toDuckDbListLiteral(update.value as unknown[])}`
           : `${quoteIdent(update.column)} = ?`;
         const setParams = isArr ? [] : [update.value];
         if (update.pk && update.pk.length > 0) {
-          // Primary-key identification: stable regardless of display order.
           const where = update.pk
             .map((p) => `${quoteIdent(p.column)} = ?`)
             .join(" AND ");
@@ -1728,8 +1596,8 @@ export async function createDuckDbEngine(
             [...setParams, ...update.pk.map((p) => p.value)],
           );
         } else {
-          // `rowIndex` is a trusted integer we computed, so it stays inlined
-          // (DuckDB doesn't accept a bound parameter in OFFSET).
+          // rowIndex is a trusted integer, inlined because DuckDB doesn't
+          // accept a bound parameter in OFFSET.
           const offset = Math.trunc(Number(update.rowIndex)) || 0;
           await runParams(
             `UPDATE ${qualifiedTable}
@@ -1754,8 +1622,7 @@ export async function createDuckDbEngine(
         return;
       }
       const cols = columnNames.map(quoteIdent).join(", ");
-      // Bind values as parameters (UX-17) so DuckDB casts each to its column
-      // type and quoted strings need no manual escaping.
+      // Bound parameters: DuckDB casts each to its column type.
       const placeholders = values.map(() => "?").join(", ");
       await runParams(
         `INSERT INTO ${qualified} (${cols}) VALUES (${placeholders})`,
@@ -1785,11 +1652,8 @@ export async function createDuckDbEngine(
     },
 
     async exportDatabase() {
-      // DuckDB-Wasm in-memory builds don't expose a compact binary
-      // dump that round-trips back through `OPEN`. Generate a SQL
-      // script of CREATE TABLE / INSERT statements as a portable
-      // fallback. This isn't a 1:1 binary clone but it round-trips
-      // through any DuckDB instance.
+      // In-memory builds have no binary dump that round-trips via OPEN;
+      // emit a portable CREATE TABLE / INSERT script instead.
       const out: string[] = [];
       const tables = await engine.listTables();
       for (const tbl of tables) {
@@ -1855,8 +1719,8 @@ export async function createDuckDbEngine(
       } catch {
         /* ignore */
       }
-      // Isolated learn instances own their worker, terminate it so a page
-      // full of SQL blocks doesn't leak a worker + WASM heap per block.
+      // Isolated learn instances own their worker; terminate it so a page
+      // of SQL blocks doesn't leak a worker + WASM heap per block.
       if (isolated) {
         try {
           await db.terminate();
@@ -1867,11 +1731,8 @@ export async function createDuckDbEngine(
     },
   };
 
-  // Wrap engine methods that can mutate the DuckDB catalog so they
-  // queue an OPFS snapshot on completion. `exec` already does this
-  // inline; the methods below are catalog/admin operations that bypass
-  // user-typed SQL. Wrapping them centrally keeps the OPFS persistence
-  // policy in one place rather than scattered through each method body.
+  // Wrap catalog-mutating methods to queue an OPFS snapshot on completion
+  // (`exec` already does this inline), keeping the policy in one place.
   if (workspaceId) {
     const MUTATING_METHODS: readonly (keyof DuckDbEngine)[] = [
       "loadSampleDatabase",

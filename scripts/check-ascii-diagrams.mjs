@@ -1,79 +1,34 @@
-// Lints lesson content for figures "drawn" out of characters: a diagram built
-// from `┌─┐│└┘`, from `+-----+` and `---->`, or from `└──┬──┘` underbraces, and
-// a table built out of a dashed rule and space-padded columns.
+// Lints content/**/*.mdx for figures "drawn" out of characters. Four rules:
+//   1. drawn-diagram  2+ consecutive lines with 2+ box-drawing chars each,
+//                     not all directory-tree lines.
+//   2. ascii-box      2+ `+-----+` rules in a file, plus `└──┬──┘`
+//                     underbraces.
+//   3. mermaid-glyph  any drawn char inside a ```mermaid fence (mermaid
+//                     syntax is pure ASCII, so it can only be label
+//                     decoration imitating an edge mermaid already draws).
+//   4. fake-table     a ```text/unlabelled fence that is really a table
+//                     (header, dashed rule, rows) — pure ASCII, so rules 1-2
+//                     miss it.
 //
-// Four rules, all scoped to content/**/*.mdx:
+// Drawn figures are a bug, not a style call: JetBrains Mono is loaded with
+// `subsets: ["latin"]` (app/layout.tsx), which ends before U+2500, so drawn
+// glyphs fall back to another monospace at another advance width and aligned
+// rows arrive misaligned. They also defeat screen readers, reflow, and
+// theming. Replacements live in the repo: <BoxModel>, <MemoryCells>,
+// <SyntaxBreakdown>, <CrcCard> (app/_components/mdx/diagrams.tsx), ```mermaid
+// for graphs, markdown tables for tables.
 //
-//   1. drawn-diagram, two or more consecutive lines each carrying two or more
-//                    box-drawing characters, where at least one of them is not
-//                    a directory tree (see below).
-//   2. ascii-box,    two or more `+-----+` rules in one file, the ASCII
-//                    equivalent, plus the `└──┬──┘` underbrace shape.
-//   3. mermaid-glyph, a single drawn character anywhere inside a ```mermaid
-//                    fence. Mermaid's own syntax is pure ASCII, so a drawn
-//                    glyph in one can only be decoration inside a label — and
-//                    it is always redundant decoration, because the thing it
-//                    is imitating is the edge mermaid already draws. Five node
-//                    labels across the two Java courses read `s = ●─`, a
-//                    reference dot with a wire, in a node that had a real
-//                    arrow leaving it.
-//   4. fake-table,   a ```text (or unlabelled) fence that is really a table:
-//                    header, a rule of dashes, rows. Rules 1 and 2 miss these
-//                    entirely because the drawing is pure ASCII, which is how
-//                    an `Address / Variable / Value` block on
-//                    `c-programming-for-beginners/variables-and-memory`
-//                    survived the first pass. A table typed into a fence gets
-//                    none of what a markdown table gets: it will not reflow on
-//                    a phone, its columns are held apart by literal spaces
-//                    rather than by cells, and it is a `<pre>` to a screen
-//                    reader rather than a `<table>` with headers.
+// Directory trees stay: siblings share a prefix, so they survive the font
+// fallback; `isTreeLine` recognizes them (drawn chars only in the leading
+// connector). Anything else can opt out with
+// `{/* allow-drawn-diagram: why */}` on the line above the fence.
 //
-// ── Why a drawn figure is a bug and not a style preference ─────────────────
-//
-// Code on this site is set in JetBrains Mono, loaded by next/font/google with
-// `subsets: ["latin"]` (app/layout.tsx). That subset ends long before U+2500,
-// so every box-drawing character falls back to whatever monospace the reader's
-// operating system supplies, at that font's advance width rather than
-// JetBrains Mono's. A line's rendered width then depends on how many drawn
-// characters it happens to contain, and rows that were aligned in the source
-// arrive on the page at different widths. The CSS box-model figure on
-// `modern-css-layout/box-model-and-sizing` is what surfaced this: four
-// concentric boxes reached readers as a scatter of disconnected line
-// fragments. Widening the font subset would not fix the rest of it either — a
-// drawn figure is still an image made of text, so a screen reader spells the
-// corner glyphs out one at a time, nothing reflows on a phone, and the drawing
-// cannot take the page's colors or its theme.
-//
-// The replacements are all in the repo already: `<BoxModel>`, `<MemoryCells>`,
-// `<SyntaxBreakdown>` and `<CrcCard>` (app/_components/mdx/diagrams.tsx) for a
-// figure whose geometry is the point, a ```mermaid fence for anything that is
-// really a graph, and a markdown table for anything that is really a table.
-//
-// ── The one shape that stays ───────────────────────────────────────────────
-//
-// A directory tree. It is the literal output format of `tree`, universal in
-// READMEs and terminals, and it is the one drawn shape the font fallback does
-// not break: every row at a given depth carries the same prefix, so siblings
-// still line up even at a different advance width. The `isTreeLine` test below
-// is what recognizes one, and it is deliberately narrow — drawn characters may
-// appear only in a row's leading connector, never in its content, which is
-// exactly what separates `├── data/` from `│ Class: Order │`.
-//
-// Anything else that genuinely has to be drawn (real `mysql` CLI output, say,
-// which frames its result set in `+------+`) can opt out with a comment on the
-// line above the fence:
-//
-//     {/* allow-drawn-diagram: verbatim mysql client output */}
-//
-// Used both as a CLI (`node scripts/check-ascii-diagrams.mjs [files...]`,
-// defaults to all of content/) and as a library by
-// __tests__/asciiDiagrams.test.ts.
+// Used as a CLI (`node scripts/check-ascii-diagrams.mjs [files...]`, defaults
+// to content/) and as a library by __tests__/asciiDiagrams.test.ts.
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-// The fence walker the mermaid-dash rule already uses. Shared rather than
-// re-implemented so the two linters cannot disagree about where a mermaid
-// block starts and ends.
+// Shared with check-prose.mjs so the two linters agree on mermaid bounds.
 import { mermaidLines } from "./check-prose.mjs";
 
 /** Box drawing (U+2500-257F), block elements (U+2580-259F) and geometric
@@ -150,17 +105,10 @@ function fences(lines) {
 
 /**
  * True when a fence body is a table wearing a code block: a rule of dashes
- * with a header line above it and at least one row below.
- *
- * The header/rows requirement is what keeps this off the shapes that
- * legitimately contain a dashed line — a `---` separator printed by a program,
- * or a horizontal rule at the top or bottom of a block of output — and the
- * fence language check above keeps it off source listings entirely. Columns
- * held apart by spaces with *no* rule at all are not detected: the test that
- * finds them also finds aligned trailing comments in a code listing, and a
- * linter that cries wolf on those gets switched off. Those were swept by hand
- * (see the pull request) and the ones that remain are code, program output, or
- * a directory tree.
+ * with a header above and at least one row below. The header/rows requirement
+ * keeps this off legitimate dashed lines (separators, rules around output).
+ * Space-separated columns with no rule are deliberately not detected — that
+ * test also matches aligned trailing comments in listings.
  */
 function fakeTableRule(body) {
   for (let i = 0; i < body.length; i++) {
@@ -178,11 +126,8 @@ function fakeTableRule(body) {
 
 /**
  * Lint one MDX source. Returns `{ file, rule, line, detail }` violations.
- *
- * Runs over the raw source rather than over fenced blocks only: a drawn figure
- * hides just as happily inside a JSX prop (the Python exception hierarchy sat
- * in a `starterCode` string for exactly that reason) as it does in a ```text
- * fence, and the font problem is the same in both places.
+ * Runs over the raw source, not fenced blocks only: a drawn figure hides just
+ * as happily inside a JSX prop string, with the same font problem.
  */
 export function lintSource(src, file) {
   const violations = [];
@@ -191,9 +136,8 @@ export function lintSource(src, file) {
   const allowed = new Set();
   lines.forEach((line, i) => {
     if (ALLOW.test(line)) {
-      // An opt-out covers the block that follows it, which in practice means
-      // "until the next blank line after the drawing ends". Marking a generous
-      // window is fine: the comment is an explicit author decision either way.
+      // An opt-out covers the block that follows; a generous window is fine
+      // since the comment is an explicit author decision.
       for (let j = i; j < Math.min(lines.length, i + 60); j++) allowed.add(j);
     }
   });

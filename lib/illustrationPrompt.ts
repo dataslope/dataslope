@@ -80,44 +80,13 @@ const ISOMETRIC_CONSTRAINTS =
   "perches, stands, or nudges things with its beak rather than holding them.";
 
 /**
- * What `risograph` adds instead, for the inline figures that sit beside a
- * passage of history rather than at the top of a lesson.
- *
- * **Why a second style at all**, when the isometric rule is "do not
- * reintroduce one". Because these illustrate a different kind of thing. The
- * art that opens a lesson stands for its *idea* — a sorted stack, a call
- * stack, a marmot at a keyboard — and isometric props say that well. An inline
- * figure stands for something that *happened*: a launcher breaking up in 1996,
- * an orbiter coming in too low in 1999. Print stock and flat spot inks are the
- * register an editorial aside is drawn in, and they hold the two apart on the
- * page, which is the point of the pilot.
- *
- * **Flat inks, not shading.** The isometric block asks for volume; asking a
- * risograph for it too produces a plastic 3D render with grain sprinkled on
- * top, which is neither style. So the volume clauses are dropped here and
- * replaced with what actually makes a risograph legible: a few flat inks,
- * halftone texture inside the shapes, and the slight misregistration where two
- * inks overlap.
- *
- * **Still the brand palette, and still never black.** This is the transparency
- * constraint (AGENTS.md), not an aesthetic preference: the background is
- * removed after generation, so a cut-out drawn in one dark ink would read on
- * the white page and vanish on the near-black one. Risograph's usual
- * black-key line work is therefore banned outright.
- *
- * **Blank paper, no printed panel.** The reason AGENTS.md retired risograph
- * the first time is that a full-bleed riso scene has no isolable subject:
- * background removal returns the whole rectangle. Pinning the paper blank —
- * no frame, no border, no ground shadow — is what makes the subject liftable,
- * and it is the difference between this working and the earlier attempt.
- *
- * **A wide band.** These are generated at 1536x768 (`course-inline` in
- * `meta.sizes`), so the composition is asked for in the prompt too; a scene
- * composed square and letterboxed into a 2:1 frame wastes half the width.
- *
- * **No likenesses.** Several of these passages name a real person. The figures
- * are deliberately anonymous — an image model's attempt at a specific face is
- * both unreliable and not something to publish next to their name.
+ * Risograph constraints, for inline historical figures. Flat inks, never
+ * volume (asking a riso for volume yields a plastic render with grain on
+ * top). Never black: the background is removed after generation, and a
+ * dark-ink cutout vanishes on the near-black page. Blank paper — no panel,
+ * frame, or shadow — is what makes the subject liftable by background
+ * removal. Composed as a wide band to fill the 1536x768 `course-inline`
+ * size. No likenesses of real people.
  */
 const RISOGRAPH_CONSTRAINTS =
   "Print it as a risograph: a few flat spot-color inks, coarse halftone grain " +
@@ -132,10 +101,8 @@ const RISOGRAPH_CONSTRAINTS =
   "rather than centered in the middle. Draw any person as a small stylized " +
   "figure with minimal facial detail and no resemblance to a real individual.";
 
-/** Constraint block per style. A style with no entry (the retired experiments:
- *  flat geometric vector, line art, blueprint schematic, cut-paper collage)
- *  falls back to the isometric block, which is what it got before this map
- *  existed. */
+/** Constraint block per style; styles with no entry (retired experiments)
+ *  fall back to the isometric block. */
 const STYLE_CONSTRAINTS: Record<string, string> = {
   [DEFAULT_STYLE]: ISOMETRIC_CONSTRAINTS,
   [RISOGRAPH_STYLE]: RISOGRAPH_CONSTRAINTS,
@@ -148,19 +115,8 @@ function constraintsFor(style: string): string {
 }
 
 /**
- * Build the exact GPT Image 2 generation prompt for an illustration spec, e.g.
- *
- *   An isometric illustration of a marmot waving beside a monitor. No text.
- *   Draw only the objects described — nothing scattered over, around, or
- *   behind them: no speckled dots, no confetti, no stray connecting lines.
- *   Render each object as a solid three-dimensional form with real thickness,
- *   smooth matte shading, and clean edges; never as a glossy sphere, a ball,
- *   or a thin round counter.
- *
- *   Blue: #148cff
- *   Green: #20c621
- *   Red: #ff4f59
- *   Yellow: #ffdd6c
+ * Build the exact GPT Image 2 generation prompt for a spec:
+ * "<Article> <style> of <subject>. <constraints>" plus the brand color lines.
  */
 export function buildIllustrationPrompt(
   spec: IllustrationSpec,
@@ -187,9 +143,7 @@ export function slugify(value: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-/** Stable file stem (no extension) for a prompt id, e.g.
- *  "python-basics-thumbnail". Ids are authored slug-like already; this just
- *  normalises any stray casing/spacing. */
+/** Stable file stem (no extension) for a prompt id. */
 export function illustrationFileSlug(id: string): string {
   return slugify(id);
 }

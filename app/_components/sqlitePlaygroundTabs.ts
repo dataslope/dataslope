@@ -5,14 +5,11 @@ import { createTabScope } from "./sql/shared/tabScope";
 
 const STORAGE_PREFIX = "playground_sqlite_";
 
-// localStorage keys are namespaced under `playground_sqlite_` so they collide
-// neither with the language playgrounds nor with the upcoming Postgres
-// playground.
+// Keys are namespaced so they don't collide with other playgrounds.
 export const storageKey = (k: string) => `${STORAGE_PREFIX}${k}`;
 
-// Per-database keys are scoped to the active workspace as well, so two
-// workspaces built from the same sample database keep their own tabs. See
-// `createTabScope` for how the scope is resolved and migrated.
+// Per-database keys are also scoped to the active workspace, so two workspaces
+// built from the same sample database keep their own tabs (see createTabScope).
 const tabScope = createTabScope(STORAGE_PREFIX, "sqlite");
 export const dbScopedKey = (dbId: string, k: string) =>
   tabScope.scopedKey(dbId, k);
@@ -20,23 +17,15 @@ export const setTabWorkspaceScope = tabScope.setWorkspaceScope;
 export const copyTabWorkspaceKeys = tabScope.copyScopedKeys;
 
 export interface QueryTab {
-  /** Stable id used as the React key, generated client-side because
-   *  tabs can be created at any time. */
+  /** Stable client-generated id, used as the React key. */
   id: string;
   title: string;
   code: string;
-  /** Snapshot of `code` at the time the tab was created (e.g. the
-   *  initial template, a sidebar preview's SELECT, or a structure
-   *  query). The tab is considered "dirty" only when `code !==
-   *  pristineCode`, which lets us skip the close-confirmation prompt
-   *  for tabs the user never edited. */
+  /** Snapshot of `code` at tab creation. Dirty = `code !== pristineCode`,
+   *  which skips the close-confirmation for tabs the user never edited. */
   pristineCode: string;
-  /** When "view-data", this tab was opened via the "View Data" sidebar
-   *  action for a table. These tabs display the table icon, hide the
-   *  SQL editor pane, and auto-run the preview query.
-   *  When "er-diagram", this tab shows an Entity-Relationship Diagram
-   *  of the current database schema.
-   *  When "query-history", this tab shows the full query execution log. */
+  /** Special tab types: "view-data" (table preview, no editor, auto-runs),
+   *  "er-diagram", "query-history". */
   kind?: "view-data" | "er-diagram" | "query-history";
 }
 
@@ -63,14 +52,11 @@ export function loadTabs(dbId: string, defaults: QueryTabSeed[]): QueryTab[] {
             id: typeof t.id === "string" ? t.id : newTabId(),
             title: typeof t.title === "string" ? t.title : "Query",
             code,
-            // Older saved tabs predate `pristineCode`; assume the
-            // persisted contents are what the user left them at, so
-            // treat them as clean by mirroring `code` here.
+            // Tabs saved before `pristineCode` existed are treated as clean.
             pristineCode:
               typeof t.pristineCode === "string" ? t.pristineCode : code,
-            // Preserve persisted "view-data" tabs so they reopen as data
-            // views instead of degrading to plain query tabs (transient
-            // kinds are filtered out by saveTabs and never round-trip).
+            // Keep "view-data" tabs as data views; transient kinds are
+            // filtered out by saveTabs and never round-trip.
             kind: t.kind === "view-data" ? "view-data" : undefined,
           };
         });
@@ -88,8 +74,7 @@ export function loadTabs(dbId: string, defaults: QueryTabSeed[]): QueryTab[] {
 
 export function saveTabs(dbId: string, tabs: QueryTab[]): void {
   try {
-    // ER diagram and query-history tabs are transient, never persist them
-    // so they don't reappear after a page reload or database switch.
+    // ER-diagram and query-history tabs are transient; never persist them.
     const persistable = tabs.filter((t) => t.kind !== "er-diagram" && t.kind !== "query-history");
     localStorage.setItem(dbScopedKey(dbId, "tabs"), JSON.stringify(persistable));
   } catch {

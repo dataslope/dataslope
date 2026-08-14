@@ -1,32 +1,12 @@
 /**
  * Compiles and runs every C and C++ `<CodeBlock>` and `<ChallengeCard>`.
  *
- * 402 blocks and 139 cards, checked by nothing until now.
- *
- * ── Why this one is not in CI ──────────────────────────────────────────────
- *
- * Unlike the other sweeps, this is a harvest rather than a guard. The value of
- * a sweep is proportional to how likely the content is to break with nobody
- * touching it, and these blocks compile self-contained deterministic programs
- * against a toolchain pinned at `browsercc@0.1.1` — no network, no datasets,
- * no package resolution. A block that compiles today compiles in a year unless
- * someone edits it. The Python sweep, by contrast, exists because pandas moves
- * underneath it.
- *
- * What a run *can* find is authoring bugs that shipped, and those are real:
- * `check:js` found a branded-type example that was a guaranteed
- * `ReferenceError` for every reader. So this is worth running when the C/C++
- * content changes, and not worth 114 MB and several minutes on every pull
- * request.
- *
- * ── Why the toolchain is fetched rather than installed ─────────────────────
- *
- * `browsercc` is 113.9 MB unpacked and is loaded from a CDN by
- * `runtime/browsercc.ts` rather than depended upon. Making it a devDependency
- * would put that on every `npm ci` and every contributor's install to serve a
- * check that does not run per-PR. Instead both it and the WASI shim are
- * fetched once into `.browsercc-cache/` at the pinned versions the site names,
- * so nobody pays unless they run this.
+ * Not in CI: these blocks are self-contained deterministic programs against a
+ * pinned toolchain, so they only break when edited — run this when the C/C++
+ * content changes rather than paying 114 MB and minutes per pull request.
+ * The toolchain is fetched once into `.browsercc-cache/` at the versions the
+ * site names, not installed as a devDependency, so nobody pays unless they
+ * run this.
  *
  * Usage:
  *   node scripts/check-cpp-blocks.mjs [--filter <substr>[,<substr>…]]
@@ -101,10 +81,9 @@ const wasiRoot = await ensurePackage(
   "wasi",
 );
 
-// browsercc resolves `sysroot.tar` and `stdc++.h.pch` with
-// `fetch(new URL(..., import.meta.url))`. Under Node that is a `file://` URL,
-// which undici refuses outright, so `fetch` is widened rather than the library
-// patched — the library then behaves exactly as it does in a browser.
+// browsercc fetches `sysroot.tar` / `stdc++.h.pch` relative to
+// import.meta.url; under Node those are `file://` URLs, which undici refuses,
+// so widen `fetch` rather than patch the library.
 const realFetch = globalThis.fetch;
 globalThis.fetch = async (input, init) => {
   const url = typeof input === "string" ? input : (input?.url ?? String(input));
@@ -150,9 +129,8 @@ async function runWasi(module) {
   return { stdout, stderr, exitCode, crash: null };
 }
 
-// The ~19 MB precompiled standard library header. The site fetches it in the
-// background at boot; here it is a one-time read that pays for itself across
-// hundreds of C++ compiles.
+// The ~19 MB precompiled standard library header, read once and reused
+// across every C++ compile.
 const PCH_VFS_PATH = "/include/bits/stdc++.h.pch";
 let pch = null;
 if (adapters.includes("cpp")) {
@@ -172,15 +150,10 @@ for (const [i, item] of runnable.entries()) {
   const startedAt = Date.now();
   const isCpp = item.adapter === "cpp";
 
-  // Mirrors `browsercc-worker.ts` exactly, and both halves matter.
-  //
-  // Extra *source* files are concatenated ahead of the entry (a unity build)
-  // rather than passed as extra translation units: browsercc's `compile()`
-  // takes one source, and handing it sibling paths fails to link. Getting this
-  // wrong does not under-report, it mis-reports — every multi-file lesson came
-  // back as `undefined symbol: add(int, int)`, blaming content for a harness
-  // that never compiled the file defining it. Headers go to `extraFiles`, so
-  // `#include "mathx.h"` still resolves.
+  // Mirrors `browsercc-worker.ts`: browsercc's `compile()` takes one source,
+  // so sibling sources are concatenated ahead of the entry (a unity build —
+  // passing sibling paths fails to link) and headers go to `extraFiles` so
+  // `#include` resolves.
   const flags = isCpp
     ? ["-O2", "-std=c++20", "-fno-exceptions"]
     : ["--driver-mode=gcc", "-O2", "-Wall", "-std=gnu17"];

@@ -1,6 +1,5 @@
-// Branded site-wide 404. Catches every unmatched URL and notFound() call
-// that has no closer boundary (course/lesson typos, stale bookmarks), which
-// previously fell through to Next's unstyled default with no way back.
+// Branded site-wide 404 for every unmatched URL and notFound() call that has
+// no closer boundary.
 import "@/app/tailwind.css";
 import "@/app/home.css";
 import Link from "next/link";
@@ -12,22 +11,13 @@ import { HomeNav } from "@/app/_components/home/HomeNav";
 import { HomeFooter } from "@/app/_components/home/HomeFooter";
 import { THEME_BOOTSTRAP } from "@/app/_components/home/themeBootstrap";
 
-/** The chipmunk that shares the band with the number, authored through the
- *  same pipeline as the course art (`data/illustration-prompts.json`) and
- *  promoted into `public/images/`. Every surface asks for the `-cutout` slug. */
 const ART_SLUG = "error-404-cutout";
 
 /** Renders nothing when the slug has no manifest entry, so a tree without the
- *  promoted asset shows the page without art rather than a broken image.
- *
- *  Positioned out of flow so it can lap over the number. Note the cutout is
- *  640x417 but its opaque pixels are only 365x401, centred — 21.6% of the
- *  width is transparent on each side, so where the box lands and where the
- *  chipmunk looks like it lands are ~65px apart at full size. The nudges are
- *  therefore transforms, which resolve against the element's own box and so
- *  hold that inset at a constant fraction however the art is sized; the
- *  padding also being symmetric is what lets `left-1/2` centre the visible
- *  art and not merely the box. */
+ *  asset shows the page without art. The cutout carries symmetric transparent
+ *  padding (~21.6% per side), so the nudges are transforms — they resolve
+ *  against the element's own box and hold the inset at any size — and
+ *  `left-1/2` centres the visible art, not merely the box. */
 function NotFoundArt() {
   const entry = imageManifest[ART_SLUG];
   if (!entry) return null;
@@ -57,24 +47,12 @@ export default function NotFound() {
         <main className="overflow-x-clip">
           <section className="px-4 pb-20 pt-12 sm:px-6 sm:pt-16">
             <div className="mx-auto max-w-2xl">
-              {/* The number and the chipmunk read as one object rather than
-                  two aligned ones, and the two viewports want opposite
-                  compositions: wide enough for the art to sit beside the
-                  number, it laps the bottom-right of the last 4; too narrow
-                  for that, it drops onto the number's own centre instead of
-                  squeezing the digits. That is a real change of arrangement,
-                  not a size tweak, so it switches at `md` rather than
-                  interpolating.
-
-                  The outer box buys back the overhang the out-of-flow art no
-                  longer contributes, as padding rather than a margin: a margin
-                  would collapse with the heading's `mt-6` and the two would
-                  share the larger of them instead of stacking, leaving the
-                  disc resting on the heading. The inner box carries no
-                  padding of its own, so `bottom-0` stays pinned to the digits;
-                  `w-fit` shrink-wraps it to them, which is what makes the
-                  art's offsets read against the number rather than against the
-                  column. */}
+              {/* The composition switches at `md` (art beside the number vs.
+                  on its centre) — a change of arrangement, not size. The
+                  overhang is bought back as padding, not margin, which would
+                  collapse with the heading's `mt-6`; the inner `w-fit` box
+                  shrink-wraps the digits so the art's offsets read against
+                  the number, not the column. */}
               <div className="pb-[clamp(26px,9.2vw,62px)] md:pb-7">
                 <div className="relative w-fit">
                   <p className="select-none text-[clamp(2.5rem,45vw,260px)] font-black leading-[0.85] tracking-[-0.049em] text-neutral-200 dark:text-neutral-700">
@@ -85,8 +63,7 @@ export default function NotFound() {
               </div>
               <h1 className="mt-6 text-3xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-4xl dark:text-white">
                 No page here.
-                {/* Two lines on phones, where the sentence would otherwise
-                    break after "Just" and orphan the payoff word. */}
+                {/* Break on phones so "Just" doesn't orphan the payoff word. */}
                 <br className="sm:hidden" /> Just acorns.
               </h1>
               <p className="mt-4 text-base leading-relaxed text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
@@ -99,8 +76,7 @@ export default function NotFound() {
                   href="/courses"
                   className="inline-flex items-center gap-2 rounded-lg bg-[var(--ds-green-600)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--ds-green-700)]"
                 >
-                  {/* The icons the home page already uses for these three
-                      destinations, so the same journey looks the same here. */}
+                  {/* Same icons the home page uses for these destinations. */}
                   <GraduationCap size={16} aria-hidden="true" />
                   Browse courses
                 </Link>

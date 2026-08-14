@@ -2,20 +2,11 @@
 
 /**
  * "Recent Workspaces" on the `/playground` landing page: the five most recent
- * workspaces (local + cloud, merged by id) as a hairline-separated list, with
- * a link through to the full, paginated list at `/dashboard/playground`.
- *
- * A lighter sibling of `app/dashboard/playground/PlaygroundWorkspaces.tsx`:
- * same data sources (the localStorage registry + the signed-in account's cloud
- * backups) but trimmed to a preview — no search, no pagination — and with an
- * inline delete affordance per row (mirroring the handoff mock). The heavier
- * concerns (post-sign-in bulk backup, the empty/onboarding state) stay on the
- * dashboard page; here the whole section simply hides when there's nothing
- * recent to show.
- *
- * Client-only: the registry and cloud list are unavailable during SSR, so the
- * first (server-matching) render is empty and the real content swaps in after
- * hydration.
+ * workspaces (local + cloud, merged by id), linking through to the full list
+ * at `/dashboard/playground`. A trimmed sibling of
+ * `app/dashboard/playground/PlaygroundWorkspaces.tsx` — no search or
+ * pagination, and the section hides when there's nothing recent. Client-only:
+ * the first render is empty to match the server.
  */
 
 import {
@@ -206,9 +197,8 @@ export function RecentWorkspaces() {
     };
   }, []);
 
-  // Signed-in: pull the account's cloud workspaces + usage. 401/503 (session
-  // expired server-side / cloud not configured) degrade silently to the
-  // local-only view.
+  // Signed-in: pull the account's cloud workspaces + usage. Errors degrade
+  // silently to the local-only view.
   const refreshCloud = useCallback(async () => {
     if (!isCloudSupported()) return;
     try {

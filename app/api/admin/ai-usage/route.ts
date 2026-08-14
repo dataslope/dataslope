@@ -1,27 +1,10 @@
 /**
- * Admin-only AI usage report backing /admin/ai-usage.
- *
- * One GET returns everything the page renders for a date window: per-user
- * rows aggregated over an inclusive [start, end] UTC-day range (Ask AI chat +
- * inline-completion + suggested-question counters from `ai_usage_daily`,
- * joined to the user for name/email/plan) and the site-wide per-day totals
- * from `ai_usage_global` with the configured daily ceiling, so the dashboard
- * can show how much of the budget the window consumed.
- *
- * Window selection (all params optional, all UTC 'YYYY-MM-DD'):
- *   - `start`, inclusive lower bound. Omitted ⇒ all-time (the "Total" range).
- *   - `end`, inclusive upper bound. Omitted ⇒ today (UTC).
- *   - `day`, legacy single-day shorthand (start = end = day). Kept so an
- *               older cached client keeps working through a deploy.
- * Invalid values are ignored (fall back to the defaults) and a start after
- * end is clamped, so the endpoint can never 400 on the picker's input.
- *
- * Authorization is enforced HERE (requireAdmin), matching the codebase's
- * "auth gates actions, not content" rule, the /admin pages stay statically
- * prerendered and non-admins just get a 403 from this endpoint. Any database
- * failure is logged and returned as a 500 with a message rather than a bare
- * unhandled throw, so the dashboard can surface "try again" instead of a
- * blank Worker error.
+ * Admin-only AI usage report backing /admin/ai-usage: per-user rows over an
+ * inclusive [start, end] UTC-day window plus site-wide per-day totals and the
+ * daily cap. Params (all optional, UTC 'YYYY-MM-DD'): `start` (omitted ⇒
+ * all-time), `end` (omitted ⇒ today), `day` legacy single-day shorthand kept
+ * for older cached clients. Invalid values fall back to defaults and an
+ * inverted range is clamped, so this never 400s on picker input.
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { requireAdmin } from "@/lib/auth/admin";
@@ -32,10 +15,8 @@ export const dynamic = "force-dynamic";
 /** Default mirror of lib/ai/limits.ts DEFAULT_GLOBAL_CAP for display. */
 const DEFAULT_GLOBAL_CAP = 5_000_000;
 
-/** Cap on the per-day rows returned for the "daily totals" table, an
- *  all-time window could otherwise return years of rows. The window's true
- *  totals (totalTok/peakDayTok/activeDays) are computed separately so they
- *  stay accurate even when this table is truncated. */
+/** Cap on the "daily totals" rows (an all-time window could return years).
+ *  Window totals are computed separately, so they stay accurate regardless. */
 const DAILY_ROWS_LIMIT = 31;
 
 /** Per-user usage row, summed over the window, as rendered by the dashboard. */
@@ -103,9 +84,7 @@ export async function GET(request: Request): Promise<Response> {
   let start = readDay(params, "start") ?? legacyDay; // null ⇒ all-time
   if (start && start > end) start = end; // never let the range invert
 
-  // Optional lower bound: only bind `start` when the range has one. Column
-  // references stay identical whether or not the clause is present, so the two
-  // tables share the same builder.
+  // Optional lower bound: only bind `start` when the range has one.
   const bound = (col: string) =>
     start ? `${col} <= ? AND ${col} >= ?` : `${col} <= ?`;
   const binds: string[] = start ? [end, start] : [end];

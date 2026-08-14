@@ -277,11 +277,8 @@ export default function SqlChallengeBuilder() {
     }));
   };
 
-  // Publishing is gated on the solution SQL passing the tests: the
-  // preview card is (re)mounted with the payload being saved, the solution
-  // is loaded through the card's driver (the single editor surface is one
-  // virtual "query.sql" file), and the save only proceeds on a green
-  // banner.
+  // Publishing is gated on the solution SQL passing the tests via the preview
+  // card's driver (one virtual "query.sql" file); save needs a green banner.
   const onSave = async () => {
     setFormError(null);
     const payload = validate();
@@ -321,9 +318,7 @@ export default function SqlChallengeBuilder() {
     return <ErrorNotice message={loadError} />;
   }
 
-  // The live-preview column: the real learner-facing card once Preview (or a
-  // verifying save) has mounted it, a pulsing placeholder until then. Keyed
-  // remount: the SQL engine re-seeds with the new setup SQL.
+  // Keyed remount: the SQL engine re-seeds with the new setup SQL.
   const previewColumn = preview ? (
     <div key={preview.version}>
       <CustomItemRenderer title={preview.title} payload={preview.payload} />

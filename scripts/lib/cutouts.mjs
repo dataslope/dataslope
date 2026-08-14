@@ -1,36 +1,14 @@
-// The geometry of a cut-out: where its artwork actually is, how much of the
-// frame around it to take, and — separately — answering "which pristine PNG in
-// R2 is this served illustration made of?".
+// The geometry of a cut-out: where its artwork is, how much frame to keep,
+// and which pristine PNG in R2 a served illustration was made of. Shared by
+// promote-illustrations.mjs, trim-cutouts.mjs, build-illustration-sources.mjs
+// and prune-illustration-candidates.mjs.
 //
-// Shared by the four scripts that need it: `promote-illustrations.mjs` crops
-// each cut-out on the way in, `trim-cutouts.mjs` re-crops from the source it
-// names, `build-illustration-sources.mjs` writes the answers down as committed
-// provenance, and `prune-illustration-candidates.mjs` uses those answers to
-// decide what is safe to delete.
-//
-// ── Why matching, and not the run id ────────────────────────────────────────
-//
-// A prompt id usually exists in several R2 runs: a redraw writes a new run
-// prefix and leaves the old one alone. Crucially, a redraw is *generated*
-// before it is judged, and plenty were never promoted — so the newest run is
-// routinely not the live one. Measured across 284 ids, "keep the newest run"
-// disagrees with the truth for 107 of them, 38%. Anything built on run
-// recency would delete the live source for a third of the artwork.
-//
-// So the question is answered from pixels. The separation is not close: the
-// true source scores 33-55 dB against the file the site serves, and every
-// other run of the same id lands at 6-11.
-//
-// ── Why content is normalised first ─────────────────────────────────────────
-//
-// `trim-cutouts.mjs` crops the transparent band off the served WebP, so it no
-// longer has the same shape as the PNG it came from, and comparing whole
-// frames would call them different pictures — matching would break the moment
-// it was first used, and the pristine source would be unreachable from then
-// on. Both sides are therefore cropped to their own drawn content — on both
-// axes, so the normalisation is blind to which of the two crops below an image
-// has had — before the comparison, which asks "is this the same artwork?"
-// rather than "is this the same rectangle?".
+// Source matching is done by pixels, not run recency: a redraw writes a new
+// run prefix without being promoted, so the newest run is wrong for ~38% of
+// ids. Both sides are first cropped to their own drawn content (both axes, so
+// the comparison is blind to prior crops), because trim-cutouts.mjs changes
+// the served file's shape — the question is "same artwork?", not "same
+// rectangle?".
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -47,16 +25,12 @@ export const MATCH_FLOOR = 30;
 /**
  * The rectangle of an RGBA image that carries drawn content.
  *
- * A pixel counts as drawn once its alpha clears `alpha` (16 by default, which
- * ignores the faint halo a background remover leaves), and a line counts once
- * `frac` of its pixels are (0.2%, so a stray speck of leftover background
- * cannot defeat a trim). Both thresholds are pinned in
- * `__tests__/trimCutouts.test.ts` against synthetic images.
- *
- * Rows are measured across the full frame, columns only within the rows that
- * survived — so a speck too small to make its own row count cannot drag the
- * left or right bound out to meet it either. That ordering also keeps the
- * vertical answer exactly what it was when these bounds were rows-only.
+ * A pixel is drawn once alpha clears `alpha` (16 ignores a background
+ * remover's halo); a line counts once `frac` of its pixels are (0.2%, so a
+ * stray speck cannot defeat a trim). Thresholds pinned in
+ * `__tests__/trimCutouts.test.ts`. Columns are measured only within surviving
+ * rows, so a speck too small to make a row cannot drag the left/right bound
+ * out either.
  */
 export async function contentBounds(buf, { alpha = 16, frac = 0.002 } = {}) {
   const { data, info } = await sharp(buf)
@@ -98,20 +72,12 @@ export async function contentBounds(buf, { alpha = 16, frac = 0.002 } = {}) {
 /**
  * Turn bounds into the crop to apply, or null when it isn't worth it.
  *
- * `axes` picks which margins are taken: `"vertical"` keeps the full width (the
- * default, and what every in-lesson figure gets — see `trim-cutouts.mjs` for
- * why), `"both"` takes the left and right blank as well.
- *
- * `removed` is the fraction of the *frame* removed, so it reads as "how much of
- * the layout box was blank" under either setting; with `axes: "vertical"` that
- * is exactly the fraction of the height, as it always was.
- *
- * Returns null for a fully transparent image (nothing to centre the crop on)
- * and for one already tight enough that the trim would remove less than
- * `minGain` of its area — which is what makes a re-run a no-op instead of a
- * fresh lossy generation for a percent of nothing.
- *
- * Exported for `__tests__/trimCutouts.test.ts`.
+ * `axes: "vertical"` keeps the full width (the default; see trim-cutouts.mjs),
+ * `"both"` takes left/right blank too. `removed` is the fraction of the frame
+ * removed. Returns null for a fully transparent image or when the trim would
+ * remove less than `minGain` of the area — which makes a re-run a no-op
+ * rather than a fresh lossy generation. Exported for
+ * `__tests__/trimCutouts.test.ts`.
  */
 export function trimPlan(bounds, { pad = 0.02, minGain = 0.02, axes = "vertical" } = {}) {
   if (bounds.empty) return null;
@@ -123,9 +89,7 @@ export function trimPlan(bounds, { pad = 0.02, minGain = 0.02, axes = "vertical"
   let left = 0;
   let width = bounds.width;
   if (axes === "both") {
-    // Padding is a fraction of each axis in turn, so a frame gets the same
-    // proportional breathing room all the way round rather than the same
-    // pixel count on a 1536-wide image as on its 1024-tall one.
+    // Padding is proportional per axis, not a fixed pixel count.
     const padX = Math.round(bounds.width * pad);
     left = Math.max(0, bounds.left - padX);
     const right = Math.min(bounds.width - 1, bounds.right + padX);
@@ -138,21 +102,11 @@ export function trimPlan(bounds, { pad = 0.02, minGain = 0.02, axes = "vertical"
 }
 
 /**
- * Which margins a cut-out's crop should take, from its prompt id.
- *
- * Thumbnails are trimmed on both axes, everything else vertically only. The
- * split is about where the image is painted, not about the art: a thumbnail is
- * shown at ~100px inside a fixed box, where every blank column is drawing
- * surface the subject doesn't get, while an in-lesson figure spans the content
- * column and shares its edges with the figure in the next lesson.
- *
- * The answer comes from the prompt corpus rather than the file name, so a
- * future thumbnail is trimmed for what it *is* — `data/illustration-prompts.json`
- * is where a new one is declared, and the `course-thumbnail` /
- * `interview-thumbnail` categories are already the pipeline's word for "this is
- * a thumbnail". An id the corpus doesn't know (promoted from a scratch
- * directory, say) falls back to the naming convention the corpus itself
- * follows; `__tests__/trimCutouts.test.ts` pins the two in agreement.
+ * Which margins a cut-out's crop should take, from its prompt id: thumbnails
+ * (shown small in a fixed box) on both axes, everything else vertically only.
+ * The category comes from `data/illustration-prompts.json`; an id the corpus
+ * doesn't know falls back to the naming convention, and
+ * `__tests__/trimCutouts.test.ts` pins the two in agreement.
  */
 const THUMBNAIL_SUFFIX = "-thumbnail";
 let categoryById = null;
@@ -181,13 +135,10 @@ export async function contentSignature(buf) {
   return img.resize({ width: 128, height: 128, fit: "fill" }).ensureAlpha().raw().toBuffer();
 }
 
-/**
- * Premultiplied PSNR between two content signatures, in dB.
- *
- * Premultiplying matters: RGB under a fully transparent pixel is undefined and
- * each encoder is free to rewrite it, so a naive comparison reports a large
- * difference across exactly the blank regions this pipeline removes.
- */
+/** Premultiplied PSNR between two content signatures, in dB. Premultiplied
+ *  because RGB under fully transparent pixels is encoder-defined, and a naive
+ *  comparison reports large differences across exactly the blank regions this
+ *  pipeline removes. */
 export function similarity(x, y) {
   let se = 0;
   const pixels = x.length / 4;
@@ -209,19 +160,15 @@ export function similarity(x, y) {
 export const CANDIDATE_KEY = /^illustrations\/([^/]+)\/([^/]+)\/v(\d+)\/(\w+)\.png$/;
 
 /**
- * Read-only index of the cut-out candidates in R2.
- *
- * **Reads only.** Nothing here puts or deletes; deletion lives in
- * `prune-illustration-candidates.mjs`, behind its own explicit flag.
+ * Read-only index of the cut-out candidates in R2. Nothing here puts or
+ * deletes; deletion lives in `prune-illustration-candidates.mjs`.
  */
 export function createCandidateIndex() {
   const client = createR2Client(credentialsFromEnv());
 
-  // Cache the *promise*, not the map it resolves to. Publishing a half-filled
-  // map and awaiting the listing afterwards is a race with teeth: a second
-  // worker finds a truthy (empty) index, concludes the id has no candidate,
-  // and silently takes whatever fallback its caller has. Nothing fails — the
-  // run just quietly does the wrong thing for most of the images.
+  // Cache the promise, not the resolved map: a half-filled map would let a
+  // second worker conclude an id has no candidate and silently take its
+  // fallback.
   let indexing = null;
   const load = () =>
     (indexing ??= (async () => {
@@ -247,15 +194,11 @@ export function createCandidateIndex() {
     /**
      * The pristine cut-out PNG a served image was encoded from, or null.
      *
-     * Candidates are tried newest run first and the search stops at the first
-     * one over the floor rather than scoring them all. Over 900 images that is
-     * the difference between downloading every historical redraw (~2 GB) and
-     * usually downloading one; the floor is nowhere near ambiguous, so "first
-     * over 30" and "best of all" cannot disagree. Run ids are dated, so
-     * sorting descending is chronological enough to make the guess pay off.
-     *
-     * `bestDb` distinguishes the two ways to miss: null means no candidate
-     * exists for this id at all, a number means one does and did not match.
+     * Candidates are tried newest run first, stopping at the first score over
+     * the floor — usually one download instead of every historical redraw
+     * (~2 GB over 900 images); the floor's separation is wide enough that
+     * "first over 30" and "best of all" cannot disagree. `bestDb` is null
+     * when no candidate exists at all, a number when one exists but missed.
      */
     async sourceFor(id, servedSig) {
       const { byId } = await load();

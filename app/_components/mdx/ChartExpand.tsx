@@ -1,39 +1,13 @@
 "use client";
 
 /**
- * "See the whole chart" for narrow screens.
- *
- * A chart is one fixed 680px drawing that stops scaling at the width its
- * smallest label needs (see `legibleMinWidth` in scripts/build-charts.mjs), so
- * on a phone it sits at ~578px inside a ~358px column and its container
- * scrolls. That bargain keeps the type readable, and it works for reading one
- * end of a chart at a time — but most of these figures are comparisons, and no
- * amount of sideways scrolling puts both panels in front of the reader at
- * once.
- *
- * This offers the other half of the bargain: a view that uses the whole
- * viewport, where the entire drawing is on screen at the largest size that
- * fits. In portrait that is small; turned sideways a phone gives about 844px,
- * which is more than the chart's own width, so the whole thing lands at full
- * size and full legibility. The hint says so, because "rotate your phone" is
- * not a thing readers think to try.
- *
- * The button only exists below the breakpoint where the chart is clipped
- * (Chart.module.css decides that, not this component) — above it the whole
- * drawing is already on screen.
- *
- * ── Why the markup is cloned from the DOM ───────────────────────────────────
- *
- * The obvious shape is to pass the SVG string in as a prop, and it is the
- * wrong one: the markup averages ~13KB per chart and would then cross into the
- * client payload a second time, doubling every chart's cost on a lesson that
- * carries six of them. The chart is already in the document, so the overlay
- * reads `innerHTML` off the rendered node when it opens. It is our own
- * build-time markup either way.
- *
- * The clone is given the same `.chart` class as the original, which is where
- * the `--ds-chart-*` role tokens live — without it the SVG's `var()` colors
- * resolve to nothing and the chart opens blank.
+ * "See the whole chart" overlay for narrow screens: the entire drawing at the
+ * largest size that fits the viewport. The button only exists below the
+ * breakpoint where the chart is clipped (Chart.module.css decides). The markup
+ * is cloned from the rendered DOM rather than passed as a prop — the ~13KB SVG
+ * would otherwise cross into the client payload a second time. The clone keeps
+ * the `.chart` class, where the `--ds-chart-*` tokens live; without it the
+ * `var()` colors resolve to nothing and the chart opens blank.
  */
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Maximize2, X } from "lucide-react";

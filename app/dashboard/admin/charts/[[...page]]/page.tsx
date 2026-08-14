@@ -74,22 +74,12 @@ function orderable([slug, chart]: Entry): Orderable {
 
 const PAGE_COUNT = Math.max(1, Math.ceil(Object.keys(chartManifest).length / PER_PAGE));
 
-/** The date orderings, which are the two that get a date banner. */
+/** The orderings that get a date banner. */
 const DATED: readonly Ordering[] = ["newest", "oldest"];
 
-/**
- * How many charts share each creation date, across the whole library.
- *
- * Specs arrive in bulk: at the time of writing, three commits account for every
- * chart here, so a date ordering is mostly long runs of one timestamp. Inside a
- * run `compareCreated` falls back to the slug, which is correct (the sort has
- * to be total and stable) but means "oldest first" can render a page that is
- * character-for-character "A→Z" and reads as a button that did nothing.
- *
- * Counting the runs lets the page say so. It is not a workaround for a broken
- * comparator; the comparator is right and the underlying dates are real, and
- * the fix for a control that looks dead is to show the reader what it did.
- */
+/** Charts per creation date, library-wide. Specs arrive in bulk, so a date
+ *  ordering is mostly runs of one timestamp sorted A→Z within; the banner
+ *  says so, so the sort doesn't read as a button that did nothing. */
 const DATE_RUNS: ReadonlyMap<string, number> = (() => {
   const runs = new Map<string, number>();
   for (const slug of Object.keys(chartManifest)) {
@@ -102,8 +92,7 @@ const DATE_RUNS: ReadonlyMap<string, number> = (() => {
 const sortedBy = (sort: Ordering): Entry[] =>
   orderBy(Object.entries(chartManifest) as Entry[], sort, orderable);
 
-/** Page 1 of the default sort is the bare route, so it keeps a clean canonical
- *  URL and existing links still land somewhere. */
+/** Page 1 of the default sort is the bare route. */
 function hrefFor(sort: Ordering, n: number): string {
   const base = "/dashboard/admin/charts";
   const prefix = sort === DEFAULT_SORT ? base : `${base}/${sort}`;
@@ -125,17 +114,14 @@ export default async function AdminChartsPage(props: {
 }) {
   const { page: segments } = await props.params;
 
-  // Accepted shapes: nothing, [page], [sort], [sort, page]. Anything else (a
-  // stray path, page 0, an unknown sort) is a 404 rather than a silently
-  // clamped page, so a bad link is visible instead of quietly showing the
-  // wrong slice.
+  // Accepted shapes: nothing, [page], [sort], [sort, page]. Anything else is
+  // a 404 rather than a silently clamped page.
   if (segments && segments.length > 2) notFound();
   const [first, second] = segments ?? [];
 
   const sortSegment = first !== undefined && !/^\d+$/.test(first) ? first : undefined;
   if (sortSegment !== undefined && !isOrdering(sortSegment)) notFound();
-  // The default sort owns the bare URLs, so naming it explicitly would give a
-  // slice two addresses.
+  // Naming the default sort explicitly would give a slice two addresses.
   if (sortSegment === DEFAULT_SORT) notFound();
   const sort = sortSegment ?? DEFAULT_SORT;
 
@@ -151,9 +137,8 @@ export default async function AdminChartsPage(props: {
   const bytes = ALL.reduce((n, [, c]) => n + c.svgBytes, 0);
   const placed = ALL.filter(([, c]) => c.usedBy.length > 0).length;
 
-  // The markup lives as one static asset per chart (see SVG_DIR in
-  // build-charts.mjs), not in the manifest — only this page's slice is
-  // loaded, so the gallery reads 20 files instead of holding all 5.7 MB.
+  // SVG lives as one static asset per chart (see SVG_DIR in build-charts.mjs),
+  // not in the manifest, so only this page's slice is loaded.
   const svgBySlug = new Map(
     await Promise.all(
       charts.map(async ([slug]) => [slug, (await loadChartSvg(slug)) ?? ""] as const),
@@ -204,8 +189,7 @@ export default async function AdminChartsPage(props: {
             ) : null}
           </dl>
 
-          {/* Plain links, not a client control: sorting is navigation here,
-              and a <select> would need JavaScript to do what an <a> does. */}
+          {/* Plain links: sorting is navigation here. */}
           <nav className={styles.sortBar} aria-label="Sort charts">
             <span className={styles.sortLabel}>Sort by</span>
             {ORDERINGS.map((key) => (
@@ -230,9 +214,8 @@ export default async function AdminChartsPage(props: {
 
           <div className={styles.list}>
             {charts.map(([slug, chart], i) => {
-              // A banner whenever the date changes, and always at the top of a
-              // slice so every page says which run it is in rather than only
-              // the page the run started on.
+              // Banner whenever the date changes, and always at the top of a
+              // slice so every page says which run it is in.
               const iso = createdAt.charts[slug] ?? "";
               const previous = i === 0 ? null : (createdAt.charts[charts[i - 1][0]] ?? "");
               const banner =
@@ -269,9 +252,6 @@ export default async function AdminChartsPage(props: {
                   </span>
                 </header>
 
-                {/* Straight to the page the figure appears on: the gallery is
-                    for spotting a problem, and fixing one always means reading
-                    it in context first. */}
                 <div className={styles.usedBy}>
                   {chart.usedBy.length > 0 ? (
                     chart.usedBy.map((use) => (
@@ -303,10 +283,8 @@ export default async function AdminChartsPage(props: {
 
                 <ChartMarkControls slug={slug} title={slug} />
 
-                {/* Its own row rather than a slot inside the queue controls:
-                    those render nothing until the marks fetch resolves, and
-                    this one disables itself instead so the control is never
-                    silently missing. */}
+                {/* Own row: queue controls render nothing until the marks
+                    fetch resolves, this one disables itself instead. */}
                 <div className={styles.devRow}>
                   <ChartDeleteControls
                     slug={slug}

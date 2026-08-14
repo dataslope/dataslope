@@ -1,32 +1,15 @@
 /**
- * Runs every JavaScript and TypeScript `<CodeBlock>` in `content/`, and grades
- * every `<ChallengeCard>` in those languages against its own tests.
+ * Runs every JavaScript and TypeScript `<CodeBlock>` in `content/`, and
+ * grades every `<ChallengeCard>` in those languages against its own tests.
  *
- * These are the second-largest unchecked group after SQL: 203 JS and 338 TS
- * blocks, plus 32 and 48 cards.
+ * Runs under almostnode, not real Node: the site runs these in the browser
+ * shim, and real Node is strictly more capable, so a Node sweep would pass
+ * blocks that fail for every reader. `AlmostNodeRunner` and `transpileTs` are
+ * imported from the worker's own modules so nothing drifts.
  *
- * ── Why almostnode rather than node ────────────────────────────────────────
- *
- * The obvious implementation — hand the source to `node` — is wrong in the
- * direction that hides breakage. The site runs these in almostnode, a browser
- * shim with a VirtualFS and a partial Node API. Real Node is strictly *more*
- * capable, so a block using something almostnode lacks would pass a Node sweep
- * and fail for every reader. Running the same runner the browser runs is the
- * only version of this check worth having, and `almostnode` is an ordinary npm
- * dependency that works here unchanged.
- *
- * `AlmostNodeRunner` and `transpileTs` are imported from the modules the
- * workers themselves use, for the reason the rest of these sweeps import their
- * harnesses: a second copy drifts, and a drifted copy passes things it should
- * fail.
- *
- * ── On detecting failure ───────────────────────────────────────────────────
- *
- * A thrown error does NOT reject `runner.run()`. almostnode catches it and
- * writes it to the console sink, exactly as the UI renders an error cell. So
- * failure is "anything reached stderr", which is also how the Playwright
- * sweep decides (`[data-cell-type="stderr"]`). Keying on a rejected promise
- * instead would have reported every throwing block as passing.
+ * A thrown error does NOT reject `runner.run()` — almostnode writes it to the
+ * console sink, as the UI renders an error cell. Failure is therefore
+ * "anything reached stderr", the same rule the Playwright sweep uses.
  *
  * Usage:
  *   node scripts/check-js-blocks.mjs [--filter <substr>[,<substr>…]]
@@ -42,16 +25,10 @@ import {
   parseFilter,
 } from "./lib/mdx-blocks.mjs";
 
-// almostnode replaces the global `process.exit` with its own, which throws
-// instead of exiting so that a lesson calling `process.exit()` cannot take the
-// worker down. That patch lands when its module is imported, and a static
-// import is hoisted above everything, so there is no point in the file where
-// this script could still reach the real one: calling `process.exit(0)` threw
-// "Error: Process exited with code 0" *after* printing a green tick and left
-// the real exit code at 1 — CI seeing a failure it could not explain.
-//
-// So the runner is pulled in dynamically, below, and the genuine `exit` is
-// captured first.
+// almostnode replaces `process.exit` with one that throws (so a lesson cannot
+// take the worker down), and a static import is hoisted above everything — so
+// the runner is imported dynamically below and the genuine `exit` captured
+// first, or this script could never exit cleanly.
 const exitProcess = process.exit.bind(process);
 
 const { AlmostNodeRunner, normalizeVfsPath } = await import(
@@ -170,9 +147,8 @@ for (const [i, item] of runnable.entries()) {
   }
 
   const stderr = [...diagnostics, ...err].join("\n").trim();
-  // Both directions, as in the SQL and R sweeps: a block marked `expectError`
-  // must produce error output, and one that stops producing it is a
-  // regression nothing else would catch.
+  // Both directions: an `expectError` block must produce error output, and
+  // one that stops producing it is a hidden regression.
   if (item.expectError && !stderr) {
     failures.push({
       file: item.file,

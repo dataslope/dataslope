@@ -1,21 +1,8 @@
-// Guards what `check:challenges` believes a challenge card's reference
-// solution is (scripts/lib/mdx-blocks.mjs) and how it lays that solution out
-// on disk before running it (the `stage` half of scripts/lib/pyodide-runner.mjs).
-//
-// Both halves used to read only the *entry* file, and both failures were
-// silent by construction:
-//
-//   • `solution` came from `entry.solutionCode`. Every multi-file card in
-//     python-basics puts a fixed driver in main.py ("Do not edit main.py") and
-//     the actual exercise in a sibling module, so ten fully-solved cards
-//     reported as having nothing to verify and were skipped.
-//   • `stage()` wrote siblings from `starterCode`, i.e. the learner's blanks.
-//     A card solved across files would have been graded against its own
-//     stubs, passing only when the tests never reached the sibling.
-//
-// A card that is skipped and a card that passes look identical in a green
-// sweep, which is why these are pinned here rather than left to the sweep
-// itself (it needs a 30s Pyodide boot and cannot run in unit CI).
+// Guards what `check:challenges` believes a card's reference solution is
+// (scripts/lib/mdx-blocks.mjs) and how `stage` lays it out on disk
+// (scripts/lib/pyodide-runner.mjs). Both once mis-handled multi-file cards
+// (driver entry, solution in a sibling) silently — and a skipped card looks
+// identical to a passing one in a green sweep, hence unit pins here.
 import { describe, expect, it } from "vitest";
 
 import {
@@ -77,9 +64,8 @@ function stagedBody(f: CardFile): string {
 describe("challenge card solution extraction", () => {
   it("finds a solution for every python card", () => {
     const unsolved = cards.filter((c) => !c.unparsable && !c.solution);
-    // Every card in content/ supplies a solution on some file. A new card that
-    // genuinely has none should be added deliberately, not discovered as a
-    // silent gap in the sweep months later.
+    // A card with no solution should be added deliberately, not discovered as
+    // a silent gap in the sweep later.
     expect(unsolved.map((c) => `${c.file}:${c.line}`)).toEqual([]);
   });
 
@@ -120,10 +106,8 @@ describe("challenge card solution extraction", () => {
   });
 
   it("does not prepend a blank line to a file that has no initCode", () => {
-    // A leading newline is invisible in a .py sibling and destroys a data one:
-    // it pushed sales.csv's header off line 1, so csv.DictReader came back
-    // with one empty field name and a correct solution raised
-    // KeyError: 'product'.
+    // A leading newline destroys a data file: it pushed sales.csv's header off
+    // line 1 and a correct solution raised KeyError: 'product'.
     const csv = fileOf(findCard("python-basics/files.mdx", "Parse a CSV file"), "sales.csv");
     expect(csv.initCode).toBe("");
     expect(stagedBody(csv).startsWith("\n")).toBe(false);
@@ -160,11 +144,9 @@ describe("parseFiles", () => {
   });
 });
 
-// `--filter` is what keeps a pull-request sweep to the lessons it changed
-// (see .github/workflows/content-sweeps.yml). The workflow builds the value
-// from a git diff, so the parsing here decides how much CI actually checks,
-// and the dangerous direction is a filter that quietly selects everything or
-// nothing while the run still reports a green tick.
+// `--filter` keeps a PR sweep to the lessons it changed (content-sweeps.yml
+// builds it from a git diff); the dangerous direction is a filter that quietly
+// selects everything or nothing while still reporting green.
 describe("parseFilter", () => {
   it("returns null when no filter was given, meaning sweep everything", () => {
     expect(parseFilter(null)).toBeNull();
@@ -180,9 +162,7 @@ describe("parseFilter", () => {
   });
 
   it("treats an explicitly empty filter as selecting nothing", () => {
-    // Not as selecting everything. CI computes this from a diff, and "no
-    // lesson files changed" must never widen into an unrequested full sweep
-    // (or, worse, look like one that passed).
+    // "No lesson files changed" must never widen into a full sweep.
     expect(parseFilter("")).toEqual([]);
     expect(parseFilter("  ,  ")).toEqual([]);
   });
@@ -201,8 +181,8 @@ describe("matchesFilter", () => {
   });
 
   it("also matches a card title when one is supplied", () => {
-    // `--filter "Two Sum"` is the by-hand ergonomic the challenge sweep has
-    // always had; the file-path lists CI passes go through the same call.
+    // `--filter "Two Sum"` is the by-hand ergonomic; CI's path lists go
+    // through the same call.
     expect(matchesFilter(["Two Sum"], "content/x.mdx", "Two Sum")).toBe(true);
     expect(matchesFilter(["Two Sum"], "content/x.mdx", "Valid Anagram")).toBe(false);
   });
