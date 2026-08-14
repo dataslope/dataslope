@@ -28,7 +28,9 @@ name: R2 incremental-cache cleanup
 #   • the live production build (probed from the running Worker), a site that
 #     sits unchanged for months must never lose its cache, which would 500 the
 #     home page and /courses/* (see open-next.config.ts), AND
-#   • any folder written within the last GRACE_HOURS, whatever it matches. A
+#   • any folder POPULATED within the last GRACE_HOURS, whatever it matches
+#     (populated, not "last written" — see step 5; objects also arrive at
+#     request time and must not be mistaken for a deploy). A
 #     deploy populates its cache folder BEFORE the Worker switches to serving
 #     that build, so for some minutes the incoming production folder is
 #     protected by neither the probe (which still reports the outgoing build)
@@ -422,32 +424,58 @@ jobs:
           echo "Policy: keep live production + anything written in the last ${GRACE_HOURS}h + the head commit of up to $MAX_BRANCHES open-PR branches (any age) + anything younger than ${THRESHOLD_HOURS}h + recent '$default_branch' builds within that window (cutoff $(date -u -d "@$cutoff" '+%Y-%m-%d %H:%M:%SZ'))"
           echo "Dry run: $DRY_RUN"
 
-          # 5) Timestamp every non-production folder so active-branch previews
-          #    can be ranked newest-first, the MAX_BRANCHES cap needs a global
-          #    order, not a per-folder decision.
+          # 5) Date every non-production folder by when it was POPULATED so
+          #    active-branch previews can be ranked newest-first, the
+          #    MAX_BRANCHES cap needs a global order, not a per-folder decision.
           entries=()
           for folder in "${folders[@]}"; do
             [[ "$folder" == "$prod_folder" ]] && continue
 
-            # Newest object in the folder (all written together at deploy time).
-            # The CLI auto-paginates above 1000 objects and applies --query to
-            # each page separately, so a large build folder returns one max
-            # timestamp PER PAGE (multiple lines). Collapse to the overall max,
-            # R2 reports LastModified in a uniform UTC ISO-8601 layout, so a
-            # lexical sort orders them chronologically, and drop the "None" a
-            # genuinely empty page emits, leaving `date` a single value to parse.
-            newest="$(aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$folder" \
-              --query 'sort_by(Contents, &LastModified)[-1].LastModified' --output text 2>/dev/null \
-              | grep -vxF 'None' | sort | tail -n1 || true)"
-            if [[ -z "$newest" ]]; then
+            # When was this folder POPULATED? Use the median object's
+            # LastModified, not the newest.
+            #
+            # A deploy writes the whole folder in one burst (measured 2026-08-14:
+            # median 0.8 min, max 1.8 min for ~1,081 objects), so any object in
+            # the burst dates the folder to within a couple of minutes. The max
+            # does NOT, because objects also arrive at REQUEST time, long after
+            # the deploy: a request for a `/courses/*` path that isn't
+            # prerendered renders the not-found page and OpenNext caches that
+            # 404 (~1.8 MB, `revalidate: false`) into whichever build folder is
+            # live. Every such write reset the folder's apparent age to zero.
+            # Folder 0127baf6 was populated at 17:54 and then took 404 writes at
+            # 18:22, 19:59, 20:46 and 21:07 — gaps of 28, 97, 47 and 21 minutes,
+            # every one inside GRACE_HOURS — so it was held by the grace rule as
+            # "possibly an in-flight deploy" more than three hours after its
+            # deploy finished. 4 of 33 folders were affected. Left unfixed this
+            # gets worse as THRESHOLD_HOURS shrinks, since there is less headroom
+            # for a stray write to erase, and it is unbounded: one crawler
+            # working through stale URLs can pin a folder open indefinitely.
+            #
+            # The median is immune (a burst of ~1,081 objects cannot be moved by
+            # a handful of late ones) and remains correct for the case the grace
+            # window exists to protect: during an in-flight populate the median
+            # of what has landed so far is also seconds old.
+            #
+            # The CLI auto-paginates above 1000 objects and applies --query per
+            # page, so this emits one tab-separated batch PER PAGE. Flatten to
+            # one stamp per line and sort globally: R2 reports LastModified in a
+            # uniform UTC ISO-8601 layout, so a lexical sort is chronological.
+            # Drop the "None" a genuinely empty page emits.
+            mapfile -t stamps < <(
+              aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$folder" \
+                --query 'Contents[].LastModified' --output text 2>/dev/null \
+                | tr '\t' '\n' | sed '/^$/d' | grep -vxF 'None' | sort || true
+            )
+            if [[ ${#stamps[@]} -eq 0 ]]; then
               echo "skip  $folder (empty)"; continue
             fi
-            entries+=("$(printf '%s\t%s\t%s' "$(date -u -d "$newest" +%s)" "$newest" "$folder")")
+            populated="${stamps[$(( ${#stamps[@]} / 2 ))]}"
+            entries+=("$(printf '%s\t%s\t%s' "$(date -u -d "$populated" +%s)" "$populated" "$folder")")
           done
 
           echo "KEEP  $prod_folder (live production)"
           kept=1; deleted=0; failed=0; branches=0
-          while IFS=$'\t' read -r ts newest folder; do
+          while IFS=$'\t' read -r ts populated folder; do
             [[ -z "$folder" ]] && continue
             # Folder name is the commit SHA: strip the prefix and trailing slash.
             sha="${folder#"$PREFIX"}"; sha="${sha%/}"
@@ -457,7 +485,7 @@ jobs:
             # is settled BEFORE age is consulted, so the age rule only ever
             # decides the fate of a build nobody is reading from.
             if (( ts >= grace_cutoff )); then
-              echo "KEEP  $folder (last written $newest, inside the ${GRACE_HOURS}h grace window, possibly an in-flight deploy)"
+              echo "KEEP  $folder (populated $populated, inside the ${GRACE_HOURS}h grace window, possibly an in-flight deploy)"
               kept=$((kept+1)); continue
             elif [[ -n "${pr_pending[$sha]+set}" ]]; then
               # Outranks the age rule deliberately: a build that is still being
@@ -480,12 +508,12 @@ jobs:
               fi
               echo "DELETE $folder (${pr_branch[$sha]}, beyond the $MAX_BRANCHES most recent branches)"
             elif (( ts < cutoff )); then
-              echo "DELETE $folder (last written $newest, older than ${THRESHOLD_HOURS}h)"
+              echo "DELETE $folder (populated $populated, older than ${THRESHOLD_HOURS}h)"
             elif [[ -n "${main_sha[$sha]+set}" ]]; then
               echo "KEEP  $folder (recent '$default_branch' commit, current or recent production build)"
               kept=$((kept+1)); continue
             else
-              echo "DELETE $folder (last written $newest, not the head of any open PR, merged, closed, or superseded)"
+              echo "DELETE $folder (populated $populated, not the head of any open PR, merged, closed, or superseded)"
             fi
 
             if [[ "$DRY_RUN" == "true" ]]; then
