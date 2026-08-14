@@ -1,18 +1,10 @@
 "use client";
 
 /**
- * Uploading a browser's local code workspaces to the account after sign-in.
- *
- * The promise is that signing in is enough to get your work backed up, with no
- * per-workspace ceremony. That was only true on the dashboard, and only for
- * workspaces that were already in the registry; a guest's most likely state,
- * one unsaved draft they have been typing in, was in neither. Pairing this
- * with `recoverOrphanWorkspaces` (which registers changed drafts) and running
- * it from both workspace surfaces closes both halves.
- *
- * SQL workspaces are skipped and stay manual, because their bundle carries a
- * database image only a live engine can produce, so there is nothing to build
- * from the outside.
+ * Uploads a browser's local code workspaces to the account after sign-in
+ * (pairs with `recoverOrphanWorkspaces`, which registers changed drafts).
+ * SQL workspaces are skipped: their bundle carries a database image only a
+ * live engine can produce.
  */
 
 import { isSqlPlayground } from "@/lib/workspaces/types";
@@ -47,10 +39,9 @@ export function pendingBackupCandidates(
 }
 
 /**
- * Upload every local code workspace that has no cloud copy. Returns the number
- * uploaded. Stops at the first failure, having reported it: a sweep that keeps
- * going through a quota or auth error would just repeat the same message once
- * per workspace.
+ * Uploads every local code workspace with no cloud copy; returns the number
+ * uploaded. Stops at the first failure — a quota/auth error would just
+ * repeat once per workspace.
  */
 export async function backupLocalWorkspaces({
   entries,

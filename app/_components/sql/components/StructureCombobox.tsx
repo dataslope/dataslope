@@ -194,10 +194,9 @@ export function StructureCombobox({
   );
 }
 
-/** Thin wrapper over {@link StructureCombobox} for the foreign-key table and
- *  column fields: a flat option list, constrained input, and a leading item
- *  that clears the reference. The clear item reuses the field's `placeholder`
- *  so it reads the same as the empty/default label (e.g. `(none)`, `(column)`). */
+/** Thin wrapper over {@link StructureCombobox} for FK table/column fields:
+ *  flat options, constrained input, and a leading clear item that reuses the
+ *  field's `placeholder` label. */
 export function FkCombobox({
   value,
   onChange,

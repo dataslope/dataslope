@@ -1,32 +1,12 @@
-// Shared loader for the .NET WebAssembly runtime. The C# playground
-// uses Microsoft's official Mono-based .NET WebAssembly runtime to
-// run user code entirely in the browser (no server roundtrip), in
-// the same spirit as Pyodide for Python, WebR for R, browsercc for
-// C/C++, CheerpJ for Java and php-wasm for PHP.
-//
-// The runtime bundle lives in cdn-assets/_dotnet/ (served via
-// jsDelivr, see cdn.ts) and ships:
-//   - dotnet.js              (Microsoft's Mono boot script, ES module)
-//   - dotnet.runtime.js      (the JS half of the runtime)
-//   - dotnet.native.js       (the Emscripten-generated JS)
-//   - dotnet.native.wasm     (the WASM half of the runtime)
-//   - dotnet.boot.js         (boot config listing all required assemblies)
-//   - System.* / Microsoft.CodeAnalysis.* assemblies
-//   - a tiny ScriptRunner.dll that wraps Microsoft.CodeAnalysis.CSharp
-//     .Scripting.CSharpScript.RunAsync and exposes it to JS via the
-//     [JSExport] attribute.
-//
-// Once the runtime boots we get a function `runScript(code)` that
-// returns an object containing the captured stdout + stderr from
-// running the user's C# code. Because the runtime is large (>30MB
-// gzipped) we cache the bootstrap across React strict-mode mounts
-// and across navigation between the home page and the C# playground.
-//
-// dotnet.js is an ES module; we load it with a dynamic import() so
-// the module's internal relative imports (dotnet.runtime.js, etc.)
-// resolve correctly against the jsDelivr CDN path. We also pass an
-// explicit dotnet.boot.js URL and resource loader so assemblies are
-// fetched from jsDelivr rather than falling back to the app origin.
+// Shared loader for Microsoft's Mono-based .NET WebAssembly runtime.
+// The bundle lives in cdn-assets/_dotnet/ (served via jsDelivr, see
+// cdn.ts): dotnet.js + runtime/native JS, dotnet.native.wasm, the boot
+// config, System.*/Roslyn assemblies, and a tiny ScriptRunner.dll that
+// exposes CSharpScript.RunAsync via [JSExport]. The bootstrap (>30 MB
+// gzipped) is cached across strict-mode mounts and navigations. dotnet.js
+// is imported dynamically so its internal relative imports resolve against
+// the CDN path, with an explicit boot-config URL + resource loader so
+// assemblies never fall back to the app origin.
 
 import { CDN_BASE_URL } from "./cdn";
 
@@ -42,9 +22,8 @@ export interface CSharpScriptResult {
 }
 
 export interface DotnetApi {
-  /** Compile + run a C# script. Top-level statements are allowed; the
-   *  runner internally calls `Microsoft.CodeAnalysis.CSharp.Scripting
-   *  .CSharpScript.RunAsync(code)`. */
+  /** Compile + run a C# script (top-level statements allowed) via
+   *  CSharpScript.RunAsync. */
   runScript(code: string): Promise<CSharpScriptResult>;
 }
 
@@ -64,10 +43,8 @@ interface DotnetHostBuilder {
   create(): Promise<RuntimeAPI>;
 }
 
-/** Mono's `getAssemblyExports` returns a deeply nested record keyed by
- *  namespace segments and class names, with the leaves being the
- *  exported `[JSExport]` methods. We model it loosely so callers can
- *  walk into whatever depth their bundle uses. */
+/** Mono's `getAssemblyExports` tree: nested records keyed by namespace and
+ *  class names, leaves being [JSExport] methods. Modelled loosely. */
 type AssemblyExportNode =
   | ((...args: unknown[]) => unknown)
   | { [key: string]: AssemblyExportNode };
@@ -88,11 +65,8 @@ interface DotnetModule {
 
 let dotnetPromise: Promise<DotnetApi> | null = null;
 
-/** Dynamically import the boot script (once per page), configure the
- *  runtime to load all assets from the jsDelivr CDN bundle, and
- *  resolve with a `runScript` function the C# adapter calls for every Run press.
- *  `setLoadingMessage` mirrors `LanguageAdapter.init`'s reporter: a stage
- *  line plus an optional coarse overall boot fraction. */
+/** Import the boot script once per page, point the runtime at the jsDelivr
+ *  bundle, and resolve with the `runScript` function used on every Run. */
 export function loadDotnet(
   setLoadingMessage: (message: string, fraction?: number) => void,
 ): Promise<DotnetApi> {
@@ -104,14 +78,9 @@ export function loadDotnet(
 
     setLoadingMessage("Loading C# runtime…", 0.05);
 
-    // dotnet.js is an ES module that exports a `dotnet` DotnetHostBuilder.
-    // Dynamic import() lets the module's internal relative imports
-    // (dotnet.runtime.js, dotnet.native.js) resolve against the jsDelivr
-    // CDN path. BOTH ignore comments matter: without `turbopackIgnore`,
-    // Turbopack resolves the jsDelivr URL to the repo's local
-    // cdn-assets/_dotnet copy and bundles dotnet.js + the ~3 MB
-    // dotnet.native.wasm into the build (which alone cost ~1.2 MiB of the
-    // Worker's gzipped 10 MiB budget).
+    // BOTH ignore comments matter: without `turbopackIgnore`, Turbopack
+    // resolves the jsDelivr URL to the local cdn-assets/_dotnet copy and
+    // bundles dotnet.js + the ~3 MB wasm into the Worker build.
     const dotnetModule = (await import(
       /* webpackIgnore: true */ /* turbopackIgnore: true */ BOOT_SCRIPT_URL
     )) as DotnetModule;
@@ -122,8 +91,8 @@ export function loadDotnet(
       );
     }
 
-    // `create()` is the heavy stage: it streams the ~35 MB assembly
-    // bundle from jsDelivr and instantiates the Mono WASM runtime.
+    // create() is the heavy stage: streams the ~35 MB assembly bundle and
+    // instantiates the Mono WASM runtime.
     setLoadingMessage("Initialising C# runtime…", 0.15);
     const host = await dotnetBuilder
       .withConfigSrc(BOOT_CONFIG_URL)

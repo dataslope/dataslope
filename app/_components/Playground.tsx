@@ -1963,8 +1963,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     } else if (editor) {
       code = editor.state.doc.toString();
     } else {
-      // Split view, running the focused pane's own file: its buffer is
-      // kept current by the pane's write-through listener.
+      // Split view: the pane's write-through listener keeps its buffer
+      // current.
       code = (activeFile && dirtyBuffersRef.current.get(activeFile.id)) ?? "";
     }
     if (!code.trim()) return;
@@ -1985,12 +1985,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     newRunFirstIdRef.current = firstId;
     const runId = ++runCounter.current;
 
-    // Mirror files the runtime created during the run (e.g. an R
-    // download.file() destination) into the Files pane and persist them to
-    // OPFS so they survive reloads and are re-staged on the next run.
-    // Called in both the success and error paths, a file may have been
-    // written before later user code threw, and is safe to call twice
-    // because the runtime clears its tracking list after the first read.
+    // Mirror files the runtime created during the run into the Files pane
+    // + OPFS. Called on both success and error paths (a file may have been
+    // written before user code threw); safe to call twice because the
+    // runtime clears its tracking list after the first read.
     const syncCreatedFiles = async () => {
       if (!rt.collectCreatedFiles) return;
       let created: Map<string, Uint8Array>;
@@ -2011,7 +2009,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           try {
             await writeDataFile(wsId, path, bytes);
           } catch {
-            // OPFS write failed, still surface it in the in-memory list.
+            // OPFS write failed; still surface it in the in-memory list.
           }
         }
         setVirtualFiles((prev) => {
@@ -2041,21 +2039,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     };
 
     try {
-      // Stage all currently-open workspace files into the runtime's
-      // virtual file system so multi-file `import`s, `include`s, etc.
-      // resolve correctly. Includes:
-      //   - All code tabs (latest dirty buffer takes precedence over
-      //     the on-disk OPFS copy so unsaved edits are visible).
-      //   - All uploaded data files (read straight from OPFS).
-      // Adapters that don't override `prepareFileSystem` keep
-      // single-file semantics, the call is a no-op.
+      // Stage all workspace files (code tabs + uploaded data files) into
+      // the runtime's VFS so multi-file imports resolve; a no-op for
+      // adapters without `prepareFileSystem`.
       if (rt.prepareFileSystem) {
         const fileMap = await collectWorkspaceFilesForRun();
         try {
           await rt.prepareFileSystem(fileMap);
         } catch (stageErr) {
-          // Surface staging errors as a non-fatal stderr cell, execution
-          // proceeds with whatever files made it into the VFS.
+          // Non-fatal: execution proceeds with whatever made it in.
           const msg =
             stageErr instanceof Error ? stageErr.message : String(stageErr);
           collected.push({

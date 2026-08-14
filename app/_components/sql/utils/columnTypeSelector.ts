@@ -11,20 +11,10 @@ export interface ColumnTypeGroup {
   readonly types: readonly string[];
 }
 
-/** Decide which built-in type groups to show in a column-type combobox.
- *
- *  The combobox doubles as a search box: once the user types a fragment
- *  that isn't itself a known type, the built-in list is filtered to the
- *  types that contain that fragment. But when the field still holds the
- *  column's committed type, opening the list (via the chevron or focus)
- *  should reveal every group so all types stay browsable.
- *
- *  A value counts as the "committed type", not a search fragment,
- *  whenever the input still equals it, *including* custom or parameterized
- *  types that are absent from the built-in list (`character varying(15)`,
- *  `varchar(15)`, `DECIMAL(10,2)`, …). Previously only exact matches in the
- *  built-in list were recognised, so opening the picker for a column that
- *  used any such type wrongly showed "No matching built-in types." */
+/** Decide which built-in type groups to show in a column-type combobox: all
+ *  groups while the field is empty or still equals the committed type
+ *  (including custom/parameterized types absent from the built-in list, e.g.
+ *  `character varying(15)`); otherwise filter by the typed fragment. */
 export function computeVisibleTypeGroups(
   groups: readonly ColumnTypeGroup[],
   options: readonly string[],

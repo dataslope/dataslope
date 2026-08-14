@@ -1,59 +1,30 @@
 #!/usr/bin/env node
 /**
- * Promote chosen illustration candidates into the repository.
+ * Promote chosen illustration candidates into the repository: generation
+ * writes candidates to R2 or a scratch directory, a human picks the keepers,
+ * and this converts those to WebP in `public/images/`, the files the site
+ * serves (see "Illustrations" in AGENTS.md).
  *
- * This is the last step of the illustration pipeline (see the "Illustrations"
- * section of AGENTS.md): generation writes candidates to R2 or a scratch
- * directory, a human picks the ones worth keeping, and this converts those to
- * WebP and writes them into `public/images/`, the files the site serves.
+ * The promoted file IS the served artifact — one encode, one copy in git; a
+ * source under assets/images would be re-encoded by build-images (~1.8 dB
+ * PSNR lost to save ~3 kB) and stored twice. So `--quality` is the quality
+ * users see and defaults to 92. The pristine PNGs stay in R2, so a run can
+ * be re-promoted at a different quality without regenerating. Cut-outs are
+ * trimmed on the way through, before the single encode, which makes the crop
+ * free; `trimAxesFor` in scripts/lib/cutouts.mjs decides which margins go.
  *
- * Why WebP, and why this writes the served file directly:
- *
- * Measured on the Python Basics batch, a 1536x1024 illustration is ~1.4 MB as
- * PNG and ~130 kB as WebP — an 11x reduction that holds for the alpha cut-outs
- * too. Committing PNG sources put ~58 MB in git for twenty illustrations, which
- * projects to ~2.9 GB per thousand.
- *
- * The output goes straight into `public/images/`, so each illustration is
- * encoded once and stored in git once. Writing a source under `assets/images/`
- * instead would mean build-images re-encoded it for serving — measured at ~1.8
- * dB PSNR lost to save ~3 kB — and would keep two copies of every image in the
- * repository. build-images now adopts these files into the manifest by reading
- * their dimensions, without touching the bytes.
- *
- * Because the promoted file IS the artifact, `--quality` is the quality users
- * actually see; it defaults to 92 rather than a serving-oriented 80. The
- * pristine PNGs stay in R2 for the bucket's retention window, so a run can be
- * re-promoted at a different quality without regenerating.
- *
- * **Cut-outs are trimmed on the way through.** Background removal leaves the
- * subject floating in the frame it was generated in, so a cut-out carries a
- * median 11% of its height in transparent rows that `<Figure>` still pays
- * layout for. The crop happens before the single encode below, which is what
- * makes it free — a pass over the promoted WebP afterwards would be a second
- * lossy generation.
- *
- * How much of the frame goes depends on where the image is painted, and
- * `trimAxesFor` in `scripts/lib/cutouts.mjs` is the one place that decides:
- * thumbnails lose their left and right blank as well, everything else is
- * vertical only. Nothing to pass and nothing to remember — a new course
- * thumbnail is trimmed on both axes because the prompt corpus says it is a
- * thumbnail.
- *
- * Deliberately kept separate from build-images.mjs, which is a deterministic,
- * content-hashed build step that must stay a true no-op when nothing changed.
- * Promotion is a network-touching, human-triggered action; it would poison
- * those properties if it lived in the same script.
+ * Deliberately separate from build-images.mjs, which must stay a
+ * deterministic, content-hashed no-op when nothing changed; promotion is a
+ * network-touching, human-triggered action.
  *
  * Usage:
  *   node scripts/promote-illustrations.mjs <ids...> [options]
  *   node scripts/promote-illustrations.mjs --all --from <dir>
  *
  * Ids are prompt ids (e.g. `python-basics-loops`). An id whose background has
- * been removed promotes the cut-out **and nothing else**: every surface on the
+ * been removed promotes the cut-out and nothing else: every surface on the
  * site asks for the `-cutout` slug, so the opaque original beside it is git
- * weight nothing serves. Two batches were promoted before that was the
- * default and left 1,351 files, 151 MB, that no page could reach.
+ * weight nothing serves.
  *
  * Options:
  *   --from <dir|r2>   Source of candidates (default: ./generated-illustrations)
@@ -61,27 +32,20 @@
  *   --variant <n>     Which variant to take when several exist (default: 1)
  *   --all             Promote every candidate found in the source
  *   --quality <n>     WebP quality of the served image (default: 92)
- *   --max-width <px>  Downscale to at most this width before encoding (default:
- *                     none, the generated size is served). For art that is only
- *                     ever painted small — the auth globe pins are 36 CSS px —
- *                     a 1024px source is ~50 kB of detail no one can see.
- *                     Never upscales.
+ *   --max-width <px>  Downscale to at most this width before encoding
+ *                     (default: none, the generated size is served). Never
+ *                     upscales.
  *   --no-cutout       Promote only the original, not its background-removed pair
  *   --with-original   Also promote the opaque original beside the cut-out.
- *                     Off by default: nothing on the site renders it. Reach
- *                     for this only for art that is genuinely shown with its
- *                     background, and check that something asks for the bare
- *                     slug before you do. The pristine PNG is in R2 regardless,
- *                     so a later `--with-original` re-promote brings it back.
- *   --no-build        Skip the build-images run afterwards. **Required when two
- *                     promotions run at once.** build-images prunes every file
- *                     in public/images that is missing from the manifest it
- *                     just scanned, so a second promotion writing files after
- *                     that scan has them deleted out from under it. Running
- *                     waves three, four and five concurrently cost two images
- *                     exactly this way — promoted, reported ✓, gone before the
- *                     commit. Pass --no-build to every concurrent run and do
- *                     one `npm run build:images` at the end.
+ *                     Off by default: nothing on the site renders it. The
+ *                     pristine PNG is in R2 regardless, so a later re-promote
+ *                     can bring it back.
+ *   --no-build        Skip the build-images run afterwards. Required when two
+ *                     promotions run at once: build-images prunes every file
+ *                     missing from the manifest it just scanned, so a second
+ *                     promotion writing after that scan has its files deleted
+ *                     out from under it. Pass it to every concurrent run and
+ *                     run `npm run build:images` once at the end.
  *   --dry-run         Report what would be promoted; write nothing
  *   -h, --help        Show this help
  *
