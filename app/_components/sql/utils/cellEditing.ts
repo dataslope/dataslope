@@ -39,11 +39,9 @@ export function classifyCellEditor(sqlType: string | undefined): CellEditorKind 
   const t = (sqlType ?? "").trim().toLowerCase();
   if (!t) return "text";
   if (/^bool(ean)?$/.test(t)) return "boolean";
-  // Arrays / lists get a dedicated JSON-array editor (checked before the
-  // scalar temporal/json rules so an array of timestamps isn't mistaken for a
-  // single timestamp). Postgres and DuckDB report `integer[]` / `text[]`;
-  // raw Arrow notation (`list<int32>`) is kept as a fallback for callers
-  // that bypass `arrowTypeToSqlName`.
+  // Arrays / lists: checked before the scalar temporal/json rules so an
+  // array of timestamps isn't mistaken for a single timestamp. Raw Arrow
+  // notation (`list<int32>`) covers callers that bypass arrowTypeToSqlName.
   if (t.endsWith("[]") || t.startsWith("list<") || t.startsWith("list(")) {
     return "array";
   }
@@ -63,9 +61,8 @@ export function classifyCellEditor(sqlType: string | undefined): CellEditorKind 
   return "text";
 }
 
-/** Normalize an array cell's stored value to JSON text for editing. Array
- *  values reach the grid as JSON strings (both adapters JSON-stringify them),
- *  but a value may also be a live JS array, handle both. */
+/** Normalize an array cell's stored value (JSON string or live JS array) to
+ *  JSON text for editing. */
 export function arrayEditorText(value: unknown): string {
   if (value === null || value === undefined) return "";
   if (typeof value === "string") return value;
@@ -79,10 +76,8 @@ export function arrayEditorText(value: unknown): string {
   return String(value);
 }
 
-/** Parse an edited array cell. Returns the parsed JS array when the text is a
- *  valid JSON array (the value written back, which each engine binds as a real
- *  array / LIST); otherwise `{ ok: false }` so the caller keeps the raw text
- *  rather than committing garbage. */
+/** Parse an edited array cell: the parsed JS array for valid JSON, otherwise
+ *  `{ ok: false }` so the caller keeps the raw text. */
 export function parseArrayEditValue(text: string): {
   ok: boolean;
   value: unknown[];
@@ -100,16 +95,9 @@ export function parseArrayEditValue(text: string): {
 export type TemporalEditorKind = "date" | "datetime" | "time";
 
 /** Does a stored temporal value carry a real (non-midnight) time-of-day?
- *
- *  A column may be declared `date` yet hold a value with a meaningful time,
- *  this is common with flexibly-typed engines (SQLite stores whatever string
- *  you give it) and also happens when a value like `2024-03-15 14:30:00` lands
- *  in a date-ish column. In those cases a date-only `<input type="date">`
- *  would silently hide and drop the time, so the caller upgrades to a
- *  `datetime-local` picker. Pure dates (no time, or an all-zero `T00:00:00`
- *  suffix as produced for a true SQL `date`) return `false` and keep the
- *  date-only picker. Timezone suffixes (`+05:30`) are never mistaken for the
- *  time-of-day because the first `HH:MM` in the string is the clock time. */
+ *  A `date` column can hold such a value; a date-only picker would silently
+ *  drop the time, so the caller upgrades to datetime. Timezone suffixes are
+ *  never mistaken for the time-of-day: the first `HH:MM` is the clock time. */
 export function hasTimeOfDay(stored: unknown): boolean {
   const s =
     typeof stored === "string"
@@ -129,10 +117,8 @@ export function hasTimeOfDay(stored: unknown): boolean {
   );
 }
 
-/** Resolve the *effective* editor kind for a cell from its column-derived kind
- *  and the actual stored value: a `date` column whose value carries a real
- *  time-of-day is upgraded to `datetime` so the user can edit hours/minutes
- *  too. Everything else passes through unchanged. */
+/** Effective editor kind: a `date` column whose value carries a real
+ *  time-of-day is upgraded to `datetime`; everything else passes through. */
 export function resolveTemporalEditorKind(
   columnKind: TemporalEditorKind,
   storedValue: unknown,

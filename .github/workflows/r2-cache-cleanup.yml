@@ -197,26 +197,16 @@ jobs:
             return 1
           }
 
-          # Ask a running Worker which build it is serving from. This is the
-          # whole basis of the keep set, so a single failed request is not
-          # taken as an answer: retry, and only then report failure. Prints the
-          # build ID on success and nothing on failure.
-          #
-          # The response is OPEN_NEXT_BUILD_ID verbatim (see
-          # app/api/cache-build-id/route.ts), which on Workers Builds is the
-          # deployed commit SHA and is byte-identical to the R2 folder name.
-          # Validate the shape anyway: an HTML error page from an edge in front
-          # of the Worker would otherwise be treated as a build ID, which
-          # cannot match a folder and so protects nothing.
-          #
-          # Three outcomes, because "no answer" and "no such deployment" call
-          # for opposite responses:
-          #   0 + the build ID   the deployment answered
-          #   2                  the edge returned 404: this alias has no
-          #                      deployment at all, so there is nothing to
-          #                      protect and the caller must NOT fall back
-          #   1                  no usable answer after PROBE_ATTEMPTS, so the
-          #                      caller must assume the worst and be generous
+          # Ask a running Worker which build it serves (OPEN_NEXT_BUILD_ID
+          # verbatim, byte-identical to the R2 folder name). Validate the
+          # shape: an edge HTML error page treated as a build ID would match
+          # no folder and protect nothing. Three outcomes, because "no answer"
+          # and "no such deployment" call for opposite responses:
+          #   0 + build ID   the deployment answered
+          #   2              edge 404: no deployment at this alias — caller
+          #                  must NOT fall back
+          #   1              no usable answer after PROBE_ATTEMPTS — caller
+          #                  must assume the worst and be generous
           probe_build_id() {
             local url="$1" attempt out code body
             for (( attempt = 1; attempt <= PROBE_ATTEMPTS; attempt++ )); do
@@ -227,9 +217,8 @@ jobs:
                 printf '%s' "$body"
                 return 0
               fi
-              # A 404 is Cloudflare's edge saying the hostname resolves to no
-              # deployment. It is definitive and permanent, so retrying it just
-              # burns the sweep's time.
+              # 404 = hostname resolves to no deployment; definitive, so
+              # don't retry.
               if [[ "$code" == "404" ]]; then
                 return 2
               fi
@@ -240,24 +229,12 @@ jobs:
             return 1
           }
 
-          # A branch's preview alias URL: the stable per-branch hostname
-          # Workers Builds assigns, as opposed to the per-commit Preview URL
-          # (which is keyed by version ID and useless for asking "what is this
-          # branch serving now").
-          #
-          # The alias is the branch name with every character outside [a-z0-9-]
-          # folded to '-', joined to the worker name. Verified 2026-08-14
-          # against both live aliases:
-          #   test-no-open-pr-001
-          #     -> test-no-open-pr-001-dataslope.subwaymatch.workers.dev
-          #   claude/sql-playground-info-wrap-gdt49u
-          #     -> claude-sql-playground-info-wrap-gdt49u-dataslope.subway….dev
-          #
-          # A DNS label caps at 63 characters and Cloudflare truncates to fit.
-          # Rather than guess where it cuts, refuse to guess at all: an
-          # over-long branch name yields no alias and falls back (see step 4),
-          # so the failure mode is "protect more than necessary", never
-          # "confidently probe the wrong host".
+          # A branch's stable preview alias (not the per-commit Preview URL):
+          # branch name with everything outside [a-z0-9-] folded to '-',
+          # joined to the worker name. DNS labels cap at 63 chars and
+          # Cloudflare truncates to fit; rather than guess where, an over-long
+          # name yields no alias and falls back — the failure mode is
+          # "protect more than necessary", never "probe the wrong host".
           preview_alias() {
             local branch="$1" slug label url
             slug="$(printf '%s' "$branch" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9-' '-')"

@@ -793,8 +793,6 @@ export default function SqlChallengeCard({
     const languageComp = new Compartment();
     const completionComp = new Compartment();
 
-    // Restore any previously-saved SQL buffer; fall back to the MDX
-    // starter when nothing is stored.
     const persisted = loadPersistedCode(persistedKey);
     const initialDoc = persisted ?? starterCode;
 
@@ -815,17 +813,14 @@ export default function SqlChallengeCard({
         EditorState.tabSize.of(2),
         indentUnit.of("  "),
         EditorView.lineWrapping,
-        // Schema-aware completion (same engine as the SQL playgrounds).
-        // Seeded with an empty schema so keyword completion works right
-        // away; reconfigured with live tables/columns once the card's
-        // engine boots, see `refreshCompletionSchema` below.
+        // Schema-aware completion, seeded empty so keywords complete right
+        // away; reconfigured with live tables/columns once the engine
+        // boots (see `refreshCompletionSchema`).
         completionComp.of(makeSqlAutocompletionExtension({ entities: [] }, dialect)),
         keymap.of([
           {
-            // Default keyboard action mirrors the split button:
-            // Submit (run + grade against tests). For challenges
-            // with no tests, the submit handler short-circuits to a
-            // plain Run so the keystroke isn't a dead key.
+            // Mirrors the split button's default: Submit (run + grade).
+            // Without tests the submit handler short-circuits to plain Run.
             key: "Mod-Enter",
             run: () => {
               submitRef.current();
@@ -833,9 +828,7 @@ export default function SqlChallengeCard({
             },
           },
           {
-            // Dropdown action: run the query without grading it,
-            // matching the menu item visible from the Submit
-            // button's chevron.
+            // Dropdown action: run without grading.
             key: "Mod-Shift-Enter",
             run: () => {
               runRef.current();
@@ -909,10 +902,9 @@ export default function SqlChallengeCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Rebuild the completion schema (and lang-sql's copy) from the live
-  // database. Called after engine boot and after every run/submit, so
-  // tables the challenge SQL creates complete immediately. Best-effort:
-  // failures leave the previous schema in place.
+  // Rebuild the completion schema from the live database after engine boot
+  // and after every run/submit, so newly-created tables complete
+  // immediately. Best-effort: failures leave the previous schema in place.
   const refreshCompletionSchema = useCallback(
     async (engine: SqlEngineLike) => {
       try {

@@ -512,18 +512,14 @@ async function cmdStatus(opts, key) {
 }
 
 /**
- * Yield an output file's JSONL rows one line at a time.
- *
- * Batch image output embeds each PNG as base64 in its row, so these files run to
- * gigabytes; `res.text()` would exceed V8's ~512 MB max string length. Reading
- * the body as a stream keeps only one row (~3.6 MB) in memory at a time.
+ * Yield an output file's JSONL rows one line at a time. These files run to
+ * gigabytes (base64 PNGs); `res.text()` would exceed V8's ~512 MB max string
+ * length, so stream, keeping one row in memory at a time.
  */
 async function* streamFileLines(fileId, key) {
-  // The call that actually bit: a several-hundred-MB output file fetched
-  // through a proxy returns 504 often enough to matter, and by this point the
-  // images are already generated and billed. Retries cover establishing the
-  // request; if the socket dies mid-stream the generator still throws, and the
-  // fix there is to re-run `download --batch <id>`, which starts the file over.
+  // Retried: a several-hundred-MB file through a proxy 504s often, and by now
+  // the images are already billed. Retries cover establishing the request; a
+  // mid-stream death still throws — re-run `download --batch <id>`.
   const res = await api(`/files/${fileId}/content`, { key, retries: 5 });
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
@@ -621,10 +617,9 @@ async function pollBatch(batch, opts, key, label) {
 }
 
 /**
- * Submit every chunk, keeping at most `--max-in-flight` batches live at a time,
- * and download each one's images as soon as it completes. Bounding the window
- * keeps a thousands-of-images run inside the account's queued-batch limits and
- * means disk fills incrementally rather than all at the end.
+ * Submit every chunk, at most `--max-in-flight` batches live at a time,
+ * downloading each as it completes — stays inside the account's queued-batch
+ * limits and fills disk incrementally.
  */
 async function cmdRun(entries, opts, model, key) {
   const chunks = chunk(entries, opts.batchSize);
@@ -733,9 +728,8 @@ async function main() {
     process.exit(1);
   }
   if (opts.sink === "r2" && !opts.run) {
-    // A run id groups every candidate from one invocation under one prefix, so
-    // the whole run can be deleted or expired as a unit. Default to a sortable
-    // UTC timestamp when the caller does not supply one.
+    // Run id groups one invocation's candidates under one prefix; default to
+    // a sortable UTC timestamp.
     opts.run = new Date().toISOString().replace(/[:.]/g, "-").replace(/Z$/, "");
     console.log(`No --run given; using run id ${opts.run}`);
   }

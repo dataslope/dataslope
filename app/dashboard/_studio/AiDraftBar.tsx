@@ -1,13 +1,9 @@
 "use client";
 
 /**
- * The "Fill with AI" bar shown at the top of each builder form. It is a
- * non-input affordance: clicking "Fill with AI" opens the AI Assist panel
- * WITHOUT drafting anything. Generation only starts once the user actually
- * types a description in that panel and sends it, so opening the panel never
- * spends a provider request (and can't surface a "the assistant is unavailable"
- * error before the user has asked for anything). A thin wrapper over the shared
- * AI state so every builder gets the same affordance with one line.
+ * "Fill with AI" bar at the top of each builder form. Clicking opens the AI
+ * Assist panel WITHOUT drafting anything — opening never spends a provider
+ * request; generation starts only when the user sends a description.
  */
 
 import { Sparkle } from "lucide-react";

@@ -1,19 +1,8 @@
-// Guards the YAML frontmatter of every authored MDX page.
-//
-// `fumadocs-mdx` parses each page's frontmatter as YAML at the very start of
-// `npm run build`, before `next build` runs. An unquoted scalar containing a
-// colon-space (`description: A read order, built on one principle: risk first`)
-// is a YAML mapping entry, not a string, so the whole build dies with
-// "bad indentation of a mapping entry" and a snippet that does not name the
-// file. Nothing in the rest of the suite reads frontmatter, so this used to be
-// invisible to `npm test` and only surfaced in a Cloudflare Workers Build.
-//
-// This suite calls the same `frontmatter()` helper the build calls, so a page
-// that parses here parses there. Fix a failure by quoting the value:
-//
-//   description: "A read order, built on one principle: risk first"
-//
-// 85 values in the corpus already carry quotes for exactly this reason.
+// Guards the YAML frontmatter of every authored MDX page. fumadocs-mdx parses
+// it at the very start of `npm run build`, and an unquoted scalar containing
+// a colon-space is a YAML mapping entry, not a string — the build dies with
+// an error that does not name the file. This suite calls the same
+// frontmatter() helper the build calls. Fix a failure by quoting the value.
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it } from "vitest";

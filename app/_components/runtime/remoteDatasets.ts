@@ -230,11 +230,9 @@ export function fetchDatasetText(pathOrUrl: string): Promise<string> {
   );
 }
 
-/** Fetch a binary dataset (e.g. a `.parquet`, `.csv`, or `.sqlite`
- *  file) by repo path or URL. Callers that hand the buffer to an engine
- *  which takes ownership of it (worker transfer, virtual-FS
- *  registration) should pass a copy (`bytes.slice()`) so the cached
- *  array stays usable for the next load. */
+/** Fetch a binary dataset by repo path or URL. Callers handing the buffer
+ *  to an engine that takes ownership (worker transfer, virtual-FS
+ *  registration) should pass `bytes.slice()` so the cached array survives. */
 export function fetchDatasetBytes(pathOrUrl: string): Promise<Uint8Array> {
   const candidates = datasetUrlCandidates(pathOrUrl);
   const url = candidates[0];
@@ -242,18 +240,16 @@ export function fetchDatasetBytes(pathOrUrl: string): Promise<Uint8Array> {
     const { response, persisted } = await cachedFetch(url, candidates);
     const bytes = new Uint8Array(await response.arrayBuffer());
     if (persisted && bytes.byteLength > LARGE_BYTES_MEMO_LIMIT) {
-      // Don't pin large buffers in this context's memo: the next
-      // consumer re-reads from the Cache API instead. In-flight
-      // callers still share this promise; only later calls re-load.
+      // Don't pin large buffers in the memo; later calls re-read the Cache
+      // API. In-flight callers still share this promise.
       bytesCache.delete(url);
     }
     return bytes;
   });
 }
 
-/** Filename component of a dataset path or URL (e.g.
- *  `duckdb/trips.parquet` → `trips.parquet`). Used as the default name
- *  when registering a remote file with an engine's virtual filesystem. */
+/** Filename component of a dataset path or URL (`duckdb/trips.parquet` →
+ *  `trips.parquet`); the default virtual-filesystem name. */
 export function datasetFileName(pathOrUrl: string): string {
   const path = pathOrUrl.replace(/[?#].*$/, "");
   const base = path.slice(path.lastIndexOf("/") + 1);
@@ -262,19 +258,15 @@ export function datasetFileName(pathOrUrl: string): string {
 
 // ─── Declarative staging (the `datasets` prop) ──────────────────────
 
-/** One dataset staged into a runtime's working directory by the
- *  `datasets` prop of `<CodeBlock>` / `<ChallengeCard>`. The bytes are
- *  downloaded through the cached path above and written into the
- *  runtime's virtual filesystem before each run, so init/starter code
- *  reads a local file (`pd.read_csv("penguins.csv")`,
- *  `read.csv("penguins.csv")`), identical UX in every language, no
- *  per-language CORS quirks, and lessons never embed raw URLs. */
+/** One dataset staged into a runtime's working directory by the `datasets`
+ *  prop of `<CodeBlock>` / `<ChallengeCard>`: downloaded via the cached
+ *  path and written into the virtual filesystem before each run, so code
+ *  reads a local file with no CORS quirks and no raw URLs in lessons. */
 export interface DatasetStageSpec {
   /** Path inside the dataslope/datasets repo (e.g. `"csv/penguins.csv"`)
    *  or a full `https://` URL on any CORS-enabled host. */
   path: string;
-  /** Filename the bytes are staged under in the runtime's working
-   *  directory. Defaults to the basename of `path`. */
+  /** Staged filename; defaults to the basename of `path`. */
   stageAs?: string;
 }
 
