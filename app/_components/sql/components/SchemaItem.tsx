@@ -21,18 +21,10 @@ function computeTreeColThresholds() {
   return { nameMax, typeMax };
 }
 
-/** Returns dynamic character thresholds for column names and types that
- *  scale with the window width so shorter names are never clipped on
- *  wide screens and very long names are always clipped on narrow ones.
- *
- *  Formula rationale:
- *  - The sidebar is typically ~240 px wide with ~120 px available for
- *    the column name (after icons, gaps, and the type label).
- *  - At a base window width of ~1024 px (narrow laptop) the name threshold
- *    starts at 16 chars (12 + 1024/256) and scales up by ~1 char per 256 px
- *    of additional window width.
- *  - The type threshold starts at 8 chars and grows more slowly (one char
- *    per 512 px) because type strings are typically short (e.g. "INTEGER"). */
+/** Character thresholds for column names/types that scale with window
+ *  width. At ~1024 px the name threshold is 16 chars (12 + width/256), +1
+ *  per extra 256 px; the type threshold starts at 8 and grows half as fast
+ *  since type strings are short. */
 function useTreeColThresholds(): { nameMax: number; typeMax: number } {
   const [thresholds, setThresholds] = useState(computeTreeColThresholds);
   useEffect(() => {
@@ -161,9 +153,6 @@ function SchemaItemImpl({
   const handleExportPointerLeave = useCallback(() => {
     exportCloseTimer.current = setTimeout(() => setExportOpen(false), 120);
   }, []);
-  // EntityIcon renders the table/view glyph on the tree row.  Views use
-  // lucide's dedicated "view" icon; tables use the "table" icon.  This is
-  // separate from the Search icon used for the "View table data" action button.
   const EntityIcon = kind === "view" ? View : Table;
   const pkCount = useMemo(
     () => (columns ?? []).filter((c) => c.pk > 0).length,
@@ -186,10 +175,9 @@ function SchemaItemImpl({
       }
     };
   }, []);
-  // Detect when the entity name is visually clipped (CSS ellipsis on
-  // `.sql-tree-item-name`) so the hover tooltip can lead with the full name.
-  // A ResizeObserver catches both window resizes and sidebar drag-resizes
-  // that change the width available to the name.
+  // Detect when the entity name is visually clipped so the hover tooltip can
+  // lead with the full name. The ResizeObserver catches window resizes and
+  // sidebar drag-resizes alike.
   const nameRef = useRef<HTMLSpanElement>(null);
   const [nameTruncated, setNameTruncated] = useState(false);
   useEffect(() => {
@@ -218,8 +206,7 @@ function SchemaItemImpl({
     onPreview(name, kind);
   }, [name, kind, onPreview]);
   const baseHint = `Double-click to preview, click to ${expanded ? "collapse" : "expand"}`;
-  // When the name is clipped, surface the full name first so it's readable
-  // on hover even though the row only shows a truncated label.
+  // Lead with the full name when the row label is clipped.
   const itemHint = nameTruncated ? `${name}, ${baseHint}` : baseHint;
   return (
     <div className="sql-tree-entity">

@@ -4,15 +4,10 @@ import { useCallback, useRef, useState } from "react";
 import type { ForeignKeyInfo, TableColumnInfo } from "../../runtime/sqlite";
 
 /**
- * Bundles the multi-schema sidebar state shared by Postgres and
- * DuckDB. SQLite has no schema namespace so it does not use this
- * hook.
- *
- * The dialect-specific `refreshSchema` (entity listing) is provided
- * by the caller because it diverges between Postgres and DuckDB in
- * concurrency strategy, row-count semantics, and the `listTriggers`
- * signature. The hook owns the state and exposes a uniform
- * `refreshSchemas` / `handleSchemaChange` API on top of it.
+ * Multi-schema sidebar state shared by Postgres and DuckDB (SQLite has no
+ * schema namespace). The dialect-specific `refreshSchema` is provided by the
+ * caller — it diverges between the two engines — while the hook owns the
+ * state and exposes a uniform refreshSchemas / handleSchemaChange API.
  */
 export interface UseSchemaTreeOptions {
   /** Lazy reference to the live engine so the hook can call `listSchemas`. */

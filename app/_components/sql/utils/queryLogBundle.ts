@@ -1,18 +1,10 @@
 "use client";
 
 /**
- * Moving the query history and starred queries in and out of a cloud save.
- *
- * Both live in localStorage under playground-global keys, which meant they
- * existed on exactly one device: a member who backed a workspace up and opened
- * it on a laptop found the database and the tabs, and none of the queries they
- * had run or starred.
- *
- * They travel in the bundle's `personal` section, which the cloud backup path
- * asks for explicitly and a share bundle never carries (see
- * `BundleSqlPersonal`). Coming back in they are *merged*, not replaced: the
- * device being restored onto has its own history, and a restore is not a
- * reason to lose it.
+ * Moves the query history and starred queries in and out of a cloud save.
+ * They travel in the bundle's `personal` section, which only the cloud
+ * backup path asks for — a share bundle never carries it. Restores are
+ * *merged*, not replaced: the target device keeps its own history.
  */
 
 import type {
@@ -56,13 +48,9 @@ function isSavedQuery(value: unknown): boolean {
   );
 }
 
-/**
- * Merge an incoming history into the local one.
- *
- * Deduplicated by entry id, which is a uuid per run, so the same backup
- * restored twice adds nothing the second time. Ties go to the local copy:
- * this device's record of its own run is the more trustworthy one.
- */
+/** Merge an incoming history into the local one. Deduplicated by entry id
+ *  (a uuid per run) so a twice-restored backup adds nothing; ties go to the
+ *  local copy. */
 export function mergeHistory(
   local: readonly QueryHistoryEntry[],
   incoming: readonly BundleQueryHistoryEntry[],
@@ -75,13 +63,9 @@ export function mergeHistory(
     .slice(0, BUNDLE_MAX_LOG_ENTRIES);
 }
 
-/**
- * Merge incoming starred queries into the local ones.
- *
- * Deduplicated by SQL rather than by id, because that is the identity the star
- * toggle itself uses: the same query starred on two devices is one star, not
- * two rows that can't both be unstarred.
- */
+/** Merge incoming starred queries into the local ones. Deduplicated by SQL,
+ *  not id — the identity the star toggle itself uses, so the same query
+ *  starred on two devices is one star. */
 export function mergeSaved(
   local: readonly SavedQuery[],
   incoming: readonly BundleSavedQuery[],
@@ -94,11 +78,8 @@ export function mergeSaved(
     .slice(0, BUNDLE_MAX_LOG_ENTRIES);
 }
 
-/**
- * Snapshot this device's query log for a bundle, or undefined when there is
- * nothing to carry. Pending writes are flushed first so a query run seconds
- * before the backup is in it.
- */
+/** Snapshot this device's query log for a bundle (undefined when empty).
+ *  Pending writes are flushed first so a just-run query is included. */
 export function readQueryLog(keys: QueryLogKeys): BundleSqlPersonal | undefined {
   if (typeof window === "undefined") return undefined;
   flushPersistedStorage();
@@ -114,11 +95,9 @@ export function readQueryLog(keys: QueryLogKeys): BundleSqlPersonal | undefined 
   return { history, saved };
 }
 
-/**
- * Merge a bundle's query log into this device's, and return the merged history
- * so the caller can push it into the live pane (the starred list is re-read
- * from storage whenever the history tab mounts, so it needs no such nudge).
- */
+/** Merge a bundle's query log into this device's, returning the merged
+ *  history for the live pane (the starred list is re-read from storage on
+ *  history-tab mount, so it needs no nudge). */
 export function restoreQueryLog(
   personal: BundleSqlPersonal | undefined,
   keys: QueryLogKeys,

@@ -1,9 +1,7 @@
-// Declarative catalogue of the sample SQLite databases offered by the
-// SQL playground's database-selector. Each entry owns its own seed
-// payload, either an embedded schema + seed function, or a `remoteSql`
-// reference into the dataslope/datasets GitHub repo, and the editor
-// tabs that should be opened the first time the user lands on that
-// database, so adding a new sample is a one-entry change.
+// Declarative catalogue of the SQL playground's sample SQLite databases.
+// Each entry owns its seed payload (embedded schema + seed function, or a
+// remoteSql reference) and default editor tabs, so adding a sample is a
+// one-entry change.
 
 import type { Database } from "./sqlite-wasm";
 import {
@@ -15,24 +13,17 @@ import {
 export type { QueryTabSeed } from "./sqlSamples";
 
 export interface SqliteSampleDatabase extends SqlSampleDatabaseBase {
-  /** Multi-statement DDL string. Run as one batch via `db.run`.
-   *  Ignored when `remoteSql` is set. */
+  /** Multi-statement DDL, run as one batch. Ignored when `remoteSql` is set. */
   schema?: string;
-  /** Populates the database tables created by `schema`. Receives a fresh
-   *  `Database` so the function can use prepared statements for batch
-   *  inserts without interfering with later samples. Ignored when
-   *  `remoteSql` is set. */
+  /** Populates the tables created by `schema`. Ignored when `remoteSql` is set. */
   seed?: (db: Database) => void;
-  /** Path (inside the dataslope/datasets GitHub repo) or full URL of a
-   *  SQL script that creates *and* populates the database. Fetched from
-   *  raw.githubusercontent.com when the sample is loaded, see
-   *  remoteDatasets.ts. */
+  /** Repo path or full URL of a SQL script that creates and populates the
+   *  database (see remoteDatasets.ts). */
   remoteSql?: string;
-  /** Path (inside the dataslope/datasets GitHub repo) or full URL of a
-   *  binary SQLite database file (`.sqlite` / `.db`) to clone instead
-   *  of running a script. Considered when `remoteSql` is not set. */
+  /** Repo path or full URL of a binary SQLite file to clone instead of
+   *  running a script. Considered when `remoteSql` is not set. */
   remoteDb?: string;
-  /** Default editor tabs opened on the first visit to this database. */
+  /** Editor tabs opened on the first visit to this database. */
   defaultTabs: QueryTabSeed[];
 }
 
@@ -41,22 +32,9 @@ export interface SqliteSampleDatabase extends SqlSampleDatabaseBase {
 export type SqliteSampleMetadata = Omit<SqliteSampleDatabase, "seed">;
 
 // ────────────────────────────────────────────────────────────────────────
-// Sample 1: credit_card_transactions.db
-// Ported from public/SQL Playground.html, then extended with foreign
-// keys, indices, and triggers so the playground can showcase the full
-// suite of relational features. The engine enables `PRAGMA
-// foreign_keys = ON` at init, so the FOREIGN KEY clauses below are
-// actually enforced, references must stay consistent on every insert.
-// Notable additions:
-//   - cards.user_id              REFERENCES users(user_id)
-//   - transactions.user_id       REFERENCES users(user_id)
-//   - transactions.card_id       REFERENCES cards(card_id)
-//   - transactions.vendor_id     REFERENCES vendors(vendor_id)
-//   - five indices on the busy join / filter columns
-//   - two AFTER INSERT/DELETE triggers keeping users.num_credit_cards
-//     in sync with the actual count of rows in the cards table
-//   - one BEFORE INSERT trigger that rejects non-fraud transactions
-//     with a negative amount
+// Sample 1: credit_card_transactions.db — users/cards/vendors/transactions
+// with FKs, indices, and triggers. The engine runs with foreign_keys ON,
+// so references must stay consistent on every insert.
 // ────────────────────────────────────────────────────────────────────────
 
 const CC_SCHEMA = `
@@ -198,12 +176,8 @@ const CC_SCHEMA = `
 
 type Row = Array<string | number | null>;
 
-/** Bulk-insert helper that re-uses a single prepared statement.
- *
- * sqlite-wasm's `PreparedStatement.bind()` does not implicitly clear
- * previous bindings, so we pass `true` to `reset()` to mirror the
- * sql.js `Statement.run()` convenience semantics (rebind cleanly per
- * row, step once per row). */
+/** Bulk-insert reusing one prepared statement. `reset(true)` is required:
+ *  sqlite-wasm's `bind()` doesn't implicitly clear previous bindings. */
 function bulkInsert(db: Database, sql: string, rows: Row[]): void {
   const stmt = db.prepare(sql);
   try {
@@ -261,10 +235,8 @@ function seedCreditCard(db: Database): void {
   ];
   bulkInsert(db, "INSERT INTO vendors VALUES (?,?,?,?,?,?)", vendors);
 
-  // Vendor lookup keyed by merchant name so the new transactions.vendor_id
-  // FK can be backfilled deterministically from the existing curated and
-  // generated transaction rows. Names without a vendor row are inserted
-  // as NULL so the FK remains satisfied.
+  // Vendor lookup by merchant name backfills transactions.vendor_id;
+  // unmatched names get NULL so the FK stays satisfied.
   const vendorByName = new Map<string, number>();
   for (const v of vendors) vendorByName.set(String(v[1]), Number(v[0]));
 
@@ -345,13 +317,9 @@ function seedCreditCard(db: Database): void {
     [50, 7, 10, 62.1, "2024-04-05", "Shell", "Austin", "TX", "US", "Gas Station", 0],
   ];
 
-  // Append a deterministic batch of synthetic transactions so the
-  // `transactions` table has well over 200 rows (currently 50 curated
-  // entries above + 210 generated below = 260). Used for exercising
-  // result pagination in the playground without bloating the source
-  // file with hand-written rows. The generator is intentionally
-  // seeded/deterministic so query results stay stable across reloads
-  // and across users, matching the spirit of the curated rows above.
+  // Deterministic synthetic transactions (50 curated + 210 generated = 260)
+  // to exercise result pagination; seeded so results stay stable across
+  // reloads and users.
   const merchants: Array<[string, string, string, string, string]> = [
     ["Amazon", "Seattle", "WA", "US", "E-Commerce"],
     ["Walmart", "Bentonville", "AR", "US", "Retail"],
@@ -382,8 +350,7 @@ function seedCreditCard(db: Database): void {
     const date = new Date(Date.UTC(2024, 0, 1));
     date.setUTCDate(date.getUTCDate() + dayOffset);
     const isoDate = date.toISOString().slice(0, 10);
-    // Amount: a few buckets so the mix of small/medium/large stays
-    // realistic (most transactions are < $200, occasional large ones).
+    // Amount buckets keep the small/medium/large mix realistic.
     const bucket = rand(id + 17, 20);
     let amount: number;
     if (bucket < 12) amount = +(5 + rand(id, 19500) / 100).toFixed(2);
@@ -442,11 +409,9 @@ const CC_DEFAULT_TABS: QueryTabSeed[] = [
 ];
 
 // ────────────────────────────────────────────────────────────────────────
-// Sample 2: chinook.db, the complete Chinook music store database
-// (v1.4.5), fetched from the dataslope/datasets GitHub repo at load
-// time. Table names are PascalCase: Album, Artist, Track, Genre,
-// MediaType, Playlist, PlaylistTrack, Customer, Employee, Invoice,
-// InvoiceLine.
+// Sample 2: chinook.db (v1.4.5), fetched at load time. PascalCase tables:
+// Album, Artist, Track, Genre, MediaType, Playlist, PlaylistTrack,
+// Customer, Employee, Invoice, InvoiceLine.
 // ────────────────────────────────────────────────────────────────────────
 
 const CHINOOK_TABS: QueryTabSeed[] = [
@@ -465,10 +430,9 @@ const CHINOOK_TABS: QueryTabSeed[] = [
 ];
 
 // ────────────────────────────────────────────────────────────────────────
-// Sample 3: northwind.db, the classic Northwind store, fetched from
-// the dataslope/datasets GitHub repo at load time. Table names are
-// PascalCase: Categories, Customers, Employees, OrderDetails, Orders,
-// Products, Shippers, Suppliers.
+// Sample 3: northwind.db, fetched at load time. PascalCase tables:
+// Categories, Customers, Employees, OrderDetails, Orders, Products,
+// Shippers, Suppliers.
 // ────────────────────────────────────────────────────────────────────────
 
 const NORTHWIND_TABS: QueryTabSeed[] = [
@@ -518,10 +482,8 @@ export const SQLITE_SAMPLE_DATABASES: SqliteSampleDatabase[] = [
   },
 ];
 
-/** Look a sample up by id, falling back to the first registered sample
- *  if `id` is unknown so the SQL playground always boots into a usable
- *  state even after the user deletes a sample we shipped in a previous
- *  release. */
+/** Look a sample up by id, falling back to the first registered sample so
+ *  the playground always boots even when `id` is stale. */
 export function findSampleDatabase(id: string): SqliteSampleDatabase {
   return findSqlSampleById(id, SQLITE_SAMPLE_DATABASES);
 }

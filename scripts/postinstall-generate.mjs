@@ -1,17 +1,9 @@
 // Runs the content/asset generation half of postinstall — fumadocs-mdx and
-// the build-* generator scripts — EXCEPT on Cloudflare Workers Builds.
-//
-// Why: Workers Builds runs `npm ci` (which triggers postinstall) and then the
-// configured build command (`npx opennextjs-cloudflare build` → `npm run
-// build`), whose script re-runs fumadocs-mdx and every generator anyway. The
-// postinstall pass was pure duplication: a second remark parse of ~800 course
-// MDX files (build-search-corpus), a second esbuild+minify of the almostnode
-// worker bundles, and a second hash pass over assets/images — tens of seconds
-// per deploy for outputs that are immediately regenerated.
-//
-// Local installs (and CI that runs tests/lint without `npm run build`, e.g. a
-// GitHub Actions PR check) still get the full generation pass so a fresh
-// checkout typechecks and tests out of the box.
+// the build-* generators — EXCEPT on Cloudflare Workers Builds, where the
+// build command re-runs every generator anyway and the postinstall pass was
+// pure duplication (tens of seconds per deploy). Local installs and CI
+// without `npm run build` still get the full pass so a fresh checkout
+// typechecks and tests out of the box.
 //
 // NOTE: scripts/patch-almostnode.mjs is NOT gated here — it patches
 // node_modules in place and must run after every install (package.json runs
@@ -52,11 +44,9 @@ function run(command, args = []) {
   }
 }
 
-// Same order the `build`/`dev` scripts use, and the order matters in one
-// place: build-charts writes the chart manifest that build-search-corpus reads
-// titles and captions out of, so running the search steps first yields an index
-// missing every chart caption on the site. That is not hypothetical — it is
-// what a fresh `npm ci` produced here before this line moved.
+// Same order as the `build`/`dev` scripts. Order matters in one place:
+// build-charts writes the chart manifest build-search-corpus reads titles and
+// captions from, so running the search steps first loses every chart caption.
 run("fumadocs-mdx");
 run("node", ["scripts/build-almostnode-workers.mjs"]);
 run("node", ["scripts/build-brand-fallbacks.mjs"]);
@@ -67,8 +57,6 @@ run("node", ["scripts/build-created-at.mjs"]);
 run("node", ["scripts/build-course-catalog.mjs"]);
 run("node", ["scripts/build-home-stats.mjs"]);
 run("node", ["scripts/build-images.mjs"]);
-// build-block-outputs is deliberately absent. Its manifest and figures are
-// committed (see .github/workflows/block-outputs.yml), so a fresh clone
-// already has them and an install has nothing to generate. `dev` and `build`
-// still run it, where it reuses those committed entries key-for-key and
-// executes only what actually changed.
+// build-block-outputs is deliberately absent: its manifest and figures are
+// committed (see .github/workflows/block-outputs.yml), so an install has
+// nothing to generate. `dev` and `build` still run it.

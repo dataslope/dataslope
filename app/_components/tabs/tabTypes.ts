@@ -11,10 +11,8 @@ export type TabKind =
   | "terminal"
   | (string & {});
 
-/** A single entry rendered in a tab's right-click context menu. The
- *  generic TabBar renders these *after* the built-in Rename / Close
- *  entries (when those are applicable). Callers can suppress the
- *  built-in entries via `hideBuiltinMenuItems`. */
+/** Entry in a tab's right-click context menu, rendered after the built-in
+ *  Rename / Close entries (suppress those via `hideBuiltinMenuItems`). */
 export interface TabContextMenuItem {
   /** Unique within the descriptor. */
   key: string;
@@ -41,23 +39,17 @@ export interface TabDescriptor {
   renameable?: boolean;
   /** True to pin to the leftmost position (and skip reorder). */
   pinned?: boolean;
-  /** Optional title used for the rename dialog ("Rename tab" by
-   *  default, SQL playgrounds use "Rename query tab"). */
+  /** Title for the rename dialog ("Rename tab" by default). */
   renameDialogTitle?: string;
   /** Optional helper text shown under the rename dialog title. */
   renameDialogDescription?: string;
   /** Optional extra context menu items appended after Rename / Close. */
   contextMenuItems?: TabContextMenuItem[];
-  /** When true, the built-in Rename / Close entries are NOT rendered
-   *  in the context menu, only `contextMenuItems` are. Useful for
-   *  kinds that should expose only a subset (e.g. SQL view-data tabs
-   *  hide Rename). Built-in entries still fire via the dialog and X
-   *  affordances when the underlying flags allow it. */
+  /** Hide the built-in Rename / Close context-menu entries (only
+   *  `contextMenuItems` render); the dialog and X affordances still work. */
   hideBuiltinMenuItems?: boolean;
-  /** When true, the rename dialog selects only the "stem" (substring
-   *  before the last `.`) when opened, so a user can immediately type
-   *  to replace the basename without nuking the extension. When false
-   *  (default) the entire label is selected, matches the SQL query-
-   *  tab behaviour where labels have no extension. */
+  /** Rename dialog selects only the stem (before the last `.`) so typing
+   *  replaces the basename without nuking the extension. Default false:
+   *  whole label selected. */
   renameSelectsStem?: boolean;
 }

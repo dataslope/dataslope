@@ -1,58 +1,25 @@
 #!/usr/bin/env node
 /**
  * Place the `course-inline` concept bands in their lessons.
+ * `wire-course-figures.mjs` owns the one figure per page after the opening
+ * paragraph and deliberately leaves these alone; this script owns the bands
+ * that belong beside the paragraph they illustrate, somewhere down the page.
  *
- * `wire-course-figures.mjs` deliberately will not do this. That script owns one
- * figure per page — the illustration standing for the whole lesson, placed
- * after the opening paragraph — and it leaves any `<Figure>` pointing at
- * another known prompt id alone precisely so these bands survive a re-wire.
- * This script owns the other kind: a risograph band that belongs beside the
- * paragraph it illustrates, somewhere down the page.
+ * Placement rules:
+ *   1. After the lesson's own opening figure, never above it.
+ *   2. Past the first `## ` heading — the first section introduces, the
+ *      sections after it explain.
+ *   3. Never straight after a paragraph ending in a colon (a lead-in owns
+ *      the block under it).
+ *   4. Only in a section that explains something (see `ASSESSMENT`).
+ *   5. Never against another band, and never last on the page.
+ * Rules 2, 4 and 5 are given up one at a time when a page offers nothing
+ * better — see the pools in `anchorFor`. Fenced code and JSX blocks are never
+ * treated as prose.
  *
- * Where a band goes, in the order the rules were learned:
- *
- *   1. **After the lesson's own opening figure.** Never above it. The lesson's
- *      illustration is the page's establishing shot.
- *
- *   2. **Past the first `## ` heading, when the page has one.** A band a
- *      paragraph below the opening illustration reads as a second opinion on
- *      the same picture. On `python-basics/lists` the two were literally the
- *      same idea twice — carts of blocks, then a rail of blocks, one paragraph
- *      apart. The first section introduces; the sections after it explain, and
- *      that is where a diagram earns its place. Moving 36 already-placed bands
- *      by this rule improved every one of them.
- *
- *   3. **Never straight after a paragraph ending in a colon.** That paragraph
- *      is a lead-in: the list, code block or table under it belongs to that
- *      sentence, and a figure dropped between them reads as the thing being
- *      introduced.
- *
- *   4. **Only in a section that explains something.** Not "Check your
- *      understanding", not "Challenge", not "Key takeaways" — see
- *      `ASSESSMENT`. Those sections score *well* on a band's own vocabulary,
- *      which is how 100 of the first 1,671 came to sit under a quiz.
- *
- *   5. **Never against another band, and never last on the page.** The old
- *      last-resort scan ignored both, which stacked 77 bands into 38 walls of
- *      art with no prose between them and left 84 more dangling under a
- *      multiple-choice block at the foot of a lesson.
- *
- * Rules 2, 4 and 5 are what a page *should* offer, and some pages offer none
- * of it. `anchorFor` gives them up one at a time, in order, rather than all at
- * once — see the pools there.
- *
- * Fenced code and JSX blocks are skipped when looking for prose, so a ```mermaid
- * diagram or a `<Callout>` body is never treated as a paragraph.
- *
- * Alt text is the prompt's `subject`, sentence-cased: the same description the
- * image was generated from, which is what keeps it true to the art. When a
- * subject is rewritten and the art redrawn, placement does *not* touch an
- * existing alt — the band is already on the page, and this leaves placed bands
- * alone. That is what `--audit` finds and `--fix-alt` repairs; a stale
- * description is worse than none, because a screen reader states it as fact.
- *
- * Idempotent: a band already on the page is left exactly where it is, so this
- * is safe to re-run after each wave of new art.
+ * Alt text is the prompt's `subject`, sentence-cased. Placement never touches
+ * an existing alt; `--audit` finds stale ones and `--fix-alt` repairs them.
+ * Idempotent: a band already on the page is left where it is.
  *
  * Usage:
  *   node scripts/place-inline-figures.mjs [--write] [--only a,b,c]
@@ -63,12 +30,9 @@
  *   --only <ids>   Comma-separated prompt ids to consider
  *   --audit        Report placed bands whose alt text no longer matches its
  *                  prompt subject, and any that are unterminated; write nothing
- *   --reflow       Lift every already-placed band and re-anchor it. Use after
- *                  changing where bands go; without it, placement leaves the
- *                  bands already on the page exactly where they are.
- *   --fix-alt      Rewrite those alt texts from their subjects. Rewording a
- *                  subject and redrawing its art leaves the old description on
- *                  the page, which is worse than none — this is the repair.
+ *   --reflow       Lift every already-placed band and re-anchor it; without
+ *                  it, placement leaves placed bands where they are
+ *   --fix-alt      Rewrite stale alt texts from their subjects
  *   -h, --help     Show this help
  */
 import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
@@ -107,13 +71,10 @@ function printHelp() {
 }
 
 /**
- * Per-line "fence" | "jsx" | null, mirroring how MDX reads them.
- *
- * Deliberately not `lib/mdx-regions.mjs`, which exempts the markdown containers
- * (`<Callout>` and friends) because a heading inside one is a real heading.
- * Placement wants the opposite: a Callout body is somebody's aside, not a place
- * to drop a band. Only the template-literal rule is shared, and it is shared
- * because getting it wrong put a band inside a runnable React sample.
+ * Per-line "fence" | "jsx" | null. Deliberately not `lib/mdx-regions.mjs`,
+ * which exempts markdown containers like `<Callout>` — placement wants the
+ * opposite: a Callout body is an aside, not a place to drop a band. Only the
+ * template-literal rule is shared.
  */
 export function regions(lines) {
   const out = new Array(lines.length).fill(null);
@@ -159,24 +120,13 @@ const isProse = (line) =>
   line.trim() !== "" && !/^\s*(#{1,6}\s|[-*+]\s|\d+\.\s|>\s|\||:)/.test(line);
 
 /**
- * Headings of sections that test or wrap up rather than explain.
- *
- * A band under "Check your understanding" is decoration. The reader is
- * answering questions there, and the multiple-choice block below it is what
- * the section is for; nothing in it is being explained, so a picture of the
- * mechanism has nothing to sit beside. 100 of the first 1,671 bands landed in
- * one of these, and 84 of those were the last thing on the page — a band
- * hanging under a quiz with no prose after it at all.
- *
- * They are excluded outright rather than scored down, because scoring is
- * exactly what sends bands here: a takeaways or challenge section restates the
- * lesson's vocabulary in concentrated form, so it beats the section that does
- * the actual teaching on the one signal the scorer has.
- *
- * Matched against the heading lowercased with its markdown stripped. The
- * anchors are deliberate: `^summary$` and not `^summary\b`, because
- * "Summary statistics by group" and "Summary functions and the `na.rm`
- * argument" are lessons teaching summary functions, not summaries of a lesson.
+ * Headings of sections that test or wrap up rather than explain. Excluded
+ * outright rather than scored down: a takeaways or challenge section restates
+ * the lesson's vocabulary in concentrated form, so it would out-score the
+ * section that does the teaching. Matched against the heading lowercased with
+ * markdown stripped; the anchors are deliberate — `^summary$`, not
+ * `^summary\b`, because "Summary statistics by group" teaches summary
+ * functions.
  */
 const ASSESSMENT = [
   /^(check|test) your (understanding|knowledge)\b/,
@@ -217,14 +167,9 @@ const STOPWORDS = new Set([
 ]);
 
 /**
- * Content words from a figure's title, and only its title.
- *
- * The lesson slug was in here too and had to come out. On a page carrying
- * several figures — `real-world-disasters` has four — the slug is identical for
- * all of them, so every figure scored "real", "world" and "disasters" equally
- * across every section and the signal that separates them drowned. Heartbleed
- * landed in "How modern systems push back" rather than the section named after
- * it. The title alone is what distinguishes one band on a page from another.
+ * Content words from a figure's title, and only its title: on a page with
+ * several figures the lesson slug is identical for all of them, so including
+ * it drowned the signal that separates one band from another.
  */
 function keywordsFor(prompt) {
   return [...new Set(
@@ -252,34 +197,16 @@ function sectionsOf(lines, code, floor) {
 /**
  * The line index to insert at, or -1 when the page offers no anchor.
  *
- * The band goes in the section that actually discusses it, which is both more
- * useful to a reader and the thing that stops placement looking mechanical.
- *
- * The first version of this anchored every band to the first paragraph after
- * the first `## ` heading. That is a defensible rule and it produced a median
- * depth of 9%: 87% of 671 bands sat in the top fifth of their page and not one
- * sat below 70%. Every lesson opened with its illustration, a paragraph, and
- * then a band, over and over. Correct by the rule, and obviously formulaic on
- * the page.
- *
- * So sections are scored on how much of the figure's own vocabulary they carry
- * — its title and lesson slug, which speak the lesson's language, rather than
- * its subject, which speaks in rails and chutes and trays — and the band goes
- * to the best match. A heading hit counts triple: a section called "Outer
- * joins" is a stronger signal than one that mentions joins in passing.
- *
- * Two guards keep that honest. The opening section is excluded whenever a page
- * has three or more, because it belongs to the lesson's own illustration. And
- * when nothing scores at all — a page whose headings are "Exercises" and
- * "Recap" — the middle section is taken rather than defaulting to the top,
- * since an arbitrary choice may as well be an arbitrary choice that varies.
+ * Sections are scored on how much of the figure's own vocabulary they carry
+ * (a heading hit counts triple), so the band lands where it is discussed
+ * instead of formulaically after the first heading. Two guards: the opening
+ * section is excluded when a page has three or more (it belongs to the
+ * lesson's own illustration), and when nothing scores the middle section is
+ * taken rather than the top.
  */
 export function anchorFor(lines, code, prompt) {
-  // Past the lesson's own figure — the *first* one on the page. This used to
-  // take the last, which was indistinguishable while a page held exactly one
-  // figure and wrong the moment reflow ran against pages that already carried
-  // bands: the floor jumped past every band on the page, leaving only the
-  // sections below the last of them as candidates.
+  // Past the *first* figure on the page — taking the last breaks reflow on
+  // pages that already carry bands (the floor would jump past all of them).
   let floor = 0;
   for (let i = 0; i < lines.length; i++) {
     if (code[i] === "jsx" && lines[i].includes("<Figure")) {
@@ -291,32 +218,23 @@ export function anchorFor(lines, code, prompt) {
 
   const all = sectionsOf(lines, code, floor);
   const keywords = prompt ? keywordsFor(prompt) : [];
-  // The opening section is held back for the lesson's own art, unless the band
-  // is the thing that section is named after. `The debugging mindset` opens
-  // `from-zero-to-cpp/debugging-and-reasoning`, and holding the band of that
-  // name out of it left it under "Sanitizers", three sections past the
-  // paragraph it belongs to. A heading hit is a strong enough signal to spend
-  // the exception on; a body mention is not.
+  // The opening section is held back for the lesson's own art, unless the
+  // band is the thing that section is *named* after — a heading hit is a
+  // strong enough signal to spend the exception on; a body mention is not.
   const named = (s) => keywords.some((w) => s.heading.toLowerCase().includes(w));
   const past = all.length >= 3 && !named(all[0]) ? all.slice(1) : all;
 
-  // Where a band may go, best first. The first pool is the rule; each one
-  // after it gives up exactly one thing the rule asked for, and is reached
-  // only when every pool above it is full or offers no paragraph. Ordering the
-  // concessions is the whole point: the old single fallback swept the page
-  // from `floor` down and so reached for the worst option first, putting 75
-  // bands above the first heading, in among the lesson's own opening art.
+  // Where a band may go, best first. Each pool after the first gives up
+  // exactly one thing the rule asks for, and is reached only when every pool
+  // above it is full or offers no paragraph.
   const pools = [
     // The rule: a section that teaches, below the one that opens the lesson.
     past.filter((s) => explains(s.heading)),
-    // The section that opens the lesson, when nothing below it is free. It
-    // reads as a second opinion on the establishing shot, which is a smaller
-    // problem than a band stranded under the closing challenge.
+    // The opening section, when nothing below it is free — a smaller problem
+    // than a band stranded under the closing challenge.
     all.filter((s) => explains(s.heading)),
-    // A lesson whose body runs on past the opening figure with no heading of
-    // its own until "Challenge" (the whole of `intro-web-development`) has no
-    // section to offer. Its lower half will do, and starting halfway is what
-    // keeps the band clear of the art at the top.
+    // A page with no heading until "Challenge": its lower half, starting
+    // halfway to stay clear of the art at the top.
     all[0] && all[0].start > floor
       ? [{ heading: "", start: Math.floor((floor + all[0].start) / 2), end: all[0].start }]
       : [],
@@ -374,15 +292,10 @@ function anchorIn(lines, code, section, floor) {
     return j + 1;
   }
 
-  // Nothing but lead-ins: anchor past the block one of them introduces.
-  //
-  // The colon rule exists to keep the two together, and the far side of the
-  // block does not come between them. Without this, a section written as
-  // "sentence, then code, sentence, then code" — which is most of
-  // `react-from-the-ground-up`, where every paragraph ends in a colon — offers
-  // nowhere at all, and its band ends up under the closing challenge instead.
-  // Second pass rather than a relaxed first one, so a section that does have a
-  // free-standing paragraph still gets it.
+  // Nothing but lead-ins: anchor past the block one of them introduces — the
+  // far side of the block does not come between a lead-in and its block. A
+  // second pass rather than a relaxed first one, so a section that does have
+  // a free-standing paragraph still gets it.
   for (let i = Math.max(section.start, floor); i < section.end; i++) {
     if (code[i] || !isProse(lines[i])) continue;
     let j = i;
@@ -399,14 +312,10 @@ function anchorIn(lines, code, section, floor) {
 }
 
 /**
- * Check that a placed band still describes the art it sits next to.
- *
- * Only the bands this script placed are checked, and they are the ones whose
- * id ends in `-inline`. The sixty historical figures carry alt text written by
- * hand — "A rocket veering off course seconds after launch, breaking apart
- * against a plain sky" rather than the generation prompt restated — because a
- * screen reader wants the scene, not the instruction that produced it. Holding
- * those to `alt === subject` reports sixty problems that are not problems.
+ * Check that a placed band still describes the art it sits next to. Only ids
+ * ending in `-inline` are checked: the historical figures carry hand-written
+ * alt text (the scene, not the generation prompt), and holding those to
+ * `alt === subject` reports problems that are not problems.
  */
 function audit(prompts, fix) {
   const problems = [];
@@ -418,9 +327,8 @@ function audit(prompts, fix) {
     const at = lines.findIndex((l) => l.includes(`slug="${p.id}-cutout"`));
     if (at === -1) continue;
     const alt = lines[at + 1] ?? "";
-    // An unterminated attribute is never rewritten automatically: the value has
-    // already run on into whatever follows it, so the line below is not
-    // necessarily the rest of the tag. That one gets looked at by hand.
+    // An unterminated attribute is never rewritten automatically: the value
+    // has run on into whatever follows, so the next line may not be the tag.
     if (!/^\s+alt=".*"\s*$/.test(alt)) {
       problems.push(`${p.id}: alt attribute is not a single closed line`);
     } else if (alt !== `  alt="${altFor(p)}"`) {

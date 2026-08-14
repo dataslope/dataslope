@@ -1,19 +1,10 @@
 "use client";
 
 /**
- * Nuclear "Clear all local data" helper. Wipes every browser-side storage
- * surface this app touches:
- *   - localStorage (settings, manifests, examples, workspace registry)
- *   - sessionStorage (per-session toast suppression flags, etc.)
- *   - OPFS (workspaces/, including code files, uploaded data files, and
- *     persisted SQLite / PGlite / DuckDB databases)
- *   - IndexedDB (best-effort, used by some pyodide / DuckDB-WASM caches)
- *   - Cache Storage (best-effort, service worker caches if present)
- *
- * Each step is independently best-effort: a failure in one surface (e.g.
- * private mode disables OPFS) does not abort the others. After all surfaces
- * have been visited, the caller should reload the page so freshly-mounted
- * components can re-bootstrap from a clean state.
+ * "Clear all local data": wipes localStorage, sessionStorage, OPFS,
+ * IndexedDB, and Cache Storage. Each step is independently best-effort so a
+ * failure in one surface doesn't abort the others. The caller should reload
+ * afterwards so components re-bootstrap clean.
  */
 
 import { isOpfsSupported } from "../opfs/featureDetect";
@@ -22,9 +13,7 @@ async function clearOpfs(): Promise<void> {
   if (!isOpfsSupported()) return;
   try {
     const root = await navigator.storage.getDirectory();
-    // Walk the top level and remove every entry recursively. We can't
-    // delete the root itself, only its children, so this is the
-    // closest we get to "wipe OPFS".
+    // The root itself can't be deleted, only its children.
     const entries = root as unknown as {
       entries(): AsyncIterable<[string, FileSystemHandle]>;
     };
@@ -32,8 +21,7 @@ async function clearOpfs(): Promise<void> {
       try {
         await root.removeEntry(name, { recursive: true });
       } catch {
-        // Skip handles we can't remove (e.g. locked by an open SyncAccessHandle
-        // in another tab). The remaining entries still get cleared.
+        // Skip handles locked by another tab; the rest still clear.
       }
     }
   } catch {
@@ -44,8 +32,7 @@ async function clearOpfs(): Promise<void> {
 async function clearIndexedDb(): Promise<void> {
   if (typeof indexedDB === "undefined") return;
   try {
-    // `databases()` is unsupported in Firefox / Safari; in that case the
-    // catch falls through and we just leave IDB alone.
+    // `databases()` is unsupported in Firefox/Safari; IDB is left alone there.
     const dbs = await (indexedDB as unknown as {
       databases?: () => Promise<{ name?: string }[]>;
     }).databases?.();
@@ -78,9 +65,7 @@ async function clearCacheStorage(): Promise<void> {
   }
 }
 
-/** Clears every local storage surface used by the app. Returns when
- *  every best-effort pass has run, does NOT reload the page itself
- *  (the caller decides whether to reload). */
+/** Clears every local storage surface. Does NOT reload the page itself. */
 export async function clearAllLocalData(): Promise<void> {
   try {
     localStorage.clear();

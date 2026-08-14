@@ -252,10 +252,8 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     [performImportSqlite, performImportSqlDump],
   );
 
-  /** Serializes the active database to a replayable SQL dump (DDL + data).
-   *  Shared by the "SQL dump (.sql)" export download and the cloud/share
-   *  bundle builder (see ShareControls). Returns null while the engine
-   *  is still booting. */
+  /** Serializes the active database to a replayable SQL dump. Shared by the
+   *  .sql export and the cloud/share bundle builder. Null while booting. */
   const buildSqlDumpText = useCallback(async (): Promise<string | null> => {
     const engine = engineRef.current;
     if (!engine) return null;
@@ -266,11 +264,10 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     ]);
 
     const lines: string[] = [
-      // foreign_keys OFF lets tables import regardless of FK ordering.
-      // No explicit BEGIN/COMMIT: the OPFS-backed worker manages its own
-      // transaction, and wrapping the dump in one makes the import fail
-      // ("no such table") as the engine's commit resets the open
-      // user transaction mid-script.
+      // foreign_keys OFF lets tables import regardless of FK ordering. No
+      // explicit BEGIN/COMMIT: the OPFS-backed worker manages its own
+      // transaction, and wrapping the dump in one fails the import
+      // ("no such table") when the engine's commit resets it mid-script.
       "PRAGMA foreign_keys = OFF;",
       "",
     ];
@@ -280,9 +277,8 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       const ddl = await engine.getDDL(name);
       lines.push(`${ddl};`, "");
 
-      // Generated columns are computed by the engine and can't be inserted
-      // into, so omit them from the INSERT column list / values (otherwise
-      // the re-import fails with "cannot INSERT into generated column").
+      // Omit generated columns from INSERTs — the re-import would fail with
+      // "cannot INSERT into generated column".
       const colInfo = await engine.listColumns(name);
       const generatedCols = new Set(
         colInfo.filter((c) => c.generated).map((c) => c.name),
@@ -320,10 +316,9 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       }
     }
 
-    // DDL for views and triggers. Indexes are intentionally NOT re-emitted
-    // here: getDDL(table) already includes each table's CREATE INDEX
-    // statements, so listing them again would fail the re-import with
-    // "index … already exists".
+    // DDL for views and triggers. Indexes are intentionally NOT re-emitted:
+    // getDDL(table) already includes each table's CREATE INDEX statements,
+    // and repeating them fails the re-import ("index … already exists").
     for (const name of [...viewList, ...triggerList]) {
       const ddl = await engine.getDDL(name);
       lines.push(`${ddl};`, "");
@@ -351,12 +346,8 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     return engine.exportDatabase();
   }, [engineRef]);
 
-  /**
-   * Loads a cloud/share bundle into a fresh session database: open the
-   * bundle's SQLite image → swap it in → replace the tabs with the bundle's
-   * queries. The same shape as performImportSqlite, except the tabs come
-   * from the bundle instead of the imported database's stored/default tabs.
-   */
+  /** Load a cloud/share bundle: swap in the bundle's SQLite image and
+   *  replace the tabs with the bundle's queries. */
   const applySqlBundle = useCallback(
     async (
       image: Uint8Array,

@@ -16,15 +16,11 @@ export interface ViewDataAutoRunInput {
 }
 
 /**
- * The tab whose query should be re-run right now, or null.
- *
- * Split out from the hook (the way workspaceSyncEngine is split from
- * useWorkspaceAutoSync) so the conditions are testable without a DOM.
- *
- * Only `view-data` tabs qualify. Their SQL is the `SELECT * FROM <table>` the
- * sidebar wrote when the tab was opened, so running it unprompted is safe; a
- * plain query tab holds whatever the user last typed, up to and including DDL
- * and DML, and must never re-run on its own.
+ * The tab whose query should be re-run right now, or null. Split out of the
+ * hook so the conditions are testable without a DOM. Only `view-data` tabs
+ * qualify: their SQL is the sidebar-written `SELECT * FROM <table>`, so
+ * running it unprompted is safe; a plain query tab may hold DDL/DML and must
+ * never re-run on its own.
  */
 export function viewDataTabToAutoRun({
   tabs,
@@ -63,18 +59,10 @@ interface ViewDataTabAutoRunOptions
 }
 
 /**
- * Re-runs a table tab's query when it is shown without one.
- *
- * Tabs survive a session (they're in localStorage), results don't (they're
- * component state), so returning to a workspace used to leave every table tab
- * showing the "Run a query to see results" placeholder, even though the tab is
- * a table view whose whole purpose is to show that table's rows. This fills
- * them back in.
- *
- * The query fires when the tab is *shown*, not when the workspace loads, so
- * reopening a session with a dozen table tabs costs one scan and not a dozen.
- * Each tab gets a single attempt per database: a query that comes back empty
- * (or errors) leaves the tab as the engine answered it instead of retrying on
+ * Re-runs a table tab's query when it is shown without one (tabs survive a
+ * session, results don't). The query fires when the tab is *shown*, not when
+ * the workspace loads, so a dozen restored tabs cost one scan; each tab gets
+ * a single attempt per database so an empty/errored answer isn't retried on
  * every render.
  */
 export function useViewDataTabAutoRun({

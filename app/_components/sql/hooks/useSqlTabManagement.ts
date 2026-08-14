@@ -11,20 +11,10 @@ import type { QueryRunResult } from "../types";
 import { pickFallbackTab, pushTabHistory } from "../utils/tabUtils";
 
 /**
- * Tab-management hook shared by Postgres and DuckDB playgrounds.
- *
- * Implements the identical addTab / closeTab / openTabAndRun /
- * handleTabDrag* / resetTabsForCurrentDb / openErDiagramTab /
- * openQueryHistoryTab logic from both playgrounds.
- *
- * The hook stays free of save-strategy knowledge: callers pass in
- * `persistTabs` (sync for Postgres, debounced for DuckDB) and
- * `saveTabsImmediate` (used by `addTab`, which the existing
- * playgrounds save synchronously even when persistTabs is debounced).
- *
- * SQLite has its own equivalent in `useTabManagement.ts` because it
- * predates this shared hook and is wired to Zustand stores instead
- * of plain React state setters.
+ * Tab-management hook shared by the Postgres and DuckDB playgrounds. Free of
+ * save-strategy knowledge: callers pass `persistTabs` (sync or debounced)
+ * and `saveTabsImmediate` (used by `addTab`). SQLite's equivalent is
+ * `useTabManagement.ts`, wired to Zustand stores.
  */
 export interface SqlTabManagementOptions {
   /** Ref tracking the latest tabs array (kept in sync by the caller). */
@@ -49,16 +39,10 @@ export interface SqlTabManagementOptions {
   /** React setter for the currently-dragging tab id. */
   setDraggingTabId: React.Dispatch<React.SetStateAction<string | null>>;
 
-  /**
-   * Persist tabs (and update tabsRef / setTabs). Postgres passes a
-   * synchronous wrapper, DuckDB passes its 500 ms-debounced version.
-   */
+  /** Persist tabs (sync for Postgres, 500 ms-debounced for DuckDB). */
   persistTabs: (nextTabs: QueryTab[], dbId?: string) => void;
-  /**
-   * Direct synchronous saveTabs from `createTabStorage(prefix)`. Used
-   * by `addTab` so a freshly created (empty) tab is on disk before
-   * the next keystroke fires the debounced persist.
-   */
+  /** Synchronous saveTabs; used by `addTab` so a fresh tab is on disk
+   *  before the next keystroke fires the debounced persist. */
   saveTabsImmediate: (dbId: string, tabs: QueryTab[]) => void;
 
   /** Resolve a sample database by id (dialect-specific). */

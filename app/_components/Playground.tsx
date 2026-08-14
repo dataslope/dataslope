@@ -867,11 +867,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const resizerRef = useRef<HTMLDivElement | null>(null);
 
   // ─── CodePen-style split view (adapters with `splitEditors`) ─────────
-  // Every workspace file gets its own always-visible editor stacked in
-  // the editor pane instead of the tabbed single editor. Defaults ON
-  // for the web playground; the user's choice persists per adapter.
-  // The default renders on the server too, localStorage is consulted
-  // in the mount effect below so hydration stays deterministic.
+  // One always-visible editor per file instead of the tabbed editor.
+  // Defaults ON; the choice persists per adapter, read in a mount effect
+  // so hydration stays deterministic.
   const splitAvailable = Boolean(adapter.splitEditors);
   const [splitView, setSplitViewState] = useState<boolean>(splitAvailable);
   useEffect(() => {
@@ -881,9 +879,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         window.localStorage.getItem(`playground_${adapter.id}_splitview`) ===
         "false"
       ) {
-        /* Same rationale as the persisted-settings hydration below: a
-           lazy useState initialiser would read localStorage during
-           render and mismatch the SSR markup. */
+        /* A lazy useState initialiser would read localStorage during render
+           and mismatch the SSR markup. */
         /* eslint-disable-next-line react-hooks/set-state-in-effect */
         setSplitViewState(false);
       }
@@ -901,9 +898,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const setSplitView = useCallback(
     (on: boolean) => {
       setSplitViewState(on);
-      // Switching views can change the editor arrangement (tabbed pins
-      // the editor left), drop the resizer's inline grid template so
-      // the new arrangement's CSS takes over at default proportions.
+      // Drop the resizer's inline grid template so the new arrangement's
+      // CSS takes over at default proportions.
       panesRef.current?.style.removeProperty("grid-template-columns");
       try {
         window.localStorage.setItem(
@@ -923,10 +919,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     },
     [],
   );
-  // Focusing a pane makes its file "active", the Run button label,
-  // Format target, and completion filename all track the focused pane,
-  // exactly like focusing that file's tab. No doc juggling needed: the
-  // panes write through to the dirty buffers on every edit.
+  // Focusing a pane makes its file "active" (Run label, Format target,
+  // completion filename), exactly like focusing that file's tab.
   const focusSplitFile = useCallback(
     (fileId: string) => {
       if (activeFileIdRef.current === fileId) return;
@@ -938,10 +932,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   );
 
   // ─── Auto-run on edit (preview adapters) ─────────────────────────────
-  // CodePen-style live feedback: a debounced re-run after edits (and one
-  // initial run once the runtime is ready) keeps the preview current
-  // without pressing Run. Cheap by construction, each run swaps the
-  // sandboxed iframe. Persisted per adapter; defaults ON.
+  // Debounced re-run after edits (plus one initial run) keeps the preview
+  // current without pressing Run. Persisted per adapter; defaults ON.
   const [autoRun, setAutoRunState] = useState<boolean>(hasPreview);
   useEffect(() => {
     if (!hasPreview) return;
@@ -974,7 +966,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   );
 
   // ─── Editor position (preview adapters): left / right / top ──────────
-  // The CodePen "change view" arrangements. Persisted per adapter.
   const [editorPosition, setEditorPositionState] = useState<
     "left" | "right" | "top"
   >("left");
@@ -996,9 +987,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const setEditorPosition = useCallback(
     (pos: "left" | "right" | "top") => {
       setEditorPositionState(pos);
-      // The drag resizer writes an inline grid template sized for the
-      // previous arrangement, drop it so the new arrangement's CSS
-      // takes over at its default proportions.
+      // Drop the resizer's inline grid template so the new arrangement's
+      // CSS takes over at default proportions.
       panesRef.current?.style.removeProperty("grid-template-columns");
       try {
         window.localStorage.setItem(
@@ -1011,31 +1001,25 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     },
     [adapter.id],
   );
-  // On split-capable adapters the tabbed (manage files) view always
-  // pins the editor to the left; the stored arrangement only applies
-  // while the split panes are showing. Non-split preview adapters keep
-  // their arrangement in both views.
+  // On split-capable adapters the tabbed view pins the editor left; the
+  // stored arrangement only applies while the split panes are showing.
   const editorPinnedLeft = splitAvailable && !splitActive;
   const effectiveEditorPosition = editorPinnedLeft ? "left" : editorPosition;
 
-  // Latest run handler in a ref so the editor's keymap can call into it
-  // without being re-bound on every render. `auto` marks debounced
-  // auto-runs, which skip user-facing side effects like the mobile
-  // pane switch.
+  // Latest run handler in a ref so the editor's keymap needn't re-bind.
+  // `auto` marks debounced auto-runs, which skip user-facing side effects
+  // like the mobile pane switch.
   const runRef = useRef<(opts?: { auto?: boolean }) => void>(() => undefined);
-  // Secondary run action (⌘/Ctrl+Shift+Enter), runs the Run dropdown's
-  // first/canonical entry. Kept as a ref so the CodeMirror keymap stays
-  // stable while the target entry updates as tabs/files change.
+  // Secondary run action (⌘/Ctrl+Shift+Enter): the Run dropdown's first
+  // entry. A ref so the keymap stays stable as the target changes.
   const runSecondaryRef = useRef<() => void>(() => undefined);
 
-  // The id of the first output cell produced by the most recent run.
-  // The auto-scroll effect uses it to scroll that cell into view rather
-  // than jumping all the way to the end of the scroll container.
+  // First output cell id of the most recent run; the auto-scroll effect
+  // scrolls it into view rather than jumping to the end.
   const newRunFirstIdRef = useRef<number | null>(null);
 
-  // Pending error→ready status reset. Tracked so a new run can cancel it,
-  // otherwise failing a run and re-running within 3s would let the stale
-  // timer flip the status to "ready" while the new run is still executing.
+  // Pending error→ready reset; a new run cancels it so a stale timer can't
+  // flip status to "ready" mid-run.
   const errorResetTimerRef = useRef<number | null>(null);
   useEffect(
     () => () => {
@@ -1056,9 +1040,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           `[data-cell-id="${id}"]`,
         );
         if (target) {
-          // Scroll so the cell sits ~64px below the top of the output area,
-          // giving the header a small breathing room without overshooting
-          // into the bottom padding.
+          // Land the cell ~64px below the top of the output area.
           const top = target.offsetTop - 64;
           el.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
           return;
@@ -1084,10 +1066,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       savedSize;
     const savedWordWrap =
       localStorage.getItem(storageKey("wordwrap")) !== "false";
-    // Default to appending runs (only an explicit stored value overrides
-    // it): the stacked run history keeps every run visible until the user
-    // dismisses or clears, so auto-clearing is opt-in via the setting.
-    // The SQL playgrounds keep the shared default.
+    // Default to appending runs; auto-clearing is opt-in via the setting.
     const storedClearBeforeRun = localStorage.getItem(
       storageKey("clearbeforerun"),
     );
@@ -1096,9 +1075,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         ? CODE_CLEAR_BEFORE_RUN_DEFAULT
         : storedClearBeforeRun === "true";
 
-    /* Hydrate persisted settings from localStorage. We can't use lazy
-       useState initialisers because that would cause a hydration mismatch
-       between SSR (no `window`) and CSR. */
+    /* Hydrate persisted settings here; lazy useState initialisers would
+       mismatch SSR (no `window`) and CSR. */
     /* eslint-disable react-hooks/set-state-in-effect */
     setFontSizeState(savedSize);
     setOutputFontSizeEnabledState(savedOutputEnabled);
@@ -1126,19 +1104,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   }, [adapter.id]);
 
   // ─── Workspace + file manifest bootstrap ────────────────────────────────
-  // Resolves (or auto-creates) the active workspace for this language,
-  // hydrates the file manifest from localStorage, and seeds the
-  // in-memory dirty buffer by reading each file's contents from OPFS.
-  // Once complete, the editor mount effect can dispatch a doc
-  // replacement so the user lands on their saved code.
+  // Resolves (or auto-creates) the active workspace, hydrates the file
+  // manifest, and seeds the dirty buffers from OPFS; the editor then
+  // dispatches a doc replacement so the user lands on their saved code.
   useEffect(() => {
     if (typeof window === "undefined") return;
     let cancelled = false;
-    // Releases the workspace lock when this effect tears down (unmount /
-    // client-side navigation away) so a later remount, e.g. a browser
-    // back-then-forward return to the playground, can re-acquire it instead
-    // of colliding with this document's own stale lock and showing a spurious
-    // "already open in another tab" warning.
+    // Releases the workspace lock on teardown so a later remount can
+    // re-acquire it instead of colliding with this document's own stale
+    // lock ("already open in another tab").
     const lockController = new AbortController();
     (async () => {
       try {
@@ -1160,8 +1134,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         } else {
           files = defaultFiles(adapter);
           activeId = files[0].id;
-          // Seed the file with the legacy single-file code (if any) so
-          // users migrating from Phase-4 don't lose their work.
+          // Seed with the legacy single-file code (if any) so migrating
+          // users don't lose their work.
           const legacy = localStorage.getItem(storageKey("code"));
           if (legacy && legacy.length > 0) {
             opfsWriteFile(ws.id, files[0].id, legacy);
@@ -1169,11 +1143,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           saveManifest(adapter.id, ws.id, files, activeId);
         }
 
-        // Read each file's content from OPFS into the dirty buffer.
-        // Files without OPFS content fall back to the adapter's default
-        // workspace (web: the CodePen HTML/CSS/JS trio) or the first
-        // example as a sensible starter (matches the single-file
-        // behaviour from before Phase 5).
+        // Read each file's content from OPFS into the dirty buffer; files
+        // without OPFS content fall back to the adapter's default workspace
+        // or the first example.
         const defaultSeedFor = (filename: string): string =>
           adapter.defaultWorkspace?.find((d) => d.filename === filename)
             ?.content ?? "";
@@ -1211,10 +1183,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         filesRef.current = files;
         setWorkspaceReady(true);
 
-        // Tab-isolation notice: if another tab already holds the lock
-        // for this workspace, surface a one-time toast so the user
-        // knows their edits in this tab are unsafe. Shown at most once
-        // per (workspace × session) via sessionStorage.
+        // Tab-isolation notice when another tab holds the workspace lock;
+        // shown at most once per (workspace × session).
         const noticeKey = `playground_ws_warned_${ws.id}`;
         try {
           if (window.sessionStorage.getItem(noticeKey) !== "1") {
@@ -1233,9 +1203,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           /* sessionStorage / Locks unavailable, ignore. */
         }
       } catch {
-        // Workspace bootstrap failed (OPFS down, lock contention, etc.);
-        // fall back to a single in-memory file so the playground still
-        // works.
+        // Bootstrap failed (OPFS down, etc.): fall back to a single
+        // in-memory file so the playground still works.
         if (cancelled) return;
         const files = defaultFiles(adapter);
         const activeId = files[0].id;
@@ -1273,11 +1242,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adapter.id]);
 
-  // Persist the manifest whenever files, open tabs, or the active file
-  // change. Skipped until the workspace has finished bootstrapping so the
-  // initial hydration doesn't immediately overwrite a freshly-loaded
-  // manifest. Dangling tab ids (files replaced by an example load) are
-  // filtered out at write time.
+  // Persist the manifest on changes; skipped until bootstrap completes so
+  // hydration doesn't overwrite a freshly-loaded manifest. Dangling tab
+  // ids are filtered at write time.
   useEffect(() => {
     if (!workspaceReady || !workspaceId) return;
     saveManifest(
@@ -1289,10 +1256,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     );
   }, [adapter.id, workspaceId, files, activeFileId, openTabIds, workspaceReady]);
 
-  // Whatever activates a file (tab click, Files pane, split-pane focus,
-  // the Ask AI edit handler, workspace hydration) must end with that
-  // file's tab open, centralized here so no activation path can strand
-  // an active-but-closed file.
+  // Whatever activates a file must end with its tab open; centralized so
+  // no activation path can strand an active-but-closed file.
   useEffect(() => {
     if (!workspaceReady || !activeFileId) return;
     if (!files.some((f) => f.id === activeFileId)) return;
@@ -1522,14 +1487,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   useEffect(() => {
     let cancelled = false;
 
-    // The split view mounts one editor per file (PlaygroundSplitEditors)
-    // instead of this single tabbed editor; toggling back re-runs this
-    // effect and remounts it from the active file's dirty buffer.
+    // The split view mounts one editor per file instead of this tabbed
+    // editor; toggling back remounts it from the active file's buffer.
     if (!splitActive && editorHostRef.current && !editorRef.current) {
-      // Read persisted settings directly so the editor mounts with the
-      // same values the surrounding UI was hydrated with, otherwise the
-      // editor would briefly render with default theme/wrapping and then
-      // flip to the saved values on the next effect.
+      // Read persisted settings directly so the editor doesn't briefly
+      // render with defaults and then flip to the saved values.
       const initialTheme =
         getStoredEditorTheme(storageKey("editortheme")) ?? "github-light";
       const initialWordWrap =
@@ -1539,12 +1501,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       const wrapComp = new Compartment();
       const languageComp = new Compartment();
 
-      // Listen for doc changes to persist the *currently active file*:
-      // contents land in the file's in-memory dirty buffer (synchronous)
-      // and in OPFS via an async queue. We deliberately read the active
-      // file and workspace ids from refs so tab switches don't require
-      // rebuilding the editor extensions. (Completion triggers, `.`,
-      // Ctrl-Space, etc., live inside `languageCompletion` below.)
+      // Persist the active file's doc changes: dirty buffer (sync) + OPFS
+      // (async). Ids are read from refs so tab switches don't rebuild the
+      // editor extensions.
       const persistListener = EditorView.updateListener.of((update) => {
         if (!update.docChanged) return;
         if (!suppressPersistRef.current) {
@@ -1556,19 +1515,14 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             if (wsId) opfsWriteFile(wsId, fileId, content);
           }
           // A genuine user edit makes the workspace eligible to be saved.
-          // (The cloud auto-sync pulse fires from the store's
-          // updateDirtyBuffer above, the single source for all mutations.)
           markDirty();
         }
       });
 
       const view = new EditorView({
-        // The editor mounts before the workspace bootstrap resolves; we
-        // start with the active file's dirty buffer when one exists (a
-        // split→tabs toggle remounts mid-session), else the legacy
-        // localStorage entry for a zero-flash first paint; the workspace
-        // effect dispatches a doc replacement with whatever the OPFS
-        // read returned.
+        // The editor mounts before bootstrap resolves: start with the dirty
+        // buffer (split→tabs remount) or the legacy localStorage entry for
+        // a zero-flash paint; the workspace effect replaces the doc later.
         doc:
           dirtyBuffersRef.current.get(activeFileIdRef.current ?? "") ??
           localStorage.getItem(storageKey("code")) ??
@@ -1590,8 +1544,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           highlightSelectionMatches(),
           rectangularSelection(),
           crosshairCursor(),
-          // Indent width tracks the adapter's formatter (see
-          // LanguageAdapter.indentWidth) so Tab matches the Format button.
+          // Indent width tracks the adapter's formatter so Tab matches
+          // Format.
           EditorState.tabSize.of(adapter.indentWidth),
           indentUnit.of(" ".repeat(adapter.indentWidth)),
           // Intellisense: runtime-backed + static completion sources,
@@ -1657,13 +1611,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
     (async () => {
       try {
-        // Re-use the playground-scoped runtime so navigating between
-        // playground sessions (or re-opening the drawer) doesn't
-        // re-instantiate Pyodide / WebR / CheerpJ / the almostnode
-        // worker. The /learn route uses a separate scope so side
-        // effects from the playground (pip installs, monkey-patched
-        // modules, files staged into the VFS) can't leak into the
-        // learn-page CodeBlocks/ChallengeCards.
+        // Re-use the playground-scoped runtime across sessions; /learn uses
+        // a separate scope so playground side effects (pip installs, staged
+        // VFS files) can't leak into its CodeBlocks/ChallengeCards.
         const rt = await getSharedRuntime(
           RuntimeScope.Playground,
           adapter,
@@ -1675,11 +1625,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         );
         if (cancelled) return;
         runtimeRef.current = rt;
-        // The playground can't predict what the user will type, and its
-        // audience skews toward the data stack, pre-warm the full
-        // optional package set unconditionally (the pre-#549 behaviour,
-        // now opt-in per surface via warmPackages). Fire-and-forget: a
-        // run that needs packages installs them on demand regardless.
+        // The playground can't predict what the user will type, so pre-warm
+        // the full optional package set unconditionally. Fire-and-forget.
         rt.warmPackages?.([], { force: true });
         setLoaded(true);
         setStatusState("ready");
@@ -1698,14 +1645,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       wrapCompRef.current = null;
       languageCompRef.current = null;
     };
-    // editorTheme is intentionally only consumed for the *initial* CM theme;
-    // subsequent changes are pushed via Compartment reconfigure below.
+    // editorTheme only seeds the initial CM theme; later changes go through
+    // Compartment reconfigure below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adapter, splitActive]);
 
-  // Pin this playground's runtime in the registry while mounted, so the
-  // per-scope LRU eviction never terminates the engine under a live
-  // playground (including the `runtimeRef` cached above).
+  // Pin this playground's runtime while mounted so the per-scope LRU
+  // eviction never terminates the engine under a live playground.
   useEffect(
     () => retainRuntime(RuntimeScope.Playground, adapter.id),
     [adapter.id],
@@ -1746,17 +1692,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         suppressPersistRef.current = false;
       }
     }
-    // Focus the editor so the user can type immediately after a tab
-    // switch, new-file, duplicate, or close-all action. The Settings
-    // tab is handled above (early return), so we never steal focus
-    // from the settings form here.
-    //
-    // Hold off while the boot overlay still covers the screen, and route
-    // the FIRST focus after mount through the shared entry policy: desktop
-    // lands the cursor at the end of the code; mobile skips it entirely so
-    // the on-screen keyboard doesn't pop before the user asks to type.
-    // `showLoadingOverlay` is in the deps so the entry focus fires once the
-    // overlay unmounts. Later runs (user-initiated tab ops) focus as before.
+    // Focus the editor after tab ops (the Settings tab early-returns above,
+    // so its form never loses focus). Hold off while the boot overlay
+    // covers the screen; the FIRST focus goes through the entry policy —
+    // desktop lands the cursor at the end, mobile skips focus so the
+    // keyboard doesn't pop. `showLoadingOverlay` is in the deps so entry
+    // focus fires once the overlay unmounts.
     if (showLoadingOverlay) return;
     if (!entryFocusDoneRef.current) {
       entryFocusDoneRef.current = true;
@@ -1766,10 +1707,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     view.focus();
   }, [activeFileId, activeTabId, splitActive, workspaceReady, showLoadingOverlay]);
 
-  // Per-file syntax highlighting for adapters whose workspaces mix
-  // languages (web: .html/.css/.js side by side). Reconfigures the
-  // language compartment whenever the active tab changes; adapters
-  // without `codeMirrorModeForFile` keep the mode loaded at mount.
+  // Per-file syntax highlighting for mixed-language workspaces (web);
+  // adapters without `codeMirrorModeForFile` keep the mount-time mode.
   useEffect(() => {
     if (!adapter.codeMirrorModeForFile) return;
     if (!workspaceReady) return;
@@ -1879,12 +1818,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     [adapter.id],
   );
 
-  // Restore the editor settings (font size, theme, word wrap, clear-
-  // before-run, output font size) to their built-in defaults. Drops the
-  // matching localStorage entries so a future page load also starts
-  // from defaults. The user's saved code, examples, and any other
-  // unrelated localStorage entries are intentionally left alone, the
-  // separate "Clear all localStorage" action handles those.
+  // Restore editor settings to built-in defaults (and drop their
+  // localStorage entries). Saved code is intentionally left alone — the
+  // separate "Clear all localStorage" action handles that.
   const restoreDefaultSettings = useCallback(() => {
     const D = DEFAULT_PLAYGROUND_SETTINGS;
     setFontSize(D.fontSize);
@@ -1904,26 +1840,19 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     showToast,
   ]);
 
-  // Clear every localStorage entry (across all playgrounds) and reload
-  // so the freshly cleared state takes effect everywhere, including
-  // saved editor contents, theme, and any future per-playground keys.
-  // Confirmation is handled by a Base UI dialog rendered below; by the
-  // time this callback fires the user has already opted in.
+  // Clear every localStorage entry (across all playgrounds) and reload.
+  // The confirmation dialog below has already fired by this point.
   const clearAllLocalStorage = useCallback(() => {
     try {
       localStorage.clear();
     } catch {
-      // localStorage might be unavailable in private mode; continue to
-      // the reload anyway so the user at least gets a fresh page.
+      // localStorage may be unavailable in private mode; reload anyway.
     }
     window.location.reload();
   }, []);
 
   // Nuclear wipe: clears every storage surface (localStorage, OPFS,
-  // IndexedDB, caches) before reloading. Backed by the shared
-  // `clearAllLocalData` helper so every playground gets the same
-  // behaviour. Best-effort: failures inside one surface don't block
-  // the others, and we always reload.
+  // IndexedDB, caches) before reloading. Best-effort; always reloads.
   const clearAllLocalData = useCallback(() => {
     void (async () => {
       try {
