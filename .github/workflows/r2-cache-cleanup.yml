@@ -1,78 +1,219 @@
 name: R2 incremental-cache cleanup
 
 # Prunes stale OpenNext incremental-cache build folders from the R2 bucket.
-# Every deploy (production AND every preview) writes a fresh ~2.5 GB folder
-# under `incremental-cache/<buildId>/` and OpenNext never deletes old ones —
-# left alone the bucket grows unbounded (once reached ~78 GB in days).
 #
-# The build ID IS the deployed commit SHA (next.config.ts generateBuildId =
-# WORKERS_CI_COMMIT_SHA on Workers Builds); that equality is what lets this
-# job reason about folders at all.
+# Why this exists: the R2 cache keys every object as
+# `incremental-cache/<buildId>/<hash>.cache` (see open-next.config.ts). Each
+# deploy, production AND every Cloudflare preview, writes a fresh ~2.5 GB
+# folder under a new build ID (one `.cache` object per prerendered page, ~1,080
+# of them averaging ~2.3 MB), and OpenNext never deletes old ones. Left alone,
+# the bucket grows by that much per deploy forever; at active-development
+# velocity that reached ~78 GB in a matter of days.
 #
-# Policy — ask each deployment what it serves now and what it's about to serve:
+# That per-folder figure read "~1–1.4 GB / ~1,600 objects" until 2026-08-14 and
+# was measured at 2.504 GB / 1,081 objects: fewer, much larger objects. Next 16's
+# client segment cache writes a `segmentData` map into every entry alongside
+# `html` and `rsc`, and it is ~40% of each object — half of that being
+# `segmentData["/_full"]`, which sampling found byte-identical to `rsc` in 40/40
+# objects. Nothing in this repo turns it on; it arrived as a Next default. Assume
+# the number drifts again and re-measure before trusting it.
+#
+# The build ID IS the deployed commit SHA: next.config.ts sets `generateBuildId`
+# to WORKERS_CI_COMMIT_SHA on Cloudflare Workers Builds, so a folder name equals
+# the commit it was built from. That is what lets this job decide anything at
+# all about a folder, and it is impossible with Next's default random build IDs.
+#
+# ---------------------------------------------------------------------------
+# The policy, in full
+# ---------------------------------------------------------------------------
+#
+# Two questions decide every folder: what is each deployment serving RIGHT NOW,
+# and what is it ABOUT TO serve. Both are directly obtainable, so this job asks
+# rather than approximates:
 #
 #   KEEP = { probe(production) }                  what prod serves now
-#        ∪ { probe(preview_b) ∀ branch b }        what each preview serves now
+#        ∪ { probe(preview_b) ∀ ACTIVE branch b } what each preview serves now
 #        ∪ { head(default_branch) }               what prod is about to serve
-#        ∪ { head(b) ∀ branch b }                 what each preview is about to serve
+#        ∪ { head(b) ∀ ACTIVE branch b }          what each preview is about to serve
 #        ∪ { folders populated < GRACE_HOURS }    catch-all for the unclassifiable
 #   DELETE everything else
 #
-# "probe" = GET /api/cache-build-id on the deployment, which reports the
-# running Worker's OPEN_NEXT_BUILD_ID — the exact R2 folder name, so it can't
-# drift from reality. Branches are probed at their preview ALIAS (the stable
-# per-branch hostname).
+# "probe" means an HTTP GET of /api/cache-build-id on the deployment itself,
+# which reports the running Worker's OPEN_NEXT_BUILD_ID — the exact string the
+# R2 override uses as the folder name, so it cannot drift from reality. The
+# production URL is fixed (BUILD_ID_URL); each branch is probed at its preview
+# ALIAS, the stable per-branch hostname Workers Builds assigns.
 #
-# BRANCHES, not open PRs: Workers Builds builds every branch on every push,
-# PR or not, so a PR-shaped keep set under-covers pre-PR branches. The alias
-# is DERIVED from the branch name, never read out of a check run: check runs
-# hang off a COMMIT, and a commit reachable from two branches carries
-# whichever branch's build ran, so reading it can protect the wrong branch.
+# BRANCHES, not open pull requests. Cloudflare Workers Builds builds every
+# branch on every push, whether or not a pull request exists for it (confirmed
+# 2026-08-14 by pushing to a branch with no PR and watching a build start), so
+# a PR-shaped keep set silently under-covers: a branch being worked on before
+# its PR is opened has a live preview that nothing would have claimed.
 #
-# Nothing is retained on age alone: the bucket holds live + incoming
-# production, at most two folders per active branch, plus the GRACE_HOURS
-# window — branch count, not deploy velocity, sets the bucket size.
+# ACTIVE branches, though. A branch is the unit of deployment, but a pull
+# request is the signal that the work on it is finished, and the two do not end
+# together: Workers Builds does NOT tear a preview down when a PR merges. The
+# alias keeps answering for as long as the branch exists, so a keep set that
+# only asks "is there a branch" pins ~2.5 GB per merged-but-undeleted branch,
+# indefinitely, for a preview nobody will open again. Measured 2026-08-14 on
+# run #172: `claude/incremental-cache-retention-ygg8dk` was still serving
+# 9bfd5c13 — and holding its folder — hours after #664 merged.
 #
-# Deliberate consequence: NO rollback cover. Rolling the Worker back to a
-# pruned build 500s the site (the `node:fs` mechanism in open-next.config.ts),
-# and Cloudflare's Deployments tab offers those targets with no warning;
-# revert-and-redeploy (~12 min) is the intended recovery. If rollback cover is
-# ever wanted, add it as an explicit count-bounded rule ("keep last N
-# production builds"), not by lengthening a time window.
+# So a branch is RETIRED, and claims nothing at all, when all three hold:
 #
-# Safety (two outages came from deleting a folder a deployment was serving:
-# 2026-07-16 production, 2026-08-05 preview):
-#   • Abort WITHOUT deleting if the live production build, default branch +
-#     head, or branch list can't be positively identified — a transient error
-#     must never leave every folder unexplained and therefore deleted.
-#   • Abort if the live production folder isn't in the bucket at all (catches
-#     a prefix/bucket mismatch before it deletes everything).
-#   • A PREVIEW probe failure never aborts the sweep and never widens into a
-#     delete: that branch alone falls back to keeping its last
-#     FALLBACK_COMMITS commits. "No answer" is never "nothing to keep".
-#   • Branch names are attacker-controllable and become fetched URLs: the slug
-#     rule folds everything outside [a-z0-9-] to '-', and the result is
-#     checked against PREVIEW_URL_RE before any request.
-#   • GRACE_HOURS is a safety net, not policy: a minutes-old folder may belong
-#     to an in-flight deploy no probe sees yet and no branch head names.
+#   • at least one pull request has this branch as its head,
+#   • none of them is open, and
+#   • the branch head is still the head of one of those closed pull requests.
+#
+# The third clause is what makes it safe to act the moment a PR closes. A
+# branch whose head has moved PAST its closed pull request has unreviewed work
+# on it, Workers Builds has already built and deployed that work, and the
+# preview is live again — a reopened PR, follow-up commits, a reused branch.
+# Only a branch that has not moved since its pull request closed is finished.
+# Retirement also only ever WITHHOLDS a claim; it never revokes one. Production
+# and the default branch head are registered before any branch is considered,
+# so a retired branch that happens to share a SHA with either keeps it.
+#
+# A branch that never had a pull request is NOT retired. That is the case the
+# branch-shaped keep set exists for, and there is no signal in it to say the
+# work is over — only the branch's continued existence, which is the operator's
+# to end. Such a branch is called out by name in the log so it cannot quietly
+# hold a folder forever; deleting the branch is what releases it.
+#
+# The alias is DERIVED from the branch name rather than read out of the
+# Cloudflare check run that also advertises it. Reading it looks more
+# authoritative and is not: check runs hang off a COMMIT, and a commit reached
+# by more than one branch carries whichever branch's build ran on it. Measured
+# 2026-08-14 — the Workers Builds check run on 00a0deaa, the head of `main`,
+# advertised `Preview Alias URL: https://test-no-open-pr-001-dataslope…`,
+# because a branch had been cut at that commit and built from there. Probing
+# that URL for `main` would have asked a different deployment what it was
+# serving and recorded the answer under the wrong branch, leaving the branch we
+# meant to protect unprobed. Deriving cannot be misattributed, costs no API
+# calls, and is verified against both live aliases in preview_alias() below.
+#
+# ---------------------------------------------------------------------------
+# What this replaced, and why
+# ---------------------------------------------------------------------------
+#
+# Until 2026-08-14 the keep set was assembled from six knobs — THRESHOLD_HOURS,
+# MAIN_COMMITS, PR_COMMITS, MIN_CACHE_OBJECTS, GRACE_HOURS, MAX_BRANCHES — that
+# together approximated those same two questions. Approximations leak, and each
+# of these leaked in a way that had already cost an outage or a large fraction
+# of the bucket:
+#
+#   • MIN_CACHE_OBJECTS: 100 stood in for "has this branch's head build landed
+#     yet". A folder crosses 100 of its 1,081 objects seconds into a populate,
+#     minutes before the Worker switches over, so for those minutes the build
+#     actually being served counted as superseded and lost its protection. The
+#     probe has no such window: it reports what is being served, not what looks
+#     finished.
+#   • PR_COMMITS: 3 stood in for "how far behind its branch head can a live
+#     preview be". A preview four commits stale (rapid pushes, or a failed
+#     build) was unprotected. The probe does not care how far behind it is.
+#   • MAIN_COMMITS: 30, then 10, stood in for "the incoming production build".
+#     That build IS head(default_branch): one exact value instead of N guesses,
+#     and unbounded in time, so a stalled deploy can no longer age out mid-flight.
+#   • THRESHOLD_HOURS: 24, then 4, was a blanket expiry for everything the other
+#     rules failed to explain. With the keep set exact there is nothing left for
+#     it to explain, and it was the single largest contributor to the 78 GB peak
+#     (a 24h + 6h-interval tail at ~1.2 deploys/hour IS the bucket).
+#
+# Net effect: the bucket now holds the live production build, the incoming
+# production build, and at most two folders per active branch (what its preview
+# serves now + what it is about to serve), plus whatever landed in the last
+# GRACE_HOURS. Nothing is retained on age alone, so deploy velocity no longer
+# sets the bucket size — the count of branches with unfinished work does.
+#
+# Deliberate consequence: a merged pull request's preview breaks. Once its
+# cache is pruned the alias 500s by the `node:fs` mechanism below, and the
+# Cloudflare check-run link on the merged PR still points at it. That is the
+# trade being made — the alternative is paying ~2.5 GB a branch to keep a
+# preview of already-merged code loadable. Deleting the head branch on merge
+# (GitHub's "Automatically delete head branches" setting) avoids the broken
+# link and retires the branch here in the same stroke.
+#
+# Deliberate consequence: there is no rollback cover. Rolling the Worker back
+# to a build whose cache has been pruned 500s the site by the `node:fs`
+# mechanism described in open-next.config.ts, and Cloudflare's Deployments tab
+# offers those targets with no warning. Revert-and-redeploy is ~12 minutes
+# end-to-end (measured 2026-08-14), which is the intended recovery path. If
+# rollback cover is ever wanted, add it as its own explicit rule — "keep the
+# last N production builds", count-bounded — rather than by lengthening a time
+# window and letting every unrelated folder ride along, which is exactly the
+# accident this rewrite undid.
+#
+# ---------------------------------------------------------------------------
+# Safety
+# ---------------------------------------------------------------------------
+#
+# Two outages came from this job deleting the folder a deployment was serving
+# (2026-07-16 production, 2026-08-05 preview). Every guard below exists for
+# that, and a rewrite keeps all of them:
+#
+#   • The job aborts WITHOUT deleting anything if it cannot positively identify
+#     the live production build, resolve the default branch and its head, or
+#     list the repo's branches. A transient error must never leave every folder
+#     unexplained and therefore deleted.
+#   • It also aborts if the live production folder is not present in the bucket
+#     at all, which catches a prefix or bucket mismatch before it deletes
+#     everything.
+#   • A PREVIEW probe failure, by contrast, never aborts the sweep and never
+#     widens into a delete: that branch alone falls back to the pre-probe
+#     behaviour of keeping its last FALLBACK_COMMITS commits. One unreachable
+#     preview must not stop the other branches from being swept, and "no
+#     answer" must never be read as "nothing to keep".
+#   • A pull-request lookup failure is the same shape and resolves the same
+#     way: an unanswered question about a PR leaves that branch ACTIVE, i.e.
+#     protected. Retirement is the one rule here whose job is to delete more,
+#     so it is the one rule that must never fire on a guess. The cost of
+#     guessing wrong is a folder held two hours longer, against an outage.
+#   • A branch name is attacker-controllable by anyone who can push, and this
+#     job turns one into a URL and fetches it. The slug rule folds everything
+#     outside [a-z0-9-] to '-', so a branch cannot smuggle a host, and the
+#     result is checked against PREVIEW_URL_RE before any request is made.
+#   • GRACE_HOURS survives the rewrite as a safety net rather than as policy: a
+#     folder that landed minutes ago may belong to a deploy no probe can see
+#     yet (the Worker still reports the outgoing build) and no branch head
+#     names (a merge commit's build ID is the merge commit).
 #
 # Run manually with dry_run=true to preview deletions.
 #
-# Required repository secrets:
+# Required repository secrets (Settings → Secrets and variables → Actions):
 #   CLOUDFLARE_ACCOUNT_ID           Cloudflare account ID (the R2 S3 endpoint host)
 #   R2_INC_CACHE_ACCESS_KEY_ID      R2 API token access key id (Object Read & Write)
 #   R2_INC_CACHE_SECRET_ACCESS_KEY  R2 API token secret access key
 #
-# The R2_INC_CACHE_* pair is Object Read & Write on purpose: this unattended
-# delete job never needs bucket-level rights. Admin tokens (R2_ADMIN_*, used
-# only by r2-illustrations-lifecycle.yml) are account-wide and can't be scoped
-# to one bucket — keeping one out of this job is the point of the split.
+# The R2_INC_CACHE_* pair is named for the bucket it belongs to. It is an
+# Object Read & Write token, deliberately: this job deletes objects on a
+# schedule and never needs bucket-level rights. Editing bucket configuration
+# needs an Admin Read & Write token, which lives in R2_ADMIN_* and is used only
+# by r2-illustrations-lifecycle.yml — admin tokens are account-wide and cannot
+# be scoped to one bucket, so keeping one out of this unattended delete job is
+# the point of the split. (Renamed 2026-07-30 from R2_ACCESS_KEY_ID /
+# R2_SECRET_ACCESS_KEY, which read as "the" R2 credentials once a second pair
+# existed. Unrelated to the identically-named local env vars the illustration
+# scripts use, see scripts/lib/r2.mjs.)
 
 on:
   schedule:
     # Every 2 hours, off the top of the hour to avoid scheduler congestion.
-    # Cheap: ListObjectsV2 is Class A ($4.50/million — not Class B); ~10 LISTs
-    # quiet, ~100 full sweep, ~5,000/month against R2's 1M free Class A ops.
+    # (GitHub delays scheduled runs by up to a few hours under load.)
+    #
+    # The interval used to be an ADDEND to retention — a folder written just
+    # after a sweep survived untouched until the next one, so the worst-case
+    # age of a prunable folder was interval + THRESHOLD_HOURS. With retention
+    # no longer expressed in hours that arithmetic is gone: the interval now
+    # only sets how long a superseded folder lingers before its next
+    # reconsideration, and every run reaches the same verdict about it.
+    #
+    # The job is cheap to run, though not for the reason this comment claimed
+    # until 2026-08-14: ListObjectsV2 is a Class A operation at $4.50/million,
+    # NOT Class B at $0.36/million (Class B is GetObject/HeadObject; DeleteObject
+    # really is free). A quiet run costs ~10 LIST requests and a full sweep
+    # ~100, so 12 runs a day lands near 5,000 a month against R2's 1,000,000
+    # Class A monthly free allowance — a rounding error either way, but the
+    # right rate matters if the folder count ever grows by an order of magnitude.
     - cron: "17 */2 * * *"
   workflow_dispatch:
     inputs:
@@ -85,10 +226,16 @@ concurrency:
   group: r2-cache-cleanup
   cancel-in-progress: false
 
-# Least privilege: `contents` read alone covers everything asked of GitHub
-# (branches, commits, the default branch).
+# Least privilege: read-only. `contents` covers branches, commits and the
+# default branch; `pull-requests` covers the retirement check, and covers only
+# reading — this job never comments on, closes or otherwise touches a PR. (It
+# was dropped on 2026-08-14 when the keep set stopped asking about PRs at all,
+# and came back when merged branches turned out to keep their previews alive.)
+# No `checks` scope was ever needed, since preview aliases are derived from
+# branch names rather than read out of check runs.
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   cleanup:
@@ -97,47 +244,74 @@ jobs:
       BUCKET: dataslope-inc-cache
       PREFIX: incremental-cache/
       BUILD_ID_URL: https://dataslope.com/api/cache-build-id
-      # Never delete a folder populated within the last GRACE_HOURS: a deploy
-      # populates R2 minutes before the Worker switches over, so a brand-new
-      # folder can belong to an in-flight deploy no probe sees yet and no
-      # branch head names (a merge commit's build ID is the merge SHA). 2h
-      # comfortably covers populate + switchover including build queueing.
+      # Never delete a folder populated within the last GRACE_HOURS, whatever
+      # it matches. This is the one piece of the pre-2026-08-14 policy that
+      # survives, and it is a safety net rather than a rule: a deploy populates
+      # its R2 folder minutes before the Worker starts serving that build, so a
+      # brand-new folder can belong to an in-flight deploy that no probe can
+      # see yet (production still reports the outgoing build) and no branch
+      # head names (a merge commit's build ID is the merge commit's SHA, which
+      # is head(main) only once the merge lands). 2h comfortably covers
+      # populate + switchover including Workers Builds queueing; populate alone
+      # measured a 0.8 min median and a 1.8 min max on 2026-08-14.
       GRACE_HOURS: "2"
-      # Sanity cap, not policy: bounds how many branches get probed and how
-      # many folders may be kept SOLELY on a branch-head claim
-      # (newest-populated-first). A folder a live probe named is NEVER capped —
-      # deleting one is an outage. If this cap fires, the honest fix is
-      # deleting merged branches, not raising the number.
+      # Sanity cap, not policy. Two things are bounded by it:
+      #   • how many branches get probed (alphabetical order, with a warning
+      #     when it truncates), and
+      #   • how many folders may be kept SOLELY because a branch head names
+      #     them, evaluated newest-populated-first.
+      # A folder kept because a live probe named it is never capped — that is
+      # a deployment actively serving from it, and deleting it is an outage.
+      # Retired branches are skipped before either bound applies: they cost no
+      # probe and hold no folder, so the cap now counts branches with live work
+      # rather than every branch anyone forgot to delete.
+      # At ~2.5 GB/folder and at most two folders per branch this bounds
+      # previews at roughly 50 GB, which only becomes reachable with 10
+      # simultaneously-active branches; it has been 1-3 in practice. If this
+      # cap ever fires, the honest fix is deleting stale branches, not raising
+      # the number.
       MAX_BRANCHES: "10"
-      # Degraded mode only: when a branch's preview can't be probed, that
-      # branch keeps its most recent commits instead, so an alive-but-
-      # unreachable preview cannot lose its cache. Keeping a SHA with no
-      # folder costs nothing.
+      # Degraded mode only. When a branch's preview cannot be probed — no
+      # Cloudflare check run yet, an implausible alias URL, or the preview not
+      # answering — that branch falls back to the pre-probe behaviour of
+      # keeping its most recent commits, so a preview that is alive but
+      # unreachable from this runner cannot lose its cache. Not reached on a
+      # healthy run, and cheap when it is: keeping a SHA whose folder does not
+      # exist costs nothing.
       FALLBACK_COMMITS: "3"
-      # Preview alias = https://<branch-slug>-<worker>.<subdomain>. The worker
-      # name must match wrangler.jsonc's "name".
+      # A branch's preview alias is https://<branch-slug>-<worker>.<subdomain>
+      # .workers.dev. The worker name must match wrangler.jsonc's "name"; the
+      # subdomain is the Cloudflare account's workers.dev subdomain (visible in
+      # any Preview URL the Workers Builds check run prints).
       PREVIEW_WORKER: dataslope
       PREVIEW_SUBDOMAIN: subwaymatch.workers.dev
-      # Belt and braces around the URL this job builds then fetches; only
-      # fires on a bug in the slug rule — exactly when no request must be made.
+      # Belt and braces around the URL this job builds and then fetches. The
+      # slug rule already makes a branch name incapable of changing the host,
+      # so this only ever fires on a bug in that rule — which is exactly when a
+      # request must not be made.
       PREVIEW_URL_RE: '^https://[a-z0-9-]+-dataslope\.subwaymatch\.workers\.dev$'
-      # The whole keep set rests on single HTTP GETs, so retry before
-      # believing a negative answer.
+      # A probe is a single HTTP GET and the whole keep set rests on it, so
+      # retry before believing a negative answer. Applies to production (where
+      # exhausting it aborts the run) and to previews (where it triggers the
+      # per-branch fallback).
       PROBE_ATTEMPTS: "3"
-      # Scheduled runs delete for real; manual runs honor dry_run (default true).
+      # Scheduled runs delete for real; manual runs honor the dry_run input
+      # (default true).
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
-      # For the `gh api` calls below.
+      # For the `gh api` calls below. GITHUB_TOKEN with contents+checks read.
       GH_TOKEN: ${{ github.token }}
       AWS_ACCESS_KEY_ID: ${{ secrets.R2_INC_CACHE_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_INC_CACHE_SECRET_ACCESS_KEY }}
-      # Secrets can't be tested from inside `run:` (unset arrives as empty),
-      # so resolve it here.
+      # Secrets cannot be tested from inside `run:` (an unset one arrives as
+      # empty, indistinguishable from a set-but-empty one), so resolve it here.
       CREDS_SET: ${{ secrets.R2_INC_CACHE_ACCESS_KEY_ID != '' && secrets.R2_INC_CACHE_SECRET_ACCESS_KEY != '' }}
       AWS_DEFAULT_REGION: auto
       AWS_EC2_METADATA_DISABLED: "true"
-      # R2 intermittently 500s on DeleteObject and the CLI's legacy retry
-      # gives up after ~2 tries; standard mode + more attempts absorbs bursts
-      # inside a single `aws s3 rm` before delete_folder's loop intervenes.
+      # R2 intermittently returns a transient 500 InternalError on DeleteObject.
+      # The CLI's default (legacy) retry gives up after ~2 tries; switch to the
+      # standard retry mode and raise the attempt count so a burst of transient
+      # errors is absorbed inside a single `aws s3 rm` before the per-folder
+      # retry loop (see delete_folder) even has to intervene.
       AWS_RETRY_MODE: standard
       AWS_MAX_ATTEMPTS: "10"
       ENDPOINT: https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
@@ -148,29 +322,51 @@ jobs:
           set -euo pipefail
           aws() { command aws --endpoint-url "$ENDPOINT" "$@"; }
 
-          # 0) An unset CLOUDFLARE_ACCOUNT_ID collapses ENDPOINT; every aws
-          #    call fails, and step 5's `|| true` turns that into an empty
-          #    folder list — a green run that silently stopped pruning. Fail
-          #    loudly instead.
+          # 0) An unset CLOUDFLARE_ACCOUNT_ID collapses ENDPOINT to
+          #    "https://.r2.cloudflarestorage.com": every aws call then fails,
+          #    and the `|| true` on the listing in step 5 turns that into an
+          #    empty folder list, i.e. a green run that silently stopped pruning
+          #    and lets the bucket grow unbounded. Fail loudly instead. (Worth
+          #    guarding because this secret was named CF_ACCOUNT_ID until
+          #    Cloudflare deprecated the CF_* prefix, so an older repo may still
+          #    hold it under the old name.)
           if [[ "$ENDPOINT" == "https://.r2.cloudflarestorage.com" ]]; then
             echo "::error::Repository secret CLOUDFLARE_ACCOUNT_ID is not set (it was previously named CF_ACCOUNT_ID). Aborting without deleting."
             exit 1
           fi
 
-          # 0b) Missing credentials fail the same silent way, with no
-          #     malformed ENDPOINT to catch them by: unsigned requests are
-          #     rejected, step 5's `|| true` swallows it, the run goes green
-          #     having pruned nothing.
+          # 0b) Missing credentials fail exactly the same silent way, and there
+          #     is no malformed ENDPOINT to catch them by: unsigned requests are
+          #     rejected, the `|| true` in step 5 swallows it, and the run goes
+          #     green having pruned nothing. This is a live risk right now — the
+          #     secrets were renamed to R2_INC_CACHE_* on 2026-07-30, and a
+          #     scheduled run firing between deleting the old pair and creating
+          #     the new one would otherwise report success while the bucket grew.
           if [[ "$CREDS_SET" != "true" ]]; then
             echo "::error::Repository secrets R2_INC_CACHE_ACCESS_KEY_ID and R2_INC_CACHE_SECRET_ACCESS_KEY are not both set (renamed 2026-07-30 from R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY). Aborting without deleting."
             exit 1
           fi
 
-          # Total bytes under a prefix. The CLI auto-paginates and applies
-          # --query per page, so each page emits one tab-separated batch (the
-          # same shape step 6's LastModified query relies on); flatten and
-          # sum. LISTs are Class A ops, so only the whole prefix and folders
-          # on their way out are weighed. Missing/empty prefix yields 0.
+          # Delete a folder, tolerating R2's intermittent 500 InternalError on
+          # DeleteObject. `aws s3 rm --recursive` re-lists the folder on every
+          # invocation and only deletes what is still present, so repeated
+          # attempts converge on an empty folder. Returns non-zero only if the
+          # folder still has objects after every attempt (a persistent, not
+          # transient, failure), so one flaky delete no longer aborts the run.
+          # Total bytes under a prefix, whether that is the whole cache or one
+          # build folder. The CLI auto-paginates and applies --query per page,
+          # and `Contents[].Size` is a flat list, so each page emits one
+          # tab-separated batch — the same shape the LastModified query in step
+          # 6 relies on. Flatten to one number per line and sum.
+          #
+          # A LIST returns at most 1,000 keys per request, so a pass over the
+          # whole prefix is ~18 requests at 17,000 objects and ~2 over a single
+          # 1,081-object build folder. Weighing roughly doubles the job's LIST
+          # count — a full sweep goes from ~57 requests to ~105 — which is worth
+          # it at Class A's $4.50/million (~$0.0005 a run, inside R2's 1,000,000
+          # free monthly Class A operations) but is not free enough to sprinkle
+          # around: only the whole prefix and folders on their way out are
+          # weighed. A missing or empty prefix yields 0.
           bucket_bytes() {
             aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$1" \
               --query 'Contents[].Size' --output text 2>/dev/null \
@@ -178,13 +374,11 @@ jobs:
               | awk '{ s += $1 } END { printf "%d", s + 0 }'
           }
 
-          # GB is decimal, matching the R2 dashboard; awk because bash has no
-          # floating point.
+          # Bytes are reported in GB (decimal, matching how Cloudflare's R2
+          # dashboard counts) via awk, since bash has no floating point.
           gb() { awk -v b="${1:-0}" 'BEGIN { printf "%.2f", b / 1e9 }'; }
           pct() { awk -v a="${1:-0}" -v b="${2:-0}" 'BEGIN { printf "%.0f", (b > 0 ? a * 100 / b : 0) }'; }
 
-          # Tolerates R2's transient DeleteObject 500s: `s3 rm` re-lists each
-          # attempt, so retries converge. Non-zero only on persistent failure.
           delete_folder() {
             local folder="$1" attempt
             for attempt in 1 2 3 4 5; do
@@ -197,16 +391,26 @@ jobs:
             return 1
           }
 
-          # Ask a running Worker which build it serves (OPEN_NEXT_BUILD_ID
-          # verbatim, byte-identical to the R2 folder name). Validate the
-          # shape: an edge HTML error page treated as a build ID would match
-          # no folder and protect nothing. Three outcomes, because "no answer"
-          # and "no such deployment" call for opposite responses:
-          #   0 + build ID   the deployment answered
-          #   2              edge 404: no deployment at this alias — caller
-          #                  must NOT fall back
-          #   1              no usable answer after PROBE_ATTEMPTS — caller
-          #                  must assume the worst and be generous
+          # Ask a running Worker which build it is serving from. This is the
+          # whole basis of the keep set, so a single failed request is not
+          # taken as an answer: retry, and only then report failure. Prints the
+          # build ID on success and nothing on failure.
+          #
+          # The response is OPEN_NEXT_BUILD_ID verbatim (see
+          # app/api/cache-build-id/route.ts), which on Workers Builds is the
+          # deployed commit SHA and is byte-identical to the R2 folder name.
+          # Validate the shape anyway: an HTML error page from an edge in front
+          # of the Worker would otherwise be treated as a build ID, which
+          # cannot match a folder and so protects nothing.
+          #
+          # Three outcomes, because "no answer" and "no such deployment" call
+          # for opposite responses:
+          #   0 + the build ID   the deployment answered
+          #   2                  the edge returned 404: this alias has no
+          #                      deployment at all, so there is nothing to
+          #                      protect and the caller must NOT fall back
+          #   1                  no usable answer after PROBE_ATTEMPTS, so the
+          #                      caller must assume the worst and be generous
           probe_build_id() {
             local url="$1" attempt out code body
             for (( attempt = 1; attempt <= PROBE_ATTEMPTS; attempt++ )); do
@@ -217,8 +421,9 @@ jobs:
                 printf '%s' "$body"
                 return 0
               fi
-              # 404 = hostname resolves to no deployment; definitive, so
-              # don't retry.
+              # A 404 is Cloudflare's edge saying the hostname resolves to no
+              # deployment. It is definitive and permanent, so retrying it just
+              # burns the sweep's time.
               if [[ "$code" == "404" ]]; then
                 return 2
               fi
@@ -229,12 +434,24 @@ jobs:
             return 1
           }
 
-          # A branch's stable preview alias (not the per-commit Preview URL):
-          # branch name with everything outside [a-z0-9-] folded to '-',
-          # joined to the worker name. DNS labels cap at 63 chars and
-          # Cloudflare truncates to fit; rather than guess where, an over-long
-          # name yields no alias and falls back — the failure mode is
-          # "protect more than necessary", never "probe the wrong host".
+          # A branch's preview alias URL: the stable per-branch hostname
+          # Workers Builds assigns, as opposed to the per-commit Preview URL
+          # (which is keyed by version ID and useless for asking "what is this
+          # branch serving now").
+          #
+          # The alias is the branch name with every character outside [a-z0-9-]
+          # folded to '-', joined to the worker name. Verified 2026-08-14
+          # against both live aliases:
+          #   test-no-open-pr-001
+          #     -> test-no-open-pr-001-dataslope.subwaymatch.workers.dev
+          #   claude/sql-playground-info-wrap-gdt49u
+          #     -> claude-sql-playground-info-wrap-gdt49u-dataslope.subway….dev
+          #
+          # A DNS label caps at 63 characters and Cloudflare truncates to fit.
+          # Rather than guess where it cuts, refuse to guess at all: an
+          # over-long branch name yields no alias and falls back (see step 4),
+          # so the failure mode is "protect more than necessary", never
+          # "confidently probe the wrong host".
           preview_alias() {
             local branch="$1" slug label url
             slug="$(printf '%s' "$branch" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9-' '-')"
@@ -249,22 +466,79 @@ jobs:
             printf '%s' "$url"
           }
 
-          # The keep set: build ID -> why. `keep_class` separates "a
-          # deployment is serving this now" (never capped) from "a branch head
-          # names this" (capped by MAX_BRANCHES).
+          # Is this branch's work finished? Prints "<status>\t<detail>", where
+          # status is one of:
+          #
+          #   retired  every pull request for this branch has merged or closed
+          #            and the head has not moved since, so nothing it deploys
+          #            is wanted any more and it claims no folder at all
+          #   active   an open pull request, or commits pushed after the last
+          #            one closed, or the lookup failed
+          #   none     no pull request has ever had this branch as its head, so
+          #            there is no end signal to read; treated as active and
+          #            named in the log
+          #
+          # See the header for why the head-has-not-moved clause is what makes
+          # retirement safe to act on the instant a pull request closes.
+          #
+          # One request per branch, filtered by head, rather than paginating
+          # every pull request the repo has ever had (665 and counting) to find
+          # the handful that matter. `head` wants `<owner>:<branch>`; a fork's
+          # branch therefore cannot match, which is correct — a fork branch is
+          # not in this repo and has no preview here.
+          branch_pr_status() {
+            local branch="$1" head_sha="$2" prs number state sha merged_at
+            local open="" closed="" seen=0
+            if ! prs="$(gh api "repos/$GITHUB_REPOSITORY/pulls" -X GET \
+                  -f state=all -f per_page=100 \
+                  -f head="${GITHUB_REPOSITORY_OWNER}:${branch}" \
+                  --jq '.[] | [.number, .state, .head.sha, (.merged_at // "")] | @tsv')"; then
+              # Never retire a branch on a GitHub hiccup: the whole point of
+              # this rule is to delete more, so a failed lookup has to leave
+              # the preview protected rather than unprotected.
+              echo "::warning::Could not read pull requests for '$branch'; treating it as active." >&2
+              printf 'active\tpull request lookup failed, so the branch is assumed to be in use\n'
+              return 0
+            fi
+            while IFS=$'\t' read -r number state sha merged_at; do
+              [[ -z "$number" ]] && continue
+              seen=$((seen+1))
+              if [[ "$state" == "open" ]]; then
+                open="${open:+$open, }#$number"
+              elif [[ "$sha" == "$head_sha" ]]; then
+                closed="#$number $([[ -n "$merged_at" ]] && echo merged || echo closed)"
+              fi
+            done <<< "$prs"
+            if [[ -n "$open" ]]; then
+              printf 'active\topen pull request %s\n' "$open"
+            elif [[ -n "$closed" ]]; then
+              printf 'retired\t%s, and its head has not moved since\n' "$closed"
+            elif (( seen > 0 )); then
+              printf 'active\tits pull requests are all closed, but commits landed after the last one\n'
+            else
+              printf 'none\tno pull request has ever had this branch as its head\n'
+            fi
+          }
+
+          # The keep set: build ID -> why it is kept. `keep_class` separates
+          # "a deployment is serving this right now" (never capped) from "a
+          # branch head names this" (capped by MAX_BRANCHES, see step 6).
           declare -A keep_reason keep_class
           remember() {
             local sha="$1" class="$2" reason="$3"
             if [[ -z "$sha" ]]; then return 0; fi
-            # First reason wins: strongest claims are registered first.
+            # First reason wins, so the strongest claim is the one reported:
+            # production is registered before branch heads, and a live probe
+            # before the head it may or may not equal.
             if [[ -n "${keep_reason[$sha]+set}" ]]; then return 0; fi
             keep_reason["$sha"]="$reason"
             keep_class["$sha"]="$class"
           }
 
-          # 1) What production serves RIGHT NOW. Exhausting retries aborts:
-          #    without this answer every folder is unexplained, and the sweep
-          #    would delete the live cache and 500 the site.
+          # 1) What production is serving RIGHT NOW. The only authoritative
+          #    source is the Worker itself. Exhausting the retries aborts the
+          #    run: without this answer every folder is unexplained, and the
+          #    sweep would delete the live cache and 500 the site.
           if ! prod_id="$(probe_build_id "$BUILD_ID_URL")"; then
             echo "::error::Could not read a valid production build ID from $BUILD_ID_URL after $PROBE_ATTEMPTS attempts. Aborting without deleting."
             exit 1
@@ -272,11 +546,13 @@ jobs:
           prod_folder="${PREFIX}${prod_id}/"
           remember "$prod_id" live "live production, probed at $BUILD_ID_URL"
 
-          # 2) What production is ABOUT TO serve: head(default_branch). During
-          #    the minutes between "cache populated" and "Worker switched" the
-          #    probe still reports the outgoing build — that gap wiped the
-          #    live cache mid-deploy on 2026-07-16. Unbounded in time, so a
-          #    stalled deploy cannot age out.
+          # 2) What production is ABOUT TO serve. Production builds only ever
+          #    come from the default branch, so its head is the incoming build:
+          #    during the minutes between "cache populated" and "Worker
+          #    switched" the probe above still reports the outgoing build, and
+          #    that gap is what wiped the live cache mid-deploy on 2026-07-16.
+          #    Naming the exact commit replaces the old MAIN_COMMITS window and
+          #    is unbounded in time, so a stalled deploy cannot age out of it.
           if ! default_branch="$(gh api "repos/$GITHUB_REPOSITORY" --jq .default_branch)" \
              || [[ -z "$default_branch" ]]; then
             echo "::error::Could not resolve the default branch from GitHub. Aborting without deleting."
@@ -289,8 +565,10 @@ jobs:
           fi
           remember "$default_head" next "head of '$default_branch', production's incoming build"
 
-          # 3) Enumerate branches (not PRs — see header). Abort on API
-          #    failure: a transient error would leave every preview folder
+          # 3) Enumerate branches. Workers Builds builds every branch on every
+          #    push regardless of whether a pull request exists, so this asks
+          #    for branches rather than PRs (see the header). Abort on API
+          #    failure: a transient error here would leave every preview folder
           #    unexplained, i.e. deleted.
           if ! branches_raw="$(gh api "repos/$GITHUB_REPOSITORY/branches?per_page=100" --paginate \
                 --jq '.[] | [.name, .commit.sha] | @tsv')"; then
@@ -304,22 +582,53 @@ jobs:
           done <<< "$branches_raw"
           echo "Branches: $branch_total"
 
-          # 4) Per branch, register the head commit (about to serve) and the
-          #    probe (serving now). Usually the same folder, occasionally not:
-          #    a push moves the head while the preview keeps serving the
-          #    previous commit — deleting that older folder 500'd a live
-          #    preview on 2026-08-05.
-          probed=0
+          # 4) For each branch, register what its preview is about to serve
+          #    (the head commit) and what it is serving right now (the probe).
+          #    These are usually the same folder and occasionally are not,
+          #    which is the entire point: a push moves the head immediately
+          #    while the preview Worker keeps serving the previous commit until
+          #    the new build lands. Deleting that older folder is what 500'd a
+          #    live preview on 2026-08-05.
+          probed=0; retired=0
           while IFS=$'\t' read -r branch head_sha; do
             [[ -z "$branch" ]] && continue
-            remember "$head_sha" branch "head of '$branch', that preview's incoming build"
 
-            # The default branch has no preview (it deploys to PRODUCTION,
-            # already probed in step 1). Probing it would fail into the
-            # fallback below and needlessly pin its last FALLBACK_COMMITS.
+            # The default branch has no preview: pushing to it deploys to
+            # PRODUCTION, which step 1 already probed at its own URL, and
+            # https://main-dataslope.…workers.dev 404s (measured 2026-08-14).
+            # Probing it anyway is not merely wasted — its failure would drop
+            # into the fallback below and pin the last FALLBACK_COMMITS
+            # commits of the default branch, which is MAIN_COMMITS resurrected
+            # by accident and cost 2.5 GB per run in the first dry run of this
+            # rewrite.
             if [[ "$branch" == "$default_branch" ]]; then
+              # Claimed from the branch listing as well as from step 2. The two
+              # reads are seconds apart and a push landing between them makes
+              # this the newer answer; remember() keeps the first claim, so the
+              # usual case where they agree costs nothing.
+              remember "$head_sha" next "head of '$default_branch', production's incoming build"
               continue
             fi
+
+            # Ask whether the branch still has work in it BEFORE claiming
+            # anything for it. A retired branch's head is as dead as the build
+            # its preview is still serving, and claiming either holds ~2.5 GB
+            # for code that already landed on the default branch.
+            pr_status=""; pr_detail=""
+            IFS=$'\t' read -r pr_status pr_detail < <(branch_pr_status "$branch" "$head_sha")
+            if [[ "$pr_status" == "retired" ]]; then
+              echo "Retired '$branch' ($pr_detail); it claims no build folder."
+              retired=$((retired+1))
+              continue
+            fi
+            if [[ "$pr_status" == "none" ]]; then
+              # Named explicitly, because this is the one branch shape nothing
+              # here can ever retire: it holds its folders for as long as it
+              # exists, and only deleting the branch releases them.
+              echo "Branch '$branch' has no pull request ($pr_detail); treated as work in progress."
+            fi
+
+            remember "$head_sha" branch "head of '$branch', that preview's incoming build"
 
             if (( probed >= MAX_BRANCHES )); then
               echo "::warning::More than $MAX_BRANCHES branches exist; '$branch' was not probed and is protected only by its head commit. Delete merged branches, or raise MAX_BRANCHES."
@@ -337,24 +646,31 @@ jobs:
             fi
 
             if (( rc == 0 )); then
-              # Logged even when remember() dedupes it under an earlier claim,
-              # so the run output still shows that the probe ran.
+              # Logged even though remember() may discard it as a duplicate.
+              # It usually IS one — a healthy preview serves its own branch
+              # head — and when the answer is deduped under an earlier claim
+              # the keep-set listing shows that other claim's reason, leaving
+              # no trace that the probe ran at all. A dry run exists to be read.
               echo "Preview '$branch' is serving ${served:0:12} (probed at $alias_url)"
               remember "$served" live "serving the '$branch' preview, probed at $alias_url"
               continue
             fi
 
-            # Definitive 404: no deployment at all, nothing live to protect —
-            # the head-commit claim above is the whole truth, no fallback.
+            # A definitive 404 means this branch has no deployment at all —
+            # its build failed, or has not run. There is nothing live to
+            # protect, so the head-commit claim registered above is the whole
+            # truth and the fallback would only pin folders nobody is reading.
             if (( rc == 2 )); then
               echo "No deployment at $alias_url for '$branch' (404); its head build is the only claim it has."
               continue
             fi
 
-            # rc == 1: no answer. A probe failure must never widen into a
-            # delete — fall back for THIS BRANCH ONLY, never abort the sweep.
-            # But losing the probe AND the commit list means knowing nothing
-            # about the branch, so abort rather than guess.
+            # rc == 1: no answer either way. A probe failure must never widen
+            # into a delete, so fall back to the pre-probe behaviour for THIS
+            # BRANCH ONLY and never abort the sweep over one flaky preview.
+            # Losing the probe AND the commit list, though, means knowing
+            # nothing about the branch — the one case conservative behaviour
+            # cannot be synthesised from, so abort rather than guess.
             if ! recent="$(gh api "repos/$GITHUB_REPOSITORY/commits" -X GET \
                   -f sha="$branch" -f per_page="$FALLBACK_COMMITS" --jq '.[].sha')"; then
               echo "::error::Could not probe the '$branch' preview and could not list its recent commits either. Aborting without deleting."
@@ -367,6 +683,7 @@ jobs:
             done <<< "$recent"
           done <<< "$branches_raw"
 
+          echo "Branches: $branch_total total | $retired retired | $probed previews probed"
           echo "Keep set (${#keep_reason[@]} build IDs):"
           for sha in "${!keep_reason[@]}"; do
             echo "  ${sha:0:12}  ${keep_reason[$sha]}"
@@ -384,8 +701,11 @@ jobs:
             exit 0
           fi
 
-          # Measured over the whole prefix, not summed per folder, so objects
-          # outside any build folder are counted too.
+          # What the bucket weighs before this run touches anything. Measured
+          # over the whole prefix rather than summed from the per-folder
+          # listings below, so it counts every object under it — including any
+          # that is not inside a build folder, which a sum of folders would
+          # silently miss.
           bytes_before="$(bucket_bytes "$PREFIX")"
           echo "Bucket before: $(gb "$bytes_before") GB across ${#folders[@]} build folders"
 
@@ -398,25 +718,46 @@ jobs:
 
           now=$(date -u +%s)
           grace_cutoff=$(( now - GRACE_HOURS * 3600 ))
-          echo "Policy: keep what production and every branch preview are serving or about to serve, plus anything populated in the last ${GRACE_HOURS}h (since $(date -u -d "@$grace_cutoff" '+%Y-%m-%d %H:%M:%SZ'))"
+          echo "Policy: keep what production and every ACTIVE branch's preview are serving or about to serve, plus anything populated in the last ${GRACE_HOURS}h (since $(date -u -d "@$grace_cutoff" '+%Y-%m-%d %H:%M:%SZ')). A branch whose pull request has merged or closed, with no commits since, keeps nothing."
           echo "Dry run: $DRY_RUN"
 
           # 6) Date every non-production folder by when it was POPULATED, so
-          #    the grace window means what it says and the MAX_BRANCHES cap
-          #    has a global newest-first order.
+          #    the grace window means what it says and the MAX_BRANCHES cap has
+          #    a global newest-first order to apply.
           entries=()
           for folder in "${folders[@]}"; do
             [[ "$folder" == "$prod_folder" ]] && continue
 
-            # MEDIAN LastModified, not the newest: objects can also arrive at
-            # REQUEST time long after the deploy (cached 404s once reset a
-            # folder's apparent age for hours, holding it inside GRACE_HOURS).
-            # The median is immune by construction — a ~1,081-object burst
-            # can't be moved by a few late writes — and stays seconds-old
-            # during an in-flight populate, which is what the grace window
-            # protects. Pages emit one tab-separated batch each; flatten and
-            # sort (R2's uniform UTC ISO-8601 makes lexical = chronological),
-            # dropping the "None" an empty page emits.
+            # Use the MEDIAN object's LastModified, not the newest.
+            #
+            # A deploy writes the whole folder in one burst (measured
+            # 2026-08-14: median 0.8 min, max 1.8 min for ~1,081 objects), so
+            # any object in the burst dates the folder to within a couple of
+            # minutes. The max does NOT, because objects also arrive at REQUEST
+            # time, long after the deploy: a `/courses/*` path that isn't
+            # prerendered used to render the not-found page and get that 404
+            # cached (~1.8 MB, `revalidate: false`) into whichever build folder
+            # was live. Every such write reset the folder's apparent age to
+            # zero. Folder 0127baf6 was populated at 17:54 and then took 404
+            # writes at 18:22, 19:59, 20:46 and 21:07 — gaps of 28, 97, 47 and
+            # 21 minutes, every one inside GRACE_HOURS — so it was held as
+            # "possibly an in-flight deploy" more than three hours after its
+            # deploy finished. 4 of 33 folders were affected.
+            #
+            # `dynamicParams = false` on the courses route has since stopped
+            # those writes at the source (an unmatched path now 404s without
+            # rendering), but the median stays: any future request-time write
+            # would revive the bug, and the median costs nothing. It is immune
+            # by construction (a burst of ~1,081 objects cannot be moved by a
+            # handful of late ones) and stays correct for the case the grace
+            # window exists to protect — during an in-flight populate the
+            # median of what has landed so far is also seconds old.
+            #
+            # The CLI auto-paginates above 1000 objects and applies --query per
+            # page, so this emits one tab-separated batch PER PAGE. Flatten to
+            # one stamp per line and sort globally: R2 reports LastModified in a
+            # uniform UTC ISO-8601 layout, so a lexical sort is chronological.
+            # Drop the "None" a genuinely empty page emits.
             mapfile -t stamps < <(
               aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$folder" \
                 --query 'Contents[].LastModified' --output text 2>/dev/null \
@@ -437,9 +778,11 @@ jobs:
             sha="${folder#"$PREFIX"}"; sha="${sha%/}"
 
             if [[ -n "${keep_reason[$sha]+set}" ]]; then
-              # Branch-head claims are capped; live-probe claims are not:
-              # over the cap the first costs a preview its next build, the
-              # second takes down a deployment serving right now.
+              # A folder claimed only by a branch head is capped; one a live
+              # probe named is not. The difference matters: over the cap, the
+              # first costs a preview its next build (it re-populates on the
+              # next push), while the second takes down a deployment that is
+              # serving from it right now.
               if [[ "${keep_class[$sha]}" == "branch" ]]; then
                 branches=$((branches+1))
                 if (( branches > MAX_BRANCHES )); then
@@ -453,15 +796,21 @@ jobs:
                 kept=$((kept+1)); continue
               fi
             elif (( ts >= grace_cutoff )); then
-              # Deliberately blind: a just-populated deploy may be visible to
+              # Last line of defence, and deliberately blind to what the folder
+              # is: a deploy that populated moments ago may be visible to
               # neither a probe nor a branch head yet.
               echo "KEEP  $folder (populated $populated, inside the ${GRACE_HOURS}h grace window, possibly an in-flight deploy)"
               kept=$((kept+1)); continue
             else
-              echo "DELETE $folder (populated $populated, nothing is serving it and no branch head claims it)"
+              # "No active branch" rather than "nothing is serving it": a
+              # retired branch's preview may well still be answering from this
+              # folder, and taking that preview down is the intended outcome.
+              echo "DELETE $folder (populated $populated, claimed by no live deployment and no active branch)"
             fi
 
-            # Weigh BEFORE removing — afterwards there's nothing to measure.
+            # Weigh it BEFORE removing it — afterwards there is nothing left to
+            # measure. Only folders on their way out are weighed, so this costs
+            # nothing on a run that deletes nothing.
             folder_size="$(bucket_bytes "$folder")"
             echo "       ($(gb "$folder_size") GB)"
 
@@ -470,28 +819,36 @@ jobs:
             elif delete_folder "$folder"; then
               deleted=$((deleted+1)); freed=$((freed + folder_size))
             else
-              # Persistent failure: keep sweeping the rest, fail the job at
-              # the end; the next run retries this folder.
+              # Persistent (non-transient) failure: log it, keep sweeping the
+              # rest, and fail the job at the end so it's surfaced. The next
+              # scheduled run retries this folder from scratch.
               echo "::error::Could not fully delete $folder after 5 attempts (persistent R2 errors)."
               failed=$((failed+1))
             fi
           done < <(printf '%s\n' ${entries[@]+"${entries[@]}"} | sort -rn)
 
           echo "---"
+          # DRY_RUN is always exactly "true" or "false"; choose the verb to match.
+          # (A ${DRY_RUN/true/would be } substitution used to leak a literal
+          # "false" into the summary on real runs, "folders falsedeleted".)
           if [[ "$DRY_RUN" == "true" ]]; then
             echo "Folders kept: $kept | folders would be deleted: $deleted"
-            # Nothing was removed, so the closing size is arithmetic, and says so.
+            # Nothing was removed, so the closing size is arithmetic rather
+            # than a measurement, and says so.
             echo "Bucket: $(gb "$bytes_before") GB now -> $(gb "$((bytes_before - freed))") GB projected | would free $(gb "$freed") GB ($(pct "$freed" "$bytes_before")%)"
           else
             echo "Folders kept: $kept | folders deleted: $deleted | folders failed: $failed"
-            # Re-measure rather than subtract: stays honest when a delete
-            # failed or a deploy wrote a new folder mid-sweep.
+            # Re-measure rather than subtract. R2 is strongly consistent after
+            # a delete, so this is the ground truth of what the run achieved,
+            # and it stays honest when a folder failed to delete or when a
+            # deploy wrote a new one while the sweep was running — both cases
+            # where `before - freed` would quietly overstate the result.
             bytes_after="$(bucket_bytes "$PREFIX")"
             echo "Bucket: $(gb "$bytes_before") GB before -> $(gb "$bytes_after") GB after | freed $(gb "$((bytes_before - bytes_after))") GB ($(pct "$((bytes_before - bytes_after))" "$bytes_before")%)"
           fi
 
-          # Surface persistent delete failures, but only after every folder
-          # was attempted.
+          # Surface persistent delete failures loudly, but only after every
+          # folder has been attempted, a later run will retry the stragglers.
           if (( failed > 0 )); then
             echo "::error::${failed} folder(s) could not be fully deleted after retries; the next scheduled run will retry them."
             exit 1
