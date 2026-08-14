@@ -71,11 +71,24 @@ Production and preview deploys run through Cloudflare Workers Builds rather than
 | Field | Value |
 | --- | --- |
 | Build command | `npx opennextjs-cloudflare build` |
-| Deploy command | `npx opennextjs-cloudflare deploy && npm run db:seed:search:remote` |
-| Non-production branch deploy command | `npx opennextjs-cloudflare upload` |
+| Deploy command | `npx opennextjs-cloudflare deploy --cacheChunkSize 100 && npm run db:seed:search:remote` |
+| Non-production branch deploy command | `npx opennextjs-cloudflare upload --cacheChunkSize 100` |
 | Path | `/` |
 
 Both `deploy` (production) and `upload` (preview versions) populate the R2 cache before shipping, `upload` wraps `wrangler versions upload`, so previews get the same populated cache production does. `Path` is `/` because this Worker lives at the repo root; the CORS proxy under `cloudflare-cors-proxy/` is a separate Worker with its own config.
+
+**`--cacheChunkSize` is how many cache objects are written to R2 at once, and the default is 25.** That default is not sized for this cache: the populate step ships **1,081 objects / 2.34 GiB on every deploy, production and every preview** (see [Incremental cache cleanup](#incremental-cache-cleanup) for why a full copy goes up each time), and at 25 in flight that is 44 sequential rounds of ~2.2 MB uploads. Both commands accept the flag — it is declared on `deploy` and `upload` alike, and OpenNext's arg parser consumes it rather than forwarding it to `wrangler`, so it cannot confuse the deploy underneath.
+
+Raising it is low-risk in the way that matters: an overloaded populate does not fail the build, it retries. `sendEntryToR2Worker` treats 5xx and "Worker exceeded resource limits" as retryable and backs off over up to 15 attempts, so too high a number degrades to *slower*, not broken. Measured against the local target, from an identical empty store each time:
+
+| `--cacheChunkSize` | wall time | entries | retried | failed |
+| --- | ---: | ---: | ---: | ---: |
+| 25 (default) | 179.2 s | 1,081 | 46 | 0 |
+| 100 | **81.0 s** | 1,081 | **11** | 0 |
+
+The retry column is the one that answers the risk: four times the concurrency did not strain the populate, it produced *fewer* retries, because the run finishes sooner.
+
+**Do not read the wall-time column as a prediction of the remote gain.** The local target is miniflare's on-disk R2, so that run is disk-bound where a deploy is network-bound — visible in the local throughput *falling* from 12.9 to 7.1 objects/s as the store grew, which is a property of the local store and not of the path a deploy takes. The honest measurement is the deploy stage's wall time in the Cloudflare build log, before and after. If it does not improve, the populate is bandwidth-bound rather than concurrency-bound and the flag can come back out; nothing else depends on it.
 
 The search re-seed is appended to the **production** deploy command only, and the ordering is deliberate on both counts. It runs after `deploy` so a hiccup rebuilding the search index can never block shipping the site itself. And it is absent from the preview command because there is one `dataslope-search` database and one set of rows in it: a preview build that seeded would overwrite production's index with a feature branch's content, and nothing would look broken until someone searched.
 

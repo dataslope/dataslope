@@ -153,7 +153,7 @@ with 3 threads.
 
 ## 5. Recommended next, ranked by payoff per unit of risk
 
-### 5.1 **Dashboard** — raise the R2 populate concurrency (est. large, zero code)
+### 5.1 **Dashboard** — raise the R2 populate concurrency ✅ *documented, needs the dashboard edit*
 
 The deploy step writes 1,081 objects / 2.34 GiB through a helper Worker, **one HTTP POST per
 object, 25 in flight** (`cacheChunkSize ?? 25`, `populate-cache.js:199`). That default is not tuned
@@ -168,8 +168,32 @@ There is also `--rclone`, which swaps the per-object POSTs for an rclone sync ag
 endpoint; it needs the optional `rclone.js` peer dependency. Try `--cacheChunkSize` first — it is a
 one-word change and instantly revertible.
 
-**This is the single cheapest thing on the list and it is untested here** only because populating
-R2 needs credentials this environment does not have. Time one deploy before and after.
+**Verified (2026-08-14).** Four things, so the dashboard edit can be made without a leap of faith:
+
+1. The flag is declared on **both** `deploy` and `upload` (both use `withPopulateCacheOptions`),
+   confirmed against `--help` on each.
+2. It parses to the *number* `100` in both `--cacheChunkSize 100` and `--cacheChunkSize=100` form,
+   and — the failure mode that would actually break a deploy — it is **consumed by OpenNext's
+   parser and never forwarded to `wrangler`**. `getWranglerArgs` only passes through *unrecognised*
+   flags, and a genuine wrangler flag next to it (`--dry-run`) still passes through correctly.
+3. It reaches `maxConcurrency` in `sendEntriesToR2Worker` — the *same* function the remote populate
+   uses. Local and remote differ only by `dev: { remote }`.
+4. Run end to end against the local target, from an identical empty store each time:
+
+   | `--cacheChunkSize` | wall time | entries | retried | failed |
+   | --- | ---: | ---: | ---: | ---: |
+   | 25 (default) | 179.2 s | 1,081 | 46 | 0 |
+   | 100 | **81.0 s** | 1,081 | **11** | 0 |
+
+   The retry column is what matters. The risk of raising concurrency was that the helper Worker
+   would start shedding load and the retry/backoff path would eat the gain; instead 4× the
+   concurrency produced *fewer* retries, and neither run lost an entry.
+
+**The wall-time column does not transfer.** That run is disk-bound (miniflare's on-disk R2), not
+network-bound — local throughput *fell* from 12.9 to 7.1 objects/s as the store grew, which is the
+local store's behaviour, not the deploy's. Treat the 2.2× as evidence the machinery scales, not as
+a prediction. The real number is the deploy stage's wall time in the Cloudflare build log; the next
+push to a PR measures the preview (`upload`) path directly.
 
 ### 5.2 Halve the R2 populate by dropping the duplicated segment data (est. −40% of 2.34 GiB)
 
@@ -257,7 +281,7 @@ Worth recording so nobody re-does it:
 | Action | Saving | Risk | Where |
 | --- | --- | --- | --- |
 | Parallelise `build-search-corpus` | −10 s | none (byte-identical, tested) | **shipped here** |
-| `--cacheChunkSize 100` on both deploy commands | likely tens of seconds | trivially revertible | Dashboard |
+| `--cacheChunkSize 100` on both deploy commands | 2.2× on the local path; remote TBD | none found — fewer retries, no lost entries | **README updated; needs the dashboard edit** |
 | `experimental.clientSegmentCache: false` | −40% of a 2.34 GiB upload | needs a preview test | `next.config.ts` |
 | Typecheck in Actions + `ignoreBuildErrors` | −29 s | ships type errors to `main` | new workflow |
 | Generator cache under `.next/cache` | up to −33 s | corrupt-restore surface | `build-cache.mjs` |
