@@ -82,10 +82,9 @@ describe("the committed manifest", () => {
   });
 
   it("holds bundles that kept their imports external", () => {
-    // The whole reason a bundle is small enough to commit: bare imports
-    // rewrite to pinned esm.sh URLs and stay external, so a bundle carries
-    // the block's own code and not a copy of React. If that ever changed,
-    // every entry would grow by ~300 kB and the manifest would balloon.
+    // Bare imports rewrite to pinned esm.sh URLs and stay external, so a
+    // bundle carries the block's own code and not a copy of React; otherwise
+    // every entry would grow by ~300 kB.
     const all = Object.values(entries).flatMap((byKey) => Object.values(byKey));
     expect(all.length).toBeGreaterThan(0);
     const total = all.reduce((n, e) => n + e.js.length + (e.css?.length ?? 0), 0);

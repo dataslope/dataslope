@@ -1,20 +1,12 @@
 "use client";
 
 /**
- * Cloud auto-sync for a signed-in user's active workspace.
- *
- * The model: signed-in playgrounds back up to the cloud automatically, there is
- * no manual "Back up" button. This hook watches the in-tab change pulse
- * (workspaceChanges), and hands it to WorkspaceSyncEngine, which debounces and
- * uploads a fresh backup, promoting an unsaved draft to a real saved workspace
- * on the first change so it has a stable id and shows up in the list.
- *
- * OPFS stays the local source of truth (edits persist there synchronously, as
- * before); this only mirrors to the account, so an offline or failed sync never
- * loses work, and the engine retries when the connection returns.
- *
- * Everything is ref-driven so the single subscribe/online effect never tears
- * down on a prop change (buildBundle, the cloud state, etc. all change often).
+ * Cloud auto-sync for a signed-in user's active workspace: watches the in-tab
+ * change pulse and hands it to WorkspaceSyncEngine, which debounces and
+ * uploads, promoting an unsaved draft on the first change. OPFS stays the
+ * local source of truth, so a failed sync never loses work. Everything is
+ * ref-driven so the single subscribe/online effect never tears down on a
+ * prop change.
  */
 
 import { useEffect, useRef, useState } from "react";

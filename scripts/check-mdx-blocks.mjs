@@ -94,12 +94,10 @@ for (const file of files) {
   }
 }
 
-// A fence with no language is not highlighted, and nothing says so: it renders
-// as a code block in the right font at the right size, just grey. Four Java
-// snippets in the generics course shipped that way. `text` is always an
-// available answer, so there is no case where leaving it off is what the author
-// meant. Fences carrying meta (```csharp title="x") are openers too, and a
-// closing fence is backticks alone, which is what separates them.
+// A fence with no language renders unhighlighted and nothing says so. `text`
+// is always available, so leaving it off is never intended. Fences carrying
+// meta (```csharp title="x") are openers too; a closing fence is backticks
+// alone.
 for (const file of files) {
   const lines = readFileSync(file, "utf8").split("\n");
   let open = null;
@@ -121,11 +119,9 @@ for (const file of files) {
   });
 }
 
-// The authoritative pass: does the file parse as MDX at all? `remarkMath` is
-// here because `source.config.ts` has it and `$…$` would otherwise be read as
-// ordinary text; `remarkGfm` because tables are, and a table row is where one
-// of these bugs turned up. Frontmatter is blanked rather than stripped so
-// reported line numbers still point at the file.
+// The authoritative pass: does the file parse as MDX at all? remarkMath and
+// remarkGfm match source.config.ts. Frontmatter is blanked rather than
+// stripped so reported line numbers still point at the file.
 const mdx = unified().use(remarkParse).use(remarkMdx).use(remarkGfm).use(remarkMath);
 for (const file of files) {
   const src = readFileSync(file, "utf8").replace(/^---\n[\s\S]*?\n---\n/, (m) =>

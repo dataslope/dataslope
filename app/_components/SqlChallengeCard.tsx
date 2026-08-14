@@ -264,11 +264,8 @@ function defaultSqlEngineLabel(dialect: SqlDialect): string {
       : "PostgreSQL 17";
 }
 
-// Dialects whose engine has booted at least once this page session.
-// Mirrors runtimeRegistry's `ready` set for the non-SQL adapters: it
-// lets the boot notice show its "downloads once (~N MB)" cold copy only
-// on the first block of each dialect, not on every later block (whose
-// WASM is already served from the HTTP cache).
+// Dialects that booted at least once this page session, so the boot
+// notice's cold copy only shows on the first block of each dialect.
 const bootedSqlDialects = new Set<SqlDialect>();
 
 /** Boot-progress snapshot consumed by `<TableViewer>` to render the
@@ -289,26 +286,18 @@ export interface UseSqlEngineBootOptions {
 }
 
 /** Shared engine-boot lifecycle for `<SqlChallengeCard>` and
- *  `<SqlCodeBlock>`. Owns the per-block engine promise (boot + seed
- *  folded into one cached promise so every caller awaits the same
- *  fully-seeded engine, see the race note below), the live engine
- *  label, and the boot-progress state that drives the branded boot
- *  loader. Keeping it here lets both card components surface the same
- *  loading affordance the non-SQL blocks already show. */
+ *  `<SqlCodeBlock>`: the cached boot+seed promise, the live engine label,
+ *  and the boot-progress state driving the branded loader. */
 export function useSqlEngineBoot({
   dialect,
   initSql,
   remoteInitSql,
 }: UseSqlEngineBootOptions) {
-  // The promise (not the resolved engine) is cached so two near-
-  // simultaneous callers, e.g. the mount-time table-viewer boot and a
-  // Run click, share one boot. Seeding (`initSql`) is folded INTO the
-  // promise so every caller awaits the same fully-seeded engine; an
-  // earlier design flipped a "seeded" flag before `await
-  // engine.exec(initSql)` resolved, letting a second caller query a
-  // table that didn't exist yet, invisible on in-process SQLite but
-  // reliably racy on DuckDB, whose multi-second WASM download widens the
-  // window.
+  // The promise (not the resolved engine) is cached so near-simultaneous
+  // callers share one boot, and seeding is folded INTO it so every caller
+  // awaits a fully-seeded engine — flipping a "seeded" flag early once let
+  // a second caller query a table that didn't exist yet (racy on DuckDB,
+  // whose multi-second WASM download widens the window).
   const enginePromiseRef = useRef<Promise<SqlEngineLike> | null>(null);
   const [engineLabel, setEngineLabel] = useState<string>(() =>
     defaultSqlEngineLabel(dialect),
@@ -321,9 +310,8 @@ export function useSqlEngineBoot({
   const [bootMessage, setBootMessage] = useState<string>(
     () => `Starting the ${sqlDialectDisplayName(dialect)} engine…`,
   );
-  // True once the engine has downloaded and we're running the (tiny) seed
-  // SQL. The cold-download size is the engine wasm, not the data, so it's
-  // suppressed in this phase to avoid implying the few sample rows are MBs.
+  // True while running the (tiny) seed SQL after download; the MB size hint
+  // is suppressed then so it doesn't imply the sample rows are MBs.
   const [bootSeeding, setBootSeeding] = useState(false);
 
   const ensureEngine = useCallback(async (): Promise<SqlEngineLike> => {
@@ -334,10 +322,9 @@ export function useSqlEngineBoot({
       setBootMessage(`Starting the ${sqlDialectDisplayName(dialect)} engine…`);
       setBootSeeding(false);
       enginePromiseRef.current = (async () => {
-        // Start the dataset download while the engine boots, the two
-        // are independent and the WASM fetch usually dominates. The
-        // no-op catch keeps an engine-boot failure from leaving this
-        // promise's rejection unhandled; awaiting it below still throws.
+        // Start the dataset download while the engine boots. The no-op
+        // catch keeps a boot failure from leaving this rejection
+        // unhandled; awaiting it below still throws.
         const remoteSqlPromise = remoteInitSql
           ? fetchRemoteInitSql(dialect, remoteInitSql)
           : null;
@@ -362,8 +349,7 @@ export function useSqlEngineBoot({
           return engine;
         },
         (err) => {
-          // Don't poison the cache with a failed init, let the next
-          // attempt try again.
+          // Don't poison the cache with a failed init.
           enginePromiseRef.current = null;
           setBooting(false);
           setBootFailed(true);
@@ -419,10 +405,8 @@ export function useSqlEngineBoot({
   };
 }
 
-/** Download a remote dataset script (a path inside the
- *  dataslope/datasets GitHub repo, or a full URL) and prepare it for
- *  the given dialect's embedded engine. Used by the `remoteInitSql`
- *  prop of `<SqlChallengeCard>` and `<SqlCodeBlock>`. */
+/** Download a remote dataset script and prepare it for the dialect's
+ *  embedded engine (the `remoteInitSql` prop). */
 export async function fetchRemoteInitSql(
   dialect: SqlDialect,
   pathOrUrl: string,

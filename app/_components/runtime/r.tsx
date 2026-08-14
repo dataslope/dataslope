@@ -1139,10 +1139,8 @@ unlink("${CREATED_FILES_PATH}")`,
 let activeWebR: WebRInstance | null = null;
 let dedicatedFormatterWebR: Promise<WebRInstance> | null = null;
 
-/** Forget `webR` if the formatter is set to reuse it, called when the
- *  runtime that owns the session is disposed (registry eviction), so a
- *  later Format click lazily starts a fresh session instead of hitting a
- *  terminated worker. */
+/** Forget `webR` when its owning runtime is disposed, so a later Format
+ *  click starts fresh instead of hitting a terminated worker. */
 function releaseFormatterSession(webR: WebRInstance): void {
   if (activeWebR === webR) activeWebR = null;
 }
@@ -1179,12 +1177,10 @@ function ensureStyler(webR: WebRInstance): Promise<void> {
   let ready = stylerReady.get(webR);
   if (!ready) {
     ready = (async () => {
-      // installPackages pulls styler's full dependency closure (cli, rlang,
-      // purrr, R.cache, vctrs, withr, …) from the WebR repo automatically.
+      // installPackages pulls styler's full dependency closure automatically.
       await webR.installPackages(["styler"]);
-      // Ensure /tmp exists (R_SESSION_SETUP makes it for the runtime, but a
-      // dedicated formatter session skips that) and disable styler's on-disk
-      // cache, snippets are small, so it buys little and only litters the FS.
+      // Ensure /tmp exists (a dedicated formatter session skips
+      // R_SESSION_SETUP) and disable styler's on-disk cache.
       await webR.evalRVoid(
         `suppressWarnings(dir.create("/tmp", showWarnings = FALSE))
 suppressMessages(try(styler::cache_deactivate(verbose = FALSE), silent = TRUE))`,
@@ -1209,22 +1205,18 @@ async function safeUnlink(webR: WebRInstance, paths: string[]): Promise<void> {
 }
 
 async function formatRWithStyler(code: string): Promise<string> {
-  // Blank buffers: nothing to style. Return unchanged so the UI reports
-  // "Already formatted" rather than round-tripping through R.
+  // Blank buffers return unchanged so the UI reports "Already formatted".
   if (!code.trim()) return code;
 
   const webR = await getFormatterWebR();
   await ensureStyler(webR);
 
-  // Pass user code in via a file so it never has to be escaped into the R
-  // string we evaluate (the only interpolated values below are our own
-  // constant /tmp paths).
+  // User code goes in via a file so it never needs escaping into R source.
   await webR.FS.writeFile(FMT_IN, new TextEncoder().encode(code));
 
-  // Style the input file and write either the result (FMT_OUT) or the error
-  // message (FMT_ERR). Wrapped in local() so it never leaks bindings into
-  // .GlobalEnv, and tryCatch so invalid R surfaces as a clean message instead
-  // of an unhandled R error. UTF-8 connections preserve non-ASCII source.
+  // Write the result (FMT_OUT) or the error (FMT_ERR). local() keeps
+  // bindings out of .GlobalEnv; tryCatch turns invalid R into a clean
+  // message; UTF-8 connections preserve non-ASCII source.
   await webR.evalRVoid(`suppressWarnings(local({
   unlink(c("${FMT_OUT}", "${FMT_ERR}"))
   tryCatch({
@@ -1239,8 +1231,7 @@ async function formatRWithStyler(code: string): Promise<string> {
   })
 }))`);
 
-  // Parse error path: styler couldn't parse the buffer. Surface the R message
-  // through the Format button's "Formatting failed: …" toast.
+  // Parse-error path: surface the R message via the Format toast.
   let errBytes: Uint8Array | null = null;
   try {
     errBytes = await webR.FS.readFile(FMT_ERR);
@@ -1314,13 +1305,11 @@ export const rAdapter: LanguageAdapter = {
     // @ts-expect-error -- webr ships without bundled type declarations
     const { WebR } = (await import("webr")) as { WebR: new () => WebRInstance };
 
-    // webR.init() is the heavy stage: it downloads and instantiates the
-    // R WASM image (~15 MB compressed).
+    // webR.init() is the heavy stage (~15 MB compressed R WASM image).
     setLoadingMessage("Initialising R runtime…", 0.12);
     const webR = new WebR();
     await webR.init();
-    // Expose this session to the styler-based formatter (see formatRWithStyler)
-    // so the "Format code" button reuses it instead of starting a second R.
+    // Let the styler formatter reuse this session instead of a second R.
     activeWebR = webR;
 
     setLoadingMessage("Configuring graphics device…", 0.9);
@@ -1328,9 +1317,7 @@ export const rAdapter: LanguageAdapter = {
       `options(device = function() webr::canvas(width = 720, height = 432, capture = TRUE))`,
     );
 
-    // Install the Files-pane download hook and large-data.frame print
-    // truncation (see R_SESSION_SETUP). Best-effort: a failure here shouldn't
-    // block the runtime from starting.
+    // Install R_SESSION_SETUP. Best-effort: failure shouldn't block startup.
     try {
       await webR.evalRVoid(R_SESSION_SETUP);
     } catch (err) {

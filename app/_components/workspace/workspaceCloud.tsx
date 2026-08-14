@@ -58,13 +58,10 @@ export function useCloudBackups(
   const [items, setItems] = useState<CloudWorkspaceMeta[] | null>(null);
   const [usage, setUsage] = useState<CloudUsage | null>(null);
   const [error, setError] = useState<string | null>(null);
-  // Cloud storage not configured on the server (503), treat exactly like an
-  // unsupported browser and render no cloud UI at all.
+  // Cloud storage not configured on the server (503): render no cloud UI.
   const [unavailable, setUnavailable] = useState(false);
-  // Server said 401 while the *client* session cookie still looks valid
-  // (expired/revoked server-side). The client session alone would keep
-  // `signedOut` false, leaving the menu on "Checking backups…" forever,
-  // this flag forces the sign-in row instead.
+  // Server said 401 while the client session cookie still looks valid;
+  // without this flag the menu would sit on "Checking backups…" forever.
   const [authLost, setAuthLost] = useState(false);
 
   const refresh = useCallback(async () => {
@@ -86,17 +83,16 @@ export function useCloudBackups(
     }
   }, []);
 
-  // Initial fetch once the session resolves, the badge shows a backup dot
-  // without the menu ever being opened.
+  // Initial fetch once the session resolves, so the badge shows a backup dot
+  // without the menu ever opening.
   useEffect(() => {
     if (!session || unavailable || !isCloudSupported()) return;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- the list lands async in refresh(), after the fetch resolves
     void refresh();
   }, [session, unavailable, refresh]);
 
-  // Re-read on menu open so saves/deletions from other tabs or devices show
-  // up. Separate effect: keying the initial fetch off `refreshSignal` too
-  // would refetch on every open/close flip.
+  // Re-read on menu open so other tabs'/devices' changes show up. Separate
+  // effect so the initial fetch doesn't refire on every open/close flip.
   useEffect(() => {
     if (!refreshSignal || !session || unavailable || !isCloudSupported()) return;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- the list lands async in refresh(), after the fetch resolves
@@ -119,9 +115,8 @@ export function useCloudBackups(
   };
 }
 
-/** True when the workspace was opened after its last backup was written,
- *  the backup may be missing recent changes. (Same heuristic the old Cloud
- *  dialog used for its clobber guard: the registry tracks opens, not edits.) */
+/** True when the workspace was opened after its last backup was written —
+ *  the backup may be missing changes (registry tracks opens, not edits). */
 export function isBackupStale(
   local: Pick<WorkspaceEntry, "lastUsedAt"> | undefined,
   meta: CloudWorkspaceMeta,
@@ -135,9 +130,8 @@ export async function backUpWorkspace(
   workspaceId: string,
   buildBundle: BuildBundle,
 ): Promise<CloudWorkspaceMeta> {
-  // A backup is the owner's own copy, so it carries their query history and
-  // starred queries; `createShare` builds without this and hands a stranger a
-  // workspace, never a log of what its author has run.
+  // A backup is the owner's own copy, so it carries query history/stars;
+  // `createShare` builds without these so strangers never see them.
   const bundle = await buildBundle({ includePersonal: true });
   if (!bundle) {
     throw new Error("The playground is still loading, try again in a moment.");
@@ -146,11 +140,9 @@ export async function backUpWorkspace(
 }
 
 /**
- * Opens a cloud save on this device. Family-specific, same as the old Cloud
- * dialog: SQL bundles are replayed into the session database after a reload
- * (local workspaces untouched); code bundles materialize into a local
- * workspace under the cloud id and become active. Never resolves on success,
- * both paths end in a navigation.
+ * Opens a cloud save on this device: SQL bundles replay into the session
+ * database after a reload; code bundles materialize into a local workspace
+ * under the cloud id. Never resolves on success — both paths navigate.
  */
 export async function openCloudSave(
   playgroundId: string,

@@ -1,27 +1,10 @@
 /**
  * Finds Markdown tables whose rows do not line up, which GFM renders as a
- * paragraph of pipes rather than a table.
- *
- * ── Why this exists ─────────────────────────────────────────────────────
- * `booleans-and-logic` teaches `a || b`, and wrote its truth table header as
- *
- *     | `a` | `b` | `a || b` |
- *     | :---: | :---: | :---: |
- *
- * A pipe is a cell delimiter *even inside a code span* — GFM splits the row
- * first and parses inline content second, which is the opposite of what the
- * backticks suggest. So that header is five cells against a three-cell
- * delimiter row, the table is not a table, and the reader gets a wall of
- * `| false | false | false ||` run together as prose. It renders fine in most
- * editors' preview panes, which is why it survived.
- *
- * The fix is `\|`, which GFM unescapes back to a literal pipe inside the cell.
- *
- * ── What it checks ──────────────────────────────────────────────────────
- * A table's delimiter row fixes its column count. Every other row of that
- * table must agree. Rows *may* legitimately end without a trailing pipe, and
- * a cell may contain an escaped `\|`, so both are accounted for before
- * counting.
+ * paragraph of pipes rather than a table. A pipe is a cell delimiter *even
+ * inside a code span* — GFM splits the row before parsing inline content —
+ * so `` `a || b` `` breaks a header; the fix is `\|`. The delimiter row fixes
+ * the column count and every other row must agree; missing trailing pipes and
+ * escaped `\|` are accounted for before counting.
  *
  * Usage:
  *   node scripts/check-mdx-tables.mjs [--filter <substr>[,<substr>…]]

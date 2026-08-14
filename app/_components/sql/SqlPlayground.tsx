@@ -1285,10 +1285,8 @@ function SqlPlaygroundInner() {
     window.location.reload();
   }, []);
 
-  // Nuclear wipe: clears localStorage, OPFS, IndexedDB, and caches.
-  // Backed by the shared `clearAllLocalData` helper so every playground
-  // gets the same behaviour. Best-effort: failures inside one surface
-  // don't block the others, and we always reload.
+  // Nuclear wipe: clears every storage surface (localStorage, OPFS,
+  // IndexedDB, caches) before reloading. Best-effort; always reloads.
   const clearAllLocalData = useCallback(() => {
     void (async () => {
       try {
@@ -1429,10 +1427,8 @@ function SqlPlaygroundInner() {
   // ─── Boot the engine and CodeMirror ──────────────────────────────────
   useEffect(() => {
     let cancelled = false;
-    // Releases the workspace lock when this effect tears down (unmount /
-    // client-side navigation away) so a later remount, e.g. a browser
-    // back-then-forward return to the playground, can re-acquire it instead
-    // of colliding with this document's own stale lock.
+    // Releases the workspace lock on teardown so a later remount can
+    // re-acquire it instead of colliding with this document's stale lock.
     const lockController = new AbortController();
 
     if (editorHostRef.current && !editorRef.current) {
@@ -1482,11 +1478,8 @@ function SqlPlaygroundInner() {
         const initialSampleId =
           localStorage.getItem(storageKey("db")) ??
           SQLITE_SAMPLE_DATABASES[0].id;
-        // Resolve (or auto-create) the active workspace for this
-        // playground tab so the engine can persist its database
-        // to OPFS. When OPFS is unavailable, `ensureActiveWorkspace`
-        // still returns a registry-only entry and the engine falls
-        // back to in-memory mode.
+        // Resolve (or auto-create) the active workspace so the engine can
+        // persist to OPFS; without OPFS it falls back to in-memory mode.
         let workspaceId: string | null = null;
         try {
           const workspace = await ensureActiveWorkspace(PLAYGROUND_ID);
@@ -1499,12 +1492,10 @@ function SqlPlaygroundInner() {
               signal: lockController.signal,
             });
             if (!cancelled && !hasLock) {
-              // The same OPFS-backed workspace can't be opened in two tabs:
-              // SQLite's exclusive OPFS access handle would deadlock the
-              // boot (it hangs at ~90%). Surface a conflict overlay and
-              // skip the boot rather than hang.
-              // Remember which workspace it was, so the overlay can offer a
-              // copy of it rather than only a fresh, empty one.
+              // The same OPFS-backed workspace can't open in two tabs:
+              // SQLite's exclusive OPFS access handle deadlocks the boot at
+              // ~90%. Show the conflict overlay (remembering the workspace so
+              // it can offer a copy) and skip the boot rather than hang.
               conflictWorkspaceRef.current = {
                 id: workspace.id,
                 name: workspace.name,
@@ -1524,20 +1515,16 @@ function SqlPlaygroundInner() {
           workspaceId,
         );
         if (cancelled) {
-          // Component unmounted while the engine was being created; dispose
-          // it immediately so the worker is terminated and its exclusive
-          // OPFS access handle is released. Without this, the abandoned
-          // worker keeps the workspace locked and the next mount's boot
-          // deadlocks at ~90%.
+          // Unmounted mid-create: dispose so the worker releases its OPFS
+          // access handle — otherwise the next mount's boot deadlocks at ~90%.
           engine.dispose?.();
           return;
         }
         engineRef.current = engine;
         setEngineForRender(engine);
 
-        // Apply any user-saved pragma settings to the freshly-initialised
-        // database. pragmaSettingsRef is already populated from the
-        // localStorage hydration effect that runs synchronously on mount.
+        // Apply saved pragma settings; pragmaSettingsRef is already populated
+        // by the synchronous hydration effect.
         await applyPragmasToEngine(engine, pragmaSettingsRef.current);
 
         const sample = await engine.activeSample();
@@ -1581,12 +1568,9 @@ function SqlPlaygroundInner() {
       cancelled = true;
       // Release the workspace lock so the next mount can re-acquire it.
       lockController.abort();
-      // Terminate the engine worker so its OPFS access handles are
-      // released, a zombie worker would otherwise keep the workspace's
-      // opfs-sahpool locked across StrictMode remounts and client-side
-      // route changes, failing the next boot's OPFS acquisition. A boot
-      // still in flight here is handled by createSqliteEngine itself,
-      // which terminates the previous worker before spawning a new one.
+      // Terminate the engine worker so its OPFS access handles release; a
+      // zombie worker would keep the opfs-sahpool locked and fail the next
+      // boot. An in-flight boot is handled by createSqliteEngine itself.
       engineRef.current?.dispose?.();
       engineRef.current = null;
       editorRef.current?.destroy();

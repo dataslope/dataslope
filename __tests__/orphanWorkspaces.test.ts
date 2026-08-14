@@ -1,15 +1,9 @@
 /**
- * Recovering workspaces that exist in OPFS but in no list.
- *
- * A draft is OPFS-backed but deliberately kept out of the registry until it is
- * saved, and every surface that lists workspaces reads the registry. A draft
- * the session pointer stopped pointing at was therefore unreachable, with its
- * contents still on disk.
- *
- * The rule this pins hardest is what the pass refuses to delete. "Changed"
- * comes from the dirty latch, which only the code playgrounds set, so a SQL
- * draft always looks unchanged even when it holds a hand-built database.
- * Deleting on "not changed" would throw that away.
+ * Recovering workspaces that exist in OPFS but in no list: drafts stay out of
+ * the registry until saved, so a draft the session pointer dropped was
+ * unreachable with its contents still on disk. Hardest-pinned rule: what the
+ * pass refuses to delete — only code playgrounds set the dirty latch, so a
+ * SQL draft always looks unchanged even when it holds a hand-built database.
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";

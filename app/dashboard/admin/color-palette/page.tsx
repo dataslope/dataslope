@@ -234,12 +234,7 @@ export default function ColorTestPage() {
   );
 }
 
-/**
- * A titled band. No card: a small-caps label with a hairline running to the
- * right edge, which lines every section heading up on the same left margin as
- * the grid beneath it and lets the swatches be the only filled shapes on the
- * page.
- */
+/** A titled band: small-caps label with a hairline to the right edge. */
 function Section({
   title,
   note,

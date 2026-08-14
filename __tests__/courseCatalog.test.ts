@@ -1,13 +1,9 @@
 /**
- * The course catalog is generated from `content/courses/` at build time
- * (`scripts/build-course-catalog.mjs`) so that `/` and `/courses` can render
- * without a filesystem — workerd has none, and reading one at request time is
- * what turned a deleted incremental-cache folder into a 500 on 2026-08-05.
- *
- * Generating it buys that at the cost of a file that can go stale. These tests
- * are that cost paid: they re-derive the catalog from disk and compare, so a
- * course added, renamed, or retitled without a rebuild fails here rather than
- * shipping a home page that quietly omits it.
+ * The course catalog is generated at build time so / and /courses render
+ * without a filesystem (workerd has none — a request-time read once 500'd in
+ * production). These tests re-derive the catalog from disk and compare, so a
+ * course added or renamed without a rebuild fails here rather than shipping
+ * a home page that quietly omits it.
  */
 import { describe, it, expect } from "vitest";
 import { readCourseCatalog } from "../scripts/build-course-catalog.mjs";
@@ -55,10 +51,9 @@ describe("generated home stats", () => {
 });
 
 describe("the / and /courses render path", () => {
-  // These two routes 500 rather than degrade when they touch the filesystem:
-  // workerd has no `node:fs`, so a render that is not served from the
-  // incremental cache throws. Reintroducing an import is invisible until that
-  // happens in production, so assert on the sources rather than trust review.
+  // These routes 500 when they touch the filesystem (workerd has no node:fs),
+  // and a reintroduced import is invisible until production — so assert on
+  // the sources rather than trust review.
   it.each([
     "../lib/courseCatalog.ts",
     "../app/page.tsx",

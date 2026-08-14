@@ -71,22 +71,8 @@ name: R2 incremental-cache cleanup
 on:
   schedule:
     # Every 2 hours, off the top of the hour to avoid scheduler congestion.
-    # (GitHub delays scheduled runs by up to a few hours under load.)
-    #
-    # The interval used to be an ADDEND to retention — a folder written just
-    # after a sweep survived untouched until the next one, so the worst-case
-    # age of a prunable folder was interval + THRESHOLD_HOURS. With retention
-    # no longer expressed in hours that arithmetic is gone: the interval now
-    # only sets how long a superseded folder lingers before its next
-    # reconsideration, and every run reaches the same verdict about it.
-    #
-    # The job is cheap to run, though not for the reason this comment claimed
-    # until 2026-08-14: ListObjectsV2 is a Class A operation at $4.50/million,
-    # NOT Class B at $0.36/million (Class B is GetObject/HeadObject; DeleteObject
-    # really is free). A quiet run costs ~10 LIST requests and a full sweep
-    # ~100, so 12 runs a day lands near 5,000 a month against R2's 1,000,000
-    # Class A monthly free allowance — a rounding error either way, but the
-    # right rate matters if the folder count ever grows by an order of magnitude.
+    # Cheap: ListObjectsV2 is Class A ($4.50/million — not Class B); ~10 LISTs
+    # quiet, ~100 full sweep, ~5,000/month against R2's 1M free Class A ops.
     - cron: "17 */2 * * *"
   workflow_dispatch:
     inputs:
@@ -99,11 +85,8 @@ concurrency:
   group: r2-cache-cleanup
   cancel-in-progress: false
 
-# Least privilege: read-only, and `contents` alone covers everything asked of
-# GitHub here (branches, commits, the default branch). `pull-requests: read`
-# was dropped on 2026-08-14 — the keep set is built from branches now and never
-# asks about PRs — and no `checks` scope was ever needed, since preview aliases
-# are derived from branch names rather than read out of check runs.
+# Least privilege: `contents` read alone covers everything asked of GitHub
+# (branches, commits, the default branch).
 permissions:
   contents: read
 

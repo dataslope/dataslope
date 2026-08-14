@@ -52,10 +52,8 @@ const config = flag("--config");
 
 // ─── key → every lesson that holds that block ───────────────────────────
 //
-// The capture reports a key and the route it came from; the manifest is keyed
-// by lesson path. Rather than map routes back to files, look the key up: keys
-// are content hashes, so a block that appears on two lessons genuinely belongs
-// on both, and each gets its own entry.
+// The capture reports keys; the manifest is keyed by lesson path. Keys are
+// content hashes, so a block on two lessons belongs on both.
 const byKey = new Map();
 let selected = 0;
 for (const adapter of adapters) {
@@ -144,13 +142,9 @@ function withinCaps(cells) {
   return null;
 }
 
-/** A base64 image or a Plotly figure becomes a file, as on the Python path:
- *  inline they were 98% and then 88% of the manifest's whole weight.
- *
- *  Images are re-encoded to WebP at the same quality the Python path uses.
- *  R's graphics device hands over PNG, and 136 of them straight from the
- *  browser were 10.8 MB against 2.4 MB encoded — committed bytes, fetched by
- *  every reader who scrolls to the block. */
+/** A base64 image or a Plotly figure becomes a file, as on the Python path
+ *  (inline they were nearly the whole manifest). Images are re-encoded to
+ *  WebP at the Python path's quality; R hands over PNG at ~4.5x the size. */
 const { default: sharp } = await import("sharp");
 let assetsWritten = 0;
 let assetBytes = 0;
@@ -197,8 +191,7 @@ for (const page of pages) {
     stats.captured++;
     const files = byKey.get(cap.key);
     if (!files) {
-      // A block on a page the selection reached but the extractor did not
-      // attribute to one of these adapters — a demo page, most often.
+      // Not attributed to one of these adapters — a demo page, most often.
       stats.unmatched++;
       continue;
     }
@@ -207,9 +200,8 @@ for (const page of pages) {
       stats.empty++;
       continue;
     }
-    // A block that only produced diagnostics ran and failed; recording the
-    // error as its preview would teach the reader the wrong thing, and the
-    // headless generator drops these for the same reason.
+    // Diagnostics-only means the block ran and failed; the headless generator
+    // drops these for the same reason.
     if (!cells.some((c) => c.type !== "stderr")) {
       stats.errored++;
       continue;
