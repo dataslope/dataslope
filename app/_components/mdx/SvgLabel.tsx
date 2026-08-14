@@ -10,8 +10,7 @@ const SHOW_SVG_LABELS = process.env.NODE_ENV === "development";
 export function SvgLabel({ figId }: { figId: string }) {
   if (!SHOW_SVG_LABELS) return null;
   return (
-    // `id={figId}` makes each graphic a deep-link target, so the build-time
-    // Stable per-graphic id, kept so a lesson SVG remains addressable by anchor.
+    // `id={figId}` keeps each graphic addressable as a deep-link anchor.
     <div
       id={figId}
       data-svg-id={figId}

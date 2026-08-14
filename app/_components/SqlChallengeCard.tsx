@@ -414,26 +414,20 @@ export async function fetchRemoteInitSql(
   const { fetchDatasetText } = await import("./runtime/remoteDatasets");
   const script = await fetchDatasetText(pathOrUrl);
   if (dialect === "postgres") {
-    // Scripts authored for a full Postgres server may open with psql
-    // meta-commands / CREATE DATABASE lines that can never run in
-    // PGlite, strip them before execution.
+    // Strip psql meta-commands / CREATE DATABASE lines PGlite can't run.
     const { preparePostgresScriptForPglite } = await import("./runtime/postgres");
     return preparePostgresScriptForPglite(script);
   }
   return script;
 }
 
-/** Default schema where a dialect's user tables live unless qualified
- *  otherwise. SQLite has no schema concept (we use `main`); DuckDB
- *  uses `main`; PostgreSQL uses `public`. */
+/** Default schema for a dialect's user tables (`main`, Postgres `public`). */
 export function defaultSchemaFor(dialect: SqlDialect): string {
   return dialect === "postgres" ? "public" : "main";
 }
 
-/** SQL fragment that lists every user table in the default schema for
- *  a given dialect. Used by the table viewer to enumerate tables when
- *  the author didn't hand-pick a list. Returns rows of
- *  (schema, table_name). */
+/** SQL that lists every user table in the default schema, as rows of
+ *  (schema, table_name); used when the author didn't hand-pick a list. */
 export function listTablesSqlFor(dialect: SqlDialect): string {
   if (dialect === "sqlite") {
     return `SELECT 'main' AS schema_name, name AS table_name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name;`;
@@ -464,9 +458,7 @@ export function qualifiedTable(
 
 // ─── Component ────────────────────────────────────────────────────────
 
-/** Map a SQL dialect to the corresponding key in the shared
- *  `LANGUAGE_ICONS` registry so the SqlChallengeCard's runtime label
- *  uses the same brand glyph as the playground language switcher. */
+/** Dialect → key in the shared `LANGUAGE_ICONS` registry. */
 function languageIconKeyForDialect(d: SqlDialect): string {
   return d;
 }
@@ -488,10 +480,8 @@ export function DialectGlyph({ dialect }: { dialect: SqlDialect }) {
   );
 }
 
-/** Map dialect → sql-formatter language identifier. PGlite is Postgres-
- *  compatible, so postgres formats with the `postgresql` rules; SQLite and
- *  DuckDB use sql-formatter's matching native dialects. Keep this the single
- *  source of truth so every surface formats a given dialect identically. */
+/** Dialect → sql-formatter language. Keep this the single source of truth
+ *  so every surface formats a given dialect identically. */
 export function sqlFormatterLanguage(d: SqlDialect): "sqlite" | "postgresql" | "duckdb" {
   if (d === "sqlite") return "sqlite";
   if (d === "duckdb") return "duckdb";
@@ -500,12 +490,9 @@ export function sqlFormatterLanguage(d: SqlDialect): "sqlite" | "postgresql" | "
 
 // ─── Table viewer hook ────────────────────────────────────────────────
 
-/** Fetch a single page of a table's rows. Asks for `pageSize + 1` rows
- *  so the caller can tell, without a second COUNT(*) round-trip,
- *  whether more rows remain past this page. Works for every dialect
- *  because `LIMIT … OFFSET …` is supported by SQLite, DuckDB, and
- *  Postgres alike. Errors are returned, not thrown, so one broken table
- *  can't blank the whole viewer. */
+/** Fetch one page of a table's rows. Asks for `pageSize + 1` so the caller
+ *  learns whether more rows exist without a COUNT(*) round-trip. Errors are
+ *  returned, not thrown, so one broken table can't blank the whole viewer. */
 export async function fetchTablePage(
   engine: SqlEngineLike,
   dialect: SqlDialect,
@@ -555,11 +542,8 @@ export interface ResultTabData {
 }
 
 /** Shared table-viewer state machine for `<SqlChallengeCard>` and
- *  `<SqlCodeBlock>`. Owns the list of tables, the active tab, the
- *  open/closed state, the first-load "initializing" flag (which drives
- *  the skeleton animation while the WASM engine boots and seeds), and
- *  the per-table infinite-scroll paging. Living here keeps the two
- *  card components byte-for-byte consistent. */
+ *  `<SqlCodeBlock>`: table list, active tab, first-load "initializing"
+ *  skeleton flag, and per-table infinite-scroll paging. */
 export function useSqlTableViewer({
   dialect,
   tables,

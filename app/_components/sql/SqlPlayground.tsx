@@ -1728,11 +1728,9 @@ function SqlPlaygroundInner() {
         // Ignore quota errors.
       }
     }
-    // Focus the editor so the user can type immediately after any tab
-    // operation. Skip tabs whose editor pane is hidden. The FIRST focus
-    // after mount goes through the shared entry policy instead: desktop
-    // lands the cursor at the end of the query, mobile skips the focus so
-    // the on-screen keyboard doesn't pop before the user asks to type.
+    // Focus the editor after tab operations (skipping hidden editor panes).
+    // The first focus after mount goes through the shared entry policy
+    // instead (cursor at end on desktop, no keyboard-popping focus on mobile).
     const tab = tabsRef.current.find((t) => t.id === activeTabId);
     if (
       tab?.kind !== "er-diagram" &&
@@ -1844,18 +1842,15 @@ function SqlPlaygroundInner() {
   useEffect(() => {
     if (activeTab?.kind !== "er-diagram") return;
     refreshTableMetadata();
-    // Intentionally omit activeTab?.kind: we only want this to fire when
-    // `tables` changes (e.g. a new table was created), not on every switch
-    // back to the ER diagram tab. The initial refresh on tab-open is already
-    // handled inside openErDiagramTab().
+    // Intentionally omits activeTab?.kind: fire only when `tables` changes,
+    // not on every switch back to the ER diagram tab (tab-open refresh is
+    // handled inside openErDiagramTab()).
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tables, refreshTableMetadata]);
 
-  // Lazy-load (and re-load) metadata for every currently-expanded
-  // sidebar entity that has no cached `columnsByEntity` entry.
-  // Use `engineForRender` (local state, null on every mount) as the
-  // trigger so that returning from another playground re-fetches columns
-  // even when the Zustand `loaded` flag was already true.
+  // Lazy-load metadata for expanded sidebar entities with no cached entry.
+  // `engineForRender` (null on every mount) is the trigger so returning from
+  // another playground re-fetches even when the Zustand `loaded` flag stayed true.
   useEffect(() => {
     if (expandedEntities.size === 0) return;
     if (!engineForRender) return;
@@ -2025,10 +2020,6 @@ function SqlPlaygroundInner() {
     const sample = findSampleDatabase(pendingDbId);
     return customFilenames[pendingDbId] ?? sample.filename;
   }, [pendingDbId, customFilenames]);
-
-  // Drag-and-drop tab reordering is handled by the generic TabBar
-  // internally; SqlPlayground no longer needs its own DnD sensors or
-  // dragging-tab state for the tab strip.
 
   // Resolve PK / FK / constraint hints for any table by name, so each result
   // set of a multi-statement run is editable against its own table.
@@ -2288,11 +2279,8 @@ function SqlPlaygroundInner() {
     ],
   );
 
-  // Auth had no entry point inside a playground at all. It lands as the ⋯
-  // menu's last group rather than a header control: the header is down to
-  // five controls by design and has no room on a phone, and signing in
-  // isn't something anyone reaches for mid-session. Null while the first
-  // session fetch is in flight, so nothing flashes.
+  // Auth entry point lives in the ⋯ menu's last group (the header has no
+  // room). Null while the first session fetch is in flight, so nothing flashes.
   const accountSection = useAccountMenuSection();
   const sqlMoreSections = useMemo<MoreMenuSection[]>(
     () =>

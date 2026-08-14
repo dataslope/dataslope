@@ -2,19 +2,12 @@ import { describe, it, expect } from "vitest";
 import BRAND_FALLBACKS from "../lib/generated/brand-fallbacks.js";
 
 /**
- * Contract test for the generated brand-token fallback map.
- *
- * app/brand.css is the single source of truth for the `--ds-*` color ramps;
- * `scripts/build-brand-fallbacks.mjs` parses it at build time into
- * `lib/generated/brand-fallbacks.js`, which the Mermaid brand theming
- * (app/_components/mdx/mermaid.tsx) uses as literal fallbacks when a CSS
- * variable can't be read from the DOM.
- *
- * The generator guarantees the values can't drift from brand.css, but it
- * can't know which tokens Mermaid depends on, deleting a ramp step from
- * brand.css (say, the blue half-steps the mindmap shades use) would silently
- * produce `undefined` colors at render time. This test pins that contract:
- * every token mermaid.tsx references must exist, as a concrete hex color.
+ * Contract test for the generated brand-token fallback map: app/brand.css is
+ * the source of truth, built into lib/generated/brand-fallbacks.js, which the
+ * Mermaid brand theming uses when a CSS variable can't be read from the DOM.
+ * The generator can't know which tokens Mermaid depends on — deleting a ramp
+ * step would silently produce `undefined` colors — so every token
+ * mermaid.tsx references must exist as a concrete hex color.
  */
 
 // Tokens mermaid.tsx references: the mindmap blue shades (MINDMAP_ROOT /

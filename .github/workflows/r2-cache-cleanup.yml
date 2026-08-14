@@ -97,71 +97,47 @@ jobs:
       BUCKET: dataslope-inc-cache
       PREFIX: incremental-cache/
       BUILD_ID_URL: https://dataslope.com/api/cache-build-id
-      # Never delete a folder populated within the last GRACE_HOURS, whatever
-      # it matches. This is the one piece of the pre-2026-08-14 policy that
-      # survives, and it is a safety net rather than a rule: a deploy populates
-      # its R2 folder minutes before the Worker starts serving that build, so a
-      # brand-new folder can belong to an in-flight deploy that no probe can
-      # see yet (production still reports the outgoing build) and no branch
-      # head names (a merge commit's build ID is the merge commit's SHA, which
-      # is head(main) only once the merge lands). 2h comfortably covers
-      # populate + switchover including Workers Builds queueing; populate alone
-      # measured a 0.8 min median and a 1.8 min max on 2026-08-14.
+      # Never delete a folder populated within the last GRACE_HOURS: a deploy
+      # populates R2 minutes before the Worker switches over, so a brand-new
+      # folder can belong to an in-flight deploy no probe sees yet and no
+      # branch head names (a merge commit's build ID is the merge SHA). 2h
+      # comfortably covers populate + switchover including build queueing.
       GRACE_HOURS: "2"
-      # Sanity cap, not policy. Two things are bounded by it:
-      #   • how many branches get probed (alphabetical order, with a warning
-      #     when it truncates), and
-      #   • how many folders may be kept SOLELY because a branch head names
-      #     them, evaluated newest-populated-first.
-      # A folder kept because a live probe named it is never capped — that is
-      # a deployment actively serving from it, and deleting it is an outage.
-      # At ~2.5 GB/folder and at most two folders per branch this bounds
-      # previews at roughly 50 GB, which only becomes reachable with 10
-      # simultaneously-active branches; it has been 1-3 in practice. If this
-      # cap ever fires, the honest fix is deleting merged branches, not raising
-      # the number.
+      # Sanity cap, not policy: bounds how many branches get probed and how
+      # many folders may be kept SOLELY on a branch-head claim
+      # (newest-populated-first). A folder a live probe named is NEVER capped —
+      # deleting one is an outage. If this cap fires, the honest fix is
+      # deleting merged branches, not raising the number.
       MAX_BRANCHES: "10"
-      # Degraded mode only. When a branch's preview cannot be probed — no
-      # Cloudflare check run yet, an implausible alias URL, or the preview not
-      # answering — that branch falls back to the pre-probe behaviour of
-      # keeping its most recent commits, so a preview that is alive but
-      # unreachable from this runner cannot lose its cache. Not reached on a
-      # healthy run, and cheap when it is: keeping a SHA whose folder does not
-      # exist costs nothing.
+      # Degraded mode only: when a branch's preview can't be probed, that
+      # branch keeps its most recent commits instead, so an alive-but-
+      # unreachable preview cannot lose its cache. Keeping a SHA with no
+      # folder costs nothing.
       FALLBACK_COMMITS: "3"
-      # A branch's preview alias is https://<branch-slug>-<worker>.<subdomain>
-      # .workers.dev. The worker name must match wrangler.jsonc's "name"; the
-      # subdomain is the Cloudflare account's workers.dev subdomain (visible in
-      # any Preview URL the Workers Builds check run prints).
+      # Preview alias = https://<branch-slug>-<worker>.<subdomain>. The worker
+      # name must match wrangler.jsonc's "name".
       PREVIEW_WORKER: dataslope
       PREVIEW_SUBDOMAIN: subwaymatch.workers.dev
-      # Belt and braces around the URL this job builds and then fetches. The
-      # slug rule already makes a branch name incapable of changing the host,
-      # so this only ever fires on a bug in that rule — which is exactly when a
-      # request must not be made.
+      # Belt and braces around the URL this job builds then fetches; only
+      # fires on a bug in the slug rule — exactly when no request must be made.
       PREVIEW_URL_RE: '^https://[a-z0-9-]+-dataslope\.subwaymatch\.workers\.dev$'
-      # A probe is a single HTTP GET and the whole keep set rests on it, so
-      # retry before believing a negative answer. Applies to production (where
-      # exhausting it aborts the run) and to previews (where it triggers the
-      # per-branch fallback).
+      # The whole keep set rests on single HTTP GETs, so retry before
+      # believing a negative answer.
       PROBE_ATTEMPTS: "3"
-      # Scheduled runs delete for real; manual runs honor the dry_run input
-      # (default true).
+      # Scheduled runs delete for real; manual runs honor dry_run (default true).
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
-      # For the `gh api` calls below. GITHUB_TOKEN with contents+checks read.
+      # For the `gh api` calls below.
       GH_TOKEN: ${{ github.token }}
       AWS_ACCESS_KEY_ID: ${{ secrets.R2_INC_CACHE_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_INC_CACHE_SECRET_ACCESS_KEY }}
-      # Secrets cannot be tested from inside `run:` (an unset one arrives as
-      # empty, indistinguishable from a set-but-empty one), so resolve it here.
+      # Secrets can't be tested from inside `run:` (unset arrives as empty),
+      # so resolve it here.
       CREDS_SET: ${{ secrets.R2_INC_CACHE_ACCESS_KEY_ID != '' && secrets.R2_INC_CACHE_SECRET_ACCESS_KEY != '' }}
       AWS_DEFAULT_REGION: auto
       AWS_EC2_METADATA_DISABLED: "true"
-      # R2 intermittently returns a transient 500 InternalError on DeleteObject.
-      # The CLI's default (legacy) retry gives up after ~2 tries; switch to the
-      # standard retry mode and raise the attempt count so a burst of transient
-      # errors is absorbed inside a single `aws s3 rm` before the per-folder
-      # retry loop (see delete_folder) even has to intervene.
+      # R2 intermittently 500s on DeleteObject and the CLI's legacy retry
+      # gives up after ~2 tries; standard mode + more attempts absorbs bursts
+      # inside a single `aws s3 rm` before delete_folder's loop intervenes.
       AWS_RETRY_MODE: standard
       AWS_MAX_ATTEMPTS: "10"
       ENDPOINT: https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
@@ -172,14 +148,10 @@ jobs:
           set -euo pipefail
           aws() { command aws --endpoint-url "$ENDPOINT" "$@"; }
 
-          # 0) An unset CLOUDFLARE_ACCOUNT_ID collapses ENDPOINT to
-          #    "https://.r2.cloudflarestorage.com": every aws call then fails,
-          #    and the `|| true` on the listing in step 5 turns that into an
-          #    empty folder list, i.e. a green run that silently stopped pruning
-          #    and lets the bucket grow unbounded. Fail loudly instead. (Worth
-          #    guarding because this secret was named CF_ACCOUNT_ID until
-          #    Cloudflare deprecated the CF_* prefix, so an older repo may still
-          #    hold it under the old name.)
+          # 0) An unset CLOUDFLARE_ACCOUNT_ID collapses ENDPOINT; every aws
+          #    call fails, and step 5's `|| true` turns that into an empty
+          #    folder list — a green run that silently stopped pruning. Fail
+          #    loudly instead.
           if [[ "$ENDPOINT" == "https://.r2.cloudflarestorage.com" ]]; then
             echo "::error::Repository secret CLOUDFLARE_ACCOUNT_ID is not set (it was previously named CF_ACCOUNT_ID). Aborting without deleting."
             exit 1

@@ -1,39 +1,13 @@
-// Remote sample datasets (SQL scripts, CSV/parquet files, SQLite
-// databases), fetched from the companion dataslope/datasets GitHub
-// repository and cached so that every code block, challenge card, and
-// playground that references a file shares ONE download, across
-// languages (Python, R, SQLite, Postgres, DuckDB, …), across pages,
-// and across visits.
-//
-// How a dataset is fetched (three layers, all per-URL):
-//
-//   1. In-flight memo (module-level Map<url, Promise>), dedupes
-//      concurrent and repeated requests within one JS context. Workers
-//      get their own module instance and therefore their own memo.
-//   2. Cache API (`caches.open`), persistent, shared by the main
-//      thread and every worker on the origin. A file downloaded by the
-//      SQLite worker is served from here when the DuckDB worker (or a
-//      hard-reloaded page) asks for it later. Best-effort: quota
-//      errors, private-browsing restrictions, and missing support all
-//      silently degrade to a plain network fetch.
-//   3. Network, via two hosts:
-//        - cdn.jsdelivr.net (primary): serves GitHub repos with
-//          `access-control-allow-origin: *` and, for ref-pinned URLs,
-//          a one-year immutable HTTP cache, so even fetches that bypass
-//          this module benefit.
-//        - raw.githubusercontent.com (fallback): also CORS-enabled and
-//          has no per-file size limit below GitHub's 100 MB cap, but
-//          only allows ~5-minute HTTP caching. Used when jsDelivr
-//          fails (outage, or its ~20 MB per-file limit).
-//      Either way the bytes come from a CDN rather than this app's own
-//      origin, which never has to serve a sample database.
-//
-// The helpers below are dialect-agnostic: SQLite and Postgres fetch SQL
-// scripts with `fetchDatasetText`, the DuckDB runtime uses
-// `fetchDatasetBytes` for binary datasets (e.g. registering a remote
-// parquet file), and `<CodeBlock>` / `<ChallengeCard>` stage
-// `fetchDatasetBytes` results into a runtime's virtual filesystem via
-// their `datasets` prop (see `DatasetStageSpec`).
+// Remote sample datasets from the dataslope/datasets GitHub repo, cached so
+// everything that references a file shares ONE download. Three per-URL
+// layers:
+//   1. In-flight memo (per JS context; workers each get their own).
+//   2. Cache API: persistent, shared across the origin's threads/workers.
+//      Best-effort — failures degrade to a plain network fetch.
+//   3. Network: cdn.jsdelivr.net first (CORS *, one-year immutable cache
+//      for ref-pinned URLs, ~20 MB per-file limit), falling back to
+//      raw.githubusercontent.com (CORS-enabled, no size limit below
+//      GitHub's 100 MB cap, but only ~5-minute HTTP caching).
 
 /** A GitHub repository (plus ref) that hosts dataset files. */
 export interface RemoteDatasetSource {

@@ -1,31 +1,15 @@
 #!/usr/bin/env node
 /**
  * Batch-generate the Dataslope course/interview illustrations with OpenAI's
- * GPT Image 2 (https://developers.openai.com/api/docs/models/gpt-image-2).
+ * GPT Image 2. Reads prompt definitions from `data/illustration-prompts.json`
+ * (the same source the admin gallery and `<IllustrationPrompt>` cards render),
+ * builds each prompt in the house style, and writes one PNG per prompt.
  *
- * Reads the prompt definitions from `data/illustration-prompts.json` (the same
- * source of truth the `/dashboard/admin/illustration-prompts` gallery and the in-lesson
- * `<IllustrationPrompt>` cards render), builds each generation prompt in the
- * Dataslope house style (an isometric illustration of the subject, in the four
- * brand colors), and writes one PNG per prompt named `<id>.png`.
- *
- * By default it uses the OpenAI **Batch API** (~50% cheaper, async, up to a 24h
- * completion window) at **low** quality, packing the prompts into JSONL jobs
- * against the `/v1/images/generations` endpoint. A `sync` mode is available for
- * quick one-off runs.
- *
- * Why low quality is the default: image output tokens dominate the bill, and
- * the tiers are far apart. Measured on gpt-image-2 (see COST_TOKENS below),
- * one 1024x1024 image is 196 output tokens at `low` but 1372 at `medium` and
- * 5488 at `high` — so at Batch pricing ($15 / 1M output tokens) a 1000-image
- * run is ~$2.94 low vs ~$82 high. `low` is more than good enough for flat
- * isometric / risograph art; override with `--quality` for a hero image.
- *
- * Why the work is split across several batches: every image comes back as
- * inline base64 inside the batch's output JSONL, and one 1024x1024 PNG is
- * ~2.6 MB (~3.6 MB base64). A single 1000-image batch would therefore produce
- * a ~3.6 GB output file, which cannot be read into one JS string (V8 caps
- * strings at ~512 MB). So prompts are chunked into `--batch-size` jobs and
+ * Defaults to the Batch API (~50% cheaper, async) at **low** quality: image
+ * output tokens dominate the bill and `low` (196 tokens per 1024x1024 vs 5488
+ * at `high`) holds up for flat isometric/risograph art. Work is split across
+ * batches because images come back as inline base64 in the output JSONL — one
+ * big batch's file could not be read into a JS string (V8 caps ~512 MB) — and
  * every output file is parsed as a stream, never buffered whole.
  *
  * Usage:
@@ -86,12 +70,10 @@ import { createR2Client, credentialsFromEnv } from "./lib/r2.mjs";
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DATA_FILE = join(ROOT, "data", "illustration-prompts.json");
 const API_BASE = "https://api.openai.com/v1";
-// Two spellings of one endpoint, and they are not interchangeable. `api()`
-// joins IMAGES_PATH onto API_BASE, which already carries the version; a Batch
-// JSONL line names the endpoint from the API root instead, version and all.
-// Passing the batch spelling to `api()` builds `/v1/v1/images/generations` and
-// gets a 404 that reads like a missing model — which is what `sync` did until
-// the first person tried it.
+// Two spellings, not interchangeable: `api()` joins IMAGES_PATH onto
+// API_BASE (which already carries /v1), while a Batch JSONL line names the
+// endpoint from the API root. Passing the batch spelling to `api()` builds
+// `/v1/v1/...` and 404s in a way that reads like a missing model.
 const IMAGES_PATH = "/images/generations";
 const IMAGES_ENDPOINT = `/v1${IMAGES_PATH}`;
 
@@ -115,8 +97,7 @@ function parseArgs(argv) {
     only: null,
     category: null,
     size: null,
-    // Low is the default on purpose: it is ~7x cheaper than medium and ~28x
-    // cheaper than high, and holds up for isometric / risograph art.
+    // Low on purpose: ~28x cheaper than high, holds up for this art style.
     quality: "low",
     background: "auto",
     outputFormat: "png",
@@ -183,7 +164,7 @@ export function buildPrompt(spec, colors) {
   const shared =
     "No text. Draw only the objects described — nothing scattered over, around, " +
     "or behind them: no speckled dots, no confetti, no stray connecting lines.";
-  // Mirror of ISOMETRIC_CONSTRAINTS. Also the fallback for a style with no
+  // Mirror of ISOMETRIC_CONSTRAINTS; also the fallback for a style with no
   // block of its own, exactly as in the library.
   const isometric =
     "Render each object as a solid three-dimensional form with real thickness, " +
@@ -199,9 +180,7 @@ export function buildPrompt(spec, colors) {
     "coloring and markings, never a flat brand color and never a flat " +
     "silhouette. A bird has wings, a beak and feet and never hands or arms: it " +
     "perches, stands, or nudges things with its beak rather than holding them.";
-  // Mirror of RISOGRAPH_CONSTRAINTS: the inline historical figures. Flat inks
-  // instead of volume, brand colors so the cut-out survives both page
-  // backgrounds, blank paper so there is a subject to cut out at all.
+  // Mirror of RISOGRAPH_CONSTRAINTS (the inline historical figures).
   const risograph =
     "Print it as a risograph: a few flat spot-color inks, coarse halftone grain " +
     "inside every inked shape, and slight misregistration where two inks " +
