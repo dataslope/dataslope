@@ -1,17 +1,10 @@
 "use client";
 
 /**
- * Save/edit flow shared by the three item builders (code, SQL, MCQ).
- *
- * Create: POST → remember the minted /c/<id> link. When the creator is
- * signed in, subsequent saves become PUTs to the same id (the link keeps
- * working and shows the new content); guests get a fresh link per save
- * (their rows have no owner, so there is nothing to authorize an edit
- * against).
- *
- * Edit mode (?edit=<id>): the builder calls `beginEdit` after prefilling
- * its form from GET /api/custom/items/:id, so the first save is already a
- * PUT.
+ * Save/edit flow shared by the three item builders. Signed-in creators' later
+ * saves become PUTs to the same /c/<id>; guests mint a fresh link per save
+ * (no owner → nothing to authorize an edit against). In edit mode the builder
+ * calls `beginEdit` after prefilling, so the first save is already a PUT.
  */
 
 import { useCallback, useState } from "react";

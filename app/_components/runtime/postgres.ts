@@ -55,11 +55,9 @@ function toSqlValue(value: unknown): SqlValue {
   if (typeof value === "boolean") return value ? 1 : 0;
   if (typeof value === "number" || typeof value === "string") return value;
   if (typeof value === "bigint") return Number(value);
-  // json/jsonb columns arrive as plain objects and array/composite columns
-  // as JS arrays/objects. String() would render them as "[object Object]"
-  // or comma-joined text; serialize to JSON instead so the grid is readable
-  // and an edited json/jsonb value round-trips through a text -> json cast
-  // on UPDATE.
+  // json/jsonb and array/composite columns arrive as JS objects/arrays;
+  // serialize to JSON so the grid is readable and an edited value
+  // round-trips through a text -> json cast on UPDATE.
   if (Array.isArray(value) || isPlainObject(value)) {
     try {
       return JSON.stringify(value, (_k, v) =>
@@ -259,9 +257,7 @@ export interface PostgresEngine {
       rowIndex: number;
       column: string;
       value: unknown;
-      /** When present, identifies the target row by primary-key value(s)
-       *  instead of the (display-order-dependent) ctid offset. Robust to
-       *  rows moving position after a prior edit. */
+      /** Identify the row by primary-key value(s) instead of ctid offset. */
       pk?: ReadonlyArray<{ column: string; value: unknown }>;
     }>,
     schema?: string,
@@ -273,19 +269,14 @@ export interface PostgresEngine {
     schema?: string,
   ) => Promise<void>;
   activeSample: () => PostgresSampleDatabase;
-  /** Try to import a SQL dump into a fresh sandbox worker. If the SQL
-   *  executes cleanly, swap the engine over to it. If it throws, the
-   *  sandbox is discarded and the existing database stays intact. */
+  /** Import a SQL dump into a fresh sandbox worker; swap over only when it
+   *  executes cleanly, else the existing database stays intact. */
   importSqlDump: (sql: string) => Promise<PostgresSampleDatabase>;
-  /** Uncompressed tarball of the live PGDATA (PGlite's `dumpDataDir`),
-   *  full-fidelity including sequences and non-table objects. Deliberately
-   *  uncompressed: the cloud bundle codec gzips the whole container once. */
+  /** Full-fidelity PGDATA tarball (PGlite's `dumpDataDir`). Deliberately
+   *  uncompressed: the cloud bundle codec gzips the container once. */
   dumpDataDir: () => Promise<Blob>;
-  /** Try to boot a fresh sandbox worker from a PGDATA tarball (the binary
-   *  section of a cloud/share bundle). If it comes up healthy, swap the
-   *  engine over to it; otherwise the existing database stays intact.
-   *  Same sandbox semantics as importSqlDump: the restored database runs
-   *  in-memory for this session. */
+  /** Boot a fresh sandbox worker from a PGDATA tarball; swap over only when
+   *  it comes up healthy. Restored database runs in-memory this session. */
   importDataDir: (tarball: Blob) => Promise<PostgresSampleDatabase>;
   close: () => Promise<void>;
 }
@@ -293,22 +284,12 @@ export interface PostgresEngine {
 async function createFreshWorker(
   opts: { dataDir?: string; loadDataDir?: Blob } = {},
 ): Promise<PGlite> {
-  // Pass a unique `id` so this PGliteWorker instance gets its own leader-
-  // election lock and BroadcastChannel. Without a unique id every instance
-  // with the same worker URL shares the same lock, meaning an unclosed
-  // PGliteWorker from a previous page visit stays leader while the new one
-  // becomes a follower, so SQL is silently proxied to the old (already-
-  // populated) database, causing "relation already exists" errors.
-  //
-  // When `dataDir` is provided (Phase 4 OPFS persistence), it is forwarded
-  // to the worker's `init` callback which passes it to `new PGlite(opts)`.
-  // PGlite recognises the `opfs-ahp://` scheme and uses the OPFS Access
-  // Handle Pool VFS to persist data across reloads.
-  //
-  // When `loadDataDir` is provided (cloud/share bundle restore), the worker
-  // boots from that PGDATA tarball instead of running initdb. Blobs are
-  // structured-cloneable, so the option survives the postMessage hop into
-  // the worker's init callback.
+  // Unique `id` is required: instances sharing a worker URL share one
+  // leader-election lock, so an unclosed PGliteWorker from a previous visit
+  // would stay leader and silently proxy SQL to the old database
+  // ("relation already exists"). `dataDir` (opfs-ahp:// scheme) enables
+  // OPFS persistence; `loadDataDir` boots from a PGDATA tarball instead of
+  // initdb (Blobs are structured-cloneable, surviving the postMessage hop).
   const { PGliteWorker } = await loadPGliteWorkerModule();
   return new PGliteWorker(
     new Worker(new URL("./postgres-worker.ts", import.meta.url)),
@@ -320,12 +301,9 @@ async function createFreshWorker(
   ) as unknown as PGlite;
 }
 
-/** Prepare a SQL script authored for a full Postgres server so it can
- *  run inside PGlite. Dumps and distribution scripts (e.g. the Chinook
- *  release scripts) open with psql meta-commands and CREATE/DROP
- *  DATABASE statements; PGlite is a single-database embedded build, so
- *  those lines can never succeed and are dropped. Works line-by-line,
- *  both constructs are single-line statements in practice. */
+/** Prepare a server-authored SQL script for PGlite: drop psql
+ *  meta-commands and CREATE/DROP DATABASE lines, which can never succeed
+ *  in a single-database embedded build. */
 export function preparePostgresScriptForPglite(sql: string): string {
   return sql
     .split("\n")
@@ -338,10 +316,8 @@ export function preparePostgresScriptForPglite(sql: string): string {
     .join("\n");
 }
 
-/** Resolve the SQL that seeds `sample`: its inline `sql`, or, for
- *  remote samples, the script fetched from the datasets repo, prepared
- *  for PGlite. Resolve *before* tearing anything down so a failed
- *  download leaves the current database intact. */
+/** Resolve `sample`'s seed SQL (inline or remote). Resolve BEFORE tearing
+ *  anything down so a failed download leaves the current database intact. */
 async function resolveSampleSql(sample: PostgresSampleDatabase): Promise<string> {
   if (sample.remoteSql) {
     return preparePostgresScriptForPglite(await fetchDatasetText(sample.remoteSql));
@@ -349,9 +325,8 @@ async function resolveSampleSql(sample: PostgresSampleDatabase): Promise<string>
   return sample.sql ?? "";
 }
 
-/** True when the connected PGlite cluster already has at least one
- *  user table in the `public` schema, i.e. it is an existing OPFS
- *  workspace we should *not* re-seed. */
+/** True when the cluster already has a user table in `public`, i.e. an
+ *  existing OPFS workspace that must NOT be re-seeded. */
 async function pgHasUserTables(db: PGlite): Promise<boolean> {
   try {
     const res = await db.query<{ count: string }>(
@@ -364,12 +339,10 @@ async function pgHasUserTables(db: PGlite): Promise<boolean> {
 }
 
 interface CreateDbOptions {
-  /** OPFS dataDir (e.g. `"opfs-ahp://workspaces/ws_x/postgres"`).
-   *  When omitted, PGlite runs in-memory. */
+  /** OPFS dataDir (e.g. `"opfs-ahp://workspaces/ws_x/postgres"`);
+   *  omitted = in-memory. */
   dataDir?: string;
-  /** When true, never run the sample seed (used by `loadSampleDatabase`
-   *  to force a clean rebuild even when the workspace was previously
-   *  populated). */
+  /** Force a clean rebuild even when the workspace was populated. */
   forceSeed?: boolean;
 }
 
@@ -379,9 +352,8 @@ async function createFreshDatabase(
 ): Promise<PGlite> {
   const db = await createFreshWorker({ dataDir: opts.dataDir });
   await db.waitReady;
-  // First-open detection for OPFS-backed databases: skip the sample
-  // seed when the cluster already has user tables, so a returning user
-  // re-attaches to their saved workspace rather than overwriting it.
+  // Skip the seed when an OPFS cluster already has user tables — the user
+  // is re-attaching to a saved workspace.
   if (opts.dataDir && !opts.forceSeed && (await pgHasUserTables(db))) {
     return db;
   }
@@ -408,25 +380,19 @@ export async function createPostgresEngine(
     return result.rows;
   }
 
-  /** When a workspace is active we cannot point PGlite at a fresh
-   *  dataDir on sample switch (that would orphan the OPFS files), so
-   *  we drop all user objects in the existing cluster and re-run the
-   *  sample seed against it. When no workspace is active we keep the
-   *  legacy "spin up a brand-new in-memory PGlite per sample" path. */
+  /** With a workspace active, a fresh dataDir would orphan the OPFS files,
+   *  so the existing cluster is wiped and re-seeded in place; otherwise a
+   *  brand-new in-memory PGlite is spun up per sample. */
   async function rebuildForSample(target: PostgresSampleDatabase): Promise<PGlite> {
     if (dataDir) {
-      // Resolve (and, for remote samples, download) the seed SQL before
-      // wiping the cluster, so a failed download can't leave the
-      // workspace empty.
+      // Resolve the seed SQL before wiping so a failed download can't
+      // leave the workspace empty.
       const sql = await resolveSampleSql(target);
-      // In-place reset of the persistent cluster. PGlite supports
-      // `DROP SCHEMA public CASCADE; CREATE SCHEMA public;` to wipe
-      // every user object in one statement; we keep extensions intact.
+      // In-place reset; extensions stay intact.
       try {
         await db.exec(`DROP SCHEMA public CASCADE; CREATE SCHEMA public;`);
       } catch {
-        // If the bulk reset fails (e.g. permissions on a system extension),
-        // fall through to per-table drops as a best-effort fallback.
+        // Bulk reset failed; fall through to best-effort per-table drops.
       }
       if (sql) await db.exec(sql);
       return db;
@@ -438,8 +404,7 @@ export async function createPostgresEngine(
 
   const engine: PostgresEngine = {
     async loadSampleDatabase(id) {
-      // Rebuild before adopting the new sample so a failed download /
-      // seed leaves both the database and `activeSample()` unchanged.
+      // Rebuild before adopting so a failed download/seed changes nothing.
       const target = findPostgresSampleDatabase(id);
       db = await rebuildForSample(target);
       sample = target;
@@ -622,9 +587,8 @@ export async function createPostgresEngine(
         `,
         [name, schema],
       );
-      // For any enum-typed (USER-DEFINED) column, fetch its allowed labels so
-      // the result grid can offer an inline dropdown. One query for the whole
-      // schema, only when an enum column is actually present.
+      // Enum labels for USER-DEFINED columns (drives the grid's dropdown);
+      // one query per schema, only when an enum column is present.
       const enumByType = new Map<string, string[]>();
       if (rows.some((r) => r.data_type === "USER-DEFINED")) {
         const enumRows = await queryRows<{
@@ -767,11 +731,9 @@ export async function createPostgresEngine(
         }
       }
 
-      // Patch generated column expressions that reference a renamed column.
-      // This prevents CREATE TABLE from failing with "column X does not exist"
-      // when a column referenced inside a GENERATED ALWAYS AS expression is renamed.
-      // `validatePgStructure` ensures all column names are valid unquoted identifiers
-      // (/^[A-Za-z_][A-Za-z0-9_]*$/), so newName is always safe to use unquoted.
+      // Patch generated-column expressions referencing a renamed column so
+      // CREATE TABLE doesn't fail. validatePgStructure guarantees names are
+      // valid unquoted identifiers, so newName is safe unquoted.
       const patchedColumns =
         renameMap.size > 0
           ? columns.map((col) => {
@@ -798,13 +760,9 @@ export async function createPostgresEngine(
       const copyable = patchedColumns.filter((col) => col.originalName && !col.generated);
       const targetCols = copyable.map((col) => quoteIdent(col.name)).join(", ");
       const sourceCols = copyable.map((col) => quoteIdent(col.originalName!)).join(", ");
-      // Columns whose CREATE TABLE used SERIAL/BIGSERIAL/SMALLSERIAL,
-      // Postgres auto-creates sequences for those, named
-      // `<tableName>_<columnName>_seq`. After we rename the table from
-      // tmpName to finalName, the sequences keep the tmpName prefix and
-      // the column DEFAULTs still reference them by name. Collect the
-      // pairs so we can rename the sequences too, leaving the final
-      // schema clean of __tmp_rebuild artifacts.
+      // SERIAL columns get auto-created `<table>_<col>_seq` sequences that
+      // keep the tmpName prefix after RENAME TO; rename them too so the
+      // final schema has no __tmp_rebuild artifacts.
       const serialRenames = patchedColumns
         .filter((col) => col.autoIncrement && !col.generated)
         .map((col) => ({
@@ -827,12 +785,9 @@ export async function createPostgresEngine(
             `ALTER SEQUENCE ${schemaPrefix}${quoteIdent(oldSeq)} RENAME TO ${quoteIdent(newSeq)}`,
           );
         }
-        // Like the sequences above, constraints auto-named by CREATE TABLE
-        // (`<tmpName>_pkey`, `<tmpName>_<col>_key`, `<tmpName>_<col>_fkey`,
-        // …) keep the temp prefix after RENAME TO, which would surface in
-        // the sidebar as e.g. `books__tmp_rebuild_1_pkey`. Rename every
-        // constraint that carries the temp prefix; renaming a constraint
-        // also renames its backing index.
+        // Auto-named constraints (`<tmpName>_pkey`, …) also keep the temp
+        // prefix after RENAME TO; rename them (which also renames their
+        // backing indexes).
         const likePattern = `${tmpName.replace(/([%_\\])/g, "\\$1")}%`;
         const tmpConstraints = await db.query<{ conname: string }>(
           `SELECT conname FROM pg_constraint
@@ -964,8 +919,7 @@ export async function createPostgresEngine(
       const qualifiedTable = `${quoteIdent(schema)}.${quoteIdent(tableName)}`;
       for (const update of updates) {
         if (update.pk && update.pk.length > 0) {
-          // Primary-key identification: order-independent and stable even
-          // after a prior edit moved the row to a new ctid.
+          // PK identification: stable even after an edit moves the ctid.
           const where = update.pk
             .map((p, i) => `${quoteIdent(p.column)} = $${i + 2}`)
             .join(" AND ");
@@ -976,8 +930,7 @@ export async function createPostgresEngine(
             [update.value, ...update.pk.map((p) => p.value)],
           );
         } else {
-          // Fallback for tables without a primary key: locate the row by
-          // its position in ctid (heap) order.
+          // PK-less fallback: locate the row by ctid (heap) order position.
           await db.query(
             `UPDATE ${qualifiedTable}
              SET ${quoteIdent(update.column)} = $1
@@ -1014,9 +967,7 @@ export async function createPostgresEngine(
       const next = await createFreshWorker();
       await next.waitReady;
       try {
-        // Dumps taken from a full Postgres server often open with
-        // `\connect` / CREATE DATABASE lines that can never run in
-        // PGlite, strip them instead of failing the whole import.
+        // Strip `\connect` / CREATE DATABASE lines that can't run in PGlite.
         await next.exec(preparePostgresScriptForPglite(sql));
       } catch (err) {
         try {

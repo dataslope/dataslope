@@ -1,11 +1,7 @@
-// Pins the delimiter rewrite the Ask AI panel runs before Markdown parsing.
-//
-// The case that prompted it: a model answered with `\[ … \]` (standard LaTeX
-// display math), Markdown read `\[` as an escaped bracket, and the reader got
-// `[ \text{residual} = … ]` on screen instead of a formula. The rewrite has to
-// happen before Markdown, and it must not touch code — `\[` is real syntax in
-// regexes and shell, and mangling a snippet inside an answer that exists to
-// explain that snippet is a worse bug than the one being fixed.
+// Pins the delimiter rewrite the Ask AI panel runs before Markdown parsing:
+// a model answering with `\[ … \]` rendered as literal brackets on screen.
+// The rewrite must run before Markdown and must not touch code — `\[` is
+// real syntax in regexes and shell.
 import { describe, expect, it } from "vitest";
 
 import { normalizeMathDelimiters } from "../app/_components/ai/mathDelimiters";

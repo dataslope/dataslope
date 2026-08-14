@@ -1,15 +1,9 @@
 /**
- * "Open a copy" from the workspace-conflict overlay.
- *
- * A workspace runs in one tab at a time because the engines take an exclusive
- * OPFS access handle. The second tab used to be offered only an empty
- * workspace or the door; copying gets it the same data in a workspace of its
- * own, with both tabs working and neither waiting.
- *
- * The two things that make this more than a call to `duplicateWorkspace`: the
- * source is usually an unsaved draft, which is by definition absent from the
- * registry, and the tab list lives in localStorage rather than in the
- * workspace directory, so it has to be carried across separately.
+ * "Open a copy" from the workspace-conflict overlay: a workspace runs in one
+ * tab at a time (exclusive OPFS access handle), and copying gives the second
+ * tab the same data in its own workspace. More than duplicateWorkspace: the
+ * source is usually an unsaved draft (absent from the registry), and the tab
+ * list lives in localStorage, so it is carried across separately.
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";

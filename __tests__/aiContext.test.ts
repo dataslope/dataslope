@@ -275,12 +275,9 @@ describe("fetchLessonMarkdown", () => {
   });
 });
 
-// The always-on minimum. Before this existed, a question asked with every
-// context source switched off reached the model with nothing identifying the
-// page: `slug` is used server-side only to resolve the Markdown fetch and never
-// reaches the prompt, so an answer on a scikit-learn lesson could not know it
-// was one. These pin what that line says and, just as importantly, when it says
-// nothing at all.
+// The always-on minimum: with every context source off, a question once
+// reached the model with nothing identifying the page (`slug` never reaches
+// the prompt). Pins what the line says and when it says nothing.
 describe("pageIdentityLine", () => {
   it("names the page and its course", () => {
     expect(

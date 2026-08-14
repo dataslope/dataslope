@@ -1,18 +1,11 @@
 "use client";
 
 /**
- * Client helpers for Polar billing (Pro subscriptions). Server side lives in
- * lib/billing/polar.ts, which mounts the endpoints these call under
- * /api/auth/*.
- *
- * Deliberately NOT using @polar-sh/better-auth's `polarClient()` plugin: its
- * only runtime action is the embedded checkout overlay, which would pull
- * @polar-sh/checkout into the shared auth-client bundle loaded by every page
- * (HomeNav reads the session everywhere). The hosted-checkout redirect flow
- * below is one `authClient.$fetch` call and adds nothing to the bundle.
- *
- * Both helpers navigate away on success and return an error message on
- * failure (null = navigating).
+ * Client helpers for Polar billing (server side: lib/billing/polar.ts).
+ * Deliberately NOT using @polar-sh/better-auth's `polarClient()` plugin — it
+ * would pull @polar-sh/checkout into the shared auth-client bundle loaded by
+ * every page; the hosted-checkout redirect is one `$fetch` call. Helpers
+ * navigate away on success and return an error message on failure.
  */
 import { authClient } from "@/lib/auth/client";
 
@@ -30,11 +23,9 @@ function billingError(status: number | undefined, fallback: string): string {
 }
 
 /**
- * Start a Pro checkout for the signed-in user: asks the server for a Polar
- * checkout session (slug "pro", or "pro-annual" when annual billing is
- * requested and configured) and redirects the browser to Polar's hosted
- * checkout. Polar returns the buyer to /account?checkout=success, where the
- * plan flip (written by the webhook) is picked up.
+ * Starts a Pro checkout: asks the server for a Polar checkout session and
+ * redirects to Polar's hosted checkout, which returns the buyer to
+ * /account?checkout=success.
  */
 export async function startProCheckout(
   period: "monthly" | "annual" = "monthly",
@@ -60,18 +51,15 @@ export async function startProCheckout(
     window.location.assign(data.url);
     return null;
   } catch (err) {
-    // $fetch can throw (network failures / configured-to-throw clients)
-    // instead of returning {error}, either way the caller gets a message.
+    // $fetch can throw (network failures) instead of returning {error}.
     const status = (err as { status?: number })?.status;
     return billingError(status, "Couldn't start checkout. Please try again.");
   }
 }
 
 /**
- * Open Polar's customer portal (invoices, payment method, cancel/renew) for
- * the signed-in user. Only works for users who actually have a Polar
- * customer record, i.e. they've been through checkout; comped/admin Pro
- * users get an error message instead.
+ * Opens Polar's customer portal. Only works for users with a Polar customer
+ * record (i.e. been through checkout); comped/admin Pro users get an error.
  */
 export async function openBillingPortal(): Promise<string | null> {
   try {
@@ -129,11 +117,9 @@ export function takeCheckoutPeriod(): CheckoutPeriod | null {
 }
 
 /**
- * After returning from checkout, the webhook that flips `plan` to 'pro' can
- * land a moment after the redirect, and the session cookie cache can lag up
- * to five minutes on top. Poll the session with the cookie cache bypassed
- * (each poll also refreshes the cookie) until the plan reads 'pro' or we
- * give up. Returns true once Pro is active.
+ * Polls the session (cookie cache bypassed) until the plan reads 'pro' or we
+ * give up — the webhook's plan flip can land after the checkout redirect.
+ * Returns true once Pro is active.
  */
 export async function waitForProActivation(
   attempts = 10,

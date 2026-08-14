@@ -24,10 +24,8 @@ export interface HomeCodeChallenge {
   tests: ChallengeTest[];
 }
 
-// Every language solves the same task (find the longest run of consecutive
-// equal values in a fixed list and print its length), graded on stdout so it
-// works identically on every runtime. The sample list [1, 1, 2, 3, 3, 3, 2, 2]
-// has a longest run of three, so the expected output is "3".
+// Every language solves the same task, graded on stdout so it works on every
+// runtime. [1, 1, 2, 3, 3, 3, 2, 2] has a longest run of three → "3".
 const LONGEST_RUN_TESTS: ChallengeTest[] = [
   {
     id: "longest_run",
@@ -43,11 +41,8 @@ function longestRunInstructions(printHint: string): string {
 Print the length of the **longest run** with ${printHint}. For \`[1, 1, 2, 3, 3, 3, 2, 2]\` the longest run is the three \`3\`s, so the answer is \`3\`.`;
 }
 
-/**
- * The non-SQL code challenges, in dropdown order. Every language solves the
- * same single-file "longest consecutive run" task so the demo reads
- * consistently no matter which language a visitor picks.
- */
+/** The non-SQL code challenges, in dropdown order; every language solves the
+ *  same "longest consecutive run" task so the demo reads consistently. */
 export const CODE_CHALLENGES: HomeCodeChallenge[] = [
   {
     adapter: "python",
@@ -556,12 +551,9 @@ export const WEB_CODE_BLOCKS: HomeWebBlock[] = [
 ];
 
 /**
- * Conceptual multiple-choice questions, authored in the
- * `<MultipleChoiceQuestion>` markdown format (`[o]` marks the correct choice;
- * `>` lines are per-choice explanations shown to every learner after they
- * answer). Per the repo's authoring rule, no explanation opens with an
- * affirmative word. The set spans the topics the courses cover: SQL, Python /
- * data analysis, machine learning, web development, and NLP.
+ * Conceptual multiple-choice questions in the `<MultipleChoiceQuestion>`
+ * markdown format. Per the repo's authoring rule, no explanation opens with
+ * an affirmative word.
  */
 export const CONCEPT_QUESTIONS: string[] = [
   // SQL, WHERE vs HAVING

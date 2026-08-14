@@ -1,14 +1,8 @@
 /**
- * Carrying the query history and starred queries in a cloud save.
- *
- * Both lived in one browser's localStorage, so a member who opened a backed-up
- * workspace on a second device found the database and the tabs and none of the
- * queries they had run or starred. They now travel in the bundle's `personal`
- * section.
- *
- * Two properties matter more than the plumbing: the merge must not cost the
- * receiving device its own history, and `personal` must never reach a share
- * bundle, which is a copy handed to whoever has the link.
+ * Query history and starred queries travel in a cloud save's `personal`
+ * section (they lived only in localStorage, so a second device found none).
+ * Two properties matter most: the merge must not cost the receiving device
+ * its own history, and `personal` must never reach a share bundle.
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";

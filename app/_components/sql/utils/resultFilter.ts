@@ -1,19 +1,8 @@
-/** Pure helpers for the result-grid in-grid filter ("find in results").
- *
- *  The filter is a *view* over an already-materialized result set: it narrows
- *  which rows the grid displays and paginates, matching the text the user sees
- *  in each cell (via `formatCellValue`). It never touches the database, so it
- *  is engine-independent and behaves identically for SQLite, Postgres and
- *  DuckDB, and it leaves the export paths (which operate on the full result)
- *  untouched.
- *
- *  Matching is a case-insensitive substring test. A leading `column:` prefix
- *, where `column` names a real column in the result, scopes the match to
- *  that single column; otherwise the term is matched against every column.
- *  Because the prefix only activates when it names an existing column, a value
- *  that merely contains a colon (a `12:30` time, or free text like `note: hi`
- *  when there is no `note` column) is treated as a plain whole-string term and
- *  is never silently swallowed. */
+/** Pure helpers for the in-grid result filter: a view over an
+ *  already-materialized result, matching the displayed cell text
+ *  (case-insensitive substring); never touches the database. A leading
+ *  `column:` prefix scopes the match, but only when it names a real column —
+ *  so a value that merely contains a colon (`12:30`) is never swallowed. */
 
 import { formatCellValue } from "./cellUtils";
 
@@ -48,8 +37,7 @@ export function parseResultFilter(
 }
 
 /** Does a single row match the parsed filter? A blank term matches every row
- *  (so the grid doesn't flash empty while the user is still typing, e.g. right
- *  after "name:"). */
+ *  so the grid doesn't flash empty mid-typing (e.g. right after "name:"). */
 export function rowMatchesResultFilter(
   row: readonly unknown[],
   columnNames: readonly string[],
@@ -89,17 +77,10 @@ export function filterResultRowIndices(
   return out;
 }
 
-/** Whether the in-grid (client-side) filter can be offered for a result set,
- *  i.e. the *whole* result is already in memory, so filtering its rows is
- *  complete and correct.
- *
- *  Always true for a materialized (non-lazy) result. For an engine-paged
- *  "lazy" result it is true only when the loaded rows cover the entire result
- *  starting at offset 0: a single page that happened to fit the whole result
- *  (rows ≤ the page size), or an "All"/infinite result that has been fully
- *  loaded. A partially-loaded lazy result returns false, filtering only the
- *  loaded window would mislead the user; covering it needs a SQL `WHERE`
- *  pushdown (a separate change). */
+/** Whether the client-side filter can be offered: the *whole* result must be
+ *  in memory. Always true for materialized results; for a lazy result only
+ *  when the loaded rows cover everything from offset 0. A partially-loaded
+ *  result returns false — filtering only the loaded window would mislead. */
 export function canClientFilterResult(params: {
   isLazy: boolean;
   loadedRows: number;
@@ -111,16 +92,10 @@ export function canClientFilterResult(params: {
   return startIdx === 0 && loadedRows >= totalRows;
 }
 
-// ────────────────────────────────────────────────────────────────────────
-// Server-side filter pushdown (for engine-paged / "lazy" results)
-//
-// When the whole result isn't in memory, filtering it client-side would only
-// see the loaded window. Instead, like DBeaver, we wrap the original query
-// as a subquery and push the filter down as a native SQL predicate, re-paged
-// through the engine so infinite scroll is preserved. The match is a
-// case-insensitive substring per column (LIKE on SQLite, ILIKE on Postgres /
-// DuckDB), with the same `column:term` scoping as the client-side filter.
-// ────────────────────────────────────────────────────────────────────────
+// Server-side filter pushdown for engine-paged results: wrap the original
+// query as a subquery with a native SQL predicate (LIKE / ILIKE), re-paged
+// through the engine so infinite scroll is preserved. Same `column:term`
+// scoping as the client-side filter.
 
 export type SqlDialect = "sqlite" | "postgres" | "duckdb";
 
@@ -136,34 +111,23 @@ function quoteIdent(name: string): string {
   return `"${name.replace(/"/g, '""')}"`;
 }
 
-/** Escape the LIKE metacharacters (`\`, `%`, `_`) in a search term so they are
- *  matched literally; the caller wraps the result in `%…%` and adds
- *  `ESCAPE '\'`. */
+/** Escape LIKE metacharacters (`\`, `%`, `_`) so they match literally; the
+ *  caller wraps the result in `%…%` and adds `ESCAPE '\'`. */
 function escapeLikeTerm(term: string): string {
   return term.replace(/[\\%_]/g, (ch) => `\\${ch}`);
 }
 
-/** Render a JS string as a single-quoted SQL string literal (doubling embedded
- *  single quotes). Together with `escapeLikeTerm` this keeps arbitrary user
- *  text injection-safe when inlined into the generated SQL. */
+/** Single-quoted SQL string literal (doubling embedded quotes); with
+ *  `escapeLikeTerm` this keeps arbitrary user text injection-safe. */
 function sqlStringLiteral(s: string): string {
   return `'${s.replace(/'/g, "''")}'`;
 }
 
-/** Build a SQL boolean condition (without a leading `WHERE`) that reproduces
- *  the in-grid filter as a server-side predicate, for pushing down into an
- *  engine-paged query. Returns `null` when the filter has no term (the caller
- *  should query without a `WHERE`).
- *
- *  - Case-insensitive substring per column via `LIKE` (SQLite, ASCII
- *    case-insensitive) or `ILIKE` (Postgres, DuckDB), against `CAST(col AS …)`
- *    so non-text columns are searchable too.
- *  - A leading `column:term` (when `column` names a real result column) scopes
- *    the match to that one column; otherwise the term is matched against every
- *    column with `OR`.
- *  - The term is escaped for both the SQL string literal and `LIKE` wildcards
- *    (`ESCAPE '\'`), so arbitrary text, quotes, `%`, `_`, is literal and
- *    injection-safe. */
+/** SQL boolean condition (no leading `WHERE`) reproducing the in-grid filter
+ *  server-side; `null` when the filter has no term. Uses LIKE/ILIKE against
+ *  `CAST(col AS TEXT)` so non-text columns are searchable. The term is
+ *  escaped for both the string literal and LIKE wildcards (`ESCAPE '\'`), so
+ *  arbitrary text — quotes, `%`, `_` — stays literal and injection-safe. */
 export function buildResultFilterWhere(
   columnNames: readonly string[],
   raw: string,

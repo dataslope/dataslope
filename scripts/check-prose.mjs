@@ -1,82 +1,36 @@
 // Lints authored prose for the punctuation and phrasing tics that read as
-// machine-written. Companion to check-mcq.mjs, which lints <MultipleChoice>
-// structure; this one lints the words themselves.
+// machine-written. Companion to check-mcq.mjs. Rules:
+//   1. em-dash          no em dashes in authored prose (use commas,
+//                       parentheses, a colon, a semicolon, or a full stop).
+//   2. spaced-en-dash   ` - ` with an en dash is the same tic; unspaced en
+//                       dashes stay (ranges, two-name compounds).
+//   3. ai-filler        a short high-precision list of generated-marketing
+//                       phrases; deliberately excludes ordinary technical
+//                       vocabulary (robust, leverage, underscore).
+//   4. inline-display-math  `$$…$$` on one line is TEXT math to
+//                       micromark-extension-math and renders inline at text
+//                       size; display math must be `$$`, body, `$$` on three
+//                       lines.
+//   5. blockquote-quotes  the stylesheet already draws typographic quotes
+//                       around a blockquote, so a typed pair renders doubled.
+//   6. colour-spelling  "colour" only — it is also a CSS property, Plot
+//                       channel and prop name, so the spellings collide on
+//                       the page. Other British spellings are left alone.
+//   7. mermaid-dash     a non-hyphen dash (or `--` used as one) in a mermaid
+//                       label; labels sit in fences the rules above skip, and
+//                       mermaid renders label text verbatim.
+//   8. escaped-backtick a `\`` in a <Callout> body: the body is markdown, not
+//                       a template literal, so the backslash prints. Callout
+//                       bodies only — that is where a line-based rule can be
+//                       certain.
 //
-//   1. em-dash, the house style has no em dashes (or horizontal bars) in
-//                    authored prose. A parenthetical takes commas or
-//                    parentheses, an elaboration takes a colon, and two
-//                    independent clauses take a semicolon or a full stop.
-//                    Picking the right one is the point: the em dash is
-//                    banned because it lets you avoid choosing.
-//   2. spaced-en-dash, ` - ` written with an en dash is the same tic wearing
-//                    a different glyph. Unspaced en dashes are fine and stay:
-//                    they are correct in numeric ranges (1815-1864) and in
-//                    two-name compounds (Runge-Kutta, bias-variance).
-//   3. ai-filler,    a short, high-precision list of phrases that only ever
-//                    turn up in generated marketing prose. Deliberately does
-//                    NOT include words that are ordinary technical vocabulary
-//                    here (robust, leverage, underscore all have real
-//                    meanings in statistics, regression and Python).
-//   4. inline-display-math, a `$$…$$` formula written on one line. Both
-//                    delimiters on the same line is TEXT math to
-//                    micromark-extension-math, not flow math, so the formula
-//                    is set inline at text size: a `\frac` collapses into the
-//                    line and its delimiters crowd the fraction bar. Display
-//                    math has to be `$$`, the body, `$$` on three lines.
-//   5. blockquote-quotes, a blockquote whose whole body is wrapped in a typed
-//                    pair of double quotes. The stylesheet already puts
-//                    typographic quotes around one (Fumadocs' bundled
-//                    typography sets `blockquote p:first-of-type::before {
-//                    content: open-quote }`), so the typed pair renders as a
-//                    second one and the reader sees ""like this"".
-//   6. colour-spelling, "colour" and its family, spelled the British way.
-//                    This one word is held to American spelling while the rest
-//                    of the prose is left alone, and the reason is that it is
-//                    not only a word here. It is a CSS property, a Plot channel
-//                    and a prop name, so a paragraph about `color="country"`
-//                    that calls it a colour reads as a typo rather than as a
-//                    dialect. Other British spellings in this repo (behaviour,
-//                    centre, favour) have no such collision and are not
-//                    touched.
-//   7. mermaid-dash, a dash inside a mermaid diagram label that is not a plain
-//                    ASCII hyphen. Diagram labels are prose the reader sees,
-//                    but they sit in a fenced block, so every rule above skips
-//                    them and they drifted: a flowchart shipped with
-//                    "ffill -- safe as a live feature" in a node, where mermaid
-//                    renders label text verbatim and the reader saw a literal
-//                    double hyphen. Two shapes are caught, `--` used the way an
-//                    em dash would be, and any non-ASCII dash glyph. See the
-//                    section below for why labels are held to a stricter
-//                    standard than rule 2 holds prose to.
-//   8. escaped-backtick, a `\`` in the *body* of a `<Callout>`. Inside a JS
-//                    template literal that escape is required, and nearly
-//                    every long string in these lessons is one, so the habit
-//                    travels: 285 of them reached readers across 22 files as
-//                    the literal character, `\`@app.route\`` printed with its
-//                    backticks showing instead of set as code. A callout body
-//                    is markdown, not a template literal, and markdown reads
-//                    the backslash as "print this backtick". Callout bodies
-//                    only, because that is where a line-based rule can be
-//                    certain: a template literal never starts a line with
-//                    `<Callout`. The same mistake in a table cell is real but
-//                    not detectable this cheaply.
+// Scope: content/**/*.mdx (every em dash counts);
+// data/illustration-prompts.json (gallery text); app/**/*.{ts,tsx} and
+// charts/**/*.mjs (only em dashes in a phrase, outside comments — chart
+// title/caption exports render as lesson prose).
 //
-// Scope is what a reader actually sees:
-//
-//   - content/**/*.mdx           every em dash is a violation
-//   - data/illustration-prompts.json  titles and subjects render in the gallery
-//   - app/**/*.{ts,tsx}          only em dashes sitting in a phrase, outside
-//                                comments. A bare "-" glyph marking an empty
-//                                table cell is a typographic convention, not
-//                                prose, so `{col.type || "<em dash>"}` passes.
-//   - charts/**/*.mjs          same rule as app/: a chart's `title` and
-//                                `caption` exports are read on the lesson page
-//                                exactly like the prose around them, and the
-//                                MDX linter above cannot see them because they
-//                                live in a spec rather than in content/.
-//
-// Used both as a CLI (`node scripts/check-prose.mjs [files...]`, defaults to
-// all three roots) and as a library by __tests__/proseStyle.test.ts.
+// Used as a CLI (`node scripts/check-prose.mjs [files...]`) and as a library
+// by __tests__/proseStyle.test.ts.
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -112,15 +66,11 @@ const QUOTE_CHAR = /["“”]/g;
 const LEADING_EMPHASIS = /^[*_]{1,2}/;
 const TRAILING_EMPHASIS = /[*_]{1,2}$/;
 
-/** Every unindented blockquote in an MDX body, as `{ line, body }`, where
- *  `body` is the `>` markers stripped and the lines joined into one string.
- *
- *  Unindented is the whole point: a blockquote indented by two spaces is a
- *  `<MultipleChoice>` per-choice explanation, which parseQuestion.ts strips
- *  the `>` from and renders through MarkdownInline. No <blockquote> element
- *  reaches the page, so no stylesheet quotes are added and a typed pair is
- *  the only pair there is. Fenced code is skipped, a `>` inside it is a
- *  sample, a prompt, or a mermaid edge rather than a quotation. */
+/** Every unindented blockquote in an MDX body, as `{ line, body }`.
+ *  Unindented matters: an indented `>` is a <MultipleChoice> explanation that
+ *  never becomes a <blockquote>, so it gets no stylesheet quotes and a typed
+ *  pair is fine there. Fenced code is skipped (a `>` inside is a sample or a
+ *  mermaid edge). */
 function blockquotes(lines) {
   const found = [];
   let fence = null;
@@ -153,13 +103,8 @@ function blockquotes(lines) {
 }
 
 /** True when a blockquote body carries its own wrapping pair of double
- *  quotes, on top of the pair the stylesheet draws.
- *
- *  Requiring the body to hold exactly two quote characters is what keeps
- *  this from firing on correct prose: `"Dense" describes the rank sequence,
- *  not "sparse"` also opens and closes on a quote, but its four quotes mark
- *  two quoted terms rather than one wrapped quotation. Two quotes sitting at
- *  the two ends can only be a wrapper. */
+ *  quotes. Exactly two quote characters at the two ends can only be a
+ *  wrapper; a body with more (two quoted terms, say) is correct prose. */
 export function hasWrappingQuotes(body) {
   const inner = body.replace(LEADING_EMPHASIS, "").replace(TRAILING_EMPHASIS, "").trim();
   if ((inner.match(QUOTE_CHAR) || []).length !== 2) return false;
@@ -168,35 +113,25 @@ export function hasWrappingQuotes(body) {
 
 // --- mermaid labels -------------------------------------------------------
 
-/** Any dash that is not a plain ASCII hyphen: em dash, horizontal bar, en
- *  dash, and the Unicode minus sign.
- *
- *  Stricter than rule 2, which keeps unspaced en dashes because they are
- *  correct in a numeric range. A diagram label is a few words in a box, so
- *  there is no typographic case to weigh, and one flat "hyphens only" rule
- *  beats a spaced/unspaced distinction nobody can see at label size. */
+/** Any dash that is not a plain ASCII hyphen. Stricter than rule 2: a label
+ *  is a few words in a box, so one flat "hyphens only" rule beats a
+ *  spaced/unspaced distinction nobody can see at label size. */
 const NON_ASCII_DASH = /[—―–−]/;
 
 /** A run of two or more hyphens used the way an em dash would be, with
- *  whitespace on at least one side. Mermaid renders label text verbatim, so
- *  this reaches the reader as the literal characters that were typed.
- *
- *  The whitespace is what keeps the rule off real content: `--verbose` names a
- *  CLI flag, `i--` is a decrement, and `-- comment` opens a SQL line comment.
- *  All three are things the lessons here legitimately draw in a diagram, and
- *  none of them is a dash standing in for punctuation. */
+ *  whitespace on at least one side — the whitespace keeps the rule off
+ *  `--verbose`, `i--` and SQL's `-- comment`, all of which lessons
+ *  legitimately draw. */
 const HYPHEN_RUN_AS_DASH = /(^|\s)-{2,}(\s|$)/;
 
 /** Mermaid's own line kinds whose colon introduces a style declaration or a
  *  layout keyword rather than label text (`style A fill:#f9f`). */
 const MERMAID_DIRECTIVE = /^\s*(style|classDef|class|click|linkStyle|direction)\b/;
 
-/** The diagram kinds where a colon introduces free text that runs to the end
- *  of the line: a sequence message, a note, a state description, a timeline
- *  event. In a flowchart it means nothing of the sort, and reading it that way
- *  is wrong in a way that bites, `A((a: 1,2,3,4,5)) --- I((4,5))` is a node
- *  label holding a colon, and taking the rest of the line as its text picks up
- *  the `---` link that follows. */
+/** Diagram kinds where a colon introduces free text running to end of line
+ *  (a sequence message, a note, a timeline event). In a flowchart a colon is
+ *  just label content, and reading it as free text picks up the link after
+ *  it. */
 const COLON_LABEL_DIAGRAMS = new Set([
   "sequenceDiagram",
   "stateDiagram",
@@ -209,13 +144,9 @@ const COLON_LABEL_DIAGRAMS = new Set([
 ]);
 
 /** Every line inside a ```mermaid fence, as `{ line, text, diagram }`, where
- *  `diagram` is the block's opening keyword (`flowchart`, `sequenceDiagram`).
- *
- *  Mermaid's `%%` comments are dropped: they never reach the rendered diagram,
- *  so a dash in one is as invisible as a dash in a TS comment (which
- *  stripComments already exempts). Dropping them first also means the diagram
- *  keyword is read off the first line that actually declares one, rather than
- *  off a leading `%%{init: ...}%%` directive. */
+ *  `diagram` is the block's opening keyword. `%%` comments are dropped —
+ *  they never render, and dropping them first also keeps a leading
+ *  `%%{init: ...}%%` from being read as the diagram keyword. */
 export function mermaidLines(lines) {
   const found = [];
   let fence = null;
@@ -242,26 +173,13 @@ export function mermaidLines(lines) {
   return found;
 }
 
-/** The label text on one mermaid line, for the hyphen-run rule.
- *
- *  Only the spans where a hyphen run can be *label* rather than *syntax*:
- *
- *    - quoted labels, `A["text"]` and `-->|"text"|`. A label holding two
- *      hyphens has to be quoted, since mermaid would otherwise read them as
- *      the link they look like, so this is where the rule earns its keep.
- *    - the free text after the first colon on a sequence message, a note, or a
- *      timeline event (`Alice->>Bob: text`), which runs to end of line and is
- *      the one unquoted label that can hold a hyphen run. Only in the diagram
- *      kinds where a colon means that (COLON_LABEL_DIAGRAMS).
- *
- *  Deliberately NOT the unquoted node labels (`A[text]`) or the bare edge
- *  labels (`A -->|text| B`): a hyphen run inside one is a link, not a label,
- *  and reading those spans is how you end up flagging `}|--|{` in an ER
- *  diagram or the `[ A | * ]` pointer boxes in the linked-list lesson.
- *
- *  The non-ASCII dash rule needs none of this and runs on the whole line, so
- *  it catches unquoted labels too: mermaid's syntax is pure ASCII, so any en
- *  dash on the line is already inside label text wherever it sits. */
+/** The label text on one mermaid line, for the hyphen-run rule: only spans
+ *  where a hyphen run can be *label* rather than *syntax* — quoted labels
+ *  (a label holding `--` must be quoted anyway) and the free text after a
+ *  colon in COLON_LABEL_DIAGRAMS. Unquoted node/edge labels are deliberately
+ *  excluded: a hyphen run there is a link, and scanning them flags ER
+ *  cardinality syntax. The non-ASCII dash rule runs on the whole line
+ *  instead, since mermaid syntax is pure ASCII. */
 export function mermaidLabelText(line, diagram) {
   const spans = [];
   for (const m of line.matchAll(/"([^"]*)"/g)) spans.push(m[1]);

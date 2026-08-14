@@ -757,9 +757,8 @@ async function main() {
   if (opts.command === "run") return cmdRun(entries, opts, model, key);
 }
 
-// Only drive the CLI when executed directly. The vitest suite imports
-// `buildPrompt` from here to assert it matches lib/illustrationPrompt.ts, and
-// that import must not kick off a run.
+// Only drive the CLI when executed directly: the vitest suite imports
+// `buildPrompt`, and that import must not kick off a run.
 const invokedDirectly =
   process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url;
 

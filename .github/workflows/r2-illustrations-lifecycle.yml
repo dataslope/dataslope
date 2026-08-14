@@ -1,59 +1,33 @@
 name: R2 illustrations lifecycle
 
 # Applies the retention rule for the illustration-candidate bucket
-# (`dataslope-illustrations`), so generated candidates expire on their own
-# instead of accumulating.
+# (`dataslope-illustrations`) so generated candidates expire on their own.
+# A lifecycle rule is bucket configuration — Cloudflare deletes server-side
+# once it's set — and keeping it in the repo makes the window reviewable and
+# re-appliable if the bucket is recreated.
 #
-# Why a workflow rather than a one-off command: an R2 lifecycle rule is bucket
-# configuration, not a recurring job. Cloudflare does the deleting server-side
-# for free once the rule is set, so nothing here needs a schedule. Keeping the
-# rule in the repo makes the retention window reviewable in a diff and
-# re-appliable if the bucket is ever recreated — which is exactly what a
-# hand-run `wrangler r2 bucket lifecycle add` on someone's laptop is not.
+# The bucket holds every generated candidate + cut-out (see "Illustrations"
+# in AGENTS.md); only chosen ones are promoted into git, the rest are dead
+# weight once a pick is made. EXPIRE_DAYS is the review/promote window:
+# Cloudflare deletes older objects promoted or not. The served WebP is
+# unaffected, but the pristine PNG is gone — re-promoting at different
+# quality then means paying to regenerate. Raise EXPIRE_DAYS for a longer
+# review.
 #
-# What the pipeline puts in this bucket (see "Illustrations" in AGENTS.md):
-# `scripts/generate-illustrations.mjs --sink r2` writes every generated
-# candidate under `illustrations/<runId>/<promptId>/v<n>/`, and
-# `scripts/remove-background-kie.mjs` adds the cut-outs beside them. Most are
-# rejects: the point of R2 is that only the chosen ones are promoted into git by
-# `scripts/promote-illustrations.mjs`. The rest are dead weight the moment a
-# pick is made, and this rule sweeps them.
-#
-# EXPIRE_DAYS is the window you have to review and promote a run. Anything
-# under `illustrations/` older than that is deleted by Cloudflare, promoted or
-# not — promotion writes its own encoded WebP into `public/images/`, so an
-# expired candidate that was already promoted costs nothing served. What you
-# lose is the pristine PNG, and with it the ability to re-promote at a
-# different quality without paying to regenerate. Raise EXPIRE_DAYS if a batch
-# needs to sit through a longer review.
-#
-# Uses the S3 API rather than wrangler, so no `wrangler login` and no separate
-# Cloudflare API token are needed — but NOT the same credentials as
-# r2-cache-cleanup.yml, which is what made the first run of this workflow fail.
-# A lifecycle rule is bucket *configuration*, and R2 lets only an
-# "Admin Read & Write" API token edit that. The "Object Read & Write" token the
-# rest of the pipeline shares can list, read and write objects, and even
-# head-bucket succeeds with it, so everything looks fine right up to the write,
-# where it returns a bare AccessDenied.
+# Credentials: NOT the same as r2-cache-cleanup.yml. Editing bucket
+# configuration requires an "Admin Read & Write" R2 token — an Object token
+# can list/read/write objects and even passes head-bucket, then gets a bare
+# AccessDenied on the config write. Admin tokens are account-wide, so the
+# dedicated R2_ADMIN_* pair is confined to this workflow and kept out of the
+# unattended cache-cleanup job on purpose.
 # https://developers.cloudflare.com/r2/api/tokens/#permissions
 #
-# Hence the dedicated R2_ADMIN_* pair below, used by this workflow and nothing
-# else. R2 admin tokens cannot be scoped to a single bucket (they are
-# account-wide by definition), so confining one to the single job that needs it
-# beats handing the same rights to r2-cache-cleanup.yml, which deletes objects
-# unattended every six hours and whose whole safety story is that it cannot
-# reach dataslope-workspaces (live user data, bound to the app Worker) or
-# destroy dataslope-inc-cache outright. That job keeps its own object-scoped
-# R2_INC_CACHE_* pair.
-#
 # NOTE: PutBucketLifecycleConfiguration REPLACES a bucket's entire lifecycle
-# configuration. This job targets `dataslope-illustrations` only and that bucket
-# has no other rules; it must never be pointed at dataslope-inc-cache or
+# configuration. This job must never be pointed at dataslope-inc-cache or
 # dataslope-workspaces, whose contents are not disposable.
 #
-# Required repository secrets (Settings → Secrets and variables → Actions):
-#   CLOUDFLARE_ACCOUNT_ID       Cloudflare account ID (the R2 S3 endpoint host),
-#                               shared with r2-cache-cleanup.yml
+# Required repository secrets:
+#   CLOUDFLARE_ACCOUNT_ID       Cloudflare account ID (shared with r2-cache-cleanup.yml)
 #   R2_ADMIN_ACCESS_KEY_ID      R2 API token access key id (Admin Read & Write)
 #   R2_ADMIN_SECRET_ACCESS_KEY  R2 API token secret access key
 

@@ -1,13 +1,8 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// ─────────────────────────────────────────────────────────────────────
-// Inline array / LIST editor (UX-04), Postgres + DuckDB.
-// An array column (Postgres `integer[]`, DuckDB Arrow `list<...>`) renders
-// as a JSON string and is edited as JSON; on commit the parsed JS array is
-// written back and the engine binds it as a real array (Postgres via
-// pglite, DuckDB via a bound LIST parameter). SQLite has no native array
-// type, so it's excluded.
-// ─────────────────────────────────────────────────────────────────────
+// Inline array/LIST editor, Postgres + DuckDB: an array column renders and
+// edits as JSON; on commit the parsed JS array is bound as a real array.
+// SQLite has no native array type, so it's excluded.
 
 async function runSql(page: Page, sql: string) {
   const editor = page.locator(".cm-content");

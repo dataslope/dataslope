@@ -1,32 +1,10 @@
 /**
- * Thin runtime + helpers around `@sqlite.org/sqlite-wasm`.
- *
- * Consumers (`sqlite-core.ts`, `sqliteSamples.ts`) use the underlying
- * `Database` and `PreparedStatement` classes from sqlite-wasm directly;
- * this module only adds the small bits that aren't part of the OO API:
- *
- *   - `loadSqlite3()`         memoised, CDN-hosted module init
- *   - `openDatabase()`        construct an `oo1.DB` (in-memory or
- *                             VFS-backed) and optionally deserialise
- *                             a `.sqlite` byte image into it
- *   - `iterateStatements()`   generator: yields a `PreparedStatement`
- *                             per top-level statement in a multi-stmt
- *                             SQL script (replacement for sql.js's
- *                             `db.iterateStatements`)
- *   - `execAll()`             returns one `QueryExecResult` per
- *                             result-producing statement (replacement
- *                             for sql.js's `db.exec(sql)`)
- *   - `getRow()`              read the current row as an array, with
- *                             BigInt → Number/string coercion
- *   - `exportDatabase()`      serialise the DB to a `.sqlite` image
- *
- * The reason we load sqlite-wasm from a CDN at runtime (rather than
- * bundling it) is that its `index.mjs` contains
- * `new Worker(new URL(dynamicProxyUri, import.meta.url))`, which
- * Turbopack rejects at build time even though the code path is
- * unreachable when using the SAH Pool VFS that we actually use. This
- * mirrors the same pattern already used for `@duckdb/duckdb-wasm` and
- * `parquet-wasm` in this repo.
+ * Thin runtime + helpers around `@sqlite.org/sqlite-wasm`, adding the bits
+ * that aren't part of its OO API (memoised CDN loader, statement iteration,
+ * sql.js-shaped execAll, value coercion, import/export). Loaded from a CDN
+ * at runtime because its index.mjs contains a `new Worker(new URL(...))`
+ * that Turbopack rejects at build time, even though that path is
+ * unreachable with the SAH Pool VFS we use.
  */
 
 import type {
@@ -42,14 +20,12 @@ export type { Database, PreparedStatement, Sqlite3Static, BindingSpec };
 // Value types (kept compatible with the surface the existing UI expects).
 // ---------------------------------------------------------------------------
 
-/** Per-cell value coming out of a result row. We narrow sqlite-wasm's
- *  `SqlValue` so the rest of the playground never sees `bigint` or
- *  `Int8Array` / `ArrayBuffer` instances. */
+/** Per-cell result value; narrows sqlite-wasm's `SqlValue` so the rest of
+ *  the playground never sees `bigint` or `Int8Array`/`ArrayBuffer`. */
 export type SqlValue = string | number | null | Uint8Array;
 
-/** Shape of one result set returned by `execAll`. Matches the legacy
- *  sql.js result shape so downstream UI code (ResultView, importers,
- *  etc.) does not need to change. */
+/** One `execAll` result set; matches the legacy sql.js shape so downstream
+ *  UI code doesn't change. */
 export interface QueryExecResult {
   columns: string[];
   values: SqlValue[][];
@@ -59,10 +35,9 @@ export interface QueryExecResult {
 // sqlite-wasm module loader (memoised, CDN-hosted)
 // ---------------------------------------------------------------------------
 
-// IMPORTANT: keep this constant in sync with the
-// `@sqlite.org/sqlite-wasm` version pinned in package.json. The npm
-// install only ships the TypeScript declarations to us; the actual
-// runtime is fetched from jsDelivr.
+// IMPORTANT: keep in sync with the `@sqlite.org/sqlite-wasm` version in
+// package.json — npm only supplies the type declarations; the runtime is
+// fetched from jsDelivr.
 const SQLITE_WASM_VERSION = "3.53.0-build1";
 const SQLITE_WASM_CDN = `https://cdn.jsdelivr.net/npm/@sqlite.org/sqlite-wasm@${SQLITE_WASM_VERSION}/dist/index.mjs`;
 
@@ -77,8 +52,7 @@ let sqlite3Promise: Promise<Sqlite3Static> | null = null;
 export function loadSqlite3(): Promise<Sqlite3Static> {
   if (!sqlite3Promise) {
     sqlite3Promise = (async () => {
-      // The magic comments tell webpack/turbopack to leave this URL
-      // alone instead of trying to resolve it at build time.
+      // Magic comments keep webpack/turbopack from resolving the URL at build time.
       const mod = (await import(
         /* webpackIgnore: true */ /* turbopackIgnore: true */ SQLITE_WASM_CDN
       )) as { default?: Sqlite3InitFn };
@@ -197,16 +171,10 @@ export function exportDatabase(sqlite3: Sqlite3Static, db: Database): Uint8Array
 // Value coercion
 // ---------------------------------------------------------------------------
 
-/** Coerce a single sqlite-wasm cell value to a `SqlValue`:
- *  - `undefined` → `null`
- *  - `bigint` within safe-integer range → `number`
- *  - `bigint` outside safe range → decimal string
- *  - `Int8Array` / `ArrayBuffer` → `Uint8Array`
- *  - everything else passes through.
- *
- * The coercion is required because sqlite-wasm enables BigInt support
- * by default, but the rest of the playground (ResultView, exporters,
- * etc.) assumes plain numbers/strings. */
+/** Coerce a sqlite-wasm cell value to a `SqlValue`: bigint → number (or a
+ *  decimal string outside safe range), Int8Array/ArrayBuffer → Uint8Array.
+ *  Needed because sqlite-wasm enables BigInt by default but the playground
+ *  assumes plain numbers/strings. */
 export function coerceValue(v: unknown): SqlValue {
   if (v === null || v === undefined) return null;
   if (typeof v === "bigint") {
@@ -230,8 +198,7 @@ export function coerceValue(v: unknown): SqlValue {
  *  that the most recent `stmt.step()` returned `true`. */
 export function getRow(stmt: PreparedStatement): SqlValue[] {
   const row = stmt.get([]) as unknown[];
-  // Reuse-and-mutate: sqlite-wasm fills the array we hand it; map
-  // produces a new array with coerced values.
+  // sqlite-wasm fills the array we hand it; map yields a fresh coerced one.
   return row.map(coerceValue);
 }
 
@@ -240,15 +207,10 @@ export function getRow(stmt: PreparedStatement): SqlValue[] {
 // ---------------------------------------------------------------------------
 
 /**
- * Split a multi-statement SQL script into individual statements, with
- * awareness of string literals, identifiers, single- and block-style
- * comments, and `BEGIN ... END` trigger bodies (whose internal `;`
- * does not terminate the outer CREATE TRIGGER statement).
- *
- * This is good enough for everything the playground accepts
- * (CREATE/INSERT/SELECT/PRAGMA/CREATE TRIGGER). Each returned segment
- * retains its trailing semicolon so the prepared-statement engine can
- * consume it as-is.
+ * Split a multi-statement SQL script, aware of string literals,
+ * identifiers, comments, and `BEGIN ... END` trigger bodies (whose `;`
+ * doesn't terminate the outer CREATE TRIGGER). Segments keep their
+ * trailing semicolon.
  */
 export function splitSqlStatements(sql: string): string[] {
   const out: string[] = [];
@@ -346,11 +308,9 @@ export function splitSqlStatements(sql: string): string[] {
 }
 
 /**
- * Walk a multi-statement script one prepared statement at a time. The
- * generator yields each statement; the *caller* must `finalize()` it
- * before requesting the next one (mirrors the lifetime contract that
- * sql.js's `iterateStatements` had). A `for ... of` consumer should
- * wrap the yielded statement in `try { ... } finally { stmt.finalize(); }`.
+ * Yield one prepared statement per script statement. The CALLER must
+ * `finalize()` each before requesting the next (sql.js's lifetime
+ * contract) — wrap in `try { ... } finally { stmt.finalize(); }`.
  */
 export function* iterateStatements(
   db: Database,
@@ -363,8 +323,7 @@ export function* iterateStatements(
     try {
       stmt = db.prepare(segment);
     } catch (err) {
-      // A trailing bare-semicolon segment is not a real statement; skip
-      // silently so authors don't need to strip trailing whitespace.
+      // A trailing bare-semicolon segment isn't a real statement; skip it.
       if (trimmed === ";") continue;
       throw err;
     }
@@ -373,17 +332,16 @@ export function* iterateStatements(
 }
 
 /**
- * Execute every statement in `sql` and return one `QueryExecResult`
- * for each *result-producing* statement (statements with zero columns
- * are dropped from the output, matching sql.js's `db.exec` semantics).
+ * Execute every statement and return one `QueryExecResult` per
+ * result-producing statement (zero-column statements are dropped,
+ * matching sql.js's `db.exec`).
  */
 export function execAll(db: Database, sql: string): QueryExecResult[] {
   const out: QueryExecResult[] = [];
   for (const stmt of iterateStatements(db, sql)) {
     try {
-      // sqlite-wasm 3.53.0-build1's `getColumnNames()` throws "Column
-      // index 0 is out of range" when `columnCount === 0` (DDL/DML).
-      // Guard with `columnCount` so DML statements drain cleanly.
+      // sqlite-wasm 3.53.0-build1's `getColumnNames()` throws when
+      // `columnCount === 0`; guard so DDL/DML drains cleanly.
       if (stmt.columnCount === 0) {
         while (stmt.step()) {
           /* drain */

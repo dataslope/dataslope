@@ -1,12 +1,8 @@
 import { test, expect, type Page, type Locator } from "@playwright/test";
 
-// ─────────────────────────────────────────────────────────────────────
-// "Column statistics" inspector in the shared result grid.
-// Right-clicking a column header opens its context menu; "Column
-// statistics" computes descriptive stats over the loaded rows and shows
-// them in a dialog. Verified live on all three engines (the feature lives
-// entirely in the shared ResultView, so it behaves identically).
-// ─────────────────────────────────────────────────────────────────────
+// "Column statistics" in the shared result grid: right-click a header →
+// "Column statistics" computes descriptive stats over the loaded rows.
+// Lives entirely in the shared ResultView; verified on all three engines.
 
 async function runSql(page: Page, sql: string) {
   const editor = page.locator(".cm-content");

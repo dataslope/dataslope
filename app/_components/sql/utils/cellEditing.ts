@@ -141,10 +141,8 @@ function timePart(s: string): string | null {
 }
 
 /** Convert a stored cell value into the string a native date/time input
- *  expects, or `null` if the value isn't a recognizable temporal string (in
- *  which case the caller should fall back to the plain text editor, so odd
- *  representations, e.g. a SQLite date stored as a Unix integer, are never
- *  silently mangled). */
+ *  expects, or `null` when it isn't a recognizable temporal string (caller
+ *  falls back to the text editor so odd representations are never mangled). */
 export function toDateEditorValue(
   stored: unknown,
   kind: TemporalEditorKind,
@@ -163,11 +161,9 @@ export function toDateEditorValue(
   return `${d}T${t}`;
 }
 
-/** Convert the value coming back from a native date/time input into the string
- *  to commit. Where the original value's format is known it is preserved by
- *  substituting only its date/time substrings (keeping separator, fractional
- *  seconds and any timezone suffix); otherwise a plain ISO-ish string is
- *  produced. */
+/** Convert a native date/time input's value into the string to commit,
+ *  substituting only the original's date/time substrings (preserving its
+ *  format); otherwise a plain ISO-ish string. */
 export function fromDateEditorValue(
   inputValue: string,
   kind: TemporalEditorKind,
@@ -227,18 +223,11 @@ export function formatBytesHex(bytes: Uint8Array): string {
   return rows.join("\n");
 }
 
-/** Decide whether a previously-stored cell value can be safely written back
- *  verbatim for a one-step *undo* of a committed edit (UX-10).
- *
- *  Undo re-applies the value the engine itself returned, so for scalars it is
- *  exactly as safe as the original write. Only values that round-trip cleanly
- *  through the same update path are reversible:
- *    • `null`, string, number, boolean, bigint → passed through unchanged;
- *    • `Date` → normalized to an ISO string (every engine parses it back, and
- *      it avoids DuckDB's `String(date)` literal, which isn't valid SQL);
- *  A complex original (JS array/object from a LIST/STRUCT/JSON column, or raw
- *  `Uint8Array` bytes) returns `{ ok: false }` so the caller suppresses undo
- *  rather than risk a lossy reverse-write. */
+/** Whether a stored cell value can be written back verbatim for post-commit
+ *  undo. Scalars pass through; `Date` normalizes to ISO (avoids DuckDB's
+ *  `String(date)` literal, which isn't valid SQL); complex values (arrays,
+ *  objects, bytes) return `{ ok: false }` so undo is suppressed rather than
+ *  risking a lossy reverse-write. */
 export function reversibleCellValue(value: unknown): {
   ok: boolean;
   value: unknown;

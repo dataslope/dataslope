@@ -1,12 +1,8 @@
-// Pins the flat-URL redirect table that next.config.ts bakes into the routes
-// manifest (lib/courseAliasRedirects.ts).
-//
-// Two failure modes are worth a test. The loud one is a redirect that points
-// somewhere wrong — every destination here must be a real lesson, or the fix
-// for a 404 is a redirect to a 404. The quiet one is the ambiguity rule
-// silently inverting: `next-steps` exists in 31 courses, and a rule that
-// picked one of them would send 30 courses' readers to the wrong course while
-// looking perfectly healthy in the manifest.
+// Pins the flat-URL redirect table next.config.ts bakes into the routes
+// manifest (lib/courseAliasRedirects.ts). Loud failure: a destination that is
+// not a real lesson (a redirect to a 404). Quiet failure: the ambiguity rule
+// inverting — `next-steps` exists in 31 courses, and picking one would send
+// 30 courses' readers to the wrong course while looking healthy.
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";

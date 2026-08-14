@@ -1,13 +1,8 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// ─────────────────────────────────────────────────────────────────────
-// "Create Index" / "Create View" schema-tree actions (UX-11).
-// The INDEXES and VIEWS sections each gained a "+" that opens a shared,
-// prop-controlled dialog; on submit it runs standard cross-engine DDL and
-// refreshes the sidebar. Verified live on all three engines, the dialogs
-// and the `buildCreate{Index,View}Sql` builders are shared, so behaviour
-// is identical; only the run/refresh callback is per-engine.
-// ─────────────────────────────────────────────────────────────────────
+// "Create Index" / "Create View" schema-tree actions: the "+" opens a shared
+// dialog that runs cross-engine DDL and refreshes the sidebar. Dialogs and
+// SQL builders are shared; only the run/refresh callback is per-engine.
 
 async function runSql(page: Page, sql: string) {
   const editor = page.locator(".cm-content");

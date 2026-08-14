@@ -1,10 +1,7 @@
 /**
  * The orderings behind the sort controls on both admin review galleries.
- *
- * Worth testing directly rather than through either page: both are behind an
- * admin gate, one is a static server component holding megabytes of inline SVG
- * and the other a client grid, and this project's test environment is Node
- * with no DOM. The comparators are the whole of the behaviour anyway.
+ * Tested directly: both pages sit behind an admin gate and the test
+ * environment is Node with no DOM; the comparators are the whole behaviour.
  */
 import { describe, expect, it } from "vitest";
 import {

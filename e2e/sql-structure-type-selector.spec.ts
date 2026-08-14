@@ -1,15 +1,10 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// ─────────────────────────────────────────────────────────────────────
-// Update 2: A column whose committed type isn't one of the built-in presets
-//, e.g. Postgres `character varying(15)` (how PGlite reports `varchar(15)`),
-// or any parameterized type, must NOT make the View/Edit Structure type
-// picker show "No matching built-in types." Opening the list should reveal
-// the full set of built-in types while preserving the column's real type.
-// The PgTypeSelector / DuckDb equivalents share `computeVisibleTypeGroups`
-// (unit-tested separately); this exercises the live Postgres wiring against
-// the reported northwind `categories.category_name` scenario.
-// ─────────────────────────────────────────────────────────────────────
+// A column whose committed type isn't a built-in preset (e.g. PGlite reports
+// varchar(15) as `character varying(15)`) must NOT make the structure
+// editor's type picker show "No matching built-in types"; the list opens to
+// the full set while the real type is preserved. computeVisibleTypeGroups is
+// unit-tested separately; this exercises the live Postgres wiring.
 
 async function runSql(page: Page, sql: string) {
   const editor = page.locator(".cm-content");

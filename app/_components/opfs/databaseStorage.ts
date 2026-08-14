@@ -1,23 +1,9 @@
 /**
- * OPFS database storage for workspace database files (SQLite, etc.).
- *
- * Each database lives at:
- *   opfs root / workspaces / {workspaceId} / db / {name}
- *
- * Writes are debounced: a pending write for the same `(workspaceId, name)` key
- * supersedes any earlier queued write for that key. Flushing happens:
- *  1. On `requestIdleCallback` / `setTimeout` (deferred, idle-time I/O).
- *  2. Eagerly on `pagehide` / `visibilitychange` so database state is not lost
- *     when the user closes the tab.
- *
- * `readDatabase` always reads directly from OPFS.
- *
- * Note: Phase 1 uses the async OPFS API (no synchronous access handles). This
- * means the full database byte array is serialized on each write. For large
- * databases this can be slow; Phase 3 will switch to the native OPFS VFS
- * (`@sqlite.org/sqlite-wasm`) which performs incremental page writes.
- *
- * No UI changes are made in Phase 1; this file is infrastructure only.
+ * OPFS storage for workspace database files, at
+ * `workspaces/{workspaceId}/db/{name}`. Writes are debounced (newer writes
+ * per key supersede older ones), flushed on idle and eagerly on
+ * pagehide/visibilitychange. Uses the async OPFS API, so the full byte array
+ * is serialized on each write — slow for large databases.
  */
 
 import { isOpfsSupported } from "./featureDetect";
@@ -109,12 +95,8 @@ if (typeof window !== "undefined") {
 // ---------------------------------------------------------------------------
 
 /**
- * Queues an asynchronous write of `data` to the workspace database file
- * identified by `(workspaceId, name)`. Returns immediately; the actual I/O
- * happens on the next idle callback (or `pagehide`).
- *
- * Falls back gracefully when OPFS is unavailable, the write is silently
- * dropped (the database lives only in the engine's in-memory state).
+ * Queues an async write; I/O happens on the next idle callback or pagehide.
+ * Silently dropped when OPFS is unavailable (database stays in-memory only).
  */
 export function writeDatabase(
   workspaceId: string,
@@ -125,10 +107,7 @@ export function writeDatabase(
   schedule();
 }
 
-/**
- * Reads the raw bytes of a workspace database file from OPFS.
- * Returns `null` when OPFS is unavailable or the file does not exist.
- */
+/** Reads a database file's raw bytes; null when unavailable or missing. */
 export async function readDatabase(
   workspaceId: string,
   name: string,
@@ -150,9 +129,7 @@ export async function readDatabase(
   }
 }
 
-/**
- * Force-flushes all pending database writes. Safe to call before page unload.
- */
+/** Force-flushes all pending database writes. */
 export async function flushDatabaseWrites(): Promise<void> {
   await flush();
 }

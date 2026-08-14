@@ -1,11 +1,8 @@
 /**
- * Shared catalog of the transactional auth emails, used by both the
- * /email-preview page (renders each design) and the /api/email-preview route
- * (sends a live test copy). Keeping the list in one place means the preview and
- * the "send test" button can never drift out of sync.
- *
- * Server-only: no "use client" and no client imports, so the API route can pull
- * it into the Worker runtime without dragging in React.
+ * Shared catalog of the transactional auth emails, used by both the preview
+ * page and the /api/email-preview route so the two can't drift. Server-only:
+ * no "use client" and no client imports, so the API route can pull it into
+ * the Worker runtime without dragging in React.
  */
 import {
   deleteAccountEmail,

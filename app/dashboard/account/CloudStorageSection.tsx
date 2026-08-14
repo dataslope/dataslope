@@ -1,11 +1,9 @@
 "use client";
 
 /**
- * Account-page management for cloud storage: every cloud-saved workspace and
- * share link on the account, across all playgrounds. The in-playground Cloud
- * dialog only shows its own playground's saves; this is the one place to see
- * (and free up) everything, which matters because the storage quota is
- * account-wide, and because revoking a share link is only possible here.
+ * Cloud storage management: every cloud-saved workspace and share link on the
+ * account, across all playgrounds. The quota is account-wide, and revoking a
+ * share link is only possible here.
  */
 
 import { useCallback, useEffect, useState } from "react";

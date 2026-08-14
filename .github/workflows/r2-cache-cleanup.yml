@@ -249,25 +249,22 @@ jobs:
             printf '%s' "$url"
           }
 
-          # The keep set: build ID -> why it is kept. `keep_class` separates
-          # "a deployment is serving this right now" (never capped) from "a
-          # branch head names this" (capped by MAX_BRANCHES, see step 6).
+          # The keep set: build ID -> why. `keep_class` separates "a
+          # deployment is serving this now" (never capped) from "a branch head
+          # names this" (capped by MAX_BRANCHES).
           declare -A keep_reason keep_class
           remember() {
             local sha="$1" class="$2" reason="$3"
             if [[ -z "$sha" ]]; then return 0; fi
-            # First reason wins, so the strongest claim is the one reported:
-            # production is registered before branch heads, and a live probe
-            # before the head it may or may not equal.
+            # First reason wins: strongest claims are registered first.
             if [[ -n "${keep_reason[$sha]+set}" ]]; then return 0; fi
             keep_reason["$sha"]="$reason"
             keep_class["$sha"]="$class"
           }
 
-          # 1) What production is serving RIGHT NOW. The only authoritative
-          #    source is the Worker itself. Exhausting the retries aborts the
-          #    run: without this answer every folder is unexplained, and the
-          #    sweep would delete the live cache and 500 the site.
+          # 1) What production serves RIGHT NOW. Exhausting retries aborts:
+          #    without this answer every folder is unexplained, and the sweep
+          #    would delete the live cache and 500 the site.
           if ! prod_id="$(probe_build_id "$BUILD_ID_URL")"; then
             echo "::error::Could not read a valid production build ID from $BUILD_ID_URL after $PROBE_ATTEMPTS attempts. Aborting without deleting."
             exit 1
@@ -275,13 +272,11 @@ jobs:
           prod_folder="${PREFIX}${prod_id}/"
           remember "$prod_id" live "live production, probed at $BUILD_ID_URL"
 
-          # 2) What production is ABOUT TO serve. Production builds only ever
-          #    come from the default branch, so its head is the incoming build:
-          #    during the minutes between "cache populated" and "Worker
-          #    switched" the probe above still reports the outgoing build, and
-          #    that gap is what wiped the live cache mid-deploy on 2026-07-16.
-          #    Naming the exact commit replaces the old MAIN_COMMITS window and
-          #    is unbounded in time, so a stalled deploy cannot age out of it.
+          # 2) What production is ABOUT TO serve: head(default_branch). During
+          #    the minutes between "cache populated" and "Worker switched" the
+          #    probe still reports the outgoing build — that gap wiped the
+          #    live cache mid-deploy on 2026-07-16. Unbounded in time, so a
+          #    stalled deploy cannot age out.
           if ! default_branch="$(gh api "repos/$GITHUB_REPOSITORY" --jq .default_branch)" \
              || [[ -z "$default_branch" ]]; then
             echo "::error::Could not resolve the default branch from GitHub. Aborting without deleting."
@@ -294,10 +289,8 @@ jobs:
           fi
           remember "$default_head" next "head of '$default_branch', production's incoming build"
 
-          # 3) Enumerate branches. Workers Builds builds every branch on every
-          #    push regardless of whether a pull request exists, so this asks
-          #    for branches rather than PRs (see the header). Abort on API
-          #    failure: a transient error here would leave every preview folder
+          # 3) Enumerate branches (not PRs — see header). Abort on API
+          #    failure: a transient error would leave every preview folder
           #    unexplained, i.e. deleted.
           if ! branches_raw="$(gh api "repos/$GITHUB_REPOSITORY/branches?per_page=100" --paginate \
                 --jq '.[] | [.name, .commit.sha] | @tsv')"; then
@@ -311,26 +304,19 @@ jobs:
           done <<< "$branches_raw"
           echo "Branches: $branch_total"
 
-          # 4) For each branch, register what its preview is about to serve
-          #    (the head commit) and what it is serving right now (the probe).
-          #    These are usually the same folder and occasionally are not,
-          #    which is the entire point: a push moves the head immediately
-          #    while the preview Worker keeps serving the previous commit until
-          #    the new build lands. Deleting that older folder is what 500'd a
-          #    live preview on 2026-08-05.
+          # 4) Per branch, register the head commit (about to serve) and the
+          #    probe (serving now). Usually the same folder, occasionally not:
+          #    a push moves the head while the preview keeps serving the
+          #    previous commit — deleting that older folder 500'd a live
+          #    preview on 2026-08-05.
           probed=0
           while IFS=$'\t' read -r branch head_sha; do
             [[ -z "$branch" ]] && continue
             remember "$head_sha" branch "head of '$branch', that preview's incoming build"
 
-            # The default branch has no preview: pushing to it deploys to
-            # PRODUCTION, which step 1 already probed at its own URL, and
-            # https://main-dataslope.…workers.dev 404s (measured 2026-08-14).
-            # Probing it anyway is not merely wasted — its failure would drop
-            # into the fallback below and pin the last FALLBACK_COMMITS
-            # commits of the default branch, which is MAIN_COMMITS resurrected
-            # by accident and cost 2.5 GB per run in the first dry run of this
-            # rewrite.
+            # The default branch has no preview (it deploys to PRODUCTION,
+            # already probed in step 1). Probing it would fail into the
+            # fallback below and needlessly pin its last FALLBACK_COMMITS.
             if [[ "$branch" == "$default_branch" ]]; then
               continue
             fi
@@ -351,31 +337,24 @@ jobs:
             fi
 
             if (( rc == 0 )); then
-              # Logged even though remember() may discard it as a duplicate.
-              # It usually IS one — a healthy preview serves its own branch
-              # head — and when the answer is deduped under an earlier claim
-              # the keep-set listing shows that other claim's reason, leaving
-              # no trace that the probe ran at all. A dry run exists to be read.
+              # Logged even when remember() dedupes it under an earlier claim,
+              # so the run output still shows that the probe ran.
               echo "Preview '$branch' is serving ${served:0:12} (probed at $alias_url)"
               remember "$served" live "serving the '$branch' preview, probed at $alias_url"
               continue
             fi
 
-            # A definitive 404 means this branch has no deployment at all —
-            # its build failed, or has not run. There is nothing live to
-            # protect, so the head-commit claim registered above is the whole
-            # truth and the fallback would only pin folders nobody is reading.
+            # Definitive 404: no deployment at all, nothing live to protect —
+            # the head-commit claim above is the whole truth, no fallback.
             if (( rc == 2 )); then
               echo "No deployment at $alias_url for '$branch' (404); its head build is the only claim it has."
               continue
             fi
 
-            # rc == 1: no answer either way. A probe failure must never widen
-            # into a delete, so fall back to the pre-probe behaviour for THIS
-            # BRANCH ONLY and never abort the sweep over one flaky preview.
-            # Losing the probe AND the commit list, though, means knowing
-            # nothing about the branch — the one case conservative behaviour
-            # cannot be synthesised from, so abort rather than guess.
+            # rc == 1: no answer. A probe failure must never widen into a
+            # delete — fall back for THIS BRANCH ONLY, never abort the sweep.
+            # But losing the probe AND the commit list means knowing nothing
+            # about the branch, so abort rather than guess.
             if ! recent="$(gh api "repos/$GITHUB_REPOSITORY/commits" -X GET \
                   -f sha="$branch" -f per_page="$FALLBACK_COMMITS" --jq '.[].sha')"; then
               echo "::error::Could not probe the '$branch' preview and could not list its recent commits either. Aborting without deleting."
@@ -405,11 +384,8 @@ jobs:
             exit 0
           fi
 
-          # What the bucket weighs before this run touches anything. Measured
-          # over the whole prefix rather than summed from the per-folder
-          # listings below, so it counts every object under it — including any
-          # that is not inside a build folder, which a sum of folders would
-          # silently miss.
+          # Measured over the whole prefix, not summed per folder, so objects
+          # outside any build folder are counted too.
           bytes_before="$(bucket_bytes "$PREFIX")"
           echo "Bucket before: $(gb "$bytes_before") GB across ${#folders[@]} build folders"
 
@@ -426,42 +402,21 @@ jobs:
           echo "Dry run: $DRY_RUN"
 
           # 6) Date every non-production folder by when it was POPULATED, so
-          #    the grace window means what it says and the MAX_BRANCHES cap has
-          #    a global newest-first order to apply.
+          #    the grace window means what it says and the MAX_BRANCHES cap
+          #    has a global newest-first order.
           entries=()
           for folder in "${folders[@]}"; do
             [[ "$folder" == "$prod_folder" ]] && continue
 
-            # Use the MEDIAN object's LastModified, not the newest.
-            #
-            # A deploy writes the whole folder in one burst (measured
-            # 2026-08-14: median 0.8 min, max 1.8 min for ~1,081 objects), so
-            # any object in the burst dates the folder to within a couple of
-            # minutes. The max does NOT, because objects also arrive at REQUEST
-            # time, long after the deploy: a `/courses/*` path that isn't
-            # prerendered used to render the not-found page and get that 404
-            # cached (~1.8 MB, `revalidate: false`) into whichever build folder
-            # was live. Every such write reset the folder's apparent age to
-            # zero. Folder 0127baf6 was populated at 17:54 and then took 404
-            # writes at 18:22, 19:59, 20:46 and 21:07 — gaps of 28, 97, 47 and
-            # 21 minutes, every one inside GRACE_HOURS — so it was held as
-            # "possibly an in-flight deploy" more than three hours after its
-            # deploy finished. 4 of 33 folders were affected.
-            #
-            # `dynamicParams = false` on the courses route has since stopped
-            # those writes at the source (an unmatched path now 404s without
-            # rendering), but the median stays: any future request-time write
-            # would revive the bug, and the median costs nothing. It is immune
-            # by construction (a burst of ~1,081 objects cannot be moved by a
-            # handful of late ones) and stays correct for the case the grace
-            # window exists to protect — during an in-flight populate the
-            # median of what has landed so far is also seconds old.
-            #
-            # The CLI auto-paginates above 1000 objects and applies --query per
-            # page, so this emits one tab-separated batch PER PAGE. Flatten to
-            # one stamp per line and sort globally: R2 reports LastModified in a
-            # uniform UTC ISO-8601 layout, so a lexical sort is chronological.
-            # Drop the "None" a genuinely empty page emits.
+            # MEDIAN LastModified, not the newest: objects can also arrive at
+            # REQUEST time long after the deploy (cached 404s once reset a
+            # folder's apparent age for hours, holding it inside GRACE_HOURS).
+            # The median is immune by construction — a ~1,081-object burst
+            # can't be moved by a few late writes — and stays seconds-old
+            # during an in-flight populate, which is what the grace window
+            # protects. Pages emit one tab-separated batch each; flatten and
+            # sort (R2's uniform UTC ISO-8601 makes lexical = chronological),
+            # dropping the "None" an empty page emits.
             mapfile -t stamps < <(
               aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$folder" \
                 --query 'Contents[].LastModified' --output text 2>/dev/null \
@@ -482,11 +437,9 @@ jobs:
             sha="${folder#"$PREFIX"}"; sha="${sha%/}"
 
             if [[ -n "${keep_reason[$sha]+set}" ]]; then
-              # A folder claimed only by a branch head is capped; one a live
-              # probe named is not. The difference matters: over the cap, the
-              # first costs a preview its next build (it re-populates on the
-              # next push), while the second takes down a deployment that is
-              # serving from it right now.
+              # Branch-head claims are capped; live-probe claims are not:
+              # over the cap the first costs a preview its next build, the
+              # second takes down a deployment serving right now.
               if [[ "${keep_class[$sha]}" == "branch" ]]; then
                 branches=$((branches+1))
                 if (( branches > MAX_BRANCHES )); then
@@ -500,8 +453,7 @@ jobs:
                 kept=$((kept+1)); continue
               fi
             elif (( ts >= grace_cutoff )); then
-              # Last line of defence, and deliberately blind to what the folder
-              # is: a deploy that populated moments ago may be visible to
+              # Deliberately blind: a just-populated deploy may be visible to
               # neither a probe nor a branch head yet.
               echo "KEEP  $folder (populated $populated, inside the ${GRACE_HOURS}h grace window, possibly an in-flight deploy)"
               kept=$((kept+1)); continue
@@ -509,9 +461,7 @@ jobs:
               echo "DELETE $folder (populated $populated, nothing is serving it and no branch head claims it)"
             fi
 
-            # Weigh it BEFORE removing it — afterwards there is nothing left to
-            # measure. Only folders on their way out are weighed, so this costs
-            # nothing on a run that deletes nothing.
+            # Weigh BEFORE removing — afterwards there's nothing to measure.
             folder_size="$(bucket_bytes "$folder")"
             echo "       ($(gb "$folder_size") GB)"
 
@@ -520,36 +470,28 @@ jobs:
             elif delete_folder "$folder"; then
               deleted=$((deleted+1)); freed=$((freed + folder_size))
             else
-              # Persistent (non-transient) failure: log it, keep sweeping the
-              # rest, and fail the job at the end so it's surfaced. The next
-              # scheduled run retries this folder from scratch.
+              # Persistent failure: keep sweeping the rest, fail the job at
+              # the end; the next run retries this folder.
               echo "::error::Could not fully delete $folder after 5 attempts (persistent R2 errors)."
               failed=$((failed+1))
             fi
           done < <(printf '%s\n' ${entries[@]+"${entries[@]}"} | sort -rn)
 
           echo "---"
-          # DRY_RUN is always exactly "true" or "false"; choose the verb to match.
-          # (A ${DRY_RUN/true/would be } substitution used to leak a literal
-          # "false" into the summary on real runs, "folders falsedeleted".)
           if [[ "$DRY_RUN" == "true" ]]; then
             echo "Folders kept: $kept | folders would be deleted: $deleted"
-            # Nothing was removed, so the closing size is arithmetic rather
-            # than a measurement, and says so.
+            # Nothing was removed, so the closing size is arithmetic, and says so.
             echo "Bucket: $(gb "$bytes_before") GB now -> $(gb "$((bytes_before - freed))") GB projected | would free $(gb "$freed") GB ($(pct "$freed" "$bytes_before")%)"
           else
             echo "Folders kept: $kept | folders deleted: $deleted | folders failed: $failed"
-            # Re-measure rather than subtract. R2 is strongly consistent after
-            # a delete, so this is the ground truth of what the run achieved,
-            # and it stays honest when a folder failed to delete or when a
-            # deploy wrote a new one while the sweep was running — both cases
-            # where `before - freed` would quietly overstate the result.
+            # Re-measure rather than subtract: stays honest when a delete
+            # failed or a deploy wrote a new folder mid-sweep.
             bytes_after="$(bucket_bytes "$PREFIX")"
             echo "Bucket: $(gb "$bytes_before") GB before -> $(gb "$bytes_after") GB after | freed $(gb "$((bytes_before - bytes_after))") GB ($(pct "$((bytes_before - bytes_after))" "$bytes_before")%)"
           fi
 
-          # Surface persistent delete failures loudly, but only after every
-          # folder has been attempted, a later run will retry the stragglers.
+          # Surface persistent delete failures, but only after every folder
+          # was attempted.
           if (( failed > 0 )); then
             echo "::error::${failed} folder(s) could not be fully deleted after retries; the next scheduled run will retry them."
             exit 1

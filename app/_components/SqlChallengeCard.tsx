@@ -961,8 +961,7 @@ export default function SqlChallengeCard({
     },
   });
 
-  // Sync the CodeMirror theme whenever the docs color scheme toggles
-  // (Fumadocs dark/light toggle or OS preference change).
+  // Sync the CodeMirror theme whenever the docs color scheme toggles.
   useEffect(() => {
     const reconfigure = (view: EditorView | null, comp: Compartment | null) => {
       if (view && comp) {
@@ -974,11 +973,8 @@ export default function SqlChallengeCard({
   }, [cmThemeName]);
 
   // Mount the read-only solution editor lazily when the modal opens.
-  // We keep the doc editable at the contenteditable level (relying on
-  // `readOnly` to block insertions) so the user can click into the
-  // editor and select text, including Mod-A select-all, wired via
-  // the default keymap below since `editable.of(false)` would
-  // otherwise disable keyboard focus and shortcuts.
+  // `readOnly` (not `editable.of(false)`) blocks insertions while keeping
+  // caret movement, selection, and Mod-A working.
   useEffect(() => {
     if (!solutionOpen || !solutionSql) return;
     if (!solutionEditorHostRef.current || solutionEditorRef.current) return;
@@ -1031,8 +1027,7 @@ export default function SqlChallengeCard({
   }, [destroyEngine]);
 
   // ─── Table viewer ───────────────────────────────────────────────────
-  // All table-list / paging / loading state lives in the shared hook so
-  // this card and `<SqlCodeBlock>` behave identically.
+  // Shared hook so this card and `<SqlCodeBlock>` behave identically.
   const {
     enabled: tableViewerEnabled,
     entries: tableEntries,
@@ -1051,9 +1046,7 @@ export default function SqlChallengeCard({
   );
 
   // Eagerly boot the engine on mount so the table viewer can populate
-  // before the learner clicks Run. The engine is per-card and isolated,
-  // so doing this once per mount is safe. The completion schema
-  // piggybacks on the same boot.
+  // before the learner clicks Run; the completion schema piggybacks.
   useEffect(() => {
     if (!tableViewerEnabled) return;
     void ensureEngine()
@@ -1062,26 +1055,20 @@ export default function SqlChallengeCard({
         return refreshTableViewer(engine);
       })
       .catch(() => {
-        // Lower the skeleton so it doesn't spin forever; per-table
-        // errors surface in their own column once a run succeeds.
+        // Lower the skeleton so it doesn't spin forever.
         markTablesInitDone();
       });
   }, [ensureEngine, refreshTableViewer, refreshCompletionSchema, tableViewerEnabled, markTablesInitDone]);
 
   // ─── Execution ──────────────────────────────────────────────────────
-  /**
-   * Run the user's SQL against the seeded engine. Returns the last
-   * result set produced (or `null` for DML-only batches), along with
-   * how long the SQL took to run. Throws on syntax / runtime errors so
-   * callers can surface them in the UI.
-   */
+  /** Run the user's SQL against the seeded engine. Returns the last result
+   *  set (or `null` for DML-only batches) and elapsed time; throws on
+   *  syntax / runtime errors. */
   const executeSql = useCallback(
     async (
       sql: string,
-      // The caller's run sequence (from `++runSeqRef.current`). Owning
-      // the increment in the caller lets it guard its own post-await
-      // state updates too, a newer run/check/reset supersedes both
-      // this execution's streaming updates and the caller's final ones.
+      // The caller's run sequence; owning the increment there lets it guard
+      // its own post-await state updates too.
       mySeq: number,
     ): Promise<{
       results: SqlResult[];
@@ -1101,21 +1088,16 @@ export default function SqlChallengeCard({
       try {
         results = await engine.exec(sql);
       } finally {
-        // Hold the running overlay for at least MIN_RUN_OVERLAY_MS so
-        // the wave animation doesn't blink in/out on sub-frame runs.
-        // The throw path is covered here too so error states get the
-        // same minimum visible duration before the caller's catch
-        // swaps status to "error".
+        // Hold the running overlay for at least MIN_RUN_OVERLAY_MS so the
+        // wave animation doesn't blink on sub-frame runs (throw path too).
         const wait = MIN_RUN_OVERLAY_MS - (performance.now() - startedAt);
         if (wait > 0) {
           await new Promise<void>((resolve) => setTimeout(resolve, wait));
         }
       }
       const elapsedMs = performance.now() - startedAt;
-      // The "last meaningful result" is the last result set with
-      // columns. DML statements come back with empty columns so they
-      // shouldn't shadow a preceding SELECT, but if the user only ran
-      // DML, we still want to show *something*.
+      // Last result set WITH columns: DML comes back with empty columns and
+      // shouldn't shadow a preceding SELECT; DML-only still shows something.
       let last: SqlResult | null = null;
       for (const r of results) {
         if (r.columns.length > 0) last = r;
@@ -1173,8 +1155,8 @@ export default function SqlChallengeCard({
       setStatus("error");
       setStatusMessage(message);
     } finally {
-      // Only the latest run owns the busy spinner, a superseded run
-      // clearing it would re-enable Submit mid-flight for its successor.
+      // Only the latest run owns the busy spinner; a superseded run
+      // clearing it would re-enable Submit mid-flight.
       if (runSeqRef.current === mySeq) setActiveAction(null);
     }
   }, [executeSql, ensureEngine, refreshTableViewer, refreshCompletionSchema, tableViewerEnabled]);
@@ -1259,13 +1241,9 @@ export default function SqlChallengeCard({
       return;
     }
 
-    // Run the reference solution (if any test asks for it) against the
-    // SAME engine. Because tests may want to inspect post-DML state,
-    // we evaluate `runAfterSql` BEFORE running the solution so the
-    // learner's mutations are still visible. The solution SELECT
-    // shouldn't mutate state, and if it did, every test's expectation
-    // would be against the solution-mutated state, which would be a
-    // bug in the exercise authoring anyway.
+    // Run the reference solution (if a test asks for it) against the SAME
+    // engine, after the learner's SQL so their mutations are still visible.
+    // A solution that mutates state would be an exercise-authoring bug.
     let solutionResult: SqlResult | null = null;
     const wantsSolution = tests.some((t) => t.matchesSolution);
     if (wantsSolution) {
@@ -1364,19 +1342,15 @@ export default function SqlChallengeCard({
     runRef.current = run;
   }, [run]);
 
-  // The split button's default action (and Mod-Enter) is "Submit"
-  // when the challenge actually has tests; otherwise it falls back
-  // to a plain Run so the keystroke still does something useful.
+  // Default action (and Mod-Enter) is Submit when tests exist, else Run.
   useEffect(() => {
     submitRef.current = canCheck ? () => void check() : () => void run();
   }, [canCheck, check, run]);
 
   // ─── Test hook ─────────────────────────────────────────────────────
-  // Mirror <ChallengeCard>: expose an imperative driver on the shared
-  // `window.__dsChallenges` registry so the Playwright solution sweep
-  // (e2e/challenge-solutions.spec.ts) can load a card's reference SQL into
-  // the editor and run its tests without round-tripping through the DOM.
-  // The single editor surface is modelled as one virtual file, "query.sql".
+  // Mirror <ChallengeCard>: imperative driver on `window.__dsChallenges`
+  // for the Playwright solution sweep; the single editor is modelled as one
+  // virtual file, "query.sql".
   const checkRef = useRef<() => Promise<void>>(() => Promise.resolve());
   const bannerStateRef = useRef(bannerState);
   const testResultsRef = useRef(testResults);
@@ -1436,11 +1410,8 @@ export default function SqlChallengeCard({
   }, [dialect, title, solutionSql]);
 
   // ─── Reset ──────────────────────────────────────────────────────────
-  // Reset restores the starter code AND re-seeds the database so
-  // INSERT/UPDATE/DELETE exercises can be retried from a clean slate.
-  // We do this by destroying the engine and clearing the seed flag,
-  // `ensureEngine()` will boot a fresh instance on the next user
-  // action, and the table-viewer effect will repopulate the panel.
+  // Restores the starter code AND re-seeds the database (destroying the
+  // engine) so DML exercises can be retried from a clean slate.
   const reset = useCallback(() => {
     runSeqRef.current++;
     const view = editorRef.current;
@@ -1787,9 +1758,7 @@ export default function SqlChallengeCard({
               </Menu.Root>
             </>
           ) : (
-            // No tests on this challenge: render a plain Run pill,
-            // no menu. Mod-Enter falls back to `run` for the same
-            // reason.
+            // No tests: plain Run pill, no menu.
             <button
               type="button"
               className={styles.runBtn}
@@ -1833,10 +1802,8 @@ export default function SqlChallengeCard({
           )}
         </div>
         <div className={styles.btnGroupUtil}>
-          {/* Runtime status, shows "Loading PGlite", "Loading
-              DuckDB-WASM", etc. while the SQL engine is fetching its
-              WASM bundle on first run. Once the engine is warm this
-              stays hidden. */}
+          {/* Runtime status ("Loading PGlite", …) while the engine fetches
+              its WASM bundle on first run. */}
           {isBusy && statusMessage && (
             <span
               className={styles.actionBarStatus}
@@ -2006,7 +1973,6 @@ function SolutionModal({
   const [copied, setCopied] = useState(false);
   const copiedTimerRef = useRef<number | null>(null);
 
-  // Trap-free modal: click on backdrop to close, Esc to close.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -2136,18 +2102,11 @@ function cellText(v: unknown): string {
   return String(v);
 }
 
-/** Virtualised SQL result table, used both by the main result pane
- *  and the per-table viewer at the bottom of the card. The query
- *  result set is in memory by the time we render (executeSql returns
- *  the full Promise<SqlResult>), so we just render the rows currently
- *  in the viewport via `@tanstack/react-virtual` + a TanStack table for
- *  the column definitions.
- *
- *  The table viewer passes `onLoadMore`/`hasMore` so browsing a large
- *  seeded table scroll-loads further pages on demand (infinite scroll);
- *  the main result pane omits them (the whole result is already here).
- *  Long column names / values are clipped with an ellipsis via CSS and
- *  carry a `title` so the full text stays available on hover. */
+/** Virtualised SQL result table used by the main result pane and the
+ *  per-table viewer. Rows in the viewport render via
+ *  `@tanstack/react-virtual`; the table viewer passes `onLoadMore`/`hasMore`
+ *  for infinite scroll, the result pane omits them (the whole result is
+ *  already in memory). */
 export function VirtualizedResultTable({
   columns,
   values,
@@ -2170,9 +2129,7 @@ export function VirtualizedResultTable({
   loadingMore?: boolean;
 }) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  // Stable row identity, TanStack Table keys rows by index when no
-  // explicit id is supplied, which is fine here since the result set
-  // never re-sorts in this component.
+  // Index-keyed rows are fine: the result set never re-sorts here.
   const data = useMemo(
     () => values.map((row, i) => ({ __idx: i, row })),
     [values],
@@ -2205,16 +2162,11 @@ export function VirtualizedResultTable({
     columns: tableColumns,
   });
   const tableRows = table.getRowModel().rows;
-  // This suppression used to sit on `useReactTable`, where it masked the
-  // virtualizer's own report — the rule only names the first incompatible
-  // call in a component. React Table v9's `useTable` is compatible, so
-  // TanStack Virtual is now the only one left.
   // eslint-disable-next-line react-hooks/incompatible-library -- row virtualization has no compatible alternative here.
   const rowVirtualizer = useVirtualizer({
     count: tableRows.length,
     getScrollElement: () => scrollRef.current,
-    // Matches the playground's VIRTUAL_ROW_HEIGHT_ESTIMATE so the
-    // table feels identical to the playground's result pane.
+    // Matches the playground's VIRTUAL_ROW_HEIGHT_ESTIMATE.
     estimateSize: () => 30,
     overscan: 20,
   });
@@ -2228,10 +2180,8 @@ export function VirtualizedResultTable({
   // Data columns + the trailing filler column that absorbs leftover width.
   const colSpan = tableColumns.length + 1;
 
-  // Infinite scroll: when the last virtualised row gets within a short
-  // distance of the end of what's loaded, ask the owner for the next
-  // page. The owner guards against duplicate fetches, so a few extra
-  // calls during fast scrolling are harmless.
+  // Infinite scroll: near the end of what's loaded, ask for the next page.
+  // The owner guards duplicate fetches.
   const lastIndex =
     virtualRows.length > 0 ? virtualRows[virtualRows.length - 1].index : -1;
   useEffect(() => {
@@ -2259,9 +2209,8 @@ export function VirtualizedResultTable({
                     : flexRender(h.column.columnDef.header, h.getContext())}
                 </th>
               ))}
-              {/* Filler column, absorbs the leftover width so the data
-                  columns only take the space their content needs instead
-                  of stretching across the card. */}
+              {/* Filler column absorbs leftover width so data columns don't
+                  stretch across the card. */}
               <th className={styles.sqlResultFiller} aria-hidden />
             </tr>
           ))}
@@ -2280,9 +2229,9 @@ export function VirtualizedResultTable({
                 data-index={vr.index}
                 ref={rowVirtualizer.measureElement}
               >
-                {/* getAllCells, not getVisibleCells: v9 gates visibility
-                    behind `columnVisibilityFeature`, and this grid never
-                    hides a column, so the two return the same cells. */}
+                {/* getAllCells: v9 gates getVisibleCells behind
+                    `columnVisibilityFeature`, and this grid never hides a
+                    column. */}
                 {row.getAllCells().map((cell) => (
                   <td key={cell.id} title={cellText(row.original.row[Number(cell.column.id)])}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -2313,10 +2262,8 @@ export function VirtualizedResultTable({
 // Fixed height (px) of the table viewer's scrollable contents.
 const TABLE_VIEWER_HEIGHT = 240;
 
-/** Renders a single table's contents inside the table viewer panel.
- *  Errors and empty-table cases produce a contextual message rather
- *  than a blank pane. Wires the result table's infinite scroll so more
- *  rows stream in as the learner scrolls. */
+/** One table's contents inside the viewer panel; errors and empty tables
+ *  produce a contextual message rather than a blank pane. */
 export function TableViewerPane({
   entry,
   height = TABLE_VIEWER_HEIGHT,
@@ -2382,11 +2329,9 @@ export function TableViewerSkeleton() {
   );
 }
 
-/** The always-visible "Tables" panel shared by `<SqlChallengeCard>` and
- *  `<SqlCodeBlock>`. Shows a loading skeleton until the first table
- *  list is fetched, then a tab bar (styled to match the non-SQL code
- *  block file tabs) plus the active table's paginated contents. The
- *  panel is not collapsible and renders at a fixed height. */
+/** The "Tables" panel shared by `<SqlChallengeCard>` and `<SqlCodeBlock>`:
+ *  loading skeleton until the first table list arrives, then a tab bar plus
+ *  the active table's paginated contents. Fixed height, not collapsible. */
 export function TableViewer({
   dialect,
   entries,
@@ -2404,10 +2349,8 @@ export function TableViewer({
   initializing: boolean;
   onLoadMore: () => void;
   resultTabData?: ResultTabData | null;
-  /** When set, the dialect's WASM engine is still downloading / seeding;
-   *  show the shared branded boot loader in place of the skeleton (and
-   *  in the result area for table-less blocks) so SQL matches the other
-   *  runtimes' first-run loading affordance. */
+  /** When set, the engine is still downloading / seeding; show the branded
+   *  boot loader in place of the skeleton. */
   bootState?: SqlEngineBootState | null;
 }) {
   const [resultTabDismissed, setResultTabDismissed] = useState(false);
@@ -2433,10 +2376,8 @@ export function TableViewer({
 
   const resultRowCount = resultTabData?.resultSet?.values.length ?? null;
 
-  // The tab bar scrolls horizontally, and the Result tab is one of its
-  // children — so on a card seeded with several tables the tab can be
-  // created outside the visible strip, where no amount of highlighting
-  // helps. Pull it into view whenever a run produces one.
+  // The tab strip scrolls horizontally, so the Result tab can be created
+  // outside the visible area; pull it into view whenever a run produces one.
   useEffect(() => {
     if (!resultIsActive) return;
     const el = resultTabRef.current;
@@ -2451,15 +2392,10 @@ export function TableViewer({
     });
   }, [resultIsActive, flashKey]);
 
-  // Sentence for the live region, derived rather than stored: the whole of
-  // it is a function of the current result. Empty while a run is in flight,
-  // so the reader hears the row count rather than "loading".
-  //
-  // The trailing marker alternates with the run sequence because a live
-  // region announces on *change*: re-running a query that returns the same
-  // count would otherwise produce the identical string and stay silent,
-  // which is exactly the repeat-run case this is meant to cover. A
-  // no-break space is spoken as nothing.
+  // Live-region sentence, derived from the current result. The trailing
+  // no-break space alternates with the run sequence because a live region
+  // announces on *change*: a repeat run with the same count would otherwise
+  // stay silent. A no-break space is spoken as nothing.
   let announcement = "";
   if (resultTabData != null && !resultTabData.loading) {
     if (resultTabData.error) {
@@ -2473,9 +2409,8 @@ export function TableViewer({
   }
 
   const resultTabVisible = resultTabData != null && !resultTabDismissed;
-  // While the engine cold-boots there are no tables (and any result tab
-  // is only showing "Running…"), so the boot loader takes the panel,
-  // mirroring how the non-SQL blocks show the notice before first output.
+  // While the engine cold-boots there are no tables, so the boot loader
+  // takes the panel.
   const showBootNotice = bootState != null && entries.length === 0;
   const showSkeleton =
     !showBootNotice && initializing && entries.length === 0 && !resultTabVisible;
@@ -2506,30 +2441,24 @@ export function TableViewer({
       ) : (
         <>
           <div className={styles.tableViewerTabs} role="tablist">
-            {/* The Result tab leads the strip rather than trailing it. The
-                seeded tables are inputs the learner reads; this is the output
-                of the thing they just did, and appending it last put it where
-                a card with several tables scrolls it out of sight entirely.
-                First position is also the one place it can never be scrolled
-                away from. */}
+            {/* The Result tab leads the strip: appended last, a card with
+                several tables scrolls it out of sight entirely. */}
             {resultTabVisible && (
               <button
                 ref={resultTabRef}
                 type="button"
                 role="tab"
                 aria-selected={resultIsActive}
-                // Re-keyed per run so the highlight animation replays even
-                // when the tab was already open and already selected, which
-                // is the repeat-run case nothing else signals.
+                // Re-keyed per run so the highlight animation replays on a
+                // repeat run, which nothing else signals.
                 key={`result-${flashKey}`}
                 className={`${styles.tableViewerTab} ${styles.tableViewerTabResult} ${resultIsActive ? styles.tableViewerTabActive : ""}`}
                 onClick={() => setResultIsActive(true)}
               >
                 <List size={12} aria-hidden />
                 Result
-                {/* The count is the only part of the tab that changes on a
-                    second run, so it carries the "this is new" signal when
-                    the tab itself is already there. */}
+                {/* The count is the only part that changes on a second run,
+                    so it carries the "this is new" signal. */}
                 {!resultTabData?.loading && resultRowCount != null && (
                   <span className={styles.tableViewerTabCount}>
                     {resultRowCount} {resultRowCount === 1 ? "row" : "rows"}
@@ -2581,9 +2510,8 @@ export function TableViewer({
               </button>
             ))}
           </div>
-          {/* Everything above is visual: a tab that slides into view, a count
-              that changes, a pane that flashes. This is the same news in
-              words, for a reader who gets none of it. */}
+          {/* The visual cues above (tab slide, count, flash) in words, for a
+              screen-reader user who gets none of them. */}
           <span className={styles.srOnly} role="status" aria-live="polite">
             {announcement}
           </span>
@@ -2595,10 +2523,9 @@ export function TableViewer({
               {flashKey > 0 && (
                 <div key={flashKey} className={styles.resultFlashOverlay} aria-hidden />
               )}
-              {/* Mirrors TableViewerPane's layout, table first, then the
-                  row-count footnote, so the Result tab reads exactly like
-                  the table tabs. The execution time rides along in the
-                  footnote instead of a separate info bar above the table. */}
+              {/* Mirrors TableViewerPane's layout (table, then footnote) so
+                  the Result tab reads like the table tabs; the execution
+                  time rides in the footnote. */}
               {resultTabData.error ? (
                 <div className={styles.sqlMessage} style={{ color: "var(--ch-red)" }}>
                   {resultTabData.error}
