@@ -541,3 +541,63 @@ leaves optional dependencies alone, which is why it is the one that works.
 
 Forgetting the variable is safe: CI installs everything and takes the extra ~40 s, which is today's
 behaviour.
+
+---
+
+## 5.9 `compress-cache` threaded: 27.0 s → 9.8 s
+
+The compression §5.5 added was single-threaded, and it is time added to *every*
+build — the one cost this work introduced rather than removed. Brotli is
+CPU-bound and every entry is independent, so it now fans out the same way
+`build-search-corpus` does: `availableParallelism() - 1` threads capped at 8,
+single-threaded below 64 entries, entries striped round-robin so one thread does
+not get a run of 3 MB lessons while another gets a run of small ones.
+
+**27.0 s → 9.8 s on 3 threads (2.8×)**, identical output (2.340 GiB → 0.135 GiB,
+17.4×), still idempotent (0.1 s on a second run), all 1,081 entries verified to
+decode back to valid JSON, and the empty-scan guard still exits 1.
+
+The round-trip check stays *inside* the threaded path, per entry, before the
+file is replaced. It is a fraction of the compression cost and it is the only
+thing standing between a bad encode and a cache entry the Worker cannot serve.
+A throw in any thread fails the whole run; the entries other threads already
+rewrote are harmless, because a re-run skips anything already carrying the
+magic prefix.
+
+---
+
+## 6.1 What the builder's own log says is left
+
+With the production log (§2) the remaining headroom is no longer a guess. The
+build command's 5 m 52 s breaks down as: generators ~45 s, compile **9.3 s**
+(warm), TypeScript **17.0 s**, page data + prerender **~166 s** (114 s of it
+prerender), OpenNext bundling **~112 s**.
+
+Two of those are settled and should not be revisited:
+
+- **Prerender parallelism is maxed.** The log reads `Generating static pages
+  using 3 workers`, so the builder is 4-core and Next already uses `cpus - 1`.
+  There is no `experimental.cpus` win available.
+- **Bundling (~112 s) has no safe lever.** `--noMinify` would cut it and would
+  also blow the 10 MiB gzipped Worker ceiling this repo actively manages.
+
+And one number in this document was wrong: **TypeScript is 17.0 s on the
+builder**, not the ~29 s measured locally, so `ignoreBuildErrors` (§5.3) is
+worth 17 s rather than 29.
+
+Realistic remaining headroom, against a 655 s build:
+
+| Item | Saving | Blocked on |
+| --- | ---: | --- |
+| Generator cache under `.next/cache` (§5.4) | ~35 s on content-unchanged deploys | output-hash design |
+| `ignoreBuildErrors` (§5.3) | 17 s | `checks` required in branch protection |
+
+Everything else measured is either irreducible (prerender is content-proportional
+and already parallel) or a bad trade (bundling, the admin gallery in §5.7, the
+~70 MB of `cdn-assets`/`tools-jar`/`brand-assets` in the 39 s clone).
+
+**The one stage still unmeasured is the deploy.** The 1 m 09 s in §2 had no
+populate at all. Post-merge it will have populate restored, entries 17× smaller,
+and `--cacheChunkSize 100` — three changes at once, in the stage nobody has a
+clean baseline for. Measure it on the first green build before drawing any
+conclusion about which of the three did what.
