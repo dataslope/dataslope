@@ -1,25 +1,15 @@
-/** Type-aware cell editing helpers for the result grid.
+/** Pure, type-aware cell-editing helpers for the result grid.
  *
- *  These are pure functions (no React, no engine access) so they can be
- *  unit-tested in isolation. `ResultView` uses them to pick the right inline
- *  editor for a column and to convert between a stored cell value and the
- *  value a native `<input type="date|datetime-local|time">` expects.
- *
- *  Design note on round-tripping temporal values: a date/time picker is a
- *  pure *enhancement* over the existing free-text inline editor. To guarantee
- *  an edit is at least as safe as typing the ISO text by hand, the picker
- *  reconstructs the committed string by substituting only the date and time
- *  substrings of the *original* value, preserving its separator (`T` vs a
- *  space), fractional seconds, and timezone suffix (`Z` / `+05:30`). The
- *  engine produced that format, so it always parses it back. No JS `Date`
- *  timezone arithmetic is performed, which is the usual source of off-by-an-
- *  hour bugs. */
+ *  Temporal round-trip invariant: the picker commits by substituting only the
+ *  date/time substrings of the *original* value, preserving its separator,
+ *  fractional seconds, and timezone suffix — the engine produced that format,
+ *  so it always parses back. No JS `Date` timezone arithmetic (the usual
+ *  source of off-by-an-hour bugs). */
 
 import type { TableColumnInfo } from "../../runtime/sqlite";
 
-/** Build the enum-column → allowed-labels map for `ColumnKeyHints` from a
- *  table's introspected columns. Columns without enum metadata (every SQLite
- *  column, and any non-enum Postgres/DuckDB column) are skipped. */
+/** Enum-column → allowed-labels map for `ColumnKeyHints`; columns without
+ *  enum metadata are skipped. */
 export function enumHintsFromColumns(
   cols: readonly TableColumnInfo[],
 ): Map<string, string[]> {
@@ -44,9 +34,7 @@ export type CellEditorKind =
   | "text";
 
 /** Classify a column's SQL type string into an editor kind. Handles the type
- *  names produced by all three engines (Postgres `timestamptz`, DuckDB
- *  `TIMESTAMP WITH TIME ZONE`, SQLite declared `DATETIME`, …). Array types
- *  (`integer[]`, `timestamptz[]`) and unknown types fall back to `"text"`. */
+ *  names of all three engines; unknown types fall back to `"text"`. */
 export function classifyCellEditor(sqlType: string | undefined): CellEditorKind {
   const t = (sqlType ?? "").trim().toLowerCase();
   if (!t) return "text";

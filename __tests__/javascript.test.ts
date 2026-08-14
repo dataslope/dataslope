@@ -6,10 +6,8 @@
  */
 import { describe, it, expect } from "vitest";
 
-// Pull out just the runtime class, we instantiate it manually to avoid
-// pulling in React (which is only needed for the adapter object).
-// The class isn't exported, so we re-implement the minimal runtime logic
-// that mirrors JavaScriptRuntime.run() to verify the execution model.
+// The runtime class isn't exported, so re-implement the minimal logic
+// mirroring JavaScriptRuntime.run() to verify the execution model.
 
 type OutputCell = { type: "stdout" | "stderr"; content: string };
 

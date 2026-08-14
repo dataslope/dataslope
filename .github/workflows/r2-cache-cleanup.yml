@@ -157,38 +157,20 @@ jobs:
             exit 1
           fi
 
-          # 0b) Missing credentials fail exactly the same silent way, and there
-          #     is no malformed ENDPOINT to catch them by: unsigned requests are
-          #     rejected, the `|| true` in step 5 swallows it, and the run goes
-          #     green having pruned nothing. This is a live risk right now — the
-          #     secrets were renamed to R2_INC_CACHE_* on 2026-07-30, and a
-          #     scheduled run firing between deleting the old pair and creating
-          #     the new one would otherwise report success while the bucket grew.
+          # 0b) Missing credentials fail the same silent way, with no
+          #     malformed ENDPOINT to catch them by: unsigned requests are
+          #     rejected, step 5's `|| true` swallows it, the run goes green
+          #     having pruned nothing.
           if [[ "$CREDS_SET" != "true" ]]; then
             echo "::error::Repository secrets R2_INC_CACHE_ACCESS_KEY_ID and R2_INC_CACHE_SECRET_ACCESS_KEY are not both set (renamed 2026-07-30 from R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY). Aborting without deleting."
             exit 1
           fi
 
-          # Delete a folder, tolerating R2's intermittent 500 InternalError on
-          # DeleteObject. `aws s3 rm --recursive` re-lists the folder on every
-          # invocation and only deletes what is still present, so repeated
-          # attempts converge on an empty folder. Returns non-zero only if the
-          # folder still has objects after every attempt (a persistent, not
-          # transient, failure), so one flaky delete no longer aborts the run.
-          # Total bytes under a prefix, whether that is the whole cache or one
-          # build folder. The CLI auto-paginates and applies --query per page,
-          # and `Contents[].Size` is a flat list, so each page emits one
-          # tab-separated batch — the same shape the LastModified query in step
-          # 6 relies on. Flatten to one number per line and sum.
-          #
-          # A LIST returns at most 1,000 keys per request, so a pass over the
-          # whole prefix is ~18 requests at 17,000 objects and ~2 over a single
-          # 1,081-object build folder. Weighing roughly doubles the job's LIST
-          # count — a full sweep goes from ~57 requests to ~105 — which is worth
-          # it at Class A's $4.50/million (~$0.0005 a run, inside R2's 1,000,000
-          # free monthly Class A operations) but is not free enough to sprinkle
-          # around: only the whole prefix and folders on their way out are
-          # weighed. A missing or empty prefix yields 0.
+          # Total bytes under a prefix. The CLI auto-paginates and applies
+          # --query per page, so each page emits one tab-separated batch (the
+          # same shape step 6's LastModified query relies on); flatten and
+          # sum. LISTs are Class A ops, so only the whole prefix and folders
+          # on their way out are weighed. Missing/empty prefix yields 0.
           bucket_bytes() {
             aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$1" \
               --query 'Contents[].Size' --output text 2>/dev/null \
@@ -196,11 +178,13 @@ jobs:
               | awk '{ s += $1 } END { printf "%d", s + 0 }'
           }
 
-          # Bytes are reported in GB (decimal, matching how Cloudflare's R2
-          # dashboard counts) via awk, since bash has no floating point.
+          # GB is decimal, matching the R2 dashboard; awk because bash has no
+          # floating point.
           gb() { awk -v b="${1:-0}" 'BEGIN { printf "%.2f", b / 1e9 }'; }
           pct() { awk -v a="${1:-0}" -v b="${2:-0}" 'BEGIN { printf "%.0f", (b > 0 ? a * 100 / b : 0) }'; }
 
+          # Tolerates R2's transient DeleteObject 500s: `s3 rm` re-lists each
+          # attempt, so retries converge. Non-zero only on persistent failure.
           delete_folder() {
             local folder="$1" attempt
             for attempt in 1 2 3 4 5; do

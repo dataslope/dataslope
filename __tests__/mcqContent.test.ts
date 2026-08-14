@@ -39,11 +39,9 @@ describe("content/courses + content/interview + content/fumadocs-dev <MultipleCh
   });
 });
 
-// Answer *position* must not give the answer away either. The corpus was
-// authored answer-first, which left the correct option sitting second in 61% of
-// questions (99% of the interview banks) until
-// `scripts/shuffle-mcq-options.mjs` redistributed them. See AGENTS.md,
-// "Answer position".
+// Answer position must not give the answer away: the corpus was authored
+// answer-first (correct option second in 61% of questions) until
+// shuffle-mcq-options.mjs redistributed them. See AGENTS.md, "Answer position".
 describe("the MCQ corpus is not guessable by option position", () => {
   const files = [
     ...findMcqFiles(path.join(process.cwd(), "content", "courses")),

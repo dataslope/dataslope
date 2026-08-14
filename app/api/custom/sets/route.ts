@@ -1,15 +1,9 @@
 /**
- * Quiz sets (ordered collections of custom items).
- *
- * POST /api/custom/sets, create a set and mint its /quiz/<id> link. Same
- *   member/guest split as POST /api/custom/items: members get a per-tier
- *   cap, guests get a fixed ~30-day expiry + daily creation budgets
- *   (shared with item creation, one "ci:" counter pool).
- * GET /api/custom/sets, list the signed-in member's sets.
- *
- * JSON body: { title, description?, itemIds: string[] }. Every id must
- * resolve to a live custom item at save time, a typo'd or expired id is a
- * clear error here rather than a silent hole in the published quiz.
+ * Quiz sets (ordered collections of custom items). POST creates a set and
+ * mints its /quiz/<id> link — same member/guest split as /api/custom/items,
+ * sharing the same "ci:" guest counter pool. GET lists the member's sets.
+ * Body: { title, description?, itemIds }; every id must resolve to a live
+ * item at save time, so a typo'd id errors here rather than leaving a hole.
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createAuth } from "@/lib/auth/server";

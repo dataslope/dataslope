@@ -17,15 +17,9 @@ export interface RemoteDatasetSource {
   ref: string;
 }
 
-// Pinned ref into the dataslope/datasets repository. Pinning (rather
-// than tracking `main`) makes every dataset URL immutable, which is
-// what lets the layers above cache aggressively with no revalidation
-// logic at all: bumping the ref changes every URL, and that IS the
-// cache invalidation. (Same pattern as CDN_ASSETS_TAG in cdn.ts.)
-//
-// After merging any change to the dataslope/datasets repo, update this
-// to the new commit SHA (or a tag, once the repo starts tagging):
-//
+// Pinned ref into dataslope/datasets: pinning makes every URL immutable, so
+// bumping the ref IS the cache invalidation (same pattern as CDN_ASSETS_TAG).
+// After merging changes to that repo, update to the new commit SHA:
 //   git ls-remote https://github.com/dataslope/datasets.git refs/heads/main
 export const DATASETS_REF = "f7f08485960fe4a774359a43d1eb50a84514daf2";
 
@@ -49,10 +43,8 @@ export function rawGitHubUrl(
   return `https://raw.githubusercontent.com/${source.owner}/${source.repo}/${source.ref}/${cleanDatasetPath(path)}`;
 }
 
-/** Build the cdn.jsdelivr.net URL for a file in a GitHub repo. With a
- *  pinned ref jsDelivr serves these with a one-year immutable
- *  `cache-control`, so plain HTTP caching works even for consumers
- *  that bypass this module's Cache API layer. */
+/** cdn.jsdelivr.net URL for a file in a GitHub repo. Ref-pinned URLs get a
+ *  one-year immutable cache-control. */
 export function jsDelivrGitHubUrl(
   path: string,
   source: RemoteDatasetSource = DATASLOPE_DATASETS_SOURCE,
@@ -60,32 +52,23 @@ export function jsDelivrGitHubUrl(
   return `https://cdn.jsdelivr.net/gh/${source.owner}/${source.repo}@${source.ref}/${cleanDatasetPath(path)}`;
 }
 
-/** Resolve a dataset reference to its canonical absolute URL. Accepts
- *  either a path inside the default datasets repo (e.g.
- *  `sqlite/chinook_sqlite.sql`) or a full `https://` URL, so a sample
- *  can clone a database from any repository (or any other CORS-enabled
- *  host). The canonical URL doubles as the cache key in every layer. */
+/** Resolve a dataset reference (repo path or full https URL) to its
+ *  canonical URL, which doubles as the cache key in every layer. */
 export function resolveDatasetUrl(pathOrUrl: string): string {
   return datasetUrlCandidates(pathOrUrl)[0];
 }
 
-/** Candidate download URLs for a dataset reference, in the order they
- *  should be tried. Repo-relative paths get the jsDelivr URL first
- *  (immutable HTTP caching) with raw.githubusercontent.com as the
- *  fallback host; full URLs are used as-is. The first candidate is the
- *  canonical cache key, a download that succeeded via the fallback
- *  host is still stored under the canonical URL, so later lookups hit
- *  regardless of which host happened to serve the bytes. */
+/** Candidate download URLs in try-order: jsDelivr first, raw GitHub as
+ *  fallback; full URLs as-is. The first candidate is the canonical cache
+ *  key regardless of which host served the bytes. */
 function datasetUrlCandidates(pathOrUrl: string): string[] {
   if (/^https?:\/\//i.test(pathOrUrl)) return [pathOrUrl];
   return [jsDelivrGitHubUrl(pathOrUrl), rawGitHubUrl(pathOrUrl)];
 }
 
 // ─── Layer 1: in-flight memo ────────────────────────────────────────
-// Failed downloads are evicted so a transient network error doesn't
-// poison the sample for the rest of the session. (Workers get their own
-// module instance and therefore their own memo, the Cache API layer
-// below is what makes a download shared across contexts.)
+// Failed downloads are evicted so a transient error isn't cached; the
+// Cache API layer is what shares downloads across contexts.
 const textCache = new Map<string, Promise<string>>();
 const bytesCache = new Map<string, Promise<Uint8Array>>();
 
@@ -103,25 +86,21 @@ function memoised<T>(
   return promise;
 }
 
-// Above this size a downloaded buffer is dropped from the per-context
-// memo once it is safely retrievable from the Cache API: retaining a
-// multi-MB parquet file as a live Uint8Array in every JS context is a
-// memory cost the (fast, local) Cache API re-read makes unnecessary.
+// Above this size a buffer is dropped from the per-context memo once the
+// Cache API holds it — a fast local re-read beats pinning MBs per context.
 const LARGE_BYTES_MEMO_LIMIT = 5 * 1024 * 1024;
 
 // ─── Layer 2: Cache API ─────────────────────────────────────────────
-// Bump the version suffix when the storage format changes (e.g. if
-// entries ever gain synthetic metadata headers); the sweep below
-// deletes caches left behind by older versions.
+// Bump the version suffix when the storage format changes; the sweep
+// deletes caches left by older versions.
 const DATASET_CACHE_PREFIX = "dataslope-datasets-";
 const DATASET_CACHE_NAME = `${DATASET_CACHE_PREFIX}v1`;
 
 let datasetCachePromise: Promise<Cache | null> | null = null;
 
-/** Open (once per context) the persistent dataset cache, or resolve to
- *  null when the Cache API is unavailable (Node, file://, some private
- *  modes) or fails, callers then fall through to the network. Kicks
- *  off a background sweep of stale entries on first open. */
+/** Open the persistent dataset cache once per context; null when the Cache
+ *  API is unavailable (callers fall through to the network). Kicks off a
+ *  background sweep of stale entries on first open. */
 function openDatasetCache(): Promise<Cache | null> {
   if (typeof caches === "undefined") return Promise.resolve(null);
   if (!datasetCachePromise) {
@@ -138,12 +117,9 @@ function openDatasetCache(): Promise<Cache | null> {
   return datasetCachePromise;
 }
 
-/** Best-effort storage hygiene, run once per context per session:
- *  drops caches created by older storage-format versions, and drops
- *  entries for the default datasets repo at any ref other than the
- *  current pin. The latter both cleans up after a `DATASETS_REF` bump
- *  and keeps hand-written mutable URLs (e.g. `…/datasets/main/…`) from
- *  serving stale bytes forever, they degrade to per-session caching. */
+/** Best-effort hygiene: drop old-format caches and default-repo entries at
+ *  any ref other than the current pin — cleans up after a DATASETS_REF bump
+ *  and keeps mutable URLs (`…/main/…`) from serving stale bytes forever. */
 async function sweepStaleEntries(cache: Cache): Promise<void> {
   const names = await caches.keys();
   await Promise.all(
@@ -174,9 +150,8 @@ async function sweepStaleEntries(cache: Cache): Promise<void> {
 
 interface CachedFetchResult {
   response: Response;
-  /** True when the bytes are now retrievable from the Cache API (hit,
-   *  or stored after a miss), i.e. a per-context memo may safely drop
-   *  its copy and re-read locally later. */
+  /** True when the bytes are retrievable from the Cache API, so a memo may
+   *  safely drop its copy. */
   persisted: boolean;
 }
 

@@ -215,10 +215,9 @@ const COST_TOKENS = {
   "1536x1024/low": 158,
   "1536x1024/medium": 1372,
   "1536x1024/high": 5488,
-  // The 2:1 band the inline risograph figures use (`course-inline`). Measured
-  // 2026-08-09, and the cheapest frame the API will take: 1024x512 is refused
-  // ("below the current minimum pixel budget"), so this is the floor for a
-  // wide figure. Only `low` is measured, the tier everything ships at.
+  // The 2:1 band the inline risograph figures use (`course-inline`), and the
+  // cheapest frame the API will take: 1024x512 is refused ("below the current
+  // minimum pixel budget"). Only `low` is measured, the tier everything ships at.
   "1536x768/low": 102,
 };
 // USD per 1M image output tokens (https://developers.openai.com/api/docs/pricing).
@@ -275,19 +274,13 @@ function requireKey() {
   return key;
 }
 
-// Statuses worth retrying: gateway/proxy hiccups and rate limits. A batch's
-// output file is hundreds of MB, and fetching it through a proxy is exactly
-// where a 504 shows up — losing the whole run at the last step, after the
-// images have already been generated and paid for.
+// Statuses worth retrying: gateway/proxy hiccups and rate limits.
 const RETRY_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
 
 /**
- * One OpenAI API call.
- *
- * `retries` defaults to 0 and is opted into per call site, deliberately: this
- * helper also creates batches and submits image generations, and silently
- * re-sending one of those would duplicate work and double the bill. Only
- * idempotent GETs pass a retry count.
+ * One OpenAI API call. `retries` defaults to 0 and is opted into per call
+ * site: this helper also creates batches and submits generations, and
+ * silently re-sending one would double the bill. Only idempotent GETs retry.
  */
 async function api(path, { method = "GET", key, json, form, retries = 0 } = {}) {
   const headers = { Authorization: `Bearer ${key}` };
@@ -316,8 +309,8 @@ async function api(path, { method = "GET", key, json, form, retries = 0 } = {}) 
       throw new Error(`HTTP ${res.status} ${res.statusText}${detail ? ` - ${detail}` : ""}`);
     }
 
-    // 2s, 4s, 8s, 16s, 32s (capped): long enough to outlast a proxy blip
-    // without stalling a run that is genuinely broken.
+    // 2s..32s capped backoff: outlasts a proxy blip without stalling a run
+    // that is genuinely broken.
     const waitMs = Math.min(32_000, 2_000 * 2 ** attempt);
     const reason = networkErr ? networkErr.message : `HTTP ${res.status}`;
     console.error(
@@ -327,9 +320,8 @@ async function api(path, { method = "GET", key, json, form, retries = 0 } = {}) 
   }
 }
 
-/** Internals exposed for `__tests__/generateIllustrationsRetry.test.ts`, which
- *  pins both halves of the retry contract: transient failures are retried where
- *  a caller opts in, and never retried where they are not. */
+/** Exposed for `__tests__/generateIllustrationsRetry.test.ts`, which pins
+ *  both halves of the retry contract. */
 export const __testing = { api };
 
 const BATCH_STATE_FILE = (out) => join(out, "last-batch.json");
@@ -374,14 +366,9 @@ export function candidateKey(runId, promptId, variant, kind) {
 }
 
 /**
- * Where generated images land.
- *
- * `disk` is the default and keeps one-off local work frictionless. `r2` exists
- * because most candidates are rejects: generating several variants per
- * illustration and keeping one means three quarters of the bytes should never
- * reach git. Uploading them under a run-scoped prefix keeps them reviewable,
- * makes a whole run deletable with a single prefix delete, and lets a bucket
- * lifecycle rule expire them without any bookkeeping.
+ * Where generated images land. `disk` keeps one-off local work frictionless;
+ * `r2` exists because most candidates are rejects that should never reach git,
+ * and a run-scoped prefix makes a whole run deletable/expirable as a unit.
  */
 function makeSink(opts) {
   const ext = outputExt(opts);
@@ -398,8 +385,7 @@ function makeSink(opts) {
   const runId = opts.run;
   return {
     describe: `r2://${client.bucket}/illustrations/${runId}/`,
-    // No per-object existence check: a HEAD per candidate would cost a round
-    // trip each, and re-uploading the same key is idempotent anyway.
+    // No per-object existence check: re-uploading the same key is idempotent.
     skip: () => false,
     label: (id) => candidateKey(runId, id, opts.variant, "original"),
     init: () => {},

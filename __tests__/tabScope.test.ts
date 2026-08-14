@@ -1,14 +1,9 @@
 /**
- * Workspace scoping for the SQL playgrounds' tab keys.
- *
- * The bug being pinned: two workspaces built from the same sample database
- * shared one `..._db_<dbId>_tabs` key, so opening the second showed the
- * first's tabs and editing them there rewrote the first's.
- *
- * The interesting part is the boot ordering. Tabs are read before the async
- * workspace bootstrap resolves, so the scope is a lazy guess from the same
- * pointers the bootstrap consults, corrected afterwards by `setWorkspaceScope`
- * when the bootstrap lands somewhere else.
+ * Workspace scoping for the SQL playgrounds' tab keys. Bug pinned: two
+ * workspaces built from the same sample database shared one tabs key, so one
+ * rewrote the other's. Boot ordering matters: tabs are read before the async
+ * workspace bootstrap resolves, so the scope is a lazy guess corrected by
+ * setWorkspaceScope when the bootstrap lands somewhere else.
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";

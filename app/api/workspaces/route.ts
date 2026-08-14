@@ -1,14 +1,7 @@
 /**
- * Cloud-saved workspaces, list endpoint.
- *
- * GET /api/workspaces → { workspaces: CloudWorkspaceMeta[], usage: CloudUsage }
- *
- * Signed-in users only (cloud saves require an account; sharing does not,
- * see /api/shares). Retention is evaluated at read time: rows the policy
- * says are expired are never returned and are purged in the background
- * (lib/workspaces/server.ts loadLiveUserState).
- *
- * `force-dynamic` like every session-reading route (app/api/ai/*).
+ * Cloud-saved workspaces list: GET → { workspaces, usage }. Signed-in only.
+ * Retention is evaluated at read time — expired rows are never returned and
+ * are purged in the background (loadLiveUserState).
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createAuth } from "@/lib/auth/server";

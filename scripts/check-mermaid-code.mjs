@@ -80,10 +80,9 @@ function nodeLabels(line) {
   for (let i = 0; i < line.length; i++) {
     const ch = line[i];
 
-    // The asymmetric shape `A>text]` is the one that does not nest. The
-    // character before it has to be an id character and NOT a hyphen: the `>`
-    // ending every `-->` link is preceded by one, and reading that as a node
-    // swallows the rest of the line (`D -->|Ok| E([Final result])`).
+    // The asymmetric shape `A>text]` does not nest. The preceding character
+    // must be an id character, NOT a hyphen — the `>` ending every `-->` link
+    // would otherwise swallow the rest of the line.
     if (ch === ">" && i > 0 && /\w/.test(line[i - 1])) {
       const end = line.indexOf("]", i);
       if (end === -1) continue;
@@ -136,13 +135,9 @@ export function mermaidLabels(line, diagram) {
   if (SHAPE_DIAGRAMS.has(diagram)) {
     labels.push(...nodeLabels(bare));
     // Edge labels: `-->|text|`, `-- text -->`, `-. text .->`, `== text ==>`.
-    //
-    // The middle form is ambiguous with a plain `A --- B` link, since the `-`
-    // that closes a labelled `-- text ---` is the same `-` that ends an
-    // unlabelled one: `A((a)) --- I((4,5)) --- B((b))` reads as an edge
-    // labelled `I((4,5))`. A real edge label holding a bracket has to be
-    // quoted, and the quote pass above already has those, so anything with one
-    // in it here is a node that has been mistaken for a label.
+    // The `-- text --` form is ambiguous with chained plain links, and a real
+    // edge label holding a bracket must be quoted (already collected above) —
+    // so a bracket here means a node mistaken for a label, and it is skipped.
     for (const m of bare.matchAll(/\|([^|]*)\|/g)) labels.push(m[1]);
     for (const m of bare.matchAll(/(?:--|==)\s+(.+?)\s+(?:--|==)[->]/g)) {
       if (!/[[({]/.test(m[1])) labels.push(m[1]);
@@ -174,14 +169,10 @@ export function mermaidLabels(line, diagram) {
   return labels.map((l) => l.trim()).filter(Boolean);
 }
 
-/** An identifier with `(` right after it.
- *
- *  Two characters minimum, because a one-letter name in front of a paren is
- *  mathematical notation rather than a call in every lesson that has one:
- *  `P(A given B)`, `f(x)`, `y(t-1)`, `s(i)`. Mermaid cannot typeset those
- *  (KaTeX is off in labels), so they are prose written in symbols and belong
- *  in the prose face; a genuine one-letter function like R's `c()` is rare
- *  enough to mark by hand. */
+/** An identifier with `(` right after it. Two characters minimum: a
+ *  one-letter name before a paren is mathematical notation (`f(x)`,
+ *  `P(A given B)`), not a call; a genuine one-letter function like R's `c()`
+ *  is rare enough to mark by hand. */
 const CALL = /(?<![\w$.])[A-Za-z_][\w$]+\(/g;
 
 /** Two or more identifiers joined by dots, no spaces. The `@` in the lookbehind
@@ -199,15 +190,10 @@ const RULES = [
 ];
 
 /**
- * Names that match one of the patterns above but are not code: a product's
- * name, an abbreviation, an English word, or a piece of mathematical notation
- * that happens to be spelled like a call.
- *
- * The notation entries are the ones the statistics and time-series lessons
- * write in their diagrams. `Poisson(lambda)` is the same kind of thing as
- * `f(x)`, which the two-character minimum on CALL already covers; these just
- * have longer names. A diagram with notation this list does not know about
- * opts out with `{/* allow-unmarked-code: … *\/}`.
+ * Names that match the patterns above but are not code: product names,
+ * abbreviations, and mathematical notation spelled like a call
+ * (`Poisson(lambda)` is `f(x)` with a longer name). Notation this list does
+ * not know opts out with `{/* allow-unmarked-code: … *\/}`.
  */
 const PROSE_NAMES = new Set([
   "Node.js",
@@ -275,9 +261,8 @@ export function lintSource(src, file) {
   const lines = src.split("\n");
   const allowed = new Set();
   lines.forEach((line, i) => {
-    // An opt-out covers the fence that follows it. A mermaid block runs to
-    // ~30 lines at the outside, and the comment is an explicit author decision
-    // either way, so the window is deliberately generous.
+    // An opt-out covers the fence that follows; a generous window is fine
+    // since the comment is an explicit author decision.
     if (ALLOW.test(line)) for (let j = i; j < Math.min(lines.length, i + 60); j++) allowed.add(j);
   });
 

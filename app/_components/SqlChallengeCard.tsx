@@ -555,10 +555,8 @@ export function useSqlTableViewer({
 
   const [entries, setEntries] = useState<TableViewerEntry[]>([]);
   const [activeIdx, setActiveIdx] = useState(0);
-  // True from mount until the first table list has been fetched (or the
-  // boot failed). Drives the loading skeleton. Subsequent refreshes
-  // don't re-raise it, so re-running a query updates rows in place
-  // rather than flashing the skeleton.
+  // True until the first table list is fetched (or the boot failed); later
+  // refreshes don't re-raise it, so rows update without a skeleton flash.
   const [initializing, setInitializing] = useState(enabled);
 
   // Mirror of `entries` for stale-free reads inside async callbacks.
@@ -566,14 +564,11 @@ export function useSqlTableViewer({
   useEffect(() => {
     entriesRef.current = entries;
   });
-  // Guards against firing a duplicate page fetch for the same table
-  // while one is already in flight (the scroll handler can fire many
-  // times before React commits the `loadingMore` flag).
+  // Guards duplicate page fetches; the scroll handler can fire many times
+  // before React commits the `loadingMore` flag.
   const inFlightRef = useRef<Set<number>>(new Set());
-  // Invalidates in-flight refreshes: a Reset destroys the engine and
-  // immediately starts a refresh against the fresh one, without this,
-  // a slower refresh that was already in flight (e.g. the mount-time
-  // boot on DuckDB) could land last and show the pre-reset rows.
+  // Invalidates in-flight refreshes so a slower pre-Reset refresh can't
+  // land last and show the pre-reset rows.
   const refreshSeqRef = useRef(0);
 
   const refresh = useCallback(
@@ -672,9 +667,8 @@ export function useSqlTableViewer({
     [dialect, ensureEngine, pageSize],
   );
 
-  /** Clear all entries and re-arm the loading skeleton, used by Reset,
-   *  which destroys and re-seeds the engine. Also invalidates any
-   *  refresh still in flight so it can't resurrect the cleared rows. */
+  /** Clear entries and re-arm the skeleton (Reset). Also invalidates any
+   *  in-flight refresh so it can't resurrect the cleared rows. */
   const clear = useCallback(() => {
     refreshSeqRef.current++;
     inFlightRef.current.clear();
@@ -682,8 +676,8 @@ export function useSqlTableViewer({
     setInitializing(enabled);
   }, [enabled]);
 
-  /** Lower the skeleton without populating tables, used when engine
-   *  bootstrap fails so the skeleton doesn't spin forever. */
+  /** Lower the skeleton without populating tables (engine bootstrap
+   *  failure), so it doesn't spin forever. */
   const markInitDone = useCallback(() => setInitializing(false), []);
 
   return {
@@ -716,12 +710,10 @@ export default function SqlChallengeCard({
   const editorRef = useRef<EditorView | null>(null);
   const solutionEditorHostRef = useRef<HTMLDivElement | null>(null);
   const solutionEditorRef = useRef<EditorView | null>(null);
-  // Theme compartments, stored so the dark/light sync effect can
-  // reconfigure the CM theme without remounting the editor.
+  // Compartments, stored so effects can reconfigure theme / language /
+  // completion without remounting the editor.
   const mainThemeCompRef = useRef<Compartment | null>(null);
   const solutionThemeCompRef = useRef<Compartment | null>(null);
-  // Lang/completion compartments, stored so the completion-schema
-  // refresh can reconfigure without remounting the editor.
   const langCompRef = useRef<Compartment | null>(null);
   const completionCompRef = useRef<Compartment | null>(null);
   // Debounce handle for localStorage persistence (see editor mount).
@@ -731,11 +723,9 @@ export default function SqlChallengeCard({
   const cardRef = useRef<HTMLDivElement | null>(null);
   const askAiSchemaRef = useRef<SqlCompletionSchema | null>(null);
 
-  // Stable localStorage key for the user's SQL buffer. `dialect` is in
-  // the fingerprint because the same starter SQL might mean different
-  // things across engines (e.g. `RETURNING` is Postgres/SQLite but not
-  // historically DuckDB), and `title` disambiguates challenges that
-  // happen to share starter text.
+  // Stable localStorage key. `dialect` is in the fingerprint because the
+  // same starter SQL can mean different things across engines; `title`
+  // disambiguates challenges sharing starter text.
   const persistedKey = useMemo(
     () => persistKey("sql-challenge", `${dialect}|${title}|${starterCode}`),
     [dialect, title, starterCode],
@@ -744,28 +734,25 @@ export default function SqlChallengeCard({
   // workbook's filename: already stable per card, already short.
   const exportId = persistedKey.slice(persistedKey.lastIndexOf(":") + 1);
 
-  // Each card owns its own engine instance, sharing across cards would
-  // let one challenge's CREATE TABLE leak into another's checks. The
-  // shared hook owns the cached boot+seed promise, the live engine
-  // label, and the boot-progress state that drives the boot loader.
+  // Each card owns its own engine instance — sharing would let one
+  // challenge's CREATE TABLE leak into another's checks.
   const { ensureEngine, engineLabel, bootState, destroyEngine, resetEngine } =
     useSqlEngineBoot({ dialect, initSql, remoteInitSql });
   // Raw `exec` handle for the header's tools menu (Excel export, ER
-  // diagram, DDL), which reads the same live database the card grades.
+  // diagram, DDL), reading the same live database the card grades.
   const ensureExec = useCallback(async () => {
     const engine = await ensureEngine();
     return (sql: string) => engine.exec(sql);
   }, [ensureEngine]);
   const runSeqRef = useRef(0);
   const runRef = useRef<() => void>(() => {});
-  // Default action of the split button (Submit when canCheck,
-  // otherwise plain Run). Bound to Mod-Enter from the editor's keymap.
+  // Split button's default action (Submit when canCheck, else Run); bound
+  // to Mod-Enter.
   const submitRef = useRef<() => void>(() => {});
 
   const [status, setStatus] = useState<Status>("idle");
-  // Tracks which action triggered the in-flight run so the Submit
-  // pill can show "Submitting…" vs "Running…" correctly when the
-  // dropdown's "Run without Submitting" item is the trigger.
+  // Which action triggered the in-flight run, so the Submit pill shows
+  // "Submitting…" vs "Running…" correctly.
   const [activeAction, setActiveAction] = useState<"submit" | "run" | null>(
     null,
   );

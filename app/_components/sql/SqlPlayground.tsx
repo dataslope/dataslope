@@ -2288,8 +2288,7 @@ function SqlPlaygroundInner() {
     [sqlBaseSections, accountSection],
   );
 
-  // Defined once and rendered in both the sidebar and the mobile drawer
-  // menu (the latter is an experiment, the sidebar copy may be retired).
+  // Defined once, rendered in both the sidebar and the mobile drawer menu.
   const databaseSelector = (
     <DatabaseSelector
       value={activeDbId}

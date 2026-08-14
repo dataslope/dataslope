@@ -1,13 +1,7 @@
 /**
- * One custom item.
- *
- * GET    /api/custom/items/:id, public: metadata + payload (used by the
- *          editor's prefill and the quiz-set builder's id lookup; the
- *          public /c/:id page reads D1 directly). Expired rows 404.
- * PUT    /api/custom/items/:id, owner only: update title + payload. The
- *          item's kind is fixed at creation.
- * DELETE /api/custom/items/:id, owner only. Guest items have no owner and
- *          age out on their fixed TTL.
+ * One custom item. GET: public metadata + payload; expired rows 404.
+ * PUT: owner only, updates title + payload (kind is fixed at creation).
+ * DELETE: owner only — guest items have no owner and age out on their TTL.
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createAuth } from "@/lib/auth/server";

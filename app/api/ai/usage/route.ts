@@ -1,12 +1,7 @@
 /**
- * "Ask AI" quota read: how many chat prompts the signed-in member has left
- * today, so the panel can render a "N prompts left" counter for free members.
- *
- * Read-only (no same-origin gate needed) and cheap, one D1 row lookup. The
- * chat endpoint remains the enforcement point; this is display-only, so the
- * limits come from `limitsForTier` (they don't depend on provider config
- * being present). `force-dynamic` for the same reason as the chat route: it
- * reads the session and per-day counters, so it must run per request.
+ * "Ask AI" quota read for the panel's "N prompts left" counter. Read-only
+ * and display-only — the chat endpoint remains the enforcement point, so
+ * limits come from `limitsForTier` regardless of provider config.
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createAuth } from "@/lib/auth/server";
