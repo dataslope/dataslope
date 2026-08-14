@@ -32,9 +32,9 @@ name: R2 incremental-cache cleanup
 # rather than approximates:
 #
 #   KEEP = { probe(production) }                  what prod serves now
-#        ∪ { probe(preview_b) ∀ branch b }        what each preview serves now
+#        ∪ { probe(preview_b) ∀ ACTIVE branch b } what each preview serves now
 #        ∪ { head(default_branch) }               what prod is about to serve
-#        ∪ { head(b) ∀ branch b }                 what each preview is about to serve
+#        ∪ { head(b) ∀ ACTIVE branch b }          what each preview is about to serve
 #        ∪ { folders populated < GRACE_HOURS }    catch-all for the unclassifiable
 #   DELETE everything else
 #
@@ -49,6 +49,36 @@ name: R2 incremental-cache cleanup
 # 2026-08-14 by pushing to a branch with no PR and watching a build start), so
 # a PR-shaped keep set silently under-covers: a branch being worked on before
 # its PR is opened has a live preview that nothing would have claimed.
+#
+# ACTIVE branches, though. A branch is the unit of deployment, but a pull
+# request is the signal that the work on it is finished, and the two do not end
+# together: Workers Builds does NOT tear a preview down when a PR merges. The
+# alias keeps answering for as long as the branch exists, so a keep set that
+# only asks "is there a branch" pins ~2.5 GB per merged-but-undeleted branch,
+# indefinitely, for a preview nobody will open again. Measured 2026-08-14 on
+# run #172: `claude/incremental-cache-retention-ygg8dk` was still serving
+# 9bfd5c13 — and holding its folder — hours after #664 merged.
+#
+# So a branch is RETIRED, and claims nothing at all, when all three hold:
+#
+#   • at least one pull request has this branch as its head,
+#   • none of them is open, and
+#   • the branch head is still the head of one of those closed pull requests.
+#
+# The third clause is what makes it safe to act the moment a PR closes. A
+# branch whose head has moved PAST its closed pull request has unreviewed work
+# on it, Workers Builds has already built and deployed that work, and the
+# preview is live again — a reopened PR, follow-up commits, a reused branch.
+# Only a branch that has not moved since its pull request closed is finished.
+# Retirement also only ever WITHHOLDS a claim; it never revokes one. Production
+# and the default branch head are registered before any branch is considered,
+# so a retired branch that happens to share a SHA with either keeps it.
+#
+# A branch that never had a pull request is NOT retired. That is the case the
+# branch-shaped keep set exists for, and there is no signal in it to say the
+# work is over — only the branch's continued existence, which is the operator's
+# to end. Such a branch is called out by name in the log so it cannot quietly
+# hold a folder forever; deleting the branch is what releases it.
 #
 # The alias is DERIVED from the branch name rather than read out of the
 # Cloudflare check run that also advertises it. Reading it looks more
@@ -93,7 +123,15 @@ name: R2 incremental-cache cleanup
 # production build, and at most two folders per active branch (what its preview
 # serves now + what it is about to serve), plus whatever landed in the last
 # GRACE_HOURS. Nothing is retained on age alone, so deploy velocity no longer
-# sets the bucket size — branch count does.
+# sets the bucket size — the count of branches with unfinished work does.
+#
+# Deliberate consequence: a merged pull request's preview breaks. Once its
+# cache is pruned the alias 500s by the `node:fs` mechanism below, and the
+# Cloudflare check-run link on the merged PR still points at it. That is the
+# trade being made — the alternative is paying ~2.5 GB a branch to keep a
+# preview of already-merged code loadable. Deleting the head branch on merge
+# (GitHub's "Automatically delete head branches" setting) avoids the broken
+# link and retires the branch here in the same stroke.
 #
 # Deliberate consequence: there is no rollback cover. Rolling the Worker back
 # to a build whose cache has been pruned 500s the site by the `node:fs`
@@ -125,6 +163,11 @@ name: R2 incremental-cache cleanup
 #     behaviour of keeping its last FALLBACK_COMMITS commits. One unreachable
 #     preview must not stop the other branches from being swept, and "no
 #     answer" must never be read as "nothing to keep".
+#   • A pull-request lookup failure is the same shape and resolves the same
+#     way: an unanswered question about a PR leaves that branch ACTIVE, i.e.
+#     protected. Retirement is the one rule here whose job is to delete more,
+#     so it is the one rule that must never fire on a guess. The cost of
+#     guessing wrong is a folder held two hours longer, against an outage.
 #   • A branch name is attacker-controllable by anyone who can push, and this
 #     job turns one into a URL and fetches it. The slug rule folds everything
 #     outside [a-z0-9-] to '-', so a branch cannot smuggle a host, and the
@@ -183,13 +226,16 @@ concurrency:
   group: r2-cache-cleanup
   cancel-in-progress: false
 
-# Least privilege: read-only, and `contents` alone covers everything asked of
-# GitHub here (branches, commits, the default branch). `pull-requests: read`
-# was dropped on 2026-08-14 — the keep set is built from branches now and never
-# asks about PRs — and no `checks` scope was ever needed, since preview aliases
-# are derived from branch names rather than read out of check runs.
+# Least privilege: read-only. `contents` covers branches, commits and the
+# default branch; `pull-requests` covers the retirement check, and covers only
+# reading — this job never comments on, closes or otherwise touches a PR. (It
+# was dropped on 2026-08-14 when the keep set stopped asking about PRs at all,
+# and came back when merged branches turned out to keep their previews alive.)
+# No `checks` scope was ever needed, since preview aliases are derived from
+# branch names rather than read out of check runs.
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   cleanup:
@@ -216,10 +262,13 @@ jobs:
       #     them, evaluated newest-populated-first.
       # A folder kept because a live probe named it is never capped — that is
       # a deployment actively serving from it, and deleting it is an outage.
+      # Retired branches are skipped before either bound applies: they cost no
+      # probe and hold no folder, so the cap now counts branches with live work
+      # rather than every branch anyone forgot to delete.
       # At ~2.5 GB/folder and at most two folders per branch this bounds
       # previews at roughly 50 GB, which only becomes reachable with 10
       # simultaneously-active branches; it has been 1-3 in practice. If this
-      # cap ever fires, the honest fix is deleting merged branches, not raising
+      # cap ever fires, the honest fix is deleting stale branches, not raising
       # the number.
       MAX_BRANCHES: "10"
       # Degraded mode only. When a branch's preview cannot be probed — no
@@ -417,6 +466,60 @@ jobs:
             printf '%s' "$url"
           }
 
+          # Is this branch's work finished? Prints "<status>\t<detail>", where
+          # status is one of:
+          #
+          #   retired  every pull request for this branch has merged or closed
+          #            and the head has not moved since, so nothing it deploys
+          #            is wanted any more and it claims no folder at all
+          #   active   an open pull request, or commits pushed after the last
+          #            one closed, or the lookup failed
+          #   none     no pull request has ever had this branch as its head, so
+          #            there is no end signal to read; treated as active and
+          #            named in the log
+          #
+          # See the header for why the head-has-not-moved clause is what makes
+          # retirement safe to act on the instant a pull request closes.
+          #
+          # One request per branch, filtered by head, rather than paginating
+          # every pull request the repo has ever had (665 and counting) to find
+          # the handful that matter. `head` wants `<owner>:<branch>`; a fork's
+          # branch therefore cannot match, which is correct — a fork branch is
+          # not in this repo and has no preview here.
+          branch_pr_status() {
+            local branch="$1" head_sha="$2" prs number state sha merged_at
+            local open="" closed="" seen=0
+            if ! prs="$(gh api "repos/$GITHUB_REPOSITORY/pulls" -X GET \
+                  -f state=all -f per_page=100 \
+                  -f head="${GITHUB_REPOSITORY_OWNER}:${branch}" \
+                  --jq '.[] | [.number, .state, .head.sha, (.merged_at // "")] | @tsv')"; then
+              # Never retire a branch on a GitHub hiccup: the whole point of
+              # this rule is to delete more, so a failed lookup has to leave
+              # the preview protected rather than unprotected.
+              echo "::warning::Could not read pull requests for '$branch'; treating it as active." >&2
+              printf 'active\tpull request lookup failed, so the branch is assumed to be in use\n'
+              return 0
+            fi
+            while IFS=$'\t' read -r number state sha merged_at; do
+              [[ -z "$number" ]] && continue
+              seen=$((seen+1))
+              if [[ "$state" == "open" ]]; then
+                open="${open:+$open, }#$number"
+              elif [[ "$sha" == "$head_sha" ]]; then
+                closed="#$number $([[ -n "$merged_at" ]] && echo merged || echo closed)"
+              fi
+            done <<< "$prs"
+            if [[ -n "$open" ]]; then
+              printf 'active\topen pull request %s\n' "$open"
+            elif [[ -n "$closed" ]]; then
+              printf 'retired\t%s, and its head has not moved since\n' "$closed"
+            elif (( seen > 0 )); then
+              printf 'active\tits pull requests are all closed, but commits landed after the last one\n'
+            else
+              printf 'none\tno pull request has ever had this branch as its head\n'
+            fi
+          }
+
           # The keep set: build ID -> why it is kept. `keep_class` separates
           # "a deployment is serving this right now" (never capped) from "a
           # branch head names this" (capped by MAX_BRANCHES, see step 6).
@@ -486,10 +589,9 @@ jobs:
           #    while the preview Worker keeps serving the previous commit until
           #    the new build lands. Deleting that older folder is what 500'd a
           #    live preview on 2026-08-05.
-          probed=0
+          probed=0; retired=0
           while IFS=$'\t' read -r branch head_sha; do
             [[ -z "$branch" ]] && continue
-            remember "$head_sha" branch "head of '$branch', that preview's incoming build"
 
             # The default branch has no preview: pushing to it deploys to
             # PRODUCTION, which step 1 already probed at its own URL, and
@@ -500,8 +602,33 @@ jobs:
             # by accident and cost 2.5 GB per run in the first dry run of this
             # rewrite.
             if [[ "$branch" == "$default_branch" ]]; then
+              # Claimed from the branch listing as well as from step 2. The two
+              # reads are seconds apart and a push landing between them makes
+              # this the newer answer; remember() keeps the first claim, so the
+              # usual case where they agree costs nothing.
+              remember "$head_sha" next "head of '$default_branch', production's incoming build"
               continue
             fi
+
+            # Ask whether the branch still has work in it BEFORE claiming
+            # anything for it. A retired branch's head is as dead as the build
+            # its preview is still serving, and claiming either holds ~2.5 GB
+            # for code that already landed on the default branch.
+            pr_status=""; pr_detail=""
+            IFS=$'\t' read -r pr_status pr_detail < <(branch_pr_status "$branch" "$head_sha")
+            if [[ "$pr_status" == "retired" ]]; then
+              echo "Retired '$branch' ($pr_detail); it claims no build folder."
+              retired=$((retired+1))
+              continue
+            fi
+            if [[ "$pr_status" == "none" ]]; then
+              # Named explicitly, because this is the one branch shape nothing
+              # here can ever retire: it holds its folders for as long as it
+              # exists, and only deleting the branch releases them.
+              echo "Branch '$branch' has no pull request ($pr_detail); treated as work in progress."
+            fi
+
+            remember "$head_sha" branch "head of '$branch', that preview's incoming build"
 
             if (( probed >= MAX_BRANCHES )); then
               echo "::warning::More than $MAX_BRANCHES branches exist; '$branch' was not probed and is protected only by its head commit. Delete merged branches, or raise MAX_BRANCHES."
@@ -556,6 +683,7 @@ jobs:
             done <<< "$recent"
           done <<< "$branches_raw"
 
+          echo "Branches: $branch_total total | $retired retired | $probed previews probed"
           echo "Keep set (${#keep_reason[@]} build IDs):"
           for sha in "${!keep_reason[@]}"; do
             echo "  ${sha:0:12}  ${keep_reason[$sha]}"
@@ -590,7 +718,7 @@ jobs:
 
           now=$(date -u +%s)
           grace_cutoff=$(( now - GRACE_HOURS * 3600 ))
-          echo "Policy: keep what production and every branch preview are serving or about to serve, plus anything populated in the last ${GRACE_HOURS}h (since $(date -u -d "@$grace_cutoff" '+%Y-%m-%d %H:%M:%SZ'))"
+          echo "Policy: keep what production and every ACTIVE branch's preview are serving or about to serve, plus anything populated in the last ${GRACE_HOURS}h (since $(date -u -d "@$grace_cutoff" '+%Y-%m-%d %H:%M:%SZ')). A branch whose pull request has merged or closed, with no commits since, keeps nothing."
           echo "Dry run: $DRY_RUN"
 
           # 6) Date every non-production folder by when it was POPULATED, so
@@ -674,7 +802,10 @@ jobs:
               echo "KEEP  $folder (populated $populated, inside the ${GRACE_HOURS}h grace window, possibly an in-flight deploy)"
               kept=$((kept+1)); continue
             else
-              echo "DELETE $folder (populated $populated, nothing is serving it and no branch head claims it)"
+              # "No active branch" rather than "nothing is serving it": a
+              # retired branch's preview may well still be answering from this
+              # folder, and taking that preview down is the intended outcome.
+              echo "DELETE $folder (populated $populated, claimed by no live deployment and no active branch)"
             fi
 
             # Weigh it BEFORE removing it — afterwards there is nothing left to
