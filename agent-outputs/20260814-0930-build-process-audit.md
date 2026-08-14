@@ -209,19 +209,33 @@ That test is the work: flip it on a branch, deploy the preview, confirm prefetch
 and `check-prefetch-hints` stays green. Do not ship it untested — the last prefetch regression on
 this deployment cost 7.5M requests in four days.
 
-### 5.3 Move the TypeScript check off the deploy critical path (−29 s, real tradeoff)
+### 5.3 Move the TypeScript check off the deploy critical path ✅ *half done — the gate exists*
 
 `next build` spends **28.6 s** (32.2 s under OpenNext) on TypeScript, on the critical path of every
-deploy. There is currently **no typecheck, lint or test workflow in `.github/workflows/` at all** —
-the deploy build is the only gate.
+deploy. There was **no typecheck, lint or test workflow in `.github/workflows/` at all** — the
+deploy build was the only gate on the app itself.
 
-Adding a GitHub Actions job that runs `tsc --noEmit`, `eslint .` and `vitest run` gives PRs a
-faster and more informative signal than a red Cloudflare build, and it runs *in parallel* with the
-deploy. Once it exists, `typescript: { ignoreBuildErrors: true }` in `next.config.ts` takes 29 s off
-every build.
+`.github/workflows/checks.yml` now runs `next typegen` → `tsc --noEmit` → `npm run lint` →
+`npm test` on every PR and every push to `main`, in parallel with the deploy. Measured locally:
+typegen 12 s, tsc 41.5 s, lint 65 s, vitest 26 s. One job rather than three, because `npm ci` (~3
+min) dwarfs the checks and splitting would triple it to save ~1 min of wall clock.
 
-The tradeoff is real and should be a deliberate choice: a type error on `main` would then ship
-rather than fail the build. Worth taking only *after* the Actions job exists and is required.
+**The gate found a real error the moment it existed.** `npm run lint` was exiting 1 on `main`:
+`app/_components/Playground.tsx:884` trips `react-hooks/immutability`. Nothing had ever caught it
+because Next 16 does not run ESLint during `next build` — the integration and `next lint` are both
+gone — so `npm run lint` only ran when someone typed it. The pattern flagged is legitimate (a ref
+mirroring state so six dependency-free callbacks can read the current tab list synchronously); the
+rule cannot see that the setter is never reachable from render. It carries a narrow
+`eslint-disable-next-line` with that reasoning written down, rather than a rewrite that would put
+`openTabIds` into six dependency arrays.
+
+Lint fails the job on **errors** only. The ~156 pre-existing warnings do not fail it; `--max-warnings 0`
+is the right next step once that backlog is cleared, and would make the job permanently red today.
+
+**What is left is the deliberate part.** Once `checks` is *required* in branch protection,
+`typescript: { ignoreBuildErrors: true }` in `next.config.ts` takes ~29 s off every build. Do not
+make that change before then: a type error would reach `main` with a green deploy and nothing to
+say so.
 
 ### 5.4 Make the generator cache survive CI (up to −33 s, needs care)
 
@@ -283,7 +297,8 @@ Worth recording so nobody re-does it:
 | Parallelise `build-search-corpus` | −10 s | none (byte-identical, tested) | **shipped here** |
 | `--cacheChunkSize 100` on both deploy commands | 2.2× on the local path; remote TBD | none found — fewer retries, no lost entries | **README updated; needs the dashboard edit** |
 | `experimental.clientSegmentCache: false` | −40% of a 2.34 GiB upload | needs a preview test | `next.config.ts` |
-| Typecheck in Actions + `ignoreBuildErrors` | −29 s | ships type errors to `main` | new workflow |
+| Typecheck/lint/test in Actions | 0 s directly — it is the prerequisite | none (pure addition) | **shipped: `checks.yml`** |
+| …then `ignoreBuildErrors: true` | −29 s | ships type errors to `main` | needs `checks` required first |
 | Generator cache under `.next/cache` | up to −33 s | corrupt-restore surface | `build-cache.mjs` |
 
 The floor is ~7 minutes and roughly half of it is `next build` compiling and prerendering 1,082
