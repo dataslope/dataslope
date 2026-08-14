@@ -216,9 +216,14 @@ deploy. There was **no typecheck, lint or test workflow in `.github/workflows/` 
 deploy build was the only gate on the app itself.
 
 `.github/workflows/checks.yml` now runs `next typegen` → `tsc --noEmit` → `npm run lint` →
-`npm test` on every PR and every push to `main`, in parallel with the deploy. Measured locally:
-typegen 12 s, tsc 41.5 s, lint 65 s, vitest 26 s. One job rather than three, because `npm ci` (~3
-min) dwarfs the checks and splitting would triple it to save ~1 min of wall clock.
+`npm test` on every PR and every push to `main`, in parallel with the deploy. **First run: green in
+2 m 37 s** — checkout 15 s, setup-node 8 s, `npm ci` 54 s, typegen 2 s, tsc 20 s, lint 39 s, vitest
+13 s. (The runner is roughly twice this audit's 4-core box on every step; the local figures were
+typegen 12 s, tsc 41.5 s, lint 65 s, vitest 26 s.)
+
+One job rather than three: three would each re-pay the ~77 s of checkout + setup + install to
+overlap 72 s of checks — about 40 s of wall clock for 3× the runner minutes. The whole job fits
+comfortably inside the Cloudflare build it runs beside, so it is never what a merge waits on.
 
 **The gate found a real error the moment it existed.** `npm run lint` was exiting 1 on `main`:
 `app/_components/Playground.tsx:884` trips `react-hooks/immutability`. Nothing had ever caught it

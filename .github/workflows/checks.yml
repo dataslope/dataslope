@@ -30,10 +30,15 @@ name: Checks
 #
 # ── Shape ───────────────────────────────────────────────────────────────────
 #
-# One job, not three. `npm ci` is ~3 minutes and dwarfs the checks it enables
-# (typegen ~12s, tsc ~42s, lint ~65s, vitest ~26s, measured locally), so
-# splitting into parallel jobs would triple the install cost to save about a
-# minute of wall clock.
+# One job, not three. Measured on the runner (first green run, 2m37s end to
+# end): checkout 15s, setup-node 8s, npm ci 54s, typegen 2s, tsc 20s, lint 39s,
+# vitest 13s. Three parallel jobs would each re-pay the ~77s of checkout +
+# setup + install to overlap 72s of checks — roughly 40s of wall clock for
+# three times the runner minutes. Revisit if the checks grow: the trade flips
+# once any single check costs more than the install.
+#
+# The whole job is well inside the Cloudflare build it runs beside (~7 min at
+# best, ~12 with a cold Turbopack cache), so it is never what a merge waits on.
 #
 # The checks run under `if: ${{ !cancelled() }}` so a failing typecheck does not
 # hide a failing test: one run reports every problem it can find, and the job
