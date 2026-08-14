@@ -14,19 +14,12 @@ import {
 const NONE_SENTINEL = "\0__structure_combobox_none__";
 
 /**
- * A typable combobox used by the View/Edit Structure drawer for the column
- * type field (SQLite) and the foreign-key table/column fields (all dialects).
- *
- * It deliberately mirrors the DOM/behaviour of `PgTypeSelector` /
- * `DuckDbTypeSelector`, same `computeVisibleTypeGroups` filtering, same
- * blur-lock that stops Base UI's Combobox from resetting the input on close,
- * but renders under its own `.sql-combobox-*` class set so it can be reused
- * without disturbing those two (whose `.playground-type-*` / `.duckdb-type-*`
- * hooks are relied on by existing tests and styling).
- *
- * `freeform` controls what happens to a typed value that isn't in the list:
- * types allow arbitrary text (`varchar(15)`), foreign-key fields revert to the
- * last committed value so they stay constrained to real tables/columns.
+ * Typable combobox for the Structure drawer's column-type field (SQLite) and
+ * FK table/column fields (all dialects). Mirrors PgTypeSelector /
+ * DuckDbTypeSelector behaviour but renders under its own `.sql-combobox-*`
+ * classes — their `.playground-type-*` / `.duckdb-type-*` hooks are relied
+ * on by tests and styling. `freeform` allows arbitrary typed values (types);
+ * constrained fields (FKs) revert to the last committed value.
  */
 export function StructureCombobox({
   value,

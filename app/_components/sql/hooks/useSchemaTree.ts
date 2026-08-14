@@ -79,10 +79,8 @@ export function useSchemaTree(options: UseSchemaTreeOptions) {
    */
   const handleSchemaChange = useCallback(
     async (schema: string, refreshSchema: () => Promise<void>) => {
-      // Base UI Select fires onValueChange(null) when no item matches
-      // the controlled value (e.g. while the schema list is empty
-      // during a fetch). Ignore those spurious calls to prevent
-      // "null" poisoning selectedSchemaRef.
+      // Base UI Select fires onValueChange(null) when no item matches the
+      // controlled value; ignore it so "null" can't poison selectedSchemaRef.
       if (!schema || schema === "null") return;
       selectedSchemaRef.current = schema;
       setSelectedSchema(schema);

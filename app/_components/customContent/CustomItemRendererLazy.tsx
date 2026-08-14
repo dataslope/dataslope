@@ -1,20 +1,10 @@
 "use client";
 
 /**
- * Client-only loader for `CustomItemRenderer`.
- *
- * The renderer pulls in the entire interactive-card graph, CodeMirror,
- * the language-runtime registry, react-markdown + KaTeX + highlight.js,
- * which is multiple MiB of JS. Importing it from a server-rendered page
- * would drag all of it into the OpenNext Worker bundle, and the deployed
- * Worker sits close to Cloudflare's 10 MiB (gzipped) ceiling (see
- * agent-outputs/20260620-1640-cloudflare-deploy-runbook.md). `ssr: false`
- * keeps the graph out of the server bundle entirely; the cards need a
- * browser to do anything useful anyway (WASM runtimes, editors), so
- * skipping their SSR costs only the initial paint of a placeholder.
- *
- * Every route-level consumer (the /c and /quiz viewers, the /create
- * builders' previews) must import THIS module, not CustomItemRenderer
+ * Client-only loader for `CustomItemRenderer`. The renderer's multi-MiB
+ * graph must stay out of the server bundle — the deployed Worker sits close
+ * to Cloudflare's 10 MiB gzipped ceiling — so `ssr: false` here, and every
+ * route-level consumer must import THIS module, not CustomItemRenderer
  * directly, or the Worker regains the weight.
  */
 

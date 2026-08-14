@@ -1865,11 +1865,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     })();
   }, []);
 
-  /** Build the file map handed to `runtime.prepareFileSystem` before
-   *  each run. Includes every open code tab (using the dirty editor
-   *  buffer when present, falling back to the OPFS-persisted copy) and
-   *  every uploaded data file (read straight from OPFS). Paths use the
-   *  workspace-relative names exactly as shown in the Files pane. */
+  /** Build the file map for `runtime.prepareFileSystem`: every code tab
+   *  (dirty buffer, falling back to OPFS) plus every uploaded data file,
+   *  under workspace-relative paths. */
   const collectWorkspaceFilesForRun = useCallback(async (): Promise<
     Map<string, Uint8Array>
   > => {
@@ -1877,14 +1875,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     const out = new Map<string, Uint8Array>();
     const encoder = new TextEncoder();
 
-    // Code tabs: prefer the in-memory dirty buffer (unsaved edits),
-    // otherwise read the persisted copy from OPFS. We do the OPFS reads
-    // in parallel so workspaces with many files don't serialise.
+    // Code tabs; OPFS reads run in parallel so many files don't serialise.
     const activeId = activeFileIdRef.current;
     const view = editorRef.current;
     const reads = filesRef.current.map(async (f) => {
-      // The active editor may hold edits not yet flushed to the dirty
-      // buffer, read straight from CodeMirror in that case.
+      // The active editor may hold edits not yet flushed to the buffer.
       if (view && f.id === activeId) {
         out.set(f.filename, encoder.encode(view.state.doc.toString()));
         return;
@@ -1903,8 +1898,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     });
     await Promise.all(reads);
 
-    // Data files (binary). Skip folder markers, only real files have
-    // OPFS content.
+    // Data files (binary); folder markers have no OPFS content.
     if (wsId) {
       const dataReads = virtualFilesRef.current
         .filter((vf) => !vf.isFolder)
@@ -1924,27 +1918,21 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     const editor = editorRef.current;
     const rt = runtimeRef.current;
     if (!rt) return;
-    // The split view has no single tabbed editor, its panes write
-    // through to the dirty buffers synchronously, so reads below fall
-    // back to the buffers instead.
+    // The split view has no tabbed editor; its panes write through to the
+    // dirty buffers, so reads below fall back to the buffers.
     if (!editor && !splitActiveRef.current) return;
-    // Snapshot the active file id at run start: even if the user
-    // switches tabs mid-run, the outputs should be routed to the file
-    // whose code we actually executed.
+    // Snapshot the active file id at run start so outputs route to the file
+    // whose code actually executed, even after a mid-run tab switch.
     let targetFileId = activeFileIdRef.current;
     if (!targetFileId) return;
 
-    // Resolve the entry file (chevron picks override the active tab,
-    // otherwise the active tab is the entry). When the override
-    // points at a non-active file we read its content from the dirty
-    // buffer / OPFS instead of the live editor.
+    // Resolve the entry file (chevron picks override the active tab); an
+    // override's content is read from the buffer / OPFS.
     const activeFile =
       filesRef.current.find((f) => f.id === targetFileId) ?? null;
     const entryFilename = entryOverride ?? activeFile?.filename;
-    // Split view: outputs belong to the file that actually RAN (the
-    // entry), not the focused pane, so the console reads as one stream
-    // and matches the pane the output panel derives from (see
-    // `outputFileId`).
+    // Split view: outputs belong to the file that RAN (the entry), not the
+    // focused pane, so the console reads as one stream (see `outputFileId`).
     if (splitActiveRef.current && entryFilename) {
       const entryFile = filesRef.current.find(
         (f) => f.filename === entryFilename,
