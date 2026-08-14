@@ -8,7 +8,7 @@ name: R2 incremental-cache cleanup
 # folder under a new build ID (one `.cache` object per prerendered page, ~1,080
 # of them averaging ~2.3 MB), and OpenNext never deletes old ones. Left alone,
 # the bucket grows by that much per deploy forever; at active-development
-# velocity that reached ~34 GB in a matter of days.
+# velocity that reached ~78 GB in a matter of days.
 #
 # That per-folder figure read "~1–1.4 GB / ~1,600 objects" until 2026-08-14 and
 # was measured at 2.504 GB / 1,081 objects: fewer, much larger objects. Next 16's
@@ -20,89 +20,121 @@ name: R2 incremental-cache cleanup
 #
 # The build ID IS the deployed commit SHA: next.config.ts sets `generateBuildId`
 # to WORKERS_CI_COMMIT_SHA on Cloudflare Workers Builds, so a folder name equals
-# the commit it was built from. That's what lets this job map each folder to the
-# open pull request (branch) it belongs to and keep only the latest commit per
-# branch, impossible with Next's default random build IDs.
+# the commit it was built from. That is what lets this job decide anything at
+# all about a folder, and it is impossible with Next's default random build IDs.
 #
-# What it does: always keeps
-#   • the live production build (probed from the running Worker), a site that
-#     sits unchanged for months must never lose its cache, which would 500 the
-#     home page and /courses/* (see open-next.config.ts), AND
-#   • any folder POPULATED within the last GRACE_HOURS, whatever it matches
-#     (populated, not "last written" — see step 5; objects also arrive at
-#     request time and must not be mistaken for a deploy). A
-#     deploy populates its cache folder BEFORE the Worker switches to serving
-#     that build, so for some minutes the incoming production folder is
-#     protected by neither the probe (which still reports the outgoing build)
-#     nor the open-PR rule below (a merge commit's PR closed on merge). A
-#     scheduled run that fired inside that window deleted the incoming
-#     production cache mid-deploy and 500'd the site (2026-07-16), AND
-#   • any folder that a PREVIEW is still serving, i.e. a recent commit of an
-#     open PR whose head build has not populated its cache yet. A push moves
-#     the PR head immediately but the preview Worker keeps serving the previous
-#     commit until the new build lands, so the open-PR-head rule below would
-#     delete the cache out from under a live preview and 500 it. Production has
-#     been guarded against this since 2026-07-16 by the build-ID probe; this is
-#     the preview equivalent, added 2026-08-05 after a run did exactly that, AND
-#   • any folder whose commit is the current head of an OPEN pull request, i.e.
-#     the live preview of an active branch, for as long as that PR stays open
-#     and among the MAX_BRANCHES most-recently-deployed such branches. Age is
-#     deliberately NOT a factor here (see below). Superseded commits (an older
-#     head of a still-open PR) and merged/closed PR previews do not match, so
-#     they are pruned.
+# ---------------------------------------------------------------------------
+# The policy, in full
+# ---------------------------------------------------------------------------
 #
-# Every OTHER folder is kept only while younger than THRESHOLD_HOURS. Within
-# that window one more rule applies: a folder built from one of the MAIN_COMMITS
-# most recent default-branch commits is kept even though nothing else claims it.
-# Production builds only ever come from that branch, so this covers the incoming
-# build of a deploy that stalls past the grace window. It cannot outlive
-# THRESHOLD_HOURS — deliberately, since a superseded production build has no
-# claim on the bucket and the live one is already protected by the probe.
+# Two questions decide every folder: what is each deployment serving RIGHT NOW,
+# and what is it ABOUT TO serve. Both are directly obtainable, so this job asks
+# rather than approximates:
 #
-# The rules are applied to each folder in a fixed order, and the order carries
-# the policy — see step 5:
+#   KEEP = { probe(production) }                  what prod serves now
+#        ∪ { probe(preview_b) ∀ branch b }        what each preview serves now
+#        ∪ { head(default_branch) }               what prod is about to serve
+#        ∪ { head(b) ∀ branch b }                 what each preview is about to serve
+#        ∪ { folders populated < GRACE_HOURS }    catch-all for the unclassifiable
+#   DELETE everything else
 #
-#   1. written within GRACE_HOURS            -> KEEP
-#   2. predecessor of a pending head build   -> KEEP
-#   3. head of an open PR (within the cap)   -> KEEP
-#   4. older than THRESHOLD_HOURS            -> DELETE
-#   5. recent default-branch commit          -> KEEP
-#   6. anything else                         -> DELETE
+# "probe" means an HTTP GET of /api/cache-build-id on the deployment itself,
+# which reports the running Worker's OPEN_NEXT_BUILD_ID — the exact string the
+# R2 override uses as the folder name, so it cannot drift from reality. The
+# production URL is fixed (BUILD_ID_URL); each branch is probed at its preview
+# ALIAS, the stable per-branch hostname Workers Builds assigns.
 #
-# Rule 3 sat BELOW the age check until 2026-08-14, which meant an open PR's
-# preview lost its cache once the folder aged past THRESHOLD_HOURS even though
-# the PR was still open and that commit was still its head — the preview then
-# re-rendered on demand and 500'd every `node:fs` page (see open-next.config.ts).
-# THRESHOLD_HOURS was set to 24 mainly to paper over that ("keeps a preview alive
-# through next-morning review"), which forced a day-deep tail of every OTHER
-# folder too and was the single largest contributor to a 78 GB bucket. Keeping an
-# open PR's head on merit instead of on age decouples the two: previews now live
-# exactly as long as their PR does, and THRESHOLD_HOURS is free to be short.
+# BRANCHES, not open pull requests. Cloudflare Workers Builds builds every
+# branch on every push, whether or not a pull request exists for it (confirmed
+# 2026-08-14 by pushing to a branch with no PR and watching a build start), so
+# a PR-shaped keep set silently under-covers: a branch being worked on before
+# its PR is opened has a live preview that nothing would have claimed.
 #
-# Rule 5 stays BELOW the age check on purpose, for the reason given above. Note
-# the consequence of pairing that with a short THRESHOLD_HOURS: the cover for a
-# stalled production deploy is now GRACE_HOURS..THRESHOLD_HOURS, i.e. 2-4h
-# rather than 2-24h. Populate and switchover are consecutive steps of one
-# `opennextjs-cloudflare deploy`, minutes apart, so 4h is still ~2x the margin
-# the grace window alone was documented as covering — but if that assumption
-# ever stops holding, raise THRESHOLD_HOURS rather than MAIN_COMMITS, which
-# cannot help past the cutoff.
+# The alias is DERIVED from the branch name rather than read out of the
+# Cloudflare check run that also advertises it. Reading it looks more
+# authoritative and is not: check runs hang off a COMMIT, and a commit reached
+# by more than one branch carries whichever branch's build ran on it. Measured
+# 2026-08-14 — the Workers Builds check run on 00a0deaa, the head of `main`,
+# advertised `Preview Alias URL: https://test-no-open-pr-001-dataslope…`,
+# because a branch had been cut at that commit and built from there. Probing
+# that URL for `main` would have asked a different deployment what it was
+# serving and recorded the answer under the wrong branch, leaving the branch we
+# meant to protect unprobed. Deriving cannot be misattributed, costs no API
+# calls, and is verified against both live aliases in preview_alias() below.
 #
-# Net effect: the live production build, plus at most one preview per active
-# branch capped at MAX_BRANCHES, plus a THRESHOLD_HOURS-deep tail of everything
-# else. Merging a PR (or pushing a newer commit to it) drops the stale preview
-# folder on the next run. Worst case is (MAX_BRANCHES + 1) build folders plus
-# that tail; at the deploy velocity measured on 2026-08-14 (~1.2 deploys/hour)
-# the tail dominates, and its depth is the sweep interval plus THRESHOLD_HOURS,
-# NOT THRESHOLD_HOURS alone — a folder created just after a sweep is not
-# reconsidered until the next one. That is why the schedule below matters as
-# much as the threshold.
+# ---------------------------------------------------------------------------
+# What this replaced, and why
+# ---------------------------------------------------------------------------
 #
-# Safety: the job aborts WITHOUT deleting anything if it cannot (a) positively
-# identify the live production build folder, (b) list the repo's open pull
-# requests, or (c) list the default branch's recent commits, so a transient
-# error can never leave every preview "unmatched" and wipe the bucket. Run
-# manually with dry_run=true to preview deletions.
+# Until 2026-08-14 the keep set was assembled from six knobs — THRESHOLD_HOURS,
+# MAIN_COMMITS, PR_COMMITS, MIN_CACHE_OBJECTS, GRACE_HOURS, MAX_BRANCHES — that
+# together approximated those same two questions. Approximations leak, and each
+# of these leaked in a way that had already cost an outage or a large fraction
+# of the bucket:
+#
+#   • MIN_CACHE_OBJECTS: 100 stood in for "has this branch's head build landed
+#     yet". A folder crosses 100 of its 1,081 objects seconds into a populate,
+#     minutes before the Worker switches over, so for those minutes the build
+#     actually being served counted as superseded and lost its protection. The
+#     probe has no such window: it reports what is being served, not what looks
+#     finished.
+#   • PR_COMMITS: 3 stood in for "how far behind its branch head can a live
+#     preview be". A preview four commits stale (rapid pushes, or a failed
+#     build) was unprotected. The probe does not care how far behind it is.
+#   • MAIN_COMMITS: 30, then 10, stood in for "the incoming production build".
+#     That build IS head(default_branch): one exact value instead of N guesses,
+#     and unbounded in time, so a stalled deploy can no longer age out mid-flight.
+#   • THRESHOLD_HOURS: 24, then 4, was a blanket expiry for everything the other
+#     rules failed to explain. With the keep set exact there is nothing left for
+#     it to explain, and it was the single largest contributor to the 78 GB peak
+#     (a 24h + 6h-interval tail at ~1.2 deploys/hour IS the bucket).
+#
+# Net effect: the bucket now holds the live production build, the incoming
+# production build, and at most two folders per active branch (what its preview
+# serves now + what it is about to serve), plus whatever landed in the last
+# GRACE_HOURS. Nothing is retained on age alone, so deploy velocity no longer
+# sets the bucket size — branch count does.
+#
+# Deliberate consequence: there is no rollback cover. Rolling the Worker back
+# to a build whose cache has been pruned 500s the site by the `node:fs`
+# mechanism described in open-next.config.ts, and Cloudflare's Deployments tab
+# offers those targets with no warning. Revert-and-redeploy is ~12 minutes
+# end-to-end (measured 2026-08-14), which is the intended recovery path. If
+# rollback cover is ever wanted, add it as its own explicit rule — "keep the
+# last N production builds", count-bounded — rather than by lengthening a time
+# window and letting every unrelated folder ride along, which is exactly the
+# accident this rewrite undid.
+#
+# ---------------------------------------------------------------------------
+# Safety
+# ---------------------------------------------------------------------------
+#
+# Two outages came from this job deleting the folder a deployment was serving
+# (2026-07-16 production, 2026-08-05 preview). Every guard below exists for
+# that, and a rewrite keeps all of them:
+#
+#   • The job aborts WITHOUT deleting anything if it cannot positively identify
+#     the live production build, resolve the default branch and its head, or
+#     list the repo's branches. A transient error must never leave every folder
+#     unexplained and therefore deleted.
+#   • It also aborts if the live production folder is not present in the bucket
+#     at all, which catches a prefix or bucket mismatch before it deletes
+#     everything.
+#   • A PREVIEW probe failure, by contrast, never aborts the sweep and never
+#     widens into a delete: that branch alone falls back to the pre-probe
+#     behaviour of keeping its last FALLBACK_COMMITS commits. One unreachable
+#     preview must not stop the other branches from being swept, and "no
+#     answer" must never be read as "nothing to keep".
+#   • A branch name is attacker-controllable by anyone who can push, and this
+#     job turns one into a URL and fetches it. The slug rule folds everything
+#     outside [a-z0-9-] to '-', so a branch cannot smuggle a host, and the
+#     result is checked against PREVIEW_URL_RE before any request is made.
+#   • GRACE_HOURS survives the rewrite as a safety net rather than as policy: a
+#     folder that landed minutes ago may belong to a deploy no probe can see
+#     yet (the Worker still reports the outgoing build) and no branch head
+#     names (a merge commit's build ID is the merge commit).
+#
+# Run manually with dry_run=true to preview deletions.
 #
 # Required repository secrets (Settings → Secrets and variables → Actions):
 #   CLOUDFLARE_ACCOUNT_ID           Cloudflare account ID (the R2 S3 endpoint host)
@@ -123,20 +155,18 @@ name: R2 incremental-cache cleanup
 on:
   schedule:
     # Every 2 hours, off the top of the hour to avoid scheduler congestion.
-    # (GitHub delays scheduled runs by up to a few hours under load; the
-    # THRESHOLD_HOURS retention absorbs that jitter.)
+    # (GitHub delays scheduled runs by up to a few hours under load.)
     #
-    # Was every 6 hours until 2026-08-14. The sweep interval is an ADDEND to
-    # retention, not a detail: a folder written just after a sweep survives
-    # untouched until the next one, so the worst-case age of a prunable folder
-    # is interval + THRESHOLD_HOURS. At 6h + 24h that was a 30-hour tail, and at
-    # ~1.2 deploys/hour and ~2.5 GB/folder the tail alone accounted for most of
-    # the bucket. Lowering THRESHOLD_HOURS without also sweeping more often
-    # would have left the interval as the binding constraint.
+    # The interval used to be an ADDEND to retention — a folder written just
+    # after a sweep survived untouched until the next one, so the worst-case
+    # age of a prunable folder was interval + THRESHOLD_HOURS. With retention
+    # no longer expressed in hours that arithmetic is gone: the interval now
+    # only sets how long a superseded folder lingers before its next
+    # reconsideration, and every run reaches the same verdict about it.
     #
     # The job is cheap to run: it LISTs the bucket (Class B, $0.36/million) and
-    # DELETEs are free, so the cost of 12 runs/day over 4 is a couple of minutes
-    # of Actions time.
+    # DELETEs are free, so the cost of 12 runs/day is a couple of minutes of
+    # Actions time.
     - cron: "17 */2 * * *"
   workflow_dispatch:
     inputs:
@@ -149,10 +179,13 @@ concurrency:
   group: r2-cache-cleanup
   cancel-in-progress: false
 
-# Least privilege: read-only, and only what `gh pr list` needs.
+# Least privilege: read-only, and `contents` alone covers everything asked of
+# GitHub here (branches, commits, the default branch). `pull-requests: read`
+# was dropped on 2026-08-14 — the keep set is built from branches now and never
+# asks about PRs — and no `checks` scope was ever needed, since preview aliases
+# are derived from branch names rather than read out of check runs.
 permissions:
   contents: read
-  pull-requests: read
 
 jobs:
   cleanup:
@@ -161,67 +194,58 @@ jobs:
       BUCKET: dataslope-inc-cache
       PREFIX: incremental-cache/
       BUILD_ID_URL: https://dataslope.com/api/cache-build-id
-      # Blanket expiry for any folder NOT otherwise spoken for: not the live
-      # production build, not inside the grace window, not an open PR's head,
-      # not a predecessor of a pending head build. In practice that is merged
-      # and abandoned previews, plus superseded production builds.
-      #
-      # 4h, down from 24h on 2026-08-14. The 24h figure existed to keep an open
-      # PR's preview alive overnight, which rule 3 now does on merit regardless
-      # of age (see the header), so this no longer has to be generous on a
-      # preview's behalf. What is left is "how long to keep a build nobody is
-      # serving", and the answer is only long enough to absorb the races the
-      # grace window and the pending-head rule already handle explicitly.
-      # Combined with the 2h sweep interval the real worst case is ~6h.
-      THRESHOLD_HOURS: "4"
-      # Caps how many open-PR previews are protected, newest-deployed first.
-      # Now that rule 3 ignores age, this is the ONLY bound on preview
-      # retention: a PR left open for months keeps its head folder for months.
-      # At ~2.5 GB/folder that is a worst case of ~25 GB in previews, which is
-      # the deliberate price of previews that do not rot. Lower it if open-PR
-      # count grows; it has been 1-3 in practice.
-      MAX_BRANCHES: "10"
-      # Never delete a folder written within the last GRACE_HOURS, no matter
-      # what it matches. A deploy populates its R2 folder minutes before the
-      # Worker starts serving that build, so a brand-new folder can belong to
-      # an in-flight production deploy that the build-ID probe can't see yet
-      # (it still reports the outgoing build) and that no open PR matches (a
-      # merge commit's PR closed on merge). 2h comfortably covers populate +
-      # switchover, including Workers Builds queueing.
+      # Never delete a folder populated within the last GRACE_HOURS, whatever
+      # it matches. This is the one piece of the pre-2026-08-14 policy that
+      # survives, and it is a safety net rather than a rule: a deploy populates
+      # its R2 folder minutes before the Worker starts serving that build, so a
+      # brand-new folder can belong to an in-flight deploy that no probe can
+      # see yet (production still reports the outgoing build) and no branch
+      # head names (a merge commit's build ID is the merge commit's SHA, which
+      # is head(main) only once the merge lands). 2h comfortably covers
+      # populate + switchover including Workers Builds queueing; populate alone
+      # measured a 0.8 min median and a 1.8 min max on 2026-08-14.
       GRACE_HOURS: "2"
-      # Also keep folders built from any of the last MAIN_COMMITS commits on
-      # the default branch (production builds only come from there), so a
-      # production deploy that stalls past the grace window still can't lose
-      # its cache. The THRESHOLD_HOURS age rule retires these eventually.
-      #
-      # 10, down from 30 on 2026-08-14, and non-binding either way: this rule
-      # is checked AFTER the age cutoff, so it can only ever protect a build
-      # younger than THRESHOLD_HOURS. The last 10 default-branch commits spanned
-      # 19.2 hours when measured, ~5x the 4h window, so the age rule bites first
-      # and the count is pure headroom. It is expressed as a commit count rather
-      # than a duration because that is what `gh api .../commits` takes; keep it
-      # comfortably above the number of commits the branch sees in
-      # THRESHOLD_HOURS and it does its job.
-      MAIN_COMMITS: "10"
-      # A preview branch whose HEAD build has not populated its cache yet is
-      # mid-deploy, and its Worker is still serving an EARLIER commit. Keep
-      # that many recent commits of such a branch so the build actually being
-      # served cannot be pruned out from under it. Only branches with a pending
-      # head cost anything: a branch whose head cache is present protects
-      # nothing extra. See step 4b.
-      PR_COMMITS: "3"
-      # How many objects a build folder must hold to count as populated. A
-      # healthy folder held 1,081 objects when last measured (2026-08-14); the
-      # point is
-      # only to tell "a finished deploy" from "absent, or mid-populate, or
-      # half-deleted" (the folder this rule was written for had 5 left), so the
-      # threshold sits an order of magnitude below a real cache rather than
-      # tracking its exact size.
-      MIN_CACHE_OBJECTS: "100"
+      # Sanity cap, not policy. Two things are bounded by it:
+      #   • how many branches get probed (alphabetical order, with a warning
+      #     when it truncates), and
+      #   • how many folders may be kept SOLELY because a branch head names
+      #     them, evaluated newest-populated-first.
+      # A folder kept because a live probe named it is never capped — that is
+      # a deployment actively serving from it, and deleting it is an outage.
+      # At ~2.5 GB/folder and at most two folders per branch this bounds
+      # previews at roughly 50 GB, which only becomes reachable with 10
+      # simultaneously-active branches; it has been 1-3 in practice. If this
+      # cap ever fires, the honest fix is deleting merged branches, not raising
+      # the number.
+      MAX_BRANCHES: "10"
+      # Degraded mode only. When a branch's preview cannot be probed — no
+      # Cloudflare check run yet, an implausible alias URL, or the preview not
+      # answering — that branch falls back to the pre-probe behaviour of
+      # keeping its most recent commits, so a preview that is alive but
+      # unreachable from this runner cannot lose its cache. Not reached on a
+      # healthy run, and cheap when it is: keeping a SHA whose folder does not
+      # exist costs nothing.
+      FALLBACK_COMMITS: "3"
+      # A branch's preview alias is https://<branch-slug>-<worker>.<subdomain>
+      # .workers.dev. The worker name must match wrangler.jsonc's "name"; the
+      # subdomain is the Cloudflare account's workers.dev subdomain (visible in
+      # any Preview URL the Workers Builds check run prints).
+      PREVIEW_WORKER: dataslope
+      PREVIEW_SUBDOMAIN: subwaymatch.workers.dev
+      # Belt and braces around the URL this job builds and then fetches. The
+      # slug rule already makes a branch name incapable of changing the host,
+      # so this only ever fires on a bug in that rule — which is exactly when a
+      # request must not be made.
+      PREVIEW_URL_RE: '^https://[a-z0-9-]+-dataslope\.subwaymatch\.workers\.dev$'
+      # A probe is a single HTTP GET and the whole keep set rests on it, so
+      # retry before believing a negative answer. Applies to production (where
+      # exhausting it aborts the run) and to previews (where it triggers the
+      # per-branch fallback).
+      PROBE_ATTEMPTS: "3"
       # Scheduled runs delete for real; manual runs honor the dry_run input
       # (default true).
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
-      # For `gh pr list` (see step 2). GITHUB_TOKEN with pull-requests: read.
+      # For the `gh api` calls below. GITHUB_TOKEN with contents+checks read.
       GH_TOKEN: ${{ github.token }}
       AWS_ACCESS_KEY_ID: ${{ secrets.R2_INC_CACHE_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_INC_CACHE_SECRET_ACCESS_KEY }}
@@ -247,7 +271,7 @@ jobs:
 
           # 0) An unset CLOUDFLARE_ACCOUNT_ID collapses ENDPOINT to
           #    "https://.r2.cloudflarestorage.com": every aws call then fails,
-          #    and the `|| true` on the listing in step 3 turns that into an
+          #    and the `|| true` on the listing in step 5 turns that into an
           #    empty folder list, i.e. a green run that silently stopped pruning
           #    and lets the bucket grow unbounded. Fail loudly instead. (Worth
           #    guarding because this secret was named CF_ACCOUNT_ID until
@@ -260,7 +284,7 @@ jobs:
 
           # 0b) Missing credentials fail exactly the same silent way, and there
           #     is no malformed ENDPOINT to catch them by: unsigned requests are
-          #     rejected, the `|| true` in step 3 swallows it, and the run goes
+          #     rejected, the `|| true` in step 5 swallows it, and the run goes
           #     green having pruned nothing. This is a live risk right now — the
           #     secrets were renamed to R2_INC_CACHE_* on 2026-07-30, and a
           #     scheduled run firing between deleting the old pair and creating
@@ -276,15 +300,6 @@ jobs:
           # attempts converge on an empty folder. Returns non-zero only if the
           # folder still has objects after every attempt (a persistent, not
           # transient, failure), so one flaky delete no longer aborts the run.
-          # Number of objects under a folder. The CLI auto-paginates and applies
-          # --query per page, so this emits one count per page; sum them. A
-          # missing folder yields 0, which is what step 4b wants.
-          folder_objects() {
-            aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$1" \
-              --query 'length(Contents)' --output text 2>/dev/null \
-              | grep -vxF 'None' | awk '{s+=$1} END {print s+0}'
-          }
-
           delete_folder() {
             local folder="$1" attempt
             for attempt in 1 2 3 4 5; do
@@ -297,65 +312,220 @@ jobs:
             return 1
           }
 
-          # 1) Ask the live production Worker which build it is serving from.
-          prod_id="$(curl -fsS --max-time 30 "$BUILD_ID_URL" || true)"
-          prod_id="$(printf '%s' "$prod_id" | tr -d '[:space:]')"
-          if [[ ! "$prod_id" =~ ^[A-Za-z0-9_-]{6,}$ ]]; then
-            echo "::error::Could not read a valid production build ID from $BUILD_ID_URL (got '${prod_id}'). Aborting without deleting."
+          # Ask a running Worker which build it is serving from. This is the
+          # whole basis of the keep set, so a single failed request is not
+          # taken as an answer: retry, and only then report failure. Prints the
+          # build ID on success and nothing on failure.
+          #
+          # The response is OPEN_NEXT_BUILD_ID verbatim (see
+          # app/api/cache-build-id/route.ts), which on Workers Builds is the
+          # deployed commit SHA and is byte-identical to the R2 folder name.
+          # Validate the shape anyway: an HTML error page from an edge in front
+          # of the Worker would otherwise be treated as a build ID, which
+          # cannot match a folder and so protects nothing.
+          #
+          # Three outcomes, because "no answer" and "no such deployment" call
+          # for opposite responses:
+          #   0 + the build ID   the deployment answered
+          #   2                  the edge returned 404: this alias has no
+          #                      deployment at all, so there is nothing to
+          #                      protect and the caller must NOT fall back
+          #   1                  no usable answer after PROBE_ATTEMPTS, so the
+          #                      caller must assume the worst and be generous
+          probe_build_id() {
+            local url="$1" attempt out code body
+            for (( attempt = 1; attempt <= PROBE_ATTEMPTS; attempt++ )); do
+              out="$(curl -sS --max-time 30 -w $'\n%{http_code}' "$url" 2>/dev/null || true)"
+              code="${out##*$'\n'}"
+              body="$(printf '%s' "${out%$'\n'*}" | tr -d '[:space:]')"
+              if [[ "$code" == "200" && "$body" =~ ^[A-Za-z0-9_-]{6,}$ ]]; then
+                printf '%s' "$body"
+                return 0
+              fi
+              # A 404 is Cloudflare's edge saying the hostname resolves to no
+              # deployment. It is definitive and permanent, so retrying it just
+              # burns the sweep's time.
+              if [[ "$code" == "404" ]]; then
+                return 2
+              fi
+              if (( attempt < PROBE_ATTEMPTS )); then
+                sleep $(( attempt * 3 ))
+              fi
+            done
+            return 1
+          }
+
+          # A branch's preview alias URL: the stable per-branch hostname
+          # Workers Builds assigns, as opposed to the per-commit Preview URL
+          # (which is keyed by version ID and useless for asking "what is this
+          # branch serving now").
+          #
+          # The alias is the branch name with every character outside [a-z0-9-]
+          # folded to '-', joined to the worker name. Verified 2026-08-14
+          # against both live aliases:
+          #   test-no-open-pr-001
+          #     -> test-no-open-pr-001-dataslope.subwaymatch.workers.dev
+          #   claude/sql-playground-info-wrap-gdt49u
+          #     -> claude-sql-playground-info-wrap-gdt49u-dataslope.subway….dev
+          #
+          # A DNS label caps at 63 characters and Cloudflare truncates to fit.
+          # Rather than guess where it cuts, refuse to guess at all: an
+          # over-long branch name yields no alias and falls back (see step 4),
+          # so the failure mode is "protect more than necessary", never
+          # "confidently probe the wrong host".
+          preview_alias() {
+            local branch="$1" slug label url
+            slug="$(printf '%s' "$branch" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9-' '-')"
+            label="${slug}-${PREVIEW_WORKER}"
+            if (( ${#label} > 63 )); then
+              return 1
+            fi
+            url="https://${label}.${PREVIEW_SUBDOMAIN}"
+            if [[ ! "$url" =~ $PREVIEW_URL_RE ]]; then
+              return 1
+            fi
+            printf '%s' "$url"
+          }
+
+          # The keep set: build ID -> why it is kept. `keep_class` separates
+          # "a deployment is serving this right now" (never capped) from "a
+          # branch head names this" (capped by MAX_BRANCHES, see step 6).
+          declare -A keep_reason keep_class
+          remember() {
+            local sha="$1" class="$2" reason="$3"
+            if [[ -z "$sha" ]]; then return 0; fi
+            # First reason wins, so the strongest claim is the one reported:
+            # production is registered before branch heads, and a live probe
+            # before the head it may or may not equal.
+            if [[ -n "${keep_reason[$sha]+set}" ]]; then return 0; fi
+            keep_reason["$sha"]="$reason"
+            keep_class["$sha"]="$class"
+          }
+
+          # 1) What production is serving RIGHT NOW. The only authoritative
+          #    source is the Worker itself. Exhausting the retries aborts the
+          #    run: without this answer every folder is unexplained, and the
+          #    sweep would delete the live cache and 500 the site.
+          if ! prod_id="$(probe_build_id "$BUILD_ID_URL")"; then
+            echo "::error::Could not read a valid production build ID from $BUILD_ID_URL after $PROBE_ATTEMPTS attempts. Aborting without deleting."
             exit 1
           fi
           prod_folder="${PREFIX}${prod_id}/"
-          echo "Live production build: $prod_id"
+          remember "$prod_id" live "live production, probed at $BUILD_ID_URL"
 
-          # 2) Map active branches to their latest commit. Each OPEN PR's head
-          #    SHA is the most recent commit on that branch; a folder built from
-          #    that SHA (build IDs are commit SHAs, see next.config.ts) is the
-          #    branch's live preview. Merged/closed PRs drop out of this list, so
-          #    their previews are pruned. Abort on API failure, otherwise a
-          #    transient error would leave every folder unmatched and delete it.
-          if ! pr_json="$(gh pr list --repo "$GITHUB_REPOSITORY" --state open \
-                --json number,headRefName,headRefOid --limit 300)"; then
-            echo "::error::Could not list open pull requests from GitHub. Aborting without deleting."
-            exit 1
-          fi
-          declare -A pr_branch   # commit SHA -> "branch (PR #n)", for keep decisions + logging
-          while IFS=$'\t' read -r sha branch num; do
-            [[ -z "$sha" ]] && continue
-            pr_branch["$sha"]="$branch (PR #$num)"
-          done < <(printf '%s' "$pr_json" | jq -r '.[] | [.headRefOid, .headRefName, (.number|tostring)] | @tsv')
-          # `${#assoc[@]}` on an EMPTY associative array trips `set -u`
-          # ("unbound variable"), bash treats a zero-element associative array
-          # as unset. Expanding its keys is safe when empty, so count those.
-          pr_shas=("${!pr_branch[@]}")
-          echo "Open PRs (active branches): ${#pr_shas[@]}"
-
-          # 2b) Recent default-branch commits: production builds come from the
-          #     default branch, and between "cache populated" and "Worker
-          #     switched" the incoming build is invisible to the probe in
-          #     step 1 and matches no open PR (its PR just merged) — the race
-          #     that wiped the live cache mid-deploy on 2026-07-16. Protect
-          #     these SHAs outright. Abort on API failure for the same reason
-          #     as step 2.
+          # 2) What production is ABOUT TO serve. Production builds only ever
+          #    come from the default branch, so its head is the incoming build:
+          #    during the minutes between "cache populated" and "Worker
+          #    switched" the probe above still reports the outgoing build, and
+          #    that gap is what wiped the live cache mid-deploy on 2026-07-16.
+          #    Naming the exact commit replaces the old MAIN_COMMITS window and
+          #    is unbounded in time, so a stalled deploy cannot age out of it.
           if ! default_branch="$(gh api "repos/$GITHUB_REPOSITORY" --jq .default_branch)" \
              || [[ -z "$default_branch" ]]; then
             echo "::error::Could not resolve the default branch from GitHub. Aborting without deleting."
             exit 1
           fi
-          if ! main_shas_raw="$(gh api "repos/$GITHUB_REPOSITORY/commits?sha=${default_branch}&per_page=${MAIN_COMMITS}" \
-                --jq '.[].sha')"; then
-            echo "::error::Could not list recent '$default_branch' commits from GitHub. Aborting without deleting."
+          if ! default_head="$(gh api "repos/$GITHUB_REPOSITORY/commits/$default_branch" --jq .sha)" \
+             || [[ -z "$default_head" ]]; then
+            echo "::error::Could not resolve the head of '$default_branch' from GitHub. Aborting without deleting."
             exit 1
           fi
-          declare -A main_sha   # commit SHA -> 1, recent default-branch commits
-          while IFS= read -r sha; do
-            [[ -z "$sha" ]] && continue
-            main_sha["$sha"]=1
-          done <<< "$main_shas_raw"
-          # Same empty-associative-array/`set -u` dance as pr_branch above.
-          main_keys=("${!main_sha[@]}")
-          echo "Recent '$default_branch' commits protected: ${#main_keys[@]}"
+          remember "$default_head" next "head of '$default_branch', production's incoming build"
 
-          # 3) Enumerate the build folders in the bucket.
+          # 3) Enumerate branches. Workers Builds builds every branch on every
+          #    push regardless of whether a pull request exists, so this asks
+          #    for branches rather than PRs (see the header). Abort on API
+          #    failure: a transient error here would leave every preview folder
+          #    unexplained, i.e. deleted.
+          if ! branches_raw="$(gh api "repos/$GITHUB_REPOSITORY/branches?per_page=100" --paginate \
+                --jq '.[] | [.name, .commit.sha] | @tsv')"; then
+            echo "::error::Could not list branches from GitHub. Aborting without deleting."
+            exit 1
+          fi
+          branch_total=0
+          while IFS= read -r line; do
+            [[ -z "$line" ]] && continue
+            branch_total=$((branch_total+1))
+          done <<< "$branches_raw"
+          echo "Branches: $branch_total"
+
+          # 4) For each branch, register what its preview is about to serve
+          #    (the head commit) and what it is serving right now (the probe).
+          #    These are usually the same folder and occasionally are not,
+          #    which is the entire point: a push moves the head immediately
+          #    while the preview Worker keeps serving the previous commit until
+          #    the new build lands. Deleting that older folder is what 500'd a
+          #    live preview on 2026-08-05.
+          probed=0
+          while IFS=$'\t' read -r branch head_sha; do
+            [[ -z "$branch" ]] && continue
+            remember "$head_sha" branch "head of '$branch', that preview's incoming build"
+
+            # The default branch has no preview: pushing to it deploys to
+            # PRODUCTION, which step 1 already probed at its own URL, and
+            # https://main-dataslope.…workers.dev 404s (measured 2026-08-14).
+            # Probing it anyway is not merely wasted — its failure would drop
+            # into the fallback below and pin the last FALLBACK_COMMITS
+            # commits of the default branch, which is MAIN_COMMITS resurrected
+            # by accident and cost 2.5 GB per run in the first dry run of this
+            # rewrite.
+            if [[ "$branch" == "$default_branch" ]]; then
+              continue
+            fi
+
+            if (( probed >= MAX_BRANCHES )); then
+              echo "::warning::More than $MAX_BRANCHES branches exist; '$branch' was not probed and is protected only by its head commit. Delete merged branches, or raise MAX_BRANCHES."
+              continue
+            fi
+            probed=$((probed+1))
+
+            served=""; rc=1
+            if alias_url="$(preview_alias "$branch")"; then
+              served="$(probe_build_id "${alias_url}/api/cache-build-id")" || rc=$?
+              if [[ -n "$served" ]]; then rc=0; fi
+            else
+              alias_url=""
+              echo "Branch name '$branch' does not yield a preview alias that fits a DNS label; keeping its last $FALLBACK_COMMITS commits instead."
+            fi
+
+            if (( rc == 0 )); then
+              remember "$served" live "serving the '$branch' preview, probed at $alias_url"
+              continue
+            fi
+
+            # A definitive 404 means this branch has no deployment at all —
+            # its build failed, or has not run. There is nothing live to
+            # protect, so the head-commit claim registered above is the whole
+            # truth and the fallback would only pin folders nobody is reading.
+            if (( rc == 2 )); then
+              echo "No deployment at $alias_url for '$branch' (404); its head build is the only claim it has."
+              continue
+            fi
+
+            # rc == 1: no answer either way. A probe failure must never widen
+            # into a delete, so fall back to the pre-probe behaviour for THIS
+            # BRANCH ONLY and never abort the sweep over one flaky preview.
+            # Losing the probe AND the commit list, though, means knowing
+            # nothing about the branch — the one case conservative behaviour
+            # cannot be synthesised from, so abort rather than guess.
+            if ! recent="$(gh api "repos/$GITHUB_REPOSITORY/commits" -X GET \
+                  -f sha="$branch" -f per_page="$FALLBACK_COMMITS" --jq '.[].sha')"; then
+              echo "::error::Could not probe the '$branch' preview and could not list its recent commits either. Aborting without deleting."
+              exit 1
+            fi
+            echo "::warning::The '$branch' preview did not answer at ${alias_url:-<no alias>}; keeping its last $FALLBACK_COMMITS commits instead."
+            while IFS= read -r c; do
+              [[ -z "$c" ]] && continue
+              remember "$c" live "recent commit of '$branch', kept because that preview could not be probed"
+            done <<< "$recent"
+          done <<< "$branches_raw"
+
+          echo "Keep set (${#keep_reason[@]} build IDs):"
+          for sha in "${!keep_reason[@]}"; do
+            echo "  ${sha:0:12}  ${keep_reason[$sha]}"
+          done
+
+          # 5) Enumerate the build folders in the bucket.
           mapfile -t folders < <(
             aws s3api list-objects-v2 \
               --bucket "$BUCKET" --prefix "$PREFIX" --delimiter "/" \
@@ -367,94 +537,49 @@ jobs:
             exit 0
           fi
 
-          # 4) Safety: refuse to proceed unless the production folder is present.
-          #    (Guards against a prefix/bucket mismatch deleting everything.)
+          # Safety: refuse to proceed unless the production folder is present.
+          # (Guards against a prefix/bucket mismatch deleting everything.)
           if ! printf '%s\n' "${folders[@]}" | grep -qxF "$prod_folder"; then
             echo "::error::Production folder '$prod_folder' not found in bucket. Aborting without deleting."
             exit 1
           fi
 
-          # 4b) Protect the build each PREVIEW is actually serving.
-          #
-          #     Step 2 keeps a preview folder only while its SHA is the CURRENT
-          #     head of an open PR. That assumes the head commit is what the
-          #     preview Worker is serving, and between pushing a commit and its
-          #     Workers Build finishing, it is not: the Worker still serves the
-          #     previous commit, whose folder now matches nothing and is deleted.
-          #     The preview then loses its prerendered pages and re-renders on
-          #     demand, which 500s every `node:fs` page (see open-next.config.ts).
-          #     That is exactly the production race fixed on 2026-07-16 — the
-          #     build-ID probe in step 1 protects production from it, and
-          #     previews had no equivalent guard until this (2026-08-05: a
-          #     scheduled run deleted the cache of the commit a preview was
-          #     still serving, 500ing / and /courses/* on that PR).
-          #
-          #     A head whose folder is populated is not mid-deploy, so it costs
-          #     nothing. Only a PENDING head — folder absent or far short of a
-          #     full cache — protects its branch's recent commits, and only
-          #     until its own build lands.
-          declare -A pr_pending   # sha -> "branch (PR #n)", predecessor still serving
-          pending=0
-          while IFS=$'\t' read -r sha branch num; do
-            [[ -z "$sha" ]] && continue
-            if [[ $(folder_objects "${PREFIX}${sha}/") -ge $MIN_CACHE_OBJECTS ]]; then continue; fi
-            pending=$((pending+1))
-            if (( pending > MAX_BRANCHES )); then
-              echo "::warning::More than $MAX_BRANCHES open PRs have a pending head build; predecessors of the rest are not protected."
-              break
-            fi
-            # Abort rather than continue: a failed lookup here leaves this
-            # branch's still-serving folder unmatched, i.e. deleted — the very
-            # outage this step exists to prevent.
-            if ! recent="$(gh api "repos/$GITHUB_REPOSITORY/commits" -X GET \
-                  -f sha="$branch" -f per_page="$PR_COMMITS" --jq '.[].sha')"; then
-              echo "::error::Could not list recent commits for '$branch' (PR #$num). Aborting without deleting."
-              exit 1
-            fi
-            while IFS= read -r c; do
-              [[ -z "$c" || "$c" == "$sha" ]] && continue
-              pr_pending["$c"]="$branch (PR #$num)"
-            done <<< "$recent"
-            echo "Pending head build: $branch (PR #$num) at ${sha:0:7}, protecting its last $PR_COMMITS commits"
-          done < <(printf '%s' "$pr_json" | jq -r '.[] | [.headRefOid, .headRefName, (.number|tostring)] | @tsv')
-
           now=$(date -u +%s)
-          cutoff=$(( now - THRESHOLD_HOURS * 3600 ))
           grace_cutoff=$(( now - GRACE_HOURS * 3600 ))
-          echo "Policy: keep live production + anything written in the last ${GRACE_HOURS}h + the head commit of up to $MAX_BRANCHES open-PR branches (any age) + anything younger than ${THRESHOLD_HOURS}h + recent '$default_branch' builds within that window (cutoff $(date -u -d "@$cutoff" '+%Y-%m-%d %H:%M:%SZ'))"
+          echo "Policy: keep what production and every branch preview are serving or about to serve, plus anything populated in the last ${GRACE_HOURS}h (since $(date -u -d "@$grace_cutoff" '+%Y-%m-%d %H:%M:%SZ'))"
           echo "Dry run: $DRY_RUN"
 
-          # 5) Date every non-production folder by when it was POPULATED so
-          #    active-branch previews can be ranked newest-first, the
-          #    MAX_BRANCHES cap needs a global order, not a per-folder decision.
+          # 6) Date every non-production folder by when it was POPULATED, so
+          #    the grace window means what it says and the MAX_BRANCHES cap has
+          #    a global newest-first order to apply.
           entries=()
           for folder in "${folders[@]}"; do
             [[ "$folder" == "$prod_folder" ]] && continue
 
-            # When was this folder POPULATED? Use the median object's
-            # LastModified, not the newest.
+            # Use the MEDIAN object's LastModified, not the newest.
             #
-            # A deploy writes the whole folder in one burst (measured 2026-08-14:
-            # median 0.8 min, max 1.8 min for ~1,081 objects), so any object in
-            # the burst dates the folder to within a couple of minutes. The max
-            # does NOT, because objects also arrive at REQUEST time, long after
-            # the deploy: a request for a `/courses/*` path that isn't
-            # prerendered renders the not-found page and OpenNext caches that
-            # 404 (~1.8 MB, `revalidate: false`) into whichever build folder is
-            # live. Every such write reset the folder's apparent age to zero.
-            # Folder 0127baf6 was populated at 17:54 and then took 404 writes at
-            # 18:22, 19:59, 20:46 and 21:07 — gaps of 28, 97, 47 and 21 minutes,
-            # every one inside GRACE_HOURS — so it was held by the grace rule as
+            # A deploy writes the whole folder in one burst (measured
+            # 2026-08-14: median 0.8 min, max 1.8 min for ~1,081 objects), so
+            # any object in the burst dates the folder to within a couple of
+            # minutes. The max does NOT, because objects also arrive at REQUEST
+            # time, long after the deploy: a `/courses/*` path that isn't
+            # prerendered used to render the not-found page and get that 404
+            # cached (~1.8 MB, `revalidate: false`) into whichever build folder
+            # was live. Every such write reset the folder's apparent age to
+            # zero. Folder 0127baf6 was populated at 17:54 and then took 404
+            # writes at 18:22, 19:59, 20:46 and 21:07 — gaps of 28, 97, 47 and
+            # 21 minutes, every one inside GRACE_HOURS — so it was held as
             # "possibly an in-flight deploy" more than three hours after its
-            # deploy finished. 4 of 33 folders were affected. Left unfixed this
-            # gets worse as THRESHOLD_HOURS shrinks, since there is less headroom
-            # for a stray write to erase, and it is unbounded: one crawler
-            # working through stale URLs can pin a folder open indefinitely.
+            # deploy finished. 4 of 33 folders were affected.
             #
-            # The median is immune (a burst of ~1,081 objects cannot be moved by
-            # a handful of late ones) and remains correct for the case the grace
-            # window exists to protect: during an in-flight populate the median
-            # of what has landed so far is also seconds old.
+            # `dynamicParams = false` on the courses route has since stopped
+            # those writes at the source (an unmatched path now 404s without
+            # rendering), but the median stays: any future request-time write
+            # would revive the bug, and the median costs nothing. It is immune
+            # by construction (a burst of ~1,081 objects cannot be moved by a
+            # handful of late ones) and stays correct for the case the grace
+            # window exists to protect — during an in-flight populate the
+            # median of what has landed so far is also seconds old.
             #
             # The CLI auto-paginates above 1000 objects and applies --query per
             # page, so this emits one tab-separated batch PER PAGE. Flatten to
@@ -473,47 +598,39 @@ jobs:
             entries+=("$(printf '%s\t%s\t%s' "$(date -u -d "$populated" +%s)" "$populated" "$folder")")
           done
 
-          echo "KEEP  $prod_folder (live production)"
+          echo "KEEP  $prod_folder (${keep_reason[$prod_id]})"
           kept=1; deleted=0; failed=0; branches=0
           while IFS=$'\t' read -r ts populated folder; do
             [[ -z "$folder" ]] && continue
             # Folder name is the commit SHA: strip the prefix and trailing slash.
             sha="${folder#"$PREFIX"}"; sha="${sha%/}"
 
-            # Order matters, and it IS the policy (see the header for the full
-            # ladder): everything a deploy or a preview might still be serving
-            # is settled BEFORE age is consulted, so the age rule only ever
-            # decides the fate of a build nobody is reading from.
-            if (( ts >= grace_cutoff )); then
-              echo "KEEP  $folder (populated $populated, inside the ${GRACE_HOURS}h grace window, possibly an in-flight deploy)"
-              kept=$((kept+1)); continue
-            elif [[ -n "${pr_pending[$sha]+set}" ]]; then
-              # Outranks the age rule deliberately: a build that is still being
-              # served must keep its cache however old it is. Deleting it does
-              # not save a stale folder, it takes down a live preview. Bounded
-              # by PR_COMMITS x MAX_BRANCHES, and only while a head is pending.
-              echo "KEEP  $folder (${pr_pending[$sha]}, still being served while that branch's head build is pending)"
-              kept=$((kept+1)); continue
-            elif [[ -n "${pr_branch[$sha]+set}" ]]; then
-              # Moved above the age check on 2026-08-14. An open PR's head is
-              # its live preview; how long ago it was built says nothing about
-              # whether someone is about to open the URL, and expiring it just
-              # 500s the preview (see open-next.config.ts). A PR going stale is
-              # what closing it is for. Still capped by MAX_BRANCHES, evaluated
-              # newest-deployed first, which is the only bound on this rule now.
-              branches=$((branches+1))
-              if (( branches <= MAX_BRANCHES )); then
-                echo "KEEP  $folder (${pr_branch[$sha]}, latest commit, branch ${branches}/${MAX_BRANCHES})"
+            if [[ -n "${keep_reason[$sha]+set}" ]]; then
+              # A folder claimed only by a branch head is capped; one a live
+              # probe named is not. The difference matters: over the cap, the
+              # first costs a preview its next build (it re-populates on the
+              # next push), while the second takes down a deployment that is
+              # serving from it right now.
+              if [[ "${keep_class[$sha]}" == "branch" ]]; then
+                branches=$((branches+1))
+                if (( branches > MAX_BRANCHES )); then
+                  echo "DELETE $folder (${keep_reason[$sha]}, beyond the $MAX_BRANCHES most recently populated branch builds)"
+                else
+                  echo "KEEP  $folder (${keep_reason[$sha]}, branch ${branches}/${MAX_BRANCHES})"
+                  kept=$((kept+1)); continue
+                fi
+              else
+                echo "KEEP  $folder (${keep_reason[$sha]})"
                 kept=$((kept+1)); continue
               fi
-              echo "DELETE $folder (${pr_branch[$sha]}, beyond the $MAX_BRANCHES most recent branches)"
-            elif (( ts < cutoff )); then
-              echo "DELETE $folder (populated $populated, older than ${THRESHOLD_HOURS}h)"
-            elif [[ -n "${main_sha[$sha]+set}" ]]; then
-              echo "KEEP  $folder (recent '$default_branch' commit, current or recent production build)"
+            elif (( ts >= grace_cutoff )); then
+              # Last line of defence, and deliberately blind to what the folder
+              # is: a deploy that populated moments ago may be visible to
+              # neither a probe nor a branch head yet.
+              echo "KEEP  $folder (populated $populated, inside the ${GRACE_HOURS}h grace window, possibly an in-flight deploy)"
               kept=$((kept+1)); continue
             else
-              echo "DELETE $folder (populated $populated, not the head of any open PR, merged, closed, or superseded)"
+              echo "DELETE $folder (populated $populated, nothing is serving it and no branch head claims it)"
             fi
 
             if [[ "$DRY_RUN" == "true" ]]; then
