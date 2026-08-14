@@ -1,45 +1,12 @@
 #!/usr/bin/env node
 /**
- * Pre-bundle the playground workers that must run as genuine module
- * workers (the almostnode-backed JS/TS workers and the Pyodide worker)
- * as standalone ES module files served from `/public/_workers/`.
- *
- * Why this exists:
- *
- * Turbopack's worker bundler emits a bootstrap script that loads its
- * dependency chunks with `importScripts.apply(self, chunks)`, and
- * explicitly strips the `type` option from the Worker constructor
- * (see `new e(u, i ? {...i, type: void 0} : void 0)` in Turbopack's
- * runtime). Two consequences for the almostnode worker:
- *
- *   1. `{ type: "module" }` on `new Worker(...)` is ignored, the
- *      worker is always classic.
- *   2. almostnode's ~16 MB bundle is split into many chunks, all
- *      concatenated via `importScripts`. Two chunks happen to declare
- *      the same minified top-level identifier (`e1`), and the worker
- *      aborts at startup with
- *      `SyntaxError: Failed to execute 'importScripts' on
- *       'WorkerGlobalScope': Identifier 'e1' has already been declared`.
- *
- * Switching the whole app to Webpack would fix it but would also slow
- * `next build`/`next dev` substantially. Pre-bundling only the two
- * worker files with esbuild keeps Turbopack for everything else while
- * producing a single self-contained worker module that has zero chunk
- * collisions to worry about.
- *
- * The output goes under `public/_workers/` so Next.js serves it as a
- * plain static asset at `/_workers/...`. The adapters spawn:
- *
- *     new Worker("/_workers/javascript-worker.js", { type: "module" })
- *
- * which Turbopack treats as a regular URL string (no static analysis,
- * no bundling).
- *
- * The Pyodide worker is bundled here for consequence 1 alone: Pyodide
- * 314's environment detection throws "Classic web workers are not
- * supported" at import time when `importScripts` works (i.e. in a
- * classic worker scope), so the worker MUST be spawned with a real
- * `{ type: "module" }` — which Turbopack-bundled workers can never be.
+ * Pre-bundle the playground workers that must run as genuine module workers
+ * (the almostnode JS/TS workers and the Pyodide worker) into standalone ES
+ * modules under `public/_workers/`. Turbopack strips `{ type: "module" }`
+ * from workers it bundles (always classic) and its `importScripts` chunking
+ * collides on minified identifiers for almostnode's ~16 MB bundle; Pyodide
+ * 314 refuses to boot in a classic worker at all. Adapters spawn these from
+ * a plain URL string, which Turbopack leaves alone.
  *
  * Idempotent. Safe to run from `postinstall`, `prebuild`, and `predev`.
  */
@@ -55,14 +22,10 @@ const OUT_DIR = join(ROOT, "public", "_workers");
 const SRC_DIR = join(ROOT, "app", "_components", "runtime");
 
 /**
- * almostnode pulls in `just-bash`'s browser bundle (`vercel-labs/just-
- * bash`), which has straggler `import "node:zlib"` / `"node:async_hooks"`
- * / `"node:dns"` references that aren't actually called at runtime but
- * still trip esbuild's resolver. Stub every `node:*` specifier to an
- * empty module so the bundle resolves cleanly. almostnode ships its own
- * shims for the Node modules our user code actually touches (fs, path,
- * crypto, …) inside `dist/index.mjs`, so the empty stubs are only used
- * by dead-code branches.
+ * just-bash's browser bundle (pulled in by almostnode) has dead-code
+ * `import "node:zlib"` etc. that still trip esbuild's resolver. Stub every
+ * `node:*` specifier; almostnode ships its own shims for the Node modules
+ * user code actually touches.
  */
 const stubNodeBuiltins = {
   name: "stub-node-builtins",
@@ -72,16 +35,8 @@ const stubNodeBuiltins = {
       namespace: "node-stub",
     }));
     buildContext.onLoad({ filter: /.*/, namespace: "node-stub" }, () => ({
-      // CommonJS loader so any `import { foo } from "node:zlib"`
-      // resolves at runtime through property access on the stub
-      // object, esbuild interops ESM↔CJS by reading properties
-      // dynamically. just-bash's browser bundle imports things like
-      // `{ gunzipSync, gzipSync, constants }` from `node:zlib` in dead
-      // code paths; this stub returns `undefined` for any name so the
-      // bundle resolves cleanly. If any of these are actually called,
-      // they'll throw `TypeError: undefined is not a function`, which
-      // is the right behaviour for code that was never meant to run in
-      // a browser.
+      // CJS Proxy stub: any named import resolves to `undefined`, and calling
+      // one throws — the right behaviour for dead browser-bundle branches.
       contents:
         "module.exports = new Proxy({}, { get() { return undefined; } });",
       loader: "js",

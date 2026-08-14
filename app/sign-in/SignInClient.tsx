@@ -23,19 +23,13 @@ import {
 } from "../_components/auth/authBlocks";
 import { isSafeReturnPath, readReturnTo } from "../_components/auth/returnTo";
 
-/** Where to land after a successful sign-in when we don't know where
- *  the visitor came from (direct /sign-in loads, private mode). The
- *  usual case resolves to the page they were on instead, see
- *  `resolveCallbackUrl` below and _components/auth/returnTo.ts. */
+/** Post-sign-in destination when no return path is known; see resolveCallbackUrl. */
 const FALLBACK_CALLBACK_URL = "/dashboard/account";
 
 /**
- * The post-sign-in destination: an explicit, validated `?next=` param
- * wins, then the tracked "page the user came from" (recorded per-tab by
- * ReturnToTracker in the root layout, it sees client-side navigations,
- * which document.referrer misses), then /account. Read via
- * window.location (not useSearchParams) so the page keeps prerendering
- * statically without a Suspense boundary.
+ * Post-sign-in destination: validated `?next=` param, else the tracked
+ * return-to page, else /account. Reads window.location (not useSearchParams)
+ * so the page keeps prerendering statically without a Suspense boundary.
  */
 function resolveCallbackUrl(): string {
   const next = new URLSearchParams(window.location.search).get("next");
@@ -45,19 +39,9 @@ function resolveCallbackUrl(): string {
 
 /**
  * Friendly copy for the `?error=<code>` a failed OAuth callback forwards here
- * (see `onAPIError` in lib/auth/server.ts). The dominant code,
- * `state_mismatch`, has two known shapes:
- *
- *   - The one-time `state` cookie didn't make it back to the callback host.
- *     This used to fail *every* sign-in started on www.dataslope.com (the
- *     host-only cookie stayed on www while Google returned to the apex);
- *     fixed by domain-scoping the cookie, see `oauthStateCookieDomain` in
- *     lib/auth/server.ts. It still happens on hosts no cookie can bridge,
- *     e.g. a workers.dev preview, where retrying (now from the apex this
- *     error page landed on) is genuinely the fix.
- *   - A *duplicate* callback request whose state was already consumed by the
- *     request that signed the user in, a session exists, and the signed-in
- *     redirect below whisks the visitor to /account before any copy renders.
+ * (see `onAPIError` in lib/auth/server.ts). `state_mismatch` means the state
+ * cookie didn't reach the callback host or a duplicate callback already
+ * consumed it; retrying is the fix.
  */
 const STALE_ATTEMPT_COPY =
   "That sign-in attempt expired or was already used. Please try again.";
@@ -99,9 +83,8 @@ const COPY: Record<
   },
 };
 
-/** Browser-tab title per mode, mirroring the dedicated routes' metadata
- *  (the root layout appends "· DataSlope"). Kept in step client-side because
- *  switching modes doesn't navigate, so Next never re-runs the route metadata. */
+/** Browser-tab title per mode; switching modes doesn't navigate, so Next
+ *  never re-applies the route metadata (root layout appends "· DataSlope"). */
 const DOC_TITLE: Record<Mode, string> = {
   signin: "Sign in",
   signup: "Create your account",
@@ -109,28 +92,12 @@ const DOC_TITLE: Record<Mode, string> = {
 };
 
 /**
- * Auth card spanning three modes, sign in, create account, and request a
- * password reset, styled on the shadcn UI login block (social buttons up
- * top, an "Or continue with" divider, then email + password).
- *
- * Success paths (destination = resolveCallbackUrl(): the page the user
- * came from, else /account):
- *   - sign in → session set, redirect to the destination
- *   - sign up → if verification is required, show a "check your email" notice
- *               and switch to sign-in; otherwise redirect to the destination
- *   - forgot  → always show a neutral "if an account exists…" notice
- *
- * Verification + reset only do anything once RESEND_API_KEY is configured
- * server-side; until then those calls surface a friendly error.
- *
- * There is no name field: Better Auth's `user.name` column is required (social
- * logins fill it from the provider profile), so for email sign-ups we derive a
- * name from the email's local-part rather than asking for it.
+ * Auth card spanning sign in, create account, and password reset, styled on
+ * the shadcn UI login block. Verification + reset emails require
+ * RESEND_API_KEY server-side; until then those calls surface a friendly error.
  */
 export function SignInClient({
-  /** Which form to open on first render. The dedicated /sign-up and
-   *  /forgot-password routes pass "signup"/"forgot"; /sign-in defaults to
-   *  "signin". */
+  /** Initial form; /sign-up and /forgot-password pass "signup"/"forgot". */
   initialMode = "signin",
 }: {
   initialMode?: Mode;
@@ -147,17 +114,14 @@ export function SignInClient({
   const [notice, setNotice] = useState<string | null>(null);
   const [socialPending, setSocialPending] = useState<string | null>(null);
 
-  // A signed-in visitor has no reason to be on the sign-in/registration screen
-  //, send them back where they came from (or to their account).
+  // Signed-in visitors don't belong here, send them back.
   useEffect(() => {
     if (!isPending && session) router.replace(resolveCallbackUrl());
   }, [isPending, session, router]);
 
-  // Surface a forwarded OAuth-callback failure (`/sign-in?error=<code>`) and
-  // scrub the code from the address bar so it doesn't linger through reloads,
-  // bookmarks, or copied links. Read via window.location (not useSearchParams)
-  // so the page keeps prerendering statically without a Suspense boundary,
-  // same pattern as the checkout return in app/account/AccountClient.tsx.
+  // Surface a forwarded OAuth-callback failure (`?error=<code>`) and scrub it
+  // from the URL. window.location (not useSearchParams) keeps the page
+  // statically prerendered.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("error");
@@ -174,10 +138,9 @@ export function SignInClient({
     setError(AUTH_ERROR_COPY[code] ?? AUTH_ERROR_FALLBACK);
   }, []);
 
-  // A browser Back from the OAuth provider can restore this page from the
-  // bfcache with `socialPending`/`submitting` still set from before the
-  // navigation, which would leave every control disabled with no request in
-  // flight. `pageshow` with `persisted` fires exactly on that restore.
+  // Back from the OAuth provider can restore this page from the bfcache with
+  // pending flags still set, leaving every control disabled; `pageshow` with
+  // `persisted` fires exactly on that restore.
   useEffect(() => {
     function onPageShow(e: PageTransitionEvent) {
       if (!e.persisted) return;
@@ -188,9 +151,8 @@ export function SignInClient({
     return () => window.removeEventListener("pageshow", onPageShow);
   }, []);
 
-  // Keep the browser-tab title tracking the visible form. `go()` swaps the
-  // URL with replaceState (no navigation), so Next doesn't re-apply the
-  // route's metadata title, do it here.
+  // `go()` swaps the URL with replaceState (no navigation), so Next won't
+  // re-apply the route's metadata title, do it here.
   useEffect(() => {
     document.title = `${DOC_TITLE[mode]} · DataSlope`;
   }, [mode]);
@@ -211,18 +173,14 @@ export function SignInClient({
   const pwOk = password.length >= MIN_PASSWORD;
   const { title, subtitle, cta } = COPY[mode];
   const busy = submitting || socialPending !== null;
-  // Leading glyph for the primary button, matched to the action (same 14px
-  // size as the shared header's Sign in button).
   const SubmitIcon = isForgot ? Mail : isSignup ? UserPlus : LogIn;
 
   function go(next: Mode) {
     setMode(next);
     setError(null);
     setNotice(null);
-    // Keep the address bar in step with the visible form (the dedicated
-    // /sign-in, /sign-up and /forgot-password routes) without a full
-    // navigation, so a reload or shared link lands on the same screen while
-    // the typed email + password survive the switch.
+    // Swap the URL without navigating so reloads and shared links land on the
+    // same screen while the typed email + password survive the switch.
     const path =
       next === "signup"
         ? "/sign-up"
@@ -239,12 +197,9 @@ export function SignInClient({
   async function startSocial(provider: string) {
     setSocialPending(provider);
     setError(null);
-    // Full-page redirect to the provider, returning to the resolved
-    // callback URL. On success the client's redirect plugin navigates
-    // away, so the button staying "pending" is right. Server-side
-    // failures resolve with {error} (they do NOT reject), e.g. the
-    // provider isn't configured in this environment, and must
-    // re-enable the card; a rejection is a network failure and must too.
+    // On success the redirect plugin navigates away, so the button stays
+    // "pending". Server-side failures resolve with {error} (they do NOT
+    // reject); a rejection is a network failure. Both must re-enable the card.
     try {
       const { error } = await signIn.social({
         provider,
@@ -272,11 +227,9 @@ export function SignInClient({
     if (isForgot) {
       setSubmitting(true);
       try {
-        // The server already answers 200 with a neutral body for unknown
-        // emails, so the form can't probe which addresses are registered.
-        // A returned error is therefore always a genuine failure (sender not
-        // configured, Resend outage), surfacing it leaks nothing, and
-        // pretending the link was sent would leave the user waiting forever.
+        // The server answers neutrally for unknown emails, so a returned
+        // error is always a genuine failure (e.g. sender not configured);
+        // surfacing it leaks nothing.
         const { error } = await requestPasswordReset({
           email,
           redirectTo: "/reset-password",
@@ -301,12 +254,10 @@ export function SignInClient({
 
     setSubmitting(true);
 
-    // `user.name` is NOT NULL and required by Better Auth; for email sign-ups we
-    // derive it from the email rather than prompting for it.
+    // Better Auth requires user.name; derive it rather than prompting.
     const derivedName = email.split("@")[0]?.trim() || email;
 
-    // Server-side failures resolve with {error}; only a network-level failure
-    // rejects, catch it so the form doesn't stay disabled at "Signing in…".
+    // Server-side failures resolve with {error}; only network failures reject.
     const callbackUrl = resolveCallbackUrl();
     try {
       const { data, error } = isSignup
@@ -319,22 +270,15 @@ export function SignInClient({
         : await signIn.email({ email, password, callbackURL: callbackUrl });
 
       if (error) {
-        // When verification is required, an unverified sign-in is rejected and a
-        // fresh verification email is sent, tell the user to check their inbox.
+        // Unverified sign-in is rejected and a fresh verification email sent.
         if (error.code === "EMAIL_NOT_VERIFIED") {
           setNotice(
             "Please verify your email first. We've sent you a new verification link.",
           );
         } else if (isSignup && error.code === "USER_ALREADY_EXISTS") {
-          // Sign-up never attaches a password to an existing account, it only
-          // ever creates a new user, so a same-email sign-up is a collision.
-          // The most common cause is someone who first signed in with Google or
-          // GitHub and doesn't realize they already have an account. Point them
-          // at signing in (including socially) or the reset flow to set a
-          // password, rather than the bare "User already exists". (This branch
-          // only runs where Better Auth surfaces the collision as an error;
-          // when email verification is on it instead returns a neutral success
-          // to prevent enumeration, handled below.)
+          // Usually a prior social sign-in, point at signing in or the reset
+          // flow. (With email verification on, Better Auth instead returns a
+          // neutral success to prevent enumeration, handled below.)
           setError(
             "An account already exists for that email. Try signing in below. " +
               "including with Google or GitHub if that's how you first signed " +
@@ -347,14 +291,9 @@ export function SignInClient({
         return;
       }
 
-      // Sign-up with verification required returns no active session, prompt to
-      // verify rather than redirecting into a gated page. The copy is kept
-      // honest for BOTH outcomes this branch covers without leaking which one
-      // happened: a genuinely new sign-up (a link really is on its way) and a
-      // same-email collision, where Better Auth returns this same neutral
-      // success to prevent user enumeration and no account or password was
-      // created. So it avoids claiming "account created" and nudges an existing
-      // (often social) user to just sign in.
+      // No session means verification is required. This same neutral success
+      // also covers a same-email collision (anti-enumeration), so the copy
+      // must not claim an account was created.
       if (isSignup && data && !("token" in data && data.token)) {
         setPassword("");
         go("signin"); // clears notice…
@@ -374,8 +313,7 @@ export function SignInClient({
       return;
     }
 
-    // Session is set; return to the originating page (and re-render the
-    // header so it shows the signed-in state).
+    // Refresh so the header re-renders with the signed-in state.
     router.push(callbackUrl);
     router.refresh();
   }

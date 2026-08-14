@@ -68,14 +68,9 @@ import type {
 } from "../types";
 import type { ColumnConstraintInfo } from "../../runtime/sqlite";
 
-/** TanStack Table v9 replaces v8's `get*RowModel()` options with an explicit,
- *  tree-shakeable feature set. The core row model is always present, so only
- *  sorting has to be opted into here — the grid's other behaviour (column
- *  sizing, selection, editing) is this component's own, not the table's.
- *  `manualSorting` stays on at the call site: the sorted row model is what
- *  registers the sorting state and headers, while the actual ordering is done
- *  upstream against the full result set, not just the loaded page. Built once
- *  at module scope so its identity is stable across renders. */
+/** TanStack Table v9 feature set: only sorting is opted in. `manualSorting`
+ *  stays on at the call site (ordering happens upstream against the full
+ *  result). Module scope keeps its identity stable across renders. */
 const RESULT_TABLE_FEATURES = tableFeatures({
   rowSortingFeature,
   sortedRowModel: createSortedRowModel(),
@@ -115,13 +110,8 @@ import {
 import { orderEditedStatementByPk } from "../utils/sqlAnalysis";
 import { DiamondMark } from "../../mdx/loadingAnimations";
 
-// ────────────────────────────────────────────────────────────────────────
-// Local helpers
-// ────────────────────────────────────────────────────────────────────────
-
-/** Produce a friendly hint for a raw engine error string. Despite the
- *  per-engine sections, this is shared across SQLite, DuckDB, and
- *  PostgreSQL. */
+/** Friendly hint for a raw engine error string; shared across SQLite,
+ *  DuckDB, and PostgreSQL. */
 function getEngineErrorHint(error: string): string | null {
   // SQLite patterns
   const nearMatch = error.match(/^near "(.+)": syntax error$/i);
@@ -180,8 +170,7 @@ function getEngineErrorHint(error: string): string | null {
   return null;
 }
 
-/** Small self-contained button that copies an error string to the
- *  clipboard and briefly shows a "Copied" confirmation. */
+/** Copies an error string to the clipboard with a brief confirmation. */
 function CopyErrorButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
   return (
@@ -250,9 +239,7 @@ function clonePendingEdits(src: PendingEditsByResult): PendingEditsByResult {
   ) as PendingEditsByResult;
 }
 
-/** Returns a small icon component that visually represents a SQL/inferred
- *  column type. Matches by prefix so "VARCHAR", "NVARCHAR", "CHAR" all
- *  resolve to the text icon, and "DATETIME"/"TIMESTAMP" to the clock icon. */
+/** Icon for a SQL/inferred column type, matched by substring. */
 function DataTypeIcon({ type }: { type: string }) {
   const t = type.toUpperCase();
   if (t === "NULL") return <Minus size={10} aria-hidden="true" />;
@@ -280,12 +267,8 @@ function DataTypeIcon({ type }: { type: string }) {
   return null;
 }
 
-// ─── Result grid column header ───────────────────────────────────────────
-// The header is one big hover trigger for the "Click to sort…" tip, and the
-// PK/FK markers inside it are hover triggers of their own — so pointing at a
-// key icon used to pop both tips, overlapping each other. The marker tells
-// the header it's being hovered and the header keeps its own tip shut for as
-// long as that's true, so only the key tip shows.
+// Column header: the header's "Click to sort…" tip is suppressed while a
+// nested PK/FK marker is hovered, so the two tips never overlap.
 
 /** Set by `ColumnHeaderButton` for the key markers nested inside it. */
 const SuppressSortTipContext = createContext<
@@ -431,32 +414,21 @@ const PAGE_SIZE_OPTIONS: ReadonlyArray<{ value: number; label: string }> = [
 
 const VIRTUAL_ROW_HEIGHT_ESTIMATE = 30;
 const LOAD_MORE_THRESHOLD_ROWS = 25;
-// ─── Column sizing ──────────────────────────────────────────────────────
-// Data columns get an explicit pixel width right after the first paint of a
-// result: the grid renders once with the browser's auto table layout,
-// measures each header cell, freezes those widths and switches to
-// `table-layout: fixed` (plus a trailing filler column that absorbs any
-// leftover space, so columns only take the width their content needs).
-// Frozen widths keep the grid predictable, entering/leaving inline cell
-// edit or streaming in more rows can no longer reflow every column, and
-// they're what the drag-to-resize header handles adjust.
+// Column sizing: the grid renders once with auto table layout, measures the
+// header cells, freezes those widths and switches to `table-layout: fixed`
+// (plus a trailing filler column). Frozen widths prevent reflow during edits
+// or row streaming, and are what the drag-to-resize handles adjust.
 const COL_MIN_WIDTH = 48;
-// Cap for the *measured* width, mirrors the auto-layout `max-width` clamp
-// the CSS applies to cells, so one long value can't take the whole pane.
-// Users can still drag a column wider, up to COL_MAX_WIDTH.
+// Cap for the *measured* width (mirrors the CSS max-width clamp on cells);
+// users can still drag wider, up to COL_MAX_WIDTH.
 const COL_MAX_MEASURED_WIDTH = 340;
 const COL_MAX_WIDTH = 1600;
 const SELECT_COL_WIDTH = 28;
-// Stage 1 (DuckDB perf): when a paged result still contains more than
-// this many DOM rows (e.g. the user disabled pagination, or chose a
-// very large page size), switch the rendering path to the same
-// virtualizer infinite scroll uses so we don't push thousands of
-// <tr> elements into the DOM.
+// Above this many DOM rows a paged result switches to the virtualizer so
+// thousands of <tr> elements aren't pushed into the DOM.
 const VIRTUALIZE_ROW_THRESHOLD = 200;
 
-// ─── Result set export button + tooltip ──────────────────────────────────
-// Encapsulated so it can track menu-open state with a hook and suppress
-// the hover popover while the export dropdown is visible.
+// Export button; suppresses the hover popover while the dropdown is open.
 
 type ResultSetExportFormat = "csv" | "json" | "sql" | "parquet" | "xlsx";
 
@@ -602,10 +574,6 @@ function ResultSetExportButton({
   );
 }
 
-// ────────────────────────────────────────────────────────────────────────
-// Exports
-// ────────────────────────────────────────────────────────────────────────
-
 export function sqlValueEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true;
   if (a instanceof Uint8Array && b instanceof Uint8Array) {
@@ -618,10 +586,8 @@ export function sqlValueEqual(a: unknown, b: unknown): boolean {
   return false;
 }
 
-/** True when two results have the same statement *shape*, same set count,
- *  same per-set has-result-ness and column names, i.e. they look like
- *  re-runs of the same statements (an edit/sort/filter re-fetch, or the user
- *  re-running the same tab) rather than a different query. Cheaper than
+/** True when two results have the same statement shape (set count, per-set
+ *  columns), i.e. a re-run of the same statements. Cheaper than
  *  `queryResultsIdentical`, which also compares every cell. */
 export function sameResultShape(
   a: QueryRunResult | null,
@@ -669,18 +635,15 @@ export function queryResultsIdentical(
 
 export const ResultView = memo(ResultViewImpl);
 
-/** Minimum time the filter overlay stays on screen once shown. Mirrors the run
- *  overlay's `MIN_ANIMATION_MS`: a fast filter would otherwise flash the overlay
- *  for a single frame ("blink"). Combined with the CSS opacity fade-out, the
- *  overlay reads as a smooth, deliberate state rather than a glitch. */
+/** Minimum on-screen time for the filter overlay so a fast filter doesn't
+ *  blink (mirrors the run overlay's MIN_ANIMATION_MS). */
 const FILTER_OVERLAY_MIN_MS = 400;
 
 // How long the post-commit "Undo" bar stays offered before auto-dismissing.
 const COMMIT_UNDO_TIMEOUT_MS = 15000;
 
-/** Mirror `active`, but once it becomes true keep it true for at least `minMs`
- *  so a brief activation stays visible long enough to read and to let a CSS
- *  fade-out play. Re-activating while waiting cancels the pending hide. */
+/** Mirror `active`, but hold true for at least `minMs`; re-activating while
+ *  waiting cancels the pending hide. */
 function useMinVisible(active: boolean, minMs: number): boolean {
   const [visible, setVisible] = useState(active);
   const shownAtRef = useRef(0);
@@ -738,14 +701,12 @@ function ResultViewImpl({
 }: {
   result: QueryRunResult | null;
   loading: boolean;
-  /** Human-readable engine name shown in the loading placeholder
-   *  (e.g. "PostgreSQL", "DuckDB", "SQLite"). Defaults to "SQLite". */
+  /** Engine name shown in the loading placeholder. Defaults to "SQLite". */
   engineLabel?: string;
   keyHints?: ColumnKeyHints;
   sourceTable?: string;
   constraintInfo?: ColumnConstraintInfo[];
-  /** Resolves a table's editing metadata by name. Used to pick up the PK / FK /
-   *  constraint hints for whichever result set is active, so every tab of a
+  /** Resolves a table's editing metadata by name, so every set of a
    *  multi-statement run is editable against its own table. */
   tableMetaFor?: (table: string) => {
     keyHints?: ColumnKeyHints;
@@ -804,12 +765,10 @@ function ResultViewImpl({
   const [activeEditCellByIndex, setActiveEditCellByIndex] = useState<
     Record<number, string | null>
   >({});
-  // One-step undo of the most recent committed cell edit(s) (UX-10). Set
-  // synchronously when `commitEdits` runs and survives the post-commit refetch
-  // (it's component state the result-change effect deliberately leaves alone),
-  // so the bar appears once the reloaded grid shows the new values. Auto-
-  // dismisses after a short window; clicking it re-applies the *previous*
-  // values (PK-addressed, so still correct after the row moved under MVCC).
+  // One-step undo of the last committed cell edit(s). Set synchronously by
+  // `commitEdits` and deliberately left alone by the result-change effect so
+  // it survives the post-commit refetch. Undo re-applies the previous values
+  // PK-addressed, so it stays correct after the row moved under MVCC.
   const [commitUndo, setCommitUndo] = useState<{
     tableName: string;
     reverseUpdates: ReadonlyArray<{
@@ -828,11 +787,9 @@ function ResultViewImpl({
     setIdx: number;
     absoluteRow: number;
   } | null>(null);
-  // Result-set indices currently showing a *server-side* filtered re-query
-  // (pushdown, for engine-paged results). Maps idx → the pre-filter total row
-  // count (for the "filtered from N" readout). Its presence means further
-  // filter edits re-query the engine, even after the filtered result becomes
-  // small enough to fit in memory, rather than switching to client-filtering.
+  // Result sets showing a server-side (pushdown) filtered re-query: maps idx
+  // → pre-filter total row count. Presence means further filter edits keep
+  // re-querying the engine rather than switching to client-filtering.
   const [serverFilterByIndex, setServerFilterByIndex] = useState<
     Record<number, number>
   >({});
@@ -854,11 +811,9 @@ function ResultViewImpl({
   );
 
   const [activeSetIdx, setActiveSetIdx] = useState<number>(0);
-  // True while a filter keystroke is debouncing (or its re-query is in flight):
-  // drives a loading overlay over the result table so the wait is visible.
+  // True while a filter keystroke is debouncing (or its re-query is in
+  // flight); drives a loading overlay over the result table.
   const [filterPending, setFilterPending] = useState(false);
-  // Hold the overlay on screen for a minimum time (then fade) so a fast filter
-  // doesn't blink, see `useMinVisible` / FILTER_OVERLAY_MIN_MS.
   const filterOverlayActive = useMinVisible(filterPending, FILTER_OVERLAY_MIN_MS);
   const flashWrapperRef = useRef<HTMLDivElement>(null);
   const noResultsRef = useRef<HTMLDivElement>(null);
@@ -891,33 +846,24 @@ function ResultViewImpl({
     setSortingByIndex(preserved?.sortingByIndex ?? cachedSorting ?? {});
     setActiveEditCellByIndex({});
     if (preserved || sameResultShape(result, prevResultRef.current)) {
-      // A reload of the same statements (edit/sort/filter re-fetch, which
-      // preserves state, or a same-shape re-run, including a queued
-      // re-fetch that arrives without a preserve slot): keep the active
-      // result-set tab, clamped to the new set count. (Clamping rather than
-      // restoring from a single "preserved" slot is robust when an edit
-      // triggers more than one queued re-fetch, e.g. quickly editing Set 1
-      // then Set 2: each re-fetch would otherwise reset to Set 1.)
+      // Same-shape reload/re-run: keep the active set tab, clamped to the new
+      // set count. (Clamping is robust when one edit queues multiple
+      // re-fetches, which would otherwise each reset to Set 1.)
       const nextSetCount = result?.sets.length ?? 1;
       setActiveSetIdx((prev) => Math.max(0, Math.min(prev, nextSetCount - 1)));
     } else {
-      // Fresh run: land on the first set that actually returned a result
-      // table. A multi-statement script commonly ends in a SELECT after
-      // DDL/DML setup statements, defaulting to Set 1 would show the
-      // "no result set returned" notice instead of the data just queried.
+      // Fresh run: land on the first set with a result table (scripts
+      // commonly end in a SELECT after DDL/DML setup statements).
       const firstWithTable = (result?.sets ?? []).findIndex((s) => s !== null);
       setActiveSetIdx(firstWithTable >= 0 ? firstWithTable : 0);
     }
-    // A fresh result (or a filter/sort/edit reload) settles any pending filter
-    // overlay, the rows shown now already reflect the applied filter.
+    // A new result settles any pending filter overlay.
     setFilterPending(false);
-    // Scroll the result table back to the top whenever a new result arrives
-    // (fresh query run or lazy page navigation).
     resultSetsScrollRef.current?.scrollTo(0, 0);
     if (focusFilterAfterReloadRef.current) {
       focusFilterAfterReloadRef.current = false;
-      // A server-side filter reload re-mounts the grid and steals focus,
-      // restore it to the filter input (and its caret) so typing continues.
+      // The reload re-mounts the grid and steals focus; restore it to the
+      // filter input (and its caret) so typing continues.
       requestAnimationFrame(() => {
         const el = document.querySelector<HTMLInputElement>(
           ".sql-result-filter-input",
@@ -963,9 +909,8 @@ function ResultViewImpl({
         pendingEditsByIndex:
           overrides?.pendingEditsByIndex ?? clonePendingEdits(pendingEditsByIndex),
         sortingByIndex: overrides?.sortingByIndex ?? { ...sortingByIndex },
-        // Filter + server-filter state are preserved by default so a sort /
-        // edit reload of a filtered result keeps the filter; an explicit
-        // override (or a fresh query, which doesn't preserve at all) clears it.
+        // Filter + server-filter state are preserved by default so a
+        // sort/edit reload keeps the filter; an explicit override clears it.
         filterByIndex: overrides?.filterByIndex ?? { ...filterByIndex },
         serverFilterByIndex:
           overrides?.serverFilterByIndex ?? { ...serverFilterByIndex },
@@ -980,11 +925,9 @@ function ResultViewImpl({
     ],
   );
 
-  // Compose the lazy SQL for a server-side filter + sort pushdown: wrap the
-  // original base query as a subquery with a native `WHERE` (LIKE/ILIKE), then
-  // apply ORDER BY for the active sort. Either part may be absent. This is the
-  // DBeaver model, the filtered query re-pages through the engine, so infinite
-  // scroll is preserved instead of loading the whole result into memory.
+  // Compose lazy SQL for server-side filter + sort pushdown: wrap the base
+  // query with a native WHERE, then ORDER BY. The filtered query re-pages
+  // through the engine, so infinite scroll is preserved.
   const composeLazyQuery = useCallback(
     (
       baseSql: string,
@@ -1012,10 +955,9 @@ function ResultViewImpl({
     [engineLabel],
   );
 
-  // Push a server-side filter for an engine-paged result: re-query the original
-  // base wrapped with a `WHERE` so only matching rows stream in (infinite
-  // scroll preserved). An empty term reloads the unfiltered base. Selection /
-  // pending edits are cleared because the row set (and absolute indices) change.
+  // Push a server-side filter for an engine-paged result; an empty term
+  // reloads the unfiltered base. Selection / pending edits are cleared
+  // because the row set (and absolute indices) change.
   const triggerServerFilter = useCallback(
     (
       idx: number,
@@ -1054,10 +996,9 @@ function ResultViewImpl({
     ],
   );
 
-  // Apply a server-side (pushdown) filter. The keystroke debounce now lives in
-  // the filter input (`FilterInput`), so this fires on an already-settled value:
-  // mark the set as server-filtered up front (so the grid stops client-filtering
-  // the rows it's about to replace) and re-query immediately.
+  // Apply a server-side filter (fires on an already-debounced value): mark
+  // the set server-filtered up front so the grid stops client-filtering the
+  // rows it's about to replace, then re-query.
   const applyServerFilter = useCallback(
     (
       idx: number,
@@ -1089,8 +1030,7 @@ function ResultViewImpl({
     resultSetsScrollRef.current?.scrollTo(0, 0);
   }, []);
 
-  // Update the in-grid filter for a result set and jump back to its first page
-  // so the user always sees the start of the filtered view.
+  // Update the in-grid filter and jump back to the first page.
   const setFilter = useCallback((idx: number, value: string) => {
     setFilterByIndex((prev) => {
       if ((prev[idx] ?? "") === value) return prev;
@@ -1102,13 +1042,10 @@ function ResultViewImpl({
     setPageStates((prev) => ({ ...prev, [idx]: { page: 0 } }));
   }, []);
 
-  // Editable identity is per active result set, not per query: a multi-statement
-  // run can show several `SELECT * FROM <table>` tabs, each editable against its
-  // own table. `result.sourceTables` carries the table per set (positionally
-  // aligned with `sets`); fall back to the whole-query `sourceTable` for a
-  // single set. The PK / FK / constraint hints below all follow that table, so
-  // every reference to `sourceTable` / `keyHints` / `constraintInfo` downstream
-  // resolves against whichever set the user is looking at.
+  // Editable identity is per active result set: `result.sourceTables` carries
+  // the table per set (positionally aligned with `sets`); fall back to the
+  // query-wide `sourceTable` for a single set. The PK / FK / constraint hints
+  // below follow that table.
   const activeSetClamped = result
     ? Math.max(0, Math.min(activeSetIdx, result.sets.length - 1))
     : 0;

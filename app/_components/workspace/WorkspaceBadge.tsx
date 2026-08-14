@@ -1,25 +1,11 @@
 "use client";
 
 /**
- * Workspace badge + popover + manager drawer used by every playground
- * header. Renders the current workspace name as a pill button; clicking
- * opens a popover listing recent workspaces for this playground with
- * "New" and "Manage" affordances. The Manage button promotes the popover
- * into a Drawer-backed full manager (rename / delete / duplicate +
- * per-workspace size estimate).
- *
- * This menu is also the single home for cloud backups (workspaceCloud.tsx):
- * cloud saves share their id with the local workspace, so instead of a
- * separate "Cloud" dialog with a second list, each local row carries its
- * backup status, backups that exist only on the account are listed as
- * "on your account" rows, and the active workspace gets one "Back up"
- * action. Sharing stays separate (ShareControls), publishing an immutable
- * link is a different intent than saving.
- *
- * Workspace switching is implemented as `setActiveWorkspaceId` followed
- * by `window.location.reload()`, engines and editor state rebuild from
- * scratch as a side effect of the reload, which is both simpler and
- * indistinguishable from an in-place tear-down to the user.
+ * Workspace badge + popover + manager drawer used by every playground header.
+ * Also the single home for cloud backups (workspaceCloud.tsx): cloud saves
+ * share ids with local workspaces, so local rows carry backup status and
+ * account-only backups get their own rows. Workspace switching reloads the
+ * page so engines/editor rebuild from scratch.
  */
 
 import {
@@ -96,33 +82,23 @@ const RECENT_LIMIT = 6;
 export interface WorkspaceBadgeProps {
   /** The playground this badge belongs to ("python", "sqlite", …). */
   playgroundId: string;
-  /** Currently-active workspace id (from `ensureActiveWorkspace`). */
   activeWorkspaceId: string | null;
-  /** Currently-active workspace display name. */
   activeWorkspaceName: string;
-  /** Optional controlled state for the full workspace-manager drawer.
-   *  Lets a host open the manager directly, e.g. the mobile hamburger
-   *  menu, which hides the badge pill but still needs a way in. When
-   *  omitted the badge manages the manager itself. */
+  /** Optional controlled state for the manager drawer, so a host (e.g. the
+   *  mobile hamburger) can open it while the badge pill is hidden. */
   managerOpen?: boolean;
   onManagerOpenChange?: (open: boolean) => void;
-  /** True when the active workspace is an unsaved draft that the user has
-   *  changed, surfaces a "Save" button next to the badge. Drafts (the
-   *  auto-created default) stay out of the saved list until saved. */
+  /** True when the active workspace is a changed unsaved draft; surfaces a
+   *  "Save" button next to the badge. */
   unsaved?: boolean;
-  /** Invoked with the chosen name when the user saves an unsaved draft.
-   *  The host promotes the draft to a saved workspace (see
-   *  `saveDraftWorkspace`). */
+  /** Called with the chosen name when the user saves an unsaved draft. */
   onSave?: (name: string) => void | Promise<void>;
-  /** Serializes the CURRENT playground state into a bundle, the same
-   *  builder the Share dialog uses. Powers "Back up" for the active
-   *  workspace; when omitted, the backup action is hidden (cloud rows and
-   *  statuses still render). */
+  /** Serializes current playground state into a bundle (same builder as the
+   *  Share dialog). Powers "Back up"; when omitted the backup action is
+   *  hidden but cloud rows still render. */
   buildBundle?: BuildBundle;
-  /** Render no header UI (badge pill, sync status, save menu) — keep only
-   *  the auto-sync engine and the workspace-manager drawer mounted. The
-   *  simplified header (PlaygroundHeaderControls) owns the visible
-   *  save/rename controls and opens the manager through `managerOpen`. */
+  /** Render no header UI — keep only the auto-sync engine and manager
+   *  drawer mounted (the simplified header owns the visible controls). */
   hideBadge?: boolean;
 }
 
@@ -138,10 +114,7 @@ function formatBytes(bytes: number): string {
   return `${n.toFixed(n >= 10 || i === 0 ? 0 : 1)} ${units[i]}`;
 }
 
-/** A friendly default name for a newly-created workspace, e.g.
- *  "Workspace 2", instead of a raw `toLocaleString()` timestamp (which
- *  was meaningless and truncated in the header badge). Reads naturally
- *  next to the auto-created "Default <playground>". */
+/** Friendly default name for a new workspace, e.g. "Workspace 2". */
 export function defaultWorkspaceName(
   registry: WorkspaceEntry[],
   playgroundId: string,
@@ -164,9 +137,8 @@ function formatRelative(timestamp: number): string {
   return new Date(timestamp).toLocaleDateString();
 }
 
-/** One-line backup status for a workspace, e.g. "Backed up 5m ago". "Opened
- *  since" flags that the backup predates the last open, the registry tracks
- *  opens, not edits, so it's a prompt to back up again, not a diff. */
+/** One-line backup status, e.g. "Backed up 5m ago". "Opened since" flags a
+ *  backup older than the last open (the registry tracks opens, not edits). */
 function backupStatusText(
   meta: CloudWorkspaceMeta | undefined,
   stale: boolean,
@@ -176,10 +148,8 @@ function backupStatusText(
   return stale ? `Backed up ${rel} · opened since` : `Backed up ${rel}`;
 }
 
-/** Passive cloud-sync indicator that replaces the old manual "Back up" button
- *  for signed-in users. The transient phases (saving / offline / error) come
- *  from the auto-sync engine; the resting state reflects the last known backup
- *  of the active workspace. */
+/** Passive cloud-sync indicator. Transient phases come from the auto-sync
+ *  engine; the resting state reflects the active workspace's last backup. */
 function WorkspaceSyncStatus({
   status,
   activeMeta,

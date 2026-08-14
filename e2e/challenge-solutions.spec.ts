@@ -1,26 +1,12 @@
 import { test, expect, type Page } from "@playwright/test";
 import { pagesForAdapters, requestedAdapters } from "./_adapterFilter";
 
-// Drives every <ChallengeCard> on every /fumadocs-dev/challenge-cards-<lang>
-// page, loads its reference solution into the editor buffers, clicks
-// Submit, and asserts that all of the card's declared tests pass.
-//
-// Each card exposes a test driver via:
-//   - DOM:    [data-testid="challenge-card"][data-adapter-id][data-challenge-title][data-solution-files]
-//   - window: window.__dsChallenges["<adapter>::<title>"]
-//
-// `data-solution-files` carries the per-file solution payload as JSON
-// so the spec doesn't have to re-parse MDX. `window.__dsChallenges`
-// hands us a programmatic setFileContent/submit/getTestResults trio
-// so we don't have to round-trip every character through CodeMirror's
-// contenteditable, that pathway is fragile against IME / paste /
-// indent extensions.
-//
-// Pages and per-card runs are slow because each runtime fetches its
-// WASM toolchain from a CDN on first load (browsercc, Pyodide, WebR,
-// php-wasm, pglite, sqlite-wasm). The per-test timeouts in
-// playwright.config.ts already allow for that, we don't need extra
-// retry logic here.
+// Loads every <ChallengeCard>'s reference solution, submits it, and asserts
+// all declared tests pass. Cards are driven programmatically through
+// window.__dsChallenges (typing through CodeMirror's contenteditable is
+// fragile); data-solution-files carries the solution payload as JSON. Runs are
+// slow because each runtime fetches its WASM toolchain on first load —
+// playwright.config.ts timeouts already allow for that.
 
 type SolutionFilePayload = { filename: string; source: string };
 
@@ -48,9 +34,8 @@ declare global {
   }
 }
 
-// Default: the per-language/dialect demo pages. Set COURSEWARE=1 to sweep
-// every docs page that embeds a <ChallengeCard> or <SqlChallengeCard>
-// across all courses, a long, opt-in CI run. `path` is the full route.
+// Default: the per-language demo pages. COURSEWARE=1 sweeps every docs page
+// embedding a <ChallengeCard> or <SqlChallengeCard>.
 const DEMO_PAGES: { path: string; label: string }[] = [
   { path: "/fumadocs-dev/challenge-cards-javascript", label: "JavaScript" },
   { path: "/fumadocs-dev/challenge-cards-typescript", label: "TypeScript" },
@@ -63,15 +48,13 @@ const DEMO_PAGES: { path: string; label: string }[] = [
   { path: "/fumadocs-dev/challenge-cards-php", label: "PHP" },
   { path: "/fumadocs-dev/challenge-cards-web", label: "Web (HTML/CSS/JS)" },
   { path: "/fumadocs-dev/challenge-cards-react", label: "React" },
-  // SQL challenge cards register on the same window.__dsChallenges registry
-  // and expose the same data-* attributes (see SqlChallengeCard).
+  // SQL challenge cards register on the same window.__dsChallenges registry.
   { path: "/fumadocs-dev/sql-challenge-cards-sqlite", label: "SQLite" },
   { path: "/fumadocs-dev/sql-challenge-cards-duckdb", label: "DuckDB" },
   { path: "/fumadocs-dev/sql-challenge-cards-postgres", label: "PostgreSQL" },
 ];
 
-// `ADAPTERS=java,csharp,…` narrows both the page list and the cards driven on
-// each page to those languages (see _adapterFilter.ts).
+// ADAPTERS=java,csharp,… narrows the page list and cards (see _adapterFilter.ts).
 const ADAPTERS = requestedAdapters();
 
 const CHALLENGE_PAGES: { path: string; label: string }[] = process.env
@@ -154,22 +137,16 @@ async function runOneCard(
 ): Promise<{ ok: boolean; detail: string }> {
   await waitForChallengeHandle(page, card.key, 60_000);
 
-  // The `web` and `react` cards grade a live preview: their tests query the
-  // rendered DOM inside a sandboxed iframe, measure geometry and dispatch
-  // clicks. An iframe that is off-screen has no useful layout, and the tests
-  // then fail on the *harness*, not the solution — `repeat(4, 1fr)` reported
-  // as resolving to two columns, a padded link measured 0 px tall, three
-  // clicks landing as two. Everything is driven programmatically through
-  // `window.__dsChallenges` so nothing else here needs the card visible;
-  // this scroll is what makes the preview measurable.
+  // web/react cards grade a live preview iframe by measuring its DOM; an
+  // off-screen iframe has no useful layout and fails on the harness, not the
+  // solution. This scroll is what makes the preview measurable.
   const cardRoot = page
     .locator(
       `[data-challenge-title="${card.title.replace(/"/g, '\\"')}"][data-adapter-id="${card.adapterId}"]`,
     )
     .first();
-  // The preview slot, not the card's top edge: a card is tall enough that its
-  // heading can be on screen while the iframe underneath is still below the
-  // fold, and a document that is not being presented does not get laid out.
+  // Scroll to the preview slot, not the card's top edge: the iframe can still
+  // be below the fold while the heading is visible.
   const preview = cardRoot.locator('[data-testid="web-preview"]').first();
   await ((await preview.count()) > 0 ? preview : cardRoot)
     .scrollIntoViewIfNeeded()
@@ -195,9 +172,8 @@ async function runOneCard(
     };
   }
 
-  // Submit the run and wait for the banner to flip to pass/fail.
-  // The runtime may take a while on first run per language because
-  // packages are still warming up.
+  // Submit and wait for the banner to flip; first run per language is slow
+  // while packages warm up.
   await page.evaluate((key) => {
     const handle = window.__dsChallenges?.[key];
     return handle?.submit();
@@ -237,10 +213,8 @@ test.describe("Challenge solutions", () => {
       page.on("pageerror", (err) => pageErrors.push(err.message));
 
       await page.goto(pagePath);
-      // Cards register on `window.__dsChallenges` from a `useEffect`
-      // that fires once the React tree commits, wait until at least
-      // one card has registered before reading the manifest, so we
-      // don't race the initial render.
+      // Cards register on window.__dsChallenges after the React tree commits;
+      // wait for at least one so we don't race the initial render.
       await page.waitForFunction(
         () => {
           const reg = window.__dsChallenges;
@@ -251,12 +225,9 @@ test.describe("Challenge solutions", () => {
       );
 
       const cards = await readCardsOnPage(page, ADAPTERS);
-      // With no adapter filter, a page reached through `<ChallengeCard` must
-      // have cards. With one, it may legitimately have none: the page was
-      // selected because the language appears *somewhere* in its MDX, which
-      // can be on a `<CodeBlock>` alone. Reported rather than asserted, and
-      // reconciled against the extractor's totals by check-browser-blocks.mjs
-      // so a filter that silently matches nothing cannot pass for coverage.
+      // With an adapter filter a page may legitimately have no cards (the
+      // language may appear only on a <CodeBlock>); counts are reconciled by
+      // check-browser-blocks.mjs instead of asserted here.
       if (ADAPTERS === null) {
         expect(cards.length, "page should contain at least one challenge card").toBeGreaterThan(0);
       }
@@ -278,9 +249,7 @@ test.describe("Challenge solutions", () => {
         );
       }
 
-      // Anything thrown into pageerror during the sweep is worth
-      // surfacing, it usually means a runtime crashed before its
-      // banner could settle.
+      // A pageerror usually means a runtime crashed before its banner settled.
       expect(pageErrors, "no uncaught page errors during run").toEqual([]);
     });
   }

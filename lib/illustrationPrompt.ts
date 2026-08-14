@@ -1,23 +1,9 @@
 /**
- * Shared, dependency-free helpers for the illustration-prompt system:
- *
- *   - the in-lesson `<IllustrationPrompt>` MDX card
- *     (app/_components/mdx/IllustrationPrompt.tsx),
- *   - the `/dashboard/admin/illustration-prompts` review gallery
- *     (lib/illustrationPromptsGallery.ts), and
- *   - the batch image generator (scripts/generate-illustrations.mjs).
- *
- * All three read the same prompt definitions from `data/illustration-prompts.json`
- * and build the exact generation prompt through `buildIllustrationPrompt` here,
- * so the card, the gallery, and the generated PNG all agree on the prompt text
- * and the target file name. One source of truth, no per-call-site duplication.
- *
- * The prompts target OpenAI's GPT Image 2 and follow the Dataslope house style:
- * an isometric illustration of a subject, rendered in the four brand colors. See
- * `data/illustration-prompts.json` `meta.brandColors`.
- *
- * Pure (no Node/DOM APIs) so it can be imported from a client component, a
- * server component, and a plain Node build script alike.
+ * Shared helpers for the illustration-prompt system. The MDX card, the admin
+ * review gallery, and the batch generator all build prompts through
+ * `buildIllustrationPrompt` from `data/illustration-prompts.json`, so prompt
+ * text and file names agree everywhere. Pure (no Node/DOM APIs) so it can be
+ * imported from client, server, and build-script code alike.
  */
 
 /** The four Dataslope brand colors, as named in every generation prompt. */
@@ -36,13 +22,9 @@ export const BRAND_COLORS: BrandColors = {
   yellow: "#ffdd6c",
 };
 
-/** The house illustration style when a prompt does not name its own.
- *  Isometric is the default because it was the one style that survived every
- *  test: it isolates a subject cleanly, reads on both page backgrounds, and
- *  cuts out reliably. It is the only style used for the art that opens a
- *  lesson; the one other style with constraints of its own is `risograph`,
- *  reserved for the inline figures that sit beside a passage of history. See
- *  the "Illustrations" section of AGENTS.md. */
+/** House illustration style when a prompt does not name its own. Risograph is
+ *  the only other style with its own constraints (see AGENTS.md,
+ *  "Illustrations"). */
 export const DEFAULT_STYLE = "isometric illustration";
 
 /** Style name for the in-body historical figures. */
@@ -53,11 +35,8 @@ export interface IllustrationSpec {
   /** What to illustrate, phrased to read naturally after "An isometric
    *  illustration of " (e.g. "a marmot waving beside a monitor"). */
   subject: string;
-  /** Illustration style descriptor, inserted after the article, e.g.
-   *  "isometric illustration" (default) or "risograph". Those two are the
-   *  only styles with constraints written for them; the others tried (flat
-   *  geometric vector, line art, blueprint schematic, cut-paper collage) are
-   *  discouraged and fall back to the isometric constraints, see AGENTS.md. */
+  /** Style descriptor, e.g. "isometric illustration" (default) or
+   *  "risograph"; other styles fall back to the isometric constraints. */
   style?: string;
 }
 
@@ -67,67 +46,23 @@ function article(style: string): string {
 }
 
 /**
- * The two constraints every generated illustration carries, whatever its
- * subject and whatever its style.
- *
- * **No text** because none of the illustrations should carry lettering (the
- * model bakes in garbled text otherwise).
- *
- * **Nothing beyond the objects described**, because the previous wording of
- * this rule — "draw dots, markers, and nodes as flat 2D circles" — named three
- * things to draw in all 879 prompts, including the ones with no dot, marker, or
- * node anywhere in the subject. An image model reads a named noun as content,
- * so it supplied them: a chest of drawers came back with a colored dot on
- * every corner, a folder wore a constellation of dots joined by thin lines, and
- * a press had confetti scattered across its base. The clutter was not coming
- * from the subjects; it was coming from here.
+ * Constraints every prompt carries. "No text" avoids garbled baked-in
+ * lettering. The phrasing must stay purely prohibitive: the image model reads
+ * any named noun as content to draw (a former "draw dots ... as flat 2D
+ * circles" wording scattered dots and confetti across every scene).
  */
 const SHARED_CONSTRAINTS =
   "No text. Draw only the objects described — nothing scattered over, around, " +
   "or behind them: no speckled dots, no confetti, no stray connecting lines.";
 
 /**
- * What the isometric house style adds to those two, and what every prompt
- * authored before the risograph pilot carries verbatim.
- *
- * **Solid 3D forms**, because the same sentence asked for "flat 2D circles" and
- * flattened whole scenes with it. Isometric is the house style *because* it has
- * volume (AGENTS.md, "Illustrations"), so the constraint now says so outright
- * rather than pulling against it.
- *
- * The glossy-sphere guard survives, since it was a real failure — scatter dots,
- * chart markers and tree nodes rendering as a bag of marbles. What does NOT
- * survive is the cure: telling the model to draw round elements "as low solid
- * discs" was a positive instruction naming a shape, the same mistake as the
- * "draw dots as flat 2D circles" line that once littered every scene. It duly
- * drew discs everywhere — rows of colored coins standing in for data points,
- * cells, and steps — until a reviewer asked why everything looked like tokens.
- * The rule is now purely prohibitive: no spheres, no balls, no thin counters,
- * and no opinion about what a round thing should be instead. Subjects that
- * genuinely need a round object name one.
- *
- * **Light staging** because asking for solid form on its own overshot: the
- * first run under this rule came back as glossy plastic toys on heavy charcoal
- * plinths. The house look has always been bright colors on pale grey and white
- * platforms (see any illustration predating the regeneration rounds), so the
- * background and the plinths are pinned here rather than left to each subject
- * to remember — "heavy base" in a subject is otherwise taken literally.
- *
- * **One piece, one color**, because the model cannot hold an assembly together.
- * Anything described as built from or filled with many small units — a cube made
- * of cubelets, a bin packed with blocks, a tower of stacked cubes — comes back
- * with the units fused, notched, or half-melted into each other, and their
- * colors bleeding into shades that are not in the palette at all (a four-color
- * brand returning an orange face). The failure is the *assembly*, not the count:
- * three large blocks side by side render perfectly, while the same volume drawn
- * as forty cubelets does not. So each object is one solid piece in one flat
- * brand color, and a container holds a few large items rather than a heap.
- *
- * **Animals are exempt from the color half of that rule.** Without the
- * exception the model reads a creature as one more object and paints it a flat
- * brand color: a run of 60 creature illustrations came back with 15 of them
- * carrying a solid blue marmot, a blue owl, and a green marmot. Fur, feathers
- * and skin keep their own colors; only the props obey the palette.
+ * Isometric house-style constraints. Each rule guards a real model failure:
+ * the sphere/ball ban is prohibitive-only because naming a replacement shape
+ * ("low solid discs") made the model draw discs everywhere; light staging is
+ * pinned because "solid form" alone came back as toys on charcoal plinths;
+ * one piece / one flat color because assemblies of small units render fused
+ * with off-palette color bleed; animals are exempt from the color rule
+ * because a flat brand color otherwise gets applied to creatures too.
  */
 const ISOMETRIC_CONSTRAINTS =
   "Render each object as a solid three-dimensional form with real thickness, " +

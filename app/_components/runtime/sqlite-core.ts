@@ -1,18 +1,6 @@
-// SQLite engine wrapper for the SQL playground. Sits on top of
-// `@sqlite.org/sqlite-wasm` (the official SQLite WASM build) and
-// exposes the small surface that `SqlPlayground.tsx` actually needs:
-//
-//   - `init()`, load the wasm + create a Database
-//   - `loadSampleDatabase(id)`, tear down and rebuild against a sample
-//   - `exec(sql)`, run user-authored SQL, returning the
-//                                  raw `QueryExecResult[]` shape that
-//                                  the UI renders directly
-//   - `listTables()` / `listViews()` / `previewTable(name, limit)`,
-//                                  used to populate the sidebar tree
-//                                  and the table-preview pane
-//
-// Initialisation is memoised so navigating away and back doesn't
-// re-download the wasm module.
+// SQLite engine wrapper for the SQL playground, built on
+// @sqlite.org/sqlite-wasm. Initialisation is memoised so navigating away
+// and back doesn't re-download the wasm module.
 
 import {
   execAll,
@@ -30,61 +18,42 @@ import { fetchDatasetBytes, fetchDatasetText } from "./remoteDatasets";
 
 export type { QueryExecResult } from "./sqlite-wasm";
 
-/** Result of a SELECT-like statement with the per-column declared types
- *  attached.  `columnTypes` may contain empty strings for computed /
- *  expression columns that don't map back to a single declared SQLite
- *  column type, the UI falls back to value-based inference for those. */
+/** SELECT-like result with per-column declared types. `columnTypes` entries
+ *  may be empty for computed columns; the UI falls back to value inference. */
 export type QueryExecResultWithTypes = QueryExecResult & {
   columnTypes?: string[];
 };
 
-/** Description of a single column inside a table, derived from
- *  `PRAGMA table_info(...)`. Exposed to the UI so the schema sidebar
- *  doesn't have to re-parse `QueryExecResult`. */
+/** Column description derived from `PRAGMA table_info(...)`. */
 export interface TableColumnInfo {
-  /** Column ordinal (`cid` from PRAGMA). */
   cid: number;
-  /** Column name as declared in the CREATE TABLE statement. */
   name: string;
-  /** Declared type, e.g. `INTEGER`, `TEXT`. May be empty for
-   *  type-less columns. */
+  /** Declared type; may be empty for type-less columns. */
   type: string;
-  /** True when the column has a `NOT NULL` constraint. */
   notNull: boolean;
-  /** Default value as recorded in `sqlite_master` (string form), or
-   *  `null` when no default was declared. */
   defaultValue: string | null;
-  /** Position within the primary key (1-indexed). 0 means "not a
-   *  primary key column". */
+  /** Position within the primary key (1-indexed); 0 = not part of the PK. */
   pk: number;
-  /** For generated (computed) columns: the generation expression and
-   *  storage type. `null` for ordinary columns. */
+  /** Generation expression/storage for generated columns; null otherwise. */
   generated: { expression: string; storageType: "VIRTUAL" | "STORED" } | null;
-  /** Allowed labels for an enum-typed column (Postgres `enum`, DuckDB
-   *  `ENUM(...)`), in declaration order. `null`/absent for non-enum
-   *  columns and for SQLite (which has no native enum type). Drives the
-   *  result grid's inline enum dropdown. */
+  /** Allowed labels for enum-typed columns (Postgres/DuckDB); null/absent for
+   *  SQLite, which has no native enum type. Drives the grid's enum dropdown. */
   enumValues?: string[] | null;
 }
 
-/** Unique / primary-key constraint info for a single column, used to
- *  determine whether a row can be safely duplicated. */
+/** Per-column unique/PK constraint info, used to decide whether a row can
+ *  be safely duplicated. */
 export interface ColumnConstraintInfo {
-  /** Column name as declared in the CREATE TABLE statement. */
   name: string;
-  /** True when this column is part of the primary key. */
   isPrimaryKey: boolean;
-  /** True when this column is an INTEGER PRIMARY KEY AUTOINCREMENT,
-   *  its value is assigned automatically by SQLite so it can be
-   *  omitted from an INSERT when duplicating a row. */
+  /** INTEGER PRIMARY KEY AUTOINCREMENT columns can be omitted from an
+   *  INSERT when duplicating a row. */
   isAutoIncrement: boolean;
-  /** True when this column has an explicit UNIQUE constraint (separate
-   *  from the primary key). */
+  /** Explicit UNIQUE constraint (separate from the primary key). */
   isUnique: boolean;
 }
 
-/** Description of one column-level foreign-key relationship, derived
- *  from `PRAGMA foreign_key_list(...)`. */
+/** One column-level foreign key, from `PRAGMA foreign_key_list(...)`. */
 export interface ForeignKeyInfo {
   /** Source column on this table. */
   from: string;
@@ -92,206 +61,130 @@ export interface ForeignKeyInfo {
   table: string;
   /** Referenced column. */
   to: string;
-  /** ON DELETE action (e.g. "CASCADE", "SET NULL", "NO ACTION"). */
+  /** e.g. "CASCADE", "SET NULL", "NO ACTION". */
   onDelete: string;
-  /** ON UPDATE action (e.g. "CASCADE", "SET NULL", "NO ACTION"). */
   onUpdate: string;
 }
 
 /** Specification of a single column passed to `rebuildTable`. */
 export interface ColumnSpec {
-  /** New column name. */
   name: string;
   /** SQLite type affinity (INTEGER / REAL / TEXT / BLOB / NUMERIC). */
   type: string;
-  /** When true, render `NOT NULL` in the CREATE TABLE statement. */
   notNull?: boolean;
-  /** When true, this column is part of the primary key. */
   primaryKey?: boolean;
-  /** When true (only valid for a single-column INTEGER PRIMARY KEY),
-   *  add `AUTOINCREMENT`. */
+  /** Only valid for a single-column INTEGER PRIMARY KEY. */
   autoIncrement?: boolean;
-  /** When true, render `UNIQUE` in the column definition. */
   unique?: boolean;
-  /** Default value (raw SQL literal, e.g. `'foo'` or `42`). When
-   *  empty/undefined no default is rendered. */
+  /** Raw SQL literal (e.g. `'foo'`, `42`); empty/undefined = no default. */
   defaultValue?: string;
-  /** Optional column-level foreign key. */
   foreignKey?: { table: string; column: string; onDelete?: string; onUpdate?: string };
-  /** When set, this is a generated column. The `expression` is the
-   *  raw SQL expression (without surrounding parens), and `storageType`
-   *  is either `"VIRTUAL"` (default) or `"STORED"`. When present, most
-   *  other column modifiers (NOT NULL, UNIQUE, DEFAULT, FK) are ignored
-   *  by `renderColumnDef`. */
+  /** Generated column (expression without surrounding parens). When present,
+   *  other modifiers (NOT NULL, UNIQUE, DEFAULT, FK) are ignored. */
   generated?: { expression: string; storageType: "VIRTUAL" | "STORED" };
-  /** When set, the column existed under this name on the original
-   *  table. Used by `rebuildTable` to copy data from `originalName`
-   *  into `name` even after a rename. */
+  /** Prior name of the column, so `rebuildTable` copies data across a rename. */
   originalName?: string;
 }
 
-/** Spec passed to `rebuildTable` describing the desired post-rebuild
- *  shape of a table. */
+/** Desired post-rebuild shape of a table, passed to `rebuildTable`. */
 export interface TableRebuildSpec {
-  /** Current name of the table being modified. */
   originalName: string;
-  /** Desired name after the rebuild (may equal `originalName`). */
+  /** May equal `originalName`. */
   newName: string;
-  /** Ordered list of columns the rebuilt table should have. */
   columns: ColumnSpec[];
 }
 
 export interface SqliteEngine {
-  /** Release the engine's resources. Implemented by the worker-backed
-   *  engine (terminates the worker, which closes its OPFS access handles);
-   *  the in-process engine used by /learn code blocks has no out-of-band
-   *  resources, so the method is optional. */
+  /** Release resources. Implemented by the worker-backed engine (terminates
+   *  the worker, closing its OPFS handles); the in-process engine has none. */
   dispose?: () => void;
-  /** Replace the active in-memory database with a fresh build of the
-   *  given sample. Returns the active sample for convenience. */
+  /** Replace the active database with a fresh build of the given sample. */
   loadSampleDatabase: (id: string) => Promise<SqliteSampleMetadata>;
-  /** Execute a (potentially multi-statement) SQL string against the
-   *  active database. Throws on syntax / runtime errors. */
+  /** Execute a (potentially multi-statement) SQL string. Throws on errors. */
   exec: (sql: string) => Promise<QueryExecResult[]>;
-  /**
-   * Like `exec`, but returns one entry per SQL statement in the input.
-   * – `QueryExecResult` for statements that produce a result set (SELECT,
-   *   PRAGMA with output, …).  A zero-row SELECT still has column names.
-   * – `null` for statements that ran successfully but returned no result set
-   *   (INSERT, UPDATE, DELETE, CREATE TABLE, …).
-   * Throws on syntax / runtime errors.
-   */
+  /** Like `exec`, but one entry per statement: a result for SELECT-like
+   *  statements (zero-row SELECTs keep column names), null for statements
+   *  with no result set. */
   execAll: (sql: string) => Promise<(QueryExecResultWithTypes | null)[]>;
-  /** Names of every user table in the active database. */
   listTables: () => Promise<string[]>;
-  /** Names of every view in the active database. */
   listViews: () => Promise<string[]>;
-  /** Names of every user-defined index in the active database. Built-in
-   *  auto-indexes (created implicitly by `PRIMARY KEY` / `UNIQUE`) are
-   *  excluded, they have no `CREATE INDEX` statement and aren't
-   *  meaningful to the user. */
+  /** User-defined indexes only; auto-indexes from PRIMARY KEY / UNIQUE
+   *  are excluded. */
   listIndexes: () => Promise<string[]>;
-  /** Names of every trigger in the active database. */
   listTriggers: () => Promise<string[]>;
-  /** `SELECT * FROM "<name>" LIMIT <limit>` against the active
-   *  database. Identifier is quoted to defend against names that
-   *  collide with reserved words; sqlite-wasm does not expose a parameter
-   *  binding for identifiers, so quoting is the only viable option. */
+  /** `SELECT * FROM "<name>" LIMIT <limit>`. Identifier is quoted;
+   *  sqlite-wasm has no parameter binding for identifiers. */
   previewTable: (name: string, limit?: number) => Promise<QueryExecResult[]>;
-  /** `PRAGMA table_info(<name>)`, used by the sidebar context-menu
-   *  "View Structure" action to render the column list of a table or
-   *  view in the results pane. */
+  /** `PRAGMA table_info(<name>)`, for the sidebar "View Structure" action. */
   describeTable: (name: string) => Promise<QueryExecResult[]>;
-  /** `SELECT COUNT(*) FROM <name>`, used by the sidebar context-menu
-   *  "Count Rows" action. */
+  /** `SELECT COUNT(*) FROM <name>`, for the sidebar "Count Rows" action. */
   countRows: (name: string) => Promise<QueryExecResult[]>;
-  /** `DROP TABLE`/`DROP VIEW`/`DROP INDEX`/`DROP TRIGGER`, used by
-   *  the sidebar context-menu "Drop" action. The kind is restricted to
-   *  a fixed allowlist so the resulting statement can never be coerced
-   *  into something else. */
+  /** DROP the given entity. `kind` is a fixed allowlist so the statement
+   *  can never be coerced into something else. */
   dropEntity: (
     name: string,
     kind: "table" | "view" | "index" | "trigger",
   ) => Promise<void>;
-  /** `DELETE FROM <name>`, clears every row of a table without
-   *  dropping the schema. SQLite has no `TRUNCATE` keyword; an
-   *  unqualified DELETE is the standard equivalent. */
+  /** `DELETE FROM <name>` (SQLite has no TRUNCATE keyword). */
   truncateTable: (name: string) => Promise<void>;
   /** Structured form of `PRAGMA table_info(<name>)`. */
   listColumns: (name: string) => Promise<TableColumnInfo[]>;
   /** Structured form of `PRAGMA foreign_key_list(<name>)`. */
   listForeignKeys: (name: string) => Promise<ForeignKeyInfo[]>;
-  /** Apply the SQLite "rebuild table" pattern for the given spec:
-   *  create a `<name>__new` with the new shape, copy over rows whose
-   *  source column still exists (matched by `originalName`), drop the
-   *  old table and rename the new one in place. Wrapped in a single
-   *  transaction with foreign-key enforcement disabled so referencing
-   *  tables aren't broken mid-flight. */
+  /** SQLite rebuild-table pattern: create `<name>__new`, copy rows whose
+   *  source column still exists, drop the old table, rename. One transaction
+   *  with foreign-key enforcement disabled. */
   rebuildTable: (spec: TableRebuildSpec) => Promise<void>;
-  /** Returns the original DDL string (`CREATE TABLE …` / `CREATE VIEW
-   *  …`) recorded in `sqlite_master.sql` for the given entity, plus
-   *  the `CREATE INDEX` statements for any indexes defined on it.
-   *  Returns an empty string when the entity has no recorded DDL
-   *  (system tables, certain virtual tables). */
+  /** DDL recorded in `sqlite_master.sql` plus the entity's CREATE INDEX
+   *  statements; empty string when no DDL is recorded. */
   getDDL: (name: string) => Promise<string>;
   /** The sample database currently loaded into memory. */
   activeSample: () => Promise<SqliteSampleMetadata>;
-  /** Serialise the active database to a SQLite file image. The bytes
-   *  are exactly what would land on disk if SQLite wrote the database
-   *  to a `.sqlite` file, so the result can be downloaded as-is or
-   *  re-opened by any SQLite-compatible tool. */
+  /** Serialise the active database to a standard `.sqlite` file image. */
   exportDatabase: () => Promise<Uint8Array>;
-  /** Delete a set of rows from `<tableName>` identified by the values
-   *  of their primary-key columns. Each entry in `pkRows` is the
-   *  ordered list of primary-key values that identifies one row, in
-   *  the same order as `pkColumns`. Bound through prepared statements
-   *  so user-supplied cell values can never be interpreted as SQL. */
+  /** Delete rows identified by primary-key values (each `pkRows` entry is
+   *  ordered like `pkColumns`). Values are bound via prepared statements. */
   deleteRows: (
     tableName: string,
     pkColumns: string[],
     pkRows: ReadonlyArray<ReadonlyArray<unknown>>,
   ) => Promise<number>;
-  /** Update individual cells in `<tableName>`. Each entry in `updates`
-   *  identifies a row by its 0-based index in the table's natural scan
-   *  order (via `rowid OFFSET rowIndex`) and sets one column to a new
-   *  value. Because this is a single-user in-memory playground, using
-   *  the row position is safe and avoids requiring a primary key.
-   *  All updates run inside a single transaction; any failure rolls back
-   *  the entire batch. Returns the number of UPDATE statements executed. */
+  /** Update individual cells. Rows are identified by 0-based scan-order
+   *  index (`rowid OFFSET`), which is safe in this single-user playground
+   *  and needs no primary key. One transaction; failures roll back the
+   *  whole batch. Returns the number of UPDATEs executed. */
   updateRows: (
     tableName: string,
     updates: ReadonlyArray<{
       rowIndex: number;
       column: string;
       value: unknown;
-      /** When present, identifies the target row by primary-key value(s)
-       *  instead of the rowid offset, robust to display reordering. */
+      /** Identify the row by primary-key value(s) instead of rowid offset. */
       pk?: ReadonlyArray<{ column: string; value: unknown }>;
     }>,
   ) => Promise<number>;
-  /** Replace the active in-memory database with a fresh empty database.
-   *  Returns a synthetic SqliteSampleDatabase descriptor for the blank DB. */
+  /** Replace the active database with a fresh empty one. */
   loadBlankDatabase: () => Promise<SqliteSampleMetadata>;
-  /** Replace the active in-memory database with a database loaded from
-   *  the given bytes (e.g., a user-uploaded .sqlite file). The filename
-   *  parameter is used only for display purposes. Returns a synthetic
-   *  SqliteSampleDatabase descriptor. */
+  /** Replace the active database with one loaded from bytes (e.g. an
+   *  uploaded .sqlite file). `filename` is display-only. */
   loadFromBytes: (bytes: Uint8Array, filename: string) => Promise<SqliteSampleMetadata>;
-  /** Returns per-column constraint info for `<tableName>`, combining
-   *  `PRAGMA table_info` (for primary key membership) with
-   *  `PRAGMA index_list` / `PRAGMA index_info` (for UNIQUE constraints)
-   *  and a DDL scan (for AUTOINCREMENT). Used by the result-table
-   *  context menu to decide whether a row can be safely duplicated. */
+  /** Per-column constraint info (PK from table_info, UNIQUE from index
+   *  pragmas, AUTOINCREMENT from a DDL scan). */
   getColumnConstraintInfo: (tableName: string) => Promise<ColumnConstraintInfo[]>;
-  /** Insert a single row into `<tableName>`. Column names and values
-   *  are paired positionally and bound through sqlite-wasm's parameter API
-   *  so no user-supplied value can be interpreted as SQL. Skipping
-   *  auto-increment columns in `columnNames` lets SQLite assign the
-   *  next value automatically (the usual behaviour when duplicating). */
+  /** Insert one row; values are bound via the parameter API. Omitting
+   *  auto-increment columns lets SQLite assign them. */
   insertRow: (
     tableName: string,
     columnNames: string[],
     values: unknown[],
   ) => Promise<void>;
-  /** Names of user-defined indexes on a specific table (excludes
-   *  auto-indexes created by PRIMARY KEY / UNIQUE constraints). */
+  /** User-defined indexes on one table (auto-indexes excluded). */
   listTableIndexes: (tableName: string) => Promise<string[]>;
-  /** Names of triggers defined on a specific table. */
+  /** Triggers defined on one table. */
   listTableTriggers: (tableName: string) => Promise<string[]>;
-  /** Execute a single SELECT (or WITH…SELECT) statement with server-side
-   *  pagination. Returns the rows for one page together with the total
-   *  row count so the UI can render "Rows 1–50 of 12,345" without ever
-   *  materialising the full result set in JavaScript memory.
-   *
-   *  - `sql`      The trimmed SQL string.  Any trailing semicolons are
-   *               stripped automatically before the query is wrapped.
-   *  - `pageSize` Number of rows to return (≥ 1).
-   *  - `offset`   0-based index of the first row to return.
-   *
-   *  The count is obtained via `SELECT COUNT(*) FROM (<sql>)` and the
-   *  page via `<sql> LIMIT <pageSize> OFFSET <offset>`.  If the count
-   *  query fails (e.g. due to an unusual expression list) `totalCount`
-   *  falls back to the number of rows returned by the page query. */
+  /** Run one SELECT with `LIMIT <pageSize> OFFSET <offset>` plus a
+   *  `SELECT COUNT(*)` wrapper for the total; falls back to the page row
+   *  count when the count query fails. Trailing semicolons are stripped. */
   execPaged: (
     sql: string,
     pageSize: number,
@@ -299,66 +192,51 @@ export interface SqliteEngine {
   ) => Promise<{ result: QueryExecResultWithTypes[]; totalCount: number }>;
 }
 
-/** Options for opening the engine's database, used by Phase 3 to
- *  switch from in-memory storage to OPFS persistence. When `vfs` is
- *  provided (e.g. `"opfs-sahpool"`), the database is opened against
- *  that VFS and `filename` becomes the OPFS-relative path. */
+/** Options for opening the engine's database. When `vfs` is set
+ *  (e.g. `"opfs-sahpool"`), `filename` becomes the OPFS-relative path. */
 export interface SqliteEngineOpenOptions {
-  /** Database filename. Defaults to `":memory:"`. */
+  /** Defaults to `":memory:"`. */
   filename?: string;
-  /** Open-mode flags (sqlite-wasm OO1: `c` create, `w` write, `r`
-   *  read-only, `t` trace). Defaults to `"c"`. */
+  /** sqlite-wasm OO1 flags (`c` create, `w` write, `r` read-only,
+   *  `t` trace). Defaults to `"c"`. */
   flags?: string;
-  /** Optional SQLite VFS name. When set, the DB is OPFS-backed. */
+  /** SQLite VFS name. When set, the DB is OPFS-backed. */
   vfs?: string;
-  /** When true, skip seeding the sample's schema/data. Used when the
-   *  on-disk database already exists (Phase 3 persistence). */
+  /** Skip seeding the sample's schema/data (on-disk DB already exists). */
   skipSeed?: boolean;
 }
 
 
-/** Treat any identifier whose value isn't a safe `[A-Za-z_][A-Za-z0-9_]*`
- *  as untrusted and escape embedded double-quotes per the SQL standard.
- *  The names we feed in come straight out of `sqlite_master`, so this
- *  is mostly defensive, but defensive is what we want when building
- *  SQL by string concatenation. */
+/** Quote an identifier, escaping embedded double-quotes — defensive, since
+ *  these names are concatenated into SQL. */
 function quoteIdent(name: string): string {
   return `"${name.replace(/"/g, '""')}"`;
 }
 
 const SAFE_TYPE = /^[A-Za-z_][A-Za-z0-9_ ()]*$/;
 
-/** Render one `ColumnSpec` into a column definition for use inside
- *  `CREATE TABLE (...)`. Inline foreign keys are emitted via
- *  `REFERENCES`. The output never trusts free-form identifiers, table
- *  / column names are quoted, and the `type` keyword is checked
- *  against a conservative allowlist before being inlined. */
+/** Render one `ColumnSpec` as a CREATE TABLE column definition. Identifiers
+ *  are quoted and `type` is checked against an allowlist before inlining. */
 function renderColumnDef(col: ColumnSpec): string {
   const parts: string[] = [quoteIdent(col.name)];
   const type = col.type && SAFE_TYPE.test(col.type) ? col.type : "TEXT";
   parts.push(type);
 
-  // Generated columns use a completely different clause; all other
-  // modifiers (NOT NULL, UNIQUE, DEFAULT, FK) are not applicable.
+  // Generated columns use a different clause; other modifiers don't apply.
   if (col.generated) {
     const st = col.generated.storageType === "STORED" ? "STORED" : "VIRTUAL";
     parts.push(`GENERATED ALWAYS AS (${col.generated.expression}) ${st}`);
     return parts.join(" ");
   }
 
-  // For multi-column primary keys we emit a table-level constraint
-  // separately; here we only handle the single-column form so we can
-  // attach `AUTOINCREMENT`.
+  // Single-column PK only; multi-column PKs get a table-level constraint.
   if (col.primaryKey && col.autoIncrement) {
     parts.push("PRIMARY KEY AUTOINCREMENT");
   }
   if (col.notNull) parts.push("NOT NULL");
   if (col.unique) parts.push("UNIQUE");
   if (col.defaultValue !== undefined && col.defaultValue !== "") {
-    // The default value goes in raw so callers can use SQL literals
-    // (`'foo'`, `42`, `CURRENT_TIMESTAMP`). Surround simple bare
-    // identifiers / literals in single quotes when they don't already
-    // look like a SQL expression to keep the most common case ergonomic.
+    // Raw SQL literal so callers can use 'foo', 42, CURRENT_TIMESTAMP.
     const v = col.defaultValue.trim();
     parts.push(`DEFAULT ${v}`);
   }
@@ -378,16 +256,9 @@ function renderColumnDef(col: ColumnSpec): string {
   return parts.join(" ");
 }
 
-/**
- * Parse the `GENERATED ALWAYS AS (expr) [STORED|VIRTUAL]` clause for each
- * generated column from the table's CREATE TABLE DDL.
- *
- * SQLite stores the full DDL in `sqlite_master.sql` but `PRAGMA table_xinfo`
- * only tells us *which* columns are generated (via the `hidden` flag), not
- * the expression itself.  This helper bridges that gap by scanning the DDL
- * for each known generated column name and extracting its expression using a
- * parenthesis-depth counter (to correctly handle nested function calls).
- */
+/** Extract each generated column's `GENERATED ALWAYS AS (expr) [STORED|
+ *  VIRTUAL]` clause from the CREATE TABLE DDL. Needed because PRAGMA
+ *  table_xinfo flags generated columns but doesn't expose the expression. */
 function parseGeneratedFromDDL(
   ddl: string,
   generatedColNames: string[],
@@ -395,9 +266,7 @@ function parseGeneratedFromDDL(
   const result = new Map<string, { expression: string; storageType: "VIRTUAL" | "STORED" }>();
 
   for (const colName of generatedColNames) {
-    // Build a regex that matches the column name (quoted or unquoted) followed
-    // eventually by `GENERATED ALWAYS AS (`.  We use a non-greedy `[\s\S]*?`
-    // so we latch onto the first match for each column name.
+    // Match the column name (quoted or unquoted) up to `GENERATED ALWAYS AS (`.
     const escaped = colName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const pat = new RegExp(
       `(?:"${escaped}"|\\b${escaped}\\b)[\\s\\S]*?GENERATED\\s+ALWAYS\\s+AS\\s*\\(`,
@@ -417,7 +286,6 @@ function parseGeneratedFromDDL(
     }
     const expression = ddl.slice(start, pos - 1).trim();
 
-    // Look for STORED or VIRTUAL keyword immediately after the closing paren.
     const after = ddl.slice(pos).trimStart();
     const storageMatch = /^(STORED|VIRTUAL)\b/i.exec(after);
     const storageType: "VIRTUAL" | "STORED" = storageMatch
@@ -430,29 +298,18 @@ function parseGeneratedFromDDL(
   return result;
 }
 
-/** Build a per-column declared-type list for a result set by looking
- *  the column names up in the database's schema.
- *
- *  sqlite-wasm does NOT export `sqlite3_column_decltype` (verified against
- *  the published 1.13.0 wasm, the export table only includes
- *  `column_blob/bytes/count/double/name/text/type`), so we can't read
- *  declared types directly from the prepared statement.  Instead we
- *  parse FROM/JOIN clauses out of the SQL and consult
- *  `PRAGMA table_info(<table>)` for every referenced table, keyed by
- *  column name.  Unknown columns (computed expressions, columns from
- *  CTEs, columns whose name doesn't match any referenced table) come
- *  back as the empty string so the consumer can fall back to
- *  value-based inference. */
+/** Resolve declared column types for a result set. sqlite-wasm does NOT
+ *  export `sqlite3_column_decltype`, so we parse FROM/JOIN tables out of the
+ *  SQL and consult `PRAGMA table_info` instead. Unknown columns (expressions,
+ *  CTE columns) come back as "" so the consumer falls back to value-based
+ *  inference. */
 function resolveDeclaredColumnTypes(
   db: Database,
   sql: string,
   columns: string[],
 ): string[] {
   const referenced = extractReferencedTables(sql);
-  // Build a column-name → declared-type map by walking each referenced
-  // table's `PRAGMA table_info`.  When two tables share a column name
-  // with conflicting types, the first table referenced in the SQL wins,
-  // which matches what a developer reading the query usually expects.
+  // First referenced table wins on column-name conflicts.
   const byColumn = new Map<string, string>();
   for (const table of referenced) {
     let info: QueryExecResult[];
@@ -475,16 +332,10 @@ function resolveDeclaredColumnTypes(
   return columns.map((c) => byColumn.get(c) ?? "");
 }
 
-/** Pull every table name referenced by a FROM/JOIN clause out of an SQL
- *  string.  Strips string literals and SQL comments first so identifiers
- *  inside them aren't misread as table references.  Quoted identifiers
- *  (`"users"`, `[users]`, `` `users` ``) are unquoted before being
- *  returned.  Not a full SQL parser, designed to be good enough for
- *  the common single-statement SELECTs the playground actually runs. */
+/** Extract table names from FROM/JOIN clauses. Strips comments and string
+ *  literals first so identifiers inside them aren't misread; not a full SQL
+ *  parser, good enough for the playground's single-statement SELECTs. */
 function extractReferencedTables(sql: string): string[] {
-  // Remove block comments, line comments, and string/identifier literals
-  // before scanning for FROM/JOIN so e.g. `FROM` inside a string doesn't
-  // produce a phantom table name.
   const stripped = sql
     .replace(/\/\*[\s\S]*?\*\//g, " ")
     .replace(/--[^\n]*/g, " ")
@@ -499,8 +350,7 @@ function extractReferencedTables(sql: string): string[] {
   while ((match = pattern.exec(stripped)) !== null) {
     const name = match[1] || match[2] || match[3] || match[4];
     if (!name) continue;
-    // Skip SQL keywords that can follow JOIN (e.g. "JOIN LATERAL …") and
-    // common aliases that look like tables but aren't.
+    // Skip keywords that can follow JOIN (e.g. "JOIN LATERAL …").
     const upper = name.toUpperCase();
     if (upper === "LATERAL" || upper === "SELECT") continue;
     if (seen.has(name)) continue;
@@ -510,15 +360,11 @@ function extractReferencedTables(sql: string): string[] {
   return tables;
 }
 
-/** Drop every user-created table, view, index, and trigger from the
- *  database, leaving the schema empty.  Used when loading a sample or
- *  blank database into a persistent (OPFS-backed) DB instead of
- *  closing and re-opening the file.  Foreign-key enforcement is
- *  disabled around the drops so cross-table references don't block. */
+/** Drop every user table, view, index, and trigger. Used when loading into
+ *  a persistent (OPFS-backed) DB instead of reopening the file. Foreign-key
+ *  enforcement is disabled around the drops. */
 function dropAllUserObjects(db: Database): void {
-  // Iterate kinds in a sensible drop order: triggers / views first
-  // (they reference tables), then tables (auto-drops their auto-index),
-  // then any remaining user indexes.
+  // Drop triggers/views first (they reference tables), then tables, indexes.
   db.exec("PRAGMA foreign_keys = OFF;");
   try {
     for (const kind of ["trigger", "view", "table", "index"] as const) {
@@ -547,8 +393,7 @@ function dropAllUserObjects(db: Database): void {
         try {
           db.exec(`DROP ${keyword} IF EXISTS ${quoteIdent(name)}`);
         } catch {
-          // Drops can race against schema dependencies; ignore and let
-          // a later iteration pick up the leftovers.
+          // Drops can race schema dependencies; a later iteration retries.
         }
       }
     }
@@ -557,10 +402,8 @@ function dropAllUserObjects(db: Database): void {
   }
 }
 
-/** Best-effort full-database copy from `src` -> `dst`.  Used by
- *  `loadFromBytes` when a persistent (OPFS) DB is active, since we
- *  cannot deserialise an arbitrary byte image directly into an
- *  OPFS-backed file. */
+/** Best-effort full copy src -> dst. Used by `loadFromBytes` in OPFS mode,
+ *  where a byte image can't be deserialised into an OPFS-backed file. */
 function copyDatabaseContents(src: Database, dst: Database): void {
   // Re-emit every CREATE statement from sqlite_master.
   const schemaRows = execAll(
@@ -577,8 +420,7 @@ function copyDatabaseContents(src: Database, dst: Database): void {
         try {
           dst.exec(sql);
         } catch {
-          // Skip individual statements that fail (e.g. references to
-          // missing modules); continue with the rest of the import.
+          // Skip statements that fail; continue the import.
         }
       }
     }
@@ -628,10 +470,8 @@ function copyDatabaseContents(src: Database, dst: Database): void {
   }
 }
 
-/** The `SqliteEngine` surface with every promise unwrapped, the
- *  in-process engine executes synchronously, except for
- *  `loadSampleDatabase`, which stays async because samples backed by
- *  `remoteSql` download their seed script before the rebuild. */
+/** `SqliteEngine` with promises unwrapped (in-process execution is sync),
+ *  except `loadSampleDatabase`, which may download a remote seed script. */
 export type InProcessSqliteEngine = Omit<
   {
     [K in keyof SqliteEngine]: Awaited<
@@ -645,11 +485,8 @@ export type InProcessSqliteEngine = Omit<
   loadSampleDatabase: (id: string) => Promise<SqliteSampleMetadata>;
 };
 
-/** Execute a multi-statement script that creates *and* populates a
- *  database (a remote sample download or imported dump). Wrapped in a
- *  transaction when the script doesn't manage its own, so scripts made
- *  of thousands of single-row INSERTs commit in one journal write
- *  instead of one implicit transaction per statement. */
+/** Run a seed script inside a transaction (unless it manages its own) so
+ *  thousands of single-row INSERTs commit in one journal write. */
 function execSeedScript(target: Database, script: string): void {
   if (/^\s*(BEGIN|COMMIT)\b/im.test(script)) {
     target.exec(script);
@@ -677,11 +514,8 @@ export async function createSqliteEngineInProcess(
   let db: Database | null = null;
   let active: SqliteSampleDatabase = findSampleDatabase(initialSampleId);
 
-  // When a persistent (OPFS-backed) VFS is used, we open the database
-  // file once and *re-use* it across sample switches.  Switching
-  // samples in OPFS mode wipes the existing schema instead of opening
-  // a fresh in-memory database, so the on-disk file always reflects
-  // the active sample.
+  // With an OPFS-backed VFS the file is opened once and reused; sample
+  // switches wipe the schema so the on-disk file tracks the active sample.
   const persistent =
     typeof openOptions.vfs === "string" && openOptions.vfs.length > 0;
 

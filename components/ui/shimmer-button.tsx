@@ -82,10 +82,9 @@ export const ShimmerButton = React.forwardRef<
           )}
         />
 
-        {/* backdrop, inset by --cut on every side, so its corner radius has to
-            shrink by the same amount to stay concentric with the outer border.
-            Reusing the full --radius here left the inner fill looking rounder
-            than the edge (a mismatched, uneven shimmer ring at the corners). */}
+        {/* backdrop, inset by --cut; its radius must shrink by --cut too to
+            stay concentric with the outer border (full --radius reads rounder
+            than the edge, giving an uneven shimmer ring at the corners). */}
         <div
           className={cn(
             "absolute inset-(--cut) -z-20 [border-radius:calc(var(--radius)_-_var(--cut))] [background:var(--bg)]"
