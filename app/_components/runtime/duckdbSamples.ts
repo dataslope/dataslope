@@ -24,21 +24,16 @@ export interface DuckDbSampleDatabase extends SqlSampleDatabaseBase {
    *  database (see remoteDatasets.ts). The script may also read remote
    *  data directly; duckdb-wasm queries CORS-enabled https URLs natively. */
   remoteSql?: string;
-  /** Remote data files (`.parquet`, `.csv`, `.json`, …) fetched from
-   *  the datasets repo and registered with duckdb-wasm's virtual
-   *  filesystem before the seed SQL runs, so `sql`/`remoteSql` can
-   *  query them by name: `SELECT * FROM read_parquet('trips.parquet')`. */
+  /** Remote data files registered with duckdb-wasm's virtual filesystem
+   *  before the seed SQL runs, queryable by name via read_parquet etc. */
   remoteFiles?: readonly DuckDbRemoteFile[];
   defaultTabs: QueryTabSeed[];
 }
 
 // ─── E-Commerce sample ───────────────────────────────────────────────
-// A compact orders/products/customers schema that exercises DuckDB's
-// integer-family types, DECIMAL, and DATE. Note: DuckDB-Wasm does not
-// currently support STORED generated columns via DDL, so line_total is
-// stored as a plain DECIMAL populated at INSERT time.
-// Mirrors the structure of the SQLite "credit card transactions" sample
-// so users switching playgrounds see familiar shapes.
+// Compact orders/products/customers schema. DuckDB-Wasm doesn't support
+// STORED generated columns via DDL, so line_total is a plain DECIMAL
+// populated at INSERT time.
 
 const ECOMMERCE_SQL = `
 CREATE TABLE customers (
@@ -147,11 +142,9 @@ const ECOMMERCE_TABS: QueryTabSeed[] = [
   },
 ];
 
-// ─── Analytics sample showcasing DuckDB-specific features ───────────
-// PIVOT, list aggregations, and the UNNEST / STRUCT type system are
-// what set DuckDB apart from SQLite/Postgres in the browser. The
-// "Analytics" sample seeds a small events table and pre-loads a few
-// queries that show off these features.
+// ─── Analytics sample ────────────────────────────────────────────────
+// Showcases DuckDB-specific features: PIVOT, list aggregations, UNNEST/
+// STRUCT.
 
 const ANALYTICS_SQL = `
 CREATE TABLE events (
@@ -191,9 +184,8 @@ const ANALYTICS_TABS: QueryTabSeed[] = [
 ];
 
 // ─── Parquet demo sample ─────────────────────────────────────────────
-// Showcases DuckDB's killer browser feature: querying registered files
-// (Parquet/CSV/JSON) directly without an explicit CREATE TABLE step.
-// The sample seeds a tiny in-memory CSV via duckdb's `read_csv_auto`.
+// Querying registered files (Parquet/CSV/JSON) without CREATE TABLE;
+// seeds a tiny in-memory CSV via read_csv_auto.
 
 const PARQUET_DEMO_SQL = `
 -- Use DuckDB's "values" syntax to materialize an inline dataset.
