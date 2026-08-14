@@ -743,10 +743,8 @@ class PyodideWorkerRuntime implements LanguageRuntime {
         }
         if (msg.id !== id) return;
         if (msg.kind === "run-status") {
-          // Mid-run wait notices (e.g. the deferred package set still
-          // installing on the first data-stack run), see RunOptions.
-          // `preparing` lets the UI show the boot notice during the wait
-          // and drop it once execution actually starts.
+          // Mid-run wait notices; `preparing` shows the boot notice until
+          // execution actually starts.
           options?.onStatus?.(msg.message, msg.preparing);
           return;
         }
@@ -787,10 +785,8 @@ class PyodideWorkerRuntime implements LanguageRuntime {
 
   async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
     const id = ++this.nextId;
-    // Filter to plain files Python is likely to consume, staging
-    // archives, hidden dotfiles, etc. is fine but we always send the
-    // workspace's exact filenames so the user's mental model matches
-    // what shows up in `os.listdir()`.
+    // Send the workspace's exact filenames so `os.listdir()` matches the
+    // user's mental model.
     const payload: Array<[string, Uint8Array]> = [];
     for (const [path, bytes] of files) payload.push([path, bytes]);
     return new Promise<void>((resolve, reject) => {
@@ -828,9 +824,8 @@ export const pythonAdapter: LanguageAdapter = {
     notes: "Runs in a Web Worker so the UI stays responsive while your code executes.",
   },
   codeMirrorMode: "python",
-  // Phase A of the two-phase boot (interpreter + stdlib, what the boot
-  // notice actually waits for); the ~32 MB package set follows in the
-  // background and surfaces via run-status if a run needs it earlier.
+  // Phase A of the two-phase boot (interpreter + stdlib); the ~32 MB
+  // package set follows in the background.
   coldDownloadMB: 6,
   // ruff_fmt (PEP 8) (see formatCode), keep in sync.
   indentWidth: 4,

@@ -20,12 +20,9 @@ export interface DuckDbRemoteFile {
 export interface DuckDbSampleDatabase extends SqlSampleDatabaseBase {
   /** Inline DDL + seed SQL. Ignored when `remoteSql` is set. */
   sql?: string;
-  /** Path (inside the dataslope/datasets GitHub repo) or full URL of a
-   *  SQL script that creates *and* populates the database, fetched from
-   *  raw.githubusercontent.com when the sample is loaded, see
-   *  remoteDatasets.ts. The script itself can also read remote data
-   *  directly (e.g. `... FROM read_parquet('https://raw.githubusercontent.com/…')`),
-   *  since duckdb-wasm can query CORS-enabled https URLs natively. */
+  /** Repo path or full URL of a SQL script that creates and populates the
+   *  database (see remoteDatasets.ts). The script may also read remote
+   *  data directly; duckdb-wasm queries CORS-enabled https URLs natively. */
   remoteSql?: string;
   /** Remote data files (`.parquet`, `.csv`, `.json`, …) fetched from
    *  the datasets repo and registered with duckdb-wasm's virtual
