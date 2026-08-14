@@ -241,32 +241,15 @@ describe("hasHarnessMarker", () => {
   });
 });
 
-describe("composeWebDocument bridge opt-out", () => {
-  it("omits the bridge (and its token) when asked", () => {
-    const doc = composeWebDocument({
-      entryHtml: "<h1>hi</h1>",
-      bridge: false,
-    });
-    expect(doc).not.toContain(PREVIEW_MESSAGE_KEY);
+describe("composeWebDocument always carries the bridge", () => {
+  it("injects the bridge with the caller's token", () => {
+    // Every composed document is bridged — a bridgeless one would send a
+    // run's console output nowhere and render as a block that prints
+    // nothing. The auto-preview keeps determinism with a derived token,
+    // not by omitting the bridge.
+    const doc = composeWebDocument({ entryHtml: "<h1>hi</h1>", token: "tok" });
+    expect(doc).toContain(PREVIEW_MESSAGE_KEY);
     expect(doc).toContain("<h1>hi</h1>");
-  });
-
-  it("still injects Tailwind with the bridge off", () => {
-    const doc = composeWebDocument({
-      entryHtml: "<h1>hi</h1>",
-      bridge: false,
-      tailwind: true,
-    });
-    expect(doc).toContain(TAILWIND_BROWSER_CDN);
-    expect(doc).not.toContain(PREVIEW_MESSAGE_KEY);
-  });
-
-  it("refuses to compose a bridged document with no token", () => {
-    // Composing one silently would send a run's console output nowhere
-    // and render as a block that prints nothing.
-    expect(() => composeWebDocument({ entryHtml: "<h1>hi</h1>" })).toThrow(
-      /token/,
-    );
   });
 });
 

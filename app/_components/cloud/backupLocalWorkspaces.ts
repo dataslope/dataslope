@@ -54,9 +54,10 @@ export async function backupLocalWorkspaces({
   if (candidates.length === 0) return 0;
 
   onProgress?.({ done: 0, total: candidates.length });
-  let done = 0;
+  let uploaded = 0;
+  let processed = 0;
   for (const entry of candidates) {
-    if (isCancelled?.()) return done;
+    if (isCancelled?.()) return uploaded;
     try {
       const bundle = await buildCodeBundleFromOpfs(
         entry.playground,
@@ -65,7 +66,12 @@ export async function backupLocalWorkspaces({
       );
       // No manifest/files to rebuild from: skip silently rather than
       // uploading an empty bundle that would clobber a better copy later.
-      if (bundle) await saveCloudWorkspace(entry.id, bundle);
+      // Skips don't count toward the return value — callers refresh the
+      // cloud list only when something was actually uploaded.
+      if (bundle) {
+        await saveCloudWorkspace(entry.id, bundle);
+        uploaded += 1;
+      }
     } catch (err) {
       if (!isCancelled?.()) {
         onError?.(
@@ -76,9 +82,9 @@ export async function backupLocalWorkspaces({
       }
       break;
     }
-    done += 1;
-    if (isCancelled?.()) return done;
-    onProgress?.({ done, total: candidates.length });
+    processed += 1;
+    if (isCancelled?.()) return uploaded;
+    onProgress?.({ done: processed, total: candidates.length });
   }
-  return done;
+  return uploaded;
 }

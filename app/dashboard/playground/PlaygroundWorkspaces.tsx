@@ -177,6 +177,9 @@ export function PlaygroundWorkspaces() {
     done: number;
     total: number;
   } | null>(null);
+  // True once the orphan sweep has settled — the bulk backup must not start
+  // from the pre-recovery entry list (see RecentWorkspaces.tsx).
+  const [orphanSweepDone, setOrphanSweepDone] = useState(false);
   const bulkRanRef = useRef(false);
 
   useEffect(() => {
@@ -187,12 +190,17 @@ export function PlaygroundWorkspaces() {
     // Sweep up drafts that exist in OPFS but in no list, so unsaved work
     // appears here instead of being unreachable.
     let cancelled = false;
-    void recoverOrphanWorkspaces(PLAYGROUNDS.map((p) => p.id)).then(
-      (result) => {
+    void recoverOrphanWorkspaces(PLAYGROUNDS.map((p) => p.id))
+      .then((result) => {
         if (cancelled || result.recovered.length === 0) return;
         setLocalEntries(getWorkspaceRegistry());
-      },
-    );
+      })
+      .catch(() => {
+        // Recovery is best-effort; the backup still runs on what's listed.
+      })
+      .finally(() => {
+        if (!cancelled) setOrphanSweepDone(true);
+      });
     return () => {
       cancelled = true;
     };
@@ -223,9 +231,12 @@ export function PlaygroundWorkspaces() {
   }, [session]);
 
   // Post-sign-in bulk backup: browser-saved work uploads to the account
-  // automatically. Shared with the /playground index; runs once per page view.
+  // automatically. Shared with the /playground index; runs once per page
+  // view. Waits for the orphan sweep and, if a dep change cancels it
+  // mid-upload, releases the once-latch so the re-run finishes the job.
   useEffect(() => {
-    if (!session || !cloudLoaded || bulkRanRef.current) return;
+    if (!session || !cloudLoaded || !orphanSweepDone || bulkRanRef.current)
+      return;
     const cloudIds = new Set(cloudMetas.map((m) => m.id));
     if (pendingBackupCandidates(localEntries, cloudIds).length === 0) return;
     bulkRanRef.current = true;
@@ -238,22 +249,24 @@ export function PlaygroundWorkspaces() {
         onError: setOpenError,
         isCancelled: () => cancelled,
       });
+      if (cancelled) {
+        bulkRanRef.current = false;
+        return;
+      }
       // Re-fetch so the freshly-backed-up rows render as synced.
       try {
         const res = await listCloudWorkspaces();
-        if (!cancelled) {
-          setCloudMetas(res.workspaces);
-          setCloudUsage(res.usage);
-        }
+        setCloudMetas(res.workspaces);
+        setCloudUsage(res.usage);
       } catch {
         // The rows still show local; the next visit reconciles.
       }
-      if (!cancelled) setBackingUp(null);
+      setBackingUp(null);
     })();
     return () => {
       cancelled = true;
     };
-  }, [session, cloudLoaded, cloudMetas, localEntries]);
+  }, [session, cloudLoaded, orphanSweepDone, cloudMetas, localEntries]);
 
   // Estimate on-device sizes; backed-up rows already carry a cloud size.
   useEffect(() => {

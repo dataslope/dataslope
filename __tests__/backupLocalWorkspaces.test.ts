@@ -77,13 +77,19 @@ describe("backupLocalWorkspaces", () => {
   it("skips a workspace with nothing to rebuild from, without failing the sweep", async () => {
     buildResult = null;
     const { backupLocalWorkspaces } = await import(BACKUP);
+    const progress: (number | null)[] = [];
     const uploaded = await backupLocalWorkspaces({
       entries: [entry("a", "python")],
       cloudIds: new Set<string>(),
+      onProgress: (p: { done: number } | null) => progress.push(p?.done ?? null),
     });
     expect(built).toEqual(["a"]);
     expect(saved).toEqual([]);
-    expect(uploaded).toBe(1);
+    // A skip is not an upload: callers use the count to decide whether the
+    // cloud list needs re-fetching, so nothing-uploaded must return 0 …
+    expect(uploaded).toBe(0);
+    // … while progress still advances past the skipped workspace.
+    expect(progress).toEqual([0, 1]);
   });
 
   it("stops at the first failure and reports it once", async () => {

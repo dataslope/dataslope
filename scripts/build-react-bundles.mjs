@@ -8,7 +8,7 @@
  *
  * Run by `.github/workflows/react-bundles.yml`, not `build`/`dev`; the
  * manifest `lib/generated/react-bundles.json` is committed. Entries are keyed
- * by `blockOutputKey` and reuse is checked against the committed manifest
+ * by `workspaceOutputKey` and reuse is checked against the committed manifest
  * (`node_modules/.cache` does not survive `npm ci` on CI). Build options come
  * from `reactBundle.ts`, shared with the browser worker, and esbuild is
  * pinned to `ESBUILD_WASM_VERSION` — a version mismatch fails loudly, since a
@@ -29,7 +29,7 @@ enableTsResolution();
 
 // Dynamic on purpose: a static `import` is hoisted and resolved before the
 // resolver hook above is installed.
-const { blockOutputKey } = await import("../lib/blockOutputKey.ts");
+const { workspaceOutputKey } = await import("../lib/blockOutputKey.ts");
 const { REACT_BUILD_OPTIONS, splitBundleOutput, vfsPlugin } = await import(
   "../app/_components/runtime/reactBundle.ts"
 );
@@ -117,9 +117,13 @@ let bytes = 0;
 
 for (const block of blocks) {
   if (block.expectError) continue; // the failure is the lesson; don't pre-render it
-  const entryFile =
-    block.files.find((f) => f.filename === block.entry) ?? block.files[0];
-  const key = blockOutputKey(ADAPTER, entryFile.initCode, entryFile.starterCode);
+  // Keyed over EVERY file, not just the entry: the bundle bakes the whole
+  // VFS in, so an edit to any file must mint a new key or the committed
+  // bundle would be reused stale forever.
+  const entryName = block.files.some((f) => f.filename === block.entry)
+    ? block.entry
+    : block.files[0].filename;
+  const key = workspaceOutputKey(ADAPTER, block.files, entryName);
 
   const reusable = previous[block.file]?.[key];
   if (reusable) {

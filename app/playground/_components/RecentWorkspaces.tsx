@@ -175,6 +175,10 @@ export function RecentWorkspaces() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [cloudLoaded, setCloudLoaded] = useState(false);
+  // True once the orphan sweep has settled (found something, found nothing,
+  // or failed): the bulk backup below must not start from the pre-recovery
+  // entry list, or a just-recovered draft misses the sweep.
+  const [orphanSweepDone, setOrphanSweepDone] = useState(false);
   const bulkRanRef = useRef(false);
 
   // Read the localStorage registry only after mount (it's undefined on the
@@ -186,12 +190,17 @@ export function RecentWorkspaces() {
     // Sweep up drafts that exist in OPFS but in no list, so changed-but-never-
     // saved work shows up here instead of being unreachable.
     let cancelled = false;
-    void recoverOrphanWorkspaces(PLAYGROUNDS.map((p) => p.id)).then(
-      (result) => {
+    void recoverOrphanWorkspaces(PLAYGROUNDS.map((p) => p.id))
+      .then((result) => {
         if (cancelled || result.recovered.length === 0) return;
         setLocalEntries(getWorkspaceRegistry());
-      },
-    );
+      })
+      .catch(() => {
+        // Recovery is best-effort; the backup still runs on what's listed.
+      })
+      .finally(() => {
+        if (!cancelled) setOrphanSweepDone(true);
+      });
     return () => {
       cancelled = true;
     };
@@ -233,8 +242,12 @@ export function RecentWorkspaces() {
   // Post-sign-in bulk backup, the same sweep the dashboard runs: whichever
   // surface the user lands on first backs their local work up. Once per page
   // view, and silent, this page has no progress affordance of its own.
+  // Waits for the orphan sweep and, if a dep change cancels it mid-upload,
+  // releases the once-latch so the re-run finishes the job instead of
+  // silently dropping the remaining candidates.
   useEffect(() => {
-    if (!session || !cloudLoaded || bulkRanRef.current) return;
+    if (!session || !cloudLoaded || !orphanSweepDone || bulkRanRef.current)
+      return;
     const cloudIds = new Set(cloudMetas.map((m) => m.id));
     if (pendingBackupCandidates(localEntries, cloudIds).length === 0) return;
     bulkRanRef.current = true;
@@ -245,12 +258,23 @@ export function RecentWorkspaces() {
         cloudIds,
         isCancelled: () => cancelled,
       });
-      if (uploaded > 0 && !cancelled) await refreshCloud();
+      if (cancelled) {
+        bulkRanRef.current = false;
+        return;
+      }
+      if (uploaded > 0) await refreshCloud();
     })();
     return () => {
       cancelled = true;
     };
-  }, [session, cloudLoaded, cloudMetas, localEntries, refreshCloud]);
+  }, [
+    session,
+    cloudLoaded,
+    orphanSweepDone,
+    cloudMetas,
+    localEntries,
+    refreshCloud,
+  ]);
 
   // Estimate on-device sizes for the browser-only rows (backed-up rows already
   // carry an authoritative cloud size).

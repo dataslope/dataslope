@@ -38,19 +38,25 @@ interface GalleryData {
   illustrationsCreatedAt: Record<string, string>;
 }
 
-/** Cached per isolate: the JSON is immutable for the life of a deploy. */
+/** Cached per isolate: the JSON is immutable for the life of a deploy.
+ *  Only a successful parse is cached — a transient asset-fetch failure must
+ *  not pin the route to 503 for the isolate's lifetime. */
 let galleryDataPromise: Promise<GalleryData | null> | null = null;
 function getGalleryData(): Promise<GalleryData | null> {
-  galleryDataPromise ??= readPublicAsset("_gen/illustration-gallery.json").then(
-    (text) => {
+  galleryDataPromise ??= readPublicAsset("_gen/illustration-gallery.json")
+    .then((text): GalleryData | null => {
       if (!text) return null;
       try {
         return JSON.parse(text) as GalleryData;
       } catch {
         return null;
       }
-    },
-  );
+    })
+    .catch(() => null)
+    .then((data) => {
+      if (!data) galleryDataPromise = null;
+      return data;
+    });
   return galleryDataPromise;
 }
 

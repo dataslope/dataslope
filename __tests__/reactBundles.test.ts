@@ -7,7 +7,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 
 import { ESBUILD_WASM_VERSION } from "../app/_components/runtime/cdn";
-import { blockOutputKey } from "../lib/blockOutputKey";
+import { workspaceOutputKey } from "../lib/blockOutputKey";
 import { extractBlocks } from "../scripts/lib/mdx-blocks.mjs";
 
 /** The shape `extractBlocks` returns, narrowed to what these guards use. */
@@ -21,6 +21,13 @@ interface ExtractedBlock {
 
 const ROOT = join(__dirname, "..");
 const MANIFEST = join(ROOT, "lib/generated/react-bundles.json");
+
+/** Mirrors the generator's and CodeBlock's entry resolution. */
+function resolveEntry(b: ExtractedBlock): string {
+  return b.files.some((f) => f.filename === b.entry)
+    ? b.entry
+    : b.files[0].filename;
+}
 
 function manifest(): Record<string, Record<string, { js: string; css?: string }>> {
   return existsSync(MANIFEST)
@@ -54,8 +61,7 @@ describe("the committed manifest", () => {
     // nothing else would say so.
     const missing: string[] = [];
     for (const b of blocks) {
-      const entry = b.files.find((f) => f.filename === b.entry) ?? b.files[0];
-      const key = blockOutputKey("react", entry.initCode, entry.starterCode);
+      const key = workspaceOutputKey("react", b.files, resolveEntry(b));
       if (!entries[b.file]?.[key]) missing.push(`${b.file}:${b.line}`);
     }
     expect(missing, "run `npm run build:react-bundles`").toEqual([]);
@@ -67,10 +73,7 @@ describe("the committed manifest", () => {
     // generator running, and it would keep serving a stale preview.
     const live = new Set<string>();
     for (const b of blocks) {
-      const entry = b.files.find((f) => f.filename === b.entry) ?? b.files[0];
-      live.add(
-        `${b.file}|${blockOutputKey("react", entry.initCode, entry.starterCode)}`,
-      );
+      live.add(`${b.file}|${workspaceOutputKey("react", b.files, resolveEntry(b))}`);
     }
     const stale: string[] = [];
     for (const [file, byKey] of Object.entries(entries)) {

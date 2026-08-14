@@ -270,12 +270,11 @@ export interface WebComposeInput {
   /** Entry document HTML (full document or fragment). May already carry a
    *  challenge harness `<script>`. */
   entryHtml: string;
-  /** Per-run bridge token. Required unless `bridge` is false. */
-  token?: string;
-  /** Inject the console bridge. Default true. The server-rendered
-   *  auto-preview passes false: the per-call random token would make the
-   *  server and browser renders differ — a hydration mismatch. */
-  bridge?: boolean;
+  /** Per-run bridge token. Always required — every composed document
+   *  carries the bridge. The server-rendered auto-preview derives its
+   *  token from the block's content hash rather than randomness, so the
+   *  server and browser renders stay identical (no hydration mismatch). */
+  token: string;
   /** Workspace text files by relative path; `<link>`/`<script src>`
    *  references to these are inlined so the document is self-contained. */
   textFiles?: Map<string, string>;
@@ -385,20 +384,9 @@ export function composeWebDocument(input: WebComposeInput): string {
     }
   }
 
-  let prelude = "";
-  if (input.bridge !== false) {
-    if (input.token === undefined) {
-      // A silently bridgeless document would send console output nowhere
-      // and look like a block that prints nothing.
-      throw new Error(
-        "composeWebDocument: `token` is required unless `bridge: false`.",
-      );
-    }
-    prelude += buildPreviewBridge(input.token);
-  }
-  if (input.tailwind) prelude += tailwindScriptTag();
-  if (!prelude) return html;
-  return injectAtDocumentStart(html, prelude);
+  let out = buildPreviewBridge(input.token);
+  if (input.tailwind) out += tailwindScriptTag();
+  return injectAtDocumentStart(html, out);
 }
 
 export interface ReactComposeInput {

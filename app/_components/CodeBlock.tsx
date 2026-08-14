@@ -78,7 +78,7 @@ import {
 } from "./codePersistence";
 import { usePrepopulatedOutput } from "./mdx/BlockOutputs";
 import { usePrecompiledBundle } from "./mdx/ReactBundles";
-import { blockOutputKey } from "@/lib/blockOutputKey";
+import { blockOutputKey, workspaceOutputKey } from "@/lib/blockOutputKey";
 import { previewStageStyle } from "./previewStage";
 import {
   PREVIEW_IFRAME_CLASS,
@@ -388,9 +388,16 @@ function CodeBlockInner({
   const autoPreviewToken = `${outputKey}-${blockId.replace(/[^a-zA-Z0-9-]/g, "")}`;
   // Build-time bundle for adapters that can't compose from source alone:
   // `web` ignores it; `react` renders nothing without it (in-browser TSX
-  // translation is the ~3 MB download this avoids). Keyed by the same
-  // content hash, so an edited block has no bundle until the workflow runs.
-  const precompiled = usePrecompiledBundle(outputKey);
+  // translation is the ~3 MB download this avoids). Keyed over the whole
+  // workspace (`workspaceOutputKey`), not the entry alone — the bundle
+  // bakes every file in, so an edit to any of them must miss here and
+  // fall back to the empty panel until the workflow rebuilds.
+  const bundleKey = workspaceOutputKey(
+    adapter.id,
+    workspaceFiles,
+    resolvedEntryFilename,
+  );
+  const precompiled = usePrecompiledBundle(bundleKey);
   const autoPreviewDoc = useMemo(() => {
     if (!autoPreviewEnabled || !adapter.composeStaticPreview) return null;
     const sources = workspaceFiles.map((f) => {

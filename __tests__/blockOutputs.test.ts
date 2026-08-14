@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 import { describe, it, expect } from "vitest";
 
-import { blockOutputKey } from "../lib/blockOutputKey";
+import { blockOutputKey, workspaceOutputKey } from "../lib/blockOutputKey";
 import { toOutputCells } from "../app/_components/runtime/pythonDisplayOutputs";
 import { BROWSER_ADAPTERS, TEXT_ADAPTERS } from "../scripts/lib/block-runners.mjs";
 
@@ -53,6 +53,37 @@ describe("blockOutputKey", () => {
     );
     expect(blockOutputKey("python", "ab", "c")).not.toBe(
       blockOutputKey("python", "a", "bc"),
+    );
+  });
+});
+
+describe("workspaceOutputKey", () => {
+  const files = [
+    { filename: "main.tsx", starterCode: "import App from './App'" },
+    { filename: "App.tsx", starterCode: "export default () => <p>hi</p>" },
+  ];
+
+  it("is stable for the same workspace", () => {
+    expect(workspaceOutputKey("react", files, "main.tsx")).toBe(
+      workspaceOutputKey("react", files, "main.tsx"),
+    );
+  });
+
+  it("changes when a NON-entry file changes", () => {
+    // The regression this key exists for: the bundle bakes every file in,
+    // so editing App.tsx must invalidate a bundle whose entry is main.tsx.
+    const edited = [
+      files[0],
+      { ...files[1], starterCode: "export default () => <p>bye</p>" },
+    ];
+    expect(workspaceOutputKey("react", files, "main.tsx")).not.toBe(
+      workspaceOutputKey("react", edited, "main.tsx"),
+    );
+  });
+
+  it("changes when the entry choice changes", () => {
+    expect(workspaceOutputKey("react", files, "main.tsx")).not.toBe(
+      workspaceOutputKey("react", files, "App.tsx"),
     );
   });
 });
