@@ -415,8 +415,7 @@ export default function SqlCodeBlock({
         }
       }
       const elapsedMs = performance.now() - startedAt;
-      // The "last meaningful result" is the last result set with
-      // columns. DML statements come back with empty columns so they
+      // Last result set WITH columns: DML comes back with empty columns and
       // shouldn't shadow a preceding SELECT.
       let last: SqlResult | null = null;
       for (const r of results) {
@@ -480,8 +479,8 @@ export default function SqlCodeBlock({
   }, [run]);
 
   // ─── Reset ──────────────────────────────────────────────────────────
-  // Reset restores the starter code AND re-seeds the database so
-  // INSERT/UPDATE/DELETE snippets can be retried from a clean slate.
+  // Restores the starter code AND re-seeds the database so DML snippets can
+  // be retried from a clean slate.
   const reset = useCallback(() => {
     runSeqRef.current++;
     const view = editorRef.current;

@@ -61,9 +61,6 @@ import { PLAYGROUNDS } from "./playgrounds";
 import { useCreepingBootFraction } from "./challengeShared";
 import { useRouter } from "next/navigation";
 import Link from "./Link";
-// Base UI primitives, used for menus, popovers, dialogs, and toasts so
-// that the playground gets consistent positioning, focus management,
-// and natural enter/exit animations out of the box.
 import { Menu } from "@base-ui/react/menu";
 import { Popover } from "@base-ui/react/popover";
 import { Dialog } from "@base-ui/react/dialog";
@@ -189,21 +186,15 @@ import { PlotlyChart } from "./PlotlyChart";
 
 const MOBILE_EDITOR_TAB = "editor" as const;
 
-/** The code playgrounds append runs to one scrolling history ("when runs
- *  stack up"), so clear-before-run is opt-in here; the SQL playgrounds
- *  keep DEFAULT_PLAYGROUND_SETTINGS.clearBeforeRun. */
+/** Code playgrounds append runs to one scrolling history, so
+ *  clear-before-run is opt-in here; the SQL playgrounds keep the default. */
 const CODE_CLEAR_BEFORE_RUN_DEFAULT = false;
-// Minimum time (ms) the "running" overlay is shown so the 180ms CSS
-// transition can complete and be clearly visible to the user.
+// Minimum ms the "running" overlay shows so its 180ms CSS transition can
+// complete visibly.
 const MIN_ANIMATION_MS = 300;
 
-/** Build the empty-state output-panel blurb based on what the runtime
- *  can actually produce. Every runtime supports plain text; richer
- *  outputs (data frames / charts / figures) are advertised only when the
- *  adapter explicitly enables them via `outputCapabilities`. Returns an
- *  empty string for text-only runtimes so the welcome panel doesn't
- *  show a noisy "Supports text output." line for languages that have no
- *  richer outputs to brag about. */
+/** Empty-state output-panel blurb from `outputCapabilities`; empty string
+ *  for text-only runtimes so the welcome panel isn't noisy. */
 function buildCapabilitiesBlurb(
   caps: LanguageAdapter["outputCapabilities"],
 ): string {
@@ -226,11 +217,8 @@ function entryStem(filename: string): string {
   return dot > 0 ? leaf.slice(0, dot) : leaf;
 }
 
-/** Render a Run-button label that wraps the entry-file stem in a
- *  semantic `<code>` element (styled as a subtle inline chip) rather
- *  than literal backticks, e.g. Run `main` → Run <code>main</code>.
- *  `topLevel` appends the " (top-level)" qualifier used by C# entry
- *  points in the chevron dropdown. */
+/** Run-button label wrapping the entry-file stem in a `<code>` chip;
+ *  `topLevel` appends the C# " (top-level)" qualifier. */
 function runEntryLabel(stem: string, topLevel = false): ReactNode {
   return (
     <>
@@ -247,10 +235,7 @@ interface RunDropdownItem {
   entryFilename: string;
 }
 
-/** Result of `computeRunButtonState`: drives the Run button UI in
- *  `Playground.tsx` for both multi-entry-point languages (C, C++,
- *  Java, C#) and single-entry-point languages (Python, R, JS, TS,
- *  PHP). */
+/** Result of `computeRunButtonState`; drives the Run button UI. */
 interface RunButtonState {
   /** Content rendered inside the primary button after the play icon. */
   primaryLabel: ReactNode;

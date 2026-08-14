@@ -188,9 +188,8 @@ function resultToQueryExecResult(result: PgliteResult): QueryExecResult & { colu
   if (result.fields.length === 0) return null;
   const columns = result.fields.map((field) => field.name);
   const columnTypes = result.fields.map((field) => pgTypeName(field.dataTypeID));
-  // PGlite returns a `date` column (OID 1082) as a JS Date at UTC midnight,
-  // which would render as the noisy `2024-12-30T00:00:00.000Z`. Render those as
-  // a plain `YYYY-MM-DD` calendar date (timestamps keep their time component).
+  // PGlite returns `date` (OID 1082) as a JS Date at UTC midnight; render
+  // as plain `YYYY-MM-DD` (timestamps keep their time component).
   const columnIsDate = result.fields.map((field) => field.dataTypeID === 1082);
   return {
     columns,
@@ -995,9 +994,8 @@ export async function createPostgresEngine(
       const next = await createFreshWorker({ loadDataDir: tarball });
       try {
         await next.waitReady;
-        // Probe the restored cluster before adopting it: a corrupted or
-        // version-mismatched tarball surfaces here, not on the user's
-        // next query.
+        // Probe before adopting: a corrupted/mismatched tarball surfaces
+        // here, not on the user's next query.
         await next.query("SELECT 1");
       } catch (err) {
         try {

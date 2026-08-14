@@ -57,32 +57,18 @@ jobs:
     env:
       BUCKET: dataslope-illustrations
       PREFIX: illustrations/
-      # 120 days, raised from 30 on 2026-08-10 at the reviewer's request (and
-      # from a standing 14 before that). One value covers both PNGs a run
-      # writes — `<run>/<id>/v<n>/original.png` and `.../cutout.png` sit under
-      # the same prefix — so this is the window for the pristine art and the
-      # background-removed art alike.
-      #
-      # Why it keeps going up: R2 is now the *only* copy of both. The served
-      # WebP is a cut-out that has already been trimmed and re-encoded, and
-      # since promotion stopped writing the opaque original into git there is
-      # no full-frame copy in the repo at all. Re-promoting at a different
-      # quality, re-trimming on different axes, or restoring an original for a
-      # page that wants one all read from here — and once these expire the
-      # only way back is paying to regenerate art that already existed.
-      #
-      # The cost this trades against is rejected candidates: a few thousand
-      # PNGs per round sitting four months instead of one. That was the right
-      # trade at 14 days when the repo held a second copy; it is the wrong one
-      # now.
+      # Covers both the original and cutout PNGs (same prefix). Generous on
+      # purpose: R2 is the ONLY copy of both — the repo holds no full-frame
+      # original — so once these expire, re-promoting or re-trimming means
+      # paying to regenerate art that already existed.
       EXPIRE_DAYS: "120"
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
-      # Editing bucket configuration needs an R2 Admin Read & Write token; the
-      # object-scoped R2_INC_CACHE_* pair is denied here (see the header).
+      # Must be Admin Read & Write; the object-scoped R2_INC_CACHE_* pair is
+      # denied here (see header).
       AWS_ACCESS_KEY_ID: ${{ secrets.R2_ADMIN_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_ADMIN_SECRET_ACCESS_KEY }}
-      # Secrets cannot be tested from inside `run:` (an unset one arrives as
-      # empty, indistinguishable from a set-but-empty one), so resolve it here.
+      # Secrets can't be tested from inside `run:` (unset arrives as empty),
+      # so resolve it here.
       ADMIN_CREDS_SET: ${{ secrets.R2_ADMIN_ACCESS_KEY_ID != '' && secrets.R2_ADMIN_SECRET_ACCESS_KEY != '' }}
       AWS_DEFAULT_REGION: auto
       AWS_EC2_METADATA_DISABLED: "true"
@@ -96,10 +82,8 @@ jobs:
           set -euo pipefail
           aws() { command aws --endpoint-url "$ENDPOINT" "$@"; }
 
-          # An unset CLOUDFLARE_ACCOUNT_ID collapses ENDPOINT to
-          # "https://.r2.cloudflarestorage.com" and every call fails; say so
-          # plainly rather than emitting a wall of AWS CLI errors. (The secret
-          # was named CF_ACCOUNT_ID until Cloudflare deprecated the CF_* prefix.)
+          # An unset CLOUDFLARE_ACCOUNT_ID collapses ENDPOINT and every call
+          # fails; say so plainly rather than emitting a wall of CLI errors.
           if [[ "$ENDPOINT" == "https://.r2.cloudflarestorage.com" ]]; then
             echo "::error::Repository secret CLOUDFLARE_ACCOUNT_ID is not set (it was previously named CF_ACCOUNT_ID)."
             exit 1
@@ -112,9 +96,8 @@ jobs:
             exit 1
           fi
 
-          # Say which secret is missing. Half a pair signs requests with a
-          # mismatched key/secret and fails as an opaque SignatureDoesNotMatch;
-          # neither fails as an equally opaque unsigned-request error.
+          # Say which secret is missing: half a pair fails as an opaque
+          # SignatureDoesNotMatch, neither as an unsigned-request error.
           if [[ "$ADMIN_CREDS_SET" != "true" ]]; then
             echo "::error::Repository secrets R2_ADMIN_ACCESS_KEY_ID and R2_ADMIN_SECRET_ACCESS_KEY are not both set. This job needs an R2 'Admin Read & Write' token; see https://developers.cloudflare.com/r2/api/tokens/#permissions"
             exit 1

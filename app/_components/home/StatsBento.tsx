@@ -8,18 +8,10 @@ import {
 } from "./statsBentoBackgrounds";
 
 /**
- * Turn a generated illustration into the `Icon` component `<BentoCard>` wants.
- *
- * The card renders `<Icon className={…} />` with its own sizing classes, so an
- * illustration has to arrive as a component with that same shape rather than as
- * an `<img>` inline. Each icon is the `-cutout` slug (transparent background),
- * so the marmot sits directly on the card in both themes instead of inside a
- * white tile — the same reason the course rows use cut-outs.
- *
- * Returns `null` when the slug has no manifest entry, which renders nothing
- * rather than a broken image; the card's heading and copy still stand on their
- * own. The images are eager and non-lazy: all four sit in the bento grid near
- * the top of the home page.
+ * Turns a generated illustration into the `Icon` component `<BentoCard>`
+ * wants (it renders `<Icon className={…} />` with its own sizing classes).
+ * A slug with no manifest entry renders nothing rather than a broken image.
+ * Eager/non-lazy: all four sit near the top of the home page.
  */
 function illustrationIcon(slug: string) {
   const entry = imageManifest[slug];
@@ -46,29 +38,15 @@ const InterviewPrepIcon = illustrationIcon("home-icon-interview-prep-cutout");
 const ChallengesIcon = illustrationIcon("home-icon-challenges-cutout");
 const CodeBlocksIcon = illustrationIcon("home-icon-code-blocks-cutout");
 
-/** 160px square, the same on every card. `scale-100` is required: the card's
- *  default icon classes carry a `scale-75` (pinned there when the icon was a
- *  line glyph), which would otherwise render `h-40` at 120px. All four cards
- *  now share one size — the illustrations differ enough card to card that the
- *  old large/small split no longer bought any hierarchy.
- *
- *  `object-contain` is load-bearing, not decoration: the box is square but the
- *  art is not. `scripts/trim-cutouts.mjs` crops each cut-out's transparent top
- *  and bottom away, so a 1024x1024 render is served a little shorter than it
- *  is wide, and a fixed `h-40 w-40` with no fit rule would stretch it back to
- *  square — subtly, which is the bad kind. Contained, it paints at its own
- *  ratio inside the same reserved box, so the layout below is unaffected.
- *
- *  This size drives the copy: at 160px the icon plus a heading, a CTA, and the
- *  card's padding leave roughly two lines for the description inside the
- *  grid's fixed `auto-rows-[22rem]`, and less than that on a single-column
- *  card. Descriptions below are written to that budget. */
+/** 160px square on every card. `scale-100` overrides the card's default
+ *  `scale-75` icon classes. `object-contain` is load-bearing: the cut-outs
+ *  are trimmed shorter than wide, and a fixed square box with no fit rule
+ *  would subtly stretch them. At this size descriptions get roughly two
+ *  lines inside the grid's fixed rows — copy below is written to that. */
 const ICON_SIZE = "mb-3 h-40 w-40 scale-100 object-contain";
 
-/** The interview prep card only. It is a one-column card whose background is
- *  the typing animation, and at 160px the marmot ran into that text once the
- *  grid went three-across. 140px clears it. Below `lg` the cards stack full
- *  width, the animation has room, and the icon goes back to the shared size. */
+/** Interview-prep card only: at 160px the marmot ran into the typing
+ *  animation once the grid went three-across; 140px clears it. */
 const ICON_SIZE_LG_140 = `${ICON_SIZE} lg:h-[140px] lg:w-[140px]`;
 
 export interface HomeStats {
@@ -104,8 +82,7 @@ export function StatsBento({
     {
       Icon: InterviewPrepIcon,
       name: "Free interview prep",
-      // Narrowest card (one column) and it carries a CTA, so it has the
-      // tightest copy budget of the four: the full role list overflowed.
+      // Tightest copy budget of the four; the full role list overflowed.
       description: "Role-based prep for analyst, data, ML, and backend roles.",
       href: "/interview-prep",
       cta: "Start prepping",

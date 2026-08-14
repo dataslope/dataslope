@@ -222,14 +222,10 @@ export function createSqlEditorExtensions(
         },
       },
       ...closeBracketsKeymap,
-      // Completion keys must come before `defaultKeymap`, otherwise
-      // ArrowUp/ArrowDown would move the cursor instead of the popup
-      // selection. Enter is removed so it always inserts a newline,
-      // Tab accepts the active completion instead (falling through to
-      // indentWithTab when no completion is shown). This only works
-      // because the autocompletion extension's own keymap is disabled
-      // (`defaultKeymap: false` above); that built-in copy binds Enter
-      // at the highest precedence and would override anything here.
+      // Completion keys must precede `defaultKeymap` so ArrowUp/Down move the
+      // popup selection, not the cursor. Enter is removed so it always
+      // inserts a newline; Tab accepts the completion instead. Only works
+      // because the extension's own keymap is disabled (defaultKeymap: false).
       ...completionKeymap.filter((b) => b.key !== "Enter"),
       { key: "Tab", run: acceptCompletion },
       ...defaultKeymap,
