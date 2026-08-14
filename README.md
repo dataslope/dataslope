@@ -74,6 +74,13 @@ Production and preview deploys run through Cloudflare Workers Builds rather than
 | Deploy command | `npx opennextjs-cloudflare deploy --cacheChunkSize 100 && npm run db:seed:search:remote` |
 | Non-production branch deploy command | `npx opennextjs-cloudflare upload --cacheChunkSize 100` |
 | Path | `/` |
+| Build variable | `NPM_CONFIG_OMIT` = `dev` |
+
+**`NPM_CONFIG_OMIT=dev` is why `dependencies` looks the way it does.** Workers Builds runs its own `npm clean-install` and exposes no install command to override, but npm reads `NPM_CONFIG_*` from the environment, and build variables are environment. So everything `npm run build` and the deploy actually load lives in `dependencies` — including `typescript`, `tailwindcss`, `sharp`, `pyodide`, `remark-mdx` and `@cloudflare/workers-types`, several of which are imported by `app/` and `lib/` source and were mis-filed as dev dependencies to begin with. What is left in `devDependencies` is only what CI never runs: the test, lint, e2e and content-sweep tooling.
+
+Measured: **98 s → 62 s** locally (2.1 GB → 1.9 GB of `node_modules`), by not installing `@duckdb/duckdb-wasm` (149 MB), `vitest`, `playwright`, `eslint` and friends on a machine that only builds.
+
+Forgetting the variable is safe — CI just installs everything and takes the extra ~40 s, which is exactly today's behaviour. Do **not** reach for `NPM_CONFIG_OMIT=optional` instead: npm ships platform-specific native binaries *as* optional dependencies, so it strips them out of unrelated packages and the build dies on `Cannot find native binding` (`@ast-grep/napi`, measured).
 
 Both `deploy` (production) and `upload` (preview versions) populate the R2 cache before shipping, `upload` wraps `wrangler versions upload`, so previews get the same populated cache production does. `Path` is `/` because this Worker lives at the repo root; the CORS proxy under `cloudflare-cors-proxy/` is a separate Worker with its own config.
 

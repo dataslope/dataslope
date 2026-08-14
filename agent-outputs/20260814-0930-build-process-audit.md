@@ -464,3 +464,80 @@ string match, exercised only by a real deploy. Two things follow — the preview
 optional for changes to this path (§5.2 said so about prefetching and it was just as true here),
 and anything that reads "does not need doing" in a build log deserves the same question that caught
 this one.
+
+---
+
+## 5.7 The admin chart gallery: measured, and deliberately left alone
+
+`/dashboard/admin/charts/*` is **80 of the 1,081 prerendered routes** — 20 slices × 4 orderings
+(`PER_PAGE = 20`, 383 charts, `ORDERINGS = alpha | newest | oldest | course`) — and it looked like
+the biggest structural target on the list:
+
+| Route group | Objects | Raw | Share | Avg |
+| --- | ---: | ---: | ---: | ---: |
+| courses | 835 | 1,971 MiB | 82.2% | 2.36 MiB |
+| **dashboard/admin/charts** | **80** | **292 MiB** | **12.2%** | **3.65 MiB** |
+| other | 84 | 96 MiB | 4.0% | 1.14 MiB |
+| fumadocs-dev + llms | 68 | 33 MiB | 1.4% | 0.48 MiB |
+| dashboard (other) | 14 | 5 MiB | 0.2% | 0.35 MiB |
+
+12.2% of the cache, at a *higher* average than a lesson, for internal noindex tooling. Two things
+also turned out to be true of it: every page carries all **383** chart slugs (not its own 20 — the
+`ChartReviewSummary slugs={ALL.map(…)}` prop), and each chart's SVG is inlined **twice**, once per
+theme pane. The second is the page's whole purpose (a figure is judged against both themes), so it
+is not waste.
+
+**And then compression made the question moot.** As actually shipped:
+
+| Route group | Objects | Compressed | Share |
+| --- | ---: | ---: | ---: |
+| courses | 835 | 123.9 MiB | 89.8% |
+| dashboard/admin/charts | 80 | **7.8 MiB** | 5.7% |
+| other | 166 | 6.2 MiB | 4.5% |
+| **total** | | **137.9 MiB** | |
+
+292 MiB → **7.8 MiB**. Dropping three of the four orderings would save ~5.9 MiB of upload and about
+4 s of prerender, and would cost removing `export const dynamic = "force-static"` from the route —
+because with it, any ordering absent from `generateStaticParams` 404s rather than rendering on
+demand. (An on-demand render would in fact work: `loadChartSvg` goes through `readPublicAsset`,
+which is the filesystem at build time and the **ASSETS binding** at request time, so this page has
+no `node:fs` dependency. The blocker is `force-static`, not safety.)
+
+**Left alone.** Trading a deliberate `force-static` declaration on an admin route for ~6 MiB is not
+a good trade, and the honest reason it is not worth doing is that §5.5's compression already took
+it. Recorded here so the 12.2% figure does not tempt anyone back — check the compressed column
+first.
+
+**The route-count trap, worth remembering.** `fumadocs-dev` + its `llms` mirrors are 68 routes, 6%
+of the prerender count, which is what flagged them in the first place — and 1.4% of the bytes. Route
+count is a bad proxy for cost here; pages differ by 10× in size.
+
+---
+
+## 5.8 Install: `NPM_CONFIG_OMIT=dev` ✅ *shipped, needs the build variable*
+
+`npm ci` is **2 m 02 s of the 10 m 55 s build** (~19%) even with Workers Builds' dependency cache
+restored — that cache saves downloads, not the extraction and linking of 1,301 packages.
+
+§5.5 recorded this as impossible: Workers Builds exposes no install command and no `NPM_FLAGS`.
+**That was too strong.** It does expose **build variables**, and npm reads `NPM_CONFIG_*` from the
+environment, so `NPM_CONFIG_OMIT=dev` reaches its `npm clean-install` — and applies to CI only,
+never to a local checkout.
+
+Everything the build or deploy loads moved to `dependencies`; `devDependencies` now holds only what
+CI never runs (`@duckdb/duckdb-wasm` 149 MB, `vitest`, `playwright`, `@playwright/test`, `eslint`,
+`eslint-config-next`, `@resvg/resvg-js`, `esbuild-wasm`, `web-worker`). Several of the moved
+packages — `typescript`, `sharp`, `pyodide`, `remark-mdx`, `@cloudflare/workers-types` — are
+imported by `app/` and `lib/` source and were mis-filed to begin with.
+
+**Measured: 98 s → 62 s** (−37%), `node_modules` 2.1 GB → 1.9 GB, full build green afterwards.
+
+**`NPM_CONFIG_OMIT=optional` is the trap, and it was tried first.** It looked cleaner — move only
+the nine unwanted packages to `optionalDependencies` and leave the other classifications alone —
+and it installs faster still (55 s). It also breaks the build: npm ships platform-specific native
+binaries *as* optional dependencies, so omitting them strips native bindings out of unrelated
+packages and the build dies with `Cannot find native binding` on `@ast-grep/napi`. `--omit=dev`
+leaves optional dependencies alone, which is why it is the one that works.
+
+Forgetting the variable is safe: CI installs everything and takes the extra ~40 s, which is today's
+behaviour.
