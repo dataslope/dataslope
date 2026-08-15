@@ -1114,6 +1114,19 @@ body.playground-active {
 .playground-run-multi.running {
   opacity: 0.75;
 }
+/* A run that can be stopped isn't a dead control, so it keeps full contrast
+   and switches to the danger color — the button is now the way out of a
+   runaway loop, not a progress indicator. */
+.playground-run-multi.running.stoppable {
+  opacity: 1;
+  background: var(--danger);
+}
+.playground-run-multi-main.stop {
+  cursor: pointer;
+}
+.playground-run-multi-main.stop:disabled {
+  cursor: progress;
+}
 .playground-run-multi-main {
   /* Override `.run-btn` background to participate in the shared group
    * background; the parent provides the brand color. */
@@ -3456,6 +3469,16 @@ input[type="range"].fs-slider:disabled {
 .confirm-backdrop[data-starting-style],
 .confirm-backdrop[data-ending-style] {
   opacity: 0;
+}
+/* A dismissed dialog is still mounted while it fades out, and until it
+   unmounts it eats the click that follows — the first click on Run after
+   closing an Example confirmation went nowhere. Once it's on the way out
+   it has no business receiving input, so let clicks through immediately.
+   (Also the honest fix for a background tab, where the transition may
+   never run and the exit state can persist indefinitely.) */
+.confirm-backdrop[data-ending-style],
+.confirm-popup[data-ending-style] {
+  pointer-events: none;
 }
 .confirm-popup {
   /* Anchor the whole dialog to the UI font so a styled host (the
@@ -5822,6 +5845,33 @@ html[data-playground-theme="dark"] {
   font-size: 11px;
   color: var(--text-dim);
   text-align: center;
+}
+
+/* Mid-run wait notice (e.g. "Installing data packages, first run only…"),
+   pinned above the run blocks while a run is blocked on something that
+   isn't the user's code. */
+.run-status-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 10px 0;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg2);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.run-status-note::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  border-top-color: transparent;
+  animation: playground-spin 0.75s linear infinite;
 }
 
 /* Right-side header cluster (Save ▾ · Share · ⋯). */

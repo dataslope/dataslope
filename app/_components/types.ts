@@ -86,8 +86,21 @@ export interface ExportFormat {
   mimeType: string;
 }
 
-/** Emitter passed to `runtime.run` for streaming cells as they arrive. */
-export type EmitOutput = (cell: Omit<OutputCell, "id" | "elapsed">) => void;
+/**
+ * Emitter passed to `runtime.run` for streaming cells as they arrive.
+ *
+ * With no `seq` the cell is appended, which is all a runtime that emits
+ * once-per-complete-cell needs. Runtimes that stream a cell while it is
+ * still growing (Python's stdout during a long loop) pass `seq`, the cell's
+ * position in the run's output, and set `append` on every chunk after the
+ * first — so the surface can grow one cell instead of accumulating
+ * fragments.
+ */
+export type EmitOutput = (
+  cell: Omit<OutputCell, "id" | "elapsed">,
+  seq?: number,
+  append?: boolean,
+) => void;
 
 /** Per-run context passed to `runtime.run`. */
 export interface RunOptions {
@@ -165,6 +178,11 @@ export interface LanguageRuntime {
    *  so implementations must clear their tracking after returning to avoid
    *  double-reporting. */
   collectCreatedFiles?(): Promise<Map<string, Uint8Array>>;
+  /** Stop the run in flight, rejecting its `run()` promise with an error
+   *  named `RunCancelledError`, and leave the runtime ready for the next
+   *  run. Implementing this is what puts a Stop control in the surface, so
+   *  omit it unless a runaway program really can be stopped. */
+  cancelRun?(): Promise<void>;
   /** Tear down and free resources (worker, WASM heap); called on registry
    *  eviction, after which the instance must not be used. Runtimes that
    *  can't release resources omit this, which also exempts them from

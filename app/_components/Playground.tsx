@@ -52,6 +52,7 @@ import type {
   ExampleSnippet,
   ExportFormat,
   LanguageAdapter,
+  EmitOutput,
   LanguageRuntime,
   OutputCell,
   PackageInfo,
@@ -74,6 +75,7 @@ import {
   Share2,
   Eraser,
   Play,
+  Square,
   FileCode,
   FolderOpen,
   Info,
@@ -123,6 +125,7 @@ import {
   suggestNextFilename,
   type PlaygroundFile,
 } from "./playgroundTabs";
+import { utf8ByteLength } from "./utf8Size";
 import { getPlaygroundStore } from "./stores/createPlaygroundStore";
 import {
   deleteFile as opfsDeleteFile,
@@ -156,7 +159,16 @@ import {
   MobileMenuSubSheet,
 } from "./MobileMenuSheet";
 import { applyEntryFocus } from "./playgroundEntryFocus";
-import type { BundleCodeFile, WorkspaceBundle } from "@/lib/workspaces/types";
+import type {
+  BundleCodeFile,
+  BundleDataFile,
+  WorkspaceBundle,
+} from "@/lib/workspaces/types";
+import {
+  BUNDLE_MAX_DATA_BYTES,
+  BUNDLE_MAX_DATA_FILES,
+} from "@/lib/workspaces/types";
+import { bytesToBase64 } from "@/lib/workspaces/base64";
 import {
   FileCode2,
   PanelLeft,
@@ -189,6 +201,11 @@ const MOBILE_EDITOR_TAB = "editor" as const;
 /** Code playgrounds append runs to one scrolling history, so
  *  clear-before-run is opt-in here; the SQL playgrounds keep the default. */
 const CODE_CLEAR_BEFORE_RUN_DEFAULT = false;
+// How often the output panel repaints while a run is still producing
+// output. Fast enough to read as live, slow enough that a print-heavy loop
+// doesn't re-render per chunk.
+const LIVE_OUTPUT_FLUSH_MS = 80;
+
 // Minimum ms the "running" overlay shows so its 180ms CSS transition can
 // complete visibly.
 const MIN_ANIMATION_MS = 300;
@@ -602,6 +619,14 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const [editorTheme, setEditorThemeState] = useState<string>("github-light");
   const [wordWrap, setWordWrapState] = useState<boolean>(true);
   const [clearBeforeRun, setClearBeforeRunState] = useState<boolean>(false);
+  /** True once a runtime that implements `cancelRun` has booted; drives the
+   *  Run button's switch to Stop while a program is running. */
+  const [canStopRun, setCanStopRun] = useState(false);
+  const [stopping, setStopping] = useState(false);
+  /** Mid-run wait notice from the runtime (e.g. Python's first-run package
+   *  install), so a multi-second pause explains itself instead of looking
+   *  like a slow program. */
+  const [runStatusMessage, setRunStatusMessage] = useState<string | null>(null);
 
   // ─── UI state ───────────────────────────────────────────────────────────
   const [packagesOpen, setPackagesOpen] = useState(false);
@@ -744,6 +769,42 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // Serializes the live workspace (dirty buffers, falling back to OPFS)
   // into the portable bundle /api/workspaces and /api/shares store.
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  /** Data files that didn't fit in the last bundle, so Share can say so
+   *  instead of publishing a copy that silently can't run. */
+  const excludedShareFilesRef = useRef<string[]>([]);
+
+  /** Uploaded data files as base64, newest-smallest-first so a big archive
+   *  can't crowd out the little CSV the program actually reads. */
+  const collectBundleDataFiles = useCallback(
+    async (
+      wsId: string,
+    ): Promise<{ dataFiles: BundleDataFile[]; excluded: string[] }> => {
+      const dataFiles: BundleDataFile[] = [];
+      const excluded: string[] = [];
+      const candidates = virtualFilesRef.current
+        .filter((vf) => !vf.isFolder)
+        .slice()
+        .sort((a, b) => a.size - b.size);
+      let budget = BUNDLE_MAX_DATA_BYTES;
+      for (const vf of candidates) {
+        if (dataFiles.length >= BUNDLE_MAX_DATA_FILES) {
+          excluded.push(vf.path);
+          continue;
+        }
+        const bytes = await readDataFile(wsId, vf.path);
+        if (!bytes) continue;
+        if (bytes.length > budget) {
+          excluded.push(vf.path);
+          continue;
+        }
+        budget -= bytes.length;
+        dataFiles.push({ path: vf.path, base64: bytesToBase64(bytes) });
+      }
+      return { dataFiles, excluded };
+    },
+    [],
+  );
+
   const buildCloudBundle =
     useCallback(async (): Promise<WorkspaceBundle | null> => {
       const wsId = workspaceIdRef.current;
@@ -761,6 +822,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       const openFilenames = openTabIdsRef.current
         .map((id) => fileList.find((f) => f.id === id)?.filename)
         .filter((name): name is string => !!name);
+      // Uploaded data files ride along: the Files panel lists them as part
+      // of the workspace and programs read them by name, so a snapshot
+      // without them is a snapshot that doesn't run.
+      const { dataFiles, excluded } = await collectBundleDataFiles(wsId);
+      excludedShareFilesRef.current = excluded;
       return {
         version: 2,
         kind: "code",
@@ -768,10 +834,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         name: workspaceName || "Workspace",
         exportedAt: Date.now(),
         files: bundleFiles,
+        ...(dataFiles.length > 0 ? { dataFiles } : {}),
         activeFilename: active?.filename,
         openFilenames,
       };
-    }, [adapter.id, workspaceName]);
+    }, [adapter.id, collectBundleDataFiles, workspaceName]);
 
   useEffect(() => {
     settingsOpenRef.current = settingsOpen;
@@ -1641,6 +1708,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         // The playground can't predict what the user will type, so pre-warm
         // the full optional package set unconditionally. Fire-and-forget.
         rt.warmPackages?.([], { force: true });
+        // Only runtimes that can actually stop a run get a Stop control.
+        setCanStopRun(typeof rt.cancelRun === "function");
         setLoaded(true);
         setStatusState("ready");
       } catch (err) {
@@ -1992,11 +2061,90 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       setOutputsForFile(targetFileId, []);
     }
 
+    setRunStatusMessage(null);
+
     const t0 = performance.now();
-    const collected: Omit<OutputCell, "id" | "elapsed">[] = [];
+    // Notices the surface itself produces (a staging failure), kept out of
+    // `collected` because that array is addressed by stream position: a cell
+    // pushed at index 0 here would be overwritten by the run's first cell.
+    const preCells: Omit<OutputCell, "id" | "elapsed">[] = [];
+    // Sparse: a runtime that streams addresses cells by position, and a
+    // position can end up empty (a text segment that was only whitespace).
+    const collected: (Omit<OutputCell, "id" | "elapsed"> | undefined)[] = [];
     const firstId = outputCounter.current + 1;
     newRunFirstIdRef.current = firstId;
     const runId = ++runCounter.current;
+
+    /**
+     * Show what the run has produced so far.
+     *
+     * Called repeatedly while the program is still going (Python streams its
+     * stdout), so this replaces the run's whole slice rather than appending:
+     * `mergeConsecutiveStdout` is deterministic, so a growing input produces
+     * a growing output with a stable prefix, and deriving ids from `firstId`
+     * instead of the running counter keeps each cell's React key stable
+     * across updates.
+     */
+    const publish = (finishedAt?: number): number => {
+      const merged = mergeConsecutiveStdout([
+        ...preCells,
+        ...collected.filter(
+          (c): c is Omit<OutputCell, "id" | "elapsed"> => c !== undefined,
+        ),
+      ]);
+      const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
+      setOutputsForFile(targetFileId, (prev) => [
+        ...prev.filter((c) => c.runId !== runId),
+        ...merged.map((c, i) => ({
+          ...c,
+          id: firstId + i,
+          elapsed,
+          runId,
+          finishedAt,
+        })),
+      ]);
+      outputCounter.current = Math.max(
+        outputCounter.current,
+        firstId + merged.length - 1,
+      );
+      return merged.length;
+    };
+
+    // Throttled live publishing: the first cell shows immediately, the rest
+    // batch, so a 50,000-line run doesn't re-render per chunk.
+    let liveTimer: number | null = null;
+    let livePending = false;
+    const scheduleLive = () => {
+      if (liveTimer !== null) {
+        livePending = true;
+        return;
+      }
+      publish();
+      liveTimer = window.setTimeout(function tick() {
+        liveTimer = null;
+        if (!livePending) return;
+        livePending = false;
+        scheduleLive();
+      }, LIVE_OUTPUT_FLUSH_MS);
+    };
+    const stopLive = () => {
+      if (liveTimer !== null) {
+        window.clearTimeout(liveTimer);
+        liveTimer = null;
+      }
+    };
+    const emitCell: EmitOutput = (cell, seq, append) => {
+      if (seq === undefined) {
+        collected.push(cell);
+      } else {
+        const prev = collected[seq];
+        collected[seq] =
+          append && prev
+            ? { ...prev, content: prev.content + cell.content }
+            : cell;
+      }
+      scheduleLive();
+    };
 
     // Mirror files the runtime created during the run into the Files pane
     // + OPFS. Called on both success and error paths (a file may have been
@@ -2063,33 +2211,28 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           // Non-fatal: execution proceeds with whatever made it in.
           const msg =
             stageErr instanceof Error ? stageErr.message : String(stageErr);
-          collected.push({
+          preCells.push({
             type: "stderr",
             content: `Failed to stage workspace files: ${msg}`,
           });
         }
       }
-      const runOptions: RunOptions = {};
+      const runOptions: RunOptions = {
+        // Mid-run waits (Python's first-run package install) explain
+        // themselves in the output panel instead of looking like a hang.
+        onStatus: (message, preparing) => {
+          setRunStatusMessage(preparing ? message : null);
+        },
+      };
       if (entryFilename) runOptions.entryFilename = entryFilename;
       // Preview adapters render into the surface-owned slot; each run
       // replaces the previous iframe (which is also the teardown story).
       if (hasPreview) runOptions.previewHost = previewHostRef.current;
-      await rt.run(code, (cell) => collected.push(cell), runOptions);
+      await rt.run(code, emitCell, runOptions);
       await syncCreatedFiles();
-      const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
-      const finishedAt = Date.now();
-      const merged = mergeConsecutiveStdout(collected);
-      setOutputsForFile(targetFileId, (prev) => [
-        ...prev,
-        ...merged.map((c) => ({
-          ...c,
-          id: ++outputCounter.current,
-          elapsed,
-          runId,
-          finishedAt,
-        })),
-      ]);
-      if (collected.length === 0 && !hasPreview) {
+      stopLive();
+      const cellCount = publish(Date.now());
+      if (cellCount === 0 && !hasPreview) {
         // Preview adapters "output" the page itself; no toast there.
         showToast("Code ran successfully, no output.");
       }
@@ -2101,34 +2244,28 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     } catch (err) {
       // User code may have created files before throwing; surface them.
       await syncCreatedFiles();
-      const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
-      const finishedAt = Date.now();
+      stopLive();
+      // A Stop is a deliberate act, not a failure: whatever the program
+      // printed before it was stopped stays on screen, with a plain note.
+      const cancelled = err instanceof Error && err.name === "RunCancelledError";
       const msg = err instanceof Error ? err.message : String(err);
-      const mergedOnErr = mergeConsecutiveStdout(collected);
-      setOutputsForFile(targetFileId, (prev) => [
-        ...prev,
-        ...mergedOnErr.map((c) => ({
-          ...c,
-          id: ++outputCounter.current,
-          elapsed,
-          runId,
-          finishedAt,
-        })),
-        {
-          id: ++outputCounter.current,
-          type: "stderr" as const,
-          content: msg,
-          elapsed,
-          runId,
-          finishedAt,
-        },
-      ]);
-      setStatusState("error");
-      errorResetTimerRef.current = window.setTimeout(() => {
-        errorResetTimerRef.current = null;
+      collected.push({
+        type: "stderr" as const,
+        content: cancelled ? "Run stopped." : msg,
+      });
+      publish(Date.now());
+      if (cancelled) {
         setStatusState("ready");
-      }, 3000);
+      } else {
+        setStatusState("error");
+        errorResetTimerRef.current = window.setTimeout(() => {
+          errorResetTimerRef.current = null;
+          setStatusState("ready");
+        }, 3000);
+      }
     } finally {
+      stopLive();
+      setRunStatusMessage(null);
       // On narrow viewports, surface the output tab once the run is done.
       // Debounced auto-runs skip this — yanking the pane mid-typing would
       // be hostile.
@@ -2136,6 +2273,24 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     }
   },
   [clearBeforeRun, collectWorkspaceFilesForRun, hasPreview, setOutputsForFile, showToast]);
+
+  /** Stop the running program. The runtime rejects the in-flight `run()`
+   *  with a RunCancelledError, which `runCode` renders as "Run stopped."
+   *  above whatever the program had already printed. */
+  const stopRun = useCallback(async () => {
+    const rt = runtimeRef.current;
+    if (!rt?.cancelRun) return;
+    setStopping(true);
+    try {
+      await rt.cancelRun();
+    } catch (err) {
+      showToast(
+        `Couldn't stop the run: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    } finally {
+      setStopping(false);
+    }
+  }, [showToast]);
 
   const clearOutput = useCallback(() => {
     // Clear the pane the output panel is actually showing (split view
@@ -2587,9 +2742,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const mergedVirtualFiles = useMemo<VirtualFile[]>(() => {
     const codeEntries: VirtualFile[] = files.map((f) => ({
       path: f.filename,
-      // String length, not UTF-8 bytes — the same approximation FilesPanel
-      // uses everywhere else.
-      size: dirtyBuffers.get(f.id)?.length ?? 0,
+      // Real UTF-8 bytes, so the column agrees with os.path.getsize() inside
+      // the runtime for files containing accented text, CJK or emoji.
+      size: utf8ByteLength(dirtyBuffers.get(f.id) ?? ""),
       isFolder: false,
     }));
     const filteredData = virtualFiles.filter(
@@ -3397,10 +3552,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         items: [
           {
             key: "export",
-            label: "Export code",
+            // "Export code" read as "export the workspace"; it only ever
+            // wrote the file in front of you. The whole-workspace path is
+            // Save -> Download copy.
+            label: "Export current file",
             icon: ArrowDownToLine,
             panel: {
-              title: "Export code",
+              title: "Export current file",
               render: (close: () => void) => (
                 <>
                   {adapter.exportFormats.map((fmt) => (
@@ -3417,7 +3575,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                         {fmt.label}
                         <span className="ext-badge">.{fmt.extension}</span>
                       </div>
-                      <div className="ex-desc">Download as .{fmt.extension}</div>
+                      <div className="ex-desc">
+                        Downloads the open file only, as .{fmt.extension}
+                      </div>
                     </button>
                   ))}
                 </>
@@ -3744,6 +3904,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             <ShareControls
               workspaceName={workspaceName}
               buildBundle={buildCloudBundle}
+              excludedFiles={() => excludedShareFilesRef.current}
               shareOpen={shareDialogOpen}
               onShareOpenChange={setShareDialogOpen}
             />
@@ -4278,8 +4439,26 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 <kbd className="kbd">Enter</kbd>
               </span>
               <div
-                className={`playground-run-multi${runButtonState.dropdownItems.length > 0 ? " has-dropdown" : ""}${statusState === "running" ? " running" : ""}`}
+                className={`playground-run-multi${runButtonState.dropdownItems.length > 0 ? " has-dropdown" : ""}${statusState === "running" ? " running" : ""}${statusState === "running" && canStopRun ? " stoppable" : ""}`}
               >
+                {/* While a stoppable runtime is running, the primary button
+                    becomes Stop — an accidental `while True:` is one of the
+                    likeliest things a beginner writes, and reloading the page
+                    must not be the only way out. */}
+                {statusState === "running" && canStopRun ? (
+                  <button
+                    type="button"
+                    className="run-btn playground-run-multi-main stop"
+                    onClick={() => void stopRun()}
+                    disabled={stopping}
+                    title="Stop the running program"
+                  >
+                    <Square size={9} aria-hidden="true" fill="currentColor" />
+                    <span className="playground-run-multi-label">
+                      {stopping ? "Stopping…" : "Stop"}
+                    </span>
+                  </button>
+                ) : (
                 <Popover.Root>
                   <Popover.Trigger
                     render={(props) => (
@@ -4287,7 +4466,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                         {...props}
                         type="button"
                         className={`run-btn playground-run-multi-main${statusState === "running" ? " running" : ""}${runButtonState.dropdownItems.length > 0 ? " has-chevron" : ""}`}
-                        disabled={!loaded || statusState === "running"}
+                        // `stopping`: the previous run's Stop is still
+                        // standing a fresh interpreter up.
+                        disabled={!loaded || statusState === "running" || stopping}
                         onClick={() => {
                           void runCode(runButtonState.primaryEntry ?? undefined);
                         }}
@@ -4317,6 +4498,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     </Popover.Positioner>
                   </Popover.Portal>
                 </Popover.Root>
+                )}
                 {runButtonState.dropdownItems.length > 0 && (
                   <Menu.Root>
                     <Menu.Trigger
@@ -4325,7 +4507,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                           {...props}
                           type="button"
                           className={`run-btn playground-run-multi-chevron${statusState === "running" ? " running" : ""}`}
-                          disabled={!loaded || statusState === "running"}
+                          disabled={!loaded || statusState === "running" || stopping}
                           aria-label="More run options"
                         >
                           <ChevronDown size={12} aria-hidden="true" />
@@ -4672,7 +4854,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                   </div>
                 )
               ) : (
-                outputGroups.map((group, groupIndex) => {
+                <>
+                {/* Mid-run wait notice (package installs), so a multi-second
+                    pause before the first line explains itself. */}
+                {statusState === "running" && runStatusMessage && (
+                  <div className="run-status-note" role="status">
+                    {runStatusMessage}
+                  </div>
+                )}
+                {outputGroups.map((group, groupIndex) => {
                   // One slim cell per run. stderr-only runs read red;
                   // older runs dim, the newest stays full color.
                   const onlyStderr = group.every((c) => c.type === "stderr");
@@ -4790,7 +4980,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                       </div>
                     </div>
                   );
-                })
+                })}
+                </>
               )}
             </div>
             <DataslopeRunOverlay running={statusState === "running"} />

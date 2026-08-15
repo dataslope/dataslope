@@ -585,15 +585,17 @@ print("unpacked:", msgpack.unpackb(packed))
   // Networking & Utilities
   {
     cat: "Utilities", icon: "🌐", color: "#60a5fa", name: "requests", ver: "2.33",
-    desc: "HTTP requests (via micropip, pure Python)",
-    example: `# Note: real network calls are blocked in the browser sandbox; this
-# example shows the request-construction API instead of executing it.
-import requests
+    desc: "HTTP requests; real calls work, but only to hosts that allow CORS",
+    example: `import requests
 
-req = requests.Request("GET", "https://api.example.com/users",
-                       params={"q": "ada"}).prepare()
-print("URL:    ", req.url)
-print("method: ", req.method)
+# Requests really do go out, but the browser's same-origin policy applies:
+# a host that doesn't send an Access-Control-Allow-Origin header will fail
+# no matter what Python does. raw.githubusercontent.com sends one.
+url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv"
+r = requests.get(url, timeout=15)
+print("status:", r.status_code)
+print("bytes: ", len(r.content))
+print(r.text.splitlines()[0])
 `,
   },
   {
@@ -668,11 +670,18 @@ type WorkerOutMessage =
   | { kind: "ready" }
   | { kind: "init-error"; message: string }
   | { kind: "run-status"; id: number; message: string; preparing: boolean }
-  | { kind: "output"; id: number; cell: OutputCellMessage }
+  | {
+      kind: "output";
+      id: number;
+      cell: OutputCellMessage;
+      seq: number;
+      append?: boolean;
+    }
   | { kind: "done"; id: number }
   | { kind: "error"; id: number; message: string }
   | { kind: "prepare-fs-done"; id: number }
   | { kind: "prepare-fs-error"; id: number; message: string }
+  | { kind: "created-files"; id: number; files: Array<[string, Uint8Array]> }
   | {
       kind: "complete-result";
       id: number;
@@ -692,8 +701,59 @@ function detectChartTheme(): "light" | "dark" {
   return html.classList.contains("dark") ? "dark" : "light";
 }
 
+/** Spawns the Pyodide worker and resolves once it reports `ready`.
+ *  Shared by the first boot and by the respawn a Stop triggers. */
+function spawnPyodideWorker(
+  onLoading?: (message: string, fraction?: number) => void,
+): Promise<Worker> {
+  // Pre-bundled by `scripts/build-almostnode-workers.mjs` and served
+  // as a static asset, the same pattern as the JS/TS workers. Pyodide
+  // 314's environment detection throws "Classic web workers are not
+  // supported" when `importScripts` works (i.e. in a classic worker
+  // scope), so this worker MUST run with a real `{ type: "module" }`
+  // — and Turbopack strips the `type` option from workers it bundles
+  // itself (`new Worker(new URL(...), ...)`), which is why the
+  // bundler-analyzed construction can't be used here.
+  const worker = new Worker("/_workers/pyodide-worker.js", { type: "module" });
+  return new Promise<Worker>((resolve, reject) => {
+    const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+      const msg = ev.data;
+      if (msg.kind === "loading") {
+        onLoading?.(msg.message, msg.fraction);
+      } else if (msg.kind === "ready") {
+        worker.removeEventListener("message", onMessage);
+        resolve(worker);
+      } else if (msg.kind === "init-error") {
+        worker.removeEventListener("message", onMessage);
+        worker.terminate();
+        reject(new Error(msg.message));
+      }
+    };
+    worker.addEventListener("message", onMessage);
+    worker.addEventListener("error", (ev) => {
+      worker.removeEventListener("message", onMessage);
+      reject(new Error(ev.message || "Pyodide worker failed to start"));
+    });
+    worker.postMessage({ kind: "init" });
+  });
+}
+
 class PyodideWorkerRuntime implements LanguageRuntime {
   private nextId = 0;
+  /** Rejects the in-flight `run()` when Stop terminates the worker. */
+  private abortActiveRun: ((err: Error) => void) | null = null;
+  /** Settlers for the other in-flight requests (completions, staging,
+   *  created-file reads). A terminated worker never answers them, so Stop
+   *  has to release each one or the next run waits on a dead promise. */
+  private pendingAborts = new Set<() => void>();
+  /** Replayed after a respawn so the fresh interpreter re-warms the same
+   *  package set instead of paying for it on the user's next run. */
+  private lastWarmHint: { sources: string[]; force: boolean } | null = null;
+  /** Non-null between the Stop that killed the old worker and the moment its
+   *  replacement reports ready. Every entry point waits on (or declines for)
+   *  this, so nothing is ever posted to a terminated worker — which answers
+   *  no message, and would leave the caller's promise pending forever. */
+  private restartPromise: Promise<void> | null = null;
 
   constructor(private worker: Worker) {}
 
@@ -714,6 +774,7 @@ class PyodideWorkerRuntime implements LanguageRuntime {
       ...(options?.packages ?? []).map((mod) => `import ${mod}`),
     ].filter((s) => s.trim().length > 0);
     if (hints.length === 0 && !options?.force) return;
+    this.lastWarmHint = { sources: hints, force: options?.force ?? false };
     this.worker.postMessage({
       kind: "warm-packages",
       sources: hints,
@@ -721,13 +782,67 @@ class PyodideWorkerRuntime implements LanguageRuntime {
     });
   }
 
+  /**
+   * Stop the running program.
+   *
+   * Python has no yield point to interrupt from the outside here — a
+   * `while True:` never returns to the worker's event loop — so the only
+   * reliable lever is to kill the worker and stand a new one up. That costs
+   * the interpreter's state, which is already wiped between runs anyway
+   * (`_pg_reset_user_globals`), so nothing the user could observe is lost.
+   * Resolves once the replacement is ready to take a run.
+   */
+  async cancelRun(): Promise<void> {
+    if (this.restartPromise) return this.restartPromise;
+    // Tear down synchronously, so no caller can slip a message onto the dead
+    // worker between the terminate and the guard being in place.
+    const abort = this.abortActiveRun;
+    this.worker.terminate();
+    if (abort) {
+      const err = new Error("Run stopped.");
+      err.name = "RunCancelledError";
+      abort(err);
+    }
+    for (const release of [...this.pendingAborts]) release();
+    this.pendingAborts.clear();
+
+    this.restartPromise = (async () => {
+      try {
+        this.worker = await spawnPyodideWorker();
+        const warm = this.lastWarmHint;
+        if (warm) {
+          this.worker.postMessage({
+            kind: "warm-packages",
+            sources: warm.sources,
+            force: warm.force,
+          });
+        }
+      } finally {
+        this.restartPromise = null;
+      }
+    })();
+    return this.restartPromise;
+  }
+
   async run(
     code: string,
     emit: EmitOutput,
     options?: RunOptions,
   ): Promise<void> {
+    // A Stop leaves the runtime rebuilding itself; the next run belongs on
+    // the fresh interpreter, so wait rather than race it.
+    if (this.restartPromise) await this.restartPromise;
     const id = ++this.nextId;
+    const worker = this.worker;
     return new Promise<void>((resolve, reject) => {
+      const finish = (fn: () => void) => {
+        worker.removeEventListener("message", onMessage);
+        this.abortActiveRun = null;
+        fn();
+      };
+      // cancelRun() terminates the worker, so no further message ever
+      // arrives for this run — the promise has to be settled from here.
+      this.abortActiveRun = (err) => finish(() => reject(err));
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
         const msg = ev.data;
         // Ignore messages from earlier or unrelated runs.
@@ -747,30 +862,70 @@ class PyodideWorkerRuntime implements LanguageRuntime {
           return;
         }
         if (msg.kind === "output") {
-          emit(msg.cell);
+          emit(msg.cell, msg.seq, msg.append);
           return;
         }
-        this.worker.removeEventListener("message", onMessage);
-        if (msg.kind === "done") resolve();
-        else reject(new Error(msg.message));
+        if (msg.kind === "done") finish(resolve);
+        else finish(() => reject(new Error(msg.message)));
       };
-      this.worker.addEventListener("message", onMessage);
-      this.worker.postMessage({ kind: "run", id, code, theme: detectChartTheme() });
+      worker.addEventListener("message", onMessage);
+      worker.postMessage({
+        kind: "run",
+        id,
+        code,
+        theme: detectChartTheme(),
+        entryFilename: options?.entryFilename,
+      });
+    });
+  }
+
+  /** Files the run wrote into the working directory (`df.to_csv(...)`,
+   *  `plt.savefig(...)`, `open(..., "w")`). The worker re-stamps each one as
+   *  it reports it, so a file is handed over once per change. */
+  async collectCreatedFiles(): Promise<Map<string, Uint8Array>> {
+    // Terminating the worker took its filesystem with it, so a stopped run
+    // has nothing to hand back; don't stall the run's tail waiting for it.
+    if (this.restartPromise) return new Map();
+    const id = ++this.nextId;
+    const worker = this.worker;
+    return new Promise<Map<string, Uint8Array>>((resolve) => {
+      const settle = (files: Map<string, Uint8Array>) => {
+        worker.removeEventListener("message", onMessage);
+        this.pendingAborts.delete(release);
+        resolve(files);
+      };
+      const release = () => settle(new Map());
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        if (msg.kind !== "created-files" || msg.id !== id) return;
+        settle(new Map(msg.files));
+      };
+      this.pendingAborts.add(release);
+      worker.addEventListener("message", onMessage);
+      worker.postMessage({ kind: "collect-created-files", id });
     });
   }
 
   async complete(request: CompletionRequest): Promise<CompletionResult> {
+    if (this.restartPromise) return { list: [], replaceLength: 0 };
     const id = ++this.nextId;
+    const worker = this.worker;
     return new Promise<CompletionResult>((resolve) => {
+      const settle = (result: CompletionResult) => {
+        worker.removeEventListener("message", onMessage);
+        this.pendingAborts.delete(release);
+        resolve(result);
+      };
+      const release = () => settle({ list: [], replaceLength: 0 });
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
         const msg = ev.data;
         if (msg.kind !== "complete-result") return;
         if (msg.id !== id) return;
-        this.worker.removeEventListener("message", onMessage);
-        resolve({ list: msg.completions, replaceLength: msg.replaceLength });
+        settle({ list: msg.completions, replaceLength: msg.replaceLength });
       };
-      this.worker.addEventListener("message", onMessage);
-      this.worker.postMessage({
+      this.pendingAborts.add(release);
+      worker.addEventListener("message", onMessage);
+      worker.postMessage({
         kind: "complete",
         id,
         doc: request.doc,
@@ -782,12 +937,22 @@ class PyodideWorkerRuntime implements LanguageRuntime {
   }
 
   async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
+    if (this.restartPromise) await this.restartPromise;
     const id = ++this.nextId;
     // Send the workspace's exact filenames so `os.listdir()` matches the
     // user's mental model.
     const payload: Array<[string, Uint8Array]> = [];
     for (const [path, bytes] of files) payload.push([path, bytes]);
+    const worker = this.worker;
     return new Promise<void>((resolve, reject) => {
+      const settle = (fn: () => void) => {
+        worker.removeEventListener("message", onMessage);
+        this.pendingAborts.delete(release);
+        fn();
+      };
+      // Stop mid-staging: the fresh worker re-stages on the next run, so
+      // resolving is the honest outcome, not an error.
+      const release = () => settle(resolve);
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
         const msg = ev.data;
         if (
@@ -797,12 +962,12 @@ class PyodideWorkerRuntime implements LanguageRuntime {
           return;
         }
         if (msg.id !== id) return;
-        this.worker.removeEventListener("message", onMessage);
-        if (msg.kind === "prepare-fs-done") resolve();
-        else reject(new Error(msg.message));
+        if (msg.kind === "prepare-fs-done") settle(resolve);
+        else settle(() => reject(new Error(msg.message)));
       };
-      this.worker.addEventListener("message", onMessage);
-      this.worker.postMessage({ kind: "prepare-fs", id, files: payload });
+      this.pendingAborts.add(release);
+      worker.addEventListener("message", onMessage);
+      worker.postMessage({ kind: "prepare-fs", id, files: payload });
     });
   }
 }
@@ -866,38 +1031,7 @@ export const pythonAdapter: LanguageAdapter = {
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Starting Python runtime…", 0.02);
-    // Pre-bundled by `scripts/build-almostnode-workers.mjs` and served
-    // as a static asset, the same pattern as the JS/TS workers. Pyodide
-    // 314's environment detection throws "Classic web workers are not
-    // supported" when `importScripts` works (i.e. in a classic worker
-    // scope), so this worker MUST run with a real `{ type: "module" }`
-    // — and Turbopack strips the `type` option from workers it bundles
-    // itself (`new Worker(new URL(...), ...)`), which is why the
-    // bundler-analyzed construction can't be used here.
-    const worker = new Worker("/_workers/pyodide-worker.js", {
-      type: "module",
-    });
-
-    return new Promise<LanguageRuntime>((resolve, reject) => {
-      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
-        const msg = ev.data;
-        if (msg.kind === "loading") {
-          setLoadingMessage(msg.message, msg.fraction);
-        } else if (msg.kind === "ready") {
-          worker.removeEventListener("message", onMessage);
-          resolve(new PyodideWorkerRuntime(worker));
-        } else if (msg.kind === "init-error") {
-          worker.removeEventListener("message", onMessage);
-          worker.terminate();
-          reject(new Error(msg.message));
-        }
-      };
-      worker.addEventListener("message", onMessage);
-      worker.addEventListener("error", (ev) => {
-        worker.removeEventListener("message", onMessage);
-        reject(new Error(ev.message || "Pyodide worker failed to start"));
-      });
-      worker.postMessage({ kind: "init" });
-    });
+    const worker = await spawnPyodideWorker(setLoadingMessage);
+    return new PyodideWorkerRuntime(worker);
   },
 };
