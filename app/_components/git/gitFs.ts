@@ -14,6 +14,17 @@ import { MAX_FILE_BYTES, MAX_TREE_BYTES } from "./protocol";
 /** Structural type for the bits of `IFileSystem` we call or forward. */
 type AnyFs = InstanceType<typeof InMemoryFs> & Record<string, unknown>;
 
+interface JbStat {
+  isFile: boolean;
+  isDirectory: boolean;
+  isSymbolicLink: boolean;
+  mode: number;
+  size: number;
+  mtime: Date;
+  ino?: number | bigint;
+}
+
+
 const enc = new TextEncoder();
 const dec = new TextDecoder();
 
@@ -31,7 +42,27 @@ export class FileTooLargeError extends Error {
  * Enforces a per-file and whole-tree byte cap on every write path — shell
  * redirection, editor save, and upload all funnel through here.
  */
+/**
+ * isomorphic-git's index records mtime in **whole seconds**, and its
+ * status walk skips hashing a file whose size and mtime both match the index.
+ * In a browser that is fine, because seconds pass between a learner's edits.
+ * It is not fine for scenario seeding or history replay, where a whole lesson
+ * runs inside one millisecond and a same-length rewrite would read as
+ * unmodified. A virtual clock advancing one second per write keeps the
+ * shortcut honest without making anything wait.
+ */
+function monotonicMtimes() {
+  const stamps = new Map<string, number>();
+  let seq = 0;
+  const base = 1767225600000; // 2026-01-01T00:00:00Z, matching the commit clock.
+  return {
+    touch: (path: string) => stamps.set(path, base + (seq += 1) * 1000),
+    of: (path: string) => stamps.get(path),
+  };
+}
+
 export function cappedFs(inner: AnyFs): AnyFs {
+  const clock = monotonicMtimes();
   const guard = async (path: string, content: string | Uint8Array, appending: boolean) => {
     const incoming = byteLength(content);
     if (incoming > MAX_FILE_BYTES) throw new FileTooLargeError(path, MAX_FILE_BYTES);
@@ -65,12 +96,24 @@ export function cappedFs(inner: AnyFs): AnyFs {
       if (prop === "writeFile" || prop === "appendFile") {
         return async (path: string, content: string | Uint8Array, options?: unknown) => {
           await guard(path, content, prop === "appendFile");
-          return (target[prop] as (...a: unknown[]) => Promise<void>).call(
+          const result = await (target[prop] as (...a: unknown[]) => Promise<void>).call(
             target,
             path,
             content,
             options,
           );
+          clock.touch(path);
+          return result;
+        };
+      }
+      if (prop === "stat" || prop === "lstat") {
+        return async (path: string) => {
+          const s = (await (target[prop] as (p: string) => Promise<JbStat>).call(
+            target,
+            path,
+          )) as JbStat;
+          const stamped = clock.of(path);
+          return stamped === undefined ? s : { ...s, mtime: new Date(stamped) };
         };
       }
       const value = Reflect.get(target, prop, receiver);
@@ -81,16 +124,6 @@ export function cappedFs(inner: AnyFs): AnyFs {
 
 const errno = (code: string, message: string) =>
   Object.assign(new Error(`${code}: ${message}`), { code });
-
-interface JbStat {
-  isFile: boolean;
-  isDirectory: boolean;
-  isSymbolicLink: boolean;
-  mode: number;
-  size: number;
-  mtime: Date;
-  ino?: number | bigint;
-}
 
 /** IFileSystem reports booleans; isomorphic-git calls methods. */
 const toNodeStat = (s: JbStat) => ({

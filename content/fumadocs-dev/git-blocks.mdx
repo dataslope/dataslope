@@ -1,0 +1,158 @@
+---
+title: "Git Blocks"
+description: Sandbox for the `<GitBlock>` component, a runnable Git repository inside lesson prose.
+---
+
+`<GitBlock>` runs Git commands against a real repository in your browser.
+The engine is isomorphic-git for the repository and just-bash for the
+shell, both over one in-memory filesystem, so `ls` and `cat` see exactly
+what `git` wrote. Nothing is saved: a reload starts over.
+
+Every block gets its own repository unless it opts into sharing one.
+
+## A block that runs
+
+The simplest form: a scenario to start from, and a command script. The
+script is editable, so a reader can change a message and re-run.
+
+<GitBlock
+  scenario="linear-history"
+  label="Three commits on main"
+  commands={`git log --oneline
+git status`}
+/>
+
+## The state strip
+
+Every block carries a one-line summary of the repository. It is collapsed
+by default, because a lesson with a dozen blocks cannot afford a dozen
+panels. Click it to open a compact three-areas table and commit graph.
+
+Pass `expandState` on the blocks where the state *is* the lesson:
+
+<GitBlock
+  scenario="staged-and-unstaged"
+  label="One staged, one modified, one untracked"
+  expandState
+  commands={`git status --short`}
+/>
+
+## Watching a file move between areas
+
+The point of the three-areas panel is that `git add` moves a dot. Run
+this one with the state panel open and watch the Index column.
+
+<GitBlock
+  scenario="staged-and-unstaged"
+  label="Stage a modified file"
+  expandState
+  commands={`git add app.js
+git status --short`}
+/>
+
+## The shell is real
+
+`.git` is a directory, so the object model is reachable with ordinary
+commands. This is the cheapest way to make "a branch is a file containing
+a commit id" concrete.
+
+<GitBlock
+  scenario="linear-history"
+  label="HEAD is a pointer to a pointer"
+  commands={`cat .git/HEAD
+cat .git/refs/heads/main
+ls .git`}
+/>
+
+Shell and Git compose, because `git` is registered as a command inside the
+same shell:
+
+<GitBlock
+  scenario="linear-history"
+  label="Piping git into a builtin"
+  commands={`git log --oneline | wc -l
+git log --oneline | head -2`}
+/>
+
+## Blocks that share a repository
+
+Blocks with the same `repo` id continue each other in document order.
+Blocks without one are isolated, so re-running an earlier block can never
+corrupt a later one.
+
+<GitBlock
+  repo="tutorial"
+  scenario="empty"
+  label="Step 1: start a repository"
+  commands={`git init
+printf '# Tutorial\\n' > README.md
+git status --short`}
+/>
+
+<GitBlock
+  repo="tutorial"
+  scenario="empty"
+  label="Step 2: stage it"
+  expandState
+  commands={`git add README.md
+git status --short`}
+/>
+
+<GitBlock
+  repo="tutorial"
+  scenario="empty"
+  label="Step 3: commit it"
+  expandState
+  commands={`git commit -m "Initial commit"
+git log --oneline`}
+/>
+
+A reader who scrolls down and runs step 3 first does not get an error.
+The block notices it is out of order and offers to catch up, replaying the
+earlier steps before its own.
+
+## Conflicts
+
+The conflict scenario leaves two branches editing the same line. Merging
+them writes real conflict markers into the working tree, which is what a
+learner meets in a real terminal.
+
+<GitBlock
+  scenario="conflict-pending"
+  label="Cause a conflict, then look at it"
+  expandState
+  commands={`git merge rename
+cat config.yml`}
+/>
+
+## Unsupported commands
+
+The playground implements a teaching subset. Anything outside it says so
+and points at the list, rather than failing silently.
+
+<GitBlock
+  scenario="linear-history"
+  label="Out of scope"
+  commands={`git rebase main`}
+/>
+
+## Props
+
+| Prop | Type | Default | Notes |
+| --- | --- | --- | --- |
+| `commands` | `string` | required | Newline-separated commands. Editable before running. |
+| `scenario` | `string` | `linear-history` | `empty`, `linear-history`, `staged-and-unstaged`, `branching`, `conflict-pending`. |
+| `repo` | `string` | none | Share a repository with other blocks carrying the same id. |
+| `expandState` | `boolean` | `false` | Open the state panels on mount. |
+| `label` | `string` | none | Caption in the block header. |
+| `hideOpenInPlayground` | `boolean` | `false` | Hide the link out to `/playground/git`. |
+
+```jsx
+<GitBlock
+  scenario="linear-history"
+  label="Three commits on main"
+  expandState
+  commands={`git log --oneline
+git status`}
+/>
+```

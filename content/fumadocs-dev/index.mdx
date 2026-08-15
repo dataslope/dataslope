@@ -27,6 +27,17 @@ are loaded on demand.
 - Java, javac + the JVM via CheerpJ
 - C#, Roslyn on .NET wasm
 
+## Version control
+
+- Git, isomorphic-git for the repository and just-bash for the shell, over
+  one in-memory filesystem. See [Git Blocks](./git-blocks) and
+  [Git Challenge Cards](./git-challenge-cards).
+
+`<GitBlock>` and `<GitChallengeCard>` differ from the language components
+in two ways. They run commands rather than source, and they grade on
+**repository state** rather than printed output, which lets a challenge
+card tick its objectives live as the learner works.
+
 ## How code blocks work
 
 - Each `<CodeBlock>` is independent. State you set in one block is

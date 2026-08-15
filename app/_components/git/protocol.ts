@@ -47,12 +47,22 @@ export const EMPTY_STATE: RepoState = {
   cwd: "/repo",
 };
 
+/**
+ * Every request names a session. One Worker serves a whole page, but each
+ * session is a separate repository: sharing the worker is cheap, sharing repo
+ * state between unrelated blocks is the bug (a block would silently inherit
+ * the one above it). Blocks opt into continuity by passing the same id.
+ */
 export type GitWorkerRequest =
-  | { id: number; type: "init"; scenario: string }
-  | { id: number; type: "exec"; command: string }
-  | { id: number; type: "reset"; scenario: string }
-  | { id: number; type: "readFile"; path: string }
-  | { id: number; type: "writeFile"; path: string; content: string };
+  | { id: number; session: string; type: "init"; scenario: string }
+  | { id: number; session: string; type: "exec"; command: string }
+  | { id: number; session: string; type: "reset"; scenario: string }
+  | { id: number; session: string; type: "readFile"; path: string }
+  | { id: number; session: string; type: "writeFile"; path: string; content: string }
+  | { id: number; session: string; type: "dispose" }
+  /** Read a session's current state without re-seeding it, so a second block
+   *  sharing a repo id joins the first block's work rather than wiping it. */
+  | { id: number; session: string; type: "attach" };
 
 export type GitWorkerResponse =
   | {

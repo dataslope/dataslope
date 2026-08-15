@@ -25,7 +25,7 @@ import {
   useBootOverlayVisibility,
 } from "../PlaygroundBootOverlay";
 import { applyThemePalette, getStoredEditorTheme, applyMode } from "../playgroundTheme";
-import { useGitWorker } from "./useGitWorker";
+import { useGitSession } from "./gitRuntime";
 import { GitTerminal, type TranscriptEntry } from "./GitTerminal";
 import { ThreeAreasPanel } from "./ThreeAreasPanel";
 import { CommitGraph } from "./CommitGraph";
@@ -53,7 +53,10 @@ export default function GitPlayground() {
   const router = useRouter();
   const embedded = useIsFramed();
   const [scenario, setScenario] = useState(DEFAULT_SCENARIO);
-  const { state, ready, error, exec, reset, readFile, writeFile } = useGitWorker(scenario);
+  const { state, ready, error, exec, reset, readFile, writeFile } = useGitSession(
+    scenario,
+    "playground",
+  );
 
   const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
   const [input, setInput] = useState("");
@@ -139,7 +142,7 @@ export default function GitPlayground() {
       setHistory([]);
       previous.current = new Map();
       try {
-        if (next === scenario) await reset(next);
+        if (next === scenario) await reset();
         else setScenario(next);
       } finally {
         setBusy(false);

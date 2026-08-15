@@ -10,7 +10,7 @@
  * learner presses Enter.
  */
 
-import { useEffect, useLayoutEffect, useRef, type KeyboardEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, type KeyboardEvent, type ReactNode } from "react";
 
 export interface TranscriptEntry {
   id: number;
@@ -28,6 +28,11 @@ interface Props {
   history: string[];
   busy: boolean;
   completions: string[];
+  /** Transcript only, no prompt: `<GitBlock>` runs a fixed script rather than
+   *  taking free input. */
+  readOnly?: boolean;
+  /** Replaces the default empty-state copy. */
+  placeholderHint?: ReactNode;
 }
 
 export function GitTerminal({
@@ -38,6 +43,8 @@ export function GitTerminal({
   history,
   busy,
   completions,
+  readOnly = false,
+  placeholderHint,
 }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -49,8 +56,8 @@ export function GitTerminal({
   }, [transcript, busy]);
 
   useEffect(() => {
-    if (!busy) inputRef.current?.focus();
-  }, [busy]);
+    if (!busy && !readOnly) inputRef.current?.focus();
+  }, [busy, readOnly]);
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     if (event.key === "Enter") {
@@ -99,13 +106,13 @@ export function GitTerminal({
   return (
     <div className="git-terminal">
       <div className="git-terminal-scroll" ref={scrollRef}>
-        {transcript.length === 0 && (
+        {transcript.length === 0 && (placeholderHint ?? (
           <p className="git-terminal-hint">
             Type a Git command, or pick one from the panel on the right: it fills the prompt and
             you press Enter. <code>ls</code>, <code>cat</code> and friends work too, so{" "}
             <code>cat .git/HEAD</code> shows you what a branch really is.
           </p>
-        )}
+        ))}
         {transcript.map((entry) => (
           <div key={entry.id} className="git-terminal-block">
             <div className="git-terminal-command">
@@ -125,6 +132,7 @@ export function GitTerminal({
         {busy && <div className="git-terminal-busy">working…</div>}
       </div>
 
+      {!readOnly && (
       <form
         className="git-terminal-inputrow"
         onSubmit={(e) => {
@@ -151,6 +159,7 @@ export function GitTerminal({
           placeholder={busy ? "" : "git status"}
         />
       </form>
+      )}
     </div>
   );
 }

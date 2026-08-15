@@ -7,6 +7,7 @@
 
 import { describe, it, expect } from "vitest";
 import { Bash, defineCommand } from "just-bash/browser";
+import git from "isomorphic-git";
 import { createGitFs, FileTooLargeError } from "@/app/_components/git/gitFs";
 import { createGitCommand } from "@/app/_components/git/gitCommand";
 import { SCENARIOS, scenarioById } from "@/app/_components/git/scenarios";
@@ -87,6 +88,17 @@ describe("git command", () => {
     expect((await run("git log --oneline")).out).toContain("Add feature flag");
   });
 
+  it("puts the merged branch's files in the working tree", async () => {
+    const { run } = await seeded("branching");
+    expect((await run("ls")).out).not.toContain("feature.js");
+
+    await run("git merge feature");
+    // isomorphic-git updates the ref without touching the working directory,
+    // so a fast-forward would otherwise leave the file missing.
+    expect((await run("ls")).out).toContain("feature.js");
+    expect((await run("git status")).out).toContain("nothing to commit");
+  });
+
   it("surfaces a merge conflict rather than throwing", async () => {
     const { run } = await seeded("conflict-pending");
     const r = await run("git merge rename");
@@ -130,6 +142,66 @@ describe("the shell sees the same filesystem as git", () => {
   it("pipes git output into shell builtins", async () => {
     const { run } = await seeded("linear-history");
     expect((await run("git log --oneline | wc -l")).out.trim()).toBe("3");
+  });
+});
+
+describe("merge bookkeeping", () => {
+  it("gives the conflict-resolving commit two parents", async () => {
+    const { run, fs } = await seeded("conflict-pending");
+    expect((await run("git merge rename")).code).toBe(1);
+    expect((await run("git status")).out).toContain("You have unmerged paths");
+
+    await run(`printf 'title: Final\nauthor: unknown\n' > config.yml`);
+    await run("git add config.yml");
+    await run('git commit -m "Resolve"');
+
+    // isomorphic-git never writes MERGE_HEAD, so without explicit tracking the
+    // resolving commit would claim the merge never happened.
+    const log = await git.log({ fs: fs as never, dir: REPO, depth: 1 });
+    expect(log[0].commit.parent).toHaveLength(2);
+    expect((await run("git status")).out).not.toContain("unmerged paths");
+  });
+
+  it("refuses to delete an unmerged branch with -d", async () => {
+    const { run } = await seeded("branching");
+    const refused = await run("git branch -d feature");
+    expect(refused.code).toBe(1);
+    expect(refused.err).toContain("not fully merged");
+
+    expect((await run("git branch -D feature")).code).toBe(0);
+    expect((await run("git branch")).out).not.toContain("feature");
+  });
+
+  it("deletes a branch once its work is merged", async () => {
+    const { run } = await seeded("branching");
+    await run("git merge feature");
+    const deleted = await run("git branch -d feature");
+    expect(deleted.code).toBe(0);
+    expect(deleted.out).toContain("Deleted branch feature");
+  });
+
+  it("aborts a conflicted merge", async () => {
+    const { run } = await seeded("conflict-pending");
+    await run("git merge rename");
+    expect((await run("git merge --abort")).code).toBe(0);
+    expect((await run("git status")).out).not.toContain("unmerged paths");
+    expect((await run("git merge --abort")).code).toBe(128);
+  });
+});
+
+describe("change detection", () => {
+  it("notices a same-length rewrite inside one millisecond", async () => {
+    // isomorphic-git's index stores mtime in whole seconds and skips hashing
+    // when size and mtime match, so seeding a whole scenario in under a
+    // millisecond would otherwise report a modified file as clean.
+    const { run } = await session();
+    await run("git init");
+    await run(`printf 'const version = 1;\n' > app.js`);
+    await run("git add app.js");
+    await run('git commit -m "Add app"');
+    await run(`printf 'const version = 2;\n' > app.js`);
+
+    expect((await run("git status -s")).out).toContain("app.js");
   });
 });
 

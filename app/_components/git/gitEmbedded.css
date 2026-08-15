@@ -1,0 +1,454 @@
+/* ─── Embedded Git surfaces (GitBlock, GitChallengeCard) ────────────────── */
+@import "./gitPanels.css";
+/* These render inside lesson prose, not the playground shell, so they cannot
+   read playground.css's --bg/--text tokens (applyThemePalette only runs on a
+   playground route). They define their own semantic aliases over the brand
+   ramp and re-point them for dark mode, the same shape ChallengeCard.module.css
+   uses. The shared panel components (three areas, commit graph, terminal) read
+   the playground token names, so those are aliased here too. */
+
+.gitblock,
+.gitcard {
+  --gb-bg: var(--ds-white);
+  --gb-bg-subtle: var(--ds-gray-50);
+  --gb-bg-strong: var(--ds-gray-100);
+  --gb-border: var(--ds-gray-200);
+  --gb-text: var(--ds-gray-900);
+  --gb-text-secondary: var(--ds-gray-500);
+  --gb-text-muted: var(--ds-gray-400);
+  --gb-accent: var(--ds-blue-600);
+  --gb-red: var(--ds-red-600);
+  --gb-font-ui: var(--font-sans, system-ui, -apple-system, sans-serif);
+  --gb-font-mono: var(--font-mono, ui-monospace, monospace);
+
+  /* Aliases consumed by the shared panels. */
+  --bg: var(--gb-bg);
+  --bg2: var(--gb-bg-subtle);
+  --bg3: var(--gb-bg-strong);
+  --border: var(--gb-border);
+  --text: var(--gb-text);
+  --text-muted: var(--gb-text-secondary);
+  --text-dim: var(--gb-text-muted);
+  --primary: var(--gb-accent);
+  --primary-glow: rgba(8, 120, 221, 0.12);
+  --menu-item-hover: rgba(17, 24, 39, 0.06);
+  --red: var(--gb-red);
+  --green: var(--ds-green-600);
+  --yellow: var(--ds-yellow-600);
+  --font-ui: var(--gb-font-ui);
+
+  margin: 1.5rem 0;
+  border: 1px solid var(--gb-border);
+  border-radius: 8px;
+  background: var(--gb-bg);
+  color: var(--gb-text);
+  font-family: var(--gb-font-ui);
+  font-size: 14px;
+  overflow: hidden;
+}
+
+html:is(.dark, [data-theme="dark"]) .gitblock,
+html:is(.dark, [data-theme="dark"]) .gitcard {
+  --gb-bg: var(--color-fd-background, #121212);
+  --gb-bg-subtle: #0d0d0d;
+  --gb-bg-strong: #1c1c1c;
+  --gb-border: #232323;
+  --gb-text: #e0e0e0;
+  --gb-text-secondary: #b0b0b0;
+  --gb-text-muted: #808080;
+  --gb-accent: var(--ds-blue-400);
+  --gb-red: var(--ds-red-400);
+  --green: var(--ds-green-400);
+  --yellow: var(--ds-yellow-400);
+  --primary-glow: rgba(91, 167, 255, 0.16);
+  --menu-item-hover: rgba(224, 224, 224, 0.08);
+}
+
+/* Fumadocs' prose typography claims bare h2/p/ul/li/code inside a docs page,
+   so the panel elements that are those tags need their own scale restated at a
+   specificity that wins. Everything else comes from gitPanels.css. */
+.gitblock .git-panel-head h2,
+.gitcard .git-panel-head h2 {
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.gitblock .git-panel-empty,
+.gitcard .git-panel-empty,
+.gitblock .git-terminal-hint,
+.gitcard .git-terminal-hint {
+  margin: 0 0 8px;
+}
+
+.gitblock .git-graph-labels,
+.gitcard .git-graph-labels,
+.gitblock .git-file-list,
+.gitcard .git-file-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gitblock .git-graph-label,
+.gitcard .git-graph-label {
+  margin: 0;
+  padding-left: 6px;
+}
+
+.gitblock .git-graph-oid,
+.gitcard .git-graph-oid {
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+.gitblock .git-panel-empty code,
+.gitcard .git-panel-empty code,
+.gitblock .git-terminal-hint code,
+.gitcard .git-terminal-hint code {
+  border: none;
+  font-size: 0.92em;
+}
+
+.gitblock .git-areas,
+.gitcard .git-areas {
+  margin: 0;
+}
+
+.gitblock .git-areas th,
+.gitcard .git-areas th,
+.gitblock .git-areas td,
+.gitcard .git-areas td {
+  border: none;
+  background: none;
+}
+
+/* ─── Block header ─── */
+.gitblock-head,
+.gitcard-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--gb-border);
+  background: var(--gb-bg-subtle);
+  flex-wrap: wrap;
+}
+
+.gitblock-head-sep {
+  flex: 1;
+}
+
+.gitblock-tag {
+  font-family: var(--gb-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gb-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.gitblock-label,
+.gitblock-chain {
+  font-size: 12px;
+  color: var(--gb-text-secondary);
+}
+
+.gitblock-chain {
+  font-family: var(--gb-font-mono);
+  font-size: 11px;
+  color: var(--gb-text-muted);
+}
+
+.gitblock-btn,
+.gitblock-run,
+.gitblock-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 6px;
+  font-family: var(--gb-font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 9px;
+  cursor: pointer;
+  border: 1px solid var(--gb-border);
+  background: var(--gb-bg);
+  color: var(--gb-text-secondary);
+  text-decoration: none;
+}
+
+.gitblock-btn:hover:not(:disabled),
+.gitblock-open:hover {
+  color: var(--gb-text);
+  background: var(--gb-bg-strong);
+}
+
+.gitblock-run {
+  border-color: transparent;
+  background: var(--gb-accent);
+  color: #fff;
+}
+
+.gitblock-run:hover:not(:disabled) {
+  background: var(--ds-blue-700);
+  color: #fff;
+}
+
+.gitblock-btn:disabled,
+.gitblock-run:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ─── Command script ─── */
+.gitblock-script {
+  display: block;
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--gb-border);
+  background: var(--gb-bg);
+  color: var(--gb-text);
+  font-family: var(--gb-font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 10px 12px;
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.gitblock-script:focus {
+  background: var(--gb-bg-subtle);
+}
+
+.gitblock-notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--gb-border);
+  background: rgba(255, 221, 108, 0.16);
+  font-size: 12.5px;
+  color: var(--gb-text);
+}
+
+.gitblock-notice.error {
+  background: rgba(220, 63, 73, 0.12);
+  color: var(--gb-red);
+}
+
+.gitblock-notice code {
+  font-family: var(--gb-font-mono);
+  font-size: 11.5px;
+}
+
+/* ─── Output ─── */
+.gitblock-output {
+  background: var(--gb-bg-subtle);
+  border-bottom: 1px solid var(--gb-border);
+  max-height: 320px;
+  display: flex;
+}
+
+.gitblock-output .git-terminal-scroll {
+  padding: 10px 12px;
+  font-size: 12.5px;
+}
+
+/* ─── State strip ─── */
+.gitblock-strip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  border: none;
+  background: var(--gb-bg-subtle);
+  color: var(--gb-text-secondary);
+  font-family: var(--gb-font-mono);
+  font-size: 11.5px;
+  padding: 6px 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.gitblock-strip:hover {
+  color: var(--gb-text);
+}
+
+.gitblock-strip-caret {
+  flex: none;
+  transition: transform 0.15s;
+}
+
+.gitblock-strip-caret.open {
+  transform: rotate(90deg);
+}
+
+.gitblock-strip-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gitblock-strip-action {
+  flex: none;
+  font-family: var(--gb-font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gb-accent);
+}
+
+.gitblock-panels {
+  border-top: 1px solid var(--gb-border);
+  background: var(--gb-bg);
+}
+
+.gitblock-panels .git-graph-scroll {
+  max-height: 190px;
+}
+
+/* ─── Challenge card ─── */
+.gitcard {
+  margin: 2rem 0;
+}
+
+.gitcard.solved {
+  border-color: rgba(10, 168, 15, 0.45);
+}
+
+.gitcard-badge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--gb-accent);
+}
+
+.gitcard-title {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--gb-text);
+}
+
+.gitcard-progress {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gb-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gitcard-progress.solved {
+  color: var(--green);
+}
+
+.gitcard-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(240px, 0.95fr);
+}
+
+.gitcard-left {
+  padding: 12px 14px;
+  min-width: 0;
+}
+
+.gitcard-right {
+  border-left: 1px solid var(--gb-border);
+  background: var(--gb-bg-subtle);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.gitcard-right > :first-child {
+  padding: 12px 14px;
+}
+
+.gitcard-instructions {
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--gb-text);
+  margin-bottom: 10px;
+}
+
+.gitcard-instructions p {
+  margin: 0 0 0.6em;
+}
+
+.gitcard-instructions code {
+  background: var(--gb-bg-strong);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: var(--gb-font-mono);
+  font-size: 12px;
+}
+
+.gitcard-terminal {
+  border: 1px solid var(--gb-border);
+  border-radius: 6px;
+  background: var(--gb-bg-subtle);
+  min-height: 160px;
+  max-height: 300px;
+  display: flex;
+  overflow: hidden;
+}
+
+.gitcard-terminal .git-terminal-scroll {
+  font-size: 12.5px;
+  padding: 10px 12px;
+}
+
+.gitcard-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.gitcard-hint,
+.gitcard-verdict {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--gb-text-secondary);
+  border-left: 2px solid var(--gb-border);
+  padding-left: 10px;
+}
+
+.gitcard-verdict {
+  border-left-color: var(--gb-red);
+  color: var(--gb-red);
+}
+
+.gitcard-solution {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--gb-bg-strong);
+  font-family: var(--gb-font-mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--gb-text);
+  overflow-x: auto;
+  white-space: pre;
+}
+
+@media (max-width: 720px) {
+  .gitcard-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gitcard-right {
+    border-left: none;
+    border-top: 1px solid var(--gb-border);
+  }
+}

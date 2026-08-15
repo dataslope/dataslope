@@ -13,7 +13,7 @@
 import { useState } from "react";
 import { FilePlus2, Save } from "lucide-react";
 import type { RepoState } from "./protocol";
-import type { CommandResult } from "./useGitWorker";
+import type { CommandResult } from "./gitRuntime";
 
 interface Props {
   state: RepoState;

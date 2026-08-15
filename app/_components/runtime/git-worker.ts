@@ -43,7 +43,9 @@ type Session = {
   clock: { commits: number };
 };
 
-let session: Session | null = null;
+/** One repository per session id. The Worker is shared by a whole page; the
+ *  sessions are not (see GitWorkerRequest). */
+const sessions = new Map<string, Session>();
 
 async function createSession(): Promise<Session> {
   const { store, fs } = createGitFs();
@@ -181,6 +183,15 @@ async function readState(s: Session): Promise<RepoState> {
   };
 }
 
+async function sessionFor(id: string): Promise<Session> {
+  let s = sessions.get(id);
+  if (!s) {
+    s = await createSession();
+    sessions.set(id, s);
+  }
+  return s;
+}
+
 const post = (msg: GitWorkerResponse) => (self as unknown as Worker).postMessage(msg);
 
 self.addEventListener("message", (event: MessageEvent<GitWorkerRequest>) => {
@@ -190,26 +201,27 @@ self.addEventListener("message", (event: MessageEvent<GitWorkerRequest>) => {
       switch (req.type) {
         case "init":
         case "reset": {
-          session = await seed(req.scenario);
-          post({ id: req.id, ok: true, stdout: "", stderr: "", exitCode: 0, state: await readState(session) });
+          const seeded = await seed(req.scenario);
+          sessions.set(req.session, seeded);
+          post({ id: req.id, ok: true, stdout: "", stderr: "", exitCode: 0, state: await readState(seeded) });
           return;
         }
         case "exec": {
-          if (!session) session = await createSession();
-          const result = await runCommand(session.bash, req.command);
+          const s = await sessionFor(req.session);
+          const result = await runCommand(s.bash, req.command);
           post({
             id: req.id,
             ok: true,
             stdout: result.stdout,
             stderr: result.stderr,
             exitCode: result.exitCode,
-            state: await readState(session),
+            state: await readState(s),
           });
           return;
         }
         case "readFile": {
-          if (!session) session = await createSession();
-          const content = await session.store.readFile(`${REPO}/${req.path}`).catch(() => "");
+          const s = await sessionFor(req.session);
+          const content = await s.store.readFile(`${REPO}/${req.path}`).catch(() => "");
           post({
             id: req.id,
             ok: true,
@@ -217,21 +229,31 @@ self.addEventListener("message", (event: MessageEvent<GitWorkerRequest>) => {
             stderr: "",
             exitCode: 0,
             content,
-            state: await readState(session),
+            state: await readState(s),
           });
           return;
         }
         case "writeFile": {
-          if (!session) session = await createSession();
+          const s = await sessionFor(req.session);
           let stderr = "";
           let exitCode = 0;
           try {
-            await session.store.writeFile(`${REPO}/${req.path}`, req.content);
+            await s.store.writeFile(`${REPO}/${req.path}`, req.content);
           } catch (e) {
             stderr = `${(e as Error).message}\n`;
             exitCode = 1;
           }
-          post({ id: req.id, ok: true, stdout: "", stderr, exitCode, state: await readState(session) });
+          post({ id: req.id, ok: true, stdout: "", stderr, exitCode, state: await readState(s) });
+          return;
+        }
+        case "attach": {
+          const s = await sessionFor(req.session);
+          post({ id: req.id, ok: true, stdout: "", stderr: "", exitCode: 0, state: await readState(s) });
+          return;
+        }
+        case "dispose": {
+          sessions.delete(req.session);
+          post({ id: req.id, ok: true, stdout: "", stderr: "", exitCode: 0, state: EMPTY_STATE });
           return;
         }
       }

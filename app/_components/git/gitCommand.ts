@@ -78,6 +78,11 @@ export function createGitCommand(opts: GitCommandOptions) {
   const fs = opts.fs as FsArg;
   const author = opts.author ?? AUTHOR;
 
+  /** isomorphic-git never writes MERGE_HEAD, so a conflicted merge is tracked
+   *  here. Without it the commit that resolves a conflict would have a single
+   *  parent, and the history would claim a merge never happened. */
+  let pendingMerge: { branch: string; oid: string } | null = null;
+
   const isRepo = async () => {
     try {
       await git.resolveRef({ fs, dir, ref: "HEAD", depth: 1 });
@@ -132,6 +137,13 @@ export function createGitCommand(opts: GitCommandOptions) {
     }
 
     const out: string[] = [branch ? `On branch ${branch}` : "HEAD detached"];
+    if (pendingMerge) {
+      out.push(
+        `You have unmerged paths.`,
+        `  (fix conflicts and run "git commit")`,
+        `  (use "git merge --abort" to abort the merge)`,
+      );
+    }
     if (!(await headOid())) out.push("", "No commits yet");
 
     const stagedAll = [...new Set([...staged, ...deletedStaged])];
@@ -199,6 +211,9 @@ export function createGitCommand(opts: GitCommandOptions) {
     }
     const timestamp = EPOCH + clock.commits * 60;
     clock.commits += 1;
+    const head = await headOid();
+    const parents =
+      pendingMerge && head ? [head, pendingMerge.oid] : undefined;
     const oid = await git.commit({
       fs,
       dir,
@@ -206,7 +221,9 @@ export function createGitCommand(opts: GitCommandOptions) {
       author: { ...author, timestamp, timezoneOffset: 0 },
       committer: { ...author, timestamp, timezoneOffset: 0 },
       amend: flags.has("--amend") || undefined,
+      ...(parents ? { parent: parents } : {}),
     });
+    pendingMerge = null;
     const branch = await currentBranch();
     const count = matrix.filter(([, h, , s]) => s !== h).length;
     const root = (await git.log({ fs, dir, depth: 2 })).length === 1 ? " (root-commit)" : "";
@@ -278,8 +295,27 @@ export function createGitCommand(opts: GitCommandOptions) {
       if (name === (await currentBranch())) {
         return fail(`error: Cannot delete branch '${name}' checked out at '${dir}'\n`, 1);
       }
+      if (!(await git.listBranches({ fs, dir })).includes(name)) {
+        return fail(`error: branch '${name}' not found.\n`, 1);
+      }
+      // Real git refuses to drop unmerged work with -d, which is the whole
+      // point of the flag; -D is the override.
+      if (!flags.has("-D")) {
+        const tip = await git.resolveRef({ fs, dir, ref: name });
+        const reachable = (await git.log({ fs, dir, depth: 200 }).catch(() => [])).some(
+          (c) => c.oid === tip,
+        );
+        if (!reachable) {
+          return fail(
+            `error: The branch '${name}' is not fully merged.\n` +
+              `If you are sure you want to delete it, run 'git branch -D ${name}'.\n`,
+            1,
+          );
+        }
+      }
+      const short_ = (await git.resolveRef({ fs, dir, ref: name })).slice(0, 7);
       await git.deleteBranch({ fs, dir, ref: name });
-      return ok(`Deleted branch ${name}\n`);
+      return ok(`Deleted branch ${name} (was ${short_}).\n`);
     }
     if (rest.length) {
       const name = rest[0];
@@ -320,8 +356,18 @@ export function createGitCommand(opts: GitCommandOptions) {
     return ok(`Switched to branch '${target}'\n`);
   }
 
+  const flagsOf = (args: string[]) => splitFlags(args).flags;
+
   async function merge(args: string[]): Promise<ExecResult> {
     await requireRepo();
+    // Handled before the target guard: `--abort` takes no branch name.
+    if (flagsOf(args).has("--abort")) {
+      if (!pendingMerge) return fail("fatal: There is no merge to abort.\n", 128);
+      pendingMerge = null;
+      const current = await currentBranch();
+      if (current) await git.checkout({ fs, dir, ref: current, force: true });
+      return ok();
+    }
     const { rest } = splitFlags(args);
     const theirs = rest[0];
     if (!theirs) return fail("fatal: no merge target specified\n", 128);
@@ -340,6 +386,9 @@ export function createGitCommand(opts: GitCommandOptions) {
         author: { ...author, timestamp: EPOCH + clock.commits * 60, timezoneOffset: 0 },
         message: `Merge branch '${theirs}' into ${ours}`,
       });
+      // isomorphic-git moves the ref but leaves the working tree alone, so
+      // without this the merged files never appear on disk.
+      await git.checkout({ fs, dir, ref: ours, force: true });
       if (result.fastForward) return ok(`Updating ${theirs}\nFast-forward\n`);
       clock.commits += 1;
       return ok(`Merge made by the 'ort' strategy.\n`);
@@ -347,6 +396,11 @@ export function createGitCommand(opts: GitCommandOptions) {
       const err = e as { code?: string; data?: { filepaths?: string[] } };
       if (err.code === "MergeConflictError") {
         const files = err.data?.filepaths ?? [];
+        try {
+          pendingMerge = { branch: theirs, oid: await git.resolveRef({ fs, dir, ref: theirs }) };
+        } catch {
+          pendingMerge = null;
+        }
         return fail(
           [
             ...files.map((f) => `Auto-merging ${f}`),
