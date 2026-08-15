@@ -22,7 +22,7 @@ import brotliR2IncrementalCache from "./lib/cache/brotliR2IncrementalCache";
 // responses aren't stored there, so every visitor costs one Worker invocation
 // plus one R2 GET. `withRegionalCache` fronts R2 with the per-colo Cache API;
 // it does not remove the Worker invocation (only an origin-side Cache Rule
-// can — dashboard config, see README.md "Incremental cache cleanup").
+// can — dashboard config, see DEVELOPMENT.md "Incremental cache cleanup").
 //
 // Both non-default options are safe because the regional key is scoped by
 // build ID (the deployed commit SHA), making entries immutable per deploy:
