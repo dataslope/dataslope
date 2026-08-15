@@ -958,6 +958,31 @@ Manifests live in `node_modules/.cache/dataslope-build/`, so `npm ci` wipes
 them and the first run after an install regenerates everything — which is when
 it should.
 
+**Except for one generator, deliberately.** `build-search-corpus` passes
+`persist: true`, which moves its stamp *and a copy of its output* into
+`.next/cache/dataslope-build/`. That is the only build directory Workers Builds
+restores, and it survives `next build` (Next cleans `.next` with an exclude of
+`^(cache|dev|lock|trace)`). It matters because of the paragraph below this one:
+the chain runs cold on every deploy, and remark over ~889 lessons is 18.6 s of
+the runner's 38 s generator chain. Restoring instead takes ~240 ms.
+
+Two things keep that honest, and both are load-bearing:
+
+- **Restored outputs are hash-verified** against the manifest before they are
+  trusted; a mismatch deletes the copy and regenerates. This repo has already
+  shipped one incident caused by a corrupt Workers Builds cache restore (see
+  `scripts/check-prefetch-hints.mjs`), so generated *content* living in that
+  cache must degrade to "regenerate", never to "ship wrong bytes".
+- **`package-lock.json` is folded into the salt** for persisted generators.
+  `npm ci` wiping the manifests is what used to invalidate a generator after a
+  dependency bump — a generator lists its own source and its data as inputs,
+  not the version of the library that parses them. Persisting across installs
+  removes that implicit invalidation, so it is made explicit.
+
+Opt in only when `outputs` names **every** file the generator writes.
+`build-course-md` declares one representative of 834 files, which is fine for
+an existence check and would be wrong for a restore.
+
 **Which is also why the cold number still matters.** Cloudflare Workers Builds
 runs `npm ci` on every build and its build cache covers `.npm` and `.next/cache`
 but *not* `node_modules`, so no deploy has ever hit one of these gates: the
