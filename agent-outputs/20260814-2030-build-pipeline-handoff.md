@@ -10,6 +10,8 @@
 > **You are the operator.** PR #665 is written, tested and pushed but **not merged**.
 > Four of the changes do nothing until you edit the Cloudflare dashboard, and **one of those
 > edits is order-dependent** — see [Merge runbook](#merge-runbook). Do that section in order.
+>
+> Step 2 is the only optional one, and it is not build-related at all.
 
 ---
 
@@ -18,7 +20,7 @@
 | | |
 | --- | --- |
 | **Shipped in the branch** | corpus build −10 s · install −37 % · R2 upload 2.340 GiB → 0.135 GiB · a typecheck/lint/test gate that did not exist |
-| **Needs you** | 4 dashboard fields + branch protection, in the order below |
+| **Needs you** | 4 Cloudflare dashboard fields, in the order below. No GitHub config required. |
 | **One landmine** | add `compress-cache` to the **build command only after** the Worker is deployed |
 | **Still open** | generator cache (~35 s), and one stage nobody has a baseline for |
 
@@ -59,13 +61,20 @@ decode back to valid JSON.
 Nothing below works before this. The Worker must be *deployed* with the brotli reader before the
 build command starts producing brotli bytes.
 
-### 2. Branch ruleset on `main` — but *not* required status checks
+### 2. Branch ruleset on `main` — **optional, and unrelated to the build**
 
-Settings → Rules → Rulesets → New branch ruleset. Target the default branch, enforcement **Active**,
-and tick **Restrict deletions** and **Block force pushes**. Leave **Require status checks to pass**
-OFF, and leave **Require a pull request before merging** off too.
+Nothing in this branch needs one. It is listed here only because an earlier draft of this runbook
+asked for one, and the reason it did has since been retired: a ruleset was only ever the
+prerequisite for `ignoreBuildErrors` (step 5), which is no longer recommended. Every measured
+saving in this branch is independent of branch protection. **Skipping this step costs nothing.**
 
-**Why not require the check, when this branch adds the repo's only one.** That rule gates *ref
+If you want it anyway, it is generic repo safety rather than build tooling: Settings → Rules →
+Rulesets → New branch ruleset, target the default branch, enforcement **Active**, tick **Restrict
+deletions** and **Block force pushes**. Those are policies rather than checks, and the bot workflows
+below do ordinary pushes, so nothing conflicts. Leave **Require status checks to pass** OFF, and
+leave **Require a pull request before merging** off too.
+
+**Why not require the check, even though this branch adds the repo's only one.** That rule gates *ref
 updates*, not merges — GitHub's own wording is "commits must first be pushed to another ref where
 the checks pass". Four workflows push generated content straight to `main` with `GITHUB_TOKEN`
 (`block-outputs`, `react-bundles`, `refresh-created-at`, `optimize-images`), and none of their
