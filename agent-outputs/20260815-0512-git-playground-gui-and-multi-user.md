@@ -29,6 +29,8 @@ dropping persistence entirely in favour of an in-memory filesystem.
 | WebContainers / v86 / `almostnode` | **No.** COOP/COEP conflict; VM weight; almostnode is ~16 MB (§4.8). |
 | **Memory-only — no OPFS, no cloud** | **Adopted.** Git's filesystem is derived state, not authored code (§5.1). Deletes §7.1, §7.2 and §7.3.2 of the original. |
 | Share links | **Kept, in better form.** Share the command history, not the filesystem — a URL, not an R2 object (§5.4). |
+| Size caps | **Required regardless of sharing.** `maxFileSystemBytes` does not apply to an injected FS, and per-command snapshots make large files fatal (§5.7.2). |
+| Shared history as untrusted input | **Real, but small.** Needs a tight `executionLimits` profile and pre-replay bounds (§5.7.4). |
 | `sessionStorage` for command history | **Open.** Buys refresh recovery for a few KB of strings; declinable independently of the filesystem decision (§5.5). |
 
 The single most valuable line in this addendum is §3.3: the collaboration
@@ -562,11 +564,14 @@ Keep it by sharing the **command history** instead of the filesystem:
 /playground/git?scenario=conflict-pending&h=<compressed command list>
 ```
 
-Replayed on load. This is strictly better than the bundle it replaces —
-smaller, inspectable in the address bar, no R2 object, no D1 row, and no
-untrusted binary format to harden. It also subsumes the `[↗] Open in
+Replayed on load. Smaller than the bundle it replaces, inspectable in the
+address bar, no R2 object and no D1 row. It also subsumes the `[↗] Open in
 playground` handoff from `<GitBlock>` (§5.2 of the original): hand over the
 block's command list, which the block already has.
+
+It removes the *binary parsing* surface the tar format would have introduced,
+but **it is not untrusted-input-free** — see §5.7, which supersedes an
+earlier claim in this section that it was.
 
 Two requirements this creates, both worth building in deliberately:
 
@@ -594,6 +599,115 @@ can be declined independently; the filesystem stays memory-only either way.
 
 Deliberately *not* mitigated: cross-device resume. Course progress is tracked
 separately, and a playground session is exploration rather than coursework.
+
+### 5.7 Large files, size caps, and replay as untrusted input
+
+Sharing the command history moves the size problem rather than removing it:
+editor saves are serialized as heredocs (§5.4), so **file contents end up in
+the URL**, and §3.2 of the original explicitly permits file upload.
+
+#### 5.7.1 The discriminator is entropy, not file size
+
+Measured 2026-08-15 — gzip + base64url of a realistic history:
+
+| Shared history | URL chars |
+| --- | ---: |
+| 10 git commands | 178 |
+| 40 git commands | 188 |
+| 300 git commands | 220 |
+| 40 commands + 2 KB source file | 258 |
+| 40 commands + 32 KB source file | 383 |
+| 40 commands + 256 KB source file | 1,132 |
+| **40 commands + 256 KB random bytes** | **343,031** |
+
+Two conclusions:
+
+1. **Commands are free.** 300 of them cost 220 characters. History length is
+   never the constraint.
+2. **A file-size cap cannot predict URL size.** 256 KB of repetitive source
+   costs 1 KB encoded; 256 KB of incompressible content (an image, a zip, a
+   minified bundle) costs 343 KB and is instantly unshareable. The gate has
+   to be on the *encoded length*, computed at share time.
+
+A useful corollary: *generated* content is free. `seq 1 100000 > big.txt` is
+24 characters of history and regenerates 588 KB on replay. Only literal bytes
+— paste and upload — are expensive, so the caps below bite less often than
+expected.
+
+#### 5.7.2 Write-time caps are required regardless of sharing
+
+**`just-bash`'s `maxFileSystemBytes` does not apply to a supplied `fs`.** Its
+documentation says "Bash's *default* in-memory filesystem"; verified — a
+588 KB write completed cleanly under a 100 KB cap when the FS was injected.
+Since §4.2 requires injecting our own `IFileSystem` to share it with
+isomorphic-git, **storage limits are our responsibility.** Interpreter limits
+(iterations, traversal, source bytes) still apply; byte limits do not.
+
+The motivating reason is not sharing. §6.3 of the original snapshots the
+filesystem before *every command* for time travel, so a 5 MB file becomes
+~200 MB of clones across a 40-command session unless snapshots use structural
+sharing. Under §5's memory-only model that is a dead tab. **Large files break
+the playground before they break a URL.**
+
+Enforce in the `IFileSystem` wrapper, which is the single chokepoint all three
+write paths pass through — shell redirection, editor save, and upload:
+
+| Cap | Suggested | Rationale |
+| --- | --- | --- |
+| Per file | 256 KB | Well above any teaching file; far below snapshot pain |
+| Whole working tree | 2 MB | Bounds the per-command snapshot clone |
+| Upload, pre-read | same 256 KB | Reject at the picker, before reading bytes into memory |
+
+Error wording should be real and specific:
+`cannot write 'data.csv': exceeds the 256 KB playground limit`. Silent
+truncation is the one unacceptable behaviour.
+
+#### 5.7.3 Share-time budget: fail loudly, or share structure only
+
+Because entropy decides, compute the **actual encoded URL** when the learner
+clicks Share and compare against a budget (~8 KB is safely inside browser and
+CDN ceilings; measure the real limit on the deployed stack rather than
+assuming one). Over budget, offer a choice rather than truncating:
+
+1. **Drop the oversized files** — named explicitly, so the learner knows what
+   is being lost.
+2. **Share structure only** — preserve the commit graph, branches, HEAD and
+   the command history, replacing oversized blobs with same-sized
+   placeholders.
+
+Option 2 fits the use case §7.2 of the original actually described. A stuck
+learner's problem is nearly always structural — a detached HEAD, a bad merge,
+divergence from `origin` — not the bytes inside a binary. A share that
+reproduces the graph and stubs the blobs answers the real question.
+
+#### 5.7.4 A replayed history is untrusted input
+
+A shared history is a program written by someone else that executes in the
+recipient's tab, and it can be **cheap in the URL but ruinous to run**:
+`seq 1 100000000 > f` is 24 characters.
+
+`just-bash`'s interpreter limits do apply to an injected FS and behave well.
+Verified, each returning exit 126 with real bash wording:
+
+```
+bash: while loop: too many iterations (500), increase executionLimits.maxLoopIterations
+bash: seq: iteration limit exceeded (100000)
+bash: script input size limit exceeded (1000 bytes)
+bash: find: filesystem traversal entry limit exceeded (2)
+```
+
+Replay therefore needs, together:
+
+- a tight `executionLimits` profile — the defaults are sized for server
+  sandboxes (`maxFileSystemBytes` 1 GiB, `maxLiveBytes` 512 MiB) and are
+  far too generous for a browser tab;
+- a cap on history length and total decoded size, checked *before* replay
+  begins;
+- the §5.7.2 write caps active during replay, not only during authoring.
+
+This is a smaller surface than validating an untrusted tar (§7.3.2 of the
+original), and the enforcement primitives already exist — but it is not zero,
+and §5.4 should not be read as claiming otherwise.
 
 ### 5.6 The registry gotcha survives, in a smaller form
 
@@ -665,10 +779,10 @@ Data-model shaping for phase 4 (§3.6) happens in phase 2, when scenarios and
 8. **Does the command history persist to `sessionStorage`?** (§5.5) The
    filesystem decision is settled; this one is not, and can go either way
    without affecting anything else.
-9. **How large can a shared history URL get before it needs shortening?** A
-   40-command session compresses to a few hundred bytes, but a long
-   exploration plus heredoc'd file contents could exceed practical URL
-   limits. Decide the fallback (truncate, or a short-link row) in phase 3.
+9. ~~**How large can a shared history URL get?**~~ **Measured, §5.7.1** —
+   commands are free (300 ≈ 220 chars); entropy decides. Remaining sub-question:
+   the exact URL ceiling on the deployed Cloudflare stack, which sets the
+   §5.7.3 budget. Measure rather than assume.
 10. **Conflict authoring.** For a scenario to *reliably* produce a conflict,
    the fixture needs both machines pointed at the same lines. Worth a helper
    in the scenario format rather than leaving it to per-lesson hand-authoring.
