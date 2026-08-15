@@ -22,14 +22,18 @@ the UNIX commands a Git curriculum interleaves with `git` itself.
 | Multi-user repos | **Strongly recommended** — and worth more than conflict generation alone (§3). |
 | Multi-user in phase 1 | **No.** Shape the data model for it now (§3.6); ship it in phase 4. |
 | Git-only terminal (no `ls`/`cat`/`echo`) | **Not viable.** Advertises a capability then withdraws it (§4). |
-| Hand-rolled ~12-command POSIX subset | **Recommended.** The FS shim §7.1 already mandates *is* the shell (§4.1). |
-| `just-bash` instead of hand-rolling | **Spike first.** Already in the tree via `almostnode`; size and FS-pluggability unverified (§4.5). |
-| WebContainers / v86 | **No.** COOP/COEP conflicts with the CDN-import strategy; VM weight (§4.5). |
+| **`just-bash` as the shell** | **Adopted — spike run 2026-08-15.** 79 commands, pluggable FS, custom `git` command, complete shell language, Apache-2.0 (§4.1). |
+| Hand-rolled ~12-command subset | **Fallback only.** Superseded by the spike result (§4.8). |
+| Worker-bundle impact | **None.** It ships as a `public/_workers/` static asset, served by `ASSETS` before the Worker (§4.3). Cost is 431 KiB gz of learner download. |
+| WebContainers / v86 / `almostnode` | **No.** COOP/COEP conflict; VM weight; almostnode is ~16 MB (§4.8). |
 
 The single most valuable line in this addendum is §3.3: the collaboration
 half of Git is unreachable with one repository, and it is the half where
 learners fail in the workplace. The best *cheap* idea is §4.2 — with `cat` in
-the terminal, `.git/HEAD` turns the pointer chain from a diagram into a file.
+the terminal, `.git/HEAD` turns the pointer chain from a diagram into a file,
+now verified working. The largest strategic consequence is §4.5: the same
+runtime supports a command-line course, a gap in the current ~30-course
+catalogue.
 
 ---
 
@@ -269,121 +273,224 @@ above. Ship the feature in phase 4.
 
 ---
 
-## 4. The shell problem
+## 4. The shell problem — resolved by `just-bash`
 
 A terminal that answers `ls` with `command not found` is worse than no
 terminal: it advertises a capability and then withdraws it, and the learner
 concludes the environment is broken rather than that the command is out of
-scope. Real Git work interleaves shell and Git constantly — `ls`, `cat`,
-`mkdir`, `echo > file` — and every tutorial on the internet creates its first
-file with `echo "# Project" > README.md`.
+scope. Real Git work interleaves shell and Git constantly, and every tutorial
+on the internet creates its first file with `echo "# Project" > README.md`.
 
-### 4.1 The FS shim already required *is* the shell
+The original recommendation here was a hand-rolled ~12-command POSIX subset,
+with `just-bash` flagged as a spike. **The spike was run on 2026-08-15 and
+`just-bash` won outright.** Hand-rolling is now the fallback, not the plan.
 
-The strongest argument for building a small POSIX subset ourselves is that
-almost all of the work is already mandatory. §7.1 requires the OPFS shim to
-implement `readFile`, `writeFile`, `unlink`, `readdir`, `mkdir`, `rmdir`,
-`stat`, and `lstat` because isomorphic-git demands them. That is precisely the
-syscall set a file-command subset needs:
+### 4.1 Spike result
 
-| Command | Implemented with |
+`just-bash@3.3.0` (vercel-labs, **Apache-2.0**) ships a dedicated browser
+entry point, `just-bash/browser`, that excludes the `node:fs`-dependent
+modules. Measured, not assumed:
+
+| Property | Finding |
 | --- | --- |
-| `ls`, `ls -a`, `ls -l` | `readdir` + `stat` |
-| `cat` | `readFile` |
-| `echo`, `echo > f`, `echo >> f` | `writeFile` |
-| `touch` | `stat` + `writeFile` |
-| `mkdir`, `mkdir -p` | `mkdir` |
-| `rm`, `rm -r` | `unlink`, `readdir` + `rmdir` |
-| `mv`, `cp` | `readFile` + `writeFile` + `unlink` |
-| `pwd`, `cd` | shell-local state — no FS call at all |
+| Commands | **79** — `ls cat echo printf mkdir rm cp mv ln touch head tail wc grep rg sed awk sort uniq cut tr find xargs diff jq base64 tee stat du tree seq …` |
+| Filesystem | **Pluggable.** `new Bash({ fs })` takes an `IFileSystem`; the interface docs name "browser IndexedDB" as an intended backend |
+| Custom commands | **Yes.** `defineCommand(name, fn)` + `customCommands: []`, plus a `LazyCommand` variant for code-splitting |
+| Shell language | **Complete** (§4.4) |
+| Bundle, with isomorphic-git | **431 KiB gz** (1509 KiB raw), minified, single chunk |
+| Licence | Apache-2.0 — no commercial restriction |
 
-Not one of these needs a filesystem primitive the Git runtime does not already
-force us to write. And §2.3 concedes a command parser is unavoidable for
-either runtime, so the marginal cost here is **argument parsing and output
-formatting against an existing dispatch table** — not filesystem engineering.
-Estimate: 400–600 lines, no new dependency, no bundle impact (it lives in
-`public/_workers/git-worker.js` per §8.4.1, outside both bundles).
+The heavy dependencies in its `package.json` do **not** reach a browser
+bundle: `sql.js`, `quickjs-emscripten`, `undici`, `papaparse`,
+`fast-xml-parser`, `file-type` and `seek-bzip` all tree-shake away through the
+browser entry. Only `re2js` (the regex engine behind `grep`/`sed`) and
+`turndown` (`html-to-markdown`) survive; dropping the latter is a possible
+further trim.
 
-### 4.2 The payoff: `.git` becomes explorable
+### 4.2 The integration: one filesystem, two facades
 
-This is the reason to prefer a real shell subset over GUI-only file
-management, and it is worth more than the convenience.
+The decisive question was whether isomorphic-git and `just-bash` can operate
+on the *same* filesystem — a shell that cannot see `.git` is useless. They
+can. `just-bash`'s `IFileSystem` becomes the single source of truth, and
+isomorphic-git gets a thin `node:fs`-promises facade over it:
 
-isomorphic-git writes a **genuine on-disk Git layout** — `.git/HEAD`,
-`.git/refs/heads/*`, `.git/objects/`, `.git/config`, `.git/index`. With `cat`
-and `ls` in the terminal, the object model stops being a diagram and becomes a
-directory:
+```
+        ┌─────────────────────────────────┐
+        │  IFileSystem  (OPFS-backed)     │  ← single source of truth
+        └───────┬─────────────────┬───────┘
+                │                 │
+      native ───┘                 └─── ~40-line node:fs facade
+                │                 │
+         ┌──────┴──────┐   ┌──────┴───────┐
+         │  just-bash  │   │isomorphic-git│
+         └─────────────┘   └──────────────┘
+```
+
+Verified end to end in the spike — isomorphic-git wrote the repo, `just-bash`
+read it:
 
 ```
 $ cat .git/HEAD
 ref: refs/heads/main
-
 $ cat .git/refs/heads/main
-a1b2c3d4e5f6...
-
-$ ls .git/
-HEAD  config  index  objects/  refs/
+65896b7d80d8f24e71bdd807c60794cd405fbad9
+$ ls .git
+HEAD  config  hooks  index  info  objects  refs
 ```
 
-That is §4.3's pointer chain, except the learner *discovers* it instead of
-reading it off a panel. "HEAD is a pointer to a pointer" stops being a claim
-to be believed and becomes two files to look at. No GUI can teach this, and a
-Git-only terminal cannot either — it needs `cat`.
+Writes flow the other way too: after `echo "second line" >> README.md` and
+`mkdir -p src && echo … > src/app.py` in the shell,
+`git.statusMatrix()` reported `README.md HEAD=1 WT=2 stage=1` and
+`src/app.py HEAD=0 WT=2 stage=0` — the three-areas panel (§4.1 of the
+original) updating from shell activity with no extra plumbing.
 
-Caveat worth turning into a lesson: loose objects are zlib-deflated, so
-`cat .git/objects/ab/cdef…` prints binary noise. That is the natural entry
-point to `git cat-file -p`, which isomorphic-git supports directly via
-`readObject`. Worth adding to the supported command list for exactly this
-reason.
+Registering `git` itself as a custom command works, and composes with
+builtins through pipes:
 
-### 4.3 Scope: three tiers, and a stated line
+```
+$ git init
+Initialized empty Git repository in /repo/.git/
+$ git commit -m "Initial commit"
+[main 68ddea5] Initial commit
+$ git log | wc -l
+1
+```
 
-The failure mode of a hand-rolled shell is unbounded creep — "just add
-`sed`," "just add variables." Fix the boundary in advance:
+That last line is the point: a custom command piping into a builtin is
+something a Git-only terminal structurally cannot do.
 
-| Tier | Contents | Decision |
-| --- | --- | --- |
-| **1 — must have** | The 12 commands above, plus `>` and `>>` redirection | Build in phase 1 |
-| **2 — cheap, worth it** | `\|`, `&&`, `*` glob in the final path segment, `head`, `tail`, `wc`, `grep -n`, `clear` | Build if commands are modelled as `(args, stdin) => stdout`, which makes pipes nearly free |
-| **3 — refuse by policy** | Variables, `$(…)`, subshells, `sed`/`awk`, `vim`/`nano`/`less`, job control, `sudo`, `curl`/`ssh`/`npm` | Never — each gets a redirect message (§4.4) |
+**The facade is where the real work is** — roughly 40 lines, but three details
+must be right: `stat`/`lstat` must return `isFile()`/`isDirectory()` as
+*methods* (`IFileSystem` returns booleans), thrown errors need `.code` set to
+`ENOENT`/`EEXIST` (isomorphic-git branches on it), and `readFile` must return
+`Uint8Array` when no encoding is given but a `string` when one is.
 
-The governing principle: **the shell exists to serve Git lessons, not to teach
-shell.** Any command that does not appear in a Git curriculum is out, and the
-curriculum's actual vocabulary is remarkably small.
+### 4.3 Bundle cost, and why the 10 MiB limit is not the constraint
 
-### 4.4 Unknown commands are a product surface, not an error path
+**`just-bash` never enters the Worker.** Per §8.4.1 of the original design the
+Git engine lives in a prebuilt module at `public/_workers/git-worker.js`, and
+`wrangler.jsonc:13` records that `/_next/static/*` and `public/` are served by
+the `ASSETS` binding **before the Worker runs**. Static assets do not count
+against the 10 MiB Worker cap. This is the same mechanism that already keeps
+Pyodide, DuckDB, PGlite, PHP and .NET out of the bundle — §8.3 verified those
+are absent from the Worker entirely.
 
-This is where the subset either feels curated or feels half-finished, and it
-is almost entirely a copywriting problem. Three response classes:
+| Bundle | Raw | GZ |
+| --- | ---: | ---: |
+| isomorphic-git alone | 256 KiB | **78 KiB** |
+| just-bash + isomorphic-git | 1509 KiB | **431 KiB** |
+| **Marginal cost of the shell** | | **353 KiB** |
 
-1. **Deliberately absent, and we know why.** `vim`, `nano`, `less`, `sudo`,
-   `npm`, `curl`, `ssh` get a named redirect to the right affordance rather
-   than a failure:
+(The 78 KiB confirms the original §8.4.1 estimate of 76 KiB.)
+
+So the cost is **learner download, not Worker headroom** — 431 KiB gz fetched
+lazily on first Run, against a page that already ships megabytes of WASM for
+every other runtime. For scale: the current Worker headroom after the §8.7
+fixes is 2999.59 KiB, so even the naive outcome of accidentally bundling the
+whole thing into the Worker would fit. It should still not happen, and the
+§8.4.1 rule is what prevents it.
+
+One build note, already solved in this repo: esbuild fails on `just-bash`'s
+dead `node:zlib` import unless `node:*` specifiers are stubbed.
+`scripts/build-almostnode-workers.mjs:29` already contains exactly that
+plugin — `stubNodeBuiltins` — because almostnode pulls `just-bash` in
+transitively today. The Git worker reuses it verbatim.
+
+### 4.4 The shell language is complete
+
+Every construct tested passed, which is what separates "a shim that fakes
+`ls`" from "a shell you can teach":
+
+| Feature | Verified |
+| --- | --- |
+| Variables, `$(…)` substitution, `$((…))` arithmetic | ✅ |
+| `for`, `while`, `if/else`, `case` | ✅ |
+| Functions with positional args | ✅ |
+| Arrays (`${arr[1]}`, `${#arr[@]}`) | ✅ |
+| Parameter expansion (`${S^^}`, `${#S}`) | ✅ |
+| Multi-stage pipes, `&&`/`\|\|`, `$?` | ✅ |
+| Heredocs, globs, subshells, `export` | ✅ |
+| `sed`, `awk`, `jq`, `xargs` | ✅ |
+
+Error wording is real bash (`bash: git: command not found`), which is a
+better outcome than the original §2.3 accepted for isomorphic-git's own
+messages.
+
+### 4.5 What this unlocks: a command-line course
+
+The marginal 353 KiB gz is a debatable price for `ls` inside a Git
+playground. It is an obviously good price for **a new course vertical**, and
+that is the strongest argument for `just-bash` over hand-rolling.
+
+DataSlope has ~30 courses and **none on the command line** — a conspicuous
+gap for a data-skills site whose interview tracks include data-engineer,
+analytics-engineer, backend-engineer and ML-engineer, every one of which
+assumes shell fluency. §4.4 shows the runtime supports a real curriculum:
+navigation and file manipulation, pipes and filters, text processing with
+`grep`/`sed`/`awk`/`cut`/`sort`/`uniq`, `find` + `xargs`, and scripting with
+variables, loops and functions.
+
+Almost all the surrounding machinery would already exist by the time the Git
+playground ships: the terminal console (§3.3), the OPFS-backed `IFileSystem`
+(§7.1), the bundle codec and share links (§7.2, adding `"bash"` to
+`BundleKind` beside `"git"`), the reset tiers (§6.3), and the challenge-card
+grammar. A `<BashChallengeCard>` grading on filesystem state and stdout is a
+near-clone of `<GitChallengeCard>` grading on repo state.
+
+**Scope discipline:** a Bash course is a separate project and must not expand
+the Git playground's phase 1. The claim here is narrower and only about
+sequencing — choosing `just-bash` now keeps that option open at no additional
+runtime cost, whereas a hand-rolled 12-command subset would have to be thrown
+away and rewritten to get there.
+
+### 4.6 Residual risks
+
+1. **Release velocity.** 98 versions published, `3.3.0` released two days
+   before this spike. **Pin the exact version** and treat upgrades as
+   deliberate, tested changes. This is the main ongoing cost of the
+   dependency.
+2. **`gzip`/`gunzip`/`zcat` fail in the browser** — the package documents
+   this (they need `node:zlib`). Worth noting these are exactly the commands
+   someone might reach for on a loose Git object; the answer there is
+   `git cat-file -p` via isomorphic-git's `readObject`, which is the correct
+   teaching path anyway. Add the three to the redirect list in §4.7.
+3. **OPFS under async concurrency is still unproven.** The original §9.2
+   already flagged this for isomorphic-git (`async-lock` is one of its
+   deps); `just-bash` driving the same `IFileSystem` concurrently makes it
+   more pressing, not less. This is now the top open question.
+4. **Not built as a teaching tool.** `just-bash` targets AI-agent sandboxes.
+   Its command coverage is generous but its *flag* coverage per command is
+   unverified — a lesson using an unsupported flag would fail confusingly.
+   Mitigation: the supported-command list §9.4 already requires should be
+   generated from `getCommandNames()`, and lesson commands should be checked
+   in CI the way `scripts/check-*.mjs` already validate code blocks.
+
+### 4.7 Unknown commands are still a product surface
+
+Adopting a 79-command shell shrinks this problem but does not remove it —
+`vim`, `nano`, `less`, `sudo`, `npm`, `ssh` and the three zlib commands are
+all still absent. Three response classes:
+
+1. **Deliberately absent.** A named redirect to the right affordance:
    `vim isn't available here — click README.md in the working tree to edit it.`
-   Editors are the important case: they are the most likely thing a learner
-   reaches for, and the working-tree editor genuinely is the answer.
-2. **A typo of something supported.** Edit-distance match →
-   `git stauts` → `did you mean: git status?`
-3. **Genuinely unknown.** The real message, unembellished:
-   `bash: foo: command not found`.
+2. **A typo of something supported.** Edit-distance match against
+   `getCommandNames()` → `git stauts` → `did you mean: git status?`
+3. **Genuinely unknown.** `just-bash`'s own real-bash wording, unmodified.
 
-§9.4 already requires publishing the supported Git command list in the UI. It
-should be **one list covering both** Git commands and shell builtins — a
-learner does not experience those as separate vocabularies.
+§9.4 requires publishing the supported command list in the UI; it should be
+**generated from `getCommandNames()`** rather than hand-maintained, so it
+cannot drift from what the runtime actually accepts.
 
-### 4.5 Options considered and rejected
+### 4.8 Options rejected
 
 | Option | Verdict |
 | --- | --- |
-| **Hand-rolled subset** (§4.1) | **Recommended.** Bounded, no dependency, reuses the mandatory FS shim, and unlocks §4.2. |
-| **`just-bash`** | **Spike it first.** Already in the tree transitively via `almostnode` (`scripts/build-almostnode-workers.mjs:24` stubs its dead `node:*` imports). Unverified: standalone bundle size, whether it accepts a custom FS backend, and its command coverage. Note `almostnode` itself is ~16 MB bundled and must **not** be pulled into the Git worker for a shell. |
-| **WebContainers** (StackBlitz) | **No.** Requires site-wide COOP/COEP cross-origin isolation, which conflicts directly with the CDN-import strategy every other runtime depends on (§8.2), and its licence is restrictive for commercial use. |
+| **`just-bash`** | **Adopted.** 79 commands, pluggable FS, custom commands, complete shell language, Apache-2.0, 353 KiB gz marginal — all measured. |
+| Hand-rolled ~12-command subset | **Fallback only.** Still viable (the §7.1 FS shim is most of it), but delivers a fraction of the coverage, none of the shell language, and forecloses §4.5. |
+| **WebContainers** (StackBlitz) | **No.** Requires site-wide COOP/COEP cross-origin isolation, which conflicts with the CDN-import strategy every other runtime depends on (§8.2), plus commercial licensing. |
 | **v86 / full Linux VM** | **No.** Multi-megabyte image and a visible boot delay to run `ls`. |
-| **No shell; GUI-only file management** | **No.** Leaves `ls` failing, which is the original complaint. |
-
-The spike is worth an hour before committing to §4.1: if `just-bash` is small,
-FS-pluggable, and covers tier 1, it removes 400–600 lines of maintained code.
-If it is not, the hand-rolled subset is a known quantity.
+| **`almostnode`** (already a dependency) | **No.** ~16 MB bundled per `build-almostnode-workers.mjs`; it is the JS/TS runtime, and pulling it in for a shell would cost 37× what `just-bash` alone does. |
+| No shell; GUI-only file management | **No.** Leaves `ls` failing, which was the original complaint. |
 
 ---
 
@@ -391,9 +498,9 @@ If it is not, the hand-rolled subset is a known quantity.
 
 | Phase | Contents | Change from original |
 | --- | --- | --- |
-| 0 | **`just-bash` spike (§4.5)** — size, FS-pluggability, tier-1 coverage. One hour; decides §4.1. | New |
-| 1 | `git-worker.js` + parser + console + three-areas panel. **Composed-command palette + drag-to-stage from day one. Tier-1 shell subset + redirect messages (§4.3–4.4).** Single machine. | Palette promoted from carve-out; shell added |
-| 2 | Commit graph, pointer chain, scenarios, reset tiers, OPFS persistence. **Assistance dial. Tier-2 shell (pipes, glob), `git cat-file -p`.** | Dial and tier-2 shell added |
+| 0 | ~~`just-bash` spike~~ — **done 2026-08-15, §4.** Adopted. Remaining prerequisite: the OPFS `IFileSystem` concurrency check (§6 Q6). | Spike complete |
+| 1 | `git-worker.js` (just-bash + isomorphic-git, node-builtins stubbed) + `git` as a custom command + console + three-areas panel. **Composed-command palette + drag-to-stage from day one. Generated command list + redirect messages (§4.7).** Single machine. | Palette promoted from carve-out; shell is now a dependency, not a build |
+| 2 | Commit graph, pointer chain, scenarios, reset tiers, OPFS persistence. **Assistance dial, `git cat-file -p`, CI check that lesson commands exist in `getCommandNames()` (§4.6.4).** | Dial and lesson-command linting added |
 | 3 | Cloud save/share (`BundleKind: "git"`), `[↗]` handoff. | Unchanged |
 | 4 | **Multi-machine + `origin`, three-lane graph, machine-aware `GitExpect`.** Then `<GitBlock>`, `<GitChallengeCard>` + live checklist. | Multi-machine added ahead of cards, so card grading is machine-aware from its first release |
 | 5 | Object inspector, conflict merge view, `rebase` on plumbing. | Unchanged |
@@ -422,10 +529,82 @@ Data-model shaping for phase 4 (§3.6) happens in phase 2, when scenarios and
    who has graduated to Bare should not be dropped back to Guided by the next
    lesson's default. Suggest: surface sets the *initial* level, learner
    override persists.
-5. **Does the shell subset get its own `cd` state per machine?** Once §3
+5. **OPFS-backed `IFileSystem` under async concurrency** — now the top
+   unknown. The original §9.2 flagged it for isomorphic-git alone; with
+   `just-bash` driving the same backend the question is sharper. Everything
+   else about the shell is settled; this is not. Spike before phase 1.
+6. **Flag coverage per command.** `getCommandNames()` proves a command
+   exists, not that `ls -lh` or `sort -rn` parse. Worth enumerating the flags
+   the curriculum actually uses and testing them in one pass (§4.6.4).
+7. **Does the shell subset get its own `cd` state per machine?** Once §3
    lands, each machine has its own working directory. A shared `cwd` across a
    machine switch would be confusing; a per-machine `cwd` is one more field on
    the machine record. Recommend per-machine.
-6. **Conflict authoring.** For a scenario to *reliably* produce a conflict,
+8. **Conflict authoring.** For a scenario to *reliably* produce a conflict,
    the fixture needs both machines pointed at the same lines. Worth a helper
    in the scenario format rather than leaving it to per-lesson hand-authoring.
+
+---
+
+## Appendix A — the node:fs facade (verified working)
+
+The bridge from `just-bash`'s `IFileSystem` to what isomorphic-git expects.
+Reproduced from the 2026-08-15 spike, which drove `git init` / `add` /
+`commit` / `log` / `statusMatrix` through it successfully.
+
+```js
+const err = (code, msg) => Object.assign(new Error(`${code}: ${msg}`), { code });
+
+// IFileSystem returns booleans; isomorphic-git calls methods.
+const toStat = (s) => ({
+  isFile: () => s.isFile,
+  isDirectory: () => s.isDirectory,
+  isSymbolicLink: () => s.isSymbolicLink,
+  mode: s.mode, size: s.size,
+  mtimeMs: s.mtime.getTime(), ctimeMs: s.mtime.getTime(),
+  uid: 1, gid: 1, dev: 1, ino: s.ino ?? 1,
+});
+
+// isomorphic-git branches on err.code, so map messages onto errno strings.
+const wrap = (fn) => async (...args) => {
+  try { return await fn(...args); }
+  catch (e) {
+    if (e.code) throw e;
+    const m = String(e.message || "");
+    if (/no such file|not found|ENOENT/i.test(m)) throw err("ENOENT", m);
+    if (/exists|EEXIST/i.test(m)) throw err("EEXIST", m);
+    throw e;
+  }
+};
+
+export const makeNodeFacade = (jbfs) => ({
+  promises: {
+    // Bytes with no encoding, string with one — isomorphic-git relies on both.
+    readFile: wrap(async (p, opts) => {
+      const enc = typeof opts === "string" ? opts : opts?.encoding;
+      const buf = await jbfs.readFileBuffer(p);
+      return enc && enc !== "binary" ? new TextDecoder().decode(buf) : buf;
+    }),
+    writeFile: wrap(async (p, d) =>
+      void await jbfs.writeFile(p, typeof d === "string" ? d : new Uint8Array(d))),
+    unlink:   wrap(async (p) => void await jbfs.rm(p, {})),
+    readdir:  wrap((p) => jbfs.readdir(p)),
+    mkdir:    wrap(async (p) => void await jbfs.mkdir(p, {})),
+    rmdir:    wrap(async (p) => void await jbfs.rm(p, { recursive: true })),
+    stat:     wrap(async (p) => toStat(await jbfs.stat(p))),
+    lstat:    wrap(async (p) => toStat(await jbfs.lstat(p))),
+    readlink: wrap((p) => jbfs.readlink(p)),
+    symlink:  wrap(async (t, p) => void await jbfs.symlink(t, p)),
+  },
+});
+```
+
+In production `jbfs` is the OPFS-backed `IFileSystem` from §7.1 rather than
+`InMemoryFs`, which is what open question 5 exists to de-risk.
+
+**Registering `git`:** `defineCommand(name, async (args, ctx) => ({ stdout,
+stderr, exitCode }))` — note the positional signature, not an options object —
+passed via `new Bash({ fs, cwd, customCommands: [gitCmd] })`. A `LazyCommand`
+variant (`{ name, load }`) exists if the Git half should code-split away from
+the shell half.
+
