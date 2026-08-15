@@ -58,6 +58,27 @@ function main() {
   const files = walk(APP_DIR).filter(
     (p) => p.endsWith(".rsc") || p.includes(".segments"),
   );
+  // A scan that finds nothing to scan is not a pass. This check's whole job is
+  // to be the thing that noticed, and "0 prerendered file(s) clean" reads
+  // exactly like a green run — which is how a build that emitted no payloads
+  // at all, or a rename of `.rsc`, would sail through.
+  //
+  // The floor is deliberately low. The file count is not stable: with Next's
+  // client segment cache on it is ~8,500 (one `.rsc` per route plus the
+  // per-segment tree files), and with it off — where `next.config.ts` has it —
+  // it is ~1,045, because only the route payloads remain. Anything under 100
+  // means the output shape changed, not that the site shrank.
+  if (files.length < 100) {
+    console.error(
+      `check-prefetch-hints: only ${files.length} prerendered file(s) found under ` +
+        `${relative(ROOT, APP_DIR)} — expected ~1,045 or more.\n` +
+        "Refusing to report a pass on an empty scan: either the build did not " +
+        "produce prerendered payloads, or their naming changed and this check " +
+        "is now looking for the wrong thing.",
+    );
+    process.exit(1);
+  }
+
   const offenders = [];
   for (const file of files) {
     const hits = staleFlagsIn(readFileSync(file, "utf8"));

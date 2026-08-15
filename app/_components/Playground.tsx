@@ -821,6 +821,19 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     (next: string[] | ((prev: string[]) => string[])) => {
       const value =
         typeof next === "function" ? next(openTabIdsRef.current) : next;
+      // `react-hooks/immutability` flags a ref written inside a function
+      // handed to a hook, because React Compiler must assume that function
+      // could run during render, and mutating a ref during render is unsafe.
+      // It cannot see that this one never does: `setOpenTabIds` is only ever
+      // called from event handlers and effects.
+      //
+      // The ref is the point of the pattern. Six dependency-free callbacks
+      // (lines ~817, 2497, 2548, 2647, 2735) read `openTabIdsRef.current` to
+      // get the *current* tab list synchronously; taking `openTabIds` as a
+      // dependency instead would rebuild all six on every tab change. Keep
+      // the suppression narrow — if this setter ever becomes reachable from
+      // render, the rule is right and this comment is wrong.
+      // eslint-disable-next-line react-hooks/immutability
       openTabIdsRef.current = value;
       setOpenTabIdsState(value);
     },

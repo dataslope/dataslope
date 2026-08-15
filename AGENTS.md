@@ -926,6 +926,7 @@ Measured on this repo, warm:
 | step | before | now |
 | --- | --- | --- |
 | `build-search-corpus` | 26–27s | skipped |
+| `build-search-corpus`, cache cold | 23.7s | 13.7s (3 threads) |
 | `build-images` | 0.6–11s | 0.09s |
 | `build-almostnode-workers` | 1.3–4.7s | skipped |
 | `build-created-at` | 0.1–2.3s | skipped |
@@ -956,6 +957,19 @@ a quarter-second, and give the cache three things:
 Manifests live in `node_modules/.cache/dataslope-build/`, so `npm ci` wipes
 them and the first run after an install regenerates everything — which is when
 it should.
+
+**Which is also why the cold number still matters.** Cloudflare Workers Builds
+runs `npm ci` on every build and its build cache covers `.npm` and `.next/cache`
+but *not* `node_modules`, so no deploy has ever hit one of these gates: the
+chain above runs cold, in full, on every production and preview build. That is
+what makes `build-search-corpus` worth parallelising even though a warm local
+run skips it outright — it splits ~889 lessons across
+`availableParallelism() - 1` worker threads (capped at 8, and it stays on the
+main thread below 64 lessons, where the ~0.5 s of worker startup would not pay
+for itself). Lessons are striped round-robin rather than sliced contiguously
+because a course's lessons resemble each other in size; rows are reassembled in
+walk order afterwards, so the corpus stays byte-identical to the serial output
+and the downstream D1 re-seed gate still sees "nothing changed".
 
 ### Prepopulated code-block output
 

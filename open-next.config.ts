@@ -1,6 +1,6 @@
 import { defineCloudflareConfig } from "@opennextjs/cloudflare";
-import r2IncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cache/r2-incremental-cache";
 import { withRegionalCache } from "@opennextjs/cloudflare/overrides/incremental-cache/regional-cache";
+import brotliR2IncrementalCache from "./lib/cache/brotliR2IncrementalCache";
 
 // OpenNext (Cloudflare) build configuration.
 //
@@ -12,11 +12,11 @@ import { withRegionalCache } from "@opennextjs/cloudflare/overrides/incremental-
 // R2-backed cache, not the read-only `staticAssetsIncrementalCache`: that one
 // only resolves prerenders on the *production* deployment, so Workers Builds
 // preview URLs would 500 on exactly those pages; R2 reads identically on
-// both. Each deploy's populate writes a full copy (~2.5 GB) under a new build
-// ID; stale build folders are pruned by .github/workflows/r2-cache-cleanup.yml.
-// (`experimental.clientSegmentCache: false` would shrink entries ~40%, but is
-// left ON: the segment cache is load-bearing for prefetching and its
-// interaction with `prefetchInlining: false` is untested on preview.)
+// both. Each deploy's populate writes a full copy under a new build ID
+// (~0.14 GiB brotli-framed; see below); stale build folders are pruned by
+// .github/workflows/r2-cache-cleanup.yml. Note `segmentData` cannot be turned
+// off on this Next version (no such experimental flag despite what older
+// notes claimed), so compression is the lever for its bulk, not omission.
 //
 // Reads are NOT rare: the Worker runs ahead of Cloudflare's CDN cache and its
 // responses aren't stored there, so every visitor costs one Worker invocation
@@ -40,11 +40,36 @@ import { withRegionalCache } from "@opennextjs/cloudflare/overrides/incremental-
 // `enableCacheInterception` resolves cache hits ahead of the Next handler.
 // No queue/tag cache because nothing revalidates; add one only when a
 // revalidating server feature is introduced.
-export default defineCloudflareConfig({
-  incrementalCache: withRegionalCache(r2IncrementalCache, {
+//
+// The store is `brotliR2IncrementalCache`, not OpenNext's stock
+// `r2IncrementalCache`: same bucket and keys, but entries are brotli-framed
+// (~17x smaller — the raw entries are repetitive JSON, and `segmentData`
+// duplicates `rsc` byte-for-byte). Read side in
+// lib/cache/brotliR2IncrementalCache.ts; the deploy-time populate compresses
+// via scripts/compress-cache.mjs, not this override.
+//
+// Layering order matters: `withRegionalCache` wraps the store, so a colo hit
+// never touches it and a colo miss caches the DECOMPRESSED value —
+// decompression is paid once per colo per deploy, on a request already paying
+// the R2 round trip (brotli decompress is cheaper than the JSON.parse that
+// follows it).
+const config = defineCloudflareConfig({
+  incrementalCache: withRegionalCache(brotliR2IncrementalCache, {
     mode: "long-lived",
     defaultLongLivedTtlSec: 24 * 60 * 60,
     shouldLazilyUpdateOnCacheHit: false,
   }),
   enableCacheInterception: true,
 });
+
+// `node:zlib` must be external: the Cloudflare CLI compiles this config twice,
+// and the edge pass (`platform: "browser"`) cannot resolve `node:` builtins —
+// the build dies with `Could not resolve "node:zlib"`. External leaves the
+// import in place; workerd with `nodejs_compat` provides `node:zlib` natively
+// (brotliDecompressSync verified there). Same mechanism the framework uses
+// for `node:crypto` — PRESERVE the existing entries, `ensure-cf-config`
+// fails if `node:crypto` is dropped.
+export default {
+  ...config,
+  edgeExternals: [...(config.edgeExternals ?? []), "node:zlib"],
+};
