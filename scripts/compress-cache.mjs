@@ -29,7 +29,7 @@ import { brotliCompressSync, brotliDecompressSync, constants } from "node:zlib";
 // Duplicated as literals here rather than imported because this script runs
 // under plain Node before any TypeScript build step exists to resolve it.
 const MAGIC = Uint8Array.from([0x00, 0x42, 0x52, 0x31]);
-const QUALITY = 5;
+const QUALITY = 4;
 
 const CACHE_DIR = process.argv[2] ?? join(process.cwd(), ".open-next", "cache");
 
@@ -124,9 +124,13 @@ if (!isMainThread) {
 
   // Brotli is CPU-bound and every entry is independent, so this is the same
   // trade as the corpus builder: worth threading once there is enough work to
-  // amortise ~0.5 s of worker startup, and not before. Single-threaded this
-  // step measured 27 s on 1,081 entries, which is time added to every build.
-  const POOL = Math.min(Math.max(1, availableParallelism() - 1), 8);
+  // amortise ~0.5 s of worker startup, and not before.
+  //
+  // All cores, not `- 1` like the corpus builder. That reservation exists to
+  // leave the main thread room, and here the main thread does nothing but
+  // await: this is the last step of the build, with no `next build` alongside
+  // it. On the 4-core Workers Builds runner that is a whole extra worker.
+  const POOL = Math.min(Math.max(1, availableParallelism()), 8);
   const workers = files.length >= 64 ? POOL : 1;
 
   // Round-robin rather than contiguous slices: entries are walked in directory

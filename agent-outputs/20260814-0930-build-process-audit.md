@@ -601,3 +601,68 @@ populate at all. Post-merge it will have populate restored, entries 17× smaller
 and `--cacheChunkSize 100` — three changes at once, in the stage nobody has a
 clean baseline for. Measure it on the first green build before drawing any
 conclusion about which of the three did what.
+
+---
+
+## 5.10 The first post-merge build, and two things it corrected
+
+Production build `73f7afdf`, 2026-08-15 01:58 UTC — the first with everything on:
+**12 m 03 s**, against the 10 m 55 s baseline in §2. Slower, and worth reading carefully before
+concluding anything from it.
+
+| Stage | §2 baseline | This build | Δ |
+| --- | ---: | ---: | ---: |
+| init + clone + cache restore | 70 s | 55 s | −15 s |
+| `npm ci` | 2 m 02 s | 2 m 14 s | +12 s |
+| **build command** | **5 m 52 s** | **7 m 25 s** | **+1 m 33 s** |
+| deploy | 1 m 09 s | 1 m 12 s | +3 s |
+| build-cache upload | 40 s | 14 s | −26 s |
+
+Inside the build command: compile **9.3 s → 22.5 s**, TypeScript **17.0 s → 58 s**, prerender
+~2 m 46 s → ~2 m 55 s, bundling ~1 m 52 s → ~1 m 42 s, plus `compress-cache` at **38.9 s**.
+
+**+54 s of the +68 s is compile and TypeScript, and neither is a regression.** #667 changed **552
+files**, which invalidates most of the Turbopack cache and TypeScript's incremental state. The
+build cache restored fine (`Build output restored from build cache`) — restoring is not the same as
+being *valid* for 552 changed files. This is the one-off the §2 note warned about; the next build
+should return to ~9 s and ~17 s.
+
+### The deploy side worked
+
+```
+02:09:37  Populating remote R2 incremental cache...
+02:09:52  Successfully populated cache with 1081 entries
+```
+
+**15 s for 1,081 objects.** `NPM_CONFIG_OMIT=dev` is live too — `added 997 packages` against 1,301.
+
+### Correction: the local `compress-cache` measurement was 4× optimistic
+
+§5.9 reported 9.8 s from a 4-core local box. The runner, on the same 3 threads, took **38.9 s**.
+Same core count, ~4× the time — the runner's per-core throughput and I/O are simply slower, and
+nothing about the local figure predicted it. **Do not size a build step from this box again without
+saying which machine the number came from.**
+
+That mattered, because 39 s of build time was buying a populate that finishes in 15 s. Two changes,
+both measured over 121 real entries:
+
+| | ratio | time (sample) |
+| --- | ---: | ---: |
+| q3 | 12.2× | 1.1 s |
+| **q4** | **16.4×** | **1.2 s** |
+| q5 (shipped) | 17.9× | 2.1 s |
+| q6 | 18.7× | 2.4 s |
+
+q4 is ~43% less CPU than q5 for 8% less compression, and below it the ratio falls off a cliff for
+no further saving. Paired with using *all* cores rather than `- 1` (this is the last step of the
+build; the main thread only awaits), the local run went **9.8 s → 3.8 s**, which scales to roughly
+**15 s on the runner**. Upload goes 0.135 → 0.147 GiB, which is noise.
+
+### What is still not known
+
+Whether the populate is request-bound or bandwidth-bound. 1,081 objects in 15 s is ~72 objects/s
+and ~9 MB/s, which *looks* like per-request overhead dominating — but there has never been an
+uncompressed populate at `--cacheChunkSize 100` to compare against, so the honest answer is that
+compression's effect on deploy *duration* is unmeasured. Its effect on **storage** is not in doubt:
+2.34 GiB → 0.147 GiB per retained build, against a bucket that holds production plus up to ten
+branch previews.
