@@ -153,11 +153,9 @@ const createTableBodyPattern = new RegExp(
   "gi",
 );
 
-// All sections use `rank: "dynamic"` so the group containing the
-// best-scoring suggestion renders first. With static ranks the section
-// order would *override* every per-option boost, the Tables section
-// would sit above Columns even inside a WHERE clause where columns carry
-// the high boost, which is backwards from how SQL IDEs order results.
+// All sections use `rank: "dynamic"` so the group with the best-scoring
+// suggestion renders first; static ranks would override per-option boosts
+// (Tables above Columns even inside a WHERE clause).
 const tableSection = { name: "Tables", rank: "dynamic" } as const;
 const viewSection = { name: "Views", rank: "dynamic" } as const;
 const cteSection = { name: "CTEs", rank: "dynamic" } as const;
@@ -613,10 +611,8 @@ interface DialectProfile {
   functions: string[];
 }
 
-// Build a dialect's full keyword/function set by layering its extensions
-// over the shared CORE_* lists. Duplicates collapse to a single entry, so
-// dialects can mention common identifiers (e.g. DuckDB declaring REPLACE)
-// without conflicting with the core.
+// Build a dialect's keyword/function set by layering its extensions over the
+// shared CORE_* lists; duplicates collapse to a single entry.
 function buildProfile(
   extraKeywords: readonly string[],
   extraFunctions: readonly string[],
@@ -819,11 +815,9 @@ function maskCommentsAndStrings(sql: string): string {
   return masked;
 }
 
-/** The statement that contains `pos`, split at the cursor. `before` is
- *  what precedes the cursor (drives slot detection); `full` also covers
- *  the text after the cursor up to the next `;` so tables referenced
- *  *later* in the statement still feed column/alias scope, the
- *  "SELECT | FROM customers" case every SQL IDE handles. */
+/** The statement containing `pos`, split at the cursor. `before` drives
+ *  slot detection; `full` also covers text after the cursor so tables
+ *  referenced *later* still feed scope ("SELECT | FROM customers"). */
 function statementAround(
   sql: string,
   pos: number,
@@ -851,19 +845,16 @@ function isClauseBoundaryKeyword(value: string | undefined): boolean {
   return value ? clauseBoundaryKeywords.has(value.toUpperCase()) : false;
 }
 
-// Keyword tiers per syntactic context. `primary` is the strongest match,
-// `secondary` is plausible-but-less-likely. The resolver picks the tier list
-// that fits the cursor's surroundings; the keyword emitter then ranks the
-// SQL keyword catalog accordingly.
+// Keyword tiers per syntactic context: `primary` is the strongest match,
+// `secondary` plausible-but-less-likely. The resolver picks the tier list;
+// the keyword emitter ranks the catalog accordingly.
 const KW_NAME_TAIL: KeywordContext = {
   primary: ["IF", "NOT", "EXISTS"],
   restrict: true,
 };
 
-// Statement-starter keywords depend on the dialect: PRAGMA is SQLite-only,
-// TRUNCATE/GRANT/REVOKE are Postgres-flavored, COPY/EXPORT/IMPORT/DESCRIBE
-// are common in DuckDB. We share the same `primary` set so the most common
-// DML/DDL verbs always sort first regardless of dialect.
+// Statement starters vary by dialect (PRAGMA, TRUNCATE, COPY, …), but the
+// shared `primary` set keeps the common DML/DDL verbs sorted first.
 const STATEMENT_STARTERS_BASE: readonly string[] = [
   "SELECT",
   "WITH",
@@ -931,11 +922,9 @@ function isIdentifierToken(token: string | undefined): boolean {
   return !clauseBoundaryKeywords.has(token);
 }
 
-/** True when `token` reads as a *complete operand*: an identifier, a
- *  numeric literal (incl. the `0` marker masked strings leave behind), a
- *  closing paren, or END finishing a CASE. After an operand the user
- *  wants connectors (AND/OR), clause keywords, or an alias, not the
- *  start of a fresh expression. */
+/** True when `token` reads as a *complete operand* (identifier, numeric
+ *  literal incl. the masked-string `0` marker, `)`, or END). After an
+ *  operand the user wants connectors/clauses, not a fresh expression. */
 function isOperandToken(token: string | undefined): boolean {
   if (!token) return false;
   if (token === ")" || token === "END") return true;
@@ -2000,10 +1989,9 @@ function keywordOptions(
   const emitFunctions = includeFunctions && !restrict;
   const functionLabels = emitFunctions ? new Set(profile.functions) : null;
 
-  // Primary/secondary entries from the context may reference keywords
-  // outside the active dialect (e.g. PRAGMA in Postgres). We keep them in
-  // the suggestion list anyway, the context resolver is already dialect-
-  // aware, but fall back to the dialect catalog for the unranked tail.
+  // Context entries may reference keywords outside the active dialect; keep
+  // them (the resolver is dialect-aware) and fall back to the dialect
+  // catalog for the unranked tail.
   const orderedKeywords = primary
     ? [
         ...keywordContext!.primary,
@@ -2235,9 +2223,8 @@ function joinConditionCompletion(
   };
 }
 
-/** Ready-made `a.col = b.col` conditions for the `JOIN … ON |` slot.
- *  Foreign-key metadata drives the suggestions when available (the
- *  DataGrip behavior); otherwise we fall back to name-matching
+/** Ready-made `a.col = b.col` conditions for the `JOIN … ON |` slot. FK
+ *  metadata drives the suggestions when available; otherwise name-matching
  *  heuristics (`x.customer_id = customers.id`, shared column names). */
 function joinConditionOptions(
   schema: SqlCompletionSchema,

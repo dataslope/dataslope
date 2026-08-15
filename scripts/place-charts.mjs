@@ -1,22 +1,10 @@
 /**
- * One-off helper for dropping `<Chart slug="…" />` into lessons.
- *
- * Placement is mechanical and easy to get subtly wrong by hand: a chart landing
- * inside a `<CodeBlock>`, a fenced block or a `<Callout>` reads as a bug in the
- * lesson rather than a misplaced tag. So the rule is spelled out once here
- * instead of being applied fifty times by eye:
- *
- *   find the anchor heading → walk to the end of its section (the next heading
- *   at the same level or higher) → back up over trailing blank lines → insert
- *   the lead paragraph and the tag there.
- *
- * End-of-section rather than mid-section, because a section boundary is the one
- * position in the file that is reliably at the top level. "Reliably" does the
- * work there: a `#` at the start of a line is a heading in prose and a comment
- * in Python, so the scan runs over `codeRegions()` and treats heading-shaped
- * lines inside a `<CodeBlock>` as what they are.
- *
- * Re-running is safe: a slug already present in a file is left alone.
+ * One-off helper for dropping `<Chart slug="…" />` into lessons: find the
+ * anchor heading, walk to the end of its section, back up over trailing blank
+ * lines, insert the lead paragraph and the tag. End-of-section because a
+ * section boundary is the one position reliably at the top level — the scan
+ * runs over `codeRegions()` so heading-shaped lines inside a `<CodeBlock>`
+ * are not headings. Re-running is safe: a slug already present is left alone.
  *
  *   node scripts/place-charts.mjs [--dry]
  */
@@ -67,11 +55,8 @@ for (const [file, rows] of Object.entries(PLACEMENTS)) {
       : ["", `<Chart slug="${slug}" />`];
     lines.splice(end, 0, ...block);
 
-    // Verify against the result rather than the plan. A section that *ends*
-    // with a `<CodeBlock>` is a perfectly good place to append — the closing
-    // `/>` belongs to the block, but the line after it does not — so the
-    // question is only ever whether the tag we just wrote came out at the top
-    // level. Re-scanning answers that directly.
+    // Verify against the result rather than the plan: re-scan and ask whether
+    // the tag just written came out at the top level.
     const tagAt = end + block.length - 1;
     if (codeRegions(lines)[tagAt]) {
       skipped.push(`${file} :: ${slug} :: would land inside a code region`);

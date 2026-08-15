@@ -2,33 +2,23 @@
 
 import type { LanguageAdapter } from "./types";
 
-/** Reserved tab id used to render the Settings panel as a tab. Lives
- *  alongside the file tabs in the generic TabBar so users can switch
- *  between code and settings without losing their place. */
+/** Reserved tab id that renders the Settings panel as a tab. */
 export const SETTINGS_TAB_ID = "__settings__";
 
-/** A file slot rendered as a tab in the non-SQL playgrounds. The file
- *  contents are NOT stored here, code lives in OPFS under
- *  `workspaces/<wsId>/files/<id>` and is shadowed by an in-memory
+/** A file slot rendered as a tab. Contents are NOT stored here — code lives
+ *  in OPFS under `workspaces/<wsId>/files/<id>`, shadowed by an in-memory
  *  dirty buffer in the Zustand store. */
 export interface PlaygroundFile {
-  /** Stable tab id. Doubles as the OPFS filename, never derive it from
-   *  `filename` since renames must not touch OPFS. */
+  /** Stable tab id; doubles as the OPFS filename. Never derive from
+   *  `filename` — renames must not touch OPFS. */
   id: string;
-  /** User-visible path inside the workspace's virtual filesystem
-   *  (e.g. `"main.py"`, `"src/utils.py"`). May include `/` to nest
-   *  files inside folders; the tab strip displays only the leaf name
-   *  (basename). */
+  /** User-visible path; may include `/` (the tab strip shows the basename). */
   filename: string;
   /** Filename at creation, used to detect rename. */
   pristineFilename: string;
 }
 
-/** Convenience: the canonical "primary" filename for a workspace,
- *  `${exportBaseFilename}.${defaultFileExtension}`. Used as the
- *  default file in fresh workspaces and (for non-multi-entry
- *  languages) as the file shown in the Run dropdown when the user
- *  is on a non-default tab. */
+/** Canonical primary filename, `${exportBaseFilename}.${defaultFileExtension}`. */
 export function primaryEntryFilename(adapter: LanguageAdapter): string {
   const base = adapter.exportBaseFilename || "main";
   const ext = adapter.defaultFileExtension || "txt";
@@ -39,10 +29,8 @@ export function newFileId(): string {
   return `f_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
 }
 
-/** Default initial file set for a freshly-created workspace. Adapters
- *  with a `defaultWorkspace` (web: the CodePen-style HTML/CSS/JS trio)
- *  get one file per entry; everything else gets the single canonical
- *  `<exportBaseFilename>.<ext>` file. */
+/** Initial file set for a fresh workspace: one file per `defaultWorkspace`
+ *  entry when present, else the single canonical primary file. */
 export function defaultFiles(adapter: LanguageAdapter): PlaygroundFile[] {
   const workspace = adapter.defaultWorkspace;
   if (workspace && workspace.length > 0) {
@@ -76,21 +64,16 @@ export function suggestNextFilename(
 }
 
 // ---------------------------------------------------------------------------
-// Manifest persistence (small, synchronous → localStorage)
+// Manifest persistence (localStorage). Metadata only — file content lives in
+// OPFS via `fileStorage.ts`.
 // ---------------------------------------------------------------------------
-//
-// Per (adapter, workspace) we keep a JSON list of `PlaygroundFile`
-// records plus the active file id. File CONTENT lives in OPFS via
-// `fileStorage.ts`; the manifest is metadata only.
 
 interface ManifestPayload {
   files: PlaygroundFile[];
   activeFileId: string;
-  /** Ids of the files whose editor tabs are open, in tab order. The tab
-   *  strip shows a SUBSET of the workspace files, closing a tab hides
-   *  its editor without deleting the file. Absent in manifests written
-   *  before this field existed (and by the share-materialize path):
-   *  loadManifest then defaults to "all files open". */
+  /** Open editor tabs, in order — a SUBSET of the workspace files (closing a
+   *  tab hides the editor without deleting the file). When absent (older
+   *  manifests, share-materialize), loadManifest opens all files. */
   openTabIds?: string[];
 }
 
@@ -127,9 +110,8 @@ export function loadManifest(
       cleaned.some((f) => f.id === parsed.activeFileId)
         ? parsed.activeFileId
         : cleaned[0].id;
-    // Sanitize the open-tab list: known ids only, de-duplicated, and
-    // always including the active file. A missing/empty list (older
-    // manifests, share materialize) opens every file.
+    // Open-tab list: known ids only, de-duplicated, always including the
+    // active file; missing/empty opens every file.
     const known = new Set(cleaned.map((f) => f.id));
     let openTabIds = Array.isArray(parsed.openTabIds)
       ? [

@@ -1,57 +1,25 @@
 name: Prepopulated block output
 
-# Regenerates the output a `<CodeBlock>` shows before the reader presses Run
-# (`scripts/build-block-outputs.mjs`), and commits the result. Python runs
-# through Pyodide, JavaScript and TypeScript through almostnode, C and C++
-# through the browsercc toolchain — in every case the same runtime the browser
-# would have used, so a prepopulated panel and a pressed Run agree.
+# Regenerates the prepopulated `<CodeBlock>` output
+# (scripts/build-block-outputs.mjs) and commits it, using the same runtimes
+# the browser would (Pyodide, almostnode, browsercc) so the panel and a
+# pressed Run agree.
 #
-# ── Why this is a workflow and not part of the deploy ──────────────────────
+# Committed rather than built on deploy: executing all ~2,600 blocks takes
+# ~an hour. Manifest keys are content hashes, so the generator reuses
+# committed entries — deploys execute nothing, this workflow only executes
+# changed blocks, and unchanged figure files are never rewritten (matplotlib
+# PNG bytes aren't reproducible, so a full re-run would churn all ~370 files).
 #
-# Executing 2,600 blocks costs the better part of an hour, most of it Pyodide.
-# Paying that on every Cloudflare deploy took a 20-minute build and returned
-# the same answer each time, because the answer only changes when a lesson
-# changes.
+# r, java, csharp, web, react and php have no Node runtime: their entries come
+# from `npm run capture:block-outputs` (real browser, run by hand). This job
+# carries those entries forward untouched but cannot create them — a new or
+# edited block in those languages shows an empty panel until someone runs the
+# capture. Missing entries are "no entry", not an error; Run is unaffected.
 #
-# So the manifest and its figures are committed, and this workflow is what
-# keeps them current. The generator reuses committed entries key-for-key —
-# keys are content hashes, so an entry that exists is an entry that is still
-# correct — which means:
-#
-#   • a deploy reads the committed manifest and executes nothing;
-#   • this workflow only executes the blocks that actually changed;
-#   • an unchanged block's figure file is never rewritten, so the committed
-#     assets do not churn. That matters: matplotlib's PNG bytes are not
-#     reproducible run to run, so a full re-run would rewrite all ~370 files
-#     every time for no visible change.
-#
-# ── What this job does not regenerate ─────────────────────────────────────
-#
-# r, java, csharp, web, react and php have no Node runtime, so their output
-# comes from `scripts/capture-browser-outputs.mjs`, which drives a real
-# browser and is run by hand. This job *carries* those entries forward
-# untouched — it used to delete them, which cost R, Java and C# their
-# previews for four commits — but it cannot create them. A new or edited
-# block in one of those languages shows an empty panel until someone runs
-# `npm run capture:block-outputs`.
-#
-# This workflow is the *only* thing that runs the generator automatically.
-# Neither `build` nor `dev` does: both read the committed manifest and nothing
-# else, so no deploy and no local start ever boots Pyodide or clang. Anyone
-# who wants a block's output sooner runs `npm run build:block-outputs`.
-#
-# ── What a pull request sees ──────────────────────────────────────────────
-#
-# A block that already existed: its committed output, same as production. A
-# block the PR *adds or edits*: an empty output panel, until this workflow
-# regenerates after the merge. That is the same panel the block would show if
-# its entry were missing for any other reason, and the same one every block
-# showed before this feature existed — prepopulated output is a nicety, and
-# every consumer treats a missing entry as "no entry" rather than an error.
-# Pressing Run is unaffected either way.
-#
-# This workflow deliberately does not run on pull requests: it would mean a
-# bot commit on every content branch.
+# This is the only thing that runs the generator automatically; `build` and
+# `dev` just read the committed manifest. Deliberately not run on PRs — that
+# would mean a bot commit on every content branch.
 
 on:
   push:
@@ -91,9 +59,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          # The commit this job pushes must not re-trigger the workflow; a
-          # push made with the default GITHUB_TOKEN does not fire `push`
-          # events, which is exactly the behaviour wanted here.
+          # Pushes made with the default GITHUB_TOKEN don't fire `push`
+          # events, so this job's commit can't re-trigger the workflow.
           persist-credentials: true
 
       - uses: actions/setup-node@v7
@@ -101,9 +68,8 @@ jobs:
           node-version: "22"
           cache: npm
 
-      # `--ignore-scripts` skips the postinstall codegen, the same as the
-      # content sweeps: this job needs the dependencies, not a second pass
-      # over 900 lessons.
+      # `--ignore-scripts` skips the postinstall codegen; this job needs the
+      # dependencies only.
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
@@ -112,9 +78,8 @@ jobs:
       - name: Patch almostnode
         run: node scripts/patch-almostnode.mjs
 
-      # Blocks that read a CSV fetch it from the dataslope/datasets repo. The
-      # sweeps cache these the same way; without it every regeneration
-      # re-downloads the same files.
+      # CSV-reading blocks fetch from the dataslope/datasets repo; cache so
+      # regenerations don't re-download the same files.
       - name: Restore dataset cache
         uses: actions/cache@v6
         with:
@@ -122,9 +87,8 @@ jobs:
           key: dataset-cache-v1-${{ hashFiles('content/**/*.mdx') }}
           restore-keys: dataset-cache-v1-
 
-      # The C and C++ blocks compile against a 114 MB toolchain the generator
-      # downloads from npm on first use. Keyed on the pinned versions inside
-      # block-runners.mjs, so a version bump fetches a fresh one.
+      # 114 MB toolchain, downloaded from npm on first use. Keyed on the
+      # pinned versions in block-runners.mjs so a bump fetches fresh.
       - name: Restore C/C++ toolchain
         uses: actions/cache@v6
         with:
@@ -144,9 +108,7 @@ jobs:
             echo "No block output changed."
             exit 0
           fi
-          # Say what moved, in the commit itself: a bot commit that only says
-          # "update outputs" tells a reader nothing about which lessons now
-          # show something different.
+          # Include what moved so the bot commit says which lessons changed.
           summary=$(git diff --cached --stat | tail -1)
           git commit -m "Regenerate prepopulated block output" \
                      -m "$summary" \

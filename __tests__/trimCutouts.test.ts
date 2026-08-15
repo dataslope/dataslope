@@ -1,16 +1,8 @@
-// Pins the geometry `scripts/trim-cutouts.mjs` derives from a cut-out's alpha
-// channel, because every failure mode of that script is silent: the artwork is
-// what ships, and a bound that is one row too tight clips a shadow (or a
-// creature's ear) in a file that still looks like a perfectly good illustration
-// in a directory listing. The two rules the script leans on — a faint halo is
-// not content, and a stray speck is not content — are exactly the ones a
-// synthetic image can state exactly.
-//
-// The other thing pinned here is *which margins* a given image loses, which is
-// a policy rather than a measurement: an in-lesson figure keeps its left and
-// right blank so a run of lessons shares an edge, a thumbnail gives it up
-// because it is painted ~100px wide and every blank column is drawing surface
-// the subject does not get.
+// Pins the geometry scripts/trim-cutouts.mjs derives from a cut-out's alpha
+// channel — every failure mode is silent (a bound one row too tight clips a
+// shadow in art that still looks fine). Also pins the margin policy:
+// in-lesson figures keep left/right blank so lessons share an edge;
+// thumbnails give it up because they paint ~100px wide.
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 
@@ -89,10 +81,8 @@ describe("contentBounds", () => {
   });
 
   it("does not let a speck outside the content band widen the horizontal bound", async () => {
-    // Columns are measured only within the rows that survived, so the speck
-    // that was too small to make row 5 count cannot pull `left` out to 0
-    // either — otherwise the horizontal trim would be defeated by exactly the
-    // debris the vertical one is built to ignore.
+    // Columns are measured only within surviving rows, so a speck too small
+    // to count vertically cannot pull `left` out to 0 either.
     const bounds = await contentBounds(
       await image([
         { from: 0, to: 8, alpha: 255, x0: 0, x1: 2 },
@@ -172,9 +162,8 @@ describe("trimPlan", () => {
   });
 
   it("trims a frame that is blank only at the sides under axes: both", async () => {
-    // Vertically tight, horizontally not: the case the old height-only gain
-    // measure would have skipped, and the one every thumbnail is in after the
-    // first vertical-only pass.
+    // Vertically tight, horizontally not: the case a height-only gain measure
+    // would skip, and where every thumbnail lands after a vertical-only pass.
     const bounds = await contentBounds(
       await image([{ from: 1, to: 98, alpha: 255, x0: 40, x1: 159 }]),
     );
@@ -207,11 +196,9 @@ describe("trimAxesFor", () => {
   });
 
   it("agrees with the prompt corpus on every prompt", () => {
-    // The fallback above is only safe while the corpus keeps naming thumbnails
-    // `<something>-thumbnail`. A prompt that broke the convention would be
-    // trimmed correctly (the category wins) but would quietly make the
-    // fallback wrong for anything promoted outside the corpus, so the two are
-    // held together here rather than in a comment.
+    // The fallback is only safe while the corpus names thumbnails
+    // `<x>-thumbnail`; a convention-breaking prompt would trim fine (category
+    // wins) but silently break the fallback, so the two are held together here.
     const disagreements = promptsData.prompts.filter(
       (p) => p.category.endsWith("-thumbnail") !== p.id.endsWith("-thumbnail"),
     );

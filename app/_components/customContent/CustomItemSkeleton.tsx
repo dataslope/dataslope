@@ -1,26 +1,11 @@
 "use client";
 
 /**
- * Static, dependency-light placeholder shown while the real interactive
- * card (CustomItemRenderer) is being fetched on /c, /quiz, and the
- * builder previews.
- *
- * Two jobs, both UX (see the lazy-loading note in
- * CustomItemRendererLazy.tsx):
- *
- *  1. Content, not a spinner: the payload is already on the page (it
- *     came with the server render), so the skeleton shows the REAL
- *     instructions, starter code, and MCQ choices as plain text. A
- *     visitor starts reading the task immediately; only interactivity
- *     arrives later.
- *  2. Shape parity: the layout mirrors the card's chrome (header strip,
- *     instructions block, editor-sized code area, toolbar strip) so the
- *     swap to the mounted card barely moves the content below it.
- *
- * Everything here must stay cheap: no markdown pipeline, no CodeMirror,
- * no runtime imports — the whole point is that this module (unlike the
- * card graph) is small enough to ship in every bundle, including the
- * SSR/Worker one. `parseQuestion` is a small pure parser, safe to use.
+ * Static placeholder shown while CustomItemRenderer is fetched. Shows the
+ * REAL instructions/starter code/choices as plain text (the payload came
+ * with the server render), shaped like the card so the swap barely shifts
+ * layout. Must stay cheap — no markdown pipeline, CodeMirror, or runtime
+ * imports — so it can ship in every bundle including the SSR/Worker one.
  */
 
 import { parseQuestion } from "../multipleChoice/parseQuestion";
@@ -46,9 +31,7 @@ export default function CustomItemSkeleton({
   badge,
 }: CustomItemRendererProps) {
   if (payload.kind === "mcq") {
-    // Parse once to echo the question body + choices as inert text. The
-    // markdown source reads fine as plain text for the second or so the
-    // skeleton is visible.
+    // Echo the question body + choices as inert text.
     const parsed = parseQuestion(payload.markdown);
     return (
       <section aria-busy="true" role="status" className={CARD_CLS}>
@@ -103,9 +86,8 @@ export default function CustomItemSkeleton({
           {payload.instructions}
         </p>
       </div>
-      {/* Editor-shaped block: sized to the mounted card's typical editor
-          footprint (SQL cards run taller, they carry an engine status /
-          table strip) so the swap barely moves the content below. */}
+      {/* Editor-shaped block sized to the mounted card's footprint (SQL
+          cards run taller). */}
       <div
         className={`${isSql ? "min-h-[270px]" : "min-h-[260px]"} bg-[var(--ds-gray-50)] px-4 py-3 dark:bg-white/[0.03]`}
       >

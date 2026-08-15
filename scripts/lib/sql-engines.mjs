@@ -1,33 +1,15 @@
 /**
  * The site's SQL runtimes, in Node, behind the `SqlEngineLike` interface that
- * `app/_components/sqlChallengeHarness.ts` grades against.
+ * `app/_components/sqlChallengeHarness.ts` grades against. Each engine runs
+ * the same database at the same major version the browser serves; the DuckDB
+ * devDependency must stay pinned *exactly* to the `DUCKDB_VERSION` in
+ * `runtime/duckdb.ts` (a caret range would drift onto a build no reader
+ * gets). The UI (result grid, sidebar, paging) is not reproduced — it cannot
+ * make correct SQL fail.
  *
- * `<SqlCodeBlock>` and `<SqlChallengeCard>` are the largest unchecked group of
- * runnable content in the repo: 381 blocks and 73 cards. Nothing has ever
- * executed them outside a browser, so a dialect quirk or a renamed column in a
- * remote dataset ships silently, exactly as it did for Python before
- * check-code-blocks existed.
- *
- * PGlite and sqlite-wasm publish Node builds and are already runtime
- * dependencies of the site. DuckDB is loaded from a CDN by `runtime/duckdb.ts`
- * rather than installed, so it is a devDependency here, pinned *exactly* to
- * the `DUCKDB_VERSION` that file names. A caret range would let the sweep
- * drift onto a build no reader is served, which defeats the point of running
- * the same engine they do.
- *
- * ── On fidelity ────────────────────────────────────────────────────────────
- *
- * Each engine below answers the same question the browser does — "does this
- * SQL run, and does the card's own reference solution satisfy its own tests?"
- * — against the same database engine at the same major version. What it does
- * not reproduce is the UI: no result grid, no schema sidebar, no paging. Those
- * cannot make correct SQL fail.
- *
- * A fresh database per block is deliberate. The browser gives every block its
- * own engine instance, so `CREATE TABLE orders` in one lesson must not be
- * visible to the next; a shared connection would let a block pass because an
- * earlier one happened to set it up, which is the SQL version of the
- * `sys.modules` leak that made the Python sweep fail innocent cards.
+ * A fresh database per block is deliberate: the browser gives every block its
+ * own engine instance, and a shared connection would let a block pass because
+ * an earlier one set up its tables.
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -59,16 +41,10 @@ export async function fetchRemoteInitSql(pathOrUrl) {
 
 /**
  * Mirrors `preparePostgresScriptForPglite` in
- * `app/_components/runtime/postgres.ts`.
- *
- * The Chinook release script is a psql dump: it opens with meta-commands
- * (`\c`, `\connect`) and `CREATE DATABASE`, neither of which a single-database
- * embedded PGlite can run. The browser strips them before seeding, so a sweep
- * that does not is testing a script no reader is ever given — it reported
- * `syntax error at or near "\"` against six perfectly good lessons.
- *
- * Both constructs are single-line in practice, which is why this is a line
- * filter there and here.
+ * `app/_components/runtime/postgres.ts`: strip the psql meta-commands and
+ * `CREATE DATABASE` a single-database embedded PGlite cannot run, as the
+ * browser does before seeding. Both constructs are single-line in practice,
+ * hence the line filter.
  */
 export function preparePostgresScript(sql) {
   return sql
@@ -83,12 +59,9 @@ export function preparePostgresScript(sql) {
 }
 
 /**
- * Split on semicolons that are not inside a string, a quoted identifier, or a
- * comment.
- *
- * sqlite-wasm's `exec` takes one statement at a time, and `initSql` is
- * routinely several. Naive `sql.split(";")` breaks on the first row literal
- * containing a semicolon, which lesson data does contain.
+ * Split on semicolons that are not inside a string, quoted identifier, or
+ * comment — lesson data contains row literals with semicolons, so a naive
+ * split breaks.
  */
 export function splitStatements(sql) {
   const out = [];
@@ -199,20 +172,12 @@ async function createPostgresEngine() {
 /**
  * DuckDB-Wasm, the same version `runtime/duckdb.ts` loads from jsDelivr.
  *
- * Two pieces of Node plumbing, both non-obvious enough to be worth recording:
- *
- *   • The worker is created with the `web-worker` package rather than
- *     `node:worker_threads`. duckdb-wasm drives a Web Worker (addEventListener,
- *     postMessage-with-events), and `node:worker_threads` has the same idea
- *     under different names; hand it the raw Node worker and `instantiate()`
- *     hangs forever with no error, because the bundled bootstrap never gets
- *     the messages it is waiting for.
- *   • `createWorker()` from the Node build is not usable here: it `fetch`es
- *     the worker URL, which rules out `file://`, and then hands the result to
- *     a shim that calls `fileURLToPath`, which rules out `http://`.
- *
- * Bundle selection still goes through duckdb's own `selectBundle`, so the
- * sweep gets whichever of mvp/eh this runtime supports rather than a guess.
+ * Node plumbing quirks: the worker must come from the `web-worker` package —
+ * duckdb-wasm drives a Web Worker, and a raw `node:worker_threads` worker
+ * makes `instantiate()` hang forever with no error. duckdb's own
+ * `createWorker()` is unusable here (it fetches the URL, ruling out
+ * `file://`, then `fileURLToPath`s it, ruling out `http://`). Bundle
+ * selection still goes through duckdb's `selectBundle`.
  */
 async function createDuckDbEngine() {
   const require = createRequire(import.meta.url);
@@ -241,19 +206,12 @@ async function createDuckDbEngine() {
   return {
     label: "DuckDB",
     /**
-     * Stage the files a block reads over HTTP, and remember what to call them.
-     *
-     * In the browser duckdb reaches those URLs through httpfs; here it reports
-     * "No files found that match the pattern", and registering the bytes under
-     * the URL as a filename does not help — duckdb sees the `https://` prefix
-     * as a protocol and goes to the network before it consults registered
-     * files. So the bytes are registered under a plain name and `exec` rewrites
-     * references to it.
-     *
-     * That is staging, not cheating: it is the same substitution
-     * `datasets={[{ path, stageAs }]}` performs for the Python and R blocks,
-     * and the query under test is unchanged in everything except where its
-     * bytes come from.
+     * Stage the files a block reads over HTTP. In the browser duckdb uses
+     * httpfs; here it cannot, and registering bytes under the URL as a
+     * filename fails too (duckdb treats the `https://` prefix as a protocol
+     * before consulting registered files). So bytes are registered under a
+     * plain name and `exec` rewrites references — the same substitution
+     * `datasets={[{ path, stageAs }]}` performs for Python and R blocks.
      */
     async registerUrls(urls) {
       for (const url of urls) {
@@ -283,14 +241,12 @@ async function createDuckDbEngine() {
         const columns = table.schema.fields.map((f) => f.name);
         const values = table.toArray().map((row) => {
           const obj = row.toJSON();
-          // Positional, through the schema's field order: the harness compares
-          // by index, and Object.values would silently reorder a duplicated
-          // column name.
+          // Positional through the schema's field order: the harness compares
+          // by index, and Object.values would reorder a duplicated name.
           return columns.map((c) => {
             const v = obj[c];
-            // Arrow hands back BigInt for 64-bit ints; the harness's
-            // valueEquals already treats those as comparable to numbers, but
-            // only once they are not Arrow's own wrapper types.
+            // Unwrap Arrow wrapper types; BigInt is already comparable in the
+            // harness's valueEquals.
             return typeof v === "bigint" ? v : (v?.valueOf?.() ?? v);
           });
         });

@@ -1,16 +1,9 @@
 /**
  * TypeScript → JavaScript, exactly as the TypeScript adapter does it.
- *
- * Extracted from `typescript-worker.ts` so something other than a Web Worker
- * can call it. That worker touches `self` at module scope, so a script cannot
- * import it; without this split a sweep would have to restate the compiler
- * options, and a restated compiler is a compiler that drifts. The one that
- * matters most is `module: CommonJS` — it is what makes almostnode's
- * `require()` resolve modules out of the VirtualFS, and getting it wrong turns
- * every multi-file TypeScript lesson into a module-resolution error that no
- * reader sees.
- *
- * `typescript-worker.ts` imports these, so there is one definition.
+ * Extracted from typescript-worker.ts (which touches `self` at module
+ * scope) so scripts can import it — one definition, no drifting compiler
+ * options. `module: CommonJS` is the critical one: it's what lets
+ * almostnode's require() resolve modules out of the VirtualFS.
  */
 import * as ts from "typescript";
 
@@ -29,9 +22,8 @@ export function tsToJsPath(p: string): string {
   return p;
 }
 
-/** Transpile TS source → JS. Diagnostics are returned alongside the output
- *  text so the caller can surface them as stderr cells without aborting the
- *  run (the legacy adapter behaved the same way). */
+/** Transpile TS source → JS. Diagnostics return alongside the output so
+ *  the caller can surface them as stderr without aborting the run. */
 export function transpileTs(
   source: string,
   fileName: string,
@@ -39,9 +31,7 @@ export function transpileTs(
   const result = ts.transpileModule(source, {
     compilerOptions: {
       target: ts.ScriptTarget.ES2022,
-      // CommonJS so almostnode's `require()` resolves modules from
-      // VirtualFS. Top-level `import`/`export` statements in user code
-      // are downleveled to `require()`/`module.exports` automatically.
+      // CommonJS so almostnode's require() resolves modules from VirtualFS.
       module: ts.ModuleKind.CommonJS,
       esModuleInterop: true,
       allowJs: true,

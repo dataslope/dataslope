@@ -1,26 +1,11 @@
 /**
- * Build-time data for the `/courses` catalog page.
- *
- * Every course folder's `meta.json` under `content/courses/` (the same source
- * of truth the homepage cards use, see `getCourses` in `app/page.tsx`) is
- * mirrored into `lib/generated/course-catalog.js` by
- * `scripts/build-course-catalog.mjs`. This module enriches that with a "most
- * popular" rank for the catalog's default sort.
- *
- * It reads the generated module rather than the filesystem ON PURPOSE. The
- * previous version called `readdir`/`readFile` here, which throws on
- * Cloudflare Workers — workerd has no filesystem — so any request that had to
- * render `/` or `/courses` on demand rather than serve them from the
- * incremental cache returned a 500. That happened for real on 2026-08-05 when
- * a cache cleanup deleted the folder a preview was serving. Importing the data
- * keeps a cache miss slow rather than fatal. Keep this module free of
- * `node:fs`.
- *
- * The popularity ranking is a hand-curated stand-in, the repo has no
- * analytics data, ordered roughly "friendliest entry points first". Replace
- * with real engagement figures when they exist. Courses missing from the list
- * sort after every ranked course, alphabetically. It stays here rather than in
- * the generated file because it is editorial judgement, not content.
+ * Data for the `/courses` catalog page: enriches the generated course catalog
+ * (lib/generated/course-catalog.js) with a "most popular" rank for the
+ * default sort. Reads the generated module rather than the filesystem ON
+ * PURPOSE: workerd has no filesystem, so fs calls 500 any request rendered on
+ * demand instead of from the incremental cache — keep this module free of
+ * `node:fs`. The ranking is a hand-curated stand-in (no analytics yet);
+ * unranked courses sort after every ranked one, alphabetically.
  */
 import generatedCourses from "@/lib/generated/course-catalog";
 import type { CourseTags } from "@/app/_components/home/CoursesSection";
@@ -73,12 +58,8 @@ const POPULARITY_ORDER: string[] = [
 
 const RANK = new Map(POPULARITY_ORDER.map((slug, i) => [slug, i + 1]));
 
-/** Every course (root folder with a titled meta.json) under content/courses,
- *  sorted by the stand-in popularity rank (ties: alphabetical).
- *
- *  Async purely to keep the call sites unchanged — the two callers await it
- *  from server components, and this stayed a promise so switching the data
- *  source is not also a refactor of `app/page.tsx` and `app/courses/page.tsx`. */
+/** Every course under content/courses, sorted by the stand-in popularity
+ *  rank (ties: alphabetical). Async purely to keep the call sites unchanged. */
 export async function getCourseCatalog(): Promise<CatalogCourse[]> {
   return generatedCourses
     .map((course) => ({

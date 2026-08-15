@@ -5,27 +5,12 @@ import { extractMcqBlocks, findMcqFiles } from "../scripts/check-mcq.mjs";
 import { parseQuestion } from "../app/_components/multipleChoice/parseQuestion";
 
 /**
- * Runs the REAL runtime parser over the authored MCQ corpus.
- *
- * `mcqContent.test.ts` guards the same corpus for authoring rules, but through
- * `check-mcq.mjs`'s own loose reimplementation of the parser ("mirrors
- * parseQuestion.ts closely enough for linting purposes"). The two drifted, and
- * the gap shipped: `beginners-javascript/promises-and-async-await` authored its
- * four choices as a bare `- ` marker with the code fence on the line below,
- * which the linter read as four choices and `parseQuestion` read as one empty
- * one. The lesson rendered a question with a single blank radio button in
- * production, and every check was green.
- *
- * So this file deliberately imports the component's own parser: whatever the
- * linter believes, these are the assertions that describe what a learner
- * actually sees.
- *
- * Each block is checked twice, as authored and with one level of indentation
- * removed, because MDX strips the template literal's indent before the parser
- * runs (verified against `@mdx-js/mdx`: `  ```js` inside `markdown={` … `}`
- * reaches the runtime at column 0). Asserting both means the corpus stays
- * valid whether or not that behaviour holds in a future MDX release, without
- * this test having to model it exactly.
+ * Runs the REAL runtime parser (parseQuestion) over the authored MCQ corpus.
+ * check-mcq.mjs's loose reimplementation drifted from it once and the gap
+ * shipped: a lesson rendered a single blank radio button while every check
+ * was green. Each block is checked twice — as authored and dedented — because
+ * MDX strips the template literal's indent before the parser runs, and
+ * asserting both keeps the corpus valid either way.
  */
 describe("<MultipleChoice> corpus through the runtime parser", () => {
   const files = [

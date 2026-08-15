@@ -1,13 +1,9 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// ─────────────────────────────────────────────────────────────────────
-// Post-commit undo (UX-10), all three engines:
-//   • after committing a cell edit, a slim undo bar offers to revert it;
-//   • clicking "Undo" re-applies the previous value (PK-addressed) and the
-//     bar disappears.
-// The feature lives entirely in the shared ResultView; the reverse write goes
-// through each engine's existing update path, so this exercises all three.
-// ─────────────────────────────────────────────────────────────────────
+// Post-commit undo, all three engines: after a committed cell edit an undo
+// bar offers to revert; "Undo" re-applies the previous value (PK-addressed).
+// Lives in the shared ResultView; the reverse write goes through each
+// engine's update path.
 
 async function runSql(page: Page, sql: string) {
   const editor = page.locator(".cm-content");

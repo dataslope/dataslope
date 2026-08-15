@@ -1,21 +1,10 @@
 "use client";
 
 /**
- * Ask AI answer ratings: the thumbs up/down readers leave under an answer,
- * with the exchange each one refers to.
- *
- * This is the whole point of storing anything — a downvote you cannot read is
- * a number, where a downvote next to the question that produced it is a bug
- * report. So the page leads with the ratio, defaults to the downvotes (the
- * ones worth acting on), and shows each answer in full behind a disclosure
- * rather than truncating it to a preview nobody can judge from.
- *
- * Only rated exchanges exist to show: nothing is written unless a user rates
- * an answer (see app/api/ai/feedback/route.ts), so an empty page means nobody
- * has rated anything, not that the feature is broken.
- *
- * Data comes from `GET /api/admin/ai-feedback` (admin-enforced server-side).
- * Presentation follows the soft design kit in `_components/shared.tsx`.
+ * Ask AI answer ratings with the exchange each refers to, from
+ * GET /api/admin/ai-feedback (admin-enforced server-side). Only rated
+ * exchanges are ever stored, so an empty page means nobody has rated
+ * anything, not that the feature is broken.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader2, RefreshCw, ThumbsDown, ThumbsUp } from "lucide-react";
@@ -48,8 +37,7 @@ const FILTERS: { id: Filter; label: string }[] = [
   { id: "all", label: "All" },
 ];
 
-/** "3 Feb, 14:05" — short, and stable between server and client because it is
- *  only ever rendered after a fetch. */
+/** "3 Feb, 14:05" — only rendered after a fetch, so no hydration mismatch. */
 function when(iso: string): string {
   const d = new Date(iso);
   return Number.isNaN(d.getTime())
@@ -62,14 +50,8 @@ function when(iso: string): string {
       });
 }
 
-/**
- * Where the question was asked, clickable when it is a page.
- *
- * A `learn` slug is the full path from the root ("courses/python-basics/
- * variables", "interview-prep/…"), collection segment included, so the link is
- * just `/<slug>` — prefixing it with `/courses` would send a reviewer to
- * `/courses/courses/…`.
- */
+/** Where the question was asked, clickable when it is a page. A `learn` slug
+ *  already includes the collection segment, so the link is just `/<slug>`. */
 function Where({ row }: { row: AiFeedbackRow }) {
   if (!row.slug) return <span className="text-muted-foreground">—</span>;
   if (row.surface === "playground") {
@@ -148,8 +130,7 @@ export function AiFeedbackClient() {
   const [error, setError] = useState<string | null>(null);
   const [denied, setDenied] = useState(false);
 
-  // Same guard the usage page uses: flipping filters quickly fires overlapping
-  // fetches, and a slow stale response must not overwrite the newer one.
+  // Monotonic sequence: a slow stale response must not overwrite a newer one.
   const loadSeq = useRef(0);
 
   const load = useCallback(async (next: Filter) => {

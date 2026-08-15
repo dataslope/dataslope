@@ -8,16 +8,11 @@ export default defineConfig({
     alias: { "@": path.resolve(import.meta.dirname) },
   },
   test: {
-    // Tests that use browser APIs (WebAssembly, WebWorker, SharedArrayBuffer)
-    // are tagged as "browser" and skipped in the Node environment.
-    // Run the full test suite with:  npm test
+    // Tests using browser APIs are tagged "browser" and skipped in Node.
     environment: "node",
-    // E2E tests live in `e2e/` and are run by Playwright
-    // (`npm run test:e2e`). Keep Vitest from picking them up so that
-    // `npm test` stays a fast Node-only check.
-    // Match nested node_modules too (e.g. cloudflare-cors-proxy/node_modules)
-    // so we never pick up third-party package tests when the worker's deps
-    // are installed locally.
+    // e2e/ belongs to Playwright (`npm run test:e2e`). `**/node_modules/**`
+    // also matches nested ones (e.g. cloudflare-cors-proxy/node_modules) so
+    // third-party package tests are never collected.
     exclude: ["**/node_modules/**", "dist/**", ".next/**", "e2e/**"],
   },
 });

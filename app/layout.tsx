@@ -9,12 +9,8 @@ import SkipToContent from "@/app/_components/SkipToContent";
 import { ReturnToTracker } from "@/app/_components/auth/returnTo";
 
 // The app's two typefaces, self-hosted by next/font and published as CSS
-// variables on <html> so every route (and every portal, portals stay inside
-// <html>) can consume them. This is the ONLY place the webfonts are loaded;
-// stylesheets reference var(--font-sans) / var(--font-mono) and must not
-// re-import the faces (the old per-stylesheet Google Fonts @imports
-// double-loaded Inter alongside next/font and forced a render-blocking
-// third-party request).
+// variables on <html>. This is the ONLY place webfonts load — stylesheets
+// reference var(--font-sans)/var(--font-mono) and must not re-import faces.
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -30,12 +26,9 @@ const jetbrainsMono = JetBrains_Mono({
 const SITE_DESCRIPTION =
   "Free, interactive, no sign-up. Browser-based playgrounds and courses for Python, SQL, C++, and more, all running on WebAssembly.";
 
-// `metadataBase` makes every relative OpenGraph/canonical URL resolve to an
-// absolute production URL. The `title.template` appends "· DataSlope" to each
-// page's own title (e.g. "SQLite Playground" → "SQLite Playground · DataSlope")
-// while `default` covers routes that set no title of their own. Routes without
-// their own `openGraph`/`twitter` (the playground layouts, /terms, /privacy)
-// inherit this site-level card + share image, so every page is shareable.
+// `metadataBase` resolves relative OG/canonical URLs to absolute production
+// URLs; `title.template` appends "· DataSlope". Routes without their own
+// openGraph/twitter inherit this site-level card, so every page is shareable.
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -60,21 +53,12 @@ export const metadata: Metadata = {
   },
 };
 
-// Runs before React hydrates, on EVERY route.
-//
-// First it normalizes the shared `localStorage["theme"]` key to the site's
-// binary contract ("light" | "dark"): any other value (e.g. a legacy
-// "system" written by Fumadocs's default theme switch before it was replaced
-// by the shared pill toggle) is removed, so both the non-Fumadocs bootstrap
-// scripts (which treat non-"dark" as light) and next-themes on the Fumadocs
-// routes (configured with defaultTheme "light", enableSystem false) resolve
-// a missing value to the same light default instead of diverging.
-//
-// Then, on /playground routes only, it applies the site light/dark choice to
-// the playground's CSS custom properties + `data-playground-theme`, so the
-// chrome never paints in the wrong palette before the React app (and
-// usePlaygroundThemeSync) takes over. The two GitHub palettes mirror
-// THEME_PALETTES in playgroundTheme.ts.
+// Runs before React hydrates, on EVERY route. Normalizes localStorage
+// "theme" to the site's binary "light" | "dark" contract (anything else is
+// removed so every consumer resolves a missing value to light). Then, on
+// /playground routes only, applies the choice to the playground CSS custom
+// properties + `data-playground-theme` so the chrome never paints in the
+// wrong palette; the palettes mirror THEME_PALETTES in playgroundTheme.ts.
 const themeBootstrapScript = `
 (function () {
   try {
@@ -125,13 +109,9 @@ export default function RootLayout({
     >
       <head>
         <link rel="icon" href="/dataslope-logo-blue.svg" type="image/svg+xml" />
-        {/* Warm up the CDNs the WASM runtimes and sample datasets load
-            from, so the first runtime boot skips the DNS + TLS round
-            trips. Full preconnect for the two hosts almost every page
-            hits (jsDelivr serves Pyodide, sqlite-wasm, PGlite, the .NET
-            assemblies, browsercc and the datasets; raw.githubusercontent
-            is the datasets fallback); cheap dns-prefetch for the
-            language-specific rest. */}
+        {/* Warm up the WASM-runtime/dataset CDNs so the first boot skips
+            DNS + TLS. Full preconnect for the two hosts almost every page
+            hits; cheap dns-prefetch for the language-specific rest. */}
         <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://raw.githubusercontent.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://webr.r-wasm.org" />
@@ -145,9 +125,8 @@ export default function RootLayout({
             stops before the editor. Visually hidden until focused. */}
         <SkipToContent />
         {children}
-        {/* Signed-in "Ask AI" chat pane. Renders only on /learn and
-            /playground (pathname-gated inside), and its heavy deps are
-            dynamically imported so other pages don't pay for them. */}
+        {/* "Ask AI" chat pane; pathname-gated inside to /learn and
+            /playground, heavy deps dynamically imported. */}
         <AskAi />
         {/* Corner badge with the brand diamond loader, shown while a slow
             client-side navigation (playgrounds, course pages) is pending. */}

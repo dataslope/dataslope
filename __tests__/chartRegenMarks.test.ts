@@ -1,12 +1,8 @@
-// The chart review queue (lib/charts/regenMarks.ts), the D1 layer behind the
-// "mark for redraw" control on /dashboard/admin/charts.
-//
-// The mechanics are shared with the illustration queue (lib/review/marks.ts)
-// and covered by illustrationRegenMarks.test.ts. What is worth pinning *here*
-// is the part that is not shared and cannot be caught by types: the table name.
-// D1 cannot bind an identifier, so the queue name is interpolated into every
-// statement, and a chart binding that reached `illustration_regen_marks` would
-// silently write into the wrong queue and pass every other test in the file.
+// The chart review queue (lib/charts/regenMarks.ts). Mechanics are shared
+// with the illustration queue and covered by illustrationRegenMarks.test.ts;
+// pinned here is what types cannot catch: D1 cannot bind an identifier, so
+// the queue table name is interpolated into every statement, and a chart
+// binding reaching the illustration table would silently write there.
 import { describe, expect, it } from "vitest";
 import type { D1Database } from "@cloudflare/workers-types";
 

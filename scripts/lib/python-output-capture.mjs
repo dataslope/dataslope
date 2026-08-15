@@ -1,33 +1,19 @@
 /**
- * Rich-output capture for `build-block-outputs.mjs`.
+ * Rich-output capture for `build-block-outputs.mjs`: re-patches the rendering
+ * seams `pyodide-runner.mjs` stubs, so a lesson's output panel gets the
+ * table/chart/figure a reader would see.
  *
- * `pyodide-runner.mjs` deliberately stubs rendering: the sweeps only ask
- * "does this raise?", so `plt.show()` is a no-op and `display()` just
- * prints. Prepopulating a lesson's output panel needs the opposite — the
- * table, the chart and the figure exactly as a reader would see them — so
- * this script re-patches the same three seams on top of that boot.
- *
- * ── Keep this in step with the worker ────────────────────────────────────
- * The wire shape below (`{type: "stdout"|"stderr"|"dataframe"|"html"|
- * "image"|"plot"}`) is the one `app/_components/runtime/pyodide-worker.ts`
- * produces in `_display_outputs`, and the JS side of the conversion is
- * shared rather than copied: both go through `toOutputCells()` in
- * `app/_components/runtime/pythonDisplayOutputs.ts`. The *Python* half is
- * a second implementation, and the risk that comes with that is real: if
- * the worker changes how it renders a DataFrame, a prepopulated panel will
- * quietly disagree with what Run produces. Two things bound the damage —
- * the shapes are asserted by `__tests__/blockOutputs.test.ts`, and a
- * mismatch is visible rather than silent, because the learner can press Run
- * and compare.
+ * Keep the wire shape (`{type: "stdout"|"stderr"|"dataframe"|"html"|"image"|
+ * "plot"}`) in step with `_display_outputs` in
+ * `app/_components/runtime/pyodide-worker.ts`; the JS side is shared via
+ * `toOutputCells()` in `pythonDisplayOutputs.ts`, but the Python half here is
+ * a second implementation, pinned by `__tests__/blockOutputs.test.ts`.
  */
 
 /**
- * Installed once, after `bootPyodide()`.
- *
- * Everything lives in the *main* globals, while blocks execute in a fresh
- * namespace per run, which is exactly what makes the split work: the tee
- * and the patched `show()` persist, and nothing a block defines leaks into
- * the next one.
+ * Installed once, after `bootPyodide()`, into the *main* globals — blocks run
+ * in a fresh namespace each, so the tee and patched `show()` persist while
+ * nothing a block defines leaks into the next.
  */
 export const CAPTURE_SETUP = `
 import sys, io, base64, json, ast as _bo_ast
@@ -187,23 +173,14 @@ def _bo_last_expr_span(src):
     return json.dumps({"start": start, "end": end})
 `;
 
-/**
- * Figure DPI for prepopulated charts.
- *
- * The worker renders at 130 for a crisp on-screen figure the reader just
- * asked for. A preview is a still the reader did not ask for and pays for
- * on page load, so it is rendered at 96: visually near-identical at the
- * width a lesson column gives it, and roughly half the bytes.
- */
+/** Figure DPI for prepopulated charts. The worker renders at 130; a preview
+ *  is paid for on page load, so 96 — near-identical at lesson-column width,
+ *  roughly half the bytes. */
 export const FIGURE_DPI = 96;
 
-/** The setup script with its DPI placeholder filled in.
- *
- *  `replaceAll`, not `replace`: the placeholder appears in both the
- *  `plt.show()` patch and the end-of-run figure flush, and a single-shot
- *  replace left the second one as a bare name, so every figure-producing
- *  block raised `NameError` inside `_bo_take()` and was silently recorded
- *  as having produced no output at all. */
+/** The setup script with its DPI placeholder filled in. `replaceAll`, not
+ *  `replace`: the placeholder appears twice, and a single-shot replace left
+ *  the second as a bare name that raised NameError in `_bo_take()`. */
 export function captureSetupScript() {
   return CAPTURE_SETUP.replaceAll("BO_FIGURE_DPI", String(FIGURE_DPI));
 }

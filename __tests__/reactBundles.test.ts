@@ -7,7 +7,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 
 import { ESBUILD_WASM_VERSION } from "../app/_components/runtime/cdn";
-import { blockOutputKey } from "../lib/blockOutputKey";
+import { workspaceOutputKey } from "../lib/blockOutputKey";
 import { extractBlocks } from "../scripts/lib/mdx-blocks.mjs";
 
 /** The shape `extractBlocks` returns, narrowed to what these guards use. */
@@ -22,6 +22,13 @@ interface ExtractedBlock {
 const ROOT = join(__dirname, "..");
 const MANIFEST = join(ROOT, "lib/generated/react-bundles.json");
 
+/** Mirrors the generator's and CodeBlock's entry resolution. */
+function resolveEntry(b: ExtractedBlock): string {
+  return b.files.some((f) => f.filename === b.entry)
+    ? b.entry
+    : b.files[0].filename;
+}
+
 function manifest(): Record<string, Record<string, { js: string; css?: string }>> {
   return existsSync(MANIFEST)
     ? JSON.parse(readFileSync(MANIFEST, "utf8"))
@@ -32,9 +39,7 @@ describe("the esbuild pin", () => {
   it("matches the devDependency the generator bundles with", () => {
     // The browser worker loads esbuild from jsDelivr at ESBUILD_WASM_VERSION;
     // the generator bundles with the npm package. A different esbuild is a
-    // different bundle, and the reader would see this one in the preview and
-    // produce the other one by pressing Run. The generator exits non-zero on
-    // a mismatch — this fails the suite before it gets that far.
+    // different bundle — preview and Run would disagree.
     const pkg = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8"));
     const dep: string = pkg.devDependencies["esbuild-wasm"];
     expect(dep, "esbuild-wasm must be a devDependency").toBeTruthy();
@@ -56,8 +61,7 @@ describe("the committed manifest", () => {
     // nothing else would say so.
     const missing: string[] = [];
     for (const b of blocks) {
-      const entry = b.files.find((f) => f.filename === b.entry) ?? b.files[0];
-      const key = blockOutputKey("react", entry.initCode, entry.starterCode);
+      const key = workspaceOutputKey("react", b.files, resolveEntry(b));
       if (!entries[b.file]?.[key]) missing.push(`${b.file}:${b.line}`);
     }
     expect(missing, "run `npm run build:react-bundles`").toEqual([]);
@@ -69,10 +73,7 @@ describe("the committed manifest", () => {
     // generator running, and it would keep serving a stale preview.
     const live = new Set<string>();
     for (const b of blocks) {
-      const entry = b.files.find((f) => f.filename === b.entry) ?? b.files[0];
-      live.add(
-        `${b.file}|${blockOutputKey("react", entry.initCode, entry.starterCode)}`,
-      );
+      live.add(`${b.file}|${workspaceOutputKey("react", b.files, resolveEntry(b))}`);
     }
     const stale: string[] = [];
     for (const [file, byKey] of Object.entries(entries)) {
@@ -84,10 +85,9 @@ describe("the committed manifest", () => {
   });
 
   it("holds bundles that kept their imports external", () => {
-    // The whole reason a bundle is small enough to commit: bare imports
-    // rewrite to pinned esm.sh URLs and stay external, so a bundle carries
-    // the block's own code and not a copy of React. If that ever changed,
-    // every entry would grow by ~300 kB and the manifest would balloon.
+    // Bare imports rewrite to pinned esm.sh URLs and stay external, so a
+    // bundle carries the block's own code and not a copy of React; otherwise
+    // every entry would grow by ~300 kB.
     const all = Object.values(entries).flatMap((byKey) => Object.values(byKey));
     expect(all.length).toBeGreaterThan(0);
     const total = all.reduce((n, e) => n + e.js.length + (e.css?.length ?? 0), 0);

@@ -1,18 +1,10 @@
 "use client";
 
-// Schema snapshot for the learn-route SQL surfaces (`SqlCodeBlock`,
-// `SqlChallengeCard`) — the data behind the header's tools menu:
-// the ER diagram, the DDL viewer, and the Excel export's sheet list.
-//
-// The full playgrounds read this from their engines' dedicated
-// introspection APIs (`listColumns`, `listForeignKeys`, `getDDL`). The
-// inline cards hold nothing but a generic `exec(sql)` handle, exactly
-// as `schemaIntrospect.ts` found for autocompletion, so everything here
-// is derived from plain SQL against the three dialects' catalogs.
-//
-// Failures are contained per section: a dialect that cannot answer the
-// foreign-key query still yields tables and columns, and the diagram
-// simply draws no edges.
+// Schema snapshot for the learn-route SQL surfaces (ER diagram, DDL viewer,
+// Excel export). Inline cards only hold a generic `exec(sql)` handle, so
+// everything is derived from plain SQL against the three dialects' catalogs.
+// Failures are contained per section: a dialect that can't answer the FK
+// query still yields tables and columns.
 
 import type {
   ForeignKeyInfo,
@@ -104,15 +96,10 @@ function entitiesSql(dialect: SqlDialect): string {
 
 function columnsSql(dialect: SqlDialect): string {
   if (dialect === "sqlite") {
-    // `pragma_table_info` reaches views as well as tables, and carries
-    // the pk ordinal the ER node needs for its key glyphs.
-    //
-    // `notnull` is aliased to `not_null`, not to itself: SQLite's parser
-    // rejects `AS notnull` outright ("near \"notnull\": syntax error"),
-    // even though `p."notnull"` on the left is fine. That took the whole
-    // statement down, and since a failed column query degrades to "no
-    // columns" rather than throwing, the diagram drew every table as an
-    // empty box with no hint as to why.
+    // `pragma_table_info` reaches views too and carries the pk ordinal.
+    // `notnull` must be aliased to `not_null`: SQLite's parser rejects
+    // `AS notnull` outright, and the failed query silently degrades to
+    // "no columns" (empty ER boxes).
     return `SELECT m.name AS entity, p.cid AS cid, p.name AS col, p.type AS coltype,
                    p."notnull" AS not_null, p.dflt_value AS dflt, p.pk AS pk
             FROM sqlite_master m
@@ -121,9 +108,7 @@ function columnsSql(dialect: SqlDialect): string {
             ORDER BY m.name, p.cid;`;
   }
   const schema = quoteLiteral(defaultSchemaOf(dialect));
-  // The primary-key ordinal comes from a left join onto the PK
-  // constraint's key_column_usage rows, which both PGlite and duckdb-wasm
-  // expose; `pk` stays 0 when a column isn't part of one.
+  // PK ordinal via a left join onto key_column_usage; 0 when not part of one.
   return `SELECT c.table_name AS entity, c.ordinal_position AS cid,
                  c.column_name AS col, c.data_type AS coltype,
                  c.is_nullable AS nullable, c.column_default AS dflt,
@@ -142,11 +127,8 @@ function columnsSql(dialect: SqlDialect): string {
           ORDER BY c.table_name, c.ordinal_position;`;
 }
 
-// A catalog that refuses the richer query above still has usable column
-// names and types, so the introspection retries with the smallest query
-// that answers before giving up. For SQLite that means dropping the
-// pragma columns whose names are parser minefields; for the other two,
-// dropping the primary-key join.
+// Retry with the smallest query that answers: SQLite drops the parser-hostile
+// pragma columns, the other two drop the primary-key join.
 function columnsFallbackSql(dialect: SqlDialect): string | null {
   if (dialect === "sqlite") {
     return `SELECT m.name AS entity, p.cid AS cid, p.name AS col, p.type AS coltype, p.pk AS pk
@@ -167,8 +149,7 @@ function columnsFallbackSql(dialect: SqlDialect): string | null {
 // ─── Foreign keys ────────────────────────────────────────────────────
 
 // DuckDB's constraint views don't expose FK column pairs reliably across
-// versions (the same gap `schemaIntrospect.ts` works around), so its ER
-// diagram draws tables without edges rather than wrong ones.
+// versions, so its ER diagram draws tables without edges rather than wrong ones.
 function foreignKeysSql(dialect: SqlDialect): string | null {
   if (dialect === "sqlite") {
     return `SELECT m.name AS entity, f."from" AS col, f."table" AS ref_table,
@@ -196,9 +177,8 @@ function foreignKeysSql(dialect: SqlDialect): string | null {
   return null;
 }
 
-/** Read tables, views, columns and foreign keys for the card's database.
- *  Never throws — a catalog the engine can't answer yields an empty
- *  section rather than failing the whole snapshot. */
+/** Reads tables, views, columns and foreign keys. Never throws — an
+ *  unanswerable catalog yields an empty section. */
 export async function readSqlSchemaSnapshot(
   exec: SqlExec,
   dialect: SqlDialect,
@@ -237,8 +217,7 @@ export async function readSqlSchemaSnapshot(
       cid: num(row.cid),
       name: col,
       type: str(row.coltype),
-      // SQLite reports the constraint directly; information_schema
-      // reports the inverse ("YES" when the column *is* nullable).
+      // information_schema reports the inverse ("YES" = nullable).
       notNull:
         dialect === "sqlite"
           ? bool(row.not_null)
@@ -277,12 +256,9 @@ export async function readSqlSchemaSnapshot(
 
 // ─── DDL ─────────────────────────────────────────────────────────────
 
-/** The `CREATE` statements for one entity.
- *
- *  SQLite and DuckDB store the original text in their catalogs, so they
- *  hand back what the lesson's own setup SQL wrote. Postgres keeps no
- *  such text, so its table DDL is reconstructed from the snapshot the
- *  same way `runtime/postgres.ts` reconstructs it for the playground. */
+/** The `CREATE` statements for one entity. SQLite/DuckDB return the original
+ *  catalog text; Postgres keeps none, so its table DDL is reconstructed from
+ *  the snapshot. */
 export async function readEntityDdl(
   exec: SqlExec,
   dialect: SqlDialect,
@@ -325,9 +301,8 @@ export async function readEntityDdl(
   return buildCreateTableDdl(dialect, entity, snapshot);
 }
 
-/** Reconstruct a `CREATE TABLE` from the snapshot's columns, primary key
- *  and foreign keys. Used for Postgres (which stores no DDL text) and as
- *  the fallback anywhere a catalog lookup comes back empty. */
+/** Reconstructs a `CREATE TABLE` from the snapshot. Used for Postgres and as
+ *  the fallback when a catalog lookup comes back empty. */
 export function buildCreateTableDdl(
   dialect: SqlDialect,
   entity: string,
@@ -358,8 +333,8 @@ export function buildCreateTableDdl(
   return `CREATE TABLE ${qualified} (\n${lines.join(",\n")}\n);`;
 }
 
-/** Every entity's DDL, in table-then-view order, joined into one
- *  document — what the "View DDL" dialog shows for the whole database. */
+/** Every entity's DDL, tables then views, joined into one document (the
+ *  "View DDL" dialog's content). */
 export async function readSchemaDdl(
   exec: SqlExec,
   dialect: SqlDialect,

@@ -1,27 +1,10 @@
 "use client";
 
 /**
- * <ReactPreview>, the React-course counterpart to <LivePreview>: a real,
- * interactive React component rendered inline (click the buttons, type in the
- * inputs) with the TSX that defines it shown directly underneath.
- *
- * The live component is passed as `children` (so it mounts and runs
- * immediately, no "Run" step) and its source is passed as `code` (a string,
- * shown verbatim below). Keeping the two as separate props is the standard
- * component-docs pattern: `children` is the running thing, `code` is the
- * teachable artifact. Reusable demo components live in `reactDemos.tsx` and
- * are registered globally (see mdx-components.tsx) so lessons can drop them in
- * without an import.
- *
- * Usage in MDX:
- * ```mdx
- * <ReactPreview code={`function Counter() {
- *   const [n, setN] = useState(0);
- *   return <button onClick={() => setN(n + 1)}>Clicked {n}</button>;
- * }`}>
- *   <CounterDemo />
- * </ReactPreview>
- * ```
+ * <ReactPreview>, the React-course counterpart to <LivePreview>: a live
+ * interactive component (`children`, mounts immediately) with the TSX that
+ * defines it (`code`, shown verbatim) underneath. Reusable demo components
+ * live in reactDemos.tsx, registered globally in mdx-components.tsx.
  */
 
 import type { ReactNode } from "react";

@@ -1,13 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import * as gen from "../scripts/generate-illustrations.mjs";
 
-// The batch generator fetches each job's output file — hundreds of MB of inline
-// base64 — through whatever proxy sits in front of the run. That call returned
-// 504 and killed a run *after* the images had been generated and billed, which
-// is the expensive way to fail. `api` now retries transient failures, but only
-// where a caller opts in: it is the same helper that creates batches and submits
-// image generations, and silently re-sending one of those would double the bill.
-// Both halves of that contract are pinned here.
+// The batch generator fetches each job's output through a proxy that once
+// 504'd AFTER the images were generated and billed. `api` retries transient
+// failures only where a caller opts in: the same helper creates batches and
+// submits generations, and re-sending those would double the bill.
 
 const apiFor = gen.__testing as {
   api: (

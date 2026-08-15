@@ -1,15 +1,9 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// ─────────────────────────────────────────────────────────────────────
-// In-grid filter on an ENGINE-PAGED result (more rows than "Rows per
-// page"). The filter is pushed down to SQL (DBeaver-style: the query is
-// wrapped as a subquery + a native LIKE/ILIKE WHERE) and re-paged through
-// the engine, so:
-//   • it matches across the WHOLE result, not just the loaded window, and
-//   • paging / infinite scroll is preserved (the filtered result is itself
-//     paged, only one page is loaded, never the whole table).
-// Verified on all three engines (the LIKE/ILIKE dialect differs).
-// ─────────────────────────────────────────────────────────────────────
+// In-grid filter on an ENGINE-PAGED result: the filter is pushed down to SQL
+// (query wrapped as a subquery + native LIKE/ILIKE WHERE) and re-paged, so it
+// matches across the WHOLE result while only one page loads. Verified on all
+// three engines (the LIKE/ILIKE dialect differs).
 
 async function runSql(page: Page, sql: string) {
   const editor = page.locator(".cm-content");
@@ -20,10 +14,8 @@ async function runSql(page: Page, sql: string) {
   await page.locator("button.run-btn-split-main, button.run-btn").first().click();
 }
 
-// Wait until the engine is idle (no run spinner). A query holds the engine's
-// "running" lock through its post-run schema refresh; the filter re-query is
-// dropped if fired during that window, exactly as a real user waits for the
-// grid to settle before (re-)typing a filter.
+// Wait until the engine is idle: a query holds the "running" lock through its
+// post-run schema refresh, and a filter re-query fired in that window is dropped.
 async function waitIdle(page: Page) {
   await expect(page.locator(".run-btn-spinner")).toHaveCount(0, {
     timeout: 60_000,

@@ -3,12 +3,9 @@ import { ArrowRightIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-// Magic UI Bento Grid (https://magicui.design/docs/components/bento-grid).
-// Vendored into components/ui like the project's other Magic UI primitives.
-// The upstream component depends on a shadcn `<Button>` and
-// `@radix-ui/react-icons`, neither of which this project installs, so the CTA
-// is rendered as a plain anchor and the arrow comes from lucide-react (the
-// icon library already used across the home page).
+// Vendored Magic UI Bento Grid (https://magicui.design/docs/components/bento-grid).
+// Upstream's shadcn <Button> and @radix-ui/react-icons aren't installed here,
+// so the CTA is a plain anchor with a lucide-react arrow.
 
 interface BentoGridProps extends ComponentPropsWithoutRef<"div"> {
   children: ReactNode;
@@ -21,12 +18,10 @@ interface BentoCardProps extends ComponentPropsWithoutRef<"div"> {
   background: ReactNode;
   Icon: React.ElementType;
   description: string;
-  /** Optional CTA link, rendered (always visible) beneath the copy. When
-   *  `href`/`cta` are omitted the card simply has no link. */
+  /** Optional always-visible CTA link; omit both `href` and `cta` for a link-less card. */
   href?: string;
   cta?: string;
-  /** Override the icon's size/spacing classes (e.g. a smaller icon on
-   *  link-less cards). Merged after the defaults so it wins. */
+  /** Overrides the icon's size/spacing classes; merged after the defaults so it wins. */
   iconClassName?: string;
 }
 
@@ -70,22 +65,18 @@ const BentoCard = ({
       {...props}
     >
       <div>{background}</div>
-      {/* Page-colored scrim so the animated background reads softly behind the
-          card copy (white in light mode, #121212 in dark). */}
+      {/* Page-colored scrim to soften the animated background behind the copy. */}
       <div className="pointer-events-none absolute inset-0 bg-white/60 dark:bg-[#121212]/60" />
-      {/* `relative z-10` lifts the copy (and CTA) above the absolute scrim and
-          hover-tint overlays, a bare `z-10` on a static element has no effect. */}
+      {/* `relative` is required: a bare `z-10` on a static element has no effect. */}
       <div className="relative z-10 p-6">
         <div className="pointer-events-none flex flex-col gap-1">
-          {/* Icon size/position pinned to the former hover state (scale-75,
-              shrinking from its left edge) so it no longer resizes on hover. */}
+          {/* scale-75/origin-left pins the icon at one size (no hover resize). */}
           <Icon
             className={cn(
               "mb-3 h-12 w-12 origin-left scale-75 transform-gpu text-[var(--ds-gray-900)] dark:text-white",
               iconClassName,
             )}
           />
-          {/* Icon, heading, and paragraph all share the body font color. */}
           <h3 className="text-xl font-semibold text-[var(--ds-gray-900)] dark:text-white">
             {name}
           </h3>
@@ -94,8 +85,7 @@ const BentoCard = ({
           </p>
         </div>
 
-        {/* CTA is always shown (no hover reveal), tinted brand green, and
-            inherits the paragraph's font size (arrow sized to match via em). */}
+        {/* CTA is always shown — no upstream hover reveal. */}
         {hasCta && (
           <a
             href={href}

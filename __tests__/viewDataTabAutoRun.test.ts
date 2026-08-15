@@ -1,14 +1,8 @@
 /**
- * Conditions under which a restored table tab re-queries.
- *
- * Tabs outlive a session (localStorage), results don't (component state), so a
- * `view-data` tab reopened from a previous visit arrives with no rows and the
- * "Run a query to see results" placeholder where its table should be. The
- * playgrounds fix that by re-running the tab's query when it is shown; the
- * decision itself lives in `viewDataTabToAutoRun`, which is what this pins.
- *
- * The safety-critical case is the last one: a plain query tab holds whatever
- * SQL the user last typed, so it must never run on its own.
+ * Conditions under which a restored table tab re-queries: tabs outlive a
+ * session (localStorage), results don't, so a reopened view-data tab arrives
+ * with no rows and is re-run when shown (viewDataTabToAutoRun decides).
+ * Safety-critical case: a plain query tab must never run on its own.
  */
 import { describe, expect, it } from "vitest";
 import {

@@ -1,16 +1,7 @@
 /**
- * Layout for the Fumadocs-powered `/fumadocs-dev` route, the
- * development-only component gallery (code blocks, challenge cards,
- * loading states, …) that used to live at `/learn`.
- *
- * Wraps every page in Fumadocs's `RootProvider` (theme/search context)
- * and `DocsLayout` (sidebar + nav). The sidebar tree is generated
- * automatically from the MDX content under `content/fumadocs-dev/`
- * via the `devSource` loader.
- *
- * The Tailwind/Fumadocs CSS is imported here (not in `app/layout.tsx`)
- * so it's scoped to this route's bundle and doesn't leak into the
- * /playground pages, which use plain CSS + CSS modules.
+ * Fumadocs layout for `/fumadocs-dev`, the development-only component
+ * gallery. Importing docs.css here keeps it out of the plain-CSS /playground
+ * pages.
  */
 import "../docs.css";
 import type { ReactNode } from "react";
@@ -32,18 +23,10 @@ export default function FumadocsDevLayout({
       <DocsLayout
         tree={devSource.pageTree}
         tabs={false}
-        // Use the site's shared light/dark pill toggle in place of Fumadocs's
-        // default segmented theme switch, so the docs chrome matches the home
-        // header, mobile drawer, and playground settings.
+        // The site's shared pill toggle instead of Fumadocs's segmented switch.
         slots={{ themeSwitch: ThemePillToggleSlot }}
-        // Don't prefetch sidebar links. The sidebar renders hundreds of
-        // lesson links per page; with Next.js's default viewport prefetch
-        // every visible link fans out its own segment request the moment the
-        // sidebar scrolls into view. (On Vercel each of those that missed the
-        // edge cache was also a billed ISR Read, which is what originally
-        // forced this; Cloudflare has no such meter, but the request fan-out
-        // is reason enough on its own.) Navigation falls back to fetching on
-        // click, which is fast for these fully static pages.
+        // The sidebar renders hundreds of links; viewport prefetch would fan
+        // out a request per visible link. Static pages fetch fast on click.
         sidebar={{ prefetch: false }}
         nav={{
           title: (
@@ -74,9 +57,8 @@ export default function FumadocsDevLayout({
       >
         {children}
       </DocsLayout>
-      {/* Outside <DocsLayout>, deliberately: the footer sits below the docs
-          grid so the sidebar (and the TOC) stay pinned until the page runs out
-          and then release into it. See DocsFooter. */}
+      {/* Outside <DocsLayout> deliberately, so the sidebar/TOC stay pinned
+          until the page runs out. See DocsFooter. */}
       <DocsFooter />
     </RootProvider>
   );

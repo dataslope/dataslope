@@ -1,66 +1,31 @@
 #!/usr/bin/env node
 /**
- * Trim the transparent margins off promoted cut-out illustrations.
+ * Trim the transparent margins off promoted cut-out illustrations: background
+ * removal leaves the subject floating in its generated frame, and `<Figure>`
+ * renders full-width with `height: auto`, so every transparent row is
+ * vertical space a lesson pays for and no one sees.
  *
- * Background removal leaves the subject floating in the frame it was generated
- * in, so a 1536x1024 cut-out is typically 1536x1024 of *layout* carrying rather
- * less than that of drawing. `<Figure>` renders at the full content width with
- * `height: auto`, so every transparent row is vertical space a lesson pays for
- * and no one sees. Measured across all 916 promoted cut-outs, the blank band
- * above and below the artwork is a median 11% of the image's height, and 41 of
- * them are over 30%.
+ * Which margins go depends on where the image is painted; `--axes auto`
+ * (default) asks `trimAxesFor` in scripts/lib/cutouts.mjs. In-lesson figures
+ * are trimmed vertically only — cropping the sides would give figures ragged
+ * widths that stop sharing an edge — while thumbnails, painted small in a
+ * fixed box, lose both axes.
  *
- * **Which margins go depends on where the image is painted.** `--axes` picks,
- * and its default, `auto`, asks `trimAxesFor` in `scripts/lib/cutouts.mjs`:
+ * Pixels come from `--from r2` (default): the pristine `cutout.png`, found by
+ * matching pixels against the served file rather than trusting a run id (a
+ * redraw's newer run is routinely not the live one), keeping the trimmed WebP
+ * a single lossy generation. `--from local` — also the automatic fallback
+ * when no candidate matches — re-encodes the served WebP: visually lossless
+ * but a second generation, so R2 is preferred.
  *
- *   - **In-lesson figures: vertical only.** The left/right margins are left
- *     exactly as they are. Horizontal blank costs nothing in a page that
- *     scrolls, and cropping it would make each figure a different width, so a
- *     run of lessons would stop sharing an edge.
- *   - **Thumbnails: both axes.** A course or interview-prep thumbnail is
- *     painted ~100px wide inside a fixed box, and there the same reasoning runs
- *     the other way: a blank column is drawing surface the subject does not
- *     get, at exactly the size where it can least afford to be small. Nothing
- *     shares an edge with it — each one sits alone in its own box — so the
- *     ragged widths that rule out cropping a figure cost nothing here.
+ * This script only ever READS from R2; the only files it writes are
+ * `public/images/<id>-cutout.webp`, which are committed and revertible.
  *
- * Where the pixels come from, and why it matters:
- *
- *   - **`--from r2` (default)** re-crops the *pristine* `cutout.png` that
- *     `remove-background-kie.mjs` wrote, so the trimmed WebP is still a single
- *     lossy generation from the original — trimming costs nothing in quality.
- *     A prompt id is often present in several runs (a redraw writes a new run
- *     prefix and leaves the old one alone), so the right PNG is found by
- *     *matching pixels* against the file the site currently serves rather than
- *     by trusting a run id. The match is unambiguous in practice: the true
- *     source scores ~44 dB against the served WebP and every other run of the
- *     same id lands at 6-11 dB, so `MATCH_FLOOR` sits at 30.
- *   - **`--from local`** (and the automatic fallback when no R2 candidate
- *     matches, e.g. the run has aged out of the bucket) re-encodes the served
- *     WebP itself. That is a second lossy generation, measured at 41-49 dB
- *     premultiplied PSNR against the same crop of the original — visually
- *     lossless, but not free, which is why R2 is preferred when it can answer.
- *
- * **This script only ever reads from R2.** It never puts and never deletes, so
- * the background-removed originals in the bucket survive it untouched. The only
- * files it writes are `public/images/<id>-cutout.webp`, which are committed and
- * therefore revertible with git.
- *
- * How a row or column is judged blank: a pixel counts as drawn once its alpha
- * clears `--alpha` (16 by default, which ignores the faint halo a background
- * remover leaves), and a line counts as drawn once `--frac` of its pixels are
- * (0.2%, so a stray speck of leftover background cannot defeat the trim).
- * `--pad` of the original width/height is then kept around the content so
- * nothing sits flush against the edge. On all 916 cut-outs the speck-tolerant
- * rule and a strict any-drawn-pixel rule pick the same bounds, so the tolerance
- * costs nothing today and guards a future messier cut-out.
- *
- * Idempotent: a second run finds each image already tight and skips it under
- * `--min-gain`.
- *
- * Re-running is safe and produces no git churn: the crop is derived from the
- * pristine PNG and WebP encoding is deterministic, so an already-trimmed image
- * is rewritten with the same bytes it already had.
+ * Blankness: a pixel counts as drawn once alpha clears `--alpha` (16 ignores
+ * the remover's halo); a line once `--frac` of its pixels are (0.2%, so a
+ * stray speck cannot defeat the trim); `--pad` is kept around the content.
+ * Idempotent: a re-run skips already-tight images under `--min-gain`, and an
+ * unskipped rewrite reproduces the same bytes.
  *
  * Usage:
  *   node scripts/trim-cutouts.mjs <ids...> [options]
@@ -232,29 +197,20 @@ async function main() {
         return;
       }
 
-      // Crop to a PNG rather than straight to WebP so the one definition of
-      // the served encode stays `toWebpSource`. PNG is lossless, so the
-      // hand-off adds nothing to the image; leaving the format off instead
-      // would re-encode a WebP source at sharp's default quality 80, which is
-      // a real loss for the local fallback path.
+      // Crop to lossless PNG so the one definition of the served encode stays
+      // `toWebpSource`; leaving the format off would re-encode at sharp's
+      // default quality 80.
       const cropped = await sharp(source)
         .extract({ left: plan.left, top: plan.top, width: plan.width, height: plan.height })
         .png({ compressionLevel: 0 })
         .toBuffer();
 
-      // Re-apply whatever downscale promotion applied. Some art is promoted
-      // with `--max-width` because it is only ever painted small — the auth
-      // globe pins are 264px wide for a 36 CSS px slot — and re-cropping from
-      // the 1024px pristine PNG would silently undo that, handing those pins
-      // back at full resolution and five times the bytes for detail no one can
-      // see. The served file's own width is the record of that decision, so it
-      // is what the new encode is held to.
-      //
-      // Held against the *crop's* width, not the source frame's: a thumbnail's
-      // served file is legitimately narrower than the PNG it came from, because
-      // the crop took its side margins, and measuring against the frame would
-      // read that as a downscale and pin every re-trim to the width of the
-      // previous one.
+      // Re-apply whatever `--max-width` downscale promotion applied —
+      // re-cropping from the pristine PNG would silently undo it. The served
+      // file's width is the record of that decision, held against the
+      // *crop's* width, not the source frame's: a thumbnail's served file is
+      // legitimately narrower than its PNG because the crop took its side
+      // margins.
       const servedMeta = await sharp(served).metadata();
       const keepWidth = servedMeta.width < plan.width ? servedMeta.width : null;
       const out = await toWebpSource(cropped, opts.quality, keepWidth);
@@ -278,11 +234,8 @@ async function main() {
     }
   }
 
-  // Each image is a download, a decode, a crop and an encode, so the run is
-  // alternately network- and CPU-bound and neither saturates on its own. A
-  // handful of workers keeps both busy; the images are independent and each
-  // writes only its own file, so there is nothing to coordinate beyond the
-  // counters above.
+  // Each image alternates network- and CPU-bound work; a handful of workers
+  // keeps both busy, and images are independent (each writes only its file).
   let next = 0;
   await Promise.all(
     Array.from({ length: Math.min(opts.concurrency, slugs.length) }, async () => {

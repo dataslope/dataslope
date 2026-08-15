@@ -1,50 +1,20 @@
 /**
  * Remark plugin: preserve the authored indentation of code-bearing
  * template-literal props on `<CodeBlock>`, `<ChallengeCard>`,
- * `<SqlCodeBlock>` and `<SqlChallengeCard>`.
- *
- * Why this exists
- * ---------------
- * `@mdx-js/mdx` (micromark) strips a base indentation from the continuation
- * lines of a multi-line JSX attribute expression while tokenizing, so a
- * formatted snippet authored as
- *
- *   starterCode={`if (age >= 18) {
- *     console.log("You can vote.");
- *   }
- *   `}
- *
- * reaches the editor with the leading indentation collapsed:
- *
- *   if (age >= 18) {
- *   console.log("You can vote.");
- *   }
- *
- * i.e. the editor (and the "Format code" button) sees *un-formatted* code even
- * though the `.mdx` source is formatted. The strip happens during tokenization,
- * so the mdast/estree `value` is already collapsed by the time any plugin runs.
- *
- * The fix
- * -------
- * The estree `TemplateLiteral` quasis still carry a `range` (`start`/`end`
- * offsets) into the *original* source. We slice the original source back out
- * and restore each quasi's `raw` (and re-derive `cooked`), so the compiled
- * output, and therefore the editor, faithfully reflects the authored,
- * formatted indentation. Zero content changes required.
- *
- * Scoped to the props that render as editable/inspectable code so prose
- * (`instructions`) and the test harness (`tests`) keep their existing
- * behavior.
+ * `<SqlCodeBlock>` and `<SqlChallengeCard>`. micromark strips a base
+ * indentation from the continuation lines of a multi-line JSX attribute
+ * expression during tokenization, so the editor sees un-formatted code even
+ * though the `.mdx` source is formatted (the estree value is already
+ * collapsed before any plugin runs). The estree `TemplateLiteral` quasis
+ * still carry `range` offsets into the original source, so each quasi's
+ * `raw` is re-sliced from it (`cooked` re-derived). Scoped to props that
+ * render as editable/inspectable code so prose (`instructions`) and the test
+ * harness (`tests`) keep their existing behavior.
  */
 
-// Attribute names whose template-literal value IS the code. These are the
-// top-level props still used by the SQL components (`starterCode`,
-// `initSql`, `solutionSql`) and by the read-only preview components, whose
-// code is displayed rather than edited: `<LivePreview html={…} css={…}>`
-// (the CSS course) and `<ReactPreview code={…}>` (the React course). Those
-// three were missing until 2026-08, so every CSS rule body and JSX block in
-// those two courses rendered flush against the left margin while the .mdx
-// source was correctly indented.
+// Attribute names whose template-literal value IS the code: the SQL
+// components' top-level props plus the read-only preview components
+// (`<LivePreview html/css>`, `<ReactPreview code>`).
 const CODE_ATTRS = new Set([
   "starterCode",
   "solutionCode",
@@ -55,10 +25,8 @@ const CODE_ATTRS = new Set([
   "css",
   "code",
 ]);
-// Object keys carrying code inside `files={[ { … } ]}` blocks. The non-SQL
-// CodeBlock/ChallengeCard now keep all per-file code here as `initCode` /
-// `starterCode` / `solutionCode`; `initialContent` / `solutionContent` are
-// the legacy key names kept for safety.
+// Object keys carrying code inside `files={[ { … } ]}` blocks;
+// `initialContent` / `solutionContent` are legacy key names kept for safety.
 const CODE_OBJECT_KEYS = new Set([
   "initCode",
   "starterCode",

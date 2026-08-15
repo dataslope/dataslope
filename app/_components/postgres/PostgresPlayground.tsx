@@ -72,9 +72,8 @@ import "../playground.css";
 import "../sqlPlayground.css";
 import dynamic from "next/dynamic";
 
-// ErDiagramPane pulls in @xyflow/react and elkjs/lib/elk.bundled.js
-// (~hundreds of KB of layout-algorithm code). It only renders when
-// the user opens the ER-diagram tab, so defer the chunk until then.
+// ErDiagramPane pulls in @xyflow/react + elkjs (~hundreds of KB); defer the
+// chunk until the ER-diagram tab opens.
 const ErDiagramPane = dynamic(
   () => import("../ErDiagramPane").then((m) => m.ErDiagramPane),
   { ssr: false, loading: ErDiagramLoadingFallback },
@@ -514,12 +513,8 @@ function PgTypeSelector({
     }
   }, [value]);
 
-  // When the field is empty or still holds the column's committed type (i.e.
-  // the user opened the list via the chevron rather than typing a search
-  // fragment), show every group so all types stay discoverable, including
-  // committed types absent from the built-in list such as
-  // `character varying(15)`. Only filter once they type a partial that is
-  // not itself a known type.
+  // Show every group while the field is empty or still holds the committed
+  // type; only filter once the user types a partial that isn't a known type.
   const visibleGroups = useMemo(
     () =>
       computeVisibleTypeGroups(PG_TYPE_GROUPS, PG_TYPE_OPTIONS, inputVal, value),
@@ -992,9 +987,8 @@ function PostgresPlaygroundInner() {
   // True when this workspace is already open (locked) in another tab, so
   // the shell shows a conflict overlay instead of deadlocking on boot.
   const [workspaceConflict, setWorkspaceConflict] = useState(false);
-  // The workspace that conflict was over, so the overlay can offer a copy of
-  // it. A ref because the boot effect records it and only the overlay's
-  // handlers read it, no render depends on the value.
+  // The conflicted workspace, so the overlay can offer a copy of it. A ref:
+  // no render depends on the value.
   const conflictWorkspaceRef = useRef<{ id: string; name: string } | null>(null);
   const [conflictCopyBusy, setConflictCopyBusy] = useState(false);
   const [conflictCopyError, setConflictCopyError] = useState<string | null>(
@@ -1159,10 +1153,8 @@ function PostgresPlaygroundInner() {
     () => validatePgStructure(viewStructureDialog, columnsByEntity),
     [viewStructureDialog, columnsByEntity],
   );
-  // Only include NEW columns (originalName === null) that have been touched
-  // (blurred) or already have a non-empty name so that empty-name errors
-  // don't appear until the user has had a chance to type something.
-  // Existing columns always show validation errors immediately.
+  // New columns only surface empty-name errors once touched (blurred) or
+  // named; existing columns show validation errors immediately.
   const viewStructureDisplayValidation = useMemo(() => {
     if (!viewStructureDialog) {
       return {
@@ -1189,9 +1181,7 @@ function PostgresPlaygroundInner() {
     () => validatePgStructure(addTableDialog, columnsByEntity),
     [addTableDialog, columnsByEntity],
   );
-  // Only include columns that have been touched (blurred) or already have a
-  // non-empty name so that empty-name errors don't appear until the user
-  // has had a chance to type something.
+  // Columns only surface empty-name errors once touched (blurred) or named.
   const addTableDisplayValidation = useMemo(() => {
     if (!addTableDialog) {
       return {
@@ -1261,11 +1251,10 @@ function PostgresPlaygroundInner() {
   );
   const runActiveTabRef = useRef<() => void>(() => undefined);
   const runSelectionRef = useRef<(sql: string) => void>(() => undefined);
-  // PGlite runs one statement batch at a time. Rather than drop a run that
-  // arrives while the engine is busy (which would silently lose, e.g., the
-  // re-fetch after a second edit), we coalesce the latest such request here and
-  // run it the moment the in-flight one settles, see `drainPendingRun`, called
-  // from every engine-busy path's `finally`.
+  // PGlite runs one statement batch at a time. A run arriving while the
+  // engine is busy is coalesced (latest wins) instead of dropped, and runs
+  // when the in-flight one settles — see `drainPendingRun`, called from every
+  // engine-busy path's `finally`.
   const runSqlForTabRef = useRef<
     | ((
         tabId: string,
@@ -1314,8 +1303,7 @@ function PostgresPlaygroundInner() {
       setActiveTabId(SETTINGS_TAB_ID);
     }
   }, [setSettingsOpen, setActiveTabId]);
-  /** Close the Settings tab (✕ in its tab strip entry or in the settings
-   *  tab bar) and return focus to the most-recent query tab. */
+  /** Close the Settings tab and return focus to the most-recent query tab. */
   const closeSettingsTab = useCallback(() => {
     setSettingsOpen(false);
     const fallback = tabsRef.current[0]?.id;
@@ -1331,10 +1319,8 @@ function PostgresPlaygroundInner() {
     activeDbId === POSTGRES_BLANK_DATABASE.id && customDbFilename !== null
       ? customDbFilename
       : activeSample.filename;
-  // Tab reordering is delegated to the generic TabBar; no externalised
-  // drag state or sensors are needed for the tab strip. `setDraggingTabId`
-  // remains in the hook signature for legacy compatibility, passed a
-  // no-op below.
+  // Tab reordering is delegated to the generic TabBar; `setDraggingTabId`
+  // remains in the hook signature only, passed a no-op.
   const setDraggingTabId = useCallback(() => {}, []);
 
   const persistTabs = useCallback(
@@ -1652,12 +1638,10 @@ function PostgresPlaygroundInner() {
           elapsedMs,
           success: true,
         });
-        // Refresh the schema sidebar in the background, don't hold the run
-        // lock (which blocks the next re-page: filter / sort / page) on slow
-        // PGlite introspection, since a re-page doesn't change the schema.
+        // Refresh the schema sidebar in the background; don't hold the run
+        // lock (which blocks the next re-page) on slow PGlite introspection.
         void refreshSchema().catch(() => undefined);
-        // Keep the running overlay visible long enough for the 180ms CSS
-        // transition to complete and be perceptible to the user.
+        // Keep the running overlay up long enough for its CSS transition.
         const waitMs = MIN_ANIMATION_MS - (performance.now() - t0);
         if (waitMs > 0) await new Promise((resolve) => setTimeout(resolve, waitMs));
         setStatusState("ready");
@@ -1885,10 +1869,8 @@ function PostgresPlaygroundInner() {
   // ─── Editor + engine init ────────────────────────────────────────────
   useEffect(() => {
     let cancelled = false;
-    // Releases the workspace lock when this effect tears down (unmount /
-    // client-side navigation away) so a later remount, e.g. a browser
-    // back-then-forward return to the playground, can re-acquire it instead
-    // of colliding with this document's own stale lock.
+    // Releases the workspace lock on teardown so a later remount can
+    // re-acquire it instead of colliding with this document's stale lock.
     const lockController = new AbortController();
     if (editorHostRef.current && !editorRef.current) {
       const compartments = makeSqlEditorCompartments();
@@ -1930,10 +1912,8 @@ function PostgresPlaygroundInner() {
     (async () => {
       try {
         setLoadingMessage("Loading PostgreSQL engine…");
-        // Resolve (or auto-create) the active workspace for this
-        // playground tab so PGlite can persist its data directory to
-        // OPFS. Best-effort: falls back to in-memory when OPFS isn't
-        // available.
+        // Resolve (or auto-create) the active workspace so PGlite can persist
+        // its data directory to OPFS. Best-effort: falls back to in-memory.
         let workspaceId: string | null = null;
         try {
           const workspace = await ensureActiveWorkspace(PLAYGROUND_ID);
@@ -1946,12 +1926,10 @@ function PostgresPlaygroundInner() {
               signal: lockController.signal,
             });
             if (!cancelled && !hasLock) {
-              // The same OPFS-backed workspace can't be opened in two tabs:
-              // PGlite's exclusive OPFS access handle would deadlock the
-              // boot (it hangs at ~90%). Surface a conflict overlay and
-              // skip the boot rather than hang.
-              // Remember which workspace it was, so the overlay can offer a
-              // copy of it rather than only a fresh, empty one.
+              // The same OPFS-backed workspace can't open in two tabs:
+              // PGlite's exclusive OPFS access handle deadlocks the boot at
+              // ~90%. Show the conflict overlay (remembering the workspace so
+              // it can offer a copy) and skip the boot rather than hang.
               conflictWorkspaceRef.current = {
                 id: workspace.id,
                 name: workspace.name,
@@ -1971,11 +1949,9 @@ function PostgresPlaygroundInner() {
           workspaceId,
         );
         if (cancelled) {
-          // Component unmounted while the engine was being created; close it
-          // immediately so the worker is terminated and its leader-election
-          // lock is released. Without this, the abandoned worker stays leader
-          // and any subsequent engine creation would proxy SQL to it instead
-          // of running against a fresh database.
+          // Unmounted mid-create: close the engine so the worker releases its
+          // leader-election lock — an abandoned worker stays leader and later
+          // engines would proxy SQL to it instead of a fresh database.
           void engine.close();
           return;
         }
@@ -2001,10 +1977,9 @@ function PostgresPlaygroundInner() {
       completionCompRef.current = null;
       themeCompRef.current = null;
       wrapCompRef.current = null;
-      // Close the engine so the underlying PGliteWorker terminates and
-      // releases its leader-election lock. If we don't do this an
-      // unclosed worker from a previous visit stays the leader, causing
-      // new workers to proxy SQL to the old (already-populated) database.
+      // Close the engine so the PGliteWorker releases its leader-election
+      // lock; an unclosed worker stays leader and new workers would proxy
+      // SQL to the old database.
       const oldEngine = engineRef.current;
       engineRef.current = null;
       void oldEngine?.close();
@@ -2027,10 +2002,8 @@ function PostgresPlaygroundInner() {
         changes: { from: 0, to: current.length, insert: activeTab.code },
       });
     }
-    // The FIRST focus after mount goes through the shared entry policy:
-    // desktop lands the cursor at the end of the query, mobile skips the
-    // focus so the on-screen keyboard doesn't pop before the user asks to
-    // type. Later runs (user-initiated tab ops) focus as before.
+    // First focus after mount goes through the shared entry policy (cursor at
+    // end on desktop, no keyboard-popping focus on mobile); applied once.
     if (!entryFocusDoneRef.current) {
       entryFocusDoneRef.current = true;
       applyEntryFocus(view);
@@ -2087,10 +2060,9 @@ function PostgresPlaygroundInner() {
     void refreshSchemas();
   }, [showSystemSchemas, refreshSchemas]);
 
-  // Keep autocomplete schema in sync with current tables/views. The
-  // reconfigure key memoization mirrors the DuckDB playground's
-  // Stage 1.2 fix so a query / CSV import that doesn't change the
-  // visible schema doesn't trigger a full editor re-parse.
+  // Keep autocomplete schema in sync with tables/views. Compared by value so
+  // a query / import that doesn't change the visible schema doesn't trigger
+  // a full editor re-parse.
   const lastReconfigureKeyRef = useRef<string>("");
   useEffect(() => {
     const view = editorRef.current;
@@ -2140,11 +2112,9 @@ function PostgresPlaygroundInner() {
         ),
       ],
     });
-    // Lazy-load `@codemirror/lang-sql` (Stage 5.3) and apply the lang
-    // reconfigure once the chunk lands. Only commit
-    // `lastReconfigureKeyRef` after the dispatch fires so a
-    // StrictMode-cancelled effect can't make the next run skip the
-    // lang reconfigure for the current schema.
+    // `@codemirror/lang-sql` is lazy-loaded, so the lang reconfigure awaits
+    // the chunk. `lastReconfigureKeyRef` is only committed after the dispatch
+    // fires, so a StrictMode-cancelled effect can't skip the reconfigure.
     let cancelled = false;
     void makeSqlLangExtension("postgres", schema).then((langExt) => {
       if (cancelled) return;
@@ -2250,12 +2220,10 @@ function PostgresPlaygroundInner() {
     [persistTabs, refreshSchema, refreshSchemas, showToast],
   );
 
-  // "Open in new workspace": create a fresh workspace and switch to it WITHOUT
-  // reloading the page. A reload races PGlite's per-origin OPFS access-handle
-  // pool against the outgoing page's worker, the reloaded page then throws
-  // `createSyncAccessHandle ... already an open access handle` and hangs on
-  // "Loading PostgreSQL engine…". Doing it in-place lets us close the old
-  // engine (freeing the pool) *before* the new one opens.
+  // "Open in new workspace" switches WITHOUT reloading: a reload races
+  // PGlite's per-origin OPFS access-handle pool against the outgoing page's
+  // worker ("createSyncAccessHandle ... already an open access handle") and
+  // hangs. In-place, the old engine closes before the new one opens.
   const performNewWorkspaceSwitch = useCallback(
     async (nextId: string) => {
       const old = engineRef.current;
@@ -2304,14 +2272,9 @@ function PostgresPlaygroundInner() {
     [persistTabs, refreshSchema, refreshSchemas, showToast],
   );
 
-  // From the "open in another tab" conflict overlay: create a fresh
-  // workspace and switch to it. No engine is open in the conflict case
-  // (the boot was skipped), so a reload is the simplest safe path, the
-  // new workspace id isn't locked, so it boots normally.
   // From the conflict overlay: duplicate the workspace another tab is holding
-  // and switch to the duplicate, which is the only action here that keeps the
-  // data the user came for. `copyConflictedWorkspace` reloads on success, so
-  // reaching the end of this callback means it failed.
+  // and switch to the duplicate. `copyConflictedWorkspace` reloads on
+  // success, so reaching the end of this callback means it failed.
   const handleConflictOpenCopy = useCallback(() => {
     const source = conflictWorkspaceRef.current;
     if (!source) return;
@@ -2340,6 +2303,9 @@ function PostgresPlaygroundInner() {
     })();
   }, []);
 
+  // From the conflict overlay: create a fresh workspace and switch to it. No
+  // engine is open in the conflict case, so a reload is safe and the new
+  // workspace id isn't locked.
   const handleConflictNewWorkspace = useCallback(() => {
     void (async () => {
       try {
@@ -3048,9 +3014,9 @@ function PostgresPlaygroundInner() {
     [],
   );
 
-  // Row counts are precomputed by `refreshSchema` so this is a synchronous
-  // lookup. SchemaItem caches the first non-null result it sees, so we
-  // can't hand back a stale 0 while a real count is in flight.
+  // Row counts are precomputed by `refreshSchema`, so this is synchronous.
+  // SchemaItem caches the first non-null result it sees, so we can't hand
+  // back a stale 0 while a real count is in flight.
   const fetchEntityRowCount = useCallback(
     (name: string): number => rowCountByTable[name] ?? 0,
     [rowCountByTable],
@@ -3386,9 +3352,8 @@ function PostgresPlaygroundInner() {
       `-- PostgreSQL dump`,
       `-- Generated by Dataslope\n`,
     ];
-    // Emit tables in foreign-key dependency order so the inline
-    // `FOREIGN KEY … REFERENCES` constraints (and the per-table INSERTs)
-    // never reference a table that hasn't been created yet on re-import.
+    // Emit tables in FK dependency order so constraints and INSERTs never
+    // reference a table that doesn't exist yet on re-import.
     const fkDeps = new Map<string, string[]>();
     await Promise.all(
       tables.map(async (t) => {
@@ -3409,9 +3374,8 @@ function PostgresPlaygroundInner() {
       if (ddl) {
         lines.push(`${ddl};\n`);
       }
-      // Generated columns are computed by the engine; a dump that tries to
-      // INSERT a value into them fails on re-import ("cannot insert a
-      // non-DEFAULT value into column …"), so omit them from the INSERTs.
+      // Omit generated columns from INSERTs: writing them fails on re-import
+      // ("cannot insert a non-DEFAULT value into column …").
       const colInfo = await engine.listColumns(tableName, schema);
       const generatedCols = new Set(
         colInfo.filter((c) => c.generated).map((c) => c.name),
@@ -3463,11 +3427,9 @@ function PostgresPlaygroundInner() {
     }
   }, [tables, buildPostgresDumpSql, displayFilename, showToast]);
 
-  // ─── Cloud saves + sharing ────────────────────────────────────────────
-  // A SQL bundle carries the active database as a PGDATA tarball (PGlite's
-  // dumpDataDir; the codec gzips it) plus the query tabs. Full fidelity —
-  // sequences, functions, and other non-table objects a handwritten dump
-  // would miss — and reopening boots straight from the tarball.
+  // Cloud saves + sharing: a SQL bundle carries the database as a PGDATA
+  // tarball (full fidelity — sequences, functions, etc.) plus the query
+  // tabs; reopening boots straight from the tarball.
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const buildCloudBundle = useCallback<BuildBundle>(
     async (opts) => {
@@ -3547,8 +3509,7 @@ function PostgresPlaygroundInner() {
           bundle.sql.databaseLabel ?? bundle.name,
         );
         // A cloud save is the owner's own; a share is someone else's copy,
-        // whose `personal` section (if a future client ever sends one) is not
-        // ours to absorb.
+        // whose `personal` section is not ours to absorb.
         if (pendingRef.source === "cloud") {
           const restored = restoreQueryLog(bundle.sql.personal, queryLogKeys);
           if (restored) replaceHistory(restored.history);
@@ -3814,8 +3775,7 @@ function PostgresPlaygroundInner() {
     ],
   );
 
-  // Defined once and rendered in both the sidebar and the mobile drawer
-  // menu (the latter is an experiment, the sidebar copy may be retired).
+  // Defined once, rendered in both the sidebar and the mobile drawer menu.
   const databaseSelector = (
     <DatabaseSelector
       value={activeDbId}
@@ -4028,11 +3988,8 @@ function PostgresPlaygroundInner() {
                 },
               ];
 
-  // Auth had no entry point inside a playground at all. It lands as the ⋯
-  // menu's last group rather than a header control: the header is down to
-  // five controls by design and has no room on a phone, and signing in
-  // isn't something anyone reaches for mid-session. Null while the first
-  // session fetch is in flight, so nothing flashes.
+  // Auth entry point lives in the ⋯ menu's last group (the header has no
+  // room). Null while the first session fetch is in flight, so nothing flashes.
   const accountSection = useAccountMenuSection();
   const moreSections: MoreMenuSection[] = accountSection
     ? [...baseMoreSections, accountSection]

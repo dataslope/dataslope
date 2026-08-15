@@ -21,15 +21,11 @@ import {
 import { DiamondMark } from "../../mdx/loadingAnimations";
 import imageManifest from "@/lib/generated/images";
 
-/** Illustration shown on the conflict overlay, authored through the same
- *  pipeline as the course art (`data/illustration-prompts.json`, see the
- *  Illustrations section of AGENTS.md) and promoted into `public/images/`.
- *  Every surface asks for the `-cutout` slug. */
+/** Conflict-overlay illustration slug (promoted into public/images/). */
 const CONFLICT_MARK_SLUG = "playground-workspace-conflict-cutout";
 
-/** The mark above the conflict message. Falls back to the brand diamond when
- *  the illustration isn't in the manifest, so a tree without the promoted
- *  asset shows the old mark rather than an empty space. */
+/** Mark above the conflict message; falls back to the brand diamond when the
+ *  illustration is missing from the manifest. */
 function ConflictMark() {
   const entry = imageManifest[CONFLICT_MARK_SLUG];
   if (!entry) return <DiamondMark size={88} />;
@@ -48,22 +44,10 @@ function ConflictMark() {
   );
 }
 
-/**
- * Re-exported from the pure helper module (`../utils/mobilePane`) so existing
- * importers of `SqlMobilePane` keep working. The single-pane mobile layout
- * shows one of these surfaces at a time; desktop ignores it (the CSS only acts
- * on it below the mobile breakpoint). It lets the shared bottom tab bar, and
- * the jump-to-results / per-query-tab-restore affordances, work for all three
- * SQL playgrounds without each playground body knowing anything about
- * responsiveness.
- */
+/** Re-exported from ../utils/mobilePane so existing importers keep working. */
 export type { SqlMobilePane };
 
-/**
- * Visual + interactive states the loading overlay can be in. Mirrors
- * the per-playground `statusState` machine; the shell only needs the
- * `"error"` flag to color the overlay red.
- */
+/** Loading-overlay states; mirrors the per-playground `statusState` machine. */
 export type SqlPlaygroundOverlayStatus =
   | "loading"
   | "ready"
@@ -71,83 +55,50 @@ export type SqlPlaygroundOverlayStatus =
   | "error";
 
 export interface SqlPlaygroundShellProps {
-  /** Id of the playground being rendered (e.g. `"postgres"`,
-   *  `"duckdb"`, `"sqlite"`). Drives the playground-switcher
-   *  selection. */
+  /** Playground id (e.g. `"postgres"`); drives the switcher selection. */
   playgroundId: string;
-  /** Title shown in the rolling "loading hero" strip during boot
-   *  (e.g. `"PostgreSQL Playground"`). */
+  /** Title shown in the boot overlay. */
   playgroundTitle: string;
-  /** True once the engine has booted and the initial sample database
-   *  is loaded; gates the loading overlay's visibility. */
+  /** True once the engine has booted; gates the loading overlay. */
   loaded: boolean;
-  /** Current playground status; used by the overlay to render the
-   *  red-tinted error state when something goes wrong during boot. */
+  /** Current status; `"error"` tints the overlay red. */
   statusState: SqlPlaygroundOverlayStatus;
-  /** Body of the loading overlay's caption. Pass a plain status string
-   *  for Postgres/DuckDB, or a rotating quip for SQLite. */
+  /** Caption body of the loading overlay. */
   loadingCaption: ReactNode;
-  /** Number of times the title is repeated in the hero scroll strip.
-   *  Postgres/DuckDB use 3, SQLite uses 4. */
+  /** Times the title repeats in the hero scroll strip. */
   loadingHeroRepeat?: number;
-  /** Left-docked header content rendered right after the playground
-   *  switcher, before the flexible separator — the workspace name +
-   *  inline rename control in the simplified header. */
+  /** Header content after the switcher (workspace name + rename control). */
   headerName?: ReactNode;
-  /** Right-of-logo header actions (Save, Share, ⋯). The shell renders
-   *  them directly inside `<header className="playground-header">`
-   *  after the logo + separator. */
+  /** Header actions rendered after the separator (Save, Share, ⋯). */
   headerActions?: ReactNode;
-  /** Contents of the mobile "hamburger" menu (rendered only below the
-   *  mobile breakpoint). The shell owns the sheet's open state and the
-   *  trigger; each dialect supplies the rows (Workspace, Import, Export,
-   *  History, ER Diagram, Information, Settings) via `MobileMenuAction` /
-   *  `MobileMenuSubSheet`. Omit to render no menu. */
+  /** Rows of the mobile hamburger menu; omit for none. The shell owns the
+   *  sheet's open state. */
   mobileMenu?: ReactNode;
-  /** Real, smoothed boot fraction (0..1) when the engine reports download
-   *  progress (DuckDB). Omit for engines that don't, the shell then
-   *  creeps a determinate bar over time instead. */
+  /** Real boot fraction (0..1) when the engine reports progress (DuckDB);
+   *  omit and the shell creeps a determinate bar instead. */
   bootFraction?: number | null;
-  /** True when the active workspace is already open (locked) in another
-   *  browser tab. The shell then shows a conflict overlay instead of the
-   *  boot overlay, opening the same OPFS-backed database in two tabs would
-   *  otherwise deadlock the engine boot (it hangs at ~90%). */
+  /** True when the workspace is locked by another browser tab; shows the
+   *  conflict overlay (opening the same OPFS-backed database in two tabs
+   *  would deadlock the engine boot). */
   workspaceConflict?: boolean;
-  /** Invoked when the user picks "Open a new workspace" from the conflict
-   *  overlay. The host should create a fresh workspace and switch to it
-   *  (a reload is fine, a new workspace id isn't locked elsewhere). */
+  /** "Open a new workspace" action on the conflict overlay. */
   onOpenNewWorkspace?: () => void;
-  /** Invoked when the user picks "Open a copy". The host should duplicate the
-   *  conflicted workspace and switch to the duplicate, so this tab gets the
-   *  same data without contending for the original's OPFS handle. Offered
-   *  first: it is the only action that keeps what the user came for. */
+  /** "Open a copy" action: duplicate the conflicted workspace so this tab
+   *  keeps the data without contending for the original's OPFS handle. */
   onOpenCopy?: () => void;
-  /** True while a copy is being made, so the overlay can show it working;
-   *  duplicating a large database is not instant. */
+  /** True while a copy is in progress. */
   copyBusy?: boolean;
-  /** Why a copy attempt failed. Shown in the overlay: an action that quietly
-   *  does nothing is the dead end this overlay exists to remove. */
+  /** Copy failure message shown in the overlay. */
   copyError?: string | null;
-  /** Main body of the page, typically the top toolbar + sidebar +
-   *  editor + results pane structure. Rendered directly inside
-   *  `<div className="playground-app">` after the header. */
+  /** Main body (toolbar + sidebar + editor + results). */
   children: ReactNode;
 }
 
 /**
- * Unified outer chrome for the three SQL playgrounds (SQLite,
- * Postgres, DuckDB). Owns the page root, the pyodide-style loading
- * overlay, the application frame, and the shared header (Dataslope
- * brand + playground switcher). Each dialect renders its own toolbar,
- * sidebar, editor, results pane, and dialogs via the `headerActions`
- * and `children` slots.
- *
- * Note: the `<Toast.Provider>` and `<Toast.Portal>` wiring is kept at
- * the per-dialect default export (one level above `…Inner`) because
- * `Toast.useToastManager()` is invoked during the Inner component's
- * render, moving the Provider inside the shell would render the
- * Provider *after* the Inner ran its hooks and trigger Base UI's
- * "missing provider" error during SSG.
+ * Shared outer chrome for the three SQL playgrounds: page root, boot
+ * overlay, app frame, and header. Toast.Provider must stay in each
+ * dialect's default export: Toast.useToastManager() runs during Inner's
+ * render, so a Provider inside the shell would mount too late and break SSG.
  */
 export function SqlPlaygroundShell({
   playgroundId,
@@ -166,23 +117,16 @@ export function SqlPlaygroundShell({
   copyError = null,
   children,
 }: SqlPlaygroundShellProps) {
-  // Loading-overlay lifecycle (show → fade → unmount) with a minimum
-  // on-screen time, shared by all three SQL dialects. A warm revisit
-  // boots the cached engine almost instantly; the floor keeps the overlay
-  // up long enough to read as a deliberate transition rather than a blink.
+  // Boot-overlay lifecycle (show → fade → unmount) with a minimum on-screen
+  // time so warm boots don't read as a blink.
   const { mounted: showLoadingOverlay, fading: loadingFading } =
     useBootOverlayVisibility(loaded);
-  // Mobile hamburger menu open state (the shell owns it; dialects only
-  // supply the rows via `mobileMenu`).
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  // True while the full-screen Settings tab is showing. Used to hide the
-  // bottom Schema/Editor/Results pane switcher, which doesn't apply to
-  // the settings pane. Detected from the DOM (below) so the three
-  // playground bodies stay untouched.
+  // Full-screen Settings tab showing? Hides the bottom pane switcher.
+  // Detected from the DOM so the playground bodies stay untouched.
   const [settingsTabActive, setSettingsTabActive] = useState(false);
-  // Fallback for engines that don't report real download progress
-  // (Postgres, SQLite): creep a determinate bar toward ~90% while booting.
-  // Skipped when the dialect supplies a real `bootFraction` (DuckDB).
+  // Fallback when no real `bootFraction` is supplied: creep a determinate
+  // bar toward ~90% while booting.
   const [creepFraction, setCreepFraction] = useState(0.05);
   useEffect(() => {
     if (loaded || bootFraction !== undefined) return;
@@ -194,47 +138,29 @@ export function SqlPlaygroundShell({
   const overlayFraction =
     bootFraction !== undefined ? bootFraction : creepFraction;
 
-  // ─── Mobile single-pane navigation ───────────────────────────────────
-  // Below the mobile breakpoint the desktop 3-pane IDE collapses to one
-  // full-width surface at a time, switched from the bottom tab bar. The
-  // state has no effect on desktop (the CSS that reads `data-mobile-pane`
-  // is scoped to the mobile media query), so it's safe to keep mounted.
+  // Mobile single-pane navigation: below the breakpoint one surface shows at
+  // a time. No effect on desktop (the CSS is media-query scoped).
   const [mobilePane, setMobilePane] = useState<SqlMobilePane>("editor");
-  // Whether the active query tab currently has something worth showing on
-  // the Results surface (a table, an error, or a "statement executed"
-  // notice). Drives the mobile Results tab's disabled state so users can't
-  // tab into an empty pane before they've run anything. Detected from the
-  // rendered DOM (see the observer below) so the three playground bodies
-  // stay untouched.
+  // Whether the active query tab has real output; gates the mobile Results
+  // tab's disabled state. Detected from the DOM (observer below).
   const [hasResults, setHasResults] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
-  // Per-query-tab memory of the last bottom pane the user looked at, keyed by
-  // the tab's `data-tab-id` (rendered by the shared TabBar). Activating a tab
-  // restores its remembered pane instead of carrying the previous tab's pane
-  // over, so leaving tab A on Results and switching to a never-run tab B lands
-  // on B's Editor, not an empty Results. A ref (not state): it's a side table
-  // that must never itself trigger a render. Session-scoped (not persisted).
+  // Last bottom pane per query tab (keyed by `data-tab-id`) so switching tabs
+  // restores that tab's pane instead of carrying the previous one over.
+  // A ref: this side table must never itself trigger a render.
   const tabPaneMemory = useRef<Map<string, SqlMobilePane>>(new Map());
-  // The query tab the shell currently considers active, derived from the DOM by
-  // the observer below. Lets the pane handlers attribute a choice to the right
-  // tab, and lets the observer detect tab switches.
+  // Active query tab id, derived from the DOM by the observer below.
   const activeTabIdRef = useRef<string | null>(null);
 
-  // Comfort affordance: when the user runs a query (Run button) or opens a
-  // table by double-clicking it in the schema tree, jump the mobile view to
-  // the surface that's about to show the answer, Results, so they don't
-  // have to hunt for the right tab after every run. Creating a new query tab
-  // (the "+" button) instead jumps to the Editor, where the user will start
-  // typing. Implemented with event delegation on the shell so the individual
-  // playgrounds stay untouched; it's a no-op on desktop where the bottom bar
-  // is hidden.
+  // Jump the mobile view on run / schema double-click (→ Results) or new tab
+  // (→ Editor). Event delegation keeps the playground bodies untouched;
+  // no-op on desktop.
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
     const isMobile = () =>
       typeof window !== "undefined" &&
       window.matchMedia("(max-width: 768px)").matches;
-    // Record a pane as the active tab's remembered choice (see tabPaneMemory).
     const remember = (pane: SqlMobilePane) => {
       const id = activeTabIdRef.current;
       if (id) tabPaneMemory.current.set(id, pane);
@@ -243,10 +169,8 @@ export function SqlPlaygroundShell({
       if (!isMobile()) return;
       const t = e.target as HTMLElement | null;
       if (t?.closest(".playground-tab-add")) {
-        // A brand-new tab has no remembered pane; the observer below lands it on
-        // Editor once it becomes active. Set it eagerly too so the jump feels
-        // instant. Deliberately *not* recorded against the current tab, which is
-        // still the active one at click time.
+        // New tab: land on Editor eagerly. Deliberately not recorded against
+        // the current tab, which is still the active one at click time.
         setMobilePane("editor");
       } else if (t?.closest(".run-btn, .run-btn-split-main")) {
         setMobilePane("results");
@@ -256,9 +180,7 @@ export function SqlPlaygroundShell({
     const onDblClick = (e: Event) => {
       if (!isMobile()) return;
       const t = e.target as HTMLElement | null;
-      // A double-click on a schema *leaf* (table/view row) opens & runs it;
-      // double-clicks on section headers (which only collapse a group) are
-      // ignored so we don't yank the user to a stale Results pane.
+      // Only leaf rows open & run; section headers just collapse a group.
       if (
         t?.closest(".sql-tree") &&
         !t.closest(".sql-tree-section-header")
@@ -275,33 +197,26 @@ export function SqlPlaygroundShell({
     };
   }, []);
 
-  // Track whether the results pane is showing real content vs. the
-  // "Run a query to see results" / loading placeholder. ResultView tags
-  // both placeholder states with `data-result-empty`; everything else
-  // (table, error, "no rows") is real output. A MutationObserver keeps the
-  // flag in sync as the user runs queries, switches tabs, or reloads a
-  // sample, without threading a prop through every playground.
+  // Real output vs. placeholder: ResultView tags placeholders with
+  // `data-result-empty`; a MutationObserver keeps the flags in sync without
+  // threading props through every playground.
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
     const recompute = () => {
-      // (a) Does the *active* query tab have real output? Only the active tab's
-      // results live in `.sql-results-pane`, so this reflects that tab.
+      // (a) Does the active query tab have real output?
       const pane = root.querySelector(".sql-results-pane");
       const empty = pane?.querySelector("[data-result-empty]");
       const nowHasResults = !!pane && !empty;
       setHasResults(nowHasResults);
 
-      // (c) Is the full-screen Settings tab open? Its pane replaces the
-      // editor/results split, so the bottom pane switcher is hidden while
-      // it's up (see the `data-settings-active` rule in sqlPlayground.css).
+      // (c) Full-screen Settings tab open? (see `data-settings-active` in
+      // sqlPlayground.css)
       setSettingsTabActive(!!root.querySelector(".sql-settings-tab-pane"));
 
-      // (b) Did the active query tab change? React swaps the tab's `.active`
-      // class and the results-pane contents in the same commit, so by the time
-      // the observer runs we can read the new tab's id *and* its result-state
-      // together. On a switch, restore that tab's remembered bottom pane,
-      // falling back to the Editor rather than landing on an empty Results.
+      // (b) Tab switch? React swaps the `.active` class and the results pane
+      // in the same commit, so the new tab's id and result state read
+      // together. Restore its remembered pane, defaulting to Editor.
       const activeId =
         root
           .querySelector(".playground-tab.active")
@@ -319,8 +234,7 @@ export function SqlPlaygroundShell({
       }
     };
     recompute();
-    // Watch childList (results swapping in/out) *and* class attributes (the
-    // query tab's `.active` toggle) so both (a) and (b) stay live.
+    // Watch childList and class attributes so both (a) and (b) stay live.
     const observer = new MutationObserver(recompute);
     observer.observe(root, {
       childList: true,
@@ -386,7 +300,6 @@ export function SqlPlaygroundShell({
                     onClick={onOpenNewWorkspace}
                     disabled={copyBusy}
                   >
-                    {/* The same icon the header's new-workspace control uses. */}
                     <DatabasePlus size={15} aria-hidden="true" />
                     Open a new workspace
                   </button>
@@ -443,9 +356,8 @@ export function SqlPlaygroundShell({
               ["results", "Results", Table2],
             ] as const
           ).map(([pane, label, Icon]) => {
-            // Results stays disabled until a query has produced output, so
-            // users can't tab into an empty pane. It's never disabled while
-            // it's the active pane (e.g. mid-run, showing the run overlay).
+            // Results stays disabled until output exists, but never while it
+            // is the active pane (e.g. mid-run).
             const disabled =
               pane === "results" && !hasResults && mobilePane !== "results";
             return (
@@ -462,8 +374,7 @@ export function SqlPlaygroundShell({
                 onClick={() => {
                   if (disabled) return;
                   setMobilePane(pane);
-                  // Remember this explicit choice for the active query tab so
-                  // returning to the tab later restores the same pane.
+                  // Remember this choice for the active query tab.
                   const id = activeTabIdRef.current;
                   if (id) tabPaneMemory.current.set(id, pane);
                 }}

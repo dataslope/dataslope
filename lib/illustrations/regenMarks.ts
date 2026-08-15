@@ -1,30 +1,11 @@
 /**
- * The illustration regeneration queue: which generated images an admin wants
- * redrawn, and the brief to write each replacement prompt from.
- *
- * Storage is D1 database **`dataslope-illustrations`**, table
- * **`illustration_regen_marks`**, reached through the `ILLUSTRATIONS_DB`
- * binding (schema in `migrations/illustrations/0001_…`). It is deliberately a
- * different database from `dataslope-auth`: this is authoring state, so the
- * whole queue can be read, dumped, or wiped by a coding agent without touching
- * accounts or sessions.
- *
- * Marks are written from `/dashboard/admin/illustration-prompts` (admin-only) via
- * `/api/admin/illustration-prompts`, and read back by whoever regenerates the
- * art. The full workflow is written up in
- * `agent-outputs/20260803-0900-illustration-regeneration-queue.md`.
- *
- * `prompt_id` is the illustration id from `data/illustration-prompts.json`,
- * which is also the file stem (`<id>.webp`, `<id>-cutout.webp`), so a mark
- * points at a prompt, a served file, and an R2 candidate all at once.
- *
- * The mechanics live in `lib/review/marks.ts`, which the chart review queue
- * shares: the two tables have the same shape, and a bug fixed in one should
- * not have to be found twice. This module is the illustration binding of it,
- * which is to say the table and nothing else.
- *
- * The note is optional and has no default. Marking with nothing typed stores
- * an empty note, and means only that: flagged, no reason given.
+ * The illustration regeneration queue: the illustration binding of the shared
+ * mechanics in lib/review/marks.ts (table `illustration_regen_marks` in the
+ * ILLUSTRATIONS_DB D1 database, schema in migrations/illustrations/0001 —
+ * deliberately separate from `dataslope-auth`). `prompt_id` is the
+ * illustration id from data/illustration-prompts.json, which is also the file
+ * stem, so a mark points at a prompt, a served file, and an R2 candidate at
+ * once. An empty note means flagged, no reason given.
  */
 import type { D1Database } from "@cloudflare/workers-types";
 import {

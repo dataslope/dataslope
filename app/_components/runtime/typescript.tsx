@@ -16,21 +16,14 @@ import {
   decodeWorkspaceTextFiles,
 } from "./tsLanguageService";
 
-// The compiler version shown in the runtime panel, derived from the single
-// pin in cdn.ts rather than written out again. The two had already drifted
-// apart (panel said 5.7 while the worker loaded 5.9.3).
+// Runtime-panel compiler version, derived from cdn.ts's single pin so the
+// two can't drift apart again.
 const TS_MINOR = TYPESCRIPT_VERSION.split(".").slice(0, 2).join(".");
 
 // TypeScript runs in a dedicated Web Worker (typescript-worker.ts):
-//   1. Every .ts/.tsx file in the workspace is transpiled to JavaScript
-//      via the official TypeScript compiler.
-//   2. The transpiled .js files are staged into almostnode's VirtualFS.
-//   3. almostnode's Runtime executes the entry file with CommonJS
-//      semantics, so require()/module.exports across files Just Works.
-//
-// almostnode's resolver doesn't recognise .ts paths, so we do the
-// transpile-then-stage dance ourselves rather than handing raw .ts to
-// the runtime.
+// .ts/.tsx files are transpiled, staged into almostnode's VirtualFS, and
+// the entry executes with CommonJS semantics. The transpile-then-stage
+// dance is ours because almostnode's resolver doesn't recognise .ts paths.
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -289,9 +282,8 @@ export function bye(name: string): string {
 ];
 
 const PACKAGES: PackageInfo[] = [
-  // npm package installation through the packages drawer is a future
-  // feature. Node.js core modules (fs, path, crypto, …) are reachable
-  // via require() out of the box thanks to almostnode's shims.
+  // npm install via the drawer is a future feature; almostnode's Node
+  // shims are always require()-able.
 ];
 
 type WorkerOutMessage =
@@ -305,9 +297,7 @@ type WorkerOutMessage =
 
 class TypeScriptWorkerRuntime implements LanguageRuntime {
   private nextId = 0;
-  // Text files from the last `prepareFileSystem` snapshot, cross-file
-  // context for the language-service completions (imports of sibling
-  // workspace files resolve against these).
+  // Last snapshot's text files: cross-file context for completions.
   private stagedText = new Map<string, string>();
 
   constructor(private worker: Worker) {}
@@ -377,9 +367,8 @@ class TypeScriptWorkerRuntime implements LanguageRuntime {
         kind: "run",
         id,
         code,
-        // The Playground passes the active file's path. Falling back
-        // to "index.ts" preserves single-file behaviour for callers
-        // that don't supply options.
+        // "index.ts" preserves single-file behaviour for callers that
+        // don't supply options.
         entryPath: options?.entryFilename ?? "index.ts",
       });
     });
@@ -431,8 +420,7 @@ export const typescriptAdapter: LanguageAdapter = {
   importSnippet: (name) => `import * as ${name} from "${name}";`,
   hasImport(code, name) {
     const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    // Match either an ES `import ... from "name"` or a CJS
-    // `require("name")` so users with either style aren't pestered.
+    // Match ES `import ... from "name"` or CJS `require("name")`.
     const importRe = new RegExp(
       `(^|\\n)\\s*import[^;]*from\\s*["'\`]${escapedName}["'\`]`,
     );
@@ -447,10 +435,8 @@ export const typescriptAdapter: LanguageAdapter = {
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Starting TypeScript runtime…");
-    // Pre-bundled by `scripts/build-almostnode-workers.mjs`; see
-    // javascript.tsx for the rationale (Turbopack's worker bundler
-    // chunks almostnode's tree and load-collides on minified
-    // identifiers, so we route around it with a static URL).
+    // Pre-bundled and loaded via static URL; see javascript.tsx for the
+    // Turbopack rationale.
     const worker = new Worker("/_workers/typescript-worker.js", {
       type: "module",
     });

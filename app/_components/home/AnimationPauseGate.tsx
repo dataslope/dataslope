@@ -3,21 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 
 /**
- * Pauses every CSS animation in its subtree while the wrapper is offscreen.
- *
- * The home page leans on infinite CSS animations for decoration (the hero
- * marquees, the Ripple halo, the ShimmerButton spark, the bento's diamond
- * loader and blinking cursor). CSS keeps those ticking even when the element
- * is scrolled far out of the viewport, so they burn style/paint time for
- * nobody. This wrapper generalises the FlickeringGrid pattern: an
- * IntersectionObserver toggles `data-anims="paused"` on the subtree, and a
- * scoped rule in app/home.css sets `animation-play-state: paused` for
- * everything inside. Paused animations freeze in place and resume mid-cycle
- * on re-entry.
- *
- * JS-driven animations (motion springs, rAF loops, timers) are unaffected,
- * those pause themselves (see AnimatedBeam, BeamSection, TypingAnimation,
- * and statsBentoBackgrounds).
+ * Pauses every CSS animation in its subtree while offscreen (CSS keeps
+ * ticking out of view, burning style/paint time for nobody): an
+ * IntersectionObserver toggles `data-anims="paused"`, and a rule in
+ * app/home.css sets `animation-play-state: paused` inside. JS-driven
+ * animations pause themselves.
  */
 export function AnimationPauseGate({
   children,

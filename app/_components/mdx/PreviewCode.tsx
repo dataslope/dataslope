@@ -1,15 +1,10 @@
 "use client";
 
 /**
- * The labeled, copyable source panel shared by <LivePreview> (CSS course)
- * and <ReactPreview> (React course). Renders a language chip, a copy button,
- * and the source, syntax-highlighted on the client (see below).
- *
- * Highlighting is done after mount with the Lezer parsers the editors already
- * ship to the browser (`staticHighlight`), so it adds nothing to the
- * Cloudflare Worker / SSR bundle. Until the highlight lands (and whenever the
- * language has no parser) the plain source is shown, which is also the
- * server-rendered first paint.
+ * The labeled, copyable source panel shared by <LivePreview> and
+ * <ReactPreview>. Highlighted after mount with the Lezer parsers the editors
+ * already ship (`staticHighlight`), so nothing joins the Worker/SSR bundle;
+ * plain source is the first paint and the no-parser fallback.
  */
 
 import { useEffect, useState } from "react";
@@ -21,10 +16,8 @@ export function PreviewCode({ lang, source }: { lang: string; source: string }) 
   const [copied, setCopied] = useState(false);
   const [tokens, setTokens] = useState<HighlightToken[] | null>(null);
 
-  // Highlight on the client only. The mode lookup + parser load + parse all
-  // run in this effect, never during SSR, so the parser modules stay in
-  // client chunks and out of the Worker bundle. State is only ever set from
-  // the async callback (unknown languages resolve null → plain text).
+  // Highlight in an effect only, so the parser modules stay in client chunks
+  // and out of the Worker bundle. Unknown languages resolve null → plain text.
   useEffect(() => {
     let cancelled = false;
     void highlightSource(source, lang)

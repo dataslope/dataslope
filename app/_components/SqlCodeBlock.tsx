@@ -1,19 +1,11 @@
 "use client";
 
 /**
- * `SqlCodeBlock`, a runnable SQL snippet for the `/learn` route.
- *
- * It's the SQL counterpart to `<CodeBlock>`: an editor + Run button +
- * result table, plus an optional read-only viewer of the seeded tables.
- * Unlike `<SqlChallengeCard>` it has no instructions, no Submit/grading,
- * and no reference-solution button, it's just a place to type SQL and
- * see the result set.
- *
- * Supported dialects: SQLite (via `@sqlite.org/sqlite-wasm`), DuckDB
- * (via `@duckdb/duckdb-wasm`), and PostgreSQL (via PGlite). All run
- * entirely in the browser. The execution engine, result-table renderer,
- * and table-viewer primitives are shared with `<SqlChallengeCard>` so
- * the two components stay visually and behaviourally consistent.
+ * `SqlCodeBlock`, the SQL counterpart to `<CodeBlock>` for `/learn`:
+ * editor + Run + result table + optional viewer of the seeded tables, with
+ * no instructions or grading. Dialects (SQLite / DuckDB / PGlite) run
+ * entirely in the browser; the engine, result renderer, and table-viewer
+ * primitives are shared with `<SqlChallengeCard>`.
  */
 
 import {
@@ -94,27 +86,18 @@ export interface SqlCodeBlockProps {
   title?: string;
   /** Header badge label. Defaults to "SQL". */
   badge?: string;
-  /** Setup SQL run once before the first execution, creates tables,
-   *  seeds data, etc. */
+  /** Setup SQL run once before the first execution (tables, seed data). */
   initSql?: string;
-  /** Remote dataset to load before `initSql`: a path inside the
-   *  dataslope/datasets GitHub repo (e.g. `sqlite/chinook_sqlite.sql`)
-   *  or a full URL. The script is downloaded from
-   *  raw.githubusercontent.com and executed against the block's engine,
-   *  so a block can clone a complete sample database (Chinook,
-   *  Northwind, …) without embedding it. `initSql` still runs after it
-   *  for any block-specific extras. */
+  /** Remote dataset script to run before `initSql`: a path inside the
+   *  dataslope/datasets repo or a full URL, so a block can clone a complete
+   *  sample database without embedding it. */
   remoteInitSql?: string;
   /** Starter SQL shown in the editor. */
   starterCode: string;
-  /** Marks a block whose lesson *is* the failure: "A UNIQUE constraint
-   *  rejects duplicate email", or a deliberately misspelled function name.
-   *  Purely declarative — the block runs and reports exactly as it always
-   *  did — but the content sweeps assert it in both directions: such a block
-   *  must raise, and one that stops raising is a regression nothing else
-   *  would catch, because the surrounding prose keeps promising an error the
-   *  reader no longer sees. Surfaced as `data-expect-error` so the e2e sweeps
-   *  can read it too. */
+  /** Marks a block whose lesson *is* the failure. Purely declarative, but
+   *  the content sweeps assert it in both directions: the block must raise,
+   *  and one that stops raising is a regression nothing else would catch.
+   *  Surfaced as `data-expect-error` for the e2e sweeps. */
   expectError?: boolean;
   /** Hand-picked tables (and optional schemas) to display in the table
    *  viewer. When omitted, every user table in the default schema is
@@ -148,10 +131,9 @@ export default function SqlCodeBlock({
   const cardRef = useRef<HTMLDivElement | null>(null);
   const askAiSchemaRef = useRef<SqlCompletionSchema | null>(null);
 
-  // Stable localStorage key for the user's SQL buffer. `dialect` is in
-  // the fingerprint because identical starter SQL can mean different
-  // things across engines, and `title` disambiguates blocks that share
-  // starter text.
+  // Stable localStorage key. `dialect` is in the fingerprint because the
+  // same starter SQL can mean different things across engines; `title`
+  // disambiguates blocks sharing starter text.
   const persistedKey = useMemo(
     () => persistKey("sql-codeblock", `${dialect}|${title ?? ""}|${starterCode}`),
     [dialect, title, starterCode],
@@ -160,14 +142,12 @@ export default function SqlCodeBlock({
   // workbook's filename: already stable per block, already short.
   const exportId = persistedKey.slice(persistedKey.lastIndexOf(":") + 1);
 
-  // Each block owns its own engine instance, sharing across blocks
-  // would let one block's CREATE TABLE leak into another's results. The
-  // shared hook owns the cached boot+seed promise, the live engine
-  // label, and the boot-progress state that drives the boot loader.
+  // Each block owns its own engine instance — sharing would let one block's
+  // CREATE TABLE leak into another's results.
   const { ensureEngine, engineLabel, bootState, destroyEngine, resetEngine } =
     useSqlEngineBoot({ dialect, initSql, remoteInitSql });
   // Raw `exec` handle for the header's tools menu (Excel export, ER
-  // diagram, DDL), which reads the same live database the block queries.
+  // diagram, DDL), reading the same live database the block queries.
   const ensureExec = useCallback(async () => {
     const engine = await ensureEngine();
     return (sql: string) => engine.exec(sql);
@@ -227,10 +207,9 @@ export default function SqlCodeBlock({
         EditorState.tabSize.of(2),
         indentUnit.of("  "),
         EditorView.lineWrapping,
-        // Schema-aware completion (same engine as the SQL playgrounds).
-        // Seeded with an empty schema so keyword completion works right
-        // away; reconfigured with live tables/columns once the block's
-        // engine boots, see `refreshCompletionSchema` below.
+        // Schema-aware completion, seeded empty so keywords complete right
+        // away; reconfigured with live tables/columns once the engine
+        // boots (see `refreshCompletionSchema`).
         completionComp.of(makeSqlAutocompletionExtension({ entities: [] }, dialect)),
         keymap.of([
           {
@@ -304,10 +283,9 @@ export default function SqlCodeBlock({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Rebuild the completion schema (and lang-sql's copy) from the live
-  // database. Called after engine boot and after every run, so tables
-  // created by the block's own SQL complete immediately. Best-effort:
-  // failures leave the previous schema in place.
+  // Rebuild the completion schema from the live database after engine boot
+  // and after every run, so newly-created tables complete immediately.
+  // Best-effort: failures leave the previous schema in place.
   const refreshCompletionSchema = useCallback(
     async (engine: { exec: (sql: string) => Promise<SqlResult[]> }) => {
       try {
@@ -410,10 +388,8 @@ export default function SqlCodeBlock({
   const executeSql = useCallback(
     async (
       sql: string,
-      // The caller's run sequence (from `++runSeqRef.current`). Owning
-      // the increment in the caller lets it guard its own post-await
-      // state updates too, a newer run/reset supersedes both this
-      // execution's status updates and the caller's final ones.
+      // The caller's run sequence; owning the increment there lets it guard
+      // its own post-await state updates too.
       mySeq: number,
     ): Promise<{
       results: SqlResult[];
@@ -439,8 +415,7 @@ export default function SqlCodeBlock({
         }
       }
       const elapsedMs = performance.now() - startedAt;
-      // The "last meaningful result" is the last result set with
-      // columns. DML statements come back with empty columns so they
+      // Last result set WITH columns: DML comes back with empty columns and
       // shouldn't shadow a preceding SELECT.
       let last: SqlResult | null = null;
       for (const r of results) {
@@ -504,8 +479,8 @@ export default function SqlCodeBlock({
   }, [run]);
 
   // ─── Reset ──────────────────────────────────────────────────────────
-  // Reset restores the starter code AND re-seeds the database so
-  // INSERT/UPDATE/DELETE snippets can be retried from a clean slate.
+  // Restores the starter code AND re-seeds the database so DML snippets can
+  // be retried from a clean slate.
   const reset = useCallback(() => {
     runSeqRef.current++;
     const view = editorRef.current;

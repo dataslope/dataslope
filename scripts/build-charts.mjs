@@ -1,47 +1,19 @@
 #!/usr/bin/env node
 /**
  * Render the Observable Plot chart specs in `charts/` to SVG and emit the
- * generated module the app inlines them from.
+ * generated module the app inlines them from. Two constraints shape it:
+ * course MDX compiles at request time inside the Worker under a 10 MiB
+ * gzipped bundle cap, so Plot must never ship; and dark mode is a runtime
+ * class, so the SVG is inlined and painted with `currentColor` +
+ * `var(--ds-chart-*)` tokens (see charts/_theme.mjs).
  *
- * Why this exists:
- *
- * Course lessons need data-driven statistical figures (a normal density, a
- * sampling distribution, a power curve) that read correctly in both themes.
- * Two constraints decide the shape of this script:
- *
- *   1. Course MDX compiles *at request time inside the Worker* (`dynamic: true`
- *      in source.config.ts), against a gzipped 10 MiB bundle ceiling. A chart
- *      library imported by an MDX component would land in that bundle, so the
- *      rendering happens here, at build time, and Plot never ships.
- *   2. Dark mode is a `.dark` class toggled at runtime, so a generated file
- *      referenced as `<img src="…svg">` could never follow the theme. The SVG
- *      is therefore *inlined* into the page and painted with `currentColor` +
- *      `var(--ds-chart-*)` tokens (see charts/_theme.mjs).
- *
- * ── Caching: one coarse gate, not per-chart hashing ─────────────────────────
- *
- * Unlike `build-images.mjs` (seconds per artifact, so it caches per slug and
- * commits its outputs), rendering a chart costs ~5 ms; 60 of them is ~0.3 s.
- * The only expensive part is importing Plot (~1.3 s), so the gate's job is to
- * return *before* that import when nothing changed.
- *
- * The digest covers every file in `charts/` (specs and shared helpers alike),
- * Plot's version, and this script, and is stored in the generated module. Any
- * edit re-renders everything, which is both cheaper and safer than per-file
- * hashing: a spec that imports `_theme.mjs` would silently go stale under
- * per-file hashing when only the helper changed.
- *
- * Alongside the markup, each entry carries `usedBy`: the lessons whose MDX
- * contains its `<Chart>` tag, so the admin gallery can link a figure back to
- * the page it appears on without reading the corpus at request time.
- *
- * Output: `lib/generated/charts.js` (gitignored; its committed `.d.ts` sibling
- * types it so typecheck/lint pass on a fresh checkout). Runs from `dev`,
- * `build`, and `postinstall`, so the file always exists before typecheck.
- *
- * Idempotent, and deterministic: the same specs always produce byte-identical
- * SVG, so re-running never churns. Specs using random data must draw from the
- * seeded `rng()`/`normalSamples()` helpers in charts/_theme.mjs.
+ * Caching is one coarse digest (everything in charts/, Plot's version, this
+ * script) rather than per-file: rendering is ~5 ms/chart, and per-file
+ * hashing would go stale when only a shared helper changed. Each entry also
+ * carries `usedBy` so the admin gallery can link back without reading MDX at
+ * request time. Output: lib/generated/charts.js (gitignored; committed
+ * `.d.ts` sibling). Runs from dev, build, postinstall. Deterministic: specs
+ * using random data must draw from the seeded helpers in charts/_theme.mjs.
  */
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -52,18 +24,14 @@ const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const CHARTS_DIR = join(ROOT, "charts");
 const CONTENT_DIR = join(ROOT, "content");
 const OUT_FILE = join(ROOT, "lib", "generated", "charts.js");
-// Slugs-only sibling for consumers that need an existence check without the
-// SVG corpus. API routes compile as their own bundler graph, so importing the
-// full manifest from app/api/admin/charts put a second ~5.7 MB copy of every
-// chart's markup into the deployed Worker (~891 KiB gzipped, measured — see
-// agent-outputs/20260813-1424-git-playground-design.md §8.6.1).
+// Slugs-only sibling for existence checks: API routes compile as their own
+// bundler graph, and importing the full manifest put a second copy of every
+// chart's markup into the deployed Worker.
 const SLUGS_FILE = join(ROOT, "lib", "generated", "chart-slugs.js");
-// One static asset per chart's rendered markup. The manifest itself carries
-// metadata only (title, caption, dimensions, svgBytes); the SVG corpus was
-// ~99% of its weight, and as an `import`ed module it sat in the Worker
-// bundle (~887 KiB gzipped) for pages that are all prerendered anyway.
-// `<Chart>` reads these via lib/charts/loadChartSvg.ts — filesystem at
-// build time, the ASSETS binding on a request-time render.
+// One static asset per chart's markup; the manifest keeps metadata only (the
+// SVG corpus was ~99% of its weight and sat in the Worker bundle as an
+// import). `<Chart>` reads these via lib/charts/loadChartSvg.ts — filesystem
+// at build time, the ASSETS binding on a request-time render.
 const SVG_DIR = join(ROOT, "public", "chart-svgs");
 
 /** Content collection → route prefix, mirroring the `baseUrl`s in lib/source.ts.
@@ -101,10 +69,8 @@ function mdxFiles(dir) {
 }
 
 /**
- * Display name of the course or track a lesson belongs to, which is the
- * `title` in the top-level directory's meta.json (the same string the site's
- * own navigation shows). Falls back to the directory name so a collection
- * without one still labels its links.
+ * Display name of the course/track a lesson belongs to: the `title` in the
+ * top-level meta.json, falling back to the directory name.
  */
 function sectionName(collection, relPath) {
   const top = relPath.split("/")[0];
@@ -115,8 +81,7 @@ function sectionName(collection, relPath) {
       const title = JSON.parse(readFileSync(meta, "utf8")).title;
       if (typeof title === "string" && title.length > 0) return title;
     } catch {
-      // A malformed meta.json is the site's problem to report, not this
-      // script's; fall through to the directory name.
+      // Malformed meta.json: fall through to the directory name.
     }
   }
   return top;
@@ -124,17 +89,9 @@ function sectionName(collection, relPath) {
 
 /**
  * Where each chart is used: slug → [{ url, title, section, collection }].
- *
- * The gallery's whole job is reviewing a figure in context, so it needs a way
- * back to the lesson, and `section` names the course it belongs to so a link
- * reading "Histograms" is not ambiguous across thirty-odd courses. Building the
- * index here (rather than in the page) keeps the app from reading ~800 MDX
- * files at request time inside the Worker, which is the same reason the charts
- * themselves are rendered at build time.
- *
- * The scan is a regex over `<Chart slug="…"`, not an MDX parse: the tag is
- * written by hand in a lesson body and that is the entire surface. A chart
- * rendered through a variable slug would be missed, and would show as unused.
+ * Built here so the Worker never reads ~800 MDX files at request time. The
+ * scan is a regex over `<Chart slug="…"`, not an MDX parse; a chart rendered
+ * through a variable slug would be missed and show as unused.
  */
 function chartUsages() {
   const usages = {};
@@ -145,8 +102,8 @@ function chartUsages() {
       const slugs = [...src.matchAll(/<Chart\s[^>]*slug="([^"]+)"/g)].map((m) => m[1]);
       if (slugs.length === 0) continue;
 
-      // content/<collection>/<…>/<page>.mdx → <base>/<…>/<page>, with `index`
-      // collapsing to its parent, exactly as Fumadocs's loader routes it.
+      // content/<collection>/<…>/<page>.mdx → <base>/<…>/<page>, `index`
+      // collapsing to its parent, exactly as Fumadocs routes it.
       const rel = file.slice(dir.length + 1).replace(/\.mdx$/, "");
       const path = rel === "index" ? "" : rel.replace(/(^|\/)index$/, "");
       const url = path ? `${base}/${path}` : base;
@@ -163,8 +120,7 @@ function chartUsages() {
       }
     }
   }
-  // Grouped by course, then by lesson: a chart used four times in one course
-  // and once in another should not interleave them.
+  // Grouped by course, then by lesson, so uses do not interleave.
   for (const list of Object.values(usages)) {
     list.sort(
       (a, b) =>
@@ -175,19 +131,17 @@ function chartUsages() {
 }
 
 /**
- * Digest of everything that can change the rendered output: every file in
- * `charts/`, Plot's version, and this script's own bytes (the post-processing
- * below is part of the output, so editing it must re-render — hashing the file
- * removes the "remember to bump RENDERER_VERSION" step that would otherwise
- * silently ship stale charts).
+ * Digest of everything that can change the output: every file in `charts/`,
+ * Plot's version, and this script's own bytes — hashing the script removes
+ * the "remember to bump RENDERER_VERSION" step.
  */
 function computeDigest(files, usages) {
   const h = createHash("sha256")
     .update(readFileSync(fileURLToPath(import.meta.url)))
     .update("\0")
     .update(plotVersion())
-    // The usage index is part of the output, so placing a `<Chart>` in a new
-    // lesson has to invalidate too, even though no spec changed.
+    // The usage index is part of the output, so a new `<Chart>` placement
+    // invalidates too.
     .update("\0")
     .update(JSON.stringify(usages));
   for (const name of files) {
@@ -205,39 +159,32 @@ function priorDigest() {
 }
 
 /**
- * Shrink and normalize the markup Plot produced.
- *
- * `--plot-background` is Plot's own token for label halos and tip backdrops
- * and defaults to a literal `white`, which would glow on the dark page; it
- * becomes a theme token. Coordinates get rounded to 2dp, which is well under
- * a device pixel at any width we render and cuts a dense path by ~5%.
+ * Shrink and normalize the markup Plot produced. `--plot-background` (label
+ * halos, tip backdrops) defaults to literal `white`, which would glow on the
+ * dark page; it becomes a theme token.
  */
 function postProcess(svg, slug) {
   const out = svg
     .replace(/--plot-background:\s*white;/g, "--plot-background: var(--ds-chart-surface);")
-    // Round long decimals to 2dp, which halves the file with no visible effect
-    // on a path or a transform. Scoped to attribute values: applied to the
-    // whole document it also rewrites *text content*, so a label reading
-    // "t* = 1.645" would silently ship as "1.65".
+    // Round long decimals to 2dp (well under a device pixel). Scoped to
+    // attribute values: applied to the whole document it would also rewrite
+    // text content, so a label "t* = 1.645" would ship as "1.65".
     .replace(/="([^"]*)"/g, (m, value) =>
       value.includes(".")
         ? `="${value.replace(/-?\d+\.\d{3,}/g, (n) => String(Number(Number(n).toFixed(2))))}"`
         : m,
     );
-  // Plot names each chart's scoped stylesheet `plot-<hash of its own CSS>`, so
-  // two charts with identical styling would share a class — and any change to
-  // Plot's stylesheet would rename every chart at once. Rename it after the
-  // slug: unique per chart, stable across upgrades, and legible in devtools.
+  // Plot's scoped stylesheet class is `plot-<hash of its CSS>`: identical
+  // styling shares a class, and a Plot upgrade renames every chart at once.
+  // Rename after the slug: unique per chart, stable across upgrades.
   const generated = out.match(/class="(plot-[a-z0-9]+)"/);
   return generated ? out.split(generated[1]).join(`ds-chart-${slug}`) : out;
 }
 
 /**
- * Reject any literal color that survived into the output.
- *
- * A hex or rgb() fill is the one failure mode this pipeline can't catch
- * visually in review, because it looks right in whichever theme the author had
- * open and wrong in the other one. Fail the build instead.
+ * Reject any literal color that survived into the output: a hex or rgb()
+ * fill looks right in the author's theme and wrong in the other, so fail the
+ * build instead of relying on review.
  */
 function literalColors(svg) {
   return [...svg.matchAll(/(?:fill|stroke|stop-color)="(#[0-9a-fA-F]{3,8}|rgba?\([^"]*\))"/g)].map(
@@ -246,74 +193,34 @@ function literalColors(svg) {
 }
 
 /**
- * Reject a function that leaked into an SVG attribute.
- *
- * Several Plot options that read like channels are constants: `textAnchor`,
- * `dx`, `dy`, `strokeDasharray`. Handing one a function neither throws nor
- * falls back — Plot stringifies it into the attribute, so the output carries
- * `text-anchor="(d) => …"`, the renderer discards the invalid value, and every
- * label quietly reverts to its default. That is invisible in a spec review and
- * subtle enough in a rendered chart (labels that look a little off rather than
- * obviously broken) to ship. Fail the build instead; `sidedText()` in
- * charts/_theme.mjs is the supported way to vary anchoring per row.
+ * Reject a function that leaked into an SVG attribute. Plot options that read
+ * like channels but are constants (`textAnchor`, `dx`, `dy`,
+ * `strokeDasharray`) stringify a function into the attribute; the renderer
+ * discards it and labels quietly revert to defaults. Fail the build;
+ * `sidedText()` in charts/_theme.mjs is the supported per-row anchoring.
  */
 function stringifiedFunctions(svg) {
   return [...svg.matchAll(/([a-zA-Z-]+)="[^"]*=>[^"]*"/g)].map((m) => m[1]);
 }
 
 /**
- * Count `<text>` elements that rendered with nothing in them.
- *
- * Almost always a tick whose label was thrown away. On a `type: "log"` scale
- * d3 formats only the values it considers nice for the base, and returns an
- * empty string for the rest — *including* values handed to it explicitly
- * through `ticks`, and regardless of any `tickFormat` the spec supplies. So
- * `ticks: [1, 16, 256, 4096, 65536]` on a base-10 log axis draws five ticks
- * and labels two, with no warning from Plot and nothing wrong-looking in the
- * spec. The fix is `base: 2` when the ticks are powers of two, or ticks that
- * are powers of ten when they are not.
- *
- * A spec never has a reason to draw an empty string, so the check needs no
- * exceptions: any empty text element is a label that went missing.
+ * Count `<text>` elements that rendered empty — almost always a tick label:
+ * on a log scale d3 labels only values nice for the base, even ones passed
+ * explicitly via `ticks` and regardless of `tickFormat`. Fix with `base: 2`
+ * for powers of two, or powers-of-ten ticks. A spec never draws an empty
+ * string on purpose, so the check needs no exceptions.
  */
 function emptyLabels(svg) {
   return [...svg.matchAll(/<text\b[^>]*>(?:<tspan\b[^>]*>\s*<\/tspan>)*<\/text>/g)].length;
 }
 
 /**
- * The narrowest width this chart can be drawn at before its smallest label
- * stops being readable.
- *
- * An inlined chart is responsive the cheap way: `width: 100%` on an SVG with a
- * viewBox scales the whole drawing, type included. That is fine down to a
- * point and then it is not. A 680px chart in a 358px phone column renders at
- * 0.53x, which turns a 13px axis tick into 6.9px and a 9px annotation into
- * 4.8px — present, and unreadable. The page never overflows and the chart
- * looks fine in a screenshot, so nothing about it announces itself as broken.
- *
- * A single global floor would be wrong, because how far a chart can shrink
- * depends on what it drew: a spec whose smallest type is a 13px tick has far
- * more room than one carrying 9px annotations inside a facet grid. The build
- * already has the answer in the markup, so it computes the floor per chart
- * and the stylesheet enforces it, and specs stay unaware of any of it.
- *
- * Below `MIN_LEGIBLE_PX` the chart stops scaling and its container scrolls
- * instead, which is the same bargain a wide table makes.
- */
-/**
- * The smallest type a spec may author.
- *
- * Not a style preference: it is the input to the floor below. A chart is one
- * fixed drawing scaled to whatever column it lands in, so its smallest label
- * decides how far it can shrink, and a single 9px annotation drags the whole
- * chart's floor up by 65px of forced horizontal scrolling on a phone. 10px is
- * where the library already sits (224 of 250 specs bottom out there), so
- * holding the line costs nothing and keeps one chart's stray small label from
- * making that chart worse than its neighbours for no benefit anyone chose.
- *
- * A spec whose *subject* is unreadably small type exports `smallTypeAllowed`
- * with a reason, the same escape hatch `literalColorsAllowed` offers when the
- * colors are the data.
+ * The smallest type a spec may author — the input to the per-chart min-width
+ * floor below. An inlined SVG scales its type with its width, so one 9px
+ * annotation drags a chart's floor up and forces horizontal scrolling on a
+ * phone. A spec whose *subject* is unreadably small type exports
+ * `smallTypeAllowed` with a reason (same escape hatch as
+ * `literalColorsAllowed`).
  */
 const MIN_AUTHORED_PX = 10;
 
@@ -324,20 +231,11 @@ function undersizedType(svg) {
 }
 
 /**
- * Check a spec's optional `sources` export, the credit line under the chart.
- * Returns the problem to report, or null when it is fine (including absent).
- *
- * ```js
- * export const sources = [
- *   { text: "Boehm, *Software Engineering Economics* (1981)", href: "https://…" },
- * ];
- * ```
- *
- * Checked here rather than trusted at render time because the manifest is
- * generated: a typo in the shape would otherwise surface as a blank credit on
- * every lesson that places the chart, which is exactly the kind of thing
- * nobody notices. `href` is optional (not every reference has a stable public
- * home) but must be `http(s)` when given, since it renders as a link out.
+ * Check a spec's optional `sources` export ([{ text, href? }]), the credit
+ * line under the chart. Returns the problem to report, or null (including
+ * absent). Checked here because a typo'd shape would surface as a blank
+ * credit nobody notices; `href` is optional but must be http(s) — it renders
+ * as a link out.
  */
 function badSources(sources) {
   if (sources === undefined) return null;
@@ -363,25 +261,22 @@ const MIN_LEGIBLE_PX = 8.5;
  *  narrowest phone column with room to spare. */
 const IGNORE_BELOW_PX = 340;
 
+/** Narrowest width this chart can be drawn at before its smallest label
+ *  drops under MIN_LEGIBLE_PX; below it the container scrolls instead of
+ *  scaling. Computed per chart from its own markup. */
 function legibleMinWidth(svg, width, smallTypeAllowed = false) {
   const sizes = [...svg.matchAll(/font-size[=:]\s*"?([0-9.]+)/g)].map((m) =>
     Number(m[1]),
   );
   if (sizes.length === 0) return 0;
-  // A spec that exempted itself from the authoring floor drew type it *wants*
-  // illegible. Sizing the chart from that type is the wrong bargain twice
-  // over: the drawing is pinned at full width, forcing the most horizontal
-  // scrolling of anything in the library, in order to protect labels whose
-  // whole point is that they cannot be read. Size it from the floor every
-  // other spec is held to, so the type a reader is meant to read is safe and
-  // the chart shrinks like its neighbours.
+  // An exempted spec drew type it *wants* illegible; sizing from it would pin
+  // the chart at full width to protect unreadable labels. Size from the
+  // authoring floor instead, so readable type is safe and the chart shrinks.
   const smallest = smallTypeAllowed
     ? Math.max(MIN_AUTHORED_PX, Math.min(...sizes))
     : Math.min(...sizes);
-  // Scaling the SVG scales its type by the same factor, so a label of
-  // `smallest` px renders at `smallest * (w / width)`. Solve that for the w
-  // where it reaches the floor. Never ask for more than the chart's own
-  // width: at 1x every label is already the size the spec chose.
+  // A label of `smallest` px renders at `smallest * (w / width)`; solve for
+  // the w where it hits the floor, capped at the chart's own width.
   const floor = Math.min(width, Math.ceil((width * MIN_LEGIBLE_PX) / smallest));
   return floor <= IGNORE_BELOW_PX ? 0 : floor;
 }
@@ -393,9 +288,8 @@ const specs = files.filter(isSpec);
 const usages = chartUsages();
 const digest = computeDigest(files, usages);
 
-// The sibling outputs must exist too: a checkout whose charts.js is current
-// but that predates the slugs split (or the SVG-asset split) would otherwise
-// skip straight past the writes and break their consumers.
+// The sibling outputs must exist too, or a checkout with a current charts.js
+// that predates the slugs/SVG splits would skip the writes.
 const svgDirCurrent = () => {
   try {
     return readdirSync(SVG_DIR).filter((f) => f.endsWith(".svg")).length === specs.length;
@@ -424,8 +318,7 @@ for (const file of specs) {
     continue;
   }
 
-  // Where the numbers came from, rendered as a credit line under the caption
-  // (<FigureSources>). It lives on the spec rather than on the `<Chart>` tag
+  // Credit line (<FigureSources>). Lives on the spec, not the `<Chart>` tag,
   // so it travels with the chart to every lesson that places it.
   const sourceProblem = badSources(mod.sources);
   if (sourceProblem) {
@@ -436,12 +329,9 @@ for (const file of specs) {
   const el = mod.render();
   const svg = postProcess(el.outerHTML, slug);
 
-  // A spec may opt out of the literal-color guard, but only by exporting a
-  // reason, which lands in the failure message of any future spec that copies
-  // the pattern without one. The single legitimate case is a chart whose
-  // subject *is* a set of specific colors (a color-map comparison), where
-  // the role tokens would change the very thing being shown. Such a chart
-  // does not follow the page theme, which is correct: the swatches are data.
+  // Opting out of the literal-color guard requires an exported reason; the
+  // one legitimate case is a chart whose subject *is* specific colors, where
+  // the swatches are data and correctly ignore the theme.
   const literal = mod.literalColorsAllowed ? [] : literalColors(svg);
   if (mod.literalColorsAllowed && typeof mod.literalColorsAllowed !== "string") {
     problems.push(
@@ -509,12 +399,11 @@ for (const file of specs) {
     ...(mod.sources?.length ? { sources: mod.sources } : {}),
     width,
     height: Number(el.getAttribute("height")),
-    // Omitted when the chart can shrink to any width without a label falling
-    // under the legibility floor, so the common case costs nothing.
+    // Omitted when the chart can shrink to any width legibly.
     ...(minWidth ? { minWidth } : {}),
     usedBy: usages[slug] ?? [],
-    // The markup itself goes to public/chart-svgs/<slug>.svg (see SVG_DIR);
-    // the manifest keeps only its size, for the admin gallery's stats.
+    // The markup goes to public/chart-svgs/<slug>.svg; the manifest keeps
+    // only its size, for the admin gallery's stats.
     svgBytes: svg.length,
   };
   svgBySlug.set(slug, svg);
@@ -556,9 +445,8 @@ console.log(
   `build-charts: ${specs.length} chart(s) rendered ` +
     `(${(bytes / 1024).toFixed(0)} KB SVG) → lib/generated/charts.js`,
 );
-// Not an error: a spec is often written before the lesson that will carry it.
-// Worth saying out loud, though, since an unplaced chart costs bundle bytes
-// for nothing and a typo'd slug looks exactly like this.
+// Not an error — specs are often written before their lesson — but worth
+// saying: a typo'd slug looks exactly like this.
 if (orphans.length > 0) {
   console.log(`build-charts: not placed in any lesson yet: ${orphans.join(", ")}`);
 }

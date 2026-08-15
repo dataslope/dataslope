@@ -241,32 +241,15 @@ describe("hasHarnessMarker", () => {
   });
 });
 
-describe("composeWebDocument bridge opt-out", () => {
-  it("omits the bridge (and its token) when asked", () => {
-    const doc = composeWebDocument({
-      entryHtml: "<h1>hi</h1>",
-      bridge: false,
-    });
-    expect(doc).not.toContain(PREVIEW_MESSAGE_KEY);
+describe("composeWebDocument always carries the bridge", () => {
+  it("injects the bridge with the caller's token", () => {
+    // Every composed document is bridged — a bridgeless one would send a
+    // run's console output nowhere and render as a block that prints
+    // nothing. The auto-preview keeps determinism with a derived token,
+    // not by omitting the bridge.
+    const doc = composeWebDocument({ entryHtml: "<h1>hi</h1>", token: "tok" });
+    expect(doc).toContain(PREVIEW_MESSAGE_KEY);
     expect(doc).toContain("<h1>hi</h1>");
-  });
-
-  it("still injects Tailwind with the bridge off", () => {
-    const doc = composeWebDocument({
-      entryHtml: "<h1>hi</h1>",
-      bridge: false,
-      tailwind: true,
-    });
-    expect(doc).toContain(TAILWIND_BROWSER_CDN);
-    expect(doc).not.toContain(PREVIEW_MESSAGE_KEY);
-  });
-
-  it("refuses to compose a bridged document with no token", () => {
-    // Composing one silently would send a run's console output nowhere
-    // and render as a block that prints nothing.
-    expect(() => composeWebDocument({ entryHtml: "<h1>hi</h1>" })).toThrow(
-      /token/,
-    );
   });
 });
 
@@ -310,10 +293,8 @@ describe("webAdapter.composeStaticPreview", () => {
   });
 
   it("agrees exactly with what a real Run composes", () => {
-    // The anti-drift guard: a preview that disagrees with the reader's
-    // own Run is worse than no preview, because nothing tells them which
-    // to believe. Both paths reach composeWebDocument with the same file
-    // map and the same token, so the documents must be identical.
+    // Anti-drift guard: a preview that disagrees with the reader's own Run is
+    // worse than no preview. Both paths must compose identical documents.
     const textFiles = new Map(sources.map((f) => [f.filename, f.source]));
     const runDoc = composeWebDocument({
       entryHtml: sources[0].source,
@@ -353,10 +334,8 @@ describe("auto-preview is opt-in per adapter", () => {
   });
 
   it("react composes from a precompiled bundle, never from source", () => {
-    // Deriving a second answer from the sources in the browser is exactly
-    // the ~3 MB esbuild-wasm download the build-time bundle exists to
-    // avoid — and a second implementation of the bundler is the drift this
-    // whole design is arranged to prevent. No bundle, no preview.
+    // Bundling in the browser would need the ~3 MB esbuild-wasm download the
+    // build-time bundle exists to avoid. No bundle, no preview.
     const sources = [{ filename: "main.tsx", source: "export {}" }];
     expect(
       reactAdapter.composeStaticPreview!(sources, {
@@ -386,10 +365,9 @@ describe("auto-preview is opt-in per adapter", () => {
 });
 
 describe("bridge replay buffer", () => {
-  // The server-rendered frame runs while the page's JavaScript is still
-  // downloading, so by the time React subscribes the block has usually
-  // already printed everything it will. Without a replay those messages
-  // are lost and the block looks like one that prints nothing.
+  // The server-rendered frame runs while page JS is still downloading, so the
+  // block has usually printed before React subscribes; without a replay those
+  // messages are lost.
   it("buffers what it posts and re-posts on request", () => {
     const js = buildPreviewBridge("tok");
     expect(js).toContain(PREVIEW_REPLAY_KEY);

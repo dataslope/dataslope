@@ -1,40 +1,21 @@
 #!/usr/bin/env node
 /**
- * Fail the build if any prerendered payload carries `InliningHintsStale`.
+ * Fail the build if any prerendered payload carries `InliningHintsStale`
+ * (bit 512). Next's client contract for that bit is "this route entry already
+ * expired — re-fetch until a payload without the bit arrives"; a corrupt
+ * Workers Builds cache once produced builds carrying the bit with the
+ * segment-prefetch files missing, so every open tab looped RSC prefetches
+ * forever, with nothing else visibly wrong (full chain: the
+ * `prefetchInlining` comment in next.config.ts).
  *
- * ── The incident this guards against ────────────────────────────────────────
+ * The bit is not wrong in general — a healthy origin resolves it in one round
+ * trip — but on this deployment target it means the hints pipeline broke, and
+ * the fix is purging the Workers Builds build cache, not deploying and
+ * hoping. SKIP_PREFETCH_HINTS_CHECK=1 downgrades the failure to a warning.
  *
- * On 2026-08-06 the deployed site began looping RSC prefetch requests at
- * ~150/second per open browser tab — 7.5M requests in four days. The trigger
- * was `PrefetchHint.InliningHintsStale` (bit 512) in the prerendered router
- * state: Next's client contract for that bit is "cache this route entry
- * already expired and immediately re-fetch", and it terminates only when the
- * re-fetch returns a payload with the bit stripped. A corrupted Workers Builds
- * build cache produced builds whose payloads carried the bit AND whose
- * segment-prefetch files were missing, so the re-fetch was answered by the
- * same stale payload, forever. The full chain is written up in the
- * next.config.ts comment beside `prefetchInlining`.
- *
- * The poisoning was invisible: builds succeeded, pages rendered, every
- * response was a 200. The only symptom was request volume in a dashboard
- * nobody was watching. This check turns that silence into a red build.
- *
- * A payload with the bit set is not necessarily wrong in general — Next stamps
- * it by design on payloads generated before `collectPrefetchHints` runs, and a
- * healthy origin resolves it in one round trip. But on THIS deployment target
- * a build that ships the bit is a build whose hints pipeline broke (to date:
- * always a corrupt `.next/cache` restore), and the fix is purging the Workers
- * Builds build cache, not deploying and hoping. So: refuse to ship it.
- *
- * Escape hatch: SKIP_PREFETCH_HINTS_CHECK=1 downgrades the failure to a
- * warning, for a knowingly-accepted deploy while an upstream change is
- * investigated.
- *
- * Runs right after `next build` in the build chain, so `.next/server/app`
- * always exists when it runs. Scans two shapes:
- *   - `*.rsc` initial payloads: the router-state tuple's trailing flags,
- *     `..."$undefined","$undefined",<flags>]`
- *   - `*.segments/**` tree files: `"prefetchHints":<flags>`
+ * Runs right after `next build`, so `.next/server/app` exists. Scans two
+ * shapes: `*.rsc` router-state tuples (`..."$undefined","$undefined",
+ * <flags>]`) and `*.segments/**` tree files (`"prefetchHints":<flags>`).
  */
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
@@ -82,11 +63,11 @@ function main() {
   // exactly like a green run — which is how a build that emitted no payloads
   // at all, or a rename of `.rsc`, would sail through.
   //
-  // The floor is deliberately low. The file count is not stable: with Next's
-  // client segment cache on it is ~8,500 (one `.rsc` per route plus the
-  // per-segment tree files), and with it off — where `next.config.ts` has it —
-  // it is ~1,045, because only the route payloads remain. Anything under 100
-  // means the output shape changed, not that the site shrank.
+  // The floor is deliberately low. The file count is not stable — with the
+  // per-segment tree files of Next's client segment cache (not disableable on
+  // this Next version, see open-next.config.ts) the scan sees thousands of
+  // files, and route payloads alone are ~1,045. Anything under 100 means the
+  // output shape changed, not that the site shrank.
   if (files.length < 100) {
     console.error(
       `check-prefetch-hints: only ${files.length} prerendered file(s) found under ` +

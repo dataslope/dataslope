@@ -1,10 +1,8 @@
 import { snippetCompletion, type Completion } from "@codemirror/autocomplete";
 
-// Static completion tier for the Java playground surfaces. No client-side
-// Java language server exists (Eclipse JDT-LS has no browser port, see
-// the feasibility report in agent-outputs/), so this is keywords, the
-// common JDK vocabulary, and a few high-value snippets; document-word
-// completion (wired in `languageCompletion.ts`) covers the rest.
+// Static completion tier for Java: no client-side language server exists
+// (JDT-LS has no browser port), so this is keywords, common JDK vocabulary,
+// and a few snippets; document-word completion covers the rest.
 
 const kw = (label: string): Completion => ({ label, type: "keyword" });
 const ty = (label: string, detail?: string): Completion => ({

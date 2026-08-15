@@ -1,13 +1,8 @@
-// Pins the freshness rules every content generator now sits behind
-// (scripts/lib/build-cache.mjs). The failure mode this guards is the quiet
-// one: a cache that says "fresh" when an input moved doesn't crash, it serves
-// yesterday's search index, yesterday's Markdown mirrors, and yesterday's
-// image dimensions, and the first person to notice is a reader.
-//
-// The two tiers are asserted separately, because they answer different
-// questions: the stat tier is what makes the check cheap, and the content tier
-// is what keeps it honest when a clone or a branch switch rewrites every mtime
-// without changing a byte.
+// Pins the freshness rules of scripts/lib/build-cache.mjs. The failure mode
+// is quiet: a cache that says "fresh" after an input moved serves yesterday's
+// generated artifacts. The two tiers are asserted separately: the stat tier
+// makes the check cheap; the content tier keeps it honest when a clone or
+// branch switch rewrites every mtime without changing a byte.
 import { mkdtempSync, mkdirSync, rmSync, statSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -62,10 +57,9 @@ describe("freshness", () => {
   });
 
   it("goes stale on a same-size rewrite inside one clock tick", () => {
-    // The racy case, and the reason tier 1 requires the stamp to be strictly
-    // newer than every input: "one" → "two" is the same three bytes, and a
-    // rewrite this fast can land on the same millisecond, so size+mtime alone
-    // would call it unchanged. A typo fix in a lesson is exactly this shape.
+    // The racy case: "one" → "two" is the same three bytes and can land on
+    // the same millisecond, so size+mtime alone would call it unchanged —
+    // hence tier 1 requires the stamp to be strictly newer than every input.
     const input = write("in.txt", "one");
     const output = write("out.txt", "generated");
     freshness(root, "t", { inputs: [input], outputs: [output] }).commit();

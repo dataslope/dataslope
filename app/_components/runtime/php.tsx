@@ -181,9 +181,7 @@ function bye(string $name): string {
 ];
 
 const PACKAGES: PackageInfo[] = [
-  // All PHP standard-library functions and constants (str_replace,
-  // sprintf, M_PI, array_map, json_decode, etc.) are globally available
-  // without any require or include, there are no packages to install.
+  // The whole PHP stdlib is globally available; nothing to install.
 ];
 
 // ─── Worker-based runtime ────────────────────────────────────────────────
@@ -203,8 +201,7 @@ class PhpWorkerRuntime implements LanguageRuntime {
 
     constructor(private worker: Worker) {}
 
-  /** Free the runtime by terminating its worker. Registry-eviction hook,
-   *  the instance must not be used after this. */
+  /** Terminate the worker (registry-eviction hook; unusable after). */
   dispose(): void {
     this.worker.terminate();
   }
@@ -290,10 +287,8 @@ export const phpAdapter: LanguageAdapter = {
       and are always available, no <code>require</code> needed.
     </>
   ),
-  // PHP doesn't have a per-call import statement that maps cleanly to
-  // the packages drawer, so we just drop a hint comment near the top of
-  // the file. Keeps the click affordance consistent with the other
-  // playgrounds.
+  // PHP has no per-call import statement; a hint comment keeps the click
+  // affordance consistent with the other playgrounds.
   importSnippet: (name) => `<?php // ${name} is part of the PHP standard library.`,
   hasImport(code, name) {
     return code.includes(`// ${name} is part of the PHP standard library.`);

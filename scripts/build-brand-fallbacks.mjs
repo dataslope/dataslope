@@ -1,29 +1,11 @@
 #!/usr/bin/env node
 /**
- * Generate the Mermaid brand-token fallback map from app/brand.css.
- *
- * Why this exists:
- *
- * The Mermaid theming in app/_components/mdx/mermaid.tsx resolves the
- * `--ds-*` brand tokens from the DOM at render time (brand.css is imported
- * by the root layout, so the variables are always defined in the browser),
- * but keeps a literal hex fallback per token so text/label colors stay
- * correct even if a variable is ever missing. That fallback map used to be
- * hand-duplicated in mermaid.tsx and could silently drift from brand.css.
- *
- * This script makes brand.css the single source of truth: it extracts every
- * concrete hex-valued `--ds-*` declaration (aliases such as
- * `--ds-blue: var(--ds-blue-500)` are skipped, Mermaid runs color math over
- * these values and needs concrete colors) and emits them as an ES module.
- *
- * Output: `lib/generated/brand-fallbacks.js` (an `export default {...}`
- * module, gitignored; its committed `.d.ts` sibling gives it a type so
- * typecheck/lint pass on a fresh checkout). Runs from `dev`, `build`, and
- * `postinstall`, so the file always exists before typecheck/lint/build.
- *
- * Idempotent. The map reflects brand.css at the time it ran, so restart
- * `next dev` (or run `npm run build:brand-fallbacks`) after editing the
- * ramps.
+ * Generate the Mermaid brand-token fallback map from app/brand.css, so the
+ * hex fallbacks in app/_components/mdx/mermaid.tsx cannot drift from the
+ * ramps. Only concrete hex `--ds-*` declarations are extracted — aliases like
+ * `--ds-blue: var(--ds-blue-500)` are skipped because Mermaid runs color math
+ * and needs concrete colors. Output: lib/generated/brand-fallbacks.js
+ * (gitignored; committed `.d.ts` sibling). Runs from dev, build, postinstall.
  */
 import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";

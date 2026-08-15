@@ -1,7 +1,4 @@
-// Branded not-found for share links, the most common negative moment in the
-// sharing flow (expired, revoked, or mistyped /s/ URLs land here via the
-// page's notFound()). Explains why the link stopped working and offers a way
-// forward instead of Next's bare default 404.
+// Branded not-found for expired, revoked, or mistyped /s/ share links.
 import "@/app/tailwind.css";
 import "@/app/home.css";
 import Link from "next/link";

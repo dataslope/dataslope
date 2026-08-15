@@ -1,22 +1,11 @@
 /**
- * Dataslope CORS Proxy, Cloudflare Worker
+ * Dataslope CORS Proxy (Cloudflare Worker): proxies playground requests to
+ * third-party APIs that lack permissive CORS headers.
  *
- * Proxies HTTP/HTTPS requests on behalf of playground runtimes so that
- * third-party APIs that don't expose permissive CORS headers can be reached
- * from browser-side code.
- *
- * Security model
- * ──────────────
- * 1. Only requests from allowed Origins may use the proxy
- *    (ALLOWED_ORIGINS env var, comma-separated).
- * 2. Only http:// and https:// target URLs are accepted.
- * 3. Private/loopback IP addresses are never proxied, including on every
- *    redirect hop (redirect: "manual" + per-hop re-validation).
- * 4. Hop-by-hop headers are stripped from both the forwarded request and the
- *    upstream response to prevent header smuggling.
- * 5. The browser's ambient Cookie header is stripped before forwarding, it is
- *    never relevant to third-party upstream APIs. Explicitly-set Authorization
- *    headers are kept so authenticated API calls work.
+ * Security model: only allowed Origins (ALLOWED_ORIGINS); http/https targets
+ * only; private/loopback IPs blocked on every redirect hop; hop-by-hop
+ * headers stripped both directions; ambient Cookie stripped (explicit
+ * Authorization kept).
  */
 
 import {
@@ -27,24 +16,14 @@ import {
 
 export interface Env {
   /**
-   * Comma-separated list of allowed Origin values, e.g.:
-   *   "http://localhost:3000,https://dataslope.com,https://dataslope.subwaymatch.workers.dev"
-   *
-   * Entries may contain a `*` wildcard that matches a single hostname label
-   * (no dots, no slashes) so the app worker's version and alias preview
-   * hostnames can be allowed without listing each one, e.g.:
-   *   "https://*-dataslope.subwaymatch.workers.dev"
-   *
-   * Configure in wrangler.toml [vars] for development, or via
-   * `wrangler secret put ALLOWED_ORIGINS` / Cloudflare dashboard for production.
+   * Comma-separated allowed Origin values. A `*` wildcard matches a single
+   * hostname label (no dots/slashes), e.g. "https://*-dataslope.subwaymatch.workers.dev"
+   * for preview hostnames. Set in wrangler.toml [vars] (dev) or via
+   * `wrangler secret put ALLOWED_ORIGINS` (prod).
    */
   ALLOWED_ORIGINS: string;
 
 }
-
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
 
 /** Headers that must not be forwarded upstream (hop-by-hop). */
 const HOP_BY_HOP_HEADERS = new Set([
@@ -56,24 +35,18 @@ const HOP_BY_HOP_HEADERS = new Set([
   "trailer",
   "transfer-encoding",
   "upgrade",
-  // Strip the host header, Cloudflare sets the correct one for the upstream.
+  // Cloudflare sets the correct Host for the upstream.
   "host",
 ]);
 
-/**
- * Patterns that identify private/loopback IP ranges.
- * We block these to prevent Server-Side Request Forgery (SSRF) to internal
- * services that would be reachable from the Cloudflare edge.
- */
+/** Private/loopback ranges, blocked to prevent SSRF from the Cloudflare edge. */
 const PRIVATE_IP_PATTERNS = [
   /^localhost$/i,
   /^127\./,
   /^10\./,
   /^192\.168\./,
   /^172\.(1[6-9]|2\d|3[01])\./,
-  // IPv4 link-local (169.254.0.0/16), also covers the cloud metadata
-  // endpoint 169.254.169.254. The IPv6 link-local equivalent (fe80:) is
-  // already blocked below.
+  // IPv4 link-local, incl. cloud metadata endpoint 169.254.169.254.
   /^169\.254\./,
   /^::1$/,
   /^fc00:/i,
@@ -81,12 +54,7 @@ const PRIVATE_IP_PATTERNS = [
   /^0\.0\.0\.0$/,
 ];
 
-/** Maximum number of redirects the proxy will follow before giving up. */
 const MAX_REDIRECTS = 5;
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 
 function buildCorsHeaders(origin: string): HeadersInit {
   return {
@@ -114,37 +82,24 @@ function errorResponse(
 }
 
 /**
- * Returns true when the hostname looks like a private / loopback address that
- * should never be reachable via the proxy.
- *
- * Handles the common bypass vectors beyond the regex list:
- *  - IPv6 bracket syntax (`URL.hostname` returns "[::1]", not "::1")
- *  - IPv4-mapped IPv6 (::ffff:127.0.0.1)
- *  - Decimal-encoded IPv4 (2130706433 == 127.0.0.1)
- *  - Hex-encoded IPv4 (0x7f000001 == 127.0.0.1)
- *
- * Note: DNS rebinding (a public hostname that later resolves to a private IP)
- * is not detectable at this layer. On Cloudflare Workers the risk is reduced
- * because the runtime restricts outbound routing and there is no privileged
- * internal metadata service reachable via the same private IP ranges available
- * on typical cloud VMs.
+ * True when the hostname is a private/loopback address. Beyond the regex list
+ * it covers bypass vectors: IPv6 brackets ("[::1]"), IPv4-mapped IPv6
+ * (::ffff:127.0.0.1), and decimal/hex-encoded IPv4 (2130706433, 0x7f000001).
+ * DNS rebinding is not detectable at this layer.
  */
 function isPrivateHostname(hostname: string): boolean {
-  // URL.hostname wraps IPv6 addresses in brackets: "[::1]". Strip them so
-  // patterns match the raw address string.
+  // URL.hostname wraps IPv6 in brackets ("[::1]"); strip for pattern matching.
   const h = /^\[.+]$/.test(hostname) ? hostname.slice(1, -1) : hostname;
 
   if (PRIVATE_IP_PATTERNS.some((re) => re.test(h))) return true;
 
-  // IPv4-mapped IPv6: ::ffff:127.0.0.1, ::ffff:192.168.0.1, etc.
+  // IPv4-mapped IPv6: ::ffff:127.0.0.1, etc.
   const v4Mapped = h.match(/^::ffff:(\d{1,3}(?:\.\d{1,3}){3})$/i);
   if (v4Mapped && PRIVATE_IP_PATTERNS.some((re) => re.test(v4Mapped[1]))) {
     return true;
   }
 
-  // Decimal-encoded IPv4 (e.g. 2130706433 == 127.0.0.1). No valid public
-  // hostname is a bare integer, so any pure-numeric hostname is treated as
-  // private.
+  // Decimal-encoded IPv4: no valid public hostname is a bare integer.
   if (/^\d+$/.test(h)) return true;
 
   // Hex-encoded IPv4 (e.g. 0x7f000001 == 127.0.0.1).
@@ -153,10 +108,6 @@ function isPrivateHostname(hostname: string): boolean {
   return false;
 }
 
-/**
- * Strips hop-by-hop headers from a Headers object and returns a plain object
- * suitable for constructing a new Headers instance.
- */
 function stripHopByHopHeaders(headers: Headers): Record<string, string> {
   const out: Record<string, string> = {};
   for (const [key, value] of headers.entries()) {
@@ -167,25 +118,15 @@ function stripHopByHopHeaders(headers: Headers): Record<string, string> {
   return out;
 }
 
-// ---------------------------------------------------------------------------
-// Main handler
-// ---------------------------------------------------------------------------
-
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const allowedOrigins = parseAllowedOrigins(env.ALLOWED_ORIGINS ?? "");
 
-    // ------------------------------------------------------------------
-    // 1. Determine and validate the request Origin
-    // ------------------------------------------------------------------
     const rawOrigin = request.headers.get("Origin");
-    // null means no Origin header was sent (browser navigation, curl, Postman…).
     const normalizedOrigin = rawOrigin ? rawOrigin.replace(/\/+$/, "") : null;
 
-    // Requests without an Origin header are always allowed, only browser
-    // cross-origin fetch/XHR requests reliably include an Origin header.
-    // Short-circuit evaluation means isLocalhostOrigin() is only called when
-    // normalizedOrigin is a non-null string (TypeScript narrows accordingly).
+    // No Origin header (navigation, curl, ...) is always allowed — only
+    // browser cross-origin fetch/XHR reliably sends one.
     const isAllowedOrigin =
       normalizedOrigin === null ||
       isOriginInAllowList(normalizedOrigin, allowedOrigins) ||
@@ -196,9 +137,7 @@ export default {
       ? buildCorsHeaders(normalizedOrigin ?? "*")
       : buildCorsHeaders("null");
 
-    // ------------------------------------------------------------------
-    // 2. Handle preflight OPTIONS request
-    // ------------------------------------------------------------------
+    // Preflight.
     if (request.method === "OPTIONS") {
       if (!isAllowedOrigin) {
         return errorResponse(403, "Origin not allowed", corsHeaders);
@@ -206,16 +145,10 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders });
     }
 
-    // ------------------------------------------------------------------
-    // 3. Reject requests from disallowed Origins
-    // ------------------------------------------------------------------
     if (!isAllowedOrigin) {
       return errorResponse(403, "Origin not allowed", corsHeaders);
     }
 
-    // ------------------------------------------------------------------
-    // 4. Parse and validate the target URL
-    // ------------------------------------------------------------------
     const { searchParams } = new URL(request.url);
     const targetUrlRaw = searchParams.get("url");
 
@@ -234,7 +167,6 @@ export default {
       return errorResponse(400, "Invalid target URL", corsHeaders);
     }
 
-    // Only allow http and https schemes.
     if (targetUrl.protocol !== "http:" && targetUrl.protocol !== "https:") {
       return errorResponse(
         400,
@@ -243,7 +175,7 @@ export default {
       );
     }
 
-    // Block private / loopback addresses (SSRF protection).
+    // SSRF protection.
     if (isPrivateHostname(targetUrl.hostname)) {
       return errorResponse(
         400,
@@ -252,33 +184,23 @@ export default {
       );
     }
 
-    // ------------------------------------------------------------------
-    // 5. Forward the request to the upstream server, following redirects
-    //    manually so that each hop is re-validated against the private-IP
-    //    list. Using redirect: "follow" would skip that check for hops
-    //    after the first.
-    // ------------------------------------------------------------------
+    // Redirects are followed manually so every hop is re-validated against
+    // the private-IP list; redirect: "follow" would skip checks after hop 1.
     const upstreamHeaders = new Headers(
       stripHopByHopHeaders(request.headers),
     );
 
-    // Remove the Origin header, the caller's origin is irrelevant to the
-    // target server, and leaking it could expose the requester's identity.
+    // Don't leak the caller's identity to the target.
     upstreamHeaders.delete("origin");
     upstreamHeaders.delete("referer");
-    // Strip ambient browser cookies, never relevant to third-party upstream
-    // APIs and must not be leaked to arbitrary hosts. Explicitly-set
+    // Ambient cookies must never leak to arbitrary hosts; explicitly-set
     // Authorization headers are kept so authenticated API calls work.
     upstreamHeaders.delete("cookie");
 
-    // Let the Workers runtime negotiate content encoding itself. If we forward
-    // the client's Accept-Encoding, fetch() switches to pass-through mode where
-    // the returned body and Content-Encoding header can disagree (the runtime
-    // may hand back a decompressed body while still reporting the upstream
-    // Content-Encoding). Clients that trust that header, e.g. pandas read_csv
-    // in Pyodide, then try to gunzip already-decoded bytes and fail with
-    // "Not a gzipped file". Removing it lets Cloudflare transparently
-    // decompress and return a clean, identity-encoded body.
+    // Never forward Accept-Encoding: fetch() then goes pass-through and can
+    // return a decompressed body while keeping the upstream Content-Encoding,
+    // so clients that trust the header (pandas read_csv in Pyodide) fail with
+    // "Not a gzipped file". Without it Cloudflare returns an identity body.
     upstreamHeaders.delete("accept-encoding");
 
     // Tag requests so upstream servers can identify the proxy.
@@ -295,8 +217,8 @@ export default {
         headers: upstreamHeaders,
         redirect: "manual",
       };
-      // Only attach a body for methods that allow one, and only on the first
-      // hop, the request body stream is consumed after the initial read.
+      // Body only on the first hop: the request body stream is consumed
+      // after the initial read.
       if (!["GET", "HEAD"].includes(request.method) && redirectCount === 0) {
         init.body = request.body;
       }
@@ -310,7 +232,6 @@ export default {
         return errorResponse(502, `Upstream error: ${message}`, corsHeaders);
       }
 
-      // Not a redirect, use this response.
       if (response.status < 300 || response.status >= 400) {
         upstreamResponse = response;
         break;
@@ -318,7 +239,6 @@ export default {
 
       const location = response.headers.get("Location");
       if (!location) {
-        // 3xx with no Location, return as-is.
         upstreamResponse = response;
         break;
       }
@@ -354,24 +274,17 @@ export default {
       return errorResponse(502, "Upstream request failed", corsHeaders);
     }
 
-    // ------------------------------------------------------------------
-    // 6. Build and return the proxied response
-    // ------------------------------------------------------------------
     const responseHeaders = new Headers(
       stripHopByHopHeaders(upstreamResponse.headers),
     );
 
-    // Inject CORS headers so the browser accepts the response.
     for (const [key, value] of Object.entries(corsHeaders)) {
       responseHeaders.set(key, value);
     }
 
-    // The Workers runtime transparently decompresses gzip/brotli upstream
-    // bodies, so `upstreamResponse.body` is already decoded. The upstream
-    // Content-Encoding/Content-Length no longer describe the bytes we return,
-    // leaving them in place makes clients (e.g. pandas read_csv, which trusts
-    // Content-Encoding over its own `compression=` argument) try to gunzip
-    // already-decompressed data, or truncate on a stale length. Drop them.
+    // The Workers runtime already decompressed the body, so the upstream
+    // Content-Encoding/Content-Length no longer describe the returned bytes —
+    // clients trusting them would gunzip decoded data or truncate. Drop them.
     responseHeaders.delete("content-encoding");
     responseHeaders.delete("content-length");
 

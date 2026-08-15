@@ -1,19 +1,8 @@
 /**
- * OPFS file storage for workspace editor files (code tabs).
- *
- * Each file lives at:
- *   opfs root / workspaces / {workspaceId} / files / {fileId}
- *
- * Writes are coalesced via an async write queue (mirroring the
- * `persistedStorage.ts` pattern for localStorage) and flushed:
- *  1. On `requestIdleCallback` / `setTimeout` (deferred, idle-time I/O).
- *  2. Eagerly on `pagehide` / `visibilitychange` so no edits are lost when
- *     the user closes the tab.
- *
- * `readFile` always reads directly from OPFS (no caching here, callers
- * maintain their own in-memory dirty buffers in Zustand).
- *
- * No UI changes are made in Phase 1; this file is infrastructure only.
+ * OPFS file storage for workspace editor files, at
+ * `workspaces/{workspaceId}/files/{fileId}`. Writes coalesce in a queue
+ * flushed on idle and eagerly on pagehide/visibilitychange so edits survive
+ * tab close. Reads are uncached; callers keep their own dirty buffers.
  */
 
 import { isOpfsSupported } from "./featureDetect";
@@ -36,8 +25,8 @@ interface PendingFileWrite {
 const pending = new Map<string, PendingFileWrite>();
 let scheduled = false;
 
-/** The WHATWG spec defines FileSystemDirectoryHandle as async-iterable but
- *  the TypeScript DOM lib types don't yet include [Symbol.asyncIterator]. */
+/** FileSystemDirectoryHandle is async-iterable per spec, but the TS DOM lib
+ *  types don't include [Symbol.asyncIterator] yet. */
 type IterableDir = AsyncIterable<[string, FileSystemHandle]>;
 
 type IdleCallback = (deadline: {
@@ -106,12 +95,8 @@ if (typeof window !== "undefined") {
 // ---------------------------------------------------------------------------
 
 /**
- * Queues an asynchronous write of `content` to the workspace file identified
- * by `(workspaceId, fileId)`. Returns immediately; the actual I/O happens on
- * the next idle callback (or `pagehide`).
- *
- * Falls back gracefully when OPFS is unavailable, the write is silently
- * dropped (callers must maintain their own in-memory dirty buffer).
+ * Queues an async write; I/O happens on the next idle callback or pagehide.
+ * Silently dropped when OPFS is unavailable (callers keep their own buffer).
  */
 export function writeFile(
   workspaceId: string,
@@ -122,10 +107,7 @@ export function writeFile(
   schedule();
 }
 
-/**
- * Reads the content of a workspace file from OPFS.
- * Returns `null` when OPFS is unavailable or the file does not exist.
- */
+/** Reads a workspace file. Null when OPFS is unavailable or the file is missing. */
 export async function readFile(
   workspaceId: string,
   fileId: string,
@@ -146,15 +128,12 @@ export async function readFile(
   }
 }
 
-/**
- * Deletes a workspace file from OPFS.
- * Safe to call when the file does not exist.
- */
+/** Deletes a workspace file. Safe when the file does not exist. */
 export async function deleteFile(
   workspaceId: string,
   fileId: string,
 ): Promise<void> {
-  // Also cancel any pending queued write for this file.
+  // Cancel any pending queued write for this file.
   pending.delete(`${workspaceId}/${fileId}`);
   if (!isOpfsSupported()) return;
   try {
@@ -170,11 +149,8 @@ export async function deleteFile(
   }
 }
 
-/**
- * Lists all file IDs (OPFS entry names) inside a workspace's `files/`
- * directory. Returns an empty array when OPFS is unavailable or the workspace
- * directory does not exist.
- */
+/** Lists file IDs in a workspace's `files/` directory; empty when OPFS or
+ *  the directory is unavailable. */
 export async function listFiles(workspaceId: string): Promise<string[]> {
   if (!isOpfsSupported()) return [];
   const names: string[] = [];
@@ -194,20 +170,13 @@ export async function listFiles(workspaceId: string): Promise<string[]> {
   return names;
 }
 
-/**
- * Force-flushes all pending file writes. Safe to call before page unload or
- * after a tab switch when you need the OPFS state to be fully up to date.
- */
+/** Force-flushes all pending file writes. */
 export async function flushFileWrites(): Promise<void> {
   await flush();
 }
 
-/**
- * Recursively sums every file size under a workspace's OPFS directory.
- * Returns a byte count suitable for display in the Workspace Manager UI.
- * Returns `0` when OPFS is unavailable or the workspace has no backing
- * directory.
- */
+/** Recursively sums file sizes under a workspace's OPFS directory, in bytes.
+ *  0 when OPFS is unavailable or the workspace has no backing directory. */
 export async function estimateWorkspaceSize(
   workspaceId: string,
 ): Promise<number> {

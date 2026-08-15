@@ -1,9 +1,7 @@
 "use client";
 
-// Concrete SQLite implementation of `SqlEngineAdapter`. The SQLite
-// playground imports this and routes its engine factory / identity
-// constants through it so the per-dialect surface lives in one place
-// (Stage 3 scaffolding from the playground refactor plan).
+// Concrete SQLite implementation of `SqlEngineAdapter`; keeps the
+// per-dialect surface in one place.
 
 import type { SqlEngineAdapter } from "./shared/engineAdapter";
 import { createSqliteEngine, type SqliteEngine } from "../runtime/sqlite";

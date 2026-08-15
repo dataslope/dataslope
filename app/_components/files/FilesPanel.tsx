@@ -53,26 +53,18 @@ interface FilesPanelProps {
   onCreateFolder: (parentPath: string, name: string) => void;
   onCreateFile?: (parentPath: string, name: string) => void;
   onMove: (sourcePath: string, destFolderPath: string) => void;
-  /** Called when the user opens a file into the editor (double-click or
-   *  the "Open in Editor" context item). Only rendered when provided,
-   *  playgrounds use it to (re)open a workspace code file's tab. */
+  /** Opens a file into the editor (double-click or context item); the
+   *  affordance renders only when provided. */
   onOpenFile?: (path: string) => void;
-  /** Predicate gating the open-file affordance per file (e.g. only
-   *  workspace code files, not uploaded data files). When omitted, every
-   *  file offers it as long as `onOpenFile` is provided. */
+  /** Per-file gate for the open-file affordance; omitted = every file. */
   canOpenFile?: (path: string) => boolean;
-  /** Called when the user chooses to open/query a file. Only rendered when
-   *  provided, use to surface a runtime-specific "open" action. */
+  /** Runtime-specific open/query action; rendered only when provided. */
   onOpenQuery?: (path: string) => void;
   /** Label for the open-query menu item (defaults to "Query with SELECT"). */
   openQueryLabel?: string;
-  /** Called when the user chooses to create a table from a file. Only
-   *  rendered when provided, use to surface a runtime-specific "import as
-   *  table" action. */
+  /** Runtime-specific create-table action; rendered only when provided. */
   onCreateTable?: (path: string) => void;
-  /** Predicate gating the create-table menu item per file (e.g. only for
-   *  extensions the runtime can read). When omitted, the item shows for
-   *  every file as long as `onCreateTable` is provided. */
+  /** Per-file gate for the create-table item; omitted = every file. */
   canCreateTable?: (path: string) => boolean;
   /** Label for the create-table menu item (defaults to "Create Table"). */
   createTableLabel?: string;
@@ -498,9 +490,8 @@ export function FilesPanel({
 
   const tree = useMemo(() => buildTree(files), [files]);
 
-  // Determine the parent path where new items should land. If a folder
-  // is selected, uploads/new folders go inside it; if a file is selected,
-  // they land alongside it; otherwise they land at the root.
+  // Parent path for new items: inside a selected folder, alongside a
+  // selected file, else at the root.
   const parentPath = useMemo(() => {
     if (!selectedPath) return "";
     const node = files.find((f) => f.path === selectedPath);

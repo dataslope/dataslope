@@ -16,34 +16,12 @@ export interface ParsedTimeline {
 }
 
 /**
- * Parse a Mermaid `timeline` chart into structured data.
- *
- * We render these as a native React timeline instead of a Mermaid SVG because
- * Mermaid lays timelines out horizontally: with a dozen year-columns the SVG
- * grows far wider than the article column and gets scaled to fit, leaving the
- * text illegible. The vertical layout below stays readable at any width.
- *
- * Supported subset (everything our lesson content actually uses):
- *
- *   timeline
- *       title The C family tree
- *       1972 : C by Dennis Ritchie at Bell Labs
- *       1996 : Ihaka & Gentleman publish "R: A Language…"
- *              Core development team forms (now "R Core")
- *
- * Rules:
- *   - `title <text>`            → diagram title.
- *   - `section <text>`          → group label (rare in our content; rendered
- *                                 as a divider so nothing is silently dropped).
- *   - `<period> : <event>`      → a new marker. Only the FIRST colon splits the
- *                                 period from the text, because event text
- *                                 frequently contains colons (book titles, etc.).
- *   - an indented continuation line with no colon attaches as an additional
- *     event under the most recent period (Mermaid stacks these).
- *
- * Note we deliberately do not split the event text on subsequent colons into
- * multiple events: none of our timelines rely on that, and doing so would
- * mangle the common `"Title: Subtitle"` case.
+ * Parse a Mermaid `timeline` chart into structured data (rendered natively
+ * because Mermaid's horizontal layout scales wide charts illegibly small).
+ * Supported subset: `title`, `section` (rendered as a divider), and
+ * `<period> : <event>` markers. Only the FIRST colon splits — event text
+ * frequently contains colons ("Title: Subtitle") — and a continuation line
+ * with no colon attaches as an extra event under the most recent period.
  */
 export function parseMermaidTimeline(chart: string): ParsedTimeline {
   // The Mermaid pipeline can hand us literal "\n" escapes rather than real
@@ -83,15 +61,13 @@ export function parseMermaidTimeline(chart: string): ParsedTimeline {
   return { title, entries };
 }
 
-/** A `<code>` span, the marker lesson authors use for code inside a diagram
- *  label (see `applyCodeFont` in mermaid.tsx for the Mermaid-rendered side of
- *  the same convention). Everything else in a label is plain author prose. */
+/** The author convention for code inside a diagram label (see applyCodeFont in
+ *  mermaid.tsx for the Mermaid-rendered side). */
 const CODE_TAG = /<code>([\s\S]*?)<\/code>/gi;
 
 /**
- * Render one label: Mermaid's `<br>` separators become real line breaks, and a
- * `<code>` span becomes a real `<code>` element, which `app/docs.css` sets in
- * JetBrains Mono. Those two are the only markup a timeline label carries.
+ * Render one label: `<br>` becomes a real line break and `<code>` a real code
+ * element — the only two pieces of markup a timeline label carries.
  */
 function renderLabel(text: string): ReactNode {
   const parts: ReactNode[] = [];
@@ -118,13 +94,9 @@ function renderLabel(text: string): ReactNode {
 }
 
 /**
- * Vertical, center-railed timeline for Mermaid `timeline` diagrams.
- *
- * A single rail runs down the centre with a circular marker for every period;
- * the event cards alternate left and right of the rail on wide layouts and
- * collapse to a single left-railed column on narrow ones. Layout switching is
- * driven by a container query so it responds to the article column width
- * rather than the viewport.
+ * Vertical, center-railed timeline for Mermaid `timeline` diagrams. Cards
+ * alternate sides on wide layouts and collapse to one column on narrow ones,
+ * switched by a container query (article column width, not viewport).
  */
 export function Timeline({ chart }: { chart: string }) {
   const { title, entries } = parseMermaidTimeline(chart);

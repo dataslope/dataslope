@@ -10,12 +10,9 @@ import {
 } from "../utils/ddl";
 
 /**
- * Shared "Create View" dialog for the SQLite / Postgres / DuckDB
- * playgrounds. The only dialect-aware bit is replacement: Postgres and
- * DuckDB emit `CREATE OR REPLACE VIEW`, while SQLite (which has no such
- * form) emulates it with `DROP VIEW IF EXISTS` + `CREATE VIEW`. That
- * divergence lives entirely in the pure `buildCreateViewSql` builder, so
- * each playground only supplies its `dialect` and an `onSubmit` runner.
+ * Shared "Create View" dialog. The only dialect-aware bit is replacement
+ * (CREATE OR REPLACE vs SQLite's DROP+CREATE emulation), which lives in the
+ * pure `buildCreateViewSql` builder.
  */
 export interface CreateViewDialogProps {
   open: boolean;
@@ -39,9 +36,8 @@ export function CreateViewDialog({
   const [orReplace, setOrReplace] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Reset the form during the render that flips `open` to true (React's
-  // "adjust state when a prop changes" pattern, done in render, not an
-  // effect, so there's no cascading-render lint violation).
+  // Reset the form during the render that flips `open` to true (the
+  // "adjust state when a prop changes" pattern — in render, not an effect).
   const [wasOpen, setWasOpen] = useState(false);
   if (open !== wasOpen) {
     setWasOpen(open);

@@ -28,12 +28,8 @@ export interface SearchRow {
 
 /**
  * The reader's current course or interview track, sent by the search dialog
- * as `?tag=courses/<slug>` / `?tag=interview/<slug>` (see DocsRootProvider).
- *
- * Unlike Fumadocs's stock APIs, the tag does not *filter*: it re-weights.
- * Someone searching "bar" inside the Plotly course almost always wants the
- * Plotly bar-chart lesson, but the ggplot2 lesson must stay reachable for
- * when they do not.
+ * as `?tag=courses/<slug>` / `?tag=interview/<slug>`. The tag re-weights
+ * rather than filters: in-scope lessons win, out-of-scope stay reachable.
  */
 export interface SearchScope {
   collection: "courses" | "interview";
@@ -48,10 +44,8 @@ const COLLECTION_BASE = { courses: "/courses", interview: "/interview-prep" } as
 
 /**
  * The tag the search dialog should send for a page: `/courses/<slug>/…` →
- * `courses/<slug>`, `/interview-prep/<slug>/…` → `interview/<slug>` (the
- * collection names the index uses), anything else → undefined. The client
- * half of `parseScope` (used by DocsRootProvider); kept beside it so the two
- * cannot drift.
+ * `courses/<slug>`, `/interview-prep/<slug>/…` → `interview/<slug>`, else
+ * undefined. Client half of `parseScope`; kept beside it so they can't drift.
  */
 export function searchScopeFor(pathname: string): string | undefined {
   const m = /^\/(courses|interview-prep)\/([^/]+)/.exec(pathname);
@@ -74,51 +68,38 @@ export function parseScope(tag: string | null): SearchScope | null {
 }
 
 /**
- * BM25 column weights, in the table's column order. The five UNINDEXED columns
- * lead and take 0, because `bm25()` wants one weight per column and they carry
- * no tokens.
- *
- * Prose outranks code by roughly seven to one. That ratio is what makes
- * indexing code safe: a search for a common identifier should surface the
- * lesson that *explains* it above the dozen that merely use it in a starter
- * file, and without the split there is no way to express that.
+ * BM25 column weights, in the table's column order; the five UNINDEXED
+ * columns lead and take 0 (`bm25()` wants one weight per column). Prose
+ * outranks code ~7:1 so the lesson that explains an identifier beats the
+ * dozen that merely use it in a starter file.
  */
 export const WEIGHTS = "0, 0, 0, 0, 0, 8.0, 6.0, 4.0, 1.0, 0.15";
 
 /**
  * Scope multipliers. `bm25()` returns negative scores (more negative = more
- * relevant), so multiplying a row's score amplifies it: ×2 means a lesson in
- * the reader's current course wins unless a foreign lesson is more than twice
- * as relevant, which is exactly the "twice as good to interrupt me" bar a
- * context switch should have to clear. The collection nudge is mild: reading
- * a course signals little about which interview track is relevant.
+ * relevant), so multiplying amplifies: ×2 means an in-course lesson wins
+ * unless a foreign one is more than twice as relevant. The collection nudge
+ * is mild.
  */
 const COURSE_BOOST = "2.0";
 const COLLECTION_BOOST = "1.15";
 
 /**
- * Component rows (empty `heading`, non-empty anchor) are deliberately tiny
- * (one quiz, one figure caption), and BM25's length normalisation rewards
- * tiny documents heavily: unchecked, a figure's eight-word alt text outranks
- * the section that actually teaches the term. Shrinking their score keeps
- * sections on top while the component row still ranks close behind, and when
- * both quote the same match the response collapses them onto the component's
- * anchor anyway (`toResults`), so nothing precise is lost.
+ * Component rows (empty `heading`, non-empty anchor) are tiny, and BM25's
+ * length normalisation rewards tiny documents: undamped, an eight-word alt
+ * text outranks the section that teaches the term. Damping keeps sections on
+ * top; duplicate quotes still collapse onto the component's anchor in
+ * `toResults`.
  */
 const COMPONENT_ROW_DAMP = "0.75";
 
 /**
- * The search statement. Two snippets, because `snippet()` reads one column:
- * a match that lives only in `code` produces a highlight-less prose snippet,
- * and the code one is the fallback that keeps the dialog's excerpt honest
- * (see `bestExcerpt`).
- *
- * The trailing `page, url` keeps equal-score rows in a stable order across
- * replicas, so the CDN-cached response does not depend on which replica
- * answered first.
- *
- * Parameters, in order: ?1 MATCH, ?2 LIMIT, and for the scoped variant
- * ?3 scope page, ?4 scope LIKE prefix, ?5 scope collection.
+ * The search statement. Two snippets because `snippet()` reads one column:
+ * the code snippet is the fallback when the match lives only in `code` (see
+ * `bestExcerpt`). The trailing `page, url` keeps equal-score rows stable
+ * across replicas so the CDN-cached response is deterministic. Parameters:
+ * ?1 MATCH, ?2 LIMIT; scoped adds ?3 scope page, ?4 LIKE prefix,
+ * ?5 collection.
  */
 export function searchSql(scoped: boolean): string {
   const damp = `(CASE WHEN heading = '' AND anchor != '' THEN ${COMPONENT_ROW_DAMP} ELSE 1.0 END)`;
@@ -139,9 +120,8 @@ export function searchSql(scoped: boolean): string {
   `;
 }
 
-/** How many section/component rows one page may spend from the row budget.
- *  Without a cap, a page whose every section matches a common term eats the
- *  whole result list and the second-best page never appears. */
+/** Rows one page may spend from the budget; without a cap, one page whose
+ *  every section matches eats the whole result list. */
 const PAGE_ROW_CAP = 4;
 
 /** The dialog's excerpt: the prose snippet when it actually highlights
@@ -183,23 +163,12 @@ interface TextEntry {
 }
 
 /**
- * Group ranked rows into Fumadocs's page-then-children shape.
- *
- * Sections arrive already ranked. The first row seen for a page fixes that
- * page's position in the output, so a lesson whose best section ranked third
- * overall lands third, rather than every page floating to wherever its
- * strongest and weakest sections happen to be.
- *
- * Component rows (empty `heading`, non-null anchor; see
- * scripts/build-search-corpus.mjs) render as text entries linking to the
- * component's own anchor. Because component content is indexed twice (in its
- * section row and in its component row), the same match often arrives as two
- * near-identical snippets; they are collapsed here, keeping the component's
- * anchor, which is the one that scrolls to the matched text rather than to
- * the heading above it.
- *
- * `hl` (the query's searched tokens) is carried on every result URL so the
- * lesson page can highlight the matched words after navigation.
+ * Group ranked rows into Fumadocs's page-then-children shape. The first row
+ * seen for a page fixes that page's position. Component content is indexed
+ * twice (section row + component row), so near-identical snippets are
+ * collapsed keeping the component's anchor — the one that scrolls to the
+ * matched text. `hl` (the searched tokens) is carried on every result URL so
+ * the lesson page can highlight matches after navigation.
  */
 export function toResults(
   rows: SearchRow[],
@@ -241,11 +210,9 @@ export function toResults(
   for (const row of rows) {
     if (spent >= limit) break;
 
-    // A component row with nothing to quote matched only through its `title`
-    // column (component rows carry no heading/description). Such a match also
-    // matched every other row of the same page, its page row included, so
-    // dropping this one costs nothing and frees its slot for a row a reader
-    // can actually see.
+    // A component row with nothing to quote matched only via its `title`
+    // column; that match also hit every other row of the page, so dropping
+    // it costs nothing.
     const isComponentRow = !row.heading && row.anchor !== null && row.anchor !== "";
     if (isComponentRow && !bestExcerpt(row)) continue;
 

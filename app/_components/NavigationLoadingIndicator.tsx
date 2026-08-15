@@ -1,30 +1,16 @@
 "use client";
 
 /**
- * Global navigation loading indicator.
+ * Global navigation loading indicator: mounted once in the root layout,
+ * shows a corner badge while an App Router navigation is in flight.
  *
- * App Router navigations to heavy routes (playgrounds, course pages) can
- * take a few seconds before the new page commits, during which the old page
- * just sits there and the site feels unresponsive. This component, mounted
- * once in the root layout, shows the brand "diamond assemble + quarter-turn"
- * loader in a small corner badge while a navigation is in flight.
- *
- * There is no global "navigation started" event in the App Router, so start
- * is detected the way the top-loader libraries do it: a capture-phase click
- * listener on `document` that recognises left-clicks on same-origin,
- * same-tab, non-download links whose path/query differ from the current URL
- * (capture phase, because next/link calls preventDefault before the bubble
- * phase, `defaultPrevented` can't distinguish an SPA navigation from an
- * app-handled click). Back/forward is covered by `popstate`. Programmatic
- * `router.push` calls are not detected, link clicks are how users reach
- * playgrounds and courses.
- *
- * "Navigation finished" is the router state actually changing:
- * usePathname/useSearchParams only update when the new route commits, so an
- * effect keyed on them hides the badge. Two timers keep it honest: the badge
- * only appears after SHOW_DELAY_MS (fast navigations never flash it), and a
- * safety timeout clears it if a detected "navigation" never commits (the
- * click was intercepted by app code, or the fetch failed).
+ * The App Router has no "navigation started" event, so starts are detected
+ * via a capture-phase click listener on qualifying links (capture, because
+ * next/link calls preventDefault before the bubble phase) plus `popstate`;
+ * programmatic `router.push` is not detected. "Finished" is the router state
+ * committing (usePathname/useSearchParams). Two timers keep it honest:
+ * SHOW_DELAY_MS hides fast navigations, and a safety timeout clears a
+ * detected navigation that never commits.
  */
 
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";

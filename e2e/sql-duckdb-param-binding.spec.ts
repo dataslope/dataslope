@@ -1,16 +1,10 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// ─────────────────────────────────────────────────────────────────────
-// DuckDB inline edits via prepared-statement parameter binding (UX-17).
-//
-// DuckDB's row-mutation methods used to build SQL by string-concatenating
-// quote-escaped literals; they now bind values as positional `?` parameters.
-// This spec drives a real edit through that path on DuckDB and asserts a
-// commit round-trips a value containing single quotes, double quotes and an
-// ampersand, i.e. that prepared-statement binding works in duckdb-wasm and
-// needs no manual escaping. (The shared edit/commit UI is covered for all
-// three engines by sql-edit-ergonomics / sql-edit-undo.)
-// ─────────────────────────────────────────────────────────────────────
+// DuckDB inline edits via prepared-statement parameter binding: the mutation
+// methods used to string-concatenate quote-escaped literals and now bind
+// positional `?` parameters. A commit must round-trip a value with single
+// quotes, double quotes, and an ampersand with no manual escaping. (The
+// shared edit UI is covered by sql-edit-ergonomics / sql-edit-undo.)
 
 async function runSql(page: Page, sql: string) {
   const editor = page.locator(".cm-content");
@@ -59,10 +53,8 @@ test("DuckDB: committed edit with quotes round-trips via param binding", async (
     page.locator(".toast-title", { hasText: "Updated 1 cell" }),
   ).toBeVisible({ timeout: 40_000 });
 
-  // The exact string (quotes and all) is back in the grid. The post-commit
-  // re-fetch is a real `SELECT * FROM customers ORDER BY customer_id` against
-  // DuckDB, so seeing the value proves the prepared-statement UPDATE bound and
-  // persisted it without corruption, no manual escaping required.
+  // The exact string is back after a real re-fetch against DuckDB, proving
+  // the prepared-statement UPDATE bound and persisted it without corruption.
   await expect(
     page.locator(".sql-result-table").getByText(TRICKY, { exact: true }),
   ).toBeVisible({ timeout: 40_000 });

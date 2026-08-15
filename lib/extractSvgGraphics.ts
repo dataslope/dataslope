@@ -1,24 +1,13 @@
 /**
- * Pure extraction of custom inline `<svg>` graphics from a single lesson's MDX
- * source, the parsing core behind the build-time SVG gallery (lib/svgGallery.ts).
- *
- * Kept free of any Fumadocs `source` / filesystem dependency so it can be unit
- * tested directly (lib/svgGallery.ts layers the page-URL/course grouping on top).
- *
- * Parsing pipeline: the leading YAML frontmatter is blanked out (a handful of
- * lessons carry JSX-like text, `<Animal>`, `<T,>`, in their title/description,
- * which a frontmatter-unaware MDX parser would choke on), then the body is parsed
- * with the same micromark extensions the real build relies on, GFM, math, MDX,
- * and Mermaid, so every lesson parses and `<svg>` source offsets line up.
- *
- * IDs are computed with the very helpers `remarkSvgLabels` uses, so each ID here
- * is byte-for-byte the label the plugin stamps under the graphic on its page
- * (e.g. `svg-intro-sql-postgres-filtering-rows-f4f4db`). The hash is a pure
- * function of the graphic's own `<svg>` source, so blanking the frontmatter
- * (which never moves an svg's bytes) leaves it unchanged.
- *
- * Mermaid diagrams are authored as ```mermaid fences, never `<svg>` elements, so
- * collecting only `name === "svg"` nodes excludes them by construction.
+ * Pure extraction of custom inline `<svg>` graphics from one lesson's MDX
+ * source, the parsing core behind lib/svgGallery.ts; free of Fumadocs and
+ * filesystem deps so it unit-tests directly. The leading YAML frontmatter is
+ * blanked (some titles carry JSX-like text an MDX parser chokes on) with
+ * byte offsets kept aligned, then the body is parsed with the same micromark
+ * extensions the real build uses. IDs are computed with the same helpers as
+ * `remarkSvgLabels`, so each ID is byte-for-byte the on-page label. Mermaid
+ * diagrams are ```mermaid fences, never `<svg>`, so they are excluded by
+ * construction.
  */
 import { remark } from "remark";
 import remarkMdx from "remark-mdx";

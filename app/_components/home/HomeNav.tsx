@@ -23,11 +23,8 @@ import { ThemePillToggle } from "../ThemePillToggle";
 
 const GITHUB_URL = "https://github.com/dataslope/dataslope/";
 
-/** The primary sections the header links to, with their lucide glyphs (shared
- *  by the desktop menu and the mobile drawer). */
-/** Colour a nav item takes on the section being viewed. The default is the
- *  brand blue; Pricing goes green so its label and its "Free" badge read as
- *  one green unit. */
+/** Active-item colors: brand blue by default; Pricing goes green so its label
+ *  and "Free" badge read as one unit. */
 const ACTIVE_BLUE = "text-[var(--ds-blue-700)] dark:text-[var(--ds-blue-400)]";
 const ACTIVE_GREEN = "text-[var(--ds-green-500)]";
 
@@ -44,8 +41,7 @@ const NAV_SECTIONS: {
   { href: "/courses", label: "Courses", icon: GraduationCap, prefetch: true },
   { href: "/interview-prep", label: "Interview Prep", icon: BriefcaseBusiness },
   { href: "/playground", label: "Playground", icon: SquareTerminal },
-  // The pricing page's own headline is that everything is free; saying so in
-  // the nav is what stops "Pricing" reading as a paywall.
+  // The "Free" badge stops "Pricing" reading as a paywall.
   {
     href: "/pricing",
     label: "Pricing",
@@ -55,14 +51,8 @@ const NAV_SECTIONS: {
   },
 ];
 
-/**
- * The pill beside a nav label, in the pricing table's "Recommended" badge
- * style (green fill, white semibold caps-height text, fully rounded) a step
- * smaller so it sits under a 15px nav item rather than an 18px heading.
- *
- * Green in both appearances and in every state: the label it belongs to turns
- * green when active, so the badge has nothing to switch to.
- */
+/** The pill beside a nav label, in the pricing table's badge style a step
+ *  smaller. Green in every state. */
 function NavBadge({ children }: { children: string }) {
   return (
     <span className="inline-flex items-center rounded-full bg-[var(--ds-green-500)] px-2 py-0.5 text-[11px] font-semibold leading-normal text-white">
@@ -71,11 +61,6 @@ function NavBadge({ children }: { children: string }) {
   );
 }
 
-/** Desktop primary-menu link (text-only; the icons in NAV_SECTIONS are for
- *  the mobile drawer). Idle items sit in a muted neutral with a subtle darken
- *  on hover; the item for the section being viewed renders in the brand
- *  accent (matching the courses-page mockup), derived from the current
- *  pathname, so `/courses/python-basics` still lights up "Courses". */
 /** True when `pathname` is `href` or a page under it, so
  *  `/courses/python-basics` still lights up "Courses". */
 function isActiveSection(pathname: string, href: string): boolean {
@@ -92,9 +77,7 @@ function NavLink({
 }: {
   href: string;
   prefetch?: boolean;
-  /** The header has been scrolled past its threshold, so the type steps down
-   *  with everything else. Half a pixel: the compaction should read as the bar
-   *  getting tighter, not as the type changing size. */
+  /** Header scrolled past its threshold; type steps down with the bar. */
   compact?: boolean;
   badge?: string;
   activeClass?: string;
@@ -107,13 +90,8 @@ function NavLink({
       href={href}
       prefetch={prefetch}
       aria-current={active ? "page" : undefined}
-      // font-size is animated alongside the color, so the step down happens
-      // with the nav's height rather than snapping a frame ahead of it.
-      //
-      // The base size is the one for the tightest desktop band (md up to lg),
-      // where five menu items, the brand, the icons and the auth button share
-      // a ~770px bar; from lg the type steps back up. Below md this menu isn't
-      // rendered at all, so the base size only ever applies in that band.
+      // font-size animates with the color so the step down moves with the
+      // nav's height. Base size targets the tightest desktop band (md–lg).
       className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 font-medium transition-[color,font-size] duration-200 ${
         compact ? "text-[13px] lg:text-[14.5px]" : "text-[13px] lg:text-[15px]"
       } ${
@@ -151,9 +129,8 @@ function BrandLogo({ compact }: { compact?: boolean }) {
       href="/"
       aria-label="Dataslope home"
       className="group flex items-center gap-2"
-      // This nav only renders on "/", so a Link to "/" is a same-route no-op
-      // and nothing appears to happen. Scroll back to the top instead, the
-      // expected behaviour of clicking a site logo.
+      // This nav only renders on "/", where a Link to "/" is a no-op; scroll
+      // to the top instead.
       onClick={() => {
         const reduce = window.matchMedia?.(
           "(prefers-reduced-motion: reduce)",
@@ -161,29 +138,22 @@ function BrandLogo({ compact }: { compact?: boolean }) {
         window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
       }}
     >
-      {/* Both hover transforms carry `will-change-transform` so these two
-          elements keep permanent (tiny) compositor layers. Without it, each
-          hover starts an accelerated transform transition that promotes and
-          then drops a layer inside the sticky header — layer churn that has
-          coincided with stale marquee raster ghosting through the band under
-          the header (the original "hover a nav control" repro). */}
+      {/* `will-change-transform` keeps permanent compositor layers on both
+          hover transforms: layer churn inside the sticky header has caused
+          stale marquee raster ghosting under it. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/dataslope-logo-blue.svg"
         alt=""
-        // `height` is animated rather than `transform: scale`, which would
-        // fight the hover rotate on the same property and undo the layer
-        // stability the comment above is about.
+        // `height` (not `transform: scale`) so it can't fight the hover
+        // rotate on the same property.
         className={`relative top-px w-auto transition-[transform,height] duration-200 will-change-transform group-hover:rotate-[8deg] ${
           compact ? "h-[12px]" : "h-[13px]"
         }`}
         aria-hidden="true"
       />
-      {/* Hidden in the tightest desktop band only (md up to lg): there the
-          menu, the icons and the auth button already fill the bar, and the
-          wordmark is what pushes "Sign in" into wrapping. The mark alone still
-          identifies the site, and below md the drawer frees the room back up
-          so the full lockup returns. */}
+      {/* Wordmark hidden in the tightest desktop band (md–lg), where it
+          pushes "Sign in" into wrapping. */}
       <span
         className={`font-semibold tracking-tight text-[#121212] transition-[transform,font-size] duration-200 will-change-transform group-hover:translate-x-0.5 md:hidden lg:inline dark:text-white ${
           compact ? "text-[17px]" : "text-lg"
@@ -195,11 +165,9 @@ function BrandLogo({ compact }: { compact?: boolean }) {
   );
 }
 
-/** Auth block for the top of the mobile drawer: a solid "Sign in" button (styled
- *  like the desktop control) when signed out, or the account name +
- *  Account/Sign-out actions when signed in. While the first session read is in
- *  flight a size-matched skeleton renders instead of "Sign in", so a signed-in
- *  visitor doing a full-page load doesn't see it flash before the account rows. */
+/** Auth block for the mobile drawer: "Sign in" when signed out, account rows
+ *  when signed in. A size-matched skeleton renders while the session loads so
+ *  "Sign in" doesn't flash for signed-in visitors. */
 function MobileAuthSection() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
@@ -256,8 +224,7 @@ function MobileAuthSection() {
   );
 }
 
-/** Mobile slide-in drawer (a Base UI Dialog presented as a right-edge
- *  drawer) holding the same navigation the desktop bar exposes inline. */
+/** Mobile slide-in drawer holding the same navigation as the desktop bar. */
 function MobileDrawer() {
   const pathname = usePathname() ?? "";
   return (
@@ -285,9 +252,7 @@ function MobileDrawer() {
             <MobileAuthSection />
           </div>
 
-          {/* One unified scroll for all nav items (rather than a nested
-              scrollbar on just the playground list). The header above and the
-              footer below stay pinned. */}
+          {/* One unified scroll for all nav items; header and footer pinned. */}
           <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
             {NAV_SECTIONS.map(({ href, label, icon: Icon, badge, activeClass }) => {
               const active = isActiveSection(pathname, href);
@@ -296,9 +261,8 @@ function MobileDrawer() {
                   key={href}
                   render={<Link href={href} prefetch={false} />}
                   aria-current={active ? "page" : undefined}
-                  // Same active colour as the desktop menu (blue, green on
-                  // Pricing); idle rows keep the drawer's own neutral, which
-                  // is a step darker than the desktop menu's.
+                  // Same active color as the desktop menu; idle rows keep the
+                  // drawer's own (darker) neutral.
                   className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:bg-[var(--ds-gray-100)] dark:hover:bg-white/[0.06] ${
                     active
                       ? (activeClass ?? ACTIVE_BLUE)
@@ -332,22 +296,12 @@ function MobileDrawer() {
 }
 
 export function HomeNav() {
-  // Shrink-on-scroll: the nav bar is taller at the top of the page and
-  // compacts once scrolled. The background stays a solid white/#121212 (no
-  // backdrop blur, shadow, or opacity).
-  //
-  // Only the inner <nav> changes height; the <header> box itself is a fixed
-  // h-14/16. That keeps the shrink out of document flow (crossing a threshold
-  // no longer reflows the page, the cause of an earlier scroll-anchoring
-  // bounce) and, just as deliberately, keeps the header's composited layer a
-  // constant size: this header sits over the hero marquee's continuously
-  // animating composited rows, and resizing the sticky layer mid-scroll has
-  // produced stale "ghost" slices of marquee raster in the strip it vacates
-  // (GPU-only; not reproducible under software rasterization). Don't move the
-  // height transition back onto the <header> box.
-  //
-  // Two thresholds (hysteresis) so small scroll jitter around a single
-  // threshold can't flap the shrink transition back and forth.
+  // Shrink-on-scroll. Only the inner <nav> changes height; the <header> box
+  // stays a fixed h-14/16 — resizing the sticky layer mid-scroll reflowed the
+  // page (scroll-anchoring bounce) and produced stale "ghost" slices of
+  // marquee raster (GPU-only). Don't move the height transition back onto
+  // the <header> box. Two thresholds (hysteresis) so scroll jitter can't
+  // flap the transition.
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const onScroll = () =>
@@ -358,8 +312,8 @@ export function HomeNav() {
         return prev;
       });
     window.addEventListener("scroll", onScroll, { passive: true });
-    // Defer the initial read out of the effect body (handles back-nav into a
-    // scrolled position without a synchronous setState).
+    // Deferred initial read: handles back-nav into a scrolled position
+    // without a synchronous setState.
     const raf = requestAnimationFrame(onScroll);
     return () => {
       window.removeEventListener("scroll", onScroll);
@@ -367,21 +321,13 @@ export function HomeNav() {
     };
   }, []);
   return (
-    // `transform-gpu` (translateZ(0)) keeps the sticky header on its own
-    // compositing layer, so hover repaints inside it (nav-link color
-    // transitions, the logo's group-hover transform) stay isolated from the
-    // continuously-animating hero marquee below. Combined with the fixed
-    // h-14/16 box (see above), it keeps that layer a constant size over the
-    // marquee; the opaque occluder itself is the background div inside it.
+    // `transform-gpu` keeps the sticky header on its own compositing layer so
+    // hover repaints stay isolated from the animating hero marquee below.
     <header className="sticky top-0 z-40 h-14 transform-gpu md:h-16">
-      {/* The opaque background, tracking the nav's height rather than the
-          header box's. The box has to stay h-14/16 (see above), so painting
-          the background across all of it left the compacted header carrying a
-          16px band of dead white below the content before the fade began.
-          Painting only as far as the nav puts the fade directly under the
-          logo/menu row, and costs the occluder nothing the fade doesn't
-          immediately cover. This is a repaint inside the header's existing
-          layer, not a resize of the layer itself. */}
+      {/* Opaque background tracking the nav's height, not the fixed header
+          box's — otherwise the compacted header carries a dead white band
+          below the content. A repaint inside the existing layer, not a
+          resize of the layer itself. */}
       <div
         aria-hidden="true"
         className={`pointer-events-none absolute inset-x-0 top-0 bg-white transition-[height] duration-200 dark:bg-[#121212] ${
@@ -398,9 +344,8 @@ export function HomeNav() {
           <BrandLogo compact={scrolled} />
         </div>
 
-        {/* Center: primary menu (desktop only, visibility handled by the
-            hardened `.ds-nav-menu` rule in home.css so a leaked `.hidden`
-            from a docs route can't keep it collapsed after a back-navigation). */}
+        {/* Center: primary menu (desktop only; visibility hardened in
+            home.css's `.ds-nav-menu` against a leaked `.hidden`). */}
         <div className="ds-nav-menu items-center justify-center gap-4 lg:gap-6">
           {NAV_SECTIONS.map(({ href, label, prefetch, badge, activeClass }) => (
             <NavLink
@@ -418,31 +363,22 @@ export function HomeNav() {
 
         {/* Right: theme + GitHub + (mobile) hamburger */}
         <div className="flex items-center justify-end gap-1">
-          {/* Theme + GitHub are desktop-only; on mobile the drawer carries a
-              theme switch and a GitHub link instead. */}
+          {/* Desktop-only; the mobile drawer carries its own. */}
           <span className="ds-nav-icons items-center gap-2">
             <ThemePillToggle />
             <GitHubLink compact={scrolled} />
           </span>
-          {/* Desktop-only: the mobile drawer carries its own auth control so
-              this one isn't crammed next to the hamburger on small screens. */}
+          {/* Desktop-only; the drawer has its own auth control. */}
           <span className="ds-nav-auth">
             <AuthMenu compact={scrolled} />
           </span>
           <MobileDrawer />
         </div>
       </nav>
-      {/* Short fade below the compacted header so its solid background melts
-          into the page instead of slicing through content scrolling under it
-          (most visible against the hero marquee). It sits at the background's
-          bottom edge, not the header box's, so it moves up with the shrink
-          instead of leaving a gap of flat color behind it. Hidden while the
-          page is at the top, where the header sits in normal flow above the
-          content.
-          `will-change-[opacity]` keeps this strip permanently on its own
-          compositor layer: without it, the opacity transition creates and
-          destroys a layer on every scroll-threshold crossing, right at the
-          band under the header where stale marquee raster has ghosted. */}
+      {/* Fade below the compacted header, at the background's bottom edge so
+          it moves with the shrink. `will-change-[opacity]` keeps it on a
+          permanent compositor layer — layer churn here has caused stale
+          marquee raster ghosting. */}
       <div
         aria-hidden="true"
         className={`pointer-events-none absolute inset-x-0 h-3 bg-gradient-to-b from-white to-transparent transition-[opacity,top] duration-200 will-change-[opacity] dark:from-[#121212] ${

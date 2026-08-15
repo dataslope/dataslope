@@ -1,16 +1,10 @@
 "use client";
 
 /**
- * Thin wrapper around the generic playground `TabBar` that adapts the
- * SQL playgrounds' `QueryTab` model into `TabDescriptor`s. We keep
- * SQL-specific concerns (kind icons, the query-history / ER-diagram /
- * view-data tab variants, the Duplicate / Close Others / Close All
- * context-menu entries) here while delegating layout, drag-and-drop,
- * inline rename, and tooltip behaviour to the shared TabBar.
- *
- * Replaces the legacy stand-alone implementation in `SqlTab.tsx` +
- * `SqlTabBar.tsx`. See `agent-outputs/20260518-1306-...` plan item
- * "Refactor `SqlTabBar` onto the generic `TabBar`".
+ * Thin wrapper adapting the SQL playgrounds' `QueryTab` model into
+ * `TabDescriptor`s: SQL-specific concerns (kind icons, tab variants,
+ * context-menu entries) live here; layout, drag-and-drop, rename and
+ * tooltips are delegated to the shared TabBar.
  */
 
 import React, { useEffect, useMemo, useState } from "react";
@@ -32,10 +26,7 @@ export interface SqlTabBarProps {
   onReorderTabs: (next: QueryTab[]) => void;
   onAddTab: () => void;
   /** Additional non-`QueryTab` descriptors appended to the tab strip
-   *  (e.g. the inline Settings tab). Handlers (`onSelectTab`,
-   *  `onCloseTab`) on these descriptors fall through to the generic
-   *  TabBar; SqlTabBar only uses them for activation/close routing
-   *  when the descriptor id doesn't match a `QueryTab`. */
+   *  (e.g. the inline Settings tab). */
   extraTabs?: TabDescriptor[];
   /** Called when an `extraTabs` descriptor is closed. */
   onExtraTabClose?: (tabId: string) => void;
@@ -55,13 +46,11 @@ export function SqlTabBar({
   extraTabs,
   onExtraTabClose,
 }: SqlTabBarProps) {
-  // Track where the settings (extra) tab sits within the full descriptor
-  // list so the user can drag it anywhere among the query tabs.
-  // Infinity means "append at the end", the natural starting position.
+  // Where the settings (extra) tab sits in the descriptor list, so it can be
+  // dragged among the query tabs. Infinity = append at the end.
   const [settingsIdx, setSettingsIdx] = useState<number>(Infinity);
 
-  // Reset position to the end whenever the settings tab is removed so
-  // that it starts fresh the next time the user opens it.
+  // Reset to the end when the settings tab is removed.
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional reset synced to the extraTabs prop
     if (!extraTabs || extraTabs.length === 0) setSettingsIdx(Infinity);
@@ -70,10 +59,8 @@ export function SqlTabBar({
   const descriptors = useMemo<TabDescriptor[]>(
     () => {
       const queryDescriptors = tabs.map<TabDescriptor>((tab) => {
-        // ER-diagram, view-data, and query-history tabs are transient
-        //, duplicate and rename don't make sense. SqlTab used to hide
-        // these entries selectively; we mirror that via per-descriptor
-        // flags here so the wider TabBar contract stays uniform.
+        // ER-diagram, view-data, and query-history tabs are transient, so
+        // duplicate and rename don't make sense there.
         const isViewData = tab.kind === "view-data";
         const isErDiagram = tab.kind === "er-diagram";
         const isQueryHistory = tab.kind === "query-history";
@@ -121,9 +108,7 @@ export function SqlTabBar({
         };
       });
 
-      // Insert the settings (extra) tab at its tracked position so the
-      // user can reorder it freely. When there is no extra tab (settings
-      // closed) or the position hasn't been set yet, it goes at the end.
+      // Insert the settings (extra) tab at its tracked position.
       const settingsTab = extraTabs && extraTabs.length > 0 ? extraTabs[0] : null;
       if (!settingsTab) return queryDescriptors;
 
@@ -145,27 +130,24 @@ export function SqlTabBar({
       activeTabId={activeTabId}
       onSelectTab={onTabActivate}
       onCloseTab={(tabId) => {
-        // Route close requests to the QueryTab handler when applicable;
-        // fall through to `onExtraTabClose` for non-QueryTab entries
-        // (e.g. the Settings tab).
+        // Route to the QueryTab handler; non-QueryTab entries (Settings)
+        // fall through to `onExtraTabClose`.
         const isQueryTab = tabs.some((t) => t.id === tabId);
         if (isQueryTab) onTabClose(tabId);
         else onExtraTabClose?.(tabId);
       }}
       onRenameTab={onTabRename}
       onReorderTabs={(next) => {
-        // Track where the settings tab landed so it stays at its new
-        // position after the drop.
+        // Track where the settings tab landed so it stays put after the drop.
         const settingsTab = extraTabs?.[0];
         if (settingsTab) {
           const newIdx = next.findIndex((d) => d.id === settingsTab.id);
           if (newIdx >= 0) setSettingsIdx(newIdx);
         }
 
-        // Project the descriptor order back onto the QueryTab[] model
-        //, the descriptors are derived from `tabs`, so we can recover
-        // the originals via id lookup. Non-QueryTab `extraTabs` are
-        // skipped so reordering only affects the persisted tab list.
+        // Project the descriptor order back onto QueryTab[] via id lookup;
+        // non-QueryTab extras are skipped so reordering only affects the
+        // persisted tab list.
         const byId = new Map(tabs.map((t) => [t.id, t]));
         const reordered: QueryTab[] = [];
         for (const d of next) {

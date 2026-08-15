@@ -1,32 +1,16 @@
 /**
- * The declarative test language `<SqlChallengeCard>` grades against, and the
- * evaluator for it.
- *
- * Extracted from SqlChallengeCard.tsx so that something other than a React
- * component can run it. `scripts/check-sql-blocks.mjs` imports this module
- * directly and grades every card in `content/` with the same code a reader's
- * Check Answer runs, for the same reason `check-challenge-cards.mjs` imports
- * `challengeHarness.ts` rather than reimplementing the Python one: a second
- * copy of a grader drifts from the first, and a drifted grader does not fail
- * loudly, it passes cards it should have failed.
- *
- * Everything here is pure and engine-agnostic. The only contact with a
- * database is `SqlEngineLike`, an interface the caller supplies, so the same
- * evaluator serves sqlite-wasm in the browser and PGlite in Node without
- * knowing which it has.
- *
- * SqlChallengeCard.tsx re-exports the types below, so existing imports of
- * `SqlDialect` / `SqlResult` / `SqlChallengeTest` from that module keep
- * working.
+ * The declarative test language `<SqlChallengeCard>` grades against, and its
+ * evaluator. Also imported by `scripts/check-sql-blocks.mjs` so content is
+ * graded by the exact code a reader's Check Answer runs — a second grader
+ * copy would drift and silently pass cards it should fail. Pure and
+ * engine-agnostic: the caller supplies `SqlEngineLike` (sqlite-wasm or
+ * PGlite). SqlChallengeCard.tsx re-exports these types.
  */
-/** Supported SQL dialects. Each maps to a distinct WASM runtime in
- *  this codebase. */
+/** Supported SQL dialects; each maps to a distinct WASM runtime. */
 export type SqlDialect = "sqlite" | "duckdb" | "postgres";
 
-/** Generic result-set shape. Mirrors `QueryExecResult` from
- *  sqlite-wasm so existing playground helpers can be reused without
- *  glue, but typed locally so this module doesn't depend on the
- *  larger sqlite-wasm surface. */
+/** Result-set shape mirroring sqlite-wasm's `QueryExecResult`, typed locally
+ *  to avoid depending on the larger sqlite-wasm surface. */
 export interface SqlResult {
   columns: string[];
   values: unknown[][];
@@ -42,8 +26,7 @@ export interface SqlChallengeTest {
   rowCountAtLeast?: number;
   /** Result set must include exactly these columns, in this order. */
   expectedColumns?: string[];
-  /** Result set must include each of these column names (order
-   *  doesn't matter, extras are allowed). */
+  /** Result set must include these column names (any order, extras allowed). */
   expectedColumnsInclude?: string[];
   /** Exact row values to match (defaults to order-independent). */
   expectedRows?: {
@@ -52,27 +35,20 @@ export interface SqlChallengeTest {
     /** When true, row order must match. Defaults to false. */
     ordered?: boolean;
   };
-  /** Compare the learner's result set against the result of running
-   *  `solutionSql` (provided at the card level). Default ordering
-   *  applies (order-independent). Use `ordered` to enforce row
-   *  ordering. */
+  /** Compare against the card-level `solutionSql` result (order-independent
+   *  unless `ordered`). */
   matchesSolution?: boolean;
   /** When `matchesSolution` is true, require row ordering to match. */
   ordered?: boolean;
-  /** Run this SQL after the learner's SQL and check the result. Useful
-   *  for INSERT/UPDATE/DELETE exercises ("how many rows are in
-   *  `orders` now?"). */
+  /** SQL run after the learner's SQL, for INSERT/UPDATE/DELETE exercises. */
   runAfterSql?: string;
-  /** Required scalar value of the first cell returned by
-   *  `runAfterSql`. */
+  /** Required first-cell scalar of the `runAfterSql` result. */
   runAfterEquals?: unknown;
   /** Required row count of the `runAfterSql` result. */
   runAfterRowCount?: number;
 }
 
-/** Human-readable, one-check-per-line summary of a SQL test's
- *  declarative expectations, shown by the test-details popover where a
- *  code-based test would show its code. */
+/** One-check-per-line summary of a SQL test, for the test-details popover. */
 export function sqlTestChecksSummary(t: SqlChallengeTest): string {
   const lines: string[] = [];
   if (t.expectedRowCount !== undefined)
@@ -101,8 +77,7 @@ export function sqlTestChecksSummary(t: SqlChallengeTest): string {
 
 export interface SqlEngineLike {
   exec: (sql: string) => Promise<SqlResult[]>;
-  /** Optional: detach any worker / connection so component unmount
-   *  doesn't leak background threads. */
+  /** Detach any worker/connection so unmount doesn't leak threads. */
   destroy?: () => Promise<void>;
   /** Display name for the topbar. */
   label: string;
@@ -115,12 +90,9 @@ export interface SqlEngineLike {
 function valueEquals(a: unknown, b: unknown): boolean {
   if (a === b) return true;
   if (a == null || b == null) return a == b;
-  // Coerce numeric strings to numbers and vice versa, PGlite tends to
-  // return numeric-typed columns as JS numbers while sqlite-wasm
-  // returns them as strings for INTEGER columns wider than 2^53. For a
-  // learner-facing test framework, treating "42" and 42 as equal is
-  // the principle of least surprise. Blank strings are excluded,
-  // Number("") is 0, which would make '' compare equal to 0.
+  // Treat "42" and 42 as equal: PGlite returns numbers where sqlite-wasm may
+  // return strings. Blank strings are excluded — Number("") is 0, which would
+  // make '' equal 0.
   if (typeof a === "number" && typeof b === "string") {
     return b.trim() !== "" && Number(b) === a;
   }
@@ -163,9 +135,8 @@ function compareRowSets(
     }
     return { equal: true };
   }
-  // Order-independent: greedy match each actual row to a not-yet-used
-  // expected row. n^2 in the row count, fine for teaching-scale
-  // result sets (under ~1000 rows).
+  // Order-independent: greedy-match each actual row to an unused expected
+  // row. O(n^2), fine for teaching-scale result sets.
   const used = new Array(expected.length).fill(false);
   for (const aRow of actual) {
     let matched = false;

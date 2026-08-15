@@ -6,14 +6,9 @@ import {
   isLocalhostOrigin,
 } from "../cloudflare-cors-proxy/src/origins";
 
-// The allowlist the proxy actually ships with (see cloudflare-cors-proxy's
-// README): the app's production domains plus its Cloudflare Workers hosts.
-// This used to be modelled on the Vercel deployment, whose preview wildcard
-// put the variable part in a *suffix* segment
-// (`dataslope-*-<team>.vercel.app`). Cloudflare inverts that — the version or
-// alias is a *prefix* on a fixed worker-name host — so the old fixtures were
-// exercising a pattern shape this project no longer deploys, and leaving the
-// deployed one untested.
+// The allowlist the proxy actually ships with: production domains plus the
+// Cloudflare Workers hosts. Note the wildcard shape: on Cloudflare the
+// version/alias is a PREFIX on a fixed worker-name host.
 const ALLOW = parseAllowedOrigins(
   "http://localhost:3000,https://dataslope.com,https://www.dataslope.com,https://dataslope.subwaymatch.workers.dev,https://*-dataslope.subwaymatch.workers.dev",
 );

@@ -1,30 +1,11 @@
 "use client";
 
-// Decorative background for the auth shell: the Magic UI / cobe globe parked
-// low behind the card, with Dataslope creature "stickers" pinned to points on
-// the sphere that orbit with the rotation (à la https://cobe.vercel.app).
-//
-// This embeds cobe directly (rather than the generic components/ui/globe.tsx)
-// because the stickers have to be projected from the *live* rotation each
-// frame: the render callback advances `phi`, then positions each sticker's DOM
-// node from its lat/long, hiding the ones that rotate to the back. Positions
-// are written straight to the refs (no React re-render) so it stays cheap.
-//
-// Shown in both themes with a theme-appropriate config (light: pale sphere;
-// dark: near-black sphere that melts into #121212). The dotted continents are
-// kept faint via a low canvas opacity so the globe reads as a soft backdrop;
-// the stickers stay fully opaque on top. `useIsDark` tracks the live
-// `.dark` class the shared toggle flips; cobe bakes colors in at creation, so
-// a theme change tears down and rebuilds the globe.
-//
-// Desktop only. On a phone the sphere is mostly off-screen behind the form
-// anyway, and the auth pages there are a flat, card-less surface (see
-// AuthPageShell) that the globe would only clutter. This is a render-time
-// opt-out rather than a `hidden` class on purpose: nothing is created, so a
-// mobile visitor pays for no WebGL context, no rAF loop, and none of the
-// sticker images.
-//
-// Non-interactive (pointer-events off, aria-hidden): a pure backdrop.
+// Decorative auth-shell background: a cobe globe with creature "stickers"
+// projected from the live rotation each frame (positions written straight to
+// refs, no React re-render). cobe bakes colors in at creation, so a theme
+// change tears down and rebuilds the globe. Desktop only, as a render-time
+// opt-out (not a `hidden` class) so mobile pays for no WebGL context, rAF
+// loop, or sticker images. Non-interactive (pointer-events off, aria-hidden).
 
 import { useEffect, useRef, useState } from "react";
 import createGlobe, { type COBEOptions } from "cobe";
@@ -37,21 +18,12 @@ interface GlobePin {
   /** Illustration slug under `public/images/`, without the `-cutout` suffix
    *  (see `pinSrc`). Doubles as the React key. */
   slug: string;
-  /** What the sticker depicts, for the comment trail only — the globe is
-   *  `aria-hidden`, so nothing here is announced. */
+  /** Documentation only — the globe is `aria-hidden`, nothing is announced. */
   label: string;
 }
 
-// Dataslope-flavoured stickers, languages, data, challenges, and a little fun,
-// spread around the globe so several sit on the front face at any moment. Each
-// is a generated illustration on a white disc: mostly the marmot, plus the
-// PostgreSQL elephant and a DuckDB duck where the domain has its own mascot
-// (the same convention the course art follows).
-//
-// The globe is parked low behind the card (see the container transform below),
-// so its *upper* latitudes hide behind the card and only the lower arc is on
-// show, the bulk of the pins therefore sit in the southern hemisphere / low
-// latitudes so the visible region below the card stays populated.
+// Only the globe's lower arc shows below the card, so most pins sit in the
+// southern hemisphere / low latitudes to keep the visible region populated.
 const PINS: GlobePin[] = [
   // Northern / mid latitudes (partly tucked behind the card).
   { location: [37.7749, -122.4194], slug: "auth-pin-python", label: "Python" },
@@ -61,8 +33,8 @@ const PINS: GlobePin[] = [
   { location: [40.7128, -74.006], slug: "auth-pin-postgres", label: "Postgres" },
   { location: [52.52, 13.405], slug: "auth-pin-duckdb", label: "DuckDB" },
   { location: [28.6139, 77.209], slug: "auth-pin-streak", label: "streak" },
-  // Southern / low latitudes (the visible lower arc), spread across longitudes
-  // so several are always on the front face as the globe rotates.
+  // Southern / low latitudes (the visible lower arc), spread across
+  // longitudes so several are always on the front face.
   { location: [-23.5505, -46.6333], slug: "auth-pin-learning", label: "learning" },
   { location: [-33.8688, 151.2093], slug: "auth-pin-speed", label: "speed" },
   { location: [-34.6037, -58.3816], slug: "auth-pin-growth", label: "growth" },
@@ -77,10 +49,8 @@ const PINS: GlobePin[] = [
   { location: [-37.8136, 144.9631], slug: "auth-pin-star", label: "achievements" },
 ];
 
-/** The served file for a pin: the `-cutout` (transparent) copy, which is what
- *  lets the creature sit on the sphere with no plate behind it. Falls back to
- *  nothing when a slug is missing from the manifest, so an unknown slug is an
- *  absent sticker rather than a broken image. */
+/** Served file for a pin: the transparent `-cutout` copy. Null when the slug
+ *  is missing from the manifest (absent sticker, not a broken image). */
 function pinSrc(slug: string): string | null {
   const entry = imageManifest[`${slug}-cutout`];
   if (!entry) return null;
@@ -98,25 +68,18 @@ const SHARED: Omit<
   theta: 0.24,
   mapSamples: 16000,
   markerColor: [0.078, 0.549, 1],
-  // No cobe markers, the stickers are the points of interest.
+  // No cobe markers; the stickers are the points of interest.
   markers: [],
 };
 
-// cobe colors the whole sphere as `baseColor` scaled by a per-pixel
-// brightness; the dotted continents are the *same* hue as the ocean, just
-// brighter (when `dark: 1`) or darker (when `dark: 0`) by `mapBrightness`. So
-// the ocean reads as roughly `baseColor × 0.1` and a continent dot as
-// `baseColor × (mapBrightness × facing)`. To keep the dots close to the ocean
-// color we simply keep `mapBrightness` low, rather than picking a separate dot
-// color (cobe has no such knob).
+// cobe has no separate continent-dot color: dots are `baseColor` scaled by
+// `mapBrightness` (ocean ≈ baseColor × 0.1), so a low mapBrightness is the
+// only knob for keeping the dots subtle.
 const DARK_CONFIG: COBEOptions = {
   ...SHARED,
   dark: 1,
   diffuse: 1.1,
-  // Near-black oceans that melt into #121212 (baseColor × 0.1 ≈ #0D0F12), with
-  // continent dots kept only *very* subtly brighter than that background: a low
-  // mapBrightness is the knob for how much the dots stand out. Raise it for
-  // more prominent continents, lower it for an even fainter globe.
+  // Near-black oceans melting into #121212 (baseColor × 0.1 ≈ #0D0F12).
   mapBrightness: 0.6,
   baseColor: [0.4, 0.5, 0.72],
   glowColor: [0.07, 0.18, 0.45],
@@ -126,21 +89,15 @@ const LIGHT_CONFIG: COBEOptions = {
   ...SHARED,
   dark: 0,
   diffuse: 1.2,
-  // White/neutral globe on the light page: a pure-white base drops the old
-  // blue tint so the dotted sphere reads as white rather than blue-grey, and a
-  // lower mapBrightness keeps the continents pale instead of darkening them
-  // into grey specks. (cobe renders `dark: 0` continents *darker* than the
-  // ocean, so true white-on-white dots aren't possible; this keeps the whole
-  // sphere a soft, near-white backdrop.) baseColor / mapBrightness are the
-  // knobs to fine-tune on a real GPU; keep mapBrightness low for very subtle
-  // continents.
+  // Near-white backdrop. `dark: 0` renders continents darker than the ocean,
+  // so true white-on-white dots aren't possible; low mapBrightness keeps them
+  // pale rather than grey specks.
   mapBrightness: 1.1,
   baseColor: [1, 1, 1],
   glowColor: [1, 1, 1],
 };
 
-// Target opacity of the dotted sphere, low so the continents stay subtle (the
-// stickers ride on top at full opacity).
+// Low so the continents stay subtle; stickers ride on top at full opacity.
 const CANVAS_OPACITY = { dark: 0.6, light: 0.42 };
 
 function useIsDark(): boolean {
@@ -156,9 +113,8 @@ function useIsDark(): boolean {
   return dark;
 }
 
-/** The `md` breakpoint, read live so a resize across it mounts or tears down
- *  the globe. Starts `false`, which also keeps the server render and the first
- *  client render globe-free (it needs a canvas and JS either way). */
+/** The `md` breakpoint, read live so a resize across it mounts/tears down the
+ *  globe. Starts `false` so server and first client render stay globe-free. */
 function useIsDesktop(): boolean {
   const [desktop, setDesktop] = useState(false);
   useEffect(() => {
@@ -203,12 +159,8 @@ export function AuthGlobe() {
       height: width * 2,
     });
 
-    // cobe v2 removed the `onRender` option: v1 called it from inside its own
-    // render loop and let you mutate the next frame's state in place. v2
-    // exposes `globe.update(partialState)` instead, so the rotation and the
-    // sticker projection that used to live in `onRender` now run from a rAF
-    // loop this component owns. Same work, same once-per-frame cadence,
-    // just driven from the outside.
+    // cobe v2 has no `onRender`; rotation and sticker projection run from a
+    // rAF loop this component owns, driving `globe.update()` once per frame.
     let frame = 0;
     const step = () => {
       frame = requestAnimationFrame(step);
@@ -261,8 +213,7 @@ export function AuthGlobe() {
       globe.destroy();
       window.removeEventListener("resize", onResize);
     };
-    // `desktop` is in the deps because the canvas it reads only exists while
-    // the globe is rendered; crossing the breakpoint has to re-run this.
+    // `desktop` is a dep because crossing the breakpoint must re-run this.
   }, [dark, desktop]);
 
   if (!desktop) return null;
@@ -297,11 +248,8 @@ export function AuthGlobe() {
               className="absolute left-0 top-0 flex size-[88px] items-center justify-center opacity-0 will-change-transform"
             >
               {src ? (
-                // No disc behind these: the artwork is a transparent cut-out
-                // drawn in the brand palette, so it reads directly on the
-                // sphere in both themes. A soft drop-shadow does the work the
-                // white circle used to, lifting each creature off the globe
-                // without boxing it in.
+                // Transparent cut-out with a drop-shadow lifting it off the
+                // globe; no disc behind it.
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={src}

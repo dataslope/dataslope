@@ -1,23 +1,15 @@
 "use client";
 
 /**
- * Entry-focus policy shared by every playground's editor.
- *
- * On the FIRST focus after a playground mounts ("entering" the playground):
- * - Desktop viewports focus the editor with the cursor at the END of the
- *   restored code, ready to continue typing where the work left off.
- * - Mobile viewports skip the focus entirely, focusing CodeMirror pops the
- *   on-screen keyboard, which covers a large share of the screen before the
- *   user has asked to type.
- *
- * Subsequent tab/file operations keep focusing unconditionally in the
- * playgrounds (they're user-initiated, so the keyboard is expected).
+ * Entry-focus policy for playground editors. On first focus after mount,
+ * desktop focuses the editor with the cursor at the end; mobile skips the
+ * focus so the on-screen keyboard doesn't pop before the user asks to type.
+ * Later tab/file operations focus unconditionally (user-initiated).
  */
 
 import type { EditorView } from "@codemirror/view";
 
-/** Matches the stylesheet's mobile breakpoint (playground.css and
- *  SqlPlaygroundShell both key off `max-width: 768px`). */
+/** Keep in sync with the stylesheets' `max-width: 768px` mobile breakpoint. */
 export function isMobileViewport(): boolean {
   return (
     typeof window !== "undefined" &&

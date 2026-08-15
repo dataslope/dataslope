@@ -1,19 +1,8 @@
 /**
- * Layout for the Fumadocs-powered course lessons under `/courses/<slug>/…`.
- *
- * Wraps every lesson in Fumadocs's `RootProvider` (theme/search context)
- * and `DocsLayout` (sidebar + nav). The sidebar tree is generated
- * automatically from the MDX content under `content/courses/` via the
- * `courseSource` loader; each course folder's meta.json sets `root: true`,
- * so the sidebar scopes itself to the course being read.
- *
- * This layout lives inside the required `[...slug]` catch-all (rather than
- * at `app/courses/`) so the `/courses` index, the custom course-catalog
- * page in `app/courses/page.tsx`, is NOT wrapped in the docs chrome.
- *
- * The Tailwind/Fumadocs CSS is imported here (not in `app/layout.tsx`)
- * so it's scoped to the lesson bundle and doesn't leak into the
- * /playground pages, which use plain CSS + CSS modules.
+ * Fumadocs layout for course lessons under `/courses/<slug>/…`. Lives inside
+ * the `[...slug]` catch-all so the `/courses` catalog index is NOT wrapped in
+ * docs chrome. The Fumadocs CSS is imported here (not app/layout.tsx) so it
+ * doesn't leak into the /playground pages.
  */
 import "../../docs.css";
 import type { ReactNode } from "react";
@@ -29,32 +18,19 @@ export default function CourseLessonLayout({
   children: ReactNode;
 }) {
   return (
-    // Override next-themes' defaults (defaultTheme "system", enableSystem) to
-    // match the rest of the site: the non-Fumadocs pages' bootstrap scripts
-    // and the shared pill toggle (siteTheme.ts) treat the `theme` key as a
-    // binary "light" | "dark" with a light default, so without this a dark-OS
-    // visitor with no stored choice would get dark docs but light pages
-    // everywhere else.
-    //
-    // DocsRootProvider (not the bare RootProvider) so the search dialog knows
-    // the current course and deep links stay aligned + highlighted; see that
-    // component's header.
+    // Theme must match the rest of the site, which treats `theme` as a binary
+    // "light" | "dark" with a light default (siteTheme.ts) — without this a
+    // dark-OS visitor with no stored choice would get dark docs, light pages.
+    // DocsRootProvider (not bare RootProvider) so search knows the course.
     <DocsRootProvider theme={{ defaultTheme: "light", enableSystem: false }}>
       <DocsLayout
         tree={courseSource.pageTree}
         tabs={false}
-        // Use the site's shared light/dark pill toggle in place of Fumadocs's
-        // default segmented theme switch, so the docs chrome matches the home
-        // header, mobile drawer, and playground settings.
+        // The site's shared pill toggle instead of Fumadocs's segmented switch.
         slots={{ themeSwitch: ThemePillToggleSlot }}
-        // Don't prefetch sidebar links. The sidebar renders hundreds of
-        // lesson links per page; with Next.js's default viewport prefetch
-        // every visible link fans out its own segment request the moment the
-        // sidebar scrolls into view. (On Vercel each of those that missed the
-        // edge cache was also a billed ISR Read, which is what originally
-        // forced this; Cloudflare has no such meter, but the request fan-out
-        // is reason enough on its own.) Navigation falls back to fetching on
-        // click, which is fast for these fully static pages.
+        // The sidebar renders hundreds of lesson links; viewport prefetch
+        // would fan out a segment request per visible link. Fetch on click
+        // instead, which is fast for these fully static pages.
         sidebar={{ prefetch: false }}
         nav={{
           title: (
@@ -85,9 +61,8 @@ export default function CourseLessonLayout({
       >
         {children}
       </DocsLayout>
-      {/* Outside <DocsLayout>, deliberately: the footer sits below the docs
-          grid so the sidebar (and the TOC) stay pinned until the lesson runs
-          out and then release into it. See DocsFooter. */}
+      {/* Outside <DocsLayout> deliberately, so the sidebar/TOC stay pinned
+          until the lesson runs out. See DocsFooter. */}
       <DocsFooter />
     </DocsRootProvider>
   );

@@ -1,21 +1,12 @@
 /**
- * OAuth `state` cookie scoping (lib/auth/server.ts), the fix for the "first
- * Google sign-in fails with ?error=state_mismatch, clicking again works" loop.
- *
- * The one-time `state` cookie set by the sign-in POST must come back on the
- * OAuth callback, which Google always sends to the BETTER_AUTH_URL host (the
- * registered redirect_uri). Host-only cookies made every flow started on
- * www.dataslope.com fail: the cookie stayed on www while the callback landed
- * on the apex. The fix scopes the cookie to the registrable domain and aligns
- * its lifetime with the server-side state's 10-minute window.
- *
- * Two layers of coverage, both with a mocked D1 (statement echo, no network,
- * same posture as adminPromotion.test.ts / polarBilling.test.ts):
- *   - `oauthStateCookieDomain`: the derivation rules, including the hosts
- *     where a Domain attribute must NOT be emitted (browsers reject a Domain
- *     they can't tail-match, which would drop the cookie and break sign-in).
- *   - the full `sign-in/social` endpoint: the Set-Cookie the browser actually
- *     receives carries Domain + Max-Age=600, and redirect_uri stays pinned.
+ * OAuth `state` cookie scoping (lib/auth/server.ts): the state cookie must
+ * come back on the OAuth callback, which Google always sends to the
+ * BETTER_AUTH_URL host. Host-only cookies made every flow started on www fail
+ * (?error=state_mismatch, works on retry); the fix scopes the cookie to the
+ * registrable domain and matches the server-side state's 10-minute window.
+ * Covers the derivation rules (including hosts where Domain must NOT be
+ * emitted — browsers reject a Domain they can't tail-match) and the full
+ * sign-in/social endpoint, both against a mocked D1.
  */
 import { describe, it, expect } from "vitest";
 import type { D1Database } from "@cloudflare/workers-types";

@@ -1,21 +1,11 @@
 "use client";
 
 /**
- * The two viewers behind the learn-route SQL cards' tools menu: the ER
- * diagram and the DDL script.
- *
- * Kept in its own module because of what it pulls in. `ErDiagramPane`
- * carries `@xyflow/react` + `elkjs`, and `DdlViewer` a second CodeMirror
- * configuration; a lesson that never opens either should not pay for
- * them, so `SqlCardToolsMenu` imports this file lazily and the whole
- * subtree — code and stylesheet alike — arrives on the first open.
- *
- * `erDiagram.css` is imported here rather than by the card: it is the
- * diagram's own rules, extracted from `sqlPlayground.css` (which cannot
- * be loaded on a docs page — its `:root` block would repaint the lesson
- * in the playground's fixed dark palette). The `.er-*` class names it
- * defines collide with nothing on the page, and the palette variables
- * they consume are supplied by `.erHost` in the module CSS.
+ * The ER-diagram and DDL viewers behind the SQL cards' tools menu. Own
+ * module because it carries @xyflow/react + elkjs + a second CodeMirror —
+ * SqlCardToolsMenu imports it lazily so lessons only pay on first open.
+ * `erDiagram.css` is imported here, not sqlPlayground.css, whose `:root`
+ * block would repaint the lesson in the playground's dark palette.
  */
 
 import { useEffect } from "react";
@@ -155,9 +145,8 @@ export default function SqlCardDialogs({
           </div>
         ) : (
           <div className={styles.erHost}>
-            {/* Read-only: the learn-route cards expose no schema-editing
-                actions, so every context-menu callback is omitted and
-                ErDiagramPane renders the nodes without one. */}
+            {/* Read-only: context-menu callbacks omitted, so no editing
+                actions render. */}
             <ErDiagramPane
               tables={tables}
               columnsByEntity={snapshot.columnsByEntity}

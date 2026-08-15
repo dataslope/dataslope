@@ -1,50 +1,23 @@
 /**
- * Which lines of an MDX file are *code* rather than prose.
+ * Which lines of an MDX file are *code* rather than prose — a `#` is a
+ * heading in prose but a comment in Python, and a scanner that does not
+ * exclude code will eventually splice a tag into a `files={[…]}` expression.
  *
- * The distinction matters because a `#` at the start of a line is a markdown
- * heading in prose and a comment in Python, a preprocessor directive in C, and
- * a shell comment in bash. Anything that scans an MDX file for headings and
- * does not first exclude code will eventually find one inside a `<CodeBlock>`
- * and act on it. That is not hypothetical: it is how a `<Chart>` tag ended up
- * spliced into the middle of a `files={[…]}` expression, which parses fine as
- * markdown and fails only at prerender, as `Could not parse expression with
- * acorn`.
- *
- * Two kinds of region are recognised, and the caller is told which is which
- * because they are not equally dangerous:
- *
- *   • `"fence"` — a fenced block, from ``` to the matching fence. Its contents
- *     are displayed verbatim, so a component tag inside one is a code sample,
- *     not a mistake. Several lessons legitimately show `<Welcome />` this way.
- *   • `"props"` — a component props block, from a component tag at column 0 to
- *     the `/>` or `</Tag>` that closes it. Its contents are a JavaScript
- *     expression, so anything spliced into one breaks the parse.
- *
- * Components whose *children* are markdown are deliberately not regions: a
- * heading inside a `<Callout>` is a real heading, and prose inside one is a
- * legitimate place for a figure.
+ * Two region kinds, reported separately: `"fence"` (contents displayed
+ * verbatim — a tag inside one is a code sample) and `"props"` (a component
+ * props block spanning lines — a JavaScript expression, where a splice breaks
+ * the parse). Components whose children are markdown are deliberately not
+ * regions: a heading inside a `<Callout>` is a real heading.
  */
 
 /** Components whose body is markdown, so their contents stay scannable. */
 const MARKDOWN_CONTAINERS = new Set(["Callout", "Step", "Steps"]);
 
 /**
- * Unescaped backticks on a line, which is how a props block's template literals
- * are tracked.
- *
- * They have to be, because a props block does not end at the first `/>` — it
- * ends at the first `/>` *outside* its template literals, and those literals
- * hold whole programs. A React sample containing
- *
- *     <SplitPanel
- *       left={…}
- *     />
- *
- * closes the enclosing `<CodeBlock>` three lines early if the literal is not
- * tracked, and every line of the rest of that sample then reads as prose. That
- * is not hypothetical either: it is how a `<Figure>` was placed into the middle
- * of a runnable React block, where it compiled to `Figure is not defined` and
- * cost a 1.2 hour browser suite to find.
+ * Unescaped backticks on a line, used to track a props block's template
+ * literals: a props block ends at the first `/>` *outside* its literals, and
+ * those literals hold whole programs whose own `/>` must not close the tag
+ * early.
  */
 export const backticks = (line) => (line.match(/(?<!\\)`/g) ?? []).length;
 

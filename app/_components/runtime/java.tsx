@@ -10,21 +10,11 @@ import type {
 import { loadCheerpJ, TOOLS_JAR_VFS_PATH, type CheerpJApi } from "./cheerpj";
 import { getClangFormat } from "./clangFormat";
 
-// Run Java in the browser via CheerpJ
-// (https://cheerpj.com/), a full OpenJDK runtime + JIT compiled to
-// WebAssembly. CheerpJ does not ship `tools.jar`, so we fetch a Java 8
-// `tools.jar` from a CDN and mount it in CheerpJ's /str/ filesystem at
-// runtime (see cheerpj.ts); we then drive `javac`
-// (`com.sun.tools.javac.Main`) on user source and run the compiled main
-// class with `cheerpjRunMain`, the JavaFiddle approach
-// (https://github.com/leaningtech/javafiddle).
-//
-// This adapter targets Java 8 because that is what the bundled
-// `tools.jar` compiles against. Java 8 is the lingua franca of
-// online Java tutorials (lambdas, streams, Optional, java.time are
-// all there), so the playground covers what most learners need
-// without pulling in newer-language features (records, var, text
-// blocks) that would fail to compile.
+// Java in the browser via CheerpJ (OpenJDK + JIT in WebAssembly). CheerpJ
+// doesn't ship tools.jar, so a Java 8 tools.jar is fetched from a CDN and
+// mounted in /str/ (see cheerpj.ts); javac compiles user source and
+// cheerpjRunMain runs it — the JavaFiddle approach. Targets Java 8 because
+// that's what the bundled tools.jar compiles against.
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -234,9 +224,7 @@ function hasJavaMain(source: string): boolean {
 }
 
 const PACKAGES: PackageInfo[] = [
-  // Highlights from the Java 8 standard library, always available, no
-  // install step. Clicking inserts the corresponding `import` at the
-  // top of the editor.
+  // Java 8 stdlib highlights; clicking inserts the `import`.
   {
     cat: "Collections",
     icon: "📦",
@@ -444,23 +432,17 @@ public class Main {
   },
 ];
 
-// CheerpJ's classpath: tools.jar is fetched from the CDN and mounted in
-// CheerpJ's /str/ FS at TOOLS_JAR_VFS_PATH (see cheerpj.ts), it contains
-// com.sun.tools.javac.Main, and we compile user code into /files/. Both
-// must be on the classpath when running both javac and the user's main
-// class.
+// tools.jar (javac) and /files/ (compiled user code) must both be on the
+// classpath for javac and for running the user's main class.
 const CLASSPATH = `${TOOLS_JAR_VFS_PATH}:/files/`;
 const SOURCE_DIR = "/str/";
 const OUTPUT_DIR = "/files/";
 
-/** Pick the class that has `main` so we know what to run. Falls back
- *  to the first declared class, then to "Main". Defensive against the
- *  many shapes user input can take (no class, multiple classes, only
- *  a non-public class, ...). */
+/** Pick the class with `main` to run; falls back to the first declared
+ *  class, then "Main". Defensive against the many shapes user input takes. */
 function findMainClassName(source: string): string {
-  // Strip block comments + line comments + string/char literals so we
-  // don't match `class` inside them. Cheap and good enough for picking
-  // the main class out of a user snippet.
+  // Strip comments and string/char literals so `class` inside them
+  // doesn't match.
   const cleaned = source
     .replace(/\/\*[\s\S]*?\*\//g, "")
     .replace(/\/\/[^\n]*/g, "")
@@ -471,10 +453,8 @@ function findMainClassName(source: string): string {
     /\b(?:public\s+)?(?:final\s+|abstract\s+)?class\s+([A-Za-z_$][\w$]*)/g;
   const classes: { name: string; start: number; isPublic: boolean }[] = [];
   for (let m; (m = classRegex.exec(cleaned)) !== null; ) {
-    // Skip nested classes, count unmatched `{` before this match to get
-    // brace depth; depth > 0 means we are inside another class body.
-    // String/char literals and comments have already been stripped from
-    // `cleaned`, so stray braces from those sources are not a concern.
+    // Skip nested classes: brace depth > 0 means inside another class body
+    // (literals/comments are already stripped, so braces are structural).
     const prefix = cleaned.slice(0, m.index);
     const depth =
       (prefix.match(/\{/g) ?? []).length - (prefix.match(/\}/g) ?? []).length;
@@ -491,9 +471,8 @@ function findMainClassName(source: string): string {
   }
   if (classes.length === 0) return "Main";
 
-  // Prefer a class whose body contains `public static void main(`.
-  // We approximate "body" as the chunk from this class to the next
-  // class declaration (or end of file).
+  // Prefer a class whose "body" (chunk up to the next class declaration)
+  // contains `public static void main(`.
   for (let i = 0; i < classes.length; i++) {
     const start = classes[i].start;
     const end = i + 1 < classes.length ? classes[i + 1].start : cleaned.length;
@@ -504,33 +483,24 @@ function findMainClassName(source: string): string {
     }
   }
 
-  // Fall back to the public class (Java requires it match the file
-  // name), then to the first class declared.
+  // Fall back to the public class, then the first declared.
   const pub = classes.find((c) => c.isPublic);
   return (pub ?? classes[0]).name;
 }
 
 class JavaRuntime implements LanguageRuntime {
-  // Paths inside CheerpJ's /str/ virtual filesystem that have been
-  // staged by prepareFileSystem. The active file (from run()) is
-  // always added to this set so javac sees all workspace files.
+  // /str/ paths staged by prepareFileSystem; run() adds the active file.
   private stagedJavaPaths: string[] = [];
-  // Set once the JVM has compiled + run a throwaway program (see
-  // `warmUp`) so the warm-up only runs on the first init per instance.
+  // Warm-up runs once per instance.
   private warmedUp = false;
 
   constructor(private api: CheerpJApi) {}
 
-  // Capture javac's diagnostics + a program's output by intercepting
-  // console.log / console.error for the duration of one cheerpjRunMain
-  // invocation. CheerpJ writes Java's System.out/System.err to those
-  // globals (verified in cj3.js, there's no other println sink to
-  // hook); it forwards each underlying `write` as one console.log call
-  // and includes the chunk's own newline bytes (so `println("x")`
-  // arrives as "x\n"). We therefore concatenate the args verbatim,
-  // adding our own "\n" per call would produce a blank line between
-  // every chunk. The wrap+restore is in a try/finally so a thrown error
-  // during `await` can't leave the page's console permanently patched.
+  // Capture output by intercepting console.log/error for one cheerpjRunMain
+  // call — CheerpJ's only System.out/System.err sink. Each write arrives as
+  // one console call INCLUDING its own newline bytes, so args are
+  // concatenated verbatim (adding "\n" per call would double-space output).
+  // try/finally ensures the console is never left permanently patched.
   private async runWithCapture(
     fn: () => Promise<number>,
   ): Promise<{ exitCode: number; stdout: string; stderr: string }> {
@@ -553,19 +523,10 @@ class JavaRuntime implements LanguageRuntime {
     }
   }
 
-  /** Compile and run a tiny throwaway program so the expensive
-   *  first-use costs happen now, behind the boot animation, instead of
-   *  on the learner's first Run.
-   *
-   *  `cheerpjInit` (in `loadCheerpJ`) only bootstraps the CheerpJ
-   *  runtime, it does NOT load `tools.jar`, `javac`, or the core
-   *  OpenJDK classes. Those are pulled in (and JIT-compiled) lazily on
-   *  the *first* `cheerpjRunMain` call, which without this warm-up is
-   *  the user's first Run: that one execution paid the whole
-   *  tools.jar + javac + runtime class-load + JIT bill while later runs
-   *  were instant. Running a no-op `main` here moves that cost into
-   *  `init()` (covered by the loading notice). Best-effort: any failure
-   *  is swallowed so a warm-up hiccup never blocks running real code. */
+  /** Compile and run a throwaway program so the first-use costs (tools.jar,
+   *  javac, core class-load + JIT — all lazy on the first cheerpjRunMain)
+   *  happen behind the boot animation instead of on the learner's first
+   *  Run. Best-effort: failures are swallowed. */
   async warmUp(
     report?: (message: string, fraction?: number) => void,
   ): Promise<void> {
@@ -603,11 +564,8 @@ class JavaRuntime implements LanguageRuntime {
   async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
     this.stagedJavaPaths = [];
     for (const [path, bytes] of files) {
-      // Only stage .java files; skip binary data files.
       if (!path.endsWith(".java")) continue;
-      // Use only the basename (no subdirectory), CheerpJ's /str/
-      // is a flat virtual filesystem, and javac is invoked with
-      // individual file paths rather than a source root.
+      // Basename only: CheerpJ's /str/ is a flat virtual filesystem.
       const filename = path.includes("/") ? path.split("/").pop()! : path;
       const virtualPath = `${SOURCE_DIR}${filename}`;
       this.api.cheerpjAddStringFile(virtualPath, bytes);
@@ -622,11 +580,8 @@ class JavaRuntime implements LanguageRuntime {
     emit: EmitOutput,
     options?: RunOptions,
   ): Promise<void> {
-    // The Playground passes the chosen entry file's contents as `code`
-    // and its filename via `options.entryFilename` so the user can pick
-    // which class with a `main` method to execute. When omitted, fall
-    // back to detecting the main class from `code` (legacy single-file
-    // behaviour).
+    // `options.entryFilename` picks the class to execute; when omitted,
+    // detect the main class from `code` (legacy single-file behaviour).
     let className: string;
     if (options?.entryFilename) {
       const base = options.entryFilename.includes("/")
@@ -638,33 +593,20 @@ class JavaRuntime implements LanguageRuntime {
     }
     const sourcePath = `${SOURCE_DIR}${className}.java`;
 
-    // 1) Mount the user's source under /str/<Class>.java so javac can
-    //    read it. CheerpJ's `cheerpjAddStringFile` takes raw bytes.
-    //    Always update the active file so unsaved edits are visible
-    //    even if prepareFileSystem was already called with an older copy.
+    // Mount the user's source; always update the active file so unsaved
+    // edits win over an older prepareFileSystem copy.
     const encoder = new TextEncoder();
     this.api.cheerpjAddStringFile(sourcePath, encoder.encode(code));
 
-    // 2) Build the full list of source files to compile. Start with
-    //    the files staged by prepareFileSystem (all .java workspace
-    //    files), then ensure the active file's path is included too
-    //    (it may not be in stagedJavaPaths if prepareFileSystem wasn't
-    //    called, e.g. for single-file workspaces).
+    // Staged workspace files plus the active file (which may not be staged
+    // for single-file workspaces).
     const filesToCompile = [...this.stagedJavaPaths];
     if (!filesToCompile.includes(sourcePath)) {
       filesToCompile.push(sourcePath);
     }
 
-    // 3) Capture javac's diagnostics + the program's output via the
-    //    shared `runWithCapture` helper (which intercepts console.log /
-    //    console.error, CheerpJ's only println sink). `printf("%a
-    //    %b%n", …)` triggers several writes per logical line, so the
-    //    helper concatenates chunks verbatim rather than adding newlines.
-
-    // 4) Compile all staged .java files together. Passing every source
-    //    file in a single javac invocation lets the compiler resolve
-    //    cross-file references (e.g. Main.java using Dog from Dog.java)
-    //    in one pass. `-Xlint` matches JavaFiddle's defaults.
+    // Compile all .java files in one javac invocation so cross-file
+    // references resolve; `-Xlint` matches JavaFiddle's defaults.
     const javacResult = await this.runWithCapture(() =>
       this.api.cheerpjRunMain(
         "com.sun.tools.javac.Main",
@@ -676,18 +618,15 @@ class JavaRuntime implements LanguageRuntime {
       ),
     );
 
-    // javac writes diagnostics to stderr; treat any combined output as
-    // "compile diagnostics" so warnings show up alongside errors.
+    // Treat all javac output as compile diagnostics so warnings show too.
     const diag = (javacResult.stdout + javacResult.stderr).replace(/\n+$/, "");
     if (diag) emit({ type: "stderr", content: diag });
 
     if (javacResult.exitCode !== 0) {
-      // Compilation failed, `diag` already explains why; nothing to
-      // run.
+      // Compilation failed; `diag` already explains why.
       return;
     }
 
-    // 5) Run the user's main() with /files/ on the classpath.
     const runResult = await this.runWithCapture(() =>
       this.api.cheerpjRunMain(className, CLASSPATH),
     );

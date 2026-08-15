@@ -1,23 +1,11 @@
 "use client";
 
 /**
- * `<MultipleChoiceQuestion>`, a self-contained quiz card authored in
- * Markdown. Parses the raw question source on mount via
- * `parseQuestion()` and renders the result with the same paper/badge
- * chrome as `<ChallengeCard>`.
- *
- * Behaviour:
- *   - Choices render as a radio group: the learner picks exactly one
- *     option. Selecting a choice immediately reveals per-choice verdicts
- *     and the overall explanation.
- *   - A "Try Again" button then resets the selection so learners can
- *     iterate as many times as they like (mirrors the "unlimited
- *     attempts" UX of the existing `<ChallengeCard>` Check-Answer flow).
- *   - All learner-visible Markdown, body, choice labels, per-choice
- *     explanations, overall explanation, is rendered through
- *     react-markdown with GFM + KaTeX + rehype-highlight so authors
- *     can mix prose, lists, code (with syntax coloring), tables, and
- *     math equations.
+ * Self-contained quiz card authored in Markdown (parsed via
+ * `parseQuestion()`), with the same paper/badge chrome as `<ChallengeCard>`.
+ * Selecting a choice immediately reveals verdicts and the explanation;
+ * "Try Again" allows unlimited attempts. All learner-visible Markdown goes
+ * through react-markdown with GFM + KaTeX + rehype-highlight.
  */
 
 import { useId, useMemo, useRef, useState } from "react";
@@ -54,22 +42,15 @@ type Verdict =
   | "neutral";
 
 export interface MultipleChoiceQuestionProps {
-  /** Raw Markdown source for the question. See `parseQuestion.ts` for
-   *  the syntax. The component is intentionally markdown-in,
-   *  React-out, authors should never need to construct the parsed
-   *  shape by hand. */
+  /** Raw Markdown source (syntax: `parseQuestion.ts`). */
   markdown: string;
-  /** Optional label shown in the top-left badge. Defaults to
-   *  "Question" so the card reads cleanly even when no badge is
-   *  authored. */
+  /** Label shown in the top-left badge. Defaults to "Question". */
   badge?: string;
 }
 
 function MarkdownInline({ source }: { source: string }) {
-  // The shared markdown pipeline used by every text surface inside the
-  // card: question body, choice labels, per-choice explanations, and
-  // the overall explanation. Centralising the plugin list here keeps
-  // math, GFM, and syntax highlighting consistent across all call sites.
+  // Shared markdown pipeline for every text surface in the card, so math,
+  // GFM, and highlighting stay consistent.
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm, remarkMath]}
@@ -96,26 +77,20 @@ export default function MultipleChoiceQuestion({
   markdown,
   badge = "Question",
 }: MultipleChoiceQuestionProps) {
-  // Parse once per `markdown` prop. Authors editing MDX get instant
-  // feedback because fumadocs hot-reloads the page, which re-mounts
-  // this component with the new source.
   const parsed = useMemo(() => parseQuestion(markdown), [markdown]);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
   const select = (id: string) => {
-    // Picking a choice locks the card and reveals feedback immediately,
-    // a single-answer question has no separate Submit step.
+    // Picking a choice locks the card and reveals feedback; no Submit step.
     if (submitted) return;
     setSelectedId(id);
     setSubmitted(true);
   };
 
   const onRetry = () => {
-    // Reset the selection so the learner can try again. The overall
-    // explanation hides again so the next attempt isn't trivially cued
-    // by the previous reveal.
+    // Reset; the explanation hides again so the next attempt isn't cued.
     setSelectedId(null);
     setSubmitted(false);
   };
@@ -174,9 +149,8 @@ export default function MultipleChoiceQuestion({
         </div>
       ) : null}
 
-      {/* Choices are rendered as <div> block elements instead of <li>
-          items so that block-level content (e.g. fenced code blocks)
-          inside a choice label is valid HTML. */}
+      {/* <div>s rather than <li>s so block-level content (fenced code) in a
+          choice label is valid HTML. */}
       <div
         className={styles.choiceList}
         role="radiogroup"
@@ -185,17 +159,12 @@ export default function MultipleChoiceQuestion({
         {parsed.choices.map((choice) => {
           const isSelected = selectedId === choice.id;
           const verdict = computeVerdict(choice, isSelected, submitted);
-          // Show explanations for all choices after submit so learners
-          // can understand why each option is right or wrong.
           const showExplanation = submitted && choice.explanation;
           return (
             <div key={choice.id} className={styles.choiceItem}>
-              {/* Use <div> rather than <label> so that block-level
-                  content such as fenced code blocks is valid HTML.
-                  Click handling is wired up manually: the outer div
-                  handles mouse clicks on the non-input area, and
-                  stopPropagation on the input prevents a double-toggle
-                  when the input itself is clicked. */}
+              {/* <div> rather than <label> for valid block-level HTML; the
+                  outer div handles clicks and stopPropagation on the input
+                  prevents a double-toggle. */}
               <div
                 className={styles.choice}
                 data-locked={submitted ? "true" : "false"}
@@ -248,11 +217,8 @@ export default function MultipleChoiceQuestion({
         })}
       </div>
 
-      {/* Feedback first, action last: the verdict banner and explanation
-          read before the "Try again" affordance, mirroring the usual
-          quiz flow (see what happened → understand why → act).
-          `role="status"` announces the verdict to screen readers when
-          it appears. */}
+      {/* Feedback before the "Try again" affordance. `role="status"`
+          announces the verdict to screen readers. */}
       {result ? (
         <div className={styles.banner} data-state={result} role="status">
           <span className={styles.bannerIcon}>

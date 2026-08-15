@@ -1,61 +1,34 @@
 // Shared machinery for the live-page-preview adapters (web, react).
-//
-// The execution model (per the §4.1 architecture in
-// agent-outputs/20260706-0224-web-dev-playgrounds-browser-wasm-research.md):
-// user code becomes a self-contained HTML document that runs inside a
-// sandboxed `<iframe srcdoc>` with a *bare opaque origin*, `sandbox`
-// grants `allow-scripts allow-modals allow-forms` and **never**
-// `allow-same-origin` (the HTML spec warns that combination would let
-// embedded script reach up and remove its own sandbox). A tiny bridge
-// script injected at the top of the document wraps `console.*`,
-// `window.onerror`, and `unhandledrejection`, forwarding serialized
-// entries to the parent via `postMessage`; the parent turns them into
-// ordinary stdout/stderr output cells, so console output, error
-// reporting, and the challenge-test sentinel protocol all flow through
-// the same pipeline every other adapter uses.
-//
-// Messages are authenticated by a per-run random token baked into the
-// bridge (an opaque-origin frame can't be targeted by origin, so
-// `targetOrigin` is necessarily `"*"`); frames that don't know the
-// token are ignored. The learner's own code could of course post forged
-// messages, but it already controls its own console output, so this is
-// the same trust level as every other adapter (a learner can "cheat" a
-// challenge by printing the sentinel lines in any language).
-//
-// Teardown story: each run replaces the host's children with a fresh
-// iframe, killing the previous document's scripts, an infinite loop
-// freezes only its own (old) frame, never the app.
+// User code runs in a sandboxed `<iframe srcdoc>` with a bare opaque
+// origin; `sandbox` must NEVER include `allow-same-origin` (the HTML spec
+// warns that with allow-scripts it lets the frame remove its own sandbox).
+// An injected bridge forwards console/error output to the parent via
+// postMessage, authenticated by a per-run random token (opaque-origin
+// frames can't be targeted by origin, so targetOrigin is "*"). Each run
+// replaces the host's iframe, so a frozen document never freezes the app.
 
 import type { EmitOutput } from "../types";
 import { HARNESS_BEGIN } from "../challengeHarness";
 import { TAILWIND_BROWSER_CDN } from "./cdn";
 
-/** Property stamped on every bridge message so the parent can match it
- *  to the run that spawned the iframe. */
+/** Stamped on every bridge message to match it to its run. */
 export const PREVIEW_MESSAGE_KEY = "__dsWebPreview__";
 
-/** Property a parent stamps on a message *into* the frame to ask the
- *  bridge to re-post everything it has sent so far. See the buffer in
- *  `buildPreviewBridge`: a server-rendered frame runs before the page's
- *  JavaScript does, so the only way for a late subscriber to see its
- *  early output is to ask for it. */
+/** Stamped on a message *into* the frame to ask the bridge to re-post
+ *  everything sent so far — how a late subscriber sees a server-rendered
+ *  frame's early output. */
 export const PREVIEW_REPLAY_KEY = "__dsWebPreviewReplay__";
 
-/** Class applied to preview iframes so surfaces can style them from
- *  their stylesheet of choice. */
+/** Class applied to preview iframes for surface styling. */
 export const PREVIEW_IFRAME_CLASS = "ds-web-preview-frame";
 
-/** Sandbox grants for the preview iframe. `allow-same-origin` is
- *  deliberately absent, see the module docs. */
+/** Sandbox grants. `allow-same-origin` is deliberately absent (see module docs). */
 export const PREVIEW_SANDBOX = "allow-scripts allow-modals allow-forms";
 
-/** How long after the document's `load` event a non-harness run waits
- *  before RESOLVING (so the "running" indicator clears). Console output
- *  keeps forwarding to the output panel after this, for as long as the
- *  live preview is on screen, see the live-listener registry below. */
+/** Wait after `load` before resolving a non-harness run. Console output
+ *  keeps forwarding afterwards via the live-listener registry below. */
 const LOADED_SETTLE_MS = 150;
-/** Deadline for a run whose document never signals `load` (infinite
- *  loop in a script, endless resource). */
+/** Deadline for a document that never signals `load` (e.g. infinite loop). */
 const LOAD_DEADLINE_MS = 10_000;
 /** Deadline for a challenge run to deliver its harness-done signal. */
 const HARNESS_DEADLINE_MS = 20_000;
@@ -73,10 +46,8 @@ export function newPreviewToken(): string {
   return `${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`;
 }
 
-/** True when `source` contains a challenge harness appended by
- *  `buildHarness`, every builder starts by printing this sentinel, so
- *  its presence tells the preview runner to wait for the harness-done
- *  signal instead of resolving at document load. */
+/** True when `source` contains a challenge harness — the runner then waits
+ *  for the harness-done signal instead of resolving at document load. */
 export function hasHarnessMarker(source: string): boolean {
   return source.includes(HARNESS_BEGIN);
 }
@@ -93,14 +64,13 @@ export function escapeInlineStyleContent(css: string): string {
 }
 
 /**
- * The bridge script injected at the very top of every preview document
- * (before any user code can run). Serializes console arguments inside
- * the iframe, the messages that cross the boundary are final strings,
- * so nothing structured-clone-unfriendly ever hits postMessage.
+ * Bridge script injected at the top of every preview document, before any
+ * user code. Console args are serialized to final strings inside the iframe
+ * so nothing structured-clone-unfriendly hits postMessage.
  */
 export function buildPreviewBridge(token: string): string {
-  // ES5-flavoured on purpose: this runs inside arbitrary learner
-  // documents, including ones that quirks-mode themselves.
+  // ES5-flavoured on purpose: runs inside arbitrary learner documents,
+  // including quirks-mode ones.
   const js = `
 (function () {
   "use strict";
@@ -280,10 +250,8 @@ function bytesToBase64(bytes: Uint8Array): string {
     .toString("base64");
 }
 
-/** Insert `snippet` as early as possible in the document: right after
- *  `<head>` when present, after `<html>` otherwise, else prepended.
- *  "As early as possible" matters, the console bridge must install
- *  before any user script can log. */
+/** Insert `snippet` as early as possible (after `<head>`, else `<html>`,
+ *  else prepended) — the bridge must install before any user script logs. */
 export function injectAtDocumentStart(html: string, snippet: string): string {
   const headMatch = html.match(/<head\b[^>]*>/i);
   if (headMatch && headMatch.index !== undefined) {
@@ -299,27 +267,18 @@ export function injectAtDocumentStart(html: string, snippet: string): string {
 }
 
 export interface WebComposeInput {
-  /** The entry document's HTML (a full document or a fragment, the
-   *  browser's fragment parsing rules handle both inside srcdoc). May
-   *  already carry a challenge harness `<script>` appended by
-   *  `ChallengeCard`. */
+  /** Entry document HTML (full document or fragment). May already carry a
+   *  challenge harness `<script>`. */
   entryHtml: string;
-  /** Per-run bridge token (see `newPreviewToken`). Required unless
-   *  `bridge` is false, which is the only case with nothing to key. */
-  token?: string;
-  /** Inject the console bridge. Default true.
-   *
-   *  The server-rendered auto-preview passes false: no run is listening
-   *  for its messages, and the token baked into the bridge is random
-   *  per call, which would make the composed document differ between
-   *  the server's render and the browser's — a hydration mismatch, and
-   *  the one thing that document cannot be. */
-  bridge?: boolean;
-  /** Text files from the workspace, keyed by workspace-relative path,
-   *  `<link rel="stylesheet" href>` / `<script src>` references to
-   *  these are inlined so the sandboxed document is self-contained. */
+  /** Per-run bridge token. Always required — every composed document
+   *  carries the bridge. The server-rendered auto-preview derives its
+   *  token from the block's content hash rather than randomness, so the
+   *  server and browser renders stay identical (no hydration mismatch). */
+  token: string;
+  /** Workspace text files by relative path; `<link>`/`<script src>`
+   *  references to these are inlined so the document is self-contained. */
   textFiles?: Map<string, string>;
-  /** Binary files (uploads), `<img src>` references become data URIs. */
+  /** Binary files (uploads); `<img src>` references become data URIs. */
   binaryFiles?: Map<string, Uint8Array>;
   /** Inject the pinned Tailwind browser compiler before user code. */
   tailwind?: boolean;
@@ -327,21 +286,13 @@ export interface WebComposeInput {
 
 /**
  * Compose the final srcdoc for an HTML/CSS/JS run. Workspace-relative
- * `<link>`/`<script src>`/`<img src>` references are inlined (a srcdoc
- * document has no base URL to resolve them against, Tier 2's
- * Service-Worker virtual server is the "real URLs" upgrade path), and
- * the console bridge (+ optional Tailwind compiler) is injected at the
- * top of the document.
+ * references are inlined (a srcdoc document has no base URL), and the
+ * bridge (+ optional Tailwind) is injected at the top.
  *
- * CodePen-style implicit composition: root-level `.css` / `.js`
- * workspace files that the entry document does NOT reference get
- * appended automatically, styles as `<style>`, scripts as `<script>`
- * after the user's markup (so scripts see the parsed DOM, exactly like
- * CodePen's JS pane). Explicitly referenced files inline at their tag
- * as before, so documents that link their assets keep full control of
- * position and never double-apply. Files inside folders stay opt-in
- * (reference them explicitly) so nested/uploaded assets don't execute
- * by surprise.
+ * CodePen-style implicit composition: unreferenced root-level `.css`/`.js`
+ * files are appended after the markup (scripts see the parsed DOM);
+ * explicitly referenced files inline at their tag and never double-apply.
+ * Files inside folders stay opt-in so uploads don't execute by surprise.
  */
 export function composeWebDocument(input: WebComposeInput): string {
   const textFiles = input.textFiles ?? new Map<string, string>();
@@ -378,16 +329,13 @@ export function composeWebDocument(input: WebComposeInput): string {
       const isModule = type?.toLowerCase() === "module";
       const escaped = escapeInlineScriptContent(js);
       if (isModule) {
-        // Module scripts are deferred by definition, so inlining keeps
-        // the original execution timing.
+        // Module scripts are deferred by definition; inlining keeps timing.
         return `<script type="module" data-inlined-from="${path}">\n${escaped}\n</script>`;
       }
       if (hasBareAttr(attrs, "defer")) {
-        // Classic `defer` scripts run after parsing. Approximate that
-        // for the inlined copy with a DOMContentLoaded wrapper, the
-        // one observable difference is that top-level declarations
-        // become listener-local, so course content prefers body-end
-        // script tags where plain inlining is exact.
+        // Approximate classic `defer` with a DOMContentLoaded wrapper; the
+        // one observable difference is top-level declarations becoming
+        // listener-local.
         return `<script data-inlined-from="${path}">\ndocument.addEventListener("DOMContentLoaded", function () {\n${escaped}\n});\n</script>`;
       }
       return `<script data-inlined-from="${path}">\n${escaped}\n</script>`;
@@ -407,8 +355,8 @@ export function composeWebDocument(input: WebComposeInput): string {
     const b64 = bytes !== undefined
       ? bytesToBase64(bytes)
       : bytesToBase64(new TextEncoder().encode(text));
-    // Rewrite the src ATTRIBUTE specifically, a bare string replace
-    // could clobber an alt/title that happens to contain the same text.
+    // Rewrite the src ATTRIBUTE only — a bare replace could clobber an
+    // alt/title containing the same text.
     const escaped = src.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     return tag.replace(
       new RegExp(`(\\bsrc\\s*=\\s*)(["']?)${escaped}\\2`, "i"),
@@ -416,12 +364,9 @@ export function composeWebDocument(input: WebComposeInput): string {
     );
   });
 
-  // Implicit CodePen-style composition of unreferenced root-level
-  // files. Styles append after the markup (they still apply page-wide,
-  // and appending keeps them the "last word" in the cascade, the
-  // pane-CSS mental model); scripts append last so they run against
-  // the fully parsed DOM, like CodePen's JS pane. Sorted for
-  // deterministic ordering across runs.
+  // Implicit CodePen-style composition: styles append after the markup
+  // (last word in the cascade), scripts last so they see the parsed DOM.
+  // Sorted for deterministic ordering.
   const injectable = [...textFiles.keys()]
     .filter((path) => !path.includes("/") && !referenced.has(path))
     .sort();
@@ -439,21 +384,9 @@ export function composeWebDocument(input: WebComposeInput): string {
     }
   }
 
-  let prelude = "";
-  if (input.bridge !== false) {
-    if (input.token === undefined) {
-      // Silently composing a bridgeless document would send a run's
-      // console output nowhere and look like a block that prints
-      // nothing, which is indistinguishable from a block that does.
-      throw new Error(
-        "composeWebDocument: `token` is required unless `bridge: false`.",
-      );
-    }
-    prelude += buildPreviewBridge(input.token);
-  }
-  if (input.tailwind) prelude += tailwindScriptTag();
-  if (!prelude) return html;
-  return injectAtDocumentStart(html, prelude);
+  let out = buildPreviewBridge(input.token);
+  if (input.tailwind) out += tailwindScriptTag();
+  return injectAtDocumentStart(html, out);
 }
 
 export interface ReactComposeInput {
@@ -498,22 +431,11 @@ function cellTypeFor(level: PreviewConsoleLevel): "stdout" | "stderr" {
 }
 
 /**
- * Forward one preview frame's console output to `emit` for as long as the
- * returned function hasn't been called.
- *
- * The auto-rendered preview uses this instead of `runPreviewDocument`:
- * there is no run to wait for, no deadline to trip and no document to
- * mount — the frame is already in the page's HTML. What it still needs is
- * the half `runPreviewDocument` also does, turning bridge messages into
- * output cells, which lives here so the two cannot disagree about what a
- * `console.warn` is.
- *
- * `frame` is asked to replay whatever it printed before we subscribed,
- * which for a server-rendered frame is normally everything (see the
- * buffer in `buildPreviewBridge`). Replayed and live messages overlap by
- * a few milliseconds, so they are deduped on the bridge's own sequence
- * number — not on text, which would collapse a block that genuinely
- * logs the same line twice.
+ * Forward one preview frame's console output to `emit` until the returned
+ * function is called. Used by the auto-rendered preview, whose frame is
+ * already in the page's HTML. The frame is asked to replay pre-subscribe
+ * output; replayed and live messages are deduped on the bridge's sequence
+ * number — not on text, which would collapse genuinely repeated lines.
  */
 export function subscribeToPreviewConsole(options: {
   frame: HTMLIFrameElement;
@@ -546,18 +468,14 @@ export function subscribeToPreviewConsole(options: {
       "*",
     );
   } catch {
-    // A frame that isn't ready yet will still post live; the replay is
-    // the catch-up path, not the only one.
+    // A not-yet-ready frame still posts live; replay is only the catch-up.
   }
   return () => window.removeEventListener("message", onMessage);
 }
 
-// The live preview stays interactive after a run resolves (its iframe is
-// left mounted), so its console output must keep flowing to the output panel
-// too, e.g. a `console.log` inside a button's click handler. We therefore
-// leave the `message` listener attached past the run's resolution and retire
-// it only when the NEXT run on the same host replaces the iframe. This map
-// holds the pending "retire the previous run's listener" callback per host.
+// The preview stays interactive after a run resolves, so its message
+// listener stays attached until the NEXT run on the same host replaces the
+// iframe. This map holds the retire-previous-listener callback per host.
 const liveConsoleCleanup = new WeakMap<HTMLElement, () => void>();
 
 // Off-DOM fallback host so a run without a surface slot (tests, future
@@ -586,29 +504,18 @@ export interface PreviewRunRequest {
 }
 
 /**
- * Mount the composed document in a fresh sandboxed iframe and forward
- * its bridge messages to `emit` until the run completes:
- *
- *   - plain runs resolve shortly after the document's `load` event
- *     (console output from later timers/clicks stays visible in the live
- *     preview but is no longer captured as cells);
- *   - challenge runs (`waitForHarness`) resolve on the harness-done
- *     signal, so every test sentinel is captured first (postMessage is
- *     FIFO per source);
- *   - a document that never signals (infinite loop) trips a deadline
- *     that surfaces a hint and resolves, the next run replaces the
- *     frozen frame.
- *
- * Never rejects: failures surface as stderr cells, matching the
- * emit-and-resolve convention of the other adapters.
+ * Mount the composed document in a fresh sandboxed iframe and forward its
+ * bridge messages to `emit`. Plain runs resolve shortly after `load`;
+ * harness runs resolve on the harness-done signal (postMessage is FIFO per
+ * source, so all sentinels are captured first); a silent document trips a
+ * deadline. Never rejects — failures surface as stderr cells.
  */
 export function runPreviewDocument(req: PreviewRunRequest): Promise<void> {
   return new Promise<void>((resolve) => {
     const host = req.previewHost ?? getFallbackHost();
 
-    // Retire the previous run's still-attached console listener for this
-    // host, its iframe is about to be replaced below, so it can't post any
-    // more messages anyway.
+    // Retire the previous run's console listener; its iframe is about to
+    // be replaced.
     liveConsoleCleanup.get(host)?.();
     liveConsoleCleanup.delete(host);
 
@@ -635,9 +542,8 @@ export function runPreviewDocument(req: PreviewRunRequest): Promise<void> {
       if (settleTimer !== null) window.clearTimeout(settleTimer);
       if (deadlineTimer !== null) window.clearTimeout(deadlineTimer);
       resolve();
-      // Do NOT detach the listener here: the preview is still live and
-      // interactive, so keep forwarding its console output to the output
-      // panel until the next run replaces this iframe (see the registry).
+      // Do NOT detach the listener: the preview stays interactive, so keep
+      // forwarding console output until the next run replaces this iframe.
       liveConsoleCleanup.set(host, removeListener);
     };
 

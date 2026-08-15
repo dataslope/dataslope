@@ -1,31 +1,19 @@
 // Rewrites the choice order of authored `<MultipleChoice>` blocks so the
-// correct answer is spread evenly across the option slots.
+// correct answer is spread evenly across the option slots (the corpus had a
+// strong positional tell). Each option's `[o]` marker, continuation lines and
+// `>` explanation move together, so only the order on the page changes.
 //
-// The corpus grew a strong positional tell: the correct option sat second in
-// 61% of questions overall and in 99% of the interview banks, which makes the
-// whole bank guessable without reading a word. This script permutes the choice
-// blocks in place, moving each option's `[o]` marker, continuation lines and
-// `>` explanation with it, so only the order on the page changes.
-//
-// The permutation is **content-addressed**: the target slot and the order of
-// the distractors are both derived from a hash of the question (its body plus
-// its choice texts, sorted, so the key does not depend on the current order).
-// Re-running the script is therefore a no-op, and a question keeps its layout
-// across runs unless the author edits it.
+// The permutation is content-addressed — derived from a hash of the question
+// body plus its choice texts, sorted, so the key does not depend on current
+// order — which makes re-running a no-op. Order-dependent questions ("all of
+// the above", positional references, sorted numeric answers) are left
+// untouched and reported. Every rewrite is verified: the block is re-parsed
+// and must match the original as a set with the correct option at the
+// intended slot, or it is skipped rather than written.
 //
 //   node scripts/shuffle-mcq-options.mjs --dry-run     # report, write nothing
 //   node scripts/shuffle-mcq-options.mjs               # rewrite in place
 //   node scripts/shuffle-mcq-options.mjs path/to.mdx   # limit to some files
-//
-// Questions whose options are order-dependent are left untouched, and the
-// reason is reported under `--dry-run`: "all of the above" style options, text
-// that points at another option by position ("the first choice"), and answer
-// sets that read as a sorted numeric sequence.
-//
-// Every rewrite is verified before it is kept: the block is re-parsed and the
-// set of (text, explanation, correct) triples must match the original exactly,
-// with the correct option at the intended slot. A block that fails is skipped
-// rather than written.
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";

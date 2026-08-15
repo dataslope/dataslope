@@ -1,31 +1,15 @@
 #!/usr/bin/env node
 /**
  * Batch-generate the Dataslope course/interview illustrations with OpenAI's
- * GPT Image 2 (https://developers.openai.com/api/docs/models/gpt-image-2).
+ * GPT Image 2. Reads prompt definitions from `data/illustration-prompts.json`
+ * (the same source the admin gallery and `<IllustrationPrompt>` cards render),
+ * builds each prompt in the house style, and writes one PNG per prompt.
  *
- * Reads the prompt definitions from `data/illustration-prompts.json` (the same
- * source of truth the `/dashboard/admin/illustration-prompts` gallery and the in-lesson
- * `<IllustrationPrompt>` cards render), builds each generation prompt in the
- * Dataslope house style (an isometric illustration of the subject, in the four
- * brand colors), and writes one PNG per prompt named `<id>.png`.
- *
- * By default it uses the OpenAI **Batch API** (~50% cheaper, async, up to a 24h
- * completion window) at **low** quality, packing the prompts into JSONL jobs
- * against the `/v1/images/generations` endpoint. A `sync` mode is available for
- * quick one-off runs.
- *
- * Why low quality is the default: image output tokens dominate the bill, and
- * the tiers are far apart. Measured on gpt-image-2 (see COST_TOKENS below),
- * one 1024x1024 image is 196 output tokens at `low` but 1372 at `medium` and
- * 5488 at `high` — so at Batch pricing ($15 / 1M output tokens) a 1000-image
- * run is ~$2.94 low vs ~$82 high. `low` is more than good enough for flat
- * isometric / risograph art; override with `--quality` for a hero image.
- *
- * Why the work is split across several batches: every image comes back as
- * inline base64 inside the batch's output JSONL, and one 1024x1024 PNG is
- * ~2.6 MB (~3.6 MB base64). A single 1000-image batch would therefore produce
- * a ~3.6 GB output file, which cannot be read into one JS string (V8 caps
- * strings at ~512 MB). So prompts are chunked into `--batch-size` jobs and
+ * Defaults to the Batch API (~50% cheaper, async) at **low** quality: image
+ * output tokens dominate the bill and `low` (196 tokens per 1024x1024 vs 5488
+ * at `high`) holds up for flat isometric/risograph art. Work is split across
+ * batches because images come back as inline base64 in the output JSONL — one
+ * big batch's file could not be read into a JS string (V8 caps ~512 MB) — and
  * every output file is parsed as a stream, never buffered whole.
  *
  * Usage:
@@ -86,12 +70,10 @@ import { createR2Client, credentialsFromEnv } from "./lib/r2.mjs";
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DATA_FILE = join(ROOT, "data", "illustration-prompts.json");
 const API_BASE = "https://api.openai.com/v1";
-// Two spellings of one endpoint, and they are not interchangeable. `api()`
-// joins IMAGES_PATH onto API_BASE, which already carries the version; a Batch
-// JSONL line names the endpoint from the API root instead, version and all.
-// Passing the batch spelling to `api()` builds `/v1/v1/images/generations` and
-// gets a 404 that reads like a missing model — which is what `sync` did until
-// the first person tried it.
+// Two spellings, not interchangeable: `api()` joins IMAGES_PATH onto
+// API_BASE (which already carries /v1), while a Batch JSONL line names the
+// endpoint from the API root. Passing the batch spelling to `api()` builds
+// `/v1/v1/...` and 404s in a way that reads like a missing model.
 const IMAGES_PATH = "/images/generations";
 const IMAGES_ENDPOINT = `/v1${IMAGES_PATH}`;
 
@@ -115,8 +97,7 @@ function parseArgs(argv) {
     only: null,
     category: null,
     size: null,
-    // Low is the default on purpose: it is ~7x cheaper than medium and ~28x
-    // cheaper than high, and holds up for isometric / risograph art.
+    // Low on purpose: ~28x cheaper than high, holds up for this art style.
     quality: "low",
     background: "auto",
     outputFormat: "png",
@@ -183,7 +164,7 @@ export function buildPrompt(spec, colors) {
   const shared =
     "No text. Draw only the objects described — nothing scattered over, around, " +
     "or behind them: no speckled dots, no confetti, no stray connecting lines.";
-  // Mirror of ISOMETRIC_CONSTRAINTS. Also the fallback for a style with no
+  // Mirror of ISOMETRIC_CONSTRAINTS; also the fallback for a style with no
   // block of its own, exactly as in the library.
   const isometric =
     "Render each object as a solid three-dimensional form with real thickness, " +
@@ -199,9 +180,7 @@ export function buildPrompt(spec, colors) {
     "coloring and markings, never a flat brand color and never a flat " +
     "silhouette. A bird has wings, a beak and feet and never hands or arms: it " +
     "perches, stands, or nudges things with its beak rather than holding them.";
-  // Mirror of RISOGRAPH_CONSTRAINTS: the inline historical figures. Flat inks
-  // instead of volume, brand colors so the cut-out survives both page
-  // backgrounds, blank paper so there is a subject to cut out at all.
+  // Mirror of RISOGRAPH_CONSTRAINTS (the inline historical figures).
   const risograph =
     "Print it as a risograph: a few flat spot-color inks, coarse halftone grain " +
     "inside every inked shape, and slight misregistration where two inks " +
@@ -236,10 +215,9 @@ const COST_TOKENS = {
   "1536x1024/low": 158,
   "1536x1024/medium": 1372,
   "1536x1024/high": 5488,
-  // The 2:1 band the inline risograph figures use (`course-inline`). Measured
-  // 2026-08-09, and the cheapest frame the API will take: 1024x512 is refused
-  // ("below the current minimum pixel budget"), so this is the floor for a
-  // wide figure. Only `low` is measured, the tier everything ships at.
+  // The 2:1 band the inline risograph figures use (`course-inline`), and the
+  // cheapest frame the API will take: 1024x512 is refused ("below the current
+  // minimum pixel budget"). Only `low` is measured, the tier everything ships at.
   "1536x768/low": 102,
 };
 // USD per 1M image output tokens (https://developers.openai.com/api/docs/pricing).
@@ -296,19 +274,13 @@ function requireKey() {
   return key;
 }
 
-// Statuses worth retrying: gateway/proxy hiccups and rate limits. A batch's
-// output file is hundreds of MB, and fetching it through a proxy is exactly
-// where a 504 shows up — losing the whole run at the last step, after the
-// images have already been generated and paid for.
+// Statuses worth retrying: gateway/proxy hiccups and rate limits.
 const RETRY_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
 
 /**
- * One OpenAI API call.
- *
- * `retries` defaults to 0 and is opted into per call site, deliberately: this
- * helper also creates batches and submits image generations, and silently
- * re-sending one of those would duplicate work and double the bill. Only
- * idempotent GETs pass a retry count.
+ * One OpenAI API call. `retries` defaults to 0 and is opted into per call
+ * site: this helper also creates batches and submits generations, and
+ * silently re-sending one would double the bill. Only idempotent GETs retry.
  */
 async function api(path, { method = "GET", key, json, form, retries = 0 } = {}) {
   const headers = { Authorization: `Bearer ${key}` };
@@ -337,8 +309,8 @@ async function api(path, { method = "GET", key, json, form, retries = 0 } = {}) 
       throw new Error(`HTTP ${res.status} ${res.statusText}${detail ? ` - ${detail}` : ""}`);
     }
 
-    // 2s, 4s, 8s, 16s, 32s (capped): long enough to outlast a proxy blip
-    // without stalling a run that is genuinely broken.
+    // 2s..32s capped backoff: outlasts a proxy blip without stalling a run
+    // that is genuinely broken.
     const waitMs = Math.min(32_000, 2_000 * 2 ** attempt);
     const reason = networkErr ? networkErr.message : `HTTP ${res.status}`;
     console.error(
@@ -348,9 +320,8 @@ async function api(path, { method = "GET", key, json, form, retries = 0 } = {}) 
   }
 }
 
-/** Internals exposed for `__tests__/generateIllustrationsRetry.test.ts`, which
- *  pins both halves of the retry contract: transient failures are retried where
- *  a caller opts in, and never retried where they are not. */
+/** Exposed for `__tests__/generateIllustrationsRetry.test.ts`, which pins
+ *  both halves of the retry contract. */
 export const __testing = { api };
 
 const BATCH_STATE_FILE = (out) => join(out, "last-batch.json");
@@ -395,14 +366,9 @@ export function candidateKey(runId, promptId, variant, kind) {
 }
 
 /**
- * Where generated images land.
- *
- * `disk` is the default and keeps one-off local work frictionless. `r2` exists
- * because most candidates are rejects: generating several variants per
- * illustration and keeping one means three quarters of the bytes should never
- * reach git. Uploading them under a run-scoped prefix keeps them reviewable,
- * makes a whole run deletable with a single prefix delete, and lets a bucket
- * lifecycle rule expire them without any bookkeeping.
+ * Where generated images land. `disk` keeps one-off local work frictionless;
+ * `r2` exists because most candidates are rejects that should never reach git,
+ * and a run-scoped prefix makes a whole run deletable/expirable as a unit.
  */
 function makeSink(opts) {
   const ext = outputExt(opts);
@@ -419,8 +385,7 @@ function makeSink(opts) {
   const runId = opts.run;
   return {
     describe: `r2://${client.bucket}/illustrations/${runId}/`,
-    // No per-object existence check: a HEAD per candidate would cost a round
-    // trip each, and re-uploading the same key is idempotent anyway.
+    // No per-object existence check: re-uploading the same key is idempotent.
     skip: () => false,
     label: (id) => candidateKey(runId, id, opts.variant, "original"),
     init: () => {},
@@ -547,18 +512,14 @@ async function cmdStatus(opts, key) {
 }
 
 /**
- * Yield an output file's JSONL rows one line at a time.
- *
- * Batch image output embeds each PNG as base64 in its row, so these files run to
- * gigabytes; `res.text()` would exceed V8's ~512 MB max string length. Reading
- * the body as a stream keeps only one row (~3.6 MB) in memory at a time.
+ * Yield an output file's JSONL rows one line at a time. These files run to
+ * gigabytes (base64 PNGs); `res.text()` would exceed V8's ~512 MB max string
+ * length, so stream, keeping one row in memory at a time.
  */
 async function* streamFileLines(fileId, key) {
-  // The call that actually bit: a several-hundred-MB output file fetched
-  // through a proxy returns 504 often enough to matter, and by this point the
-  // images are already generated and billed. Retries cover establishing the
-  // request; if the socket dies mid-stream the generator still throws, and the
-  // fix there is to re-run `download --batch <id>`, which starts the file over.
+  // Retried: a several-hundred-MB file through a proxy 504s often, and by now
+  // the images are already billed. Retries cover establishing the request; a
+  // mid-stream death still throws — re-run `download --batch <id>`.
   const res = await api(`/files/${fileId}/content`, { key, retries: 5 });
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
@@ -656,10 +617,9 @@ async function pollBatch(batch, opts, key, label) {
 }
 
 /**
- * Submit every chunk, keeping at most `--max-in-flight` batches live at a time,
- * and download each one's images as soon as it completes. Bounding the window
- * keeps a thousands-of-images run inside the account's queued-batch limits and
- * means disk fills incrementally rather than all at the end.
+ * Submit every chunk, at most `--max-in-flight` batches live at a time,
+ * downloading each as it completes — stays inside the account's queued-batch
+ * limits and fills disk incrementally.
  */
 async function cmdRun(entries, opts, model, key) {
   const chunks = chunk(entries, opts.batchSize);
@@ -768,9 +728,8 @@ async function main() {
     process.exit(1);
   }
   if (opts.sink === "r2" && !opts.run) {
-    // A run id groups every candidate from one invocation under one prefix, so
-    // the whole run can be deleted or expired as a unit. Default to a sortable
-    // UTC timestamp when the caller does not supply one.
+    // Run id groups one invocation's candidates under one prefix; default to
+    // a sortable UTC timestamp.
     opts.run = new Date().toISOString().replace(/[:.]/g, "-").replace(/Z$/, "");
     console.log(`No --run given; using run id ${opts.run}`);
   }
@@ -798,9 +757,8 @@ async function main() {
   if (opts.command === "run") return cmdRun(entries, opts, model, key);
 }
 
-// Only drive the CLI when executed directly. The vitest suite imports
-// `buildPrompt` from here to assert it matches lib/illustrationPrompt.ts, and
-// that import must not kick off a run.
+// Only drive the CLI when executed directly: the vitest suite imports
+// `buildPrompt`, and that import must not kick off a run.
 const invokedDirectly =
   process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url;
 

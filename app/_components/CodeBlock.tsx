@@ -78,7 +78,7 @@ import {
 } from "./codePersistence";
 import { usePrepopulatedOutput } from "./mdx/BlockOutputs";
 import { usePrecompiledBundle } from "./mdx/ReactBundles";
-import { blockOutputKey } from "@/lib/blockOutputKey";
+import { blockOutputKey, workspaceOutputKey } from "@/lib/blockOutputKey";
 import { previewStageStyle } from "./previewStage";
 import {
   PREVIEW_IFRAME_CLASS,
@@ -88,122 +88,71 @@ import {
 import styles from "./CodeBlock.module.css";
 import challengeStyles from "./ChallengeCard.module.css";
 
-/** One file in a multi-file `<CodeBlock>` workspace. Mirrors the
- *  `ChallengeFile` shape from `ChallengeCard` so authors can use the
- *  same mental model, the layout / styles are identical too. */
+/** One file in a multi-file `<CodeBlock>` workspace; mirrors the
+ *  `ChallengeFile` shape from `ChallengeCard`. */
 export interface CodeBlockFile {
   /** Workspace-relative filename, e.g. `"greeter.hpp"`. */
   filename: string;
-  /** Optional read-only initialization code for THIS file, prepended
-   *  verbatim to the file's code on every Run. Rendered in a
-   *  collapsed-by-default read-only panel above the editor when this file
-   *  is the active tab, handy for imports or sample data without
-   *  cluttering the snippet the learner edits.
-   *
-   *  Caveat: the prepend is purely textual, so init must be valid at the
-   *  *top level* of the target language (e.g. `import` / `using` /
-   *  `#include` directives, top-level statements, or, for languages
-   *  without top-level statements like Java, a complete declaration the
-   *  user code can reference). */
+  /** Optional read-only init code for THIS file, prepended verbatim on
+   *  every Run and shown in a collapsed read-only panel above the editor.
+   *  The prepend is purely textual, so init must be valid at the target
+   *  language's top level. */
   initCode?: string;
-  /** Starter content shown in the editor for this file. Reset restores
-   *  this exact text. */
+  /** Starter content shown in the editor; Reset restores this exact text. */
   starterCode: string;
 }
 
 interface CodeBlockProps {
-  /** Language adapter that describes the runtime to use. The same
-   *  adapter instance can be passed to multiple `CodeBlock`s on the
-   *  same page; they share one underlying runtime, but each block
-   *  always executes against a freshly-reset state, variables defined
-   *  in one block are never visible to another. */
+  /** Language adapter describing the runtime. Blocks sharing an adapter
+   *  share one runtime, but each block executes against freshly-reset
+   *  state. */
   adapter: LanguageAdapter;
-  /** Marks a block whose lesson *is* the failure: a deliberately misspelled
-   *  function name, a constraint violation the prose then explains. Purely
-   *  declarative — the block runs and reports exactly as it always did — but
-   *  the content sweeps assert it in both directions: such a block must raise,
-   *  and one that stops raising is a regression nothing else would catch,
-   *  because the surrounding prose keeps promising an error the reader no
-   *  longer sees. Surfaced as `data-expect-error` so the e2e sweeps can read
-   *  it too. */
+  /** Marks a block whose lesson *is* the failure. Purely declarative, but
+   *  the content sweeps assert it in both directions: the block must raise,
+   *  and one that stops raising is a regression nothing else would catch.
+   *  Surfaced as `data-expect-error` for the e2e sweeps. */
   expectError?: boolean;
-  /** Workspace files. Every block supplies at least one file; each file
-   *  carries its own `initCode` (read-only setup prepended on Run) and
-   *  `starterCode` (the editable starter). With more than one file, or
-   *  with `showFileTabBar`, a non-sortable, non-closeable tab bar
-   *  appears above the editor so the learner can switch between files.
-   *  Code runs against `entryFilename` (or the first file when omitted);
-   *  every other file is staged into the runtime's virtual file system
-   *  via `prepareFileSystem` so multi-file `import`s / `include`s /
-   *  cross-class references resolve. */
+  /** Workspace files (at least one). Code runs against `entryFilename` (or
+   *  the first file); every other file is staged into the runtime's VFS via
+   *  `prepareFileSystem` so multi-file imports/includes resolve. More than
+   *  one file (or `showFileTabBar`) renders the tab bar. */
   files: CodeBlockFile[];
   /** When `files` has more than one entry, the filename whose content is
    *  passed to `runtime.run()` as the entry. Defaults to the first file. */
   entryFilename?: string;
   /** Remote dataset files staged into the runtime's working directory
-   *  before every Run, so init/starter code reads them like local files
-   *  (e.g. `pd.read_csv("penguins.csv")`). Each entry names a path in
-   *  the dataslope/datasets repo (or a full URL); the bytes are fetched
-   *  through the globally cached dataset path, memoised in-session and
-   *  persisted via the browser's Cache API, so every block, page, and
-   *  visit that references the same file shares one download. Blocks
-   *  with different init code share the same staged bytes. Requires an
-   *  adapter whose runtime implements `prepareFileSystem` (Python, R,
-   *  JavaScript, TypeScript, PHP, …). */
+   *  before every Run (paths in the dataslope/datasets repo, or full URLs;
+   *  downloads are cached globally). Requires a runtime that implements
+   *  `prepareFileSystem`. */
   datasets?: DatasetStageSpec[];
-  /** Optional human-readable label shown in the header. Defaults to
-   *  an auto-generated one like "PyBlock-49b7". */
+  /** Optional header label. Defaults to an auto-generated one. */
   label?: string;
-  /** Force the file tab bar to render even for a single-file workspace.
-   *  Multi-file workspaces always show it; this opts a one-file block in. */
+  /** Force the file tab bar to render even for a single-file workspace. */
   showFileTabBar?: boolean;
-  /** Optional importable module names (e.g. `"pandas"`, `"sklearn"`) to
-   *  pre-install when the block's runtime warms, merged with the modules
-   *  found by scanning the block's own code (init + starter). Escape
-   *  hatch for imports the scan can't see, e.g. dynamic imports. Only
-   *  meaningful for runtimes with optional package sets (Python). */
+  /** Extra importable module names to pre-install at warm-up, merged with
+   *  the modules found by scanning the block's own code. Escape hatch for
+   *  imports the scan can't see. Python only. */
   packages?: string[];
   /** Inject the pinned Tailwind in-browser compiler into the preview
-   *  document on every Run, so utility classes in the learner's markup
-   *  compile client-side. Only meaningful for preview adapters (web /
-   *  react); see `TAILWIND_BROWSER_CDN` in runtime/cdn.ts for the pin
-   *  and the "development-time compiler" caveat. */
+   *  document on every Run. Preview adapters (web / react) only; see
+   *  `TAILWIND_BROWSER_CDN` in runtime/cdn.ts. */
   tailwind?: boolean;
-  /** Height of the live-preview stage (number → px). Only meaningful for
-   *  preview adapters (web / react).
-   *
-   *  The slot reserves this space from first paint, empty or not, so a Run
-   *  never grows the card under the reader. That makes the number the
-   *  author's problem rather than the layout's: leave it alone for a block
-   *  that renders a page (300px, the default), and set it for one that
-   *  renders a 60px box, where the default would reserve a screenful of
-   *  white to show a rule of thumb about margins. */
+  /** Height of the live-preview stage (number → px), preview adapters only.
+   *  Reserved from first paint so a Run never grows the card; set it lower
+   *  than the 300px default for small-output blocks. */
   previewHeight?: number | string;
-  /** Render the preview before the reader presses Run, when the adapter
-   *  can compose it without a runtime (`composeStaticPreview`).
-   *
-   *  Defaults to the adapter's `outputCapabilities.autoPreview`, which is
-   *  on for `web` and off for `react` — 42 of the site's 42 web blocks
-   *  want this, and a prop that has to be remembered on every one of them
-   *  is a prop the next block will be missing, with a blank panel for a
-   *  symptom and nothing to distinguish it from a block that never had a
-   *  preview. So this exists to say *no* (or to say yes for an adapter
-   *  that doesn't default to it), not to turn the feature on.
-   *
-   *  Forced off for `expectError` blocks: their lesson is the failure,
-   *  and rendering it unasked spoils the reveal. */
+  /** Render the preview before the reader presses Run (needs the adapter's
+   *  `composeStaticPreview`). Defaults to the adapter's
+   *  `outputCapabilities.autoPreview` (on for web, off for react) — this
+   *  prop exists to say *no*, not to turn the feature on. Forced off for
+   *  `expectError` blocks so the failure isn't spoiled. */
   autoPreview?: boolean;
 }
 
-// Detect the active color scheme on `<html>`. Fumadocs uses next-themes
-// with `attribute: "class"`, so light/dark is reflected as the `dark`
-// class (or absence thereof) on the document root. We fall back to the
-// OS-level preference in case the page is rendered outside fumadocs.
-// Note: we intentionally do NOT read `data-theme` here because the
-// playground sets that attribute for its own light/dark switching and
-// it can transiently persist during SPA navigation (between playground
-// unmount cleanup and learn page mount), causing CodeBlocks on /learn
-// to pick up the wrong theme. Playgrounds use `data-playground-theme` instead.
+// Detect the active color scheme from the `dark`/`light` class next-themes
+// puts on <html>, falling back to the OS preference. Deliberately does NOT
+// read `data-theme`: the playground sets it and it can transiently persist
+// during SPA navigation, giving /learn CodeBlocks the wrong theme.
 function detectIsDark(): boolean {
   if (typeof document === "undefined") return true;
   const root = document.documentElement;
@@ -215,9 +164,8 @@ function detectIsDark(): boolean {
   return true;
 }
 
-// Subscribe to <html> class mutations so we can re-render when the user
-// toggles the docs theme. Pairs with `useSyncExternalStore` to stay
-// SSR-safe (snapshot defaults to `true` / dark on the server).
+// Subscribe to <html> class mutations to re-render on docs theme toggles;
+// SSR snapshot defaults to dark.
 function useIsDark(): boolean {
   return useSyncExternalStore(
     (notify) => {
@@ -242,15 +190,12 @@ function useIsDark(): boolean {
   );
 }
 
-// Map the document's color scheme to the matching CodeMirror theme name.
-// Light docs → GitHub Light, dark docs → GitHub Dark.
 function cmThemeNameFor(isDark: boolean): string {
   return isDark ? "github-dark" : "github-light";
 }
 
-// Small clipboard / "copy to clipboard" glyph reused by the action bar
-// and the output-cell headers. Stroke-only so it inherits the current
-// text color and reads as part of the surrounding chrome.
+// Clipboard glyph shared by the action bar and output-cell headers;
+// stroke-only so it inherits the current text color.
 function CopyIcon() {
   return (
     <svg
@@ -270,10 +215,8 @@ function CopyIcon() {
   );
 }
 
-// Glyph for the adapter's language. Uses the shared `languageIcons`
-// ToastList renders all active toasts into the viewport.  It must be
-// rendered inside a Toast.Provider context (supplied by the CodeBlock
-// wrapper below) so that Toast.useToastManager() works.
+// Renders all active toasts; must live inside the Toast.Provider supplied
+// by the CodeBlock wrapper so Toast.useToastManager() works.
 function ToastList() {
   const { toasts } = Toast.useToastManager();
   return toasts.map((toast) => (
@@ -304,8 +247,7 @@ function ToastList() {
   ));
 }
 
-// Public export, wraps the inner component with a Toast.Provider so
-// that Toast.useToastManager() works inside CodeBlockInner.
+// Public export: wraps the inner component with a Toast.Provider.
 export default function CodeBlock(props: CodeBlockProps) {
   return (
     <Toast.Provider timeout={2400}>
@@ -342,40 +284,32 @@ function CodeBlockInner({
   const editorHostRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<EditorView | null>(null);
   const themeCompRef = useRef<Compartment | null>(null);
-  // Line-number compartment, reconfigured when the active file changes
-  // so the gutter offset tracks that file's init line count.
+  // Compartments reconfigured when the active file changes: line-number
+  // offset (init line count) and language (mixed-language workspaces).
   const lineNumberCompRef = useRef<Compartment | null>(null);
-  // Language compartment, reconfigured per active file for adapters
-  // whose workspaces mix languages (web: .html/.css/.js).
   const languageCompRef = useRef<Compartment | null>(null);
-  // Slot the preview adapters (web / react) mount their sandboxed
-  // iframe into; always in the DOM for preview-capable adapters so the
-  // element exists by the time `runtime.run` needs it.
+  // Preview iframe slot; always in the DOM for preview-capable adapters so
+  // the element exists by the time `runtime.run` needs it.
   const previewHostRef = useRef<HTMLDivElement | null>(null);
   const hasPreview = Boolean(adapter.outputCapabilities?.preview);
   const initEditorHostRef = useRef<HTMLDivElement | null>(null);
   const initEditorRef = useRef<EditorView | null>(null);
   const initThemeCompRef = useRef<Compartment | null>(null);
   const runtimeRef = useRef<LanguageRuntime | null>(null);
-  // Outer card element, observed so the shared runtime can be warmed when
-  // the block first scrolls into view (so the learner's first Run isn't a
-  // cold download). `warmedRef` guards against re-warming on re-intersect.
+  // Outer card element + one-shot guard for the scroll-into-view warm-up.
   const cardRef = useRef<HTMLDivElement | null>(null);
   const warmedRef = useRef(false);
-  // Sequence number lets us drop output from a previous run if the
-  // user clicks Run again while one is in flight.
+  // Sequence number so output from a superseded run is dropped.
   const runSeqRef = useRef(0);
-  // Stable ref to the latest run() so the CodeMirror keymap closure
-  // (created once at mount) always invokes the current handler.
+  // Latest run handler, keeps the mount-once CodeMirror keymap current.
   const runRef = useRef<() => void>(() => {});
   // Debounce handle for localStorage persistence (see editor mount).
   const persistSaveTimerRef = useRef<number | null>(null);
 
   const [status, setStatus] = useState<Status>("idle");
   const [statusMessage, setStatusMessage] = useState<string>("");
-  // True while a *cold* runtime download is in flight (vs a warm runtime
-  // already initialised), so the boot notice only promises "first run only"
-  // when it really is the first run.
+  // True while a *cold* runtime download is in flight, so the boot notice
+  // only promises "first run only" when it really is.
   const [bootCold, setBootCold] = useState(false);
   // Latest stage-floor fraction reported by the adapter's boot (null
   // until the adapter reports one); smoothed for display below.
@@ -389,17 +323,11 @@ function CodeBlockInner({
     reset: resetPrepare,
   } = useMidRunPreparing();
   // ─── Prepopulated output ────────────────────────────────────────────
-  // What this block printed when the site was built (see
-  // `scripts/build-block-outputs.mjs`), so the lesson reads end to end
-  // without the reader pressing anything. Seeded once, into the same state
-  // a real run writes, so every downstream consumer — the copy button, the
-  // Ask AI snapshot, the renderer — sees ordinary cells and needs no
-  // knowledge that these arrived early. The first Run clears them.
-  // Keyed on the *entry* file, the one whose code actually runs, mirroring
-  // `resolvedEntryFilename` below (which is computed further down, so the
-  // same fallback is spelled out rather than reused). A multi-file block
-  // with an explicit `entryFilename` would otherwise be keyed on a file the
-  // generator never executed.
+  // What this block printed at build time (scripts/build-block-outputs.mjs),
+  // seeded into the same state a real run writes so downstream consumers
+  // see ordinary cells; the first Run clears them. Keyed on the *entry*
+  // file (mirroring `resolvedEntryFilename`, computed further down), else a
+  // multi-file block would be keyed on a file the generator never executed.
   const entryFile =
     (entryFilename ? files?.find((f) => f.filename === entryFilename) : null) ??
     files?.[0];
@@ -409,7 +337,7 @@ function CodeBlockInner({
     entryFile?.starterCode ?? "",
   );
   const prepopulated = usePrepopulatedOutput(outputKey);
-  // Negative ids so a prepopulated cell can never collide with a run's own
+  // Negative ids so prepopulated cells never collide with a run's own
   // (which count up from 1).
   const seedOutputs = useCallback(
     (): OutputCell[] =>
@@ -428,17 +356,14 @@ function CodeBlockInner({
   const initPanelId = `${blockId}-init`;
 
   // ─── Multi-file workspace ───────────────────────────────────────────
-  // Normalise into a non-empty list of files. Authors always pass
-  // `files`; guard against an empty array so the rest of the component
-  // can assume at least one file is present.
+  // Guard against an empty `files` array so the rest of the component can
+  // assume at least one file.
   const workspaceFiles: CodeBlockFile[] = useMemo(() => {
     if (files && files.length > 0) return files;
     const defaultName = `main.${adapter.defaultFileExtension || "txt"}`;
     return [{ filename: defaultName, starterCode: "" }];
   }, [files, adapter.defaultFileExtension]);
   const isMultiFile = workspaceFiles.length > 1;
-  // The tab bar renders for multi-file workspaces, or when a single-file
-  // block explicitly opts in via `showFileTabBar`.
   const showTabs = isMultiFile || showFileTabBar;
   const resolvedEntryFilename =
     (entryFilename && workspaceFiles.find((f) => f.filename === entryFilename)
@@ -447,40 +372,32 @@ function CodeBlockInner({
 
   // ─── Auto-rendered preview ──────────────────────────────────────────
   // The page this block's *starter* renders, composed without a runtime
-  // and without a browser (see `LanguageAdapter.composeStaticPreview`),
-  // so it is in the server's HTML and on screen at first paint rather
-  // than one Run behind. Same posture as the prepopulated output panel:
-  // the lesson reads end to end without pressing anything.
-  //
-  // The starter, deliberately, not the reader's restored buffer. Their
-  // edits are on screen in the editor either way, the buffer is restored
-  // after hydration so composing from it would mean rendering twice and
-  // shifting between, and Run replaces this frame with their version the
-  // moment they ask. It is the same rule the prepopulated cells follow.
+  // (`composeStaticPreview`) so it's in the server's HTML at first paint.
+  // Deliberately the starter, not the restored buffer: the buffer is
+  // restored after hydration, so composing from it would render twice and
+  // shift between; Run replaces this frame with the reader's version.
   const autoPreviewEnabled =
     (autoPreview ?? adapter.outputCapabilities?.autoPreview ?? false) &&
     !expectError;
-  // The frame's bridge token. A run's token is random per run, which is
-  // right for a document composed at click time; this one is composed on
-  // the server and again in the browser, and React compares the two, so
-  // it has to be derived rather than drawn. Both halves are already
-  // deterministic — a content hash of the block and React's own
-  // `useId` — and together they stay distinct between two blocks with
-  // identical source on one page, which a content hash alone would not.
-  //
-  // A derived token is guessable by anything already running on the
-  // page, and that is acceptable *here* only because the frame carries
-  // no harness: the token authenticates "which frame said this", not
-  // "did the learner really pass". Challenge cards never auto-render and
-  // keep their per-run random tokens, so the sentinel protocol is
-  // untouched. Do not reuse this token for a harnessed document.
+  // The frame's bridge token. It must be DERIVED, not random: the document
+  // is composed on the server and again in the browser and React compares
+  // the two. Content hash + blockId stays distinct between identical blocks
+  // on one page. A derived token is guessable, acceptable only because this
+  // frame carries no harness — it authenticates "which frame said this",
+  // not "did the learner pass". Do not reuse for a harnessed document.
   const autoPreviewToken = `${outputKey}-${blockId.replace(/[^a-zA-Z0-9-]/g, "")}`;
-  // A build-time artifact for adapters that cannot compose from source
-  // alone. `web` ignores it; `react` renders nothing without it, because
-  // translating TSX in the reader's browser is the ~3 MB download this
-  // exists to avoid. Keyed by the same content hash as everything else, so
-  // an edited block simply has no bundle until the workflow runs again.
-  const precompiled = usePrecompiledBundle(outputKey);
+  // Build-time bundle for adapters that can't compose from source alone:
+  // `web` ignores it; `react` renders nothing without it (in-browser TSX
+  // translation is the ~3 MB download this avoids). Keyed over the whole
+  // workspace (`workspaceOutputKey`), not the entry alone — the bundle
+  // bakes every file in, so an edit to any of them must miss here and
+  // fall back to the empty panel until the workflow rebuilds.
+  const bundleKey = workspaceOutputKey(
+    adapter.id,
+    workspaceFiles,
+    resolvedEntryFilename,
+  );
+  const precompiled = usePrecompiledBundle(bundleKey);
   const autoPreviewDoc = useMemo(() => {
     if (!autoPreviewEnabled || !adapter.composeStaticPreview) return null;
     const sources = workspaceFiles.map((f) => {
@@ -500,8 +417,7 @@ function CodeBlockInner({
         bundle: precompiled ?? undefined,
       });
     } catch {
-      // A block that can't be composed falls back to the empty slot it
-      // has always had; a thrown error here would take the lesson with it.
+      // Fall back to the empty slot; a throw here would take the lesson down.
       return null;
     }
   }, [
@@ -516,20 +432,11 @@ function CodeBlockInner({
   // Retired by the first Run (see `run`), restored by Reset.
   const [showAutoPreview, setShowAutoPreview] = useState(true);
   const autoPreviewFrameRef = useRef<HTMLIFrameElement | null>(null);
-  // True when this block reserves space for its output panel, so the
-  // panel is in the server's HTML at the height it will have once the
-  // auto-preview has printed — otherwise the cells arriving a moment
-  // later would grow the card by ~96px, which is the shift phase 1 spent
-  // its whole diff removing from the panel above.
-  //
-  // Gated on the source mentioning `console.`, because a panel reserved
-  // on all 42 web blocks would put an empty box under the 39 that never
-  // print. It is a heuristic and it is allowed to be: the false positive
-  // (a `console.` call that never executes) reserves a little space for
-  // nothing, and the false negative needs a block that reaches the
-  // console without naming it, which no lesson does. The alternative is
-  // knowing the output in advance, which means running the code at build
-  // time — the thing this whole approach exists to avoid.
+  // Reserve output-panel space in the server's HTML so the auto-preview's
+  // console cells don't grow the card ~96px on arrival. Gated on the source
+  // mentioning `console.` — a deliberate heuristic: a false positive
+  // reserves a little space for nothing, and a false negative would need a
+  // block that reaches the console without naming it.
   const reservesOutput = useMemo(() => {
     if (!autoPreviewEnabled || !autoPreviewDoc) return false;
     return workspaceFiles.some(
@@ -537,14 +444,10 @@ function CodeBlockInner({
     );
   }, [autoPreviewEnabled, autoPreviewDoc, workspaceFiles]);
 
-  // Forward the auto-rendered frame's console output into this block's own
-  // output panel. Without this the frame still prints — into the browser's
-  // devtools, where the bridge echoes it — and the panel below stays empty,
-  // which would make the site's own surface the one place the output *isn't*.
-  //
-  // The frame is in the server's HTML, so it has usually finished printing
-  // before this effect exists; `subscribeToPreviewConsole` asks it to replay
-  // what it buffered, and dedupes against anything still arriving live.
+  // Forward the auto-rendered frame's console output into this block's
+  // output panel. The frame usually finishes printing before this effect
+  // exists; `subscribeToPreviewConsole` replays what it buffered and
+  // dedupes against anything still arriving live.
   useEffect(() => {
     const frame = autoPreviewFrameRef.current;
     if (!frame || !showAutoPreview || !autoPreviewDoc) return;
@@ -553,8 +456,7 @@ function CodeBlockInner({
       token: autoPreviewToken,
       emit: (cell) =>
         setOutputs((prev) => {
-          // Same collapse the run path applies: one cell per console call
-          // would stack a noisy pile of one-line boxes.
+          // Same stdout collapse the run path applies.
           const last = prev[prev.length - 1];
           if (cell.type === "stdout" && last && last.type === "stdout") {
             const merged: OutputCell = {
@@ -563,29 +465,25 @@ function CodeBlockInner({
             };
             return [...prev.slice(0, -1), merged];
           }
-          // Negative ids, like the prepopulated cells: a run counts up
-          // from 1, and these have to be distinguishable from its own.
+          // Negative ids, distinguishable from a run's own (they count up
+          // from 1).
           return [...prev, { id: -(prev.length + 1), elapsed: "", ...cell }];
         }),
     });
   }, [autoPreviewDoc, autoPreviewToken, showAutoPreview]);
 
-  // Remote datasets staged before every run (see the `datasets` prop).
   // Mirrored into a ref so the mount-once warm-up effect can prefetch
-  // them without re-registering its IntersectionObserver when MDX
-  // re-creates the prop array.
+  // datasets without re-registering when MDX re-creates the prop array.
   const blockDatasets = datasets ?? NO_DATASETS;
   const datasetsRef = useRef(blockDatasets);
   useEffect(() => {
     datasetsRef.current = blockDatasets;
   }, [blockDatasets]);
 
-  // Everything this block could ask the runtime to execute, per-file
-  // init + starter code. Passed to `runtime.warmPackages` as the
-  // needs-analysis input so heavy optional packages (Python's data
-  // stack) only download for blocks whose code actually imports them.
-  // Kept in a ref (like `datasetsRef` above) so the warm-up observer
-  // doesn't re-register when MDX re-creates the prop arrays.
+  // Everything this block could execute, passed to `runtime.warmPackages`
+  // so heavy optional packages only download for blocks whose code imports
+  // them. A ref, so the warm-up observer doesn't re-register on prop
+  // identity.
   const warmHintRef = useRef<{ sources: string[]; packages?: string[] }>({
     sources: [],
   });
@@ -598,9 +496,8 @@ function CodeBlockInner({
     warmHintRef.current = { sources, packages };
   }, [files, packages]);
 
-  // Per-file read-only init code (trimmed). Init now belongs to a file,
-  // so the init drawer + the editor's line-number offset both track
-  // whichever file is the active tab.
+  // Per-file read-only init code (trimmed); the init drawer and the
+  // editor's line-number offset both track the active tab's file.
   const initForFile = useCallback(
     (filename: string) => {
       const f = workspaceFiles.find((wf) => wf.filename === filename);
@@ -609,9 +506,8 @@ function CodeBlockInner({
     [workspaceFiles],
   );
 
-  // Per-file workspace fingerprint so editing the MDX retires saved
-  // attempts against the previous starter. The filename is appended per
-  // file so each tab persists independently.
+  // Workspace fingerprint so editing the MDX retires saved attempts; the
+  // filename is appended so each tab persists independently.
   const workspaceFingerprint = useMemo(
     () =>
       workspaceFiles
@@ -635,9 +531,7 @@ function CodeBlockInner({
     [persistedKeyForFile],
   );
 
-  // Active filename + per-file buffer map. The single editor view shows
-  // the active file; swapping tabs rewrites the doc with the saved
-  // buffer for the newly-active file.
+  // Active filename + per-file buffer map; tab switches rewrite the doc.
   const [activeFilename, setActiveFilename] = useState<string>(
     workspaceFiles[0].filename,
   );
@@ -654,27 +548,21 @@ function CodeBlockInner({
     activeFilenameRef.current = activeFilename;
   }, [activeFilename]);
 
-  // Active file's init code (trimmed) + derived line metrics. Init now
-  // belongs to a file, so the read-only init drawer and the editor's
-  // line-number offset both re-render / reconfigure when the active tab
-  // changes.
+  // Active file's init code (trimmed) + derived line metrics; the init
+  // drawer and line-number offset reconfigure when the active tab changes.
   const activeTrimmedInit = initForFile(activeFilename);
   const activeHasInit = activeTrimmedInit.length > 0;
   const activeInitLineCount = activeHasInit
     ? activeTrimmedInit.split("\n").length
     : 0;
 
-  // Use the same SSR-safe pattern as Playground so the keyboard
-  // shortcut hint matches what the freshly hydrated page would show.
+  // SSR-safe (matches Playground) so the kbd hint matches hydration.
   const isMac = useSyncExternalStore(
     () => () => {},
     () => detectIsMac(),
     () => false,
   );
 
-  // Track the active docs color scheme so the CodeMirror theme can flip
-  // between IntelliJ IDEA (light) and Dracula (dark) when the user
-  // toggles the docs theme.
   const isDark = useIsDark();
   const cmThemeName = cmThemeNameFor(isDark);
 
@@ -686,15 +574,11 @@ function CodeBlockInner({
     const languageComp = new Compartment();
     const lineNumberComp = new Compartment();
 
-    // When the active file has init code, the user-editable region's line
-    // numbers continue from where that init left off so the combined code
-    // reads as a single contiguous program. The reconfigure effect below
-    // keeps the offset in sync as the active tab changes.
+    // Line numbers continue after the active file's init code; a
+    // reconfigure effect keeps the offset in sync on tab switches.
     const initial = initForFile(activeFilenameRef.current);
     const initialOffset = initial ? initial.split("\n").length : 0;
 
-    // Initial doc = active file's buffer (already includes any restored
-    // persisted content from the workspace bootstrap above).
     const initialDoc =
       fileBuffersRef.current.get(activeFilenameRef.current) ?? "";
 
@@ -712,9 +596,7 @@ function CodeBlockInner({
         lineNumberComp.of(lineNumbersWithOffset(initialOffset)),
         highlightActiveLineGutter(),
         highlightActiveLine(),
-        // Indent width tracks the adapter's formatter (see
-        // LanguageAdapter.indentWidth) so Tab inserts what the
-        // "Format code" button would produce.
+        // Indent width tracks the adapter's formatter so Tab matches Format.
         EditorState.tabSize.of(adapter.indentWidth),
         indentUnit.of(" ".repeat(adapter.indentWidth)),
         EditorView.lineWrapping,
@@ -755,10 +637,9 @@ function CodeBlockInner({
           filename: () => activeFilenameRef.current,
           contextPrefix: () => initForFile(activeFilenameRef.current),
         }),
-        // Debounce-persist the *active* file's buffer so reloads /
-        // navigation restore in-progress code. We always look up the
-        // active filename through the ref so the listener, registered
-        // once at mount, stays correct after tab switches.
+        // Debounce-persist the active file's buffer so reloads restore
+        // in-progress code; the filename is read through the ref so the
+        // mount-once listener stays correct after tab switches.
         EditorView.updateListener.of((update) => {
           if (!update.docChanged) return;
           const current = update.state.doc.toString();
@@ -779,9 +660,8 @@ function CodeBlockInner({
     lineNumberCompRef.current = lineNumberComp;
     languageCompRef.current = languageComp;
 
-    // Lazy-load the language extension so the editor mounts immediately
-    // and re-highlights once the language module resolves. Mixed-language
-    // adapters pick the mode from the active file's extension.
+    // Lazy-load the language extension; the editor mounts immediately and
+    // re-highlights once the module resolves.
     const initialMode =
       adapter.codeMirrorModeForFile?.(activeFilenameRef.current) ??
       adapter.codeMirrorMode;
@@ -823,12 +703,9 @@ function CodeBlockInner({
     }
   }, [cmThemeName]);
 
-  // Mount / re-mount the read-only init editor for the active file's
-  // init code. Init now belongs to a file, so switching tabs rebuilds
-  // this editor with the new file's init (or tears it down when the
-  // active file has none). We keep it mounted even while collapsed so
-  // the collapsed preview can show the first few lines through the
-  // gradient fade.
+  // Mount / re-mount the read-only init editor for the active file's init
+  // code (tab switches rebuild it; kept mounted while collapsed so the
+  // first lines show through the gradient fade).
   useEffect(() => {
     if (!activeHasInit) return;
     if (!initEditorHostRef.current) return;
@@ -878,10 +755,8 @@ function CodeBlockInner({
   }, [activeHasInit, activeTrimmedInit]);
 
   // ─── Multi-file tab switching ───────────────────────────────────────
-  // When the active tab changes, snapshot the outgoing file's buffer
-  // (so unsaved edits aren't lost), persist it, load the incoming file's
-  // saved buffer into the single editor view, and collapse the init
-  // drawer for the newly-active file. Mirrors ChallengeCard's pattern.
+  // Snapshot + persist the outgoing file's buffer, load the incoming one,
+  // collapse the init drawer. Mirrors ChallengeCard.
   const previousActiveRef = useRef<string>(activeFilename);
   useEffect(() => {
     const view = editorRef.current;
@@ -906,9 +781,7 @@ function CodeBlockInner({
     previousActiveRef.current = activeFilename;
   }, [activeFilename, persistActiveFile]);
 
-  // Keep the editor's line-number gutter offset in sync with the active
-  // file's init line count. Runs on mount (after the view exists) and on
-  // every tab switch.
+  // Keep the gutter offset in sync with the active file's init line count.
   useEffect(() => {
     const view = editorRef.current;
     const comp = lineNumberCompRef.current;
@@ -939,9 +812,8 @@ function CodeBlockInner({
   }, [adapter, activeFilename]);
 
   // ─── Run / Reset / Format ──────────────────────────────────────────
-  // Snapshot every file's current content. Reads the active file from
-  // the live editor (so unsaved edits propagate) and the rest from the
-  // in-memory buffers Map.
+  // Snapshot every file: the active file from the live editor (unsaved
+  // edits propagate), the rest from the in-memory buffers Map.
   const snapshotAllFiles = useCallback((): Map<string, string> => {
     const out = new Map<string, string>();
     const view = editorRef.current;
@@ -995,32 +867,22 @@ function CodeBlockInner({
   const run = useCallback(async () => {
     const filesSnapshot = snapshotAllFiles();
     const entrySource = filesSnapshot.get(resolvedEntryFilename) ?? "";
-    // Each file's init code is prepended verbatim to its buffer, every
-    // adapter resets state at the start of run(), so init effectively
-    // executes inside the same fresh scope as the user code. Authors are
-    // responsible for providing syntactically-compatible init (e.g.
-    // top-level `using`/`#include` for compiled languages).
+    // Init is prepended verbatim and every adapter resets state at run()
+    // start, so init executes in the same fresh scope as the user code.
     const code = effectiveSourceFor(resolvedEntryFilename, entrySource);
     const mySeq = ++runSeqRef.current;
 
     // Hand the preview slot back to the runtime before anything can await.
-    //
-    // React owns the auto-rendered frame; `runPreviewDocument` owns the
-    // slot's children imperatively (`host.replaceChildren`). Both are
-    // fine on their own, and a disaster interleaved: if React's removal
-    // lands after the runtime's insertion it deletes the run's frame, and
-    // if it lands after React has lost track of the node it throws. So
-    // the unmount is flushed synchronously here, while we still hold the
-    // event's call stack and the runtime has not been touched — after
-    // this line the slot is empty and imperative, which is what every
-    // adapter has always assumed. `flushSync` is the point, not an
-    // optimisation; a plain setState is a race.
+    // React owns the auto-rendered frame while the runtime owns the slot's
+    // children imperatively; if React's removal lands after the runtime's
+    // insertion it deletes the run's frame (or throws). `flushSync` is the
+    // point, not an optimisation — a plain setState is a race.
     if (showAutoPreview && autoPreviewDoc) {
       flushSync(() => setShowAutoPreview(false));
     }
 
-    // The reader is running it themselves now, so the prepopulated cells go
-    // and the panel stops calling itself a preview.
+    // The reader is running it themselves now: drop the prepopulated cells
+    // and the "preview" label.
     setOutputs([]);
     setShowingPreview(false);
     setBootCold(!isRuntimeReady(RuntimeScope.Fumadocs, adapter.id));
@@ -1030,12 +892,9 @@ function CodeBlockInner({
     setStatusMessage("Initialising runtime…");
 
     try {
-      // Kick dataset downloads in parallel with the runtime boot so a
-      // cold first Run overlaps the two waits. Usually instant: the
-      // bytes are memoised in-session and persisted in the Cache API.
-      // The no-op catch keeps an early bail-out (superseded run, boot
-      // failure) from surfacing an unhandled rejection; awaiting the
-      // promise below still observes the real error.
+      // Kick dataset downloads in parallel with the runtime boot. The no-op
+      // catch keeps an early bail-out from surfacing an unhandled rejection;
+      // awaiting the promise below still observes the real error.
       const datasetsPromise =
         blockDatasets.length > 0
           ? Promise.all(
@@ -1048,9 +907,8 @@ function CodeBlockInner({
       datasetsPromise?.catch(() => {});
 
       if (!runtimeRef.current) {
-        // The registry subscribes this callback to the in-flight boot
-        // even when a silent warm-up started it, replaying the current
-        // stage, so a Run click mid-boot shows live progress.
+        // The registry replays the in-flight boot's current stage to this
+        // callback, so a Run click mid-boot shows live progress.
         runtimeRef.current = await getSharedRuntime(
           RuntimeScope.Fumadocs,
           adapter,
@@ -1078,13 +936,10 @@ function CodeBlockInner({
       setStatus("running");
       setStatusMessage("Running…");
 
-      // Stage files into the runtime VFS: the block's remote datasets
-      // (so init/starter code can read them like local files) and, for
-      // multi-file workspaces, every workspace file, so imports /
-      // #includes / cross-class references resolve. The entry file's
-      // bytes mirror what we pass to `run()` below. Single-file blocks
-      // without datasets skip the call entirely (see ChallengeCard's
-      // `execute` for why their source must not be pre-staged).
+      // Stage remote datasets and (multi-file only) workspace files into
+      // the runtime VFS so imports resolve. Single-file blocks without
+      // datasets skip the call entirely (see ChallengeCard's `execute` for
+      // why their source must not be pre-staged).
       if (
         (isMultiFile || datasetFiles.length > 0) &&
         runtimeRef.current.prepareFileSystem
@@ -1135,10 +990,8 @@ function CodeBlockInner({
                 ? `${elapsedMs.toFixed(0)}ms`
                 : `${(elapsedMs / 1000).toFixed(2)}s`;
             setOutputs((prev) => {
-              // Collapse consecutive stdout cells into a single block
-              // (matches the JS/TS/PHP playground behaviour where one
-              // console.log per cell would otherwise produce a noisy
-              // stack of one-line cells).
+              // Collapse consecutive stdout cells so one console.log per
+              // cell doesn't stack a pile of one-line cells.
               const last = prev[prev.length - 1];
               if (
                 cell.type === "stdout" &&
@@ -1167,10 +1020,8 @@ function CodeBlockInner({
             // teardown story for runaway scripts).
             previewHost: hasPreview ? previewHostRef.current : undefined,
             previewTailwind: hasPreview && tailwind ? true : undefined,
-            // Mid-run waits (e.g. Python's deferred package set on the
-            // first run, or an on-demand `import`) show the boot notice
-            // for the duration instead of a bare "Running…" while
-            // megabytes download.
+            // Mid-run waits (e.g. Python's first-run package install) show
+            // the boot notice instead of a bare "Running…".
             onStatus: (message, preparing) => {
               if (runSeqRef.current !== mySeq) return;
               setStatusMessage(message);
@@ -1179,10 +1030,8 @@ function CodeBlockInner({
           },
         );
       } finally {
-        // Hold the running overlay for at least MIN_RUN_OVERLAY_MS so
-        // the wave animation doesn't blink in/out on sub-frame runs.
-        // Covers the throw path too so error states get the same
-        // minimum visible duration.
+        // Hold the running overlay for at least MIN_RUN_OVERLAY_MS so the
+        // wave animation doesn't blink on sub-frame runs (throw path too).
         const wait = MIN_RUN_OVERLAY_MS - (performance.now() - startedAt);
         if (wait > 0) {
           await new Promise<void>((resolve) => setTimeout(resolve, wait));
@@ -1221,33 +1070,22 @@ function CodeBlockInner({
     tailwind,
   ]);
 
-  // Keep the ref pointing at the latest handler so the editor's keymap
-  // (registered once at mount) always invokes the current closure.
+  // Keep the mount-once keymap's closure current.
   useEffect(() => {
     runRef.current = run;
   }, [run]);
 
-  // Pin this block's runtime in the registry while the block is mounted,
-  // so eviction (the per-scope LRU cap) never tears a runtime down under
-  // a block that could still Run against it, including the `runtimeRef`
-  // cached above.
+  // Pin this block's runtime while mounted so the per-scope LRU eviction
+  // never tears it down under a block that could still Run against it.
   useEffect(
     () => retainRuntime(RuntimeScope.Fumadocs, adapter.id),
     [adapter.id],
   );
 
-  // A block that is already showing its result has nothing to warm *for*.
-  //
-  // The warm-ups below exist to move a runtime download off the Run click
-  // and into the time a reader spends on the prose. That trade is only
-  // worth making when the download is the difference between seeing the
-  // result and not. Once the preview is on screen, it inverts: react's
-  // runtime is a ~3 MB esbuild-wasm fetch, and speculatively spending it on
-  // a reader who can already see the answer — and may never press
-  // anything — is precisely the cost the precompiled bundle was built to
-  // remove. It would have quietly cancelled out the whole of phase 4.
-  //
-  // Pressing Run still boots it, on demand, behind the boot notice.
+  // A block already showing its auto-rendered result has nothing to warm
+  // for: speculatively fetching react's ~3 MB esbuild-wasm runtime for a
+  // reader who may never press Run is the cost the precompiled bundle
+  // exists to remove. Pressing Run still boots it on demand.
   const skipSpeculativeWarmup = autoPreviewDoc !== null;
 
   // Warm the shared runtime as soon as the page lands (idle-scheduled,
@@ -1259,13 +1097,10 @@ function CodeBlockInner({
     warmRuntimeOnRouteLand(RuntimeScope.Fumadocs, adapter);
   }, [adapter, skipSpeculativeWarmup]);
 
-  // Warm the shared runtime when the block first scrolls into view, so the
-  // learner's first Run reuses an already-initialised runtime instead of
-  // triggering a cold (~10 s for Pyodide) download on click. Kept as the
-  // fallback for Save-Data users (the route-land warm-up skips them) and
-  // for additional languages further down the page. Best-effort:
-  // the registry dedupes warm-ups across blocks of the same language, and
-  // any failure here is swallowed so an actual Run can retry and report it.
+  // Warm the shared runtime when the block first scrolls into view; the
+  // fallback for Save-Data users (route-land warm-up skips them) and for
+  // additional languages further down the page. Best-effort and deduped by
+  // the registry; failures are swallowed so a real Run can retry.
   useEffect(() => {
     const card = cardRef.current;
     if (!card || warmedRef.current || skipSpeculativeWarmup) return;
@@ -1278,20 +1113,16 @@ function CodeBlockInner({
         void getSharedRuntime(RuntimeScope.Fumadocs, adapter)
           .then((rt) => {
             if (!runtimeRef.current) runtimeRef.current = rt;
-            // Pre-install heavy optional packages only if this block's
-            // authored code (or its explicit `packages` prop) needs
-            // them, see LanguageRuntime.warmPackages. Fire-and-forget:
-            // a Run installs on demand regardless.
+            // Pre-install heavy optional packages only if this block's code
+            // needs them (see LanguageRuntime.warmPackages). Fire-and-forget.
             const hint = warmHintRef.current;
             rt.warmPackages?.(hint.sources, { packages: hint.packages });
           })
           .catch(() => {
-            // Warm-up is best-effort; let a later Run retry and surface errors.
             warmedRef.current = false;
           });
-        // Prefetch the block's datasets alongside the runtime, so a cold
-        // Run finds both the engine and the data already local. Also
-        // best-effort: the Run path re-requests (and reports) failures.
+        // Prefetch datasets alongside the runtime; best-effort, the Run
+        // path re-requests (and reports) failures.
         for (const spec of datasetsRef.current) {
           void fetchDatasetBytes(spec.path).catch(() => {});
         }
@@ -1304,9 +1135,8 @@ function CodeBlockInner({
 
   const reset = useCallback(() => {
     runSeqRef.current++;
-    // Restore every file's buffer to its starter and wipe persisted
-    // copies. Then push the active file's starter into the editor so
-    // the user sees the reset immediately.
+    // Restore every buffer to its starter, wipe persisted copies, and push
+    // the active file's starter into the editor.
     for (const f of workspaceFiles) {
       fileBuffersRef.current.set(f.filename, f.starterCode);
       clearPersistedCode(persistedKeyForFile(f.filename));
@@ -1320,27 +1150,21 @@ function CodeBlockInner({
         changes: { from: 0, to: view.state.doc.length, insert: activeStarter },
       });
     }
-    // The dispatch above re-fires the persist listener and schedules a
-    // write of the starter contents. Cancel it AFTER dispatching so
-    // the localStorage entries stay gone.
+    // The dispatch above re-fires the persist listener; cancel its
+    // scheduled write AFTER dispatching so the localStorage entries stay
+    // gone.
     if (persistSaveTimerRef.current !== null) {
       window.clearTimeout(persistSaveTimerRef.current);
       persistSaveTimerRef.current = null;
     }
-    // Reset puts the block back to how it arrived, which includes its
-    // output: the starter code is restored, and the prepopulated cells are
-    // exactly what that code prints, so showing them again is the honest
-    // state rather than an empty panel.
+    // Reset restores the starter, so the prepopulated cells (exactly what
+    // the starter prints) come back with it.
     setOutputs(seedOutputs());
     setShowingPreview(prepopulated !== null);
-    // Reset also tears down the live preview, removing the iframe
-    // kills its document (scripts, timers, listeners) immediately.
-    // Clearing the host first and re-showing after is what keeps the two
-    // owners from overlapping: the DOM is empty when React re-inserts
-    // its frame, which is the same handover the Run path makes in
-    // reverse. The auto-preview renders the starter, and the starter is
-    // what Reset just restored, so bringing it back is the honest state
-    // for the same reason the prepopulated cells come back with it.
+    // Tear down the live preview (removing the iframe kills its document
+    // immediately); clearing the host before re-showing the auto-preview
+    // keeps the two DOM owners from overlapping — the reverse of the Run
+    // path's handover.
     previewHostRef.current?.replaceChildren();
     setShowAutoPreview(true);
     setStatus("idle");
@@ -1401,11 +1225,8 @@ function CodeBlockInner({
     }
   }, [adapter, toastManager]);
 
-  // Copy the current contents of the user-editable editor (not the init
-  // block) to the clipboard. Mirrors the Playground's editor copy
-  // affordance, including the legacy `execCommand` fallback for browsers
-  // / contexts where the async Clipboard API is unavailable.
-  // On success or failure, fires a toast identical to the playground's.
+  // Copy the user-editable editor's contents (not the init block), with the
+  // legacy `execCommand` fallback for contexts without the Clipboard API.
   const copyEditor = useCallback(async () => {
     const code = editorRef.current?.state.doc.toString() ?? "";
     try {
@@ -1437,18 +1258,11 @@ function CodeBlockInner({
 
   const isBusy = status === "loading" || status === "running";
 
-  // Test-only capture seam, for `scripts/capture-browser-outputs.mjs`.
-  //
-  // The languages that only run in a browser — java, csharp, web, react, php —
-  // and R, whose output is HTML tables and images rather than text, cannot be
-  // prepopulated by a Node runner, so their blocks show an empty panel. The
-  // capture drives a real page with Playwright and reads the cells off here
-  // rather than off the DOM, because a `plot` cell's figure JSON has already
-  // been handed to Plotly by the time it is markup and an `image` cell's
-  // bytes are a base64 attribute.
-  //
-  // Nothing in production creates this global, so for a reader the effect is
-  // a closure that reads one undefined property and returns.
+  // Test-only capture seam for `scripts/capture-browser-outputs.mjs`, which
+  // drives a real page with Playwright for browser-only languages and reads
+  // the cells here rather than off the DOM (a plot cell's figure JSON is
+  // already inside Plotly by the time it's markup). Nothing in production
+  // creates this global.
   useEffect(() => {
     const sink = (window as unknown as { __blockCapture?: unknown[] })
       .__blockCapture;
@@ -1470,18 +1284,13 @@ function CodeBlockInner({
     status === "loading",
   );
 
-  // Show the boot notice during a cold boot (status "loading") and during
-  // a mid-run blocking wait (e.g. installing packages mid-run, while
-  // status is "running"). The mid-run case has no runtime download and no
-  // determinate fraction, just the loader + the wait message.
+  // Boot notice shows during a cold boot and during mid-run blocking waits
+  // (which have no download/fraction, just the loader + message).
   const showBootNotice =
     status === "loading" || (status === "running" && midRunPreparing);
 
-  // Header readouts for the merged output panel. Cells stream in during
-  // the run, each stamped with the elapsed time at its arrival, the last
-  // one is the closest to the run's total. Only text is sensibly
-  // copyable: skipping image/plot content avoids dumping a raw base64
-  // PNG / Plotly JSON blob behind a misleading "Copy" affordance.
+  // Header readouts. The last cell's elapsed is closest to the run's total;
+  // only text is copyable (no base64 PNG / Plotly JSON blobs behind "Copy").
   const outputElapsed = outputs[outputs.length - 1]?.elapsed ?? "";
   const outputCopyText = outputs
     .filter((c) => c.type === "stdout" || c.type === "stderr")
@@ -1496,12 +1305,8 @@ function CodeBlockInner({
       className={`${challengeStyles.card} ${styles.outputScope}`}
       aria-label={`${adapter.runtimeInfo.language} executable code block`}
       data-testid="code-block"
-      // Lets a sweep select only the blocks it can actually run. Without it
-      // the courseware-wide e2e run is all-or-nothing: it would re-run the
-      // ~1700 Python blocks the Node sweeps already cover far more cheaply,
-      // just to reach the browser-only languages sharing their pages.
-      // `ChallengeCard` has carried the equivalent `data-adapter-id` since it
-      // was written.
+      // Lets the e2e sweeps select only the blocks they can run instead of
+      // re-running every Python block to reach the browser-only languages.
       data-adapter={adapter.id}
       data-expect-error={expectError ? "true" : undefined}
     >
@@ -1525,10 +1330,7 @@ function CodeBlockInner({
         </div>
       </div>
 
-      {/* ── File tab bar ──
-            Shown for multi-file workspaces, or when a single-file block
-            opts in via `showFileTabBar`. The init drawer (which now
-            belongs to the active file) renders below it. */}
+      {/* ── File tab bar (multi-file, or single-file opt-in) ── */}
       {showTabs && (
         <div
           className={challengeStyles.fileTabBar}
@@ -1561,10 +1363,7 @@ function CodeBlockInner({
         </div>
       )}
 
-      {/* ── Init code (active file) ──
-            The init drawer belongs to the active file and renders below
-            the file tab bar. A light top border is added only when no
-            file tab bar sits above it to supply the divider. */}
+      {/* ── Init code (active file) ── */}
       {activeHasInit && (
         <div
           className={`${challengeStyles.initWrap}${
@@ -1596,9 +1395,8 @@ function CodeBlockInner({
               </span>
             </button>
           ) : (
-            // Short init code isn't collapsible, but it still needs a
-            // label so the learner knows the first block is read-only
-            // setup code rather than part of the editable snippet.
+            // Short init isn't collapsible but still needs a label marking
+            // it as read-only setup.
             <div className={challengeStyles.initHeaderStatic}>
               <Lock
                 size={11}
@@ -1654,9 +1452,7 @@ function CodeBlockInner({
         </div>
       )}
 
-      {/* ── Editor ──
-            Gets a light top border only when nothing above it (file tab
-            bar or the active file's init drawer) already supplies a
+      {/* ── Editor ── light top border only when nothing above supplies a
             divider. */}
       <div
         className={`${challengeStyles.editor}${
@@ -1791,11 +1587,8 @@ function CodeBlockInner({
       </div>
 
       {hasPreview && (
-        // Live page preview for the web/react adapters. Always mounted
-        // so the slot element exists before the first run; the runtime
-        // swaps a sandboxed iframe into the slot on every run, and CSS
-        // renders a placeholder while the slot is still empty — at the
-        // same height it will have once filled, so the swap moves nothing.
+        // Live page preview: always mounted so the slot exists before the
+        // first run; the runtime swaps a sandboxed iframe in on every run.
         <div className={challengeStyles.previewPanel} data-testid="web-preview">
           <div className={challengeStyles.previewHeader}>
             <span className={challengeStyles.previewLabel}>Preview</span>
@@ -1805,13 +1598,11 @@ function CodeBlockInner({
             style={previewStageStyle(previewHeight)}
             ref={previewHostRef}
           >
-            {/* The auto-rendered starter, present in the server's HTML so
-                it paints with the page. React owns this frame until the
-                first Run, which flushes it out and hands the slot to the
-                runtime — see `run`. `srcDoc` (not innerHTML) so React
-                does the attribute escaping; `loading="lazy"` so a block
-                nobody scrolls to costs nothing, matching how the
-                prepopulated charts are fetched. */}
+            {/* The auto-rendered starter, in the server's HTML so it paints
+                with the page. React owns this frame until the first Run
+                hands the slot to the runtime (see `run`). `srcDoc` so React
+                escapes attributes; `loading="lazy"` so an unscrolled block
+                costs nothing. */}
             {showAutoPreview && autoPreviewDoc && (
               <iframe
                 ref={autoPreviewFrameRef}
@@ -1827,21 +1618,15 @@ function CodeBlockInner({
       )}
 
       {(outputs.length > 0 || isBusy || reservesOutput) && (
-        // Same output panel as the challenge card (its styles are shared
-        // through ChallengeCard.module.css): an accent-bar header with the
-        // elapsed time, and one clean body that stacks the run's segments
-        // in chronological order, no per-segment chrome.
-        //
-        // `reservesOutput` keeps it mounted from the server's HTML for a
-        // block whose auto-preview is about to print, so the cells land in
-        // a box that is already the right size instead of creating one.
+        // Same output panel as the challenge card. `reservesOutput` keeps it
+        // mounted from the server's HTML so the auto-preview's cells land in
+        // a box that is already the right size.
         <div
           className={`${challengeStyles.outputPanel}${isBusy ? ` ${styles.outputRunning}` : ""}`}
           aria-live="polite"
         >
-          {/* The "Output" header is hidden while the boot notice (loading
-              animation) is showing, there's no output yet, just setup.
-              It returns the moment user code actually runs. */}
+          {/* "Output" header hidden while the boot notice shows; it returns
+              once user code actually runs. */}
           {!showBootNotice && (
             <div
               className={`${challengeStyles.outputHeader} ${challengeStyles.outputHeaderSpaced}`}
@@ -1856,15 +1641,10 @@ function CodeBlockInner({
               >
                 {showingPreview ? "Output preview" : "Output"}
               </span>
-              {/* The label is where the honesty lives: this output came from
-                  running the code when the page was built, not from the
-                  reader's browser, so a block using randomness or the clock
-                  will print something else when they press Run. Every
-                  prepopulated panel says "preview", not just the ones we
-                  suspect are non-deterministic — sorting one from the other
-                  is a losing game, and one label that is always true beats a
-                  cleverer one that is sometimes wrong. The popover carries
-                  the "why", for whoever wants it. */}
+              {/* Every prepopulated panel says "preview" (built at page
+                  build time, may differ from a live run) — one label that is
+                  always true beats a cleverer one that is sometimes wrong.
+                  The popover carries the why. */}
               {showingPreview && (
                 <Popover.Root>
                   <Popover.Trigger
@@ -1947,9 +1727,8 @@ function CodeBlockInner({
               ))}
             </div>
           )}
-          {/* No "Running…" placeholder while output is empty, a centered
-              spinner signals the run is in progress. Suppressed during the
-              boot notice, which carries its own loader. */}
+          {/* Centered spinner instead of a "Running…" placeholder; suppressed
+              while the boot notice carries its own loader. */}
           {isBusy && !showBootNotice && (
             <div className={challengeStyles.runSpinner} aria-hidden="true">
               <DiamondSpinner size={28} label="Running…" />
@@ -1962,10 +1741,8 @@ function CodeBlockInner({
   );
 }
 
-// Shared clipboard helper used by the per-output-cell copy buttons.
-// Mirrors the editor's `copyEditor` fallback path so both code paths
-// behave identically across browsers. Resolves false on failure so the
-// caller can surface feedback instead of appearing to silently succeed.
+// Clipboard helper for the output-cell copy buttons; mirrors `copyEditor`'s
+// fallback path. Resolves false on failure so the caller can surface it.
 async function copyToClipboard(text: string): Promise<boolean> {
   try {
     if (navigator.clipboard?.writeText) {
@@ -1984,24 +1761,15 @@ async function copyToClipboard(text: string): Promise<boolean> {
     }
     return true;
   } catch {
-    // Non-fatal, see CodeBlock.copyEditor for rationale.
     return false;
   }
 }
 
-/** One chronological piece of a run's output, rendered with the challenge
- *  card's output-panel styles so both surfaces read identically. Keeps the
- *  `data-cell-type` attribute the per-cell rendering used to carry, so
- *  tests and tooling can keep counting stdout/stderr/html/image/plot
- *  outputs. */
 /**
  * A prepopulated Plotly figure, fetched when it nears the viewport.
- *
- * Deferring on visibility rather than on mount matters here: the output
- * panels are server-rendered, so every chart on a lesson would otherwise
- * fetch its figure the moment the page hydrates, which is the cost this
- * indirection exists to avoid. `PlotlyChart` then loads plotly.js itself,
- * so nothing about a chart the reader never reaches is downloaded.
+ * Deferring on visibility (not mount) keeps every chart on a lesson from
+ * fetching at hydration; `PlotlyChart` then loads plotly.js itself, so a
+ * chart the reader never reaches downloads nothing.
  */
 function LazyPlotCell({ src }: { src: string }) {
   const hostRef = useRef<HTMLDivElement | null>(null);
@@ -2010,8 +1778,7 @@ function LazyPlotCell({ src }: { src: string }) {
   useEffect(() => {
     const el = hostRef.current;
     if (!el || typeof IntersectionObserver === "undefined") {
-      // No observer (older browser, jsdom): fetch straight away rather than
-      // leave the panel permanently blank.
+      // No observer (older browser, jsdom): fetch straight away.
       void fetch(src)
         .then((r) => r.json())
         .then(setFigure)
@@ -2028,8 +1795,7 @@ function LazyPlotCell({ src }: { src: string }) {
           .then((fig) => {
             if (!cancelled) setFigure(fig as PlotlyFigure);
           })
-          // A figure that fails to load leaves an empty slot, which is the
-          // same thing the reader saw before any of this existed.
+          // A failed load leaves an empty slot.
           .catch(() => {});
       },
       { rootMargin: "400px" },
@@ -2054,11 +1820,9 @@ function LazyPlotCell({ src }: { src: string }) {
 
 function OutputSegment({ cell }: { cell: OutputCell }) {
   if (cell.type === "html") {
-    // Same trust assumption as the main playground: HTML cells are
-    // produced by the embedded runtime executing code the user
-    // themselves typed in this very widget. `not-prose` keeps the
-    // docs' prose typography (enlarged Inter, table margins) from restyling
-    // the dataframe markup when the block sits inside MDX content.
+    // Same trust assumption as the playground: HTML cells come from code
+    // the user typed in this very widget. `not-prose` keeps the docs'
+    // prose typography from restyling the dataframe markup.
     return (
       <div
         className={`${challengeStyles.outCellHtml} not-prose`}
@@ -2068,9 +1832,8 @@ function OutputSegment({ cell }: { cell: OutputCell }) {
     );
   }
   if (cell.type === "image") {
-    // A run's own figure arrives as base64 and is drawn from memory; a
-    // prepopulated one carries a `src` instead and is fetched lazily, so a
-    // reader who never scrolls this far pays nothing for it.
+    // A run's own figure arrives as base64; a prepopulated one carries a
+    // `src` and is fetched lazily.
     return (
       <div className={challengeStyles.outCellImage} data-cell-type="image">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -2086,11 +1849,8 @@ function OutputSegment({ cell }: { cell: OutputCell }) {
   }
   if (cell.type === "plot") {
     // A run's own figure arrives parsed; a prepopulated one carries a `src`
-    // and is fetched when it scrolls into view. Figure JSON is the single
-    // heaviest thing these panels hold — 88% of the manifest's inline bytes
-    // before this, and 146 kB to 866 kB on the charts that had to be
-    // dropped entirely — so it is kept out of the page the same way the
-    // images are.
+    // and is fetched on scroll-in. Figure JSON is the heaviest thing these
+    // panels hold, so it stays out of the page like the images do.
     if (cell.plot) {
       return (
         <div className={challengeStyles.outCellPlot} data-cell-type="plot">

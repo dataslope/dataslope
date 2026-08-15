@@ -1,18 +1,11 @@
 "use client";
 
 /**
- * Shell-level state for the builders' live preview column, mirroring the
- * design handoff's top-bar controls:
- *
- *   - `previewOpen`: the "Live Preview" switch — shows/hides the side-by-side
- *     preview column inside the builder pages.
- *   - `fullPreview`: the expand button — hides the form and lets the preview
- *     take the full content width. Turning it on forces the preview open;
- *     toggling the switch off exits full preview too (same coupling as the
- *     design's togglePreview/toggleFullPreview).
- *
- * It lives in the shell (not the builder pages) because the toggles render in
- * the top bar while the columns render inside each builder's content.
+ * Shell-level state for the builders' live preview column. `previewOpen`
+ * shows/hides the side-by-side column; `fullPreview` hides the form instead.
+ * Turning full preview on forces the preview open, and switching the preview
+ * off exits full preview. Lives in the shell because the toggles render in
+ * the top bar while the columns render inside each builder.
  */
 
 import { createContext, useCallback, useContext, useMemo, useState } from "react";

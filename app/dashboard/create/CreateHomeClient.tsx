@@ -1,12 +1,9 @@
 "use client";
 
 /**
- * The /create hub ("My Creations"): the signed-in member's challenges &
- * questions and their quiz sets, in the design's two-table layout with
- * per-row view / copy-link / edit / delete. Auth gates actions, not content
- * (the repo convention), so the page itself stays static and this component
- * reads the session client-side via useSession(). Data comes from the real
- * /api/custom endpoints; chrome comes from the /create layout's Studio shell.
+ * The /create hub ("My Creations"): the member's items and quiz sets with
+ * per-row view / copy-link / edit / delete. The page stays static; this
+ * component reads the session client-side and data from /api/custom.
  */
 
 import { useCallback, useEffect, useMemo, useState } from "react";

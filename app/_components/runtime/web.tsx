@@ -22,19 +22,13 @@ import {
 } from "./webPreview";
 import { TAILWIND_BROWSER_CDN } from "./cdn";
 
-// The web (HTML/CSS/JS) playground runs on native browser primitives,
-// no downloaded runtime at all. Each Run composes the workspace's entry
-// document (inlining `<link>`/`<script src>` references to sibling
-// tabs), injects a console bridge, and swaps the result into a
-// sandboxed `<iframe srcdoc>` rendered by the surface's preview slot.
-// Console output and uncaught errors stream back over postMessage as
-// ordinary stdout/stderr cells. See runtime/webPreview.ts for the
-// architecture and the sandboxing rules.
+// The web (HTML/CSS/JS) playground runs on native browser primitives — no
+// downloaded runtime. Each Run composes the entry document, injects a
+// console bridge, and swaps it into a sandboxed `<iframe srcdoc>`; see
+// runtime/webPreview.ts for the architecture and sandboxing rules.
 
-// The CodePen-style default workspace: three panes, three languages,
-// implicit composition. The HTML pane is a body fragment, the CSS and
-// JS tabs apply automatically (see composeWebDocument), no <link> or
-// <script src> boilerplate required.
+// CodePen-style default workspace: three panes, implicit composition
+// (see composeWebDocument), no <link>/<script src> boilerplate.
 const DEFAULT_HTML = `<div class="card">
   <h1>Hello, Web Playground!</h1>
   <p>
@@ -358,9 +352,7 @@ button.addEventListener("click", () => {
 ];
 
 const PACKAGES: PackageInfo[] = [
-  // No installable packages, the preview is the platform. External
-  // libraries load the way real pages load them: a `<script src>` /
-  // `<link>` tag pointing at a CDN (see the Tailwind example).
+  // No installable packages; external libraries load via CDN tags.
 ];
 
 // Text extensions staged for composition & completion; anything else is
@@ -390,9 +382,8 @@ class WebPreviewRuntime implements LanguageRuntime {
     this.stagedBinary = binary;
   }
 
-  /** JS tabs get real TypeScript-service completions (allowJs
-   *  inference), matching the JavaScript adapter; HTML/CSS tabs rely on
-   *  the CodeMirror language packages' built-in completion sources. */
+  /** JS tabs get TypeScript-service completions; HTML/CSS tabs rely on
+   *  CodeMirror's built-in completion sources. */
   async complete(request: CompletionRequest): Promise<CompletionResult> {
     const filename = request.filename ?? "";
     if (!/\.(js|mjs|cjs)$/i.test(filename)) {
@@ -414,10 +405,8 @@ class WebPreviewRuntime implements LanguageRuntime {
     emit: EmitOutput,
     options?: RunOptions,
   ): Promise<void> {
-    // Consume-and-clear the staged snapshot: surfaces that stage
-    // (multi-file) always re-stage before each run, and surfaces that
-    // don't (single-file blocks sharing this scope's runtime) must not
-    // inherit another block's files.
+    // Consume-and-clear the staged snapshot so single-file blocks sharing
+    // this runtime can't inherit another block's files.
     const textFiles = this.stagedText;
     const binaryFiles = this.stagedBinary;
     this.stagedText = new Map();
@@ -450,22 +439,12 @@ function findHtmlEntryFiles(
 }
 
 /**
- * The document this workspace renders, composed from its sources alone
- * (see `LanguageAdapter.composeStaticPreview`). Pure, Node-safe and
- * deterministic, which is what lets `<CodeBlock>` put the result in the
- * page's HTML instead of waiting for a Run.
- *
- * It reaches the same `composeWebDocument` a real Run does, with the
- * same file map `prepareFileSystem` would have staged, so a block's
- * preview and its first Run agree about the page by construction rather
- * than by two implementations staying in step;
- * `__tests__/webPreview.test.ts` pins that.
- *
- * The bridge is included, so the frame's console output reaches the
- * block's own output panel rather than only the browser's devtools — but
- * its token is supplied by the caller and derived from the block, never
- * generated here. A random token would differ between the server's
- * render and the browser's, and this document has to hydrate.
+ * The document this workspace renders, composed from its sources alone —
+ * pure, Node-safe and deterministic, so `<CodeBlock>` can put it in the
+ * page's HTML. Goes through the same `composeWebDocument` as a real Run,
+ * so preview and first Run agree by construction (webPreview.test.ts pins
+ * that). The bridge token is supplied by the caller and derived from the
+ * block, never random: this document must hydrate identically.
  */
 function composeStaticWebPreview(
   sources: { filename: string; source: string }[],
@@ -474,10 +453,8 @@ function composeStaticWebPreview(
   const entry =
     sources.find((f) => f.filename === options.entryFilename) ?? sources[0];
   if (!entry) return null;
-  // Mirrors the run path: `prepareFileSystem` stages every workspace
-  // file, entry included, and sorts them into text and binary by
-  // extension. Authored blocks carry no uploads, so the binary half is
-  // empty here and `<img src>` references stay as written.
+  // Mirrors the run path's staging; authored blocks carry no uploads, so
+  // the binary half is empty and `<img src>` references stay as written.
   const textFiles = new Map<string, string>();
   for (const f of sources) {
     if (TEXT_FILE_RE.test(f.filename)) textFiles.set(f.filename, f.source);
@@ -526,31 +503,22 @@ export const webAdapter: LanguageAdapter = {
   ],
   exportBaseFilename: "index",
   defaultFileExtension: "html",
-  // Fresh workspaces open as the CodePen trio with one always-visible
-  // editor per pane (the playground's split view).
+  // Fresh workspaces open as the CodePen trio, one editor per pane.
   defaultWorkspace: [
     { filename: "index.html", content: DEFAULT_HTML },
     { filename: "styles.css", content: DEFAULT_CSS },
     { filename: "script.js", content: DEFAULT_JS },
   ],
   splitEditors: true,
-  // The split panes already show every file; a separate file tree with
-  // nowhere to "open" files into would only confuse.
+  // The split panes already show every file; a file tree would only confuse.
   hideFilesPane: true,
-  // The HTML/CSS/JS playground is a fixed index.html / styles.css /
-  // script.js trio, hide the "+ New file" affordances so the workspace
-  // stays the CodePen-style three-pane shape.
+  // Fixed trio: hide "+ New file" so the three-pane shape stays put.
   disableAddFile: true,
-  // ...and for the same reason no file may be closed, deleted,
-  // duplicated, or renamed. This adapter has no Files pane, which is the
-  // only thing that reopens a closed tab, so a closed file would be
-  // unreachable in tabbed mode. Renaming is out for a related reason:
-  // the trio references itself by name (styles.css and script.js are
-  // pulled in by index.html, which is also the preview entry), so a
-  // rename breaks the composed page without saying so.
+  // No close/delete/duplicate/rename either: with no Files pane a closed
+  // file would be unreachable, and the trio references itself by name, so
+  // a rename silently breaks the composed page.
   lockWorkspaceFiles: true,
-  // The Run button runs the composed preview (index.html), not a named
-  // file, so show a bare "Run" rather than "Run index".
+  // Run executes the composed preview, not a named file: bare "Run" label.
   simpleRunLabel: true,
   findEntryFiles: findHtmlEntryFiles,
   packagesFooter: (

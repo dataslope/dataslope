@@ -47,11 +47,8 @@ function MonoIcon({ id, size = 22 }: { id: string; size?: number }) {
   return <Icon size={Math.round(size * factor)} aria-hidden="true" />;
 }
 
-/** Steps through `count` on an interval, after an initial `delay`. A count of
- *  1 stays put (no animation), and rotation only runs while `active` (i.e.
- *  the section is on screen and the user hasn't asked for reduced motion).
- *  Shared by the rotating icon and its label so they always show the same
- *  language. */
+/** Steps through `count` on an interval after `delay`; rotation only runs
+ *  while `active`. Shared by icon and label so they show the same language. */
 function useRotatingIndex(
   count: number,
   delay = 0,
@@ -100,10 +97,9 @@ function SwapIcon({ id }: { id: string }) {
 function SwapLabel({ name, align }: { name: string; align: "left" | "right" }) {
   return (
     <span
-      // Desktop only, on mobile the names are hidden to keep the diagram
-      // tight. The fixed width keeps each circle's position constant as the
-      // label cross-fades between names of different lengths, so the beams
-      // (which are only recomputed on container resize) stay aligned.
+      // Desktop only. The fixed width keeps each circle's position constant
+      // across cross-fades so the beams (recomputed only on container
+      // resize) stay aligned.
       className={cn(
         "hidden w-28 whitespace-nowrap text-sm font-medium text-[var(--ds-gray-600)] sm:block dark:text-[var(--ds-gray-300)]",
         align === "right" ? "text-right" : "text-left",
@@ -130,10 +126,8 @@ interface NodeItem {
   name: string;
 }
 
-/** A language node: its circle plus a rotating label. `side` decides which
- *  edge of the diagram it lives on, left-column labels sit to the left of the
- *  circle (right-aligned), right-column labels to the right (left-aligned).
- *  `active` gates the rotation (false while the section is offscreen). */
+/** A language node: circle + rotating label. `side` picks the diagram edge
+ *  and label alignment; `active` gates the rotation while offscreen. */
 const BeamNode = forwardRef<
   HTMLDivElement,
   {
@@ -176,10 +170,8 @@ BeamNode.displayName = "BeamNode";
 
 export function BeamSection() {
   const containerRef = useRef<HTMLDivElement>(null);
-  // Icon/label rotation drives AnimatePresence cross-fades on eight nodes
-  // every 2.8s forever, pause it while the diagram is offscreen, and skip
-  // it under prefers-reduced-motion. (The beams themselves pause in
-  // AnimatedBeam, and the FlickeringGrid backdrop already self-gates.)
+  // Pause the rotation offscreen and under prefers-reduced-motion (beams
+  // and the FlickeringGrid backdrop gate themselves).
   const sectionInView = useInView(containerRef as RefObject<Element>);
   const reducedMotion = useReducedMotion();
   const rotationActive = sectionInView && !reducedMotion;

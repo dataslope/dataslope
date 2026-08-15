@@ -1,15 +1,8 @@
 import { test, expect, type Locator } from "@playwright/test";
 import { discoverPages } from "./_discoverPages";
 
-// Runs every <SqlCodeBlock> on each /fumadocs-dev/sql-code-blocks-<dialect> demo
-// page and asserts the query executes without the block entering its
-// "error" status. SQL blocks render via @sqlite.org/sqlite-wasm (in
-// process), DuckDB-WASM and PGlite, all client-side.
-//
-// Each <SqlCodeBlock> exposes:
-//   - root:   [data-testid="sql-code-block"] with [data-run-status]
-//             ("idle"|"loading"|"running"|"ready"|"error")
-//   - run:    [data-testid="sql-codeblock-run"] (disabled while busy)
+// Runs every <SqlCodeBlock> on each demo page and asserts the query executes
+// without the block entering "error" status. All engines run client-side.
 
 // Default: the per-dialect demo pages. COURSEWARE=1 sweeps every docs page
 // that embeds a <SqlCodeBlock> across all courses (long, opt-in CI run).

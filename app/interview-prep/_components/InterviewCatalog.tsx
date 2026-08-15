@@ -1,38 +1,10 @@
 /**
- * The `/interview-prep` catalog body: two columns of role-track rows (each a
- * centred banner, a short description of what the track drills, its topic
- * count, and a "Start track" link), and a footer line with the totals and a
- * pointer to /courses.
- *
- * The centered page header lives in the server page
- * (`app/interview-prep/page.tsx`), mirroring how `/courses` splits its header
- * from `CoursesCatalog`.
- *
- * ── No cards ───────────────────────────────────────────────────────────────
- *
- * This used to be the "4a, riso cards" mockup: each track sat in a bordered
- * surface with a hatched second-print shadow behind it, a full-bleed 3:2
- * banner across its top, and a role glyph in a ring straddling the banner's
- * edge. Six of those on one screen meant the artwork and the frames were doing
- * all the talking and the six *sentences* that actually tell a visitor which
- * track is theirs were the quietest thing on the page.
- *
- * Now each track is a borderless row: the banner centred above its text at
- * two thirds of the row's width, so the artwork is legible at the size it was
- * drawn for without outweighing the sentence under it, and the frames and the
- * second-print shadow stay gone. The glyphs went with the cards — they were a
- * device for straddling the banner edge, and above a banner of the same role
- * they were a second icon for one idea.
- *
- * The track list (title, topics, links) is content-driven, passed in from
- * `getInterviewTracks` (see `lib/interviewCatalog.ts`). The per-role
- * presentation, description, glyph, and banner illustration, is the design
- * layer and lives here in `PRESENTATION`, keyed by role slug. A role with no entry
- * still renders (glyph + banner fall back), so adding a track in content never
- * breaks the page.
- *
- * No client interactivity, the hover affordances are pure CSS, so this stays a
- * server component (the banners read the build-time image manifest directly).
+ * The `/interview-prep` catalog body: role-track rows plus a footer with
+ * totals and a pointer to /courses; the page header lives in the server page.
+ * Track data comes from `getInterviewTracks` (lib/interviewCatalog.ts); the
+ * per-role presentation lives in `PRESENTATION`, keyed by role slug — a role
+ * with no entry still renders, so adding a track in content never breaks the
+ * page. Hover affordances are pure CSS, keeping this a server component.
  */
 import { Layers } from "lucide-react";
 import Link from "@/app/_components/Link";
@@ -40,10 +12,7 @@ import imageManifest from "@/lib/generated/images";
 import type { InterviewTrack } from "@/lib/interviewCatalog";
 
 interface Presentation {
-  /** Short paragraph shown under the role name, the card's whole body now
-   *  that the topic list is gone (see `TrackCard`). Written to name what the
-   *  track actually drills, so a reader gets the same signal the list used to
-   *  carry in a few lines instead of nine. Clamped to three lines, so the
+  /** Short paragraph under the role name. Clamped to three lines, so the
    *  useful detail belongs in the first sentence. */
   description: string;
   /** Image slug for the 3:2 card banner. */
@@ -98,39 +67,20 @@ const MIME: Record<string, string> = {
   avif: "image/avif",
 };
 
-/** The track's illustration, centred above its row's copy at two thirds of the
- *  row width. Served WebP-first with a raster fallback from the build-time
- *  image manifest (the same source `<Figure>` reads).
- *
- *  The 3:2 box is kept — six thumbnails the same shape is what makes this read
- *  as a list rather than a scrapbook — but the art no longer fills it exactly.
- *  Every render starts 1536x1024, and then `scripts/trim-cutouts.mjs` crops
- *  away every transparent margin, so a banner arrives at whatever shape its own
- *  artwork is and `object-cover` would answer that by cropping, quietly cutting
- *  the marmot out of its own frame. `object-contain` keeps the whole artwork
- *  and letterboxes instead — invisibly, the art being transparent — and it
- *  paints *larger* than an untrimmed version would, since the blank the frame
- *  used to carry inside the box is gone. That is the whole point of cropping a
- *  thumbnail on both axes: the box is fixed, so every margin removed from the
- *  file is width the subject gets back. The fixed 3:2 box is what keeps the
- *  six rows the same height now that the banner sits above the copy rather
- *  than beside it: without it, six differently-cropped files would each set
- *  their own row height.
- *
- *  `sizes` describes the painted width so the browser can pick the cheap
- *  decode: two thirds of the row, which is two thirds of the screen on a
- *  phone and a third of the grid on a desktop, where rows sit two to a line. */
+/** Track illustration, WebP-first with a raster fallback from the build-time
+ *  image manifest. `scripts/trim-cutouts.mjs` crops transparent margins, so
+ *  banners arrive at arbitrary aspect ratios: `object-contain` in a fixed 3:2
+ *  box keeps the whole artwork visible and all rows the same height
+ *  (`object-cover` would crop the subject). `sizes` matches the painted
+ *  width, about two thirds of the row. */
 function TrackThumb({ slug, alt }: { slug: string; alt: string }) {
   const entry = imageManifest[slug];
   if (!entry) return null;
   const fallback = entry.formats[entry.formats.length - 1];
   const sources = entry.formats.slice(0, -1);
   return (
-    // Two thirds of the row rather than all of it: at full width the banner
-    // outweighed the sentence that actually tells a visitor whether the track
-    // is theirs. `block` is stated rather than relied on — a <picture> is
-    // inline by default and is only blockified here because it happens to be a
-    // flex item, which is not a property of this element worth depending on.
+    // 65% so the banner doesn't outweigh the copy; <picture> is inline by
+    // default, so `block` is stated explicitly.
     <picture className="mx-auto block w-[65%]">
       {sources.map((ext) => (
         <source key={ext} srcSet={`/images/${slug}.${ext}`} type={MIME[ext]} sizes="(min-width: 640px) 30vw, 65vw" />
@@ -143,13 +93,8 @@ function TrackThumb({ slug, alt }: { slug: string; alt: string }) {
         loading="lazy"
         decoding="async"
         sizes="(min-width: 640px) 30vw, 65vw"
-        // The row's hover affordance on the artwork itself, matched to the
-        // `/courses` thumbnail so the two catalogs answer a pointer the same
-        // way. A transform rather than a width: the 3:2 box keeps its measured
-        // size, so the art paints slightly larger over the row's padding and
-        // the gap beneath it without moving a single line of copy — which is
-        // the only way six rows on a grid can grow without their neighbours
-        // shifting.
+        // Hover matched to the /courses thumbnail; a transform (not a width)
+        // so the art grows without shifting any copy.
         className="block aspect-[3/2] w-full rounded-xl object-contain transition-transform duration-200 group-hover:scale-105"
       />
     </picture>
@@ -157,62 +102,38 @@ function TrackThumb({ slug, alt }: { slug: string; alt: string }) {
 }
 
 /**
- * One track: thumbnail, name, what it drills, and the two facts a visitor
- * chooses on (how much is in there, and where the link goes).
- *
- * Nothing paints a surface, at rest or on hover: the row answers the pointer
- * through its own content instead, with the thumbnail scaling, the title going
- * blue and the arrow sliding. `-mx-3 px-3` stays for the click target, which
- * still reaches past the text on both sides.
+ * One track row: thumbnail, name, description, topic count, link. No surface
+ * at rest or on hover — the content answers the pointer. `-mx-3 px-3` widens
+ * the click target past the text.
  */
 function TrackRow({ track }: { track: InterviewTrack }) {
   const p = PRESENTATION[track.slug];
   return (
     <Link
       href={track.url}
-      // Six-row index, don't viewport-prefetch every track (same opt-out the
-      // courses grid uses).
+      // Don't viewport-prefetch every track (same opt-out as the courses grid).
       prefetch={false}
-      // Stacked, not a thumbnail column: the banner sits centred above the
-      // copy. Same shape at every breakpoint, and `gap-5` is the space beneath
-      // it — enough that the centred art reads as its own block rather than as
-      // something the title is crowding.
       className="group -mx-3 flex flex-col gap-5 rounded-2xl px-3 py-4"
     >
       {p ? <TrackThumb slug={p.banner} alt={p.bannerAlt} /> : null}
 
-      {/* Type matched to a `/courses` catalog row: 18px title, 16px body, and
-          a single 1.7 leading on every line in the row. The two pages are the
-          same kind of list one click apart, and they were set at different
-          sizes and rhythms, which read as two different designs. */}
+      {/* Type matched to a `/courses` catalog row so the two lists read as
+          one design. */}
       <span className="flex min-w-0 flex-col leading-[1.7]">
         <span className="text-[18px] font-semibold leading-[1.7] tracking-[-0.02em] text-[var(--ds-gray-900)] transition-colors group-hover:text-[var(--ds-blue-700)] dark:text-white dark:group-hover:text-[var(--ds-blue-400)]">
           {track.title}
         </span>
 
-        {/* `line-clamp-3` is the guard against a future entry running long and
-            pushing one row taller than the rest of its grid line.
-
-            This line and the topic count below it step one notch toward the
-            foreground on hover (darker on light, lighter on dark): enough that
-            the whole row answers the pointer as one block, small enough not to
-            compete with the title going blue. */}
+        {/* `line-clamp-3` guards against a long entry making one row taller
+            than the rest of its grid line. */}
         {p ? (
           <span className="mt-1.5 line-clamp-3 text-[16px] leading-[1.7] text-[#8a8a8a] transition-colors group-hover:text-[#6b6b6b] dark:text-[var(--ds-gray-400)] dark:group-hover:text-[var(--ds-gray-300)]">
             {p.description}
           </span>
         ) : null}
 
-        {/* `Layers` for the topic count: a track's topics are a stack of
-            subject areas, which is the sense this glyph already carries
-            elsewhere in the app (the playgrounds use it for a stack of
-            schemas). On its own line above the link, so the row reads as
-            "what's in it", then "go".
-
-            The glyph carries its own green rather than inheriting the line's
-            grey, so the count reads as a labelled quantity instead of one
-            undifferentiated grey run; it steps a notch on hover in the
-            direction that gains contrast against each appearance mode. */}
+        {/* The glyph carries its own green so the count reads as a labelled
+            quantity rather than one grey run. */}
         <span className="mt-2 flex items-center gap-1.5 text-[14px] leading-[1.7] text-[var(--ds-gray-400)] transition-colors group-hover:text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-500)] dark:group-hover:text-[var(--ds-gray-400)]">
           <Layers
             size={14}
@@ -252,11 +173,7 @@ export function InterviewCatalog({ tracks }: { tracks: InterviewTrack[] }) {
 
   return (
     <>
-      {/* ── Track rows ──
-          Two columns at most, even on the widest viewports: a third column
-          would leave each description too narrow to say anything. Six tracks
-          divide evenly into three lines. `items-start` rather than stretch,
-          because rows carry no surface to align the bottoms of. */}
+      {/* Two columns at most — a third would leave descriptions too narrow. */}
       <div className="mt-10 grid grid-cols-1 items-start gap-x-10 gap-y-2 sm:mt-12 sm:grid-cols-2">
         {tracks.map((track) => (
           <TrackRow key={track.slug} track={track} />

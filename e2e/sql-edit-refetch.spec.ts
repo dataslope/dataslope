@@ -1,11 +1,9 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// ─────────────────────────────────────────────────────────────────────
-// Regression (all three engines): editing a cell inline in a result that
-// has its own LIMIT used to re-fetch with a bare `SELECT * FROM <table>`
-// (no LIMIT), so the grid jumped from e.g. 3 rows to the whole table. The
-// refetch must re-run the SAME query so the LIMIT (and shape) is preserved.
-// ─────────────────────────────────────────────────────────────────────
+// Regression (all three engines): editing a cell in a result with its own
+// LIMIT used to re-fetch with a bare `SELECT * FROM <table>`, so the grid
+// jumped from 3 rows to the whole table. The refetch must re-run the SAME
+// query so the LIMIT (and shape) is preserved.
 
 async function runSql(page: Page, sql: string) {
   const editor = page.locator(".cm-content");

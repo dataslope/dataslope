@@ -1,33 +1,20 @@
 #!/usr/bin/env node
 /**
  * Remove the background from generated illustrations with Recraft's
- * `remove-background`, served through Kie AI.
+ * `remove-background`, served through Kie AI. Middle step of the illustration
+ * pipeline (generate → remove background → promote, see AGENTS.md): reads a
+ * run's candidates (local dir or R2 prefix) and writes each cut-out back
+ * beside its original for `promote-illustrations.mjs`.
  *
- * Middle step of the illustration pipeline (see "Illustrations" in AGENTS.md):
- * generate → **remove background** → promote. It reads the candidates a run
- * produced (a local directory or an R2 run prefix) and writes each cut-out back
- * beside its original, so `promote-illustrations.mjs` can pick up both.
- *
- * Why this model: Recraft beat both Replicate's `851-labs/background-remover`
- * and a local color-key on this material. It lifts a subject out of a
- * full-bleed scene instead of dissolving the frame into a translucent ghost,
- * which is what the alternatives did to the busier illustrations.
- *
- * Three Kie API details this script exists to encapsulate, because each cost an
- * hour to rediscover, or would:
- *
- *   1. The model input takes a **public URL only** — no base64, no data URI. So
- *      each image is pushed through Kie's own upload endpoint first (free,
- *      auto-deleted after 24h) and the returned `downloadUrl` is what gets
- *      handed to the model.
+ * Kie API quirks this script encapsulates:
+ *   1. The model input takes a public URL only — each image is pushed through
+ *      Kie's upload endpoint first (auto-deleted after 24h).
  *   2. Both Kie hosts sit behind Cloudflare and answer a request with no
- *      browser `User-Agent` with a bare 403 and `error code: 1010`. It reads
- *      exactly like an auth failure and is not.
- *   3. Kie caps an account at 20 new generation requests per 10 seconds, and
- *      rejects the excess with 429 WITHOUT queueing it. A shared sliding-window
- *      limiter admits createTask calls at 18 per 10s so --concurrency can be
- *      raised freely without tripping it, and a 429 waits out a full window
- *      rather than the usual short backoff, since the request was dropped.
+ *      browser User-Agent with a bare 403 `error code: 1010` — it reads like
+ *      an auth failure and is not.
+ *   3. Kie caps an account at 20 new generation requests per 10s and rejects
+ *      the excess with 429 WITHOUT queueing; a shared sliding-window limiter
+ *      admits createTask at 18/10s, and a 429 waits out a full window.
  *
  * Usage:
  *   KIE_API_KEY=... node scripts/remove-background-kie.mjs [options]
@@ -108,11 +95,9 @@ function requireKey() {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-// Kie enforces, per account, 20 new generation requests per 10 seconds. Excess
-// requests are rejected with 429 and are NOT queued, so the limit has to be
-// respected client-side rather than discovered. Only createTask counts as a
-// "generation request"; uploads and status polls are not throttled here, but
-// they do get the same 429 retry below in case that ever changes.
+// Kie's per-account cap: 20 new generation requests per 10s, excess rejected
+// with 429 and NOT queued. Only createTask counts; uploads and polls are not
+// throttled here but share the 429 retry below.
 const RATE_WINDOW_MS = 10_000;
 const RATE_MAX = 18; // a little under 20, so a burst can't race past the limit
 
@@ -143,13 +128,9 @@ const RETRY_STATUS = new Set([408, 429, 500, 502, 503, 504]);
 const MAX_ATTEMPTS = 6;
 
 /**
- * Fetch binary content with the same transient-failure policy as `kie`.
- *
- * This exists because the finished image is served from Kie's CDN rather than
- * its API, and a bare fetch there is exactly where a run gets lost: the
- * generation has already succeeded and been billed, so a 503 on the download
- * throws away paid work. Eight of forty-four images failed this way before it
- * was wrapped.
+ * Fetch binary content with the same transient-failure policy as `kie`. The
+ * finished image is served from Kie's CDN, and a 503 on that download throws
+ * away generation work that has already been billed.
  */
 async function fetchBinary(url, label) {
   let lastDetail = "";
@@ -291,36 +272,19 @@ function makeStore(opts) {
 
 /**
  * How much of the original's drawn content survived into the cut-out, as two
- * numbers that have to be read together.
+ * numbers read together — one measure cannot see both failure modes:
  *
- * The guard exists because a remover that eats an object is invisible until
- * someone looks at the picture, and by then it has been promoted. Two ways for
- * that to happen, and one measure cannot see both:
- *
- *   - `ink` — of all the ink the original laid down, how much is still covered
- *     by alpha. Weighted by how strongly each pixel was inked, and capped per
- *     pixel, so a half-tone pixel is fully accounted for by half alpha. This is
- *     what catches whole objects being deleted.
- *   - `solid` — of the pixels that were *unambiguously* inked (at least half
- *     the distance from the background), how many came back genuinely opaque.
- *     This is what catches a ghost matte: uniform partial alpha over the whole
- *     frame, which is exactly what the alternatives to Recraft did, and which
- *     `ink` alone reads as a mild loss rather than a failure.
- *
- * **`ink` is weighted rather than counted because of the risograph bands.** The
- * earlier measure asked every not-background pixel to come back with alpha over
- * 200, which is true of a flat isometric shape and false of a half-tone screen:
- * between the dots is paper, the remover is right to make it transparent, and
- * at the scale below a screened area averages to a mid-tone that can never
- * satisfy an opacity test. Measured over the first ten inline bands, that read
- * 0.36 and 0.62 on two images with nothing whatsoever wrong with them, against
- * 0.998 and 1.000 here. The pair below, on the same ten: ink 0.998-1.000, solid
- * 0.82-0.98. Against deliberate damage on one of them: a third of the frame
- * deleted → 0.70 / 0.69, a 30% ghost → 0.40 / 0.00, a 60% ghost → 0.77 / 0.00.
+ *   - `ink` — of all the ink laid down, how much is still covered by alpha,
+ *     weighted per pixel and capped, so a half-tone pixel is fully accounted
+ *     for by half alpha (a plain opacity count fails healthy risograph
+ *     screens, where between the dots is rightly transparent). Catches whole
+ *     objects being deleted.
+ *   - `solid` — of unambiguously inked pixels, how many came back genuinely
+ *     opaque. Catches a ghost matte (uniform partial alpha), which `ink`
+ *     alone reads as a mild loss.
  *
  * Both images are downscaled to a common width first: the comparison is
- * statistical, and the remover may return a different pixel size than it was
- * given.
+ * statistical, and the remover may return a different pixel size.
  */
 export async function keptFraction(originalBuf, cutoutBuf) {
   const W = 320;
@@ -330,12 +294,10 @@ export async function keptFraction(originalBuf, cutoutBuf) {
   const w = o.info.width, h = o.info.height;
   const n = Math.min(w * h, c.info.width * c.info.height);
 
-  // Derive the background from the original's border rather than assuming
-  // white. The house style stages on white, but older art (and the occasional
-  // fresh render) fills the background with a solid color — and there,
-  // "everything not white" counts the background as content, so a correct
-  // removal scores as catastrophic loss. Taking the median border pixel makes
-  // the measure mean the same thing either way.
+  // Derive the background from the original's border (median pixel) rather
+  // than assuming white: on art staged over a solid color, "everything not
+  // white" counts the background as content and a correct removal scores as
+  // catastrophic loss.
   const chan = [[], [], []];
   const push = (i) => { for (let k = 0; k < 3; k++) chan[k].push(o.data[i * 4 + k]); };
   for (let x = 0; x < w; x++) { push(x); push((h - 1) * w + x); }
@@ -383,29 +345,14 @@ async function main() {
   }
 
   // How much of the original's drawn content a cut-out must retain. The
-  // remover occasionally decides that everything except the animal is
-  // background and returns a lone creature on transparency — `c-functions`
-  // came back as a beaver with its blue funnel machine and platform gone,
-  // `dsa-searching` as a capybara with its bar chart gone. Both share a shape:
-  // the animal stands apart from the objects, and only the largest connected
-  // subject survives.
-  //
-  // Measured across all 879 illustrations, a good cut-out keeps a median 96%
-  // of the original's drawn content and the 5th percentile is 90%. The two
-  // failures scored 0.26 and 0.19. A 0.70 floor sits far below anything
-  // healthy and far above both failures.
-  //
-  // One floor, applied to both of `keptFraction`'s numbers, and a cut-out has
-  // to clear it on each: they fail differently (an object deleted vs. a ghost
-  // matte) and passing one is no evidence about the other.
-  //
-  // Known limit: the measure reads the background off the border, so a
-  // background that is one solid color (white staging, or a flat blue field)
-  // is handled exactly, but a TEXTURED one is not — legacy `pandas-messy-data`,
-  // a panda on a tiled floor, scores 0.44 for a perfectly good removal. The
-  // house style has staged on plain white since 2026-07, so fresh art does not
-  // hit this; when it does, the run refuses to write and asks for --force,
-  // which is the safe direction to be wrong in.
+  // remover occasionally keeps only the animal and deletes its objects;
+  // healthy cut-outs keep a median 96% (5th percentile 90%) while those
+  // failures scored ~0.2, so 0.70 sits far from both. Applied to BOTH of
+  // `keptFraction`'s numbers — they fail differently, and passing one is no
+  // evidence about the other. Known limit: a textured background defeats the
+  // border-derived background measure and scores a good removal low; the run
+  // then refuses to write and asks for --force, the safe direction to be
+  // wrong in.
   const KEEP_FLOOR = 0.7;
 
   const todo = [];
@@ -433,9 +380,8 @@ async function main() {
         const pct = (v) => `${(v * 100).toFixed(0)}%`;
         const score = `ink ${pct(kept.ink)}, solid ${pct(kept.solid)}`;
         if (kept.ink < KEEP_FLOOR || kept.solid < KEEP_FLOOR) {
-          // Do NOT write it. A cut-out is what the site serves, so promoting
-          // this would publish a lone animal on an otherwise empty card, and
-          // the next run would skip the id because a cut-out now exists.
+          // Do NOT write it: a written cut-out would be served, and the next
+          // run would skip the id because a cut-out now exists.
           eaten.push({ id, score });
           failed++;
           console.error(

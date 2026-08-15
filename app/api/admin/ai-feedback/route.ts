@@ -1,19 +1,8 @@
 /**
- * Admin-only read of Ask AI answer ratings, backing /dashboard/admin/ai-feedback.
- *
- * Returns the rated exchanges newest first, joined to the user who rated them,
- * plus the up/down totals so the page can lead with the ratio rather than make
- * someone count rows.
- *
- * Query (all optional):
- *   - `rating`, 'up' | 'down'. Anything else is ignored (⇒ both).
- *   - `limit`, 1..200, default 50.
- *   - `before`, ISO timestamp; returns rows older than it (cursor paging,
- *     stable under new feedback arriving mid-read in a way an OFFSET is not).
- *
- * Authorization is enforced HERE (requireAdmin), matching the codebase's "auth
- * gates actions, not content" rule: the /admin pages stay statically
- * prerendered and a non-admin just gets a 403 from this endpoint.
+ * Admin-only read of Ask AI answer ratings (requireAdmin enforced here).
+ * Returns rated exchanges newest first plus up/down totals. Query (optional):
+ * `rating` 'up'|'down'; `limit` 1..200 (default 50); `before` ISO timestamp —
+ * cursor paging, stable under new feedback in a way OFFSET is not.
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { requireAdmin } from "@/lib/auth/admin";
@@ -107,9 +96,8 @@ export async function GET(request: Request): Promise<Response> {
         name: string | null;
       }>();
 
-    // Totals ignore the filter and the cursor on purpose: they are the
-    // standing up/down ratio, which is the number worth watching, and it would
-    // be a strange thing to have change as you page.
+    // Totals ignore the filter and cursor on purpose: they are the standing
+    // up/down ratio and must not change as you page.
     const totals = await env.DB.prepare(
       `SELECT rating, COUNT(*) AS n FROM ai_answer_feedback GROUP BY rating`,
     ).all<{ rating: string; n: number }>();
@@ -119,10 +107,8 @@ export async function GET(request: Request): Promise<Response> {
       rows: results.map((r) => ({
         turnId: r.turn_id,
         userId: r.user_id,
-        // Deleting an account cascades its ratings away (migration 0008), so
-        // this should not happen; LEFT JOIN and a placeholder rather than an
-        // INNER JOIN, so a row that somehow outlives its user is visible here
-        // instead of silently missing from the report.
+        // LEFT JOIN + placeholder so a row that somehow outlives its user is
+        // visible rather than silently missing (cascade should prevent it).
         email: r.email ?? "(deleted user)",
         name: r.name ?? "",
         rating: r.rating,

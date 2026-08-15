@@ -1,21 +1,10 @@
 /**
- * Admin → Email Preview: review the transactional auth emails (verification,
- * password reset, account deletion) exactly as `lib/auth/email.ts` renders
- * them, plus a "send a live test to my inbox" control.
- *
- * Each design is rendered inside an isolated <iframe srcDoc>, so the email's own
- * <html>/<body> and inline styles render faithfully without the app's CSS
- * leaking in (or vice versa).
- *
- * The real emails reference the hosted production logo URL (Gmail blocks inline
- * data-URI images), but for on-page preview we inline the mark as a data URI so
- * it shows in every environment, local dev and preview deploys included, where
- * the production asset URL may not resolve yet. Read at build time; this route
- * is force-static, so `fs` only runs during prerender, never at the edge.
- *
- * Moved here from a standalone `/email-preview` route that was only reachable
- * from a `next dev`-only footer link. Chrome (sidebar, top bar, theme toggle)
- * now comes from the dashboard shell, so this file renders content only.
+ * Admin → Email Preview: the transactional auth emails exactly as
+ * lib/auth/email.ts renders them, each in an isolated <iframe srcDoc> so no
+ * CSS leaks either way, plus a "send a live test" control. The preview inlines
+ * the logo as a data URI (the real emails use the hosted URL, which may not
+ * resolve in dev/preview); read at build time — this route is force-static,
+ * so `fs` only runs during prerender.
  */
 import type { Metadata } from "next";
 import { readFileSync } from "node:fs";

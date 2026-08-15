@@ -1,13 +1,10 @@
 "use client";
 
 /**
- * The share page's "Open a copy" action. Everything user-facing about a
- * share is fork-on-open: the visitor gets their own private copy, the
- * sharer's original is never editable through the link.
- *
- * Code bundles materialize into a local workspace here, then we navigate to
- * the playground (which boots the new workspace like any other). SQL bundles
- * leave a pending ref for the playground to replay after its engine boots.
+ * The share page's "Open a copy" action. Shares are fork-on-open: the sharer's
+ * original is never editable through the link. Code bundles materialize into a
+ * local workspace before navigating; SQL bundles leave a pending ref for the
+ * playground to replay after its engine boots.
  */
 
 import { useCallback, useState } from "react";

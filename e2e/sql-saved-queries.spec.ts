@@ -1,11 +1,8 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// ─────────────────────────────────────────────────────────────────────
-// Saved queries ("star" a history entry). Lives in the shared History
-// pane: each history entry has a star toggle; starred queries appear in a
-// "Saved queries" section that persists to localStorage (survives a
-// history clear / reload). Verified on all three engines.
-// ─────────────────────────────────────────────────────────────────────
+// Saved queries: starring a history entry adds it to a "Saved queries"
+// section persisted in localStorage (survives history clear / reload).
+// Lives in the shared History pane; verified on all three engines.
 
 async function runSql(page: Page, sql: string) {
   const editor = page.locator(".cm-content").first();

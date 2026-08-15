@@ -1,71 +1,32 @@
-// Lints lesson content for code inside a Mermaid label that is not marked as
-// code, and therefore reaches the reader set in Inter next to the same
-// identifier set in JetBrains Mono one line above it.
+// Lints lesson content for code inside a Mermaid label that is not wrapped in
+// a `<code>` tag (the renderer sets that span in the mono face — see
+// mermaid.module.css); unmarked code reaches the reader in Inter next to the
+// same identifier in JetBrains Mono.
 //
-// The convention this enforces already exists: an author wraps the code part
-// of a diagram label in a `<code>` tag,
+// What counts as code — three shapes prose cannot produce by accident:
+//   1. call        an identifier with `(` directly after it (`println(`);
+//                  the absence of a space is the whole rule — prose asides
+//                  always have one.
+//   2. qualified   identifiers joined by dots, no spaces (`System.out`);
+//                  a sentence's full stop is always followed by a space.
+//                  Prose-y product names (`Node.js`) are in PROSE_NAMES.
+//   3. snake_case  English does not use underscores.
+// Bare CamelCase/lowercase words are deliberately NOT flagged — no test
+// separates `Main` from `Editor`, so those stay the author's call.
 //
-//     flowchart LR
-//       Doc["<code>report.qmd</code><br/>prose + R code"] --> R[quarto render]
+// Class and ER diagrams are skipped (mermaid.tsx renders them wholly in mono;
+// see `isCodeDiagram`). Only *label* text is read, never Mermaid syntax or
+// node ids, which are never painted — `nodeLabels` keeps those apart. A label
+// that wants the prose face opts out with
+// `{/* allow-unmarked-code: why */}` on the line above the fence.
 //
-// and the renderer sets that span in the mono face
-// (`app/_components/mdx/mermaid.module.css`). ~395 diagrams do this. What the
-// rule catches is the ones that do not: `System.out` in the sequence diagram
-// on `java-programming-for-beginners/your-first-java-program` sat in an actor
-// box in Inter, three paragraphs below the same name in a code block.
-//
-// ── What counts as code ────────────────────────────────────────────────────
-//
-// Three shapes, each chosen because prose cannot produce it by accident:
-//
-//   1. call,       an identifier with `(` directly after it: `println(`,
-//                  `group_by(`. The *absence of a space* is the whole rule.
-//                  Nearly every parenthesis in a lesson label opens an aside
-//                  ("Reality (infinite detail)", "Wide form (humans love
-//                  this)"), and every one of those has a space in front of it.
-//   2. qualified,  two identifiers joined by a dot with no spaces:
-//                  `System.out`, `Main.class`, `report.qmd`. A sentence's full
-//                  stop is always followed by a space or the end of the label,
-//                  so it cannot match. Product names that are spelled with a
-//                  dot but read as prose (`Node.js`) are in PROSE_NAMES.
-//   3. snake_case, `read_csv`, `dim_product`, `was_missing`. English does not
-//                  use underscores; a token with one is an identifier wherever
-//                  it appears.
-//
-// Deliberately NOT flagged: a bare CamelCase or lowercase word. `Main`,
-// `args`, `void` and `int` are all code in the language sense, but so are
-// `Editor`, `Reality` and `You`, and no test tells them apart. Those stay the
-// author's call, which is why this rule reports what it is sure of rather than
-// trying to be exhaustive.
-//
-// ── Which diagrams are read ────────────────────────────────────────────────
-//
-// All of them except class and ER diagrams: those are code end to end, so
-// `mermaid.tsx` renders the whole diagram in the mono face and there is
-// nothing inside one to mark (see `isCodeDiagram` there).
-//
-// Only *label* text is read, never Mermaid's own syntax and never a node id.
-// `set_types[Set types]` draws a box reading "Set types"; the snake_case id in
-// front of it is never painted, and flagging it would be asking the author to
-// mark up something no reader can see. `nodeLabels` below is the delimiter
-// walker that keeps those apart.
-//
-// ── Opting out ─────────────────────────────────────────────────────────────
-//
-// A label that genuinely wants the prose face (a sentence that happens to name
-// a file, say) says so on the line above the fence:
-//
-//     {/* allow-unmarked-code: the address is a value, not an identifier */}
-//
-// Used both as a CLI (`node scripts/check-mermaid-code.mjs [files...]`,
-// defaults to all of content/) and as a library by
-// __tests__/mermaidCode.test.ts.
+// Used as a CLI (`node scripts/check-mermaid-code.mjs [files...]`, defaults
+// to content/) and as a library by __tests__/mermaidCode.test.ts.
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-// The fence walker check-prose.mjs and check-ascii-diagrams.mjs already share,
-// so the three linters cannot disagree about where a mermaid block starts and
-// ends or which keyword it opens with.
+// Shared with check-prose.mjs and check-ascii-diagrams.mjs so the three
+// linters agree on mermaid bounds.
 import { mermaidLines } from "./check-prose.mjs";
 
 /** Diagram kinds Mermaid renders wholesale in the mono face (`isCodeDiagram`
@@ -119,10 +80,9 @@ function nodeLabels(line) {
   for (let i = 0; i < line.length; i++) {
     const ch = line[i];
 
-    // The asymmetric shape `A>text]` is the one that does not nest. The
-    // character before it has to be an id character and NOT a hyphen: the `>`
-    // ending every `-->` link is preceded by one, and reading that as a node
-    // swallows the rest of the line (`D -->|Ok| E([Final result])`).
+    // The asymmetric shape `A>text]` does not nest. The preceding character
+    // must be an id character, NOT a hyphen — the `>` ending every `-->` link
+    // would otherwise swallow the rest of the line.
     if (ch === ">" && i > 0 && /\w/.test(line[i - 1])) {
       const end = line.indexOf("]", i);
       if (end === -1) continue;
@@ -175,13 +135,9 @@ export function mermaidLabels(line, diagram) {
   if (SHAPE_DIAGRAMS.has(diagram)) {
     labels.push(...nodeLabels(bare));
     // Edge labels: `-->|text|`, `-- text -->`, `-. text .->`, `== text ==>`.
-    //
-    // The middle form is ambiguous with a plain `A --- B` link, since the `-`
-    // that closes a labelled `-- text ---` is the same `-` that ends an
-    // unlabelled one: `A((a)) --- I((4,5)) --- B((b))` reads as an edge
-    // labelled `I((4,5))`. A real edge label holding a bracket has to be
-    // quoted, and the quote pass above already has those, so anything with one
-    // in it here is a node that has been mistaken for a label.
+    // The `-- text --` form is ambiguous with chained plain links, and a real
+    // edge label holding a bracket must be quoted (already collected above) —
+    // so a bracket here means a node mistaken for a label, and it is skipped.
     for (const m of bare.matchAll(/\|([^|]*)\|/g)) labels.push(m[1]);
     for (const m of bare.matchAll(/(?:--|==)\s+(.+?)\s+(?:--|==)[->]/g)) {
       if (!/[[({]/.test(m[1])) labels.push(m[1]);
@@ -213,14 +169,10 @@ export function mermaidLabels(line, diagram) {
   return labels.map((l) => l.trim()).filter(Boolean);
 }
 
-/** An identifier with `(` right after it.
- *
- *  Two characters minimum, because a one-letter name in front of a paren is
- *  mathematical notation rather than a call in every lesson that has one:
- *  `P(A given B)`, `f(x)`, `y(t-1)`, `s(i)`. Mermaid cannot typeset those
- *  (KaTeX is off in labels), so they are prose written in symbols and belong
- *  in the prose face; a genuine one-letter function like R's `c()` is rare
- *  enough to mark by hand. */
+/** An identifier with `(` right after it. Two characters minimum: a
+ *  one-letter name before a paren is mathematical notation (`f(x)`,
+ *  `P(A given B)`), not a call; a genuine one-letter function like R's `c()`
+ *  is rare enough to mark by hand. */
 const CALL = /(?<![\w$.])[A-Za-z_][\w$]+\(/g;
 
 /** Two or more identifiers joined by dots, no spaces. The `@` in the lookbehind
@@ -238,15 +190,10 @@ const RULES = [
 ];
 
 /**
- * Names that match one of the patterns above but are not code: a product's
- * name, an abbreviation, an English word, or a piece of mathematical notation
- * that happens to be spelled like a call.
- *
- * The notation entries are the ones the statistics and time-series lessons
- * write in their diagrams. `Poisson(lambda)` is the same kind of thing as
- * `f(x)`, which the two-character minimum on CALL already covers; these just
- * have longer names. A diagram with notation this list does not know about
- * opts out with `{/* allow-unmarked-code: … *\/}`.
+ * Names that match the patterns above but are not code: product names,
+ * abbreviations, and mathematical notation spelled like a call
+ * (`Poisson(lambda)` is `f(x)` with a longer name). Notation this list does
+ * not know opts out with `{/* allow-unmarked-code: … *\/}`.
  */
 const PROSE_NAMES = new Set([
   "Node.js",
@@ -314,9 +261,8 @@ export function lintSource(src, file) {
   const lines = src.split("\n");
   const allowed = new Set();
   lines.forEach((line, i) => {
-    // An opt-out covers the fence that follows it. A mermaid block runs to
-    // ~30 lines at the outside, and the comment is an explicit author decision
-    // either way, so the window is deliberately generous.
+    // An opt-out covers the fence that follows; a generous window is fine
+    // since the comment is an explicit author decision.
     if (ALLOW.test(line)) for (let j = i; j < Math.min(lines.length, i + 60); j++) allowed.add(j);
   });
 

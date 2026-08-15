@@ -1,24 +1,15 @@
 /**
- * OPFS binary file storage for user-uploaded data files in non-SQL playgrounds.
- *
- * Files live at:
- *   opfs root / workspaces / {workspaceId} / data / {encodedPath}
- *
- * The path is encoded (replacing "/" with "\x00") so nested virtual paths like
- * "folder/file.csv" can be stored flat without creating real sub-directories.
- * A companion manifest ("data/__manifest.json") tracks every stored entry so
- * the panel can reconstruct the full file list (including empty folders) on
- * reload without iterating the directory.
- *
- * All operations are best-effort: when OPFS is unavailable the in-memory
- * VirtualFile list still works; it just won't survive a page refresh.
+ * OPFS binary storage for user-uploaded data files, at
+ * `workspaces/{workspaceId}/data/{encodedPath}`. Virtual paths are stored
+ * flat ("/" encoded as "\x00"); a manifest (`data/__manifest.json`) tracks
+ * entries so the list (including empty folders) survives reloads. All
+ * operations are best-effort — without OPFS the in-memory list still works.
  */
 
 import { isOpfsSupported } from "../opfs/featureDetect";
 import type { VirtualFile } from "../files/FilesPanel";
 
-// Separator used to encode "/" in a virtual path so it can be stored as a
-// single OPFS filename. Must not appear in valid file/folder names.
+// Encodes "/" in a virtual path; must not appear in valid file/folder names.
 const SEP = "\x00";
 
 function encodePath(virtualPath: string): string {
@@ -38,11 +29,8 @@ async function getDataDir(
     const root = await navigator.storage.getDirectory();
     const wsDir = await root.getDirectoryHandle("workspaces", { create });
     const wDir = await wsDir.getDirectoryHandle(workspaceId, { create });
-    // `await` (not a bare `return`) so a NotFoundError from the missing
-    // `data/` dir, expected on first load before any data file is
-    // written, is caught here and returned as `null` instead of
-    // rejecting the caller's promise (which, fire-and-forget, would
-    // surface as an uncaught rejection).
+    // `await` (not a bare `return`) so the expected NotFoundError on first
+    // load is caught here as `null` instead of an uncaught rejection.
     return await wDir.getDirectoryHandle("data", { create });
   } catch {
     return null;
@@ -98,10 +86,8 @@ function isVirtualFile(v: unknown): v is VirtualFile {
 // Public API
 // ---------------------------------------------------------------------------
 
-/**
- * Loads all VirtualFile entries for the workspace from OPFS.
- * Returns an empty array when OPFS is unavailable or no data has been stored.
- */
+/** Loads all VirtualFile entries for the workspace; empty when OPFS is
+ *  unavailable or nothing is stored. */
 export async function loadDataFiles(
   workspaceId: string,
 ): Promise<VirtualFile[]> {
@@ -110,10 +96,7 @@ export async function loadDataFiles(
   return readManifest(dir);
 }
 
-/**
- * Writes a binary file to the workspace's data directory and updates the
- * manifest so the entry survives reloads.
- */
+/** Writes a binary file and updates the manifest. */
 export async function writeDataFile(
   workspaceId: string,
   virtualPath: string,
@@ -138,10 +121,7 @@ export async function writeDataFile(
   }
 }
 
-/**
- * Reads a binary file from the workspace's data directory.
- * Returns null when the file does not exist or OPFS is unavailable.
- */
+/** Reads a binary file; null when missing or OPFS is unavailable. */
 export async function readDataFile(
   workspaceId: string,
   virtualPath: string,
@@ -159,10 +139,7 @@ export async function readDataFile(
   }
 }
 
-/**
- * Deletes a file (or folder marker) from the workspace's data directory.
- * If the path is a folder, all children are also removed.
- */
+/** Deletes a file or folder marker; a folder's children go with it. */
 export async function deleteDataEntry(
   workspaceId: string,
   virtualPath: string,
@@ -191,10 +168,7 @@ export async function deleteDataEntry(
   await writeManifest(dir, remaining);
 }
 
-/**
- * Renames (or moves) a virtual path within the workspace data directory.
- * Handles both files and folders (including all descendants).
- */
+/** Renames/moves a virtual path, files and folders (with descendants). */
 export async function renameDataEntry(
   workspaceId: string,
   oldPath: string,
@@ -243,9 +217,7 @@ export async function renameDataEntry(
   await writeManifest(dir, updated);
 }
 
-/**
- * Upserts a folder marker in the manifest so empty folders survive reloads.
- */
+/** Upserts a folder marker so empty folders survive reloads. */
 export async function upsertDataFolder(
   workspaceId: string,
   folderPath: string,

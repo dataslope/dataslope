@@ -1,18 +1,10 @@
 import { test, expect } from "@playwright/test";
 
-// ─────────────────────────────────────────────────────────────────────
-// Run controls for multi-statement tabs (Phase 4 / §9 IDE feature).
-//
-// ⌘/Ctrl+Enter triggers the PRIMARY action (the toolbar's primary button);
-// ⌘/Ctrl+Shift+Enter triggers the dropdown's SECONDARY action. Split-button
-// rules, the dropdown never duplicates the primary action:
-//   • Multi-statement, no selection → primary "Run All" (⌘/Ctrl+Enter);
-//     dropdown "Run statement at cursor" (⌘/Ctrl+Shift+Enter).
-//   • Selection active             → primary "Run Selection" (⌘/Ctrl+Enter);
-//     dropdown "Run All" (⌘/Ctrl+Shift+Enter).
-//   • Single statement             → plain "Run" button (runs everything).
-// Engine-agnostic (shared editor + toolbar) → tested on SQLite.
-// ─────────────────────────────────────────────────────────────────────
+// Run controls for multi-statement tabs. ⌘/Ctrl+Enter = primary action,
+// ⌘/Ctrl+Shift+Enter = the dropdown's secondary; the dropdown never
+// duplicates the primary. No selection → "Run All" + "Run statement at
+// cursor"; selection → "Run Selection" + "Run All"; single statement →
+// plain "Run". Engine-agnostic (shared editor/toolbar), tested on SQLite.
 
 const THREE = "SELECT 1 AS one;\nSELECT 2 AS two;\nSELECT 3 AS three;";
 

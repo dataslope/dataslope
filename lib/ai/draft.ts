@@ -1,21 +1,11 @@
 // "Fill with AI" for the /create builders: prompt assembly + response parsing
-// for drafting a whole custom item from a plain-English description.
-//
-// Pure functions (no D1, no network) so they unit-test in Node, mirroring
-// lib/ai/suggest.ts. The endpoint (app/api/ai/draft) does auth/budget
-// enforcement and the provider call; this module only shapes what goes to the
-// model and normalizes what comes back into a strict, bounded draft the
-// builders can apply to their form state directly.
-//
-// The normalized draft shapes deliberately mirror each builder's on-screen
-// fields (title, instructions, files, tests, choices, …) rather than the
-// stored payload types, so a builder applies a draft by calling the same
-// setters its manual form uses. Server-side validation clamps everything to
-// the same limits the save endpoint enforces (lib/custom-content/policy.ts),
-// so an AI draft can't produce something the user then can't save. The
-// code/SQL solution still has to pass its own tests on save (the builders'
-// verify-before-publish gate), so a wrong draft fails loudly at save time,
-// never silently publishes.
+// for drafting a custom item from a plain-English description. Pure functions
+// (no D1, no network) so they unit-test in Node; the endpoint (app/api/ai/draft)
+// does auth/budget enforcement and the provider call. Draft shapes mirror each
+// builder's on-screen fields, and everything is clamped to the same limits the
+// save endpoint enforces (lib/custom-content/policy.ts), so a draft can't
+// produce something the user then can't save; a wrong code/SQL solution still
+// fails its tests at save time rather than silently publishing.
 
 import {
   CUSTOM_CODE_FIELD_MAX,
@@ -36,9 +26,7 @@ export function isDraftKind(v: unknown): v is DraftKind {
   return typeof v === "string" && (DRAFT_KINDS as readonly string[]).includes(v);
 }
 
-/** Max output tokens for a full draft. Larger than chat/suggest: a complete
- *  code challenge (instructions + setup + starter + solution + a couple of
- *  tests) is a few hundred tokens of prose plus JSON scaffolding. Still bills
+/** Max output tokens for a full draft; larger than chat/suggest. Still bills
  *  against the member's shared Ask AI daily token budget. */
 export const DRAFT_MAX_TOKENS = 2_048;
 

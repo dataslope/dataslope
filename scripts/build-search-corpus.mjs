@@ -1,64 +1,21 @@
 #!/usr/bin/env node
 /**
- * Build the full-text search corpus that backs `/api/search`.
+ * Build the full-text search corpus that backs `/api/search` (SQLite FTS5 on
+ * D1; nothing is rebuilt at request time).
  *
- * ── What changed and why ────────────────────────────────────────────────────
+ * Rows are sections, one per (page, heading), so hits carry `#anchor` links
+ * and `snippet()` draws from the section that matched; content before the
+ * first heading becomes a row with a null anchor (the page-level result).
+ * Anchored components (lib/search/anchors.mjs) get a second, narrower row
+ * whose anchor is the component's own DOM id — both sides derive identical
+ * ids from the authored MDX (`remarkComponentAnchors`). The component's
+ * content stays in the section row too; the near-duplicates are collapsed at
+ * query time (lib/search/ranking.ts). An empty `heading` plus a non-empty
+ * anchor identifies a component row.
  *
- * The previous indexer fed an Orama "simple" index that the Worker rebuilt on
- * every cold isolate. That had two problems. The first was cost: parsing a
- * multi-megabyte JSON blob and tokenising every document is CPU paid again in
- * every data centre, after every deploy, forever, and it grows with the
- * content. The second was coverage: it restricted `remark-structure` to
- * `heading`/`paragraph`/`blockquote`/`tableCell`, which excludes
- * `mdxJsxFlowElement` wholesale. That was aimed at keeping code out of the
- * index, but it also threw out the *prose* those components carry, which
- * measured at 37% of everything a learner reads: every `<MultipleChoice>`
- * question and explanation, every `<ChallengeCard>` instruction. It also only
- * ever walked `content/courses`, so the whole interview-prep track was absent.
- *
- * This script indexes everything, into SQLite FTS5 on D1. Nothing is rebuilt
- * at request time.
- *
- * ── Rows are sections, not pages ────────────────────────────────────────────
- *
- * One row per (page, heading) rather than one per page. On lessons this long a
- * page-level hit tells a reader which of forty screens to start reading, which
- * is barely an answer. Section rows give `#anchor` links straight to the part
- * that matched, and they make `snippet()` useful, because the snippet is drawn
- * from the section that matched instead of from wherever in the page the
- * tokeniser happened to land. FTS5 does not care about the row count: ~11k
- * sections is nothing.
- *
- * Content before the first heading becomes a row with a null anchor, which is
- * the page-level result.
- *
- * ── …and one extra row per anchored component ───────────────────────────────
- *
- * A section row's anchor is its heading, but a `<MultipleChoice>` often sits
- * several screens below its heading, so a hit on quiz text used to land the
- * reader far above the text that matched. Anchored components (the set in
- * lib/search/anchors.mjs) therefore get a second, narrower row whose anchor is
- * the component's own DOM id (injected at render time by
- * `remarkComponentAnchors`; both sides derive identical ids from the authored
- * MDX). The component's content stays in the section row too, so queries whose
- * terms span a paragraph and a component keep matching; the resulting
- * near-duplicate entries are collapsed at query time in favour of the
- * component's anchor (lib/search/ranking.ts). Rows with an empty `heading`
- * column and a non-empty anchor are exactly these component rows.
- *
- * ── Prose and code are separate columns ─────────────────────────────────────
- *
- * Both are indexed, but a match in prose should outrank a match in a code
- * sample, or a search for a common identifier would bury the lesson that
- * explains it under every lesson that merely uses it. Splitting them into two
- * FTS5 columns lets `bm25()` weight them independently at query time, which is
- * the thing a single blob cannot do. It is also why indexing code is safe here
- * where it was not before.
- *
- * ── How component content is reached ────────────────────────────────────────
- *
- * See scripts/lib/search-extract.mjs (split out so the anchor-id contract is
- * testable against the render-side plugin).
+ * Prose and code are separate FTS5 columns so `bm25()` can weight them
+ * independently — a match in prose must outrank a match in a code sample.
+ * Component extraction lives in scripts/lib/search-extract.mjs.
  *
  * Output: `lib/generated/search-corpus.json` (gitignored), consumed by
  * `scripts/build-search-sql.mjs` to produce the D1 seed.
@@ -88,16 +45,11 @@ const SECTIONS = [
 const OUT_FILE = join(ROOT, "lib", "generated", "search-corpus.json");
 
 /**
- * Chart titles and captions live in the generated manifest, not in the MDX, so
- * this step has to run *after* `build:charts` — which is why it sits where it
- * does in the `build` chain rather than up with the other content steps.
- *
- * Getting that order wrong is not fatal and that is exactly the problem: the
- * index simply comes out missing every chart title and caption, which was worth
- * 264 kB of prose across ~250 charts the first time it happened, with nothing
- * in the build log to say so. So an absent or empty manifest warns loudly now.
- * It stays non-fatal because running `build:search-corpus` on its own, before
- * ever rendering charts, is a legitimate thing to do.
+ * Chart titles/captions live in the generated manifest, so this step must run
+ * AFTER `build:charts` (hence its position in the `build` chain). A missing or
+ * empty manifest silently drops all of them from the index, so it warns
+ * loudly — but stays non-fatal, since running this script standalone before
+ * charts is legitimate.
  */
 function loadChartManifest() {
   const path = join(ROOT, "lib", "generated", "charts.js");

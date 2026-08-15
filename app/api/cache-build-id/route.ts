@@ -1,25 +1,10 @@
 /**
- * Reports the running Worker's OpenNext build ID.
- *
- * The R2 incremental cache keys every object as
- * `incremental-cache/<OPEN_NEXT_BUILD_ID>/<hash>.cache` (see
- * open-next.config.ts). Each deploy, production *and* every preview, writes a
- * fresh ~0.6 GB folder under a new build ID and nothing is pruned automatically
- * (the key includes the build ID and OpenNext never deletes old ones).
- *
- * The scheduled cleanup workflow (.github/workflows/r2-cache-cleanup.yml) deletes
- * stale build folders but must never delete the one the LIVE production Worker is
- * serving from. The only authoritative source for "which build is live" is the
- * running Worker itself, so it exposes its build ID here: the cleanup job fetches
- * https://dataslope.com/api/cache-build-id and preserves that folder regardless of
- * age. `OPEN_NEXT_BUILD_ID` is the exact value the R2 override uses for the key,
- * so this can't drift from the actual folder name. On Cloudflare Workers Builds
- * that value is the deployed commit SHA (next.config.ts sets `generateBuildId` to
- * `WORKERS_CI_COMMIT_SHA`), which is also how the cleanup job maps every other
- * folder to the branch/PR it belongs to.
- *
- * The build ID is not sensitive, Next.js already exposes it in page payloads and
- * `/_next/static/<buildId>/…` asset URLs. `/api/` is disallowed in robots.ts.
+ * Reports the running Worker's OpenNext build ID, which keys the R2
+ * incremental cache (`incremental-cache/<OPEN_NEXT_BUILD_ID>/…`). The
+ * r2-cache-cleanup workflow fetches this to learn which build folder is LIVE
+ * and must never be deleted; `OPEN_NEXT_BUILD_ID` is the exact value the R2
+ * override uses, so it can't drift from the folder name. The build ID is not
+ * sensitive — Next.js already exposes it in asset URLs.
  */
 
 // Always reflect the running Worker, never a prerendered/cached value.

@@ -1,18 +1,9 @@
 /**
- * Retention + quota policy for cloud saves and share links.
- *
- * All numbers here are the single source of truth for what the pricing page
- * promises (app/pricing + PricingSection): free members get a fixed storage
- * quota with a ~30-day inactivity cleanup, Pro removes the cleanup and raises
- * the quota, and guests can share (but not save) with a fixed link TTL.
- *
- * There is no cron: expiry is *evaluated at read time* (an expired row is
- * never listed or served) and enforced lazily, routes delete expired rows +
- * R2 objects when they encounter them. This keeps the promise exact without a
- * scheduled worker; actual byte reclamation can additionally be backstopped
- * with an R2 lifecycle rule on the `share/` prefix (see README).
- *
- * Pure module: no D1/R2 access, unit-tested in __tests__/workspacePolicy.test.ts.
+ * Retention + quota policy for cloud saves and share links. The numbers here
+ * are the single source of truth for what the pricing page promises. There is
+ * no cron: expiry is evaluated at read time (an expired row is never listed
+ * or served) and enforced lazily by the routes that encounter it. Pure
+ * module: no D1/R2 access.
  */
 
 import type { MemberTier } from "@/lib/ai/types";

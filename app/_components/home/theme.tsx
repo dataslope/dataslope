@@ -1,26 +1,12 @@
 "use client";
 
 /**
- * Minimal, dependency-free light/dark theme controller for the home route.
- *
- * Why not next-themes? The `/learn` route gets its theming from Fumadocs's
- * `RootProvider`, which wraps next-themes. next-themes isn't a direct
- * dependency of this app (it's pulled in transitively under fumadocs-ui), so
- * importing it from a top-level route isn't guaranteed to resolve. Instead we
- * replicate the exact contract next-themes uses so the choice is SHARED across
- * routes:
- *
- *   - persisted under the `localStorage["theme"]` key (next-themes' default), and
- *   - applied as a `.dark` class on `<html>` (the class strategy Fumadocs uses).
- *
- * That means toggling the theme here and then navigating to `/learn` (a
- * client-side transition that keeps the same document) is picked up by
- * Fumadocs's provider, and vice-versa.
- *
- * The home route defaults to LIGHT: a missing or non-"dark" stored value is
- * treated as light. A pre-hydration inline script (see `app/page.tsx`) applies
- * the stored class before first paint so there's no flash. The live value is
- * read via `useSyncExternalStore`, so we never set React state inside an effect.
+ * Minimal light/dark theme controller for the home route. next-themes is only
+ * a transitive dependency (under fumadocs-ui), so instead of importing it we
+ * replicate its exact contract — `localStorage["theme"]` key + `.dark` class
+ * on `<html>` — so the choice is shared with Fumadocs-themed routes in both
+ * directions. Defaults to light; a pre-hydration inline script (app/page.tsx)
+ * applies the stored class before first paint.
  */
 
 import { useCallback, useSyncExternalStore } from "react";
@@ -47,11 +33,9 @@ function readStoredTheme(): Theme {
 
 function applyTheme(theme: Theme) {
   if (typeof document === "undefined") return;
-  // Set an EXPLICIT class for the active theme (both `dark` and `light`),
-  // mirroring next-themes. Components that detect the scheme (e.g. the
-  // challenge card's CodeMirror theme picker) treat a missing class as "ask
-  // the OS", so without an explicit `light` class, a light page on a
-  // dark-OS device would render its editors dark.
+  // Explicit class for both themes, mirroring next-themes: scheme-detecting
+  // components treat a missing class as "ask the OS", so a light page on a
+  // dark-OS device would otherwise render its editors dark.
   const root = document.documentElement;
   root.classList.toggle("dark", theme === "dark");
   root.classList.toggle("light", theme === "light");

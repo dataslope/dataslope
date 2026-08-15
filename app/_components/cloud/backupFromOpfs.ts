@@ -1,14 +1,10 @@
 "use client";
 
 /**
- * Builds a code workspace's portable bundle straight from persisted state,
- * the localStorage tab manifest + OPFS file contents, with no live playground
- * involved. This is what lets the /playground index back up a guest's saved
- * workspaces right after sign-in, without opening each one.
- *
- * SQL workspaces can't be built this way (their bundle carries a database
- * image that only the engine can produce), which is fine: SQL backups are
- * manual by design, from inside the playground.
+ * Builds a code workspace's bundle straight from persisted state (tab
+ * manifest + OPFS files), no live playground involved — lets the /playground
+ * index back up workspaces without opening each one. SQL workspaces can't be
+ * built this way (their database image needs the engine) and stay manual.
  */
 
 import type { BundleCodeFile, WorkspaceBundle } from "@/lib/workspaces/types";

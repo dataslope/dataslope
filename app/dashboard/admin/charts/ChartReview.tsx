@@ -1,33 +1,12 @@
 "use client";
 
 /**
- * The review queue layered onto the chart gallery: mark a figure for a redraw,
- * say what is wrong with it, and sign the redraw off when it lands.
- *
- * It is a layer rather than a rewrite because the gallery around it is a
- * *static server component* holding ~1.8 MB of inline SVG, sliced into pages by
- * route segment so a visitor only downloads the twelve figures they are
- * looking at. Turning that into a client page to add three buttons would ship
- * the whole library to render a slice of it. So the SVG stays on the server and
- * only the queue is interactive:
- *
- *   • `ChartReviewProvider` fetches every mark once and holds them.
- *   • `ChartReviewSummary` shows the counts and, crucially, links to the marked
- *     charts that are *not on this page* — the queue spans the library while a
- *     page is one slice of it, so without those links a marked chart on page 4
- *     would be invisible from page 1.
- *   • `ChartMarkControls` is the per-figure row.
- *
- * The gallery is deliberately open to non-admins (it renders build artefacts,
- * not data — see the tools band note in app/dashboard/_studio/nav.ts) while the
- * queue behind `/api/admin/charts` is not. A non-admin therefore gets a 403 on
- * the fetch and simply sees the gallery with no queue attached, which is the
- * intended outcome: look all you like, queuing work is an admin action.
- *
- * The marked/awaiting state is painted on the figure's own section by
- * `.item:has(...)` in charts.module.css, reading the `data-mark-state` this
- * component sets. That keeps the colored frame on the server-rendered element
- * without making it a client component.
+ * Review queue layered onto the (static, server-rendered) chart gallery; only
+ * the queue is interactive so the ~1.8 MB of inline SVG stays on the server.
+ * The gallery is open to non-admins; the queue behind /api/admin/charts is not
+ * — a 403 on the fetch just leaves the gallery with no queue attached.
+ * Mark state is painted by `.item:has(...)` in charts.module.css reading the
+ * `data-mark-state` this component sets, keeping the frame server-rendered.
  */
 import {
   createContext,
@@ -45,28 +24,24 @@ import { isAwaitingApproval, type RegenMark } from "@/lib/charts/regenMarks";
 import { ChartDelete } from "./ChartDelete";
 import styles from "./charts.module.css";
 
-/** How long typing has to pause before the note is written. Long enough that a
- *  sentence is one request, short enough that walking away mid-review still
- *  leaves the note stored. */
+/** Debounce (ms) before a typed note is written. */
 const NOTE_SAVE_DELAY = 700;
 
 /** Local, possibly-unsaved state for one chart's queue entry. */
 interface MarkState {
   marked: boolean;
-  /** What is in the input right now. */
   note: string;
   /** What the server last confirmed, so blur can skip a no-op write. */
   savedNote: string;
-  /** Redrawn since anyone last signed it off: the figure wants a look. */
+  /** Redrawn since last sign-off. */
   awaitingApproval: boolean;
   /** When the chart was last redrawn (ISO-8601 UTC), null if never. */
   regeneratedAt: string | null;
   saving: boolean;
   /** Set briefly after a successful write, to flash a tick. */
   justSaved: boolean;
-  /** ISO-8601 of an outstanding request to delete this chart from the repo,
-   *  null when none. The gallery cannot delete anything, so this is a decision
-   *  waiting on a commit; see ChartDelete.tsx. */
+  /** ISO-8601 of an outstanding delete request, null when none; the actual
+   *  deletion waits on a commit (see ChartDelete.tsx). */
   deleteRequestedAt: string | null;
 }
 
@@ -107,8 +82,7 @@ interface ReviewContext {
   /** Null until the fetch resolves; stays null for a non-admin. */
   marks: Record<string, MarkState> | null;
   available: boolean;
-  /** Why the queue is read-only, when it is: the two causes have different
-   *  fixes and reporting the wrong one sends people to the wrong file. */
+  /** Why the queue is read-only, when it is. */
   state: ChartQueueState;
   maxNoteLength: number;
   onToggleMark: (slug: string, marked: boolean) => void;
@@ -121,16 +95,9 @@ interface ReviewContext {
   error: string | null;
 }
 
-/**
- * What to say when the queue will not accept writes.
- *
- * `unreadable` is the one worth being specific about. The binding is declared
- * in wrangler.jsonc so it is nearly always present; what is usually missing is
- * the `chart_regen_marks` table, because it arrived after the
- * `dataslope-illustrations` database already existed and a deployment only gets
- * it by re-running the migration. Naming the command is the difference between
- * a two-minute fix and an afternoon spent auditing bindings.
- */
+/** What to say when the queue will not accept writes. `unreadable` usually
+ *  means the `chart_regen_marks` migration has not been applied, so it names
+ *  the command. */
 const QUEUE_OFFLINE: Record<ChartQueueState, string> = {
   ok: "",
   unbound:
@@ -150,7 +117,7 @@ export function ChartReviewProvider({ children }: { children: React.ReactNode })
   const [maxNoteLength, setMaxNoteLength] = useState(500);
   const [error, setError] = useState<string | null>(null);
 
-  // One timer per slug, so two notes typed in the same pause both save.
+  // One debounce timer per slug.
   const noteTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const flashTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
@@ -159,8 +126,7 @@ export function ChartReviewProvider({ children }: { children: React.ReactNode })
     void (async () => {
       try {
         const res = await fetch("/api/admin/charts", { cache: "no-store" });
-        // 401/403 is the ordinary case for a signed-out or non-admin visitor
-        // on a page that is open to them: leave the queue off and say nothing.
+        // 401/403 is normal for a non-admin: leave the queue off, say nothing.
         if (!res.ok) return;
         const data = (await res.json()) as ChartMarksPayload;
         if (!live) return;
@@ -168,8 +134,7 @@ export function ChartReviewProvider({ children }: { children: React.ReactNode })
         for (const m of data.marks) next[m.promptId] = markStateFrom(m);
         setMarks(next);
         setAvailable(data.available);
-        // `state` predates nothing, but an older cached payload will not carry
-        // it; fall back to the boolean rather than claiming a cause.
+        // Older cached payloads lack `state`; fall back to the boolean.
         setState(data.state ?? (data.available ? "ok" : "unbound"));
         setMaxNoteLength(data.maxNoteLength);
       } catch {
@@ -181,7 +146,7 @@ export function ChartReviewProvider({ children }: { children: React.ReactNode })
     };
   }, []);
 
-  // Cleanup only: the refs are read inside the teardown, never during render.
+  // Cleanup only.
   useEffect(
     () => () => {
       for (const t of Object.values(noteTimers.current)) clearTimeout(t);
@@ -226,8 +191,8 @@ export function ChartReviewProvider({ children }: { children: React.ReactNode })
 
   const onToggleMark = useCallback(
     (slug: string, marked: boolean) => {
-      // A pending note write would land after this and re-assert the old mark,
-      // so cancel it; the note goes out with this request instead.
+      // Cancel any pending note write (it would re-assert the old mark);
+      // the note goes out with this request instead.
       clearTimeout(noteTimers.current[slug]);
       delete noteTimers.current[slug];
       setMarks((prev) => {
@@ -247,8 +212,7 @@ export function ChartReviewProvider({ children }: { children: React.ReactNode })
         setMarks((prev) => {
           const state = prev?.[slug];
           if (!state || state.note === state.savedNote) return prev;
-          // Typing a note is itself a flag: nobody writes "labels collide" about
-          // a chart they are happy with.
+          // Typing a note is itself a flag, so it also marks the chart.
           void save(slug, { marked: true, note: state.note });
           return prev;
         });
@@ -309,18 +273,14 @@ export function ChartReviewProvider({ children }: { children: React.ReactNode })
 }
 
 /** The counts, plus links to outstanding charts that live on other pages.
- *
- *  `slugs` is the whole library in gallery order and `perPage` the slice size,
- *  which is all this needs to turn a slug into the URL of the page holding it.
- *  Sending 70-odd strings is cheap; sending 70-odd SVGs would not be. */
+ *  `slugs` is the whole library in gallery order; enough to map a slug to the
+ *  page holding it. */
 export function ChartReviewSummary({
   slugs,
   perPage,
   currentPage,
-  /** URL prefix for the current ordering, so a jump link lands on the page
-   *  that really holds the slug. `slugs` arrives already sorted, and the page
-   *  a chart sits on depends on that ordering, so a link built against the
-   *  default sort would be wrong on every other one. */
+  /** URL prefix for the current ordering — the page a chart sits on depends on
+   *  the sort, so links built against the default sort would be wrong. */
   basePath,
 }: {
   slugs: string[];
@@ -366,8 +326,7 @@ export function ChartReviewSummary({
 
       {ctx.error ? <p className={styles.queueError}>{ctx.error}</p> : null}
 
-      {/* Only what is *not* on this page: everything else already has its
-          controls a scroll away, and repeating it would be noise. */}
+      {/* Only what is *not* on this page. */}
       {[
         { key: "marked", label: "Marked on other pages", list: elsewhere(marked) },
         { key: "awaiting", label: "Awaiting approval on other pages", list: elsewhere(awaiting) },
@@ -394,9 +353,7 @@ export function ChartMarkControls({ slug, title }: { slug: string; title: string
   if (!ctx?.marks) return null;
 
   const mark = ctx.marks[slug] ?? EMPTY_MARK;
-  // A fresh mark outranks a pending approval: if the redraw is still wrong and
-  // has been queued again, "waiting to be looked at" is no longer the state
-  // worth showing.
+  // A fresh mark outranks a pending approval.
   const state = mark.marked ? "marked" : mark.awaitingApproval ? "awaiting" : "none";
 
   return (
@@ -463,17 +420,9 @@ export function ChartMarkControls({ slug, title }: { slug: string; title: string
   );
 }
 
-/**
- * The deletion-request control for one figure, wired to the queue.
- *
- * Separate from `ChartMarkControls` and deliberately more forgiving: that
- * component returns null until the marks fetch resolves and for anyone who is
- * not an admin, which is right for a redraw queue nobody else can write to.
- * This one renders regardless and disables itself instead, because a control
- * that silently is not there reads as a missing feature rather than as a
- * permission, and because the button is the only place the outstanding request
- * is visible on the figure itself.
- */
+/** The deletion-request control for one figure. Unlike ChartMarkControls it
+ *  renders even before the marks fetch resolves (disabled, not hidden): the
+ *  button is the only place an outstanding request is visible on the figure. */
 export function ChartDeleteControls({
   slug,
   usedBy,

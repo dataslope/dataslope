@@ -25,27 +25,20 @@ import { Highlighter } from "@/components/ui/highlighter";
 import { PatternBackdrop } from "../PatternBackdrop";
 import { stashCheckoutPeriod, startProCheckout } from "../billing/proCheckout";
 
-/** A single capability line: an icon that maps to the feature, the text, and an
- *  optional clarifying sub-note. Set `included: false` to render it as a
- *  not-available row (red ✕), kept in place so the rows line up across plans
- *  for direct comparison. */
+/** A capability line. `included: false` renders a not-available row (red ✕),
+ *  kept in place so rows line up across plans. */
 type Feature = {
   text: string;
   icon?: LucideIcon;
   note?: string;
   included?: boolean;
-  /** Optional substring of `text` to wrap in a Magic UI underline
-   *  highlight (used to draw the eye to the headline Pro perks). */
+  /** Substring of `text` to wrap in a Magic UI underline highlight. */
   highlight?: string;
 };
 
 interface Plan {
   name: string;
-  /** Illustration slug shown at the right end of the column's title line, one
-   *  marmot posed to read as the tier: a satchel for the visiting Guest, a
-   *  scarf for the signed-up Free Member, a crown for Pro. Replaces the Lucide
-   *  glyphs (User / UserCheck / Crown) these columns used to carry, so the
-   *  table is dressed in the same artwork as the rest of the site. */
+  /** Illustration slug shown at the right end of the column's title line. */
   iconSlug: string;
   description: string;
   /** Price + sub-line per billing period. The free tiers ignore the toggle
@@ -66,10 +59,9 @@ interface Plan {
   checkout?: boolean;
 }
 
-// Number of feature rows every plan lists, in the same order, so the subgrid
-// can line the rows up across columns. If you change this, also update the
-// hardcoded subgrid row counts in the render below (they are FEATURE_COUNT + 3
-// header/price/CTA rows) since Tailwind needs the literal class strings.
+// Feature rows per plan. If you change this, also update the hardcoded
+// subgrid row counts in the render below (FEATURE_COUNT + 3) — Tailwind
+// needs literal class strings.
 const FEATURE_COUNT = 8;
 
 const PLANS: Plan[] = [
@@ -79,10 +71,6 @@ const PLANS: Plan[] = [
     description: "Jump straight in, sign-in optional.",
     priceMonthly: "$0",
     priceAnnual: "$0",
-    // Sits directly under the "$0 / month" line, so it reads as the billing
-    // sub-line (the Free Member column's "Free forever" is its counterpart).
-    // "Sign-in optional" was both the wrong register for that slot and a
-    // repeat of the column description right above it.
     noteMonthly: "No account needed",
     noteAnnual: "No account needed",
     features: [
@@ -146,18 +134,11 @@ const PLANS: Plan[] = [
     highlighted: true,
     badge: "Recommended",
   },
-  // ── Pro plan: temporarily hidden ──────────────────────────────────────────
-  // The paid "Pro" column is intentionally kept OUT of the rendered table for
-  // now (see SHOW_PRO_PLAN below). The goal right now is to attract as many
-  // users as possible, and surfacing a paid tier can read as an upsell even
-  // though every course, playground, and challenge is free on all tiers. The
-  // plan object and all of its billing wiring (ProCheckoutCta, startProCheckout,
-  // stashCheckoutPeriod, the Polar checkout, the `checkout`/`plan` fields) are
-  // deliberately LEFT IN PLACE so Pro can be brought back by flipping
-  // SHOW_PRO_PLAN to `true` — do not delete them. When restoring, also:
-  //   • re-add the "AI-suggested autocomplete" feature rows (removed across all
-  //     plans) and bump FEATURE_COUNT back up accordingly, and
-  //   • widen the grid again (see the grid-cols / subgrid-row comments below).
+  // Pro is intentionally hidden (SHOW_PRO_PLAN below) but its plan object and
+  // all billing wiring (ProCheckoutCta, startProCheckout, Polar checkout) are
+  // deliberately left in place — do not delete. To restore: flip
+  // SHOW_PRO_PLAN, re-add the "AI-suggested autocomplete" rows (bumping
+  // FEATURE_COUNT), and widen the grid (see grid-cols / subgrid-row comments).
   {
     name: "Pro",
     iconSlug: "pricing-pro",
@@ -202,16 +183,11 @@ const PLANS: Plan[] = [
   },
 ];
 
-// Toggle the paid "Pro" column on/off. Flip to `true` to restore the tier
-// (see the "Pro plan: temporarily hidden" note above for the full checklist).
+// Flip to `true` to restore Pro (see the checklist above).
 const SHOW_PRO_PLAN = false;
 const VISIBLE_PLANS = PLANS.filter((p) => SHOW_PRO_PLAN || p.name !== "Pro");
 
 // Shown above the table in place of the billing toggle while Pro is hidden.
-// Three sentences, because a table of $0s raises exactly three suspicions: that
-// a card is wanted up front, that the free run is a trial, and that access
-// lapses. Phrased as the denials a visitor is already half-expecting, rather
-// than as a claim ("Free forever") the price column has made twice already.
 const NO_CATCH = ["No credit card", "No trial period", "No expiry"];
 
 // Explicit column placement keeps each plan in its own column while spanning
@@ -251,14 +227,11 @@ function FeatureRow({
 }: {
   feature: Feature;
   last: boolean;
-  /** Hide on mobile (shown only in the desktop comparison grid) because the
-   *  feature is identical to the previous plan's, the mobile layout replaces
-   *  these repeats with an "Everything in <plan>, plus" line. */
+  /** Hide on mobile: identical to the previous plan's row, replaced there by
+   *  the "Everything in <plan>, plus" line. */
   mobileHidden?: boolean;
 }) {
   const included = feature.included !== false;
-  // Supported → the feature's own icon; missing → an ✕. Both sit in a filled
-  // circle (green / red) with a white glyph.
   const Icon = included ? (feature.icon ?? Check) : X;
   return (
     <div
@@ -272,10 +245,9 @@ function FeatureRow({
       >
         <Icon size={12} strokeWidth={2.5} className="text-white" />
       </span>
-      {/* leading-relaxed (not snug) so the Magic UI underline under a
-          highlighted word (Pro's "10 GB" / "Unlimited") clears the wrapped
-          continuation line instead of crowding it. Applied to every column's
-          rows so the three stay vertically consistent. */}
+      {/* leading-relaxed so the Magic UI underline under a highlighted word
+          clears the wrapped continuation line. Applied to every column for
+          vertical consistency. */}
       <span className="text-[15px] leading-relaxed text-[var(--ds-gray-900)] dark:text-white">
         <FeatureText feature={feature} />
         {feature.note && (
@@ -289,12 +261,9 @@ function FeatureRow({
 }
 
 /**
- * CTA for the Pro column. Where it sends the visitor depends on who they are:
- * signed out → /sign-in (an account is required, the Polar customer is
- * keyed to the user id); already Pro → /account (manage the subscription);
- * signed-in free member → straight into Polar's hosted checkout for the
- * period selected by the monthly/annual toggle. If billing isn't configured
- * (or the annual product isn't), the button says so instead of dead-ending.
+ * Pro CTA: signed out → /sign-in (the Polar customer is keyed to the user
+ * id); already Pro → /account; signed-in free member → Polar hosted checkout
+ * for the selected period. If billing isn't configured the button says so.
  */
 function ProCheckoutCta({ plan, annual }: { plan: Plan; annual: boolean }) {
   const { data: session, isPending } = useSession();
@@ -304,25 +273,21 @@ function ProCheckoutCta({ plan, annual }: { plan: Plan; annual: boolean }) {
   const sessionUser = session?.user as
     | { plan?: string; role?: string }
     | undefined;
-  // Admins are treated as Pro everywhere (lib/ai/tier.ts), route them to
-  // their account page rather than into a checkout for a plan they already
-  // effectively have, mirroring app/account/AccountClient.tsx.
+  // Admins are treated as Pro everywhere (lib/ai/tier.ts): route to account,
+  // not into a checkout for a plan they effectively have.
   const isPro =
     (sessionUser?.plan ?? "").toLowerCase() === "pro" ||
     sessionUser?.role === "admin";
 
   async function handleClick() {
     setError(null);
-    // While the first session fetch is in flight a signed-in user would be
-    // misrouted to /sign-in (which bounces to /account, never checkout),
-    // ignore clicks until the session state is known.
+    // Ignore clicks while the session fetch is in flight — a signed-in user
+    // would otherwise be misrouted to /sign-in.
     if (isPending) return;
     if (!session) {
-      // Remember the chosen billing period across the sign-in detour, the
-      // buyer lands on /account afterwards, whose Upgrade button honors it
-      // (otherwise an annual purchase silently becomes monthly). The explicit
-      // ?next= pins that destination: sign-in otherwise returns the user to
-      // the page they came from (see app/_components/auth/returnTo.ts).
+      // Remember the billing period across the sign-in detour; /account's
+      // Upgrade button honors it (otherwise annual silently becomes monthly).
+      // ?next= pins the destination.
       stashCheckoutPeriod(annual ? "annual" : "monthly");
       router.push("/sign-in?next=/dashboard/account");
       return;
@@ -366,27 +331,22 @@ function PlanColumn({
   plan: Plan;
   annual: boolean;
   colClass: string;
-  /** The plan one tier down (undefined for Guest). Its features collapse the
-   *  repeated rows on mobile behind an "Everything in <plan>, plus" line. */
+  /** The plan one tier down (undefined for Guest); its repeated rows collapse
+   *  on mobile behind an "Everything in <plan>, plus" line. */
   prevPlan?: Plan;
 }) {
   const price = annual ? plan.priceAnnual : plan.priceMonthly;
   const note = annual ? plan.noteAnnual : plan.noteMonthly;
 
   return (
-    // On desktop each plan is a row-subgrid spanning all FEATURE_COUNT + 3 rows
-    // so its header / price / CTA / feature rows align with the other plans.
-    // Vertical padding is kept off the subgrid container (it would offset the
-    // shared row tracks); top/bottom breathing room is added to the header and
-    // last feature instead.
+    // Each plan is a row-subgrid spanning FEATURE_COUNT + 3 rows so rows
+    // align across plans. Vertical padding stays off the subgrid container
+    // (it would offset the shared row tracks).
     <div
       className={`flex flex-col gap-3 px-6 py-6 lg:row-span-11 lg:row-start-1 lg:grid lg:grid-rows-subgrid lg:px-8 lg:py-0 ${colClass}`}
     >
-      {/* `relative` so the marmot can be lifted OUT OF FLOW below. The title
-          row must keep the height it had when this was a 20px Lucide glyph:
-          as a flex item, a 120px image sets the row height and pushes the
-          price, CTA and every feature row down, which shows up as the plan
-          columns no longer aligning with each other. */}
+      {/* `relative` so the marmot is lifted out of flow below — in flow a
+          120px image would set the row height and break column alignment. */}
       <div className="relative lg:pt-8">
         <div className="flex items-center gap-2.5">
           <h3 className="text-lg font-semibold text-[var(--ds-gray-900)] dark:text-white">
@@ -398,42 +358,14 @@ function PlanColumn({
             </span>
           )}
         </div>
-        {/* Decorative: the plan name beside it already says which tier this is,
-            so the marmot is hidden from assistive tech rather than read out as
-            "Guest, Guest".
-
-            Out of flow, and deliberately overhanging the card's top edge — the
-            reviewer liked the marmot breaking the border rather than sitting
-            inside it. -40% rather than -50% drops it a little further into the
-            card so it reads as resting on the edge instead of floating over
-            it. `pointer-events-none` keeps it from swallowing clicks.
-
-            Below `lg` all three values change, because the same box lands
-            somewhere else once the column becomes a full-width row:
-
-            - `-right-6` instead of `right-0`. Each cut-out carries a wide
-              transparent margin (the free-member art paints across 605 of its
-              1024px canvas), so `right-0` aligns the *box* to the content edge
-              and leaves the marmot itself ~24px short of it, reading as
-              floated left of where it belongs. Pulling the box out by the
-              column's own padding puts the drawing where `right-0` looks like
-              it should have put it, flush with the card edge.
-            - `-translate-y-[60%]` instead of -40%. The desktop header carries
-              `lg:pt-8` and the column has no vertical padding, while a phone
-              row has neither — `top-1/2` is measured against a 28px title row
-              sitting 24px into the card, which dropped the marmot ~10px lower
-              than on desktop and left it resting *inside* the top edge rather
-              than breaking it, hanging down over the price instead.
-            - `size-24` instead of 120px, which is the part a move alone could
-              not fix. A phone row is a third the width of the table it came
-              from, but the art was still drawn at desktop size, so on a 360px
-              screen it reached back across the title line and painted over the
-              "Recommended" badge (~45px of it, enough to cut the word in
-              half). Lifting it makes that worse rather than better: the badge
-              line then crosses the marmot's middle, which is the widest part
-              of the silhouette. At 96px the drawing meets the badge's rounded
-              end and leaves its text clear by ~9px, on the narrowest phone
-              worth designing for. */}
+        {/* Decorative (aria-hidden: the plan name already names the tier).
+            Deliberately overhangs the card's top edge; -40% rather than -50%
+            so it reads as resting on the edge. Below `lg` the values change
+            because the column becomes a full-width row: `-right-6`
+            compensates for the cut-out's transparent margin so the drawing
+            sits flush with the card edge; `-translate-y-[60%]` compensates
+            for the missing desktop header padding; `size-24` keeps the art
+            clear of the "Recommended" badge on narrow phones. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={`/images/${plan.iconSlug}-cutout.webp`}
@@ -449,12 +381,8 @@ function PlanColumn({
         <span className="text-4xl font-medium tracking-tight text-[var(--ds-gray-900)] dark:text-white">
           {price}
         </span>
-        {/* Billing-period suffix, moved by the toggle when there is one. With
-            Pro hidden there is no toggle, so this always reads "/ month" above
-            two $0 columns and one of them says "Free forever" underneath —
-            vestigial, and a fair candidate for dropping while nothing is
-            billed. Left alone for now so the price line stays a deliberate
-            copy decision rather than a side effect of removing a control. */}
+        {/* Billing-period suffix, moved by the toggle when there is one
+            (always "/ month" while Pro is hidden). */}
         <span className="ml-1 text-base font-normal text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
           {annual ? "/ year" : "/ month"}
         </span>
@@ -479,11 +407,8 @@ function PlanColumn({
         </Link>
       )}
 
-      {/* Mobile only: each paid column stacks below the one before it, so
-          repeating every shared line is noise. Lead with an "Everything in
-          <previous plan>, plus" note and show only the rows that differ. The
-          desktop comparison grid (lg+) still renders every row so the three
-          columns line up. */}
+      {/* Mobile only: stacked columns lead with "Everything in <plan>, plus"
+          and show only the differing rows; desktop renders every row. */}
       {prevPlan && (
         <div className="flex items-center gap-3 lg:hidden">
           <span
@@ -515,9 +440,8 @@ function PlanColumn({
 }
 
 export function PricingSection({
-  /** Render the section's own "Pricing" title + blurb. The dedicated /pricing
-   *  page supplies its own page-level heading and turns this off to avoid a
-   *  duplicate; the home page leaves it on. */
+  /** Render the section's own "Pricing" title + blurb; /pricing turns this
+   *  off because it has its own page-level heading. */
   showHeading = true,
 }: {
   showHeading?: boolean;
@@ -540,25 +464,9 @@ export function PricingSection({
         </div>
       )}
 
-      {/* The slot above the table: the billing toggle when there is something
-          to bill for, the "no catch" strip when there isn't.
-
-          With Pro hidden the toggle was a dead control. Both remaining columns
-          are $0 with the same sub-line, so the only thing it changed was the
-          "/ month" suffix, and the "Best value" badge on Annual promised a
-          discount that could not exist — a visitor who clicked to find the
-          saving got $0 → $0.
-
-          The strip answers the question the toggle never could. Somebody
-          reading a table where every price is $0 is not working out a billing
-          period, they are looking for the catch, and "No credit card / No
-          trial period / No expiry" names all three catches they are expecting.
-          Each one carries the same green check the feature rows use for an
-          included capability, so the mark that means "you get this" is the
-          same mark on both sides of the table's top edge.
-
-          Restoring Pro is still one flag: flip SHOW_PRO_PLAN and the toggle
-          comes back with its state and checkout wiring untouched. */}
+      {/* Billing toggle when there is something to bill for; the "no catch"
+          strip while Pro is hidden (a toggle over all-$0 columns was a dead
+          control). Restoring Pro is one flag: SHOW_PRO_PLAN. */}
       {SHOW_PRO_PLAN ? (
       <div className="mb-10 flex items-center justify-center">
         <div className="inline-flex items-center rounded-full border border-[var(--ds-gray-200)] bg-white p-1 dark:border-white/15 dark:bg-[#121212]">
@@ -612,28 +520,13 @@ export function PricingSection({
         </ul>
       )}
 
-      {/* Comparison: bordered, no gaps between plans, thin dividers between
-          them, and feature rows aligned via subgrid. The striped-shell gives
-          it the same diagonal-offset elevation as the code blocks / challenge
-          cards. The stripe layer sits behind an OPAQUE inner surface (the
-          bordered card below), so it only shows in the down-right offset
-          sliver, not through the table body. */}
-      {/* Fadedbar backdrop, the same pattern the /playground hero band uses.
-          The table's surface and its striped shell are both opaque, so the
-          pattern is only visible where it extends past them: it starts a
-          little way down the table, runs the full width of the viewport, and
-          continues 120px below the table's bottom edge, so it reads as
-          something the table is resting on.
-
-          That tail is long enough that a hard bottom edge would read as a
-          band, so the last 96px fade to nothing — shorter than the footer
-          band's own 143px fade-in, which is the deepest dissolve on the site
-          and the one the others stay under. The trailing margin clears the
-          full 120px so the faded tail never reaches the next section.
-
-          Brand green joins the grey + blue inks here (the free tiers' CTA and
-          "Recommended" badge are green), giving the table's backdrop its own
-          accent without leaving the palette. */}
+      {/* Comparison table: feature rows aligned via subgrid; the striped
+          shell sits behind an opaque surface so it only shows in the offset
+          sliver. */}
+      {/* Fadedbar backdrop (same pattern as the /playground hero band); only
+          visible where it extends past the opaque table. The last 96px fade
+          out so the tail doesn't read as a band, and the trailing margin
+          clears the 120px overhang before the next section. */}
       <PatternBackdrop
         pattern={fadedbar}
         insetTop={72}
@@ -650,10 +543,8 @@ export function PricingSection({
       >
         <div className="ds-striped-shell rounded-2xl">
           <div className="rounded-2xl border border-[var(--ds-gray-200)] bg-white dark:border-white/10 dark:bg-[#121212]">
-            {/* Column count tracks the number of visible plans; the subgrid
-                row count is FEATURE_COUNT + 3 (header/price/CTA). Both are
-                literal class strings so Tailwind's JIT can see them; when
-                restoring Pro, switch `lg:grid-cols-2` to `lg:grid-cols-3`. */}
+            {/* Subgrid row count is FEATURE_COUNT + 3 (header/price/CTA),
+                as literal class strings for Tailwind's JIT. */}
             <div
               className={`grid grid-cols-1 divide-y divide-[var(--ds-gray-200)] lg:grid-rows-[repeat(11,auto)] lg:gap-y-3 lg:divide-x lg:divide-y-0 dark:divide-white/10 ${
                 SHOW_PRO_PLAN ? "lg:grid-cols-3" : "lg:grid-cols-2"

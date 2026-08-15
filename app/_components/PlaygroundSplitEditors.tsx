@@ -1,24 +1,12 @@
 "use client";
 
 /**
- * CodePen-style split editors for the playground, one always-visible
- * CodeMirror editor per workspace file (HTML on top, then CSS, then
- * JS), stacked vertically in the editor pane instead of the tabbed
- * single editor. Offered by adapters that set `splitEditors` (web).
- *
- * State contract: the per-file dirty-buffer Map in the playground
- * store is the source of truth.
- *   - User edits here write through synchronously (`onChange` mirrors
- *     the main editor's persist listener: buffer + OPFS + dirty mark),
- *     so Run / snapshot paths that read buffers are always current.
- *   - External writes (loading an example, an AI-suggestion revert)
- *     flow back in via the `buffers` prop: each editor replaces its doc
- *     when the buffer diverges, with a suppress flag so the replacement
- *     isn't echoed back out as a user edit.
- *
- * Focusing an editor reports the file as "active" so the Run button
- * label, Format target, and completion filename all track the pane the
- * user is working in, same semantics as focusing a tab.
+ * CodePen-style split editors: one always-visible CodeMirror editor per
+ * workspace file, for adapters that set `splitEditors` (web). The store's
+ * per-file dirty-buffer Map is the source of truth: user edits write through
+ * synchronously, and external writes flow back via the `buffers` prop (doc
+ * replaced under a suppress flag so it isn't echoed back as a user edit).
+ * Focusing a pane makes its file "active", same semantics as focusing a tab.
  */
 
 import { useEffect, useMemo, useRef } from "react";

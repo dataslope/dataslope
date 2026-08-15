@@ -1,25 +1,15 @@
-/** Type-aware cell editing helpers for the result grid.
+/** Pure, type-aware cell-editing helpers for the result grid.
  *
- *  These are pure functions (no React, no engine access) so they can be
- *  unit-tested in isolation. `ResultView` uses them to pick the right inline
- *  editor for a column and to convert between a stored cell value and the
- *  value a native `<input type="date|datetime-local|time">` expects.
- *
- *  Design note on round-tripping temporal values: a date/time picker is a
- *  pure *enhancement* over the existing free-text inline editor. To guarantee
- *  an edit is at least as safe as typing the ISO text by hand, the picker
- *  reconstructs the committed string by substituting only the date and time
- *  substrings of the *original* value, preserving its separator (`T` vs a
- *  space), fractional seconds, and timezone suffix (`Z` / `+05:30`). The
- *  engine produced that format, so it always parses it back. No JS `Date`
- *  timezone arithmetic is performed, which is the usual source of off-by-an-
- *  hour bugs. */
+ *  Temporal round-trip invariant: the picker commits by substituting only the
+ *  date/time substrings of the *original* value, preserving its separator,
+ *  fractional seconds, and timezone suffix — the engine produced that format,
+ *  so it always parses back. No JS `Date` timezone arithmetic (the usual
+ *  source of off-by-an-hour bugs). */
 
 import type { TableColumnInfo } from "../../runtime/sqlite";
 
-/** Build the enum-column → allowed-labels map for `ColumnKeyHints` from a
- *  table's introspected columns. Columns without enum metadata (every SQLite
- *  column, and any non-enum Postgres/DuckDB column) are skipped. */
+/** Enum-column → allowed-labels map for `ColumnKeyHints`; columns without
+ *  enum metadata are skipped. */
 export function enumHintsFromColumns(
   cols: readonly TableColumnInfo[],
 ): Map<string, string[]> {
@@ -44,18 +34,14 @@ export type CellEditorKind =
   | "text";
 
 /** Classify a column's SQL type string into an editor kind. Handles the type
- *  names produced by all three engines (Postgres `timestamptz`, DuckDB
- *  `TIMESTAMP WITH TIME ZONE`, SQLite declared `DATETIME`, …). Array types
- *  (`integer[]`, `timestamptz[]`) and unknown types fall back to `"text"`. */
+ *  names of all three engines; unknown types fall back to `"text"`. */
 export function classifyCellEditor(sqlType: string | undefined): CellEditorKind {
   const t = (sqlType ?? "").trim().toLowerCase();
   if (!t) return "text";
   if (/^bool(ean)?$/.test(t)) return "boolean";
-  // Arrays / lists get a dedicated JSON-array editor (checked before the
-  // scalar temporal/json rules so an array of timestamps isn't mistaken for a
-  // single timestamp). Postgres and DuckDB report `integer[]` / `text[]`;
-  // raw Arrow notation (`list<int32>`) is kept as a fallback for callers
-  // that bypass `arrowTypeToSqlName`.
+  // Arrays / lists: checked before the scalar temporal/json rules so an
+  // array of timestamps isn't mistaken for a single timestamp. Raw Arrow
+  // notation (`list<int32>`) covers callers that bypass arrowTypeToSqlName.
   if (t.endsWith("[]") || t.startsWith("list<") || t.startsWith("list(")) {
     return "array";
   }
@@ -75,9 +61,8 @@ export function classifyCellEditor(sqlType: string | undefined): CellEditorKind 
   return "text";
 }
 
-/** Normalize an array cell's stored value to JSON text for editing. Array
- *  values reach the grid as JSON strings (both adapters JSON-stringify them),
- *  but a value may also be a live JS array, handle both. */
+/** Normalize an array cell's stored value (JSON string or live JS array) to
+ *  JSON text for editing. */
 export function arrayEditorText(value: unknown): string {
   if (value === null || value === undefined) return "";
   if (typeof value === "string") return value;
@@ -91,10 +76,8 @@ export function arrayEditorText(value: unknown): string {
   return String(value);
 }
 
-/** Parse an edited array cell. Returns the parsed JS array when the text is a
- *  valid JSON array (the value written back, which each engine binds as a real
- *  array / LIST); otherwise `{ ok: false }` so the caller keeps the raw text
- *  rather than committing garbage. */
+/** Parse an edited array cell: the parsed JS array for valid JSON, otherwise
+ *  `{ ok: false }` so the caller keeps the raw text. */
 export function parseArrayEditValue(text: string): {
   ok: boolean;
   value: unknown[];
@@ -112,16 +95,9 @@ export function parseArrayEditValue(text: string): {
 export type TemporalEditorKind = "date" | "datetime" | "time";
 
 /** Does a stored temporal value carry a real (non-midnight) time-of-day?
- *
- *  A column may be declared `date` yet hold a value with a meaningful time,
- *  this is common with flexibly-typed engines (SQLite stores whatever string
- *  you give it) and also happens when a value like `2024-03-15 14:30:00` lands
- *  in a date-ish column. In those cases a date-only `<input type="date">`
- *  would silently hide and drop the time, so the caller upgrades to a
- *  `datetime-local` picker. Pure dates (no time, or an all-zero `T00:00:00`
- *  suffix as produced for a true SQL `date`) return `false` and keep the
- *  date-only picker. Timezone suffixes (`+05:30`) are never mistaken for the
- *  time-of-day because the first `HH:MM` in the string is the clock time. */
+ *  A `date` column can hold such a value; a date-only picker would silently
+ *  drop the time, so the caller upgrades to datetime. Timezone suffixes are
+ *  never mistaken for the time-of-day: the first `HH:MM` is the clock time. */
 export function hasTimeOfDay(stored: unknown): boolean {
   const s =
     typeof stored === "string"
@@ -141,10 +117,8 @@ export function hasTimeOfDay(stored: unknown): boolean {
   );
 }
 
-/** Resolve the *effective* editor kind for a cell from its column-derived kind
- *  and the actual stored value: a `date` column whose value carries a real
- *  time-of-day is upgraded to `datetime` so the user can edit hours/minutes
- *  too. Everything else passes through unchanged. */
+/** Effective editor kind: a `date` column whose value carries a real
+ *  time-of-day is upgraded to `datetime`; everything else passes through. */
 export function resolveTemporalEditorKind(
   columnKind: TemporalEditorKind,
   storedValue: unknown,
@@ -167,10 +141,8 @@ function timePart(s: string): string | null {
 }
 
 /** Convert a stored cell value into the string a native date/time input
- *  expects, or `null` if the value isn't a recognizable temporal string (in
- *  which case the caller should fall back to the plain text editor, so odd
- *  representations, e.g. a SQLite date stored as a Unix integer, are never
- *  silently mangled). */
+ *  expects, or `null` when it isn't a recognizable temporal string (caller
+ *  falls back to the text editor so odd representations are never mangled). */
 export function toDateEditorValue(
   stored: unknown,
   kind: TemporalEditorKind,
@@ -189,11 +161,9 @@ export function toDateEditorValue(
   return `${d}T${t}`;
 }
 
-/** Convert the value coming back from a native date/time input into the string
- *  to commit. Where the original value's format is known it is preserved by
- *  substituting only its date/time substrings (keeping separator, fractional
- *  seconds and any timezone suffix); otherwise a plain ISO-ish string is
- *  produced. */
+/** Convert a native date/time input's value into the string to commit,
+ *  substituting only the original's date/time substrings (preserving its
+ *  format); otherwise a plain ISO-ish string. */
 export function fromDateEditorValue(
   inputValue: string,
   kind: TemporalEditorKind,
@@ -253,18 +223,11 @@ export function formatBytesHex(bytes: Uint8Array): string {
   return rows.join("\n");
 }
 
-/** Decide whether a previously-stored cell value can be safely written back
- *  verbatim for a one-step *undo* of a committed edit (UX-10).
- *
- *  Undo re-applies the value the engine itself returned, so for scalars it is
- *  exactly as safe as the original write. Only values that round-trip cleanly
- *  through the same update path are reversible:
- *    • `null`, string, number, boolean, bigint → passed through unchanged;
- *    • `Date` → normalized to an ISO string (every engine parses it back, and
- *      it avoids DuckDB's `String(date)` literal, which isn't valid SQL);
- *  A complex original (JS array/object from a LIST/STRUCT/JSON column, or raw
- *  `Uint8Array` bytes) returns `{ ok: false }` so the caller suppresses undo
- *  rather than risk a lossy reverse-write. */
+/** Whether a stored cell value can be written back verbatim for post-commit
+ *  undo. Scalars pass through; `Date` normalizes to ISO (avoids DuckDB's
+ *  `String(date)` literal, which isn't valid SQL); complex values (arrays,
+ *  objects, bytes) return `{ ok: false }` so undo is suppressed rather than
+ *  risking a lossy reverse-write. */
 export function reversibleCellValue(value: unknown): {
   ok: boolean;
   value: unknown;

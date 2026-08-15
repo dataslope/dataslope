@@ -1,59 +1,33 @@
 name: R2 illustrations lifecycle
 
 # Applies the retention rule for the illustration-candidate bucket
-# (`dataslope-illustrations`), so generated candidates expire on their own
-# instead of accumulating.
+# (`dataslope-illustrations`) so generated candidates expire on their own.
+# A lifecycle rule is bucket configuration — Cloudflare deletes server-side
+# once it's set — and keeping it in the repo makes the window reviewable and
+# re-appliable if the bucket is recreated.
 #
-# Why a workflow rather than a one-off command: an R2 lifecycle rule is bucket
-# configuration, not a recurring job. Cloudflare does the deleting server-side
-# for free once the rule is set, so nothing here needs a schedule. Keeping the
-# rule in the repo makes the retention window reviewable in a diff and
-# re-appliable if the bucket is ever recreated — which is exactly what a
-# hand-run `wrangler r2 bucket lifecycle add` on someone's laptop is not.
+# The bucket holds every generated candidate + cut-out (see "Illustrations"
+# in AGENTS.md); only chosen ones are promoted into git, the rest are dead
+# weight once a pick is made. EXPIRE_DAYS is the review/promote window:
+# Cloudflare deletes older objects promoted or not. The served WebP is
+# unaffected, but the pristine PNG is gone — re-promoting at different
+# quality then means paying to regenerate. Raise EXPIRE_DAYS for a longer
+# review.
 #
-# What the pipeline puts in this bucket (see "Illustrations" in AGENTS.md):
-# `scripts/generate-illustrations.mjs --sink r2` writes every generated
-# candidate under `illustrations/<runId>/<promptId>/v<n>/`, and
-# `scripts/remove-background-kie.mjs` adds the cut-outs beside them. Most are
-# rejects: the point of R2 is that only the chosen ones are promoted into git by
-# `scripts/promote-illustrations.mjs`. The rest are dead weight the moment a
-# pick is made, and this rule sweeps them.
-#
-# EXPIRE_DAYS is the window you have to review and promote a run. Anything
-# under `illustrations/` older than that is deleted by Cloudflare, promoted or
-# not — promotion writes its own encoded WebP into `public/images/`, so an
-# expired candidate that was already promoted costs nothing served. What you
-# lose is the pristine PNG, and with it the ability to re-promote at a
-# different quality without paying to regenerate. Raise EXPIRE_DAYS if a batch
-# needs to sit through a longer review.
-#
-# Uses the S3 API rather than wrangler, so no `wrangler login` and no separate
-# Cloudflare API token are needed — but NOT the same credentials as
-# r2-cache-cleanup.yml, which is what made the first run of this workflow fail.
-# A lifecycle rule is bucket *configuration*, and R2 lets only an
-# "Admin Read & Write" API token edit that. The "Object Read & Write" token the
-# rest of the pipeline shares can list, read and write objects, and even
-# head-bucket succeeds with it, so everything looks fine right up to the write,
-# where it returns a bare AccessDenied.
+# Credentials: NOT the same as r2-cache-cleanup.yml. Editing bucket
+# configuration requires an "Admin Read & Write" R2 token — an Object token
+# can list/read/write objects and even passes head-bucket, then gets a bare
+# AccessDenied on the config write. Admin tokens are account-wide, so the
+# dedicated R2_ADMIN_* pair is confined to this workflow and kept out of the
+# unattended cache-cleanup job on purpose.
 # https://developers.cloudflare.com/r2/api/tokens/#permissions
 #
-# Hence the dedicated R2_ADMIN_* pair below, used by this workflow and nothing
-# else. R2 admin tokens cannot be scoped to a single bucket (they are
-# account-wide by definition), so confining one to the single job that needs it
-# beats handing the same rights to r2-cache-cleanup.yml, which deletes objects
-# unattended every six hours and whose whole safety story is that it cannot
-# reach dataslope-workspaces (live user data, bound to the app Worker) or
-# destroy dataslope-inc-cache outright. That job keeps its own object-scoped
-# R2_INC_CACHE_* pair.
-#
 # NOTE: PutBucketLifecycleConfiguration REPLACES a bucket's entire lifecycle
-# configuration. This job targets `dataslope-illustrations` only and that bucket
-# has no other rules; it must never be pointed at dataslope-inc-cache or
+# configuration. This job must never be pointed at dataslope-inc-cache or
 # dataslope-workspaces, whose contents are not disposable.
 #
-# Required repository secrets (Settings → Secrets and variables → Actions):
-#   CLOUDFLARE_ACCOUNT_ID       Cloudflare account ID (the R2 S3 endpoint host),
-#                               shared with r2-cache-cleanup.yml
+# Required repository secrets:
+#   CLOUDFLARE_ACCOUNT_ID       Cloudflare account ID (shared with r2-cache-cleanup.yml)
 #   R2_ADMIN_ACCESS_KEY_ID      R2 API token access key id (Admin Read & Write)
 #   R2_ADMIN_SECRET_ACCESS_KEY  R2 API token secret access key
 
@@ -83,32 +57,18 @@ jobs:
     env:
       BUCKET: dataslope-illustrations
       PREFIX: illustrations/
-      # 120 days, raised from 30 on 2026-08-10 at the reviewer's request (and
-      # from a standing 14 before that). One value covers both PNGs a run
-      # writes — `<run>/<id>/v<n>/original.png` and `.../cutout.png` sit under
-      # the same prefix — so this is the window for the pristine art and the
-      # background-removed art alike.
-      #
-      # Why it keeps going up: R2 is now the *only* copy of both. The served
-      # WebP is a cut-out that has already been trimmed and re-encoded, and
-      # since promotion stopped writing the opaque original into git there is
-      # no full-frame copy in the repo at all. Re-promoting at a different
-      # quality, re-trimming on different axes, or restoring an original for a
-      # page that wants one all read from here — and once these expire the
-      # only way back is paying to regenerate art that already existed.
-      #
-      # The cost this trades against is rejected candidates: a few thousand
-      # PNGs per round sitting four months instead of one. That was the right
-      # trade at 14 days when the repo held a second copy; it is the wrong one
-      # now.
+      # Covers both the original and cutout PNGs (same prefix). Generous on
+      # purpose: R2 is the ONLY copy of both — the repo holds no full-frame
+      # original — so once these expire, re-promoting or re-trimming means
+      # paying to regenerate art that already existed.
       EXPIRE_DAYS: "120"
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
-      # Editing bucket configuration needs an R2 Admin Read & Write token; the
-      # object-scoped R2_INC_CACHE_* pair is denied here (see the header).
+      # Must be Admin Read & Write; the object-scoped R2_INC_CACHE_* pair is
+      # denied here (see header).
       AWS_ACCESS_KEY_ID: ${{ secrets.R2_ADMIN_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_ADMIN_SECRET_ACCESS_KEY }}
-      # Secrets cannot be tested from inside `run:` (an unset one arrives as
-      # empty, indistinguishable from a set-but-empty one), so resolve it here.
+      # Secrets can't be tested from inside `run:` (unset arrives as empty),
+      # so resolve it here.
       ADMIN_CREDS_SET: ${{ secrets.R2_ADMIN_ACCESS_KEY_ID != '' && secrets.R2_ADMIN_SECRET_ACCESS_KEY != '' }}
       AWS_DEFAULT_REGION: auto
       AWS_EC2_METADATA_DISABLED: "true"
@@ -122,10 +82,8 @@ jobs:
           set -euo pipefail
           aws() { command aws --endpoint-url "$ENDPOINT" "$@"; }
 
-          # An unset CLOUDFLARE_ACCOUNT_ID collapses ENDPOINT to
-          # "https://.r2.cloudflarestorage.com" and every call fails; say so
-          # plainly rather than emitting a wall of AWS CLI errors. (The secret
-          # was named CF_ACCOUNT_ID until Cloudflare deprecated the CF_* prefix.)
+          # An unset CLOUDFLARE_ACCOUNT_ID collapses ENDPOINT and every call
+          # fails; say so plainly rather than emitting a wall of CLI errors.
           if [[ "$ENDPOINT" == "https://.r2.cloudflarestorage.com" ]]; then
             echo "::error::Repository secret CLOUDFLARE_ACCOUNT_ID is not set (it was previously named CF_ACCOUNT_ID)."
             exit 1
@@ -138,17 +96,15 @@ jobs:
             exit 1
           fi
 
-          # Say which secret is missing. Half a pair signs requests with a
-          # mismatched key/secret and fails as an opaque SignatureDoesNotMatch;
-          # neither fails as an equally opaque unsigned-request error.
+          # Say which secret is missing: half a pair fails as an opaque
+          # SignatureDoesNotMatch, neither as an unsigned-request error.
           if [[ "$ADMIN_CREDS_SET" != "true" ]]; then
             echo "::error::Repository secrets R2_ADMIN_ACCESS_KEY_ID and R2_ADMIN_SECRET_ACCESS_KEY are not both set. This job needs an R2 'Admin Read & Write' token; see https://developers.cloudflare.com/r2/api/tokens/#permissions"
             exit 1
           fi
 
-          # Turn an AWS CLI failure into an annotation that says what to do.
-          # AccessDenied on a bucket-configuration call means one specific
-          # thing here, and the CLI's one-liner does not hint at it.
+          # Turn an AWS CLI failure into an annotation that says what to do;
+          # AccessDenied on a bucket-configuration call means one specific thing.
           fail_aws() {
             local what="$1" err="$2"
             printf '%s\n' "$err"
@@ -172,10 +128,8 @@ jobs:
             exit 1
           }
 
-          # Confirm the bucket exists before touching its configuration, so a
-          # typo or a not-yet-created bucket fails here with a clear message.
-          # Note this passes with an object-scoped token too — reachability
-          # says nothing about the right to edit the configuration below.
+          # Confirm the bucket exists first. This passes with an object-scoped
+          # token too — reachability says nothing about config-edit rights.
           if ! aws s3api head-bucket --bucket "$BUCKET" 2>/dev/null; then
             echo "::error::Bucket '$BUCKET' is not reachable with these credentials. Create it, or check the R2 token covers it."
             exit 1
@@ -204,11 +158,9 @@ jobs:
           if [[ "$DRY_RUN" == "true" ]]; then
             echo "---"
             echo "Dry run: existing configuration left untouched. Current rules:"
-            # Reading the configuration needs the same admin-tier token the
-            # write does, so this used to be the one path that hid the problem:
-            # `|| echo "(none set)"` reported a *denied read* as an empty
-            # policy, an all-green dry run that proved nothing. Only a genuine
-            # "this bucket has no rules" may print that now.
+            # Reading the config needs the admin-tier token too: a denied read
+            # must not be reported as "(none set)" — only a genuine
+            # NoSuchLifecycleConfiguration may print that.
             if current="$(aws s3api get-bucket-lifecycle-configuration --bucket "$BUCKET" 2>&1)"; then
               printf '%s\n' "$current"
             elif grep -q 'NoSuchLifecycleConfiguration' <<<"$current"; then
@@ -226,8 +178,7 @@ jobs:
           fi
 
           # Read back rather than trusting the write: a silently-empty policy
-          # would mean candidates accumulate forever, which is the one failure
-          # this job exists to prevent and the one that shows no symptom.
+          # means candidates accumulate forever, with no symptom.
           echo "---"
           echo "Applied. Current configuration:"
           if ! applied="$(aws s3api get-bucket-lifecycle-configuration --bucket "$BUCKET" 2>&1)"; then

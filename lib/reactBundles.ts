@@ -1,20 +1,11 @@
 /**
- * Build-time lookup into the generated React-bundle manifest.
- *
- * The sibling of `lib/blockOutputs.ts`, and deliberately a separate file
- * rather than another field on that one: the two are filled by different
- * generators on different workflows, and a single manifest would make
- * "which job owns this entry" a question with no obvious answer. AGENTS.md
- * records what that ambiguity cost the last time (689 entries deleted by the
- * job that did not own them).
- *
- * Everything in that file's header applies here for the same reasons, so
- * read it before changing this one. In short: read the file with `fs`
- * instead of importing it, so the bytes stay at build time and never join
- * the Cloudflare Worker bundle; memoise the parse across prerendered
- * lessons; and treat every miss — absent file, absent lesson, absent entry
- * — as "no bundle", which degrades to the empty preview panel a react block
- * showed before any of this existed. Pressing Run is unaffected either way.
+ * Build-time lookup into the generated React-bundle manifest. Deliberately a
+ * separate file from lib/blockOutputs.ts: the two are filled by different
+ * generators, and a single manifest makes entry ownership ambiguous (see
+ * AGENTS.md — that ambiguity once cost 689 deleted entries). Same rules as
+ * that file: read with `fs` so the bytes never join the Worker bundle,
+ * memoise the parse, and treat every miss as "no bundle" (degrades to the
+ * empty preview panel; Run is unaffected).
  */
 
 import { readFileSync } from "node:fs";

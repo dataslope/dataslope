@@ -12,13 +12,10 @@ import type {
 } from "../types";
 import { getRuffFmt } from "./ruffFmt";
 
-// Pyodide is loaded inside a dedicated module Web Worker (see
-// `runtime/pyodide-worker.ts`). The worker pulls `pyodide.mjs` from the
-// CDN via a bundler-ignored dynamic `import()`, which keeps the
-// Next.js / Turbopack bundler from ever touching Pyodide's internal
-// `await import(e)` (which would otherwise fail with "Cannot find
-// module as expression is too dynamic") AND keeps Python execution off
-// the main thread so the UI stays responsive while user code runs.
+// Pyodide loads inside a dedicated module Web Worker (see
+// runtime/pyodide-worker.ts): a bundler-ignored CDN import keeps Turbopack
+// away from Pyodide's dynamic imports, and execution stays off the main
+// thread.
 
 const EXAMPLES: ExampleSnippet[] = [
   {
@@ -684,9 +681,8 @@ type WorkerOutMessage =
     };
 
 /**
- * Resolve the active light/dark mode so the worker can pick a matching Plotly
- * template. Playground pages set `data-playground-theme` on <html>; the Fumadocs-powered
- * `/learn` pages use next-themes, which toggles a `.dark` class instead.
+ * Resolve light/dark mode for the Plotly template. Playground pages set
+ * `data-playground-theme` on <html>; /learn pages toggle a `.dark` class.
  */
 function detectChartTheme(): "light" | "dark" {
   if (typeof document === "undefined") return "dark";
@@ -701,18 +697,14 @@ class PyodideWorkerRuntime implements LanguageRuntime {
 
   constructor(private worker: Worker) {}
 
-  /** Free the Pyodide heap by terminating the worker. Registry-eviction
-   *  hook, the instance must not be used after this. */
+  /** Terminate the worker (registry-eviction hook; unusable after). */
   dispose(): void {
     this.worker.terminate();
   }
 
-  /** Fire-and-forget warm hint (see LanguageRuntime.warmPackages): asks
-   *  the worker to pre-install the heavy package set, and any micropip
-   *  drawer packages the sources import, when the authored code (or an
-   *  explicit `packages` list) actually needs it. Explicit module names
-   *  are turned into synthetic `import x` lines so the worker's gate and
-   *  micropip mapping treat them exactly like authored imports. */
+  /** Fire-and-forget warm hint (see LanguageRuntime.warmPackages).
+   *  Explicit module names become synthetic `import x` lines so the
+   *  worker's gate treats them like authored imports. */
   warmPackages(
     sources: string[],
     options?: { packages?: string[]; force?: boolean },
@@ -749,10 +741,8 @@ class PyodideWorkerRuntime implements LanguageRuntime {
         }
         if (msg.id !== id) return;
         if (msg.kind === "run-status") {
-          // Mid-run wait notices (e.g. the deferred package set still
-          // installing on the first data-stack run), see RunOptions.
-          // `preparing` lets the UI show the boot notice during the wait
-          // and drop it once execution actually starts.
+          // Mid-run wait notices; `preparing` shows the boot notice until
+          // execution actually starts.
           options?.onStatus?.(msg.message, msg.preparing);
           return;
         }
@@ -793,10 +783,8 @@ class PyodideWorkerRuntime implements LanguageRuntime {
 
   async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
     const id = ++this.nextId;
-    // Filter to plain files Python is likely to consume, staging
-    // archives, hidden dotfiles, etc. is fine but we always send the
-    // workspace's exact filenames so the user's mental model matches
-    // what shows up in `os.listdir()`.
+    // Send the workspace's exact filenames so `os.listdir()` matches the
+    // user's mental model.
     const payload: Array<[string, Uint8Array]> = [];
     for (const [path, bytes] of files) payload.push([path, bytes]);
     return new Promise<void>((resolve, reject) => {
@@ -834,9 +822,8 @@ export const pythonAdapter: LanguageAdapter = {
     notes: "Runs in a Web Worker so the UI stays responsive while your code executes.",
   },
   codeMirrorMode: "python",
-  // Phase A of the two-phase boot (interpreter + stdlib, what the boot
-  // notice actually waits for); the ~32 MB package set follows in the
-  // background and surfaces via run-status if a run needs it earlier.
+  // Phase A of the two-phase boot (interpreter + stdlib); the ~32 MB
+  // package set follows in the background.
   coldDownloadMB: 6,
   // ruff_fmt (PEP 8) (see formatCode), keep in sync.
   indentWidth: 4,

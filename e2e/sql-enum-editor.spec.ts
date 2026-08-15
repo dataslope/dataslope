@@ -1,14 +1,9 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// ─────────────────────────────────────────────────────────────────────
-// Inline enum dropdown editor (UX-04), Postgres + DuckDB.
-// An enum-typed column renders a <select> of its declared labels on
-// double-click instead of a free-text input; the committed value is the
-// chosen label (a plain string), so the engine casts it to the enum type
-// on write. SQLite has no native enum type, so it's excluded. The enum
-// labels ride along on listColumns (Postgres pg_enum / DuckDB
-// duckdb_columns()) into the shared ResultView via ColumnKeyHints.enums.
-// ─────────────────────────────────────────────────────────────────────
+// Inline enum dropdown editor, Postgres + DuckDB: an enum column renders a
+// <select> of its declared labels on double-click; the committed value is the
+// label and the engine casts on write. SQLite has no enum type. Labels ride
+// listColumns into the shared ResultView via ColumnKeyHints.enums.
 
 async function runSql(page: Page, sql: string) {
   const editor = page.locator(".cm-content");

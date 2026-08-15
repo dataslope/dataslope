@@ -1,13 +1,8 @@
 /**
- * The scheduling + phase state machine behind cloud auto-sync, factored out of
- * the React hook (useWorkspaceAutoSync) so the tricky parts, the settle window,
- * debounce, offline retry, and error branching, are unit-testable without a DOM
- * (see __tests__/workspaceSyncEngine.test.ts).
- *
- * The engine is deliberately ignorant of React, the account, and OPFS: it just
- * decides *when* to call the injected `sync()` and reports the resulting phase.
- * The hook wires it to the change pulse, the online event, and the actual
- * promote-then-backup work.
+ * Scheduling + phase state machine behind cloud auto-sync, factored out of
+ * useWorkspaceAutoSync so the settle window, debounce, offline retry, and
+ * error branching are unit-testable without a DOM. Deliberately ignorant of
+ * React/account/OPFS: it only decides when to call the injected `sync()`.
  */
 
 export type SyncPhase =

@@ -1,17 +1,7 @@
 /**
- * Shared programming-language icon registry used across the app, the
- * playground header switcher (`Playground.tsx`), the playground index
- * card list (`/playground/page.tsx`), and the embedded MDX code blocks
- * (`CodeBlock.tsx`). Centralising the lookup means a logo or brand
- * color change only has to be made in one place and all three surfaces
- * stay visually consistent.
- *
- * Looked up by language adapter `id` (e.g. `"python"`, `"javascript"`).
- *
- * `LangIcon` at the bottom is the rendered form of all this: the registry
- * lookup, the per-glyph size factor, and a fixed square box, in the one
- * component every mono-icon surface uses (the /courses catalog cards and
- * filter sidebar, the footer's Courses and Playgrounds columns).
+ * Shared language icon registry, keyed by adapter id, so every surface
+ * (playground switcher, /playground cards, code blocks) stays consistent.
+ * `LangIcon` is the rendered form used by the mono-icon surfaces.
  */
 
 import type { ReactNode } from "react";
@@ -33,10 +23,7 @@ import {
 } from "react-icons/si";
 import { RiPhpFill } from "react-icons/ri";
 
-/** Custom inline icon for the C playground. Mirrors the Streamline
- *  "C language logo (solid)" mark, kept as a tiny inline component so
- *  the C playground can opt into a more recognisable language glyph
- *  than the generic devicon. */
+/** Inline C icon (Streamline "C language logo (solid)" mark). */
 function CLanguageLogoSolidIcon({ size }: { size?: number }) {
   return (
     <svg
@@ -56,17 +43,15 @@ function CLanguageLogoSolidIcon({ size }: { size?: number }) {
   );
 }
 
-/** Per-playground brand icons. Looked up by adapter `id`; consumers
- *  should fall back to the adapter's two-character glyph when no icon
- *  is registered. */
+/** Brand icons by adapter id; consumers fall back to the adapter's
+ *  two-character glyph when none is registered. */
 export const LANGUAGE_ICONS: Record<string, IconType> = {
   python: SiPython,
   r: SiR,
   javascript: SiJavascript,
   typescript: SiTypescript,
-  // RiPhpFill renders with much less internal whitespace than DiPhp /
-  // SiPhp, so it reads at the same optical size as the other glyphs
-  // without a per-language size factor.
+  // RiPhpFill has less internal whitespace than SiPhp, so it reads at the
+  // same optical size without a size factor.
   php: RiPhpFill,
   c: CLanguageLogoSolidIcon as unknown as IconType,
   cpp: SiCplusplus,
@@ -81,18 +66,15 @@ export const LANGUAGE_ICONS: Record<string, IconType> = {
   react: SiReact,
 };
 
-/** Per-language relative size multiplier. Some glyphs read "heavier"
- *  than the others at the default size, so we fine-tune them per
- *  playground. Defaults to 1 when unspecified. */
+/** Per-language size multiplier for glyphs that read heavier than the rest;
+ *  defaults to 1. */
 export const LANGUAGE_ICON_SIZE_FACTOR: Record<string, number> = {
   python: 0.9,
   typescript: 0.9,
   csharp: 0.9,
 };
 
-/** Brand colors used to tint the playground language icons across the
- *  switcher dropdown, the /playground card list, and embedded code
- *  blocks. Shared so all three surfaces stay in sync. */
+/** Brand tint colors for the language icons. */
 export const LANGUAGE_ICON_COLORS: Record<string, string> = {
   python: "#3776ab",
   r: "#276dc3",
@@ -110,13 +92,9 @@ export const LANGUAGE_ICON_COLORS: Record<string, string> = {
   react: "#61dafb",
 };
 
-/** Neutral database glyph for "sql", the registry above only has per-engine
- *  marks (SQLite/PostgreSQL/DuckDB); path from the mockup.
- *
- *  Deliberately not an entry in `LANGUAGE_ICONS`: that map is keyed by
- *  playground adapter id, no adapter is called "sql", and adding one would
- *  put this glyph on any code block tagged `sql` — a surface that has never
- *  asked for it. `LangIcon` handles the content tag instead. */
+/** Neutral database glyph for the "sql" content tag. Deliberately not in
+ *  `LANGUAGE_ICONS` — that map is keyed by adapter id, and adding "sql" would
+ *  put this glyph on every code block tagged `sql`. */
 function SqlIcon({ size = 16 }: { size?: number }) {
   return (
     <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor">
@@ -125,18 +103,9 @@ function SqlIcon({ size = 16 }: { size?: number }) {
   );
 }
 
-/** Mono (currentColor) language icon at the mockup's optical sizes.
- *
- *  Takes a language *or* playground id: the two vocabularies overlap on
- *  everything except `sql` (a content tag with no playground) and the
- *  engine/framework ids (`sqlite`, `web`, `react`, …), which no course is
- *  tagged with. Unknown ids render nothing, so a new tag is a missing glyph
- *  rather than a crash — callers that need a visible fallback supply their
- *  own (see `CourseThumb`'s `CourseGlyph`).
- *
- *  `currentColor` throughout rather than the brand tint `LANGUAGE_ICON_COLORS`
- *  carries: every surface using this puts the glyph beside text it should
- *  travel with, including that text's hover colour. */
+/** Mono (currentColor, so it follows the adjacent text's hover color) language
+ *  icon. Takes a language or playground id; unknown ids render nothing, so
+ *  callers needing a visible fallback supply their own. */
 export function LangIcon({ id, size = 16 }: { id: string; size?: number }) {
   let glyph: ReactNode;
   if (id === "sql") {

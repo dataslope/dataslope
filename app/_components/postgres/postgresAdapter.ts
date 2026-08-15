@@ -1,9 +1,7 @@
 "use client";
 
-// Concrete Postgres implementation of `SqlEngineAdapter`. The Postgres
-// playground imports this and routes its engine factory / identity
-// constants through it so the per-dialect surface lives in one place
-// (Stage 3 scaffolding from the playground refactor plan).
+// Concrete Postgres implementation of `SqlEngineAdapter`; keeps the
+// per-dialect surface in one place.
 
 import type { SqlEngineAdapter } from "../sql/shared/engineAdapter";
 import { createPostgresEngine, type PostgresEngine } from "../runtime/postgres";

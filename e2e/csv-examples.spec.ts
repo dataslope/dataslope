@@ -1,13 +1,8 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// Verifies the "Read/Fetch CSV from URL" examples added to the Python, R,
-// JavaScript and TypeScript playgrounds. Each loads the example from the
-// Examples menu, runs it, and asserts the remote penguins.csv was read.
-//
-// Needs the heavy runtimes (fetched from CDNs) and reaches a real
-// raw.githubusercontent.com CSV, so it's kept out of the default e2e run.
-// Enable with:
-//
+// "Read/Fetch CSV from URL" examples in the Python/R/JS/TS playgrounds: load
+// from the Examples menu, run, assert the remote penguins.csv was read.
+// Needs heavy runtimes and a real network fetch, so opt-in:
 //   CSV_E2E=1 npx playwright test e2e/csv-examples.spec.ts
 
 const ENABLED = !!process.env.CSV_E2E;

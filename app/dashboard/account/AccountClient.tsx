@@ -16,15 +16,10 @@ import { ConnectedAccountsSection } from "./ConnectedAccountsSection";
 import { DeleteAccountSection } from "./DeleteAccountSection";
 
 /**
- * The account area is the canonical example of the report's rule: auth gates
- * *actions/areas*, never *content*. This page is personalized and so is read
- * client-side from the session, it does not turn any lesson dynamic.
- *
- * Membership: the plan comes off the session (`user.plan`, flipped by the
- * Polar webhook, lib/billing/polar.ts). Free members get an Upgrade button
- * (Polar hosted checkout); Pro members get the billing portal. Returning
- * from checkout (`?checkout=success`) polls the session with the cookie
- * cache bypassed until the webhook's plan flip is visible, then reloads.
+ * Account page, read client-side from the session. Plan comes off
+ * `user.plan` (flipped by the Polar webhook): free members get an Upgrade
+ * button, Pro members the billing portal. Returning from checkout
+ * (`?checkout=success`) polls until the webhook's plan flip is visible.
  */
 export function AccountClient() {
   const { data: session, isPending } = useSession();
@@ -37,9 +32,8 @@ export function AccountClient() {
   const [activation, setActivation] = useState<"idle" | "waiting" | "slow">(
     "idle",
   );
-  // Billing period picked on the pricing page while signed out, the sign-in
-  // detour lands here, and the Upgrade button must honor the original choice
-  // (an annual pick must not silently become a monthly checkout).
+  // Billing period stashed on the pricing page while signed out; the Upgrade
+  // button must honor the original choice.
   const [period, setPeriod] = useState<CheckoutPeriod>("monthly");
 
   useEffect(() => {
@@ -49,9 +43,8 @@ export function AccountClient() {
   }, []);
 
   // Detect the checkout return via window.location (not useSearchParams, so
-  // the page keeps prerendering statically without a Suspense boundary).
-  // Require the exact value Polar sends (lib/billing/polar.ts), a stale or
-  // hand-typed `?checkout=` must not flash a "payment received" notice.
+  // the page keeps prerendering statically). Require the exact value Polar
+  // sends: a hand-typed `?checkout=` must not flash "payment received".
   useEffect(() => {
     const value = new URLSearchParams(window.location.search).get("checkout");
     if (value !== "success") return;
@@ -98,8 +91,7 @@ export function AccountClient() {
 
   const { user } = session;
   // `plan` is a server-defined additional field, not on the client's user
-  // type. Admins are treated as Pro everywhere (lib/ai/tier.ts), reflect
-  // that here rather than offering them a pointless upgrade.
+  // type. Admins are treated as Pro everywhere (lib/ai/tier.ts).
   const plan = ((user as { plan?: string }).plan ?? "free").toLowerCase();
   const isAdmin = (user as { role?: string }).role === "admin";
   const isPro = plan === "pro" || isAdmin;
@@ -237,17 +229,12 @@ export function AccountClient() {
       </button>
     </div>
 
-    {/* Connected sign-in methods (Google / GitHub), plus the guard against
-        removing a user's only way back in. */}
     <ConnectedAccountsSection />
 
-    {/* Cloud saves + share links (all playgrounds), the quota is
-        account-wide, so this is where users see and free up everything. */}
     <CloudStorageSection />
 
-    {/* Irreversible account deletion, kept last. `plan === "pro"` (not the
-        admin-as-Pro case) is what carries a real Polar subscription to warn
-        about. */}
+    {/* `plan === "pro"` (not admin-as-Pro) is what carries a real Polar
+        subscription to warn about. */}
     <DeleteAccountSection email={user.email} isPaidPro={plan === "pro"} />
     </>
   );

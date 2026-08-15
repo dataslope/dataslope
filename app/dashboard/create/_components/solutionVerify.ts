@@ -1,17 +1,11 @@
 "use client";
 
 /**
- * Solution verification for the code/SQL challenge builders: a challenge
- * can only be published once its reference solution passes its own tests.
- *
- * The builder mounts the REAL challenge card (its preview pane) and drives
- * it through the imperative handle both cards register on
- * `window.__dsChallenges["<adapter|dialect>::<title>"]` — the same driver
- * the Playwright solution sweep uses (e2e/challenge-solutions.spec.ts):
- * load each file's solution into the card's buffers, submit, and read the
- * pass/fail banner. Reusing the card's own Check-Answer path means the
- * verification is exactly the run a learner's submission gets, harness,
- * stdout expectations, SQL assertions and all.
+ * Solution verification for the code/SQL builders: a challenge publishes only
+ * once its reference solution passes its own tests. Drives the REAL preview
+ * card through the `window.__dsChallenges["<adapter|dialect>::<title>"]`
+ * handle (same driver as e2e/challenge-solutions.spec.ts), so verification is
+ * exactly the run a learner's submission gets.
  */
 
 import type { ChallengeTestHandle } from "@/app/_components/ChallengeCard";

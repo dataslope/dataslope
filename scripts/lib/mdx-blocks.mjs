@@ -1,25 +1,12 @@
 /**
  * Pulls the runnable components out of MDX source: `<CodeBlock>` and
- * `<ChallengeCard>`.
+ * `<ChallengeCard>`. Shared by check-code-blocks.mjs and
+ * check-challenge-cards.mjs — a drifted second parser under-reports silently.
  *
- * Shared by check-code-blocks.mjs and check-challenge-cards.mjs. Two sweeps
- * with two parsers would drift, and the failure mode of a drifted parser is
- * silent under-reporting: a block it cannot parse is a block that looks like it
- * passed.
- *
- * ── On evaluating props as JavaScript ──────────────────────────────────────
- *
- * `files={[…]}` and `tests={[…]}` are JavaScript array literals containing
- * template literals containing source code in a third language. Regexes get
- * `files` roughly right because its shape is predictable, but `tests` carries
- * arbitrary assertion code with braces, brackets and nested quotes in it, and
- * regexing that is a losing game.
- *
- * So the props are read by balancing delimiters to find the expression, and
- * then evaluated as what they are. `new Function` is the whole point rather
- * than a shortcut: JavaScript already knows how template literals nest and
- * escape, and the alternative is reimplementing that badly. The input is this
- * repo's own content, which is also the input to the site's build.
+ * Props like `files={[…]}` and `tests={[…]}` are JavaScript literals holding
+ * template literals holding code in a third language, so they are located by
+ * balancing delimiters and evaluated with `new Function` rather than regexed.
+ * The input is this repo's own content, which is also the site build's input.
  */
 import { readFileSync, readdirSync } from "node:fs";
 import { join, relative } from "node:path";
@@ -27,15 +14,8 @@ import { join, relative } from "node:path";
 export const CONTENT_DIR = "content";
 
 /**
- * Split a `--filter` value into the substrings it selects.
- *
- * Comma-separated so CI can hand a sweep exactly the files a pull request
- * touched. Checking one edited lesson takes seconds; checking all 1,694 blocks
- * to prove that one lesson still works takes 25 minutes, and a check nobody
- * wants to wait for is a check that gets bypassed.
- *
- * A single substring still behaves as it always did, so `--filter polars` is
- * unchanged.
+ * Split a `--filter` value into the substrings it selects. Comma-separated so
+ * CI can hand a sweep exactly the files a pull request touched.
  */
 export function parseFilter(value) {
   if (value === null || value === undefined) return null;
@@ -43,9 +23,8 @@ export function parseFilter(value) {
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
-  // An explicitly empty filter selects nothing rather than everything. CI
-  // computes this list from a diff, and "no content files changed" must not
-  // silently widen into a full sweep.
+  // An explicitly empty filter selects nothing: CI computes this from a diff,
+  // and "no content changed" must not widen into a full sweep.
   return parts;
 }
 
@@ -96,16 +75,10 @@ export function readTemplate(src, start) {
     const c = src[i];
     if (c === "\\") {
       const next = src[i + 1];
-      // MDX hands the prop to JavaScript, so these are template-literal
-      // escapes and have to be resolved the way JavaScript resolves them.
-      //
-      // \n, \t and \r are real control characters, not two characters. Leaving
-      // them as backslash-n was wrong in the direction that hides work: a card
-      // authored on one line as `def f():\n    return 1` extracted as Python
-      // containing a literal backslash, which raises "unexpected character
-      // after line continuation character" — a parser bug reported as broken
-      // content. The `"\\n"` a lesson prints is written `\\n` in the source
-      // and still arrives here as one backslash plus n, via the `\\` case.
+      // Resolve escapes the way JavaScript resolves them: \n/\t/\r are real
+      // control characters, or an inline `def f():\n    return 1` extracts as
+      // Python with a literal backslash. A printed `"\\n"` still arrives as
+      // backslash-n via the `\\` case.
       const simple = { n: "\n", t: "\t", r: "\r" };
       if (next in simple) {
         out += simple[next];
@@ -156,8 +129,7 @@ export function propSource(raw, name) {
 }
 
 /** Evaluate `name={…}` as the JavaScript literal it is. Throws with the prop
- *  name attached, because a prop this parser cannot read must be loud: a
- *  silently dropped card is a card that appears to have passed. */
+ *  name attached — a silently dropped card looks like a passing one. */
 export function propValue(raw, name) {
   const src = propSource(raw, name);
   if (src === null) return undefined;
@@ -175,13 +147,9 @@ export function propString(raw, name) {
 
 /**
  * A prop that carries text, in either syntax MDX allows: `name="value"` or
- * ``name={`value`}``.
- *
- * `propString` alone was not enough and failed in the worst direction. Every
- * SQL prop that matters (`initSql`, `starterCode`, `solutionSql`) is authored
- * as a template literal, so `propString` returned undefined, the sweep ran an
- * empty string, and twelve blocks reported as passing having executed nothing
- * at all.
+ * ``name={`value`}``. The template-literal form matters: the SQL props are
+ * all authored that way, and `propString` alone made the sweep run empty
+ * strings that reported as passes.
  */
 export function propText(raw, name) {
   const plain = propString(raw, name);
@@ -202,14 +170,9 @@ export function propText(raw, name) {
 
 /**
  * A boolean JSX prop, in either form MDX allows: bare `expectError` or
- * `expectError={true}`.
- *
- * Used for `expectError`, which marks a block whose lesson *is* the failure —
- * "A UNIQUE constraint rejects duplicate email", or the misspelled `prnt()` in
- * "Errors are friendly (most of the time)". The sweeps assert it in both
- * directions: such a block must raise, and one that stops raising is a
- * regression nothing else would catch, because the prose keeps promising an
- * error the reader no longer sees.
+ * `expectError={true}`. `expectError` marks a block whose lesson is the
+ * failure; the sweeps assert it in both directions, since a block that stops
+ * raising is a regression nothing else would catch.
  */
 export function propFlag(raw, name) {
   const explicit = new RegExp(`\\b${name}\\s*=\\s*\\{\\s*(true|false)\\s*\\}`).exec(raw);
@@ -238,25 +201,15 @@ function bodyStart(src) {
 }
 
 /**
- * Is `idx` inside a fenced block or an inline code span?
- *
- * Lessons discuss the components they use — "A variable defined in one
- * `<CodeBlock>` is not visible to the next" appears in ten course overviews —
- * and prose about a tag is not a tag. Without this those matches are reported
- * as unterminated tags, which is noise in exactly the channel that has to stay
- * quiet enough to notice a real one.
+ * Is `idx` inside an inline code span? Lessons discuss the components they
+ * use, and prose mentioning a tag must not be reported as an unterminated
+ * tag.
  */
 function insideCode(src, idx) {
-  // An odd number of backticks earlier on the same line means this match is
-  // inside an inline code span, which is how every one of these prose mentions
-  // is written.
-  //
-  // Only the same line is considered. Counting ``` fences across the file
-  // looks more thorough and is wrong: `markdown={…}` and `starterCode={…}`
-  // props carry fenced blocks of their own, so a document-level parity count
-  // flips inside a prop and starts discarding real tags after it (it lost 20
-  // `<SqlCodeBlock>`s that way). A real tag opens its own line, so it has no
-  // backticks before it and this cannot swallow one.
+  // Odd backtick count earlier on the same line = inside an inline code span.
+  // Only the same line is considered: a document-level fence parity count
+  // flips inside `markdown={…}` / `starterCode={…}` props and discards real
+  // tags after it. A real tag opens its own line, so this cannot swallow one.
   const before = src.slice(0, idx);
   const lineStart = before.lastIndexOf("\n") + 1;
   const ticks = (before.slice(lineStart).match(/`/g) ?? []).length;
@@ -265,23 +218,16 @@ function insideCode(src, idx) {
 
 /**
  * Advance a top-level fence state across `text`, returning the new state.
- *
- * "Top-level" is what makes this safe. A document-wide backtick count is
- * wrong, because `markdown={…}` and `starterCode={…}` props carry fenced
- * blocks of their own and flip the parity mid-prop — that attempt lost 20
- * `<SqlCodeBlock>`s and was reverted. Here the caller only ever feeds in the
- * text *between* tags, never a tag's own body, so prop fences are invisible
- * to it by construction.
+ * Safe only because the caller feeds in the text *between* tags, never a
+ * tag's own body — so fences inside props are invisible by construction (a
+ * document-wide count flips mid-prop and loses real tags).
  */
 function advanceFence(text, open) {
   for (const line of text.split("\n")) {
-    // CommonMark: a fence is three or more backticks up to three spaces deep,
-    // and the info string that follows may not itself contain a backtick.
-    // That last clause is the whole difference between a fence and an inline
-    // code span written with triple backticks — pattern-matching.mdx has
-    // ``` `${current}:${emergency}` ``` mid-sentence, and reading it as an
-    // opening fence swallowed the real `<ChallengeCard>` 21 lines below it.
-    // Tildes cannot be escaped that way and take the looser rule.
+    // CommonMark: 3+ backticks up to three spaces deep, and the info string
+    // may not contain a backtick — that clause is what separates a fence from
+    // an inline span written with triple backticks mid-sentence. Tildes take
+    // the looser rule.
     if (/^ {0,3}`{3,}[^`]*$/.test(line) || /^ {0,3}~{3,}/.test(line)) open = !open;
   }
   return open;
@@ -290,28 +236,13 @@ function advanceFence(text, open) {
 /**
  * Every `<Tag …/>` in `content/`, as `{file, line, raw}`.
  *
- * Two things here are load-bearing, and both were learned from this generator
- * quietly dropping work:
- *
- *   • Frontmatter is skipped. `description: Sandbox for
- *     \`<SqlChallengeCard dialect="postgres">\` variations.` is not a tag, has
- *     no `/>` to find, and used to be matched anyway.
- *   • A match whose tag never terminates skips that occurrence instead of
- *     abandoning the file. It used to `break`, so one unterminated match cost
- *     every remaining tag in that file: ~84 `<ChallengeCard>`s across nine
- *     files and ~20 `<CodeBlock>`s across thirteen were invisible to the
- *     sweeps, which then reported everything they *had* found as passing.
- *   • A tag inside a top-level ```jsx fence is documentation *of* a component,
- *     not a component. The eleven `content/fumadocs-dev/*` demo pages print
- *     each example's own MDX source below it, so every item on them was
- *     counted twice. Harmless while nothing compared the count to reality;
- *     `check:browser` does exactly that, and read the duplicates as 50%
- *     of the page having gone unswept.
- *
- * An unterminated tag after the frontmatter is still yielded, with
- * `unterminated: true` and no `raw`, so callers count it rather than lose it.
- * The whole point of this module is that a component it cannot read is loud;
- * silently skipping one is the same defect in a politer form.
+ * Load-bearing details: frontmatter is skipped (its prose mentions tags); an
+ * unterminated match skips that occurrence rather than abandoning the file
+ * (a `break` here once hid ~100 tags from the sweeps); and a tag inside a
+ * top-level fence is documentation of a component, not a component (the
+ * fumadocs-dev demo pages print their own MDX source). An unterminated tag is
+ * still yielded with `unterminated: true` and no `raw`, so callers count it —
+ * a component this module cannot read must be loud.
  */
 export function* eachTag(tag, root = CONTENT_DIR) {
   const opener = `<${tag}`;
@@ -319,9 +250,8 @@ export function* eachTag(tag, root = CONTENT_DIR) {
     const src = readFileSync(file, "utf8");
     const rel = relative(process.cwd(), file);
     let idx = bodyStart(src);
-    // Fence parity over the text between tags only. `scanned` is how far that
-    // parity has been carried; a tag's own body is jumped over rather than
-    // scanned, which is what keeps prop-level fences out of it.
+    // `scanned` tracks how far fence parity has been carried; tag bodies are
+    // jumped over, keeping prop-level fences out of it.
     let scanned = idx;
     let fenced = false;
     for (;;) {
@@ -444,18 +374,10 @@ export function extractChallengeCards(root = CONTENT_DIR, adapter = "python") {
     }
 
     // Which buffers the Solution button fills, mirroring `solutionFiles` in
-    // ChallengeCard.tsx: every file is shown, one that supplies `solutionCode`
-    // shows that and one that does not keeps its starter.
-    //
-    // Reading `solutionCode` off the *entry* alone was wrong in both
-    // directions. On the multi-file cards in python-basics the entry is a
-    // fixed driver the instructions say not to edit ("Do not edit main.py")
-    // and the whole exercise lives in the sibling modules, so ten fully
-    // solved cards looked unsolved and went unchecked. In the other
-    // direction, `stage()` wrote siblings from `starterCode`, so a card whose
-    // solution spanned files would have been graded against its own blanks —
-    // it passes only if the tests never touch the sibling, which is a test
-    // gap reported as a pass.
+    // ChallengeCard.tsx: a file with `solutionCode` shows that, otherwise its
+    // starter. Must consider every file, not just the entry — multi-file
+    // cards keep the exercise in sibling modules, and grading siblings from
+    // their starters would grade a card against its own blanks.
     const solved = files.filter((f) => f.solutionCode);
     for (const f of files) f.solutionSource = f.solutionCode || f.starterCode;
 
@@ -508,12 +430,9 @@ export function extractSqlBlocks(root = CONTENT_DIR, dialect = null) {
 }
 
 /**
- * Every `<SqlChallengeCard>`, with the SQL Check Answer runs once the Solution
- * button has filled the editor, plus the card's declarative tests.
- *
- * `solutionSql` is the whole point of the card, so unlike the Python cards
- * there is no multi-file subtlety here: a card without one cannot be verified
- * and is counted rather than dropped.
+ * Every `<SqlChallengeCard>`, with the SQL Check Answer runs once Solution
+ * has filled the editor, plus the card's declarative tests. A card without
+ * `solutionSql` cannot be verified and is counted rather than dropped.
  */
 export function extractSqlCards(root = CONTENT_DIR, dialect = null) {
   const cards = [];

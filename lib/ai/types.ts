@@ -22,11 +22,9 @@ export interface AskAiFile {
 }
 
 /**
- * One on-page widget (challenge card, code block, multiple-choice question,
- * SQL playground shell) captured at send time. `content` is a packed
- * plain-text description of the widget's live state, instructions, the
- * user's current code, output, test results, selected answers. The server
- * treats every field as untrusted DATA and re-clips against the token budget.
+ * One on-page widget captured at send time. `content` is a packed plain-text
+ * description of the widget's live state. The server treats every field as
+ * untrusted DATA and re-clips against the token budget.
  */
 export interface AskAiWidgetContext {
   /** Widget kind, e.g. "challenge", "code-block", "mcq", "sql-playground". */
@@ -50,35 +48,22 @@ export interface AskAiClientContext {
   surface: AskAiSurface;
   /**
    * Learn surface only: full lesson path segments including the section base,
-   * e.g. ["courses", "python-basics", "loops"] or
-   * ["fumadocs-dev", "code-blocks-python"]. The server allowlists the base,
-   * resolves the lesson markdown itself (fetching the prerendered `.md`
-   * asset), and never trusts client-supplied page text.
+   * e.g. ["courses", "python-basics", "loops"]. The server allowlists the
+   * base, resolves the lesson markdown itself, and never trusts
+   * client-supplied page text.
    */
   slug?: string[];
   /**
-   * Whether the server should fetch and include this lesson's full Markdown.
-   * Off by default (the "Auto" context mode sends only what's on screen); the
-   * user opts in via the panel's context sheet ("Full page", or a Custom
-   * "Lesson text" toggle). Even when true the server hard-caps the lesson
-   * text to a few thousand tokens. Ignored off the learn surface.
+   * Whether the server should fetch this lesson's full Markdown. Off by
+   * default; the user opts in via the panel's context sheet. The server
+   * hard-caps the text regardless. Ignored off the learn surface.
    */
   includeLessonText?: boolean;
   /**
-   * Where the reader is, in words: the page's own heading, and the course or
-   * track it sits in.
-   *
-   * This is the one context source that is on by default and costs ~15 tokens.
-   * Without it the model gets the system prompt, the conversation, and the
-   * question — and nothing that says which lesson is on screen, because `slug`
-   * is only ever used server-side to resolve the Markdown and never reaches the
-   * prompt. Answers were correspondingly generic: asked about "residuals" on a
-   * scikit-learn page, the model had no way to know it was a scikit-learn page.
-   *
-   * `title` is read from the rendered heading, so it is what the reader can
-   * see. `course` is resolved server-side from `slug` against the course
-   * catalog rather than taken from here, so the collection name is ours rather
-   * than the page's to assert.
+   * The page's rendered heading. On by default (~15 tokens): `slug` never
+   * reaches the prompt, so without this the model doesn't know which lesson
+   * is on screen. The course name is resolved server-side from `slug`, not
+   * taken from here.
    */
   page?: { title?: string };
   /** Language / SQL-dialect id, e.g. "python", "duckdb". */

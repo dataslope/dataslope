@@ -1,49 +1,18 @@
 /**
  * Precompiled React bundles, so a `<CodeBlock adapter="react">` can render
- * its result before the reader presses Run.
+ * its result before the reader presses Run — TSX needs translating, and the
+ * translator is a ~3 MB esbuild-wasm download the reader should not pay for
+ * scrolling past a lesson. Bare imports are marked external and rewritten to
+ * pinned esm.sh URLs (`esmResolve.ts`), so each bundle is a pure function of
+ * the block's own tabs: small, stable, safe to commit.
  *
- * ── Why this exists ───────────────────────────────────────────────────────
- *
- * `web` blocks auto-render for free: composing their document is a pure
- * string operation and the browser is the runtime. `react` cannot do that,
- * because TSX has to be translated before a browser will take it, and the
- * translator is a ~3 MB esbuild-wasm download the reader would pay just for
- * scrolling past a lesson.
- *
- * So the translation moves here. It is possible at all because the bundler
- * marks every bare import **external** and rewrites it to a pinned esm.sh
- * URL (`esmResolve.ts`) — the bundle is a pure function of the block's own
- * tabs, with no node_modules and no network. That makes it small, stable,
- * and safe to commit; the reader's browser fetches React itself, once, and
- * caches it across the whole course.
- *
- * ── Why it is a workflow and not part of the build ────────────────────────
- *
- * Same reasoning as `build-block-outputs`, one order of magnitude down:
- * bundling 25 workspaces is real work that returns the same answer until a
- * lesson changes, so paying it on every deploy — and every `dev` start —
- * buys nothing. `lib/generated/react-bundles.json` is committed,
- * `.github/workflows/react-bundles.yml` keeps it current, and `build` and
- * `dev` read it and bundle nothing. A block whose entry is missing simply
- * shows the empty preview panel it showed before this existed.
- *
- * ── Reuse ─────────────────────────────────────────────────────────────────
- *
- * Keyed by `blockOutputKey` — the same content hash the prepopulated-output
- * manifest uses — so editing one block re-bundles that block and nothing
- * else. Reuse is checked against the committed manifest rather than a local
- * cache stamp, deliberately: `node_modules/.cache` does not survive the
- * `npm ci` on a CI runner, and the manifest does.
- *
- * ── Drift ─────────────────────────────────────────────────────────────────
- *
- * The resolution rules, loader table and build options all come from
- * `app/_components/runtime/reactBundle.ts`, which the browser worker imports
- * too (via the resolver hook in `scripts/lib/ts-resolve.mjs`). The esbuild
- * version is pinned to `ESBUILD_WASM_VERSION` from `cdn.ts` — the same
- * number the worker loads from jsDelivr — and this script fails loudly if
- * the installed devDependency disagrees. A bundle that differs between here
- * and the reader's Run would show them one thing and produce another.
+ * Run by `.github/workflows/react-bundles.yml`, not `build`/`dev`; the
+ * manifest `lib/generated/react-bundles.json` is committed. Entries are keyed
+ * by `workspaceOutputKey` and reuse is checked against the committed manifest
+ * (`node_modules/.cache` does not survive `npm ci` on CI). Build options come
+ * from `reactBundle.ts`, shared with the browser worker, and esbuild is
+ * pinned to `ESBUILD_WASM_VERSION` — a version mismatch fails loudly, since a
+ * differing bundle would show the reader one thing and Run another.
  *
  * Usage:
  *   node scripts/build-react-bundles.mjs [--force] [--filter <substr>] [--stats]
@@ -58,11 +27,9 @@ import { enableTsResolution } from "./lib/ts-resolve.mjs";
 
 enableTsResolution();
 
-// Dynamic on purpose, and it has to stay that way. A static `import`
-// declaration is hoisted and resolved before *any* statement in this module
-// runs, so the hook above would not be installed yet and the first shared
-// module that imports a sibling extensionlessly would fail to resolve.
-const { blockOutputKey } = await import("../lib/blockOutputKey.ts");
+// Dynamic on purpose: a static `import` is hoisted and resolved before the
+// resolver hook above is installed.
+const { workspaceOutputKey } = await import("../lib/blockOutputKey.ts");
 const { REACT_BUILD_OPTIONS, splitBundleOutput, vfsPlugin } = await import(
   "../app/_components/runtime/reactBundle.ts"
 );
@@ -87,8 +54,7 @@ const installed = JSON.parse(
   readFileSync(join(ROOT, "node_modules/esbuild-wasm/package.json"), "utf8"),
 ).version;
 if (installed !== ESBUILD_WASM_VERSION) {
-  // Not a warning. A different esbuild is a different bundle, and the
-  // reader would see this one in the preview and the browser's in their Run.
+  // Not a warning: a different esbuild is a different bundle.
   console.error(
     `esbuild-wasm mismatch: cdn.ts pins ${ESBUILD_WASM_VERSION}, node_modules has ${installed}.\n` +
       `Update the devDependency and the pin together, or the precompiled preview\n` +
@@ -96,10 +62,8 @@ if (installed !== ESBUILD_WASM_VERSION) {
   );
   process.exit(1);
 }
-// No `wasmURL` here: that option is browser-only, and under Node the
-// package finds its own `esbuild.wasm` beside itself. Same binary, same
-// version — which is the whole point of pinning the devDependency to the
-// number the worker loads from jsDelivr.
+// No `wasmURL`: that option is browser-only; under Node the package finds
+// its own `esbuild.wasm` beside itself.
 await esbuild.initialize({});
 
 // ─── Manifest ────────────────────────────────────────────────────────────
@@ -153,9 +117,13 @@ let bytes = 0;
 
 for (const block of blocks) {
   if (block.expectError) continue; // the failure is the lesson; don't pre-render it
-  const entryFile =
-    block.files.find((f) => f.filename === block.entry) ?? block.files[0];
-  const key = blockOutputKey(ADAPTER, entryFile.initCode, entryFile.starterCode);
+  // Keyed over EVERY file, not just the entry: the bundle bakes the whole
+  // VFS in, so an edit to any file must mint a new key or the committed
+  // bundle would be reused stale forever.
+  const entryName = block.files.some((f) => f.filename === block.entry)
+    ? block.entry
+    : block.files[0].filename;
+  const key = workspaceOutputKey(ADAPTER, block.files, entryName);
 
   const reusable = previous[block.file]?.[key];
   if (reusable) {
@@ -177,9 +145,9 @@ for (const block of blocks) {
       );
     }
   } catch (err) {
-    // A block that will not bundle keeps no entry and falls back to the
-    // empty preview panel — the same one it shows today. Loud, but not
-    // fatal: one broken lesson must not cost the other 24 their previews.
+    // A block that will not bundle keeps no entry and falls back to the empty
+    // preview panel. Loud but not fatal: one broken lesson must not cost the
+    // rest their previews.
     failed++;
     const message = err?.errors?.[0]?.text ?? err?.message ?? String(err);
     console.error(`  FAILED ${block.file}:${block.line} — ${message}`);

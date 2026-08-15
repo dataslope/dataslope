@@ -1,16 +1,10 @@
 "use client";
 
 /**
- * Header auth control: a "Sign in" link when signed out, and an avatar menu
- * (account / sign out) when signed in.
- *
- * The session is read client-side via `useSession()` so the header can sit on
- * statically prerendered pages without making them dynamic, the server ships
- * the same anonymous HTML to everyone and this swaps in after hydration. While
- * the first session fetch is in flight we render a neutral skeleton (not the
- * "Sign in" button), so the markup is stable on first paint (no hydration
- * mismatch) and a signed-in visitor doing a full-page load never sees "Sign in"
- * flash before the avatar resolves.
+ * Header auth control: "Sign in" link when signed out, avatar menu when
+ * signed in. Session is read client-side so the header can sit on statically
+ * prerendered pages; a neutral skeleton renders while the first fetch is in
+ * flight so "Sign in" never flashes for signed-in visitors.
  */
 import { useState } from "react";
 import { Menu } from "@base-ui/react/menu";
@@ -22,18 +16,13 @@ import { signOut, useSession } from "@/lib/auth/client";
 const TRIGGER_CLASS =
   "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[#121212] transition-colors hover:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)]";
 
-/** Everything about the "Sign in" button except its vertical padding:
- *  near-black on light (#121212 fill, white text), inverted to white-on-#121212
- *  on dark. Split out so the header can tighten the box when it compacts
- *  without an `!important` fighting the padding baked into one string. */
+/** "Sign in" button styles minus the vertical padding, split out so the
+ *  compacted header can tighten the box. `whitespace-nowrap` keeps the label
+ *  on one line in the header's tightest band. */
 const SIGN_IN_BUTTON_BASE =
-  // `whitespace-nowrap`: in the header's tightest band the flex row would
-  // otherwise break "Sign in" across two lines rather than let the button keep
-  // its width.
   "inline-flex items-center gap-2 whitespace-nowrap rounded-sm bg-[#121212] px-3 text-sm font-medium tracking-tight text-white transition-colors hover:bg-[#2a2a2a] dark:bg-white dark:text-[#121212] dark:hover:bg-[var(--ds-gray-200)]";
 
-/** The button at its normal size. Shared with the mobile drawer's sign-in row
- *  so the two match. */
+/** The button at its normal size; shared with the mobile drawer. */
 export const SIGN_IN_BUTTON_CLASS = `${SIGN_IN_BUTTON_BASE} py-1.5`;
 
 /** Circular avatar: the provider image when present, otherwise an initial. */
@@ -61,21 +50,15 @@ function Avatar({ image, name }: { image?: string | null; name?: string | null }
   );
 }
 
-/**
- * @param compact The site header has scrolled past its threshold and stepped
- *   everything down a size. The button's *type* stays put (14px, matching the
- *   drawer's copy of it); only the box around it tightens, which is enough to
- *   keep it in proportion with the shrunken logo and links beside it.
- */
+/** @param compact Header scrolled past its threshold; only the box tightens,
+ *  the type stays 14px. */
 export function AuthMenu({ compact }: { compact?: boolean } = {}) {
   const { data: session, isPending } = useSession();
   const router = useRouter();
   const [signingOut, setSigningOut] = useState(false);
 
-  // Still loading the first session: render a size-matched skeleton rather than
-  // the "Sign in" button, so a signed-in visitor doing a full-page load doesn't
-  // see "Sign in" flash before the avatar swaps in. The server always prerenders
-  // this (isPending) state, so the placeholder is hydration-stable.
+  // Size-matched skeleton while the session loads; the server always
+  // prerenders this state, so the placeholder is hydration-stable.
   if (isPending) {
     return (
       <span
@@ -87,21 +70,16 @@ export function AuthMenu({ compact }: { compact?: boolean } = {}) {
     );
   }
 
-  // Signed out: a solid, subtly filled button linking to /sign-in.
   if (!session) {
     return (
-      // The md-to-lg band is where the header is tightest (see the wordmark
-      // and menu-size notes in HomeNav), so the button steps down with the
-      // menu beside it and back up from lg. The drawer's copy of this button
-      // renders below md, where these variants don't apply.
+      // Steps down in the header's tightest band (md–lg) and back up from lg.
       <Link
         href="/sign-in"
         className={`${SIGN_IN_BUTTON_BASE} transition-[padding] duration-200 md:text-[13px] lg:text-sm ${
           compact ? "py-[5px]" : "py-1.5"
         }`}
       >
-        {/* Sized in CSS rather than by the `size` prop so it can follow the
-            label; the attribute below is the base the variants override. */}
+        {/* Sized in CSS so it can follow the label's responsive size. */}
         <LogIn
           size={14}
           aria-hidden="true"
@@ -113,10 +91,8 @@ export function AuthMenu({ compact }: { compact?: boolean } = {}) {
   }
 
   const { user } = session;
-  // Admins see a shortcut to /admin. Config-listed admins (ADMIN_EMAILS /
-  // ADMIN_USER_IDS) have their `role` column promoted to "admin" at sign-in
-  // (sign-in hooks in lib/auth/server.ts), so this role check covers them
-  // too; either way the dashboard's actions are server-enforced.
+  // Config-listed admins get `role` promoted at sign-in (lib/auth/server.ts),
+  // so this check covers them too; dashboard actions are server-enforced.
   const isAdmin = user.role === "admin";
 
   async function handleSignOut() {

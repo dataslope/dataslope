@@ -1,22 +1,11 @@
 /**
- * Read a generated static asset out of `public/` from server code, on
- * whichever side happens to be running:
- *
- *   - Build-time prerender and `next dev` run on Node, where `public/` is a
- *     real directory — plain filesystem read.
- *   - Request-time renders run in workerd, where unenv's `node:fs` stub
- *     throws at call time and the file only exists behind the `ASSETS`
- *     binding — fetch it from there instead.
- *
- * This is the pattern that lets build products (chart SVGs, the
- * illustration-gallery data) live as static assets instead of as `import`ed
- * modules: an imported module joins the Worker bundle (against the 10 MiB
- * gzipped ceiling), an asset is served from Cloudflare's asset store and
- * only fetched by the rare cache-miss render that actually needs it. See
- * agent-outputs/20260813-1424-git-playground-design.md §8.6.
- *
- * Returns null when the asset can't be found on either side; callers decide
- * how to degrade. Server-only — do not import from client components.
+ * Read a generated static asset out of `public/` from server code on
+ * whichever side is running: Node (build/dev) reads the filesystem; workerd
+ * fetches from the ASSETS binding (unenv's `node:fs` stub throws at call
+ * time). This lets build products live as static assets instead of imported
+ * modules that count against the Worker's 10 MiB gzipped ceiling. Returns
+ * null when not found on either side; callers decide how to degrade.
+ * Server-only — do not import from client components.
  */
 
 /** The slice of the ASSETS fetcher this module touches. Structural on

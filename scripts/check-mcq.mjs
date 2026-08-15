@@ -8,14 +8,11 @@
 //   3. too-few-choices, a question needs at least 2 choices.
 //   4. duplicate-choice, no two choices may be verbatim identical.
 //   5. affirmative-opener, a choice explanation may not start with an
-//                            affirmation ("Yes.", "Right!", "Exactly,",
-//                            "This works"…). Explanations render for ALL
-//                            choices after submit, so a learner who picked a
-//                            wrong answer would still see false praise under
-//                            the correct one (see AGENTS.md). True/False
-//                            openers are allowed in "which is false/NOT
-//                            true" questions, where they label each
-//                            statement's truth value.
+//                            affirmation ("Yes.", "Right!"…): explanations
+//                            render for ALL choices after submit, so praise
+//                            under the correct one reads as false praise (see
+//                            AGENTS.md). True/False openers are allowed in
+//                            "which is false/NOT true" questions.
 //
 // Used both as a CLI (`node scripts/check-mcq.mjs [files...]`, defaults to
 // all course + interview + fumadocs-dev content) and as a library by
@@ -51,20 +48,13 @@ export function extractMcqBlocks(src) {
 
 // Parse one block into { body, choices:[{ correct, text, explanation }] }.
 //
-// A LOOSE approximation of parseQuestion.ts, kept separate so this script stays
-// dependency-free plain JS. It is deliberately more permissive than the real
-// parser — notably it drops fenced code rather than capturing it as choice
-// text, so `choices[].text` is empty for any fenced choice, which is why the
-// duplicate-choice rule below skips empty keys.
-//
-// That permissiveness has bitten once: `promises-and-async-await` authored its
-// choices as a bare `- ` with the fence on the next line, which this parser
-// read as four choices and parseQuestion read as one empty one. Every check was
-// green while the lesson rendered a single blank radio button in production.
-//
-// So do not treat a green run here as proof a question is answerable. The
-// authoritative guard is __tests__/mcqRuntimeParse.test.ts, which runs the
-// component's own parser over this same corpus; add structural rules there.
+// A LOOSE approximation of parseQuestion.ts, kept dependency-free. It drops
+// fenced code rather than capturing it as choice text (hence the
+// duplicate-choice rule skipping empty keys), and it can read a question
+// differently from the real parser — a green run here is not proof a
+// question is answerable. The authoritative guard is
+// __tests__/mcqRuntimeParse.test.ts, which runs the component's own parser;
+// add structural rules there.
 export function parseChoices(md) {
   const lines = md.replace(/\r\n?/g, "\n").split("\n");
   const choices = [];
@@ -164,14 +154,9 @@ export function lintSource(src, file) {
 
 // --- length bias ----------------------------------------------------------
 
-// A correct answer that is visibly longer than every distractor is guessable
-// without reading the question: the writer packs the justification into the
-// right option and leaves the wrong ones as stubs. The justification belongs
-// in the explanation, which every learner sees after submitting anyway.
-//
-// The threshold is deliberately loose. It does not ask for equal lengths, only
-// that the correct option is never *conspicuously* the longest, so a question
-// whose right answer genuinely needs a few more words still passes.
+// A correct answer visibly longer than every distractor is guessable without
+// reading the question; the justification belongs in the explanation. The
+// threshold is loose on purpose: only *conspicuously* longest fails.
 const LENGTH_RATIO = 1.4;
 const LENGTH_DELTA = 20;
 
@@ -201,17 +186,11 @@ export function lintLengthBias(src, file) {
 
 // --- position bias --------------------------------------------------------
 
-// The other free giveaway: where the correct option sits. The corpus was once
-// written top-down ("state the answer, then pad three distractors around it"),
-// which parked the answer in slot 2 for 61% of questions overall and 99% of the
-// interview banks. A learner who notices picks second and passes without
-// reading. `scripts/shuffle-mcq-options.mjs` spreads the answers across the
-// slots; this is the guard that keeps them spread.
-//
-// The threshold is corpus-level on purpose: a single question has to put its
-// answer *somewhere*, and a page with six of them can land four in one slot by
-// chance. Only across hundreds of questions does a concentration mean the
-// habit is back.
+// The other free giveaway: where the correct option sits.
+// `scripts/shuffle-mcq-options.mjs` spreads the answers across slots; this
+// guard keeps them spread. Corpus-level on purpose — a single question has to
+// put its answer somewhere, and only across hundreds does a concentration
+// mean the habit is back.
 export const POSITION_MAX_RATE = 0.35;
 
 /** Distribution of the correct option's slot across a set of files. `rate` is

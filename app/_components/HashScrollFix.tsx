@@ -1,24 +1,12 @@
 "use client";
 
 /**
- * Keeps `#hash` navigation pointed at its target while the page settles.
- *
- * The browser (and Next's router) scroll to the hash target as soon as the
- * HTML is there, but lesson pages keep changing height for a while after
- * that: `<CodeBlock>` mounts CodeMirror, `<MultipleChoice>` renders its
- * markdown through KaTeX, Mermaid draws asynchronously. Every one of those
- * mounts above the target pushes it away from where the browser left the
- * viewport, which is exactly the "search result lands screens away from the
- * match" bug for deep links into long lessons.
- *
- * So: while a hash target exists, re-align the viewport to it every time the
- * document resizes, for a short settle window. The user stays in charge; any
- * scroll intent (wheel, touch, arrow keys, page keys) cancels the window
- * immediately.
- *
- * Keyed on `pathname` only, deliberately: in-page hash navigation (a TOC
- * click) happens long after layout has settled and needs no correction, so
- * re-running there would only fight the native jump.
+ * Keeps `#hash` navigation pointed at its target while late-mounting
+ * components (CodeMirror, KaTeX, Mermaid) shift the page after the browser's
+ * initial scroll: re-align the viewport on every document resize for a short
+ * settle window; any scroll intent (wheel, touch, scroll keys) cancels it.
+ * Keyed on `pathname` only: in-page hash navigation (a TOC click) happens
+ * after layout has settled, and re-running would fight the native jump.
  */
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";

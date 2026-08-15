@@ -1,15 +1,8 @@
 "use client";
 
 /**
- * Shared helpers used by both `<ChallengeCard>` and `<SqlChallengeCard>`:
- *
- *   - `renderInstructions(input)`, accepts either a React node (used
- *     verbatim) or a markdown string (rendered via react-markdown + GFM).
- *   - `useChallengeToasts()`, minimal in-card toast manager. Each
- *     card mounts its own viewport so toasts feel attached to the card
- *     even when many are on the page.
- *   - `FormatIcon` / `CopyIcon` / `PlayIcon`, icon glyphs reused by
- *     both cards.
+ * Shared helpers for `<ChallengeCard>` and `<SqlChallengeCard>`: instructions
+ * rendering, in-card toasts, and shared icon glyphs.
  */
 
 import {
@@ -30,22 +23,11 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 
 // ─── Boot progress smoothing ─────────────────────────────────────────
-// Adapters report coarse stage *floors* (0.05, 0.55, 0.85, …) during a
-// runtime boot. A bar that only moves on those few events looks stuck
-// for the long middle of a download, so this hook animates the
-// displayed fraction asymptotically toward a ceiling a little above
-// the latest report, classic capped pseudo-progress. It never reaches
-// 1: completion is signalled by the boot UI unmounting, not the bar.
 
-/** Smooth a stage-floor boot fraction for display. Returns null (render
- *  an indeterminate spinner) until the first fraction arrives; resets
- *  when `active` goes false so the next boot starts clean.
- *
- *  All state writes happen inside timer callbacks (a 0 ms kick plus the
- *  creep interval) with functional updaters: the kick jumps the value
- *  up to a freshly reported stage floor (never backwards), and each
- *  interval tick eases it toward just shy of the next stage so the bar
- *  never looks stuck mid-download. */
+/** Smooth coarse stage-floor boot fractions (0.05, 0.55, …) into a creeping
+ *  display value (capped pseudo-progress; never reaches 1 — completion is the
+ *  boot UI unmounting). Returns null until the first fraction arrives; resets
+ *  when `active` goes false. */
 export function useCreepingBootFraction(
   target: number | null,
   active: boolean,
@@ -54,8 +36,7 @@ export function useCreepingBootFraction(
 
   useEffect(() => {
     if (!active || target == null) {
-      // Reset for the next boot, scheduled, not set synchronously in
-      // the effect body.
+      // Reset for the next boot; scheduled, not set synchronously in the effect.
       const reset = window.setTimeout(() => setDisplay(null), 0);
       return () => window.clearTimeout(reset);
     }
@@ -78,14 +59,9 @@ export function useCreepingBootFraction(
 }
 
 // ─── Mid-run "preparing" wait ─────────────────────────────────────────
-// Some runtimes block *inside* a run to download/install something before
-// the user's code executes, Python's two-phase data-package install, its
-// on-demand `loadPackagesFromImports`, R installing a `library()` on
-// demand. Those arrive via `RunOptions.onStatus(message, preparing)`.
-// This hook turns that stream into a `preparing` flag the surface uses to
-// show the runtime boot notice for the duration. The transition to
-// visible is debounced (~150 ms) so an all-cached run, which reports
-// preparing→done almost instantly, never flashes the notice.
+// Turns `RunOptions.onStatus(message, preparing)` reports (e.g. Python/R
+// installing packages mid-run) into a `preparing` flag. Becoming visible is
+// debounced so an all-cached run never flashes the notice.
 
 const PREPARING_SHOW_DELAY_MS = 150;
 
@@ -143,9 +119,8 @@ export function useMidRunPreparing(): MidRunPreparing {
 }
 
 // ─── Dark mode detection ─────────────────────────────────────────────
-// Mirrors the logic in CodeBlock.tsx: Fumadocs toggles a `dark` class
-// on <html> when the user switches themes; we fall back to the OS
-// preference when outside the /learn route.
+// Fumadocs toggles a `dark` class on <html>; fall back to the OS preference
+// outside /learn.
 
 function detectIsDark(): boolean {
   if (typeof document === "undefined") return true;
@@ -158,9 +133,8 @@ function detectIsDark(): boolean {
   return true;
 }
 
-/** Subscribe to the document's color-scheme so components can react
- *  to the Fumadocs theme toggle without polling. SSR-safe: the server
- *  snapshot defaults to `true` (dark) to match the site's dark default. */
+/** Subscribe to the document's color scheme. SSR snapshot defaults to dark
+ *  to match the site's dark default. */
 export function useIsDark(): boolean {
   return useSyncExternalStore(
     (notify) => {
@@ -185,8 +159,7 @@ export function useIsDark(): boolean {
   );
 }
 
-/** Map dark/light to the matching CodeMirror theme name.
- *  Dark → GitHub Dark, light → GitHub Light. */
+/** Map dark/light to the matching CodeMirror theme name. */
 export function cmThemeNameFor(isDark: boolean): string {
   return isDark ? "github-dark" : "github-light";
 }
@@ -194,27 +167,10 @@ export function cmThemeNameFor(isDark: boolean): string {
 // ─── Instructions: ReactNode | markdown string ───────────────────────
 
 /**
- * Label every unlabelled opening fence `text`.
- *
- * A safety net, not the mechanism: every fence in `content/` names its own
- * language, and `__tests__/challengeInstructionsHighlight.test.tsx` fails the
- * build if a new one does not. `text` is the right default for the one an
- * author forgets, because forgetting correlates with output rather than with
- * code: of the 89 fences that once carried no info string, 87 were samples of
- * what the program prints. Highlighting those is worse than leaving them
- * plain, since highlight.js finds keywords in ordinary words and paints a
- * column of `Hello, Grace!` in three colors.
- *
- * (An earlier version inherited the card's `adapter` here. It was wrong 87
- * times out of 89, which is why the label now lives in the source.)
- *
- * Done on the markdown text rather than on the syntax tree because the
- * alternative is a rehype plugin, and that means importing `unist-util-visit`
- * and `hast`, neither of which is a direct dependency.
- *
- * Only *opening* fences are touched: the state flips on every fence line, so a
- * closing ``` is never mistaken for a new block, and a fence that already
- * names a language keeps it.
+ * Label every unlabelled opening fence `text`. Safety net only — content
+ * fences name their language and a test enforces it. Unlabelled fences are
+ * almost always program output, which highlight.js would mislabel as code,
+ * so plain `text` beats guessing. Only opening fences are touched.
  */
 export function labelBareFences(source: string): string {
   if (!source.includes("```") && !source.includes("~~~")) return source;
@@ -232,35 +188,12 @@ export function labelBareFences(source: string): string {
     .join("\n");
 }
 
-/** Renders an instructions string as Markdown using react-markdown, with GFM,
- *  math, and fenced code syntax-highlighted by highlight.js. Supports the full
- *  CommonMark + GitHub-Flavored Markdown surface (headings, lists, tables,
- *  code, autolinks, …) so authors can write natural Markdown instead of
- *  nested JSX.
- *
- *  **Math is not optional here.** A lesson body gets `remarkMath` +
- *  `rehypeKatex` from `source.config.ts`, and a `<MultipleChoice>` gets them
- *  from its own pipeline, but an `instructions` string never reaches either:
- *  it is a *prop*, so the MDX compiler passes it through as a plain string and
- *  this component is the only thing that ever parses it. Without the two
- *  plugins the card printed the source verbatim, so `numerical-calculus`'s π
- *  challenge read `Recall that $\int_{-1}^{1} \sqrt{1 - x^2},dx = \pi/2$` on
- *  the page. Eighteen challenges across the scientific-computing and
- *  statistics courses were doing the same thing. KaTeX's stylesheet is already
- *  loaded on every route that can host a card, by `app/docs.css` for lessons
- *  and interview pages and by a direct import in `/c/[id]`, `/quiz/[id]` and
- *  the dashboard authoring pages.
- *
- *  `rehypeKatex` runs before `rehypeHighlight`, matching the order
- *  `source.config.ts` documents for the lesson pipeline. The two do not in
- *  fact collide here, because `remark-math` turns `$$…$$` into a `math` node
- *  that becomes a `div` rather than a `pre > code`, but the ordering is the
- *  one the rest of the codebase asserts and there is no reason to differ.
- *
- *  `detect: false`, so the language is always the one the fence names and
- *  never one highlight.js guessed from a two-line sample. Inline spans are
- *  untouched: `rehypeHighlight` only visits `pre > code`, and a `` `df` `` in
- *  a sentence wants to read as an identifier, not as code. */
+/** Render an instructions string as Markdown (GFM + math + highlight.js).
+ *  Math plugins are required: `instructions` is a prop, so it bypasses the MDX
+ *  pipeline and this is the only parser it ever reaches — without them `$…$`
+ *  prints verbatim. `rehypeKatex` before `rehypeHighlight` matches the lesson
+ *  pipeline's order; `detect: false` so the language is always the one the
+ *  fence names. */
 export function renderMarkdownInstructions(source: string): ReactNode {
   return (
     <ReactMarkdown
@@ -275,9 +208,7 @@ export function renderMarkdownInstructions(source: string): ReactNode {
   );
 }
 
-/** Accepts either a React node or a markdown string. Strings are
- *  rendered with react-markdown; nodes pass through unchanged so
- *  existing JSX-based call sites are unaffected. */
+/** Strings render as markdown; React nodes pass through unchanged. */
 export function renderInstructions(input: ReactNode | string): ReactNode {
   if (typeof input === "string") return renderMarkdownInstructions(input);
   return input;
@@ -297,8 +228,7 @@ export interface ChallengeToastApi {
   dismiss: (id: number) => void;
 }
 
-/** Tiny self-contained toast manager, one queue per card. Toasts
- *  auto-dismiss after 2.4s; the user can also click the close button. */
+/** Per-card toast manager; toasts auto-dismiss after 2.4s. */
 export function useChallengeToasts(): ChallengeToastApi {
   const [toasts, setToasts] = useState<ChallengeToast[]>([]);
   const seqRef = useRef(0);
@@ -336,9 +266,7 @@ export function useChallengeToasts(): ChallengeToastApi {
   return { toasts, show, dismiss };
 }
 
-/** Renders a toast stack at the bottom-right of the containing card.
- *  Expects to be placed inside a position-relative ancestor (the card
- *  root). */
+/** Toast stack; must sit inside a position-relative ancestor (the card root). */
 export function ChallengeToastViewport({
   toasts,
   onDismiss,
@@ -370,10 +298,8 @@ export function ChallengeToastViewport({
 }
 
 // ─── Shared SVG glyphs ────────────────────────────────────────────────
-// We use lucide-react glyphs so the challenge cards share an icon
-// language with the playgrounds and code-blocks. `Play` ships with a
-// thin stroke that reads small; we keep a tiny solid-triangle here for
-// the primary Run button so it matches the playgrounds' filled glyph.
+// lucide-react glyphs, except Play: a solid triangle to match the
+// playgrounds' filled glyph (lucide's stroke reads too thin at this size).
 
 import { Copy as LucideCopy, Wand2 } from "lucide-react";
 
@@ -389,14 +315,12 @@ export function PlayIcon() {
   );
 }
 
-/** Format code glyph. Matches the wand icon used by `<Playground>`'s
- *  Format button so the two surfaces feel like one product. */
+/** Format glyph; same wand icon as `<Playground>`'s Format button. */
 export function FormatIcon() {
   return <Wand2 size={13} aria-hidden />;
 }
 
-/** Stable, deterministic short-id for a card given a React useId() seed.
- *  Pulled out so both card flavours can share the implementation. */
+/** Stable, deterministic short id for a card, derived from React useId(). */
 export function useShortId(prefix: string): string {
   const reactId = useId();
   let h = 0;
@@ -408,13 +332,8 @@ export function useShortId(prefix: string): string {
 }
 
 // ─── Test results rail ───────────────────────────────────────────────
-// Shared by `<ChallengeCard>` and `<SqlChallengeCard>`: a minimal
-// pass/fail readout. A vertical rail runs down the left; each test is a
-// circle on the rail, green (--ds-green-500) with a white check for a
-// pass, red (--ds-red-500) with a white ✕ for a fail, and the rail
-// segment below each circle is painted in that test's color. Rows are
-// just the test name; the description, the test's code/checks, and the
-// exact error message live in a click-popover so the list stays clean.
+// Shared pass/fail readout: circles on a vertical rail, with details
+// (description, code/checks, error) in a click-popover per row.
 
 import { Info } from "lucide-react";
 import { Popover } from "@base-ui/react/popover";
@@ -426,8 +345,7 @@ export interface TestRailEntry {
   description?: string | null;
   state: "pass" | "fail" | "pending";
   detail?: string | null;
-  /** Code (or a readable summary of declarative checks) shown in the
-   *  details popover under `codeLabel`. */
+  /** Code (or summary of declarative checks) shown in the details popover. */
   code?: string;
 }
 
@@ -442,8 +360,7 @@ export function TestResultsRail({
   codeLabel = "Test code",
 }: {
   tests: TestRailEntry[];
-  /** Heading for the code section of the popover (e.g. "Checks" for
-   *  SQL's declarative expectations). */
+  /** Heading for the popover's code section (e.g. "Checks" for SQL). */
   codeLabel?: string;
 }) {
   return (
@@ -452,8 +369,7 @@ export function TestResultsRail({
         <div key={t.id} className={railStyles.testRailRow}>
           <div className={railStyles.testRailTrack} aria-hidden>
             <span className={railStyles.testRailNode} data-state={t.state}>
-              {/* Failures keep the ✕ for emphasis; passing/pending
-                  circles carry the 1-based test number. */}
+              {/* Failures show ✕; passing/pending show the 1-based number. */}
               {t.state === "fail" ? (
                 <X size={11} strokeWidth={3.2} aria-hidden />
               ) : (
@@ -525,8 +441,7 @@ export function TestResultsRail({
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Run-state primitives + editor helpers shared by the executable-block family
-// (ChallengeCard, SqlChallengeCard, CodeBlock, SqlCodeBlock). Each of those
-// files used to carry a byte-identical private copy of everything below.
+// (ChallengeCard, SqlChallengeCard, CodeBlock, SqlCodeBlock).
 
 import { lineNumbers as lineNumbersExt } from "@codemirror/view";
 import type { LanguageAdapter } from "./types";
@@ -537,8 +452,7 @@ export type Status = "idle" | "loading" | "ready" | "running" | "error";
 /** Lifecycle of a single challenge test row. */
 export type TestState = "pending" | "pass" | "fail";
 
-/** One row in the test-results rail, as rendered (name resolved, state
- *  computed, failure detail attached). */
+/** One rendered row in the test-results rail. */
 export interface DisplayedTest {
   id: string;
   name: string;
@@ -554,17 +468,12 @@ export function detectIsMac(): boolean {
   return /Mac|iPhone|iPod/.test(platform) || /Macintosh/.test(ua);
 }
 
-// Minimum time (ms) the "running" overlay is held visible after a run
-// completes. Matches the playground's MIN_ANIMATION_MS so a fast run
-// (e.g. a few-line JS challenge that finishes in 20ms) doesn't blink
-// the wave animation in and back out within a single frame.
+// Minimum ms the "running" overlay stays visible; matches the playground's
+// MIN_ANIMATION_MS so a 20ms run doesn't blink the wave animation.
 export const MIN_RUN_OVERLAY_MS = 300;
 
-// Build a line-numbers extension whose gutter starts after `offset`
-// lines, so the editable region's numbering continues from where a
-// file's read-only init code left off. Stored in a compartment so the
-// offset can be reconfigured when the active file (hence its init)
-// changes, without remounting the editor.
+// Line-numbers gutter starting after `offset` lines, so numbering continues
+// from a file's read-only init code. Held in a compartment for reconfiguration.
 export function lineNumbersWithOffset(offset: number) {
   return lineNumbersExt({
     formatNumber: offset ? (n) => String(n + offset) : undefined,
@@ -586,8 +495,7 @@ export function LanguageGlyph({ adapter }: { adapter: LanguageAdapter }) {
   );
 }
 
-/** Short, stable, human-readable block id ("PythonBlock-3f2a") derived from
- *  React's useId, used to label runtimes/workspaces in the registry. */
+/** Short stable block id ("PythonBlock-3f2a") used to label runtimes/workspaces. */
 export function useBlockId(adapter: LanguageAdapter): string {
   const reactId = useId();
   return useMemo(() => {

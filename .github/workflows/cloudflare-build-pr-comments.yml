@@ -1,18 +1,12 @@
 name: Cloudflare build PR comments
 
-# Posts a NEW pull-request comment on every Cloudflare Workers Builds event:
-#   • build started
-#   • build succeeded  (includes the commit's preview URL)
-#   • build failed / cancelled / timed out
-#   • build skipped
+# Posts a new PR comment for every Cloudflare Workers Builds event (started /
+# succeeded with preview URL / failed / skipped), linking to the Cloudflare
+# build page. Everything comes from the check_run payload; GITHUB_TOKEN is
+# enough, no Cloudflare secret.
 #
-# Every comment links to the Cloudflare build page for that exact commit.
-# All data comes from the check_run event payload that Cloudflare emits, no
-# Cloudflare API token or secret is required (GITHUB_TOKEN is enough).
-#
-# NOTE: check_run-triggered workflows always run from the DEFAULT branch's copy
-# of this file, so this only takes effect once it is merged to `main`. It cannot
-# post comments for the very PR that introduces it.
+# NOTE: check_run-triggered workflows always run from the DEFAULT branch's
+# copy of this file, so changes only take effect once merged to `main`.
 
 on:
   check_run:
@@ -84,7 +78,6 @@ jobs:
               }
             }
 
-            // Compose the comment body for this event.
             let body;
             if (action === 'created') {
               body =

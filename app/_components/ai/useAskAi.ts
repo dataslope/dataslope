@@ -1,26 +1,11 @@
 "use client";
 
 /**
- * Client hook driving an "Ask AI" conversation against `/api/ai/chat`.
- *
- * The endpoint streams Server-Sent Events over a POST response (not an
- * EventSource, since we POST a body), so we read `res.body` and parse `data:`
- * lines ourselves, appending each `delta` to the in-progress assistant message.
- *
- * ── Questions queue rather than being locked out ───────────────────────────
- *
- * A question asked while an answer is still streaming is *accepted*, not
- * dropped: it joins `queued`, shows in the transcript as a waiting turn, and is
- * sent the moment the current answer finishes. This is the behaviour every
- * assistant UI has converged on — a thought had mid-answer is not worth losing,
- * and the alternative (a disabled composer) makes the user hold it in their
- * head until the stream ends.
- *
- * Answers stay strictly ordered: `drain` runs one request at a time, so each
- * question still sees the full conversation before it as history. Stop clears
- * the queue as well as aborting the answer in flight — it is the one "stop
- * everything" control, and having it cancel an answer only for the next queued
- * question to start would read as ignoring the button.
+ * Client hook driving an "Ask AI" conversation against `/api/ai/chat`. The
+ * endpoint streams SSE over a POST response (no EventSource — we POST a body),
+ * so `data:` lines are parsed by hand. Questions asked mid-stream queue rather
+ * than being locked out; `drain` runs one request at a time so answers stay
+ * ordered. Stop clears the queue as well as aborting the in-flight answer.
  */
 import { useCallback, useRef, useState } from "react";
 import type {
@@ -34,10 +19,8 @@ import type {
 export interface UiMessage {
   role: "user" | "assistant";
   content: string;
-  /** Stable id for this turn, for the life of the conversation. Assistant
-   *  turns are rated by it (`/api/ai/feedback`), so it has to survive the
-   *  re-renders a streaming answer causes — an array index would not, and a
-   *  rating would follow the position rather than the answer. */
+  /** Stable turn id. Ratings key on it (`/api/ai/feedback`), so it must
+   *  survive streaming re-renders — an array index would not. */
   id: string;
   /** Model that produced this answer, from the stream's `done` event. Rides
    *  along with a rating so a downvote says which tier produced it. */
@@ -75,10 +58,8 @@ export interface UseAskAi {
   tier: MemberTier | null;
   /** Set when the server returns 401, the caller should show a sign-in CTA. */
   needsSignIn: boolean;
-  /** Resolves true once the server ACCEPTED the request (2xx, stream opened),
-   *  i.e. the moment a prompt is actually consumed; false on any failure or
-   *  no-op. Callers use this to keep their local quota display accurate.
-   *  A queued question resolves when its turn comes, not when it is queued. */
+  /** Resolves true once the server ACCEPTED the request (prompt consumed);
+   *  false on failure/no-op. Queued questions resolve when their turn comes. */
   send: (question: string) => Promise<boolean>;
   stop: () => void;
   reset: () => void;
@@ -102,15 +83,13 @@ export function useAskAi(
   const [needsSignIn, setNeedsSignIn] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
-  // Read at request time, so neither of these has to be a dependency of the
-  // engine below (which must keep a stable identity across renders — it is
-  // driven by refs, and re-creating it mid-drain would be a second loop).
+  // Read at request time so neither is a dependency of the engine below,
+  // which must keep a stable identity — re-creating it mid-drain would loop.
   const depsRef = useRef({ collectContext, getAnswerLength });
   depsRef.current = { collectContext, getAnswerLength };
 
-  // The transcript is mirrored into a ref because a request needs the history
-  // *as of the moment it starts*, which during a drain is several setState
-  // calls newer than the `messages` this render closed over.
+  // Mirrored into a ref: a request needs the history as of the moment it
+  // starts, which mid-drain is newer than the `messages` this render sees.
   const messagesRef = useRef<UiMessage[]>([]);
   const applyMessages = useCallback((fn: (prev: UiMessage[]) => UiMessage[]) => {
     messagesRef.current = fn(messagesRef.current);
@@ -167,9 +146,8 @@ export function useAskAi(
         });
 
       let accepted = false;
-      // Whether the server said the answer was complete. A socket that drops
-      // *after* this is not a failure the user needs to hear about — the answer
-      // on screen is the whole answer.
+      // Server said the answer was complete; a socket drop after this is not
+      // a failure worth surfacing.
       let completed = false;
       let streamedAny = false;
       try {
@@ -224,8 +202,7 @@ export function useAskAi(
           while ((nl = buffer.indexOf("\n")) !== -1) {
             const line = buffer.slice(0, nl).trim();
             buffer = buffer.slice(nl + 1);
-            // `:` lines are SSE comments — the server's keepalive. They carry
-            // nothing, and their whole job is to have been sent.
+            // `:` lines are SSE keepalive comments; they carry nothing.
             if (!line.startsWith("data:")) continue;
             const data = line.slice(5).trim();
             if (!data) continue;
@@ -257,9 +234,8 @@ export function useAskAi(
             }
           }
         }
-        // A stream that ends without a `done` event ended early — the answer on
-        // screen is a fragment, and saying so is the difference between the
-        // reader trusting it and re-reading it looking for the rest.
+        // A stream ending without a `done` event ended early — the answer on
+        // screen is a fragment, and the reader must be told so.
         if (!completed) {
           setError({
             message: streamedAny

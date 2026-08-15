@@ -1,33 +1,10 @@
 #!/usr/bin/env node
 /**
- * Precompute the home page's corpus figures from `content/`.
- *
- * Why this exists:
- *
- * `getHomeStats` in `app/page.tsx` used to recursively read every `.mdx` file
- * under `content/` — ~800 of them — and regex them for `<CodeBlock>` /
- * `<ChallengeCard>` occurrences, on each render. Two problems:
- *
- *  1. It cannot run on Cloudflare Workers at all. workerd has no filesystem,
- *     so a `/` that has to render on demand rather than come from the
- *     incremental cache throws and 500s. That happened on 2026-08-05 when a
- *     cache cleanup deleted the folder a preview Worker was serving.
- *  2. Even where it works, it is ~800 file reads plus a regex pass to render
- *     one page of headline numbers.
- *
- * The figures only change when the corpus changes, i.e. at build time, so
- * they are computed here instead. `app/page.tsx` then imports them, needs no
- * `node:fs`, and a cache miss re-renders successfully.
- *
- * The counts are deliberately raw here; `app/page.tsx` still floors them to a
- * round number for display, keeping that presentation choice in the component
- * that renders it.
- *
- * Output: `lib/generated/home-stats.js` (gitignored; committed `.d.ts`
- * sibling types it). Runs from `dev`, `build`, and `postinstall`.
- *
- * Idempotent. Restart `next dev` (or run `npm run build:home-stats`) after
- * editing lessons if you need the figures to move.
+ * Precompute the home page's corpus figures from `content/`: workerd has no
+ * filesystem, so scanning ~800 MDX files at request time 500s whenever `/`
+ * renders on demand. The counts stay raw here — `app/page.tsx` floors them
+ * for display. Output: lib/generated/home-stats.js (gitignored; committed
+ * `.d.ts` sibling). Runs from dev, build, postinstall.
  */
 import { readdirSync, readFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -52,8 +29,6 @@ const countMatches = (texts, pattern) =>
 
 /** Exported so the freshness test can re-derive without duplicating the rules. */
 export function readHomeStats() {
-  // Courses + the fumadocs-dev demo pages + interview prep — the same corpus
-  // the inline version scanned, so the figures stay comparable.
   const allMdx = [
     ...readMdxFiles(join(CONTENT, "courses")),
     ...readMdxFiles(join(CONTENT, "fumadocs-dev")),
@@ -79,9 +54,8 @@ export function readHomeStats() {
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const stats = readHomeStats();
 
-  // Zero anywhere means the scan stopped matching — a component renamed, or a
-  // content directory moved. The home page would render "0+ runnable code
-  // blocks", which reads as a broken site rather than a stale build.
+  // Zero anywhere means the scan stopped matching (renamed component, moved
+  // directory); the home page would render "0+ runnable code blocks".
   for (const [key, value] of Object.entries(stats)) {
     if (!value) {
       console.error(

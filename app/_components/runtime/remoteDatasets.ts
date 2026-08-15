@@ -1,39 +1,13 @@
-// Remote sample datasets (SQL scripts, CSV/parquet files, SQLite
-// databases), fetched from the companion dataslope/datasets GitHub
-// repository and cached so that every code block, challenge card, and
-// playground that references a file shares ONE download, across
-// languages (Python, R, SQLite, Postgres, DuckDB, …), across pages,
-// and across visits.
-//
-// How a dataset is fetched (three layers, all per-URL):
-//
-//   1. In-flight memo (module-level Map<url, Promise>), dedupes
-//      concurrent and repeated requests within one JS context. Workers
-//      get their own module instance and therefore their own memo.
-//   2. Cache API (`caches.open`), persistent, shared by the main
-//      thread and every worker on the origin. A file downloaded by the
-//      SQLite worker is served from here when the DuckDB worker (or a
-//      hard-reloaded page) asks for it later. Best-effort: quota
-//      errors, private-browsing restrictions, and missing support all
-//      silently degrade to a plain network fetch.
-//   3. Network, via two hosts:
-//        - cdn.jsdelivr.net (primary): serves GitHub repos with
-//          `access-control-allow-origin: *` and, for ref-pinned URLs,
-//          a one-year immutable HTTP cache, so even fetches that bypass
-//          this module benefit.
-//        - raw.githubusercontent.com (fallback): also CORS-enabled and
-//          has no per-file size limit below GitHub's 100 MB cap, but
-//          only allows ~5-minute HTTP caching. Used when jsDelivr
-//          fails (outage, or its ~20 MB per-file limit).
-//      Either way the bytes come from a CDN rather than this app's own
-//      origin, which never has to serve a sample database.
-//
-// The helpers below are dialect-agnostic: SQLite and Postgres fetch SQL
-// scripts with `fetchDatasetText`, the DuckDB runtime uses
-// `fetchDatasetBytes` for binary datasets (e.g. registering a remote
-// parquet file), and `<CodeBlock>` / `<ChallengeCard>` stage
-// `fetchDatasetBytes` results into a runtime's virtual filesystem via
-// their `datasets` prop (see `DatasetStageSpec`).
+// Remote sample datasets from the dataslope/datasets GitHub repo, cached so
+// everything that references a file shares ONE download. Three per-URL
+// layers:
+//   1. In-flight memo (per JS context; workers each get their own).
+//   2. Cache API: persistent, shared across the origin's threads/workers.
+//      Best-effort — failures degrade to a plain network fetch.
+//   3. Network: cdn.jsdelivr.net first (CORS *, one-year immutable cache
+//      for ref-pinned URLs, ~20 MB per-file limit), falling back to
+//      raw.githubusercontent.com (CORS-enabled, no size limit below
+//      GitHub's 100 MB cap, but only ~5-minute HTTP caching).
 
 /** A GitHub repository (plus ref) that hosts dataset files. */
 export interface RemoteDatasetSource {
@@ -43,15 +17,9 @@ export interface RemoteDatasetSource {
   ref: string;
 }
 
-// Pinned ref into the dataslope/datasets repository. Pinning (rather
-// than tracking `main`) makes every dataset URL immutable, which is
-// what lets the layers above cache aggressively with no revalidation
-// logic at all: bumping the ref changes every URL, and that IS the
-// cache invalidation. (Same pattern as CDN_ASSETS_TAG in cdn.ts.)
-//
-// After merging any change to the dataslope/datasets repo, update this
-// to the new commit SHA (or a tag, once the repo starts tagging):
-//
+// Pinned ref into dataslope/datasets: pinning makes every URL immutable, so
+// bumping the ref IS the cache invalidation (same pattern as CDN_ASSETS_TAG).
+// After merging changes to that repo, update to the new commit SHA:
 //   git ls-remote https://github.com/dataslope/datasets.git refs/heads/main
 export const DATASETS_REF = "f7f08485960fe4a774359a43d1eb50a84514daf2";
 
@@ -75,10 +43,8 @@ export function rawGitHubUrl(
   return `https://raw.githubusercontent.com/${source.owner}/${source.repo}/${source.ref}/${cleanDatasetPath(path)}`;
 }
 
-/** Build the cdn.jsdelivr.net URL for a file in a GitHub repo. With a
- *  pinned ref jsDelivr serves these with a one-year immutable
- *  `cache-control`, so plain HTTP caching works even for consumers
- *  that bypass this module's Cache API layer. */
+/** cdn.jsdelivr.net URL for a file in a GitHub repo. Ref-pinned URLs get a
+ *  one-year immutable cache-control. */
 export function jsDelivrGitHubUrl(
   path: string,
   source: RemoteDatasetSource = DATASLOPE_DATASETS_SOURCE,
@@ -86,32 +52,23 @@ export function jsDelivrGitHubUrl(
   return `https://cdn.jsdelivr.net/gh/${source.owner}/${source.repo}@${source.ref}/${cleanDatasetPath(path)}`;
 }
 
-/** Resolve a dataset reference to its canonical absolute URL. Accepts
- *  either a path inside the default datasets repo (e.g.
- *  `sqlite/chinook_sqlite.sql`) or a full `https://` URL, so a sample
- *  can clone a database from any repository (or any other CORS-enabled
- *  host). The canonical URL doubles as the cache key in every layer. */
+/** Resolve a dataset reference (repo path or full https URL) to its
+ *  canonical URL, which doubles as the cache key in every layer. */
 export function resolveDatasetUrl(pathOrUrl: string): string {
   return datasetUrlCandidates(pathOrUrl)[0];
 }
 
-/** Candidate download URLs for a dataset reference, in the order they
- *  should be tried. Repo-relative paths get the jsDelivr URL first
- *  (immutable HTTP caching) with raw.githubusercontent.com as the
- *  fallback host; full URLs are used as-is. The first candidate is the
- *  canonical cache key, a download that succeeded via the fallback
- *  host is still stored under the canonical URL, so later lookups hit
- *  regardless of which host happened to serve the bytes. */
+/** Candidate download URLs in try-order: jsDelivr first, raw GitHub as
+ *  fallback; full URLs as-is. The first candidate is the canonical cache
+ *  key regardless of which host served the bytes. */
 function datasetUrlCandidates(pathOrUrl: string): string[] {
   if (/^https?:\/\//i.test(pathOrUrl)) return [pathOrUrl];
   return [jsDelivrGitHubUrl(pathOrUrl), rawGitHubUrl(pathOrUrl)];
 }
 
 // ─── Layer 1: in-flight memo ────────────────────────────────────────
-// Failed downloads are evicted so a transient network error doesn't
-// poison the sample for the rest of the session. (Workers get their own
-// module instance and therefore their own memo, the Cache API layer
-// below is what makes a download shared across contexts.)
+// Failed downloads are evicted so a transient error isn't cached; the
+// Cache API layer is what shares downloads across contexts.
 const textCache = new Map<string, Promise<string>>();
 const bytesCache = new Map<string, Promise<Uint8Array>>();
 
@@ -129,25 +86,21 @@ function memoised<T>(
   return promise;
 }
 
-// Above this size a downloaded buffer is dropped from the per-context
-// memo once it is safely retrievable from the Cache API: retaining a
-// multi-MB parquet file as a live Uint8Array in every JS context is a
-// memory cost the (fast, local) Cache API re-read makes unnecessary.
+// Above this size a buffer is dropped from the per-context memo once the
+// Cache API holds it — a fast local re-read beats pinning MBs per context.
 const LARGE_BYTES_MEMO_LIMIT = 5 * 1024 * 1024;
 
 // ─── Layer 2: Cache API ─────────────────────────────────────────────
-// Bump the version suffix when the storage format changes (e.g. if
-// entries ever gain synthetic metadata headers); the sweep below
-// deletes caches left behind by older versions.
+// Bump the version suffix when the storage format changes; the sweep
+// deletes caches left by older versions.
 const DATASET_CACHE_PREFIX = "dataslope-datasets-";
 const DATASET_CACHE_NAME = `${DATASET_CACHE_PREFIX}v1`;
 
 let datasetCachePromise: Promise<Cache | null> | null = null;
 
-/** Open (once per context) the persistent dataset cache, or resolve to
- *  null when the Cache API is unavailable (Node, file://, some private
- *  modes) or fails, callers then fall through to the network. Kicks
- *  off a background sweep of stale entries on first open. */
+/** Open the persistent dataset cache once per context; null when the Cache
+ *  API is unavailable (callers fall through to the network). Kicks off a
+ *  background sweep of stale entries on first open. */
 function openDatasetCache(): Promise<Cache | null> {
   if (typeof caches === "undefined") return Promise.resolve(null);
   if (!datasetCachePromise) {
@@ -164,12 +117,9 @@ function openDatasetCache(): Promise<Cache | null> {
   return datasetCachePromise;
 }
 
-/** Best-effort storage hygiene, run once per context per session:
- *  drops caches created by older storage-format versions, and drops
- *  entries for the default datasets repo at any ref other than the
- *  current pin. The latter both cleans up after a `DATASETS_REF` bump
- *  and keeps hand-written mutable URLs (e.g. `…/datasets/main/…`) from
- *  serving stale bytes forever, they degrade to per-session caching. */
+/** Best-effort hygiene: drop old-format caches and default-repo entries at
+ *  any ref other than the current pin — cleans up after a DATASETS_REF bump
+ *  and keeps mutable URLs (`…/main/…`) from serving stale bytes forever. */
 async function sweepStaleEntries(cache: Cache): Promise<void> {
   const names = await caches.keys();
   await Promise.all(
@@ -200,9 +150,8 @@ async function sweepStaleEntries(cache: Cache): Promise<void> {
 
 interface CachedFetchResult {
   response: Response;
-  /** True when the bytes are now retrievable from the Cache API (hit,
-   *  or stored after a miss), i.e. a per-context memo may safely drop
-   *  its copy and re-read locally later. */
+  /** True when the bytes are retrievable from the Cache API, so a memo may
+   *  safely drop its copy. */
   persisted: boolean;
 }
 
@@ -281,11 +230,9 @@ export function fetchDatasetText(pathOrUrl: string): Promise<string> {
   );
 }
 
-/** Fetch a binary dataset (e.g. a `.parquet`, `.csv`, or `.sqlite`
- *  file) by repo path or URL. Callers that hand the buffer to an engine
- *  which takes ownership of it (worker transfer, virtual-FS
- *  registration) should pass a copy (`bytes.slice()`) so the cached
- *  array stays usable for the next load. */
+/** Fetch a binary dataset by repo path or URL. Callers handing the buffer
+ *  to an engine that takes ownership (worker transfer, virtual-FS
+ *  registration) should pass `bytes.slice()` so the cached array survives. */
 export function fetchDatasetBytes(pathOrUrl: string): Promise<Uint8Array> {
   const candidates = datasetUrlCandidates(pathOrUrl);
   const url = candidates[0];
@@ -293,18 +240,16 @@ export function fetchDatasetBytes(pathOrUrl: string): Promise<Uint8Array> {
     const { response, persisted } = await cachedFetch(url, candidates);
     const bytes = new Uint8Array(await response.arrayBuffer());
     if (persisted && bytes.byteLength > LARGE_BYTES_MEMO_LIMIT) {
-      // Don't pin large buffers in this context's memo: the next
-      // consumer re-reads from the Cache API instead. In-flight
-      // callers still share this promise; only later calls re-load.
+      // Don't pin large buffers in the memo; later calls re-read the Cache
+      // API. In-flight callers still share this promise.
       bytesCache.delete(url);
     }
     return bytes;
   });
 }
 
-/** Filename component of a dataset path or URL (e.g.
- *  `duckdb/trips.parquet` → `trips.parquet`). Used as the default name
- *  when registering a remote file with an engine's virtual filesystem. */
+/** Filename component of a dataset path or URL (`duckdb/trips.parquet` →
+ *  `trips.parquet`); the default virtual-filesystem name. */
 export function datasetFileName(pathOrUrl: string): string {
   const path = pathOrUrl.replace(/[?#].*$/, "");
   const base = path.slice(path.lastIndexOf("/") + 1);
@@ -313,19 +258,15 @@ export function datasetFileName(pathOrUrl: string): string {
 
 // ─── Declarative staging (the `datasets` prop) ──────────────────────
 
-/** One dataset staged into a runtime's working directory by the
- *  `datasets` prop of `<CodeBlock>` / `<ChallengeCard>`. The bytes are
- *  downloaded through the cached path above and written into the
- *  runtime's virtual filesystem before each run, so init/starter code
- *  reads a local file (`pd.read_csv("penguins.csv")`,
- *  `read.csv("penguins.csv")`), identical UX in every language, no
- *  per-language CORS quirks, and lessons never embed raw URLs. */
+/** One dataset staged into a runtime's working directory by the `datasets`
+ *  prop of `<CodeBlock>` / `<ChallengeCard>`: downloaded via the cached
+ *  path and written into the virtual filesystem before each run, so code
+ *  reads a local file with no CORS quirks and no raw URLs in lessons. */
 export interface DatasetStageSpec {
   /** Path inside the dataslope/datasets repo (e.g. `"csv/penguins.csv"`)
    *  or a full `https://` URL on any CORS-enabled host. */
   path: string;
-  /** Filename the bytes are staged under in the runtime's working
-   *  directory. Defaults to the basename of `path`. */
+  /** Staged filename; defaults to the basename of `path`. */
   stageAs?: string;
 }
 

@@ -1,15 +1,8 @@
 /**
- * Course-row artwork for the course cards (the `/courses` catalog and the
- * home page's Courses section): a single lucide line icon, unique per course.
- *
- * Every course gets its OWN motif via `COURSE_MOTIFS` (slug → kind); no two
- * courses share one (__tests__/courseArt.test.ts enforces it). Each motif kind
- * maps to a distinct lucide icon in `KIND_ICONS`. A course missing from the
- * map falls back to its domain tag's motif, add a bespoke entry when a new
- * course lands.
- *
- * The icon inherits the row's text color (heading tone by default) so it
- * reads as part of the title rather than a separate per-language accent.
+ * Course-card artwork: a single lucide line icon, unique per course via
+ * `COURSE_MOTIFS` (uniqueness enforced by __tests__/courseArt.test.ts). A
+ * course missing from the map falls back to its domain tag's motif — add a
+ * bespoke entry when a new course lands.
  */
 import {
   AppWindow,

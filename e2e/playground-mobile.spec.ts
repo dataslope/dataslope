@@ -1,20 +1,10 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// ─────────────────────────────────────────────────────────────────────
-// Responsive / mobile layout coverage for the three SQL playgrounds
-// (SQLite, Postgres, DuckDB). The desktop UI is a fixed 3-pane IDE; below
-// the 768px breakpoint the shared SqlPlaygroundShell collapses it to a
-// single full-width surface switched from a bottom tab bar
-// (Schema / Editor / Results), driven by `data-mobile-pane` on
-// `.playground-root`.
-//
-// These assertions deliberately do NOT wait for the WASM engine to finish
-// booting: the layout (shell + sidebar + editor + results + bottom tabs)
-// renders immediately and the tab switching is pure shell state + CSS, so
-// the test stays fast and independent of the CDN that serves the engines.
-// We just hide the boot overlay (and the dev-mode badge) so it doesn't
-// cover the surfaces under test.
-// ─────────────────────────────────────────────────────────────────────
+// Mobile layout coverage for the three SQL playgrounds: below 768px the
+// 3-pane IDE collapses to a single surface switched by a bottom tab bar,
+// driven by data-mobile-pane on .playground-root. Deliberately does NOT wait
+// for the WASM engine: layout and tab switching are pure shell state + CSS,
+// keeping the test fast and CDN-independent (the boot overlay is hidden).
 
 const ENGINES = ["sqlite", "postgres", "duckdb"] as const;
 const MOBILE = { width: 390, height: 844 };
@@ -78,11 +68,8 @@ test.describe("SQL playgrounds, mobile layout (390×844)", () => {
       await expect(editor).toBeVisible();
       await expect(sidebar).toBeHidden();
 
-      // Results is gated until a query produces output: the bottom-bar Results
-      // tab stays disabled so the user can never land on an empty Results pane.
-      // A brand-new query tab has no output regardless of whether the WASM
-      // engine has booted, which keeps this deterministic and CDN-independent
-      // (the engine is intentionally not awaited in this spec).
+      // Results stays disabled until a query produces output; a brand-new tab
+      // has none regardless of engine boot, keeping this deterministic.
       await page.locator(".playground-tab-add").click();
       await expect(root).toHaveAttribute("data-mobile-pane", "editor");
       await expect(resultsTab).toBeDisabled();
@@ -92,14 +79,10 @@ test.describe("SQL playgrounds, mobile layout (390×844)", () => {
     });
   }
 
-  // ── Request 3: per-query-tab bottom-pane memory ──────────────────────
-  // Activating a query tab restores *that tab's* remembered bottom pane (a
-  // brand-new tab defaults to Editor), and the restore never strands the user
-  // on the disabled, empty Results pane. The full Editor↔Results memory needs a
-  // booted engine to produce results (so a tab can legitimately remember
-  // Results) and is exhaustively covered by the `paneForActivatedTab` unit
-  // test. Here we exercise the DOM wiring engine-free: tab creation, activation,
-  // and the data-tab-id / .active observer that drives the per-tab restore.
+  // Activating a query tab restores that tab's remembered bottom pane, never
+  // stranding the user on the disabled Results pane. Full Editor↔Results
+  // memory needs a booted engine and is covered by the paneForActivatedTab
+  // unit test; here the DOM wiring is exercised engine-free.
   test("sqlite: activating a query tab restores a reachable pane (never empty Results)", async ({
     page,
   }) => {
@@ -122,9 +105,8 @@ test.describe("SQL playgrounds, mobile layout (390×844)", () => {
     await expect(root).toHaveAttribute("data-mobile-pane", "editor");
     await expect(resultsTab).toBeDisabled();
 
-    // Switching between query tabs runs the per-tab restore (the observer reads
-    // each tab's data-tab-id + .active). With no tab holding results, every
-    // activation lands on the Editor, and never on the disabled Results pane.
+    // With no tab holding results, every activation lands on the Editor,
+    // never on the disabled Results pane.
     await tabs.first().click();
     await expect(root).toHaveAttribute("data-mobile-pane", "editor");
     await tabs.last().click();

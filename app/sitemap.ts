@@ -1,19 +1,8 @@
 /**
- * XML sitemap, emitted at `/sitemap.xml`.
- *
- * Lists the home page, the `/courses` catalog index, every prerendered lesson
- * resolved from the Fumadocs `courseSource` loader (the same page set behind
- * `generateStaticParams`), the interview-prep pages, and the static
- * playground landing pages. This is the single biggest indexing win for ~800
- * static lessons that previously had no sitemap.
- *
- * Generated at build time as a static route, so it costs nothing at request
- * time, consistent with the site's static-content model. URLs resolve
- * against `SITE_URL`.
- *
- * The raw-Markdown mirrors (`*.md`, `/llms/`) and the dev-only
- * `/fumadocs-dev` gallery are intentionally omitted to stay consistent with
- * `app/robots.ts`, which disallows them.
+ * XML sitemap at `/sitemap.xml`, generated at build time: home, catalog
+ * indexes, every prerendered lesson, and the playground landing pages. The
+ * raw-Markdown mirrors and dev-only `/fumadocs-dev` gallery are intentionally
+ * omitted, consistent with `app/robots.ts`.
  */
 import type { MetadataRoute } from "next";
 import { courseSource, interviewSource } from "@/lib/source";
@@ -32,22 +21,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 1,
   });
 
-  // Standalone pricing page (static; reuses the home page's pricing table).
   entries.set(abs("/pricing"), {
     url: abs("/pricing"),
     changeFrequency: "monthly",
     priority: 0.8,
   });
 
-  // The course-catalog index page (app/courses/page.tsx, not a source page,
-  // so it's added explicitly).
+  // Catalog index pages are not source pages, so they're added explicitly.
   entries.set(abs("/courses"), {
     url: abs("/courses"),
     changeFrequency: "weekly",
     priority: 0.9,
   });
 
-  // Every course lesson (content/courses → /courses/<course>/…).
   for (const page of courseSource.getPages()) {
     const url = abs(page.url);
     entries.set(url, {
@@ -57,15 +43,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
   }
 
-  // The interview-prep catalog index (app/interview-prep/page.tsx, not a
-  // source page, so it's added explicitly, mirroring /courses above).
   entries.set(abs("/interview-prep"), {
     url: abs("/interview-prep"),
     changeFrequency: "weekly",
     priority: 0.9,
   });
 
-  // Interview Prep collection (content/interview → /interview-prep/<role>/…).
   for (const page of interviewSource.getPages()) {
     const url = abs(page.url);
     entries.set(url, {
@@ -75,8 +58,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
   }
 
-  // Playground hub + per-language landing pages (static; high-intent "online
-  // <lang> playground" queries). Now indexable, see app/robots.ts.
+  // Playground hub + per-language landing pages (indexable, see app/robots.ts).
   for (const path of getPlaygroundPaths()) {
     const url = abs(path);
     entries.set(url, {

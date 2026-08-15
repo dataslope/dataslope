@@ -103,10 +103,9 @@ describe("authored prose style", () => {
     expect(lintSource('```markdown\n> "A quoted blockquote."\n```', "x.mdx", "mdx")).toEqual([]);
   });
 
-  // Mermaid labels are prose the reader sees, but they live in a fenced block,
-  // so every rule above skips them. This rule reaches inside the fence, which
-  // means it has to tell a label from mermaid's own link syntax: nearly every
-  // way of drawing a link is made of the same hyphens the rule is looking for.
+  // Mermaid labels are reader-visible prose inside a fenced block the other
+  // rules skip. Reaching inside the fence means telling a label from mermaid's
+  // own link syntax, which is made of the same hyphens.
   describe("mermaid labels", () => {
     const mermaid = (...body: string[]) => ["```mermaid", ...body, "```"].join("\n");
     const rules = (src: string) => lintSource(src, "x.mdx", "mdx").map((v) => v.rule);

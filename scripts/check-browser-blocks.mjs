@@ -1,24 +1,11 @@
 /**
- * Runs the courseware-wide Playwright sweep for the languages that have no
- * Node runner, and reconciles what it actually ran against what exists.
- *
- * java (CheerpJ), csharp (.NET wasm), web and react (sandboxed preview
- * iframes) and php (php-wasm) are the last unswept languages on the site: 663
- * items that only a browser can execute. Every other language got a headless
- * runner in this PR precisely because a browser sweep is expensive; these five
- * have no such option, so this drives the real thing.
- *
- * ── Why a wrapper rather than `playwright test` directly ───────────────────
- *
- * Page selection is a `adapter="java"`-style scan of the MDX, which is loose
- * on purpose (see _adapterFilter.ts): a page can be selected and then have
- * nothing to run, so a zero-item page is not an error. That tolerance is
- * exactly what would let a broken selector — a renamed `data-adapter`, a typo
- * in ADAPTERS — sweep 177 pages, run nothing at all, and exit green. So the
- * spec prints one `SWEEP {...}` line per page and this script adds up what was
- * run, compares it with what `scripts/lib/mdx-blocks.mjs` says is there, and
- * fails on a shortfall. Coverage that cannot be silently lost is the whole
- * point of the exercise.
+ * Runs the courseware-wide Playwright sweep for the languages with no Node
+ * runner (java, csharp, web, react, php) and reconciles what it ran against
+ * what exists. Page selection is loose on purpose (see _adapterFilter.ts), so
+ * a broken selector could sweep every page, run nothing, and exit green —
+ * instead the spec prints one `SWEEP {...}` line per page and this script
+ * compares the totals with what scripts/lib/mdx-blocks.mjs says is there,
+ * failing on a shortfall.
  *
  * Usage:
  *   node scripts/check-browser-blocks.mjs [--adapters java,csharp,…]
@@ -55,9 +42,8 @@ const wantCards = !args.includes("--blocks-only");
 
 // ─── What exists ───────────────────────────────────────────────────────────
 
-// Kept in step with the spec's own page selection: whatever the filter drops
-// from the run must drop out of the expected total too, or the reconciliation
-// below reports a filtered run as a shortfall.
+// Whatever the filter drops from the run must drop out of the expected total
+// too, or the reconciliation reports a filtered run as a shortfall.
 const filter = parseFilter(flag("--filter"));
 const keep = (x) => (filter ? matchesFilter(filter, x.file, x.title) : true);
 
@@ -123,8 +109,7 @@ child.stdout.on("data", (chunk) => {
     try {
       swept.push(JSON.parse(line.slice(at + "SWEEP ".length)));
     } catch {
-      // A torn line is a reconciliation gap, not a crash; the totals below
-      // will be short and the run will fail for that reason instead.
+      // A torn line just leaves the totals short; the run fails on that.
     }
   }
 });
@@ -153,9 +138,7 @@ console.log(
 );
 
 if (shortfalls.length > 0) {
-  // Over-count is fine and expected: a card shown inside a ```jsx
-  // documentation fence is extracted by the scanner but also rendered live, so
-  // the browser can legitimately see more than the file scan predicts. Only a
+  // Over-count is fine (documentation-fence items also render live); only a
   // shortfall means coverage was lost.
   console.error(`\n✗ the sweep did not reach everything it should have:`);
   for (const s of shortfalls) console.error(`    ${s}`);

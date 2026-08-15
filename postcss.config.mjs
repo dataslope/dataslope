@@ -1,9 +1,7 @@
 /**
- * PostCSS config, only loads the Tailwind v4 plugin, which Fumadocs UI
- * relies on. Tailwind only activates for stylesheets that explicitly
- * `@import 'tailwindcss'` (currently just `app/learn/learn.css`), so the
- * existing `app/globals.css` and the per-component CSS modules under
- * `app/_components/` are unaffected.
+ * Only the Tailwind v4 plugin (Fumadocs UI relies on it). Tailwind activates
+ * only in stylesheets that `@import 'tailwindcss'`, so app/globals.css and
+ * the per-component CSS modules are unaffected.
  */
 const config = {
   plugins: {

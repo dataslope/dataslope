@@ -1,36 +1,14 @@
 /**
  * Redirects from the flat `/courses/<lesson>` shape to the real
- * `/courses/<course>/<lesson>` URL.
- *
- * Every lesson lives two segments deep (`content/courses/<course>/<lesson>.mdx`
- * → `/courses/<course>/<lesson>`), and `app/sitemap.ts` only ever emits that
- * shape. Requests for the one-segment shape nevertheless arrive and 404 —
- * confirmed live on 2026-08-14, `/courses/capstone-data-pipeline` 404s while
- * `/courses/csharp-linq-functional/capstone-data-pipeline` is a real page, and
- * likewise for `/courses/setup-and-tsconfig`. Where those links come from was
- * never identified (an older URL scheme, inbound external links, or guessed
- * URLs), which is precisely why this is fixed by shape rather than by chasing
- * the source: they are broken links to content that exists, and that is an SEO
- * and UX bug whatever minted them.
- *
- * It also removes a storage bug at its source. An unmatched `/courses/*` path
- * used to render the not-found page and OpenNext cached that 404 into the live
- * build's R2 folder — ~1.8 MB apiece with `revalidate: false`, i.e. forever,
- * for URLs whose hit rate is near zero (see open-next.config.ts). The catch-all
- * route now sets `dynamicParams = false` so nothing renders for an unknown
- * path at all; these redirects run one phase earlier still, in the router,
- * so a flat lesson link never reaches the route.
- *
- * AMBIGUOUS LEAVES ARE SKIPPED. A lesson slug is only unique within its course:
- * `next-steps` exists in 31 courses, `computational-thinking` in 5, and 61
- * leaves collide overall. There is no honest destination for those, so they
- * keep 404ing rather than being sent to an arbitrary course. That leaves ~620
- * of ~685 distinct leaves covered.
- *
- * Computed at build time from the content tree rather than from a generated
- * artifact: `next.config.ts` is loaded before anything else runs, and walking
- * ~830 filenames costs a few milliseconds against the risk of reading a
- * manifest some entry point forgot to regenerate.
+ * `/courses/<course>/<lesson>` URL. Flat requests arrive from unknown
+ * sources and 404 on content that exists, so the shape is fixed rather than
+ * the source chased; running in the router also keeps OpenNext from caching
+ * those 404s into R2 forever. AMBIGUOUS LEAVES ARE SKIPPED: a lesson slug is
+ * only unique within its course (61 leaves collide), so those keep 404ing
+ * rather than being sent to an arbitrary course. Computed at build time from
+ * the content tree — next.config.ts loads before anything else, and walking
+ * the filenames beats trusting a manifest an entry point forgot to
+ * regenerate.
  */
 import { readdirSync } from "node:fs";
 import { join } from "node:path";

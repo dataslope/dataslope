@@ -1,29 +1,15 @@
-// Shared chrome for the standalone auth routes (/sign-in, /sign-up,
-// /forgot-password, /reset-password), rebuilt on the shadcn UI auth block
-// layout: a centered column on a muted page background with the brand
-// lockup above a single card. Pulls in the shared Tailwind root (scoped by
-// Next.js to the routes that import this component); the pre-paint theme
-// bootstrap keeps the same contract as the rest of the site.
-//
-// Dark mode paints the page and the card the same near-black (#121212) and
-// floats a decorative globe (AuthGlobe) at the bottom, behind the card. The
-// shared light/dark toggle sits top-right, mirroring the site header.
-//
-// Mobile is deliberately plainer: no globe (AuthGlobe skips small viewports
-// entirely, so the WebGL sphere is never even created there) and no card —
-// the page paints one flat white/near-black surface and the form sits
-// directly on it. A card inside a 360px viewport is two nested boxes of
-// padding around a column of full-width inputs; dropping it buys back the
-// horizontal room without changing anything about the form itself.
+// Shared chrome for the standalone auth routes: centered column, brand
+// lockup above a single card, decorative globe behind it in dark mode.
+// Mobile is deliberately plainer — no globe (never created there) and no
+// card, so the form sits directly on a flat surface and narrow phones get
+// the horizontal room back.
 import "@/app/tailwind.css";
 import type { ReactNode } from "react";
 import Link from "../Link";
 import { ThemePillToggle } from "../ThemePillToggle";
 import { AuthGlobe } from "./AuthGlobe";
 
-// Applies the persisted light/dark choice before first paint (same contract
-// as the home and pricing pages) so a returning dark-mode visitor sees no
-// flash.
+// Applies the persisted light/dark choice before first paint (no flash).
 const THEME_BOOTSTRAP = `(function(){try{var d=localStorage.getItem('theme')==='dark';var r=document.documentElement;r.classList.toggle('dark',d);r.classList.toggle('light',!d);r.style.colorScheme=d?'dark':'light';}catch(e){}})();`;
 
 export function AuthPageShell({ children }: { children: ReactNode }) {

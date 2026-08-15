@@ -1,22 +1,11 @@
 "use client";
 
 /**
- * Interactive demo components for the "React from the Ground Up" course.
- *
- * Each one is a small, self-contained, genuinely-interactive React component
- * that a lesson renders inline through <ReactPreview>, with a matching TSX
- * snippet shown underneath. They bring their own inline styles (a real
- * component ships its own look) so they read cleanly on both the light and
- * dark lesson canvas without depending on page theme variables.
- *
- * Registered as a group in mdx-components.tsx (spread from `reactDemoComponents`)
- * so lessons can drop `<CounterDemo />` in without an import, mirroring how
- * <CodeBlock> / <ChallengeCard> are made available.
- *
- * Everything here is offline: demos that illustrate "data fetching" simulate
- * an async source with a timer so they behave identically wherever the page is
- * served. Lessons pair them with a real `fetch` example in an executable
- * <CodeBlock> when a live network call is the point.
+ * Interactive demo components for the "React from the Ground Up" course,
+ * rendered inline via <ReactPreview>. Inline styles only, so they read on
+ * both light and dark canvases without page theme variables. Registered as a
+ * group in mdx-components.tsx (via `reactDemoComponents`). Everything is
+ * offline: "data fetching" demos simulate an async source with a timer.
  */
 
 import {
@@ -1266,8 +1255,5 @@ export function ThemeContextDemo() {
   );
 }
 
-// The registry object that groups these demos for MDX is assembled in the
-// plain (non-"use client") barrel `reactDemoComponents.ts`. It must NOT live
-// here: every export of a "use client" module becomes an opaque client
-// *reference* on the server, so an object exported from this file would spread
-// to nothing when merged into the server-side MDX component map.
+// The MDX registry object is assembled in reactDemoComponents.ts and must NOT
+// live here — see that file for why.

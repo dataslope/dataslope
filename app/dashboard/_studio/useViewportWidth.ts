@@ -1,11 +1,8 @@
 "use client";
 
-// Tracks the viewport width so the Studio shell can pick between the design's
-// sidebar states (full / icon rail / drawer) at its exact breakpoints — 640px
-// for the phone drawer, 900px (or 1240px while a builder shows its live
-// preview) for auto-collapsing to the rail. useSyncExternalStore over resize
-// so it reconciles cleanly on hydration; SSR assumes a wide desktop (the
-// layout the sidebar defaults to).
+// Viewport width for the Studio shell's sidebar breakpoints.
+// useSyncExternalStore over resize so it reconciles cleanly on hydration;
+// SSR assumes a wide desktop.
 import { useSyncExternalStore } from "react";
 
 const SSR_WIDTH = 1400;

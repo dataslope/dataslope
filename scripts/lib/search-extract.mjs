@@ -1,34 +1,18 @@
 /**
  * MDX content extraction for the search corpus: everything `structure()` does
- * not return. Split out of scripts/build-search-corpus.mjs so the anchor
- * consistency contract (see lib/search/anchors.mjs) is testable: the ids this
- * module stamps on component rows must equal the DOM ids the
- * `remarkComponentAnchors` plugin injects at render time.
+ * not return — fenced code, mermaid sources, and component attribute content
+ * (read from remark-mdx's ESTree by property name, classified by PROSE_KEYS /
+ * CODE_KEYS). Split out of scripts/build-search-corpus.mjs so the anchor
+ * contract is testable: ids stamped here must equal the DOM ids
+ * `remarkComponentAnchors` injects at render time.
  *
- * ── What is collected, and where it lands ───────────────────────────────────
- *
- * Fenced code, mermaid sources, and the content carried in component
- * attributes (`remark-mdx` attaches an ESTree to every expression attribute,
- * so `files={[{ starterCode: `…` }]}` and `markdown={`…`}` are read from the
- * parsed tree by property name rather than scraped with a regex; keys are
- * classified by PROSE_KEYS / CODE_KEYS).
- *
- * Everything is attributed to the heading it sits under (`perHeading`), which
- * is what the per-section rows are built from. Content inside an *anchored*
- * component (lib/search/anchors.mjs) is ALSO collected under the component's
- * own anchor id (`perComponent`), from which the corpus builds one extra row
- * per component. The duplication is deliberate:
- *
- *   - the per-section row keeps matching queries whose terms span a paragraph
- *     AND a component under the same heading (FTS5 ANDs terms within one row,
- *     so splitting the content would stop those queries matching anything);
- *   - the per-component row is shorter, so BM25's length normalisation ranks
- *     it above the section row for matches inside the component, and its
- *     anchor scrolls the reader to the component itself rather than to the
- *     heading somewhere above it.
- *
- * The near-duplicate result entries this produces are collapsed at query time
- * (lib/search/ranking.ts), keeping the component's more precise anchor.
+ * Content lands under its heading (`perHeading`) AND, inside an anchored
+ * component, under the component's anchor id (`perComponent`). The
+ * duplication is deliberate: FTS5 ANDs terms within one row, so the section
+ * row keeps cross-paragraph/component queries matching, while the shorter
+ * component row wins BM25 for in-component matches and scrolls to the
+ * component itself. Near-duplicate results are collapsed at query time
+ * (lib/search/ranking.ts).
  */
 import { unified } from "unified";
 import remarkParse from "remark-parse";
@@ -96,10 +80,9 @@ export function harvestEstree(node, fallback, out, key = fallback) {
   }
 }
 
-/** `remarkMath` is not decoration here. Without it, MDX reads the braces in
- *  `$$p_i = \frac{e^{z_i}}{…}$$` as a JSX expression and acorn rejects the
- *  file, which silently dropped 31 lessons from the previous index. The real
- *  render pipeline (source.config.ts) has always had it; the indexer did not. */
+/** `remarkMath` is required: without it MDX reads `$$…$$` braces as a JSX
+ *  expression, acorn rejects the file, and lessons silently drop from the
+ *  index. The render pipeline (source.config.ts) has it too. */
 const processor = unified().use(remarkParse).use(remarkMath).use(remarkMdx);
 
 /**

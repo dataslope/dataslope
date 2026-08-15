@@ -1,16 +1,8 @@
 /**
- * POST /api/email-preview, send a live test copy of one auth email design to
- * the requester's own inbox, so the /email-preview page can preview the real
- * rendered result in a real email client (not just an on-page iframe).
- *
- * Guardrails, this is a dev/design tool, not a mailer:
- *   - Admin-only (requireAdmin): 401 without a session, 403 for non-admins.
- *   - Sends ONLY to the admin's own account email, never a caller-supplied
- *     address, so it can't be turned into an open relay or spam vector.
- *   - Uses the fake SAMPLE_URL, so the test link verifies nothing.
- *
- * Fail-safe: if no sender is configured (RESEND_API_KEY unset) it returns a
- * clear 400 instead of throwing, matching the rest of the email surface.
+ * POST /api/email-preview: send a live test copy of one auth email design.
+ * Admin-only, and it sends ONLY to the admin's own account email — never a
+ * caller-supplied address — so it can't become a relay. Uses the fake
+ * SAMPLE_URL (verifies nothing); a missing RESEND_API_KEY is a clear 400.
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { requireAdmin } from "@/lib/auth/admin";

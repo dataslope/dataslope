@@ -76,12 +76,9 @@ public partial class Runner
             {
                 peStream.Position = 0;
                 var assembly = Assembly.Load(peStream.ToArray());
-                // For top-level statements that use `await`, Roslyn makes the
-                // public EntryPoint a synchronous wrapper that blocks on the
-                // async body via `.GetAwaiter().GetResult()`. That blocking
-                // wait throws "Cannot wait on monitors on this runtime" on the
-                // single-threaded WASM interpreter, so prefer the generated
-                // async entry point (`<Main>$`) and await it instead.
+                // Roslyn's sync EntryPoint wrapper blocks on the async body,
+                // which throws "Cannot wait on monitors on this runtime" on
+                // single-threaded WASM — prefer the async `<Main>$` and await it.
                 var asyncEntry = assembly.GetTypes()
                     .SelectMany(t => t.GetMethods(
                         BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
@@ -138,13 +135,9 @@ public partial class Runner
             .Where(assembly => !assembly.IsDynamic)
             .Select(assembly => assembly.GetName().Name)
             .Where(name => !string.IsNullOrEmpty(name) && IsSafeAssemblyName(name))
-            // Assemblies the Packages drawer advertises but that aren't loaded
-            // into the AppDomain when the first script compiles, so they're
-            // missing from GetAssemblies() above and user code using
-            // BigInteger/Complex/Vector<T> (System.Runtime.Numerics,
-            // System.Numerics.Vectors) or Regex (System.Text.RegularExpressions)
-            // fails with CS0246. Add them by name; the DLLs already ship in the
-            // boot bundle, so this adds no payload.
+            // Advertised in the Packages drawer but not yet loaded into the
+            // AppDomain at first compile, so user code (BigInteger, Regex, ...)
+            // would fail CS0246. The DLLs already ship in the boot bundle.
             .Concat(new[]
             {
                 "System.Runtime.Numerics",

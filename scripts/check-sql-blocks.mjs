@@ -1,21 +1,11 @@
 /**
  * Runs every `<SqlCodeBlock>` in `content/` and grades every
  * `<SqlChallengeCard>`'s reference solution against that card's own tests.
- *
- * The SQL half of the courseware was checked by nothing. `check:code-blocks`
- * and `check:challenges` cover Python; these 381 blocks and 73 cards are the
- * largest group with no coverage at all, and they fail the same way Python
- * did before its sweep existed: a dialect quirk, a renamed column in a remote
- * dataset, or a reference solution that stopped matching its own expected
- * rows, shipping silently and breaking in the reader's browser.
- *
- * Grading goes through `app/_components/sqlChallengeHarness.ts`, the same
- * `evaluateSqlTest` a reader's Check Answer runs, imported rather than
- * reimplemented. A second copy of a grader drifts from the first, and a
- * drifted grader does not fail loudly: it passes cards it should have failed.
- *
- * Engines come from lib/sql-engines.mjs, one fresh instance per block, because
- * the browser gives every block its own.
+ * Grading goes through the same `evaluateSqlTest` in
+ * `app/_components/sqlChallengeHarness.ts` that a reader's Check Answer runs
+ * — a second copy of a grader drifts and passes cards it should fail.
+ * Engines come from lib/sql-engines.mjs, one fresh instance per block, as the
+ * browser gives every block its own.
  *
  * Usage:
  *   node scripts/check-sql-blocks.mjs [--filter <substr>[,<substr>…]]
@@ -62,13 +52,11 @@ if (args.includes("--list")) {
 const runnableDialect = (d) =>
   SUPPORTED_DIALECTS.includes(d) && (!onlyDialect || d === onlyDialect);
 
-// Counted, never hidden. A dialect this cannot run is a gap in the sweep, and
-// a gap that is not printed reads exactly like coverage.
+// Counted, never hidden: an unprinted gap reads exactly like coverage.
 const unsupportedBlocks = allBlocks.filter((b) => !b.unparsable && !runnableDialect(b.dialect));
 const unsupportedCards = allCards.filter((c) => !c.unparsable && !runnableDialect(c.dialect));
 const unparsable = [...allBlocks, ...allCards].filter((x) => x.unparsable);
-// A card with no `solutionSql` has nothing to verify; same idea as a Python
-// card with no solutionCode.
+// A card with no `solutionSql` has nothing to verify.
 const unsolved = allCards.filter(
   (c) => !c.unparsable && runnableDialect(c.dialect) && !c.solutionSql,
 );
@@ -117,10 +105,8 @@ for (const [i, b] of blocks.entries()) {
   } finally {
     await engine?.destroy?.().catch(() => {});
   }
-  // `expectError` asserts in both directions. A block that teaches constraint
-  // enforcement by triggering it must raise; if it ever stops raising, the
-  // lesson has become a lie — prose promising an error above output showing
-  // success — and nothing else in the repo would notice.
+  // `expectError` asserts in both directions: a block whose lesson is the
+  // failure must raise, and one that stops raising is a hidden regression.
   if (b.expectError && raised === null) {
     failures.push({
       ...b,
@@ -151,11 +137,9 @@ for (const c of cards) {
 
     const failed = [];
     for (const test of c.tests) {
-      // `matchesSolution` compares the learner's result against the solution's.
-      // With the solution *as* the buffer the two are the same query, so this
-      // proves the test is well-formed rather than that the solution is right,
-      // which is the same thing the Python sweep gets from a card whose tests
-      // only restate the starter.
+      // With the solution as the buffer, `matchesSolution` compares the query
+      // to itself — this proves the test is well-formed rather than that the
+      // solution is right.
       const verdict = await evaluateSqlTest(test, {
         engine,
         finalResult,

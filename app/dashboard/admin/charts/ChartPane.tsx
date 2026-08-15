@@ -1,21 +1,11 @@
 "use client";
 
 /**
- * One theme-pinned copy of a chart, with an expand control.
- *
- * `data-force` is read by Chart.module.css, which is also what resolves the
- * `--ds-chart-*` roles on a normal page, so a pane here is painted by exactly
- * the rules that will paint the figure in a lesson.
- *
- * The expand overlay exists because the gallery shows two copies side by side,
- * which halves each one: at 680px natural width a pane is rendering at roughly
- * 45% scale on a laptop, and label collisions or a hairline that vanishes are
- * precisely the defects that only show at full size. Expanded, the figure gets
- * the viewport and keeps its pinned theme, so the thing being inspected is
- * still the thing that ships.
- *
- * Only this control is a client component; the gallery around it stays a
- * server component rendering strings.
+ * One theme-pinned copy of a chart, with an expand control. `data-force` is
+ * read by Chart.module.css — the same rules that paint the figure in a lesson.
+ * The expand overlay gives the figure full size (side-by-side panes render at
+ * ~45% scale, hiding label collisions and vanishing hairlines) while keeping
+ * its pinned theme. Only this control is a client component.
  */
 import { useCallback, useEffect, useState } from "react";
 import { Maximize2, X } from "lucide-react";

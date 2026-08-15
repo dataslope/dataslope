@@ -1,7 +1,5 @@
-// Registry of available language playgrounds. Used by the header
-// dropdown so users can navigate between playgrounds, and by any other
-// component that needs the canonical list (e.g. the landing page).
-// Keep in sync with the routes defined under `app/playground/<id>/`.
+// Canonical registry of language playgrounds (header dropdown, landing page).
+// Keep in sync with the routes under `app/playground/<id>/`.
 
 export interface PlaygroundEntry {
   /** Stable id matching the LanguageAdapter id and the route segment. */
@@ -24,9 +22,8 @@ export const PLAYGROUNDS: PlaygroundEntry[] = [
   { id: "cpp", label: "C++", href: "/playground/cpp" },
   { id: "java", label: "Java", href: "/playground/java" },
   { id: "csharp", label: "C#", href: "/playground/csharp" },
-  // Databases, always in this order (PostgreSQL · SQLite · DuckDB) — the
-  // playground index and the dashboard read the same list, so the switcher
-  // and those grids can't drift apart.
+  // Databases, always in this order (PostgreSQL · SQLite · DuckDB); the
+  // playground index and dashboard grids read the same list.
   { id: "postgres", label: "PostgreSQL", href: "/playground/postgres" },
   { id: "sqlite", label: "SQLite", href: "/playground/sqlite" },
   { id: "duckdb", label: "DuckDB", href: "/playground/duckdb" },

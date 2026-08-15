@@ -1,29 +1,11 @@
 /**
- * Renders a build-time Observable Plot chart inside a lesson or landing page:
- *
- * ```mdx
- * <Chart slug="normal-68-95-997" />
- * ```
- *
- * The SVG is authored as a spec in `charts/<slug>.mjs`, rendered to markup by
- * `scripts/build-charts.mjs`, and read here from the generated manifest. Plot
- * itself never reaches the browser or the Worker bundle; this component ships
- * a string.
- *
- * The markup is *inlined* rather than referenced as `<img src="…svg">`, which
- * is what lets one file serve both themes: the site toggles dark mode with a
- * `.dark` class, and an `<img>` can't see page CSS. Inlined, the chart's
- * `currentColor` axes follow the page foreground and its `var(--ds-chart-*)`
- * series resolve against Chart.module.css, which maps each role to a different
- * brand step per theme.
- *
- * `title` (required on every spec) becomes the accessible name; the chart is
- * exposed as a single `role="img"` rather than letting a screen reader walk
- * several hundred `<path>` and tick nodes.
- *
- * A slug with no generated chart renders a "pending" hint while developing and
- * nothing at all in production, so a placement can be authored before its spec
- * exists — the same contract `<Figure>` offers for illustrations.
+ * Renders a build-time Observable Plot chart. The SVG is authored as a spec in
+ * `charts/<slug>.mjs`, rendered by `scripts/build-charts.mjs`, and read from
+ * the generated manifest — Plot never reaches the browser or Worker bundle.
+ * The markup is INLINED (not `<img src>`): an `<img>` can't see page CSS, and
+ * inlining lets `currentColor` axes and `var(--ds-chart-*)` series follow the
+ * theme. Exposed as a single `role="img"` named by the spec's `title`. A slug
+ * with no generated chart shows a dev-only pending hint, nothing in prod.
  */
 import type { CSSProperties } from "react";
 import { ChartLine } from "lucide-react";
@@ -34,43 +16,27 @@ import { FigureSources, type FigureSource } from "./FigureSources";
 import ChartExpand from "./ChartExpand";
 import styles from "./Chart.module.css";
 
-// The slug printed under each chart is an authoring handle (which spec file to
-// edit), not something a learner should see, so it is development-only — same
-// rule as <Figure>'s asset id.
+// The slug printed under each chart is an authoring handle, dev-only.
 const SHOW_CHART_ID = process.env.NODE_ENV === "development";
 
 interface ChartProps {
   /** Spec slug: the `charts/<slug>.mjs` filename without its extension. */
   slug: string;
-  /**
-   * Caption shown under the chart. Defaults to the spec's own `caption`
-   * export; pass `null` to render none, or a string to override it here.
-   * Backtick spans render as code chips and `*asterisks*` as emphasis, so a
-   * spec writing `` `s += piece` `` gets a code element rather than literal
-   * backticks. Keep it to a sentence or two: the detail belongs in the lesson
-   * prose around the chart, where a reader meets it before the figure.
-   */
+  /** Caption under the chart. Defaults to the spec's `caption` export; `null`
+   *  renders none. Backticks/asterisks render via `withInlineMarkup`. */
   caption?: string | null;
-  /**
-   * Where the chart's numbers came from, rendered as a credit line under the
-   * caption. Defaults to the spec's own `sources` export, which is where it
-   * belongs when the same chart is placed on several lessons; pass `null` to
-   * render none, or a list here to override.
-   */
+  /** Credit line for the chart's numbers. Defaults to the spec's `sources`
+   *  export; `null` renders none. */
   sources?: readonly FigureSource[] | null;
-  /**
-   * Optional cap on display width in px. Omitted by default so the chart
-   * fills the content column.
-   */
+  /** Optional cap on display width in px; omitted = full content column. */
   maxWidth?: number;
 }
 
 export async function Chart({ slug, caption, sources, maxWidth }: ChartProps) {
   const entry = chartManifest[slug];
   // The markup lives as a static asset, not in the manifest (which would put
-  // the whole SVG corpus back into the Worker bundle) — filesystem at build
-  // time, the ASSETS binding on a cache-miss render. A missing file with a
-  // present entry means the generator half-ran; treat it like a pending spec.
+  // the SVG corpus back into the Worker bundle). A missing file with a present
+  // entry means the generator half-ran; treat it as pending.
   const svg = entry ? await loadChartSvg(slug) : null;
 
   if (!entry || svg === null) {
@@ -94,12 +60,9 @@ export async function Chart({ slug, caption, sources, maxWidth }: ChartProps) {
       className={styles.figure}
       style={maxWidth ? { maxWidth: `${maxWidth}px` } : undefined}
     >
-      {/* `--ds-chart-min-width` is the narrowest width this chart's smallest
-          label survives (computed by the build, see charts.d.ts). On a wide
-          column nothing consumes it; on a phone the stylesheet lets the
-          figure scroll rather than scale its type into the ground — and
-          <ChartExpand> offers the whole drawing at once for the comparisons
-          that scrolling cannot serve. */}
+      {/* `--ds-chart-min-width` is the narrowest width the smallest label
+          survives (build-computed); on a phone the stylesheet scrolls the
+          figure rather than scaling its type into the ground. */}
       <ChartExpand label={entry.title}>
         <div
           className={styles.chart}

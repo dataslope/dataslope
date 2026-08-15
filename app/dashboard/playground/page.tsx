@@ -1,8 +1,5 @@
-// The playground index, moved into the dashboard (from the old standalone
-// /playground page, which now redirects here). Chrome (sidebar + top bar)
-// comes from the /dashboard layout's Studio shell; this page renders the
-// studio-styled heading, the "Start something new" language grid, and the
-// paginated workspace list.
+// The playground index inside the dashboard shell: heading, "Start something
+// new" language grid, and the paginated workspace list.
 import "@/app/tailwind.css";
 import type { Metadata } from "next";
 import { Rocket } from "lucide-react";

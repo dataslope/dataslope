@@ -1,11 +1,8 @@
 /**
- * Unit tests for app/_components/opfs/activeWorkspace.ts — focused on the
- * sign-in resume handoff that keeps a guest's unsaved playground work across
- * signing in / signing up.
- *
- * Uses the in-memory OPFS mock plus per-tab (sessionStorage) and durable
- * (localStorage) storage stubs so the "lost per-tab pointer" scenario can be
- * simulated by clearing sessionStorage while localStorage + OPFS survive.
+ * Tests for app/_components/opfs/activeWorkspace.ts — the sign-in resume
+ * handoff that keeps a guest's unsaved playground work across signing in.
+ * The "lost per-tab pointer" scenario is simulated by clearing sessionStorage
+ * while localStorage + OPFS survive.
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
@@ -73,11 +70,9 @@ function setupStubs(opts: { opfs?: boolean; heldLocks?: string[] } = {}) {
 }
 
 /**
- * Forget the durable "workspace this device last opened" pointer, leaving the
- * sign-in stash as the only way back. Stands in for a device that has never
- * opened this playground, or one whose site data was cleared. The tests below
- * that isolate the *stash* need this, because without it the durable resume
- * would answer first and they'd pass for the wrong reason.
+ * Forget the durable "last opened" pointer, leaving the sign-in stash as the
+ * only way back — without this, durable resume would answer first and the
+ * stash tests would pass for the wrong reason.
  */
 function clearDeviceResume(playgroundId: string) {
   local.removeItem(`playground_last_ws_${playgroundId}`);
@@ -179,11 +174,9 @@ describe("sign-in resume handoff", () => {
 // ---------------------------------------------------------------------------
 // Resuming the last workspace across sessions
 // ---------------------------------------------------------------------------
-// The per-tab pointer dies with the tab, so every new tab (and every visit
-// after the browser closes) used to mint a fresh draft: a member's saved
-// workspace went unselected, and a guest's unsaved database was left in OPFS
-// with nothing in the UI pointing at it. `session.clear()` below is that lost
-// per-tab pointer; localStorage and OPFS survive it, as they do in a browser.
+// The per-tab pointer dies with the tab, so every new tab used to mint a
+// fresh draft, orphaning saved workspaces and guests' unsaved databases.
+// session.clear() below is that lost pointer; localStorage and OPFS survive.
 
 describe("resuming the last workspace", () => {
   it("reopens a saved workspace in a new session", async () => {

@@ -112,19 +112,14 @@ function PickerSelect({
           if (next != null) onValueChange(next);
         }}
       >
-        {/* Magic UI ShimmerButton as the select trigger. The background tracks
-            the page surface (--color-fd-background: white in light, #121212 in
-            dark, see app/home.css) so the trigger reads as part of the page
-            rather than a floating dark pill; text/border/chevron flip per theme
-            so they stay legible on either surface, with the blue shimmer as the
-            accent edge. */}
+        {/* ShimmerButton trigger; background tracks the page surface
+            (--color-fd-background) so it reads as part of the page. */}
         <Select.Trigger
           aria-label={label}
           className={`${HOME_SELECT_TRIGGER} min-w-40 justify-between`}
         >
           {active && <OptionIcon id={active.iconId} />}
-          {/* Render the label explicitly, a bare <Select.Value/> shows the
-              raw (lowercased) value instead of the option's label. */}
+          {/* Explicit label: a bare <Select.Value/> shows the raw value. */}
           <Select.Value className="flex-1 truncate text-left">
             {active?.label ?? value}
           </Select.Value>
@@ -166,12 +161,8 @@ function ControlRow({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * Wraps a preview card with a Magic UI Ripple that is centered on the card
- * (both axes) and sized from the card's shorter edge, so its largest circle
- * reaches a bit beyond that edge, a soft halo rather than a ring
- * spanning the whole card. The card renders on top (opaque), so the rings read
- * as a halo around it. The ripple re-sizes itself as the card's measured box
- * changes (e.g. when the runtime loads or the viewport resizes).
+ * Wraps a preview card with a Ripple centered on it and sized from its
+ * shorter edge — a soft halo, re-sized as the card's measured box changes.
  */
 function RippleFrame({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -187,10 +178,7 @@ function RippleFrame({ children }: { children: React.ReactNode }) {
     return () => ro.disconnect();
   }, []);
 
-  // Size the ripple from the card's SHORTER edge so it stays subtle, the
-  // largest circle reaches a bit beyond that edge for a soft halo without
-  // spreading the full width of the card. Fall back to a sensible size
-  // until the card is measured.
+  // Shorter edge keeps the halo subtle; fall back until the card is measured.
   const NUM_CIRCLES = 7;
   const shortEdge = Math.min(box.w, box.h) || 360;
   const maxCircle = Math.round(shortEdge * 1.25);
@@ -199,16 +187,14 @@ function RippleFrame({ children }: { children: React.ReactNode }) {
 
   return (
     <div ref={ref} className="relative">
-      {/* Box is the size of the largest circle, centered on the card. No
-          overflow clip, the rings are meant to spill slightly past the card;
-          the page itself is kept from widening by <main>'s overflow-x-clip. */}
+      {/* Largest-circle-sized box centered on the card. No overflow clip —
+          the rings spill slightly; <main>'s overflow-x-clip protects the page. */}
       <div
         className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2"
         style={{ width: maxCircle, height: maxCircle }}
       >
-        {/* No mask: the Ripple ships a built-in solid→transparent fade that
-            would hide the rings, drop it so the ripple stays fully visible.
-            The rings fade naturally via their own decreasing opacity. */}
+        {/* Drop the Ripple's built-in mask (it would hide the rings); they
+            fade via their own decreasing opacity. */}
         <Ripple
           className="[mask-image:none]"
           mainCircleOpacity={0.26}
@@ -365,10 +351,8 @@ export function HeroInteractive() {
 
   return (
     <div className="relative mx-auto w-full max-w-3xl">
-      {/* Tab bar. Bottom margin gives the active-item underline room while
-          keeping the pickers close below; a roomier row gap keeps the tabs
-          from crowding when they wrap onto multiple lines on narrow screens;
-          and desktop gets wider horizontal spacing between items. */}
+      {/* Tab bar; margins give the underline room and keep wrapped rows from
+          crowding on narrow screens. */}
       <div className="relative z-10 mb-10 flex flex-wrap items-center justify-center gap-x-1 gap-y-3 sm:gap-x-6">
         {TABS.map((t) => {
           const active = t.id === tab;
@@ -386,10 +370,8 @@ export function HeroInteractive() {
             >
               <Icon size={16} aria-hidden="true" />
               {t.label}
-              {/* Active-item underline (a short bar in the label's own
-                  color), desktop only (on mobile the bold, darker label
-                  already marks the active tab). The shared layoutId slides it
-                  between tabs when the selection changes. */}
+              {/* Active-item underline, desktop only (mobile's bold label
+                  already marks it); the shared layoutId slides it between tabs. */}
               {active && (
                 <motion.span
                   layoutId="hero-tab-underline"
@@ -402,9 +384,7 @@ export function HeroInteractive() {
         })}
       </div>
 
-      {/* Active panel. Each preview wraps its card in a <RippleFrame>, which
-          centers the ripple on the card (both axes) and sizes it to reach
-          beyond every edge. */}
+      {/* Active panel; each preview wraps its card in a <RippleFrame>. */}
       <div>
         {tab === "code" && <CodeChallengePanel />}
         {tab === "sql" && <SqlChallengePanel />}

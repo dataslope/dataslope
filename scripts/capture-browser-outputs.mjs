@@ -1,39 +1,19 @@
 /**
- * Records prepopulated output for the blocks a Node process cannot run.
- *
- * `build-block-outputs.mjs` covers Python, JavaScript, TypeScript, C and C++
- * headlessly. That leaves 766 blocks showing an empty panel, in two groups:
- *
- *   - **java, csharp, web, react, php** have no Node runtime at all. CheerpJ,
- *     the .NET wasm bundle and php-wasm need a browser; web and react render
- *     into a sandboxed preview iframe.
- *   - **r** does run under Node — the R sweep proves it — but its output is
- *     not text. `runtime/r.tsx` decides visibility with `withVisible()`,
- *     renders a data frame as an HTML table and turns captured graphics into
- *     images, and none of that is shared the way `pythonDisplayOutputs.ts` is.
- *     A stdout-only runner would record a panel missing every table and every
- *     plot. A real browser has already done that conversion.
- *
- * So this drives real pages with Playwright (`e2e/capture-block-outputs.spec.ts`)
- * and reads the finished `OutputCell[]` off the page, then merges them into the
- * same manifest under the same keys as the headless generator. Everything below
- * the runtime is shared with it deliberately: the content-hash key, the size
- * caps, the externalised figures. A reader cannot tell which produced a panel,
- * which is the point.
- *
- * ── What it does not do ─────────────────────────────────────────────────
- * No second run, so no determinism flag. The headless generator runs every
- * block twice and compares; here a second pass would mean booting CheerpJ and
- * webR again for an hour to set a field nothing reads. Entries are recorded
- * `stable: false`, which is the conservative answer rather than a measured one.
+ * Records prepopulated output for the blocks a Node process cannot run:
+ * java/csharp/web/react/php have no Node runtime, and r's output is not text
+ * (`runtime/r.tsx` renders tables and graphics in the browser). Drives real
+ * pages with Playwright (`e2e/capture-block-outputs.spec.ts`), reads the
+ * finished `OutputCell[]` off the page, and merges into the same manifest
+ * under the same keys and caps as `build-block-outputs.mjs` — a reader cannot
+ * tell which generator produced a panel. No second run, so entries are
+ * recorded `stable: false` (conservative, not measured).
  *
  * Usage:
  *   node scripts/capture-browser-outputs.mjs [--adapters java,r,…]
  *                                            [--port <n>] [--relay] [--dry-run]
  *
- * `--relay` hands the browser's CDN requests to this process. Needed where a
- * sandbox allows Node's egress but not the browser's; without it, every
- * runtime fails to download and every block records an error instead.
+ * `--relay` hands the browser's CDN requests to this process, for sandboxes
+ * that allow Node's egress but not the browser's.
  */
 import { spawn } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -49,13 +29,10 @@ const OUT_FILE = join(ROOT, "lib", "generated", "block-outputs.json");
 const ASSET_DIR = join(ROOT, "public", "block-outputs");
 const ASSET_URL_BASE = "/block-outputs";
 
-// The adapters this can reach and the headless generator cannot live in
-// `block-runners.mjs`, next to the ones it can: the headless generator has to
-// carry these entries rather than regenerate them, so a list only this script
-// knew about would be one the other could not honour.
+// BROWSER_ADAPTERS lives in `block-runners.mjs` beside the headless list: the
+// headless generator has to carry these entries, so it must know the set.
 
-// Same ceilings as build-block-outputs, for the same reason: every byte is
-// paid by a reader loading the lesson whether or not they look at the block.
+// Same ceilings as build-block-outputs, for the same reason.
 const MAX_CELL_BYTES = 120_000;
 const MAX_BLOCK_BYTES = 250_000;
 const MAX_TEXT_CHARS = 20_000;
@@ -75,10 +52,8 @@ const config = flag("--config");
 
 // ─── key → every lesson that holds that block ───────────────────────────
 //
-// The capture reports a key and the route it came from; the manifest is keyed
-// by lesson path. Rather than map routes back to files, look the key up: keys
-// are content hashes, so a block that appears on two lessons genuinely belongs
-// on both, and each gets its own entry.
+// The capture reports keys; the manifest is keyed by lesson path. Keys are
+// content hashes, so a block on two lessons belongs on both.
 const byKey = new Map();
 let selected = 0;
 for (const adapter of adapters) {
@@ -167,13 +142,9 @@ function withinCaps(cells) {
   return null;
 }
 
-/** A base64 image or a Plotly figure becomes a file, as on the Python path:
- *  inline they were 98% and then 88% of the manifest's whole weight.
- *
- *  Images are re-encoded to WebP at the same quality the Python path uses.
- *  R's graphics device hands over PNG, and 136 of them straight from the
- *  browser were 10.8 MB against 2.4 MB encoded — committed bytes, fetched by
- *  every reader who scrolls to the block. */
+/** A base64 image or a Plotly figure becomes a file, as on the Python path
+ *  (inline they were nearly the whole manifest). Images are re-encoded to
+ *  WebP at the Python path's quality; R hands over PNG at ~4.5x the size. */
 const { default: sharp } = await import("sharp");
 let assetsWritten = 0;
 let assetBytes = 0;
@@ -220,8 +191,7 @@ for (const page of pages) {
     stats.captured++;
     const files = byKey.get(cap.key);
     if (!files) {
-      // A block on a page the selection reached but the extractor did not
-      // attribute to one of these adapters — a demo page, most often.
+      // Not attributed to one of these adapters — a demo page, most often.
       stats.unmatched++;
       continue;
     }
@@ -230,9 +200,8 @@ for (const page of pages) {
       stats.empty++;
       continue;
     }
-    // A block that only produced diagnostics ran and failed; recording the
-    // error as its preview would teach the reader the wrong thing, and the
-    // headless generator drops these for the same reason.
+    // Diagnostics-only means the block ran and failed; the headless generator
+    // drops these for the same reason.
     if (!cells.some((c) => c.type !== "stderr")) {
       stats.errored++;
       continue;

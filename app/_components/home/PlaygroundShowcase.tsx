@@ -91,9 +91,8 @@ function PlaygroundSwitcher({
  *  a link to the full page. */
 export function PlaygroundShowcase() {
   const [playgroundId, setPlaygroundId] = useState("postgres");
-  // Drives the connector's hover state from the link itself (not from hovering
-  // the connector), so the line/dot only react to the "Open the … playground"
-  // link and both revert together on mouseout.
+  // Connector hover is driven by the link itself, so line and dot react
+  // together and revert together.
   const [linkHover, setLinkHover] = useState(false);
   const name = languageName(playgroundId);
   const isSql = SQL_IDS.has(playgroundId);
@@ -126,12 +125,9 @@ export function PlaygroundShowcase() {
         <EmbeddedPlayground playgroundId={playgroundId} label={name} />
       </div>
 
-      {/* Connector stemming from the playground's bottom center down to a dot
-          above the link. It tracks the link's color, and only while the link
-          itself is hovered the line extends toward the link, a shorter reach
-          than before so the dot keeps more space from the link. State-driven so
-          it reacts to the link, not to hovering the connector; both revert on
-          mouseout. */}
+      {/* Connector from the playground's bottom center down to a dot above
+          the link; tracks the link's color and extends only while the link
+          is hovered. */}
       <div className="mt-2 flex flex-col items-center">
         <div className="flex h-24 flex-col items-center" aria-hidden="true">
           <span

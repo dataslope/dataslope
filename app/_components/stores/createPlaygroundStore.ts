@@ -63,10 +63,8 @@ export function createPlaygroundStore(): PlaygroundStore {
 
     setWorkspace: (workspaceId, workspaceName) =>
       set({ workspaceId, workspaceName }),
-    // File-list changes (create / delete / rename / duplicate) alter what a
-    // backup would contain, so they pulse the cloud auto-sync alongside
-    // content edits. Bootstrap also lands here; the sync engine's settle
-    // window absorbs those.
+    // File-list changes alter what a backup contains, so they pulse the
+    // cloud auto-sync; the engine's settle window absorbs bootstrap noise.
     setFiles: (files) => {
       set({ files });
       notifyWorkspaceChanged();
@@ -74,10 +72,9 @@ export function createPlaygroundStore(): PlaygroundStore {
     setActiveTabId: (activeTabId) => set({ activeTabId }),
     setActiveFileId: (activeFileId) => set({ activeFileId }),
     updateDirtyBuffer: (fileId, code) => {
-      // Every content mutation funnels through here (editor keystrokes,
-      // example loads, AI-applied edits), making it the one change-pulse
-      // source for the cloud auto-sync. Pulse outside the updater so the
-      // reducer stays pure, and only when the content actually changed.
+      // Every content mutation funnels through here — the one change-pulse
+      // source for cloud auto-sync. Pulse outside the updater (reducer stays
+      // pure) and only on a real change.
       let changed = false;
       set((state) => {
         if (state.dirtyBuffers.get(fileId) === code) return state;
@@ -116,10 +113,8 @@ export function createPlaygroundStore(): PlaygroundStore {
   }));
 }
 
-// Module-level registry of per-adapter stores so that any component that
-// asks for "the python playground store" reaches the same instance.
-// Each non-SQL playground occupies its own route → component → adapter,
-// so this map is effectively keyed by route.
+// Per-adapter store registry so every component asking for "the python
+// playground store" reaches the same instance (effectively keyed by route).
 const stores = new Map<string, PlaygroundStore>();
 
 export function getPlaygroundStore(adapterId: string): PlaygroundStore {

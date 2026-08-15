@@ -1,34 +1,10 @@
 "use client";
 
 /**
- * Interactive shell for the `/dashboard/admin/illustration-prompts` review gallery.
- *
- * Three things shape this component:
- *
- * 1. **Admin-only.** It holds no data of its own; everything comes from
- *    `GET /api/admin/illustration-prompts`, which enforces the admin check
- *    server-side. A signed-out visitor sees a sign-in prompt, a signed-in
- *    non-admin sees an access-denied notice, and neither ever receives the
- *    prompt corpus (the page shell is static and empty).
- *
- * 2. **A grid of cut-outs.** One card per illustration, several per row, and
- *    the only image shown is the background-removed WebP the site actually
- *    serves. It gets no backdrop of its own, so the page color shows through
- *    its alpha and the docked theme pill doubles as the judgement tool: a
- *    cut-out that only reads on one background is exactly what this page is
- *    for. Clicking one opens the raw file in a new tab, at full size.
- *
- * 3. **A regeneration queue.** Each card can be marked "redraw this" with a
- *    note ("too busy, the small parcels came out as smears"), persisted through
- *    `PUT` on the same endpoint into D1 `dataslope-illustrations` →
- *    `illustration_regen_marks`. A later regeneration run reads that table and
- *    writes the prompt again from scratch against the note, so the note is a
- *    brief for a new illustration rather than an addition to the old prompt.
- *    See agent-outputs/20260803-0900-illustration-regeneration-queue.md.
- *
- * Theme is the shared site one (ThemePillToggle → siteTheme.ts → `.dark` on
- * <html>), not a page-local toggle, so the palette matches every other surface
- * and survives a reload.
+ * Admin-only review gallery for illustration prompts, backed by GET/PUT
+ * /api/admin/illustration-prompts (admin check enforced server-side). Regen
+ * marks persist to D1 `dataslope-illustrations` → `illustration_regen_marks`;
+ * a note is the brief for a from-scratch redraw, not an addition to the prompt.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -57,24 +33,19 @@ import type {
 import { isAwaitingApproval, type RegenMark } from "@/lib/illustrations/regenMarks";
 import styles from "./illustration-prompts.module.css";
 
-/** Cards per page. One image per card now (the cut-out), laid out in a grid,
- *  so a page holds far more than the old two-image stack did while staying a
- *  bounded number of bytes. */
+/** Cards per page. */
 const PAGE_SIZE = 36;
 
-/** How long typing has to pause before the note is written. Long enough that a
- *  sentence is one request, short enough that walking away mid-review still
- *  leaves the note stored. */
+/** Debounce (ms) before a typed note is written. */
 const NOTE_SAVE_DELAY = 700;
 
 /** Local, possibly-unsaved state for one card's queue entry. */
 interface MarkState {
   marked: boolean;
-  /** What is in the input right now. */
   note: string;
   /** What the server last confirmed, so blur can skip a no-op write. */
   savedNote: string;
-  /** Redrawn since anyone last signed it off: the card wants a look. */
+  /** Redrawn since last sign-off. */
   awaitingApproval: boolean;
   /** When the art was last redrawn (ISO-8601 UTC), null if never. */
   regeneratedAt: string | null;
@@ -83,14 +54,11 @@ interface MarkState {
   justSaved: boolean;
 }
 
-/** Which subset of the gallery is shown. `regenerated` is the review queue for
- *  redraws that have landed but nobody has looked at yet. */
+/** Gallery subset. `regenerated` = redraws landed but not yet reviewed. */
 type Filter = "all" | "marked" | "regenerated";
 
-/** How the gallery is ordered. `category` is the corpus order the prompts file
- *  and its headings already impose, so it stays the default and is dropped
- *  from the URL; the rest come from lib/review/ordering.ts, shared with the
- *  chart gallery so the two agree on what each ordering means. */
+/** `category` is the corpus order and the default (dropped from the URL); the
+ *  rest come from lib/review/ordering.ts, shared with the chart gallery. */
 type Sort = "category" | Ordering;
 
 const SORTS: Sort[] = ["category", ...ORDERINGS];
@@ -120,9 +88,8 @@ function sortFromSearch(search: string): Sort {
   return isOrdering(raw) ? raw : "category";
 }
 
-/** The current URL carrying a page (1-based), filter and sort, each dropped at
- *  its default so the plain gallery keeps a clean canonical URL. Hash is
- *  preserved: card ids are anchors on this page. */
+/** URL carrying page (1-based), filter and sort, each dropped at its default.
+ *  Hash preserved: card ids are anchors on this page. */
 function urlFor(page: number, filter: Filter, sort: Sort): string {
   const url = new URL(window.location.href);
   if (page > 0) url.searchParams.set(PAGE_PARAM, String(page + 1));
@@ -134,9 +101,8 @@ function urlFor(page: number, filter: Filter, sort: Sort): string {
   return `${url.pathname}${url.search}${url.hash}`;
 }
 
-/** "3 Aug 2026", or "" when the illustration has never been committed. Fixed
- *  to en-GB rather than the visitor's locale so the column reads the same for
- *  everyone reviewing the same corpus. */
+/** "3 Aug 2026", or "" when never committed. en-GB fixed so the column reads
+ *  the same for every reviewer. */
 function formatCreated(iso: string | null): string {
   if (!iso) return "";
   const d = new Date(iso);
@@ -206,8 +172,7 @@ function CutoutImage({ entry }: { entry: GalleryEntry }) {
       rel="noreferrer"
       title="Open the full-size image in a new tab"
     >
-      {/* Plain <img>: these are pre-encoded WebP served straight from
-          public/images, so next/image would only add a proxy hop. */}
+      {/* Pre-encoded WebP from public/images; next/image would only add a proxy hop. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={entry.cutout.src}
@@ -248,13 +213,7 @@ function PromptCard({
   const [expanded, setExpanded] = useState(false);
   const promptKey = `${entry.id}:prompt`;
 
-  // A fresh mark outranks a pending approval: if the redraw is still wrong and
-  // it has been queued again, "waiting to be looked at" is no longer the state
-  // worth showing.
-  // State is carried on the artwork's own dashed frame rather than by tinting
-  // a card, because there is no card any more: the frame is already the one
-  // piece of chrome each item has, and coloring it puts the signal on the
-  // thing being judged. The chip above it says the same in words.
+  // A fresh mark outranks a pending approval.
   const state = mark.marked
     ? styles.itemMarked
     : mark.awaitingApproval
@@ -263,10 +222,6 @@ function PromptCard({
 
   return (
     <figure id={entry.id} className={`${styles.item} ${state}`}>
-      {/* The state chip sits on the artwork rather than above it: with no card
-          to hold a status line, a separate row would either add a permanent
-          gap over every unmarked image or let the images fall out of line
-          across a row. */}
       <div className={styles.frame}>
         <CutoutImage entry={entry} />
         {mark.marked ? (
@@ -287,9 +242,7 @@ function PromptCard({
           {entry.title}
           {entry.mascot ? <span className={styles.badgeMuted}>marmot</span> : null}
         </p>
-        {/* The slug is the handle every pipeline script takes as `--only`, so
-            it sits directly under the name where it can be read off and
-            selected in one gesture. */}
+        {/* The slug is what pipeline scripts take as `--only`. */}
         <code className={styles.file}>{entry.file}</code>
         <p className={styles.created}>
           {entry.createdAt
@@ -312,8 +265,7 @@ function PromptCard({
         </button>
       </div>
 
-      {/* The regeneration queue controls. Disabled wholesale when the D1
-          binding is missing, so the gallery still reviews fine read-only. */}
+      {/* Regen queue controls; disabled when the D1 binding is missing. */}
       <div className={styles.regen}>
         {mark.awaitingApproval && !mark.marked ? (
           <button
@@ -409,9 +361,7 @@ export function IllustrationPromptsClient() {
   // 0-based internally, 1-based in the URL (`?page=3`).
   const [page, setPage] = useState(0);
 
-  // The saved state, mirrored for callbacks that outlive the render that
-  // created them (the debounced note save, the mark button's read of the
-  // input). Kept in an effect so it tracks what was actually committed.
+  // Mirror for callbacks that outlive the render that created them.
   const marksRef = useRef(marks);
   useEffect(() => {
     marksRef.current = marks;
@@ -426,8 +376,7 @@ export function IllustrationPromptsClient() {
     noteTimers.current.delete(id);
   }, []);
 
-  // Timers that clear the transient "copied"/"saved" flashes, cancelled on
-  // unmount so a state update can't land on a gone component.
+  // "Copied"/"saved" flash timers, cancelled on unmount.
   const timers = useRef<number[]>([]);
   useEffect(() => {
     const flashes = timers.current;
@@ -465,12 +414,9 @@ export function IllustrationPromptsClient() {
     setLoading(false);
   }, []);
 
-  // Load once per signed-in user, NOT once per `session` object.
-  // `useSession` re-resolves when the tab regains focus (coming back from an
-  // image opened in a new tab, for one), handing back a fresh object every
-  // time; keying the effect off that identity re-ran the whole fetch, threw
-  // the rendered grid away for a "Loading illustrations…" notice, and lost the
-  // scroll position. Keying off the user id makes those refreshes inert.
+  // Load once per signed-in user, NOT once per `session` object: useSession
+  // hands back a fresh object whenever the tab regains focus, and keying off
+  // that identity re-ran the fetch and lost the scroll position.
   const loadedForUser = useRef<string | null>(null);
   useEffect(() => {
     if (sessionPending) return;
@@ -499,14 +445,9 @@ export function IllustrationPromptsClient() {
     [later],
   );
 
-  /**
-   * Persist one card's queue row. The note travels with the mark on every
-   * write, so whichever control the reviewer touched, both end up stored.
-   *
-   * Both values are passed in rather than read from `marks`: the debounced
-   * note save fires after the state that scheduled it has moved on, and a
-   * closure over `marks` would write whatever was there a keystroke ago.
-   */
+  /** Persist one card's queue row; mark and note travel together. Values are
+   *  passed in rather than read from `marks`: the debounced save fires after
+   *  the state that scheduled it has moved on. */
   const save = useCallback(
     async (id: string, marked: boolean, note: string) => {
       setMarks((prev) => ({
@@ -524,8 +465,7 @@ export function IllustrationPromptsClient() {
         setMarks((prev) => {
           const cur = prev[id];
           const next = { ...markStateFrom(mark), justSaved: true };
-          // Keep what is in the input if the reviewer kept typing while this
-          // request was in flight; the next save will carry it.
+          // Keep the input's text if the reviewer kept typing mid-flight.
           if (cur && cur.note !== note) next.note = cur.note;
           return { ...prev, [id]: next };
         });
@@ -537,8 +477,7 @@ export function IllustrationPromptsClient() {
           1200,
         );
       } catch {
-        // Roll the optimistic flip back rather than leaving the card claiming
-        // a mark the queue never took.
+        // Roll back the optimistic flip.
         setMarks((prev) => ({
           ...prev,
           [id]: { ...(prev[id] ?? EMPTY_MARK), marked: !marked, saving: false },
@@ -558,13 +497,8 @@ export function IllustrationPromptsClient() {
     [save, cancelNoteSave],
   );
 
-  /**
-   * Typing guidance about an illustration IS marking it: nobody writes "the
-   * star points are mushed" about a picture they are happy with. The card
-   * flips to marked on the first keystroke (so the tint confirms it landed),
-   * and the row is written once typing pauses, without waiting for a blur that
-   * may never come.
-   */
+  /** Typing a note marks the card on the first keystroke; the row is written
+   *  once typing pauses, without waiting for a blur that may never come. */
   const onNoteChange = useCallback(
     (id: string, note: string) => {
       const marked = note.trim().length > 0 || (marksRef.current[id]?.marked ?? false);
@@ -631,8 +565,7 @@ export function IllustrationPromptsClient() {
     const all = Object.values(marks);
     return {
       marked: all.filter((m) => m.marked).length,
-      // A card queued again is counted as queued, not as waiting for a look,
-      // matching how the card itself is tinted.
+      // A card queued again counts as queued, not awaiting a look.
       regenerated: all.filter((m) => m.awaitingApproval && !m.marked).length,
     };
   }, [marks]);
@@ -663,8 +596,7 @@ export function IllustrationPromptsClient() {
   const pageCount = Math.max(1, Math.ceil(ordered.length / PAGE_SIZE));
   const current = Math.min(page, pageCount - 1);
 
-  // Group whatever landed on the current page, so category headings still
-  // appear but only for what is actually shown.
+  // Group the current page so category headings only cover what's shown.
   const groups = useMemo(() => {
     const slice = ordered.slice(current * PAGE_SIZE, (current + 1) * PAGE_SIZE);
     const byLabel = new Map<string, GalleryEntry[]>();
@@ -676,14 +608,9 @@ export function IllustrationPromptsClient() {
     return [...byLabel.entries()];
   }, [ordered, current]);
 
-  // The page and filter live in the URL (`?page=3&filter=regenerated`), so the
-  // view survives a reload, can be bookmarked or shared ("here are the ones
-  // waiting on you"), and comes back with the Back button.
-  //
-  // Read on mount rather than through `useSearchParams`: this page is
-  // prerendered (`force-static`), where that hook forces a Suspense boundary
-  // and reads empty params at build time anyway. Parsing `window.location`
-  // after hydration sidesteps both, at the cost of one extra render.
+  // Page/filter/sort live in the URL. Read on mount rather than via
+  // `useSearchParams`: this page is force-static, where that hook forces a
+  // Suspense boundary and reads empty params at build time anyway.
   useEffect(() => {
     const adopt = () => {
       setPage(pageFromSearch(window.location.search));
@@ -695,9 +622,7 @@ export function IllustrationPromptsClient() {
     return () => window.removeEventListener("popstate", adopt);
   }, []);
 
-  // A URL can name a page past the end (`?page=99`, or a filter that shrank the
-  // list). Rendering already clamps; this settles the state and the URL onto
-  // the page actually being shown, so a reload or a share is honest.
+  // Settle state and URL onto the real page when `?page=` is past the end.
   useEffect(() => {
     if (!gallery || page <= pageCount - 1) return;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- clamping to the real page count, which is only known after the data loads
@@ -708,16 +633,14 @@ export function IllustrationPromptsClient() {
   const goTo = useCallback(
     (next: number) => {
       setPage(next);
-      // pushState, so Back walks the pages a reviewer actually visited; the
-      // popstate listener above puts the state back in step.
+      // pushState so Back walks the pages actually visited.
       window.history.pushState(null, "", urlFor(next, filter, sort));
       window.scrollTo({ top: 0, behavior: "smooth" });
     },
     [filter, sort],
   );
 
-  /** Switch filters, back to page 1. replaceState rather than pushState: this
-   *  is narrowing the view, not navigating within it, and Back should leave the
+  /** Switch filters, back to page 1. replaceState: Back should leave the
    *  gallery rather than undo a chip. */
   const selectFilter = useCallback(
     (next: Filter) => {
@@ -728,8 +651,7 @@ export function IllustrationPromptsClient() {
     [sort],
   );
 
-  /** Switch orderings, back to page 1. Same reasoning as the filter: reordering
-   *  is a change of view rather than a step through it. */
+  /** Switch orderings, back to page 1; same replaceState reasoning as the filter. */
   const selectSort = useCallback(
     (next: Sort) => {
       setSort(next);
@@ -740,10 +662,9 @@ export function IllustrationPromptsClient() {
   );
 
   const body = () => {
-    // Order matters: a *settled* signed-out or denied session replaces the
-    // gallery, but a pending one never does. `useSession` goes pending again
-    // whenever the tab regains focus, and swapping the grid for a spinner on
-    // that would throw away the reader's scroll position for nothing.
+    // Only a *settled* signed-out/denied session replaces the gallery:
+    // `useSession` goes pending on every tab refocus, and swapping the grid
+    // for a spinner then would lose the scroll position.
     if (!sessionPending && !session) {
       return (
         <Notice>
@@ -779,9 +700,6 @@ export function IllustrationPromptsClient() {
 
     return (
       <>
-        {/* The page's prose lives in the dashboard's <AdminPageHeader> (see
-            page.tsx); what belongs here is the shape of the corpus, as figures
-            you can scan rather than a paragraph you have to read. */}
         <header className={styles.header}>
           <dl className={styles.stats}>
             <div className={styles.stat}>
@@ -811,8 +729,7 @@ export function IllustrationPromptsClient() {
           {error ? <p className={styles.warn}>{error}</p> : null}
         </header>
 
-        {/* Clicking the active chip clears it, so each is a toggle even though
-            the three states are exclusive. */}
+        {/* Clicking the active chip clears it. */}
         <div className={styles.toolbar}>
           <button
             type="button"
@@ -840,9 +757,6 @@ export function IllustrationPromptsClient() {
           </span>
         </div>
 
-        {/* A second row rather than more chips in the first: the filters narrow
-            *what* is shown and these change the *order*, and mixing the two in
-            one strip made both read as filters. */}
         <div className={styles.sortBar}>
           <span className={styles.sortLabel}>Sort by</span>
           {SORTS.map((key) => (
@@ -927,10 +841,8 @@ export function IllustrationPromptsClient() {
           </nav>
         ) : null}
 
-        {/* Every page as its own link, so a reviewer working through the queue
-            can jump straight to where they left off instead of stepping through
-            with Next. Real hrefs, so they can be opened in a new tab or copied;
-            the click is intercepted to keep the SPA's pushState behaviour. */}
+        {/* Real hrefs so pages open in a new tab; clicks are intercepted to
+            keep the SPA's pushState behaviour. */}
         {pageCount > 1 ? (
           <nav className={styles.pageList} aria-label="Jump to illustration page">
             {Array.from({ length: pageCount }, (_, i) => (
@@ -961,12 +873,9 @@ export function IllustrationPromptsClient() {
   };
 
   return (
-    // `styles.page` still paints the site's own backgrounds (#ffffff / #121212)
-    // rather than inheriting the dashboard's, because judging a cut-out means
-    // seeing it on the exact surface the lesson serves it on. The dashboard's
-    // main background is a near-neighbour (#161616 in dark), which would make
-    // this page quietly lie. The theme pill it used to dock itself is now in
-    // the shell's top bar.
+    // `styles.page` paints the site's exact backgrounds (#ffffff / #121212),
+    // not the dashboard's near-neighbour: cut-outs must be judged on the
+    // surface lessons actually serve them on.
     <div className={styles.page}>
       <div className={styles.inner}>{body()}</div>
     </div>

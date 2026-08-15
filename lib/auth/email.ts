@@ -1,20 +1,9 @@
 /**
- * Transactional email for auth flows (password reset, email verification),
- * sent via Resend's HTTP API.
- *
- * Why Resend (and not SMTP): the Cloudflare Workers runtime can't open SMTP/TCP
- * sockets, only outbound `fetch`. Resend is a single authenticated POST, so it
- * works from the Worker with no SDK. Swapping to another provider (e.g. AWS SES
- * via `aws4fetch`) later means changing only `sendEmail` below; the Better Auth
- * wiring in server.ts calls these helpers and is provider-agnostic.
- *
- * Setup: verify your sending domain in Resend, set `RESEND_API_KEY` with
- * `wrangler secret put`, and (optionally) override the From address via the
- * `EMAIL_FROM` var. Until a domain is verified you can only send to your own
- * Resend account address using the `onboarding@resend.dev` sandbox From.
- *
- * Preview the rendered design at /email-preview (a dev-only page), which can
- * also send a live test copy to the signed-in admin's own inbox.
+ * Transactional email for auth flows, sent via Resend's HTTP API. Workers
+ * can't open SMTP/TCP sockets, only `fetch`, so Resend is a single
+ * authenticated POST; swapping provider means changing only `sendEmail`.
+ * Setup: verify the sending domain in Resend, set `RESEND_API_KEY`,
+ * optionally override `EMAIL_FROM`. Preview at /email-preview (dev-only).
  */
 import { SITE_URL } from "@/lib/site";
 
@@ -22,23 +11,17 @@ import { SITE_URL } from "@/lib/site";
 const DEFAULT_FROM = "Dataslope <no-reply@dataslope.com>";
 
 /**
- * Font stack for the email. `Inter` first as progressive enhancement, then the
- * system UI stack. Only clients that support web fonts (Apple Mail, iOS Mail)
- * actually load Inter — via the `@import` in `layout`'s <head> — or use it if
- * the recipient has it installed locally; Gmail and Outlook ignore web fonts
- * and fall back to the near-identical system faces below, so the layout never
- * shifts. Declared inline on every text element because email clients strip
- * <style> rules that aren't inlined.
+ * Font stack. Inter first as progressive enhancement; Gmail/Outlook ignore
+ * web fonts and fall back to the near-identical system faces, so the layout
+ * never shifts. Declared inline on every text element because email clients
+ * strip non-inlined <style> rules.
  */
 const FONT_STACK =
   "'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
 
 /**
- * Absolute URL of the raster brand mark shown in the header. Email clients
- * (Gmail, Outlook, Yahoo) don't render SVG, so the vector logo is rasterized to
- * a small PNG under public/email/ for mail. Absolute on purpose: an email has
- * no base URL, so a relative src wouldn't resolve. Served from the production
- * origin so the image is reachable from any recipient's client.
+ * Absolute URL of the raster brand mark (email clients don't render SVG, and
+ * an email has no base URL, so a relative src wouldn't resolve).
  */
 const LOGO_URL = `${SITE_URL}/email/dataslope-logo-blue.png`;
 
@@ -85,12 +68,9 @@ export async function sendEmail(
   }
 }
 
-/** Minimal, client-agnostic HTML wrapper (inline styles, email clients ignore
- *  non-inlined <style>/external CSS). A brand lockup (blue mark + wordmark), a
- *  single call-to-action button, and a copy-paste URL fallback for clients that
- *  strip links. The header pairs the raster mark with the "Dataslope" wordmark
- *  text: if a client blocks images (many do by default), the empty-alt mark
- *  simply disappears and the wordmark still carries the brand. */
+/** Minimal, client-agnostic HTML wrapper (inline styles only). If a client
+ *  blocks images, the empty-alt mark disappears and the wordmark text still
+ *  carries the brand. */
 function layout(opts: { heading: string; body: string; cta: string; url: string }): string {
   return `<!doctype html>
 <html lang="en">

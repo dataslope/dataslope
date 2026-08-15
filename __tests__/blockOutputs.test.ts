@@ -1,19 +1,14 @@
 /**
- * Prepopulated code-block output: the key both sides agree on, and the
- * conversion both producers go through.
- *
- * These two are the seams where a silent mismatch would be worst. A key that
- * drifts between `scripts/build-block-outputs.mjs` and `<CodeBlock>` shows
- * nothing (harmless but useless); a conversion that drifts between the build
- * generator and `pyodide-worker.ts` shows the *wrong* thing, which is the
- * failure this whole feature must not have.
+ * Prepopulated code-block output. A key drifting between
+ * build-block-outputs.mjs and <CodeBlock> shows nothing; a conversion drifting
+ * between the generator and pyodide-worker.ts shows the wrong thing.
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { describe, it, expect } from "vitest";
 
-import { blockOutputKey } from "../lib/blockOutputKey";
+import { blockOutputKey, workspaceOutputKey } from "../lib/blockOutputKey";
 import { toOutputCells } from "../app/_components/runtime/pythonDisplayOutputs";
 import { BROWSER_ADAPTERS, TEXT_ADAPTERS } from "../scripts/lib/block-runners.mjs";
 
@@ -62,6 +57,37 @@ describe("blockOutputKey", () => {
   });
 });
 
+describe("workspaceOutputKey", () => {
+  const files = [
+    { filename: "main.tsx", starterCode: "import App from './App'" },
+    { filename: "App.tsx", starterCode: "export default () => <p>hi</p>" },
+  ];
+
+  it("is stable for the same workspace", () => {
+    expect(workspaceOutputKey("react", files, "main.tsx")).toBe(
+      workspaceOutputKey("react", files, "main.tsx"),
+    );
+  });
+
+  it("changes when a NON-entry file changes", () => {
+    // The regression this key exists for: the bundle bakes every file in,
+    // so editing App.tsx must invalidate a bundle whose entry is main.tsx.
+    const edited = [
+      files[0],
+      { ...files[1], starterCode: "export default () => <p>bye</p>" },
+    ];
+    expect(workspaceOutputKey("react", files, "main.tsx")).not.toBe(
+      workspaceOutputKey("react", edited, "main.tsx"),
+    );
+  });
+
+  it("changes when the entry choice changes", () => {
+    expect(workspaceOutputKey("react", files, "main.tsx")).not.toBe(
+      workspaceOutputKey("react", files, "App.tsx"),
+    );
+  });
+});
+
 describe("toOutputCells", () => {
   it("maps every wire type to its cell", () => {
     const cells = toOutputCells([
@@ -105,19 +131,11 @@ describe("toOutputCells", () => {
 });
 
 /**
- * Who owns which entry in the shared manifest.
- *
- * Two generators write `lib/generated/block-outputs.json`:
- * `build-block-outputs.mjs` records python and `TEXT_ADAPTERS` headlessly,
- * `capture-browser-outputs.mjs` records `BROWSER_ADAPTERS` from a real page.
- * A full headless run starts from an empty object and carries the captured
- * entries across by name, so an adapter missing from both lists is one whose
- * output the next run deletes and no workflow ever restores — which is
- * exactly what happened to r, java, csharp and php, for 689 blocks.
- *
- * Nothing about that failure is visible: the manifest is one line of JSON,
- * the capture is manual, and the site treats a missing entry as "no entry"
- * rather than an error. So the invariant is asserted here instead.
+ * Two generators write lib/generated/block-outputs.json: build-block-outputs
+ * (python + TEXT_ADAPTERS, headless) and capture-browser-outputs
+ * (BROWSER_ADAPTERS). A full headless run carries captured entries across by
+ * name, so an adapter in neither list has its output silently deleted and
+ * never restored — which happened to r/java/csharp/php (689 blocks).
  */
 describe("block-output adapter ownership", () => {
   /** The registry `<CodeBlock adapter="…">` resolves against. Read as source

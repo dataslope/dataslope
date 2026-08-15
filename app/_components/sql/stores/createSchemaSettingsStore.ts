@@ -3,11 +3,9 @@
 import { create } from "zustand";
 import { DEFAULT_PLAYGROUND_SETTINGS } from "../../playgroundShared";
 
-// Shape shared by the DuckDB and Postgres playground settings stores.
-// Both expose the same appearance toggles plus a `showSystemSchemas`
-// flag for the schema-selector dropdown. (The SQLite playground has
-// its own slightly different store because of distinct theme defaults
-// and a PRAGMA tab in place of system schemas.)
+// Shape shared by the DuckDB and Postgres settings stores: the appearance
+// toggles plus `showSystemSchemas`. (SQLite has its own store — different
+// theme defaults, PRAGMA tab instead of system schemas.)
 export interface SchemaSettingsState {
   fontSize: number;
   outputFontSizeEnabled: boolean;

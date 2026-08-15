@@ -3,47 +3,24 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
- * Geometry for the Ask AI panel: drag to reposition, and drag a grip to resize.
- *
- * The panel is docked bottom-right by CSS (`position: fixed; right/bottom`).
- * Dragging switches it to explicit `left`/`top` co-ordinates, seeded from
- * wherever it currently sits so the first pointer move does not make it jump.
- *
- * ── Resizing keeps the bottom-right corner still ───────────────────────────
- *
- * The grips are on the top and left edges and the corner between them, because
- * the panel's bottom-right is its anchor: that is where it docks, where the
- * composer is, and the one corner a user is never dragging *toward* off-screen.
- * Growing away from it means the thing being read stays where it was. In the
- * docked case CSS does that for free; once the panel has been dragged it is
- * anchored `left`/`top` instead, so the hook moves the origin by exactly as
- * much as the size changed and the effect is identical.
- *
- * Desktop only, both gestures. Below `MIN_DRAG_WIDTH` the panel is nearly the
- * width of the screen, so there is nowhere to drag it to, nothing to gain by
- * widening it, and a pointer gesture on its edge would only fight the scroll;
- * the hook reports `enabled: false` and the caller renders a plain header and
- * no grips.
- *
- * Position and size are remembered per browser, and both are re-clamped on
- * window resize, so a panel parked against the right edge of a wide window (or
- * sized to fill a tall one) does not end up off-screen or overflowing in a
- * small one.
+ * Geometry for the Ask AI panel: drag to reposition, drag a grip to resize.
+ * The panel is docked bottom-right by CSS; dragging switches it to explicit
+ * `left`/`top`, seeded from where it sits so the first move doesn't jump.
+ * Resizing keeps the bottom-right corner (the anchor: dock + composer) still.
+ * Desktop only — below `MIN_DRAG_WIDTH` the hook reports `enabled: false`.
+ * Geometry is remembered per browser and re-clamped on window resize so the
+ * panel never ends up off-screen.
  */
 
 const STORAGE_KEY = "askai_panel_pos";
 const SIZE_STORAGE_KEY = "askai_panel_size";
 const MIN_DRAG_WIDTH = 768;
-/** Panel size assumed when the element cannot be measured (it is always
- *  mounted by the time a drag can start, so this only covers the restore
- *  path racing layout). Matches the panel's CSS width/height. */
+/** Size assumed when the element cannot be measured (restore path racing
+ *  layout). Must match the panel's CSS width/height. */
 const FALLBACK_SIZE: PanelSize = { width: 400, height: 620 };
 
-/** Resize bounds. The minimum is the width at which the composer, the context
- *  chip and the quota ring still fit on their two lines, and roughly four lines
- *  of answer are visible above them — below that the panel is a worse way to
- *  read an answer than no panel at all. The maximum keeps it a panel rather
- *  than a takeover of the page it is meant to be answering questions about. */
+/** Resize bounds: the minimum still fits the composer/chip/quota lines plus a
+ *  few lines of answer; the maximum keeps it a panel, not a page takeover. */
 const MIN_SIZE: PanelSize = { width: 340, height: 380 };
 const MAX_SIZE: PanelSize = { width: 760, height: 1000 };
 
@@ -81,14 +58,10 @@ function clampSize(size: PanelSize): PanelSize {
   };
 }
 
-/** The panel is kept wholly inside the window: no edge may pass a viewport
- *  edge, so it can never be dragged half (or entirely) out of the browser.
- *  Measured against the document element's client box rather than
- *  `innerWidth`/`innerHeight`, which count the scrollbar gutter.
- *
- *  `Math.max(0, …)` on the upper bounds handles a panel taller or wider than
- *  the window: it pins to the top-left rather than going negative, so the
- *  header (the drag handle, and the close button) stays reachable. */
+/** Keep the panel wholly inside the window. Measured against the document
+ *  element's client box (`innerWidth` counts the scrollbar gutter).
+ *  `Math.max(0, …)` pins an oversized panel to the top-left rather than going
+ *  negative, so the header stays reachable. */
 function clampToViewport(pos: PanelPosition, size: PanelSize): PanelPosition {
   const view = document.documentElement;
   const vw = view?.clientWidth || window.innerWidth;
@@ -154,10 +127,8 @@ function write(key: string, value: unknown): void {
 }
 
 export function useDraggablePanel(panelRef: React.RefObject<HTMLElement | null>) {
-  // Position and size are one state, not two: a resize moves the origin and
-  // changes the size in the same gesture (the bottom-right is held still), and
-  // splitting them would make that one visual change two renders — the panel
-  // visibly stepping before it settles.
+  // Position and size are one state: a resize moves the origin and the size in
+  // the same gesture, and splitting them would make that two visible renders.
   const [geom, setGeom] = useState<PanelGeometry>({ pos: null, size: null });
   const { pos, size } = geom;
   const setPos = useCallback(
@@ -185,9 +156,8 @@ export function useDraggablePanel(panelRef: React.RefObject<HTMLElement | null>)
     return () => mq.removeEventListener("change", sync);
   }, []);
 
-  // Restore once the panel is mounted and measurable. The stored position is
-  // clamped against the stored *size*, not the CSS default, or a panel saved
-  // large would be clamped as if it were small and jump on the first frame.
+  // Restore once mounted. The stored position is clamped against the stored
+  // *size*, not the CSS default, or a panel saved large would jump on frame 1.
   useEffect(() => {
     if (!enabled) return;
     const storedSize = readStoredSize();
@@ -371,9 +341,7 @@ export function useDraggablePanel(panelRef: React.RefObject<HTMLElement | null>)
     enabled,
     dragging,
     resizing: resizing !== null,
-    /** True once the panel has been moved OR resized, so the header's
-     *  double-click-to-restore is offered whenever there is something to
-     *  restore. */
+    /** True once moved OR resized — i.e. there is something to restore. */
     moved: pos !== null || size !== null,
     style,
     reset,

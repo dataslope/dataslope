@@ -109,10 +109,8 @@ describe("registry", () => {
   });
 
   it("migrates the legacy pg_workspaces key forward", async () => {
-    // Pre-#409 builds stored the registry under `pg_workspaces`; the
-    // current key is `playground_workspaces`. Reading the registry should
-    // surface the legacy entries and copy them onto the new key so the
-    // migration only happens once.
+    // Legacy `pg_workspaces` entries must surface and be copied onto the
+    // current key so the migration happens once.
     store.set(
       "pg_workspaces",
       JSON.stringify([
@@ -260,11 +258,9 @@ describe("deleteWorkspace", () => {
 // ---------------------------------------------------------------------------
 
 /**
- * Minimal in-memory Web Locks stub modelling exclusive, *queued* requests.
- * A request for a free name is granted immediately; a request for a held name
- * waits until the holder releases (its callback's promise settles), or
- * rejects if the request's `AbortSignal` fires first, which is how the real
- * API surfaces both our grace-window timeout and caller-unmount cancellation.
+ * Minimal Web Locks stub with exclusive, queued requests: a held name waits
+ * until the holder releases, or rejects when the request's AbortSignal fires —
+ * how the real API surfaces the grace-window timeout and unmount cancellation.
  */
 function makeLocksStub() {
   const held = new Set<string>();
@@ -348,9 +344,8 @@ describe("acquireWorkspaceLock", () => {
   });
 
   it("releases the lock when the caller aborts, so a remount can re-acquire", async () => {
-    // Regression test for the back/forward false-conflict: the first mount must
-    // hand the lock off to the next mount instead of holding it for the life of
-    // the document.
+    // Regression: back/forward false-conflict — the first mount must hand the
+    // lock to the next mount, not hold it for the document's life.
     vi.stubGlobal("navigator", {
       storage: { getDirectory: () => Promise.resolve(makeOpfsRoot()) },
       locks: makeLocksStub(),

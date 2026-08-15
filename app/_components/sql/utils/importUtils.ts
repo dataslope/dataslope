@@ -52,11 +52,9 @@ export function parseCsv(text: string): {
   return { headers, rows };
 }
 
-/** Every SQLite database file starts with the 16-byte magic header
- *  "SQLite format 3\0". The unified database-import flow sniffs this to
- *  decide whether the picked file is a binary SQLite database or a SQL
- *  text dump, the filename extension is deliberately ignored so any
- *  extension (.db3, .bak, …) imports correctly. */
+/** SQLite's 16-byte magic header. The import flow sniffs this instead of
+ *  the filename extension, so any extension (.db3, .bak, …) imports
+ *  correctly. */
 const SQLITE_MAGIC = "SQLite format 3\0";
 
 export function isSqliteBinary(bytes: Uint8Array): boolean {

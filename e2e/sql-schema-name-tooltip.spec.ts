@@ -1,14 +1,8 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// ─────────────────────────────────────────────────────────────────────
-// Update 1: In the Schema pane, when a table/view name is clipped with a
-// CSS ellipsis, the row's hover tooltip (the native `title`) leads with the
-// FULL name so it's readable on hover, e.g.
-//   "very_long_name, Double-click to preview, click to expand".
-// Names that already fit keep the plain hint. The schema row (`SchemaItem`)
-// is shared by all three engines, so SQLite, which uses a local sample and
-// needs no CDN, exercises the same code path.
-// ─────────────────────────────────────────────────────────────────────
+// Schema pane: a table name clipped by CSS ellipsis gets a `title` tooltip
+// leading with the FULL name; names that fit keep the plain hint. SchemaItem
+// is shared by all three engines, so SQLite (local sample, no CDN) suffices.
 
 async function runSql(page: Page, sql: string) {
   const editor = page.locator(".cm-content");

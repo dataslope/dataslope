@@ -81,10 +81,8 @@ function topKeywords(result: CompletionResult | null, n = 8): string[] {
 }
 
 // Replicates @codemirror/autocomplete's sortOptions for an empty typed
-// pattern: every option's fuzzy score is equal, so ordering is boost plus
-// the dynamic-section offset (sections sort by their best-scoring option).
-// This is the order users actually see in the dropdown, assertions on raw
-// `options` order or plain boosts can't catch section-level inversions.
+// pattern: ordering is boost plus the dynamic-section offset. This is the
+// order users actually see; raw option order can't catch section inversions.
 function renderedLabels(result: CompletionResult | null): string[] {
   const options = result?.options ?? [];
   const sectionBest = new Map<string, number>();

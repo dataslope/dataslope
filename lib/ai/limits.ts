@@ -131,15 +131,11 @@ export async function checkCompletionBudget(
 
 /**
  * Reserve one suggested-questions request. Suggestions have their own
- * per-user daily counters (migration 0006) so the panel fetching three
- * questions on open / after each answer never consumes the member's Ask AI
- * chat budget, but they share the global daily token ceiling, that stays
- * the single backstop on total spend.
- *
- * The request slot is claimed with an atomic conditional increment rather
- * than read-check-then-deferred-write: the endpoint is auto-fired by the
+ * per-user daily counters (migration 0006) so they never consume the Ask AI
+ * chat budget, but share the global daily token ceiling. The slot is claimed
+ * with an atomic conditional increment: the endpoint is auto-fired by the
  * client, so concurrent bursts would otherwise all read the same
- * pre-increment count and blow through the daily cap.
+ * pre-increment count and blow through the cap.
  */
 export async function reserveSuggestRequest(
   env: CloudflareEnv,

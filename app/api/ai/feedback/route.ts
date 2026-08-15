@@ -1,23 +1,9 @@
 /**
- * Record (or withdraw) a thumbs up/down on an Ask AI answer.
- *
- * The panel's rating buttons used to be local React state — a click colored
- * an icon and nothing left the browser. This is the write behind them.
- *
- * **Rated turns only.** A row exists because someone deliberately rated an
- * answer; no conversation is stored otherwise. That is the whole privacy shape
- * of the feature (see `migrations/auth/0008_…` for why), so this route is the
- * only thing in the codebase that writes Ask AI content to a database, and it
- * writes nothing on the unrated path because it is never called on it.
- *
- * Signed-in and same-origin, like every other cookie-authenticated mutation.
- * The stored text is truncated here rather than trusted from the client: the
- * question and answer are echoed back by the browser, so their length is not
- * ours to assume.
- *
- * `rating: null` deletes. There is no "cleared" state to keep — an answer
- * nobody rated and one whose rating was withdrawn mean the same thing, and the
- * row would otherwise outlive the opinion it recorded.
+ * Record (or withdraw) a thumbs up/down on an Ask AI answer. Privacy
+ * invariant: only rated turns are ever stored — this route is the only thing
+ * in the codebase that writes Ask AI content to a database. Signed-in and
+ * same-origin; stored text is truncated server-side rather than trusted from
+ * the client. `rating: null` deletes the row.
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createAuth } from "@/lib/auth/server";
@@ -25,9 +11,7 @@ import { isSameOrigin } from "@/lib/workspaces/server";
 
 export const dynamic = "force-dynamic";
 
-/** Longest question/answer stored. Long enough for any real Ask AI exchange
- *  (answers are capped by the model's own `maxTokens` well below this), short
- *  enough that one row cannot be used to park arbitrary data in D1. */
+/** Longest question/answer stored; keeps a row from parking arbitrary data. */
 const MAX_TEXT = 8000;
 /** Defensive caps on the short identifying fields. */
 const MAX_ID = 128;
@@ -89,9 +73,8 @@ export async function POST(request: Request): Promise<Response> {
       return json({ ok: true, rating: null });
     }
 
-    // Upsert: changing your mind edits the row you already wrote, and
-    // `created_at` deliberately keeps the first rating's time — the admin view
-    // is ordered by when feedback arrived, not by when it was last amended.
+    // Upsert; `created_at` deliberately keeps the first rating's time (the
+    // admin view orders by when feedback arrived).
     await env.DB.prepare(
       `INSERT INTO ai_answer_feedback
          (turn_id, user_id, rating, question, answer, surface, slug, model,

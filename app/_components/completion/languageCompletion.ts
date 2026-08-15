@@ -1,37 +1,15 @@
 "use client";
 
-// Shared intellisense wiring for every imperative-language CodeMirror
-// editor (Playground, CodeBlock, ChallengeCard). One extension bundles:
-//
-//   1. `autocompletion()` with an explicitly composed per-language
-//      source list:
-//        - a *runtime* source that bridges the adapter's optional
-//          `LanguageRuntime.complete()` hook (live-introspection
-//          completions from Pyodide/WebR/the TS language service);
-//        - the language package's own static sources where they exist
-//          (lang-python keywords/builtins/locals, lang-javascript
-//          snippets/locals), re-assembled here so they can be guarded
-//          against firing in member-access position (`pd.|` must not
-//          offer `print`);
-//        - a curated builtin/keyword list for languages with no
-//          semantic analyzer (PHP, Java, C, C++, C#, R-before-boot),
-//          lazy-loaded so the lists stay out of the main bundle;
-//        - document-word completion for the static-only languages, so
-//          `obj.` / `ptr->` at least offers identifiers already in the
-//          buffer (the classic editor fallback).
-//      Static sources that a booted runtime supersedes are suppressed
-//      once `runtime.complete` is available, CodeMirror only dedupes
-//      options whose label/detail/boost all match, so running both
-//      tiers at once would show visible duplicates.
-//   2. Trigger characters (`.`, `->`, `::`, `$` per language) that open
-//      the popup, plus Ctrl-Space. `activateOnTyping` stays OFF on
-//      these surfaces by design: typing pauses are reserved for the AI
-//      ghost-text suggestions (see app/_components/ai/inlineCompletion
-//      on the ai-autocomplete branch), which stand down while this
-//      popup is open.
-//   3. The completion keymap at high precedence: Tab accepts, Escape
-//      closes, arrows navigate, Enter always inserts a newline, the
-//      same bindings the SQL playgrounds already teach.
+// Shared intellisense wiring for every imperative-language CodeMirror editor
+// (Playground, CodeBlock, ChallengeCard): a runtime source bridging
+// `LanguageRuntime.complete()`, the language package's static sources
+// (guarded against member-access position), curated builtin lists for
+// analyzer-less languages (lazy-loaded), and document-word fallback.
+// Static sources are suppressed once the runtime can complete — CodeMirror
+// only dedupes exact label/detail/boost matches, so both tiers at once show
+// duplicates. `activateOnTyping` stays off by design: typing pauses are
+// reserved for the AI ghost-text suggestions. Tab accepts, Enter always
+// inserts a newline (same convention as the SQL playgrounds).
 
 import {
   acceptCompletion,
@@ -65,15 +43,12 @@ export interface LanguageCompletionConfig {
   /** Adapter id ("python", "r", "javascript", …), selects the
    *  language profile below. */
   adapterId: string;
-  /** Returns the live runtime when one is booted, or null. The runtime
-   *  source degrades to nothing (static sources still answer) until a
-   *  runtime is available. */
+  /** Returns the live runtime when booted, or null (static sources still
+   *  answer until then). */
   getRuntime: () => CompletionRuntime | null;
-  /** Read-only init code that conceptually runs before this editor's
-   *  doc (the CodeBlock/ChallengeCard init drawer). Prepended to the
-   *  document sent to whole-file analyzers so names it defines
-   *  complete. Read per request so tab switches don't require an
-   *  editor reconfigure. */
+  /** Read-only init code prepended to the doc sent to whole-file analyzers
+   *  so names it defines complete. Read per request so tab switches don't
+   *  require an editor reconfigure. */
   getContextPrefix?: () => string;
   /** Active workspace-relative filename, for multi-file surfaces. */
   getFilename?: () => string | undefined;
@@ -102,19 +77,16 @@ interface LanguageProfile {
   /** `validFor` handed to CodeMirror so further typing filters the open
    *  popup instead of re-querying the (possibly slow) runtime. */
   validFor: RegExp;
-  /** Endings (looking backwards from the token start) that mark
-   *  member-access position, static/global sources are suppressed
-   *  there so `pd.|` never offers top-level keywords. */
+  /** Endings before the token that mark member-access position, where
+   *  static/global sources are suppressed (`pd.|` must not offer `print`). */
   memberEndings: string[];
   /** Typed sequences that auto-open the completion popup. */
   triggerEndings: string[];
   /** Lazy loader for the language package's own completion sources
    *  (locals first, then globals/snippets). */
   langPack?: () => Promise<CompletionSource[]>;
-  /** When true, the language-pack sources stay active even once the
-   *  runtime provides completions (JS/TS keep their snippet templates,
-   *  which the TS language service doesn't offer; exact-duplicate
-   *  keywords collapse via CodeMirror's dedup). When false they're a
+  /** When true the pack stays active alongside the runtime (JS/TS keep
+   *  snippet templates the TS service doesn't offer); otherwise it's a
    *  pre-boot fallback only. */
   langPackAlwaysOn?: boolean;
   /** Lazy loader for the curated static builtin/keyword list. */
@@ -158,9 +130,7 @@ const PROFILES: Record<string, LanguageProfile> = {
     validFor: VALID_DEFAULT,
     memberEndings: ["."],
     triggerEndings: ["."],
-    // Pre-boot fallback only: once the Pyodide worker answers (jedi,
-    // which covers keywords, builtins, and locals with richer
-    // metadata), these would only add duplicate rows.
+    // Pre-boot fallback only: once jedi answers, these would only duplicate.
     langPack: async () => {
       const { localCompletionSource, globalCompletion } = await import(
         "@codemirror/lang-python"
@@ -169,9 +139,8 @@ const PROFILES: Record<string, LanguageProfile> = {
     },
   },
   r: {
-    // R identifiers include dots (`read.csv`); `::`/`$`/`@` extend the
-    // token so the runtime sees the full qualified fragment (R answers
-    // with full replacements like `frame$col` / `utils::read.csv`).
+    // R identifiers include dots; `::`/`$`/`@` extend the token so the
+    // runtime sees the full qualified fragment.
     wordRe: /[\w.:$@]*$/,
     validFor: /^[\w.:$@]*$/,
     memberEndings: ["$", "@", "::"],
@@ -306,8 +275,7 @@ function lazySource(load: () => Promise<CompletionSource>): CompletionSource {
           loaded = s;
         },
         () => {
-          // Leave `loading` settled-but-failed; a page with a broken
-          // chunk simply has no static completions.
+          // Broken chunk: page simply has no static completions.
         },
       );
     }
@@ -340,9 +308,8 @@ function runtimeSource(
 
     const cursorLine = ctx.state.doc.lineAt(ctx.pos);
     const prefix = cfg.getContextPrefix?.() ?? "";
-    // Prepend the read-only init code (when any) so whole-file
-    // analyzers see the names it defines. Offsets shift accordingly;
-    // line-based engines only consume `line`/`column`, which don't.
+    // Prepend init code so whole-file analyzers see its names. Offsets shift
+    // accordingly; line-based engines only consume `line`/`column`, which don't.
     const prefixBlock = prefix.trim() ? `${prefix.trimEnd()}\n` : "";
     const request: CompletionRequest = {
       doc: prefixBlock + ctx.state.doc.toString(),
@@ -372,9 +339,8 @@ function runtimeSource(
 
 // ─── Extension assembly ───────────────────────────────────────────────────
 
-/** Build the full intellisense extension for one editor. Append to the
- *  editor's extension list; it is self-contained (completion sources,
- *  trigger characters, and keymap included). */
+/** Builds the self-contained intellisense extension for one editor
+ *  (sources, trigger characters, and keymap included). */
 export function languageCompletion(cfg: LanguageCompletionConfig): Extension {
   const profile = PROFILES[cfg.adapterId] ?? FALLBACK_PROFILE;
 
@@ -386,17 +352,15 @@ export function languageCompletion(cfg: LanguageCompletionConfig): Extension {
   const unlessRuntime = (source: CompletionSource): CompletionSource =>
     (ctx) => (runtimeCanComplete() ? null : source(ctx));
 
-  // Labels of the curated static list, once loaded, document-word
-  // completion filters against them so `printf` isn't offered twice
-  // (once with a signature, once as a bare doc word).
+  // Static-list labels; doc-word completion filters against them so
+  // `printf` isn't offered twice.
   const staticLabels = new Set<string>();
 
   const sources: CompletionSource[] = [runtimeSource(cfg, profile)];
   if (profile.extraSource) sources.push(profile.extraSource);
   if (profile.langPack) {
-    // Language packs ship up to two independent sources (locals +
-    // globals/snippets). Each gets its own lazy wrapper; the import
-    // promise is shared so the chunk loads once.
+    // Packs ship up to two sources; each gets a lazy wrapper sharing one
+    // import promise so the chunk loads once.
     let packPromise: Promise<CompletionSource[]> | null = null;
     const loadPack = () => (packPromise ??= profile.langPack!());
     for (const idx of [0, 1]) {
@@ -424,8 +388,8 @@ export function languageCompletion(cfg: LanguageCompletionConfig): Extension {
     );
   }
   if (profile.docWords) {
-    // Document words answer everywhere, including member position,
-    // where they're the only fallback static languages have.
+    // Doc words answer everywhere, including member position, where they're
+    // the only fallback static languages have.
     const docWordSource = ifNotIn(DONT_COMPLETE_IN, (ctx) => {
       const res = completeAnyWord(ctx) as CmCompletionResult | null;
       if (!res) return null;
@@ -437,8 +401,7 @@ export function languageCompletion(cfg: LanguageCompletionConfig): Extension {
     sources.push(unlessRuntime(docWordSource));
   }
 
-  // Auto-open the popup on the language's member-access triggers,
-  // mirroring the "type a dot" UX of the original Playground wiring.
+  // Auto-open the popup on the language's member-access triggers.
   const triggerListener =
     profile.triggerEndings.length === 0
       ? []
@@ -465,11 +428,8 @@ export function languageCompletion(cfg: LanguageCompletionConfig): Extension {
       override: sources,
       activateOnTyping: false,
       closeOnBlur: true,
-      // The built-in keymap binds Enter → acceptCompletion at the
-      // highest precedence; we register our own bindings below so
-      // Enter always inserts a newline and Tab accepts, the same
-      // convention as the SQL playground editors. Ctrl-Space (open)
-      // comes with `completionKeymap`.
+      // Own bindings below: Enter always inserts a newline, Tab accepts
+      // (the default keymap binds Enter → acceptCompletion).
       defaultKeymap: false,
     }),
     triggerListener,
@@ -482,8 +442,7 @@ export function languageCompletion(cfg: LanguageCompletionConfig): Extension {
   ];
 }
 
-/** Test-only handles (see __tests__/languageCompletion.test.ts). Not
- *  part of the public surface. */
+/** Test-only handles; not part of the public surface. */
 export const _internal = {
   PROFILES,
   phpVariableSource,

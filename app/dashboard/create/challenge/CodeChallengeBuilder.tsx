@@ -241,10 +241,8 @@ export default function CodeChallengeBuilder() {
     };
   }, [editId, beginEdit]);
 
-  // "Fill with AI": map a drafted code challenge onto the form fields, reusing
-  // the same representation the edit path hydrates from. The drafted solution
-  // is still verified against the drafted tests when the user saves, so a wrong
-  // draft fails at publish rather than shipping silently.
+  // "Fill with AI": map a drafted challenge onto the form. The drafted
+  // solution is still verified against the drafted tests at save time.
   useRegisterBuilderDraft("code", (draft: DraftResult) => {
     if (draft.kind !== "code") return;
     saveState.clearError();
@@ -352,10 +350,8 @@ export default function CodeChallengeBuilder() {
     }));
   };
 
-  // Publishing is gated on the reference solution passing the tests: the
-  // preview card is (re)mounted with the exact payload being saved, the
-  // solution is loaded into its buffers through the card's imperative
-  // driver, and the save only proceeds on a green banner.
+  // Publishing is gated on the reference solution passing the tests via the
+  // preview card's driver; the save only proceeds on a green banner.
   const onSave = async () => {
     setFormError(null);
     const payload = validate();
@@ -406,10 +402,7 @@ export default function CodeChallengeBuilder() {
     return <ErrorNotice message={loadError} />;
   }
 
-  // The live-preview column: the real learner-facing card once Preview (or a
-  // verifying save) has mounted it, a pulsing placeholder until then. Keyed
-  // remount so the card re-reads the edited files/tests (booting the language
-  // runtime again on Refresh).
+  // Keyed remount so the card re-reads the edited files/tests.
   const previewColumn = preview ? (
     <div key={preview.version}>
       <CustomItemRenderer title={preview.title} payload={preview.payload} />

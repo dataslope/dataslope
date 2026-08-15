@@ -1,21 +1,10 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// ─────────────────────────────────────────────────────────────────────
-// The HTML/CSS/JS playground has a fixed index.html / styles.css /
-// script.js trio: `disableAddFile` hides the "+" affordances,
-// `hideFilesPane` hides the file tree, and `lockWorkspaceFiles` takes
-// away closing, deleting, duplicating, and renaming.
-//
-// Those go together. Closing a tab hides its editor but keeps the file,
-// and the Files pane is what reopens it — so an adapter with no Files
-// pane and no way to add a file must not let one be closed either, or
-// the file becomes unreachable in tabbed mode. Renaming is locked
-// because the trio references itself by name, so a rename breaks the
-// composed page silently.
-//
-// Split view hid the problem (it renders every workspace file whatever
-// the open tabs are), so these assertions run against tabbed mode.
-// ─────────────────────────────────────────────────────────────────────
+// The web playground's fixed HTML/CSS/JS trio is fully locked, and the locks
+// go together: with no Files pane and no way to add a file, a closed tab
+// would make the file unreachable in tabbed mode, and a rename silently
+// breaks the composed page (the trio references itself by name). Split view
+// hid the problem, so these assertions run against tabbed mode.
 
 const TABBAR = ".playground-file-tabbar";
 

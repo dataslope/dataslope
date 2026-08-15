@@ -1,20 +1,9 @@
 /**
- * Schema snapshot for the learn-route SQL cards' tools menu, run against
- * the **real** engines rather than a stubbed `exec`.
- *
- * That distinction is the whole point of this file. `sqlSchemaIntrospect.test.ts`
- * stubs `exec` and checks the row→shape mapping, which is the right test for
- * the mapping and no test at all for the SQL: the first version of
- * `columnsSql("sqlite")` aliased a pragma column `AS notnull`, which SQLite's
- * parser rejects outright. Every stubbed test passed, the statement threw in
- * the browser, and because a failed column query degrades to "no columns"
- * rather than throwing, the ER diagram drew every table as an empty box.
- *
- * So these cases boot sqlite-wasm / PGlite / duckdb-wasm through the same
- * helper the content sweeps use, create a two-table schema with a primary key,
- * a NOT NULL and a foreign key, and assert the snapshot comes back populated.
- * Any dialect whose catalog query stops parsing fails here instead of silently
- * emptying a dialog.
+ * Schema snapshot for the SQL cards' tools menu, run against the REAL engines:
+ * sqlSchemaIntrospect.test.ts stubs `exec` and tests the mapping but not the
+ * SQL, and a catalog query that stops parsing degrades to "no columns" rather
+ * than throwing (the ER diagram once drew every table as an empty box). A
+ * dialect whose catalog query breaks fails here instead.
  */
 import { describe, it, expect } from "vitest";
 

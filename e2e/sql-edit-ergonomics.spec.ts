@@ -1,13 +1,9 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// ─────────────────────────────────────────────────────────────────────
-// Cell-editing ergonomics (UX-10), all three engines:
-//   • a pending cell edit shows a per-cell discard "✕" that reverts just
-//     that cell (without touching other pending edits);
-//   • Ctrl/⌘+Enter commits the pending edits (when focus isn't in the
-//     SQL editor, whose own keymap owns that chord for "run").
-// The feature lives entirely in the shared ResultView.
-// ─────────────────────────────────────────────────────────────────────
+// Cell-editing ergonomics, all three engines: a pending edit shows a per-cell
+// discard "✕" reverting just that cell, and Ctrl/⌘+Enter commits pending
+// edits when focus isn't in the SQL editor (whose keymap owns that chord for
+// "run"). Lives entirely in the shared ResultView.
 
 async function runSql(page: Page, sql: string) {
   const editor = page.locator(".cm-content");

@@ -66,12 +66,9 @@ describe("reading catalog filters from a URL", () => {
   });
 });
 
-// `COURSE_LANGUAGES` is hand-kept, and one of its two consumers cannot notice
-// when it falls behind. The /courses sidebar derives its rows from the courses
-// it is handed and uses the list only to order them, so a language missing
-// from it still gets a row. The footer's Courses column has no catalog to
-// derive from and renders the list verbatim, so the same omission is simply a
-// language the footer never links to. These are that gap, closed.
+// COURSE_LANGUAGES is hand-kept and one consumer cannot notice drift: the
+// sidebar derives its rows from the courses it is handed, but the footer
+// renders the list verbatim, so an omission is a language it never links to.
 describe("the catalog's language vocabulary", () => {
   const inContent = [
     ...new Set(

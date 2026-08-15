@@ -1,11 +1,6 @@
 /**
- * Fumadocs's `<Callout>`, with backticks in its `title` rendered as code.
- *
- * A callout is authored as `<Callout title="`gets()` is so dangerous…">`, and
- * `title` is a JSX *attribute*, which markdown never sees. `withInlineMarkup`
- * (shared with `<Figure>` and `<Chart>` captions, which have the same problem)
- * is what turns those backticks into code chips, and what renders `*this*`
- * as emphasis; see that module for the rules it applies and why.
+ * Fumadocs's `<Callout>` with backticks/asterisks in its `title` rendered via
+ * `withInlineMarkup` — `title` is a JSX attribute markdown never sees.
  */
 import type { ComponentProps } from "react";
 import { Callout } from "fumadocs-ui/components/callout";

@@ -1,10 +1,9 @@
 "use client";
 
 // Last-resort error boundary: catches failures in the root layout itself,
-// which app/error.tsx (a segment boundary rendered *inside* the layout)
-// cannot. Must render its own <html>/<body> because it replaces the layout.
-// Deliberately dependency-free (inline styles, no CSS imports, no theme
-// bootstrap): the less this page depends on, the less likely it is to crash
+// which app/error.tsx (rendered inside the layout) cannot. Must render its
+// own <html>/<body> because it replaces the layout. Deliberately
+// dependency-free: the less this depends on, the less likely it is to crash
 // while reporting a crash.
 import { useEffect } from "react";
 

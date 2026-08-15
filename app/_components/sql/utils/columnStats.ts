@@ -1,20 +1,12 @@
 import { formatCellValue } from "./cellUtils";
 
 /**
- * Pure, dependency-light column-statistics helper for the result grid's
- * "Column statistics" inspector. It runs over the rows currently held in a
- * result set (the loaded rows, most learning queries fit in one page) and is
- * engine-agnostic: it inspects the runtime JavaScript values, so it works
- * identically for SQLite, PostgreSQL and DuckDB results.
- *
- * Design notes:
- * - Values arrive as `SqlValue` (string | number | null | Uint8Array) but a few
- *   adapters surface booleans (PG `boolean`), `Date`s, or arrays (DuckDB LIST),
- *   so the input is typed `unknown` and every branch is defensive.
- * - PostgreSQL `numeric`/`decimal` columns arrive as *strings*, so a column
- *   whose every non-null value is a finite numeric string is treated as numeric
- *   (its min/max/mean/etc. are computed from the parsed numbers). A column with
- *   any non-numeric string stays "text".
+ * Pure, engine-agnostic column statistics over the loaded rows for the
+ * "Column statistics" inspector. Input is `unknown` and every branch is
+ * defensive (adapters surface booleans, Dates, arrays). PG numeric/decimal
+ * columns arrive as *strings*, so a column whose every non-null value is a
+ * finite numeric string is treated as numeric; any non-numeric string keeps
+ * it "text".
  */
 
 /** One of the most-frequent non-null values, with its occurrence count. */
@@ -113,12 +105,7 @@ function median(nums: number[]): number {
     : sorted[mid];
 }
 
-/**
- * Compute descriptive statistics for a single column's values.
- *
- * @param values    The column's cell values (one entry per row).
- * @param topN      How many most-frequent values to surface (default 5).
- */
+/** Compute descriptive statistics for a single column's values. */
 export function computeColumnStats(
   values: readonly unknown[],
   topN: number = DEFAULT_TOP_VALUES,

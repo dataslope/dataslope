@@ -1,35 +1,16 @@
 /**
- * Admin-only data + write endpoint behind the `/dashboard/admin/illustration-prompts` review
- * gallery.
- *
- * The page itself stays a statically prerendered shell (the codebase's "auth
- * gates actions, not content" rule); everything it renders comes from here, so
- * a non-admin who opens the URL gets the shell and a 403 rather than the
- * prompt corpus. That is the difference from the old build-time page, which
- * inlined all ~900 prompts into public HTML.
- *
- *   GET  → the whole gallery: every built prompt entry, its background-removed
- *          WebP (the only image the gallery shows), and the current
- *          regeneration marks.
- *   PUT  → set or clear one illustration's regeneration mark, with an optional
- *          note (the brief the redraw's new prompt gets written from), or, with
- *          `approve: true`, sign off a redraw so it stops showing as waiting to
- *          be looked at.
- *
- * Marks live in D1 `dataslope-illustrations`, table `illustration_regen_marks`
- * (binding `ILLUSTRATIONS_DB`; see lib/illustrations/regenMarks.ts and
- * agent-outputs/20260803-0900-illustration-regeneration-queue.md). That binding
- * is optional: without it GET still returns the gallery with
- * `marksAvailable: false` and PUT answers 503, so a deployment that has not run
- * the migration yet degrades to a read-only gallery instead of erroring.
+ * Admin-only endpoint behind the illustration-prompts review gallery. The page
+ * is a static shell; all data (prompt entries, cut-outs, regen marks) comes
+ * from GET here, so a non-admin never receives the prompt corpus. PUT sets or
+ * clears a mark, or (`approve: true`) signs off a redraw. Marks live in D1
+ * `dataslope-illustrations`.`illustration_regen_marks` (ILLUSTRATIONS_DB,
+ * optional binding): without it GET reports `marksAvailable: false` and PUT
+ * answers 503, degrading to a read-only gallery.
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { requireAdmin } from "@/lib/auth/admin";
-// The image manifest and created-at timestamps arrive as a static asset
-// (public/_gen/illustration-gallery.json, emitted by build-images.mjs), not
-// as imports: API routes compile as their own bundler graph, so importing
-// lib/generated/images.js + created-at.js here carried a private copy of
-// both in the deployed Worker for data this admin-only route reads rarely.
+// Manifest + created-at arrive as a static asset (emitted by build-images.mjs)
+// rather than imports, which would bundle a private copy into the Worker.
 import type { ImageManifestEntry } from "@/lib/generated/images";
 import { readPublicAsset } from "@/lib/serverAssets";
 import {
@@ -57,35 +38,36 @@ interface GalleryData {
   illustrationsCreatedAt: Record<string, string>;
 }
 
-/** Cached per isolate: the JSON is immutable for the life of a deploy (it is
- *  a build artifact, same as the module import it replaced). */
+/** Cached per isolate: the JSON is immutable for the life of a deploy.
+ *  Only a successful parse is cached — a transient asset-fetch failure must
+ *  not pin the route to 503 for the isolate's lifetime. */
 let galleryDataPromise: Promise<GalleryData | null> | null = null;
 function getGalleryData(): Promise<GalleryData | null> {
-  galleryDataPromise ??= readPublicAsset("_gen/illustration-gallery.json").then(
-    (text) => {
+  galleryDataPromise ??= readPublicAsset("_gen/illustration-gallery.json")
+    .then((text): GalleryData | null => {
       if (!text) return null;
       try {
         return JSON.parse(text) as GalleryData;
       } catch {
         return null;
       }
-    },
-  );
+    })
+    .catch(() => null)
+    .then((data) => {
+      if (!data) galleryDataPromise = null;
+      return data;
+    });
   return galleryDataPromise;
 }
 
-/** A prompt plus the one image the gallery renders for it: the cut-out. The
- *  original is deliberately not shown, since reviewing is about how the art
- *  reads once its background is gone; `hasOriginal` is still reported so the
- *  gallery can tell "never generated" apart from "generated, but background
- *  removal never ran", which is a real and silent pipeline failure. */
+/** A prompt plus the cut-out (the only image the gallery shows). `hasOriginal`
+ *  lets the gallery tell "never generated" from "generated, but background
+ *  removal never ran" — a real and silent pipeline failure. */
 export interface GalleryEntry extends IllustrationPromptEntry {
   cutout: { src: string; width: number; height: number } | null;
   hasOriginal: boolean;
-  /** ISO-8601 UTC of the commit that added this illustration's cut-out, or
-   *  null when it has never been committed (or the clone has no history to
-   *  read). The cut-out is the file the site serves, so its birth is the
-   *  illustration's; see scripts/build-created-at.mjs. */
+  /** ISO-8601 UTC of the commit that added the cut-out, null if never
+   *  committed (see scripts/build-created-at.mjs). */
   createdAt: string | null;
 }
 
@@ -116,8 +98,7 @@ function cutoutFor(
   const slug = `${id}${CUTOUT_SUFFIX}`;
   const entry = images[slug];
   if (!entry) return null;
-  // Illustrations are single-format WebP (see AGENTS.md); take whatever the
-  // manifest recorded rather than assuming the extension.
+  // Take whatever format the manifest recorded rather than assuming .webp.
   const ext = entry.formats[entry.formats.length - 1];
   return { src: `/images/${slug}.${ext}`, width: entry.width, height: entry.height };
 }
@@ -127,9 +108,8 @@ export async function GET(request: Request): Promise<Response> {
   const gate = await requireAdmin(env, request);
   if (!gate.ok) return json({ error: gate.message }, gate.status);
 
-  // A missing/unparseable asset means a broken deploy (the build chain always
-  // emits it); degrading to a gallery with every image blank would read as
-  // "nothing generated", which is worse than saying what happened.
+  // A missing/unparseable asset means a broken deploy; say so rather than
+  // render a gallery of blanks that reads as "nothing generated".
   const gallery = await getGalleryData();
   if (!gallery) {
     return json({ error: "Illustration gallery data is unavailable." }, 503);
@@ -145,8 +125,7 @@ export async function GET(request: Request): Promise<Response> {
       marks = await listRegenMarks(db);
       marksAvailable = true;
     } catch (err) {
-      // A missing table (migration not applied) must not take the gallery
-      // down with it; reviewing the art is still useful without the queue.
+      // A missing table (migration not applied) must not take the gallery down.
       console.error("illustration marks read failed", err);
     }
   }
@@ -193,15 +172,13 @@ export async function PUT(request: Request): Promise<Response> {
   }
 
   const id = typeof body.id === "string" ? body.id : "";
-  // Only ids that exist in data/illustration-prompts.json can be marked, so
-  // the queue can never accumulate rows pointing at nothing.
+  // Only known prompt ids can be marked, so the queue never accumulates rows
+  // pointing at nothing.
   if (!id || !getIllustrationPromptById(id)) {
     return json({ error: "Unknown illustration id." }, 400);
   }
 
   try {
-    // Two writes share this endpoint because they are two halves of one round
-    // trip: `approve: true` signs off a redraw, anything else sets the mark.
     const mark = body.approve
       ? await approveRegenMark(db, { promptId: id, approvedBy: gate.user.id })
       : await upsertRegenMark(db, {

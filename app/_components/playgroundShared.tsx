@@ -1,11 +1,7 @@
 "use client";
 
-// Shared chrome that every playground (Python, R, …, SQLite) uses so
-// the Settings panel, runtime info popover, run-overlay animation, and
-// loading screen stay visually and behaviorally identical across
-// playgrounds. Extracted from `Playground.tsx` so a non-adapter-driven
-// playground (the SQL playground) can mount the same components without
-// duplicating them.
+// Shared chrome (settings panel, runtime info popover, run overlay, loading
+// screen) used by every playground, including the non-adapter-driven SQL one.
 
 import { useCallback, useState, type ReactNode } from "react";
 import { Switch } from "@base-ui/react/switch";
@@ -23,10 +19,7 @@ import {
 import { ThemePillToggle } from "./ThemePillToggle";
 import type { RuntimeInfo } from "./types";
 
-/** Small clipboard / "copy to clipboard" glyph shared by the editor
- *  pane bar, output cell headers, and the split-editor pane headers.
- *  Stroked rather than filled so it visually matches the pane-bar
- *  icons. */
+/** Copy-to-clipboard glyph; stroked to match the pane-bar icons. */
 export function CopyIcon() {
   return (
     <svg
@@ -46,10 +39,8 @@ export function CopyIcon() {
   );
 }
 
-/** Built-in defaults for the per-language playground settings. Used
- *  both when hydrating an unconfigured playground from localStorage and
- *  when the user clicks "Restore default settings", so the two paths
- *  can never drift out of sync. */
+/** Playground settings defaults; used by both localStorage hydration and
+ *  "Restore default settings" so the two can't drift. */
 export const DEFAULT_PLAYGROUND_SETTINGS = {
   fontSize: 14,
   outputFontSize: 13,
@@ -59,9 +50,7 @@ export const DEFAULT_PLAYGROUND_SETTINGS = {
   clearBeforeRun: true,
 } as const;
 
-/** Cheeky one-liners cycled below the loading hero while the runtime
- *  initialises. Shared so the SQL playground's loading screen feels the
- *  same as the language playgrounds. */
+/** One-liners cycled below the loading hero while the runtime initialises. */
 export const LOADING_QUIPS: string[] = [
   "Bribing the WebAssembly elves with cookies…",
   "Convincing electrons to behave for a few seconds…",
@@ -85,9 +74,8 @@ export const LOADING_QUIPS: string[] = [
   "Compressing entropy into adorable little packets…",
 ];
 
-/** Detect desktop macOS so we can show the user the actual modifier
- *  key combo for the run shortcut (⌘ Enter on macOS, Ctrl Enter
- *  everywhere else). Defaults to false during SSR. */
+/** Detect desktop macOS (for showing ⌘ vs Ctrl in the run shortcut).
+ *  False during SSR and on iPhone/iPad. */
 export function detectIsMac(): boolean {
   if (typeof navigator === "undefined") return false;
   const platform = navigator.platform || "";
@@ -99,9 +87,7 @@ export function detectIsMac(): boolean {
   return /Mac/i.test(platform) || /Macintosh/i.test(ua);
 }
 
-/** The wave/glow overlay shown in the editor pane while a run is in
- *  flight. Used by both the language playgrounds (over the output pane)
- *  and the SQL playground (over the data panel). */
+/** Wave/glow overlay shown while a run is in flight. */
 export function DataslopeRunOverlay({
   running,
   variant,
@@ -138,11 +124,8 @@ export function DataslopeRunOverlay({
   );
 }
 
-/** Placeholder shown inside the ER-diagram tab area while the
- *  ErDiagramPane chunk is being lazily loaded. Renders the same
- *  bottom-anchored wave animation that ErDiagramPane shows during the
- *  ELK layout computation, so there is no visible gap between the two
- *  phases. */
+/** Placeholder while the ErDiagramPane chunk loads; renders the same wave
+ *  animation ErDiagramPane shows during layout, so the phases join seamlessly. */
 export function ErDiagramLoadingFallback() {
   return (
     <div className="er-diagram-wrap">
@@ -164,15 +147,9 @@ export function ErDiagramLoadingFallback() {
   );
 }
 
-/** Body of the runtime-info popover (the small info button in the
- *  header). Surfaces language/runtime/version + a GitHub link. Reused
- *  verbatim by the SQL playground.
- *
- *  Label above value rather than label-left/value-right: at this panel
- *  width the values are long enough to wrap ("almostnode (browser-native
- *  Node.js)"), and a right-aligned wrapped value ends up ragged and
- *  visually unrelated to the row above it. Stacking puts every value on
- *  the same left edge and gives each one the full width. */
+/** Runtime-info popover body (language/runtime/version + GitHub link).
+ *  Labels stack above values because values are long enough to wrap at this
+ *  panel width. */
 export function RuntimeInfoContent({ info }: { info: RuntimeInfo }) {
   return (
     <>
@@ -234,53 +211,38 @@ export interface SettingsPanelProps {
   setWordWrap: (b: boolean) => void;
   clearBeforeRun: boolean;
   setClearBeforeRun: (b: boolean) => void;
-  /** Adapter id used to render a representative snippet inside each
-   *  theme preview card (`"python"`, `"r"`, `"sqlite"`, …). */
+  /** Adapter id for the snippet shown in each theme preview card. */
   language: string;
-  /** Optional override for the "Use Different Font Size for Outputs"
-   *  row label, the SQL playground uses "Results" instead. */
+  /** Override for the output font-size row label (SQL uses "Results"). */
   outputFontSizeLabel?: string;
   /** Whether to render the output/result font-size controls. */
   showOutputFontSizeControls?: boolean;
-  /** Optional override for the "Clear Output Before Running" row label
-   *, the SQL playground says "Clear Results Before Running". */
+  /** Override for the "Clear Output Before Running" row label. */
   clearBeforeRunLabel?: string;
-  /** Whether to render the "Clear Output/Results Before Running" row.
-   *  SQL playgrounds set this to false, the option only applies to
-   *  non-SQL playgrounds where outputs are appended. Defaults to true. */
+  /** Whether to render the clear-before-run row; SQL sets false since the
+   *  option only applies where outputs are appended. Defaults to true. */
   showClearBeforeRunRow?: boolean;
   onRestoreDefaults: () => void;
   onClearLocalStorage: () => void;
-  /** Wipe every browser-side storage surface this app uses
-   *  (localStorage + sessionStorage + OPFS + IndexedDB + caches) and
-   *  reload. More thorough than `onClearLocalStorage`. Optional so
-   *  callers can opt into surfacing the action, when omitted the row
-   *  is hidden. */
+  /** Wipe all browser-side storage (localStorage + sessionStorage + OPFS +
+   *  IndexedDB + caches) and reload; the row is hidden when omitted. */
   onClearAllLocalData?: () => void;
-  /** Optional extra rows appended inside the General tab, used by the
-   *  SQL playground to surface a per-DB "Reset query tabs" action. */
+  /** Extra rows appended inside the General tab. */
   extraGeneralRows?: ReactNode;
-  /** Optional extra action buttons prepended inside the `.settings-actions`
-   *  group, used by the SQL playground to surface "Reset query tabs" next
-   *  to the other destructive actions so all three form one grouped button. */
+  /** Extra action buttons prepended to the `.settings-actions` group. */
   extraActionRows?: ReactNode;
-  /** Optional extra settings tabs rendered after "Editor Themes". Each
-   *  entry provides the tab trigger and its panel content. Used by the
-   *  SQL playground to surface the Pragmas tab. */
+  /** Extra settings tabs (trigger + panel), e.g. the SQL Pragmas tab. */
   extraTabs?: Array<{
     value: string;
     trigger: ReactNode;
     panel: ReactNode;
   }>;
-  /** Close the Settings tab. When provided, a ✕ button is rendered at
-   *  the far right of the settings tab bar (after the last tab). */
+  /** Close the Settings tab; when provided, a ✕ button ends the tab bar. */
   onClose?: () => void;
 }
 
-/** Tabbed settings UI body (General + Editor Themes + extra tabs)
- *  shared across all playgrounds. Rendered inline inside a tab pane in
- *  every playground, the legacy modal-dialog form has been retired in
- *  favour of the "Settings as a tab" affordance. */
+/** Tabbed settings UI body shared by all playgrounds, rendered inline
+ *  inside a tab pane. */
 export function SettingsPanelContent({
   fontSize,
   setFontSize,

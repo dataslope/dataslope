@@ -1,12 +1,7 @@
 /**
- * One quiz set.
- *
- * GET    /api/custom/sets/:id, public: set metadata + ordered item ids
- *          (used by the set builder's edit prefill; the public /quiz/:id
- *          page reads D1 directly). Expired rows 404.
- * PUT    /api/custom/sets/:id, owner only: update title, description, and
- *          item list (every id must resolve to a live item).
- * DELETE /api/custom/sets/:id, owner only.
+ * One quiz set. GET: public metadata + ordered item ids; expired rows 404.
+ * PUT: owner only, updates title/description/item list (every id must
+ * resolve to a live item). DELETE: owner only.
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createAuth } from "@/lib/auth/server";

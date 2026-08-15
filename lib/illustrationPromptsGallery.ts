@@ -1,17 +1,10 @@
 /**
- * Data layer for the `/dashboard/admin/illustration-prompts` review gallery and the in-lesson
- * `<IllustrationPrompt>` card.
- *
- * The prompt definitions live in `data/illustration-prompts.json` (the single
- * source of truth, also consumed by scripts/generate-illustrations.mjs). This
- * module turns each raw definition into a fully-built entry, the exact GPT
- * Image 2 prompt via `buildIllustrationPrompt`, the target PNG file name, and a
- * deep link to the lesson that embeds it, so the gallery, the card, and the
- * generator all agree.
- *
- * Deliberately free of Node/DOM APIs (it just imports the JSON), so it can be
- * imported from the server component that prerenders the gallery page AND from
- * the client component that renders the in-lesson card.
+ * Data layer for the illustration-prompts review gallery and the in-lesson
+ * `<IllustrationPrompt>` card. Turns each raw definition from
+ * `data/illustration-prompts.json` into a fully-built entry (exact prompt,
+ * target file name, lesson deep link) so the gallery, the card, and the
+ * generator agree. Free of Node/DOM APIs so both server and client components
+ * can import it.
  */
 import promptsData from "@/data/illustration-prompts.json";
 import {
@@ -20,13 +13,9 @@ import {
   type BrandColors,
 } from "./illustrationPrompt";
 
-/** Content collections: which public URL base each maps to.
- *
- *  `home` and `auth` are not collections of lessons but single pages, so they
- *  have no course/lesson hierarchy beneath them (see `SINGLE_PAGE` below). They
- *  exist so chrome artwork — the home page's bento icons, the auth globe pins —
- *  is authored, reviewed, and regenerated through the same pipeline as
- *  everything else rather than as one-off art. */
+/** Content collections: which public URL base each maps to. `home`/`auth`
+ *  etc. are single pages with no lesson hierarchy (see `SINGLE_PAGE`); they
+ *  exist so chrome artwork goes through the same review pipeline. */
 export type Collection =
   | "courses"
   | "interview"
@@ -42,8 +31,7 @@ const URL_BASE: Record<Collection, string> = {
   auth: "/sign-in",
   pricing: "/pricing",
   playground: "/playground",
-  // Any unmatched path renders the 404, so this both names the surface and
-  // demonstrates it.
+  // Any unmatched path renders the 404.
   error: "/404",
 };
 
@@ -60,9 +48,8 @@ const SINGLE_PAGE: ReadonlySet<Collection> = new Set<Collection>([
 export type Category =
   | "course-thumbnail"
   | "course-illustration"
-  /** A risograph band placed beside a passage inside a lesson, rather than at
-   *  the top of one. Generated at 2:1 (`meta.sizes`), and the only category
-   *  that is not in the isometric house style — see lib/illustrationPrompt.ts. */
+  /** Risograph band beside a passage inside a lesson; 2:1, the only category
+   *  not in the isometric house style (see lib/illustrationPrompt.ts). */
   | "course-inline"
   | "interview-thumbnail"
   | "interview-illustration"

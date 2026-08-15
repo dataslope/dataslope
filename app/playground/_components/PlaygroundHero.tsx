@@ -5,37 +5,14 @@ import { fadedbar } from "tabbied/patterns";
 import imageManifest from "@/lib/generated/images";
 
 /**
- * The full-bleed decorative band between the `/playground` title block and the
+ * Full-bleed decorative band between the `/playground` title block and the
  * language chooser: a `fadedbar` Tabbied pattern with the playground
- * illustration (a marmot, a fox, and a penguin on a slide, a seesaw, and a
- * climbing block) sitting over it.
- *
- * Full-bleed rather than inside `<main>`'s `max-w-6xl`, via the standard
- * left-1/2 / -translate-x-1/2 / w-screen escape, so the pattern runs edge to
- * edge while the artwork stays centered on the page's own axis.
- *
- * Color follows `FooterPattern`: theme-neutral low-alpha inks, with the
- * palette's first entry left transparent so the page color shows through.
- * Grey and blue are joined by brand yellow and green, which is the full
- * four-color brand set the illustrations use — the band sits directly under
- * the playground artwork, so the two now share a palette. Yellow carries a
- * higher alpha than the others because it is the lightest of the four and
- * washes out against white at the alpha the rest use.
- *
- * Motion is deliberately faster here than in the footer (2.5s against 18s).
- * The footer band is ambient texture a reader passes over; this one is the
- * page's hero, where a visible reseed reads as "this thing is alive" rather
- * than as a distraction. The inks are faint enough that a redraw registers
- * peripherally instead of pulling focus off the language grid. Tabbied still
- * skips ticks under `prefers-reduced-motion`, while the tab is hidden, and
- * while the element is outside the viewport, so the shorter interval costs
- * nothing when nobody is looking.
- *
- * The band is masked to fade out at both ends so it emerges from the page
- * rather than starting and stopping on hard edges.
- *
- * `aria-hidden` throughout: the pattern and the illustration are decoration,
- * and the heading above them already says what the page is.
+ * illustration over it. Palette follows `FooterPattern` (first entry
+ * transparent so the page color shows through; yellow gets a higher alpha
+ * because it washes out at the others'). Redraw is deliberately faster than
+ * the footer's (2.5s vs 18s) — Tabbied skips ticks under reduced-motion,
+ * hidden tabs, and off-screen elements, so it costs nothing when unseen.
+ * `aria-hidden` throughout: pure decoration.
  */
 
 const ART_SLUG = "playground-hero-cutout";
@@ -51,9 +28,8 @@ export function PlaygroundHero() {
       aria-hidden="true"
       className="pointer-events-none relative left-1/2 mt-6 h-[300px] w-screen -translate-x-1/2 select-none sm:mt-8"
     >
-      {/* The pattern occupies the lower 260px of the 300px band, which is the
-          nudge down: the 40px it leaves at the top is the room the artwork
-          overhangs into. */}
+      {/* Lower 260px of the 300px band; the 40px left at the top is the room
+          the artwork overhangs into. */}
       <div className="absolute inset-x-0 bottom-0 h-[260px] opacity-60 [mask-image:linear-gradient(to_right,transparent,black_18%,black_82%,transparent)] dark:opacity-50">
         <TabbiedPattern
           pattern={fadedbar}
@@ -70,12 +46,9 @@ export function PlaygroundHero() {
         />
       </div>
 
-      {/* The artwork sits on the pattern's baseline and is taller than the
-          pattern, so its top breaks the band's upper edge rather than sitting
-          inside it — the same "resting on the edge" treatment the pricing
-          cards give their marmots. A percentage height keeps the overhang
-          proportional at every breakpoint. It is centered on the page axis
-          rather than the viewport's, so it stays aligned with the heading. */}
+      {/* The artwork is taller than the pattern so its top breaks the band's
+          upper edge; the percentage height keeps the overhang proportional at
+          every breakpoint. */}
       <div className="absolute inset-x-0 bottom-0 flex h-[260px] items-end justify-center">
         {artSrc ? (
           // eslint-disable-next-line @next/next/no-img-element

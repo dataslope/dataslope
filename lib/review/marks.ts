@@ -1,31 +1,16 @@
 /**
  * The shared review queue: which generated artefacts an admin wants redone,
- * and the brief to redo each one from.
- *
- * There are two of these queues, one for illustrations and one for charts, and
- * they are the same queue twice: an id, a mark, a note, and a pair of
- * timestamps that turn "redrawn" and "signed off" into a round trip. Rather
- * than keep two copies of that logic, both wrappers
- * (`lib/illustrations/regenMarks.ts`, `lib/charts/regenMarks.ts`) bind this
- * module to their own table.
- *
- * Storage is D1 **`dataslope-illustrations`** through the `ILLUSTRATIONS_DB`
- * binding. Despite the name, that database is *authoring and review state*
- * rather than illustration state — deliberately separate from
- * `dataslope-auth`, so the whole thing can be read, dumped, or wiped by a
- * coding agent without touching accounts or sessions. A second review queue
- * belongs in it for exactly that reason.
- *
- * Table names come from this module's own constants, never from a caller's
- * string, because they are interpolated into SQL. D1 cannot bind an
- * identifier, so the only safe rule is that the set of tables is closed and
- * lives here.
+ * and the brief for each. Two queues (illustrations, charts) bind this module
+ * to their own table via lib/illustrations/regenMarks.ts and
+ * lib/charts/regenMarks.ts. Storage is the ILLUSTRATIONS_DB D1 database —
+ * authoring/review state, deliberately separate from `dataslope-auth`. Table
+ * names come only from this module's constants, never a caller's string: D1
+ * cannot bind an identifier, so the set of tables is closed and lives here.
  */
 import type { D1Database } from "@cloudflare/workers-types";
 
-/** Longest note stored. A note is the brief for a prompt or spec written from
- *  scratch, not the replacement itself, so a sentence is always enough and the
- *  cap keeps a whole queue one cheap read. */
+/** Longest note stored. A note is a one-sentence brief; the cap keeps a
+ *  whole queue one cheap read. */
 export const MAX_NOTE_LENGTH = 500;
 
 /** The review tables, as a closed set. `queueTable()` is the only way to reach
@@ -91,12 +76,9 @@ function toMark(row: MarkRow): RegenMark {
 }
 
 /**
- * Whether this artefact has been redone since anyone last signed it off, so
- * the gallery should surface it for a look.
- *
- * Comparing the timestamps (rather than treating approval as a flag) is what
- * makes a *second* redo of an already-approved artefact come back: the fresh
- * `regeneratedAt` overtakes the stale `approvedAt`.
+ * Redone since last sign-off? Comparing timestamps (rather than a flag) is
+ * what makes a second redo of an already-approved artefact come back: the
+ * fresh `regeneratedAt` overtakes the stale `approvedAt`.
  */
 export function isAwaitingApproval(mark: RegenMark): boolean {
   if (!mark.regeneratedAt) return false;
@@ -118,11 +100,9 @@ export function normalizeNote(raw: unknown): string {
 }
 
 /**
- * Every row in a queue, marked ones first and oldest mark first within each
- * group, which is the order a regeneration run should work through them.
- *
- * Cleared rows come back too: their note is the record of what was asked for
- * last time, and the gallery shows it in the input rather than losing it.
+ * Every row in a queue, marked ones first and oldest mark first (the order a
+ * regeneration run works through them). Cleared rows come back too: their
+ * note records what was asked for last time.
  */
 export async function listRegenMarks(
   db: D1Database,
@@ -157,17 +137,9 @@ export async function readMark(
 }
 
 /**
- * Set (or clear) the mark on one artefact, keeping the note either way.
- *
- * Upsert rather than insert-or-delete: unmarking something should not throw
- * away the note written about it, so the next review round starts from what
- * was already observed.
- *
- * The note is optional and stays empty when nothing is typed. Marking used to
- * substitute a canned brief for a blank note, which made the common case (flag
- * it, look at it later) write a paragraph nobody had asked for and then read
- * back as if someone had. An empty note now means what it says: flagged, no
- * reason given.
+ * Set (or clear) the mark on one artefact. Upsert rather than
+ * insert-or-delete: unmarking must not throw away the note. An empty note
+ * means flagged with no reason given — no canned brief is substituted.
  */
 export async function upsertRegenMark(
   db: D1Database,
@@ -214,13 +186,9 @@ export async function upsertRegenMark(
 }
 
 /**
- * Sign off a redo: stamp `approved_at` so the artefact stops showing as
- * "regenerated, waiting to be looked at" and its card goes back to normal.
- *
- * A no-op on something that was never regenerated (nothing to approve), which
- * is why this returns the row rather than assuming a state change. Approval
- * deliberately does not touch `marked`: an admin who wants another pass marks
- * it again, and that mark outranks the approval visually.
+ * Sign off a redo: stamp `approved_at`. A no-op on something never
+ * regenerated, hence returning the row rather than assuming a state change.
+ * Deliberately does not touch `marked`: a fresh mark outranks the approval.
  */
 export async function approveRegenMark(
   db: D1Database,
@@ -241,24 +209,11 @@ export async function approveRegenMark(
 
 /**
  * Ask for an artefact to be deleted from the repository, or withdraw the ask.
- *
- * The gallery cannot do the deletion. A chart is `charts/<slug>.mjs` and an
- * illustration is a file under `public/images/`, both of them in git and
- * compiled into the deployed bundle at build time, so removing one is a commit
- * and a commit is something a person or a coding agent makes. What the gallery
- * can do is record the decision, taken by the one person actually looking at
- * the artefact, and hand it to whoever is next in the repository. The SQL for
- * reading the queue back and clearing a request is in
- * `migrations/illustrations/0004_…`.
- *
- * The request is its own field rather than another value of `marked`, because
- * the two mean opposite things about the artefact's future: `marked` says redo
- * this one, and a deletion request says do not. An artefact can carry both at
- * once (queued for a redraw last month, judged not worth keeping today) and
- * the gallery shows the deletion, since it is the decision that supersedes.
- *
- * Upsert, so a chart with no review history can still be requested without a
- * mark being invented for it first.
+ * The gallery only records the decision — the artefacts live in git, so the
+ * deletion itself is a commit made by a person or agent. A separate field
+ * from `marked` because the two mean opposite futures and can coexist; the
+ * gallery shows the deletion, which supersedes. Upsert, so an artefact with
+ * no review history can still be requested.
  */
 export async function requestDeletion(
   db: D1Database,

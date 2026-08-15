@@ -1,22 +1,13 @@
-// One-time (re-runnable, idempotent) formatter for the authored
-// `starterCode` / `solutionCode` of the HTML/CSS/React learning widgets.
+// Idempotent formatter for the authored `starterCode` / `solutionCode` of
+// `<CodeBlock>` / `<ChallengeCard>` elements with adapter "web" or "react",
+// using the SAME @wasm-fmt/web_fmt the in-app "Format" button uses (2-space),
+// so clicking Format on a starter stays a no-op.
 //
-// Scope: `<CodeBlock>` and `<ChallengeCard>` elements whose `adapter` is
-// "web" or "react". Their per-file code lives in `files={[{ filename,
-// starterCode, solutionCode }]}` template literals; we reformat each with the
-// SAME @wasm-fmt/web_fmt the in-app "Format" button uses (web.tsx / react.tsx,
-// 2-space), so clicking Format on a starter stays a no-op.
-//
-// How it stays safe:
-//   * Targets are located via the MDX estree (the exact mechanism
-//     lib/remarkPreserveCodeIndent.ts trusts), never a regex, so the template
-//     literal boundaries are always correct.
-//   * Only single-quasi template literals are touched; any real `${…}`
-//     interpolation is skipped (reformatting would drop it).
-//   * The language is taken from each file's `filename` extension; unknown
-//     extensions are skipped.
-//   * Every changed file is re-compiled with @mdx-js/mdx before it is written;
-//     a compile failure aborts that file (no partial writes).
+// Safety: targets are located via the MDX estree, never a regex; template
+// literals with `${…}` interpolation are skipped (reformatting would drop
+// it); unknown filename extensions are skipped; every changed file is
+// re-compiled with @mdx-js/mdx before writing, and a compile failure aborts
+// that file.
 //
 // Usage:
 //   node scripts/format-content-code.mjs                 # dry run, all content

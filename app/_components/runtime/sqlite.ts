@@ -31,12 +31,10 @@ type SqliteWorkerResponse =
   | { id: number; ok: true; result: unknown }
   | { id: number; ok: false; error: string };
 
-// The playground owns at most one worker-backed engine at a time. Track it
-// module-wide so a new boot can terminate a predecessor that was never
-// disposed (or whose boot is still in flight): a leftover worker keeps the
-// workspace's exclusive opfs-sahpool access handles open, which makes the
-// next engine's OPFS acquisition fail with NoModificationAllowedError,
-// seen on dev StrictMode remounts and client-side route changes.
+// At most one worker-backed engine at a time, tracked module-wide so a new
+// boot can terminate an undisposed predecessor — a leftover worker holds
+// the exclusive opfs-sahpool handles and the next engine fails with
+// NoModificationAllowedError (StrictMode remounts, route changes).
 let activeWorker: Worker | null = null;
 let rejectActivePending: ((reason: Error) => void) | null = null;
 

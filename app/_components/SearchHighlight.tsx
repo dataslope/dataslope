@@ -1,35 +1,16 @@
 "use client";
 
 /**
- * Paints the searched words on a lesson a reader arrived at from the search
- * dialog, browser-find style.
+ * Paints the searched words (the `?hl=…` tokens /api/search puts on result
+ * URLs) on the arrived-at lesson via the CSS Custom Highlight API — no DOM
+ * mutation, so CodeMirror, KaTeX and hydration are undisturbed; browsers
+ * without the API get the page unchanged.
  *
- * `/api/search` puts the sanitised query tokens on every result URL as
- * `?hl=…` (see lib/search/ranking.ts). This component reads them back and
- * marks every word starting with one of those tokens via the CSS Custom
- * Highlight API: ranges in `CSS.highlights`, painted by the
- * `::highlight(ds-search-match)` rule in docs.css. No DOM mutation, so
- * CodeMirror, KaTeX and hydration are never disturbed; browsers without the
- * API (or visitors who arrived without `?hl=`) get exactly the page they had
- * before.
- *
- * Prefix matching (not whole-word) is deliberate: FTS5 porter-stems its
- * index and prefix-matches the final token, so the query "reason" may have
- * matched the page's "reasons"; highlighting only exact words would light up
- * nothing on the very page the API said matches.
- *
- * Late-mounting components (`<MultipleChoice>` renders its markdown client
- * side) add their text after the first pass, so mutations re-trigger the
- * pass during the same settle window HashScrollFix uses; after that the
- * highlights stay put until navigation.
- *
- * Escape dismisses them, the way it leaves a browser's find bar. Highlights
- * are a *view* of a search, not part of the lesson, and a reader who has found
- * their answer is otherwise stuck with a yellow-flecked page until they
- * navigate away: the API paints every prefix match, so a common word can light
- * up a page dozens of times. Dismissing also drops `?hl=` from the URL, so a
- * reload, a copied link or a step back through history does not repaint what
- * was just dismissed.
+ * Prefix matching is deliberate: FTS5 porter-stems and prefix-matches, so
+ * the query "reason" may have matched the page's "reasons" and exact-word
+ * highlighting would light up nothing. Mutations re-trigger the pass during
+ * a settle window for late-mounting content. Escape dismisses the highlights
+ * and drops `?hl=` from the URL so reload/history don't repaint them.
  */
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";

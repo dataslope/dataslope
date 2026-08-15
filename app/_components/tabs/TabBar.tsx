@@ -31,22 +31,15 @@ export interface TabBarProps {
   onCloseTab?: (id: string) => void;
   onAddTab?: () => void;
   onRenameTab?: (id: string, newLabel: string) => void;
-  /**
-   * Optional handler that receives the post-drop tab order. When
-   * provided, the bar mounts a `DndContext` + horizontal
-   * `SortableContext` so users can drag tabs to reorder them. Pass
-   * `undefined` to keep the bar non-draggable (cheaper render path).
-   */
+  /** Receives the post-drop tab order; providing it mounts the DnD contexts
+   *  for drag-to-reorder. `undefined` keeps the bar non-draggable (cheaper). */
   onReorderTabs?: (nextTabs: TabDescriptor[]) => void;
   /** Optional className appended to the root tabbar element. */
   className?: string;
 }
 
-/**
- * Generic, content-agnostic tab strip. The bar renders only the strip
- * and "+" button, the surrounding component is responsible for
- * rendering the active tab's content.
- */
+/** Generic tab strip: renders only the strip and "+" button; the host
+ *  renders the active tab's content. */
 export function TabBar({
   tabs,
   activeTabId,
@@ -60,9 +53,8 @@ export function TabBar({
   const cls = ["playground-tabbar", className].filter(Boolean).join(" ");
   const sortable = !!onReorderTabs;
 
-  // Keep the active tab visible in the now horizontally-scrollable strip
-  //, e.g. after opening a new tab (the "+" button) or switching tabs
-  // from elsewhere (mobile pane bar, programmatic activation).
+  // Keep the active tab visible in the scrollable strip (new tab opened,
+  // or activation from elsewhere).
   const stripRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = stripRef.current?.querySelector<HTMLElement>(
@@ -151,9 +143,8 @@ function DndStrip({
     (event: DragStartEvent) => {
       const id = String(event.active.id);
       setDraggingId(id);
-      // Mirror VSCode: dragging a tab to reorder it should also activate
-      // it. Do this on drag start so the editor switches as soon as the
-      // user picks the tab up, not only on drop.
+      // Mirror VSCode: dragging a tab also activates it, on drag start so
+      // the editor switches as soon as the tab is picked up.
       if (id !== activeTabId) onSelectTab(id);
     },
     [activeTabId, onSelectTab],
@@ -225,9 +216,8 @@ const TabItem = memo(function TabItem({
   const closedRef = useRef(false);
   const renameInputRef = useRef<HTMLInputElement>(null);
 
-  // Truncation tooltip: when the label overflows the tab, show the
-  // full text in a popover after a short hover delay. Mirrors the
-  // SQL playground's previous SqlTab behaviour.
+  // Truncation tooltip: overflowing labels show full text in a popover
+  // after a short hover delay.
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [tooltipMounted, setTooltipMounted] = useState(false);
   const titleRef = useRef<HTMLSpanElement>(null);
@@ -240,9 +230,8 @@ const TabItem = memo(function TabItem({
   }, []);
   useEffect(() => clearHoverTimer, [clearHoverTimer]);
 
-  // useSortable must be called unconditionally; when `sortable` is
-  // false we just don't apply its props/refs, so the tab renders as a
-  // static button.
+  // useSortable must be called unconditionally; when `sortable` is false its
+  // props/refs just aren't applied.
   const sortableState = useSortable({ id: tab.id, disabled: !sortable });
   const dragStyle: React.CSSProperties = sortable
     ? {
@@ -287,10 +276,9 @@ const TabItem = memo(function TabItem({
     closedRef.current = false;
   }, [tab.id]);
 
-  // Focus the rename input when the dialog opens, and select either the
-  // full label or just the stem (the bit before the last `.`) so the
-  // user can immediately start typing. The Dialog mounts asynchronously
-  //, wait one frame so the input is in the DOM before we touch it.
+  // Focus the rename input on open and select the full label or just the
+  // stem. The Dialog mounts asynchronously — wait one frame so the input is
+  // in the DOM.
   useEffect(() => {
     if (!renameOpen) return;
     const id = window.requestAnimationFrame(() => {
@@ -481,9 +469,7 @@ const TabItem = memo(function TabItem({
   );
 });
 
-/** Lightweight clone rendered inside `DragOverlay` while a tab is
- *  being dragged. No interactive affordances, DnD-kit handles the
- *  drop animation. */
+/** Lightweight clone rendered inside `DragOverlay` while a tab is dragged. */
 function TabOverlay({
   tab,
   active,

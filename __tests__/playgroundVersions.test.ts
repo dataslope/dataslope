@@ -1,18 +1,9 @@
-// The `/playground` hub advertises a version caption per language
-// (`LanguageCategories.tsx`), and each runtime adapter separately declares its
-// own `runtimeInfo.version`, shown in the playground's runtime panel. Nothing
-// tied the two together, and by 2026-08 the hub had drifted badly: it claimed
-// Python 3.12 against a Pyodide that ships 3.14, Java 21 against a CheerpJ
-// setup whose bundled `tools.jar` is a Java 8 `javac`, React 18.3 against
-// REACT_VERSION 19.2.8, SQLite 3.46 against 3.53, and DuckDB 1.1 against 1.32.
-//
+// The /playground hub advertises a version caption per language, and each
+// adapter separately declares runtimeInfo.version; nothing tied the two
+// together and they drifted badly (e.g. Python 3.12 vs Pyodide's 3.14).
 // These tests re-derive each caption from the source the runtime actually
-// loads, so upgrading a runtime and forgetting the hub fails here rather than
-// shipping a wrong number on a marketing surface.
-//
-// The captions are intentionally short (a major.minor, or a dialect name), so
-// the rule is "the caption is a prefix of the authoritative version", not
-// string equality.
+// loads. Captions are short (major.minor or dialect), so the rule is "caption
+// is a prefix of the authoritative version", not equality.
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import path from "node:path";

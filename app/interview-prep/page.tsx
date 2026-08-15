@@ -1,15 +1,7 @@
 /**
- * The `/interview-prep` landing page: a centered header over a grid of role
- * tracks. Implements the "4a" mockup from the interview-prep redesign and
- * replaces the old MDX index (`content/interview/index.mdx`) that rendered
- * inside the Fumadocs docs chrome.
- *
- * Structured exactly like `/courses` (`app/courses/page.tsx`): the shared
- * home-page nav/footer wrap a `max-w-[1120px]` main, the centered title block
- * matches the pricing/courses header, and the grid of cards is delegated to a
- * catalog component. The role/topic docs pages still live under
- * `app/interview-prep/[...slug]/`, wrapped in `DocsLayout` there; this bare
- * `/interview-prep` route is the catalog, so it is not.
+ * The `/interview-prep` landing page: a centered header over the role-track
+ * catalog, structured like `/courses`. The role/topic docs pages live under
+ * `app/interview-prep/[...slug]/` with docs chrome; this catalog route is not.
  */
 import "@/app/tailwind.css";
 import "@/app/home.css";
@@ -27,8 +19,7 @@ const PAGE_DESCRIPTION =
   "Free, hands-on interview prep for six data and software roles. Every SQL, coding, and concept question runs live in your browser, no setup, no sign-up.";
 
 export const metadata: Metadata = {
-  // A bare string here lets the root layout's "%s · DataSlope" template render
-  // the tab title as "Interview Prep · DataSlope".
+  // Bare string so the root template renders "Interview Prep · DataSlope".
   title: "Interview Prep",
   description: PAGE_DESCRIPTION,
   alternates: { canonical: "/interview-prep" },
@@ -48,16 +39,14 @@ export const metadata: Metadata = {
   },
 };
 
-// Applies the persisted light/dark choice before first paint (same contract as
-// the home + courses pages) so a returning dark-mode visitor never sees a
-// light flash.
+// Applies the persisted light/dark choice before first paint (same contract
+// as the home page) so returning dark-mode visitors see no light flash.
 const THEME_BOOTSTRAP = `(function(){try{var d=localStorage.getItem('theme')==='dark';var r=document.documentElement;r.classList.toggle('dark',d);r.classList.toggle('light',!d);}catch(e){}})();`;
 
 export default async function InterviewPrepPage() {
   const tracks = await getInterviewTracks();
 
-  // BreadcrumbList + an ItemList of the role tracks, the SEO the old MDX index
-  // carried, rebuilt for the catalog.
+  // BreadcrumbList + an ItemList of the role tracks.
   const structuredData = [
     breadcrumbLd([{ name: "Interview Prep", url: absUrl("/interview-prep") }]),
     {

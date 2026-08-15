@@ -1,40 +1,10 @@
 "use client";
 
 /**
- * MDX-friendly wrapper around `<ChallengeCard>`.
- *
- * MDX content can't import TypeScript modules, so this component
- * accepts the adapter as a string id (e.g. `"python"`) and resolves it
- * to the corresponding adapter instance, mirroring `<MdxCodeBlock>`.
- *
- * Usage in MDX (instructions can be a markdown string or a JSX node;
- * every card passes a `files` array, each file carrying its own
- * `initCode`, `starterCode`, and optional `solutionCode`):
- * ```mdx
- * <ChallengeCard
- *   adapter="python"
- *   title="Summarize Sales by Category"
- *   instructions={`You have a DataFrame called \`df\` with sales data.
- *
- * Group by \`category\` and compute totals.`}
- *   files={[
- *     {
- *       filename: "main.py",
- *       initCode: `import pandas as pd\ndf = pd.DataFrame(...)`,
- *       starterCode: `summary = None`,
- *       solutionCode: `summary = df.groupby("category").sum()`,
- *     },
- *   ]}
- *   tests={[
- *     {
- *       id: "summary_exists",
- *       name: "`summary` exists",
- *       description: "A variable named `summary` is defined",
- *       code: `assert summary is not None`,
- *     },
- *   ]}
- * />
- * ```
+ * MDX-friendly wrapper around `<ChallengeCard>`. MDX content can't import
+ * TypeScript modules, so this accepts the adapter as a string id (e.g.
+ * `"python"`) and resolves it to the adapter instance, mirroring
+ * `<MdxCodeBlock>`.
  */
 
 import ChallengeCard, { type ChallengeCardProps } from "./ChallengeCard";

@@ -18,16 +18,12 @@ type SqliteWorkerResponse =
 
 let enginePromise: ReturnType<typeof createSqliteEngineInProcess> | null = null;
 
-/** Install the SAH Pool VFS once per worker.  The pool's `directory`
- *  defaults to `".opfs-sahpool"`, which keeps its metadata files clear
- *  of the user-facing `workspaces/` tree.  The capacity is sized to
- *  comfortably cover a handful of workspaces' database + journal files
- *  in the same worker (worst case ~3 files per DB). */
+/** Install the SAH Pool VFS once per worker. The default pool directory
+ *  (".opfs-sahpool") keeps metadata clear of the workspaces/ tree; the
+ *  capacity covers several workspaces' DB + journal files (~3 per DB). */
 let sahPoolPromise: Promise<unknown> | null = null;
 async function ensureSAHPoolVfs(): Promise<boolean> {
-  // OPFS / SAH access handles are required.  Both checks are inside a
-  // try/catch because the SAH Pool installer itself throws on
-  // browsers that lack the feature.
+  // try/catch: the installer itself throws on browsers without OPFS/SAH.
   try {
     if (typeof navigator === "undefined" || !("storage" in navigator)) {
       return false;
@@ -51,8 +47,7 @@ async function ensureSAHPoolVfs(): Promise<boolean> {
     await sahPoolPromise;
     return true;
   } catch (err) {
-    // Reset so a later worker call could in principle retry, though in
-    // practice OPFS support does not change at runtime.
+    // Reset so a later call could retry.
     sahPoolPromise = null;
     if (typeof console !== "undefined") {
       console.warn("SQLite OPFS SAH Pool unavailable; falling back to in-memory:", err);
@@ -61,10 +56,8 @@ async function ensureSAHPoolVfs(): Promise<boolean> {
   }
 }
 
-/** Compute the OPFS file path used by the SAH Pool VFS for a given
- *  workspace.  The SAH Pool VFS treats this string as an opaque key
- *  inside its own pool directory, so the leading-slash + nested-path
- *  form is purely for human readability when inspecting OPFS.  */
+/** OPFS file path for a workspace. The SAH Pool VFS treats it as an
+ *  opaque key; the nested-path form is only for human readability. */
 function workspaceDbFilename(workspaceId: string): string {
   return `/workspaces/${workspaceId}/sqlite.db`;
 }
@@ -78,11 +71,8 @@ async function resolveOpenOptions(
   return {
     filename: workspaceDbFilename(workspaceId),
     vfs: "opfs-sahpool",
-    // The sample seed must only run on the first open of a brand-new
-    // database file. `sqlite-core` decides this by inspecting
-    // sqlite_master after the file is opened (see `build()` in
-    // sqlite-core.ts); we keep `skipSeed` unset here so the engine
-    // applies its own first-open detection.
+    // `skipSeed` stays unset so the engine applies its own first-open
+    // detection (see build() in sqlite-core.ts).
   };
 }
 
@@ -99,10 +89,8 @@ self.addEventListener("message", async (ev: MessageEvent<SqliteWorkerRequest>) =
       enginePromise = createSqliteEngineInProcess(initialSampleId, openOptions);
     }
     const engine = await enginePromise!;
-    // The first `loadSampleDatabase` call already built the engine
-    // against the requested sample. Re-dispatching it would wipe and
-    // reseed the (possibly already-populated) OPFS database, so we
-    // short-circuit and return the active sample metadata directly.
+    // The first loadSampleDatabase already built the engine; re-dispatch
+    // would wipe and reseed a possibly-populated OPFS database.
     if (firstCall && method === "loadSampleDatabase") {
       const result = engine.activeSample();
       self.postMessage(

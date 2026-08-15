@@ -41,9 +41,8 @@ import {
 } from "../sqlCompletion";
 import { splitSqlStatements, statementAtCursor } from "../utils/sqlAnalysis";
 
-// 75 ms keeps local schema suggestions feeling immediate while still
-// coalescing rapid typing before recomputing completions. CodeMirror's
-// default is 100 ms.
+// 75 ms keeps schema suggestions feeling immediate while coalescing rapid
+// typing (CodeMirror's default is 100 ms).
 const AUTOCOMPLETE_DELAY_MS = 75;
 
 export interface SqlEditorCompartments {
@@ -68,23 +67,17 @@ export interface CreateSqlEditorExtensionsOptions {
   initialSchema?: SqlCompletionSchema;
   initialTheme: string;
   initialWordWrap: boolean;
-  // The editor calls these on document / selection changes. The host
-  // typically wires them to refs that always reflect the freshest
-  // callbacks so the editor doesn't have to be torn down when a tab
-  // switch changes which "run" function should fire.
+  // Called on document / selection changes. Hosts typically wire these to
+  // refs so the editor needn't be torn down when a tab switch changes them.
   onDocChange: (code: string) => void;
   onSelectionChange: (hasSelection: boolean) => void;
   onRunSelection: (text: string) => void;
   onRunAll: () => void;
 }
 
-// Stage 5.3, `@codemirror/lang-sql` is loaded on demand so it lives in
-// its own chunk instead of bloating each SQL playground's main bundle.
-// The chunk is small enough that fetching it in parallel with engine
-// boot keeps the user-visible editor mount instant: the editor renders
-// immediately with no syntax highlighting / lang-aware completions and
-// the lang compartment is reconfigured as soon as the dynamic import
-// resolves (typically before the user even finishes the database boot).
+// `@codemirror/lang-sql` is loaded on demand so it lives in its own chunk.
+// The editor mounts instantly without highlighting; the lang compartment is
+// reconfigured as soon as the dynamic import resolves.
 type LangSqlModule = typeof import("@codemirror/lang-sql");
 let _langSqlPromise: Promise<LangSqlModule> | null = null;
 function loadLangSql(): Promise<LangSqlModule> {
@@ -99,10 +92,8 @@ export function ensureLangSqlLoaded(): Promise<LangSqlModule> {
   return loadLangSql();
 }
 
-/** Returns the dialect-specific argument for `@codemirror/lang-sql`'s
- *  `sql({ dialect })` factory. DuckDB has no native dialect descriptor,
- *  so we fall back to undefined (which lets lang-sql use its default
- *  generic SQL grammar). */
+/** Dialect argument for lang-sql's `sql({ dialect })`. DuckDB has no native
+ *  descriptor, so it falls back to the generic SQL grammar. */
 function pickLangDialect(mod: LangSqlModule, dialect: SqlDialect) {
   if (dialect === "postgres") return mod.PostgreSQL;
   if (dialect === "sqlite") return mod.SQLite;
@@ -117,25 +108,16 @@ export function makeSqlAutocompletionExtension(
     activateOnTyping: true,
     activateOnTypingDelay: AUTOCOMPLETE_DELAY_MS,
     closeOnBlur: true,
-    // The extension's built-in keymap binds Enter → acceptCompletion at
-    // the highest precedence, which would shadow the Enter-less keymap
-    // assembled in `createSqlEditorExtensions` and hijack newlines
-    // whenever the (eagerly opened) popup is visible. We register the
-    // completion keys ourselves instead.
+    // The built-in keymap binds Enter → acceptCompletion at highest
+    // precedence, hijacking newlines while the popup is visible; the
+    // completion keys are registered manually instead.
     defaultKeymap: false,
     override: [createSqlCompletionSource(schema, { dialect })],
   });
 }
 
-/** Build the `@codemirror/lang-sql` extension for a reconfigure
- *  dispatch (when the schema or dialect changes after the editor is
- *  mounted). The optional `schema` is the lang-sql shape used for
- *  built-in completions, it's the same `Record<table, columns>`
- *  the SQLite playground has always passed.
- *
- *  Returns a Promise so callers can re-use the lazy-loaded chunk
- *  without re-importing it. Each playground caches the resolved
- *  module via the shared `loadLangSql` promise above. */
+/** Build the lang-sql extension for a reconfigure dispatch. Returns a
+ *  Promise so callers share the lazy-loaded chunk via `loadLangSql`. */
 export async function makeSqlLangExtension(
   dialect: SqlDialect,
   schema?: Record<string, string[]>,
@@ -148,18 +130,10 @@ export async function makeSqlLangExtension(
   });
 }
 
-/** Build the canonical extension list every SQL playground needs.
- *
- *  This consolidates ~80 lines that were duplicated across the SQLite,
- *  Postgres, and DuckDB playgrounds. The four CodeMirror compartments
- *  (lang / completion / theme / wrap) are passed in by the caller so
- *  it can hold onto them for later `.reconfigure(...)` dispatches
- *  (schema updates, theme toggles, word-wrap toggles).
- *
- *  The `lang` compartment is intentionally seeded with an empty
- *  extension. The caller is expected to dispatch a reconfigure with
- *  the resolved `makeSqlLangExtension(...)` once it lands, this lets
- *  us defer the lang-sql chunk without blocking editor mount. */
+/** Canonical extension list shared by every SQL playground. Compartments are
+ *  passed in so the caller can `.reconfigure(...)` later. The `lang`
+ *  compartment is intentionally seeded empty: the caller dispatches the
+ *  resolved `makeSqlLangExtension(...)` so lang-sql never blocks mount. */
 export function createSqlEditorExtensions(
   opts: CreateSqlEditorExtensionsOptions,
 ): Extension[] {
@@ -210,10 +184,7 @@ export function createSqlEditorExtensions(
     }),
     keymap.of([
       {
-        // Primary run action (matches the toolbar's primary button): run the
-        // selection if there is one, otherwise run every statement. Use
-        // Mod-Shift-Enter for the secondary action (run just the statement under
-        // the cursor in a multi-statement document).
+        // Primary run action: run the selection if any, else every statement.
         key: "Mod-Enter",
         run: (view) => {
           const sel = view.state.selection.main;
@@ -226,9 +197,8 @@ export function createSqlEditorExtensions(
         },
       },
       {
-        // Secondary run action (the toolbar dropdown's "other" option): in a
-        // multi-statement document with no selection, run just the statement
-        // under the cursor (the standard IDE behavior); otherwise run all.
+        // Secondary run action: with no selection in a multi-statement doc,
+        // run just the statement under the cursor; otherwise run all.
         key: "Mod-Shift-Enter",
         run: (view) => {
           const sel = view.state.selection.main;
@@ -252,14 +222,10 @@ export function createSqlEditorExtensions(
         },
       },
       ...closeBracketsKeymap,
-      // Completion keys must come before `defaultKeymap`, otherwise
-      // ArrowUp/ArrowDown would move the cursor instead of the popup
-      // selection. Enter is removed so it always inserts a newline,
-      // Tab accepts the active completion instead (falling through to
-      // indentWithTab when no completion is shown). This only works
-      // because the autocompletion extension's own keymap is disabled
-      // (`defaultKeymap: false` above); that built-in copy binds Enter
-      // at the highest precedence and would override anything here.
+      // Completion keys must precede `defaultKeymap` so ArrowUp/Down move the
+      // popup selection, not the cursor. Enter is removed so it always
+      // inserts a newline; Tab accepts the completion instead. Only works
+      // because the extension's own keymap is disabled (defaultKeymap: false).
       ...completionKeymap.filter((b) => b.key !== "Enter"),
       { key: "Tab", run: acceptCompletion },
       ...defaultKeymap,

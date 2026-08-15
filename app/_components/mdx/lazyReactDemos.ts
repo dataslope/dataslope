@@ -1,19 +1,11 @@
 "use client";
 
 /**
- * Lazily-loaded versions of the React-course demo components.
- *
- * `"use client"` is load-bearing, for the reason spelled out in
- * `lazyWidgets.ts`: an `import()` only becomes a split point when it is
- * evaluated inside the client graph. These 33 demos are spread into the MDX
- * component map for EVERY lesson, so statically imported they rode along on
- * every Python, SQL and C++ page that will never render one.
- *
- * They all resolve to the same module, so the split costs a single shared
- * async chunk that only a React-course lesson ever fetches.
- *
- * `reactDemoComponents.ts` is what collects these into the spreadable object
- * the component map wants; see that file for why the object cannot live here.
+ * Lazily-loaded versions of the React-course demo components. `"use client"`
+ * is load-bearing (see lazyWidgets.ts): an `import()` only splits inside the
+ * client graph. All demos resolve to one shared async chunk that only a
+ * React-course lesson fetches. reactDemoComponents.ts collects these into the
+ * spreadable object the component map wants.
  */
 
 import { lazyWidget } from "./lazyWidget";

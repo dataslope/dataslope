@@ -1,15 +1,9 @@
 /**
- * A tiny in-tab pub/sub for "the current playground's workspace content just
- * changed." Playgrounds emit a bare pulse from their existing edit-persist
- * sinks (the code editor's persist listener, the SQL families' `saveTabs`);
- * the auto-sync hook (useWorkspaceAutoSync) subscribes and debounces a cloud
- * backup off it.
- *
- * A bare pulse (no id) is deliberate: exactly one playground is mounted per
- * document, so a pulse always means "the workspace on screen changed," and the
- * subscriber already knows which workspace that is. Keeping this a plain module
- * (no React, no "use client") lets the low-level tab-storage utils import it
- * without dragging the client/runtime graph along.
+ * Tiny in-tab pub/sub for "the current workspace's content changed";
+ * useWorkspaceAutoSync debounces a cloud backup off it. A bare pulse (no id)
+ * is deliberate: exactly one playground is mounted per document. Kept a
+ * plain module (no React/"use client") so low-level tab-storage utils can
+ * import it without dragging the client graph along.
  */
 
 type Listener = () => void;

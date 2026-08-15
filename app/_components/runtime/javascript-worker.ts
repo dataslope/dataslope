@@ -1,22 +1,8 @@
 /// <reference lib="webworker" />
 
-// Web Worker that executes JavaScript code via almostnode, a browser-
-// native Node.js runtime. The worker accepts multi-file workspaces,
-// stages them into almostnode's VirtualFS, and runs the entry file with
-// CommonJS semantics (`require()`, `module.exports`, 40+ Node module
-// shims like `fs`, `path`, `http`, `events`).
-//
-// Protocol
-//   Main → Worker  { kind: "prepare-fs"; id: number;
-//                    files: Array<[path, Uint8Array]> }
-//                  { kind: "run"; id: number; code: string;
-//                    entryPath: string }
-//   Worker → Main  { kind: "ready" }
-//                  { kind: "prepare-fs-done"; id: number }
-//                  { kind: "prepare-fs-error"; id: number; message: string }
-//                  { kind: "stdout"; id: number; content: string }
-//                  { kind: "stderr"; id: number; content: string }
-//                  { kind: "done"; id: number }
+// Web Worker executing JavaScript via almostnode: multi-file workspaces
+// stage into VirtualFS and the entry runs with CommonJS semantics.
+// Protocol: see In/OutMessage below.
 
 import { AlmostNodeRunner, normalizeVfsPath } from "./almostnode-worker-shared";
 
@@ -38,9 +24,8 @@ function post(msg: OutMessage): void {
   self.postMessage(msg);
 }
 
-// One runner shared across messages. It hands each run a VirtualFS that
-// reflects only that run's files, so the entry/file state from one
-// block's run can't leak into the next on this long-lived worker.
+// One runner shared across messages; each run gets a VFS with only that
+// run's files, so state can't leak between blocks on this long-lived worker.
 const runner = new AlmostNodeRunner();
 
 async function handlePrepareFs(
@@ -63,12 +48,8 @@ async function handleRun(
 ): Promise<void> {
   const entryVfsPath = normalizeVfsPath(entryPath);
 
-  // The `code` argument is always the authoritative entry source: every
-  // caller passes the entry file's exact bytes here, and in multi-file
-  // mode stages those same bytes via prepare-fs. Using it directly (over
-  // whatever happens to sit at `entryVfsPath`) is what guarantees a
-  // single-file run executes its own code rather than the previous
-  // block's leftover entry file.
+  // `code` is always the authoritative entry source; using it directly
+  // guarantees a single-file run never executes a leftover entry file.
   await runner.run(entryVfsPath, () => code, {
     stdout: (content) => post({ kind: "stdout", id, content }),
     stderr: (content) => post({ kind: "stderr", id, content }),
@@ -77,8 +58,7 @@ async function handleRun(
   post({ kind: "done", id });
 }
 
-// Serialise concurrent run requests so async user code can't interleave
-// across runs, matches the behaviour of the legacy worker.
+// Serialise requests so async user code can't interleave across runs.
 let queue: Promise<unknown> = Promise.resolve();
 function enqueue(task: () => Promise<void>): void {
   queue = queue.then(task, task).catch(() => {});

@@ -37,23 +37,11 @@ const BRAND_CYCLE = [
 ];
 
 /**
- * The ⚡ 🔓 💯 separating this line's phrases, as images rather than characters.
- *
- * Written as literal emoji, these rendered as whatever glyph the visitor's OS
- * ships — so the line looked materially different on Windows and macOS, and the
- * reviewer preferred the Windows drawing. Windows renders them from Segoe UI
- * Emoji, which is proprietary and cannot be embedded on a site. Microsoft's
- * Fluent Emoji is the same design language open-sourced under MIT, so these are
- * its 3D variants, self-hosted: one drawing, identical on every platform.
- *
- * They live in `public/emoji/` rather than `public/images/`, deliberately —
- * `scripts/build-images.mjs` prunes anything under `public/images` that is not
- * in its generated manifest, and these are third-party assets it knows nothing
- * about. Attribution is in THIRD-PARTY-NOTICES.md.
- *
- * Sized in `em` so they scale with the marquee's responsive font size, and
- * `aria-hidden` because they are punctuation between phrases, not content — the
- * line already reads correctly as "Interactive No sign-up Free".
+ * Separator emoji as self-hosted images (MIT Fluent Emoji 3D) so they render
+ * identically on every platform. They live in `public/emoji/`, deliberately
+ * not `public/images/`, which `scripts/build-images.mjs` prunes to its
+ * manifest. Sized in `em` to track the responsive font size; `aria-hidden`
+ * because they are punctuation, not content.
  */
 function MarqueeEmoji({ name }: { name: string }) {
   return (
@@ -103,23 +91,14 @@ function RosterSegment() {
 }
 
 /**
- * A marquee row scrolled by a requestAnimationFrame loop writing 2D
- * `translateX` styles, deliberately NOT a CSS `animation`.
- *
- * Why not the shared <Marquee> (CSS keyframes): an actively-animating CSS
- * transform promotes each row to its own compositor layer, and at text-7xl
- * those layers are thousands of pixels wide, clipped only at composite time.
- * Chromium has repeatedly drawn stale tiles of those layers with the clip
- * missing (giant marquee glyphs "bleeding" across the page around the sticky
- * header — see PRs #599/#602, which tried to pin the layer tree down with
- * compositor hints and didn't hold). JS per-frame style writes are not a
- * compositing trigger, so these rows paint inside the clipped wrapper on the
- * main thread and the unclipped pixels never exist in any GPU buffer.
- *
- * The loop advances by wall-clock delta (capped so a background-tab resume
- * doesn't jump), wraps at one segment width for a seamless loop, pauses
- * while the hero is offscreen, and leaves the row static under
- * prefers-reduced-motion.
+ * A marquee row scrolled by a rAF loop writing `translateX`, deliberately NOT
+ * a CSS animation: an animating CSS transform promotes each row to a huge
+ * compositor layer, and Chromium has repeatedly drawn stale tiles of those
+ * layers with the clip missing (marquee glyphs bleeding across the page).
+ * JS style writes are not a compositing trigger, so the unclipped pixels
+ * never exist in any GPU buffer. The loop advances by wall-clock delta
+ * (capped), wraps at one segment width, pauses offscreen, and stays static
+ * under prefers-reduced-motion.
  */
 function JsMarquee({
   children,
@@ -148,8 +127,7 @@ function JsMarquee({
     let last = 0;
     let offset = 0;
     let running = false;
-    // Re-read on every wrap; cheap, and it tracks font-load reflows without
-    // a ResizeObserver.
+    // Re-read on every wrap: tracks font-load reflows without a ResizeObserver.
     let segmentWidth = segment.offsetWidth || 1;
 
     const step = (now: number) => {
@@ -186,10 +164,9 @@ function JsMarquee({
     };
   }, [secondsPerLoop, reverse]);
 
-  // Two copies of the segment give the seamless loop; each segment is wider
-  // than the clipped container, so two always cover it. The reverse row is
-  // pre-shifted one segment left (see `step`) so it scrolls the other way
-  // without ever exposing its trailing edge.
+  // Two copies of the segment give the seamless loop. The reverse row is
+  // pre-shifted one segment left (see `step`) so it never exposes its
+  // trailing edge.
   return (
     <div className={`overflow-hidden ${className}`}>
       <div ref={trackRef} className="flex w-max">
@@ -205,15 +182,12 @@ function JsMarquee({
 }
 
 export function HeroMarquee() {
-  // [contain:paint] clips this wrapper's painting as a unit, and
-  // `will-change-transform` keeps it on one stable layer through the BlurFade
-  // entrance hand-off. With the rows now painted (not composited — see
-  // JsMarquee), any stale raster is at worst a correctly-clipped copy of
-  // this 768px-wide box, never an unclipped row.
+  // [contain:paint] clips painting as a unit; `will-change-transform` keeps
+  // one stable layer through the BlurFade hand-off, so any stale raster is
+  // at worst a correctly-clipped copy of this box.
   return (
     <div className="relative mx-auto w-full max-w-3xl select-none overflow-hidden py-2 will-change-transform [contain:paint]">
-      {/* Both lines share one font-size scale so they read as a matched pair. */}
-      {/* Line 1, the language roster, scrolling left. */}
+      {/* Line 1: the language roster, scrolling left. */}
       <JsMarquee
         secondsPerLoop={42}
         className="py-1 text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl"
@@ -221,7 +195,7 @@ export function HeroMarquee() {
         <RosterSegment />
       </JsMarquee>
 
-      {/* Line 2, the tagline, scrolling the other way, in blue-gray-100. */}
+      {/* Line 2: the tagline, scrolling the other way. */}
       <JsMarquee
         secondsPerLoop={30}
         reverse
@@ -237,8 +211,7 @@ export function HeroMarquee() {
         </span>
       </JsMarquee>
 
-      {/* Soft edge fades so the scroll dissolves into the page background
-          (kept in sync with HomeClient's bg: white / #121212). */}
+      {/* Edge fades; keep in sync with HomeClient's bg (white / #121212). */}
       <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white to-transparent dark:from-[#121212]" />
       <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white to-transparent dark:from-[#121212]" />
     </div>

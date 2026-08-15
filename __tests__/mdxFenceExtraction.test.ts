@@ -1,22 +1,10 @@
 // Guards which `<Tag …/>` occurrences the sweeps' shared extractor treats as
-// real components (`eachTag` in scripts/lib/mdx-blocks.mjs).
-//
-// Two opposite mistakes are pinned here, because each one is invisible in a
-// green sweep:
-//
-//   • Counting a tag that only appears inside a ```jsx fence. The eleven
-//     `content/fumadocs-dev/*` demo pages print each example's own MDX source
-//     below the live example, so every item on them existed twice. Nothing
-//     noticed until `check:browser` compared the extractor's count with what a
-//     real browser found on the page and read the gap as half the page having
-//     gone unswept.
-//   • Mistaking an inline code span for a fence. Triple backticks are also
-//     legal *inline* — pattern-matching.mdx writes
-//     ``` `${current}:${emergency}` ``` mid-sentence — and treating that as an
-//     opening fence silently swallowed the next real `<ChallengeCard>`.
-//
-// Both are exercised against fixtures written to a temp dir rather than
-// against `content/`, so a lesson being edited cannot turn one of these red.
+// real components (`eachTag` in scripts/lib/mdx-blocks.mjs). Two opposite
+// mistakes are pinned, each invisible in a green sweep: counting a tag that
+// only appears inside a ```jsx fence (demo pages print each example's own MDX
+// source, doubling every item), and mistaking an inline triple-backtick span
+// for an opening fence (which swallowed the next real <ChallengeCard>).
+// Fixtures live in a temp dir so editing content/ cannot turn these red.
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -127,12 +115,10 @@ ${LIVE_BLOCK}
   });
 });
 
-// A props block ends at the first `/>` *outside* its template literals. The
-// literals hold whole programs, and a React sample's own self-closing JSX looks
-// exactly like the end of the enclosing tag. Getting this wrong does not fail
-// loudly: the rest of the sample reads as prose, so an automated placement drops
-// a component into the middle of somebody's source, and it compiles to a
-// `ReferenceError` that only a browser run catches.
+// A props block ends at the first `/>` outside its template literals: the
+// literals hold whole programs whose self-closing JSX looks like the tag's
+// end, and getting it wrong silently misplaces components — a ReferenceError
+// only a browser run catches.
 describe("codeRegions template literals", () => {
   it("does not end a props block at a `/>` inside a template literal", async () => {
     const { codeRegions } = await import("../scripts/lib/mdx-regions.mjs");

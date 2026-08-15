@@ -1,25 +1,14 @@
 /**
  * A Pyodide interpreter in Node, set up to behave like the one the site runs
- * in a browser worker.
+ * in a browser worker. Shared by check-code-blocks.mjs and
+ * check-challenge-cards.mjs; without the package mirroring below, runner gaps
+ * get reported as broken lesson content. Rendering is deliberately not
+ * mirrored — `fig.show()` / `plt.show()` are stubbed; the sweeps only ask
+ * "does this raise?".
  *
- * Shared by check-code-blocks.mjs and check-challenge-cards.mjs. The setup
- * here is not incidental: without the package mirroring below, a sweep reports
- * a few hundred failures that no reader ever sees — every polars and
- * scikit-learn block with Pyodide's "see loading-packages" notice, every
- * openpyxl block with ModuleNotFoundError, every tz-aware timestamp with
- * ZoneInfoNotFoundError, and every `display()` call with a NameError. A second
- * copy of that logic would drift from the worker within a release, and the way
- * drift shows up is as lesson content being blamed for a runner gap.
- *
- * What this deliberately does *not* mirror is rendering: `fig.show()` and
- * `plt.show()` have nowhere to draw, so they are stubbed. The question these
- * sweeps ask is only ever "does this raise?".
- *
- * The pyodide devDependency MUST stay pinned to the same version
- * `app/_components/runtime/pyodide-worker.ts` loads from the CDN. An older
- * build ships an older pandas, and the whole point is to catch the
- * deprecations that fire on the version readers actually get: pandas 2 only
- * warns about `freq="H"`, pandas 3 raises.
+ * The pyodide devDependency MUST stay pinned to the version
+ * `app/_components/runtime/pyodide-worker.ts` loads from the CDN, so
+ * deprecations fire on the pandas readers actually get.
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -32,18 +21,10 @@ const DATASET_BASE = "https://raw.githubusercontent.com/dataslope/datasets/main/
 const CACHE = ".dataset-cache";
 
 /**
- * Per-block wall-clock budget.
- *
- * 30s is not a guess about the runner, it is a claim about the reader: a block
- * a lesson invites you to press Run on and which then takes longer than this
- * is a content problem, not a sweep problem, so the default stays where a
- * reader's patience is rather than where the machine's is.
- *
- * `BLOCK_TIMEOUT_MS` in the environment raises it, which exists for measuring
- * how long an over-budget block actually takes ("did not finish in 30s" tells
- * you nothing about whether the answer is 31s or ten minutes) — not for
- * quieting the sweep. Raising it in CI turns the check into one that cannot
- * fail on the thing it was built to catch.
+ * Per-block wall-clock budget. 30s is a claim about the reader's patience,
+ * not the machine: a slower block is a content problem. The env override
+ * exists for measuring over-budget blocks, not for quieting the sweep — do
+ * not raise it in CI.
  */
 export const BLOCK_TIMEOUT_MS = Number(process.env.BLOCK_TIMEOUT_MS ?? 30_000);
 
@@ -51,49 +32,22 @@ export const BLOCK_TIMEOUT_MS = Number(process.env.BLOCK_TIMEOUT_MS ?? 30_000);
 const CAPTURE_LIMIT = 4_000_000;
 
 /**
- * Failures this environment causes, which a reader never sees.
+ * Failure patterns skipped rather than reported as content failures, so real
+ * breakages are not buried in noise. Every entry is a block nobody is
+ * checking, so the list is meant to shrink — TLS errors are deliberately not
+ * excused (sync-http.mjs makes HTTP work for real).
  *
- * Pyodide-in-Node is close to Pyodide-in-a-browser but not identical, and the
- * gaps are all in the host rather than in the lesson:
- *
- *   • JSPI, below.
- *
- * `could not spawn threads` used to be listed here as one of them, on the
- * belief that "a browser worker gives polars threads; Node does not". That is
- * wrong, and it hid a real breakage for as long as it stood. The site serves
- * no COOP/COEP headers, so `crossOriginIsolated` is false and there is no
- * SharedArrayBuffer in the reader's worker either — `__tests__/syncHttp.test.ts`
- * pins exactly that. A panic here is a panic the reader gets.
- *
- * `app/_components/runtime/polarsWasm.ts` now removes the common cause (the
- * mmap reader's thread pool, on any file over a megabyte) in both runtimes at
- * once, so an eager read is no longer affected. What remains is `scan_csv` on
- * a big file, which cannot be fixed from this side: the Pyodide wheel has no
- * `new-streaming` feature, so a LazyFrame cannot be built over a buffer. Those
- * patterns stay below so the sweep is not drowned by the poisoned-lock cascade
- * that follows the first one, but they are *content* failures, not
- * environmental ones, and `check-polars-scan.mjs` counts them so they cannot
- * quietly grow.
- *
- * Reporting these as content failures is worse than not running the block at
- * all: it buries the real breakages (a deprecated argument, a dtype that
- * pandas 3 now rejects) in a few hundred lines of noise, which is how the
- * first sweep of this file ended up chasing the wrong thing twice.
- *
- * Every entry here is a block nobody is checking, so the list is meant to
- * shrink. HTTP used to be on it and is not any more: `lib/sync-http.mjs`
- * gives `pyodide_http` a genuinely blocking XMLHttpRequest to patch onto, so
- * the 53 `sns.load_dataset(...)` blocks in the Seaborn course — which were
- * the largest gap the sweep had — now run for real. A TLS error is therefore
- * no longer expected from anywhere, and is deliberately not excused below:
- * if one appears it means some block reaches the network by a path the shim
- * does not cover, and that is worth seeing rather than skipping.
+ * The polars thread/lock patterns are actually *content* failures the reader
+ * gets too (`scan_csv` on a big file — the Pyodide wheel has no
+ * `new-streaming` feature); they stay here only so the sweep is not drowned
+ * by the poisoned-lock cascade after the first one, and
+ * `check-polars-scan.mjs` counts them so they cannot quietly grow.
  */
 export const ENVIRONMENT_ONLY = [
   /could not spawn threads/,
   /LazyLock instance has previously been poisoned/,
-  // JSPI. Chrome has it; Node's V8 build here does not, so any block that
-  // suspends WebAssembly (`input()`, and anything built on it) cannot run.
+  // JSPI: Chrome has it, Node's V8 build does not, so blocks that suspend
+  // WebAssembly (`input()` etc.) cannot run.
   /WebAssembly stack switching not supported/,
 ];
 
@@ -121,10 +75,8 @@ const IMPLICIT_PACKAGES = [
   { pattern: /\btrendline\s*=/, pkg: "statsmodels" },
   { pattern: /\bpyarrow\b|\.(?:to|from)_(?:arrow|pandas)\(/, pkg: "pyarrow" },
   { pattern: /\.(?:to|read|scan|sink)_parquet\(/, pkg: "pyarrow" },
-  // pyarrow has to be on disk before the first `import polars`: polars caches
-  // "is Arrow available?" at import time and nothing can change its mind
-  // afterwards. See the long note in the worker where the old repair used to
-  // live.
+  // pyarrow must be on disk before the first `import polars`: polars caches
+  // "is Arrow available?" at import time and never re-checks.
   {
     pattern:
       /^\s*(?:from\s+polars(?:\.[\w.]+)?\s+import\b|import\s+(?:[\w.]+\s*,\s*)*polars(?:\.[\w.]+)?(?:\s+as\s+\w+)?\s*(?:,|$|#))/m,
@@ -183,16 +135,11 @@ export async function bootPyodide(label) {
     console.error("Blocks that import it will be reported as failures; rerun with network access.");
   }
 
-  // HTTP, the same way the worker sets it up (see SETUP_SCRIPT_B in
-  // pyodide-worker.ts): install pyodide_http and let it reroute urllib and
-  // requests through XMLHttpRequest.
-  //
-  // Node has no XMLHttpRequest, so this used to be a no-op that looked like a
-  // success — `patch_all()` returns cleanly either way, and the first HTTP
-  // call then fell through to a real socket with no TLS. `installSyncHttp`
-  // supplies a genuinely blocking XHR so the patch has something to patch
-  // onto, which is what brings the Seaborn course's `sns.load_dataset(...)`
-  // blocks into the sweep.
+  // HTTP, the same way the worker sets it up (SETUP_SCRIPT_B in
+  // pyodide-worker.ts): pyodide_http reroutes urllib/requests through XHR.
+  // Node has no XMLHttpRequest — `patch_all()` still "succeeds" but requests
+  // fall through to a raw socket with no TLS — so installSyncHttp supplies a
+  // genuinely blocking XHR first.
   const uninstallSyncHttp = installSyncHttp();
   try {
     const micropip = py.pyimport("micropip");
@@ -203,13 +150,9 @@ export async function bootPyodide(label) {
     console.error("Blocks that fetch over HTTP will be reported as failures.");
   }
 
-  // The blocks call fig.show() and plt.show(); neither has anywhere to draw
-  // here, and a headless failure there is not a lesson bug.
-  //
-  // `display` is the other one. The worker installs it into builtins so a
-  // lesson can render a DataFrame as a table (see pyodide-worker.ts), and
-  // without the same shim here every block that uses it fails with NameError:
-  // a runner gap reported as seven broken lessons.
+  // fig.show()/plt.show() have nowhere to draw here, and the worker installs
+  // `display` into builtins (see pyodide-worker.ts) — without the same shim
+  // every block using it fails with NameError.
   py.runPython(`
 import builtins
 import matplotlib
@@ -228,29 +171,18 @@ def display(*objs, **kwargs):
 builtins.display = display
 `);
 
-  // Pyodide runs Python synchronously, so the only way to stop a block that
-  // loops forever (or sits waiting on a package that will never arrive) is the
-  // interrupt buffer: Python checks it between bytecodes and raises
-  // KeyboardInterrupt when it sees a 2. Without this, one bad block hangs the
-  // whole sweep and every result collected so far is lost.
+  // The interrupt buffer is the only way to stop a looping block: Python
+  // checks it between bytecodes and raises KeyboardInterrupt on a 2.
   const interrupt = new Uint8Array(new SharedArrayBuffer(1));
   py.setInterruptBuffer(interrupt);
 
-  // …and the thing that writes that 2 has to live on another thread.
-  //
-  // The obvious `setTimeout(() => { interrupt[0] = 2 }, …)` cannot work, and
-  // silently so: `runPythonAsync` only yields to the event loop at `await`
-  // points *in the Python*, so a block that just computes blocks the loop
-  // outright. The timer never fires, the interrupt is never armed, and the
-  // timeout that looks like it bounds the run bounds nothing. A parameter
-  // sweep in the scientific-computing capstone sat there indefinitely, which
-  // reads exactly like a hung sweep and is really a timeout that was never
-  // able to run.
-  //
-  // A worker thread is not blocked by any of that. It shares the interrupt
-  // buffer, waits out the budget on `ctl`, and writes the 2 itself. `ctl`
-  // carries a generation number so a run that finishes early wakes the
-  // watchdog and it skips that round instead of firing into the next block.
+  // The 2 must be written from another thread: a `setTimeout` never fires
+  // because `runPythonAsync` only yields at Python `await` points, so a
+  // compute-bound block blocks the event loop and the "timeout" bounds
+  // nothing. The watchdog worker shares the interrupt buffer, waits out the
+  // budget on `ctl`, and writes the 2 itself; `ctl` carries a generation
+  // number so a run that finishes early wakes the watchdog and it skips that
+  // round instead of firing into the next block.
   const ctl = new Int32Array(new SharedArrayBuffer(4));
   const watchdog = new Worker(
     `const { parentPort, workerData } = require("node:worker_threads");
@@ -278,10 +210,8 @@ builtins.display = display
     };
   }
 
-  // Fetched once. `py.globals.get(...)` mints a PyProxy on every call, and one
-  // leaked per block was enough to wedge the interpreter about a thousand
-  // blocks in — which looked exactly like a hang on whatever block happened to
-  // be next, and sent two debugging attempts after innocent lesson content.
+  // Fetched once: `py.globals.get(...)` mints a PyProxy per call, and one
+  // leaked per block wedged the interpreter ~1000 blocks in.
   const dictCtor = py.globals.get("dict");
 
   const micropipInstalled = new Set(["plotly"]);
@@ -291,8 +221,7 @@ builtins.display = display
 
   /** The two package steps the browser does before every run, mirrored here. */
   async function ensurePackages(code) {
-    // Quiet: the loader narrates every fetch through stdout, which would be
-    // interleaved with the block's own output.
+    // Quiet: the loader narrates every fetch through stdout.
     await py.loadPackagesFromImports(code, {
       messageCallback: () => {},
       errorCallback: () => {},
@@ -323,10 +252,8 @@ builtins.display = display
         micropip.destroy();
       }
     }
-    // The same polars mmap shim the browser worker installs, for the same
-    // reason and at the same moment: before the block's own `import polars`.
-    // Without it this runner and the reader's browser fail differently, and a
-    // sweep that fails differently from the site is not checking the site.
+    // The same polars mmap shim the browser worker installs, at the same
+    // moment: before the block's own `import polars`.
     if (!polarsShimmed && POLARS_IMPORT_PATTERN.test(code)) {
       await py.runPythonAsync(POLARS_WASM_SHIM);
       polarsShimmed = true;
@@ -345,22 +272,13 @@ builtins.display = display
         return `dataset ${d.path}: ${err.message}`;
       }
     }
-    // Non-entry files are importable siblings, so they have to exist on disk.
-    //
-    // `solutionSource` is set only by the challenge-card extractor, and is the
-    // buffer the Solution button would leave in that file (its `solutionCode`
-    // when it has one, its starter otherwise). Without it a card whose
-    // exercise lives in a sibling module — which is every multi-file card in
-    // python-basics — is graded with that module still blank. Code blocks
-    // never set it and keep staging their starters, which is what Run does.
-    //
-    // `initCode` is joined only when there is some, matching
-    // `effectiveSourceFor` in ChallengeCard.tsx (`init ? merge(init, buf) :
-    // buf`) and the entry-code path in mdx-blocks.mjs. Prepending "\n"
-    // unconditionally is invisible in a .py sibling and corrupts a data one:
-    // it cost `sales.csv` its header row, so `csv.DictReader` came back with a
-    // single empty field name and a correct solution raised
-    // `KeyError: 'product'`.
+    // Non-entry files are importable siblings, so they must exist on disk.
+    // `solutionSource` (set only by the challenge-card extractor) is the
+    // buffer Solution would leave in that file; without it multi-file cards
+    // are graded with sibling modules still blank. `initCode` is joined only
+    // when present, matching `effectiveSourceFor` in ChallengeCard.tsx — an
+    // unconditional "\n" prefix corrupts data siblings (it once cost a CSV
+    // its header row).
     const siblings = [];
     for (const f of files) {
       if (f.filename === entry) continue;
@@ -369,16 +287,10 @@ builtins.display = display
       siblings.push(f.filename);
     }
 
-    // Drop these modules from the import cache before the run.
-    //
-    // One interpreter serves the whole sweep, but a reader gets a fresh
-    // runtime per card, so module state that persists here persists nowhere
-    // else. `utils.py` is the case that bites: several cards ship one, and
-    // once any of them has been imported, `import utils` in a later card
-    // returns the first card's module and its `greet` is missing. The failure
-    // lands on the innocent card, only in a full sweep, and never for a
-    // reader — the worst combination to debug, and the reason this is done by
-    // filename rather than by clearing everything.
+    // Drop these modules from the import cache before the run: one
+    // interpreter serves the whole sweep, but a reader gets a fresh runtime
+    // per card, so a cached `utils.py` from an earlier card fails a later,
+    // innocent one. Done by filename rather than clearing everything.
     const modules = siblings
       .filter((n) => n.endsWith(".py"))
       .map((n) => n.slice(0, -3).replace(/\//g, "."));
@@ -395,17 +307,10 @@ importlib.invalidate_caches()
   }
 
   /**
-   * Run `code` in a fresh namespace.
-   *
-   * `capture` is off by default, and deliberately so. Redirecting Pyodide's
-   * stdout into a JavaScript string means holding every byte a block prints:
-   * a lesson that prints a large frame in a loop grows the buffer without
-   * bound, and repeated `+=` on a multi-megabyte string is quadratic on top of
-   * that. A sweep that only asks "does this raise?" has no use for the output,
-   * so it lets Pyodide write through to the console as it always did.
-   *
-   * Callers that do need the text (the challenge harness prints its results
-   * there) opt in and get a capped buffer.
+   * Run `code` in a fresh namespace. `capture` is off by default — holding
+   * every printed byte in a JS string is unbounded and quadratic, and a
+   * "does this raise?" sweep has no use for it. Callers that need the text
+   * (the challenge harness) opt in and get a capped buffer.
    *
    * @returns {{error: string|null, full: string|null, stdout: string,
    *   stderr: string, truncated: boolean, ms: number}}
@@ -419,10 +324,8 @@ importlib.invalidate_caches()
     let captured = 0;
     let truncated = false;
     if (capture) {
-      // Chunks in an array, joined once: linear rather than quadratic. The cap
-      // is far above anything a lesson legitimately prints, and exists so a
-      // runaway loop is reported as one bad card instead of taking the sweep
-      // down with it.
+      // Chunks in an array, joined once: linear, not quadratic. The cap keeps
+      // a runaway loop from taking the sweep down.
       const sink = (bucket) => (s) => {
         if (captured > CAPTURE_LIMIT) {
           truncated = true;
@@ -437,10 +340,8 @@ importlib.invalidate_caches()
     let error = null;
     let full = null;
     try {
-      // Two timeouts, because there are two ways to hang. The interrupt buffer
-      // above stops Python spinning in its own bytecode; it cannot touch a
-      // pending JS promise, and `runPythonAsync` awaits package downloads for
-      // any module the block imports. This race covers that second case.
+      // Two timeouts for two ways to hang: the interrupt buffer stops Python
+      // bytecode; this race covers a pending JS promise (package downloads).
       await Promise.race([
         ensurePackages(code).then(() => py.runPythonAsync(code, { globals: ns })),
         new Promise((_, reject) =>
@@ -457,8 +358,8 @@ importlib.invalidate_caches()
       error = timedOut ? `did not finish in ${BLOCK_TIMEOUT_MS / 1000}s` : last;
       full = message;
     } finally {
-      // Always, including on the failure path: a leaked namespace per broken
-      // block is the same slow death as above.
+      // Always, including on failure: a leaked namespace per broken block is
+      // the same slow death as a leaked PyProxy.
       ns.destroy();
       disarm();
       if (capture) {

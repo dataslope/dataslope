@@ -1,24 +1,12 @@
 "use client";
 
 /**
- * `ChallengeCard`, an executable coding-challenge embeddable for the
- * `/learn` pages. Visually matches the "Python Challenge" design from
- * the handoff bundle, but is intentionally language-agnostic so the
- * same component will host upcoming R and TypeScript challenges.
- *
- * Architecture mirrors `<CodeBlock>`:
- *   - A shared per-adapter runtime is fetched via `getSharedRuntime`,
- *     so multiple challenge cards on the same page share one worker.
- *   - The CodeMirror editor uses the same theme + language loader as
- *     the surrounding playground / code blocks.
- *
- * What's different from a CodeBlock:
- *   - There's a header (badge + title + meta + status), an
- *     instructions panel with an optional hint, and a Check Answer
- *     button that runs a test harness on top of the user's submission.
- *   - Test results render in a collapsible panel with a pass/fail
- *     banner. The harness is language-specific and lives in
- *     `challengeHarness.ts`.
+ * `ChallengeCard`, a language-agnostic executable coding-challenge
+ * embeddable for the `/learn` pages. Mirrors `<CodeBlock>` (shared
+ * per-adapter runtime via `getSharedRuntime`, same editor setup) and adds
+ * instructions, a Check Answer flow that runs the language-specific harness
+ * from `challengeHarness.ts`, and a test-results panel with a pass/fail
+ * banner.
  */
 
 import {
@@ -115,40 +103,28 @@ import { mergeInitAndEntry } from "./runtime/mergeInit";
 import { PlotlyChart } from "./PlotlyChart";
 
 import styles from "./ChallengeCard.module.css";
-// Boot-notice styles are shared with `<CodeBlock>` (which already
-// shares this card's styles for its chrome, the reuse runs both ways).
 import codeBlockStyles from "./CodeBlock.module.css";
 import { previewStageStyle } from "./previewStage";
 
-/** One file in a challenge workspace. Every challenge passes at least
- *  one file (single-file authors pass a one-element `files` array). A
- *  file carries its own read-only initialization code, the editable
- *  starter shown in the editor, and an optional reference solution. */
+/** One file in a challenge workspace (single-file authors pass a
+ *  one-element `files` array). */
 export interface ChallengeFile {
   /** Workspace-relative filename, e.g. `"Dog.java"`. */
   filename: string;
-  /** Optional read-only initialization code for THIS file, prepended
-   *  verbatim to the file's code on every run. Rendered in a
-   *  collapsed-by-default read-only panel above the editor whenever this
-   *  file is the active tab, mirroring `<CodeBlock>`'s init drawer. */
+  /** Optional read-only init code for THIS file, prepended verbatim on
+   *  every run and shown in a collapsed read-only panel above the editor. */
   initCode?: string;
-  /** Starter content shown in the editor for this file. Reset restores
-   *  this exact text. */
+  /** Starter content shown in the editor; Reset restores this exact text. */
   starterCode: string;
-  /** Optional reference solution for this file. When at least one file
-   *  in the workspace supplies `solutionCode`, the Solution modal
-   *  renders the file tab bar (non-sortable, non-closeable) so the
-   *  learner can flip between files; files that omit `solutionCode` are
-   *  shown with their `starterCode` (the scaffold the learner does not
+  /** Optional reference solution. Files that omit it are shown in the
+   *  Solution modal with their `starterCode` (scaffold the learner does not
    *  need to modify). */
   solutionCode?: string;
 }
 
-/** Imperative driver exposed on `window.__dsChallenges[adapter::title]`
- *  so the Playwright solution sweep can load a card's reference
- *  solution and trigger the test run without driving every keystroke
- *  through the DOM. Production code must not depend on this, it is
- *  a test surface and may change shape across releases. */
+/** Imperative driver exposed on `window.__dsChallenges[adapter::title]` for
+ *  the Playwright solution sweep. Test-only surface, production code must
+ *  not depend on it. */
 export interface ChallengeTestHandle {
   adapterId: string;
   title: string;
@@ -169,90 +145,59 @@ export interface ChallengeTestHandle {
 interface SolutionFile {
   filename: string;
   source: string;
-  /** True when the file supplied a real `solutionCode`. False when we
-   *  are echoing back the file's `starterCode` because the file is part
-   *  of the scaffold the learner is not expected to modify. The modal
-   *  labels these "(unchanged)" so the learner can tell the file apart
-   *  from one they should edit. */
+  /** True when the file supplied a real `solutionCode` (false = scaffold
+   *  echoed back from `starterCode`, labelled "(unchanged)" in the modal). */
   hasSolution: boolean;
-  /** True when the displayed solution is byte-for-byte identical to the
-   *  file's `starterCode`, either because the file supplied no
-   *  `solutionCode` (scaffold) or because its `solutionCode` matches the
-   *  starter. In a multi-file workspace the modal surfaces a subtle note
-   *  for these files so the learner knows the tab needs no edits. */
+  /** True when the displayed solution is identical to `starterCode`; the
+   *  modal notes these tabs need no edits. */
   isUnchanged: boolean;
 }
 
 export interface ChallengeCardProps {
-  /** Language adapter used for both running the code and building the
-   *  test harness. Pass the same instance as a CodeBlock would. */
+  /** Language adapter used to run the code and build the test harness. */
   adapter: LanguageAdapter;
   /** Challenge title shown in the header. */
   title: string;
   /** Optional uppercase badge label. Defaults to "Challenge". */
   badge?: string;
-  /** Rendered above the editor. Pass MDX content / React elements, or a
-   *  markdown string for terser authoring. Strings support paragraphs,
-   *  bullet lists, **bold**, *italic*, and `inline code`. */
+  /** Rendered above the editor. MDX/JSX, or a markdown string (paragraphs,
+   *  bullets, **bold**, *italic*, `inline code`). */
   instructions: React.ReactNode | string;
-  /** Workspace files. Every challenge supplies at least one file; each
-   *  file carries its own `initCode` (read-only setup), `starterCode`
-   *  (the editable starter), and optional `solutionCode`. With more than
-   *  one file, or with `showFileTabBar`, a non-sortable, non-closeable
-   *  tab bar appears above the editor so the learner can switch between
-   *  files. Tests run against `entryFilename` (or the first file when
-   *  omitted); every other file is staged into the runtime's virtual
-   *  file system via `prepareFileSystem` so multi-file `import`s /
-   *  `include`s / cross-class references resolve. */
+  /** Workspace files (at least one). Tests run against `entryFilename` (or
+   *  the first file); every other file is staged into the runtime's VFS via
+   *  `prepareFileSystem` so multi-file imports/includes resolve. More than
+   *  one file (or `showFileTabBar`) renders the tab bar. */
   files: ChallengeFile[];
   /** When `files` has more than one entry, the filename whose content is
    *  passed to `runtime.run()` as the entry. Defaults to the first file. */
   entryFilename?: string;
   /** Remote dataset files staged into the runtime's working directory
-   *  before every Run / Check Answer, so init/starter/solution code
-   *  reads them like local files (e.g. `pd.read_csv("penguins.csv")`).
-   *  Each entry names a path in the dataslope/datasets repo (or a full
-   *  URL); the bytes are fetched through the globally cached dataset
-   *  path, memoised in-session and persisted via the browser's Cache
-   *  API, so every card, block, page, and visit that references the
-   *  same file shares one download. Requires an adapter whose runtime
-   *  implements `prepareFileSystem` (Python, R, JavaScript, TypeScript,
-   *  PHP, …). */
+   *  before every Run / Check Answer (paths in the dataslope/datasets repo,
+   *  or full URLs; downloads are cached globally). Requires a runtime that
+   *  implements `prepareFileSystem`. */
   datasets?: DatasetStageSpec[];
-  /** Force the file tab bar to render even for a single-file workspace.
-   *  Multi-file workspaces always show it; this opts a one-file card in. */
+  /** Force the file tab bar to render even for a single-file workspace. */
   showFileTabBar?: boolean;
-  /** Tests run when "Check Answer" is pressed. Each test's `code`
-   *  should `assert`/`throw`/`stop()` on failure and be silent on
-   *  success, the language-specific harness wraps the rest. */
+  /** Tests run when "Check Answer" is pressed. Each test's `code` should
+   *  `assert`/`throw`/`stop()` on failure and be silent on success. */
   tests: ChallengeTest[];
-  /** Optional importable module names (e.g. `"pandas"`, `"sklearn"`) to
-   *  pre-install when the card's runtime warms, merged with the modules
-   *  found by scanning the card's own code (init/starter/solution/tests).
-   *  Escape hatch for imports the scan can't see, instructions that ask
-   *  the learner to write the import themselves, or dynamic imports.
-   *  Only meaningful for runtimes with optional package sets (Python). */
+  /** Extra importable module names to pre-install at warm-up, merged with
+   *  the modules found by scanning the card's own code. Escape hatch for
+   *  imports the scan can't see. Python only. */
   packages?: string[];
   /** Inject the pinned Tailwind in-browser compiler into the preview
-   *  document on every Run / Check Answer. Only meaningful for preview
-   *  adapters (web / react); see `TAILWIND_BROWSER_CDN` in
-   *  runtime/cdn.ts for the pin. */
+   *  document on every run. Preview adapters (web / react) only; see
+   *  `TAILWIND_BROWSER_CDN` in runtime/cdn.ts. */
   tailwind?: boolean;
-  /** Height of the live-preview stage (number → px). Only meaningful for
-   *  preview adapters (web / react).
-   *
-   *  The slot reserves this space from first paint, empty or not, so a Run
-   *  never grows the card under the learner. Leave it alone for a card
-   *  whose answer is a page (300px, the default); set it for one whose
-   *  answer is a single element, where the default reserves a screenful of
-   *  white above the instructions the learner still has to read. */
+  /** Height of the live-preview stage (number → px), preview adapters only.
+   *  Reserved from first paint so a Run never grows the card; set it lower
+   *  than the 300px default for single-element answers. */
   previewHeight?: number | string;
 }
 
-// Pick a line-comment prefix for the language. Used only to prepend a
-// human-readable "init code runs first" notice at the top of solution
-// files, the comment must parse as a no-op in the target language so
-// the displayed solution still pastes back as valid source.
+// Line-comment prefix for the "init code runs first" notice prepended to
+// displayed solutions; must parse as a no-op so the solution pastes back as
+// valid source.
 function lineCommentFor(codeMirrorMode: string): string {
   switch (codeMirrorMode) {
     case "python":
@@ -264,11 +209,6 @@ function lineCommentFor(codeMirrorMode: string): string {
       return "//";
   }
 }
-
-// The challenge card adapts its CodeMirror theme to the surrounding
-// docs: dark docs → material-darker, light docs → IntelliJ IDEA.
-// The active theme name is derived from `useIsDark()` at render time
-// and reconfigured via compartments whenever the docs theme toggles.
 
 // Stable empty list so cards without a `datasets` prop don't re-create
 // hook dependencies on every render.
@@ -291,9 +231,8 @@ export default function ChallengeCard({
   const blockId = useBlockId(adapter);
   const initPanelId = `${blockId}-init`;
 
-  // Normalize into a non-empty list of files. Authors always pass
-  // `files`; guard against an empty array so the rest of the component
-  // can assume at least one file is present.
+  // Guard against an empty `files` array so the rest of the component can
+  // assume at least one file.
   const workspaceFiles: ChallengeFile[] = useMemo(() => {
     if (files && files.length > 0) return files;
     const defaultName = `main.${adapter.defaultFileExtension || "txt"}`;
@@ -301,31 +240,23 @@ export default function ChallengeCard({
   }, [files, adapter.defaultFileExtension]);
 
   const isMultiFile = workspaceFiles.length > 1;
-  // The tab bar renders for multi-file workspaces, or when a single-file
-  // card explicitly opts in via `showFileTabBar`.
   const showTabs = isMultiFile || showFileTabBar;
   const resolvedEntryFilename =
     (entryFilename && workspaceFiles.find((f) => f.filename === entryFilename)
       ? entryFilename
       : workspaceFiles[0].filename) ?? workspaceFiles[0].filename;
 
-  // Remote datasets staged before every run (see the `datasets` prop).
   // Mirrored into a ref so the mount-once warm-up effect can prefetch
-  // them without re-registering its IntersectionObserver when MDX
-  // re-creates the prop array.
+  // datasets without re-registering when MDX re-creates the prop array.
   const cardDatasets = datasets ?? NO_DATASETS;
   const datasetsRef = useRef(cardDatasets);
   useEffect(() => {
     datasetsRef.current = cardDatasets;
   }, [cardDatasets]);
 
-  // Everything this card could ask the runtime to execute, per-file
-  // init/starter/solution plus injected test snippets. Passed to
-  // `runtime.warmPackages` as the needs-analysis input so heavy optional
-  // packages (Python's data stack) only download for cards whose code
-  // actually imports them. Kept in a ref (like `datasetsRef` above) so
-  // the warm-up observer doesn't re-register when MDX re-creates the
-  // prop arrays.
+  // Everything this card could execute, passed to `runtime.warmPackages` so
+  // heavy optional packages only download for cards whose code imports them.
+  // A ref, so the warm-up observer doesn't re-register on prop identity.
   const warmHintRef = useRef<{ sources: string[]; packages?: string[] }>({
     sources: [],
   });
@@ -342,9 +273,8 @@ export default function ChallengeCard({
     warmHintRef.current = { sources, packages };
   }, [files, tests, packages]);
 
-  // Per-file read-only init code (trimmed). Init now belongs to a file,
-  // so the init drawer + the editor's line-number offset both track
-  // whichever file is the active tab.
+  // Per-file read-only init code (trimmed); the init drawer and the
+  // editor's line-number offset both track the active tab's file.
   const initForFile = useCallback(
     (filename: string) => {
       const f = workspaceFiles.find((wf) => wf.filename === filename);
@@ -354,11 +284,8 @@ export default function ChallengeCard({
   );
 
   // ─── Solution files ─────────────────────────────────────────────────
-  // Build the per-file solution view the modal renders. Every file
-  // appears; files that supplied `solutionCode` show that text, while
-  // files that did not are shown with their `starterCode` (the scaffold
-  // the learner is not expected to change). The modal opens iff at least
-  // one file actually has a solution.
+  // Per-file solution view for the modal: files without `solutionCode` show
+  // their starter. The modal opens iff at least one file has a solution.
   const solutionFiles: SolutionFile[] = useMemo(() => {
     return workspaceFiles.map((file) => {
       const source = file.solutionCode ?? file.starterCode;
@@ -378,30 +305,22 @@ export default function ChallengeCard({
   const initEditorRef = useRef<EditorView | null>(null);
   const solutionEditorHostRef = useRef<HTMLDivElement | null>(null);
   const solutionEditorRef = useRef<EditorView | null>(null);
-  // Theme compartments, stored so the dark/light sync effect can
-  // reconfigure the CM theme without remounting the editor.
+  // Compartments, stored so effects can reconfigure theme / line-number
+  // offset / language without remounting the editor.
   const mainThemeCompRef = useRef<Compartment | null>(null);
   const initThemeCompRef = useRef<Compartment | null>(null);
   const solutionThemeCompRef = useRef<Compartment | null>(null);
-  // Line-number compartment for the main editor, reconfigured when the
-  // active file changes so the gutter offset tracks that file's init
-  // line count (the editable region continues numbering after the init).
   const mainLineNumberCompRef = useRef<Compartment | null>(null);
-  // Language compartment, reconfigured per active file for adapters
-  // whose workspaces mix languages (web: .html/.css/.js).
   const mainLanguageCompRef = useRef<Compartment | null>(null);
-  // Slot the preview adapters (web / react) mount their sandboxed
-  // iframe into; always in the DOM for preview-capable adapters so the
-  // element exists by the time `runtime.run` needs it.
+  // Preview iframe slot; always in the DOM for preview-capable adapters so
+  // the element exists by the time `runtime.run` needs it.
   const previewHostRef = useRef<HTMLDivElement | null>(null);
-  // Debounce handle for the localStorage write that mirrors the editor
-  // buffer. See `persistedKeyForFile` below.
+  // Debounce handle for the localStorage write mirroring the editor buffer.
   const persistSaveTimerRef = useRef<number | null>(null);
 
-  // Stable per-file localStorage keys. The workspace fingerprint
-  // includes every file's init + starter so editing the MDX retires
-  // saved attempts against the old prompt; the filename is appended per
-  // file so each tab persists independently.
+  // Per-file localStorage keys. The fingerprint includes every file's
+  // init + starter so editing the MDX retires saved attempts against the
+  // old prompt; the filename is appended so each tab persists independently.
   const workspaceFingerprint = useMemo(
     () =>
       workspaceFiles
@@ -417,42 +336,30 @@ export default function ChallengeCard({
       ),
     [adapter.id, title, workspaceFingerprint],
   );
-  // Shared per-adapter runtime, scoped to the fumadocs surface: every
-  // `<CodeBlock>` / `<ChallengeCard>` rendered on the /learn route
-  // (across pages, within the same SPA session) reuses one runtime
-  // instance via `getSharedRuntime(RuntimeScope.Fumadocs, …)`. The
-  // `<Playground>` lives in a separate scope, so its installed
-  // packages / staged VFS files cannot bleed into challenge results.
-  // State isolation between cards in the same scope is the adapter's
-  // responsibility, each `run()` wipes user globals before evaluating
-  // the next snippet.
+  // Shared per-adapter runtime, scoped to the fumadocs surface (the
+  // Playground uses a separate scope so its installed packages / staged VFS
+  // files can't bleed into challenge results). Isolation between cards in
+  // the same scope is the adapter's job: each `run()` wipes user globals.
   const runtimeRef = useRef<LanguageRuntime | null>(null);
-  // Outer card element + one-shot guard so the shared runtime can be warmed
-  // when the card first scrolls into view (see the warm-up effect below).
+  // Outer card element + one-shot guard for the scroll-into-view warm-up.
   const cardRef = useRef<HTMLDivElement | null>(null);
   const warmedRef = useRef(false);
   const runSeqRef = useRef(0);
-  // Latest run handler, keeps the CodeMirror keymap closure
-  // (registered once at mount) wired to the current function.
+  // Latest run handler, keeps the mount-once CodeMirror keymap current.
   const runRef = useRef<() => void>(() => {});
-  // Latest submit handler. Bound to Mod-Enter from the editor's
-  // keymap and to the split-button's default click. Falls back to
-  // `run` for challenges that don't supply tests, so Mod-Enter
-  // always does *something* sensible.
+  // Latest submit handler (Mod-Enter + split-button default). Falls back to
+  // `run` for challenges without tests so the keystroke isn't dead.
   const submitRef = useRef<() => void>(() => {});
 
   const [status, setStatus] = useState<Status>("idle");
-  // Tracks which action triggered the in-flight run so the Submit
-  // pill can show the correct "Submitting…" vs "Running…" label
-  // (the dropdown's "Run without Submitting" item should *not* read
-  // as "Submitting…" while it's executing).
+  // Which action triggered the in-flight run, so the Submit pill shows
+  // "Submitting…" vs "Running…" correctly.
   const [activeAction, setActiveAction] = useState<"submit" | "run" | null>(
     null,
   );
   const [statusMessage, setStatusMessage] = useState<string>("");
-  // True while a *cold* runtime download is in flight, so the boot
-  // notice only promises "first run only" when it really is the first
-  // run. Mirrors `<CodeBlock>`.
+  // True while a *cold* runtime download is in flight, so the boot notice
+  // only promises "first run only" when it really is.
   const [bootCold, setBootCold] = useState(false);
   // Latest stage-floor fraction reported by the adapter's boot (null
   // until the adapter reports one); smoothed for display below.
@@ -482,15 +389,11 @@ export default function ChallengeCard({
   const toasts = useChallengeToasts();
 
   // ─── Multi-file workspace state ─────────────────────────────────────
-  // Each file has its own buffer + persisted copy. The single editor
-  // view shows the active file; swapping tabs rewrites the doc with the
-  // saved buffer for the newly-active file.
+  // Each file has its own buffer + persisted copy; the single editor view
+  // shows the active file, and tab switches rewrite the doc.
   const [activeFilename, setActiveFilename] = useState<string>(
     workspaceFiles[0].filename,
   );
-  // Initialise once from props + persisted localStorage. Subsequent
-  // edits drive this via the editor's update listener; tab switches
-  // read it to repopulate the doc.
   const fileBuffersRef = useRef<Map<string, string>>(
     new Map(
       workspaceFiles.map((f) => {
@@ -504,10 +407,8 @@ export default function ChallengeCard({
     activeFilenameRef.current = activeFilename;
   }, [activeFilename]);
 
-  // Active file's init code (trimmed) + derived line metrics. Init now
-  // belongs to a file, so the read-only init drawer and the editor's
-  // line-number offset both re-render / reconfigure when the active tab
-  // changes.
+  // Active file's init code (trimmed) + derived line metrics; the init
+  // drawer and line-number offset reconfigure when the active tab changes.
   const activeTrimmedInit = initForFile(activeFilename);
   const activeHasInit = activeTrimmedInit.length > 0;
   const activeInitLineCount = activeHasInit
@@ -531,9 +432,8 @@ export default function ChallengeCard({
 
   const canCheck = canRunTests(adapter.id, tests);
 
-  // Persist the active file's current doc content to its localStorage
-  // key. Used by both the debounced editor listener and tab-switch /
-  // unmount flushes.
+  // Persist a file's doc content to its localStorage key (debounced editor
+  // listener + tab-switch / unmount flushes).
   const persistActiveFile = useCallback(
     (filename: string, content: string) => {
       savePersistedCode(persistedKeyForFile(filename), content);
@@ -547,9 +447,8 @@ export default function ChallengeCard({
     const themeComp = new Compartment();
     const languageComp = new Compartment();
     const lineNumberComp = new Compartment();
-    // Initial gutter offset = the active file's init line count. The
-    // reconfigure effect below keeps it in sync as the active tab (and
-    // therefore its init code) changes.
+    // Initial gutter offset = the active file's init line count; a
+    // reconfigure effect keeps it in sync on tab switches.
     const initial = initForFile(activeFilenameRef.current);
     const initialOffset = initial ? initial.split("\n").length : 0;
 
@@ -586,11 +485,8 @@ export default function ChallengeCard({
         }),
         keymap.of([
           {
-            // Default keyboard action mirrors the split button's
-            // default button: Submit (i.e. run + check tests). For
-            // challenges with no tests (`canCheck` false), the
-            // submit handler short-circuits to run + display output
-            // without ever flipping the pass/fail banner.
+            // Mirrors the split button's default: Submit (run + check).
+            // Without tests the submit handler short-circuits to plain Run.
             key: "Mod-Enter",
             run: () => {
               submitRef.current();
@@ -598,9 +494,7 @@ export default function ChallengeCard({
             },
           },
           {
-            // Dropdown action: run the code without grading it.
-            // Matches the dropdown menu item visible from the
-            // chevron on the Submit button.
+            // Dropdown action: run without grading.
             key: "Mod-Shift-Enter",
             run: () => {
               runRef.current();
@@ -646,8 +540,8 @@ export default function ChallengeCard({
     mainLineNumberCompRef.current = lineNumberComp;
     mainLanguageCompRef.current = languageComp;
 
-    // Mixed-language adapters (web) pick the mode from the active
-    // file's extension; the per-file effect below keeps it in sync.
+    // Mixed-language adapters (web) pick the mode from the active file's
+    // extension; a per-file effect keeps it in sync.
     const initialMode =
       adapter.codeMirrorModeForFile?.(activeFilenameRef.current) ??
       adapter.codeMirrorMode;
@@ -674,10 +568,8 @@ export default function ChallengeCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Tab switch: flush any pending debounced save for the previously
-  // active file, snapshot the current editor doc into the file
-  // buffers Map, load the newly-active file's buffer, and reset the
-  // init drawer to collapsed (each file's init starts collapsed).
+  // Tab switch: flush + snapshot the outgoing file's buffer, load the
+  // incoming file's buffer, and collapse the init drawer.
   const previousActiveRef = useRef(activeFilename);
   useEffect(() => {
     const view = editorRef.current;
@@ -687,7 +579,6 @@ export default function ChallengeCard({
     }
     const previousFilename = previousActiveRef.current;
     if (previousFilename === activeFilename) return;
-    // Snapshot the outgoing file's buffer and flush its persisted copy.
     const outgoingContent = view.state.doc.toString();
     fileBuffersRef.current.set(previousFilename, outgoingContent);
     if (persistSaveTimerRef.current !== null) {
@@ -695,7 +586,6 @@ export default function ChallengeCard({
       persistSaveTimerRef.current = null;
     }
     persistActiveFile(previousFilename, outgoingContent);
-    // Load the incoming file's buffer into the editor.
     const incoming = fileBuffersRef.current.get(activeFilename) ?? "";
     view.dispatch({
       changes: { from: 0, to: view.state.doc.length, insert: incoming },
@@ -704,10 +594,8 @@ export default function ChallengeCard({
     previousActiveRef.current = activeFilename;
   }, [activeFilename, persistActiveFile]);
 
-  // Keep the editor's line-number gutter offset in sync with the active
-  // file's init line count (the editable region numbers continue after
-  // the read-only init). Runs on mount (after the view exists) and on
-  // every tab switch.
+  // Keep the gutter offset in sync with the active file's init line count
+  // (the editable region continues numbering after the read-only init).
   useEffect(() => {
     const view = editorRef.current;
     const comp = mainLineNumberCompRef.current;
@@ -750,12 +638,9 @@ export default function ChallengeCard({
     reconfigure(solutionEditorRef.current, solutionThemeCompRef.current);
   }, [cmThemeName]);
 
-  // Resolve which file the modal should display. Prefer the user's
-  // explicit click; otherwise default to the first file that actually
-  // has a real `solutionCode` so the modal lands on something the
-  // learner is supposed to read. Derived rather than stored so we
-  // don't need a `useEffect` to keep the selection in sync with
-  // `solutionFiles` (which would trigger react-hooks/set-state-in-effect).
+  // Which file the modal displays: the user's explicit click, else the
+  // first file with a real solution. Derived rather than stored so no
+  // effect is needed to keep it in sync with `solutionFiles`.
   const activeSolutionFile = useMemo(() => {
     if (solutionFiles.length === 0) return null;
     if (solutionActiveFilename) {
@@ -767,9 +652,8 @@ export default function ChallengeCard({
     return solutionFiles.find((f) => f.hasSolution) ?? solutionFiles[0];
   }, [solutionFiles, solutionActiveFilename]);
 
-  // What text the modal actually displays for the active file. When
-  // `initCode` is set we prepend a single-line comment header so the
-  // learner knows there's read-only setup that runs before this code.
+  // Modal text for the active file; when it has init code, prepend a
+  // comment header noting the read-only setup that runs first.
   const activeSolutionSource = useMemo(() => {
     if (!activeSolutionFile) return "";
     const fileInit = initForFile(activeSolutionFile.filename);
@@ -779,13 +663,9 @@ export default function ChallengeCard({
     return header + activeSolutionFile.source;
   }, [activeSolutionFile, initForFile, adapter.codeMirrorMode]);
 
-  // Mount / re-mount the read-only solution editor whenever the modal
-  // opens or the active solution file changes. We keep the doc
-  // editable at the contenteditable level (relying on `readOnly` to
-  // block insertions) so the user can click into the editor, move the
-  // caret, and select text, including Mod-A select-all, which is
-  // wired explicitly below since `editable.of(false)` would otherwise
-  // drop keyboard focus and disable the default keymap.
+  // Mount / re-mount the read-only solution editor when the modal opens or
+  // the active file changes. `readOnly` (not `editable.of(false)`) blocks
+  // insertions while keeping caret movement, selection, and Mod-A working.
   useEffect(() => {
     if (!solutionOpen || !activeSolutionFile) return;
     if (!solutionEditorHostRef.current) return;
@@ -829,12 +709,9 @@ export default function ChallengeCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [solutionOpen, activeSolutionFile, activeSolutionSource]);
 
-  // Mount / re-mount the read-only init editor for the active file's
-  // init code. Init now belongs to a file, so switching tabs rebuilds
-  // this editor with the new file's init (or tears it down when the
-  // active file has none). We keep it mounted even while collapsed so
-  // the learner can see the first few lines through the gradient fade,
-  // clicking the fade or the toggle expands it to full height.
+  // Mount / re-mount the read-only init editor for the active file's init
+  // code (tab switches rebuild it; kept mounted while collapsed so the
+  // first lines show through the gradient fade).
   useEffect(() => {
     if (!activeHasInit) return;
     if (!initEditorHostRef.current) return;
@@ -941,24 +818,16 @@ export default function ChallengeCard({
     [adapter.id, initForFile],
   );
 
-  /** Execute the entry file's code against the shared runtime. Before
-   *  invoking `run()`, stage every workspace file into the runtime's
-   *  virtual file system (so multi-file `import`s / `include`s /
-   *  cross-class references resolve) via `prepareFileSystem`. The
-   *  caller passes a precomputed entry source so it can prepend the
-   *  init/harness blocks without us having to know about either.
-   *
-   *  Sentinel-line filtering for the test harness is handled by the
-   *  caller (so plain Run can stream raw output, but Check can post-
-   *  process the stdout to peel off `__DSTEST__:…` lines). */
+  /** Execute the entry source against the shared runtime, staging workspace
+   *  files into the VFS first so multi-file imports resolve. The caller
+   *  precomputes the entry source (init/harness prepends) and post-processes
+   *  stdout (`__DSTEST__:…` sentinel filtering) itself. */
   const execute = useCallback(
     async (
       entrySource: string,
       filesSnapshot: Map<string, string>,
-      // The caller's run sequence (from `++runSeqRef.current`). Owning
-      // the increment in the caller lets it guard its own post-await
-      // state updates too, a newer run/check/reset supersedes both
-      // this execution's streaming updates and the caller's final ones.
+      // The caller's run sequence; owning the increment there lets it guard
+      // its own post-await state updates too.
       mySeq: number,
     ): Promise<{ cells: OutputCell[]; elapsedMs: number }> => {
       setOutputs([]);
@@ -968,12 +837,9 @@ export default function ChallengeCard({
       setStatus("loading");
       setStatusMessage("Initializing runtime…");
 
-      // Kick dataset downloads in parallel with the runtime boot so a
-      // cold first Run overlaps the two waits. Usually instant: the
-      // bytes are memoised in-session and persisted in the Cache API.
-      // The no-op catch keeps an early bail-out (superseded run, boot
-      // failure) from surfacing an unhandled rejection; awaiting the
-      // promise below still observes the real error.
+      // Kick dataset downloads in parallel with the runtime boot. The no-op
+      // catch keeps an early bail-out from surfacing an unhandled rejection;
+      // awaiting the promise below still observes the real error.
       const datasetsPromise =
         cardDatasets.length > 0
           ? Promise.all(
@@ -985,17 +851,11 @@ export default function ChallengeCard({
           : null;
       datasetsPromise?.catch(() => {});
 
-      // Re-use the shared per-adapter runtime, see runtimeRegistry.ts.
-      // Once Pyodide / WebR / CheerpJ has loaded for any block on this
-      // page, every other `<CodeBlock>` and `<ChallengeCard>` for the
-      // same language attaches to that same worker instead of spinning
-      // up its own. The adapter's `run()` wipes user globals before
-      // every execution, so cards still can't observe each other's
-      // variable state.
+      // Re-use the shared per-adapter runtime (see runtimeRegistry.ts); the
+      // adapter's `run()` wipes user globals so cards stay isolated.
       if (!runtimeRef.current) {
-        // The registry subscribes this callback to the in-flight boot
-        // even when a silent warm-up started it, replaying the current
-        // stage, so a Run click mid-boot shows live progress.
+        // The registry replays the in-flight boot's current stage to this
+        // callback, so a Run click mid-boot shows live progress.
         runtimeRef.current = await getSharedRuntime(
           RuntimeScope.Fumadocs,
           adapter,
@@ -1030,20 +890,11 @@ export default function ChallengeCard({
       let nextOutputId = 0;
       const cells: OutputCell[] = [];
 
-      // Stage files into the runtime VFS: the card's remote datasets
-      // (so init/starter code can read them like local files) and, for
-      // multi-file workspaces, every workspace file, so imports
-      // resolve. The entry file's bytes mirror what we pass to `run()`
-      // below, including any init prelude / harness suffix the caller
-      // bolted on.
-      //
-      // Single-file cards pass their source straight to `run()` and must
-      // NOT pre-stage it: some runtimes (CheerpJ/Java, .NET/C#) compile the
-      // staged file set when the VFS is populated, and with no
-      // `entryFilename` (single-file) they then can't locate `main`, so the
-      // program produces no output. This mirrors <CodeBlock>, which only
-      // stages for multi-file workspaces. (Staging only *dataset* files is
-      // safe: those runtimes ignore non-source files.)
+      // Stage remote datasets and (multi-file only) workspace files into the
+      // runtime VFS so imports resolve. Single-file cards must NOT pre-stage
+      // their source: some runtimes (CheerpJ/Java, .NET/C#) compile the
+      // staged file set and, with no `entryFilename`, then can't locate
+      // `main`. Staging only dataset files is safe (non-source is ignored).
       if (
         (isMultiFile || datasetFiles.length > 0) &&
         runtime.prepareFileSystem
@@ -1088,10 +939,8 @@ export default function ChallengeCard({
               elapsedMs < 1000
                 ? `${elapsedMs.toFixed(0)}ms`
                 : `${(elapsedMs / 1000).toFixed(2)}s`;
-            // Collapse consecutive stdout cells into a single block
-            // (matches the JS/TS/PHP playground behaviour where one
-            // console.log per cell would otherwise produce a noisy
-            // stack of one-line cells).
+            // Collapse consecutive stdout cells so one console.log per cell
+            // doesn't stack a pile of one-line cells.
             const last = cells[cells.length - 1];
             if (
               cell.type === "stdout" &&
@@ -1124,10 +973,8 @@ export default function ChallengeCard({
               adapter.outputCapabilities?.preview && tailwind
                 ? true
                 : undefined,
-            // Mid-run waits (e.g. Python's deferred package set on the
-            // first run, or an on-demand `import`) show the boot notice
-            // for the duration instead of a bare "Running…" while
-            // megabytes download.
+            // Mid-run waits (e.g. Python's first-run package install) show
+            // the boot notice instead of a bare "Running…".
             onStatus: (message, preparing) => {
               if (runSeqRef.current !== mySeq) return;
               setStatusMessage(message);
@@ -1136,11 +983,9 @@ export default function ChallengeCard({
           },
         );
       } finally {
-        // Hold the running overlay for at least MIN_RUN_OVERLAY_MS so
-        // the wave animation doesn't blink in/out on sub-frame runs.
-        // The `finally` covers the throw path so error states also
-        // get the same minimum visible duration; the thrown exception
-        // still propagates to the caller's catch.
+        // Hold the running overlay for at least MIN_RUN_OVERLAY_MS so the
+        // wave animation doesn't blink on sub-frame runs; `finally` covers
+        // the throw path too, and the exception still propagates.
         const wait = MIN_RUN_OVERLAY_MS - (performance.now() - startedAt);
         if (wait > 0) {
           await new Promise<void>((resolve) => setTimeout(resolve, wait));
@@ -1169,8 +1014,7 @@ export default function ChallengeCard({
   const run = useCallback(async () => {
     const mySeq = ++runSeqRef.current;
     setActiveAction("run");
-    // Running without submitting isn't a graded attempt, so clear any prior
-    // test results and pass/fail banner instead of leaving stale state behind.
+    // Not a graded attempt: clear stale test results and banner.
     setTestResults([]);
     setBannerState(null);
     const snapshot = snapshotAllFiles();
@@ -1198,9 +1042,8 @@ export default function ChallengeCard({
       setStatus("error");
       setStatusMessage(message);
     } finally {
-      // Only the latest run owns the busy spinner, a superseded run
-      // clearing it would re-enable Run/Submit mid-flight for its
-      // successor.
+      // Only the latest run owns the busy spinner; a superseded run
+      // clearing it would re-enable Run/Submit mid-flight.
       if (runSeqRef.current === mySeq) setActiveAction(null);
     }
   }, [execute, resolvedEntryFilename, snapshotAllFiles, effectiveSourceFor]);
@@ -1236,11 +1079,9 @@ export default function ChallengeCard({
       const { cells, elapsedMs } = await execute(combined, snapshot, mySeq);
       if (runSeqRef.current !== mySeq) return;
 
-      // Split stdout cells into "user-visible" + parsed harness results.
-      // Non-stdout cells (html / image / plot / stderr) pass through
-      // untouched, the harness only emits text. Also collect the raw
-      // stdout/stderr text so we can evaluate stdout-based expectations
-      // against it.
+      // Split stdout into user-visible text + parsed harness results
+      // (non-stdout cells pass through untouched); also collect raw
+      // stdout/stderr for the stdout-based expectations.
       const finalCells: OutputCell[] = [];
       const allResults: ParsedTestResult[] = [];
       let cleanStdout = "";
@@ -1334,10 +1175,8 @@ export default function ChallengeCard({
     runRef.current = run;
   }, [run]);
 
-  // Pin this card's runtime in the registry while the card is mounted, so
-  // eviction (the per-scope LRU cap) never tears a runtime down under a
-  // card that could still Run against it, including the `runtimeRef`
-  // cached above.
+  // Pin this card's runtime while mounted so the per-scope LRU eviction
+  // never tears it down under a card that could still Run against it.
   useEffect(
     () => retainRuntime(RuntimeScope.Fumadocs, adapter.id),
     [adapter.id],
@@ -1351,13 +1190,10 @@ export default function ChallengeCard({
     warmRuntimeOnRouteLand(RuntimeScope.Fumadocs, adapter);
   }, [adapter]);
 
-  // Warm the shared runtime when the card first scrolls into view, so the
-  // learner's first Run/Submit reuses an already-initialised runtime instead
-  // of triggering a cold download on click. Kept as the fallback for
-  // Save-Data users (the route-land warm-up skips them) and for additional
-  // languages further down the page. Best-effort and deduped across all
-  // cards/blocks of the same language by the registry; failures are swallowed
-  // so an actual Run can retry and surface the real error.
+  // Warm the shared runtime when the card first scrolls into view; the
+  // fallback for Save-Data users (route-land warm-up skips them) and for
+  // additional languages further down the page. Best-effort and deduped by
+  // the registry; failures are swallowed so a real Run can retry.
   useEffect(() => {
     const card = cardRef.current;
     if (!card || warmedRef.current) return;
@@ -1370,20 +1206,16 @@ export default function ChallengeCard({
         void getSharedRuntime(RuntimeScope.Fumadocs, adapter)
           .then((rt) => {
             if (!runtimeRef.current) runtimeRef.current = rt;
-            // Pre-install heavy optional packages only if this card's
-            // authored code (or its explicit `packages` prop) needs
-            // them, see LanguageRuntime.warmPackages. Fire-and-forget:
-            // a Run installs on demand regardless.
+            // Pre-install heavy optional packages only if this card's code
+            // needs them (see LanguageRuntime.warmPackages). Fire-and-forget.
             const hint = warmHintRef.current;
             rt.warmPackages?.(hint.sources, { packages: hint.packages });
           })
           .catch(() => {
             warmedRef.current = false;
           });
-        // Prefetch the card's datasets alongside the runtime, so a cold
-        // Run/Submit finds both the engine and the data already local.
-        // Also best-effort: the Run path re-requests (and reports)
-        // failures.
+        // Prefetch datasets alongside the runtime; best-effort, the Run
+        // path re-requests (and reports) failures.
         for (const spec of datasetsRef.current) {
           void fetchDatasetBytes(spec.path).catch(() => {});
         }
@@ -1399,9 +1231,7 @@ export default function ChallengeCard({
     checkRef.current = check;
   }, [check]);
 
-  // The split button's default action (and Mod-Enter) is "Submit"
-  // when the challenge actually has tests; otherwise it falls back
-  // to a plain Run so the keystroke isn't a dead key.
+  // Default action (and Mod-Enter) is Submit when tests exist, else Run.
   useEffect(() => {
     submitRef.current = canCheck ? () => void check() : () => void run();
   }, [canCheck, check, run]);
@@ -1409,9 +1239,8 @@ export default function ChallengeCard({
   // ─── Reset ─────────────────────────────────────────────────────────
   const reset = useCallback(() => {
     runSeqRef.current++;
-    // Restore every file's buffer to its MDX starter, drop the active
-    // file's saved copy from localStorage so the next mount picks up
-    // the starter cleanly, and reload the active doc into the editor.
+    // Restore every buffer to its starter, drop saved copies, and reload
+    // the active doc.
     for (const f of workspaceFiles) {
       fileBuffersRef.current.set(f.filename, f.starterCode);
       clearPersistedCode(persistedKeyForFile(f.filename));
@@ -1444,13 +1273,9 @@ export default function ChallengeCard({
   }, [persistedKeyForFile, toasts, workspaceFiles]);
 
   // ─── Apply solution ────────────────────────────────────────────────
-  // Load every file's reference solution into the learner's editor (the
-  // "Load Solution into Editor" button in the solution modal). Files
-  // without their own solution are scaffold the learner isn't meant to
-  // change, so they're left untouched. The active file is written
-  // straight into the live editor; if it has no solution of its own we
-  // hop to the first file that does, so the applied code lands on screen
-  // instead of silently in a background buffer.
+  // Load every solved file's reference solution into the buffers (scaffold
+  // files are left untouched); if the active tab is scaffold, hop to the
+  // first solved file so the applied code lands on screen.
   const applySolutionToEditor = useCallback(() => {
     const solvable = solutionFiles.filter((f) => f.hasSolution);
     if (solvable.length === 0) return;
@@ -1467,11 +1292,8 @@ export default function ChallengeCard({
       }
     }
 
-    // If the active tab is a scaffold file (no solution of its own),
-    // switch to the first solved file. The tab-switch effect snapshots
-    // the unchanged scaffold out and loads the freshly-set solution
-    // buffer in, no clobbering, since we never wrote the scaffold's
-    // buffer above.
+    // Scaffold tab active: switch to the first solved file. The tab-switch
+    // effect snapshots the scaffold out and loads the solution buffer in.
     if (!solvable.some((f) => f.filename === active)) {
       setActiveFilename(solvable[0].filename);
     }
@@ -1485,13 +1307,9 @@ export default function ChallengeCard({
   }, [solutionFiles, persistActiveFile, toasts]);
 
   // ─── Test hook ─────────────────────────────────────────────────────
-  // Expose an imperative driver on `window.__dsChallenges` so the
-  // Playwright solution sweep (e2e/challenge-solutions.spec.ts) can
-  // load a card's reference solution into its buffers and run the
-  // tests without round-tripping every keystroke through the DOM.
-  // The registry key is a (adapter.id, title) tuple, stable across
-  // page reloads, so the test can lock onto a card via the same
-  // identifier the data attributes expose.
+  // Imperative driver on `window.__dsChallenges` for the Playwright
+  // solution sweep (e2e/challenge-solutions.spec.ts), keyed by the stable
+  // (adapter.id, title) tuple.
   const checkRef = useRef<() => Promise<void>>(() => Promise.resolve());
   const testResultsRef = useRef(testResults);
   const bannerStateRef = useRef(bannerState);
@@ -1670,12 +1488,8 @@ export default function ChallengeCard({
         ? "fail"
         : "pending";
 
-  // Test-only solution payload. Stamped onto the card as a JSON-encoded
-  // list of { filename, source } pairs so the Playwright solution
-  // runner (e2e/challenge-solutions.spec.ts) can drive each card
-  // without us having to parse MDX outside of next. Only files with
-  // an actual solution are included, scaffold files the learner is
-  // not expected to modify are omitted.
+  // Test-only solution payload stamped onto the card (JSON list of
+  // { filename, source }, solved files only) for the Playwright runner.
   const solutionTestPayload = useMemo(() => {
     const real = solutionFiles.filter((f) => f.hasSolution);
     if (real.length === 0) return null;
@@ -1746,10 +1560,7 @@ export default function ChallengeCard({
         </div>
       </div>
 
-      {/* ── File tab bar ──
-            Shown for multi-file workspaces, or when a single-file card
-            opts in via `showFileTabBar`. The init drawer (which now
-            belongs to the active file) renders below it. */}
+      {/* ── File tab bar (multi-file, or single-file opt-in) ── */}
       {showTabs && (
         <div
           className={styles.fileTabBar}
@@ -1785,12 +1596,8 @@ export default function ChallengeCard({
       )}
 
       {/* ── Init code (active file) ──
-            The init drawer belongs to the active file and renders below
-            the file tab bar. When ≤3 lines: always shown expanded, no
-            toggle header. When >3 lines: collapsed by default with a
-            gradient fade overlay and "Click to expand" prompt; the toggle
-            header lets the user collapse it again. The light top border
-            is added only when no file tab bar sits above it. */}
+            ≤3 lines: always expanded, no toggle. >3 lines: collapsed by
+            default behind a gradient fade with expand/collapse toggles. */}
       {activeHasInit && (
         <div
           className={`${styles.initWrap}${
@@ -1864,9 +1671,7 @@ export default function ChallengeCard({
         </div>
       )}
 
-      {/* ── Editor ──
-            Gets a light top border only when nothing above it (file tab
-            bar or the active file's init drawer) already supplies a
+      {/* ── Editor ── light top border only when nothing above supplies a
             divider. */}
       <div
         className={`${styles.editor}${
@@ -1988,10 +1793,7 @@ export default function ChallengeCard({
               </Menu.Root>
             </>
           ) : (
-            // Challenges without tests still get a plain Run pill,
-            // no menu, no dropdown, since there's nothing to
-            // submit. The keymap above falls back to `run` for the
-            // same reason.
+            // Challenges without tests get a plain Run pill, no dropdown.
             <button
               type="button"
               className={styles.runBtn}
@@ -2033,12 +1835,8 @@ export default function ChallengeCard({
           )}
         </div>
         <div className={styles.btnGroupUtil}>
-          {/* Runtime status / loading message, mirrors the executable
-              code block's status text. While the runtime is fetching
-              its WASM toolchain on first run, this surfaces "Loading
-              Pyodide", "Loading browsercc clang toolchain (this can
-              take a moment)…" etc. instead of leaving the user
-              staring at a spinning button with no context. */}
+          {/* Runtime status text ("Loading Pyodide", …) so a first-run WASM
+              fetch isn't just a spinning button. */}
           {isBusy && statusMessage && (
             <span
               className={styles.actionBarStatus}
@@ -2136,9 +1934,8 @@ export default function ChallengeCard({
           className={`${styles.outputPanel}${isBusy ? ` ${styles.outputRunning}` : ""}`}
           aria-live="polite"
         >
-          {/* The "Output" header is hidden while the boot notice (loading
-              animation) is showing, there's no output yet, just setup.
-              It returns the moment user code actually runs. */}
+          {/* "Output" header hidden while the boot notice shows; it returns
+              once user code actually runs. */}
           {!showBootNotice && (
             <div className={styles.outputHeader}>
               <div
@@ -2157,12 +1954,8 @@ export default function ChallengeCard({
             </div>
           )}
           {showBootNotice && (
-            // Same boot affordance as `<CodeBlock>`: the brand
-            // assemble-and-quarter-turn loader, staged copy with the
-            // cold-download size, and a determinate bar once the adapter
-            // reports stage fractions (see RuntimeBootNotice). Also shown
-            // for mid-run blocking waits (package install), no runtime
-            // download or fraction in that case.
+            // Same boot affordance as `<CodeBlock>` (see RuntimeBootNotice);
+            // also shown for mid-run blocking waits, without size/fraction.
             <div className={codeBlockStyles.bootNoticeWrap}>
               <RuntimeBootNotice
                 language={adapter.runtimeInfo.language}
@@ -2184,9 +1977,8 @@ export default function ChallengeCard({
               ))}
             </div>
           )}
-          {/* No "Running…" placeholder while output is empty, a centered
-              spinner signals the run is in progress. Suppressed during the
-              boot notice, which carries its own loader. */}
+          {/* Centered spinner instead of a "Running…" placeholder; suppressed
+              while the boot notice carries its own loader. */}
           {isBusy && !showBootNotice && (
             <div className={styles.runSpinner} aria-hidden="true">
               <DiamondSpinner size={28} label="Running…" />
@@ -2322,15 +2114,13 @@ function SolutionModal({
     [],
   );
 
-  // Copy the active file's raw solution, not the synthetic
-  // "init runs first" comment header that the read-only editor prepends
-  // for display when the file carries its own init code.
+  // Copy the active file's raw solution, not the synthetic "init runs
+  // first" header prepended for display.
   const activeRaw = useMemo(
     () => files.find((f) => f.filename === activeFilename)?.source ?? source,
     [files, activeFilename, source],
   );
-  // Whether the active file's solution is identical to its starter, used
-  // to surface a subtle "no edits needed" note in multi-file workspaces.
+  // Solution identical to starter → "no edits needed" note (multi-file).
   const activeIsUnchanged = useMemo(
     () => files.find((f) => f.filename === activeFilename)?.isUnchanged ?? false,
     [files, activeFilename],
@@ -2497,28 +2287,20 @@ function SolutionModal({
     : createPortal(modal, document.body);
 }
 
-/** Output cell renderer, a trimmed copy of `<CodeBlock>`'s adjusted for the
- *  lighter challenge-card chrome: text cells use mono-spaced pre-wrap, HTML
- *  cells (DataFrames) get the table styles defined in the module, image and
- *  plot cells render inline.
- *
- *  The `plot` branch was missing until it was noticed that a `fig.show()` in
- *  a challenge printed a wall of escaped JSON instead of drawing a chart. A
- *  plot cell carries the raw `fig.to_json()` string in `content` and the
- *  parsed figure in `plot`, so the text fallback at the bottom of this
- *  function renders one perfectly happily; nothing throws and nothing warns.
- *  Any new cell type added to `OutputCellType` needs a branch here as well as
- *  in `<CodeBlock>`'s `OutputSegment`. */
+/** Output cell renderer, a trimmed copy of `<CodeBlock>`'s for the lighter
+ *  challenge-card chrome. Any new cell type added to `OutputCellType` needs
+ *  a branch here AND in `<CodeBlock>`'s `OutputSegment` — a missing branch
+ *  falls through to the text fallback silently (a plot cell's `content` is
+ *  raw figure JSON). */
 function OutputCellView({ cell }: { cell: OutputCell }) {
   if (cell.type === "html") {
     return (
       <div
-        // `not-prose` keeps the docs' prose typography (enlarged Inter,
-        // table margins) from restyling the dataframe markup when the
-        // card sits inside MDX content.
+        // `not-prose` keeps the docs' prose typography from restyling the
+        // dataframe markup inside MDX content.
         className={`${styles.outCellHtml} not-prose`}
-        // Same trust assumption as the playground / code block: HTML
-        // cells originate from code the user typed in this very widget.
+        // Same trust assumption as the playground: HTML cells come from
+        // code the user typed in this very widget.
         dangerouslySetInnerHTML={{ __html: cell.content }}
       />
     );

@@ -1,22 +1,9 @@
 "use client";
 
-// Browser-based SQLite playground. Boots @sqlite.org/sqlite-wasm, renders the schema in
-// a left sidebar (Tables/Views), and gives the user a multi-tab SQL
-// editor whose results land in a top results panel.
-//
-// Differs from `Playground.tsx` (which wraps a single REPL-style
-// adapter) in three significant ways:
-//   1. The engine is persistent across runs and tabs, only the
-//      database-selector causes a teardown/rebuild.
-//   2. The editor is multi-tab, with per-database persistence so
-//      switching databases doesn't blow away your work in the others.
-//   3. The "output" is a tabular result panel, not a stream of
-//      heterogeneous cells.
-//
-// All shared chrome (Settings dialog, runtime-info popover, run-overlay
-// animation, themes) is reused from `playgroundShared`/`playgroundTheme`
-// so this playground retints in lockstep with every other one when the
-// user picks a different editor theme.
+// Browser-based SQLite playground: boots @sqlite.org/sqlite-wasm, schema
+// sidebar, multi-tab SQL editor, tabular results panel. Unlike
+// `Playground.tsx`, the engine persists across runs/tabs and tabs persist
+// per database. Shared chrome comes from playgroundShared/playgroundTheme.
 
 import React, {
   useCallback,
@@ -135,9 +122,8 @@ import {
 const SQLITE_SAMPLE_DATABASES = sqliteAdapter.samples;
 import dynamic from "next/dynamic";
 
-// ErDiagramPane pulls in @xyflow/react and elkjs/lib/elk.bundled.js
-// (~hundreds of KB of layout-algorithm code). It only renders when
-// the user opens the ER-diagram tab, so defer the chunk until then.
+// ErDiagramPane pulls in @xyflow/react + elkjs (~hundreds of KB); defer the
+// chunk until the ER-diagram tab opens.
 const ErDiagramPane = dynamic(
   () => import("../ErDiagramPane").then((m) => m.ErDiagramPane),
   { ssr: false, loading: ErDiagramLoadingFallback },
@@ -242,10 +228,8 @@ const RUNTIME_INFO: RuntimeInfo = {
 // Modify Structure drawer
 // ────────────────────────────────────────────────────────────────────────
 
-/** Hints used by the result-view header to render PK / FK icons next
- *  to columns sourced from a known table. Computed by the parent
- *  whenever the current tab's result was produced by a sidebar
- *  preview, and threaded through `ResultView` → `ResultTableBody`. */
+/** Hints for the result-view header's PK / FK column icons; threaded
+ *  through `ResultView` → `ResultTableBody`. */
 interface ColumnKeyHints {
   pk: Set<string>;
   fk: Map<string, ForeignKeyInfo>;
@@ -253,9 +237,8 @@ interface ColumnKeyHints {
 
 // ─── Pragma settings ─────────────────────────────────────────────────────
 
-/** SQLite pragma defaults that the playground starts with when no saved
- *  preferences are found. `foreignKeys` is ON here because the engine
- *  already enables it via `PRAGMA foreign_keys = ON` in `build()`. */
+/** Pragma defaults when no saved preferences exist. `foreignKeys` is ON
+ *  because the engine already enables it in `build()`. */
 const DEFAULT_PRAGMA_SETTINGS = {
   foreignKeys: true,
   journalMode: "delete",
@@ -278,20 +261,15 @@ type PragmaSettings = {
 const PRAGMA_PAGE_SIZE_MIN = 512;
 const PRAGMA_PAGE_SIZE_MAX = 65536;
 
-/** Maps the human-readable `synchronous` setting names to their
- *  PRAGMA integer values. Kept at module level to avoid re-creating
- *  the object on every `applyPragmasToEngine` call. */
+/** Human-readable `synchronous` names → PRAGMA integer values. */
 const PRAGMA_SYNC_MAP: Record<string, string> = {
   off: "0",
   normal: "1",
   full: "2",
 };
 
-/** Apply a set of pragma settings to an already-initialised SQLite engine.
- *  Called once after the engine boots and again whenever the user saves
- *  changes in the Pragmas settings tab. Errors are swallowed so a single
- *  unsupported pragma (e.g. page_size on an existing database) does not
- *  prevent the other pragmas from being applied. */
+/** Apply pragma settings to an initialised engine (after boot and on save).
+ *  Errors are swallowed so one unsupported pragma doesn't block the rest. */
 async function applyPragmasToEngine(
   engine: import("../runtime/sqlite").SqliteEngine,
   p: PragmaSettings,
@@ -610,18 +588,16 @@ function SqlPlaygroundInner() {
   // True when this workspace is already open (locked) in another tab, so
   // the shell shows a conflict overlay instead of deadlocking on boot.
   const [workspaceConflict, setWorkspaceConflict] = useState(false);
-  // The workspace that conflict was over, so the overlay can offer a copy of
-  // it. A ref because the boot effect records it and only the overlay's
-  // handlers read it, no render depends on the value.
+  // The conflicted workspace, so the overlay can offer a copy of it. A ref:
+  // no render depends on the value.
   const conflictWorkspaceRef = useRef<{ id: string; name: string } | null>(null);
   const [conflictCopyBusy, setConflictCopyBusy] = useState(false);
   const [conflictCopyError, setConflictCopyError] = useState<string | null>(
     null,
   );
   // From the conflict overlay: duplicate the workspace another tab is holding
-  // and switch to the duplicate, which is the only action here that keeps the
-  // data the user came for. `copyConflictedWorkspace` reloads on success, so
-  // reaching the end of this callback means it failed.
+  // and switch to the duplicate. `copyConflictedWorkspace` reloads on
+  // success, so reaching the end of this callback means it failed.
   const handleConflictOpenCopy = useCallback(() => {
     const source = conflictWorkspaceRef.current;
     if (!source) return;
@@ -649,9 +625,9 @@ function SqlPlaygroundInner() {
       }
     })();
   }, []);
-  // From the conflict overlay: create a fresh workspace and switch to it.
-  // No engine is open in the conflict case, so a reload is the simplest
-  // safe path, the new workspace id isn't locked, so it boots normally.
+  // From the conflict overlay: create a fresh workspace and switch to it. No
+  // engine is open in the conflict case, so a reload is safe and the new
+  // workspace id isn't locked.
   const handleConflictNewWorkspace = useCallback(() => {
     void (async () => {
       try {
@@ -882,8 +858,7 @@ function SqlPlaygroundInner() {
     }
   }, [setSettingsOpen, setActiveTabId]);
 
-  /** Close the Settings tab (✕ in its tab strip entry or in the settings
-   *  tab bar) and return focus to the most-recent query tab. */
+  /** Close the Settings tab and return focus to the most-recent query tab. */
   const closeSettingsTab = useCallback(() => {
     setSettingsOpen(false);
     const fallback = tabsRef.current[0]?.id;
@@ -1118,10 +1093,9 @@ function SqlPlaygroundInner() {
     submitParquetImport,
   } = useDatabaseActions({ ...queryRunnerRefs, pragmaSettingsRef });
 
-  // ─── Cloud saves + sharing ────────────────────────────────────────────
-  // A SQL bundle carries the active database as its native SQLite file image
-  // (the codec gzips it) plus the query tabs; reopening loads the image
-  // directly instead of replaying a dump.
+  // Cloud saves + sharing: a SQL bundle carries the database as its native
+  // SQLite file image plus the query tabs; reopening loads the image
+  // instead of replaying a dump.
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const buildCloudBundle = useCallback<BuildBundle>(
     async (opts) => {
@@ -1162,10 +1136,8 @@ function SqlPlaygroundInner() {
     ],
   );
 
-  // Apply a pending share/cloud bundle once the engine is up (the /s/<id>
-  // page and the Cloud dialog leave a ref in sessionStorage and navigate
-  // here; the marker is consumed on the first attempt so a failure can't
-  // loop across reloads).
+  // Apply a pending share/cloud bundle once the engine is up. The marker is
+  // consumed on the first attempt so a failure can't loop across reloads.
   const pendingBundleTriedRef = useRef(false);
   useEffect(() => {
     if (!loaded || pendingBundleTriedRef.current) return;
@@ -1189,8 +1161,7 @@ function SqlPlaygroundInner() {
           bundleTabSeeds(bundle),
         );
         // A cloud save is the owner's own; a share is someone else's copy,
-        // whose `personal` section (if a future client ever sends one) is not
-        // ours to absorb.
+        // whose `personal` section is not ours to absorb.
         if (pendingRef.source === "cloud") {
           const restored = restoreQueryLog(bundle.sql.personal, queryLogKeys);
           if (restored) replaceHistory(restored.history);
@@ -1314,10 +1285,8 @@ function SqlPlaygroundInner() {
     window.location.reload();
   }, []);
 
-  // Nuclear wipe: clears localStorage, OPFS, IndexedDB, and caches.
-  // Backed by the shared `clearAllLocalData` helper so every playground
-  // gets the same behaviour. Best-effort: failures inside one surface
-  // don't block the others, and we always reload.
+  // Nuclear wipe: clears every storage surface (localStorage, OPFS,
+  // IndexedDB, caches) before reloading. Best-effort; always reloads.
   const clearAllLocalData = useCallback(() => {
     void (async () => {
       try {
@@ -1458,10 +1427,8 @@ function SqlPlaygroundInner() {
   // ─── Boot the engine and CodeMirror ──────────────────────────────────
   useEffect(() => {
     let cancelled = false;
-    // Releases the workspace lock when this effect tears down (unmount /
-    // client-side navigation away) so a later remount, e.g. a browser
-    // back-then-forward return to the playground, can re-acquire it instead
-    // of colliding with this document's own stale lock.
+    // Releases the workspace lock on teardown so a later remount can
+    // re-acquire it instead of colliding with this document's stale lock.
     const lockController = new AbortController();
 
     if (editorHostRef.current && !editorRef.current) {
@@ -1511,11 +1478,8 @@ function SqlPlaygroundInner() {
         const initialSampleId =
           localStorage.getItem(storageKey("db")) ??
           SQLITE_SAMPLE_DATABASES[0].id;
-        // Resolve (or auto-create) the active workspace for this
-        // playground tab so the engine can persist its database
-        // to OPFS. When OPFS is unavailable, `ensureActiveWorkspace`
-        // still returns a registry-only entry and the engine falls
-        // back to in-memory mode.
+        // Resolve (or auto-create) the active workspace so the engine can
+        // persist to OPFS; without OPFS it falls back to in-memory mode.
         let workspaceId: string | null = null;
         try {
           const workspace = await ensureActiveWorkspace(PLAYGROUND_ID);
@@ -1528,12 +1492,10 @@ function SqlPlaygroundInner() {
               signal: lockController.signal,
             });
             if (!cancelled && !hasLock) {
-              // The same OPFS-backed workspace can't be opened in two tabs:
-              // SQLite's exclusive OPFS access handle would deadlock the
-              // boot (it hangs at ~90%). Surface a conflict overlay and
-              // skip the boot rather than hang.
-              // Remember which workspace it was, so the overlay can offer a
-              // copy of it rather than only a fresh, empty one.
+              // The same OPFS-backed workspace can't open in two tabs:
+              // SQLite's exclusive OPFS access handle deadlocks the boot at
+              // ~90%. Show the conflict overlay (remembering the workspace so
+              // it can offer a copy) and skip the boot rather than hang.
               conflictWorkspaceRef.current = {
                 id: workspace.id,
                 name: workspace.name,
@@ -1553,20 +1515,16 @@ function SqlPlaygroundInner() {
           workspaceId,
         );
         if (cancelled) {
-          // Component unmounted while the engine was being created; dispose
-          // it immediately so the worker is terminated and its exclusive
-          // OPFS access handle is released. Without this, the abandoned
-          // worker keeps the workspace locked and the next mount's boot
-          // deadlocks at ~90%.
+          // Unmounted mid-create: dispose so the worker releases its OPFS
+          // access handle — otherwise the next mount's boot deadlocks at ~90%.
           engine.dispose?.();
           return;
         }
         engineRef.current = engine;
         setEngineForRender(engine);
 
-        // Apply any user-saved pragma settings to the freshly-initialised
-        // database. pragmaSettingsRef is already populated from the
-        // localStorage hydration effect that runs synchronously on mount.
+        // Apply saved pragma settings; pragmaSettingsRef is already populated
+        // by the synchronous hydration effect.
         await applyPragmasToEngine(engine, pragmaSettingsRef.current);
 
         const sample = await engine.activeSample();
@@ -1610,12 +1568,9 @@ function SqlPlaygroundInner() {
       cancelled = true;
       // Release the workspace lock so the next mount can re-acquire it.
       lockController.abort();
-      // Terminate the engine worker so its OPFS access handles are
-      // released, a zombie worker would otherwise keep the workspace's
-      // opfs-sahpool locked across StrictMode remounts and client-side
-      // route changes, failing the next boot's OPFS acquisition. A boot
-      // still in flight here is handled by createSqliteEngine itself,
-      // which terminates the previous worker before spawning a new one.
+      // Terminate the engine worker so its OPFS access handles release; a
+      // zombie worker would keep the opfs-sahpool locked and fail the next
+      // boot. An in-flight boot is handled by createSqliteEngine itself.
       engineRef.current?.dispose?.();
       engineRef.current = null;
       editorRef.current?.destroy();
@@ -1773,11 +1728,9 @@ function SqlPlaygroundInner() {
         // Ignore quota errors.
       }
     }
-    // Focus the editor so the user can type immediately after any tab
-    // operation. Skip tabs whose editor pane is hidden. The FIRST focus
-    // after mount goes through the shared entry policy instead: desktop
-    // lands the cursor at the end of the query, mobile skips the focus so
-    // the on-screen keyboard doesn't pop before the user asks to type.
+    // Focus the editor after tab operations (skipping hidden editor panes).
+    // The first focus after mount goes through the shared entry policy
+    // instead (cursor at end on desktop, no keyboard-popping focus on mobile).
     const tab = tabsRef.current.find((t) => t.id === activeTabId);
     if (
       tab?.kind !== "er-diagram" &&
@@ -1889,18 +1842,15 @@ function SqlPlaygroundInner() {
   useEffect(() => {
     if (activeTab?.kind !== "er-diagram") return;
     refreshTableMetadata();
-    // Intentionally omit activeTab?.kind: we only want this to fire when
-    // `tables` changes (e.g. a new table was created), not on every switch
-    // back to the ER diagram tab. The initial refresh on tab-open is already
-    // handled inside openErDiagramTab().
+    // Intentionally omits activeTab?.kind: fire only when `tables` changes,
+    // not on every switch back to the ER diagram tab (tab-open refresh is
+    // handled inside openErDiagramTab()).
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tables, refreshTableMetadata]);
 
-  // Lazy-load (and re-load) metadata for every currently-expanded
-  // sidebar entity that has no cached `columnsByEntity` entry.
-  // Use `engineForRender` (local state, null on every mount) as the
-  // trigger so that returning from another playground re-fetches columns
-  // even when the Zustand `loaded` flag was already true.
+  // Lazy-load metadata for expanded sidebar entities with no cached entry.
+  // `engineForRender` (null on every mount) is the trigger so returning from
+  // another playground re-fetches even when the Zustand `loaded` flag stayed true.
   useEffect(() => {
     if (expandedEntities.size === 0) return;
     if (!engineForRender) return;
@@ -2070,10 +2020,6 @@ function SqlPlaygroundInner() {
     const sample = findSampleDatabase(pendingDbId);
     return customFilenames[pendingDbId] ?? sample.filename;
   }, [pendingDbId, customFilenames]);
-
-  // Drag-and-drop tab reordering is handled by the generic TabBar
-  // internally; SqlPlayground no longer needs its own DnD sensors or
-  // dragging-tab state for the tab strip.
 
   // Resolve PK / FK / constraint hints for any table by name, so each result
   // set of a multi-statement run is editable against its own table.
@@ -2333,11 +2279,8 @@ function SqlPlaygroundInner() {
     ],
   );
 
-  // Auth had no entry point inside a playground at all. It lands as the ⋯
-  // menu's last group rather than a header control: the header is down to
-  // five controls by design and has no room on a phone, and signing in
-  // isn't something anyone reaches for mid-session. Null while the first
-  // session fetch is in flight, so nothing flashes.
+  // Auth entry point lives in the ⋯ menu's last group (the header has no
+  // room). Null while the first session fetch is in flight, so nothing flashes.
   const accountSection = useAccountMenuSection();
   const sqlMoreSections = useMemo<MoreMenuSection[]>(
     () =>
@@ -2345,8 +2288,7 @@ function SqlPlaygroundInner() {
     [sqlBaseSections, accountSection],
   );
 
-  // Defined once and rendered in both the sidebar and the mobile drawer
-  // menu (the latter is an experiment, the sidebar copy may be retired).
+  // Defined once, rendered in both the sidebar and the mobile drawer menu.
   const databaseSelector = (
     <DatabaseSelector
       value={activeDbId}

@@ -1,20 +1,12 @@
 "use client";
 
 /**
- * Cloud auto-sync for a signed-in user's active workspace.
- *
- * The model: signed-in playgrounds back up to the cloud automatically, there is
- * no manual "Back up" button. This hook watches the in-tab change pulse
- * (workspaceChanges), and hands it to WorkspaceSyncEngine, which debounces and
- * uploads a fresh backup, promoting an unsaved draft to a real saved workspace
- * on the first change so it has a stable id and shows up in the list.
- *
- * OPFS stays the local source of truth (edits persist there synchronously, as
- * before); this only mirrors to the account, so an offline or failed sync never
- * loses work, and the engine retries when the connection returns.
- *
- * Everything is ref-driven so the single subscribe/online effect never tears
- * down on a prop change (buildBundle, the cloud state, etc. all change often).
+ * Cloud auto-sync for a signed-in user's active workspace: watches the in-tab
+ * change pulse and hands it to WorkspaceSyncEngine, which debounces and
+ * uploads, promoting an unsaved draft on the first change. OPFS stays the
+ * local source of truth, so a failed sync never loses work. Everything is
+ * ref-driven so the single subscribe/online effect never tears down on a
+ * prop change.
  */
 
 import { useEffect, useRef, useState } from "react";
@@ -31,37 +23,30 @@ export type { SyncPhase };
 export type AutoSyncStatus = SyncEngineState;
 
 export interface AutoSyncOptions {
-  /** Only sync when the account can actually receive backups (signed in +
-   *  cloud configured + browser can gzip). */
+  /** Only sync when the account can receive backups (signed in + cloud
+   *  configured + browser can gzip). */
   enabled: boolean;
   /** The workspace being edited; null while the playground boots. */
   activeWorkspaceId: string | null;
-  /** True when the active workspace is the auto-created, still-unregistered
-   *  draft, so the first change promotes it before backing up. */
+  /** True for the auto-created unregistered draft, promoted on first change. */
   isDraft: boolean;
   playgroundId: string;
-  /** Serializes the live playground into a portable bundle (the host's
-   *  `buildCloudBundle`). Undefined until the playground is ready. */
+  /** Serializes the live playground; undefined until it is ready. */
   buildBundle?: BuildBundle;
-  /** Registers the draft in the saved list (the host's save handler). Called
-   *  once, on the first synced change, when `isDraft` is true. */
+  /** Registers the draft in the saved list; called once when `isDraft`. */
   promoteDraft?: (name?: string) => void | Promise<void>;
-  /** Run after a successful backup (refresh the cloud list + registry so the
-   *  badge reflects the new backup). */
+  /** Run after a successful backup (refresh cloud list + registry). */
   onSynced?: () => void;
-  /** True when the host has verified there is local work with no cloud backup
-   *  (e.g. guest work found right after signing in). Triggers a sync without
-   *  waiting for a fresh edit, so signing in is enough to get backed up. */
+  /** Host verified there is local work with no cloud backup; sync without
+   *  waiting for a fresh edit. */
   needsInitialBackup?: boolean;
 }
 
-// Debounce from the last edit to the backup. Auto-sync is code-playgrounds-
-// only (WorkspaceBadge gates it): SQL bundles carry a full database image and
-// save to the cloud only when the user explicitly backs up.
+// Debounce from the last edit to the backup (code playgrounds only;
+// WorkspaceBadge gates SQL out).
 const CODE_DEBOUNCE_MS = 2000;
-// Ignore change pulses for a beat after a workspace becomes active: bootstrap
-// (loading persisted tabs, seeding a sample DB) emits through the same sinks,
-// and we don't want to back up an untouched default the instant it loads.
+// Ignore change pulses briefly after activation: bootstrap emits through the
+// same sinks, and an untouched default shouldn't back up the instant it loads.
 const SETTLE_MS = 4000;
 
 const IDLE: AutoSyncStatus = { phase: "idle", lastSyncedAt: null, error: null };
@@ -69,19 +54,17 @@ const IDLE: AutoSyncStatus = { phase: "idle", lastSyncedAt: null, error: null };
 export function useWorkspaceAutoSync(opts: AutoSyncOptions): AutoSyncStatus {
   const [status, setStatus] = useState<AutoSyncStatus>(IDLE);
 
-  // Latest inputs, read by the engine's callbacks (at call time, never during
-  // render) so the engine is created once and never re-bound on a prop change.
+  // Latest inputs, read by the engine's callbacks at call time so the engine
+  // is created once and never re-bound on a prop change.
   const optsRef = useRef(opts);
   const engineRef = useRef<WorkspaceSyncEngine | null>(null);
-  // Keep the ref current from an effect (not during render). The callbacks that
-  // read it all fire asynchronously, so a one-render lag is immaterial.
+  // Updated from an effect; callbacks fire async, so a one-render lag is fine.
   useEffect(() => {
     optsRef.current = opts;
   });
 
   // Create the engine + wire the change pulse and reconnect retry once, on
-  // mount. Building it inside the effect (not during render) keeps all ref
-  // access off the render path.
+  // mount.
   useEffect(() => {
     const engine = new WorkspaceSyncEngine({
       debounceMs: CODE_DEBOUNCE_MS,
@@ -94,8 +77,7 @@ export function useWorkspaceAutoSync(opts: AutoSyncOptions): AutoSyncStatus {
         const o = optsRef.current;
         if (!o.enabled || !o.activeWorkspaceId || !o.buildBundle) return;
         const bundle = await o.buildBundle({ includePersonal: true });
-        // A null bundle means the playground hasn't finished booting; tell
-        // the engine to retry after another debounce instead of erroring.
+        // Null bundle = playground still booting; retry after another debounce.
         if (!bundle) return false;
         if (o.isDraft && o.promoteDraft) {
           // Promote first so the backup lands on a registered workspace id.
@@ -127,17 +109,14 @@ export function useWorkspaceAutoSync(opts: AutoSyncOptions): AutoSyncStatus {
     };
   }, []);
 
-  // Re-open the settle window whenever the active workspace changes. Runs after
-  // the create effect on mount, so the engine already exists.
+  // Re-open the settle window whenever the active workspace changes.
   useEffect(() => {
     engineRef.current?.activate();
   }, [opts.activeWorkspaceId]);
 
-  // Initial backup: when the host reports unsynced local work (guest work
-  // found after sign-in), sync without waiting for an edit. requestSync
-  // bypasses the settle window but keeps the debounce; a successful backup
-  // flips needsInitialBackup off via the host's cloud refresh, and a terminal
-  // failure leaves it true without re-running (deps unchanged), so no loop.
+  // Initial backup for unsynced local work (e.g. guest work after sign-in).
+  // requestSync bypasses the settle window but keeps the debounce; a terminal
+  // failure leaves the flag true without re-running (deps unchanged), no loop.
   const needsInitialBackup = opts.enabled && !!opts.needsInitialBackup;
   useEffect(() => {
     if (needsInitialBackup) engineRef.current?.requestSync();

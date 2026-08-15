@@ -1,18 +1,7 @@
 /**
- * In-memory OPFS mock for unit tests.
- *
- * Simulates the async FileSystem Access API surface used by the OPFS modules:
- *  - FileSystemDirectoryHandle  (kind, getDirectoryHandle, getFileHandle,
- *                                removeEntry, asyncIterator)
- *  - FileSystemFileHandle       (kind, getFile, createWritable)
- *  - FileSystemWritableFileStream (write, close)
- *  - File                       (text, arrayBuffer)
- *
- * Usage:
- *   import { makeOpfsRoot } from './opfsMock';
- *
- *   const root = makeOpfsRoot();
- *   vi.stubGlobal('navigator', { storage: { getDirectory: () => Promise.resolve(root) } });
+ * In-memory OPFS mock for unit tests: simulates the FileSystem Access API
+ * surface the OPFS modules use (directory/file handles, writable streams,
+ * File). Stub navigator.storage.getDirectory to resolve makeOpfsRoot().
  */
 
 export interface MockFile {
@@ -75,9 +64,8 @@ function makeFile(mockFile: MockFile): object {
 
 function makeFileHandle(mockFile: MockFile): object {
   return {
-    // `kind` is part of the real FileSystemHandle interface, and callers
-    // branch on it to tell a file from a directory while walking a tree
-    // (see `copyDirectoryHandle`), so the mock has to carry it too.
+    // Callers branch on `kind` to tell files from directories while walking
+    // a tree (see copyDirectoryHandle), so the mock must carry it.
     kind: "file" as const,
     async getFile() {
       return makeFile(mockFile);
@@ -162,9 +150,7 @@ export function makeOpfsRoot(): object {
 /** Reads the raw MockDir tree from a root created by makeOpfsRoot.
  *  Used in tests to inspect internal state without going through the API. */
 export function _getRootDir(root: object): MockDir {
-  // Internal: we keep a reference by convention here, the handle IS the
-  // dir, but we need the underlying MockDir. Use a WeakMap for this.
-  // For simplicity in tests, expose a helper that bypasses the handle.
+  // Intentionally unimplemented; makeOpfsRootWithRef() exposes the MockDir.
   void root;
   throw new Error("Use makeOpfsRootWithRef() for internal inspection.");
 }

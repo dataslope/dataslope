@@ -1,21 +1,12 @@
 "use client";
 
 /**
- * Header "Share" control shared by the code playground shell
- * (Playground.tsx) and the three SQL playgrounds.
- *
- * Share works for everyone, signed in or not: it uploads an immutable
- * snapshot of the current workspace (built by the host's `buildBundle`) and
- * hands back a /s/<id> link. Recipients open their own copy; nobody can edit
- * the original through a link.
- *
- * Sharing is deliberately its own control: it publishes a snapshot, which is
- * a different intent than saving. Cloud *backups* live in the workspace menu
- * (WorkspaceBadge + workspaceCloud.tsx), where each workspace carries its own
- * backup status.
- *
- * The dialog supports the same controlled-optional open state as
- * WorkspaceBadge's manager drawer so mobile menus can open it too.
+ * Header "Share" control shared by the code playground shell and the SQL
+ * playgrounds. Works signed in or not: uploads an immutable snapshot and
+ * hands back a /s/<id> link (recipients open their own copy). Deliberately
+ * separate from cloud backups (WorkspaceBadge) — publishing a snapshot is a
+ * different intent than saving. Dialog open state is controlled-optional so
+ * mobile menus can open it too.
  */
 
 import { useCallback, useEffect, useState } from "react";
@@ -32,14 +23,10 @@ import { createShare, isCloudSupported } from "./cloudApi";
 
 export interface ShareControlsProps {
   workspaceName: string;
-  /** Serializes the CURRENT playground state into a bundle. Returning null
-   *  means there's nothing to share yet (e.g. engine still booting).
-   *
-   *  Deliberately typed as taking no arguments, even though the hosts pass a
-   *  `BuildBundle` that accepts options. A share is a copy handed to whoever
-   *  holds the link, and one of those options asks for the author's query
-   *  history and starred queries; with this signature, nothing under this
-   *  component can request them, and widening it would be the mistake. */
+  /** Serializes current playground state; null = nothing to share yet.
+   *  Deliberately takes no arguments: the wider `BuildBundle` has an option
+   *  requesting the author's query history/stars, and this signature keeps
+   *  anything under this component from ever asking for it. */
   buildBundle: () => Promise<WorkspaceBundle | null>;
   /** Controlled-optional dialog state (mobile menus open the dialog). */
   shareOpen?: boolean;
@@ -109,8 +96,8 @@ function ShareDialog({
 
   useEffect(() => {
     if (open) {
-      // A share is a snapshot of "now", clear the previous link so reopening
-      // the dialog never suggests an old link reflects new edits.
+      // Clear the previous link so reopening never suggests an old link
+      // reflects new edits.
       // eslint-disable-next-line react-hooks/set-state-in-effect -- reset synced to the open prop, same pattern as WorkspaceBadge's dialogs
       setUrl(null);
       setError(null);
@@ -145,8 +132,8 @@ function ShareDialog({
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      // Clipboard unavailable, the input below stays selectable; tell the
-      // user so the button doesn't appear to silently succeed.
+      // Clipboard unavailable; tell the user so the button doesn't appear to
+      // silently succeed.
       setError("Couldn't copy, select the link below and copy it manually.");
     }
   }, [url]);

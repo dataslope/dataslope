@@ -4,16 +4,11 @@ compatibility_date = "2025-05-19"
 compatibility_flags = ["nodejs_compat"]
 
 [vars]
-# Comma-separated list of allowed Origin hosts (no trailing slash).
-# Override via `wrangler secret put ALLOWED_ORIGINS` or in your Cloudflare dashboard
-# for production secrets, or set them here for non-sensitive defaults.
-#
-# A "*" in an entry is a wildcard that matches one hostname label, one or more
-# characters that are not a "." or "/", so it stays scoped to a single host. The
-# app's non-production deployments use version/alias preview URLs, which Cloudflare
-# formats as `<version-or-alias>-<worker-name>.<subdomain>.workers.dev` (the
-# variable part is a PREFIX). The `*-dataslope.subwaymatch.workers.dev` entry
-# matches those; it is safe because the `subwaymatch.workers.dev` subdomain is
-# owner-controlled, so the `*` prefix can't match a foreign domain.
+# Comma-separated allowed Origins (no trailing slash). Override for production
+# via `wrangler secret put ALLOWED_ORIGINS` or the Cloudflare dashboard.
+# "*" matches a single hostname label (never "." or "/"). The
+# `*-dataslope.subwaymatch.workers.dev` entry covers Cloudflare's
+# version/alias preview URLs (variable part is a prefix); safe because the
+# subwaymatch.workers.dev subdomain is owner-controlled.
 ALLOWED_ORIGINS = "http://localhost:3000,https://dataslope.com,https://www.dataslope.com,https://dataslope.subwaymatch.workers.dev,https://*-dataslope.subwaymatch.workers.dev"
 

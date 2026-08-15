@@ -20,28 +20,20 @@ export interface DuckDbRemoteFile {
 export interface DuckDbSampleDatabase extends SqlSampleDatabaseBase {
   /** Inline DDL + seed SQL. Ignored when `remoteSql` is set. */
   sql?: string;
-  /** Path (inside the dataslope/datasets GitHub repo) or full URL of a
-   *  SQL script that creates *and* populates the database, fetched from
-   *  raw.githubusercontent.com when the sample is loaded, see
-   *  remoteDatasets.ts. The script itself can also read remote data
-   *  directly (e.g. `... FROM read_parquet('https://raw.githubusercontent.com/…')`),
-   *  since duckdb-wasm can query CORS-enabled https URLs natively. */
+  /** Repo path or full URL of a SQL script that creates and populates the
+   *  database (see remoteDatasets.ts). The script may also read remote
+   *  data directly; duckdb-wasm queries CORS-enabled https URLs natively. */
   remoteSql?: string;
-  /** Remote data files (`.parquet`, `.csv`, `.json`, …) fetched from
-   *  the datasets repo and registered with duckdb-wasm's virtual
-   *  filesystem before the seed SQL runs, so `sql`/`remoteSql` can
-   *  query them by name: `SELECT * FROM read_parquet('trips.parquet')`. */
+  /** Remote data files registered with duckdb-wasm's virtual filesystem
+   *  before the seed SQL runs, queryable by name via read_parquet etc. */
   remoteFiles?: readonly DuckDbRemoteFile[];
   defaultTabs: QueryTabSeed[];
 }
 
 // ─── E-Commerce sample ───────────────────────────────────────────────
-// A compact orders/products/customers schema that exercises DuckDB's
-// integer-family types, DECIMAL, and DATE. Note: DuckDB-Wasm does not
-// currently support STORED generated columns via DDL, so line_total is
-// stored as a plain DECIMAL populated at INSERT time.
-// Mirrors the structure of the SQLite "credit card transactions" sample
-// so users switching playgrounds see familiar shapes.
+// Compact orders/products/customers schema. DuckDB-Wasm doesn't support
+// STORED generated columns via DDL, so line_total is a plain DECIMAL
+// populated at INSERT time.
 
 const ECOMMERCE_SQL = `
 CREATE TABLE customers (
@@ -150,11 +142,9 @@ const ECOMMERCE_TABS: QueryTabSeed[] = [
   },
 ];
 
-// ─── Analytics sample showcasing DuckDB-specific features ───────────
-// PIVOT, list aggregations, and the UNNEST / STRUCT type system are
-// what set DuckDB apart from SQLite/Postgres in the browser. The
-// "Analytics" sample seeds a small events table and pre-loads a few
-// queries that show off these features.
+// ─── Analytics sample ────────────────────────────────────────────────
+// Showcases DuckDB-specific features: PIVOT, list aggregations, UNNEST/
+// STRUCT.
 
 const ANALYTICS_SQL = `
 CREATE TABLE events (
@@ -194,9 +184,8 @@ const ANALYTICS_TABS: QueryTabSeed[] = [
 ];
 
 // ─── Parquet demo sample ─────────────────────────────────────────────
-// Showcases DuckDB's killer browser feature: querying registered files
-// (Parquet/CSV/JSON) directly without an explicit CREATE TABLE step.
-// The sample seeds a tiny in-memory CSV via duckdb's `read_csv_auto`.
+// Querying registered files (Parquet/CSV/JSON) without CREATE TABLE;
+// seeds a tiny in-memory CSV via read_csv_auto.
 
 const PARQUET_DEMO_SQL = `
 -- Use DuckDB's "values" syntax to materialize an inline dataset.
@@ -231,18 +220,10 @@ const PARQUET_DEMO_TABS: QueryTabSeed[] = [
 ];
 
 // ─── Lending Club loans sample ───────────────────────────────────────
-// A real-world analytical dataset: ~205k Lending Club consumer loans
-// with credit grade, interest rate, term, borrower income, loan
-// purpose, and whether the loan ultimately defaulted. The data lives as
-// a Parquet file in the dataslope/datasets repo and is loaded over
-// jsDelivr, the same CDN the rest of the playground uses, then
-// materialized into a single `loans` table so it shows up in the schema
-// browser like the inline samples.
-//
-// The file was added to dataslope/datasets after the pinned DATASETS_REF
-// (a repo-relative path would 404 against the pin), so the URL targets
-// `@main`. jsDelivr serves it CORS-enabled; the dataset cache treats
-// mutable-ref URLs as per-session, see remoteDatasets.ts.
+// ~205k consumer loans (Parquet in the datasets repo), materialized into
+// a `loans` table. The file postdates the pinned DATASETS_REF (a
+// repo-relative path would 404), so the URL targets `@main`; the dataset
+// cache treats mutable-ref URLs as per-session (see remoteDatasets.ts).
 const LENDING_CLUB_PARQUET_URL =
   "https://cdn.jsdelivr.net/gh/dataslope/datasets@main/lending-club-loan-results.parquet";
 

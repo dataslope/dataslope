@@ -2,37 +2,17 @@
  * Runs every R `<CodeBlock>` in `content/`, and every R `<ChallengeCard>`'s
  * reference solution.
  *
- * 287 blocks and 43 cards, checked by nothing until now.
+ * webR is the same package the site loads; `baseUrl` points at
+ * `node_modules/webr/dist` so the sweep uses the pinned build with no network
+ * — and it must be a plain filesystem path, since webR's Node channel hands
+ * it to `new Worker`, which rejects `file://`. The wrapper around each block
+ * mirrors `WebRRuntime.run` in `r.tsx` (VFS temp file,
+ * `withVisible(eval(parse(...)))`, `withAutoprint: false`), because that
+ * wrapper decides whether a top-level expression prints.
  *
- * ── The runtime ────────────────────────────────────────────────────────────
- *
- * webR is the same package the site loads, and it runs under Node unchanged.
- * `baseUrl` points at the installed `node_modules/webr/dist` rather than the
- * CDN, so the sweep uses the exact build the `webr` dependency pins and needs
- * no network to boot. It must be a plain filesystem path: webR's Node channel
- * hands it straight to `new Worker`, which rejects a `file://` string.
- *
- * The wrapper around each block mirrors `WebRRuntime.run` in `r.tsx` — code
- * written to a VFS temp file, evaluated through `withVisible(eval(parse(...)))`
- * with `withAutoprint: false` — because that wrapper is what decides whether a
- * top-level expression prints, and running the source any other way would test
- * something the reader never executes.
- *
- * ── On detecting failure ───────────────────────────────────────────────────
- *
- * `captureR` throws on an R *error* and does not throw on a warning or a
- * `message()`. Measured, not assumed:
- *
- *   print(1+1)              -> no throw
- *   as.numeric("abc")       -> no throw   (warning: NAs introduced)
- *   message("hi")           -> no throw
- *   stop("boom")            -> throws
- *   print(no_such_object)   -> throws
- *
- * So failure is "captureR threw", which asks exactly the question the Python
- * sweep asks: does this raise? Keying on stderr instead would have failed
- * every lesson that deliberately demonstrates a warning — the trap that keeps
- * `check:sql` out of CI — and R lessons demonstrate coercion warnings often.
+ * Failure is "captureR threw", which throws on an R error but not on a
+ * warning or `message()` — keying on stderr would fail every lesson that
+ * deliberately demonstrates a coercion warning.
  *
  * Usage:
  *   node scripts/check-r-blocks.mjs [--filter <substr>[,<substr>…]]
@@ -105,8 +85,7 @@ const failures = [];
 const installFailures = [];
 /** Absolute VFS paths written for the current item, removed before the next. */
 const stagedPaths = new Set();
-/** Datasets already written; they are read-only inputs, so staging each once
- *  is enough and re-fetching per block would be pure waste. */
+/** Datasets already written; read-only inputs, staged once. */
 const stagedDatasets = new Set();
 let slowest = { ms: 0 };
 
@@ -134,20 +113,16 @@ for (const [i, item] of runnable.entries()) {
   }
 
   // A fresh global environment per item: the browser gives each block its own
-  // session, so an object defined by one lesson must not be visible to the
-  // next. Without this a block could pass only because an earlier one happened
-  // to define its inputs.
+  // session, so a block must not pass because an earlier one defined its
+  // inputs.
   await webR.evalRVoid(
     "rm(list = ls(envir = .GlobalEnv, all.names = TRUE), envir = .GlobalEnv)",
   );
 
   // Stage sibling files where `source("helpers.R")` will find them, mirroring
-  // `prepareFileSystem` in r.tsx, which writes each workspace file to
-  // `${WEB_USER_HOME}/<name>`. Skipping this is not a smaller check: the entry
-  // still runs, fails on the first `source()` with "cannot open the
-  // connection", and the multi-file lesson is reported as broken content.
-  // Stale files from the previous item are removed first, so one block's
-  // helper cannot satisfy the next block's `source()`.
+  // `prepareFileSystem` in r.tsx; skipping this reports multi-file lessons as
+  // broken content. Stale files from the previous item are removed first so
+  // one block's helper cannot satisfy the next block's `source()`.
   for (const path of stagedPaths) {
     try {
       await webR.FS.unlink(path);
@@ -209,11 +184,8 @@ for (const [i, item] of runnable.entries()) {
     await shelter.purge().catch(() => {});
   }
 
-  // `expectError` asserts in both directions. "Errors are friendly (most of
-  // the time)" quotes the very error its block triggers, and its paired "Fix
-  // me!" starter is meant to fail until the reader repairs it. If either ever
-  // stops failing, the prose is describing something the reader cannot see,
-  // and nothing else would catch that.
+  // `expectError` asserts in both directions: a block whose lesson is the
+  // failure must fail, and one that stops failing is a hidden regression.
   if (item.expectError && raised === null) {
     failures.push({
       file: item.file,

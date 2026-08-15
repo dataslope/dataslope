@@ -1,23 +1,9 @@
 /**
- * Minimal R2 (S3-compatible) client for the illustration pipeline.
- *
- * Why hand-rolled rather than `@aws-sdk/client-s3`: the only operations this
- * pipeline needs are put/get/list/delete on one bucket, and the AWS SDK is a
- * very large dependency to add to a repo that otherwise ships no AWS code.
- * SigV4 is about sixty lines against `node:crypto`, so it is written out here.
- *
- * Why not the Worker's R2 binding: these are authoring scripts run from a
- * laptop or CI, and a binding only exists inside a request. Talking to the S3
- * endpoint keeps content authoring decoupled from deploying the app.
- *
- * Credentials come from the environment (see `credentialsFromEnv`):
- *   R2_ACCOUNT_ID          Cloudflare account id
- *   R2_ACCESS_KEY_ID       R2 API token access key
- *   R2_SECRET_ACCESS_KEY   R2 API token secret
- *   R2_BUCKET              default bucket name (optional; may be passed instead)
- *
- * Create the token under Cloudflare dashboard → R2 → Manage API tokens, with
- * Object Read & Write scoped to the illustrations bucket.
+ * Minimal R2 (S3-compatible) client for the illustration pipeline:
+ * put/get/list/delete on one bucket, with SigV4 hand-rolled against
+ * `node:crypto` rather than pulling in the AWS SDK. Credentials come from the
+ * environment (see `credentialsFromEnv`): R2_ACCOUNT_ID, R2_ACCESS_KEY_ID,
+ * R2_SECRET_ACCESS_KEY, and optionally R2_BUCKET.
  */
 import { createHash, createHmac } from "node:crypto";
 
@@ -70,13 +56,10 @@ function signingKey(secret, dateStamp) {
 }
 
 /**
- * Build the signed URL + headers for one S3 request. Pure given `now`, which is
- * why it is exported: the vitest suite pins a known request against a fixed
- * clock, so the signing can regress loudly without any network access.
- *
- * `body` must be a Buffer (or undefined). R2 requires the real payload hash in
- * `x-amz-content-sha256`, so streaming uploads are out of scope here — the
- * illustrations are a few MB each, well within a buffered PUT.
+ * Build the signed URL + headers for one S3 request. Pure given `now`;
+ * exported so the vitest suite can pin a known request against a fixed clock.
+ * `body` must be a Buffer (or undefined): R2 requires the real payload hash
+ * in `x-amz-content-sha256`, so streaming uploads are out of scope.
  */
 export function buildSignedRequest(
   creds,
@@ -138,11 +121,9 @@ export function buildSignedRequest(
   };
 }
 
-// Transient conditions worth retrying. R2 (and whatever proxy sits in front of
-// it) intermittently answers with a gateway status or a DNS failure under a
-// burst of concurrent requests; a 45-image run hit "503 DNS resolution failure"
-// on 43 of them. Every operation here is idempotent — PUT overwrites the same
-// key, GET and DELETE are naturally so — which is what makes blanket retry safe.
+// Transient conditions worth retrying: R2 intermittently answers with a
+// gateway status or DNS failure under concurrent bursts. Blanket retry is
+// safe because every operation here is idempotent.
 const RETRY_STATUS = new Set([408, 429, 500, 502, 503, 504]);
 const MAX_ATTEMPTS = 6;
 
@@ -152,9 +133,8 @@ const nap = (ms) => new Promise((r) => setTimeout(r, ms));
 async function signedFetch(creds, req) {
   let lastDetail = "";
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-    // Re-sign per attempt: the signature covers x-amz-date, so a retry reusing
-    // the first attempt's headers would eventually fail the 15-minute skew
-    // check rather than succeeding.
+    // Re-sign per attempt: the signature covers x-amz-date, and stale headers
+    // eventually fail the 15-minute skew check.
     const { url, headers } = buildSignedRequest(creds, req);
     let res;
     let networkErr;
@@ -195,12 +175,8 @@ export function createR2Client(creds = credentialsFromEnv(), bucket = creds.buck
     async list(prefix) {
       return (await this.listDetailed(prefix)).map((o) => o.key);
     },
-    /**
-     * As `list`, but keeping the size and last-modified each `<Contents>`
-     * already carries. Same requests, same pages — the plain `list` above was
-     * simply throwing this away, and asking for it afterwards would be a HEAD
-     * per object (5000+ round trips to weigh one prefix).
-     */
+    /** As `list`, but keeping the size and last-modified each `<Contents>`
+     *  already carries — asking afterwards would be a HEAD per object. */
     async listDetailed(prefix) {
       const unescape = (s) =>
         s.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");

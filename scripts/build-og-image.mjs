@@ -1,15 +1,8 @@
 /**
- * Generates the default social-share image at public/og-default.png (1200×630).
- *
- * Renders an on-brand SVG (the DataSlope logo + a descending "data slope"
- * motif + headline) to PNG with @resvg/resvg-js using system fonts. The PNG is
- * a committed static asset, referenced as the default OpenGraph/Twitter image
- * in lib/site.ts, so it costs nothing at request time (no runtime next/og).
- *
- * Regenerate after editing the copy/design:  npm run build:og-image
- *
- * Standalone on purpose (not wired into `npm run build`): the card changes
- * about as often as the logo, so there's no reason to re-rasterize every build.
+ * Generates the default social-share image at public/og-default.png (1200×630)
+ * from an on-brand SVG via @resvg/resvg-js. The PNG is a committed static
+ * asset referenced in lib/site.ts (no runtime next/og). Standalone on purpose,
+ * not wired into `npm run build`; regenerate with `npm run build:og-image`.
  */
 import { writeFileSync } from "node:fs";
 import path from "node:path";

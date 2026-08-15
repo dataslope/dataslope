@@ -1,25 +1,12 @@
 "use client";
 
 /**
- * Account-page "danger zone": self-service account deletion.
- *
- * Wired to Better Auth's `deleteUser` (lib/auth/server.ts enables it). Two
- * server behaviours, both handled here:
- *
- *   - A mailer is configured → Better Auth emails a confirmation link and does
- *     NOT delete until it's clicked, so the call returns "Verification email
- *     sent" and the account stays put. We show a check-your-inbox notice. This
- *     path works for social-only accounts regardless of how old the session is.
- *   - No mailer → deletion is immediate, but Better Auth requires a *fresh*
- *     session (signed in recently); a stale one comes back SESSION_EXPIRED,
- *     which we translate into a "sign out and back in" prompt.
- *
- * Deleting drops the user row, which cascades to sessions, linked accounts,
- * cloud saves, share links, and custom content; the server's beforeDelete hook
- * additionally purges the R2 payloads those saves/shares point at.
- *
- * A typed-email confirmation guards the button, deletion is irreversible and a
- * heavier gate than the one-tap window.confirm used elsewhere on this page.
+ * Self-service account deletion via Better Auth's `deleteUser`. With a mailer
+ * configured the server emails a confirmation link and deletes nothing until
+ * clicked; without one deletion is immediate but requires a fresh session
+ * (stale → SESSION_EXPIRED, translated to a "sign out and back in" prompt).
+ * Deletion cascades to sessions, accounts, saves, shares, and custom content;
+ * the beforeDelete hook purges the R2 payloads.
  */
 
 import { useState } from "react";
@@ -31,17 +18,14 @@ export function DeleteAccountSection({
   isPaidPro,
 }: {
   email: string;
-  /** True only for an actually-billed Pro plan (not admins treated as Pro), so
-   *  the Polar-billing warning shows exactly when there's a subscription to
-   *  cancel. */
+  /** True only for an actually-billed Pro plan (not admins treated as Pro). */
   isPaidPro: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [confirmText, setConfirmText] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Set once the emailed-confirmation path succeeds; the account isn't gone yet
-  // (the link completes it), so we swap the form for a standing notice.
+  // Emailed-confirmation path: the account isn't gone yet, show a notice.
   const [emailSent, setEmailSent] = useState(false);
 
   const confirmed = confirmText.trim().toLowerCase() === email.toLowerCase();
@@ -67,9 +51,8 @@ export function DeleteAccountSection({
         setBusy(false);
         return;
       }
-      // A mailer is configured: Better Auth sent a confirmation link and hasn't
-      // deleted anything yet. Anything else means the row is already gone and
-      // the session is invalidated, so leave for home.
+      // An email-ish message means a confirmation link was sent and nothing is
+      // deleted yet; anything else means the row is gone, so leave for home.
       if (typeof data?.message === "string" && /email/i.test(data.message)) {
         setEmailSent(true);
         setBusy(false);

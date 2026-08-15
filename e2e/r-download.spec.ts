@@ -1,15 +1,9 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// E2E coverage for the R playground's data-handling fixes:
-//   1. download.file() saves a file that shows up in the Files pane.
-//   2. Printing a large data.frame is truncated (head + ellipsis + tail)
-//      instead of dumping every row and freezing the page.
-//
-// Both need the heavy WebR runtime (fetched from a CDN), and the download
-// test also reaches a real raw.githubusercontent.com CSV (~4 MB), so this
-// spec is kept out of the default e2e run. Enable it with:
-//
-//   R_E2E=1 npx playwright test e2e/r-download.spec.ts
+// R playground data-handling: download.file() saves into the Files pane, and
+// printing a large data.frame truncates (head + ellipsis + tail) instead of
+// freezing the page. Needs the WebR runtime and a real ~4 MB network fetch,
+// so it is opt-in: R_E2E=1 npx playwright test e2e/r-download.spec.ts
 
 const ENABLED = !!process.env.R_E2E;
 

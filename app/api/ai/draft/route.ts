@@ -1,17 +1,9 @@
 /**
- * "Fill with AI" endpoint for the /create builders.
- *
- * POST { kind, prompt } → a normalized draft (lib/ai/draft.ts) the builder
- * applies to its form. Signed-in only (it spends provider tokens) and billed
- * against the member's shared Ask AI daily budget via the same request/token
- * counters as chat (checkBudget / recordUsage), so drafting can't dodge the
- * abuse caps. The draft is validated and clamped server-side to the same
- * limits the save endpoint enforces; code/SQL solutions are still verified
- * against their tests when the user saves, so a wrong draft fails at publish,
- * it never silently ships.
- *
- * `force-dynamic` for the same reason as app/api/ai/chat: reads the session,
- * talks to an external API, must run per request.
+ * "Fill with AI" endpoint for the /create builders. POST { kind, prompt } →
+ * a normalized draft (lib/ai/draft.ts). Signed-in only, billed against the
+ * shared Ask AI daily budget so drafting can't dodge the caps. Drafts are
+ * validated/clamped server-side; code/SQL solutions are still verified at
+ * save time, so a wrong draft never silently ships.
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createAuth } from "@/lib/auth/server";
@@ -41,8 +33,7 @@ function json(data: unknown, status = 200): Response {
   });
 }
 
-/** Drafting a whole item is a bigger generation than a chat turn; give the
- *  provider a generous but bounded window. */
+/** Generous but bounded: drafting a whole item is bigger than a chat turn. */
 const PROVIDER_TIMEOUT_MS = 30_000;
 
 export async function POST(request: Request): Promise<Response> {
@@ -51,8 +42,7 @@ export async function POST(request: Request): Promise<Response> {
   if (!isSameOrigin(request)) return json({ error: "Forbidden." }, 403);
   const { env, ctx } = getCloudflareContext();
 
-  // --- Auth gate. Cookie cache bypassed: this endpoint spends provider
-  // tokens per request (same posture as /api/ai/chat). ---
+  // Cookie cache bypassed: spends provider tokens (same as /api/ai/chat).
   const auth = await createAuth(env, request);
   const session = await auth.api.getSession({
     headers: request.headers,
@@ -110,8 +100,7 @@ export async function POST(request: Request): Promise<Response> {
     clearTimeout(timeout);
   }
 
-  // --- Bill usage (best-effort; a failed write never fails the response). The
-  // request slot + tokens count against the shared Ask AI daily budget. ---
+  // Bill usage (best-effort; a failed write never fails the response).
   const inTok = result.inputTokens || estimateTokens(draftUserPrompt(body.kind, prompt));
   const outTok = result.outputTokens || estimateTokens(result.text);
   const write = recordUsage(env, user.id, day, inTok, outTok).catch((err) =>

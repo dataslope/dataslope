@@ -1,12 +1,8 @@
 /**
- * Runtime-registry tests.
- *
- * Covers the boot-progress hub added for the loading-UX work: every
- * caller of `getSharedRuntime` subscribes to the in-flight boot's
- * progress (not just the first caller), late subscribers get the
+ * Runtime-registry boot-progress hub: every caller of getSharedRuntime
+ * subscribes to the in-flight boot's progress, late subscribers get the
  * current stage replayed, subscriptions end when the boot settles, and
- * failed boots stay retryable. Fake adapters drive `init` by hand, no
- * real runtimes are constructed.
+ * failed boots stay retryable. Fake adapters drive init by hand.
  */
 import { describe, expect, it, vi } from "vitest";
 

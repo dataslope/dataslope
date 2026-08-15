@@ -1,15 +1,8 @@
-// Canonical site-wide light/dark controller, shared by every surface that
-// needs to read or set the color scheme: the home page, the playgrounds, and
-// (by virtue of the same contract) the Fumadocs-powered /learn route.
-//
-// Contract, identical to what next-themes/Fumadocs use, so the choice is
-// shared across routes and across same-origin documents (e.g. the home page
-// and its embedded playground iframe):
-//   - persisted under localStorage["theme"] ("light" | "dark"), and
-//   - applied as an explicit `.dark` / `.light` class on <html>.
-//
-// localStorage is the source of truth (it survives across documents and fires
-// `storage` events into other same-origin frames); the class is derived.
+// Canonical site-wide light/dark controller. Contract matches
+// next-themes/Fumadocs so the choice is shared across routes and same-origin
+// documents: persisted under localStorage["theme"] ("light" | "dark"), applied
+// as a `.dark`/`.light` class on <html>. localStorage is the source of truth
+// (survives across documents, fires `storage` events); the class is derived.
 
 export type SiteTheme = "light" | "dark";
 
@@ -51,10 +44,8 @@ export function applySiteThemeClass(theme: SiteTheme): void {
   const r = document.documentElement;
   r.classList.toggle("dark", theme === "dark");
   r.classList.toggle("light", theme === "light");
-  // Keep the UA color-scheme (scrollbars, form controls) in step with the
-  // toggle. next-themes on the Fumadocs routes writes an inline
-  // `color-scheme` onto <html>; without this a light toggle here would leave
-  // that stale dark value behind (dark scrollbar until refresh).
+  // Overwrite the inline `color-scheme` next-themes leaves on <html>;
+  // otherwise a light toggle here keeps a stale dark scrollbar until refresh.
   r.style.colorScheme = theme;
 }
 

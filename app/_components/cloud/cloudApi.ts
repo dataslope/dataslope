@@ -1,15 +1,10 @@
 "use client";
 
 /**
- * Browser client for the cloud-save + share endpoints (/api/workspaces,
- * /api/shares). A workspace travels as a **bundle**: the gzipped binary
- * container defined in lib/workspaces/bundleCodec.ts (JSON header + raw
- * database image), uploaded as multipart form data next to a small `meta`
- * JSON field.
- *
- * Every helper throws `CloudApiError` (with the HTTP status) on failure so
- * dialogs can branch on 401 (sign-in CTA) / 403 (quota) / 429 (guest limit)
- * without string-matching messages.
+ * Browser client for /api/workspaces and /api/shares. A workspace travels as
+ * a gzipped bundle (lib/workspaces/bundleCodec.ts) uploaded as multipart form
+ * data. Every helper throws `CloudApiError` with the HTTP status so dialogs
+ * can branch on 401/403/429 without string-matching messages.
  */
 
 import {
@@ -61,9 +56,8 @@ async function decodeBundleOrThrow(data: Blob): Promise<WorkspaceBundle> {
   }
 }
 
-/** fetch() that rewrites network-level failures (the browser's raw
- *  "Failed to fetch" / "Load failed") into friendly CloudApiError copy.
- *  HTTP-level errors are still handled per call site via throwResponseError. */
+/** fetch() with network-level failures rewritten to friendly CloudApiError
+ *  copy; HTTP-level errors stay per call site via throwResponseError. */
 async function apiFetch(
   input: string,
   init?: RequestInit,
@@ -113,12 +107,10 @@ export async function listCloudWorkspaces(): Promise<CloudWorkspaceList> {
   return (await res.json()) as CloudWorkspaceList;
 }
 
-/** Last successful upload per workspace, keyed by content hash, so saving
- *  an unchanged workspace is a no-op instead of a full re-upload. Session-
- *  scoped on purpose: it only ever *skips* re-sending bytes this tab already
- *  sent, so a stale entry can't lose data (worst case another device
- *  overwrote the backup and this tab's identical re-save is skipped, which
- *  is the same last-writer-wins outcome as uploading it again). */
+/** Last successful upload per workspace, keyed by content hash, so an
+ *  unchanged save skips the re-upload. Session-scoped: a stale entry can only
+ *  skip re-sending bytes this tab already sent — same last-writer-wins
+ *  outcome as uploading again. */
 const lastUploads = new Map<string, { hash: string; meta: CloudWorkspaceMeta }>();
 
 export async function saveCloudWorkspace(

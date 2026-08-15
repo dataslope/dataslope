@@ -1,16 +1,10 @@
 /**
- * Validation + sanitization for custom-content payloads.
- *
- * Every payload accepted by the API is rebuilt field-by-field here (unknown
- * keys are dropped, every value type/length-checked), because stored
- * payloads are later spread straight into the interactive components'
- * props on the public /c/<id> and /quiz/<id> pages. Hand-rolled checks
- * (no zod in this repo) following the readBundleUpload style: each
- * validator returns `{ ok: true, payload }` with the sanitized document or
- * `{ ok: false, message }` with a user-facing reason.
- *
- * Pure module: no D1/R2 access, unit-tested in
- * __tests__/customContent.test.ts.
+ * Validation + sanitization for custom-content payloads. Every payload is
+ * rebuilt field-by-field (unknown keys dropped, every value
+ * type/length-checked) because stored payloads are spread straight into the
+ * interactive components' props on the public /c/<id> and /quiz/<id> pages.
+ * Each validator returns `{ ok: true, payload }` or `{ ok: false, message }`
+ * with a user-facing reason. Pure module: no D1/R2 access.
  */
 
 import { parseQuestion } from "@/app/_components/multipleChoice/parseQuestion";

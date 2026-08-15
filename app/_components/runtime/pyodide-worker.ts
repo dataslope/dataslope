@@ -1,22 +1,10 @@
 /// <reference lib="webworker" />
 
-// Pyodide runs inside a dedicated Web Worker so that:
-//   1. The bundler (Turbopack in Next.js 16) never sees Pyodide's internal
-//      `await import(e)` calls, those would otherwise fail with
-//      "Cannot find module as expression is too dynamic". We sidestep
-//      Turbopack by loading `pyodide.mjs` from the CDN with a dynamic
-//      `import()` carrying webpackIgnore/turbopackIgnore comments, the
-//      same pattern postgres-worker.ts uses for PGlite. (Pyodide 314
-//      dropped the classic-script `pyodide.js` + global `loadPyodide`
-//      entry point that importScripts used to load. It also refuses to
-//      boot in a classic worker scope entirely, so python.tsx must
-//      spawn this worker with `{ type: "module" }`.)
-//   2. Heavy Python execution (numpy, pandas, plot rendering, …) doesn't
-//      block the main thread, so the UI stays responsive while user code
-//      is running.
-//
-// The worker speaks a small request/response protocol with the main
-// thread (see message types below).
+// Pyodide runs in a dedicated Web Worker: the CDN dynamic import keeps the
+// bundler away from Pyodide's internal dynamic imports, and heavy Python
+// execution stays off the main thread. Pyodide 314 has no classic-worker
+// entry point, so python.tsx must spawn this worker with `{ type: "module" }`.
+// The worker speaks the request/response protocol defined below.
 
 import type { PyodideInterface } from "pyodide";
 import { POLARS_IMPORT_PATTERN, POLARS_WASM_SHIM } from "./polarsWasm";
@@ -84,9 +72,8 @@ type InMessage =
     }
   | {
       kind: "warm-packages";
-      /** Authored code that may run soon (starter/init/solution/test
-       *  snippets). Phase B is kicked only when one of these actually
-       *  needs it; see `warmHintNeedsHeavyPackages`. */
+      /** Authored code that may run soon. Phase B is kicked only when one
+       *  of these needs it; see `warmHintNeedsHeavyPackages`. */
       sources: string[];
       /** Skip the needs-analysis and warm the full set (playground). */
       force?: boolean;
@@ -114,29 +101,21 @@ function post(msg: OutMessage) {
 }
 
 // ─── Two-phase boot state ──────────────────────────────────────────────
-// Phase A (initPyodide / `initPromise`): the interpreter plus the
-// display/tee/reset plumbing, enough to run any stdlib-only snippet.
-// `ready` is posted at the end of phase A, so plain-Python blocks run
-// seconds before the data stack is in.
-// Phase B (`ensurePackages`): the heavy package set (numpy, pandas,
-// matplotlib, scipy, micropip + plotly + pyodide_http) and the
-// matplotlib/urllib patches that depend on it. It starts in the
-// background right after phase A; a run whose code needs it awaits it
-// (with a run-status notice), everything else doesn't.
+// Phase A (initPyodide): interpreter + display/tee/reset plumbing; `ready`
+// posts at its end so stdlib-only blocks run early. Phase B
+// (`ensurePackages`): the heavy package set (numpy/pandas/matplotlib/scipy/
+// plotly/pyodide_http) plus dependent patches; only package-needing runs
+// await it.
 let pyodide: PyodideInterface | null = null;
 let initPromise: Promise<void> | null = null;
-// Python's stdlib top-level module names (sys.stdlib_module_names),
-// snapshotted after phase A for the needs-heavy-packages gate.
+// sys.stdlib_module_names, snapshotted after phase A for the packages gate.
 let stdlibModuleNames: Set<string> | null = null;
 let packagesReady = false;
 let packagesPromise: Promise<void> | null = null;
 
-// Some packages advertised in the Packages drawer ship as pure-Python
-// wheels on PyPI but are NOT part of the Pyodide distribution, so
-// `loadPackagesFromImports()` can't see them (it only knows the bundled
-// lockfile). Map each importable module name to its PyPI requirement and
-// micropip-install it the first time the user's code imports it. `plotly`
-// is installed eagerly at init, so it doesn't need to be listed here.
+// Drawer packages that aren't in the Pyodide distribution, so
+// `loadPackagesFromImports()` can't see them; micropip-installed on first
+// import. plotly is installed eagerly at init, so it isn't listed.
 const MICROPIP_PACKAGES: Record<string, string> = {
   openpyxl: "openpyxl",
   seaborn: "seaborn",
@@ -144,21 +123,11 @@ const MICROPIP_PACKAGES: Record<string, string> = {
 const micropipInstalled = new Set<string>();
 
 /**
- * Packages a block needs but never names, keyed by the call that needs them.
- *
- * `loadPackagesFromImports` only sees `import` statements, which misses every
- * dependency a library reaches for internally. A lesson that writes
- * `px.scatter(..., trendline="ols")` imports plotly and nothing else, and the
- * reader gets "The module 'statsmodels' is included in the Pyodide
- * distribution, but it is not installed" instead of a chart. The same happens
- * to `df.to_excel(...)` (openpyxl), `df.to_parquet(...)` and polars'
- * `.to_arrow()` (pyarrow), and any tz-aware timestamp (tzdata).
- *
- * Making the author add a dead `import statsmodels` to the block would work
- * and would be a worse lesson, so the trigger lives here instead. Each entry
- * is a pattern over the source and the distribution package it implies; a
- * false positive costs one download, so the patterns are written to be
- * specific rather than clever.
+ * Packages a block needs but never imports by name (statsmodels behind a
+ * plotly trendline, pyarrow behind .to_arrow(), tzdata behind a named tz) —
+ * `loadPackagesFromImports` only sees import statements. Each entry maps a
+ * source pattern to the package it implies; a false positive costs one
+ * download, so patterns are specific rather than clever.
  */
 const IMPLICIT_PACKAGES: { pattern: RegExp; pkg: string }[] = [
   // plotly's trendlines are fitted by statsmodels.
@@ -166,20 +135,15 @@ const IMPLICIT_PACKAGES: { pattern: RegExp; pkg: string }[] = [
   // Arrow interop, and the parquet engine pandas and polars both prefer.
   { pattern: /\bpyarrow\b|\.(?:to|from)_(?:arrow|pandas)\(/, pkg: "pyarrow" },
   { pattern: /\.(?:to|read|scan|sink)_parquet\(/, pkg: "pyarrow" },
-  // polars decides once, at import time, whether pyarrow is available, and
-  // caches the answer for the life of the interpreter. There is no way to
-  // change its mind afterwards (see the note on the deleted repair below), so
-  // pyarrow has to be on disk before the first `import polars` runs, which
-  // means triggering on the import rather than on the Arrow call that needs
-  // it. The cost is one extra wheel on polars lessons that never touch Arrow;
-  // the alternative is a polars that quietly answers wrongly.
+  // polars caches pyarrow availability at import time for the life of the
+  // interpreter, so pyarrow must be on disk before the first `import polars`
+  // — hence triggering on the import, not on the Arrow call.
   {
     pattern:
       /^\s*(?:from\s+polars(?:\.[\w.]+)?\s+import\b|import\s+(?:[\w.]+\s*,\s*)*polars(?:\.[\w.]+)?(?:\s+as\s+\w+)?\s*(?:,|$|#))/m,
     pkg: "pyarrow",
   },
-  // zoneinfo's database is a separate package on Pyodide, and pandas reaches
-  // for it on any named time zone.
+  // zoneinfo's database is a separate package on Pyodide.
   {
     pattern: /\btz_localize\(|\btz_convert\(|\bZoneInfo\(|\btz\s*=\s*["']/,
     pkg: "tzdata",
@@ -193,25 +157,10 @@ const implicitLoaded = new Set<string>();
  *  is idempotent; this just saves re-running it on every polars block. */
 let polarsShimmed = false;
 
-/*
- * There used to be a `repairPolarsForArrow()` here that dropped polars from
- * `sys.modules` so the next import would re-run its pyarrow check. It did not
- * work, and it broke more than it fixed.
- *
- * polars' compiled extension cannot be re-initialised in wasm, so the
- * re-imported package binds to the Rust registry the first import already
- * created while rebuilding its dtype singletons on the Python side. The result
- * is a polars that looks fine and compares wrongly: `df["b"].dtype ==
- * pl.String` is False, `df.dtypes == [...]` is False, and `Series == "x"`
- * raises `NotImplementedError: Series of type String does not have eq
- * operator`. Fresh objects created entirely after the repair are affected too,
- * so the old comment here claiming it only hurt "code that mixes objects from
- * before and after an Arrow call" was wrong.
- *
- * Loading pyarrow before polars is ever imported avoids the situation instead
- * of trying to recover from it, which is what the IMPLICIT_PACKAGES rule above
- * now does.
- */
+/* Deliberately NO evict-and-reimport repair for polars here: its compiled
+ * extension can't be re-initialised in wasm, so a re-import yields broken
+ * dtype comparisons. Loading pyarrow before the first `import polars`
+ * (the IMPLICIT_PACKAGES rule above) avoids the situation entirely. */
 
 /** Distribution packages implied by `code` that have not been asked for yet. */
 function implicitPackagesFor(code: string): string[] {
@@ -222,10 +171,8 @@ function implicitPackagesFor(code: string): string[] {
   return [...wanted];
 }
 
-/** True when `code` imports the top-level module `mod` (matches
- *  `import mod`, `import mod as x`, `import a, mod`, `from mod import …`,
- *  anchored to a line start so matches inside strings/comments are
- *  ignored). Mirrors the adapter's `hasImport`. */
+/** True when `code` imports top-level module `mod` (line-anchored so matches
+ *  inside strings/comments are ignored). Mirrors the adapter's `hasImport`. */
 function codeImportsModule(code: string, mod: string): boolean {
   const esc = mod.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const re = new RegExp(
@@ -235,17 +182,15 @@ function codeImportsModule(code: string, mod: string): boolean {
   return re.test(code);
 }
 
-/** Install any micropip-only drawer packages referenced by `code` that
- *  haven't been installed yet. Throws on install failure so the caller can
- *  surface it as an stderr cell. */
+/** Install micropip-only drawer packages referenced by `code`. Throws on
+ *  install failure so the caller can surface it as an stderr cell. */
 async function ensureMicropipPackages(code: string): Promise<void> {
   if (!pyodide) return;
   const needed = Object.entries(MICROPIP_PACKAGES)
     .filter(
       ([mod, req]) =>
         !micropipInstalled.has(req) &&
-        // openpyxl is pandas' Excel engine and is almost never imported by
-        // name: `df.to_excel(...)` is the whole usage, so the call counts too.
+        // openpyxl is rarely imported by name; `df.to_excel(...)` counts too.
         (codeImportsModule(code, mod) ||
           (mod === "openpyxl" && /\.(?:to|read)_excel\(/.test(code))),
     )
@@ -258,9 +203,8 @@ async function ensureMicropipPackages(code: string): Promise<void> {
   }
 }
 
-// The wire shape and its conversion into `OutputCell`s live in
-// `pythonDisplayOutputs.ts`, shared with `scripts/build-block-outputs.mjs`
-// so a prepopulated output panel and a freshly-run one render identically.
+// Wire shape → OutputCell conversion lives in pythonDisplayOutputs.ts,
+// shared with scripts/build-block-outputs.mjs for identical rendering.
 
 async function initPyodide(): Promise<void> {
   post({ kind: "loading", message: "Loading Python runtime…", fraction: 0.06 });
@@ -273,11 +217,8 @@ async function initPyodide(): Promise<void> {
     fraction: 0.8,
   });
 
-  // Set up display(), the stdout/stderr tee, and the per-run reset
-  // helpers. Deliberately matplotlib-free: the plotting stack arrives
-  // in boot phase B (see SETUP_SCRIPT_B), so this script must run on
-  // the bare interpreter. find_imports is hoisted here for the
-  // needs-heavy-packages gate in runCode().
+  // display(), stdout/stderr tee, per-run reset helpers. Deliberately
+  // matplotlib-free: this script must run on the bare (phase A) interpreter.
   await pyodide.runPythonAsync(`
 import sys, io, base64, json, ast as _ast, re as _re
 from pyodide.code import find_imports as _pg_find_imports
@@ -490,9 +431,7 @@ _PG_PROTECTED_NAMES = set(globals().keys()) | {
 }
 `);
 
-  // Snapshot the stdlib module names for the gate in runCode(): code
-  // whose imports all resolve against the bare interpreter never waits
-  // for the heavy package set.
+  // Snapshot stdlib module names for the packages gate in runCode().
   stdlibModuleNames = new Set(
     (
       pyodide.runPython(
@@ -503,19 +442,14 @@ _PG_PROTECTED_NAMES = set(globals().keys()) | {
 
   post({ kind: "ready" });
 
-  // Phase B is NOT kicked here. It starts when a `warm-packages` hint
-  // says the surface's authored code needs the data stack (or `force`s
-  // it, as the playground does), or lazily when a package-needing run
-  // awaits ensurePackages(). Booting it unconditionally made every
-  // Python surface, including stdlib-only ones like the home page's
-  // hero challenge, pay hundreds of MB for numpy/pandas/scipy/
-  // matplotlib/plotly it never used.
+  // Phase B is deliberately NOT kicked here: it starts on a warm-packages
+  // hint or lazily from a package-needing run. Booting it unconditionally
+  // made stdlib-only surfaces download hundreds of MB they never used.
 }
 
 // ─── Boot phase B: the heavy package set ───────────────────────────────
 
-// Globals (and patches) this script adds on top of SETUP_SCRIPT A. It
-// runs as ONE synchronous Python exec, no awaits, so it can never
+// Runs as ONE synchronous Python exec (no awaits) so it can never
 // interleave with a concurrently executing stdlib-only run.
 const SETUP_SCRIPT_B = `
 # Patch urllib/requests once so user code can make HTTP(S) calls (subject to
@@ -549,13 +483,8 @@ _PG_PROTECTED_NAMES |= {
 async function loadHeavyPackages(): Promise<void> {
   if (!pyodide) throw new Error("Pyodide is not initialised");
 
-  // Pyodide's package loader writes its progress messages
-  // ("Loading numpy, …", "pandas already loaded from default channel",
-  // "No new packages to load", …) through Python's `sys.stdout`. Once
-  // `runCode()` installs a `setStdout({ batched })` capture, those
-  // messages would otherwise be conflated with the user's real `print`
-  // output. Provide explicit callbacks so the loader noise stays out of
-  // user-visible output cells.
+  // The package loader writes progress through sys.stdout, which runCode()
+  // captures; explicit callbacks keep loader noise out of user output cells.
   const pkgCallbacks = {
     messageCallback: (m: string) => {
       console.log("[pyodide:loadPackage]", m);
@@ -569,17 +498,15 @@ async function loadHeavyPackages(): Promise<void> {
   await pyodide.loadPackage("micropip", pkgCallbacks);
   const micropip = pyodide.pyimport("micropip");
   await micropip.install("plotly");
-  // pyodide_http reroutes urllib/requests through the browser's fetch/XHR so
-  // that `requests.get(...)`, `pd.read_csv(url)`, etc. work in the worker.
-  // It does NOT bypass CORS, cross-origin hosts still need the CORS proxy.
+  // pyodide_http reroutes urllib/requests through fetch/XHR. It does NOT
+  // bypass CORS; cross-origin hosts still need the CORS proxy.
   await micropip.install("pyodide_http");
 
   await pyodide.runPythonAsync(SETUP_SCRIPT_B);
 }
 
-/** Memoised phase B with retry-on-failure: a failed attempt clears the
- *  memo so the next package-needing run re-kicks the download instead
- *  of caching a transient network error forever. */
+/** Memoised phase B with retry-on-failure: a failed attempt clears the memo
+ *  so a transient network error isn't cached forever. */
 function ensurePackages(): Promise<void> {
   if (!packagesPromise) {
     packagesPromise = loadHeavyPackages().then(
@@ -596,14 +523,9 @@ function ensurePackages(): Promise<void> {
 }
 
 // ─── jedi-based autocomplete ───────────────────────────────────────────
-// jedi ships as a Pyodide package (~1.7 MB of wheels) and is loaded
-// lazily on the first completion request. `jedi.Interpreter` analyses
-// the full editor buffer *and* the live worker globals, so completions
-// cover static code (imports, defs above the cursor) and the real
-// objects of the previous run (actual DataFrame columns), the same
-// approach JupyterLite's Pyodide kernel uses. On load failure (e.g. a
-// blocked CDN) completion falls back to the rlcompleter path above for
-// the rest of the session.
+// Loaded lazily on the first completion request. `jedi.Interpreter` sees
+// the editor buffer AND the live worker globals (real DataFrame columns).
+// On load failure, completion falls back to rlcompleter for the session.
 
 const JEDI_SETUP = `
 import json as _json
@@ -664,9 +586,8 @@ _PG_PROTECTED_NAMES |= {
 
 let jediPromise: Promise<boolean> | null = null;
 
-/** Load + set up jedi once; resolves false (and stops retrying) if the
- *  package can't be fetched so completions degrade to rlcompleter
- *  instead of re-downloading on every keystroke. */
+/** Load + set up jedi once; resolves false (and stops retrying) on fetch
+ *  failure so completions degrade to rlcompleter, not per-keystroke retries. */
 function ensureJedi(): Promise<boolean> {
   if (!jediPromise) {
     jediPromise = (async () => {
@@ -691,18 +612,14 @@ function ensureJedi(): Promise<boolean> {
   return jediPromise;
 }
 
-// Phase-B-provided ambient names: the setup scripts define a global
-// `plt`/`matplotlib`, and pyodide_http patches urllib/http/requests,
-// code that *references* any of these needs phase B even when it never
-// import-statements a heavy package. False positives (say, a variable
-// named http) merely wait for the full boot, i.e. today's behaviour.
+// Phase-B ambient names (global plt/matplotlib, patched urllib/http/
+// requests): referencing any of these needs phase B even without a heavy
+// import. False positives merely wait for the full boot.
 const PHASE_B_AMBIENT_RE = /\b(?:plt|matplotlib|urllib|requests|http)\b/;
 
-/** Whether `code` imports anything beyond the stdlib, or `null` when
- *  that's unknowable (unparseable code, gate machinery unavailable).
- *  Callers pick the failure direction: the run gate treats `null` as
- *  "needs packages" (never break a run), the warm-hint gate treats it
- *  as "no evidence" (never download speculatively on a guess). */
+/** Whether `code` imports beyond the stdlib; `null` when unknowable.
+ *  The run gate treats null as "needs packages" (never break a run); the
+ *  warm-hint gate treats it as "no evidence" (never download on a guess). */
 function importsBeyondStdlib(code: string): boolean | null {
   const stdlib = stdlibModuleNames;
   if (!pyodide || !stdlib) return null;
@@ -720,22 +637,17 @@ function importsBeyondStdlib(code: string): boolean | null {
   }
 }
 
-/** True when `code` can't run correctly on the bare (phase A)
- *  interpreter. Conservative: any uncertainty (unparseable code,
- *  unknown imports) waits for the full boot, the failure mode is
- *  "behaves like before the two-phase split", never a broken run. */
+/** True when `code` can't run on the bare (phase A) interpreter.
+ *  Conservative: any uncertainty waits for the full boot, never a broken run. */
 function runNeedsHeavyPackages(code: string): boolean {
   if (PHASE_B_AMBIENT_RE.test(code)) return true;
   return importsBeyondStdlib(code) ?? true;
 }
 
-/** Warm-hint variant of the gate, applied per source so one snippet
- *  with an intentionally incomplete starter (unparseable) can't poison
- *  the answer for the rest. Optimistic on uncertainty: a source that
- *  doesn't parse is skipped rather than assumed heavy, the worst case
- *  is the first Run paying the install behind the standard "first run
- *  only" notice, whereas pessimism would re-create the very
- *  download-for-everyone this hint mechanism exists to avoid. */
+/** Warm-hint variant of the gate, per source so one unparseable starter
+ *  can't poison the rest. Optimistic on uncertainty: an unparseable source
+ *  is skipped rather than assumed heavy — pessimism would re-create the
+ *  download-for-everyone this hint exists to avoid. */
 function warmHintNeedsHeavyPackages(sources: string[]): boolean {
   return sources.some(
     (src) => PHASE_B_AMBIENT_RE.test(src) || importsBeyondStdlib(src) === true,
@@ -749,10 +661,8 @@ async function runCode(
 ): Promise<void> {
   if (!pyodide) throw new Error("Pyodide is not initialised");
 
-  // Two-phase boot gate: stdlib-only code runs on the bare interpreter
-  // immediately; anything touching the data stack (or the ambient
-  // names phase B provides) waits for the package set, with a status
-  // notice so the wait doesn't masquerade as a slow user program.
+  // Two-phase boot gate: package-needing code waits for phase B, with a
+  // status notice so the wait doesn't masquerade as a slow user program.
   if (!packagesReady && runNeedsHeavyPackages(code)) {
     post({
       kind: "run-status",
@@ -769,13 +679,9 @@ async function runCode(
   pyodide.setStdout({ batched: (s: string) => { stdout += s + "\n"; } });
   pyodide.setStderr({ batched: (s: string) => { stderr += s + "\n"; } });
 
-  // Auto-install any Pyodide packages referenced by the user's imports
-  // (e.g. `import sklearn` triggers loading of scikit-learn). Suppress the
-  // loader's progress messages so they don't pollute the captured user
-  // stdout, see the comment on `pkgCallbacks` in `initPyodide()`.
-  // `preparing: true` surfaces the boot notice during the download; the
-  // main thread debounces it, so an all-cached run (nothing to fetch)
-  // doesn't flash the notice.
+  // Auto-install packages referenced by the user's imports, keeping loader
+  // noise out of captured stdout. The main thread debounces the notice so
+  // an all-cached run doesn't flash it.
   post({
     kind: "run-status",
     id,
@@ -791,9 +697,7 @@ async function runCode(
         console.error("[pyodide:loadPackage]", m);
       },
     });
-    // Dependencies the block never imports by name (statsmodels behind a
-    // plotly trendline, pyarrow behind .to_arrow(), tzdata behind a named
-    // time zone). loadPackagesFromImports cannot see these.
+    // Dependencies the block never imports by name (see IMPLICIT_PACKAGES).
     const implicit = implicitPackagesFor(code);
     if (implicit.length > 0) {
       await pyodide.loadPackage(implicit, {
@@ -806,13 +710,11 @@ async function runCode(
       });
       for (const pkg of implicit) implicitLoaded.add(pkg);
     }
-    // Pure-Python drawer packages that aren't in the Pyodide lockfile
-    // (e.g. openpyxl, seaborn) need an explicit micropip install.
+    // Drawer packages outside the Pyodide lockfile need micropip.
     await ensureMicropipPackages(code);
-    // polars cannot memory-map a file over a megabyte without threads this
-    // worker does not have, so its eager readers are taught to take the bytes
-    // instead. It has to happen before the block's own `import polars`, which
-    // is why it hangs off the source pattern rather than off an import hook.
+    // polars can't mmap >1 MB files without threads, so its eager readers
+    // are shimmed to take bytes. Must run before the block's own
+    // `import polars`, hence the source pattern rather than an import hook.
     if (!polarsShimmed && POLARS_IMPORT_PATTERN.test(code)) {
       await pyodide.runPythonAsync(POLARS_WASM_SHIM);
       polarsShimmed = true;
@@ -822,24 +724,17 @@ async function runCode(
       err instanceof Error ? err.message : String(err)
     }\n`;
   } finally {
-    // End the preparing window, the user's code is about to execute.
     post({ kind: "run-status", id, message: "Running…", preparing: false });
   }
 
   await pyodide.runPythonAsync("_pg_reset_user_globals(); _display_outputs.clear()");
 
-  // Pass the user code as a Python string to avoid template-literal escaping
-  // issues and to let _execute_with_last_display parse it with the ast module.
+  // Pass the code as a Python string to avoid template-literal escaping.
   pyodide.globals.set("_user_code_str", code);
 
-  // Wrap user code with a Plotly intercept so `fig.show()` captures the
-  // figure JSON instead of trying to open a browser tab.  The user code is
-  // executed via _execute_with_last_display so that the last expression is
-  // auto-displayed (Jupyter-style) when it evaluates to a non-None value.
-  // Match the playground's light/dark UI by making the theme-appropriate
-  // Plotly template the default. plotly.py resolves this at figure-creation
-  // time, so figures the user builds without an explicit `template=` pick it
-  // up, while an explicit template in user code still wins.
+  // Wrap user code with a Plotly show() intercept and Jupyter-style
+  // last-expression auto-display. The theme-appropriate Plotly template
+  // becomes the default; an explicit `template=` in user code still wins.
   const plotlyDefaultTemplate = theme === "light" ? "plotly" : "plotly_dark";
 
   const wrappedCode = `
@@ -898,9 +793,8 @@ if _plt is not None:
     _plt.close("all")
 `;
 
-  // Post the ordered output stream. Runs in a finally so that output
-  // produced *before* an exception (prints, tables, figures) still
-  // renders, the traceback then follows it, like a notebook.
+  // Post the ordered output stream. Runs in a finally so pre-exception
+  // output still renders, followed by the traceback, like a notebook.
   const flushOutputs = () => {
     if (!pyodide) return;
     let displayOutputsRaw: unknown;
@@ -914,15 +808,11 @@ if _plt is not None:
       return;
     }
 
-    // Anything the JS-level capture saw (output emitted outside the
-    // per-run tee window) is posted first, in practice this is the
-    // pre-run package-loader failure note added above.
+    // JS-level captures (output outside the per-run tee window, e.g. the
+    // package-loader failure note) post first.
     if (stdout.trim()) post({ kind: "output", id, cell: { type: "stdout", content: stdout.trim() } });
     if (stderr.trim()) post({ kind: "output", id, cell: { type: "stderr", content: stderr.trim() } });
 
-    // `animation_frame=` figures carry their frames through the shared
-    // converter; the renderer needs them or the play button and the
-    // slider are inert.
     for (const cell of toOutputCells(displayOutputsRaw)) {
       post({ kind: "output", id, cell });
     }
@@ -943,8 +833,7 @@ async function completeWithRlcompleter(
 ): Promise<void> {
   if (!pyodide) throw new Error("Pyodide is not initialised");
 
-  // Make the request available to the Python helper without worrying
-  // about quoting or escaping the user's text.
+  // Globals carry the request so the user's text never needs escaping.
   pyodide.globals.set("_complete_line", line);
   pyodide.globals.set("_complete_column", column);
 
@@ -985,8 +874,7 @@ async function completeCode(
     return;
   }
 
-  // Globals (not string interpolation) carry the request so the user's
-  // text never needs escaping into Python source.
+  // Globals carry the request so the user's text never needs escaping.
   pyodide.globals.set("_complete_doc", doc);
   pyodide.globals.set("_complete_line_no", lineNumber);
   pyodide.globals.set("_complete_line", line);
@@ -1006,8 +894,7 @@ async function completeCode(
     parsed = null;
   }
 
-  // `null` signals a jedi-level failure on this request (e.g. a parse
-  // edge case), fall back rather than answering with nothing.
+  // `null` signals a jedi-level failure; fall back rather than answer empty.
   if (!parsed) {
     await completeWithRlcompleter(id, line, column);
     return;
@@ -1027,9 +914,8 @@ async function completeCode(
   post({ kind: "complete-result", id, completions, replaceLength });
 }
 
-// Pyodide is not reentrant, serialise all run/complete requests behind a
-// single promise chain so a completion request that arrives while a run is
-// in progress can't interleave Python execution.
+// Pyodide is not reentrant: serialise all run/complete requests behind one
+// promise chain so requests can't interleave Python execution.
 let workQueue: Promise<unknown> = Promise.resolve();
 
 function enqueue<T>(task: () => Promise<T>): Promise<T> {
@@ -1039,18 +925,14 @@ function enqueue<T>(task: () => Promise<T>): Promise<T> {
 }
 
 // ─── Multi-file VFS staging ────────────────────────────────────────────
-// Files supplied to `prepareFs` are written to Pyodide's MEMFS at
-// `/home/pyodide/` so user code can `import other_module`, open data
-// files with relative paths, etc. We track the set of paths from the
-// previous run so renames/deletes in the UI also delete the stale files
-// from the VFS (otherwise an old `utils.py` could still be importable
-// after it's been removed from the editor).
+// prepareFs files land in Pyodide's MEMFS at /home/pyodide/. The previous
+// run's paths are tracked so UI renames/deletes also remove stale VFS files
+// (otherwise a removed utils.py would still be importable).
 const stagedPaths = new Set<string>();
 const STAGED_ROOT = "/home/pyodide";
 
 function joinStagedPath(relPath: string): string {
-  // Workspace paths are always relative; defensively strip any leading
-  // slashes so the join doesn't escape the staged root.
+  // Strip leading slashes so the join can't escape the staged root.
   const trimmed = relPath.replace(/^\/+/, "");
   return `${STAGED_ROOT}/${trimmed}`;
 }
@@ -1063,21 +945,18 @@ async function prepareFs(files: Array<[string, Uint8Array]>): Promise<void> {
   for (const [relPath, bytes] of files) {
     const abs = joinStagedPath(relPath);
     nextPaths.add(abs);
-    // Ensure parent directories exist (mkdir -p semantics).
     ensureDirs(FS, abs);
     try {
       FS.writeFile(abs, bytes);
     } catch (err) {
-      // Surface filesystem-level errors with the offending path so the
-      // user can debug invalid filenames.
+      // Include the offending path so invalid filenames are debuggable.
       throw new Error(
         `Failed to write ${relPath}: ${err instanceof Error ? err.message : String(err)}`,
       );
     }
   }
 
-  // Remove paths staged on previous runs that aren't part of the new
-  // snapshot, keeps deletes/renames in sync.
+  // Remove previously staged paths absent from the new snapshot.
   for (const prev of stagedPaths) {
     if (!nextPaths.has(prev)) {
       try {
@@ -1090,11 +969,9 @@ async function prepareFs(files: Array<[string, Uint8Array]>): Promise<void> {
   stagedPaths.clear();
   for (const p of nextPaths) stagedPaths.add(p);
 
-  // The files just changed on disk, but Pyodide may still hold a previous
-  // import of one of them in `sys.modules` (the per-run global reset does
-  // not touch the import cache). Evict staged-origin modules and invalidate
-  // the finder caches so the next run imports the freshly-written source
-  // instead of a stale module, see _pg_evict_staged_modules in initPyodide.
+  // sys.modules may still cache imports of the just-rewritten files (the
+  // per-run reset doesn't touch the import cache); evict staged-origin
+  // modules so the next run sees the fresh source.
   try {
     await pyodide.runPythonAsync("_pg_evict_staged_modules()");
   } catch {
@@ -1167,8 +1044,7 @@ self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
         if (initPromise) await initPromise;
         await completeCode(id, doc, lineNumber, line, column);
       } catch {
-        // Completions are best-effort, return an empty list rather than
-        // surfacing the error to the user.
+        // Completions are best-effort; return an empty list.
         post({ kind: "complete-result", id, completions: [], replaceLength: 0 });
       }
     });
@@ -1195,10 +1071,8 @@ self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
 
   if (msg.kind === "warm-packages") {
     const { sources, force } = msg;
-    // The gate itself is queued (it runs Python via find_imports), but
-    // the install is fired in the background so it never holds the run
-    // queue: a run that needs the packages awaits ensurePackages()
-    // itself, and everything else shouldn't wait behind the download.
+    // The gate is queued (it runs Python), but the install fires in the
+    // background so the download never holds the run queue.
     enqueue(async () => {
       try {
         if (initPromise) await initPromise;
@@ -1209,8 +1083,7 @@ self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
             .catch(() => {});
         }
       } catch {
-        // Warm-up is best-effort, a package-needing run retries and
-        // surfaces the real error through its own path.
+        // Warm-up is best-effort; a package-needing run surfaces real errors.
       }
     });
     return;

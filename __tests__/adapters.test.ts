@@ -1,30 +1,20 @@
 /**
- * Adapter configuration tests.
- *
- * These tests verify the structure of each language adapter (id, examples,
- * packages, etc.) without actually executing any WebAssembly runtime.
- * They run in Node and require no browser APIs.
- *
- * NOTE: adapters that reference React JSX (packagesFooter) are imported
- * via dynamic mocking so we don't need a full React renderer.
+ * Adapter configuration shape tests: static properties only, no WASM runtime,
+ * runs in Node.
  */
 import { describe, it, expect } from "vitest";
 
-// Minimal stubs so adapter modules can be imported in Node
-// without crashing on React JSX or browser-specific globals.
 import { vi } from "vitest";
 
-// Adapters reference React JSX in their `packagesFooter` property.
-// Stub React so adapter modules can be imported in Node without
-// needing a full renderer.
+// Adapters reference React JSX (packagesFooter); stub React so they import
+// in Node without a renderer.
 vi.mock("react", () => ({
   default: {
     createElement: () => null,
   },
 }));
 
-// Adapters that use dynamic import of WebAssembly runtimes will fail if
-// actually called, but we only access their static properties here.
+// Only static properties are accessed, so WASM dynamic imports never fire.
 import { javascriptAdapter } from "../app/_components/runtime/javascript";
 import { typescriptAdapter } from "../app/_components/runtime/typescript";
 import { phpAdapter } from "../app/_components/runtime/php";
@@ -226,9 +216,8 @@ describe("Java adapter specifics", () => {
   });
 
   it("hasImport does not match unrelated packages with the same prefix", () => {
-    // Substring-style false positives would be a real footgun (e.g. a
-    // user clicking `java.util` after `import java.util.concurrent.*;`
-    // would otherwise have its insertion silently skipped).
+    // A substring false positive would silently skip inserting `java.util`
+    // after `import java.util.concurrent.*;`.
     expect(
       javaAdapter.hasImport("import java.util.concurrent.*;", "java.util"),
     ).toBe(false);
@@ -284,9 +273,8 @@ describe("C# adapter specifics", () => {
   });
 
   it("hasImport does not match unrelated namespaces with the same prefix", () => {
-    // `using System.Linq.Expressions;` should NOT match a query for
-    // `System`, substring matching would otherwise confuse the
-    // packages drawer's "already imported?" check.
+    // Substring matching would confuse the packages drawer's
+    // "already imported?" check.
     expect(
       csharpAdapter.hasImport(
         "using System.Linq.Expressions;",
