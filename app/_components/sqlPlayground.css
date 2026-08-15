@@ -782,6 +782,14 @@
   background: var(--bg3);
 }
 
+/* Says why the checkbox column is absent, instead of silently omitting it. */
+.sql-result-nopk-hint {
+  font-size: 11.5px;
+  font-family: var(--font-ui);
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
 /* Manual re-run, beside the result pane's Download button. */
 .sql-result-refresh-btn {
   display: inline-flex;

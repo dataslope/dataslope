@@ -5,6 +5,8 @@ import {
   toTimestampString,
   toPgArrayLiteral,
   parsePgArrayLiteral,
+  arrowTimeToString,
+  arrowIntervalToString,
 } from "../app/_components/runtime/valueFormat";
 import {
   classifyExportType,
@@ -295,5 +297,97 @@ describe("stripTransactionControl (DS-04)", () => {
       "$body$ LANGUAGE plpgsql;",
     ].join("\n");
     expect(stripTransactionControl(sql)).toBe(sql);
+  });
+});
+
+describe("DuckDB Arrow temporal formatting (DK-04)", () => {
+  it("formats a TIME from its Arrow unit", () => {
+    // Verified against duckdb-wasm: TIME arrives as Time64<MICROSECOND> and
+    // apache-arrow does *not* normalize it, so 09:30:00 is the bare number
+    // 34200000000 — which is exactly what the grid used to render.
+    expect(arrowTimeToString(34_200_000_000, "MICROSECOND")).toBe("09:30:00");
+    expect(arrowTimeToString(49_500_123_456, "MICROSECOND")).toBe(
+      "13:45:00.123456",
+    );
+    expect(arrowTimeToString(34_200_000, "MILLISECOND")).toBe("09:30:00");
+    expect(arrowTimeToString(34_200, "SECOND")).toBe("09:30:00");
+  });
+
+  it("returns null for a unit it does not know", () => {
+    expect(arrowTimeToString(1, "FORTNIGHT")).toBeNull();
+    expect(arrowTimeToString("not a number", "MICROSECOND")).toBeNull();
+  });
+
+  it("formats a MONTH_DAY_NANO interval the way DuckDB prints it", () => {
+    // [months, days, nanosLow, nanosHigh] straight from the Arrow buffer.
+    expect(arrowIntervalToString(new Int32Array([0, 3, 0, 0]), "MONTH_DAY_NANO")).toBe(
+      "3 days",
+    );
+    expect(
+      arrowIntervalToString(
+        new Int32Array([14, 3, 31_978_496, 3424]),
+        "MONTH_DAY_NANO",
+      ),
+    ).toBe("1 year 2 months 3 days 04:05:06");
+    expect(arrowIntervalToString(new Int32Array([0, 0, 0, 0]), "MONTH_DAY_NANO")).toBe(
+      "00:00:00",
+    );
+    expect(arrowIntervalToString(new Int32Array([1, 0, 0, 0]), "MONTH_DAY_NANO")).toBe(
+      "1 month",
+    );
+  });
+
+  it("handles the other two interval layouts", () => {
+    expect(arrowIntervalToString(new Int32Array([1, 2]), "YEAR_MONTH")).toBe(
+      "1 year 2 months",
+    );
+    expect(arrowIntervalToString(new Int32Array([3, 14_706_000]), "DAY_TIME")).toBe(
+      "3 days 04:05:06",
+    );
+  });
+
+  it("reads an interval that crossed a structured-clone hop", () => {
+    expect(
+      arrowIntervalToString({ 0: 0, 1: 3, 2: 0, 3: 0 }, "MONTH_DAY_NANO"),
+    ).toBe("3 days");
+    expect(arrowIntervalToString({ a: 1 }, "MONTH_DAY_NANO")).toBeNull();
+  });
+});
+
+describe("DuckDB composite SQL literals (DK-06, DK-07)", () => {
+  it("emits DuckDB constructor syntax rather than a quoted string", () => {
+    expect(toSqlLiteral("[1,2]", "array", "duckdb")).toBe("[1, 2]");
+    expect(toSqlLiteral('{"k":1}', "json", "duckdb")).toBe("{'k': 1}");
+    expect(toSqlLiteral('[{"a":1},{"a":2}]', "array", "duckdb")).toBe(
+      "[{'a': 1}, {'a': 2}]",
+    );
+  });
+
+  it("keeps the Postgres literal for Postgres", () => {
+    expect(toSqlLiteral("{1,2}", "array", "postgres")).toBe("'{1,2}'");
+  });
+
+  it("uses each dialect's blob literal", () => {
+    const bytes = new Uint8Array([0xde, 0xad]);
+    expect(toSqlLiteral(bytes, "binary", "postgres")).toBe("'\\xdead'");
+    expect(toSqlLiteral(bytes, "binary", "duckdb")).toBe("X'dead'");
+    expect(toSqlLiteral(bytes, "binary", "sqlite")).toBe("X'dead'");
+  });
+
+  it("treats STRUCT/MAP as JSON so the export nests them", () => {
+    expect(classifyExportType("STRUCT")).toBe("json");
+    expect(classifyExportType("MAP")).toBe("json");
+    expect(toJsonValue('{"k":1}', "json")).toEqual({ k: 1 });
+  });
+
+  it("keeps HUGEINT a number, not a quoted string", () => {
+    expect(classifyExportType("HUGEINT")).toBe("numeric");
+    expect(
+      toSqlLiteral("170141183460469231731687303715884105727", "numeric"),
+    ).toBe("170141183460469231731687303715884105727");
+  });
+
+  it("falls back to quoting when the value is not really composite", () => {
+    expect(toSqlLiteral("not json", "array", "duckdb")).toBe("'not json'");
   });
 });

@@ -165,6 +165,30 @@ const blobLiteralQuoteHandler = Prec.highest(
   }),
 );
 
+
+/** Claim focus on `pointerdown`, and re-assert it once on the next frame.
+ *
+ *  A dialog restores focus to whatever opened it, and that restore is
+ *  asynchronous: closing the structure editor (or Add Row, or an import) and
+ *  then clicking into the editor lands the click first and the restore second,
+ *  so focus ends up back on the sidebar button that opened the dialog. The
+ *  editor looks focused but is not, and the next Ctrl+A selects the whole
+ *  page instead of the query — with anything typed after it going nowhere.
+ *
+ *  Taking focus on pointerdown (rather than waiting for `click`) wins the
+ *  first half of that race; the single re-assert covers a restore that lands
+ *  between the two. */
+const focusOnPointerDown = EditorView.domEventHandlers({
+  pointerdown(_event, view) {
+    if (view.hasFocus) return false;
+    view.focus();
+    requestAnimationFrame(() => {
+      if (!view.hasFocus) view.focus();
+    });
+    return false;
+  },
+});
+
 /** Canonical extension list shared by every SQL playground. Compartments are
  *  passed in so the caller can `.reconfigure(...)` later. The `lang`
  *  compartment is intentionally seeded empty: the caller dispatches the
@@ -193,6 +217,7 @@ export function createSqlEditorExtensions(
     bracketMatching(),
     closeBrackets(),
     blobLiteralQuoteHandler,
+    focusOnPointerDown,
     rectangularSelection(),
     tooltips({ parent: document.body }),
     lineNumbers(),

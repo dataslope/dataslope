@@ -606,7 +606,7 @@ export function useSidebarActions(
         const filename = `${name}.${format}`;
         // Column types drive per-format serialization (BLOBs, booleans);
         // the table name gives the SQL export a real INSERT target.
-        const opts = { columnTypes, tableName: name };
+        const opts = { columnTypes, tableName: name, dialect: "sqlite" as const };
         if (format === "csv") {
           exportResultToCsv(columns, rows, filename, opts);
           showToast(`Exported ${filename}.`);

@@ -11,6 +11,7 @@ import {
   toJsonValue,
   toSqlLiteral,
   type ExportCellKind,
+  type SqlExportDialect,
 } from "./valueSerialize";
 
 /** Per-column context an exporter needs to serialize a value faithfully.
@@ -21,6 +22,8 @@ export interface ResultExportOptions {
   columnTypes?: readonly (string | undefined)[];
   /** INSERT target for the SQL exporter. Defaults to `result_set`. */
   tableName?: string;
+  /** Dialect the SQL exporter writes literals for. Defaults to `postgres`. */
+  dialect?: SqlExportDialect;
 }
 
 function kindsFor(
@@ -128,14 +131,29 @@ export function exportResultToSql(
   opts?: ResultExportOptions,
 ): void {
   const kinds = kindsFor(columns, opts);
+  const dialect = opts?.dialect ?? "postgres";
   const table = `"${(opts?.tableName || "result_set").replace(/"/g, '""')}"`;
   const quotedCols = columns
     .map((c) => `"${c.replace(/"/g, '""')}"`)
     .join(", ");
-  const lines = rows.map((row) => {
-    const vals = row.map((v, i) => toSqlLiteral(v, kinds[i])).join(", ");
-    return `INSERT INTO ${table} (${quotedCols}) VALUES (${vals});`;
-  });
+  const lines: string[] = [];
+  // A file of INSERTs into a table that exists nowhere errors on the first
+  // statement, so the schema is emitted first when the column types are known.
+  const declaredTypes = columns.map((_, i) => opts?.columnTypes?.[i]);
+  if (declaredTypes.some((t) => t)) {
+    const colDefs = columns.map(
+      (c, i) =>
+        `  "${c.replace(/"/g, '""')}" ${declaredTypes[i] || "TEXT"}`,
+    );
+    lines.push(
+      `CREATE TABLE IF NOT EXISTS ${table} (\n${colDefs.join(",\n")}\n);`,
+      "",
+    );
+  }
+  for (const row of rows) {
+    const vals = row.map((v, i) => toSqlLiteral(v, kinds[i], dialect)).join(", ");
+    lines.push(`INSERT INTO ${table} (${quotedCols}) VALUES (${vals});`);
+  }
   triggerDownload(
     new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" }),
     filename,

@@ -62,6 +62,123 @@ export function toTimestampString(v: unknown, withZone: boolean): string | null 
   return `${date} ${time}${frac}${withZone ? "+00" : ""}`;
 }
 
+/** Coerce an Arrow scalar (which may be a BigInt) to a JS number. */
+function toNumber(v: unknown): number | null {
+  if (typeof v === "number") return Number.isFinite(v) ? v : null;
+  if (typeof v === "bigint") return Number(v);
+  if (typeof v === "string" && v.trim() !== "" && Number.isFinite(Number(v))) {
+    return Number(v);
+  }
+  return null;
+}
+
+/** Divisor turning a value in `unit` into microseconds. */
+const ARROW_UNIT_TO_MICROS: Record<string, number> = {
+  SECOND: 1_000_000,
+  MILLISECOND: 1_000,
+  MICROSECOND: 1,
+  NANOSECOND: 1 / 1000,
+};
+
+/** Format an Arrow `Time<unit>` value as `HH:MM:SS[.ffffff]`.
+ *
+ *  Unlike timestamps — which apache-arrow normalizes to epoch milliseconds on
+ *  the way out — a time keeps the column's own unit, so `TIME '09:30:00'`
+ *  arrives as the bare number `34200000000` (microseconds since midnight) and
+ *  was rendered as exactly that. `unit` comes from the Arrow type string
+ *  (`Time<MICROSECOND>`). */
+export function arrowTimeToString(raw: unknown, unit: string): string | null {
+  const n = toNumber(raw);
+  if (n === null) return null;
+  const perMicro = ARROW_UNIT_TO_MICROS[unit.toUpperCase()];
+  if (perMicro === undefined) return null;
+  const totalMicros = Math.round(n * perMicro);
+  const neg = totalMicros < 0;
+  const abs = Math.abs(totalMicros);
+  const micros = abs % 1_000_000;
+  const totalSeconds = Math.floor(abs / 1_000_000);
+  const p2 = (v: number) => String(v).padStart(2, "0");
+  const clock = `${p2(Math.floor(totalSeconds / 3600))}:${p2(
+    Math.floor(totalSeconds / 60) % 60,
+  )}:${p2(totalSeconds % 60)}`;
+  const frac =
+    micros === 0 ? "" : `.${String(micros).padStart(6, "0").replace(/0+$/, "")}`;
+  return `${neg ? "-" : ""}${clock}${frac}`;
+}
+
+/** Format an Arrow `Interval<unit>` value the way DuckDB prints it
+ *  (`3 days`, `1 year 2 months 3 days 04:05:06`, `00:00:00` for zero).
+ *
+ *  The value is an `Int32Array` whose meaning depends on the unit, so it was
+ *  reaching the grid as the raw index-keyed dump `{"0":0,"1":0}`. Layouts:
+ *  YEAR_MONTH `[years, months]`, DAY_TIME `[days, milliseconds]`,
+ *  MONTH_DAY_NANO `[months, days, nanosLow, nanosHigh]`. */
+export function arrowIntervalToString(
+  raw: unknown,
+  unit: string,
+): string | null {
+  const parts: number[] = [];
+  if (raw instanceof Int32Array || Array.isArray(raw)) {
+    const arr = raw as ArrayLike<number>;
+    for (let i = 0; i < arr.length; i++) parts.push(Number(arr[i]));
+  } else if (raw && typeof raw === "object") {
+    // A structured-clone hop turns the typed array into an index-keyed object.
+    for (const key of Object.keys(raw as Record<string, unknown>)) {
+      if (!/^\d+$/.test(key)) return null;
+      parts[Number(key)] = Number((raw as Record<string, number>)[key]);
+    }
+  } else {
+    return null;
+  }
+  if (parts.length === 0 || parts.some((n) => !Number.isFinite(n))) return null;
+
+  let months = 0;
+  let days = 0;
+  let micros = 0;
+  switch (unit.toUpperCase()) {
+    case "YEAR_MONTH":
+      months = (parts[0] ?? 0) * 12 + (parts[1] ?? 0);
+      break;
+    case "DAY_TIME":
+      days = parts[0] ?? 0;
+      micros = (parts[1] ?? 0) * 1000;
+      break;
+    case "MONTH_DAY_NANO": {
+      months = parts[0] ?? 0;
+      days = parts[1] ?? 0;
+      // nanoseconds is an int64 split across two int32 halves, little-endian.
+      const lo = BigInt(parts[2] ?? 0) & 0xffffffffn;
+      const hi = BigInt(parts[3] ?? 0);
+      micros = Number(((hi << 32n) | lo) / 1000n);
+      break;
+    }
+    default:
+      return null;
+  }
+  return formatIntervalParts(months, days, micros);
+}
+
+/** `months`/`days`/`micros` → DuckDB's interval text. */
+function formatIntervalParts(
+  months: number,
+  days: number,
+  micros: number,
+): string {
+  const out: string[] = [];
+  const years = Math.trunc(months / 12);
+  const restMonths = months % 12;
+  const plural = (n: number, word: string) =>
+    `${n} ${word}${Math.abs(n) === 1 ? "" : "s"}`;
+  if (years !== 0) out.push(plural(years, "year"));
+  if (restMonths !== 0) out.push(plural(restMonths, "month"));
+  if (days !== 0) out.push(plural(days, "day"));
+  const clock = arrowTimeToString(micros, "MICROSECOND");
+  // DuckDB omits a zero clock unless there is nothing else to print.
+  if (micros !== 0 && clock) out.push(clock);
+  if (out.length === 0) return "00:00:00";
+  return out.join(" ");
+}
+
 /** Render a JS array as a Postgres array literal (`{1,2,3}`), the form the
  *  grid displays and every exporter emits. `[1,2,3]` — what `JSON.stringify`
  *  produces — is not valid Postgres array input, so a displayed value could

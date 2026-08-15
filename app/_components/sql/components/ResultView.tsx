@@ -255,6 +255,11 @@ function clonePendingEdits(src: PendingEditsByResult): PendingEditsByResult {
 function DataTypeIcon({ type }: { type: string }) {
   const t = type.toUpperCase();
   if (t === "NULL") return <Minus size={10} aria-hidden="true" />;
+  // Temporal types are matched before the numeric group: `INTERVAL` contains
+  // "INT", so it was picking up the numeric `#` glyph.
+  if (t.includes("INTERVAL")) return <Clock size={10} aria-hidden="true" />;
+  if (t.includes("DATE")) return <Calendar size={10} aria-hidden="true" />;
+  if (t.includes("TIME")) return <Clock size={10} aria-hidden="true" />;
   if (
     t.includes("INT") ||
     t.includes("REAL") ||
@@ -274,8 +279,6 @@ function DataTypeIcon({ type }: { type: string }) {
   if (t.includes("BOOL")) return <ToggleLeft size={10} aria-hidden="true" />;
   if (t.includes("BLOB") || t.includes("BINARY") || t.includes("BYTE"))
     return <Binary size={10} aria-hidden="true" />;
-  if (t.includes("DATE")) return <Calendar size={10} aria-hidden="true" />;
-  if (t.includes("TIME")) return <Clock size={10} aria-hidden="true" />;
   return null;
 }
 
@@ -434,6 +437,9 @@ const COL_MIN_WIDTH = 48;
 // Cap for the *measured* width (mirrors the CSS max-width clamp on cells);
 // users can still drag wider, up to COL_MAX_WIDTH.
 const COL_MAX_MEASURED_WIDTH = 340;
+/** Measure passes allowed per column signature before the frozen widths are
+ *  accepted as final. See the convergence note where this is used. */
+const MAX_MEASURE_PASSES = 2;
 const COL_MAX_WIDTH = 1600;
 const SELECT_COL_WIDTH = 28;
 // Above this many DOM rows a paged result switches to the virtualizer so
@@ -869,10 +875,23 @@ function ResultViewImpl({
       const nextSetCount = result?.sets.length ?? 1;
       setActiveSetIdx((prev) => Math.max(0, Math.min(prev, nextSetCount - 1)));
     } else {
-      // Fresh run: land on the first set with a result table (scripts
-      // commonly end in a SELECT after DDL/DML setup statements).
-      const firstWithTable = (result?.sets ?? []).findIndex((s) => s !== null);
-      setActiveSetIdx(firstWithTable >= 0 ? firstWithTable : 0);
+      // Fresh run: land on the last set that actually returned rows. Scripts
+      // end with the statement the user cares about, and DuckDB hands back a
+      // one-column `Count` result for DDL/DML — so "first non-null set" opened
+      // on an empty acknowledgement and hid the SELECT behind a manual click.
+      const sets = result?.sets ?? [];
+      const lastIndexWhere = (pred: (s: (typeof sets)[number]) => boolean) => {
+        for (let i = sets.length - 1; i >= 0; i--) {
+          if (pred(sets[i])) return i;
+        }
+        return -1;
+      };
+      const lastWithRows = lastIndexWhere(
+        (s) => s !== null && s.values.length > 0,
+      );
+      const target =
+        lastWithRows >= 0 ? lastWithRows : lastIndexWhere((s) => s !== null);
+      setActiveSetIdx(target >= 0 ? target : 0);
     }
     // A new result settles any pending filter overlay.
     setFilterPending(false);
@@ -2039,6 +2058,7 @@ function ResultViewImpl({
                   onPageChange={handlePageChange}
                   onPageSizeChange={handlePageSizeChange}
                   deletable={pkCols !== null}
+                  noPkForSelection={isEditable && pkCols === null}
                   editable={isEditable}
                   editCount={editCount}
                   selectedCount={selectedCount}
@@ -2384,11 +2404,20 @@ export function ResultTableBody({
   colWidthsRef.current = colWidths;
   // Re-measure only when the column set changes; same-shape reloads, paging
   // and appends keep the frozen widths so the grid never reflows under the user.
-  const colSig = `${deletable ? "select" : ""}${set.columns.join("")}`;
+  // JSON, not a bare join: ["ab","c"] and ["a","bc"] concatenate to the same
+  // string, and a real column change would then not re-measure.
+  const colSig = `${deletable ? "select" : ""}${JSON.stringify(set.columns)}`;
   const [prevColSig, setPrevColSig] = useState(colSig);
+  // Counts measure passes for the current signature. Measuring writes a width
+  // that can change the next measurement (a 1px change in total width flips a
+  // horizontal scrollbar in or out, which resizes the container, which
+  // re-measures); left unbounded that never converges, and React throws
+  // "Maximum update depth exceeded" with the query still showing `Running…`.
+  const measurePassRef = useRef(0);
   if (prevColSig !== colSig) {
     setPrevColSig(colSig);
     setColWidths(null);
+    measurePassRef.current = 0;
   }
 
   // During a drag the <col> element is updated imperatively (no React
@@ -3173,6 +3202,11 @@ export function ResultTableBody({
     if (virtualized && tableRows.length > 0 && renderedRows.length === 0) {
       return;
     }
+    // Hard stop on re-entry. Two passes cover the legitimate case (the
+    // virtualizer materializing rows after the first commit); beyond that the
+    // effect is only feeding itself.
+    if (measurePassRef.current >= MAX_MEASURE_PASSES) return;
+    measurePassRef.current += 1;
     const next: Record<string, number> = {};
     for (const col of table.getAllLeafColumns()) {
       if (col.id === "select") continue;
@@ -4012,6 +4046,7 @@ export function ResultPager({
   onPageChange,
   onPageSizeChange,
   deletable,
+  noPkForSelection,
   editable,
   editCount,
   selectedCount,
@@ -4034,6 +4069,10 @@ export function ResultPager({
   onPageChange: (p: number) => void;
   onPageSizeChange: (s: number) => void;
   deletable: boolean;
+  /** The result maps to a table, but the table has no primary key, so rows
+   *  cannot be selected. Renders a hint instead of silently omitting the
+   *  checkbox column. */
+  noPkForSelection?: boolean;
   editable: boolean;
   editCount: number;
   selectedCount: number;
@@ -4159,6 +4198,11 @@ export function ResultPager({
           >
             Update {editCount} cell{editCount === 1 ? "" : "s"}…
           </button>
+        </span>
+      )}
+      {noPkForSelection && (
+        <span className="sql-result-nopk-hint">
+          Row selection needs a primary key
         </span>
       )}
       {deletable && selectedCount > 0 && (

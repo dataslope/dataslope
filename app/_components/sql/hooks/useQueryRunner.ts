@@ -490,7 +490,8 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       // `sourceTable` gives the SQL export a real INSERT target.
       const opts = {
         columnTypes: set.columnTypes,
-        tableName: result.sourceTable ?? undefined,
+        tableName: result.sourceTable ?? toFileSafeName(title),
+        dialect: "sqlite" as const,
       };
       if (format === "csv") {
         exportResultToCsv(columns, rows, filename, opts);

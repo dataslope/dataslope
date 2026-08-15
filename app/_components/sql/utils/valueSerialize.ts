@@ -32,6 +32,11 @@ export function classifyExportType(sqlType: string | undefined): ExportCellKind 
   if (t.endsWith("[]") || t.startsWith("list<") || t.startsWith("list(")) {
     return "array";
   }
+  // DuckDB STRUCT/MAP reach the exporters as JSON text, same as jsonb, and
+  // were being written out as JSON *strings* containing JSON.
+  if (t === "struct" || t === "map" || t.startsWith("struct") || t.startsWith("map<")) {
+    return "json";
+  }
   if (t === "json" || t === "jsonb") return "json";
   if (
     t.includes("blob") ||
@@ -43,7 +48,16 @@ export function classifyExportType(sqlType: string | undefined): ExportCellKind 
   }
   if (t.includes("timestamp") || t.includes("datetime")) return "timestamp";
   if (t.includes("date")) return "date";
-  if (/^(numeric|decimal)\b/.test(t) || t.startsWith("numeric(")) return "numeric";
+  // `hugeint` joins the numeric family so an exact 39-digit integer is still
+  // written as a SQL number rather than a quoted string.
+  if (
+    /^(numeric|decimal)\b/.test(t) ||
+    t.startsWith("numeric(") ||
+    t === "hugeint" ||
+    t === "uhugeint"
+  ) {
+    return "numeric";
+  }
   return "text";
 }
 
@@ -131,10 +145,24 @@ export function toJsonValue(value: unknown, kind: ExportCellKind): unknown {
   return value;
 }
 
-/** A SQL literal for the cell, valid Postgres input for its column type. */
-export function toSqlLiteral(value: unknown, kind: ExportCellKind): string {
+/** The SQL dialect a literal is being written for. DuckDB spells composite
+ *  values with constructors (`[1, 2]`, `{'k': 1}`) where Postgres uses a
+ *  quoted literal (`'{1,2}'`), so the two cannot share one rendering. */
+export type SqlExportDialect = "postgres" | "sqlite" | "duckdb";
+
+/** A SQL literal for the cell, valid input for its column type. */
+export function toSqlLiteral(
+  value: unknown,
+  kind: ExportCellKind,
+  dialect: SqlExportDialect = "postgres",
+): string {
   if (value === null || value === undefined) return "NULL";
-  if (value instanceof Uint8Array) return `'${bytesToHexLiteral(value)}'`;
+  if (value instanceof Uint8Array) {
+    // SQLite and DuckDB both take `X'…'`; Postgres takes `'\x…'`.
+    return dialect === "postgres"
+      ? `'${bytesToHexLiteral(value)}'`
+      : `X'${bytesToHexLiteral(value).slice(2)}'`;
+  }
   if (typeof value === "boolean") return value ? "TRUE" : "FALSE";
   if (kind === "boolean") return coerceBoolean(value) ? "TRUE" : "FALSE";
   if (typeof value === "number") return Number.isFinite(value) ? String(value) : "NULL";
@@ -143,7 +171,40 @@ export function toSqlLiteral(value: unknown, kind: ExportCellKind): string {
   if (kind === "numeric" && typeof value === "string" && /^-?\d+(\.\d+)?$/.test(value)) {
     return value;
   }
+  if (dialect === "duckdb" && (kind === "array" || kind === "json")) {
+    const literal = duckDbCompositeLiteral(value);
+    if (literal !== null) return literal;
+  }
   return `'${String(value).replace(/'/g, "''")}'`;
+}
+
+/** DuckDB constructor syntax for a LIST / STRUCT / MAP that reached the
+ *  exporter as JSON text, so the exported INSERT rebuilds the real type
+ *  instead of a string that happens to look like one. Returns null when the
+ *  value is not JSON, leaving the caller to quote it. */
+function duckDbCompositeLiteral(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(value);
+  } catch {
+    return null;
+  }
+  if (typeof parsed !== "object" || parsed === null) return null;
+  const render = (v: unknown): string => {
+    if (v === null || v === undefined) return "NULL";
+    if (typeof v === "number") return Number.isFinite(v) ? String(v) : "NULL";
+    if (typeof v === "boolean") return v ? "TRUE" : "FALSE";
+    if (Array.isArray(v)) return `[${v.map(render).join(", ")}]`;
+    if (typeof v === "object") {
+      const entries = Object.entries(v as Record<string, unknown>).map(
+        ([k, val]) => `'${k.replace(/'/g, "''")}': ${render(val)}`,
+      );
+      return `{${entries.join(", ")}}`;
+    }
+    return `'${String(v).replace(/'/g, "''")}'`;
+  };
+  return render(parsed);
 }
 
 /** How a cell should be written into an .xlsx sheet. Numerics, dates and
