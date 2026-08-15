@@ -5,6 +5,7 @@ export type {
   QueryExecResult,
   QueryExecResultWithTypes,
   SqliteEngine,
+  SqliteRunDetail,
   TableColumnInfo,
   TableRebuildSpec,
 } from "./sqlite-core";
@@ -16,6 +17,7 @@ import type {
   ForeignKeyInfo,
   QueryExecResultWithTypes,
   SqliteEngine,
+  SqliteRunDetail,
   TableColumnInfo,
 } from "./sqlite-core";
 
@@ -105,6 +107,7 @@ export async function createSqliteEngine(
     loadSampleDatabase: (id) => call("loadSampleDatabase", [id]) as Promise<SqliteSampleMetadata>,
     exec: (sql) => call("exec", [sql]) as Promise<QueryExecResult[]>,
     execAll: (sql) => call("execAll", [sql]) as Promise<(QueryExecResultWithTypes | null)[]>,
+    execAllDetailed: (sql) => call("execAllDetailed", [sql]) as Promise<SqliteRunDetail>,
     listTables: () => call("listTables") as Promise<string[]>,
     listViews: () => call("listViews") as Promise<string[]>,
     listIndexes: () => call("listIndexes") as Promise<string[]>,

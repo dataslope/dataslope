@@ -984,6 +984,12 @@ body.playground-active {
   animation: playground-spin 0.75s linear infinite;
   fill: none;
 }
+/* Live elapsed time beside "Running…". Tabular figures so the ticking digits
+   don't shift the button's width. */
+.run-btn-elapsed {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
 @keyframes playground-spin {
   to {
     transform: rotate(360deg);

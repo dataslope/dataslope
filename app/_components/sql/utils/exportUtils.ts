@@ -2,6 +2,36 @@
 
 import type { QueryExecResult } from "../../runtime/sqlite-wasm";
 import { ensureParquetWasm } from "./parquetWasm";
+import { formatByteCount } from "./cellUtils";
+import {
+  classifyExportType,
+  csvNeedsExplicitEmpty,
+  toCsvValue,
+  toExcelCell,
+  toJsonValue,
+  toSqlLiteral,
+  type ExportCellKind,
+  type SqlExportDialect,
+} from "./valueSerialize";
+
+/** Per-column context an exporter needs to serialize a value faithfully.
+ *  Optional throughout: a caller with no type metadata still gets the previous
+ *  `String(value)` behaviour, now with binary and boolean handled. */
+export interface ResultExportOptions {
+  /** Declared SQL type per column, parallel to `columns`. */
+  columnTypes?: readonly (string | undefined)[];
+  /** INSERT target for the SQL exporter. Defaults to `result_set`. */
+  tableName?: string;
+  /** Dialect the SQL exporter writes literals for. Defaults to `postgres`. */
+  dialect?: SqlExportDialect;
+}
+
+function kindsFor(
+  columns: readonly string[],
+  opts: ResultExportOptions | undefined,
+): ExportCellKind[] {
+  return columns.map((_, i) => classifyExportType(opts?.columnTypes?.[i]));
+}
 
 export function triggerDownload(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
@@ -17,7 +47,7 @@ export function toExcelData(v: unknown): string | number | boolean | undefined {
   if (v === null || v === undefined) return undefined;
   if (typeof v === "number") return v;
   if (typeof v === "boolean") return v;
-  if (v instanceof Uint8Array) return `[BLOB ${v.length} bytes]`;
+  if (v instanceof Uint8Array) return `[BLOB ${formatByteCount(v.length)}]`;
   return String(v);
 }
 
@@ -42,28 +72,31 @@ export function toFileSafeName(title: string): string {
   return title.replace(/[/\\:*?"<>|\x00-\x1f]/g, "_").trim() || "result_set";
 }
 
-function escapeCsvCell(val: unknown): string {
-  if (val === null || val === undefined) return "";
-  const s = String(val);
-  if (
-    s.includes(",") ||
-    s.includes("\n") ||
-    s.includes("\r") ||
-    s.includes('"')
-  ) {
-    return `"${s.replace(/"/g, '""')}"`;
-  }
-  return s;
+/** Quote a CSV field per RFC 4180. `text` is already the serialized value.
+ *  `forceQuote` writes `""` for a value that would otherwise be an empty
+ *  field, which is the only way CSV can tell an empty string from NULL. */
+function escapeCsvField(text: string, forceQuote = false): string {
+  return forceQuote || /[",\r\n]/.test(text)
+    ? `"${text.replace(/"/g, '""')}"`
+    : text;
 }
 
 export function exportResultToCsv(
   columns: string[],
   rows: QueryExecResult["values"],
   filename: string,
+  opts?: ResultExportOptions,
 ): void {
+  const kinds = kindsFor(columns, opts);
   const lines = [
-    columns.map(escapeCsvCell).join(","),
-    ...rows.map((row) => row.map(escapeCsvCell).join(",")),
+    columns.map((c) => escapeCsvField(c)).join(","),
+    ...rows.map((row) =>
+      row
+        .map((v, i) =>
+          escapeCsvField(toCsvValue(v, kinds[i]), csvNeedsExplicitEmpty(v)),
+        )
+        .join(","),
+    ),
   ];
   triggerDownload(
     new Blob([lines.join("\r\n")], { type: "text/csv;charset=utf-8" }),
@@ -75,11 +108,13 @@ export function exportResultToJson(
   columns: string[],
   rows: QueryExecResult["values"],
   filename: string,
+  opts?: ResultExportOptions,
 ): void {
+  const kinds = kindsFor(columns, opts);
   const data = rows.map((row) => {
     const obj: Record<string, unknown> = {};
     columns.forEach((col, i) => {
-      obj[col] = row[i] ?? null;
+      obj[col] = toJsonValue(row[i] ?? null, kinds[i]);
     });
     return obj;
   });
@@ -93,20 +128,32 @@ export function exportResultToSql(
   columns: string[],
   rows: QueryExecResult["values"],
   filename: string,
+  opts?: ResultExportOptions,
 ): void {
+  const kinds = kindsFor(columns, opts);
+  const dialect = opts?.dialect ?? "postgres";
+  const table = `"${(opts?.tableName || "result_set").replace(/"/g, '""')}"`;
   const quotedCols = columns
     .map((c) => `"${c.replace(/"/g, '""')}"`)
     .join(", ");
-  const lines = rows.map((row) => {
-    const vals = row
-      .map((v) => {
-        if (v === null || v === undefined) return "NULL";
-        if (typeof v === "number") return String(v);
-        return `'${String(v).replace(/'/g, "''")}'`;
-      })
-      .join(", ");
-    return `INSERT INTO result_set (${quotedCols}) VALUES (${vals});`;
-  });
+  const lines: string[] = [];
+  // A file of INSERTs into a table that exists nowhere errors on the first
+  // statement, so the schema is emitted first when the column types are known.
+  const declaredTypes = columns.map((_, i) => opts?.columnTypes?.[i]);
+  if (declaredTypes.some((t) => t)) {
+    const colDefs = columns.map(
+      (c, i) =>
+        `  "${c.replace(/"/g, '""')}" ${declaredTypes[i] || "TEXT"}`,
+    );
+    lines.push(
+      `CREATE TABLE IF NOT EXISTS ${table} (\n${colDefs.join(",\n")}\n);`,
+      "",
+    );
+  }
+  for (const row of rows) {
+    const vals = row.map((v, i) => toSqlLiteral(v, kinds[i], dialect)).join(", ");
+    lines.push(`INSERT INTO ${table} (${quotedCols}) VALUES (${vals});`);
+  }
   triggerDownload(
     new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" }),
     filename,
@@ -117,12 +164,14 @@ export async function exportResultToParquet(
   columns: string[],
   rows: QueryExecResult["values"],
   filename: string,
+  opts?: ResultExportOptions,
 ): Promise<void> {
   const [
-    { tableToIPC, tableFromArrays, Utf8, Float64, vectorFromArray },
+    { tableToIPC, tableFromArrays, Bool, Utf8, Float64, vectorFromArray },
     { Table: WasmParquetTable, writeParquet },
   ] = await Promise.all([import("apache-arrow"), ensureParquetWasm()]);
 
+  const kinds = kindsFor(columns, opts);
   const colArrays: Record<string, unknown[]> = {};
   for (const col of columns) colArrays[col] = [];
   for (const row of rows) {
@@ -134,14 +183,19 @@ export async function exportResultToParquet(
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fields: Record<string, any> = {};
-  for (const col of columns) {
+  for (let i = 0; i < columns.length; i++) {
+    const col = columns[i];
     const vals = colArrays[col];
-    const isNumeric = vals.every((v) => v === null || typeof v === "number");
-    if (isNumeric) {
+    const nonNull = vals.filter((v) => v !== null);
+    if (nonNull.length > 0 && nonNull.every((v) => typeof v === "boolean")) {
+      fields[col] = vectorFromArray(vals as (boolean | null)[], new Bool());
+    } else if (nonNull.length > 0 && nonNull.every((v) => typeof v === "number")) {
       fields[col] = vectorFromArray(vals as (number | null)[], new Float64());
     } else {
+      // Everything else lands as text, but through the shared serializer so a
+      // binary column becomes `\xdeadbeef` rather than a decimal byte list.
       fields[col] = vectorFromArray(
-        vals.map((v) => (v === null ? null : String(v))),
+        vals.map((v) => (v === null ? null : toCsvValue(v, kinds[i]))),
         new Utf8(),
       );
     }
@@ -167,13 +221,49 @@ export async function exportResultToXlsx(
   columns: string[],
   rows: QueryExecResult["values"],
   filename: string,
+  opts?: ResultExportOptions,
 ): Promise<void> {
   const mod = await initXlsxWasm();
+  const kinds = kindsFor(columns, opts);
   const workbook = new mod.Workbook();
   const worksheet = workbook.addWorksheet();
   worksheet.writeRow(0, 0, columns);
+  // Date formats are per-cell in xlsx, but a Format is reusable — build one
+  // per distinct number format rather than one per cell.
+  const dateFormats = new Map<string, InstanceType<typeof mod.Format>>();
+  const dateFormat = (numFmt: string) => {
+    let fmt = dateFormats.get(numFmt);
+    if (!fmt) {
+      fmt = new mod.Format().setNumFormat(numFmt);
+      dateFormats.set(numFmt, fmt);
+    }
+    return fmt;
+  };
   for (let ri = 0; ri < rows.length; ri++) {
-    worksheet.writeRow(ri + 1, 0, rows[ri].map(toExcelData));
+    const row = rows[ri];
+    for (let ci = 0; ci < columns.length; ci++) {
+      const cell = toExcelCell(row[ci] ?? null, kinds[ci]);
+      switch (cell.t) {
+        case "blank":
+          break;
+        case "number":
+          worksheet.writeNumber(ri + 1, ci, cell.v);
+          break;
+        case "boolean":
+          worksheet.writeBoolean(ri + 1, ci, cell.v);
+          break;
+        case "date":
+          worksheet.writeDatetimeWithFormat(
+            ri + 1,
+            ci,
+            cell.v,
+            dateFormat(cell.numFmt),
+          );
+          break;
+        default:
+          worksheet.writeString(ri + 1, ci, cell.v);
+      }
+    }
   }
   const bytes = workbook.saveToBufferSync();
   triggerDownload(

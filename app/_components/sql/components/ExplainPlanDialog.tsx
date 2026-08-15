@@ -17,6 +17,11 @@ export interface ExplainPlanDialogProps {
   plan: string;
   onCopied: () => void;
   onCopyFailed: () => void;
+  /** Postgres only: the ANALYZE / BUFFERS state of the plan on screen, plus a
+   *  callback to re-run with a different combination. Omit to hide the
+   *  toggles (SQLite and DuckDB have no equivalent). */
+  options?: { analyze?: boolean; buffers?: boolean };
+  onOptionsChange?: (options: { analyze?: boolean; buffers?: boolean }) => void;
 }
 
 export function ExplainPlanDialog({
@@ -26,6 +31,8 @@ export function ExplainPlanDialog({
   plan,
   onCopied,
   onCopyFailed,
+  options,
+  onOptionsChange,
 }: ExplainPlanDialogProps) {
   function handleCopy() {
     if (typeof navigator !== "undefined" && navigator.clipboard) {
@@ -50,6 +57,44 @@ export function ExplainPlanDialog({
           <Dialog.Description className="sql-explain-subtitle">
             {querySql}
           </Dialog.Description>
+          {options && onOptionsChange && (
+            <div className="sql-explain-options">
+              <label className="sql-explain-option">
+                <input
+                  type="checkbox"
+                  checked={!!options.analyze}
+                  onChange={(e) =>
+                    onOptionsChange({
+                      analyze: e.target.checked,
+                      // BUFFERS is meaningless without ANALYZE; turning
+                      // ANALYZE off drops it too rather than sending a flag
+                      // that reports nothing.
+                      buffers: e.target.checked ? options.buffers : false,
+                    })
+                  }
+                />
+                ANALYZE
+              </label>
+              <label className="sql-explain-option">
+                <input
+                  type="checkbox"
+                  checked={!!options.buffers}
+                  onChange={(e) =>
+                    onOptionsChange({
+                      analyze: options.analyze || e.target.checked,
+                      buffers: e.target.checked,
+                    })
+                  }
+                />
+                BUFFERS
+              </label>
+              {(options.analyze || options.buffers) && (
+                <span className="sql-explain-options-note">
+                  ANALYZE runs the statement, so a write really writes.
+                </span>
+              )}
+            </div>
+          )}
           <pre className="sql-explain-plan">{plan}</pre>
           <div className="confirm-actions">
             <button

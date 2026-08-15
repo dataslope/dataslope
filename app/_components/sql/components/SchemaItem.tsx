@@ -306,7 +306,22 @@ function SchemaItemImpl({
                     columns.map((c) => {
                       const fk = fkByCol.get(c.name);
                       return (
-                        <li key={c.cid} className="sql-tree-column">
+                        // Its own context menu, and `stopPropagation` so the
+                        // event doesn't reach the table's trigger wrapping this
+                        // list — right-clicking a column used to open the
+                        // *table's* menu (Truncate, Drop Table…), which reads
+                        // as if those actions applied to the column.
+                        <ContextMenu.Root key={c.cid}>
+                          <ContextMenu.Trigger
+                            render={(triggerProps) => (
+                        <li
+                          {...triggerProps}
+                          className="sql-tree-column"
+                          onContextMenu={(e) => {
+                            e.stopPropagation();
+                            triggerProps.onContextMenu?.(e);
+                          }}
+                        >
                           <span className="sql-tree-column-icons">
                             {c.pk > 0 && (
                               <Popover.Root>
@@ -386,6 +401,40 @@ function SchemaItemImpl({
                             maxLen={typeMax}
                           />
                         </li>
+                            )}
+                          />
+                          <ContextMenu.Portal>
+                            <ContextMenu.Positioner sideOffset={6}>
+                              <ContextMenu.Popup className="bui-popup examples-dropdown">
+                                <div className="ctx-table-name">
+                                  {name}.{c.name}
+                                  <span className="ctx-table-type">
+                                    {c.type || "—"}
+                                  </span>
+                                </div>
+                                <ContextMenu.Item
+                                  className="example-item"
+                                  onClick={() => onCopy(c.name)}
+                                >
+                                  <div className="ex-title">Copy Name</div>
+                                </ContextMenu.Item>
+                                {onModifyStructure && (
+                                  // Rename / change type / drop all live in
+                                  // the structure editor, which validates and
+                                  // applies them in one transaction.
+                                  <ContextMenu.Item
+                                    className="example-item"
+                                    onClick={() => onModifyStructure(name)}
+                                  >
+                                    <div className="ex-title">
+                                      Edit Column in Structure…
+                                    </div>
+                                  </ContextMenu.Item>
+                                )}
+                              </ContextMenu.Popup>
+                            </ContextMenu.Positioner>
+                          </ContextMenu.Portal>
+                        </ContextMenu.Root>
                       );
                     })
                   )}

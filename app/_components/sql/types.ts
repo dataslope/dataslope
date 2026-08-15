@@ -38,8 +38,14 @@ export interface QueryRunResult {
   /** True while incrementally loading all rows for the virtualized "All" view. */
   lazyInfinite?: boolean;
   /** Exact (semicolon-stripped) SQL that produced this result; re-runs the
-   *  same query after an inline edit when there is no `lazyBaseSql`. */
+   *  same query after an inline edit when there is no `lazyBaseSql`. Also
+   *  shown in the error panel, since "Run selection" makes it differ from the
+   *  editor's contents. */
   querySql?: string;
+  /** Rows affected per executed statement, aligned with `sets`; null for a
+   *  statement that reports no count. Drives the "N rows affected" line after
+   *  an INSERT / UPDATE / DELETE. */
+  affectedRows?: (number | null)[];
 }
 
 export interface ResultTableRow {
@@ -147,6 +153,10 @@ export interface CsvImportState {
   targetMode: "new" | "existing";
   targetTable: string;
   colCompare: ImportColComparison[] | null;
+  /** Column types for a "New table" import, one per header: inferred from the
+   *  file's values and overridable per column in the preview. Absent (or an
+   *  entry of `"text"`) means the column is created as text. */
+  columnTypes?: string[];
 }
 
 export interface JsonImportState {
@@ -157,6 +167,7 @@ export interface JsonImportState {
   targetMode: "new" | "existing";
   targetTable: string;
   colCompare: ImportColComparison[] | null;
+  columnTypes?: string[];
 }
 
 export interface ParquetImportState {
@@ -173,6 +184,10 @@ export interface AddRowDialogState {
   columns: TableColumnInfo[];
   values: Record<string, string>;
   addAnother: boolean;
+  /** Columns whose blank input means the empty string rather than NULL (or
+   *  the column default). A blank field is otherwise ambiguous, which left
+   *  `''` — a real, distinct value for a text column — unreachable. */
+  emptyAsText?: Record<string, boolean>;
 }
 
 /** A single entry in the query execution history. */

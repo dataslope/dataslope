@@ -60,6 +60,23 @@
   box-shadow: -3px 4px 18px rgba(8, 120, 221, 0.38);
 }
 
+/* Step aside while a menu, dropdown or modal is open.
+   Base UI portals popups to `body > div` and puts the z-index on the popup,
+   which is statically positioned — so the z-index does nothing and this fixed
+   launcher painted over open menus, clipping the bottom of the playground's
+   export dropdown. Rather than chase Base UI's internal stacking, key off the
+   `data-open` marker it already publishes on the positioner (the same hook
+   playground.css uses to make web-preview frames click-through). */
+:global(body:has([data-open][role="menu"])) .launcher,
+:global(body:has([data-open][role="listbox"])) .launcher,
+:global(body:has([data-open][role="dialog"])) .launcher,
+:global(body:has([data-open][role="menu"])) .launcherTab,
+:global(body:has([data-open][role="listbox"])) .launcherTab,
+:global(body:has([data-open][role="dialog"])) .launcherTab {
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* ── Panel shell ──────────────────────────────────────────────────── */
 .panel {
   position: fixed;

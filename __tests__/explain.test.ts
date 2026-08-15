@@ -35,6 +35,36 @@ describe("buildExplainSql", () => {
       "explain query plan select 1",
     );
   });
+
+  // DS-31: ANALYZE / BUFFERS, Postgres only.
+  it("adds the Postgres ANALYZE and BUFFERS options", () => {
+    expect(buildExplainSql("postgres", "SELECT 1", { analyze: true })).toBe(
+      "EXPLAIN (ANALYZE) SELECT 1",
+    );
+    expect(
+      buildExplainSql("postgres", "SELECT 1", { analyze: true, buffers: true }),
+    ).toBe("EXPLAIN (ANALYZE, BUFFERS) SELECT 1");
+  });
+
+  it("implies ANALYZE when only BUFFERS is asked for", () => {
+    // BUFFERS alone is accepted by Postgres but reports nothing.
+    expect(buildExplainSql("postgres", "SELECT 1", { buffers: true })).toBe(
+      "EXPLAIN (ANALYZE, BUFFERS) SELECT 1",
+    );
+  });
+
+  it("ignores the options for engines that have no equivalent", () => {
+    expect(buildExplainSql("sqlite", "SELECT 1", { analyze: true })).toBe(
+      "EXPLAIN QUERY PLAN SELECT 1",
+    );
+    expect(buildExplainSql("duckdb", "SELECT 1", { analyze: true })).toBe(
+      "EXPLAIN SELECT 1",
+    );
+  });
+
+  it("falls back to plain EXPLAIN with no options set", () => {
+    expect(buildExplainSql("postgres", "SELECT 1", {})).toBe("EXPLAIN SELECT 1");
+  });
 });
 
 describe("formatExplainResult", () => {

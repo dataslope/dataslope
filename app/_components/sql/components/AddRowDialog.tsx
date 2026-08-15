@@ -50,11 +50,27 @@ export function AddRowDialog({ state, setState, onSubmit }: AddRowDialogProps) {
               <div className="sql-add-row-fields">
                 {state.columns.map((c) => {
                   const hasDefault = c.defaultValue !== null;
-                  const placeholder = hasDefault
-                    ? `auto (${c.defaultValue})`
-                    : c.notNull
-                      ? "required"
-                      : "NULL if empty";
+                  const emptyAsText = state.emptyAsText?.[c.name] ?? false;
+                  // SQLite's rowid alias: leaving it blank assigns the next
+                  // id, so "NULL if empty" told the user the wrong thing.
+                  const isRowidAlias =
+                    c.pk > 0 && /^integer$/i.test((c.type || "").trim());
+                  const placeholder = emptyAsText
+                    ? "empty string"
+                    : isRowidAlias
+                      ? "auto (next rowid)"
+                      : hasDefault
+                        ? `auto (${c.defaultValue})`
+                        : c.notNull
+                          ? "required"
+                          : "NULL if empty";
+                  // The `''` toggle only resolves a real ambiguity: a blank
+                  // input that would otherwise become NULL or a default.
+                  const canBeEmptyString =
+                    !c.generated &&
+                    !isRowidAlias &&
+                    (hasDefault || !c.notNull);
+                  const isBoolean = /^bool(ean)?$/i.test((c.type || "").trim());
                   return (
                     <label key={c.name} className="sql-add-row-field">
                       <span className="sql-add-row-field-label">
@@ -63,25 +79,82 @@ export function AddRowDialog({ state, setState, onSubmit }: AddRowDialogProps) {
                           {c.type || "—"}
                         </span>
                       </span>
-                      <input
-                        className="sql-rename-input"
-                        value={state.values[c.name] ?? ""}
-                        onChange={(e) =>
-                          setState((prev) =>
-                            prev
-                              ? {
-                                  ...prev,
-                                  values: {
-                                    ...prev.values,
-                                    [c.name]: e.target.value,
-                                  },
-                                }
-                              : null,
-                          )
-                        }
-                        placeholder={placeholder}
-                        aria-label={c.name}
-                      />
+                      <span className="sql-add-row-field-input">
+                        {isBoolean ? (
+                          // Matches the results grid, which already renders a
+                          // boolean column as a tri-state control rather than
+                          // a free-text box.
+                          <select
+                            className="sql-rename-input"
+                            value={state.values[c.name] ?? ""}
+                            aria-label={c.name}
+                            onChange={(e) =>
+                              setState((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      values: {
+                                        ...prev.values,
+                                        [c.name]: e.target.value,
+                                      },
+                                    }
+                                  : null,
+                              )
+                            }
+                          >
+                            <option value="">{placeholder}</option>
+                            <option value="1">true (1)</option>
+                            <option value="0">false (0)</option>
+                          </select>
+                        ) : (
+                          <input
+                            className="sql-rename-input"
+                            value={state.values[c.name] ?? ""}
+                            onChange={(e) =>
+                              setState((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      values: {
+                                        ...prev.values,
+                                        [c.name]: e.target.value,
+                                      },
+                                    }
+                                  : null,
+                              )
+                            }
+                            placeholder={placeholder}
+                            aria-label={c.name}
+                          />
+                        )}
+                        {canBeEmptyString && (
+                          <button
+                            type="button"
+                            className={`sql-add-row-empty-toggle${emptyAsText ? " active" : ""}`}
+                            aria-pressed={emptyAsText}
+                            title={
+                              emptyAsText
+                                ? "Blank means the empty string. Click for NULL / default."
+                                : "Blank means NULL / default. Click for the empty string."
+                            }
+                            onClick={() =>
+                              setState((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      emptyAsText: {
+                                        ...prev.emptyAsText,
+                                        [c.name]: !emptyAsText,
+                                      },
+                                    }
+                                  : null,
+                              )
+                            }
+                          >
+                            {"''"}
+                          </button>
+                        )}
+                      </span>
                     </label>
                   );
                 })}

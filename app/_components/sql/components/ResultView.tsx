@@ -46,6 +46,7 @@ import {
   Hash,
   Lock,
   Minus,
+  RefreshCw,
   Search,
   SearchX,
   ToggleLeft,
@@ -78,6 +79,7 @@ const RESULT_TABLE_FEATURES = tableFeatures({
 import {
   compareCellValues,
   formatCellValue,
+  formatCellDisplay,
   formatCellAsSql,
   parseCellEditValue,
   pendingEditsAfterDeletedRows,
@@ -155,6 +157,16 @@ function getEngineErrorHint(error: string): string | null {
     return `Column "${duckdbBinderColMatch[1]}" was not found. Verify column names with View Structure.`;
   }
   // PostgreSQL patterns
+  // Checked before the generic column patterns below, which would otherwise
+  // match this message's `column "x" is of type …` and give a hint about a
+  // missing column that exists.
+  const pgCastMatch = error.match(
+    /column "([^"]+)" (?:is of type|cannot be cast automatically to type) ([\w ]+?)(?: but expression is of type ([\w ]+))?$/im,
+  );
+  if (pgCastMatch) {
+    const [, column, targetType] = pgCastMatch;
+    return `Postgres will not convert "${column}" to ${targetType} on its own. Add a USING expression, e.g. USING ${column}::${targetType.trim().split(/\s+/)[0]}.`;
+  }
   const pgNoTableMatch = error.match(/relation "(.+)" does not exist/i);
   if (pgNoTableMatch) {
     return `Table/view "${pgNoTableMatch[1]}" does not exist. Check the Tables pane for available tables.`;
@@ -243,6 +255,11 @@ function clonePendingEdits(src: PendingEditsByResult): PendingEditsByResult {
 function DataTypeIcon({ type }: { type: string }) {
   const t = type.toUpperCase();
   if (t === "NULL") return <Minus size={10} aria-hidden="true" />;
+  // Temporal types are matched before the numeric group: `INTERVAL` contains
+  // "INT", so it was picking up the numeric `#` glyph.
+  if (t.includes("INTERVAL")) return <Clock size={10} aria-hidden="true" />;
+  if (t.includes("DATE")) return <Calendar size={10} aria-hidden="true" />;
+  if (t.includes("TIME")) return <Clock size={10} aria-hidden="true" />;
   if (
     t.includes("INT") ||
     t.includes("REAL") ||
@@ -262,8 +279,6 @@ function DataTypeIcon({ type }: { type: string }) {
   if (t.includes("BOOL")) return <ToggleLeft size={10} aria-hidden="true" />;
   if (t.includes("BLOB") || t.includes("BINARY") || t.includes("BYTE"))
     return <Binary size={10} aria-hidden="true" />;
-  if (t.includes("DATE")) return <Calendar size={10} aria-hidden="true" />;
-  if (t.includes("TIME")) return <Clock size={10} aria-hidden="true" />;
   return null;
 }
 
@@ -422,6 +437,9 @@ const COL_MIN_WIDTH = 48;
 // Cap for the *measured* width (mirrors the CSS max-width clamp on cells);
 // users can still drag wider, up to COL_MAX_WIDTH.
 const COL_MAX_MEASURED_WIDTH = 340;
+/** Measure passes allowed per column signature before the frozen widths are
+ *  accepted as final. See the convergence note where this is used. */
+const MAX_MEASURE_PASSES = 2;
 const COL_MAX_WIDTH = 1600;
 const SELECT_COL_WIDTH = 28;
 // Above this many DOM rows a paged result switches to the virtualizer so
@@ -698,6 +716,7 @@ function ResultViewImpl({
   onExportSnapshotChange,
   onExportResultSet,
   onOpenQueryTab,
+  onRefresh,
 }: {
   result: QueryRunResult | null;
   loading: boolean;
@@ -743,6 +762,10 @@ function ResultViewImpl({
     scope: ResultSetExportScope,
   ) => void;
   onOpenQueryTab?: (title: string, sql: string) => void;
+  /** Re-run the query behind this result. Mutations refresh open tabs on
+   *  their own; this is the manual backstop for changes the UI cannot see
+   *  (a trigger, a concurrent statement in the same run). */
+  onRefresh?: () => void;
 }) {
   const [resultSetExportScope, setResultSetExportScope] =
     useState<ResultSetExportScope>("all");
@@ -852,10 +875,23 @@ function ResultViewImpl({
       const nextSetCount = result?.sets.length ?? 1;
       setActiveSetIdx((prev) => Math.max(0, Math.min(prev, nextSetCount - 1)));
     } else {
-      // Fresh run: land on the first set with a result table (scripts
-      // commonly end in a SELECT after DDL/DML setup statements).
-      const firstWithTable = (result?.sets ?? []).findIndex((s) => s !== null);
-      setActiveSetIdx(firstWithTable >= 0 ? firstWithTable : 0);
+      // Fresh run: land on the last set that actually returned rows. Scripts
+      // end with the statement the user cares about, and DuckDB hands back a
+      // one-column `Count` result for DDL/DML — so "first non-null set" opened
+      // on an empty acknowledgement and hid the SELECT behind a manual click.
+      const sets = result?.sets ?? [];
+      const lastIndexWhere = (pred: (s: (typeof sets)[number]) => boolean) => {
+        for (let i = sets.length - 1; i >= 0; i--) {
+          if (pred(sets[i])) return i;
+        }
+        return -1;
+      };
+      const lastWithRows = lastIndexWhere(
+        (s) => s !== null && s.values.length > 0,
+      );
+      const target =
+        lastWithRows >= 0 ? lastWithRows : lastIndexWhere((s) => s !== null);
+      setActiveSetIdx(target >= 0 ? target : 0);
     }
     // A new result settles any pending filter overlay.
     setFilterPending(false);
@@ -1611,14 +1647,32 @@ function ResultViewImpl({
         </div>
         <pre className="sql-result-error-body">{result.error}</pre>
         {hint && <div className="sql-result-error-hint">{hint}</div>}
+        {result.querySql && (
+          // The statement that actually ran. With "Run selection" (or "Run
+          // statement at cursor") that is not the editor's contents, so
+          // without it the message can point at SQL the user never sent.
+          <details className="sql-result-error-sql" open>
+            <summary>Executed query</summary>
+            <pre>{result.querySql}</pre>
+          </details>
+        )}
       </div>
     );
   }
   if (result.sets.length === 0) {
+    // Sum the per-statement counts a write reports. Without it a 5-row INSERT
+    // said only "executed successfully", which is the one thing the user
+    // already knew.
+    const counts = (result.affectedRows ?? []).filter(
+      (n): n is number => typeof n === "number",
+    );
+    const affected = counts.reduce((a, b) => a + b, 0);
     return (
       <div ref={noResultsRef} className="sql-result-ok">
         <CheckCircle size={14} aria-hidden="true" />
-        Statement executed successfully, no result set returned.
+        {counts.length > 0 && affected > 0
+          ? `${affected} row${affected === 1 ? "" : "s"} affected.`
+          : "Statement executed successfully, no result set returned."}
       </div>
     );
   }
@@ -2004,6 +2058,7 @@ function ResultViewImpl({
                   onPageChange={handlePageChange}
                   onPageSizeChange={handlePageSizeChange}
                   deletable={pkCols !== null}
+                  noPkForSelection={isEditable && pkCols === null}
                   editable={isEditable}
                   editCount={editCount}
                   selectedCount={selectedCount}
@@ -2018,6 +2073,17 @@ function ResultViewImpl({
                   onFilterPendingChange={setFilterPending}
                   filterUnfilteredTotal={unfilteredTotal}
                 >
+                  {onRefresh && (
+                    <button
+                      type="button"
+                      className="sql-result-refresh-btn"
+                      onClick={onRefresh}
+                      title="Re-run this query"
+                      aria-label="Refresh result"
+                    >
+                      <RefreshCw size={11} aria-hidden="true" />
+                    </button>
+                  )}
                   {onExportResultSet && (
                     <ResultSetExportButton
                       hasMultiplePages={hasMultiplePages}
@@ -2338,11 +2404,20 @@ export function ResultTableBody({
   colWidthsRef.current = colWidths;
   // Re-measure only when the column set changes; same-shape reloads, paging
   // and appends keep the frozen widths so the grid never reflows under the user.
-  const colSig = `${deletable ? "select" : ""}${set.columns.join("")}`;
+  // JSON, not a bare join: ["ab","c"] and ["a","bc"] concatenate to the same
+  // string, and a real column change would then not re-measure.
+  const colSig = `${deletable ? "select" : ""}${JSON.stringify(set.columns)}`;
   const [prevColSig, setPrevColSig] = useState(colSig);
+  // Counts measure passes for the current signature. Measuring writes a width
+  // that can change the next measurement (a 1px change in total width flips a
+  // horizontal scrollbar in or out, which resizes the container, which
+  // re-measures); left unbounded that never converges, and React throws
+  // "Maximum update depth exceeded" with the query still showing `Running…`.
+  const measurePassRef = useRef(0);
   if (prevColSig !== colSig) {
     setPrevColSig(colSig);
     setColWidths(null);
+    measurePassRef.current = 0;
   }
 
   // During a drag the <col> element is updated imperatively (no React
@@ -2757,7 +2832,7 @@ export function ResultTableBody({
               // read-only so an edit can't start that would fail at commit.
               const isReadOnly = keyHints?.readOnly?.has(c) ?? false;
               if (!editable || isReadOnly) {
-                return formatCellValue(info.getValue());
+                return formatCellDisplay(info.getValue());
               }
               const absoluteRow = info.row.original.absoluteRow;
               const cellKey = `${absoluteRow}:${ci}`;
@@ -3029,8 +3104,8 @@ export function ResultTableBody({
                   title={editable ? "Double-click to edit" : undefined}
                 >
                   {hasPendingEdit
-                    ? formatCellValue(pendingValue)
-                    : formatCellValue(rawValue)}
+                    ? formatCellDisplay(pendingValue)
+                    : formatCellDisplay(rawValue)}
                   {hasPendingEdit && (
                     <button
                       type="button"
@@ -3127,6 +3202,11 @@ export function ResultTableBody({
     if (virtualized && tableRows.length > 0 && renderedRows.length === 0) {
       return;
     }
+    // Hard stop on re-entry. Two passes cover the legitimate case (the
+    // virtualizer materializing rows after the first commit); beyond that the
+    // effect is only feeding itself.
+    if (measurePassRef.current >= MAX_MEASURE_PASSES) return;
+    measurePassRef.current += 1;
     const next: Record<string, number> = {};
     for (const col of table.getAllLeafColumns()) {
       if (col.id === "select") continue;
@@ -3360,6 +3440,29 @@ export function ResultTableBody({
                   }}
                 >
                   <div className="ex-title">Set to NULL</div>
+                </ContextMenu.Item>
+              )}
+              {editable && (
+                // Clearing a cell inline means NULL, so `''` was otherwise
+                // unreachable from the grid — a real value for a text column
+                // and a distinct one from NULL.
+                <ContextMenu.Item
+                  className="example-item"
+                  onClick={() => {
+                    const cell = rightClickedCellRef.current;
+                    if (cell === null || cell.colIdx < 0) return;
+                    const colName = set.columns[cell.colIdx] ?? "";
+                    if (keyHints?.readOnly?.has(colName)) {
+                      toastManager.add({
+                        title: `Column "${colName}" is read-only (generated).`,
+                        data: { kind: "info" },
+                      });
+                      return;
+                    }
+                    onSetPendingEdit(`${absoluteRow}:${cell.colIdx}`, "");
+                  }}
+                >
+                  <div className="ex-title">Set to empty string</div>
                 </ContextMenu.Item>
               )}
               <ContextMenu.Item
@@ -3943,6 +4046,7 @@ export function ResultPager({
   onPageChange,
   onPageSizeChange,
   deletable,
+  noPkForSelection,
   editable,
   editCount,
   selectedCount,
@@ -3965,6 +4069,10 @@ export function ResultPager({
   onPageChange: (p: number) => void;
   onPageSizeChange: (s: number) => void;
   deletable: boolean;
+  /** The result maps to a table, but the table has no primary key, so rows
+   *  cannot be selected. Renders a hint instead of silently omitting the
+   *  checkbox column. */
+  noPkForSelection?: boolean;
   editable: boolean;
   editCount: number;
   selectedCount: number;
@@ -4090,6 +4198,11 @@ export function ResultPager({
           >
             Update {editCount} cell{editCount === 1 ? "" : "s"}…
           </button>
+        </span>
+      )}
+      {noPkForSelection && (
+        <span className="sql-result-nopk-hint">
+          Row selection needs a primary key
         </span>
       )}
       {deletable && selectedCount > 0 && (

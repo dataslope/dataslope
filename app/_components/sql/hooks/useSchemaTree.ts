@@ -57,7 +57,7 @@ export function useSchemaTree(options: UseSchemaTreeOptions) {
    * currently-selected schema no longer exists.
    */
   const refreshSchemas = useCallback(
-    async (refreshSchema: () => Promise<void>) => {
+    async (refreshSchema: () => Promise<unknown>) => {
       const engine = engineRef.current;
       if (!engine) return;
       const nextSchemas = await engine.listSchemas(
@@ -78,7 +78,7 @@ export function useSchemaTree(options: UseSchemaTreeOptions) {
    * (Postgres only), and re-list entities under the new schema.
    */
   const handleSchemaChange = useCallback(
-    async (schema: string, refreshSchema: () => Promise<void>) => {
+    async (schema: string, refreshSchema: () => Promise<unknown>) => {
       // Base UI Select fires onValueChange(null) when no item matches the
       // controlled value; ignore it so "null" can't poison selectedSchemaRef.
       if (!schema || schema === "null") return;

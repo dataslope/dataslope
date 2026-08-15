@@ -21,14 +21,22 @@ export type { Database, PreparedStatement, Sqlite3Static, BindingSpec };
 // ---------------------------------------------------------------------------
 
 /** Per-cell result value; narrows sqlite-wasm's `SqlValue` so the rest of
- *  the playground never sees `bigint` or `Int8Array`/`ArrayBuffer`. */
-export type SqlValue = string | number | null | Uint8Array;
+ *  the playground never sees `bigint` or `Int8Array`/`ArrayBuffer`.
+ *  `boolean` is in the union for Postgres/DuckDB, which have a real boolean
+ *  type: coercing it to 0/1 here made the grid and every exporter print
+ *  integers for a `boolean` column, and the SQL export unreplayable. */
+export type SqlValue = string | number | boolean | null | Uint8Array;
 
 /** One `execAll` result set; matches the legacy sql.js shape so downstream
  *  UI code doesn't change. */
 export interface QueryExecResult {
   columns: string[];
   values: SqlValue[][];
+  /** Declared SQL type per column, parallel to `columns`, when the engine
+   *  reports it (Postgres/DuckDB do; SQLite is dynamically typed and leaves it
+   *  undefined). Drives the grid's inline editors and per-format export
+   *  serialization. */
+  columnTypes?: string[];
 }
 
 // ---------------------------------------------------------------------------
