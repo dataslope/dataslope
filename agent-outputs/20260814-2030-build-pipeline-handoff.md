@@ -2,16 +2,14 @@
 
 **Date:** 2026-08-14
 **Project:** DataSlope (`dataslope/dataslope`)
-**Branch:** `claude/build-process-audit-9duox3` → PR **#665** (10 commits ahead of `main`)
-**State at:** `92122ef7`
+**Branch:** `claude/build-process-audit-9duox3` → PR **#665**, **merged 2026-08-15** as `8135ed0f`
+**State at:** `8135ed0f` on `main`
 **Trigger:** the full deploy pipeline (init → clone → install → build → deploy) took ~12–13 minutes.
 **Investigation record:** [`20260814-0930-build-process-audit.md`](20260814-0930-build-process-audit.md) — every number below is derived there.
 
-> **You are the operator.** PR #665 is written, tested and pushed but **not merged**.
-> Four of the changes do nothing until you edit the Cloudflare dashboard, and **one of those
-> edits is order-dependent** — see [Merge runbook](#merge-runbook). Do that section in order.
->
-> Step 2 is the only optional one, and it is not build-related at all.
+> **You are the operator.** PR #665 is **merged and live**. Steps 1–3 of the runbook are done and
+> verified in production (see [Where this stands](#where-this-stands)). What remains is **step 4**,
+> the one order-dependent dashboard edit, which is now safe to make.
 
 ---
 
@@ -31,9 +29,31 @@ cached. Work aimed at the floor pays back on every build — that is what this b
 
 ---
 
-## Current state
+## Where this stands
 
-10 commits, none merged, CI green (`checks` passed on its first run at 2 m 37 s).
+Merged as `8135ed0f` and **verified live on 2026-08-15**:
+
+| Check | Result |
+| --- | --- |
+| `main` carries the reader, `compress-cache`, `edgeExternals`, reclassified `package.json` | ✅ |
+| `export const NAME = R2_CACHE_NAME` (the populate fix) | ✅ |
+| Production is serving the merge commit | ✅ `/api/cache-build-id` → `8135ed0f919b…` |
+| **The populate ran** | ✅ `/`, `/courses`, `/courses/*` lessons, `/interview-prep` all 200 |
+
+That last row is the one that mattered: a `/courses/*` page can only return 200 if the incremental
+cache was populated, because an empty cache means a re-render and a re-render touches `node:fs` in
+workerd. The `51400985` bug is fixed in production, not just locally.
+
+The live Worker is currently reading **uncompressed** entries through the raw-JSON fallback, since
+the build command has not been changed yet. That is the fallback doing its job, and incidental
+proof that path works.
+
+**Still to do: step 4 only** — add `&& node scripts/compress-cache.mjs` to the build command. The
+merged code is on `main`, so it is safe now.
+
+### The 10 commits, as squashed
+
+CI green (`checks` passed on its first run at 2 m 37 s).
 
 | Commit | What |
 | --- | --- |
