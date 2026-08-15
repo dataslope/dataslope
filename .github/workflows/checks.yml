@@ -2,48 +2,25 @@ name: Checks
 
 # Typecheck, lint and unit tests, on every pull request and every push to main.
 #
-# ── Why this exists ─────────────────────────────────────────────────────────
+# The only other automated gate is the Cloudflare deploy: Next 16 runs no
+# ESLint during `next build` (the integration is gone), and the deploy's own
+# typecheck covers only the app graph and reports last. `tsc --noEmit` here
+# covers everything tsconfig includes (scripts/, e2e/, __tests__/) and runs in
+# parallel with the deploy.
 #
-# Until this workflow, the Cloudflare Workers Builds deploy was the repo's only
-# automated gate on the app itself — the sweeps in content-sweeps.yml cover
-# runnable *content*, not the code around it. That left two holes.
+# Prerequisite for a faster deploy: once this job is REQUIRED in branch
+# protection, `typescript: { ignoreBuildErrors: true }` in next.config.ts
+# becomes a defensible ~29s off every build. Do not make that change earlier —
+# a type error would reach `main` with a green deploy and nothing to say so.
 #
-# ESLint was not enforced anywhere at all. Next 16 does not run ESLint during
-# `next build` (the integration, and `next lint`, are gone), so `npm run lint`
-# only ever ran when a person remembered to type it. When this workflow was
-# added it immediately found a real error that had been sitting on `main`:
-# app/_components/Playground.tsx tripping `react-hooks/immutability`.
+# One job, not three: three parallel jobs would each re-pay ~77s of checkout +
+# setup + install to overlap ~72s of checks. The trade flips once any single
+# check costs more than the install. The whole job finishes well inside the
+# Cloudflare build beside it, so it never gates a merge in practice.
 #
-# And the typecheck that *did* run was on the deploy's critical path. It costs
-# ~29s inside `next build`, it is the last thing to report rather than the
-# first, and its scope is the app graph. `tsc --noEmit` here covers everything
-# tsconfig includes — scripts/, e2e/, __tests__/ as well — and it runs in
-# parallel with the deploy instead of ahead of it.
-#
-# ── This is also the prerequisite for a faster deploy ───────────────────────
-#
-# With this workflow required, `typescript: { ignoreBuildErrors: true }` in
-# next.config.ts becomes a defensible ~29s off every production and preview
-# build (see agent-outputs/20260814-0930-build-process-audit.md §5.3). Do not
-# make that change until this job is *required* in branch protection: without
-# it, a type error would reach `main` with a green deploy and nothing to say so.
-#
-# ── Shape ───────────────────────────────────────────────────────────────────
-#
-# One job, not three. Measured on the runner (first green run, 2m37s end to
-# end): checkout 15s, setup-node 8s, npm ci 54s, typegen 2s, tsc 20s, lint 39s,
-# vitest 13s. Three parallel jobs would each re-pay the ~77s of checkout +
-# setup + install to overlap 72s of checks — roughly 40s of wall clock for
-# three times the runner minutes. Revisit if the checks grow: the trade flips
-# once any single check costs more than the install.
-#
-# The whole job is well inside the Cloudflare build it runs beside (~7 min at
-# best, ~12 with a cold Turbopack cache), so it is never what a merge waits on.
-#
-# The checks run under `if: ${{ !cancelled() }}` so a failing typecheck does not
-# hide a failing test: one run reports every problem it can find, and the job
-# still ends red. (`!cancelled()` rather than `always()`, so cancelling a
-# superseded run actually stops it.)
+# Steps run under `if: ${{ !cancelled() }}` so a failing typecheck does not
+# hide a failing test (`!cancelled()` rather than `always()`, so superseded
+# runs still cancel).
 
 on:
   pull_request:

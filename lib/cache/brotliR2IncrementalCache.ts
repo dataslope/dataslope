@@ -1,54 +1,24 @@
 /**
- * The R2 incremental cache, reading brotli-compressed entries.
+ * The R2 incremental cache, reading brotli-compressed entries (~17x smaller
+ * than the raw JSON the stock override stores; measurements in
+ * open-next.config.ts).
  *
- * Why this exists:
+ * The bulk compression is NOT in `set()`: the deploy-time populate streams
+ * `.open-next/cache/` files to R2 byte-for-byte without calling this class,
+ * so scripts/compress-cache.mjs rewrites those files after the build and this
+ * module is the reader. `set()` still compresses so a future revalidating
+ * route can't write a format `get()` can't read.
  *
- * OpenNext's stock `r2-incremental-cache` writes and reads these entries as
- * raw JSON. On this site that is 2.34 GiB across 1,081 objects, re-uploaded in
- * full to R2 on **every** deploy — production and every preview — under a fresh
- * build-ID prefix, undiffed (see open-next.config.ts). The entries are
- * repetitive JSON and compress extremely well: brotli q5 takes them to ~5.9%
- * of raw, ~17x (`node scripts/analyze-cache.mjs --compress`). That is paid back
- * twice, in per-deploy populate bytes and in per-retained-build R2 storage.
+ * `get()` MUST keep accepting uncompressed entries (magic prefix in
+ * ./brotliCacheFormat): the compress step runs from the Cloudflare build
+ * command — dashboard config outside this repo — and a deploy that shipped
+ * the Worker without the updated command would otherwise 500 site-wide (a
+ * miss falls through to a re-render that touches `node:fs`). Keys are scoped
+ * by build ID, so the fallback covers that all-or-nothing case, not a mix.
  *
- * ── Where the compression actually happens ──────────────────────────────────
- *
- * Mostly NOT in `set()` below. Every one of the 1,081 objects is written by the
- * deploy-time populate step, which streams the files under `.open-next/cache/`
- * to R2 byte-for-byte and never calls into this class. So the bulk compression
- * is `scripts/compress-cache.mjs`, which rewrites those files in place after
- * the build; this module is the reader that makes them legible again.
- *
- * `set()` still compresses, for the entries written at request time. This site
- * does not revalidate, so that path is effectively dead — but a `set` that
- * wrote a format this `get` could not read would be a trap for whoever first
- * introduces a revalidating route.
- *
- * ── Reading both formats is deliberate ──────────────────────────────────────
- *
- * `get()` accepts compressed AND uncompressed entries, distinguished by the
- * magic prefix in ./brotliCacheFormat. This is not defensive clutter; it is
- * what makes the change safe to ship. The compression step runs from the
- * Cloudflare **build command**, which is dashboard configuration living outside
- * this repo. If a deploy ever goes out with the Worker updated and the build
- * command not, every object in that build's prefix is uncompressed — and a
- * reader that assumed otherwise would turn that into a site-wide 500, because a
- * cache miss here falls through to a re-render that touches `node:fs`. With the
- * fallback, that same mistake degrades to "the cache is merely as large as it
- * used to be".
- *
- * Note that a *mixed* bucket is not actually reachable: keys are
- * `incremental-cache/<buildId>/…` and the build ID is the deployed commit SHA,
- * so a Worker only ever reads objects its own deploy wrote. The fallback covers
- * the all-or-nothing case above, not a mixture.
- *
- * ── Failure handling ────────────────────────────────────────────────────────
- *
- * A read that throws is returned as a cache MISS (`null`), matching the stock
- * override's behaviour. On this deployment a miss is a re-render and likely a
- * 500, so it is not a soft failure — but returning null keeps one poisoned
- * object from taking down requests for every other page, and the error is
- * logged so it is visible in the Workers log rather than silent.
+ * A read that throws returns a MISS (null, like the stock override): one
+ * poisoned object must not take down every other page, and the error is
+ * logged to the Workers log.
  */
 import { error } from "@opennextjs/aws/adapters/logger.js";
 import type { CacheEntryType, CacheValue } from "@opennextjs/aws/types/overrides.js";
@@ -73,30 +43,12 @@ import {
 export const DEBUG_NAME = "ds-brotli-r2-incremental-cache";
 
 /**
- * `name` MUST stay equal to the stock R2 cache's, and this is not cosmetic.
- *
- * `populateCache` in @opennextjs/cloudflare dispatches on it — literally
- * `switch (await resolveCacheName(incrementalCache))`, matching against
- * `R2_CACHE_NAME` / `KV_CACHE_NAME` / `STATIC_ASSETS_CACHE_NAME`, with a
- * `default:` that logs "Incremental cache does not need populating" and does
- * nothing. `withRegionalCache` passes the inner store's name straight through
- * (`this.name = this.store.name`), so this class's name is what that switch
- * sees.
- *
- * Giving it a distinct name therefore does not rename anything, it silently
- * turns the deploy-time populate OFF. The build stays green, the deploy
- * succeeds, and the Worker ships with an EMPTY incremental cache — which on
- * this deployment means the home page and every `/courses/*` lesson 500, since
- * a miss falls through to a re-render that touches `node:fs` in workerd.
- *
- * That is exactly what happened when this override first shipped with its own
- * name: "Incremental cache does not need populating" in the build log, nothing
- * else out of place. `__tests__/brotliCache.test.ts` pins it so it cannot
- * happen twice.
- *
- * This is also the honest description of what this class is: the same R2
- * incremental cache, same bucket, same keys, differing only in how the values
- * are encoded.
+ * `name` MUST stay equal to the stock R2 cache's: `populateCache` in
+ * @opennextjs/cloudflare switches on the override's name (via
+ * `withRegionalCache`, which forwards the inner store's), and an unrecognized
+ * name hits a `default:` that logs "Incremental cache does not need
+ * populating" and populates NOTHING — build green, deploy green, empty cache,
+ * site-wide 500s. That shipped once; __tests__/brotliCache.test.ts pins it.
  */
 export const NAME = R2_CACHE_NAME;
 

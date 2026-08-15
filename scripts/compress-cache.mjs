@@ -1,55 +1,23 @@
 #!/usr/bin/env node
 /**
  * Brotli-compress the incremental-cache entries in `.open-next/cache/`, in
- * place, after the OpenNext build and before the deploy populates R2.
+ * place, after the OpenNext build and before the deploy populates R2
+ * (2.34 GiB → ~0.14 GiB, ~17x). Read back by
+ * lib/cache/brotliR2IncrementalCache.ts, which also accepts uncompressed
+ * entries so a deploy where this never ran still serves.
  *
- * Why here and not in the cache override:
+ * Here and not in the cache override: the populate step streams these files
+ * to R2 byte-for-byte (`getCacheAssets`) and never calls the configured
+ * `incrementalCache`, so the files themselves are the only place to compress
+ * the bulk. Filenames MUST stay as-is — `getCacheAssets` requires the
+ * `.cache` suffix and throws on anything else — so the compression is
+ * recorded in the bytes (magic prefix, lib/cache/brotliCacheFormat.ts).
  *
- * All ~1,081 objects are written by the deploy-time populate step, which globs
- * `.open-next/cache/**` and streams each file to R2 byte-for-byte
- * (`getCacheAssets` in @opennextjs/cloudflare). It never calls the configured
- * `incrementalCache`. So the only place to compress the bulk of the cache is
- * the files themselves — compress them here and the populate uploads the
- * compressed bytes with no change to OpenNext at all.
- *
- * Filenames are left exactly as they are. `getCacheAssets` derives each R2 key
- * from the path and *requires* the `.cache` suffix, so renaming to `.cache.br`
- * would make the populate throw "Invalid path for a Cache Asset file". The
- * compression is recorded in the bytes (a magic prefix, see
- * lib/cache/brotliCacheFormat.ts), not in the name.
- *
- * ── Measured on this repo ───────────────────────────────────────────────────
- *
- * 2.34 GiB across 1,081 objects → ~0.14 GiB, about 17x, at quality 5. The
- * populate uploads that much less on every deploy, production and preview, and
- * R2 stores that much less for every retained build. The object *count* is
- * unchanged, so this shrinks bytes rather than round trips: it composes with
- * `--cacheChunkSize` (which raises concurrency) rather than replacing it.
- *
- * The compression itself costs build time — 27 s single-threaded on 1,081
- * entries, which is added to every build. Brotli is CPU-bound and every entry
- * is independent, so the work is split across `availableParallelism() - 1`
- * worker threads (capped at 8), staying on the main thread below 64 entries
- * where worker startup would not pay for itself. The cost is printed on every
- * run, threads included, so the trade stays visible rather than assumed.
- *
- * ── Safety ──────────────────────────────────────────────────────────────────
- *
- * Idempotent: an entry that already carries the magic prefix is skipped, so
- * running twice (or resuming a half-finished run) is a no-op rather than a
- * double-compression.
- *
- * Every entry is verified by decompressing it and comparing against the
- * original bytes before the file is replaced. That check is cheap next to the
- * compression, and the failure it guards against is expensive: an entry that
- * does not round-trip is a page that cannot be served, and on this deployment a
- * cache miss falls through to a re-render that touches `node:fs` and 500s. A
- * mismatch fails the build.
- *
- * Reading the compressed bytes back is lib/cache/brotliR2IncrementalCache.ts,
- * wired up in open-next.config.ts. That reader also accepts *uncompressed*
- * entries, so a deploy where this script did not run still serves — see the
- * note there.
+ * Safety: idempotent (an entry already carrying the magic is skipped), and
+ * every entry is round-trip-verified before its only copy is replaced — a
+ * mismatch fails the build rather than shipping a page the Worker cannot
+ * serve. Worker threads split the CPU-bound work (single-threaded it was
+ * 27 s per build); the cost is printed each run so the trade stays visible.
  */
 import { globSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { availableParallelism } from "node:os";
@@ -98,13 +66,29 @@ function compressEntry(file) {
   return { compressed: true, before: raw.length, after: framed.length };
 }
 
-/** Compress a batch, accumulating totals. Throws on the first bad entry. */
+/** Compress a batch, accumulating totals. Throws on the first bad entry.
+ *  Newly-compressed bytes are tracked separately from the grand totals: the
+ *  sanity floor below must judge only the work THIS run did, or a resumed
+ *  run (mostly skips, a small raw tail) fails on a ratio diluted by entries
+ *  that were already compressed. */
 function compressBatch(files) {
-  const totals = { compressed: 0, skipped: 0, before: 0, after: 0 };
+  const totals = {
+    compressed: 0,
+    skipped: 0,
+    before: 0,
+    after: 0,
+    newBefore: 0,
+    newAfter: 0,
+  };
   for (const file of files) {
     const r = compressEntry(file);
-    if (r.compressed) totals.compressed++;
-    else totals.skipped++;
+    if (r.compressed) {
+      totals.compressed++;
+      totals.newBefore += r.before;
+      totals.newAfter += r.after;
+    } else {
+      totals.skipped++;
+    }
     totals.before += r.before;
     totals.after += r.after;
   }
@@ -184,8 +168,10 @@ if (!isMainThread) {
       skipped: acc.skipped + r.skipped,
       before: acc.before + r.before,
       after: acc.after + r.after,
+      newBefore: acc.newBefore + r.newBefore,
+      newAfter: acc.newAfter + r.newAfter,
     }),
-    { compressed: 0, skipped: 0, before: 0, after: 0 },
+    { compressed: 0, skipped: 0, before: 0, after: 0, newBefore: 0, newAfter: 0 },
   );
 
   const mib = (b) => (b / 1048576).toFixed(1);
@@ -204,11 +190,15 @@ if (!isMainThread) {
   // have measured ~17×; anything under 2× means they are not what this script
   // thinks they are (already-compressed input, a format change upstream), and
   // the build should say so rather than quietly shipping a worse cache.
-  if (totals.compressed > 0 && ratio < 2) {
+  // Judged over THIS run's newly-compressed entries only, so a resumed run
+  // whose bulk was already compressed on the previous run still passes.
+  const newRatio = totals.newAfter > 0 ? totals.newBefore / totals.newAfter : 0;
+  if (totals.compressed > 0 && newRatio < 2) {
     console.error(
-      `[compress-cache] compression ratio ${ratio.toFixed(2)}× is far below the ` +
-        "~17× these entries have measured. Something about the cache format has " +
-        "changed; investigate before trusting this build.",
+      `[compress-cache] compression ratio ${newRatio.toFixed(2)}× on the ` +
+        `${totals.compressed} newly-compressed entr${totals.compressed === 1 ? "y" : "ies"} ` +
+        "is far below the ~17× these entries have measured. Something about the " +
+        "cache format has changed; investigate before trusting this build.",
     );
     process.exit(1);
   }

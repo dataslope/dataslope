@@ -11,12 +11,13 @@
  * prunes it. That makes "what is in here, and does it need to be?" a question
  * worth being able to answer in one command rather than by hand.
  *
- * It has already changed one decision. The client segment cache arrived on by
- * default in Next 16 and nothing in this repo opted in; this script is what
- * showed that its `segmentData` map was 42.8% of the cache, and that
- * `segmentData["/_full"]` was byte-identical to `rsc` in 1,045 of 1,045
- * objects — a fifth of the bucket being one field stored twice. It is off in
- * next.config.ts as a result, with those numbers recorded beside the flag.
+ * It has already changed one decision. This script is what showed that Next
+ * 16's client segment cache put a `segmentData` map at 42.8% of the cache,
+ * with `segmentData["/_full"]` byte-identical to `rsc` in 1,045 of 1,045
+ * objects — a fifth of the bucket being one field stored twice. There is no
+ * flag to turn it off on this Next version (see open-next.config.ts), which
+ * is why the remedy became compression (scripts/compress-cache.mjs) rather
+ * than omission.
  *
  * Usage:
  *

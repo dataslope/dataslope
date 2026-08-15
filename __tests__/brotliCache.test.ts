@@ -1,24 +1,10 @@
 /**
- * Pins the wire format shared by the incremental cache's writer and reader.
- *
- * Three things touch these bytes, in two different runtimes:
- *
- *   scripts/compress-cache.mjs         (Node, build time)  compresses all ~1,081 entries
- *   lib/cache/brotliR2IncrementalCache `set()`  (workerd)   writes runtime entries
- *   lib/cache/brotliR2IncrementalCache `get()`  (workerd)   reads them back
- *
- * and a disagreement between them is not a build error. It is a cache the
- * Worker cannot decode, which on this deployment means a cache miss, which
- * means a re-render, which on any `/courses/*` lesson touches `node:fs` inside
- * workerd and 500s. The build stays green the whole way down. So the format is
- * asserted here rather than trusted.
- *
- * This matters more than usual because the deployed read path is genuinely hard
- * to exercise locally: `wrangler dev` does not serve these pages from the
- * incremental cache at all (it re-renders them), so a local preview proves
- * nothing about decoding either format. These tests are the substitute, and
- * they run the real class against a fake R2 binding rather than a
- * reimplementation of it.
+ * Pins the wire format shared by the incremental cache's writer and reader —
+ * a disagreement is not a build error, it is a cache the Worker cannot
+ * decode, i.e. site-wide 500s with a green build. The deployed read path
+ * cannot be exercised locally (`wrangler dev` re-renders instead of serving
+ * from this cache), so these tests run the real class against a fake R2
+ * binding as the substitute.
  */
 import { brotliCompressSync, constants } from "node:zlib";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -105,22 +91,10 @@ describe("brotli cache framing", () => {
 
 describe("BrotliR2IncrementalCache", () => {
   it("keeps the stock R2 cache's name, or the deploy stops populating", async () => {
-    // This one is not a style assertion. `populateCache` in
-    // @opennextjs/cloudflare switches on the override's name against
-    // R2_CACHE_NAME / KV_CACHE_NAME / STATIC_ASSETS_CACHE_NAME, and its
-    // `default:` branch logs "Incremental cache does not need populating" and
-    // populates nothing. `withRegionalCache` forwards the inner store's name
-    // (`this.name = this.store.name`), so this value is what that switch sees.
-    //
-    // A distinct name therefore does not rename the cache, it turns the
-    // deploy-time populate off — silently. Build green, deploy succeeds, and
-    // the Worker ships with an empty incremental cache, which on this
-    // deployment 500s the home page and every lesson (a miss re-renders, and a
-    // re-render touches node:fs in workerd).
-    //
-    // That shipped once. It is pinned against the upstream constant rather
-    // than a string literal so an upstream rename fails here instead of in a
-    // deploy.
+    // `populateCache` switches on the override's name; an unrecognized one
+    // silently populates nothing → empty cache → site-wide 500s. Shipped
+    // once. Pinned against the upstream constant, not a string literal, so
+    // an upstream rename fails here instead of in a deploy.
     expect(NAME).toBe(R2_CACHE_NAME);
     expect(cache.name).toBe(R2_CACHE_NAME);
   });

@@ -63,11 +63,11 @@ function main() {
   // exactly like a green run — which is how a build that emitted no payloads
   // at all, or a rename of `.rsc`, would sail through.
   //
-  // The floor is deliberately low. The file count is not stable: with Next's
-  // client segment cache on it is ~8,500 (one `.rsc` per route plus the
-  // per-segment tree files), and with it off — where `next.config.ts` has it —
-  // it is ~1,045, because only the route payloads remain. Anything under 100
-  // means the output shape changed, not that the site shrank.
+  // The floor is deliberately low. The file count is not stable — with the
+  // per-segment tree files of Next's client segment cache (not disableable on
+  // this Next version, see open-next.config.ts) the scan sees thousands of
+  // files, and route payloads alone are ~1,045. Anything under 100 means the
+  // output shape changed, not that the site shrank.
   if (files.length < 100) {
     console.error(
       `check-prefetch-hints: only ${files.length} prerendered file(s) found under ` +
