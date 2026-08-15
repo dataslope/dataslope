@@ -1,6 +1,6 @@
 import { defineCloudflareConfig } from "@opennextjs/cloudflare";
-import r2IncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cache/r2-incremental-cache";
 import { withRegionalCache } from "@opennextjs/cloudflare/overrides/incremental-cache/regional-cache";
+import brotliR2IncrementalCache from "./lib/cache/brotliR2IncrementalCache";
 
 // OpenNext (Cloudflare) build configuration.
 //
@@ -28,16 +28,45 @@ import { withRegionalCache } from "@opennextjs/cloudflare/overrides/incremental-
 // a schedule by .github/workflows/r2-cache-cleanup.yml.
 //
 // That figure read "~1–1.4 GB" until 2026-08-14 and was measured at 2.504 GB.
-// Each entry now carries a `segmentData` map next to `html` and `rsc` — Next
-// 16's client segment cache, on by default, nothing here opts in — and it is
-// ~40% of every object. Half of that is `segmentData["/_full"]`, byte-identical
-// to `rsc` in 40/40 sampled objects, so ~20% of the bucket is a duplicate of
-// bytes already stored one key over. Setting `experimental.clientSegmentCache:
-// false` in next.config.ts would take the bucket to ~60% of its current size;
-// it is left ON because the segment cache is load-bearing for prefetching here
-// and the interaction with `prefetchInlining: false` (see the long note in
-// next.config.ts) has not been tested on a preview deploy. Measure before
-// trusting either number again.
+// Each entry carries a `segmentData` map next to `html` and `rsc` — Next 16's
+// client segment cache, on by default, nothing here opts in. Measured over a
+// whole build rather than a sample (`node scripts/analyze-cache.mjs`):
+//
+//   html         0.731 GiB  31.2%
+//   rsc          0.477 GiB  20.4%
+//   segmentData  1.003 GiB  42.8%
+//     of which `/_full` is 0.477 GiB / 20.4%, and byte-identical to `rsc`
+//     in 1,045 of 1,045 objects
+//
+// So a fifth of the bucket is `rsc` stored a second time under another key.
+//
+// THIS COMMENT USED TO SAY that `experimental.clientSegmentCache: false` would
+// take the bucket to ~60% of its size. That option does not exist. It is not a
+// key Next 16.3.0 accepts: the build warns "Unrecognized key(s) in object:
+// 'clientSegmentCache' at experimental", `tsc` rejects it against
+// `ExperimentalConfig`, and the only occurrences of the name anywhere in
+// `next/dist` are inside source maps. `segmentData` is emitted unconditionally
+// — app-render.js guards `collectSegmentData(...)` on nothing but
+// `renderOpts.isBuildTimePrerendering` — so on this Next version there is no
+// flag that turns it off. Tried on 2026-08-14; the build fails outright.
+//
+// The waste is real and the lever is not here. It also turns out to be the
+// smaller prize. These objects are written to R2 UNCOMPRESSED, and they are
+// repetitive JSON — `node scripts/analyze-cache.mjs --compress`, sampled over
+// 121 of the 1,081 objects:
+//
+//   gzip -6     18.6% of raw   5.4×   2.340 GiB → ~0.44 GiB
+//   brotli q5    5.9% of raw  17.0×   2.340 GiB → ~0.14 GiB
+//
+// Compressing cache values in a custom `incrementalCache` override — this file
+// already wraps one with `withRegionalCache` — subsumes the duplication problem
+// entirely, because a byte-identical copy of `rsc` is exactly what a compressor
+// erases. It would cut the per-deploy populate upload and the per-retained-build
+// storage by the same factor. The work is the read side: whatever writes
+// compressed has to decompress in the Worker, and `enableCacheInterception`
+// means the routing layer reads these too. Not attempted yet; measure again
+// before committing to a codec, and prefer the one whose decompress cost the
+// Worker can absorb on a cache hit.
 //
 // Reads are NOT rare, which this comment used to claim. Next sets
 // `s-maxage=31536000` on the prerendered responses, but a Worker runs *ahead*
@@ -79,11 +108,47 @@ import { withRegionalCache } from "@opennextjs/cloudflare/overrides/incremental-
 // the full Next.js handler, which also improves cold starts. No queue or tag
 // cache is configured because nothing here revalidates; add one alongside this
 // only when a server feature that revalidates is introduced.
-export default defineCloudflareConfig({
-  incrementalCache: withRegionalCache(r2IncrementalCache, {
+// The store is `brotliR2IncrementalCache` rather than OpenNext's stock
+// `r2IncrementalCache`: same bucket, same keys (it imports `computeCacheKey`
+// from the same module), but the entries are brotli-framed. See
+// lib/cache/brotliR2IncrementalCache.ts for the read side and
+// scripts/compress-cache.mjs for where the 1,081 objects actually get
+// compressed — the deploy-time populate writes them, not this override.
+//
+// The layering order matters and is the reason users never pay for this.
+// `withRegionalCache` wraps the store: on a colo hit it answers from the Cache
+// API and never calls the store at all, and on a colo miss it calls
+// `store.get()` and puts the *decompressed* value into the colo cache. So
+// decompression is paid once per colo per deploy, on the same request that was
+// already paying an R2 round trip — and that round trip now moves ~17x fewer
+// bytes. Measured on real entries, brotli decompression is also cheaper than
+// the `JSON.parse` this path already does (2.8 ms vs 25.9 ms on a 2.29 MiB
+// entry).
+const config = defineCloudflareConfig({
+  incrementalCache: withRegionalCache(brotliR2IncrementalCache, {
     mode: "long-lived",
     defaultLongLivedTtlSec: 24 * 60 * 60,
     shouldLazilyUpdateOnCacheHit: false,
   }),
   enableCacheInterception: true,
 });
+
+// `node:zlib` has to be external, or the build dies before it starts.
+//
+// The Cloudflare CLI compiles this config twice — once for Node
+// (`platform: "node"`, where `node:zlib` resolves fine) and once for the edge
+// runtime with `platform: "browser"`, where esbuild cannot resolve a `node:`
+// builtin and fails the whole build with `Could not resolve "node:zlib"`.
+// Marking it external leaves the import in place instead of bundling it, and
+// the edge runtime here is workerd with `nodejs_compat` (wrangler.jsonc), which
+// provides `node:zlib` natively — verified against workerd, where
+// `brotliDecompressSync` round-trips.
+//
+// This is the same mechanism `defineCloudflareConfig` already uses for
+// `node:crypto`, which its own config validation *requires* to be listed. So
+// the existing entries are preserved rather than replaced: dropping
+// `node:crypto` here would fail `ensure-cf-config`.
+export default {
+  ...config,
+  edgeExternals: [...(config.edgeExternals ?? []), "node:zlib"],
+};

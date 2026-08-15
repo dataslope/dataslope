@@ -1,0 +1,104 @@
+name: Checks
+
+# Typecheck, lint and unit tests, on every pull request and every push to main.
+#
+# ── Why this exists ─────────────────────────────────────────────────────────
+#
+# Until this workflow, the Cloudflare Workers Builds deploy was the repo's only
+# automated gate on the app itself — the sweeps in content-sweeps.yml cover
+# runnable *content*, not the code around it. That left two holes.
+#
+# ESLint was not enforced anywhere at all. Next 16 does not run ESLint during
+# `next build` (the integration, and `next lint`, are gone), so `npm run lint`
+# only ever ran when a person remembered to type it. When this workflow was
+# added it immediately found a real error that had been sitting on `main`:
+# app/_components/Playground.tsx tripping `react-hooks/immutability`.
+#
+# And the typecheck that *did* run was on the deploy's critical path. It costs
+# ~29s inside `next build`, it is the last thing to report rather than the
+# first, and its scope is the app graph. `tsc --noEmit` here covers everything
+# tsconfig includes — scripts/, e2e/, __tests__/ as well — and it runs in
+# parallel with the deploy instead of ahead of it.
+#
+# ── This is also the prerequisite for a faster deploy ───────────────────────
+#
+# With this workflow required, `typescript: { ignoreBuildErrors: true }` in
+# next.config.ts becomes a defensible ~29s off every production and preview
+# build (see agent-outputs/20260814-0930-build-process-audit.md §5.3). Do not
+# make that change until this job is *required* in branch protection: without
+# it, a type error would reach `main` with a green deploy and nothing to say so.
+#
+# ── Shape ───────────────────────────────────────────────────────────────────
+#
+# One job, not three. Measured on the runner (first green run, 2m37s end to
+# end): checkout 15s, setup-node 8s, npm ci 54s, typegen 2s, tsc 20s, lint 39s,
+# vitest 13s. Three parallel jobs would each re-pay the ~77s of checkout +
+# setup + install to overlap 72s of checks — roughly 40s of wall clock for
+# three times the runner minutes. Revisit if the checks grow: the trade flips
+# once any single check costs more than the install.
+#
+# The whole job is well inside the Cloudflare build it runs beside (~7 min at
+# best, ~12 with a cold Turbopack cache), so it is never what a merge waits on.
+#
+# The checks run under `if: ${{ !cancelled() }}` so a failing typecheck does not
+# hide a failing test: one run reports every problem it can find, and the job
+# still ends red. (`!cancelled()` rather than `always()`, so cancelling a
+# superseded run actually stops it.)
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  # Supersede an in-flight run for the same ref; there is nothing here worth
+  # finishing once a newer commit exists.
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Typecheck, lint, tests
+    runs-on: ubuntu-latest
+    # Install ~3m plus ~2.5m of checks locally; a 2-core runner is slower.
+    # This is a ceiling for a hung run, not a target.
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+
+      # postinstall runs the generator chain here (it only skips itself on
+      # Workers Builds, where `npm run build` re-runs it anyway), so
+      # lib/generated/* exists before anything below reads it. A checkout
+      # without it does not typecheck: those modules are gitignored and only
+      # their .d.ts siblings are committed.
+      - run: npm ci
+
+      # tsconfig.json includes `.next/types/**/*.ts`, which `next build` would
+      # normally emit. `next typegen` produces exactly those route/page types
+      # without paying for a build.
+      - name: Generate route types
+        run: npx next typegen
+
+      - name: Typecheck
+        if: ${{ !cancelled() }}
+        run: npx tsc --noEmit
+
+      # Errors fail the job; the ~156 pre-existing warnings do not. Adding
+      # `--max-warnings 0` is the natural next step once that backlog is
+      # cleared — until then it would make this job permanently red and
+      # therefore ignored.
+      - name: Lint
+        if: ${{ !cancelled() }}
+        run: npm run lint
+
+      - name: Unit tests
+        if: ${{ !cancelled() }}
+        run: npm test

@@ -143,9 +143,13 @@ Already investigated and settled. Don't re-litigate without new measurements.
 - **`prefetchInlining: false` in `next.config.ts` stays.** It is load-bearing — see the long
   note there about the ~150 req/s client-side request storm. Unrelated to this work, but a
   tempting-looking flag in the same file.
-- **Don't flip `experimental.clientSegmentCache: false` casually.** It would cut the bucket
+- ~~**Don't flip `experimental.clientSegmentCache: false` casually.** It would cut the bucket
   to ~60%, but the segment cache interacts with `prefetchInlining: false` and that
-  combination has never been tested on a preview deploy.
+  combination has never been tested on a preview deploy.~~
+  **Superseded 2026-08-14: that option does not exist.** Next 16.3.0 rejects the key outright
+  (`Unrecognized key(s) in object: 'clientSegmentCache'`, and `tsc` fails against
+  `ExperimentalConfig`); `segmentData` is emitted unconditionally. There is nothing to flip,
+  casually or otherwise. See §5 below and the note in `open-next.config.ts`.
 - **`MAIN_COMMITS` cannot rescue anything past `THRESHOLD_HOURS`** — it is checked *after*
   the cutoff. If stalled-deploy cover ever needs to be longer, raise `THRESHOLD_HOURS`.
   Raising `MAIN_COMMITS` does nothing.
@@ -249,11 +253,23 @@ immune to it; it does not stop the writes.
 
 ### 5. Decide on `segmentData` (~40% of the bucket)
 
-`experimental.clientSegmentCache: false` would take the bucket to ~60% of current size.
-`segmentData["/_full"]` alone is a byte-identical duplicate of `rsc` (40/40 sampled) —
-~20% of the bucket. Left on deliberately; see [Non-negotiables](#non-negotiables). If
-picked up: test on a preview deploy, and watch for the prefetch storm described in
-`next.config.ts`.
+**Attempted 2026-08-14, and the premise was wrong.** `experimental.clientSegmentCache: false`
+is not a Next 16.3.0 option — the build fails with `Unrecognized key(s) in object:
+'clientSegmentCache' at "experimental"`, `tsc` rejects it against `ExperimentalConfig`, and
+the name appears in `next/dist` only inside source maps. `app-render.js` guards
+`collectSegmentData(...)` on nothing but `renderOpts.isBuildTimePrerendering`, so it is
+emitted on every prerender with no flag to stop it.
+
+The measurement itself held up, and got sharper — over all 1,081 objects rather than 40
+(`node scripts/analyze-cache.mjs`): `segmentData` is **42.8%** of the bucket, and
+`segmentData["/_full"]` is byte-identical to `rsc` in **1,045 of 1,045**, i.e. 20.4% of the
+bucket is one field stored twice.
+
+**The bigger prize is compression, and it makes this moot.** These objects go to R2
+uncompressed (`--compress`): gzip -6 is 5.4× (2.340 GiB → ~0.44 GiB), brotli q5 is 17.0×
+(→ ~0.14 GiB). A compressor erases a byte-identical duplicate for free, so a custom
+`incrementalCache` override beats removing `segmentData` even if the flag existed. See
+`open-next.config.ts` for what the read side would have to do.
 
 ### 6. Decide whether rollback cover is wanted
 
