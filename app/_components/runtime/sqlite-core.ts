@@ -39,6 +39,11 @@ export interface TableColumnInfo {
   /** Allowed labels for enum-typed columns (Postgres/DuckDB); null/absent for
    *  SQLite, which has no native enum type. Drives the grid's enum dropdown. */
   enumValues?: string[] | null;
+  /** Covered by a single-column UNIQUE constraint (separate from the primary
+   *  key). Reported by Postgres; absent where the engine doesn't supply it.
+   *  A foreign key can only target a PK or unique column, so the structure
+   *  editor uses this to filter the target-column list. */
+  unique?: boolean;
 }
 
 /** Per-column unique/PK constraint info, used to decide whether a row can

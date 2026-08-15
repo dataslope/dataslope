@@ -46,6 +46,7 @@ import {
   Hash,
   Lock,
   Minus,
+  RefreshCw,
   Search,
   SearchX,
   ToggleLeft,
@@ -78,6 +79,7 @@ const RESULT_TABLE_FEATURES = tableFeatures({
 import {
   compareCellValues,
   formatCellValue,
+  formatCellDisplay,
   formatCellAsSql,
   parseCellEditValue,
   pendingEditsAfterDeletedRows,
@@ -155,6 +157,16 @@ function getEngineErrorHint(error: string): string | null {
     return `Column "${duckdbBinderColMatch[1]}" was not found. Verify column names with View Structure.`;
   }
   // PostgreSQL patterns
+  // Checked before the generic column patterns below, which would otherwise
+  // match this message's `column "x" is of type …` and give a hint about a
+  // missing column that exists.
+  const pgCastMatch = error.match(
+    /column "([^"]+)" (?:is of type|cannot be cast automatically to type) ([\w ]+?)(?: but expression is of type ([\w ]+))?$/im,
+  );
+  if (pgCastMatch) {
+    const [, column, targetType] = pgCastMatch;
+    return `Postgres will not convert "${column}" to ${targetType} on its own. Add a USING expression, e.g. USING ${column}::${targetType.trim().split(/\s+/)[0]}.`;
+  }
   const pgNoTableMatch = error.match(/relation "(.+)" does not exist/i);
   if (pgNoTableMatch) {
     return `Table/view "${pgNoTableMatch[1]}" does not exist. Check the Tables pane for available tables.`;
@@ -698,6 +710,7 @@ function ResultViewImpl({
   onExportSnapshotChange,
   onExportResultSet,
   onOpenQueryTab,
+  onRefresh,
 }: {
   result: QueryRunResult | null;
   loading: boolean;
@@ -743,6 +756,10 @@ function ResultViewImpl({
     scope: ResultSetExportScope,
   ) => void;
   onOpenQueryTab?: (title: string, sql: string) => void;
+  /** Re-run the query behind this result. Mutations refresh open tabs on
+   *  their own; this is the manual backstop for changes the UI cannot see
+   *  (a trigger, a concurrent statement in the same run). */
+  onRefresh?: () => void;
 }) {
   const [resultSetExportScope, setResultSetExportScope] =
     useState<ResultSetExportScope>("all");
@@ -1611,14 +1628,32 @@ function ResultViewImpl({
         </div>
         <pre className="sql-result-error-body">{result.error}</pre>
         {hint && <div className="sql-result-error-hint">{hint}</div>}
+        {result.querySql && (
+          // The statement that actually ran. With "Run selection" (or "Run
+          // statement at cursor") that is not the editor's contents, so
+          // without it the message can point at SQL the user never sent.
+          <details className="sql-result-error-sql" open>
+            <summary>Executed query</summary>
+            <pre>{result.querySql}</pre>
+          </details>
+        )}
       </div>
     );
   }
   if (result.sets.length === 0) {
+    // Sum the per-statement counts a write reports. Without it a 5-row INSERT
+    // said only "executed successfully", which is the one thing the user
+    // already knew.
+    const counts = (result.affectedRows ?? []).filter(
+      (n): n is number => typeof n === "number",
+    );
+    const affected = counts.reduce((a, b) => a + b, 0);
     return (
       <div ref={noResultsRef} className="sql-result-ok">
         <CheckCircle size={14} aria-hidden="true" />
-        Statement executed successfully, no result set returned.
+        {counts.length > 0 && affected > 0
+          ? `${affected} row${affected === 1 ? "" : "s"} affected.`
+          : "Statement executed successfully, no result set returned."}
       </div>
     );
   }
@@ -2018,6 +2053,17 @@ function ResultViewImpl({
                   onFilterPendingChange={setFilterPending}
                   filterUnfilteredTotal={unfilteredTotal}
                 >
+                  {onRefresh && (
+                    <button
+                      type="button"
+                      className="sql-result-refresh-btn"
+                      onClick={onRefresh}
+                      title="Re-run this query"
+                      aria-label="Refresh result"
+                    >
+                      <RefreshCw size={11} aria-hidden="true" />
+                    </button>
+                  )}
                   {onExportResultSet && (
                     <ResultSetExportButton
                       hasMultiplePages={hasMultiplePages}
@@ -2757,7 +2803,7 @@ export function ResultTableBody({
               // read-only so an edit can't start that would fail at commit.
               const isReadOnly = keyHints?.readOnly?.has(c) ?? false;
               if (!editable || isReadOnly) {
-                return formatCellValue(info.getValue());
+                return formatCellDisplay(info.getValue());
               }
               const absoluteRow = info.row.original.absoluteRow;
               const cellKey = `${absoluteRow}:${ci}`;
@@ -3029,8 +3075,8 @@ export function ResultTableBody({
                   title={editable ? "Double-click to edit" : undefined}
                 >
                   {hasPendingEdit
-                    ? formatCellValue(pendingValue)
-                    : formatCellValue(rawValue)}
+                    ? formatCellDisplay(pendingValue)
+                    : formatCellDisplay(rawValue)}
                   {hasPendingEdit && (
                     <button
                       type="button"
@@ -3360,6 +3406,29 @@ export function ResultTableBody({
                   }}
                 >
                   <div className="ex-title">Set to NULL</div>
+                </ContextMenu.Item>
+              )}
+              {editable && (
+                // Clearing a cell inline means NULL, so `''` was otherwise
+                // unreachable from the grid — a real value for a text column
+                // and a distinct one from NULL.
+                <ContextMenu.Item
+                  className="example-item"
+                  onClick={() => {
+                    const cell = rightClickedCellRef.current;
+                    if (cell === null || cell.colIdx < 0) return;
+                    const colName = set.columns[cell.colIdx] ?? "";
+                    if (keyHints?.readOnly?.has(colName)) {
+                      toastManager.add({
+                        title: `Column "${colName}" is read-only (generated).`,
+                        data: { kind: "info" },
+                      });
+                      return;
+                    }
+                    onSetPendingEdit(`${absoluteRow}:${cell.colIdx}`, "");
+                  }}
+                >
+                  <div className="ex-title">Set to empty string</div>
                 </ContextMenu.Item>
               )}
               <ContextMenu.Item

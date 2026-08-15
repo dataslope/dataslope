@@ -145,7 +145,7 @@ import {
   type BuildBundle,
 } from "@/lib/workspaces/types";
 import { MobileMenuAction, MobileMenuLabel } from "../MobileMenuSheet";
-import { type PostgresEngine } from "../runtime/postgres";
+import { type PgEntityKind, type PostgresEngine } from "../runtime/postgres";
 
 const POSTGRES_SAMPLE_DATABASES = postgresAdapter.samples;
 const POSTGRES_BLANK_DATABASE = postgresAdapter.blankSample!;
@@ -169,7 +169,11 @@ import { SchemaSection } from "../sql/components/SchemaSection";
 import { CreateIndexDialog } from "../sql/components/CreateIndexDialog";
 import { CreateViewDialog } from "../sql/components/CreateViewDialog";
 import { ExplainPlanDialog } from "../sql/components/ExplainPlanDialog";
-import { buildExplainSql, formatExplainResult } from "../sql/utils/explain";
+import {
+  buildExplainSql,
+  formatExplainResult,
+  type ExplainOptions,
+} from "../sql/utils/explain";
 import { activeSqlForEditor } from "../sql/utils/editorUtils";
 import {
   DatabaseSelector,
@@ -233,6 +237,7 @@ import { usePostgresSettingsStore } from "./stores/usePostgresSettingsStore";
 import {
   importRowsIntoPostgres,
   parseCsv,
+  inferCsvColumnTypes,
   readParquetFile,
   tableNameFromFilename,
 } from "./postgresImport";
@@ -266,6 +271,20 @@ const POSTGRES_DB_ACTIONS: readonly DatabaseSelectorAction[] = [
 ];
 const MAX_EXCEL_SHEET_NAME_LENGTH = 31;
 const INFINITE_SCROLL_PAGE_SIZE = 500;
+/** Types offered per column when a CSV/JSON import creates the table. Kept in
+ *  step with the allowlist `importRowsIntoPostgres` enforces. */
+const IMPORT_TYPE_CHOICES = [
+  "text",
+  "bigint",
+  "integer",
+  "double precision",
+  "numeric",
+  "boolean",
+  "date",
+  "timestamptz",
+  "uuid",
+  "jsonb",
+] as const;
 // Minimum time (ms) the "running" overlay is shown so the 180ms CSS
 // transition can complete and be clearly visible to the user.
 const MIN_ANIMATION_MS = 300;
@@ -502,15 +521,23 @@ function PgTypeSelector({
   onChange: (value: string) => void;
 }) {
   const [inputVal, setInputVal] = useState(value);
-  // Prevents the Combobox's internal blur-reset from overriding our state.
-  const blurLockRef = useRef<string | null>(null);
+  // Whether the user is editing right now. Base UI's Combobox clears its
+  // input when it closes with no list item selected — which is *always* the
+  // case for a custom type like `numeric(10,2)`, since that matches no group
+  // entry. The value was still applied, but the field went back to showing
+  // its placeholder, so the user could not see what would be created.
+  const focusedRef = useRef(false);
+  // The committed type, readable synchronously: the `value` prop in this
+  // closure is one render stale during the blur that commits a new one, and
+  // guarding against the reset with the stale value would restore the old
+  // type. (This used to be a 100ms timer, which raced with Base UI's reset.)
+  const committedRef = useRef(value);
 
   // Sync inputVal when the committed value changes externally (e.g. a
-  // different column row is selected) but not while we own the blur lock.
+  // different column row is selected) but never mid-edit.
   useEffect(() => {
-    if (blurLockRef.current === null) {
-      setInputVal(value);
-    }
+    committedRef.current = value;
+    if (!focusedRef.current) setInputVal(value);
   }, [value]);
 
   // Show every group while the field is empty or still holds the committed
@@ -527,20 +554,17 @@ function PgTypeSelector({
       onValueChange={(newValue) => {
         if (newValue) {
           const v = newValue as string;
-          blurLockRef.current = v;
+          committedRef.current = v;
           setInputVal(v);
           onChange(v);
-          setTimeout(() => {
-            blurLockRef.current = null;
-          }, 0);
         }
       }}
       inputValue={inputVal}
       onInputValueChange={(v) => {
-        // Ignore any reset the Combobox tries to apply while the blur lock
-        // is held (it resets to "" when no item is selected on close).
-        if (blurLockRef.current !== null) {
-          setInputVal(blurLockRef.current);
+        // Outside of active editing the committed type wins over the
+        // Combobox's close-time reset to "".
+        if (!focusedRef.current && v === "" && committedRef.current !== "") {
+          setInputVal(committedRef.current);
           return;
         }
         setInputVal(v);
@@ -554,7 +578,11 @@ function PgTypeSelector({
           className="sql-rename-input sql-modify-col-type playground-type-input"
           placeholder="e.g. varchar(255)"
           aria-label="Column type"
+          onFocus={() => {
+            focusedRef.current = true;
+          }}
           onBlur={() => {
+            focusedRef.current = false;
             const typed = inputVal.trim();
             let finalVal: string;
             if (
@@ -569,11 +597,8 @@ function PgTypeSelector({
               finalVal = typed || value;
               if (finalVal !== value) onChange(finalVal);
             }
-            blurLockRef.current = finalVal;
+            committedRef.current = finalVal;
             setInputVal(finalVal);
-            setTimeout(() => {
-              blurLockRef.current = null;
-            }, 100);
           }}
         />
         <Combobox.Trigger
@@ -653,9 +678,18 @@ function PgStructureColumnRow({
     position: isDragging ? "relative" : undefined,
     zIndex: isDragging ? 1 : undefined,
   };
-  const fkTargetColumns = col.fkTable
+  // A foreign key can only reference a primary-key or UNIQUE column; offering
+  // the rest just leads to "there is no unique constraint matching the given
+  // keys" at save time. If the target's uniqueness isn't known (an engine that
+  // doesn't report it), fall back to the full list rather than an empty one.
+  const allFkTargetColumns = col.fkTable
     ? (columnsByTable[col.fkTable] ?? [])
     : [];
+  const uniqueFkTargets = allFkTargetColumns.filter(
+    (target) => target.pk > 0 || target.unique === true,
+  );
+  const fkTargetColumns =
+    uniqueFkTargets.length > 0 ? uniqueFkTargets : allFkTargetColumns;
   const serialType = isPgSerialType(col.type);
 
   return (
@@ -983,6 +1017,13 @@ function PostgresPlaygroundInner() {
   const [resultsByTab, setResultsByTab] = useState<
     Record<string, QueryRunResult | null>
   >({});
+  // Synchronous view of the same map, so a mutation handler can find which
+  // open tabs show the table it just changed without depending on it (and
+  // re-creating every callback on each new result).
+  const resultsByTabRef = useRef(resultsByTab);
+  useEffect(() => {
+    resultsByTabRef.current = resultsByTab;
+  }, [resultsByTab]);
   const [loaded, setLoaded] = useState(false);
   // True when this workspace is already open (locked) in another tab, so
   // the shell shows a conflict overlay instead of deadlocking on boot.
@@ -1011,6 +1052,14 @@ function PostgresPlaygroundInner() {
   const [viewsExpanded, setViewsExpanded] = useState(true);
   const [tablesExpanded, setTablesExpanded] = useState(true);
   const [triggersExpanded, setTriggersExpanded] = useState(true);
+  // Collapsed by default: most databases have neither, and a serial column's
+  // sequence is an implementation detail the user did not create by hand.
+  const [sequencesExpanded, setSequencesExpanded] = useState(false);
+  const [functionsExpanded, setFunctionsExpanded] = useState(false);
+  // Postgres-only, so they live here rather than in the shared schema-tree
+  // hook that SQLite and DuckDB also use.
+  const [sequences, setSequences] = useState<string[]>([]);
+  const [functions, setFunctions] = useState<string[]>([]);
   const [globalPageSize, setGlobalPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [resultSetExportSnapshot, setResultSetExportSnapshot] =
     useState<ResultSetExportSnapshot | null>(null);
@@ -1089,7 +1138,7 @@ function PostgresPlaygroundInner() {
   const [pendingDbId, setPendingDbId] = useState<string | null>(null);
   const [pendingDropEntity, setPendingDropEntity] = useState<{
     name: string;
-    kind: "table" | "view" | "index" | "trigger";
+    kind: PgEntityKind;
   } | null>(null);
   const [pendingTruncate, setPendingTruncate] = useState<string | null>(null);
   const [ddlDialog, setDdlDialog] = useState<{
@@ -1119,7 +1168,28 @@ function PostgresPlaygroundInner() {
   const [renameDbExt, setRenameDbExt] = useState(".pg");
   // Overrides the display name for the blank/imported database without
   // touching the sample-database metadata.
-  const [customDbFilename, setCustomDbFilename] = useState<string | null>(null);
+  // Persisted alongside the active database id: an imported or renamed
+  // database kept its label only in memory, so a reload silently relabelled it
+  // `untitled.pg` while the data underneath was unchanged.
+  const [customDbFilename, setCustomDbFilenameState] = useState<string | null>(
+    () => {
+      if (typeof window === "undefined") return null;
+      try {
+        return localStorage.getItem(storageKey("db_filename"));
+      } catch {
+        return null;
+      }
+    },
+  );
+  const setCustomDbFilename = useCallback((filename: string | null) => {
+    setCustomDbFilenameState(filename);
+    try {
+      if (filename === null) localStorage.removeItem(storageKey("db_filename"));
+      else localStorage.setItem(storageKey("db_filename"), filename);
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   // ─── View Structure drawer state ──────────────────────────────────────
   const [viewStructureDialog, setViewStructureDialog] =
@@ -1360,17 +1430,27 @@ function PostgresPlaygroundInner() {
     [persistTabs],
   );
 
-  const refreshSchema = useCallback(async () => {
+  /** Reloads the sidebar's view of the schema. Returns the table names so a
+   *  caller that just replaced the database can report what it loaded. */
+  const refreshSchema = useCallback(async (): Promise<string[]> => {
     const engine = engineRef.current;
-    if (!engine) return;
+    if (!engine) return [];
     const schema = selectedSchemaRef.current;
-    const [nextTables, nextViews, nextIndexes, nextTriggers] =
-      await Promise.all([
-        engine.listTables(schema),
-        engine.listViews(schema),
-        engine.listIndexes(schema),
-        engine.listTriggers(schema),
-      ]);
+    const [
+      nextTables,
+      nextViews,
+      nextIndexes,
+      nextTriggers,
+      nextSequences,
+      nextFunctions,
+    ] = await Promise.all([
+      engine.listTables(schema),
+      engine.listViews(schema),
+      engine.listIndexes(schema),
+      engine.listTriggers(schema),
+      engine.listSequences(schema),
+      engine.listFunctions(schema),
+    ]);
     const entries = await Promise.all(
       [...nextTables, ...nextViews].map(async (name) => {
         const [colsResult, fksResult, countResult] = await Promise.allSettled([
@@ -1391,6 +1471,8 @@ function PostgresPlaygroundInner() {
     setViews(nextViews);
     setIndexes(nextIndexes);
     setTriggers(nextTriggers);
+    setSequences(nextSequences);
+    setFunctions(nextFunctions);
     setColumnsByEntity(
       Object.fromEntries(entries.map(([name, cols]) => [name, cols])),
     );
@@ -1400,6 +1482,7 @@ function PostgresPlaygroundInner() {
     setRowCountByTable(
       Object.fromEntries(entries.map(([name, , , count]) => [name, count])),
     );
+    return nextTables;
   }, []);
 
   const refreshSchemas = useCallback(
@@ -1425,36 +1508,48 @@ function PostgresPlaygroundInner() {
   const [explainPlan, setExplainPlan] = useState<{
     querySql: string;
     plan: string;
+    options: ExplainOptions;
   } | null>(null);
   // Run EXPLAIN for the selection / statement at the cursor / whole query and
   // show the plan in a read-only modal.
+  const runExplain = useCallback(
+    (sql: string, opts: ExplainOptions) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+      void (async () => {
+        try {
+          const sets = await engine.exec(
+            buildExplainSql("postgres", sql, opts),
+          );
+          const set = sets.find((s) => s != null) ?? sets[0];
+          setExplainPlan({
+            querySql: sql,
+            options: opts,
+            plan: set
+              ? formatExplainResult(set.columns, set.values)
+              : "(no plan returned)",
+          });
+        } catch (err) {
+          showToast(
+            `Explain failed: ${err instanceof Error ? err.message : String(err)}`,
+            "warn",
+          );
+        }
+      })();
+    },
+    [showToast],
+  );
+
   const handleExplain = useCallback(() => {
     const view = editorRef.current;
-    const engine = engineRef.current;
-    if (!view || !engine) return;
+    if (!view) return;
     const sql = activeSqlForEditor(view).trim();
     if (!sql) {
       showToast("Nothing to explain, the query is empty.", "warn");
       return;
     }
-    void (async () => {
-      try {
-        const sets = await engine.exec(buildExplainSql("postgres", sql));
-        const set = sets.find((s) => s != null) ?? sets[0];
-        setExplainPlan({
-          querySql: sql,
-          plan: set
-            ? formatExplainResult(set.columns, set.values)
-            : "(no plan returned)",
-        });
-      } catch (err) {
-        showToast(
-          `Explain failed: ${err instanceof Error ? err.message : String(err)}`,
-          "warn",
-        );
-      }
-    })();
-  }, [showToast]);
+    runExplain(sql, {});
+  }, [runExplain, showToast]);
 
   // Run a DDL statement from the schema tree's Create Index / Create View
   // dialogs, then refresh the sidebar. Resolves true on success.
@@ -1594,6 +1689,7 @@ function PostgresPlaygroundInner() {
         let lazyTotalCount: number | undefined;
         let lazyPage: number | undefined;
         let lazyPageSize: number | undefined;
+        let affectedRows: (number | null)[] | undefined;
         if (useLazy) {
           const lazy = await engine.execPaged(
             trimmed,
@@ -1607,7 +1703,9 @@ function PostgresPlaygroundInner() {
           lazyPage = page;
           lazyPageSize = lazyPageSizeForRun;
         } else {
-          sets = await engine.exec(trimmed);
+          const run = await engine.execWithCounts(trimmed);
+          sets = run.sets;
+          affectedRows = run.affectedRows;
         }
         const sourceTables =
           sets.length > 1
@@ -1629,6 +1727,7 @@ function PostgresPlaygroundInner() {
             lazyPageSize,
             lazyInfinite: effectivePageSize === 0 && useLazy,
             querySql: trimmed.replace(/\s*;+\s*$/, ""),
+            affectedRows,
           },
         }));
         addHistoryEntry({
@@ -1656,6 +1755,10 @@ function PostgresPlaygroundInner() {
             source,
             sourceTable,
             error: message,
+            // What actually ran, which "Run selection" makes different from
+            // the editor's contents; the error panel shows it beside the
+            // message.
+            querySql: trimmed,
           },
         }));
         addHistoryEntry({
@@ -2178,6 +2281,9 @@ function PostgresPlaygroundInner() {
             ? await engine.loadBlankDatabase()
             : await engine.loadSampleDatabase(nextId);
         setActiveDbId(sample.id);
+        // The label belonged to the database being replaced; keeping it would
+        // show a stale name over the new one (and over a later New Database).
+        setCustomDbFilename(null);
         try {
           localStorage.setItem(storageKey("db"), sample.id);
         } catch {
@@ -2243,6 +2349,7 @@ function PostgresPlaygroundInner() {
         engineRef.current = engine;
         setActiveWorkspace({ id: newWs.id, name: newWs.name });
         setActiveDbId(sample.id);
+        setCustomDbFilename(null);
         try {
           localStorage.setItem(storageKey("db"), sample.id);
         } catch {
@@ -2374,15 +2481,88 @@ function PostgresPlaygroundInner() {
         selectedSchemaRef.current = "public";
         setSelectedSchema("public");
         setExpandedEntities(new Set());
-        await Promise.all([refreshSchema(), refreshSchemas()]);
+        const [loadedTables] = await Promise.all([
+          refreshSchema(),
+          refreshSchemas(),
+        ]);
         setStatusState("ready");
-        showToast(`Loaded "${filename}".`);
+        // Close on success. Leaving the dropzone live over a database that was
+        // just replaced invited dropping a second file onto it by accident.
+        setImportSqlDumpOpen(false);
+        const n = loadedTables.length;
+        showToast(`Loaded "${filename}": ${n} table${n === 1 ? "" : "s"}.`);
       } catch (err) {
         showToast(
           `Import failed: ${err instanceof Error ? err.message : String(err)}`,
           "warn",
         );
         setStatusState("ready");
+      }
+    },
+    [persistTabs, refreshSchema, refreshSchemas, showToast],
+  );
+
+  /** Import a dump into a *fresh* workspace, leaving the current one and its
+   *  query tabs untouched. The same escape hatch the sample-database switch
+   *  offers; importing a dump used to be the one destructive path with no
+   *  alternative to overwriting. */
+  const performImportSqlDumpInNewWorkspace = useCallback(
+    async (sqlText: string, filename: string) => {
+      const old = engineRef.current;
+      if (!old) return;
+      setStatusState("loading");
+      setDbLoading(true);
+      try {
+        const newWs = await createWorkspace(
+          `${filename} Workspace`,
+          PLAYGROUND_ID,
+        );
+        setActiveWorkspaceId(PLAYGROUND_ID, newWs.id);
+        engineRef.current = null;
+        await old.close();
+        const engine = await postgresAdapter.createEngine(
+          POSTGRES_BLANK_DATABASE.id,
+          newWs.id,
+        );
+        engineRef.current = engine;
+        await engine.importSqlDump(sqlText);
+        setActiveWorkspace({ id: newWs.id, name: newWs.name });
+        setActiveDbId(POSTGRES_BLANK_DATABASE.id);
+        setCustomDbFilename(filename);
+        try {
+          localStorage.setItem(storageKey("db"), POSTGRES_BLANK_DATABASE.id);
+        } catch {
+          /* ignore */
+        }
+        const nextTabs = loadTabs(
+          POSTGRES_BLANK_DATABASE.id,
+          POSTGRES_BLANK_DATABASE.defaultTabs,
+        );
+        persistTabs(nextTabs, POSTGRES_BLANK_DATABASE.id);
+        tabHistoryRef.current = [];
+        setActiveTabId(nextTabs[0]?.id ?? "");
+        setResultsByTab({});
+        selectedSchemaRef.current = "public";
+        setSelectedSchema("public");
+        setExpandedEntities(new Set());
+        const [loadedTables] = await Promise.all([
+          refreshSchema(),
+          refreshSchemas(),
+        ]);
+        setStatusState("ready");
+        setImportSqlDumpOpen(false);
+        const n = loadedTables.length;
+        showToast(
+          `Loaded "${filename}" in a new workspace: ${n} table${n === 1 ? "" : "s"}.`,
+        );
+      } catch (err) {
+        showToast(
+          `Import failed: ${err instanceof Error ? err.message : String(err)}`,
+          "warn",
+        );
+        setStatusState("ready");
+      } finally {
+        setDbLoading(false);
       }
     },
     [persistTabs, refreshSchema, refreshSchemas, showToast],
@@ -2464,6 +2644,53 @@ function PostgresPlaygroundInner() {
     showToast,
     runSqlForTab,
   });
+
+  /** Re-run every open tab whose result came from `tableName`, keeping its
+   *  page and page size. Data tabs used to hold whatever rows they were opened
+   *  with: adding a row from the sidebar left the grid showing "Rows 1–3 of 3"
+   *  next to a table that had four. Called after every mutation the UI makes
+   *  to a table, and by the result pane's Refresh button. */
+  const refreshTabsForTable = useCallback(
+    (tableName: string) => {
+      const results = resultsByTabRef.current;
+      for (const tab of tabsRef.current) {
+        const r = results[tab.id];
+        if (!r || r.sourceTable !== tableName) continue;
+        const baseSql = r.lazyBaseSql ?? r.lazySql;
+        const sql = baseSql ?? r.querySql;
+        if (!sql) continue;
+        void runSqlForTab(
+          tab.id,
+          sql,
+          r.source,
+          r.sourceTable,
+          r.lazyPage ?? 0,
+          baseSql,
+          r.lazyPageSize,
+        );
+      }
+    },
+    [runSqlForTab],
+  );
+
+  /** Re-run the active tab's query, keeping its page and page size. */
+  const refreshActiveResult = useCallback(() => {
+    const tabId = activeTabIdRef.current;
+    const r = resultsByTabRef.current[tabId];
+    if (!r) return;
+    const baseSql = r.lazyBaseSql ?? r.lazySql;
+    const sql = baseSql ?? r.querySql;
+    if (!sql) return;
+    void runSqlForTab(
+      tabId,
+      sql,
+      r.source,
+      r.sourceTable,
+      r.lazyPage ?? 0,
+      baseSql,
+      r.lazyPageSize,
+    );
+  }, [runSqlForTab]);
 
   const previewEntity = useCallback(
     (name: string, kind: "table" | "view") => {
@@ -2612,12 +2839,20 @@ function PostgresPlaygroundInner() {
       }
       const title = activeTab?.title ?? "result_set";
       const filename = `${toFileSafeName(title)}.${format}`;
-      if (format === "csv") exportResultToCsv(columns, rows, filename);
-      else if (format === "json") exportResultToJson(columns, rows, filename);
-      else if (format === "sql") exportResultToSql(columns, rows, filename);
+      // Column types drive per-format serialization (booleans, bytea, jsonb,
+      // arrays, numerics); `sourceTable` gives the SQL export a real INSERT
+      // target instead of the placeholder `result_set`.
+      const opts = {
+        columnTypes: set.columnTypes,
+        tableName: result.sourceTable ?? undefined,
+      };
+      if (format === "csv") exportResultToCsv(columns, rows, filename, opts);
+      else if (format === "json")
+        exportResultToJson(columns, rows, filename, opts);
+      else if (format === "sql") exportResultToSql(columns, rows, filename, opts);
       else if (format === "parquet")
-        await exportResultToParquet(columns, rows, filename);
-      else await exportResultToXlsx(columns, rows, filename);
+        await exportResultToParquet(columns, rows, filename, opts);
+      else await exportResultToXlsx(columns, rows, filename, opts);
     },
     [activeTab, result, resultSetExportSnapshot],
   );
@@ -2837,21 +3072,26 @@ function PostgresPlaygroundInner() {
   const submitAddRow = useCallback(async () => {
     const engine = engineRef.current;
     if (!engine || !addRowDialog) return;
-    const { tableName, columns, values, addAnother } = addRowDialog;
+    const { tableName, columns, values, addAnother, emptyAsText } =
+      addRowDialog;
     // For a blank input on a column with a server-side default, omit the
     // column so the default (nextval, now(), explicit DEFAULT) applies.
-    // Otherwise blank means NULL.
+    // Otherwise blank means NULL — unless the field's `''` toggle is on, in
+    // which case blank is the empty string, which nothing else could express.
     const columnNames: string[] = [];
     const rowValues: unknown[] = [];
     for (const c of columns) {
       const raw = values[c.name] ?? "";
-      if (raw === "" && c.defaultValue !== null) continue;
+      const wantsEmptyString = raw === "" && (emptyAsText?.[c.name] ?? false);
+      if (raw === "" && c.defaultValue !== null && !wantsEmptyString) continue;
       columnNames.push(c.name);
-      rowValues.push(raw === "" ? null : raw);
+      rowValues.push(raw === "" && !wantsEmptyString ? null : raw);
     }
     try {
       await engine.insertRow(tableName, columnNames, rowValues, selectedSchemaRef.current);
       showToast(`Row added to "${tableName}".`);
+      void refreshSchema().catch(() => undefined);
+      refreshTabsForTable(tableName);
       if (addAnother) {
         const newValues: Record<string, string> = {};
         for (const c of columns) newValues[c.name] = "";
@@ -2863,7 +3103,7 @@ function PostgresPlaygroundInner() {
       const msg = err instanceof Error ? err.message : String(err);
       showToast(`Insert failed: ${msg}`, "warn");
     }
-  }, [addRowDialog, showToast]);
+  }, [addRowDialog, refreshSchema, refreshTabsForTable, showToast]);
 
   const copyEntityName = useCallback(
     (name: string) => {
@@ -2948,7 +3188,7 @@ function PostgresPlaygroundInner() {
   );
 
   const requestDropEntity = useCallback(
-    (name: string, kind: "table" | "view" | "index" | "trigger") => {
+    (name: string, kind: PgEntityKind) => {
       setPendingDropEntity({ name, kind });
     },
     [],
@@ -3001,15 +3241,16 @@ function PostgresPlaygroundInner() {
       const set = sets?.[0];
       if (!set) return;
       const filename = `${toFileSafeName(name)}.${format}`;
+      const opts = { columnTypes: set.columnTypes, tableName: name };
       if (format === "csv")
-        exportResultToCsv(set.columns, set.values, filename);
+        exportResultToCsv(set.columns, set.values, filename, opts);
       else if (format === "json")
-        exportResultToJson(set.columns, set.values, filename);
+        exportResultToJson(set.columns, set.values, filename, opts);
       else if (format === "sql")
-        exportResultToSql(set.columns, set.values, filename);
+        exportResultToSql(set.columns, set.values, filename, opts);
       else if (format === "parquet")
-        await exportResultToParquet(set.columns, set.values, filename);
-      else await exportResultToXlsx(set.columns, set.values, filename);
+        await exportResultToParquet(set.columns, set.values, filename, opts);
+      else await exportResultToXlsx(set.columns, set.values, filename, opts);
     },
     [],
   );
@@ -3352,6 +3593,19 @@ function PostgresPlaygroundInner() {
       `-- PostgreSQL dump`,
       `-- Generated by Dataslope\n`,
     ];
+    // Objects are emitted in the only order that replays: standalone
+    // sequences → tables (FK-ordered) → data → setval → indexes → functions →
+    // views → triggers. Anything a table's own DDL already carries (serial
+    // sequences, PK/FK/UNIQUE/CHECK, constraint-backed indexes) is not
+    // repeated here.
+    const objects = await engine.getSchemaDumpObjects(schema);
+    const identityAlways = new Set(objects.identityAlwaysTables);
+
+    if (objects.sequences.length > 0) {
+      lines.push("-- Sequences");
+      for (const seq of objects.sequences) lines.push(`${seq.sql}\n`);
+    }
+
     // Emit tables in FK dependency order so constraints and INSERTs never
     // reference a table that doesn't exist yet on re-import.
     const fkDeps = new Map<string, string[]>();
@@ -3371,9 +3625,9 @@ function PostgresPlaygroundInner() {
     );
     for (const tableName of orderedTables) {
       const ddl = await engine.getDDL(tableName, schema);
-      if (ddl) {
-        lines.push(`${ddl};\n`);
-      }
+      // `getDDL` returns a terminated statement; appending another `;` here
+      // produced the stray `);;` every CREATE TABLE used to end with.
+      if (ddl) lines.push(`${ddl.trimEnd()}\n`);
       // Omit generated columns from INSERTs: writing them fails on re-import
       // ("cannot insert a non-DEFAULT value into column …").
       const colInfo = await engine.listColumns(tableName, schema);
@@ -3392,16 +3646,41 @@ function PostgresPlaygroundInner() {
         .filter((i) => i >= 0);
       if (keepIdx.length === 0) continue;
       const quotedCols = keepIdx.map((i) => quoteIdent(columns[i])).join(", ");
+      // A `GENERATED ALWAYS AS IDENTITY` column rejects an explicit value
+      // unless the INSERT says so, which would fail the restore on row 1.
+      const overriding = identityAlways.has(tableName)
+        ? " OVERRIDING SYSTEM VALUE"
+        : "";
       for (const row of rows) {
         const vals = keepIdx
           .map((i) => formatSqlDumpValue(row[i], typeByName.get(columns[i])))
           .join(", ");
         lines.push(
-          `INSERT INTO ${quoteIdent(tableName)} (${quotedCols}) VALUES (${vals});`,
+          `INSERT INTO ${quoteIdent(tableName)} (${quotedCols})${overriding} VALUES (${vals});`,
         );
       }
       lines.push("");
     }
+
+    // After the data: a sequence left at its start value would hand out keys
+    // that already exist on the very first insert into a restored table.
+    if (objects.sequenceSetvals.length > 0) {
+      lines.push("-- Sequence positions");
+      lines.push(...objects.sequenceSetvals, "");
+    }
+    const section = (
+      title: string,
+      items: readonly { name: string; sql: string }[],
+    ) => {
+      if (items.length === 0) return;
+      lines.push(`-- ${title}`);
+      for (const item of items) lines.push(`${item.sql}\n`);
+    };
+    section("Indexes", objects.indexes);
+    section("Functions", objects.functions);
+    section("Views", objects.views);
+    section("Triggers", objects.triggers);
+
     return lines.join("\n");
   }, [tables]);
 
@@ -3593,6 +3872,7 @@ function PostgresPlaygroundInner() {
             targetMode: "new",
             targetTable: tables[0] ?? "",
             colCompare: null,
+            columnTypes: inferCsvColumnTypes(headers, rows),
           });
         } catch (err) {
           showToast(
@@ -3654,6 +3934,7 @@ function PostgresPlaygroundInner() {
             targetMode: "new",
             targetTable: tables[0] ?? "",
             colCompare: null,
+            columnTypes: inferCsvColumnTypes(headers, rows),
           });
         } catch (err) {
           showToast(
@@ -3735,6 +4016,15 @@ function PostgresPlaygroundInner() {
         showToast("Table name cannot be empty.", "warn");
         return;
       }
+      // Only a "New table" import creates columns, so inferred types apply
+      // there; importing into an existing table uses that table's own types.
+      const columnTypes = isExisting
+        ? undefined
+        : flavor === "csv"
+          ? importCsvState?.columnTypes
+          : flavor === "json"
+            ? importJsonState?.columnTypes
+            : undefined;
       try {
         await importRowsIntoPostgres(
           engine,
@@ -3743,6 +4033,7 @@ function PostgresPlaygroundInner() {
           rows,
           {
             createTable: !isExisting,
+            columnTypes,
           },
         );
         await refreshSchema();
@@ -4115,6 +4406,10 @@ function PostgresPlaygroundInner() {
           onClose={() => setImportSqlDumpOpen(false)}
           onDraggingChange={setImportSqlDumpDragging}
           onImport={(sql, filename) => void performImportSqlDump(sql, filename)}
+          onImportInNewWorkspace={(sql, filename) =>
+            void performImportSqlDumpInNewWorkspace(sql, filename)
+          }
+          persists={activeWorkspace !== null}
         />
 
         <RenameDatabaseDialog
@@ -4500,6 +4795,10 @@ function PostgresPlaygroundInner() {
           }}
           querySql={explainPlan?.querySql ?? ""}
           plan={explainPlan?.plan ?? ""}
+          options={explainPlan?.options ?? {}}
+          onOptionsChange={(next) => {
+            if (explainPlan) runExplain(explainPlan.querySql, next);
+          }}
           onCopied={() => showToast("Plan copied.")}
           onCopyFailed={() => showToast("Couldn't copy to clipboard.", "warn")}
         />
@@ -5093,6 +5392,42 @@ function PostgresPlaygroundInner() {
                   />
                 ))}
               </SchemaSection>
+              <SchemaSection
+                label="Sequences"
+                count={sequences.length}
+                expanded={sequencesExpanded}
+                onToggle={() => setSequencesExpanded((v) => !v)}
+                emptyMessage="No sequences."
+              >
+                {sequences.map((name) => (
+                  <SchemaLeafItem
+                    key={name}
+                    name={name}
+                    kind="sequence"
+                    onCopy={copyEntityName}
+                    onViewDDL={(n) => void viewDDL(n)}
+                    onDrop={requestDropEntity}
+                  />
+                ))}
+              </SchemaSection>
+              <SchemaSection
+                label="Functions"
+                count={functions.length}
+                expanded={functionsExpanded}
+                onToggle={() => setFunctionsExpanded((v) => !v)}
+                emptyMessage="No functions."
+              >
+                {functions.map((name) => (
+                  <SchemaLeafItem
+                    key={name}
+                    name={name}
+                    kind="function"
+                    onCopy={copyEntityName}
+                    onViewDDL={(n) => void viewDDL(n)}
+                    onDrop={requestDropEntity}
+                  />
+                ))}
+              </SchemaSection>
               </div>
             </div>
               </div>
@@ -5438,6 +5773,7 @@ function PostgresPlaygroundInner() {
                   void exportResultSet(format, scope)
                 }
                 onOpenQueryTab={openTabAndRun}
+                onRefresh={refreshActiveResult}
               />
               <DataslopeRunOverlay running={statusState === "running"} />
             </section>
@@ -5606,6 +5942,24 @@ function ImportDialog<
     );
   };
 
+  // Inferred column types are only shown (and only used) when the import
+  // creates the table; an existing table already has types of its own.
+  const columnTypes =
+    state && state.targetMode === "new" && flavor !== "parquet"
+      ? ((state as CsvImportState | JsonImportState).columnTypes ?? null)
+      : null;
+
+  const setColumnType = (index: number, type: string) => {
+    onStateChange((prev) => {
+      if (!prev) return prev;
+      const cur = (prev as CsvImportState | JsonImportState).columnTypes;
+      if (!cur) return prev;
+      const next = [...cur];
+      next[index] = type;
+      return { ...prev, columnTypes: next } as S;
+    });
+  };
+
   const Icon = flavorConfig.Icon;
 
   return (
@@ -5743,6 +6097,28 @@ function ImportDialog<
                           <th key={h}>{h || "(empty)"}</th>
                         ))}
                       </tr>
+                      {columnTypes && (
+                        <tr>
+                          {fileColumns.map((h, i) => (
+                            <th key={h} className="sql-import-type-cell">
+                              <select
+                                className="sql-import-type-select"
+                                value={columnTypes[i] ?? "text"}
+                                aria-label={`Column type for ${h || "(empty)"}`}
+                                onChange={(e) =>
+                                  setColumnType(i, e.target.value)
+                                }
+                              >
+                                {IMPORT_TYPE_CHOICES.map((t) => (
+                                  <option key={t} value={t}>
+                                    {t}
+                                  </option>
+                                ))}
+                              </select>
+                            </th>
+                          ))}
+                        </tr>
+                      )}
                     </thead>
                     <tbody>
                       {previewRows.slice(0, 5).map((row, i) => (

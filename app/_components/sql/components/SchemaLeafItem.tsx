@@ -3,23 +3,48 @@
 import { memo } from "react";
 import { Popover } from "@base-ui/react/popover";
 import { ContextMenu } from "@base-ui/react/context-menu";
-import { Hash, Zap } from "lucide-react";
+import { FunctionSquare, Hash, ListOrdered, Zap } from "lucide-react";
 
 // ────────────────────────────────────────────────────────────────────────
-// SchemaLeafItem, sidebar row for indexes and triggers. These have
-// no per-column metadata so the row is non-expandable; the row is just
-// a name + context menu (View DDL / Copy Name / Drop).
+// SchemaLeafItem, sidebar row for indexes, triggers, sequences and
+// functions. These have no per-column metadata so the row is
+// non-expandable; the row is just a name + context menu (View DDL /
+// Copy Name / Drop).
 // ────────────────────────────────────────────────────────────────────────
 
-export interface SchemaLeafItemProps {
+export type SchemaLeafKind = "index" | "trigger" | "sequence" | "function";
+
+const LEAF_ICON = {
+  index: Hash,
+  trigger: Zap,
+  sequence: ListOrdered,
+  function: FunctionSquare,
+} as const;
+
+const LEAF_DROP_LABEL = {
+  index: "Index",
+  trigger: "Trigger",
+  sequence: "Sequence",
+  function: "Function",
+} as const;
+
+/** Generic over the kind so each playground keeps its own narrower union:
+ *  SQLite has no sequences or functions, and its `onDrop` must not be asked to
+ *  accept kinds its engine can't drop. */
+export interface SchemaLeafItemProps<K extends SchemaLeafKind = SchemaLeafKind> {
   name: string;
-  kind: "index" | "trigger";
+  kind: K;
   onCopy: (name: string) => void;
-  onViewDDL: (name: string, kind: "index" | "trigger") => void;
-  onDrop: (name: string, kind: "index" | "trigger") => void;
+  onViewDDL: (name: string, kind: K) => void;
+  onDrop: (name: string, kind: K) => void;
 }
 
-export const SchemaLeafItem = memo(SchemaLeafItemImpl);
+// `memo` erases the generic, so the parameter is re-applied on the way out.
+export const SchemaLeafItem = memo(SchemaLeafItemImpl) as <
+  K extends SchemaLeafKind,
+>(
+  props: SchemaLeafItemProps<K>,
+) => React.ReactElement;
 
 function SchemaLeafItemImpl({
   name,
@@ -28,7 +53,7 @@ function SchemaLeafItemImpl({
   onViewDDL,
   onDrop,
 }: SchemaLeafItemProps) {
-  const Icon = kind === "index" ? Hash : Zap;
+  const Icon = LEAF_ICON[kind];
   const itemHint = `View DDL for ${kind} ${name}`;
   return (
     <div className="sql-tree-entity">
@@ -93,9 +118,7 @@ function SchemaLeafItemImpl({
                 className="example-item"
                 onClick={() => onDrop(name, kind)}
               >
-                <div className="ex-title">
-                  Drop {kind === "index" ? "Index" : "Trigger"}
-                </div>
+                <div className="ex-title">Drop {LEAF_DROP_LABEL[kind]}</div>
               </ContextMenu.Item>
             </ContextMenu.Popup>
           </ContextMenu.Positioner>

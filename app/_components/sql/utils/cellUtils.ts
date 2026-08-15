@@ -14,11 +14,20 @@ export function compareCellValues(a: unknown, b: unknown): number {
   return sa < sb ? -1 : sa > sb ? 1 : 0;
 }
 
+/** `1 byte` / `2 bytes` — the size badge on a binary cell is user-facing copy,
+ *  so it agrees with itself. */
+export function formatByteCount(n: number): string {
+  return `${n} ${n === 1 ? "byte" : "bytes"}`;
+}
+
 export function formatCellValue(v: unknown): string {
   if (v === null || v === undefined) return "NULL";
   if (typeof v === "string") return v;
   if (typeof v === "number") return Number.isFinite(v) ? String(v) : "NaN";
-  if (v instanceof Uint8Array) return `BLOB (${v.length} bytes)`;
+  // Real booleans (Postgres/DuckDB) render as `true`/`false`, matching the
+  // column's declared type rather than printing an integer for it.
+  if (typeof v === "boolean") return v ? "true" : "false";
+  if (v instanceof Uint8Array) return `BLOB (${formatByteCount(v.length)})`;
   if (v instanceof Date) return v.toISOString();
   // Array columns (e.g. DuckDB LIST, which arrive as JS arrays) render with
   // brackets so they read as a collection, `[10, 20, 30]` rather than the
@@ -28,6 +37,20 @@ export function formatCellValue(v: unknown): string {
     return `[${v.map((item) => formatCellValue(item)).join(", ")}]`;
   }
   return String(v);
+}
+
+/** Render a cell for the *grid*, where the row is a single line and runs of
+ *  whitespace would otherwise be invisible. `white-space: pre` on the cell
+ *  keeps leading/trailing spaces; embedded newlines and tabs become glyphs so
+ *  they stay on one line and are visibly different from a plain space. The
+ *  untouched value is still what gets copied, edited and exported — only the
+ *  on-screen text is substituted, so a `'  a\nb  '` no longer reads as `a b`.
+ */
+export function formatCellDisplay(v: unknown): string {
+  const text = formatCellValue(v);
+  return /[\n\r\t]/.test(text)
+    ? text.replace(/\r\n|\r|\n/g, "↵").replace(/\t/g, "→")
+    : text;
 }
 
 /** Format a cell value as a SQL literal suitable for INSERT / SELECT. */

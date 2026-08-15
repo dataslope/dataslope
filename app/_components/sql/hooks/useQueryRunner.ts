@@ -254,6 +254,9 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
           error: msg,
           source,
           sourceTable,
+          // What actually ran, which "Run selection" makes different from the
+          // editor's contents; the error panel shows it beside the message.
+          querySql: trimmed,
         });
         addHistoryEntry({
           sql: trimmed,

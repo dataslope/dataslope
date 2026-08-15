@@ -1714,6 +1714,10 @@ function DuckDbPlaygroundInner() {
             source,
             sourceTable,
             error: message,
+            // What actually ran, which "Run selection" makes different from
+            // the editor's contents; the error panel shows it beside the
+            // message.
+            querySql: trimmed,
           },
         }));
         addHistoryEntry({

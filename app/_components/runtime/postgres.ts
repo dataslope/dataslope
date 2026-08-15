@@ -21,8 +21,13 @@ import {
   type PostgresSampleDatabase,
 } from "./postgresSamples";
 import { PGLITE_WORKER_CDN } from "./cdn";
+import { topoSortByForeignKeys } from "../sql/utils/exportOrder";
 import { fetchDatasetText } from "./remoteDatasets";
-import { toDateOnlyString } from "./valueFormat";
+import {
+  toDateOnlyString,
+  toPgArrayLiteral,
+  toTimestampString,
+} from "./valueFormat";
 
 let _pgliteWorkerModulePromise: Promise<{ PGliteWorker: typeof PGliteWorkerType }> | null = null;
 
@@ -51,14 +56,20 @@ function toSqlValue(value: unknown): SqlValue {
   if (value === null || value === undefined) return null;
   if (value instanceof Uint8Array) return value;
   if (value instanceof ArrayBuffer) return new Uint8Array(value);
-  if (value instanceof Date) return value.toISOString();
-  if (typeof value === "boolean") return value ? 1 : 0;
+  if (value instanceof Date) return toTimestampString(value, true) ?? value.toISOString();
+  // Booleans stay booleans: the grid renders `true`/`false` and the exporters
+  // pick the right literal per format (see SqlValue).
+  if (typeof value === "boolean") return value;
   if (typeof value === "number" || typeof value === "string") return value;
   if (typeof value === "bigint") return Number(value);
-  // json/jsonb and array/composite columns arrive as JS objects/arrays;
-  // serialize to JSON so the grid is readable and an edited value
-  // round-trips through a text -> json cast on UPDATE.
-  if (Array.isArray(value) || isPlainObject(value)) {
+  // Array columns render as the Postgres array literal `{1,2,3}`, so a
+  // displayed value pastes straight back into SQL and an edited cell
+  // round-trips through the implicit text -> array cast on UPDATE.
+  if (Array.isArray(value)) return toPgArrayLiteral(value);
+  // Composite/record columns arrive as plain objects; JSON keeps them
+  // readable. (json/jsonb columns are parsed to their raw text upstream —
+  // see the worker's type parsers — so they never reach this branch.)
+  if (isPlainObject(value)) {
     try {
       return JSON.stringify(value, (_k, v) =>
         typeof v === "bigint" ? v.toString() : v,
@@ -127,6 +138,32 @@ const PG_TYPE_NAMES: Record<number, string> = {
 
 let pgRebuildCounter = 0;
 
+/** `serial` / `bigserial` / `smallserial` when a column is an integer whose
+ *  default reads from a sequence it owns — i.e. it was declared `serial`.
+ *  Re-emitting the shorthand is what makes a dump replayable: writing
+ *  `integer DEFAULT nextval('t_id_seq'::regclass)` on its own fails on import
+ *  with `relation "t_id_seq" does not exist`. Returns null for anything else,
+ *  including a default pointing at a standalone sequence the column does not
+ *  own (that one needs a real CREATE SEQUENCE). */
+function serialTypeFor(
+  colType: string,
+  colDefault: string | null,
+  ownedSequence: string | null,
+): string | null {
+  if (!colDefault || !ownedSequence) return null;
+  if (!/^nextval\('.*'::regclass\)$/.test(colDefault.trim())) return null;
+  switch (colType) {
+    case "integer":
+      return "serial";
+    case "bigint":
+      return "bigserial";
+    case "smallint":
+      return "smallserial";
+    default:
+      return null;
+  }
+}
+
 function pgTypeName(dataTypeID: number): string {
   return PG_TYPE_NAMES[dataTypeID] ?? "";
 }
@@ -191,6 +228,11 @@ function resultToQueryExecResult(result: PgliteResult): QueryExecResult & { colu
   // PGlite returns `date` (OID 1082) as a JS Date at UTC midnight; render
   // as plain `YYYY-MM-DD` (timestamps keep their time component).
   const columnIsDate = result.fields.map((field) => field.dataTypeID === 1082);
+  // `timestamp without time zone` (OID 1114) also arrives as a Date, but must
+  // not gain the `+00` suffix that `timestamptz` (1184) carries.
+  const columnIsNaiveTimestamp = result.fields.map(
+    (field) => field.dataTypeID === 1114,
+  );
   return {
     columns,
     columnTypes,
@@ -198,6 +240,9 @@ function resultToQueryExecResult(result: PgliteResult): QueryExecResult & { colu
       columns.map((column, i) => {
         const value = (row as Record<string, unknown>)[column];
         if (columnIsDate[i]) return toDateOnlyString(value) ?? toSqlValue(value);
+        if (columnIsNaiveTimestamp[i]) {
+          return toTimestampString(value, false) ?? toSqlValue(value);
+        }
         return toSqlValue(value);
       }),
     ),
@@ -216,10 +261,50 @@ function rowsToQueryExecResult(
   ];
 }
 
+/** Schema objects the sidebar lists and can drop. `function` covers
+ *  procedures too; its `name` carries the argument list (`f(integer)`) so
+ *  overloads stay addressable. */
+export type PgEntityKind =
+  | "table"
+  | "view"
+  | "index"
+  | "trigger"
+  | "sequence"
+  | "function";
+
+/** The non-table objects a SQL dump has to carry. Each `sql` is a complete,
+ *  terminated statement, ready to concatenate. */
+export interface PgSchemaDumpObjects {
+  /** Standalone sequences (those a `serial` column owns are reconstructed
+   *  from the column instead, so they are excluded here). */
+  sequences: { name: string; sql: string }[];
+  /** `setval` calls restoring each sequence's position, table data included,
+   *  so the first insert after a restore doesn't collide with existing keys. */
+  sequenceSetvals: string[];
+  /** Indexes not backed by a constraint (those come with the constraint). */
+  indexes: { name: string; sql: string }[];
+  functions: { name: string; sql: string }[];
+  views: { name: string; sql: string }[];
+  triggers: { name: string; sql: string }[];
+  /** Tables with a `GENERATED ALWAYS AS IDENTITY` column. Their INSERTs need
+   *  `OVERRIDING SYSTEM VALUE`, or the restore fails with "cannot insert a
+   *  non-DEFAULT value into column". */
+  identityAlwaysTables: string[];
+}
+
 export interface PostgresEngine {
   loadSampleDatabase: (id: string) => Promise<PostgresSampleDatabase>;
   loadBlankDatabase: () => Promise<PostgresSampleDatabase>;
   exec: (sql: string) => Promise<(QueryExecResult | null)[]>;
+  /** `exec` plus each statement's affected-row count (null when the statement
+   *  reports none), so the UI can say "5 rows affected" after a write instead
+   *  of only "statement executed successfully". */
+  execWithCounts: (
+    sql: string,
+  ) => Promise<{
+    sets: (QueryExecResult | null)[];
+    affectedRows: (number | null)[];
+  }>;
   execParams: (sql: string, params: unknown[]) => Promise<QueryExecResult[]>;
   execPaged: (
     sql: string,
@@ -232,6 +317,10 @@ export interface PostgresEngine {
   listViews: (schema?: string) => Promise<string[]>;
   listIndexes: (schema?: string) => Promise<string[]>;
   listTriggers: (schema?: string) => Promise<string[]>;
+  listSequences: (schema?: string) => Promise<string[]>;
+  /** User-defined functions and procedures, as `name(arg types)` so overloads
+   *  stay distinguishable (and the label is what DROP FUNCTION needs). */
+  listFunctions: (schema?: string) => Promise<string[]>;
   listColumns: (name: string, schema?: string) => Promise<TableColumnInfo[]>;
   listForeignKeys: (name: string, schema?: string) => Promise<ForeignKeyInfo[]>;
   getColumnConstraintInfo: (tableName: string, schema?: string) => Promise<ColumnConstraintInfo[]>;
@@ -239,11 +328,14 @@ export interface PostgresEngine {
   rebuildTable: (spec: TableRebuildSpec, schema?: string) => Promise<void>;
   dropEntity: (
     name: string,
-    kind: "table" | "view" | "index" | "trigger",
+    kind: PgEntityKind,
     schema?: string,
   ) => Promise<void>;
   truncateTable: (name: string, schema?: string) => Promise<void>;
   getDDL: (name: string, schema?: string) => Promise<string>;
+  /** Every non-table object in `schema`, in the order a dump must replay
+   *  them. Drives the SQL-dump export, which previously emitted tables only. */
+  getSchemaDumpObjects: (schema?: string) => Promise<PgSchemaDumpObjects>;
   deleteRows: (
     tableName: string,
     pkColumns: string[],
@@ -313,6 +405,54 @@ export function preparePostgresScriptForPglite(sql: string): string {
       return true;
     })
     .join("\n");
+}
+
+/** Advance dollar-quote state across one line. `tag` is the open tag (`$$`,
+ *  `$fn$`, …) or null outside a dollar-quoted string. */
+function trackDollarQuotes(line: string, tag: string | null): string | null {
+  let i = 0;
+  let open = tag;
+  while (i < line.length) {
+    if (open === null) {
+      const m = /\$[A-Za-z_][A-Za-z_0-9]*\$|\$\$/.exec(line.slice(i));
+      if (!m) return null;
+      open = m[0];
+      i += m.index + m[0].length;
+    } else {
+      const at = line.indexOf(open, i);
+      if (at === -1) return open;
+      i = at + open.length;
+      open = null;
+    }
+  }
+  return open;
+}
+
+/** Drop a script's own transaction-control statements. The workspace import
+ *  path wraps the whole dump in one transaction so a failure can't leave a
+ *  half-replaced database; a `COMMIT;` inside the script would end that
+ *  transaction early and defeat it.
+ *
+ *  Only statements standing alone on their line *outside a dollar-quoted
+ *  string* are removed. That exception is the whole point: `BEGIN` and `END;`
+ *  are how every plpgsql body is written, and stripping those would corrupt
+ *  each function the dump defines. */
+export function stripTransactionControl(sql: string): string {
+  const out: string[] = [];
+  let tag: string | null = null;
+  for (const line of sql.split("\n")) {
+    if (
+      tag === null &&
+      /^\s*(BEGIN|COMMIT|END|ROLLBACK|START\s+TRANSACTION)(\s+(WORK|TRANSACTION))?\s*;\s*$/i.test(
+        line,
+      )
+    ) {
+      continue;
+    }
+    tag = trackDollarQuotes(line, tag);
+    out.push(line);
+  }
+  return out.join("\n");
 }
 
 /** Resolve `sample`'s seed SQL (inline or remote). Resolve BEFORE tearing
@@ -401,6 +541,94 @@ export async function createPostgresEngine(
     return next;
   }
 
+  /** `CREATE TABLE` reconstructed from `pg_catalog`, not from
+   *  `information_schema`. It is what both "View DDL" and the SQL-dump export
+   *  emit, so it has to be replayable: `serial` columns keep their sequence,
+   *  identity columns keep their `GENERATED … AS IDENTITY` clause, and UNIQUE
+   *  / CHECK / EXCLUDE constraints are carried over verbatim from
+   *  `pg_get_constraintdef` instead of being silently dropped. */
+  async function buildTableDdl(name: string, schema: string): Promise<string> {
+    const qualified = `${quoteIdent(schema)}.${quoteIdent(name)}`;
+    const cols = await queryRows<{
+      attname: string;
+      coltype: string;
+      attnotnull: boolean;
+      coldefault: string | null;
+      attidentity: string;
+      attgenerated: string;
+      owned_sequence: string | null;
+    }>(
+      `
+      SELECT
+        a.attname,
+        pg_catalog.format_type(a.atttypid, a.atttypmod) AS coltype,
+        a.attnotnull,
+        pg_catalog.pg_get_expr(ad.adbin, ad.adrelid) AS coldefault,
+        a.attidentity,
+        a.attgenerated,
+        (
+          SELECT s.relname
+          FROM pg_catalog.pg_depend d
+          JOIN pg_catalog.pg_class s ON s.oid = d.objid AND s.relkind = 'S'
+          WHERE d.refobjid = a.attrelid
+            AND d.refobjsubid = a.attnum
+            AND d.classid = 'pg_class'::regclass
+            AND d.deptype IN ('a', 'i')
+          LIMIT 1
+        ) AS owned_sequence
+      FROM pg_catalog.pg_attribute a
+      LEFT JOIN pg_catalog.pg_attrdef ad
+        ON ad.adrelid = a.attrelid AND ad.adnum = a.attnum
+      WHERE a.attrelid = $1::regclass AND a.attnum > 0 AND NOT a.attisdropped
+      ORDER BY a.attnum
+      `,
+      [qualified],
+    );
+    // `pg_get_constraintdef` renders PRIMARY KEY / UNIQUE / CHECK / FOREIGN KEY
+    // / EXCLUDE exactly as Postgres would; PK first so the DDL reads naturally.
+    const constraints = await queryRows<{ conname: string; condef: string }>(
+      `
+      SELECT conname, pg_catalog.pg_get_constraintdef(oid) AS condef
+      FROM pg_catalog.pg_constraint
+      WHERE conrelid = $1::regclass AND contype IN ('p', 'u', 'c', 'f', 'x')
+      ORDER BY CASE contype
+                 WHEN 'p' THEN 0 WHEN 'u' THEN 1 WHEN 'c' THEN 2
+                 WHEN 'f' THEN 3 ELSE 4 END,
+               conname
+      `,
+      [qualified],
+    );
+
+    const defs = cols.map((col) => {
+      const parts = [quoteIdent(col.attname)];
+      const serialType = serialTypeFor(col.coltype, col.coldefault, col.owned_sequence);
+      if (serialType) {
+        // `serial` implies the sequence, its default and NOT NULL, so the
+        // dump stays self-contained without a separate CREATE SEQUENCE.
+        parts.push(serialType);
+        return `  ${parts.join(" ")}`;
+      }
+      parts.push(col.coltype);
+      if (col.attgenerated === "s" && col.coldefault) {
+        parts.push(`GENERATED ALWAYS AS (${col.coldefault}) STORED`);
+        return `  ${parts.join(" ")}`;
+      }
+      if (col.attidentity === "a" || col.attidentity === "d") {
+        parts.push(
+          `GENERATED ${col.attidentity === "a" ? "ALWAYS" : "BY DEFAULT"} AS IDENTITY`,
+        );
+      } else if (col.coldefault) {
+        parts.push(`DEFAULT ${col.coldefault}`);
+      }
+      if (col.attnotnull) parts.push("NOT NULL");
+      return `  ${parts.join(" ")}`;
+    });
+    for (const c of constraints) {
+      defs.push(`  CONSTRAINT ${quoteIdent(c.conname)} ${c.condef}`);
+    }
+    return `CREATE TABLE ${qualified} (\n${defs.join(",\n")}\n);`;
+  }
+
   const engine: PostgresEngine = {
     async loadSampleDatabase(id) {
       // Rebuild before adopting so a failed download/seed changes nothing.
@@ -430,6 +658,16 @@ export async function createPostgresEngine(
     async exec(sql) {
       const results = await db.exec(sql);
       return results.map(resultToQueryExecResult);
+    },
+
+    async execWithCounts(sql) {
+      const results = await db.exec(sql);
+      return {
+        sets: results.map(resultToQueryExecResult),
+        affectedRows: results.map((r) =>
+          typeof r.affectedRows === "number" ? r.affectedRows : null,
+        ),
+      };
     },
 
     async execParams(sql, params) {
@@ -537,6 +775,35 @@ export async function createPostgresEngine(
       return rows.map((row) => row.trigger_name);
     },
 
+    async listSequences(schema = "public") {
+      const rows = await queryRows<{ sequencename: string }>(
+        `
+        SELECT sequencename
+        FROM pg_catalog.pg_sequences
+        WHERE schemaname = $1
+        ORDER BY sequencename
+        `,
+        [schema],
+      );
+      return rows.map((row) => row.sequencename);
+    },
+
+    async listFunctions(schema = "public") {
+      const rows = await queryRows<{ label: string }>(
+        `
+        SELECT p.proname || '(' ||
+               pg_catalog.pg_get_function_identity_arguments(p.oid) || ')'
+               AS label
+        FROM pg_catalog.pg_proc p
+        JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
+        WHERE n.nspname = $1 AND p.prokind IN ('f', 'p')
+        ORDER BY p.proname, label
+        `,
+        [schema],
+      );
+      return rows.map((row) => row.label);
+    },
+
     async listColumns(name, schema = "public") {
       const rows = await queryRows<{
         ordinal_position: number;
@@ -586,6 +853,24 @@ export async function createPostgresEngine(
         `,
         [name, schema],
       );
+      // Single-column UNIQUE constraints, so the structure editor can offer
+      // only legal foreign-key targets.
+      const uniqueRows = await queryRows<{ column_name: string }>(
+        `
+        SELECT a.attname AS column_name
+        FROM pg_catalog.pg_constraint con
+        JOIN pg_catalog.pg_class cls ON cls.oid = con.conrelid
+        JOIN pg_catalog.pg_namespace n ON n.oid = cls.relnamespace
+        JOIN pg_catalog.pg_attribute a
+          ON a.attrelid = cls.oid AND a.attnum = con.conkey[1]
+        WHERE n.nspname = $2
+          AND cls.relname = $1
+          AND con.contype = 'u'
+          AND array_length(con.conkey, 1) = 1
+        `,
+        [name, schema],
+      );
+      const uniqueColumns = new Set(uniqueRows.map((r) => r.column_name));
       // Enum labels for USER-DEFINED columns (drives the grid's dropdown);
       // one query per schema, only when an enum column is present.
       const enumByType = new Map<string, string[]>();
@@ -629,6 +914,7 @@ export async function createPostgresEngine(
           row.data_type === "USER-DEFINED"
             ? (enumByType.get(row.udt_name) ?? null)
             : null,
+        unique: uniqueColumns.has(row.column_name),
       }));
     },
 
@@ -812,6 +1098,17 @@ export async function createPostgresEngine(
     },
 
     async dropEntity(name, kind, schema = "public") {
+      if (kind === "function") {
+        // `name` is `fn(arg types)`; the identifier and the argument list are
+        // quoted separately so an overload can be dropped unambiguously.
+        const openParen = name.indexOf("(");
+        const fnName = openParen >= 0 ? name.slice(0, openParen) : name;
+        const args = openParen >= 0 ? name.slice(openParen) : "()";
+        await db.exec(
+          `DROP FUNCTION IF EXISTS ${quoteIdent(schema)}.${quoteIdent(fnName)}${args} CASCADE`,
+        );
+        return;
+      }
       const keyword =
         kind === "table"
           ? "TABLE"
@@ -819,7 +1116,9 @@ export async function createPostgresEngine(
             ? "VIEW"
             : kind === "index"
               ? "INDEX"
-              : "TRIGGER";
+              : kind === "sequence"
+                ? "SEQUENCE"
+                : "TRIGGER";
       if (kind === "trigger") {
         const rows = await queryRows<{ event_object_table: string }>(
           `SELECT event_object_table FROM information_schema.triggers WHERE trigger_schema = $2 AND trigger_name = $1 LIMIT 1`,
@@ -843,29 +1142,7 @@ export async function createPostgresEngine(
         [name, schema],
       );
       if (tableRows.length > 0) {
-        const [cols, fks] = await Promise.all([
-          engine.listColumns(name, schema),
-          engine.listForeignKeys(name, schema),
-        ]);
-        const colSql = cols.map((col) => {
-          if (col.generated) {
-            return `  ${quoteIdent(col.name)} ${col.type} GENERATED ALWAYS AS (${col.generated.expression}) STORED`;
-          }
-          const parts = [quoteIdent(col.name), col.type];
-          if (col.notNull) parts.push("NOT NULL");
-          if (col.defaultValue) parts.push(`DEFAULT ${col.defaultValue}`);
-          return `  ${parts.join(" ")}`;
-        });
-        const pk = cols.filter((col) => col.pk > 0).sort((a, b) => a.pk - b.pk);
-        if (pk.length > 0) {
-          colSql.push(`  PRIMARY KEY (${pk.map((col) => quoteIdent(col.name)).join(", ")})`);
-        }
-        for (const fk of fks) {
-          colSql.push(
-            `  FOREIGN KEY (${quoteIdent(fk.from)}) REFERENCES ${quoteIdent(fk.table)}(${quoteIdent(fk.to)}) ON DELETE ${normalizeFkAction(fk.onDelete)} ON UPDATE ${normalizeFkAction(fk.onUpdate)}`,
-          );
-        }
-        return `CREATE TABLE ${quoteIdent(schema)}.${quoteIdent(name)} (\n${colSql.join(",\n")}\n);`;
+        return buildTableDdl(name, schema);
       }
       const viewRows = await queryRows<{ definition: string }>(
         `SELECT definition FROM pg_views WHERE schemaname = $2 AND viewname = $1`,
@@ -880,6 +1157,55 @@ export async function createPostgresEngine(
       );
       if (indexRows.length > 0 && indexRows[0].indexdef) {
         return `${indexRows[0].indexdef};`;
+      }
+      // `name` for a function carries its argument list, so it is matched
+      // against the same `proname(args)` label `listFunctions` produces.
+      if (name.includes("(")) {
+        const fnRows = await queryRows<{ funcdef: string }>(
+          `SELECT pg_catalog.pg_get_functiondef(p.oid) AS funcdef
+           FROM pg_catalog.pg_proc p
+           JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
+           WHERE n.nspname = $2
+             AND p.proname || '(' ||
+                 pg_catalog.pg_get_function_identity_arguments(p.oid) || ')' = $1
+           LIMIT 1`,
+          [name, schema],
+        );
+        if (fnRows.length > 0 && fnRows[0].funcdef) {
+          return `${fnRows[0].funcdef.trimEnd()};`;
+        }
+      }
+      const seqRows = await queryRows<{
+        start_value: string;
+        increment_by: string;
+        min_value: string;
+        max_value: string;
+        cache_size: string;
+        cycle: boolean;
+        data_type: string;
+        last_value: string | null;
+      }>(
+        `SELECT start_value::text, increment_by::text, min_value::text,
+                max_value::text, cache_size::text, cycle, data_type::text,
+                last_value::text
+         FROM pg_catalog.pg_sequences
+         WHERE schemaname = $2 AND sequencename = $1`,
+        [name, schema],
+      );
+      if (seqRows.length > 0) {
+        const s = seqRows[0];
+        return (
+          `CREATE SEQUENCE ${quoteIdent(schema)}.${quoteIdent(name)}\n` +
+          `  AS ${s.data_type}\n` +
+          `  START WITH ${s.start_value}\n` +
+          `  INCREMENT BY ${s.increment_by}\n` +
+          `  MINVALUE ${s.min_value}\n` +
+          `  MAXVALUE ${s.max_value}\n` +
+          `  CACHE ${s.cache_size}${s.cycle ? "\n  CYCLE" : ""};` +
+          (s.last_value != null
+            ? `\n-- current value: ${s.last_value}`
+            : "")
+        );
       }
       const trigRows = await queryRows<{ triggerdef: string; funcdef: string }>(
         `SELECT
@@ -900,6 +1226,194 @@ export async function createPostgresEngine(
         return `${funcdef}\n\n${triggerdef};`;
       }
       return "";
+    },
+
+    async getSchemaDumpObjects(schema = "public") {
+      // Sequences owned by a serial column are rebuilt from the column's
+      // `serial` type (see serialTypeFor), so only standalone ones are
+      // emitted — but every sequence still needs its position restored.
+      const sequences = await queryRows<{
+        name: string;
+        owned: boolean;
+        start_value: string;
+        increment: string;
+        min_value: string;
+        max_value: string;
+        cache_size: string;
+        cycle: boolean;
+        data_type: string;
+      }>(
+        `
+        SELECT
+          c.relname AS name,
+          EXISTS (
+            SELECT 1 FROM pg_catalog.pg_depend d
+            WHERE d.objid = c.oid
+              AND d.classid = 'pg_class'::regclass
+              AND d.refobjsubid > 0
+              AND d.deptype IN ('a', 'i')
+          ) AS owned,
+          s.seqstart::text AS start_value,
+          s.seqincrement::text AS increment,
+          s.seqmin::text AS min_value,
+          s.seqmax::text AS max_value,
+          s.seqcache::text AS cache_size,
+          s.seqcycle AS cycle,
+          pg_catalog.format_type(s.seqtypid, NULL) AS data_type
+        FROM pg_catalog.pg_class c
+        JOIN pg_catalog.pg_sequence s ON s.seqrelid = c.oid
+        JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+        WHERE n.nspname = $1 AND c.relkind = 'S'
+        ORDER BY c.relname
+        `,
+        [schema],
+      );
+
+      const setvals: string[] = [];
+      for (const seq of sequences) {
+        const qualified = `${quoteIdent(schema)}.${quoteIdent(seq.name)}`;
+        try {
+          const [state] = await queryRows<{
+            last_value: string | null;
+            is_called: boolean;
+          }>(`SELECT last_value::text AS last_value, is_called FROM ${qualified}`);
+          if (state?.last_value != null) {
+            setvals.push(
+              `SELECT pg_catalog.setval('${schema.replace(/'/g, "''")}.${seq.name.replace(/'/g, "''")}', ${state.last_value}, ${state.is_called ? "true" : "false"});`,
+            );
+          }
+        } catch {
+          // An unreadable sequence just loses its position, not the dump.
+        }
+      }
+
+      const indexes = await queryRows<{ name: string; sql: string }>(
+        `
+        SELECT c.relname AS name, pg_catalog.pg_get_indexdef(i.indexrelid) AS sql
+        FROM pg_catalog.pg_index i
+        JOIN pg_catalog.pg_class c ON c.oid = i.indexrelid
+        JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+        WHERE n.nspname = $1
+          -- Constraint-backed indexes arrive with their CONSTRAINT clause in
+          -- the CREATE TABLE; emitting them again would fail as a duplicate.
+          AND NOT EXISTS (
+            SELECT 1 FROM pg_catalog.pg_constraint con
+            WHERE con.conindid = i.indexrelid
+          )
+        ORDER BY c.relname
+        `,
+        [schema],
+      );
+
+      const functions = await queryRows<{ name: string; sql: string }>(
+        `
+        SELECT p.proname AS name, pg_catalog.pg_get_functiondef(p.oid) AS sql
+        FROM pg_catalog.pg_proc p
+        JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
+        WHERE n.nspname = $1
+          -- Aggregates and window functions have no functiondef.
+          AND p.prokind IN ('f', 'p')
+        ORDER BY p.proname
+        `,
+        [schema],
+      );
+
+      // Views are emitted in dependency order: a view built on another view
+      // fails to create otherwise.
+      const viewRows = await queryRows<{
+        name: string;
+        definition: string;
+        depends_on: string[] | null;
+      }>(
+        `
+        SELECT
+          c.relname AS name,
+          pg_catalog.pg_get_viewdef(c.oid, true) AS definition,
+          ARRAY(
+            SELECT DISTINCT dc.relname
+            FROM pg_catalog.pg_depend d
+            JOIN pg_catalog.pg_rewrite r ON r.oid = d.objid
+            JOIN pg_catalog.pg_class dc ON dc.oid = d.refobjid
+            JOIN pg_catalog.pg_namespace dn ON dn.oid = dc.relnamespace
+            WHERE r.ev_class = c.oid
+              AND dc.relkind = 'v'
+              AND dc.oid <> c.oid
+              AND dn.nspname = $1
+          ) AS depends_on
+        FROM pg_catalog.pg_class c
+        JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+        WHERE n.nspname = $1 AND c.relkind = 'v'
+        ORDER BY c.relname
+        `,
+        [schema],
+      );
+      const viewDeps = new Map(
+        viewRows.map((v) => [v.name, v.depends_on ?? []]),
+      );
+      const views = topoSortByForeignKeys(
+        viewRows.map((v) => v.name),
+        (v) => viewDeps.get(v) ?? [],
+      ).map((name) => {
+        // `pg_get_viewdef` already terminates its output with `;`.
+        const def = viewRows
+          .find((v) => v.name === name)!
+          .definition.trim()
+          .replace(/;+$/, "");
+        return {
+          name,
+          sql: `CREATE VIEW ${quoteIdent(schema)}.${quoteIdent(name)} AS\n${def};`,
+        };
+      });
+
+      const triggers = await queryRows<{ name: string; sql: string }>(
+        `
+        SELECT t.tgname AS name, pg_catalog.pg_get_triggerdef(t.oid) || ';' AS sql
+        FROM pg_catalog.pg_trigger t
+        JOIN pg_catalog.pg_class c ON c.oid = t.tgrelid
+        JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+        WHERE n.nspname = $1 AND NOT t.tgisinternal
+        ORDER BY t.tgname
+        `,
+        [schema],
+      );
+
+      const identityAlways = await queryRows<{ relname: string }>(
+        `
+        SELECT DISTINCT c.relname
+        FROM pg_catalog.pg_attribute a
+        JOIN pg_catalog.pg_class c ON c.oid = a.attrelid
+        JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+        WHERE n.nspname = $1 AND c.relkind = 'r' AND a.attidentity = 'a'
+        `,
+        [schema],
+      );
+
+      return {
+        sequences: sequences
+          .filter((s) => !s.owned)
+          .map((s) => ({
+            name: s.name,
+            sql:
+              `CREATE SEQUENCE ${quoteIdent(schema)}.${quoteIdent(s.name)}\n` +
+              `  AS ${s.data_type}\n` +
+              `  START WITH ${s.start_value}\n` +
+              `  INCREMENT BY ${s.increment}\n` +
+              `  MINVALUE ${s.min_value}\n` +
+              `  MAXVALUE ${s.max_value}\n` +
+              `  CACHE ${s.cache_size}${s.cycle ? "\n  CYCLE" : ""};`,
+          })),
+        sequenceSetvals: setvals,
+        indexes: indexes.map((i) => ({ name: i.name, sql: `${i.sql};` })),
+        // `pg_get_functiondef` returns the body unterminated — without the
+        // added `;` the next statement in the dump is a syntax error.
+        functions: functions.map((f) => ({
+          name: f.name,
+          sql: `${f.sql.trimEnd()};`,
+        })),
+        views,
+        triggers,
+        identityAlwaysTables: identityAlways.map((r) => r.relname),
+      };
     },
 
     async deleteRows(tableName, pkColumns, pkRows, schema = "public") {
@@ -963,11 +1477,38 @@ export async function createPostgresEngine(
     },
 
     async importSqlDump(sql) {
+      // Strip `\connect` / CREATE DATABASE lines that can't run in PGlite.
+      const script = preparePostgresScriptForPglite(sql);
+
+      if (dataDir) {
+        // A workspace-backed session must import into the *persistent*
+        // cluster. Swapping in a fresh in-memory worker (what the in-memory
+        // path below does) left the OPFS data directory holding the previous
+        // database, so a reload silently restored that one instead — the live
+        // database and the snapshot disagreed from the moment of import.
+        //
+        // One transaction, so a dump that fails half-way leaves the previous
+        // database exactly as it was: DDL is transactional in Postgres.
+        try {
+          await db.exec(
+            `BEGIN;\nDROP SCHEMA IF EXISTS public CASCADE;\nCREATE SCHEMA public;\n${stripTransactionControl(script)}\nCOMMIT;`,
+          );
+        } catch (err) {
+          try {
+            await db.exec("ROLLBACK");
+          } catch {
+            /* already rolled back */
+          }
+          throw err;
+        }
+        sample = POSTGRES_BLANK_DATABASE;
+        return sample;
+      }
+
       const next = await createFreshWorker();
       await next.waitReady;
       try {
-        // Strip `\connect` / CREATE DATABASE lines that can't run in PGlite.
-        await next.exec(preparePostgresScriptForPglite(sql));
+        await next.exec(script);
       } catch (err) {
         try {
           await next.close();

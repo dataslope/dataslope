@@ -50,11 +50,18 @@ export function AddRowDialog({ state, setState, onSubmit }: AddRowDialogProps) {
               <div className="sql-add-row-fields">
                 {state.columns.map((c) => {
                   const hasDefault = c.defaultValue !== null;
-                  const placeholder = hasDefault
-                    ? `auto (${c.defaultValue})`
-                    : c.notNull
-                      ? "required"
-                      : "NULL if empty";
+                  const emptyAsText = state.emptyAsText?.[c.name] ?? false;
+                  const placeholder = emptyAsText
+                    ? "empty string"
+                    : hasDefault
+                      ? `auto (${c.defaultValue})`
+                      : c.notNull
+                        ? "required"
+                        : "NULL if empty";
+                  // The `''` toggle only resolves a real ambiguity: a blank
+                  // input that would otherwise become NULL or a default.
+                  const canBeEmptyString =
+                    !c.generated && (hasDefault || !c.notNull);
                   return (
                     <label key={c.name} className="sql-add-row-field">
                       <span className="sql-add-row-field-label">
@@ -63,25 +70,54 @@ export function AddRowDialog({ state, setState, onSubmit }: AddRowDialogProps) {
                           {c.type || "—"}
                         </span>
                       </span>
-                      <input
-                        className="sql-rename-input"
-                        value={state.values[c.name] ?? ""}
-                        onChange={(e) =>
-                          setState((prev) =>
-                            prev
-                              ? {
-                                  ...prev,
-                                  values: {
-                                    ...prev.values,
-                                    [c.name]: e.target.value,
-                                  },
-                                }
-                              : null,
-                          )
-                        }
-                        placeholder={placeholder}
-                        aria-label={c.name}
-                      />
+                      <span className="sql-add-row-field-input">
+                        <input
+                          className="sql-rename-input"
+                          value={state.values[c.name] ?? ""}
+                          onChange={(e) =>
+                            setState((prev) =>
+                              prev
+                                ? {
+                                    ...prev,
+                                    values: {
+                                      ...prev.values,
+                                      [c.name]: e.target.value,
+                                    },
+                                  }
+                                : null,
+                            )
+                          }
+                          placeholder={placeholder}
+                          aria-label={c.name}
+                        />
+                        {canBeEmptyString && (
+                          <button
+                            type="button"
+                            className={`sql-add-row-empty-toggle${emptyAsText ? " active" : ""}`}
+                            aria-pressed={emptyAsText}
+                            title={
+                              emptyAsText
+                                ? "Blank means the empty string. Click for NULL / default."
+                                : "Blank means NULL / default. Click for the empty string."
+                            }
+                            onClick={() =>
+                              setState((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      emptyAsText: {
+                                        ...prev.emptyAsText,
+                                        [c.name]: !emptyAsText,
+                                      },
+                                    }
+                                  : null,
+                              )
+                            }
+                          >
+                            {"''"}
+                          </button>
+                        )}
+                      </span>
                     </label>
                   );
                 })}
