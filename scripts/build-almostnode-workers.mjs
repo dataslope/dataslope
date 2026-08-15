@@ -75,6 +75,15 @@ const targets = [
     out: join(OUT_DIR, "pyodide-worker.js"),
     why: "pyodide",
   },
+  {
+    // just-bash + isomorphic-git. Pre-bundled so neither reaches the client
+    // or Worker bundles; just-bash also needs the node:* stubs above.
+    entry: join(SRC_DIR, "git-worker.ts"),
+    out: join(OUT_DIR, "git-worker.js"),
+    why: "just-bash + isomorphic-git",
+    // isomorphic-git reads a global `Buffer`, which a worker does not have.
+    inject: [join(ROOT, "app", "_components", "git", "bufferShim.ts")],
+  },
 ];
 
 /** Repo-relative, forward-slashed, so output reads the same on Windows. */
@@ -104,12 +113,13 @@ await rm(OUT_DIR, { recursive: true, force: true });
 await mkdir(OUT_DIR, { recursive: true });
 
 const bundleInputs = new Set();
-for (const { entry, out, why } of targets) {
+for (const { entry, out, why, inject } of targets) {
   const result = await build({
     ...common,
     entryPoints: [entry],
     outfile: out,
     metafile: true,
+    ...(inject ? { inject } : {}),
   });
   for (const input of Object.keys(result.metafile.inputs)) {
     if (!/^[a-z-]+:/.test(input)) bundleInputs.add(input);

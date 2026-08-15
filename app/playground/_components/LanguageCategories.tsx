@@ -55,6 +55,12 @@ const CATEGORIES: Category[] = [
     ],
   },
   {
+    name: "Version Control",
+    description:
+      "A real shell and a real repository in the tab: run commands and watch the working tree, index, and commit graph move.",
+    items: [{ id: "git", label: "Git", version: "2.43" }],
+  },
+  {
     name: "SQL Workbench",
     description:
       "Load data, run queries, and inspect results against embedded or remote engines, all in the browser.",

@@ -29,7 +29,7 @@ import {
   type CloudWorkspaceMeta,
 } from "@/lib/workspaces/types";
 import Link from "@/app/_components/Link";
-import { PLAYGROUNDS } from "@/app/_components/playgrounds";
+import { PERSISTENT_PLAYGROUNDS } from "@/app/_components/playgrounds";
 import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_SIZE_FACTOR,
@@ -59,7 +59,7 @@ import { recoverOrphanWorkspaces } from "@/app/_components/opfs/orphanWorkspaces
 const PAGE_SIZE = 8;
 
 const PLAYGROUND_BY_ID: Record<string, { label: string; href: string }> =
-  Object.fromEntries(PLAYGROUNDS.map((p) => [p.id, p]));
+  Object.fromEntries(PERSISTENT_PLAYGROUNDS.map((p) => [p.id, p]));
 
 function playgroundLabel(id: string): string {
   return PLAYGROUND_BY_ID[id]?.label ?? id;
@@ -190,7 +190,7 @@ export function PlaygroundWorkspaces() {
     // Sweep up drafts that exist in OPFS but in no list, so unsaved work
     // appears here instead of being unreachable.
     let cancelled = false;
-    void recoverOrphanWorkspaces(PLAYGROUNDS.map((p) => p.id))
+    void recoverOrphanWorkspaces(PERSISTENT_PLAYGROUNDS.map((p) => p.id))
       .then((result) => {
         if (cancelled || result.recovered.length === 0) return;
         setLocalEntries(getWorkspaceRegistry());

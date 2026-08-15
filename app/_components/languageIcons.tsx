@@ -20,6 +20,7 @@ import {
   SiHtml5,
   SiCss,
   SiReact,
+  SiGit,
 } from "react-icons/si";
 import { RiPhpFill } from "react-icons/ri";
 
@@ -64,6 +65,7 @@ export const LANGUAGE_ICONS: Record<string, IconType> = {
   css: SiCss,
   web: SiHtml5,
   react: SiReact,
+  git: SiGit,
 };
 
 /** Per-language size multiplier for glyphs that read heavier than the rest;
@@ -90,6 +92,7 @@ export const LANGUAGE_ICON_COLORS: Record<string, string> = {
   duckdb: "#FFBE11",
   web: "#e34f26",
   react: "#61dafb",
+  git: "#f05032",
 };
 
 /** Neutral database glyph for the "sql" content tag. Deliberately not in

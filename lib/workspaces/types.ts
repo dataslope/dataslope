@@ -52,7 +52,21 @@ export const CODE_PLAYGROUND_IDS: readonly string[] = [
   "web",
 ];
 
+/** Playgrounds that deliberately never persist. Git's filesystem is derived
+ *  state — a scenario plus the commands run against it — so there is nothing
+ *  to save that the command history does not already describe. Listed rather
+ *  than omitted so the intent is recorded: an id missing from every list is
+ *  the bug __tests__/workspacesCloud.test.ts exists to catch. */
+export const EPHEMERAL_PLAYGROUND_IDS: readonly string[] = ["git"];
+
+/** A `/playground/<id>` route exists. */
 export function isKnownPlayground(id: string): boolean {
+  return isPersistablePlayground(id) || EPHEMERAL_PLAYGROUND_IDS.includes(id);
+}
+
+/** The playground can be saved and shared — i.e. it has a bundle kind. The
+ *  save/share endpoints gate on this, not on `isKnownPlayground`. */
+export function isPersistablePlayground(id: string): boolean {
   return (
     (SQL_PLAYGROUND_IDS as readonly string[]).includes(id) ||
     CODE_PLAYGROUND_IDS.includes(id)
@@ -209,7 +223,9 @@ export function validateBundle(value: unknown): WorkspaceBundle | null {
   if (!value || typeof value !== "object") return null;
   const b = value as Record<string, unknown>;
   if (b.version !== BUNDLE_VERSION) return null;
-  if (typeof b.playground !== "string" || !isKnownPlayground(b.playground)) {
+  // Persistable, not merely known: an ephemeral playground has no bundle
+  // kind, so a bundle claiming one is malformed by construction.
+  if (typeof b.playground !== "string" || !isPersistablePlayground(b.playground)) {
     return null;
   }
   if (typeof b.name !== "string") return null;
