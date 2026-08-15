@@ -1,4 +1,4 @@
-# Dataslope — engineering notes
+# Dataslope engineering notes
 
 Operational and architectural documentation for the Dataslope codebase:
 deployment, caching, search, authentication, billing, and the admin surface.
@@ -7,7 +7,7 @@ conventions and content-authoring rules, see [`AGENTS.md`](./AGENTS.md).
 
 Dataslope is a Next.js app deployed to Cloudflare Workers. Every language
 runtime it ships runs client-side in WebAssembly, so nothing below is about
-executing user code on a server — there is no such server.
+executing user code on a server. There is no such server.
 
 ## Deployment
 
