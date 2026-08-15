@@ -94,6 +94,13 @@ export function toCsvValue(value: unknown, kind: ExportCellKind): string {
   return String(value);
 }
 
+/** True when a cell must be written as `""` rather than bare, so an empty
+ *  string stays distinguishable from NULL. RFC 4180 gives no other way to
+ *  tell them apart, and it is the convention `COPY … CSV` follows. */
+export function csvNeedsExplicitEmpty(value: unknown): boolean {
+  return value === "";
+}
+
 /** The JS value a cell contributes to the JSON export. `json`/`array` columns
  *  are re-parsed so they nest as real JSON rather than being double-encoded
  *  into a string. */

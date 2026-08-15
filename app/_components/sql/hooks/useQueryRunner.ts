@@ -150,6 +150,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
         let lazyTotalCount: number | undefined;
         let lazyPage: number | undefined;
         let lazyPageSize: number | undefined;
+        let affectedRows: (number | null)[] | undefined;
         if (useLazy) {
           const { result: lazySets, totalCount } = await engine.execPaged(
             trimmed,
@@ -163,7 +164,9 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
           lazyPage = page;
           lazyPageSize = lazyPageSizeForRun;
         } else {
-          sets = await engine.execAll(trimmed);
+          const run = await engine.execAllDetailed(trimmed);
+          sets = run.sets;
+          affectedRows = run.affectedRows;
         }
         const sourceTables =
           sets.length > 1
@@ -183,6 +186,7 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
           lazyPageSize,
           lazyInfinite: currentPageSize === 0 && useLazy,
           querySql: trimmed.replace(/\s*;+\s*$/, ""),
+          affectedRows,
         });
         addHistoryEntry({
           sql: trimmed,
@@ -482,20 +486,26 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       const rowLabel = `${rowCount} row${rowCount === 1 ? "" : "s"}`;
       const scopeLabel = scope === "page" ? "current page" : "all rows";
       const filename = `${toFileSafeName(title)} (${scopeLabel}, ${rowLabel}).${format}`;
+      // Column types drive per-format serialization (BLOBs, booleans);
+      // `sourceTable` gives the SQL export a real INSERT target.
+      const opts = {
+        columnTypes: set.columnTypes,
+        tableName: result.sourceTable ?? undefined,
+      };
       if (format === "csv") {
-        exportResultToCsv(columns, rows, filename);
+        exportResultToCsv(columns, rows, filename, opts);
       } else if (format === "json") {
-        exportResultToJson(columns, rows, filename);
+        exportResultToJson(columns, rows, filename, opts);
       } else if (format === "parquet") {
-        exportResultToParquet(columns, rows, filename).catch((err) =>
+        exportResultToParquet(columns, rows, filename, opts).catch((err) =>
           showToast(`Export failed: ${err instanceof Error ? err.message : String(err)}`, "warn"),
         );
       } else if (format === "xlsx") {
-        exportResultToXlsx(columns, rows, filename).catch((err) =>
+        exportResultToXlsx(columns, rows, filename, opts).catch((err) =>
           showToast(`Export failed: ${err instanceof Error ? err.message : String(err)}`, "warn"),
         );
       } else {
-        exportResultToSql(columns, rows, filename);
+        exportResultToSql(columns, rows, filename, opts);
       }
       })();
     },

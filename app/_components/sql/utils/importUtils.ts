@@ -173,6 +173,36 @@ export function inferColumnTypeFromValues(
   return "text";
 }
 
+/** Column types the SQLite import flow is allowed to create. An allowlist,
+ *  not free text: the value reaches `CREATE TABLE` unquoted. */
+const SQLITE_IMPORT_TYPES = new Set(["TEXT", "INTEGER", "REAL", "NUMERIC", "BLOB"]);
+
+/** Normalize a (possibly user-overridden) column type for `CREATE TABLE`,
+ *  falling back to TEXT — SQLite's most permissive affinity. */
+export function sqliteColumnType(type: string | undefined): string {
+  const t = (type ?? "").trim().toUpperCase();
+  return SQLITE_IMPORT_TYPES.has(t) ? t : "TEXT";
+}
+
+/** Map an inferred type onto a SQLite column affinity.
+ *
+ *  This is a correctness fix, not a nicety: SQLite compares a TEXT-affinity
+ *  column as text, so a CSV of integers imported as TEXT makes
+ *  `WHERE qty > 5` return the wrong rows with no error at all. Booleans and
+ *  dates stay TEXT — SQLite has no native type for either, and INTEGER
+ *  affinity would leave a column half-converted (`'true'` does not convert
+ *  losslessly, so it would be stored as text beside real integers). */
+export function sqliteAffinityFor(type: InferredColumnType): string {
+  switch (type) {
+    case "bigint":
+      return "INTEGER";
+    case "double precision":
+      return "REAL";
+    default:
+      return "TEXT";
+  }
+}
+
 /** Infer a type per column from the parsed rows. `sampleSize` caps the scan so
  *  a very large file doesn't stall the preview. */
 export function inferCsvColumnTypes(

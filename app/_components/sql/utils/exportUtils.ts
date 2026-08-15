@@ -5,6 +5,7 @@ import { ensureParquetWasm } from "./parquetWasm";
 import { formatByteCount } from "./cellUtils";
 import {
   classifyExportType,
+  csvNeedsExplicitEmpty,
   toCsvValue,
   toExcelCell,
   toJsonValue,
@@ -68,9 +69,13 @@ export function toFileSafeName(title: string): string {
   return title.replace(/[/\\:*?"<>|\x00-\x1f]/g, "_").trim() || "result_set";
 }
 
-/** Quote a CSV field per RFC 4180. `text` is already the serialized value. */
-function escapeCsvField(text: string): string {
-  return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+/** Quote a CSV field per RFC 4180. `text` is already the serialized value.
+ *  `forceQuote` writes `""` for a value that would otherwise be an empty
+ *  field, which is the only way CSV can tell an empty string from NULL. */
+function escapeCsvField(text: string, forceQuote = false): string {
+  return forceQuote || /[",\r\n]/.test(text)
+    ? `"${text.replace(/"/g, '""')}"`
+    : text;
 }
 
 export function exportResultToCsv(
@@ -83,7 +88,11 @@ export function exportResultToCsv(
   const lines = [
     columns.map((c) => escapeCsvField(c)).join(","),
     ...rows.map((row) =>
-      row.map((v, i) => escapeCsvField(toCsvValue(v, kinds[i]))).join(","),
+      row
+        .map((v, i) =>
+          escapeCsvField(toCsvValue(v, kinds[i]), csvNeedsExplicitEmpty(v)),
+        )
+        .join(","),
     ),
   ];
   triggerDownload(

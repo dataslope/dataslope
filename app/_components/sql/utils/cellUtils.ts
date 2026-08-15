@@ -129,6 +129,22 @@ export function pendingEditsAfterDeletedRows(
   return next;
 }
 
+/** True for the exact decimal string a 64-bit integer beyond JavaScript's
+ *  safe-integer range is carried as. Deliberately narrow: a value inside the
+ *  safe range is already a JS number, so a plain digit string there really is
+ *  text and stays text. */
+function isBigIntegerLiteral(v: string): boolean {
+  if (!/^-?\d+$/.test(v)) return false;
+  try {
+    const n = BigInt(v);
+    return (
+      n > BigInt(Number.MAX_SAFE_INTEGER) || n < BigInt(Number.MIN_SAFE_INTEGER)
+    );
+  } catch {
+    return false;
+  }
+}
+
 /** Infer a SQLite-style type label from the runtime JavaScript value. */
 export function inferColumnType(
   rows: QueryExecResult["values"],
@@ -138,8 +154,15 @@ export function inferColumnType(
     const v = row[colIdx];
     if (v === null) continue;
     if (v instanceof Uint8Array) return "BLOB";
+    if (typeof v === "boolean") return "BOOLEAN";
+    if (typeof v === "bigint") return "INTEGER";
     if (typeof v === "number") return Number.isInteger(v) ? "INTEGER" : "REAL";
-    if (typeof v === "string") return "TEXT";
+    // A 64-bit integer outside the safe-integer range reaches the UI as an
+    // exact decimal string (see `coerceValue`), so `9223372036854775807` in an
+    // expression column was badged `text` beside a value that is an integer.
+    if (typeof v === "string") {
+      return isBigIntegerLiteral(v) ? "INTEGER" : "TEXT";
+    }
   }
   return "NULL";
 }

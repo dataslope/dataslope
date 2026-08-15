@@ -9,9 +9,14 @@ import {
  *  download). Round-trip assertions below use it as the export side, so a
  *  change to either quoting rule breaks a test rather than a user's import. */
 function writeCsv(columns: string[], rows: string[][]): string {
-  const field = (s: string) =>
-    /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-  return [columns, ...rows].map((r) => r.map(field).join(",")).join("\r\n");
+  // An empty string is force-quoted (`""`), the only way CSV distinguishes it
+  // from NULL — see csvNeedsExplicitEmpty.
+  const field = (s: string, forceQuote = false) =>
+    forceQuote || /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  return [
+    columns.map((c) => field(c)).join(","),
+    ...rows.map((r) => r.map((v) => field(v, v === "")).join(",")),
+  ].join("\r\n");
 }
 
 describe("parseCsv", () => {

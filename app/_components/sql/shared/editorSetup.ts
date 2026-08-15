@@ -20,7 +20,12 @@ import {
   indentUnit,
 } from "@codemirror/language";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
-import { Compartment, EditorState, type Extension } from "@codemirror/state";
+import {
+  Compartment,
+  EditorState,
+  Prec,
+  type Extension,
+} from "@codemirror/state";
 import {
   EditorView,
   crosshairCursor,
@@ -130,6 +135,36 @@ export async function makeSqlLangExtension(
   });
 }
 
+
+/** Typing `'` straight after an `x`/`X` blob prefix inserts a plain quote
+ *  instead of an auto-closed pair.
+ *
+ *  `closeBrackets` does not recognise `x'…'` as one token, so it auto-closes
+ *  the opening quote and then fails to type over its own closing quote — the
+ *  spare `'` ends up at the end of the line, and `SELECT x'' AS zz;` becomes
+ *  `SELECT x'' AS zz;'` with a syntax error pointing somewhere else entirely.
+ *  `x'…'` is idiomatic SQLite (it is how every BLOB literal is written), so
+ *  this pays for itself; a quote in any other position still auto-closes.
+ *
+ *  Highest precedence so it runs before `closeBrackets`'s own handler. */
+const blobLiteralQuoteHandler = Prec.highest(
+  EditorView.inputHandler.of((view, from, to, text) => {
+    if (text !== "'") return false;
+    const prev = view.state.doc.sliceString(Math.max(0, from - 1), from);
+    if (prev !== "x" && prev !== "X") return false;
+    // `ax'` is an identifier, not a blob literal: only a standalone x/X counts.
+    const beforePrev =
+      from >= 2 ? view.state.doc.sliceString(from - 2, from - 1) : "";
+    if (/[\w$]/.test(beforePrev)) return false;
+    view.dispatch({
+      changes: { from, to, insert: "'" },
+      selection: { anchor: from + 1 },
+      userEvent: "input.type",
+    });
+    return true;
+  }),
+);
+
 /** Canonical extension list shared by every SQL playground. Compartments are
  *  passed in so the caller can `.reconfigure(...)` later. The `lang`
  *  compartment is intentionally seeded empty: the caller dispatches the
@@ -157,6 +192,7 @@ export function createSqlEditorExtensions(
     indentOnInput(),
     bracketMatching(),
     closeBrackets(),
+    blobLiteralQuoteHandler,
     rectangularSelection(),
     tooltips({ parent: document.body }),
     lineNumbers(),

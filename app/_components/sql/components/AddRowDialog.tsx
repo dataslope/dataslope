@@ -51,17 +51,26 @@ export function AddRowDialog({ state, setState, onSubmit }: AddRowDialogProps) {
                 {state.columns.map((c) => {
                   const hasDefault = c.defaultValue !== null;
                   const emptyAsText = state.emptyAsText?.[c.name] ?? false;
+                  // SQLite's rowid alias: leaving it blank assigns the next
+                  // id, so "NULL if empty" told the user the wrong thing.
+                  const isRowidAlias =
+                    c.pk > 0 && /^integer$/i.test((c.type || "").trim());
                   const placeholder = emptyAsText
                     ? "empty string"
-                    : hasDefault
-                      ? `auto (${c.defaultValue})`
-                      : c.notNull
-                        ? "required"
-                        : "NULL if empty";
+                    : isRowidAlias
+                      ? "auto (next rowid)"
+                      : hasDefault
+                        ? `auto (${c.defaultValue})`
+                        : c.notNull
+                          ? "required"
+                          : "NULL if empty";
                   // The `''` toggle only resolves a real ambiguity: a blank
                   // input that would otherwise become NULL or a default.
                   const canBeEmptyString =
-                    !c.generated && (hasDefault || !c.notNull);
+                    !c.generated &&
+                    !isRowidAlias &&
+                    (hasDefault || !c.notNull);
+                  const isBoolean = /^bool(ean)?$/i.test((c.type || "").trim());
                   return (
                     <label key={c.name} className="sql-add-row-field">
                       <span className="sql-add-row-field-label">
@@ -71,25 +80,53 @@ export function AddRowDialog({ state, setState, onSubmit }: AddRowDialogProps) {
                         </span>
                       </span>
                       <span className="sql-add-row-field-input">
-                        <input
-                          className="sql-rename-input"
-                          value={state.values[c.name] ?? ""}
-                          onChange={(e) =>
-                            setState((prev) =>
-                              prev
-                                ? {
-                                    ...prev,
-                                    values: {
-                                      ...prev.values,
-                                      [c.name]: e.target.value,
-                                    },
-                                  }
-                                : null,
-                            )
-                          }
-                          placeholder={placeholder}
-                          aria-label={c.name}
-                        />
+                        {isBoolean ? (
+                          // Matches the results grid, which already renders a
+                          // boolean column as a tri-state control rather than
+                          // a free-text box.
+                          <select
+                            className="sql-rename-input"
+                            value={state.values[c.name] ?? ""}
+                            aria-label={c.name}
+                            onChange={(e) =>
+                              setState((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      values: {
+                                        ...prev.values,
+                                        [c.name]: e.target.value,
+                                      },
+                                    }
+                                  : null,
+                              )
+                            }
+                          >
+                            <option value="">{placeholder}</option>
+                            <option value="1">true (1)</option>
+                            <option value="0">false (0)</option>
+                          </select>
+                        ) : (
+                          <input
+                            className="sql-rename-input"
+                            value={state.values[c.name] ?? ""}
+                            onChange={(e) =>
+                              setState((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      values: {
+                                        ...prev.values,
+                                        [c.name]: e.target.value,
+                                      },
+                                    }
+                                  : null,
+                              )
+                            }
+                            placeholder={placeholder}
+                            aria-label={c.name}
+                          />
+                        )}
                         {canBeEmptyString && (
                           <button
                             type="button"

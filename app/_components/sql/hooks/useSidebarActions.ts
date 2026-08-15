@@ -602,24 +602,27 @@ export function useSidebarActions(
           showToast(`"${name}" is empty, no data to export.`, "warn");
           return;
         }
-        const { columns, values: rows } = sets[0];
+        const { columns, values: rows, columnTypes } = sets[0];
         const filename = `${name}.${format}`;
+        // Column types drive per-format serialization (BLOBs, booleans);
+        // the table name gives the SQL export a real INSERT target.
+        const opts = { columnTypes, tableName: name };
         if (format === "csv") {
-          exportResultToCsv(columns, rows, filename);
+          exportResultToCsv(columns, rows, filename, opts);
           showToast(`Exported ${filename}.`);
         } else if (format === "json") {
-          exportResultToJson(columns, rows, filename);
+          exportResultToJson(columns, rows, filename, opts);
           showToast(`Exported ${filename}.`);
         } else if (format === "parquet") {
-          exportResultToParquet(columns, rows, filename)
+          exportResultToParquet(columns, rows, filename, opts)
             .then(() => showToast(`Exported ${filename}.`))
             .catch((err) => showToast(`Export failed: ${err instanceof Error ? err.message : String(err)}`, "warn"));
         } else if (format === "xlsx") {
-          exportResultToXlsx(columns, rows, filename)
+          exportResultToXlsx(columns, rows, filename, opts)
             .then(() => showToast(`Exported ${filename}.`))
             .catch((err) => showToast(`Export failed: ${err instanceof Error ? err.message : String(err)}`, "warn"));
         } else {
-          exportResultToSql(columns, rows, filename);
+          exportResultToSql(columns, rows, filename, opts);
           showToast(`Exported ${filename}.`);
         }
       } catch (err) {

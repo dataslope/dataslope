@@ -10,6 +10,7 @@ import {
   classifyExportType,
   bytesToHexLiteral,
   bytesToBase64,
+  csvNeedsExplicitEmpty,
   numericToJson,
   toCsvValue,
   toJsonValue,
@@ -162,6 +163,12 @@ describe("bytea serialization (DS-06)", () => {
     expect(toCsvValue(new Uint8Array([]), "binary")).toBe("\\x");
     expect(toCsvValue(null, "binary")).toBe("");
     expect(toSqlLiteral(null, "binary")).toBe("NULL");
+  });
+
+  it("marks an empty string for explicit quoting, NULL not (SQ-14)", () => {
+    expect(csvNeedsExplicitEmpty("")).toBe(true);
+    expect(csvNeedsExplicitEmpty(null)).toBe(false);
+    expect(csvNeedsExplicitEmpty("a")).toBe(false);
   });
 
   it("does not lose a zero byte", () => {

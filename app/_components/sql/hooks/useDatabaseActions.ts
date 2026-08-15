@@ -16,6 +16,9 @@ import { replaceDoc } from "../utils/editorUtils";
 import {
   sanitizeImportColName,
   parseCsv,
+  inferCsvColumnTypes,
+  sqliteAffinityFor,
+  sqliteColumnType,
   tableNameFromFilename,
   readParquetFile,
   isSqliteBinary,
@@ -111,9 +114,10 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       setActiveDbId(sample.id);
       activeDbIdRef.current = sample.id;
       try {
-        if (!isCustom) {
-          localStorage.setItem(storageKey("db"), sample.id);
-        }
+        // Imported databases are persisted too. Skipping them left the *old*
+        // sample's id in storage, so a reload restored that sample's label and
+        // query tabs over the imported database's own data.
+        localStorage.setItem(storageKey("db"), sample.id);
       } catch {
         // ignore
       }
@@ -218,12 +222,10 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
         try {
           // Load a fresh blank database then execute the dump on top of it.
           const sample = await engine.loadBlankDatabase();
-          setCustomFilenames((prev) => {
-            if (!(sample.id in prev)) return prev;
-            const next = { ...prev };
-            delete next[sample.id];
-            return next;
-          });
+          // Name it after the file it came from. Clearing the override left
+          // the blank database's own `blank.sqlite` in the selector, which
+          // told the user nothing about what they had just opened.
+          setCustomFilenames((prev) => ({ ...prev, [sample.id]: filename }));
           await engine.execAll(sqlText);
           await applyDbLoad(sample);
           setImportSqliteOpen(false);
@@ -252,6 +254,13 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     [performImportSqlite, performImportSqlDump],
   );
 
+  /** Terminate a DDL statement, without doubling a semicolon it already has.
+   *  A trigger body ends `… END;`, so an unconditional `;` gave `END;;`. */
+  const terminate = useCallback(
+    (ddl: string) => (/;\s*$/.test(ddl) ? ddl.trimEnd() : `${ddl};`),
+    [],
+  );
+
   /** Serializes the active database to a replayable SQL dump. Shared by the
    *  .sql export and the cloud/share bundle builder. Null while booting. */
   const buildSqlDumpText = useCallback(async (): Promise<string | null> => {
@@ -275,7 +284,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     // DDL + INSERT statements for each table
     for (const name of tableList) {
       const ddl = await engine.getDDL(name);
-      lines.push(`${ddl};`, "");
+      lines.push(terminate(ddl), "");
 
       // Omit generated columns from INSERTs — the re-import would fail with
       // "cannot INSERT into generated column".
@@ -321,11 +330,33 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     // and repeating them fails the re-import ("index … already exists").
     for (const name of [...viewList, ...triggerList]) {
       const ddl = await engine.getDDL(name);
-      lines.push(`${ddl};`, "");
+      // A trigger body already ends with its own `END;`, so appending the
+      // terminator unconditionally produced `END;;`.
+      lines.push(terminate(ddl), "");
+    }
+
+    // AUTOINCREMENT high-water marks. Without these the counter is rebuilt
+    // from max(rowid) on restore, so a table whose highest row was deleted
+    // before the dump silently starts reusing ids — the one guarantee
+    // AUTOINCREMENT exists to give. `sqlite3 .dump` emits the same thing.
+    const seq = await engine
+      .exec(
+        `SELECT name, seq FROM sqlite_sequence ORDER BY name`,
+      )
+      .catch(() => null); // absent unless the database uses AUTOINCREMENT
+    const seqRows = seq?.[0]?.values ?? [];
+    if (seqRows.length > 0) {
+      lines.push("DELETE FROM sqlite_sequence;");
+      for (const row of seqRows) {
+        lines.push(
+          `INSERT INTO sqlite_sequence (name, seq) VALUES ('${String(row[0]).replace(/'/g, "''")}', ${Number(row[1])});`,
+        );
+      }
+      lines.push("");
     }
 
     return lines.join("\n");
-  }, [engineRef]);
+  }, [engineRef, terminate]);
 
   /** Display label for the active database, e.g. "chinook.sqlite", the
    *  rename-aware filename shown in the DB selector. */
@@ -530,6 +561,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
             targetMode: "new",
             targetTable: tables[0] ?? "",
             colCompare: null,
+            columnTypes: inferCsvColumnTypes(headers, rows).map(sqliteAffinityFor),
           });
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
@@ -562,8 +594,14 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       });
       const tableIdent = `"${effectiveTable.replace(/"/g, '""')}"`;
       if (!isExisting) {
+        // Declared affinities come from the preview (inferred, overridable).
+        // Creating everything as TEXT made `WHERE qty > 5` compare strings and
+        // quietly return the wrong rows.
+        const types = state.columnTypes;
         await engine.exec(
-          `CREATE TABLE ${tableIdent} (${safeCols.map((c) => `${c} TEXT`).join(", ")})`,
+          `CREATE TABLE ${tableIdent} (${safeCols
+            .map((c, i) => `${c} ${sqliteColumnType(types?.[i])}`)
+            .join(", ")})`,
         );
       }
       await engine.exec("BEGIN");

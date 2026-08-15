@@ -10,10 +10,16 @@ import {
   loadSqlite3,
   openDatabase,
   type Database,
+  type PreparedStatement,
   type QueryExecResult,
   type SqlValue,
 } from "./sqlite-wasm";
-import { findSampleDatabase, type SqliteSampleDatabase, type SqliteSampleMetadata } from "./sqliteSamples";
+import {
+  findSampleDatabase,
+  SQLITE_SAMPLE_DATABASES,
+  type SqliteSampleDatabase,
+  type SqliteSampleMetadata,
+} from "./sqliteSamples";
 import { fetchDatasetBytes, fetchDatasetText } from "./remoteDatasets";
 
 export type { QueryExecResult } from "./sqlite-wasm";
@@ -23,6 +29,29 @@ export type { QueryExecResult } from "./sqlite-wasm";
 export type QueryExecResultWithTypes = QueryExecResult & {
   columnTypes?: string[];
 };
+
+/** Does `sql` name `identifier` as a word? Used to spot the triggers and
+ *  views that depend on a column a rebuild is about to drop. Deliberately
+ *  simple — it can over-match an identifier inside a string literal or a
+ *  comment, which errs toward refusing a rebuild rather than silently
+ *  producing a broken table. */
+export function referencesIdentifier(sql: string, identifier: string): boolean {
+  const escaped = identifier.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(^|[^\\w"'\`\\[])${escaped}($|[^\\w"'\`\\]])`, "i").test(
+    // Quoted forms (`"col"`, `[col]`, `` `col` ``) are unwrapped first so the
+    // word-boundary test sees the bare identifier.
+    sql.replace(/["`\[\]]/g, " "),
+  );
+}
+
+/** One multi-statement run: a result (or null) per statement, plus the rows
+ *  each one changed. */
+export interface SqliteRunDetail {
+  sets: (QueryExecResultWithTypes | null)[];
+  /** Rows affected per statement, aligned with `sets`; null for a statement
+   *  that changed nothing (a SELECT, or DDL). */
+  affectedRows: (number | null)[];
+}
 
 /** Column description derived from `PRAGMA table_info(...)`. */
 export interface TableColumnInfo {
@@ -99,6 +128,82 @@ export interface TableRebuildSpec {
   columns: ColumnSpec[];
 }
 
+/** Run every statement in `sql`, collecting a result (or null) and an
+ *  affected-row count per statement. Shared by `execAll` and
+ *  `execAllDetailed`.
+ *
+ *  Execution is deliberately non-transactional (psql behaves the same way),
+ *  which makes it important that a failure says *which* statement failed:
+ *  the statements before it have already been applied and the ones after it
+ *  never ran, and a bare engine message hides both facts. */
+function runStatements(db: Database, sql: string): SqliteRunDetail {
+  const sets: (QueryExecResultWithTypes | null)[] = [];
+  const affectedRows: (number | null)[] = [];
+  let index = 0;
+  const iterator = iterateStatements(db, sql);
+  for (;;) {
+    let next: IteratorResult<PreparedStatement>;
+    try {
+      next = iterator.next();
+    } catch (err) {
+      throw statementError(err, index, sets.length);
+    }
+    if (next.done) break;
+    const stmt = next.value;
+    index += 1;
+    try {
+      // sqlite-wasm 3.53.0-build1's `getColumnNames()` throws when
+      // `columnCount === 0`, so check columnCount first.
+      if (stmt.columnCount === 0) {
+        // Non-SELECT statement (INSERT, UPDATE, CREATE TABLE, …)
+        while (stmt.step()) {
+          // execute fully, discard any rows
+        }
+        sets.push(null);
+        // `changes()` counts the rows the *last* statement modified, so it is
+        // read here rather than once at the end. DDL reports 0, which is not
+        // worth showing, so it becomes null.
+        const changed = Number(db.changes());
+        affectedRows.push(changed > 0 ? changed : null);
+      } else {
+        const columns = stmt.getColumnNames();
+        // Resolve declared types so the UI shows real types even for
+        // zero-row results. `iteratedSql` is the slice of input that
+        // produced this statement.
+        const iteratedSql =
+          typeof (stmt as unknown as { getSQL?: () => string }).getSQL ===
+          "function"
+            ? (stmt as unknown as { getSQL: () => string }).getSQL()
+            : sql;
+        const columnTypes = resolveDeclaredColumnTypes(db, iteratedSql, columns);
+        const values: QueryExecResult["values"] = [];
+        while (stmt.step()) {
+          values.push(getRow(stmt) as QueryExecResult["values"][number]);
+        }
+        sets.push({ columns, columnTypes, values });
+        affectedRows.push(null);
+      }
+    } catch (err) {
+      throw statementError(err, index, sets.length);
+    } finally {
+      stmt.finalize();
+    }
+  }
+  return { sets, affectedRows };
+}
+
+/** Prefix an engine error with the failing statement's position, and say how
+ *  many statements before it were applied. Single-statement scripts are left
+ *  alone: there the prefix would be noise. */
+function statementError(err: unknown, index: number, applied: number): Error {
+  const message = err instanceof Error ? err.message : String(err);
+  if (index <= 1) return err instanceof Error ? err : new Error(message);
+  const ran = applied === 1 ? "1 statement" : `${applied} statements`;
+  return new Error(
+    `Statement ${index} failed: ${message}\n(${ran} before it already ran; the rest of the script did not.)`,
+  );
+}
+
 export interface SqliteEngine {
   /** Release resources. Implemented by the worker-backed engine (terminates
    *  the worker, closing its OPFS handles); the in-process engine has none. */
@@ -111,6 +216,11 @@ export interface SqliteEngine {
    *  statements (zero-row SELECTs keep column names), null for statements
    *  with no result set. */
   execAll: (sql: string) => Promise<(QueryExecResultWithTypes | null)[]>;
+  /** `execAll` plus each statement's affected-row count (null where the
+   *  statement changed nothing, e.g. a SELECT or DDL). A failure names the
+   *  statement that failed, since a multi-statement script is not atomic and
+   *  an anonymous error makes partial application easy to miss. */
+  execAllDetailed: (sql: string) => Promise<SqliteRunDetail>;
   listTables: () => Promise<string[]>;
   listViews: () => Promise<string[]>;
   /** User-defined indexes only; auto-indexes from PRIMARY KEY / UNIQUE
@@ -669,6 +779,27 @@ export async function createSqliteEngineInProcess(
 
   return {
     async loadSampleDatabase(id: string) {
+      // An id that names no sample belongs to an imported database (`__blank__`
+      // or a filename-derived id). `findSampleDatabase` would fall back to the
+      // *first* sample, which on boot relabelled a restored workspace with a
+      // database it does not contain. Adopt the blank identity instead and
+      // leave the persisted file untouched.
+      const known = SQLITE_SAMPLE_DATABASES.some((s) => s.id === id);
+      if (!known) {
+        active = {
+          id,
+          label: "Imported Database",
+          filename: "database.sqlite",
+          description: "Imported database",
+          schema: "",
+          seed: () => {},
+          defaultTabs: [{ title: "Query 1", code: "" }],
+        };
+        if (!db) db = openFresh();
+        db.exec("PRAGMA foreign_keys = ON;");
+        const { seed: _seed, ...meta } = active;
+        return meta;
+      }
       await build(findSampleDatabase(id));
       const { seed: _seed, ...meta } = active;
       return meta;
@@ -677,44 +808,10 @@ export async function createSqliteEngineInProcess(
       return execAll(require(), sql);
     },
     execAll(sql: string): (QueryExecResultWithTypes | null)[] {
-      const db = require();
-      const results: (QueryExecResultWithTypes | null)[] = [];
-      for (const stmt of iterateStatements(db, sql)) {
-        try {
-          // sqlite-wasm 3.53.0-build1's `getColumnNames()` throws when
-          // `columnCount === 0`, so check columnCount first.
-          if (stmt.columnCount === 0) {
-            // Non-SELECT statement (INSERT, UPDATE, CREATE TABLE, …)
-            while (stmt.step()) {
-              // execute fully, discard any rows
-            }
-            results.push(null);
-          } else {
-            const columns = stmt.getColumnNames();
-            // Resolve declared types so the UI shows real types even for
-            // zero-row results. `iteratedSql` is the slice of input that
-            // produced this statement.
-            const iteratedSql =
-              typeof (stmt as unknown as { getSQL?: () => string }).getSQL ===
-              "function"
-                ? (stmt as unknown as { getSQL: () => string }).getSQL()
-                : sql;
-            const columnTypes = resolveDeclaredColumnTypes(
-              db,
-              iteratedSql,
-              columns,
-            );
-            const values: QueryExecResult["values"] = [];
-            while (stmt.step()) {
-              values.push(getRow(stmt) as QueryExecResult["values"][number]);
-            }
-            results.push({ columns, columnTypes, values });
-          }
-        } finally {
-          stmt.finalize();
-        }
-      }
-      return results;
+      return runStatements(require(), sql).sets;
+    },
+    execAllDetailed(sql: string): SqliteRunDetail {
+      return runStatements(require(), sql);
     },
     listTables() {
       return listFromMaster("table");
@@ -1004,6 +1101,45 @@ export async function createSqliteEngineInProcess(
           }
         } finally {
           stmt.finalize();
+        }
+      }
+
+      // A dropped column that a trigger or view still names would make the
+      // rebuild succeed and leave the table un-insertable: the recreated
+      // trigger references a column that no longer exists, and every INSERT
+      // fails with "no such column" naming something invisible in the UI.
+      // Renames are safe (patchDdl rewrites them); drops cannot be, so they
+      // are refused with the dependency named. SQLite's own
+      // `ALTER TABLE … DROP COLUMN` does not catch this either.
+      {
+        const keptSources = new Set(
+          spec.columns.map((c) => (c.originalName ?? c.name).toLowerCase()),
+        );
+        const dropped = [...existing].filter(
+          (name) => !keptSources.has(name.toLowerCase()),
+        );
+        if (dropped.length > 0) {
+          const dependents: string[] = [];
+          const scan = (names: string[], sqls: string[], kind: string) => {
+            for (let i = 0; i < names.length; i++) {
+              const sql = sqls[i] ?? "";
+              // Only objects that mention this table are candidates, so an
+              // unrelated object with a same-named column is not flagged.
+              if (!referencesIdentifier(sql, spec.originalName)) continue;
+              const hit = dropped.find((col) => referencesIdentifier(sql, col));
+              if (hit) dependents.push(`${kind} "${names[i]}" (uses ${hit})`);
+            }
+          };
+          scan(triggerNames, triggerSqls, "trigger");
+          scan(viewNames, viewSqls, "view");
+          if (dependents.length > 0) {
+            throw new Error(
+              `Cannot drop ${dropped.length === 1 ? "column" : "columns"} ${dropped
+                .map((c) => `"${c}"`)
+                .join(", ")}: still referenced by ${dependents.join(", ")}. ` +
+                `Drop or rewrite the dependent object first.`,
+            );
+          }
         }
       }
 
