@@ -276,6 +276,14 @@ if (!isMainThread) {
       ...SECTIONS.flatMap(({ dir }) => walk(dir).map((rel) => join(dir, rel))),
     ],
     outputs: [OUT_FILE],
+    // The one generator that keeps its stamp AND its output in `.next/cache`,
+    // which Workers Builds restores. It is 18.6 s of the generator chain's 38 s
+    // on the runner — remark over ~889 lessons — and until now that ran cold on
+    // every single deploy, because the local manifests live under
+    // `node_modules/.cache` and `npm ci` wipes them. Safe to opt in here
+    // because `outputs` names the ONLY file this produces; see the note on the
+    // persisted store in scripts/lib/build-cache.mjs.
+    persist: true,
   });
   if (cache.fresh) {
     console.log("[search-corpus] up to date (no lesson changed), skipping");

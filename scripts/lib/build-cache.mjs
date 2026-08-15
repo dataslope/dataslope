@@ -12,10 +12,12 @@
 // wipes them and the first run after an install regenerates.
 import { createHash } from "node:crypto";
 import {
+  copyFileSync,
   existsSync,
   mkdirSync,
   readFileSync,
   readdirSync,
+  rmSync,
   statSync,
   writeFileSync,
 } from "node:fs";
@@ -94,14 +96,61 @@ export function statSignature(root, files) {
   return statScan(root, files).sig;
 }
 
-function manifestPath(root, name) {
-  return join(root, "node_modules", ".cache", "dataslope-build", `${name}.json`);
+// ── The persisted store (`persist: true`) ───────────────────────────────────
+//
+// Everything above is a LOCAL optimisation: the manifests live under
+// `node_modules/.cache/`, which `npm ci` wipes and which Workers Builds does
+// not restore, so no deploy has ever hit one of these gates. The chain runs
+// cold, in full, on every production and preview build.
+//
+// `.next/cache` IS restored (and re-uploaded) by Workers Builds, and survives
+// `next build` — Next cleans `.next` with an exclude of `^(cache|dev|lock|
+// trace)`. So a generator that opts in keeps its manifest *and a copy of its
+// outputs* there, and a build whose inputs are unchanged restores the outputs
+// instead of regenerating them.
+//
+// Two things make that safe rather than merely fast:
+//
+//   1. **Restored outputs are hash-verified** against the manifest before they
+//      are trusted. This repo has already shipped one incident caused by a
+//      corrupt Workers Builds cache restore (see scripts/check-prefetch-hints.mjs),
+//      and the whole point of putting generated *content* in that cache is that
+//      a bad restore must degrade to "regenerate", never to "ship wrong bytes".
+//   2. **`package-lock.json` is folded into the salt.** In the local scheme,
+//      `npm ci` wiping the manifests is what invalidated a generator after a
+//      dependency bump — a generator's inputs list its own source and its data,
+//      not the version of the library that renders them. Persisting across
+//      installs removes that implicit invalidation, so it is made explicit here.
+//
+// Opt-in per generator, because it is only safe when `outputs` names EVERY
+// file the generator produces. build-course-md, for instance, declares one
+// representative of 834 files; restoring that one and declaring success would
+// leave the other 833 missing.
+const STORE_DIR = (root) => join(root, ".next", "cache", "dataslope-build");
+
+function manifestPath(root, name, persist = false) {
+  return persist
+    ? join(STORE_DIR(root), `${name}.json`)
+    : join(root, "node_modules", ".cache", "dataslope-build", `${name}.json`);
 }
 
-/** The stored manifest for `name`, or null when absent/unreadable. */
-export function readManifest(root, name) {
+/** Where a persisted generator's copy of `output` lives, mirroring its
+ *  repo-relative path so two generators cannot collide. */
+const storedOutputPath = (root, name, output) =>
+  join(STORE_DIR(root), name, relative(root, output));
+
+const sha256File = (file) => {
   try {
-    return JSON.parse(readFileSync(manifestPath(root, name), "utf8"));
+    return createHash("sha256").update(readFileSync(file)).digest("hex");
+  } catch {
+    return null;
+  }
+};
+
+/** The stored manifest for `name`, or null when absent/unreadable. */
+export function readManifest(root, name, persist = false) {
+  try {
+    return JSON.parse(readFileSync(manifestPath(root, name, persist), "utf8"));
   } catch {
     return null;
   }
@@ -110,8 +159,8 @@ export function readManifest(root, name) {
 /** Replace `name`'s manifest. `freshness().commit` is the usual way in; this
  *  raw pair is for a generator that keeps its own per-file table rather than
  *  one signature over everything (build-images). */
-export function writeManifest(root, name, data) {
-  const p = manifestPath(root, name);
+export function writeManifest(root, name, data, persist = false) {
+  const p = manifestPath(root, name, persist);
   mkdirSync(dirname(p), { recursive: true });
   writeFileSync(p, JSON.stringify(data));
 }
@@ -138,25 +187,70 @@ export function writeManifest(root, name, data) {
  *   commit: (extra?: Record<string, any>, finalInputs?: string[]) => void,
  * }}
  */
-export function freshness(root, name, { inputs, outputs = [], salt = "" }) {
-  const stored = readManifest(root, name);
-  const season = (sig) => createHash("sha256").update(salt).update("\0").update(sig).digest("hex");
+export function freshness(root, name, { inputs, outputs = [], salt = "", persist = false }) {
+  const stored = readManifest(root, name, persist);
+  // A persisted stamp outlives `npm ci`, which is what used to invalidate a
+  // generator after a dependency bump. Fold the lockfile in so that stays true.
+  const effectiveSalt = persist
+    ? `${salt}\0${sha256File(join(root, "package-lock.json")) ?? "no-lockfile"}`
+    : salt;
+  const season = (sig) =>
+    createHash("sha256").update(effectiveSalt).update("\0").update(sig).digest("hex");
   const all = [SELF, ...inputs];
   const scan = statScan(root, all);
   const statSig = season(scan.sig);
 
   const commit = (extra = {}, finalInputs = inputs) => {
     const list = [SELF, ...finalInputs];
-    writeManifest(root, name, {
-      ...extra,
-      statSig: season(statScan(root, list).sig),
-      inputsHash: season(hashInputs(root, list)),
-      stampedAt: Date.now(),
-    });
+    const outputHashes = {};
+    if (persist) {
+      for (const output of outputs) {
+        const dest = storedOutputPath(root, name, output);
+        mkdirSync(dirname(dest), { recursive: true });
+        copyFileSync(output, dest);
+        outputHashes[relative(root, output)] = sha256File(output);
+      }
+    }
+    writeManifest(
+      root,
+      name,
+      {
+        ...extra,
+        ...(persist ? { outputHashes } : {}),
+        statSig: season(statScan(root, list).sig),
+        inputsHash: season(hashInputs(root, list)),
+        stampedAt: Date.now(),
+      },
+      persist,
+    );
   };
 
-  if (!stored || !outputs.every((o) => existsSync(o))) {
-    return { fresh: false, stored, commit };
+  if (!stored) return { fresh: false, stored, commit };
+
+  // Outputs missing from the working tree are fatal locally, but on CI they are
+  // the normal case: the clone has none of them (they are gitignored) while the
+  // restored `.next/cache` does. Put them back — and only trust them if their
+  // bytes still hash to what the manifest recorded, so a corrupt cache restore
+  // regenerates rather than shipping wrong content.
+  for (const output of outputs) {
+    if (existsSync(output)) continue;
+    if (!persist) return { fresh: false, stored, commit };
+
+    const from = storedOutputPath(root, name, output);
+    const want = stored.outputHashes?.[relative(root, output)];
+    if (!want || !existsSync(from)) return { fresh: false, stored, commit };
+    try {
+      mkdirSync(dirname(output), { recursive: true });
+      copyFileSync(from, output);
+    } catch {
+      return { fresh: false, stored, commit };
+    }
+    if (sha256File(output) !== want) {
+      // Corrupt or truncated restore. Remove the bad copy so nothing
+      // downstream reads it, and regenerate.
+      rmSync(output, { force: true });
+      return { fresh: false, stored, commit };
+    }
   }
   // Tier 1, with git's racy-index rule: trust the stat signature only when
   // the stamp was taken strictly after the newest input was written — within

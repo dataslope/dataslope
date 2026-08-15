@@ -2,14 +2,14 @@
 
 **Date:** 2026-08-14
 **Project:** DataSlope (`dataslope/dataslope`)
-**Branch:** `claude/build-process-audit-9duox3` → PR **#665** (10 commits ahead of `main`)
-**State at:** `92122ef7`
+**Branch:** `claude/build-process-audit-9duox3` → PR **#665**, **merged 2026-08-15** as `8135ed0f`
+**State at:** `8135ed0f` on `main`
 **Trigger:** the full deploy pipeline (init → clone → install → build → deploy) took ~12–13 minutes.
 **Investigation record:** [`20260814-0930-build-process-audit.md`](20260814-0930-build-process-audit.md) — every number below is derived there.
 
-> **You are the operator.** PR #665 is written, tested and pushed but **not merged**.
-> Four of the changes do nothing until you edit the Cloudflare dashboard, and **one of those
-> edits is order-dependent** — see [Merge runbook](#merge-runbook). Do that section in order.
+> **You are the operator.** PR #665 is **merged and live**. Steps 1–3 of the runbook are done and
+> verified in production (see [Where this stands](#where-this-stands)). What remains is **step 4**,
+> the one order-dependent dashboard edit, which is now safe to make.
 
 ---
 
@@ -18,9 +18,9 @@
 | | |
 | --- | --- |
 | **Shipped in the branch** | corpus build −10 s · install −37 % · R2 upload 2.340 GiB → 0.135 GiB · a typecheck/lint/test gate that did not exist |
-| **Needs you** | 4 dashboard fields + branch protection, in the order below |
+| **Needs you** | 4 Cloudflare dashboard fields, in the order below. No GitHub config required. |
 | **One landmine** | add `compress-cache` to the **build command only after** the Worker is deployed |
-| **Still open** | generator cache (~35 s), `ignoreBuildErrors` (17 s), and one stage nobody has a baseline for |
+| **Still open** | nothing material — see [Where the remaining time goes](#where-the-remaining-time-goes) |
 
 The headline finding is that **there was never one build time.** A commit touching one CSS file
 built in 7 m 09 s; the same commit rebuilt after a cache miss took 10 m 33 s then 7 m 30 s. ~7
@@ -29,9 +29,31 @@ cached. Work aimed at the floor pays back on every build — that is what this b
 
 ---
 
-## Current state
+## Where this stands
 
-10 commits, none merged, CI green (`checks` passed on its first run at 2 m 37 s).
+Merged as `8135ed0f` and **verified live on 2026-08-15**:
+
+| Check | Result |
+| --- | --- |
+| `main` carries the reader, `compress-cache`, `edgeExternals`, reclassified `package.json` | ✅ |
+| `export const NAME = R2_CACHE_NAME` (the populate fix) | ✅ |
+| Production is serving the merge commit | ✅ `/api/cache-build-id` → `8135ed0f919b…` |
+| **The populate ran** | ✅ `/`, `/courses`, `/courses/*` lessons, `/interview-prep` all 200 |
+
+That last row is the one that mattered: a `/courses/*` page can only return 200 if the incremental
+cache was populated, because an empty cache means a re-render and a re-render touches `node:fs` in
+workerd. The `51400985` bug is fixed in production, not just locally.
+
+The live Worker is currently reading **uncompressed** entries through the raw-JSON fallback, since
+the build command has not been changed yet. That is the fallback doing its job, and incidental
+proof that path works.
+
+**Still to do: step 4 only** — add `&& node scripts/compress-cache.mjs` to the build command. The
+merged code is on `main`, so it is safe now.
+
+### The 10 commits, as squashed
+
+CI green (`checks` passed on its first run at 2 m 37 s).
 
 | Commit | What |
 | --- | --- |
@@ -59,17 +81,42 @@ decode back to valid JSON.
 Nothing below works before this. The Worker must be *deployed* with the brotli reader before the
 build command starts producing brotli bytes.
 
-### 2. Make `checks` required — Settings → Branches → branch protection
+### 2. Branch ruleset on `main` — **optional, and unrelated to the build**
 
-It is the gate that makes step 5 defensible, and there was **no typecheck, lint or test workflow in
-this repo before this branch**; the deploy build was the only thing checking the app.
+Nothing in this branch needs one. It is listed here only because an earlier draft of this runbook
+asked for one, and the reason it did has since been retired: a ruleset was only ever the
+prerequisite for `ignoreBuildErrors` (step 5), which is no longer recommended. Every measured
+saving in this branch is independent of branch protection. **Skipping this step costs nothing.**
+
+If you want it anyway, it is generic repo safety rather than build tooling: Settings → Rules →
+Rulesets → New branch ruleset, target the default branch, enforcement **Active**, tick **Restrict
+deletions** and **Block force pushes**. Those are policies rather than checks, and the bot workflows
+below do ordinary pushes, so nothing conflicts. Leave **Require status checks to pass** OFF, and
+leave **Require a pull request before merging** off too.
+
+**Why not require the check, even though this branch adds the repo's only one.** That rule gates *ref
+updates*, not merges — GitHub's own wording is "commits must first be pushed to another ref where
+the checks pass". Four workflows push generated content straight to `main` with `GITHUB_TOKEN`
+(`block-outputs`, `react-bundles`, `refresh-created-at`, `optimize-images`), and none of their
+commits can satisfy that. They would retry three times and `exit 1`.
+
+There is no clean bypass either: **GitHub Actions is not an installable App**, so it does not appear
+in the ruleset bypass list at all. The only entries that would cover those pushes are the `Write`
+role — which also exempts every human, making the gate meaningless — or switching the four
+workflows to push via a **deploy key**, which *is* bypassable.
+
+So the gate is deliberately soft: `checks.yml` runs on every PR and every push to `main` and reports
+in ~2 m 37 s, but does not block the merge button. It has already earned its place by catching a
+lint error sitting on `main` that nothing else was looking for (Next 16 runs no ESLint during
+`next build`). Blocking the merge button is the last 10% of the value and it costs four working
+workflows.
 
 ### 3. Dashboard — Workers → `dataslope` → Settings → Build
 
 | Field | Value |
 | --- | --- |
 | Deploy command | `npx opennextjs-cloudflare deploy --cacheChunkSize 100 && npm run db:seed:search:remote` |
-| Non-production branch deploy command | `npx opennextjs-cloudflare upload --cacheChunkSize 100` |
+| Version command *(labelled thus in the dashboard; it is the non-production branch deploy)* | `npx opennextjs-cloudflare upload --cacheChunkSize 100` |
 | Build variable | `NPM_CONFIG_OMIT` = `dev` |
 
 All three are safe in any order and independently revertible.
@@ -85,14 +132,31 @@ All three are safe in any order and independently revertible.
 - Worker deployed, build command *not* updated → **safe.** Entries stay uncompressed and the
   reader's raw-JSON fallback serves them. The cache is merely as large as it used to be. This
   fallback exists precisely so this step cannot be got wrong in this direction.
-- Build command updated, Worker *not* deployed → **breaks.** Compressed bytes, no decoder, every
-  page a 500.
+- Build command updated while `main` lacks the reader → **breaks.** Compressed bytes, no decoder,
+  every page a 500.
 
-### 5. Later, deliberately — `ignoreBuildErrors`
+**Why build-ID scoping makes this narrower than it looks.** Keys are
+`incremental-cache/<buildId>/…` and the build ID is the deployed commit SHA (`generateBuildId` in
+next.config.ts), so a Worker only ever reads the prefix its own build wrote. The live Worker cannot
+meet a newer build's objects, which means there is no bad window during a deploy and no need to
+stagger these carefully — the rule is simply *not before the merged code is on `main`*. Waiting for
+one deploy to land first, as this step says, is belt-and-braces rather than load-bearing.
 
-Once `checks` is genuinely required, `typescript: { ignoreBuildErrors: true }` in `next.config.ts`
-takes **17 s** off every build. Not before: a type error would otherwise reach `main` with a green
-deploy and nothing to say so.
+**The same rule in reverse, for rollback.** If the Worker code is ever reverted, revert the build
+command first or in the same step. A reverted Worker builds a fresh prefix, the build command
+compresses it, and the old reader cannot decode its own cache — the same failure from the other
+direction.
+
+### 5. `ignoreBuildErrors` — **not recommended**, see step 2
+
+`typescript: { ignoreBuildErrors: true }` takes **17 s** off every build, and the plan was to take
+it once `checks` was required. Step 2 explains why requiring `checks` costs four working workflows
+or a deploy-key migration.
+
+17 s on a ~10-minute build is ~2.6%. It is not worth buying a soft gate's worth of safety with that,
+so TypeScript stays in `next build`, where it already blocks a bad deploy. Revisit only if the four
+generated-content workflows move to deploy-key pushes for some other reason — at which point
+requiring `checks` becomes free and this follows from it.
 
 ---
 
@@ -165,9 +229,11 @@ per tab. Putting more build state into that same restored cache widens that surf
 the manifest must also record a content hash of each *output* and verify it on restore, so a corrupt
 restore regenerates instead of being trusted. That is the design work; the move itself is trivial.
 
-### 2. `ignoreBuildErrors` — 17 s
+### 2. `ignoreBuildErrors` — 17 s, and probably not worth it
 
-Step 5 of the runbook. Blocked only on branch protection.
+Step 5 of the runbook, which now argues against it: requiring `checks` costs four working workflows
+or a deploy-key migration, and 17 s is ~2.6% of the build. Recorded as measured rather than as
+recommended.
 
 ### 3. Measure the deploy stage — do this before anything else on this list
 
@@ -231,3 +297,35 @@ npm ci --omit=dev         # 62 s here — what Workers Builds will do
 # real CI durations: pair the 🏗️/✅ comment timestamps on any recent PR,
 # or read a build log top to bottom — the per-stage lines are all in it.
 ```
+
+
+---
+
+## Where the remaining time goes
+
+Final accounting, from preview build `be267174` (9 m 42 s) with the two shipped-but-not-yet-landed
+savings applied. Both open items from earlier drafts are closed: the generator cache is shipped
+(§5.11 of the audit), and the deploy stage now has its baseline.
+
+| Stage | Time | Anything left? |
+| --- | ---: | --- |
+| clone | 40 s | repo carries 558 MB of committed images — structural, not a build fix |
+| `npm ci` | 1 m 53 s | trimmed as far as it goes; `webr`, `parquet-wasm`, `almostnode` are real imports |
+| generators | 38.7 s | **−19 s on the next build**, when the corpus store is warm |
+| compile + TypeScript | 20 s | warm; nothing there |
+| **prerender 1,082 pages** | **103 s** | 3 workers on a 4-core runner, content-proportional |
+| finalizing page optimization | 25 s | Next internal |
+| `check-prefetch-hints` | 9 s | threadable to ~6 s; not worth the moving parts |
+| **bundling cache assets** | **63 s** | OpenNext merges ~8,514 files into 1,081 `.cache` objects, single-threaded — upstream only |
+| server bundle | 18 s | no |
+| deploy | 1 m 36 s | **→ ~69 s** once the build command compresses |
+| build-cache upload | 18 s | no |
+
+**Expected steady state: ~9 m 10 s**, from ~12–13 min. The two largest remaining blocks — prerender
+and the cache-asset merge — are **166 s together**, and neither is this repo's to fix.
+
+The one item left with a number on it is giving `build-charts` the same `persist: true` treatment as
+the corpus: **~9 s**. It is fiddlier than the corpus was, because it uses its own digest gate rather
+than `freshness()` and writes 385 files (`charts.js`, `chart-slugs.js`, and 383 SVGs under
+`public/chart-svgs/`), every one of which must be declared for a restore to be sound. Worth doing
+only if something else takes you into that file.

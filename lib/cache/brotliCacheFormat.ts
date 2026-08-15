@@ -24,7 +24,12 @@ export function hasBrotliCacheMagic(bytes: Uint8Array): boolean {
   return true;
 }
 
-/** 5, not the library default of 11: measured ~17x at a fraction of q11's
- *  compression time, which is paid on every build. Decompression cost is
- *  independent of write quality, so the read path doesn't care. */
-export const BROTLI_CACHE_QUALITY = 5;
+/** 4, not the library default of 11, and not the 5 this shipped with.
+ *  Compression time is paid on every build — 38.9 s on the Workers Builds
+ *  runner at q5, against a populate that then finishes in 15 s. Benchmarked
+ *  over 121 real entries: q4 is 16.4x at ~43% less CPU than q5's 17.9x, and
+ *  the difference in what actually uploads is 0.143 GiB vs 0.135 GiB. Below
+ *  q4 the ratio falls off a cliff (q3 is 12.2x) for no further time saving.
+ *  Decompression cost is independent of write quality, so the read path is
+ *  unaffected and old entries stay readable. */
+export const BROTLI_CACHE_QUALITY = 4;
