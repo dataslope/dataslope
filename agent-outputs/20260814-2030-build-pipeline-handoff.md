@@ -20,7 +20,7 @@
 | **Shipped in the branch** | corpus build −10 s · install −37 % · R2 upload 2.340 GiB → 0.135 GiB · a typecheck/lint/test gate that did not exist |
 | **Needs you** | 4 Cloudflare dashboard fields, in the order below. No GitHub config required. |
 | **One landmine** | add `compress-cache` to the **build command only after** the Worker is deployed |
-| **Still open** | generator cache (~35 s), and one stage nobody has a baseline for |
+| **Still open** | nothing material — see [Where the remaining time goes](#where-the-remaining-time-goes) |
 
 The headline finding is that **there was never one build time.** A commit touching one CSS file
 built in 7 m 09 s; the same commit rebuilt after a cache miss took 10 m 33 s then 7 m 30 s. ~7
@@ -297,3 +297,35 @@ npm ci --omit=dev         # 62 s here — what Workers Builds will do
 # real CI durations: pair the 🏗️/✅ comment timestamps on any recent PR,
 # or read a build log top to bottom — the per-stage lines are all in it.
 ```
+
+
+---
+
+## Where the remaining time goes
+
+Final accounting, from preview build `be267174` (9 m 42 s) with the two shipped-but-not-yet-landed
+savings applied. Both open items from earlier drafts are closed: the generator cache is shipped
+(§5.11 of the audit), and the deploy stage now has its baseline.
+
+| Stage | Time | Anything left? |
+| --- | ---: | --- |
+| clone | 40 s | repo carries 558 MB of committed images — structural, not a build fix |
+| `npm ci` | 1 m 53 s | trimmed as far as it goes; `webr`, `parquet-wasm`, `almostnode` are real imports |
+| generators | 38.7 s | **−19 s on the next build**, when the corpus store is warm |
+| compile + TypeScript | 20 s | warm; nothing there |
+| **prerender 1,082 pages** | **103 s** | 3 workers on a 4-core runner, content-proportional |
+| finalizing page optimization | 25 s | Next internal |
+| `check-prefetch-hints` | 9 s | threadable to ~6 s; not worth the moving parts |
+| **bundling cache assets** | **63 s** | OpenNext merges ~8,514 files into 1,081 `.cache` objects, single-threaded — upstream only |
+| server bundle | 18 s | no |
+| deploy | 1 m 36 s | **→ ~69 s** once the build command compresses |
+| build-cache upload | 18 s | no |
+
+**Expected steady state: ~9 m 10 s**, from ~12–13 min. The two largest remaining blocks — prerender
+and the cache-asset merge — are **166 s together**, and neither is this repo's to fix.
+
+The one item left with a number on it is giving `build-charts` the same `persist: true` treatment as
+the corpus: **~9 s**. It is fiddlier than the corpus was, because it uses its own digest gate rather
+than `freshness()` and writes 385 files (`charts.js`, `chart-slugs.js`, and 383 SVGs under
+`public/chart-svgs/`), every one of which must be declared for a restore to be sound. Worth doing
+only if something else takes you into that file.
