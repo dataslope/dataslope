@@ -3,11 +3,12 @@
 **Date:** 2026-08-15
 **Status:** Design addendum, no code written yet
 **Amends:** `agent-outputs/20260813-1424-git-playground-design.md`
-**Scope:** Three proposed changes to the Git playground design — (a) replacing
+**Scope:** Four proposed changes to the Git playground design — (a) replacing
 terminal-only input with a GUI, with the terminal reduced to a command
 display, (b) letting the learner switch between two or more users so they
-can cause conflicts rather than inherit them, and (c) how the terminal handles
-the UNIX commands a Git curriculum interleaves with `git` itself.
+can cause conflicts rather than inherit them, (c) how the terminal handles
+the UNIX commands a Git curriculum interleaves with `git` itself, and (d)
+dropping persistence entirely in favour of an in-memory filesystem.
 
 ---
 
@@ -26,6 +27,9 @@ the UNIX commands a Git curriculum interleaves with `git` itself.
 | Hand-rolled ~12-command subset | **Fallback only.** Superseded by the spike result (§4.8). |
 | Worker-bundle impact | **None.** It ships as a `public/_workers/` static asset, served by `ASSETS` before the Worker (§4.3). Cost is 431 KiB gz of learner download. |
 | WebContainers / v86 / `almostnode` | **No.** COOP/COEP conflict; VM weight; almostnode is ~16 MB (§4.8). |
+| **Memory-only — no OPFS, no cloud** | **Adopted.** Git's filesystem is derived state, not authored code (§5.1). Deletes §7.1, §7.2 and §7.3.2 of the original. |
+| Share links | **Kept, in better form.** Share the command history, not the filesystem — a URL, not an R2 object (§5.4). |
+| `sessionStorage` for command history | **Open.** Buys refresh recovery for a few KB of strings; declinable independently of the filesystem decision (§5.5). |
 
 The single most valuable line in this addendum is §3.3: the collaboration
 half of Git is unreachable with one repository, and it is the half where
@@ -33,7 +37,8 @@ learners fail in the workplace. The best *cheap* idea is §4.2 — with `cat` in
 the terminal, `.git/HEAD` turns the pointer chain from a diagram into a file,
 now verified working. The largest strategic consequence is §4.5: the same
 runtime supports a command-line course, a gap in the current ~30-course
-catalogue.
+catalogue. The largest *simplification* is §5: memory-only removes the
+design's biggest unproven assumption by deleting it rather than testing it.
 
 ---
 
@@ -494,14 +499,131 @@ cannot drift from what the runtime actually accepts.
 
 ---
 
-## 5. Revised phasing
+## 5. Memory-only: no OPFS, no cloud
+
+**Adopted.** The Git playground runs entirely in `InMemoryFs`. §7.1 (OPFS
+shim) and §7.2 (R2 + D1 bundles) of the original design do not apply to it.
+
+### 5.1 Why Git is different from the other playgrounds
+
+The other playgrounds persist because **the artifact is authored code**. A
+Python script or a SQL query exists nowhere else; the learner wrote it, and
+losing it is losing their writing.
+
+A Git playground's filesystem is **derived state** — a scenario fixture plus
+the sequence of commands run against it:
+
+```
+repo = f(scenario_id, [command, command, …])
+```
+
+The commands are the work product. The filesystem is a projection of them.
+Persisting the projection rather than the source is backwards, and it is what
+forced every expensive part of §7 — the OPFS shim, the tar-in-bundle format,
+and its untrusted-input hardening.
+
+### 5.2 What this deletes
+
+| Original | Status |
+| --- | --- |
+| §7.1 OPFS `fs` shim | **Deleted.** With it, the async-concurrency risk, the PGlite-style exclusive-lock hazard (`activeWorkspace.ts:386`), and the `copyConflictedWorkspace` class of workaround. |
+| §7.2 `BundleKind: "git"`, tar of the FS | **Deleted.** |
+| §7.3.2 tar entry-count / per-entry-size caps | **Deleted** — and with it a *new untrusted binary format* the original correctly flagged as a hostile-share DoS surface. |
+| Addendum open question 5 (OPFS concurrency) | **Resolved by deletion**, not investigation. |
+
+It also removes the design's single largest unproven assumption at the point
+where it was cheapest to remove.
+
+### 5.3 It is a product argument, not only an engineering one
+
+§3.1 of the original states "the refresh loop is the product": after every
+command, re-read repo state and re-render both panels. `git status` on a
+teaching repo walks every entry under `.git/objects/`; in memory that is
+instant, while over OPFS it is hundreds of async directory-handle walks
+between the learner's Enter and the dot moving from Working Tree to Index.
+
+The animation in §4.1 — the thing the original calls its highest-value
+component — is only convincing if it is immediate. Memory-only is what makes
+it so.
+
+The same applies to §6.3's "step back one command" time travel: a structured
+clone of an in-memory tree per command, rather than tar bytes written to
+OPFS. The reset tiers collapse to `new InMemoryFs()` plus a re-seed.
+
+### 5.4 Share links survive — share the history, not the filesystem
+
+The one genuine loss is §7.2's share feature, which it rightly called "a
+great course feature: a stuck learner shares a link reproducing their exact
+broken repo."
+
+Keep it by sharing the **command history** instead of the filesystem:
+
+```
+/playground/git?scenario=conflict-pending&h=<compressed command list>
+```
+
+Replayed on load. This is strictly better than the bundle it replaces —
+smaller, inspectable in the address bar, no R2 object, no D1 row, and no
+untrusted binary format to harden. It also subsumes the `[↗] Open in
+playground` handoff from `<GitBlock>` (§5.2 of the original): hand over the
+block's command list, which the block already has.
+
+Two requirements this creates, both worth building in deliberately:
+
+1. **Replay must be deterministic.** Fix the author identity and seed commit
+   timestamps (isomorphic-git accepts `author.timestamp` /
+   `author.timezoneOffset`) so object SHAs reproduce exactly. **Bonus:**
+   deterministic SHAs mean lesson prose can reference `a1b2c3d` and have it
+   match what the learner actually sees — impossible with wall-clock commits.
+2. **File edits must enter the history.** §3.2 exempts the CodeMirror editor
+   from the terminal-only rule, so editor saves happen outside the command
+   stream and would otherwise be lost on replay. Serialize each save as a
+   heredoc — `cat > README.md <<'EOF' … EOF` — which §4.4 verified the shell
+   supports. The history stays a single readable command list rather than a
+   command list plus a side-channel of file blobs.
+
+### 5.5 The accepted risk
+
+**Refresh, crash, or tab eviction loses the session.** Mobile Safari discards
+background tabs aggressively, so this is not a rare event.
+
+Mitigation, if wanted: persist only the **command history** — a few KB of
+strings, not a filesystem — to `sessionStorage`, and offer "restore your
+session?" on reload. This is a different decision from the filesystem one and
+can be declined independently; the filesystem stays memory-only either way.
+
+Deliberately *not* mitigated: cross-device resume. Course progress is tracked
+separately, and a playground session is exploration rather than coursework.
+
+### 5.6 The registry gotcha survives, in a smaller form
+
+`__tests__/workspacesCloud.test.ts:83` asserts that every
+`app/playground/<id>` route with a `page.tsx` satisfies `isKnownPlayground`.
+Its comment records the reason: *"a route missing from the lists ships with
+broken sharing (this is exactly how the web playground regressed)."*
+
+The test models two categories, code and SQL, and treats absence as a bug.
+A **deliberately ephemeral** playground is a third category it does not
+model, so `app/playground/git/page.tsx` fails this test on arrival even
+though nothing is wrong.
+
+Register it explicitly rather than leaving it out — an `EPHEMERAL_PLAYGROUND_IDS`
+list that `isKnownPlayground` consults, with `bundleKindForPlayground`
+rejecting those ids outright. Then the save/share endpoints refuse git for a
+stated reason instead of by omission, and the intent is recorded where the
+next person will look. §7.3.1 of the original anticipated four edits to this
+file for a persisted git playground; this is a smaller version of the same
+change, not an escape from it.
+---
+
+## 6. Revised phasing
 
 | Phase | Contents | Change from original |
 | --- | --- | --- |
-| 0 | ~~`just-bash` spike~~ — **done 2026-08-15, §4.** Adopted. Remaining prerequisite: the OPFS `IFileSystem` concurrency check (§6 Q6). | Spike complete |
+| 0 | ~~`just-bash` spike~~ — **done 2026-08-15, §4.** Adopted. ~~OPFS concurrency check~~ — **moot under §5.** No blocking prerequisites remain. | Spike complete; OPFS risk deleted |
 | 1 | `git-worker.js` (just-bash + isomorphic-git, node-builtins stubbed) + `git` as a custom command + console + three-areas panel. **Composed-command palette + drag-to-stage from day one. Generated command list + redirect messages (§4.7).** Single machine. | Palette promoted from carve-out; shell is now a dependency, not a build |
 | 2 | Commit graph, pointer chain, scenarios, reset tiers, OPFS persistence. **Assistance dial, `git cat-file -p`, CI check that lesson commands exist in `getCommandNames()` (§4.6.4).** | Dial and lesson-command linting added |
-| 3 | Cloud save/share (`BundleKind: "git"`), `[↗]` handoff. | Unchanged |
+| 3 | **Command-history share links + `[↗]` handoff (§5.4)**, deterministic replay, editor saves serialized as heredocs. | Replaces the cloud-bundle phase entirely — no R2, no D1, no tar |
 | 4 | **Multi-machine + `origin`, three-lane graph, machine-aware `GitExpect`.** Then `<GitBlock>`, `<GitChallengeCard>` + live checklist. | Multi-machine added ahead of cards, so card grading is machine-aware from its first release |
 | 5 | Object inspector, conflict merge view, `rebase` on plumbing. | Unchanged |
 
@@ -510,7 +632,7 @@ Data-model shaping for phase 4 (§3.6) happens in phase 2, when scenarios and
 
 ---
 
-## 6. Open questions
+## 7. Open questions
 
 1. **Does the composed command auto-run at Guided level?** Arguments both
    ways: auto-run is smoother on mobile; manual Enter is the repetition that
@@ -529,10 +651,10 @@ Data-model shaping for phase 4 (§3.6) happens in phase 2, when scenarios and
    who has graduated to Bare should not be dropped back to Guided by the next
    lesson's default. Suggest: surface sets the *initial* level, learner
    override persists.
-5. **OPFS-backed `IFileSystem` under async concurrency** — now the top
-   unknown. The original §9.2 flagged it for isomorphic-git alone; with
-   `just-bash` driving the same backend the question is sharper. Everything
-   else about the shell is settled; this is not. Spike before phase 1.
+5. ~~**OPFS-backed `IFileSystem` under async concurrency.**~~ **Closed by
+   §5** — there is no OPFS backend. Recorded here because it was the top
+   risk in the previous revision and its removal, not its resolution, is
+   what changed.
 6. **Flag coverage per command.** `getCommandNames()` proves a command
    exists, not that `ls -lh` or `sort -rn` parse. Worth enumerating the flags
    the curriculum actually uses and testing them in one pass (§4.6.4).
@@ -540,7 +662,14 @@ Data-model shaping for phase 4 (§3.6) happens in phase 2, when scenarios and
    lands, each machine has its own working directory. A shared `cwd` across a
    machine switch would be confusing; a per-machine `cwd` is one more field on
    the machine record. Recommend per-machine.
-8. **Conflict authoring.** For a scenario to *reliably* produce a conflict,
+8. **Does the command history persist to `sessionStorage`?** (§5.5) The
+   filesystem decision is settled; this one is not, and can go either way
+   without affecting anything else.
+9. **How large can a shared history URL get before it needs shortening?** A
+   40-command session compresses to a few hundred bytes, but a long
+   exploration plus heredoc'd file contents could exceed practical URL
+   limits. Decide the fallback (truncate, or a short-link row) in phase 3.
+10. **Conflict authoring.** For a scenario to *reliably* produce a conflict,
    the fixture needs both machines pointed at the same lines. Worth a helper
    in the scenario format rather than leaving it to per-lesson hand-authoring.
 
