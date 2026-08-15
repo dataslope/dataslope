@@ -666,3 +666,53 @@ uncompressed populate at `--cacheChunkSize 100` to compare against, so the hones
 compression's effect on deploy *duration* is unmeasured. Its effect on **storage** is not in doubt:
 2.34 GiB → 0.147 GiB per retained build, against a bucket that holds production plus up to ten
 branch previews.
+
+
+---
+
+## 5.11 The open question, answered by a build that forgot the compress step
+
+§5.10 recorded that compression's effect on deploy *duration* was unmeasured: there had never been
+an uncompressed populate at `--cacheChunkSize 100` to compare against, and 1,081 objects in 15 s
+looked like per-request overhead dominating.
+
+Preview build `be267174` (2026-08-15 02:33) supplied it by accident. Its build command was still
+`npx opennextjs-cloudflare build` — step 4 of the runbook had not been applied — so nothing
+compressed and the populate shipped the full 2.34 GiB **at chunk size 100**:
+
+| Populate, `--cacheChunkSize 100` | Bytes | Time |
+| --- | ---: | ---: |
+| Uncompressed (`be267174`) | 2.34 GiB | **41.5 s** |
+| Compressed (`fa46623c`) | 0.135 GiB | **14.7 s** |
+
+**The populate is not purely request-bound.** 17× fewer bytes buys ~27 s, on an identical object
+count and identical concurrency — so roughly two thirds of that stage is bytes and one third is
+per-request overhead. Compression is worth **−27 s of deploy time**, against `compress-cache`
+costing ~15 s at q4. Net **~−12 s on the build**, before counting the 17× off R2 storage for every
+retained build, which was always the larger prize.
+
+Note what that means about the q5 → q4 retune in §5.10: at q5's 38.9 s the whole thing was net
+*negative* on build duration (−27 s of populate for +39 s of compression). The retune is what makes
+it pay for itself, and neither number was knowable without both of these logs.
+
+### The rest of that build, for the record
+
+**9 m 42 s total**, against the 10 m 55 s baseline in §2 — and 12 m 03 s in §5.10.
+
+| Stage | §2 | §5.10 | `be267174` |
+| --- | ---: | ---: | ---: |
+| init + clone + restore | 70 s | 55 s | 61 s |
+| `npm ci` | 2 m 02 s | 2 m 14 s | **1 m 53 s** |
+| build command | 5 m 52 s | 7 m 25 s | **4 m 52 s** |
+| deploy | 1 m 09 s | 1 m 12 s | 1 m 36 s |
+| build-cache upload | 40 s | 14 s | 18 s |
+| **total** | **10 m 55 s** | **12 m 03 s** | **9 m 42 s** |
+
+Compile **7.5 s** and TypeScript **12.5 s**, against 22.5 s and 58 s the build before — which
+settles §5.10's claim that the spike was #667's 552-file churn invalidating the incremental caches,
+not a regression. `added 997 packages` confirms `NPM_CONFIG_OMIT=dev` is live.
+
+The generator chain was still 38.7 s, with the corpus taking 19.7 s: this was the first build
+carrying `persist: true`, so the store was empty in the restored `.next/cache` and the corpus
+generated and populated it. The build after this one is the one that should read
+`[search-corpus] up to date … skipping`.
