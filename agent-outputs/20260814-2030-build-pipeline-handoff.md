@@ -112,8 +112,20 @@ All three are safe in any order and independently revertible.
 - Worker deployed, build command *not* updated → **safe.** Entries stay uncompressed and the
   reader's raw-JSON fallback serves them. The cache is merely as large as it used to be. This
   fallback exists precisely so this step cannot be got wrong in this direction.
-- Build command updated, Worker *not* deployed → **breaks.** Compressed bytes, no decoder, every
-  page a 500.
+- Build command updated while `main` lacks the reader → **breaks.** Compressed bytes, no decoder,
+  every page a 500.
+
+**Why build-ID scoping makes this narrower than it looks.** Keys are
+`incremental-cache/<buildId>/…` and the build ID is the deployed commit SHA (`generateBuildId` in
+next.config.ts), so a Worker only ever reads the prefix its own build wrote. The live Worker cannot
+meet a newer build's objects, which means there is no bad window during a deploy and no need to
+stagger these carefully — the rule is simply *not before the merged code is on `main`*. Waiting for
+one deploy to land first, as this step says, is belt-and-braces rather than load-bearing.
+
+**The same rule in reverse, for rollback.** If the Worker code is ever reverted, revert the build
+command first or in the same step. A reverted Worker builds a fresh prefix, the build command
+compresses it, and the old reader cannot decode its own cache — the same failure from the other
+direction.
 
 ### 5. `ignoreBuildErrors` — **not recommended**, see step 2
 
