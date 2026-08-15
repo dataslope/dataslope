@@ -3,10 +3,11 @@
 **Date:** 2026-08-15
 **Status:** Design addendum, no code written yet
 **Amends:** `agent-outputs/20260813-1424-git-playground-design.md`
-**Scope:** Two proposed changes to the Git playground design — (a) replacing
+**Scope:** Three proposed changes to the Git playground design — (a) replacing
 terminal-only input with a GUI, with the terminal reduced to a command
-display, and (b) letting the learner switch between two or more users so they
-can cause conflicts rather than inherit them.
+display, (b) letting the learner switch between two or more users so they
+can cause conflicts rather than inherit them, and (c) how the terminal handles
+the UNIX commands a Git curriculum interleaves with `git` itself.
 
 ---
 
@@ -20,10 +21,15 @@ can cause conflicts rather than inherit them.
 | Training-wheels dial, per surface (§2.5) | **Recommended.** Resolves the prose-block vs. challenge-card conflict. |
 | Multi-user repos | **Strongly recommended** — and worth more than conflict generation alone (§3). |
 | Multi-user in phase 1 | **No.** Shape the data model for it now (§3.6); ship it in phase 4. |
+| Git-only terminal (no `ls`/`cat`/`echo`) | **Not viable.** Advertises a capability then withdraws it (§4). |
+| Hand-rolled ~12-command POSIX subset | **Recommended.** The FS shim §7.1 already mandates *is* the shell (§4.1). |
+| `just-bash` instead of hand-rolling | **Spike first.** Already in the tree via `almostnode`; size and FS-pluggability unverified (§4.5). |
+| WebContainers / v86 | **No.** COOP/COEP conflicts with the CDN-import strategy; VM weight (§4.5). |
 
 The single most valuable line in this addendum is §3.3: the collaboration
 half of Git is unreachable with one repository, and it is the half where
-learners fail in the workplace.
+learners fail in the workplace. The best *cheap* idea is §4.2 — with `cat` in
+the terminal, `.git/HEAD` turns the pointer chain from a diagram into a file.
 
 ---
 
@@ -263,12 +269,131 @@ above. Ship the feature in phase 4.
 
 ---
 
-## 4. Revised phasing
+## 4. The shell problem
+
+A terminal that answers `ls` with `command not found` is worse than no
+terminal: it advertises a capability and then withdraws it, and the learner
+concludes the environment is broken rather than that the command is out of
+scope. Real Git work interleaves shell and Git constantly — `ls`, `cat`,
+`mkdir`, `echo > file` — and every tutorial on the internet creates its first
+file with `echo "# Project" > README.md`.
+
+### 4.1 The FS shim already required *is* the shell
+
+The strongest argument for building a small POSIX subset ourselves is that
+almost all of the work is already mandatory. §7.1 requires the OPFS shim to
+implement `readFile`, `writeFile`, `unlink`, `readdir`, `mkdir`, `rmdir`,
+`stat`, and `lstat` because isomorphic-git demands them. That is precisely the
+syscall set a file-command subset needs:
+
+| Command | Implemented with |
+| --- | --- |
+| `ls`, `ls -a`, `ls -l` | `readdir` + `stat` |
+| `cat` | `readFile` |
+| `echo`, `echo > f`, `echo >> f` | `writeFile` |
+| `touch` | `stat` + `writeFile` |
+| `mkdir`, `mkdir -p` | `mkdir` |
+| `rm`, `rm -r` | `unlink`, `readdir` + `rmdir` |
+| `mv`, `cp` | `readFile` + `writeFile` + `unlink` |
+| `pwd`, `cd` | shell-local state — no FS call at all |
+
+Not one of these needs a filesystem primitive the Git runtime does not already
+force us to write. And §2.3 concedes a command parser is unavoidable for
+either runtime, so the marginal cost here is **argument parsing and output
+formatting against an existing dispatch table** — not filesystem engineering.
+Estimate: 400–600 lines, no new dependency, no bundle impact (it lives in
+`public/_workers/git-worker.js` per §8.4.1, outside both bundles).
+
+### 4.2 The payoff: `.git` becomes explorable
+
+This is the reason to prefer a real shell subset over GUI-only file
+management, and it is worth more than the convenience.
+
+isomorphic-git writes a **genuine on-disk Git layout** — `.git/HEAD`,
+`.git/refs/heads/*`, `.git/objects/`, `.git/config`, `.git/index`. With `cat`
+and `ls` in the terminal, the object model stops being a diagram and becomes a
+directory:
+
+```
+$ cat .git/HEAD
+ref: refs/heads/main
+
+$ cat .git/refs/heads/main
+a1b2c3d4e5f6...
+
+$ ls .git/
+HEAD  config  index  objects/  refs/
+```
+
+That is §4.3's pointer chain, except the learner *discovers* it instead of
+reading it off a panel. "HEAD is a pointer to a pointer" stops being a claim
+to be believed and becomes two files to look at. No GUI can teach this, and a
+Git-only terminal cannot either — it needs `cat`.
+
+Caveat worth turning into a lesson: loose objects are zlib-deflated, so
+`cat .git/objects/ab/cdef…` prints binary noise. That is the natural entry
+point to `git cat-file -p`, which isomorphic-git supports directly via
+`readObject`. Worth adding to the supported command list for exactly this
+reason.
+
+### 4.3 Scope: three tiers, and a stated line
+
+The failure mode of a hand-rolled shell is unbounded creep — "just add
+`sed`," "just add variables." Fix the boundary in advance:
+
+| Tier | Contents | Decision |
+| --- | --- | --- |
+| **1 — must have** | The 12 commands above, plus `>` and `>>` redirection | Build in phase 1 |
+| **2 — cheap, worth it** | `\|`, `&&`, `*` glob in the final path segment, `head`, `tail`, `wc`, `grep -n`, `clear` | Build if commands are modelled as `(args, stdin) => stdout`, which makes pipes nearly free |
+| **3 — refuse by policy** | Variables, `$(…)`, subshells, `sed`/`awk`, `vim`/`nano`/`less`, job control, `sudo`, `curl`/`ssh`/`npm` | Never — each gets a redirect message (§4.4) |
+
+The governing principle: **the shell exists to serve Git lessons, not to teach
+shell.** Any command that does not appear in a Git curriculum is out, and the
+curriculum's actual vocabulary is remarkably small.
+
+### 4.4 Unknown commands are a product surface, not an error path
+
+This is where the subset either feels curated or feels half-finished, and it
+is almost entirely a copywriting problem. Three response classes:
+
+1. **Deliberately absent, and we know why.** `vim`, `nano`, `less`, `sudo`,
+   `npm`, `curl`, `ssh` get a named redirect to the right affordance rather
+   than a failure:
+   `vim isn't available here — click README.md in the working tree to edit it.`
+   Editors are the important case: they are the most likely thing a learner
+   reaches for, and the working-tree editor genuinely is the answer.
+2. **A typo of something supported.** Edit-distance match →
+   `git stauts` → `did you mean: git status?`
+3. **Genuinely unknown.** The real message, unembellished:
+   `bash: foo: command not found`.
+
+§9.4 already requires publishing the supported Git command list in the UI. It
+should be **one list covering both** Git commands and shell builtins — a
+learner does not experience those as separate vocabularies.
+
+### 4.5 Options considered and rejected
+
+| Option | Verdict |
+| --- | --- |
+| **Hand-rolled subset** (§4.1) | **Recommended.** Bounded, no dependency, reuses the mandatory FS shim, and unlocks §4.2. |
+| **`just-bash`** | **Spike it first.** Already in the tree transitively via `almostnode` (`scripts/build-almostnode-workers.mjs:24` stubs its dead `node:*` imports). Unverified: standalone bundle size, whether it accepts a custom FS backend, and its command coverage. Note `almostnode` itself is ~16 MB bundled and must **not** be pulled into the Git worker for a shell. |
+| **WebContainers** (StackBlitz) | **No.** Requires site-wide COOP/COEP cross-origin isolation, which conflicts directly with the CDN-import strategy every other runtime depends on (§8.2), and its licence is restrictive for commercial use. |
+| **v86 / full Linux VM** | **No.** Multi-megabyte image and a visible boot delay to run `ls`. |
+| **No shell; GUI-only file management** | **No.** Leaves `ls` failing, which is the original complaint. |
+
+The spike is worth an hour before committing to §4.1: if `just-bash` is small,
+FS-pluggable, and covers tier 1, it removes 400–600 lines of maintained code.
+If it is not, the hand-rolled subset is a known quantity.
+
+---
+
+## 5. Revised phasing
 
 | Phase | Contents | Change from original |
 | --- | --- | --- |
-| 1 | `git-worker.js` + parser + console + three-areas panel. **Composed-command palette + drag-to-stage from day one.** Single machine. | Palette promoted from carve-out to phase 1 |
-| 2 | Commit graph, pointer chain, scenarios, reset tiers, OPFS persistence. **Assistance dial.** | Dial added |
+| 0 | **`just-bash` spike (§4.5)** — size, FS-pluggability, tier-1 coverage. One hour; decides §4.1. | New |
+| 1 | `git-worker.js` + parser + console + three-areas panel. **Composed-command palette + drag-to-stage from day one. Tier-1 shell subset + redirect messages (§4.3–4.4).** Single machine. | Palette promoted from carve-out; shell added |
+| 2 | Commit graph, pointer chain, scenarios, reset tiers, OPFS persistence. **Assistance dial. Tier-2 shell (pipes, glob), `git cat-file -p`.** | Dial and tier-2 shell added |
 | 3 | Cloud save/share (`BundleKind: "git"`), `[↗]` handoff. | Unchanged |
 | 4 | **Multi-machine + `origin`, three-lane graph, machine-aware `GitExpect`.** Then `<GitBlock>`, `<GitChallengeCard>` + live checklist. | Multi-machine added ahead of cards, so card grading is machine-aware from its first release |
 | 5 | Object inspector, conflict merge view, `rebase` on plumbing. | Unchanged |
@@ -278,7 +403,7 @@ Data-model shaping for phase 4 (§3.6) happens in phase 2, when scenarios and
 
 ---
 
-## 5. Open questions
+## 6. Open questions
 
 1. **Does the composed command auto-run at Guided level?** Arguments both
    ways: auto-run is smoother on mobile; manual Enter is the repetition that
@@ -297,6 +422,10 @@ Data-model shaping for phase 4 (§3.6) happens in phase 2, when scenarios and
    who has graduated to Bare should not be dropped back to Guided by the next
    lesson's default. Suggest: surface sets the *initial* level, learner
    override persists.
-5. **Conflict authoring.** For a scenario to *reliably* produce a conflict,
+5. **Does the shell subset get its own `cd` state per machine?** Once §3
+   lands, each machine has its own working directory. A shared `cwd` across a
+   machine switch would be confusing; a per-machine `cwd` is one more field on
+   the machine record. Recommend per-machine.
+6. **Conflict authoring.** For a scenario to *reliably* produce a conflict,
    the fixture needs both machines pointed at the same lines. Worth a helper
    in the scenario format rather than leaving it to per-lesson hand-authoring.
