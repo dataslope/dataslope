@@ -192,7 +192,7 @@ for a cache this size. Both CI commands accept the flag:
 | Field | From | To |
 | --- | --- | --- |
 | Deploy command | `npx opennextjs-cloudflare deploy && npm run db:seed:search:remote` | `npx opennextjs-cloudflare deploy --cacheChunkSize 100 && npm run db:seed:search:remote` |
-| Non-production branch deploy command | `npx opennextjs-cloudflare upload` | `npx opennextjs-cloudflare upload --cacheChunkSize 100` |
+| Version command (non-production branch deploy) | `npx opennextjs-cloudflare upload` | `npx opennextjs-cloudflare upload --cacheChunkSize 100` |
 
 There is also `--rclone`, which swaps the per-object POSTs for an rclone sync against R2's S3
 endpoint; it needs the optional `rclone.js` peer dependency. Try `--cacheChunkSize` first — it is a

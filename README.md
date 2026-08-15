@@ -66,13 +66,13 @@ This is safe here because lesson content only changes on deploy and every asset 
 
 ### Cloudflare Workers Builds configuration
 
-Production and preview deploys run through Cloudflare Workers Builds rather than the local `npm run cf:*` scripts, so its build settings (Workers → the `dataslope` worker → Settings → Build) must populate the R2 cache on **both** paths. The non-production (preview) command is the easy one to get wrong: a bare `npx wrangler versions upload` builds the Worker but skips the cache populate step, leaving previews with an empty cache that 500s the home page and `/courses/*`.
+Production and preview deploys run through Cloudflare Workers Builds rather than the local `npm run cf:*` scripts, so its build settings (Workers → the `dataslope` worker → Settings → Build) must populate the R2 cache on **both** paths. The non-production (preview) command — the dashboard labels it **Version command** — is the easy one to get wrong: a bare `npx wrangler versions upload` builds the Worker but skips the cache populate step, leaving previews with an empty cache that 500s the home page and `/courses/*`.
 
 | Field | Value |
 | --- | --- |
 | Build command | `npx opennextjs-cloudflare build && node scripts/compress-cache.mjs` |
 | Deploy command | `npx opennextjs-cloudflare deploy --cacheChunkSize 100 && npm run db:seed:search:remote` |
-| Non-production branch deploy command | `npx opennextjs-cloudflare upload --cacheChunkSize 100` |
+| Version command *(the dashboard's label for the non-production branch deploy)* | `npx opennextjs-cloudflare upload --cacheChunkSize 100` |
 | Path | `/` |
 | Build variable | `NPM_CONFIG_OMIT` = `dev` |
 

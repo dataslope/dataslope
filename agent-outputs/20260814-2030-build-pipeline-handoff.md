@@ -96,7 +96,7 @@ workflows.
 | Field | Value |
 | --- | --- |
 | Deploy command | `npx opennextjs-cloudflare deploy --cacheChunkSize 100 && npm run db:seed:search:remote` |
-| Non-production branch deploy command | `npx opennextjs-cloudflare upload --cacheChunkSize 100` |
+| Version command *(labelled thus in the dashboard; it is the non-production branch deploy)* | `npx opennextjs-cloudflare upload --cacheChunkSize 100` |
 | Build variable | `NPM_CONFIG_OMIT` = `dev` |
 
 All three are safe in any order and independently revertible.
