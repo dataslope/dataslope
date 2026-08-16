@@ -1,62 +1,55 @@
 "use client";
 
 /**
- * A graded Git challenge. Keeps the existing card grammar (header badge,
- * instructions, test rail, Show Solution, Reset) with two changes the design
- * calls for:
+ * A graded shell challenge: a terminal, a live objective checklist, and the
+ * working directory beside it.
  *
- * - **The tall element is a terminal, not a code editor.** The transcript is
- *   the work product, so the learner types real commands.
- * - **The rail is live.** Repo state is cheap to read after every command, so
- *   each objective flips the instant the repository satisfies it and the
- *   learner sees *which command* did it. No other card in the codebase can do
- *   this; Check Answer stays for the finality moment.
- *
- * The command palette is deliberately absent: grading measures composition,
- * so a card should not hand over the command.
+ * The difference from `<GitChallengeCard>` is what counts as the answer. A Git
+ * objective reads the repository; a shell objective often reads the
+ * *transcript*, because for "show the three largest files" the printed output
+ * is the deliverable. `BashExpect` covers both, and the card re-evaluates
+ * after every command so objectives tick as the learner works.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { RotateCcw, Lightbulb, CheckCircle2 } from "lucide-react";
 import { TestResultsRail, renderInstructions, type TestRailEntry } from "../challengeShared";
-import { useGitSession } from "./gitRuntime";
-import { GitTerminal, type TranscriptEntry } from "./GitTerminal";
-import { StateStrip } from "./StateStrip";
-import { DEFAULT_SCENARIO } from "./scenarios";
+import { useGitSession } from "../git/gitRuntime";
+import { GitTerminal, type TranscriptEntry } from "../git/GitTerminal";
+import { BashStateStrip } from "./FileTreePanel";
+import { DEFAULT_BASH_SCENARIO } from "./bashScenarios";
 import {
-  explainGitExpect,
-  gitExpectSummary,
-  satisfiesGitExpect,
-  type GitObjective,
-} from "./gitExpect";
-import type { FileStatus } from "./protocol";
+  bashExpectSummary,
+  explainBashExpect,
+  satisfiesBashExpect,
+  type BashObjective,
+} from "./bashExpect";
 import "../shell/embeddedShell.css";
+import "./bashPanels.css";
 
-const fileKey = (f: FileStatus) => `${f.path}:${f.head}${f.workdir}${f.stage}`;
-
-export interface GitChallengeCardProps {
+export interface BashChallengeCardProps {
   title: string;
   instructions: string;
-  objectives: GitObjective[];
+  objectives: BashObjective[];
   scenario?: string;
-  /** Commands that solve it, revealed by Show Solution. */
+  /** Commands that solve it, revealed by Show solution. */
   solution?: string;
   hint?: string;
-  /** Open the state panels on mount. Defaults on: on a challenge the state is
-   *  the feedback channel (the inverse of a demo block). */
+  /** Open the file listing on mount. On a challenge the filesystem is part of
+   *  the feedback, so this defaults on. */
   expandState?: boolean;
 }
 
-export default function GitChallengeCard({
+export default function BashChallengeCard({
   title,
   instructions,
   objectives,
-  scenario = DEFAULT_SCENARIO,
+  scenario = DEFAULT_BASH_SCENARIO,
   solution,
   hint,
   expandState = true,
-}: GitChallengeCardProps) {
-  const { state, ready, error, exec, reset } = useGitSession(scenario);
+}: BashChallengeCardProps) {
+  const { state, ready, error, exec, reset } = useGitSession(scenario, undefined, "bash");
   const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<string[]>([]);
@@ -70,10 +63,11 @@ export default function GitChallengeCard({
   const previous = useRef<Map<string, string>>(new Map());
 
   useEffect(() => {
-    const next = new Map(state.files.map((f) => [f.path, fileKey(f)]));
+    const next = new Map(Object.entries(state.contents ?? {}));
+    for (const path of state.tree) if (!next.has(path)) next.set(path, "");
     const moved = new Set<string>();
-    for (const [path, key] of next) {
-      if (previous.current.get(path) !== key) moved.add(path);
+    for (const [path, body] of next) {
+      if (previous.current.get(path) !== body) moved.add(path);
     }
     if (previous.current.size > 0) setChanged(moved);
     previous.current = next;
@@ -82,17 +76,29 @@ export default function GitChallengeCard({
       return () => clearTimeout(timer);
     }
     return undefined;
-  }, [state.files]);
+  }, [state.contents, state.tree]);
 
-  // The live evaluation: every objective, re-read after every command.
+  const context = useMemo(
+    () => ({
+      state,
+      transcript: transcript.map((t) => ({
+        command: t.command,
+        stdout: t.stdout,
+        stderr: t.stderr,
+        exitCode: t.exitCode,
+      })),
+    }),
+    [state, transcript],
+  );
+
   const results = useMemo(
     () =>
       objectives.map((objective) => ({
         objective,
-        passed: satisfiesGitExpect(objective.expect, state),
-        detail: explainGitExpect(objective.expect, state),
+        passed: satisfiesBashExpect(objective.expect, context),
+        detail: explainBashExpect(objective.expect, context),
       })),
-    [objectives, state],
+    [objectives, context],
   );
   const solved = results.length > 0 && results.every((r) => r.passed);
 
@@ -100,11 +106,10 @@ export default function GitChallengeCard({
     id: r.objective.id,
     name: r.objective.name,
     description: r.objective.description ?? null,
-    // Before Check, a failing objective reads as "not yet" rather than
-    // "wrong": nothing has been submitted.
+    // Before Check, an unmet objective reads as "not yet" rather than "wrong".
     state: r.passed ? "pass" : checked ? "fail" : "pending",
     detail: r.passed ? null : r.detail,
-    code: gitExpectSummary(r.objective.expect),
+    code: bashExpectSummary(r.objective.expect),
   }));
 
   const run = useCallback(
@@ -146,7 +151,7 @@ export default function GitChallengeCard({
   return (
     <div className={solved ? "scard solved" : "scard"}>
       <div className="scard-head">
-        <span className="scard-badge">Git challenge</span>
+        <span className="scard-badge">Shell challenge</span>
         <h3 className="scard-title">{title}</h3>
         <span className="sblock-head-sep" />
         <span className={solved ? "scard-progress solved" : "scard-progress"}>
@@ -175,8 +180,8 @@ export default function GitChallengeCard({
               completions={[]}
               placeholderHint={
                 <p className="git-terminal-hint">
-                  Type the commands that solve this. Objectives tick as soon as the repository
-                  satisfies them.
+                  Type the commands that solve this. Objectives tick as soon as the output or the
+                  files satisfy them.
                 </p>
               }
             />
@@ -209,11 +214,7 @@ export default function GitChallengeCard({
               </button>
             )}
             {solution && (
-              <button
-                type="button"
-                className="sblock-btn"
-                onClick={() => setShowSolution((v) => !v)}
-              >
+              <button type="button" className="sblock-btn" onClick={() => setShowSolution((v) => !v)}>
                 {showSolution ? "Hide solution" : "Show solution"}
               </button>
             )}
@@ -228,9 +229,7 @@ export default function GitChallengeCard({
           </div>
 
           {showHint && hint && <p className="scard-hint">{hint}</p>}
-          {showSolution && solution && (
-            <pre className="scard-solution">{solution.trim()}</pre>
-          )}
+          {showSolution && solution && <pre className="scard-solution">{solution.trim()}</pre>}
           {checked && !solved && (
             <p className="scard-verdict">
               Not there yet. The unticked objectives above say what is still missing.
@@ -240,7 +239,7 @@ export default function GitChallengeCard({
 
         <div className="scard-right">
           <TestResultsRail tests={rail} codeLabel="Checks" />
-          <StateStrip
+          <BashStateStrip
             state={state}
             open={open}
             onToggle={() => setOpen((v) => !v)}

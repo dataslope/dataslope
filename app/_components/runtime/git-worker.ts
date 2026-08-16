@@ -14,9 +14,13 @@ import git from "isomorphic-git";
 import { createGitFs } from "../git/gitFs";
 import { createGitCommand } from "../git/gitCommand";
 import { scenarioById } from "../git/scenarios";
+import { bashScenarioById } from "../bash/bashScenarios";
 import { runCommand } from "../git/runCommand";
 import {
   EMPTY_STATE,
+  MAX_SNAPSHOT_FILES,
+  MAX_SNAPSHOT_FILE_BYTES,
+  type SessionKind,
   type CommitNode,
   type FileStatus,
   type GitWorkerRequest,
@@ -41,13 +45,14 @@ type Session = {
   fs: ReturnType<typeof createGitFs>["fs"];
   bash: InstanceType<typeof Bash>;
   clock: { commits: number };
+  kind: SessionKind;
 };
 
 /** One repository per session id. The Worker is shared by a whole page; the
  *  sessions are not (see GitWorkerRequest). */
 const sessions = new Map<string, Session>();
 
-async function createSession(): Promise<Session> {
+async function createSession(kind: SessionKind): Promise<Session> {
   const { store, fs } = createGitFs();
   const clock = { commits: 0 };
   const run = createGitCommand({ fs, dir: REPO, clock });
@@ -58,11 +63,23 @@ async function createSession(): Promise<Session> {
     customCommands: [defineCommand("git", run)],
   });
   await store.mkdir(REPO, { recursive: true });
-  return { store, fs, bash, clock };
+  return { store, fs, bash, clock, kind };
 }
 
-async function seed(scenarioId: string): Promise<Session> {
-  const next = await createSession();
+async function seed(scenarioId: string, kind: SessionKind): Promise<Session> {
+  const next = await createSession(kind);
+  if (kind === "bash") {
+    const scenario = bashScenarioById(scenarioId);
+    // Scenery is written straight to the filesystem; anything the learner is
+    // meant to *see* as a command goes through the shell.
+    for (const [path, contents] of Object.entries(scenario.files)) {
+      const slash = path.lastIndexOf("/");
+      if (slash > 0) await next.store.mkdir(`${REPO}/${path.slice(0, slash)}`, { recursive: true });
+      await next.store.writeFile(`${REPO}/${path}`, contents);
+    }
+    for (const command of scenario.setup ?? []) await runCommand(next.bash, command);
+    return next;
+  }
   for (const command of scenarioById(scenarioId).setup) {
     await runCommand(next.bash, command);
   }
@@ -86,9 +103,36 @@ async function listTree(s: Session): Promise<string[]> {
   return paths.sort();
 }
 
+/** Small text files, so a card can grade `fileContains` without a round trip
+ *  per assertion. Capped in both directions: a runaway session must not post
+ *  megabytes back after every command. */
+async function snapshot(s: Session, tree: string[]): Promise<Record<string, string>> {
+  const out: Record<string, string> = {};
+  for (const rel of tree.slice(0, MAX_SNAPSHOT_FILES)) {
+    try {
+      const stat = await s.store.stat(`${REPO}/${rel}`);
+      if (stat.size > MAX_SNAPSHOT_FILE_BYTES) continue;
+      out[rel] = await s.store.readFile(`${REPO}/${rel}`);
+    } catch {
+      /* binary, or vanished between the walk and the read */
+    }
+  }
+  return out;
+}
+
 async function readState(s: Session): Promise<RepoState> {
   const fs = s.fs as Parameters<typeof git.log>[0]["fs"];
   const tree = await listTree(s);
+
+  if (s.kind === "bash") {
+    return {
+      ...EMPTY_STATE,
+      kind: "bash",
+      tree,
+      cwd: REPO,
+      contents: await snapshot(s, tree),
+    };
+  }
 
   let initialized = false;
   try {
@@ -96,7 +140,7 @@ async function readState(s: Session): Promise<RepoState> {
   } catch {
     initialized = false;
   }
-  if (!initialized) return { ...EMPTY_STATE, tree, cwd: REPO };
+  if (!initialized) return { ...EMPTY_STATE, kind: "git", tree, cwd: REPO };
 
   const branches = await git.listBranches({ fs, dir: REPO });
   let branch: string | null = null;
@@ -173,6 +217,7 @@ async function readState(s: Session): Promise<RepoState> {
     .slice(0, 60);
 
   return {
+    kind: "git",
     initialized: true,
     head: { branch, oid, detached: Boolean(oid) && branch === null },
     branches,
@@ -186,7 +231,7 @@ async function readState(s: Session): Promise<RepoState> {
 async function sessionFor(id: string): Promise<Session> {
   let s = sessions.get(id);
   if (!s) {
-    s = await createSession();
+    s = await createSession("git");
     sessions.set(id, s);
   }
   return s;
@@ -201,7 +246,7 @@ self.addEventListener("message", (event: MessageEvent<GitWorkerRequest>) => {
       switch (req.type) {
         case "init":
         case "reset": {
-          const seeded = await seed(req.scenario);
+          const seeded = await seed(req.scenario, req.kind ?? "git");
           sessions.set(req.session, seeded);
           post({ id: req.id, ok: true, stdout: "", stderr: "", exitCode: 0, state: await readState(seeded) });
           return;

@@ -115,12 +115,16 @@ export function GitTerminal({
         ))}
         {transcript.map((entry) => (
           <div key={entry.id} className="git-terminal-block">
-            <div className="git-terminal-command">
-              <span className="git-terminal-prompt" aria-hidden="true">
-                $
-              </span>
-              <span>{entry.command}</span>
-            </div>
+            {/* A script entry carries several lines; each gets its own
+                prompt so the transcript still reads like a terminal. */}
+            {entry.command.split("\n").map((line, i) => (
+              <div className="git-terminal-command" key={i}>
+                <span className="git-terminal-prompt" aria-hidden="true">
+                  $
+                </span>
+                <span>{line}</span>
+              </div>
+            ))}
             {entry.stdout && <pre className="git-terminal-out">{entry.stdout.replace(/\n$/, "")}</pre>}
             {entry.stderr && (
               <pre className={entry.exitCode === 0 ? "git-terminal-out" : "git-terminal-err"}>

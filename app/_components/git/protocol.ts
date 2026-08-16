@@ -25,8 +25,13 @@ export interface CommitNode {
   refs: string[];
 }
 
+/** Which engine a session runs. A bash session skips every git read, so a
+ *  shell lesson does not pay for repository introspection it never shows. */
+export type SessionKind = "git" | "bash";
+
 /** Everything the panels render, re-read after every command. */
 export interface RepoState {
+  kind: SessionKind;
   initialized: boolean;
   head: { branch: string | null; oid: string | null; detached: boolean };
   branches: string[];
@@ -35,9 +40,14 @@ export interface RepoState {
   /** Working-tree paths outside `.git`, for the file list. */
   tree: string[];
   cwd: string;
+  /** Contents of small text files, for grading `fileContains` without a round
+   *  trip per assertion. Bash sessions only, and capped (see the limits
+   *  below) so a session cannot post megabytes back on every command. */
+  contents?: Record<string, string>;
 }
 
 export const EMPTY_STATE: RepoState = {
+  kind: "git",
   initialized: false,
   head: { branch: null, oid: null, detached: false },
   branches: [],
@@ -54,9 +64,9 @@ export const EMPTY_STATE: RepoState = {
  * the one above it). Blocks opt into continuity by passing the same id.
  */
 export type GitWorkerRequest =
-  | { id: number; session: string; type: "init"; scenario: string }
+  | { id: number; session: string; type: "init"; scenario: string; kind?: SessionKind }
   | { id: number; session: string; type: "exec"; command: string }
-  | { id: number; session: string; type: "reset"; scenario: string }
+  | { id: number; session: string; type: "reset"; scenario: string; kind?: SessionKind }
   | { id: number; session: string; type: "readFile"; path: string }
   | { id: number; session: string; type: "writeFile"; path: string; content: string }
   | { id: number; session: string; type: "dispose" }
@@ -83,3 +93,7 @@ export type GitWorkerResponse =
  *  per-command snapshot before they break a share URL. */
 export const MAX_FILE_BYTES = 256 * 1024;
 export const MAX_TREE_BYTES = 2 * 1024 * 1024;
+
+/** Caps on the contents snapshot a bash session posts back per command. */
+export const MAX_SNAPSHOT_FILES = 40;
+export const MAX_SNAPSHOT_FILE_BYTES = 8 * 1024;

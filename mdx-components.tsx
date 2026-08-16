@@ -35,6 +35,8 @@ import {
   MdxSqlCodeBlock,
   GitBlock,
   GitChallengeCard,
+  BashBlock,
+  BashChallengeCard,
   MdxMultipleChoiceQuestion,
   Mermaid,
   IllustrationPrompt,
@@ -57,6 +59,8 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     SqlCodeBlock: withSearchAnchor(MdxSqlCodeBlock),
     GitBlock: withSearchAnchor(GitBlock),
     GitChallengeCard: withSearchAnchor(GitChallengeCard),
+    BashBlock: withSearchAnchor(BashBlock),
+    BashChallengeCard: withSearchAnchor(BashChallengeCard),
     MultipleChoice: withSearchAnchor(MdxMultipleChoiceQuestion),
     // Not fumadocs' Callout directly: MDX passes `title` as a plain string,
     // leaving backticks literal. See CalloutWithCodeTitle.

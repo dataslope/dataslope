@@ -42,24 +42,24 @@ export function StateStrip({
   changed: Set<string>;
 }) {
   return (
-    <div className="gitblock-state">
+    <div className="sblock-state">
       <button
         type="button"
-        className="gitblock-strip"
+        className="sblock-strip"
         onClick={onToggle}
         aria-expanded={open}
       >
         <ChevronRight
           size={13}
-          className={open ? "gitblock-strip-caret open" : "gitblock-strip-caret"}
+          className={open ? "sblock-strip-caret open" : "sblock-strip-caret"}
           aria-hidden="true"
         />
-        <span className="gitblock-strip-text">{stateSummary(state)}</span>
-        <span className="gitblock-strip-action">{open ? "Hide state" : "Show state"}</span>
+        <span className="sblock-strip-text">{stateSummary(state)}</span>
+        <span className="sblock-strip-action">{open ? "Hide state" : "Show state"}</span>
       </button>
 
       {open && (
-        <div className="gitblock-panels">
+        <div className="sblock-panels">
           <ThreeAreasPanel files={state.files} changed={changed} />
           <CommitGraph commits={state.commits} detached={state.head.detached} />
         </div>

@@ -19,6 +19,7 @@ import {
   type GitWorkerRequest,
   type GitWorkerResponse,
   type RepoState,
+  type SessionKind,
 } from "./protocol";
 
 export interface CommandResult {
@@ -106,17 +107,22 @@ export interface GitSession {
 }
 
 /**
- * Subscribe to one repository. `repo` names a shared session (blocks with the
- * same id continue each other in document order); omit it for an isolated one.
+ * Subscribe to one session. `repo` names a shared one (blocks with the same id
+ * continue each other in document order); omit it for an isolated one. `kind`
+ * picks the engine: a bash session skips every git read.
  */
-export function useGitSession(scenario: string, repo?: string): GitSession {
+export function useGitSession(
+  scenario: string,
+  repo?: string,
+  kind: SessionKind = "git",
+): GitSession {
   const [sessionId] = useState(() => repo ?? nextSessionId("block"));
   const [state, setState] = useState<RepoState>(EMPTY_STATE);
   const [readyFor, setReadyFor] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const mounted = useRef(true);
 
-  const ready = readyFor === `${sessionId}:${scenario}`;
+  const ready = readyFor === `${sessionId}:${scenario}:${kind}`;
 
   const track = useCallback((next: RepoState) => {
     if (mounted.current) setState(next);
@@ -150,11 +156,11 @@ export function useGitSession(scenario: string, repo?: string): GitSession {
   // other and neither calls setState from an effect body.
   useEffect(() => {
     let cancelled = false;
-    const key = `${sessionId}:${scenario}`;
+    const key = `${sessionId}:${scenario}:${kind}`;
     const first = !repo || !seededRepos.has(key);
     if (repo) seededRepos.add(key);
     const req = first
-      ? ({ type: "init", session: sessionId, scenario } as const)
+      ? ({ type: "init", session: sessionId, scenario, kind } as const)
       : ({ type: "attach", session: sessionId } as const);
     void request(req)
       .then(() => {
@@ -166,7 +172,7 @@ export function useGitSession(scenario: string, repo?: string): GitSession {
     return () => {
       cancelled = true;
     };
-  }, [scenario, sessionId, repo, track]);
+  }, [scenario, sessionId, repo, kind, track]);
 
   return useMemo<GitSession>(
     () => ({
@@ -176,14 +182,14 @@ export function useGitSession(scenario: string, repo?: string): GitSession {
       sessionId,
       exec: (command) => request({ type: "exec", session: sessionId, command }),
       reset: () => {
-        seededRepos.delete(`${sessionId}:${scenario}`);
-        return request({ type: "reset", session: sessionId, scenario });
+        seededRepos.delete(`${sessionId}:${scenario}:${kind}`);
+        return request({ type: "reset", session: sessionId, scenario, kind });
       },
       readFile: (path) => request({ type: "readFile", session: sessionId, path }),
       writeFile: (path, content) =>
         request({ type: "writeFile", session: sessionId, path, content }),
     }),
-    [state, ready, error, sessionId, scenario],
+    [state, ready, error, sessionId, scenario, kind],
   );
 }
 

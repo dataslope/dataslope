@@ -1,0 +1,155 @@
+---
+title: "Bash Blocks"
+description: Sandbox for the `<BashBlock>` component, a real shell and filesystem inside lesson prose.
+---
+
+`<BashBlock>` runs shell commands against a real in-memory filesystem in
+your browser. The engine is just-bash, the same one behind the Git
+playground, so pipes, redirection, globs, loops and functions all work.
+Nothing is saved: a reload starts over.
+
+Every block gets its own working directory unless it opts into sharing one.
+
+## A block that runs
+
+A scenario to start from, and a command script. The script is editable, so
+a reader can change a flag and re-run.
+
+<BashBlock
+  scenario="small-project"
+  label="Look around"
+  commands={`ls
+ls src`}
+/>
+
+## The file strip
+
+Every block carries a one-line summary of the working directory, collapsed
+by default. Click it to see the tree, with the paths your last command
+touched highlighted.
+
+Pass `expandState` where the filesystem *is* the lesson:
+
+<BashBlock
+  scenario="small-project"
+  label="Redirection writes a file"
+  expandState
+  commands={`wc -l notes.txt > count.txt
+cat count.txt`}
+/>
+
+## Pipes and filters
+
+The classic chain. Each stage narrows the last.
+
+<BashBlock
+  scenario="log-files"
+  label="Find the failures"
+  commands={`grep ERROR app.log
+grep ERROR app.log | wc -l
+grep ERROR app.log | cut -d' ' -f4-`}
+/>
+
+## Text processing
+
+`cut`, `sort`, `uniq` and `awk` are all present.
+
+<BashBlock
+  scenario="sales-csv"
+  label="Revenue by region"
+  commands={`cut -d, -f2 sales.csv | tail -n +2 | sort | uniq -c
+awk -F, 'NR>1 {sum[$2] += $4} END {for (r in sum) print r, sum[r]}' sales.csv`}
+/>
+
+## The shell language
+
+Variables, loops, conditionals and functions, not just a command runner.
+These blocks pass `mode="script"`: without it each line runs in its own
+shell, so a variable set on one line would be gone by the next.
+
+<BashBlock
+  scenario="messy-names"
+  label="A loop over globs"
+  mode="script"
+  commands={`for f in *.txt; do echo "found $f"; done
+count=0
+for f in *.txt; do count=$((count + 1)); done
+echo "total: $count"`}
+/>
+
+<BashBlock
+  scenario="empty"
+  label="Functions and conditionals"
+  mode="script"
+  commands={`greet() { echo "hello, $1"; }
+greet world
+if [ 5 -gt 3 ]; then echo "yes"; else echo "no"; fi`}
+/>
+
+## find and xargs
+
+<BashBlock
+  scenario="messy-names"
+  label="Clean up the scratch files"
+  expandState
+  commands={`find . -name '*.tmp'
+find . -name '*.tmp' | xargs rm
+find . -type f`}
+/>
+
+## Blocks that share a directory
+
+Blocks with the same `dir` id continue each other in document order.
+Blocks without one are isolated, so re-running an earlier block can never
+corrupt a later one.
+
+<BashBlock
+  dir="pipeline"
+  scenario="log-files"
+  label="Step 1: extract"
+  commands={`grep ERROR app.log > errors.log
+cat errors.log`}
+/>
+
+<BashBlock
+  dir="pipeline"
+  scenario="log-files"
+  label="Step 2: count what you extracted"
+  expandState
+  commands={`wc -l < errors.log`}
+/>
+
+A reader who runs step 2 first is offered a catch-up rather than an error
+about a missing file.
+
+## Errors
+
+A failing command shows its real message and a non-zero exit code, the
+same as a terminal.
+
+<BashBlock
+  scenario="small-project"
+  label="A file that is not there"
+  commands={`cat missing.txt
+echo "exit code: $?"`}
+/>
+
+## Props
+
+| Prop | Type | Default | Notes |
+| --- | --- | --- | --- |
+| `commands` | `string` | required | Newline-separated commands. Editable before running. |
+| `scenario` | `string` | `small-project` | `empty`, `small-project`, `log-files`, `sales-csv`, `messy-names`. |
+| `dir` | `string` | none | Share a working directory with other blocks carrying the same id. |
+| `expandState` | `boolean` | `false` | Open the file listing on mount. |
+| `label` | `string` | none | Caption in the block header. |
+| `mode` | `"commands" \| "script"` | `commands` | `commands` pairs each line with its own output; `script` runs the block as one program so variables and functions persist across lines. |
+
+```jsx
+<BashBlock
+  scenario="log-files"
+  label="Find the failures"
+  expandState
+  commands={`grep ERROR app.log | wc -l`}
+/>
+```

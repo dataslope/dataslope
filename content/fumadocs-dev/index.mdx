@@ -27,16 +27,19 @@ are loaded on demand.
 - Java, javac + the JVM via CheerpJ
 - C#, Roslyn on .NET wasm
 
-## Version control
+## Shell and version control
 
-- Git, isomorphic-git for the repository and just-bash for the shell, over
-  one in-memory filesystem. See [Git Blocks](./git-blocks) and
-  [Git Challenge Cards](./git-challenge-cards).
+- Bash, just-bash over an in-memory filesystem. See [Bash Blocks](./bash-blocks)
+  and [Bash Challenge Cards](./bash-challenge-cards).
+- Git, isomorphic-git for the repository over that same shell. See
+  [Git Blocks](./git-blocks) and [Git Challenge Cards](./git-challenge-cards).
 
-`<GitBlock>` and `<GitChallengeCard>` differ from the language components
-in two ways. They run commands rather than source, and they grade on
-**repository state** rather than printed output, which lets a challenge
-card tick its objectives live as the learner works.
+These four components run commands rather than source, and their challenge
+cards grade on **state** rather than printed output alone, which lets
+objectives tick live as the learner works. A Git objective reads the
+repository, because what `git commit` printed is beside the point; a shell
+objective reads the output *and* the filesystem, because in a shell lesson
+either one can be the deliverable.
 
 ## How code blocks work
 

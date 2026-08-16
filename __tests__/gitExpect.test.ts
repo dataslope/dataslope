@@ -55,7 +55,7 @@ async function harness(scenarioId: string) {
         /* gone */
       }
     }
-    if (!initialized) return { ...EMPTY_STATE, tree: tree.sort() };
+    if (!initialized) return { ...EMPTY_STATE, kind: "git", tree: tree.sort() };
 
     const branches = await git.listBranches({ fs: gitfs, dir: REPO });
     const branch = (await git.currentBranch({ fs: gitfs, dir: REPO, fullname: false })) ?? null;
@@ -91,6 +91,7 @@ async function harness(scenarioId: string) {
       }
     }
     return {
+      kind: "git" as const,
       initialized: true,
       head: { branch, oid, detached: Boolean(oid) && branch === null },
       branches,
