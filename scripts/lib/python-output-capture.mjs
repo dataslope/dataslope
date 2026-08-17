@@ -92,12 +92,15 @@ try:
     import matplotlib.pyplot as _bo_plt
 
     def _bo_show(*a, **k):
-        buf = io.BytesIO()
-        _bo_plt.savefig(buf, format="png", bbox_inches="tight", dpi=BO_FIGURE_DPI,
-                        facecolor=_bo_plt.gcf().get_facecolor())
-        buf.seek(0)
-        _bo_outputs.append({"type": "image", "data": base64.b64encode(buf.read()).decode()})
-        _bo_plt.clf()
+        # Every open figure, not just the current one: a block that builds
+        # two and calls show() once must render two, the way a script and a
+        # notebook both do. Mirrors _patched_show in the worker.
+        for _num in _bo_plt.get_fignums():
+            _fig = _bo_plt.figure(_num)
+            buf = io.BytesIO()
+            _fig.savefig(buf, format="png", bbox_inches="tight", dpi=BO_FIGURE_DPI,
+                         facecolor=_fig.get_facecolor())
+            _bo_outputs.append({"type": "image", "data": base64.b64encode(buf.getvalue()).decode()})
         _bo_plt.close("all")
     _bo_plt.show = _bo_show
 except Exception:

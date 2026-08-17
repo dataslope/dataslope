@@ -9,6 +9,8 @@
  */
 
 import type { WorkspaceBundle } from "@/lib/workspaces/types";
+import { base64ToBytes } from "@/lib/workspaces/base64";
+import { writeDataFile } from "../files/opfsDataStorage";
 import {
   createWorkspace,
   deleteWorkspace,
@@ -58,6 +60,17 @@ export async function materializeCodeWorkspace(
     writeFile(entry.id, file.id, bundle.files![i].content);
   });
   await flushFileWrites();
+
+  // Uploaded data files land in the copy's `data/` store under their
+  // original paths, so a program that reads one still finds it.
+  for (const data of bundle.dataFiles ?? []) {
+    try {
+      await writeDataFile(entry.id, data.path, base64ToBytes(data.base64));
+    } catch {
+      // A single unreadable entry shouldn't cost the recipient the copy;
+      // the Files panel simply won't list it.
+    }
+  }
 
   const active =
     files.find((f) => f.filename === bundle.activeFilename) ?? files[0];
