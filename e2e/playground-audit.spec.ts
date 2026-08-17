@@ -64,43 +64,34 @@ async function clearOutput(page: Page) {
   }
 }
 
-/** Click Run, wait for the run to start (button disables) and finish
- *  (button re-enables), then return this run's freshly-appended cells. */
+/** Click Run, wait for the run to finish, then return this run's
+ *  freshly-appended cells. While a run is in flight the Run button is the
+ *  Stop button, so "idle" is the absence of that, not a disabled button. */
 async function runAndCollect(page: Page): Promise<{ type: string; body: string }[]> {
-  const before = await page.locator(".out-cell").count();
-  const runBtn = page.locator(".run-btn").first();
-  await runBtn.click();
-  // Best-effort: observe the run starting. Interpreted runtimes can be
-  // near-instant, so don't hard-fail if we miss the disabled flicker.
-  await expect(runBtn).toBeDisabled({ timeout: 4000 }).catch(() => {});
-  await expect(runBtn).toBeEnabled({ timeout: RUN_TIMEOUT });
-  // Let any final cell settle ("Done in …" timestamp).
-  await page
-    .waitForFunction(
-      () =>
-        [...document.querySelectorAll(".out-cell")].every((c) =>
-          (c.querySelector(".cell-time")?.textContent ?? "").includes("Done in"),
-        ),
-      null,
-      { timeout: RUN_TIMEOUT },
-    )
-    .catch(() => {});
+  const before = await page.locator(".run-cell").count();
+  await page.locator(".run-btn").first().click();
+  await page.waitForFunction(
+    () => {
+      const btn = document.querySelector(".run-btn");
+      return (
+        !!btn &&
+        !btn.classList.contains("stop") &&
+        !btn.hasAttribute("disabled")
+      );
+    },
+    null,
+    { timeout: RUN_TIMEOUT },
+  );
 
-  const all = await page.locator(".out-cell").all();
-  const fresh = all.slice(before);
-  const cells: { type: string; body: string }[] = [];
-  for (const cell of fresh) {
-    const cls = (await cell.getAttribute("class")) ?? "";
-    const type =
-      cls
-        .split(/\s+/)
-        .find((c) =>
-          ["stdout", "stderr", "html", "image", "plot"].includes(c),
-        ) ?? "unknown";
-    const body = (await cell.locator(".out-cell-body").textContent()) ?? "";
-    cells.push({ type, body });
-  }
-  return cells;
+  return page.evaluate((before) => {
+    return [...document.querySelectorAll(".run-cell")]
+      .slice(before)
+      .flatMap((run) => [...run.querySelectorAll(".run-cell-content > *")])
+      .map((cell) => ({
+        type: cell.getAttribute("data-cell-type") ?? "unknown",
+        body: cell.textContent ?? "",
+      }));
+  }, before);
 }
 
 /** Decide whether an stderr cell represents a genuine error vs. benign

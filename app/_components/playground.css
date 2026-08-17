@@ -1525,6 +1525,12 @@ body.playground-active {
   text-align: center;
   color: var(--text-dim);
 }
+/* `NA` rendered as a value (R runtime): muted, so it reads as "missing"
+   rather than as text the program printed, and never as an empty cell. */
+.dataframe-wrap .dataframe-na {
+  color: var(--text-dim);
+  font-style: italic;
+}
 /* Footer row that states the full row/column count for truncated frames. */
 .dataframe-wrap .dataframe-rows-footer {
   padding: 4px 10px;
@@ -2118,7 +2124,9 @@ input[type="range"].fs-slider:disabled {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: var(--text);
+  /* Recessive while off: a filled, full-contrast knob on a grey track reads
+     as the *enabled* one when it sits next to a real on switch. */
+  background: var(--text-dim);
   transform: translateX(4px);
   transition:
     transform 0.15s,
