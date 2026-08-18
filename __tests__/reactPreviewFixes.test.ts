@@ -71,11 +71,38 @@ describe("bundle source maps", () => {
   });
 });
 
+/**
+ * Just enough of esbuild to bundle one fixture. The package is a
+ * devDependency, and the production type check does not resolve it, so
+ * the app never imports its types: `esbuild-worker.ts` declares its own
+ * surface for the same reason, and this follows suit.
+ */
+interface EsbuildLike {
+  initialize(options: Record<string, unknown>): Promise<void>;
+  build(options: Record<string, unknown>): Promise<{ outputFiles: unknown[] }>;
+}
+
+// A specifier TypeScript cannot follow, so a tree without the
+// devDependency still type-checks.
+const ESBUILD_MODULE = "esbuild-wasm";
+
+async function loadEsbuild(): Promise<EsbuildLike | null> {
+  try {
+    return (await import(/* @vite-ignore */ ESBUILD_MODULE)) as EsbuildLike;
+  } catch {
+    return null;
+  }
+}
+
 // The decoder has to agree with the compiler that writes the maps, not
 // just with a hand-built one, so this builds a real bundle.
 describe("against a real esbuild bundle", () => {
-  it("points a bundle position at the .tsx line it came from", async () => {
-    const esbuild = await import("esbuild-wasm");
+  it("points a bundle position at the .tsx line it came from", async (ctx) => {
+    const esbuild = await loadEsbuild();
+    if (!esbuild) {
+      ctx.skip("esbuild-wasm is not installed in this tree");
+      return;
+    }
     const { REACT_BUILD_OPTIONS, splitBundleOutput, vfsPlugin } = await import(
       "../app/_components/runtime/reactBundle"
     );
@@ -100,9 +127,9 @@ describe("against a real esbuild bundle", () => {
       ...REACT_BUILD_OPTIONS,
       entryPoints: ["main.tsx"],
       plugins: [vfsPlugin(files)],
-    } as unknown as Parameters<typeof esbuild.build>[0]);
+    });
     const { js } = splitBundleOutput(
-      result.outputFiles as unknown as Parameters<typeof splitBundleOutput>[0],
+      result.outputFiles as Parameters<typeof splitBundleOutput>[0],
     );
 
     const map = inlineSourceMapOf(js);
