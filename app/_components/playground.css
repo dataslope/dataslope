@@ -1423,6 +1423,12 @@ body.playground-active {
 .out-seg-stderr {
   color: var(--red);
 }
+/* A program writing to stderr deliberately (PHP's error_log, fwrite to
+   STDERR) is not reporting a failure; dimmed keeps it distinct from both
+   the program's own output and a real diagnostic. */
+.out-seg-log {
+  color: var(--text-dim);
+}
 .out-seg-image {
   text-align: center;
   white-space: normal;
@@ -5842,6 +5848,9 @@ html[data-playground-theme="dark"] {
 }
 .run-cell-content .out-seg-stderr {
   color: var(--red);
+}
+.run-cell-content .out-seg-log {
+  color: var(--text-dim);
 }
 .run-history-empty {
   flex: 1;

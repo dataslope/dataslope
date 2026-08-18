@@ -31,7 +31,8 @@ function loadPyodideModule(): Promise<{
 
 // ─── Output cell shape (mirrors `OutputCell` minus the bookkeeping the
 //     main thread fills in) ───────────────────────────────────────────────
-type OutputCellType = "stdout" | "stderr" | "html" | "image" | "plot";
+// Mirrors OutputCellType in ../types; the worker cannot import it.
+type OutputCellType = "stdout" | "stderr" | "log" | "html" | "image" | "plot";
 interface OutputCellMessage {
   type: OutputCellType;
   content: string;

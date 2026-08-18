@@ -4970,7 +4970,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     const consoleError =
                       !!latest && latest.every((c) => c.type === "stderr");
                     const textSegs = latest?.filter(
-                      (c) => c.type === "stdout" || c.type === "stderr",
+                      (c) => c.type === "stdout" || c.type === "stderr" || c.type === "log",
                     );
                     const runId = latest?.[0]?.runId;
                     const runNumber =
@@ -5072,7 +5072,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                   const fresh = groupIndex === outputGroups.length - 1;
                   const copyText = group
                     .filter(
-                      (c) => c.type === "stdout" || c.type === "stderr",
+                      (c) => c.type === "stdout" || c.type === "stderr" || c.type === "log",
                     )
                     .map((c) => c.content)
                     .join("\n");

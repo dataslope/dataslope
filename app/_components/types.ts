@@ -1,6 +1,20 @@
 // Shared types for the playground component and language adapters.
 
-export type OutputCellType = "stdout" | "stderr" | "html" | "image" | "plot";
+/**
+ * `log` is deliberately distinct from `stderr`. In PHP (and in Unix
+ * generally) stderr is a destination, not a severity: `error_log()` and
+ * `fwrite(STDERR, …)` carry progress notes as often as failures. Painting
+ * them the same red as a warning turns a script's debug log into what
+ * looks like a wall of errors, so `log` renders neutrally and does not
+ * mark a run as failed.
+ */
+export type OutputCellType =
+  | "stdout"
+  | "stderr"
+  | "log"
+  | "html"
+  | "image"
+  | "plot";
 
 export interface OutputCell {
   id: number;
