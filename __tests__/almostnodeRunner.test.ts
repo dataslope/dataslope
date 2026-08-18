@@ -13,17 +13,18 @@ import {
 
 const encoder = new TextEncoder();
 
-/** Collect stdout/stderr from a run into plain strings. */
+/** Collect stdout/stderr from a run into plain strings. The runner writes
+ *  text verbatim (no implicit newlines), so trailing ones are trimmed here
+ *  to keep the assertions about content, not about line endings. */
 function makeSink(): { sink: ConsoleSink; stdout: () => string; stderr: () => string } {
   const out: string[] = [];
   const err: string[] = [];
   return {
     sink: {
-      stdout: (c) => out.push(c),
-      stderr: (e) => err.push(e),
+      write: (channel, text) => (channel === "stdout" ? out : err).push(text),
     },
-    stdout: () => out.join("\n"),
-    stderr: () => err.join("\n"),
+    stdout: () => out.join("").trimEnd(),
+    stderr: () => err.join("").trimEnd(),
   };
 }
 

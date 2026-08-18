@@ -118,6 +118,12 @@ export interface RunOptions {
    *  installs). `preparing` marks a blocking wait, so the surface shows the
    *  boot notice until execution starts; omit/false for ordinary status. */
   onStatus?: (message: string, preparing?: boolean) => void;
+  /** Report what a type checker finds, and fail the run when it finds
+   *  errors. Set by the full playground; embedded lesson blocks leave it
+   *  off, because a snippet written to illustrate one idea is not a
+   *  standalone program and its dangling references are not the reader's
+   *  bug. Only the TypeScript runtime reads it today. */
+  diagnostics?: boolean;
 }
 
 /** A completion suggestion. Plain strings are accepted anywhere an item is

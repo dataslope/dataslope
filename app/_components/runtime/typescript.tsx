@@ -14,6 +14,8 @@ import {
   buildTsCompletionRequest,
   completeWithTsService,
   decodeWorkspaceTextFiles,
+  diagnoseWithTsService,
+  formatTsDiagnostic,
 } from "./tsLanguageService";
 
 // Runtime-panel compiler version, derived from cdn.ts's single pin so the
@@ -291,14 +293,32 @@ type WorkerOutMessage =
   | { kind: "ready" }
   | { kind: "prepare-fs-done"; id: number }
   | { kind: "prepare-fs-error"; id: number; message: string }
-  | { kind: "stdout"; id: number; content: string }
-  | { kind: "stderr"; id: number; content: string }
-  | { kind: "done"; id: number };
+  | {
+      kind: "output";
+      id: number;
+      channel: "stdout" | "stderr";
+      content: string;
+      seq: number;
+      append: boolean;
+    }
+  | {
+      kind: "done";
+      id: number;
+      error: string | null;
+      createdFiles: Array<[string, Uint8Array]>;
+    };
 
 class TypeScriptWorkerRuntime implements LanguageRuntime {
   private nextId = 0;
   // Last snapshot's text files: cross-file context for completions.
   private stagedText = new Map<string, string>();
+  // Files the last run wrote, handed to the Files panel once collected.
+  private createdFiles: Array<[string, Uint8Array]> = [];
+  /** Rejects the in-flight `run()` when Stop terminates the worker. */
+  private abortActiveRun: ((err: Error) => void) | null = null;
+  /** Non-null between the Stop that killed the worker and its replacement
+   *  reporting ready; every entry point waits on it. */
+  private restartPromise: Promise<void> | null = null;
 
   constructor(private worker: Worker) {}
 
@@ -308,22 +328,66 @@ class TypeScriptWorkerRuntime implements LanguageRuntime {
     this.worker.terminate();
   }
 
+  /** Stop the running program: terminate the worker, stand up a fresh one.
+   *  See javascript.tsx for why that is the whole story here. */
+  async cancelRun(): Promise<void> {
+    if (this.restartPromise) return this.restartPromise;
+    const abort = this.abortActiveRun;
+    this.abortActiveRun = null;
+    this.worker.terminate();
+    if (abort) {
+      const err = new Error("Run stopped.");
+      err.name = "RunCancelledError";
+      abort(err);
+    }
+    this.restartPromise = (async () => {
+      try {
+        this.worker = await spawnTypeScriptWorker();
+      } finally {
+        this.restartPromise = null;
+      }
+    })();
+    return this.restartPromise;
+  }
+
+  /** Files the program wrote (`fs.writeFileSync`, …), for the Files panel. */
+  async collectCreatedFiles(): Promise<Map<string, Uint8Array>> {
+    const created = new Map(this.createdFiles);
+    this.createdFiles = [];
+    return created;
+  }
+
   /** Intellisense via the shared TS language service worker, separate
    *  from the execution worker so analysis never queues behind a
    *  long-running user program. */
   async complete(request: CompletionRequest): Promise<CompletionResult> {
-    return completeWithTsService(
-      buildTsCompletionRequest(
+    return completeWithTsService({
+      ...buildTsCompletionRequest(
         this.stagedText,
         request.doc,
         request.filename,
         "index.ts",
         request.offset,
       ),
-    );
+      // Node globals and the shimmed modules, not the DOM: `process` and
+      // `require` exist here, `document` and `alert` do not.
+      env: "node",
+    });
+  }
+
+  /** The workspace as the checker should see it: the staged snapshot with
+   *  the code about to run overlaid on the entry. */
+  private analysisFiles(code: string, entry: string): Array<[string, string]> {
+    const files: Array<[string, string]> = [];
+    for (const [path, content] of this.stagedText) {
+      if (path !== entry) files.push([path, content]);
+    }
+    files.push([entry, code]);
+    return files;
   }
 
   async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
+    if (this.restartPromise) await this.restartPromise;
     this.stagedText = decodeWorkspaceTextFiles(files);
     const id = ++this.nextId;
     const payload: Array<[string, Uint8Array]> = [];
@@ -349,30 +413,110 @@ class TypeScriptWorkerRuntime implements LanguageRuntime {
     emit: EmitOutput,
     options?: RunOptions,
   ): Promise<void> {
+    const entry = options?.entryFilename ?? "index.ts";
+    // Type-check alongside the run rather than before it: the checker's
+    // first request pays for its lib downloads, and a program the user
+    // asked to run should not wait on analysis to start.
+    const analysis = options?.diagnostics
+      ? diagnoseWithTsService({
+          files: this.analysisFiles(code, entry),
+          entry,
+          env: "node",
+        })
+      : Promise.resolve([]);
+
+    let runError: unknown = null;
+    try {
+      await this.execute(code, emit, entry);
+    } catch (err) {
+      runError = err;
+    }
+
+    // Reported after the program's own output, where the eye lands: a
+    // single red line above a wall of output is easy to miss.
+    const errors = (await analysis).filter((d) => d.category === "error");
+    if (errors.length > 0) {
+      emit({
+        type: "stderr",
+        content: errors.map(formatTsDiagnostic).join("\n"),
+      });
+    }
+    if (runError) throw runError;
+    // tsc emits despite type errors, so the program runs — but the run is
+    // not a success, and says so instead of reporting a plain "Done".
+    if (errors.length > 0) {
+      throw new Error(
+        `Found ${errors.length} TypeScript error${errors.length === 1 ? "" : "s"}.`,
+      );
+    }
+  }
+
+  /** Run the program in the almostnode worker, streaming its output. */
+  private async execute(
+    code: string,
+    emit: EmitOutput,
+    entry: string,
+  ): Promise<void> {
+    if (this.restartPromise) await this.restartPromise;
     const id = ++this.nextId;
-    return new Promise<void>((resolve) => {
+    const worker = this.worker;
+    this.createdFiles = [];
+    return new Promise<void>((resolve, reject) => {
+      const finish = (settle: () => void) => {
+        worker.removeEventListener("message", onMessage);
+        this.abortActiveRun = null;
+        settle();
+      };
+      this.abortActiveRun = (err) => finish(() => reject(err));
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
         const msg = ev.data;
-        if (msg.kind === "stdout" || msg.kind === "stderr") {
-          if (msg.id === id) emit({ type: msg.kind, content: msg.content });
+        if (msg.kind === "output") {
+          if (msg.id === id) {
+            emit({ type: msg.channel, content: msg.content }, msg.seq, msg.append);
+          }
           return;
         }
         if (msg.kind === "done" && msg.id === id) {
-          this.worker.removeEventListener("message", onMessage);
-          resolve();
+          this.createdFiles = msg.createdFiles;
+          const error = msg.error;
+          finish(() => (error ? reject(new Error(error)) : resolve()));
         }
       };
-      this.worker.addEventListener("message", onMessage);
-      this.worker.postMessage({
+      worker.addEventListener("message", onMessage);
+      worker.postMessage({
         kind: "run",
         id,
         code,
-        // "index.ts" preserves single-file behaviour for callers that
-        // don't supply options.
-        entryPath: options?.entryFilename ?? "index.ts",
+        entryPath: entry,
       });
     });
   }
+}
+
+/** Spawn the pre-bundled worker and resolve once it reports ready. Shared
+ *  by the first boot and by the respawn a Stop triggers. */
+function spawnTypeScriptWorker(
+  setLoadingMessage?: (message: string) => void,
+): Promise<Worker> {
+  // Pre-bundled and loaded via static URL; see javascript.tsx for the
+  // Turbopack rationale.
+  const worker = new Worker("/_workers/typescript-worker.js", { type: "module" });
+  return new Promise<Worker>((resolve, reject) => {
+    const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+      const msg = ev.data;
+      if (msg.kind === "loading") {
+        setLoadingMessage?.(msg.message);
+      } else if (msg.kind === "ready") {
+        worker.removeEventListener("message", onMessage);
+        resolve(worker);
+      }
+    };
+    worker.addEventListener("message", onMessage);
+    worker.addEventListener("error", (ev) => {
+      worker.removeEventListener("message", onMessage);
+      reject(new Error(ev.message || "TypeScript worker failed to start"));
+    });
+  });
 }
 
 export const typescriptAdapter: LanguageAdapter = {
@@ -387,7 +531,7 @@ export const typescriptAdapter: LanguageAdapter = {
     engine: `TypeScript ${TS_MINOR} → almostnode (browser-native Node.js)`,
     engineUrl: "https://almostnode.dev/",
     notes:
-      "Code is transpiled in a Web Worker by the official TypeScript compiler, then executed by almostnode. Multi-file projects, require(), and 40+ shimmed Node.js modules (fs, path, http, crypto, …) work in the browser.",
+      "Code is type-checked and transpiled in a Web Worker by the official TypeScript compiler, then executed by almostnode. Multi-file projects, require(), and 40+ shimmed Node.js modules (fs, path, http, crypto, …) work in the browser.",
   },
   // CodeMirror v5 exposes TypeScript via the `text/typescript` MIME alias.
   codeMirrorMode: "text/typescript",
@@ -410,11 +554,13 @@ export const typescriptAdapter: LanguageAdapter = {
       <a href="https://almostnode.dev/" target="_blank" rel="noreferrer">
         almostnode
       </a>
-      . Type-checking is <em>syntactic-only</em> (the equivalent of{" "}
+      . Running a program type-checks the whole workspace under{" "}
       <code style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>
-        tsc --isolatedModules
+        strict
       </code>
-      ), so cross-file type errors aren&apos;t reported.
+      , reporting what{" "}
+      <code style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>tsc</code>{" "}
+      would; as with tsc, the program still runs.
     </>
   ),
   importSnippet: (name) => `import * as ${name} from "${name}";`,
@@ -435,26 +581,6 @@ export const typescriptAdapter: LanguageAdapter = {
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Starting TypeScript runtime…");
-    // Pre-bundled and loaded via static URL; see javascript.tsx for the
-    // Turbopack rationale.
-    const worker = new Worker("/_workers/typescript-worker.js", {
-      type: "module",
-    });
-    return new Promise<LanguageRuntime>((resolve, reject) => {
-      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
-        const msg = ev.data;
-        if (msg.kind === "loading") {
-          setLoadingMessage(msg.message);
-        } else if (msg.kind === "ready") {
-          worker.removeEventListener("message", onMessage);
-          resolve(new TypeScriptWorkerRuntime(worker));
-        }
-      };
-      worker.addEventListener("message", onMessage);
-      worker.addEventListener("error", (ev) => {
-        worker.removeEventListener("message", onMessage);
-        reject(new Error(ev.message || "TypeScript worker failed to start"));
-      });
-    });
+    return new TypeScriptWorkerRuntime(await spawnTypeScriptWorker(setLoadingMessage));
   },
 };

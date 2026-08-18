@@ -139,6 +139,7 @@ import {
   saveDraftWorkspace,
 } from "./opfs/activeWorkspace";
 import { acquireWorkspaceLock } from "./opfs/workspace";
+import { downloadWorkspaceZip } from "./opfs/workspaceArchive";
 import { WorkspaceBadge } from "./workspace/WorkspaceBadge";
 import { ShareControls } from "./cloud/ShareControls";
 import {
@@ -2223,6 +2224,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         onStatus: (message, preparing) => {
           setRunStatusMessage(preparing ? message : null);
         },
+        // The playground runs whole programs, so type errors in one are
+        // the user's to see.
+        diagnostics: true,
       };
       if (entryFilename) runOptions.entryFilename = entryFilename;
       // Preview adapters render into the surface-owned slot; each run
@@ -3048,6 +3052,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     [adapter.exportBaseFilename],
   );
 
+  /** Download every file in the workspace as one .zip, at its own path. */
+  const exportWorkspace = useCallback(async () => {
+    const wsId = workspaceIdRef.current;
+    const ok = wsId ? await downloadWorkspaceZip(wsId) : false;
+    if (!ok) {
+      showToast("Nothing to download yet, save the workspace first.");
+    }
+  }, [showToast]);
+
   // Copy text to the clipboard, falling back to legacy `execCommand` for
   // non-secure contexts; surfaces success/failure via toast.
   const copyToClipboard = useCallback(
@@ -3552,13 +3565,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         items: [
           {
             key: "export",
-            // "Export code" read as "export the workspace"; it only ever
-            // wrote the file in front of you. The whole-workspace path is
-            // Save -> Download copy.
-            label: "Export current file",
+            label: "Export",
             icon: ArrowDownToLine,
             panel: {
-              title: "Export current file",
+              title: "Export",
               render: (close: () => void) => (
                 <>
                   {adapter.exportFormats.map((fmt) => (
@@ -3580,6 +3590,26 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                       </div>
                     </button>
                   ))}
+                  {/* The whole-workspace download also lives under
+                      Save -> Download copy, but a multi-file project is
+                      exactly what someone opening an Export menu is
+                      looking for. */}
+                  <button
+                    type="button"
+                    className="example-item"
+                    onClick={() => {
+                      close();
+                      void exportWorkspace();
+                    }}
+                  >
+                    <div className="ex-title">
+                      Whole workspace
+                      <span className="ext-badge">.zip</span>
+                    </div>
+                    <div className="ex-desc">
+                      Every file in this workspace, at its own path
+                    </div>
+                  </button>
                 </>
               ),
             },
@@ -3617,7 +3647,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         ],
       },
     ],
-    [adapter, requestExample, exportCode, openSettingsTab],
+    [adapter, requestExample, exportCode, exportWorkspace, openSettingsTab],
   );
 
   // Account group as the ⋯ menu's last section; null while the first

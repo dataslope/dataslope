@@ -13,6 +13,10 @@
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
+    // Lets a module the content sweeps import through Node's
+    // strip-only TypeScript loader spell its relative imports with a
+    // ".ts" suffix, which Node needs and bundlers accept.
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",

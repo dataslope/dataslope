@@ -4,7 +4,13 @@
 // transpiled then staged under .js paths (almostnode's resolver tries
 // .js/.json/.node, not .ts). Protocol mirrors javascript-worker.ts.
 
-import { AlmostNodeRunner, normalizeVfsPath } from "./almostnode-worker-shared";
+import {
+  AlmostNodeRunner,
+  BufferedOutput,
+  installRejectionReporting,
+  normalizeVfsPath,
+  type OutputChunk,
+} from "./almostnode-worker-shared";
 // Shared with scripts/check-js-blocks.mjs so the sweep transpiles with the
 // same compiler options this worker does.
 import { isTsPath, transpileTs, tsToJsPath } from "./tsTranspile";
@@ -20,9 +26,15 @@ type OutMessage =
   | { kind: "ready" }
   | { kind: "prepare-fs-done"; id: number }
   | { kind: "prepare-fs-error"; id: number; message: string }
-  | { kind: "stdout"; id: number; content: string }
-  | { kind: "stderr"; id: number; content: string }
-  | { kind: "done"; id: number };
+  | ({ kind: "output"; id: number } & OutputChunk)
+  | {
+      kind: "done";
+      id: number;
+      /** Message for a run that ended in an uncaught error, else null. */
+      error: string | null;
+      /** Files the program wrote, for the Files panel. */
+      createdFiles: Array<[string, Uint8Array]>;
+    };
 
 function post(msg: OutMessage): void {
   self.postMessage(msg);
@@ -71,14 +83,13 @@ async function handleRun(
   const entryVfsPath = normalizeVfsPath(
     isTsPath(entryPath) ? tsToJsPath(entryPath) : entryPath,
   );
+  const output = new BufferedOutput((chunk) => post({ kind: "output", id, ...chunk }));
 
   // Flush prepare-fs diagnostics before the run's runtime output.
-  for (const msg of pendingDiagnostics) {
-    post({ kind: "stderr", id, content: msg });
-  }
+  for (const msg of pendingDiagnostics) output.write("stderr", `${msg}\n`);
   pendingDiagnostics = [];
 
-  await runner.run(
+  const result = await runner.run(
     entryVfsPath,
     (vfs) => {
       // Prefer the staged transpiled entry (multi-file); fall back to
@@ -88,18 +99,19 @@ async function handleRun(
         return new TextDecoder().decode(vfs.readFileSync(entryVfsPath));
       }
       const { outputText, diagnostics } = transpileTs(code, entryPath);
-      for (const d of diagnostics) {
-        post({ kind: "stderr", id, content: `TS: ${d}` });
-      }
+      for (const d of diagnostics) output.write("stderr", `TS: ${d}\n`);
       return outputText;
     },
-    {
-      stdout: (content) => post({ kind: "stdout", id, content }),
-      stderr: (content) => post({ kind: "stderr", id, content }),
-    },
+    output,
   );
+  output.flush();
 
-  post({ kind: "done", id });
+  post({
+    kind: "done",
+    id,
+    error: result.error,
+    createdFiles: result.createdFiles,
+  });
 }
 
 let queue: Promise<unknown> = Promise.resolve();
@@ -107,6 +119,7 @@ function enqueue(task: () => Promise<void>): void {
   queue = queue.then(task, task).catch(() => {});
 }
 
+installRejectionReporting();
 post({ kind: "ready" });
 
 self.addEventListener("message", (ev: MessageEvent<InMessage>) => {

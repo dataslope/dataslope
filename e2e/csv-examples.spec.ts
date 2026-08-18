@@ -45,30 +45,32 @@ async function runAndCollect(page: Page) {
   await expect(runBtn).toBeEnabled({ timeout: 150_000 });
   await page
     .waitForFunction(
-      () =>
-        [...document.querySelectorAll(".out-cell")].length > 0 &&
-        [...document.querySelectorAll(".out-cell")].every((c) =>
-          (c.querySelector(".cell-time")?.textContent ?? "").includes("Done in"),
-        ),
+      () => {
+        const runs = [...document.querySelectorAll(".run-cell")];
+        return (
+          runs.length > 0 &&
+          runs.every((c) =>
+            (c.querySelector(".run-cell-ms")?.textContent ?? "").includes(
+              "Done in",
+            ),
+          )
+        );
+      },
       null,
       { timeout: 150_000 },
     )
     .catch(() => {});
 
-  const cells = await page.locator(".out-cell").all();
-  const out: { type: string; body: string }[] = [];
-  for (const cell of cells) {
-    const cls = (await cell.getAttribute("class")) ?? "";
-    const type =
-      cls
-        .split(/\s+/)
-        .find((c) =>
-          ["stdout", "stderr", "html", "image", "plot"].includes(c),
-        ) ?? "unknown";
-    const body = (await cell.locator(".out-cell-body").textContent()) ?? "";
-    out.push({ type, body });
-  }
-  return out;
+  // One entry per segment of the newest run, in the order they appear.
+  return page.evaluate(() => {
+    const runs = [...document.querySelectorAll(".run-cell")];
+    const last = runs[runs.length - 1];
+    if (!last) return [];
+    return [...last.querySelectorAll(".run-cell-content > *")].map((c) => ({
+      type: c.getAttribute("data-cell-type") ?? "unknown",
+      body: c.textContent ?? "",
+    }));
+  });
 }
 
 const ERROR_MARKERS =

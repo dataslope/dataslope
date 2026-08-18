@@ -24,31 +24,31 @@ async function waitForRuntimeReady(page: Page) {
 
 async function runAndCollectOutput(page: Page) {
   await page.locator(".run-btn").first().click();
-  // Wait for at least one output cell that finished, the elapsed
-  // timestamp ("Done in N.NNs") only renders after the run completes.
+  // Wait for a run that finished: the elapsed time ("Done in N.NNs") only
+  // renders once it has.
   await page.waitForFunction(
     () => {
-      const cells = document.querySelectorAll(".out-cell");
-      return cells.length > 0 &&
-        Array.from(cells).every((c) =>
-          c.querySelector(".cell-time")?.textContent?.startsWith("Done in"),
-        );
+      const runs = document.querySelectorAll(".run-cell");
+      return (
+        runs.length > 0 &&
+        [...runs].every((c) =>
+          c.querySelector(".run-cell-ms")?.textContent?.startsWith("Done in"),
+        )
+      );
     },
     null,
     { timeout: 150_000 },
   );
-  const cells = await page.locator(".out-cell").all();
-  const collected: { type: string; body: string }[] = [];
-  for (const cell of cells) {
-    const cls = (await cell.getAttribute("class")) ?? "";
-    const type = cls
-      .split(/\s+/)
-      .find((c) => ["stdout", "stderr", "html", "image", "plot"].includes(c)) ??
-      "unknown";
-    const body = (await cell.locator(".out-cell-body").textContent()) ?? "";
-    collected.push({ type, body });
-  }
-  return collected;
+  // One entry per segment of the newest run, in the order they appear.
+  return page.evaluate(() => {
+    const runs = [...document.querySelectorAll(".run-cell")];
+    const last = runs[runs.length - 1];
+    if (!last) return [];
+    return [...last.querySelectorAll(".run-cell-content > *")].map((c) => ({
+      type: c.getAttribute("data-cell-type") ?? "unknown",
+      body: c.textContent ?? "",
+    }));
+  });
 }
 
 test.describe("Playgrounds (fast)", () => {
@@ -129,10 +129,10 @@ test.describe("Playgrounds (fast)", () => {
     await preview.locator("#greet").click();
     await expect(preview.locator("#greet")).toContainText("Clicked 1 time");
 
-    // Its console.log crosses the postMessage bridge into a stdout cell.
-    await page.waitForFunction(
-      () => document.querySelectorAll(".out-cell.stdout").length > 0,
-      null,
+    // Its console.log crosses the postMessage bridge into the console
+    // pane, which the web playground renders in place of output cells.
+    await expect(page.locator(".web-console-content")).toContainText(
+      "Scripts run too",
       { timeout: 30_000 },
     );
   });
