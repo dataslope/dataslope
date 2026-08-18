@@ -19,6 +19,7 @@ import {
   VenetianMask,
 } from "lucide-react";
 import { authClient, useSession } from "@/lib/auth/client";
+import { clampPage, pageCount, pageItems, pageRange } from "@/lib/pagination";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -67,22 +68,27 @@ interface AdminUser {
   createdAt: string | Date;
 }
 
-/** Page size for the browse list and cap per search request. */
-const LIST_LIMIT = 200;
+/** Rows per page. Browse pages are fetched one at a time (server-side
+ *  `offset`); search results are sliced from the matches held in memory. */
+const PAGE_SIZE = 25;
+
+/** Cap on matches pulled per search request, per searched field. */
+const SEARCH_LIMIT = 200;
 
 const SEARCH_DEBOUNCE_MS = 300;
 
 export function UsersClient() {
   const { data: session, isPending: sessionPending } = useSession();
+  // Browse mode holds one page; search mode holds every match (client-sliced).
   const [users, setUsers] = useState<AdminUser[]>([]);
-  // Server-reported total; `users.length` alone under-reports.
+  // Server-reported total in browse mode, match count while searching.
   const [total, setTotal] = useState(0);
   const [searchTruncated, setSearchTruncated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [denied, setDenied] = useState(false);
   const [query, setQuery] = useState("");
+  const [page, setPage] = useState(0);
   // User-id with an action mid-flight / with a pending "confirm remove".
   const [busyId, setBusyId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
@@ -90,11 +96,12 @@ export function UsersClient() {
   // Monotonic sequence: a slow stale response must not overwrite a newer one.
   const loadSeq = useRef(0);
 
-  /** Load the browse page or search results. Search runs SERVER-side (a
-   *  client-side filter would hide accounts older than the newest LIST_LIMIT).
-   *  The endpoint searches one field per request, so a query fans out to
-   *  email + name and merges. */
-  const loadUsers = useCallback(async (search: string) => {
+  /** Load one browse page, or the search results. Search runs SERVER-side (a
+   *  client-side filter would hide accounts older than the newest page). The
+   *  endpoint searches one field per request, so a query fans out to email +
+   *  name and merges — which is why search is fetched in one shot and paged in
+   *  memory: two independently-offset result sets can't be paged server-side. */
+  const loadUsers = useCallback(async (search: string, pageIndex: number) => {
     const seq = ++loadSeq.current;
     setLoading(true);
     setError(null);
@@ -102,7 +109,6 @@ export function UsersClient() {
     try {
       const q = search.trim();
       const baseQuery = {
-        limit: LIST_LIMIT,
         sortBy: "createdAt",
         sortDirection: "desc" as const,
       };
@@ -112,6 +118,7 @@ export function UsersClient() {
               authClient.admin.listUsers({
                 query: {
                   ...baseQuery,
+                  limit: SEARCH_LIMIT,
                   searchValue: q,
                   searchField,
                   searchOperator: "contains" as const,
@@ -119,7 +126,15 @@ export function UsersClient() {
               }),
             ),
           )
-        : [await authClient.admin.listUsers({ query: baseQuery })];
+        : [
+            await authClient.admin.listUsers({
+              query: {
+                ...baseQuery,
+                limit: PAGE_SIZE,
+                offset: pageIndex * PAGE_SIZE,
+              },
+            }),
+          ];
       if (seq !== loadSeq.current) return; // superseded by a newer load
 
       const failed = responses.find((r) => r.error)?.error;
@@ -152,7 +167,7 @@ export function UsersClient() {
         setTotal(merged.length);
         // Either field maxing out its page means matches were left behind.
         setSearchTruncated(
-          responses.some((r) => (r.data?.users?.length ?? 0) >= LIST_LIMIT),
+          responses.some((r) => (r.data?.users?.length ?? 0) >= SEARCH_LIMIT),
         );
       } else {
         const { data } = responses[0];
@@ -169,46 +184,49 @@ export function UsersClient() {
     if (seq === loadSeq.current) setLoading(false);
   }, []);
 
+  const trimmedQuery = query.trim();
+  const pages = pageCount(total, PAGE_SIZE);
+  // Derived rather than stored: `total` shrinks under us when a row is removed
+  // or a search narrows, and a stored page would be left pointing past the end.
+  const current = clampPage(page, pages);
+  // Searching fetches every match at once, so paging through them must not
+  // re-request: pin the fetch key to 0 and slice in memory instead.
+  const fetchPage = trimmedQuery ? 0 : current;
+
+  // Key the load on the signed-in USER, not on the `session` object: Better
+  // Auth refetches the session whenever the tab regains focus
+  // (`refetchOnWindowFocus`), and hands back a fresh object each time — the
+  // dates in the payload defeat its equality check — so depending on the
+  // object re-ran this fetch and threw away the page on every tab switch.
+  const sessionUserId = session?.user.id ?? null;
   useEffect(() => {
-    // Fetch once a session is confirmed. Search input re-runs this, debounced;
-    // the empty query fires at once.
-    if (sessionPending || !session) return;
+    if (sessionPending || !sessionUserId) return;
+    // Typing debounces; page changes and the first load fire at once.
     const timer = setTimeout(
-      () => void loadUsers(query),
-      query.trim() ? SEARCH_DEBOUNCE_MS : 0,
+      () => void loadUsers(query, fetchPage),
+      trimmedQuery ? SEARCH_DEBOUNCE_MS : 0,
     );
     return () => clearTimeout(timer);
-  }, [sessionPending, session, loadUsers, query]);
+  }, [
+    sessionPending,
+    sessionUserId,
+    loadUsers,
+    query,
+    trimmedQuery,
+    fetchPage,
+  ]);
 
-  /** Append the next browse page (search results are single-shot). */
-  async function handleLoadMore() {
-    setLoadingMore(true);
-    setError(null);
-    try {
-      const { data, error: listError } = await authClient.admin.listUsers({
-        query: {
-          limit: LIST_LIMIT,
-          offset: users.length,
-          sortBy: "createdAt",
-          sortDirection: "desc",
-        },
-      });
-      if (listError) {
-        setError(listError.message ?? "Couldn't load more users.");
-      } else {
-        setUsers((prev) => {
-          const seen = new Set(prev.map((u) => u.id));
-          const fresh = ((data?.users ?? []) as AdminUser[]).filter(
-            (u) => !seen.has(u.id),
-          );
-          return [...prev, ...fresh];
-        });
-        setTotal(data?.total ?? 0);
-      }
-    } catch {
-      setError("Couldn't reach the server. Please try again.");
-    }
-    setLoadingMore(false);
+  /** Searching restarts the result set, so it restarts the paging too. */
+  function handleQueryChange(next: string) {
+    setQuery(next);
+    setPage(0);
+    setConfirmId(null);
+  }
+
+  function goToPage(next: number) {
+    setPage(clampPage(next, pages));
+    // A confirm prompt belongs to a row that is about to scroll away.
+    setConfirmId(null);
   }
 
   async function handleRemove(userId: string) {
@@ -223,6 +241,15 @@ export function UsersClient() {
       } else {
         setUsers((prev) => prev.filter((u) => u.id !== userId));
         setTotal((t) => Math.max(0, t - 1));
+        if (!trimmedQuery) {
+          // Browse pages come from the server, so the hole the removal left
+          // has to be refilled from it. When losing the row also loses the
+          // page, the clamped `fetchPage` re-runs the effect instead.
+          const nextTotal = Math.max(0, total - 1);
+          if (clampPage(current, pageCount(nextTotal, PAGE_SIZE)) === current) {
+            void loadUsers("", current);
+          }
+        }
       }
     } catch {
       setError("Couldn't reach the server. Please try again.");
@@ -495,6 +522,22 @@ export function UsersClient() {
 
   // --- Dashboard -----------------------------------------------------------
 
+  // Browse mode already holds exactly one page; search holds every match.
+  const visible = trimmedQuery
+    ? users.slice(current * PAGE_SIZE, (current + 1) * PAGE_SIZE)
+    : users;
+  const { first, last } = pageRange(current, PAGE_SIZE, total);
+  const noun = trimmedQuery
+    ? total === 1
+      ? "match"
+      : "matches"
+    : total === 1
+      ? "account"
+      : "accounts";
+  // Only the first load blanks the panel; later ones (refresh, page step) keep
+  // the rows on screen so the table doesn't flash empty.
+  const firstLoad = loading && users.length === 0;
+
   return (
     <>
       <AdminPageHeader
@@ -505,24 +548,24 @@ export function UsersClient() {
         <PanelHeader
           title="All users"
           description={
-            loading
+            firstLoad
               ? "Loading users…"
-              : query.trim()
-                ? `${users.length} ${users.length === 1 ? "match" : "matches"}${
-                    searchTruncated
-                      ? " (more exist, narrow the search)"
-                      : ""
-                  }`
-                : users.length < total
-                  ? `Showing ${users.length} of ${total} accounts`
-                  : `${total} ${total === 1 ? "account" : "accounts"}`
+              : `${
+                  pages > 1
+                    ? `Showing ${first}–${last} of ${total} ${noun}`
+                    : `${total} ${noun}`
+                }${
+                  trimmedQuery && searchTruncated
+                    ? " (more exist, narrow the search)"
+                    : ""
+                }`
           }
           action={
             <Button
               variant="ghost"
               size="sm"
               className={quietActionClass}
-              onClick={() => void loadUsers(query)}
+              onClick={() => void loadUsers(query, fetchPage)}
               disabled={loading}
             >
               <RefreshCw className={loading ? "animate-spin" : undefined} />
@@ -538,7 +581,7 @@ export function UsersClient() {
               type="search"
               placeholder="Search by name or email"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => handleQueryChange(e.target.value)}
               className={`${softInputClass} pl-9`}
               aria-label="Search users"
             />
@@ -546,19 +589,22 @@ export function UsersClient() {
 
           {error && <ErrorNote>{error}</ErrorNote>}
 
-          {loading ? (
+          {firstLoad ? (
             <p className="py-12 text-center text-sm text-muted-foreground">
               <Loader2 className="mr-2 inline size-4 animate-spin" />
               Loading…
             </p>
-          ) : users.length === 0 ? (
+          ) : visible.length === 0 ? (
             <p className="py-12 text-center text-sm text-muted-foreground">
-              {query.trim()
-                ? "No users match your search."
-                : "No users yet."}
+              {trimmedQuery ? "No users match your search." : "No users yet."}
             </p>
           ) : (
-            <>
+            <div
+              aria-busy={loading || undefined}
+              className={
+                loading ? "opacity-60 transition-opacity" : "transition-opacity"
+              }
+            >
               {/* Desktop: table */}
               <div className="hidden md:block">
                 <Table>
@@ -575,7 +621,7 @@ export function UsersClient() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {users.map((user) => {
+                    {visible.map((user) => {
                       const isSelf = user.id === session.user.id;
                       const isAdminRow = user.role === "admin";
                       const isBusy = busyId === user.id;
@@ -613,7 +659,7 @@ export function UsersClient() {
 
               {/* Mobile: stacked cards */}
               <ul className="md:hidden">
-                {users.map((user) => {
+                {visible.map((user) => {
                   const isSelf = user.id === session.user.id;
                   const isAdminRow = user.role === "admin";
                   const isBusy = busyId === user.id;
@@ -638,24 +684,63 @@ export function UsersClient() {
                   );
                 })}
               </ul>
+            </div>
+          )}
 
-              {/* Browse mode pages through; search is single-shot. */}
-              {!query.trim() && users.length < total && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={`${quietActionClass} self-center`}
-                  onClick={() => void handleLoadMore()}
-                  disabled={loadingMore}
+          {/* Pagination, same chrome as the rest of the dashboard tables.
+              Browse pages come from the server one at a time; search pages are
+              sliced from the matches already in hand. */}
+          {pages > 1 && (
+            <nav
+              aria-label="User pages"
+              className="flex flex-wrap items-center gap-x-3 gap-y-2"
+            >
+              <span className="text-[13px] text-muted-foreground">
+                Page {current + 1} of {pages}
+              </span>
+              <div className="ml-auto flex items-center gap-1.5">
+                <button
+                  type="button"
+                  className="ds-page-btn"
+                  disabled={current === 0 || loading}
+                  onClick={() => goToPage(current - 1)}
                 >
-                  {loadingMore ? (
-                    <Loader2 className="animate-spin" />
+                  Previous
+                </button>
+                {pageItems(current, pages).map((item, i) =>
+                  item === "gap" ? (
+                    <span
+                      key={`gap-${i}`}
+                      aria-hidden="true"
+                      className="px-0.5 text-[13px] text-muted-foreground"
+                    >
+                      …
+                    </span>
                   ) : (
-                    `Load ${Math.min(LIST_LIMIT, total - users.length)} more`
-                  )}
-                </Button>
-              )}
-            </>
+                    <button
+                      key={item}
+                      type="button"
+                      className="ds-page-num"
+                      data-active={item === current || undefined}
+                      aria-current={item === current ? "page" : undefined}
+                      aria-label={`Page ${item + 1}`}
+                      disabled={loading}
+                      onClick={() => goToPage(item)}
+                    >
+                      {item + 1}
+                    </button>
+                  ),
+                )}
+                <button
+                  type="button"
+                  className="ds-page-btn"
+                  disabled={current >= pages - 1 || loading}
+                  onClick={() => goToPage(current + 1)}
+                >
+                  Next
+                </button>
+              </div>
+            </nav>
           )}
 
           <p className="text-xs leading-relaxed text-muted-foreground">
