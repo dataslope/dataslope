@@ -157,10 +157,15 @@ export function TestUsersClient() {
     setLoading(false);
   }, []);
 
+  // Keyed on the signed-in USER, not the `session` object: Better Auth
+  // refetches the session whenever the tab regains focus and hands back a
+  // fresh object each time, so depending on that identity re-ran this load on
+  // every tab switch.
+  const userId = session?.user.id ?? null;
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data load on mount; the fetch's setState is intentional
-    if (!sessionPending && session) void loadTestUsers();
-  }, [sessionPending, session, loadTestUsers]);
+    if (!sessionPending && userId) void loadTestUsers();
+  }, [sessionPending, userId, loadTestUsers]);
 
   const credentialsText = useMemo(
     () => created.map((c) => `${c.email}\t${c.password}\t${c.plan}`).join("\n"),

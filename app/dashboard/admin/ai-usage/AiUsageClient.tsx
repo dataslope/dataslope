@@ -237,12 +237,17 @@ export function AiUsageClient() {
     if (seq === loadSeq.current) setLoading(false);
   }, []);
 
+  // Keyed on the signed-in USER, not the `session` object: Better Auth
+  // refetches the session whenever the tab regains focus and hands back a
+  // fresh object each time, so depending on that identity re-ran this load on
+  // every tab switch.
+  const userId = session?.user.id ?? null;
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data load on mount; the fetch's setState is intentional
-    if (!sessionPending && session) void load(range, anchor);
-    // Mount-only: subsequent loads are driven by the controls' handlers.
+    if (!sessionPending && userId) void load(range, anchor);
+    // Once per signed-in user: later loads are driven by the controls' handlers.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionPending, session, load]);
+  }, [sessionPending, userId, load]);
 
   const selectRange = (r: Range) => {
     setRange(r);

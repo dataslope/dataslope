@@ -160,12 +160,17 @@ export function AiFeedbackClient() {
     if (seq === loadSeq.current) setLoading(false);
   }, []);
 
+  // Keyed on the signed-in USER, not the `session` object: Better Auth
+  // refetches the session whenever the tab regains focus and hands back a
+  // fresh object each time, so depending on that identity re-ran this load on
+  // every tab switch.
+  const userId = session?.user.id ?? null;
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data load on mount; the fetch's setState is intentional
-    if (!sessionPending && session) void load(filter);
-    // Mount-only: later loads are driven by the filter buttons.
+    if (!sessionPending && userId) void load(filter);
+    // Once per signed-in user: later loads are driven by the filter buttons.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionPending, session, load]);
+  }, [sessionPending, userId, load]);
 
   if (sessionPending) return <CenteredNote>Loading…</CenteredNote>;
   if (!session) return <SignInPrompt />;
