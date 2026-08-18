@@ -304,6 +304,11 @@ async function diagnose(msg: Extract<InMessage, { kind: "diagnose" }>): Promise<
   const env = msg.env ?? "dom";
   environment = env;
   await ensureLibs(env);
+  // JSX entries need React's typings for the checker to say anything true
+  // about a component; best-effort, as for completions.
+  if (msg.files.some(([path]) => /\.(tsx|jsx)$/i.test(path))) {
+    await ensureReactTypes().catch(() => {});
+  }
   syncScripts([...msg.files, ...ambientFilesFor(env)]);
 
   const diagnostics: TsDiagnosticMessage[] = [];

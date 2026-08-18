@@ -66,10 +66,25 @@ export function libSeedsFor(ts: typeof tsModule, env: TsEnvironment): string[] {
     : [ts.getDefaultLibFileName(options)];
 }
 
+/** Path of the browser playgrounds' ambient declarations. */
+export const BROWSER_AMBIENT_TYPES_PATH = "/__pg/browser-globals.d.ts";
+
+/**
+ * A bare import in the React playground resolves to a pinned esm.sh URL at
+ * bundle time, so the package is real at runtime but has no typings here
+ * unless they were fetched. Without this, importing `clsx` would be
+ * reported as a missing module: an error about the checker's own reach,
+ * not about the reader's program. Concrete typings (React's) still win.
+ */
+export const BROWSER_AMBIENT_TYPES = `declare module "*";\n`;
+
 /** Declarations mounted on top of the workspace: the Node surface for the
- *  playgrounds that run on almostnode, nothing for the browser ones. */
+ *  playgrounds that run on almostnode, an escape hatch for un-typed npm
+ *  imports for the browser ones. */
 export function ambientFilesFor(env: TsEnvironment): Array<[string, string]> {
-  return env === "node" ? [[NODE_AMBIENT_TYPES_PATH, NODE_AMBIENT_TYPES]] : [];
+  return env === "node"
+    ? [[NODE_AMBIENT_TYPES_PATH, NODE_AMBIENT_TYPES]]
+    : [[BROWSER_AMBIENT_TYPES_PATH, BROWSER_AMBIENT_TYPES]];
 }
 
 /** Files worth analysing; data files in a workspace are not TypeScript. */

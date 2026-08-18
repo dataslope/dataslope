@@ -15,6 +15,7 @@ import {
   completeWithTsService,
 } from "./tsLanguageService";
 import {
+  cancelPreviewRun,
   composeWebDocument,
   hasHarnessMarker,
   newPreviewToken,
@@ -362,6 +363,14 @@ const TEXT_FILE_RE = /\.(html?|css|js|mjs|cjs|json|svg|txt|md|xml)$/i;
 class WebPreviewRuntime implements LanguageRuntime {
   private stagedText = new Map<string, string>();
   private stagedBinary = new Map<string, Uint8Array>();
+  /** Slot the run in flight is rendering into, for `cancelRun`. */
+  private activeHost: HTMLElement | null = null;
+
+  /** Stop the page: the frame IS the program, so removing it ends the run
+   *  even when the document has wedged itself in a loop. */
+  async cancelRun(): Promise<void> {
+    cancelPreviewRun(this.activeHost);
+  }
 
   async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
     const text = new Map<string, string>();
@@ -419,7 +428,9 @@ class WebPreviewRuntime implements LanguageRuntime {
       textFiles,
       binaryFiles,
       tailwind: options?.previewTailwind,
+      entryFile: options?.entryFilename ?? "index.html",
     });
+    this.activeHost = options?.previewHost ?? null;
     await runPreviewDocument({
       doc,
       token,
@@ -464,6 +475,7 @@ function composeStaticWebPreview(
     token: options.token,
     textFiles,
     tailwind: options.tailwind,
+    entryFile: entry.filename,
   });
 }
 
@@ -479,9 +491,11 @@ export const webAdapter: LanguageAdapter = {
     engine: "Sandboxed iframe preview (native browser)",
     notes:
       "Pages render in a sandboxed iframe with a unique opaque origin, no runtime download at all. " +
-      "Root-level .css/.js tabs apply automatically, CodePen-style (reference a file explicitly with " +
-      "<link>/<script src> to control its position instead); console output and errors stream into " +
-      "the output panel.",
+      "The three tabs are the whole workspace: styles.css and script.js apply automatically, " +
+      "CodePen-style, or reference either with <link>/<script src> in your HTML to place it " +
+      "yourself. Console output and errors stream into the output panel, with locations in your " +
+      "own files. The opaque origin means localStorage and sessionStorage are emulated in memory " +
+      "and reset with the preview; cookies are unavailable.",
   },
   codeMirrorMode: "htmlmixed",
   codeMirrorModeForFile(filename) {
@@ -501,6 +515,51 @@ export const webAdapter: LanguageAdapter = {
   exportFormats: [
     { extension: "html", label: "HTML (.html)", mimeType: "text/html" },
   ],
+  // A CSS or JS tab is not an HTML document; exporting it as one renamed
+  // the file rather than converting it, and the browser then rendered
+  // JavaScript as a text document.
+  exportFormatsForFile(filename) {
+    if (/\.css$/i.test(filename)) {
+      return [{ extension: "css", label: "CSS (.css)", mimeType: "text/css" }];
+    }
+    if (/\.mjs$/i.test(filename)) {
+      return [
+        { extension: "mjs", label: "JavaScript module (.mjs)", mimeType: "text/javascript" },
+      ];
+    }
+    if (/\.js$/i.test(filename)) {
+      return [
+        { extension: "js", label: "JavaScript (.js)", mimeType: "text/javascript" },
+      ];
+    }
+    return undefined;
+  },
+  // The composed page is built on every Run; this is the same document
+  // without the console bridge, which is the artifact someone opening an
+  // Export menu in an HTML playground is looking for.
+  exportProject: {
+    label: "Page, with CSS and JS inlined",
+    description: "One self-contained .html file that runs anywhere",
+    extension: "html",
+    mimeType: "text/html",
+    compose(files, entryFilename) {
+      const entry =
+        files.find((f) => f.filename === entryFilename) ??
+        files.find((f) => /\.html?$/i.test(f.filename));
+      if (!entry) return null;
+      const textFiles = new Map<string, string>();
+      for (const f of files) {
+        if (TEXT_FILE_RE.test(f.filename)) textFiles.set(f.filename, f.content);
+      }
+      return composeWebDocument({
+        entryHtml: entry.content,
+        token: "export",
+        textFiles,
+        entryFile: entry.filename,
+        omitBridge: true,
+      });
+    },
+  },
   exportBaseFilename: "index",
   defaultFileExtension: "html",
   // Fresh workspaces open as the CodePen trio, one editor per pane.

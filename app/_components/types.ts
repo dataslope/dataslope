@@ -244,6 +244,30 @@ export interface LanguageAdapter {
   };
   /** Formats offered by the "Export" dropdown (client-side download). */
   exportFormats: ExportFormat[];
+  /**
+   * Formats for the file that is actually open, when a workspace holds
+   * more than one kind. Without it, a CSS or JS tab in the web playground
+   * downloads as `script.html` with a `text/html` type: the file renamed,
+   * not converted. Falls back to `exportFormats`.
+   */
+  exportFormatsForFile?: (filename: string) => ExportFormat[] | undefined;
+  /**
+   * The whole workspace as one runnable artifact, when that is a thing the
+   * playground can produce. The web playground composes exactly this
+   * document on every Run, so its natural deliverable is one self-
+   * contained `.html` file.
+   */
+  exportProject?: {
+    label: string;
+    description: string;
+    extension: string;
+    mimeType: string;
+    /** `files` is the workspace; returns the artifact's text. */
+    compose: (
+      files: { filename: string; content: string }[],
+      entryFilename: string,
+    ) => string | null;
+  };
   /** Base filename (without extension) used when exporting, e.g. "script". */
   exportBaseFilename: string;
   /** Default extension (no dot) for new tabs; seeds the initial file and

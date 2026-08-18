@@ -3052,6 +3052,43 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     [adapter.exportBaseFilename],
   );
 
+  /** Formats that match the file that is actually open. */
+  const exportFormatsForActiveFile = useMemo(() => {
+    const active = files.find((f) => f.id === activeFileId);
+    const forFile = active
+      ? adapter.exportFormatsForFile?.(active.filename)
+      : undefined;
+    return forFile ?? adapter.exportFormats;
+  }, [adapter, files, activeFileId]);
+
+  /** Download the whole workspace as the one artifact it composes into. */
+  const exportProject = useCallback(async () => {
+    const spec = adapter.exportProject;
+    if (!spec) return;
+    const sources = filesRef.current.map((f) => ({
+      filename: f.filename,
+      content: dirtyBuffersRef.current.get(f.id) ?? "",
+    }));
+    const entry =
+      filesRef.current.find((f) => f.id === outputFileIdRef.current)?.filename ??
+      sources[0]?.filename ??
+      "";
+    const text = spec.compose(sources, entry);
+    if (text === null) {
+      showToast("Nothing to export yet.");
+      return;
+    }
+    const blob = new Blob([text], { type: spec.mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${adapter.exportBaseFilename}.${spec.extension}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [adapter, showToast]);
+
   /** Download every file in the workspace as one .zip, at its own path. */
   const exportWorkspace = useCallback(async () => {
     const wsId = workspaceIdRef.current;
@@ -3482,6 +3519,80 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // A fresh run retires the "cleared" note; adjusted during render rather
   // than in an effect.
   if (outputCleared && outputs.length > 0) setOutputCleared(false);
+  // Height of the preview playgrounds' console strip. A fixed strip is
+  // about eight lines, which is thin for the only surface errors appear
+  // on; the drag handle is remembered per browser, not per workspace.
+  const CONSOLE_MIN_HEIGHT = 72;
+  const CONSOLE_DEFAULT_HEIGHT = 168;
+  const [consoleHeight, setConsoleHeightState] = useState(CONSOLE_DEFAULT_HEIGHT);
+  useEffect(() => {
+    if (!hasPreview) return;
+    try {
+      const stored = Number(
+        window.localStorage.getItem(`playground_${adapter.id}_consoleheight`),
+      );
+      if (Number.isFinite(stored) && stored >= CONSOLE_MIN_HEIGHT) {
+        /* Deterministic-SSR pattern, see the split-view hydration note. */
+        /* eslint-disable-next-line react-hooks/set-state-in-effect */
+        setConsoleHeightState(stored);
+      }
+    } catch {
+      /* private mode, keep the default. */
+    }
+  }, [adapter.id, hasPreview]);
+  const setConsoleHeight = useCallback(
+    (next: number) => {
+      setConsoleHeightState(next);
+      try {
+        window.localStorage.setItem(
+          `playground_${adapter.id}_consoleheight`,
+          String(next),
+        );
+      } catch {
+        /* private mode, the drag still applies for this session. */
+      }
+    },
+    [adapter.id],
+  );
+  const resetConsoleHeight = useCallback(() => {
+    setConsoleHeight(CONSOLE_DEFAULT_HEIGHT);
+  }, [setConsoleHeight]);
+  const beginConsoleResize = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      const handle = event.currentTarget;
+      const startY = event.clientY;
+      const strip = handle.parentElement;
+      const content = strip?.querySelector(".web-console-content");
+      const startHeight =
+        content?.getBoundingClientRect().height ?? CONSOLE_DEFAULT_HEIGHT;
+      // Leave room for the preview: a console that eats the whole pane
+      // hides the thing it is narrating.
+      const maxHeight = Math.max(
+        CONSOLE_MIN_HEIGHT,
+        (strip?.parentElement?.getBoundingClientRect().height ??
+          startHeight * 4) - 140,
+      );
+      handle.setPointerCapture(event.pointerId);
+      const onMove = (move: PointerEvent) => {
+        const next = startHeight - (move.clientY - startY);
+        setConsoleHeight(
+          Math.min(maxHeight, Math.max(CONSOLE_MIN_HEIGHT, Math.round(next))),
+        );
+      };
+      const onUp = () => {
+        handle.releasePointerCapture(event.pointerId);
+        handle.removeEventListener("pointermove", onMove);
+        handle.removeEventListener("pointerup", onUp);
+        handle.removeEventListener("pointercancel", onUp);
+      };
+      handle.addEventListener("pointermove", onMove);
+      handle.addEventListener("pointerup", onUp);
+      handle.addEventListener("pointercancel", onUp);
+    },
+    [setConsoleHeight],
+  );
+
   const runNumbers = useMemo(() => {
     const ids = new Set<number>(dismissedRuns);
     for (const group of outputGroups) {
@@ -3571,7 +3682,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               title: "Export",
               render: (close: () => void) => (
                 <>
-                  {adapter.exportFormats.map((fmt) => (
+                  {exportFormatsForActiveFile.map((fmt) => (
                     <button
                       type="button"
                       key={fmt.extension}
@@ -3590,6 +3701,26 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                       </div>
                     </button>
                   ))}
+                  {adapter.exportProject && (
+                    <button
+                      type="button"
+                      className="example-item"
+                      onClick={() => {
+                        close();
+                        void exportProject();
+                      }}
+                    >
+                      <div className="ex-title">
+                        {adapter.exportProject.label}
+                        <span className="ext-badge">
+                          .{adapter.exportProject.extension}
+                        </span>
+                      </div>
+                      <div className="ex-desc">
+                        {adapter.exportProject.description}
+                      </div>
+                    </button>
+                  )}
                   {/* The whole-workspace download also lives under
                       Save -> Download copy, but a multi-file project is
                       exactly what someone opening an Export menu is
@@ -3647,7 +3778,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         ],
       },
     ],
-    [adapter, requestExample, exportCode, exportWorkspace, openSettingsTab],
+    [
+      adapter,
+      requestExample,
+      exportCode,
+      exportFormatsForActiveFile,
+      exportProject,
+      exportWorkspace,
+      openSettingsTab,
+    ],
   );
 
   // Account group as the ⋯ menu's last section; null while the first
@@ -4833,19 +4972,46 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     const textSegs = latest?.filter(
                       (c) => c.type === "stdout" || c.type === "stderr",
                     );
+                    const runId = latest?.[0]?.runId;
+                    const runNumber =
+                      runId !== undefined ? runNumbers.get(runId) : undefined;
+                    const last = latest?.[latest.length - 1];
+                    // The console shows one run at a time, so without a
+                    // boundary the previous run's text reads as this one's.
+                    // Only a finished run gets a duration.
+                    const finishedAt = last?.finishedAt;
+                    const running = statusState === "running";
                     return (
                       <div className={`web-console${consoleError ? " error" : ""}`}>
+                        <div
+                          className="web-console-resizer"
+                          role="separator"
+                          aria-label="Resize the output panel"
+                          aria-orientation="horizontal"
+                          onPointerDown={beginConsoleResize}
+                          onDoubleClick={resetConsoleHeight}
+                        />
                         <div className="web-console-bar">
                           <span className="web-console-accent" aria-hidden="true" />
-                          <span className="web-console-label">Output</span>
+                          <span className="web-console-label">
+                            {runNumber !== undefined ? `Run ${runNumber}` : "Output"}
+                          </span>
                           <div className="pane-bar-sep" />
-                          {latest && (
-                            <span className="web-console-ms">
-                              {latest[latest.length - 1].elapsed}
+                          {finishedAt !== undefined && (
+                            <span className="web-console-time">
+                              {new Date(finishedAt).toLocaleTimeString([], {
+                                hour12: false,
+                              })}
                             </span>
                           )}
+                          {finishedAt !== undefined && last && (
+                            <span className="web-console-ms">{last.elapsed}</span>
+                          )}
                         </div>
-                        <div className="web-console-content">
+                        <div
+                          className="web-console-content"
+                          style={{ maxHeight: consoleHeight }}
+                        >
                           {textSegs && textSegs.length > 0 ? (
                             textSegs.map((cell) => (
                               <div
@@ -4861,7 +5027,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                             ))
                           ) : (
                             <span className="web-console-ready">
-                              Ready. Console output lands here.
+                              {running
+                                ? "Running…"
+                                : runNumber !== undefined
+                                  ? `Run ${runNumber} produced no console output.`
+                                  : "Ready. Console output lands here."}
                             </span>
                           )}
                         </div>

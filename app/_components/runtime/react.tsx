@@ -13,9 +13,19 @@ import { getWebFmt, WEB_FMT_2SPACE } from "./webFmt";
 import {
   buildTsCompletionRequest,
   completeWithTsService,
+  diagnoseWithTsService,
+  formatTsDiagnostic,
 } from "./tsLanguageService";
+import { ANALYZABLE_SOURCE_RE } from "./tsAnalysisConfig";
+import { bundleLineOf, inlineSourceMapOf } from "./bundleSourceMap";
 import {
+  externalSpecifiers,
+  preflightModules,
+} from "./reactModulePreflight";
+import {
+  cancelPreviewRun,
   composeReactDocument,
+  composeReactDocumentWithMeta,
   hasHarnessMarker,
   newPreviewToken,
   runPreviewDocument,
@@ -437,8 +447,16 @@ const TEXT_FILE_RE = /\.(tsx|ts|jsx|js|mjs|cjs|json|css|txt|svg|html?)$/i;
 class ReactPreviewRuntime implements LanguageRuntime {
   private nextId = 0;
   private stagedText = new Map<string, string>();
+  /** Slot the run in flight is rendering into, for `cancelRun`. */
+  private activeHost: HTMLElement | null = null;
 
   constructor(private worker: Worker) {}
+
+  /** Stop the page: the frame IS the program, so removing it ends the run
+   *  even when the document has wedged itself in a loop. */
+  async cancelRun(): Promise<void> {
+    cancelPreviewRun(this.activeHost);
+  }
 
   /** Free the runtime by terminating the esbuild worker. */
   dispose(): void {
@@ -518,20 +536,80 @@ class ReactPreviewRuntime implements LanguageRuntime {
       return;
     }
 
+    // Every bare import left the bundler as an esm.sh URL, so a mistyped
+    // package survives the build and fails inside the frame with no
+    // specifier and no message. Check them here, where the message can
+    // still name the package.
+    const failures = await preflightModules(externalSpecifiers(bundled.js));
+    for (const failure of failures) {
+      emit({ type: "stderr", content: failure.message });
+    }
+    if (failures.some((f) => f.status === 404)) {
+      // A package that does not exist cannot be fixed by running it.
+      return;
+    }
+
+    // Type checking runs alongside the render rather than ahead of it, so
+    // the preview is not held behind the checker's lib downloads.
+    const analysis = options?.diagnostics
+      ? diagnoseWithTsService({
+          files: this.analysisFiles(files, entry, code),
+          entry,
+          env: "dom",
+        })
+      : Promise.resolve([]);
+
     const token = newPreviewToken();
-    const doc = composeReactDocument({
+    const { doc, bundleStartLine } = composeReactDocumentWithMeta({
       js: bundled.js,
       css: bundled.css || undefined,
       token,
       tailwind: options?.previewTailwind,
     });
+    const sourceMap = inlineSourceMapOf(bundled.js);
+    this.activeHost = options?.previewHost ?? null;
     await runPreviewDocument({
       doc,
       token,
       emit,
       previewHost: options?.previewHost,
       waitForHarness: hasHarnessMarker(code),
+      locate: sourceMap
+        ? (line, column) => {
+            const at = sourceMap.lookup(
+              bundleLineOf(line, bundleStartLine),
+              column,
+            );
+            return at ? `${at.file}:${at.line}:${at.column}` : null;
+          }
+        : undefined,
     });
+
+    // Reported after the page has rendered, where the eye is.
+    const errors = (await analysis).filter((d) => d.category === "error");
+    if (errors.length > 0) {
+      emit({
+        type: "stderr",
+        content: errors.map(formatTsDiagnostic).join("\n"),
+      });
+      // esbuild strips types without checking them, so the page runs — but
+      // the run is not a success and says so instead of a plain "Done".
+      throw new Error(
+        `Found ${errors.length} TypeScript error${errors.length === 1 ? "" : "s"}.`,
+      );
+    }
+  }
+
+  /** Workspace snapshot for the checker: the staged files with the entry
+   *  overlaid, since `code` may carry a prelude the staged copy lacks. */
+  private analysisFiles(
+    files: Map<string, string>,
+    entry: string,
+    code: string,
+  ): Array<[string, string]> {
+    const out = new Map(files);
+    out.set(entry, code);
+    return [...out].filter(([path]) => ANALYZABLE_SOURCE_RE.test(path));
   }
 }
 
@@ -595,7 +673,9 @@ export const reactAdapter: LanguageAdapter = {
     notes:
       "TSX compiles and bundles fully client-side in a Web Worker; bare npm imports resolve " +
       "to pinned esm.sh ES modules fetched by the sandboxed preview iframe. No build server, " +
-      "no cross-origin isolation requirements.",
+      "no cross-origin isolation requirements. Types are checked alongside the render and " +
+      "errors report the .tsx line they came from. The opaque origin means localStorage and " +
+      "sessionStorage are emulated in memory and reset with the preview.",
   },
   codeMirrorMode: "tsx",
   codeMirrorModeForFile(filename) {
@@ -611,10 +691,28 @@ export const reactAdapter: LanguageAdapter = {
   packages: PACKAGES,
   outputCapabilities: { preview: true, autoPreview: true },
   composeStaticPreview: composeStaticReactPreview,
+  // One entry per file, matching what the file actually is. The old
+  // "React JSX (.jsx)" option renamed a .tsx file without transforming
+  // it, so the download still carried `interface Props` and `: number`
+  // and no bundler would accept it.
   exportFormats: [
     { extension: "tsx", label: "React TSX (.tsx)", mimeType: "text/plain" },
-    { extension: "jsx", label: "React JSX (.jsx)", mimeType: "text/plain" },
   ],
+  exportFormatsForFile(filename) {
+    if (/\.css$/i.test(filename)) {
+      return [{ extension: "css", label: "CSS (.css)", mimeType: "text/css" }];
+    }
+    if (/\.jsx$/i.test(filename)) {
+      return [{ extension: "jsx", label: "React JSX (.jsx)", mimeType: "text/plain" }];
+    }
+    if (/\.ts$/i.test(filename)) {
+      return [{ extension: "ts", label: "TypeScript (.ts)", mimeType: "text/plain" }];
+    }
+    if (/\.js$/i.test(filename)) {
+      return [{ extension: "js", label: "JavaScript (.js)", mimeType: "text/javascript" }];
+    }
+    return undefined;
+  },
   exportBaseFilename: "main",
   defaultFileExtension: "tsx",
   // Standard main/App/styles project shape; Run always resolves to the

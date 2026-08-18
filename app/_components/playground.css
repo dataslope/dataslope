@@ -5949,6 +5949,40 @@ html[data-playground-theme="dark"] {
   flex: none;
   border-top: 1px solid var(--border);
   background: var(--bg);
+  /* The strip stays content-driven: a run that printed one line should not
+     cost the preview a fixed slab of height. The drag handle sets how far
+     the content may grow before it scrolls, not how tall the strip is. */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+/* Drag handle straddling the border, in the gap between preview and
+   console. Double-click restores the default height. */
+.web-console-resizer {
+  position: absolute;
+  top: -3px;
+  left: 0;
+  right: 0;
+  height: 7px;
+  cursor: ns-resize;
+  touch-action: none;
+  z-index: 2;
+}
+.web-console-resizer::after {
+  content: "";
+  position: absolute;
+  inset: 3px 0;
+  background: transparent;
+  transition: background 0.12s ease;
+}
+.web-console-resizer:hover::after,
+.web-console-resizer:active::after {
+  background: var(--primary);
+}
+.web-console-time {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
 }
 .web-console-bar {
   display: flex;
@@ -5990,7 +6024,7 @@ html[data-playground-theme="dark"] {
   color: var(--text-dim);
   white-space: pre-wrap;
   word-break: break-word;
-  max-height: 140px;
+  min-height: 0;
   overflow-y: auto;
 }
 .web-console.error .web-console-content {
