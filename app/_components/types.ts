@@ -51,6 +51,14 @@ export interface EntryFileInfo {
   /** `"main"` = explicit main()/Main(); `"topLevel"` (C# only) = top-level
    *  statements outside any class. */
   kind: "main" | "topLevel";
+  /**
+   * What the Run button should call this entry point, when the filename is
+   * not it. Java launches the class that declares `main`, which a `package`
+   * line or a class/file mismatch can put somewhere the filename does not
+   * name; a button reading "Run App" for a program that starts
+   * `myapp.Main` is asserting something nobody checked.
+   */
+  label?: string;
 }
 
 export interface ExampleSnippet {

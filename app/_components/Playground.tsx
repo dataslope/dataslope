@@ -35,10 +35,7 @@ import {
   indentOnInput,
   indentUnit,
 } from "@codemirror/language";
-import {
-  closeBrackets,
-  closeBracketsKeymap,
-} from "@codemirror/autocomplete";
+import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
 import { loadLanguage, themeFor, redoKeymap } from "./cmExtensions";
 import { aiInlineCompletion } from "./ai/inlineCompletion";
@@ -140,6 +137,7 @@ import {
 } from "./opfs/activeWorkspace";
 import { acquireWorkspaceLock } from "./opfs/workspace";
 import { downloadWorkspaceZip } from "./opfs/workspaceArchive";
+import { mimeTypeForFilename } from "./exportMime";
 import { WorkspaceBadge } from "./workspace/WorkspaceBadge";
 import { ShareControls } from "./cloud/ShareControls";
 import {
@@ -223,8 +221,7 @@ function buildCapabilitiesBlurb(
   if (caps?.preview) items.push("a live page preview");
   if (items.length === 0) return "";
   if (items.length === 1) return `Supports text and ${items[0]}.`;
-  if (items.length === 2)
-    return `Supports text, ${items[0]}, and ${items[1]}.`;
+  if (items.length === 2) return `Supports text, ${items[0]}, and ${items[1]}.`;
   return `Supports text, ${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}.`;
 }
 
@@ -298,7 +295,7 @@ function computeRunButtonState(
     entries.sort((a, b) => a.filename.localeCompare(b.filename));
 
     const activeEntry = activeFile
-      ? entries.find((e) => e.filename === activeFile.filename) ?? null
+      ? (entries.find((e) => e.filename === activeFile.filename) ?? null)
       : null;
 
     if (activeEntry) {
@@ -307,11 +304,14 @@ function computeRunButtonState(
       const label: ReactNode =
         activeEntry.kind === "topLevel"
           ? "Run"
-          : runEntryLabel(stemFor(activeEntry.filename));
+          : runEntryLabel(activeEntry.label ?? stemFor(activeEntry.filename));
       const dropdown = entries
         .filter((e) => e.filename !== activeEntry.filename)
         .map((e) => ({
-          label: runEntryLabel(stemFor(e.filename), e.kind === "topLevel"),
+          label: runEntryLabel(
+            e.label ?? stemFor(e.filename),
+            e.kind === "topLevel",
+          ),
           entryFilename: e.filename,
         }));
       return {
@@ -342,11 +342,16 @@ function computeRunButtonState(
     const dropdown = entries
       .filter((e) => e.filename !== primaryEntry.filename)
       .map((e) => ({
-        label: runEntryLabel(stemFor(e.filename), e.kind === "topLevel"),
+        label: runEntryLabel(
+          e.label ?? stemFor(e.filename),
+          e.kind === "topLevel",
+        ),
         entryFilename: e.filename,
       }));
     return {
-      primaryLabel: runEntryLabel(stemFor(primaryEntry.filename)),
+      primaryLabel: runEntryLabel(
+        primaryEntry.label ?? stemFor(primaryEntry.filename),
+      ),
       primaryEntry: primaryEntry.filename,
       dropdownItems: dropdown,
     };
@@ -426,10 +431,7 @@ function PackagesDrawer({
       <Drawer.Portal>
         <Drawer.Backdrop className="pkg-overlay" />
         <Drawer.Viewport className="mobile-drawer-viewport pkg-drawer-viewport">
-          <Drawer.Popup
-            className="pkg-drawer"
-            aria-label="Available packages"
-          >
+          <Drawer.Popup className="pkg-drawer" aria-label="Available packages">
             <Drawer.Content className="pkg-drawer-content">
               {/* Drag handle, mobile-only (hidden via CSS on desktop). */}
               <div className="mobile-menu-handle" aria-hidden="true" />
@@ -645,10 +647,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   );
   // Confirmations for the Settings panel's destructive actions.
   const [confirmRestoreOpen, setConfirmRestoreOpen] = useState(false);
-  const [confirmClearStorageOpen, setConfirmClearStorageOpen] =
-    useState(false);
-  const [confirmClearAllDataOpen, setConfirmClearAllDataOpen] =
-    useState(false);
+  const [confirmClearStorageOpen, setConfirmClearStorageOpen] = useState(false);
+  const [confirmClearAllDataOpen, setConfirmClearAllDataOpen] = useState(false);
 
   // ─── Files pane (OPFS-backed virtual filesystem) ─────────────────────
   const [filesPaneOpen, setFilesPaneOpen] = useState(false);
@@ -678,9 +678,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const router = useRouter();
 
   // ─── Runtime state ──────────────────────────────────────────────────────
-  const [loadingMessage, setLoadingMessage] = useState(
-    "Initializing runtime…",
-  );
+  const [loadingMessage, setLoadingMessage] = useState("Initializing runtime…");
   const [loaded, setLoaded] = useState(false);
   // Latest stage-floor fraction from the adapter's boot (null until one
   // arrives); smoothed below for a determinate loading bar.
@@ -1072,10 +1070,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       // CSS takes over at default proportions.
       panesRef.current?.style.removeProperty("grid-template-columns");
       try {
-        window.localStorage.setItem(
-          `playground_${adapter.id}_editorpos`,
-          pos,
-        );
+        window.localStorage.setItem(`playground_${adapter.id}_editorpos`, pos);
       } catch {
         /* quota / private mode, ignore. */
       }
@@ -1117,9 +1112,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     requestAnimationFrame(() => {
       const id = newRunFirstIdRef.current;
       if (id != null) {
-        const target = el.querySelector<HTMLElement>(
-          `[data-cell-id="${id}"]`,
-        );
+        const target = el.querySelector<HTMLElement>(`[data-cell-id="${id}"]`);
         if (target) {
           // Land the cell ~64px below the top of the output area.
           const top = target.offsetTop - 64;
@@ -1138,8 +1131,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     document.body.classList.add("playground-active");
 
     const D = DEFAULT_PLAYGROUND_SETTINGS;
-    const savedSize = Number(localStorage.getItem(storageKey("fontsize")) ?? D.fontSize) || D.fontSize;
-    const savedTheme = getStoredEditorTheme(storageKey("editortheme")) ?? D.editorTheme;
+    const savedSize =
+      Number(localStorage.getItem(storageKey("fontsize")) ?? D.fontSize) ||
+      D.fontSize;
+    const savedTheme =
+      getStoredEditorTheme(storageKey("editortheme")) ?? D.editorTheme;
     const savedOutputEnabled =
       localStorage.getItem(storageKey("outputfontsize_enabled")) === "true";
     const savedOutputSize =
@@ -1335,7 +1331,14 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       activeFileId,
       openTabIds.filter((id) => files.some((f) => f.id === id)),
     );
-  }, [adapter.id, workspaceId, files, activeFileId, openTabIds, workspaceReady]);
+  }, [
+    adapter.id,
+    workspaceId,
+    files,
+    activeFileId,
+    openTabIds,
+    workspaceReady,
+  ]);
 
   // Whatever activates a file must end with its tab open; centralized so
   // no activation path can strand an active-but-closed file.
@@ -1378,7 +1381,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             }
             setVirtualFiles((prev) => {
               const filtered = prev.filter((f) => f.path !== path);
-              return [...filtered, { path, size: bytes.length, isFolder: false }];
+              return [
+                ...filtered,
+                { path, size: bytes.length, isFolder: false },
+              ];
             });
             // Auto-expand ancestor folders so the new file is visible.
             const segments = path.split("/").filter(Boolean);
@@ -1463,7 +1469,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           prev.map((f) => {
             if (f.path === oldPath) return { ...f, path: newPath };
             if (f.path.startsWith(oldPrefix)) {
-              return { ...f, path: `${newPrefix}${f.path.slice(oldPrefix.length)}` };
+              return {
+                ...f,
+                path: `${newPrefix}${f.path.slice(oldPrefix.length)}`,
+              };
             }
             return f;
           }),
@@ -1549,7 +1558,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           prev.map((f) => {
             if (f.path === sourcePath) return { ...f, path: newPath };
             if (f.path.startsWith(oldPrefix)) {
-              return { ...f, path: `${newPrefix}${f.path.slice(oldPrefix.length)}` };
+              return {
+                ...f,
+                path: `${newPrefix}${f.path.slice(oldPrefix.length)}`,
+              };
             }
             return f;
           }),
@@ -1788,7 +1800,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       return;
     }
     view.focus();
-  }, [activeFileId, activeTabId, splitActive, workspaceReady, showLoadingOverlay]);
+  }, [
+    activeFileId,
+    activeTabId,
+    splitActive,
+    workspaceReady,
+    showLoadingOverlay,
+  ]);
 
   // Per-file syntax highlighting for mixed-language workspaces (web);
   // adapters without `codeMirrorModeForFile` keep the mount-time mode.
@@ -1998,293 +2016,303 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // ─── Actions ────────────────────────────────────────────────────────────
   const runCode = useCallback(
     async (entryOverride?: string, opts?: { auto?: boolean }) => {
-    const editor = editorRef.current;
-    const rt = runtimeRef.current;
-    if (!rt) return;
-    // The split view has no tabbed editor; its panes write through to the
-    // dirty buffers, so reads below fall back to the buffers.
-    if (!editor && !splitActiveRef.current) return;
-    // Snapshot the active file id at run start so outputs route to the file
-    // whose code actually executed, even after a mid-run tab switch.
-    let targetFileId = activeFileIdRef.current;
-    if (!targetFileId) return;
+      const editor = editorRef.current;
+      const rt = runtimeRef.current;
+      if (!rt) return;
+      // The split view has no tabbed editor; its panes write through to the
+      // dirty buffers, so reads below fall back to the buffers.
+      if (!editor && !splitActiveRef.current) return;
+      // Snapshot the active file id at run start so outputs route to the file
+      // whose code actually executed, even after a mid-run tab switch.
+      let targetFileId = activeFileIdRef.current;
+      if (!targetFileId) return;
 
-    // Resolve the entry file (chevron picks override the active tab); an
-    // override's content is read from the buffer / OPFS.
-    const activeFile =
-      filesRef.current.find((f) => f.id === targetFileId) ?? null;
-    const entryFilename = entryOverride ?? activeFile?.filename;
-    // Outputs belong to the file that RAN (the entry), not the focused
-    // pane, so the console reads as one stream (see `outputFileId`). True
-    // in split view, and wherever a run builds the whole workspace.
-    if ((splitActiveRef.current || adapter.projectWideRuns) && entryFilename) {
-      const entryFile = filesRef.current.find(
-        (f) => f.filename === entryFilename,
-      );
-      if (entryFile) targetFileId = entryFile.id;
-    }
-    let code: string;
-    if (entryOverride && activeFile && entryOverride !== activeFile.filename) {
-      const entryFile = filesRef.current.find(
-        (f) => f.filename === entryOverride,
-      );
-      if (entryFile) {
-        const buffered = dirtyBuffersRef.current.get(entryFile.id);
-        if (buffered !== undefined) {
-          code = buffered;
-        } else if (workspaceIdRef.current) {
-          const text = await opfsReadFile(
-            workspaceIdRef.current,
-            entryFile.id,
-          );
-          code = text ?? "";
+      // Resolve the entry file (chevron picks override the active tab); an
+      // override's content is read from the buffer / OPFS.
+      const activeFile =
+        filesRef.current.find((f) => f.id === targetFileId) ?? null;
+      const entryFilename = entryOverride ?? activeFile?.filename;
+      // Outputs belong to the file that RAN (the entry), not the focused
+      // pane, so the console reads as one stream (see `outputFileId`). True
+      // in split view, and wherever a run builds the whole workspace.
+      if (
+        (splitActiveRef.current || adapter.projectWideRuns) &&
+        entryFilename
+      ) {
+        const entryFile = filesRef.current.find(
+          (f) => f.filename === entryFilename,
+        );
+        if (entryFile) targetFileId = entryFile.id;
+      }
+      let code: string;
+      if (
+        entryOverride &&
+        activeFile &&
+        entryOverride !== activeFile.filename
+      ) {
+        const entryFile = filesRef.current.find(
+          (f) => f.filename === entryOverride,
+        );
+        if (entryFile) {
+          const buffered = dirtyBuffersRef.current.get(entryFile.id);
+          if (buffered !== undefined) {
+            code = buffered;
+          } else if (workspaceIdRef.current) {
+            const text = await opfsReadFile(
+              workspaceIdRef.current,
+              entryFile.id,
+            );
+            code = text ?? "";
+          } else {
+            code = "";
+          }
         } else {
           code = "";
         }
+      } else if (editor) {
+        code = editor.state.doc.toString();
       } else {
-        code = "";
+        // Split view: the pane's write-through listener keeps its buffer
+        // current.
+        code = (activeFile && dirtyBuffersRef.current.get(activeFile.id)) ?? "";
       }
-    } else if (editor) {
-      code = editor.state.doc.toString();
-    } else {
-      // Split view: the pane's write-through listener keeps its buffer
-      // current.
-      code = (activeFile && dirtyBuffersRef.current.get(activeFile.id)) ?? "";
-    }
-    if (!code.trim()) return;
+      if (!code.trim()) return;
 
-    if (errorResetTimerRef.current !== null) {
-      window.clearTimeout(errorResetTimerRef.current);
-      errorResetTimerRef.current = null;
-    }
-    setStatusState("running");
-
-    if (clearBeforeRun) {
-      setOutputsForFile(targetFileId, []);
-    }
-
-    setRunStatusMessage(null);
-
-    const t0 = performance.now();
-    // Notices the surface itself produces (a staging failure), kept out of
-    // `collected` because that array is addressed by stream position: a cell
-    // pushed at index 0 here would be overwritten by the run's first cell.
-    const preCells: Omit<OutputCell, "id" | "elapsed">[] = [];
-    // Sparse: a runtime that streams addresses cells by position, and a
-    // position can end up empty (a text segment that was only whitespace).
-    const collected: (Omit<OutputCell, "id" | "elapsed"> | undefined)[] = [];
-    const firstId = outputCounter.current + 1;
-    newRunFirstIdRef.current = firstId;
-    const runId = ++runCounter.current;
-
-    /**
-     * Show what the run has produced so far.
-     *
-     * Called repeatedly while the program is still going (Python streams its
-     * stdout), so this replaces the run's whole slice rather than appending:
-     * `mergeConsecutiveStdout` is deterministic, so a growing input produces
-     * a growing output with a stable prefix, and deriving ids from `firstId`
-     * instead of the running counter keeps each cell's React key stable
-     * across updates.
-     */
-    const publish = (finishedAt?: number): number => {
-      const merged = mergeConsecutiveStdout([
-        ...preCells,
-        ...collected.filter(
-          (c): c is Omit<OutputCell, "id" | "elapsed"> => c !== undefined,
-        ),
-      ]);
-      const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
-      setOutputsForFile(targetFileId, (prev) => [
-        ...prev.filter((c) => c.runId !== runId),
-        ...merged.map((c, i) => ({
-          ...c,
-          id: firstId + i,
-          elapsed,
-          runId,
-          finishedAt,
-        })),
-      ]);
-      outputCounter.current = Math.max(
-        outputCounter.current,
-        firstId + merged.length - 1,
-      );
-      return merged.length;
-    };
-
-    // Throttled live publishing: the first cell shows immediately, the rest
-    // batch, so a 50,000-line run doesn't re-render per chunk.
-    let liveTimer: number | null = null;
-    let livePending = false;
-    const scheduleLive = () => {
-      if (liveTimer !== null) {
-        livePending = true;
-        return;
+      if (errorResetTimerRef.current !== null) {
+        window.clearTimeout(errorResetTimerRef.current);
+        errorResetTimerRef.current = null;
       }
-      publish();
-      liveTimer = window.setTimeout(function tick() {
-        liveTimer = null;
-        if (!livePending) return;
-        livePending = false;
+      setStatusState("running");
+
+      if (clearBeforeRun) {
+        setOutputsForFile(targetFileId, []);
+      }
+
+      setRunStatusMessage(null);
+
+      const t0 = performance.now();
+      // Notices the surface itself produces (a staging failure), kept out of
+      // `collected` because that array is addressed by stream position: a cell
+      // pushed at index 0 here would be overwritten by the run's first cell.
+      const preCells: Omit<OutputCell, "id" | "elapsed">[] = [];
+      // Sparse: a runtime that streams addresses cells by position, and a
+      // position can end up empty (a text segment that was only whitespace).
+      const collected: (Omit<OutputCell, "id" | "elapsed"> | undefined)[] = [];
+      const firstId = outputCounter.current + 1;
+      newRunFirstIdRef.current = firstId;
+      const runId = ++runCounter.current;
+
+      /**
+       * Show what the run has produced so far.
+       *
+       * Called repeatedly while the program is still going (Python streams its
+       * stdout), so this replaces the run's whole slice rather than appending:
+       * `mergeConsecutiveStdout` is deterministic, so a growing input produces
+       * a growing output with a stable prefix, and deriving ids from `firstId`
+       * instead of the running counter keeps each cell's React key stable
+       * across updates.
+       */
+      const publish = (finishedAt?: number): number => {
+        const merged = mergeConsecutiveStdout([
+          ...preCells,
+          ...collected.filter(
+            (c): c is Omit<OutputCell, "id" | "elapsed"> => c !== undefined,
+          ),
+        ]);
+        const elapsed = `${((performance.now() - t0) / 1000).toFixed(2)}s`;
+        setOutputsForFile(targetFileId, (prev) => [
+          ...prev.filter((c) => c.runId !== runId),
+          ...merged.map((c, i) => ({
+            ...c,
+            id: firstId + i,
+            elapsed,
+            runId,
+            finishedAt,
+          })),
+        ]);
+        outputCounter.current = Math.max(
+          outputCounter.current,
+          firstId + merged.length - 1,
+        );
+        return merged.length;
+      };
+
+      // Throttled live publishing: the first cell shows immediately, the rest
+      // batch, so a 50,000-line run doesn't re-render per chunk.
+      let liveTimer: number | null = null;
+      let livePending = false;
+      const scheduleLive = () => {
+        if (liveTimer !== null) {
+          livePending = true;
+          return;
+        }
+        publish();
+        liveTimer = window.setTimeout(function tick() {
+          liveTimer = null;
+          if (!livePending) return;
+          livePending = false;
+          scheduleLive();
+        }, LIVE_OUTPUT_FLUSH_MS);
+      };
+      const stopLive = () => {
+        if (liveTimer !== null) {
+          window.clearTimeout(liveTimer);
+          liveTimer = null;
+        }
+      };
+      const emitCell: EmitOutput = (cell, seq, append) => {
+        if (seq === undefined) {
+          collected.push(cell);
+        } else {
+          const prev = collected[seq];
+          collected[seq] =
+            append && prev
+              ? { ...prev, content: prev.content + cell.content }
+              : cell;
+        }
         scheduleLive();
-      }, LIVE_OUTPUT_FLUSH_MS);
-    };
-    const stopLive = () => {
-      if (liveTimer !== null) {
-        window.clearTimeout(liveTimer);
-        liveTimer = null;
-      }
-    };
-    const emitCell: EmitOutput = (cell, seq, append) => {
-      if (seq === undefined) {
-        collected.push(cell);
-      } else {
-        const prev = collected[seq];
-        collected[seq] =
-          append && prev
-            ? { ...prev, content: prev.content + cell.content }
-            : cell;
-      }
-      scheduleLive();
-    };
+      };
 
-    // Mirror files the runtime created during the run into the Files pane
-    // + OPFS. Called on both success and error paths (a file may have been
-    // written before user code threw); safe to call twice because the
-    // runtime clears its tracking list after the first read.
-    const syncCreatedFiles = async () => {
-      if (!rt.collectCreatedFiles) return;
-      let created: Map<string, Uint8Array>;
+      // Mirror files the runtime created during the run into the Files pane
+      // + OPFS. Called on both success and error paths (a file may have been
+      // written before user code threw); safe to call twice because the
+      // runtime clears its tracking list after the first read.
+      const syncCreatedFiles = async () => {
+        if (!rt.collectCreatedFiles) return;
+        let created: Map<string, Uint8Array>;
+        try {
+          created = await rt.collectCreatedFiles();
+        } catch {
+          return;
+        }
+        if (created.size === 0) return;
+
+        const wsId = workspaceIdRef.current;
+        const codePaths = new Set(filesRef.current.map((f) => f.filename));
+        const added: string[] = [];
+        for (const [path, bytes] of created) {
+          // Don't shadow an open code tab with a same-named data file.
+          if (codePaths.has(path)) continue;
+          if (wsId) {
+            try {
+              await writeDataFile(wsId, path, bytes);
+            } catch {
+              // OPFS write failed; still surface it in the in-memory list.
+            }
+          }
+          setVirtualFiles((prev) => {
+            const filtered = prev.filter((f) => f.path !== path);
+            return [...filtered, { path, size: bytes.length, isFolder: false }];
+          });
+          // Auto-expand ancestor folders so a nested download is visible.
+          const segments = path.split("/").filter(Boolean);
+          if (segments.length > 1) {
+            setExpandedFolders((prev) => {
+              const next = new Set(prev);
+              let cur = "";
+              for (let i = 0; i < segments.length - 1; i++) {
+                cur = cur ? `${cur}/${segments[i]}` : segments[i];
+                next.add(cur);
+              }
+              return next;
+            });
+          }
+          added.push(path);
+        }
+        if (added.length === 1) {
+          showToast(`Saved "${added[0]}" to Files.`);
+        } else if (added.length > 1) {
+          showToast(`Saved ${added.length} files to Files.`);
+        }
+      };
+
       try {
-        created = await rt.collectCreatedFiles();
-      } catch {
-        return;
-      }
-      if (created.size === 0) return;
-
-      const wsId = workspaceIdRef.current;
-      const codePaths = new Set(filesRef.current.map((f) => f.filename));
-      const added: string[] = [];
-      for (const [path, bytes] of created) {
-        // Don't shadow an open code tab with a same-named data file.
-        if (codePaths.has(path)) continue;
-        if (wsId) {
+        // Stage all workspace files (code tabs + uploaded data files) into
+        // the runtime's VFS so multi-file imports resolve; a no-op for
+        // adapters without `prepareFileSystem`.
+        if (rt.prepareFileSystem) {
+          const fileMap = await collectWorkspaceFilesForRun();
           try {
-            await writeDataFile(wsId, path, bytes);
-          } catch {
-            // OPFS write failed; still surface it in the in-memory list.
+            await rt.prepareFileSystem(fileMap);
+          } catch (stageErr) {
+            // Non-fatal: execution proceeds with whatever made it in.
+            const msg =
+              stageErr instanceof Error ? stageErr.message : String(stageErr);
+            preCells.push({
+              type: "stderr",
+              content: `Failed to stage workspace files: ${msg}`,
+            });
           }
         }
-        setVirtualFiles((prev) => {
-          const filtered = prev.filter((f) => f.path !== path);
-          return [...filtered, { path, size: bytes.length, isFolder: false }];
-        });
-        // Auto-expand ancestor folders so a nested download is visible.
-        const segments = path.split("/").filter(Boolean);
-        if (segments.length > 1) {
-          setExpandedFolders((prev) => {
-            const next = new Set(prev);
-            let cur = "";
-            for (let i = 0; i < segments.length - 1; i++) {
-              cur = cur ? `${cur}/${segments[i]}` : segments[i];
-              next.add(cur);
-            }
-            return next;
-          });
+        const runOptions: RunOptions = {
+          // Mid-run waits (Python's first-run package install) explain
+          // themselves in the output panel instead of looking like a hang.
+          onStatus: (message, preparing) => {
+            setRunStatusMessage(preparing ? message : null);
+          },
+          // The playground runs whole programs, so type errors in one are
+          // the user's to see.
+          diagnostics: true,
+        };
+        if (entryFilename) runOptions.entryFilename = entryFilename;
+        // Preview adapters render into the surface-owned slot; each run
+        // replaces the previous iframe (which is also the teardown story).
+        if (hasPreview) runOptions.previewHost = previewHostRef.current;
+        await rt.run(code, emitCell, runOptions);
+        await syncCreatedFiles();
+        stopLive();
+        const cellCount = publish(Date.now());
+        if (cellCount === 0 && !hasPreview) {
+          // Preview adapters "output" the page itself; no toast there.
+          showToast("Code ran successfully, no output.");
         }
-        added.push(path);
-      }
-      if (added.length === 1) {
-        showToast(`Saved "${added[0]}" to Files.`);
-      } else if (added.length > 1) {
-        showToast(`Saved ${added.length} files to Files.`);
-      }
-    };
-
-    try {
-      // Stage all workspace files (code tabs + uploaded data files) into
-      // the runtime's VFS so multi-file imports resolve; a no-op for
-      // adapters without `prepareFileSystem`.
-      if (rt.prepareFileSystem) {
-        const fileMap = await collectWorkspaceFilesForRun();
-        try {
-          await rt.prepareFileSystem(fileMap);
-        } catch (stageErr) {
-          // Non-fatal: execution proceeds with whatever made it in.
-          const msg =
-            stageErr instanceof Error ? stageErr.message : String(stageErr);
-          preCells.push({
-            type: "stderr",
-            content: `Failed to stage workspace files: ${msg}`,
-          });
-        }
-      }
-      const runOptions: RunOptions = {
-        // Mid-run waits (Python's first-run package install) explain
-        // themselves in the output panel instead of looking like a hang.
-        onStatus: (message, preparing) => {
-          setRunStatusMessage(preparing ? message : null);
-        },
-        // The playground runs whole programs, so type errors in one are
-        // the user's to see.
-        diagnostics: true,
-      };
-      if (entryFilename) runOptions.entryFilename = entryFilename;
-      // Preview adapters render into the surface-owned slot; each run
-      // replaces the previous iframe (which is also the teardown story).
-      if (hasPreview) runOptions.previewHost = previewHostRef.current;
-      await rt.run(code, emitCell, runOptions);
-      await syncCreatedFiles();
-      stopLive();
-      const cellCount = publish(Date.now());
-      if (cellCount === 0 && !hasPreview) {
-        // Preview adapters "output" the page itself; no toast there.
-        showToast("Code ran successfully, no output.");
-      }
-      // Keep the running overlay visible long enough for its CSS
-      // transition to be perceptible.
-      const waitMs = MIN_ANIMATION_MS - (performance.now() - t0);
-      if (waitMs > 0) await new Promise((resolve) => setTimeout(resolve, waitMs));
-      setStatusState("ready");
-    } catch (err) {
-      // User code may have created files before throwing; surface them.
-      await syncCreatedFiles();
-      stopLive();
-      // A Stop is a deliberate act, not a failure: whatever the program
-      // printed before it was stopped stays on screen, with a plain note.
-      const cancelled = err instanceof Error && err.name === "RunCancelledError";
-      const msg = err instanceof Error ? err.message : String(err);
-      collected.push({
-        type: "stderr" as const,
-        content: cancelled ? "Run stopped." : msg,
-      });
-      publish(Date.now());
-      if (cancelled) {
+        // Keep the running overlay visible long enough for its CSS
+        // transition to be perceptible.
+        const waitMs = MIN_ANIMATION_MS - (performance.now() - t0);
+        if (waitMs > 0)
+          await new Promise((resolve) => setTimeout(resolve, waitMs));
         setStatusState("ready");
-      } else {
-        setStatusState("error");
-        errorResetTimerRef.current = window.setTimeout(() => {
-          errorResetTimerRef.current = null;
+      } catch (err) {
+        // User code may have created files before throwing; surface them.
+        await syncCreatedFiles();
+        stopLive();
+        // A Stop is a deliberate act, not a failure: whatever the program
+        // printed before it was stopped stays on screen, with a plain note.
+        const cancelled =
+          err instanceof Error && err.name === "RunCancelledError";
+        const msg = err instanceof Error ? err.message : String(err);
+        collected.push({
+          type: "stderr" as const,
+          content: cancelled ? "Run stopped." : msg,
+        });
+        publish(Date.now());
+        if (cancelled) {
           setStatusState("ready");
-        }, 3000);
+        } else {
+          setStatusState("error");
+          errorResetTimerRef.current = window.setTimeout(() => {
+            errorResetTimerRef.current = null;
+            setStatusState("ready");
+          }, 3000);
+        }
+      } finally {
+        stopLive();
+        setRunStatusMessage(null);
+        // On narrow viewports, surface the output tab once the run is done.
+        // Debounced auto-runs skip this — yanking the pane mid-typing would
+        // be hostile.
+        if (!opts?.auto) setMobileTab("output");
       }
-    } finally {
-      stopLive();
-      setRunStatusMessage(null);
-      // On narrow viewports, surface the output tab once the run is done.
-      // Debounced auto-runs skip this — yanking the pane mid-typing would
-      // be hostile.
-      if (!opts?.auto) setMobileTab("output");
-    }
-  },
-  [
-    adapter.projectWideRuns,
-    clearBeforeRun,
-    collectWorkspaceFilesForRun,
-    hasPreview,
-    setOutputsForFile,
-    showToast,
-  ]);
+    },
+    [
+      adapter.projectWideRuns,
+      clearBeforeRun,
+      collectWorkspaceFilesForRun,
+      hasPreview,
+      setOutputsForFile,
+      showToast,
+    ],
+  );
 
   /** Stop the running program. The runtime rejects the in-flight `run()`
    *  with a RunCancelledError, which `runCode` renders as "Run stopped."
@@ -2342,7 +2370,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       runButtonState.primaryEntry ??
       files.find((f) => f.id === activeFileId)?.filename;
     return files.find((f) => f.filename === entryName)?.id ?? activeFileId;
-  }, [splitActive, adapter.projectWideRuns, runButtonState, files, activeFileId]);
+  }, [
+    splitActive,
+    adapter.projectWideRuns,
+    runButtonState,
+    files,
+    activeFileId,
+  ]);
 
   // Derived: the output pane's cells (see `outputFileId` above).
   const outputs = useMemo(
@@ -2517,8 +2551,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         // Prefer the previous tab in tab order, else the first remaining.
         const closedIdx = open.indexOf(fileId);
         const next =
-          remaining[Math.max(0, Math.min(closedIdx - 1, remaining.length - 1))] ??
-          remaining[0];
+          remaining[
+            Math.max(0, Math.min(closedIdx - 1, remaining.length - 1))
+          ] ?? remaining[0];
         activeFileIdRef.current = next;
         setActiveFileId(next);
         setActiveTabId(next);
@@ -2604,9 +2639,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       if (nextPath === target.filename) return;
       // Refuse to overwrite another tab at the same path.
       if (
-        filesRef.current.some(
-          (f) => f.id !== fileId && f.filename === nextPath,
-        )
+        filesRef.current.some((f) => f.id !== fileId && f.filename === nextPath)
       ) {
         showToast(
           `A file at "${nextPath}" already exists in this workspace.`,
@@ -2681,7 +2714,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         filename: copyName,
         pristineFilename: copyName,
       };
-      const next = [...current.slice(0, idx + 1), copy, ...current.slice(idx + 1)];
+      const next = [
+        ...current.slice(0, idx + 1),
+        copy,
+        ...current.slice(idx + 1),
+      ];
       filesRef.current = next;
       setFiles(next);
       // Open the duplicate's tab right after the source's (or at the
@@ -2759,9 +2796,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       size: utf8ByteLength(dirtyBuffers.get(f.id) ?? ""),
       isFolder: false,
     }));
-    const filteredData = virtualFiles.filter(
-      (f) => !codeFilePaths.has(f.path),
-    );
+    const filteredData = virtualFiles.filter((f) => !codeFilePaths.has(f.path));
     return [...codeEntries, ...filteredData];
   }, [files, dirtyBuffers, virtualFiles, codeFilePaths]);
 
@@ -2779,7 +2814,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         // buffer into a Blob.
         const content = dirtyBuffersRef.current.get(tabId) ?? "";
         try {
-          const blob = new Blob([content], { type: "text/plain" });
+          // Same type the Export menu would give this file, so one file
+          // does not download as two different things.
+          const blob = new Blob([content], {
+            type: mimeTypeForFilename(adapter, path),
+          });
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
@@ -2796,7 +2835,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       }
       handleFilesDownload(path);
     },
-    [handleFilesDownload, showToast, tabIdForFilesPath],
+    [adapter, handleFilesDownload, showToast, tabIdForFilesPath],
   );
 
   const mergedHandleFilesDelete = useCallback(
@@ -2820,9 +2859,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       const tabId = tabIdForFilesPath(path);
       if (!tabId) return;
       flushActiveFileToBuffer();
-      setOpenTabIds((prev) =>
-        prev.includes(tabId) ? prev : [...prev, tabId],
-      );
+      setOpenTabIds((prev) => (prev.includes(tabId) ? prev : [...prev, tabId]));
       activeFileIdRef.current = tabId;
       setActiveFileId(tabId);
       setActiveTabId(tabId);
@@ -2880,8 +2917,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const applyExample = useCallback(
     (ex: ExampleSnippet) => {
       if (ex.files && ex.files.length > 0) {
-        const entryFilename =
-          ex.entryFilename ?? primaryEntryFilename(adapter);
+        const entryFilename = ex.entryFilename ?? primaryEntryFilename(adapter);
         // Wipe OPFS copies of the previous file set; the workspace id stays
         // stable so the URL doesn't change.
         const wsId = workspaceIdRef.current;
@@ -3014,7 +3050,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         return;
       }
       const snippet = adapter.importSnippet(pkg.name);
-      const next = current.length === 0 ? `${snippet}\n` : `${snippet}\n${current}`;
+      const next =
+        current.length === 0 ? `${snippet}\n` : `${snippet}\n${current}`;
       // Cursor lands right after the inserted import line.
       const secondLineStart =
         editor.state.doc.lines >= 2
@@ -3046,7 +3083,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         (f) => f.id === activeFileIdRef.current,
       );
       const activeLeaf = active
-        ? active.filename.split("/").pop() ?? active.filename
+        ? (active.filename.split("/").pop() ?? active.filename)
         : "";
       const base = activeLeaf
         ? activeLeaf.replace(/\.[^.]+$/, "")
@@ -3078,7 +3115,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       content: dirtyBuffersRef.current.get(f.id) ?? "",
     }));
     const entry =
-      filesRef.current.find((f) => f.id === outputFileIdRef.current)?.filename ??
+      filesRef.current.find((f) => f.id === outputFileIdRef.current)
+        ?.filename ??
       sources[0]?.filename ??
       "";
     const text = spec.compose(sources, entry);
@@ -3102,7 +3140,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     const wsId = workspaceIdRef.current;
     const ok = wsId ? await downloadWorkspaceZip(wsId) : false;
     if (!ok) {
-      showToast("Nothing to download yet, save the workspace first.");
+      showToast("Nothing to download yet.");
     }
   }, [showToast]);
 
@@ -3338,7 +3376,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       ),
     });
     view.dispatch({
-      changes: { from: 0, to: view.state.doc.length, insert: pendingAiEdit.content },
+      changes: {
+        from: 0,
+        to: view.state.doc.length,
+        insert: pendingAiEdit.content,
+      },
     });
     setAiReview({
       fileId: pendingAiEdit.fileId,
@@ -3414,7 +3456,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         activeFileIdRef.current = id;
         setActiveFileId(id);
         setActiveTabId(id);
-        showToast(`Created ${suggestion.filename} from the AI suggestion.`, "info");
+        showToast(
+          `Created ${suggestion.filename} from the AI suggestion.`,
+          "info",
+        );
         return { ok: true };
       }
       const current = dirtyBuffersRef.current.get(existing.id) ?? "";
@@ -3475,7 +3520,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       // Editors-right: the editor pane is the second grid column, so a
       // rightward drag SHRINKS it.
       const reversed = panes.dataset.editorPosition === "right";
-      const delta = ((reversed ? -1 : 1) * (e.clientX - startX)) / panes.offsetWidth;
+      const delta =
+        ((reversed ? -1 : 1) * (e.clientX - startX)) / panes.offsetWidth;
       const frac = Math.min(0.8, Math.max(0.2, startFrac + delta));
       panes.style.gridTemplateColumns = reversed
         ? `${(1 - frac) * 100}% ${frac * 100}%`
@@ -3532,7 +3578,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // on; the drag handle is remembered per browser, not per workspace.
   const CONSOLE_MIN_HEIGHT = 72;
   const CONSOLE_DEFAULT_HEIGHT = 168;
-  const [consoleHeight, setConsoleHeightState] = useState(CONSOLE_DEFAULT_HEIGHT);
+  const [consoleHeight, setConsoleHeightState] = useState(
+    CONSOLE_DEFAULT_HEIGHT,
+  );
   useEffect(() => {
     if (!hasPreview) return;
     try {
@@ -3580,7 +3628,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       // the height it is already at.
       const paneHeight =
         strip?.parentElement?.getBoundingClientRect().height ?? startHeight * 4;
-      const maxHeight = Math.max(CONSOLE_MIN_HEIGHT, Math.round(paneHeight * 0.7));
+      const maxHeight = Math.max(
+        CONSOLE_MIN_HEIGHT,
+        Math.round(paneHeight * 0.7),
+      );
 
       // The preview above is an iframe, and a pointer dragged over one
       // stops being this document's business: dragging the console taller
@@ -3846,88 +3897,85 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     };
   }, [loaded, statusState]);
 
-  const fileTabDescriptors = useMemo<TabDescriptor[]>(
-    () => {
-      // OPEN tabs only, a subset of the workspace files.
-      const byId = new Map(files.map((f) => [f.id, f]));
-      const openFiles = openTabIds
-        .map((id) => byId.get(id))
-        .filter((f): f is PlaygroundFile => Boolean(f));
-      const multiple = openFiles.length > 1;
-      const locked = adapter.lockWorkspaceFiles === true;
-      // The context-menu closures read refs, but only on user click, never
-      // during render — the rule's transitive check is a false alarm.
-      // eslint-disable-next-line react-hooks/refs
-      const list: TabDescriptor[] = openFiles.map((f) => {
-        // The tab strip shows only the leaf of a multi-segment path.
-        const leaf = f.filename.split("/").pop() ?? f.filename;
-        // A locked workspace (web) gets no per-tab actions: every item
-        // closes a tab or changes which files exist, and that adapter has
-        // no Files pane to undo it with (see `lockWorkspaceFiles`).
-        const extras: TabContextMenuItem[] = [];
-        if (!locked) {
+  const fileTabDescriptors = useMemo<TabDescriptor[]>(() => {
+    // OPEN tabs only, a subset of the workspace files.
+    const byId = new Map(files.map((f) => [f.id, f]));
+    const openFiles = openTabIds
+      .map((id) => byId.get(id))
+      .filter((f): f is PlaygroundFile => Boolean(f));
+    const multiple = openFiles.length > 1;
+    const locked = adapter.lockWorkspaceFiles === true;
+    // The context-menu closures read refs, but only on user click, never
+    // during render — the rule's transitive check is a false alarm.
+    // eslint-disable-next-line react-hooks/refs
+    const list: TabDescriptor[] = openFiles.map((f) => {
+      // The tab strip shows only the leaf of a multi-segment path.
+      const leaf = f.filename.split("/").pop() ?? f.filename;
+      // A locked workspace (web) gets no per-tab actions: every item
+      // closes a tab or changes which files exist, and that adapter has
+      // no Files pane to undo it with (see `lockWorkspaceFiles`).
+      const extras: TabContextMenuItem[] = [];
+      if (!locked) {
+        extras.push({
+          key: "duplicate",
+          label: "Duplicate",
+          onSelect: () => duplicateFileTab(f.id),
+        });
+        if (multiple) {
           extras.push({
-            key: "duplicate",
-            label: "Duplicate",
-            onSelect: () => duplicateFileTab(f.id),
-          });
-          if (multiple) {
-            extras.push({
-              key: "close-others",
-              label: "Close Others",
-              onSelect: () => closeOtherFileTabs(f.id),
-            });
-          }
-          extras.push({
-            key: "delete-file",
-            label: "Delete File",
-            onSelect: () => deleteWorkspaceFile(f.id),
+            key: "close-others",
+            label: "Close Others",
+            onSelect: () => closeOtherFileTabs(f.id),
           });
         }
-        return {
-          id: f.id,
-          kind: "code" as const,
-          label: leaf,
-          icon: <FileCode2 size={11} aria-hidden="true" />,
-          closeable: multiple && !locked,
-          renameable: !locked,
-          renameDialogTitle: "Rename file",
-          renameDialogDescription:
-            "Use a leaf name (e.g. utils.py) to keep the file in its current folder, or a full path to move it.",
-          renameSelectsStem: true,
-          contextMenuItems: extras,
-        };
-      });
-      if (settingsOpen) {
-        const settingsDescriptor: TabDescriptor = {
-          id: SETTINGS_TAB_ID,
-          kind: "settings",
-          label: "Settings",
-          icon: <Settings size={11} aria-hidden="true" />,
-          closeable: true,
-          renameable: false,
-        };
-        // Insert at the tracked position, clamped so a stale index never
-        // goes out of bounds.
-        const insertAt = Math.min(
-          Number.isFinite(settingsTabIndex) ? settingsTabIndex : list.length,
-          list.length,
-        );
-        list.splice(insertAt, 0, settingsDescriptor);
+        extras.push({
+          key: "delete-file",
+          label: "Delete File",
+          onSelect: () => deleteWorkspaceFile(f.id),
+        });
       }
-      return list;
-    },
-    [
-      adapter.lockWorkspaceFiles,
-      closeOtherFileTabs,
-      deleteWorkspaceFile,
-      duplicateFileTab,
-      files,
-      openTabIds,
-      settingsOpen,
-      settingsTabIndex,
-    ],
-  );
+      return {
+        id: f.id,
+        kind: "code" as const,
+        label: leaf,
+        icon: <FileCode2 size={11} aria-hidden="true" />,
+        closeable: multiple && !locked,
+        renameable: !locked,
+        renameDialogTitle: "Rename file",
+        renameDialogDescription:
+          "Use a leaf name (e.g. utils.py) to keep the file in its current folder, or a full path to move it.",
+        renameSelectsStem: true,
+        contextMenuItems: extras,
+      };
+    });
+    if (settingsOpen) {
+      const settingsDescriptor: TabDescriptor = {
+        id: SETTINGS_TAB_ID,
+        kind: "settings",
+        label: "Settings",
+        icon: <Settings size={11} aria-hidden="true" />,
+        closeable: true,
+        renameable: false,
+      };
+      // Insert at the tracked position, clamped so a stale index never
+      // goes out of bounds.
+      const insertAt = Math.min(
+        Number.isFinite(settingsTabIndex) ? settingsTabIndex : list.length,
+        list.length,
+      );
+      list.splice(insertAt, 0, settingsDescriptor);
+    }
+    return list;
+  }, [
+    adapter.lockWorkspaceFiles,
+    closeOtherFileTabs,
+    deleteWorkspaceFile,
+    duplicateFileTab,
+    files,
+    openTabIds,
+    settingsOpen,
+    settingsTabIndex,
+  ]);
 
   const capabilitiesBlurb = useMemo(
     () => buildCapabilitiesBlurb(adapter.outputCapabilities),
@@ -3973,84 +4021,96 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         <header className="playground-header">
           <div className="logo">
             {!embedded && (
-              <Link href="/" aria-label="Dataslope home" className="ds-logo-hover">
+              <Link
+                href="/"
+                aria-label="Dataslope home"
+                className="ds-logo-hover"
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/dataslope-logo-blue.svg" alt="Dataslope logo" className="brand-logo ds-logo-mark" />
+                <img
+                  src="/dataslope-logo-blue.svg"
+                  alt="Dataslope logo"
+                  className="brand-logo ds-logo-mark"
+                />
               </Link>
             )}
             {/* Hidden when embedded (home page iframe): switching is done by
                 the page's own switcher. */}
             {!embedded && (
-            <Select.Root
-              value={adapter.id}
-              onValueChange={(value) => {
-                const next = PLAYGROUNDS.find((p) => p.id === value);
-                if (next && next.id !== adapter.id) router.push(next.href);
-              }}
-            >
-              <Select.Trigger
-                className="playground-switcher"
-                aria-label="Switch playground"
+              <Select.Root
+                value={adapter.id}
+                onValueChange={(value) => {
+                  const next = PLAYGROUNDS.find((p) => p.id === value);
+                  if (next && next.id !== adapter.id) router.push(next.href);
+                }}
               >
-                {(() => {
-                  const Icon = PLAYGROUND_ICONS[adapter.id];
-                  const factor = PLAYGROUND_ICON_SIZE_FACTOR[adapter.id] ?? 1;
-                  return Icon ? (
-                    <span
-                      className="playground-switcher-lang-icon"
-                      style={{ color: "var(--text)" }}
-                      aria-hidden="true"
-                    >
-                      <Icon size={Math.round(16 * factor)} />
-                    </span>
-                  ) : null;
-                })()}
-                {/* The label is hidden below 768px (the icon already
+                <Select.Trigger
+                  className="playground-switcher"
+                  aria-label="Switch playground"
+                >
+                  {(() => {
+                    const Icon = PLAYGROUND_ICONS[adapter.id];
+                    const factor = PLAYGROUND_ICON_SIZE_FACTOR[adapter.id] ?? 1;
+                    return Icon ? (
+                      <span
+                        className="playground-switcher-lang-icon"
+                        style={{ color: "var(--text)" }}
+                        aria-hidden="true"
+                      >
+                        <Icon size={Math.round(16 * factor)} />
+                      </span>
+                    ) : null;
+                  })()}
+                  {/* The label is hidden below 768px (the icon already
                     identifies the language) so the header has room for the
                     logo; the dropdown items keep their labels either way. */}
-                <Select.Value className="playground-switcher-label">
-                  {PLAYGROUNDS.find((p) => p.id === adapter.id)?.label ??
-                    adapter.id}
-                </Select.Value>
-                <Select.Icon className="playground-switcher-icon">
-                  <svg viewBox="0 0 12 12" width={10} height={10}>
-                    <polyline
-                      points="2,4 6,8 10,4"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    />
-                  </svg>
-                </Select.Icon>
-              </Select.Trigger>
-              <Select.Portal>
-                <Select.Positioner sideOffset={0} alignItemWithTrigger={false} className="playground-lang-switcher-positioner">
-                  <Select.Popup className="bui-select-popup playground-lang-switcher-popup">
-                    {PLAYGROUNDS.map((p) => {
-                      const Icon = PLAYGROUND_ICONS[p.id];
-                      const factor = PLAYGROUND_ICON_SIZE_FACTOR[p.id] ?? 1;
-                      return (
-                        <Select.Item
-                          key={p.id}
-                          value={p.id}
-                          className="bui-select-item"
-                        >
-                          {Icon && (
-                            <span
-                              className="bui-select-item-icon"
-                              aria-hidden="true"
-                            >
-                              <Icon size={Math.round(16 * factor)} />
-                            </span>
-                          )}
-                          <Select.ItemText>{p.label}</Select.ItemText>
-                        </Select.Item>
-                      );
-                    })}
-                  </Select.Popup>
-                </Select.Positioner>
-              </Select.Portal>
-            </Select.Root>
+                  <Select.Value className="playground-switcher-label">
+                    {PLAYGROUNDS.find((p) => p.id === adapter.id)?.label ??
+                      adapter.id}
+                  </Select.Value>
+                  <Select.Icon className="playground-switcher-icon">
+                    <svg viewBox="0 0 12 12" width={10} height={10}>
+                      <polyline
+                        points="2,4 6,8 10,4"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      />
+                    </svg>
+                  </Select.Icon>
+                </Select.Trigger>
+                <Select.Portal>
+                  <Select.Positioner
+                    sideOffset={0}
+                    alignItemWithTrigger={false}
+                    className="playground-lang-switcher-positioner"
+                  >
+                    <Select.Popup className="bui-select-popup playground-lang-switcher-popup">
+                      {PLAYGROUNDS.map((p) => {
+                        const Icon = PLAYGROUND_ICONS[p.id];
+                        const factor = PLAYGROUND_ICON_SIZE_FACTOR[p.id] ?? 1;
+                        return (
+                          <Select.Item
+                            key={p.id}
+                            value={p.id}
+                            className="bui-select-item"
+                          >
+                            {Icon && (
+                              <span
+                                className="bui-select-item-icon"
+                                aria-hidden="true"
+                              >
+                                <Icon size={Math.round(16 * factor)} />
+                              </span>
+                            )}
+                            <Select.ItemText>{p.label}</Select.ItemText>
+                          </Select.Item>
+                        );
+                      })}
+                    </Select.Popup>
+                  </Select.Positioner>
+                </Select.Portal>
+              </Select.Root>
             )}
           </div>
           {/* Workspace name + inline rename; switching/management lives in
@@ -4116,7 +4176,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
 
           {/* Mobile-only consolidated menu: Save / Share / Files up top,
               then the same sections as the desktop ⋯ menu. */}
-          <MobileMenuSheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+          <MobileMenuSheet
+            open={mobileMenuOpen}
+            onOpenChange={setMobileMenuOpen}
+          >
             <MobileMenuLabel>Workspace</MobileMenuLabel>
             {workspaceReady && (
               <MobileSaveMenu
@@ -4174,10 +4237,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 Discard current code?
               </Dialog.Title>
               <Dialog.Description className="confirm-desc">
-                Loading{" "}
-                <strong>“{pendingExample?.title}”</strong>{" "}
-                will overwrite the code currently in the editor. This
-                can&rsquo;t be undone.
+                Loading <strong>“{pendingExample?.title}”</strong> will
+                overwrite the code currently in the editor. This can&rsquo;t be
+                undone.
               </Dialog.Description>
               <div className="confirm-actions">
                 <Dialog.Close className="confirm-btn confirm-btn-secondary">
@@ -4209,9 +4271,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 Restore default settings?
               </Dialog.Title>
               <Dialog.Description className="confirm-desc">
-                This will reset this playground&apos;s editor font size, word wrap,
-                run/output preferences, and the shared editor theme to their
-                built-in defaults. Your saved code is not affected.
+                This will reset this playground&apos;s editor font size, word
+                wrap, run/output preferences, and the shared editor theme to
+                their built-in defaults. Your saved code is not affected.
               </Dialog.Description>
               <div className="confirm-actions">
                 <Dialog.Close className="confirm-btn confirm-btn-secondary">
@@ -4244,8 +4306,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               </Dialog.Title>
               <Dialog.Description className="confirm-desc">
                 This will permanently delete every saved setting and code
-                snippet across <strong>all playgrounds</strong>. The page
-                will reload immediately. This can&rsquo;t be undone.
+                snippet across <strong>all playgrounds</strong>. The page will
+                reload immediately. This can&rsquo;t be undone.
               </Dialog.Description>
               <div className="confirm-actions">
                 <Dialog.Close className="confirm-btn confirm-btn-secondary">
@@ -4277,13 +4339,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 Clear all local data?
               </Dialog.Title>
               <Dialog.Description className="confirm-desc">
-                This will permanently delete every saved setting, code
-                snippet, <strong>workspace</strong>, persisted{" "}
-                <strong>database</strong>, and uploaded{" "}
-                <strong>data file</strong> across{" "}
-                <strong>all playgrounds</strong>, including localStorage,
-                OPFS, IndexedDB, and any cached assets. The page will
-                reload immediately. This can&rsquo;t be undone.
+                This will permanently delete every saved setting, code snippet,{" "}
+                <strong>workspace</strong>, persisted <strong>database</strong>,
+                and uploaded <strong>data file</strong> across{" "}
+                <strong>all playgrounds</strong>, including localStorage, OPFS,
+                IndexedDB, and any cached assets. The page will reload
+                immediately. This can&rsquo;t be undone.
               </Dialog.Description>
               <div className="confirm-actions">
                 <Dialog.Close className="confirm-btn confirm-btn-secondary">
@@ -4306,69 +4367,72 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           {/* The icon rail only hosts the Editor/Files toggle pair, so
               adapters that hide the Files pane drop the whole rail. */}
           {!adapter.hideFilesPane && (
-          <nav className="playground-icon-sidebar" aria-label="Panel navigation">
-            <div className="playground-icon-sidebar-top">
-              <Popover.Root>
-                <Popover.Trigger
-                  openOnHover
-                  delay={150}
-                  closeDelay={100}
-                  render={(triggerProps) => (
-                    <button
-                      {...triggerProps}
-                      type="button"
-                      className={`playground-icon-sidebar-btn${filesPaneOpen ? "" : " active"}`}
-                      aria-label="Editor"
-                      aria-pressed={!filesPaneOpen}
-                      onClick={() => {
-                        // Return to the editor (closing the Files panel)
-                        // and focus CodeMirror — a real toggle, not a
-                        // permanently-lit decoration.
-                        setFilesPaneOpen(false);
-                        editorRef.current?.focus();
-                      }}
-                    >
-                      <Code2 size={16} aria-hidden="true" />
-                    </button>
-                  )}
-                />
-                <Popover.Portal>
-                  <Popover.Positioner sideOffset={6} side="right">
-                    <Popover.Popup className="bui-popup pane-btn-popover">
-                      Editor
-                    </Popover.Popup>
-                  </Popover.Positioner>
-                </Popover.Portal>
-              </Popover.Root>
-              {/* Files, toggles the virtual-filesystem sidebar panel. */}
-              <Popover.Root>
-                <Popover.Trigger
-                  openOnHover
-                  delay={150}
-                  closeDelay={100}
-                  render={(triggerProps) => (
-                    <button
-                      {...triggerProps}
-                      type="button"
-                      className={`playground-icon-sidebar-btn${filesPaneOpen ? " active" : ""}`}
-                      aria-label="Files"
-                      aria-pressed={filesPaneOpen}
-                      onClick={() => setFilesPaneOpen((v) => !v)}
-                    >
-                      <FolderTree size={16} aria-hidden="true" />
-                    </button>
-                  )}
-                />
-                <Popover.Portal>
-                  <Popover.Positioner sideOffset={6} side="right">
-                    <Popover.Popup className="bui-popup pane-btn-popover">
-                      Files
-                    </Popover.Popup>
-                  </Popover.Positioner>
-                </Popover.Portal>
-              </Popover.Root>
-            </div>
-          </nav>
+            <nav
+              className="playground-icon-sidebar"
+              aria-label="Panel navigation"
+            >
+              <div className="playground-icon-sidebar-top">
+                <Popover.Root>
+                  <Popover.Trigger
+                    openOnHover
+                    delay={150}
+                    closeDelay={100}
+                    render={(triggerProps) => (
+                      <button
+                        {...triggerProps}
+                        type="button"
+                        className={`playground-icon-sidebar-btn${filesPaneOpen ? "" : " active"}`}
+                        aria-label="Editor"
+                        aria-pressed={!filesPaneOpen}
+                        onClick={() => {
+                          // Return to the editor (closing the Files panel)
+                          // and focus CodeMirror — a real toggle, not a
+                          // permanently-lit decoration.
+                          setFilesPaneOpen(false);
+                          editorRef.current?.focus();
+                        }}
+                      >
+                        <Code2 size={16} aria-hidden="true" />
+                      </button>
+                    )}
+                  />
+                  <Popover.Portal>
+                    <Popover.Positioner sideOffset={6} side="right">
+                      <Popover.Popup className="bui-popup pane-btn-popover">
+                        Editor
+                      </Popover.Popup>
+                    </Popover.Positioner>
+                  </Popover.Portal>
+                </Popover.Root>
+                {/* Files, toggles the virtual-filesystem sidebar panel. */}
+                <Popover.Root>
+                  <Popover.Trigger
+                    openOnHover
+                    delay={150}
+                    closeDelay={100}
+                    render={(triggerProps) => (
+                      <button
+                        {...triggerProps}
+                        type="button"
+                        className={`playground-icon-sidebar-btn${filesPaneOpen ? " active" : ""}`}
+                        aria-label="Files"
+                        aria-pressed={filesPaneOpen}
+                        onClick={() => setFilesPaneOpen((v) => !v)}
+                      >
+                        <FolderTree size={16} aria-hidden="true" />
+                      </button>
+                    )}
+                  />
+                  <Popover.Portal>
+                    <Popover.Positioner sideOffset={6} side="right">
+                      <Popover.Popup className="bui-popup pane-btn-popover">
+                        Files
+                      </Popover.Popup>
+                    </Popover.Positioner>
+                  </Popover.Portal>
+                </Popover.Root>
+              </div>
+            </nav>
           )}
           {!adapter.hideFilesPane && filesPaneOpen && (
             <div className="playground-files-sidebar">
@@ -4387,463 +4451,81 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             </div>
           )}
           <div className="playground-body-content">
-        {/* File tabs: switching swaps both the editor doc and the output
+            {/* File tabs: switching swaps both the editor doc and the output
             history. In split view the bar only renders while the Settings
             tab is active; file management happens in Tabs mode. */}
-        {files.length > 0 &&
-          (!splitActive || activeTabId === SETTINGS_TAB_ID) && (
-          <TabBar
-            tabs={fileTabDescriptors}
-            activeTabId={activeTabId || activeFileId}
-            onSelectTab={selectTab}
-            onCloseTab={closeFileTab}
-            onAddTab={adapter.disableAddFile ? undefined : addNewFile}
-            onRenameTab={renameFileTab}
-            onReorderTabs={(files.length > 1 || settingsOpen) ? reorderFileTabs : undefined}
-            className="playground-file-tabbar"
-          />
-        )}
-        <div
-          className="mobile-tabs"
-          role="tablist"
-          aria-label="Pane"
-          data-settings-active={activeTabId === SETTINGS_TAB_ID || undefined}
-        >
-          <button
-            type="button"
-            role="tab"
-            aria-selected={mobileTab === "editor"}
-            className={`mobile-tab${mobileTab === "editor" ? " active" : ""}`}
-            onClick={() => setMobileTab("editor")}
-          >
-            Editor
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={mobileTab === "output"}
-            className={`mobile-tab${mobileTab === "output" ? " active" : ""}`}
-            onClick={() => setMobileTab("output")}
-          >
-            Output
-          </button>
-        </div>
-
-        <div
-          className="panes"
-          role="main"
-          data-mobile-tab={mobileTab}
-          data-settings-active={activeTabId === SETTINGS_TAB_ID || undefined}
-          data-editor-position={hasPreview ? effectiveEditorPosition : undefined}
-          ref={panesRef}
-        >
-          <h1 className="playground-sr-title">
-            {`${PLAYGROUNDS.find((p) => p.id === adapter.id)?.label ?? adapter.id} playground`}
-          </h1>
-          <div className="editor-pane" ref={editorPaneRef}>
-            <div className="pane-bar">
-              <span className="pane-label">
-                <Code2 size={12} aria-hidden="true" />
+            {files.length > 0 &&
+              (!splitActive || activeTabId === SETTINGS_TAB_ID) && (
+                <TabBar
+                  tabs={fileTabDescriptors}
+                  activeTabId={activeTabId || activeFileId}
+                  onSelectTab={selectTab}
+                  onCloseTab={closeFileTab}
+                  onAddTab={adapter.disableAddFile ? undefined : addNewFile}
+                  onRenameTab={renameFileTab}
+                  onReorderTabs={
+                    files.length > 1 || settingsOpen
+                      ? reorderFileTabs
+                      : undefined
+                  }
+                  className="playground-file-tabbar"
+                />
+              )}
+            <div
+              className="mobile-tabs"
+              role="tablist"
+              aria-label="Pane"
+              data-settings-active={
+                activeTabId === SETTINGS_TAB_ID || undefined
+              }
+            >
+              <button
+                type="button"
+                role="tab"
+                aria-selected={mobileTab === "editor"}
+                className={`mobile-tab${mobileTab === "editor" ? " active" : ""}`}
+                onClick={() => setMobileTab("editor")}
+              >
                 Editor
-              </span>
-              <div className="pane-bar-sep" />
-              <div className="pane-editor-btn-group">
-                {/* Preview adapters keep auto-run ⚡ and the view menu on
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={mobileTab === "output"}
+                className={`mobile-tab${mobileTab === "output" ? " active" : ""}`}
+                onClick={() => setMobileTab("output")}
+              >
+                Output
+              </button>
+            </div>
+
+            <div
+              className="panes"
+              role="main"
+              data-mobile-tab={mobileTab}
+              data-settings-active={
+                activeTabId === SETTINGS_TAB_ID || undefined
+              }
+              data-editor-position={
+                hasPreview ? effectiveEditorPosition : undefined
+              }
+              ref={panesRef}
+            >
+              <h1 className="playground-sr-title">
+                {`${PLAYGROUNDS.find((p) => p.id === adapter.id)?.label ?? adapter.id} playground`}
+              </h1>
+              <div className="editor-pane" ref={editorPaneRef}>
+                <div className="pane-bar">
+                  <span className="pane-label">
+                    <Code2 size={12} aria-hidden="true" />
+                    Editor
+                  </span>
+                  <div className="pane-bar-sep" />
+                  <div className="pane-editor-btn-group">
+                    {/* Preview adapters keep auto-run ⚡ and the view menu on
                     the PREVIEW bar; non-preview split-capable adapters keep
                     the layout menu here. */}
-                {!hasPreview && splitAvailable && (
-                  <Popover.Root>
-                    <Popover.Trigger
-                      openOnHover
-                      delay={150}
-                      closeDelay={100}
-                      render={(triggerProps) => (
-                        <button
-                          {...triggerProps}
-                          type="button"
-                          className="icon-btn"
-                          aria-label="Change view"
-                        >
-                          {effectiveEditorPosition === "right" ? (
-                            <PanelRight size={14} aria-hidden="true" />
-                          ) : effectiveEditorPosition === "top" ? (
-                            <PanelTop size={14} aria-hidden="true" />
-                          ) : (
-                            <PanelLeft size={14} aria-hidden="true" />
-                          )}
-                        </button>
-                      )}
-                    />
-                    <Popover.Portal>
-                      <Popover.Positioner sideOffset={6} align="start" side="bottom">
-                        <Popover.Popup className="bui-popup change-view-menu">
-                          <div className="change-view-title">Change View</div>
-                          {hasPreview &&
-                            (
-                              [
-                                { pos: "left", label: "Editors left", Icon: PanelLeft },
-                                { pos: "top", label: "Editors top", Icon: PanelTop },
-                                { pos: "right", label: "Editors right", Icon: PanelRight },
-                              ] as const
-                            ).map(({ pos, label, Icon }) => (
-                              <button
-                                key={pos}
-                                type="button"
-                                className={`change-view-item${
-                                  effectiveEditorPosition === pos ? " selected" : ""
-                                }`}
-                                disabled={editorPinnedLeft}
-                                // eslint-disable-next-line react-hooks/refs -- click handler; setEditorPosition touches panesRef only on invocation
-                                onClick={() => setEditorPosition(pos)}
-                              >
-                                <Icon size={14} aria-hidden="true" />
-                                <span>{label}</span>
-                              </button>
-                            ))}
-                          {hasPreview && editorPinnedLeft && (
-                            <div className="change-view-hint">
-                              The tabbed editor keeps the editor on the left.
-                            </div>
-                          )}
-                          {splitAvailable && (
-                            <>
-                              <div className="change-view-sep" role="separator" />
-                              <div className="change-view-title">Editor Layout</div>
-                              <button
-                                type="button"
-                                className={`change-view-item${splitActive ? " selected" : ""}`}
-                                aria-pressed={splitActive}
-                                onClick={() => setSplitView(true)}
-                              >
-                                <Rows3 size={14} aria-hidden="true" />
-                                <span>Split editors (CodePen-style)</span>
-                              </button>
-                              <button
-                                type="button"
-                                className={`change-view-item${!splitActive ? " selected" : ""}`}
-                                aria-pressed={!splitActive}
-                                onClick={() => setSplitView(false)}
-                              >
-                                <FileCode size={14} aria-hidden="true" />
-                                <span>Tabbed editor (manage files)</span>
-                              </button>
-                            </>
-                          )}
-                        </Popover.Popup>
-                      </Popover.Positioner>
-                    </Popover.Portal>
-                  </Popover.Root>
-                )}
-                {/* Split view: Copy/Format live in each pane's header. */}
-                {!splitActive && (
-                  <Popover.Root>
-                    <Popover.Trigger
-                      openOnHover
-                      delay={150}
-                      closeDelay={100}
-                      render={(triggerProps) => (
-                        <button
-                          {...triggerProps}
-                          type="button"
-                          className="icon-btn"
-                          aria-label="Copy code to clipboard"
-                          onClick={copyEditor}
-                        >
-                          <CopyIcon />
-                        </button>
-                      )}
-                    />
-                    <Popover.Portal>
-                      <Popover.Positioner sideOffset={6} align="center" side="bottom">
-                        <Popover.Popup className="bui-popup pane-btn-popover">
-                          Copy code
-                        </Popover.Popup>
-                      </Popover.Positioner>
-                    </Popover.Portal>
-                  </Popover.Root>
-                )}
-                {!splitActive && adapter.formatCode && (
-                  <Popover.Root
-                    open={isFormatting ? false : formatPopoverOpen}
-                    onOpenChange={setFormatPopoverOpen}
-                  >
-                    <Popover.Trigger
-                      openOnHover
-                      delay={150}
-                      closeDelay={100}
-                      render={(triggerProps) => (
-                        <button
-                          {...triggerProps}
-                          type="button"
-                          className="icon-btn"
-                          aria-label="Format code"
-                          aria-busy={isFormatting}
-                          disabled={!loaded || isFormatting}
-                          onClick={() => void handleFormatCode()}
-                        >
-                          {isFormatting ? (
-                            <svg
-                              viewBox="0 0 13 13"
-                              width={13}
-                              height={13}
-                              className="run-btn-spinner"
-                              aria-hidden="true"
-                            >
-                              <circle
-                                cx="6.5"
-                                cy="6.5"
-                                r="5"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeDasharray="15 9"
-                              />
-                            </svg>
-                          ) : (
-                            <Wand2 size={13} aria-hidden="true" />
-                          )}
-                        </button>
-                      )}
-                    />
-                    <Popover.Portal>
-                      <Popover.Positioner sideOffset={6} align="center" side="bottom">
-                        <Popover.Popup className="bui-popup pane-btn-popover">
-                          Format code
-                        </Popover.Popup>
-                      </Popover.Positioner>
-                    </Popover.Portal>
-                  </Popover.Root>
-                )}
-              </div>
-              <span
-                className="kbd-group"
-                title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
-              >
-                <kbd className="kbd">{isMac ? "⌘" : "Ctrl"}</kbd>
-                <span className="kbd-plus" aria-hidden="true">+</span>
-                <kbd className="kbd">Enter</kbd>
-              </span>
-              <div
-                className={`playground-run-multi${runButtonState.dropdownItems.length > 0 ? " has-dropdown" : ""}${statusState === "running" ? " running" : ""}${statusState === "running" && canStopRun ? " stoppable" : ""}`}
-              >
-                {/* While a stoppable runtime is running, the primary button
-                    becomes Stop — an accidental `while True:` is one of the
-                    likeliest things a beginner writes, and reloading the page
-                    must not be the only way out. */}
-                {statusState === "running" && canStopRun ? (
-                  <button
-                    type="button"
-                    className="run-btn playground-run-multi-main stop"
-                    onClick={() => void stopRun()}
-                    disabled={stopping}
-                    title="Stop the running program"
-                  >
-                    <Square size={9} aria-hidden="true" fill="currentColor" />
-                    <span className="playground-run-multi-label">
-                      {stopping ? "Stopping…" : "Stop"}
-                    </span>
-                  </button>
-                ) : (
-                <Popover.Root>
-                  <Popover.Trigger
-                    render={(props) => (
-                      <button
-                        {...props}
-                        type="button"
-                        className={`run-btn playground-run-multi-main${statusState === "running" ? " running" : ""}${runButtonState.dropdownItems.length > 0 ? " has-chevron" : ""}`}
-                        // `stopping`: the previous run's Stop is still
-                        // standing a fresh interpreter up.
-                        disabled={!loaded || statusState === "running" || stopping}
-                        onClick={() => {
-                          void runCode(runButtonState.primaryEntry ?? undefined);
-                        }}
-                      >
-                        {statusState === "running" ? (
-                          <svg viewBox="0 0 12 12" className="run-btn-spinner">
-                            <circle cx="6" cy="6" r="4.5" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="14 8" />
-                          </svg>
-                        ) : (
-                          <Play size={10} aria-hidden="true" />
-                        )}
-                        <span className="playground-run-multi-label">
-                          {statusState === "running"
-                            ? "Running…"
-                            : runButtonState.primaryLabel}
-                        </span>
-                      </button>
-                    )}
-                  />
-                  {/* Hover popover surfaces the full label when the button
-                      truncates. */}
-                  <Popover.Portal>
-                    <Popover.Positioner sideOffset={6}>
-                      <Popover.Popup className="bui-popup pane-btn-popover">
-                        {runButtonState.primaryLabel}
-                      </Popover.Popup>
-                    </Popover.Positioner>
-                  </Popover.Portal>
-                </Popover.Root>
-                )}
-                {runButtonState.dropdownItems.length > 0 && (
-                  <Menu.Root>
-                    <Menu.Trigger
-                      render={(props) => (
-                        <button
-                          {...props}
-                          type="button"
-                          className={`run-btn playground-run-multi-chevron${statusState === "running" ? " running" : ""}`}
-                          disabled={!loaded || statusState === "running" || stopping}
-                          aria-label="More run options"
-                        >
-                          <ChevronDown size={12} aria-hidden="true" />
-                        </button>
-                      )}
-                    />
-                    <Menu.Portal>
-                      <Menu.Positioner sideOffset={6} align="end">
-                        <Menu.Popup className="bui-popup playground-run-multi-dropdown">
-                          {runButtonState.dropdownItems.map((item, idx) => (
-                            <Menu.Item
-                              key={item.entryFilename}
-                              className="playground-run-multi-item"
-                              onClick={() => {
-                                void runCode(item.entryFilename);
-                              }}
-                            >
-                              <span className="playground-run-multi-item-label">
-                                {item.label}
-                              </span>
-                              {idx === 0 && (
-                                <span className="playground-run-multi-item-kbd">
-                                  {isMac ? "⌘⇧Enter" : "Ctrl+Shift+Enter"}
-                                </span>
-                              )}
-                            </Menu.Item>
-                          ))}
-                        </Menu.Popup>
-                      </Menu.Positioner>
-                    </Menu.Portal>
-                  </Menu.Root>
-                )}
-              </div>
-            </div>
-            {aiReview && (
-              <div className="ai-review-bar" role="region" aria-label="AI suggested changes">
-                <Wand2 size={13} aria-hidden="true" />
-                <span className="ai-review-text">
-                  AI suggested changes to{" "}
-                  <code>{aiReview.filename}</code>, accept or reject each
-                  chunk in the editor.
-                </span>
-                <div className="ai-review-actions">
-                  <button
-                    type="button"
-                    className="ai-review-btn ai-review-keep"
-                    onClick={() => endAiReview(true)}
-                    title="Finish the review, keeping the changes as shown in the editor"
-                  >
-                    Keep result
-                  </button>
-                  <button
-                    type="button"
-                    className="ai-review-btn ai-review-revert"
-                    onClick={() => endAiReview(false)}
-                    title="Restore the file to how it was before the suggestion"
-                  >
-                    Revert all
-                  </button>
-                </div>
-              </div>
-            )}
-            {splitActive ? (
-              // CodePen-style split: panes write through to the dirty
-              // buffers, so Run/Format/Copy read the same state as tabs.
-              <PlaygroundSplitEditors
-                adapter={adapter}
-                files={files}
-                buffers={dirtyBuffers}
-                activeFileId={activeFileId}
-                editorTheme={editorTheme}
-                wordWrap={wordWrap}
-                onChange={(fileId, content) => {
-                  updateDirtyBuffer(fileId, content);
-                  const wsId = workspaceIdRef.current;
-                  if (wsId) opfsWriteFile(wsId, fileId, content);
-                  markDirty();
-                }}
-                onFocusFile={focusSplitFile}
-                onRun={() => runRef.current()}
-                onRunSecondary={() => runSecondaryRef.current()}
-                onAddFile={adapter.disableAddFile ? undefined : addNewFile}
-                registerView={registerSplitEditorView}
-                getRuntime={() => runtimeRef.current}
-                onCopyFile={copySplitFile}
-                onFormatFile={
-                  adapter.formatCode
-                    ? (fileId) => void formatSplitFile(fileId)
-                    : undefined
-                }
-                formattingFileId={formattingSplitId}
-              />
-            ) : (
-              <div
-                className="editor-wrap"
-                ref={editorHostRef}
-              />
-            )}
-            <div
-              className="resizer"
-              ref={resizerRef}
-              role="separator"
-              aria-orientation="vertical"
-              aria-label="Drag to resize editor and output panes"
-              title="Drag to resize"
-            />
-          </div>
-
-          <div className="output-pane">
-            <div className="pane-bar">
-              <span className="pane-label">
-                <Terminal size={12} aria-hidden="true" />
-                {/* Count merged per-run frames, not raw cells. */}
-                {outputGroups.length === 0
-                  ? "Output"
-                  : `${outputGroups.length} ${outputGroups.length === 1 ? "Output" : "Outputs"}`}
-              </span>
-              <div className="pane-bar-sep" />
-              {outputGroups.length > 0 && (
-                <button
-                  type="button"
-                  className="clear-btn"
-                  onClick={clearRunHistory}
-                  title="Clear all output"
-                  aria-label="Clear all output"
-                >
-                  <Eraser size={13} aria-hidden="true" />
-                  <span>Clear</span>
-                </button>
-              )}
-            </div>
-            {/* role="log": run results land with no other cue a
-                screen-reader user could notice. */}
-            <div
-              className={`output-body${hasPreview ? " web-preview-body" : " run-history"}`}
-              ref={outputBodyRef}
-              role="log"
-              aria-live="polite"
-              aria-label="Program output"
-            >
-              {hasPreview ? (
-                <>
-                  {/* Live page preview: always mounted so the slot exists
-                      before the first run; the runtime swaps a sandboxed
-                      iframe in on every run. The preview owns its controls
-                      (auto-run ⚡ and the view menu). */}
-                  <div className="web-preview-panel" data-testid="web-preview">
-                    <div className="web-preview-header">
-                      <span className="web-preview-label">Preview</span>
-                      <div className="pane-bar-sep" />
+                    {!hasPreview && splitAvailable && (
                       <Popover.Root>
                         <Popover.Trigger
                           openOnHover
@@ -4853,55 +4535,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                             <button
                               {...triggerProps}
                               type="button"
-                              className={`pv-icon-btn${autoRun ? " active" : ""}`}
-                              aria-label={
-                                autoRun
-                                  ? "Turn off auto-run on edit"
-                                  : "Turn on auto-run on edit"
-                              }
-                              aria-pressed={autoRun}
-                              onClick={() => setAutoRun(!autoRun)}
-                            >
-                              {autoRun ? (
-                                <Zap size={13} aria-hidden="true" />
-                              ) : (
-                                <ZapOff size={13} aria-hidden="true" />
-                              )}
-                            </button>
-                          )}
-                        />
-                        <Popover.Portal>
-                          <Popover.Positioner
-                            sideOffset={6}
-                            align="center"
-                            side="bottom"
-                          >
-                            <Popover.Popup className="bui-popup pane-btn-popover">
-                              {autoRun
-                                ? "Auto-run on edit: on"
-                                : "Auto-run on edit: off"}
-                            </Popover.Popup>
-                          </Popover.Positioner>
-                        </Popover.Portal>
-                      </Popover.Root>
-                      <Popover.Root>
-                        <Popover.Trigger
-                          openOnHover
-                          delay={150}
-                          closeDelay={100}
-                          render={(triggerProps) => (
-                            <button
-                              {...triggerProps}
-                              type="button"
-                              className="pv-icon-btn"
+                              className="icon-btn"
                               aria-label="Change view"
                             >
                               {effectiveEditorPosition === "right" ? (
-                                <PanelRight size={13} aria-hidden="true" />
+                                <PanelRight size={14} aria-hidden="true" />
                               ) : effectiveEditorPosition === "top" ? (
-                                <PanelTop size={13} aria-hidden="true" />
+                                <PanelTop size={14} aria-hidden="true" />
                               ) : (
-                                <PanelLeft size={13} aria-hidden="true" />
+                                <PanelLeft size={14} aria-hidden="true" />
                               )}
                             </button>
                           )}
@@ -4909,36 +4551,50 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                         <Popover.Portal>
                           <Popover.Positioner
                             sideOffset={6}
-                            align="end"
+                            align="start"
                             side="bottom"
                           >
                             <Popover.Popup className="bui-popup change-view-menu">
                               <div className="change-view-title">
                                 Change View
                               </div>
-                              {(
-                                [
-                                  { pos: "left", label: "Editors left", Icon: PanelLeft },
-                                  { pos: "top", label: "Editors top", Icon: PanelTop },
-                                  { pos: "right", label: "Editors right", Icon: PanelRight },
-                                ] as const
-                              ).map(({ pos, label, Icon }) => (
-                                <button
-                                  key={pos}
-                                  type="button"
-                                  className={`change-view-item${
-                                    effectiveEditorPosition === pos
-                                      ? " selected"
-                                      : ""
-                                  }`}
-                                  disabled={editorPinnedLeft}
-                                  onClick={() => setEditorPosition(pos)}
-                                >
-                                  <Icon size={14} aria-hidden="true" />
-                                  <span>{label}</span>
-                                </button>
-                              ))}
-                              {editorPinnedLeft && (
+                              {hasPreview &&
+                                (
+                                  [
+                                    {
+                                      pos: "left",
+                                      label: "Editors left",
+                                      Icon: PanelLeft,
+                                    },
+                                    {
+                                      pos: "top",
+                                      label: "Editors top",
+                                      Icon: PanelTop,
+                                    },
+                                    {
+                                      pos: "right",
+                                      label: "Editors right",
+                                      Icon: PanelRight,
+                                    },
+                                  ] as const
+                                ).map(({ pos, label, Icon }) => (
+                                  <button
+                                    key={pos}
+                                    type="button"
+                                    className={`change-view-item${
+                                      effectiveEditorPosition === pos
+                                        ? " selected"
+                                        : ""
+                                    }`}
+                                    disabled={editorPinnedLeft}
+                                    // eslint-disable-next-line react-hooks/refs -- click handler; setEditorPosition touches panesRef only on invocation
+                                    onClick={() => setEditorPosition(pos)}
+                                  >
+                                    <Icon size={14} aria-hidden="true" />
+                                    <span>{label}</span>
+                                  </button>
+                                ))}
+                              {hasPreview && editorPinnedLeft && (
                                 <div className="change-view-hint">
                                   The tabbed editor keeps the editor on the
                                   left.
@@ -4977,263 +4633,787 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                           </Popover.Positioner>
                         </Popover.Portal>
                       </Popover.Root>
-                    </div>
-                    <div className="web-preview-slot" ref={previewHostRef} />
-                  </div>
-                  {/* Quiet console strip pinned under the preview; errors
-                      turn it red. */}
-                  {(() => {
-                    const latest = outputGroups[outputGroups.length - 1];
-                    const consoleError =
-                      !!latest && latest.every((c) => c.type === "stderr");
-                    const textSegs = latest?.filter(
-                      (c) => c.type === "stdout" || c.type === "stderr" || c.type === "log",
-                    );
-                    const runId = latest?.[0]?.runId;
-                    const runNumber =
-                      runId !== undefined ? runNumbers.get(runId) : undefined;
-                    const last = latest?.[latest.length - 1];
-                    // The console shows one run at a time, so without a
-                    // boundary the previous run's text reads as this one's.
-                    // Only a finished run gets a duration.
-                    const finishedAt = last?.finishedAt;
-                    const running = statusState === "running";
-                    return (
-                      <div className={`web-console${consoleError ? " error" : ""}`}>
-                        <div
-                          className="web-console-resizer"
-                          role="separator"
-                          aria-label="Resize the output panel"
-                          aria-orientation="horizontal"
-                          onPointerDown={beginConsoleResize}
-                          onDoubleClick={resetConsoleHeight}
+                    )}
+                    {/* Split view: Copy/Format live in each pane's header. */}
+                    {!splitActive && (
+                      <Popover.Root>
+                        <Popover.Trigger
+                          openOnHover
+                          delay={150}
+                          closeDelay={100}
+                          render={(triggerProps) => (
+                            <button
+                              {...triggerProps}
+                              type="button"
+                              className="icon-btn"
+                              aria-label="Copy code to clipboard"
+                              onClick={copyEditor}
+                            >
+                              <CopyIcon />
+                            </button>
+                          )}
                         />
-                        <div className="web-console-bar">
-                          <span className="web-console-accent" aria-hidden="true" />
-                          <span className="web-console-label">
-                            {runNumber !== undefined ? `Run ${runNumber}` : "Output"}
-                          </span>
-                          <div className="pane-bar-sep" />
-                          {finishedAt !== undefined && (
-                            <span className="web-console-time">
-                              {new Date(finishedAt).toLocaleTimeString([], {
-                                hour12: false,
-                              })}
-                            </span>
+                        <Popover.Portal>
+                          <Popover.Positioner
+                            sideOffset={6}
+                            align="center"
+                            side="bottom"
+                          >
+                            <Popover.Popup className="bui-popup pane-btn-popover">
+                              Copy code
+                            </Popover.Popup>
+                          </Popover.Positioner>
+                        </Popover.Portal>
+                      </Popover.Root>
+                    )}
+                    {!splitActive && adapter.formatCode && (
+                      <Popover.Root
+                        open={isFormatting ? false : formatPopoverOpen}
+                        onOpenChange={setFormatPopoverOpen}
+                      >
+                        <Popover.Trigger
+                          openOnHover
+                          delay={150}
+                          closeDelay={100}
+                          render={(triggerProps) => (
+                            <button
+                              {...triggerProps}
+                              type="button"
+                              className="icon-btn"
+                              aria-label="Format code"
+                              aria-busy={isFormatting}
+                              disabled={!loaded || isFormatting}
+                              onClick={() => void handleFormatCode()}
+                            >
+                              {isFormatting ? (
+                                <svg
+                                  viewBox="0 0 13 13"
+                                  width={13}
+                                  height={13}
+                                  className="run-btn-spinner"
+                                  aria-hidden="true"
+                                >
+                                  <circle
+                                    cx="6.5"
+                                    cy="6.5"
+                                    r="5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.5"
+                                    strokeLinecap="round"
+                                    strokeDasharray="15 9"
+                                  />
+                                </svg>
+                              ) : (
+                                <Wand2 size={13} aria-hidden="true" />
+                              )}
+                            </button>
                           )}
-                          {finishedAt !== undefined && last && (
-                            <span className="web-console-ms">{last.elapsed}</span>
-                          )}
-                        </div>
-                        <div
-                          className="web-console-content"
-                          style={{ maxHeight: consoleHeight }}
-                        >
-                          {textSegs && textSegs.length > 0 ? (
-                            textSegs.map((cell) => (
-                              <div
-                                key={cell.id}
-                                className={
-                                  cell.type === "stderr"
-                                    ? "out-seg-stderr"
-                                    : undefined
-                                }
-                              >
-                                {cell.content}
-                              </div>
-                            ))
-                          ) : (
-                            <span className="web-console-ready">
-                              {running
-                                ? "Running…"
-                                : runNumber !== undefined
-                                  ? `Run ${runNumber} produced no console output.`
-                                  : "Ready. Console output lands here."}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </>
-              ) : outputs.length === 0 && statusState !== "running" ? (
-                outputCleared ? (
-                  <div className="run-history-empty">
-                    Output cleared. Press Run to start a new history.
+                        />
+                        <Popover.Portal>
+                          <Popover.Positioner
+                            sideOffset={6}
+                            align="center"
+                            side="bottom"
+                          >
+                            <Popover.Popup className="bui-popup pane-btn-popover">
+                              Format code
+                            </Popover.Popup>
+                          </Popover.Positioner>
+                        </Popover.Portal>
+                      </Popover.Root>
+                    )}
                   </div>
-                ) : (
-                  <div className="welcome">
-                    <div className="welcome-icon">
-                      <DiamondMark size={40} />
+                  <span
+                    className="kbd-group"
+                    title={isMac ? "Cmd + Enter" : "Ctrl + Enter"}
+                  >
+                    <kbd className="kbd">{isMac ? "⌘" : "Ctrl"}</kbd>
+                    <span className="kbd-plus" aria-hidden="true">
+                      +
+                    </span>
+                    <kbd className="kbd">Enter</kbd>
+                  </span>
+                  <div
+                    className={`playground-run-multi${runButtonState.dropdownItems.length > 0 ? " has-dropdown" : ""}${statusState === "running" ? " running" : ""}${statusState === "running" && canStopRun ? " stoppable" : ""}`}
+                  >
+                    {/* While a stoppable runtime is running, the primary button
+                    becomes Stop — an accidental `while True:` is one of the
+                    likeliest things a beginner writes, and reloading the page
+                    must not be the only way out. */}
+                    {statusState === "running" && canStopRun ? (
+                      <button
+                        type="button"
+                        className="run-btn playground-run-multi-main stop"
+                        onClick={() => void stopRun()}
+                        disabled={stopping}
+                        title="Stop the running program"
+                      >
+                        <Square
+                          size={9}
+                          aria-hidden="true"
+                          fill="currentColor"
+                        />
+                        <span className="playground-run-multi-label">
+                          {stopping ? "Stopping…" : "Stop"}
+                        </span>
+                      </button>
+                    ) : (
+                      <Popover.Root>
+                        <Popover.Trigger
+                          render={(props) => (
+                            <button
+                              {...props}
+                              type="button"
+                              className={`run-btn playground-run-multi-main${statusState === "running" ? " running" : ""}${runButtonState.dropdownItems.length > 0 ? " has-chevron" : ""}`}
+                              // `stopping`: the previous run's Stop is still
+                              // standing a fresh interpreter up.
+                              disabled={
+                                !loaded || statusState === "running" || stopping
+                              }
+                              onClick={() => {
+                                void runCode(
+                                  runButtonState.primaryEntry ?? undefined,
+                                );
+                              }}
+                            >
+                              {statusState === "running" ? (
+                                <svg
+                                  viewBox="0 0 12 12"
+                                  className="run-btn-spinner"
+                                >
+                                  <circle
+                                    cx="6"
+                                    cy="6"
+                                    r="4.5"
+                                    fill="none"
+                                    stroke="white"
+                                    strokeWidth="1.5"
+                                    strokeLinecap="round"
+                                    strokeDasharray="14 8"
+                                  />
+                                </svg>
+                              ) : (
+                                <Play size={10} aria-hidden="true" />
+                              )}
+                              <span className="playground-run-multi-label">
+                                {statusState === "running"
+                                  ? "Running…"
+                                  : runButtonState.primaryLabel}
+                              </span>
+                            </button>
+                          )}
+                        />
+                        {/* Hover popover surfaces the full label when the button
+                      truncates. */}
+                        <Popover.Portal>
+                          <Popover.Positioner sideOffset={6}>
+                            <Popover.Popup className="bui-popup pane-btn-popover">
+                              {runButtonState.primaryLabel}
+                            </Popover.Popup>
+                          </Popover.Positioner>
+                        </Popover.Portal>
+                      </Popover.Root>
+                    )}
+                    {runButtonState.dropdownItems.length > 0 && (
+                      <Menu.Root>
+                        <Menu.Trigger
+                          render={(props) => (
+                            <button
+                              {...props}
+                              type="button"
+                              className={`run-btn playground-run-multi-chevron${statusState === "running" ? " running" : ""}`}
+                              disabled={
+                                !loaded || statusState === "running" || stopping
+                              }
+                              aria-label="More run options"
+                            >
+                              <ChevronDown size={12} aria-hidden="true" />
+                            </button>
+                          )}
+                        />
+                        <Menu.Portal>
+                          <Menu.Positioner sideOffset={6} align="end">
+                            <Menu.Popup className="bui-popup playground-run-multi-dropdown">
+                              {runButtonState.dropdownItems.map((item, idx) => (
+                                <Menu.Item
+                                  key={item.entryFilename}
+                                  className="playground-run-multi-item"
+                                  onClick={() => {
+                                    void runCode(item.entryFilename);
+                                  }}
+                                >
+                                  <span className="playground-run-multi-item-label">
+                                    {item.label}
+                                  </span>
+                                  {idx === 0 && (
+                                    <span className="playground-run-multi-item-kbd">
+                                      {isMac ? "⌘⇧Enter" : "Ctrl+Shift+Enter"}
+                                    </span>
+                                  )}
+                                </Menu.Item>
+                              ))}
+                            </Menu.Popup>
+                          </Menu.Positioner>
+                        </Menu.Portal>
+                      </Menu.Root>
+                    )}
+                  </div>
+                </div>
+                {aiReview && (
+                  <div
+                    className="ai-review-bar"
+                    role="region"
+                    aria-label="AI suggested changes"
+                  >
+                    <Wand2 size={13} aria-hidden="true" />
+                    <span className="ai-review-text">
+                      AI suggested changes to <code>{aiReview.filename}</code>,
+                      accept or reject each chunk in the editor.
+                    </span>
+                    <div className="ai-review-actions">
+                      <button
+                        type="button"
+                        className="ai-review-btn ai-review-keep"
+                        onClick={() => endAiReview(true)}
+                        title="Finish the review, keeping the changes as shown in the editor"
+                      >
+                        Keep result
+                      </button>
+                      <button
+                        type="button"
+                        className="ai-review-btn ai-review-revert"
+                        onClick={() => endAiReview(false)}
+                        title="Restore the file to how it was before the suggestion"
+                      >
+                        Revert all
+                      </button>
                     </div>
-                    <h3>Run your code to see output</h3>
-                    {capabilitiesBlurb && <p>{capabilitiesBlurb}</p>}
-                  </div>
-                )
-              ) : (
-                <>
-                {/* Mid-run wait notice (package installs), so a multi-second
-                    pause before the first line explains itself. */}
-                {statusState === "running" && runStatusMessage && (
-                  <div className="run-status-note" role="status">
-                    {runStatusMessage}
                   </div>
                 )}
-                {outputGroups.map((group, groupIndex) => {
-                  // One slim cell per run. stderr-only runs read red;
-                  // older runs dim, the newest stays full color.
-                  const onlyStderr = group.every((c) => c.type === "stderr");
-                  const runId = group[0].runId;
-                  const runNumber =
-                    runId !== undefined ? runNumbers.get(runId) : undefined;
-                  const fresh = groupIndex === outputGroups.length - 1;
-                  const copyText = group
-                    .filter(
-                      (c) => c.type === "stdout" || c.type === "stderr" || c.type === "log",
-                    )
-                    .map((c) => c.content)
-                    .join("\n");
-                  return (
-                    <div
-                      key={group[0].id}
-                      data-cell-id={group[0].id}
-                      className={`run-cell${onlyStderr ? " error" : ""}${
-                        fresh ? "" : " old"
-                      }`}
+                {splitActive ? (
+                  // CodePen-style split: panes write through to the dirty
+                  // buffers, so Run/Format/Copy read the same state as tabs.
+                  <PlaygroundSplitEditors
+                    adapter={adapter}
+                    files={files}
+                    buffers={dirtyBuffers}
+                    activeFileId={activeFileId}
+                    editorTheme={editorTheme}
+                    wordWrap={wordWrap}
+                    onChange={(fileId, content) => {
+                      updateDirtyBuffer(fileId, content);
+                      const wsId = workspaceIdRef.current;
+                      if (wsId) opfsWriteFile(wsId, fileId, content);
+                      markDirty();
+                    }}
+                    onFocusFile={focusSplitFile}
+                    onRun={() => runRef.current()}
+                    onRunSecondary={() => runSecondaryRef.current()}
+                    onAddFile={adapter.disableAddFile ? undefined : addNewFile}
+                    registerView={registerSplitEditorView}
+                    getRuntime={() => runtimeRef.current}
+                    onCopyFile={copySplitFile}
+                    onFormatFile={
+                      adapter.formatCode
+                        ? (fileId) => void formatSplitFile(fileId)
+                        : undefined
+                    }
+                    formattingFileId={formattingSplitId}
+                  />
+                ) : (
+                  <div className="editor-wrap" ref={editorHostRef} />
+                )}
+                <div
+                  className="resizer"
+                  ref={resizerRef}
+                  role="separator"
+                  aria-orientation="vertical"
+                  aria-label="Drag to resize editor and output panes"
+                  title="Drag to resize"
+                />
+              </div>
+
+              <div className="output-pane">
+                <div className="pane-bar">
+                  <span className="pane-label">
+                    <Terminal size={12} aria-hidden="true" />
+                    {/* Count merged per-run frames, not raw cells. */}
+                    {outputGroups.length === 0
+                      ? "Output"
+                      : `${outputGroups.length} ${outputGroups.length === 1 ? "Output" : "Outputs"}`}
+                  </span>
+                  <div className="pane-bar-sep" />
+                  {outputGroups.length > 0 && (
+                    <button
+                      type="button"
+                      className="clear-btn"
+                      onClick={clearRunHistory}
+                      title="Clear all output"
+                      aria-label="Clear all output"
                     >
-                      <div className="run-cell-header">
-                        <span className="run-cell-bar" aria-hidden="true" />
-                        <span className="run-cell-label">
-                          {runNumber !== undefined
-                            ? `Run ${runNumber}`
-                            : onlyStderr
-                              ? "Error"
-                              : "Output"}
-                        </span>
-                        {group[0].finishedAt !== undefined && (
-                          <span className="run-cell-time">
-                            {new Date(group[0].finishedAt).toLocaleTimeString(
-                              [],
-                              { hour12: false },
-                            )}
-                          </span>
-                        )}
-                        <span className="run-cell-ms">
-                          Done in {group[group.length - 1].elapsed}
-                        </span>
-                        {copyText.length > 0 && (
-                          <button
-                            type="button"
-                            className="run-cell-action"
-                            title="Copy this output"
-                            aria-label="Copy this output"
-                            onClick={() =>
-                              void copyToClipboard(
-                                copyText,
-                                onlyStderr ? "Error" : "Output",
-                              )
-                            }
-                          >
-                            <CopyIcon />
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          className="run-cell-action"
-                          title="Dismiss this run"
-                          aria-label="Dismiss this run"
-                          onClick={() => dismissRun(runId, group[0].id)}
-                        >
-                          <X size={11} aria-hidden="true" />
-                        </button>
-                      </div>
-                      <div className="run-cell-content">
-                        {group.map((cell) =>
-                          cell.type === "image" ? (
-                            <div
-                              key={cell.id}
-                              className="out-seg out-seg-image"
-                              data-cell-type="image"
-                            >
-                              {/* Base64 PNGs have unknown intrinsic size,
-                                  not eligible for next/image. */}
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img
-                                src={`data:image/png;base64,${cell.content}`}
-                                alt="figure"
-                                onLoad={scrollToLatestOutput}
-                              />
-                            </div>
-                          ) : cell.type === "html" ? (
-                            <div
-                              key={cell.id}
-                              className="dataframe-wrap"
-                              data-cell-type="html"
-                              dangerouslySetInnerHTML={{
-                                __html: cell.content,
-                              }}
+                      <Eraser size={13} aria-hidden="true" />
+                      <span>Clear</span>
+                    </button>
+                  )}
+                </div>
+                {/* role="log": run results land with no other cue a
+                screen-reader user could notice. */}
+                <div
+                  className={`output-body${hasPreview ? " web-preview-body" : " run-history"}`}
+                  ref={outputBodyRef}
+                  role="log"
+                  aria-live="polite"
+                  aria-label="Program output"
+                >
+                  {hasPreview ? (
+                    <>
+                      {/* Live page preview: always mounted so the slot exists
+                      before the first run; the runtime swaps a sandboxed
+                      iframe in on every run. The preview owns its controls
+                      (auto-run ⚡ and the view menu). */}
+                      <div
+                        className="web-preview-panel"
+                        data-testid="web-preview"
+                      >
+                        <div className="web-preview-header">
+                          <span className="web-preview-label">Preview</span>
+                          <div className="pane-bar-sep" />
+                          <Popover.Root>
+                            <Popover.Trigger
+                              openOnHover
+                              delay={150}
+                              closeDelay={100}
+                              render={(triggerProps) => (
+                                <button
+                                  {...triggerProps}
+                                  type="button"
+                                  className={`pv-icon-btn${autoRun ? " active" : ""}`}
+                                  aria-label={
+                                    autoRun
+                                      ? "Turn off auto-run on edit"
+                                      : "Turn on auto-run on edit"
+                                  }
+                                  aria-pressed={autoRun}
+                                  onClick={() => setAutoRun(!autoRun)}
+                                >
+                                  {autoRun ? (
+                                    <Zap size={13} aria-hidden="true" />
+                                  ) : (
+                                    <ZapOff size={13} aria-hidden="true" />
+                                  )}
+                                </button>
+                              )}
                             />
-                          ) : cell.type === "plot" && cell.plot ? (
-                            <div
-                              key={cell.id}
-                              className="out-seg out-seg-plot"
-                              data-cell-type="plot"
-                            >
-                              <PlotlyChart
-                                figure={cell.plot}
-                                className="plotly-chart"
-                              />
-                            </div>
-                          ) : (
-                            <div
-                              key={cell.id}
-                              className={`out-seg out-seg-${cell.type}`}
-                              data-cell-type={cell.type}
-                            >
-                              {cell.content}
-                            </div>
-                          ),
-                        )}
+                            <Popover.Portal>
+                              <Popover.Positioner
+                                sideOffset={6}
+                                align="center"
+                                side="bottom"
+                              >
+                                <Popover.Popup className="bui-popup pane-btn-popover">
+                                  {autoRun
+                                    ? "Auto-run on edit: on"
+                                    : "Auto-run on edit: off"}
+                                </Popover.Popup>
+                              </Popover.Positioner>
+                            </Popover.Portal>
+                          </Popover.Root>
+                          <Popover.Root>
+                            <Popover.Trigger
+                              openOnHover
+                              delay={150}
+                              closeDelay={100}
+                              render={(triggerProps) => (
+                                <button
+                                  {...triggerProps}
+                                  type="button"
+                                  className="pv-icon-btn"
+                                  aria-label="Change view"
+                                >
+                                  {effectiveEditorPosition === "right" ? (
+                                    <PanelRight size={13} aria-hidden="true" />
+                                  ) : effectiveEditorPosition === "top" ? (
+                                    <PanelTop size={13} aria-hidden="true" />
+                                  ) : (
+                                    <PanelLeft size={13} aria-hidden="true" />
+                                  )}
+                                </button>
+                              )}
+                            />
+                            <Popover.Portal>
+                              <Popover.Positioner
+                                sideOffset={6}
+                                align="end"
+                                side="bottom"
+                              >
+                                <Popover.Popup className="bui-popup change-view-menu">
+                                  <div className="change-view-title">
+                                    Change View
+                                  </div>
+                                  {(
+                                    [
+                                      {
+                                        pos: "left",
+                                        label: "Editors left",
+                                        Icon: PanelLeft,
+                                      },
+                                      {
+                                        pos: "top",
+                                        label: "Editors top",
+                                        Icon: PanelTop,
+                                      },
+                                      {
+                                        pos: "right",
+                                        label: "Editors right",
+                                        Icon: PanelRight,
+                                      },
+                                    ] as const
+                                  ).map(({ pos, label, Icon }) => (
+                                    <button
+                                      key={pos}
+                                      type="button"
+                                      className={`change-view-item${
+                                        effectiveEditorPosition === pos
+                                          ? " selected"
+                                          : ""
+                                      }`}
+                                      disabled={editorPinnedLeft}
+                                      onClick={() => setEditorPosition(pos)}
+                                    >
+                                      <Icon size={14} aria-hidden="true" />
+                                      <span>{label}</span>
+                                    </button>
+                                  ))}
+                                  {editorPinnedLeft && (
+                                    <div className="change-view-hint">
+                                      The tabbed editor keeps the editor on the
+                                      left.
+                                    </div>
+                                  )}
+                                  {splitAvailable && (
+                                    <>
+                                      <div
+                                        className="change-view-sep"
+                                        role="separator"
+                                      />
+                                      <div className="change-view-title">
+                                        Editor Layout
+                                      </div>
+                                      <button
+                                        type="button"
+                                        className={`change-view-item${splitActive ? " selected" : ""}`}
+                                        aria-pressed={splitActive}
+                                        onClick={() => setSplitView(true)}
+                                      >
+                                        <Rows3 size={14} aria-hidden="true" />
+                                        <span>
+                                          Split editors (CodePen-style)
+                                        </span>
+                                      </button>
+                                      <button
+                                        type="button"
+                                        className={`change-view-item${!splitActive ? " selected" : ""}`}
+                                        aria-pressed={!splitActive}
+                                        onClick={() => setSplitView(false)}
+                                      >
+                                        <FileCode
+                                          size={14}
+                                          aria-hidden="true"
+                                        />
+                                        <span>
+                                          Tabbed editor (manage files)
+                                        </span>
+                                      </button>
+                                    </>
+                                  )}
+                                </Popover.Popup>
+                              </Popover.Positioner>
+                            </Popover.Portal>
+                          </Popover.Root>
+                        </div>
+                        <div
+                          className="web-preview-slot"
+                          ref={previewHostRef}
+                        />
                       </div>
-                    </div>
-                  );
-                })}
-                </>
+                      {/* Quiet console strip pinned under the preview; errors
+                      turn it red. */}
+                      {(() => {
+                        const latest = outputGroups[outputGroups.length - 1];
+                        const consoleError =
+                          !!latest && latest.every((c) => c.type === "stderr");
+                        const textSegs = latest?.filter(
+                          (c) =>
+                            c.type === "stdout" ||
+                            c.type === "stderr" ||
+                            c.type === "log",
+                        );
+                        const runId = latest?.[0]?.runId;
+                        const runNumber =
+                          runId !== undefined
+                            ? runNumbers.get(runId)
+                            : undefined;
+                        const last = latest?.[latest.length - 1];
+                        // The console shows one run at a time, so without a
+                        // boundary the previous run's text reads as this one's.
+                        // Only a finished run gets a duration.
+                        const finishedAt = last?.finishedAt;
+                        const running = statusState === "running";
+                        return (
+                          <div
+                            className={`web-console${consoleError ? " error" : ""}`}
+                          >
+                            <div
+                              className="web-console-resizer"
+                              role="separator"
+                              aria-label="Resize the output panel"
+                              aria-orientation="horizontal"
+                              onPointerDown={beginConsoleResize}
+                              onDoubleClick={resetConsoleHeight}
+                            />
+                            <div className="web-console-bar">
+                              <span
+                                className="web-console-accent"
+                                aria-hidden="true"
+                              />
+                              <span className="web-console-label">
+                                {runNumber !== undefined
+                                  ? `Run ${runNumber}`
+                                  : "Output"}
+                              </span>
+                              <div className="pane-bar-sep" />
+                              {finishedAt !== undefined && (
+                                <span className="web-console-time">
+                                  {new Date(finishedAt).toLocaleTimeString([], {
+                                    hour12: false,
+                                  })}
+                                </span>
+                              )}
+                              {finishedAt !== undefined && last && (
+                                <span className="web-console-ms">
+                                  {last.elapsed}
+                                </span>
+                              )}
+                            </div>
+                            <div
+                              className="web-console-content"
+                              style={{ maxHeight: consoleHeight }}
+                            >
+                              {textSegs && textSegs.length > 0 ? (
+                                textSegs.map((cell) => (
+                                  <div
+                                    key={cell.id}
+                                    className={
+                                      cell.type === "stderr"
+                                        ? "out-seg-stderr"
+                                        : undefined
+                                    }
+                                  >
+                                    {cell.content}
+                                  </div>
+                                ))
+                              ) : (
+                                <span className="web-console-ready">
+                                  {running
+                                    ? "Running…"
+                                    : runNumber !== undefined
+                                      ? `Run ${runNumber} produced no console output.`
+                                      : "Ready. Console output lands here."}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </>
+                  ) : outputs.length === 0 && statusState !== "running" ? (
+                    outputCleared ? (
+                      <div className="run-history-empty">
+                        Output cleared. Press Run to start a new history.
+                      </div>
+                    ) : (
+                      <div className="welcome">
+                        <div className="welcome-icon">
+                          <DiamondMark size={40} />
+                        </div>
+                        <h3>Run your code to see output</h3>
+                        {capabilitiesBlurb && <p>{capabilitiesBlurb}</p>}
+                      </div>
+                    )
+                  ) : (
+                    <>
+                      {/* Mid-run wait notice (package installs), so a multi-second
+                    pause before the first line explains itself. */}
+                      {statusState === "running" && runStatusMessage && (
+                        <div className="run-status-note" role="status">
+                          {runStatusMessage}
+                        </div>
+                      )}
+                      {outputGroups.map((group, groupIndex) => {
+                        // One slim cell per run. stderr-only runs read red;
+                        // older runs dim, the newest stays full color.
+                        const onlyStderr = group.every(
+                          (c) => c.type === "stderr",
+                        );
+                        const runId = group[0].runId;
+                        const runNumber =
+                          runId !== undefined
+                            ? runNumbers.get(runId)
+                            : undefined;
+                        const fresh = groupIndex === outputGroups.length - 1;
+                        const copyText = group
+                          .filter(
+                            (c) =>
+                              c.type === "stdout" ||
+                              c.type === "stderr" ||
+                              c.type === "log",
+                          )
+                          .map((c) => c.content)
+                          .join("\n");
+                        return (
+                          <div
+                            key={group[0].id}
+                            data-cell-id={group[0].id}
+                            className={`run-cell${onlyStderr ? " error" : ""}${
+                              fresh ? "" : " old"
+                            }`}
+                          >
+                            <div className="run-cell-header">
+                              <span
+                                className="run-cell-bar"
+                                aria-hidden="true"
+                              />
+                              <span className="run-cell-label">
+                                {runNumber !== undefined
+                                  ? `Run ${runNumber}`
+                                  : onlyStderr
+                                    ? "Error"
+                                    : "Output"}
+                              </span>
+                              {group[0].finishedAt !== undefined && (
+                                <span className="run-cell-time">
+                                  {new Date(
+                                    group[0].finishedAt,
+                                  ).toLocaleTimeString([], { hour12: false })}
+                                </span>
+                              )}
+                              <span className="run-cell-ms">
+                                Done in {group[group.length - 1].elapsed}
+                              </span>
+                              {copyText.length > 0 && (
+                                <button
+                                  type="button"
+                                  className="run-cell-action"
+                                  title="Copy this output"
+                                  aria-label="Copy this output"
+                                  onClick={() =>
+                                    void copyToClipboard(
+                                      copyText,
+                                      onlyStderr ? "Error" : "Output",
+                                    )
+                                  }
+                                >
+                                  <CopyIcon />
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                className="run-cell-action"
+                                title="Dismiss this run"
+                                aria-label="Dismiss this run"
+                                onClick={() => dismissRun(runId, group[0].id)}
+                              >
+                                <X size={11} aria-hidden="true" />
+                              </button>
+                            </div>
+                            <div className="run-cell-content">
+                              {group.map((cell) =>
+                                cell.type === "image" ? (
+                                  <div
+                                    key={cell.id}
+                                    className="out-seg out-seg-image"
+                                    data-cell-type="image"
+                                  >
+                                    {/* Base64 PNGs have unknown intrinsic size,
+                                  not eligible for next/image. */}
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img
+                                      src={`data:image/png;base64,${cell.content}`}
+                                      alt="figure"
+                                      onLoad={scrollToLatestOutput}
+                                    />
+                                  </div>
+                                ) : cell.type === "html" ? (
+                                  <div
+                                    key={cell.id}
+                                    className="dataframe-wrap"
+                                    data-cell-type="html"
+                                    dangerouslySetInnerHTML={{
+                                      __html: cell.content,
+                                    }}
+                                  />
+                                ) : cell.type === "plot" && cell.plot ? (
+                                  <div
+                                    key={cell.id}
+                                    className="out-seg out-seg-plot"
+                                    data-cell-type="plot"
+                                  >
+                                    <PlotlyChart
+                                      figure={cell.plot}
+                                      className="plotly-chart"
+                                    />
+                                  </div>
+                                ) : (
+                                  <div
+                                    key={cell.id}
+                                    className={`out-seg out-seg-${cell.type}`}
+                                    data-cell-type={cell.type}
+                                  >
+                                    {cell.content}
+                                  </div>
+                                ),
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </>
+                  )}
+                </div>
+                <DataslopeRunOverlay running={statusState === "running"} />
+              </div>
+              {activeTabId === SETTINGS_TAB_ID && (
+                <div className="playground-settings-tab-pane">
+                  <SettingsPanelContent
+                    fontSize={fontSize}
+                    setFontSize={setFontSize}
+                    outputFontSizeEnabled={outputFontSizeEnabled}
+                    setOutputFontSizeEnabled={setOutputFontSizeEnabled}
+                    outputFontSize={outputFontSize}
+                    setOutputFontSize={setOutputFontSize}
+                    editorTheme={editorTheme}
+                    setEditorTheme={setEditorTheme}
+                    wordWrap={wordWrap}
+                    setWordWrap={setWordWrap}
+                    clearBeforeRun={clearBeforeRun}
+                    setClearBeforeRun={setClearBeforeRun}
+                    language={adapter.id}
+                    onRestoreDefaults={() => setConfirmRestoreOpen(true)}
+                    onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
+                    onClearAllLocalData={() => setConfirmClearAllDataOpen(true)}
+                    onClose={closeSettingsTab}
+                  />
+                </div>
               )}
             </div>
-            <DataslopeRunOverlay running={statusState === "running"} />
-          </div>
-          {activeTabId === SETTINGS_TAB_ID && (
-            <div className="playground-settings-tab-pane">
-              <SettingsPanelContent
-                fontSize={fontSize}
-                setFontSize={setFontSize}
-                outputFontSizeEnabled={outputFontSizeEnabled}
-                setOutputFontSizeEnabled={setOutputFontSizeEnabled}
-                outputFontSize={outputFontSize}
-                setOutputFontSize={setOutputFontSize}
-                editorTheme={editorTheme}
-                setEditorTheme={setEditorTheme}
-                wordWrap={wordWrap}
-                setWordWrap={setWordWrap}
-                clearBeforeRun={clearBeforeRun}
-                setClearBeforeRun={setClearBeforeRun}
-                language={adapter.id}
-                onRestoreDefaults={() => setConfirmRestoreOpen(true)}
-                onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
-                onClearAllLocalData={() => setConfirmClearAllDataOpen(true)}
-                onClose={closeSettingsTab}
-              />
-            </div>
-          )}
-        </div>
-        {/* Second overlay instance outside the tab-switched `.panes` so it
+            {/* Second overlay instance outside the tab-switched `.panes` so it
             stays visible on mobile whichever tab is active; CSS ensures
             only one instance paints at a time. */}
-        <DataslopeRunOverlay
-          running={statusState === "running"}
-          variant="mobile"
-        />
+            <DataslopeRunOverlay
+              running={statusState === "running"}
+              variant="mobile"
+            />
           </div>
         </div>
       </div>

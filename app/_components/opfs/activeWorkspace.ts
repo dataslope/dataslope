@@ -226,6 +226,48 @@ function clearDraftWorkspace(playgroundId: string): void {
   clearLastDraft(playgroundId);
 }
 
+/**
+ * The entry for a workspace id, saved or not.
+ *
+ * A playground's first workspace is a draft: real, populated, open, and
+ * absent from the registry until Save promotes it. Anything that looked
+ * workspaces up in the registry alone therefore reported that an open
+ * two-file project did not exist — which is how a multi-file Java project
+ * came to have no way to export itself.
+ */
+export function findWorkspaceEntry(
+  workspaceId: string,
+): WorkspaceEntry | null {
+  const saved = getWorkspaceRegistry().find((e) => e.id === workspaceId);
+  if (saved) return saved;
+  if (typeof window === "undefined") return null;
+
+  const scan = (storage: Storage, prefix: string): WorkspaceEntry | null => {
+    for (let i = 0; i < storage.length; i++) {
+      const key = storage.key(i);
+      if (!key || !key.startsWith(prefix)) continue;
+      try {
+        const parsed = JSON.parse(storage.getItem(key) ?? "") as WorkspaceEntry;
+        if (parsed && parsed.id === workspaceId) return parsed;
+      } catch {
+        /* a malformed entry is not the one we are looking for. */
+      }
+    }
+    return null;
+  };
+
+  try {
+    // This tab's drafts first; the durable mirror covers a tab that has
+    // resumed one from a previous session.
+    return (
+      scan(window.sessionStorage, DRAFT_KEY_PREFIX) ??
+      scan(window.localStorage, LAST_DRAFT_KEY_PREFIX)
+    );
+  } catch {
+    return null;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Sign-in resume handoff
 // ---------------------------------------------------------------------------

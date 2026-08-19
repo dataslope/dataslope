@@ -40,7 +40,7 @@ export const TRANSLATION_UNIT_NAME: Record<CFamilyLanguage, string> = {
 };
 
 /** Path that stdin is read from, when the workspace provides one. */
-export const STDIN_FILENAME = "stdin.txt";
+export { STDIN_FILENAME } from "./stdinFile";
 
 export interface TranslationUnit {
   /** The source handed to browsercc. */

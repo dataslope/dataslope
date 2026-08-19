@@ -46,6 +46,7 @@ import {
   deleteWorkspace,
   duplicateWorkspace,
   getWorkspaceRegistry,
+  WORKSPACE_REGISTRY_KEY,
   renameWorkspace,
   type WorkspaceEntry,
 } from "../opfs/workspace";
@@ -277,16 +278,32 @@ export function WorkspaceBadge({
     () => new Map(),
   );
 
-  // Client-only hydration (localStorage). Re-read on popover/manager open to
-  // reflect deletions from other tabs.
+  // Client-only hydration (localStorage).
   const refreshRegistry = useCallback(() => {
     setRegistry(getWorkspaceRegistry());
   }, []);
 
+  // Re-read whenever either surface opens, not only on mount. The registry
+  // lives in localStorage, which React cannot subscribe to, so a workspace
+  // saved after this component mounted was invisible until a page reload —
+  // including one saved from this very tab, which made a real storage
+  // problem look like a rendering glitch.
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshRegistry();
-  }, [refreshRegistry, activeWorkspaceId]);
+  }, [refreshRegistry, activeWorkspaceId, popoverOpen, managerOpen]);
+
+  // `storage` fires only in the other tabs, which is exactly the case the
+  // opens above cannot cover: a workspace created or deleted next door
+  // while this panel is already showing.
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== null && event.key !== WORKSPACE_REGISTRY_KEY) return;
+      refreshRegistry();
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [refreshRegistry]);
 
   const recent = useMemo(
     () =>

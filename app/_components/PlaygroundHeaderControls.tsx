@@ -374,11 +374,11 @@ function useSaveMenu(
 
   const doDownload = useCallback(async () => {
     if (!workspaceId) return;
-    // Drafts aren't in the registry yet; save first so the zip has a name.
-    if (unsaved && onSave) await onSave(workspaceName || "Workspace");
+    // Drafts export as they are. Promoting one to a saved workspace just to
+    // download it was a side effect nobody asked the Download button for.
     const ok = await downloadWorkspaceZip(workspaceId);
     onNotify?.(ok ? "Workspace downloaded" : "Nothing to download yet");
-  }, [workspaceId, unsaved, onSave, workspaceName, onNotify]);
+  }, [workspaceId, onNotify]);
 
   const showCloudRows = cloud.available && !cloud.signedOut;
 
