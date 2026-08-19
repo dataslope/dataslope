@@ -256,6 +256,18 @@ export interface LanguageAdapter {
      *  react: no — it boots esbuild-wasm and pulls React from esm.sh. */
     autoPreview?: boolean;
   };
+  /**
+   * A run compiles and executes the whole workspace, not the focused file.
+   *
+   * Output is filed per editor tab by default, which is right when each
+   * file runs on its own. Where it is not (C and C++ build every source
+   * into one program), that split hides results the reader just produced
+   * and gives several runs the same number: clicking another tab showed an
+   * empty pane, and running from there started its own "Run 1" holding the
+   * same program's output. With this set, a run's output belongs to the
+   * entry file, the way it already does in split-editor playgrounds.
+   */
+  projectWideRuns?: boolean;
   /** Formats offered by the "Export" dropdown (client-side download). */
   exportFormats: ExportFormat[];
   /**

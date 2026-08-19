@@ -2014,9 +2014,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     const activeFile =
       filesRef.current.find((f) => f.id === targetFileId) ?? null;
     const entryFilename = entryOverride ?? activeFile?.filename;
-    // Split view: outputs belong to the file that RAN (the entry), not the
-    // focused pane, so the console reads as one stream (see `outputFileId`).
-    if (splitActiveRef.current && entryFilename) {
+    // Outputs belong to the file that RAN (the entry), not the focused
+    // pane, so the console reads as one stream (see `outputFileId`). True
+    // in split view, and wherever a run builds the whole workspace.
+    if ((splitActiveRef.current || adapter.projectWideRuns) && entryFilename) {
       const entryFile = filesRef.current.find(
         (f) => f.filename === entryFilename,
       );
@@ -2276,7 +2277,14 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       if (!opts?.auto) setMobileTab("output");
     }
   },
-  [clearBeforeRun, collectWorkspaceFilesForRun, hasPreview, setOutputsForFile, showToast]);
+  [
+    adapter.projectWideRuns,
+    clearBeforeRun,
+    collectWorkspaceFilesForRun,
+    hasPreview,
+    setOutputsForFile,
+    showToast,
+  ]);
 
   /** Stop the running program. The runtime rejects the in-flight `run()`
    *  with a RunCancelledError, which `runCode` renders as "Run stopped."
@@ -2329,12 +2337,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // the Run button's resolved entry, so the console reads as ONE stream
   // regardless of focus (runCode routes its cells to the same id).
   const outputFileId = useMemo(() => {
-    if (!splitActive) return activeFileId;
+    if (!splitActive && !adapter.projectWideRuns) return activeFileId;
     const entryName =
       runButtonState.primaryEntry ??
       files.find((f) => f.id === activeFileId)?.filename;
     return files.find((f) => f.filename === entryName)?.id ?? activeFileId;
-  }, [splitActive, runButtonState, files, activeFileId]);
+  }, [splitActive, adapter.projectWideRuns, runButtonState, files, activeFileId]);
 
   // Derived: the output pane's cells (see `outputFileId` above).
   const outputs = useMemo(
@@ -3560,20 +3568,29 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const beginConsoleResize = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
       event.preventDefault();
-      const handle = event.currentTarget;
-      const startY = event.clientY;
-      const strip = handle.parentElement;
+      const strip = event.currentTarget.parentElement;
       const content = strip?.querySelector(".web-console-content");
+      const startY = event.clientY;
       const startHeight =
         content?.getBoundingClientRect().height ?? CONSOLE_DEFAULT_HEIGHT;
       // Leave room for the preview: a console that eats the whole pane
-      // hides the thing it is narrating.
-      const maxHeight = Math.max(
-        CONSOLE_MIN_HEIGHT,
-        (strip?.parentElement?.getBoundingClientRect().height ??
-          startHeight * 4) - 140,
-      );
-      handle.setPointerCapture(event.pointerId);
+      // hides the thing it is narrating. Proportional rather than a fixed
+      // reserve, so the handle still has somewhere to go in a short
+      // window, where subtracting a constant could cap the console below
+      // the height it is already at.
+      const paneHeight =
+        strip?.parentElement?.getBoundingClientRect().height ?? startHeight * 4;
+      const maxHeight = Math.max(CONSOLE_MIN_HEIGHT, Math.round(paneHeight * 0.7));
+
+      // The preview above is an iframe, and a pointer dragged over one
+      // stops being this document's business: dragging the console taller
+      // sent every move into the frame instead. Switching the frame off
+      // for the duration keeps the whole gesture here.
+      document.body.classList.add("ds-resizing");
+
+      // Listeners on the window, not on the handle: React re-renders the
+      // strip on every height change, so a listener (or a pointer capture)
+      // bound to the handle would be dropped with the node it was on.
       const onMove = (move: PointerEvent) => {
         const next = startHeight - (move.clientY - startY);
         setConsoleHeight(
@@ -3581,14 +3598,14 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         );
       };
       const onUp = () => {
-        handle.releasePointerCapture(event.pointerId);
-        handle.removeEventListener("pointermove", onMove);
-        handle.removeEventListener("pointerup", onUp);
-        handle.removeEventListener("pointercancel", onUp);
+        document.body.classList.remove("ds-resizing");
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+        window.removeEventListener("pointercancel", onUp);
       };
-      handle.addEventListener("pointermove", onMove);
-      handle.addEventListener("pointerup", onUp);
-      handle.addEventListener("pointercancel", onUp);
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp);
+      window.addEventListener("pointercancel", onUp);
     },
     [setConsoleHeight],
   );

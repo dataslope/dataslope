@@ -231,14 +231,26 @@ test("the console can be resized", async ({ page }) => {
     .poll(() => consoleText(page), { timeout: 30_000 })
     .toContain("line 40");
   const console_ = page.locator(".web-console");
-  const before = (await console_.boundingBox())?.height ?? 0;
   const handle = page.locator(".web-console-resizer");
-  const box = await handle.boundingBox();
-  expect(box).not.toBeNull();
-  await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(box!.x + box!.width / 2, box!.y - 60, { steps: 8 });
-  await page.mouse.up();
-  const after = (await console_.boundingBox())?.height ?? 0;
-  expect(after).toBeGreaterThan(before);
+
+  /** Drag the handle by `dy` (negative grows the console) and report the
+   *  strip's height afterwards. */
+  const drag = async (dy: number): Promise<number> => {
+    const box = await handle.boundingBox();
+    expect(box).not.toBeNull();
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + dy, { steps: 8 });
+    await page.mouse.up();
+    return (await console_.boundingBox())?.height ?? 0;
+  };
+
+  // Shrinking always has room; growing is capped so the preview keeps its
+  // own, which is why this measures from the shrunk state rather than from
+  // whatever height the strip happened to open at.
+  const before = (await console_.boundingBox())?.height ?? 0;
+  const shrunk = await drag(80);
+  expect(shrunk).toBeLessThan(before);
+  const grown = await drag(-60);
+  expect(grown).toBeGreaterThan(shrunk);
 });

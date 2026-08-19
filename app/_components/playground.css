@@ -5988,6 +5988,16 @@ html[data-playground-theme="dark"] {
 .web-console-resizer:active::after {
   background: var(--primary);
 }
+/* While the console is being dragged, the preview must not take the
+   pointer: an iframe under the cursor captures the move events and the
+   drag stops halfway. */
+body.ds-resizing iframe {
+  pointer-events: none;
+}
+body.ds-resizing {
+  cursor: ns-resize;
+  user-select: none;
+}
 .web-console-time {
   font-family: var(--font-mono);
   font-size: 10px;
