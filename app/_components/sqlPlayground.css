@@ -115,12 +115,28 @@
   overscroll-behavior: contain;
 }
 
+/* Base UI positions the popup with `position: absolute; left/top: 0` plus a
+   `transform: translate(x, y)`, so its containing block is the viewport: an
+   unconstrained popup shrink-to-fits to the *full* viewport width and the
+   translate then pushes it past the right edge, giving the document a few
+   pixels of horizontal scroll (very visible inside the mobile drawer menu,
+   where the whole page — sheet included — could be dragged sideways). Cap
+   both axes to the space Base UI publishes on the positioner
+   (`--available-width` / `--available-height`, seeded to 100vw/100vh) so the
+   dropdown always fits on screen and scrolls internally instead. */
 .sql-db-positioner {
   z-index: 500;
+  max-width: var(--available-width, 100vw);
 }
 
 .sql-db-popup {
   min-width: 260px;
+  max-width: var(--available-width, 100vw);
+  max-height: var(--available-height, 100vh);
+  overflow-y: auto;
+  /* A long sample list scrolls inside the popup; don't chain that scroll
+     out to the page (or the drawer) behind it. */
+  overscroll-behavior: contain;
   z-index: 500;
   /* Both the database and schema selector dropdowns use this popup; pin
      it to the base surface so it reads a touch darker than the default
@@ -141,6 +157,9 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  /* Let the label/description column shrink below its content width so the
+     capped popup wraps the text instead of widening past the viewport. */
+  min-width: 0;
 }
 
 .sql-db-item-desc {
