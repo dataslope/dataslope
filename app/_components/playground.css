@@ -3004,6 +3004,13 @@ input[type="range"].fs-slider:disabled {
   /* Inherits position/color from .pkg-overlay; keep it opaque enough
      that the editor underneath fades away on the small mobile screen. */
   z-index: 320;
+  /* The playground's scrolling lives in inner panes (schema tree, results,
+     editor), not on `body`, so Base UI's modal body-scroll-lock has nothing
+     to lock and a drag over the dimmed area used to scroll the playground
+     behind the open sheet. Swallow the gesture here instead, the same guard
+     `.sql-db-backdrop` uses for the database dropdown. */
+  touch-action: none;
+  overscroll-behavior: contain;
 }
 
 .mobile-drawer-viewport {
@@ -3106,6 +3113,9 @@ input[type="range"].fs-slider:disabled {
      sections (Examples / Export) expand past the drawer cap. */
   min-height: 0;
   overflow-y: auto;
+  /* Keep a flick that runs past the end of the menu inside the sheet
+     instead of chaining it to the playground underneath. */
+  overscroll-behavior: contain;
   padding: 4px 8px 16px;
   display: flex;
   flex-direction: column;

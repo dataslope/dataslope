@@ -1878,7 +1878,13 @@ function DuckDbPlaygroundInner() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     document.title = "DuckDB Playground";
-    document.body.classList.add("duckdb-active");
+    // Same body class the SQLite/Postgres playgrounds set: it pins the
+    // playground surface colors/typography and, crucially on mobile,
+    // `overflow: hidden` so the page itself can never scroll behind the
+    // fixed shell. This used to add a `duckdb-active` class no stylesheet
+    // defined, leaving the DuckDB page the only playground whose document
+    // could be dragged around under an open sheet or dropdown.
+    document.body.classList.add("playground-active");
     const D = DEFAULT_PLAYGROUND_SETTINGS;
     const savedSize =
       Number(localStorage.getItem(storageKey("fontsize")) ?? D.fontSize) ||
@@ -1931,7 +1937,7 @@ function DuckDbPlaygroundInner() {
     }
 
     return () => {
-      document.body.classList.remove("duckdb-active");
+      document.body.classList.remove("playground-active");
       clearThemePalette();
     };
   }, [
