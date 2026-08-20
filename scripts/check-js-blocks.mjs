@@ -131,7 +131,9 @@ for (const [i, item] of runnable.entries()) {
     }
 
     const entryVfsPath = normalizeVfsPath(isTs ? tsToJsPath(entryName) : entryName);
-    await runner.run(
+    // The runner reports an uncaught error rather than throwing it, so that
+    // whatever the block printed first is still collected.
+    const result = await runner.run(
       entryVfsPath,
       (vfs) => {
         if (!isTs) return entrySource;
@@ -140,8 +142,12 @@ for (const [i, item] of runnable.entries()) {
         for (const d of diags) diagnostics.push(`TS: ${d}`);
         return outputText;
       },
-      { stdout: (c) => out.push(c), stderr: (c) => err.push(c) },
+      { write: (channel, text) => (channel === "stdout" ? out : err).push(text) },
+      // Blocks are lesson-sized; a runaway one should fail the sweep rather
+      // than hold it for the playground's full 30 seconds.
+      { timeLimitMs: 10_000 },
     );
+    if (result.error) err.push(result.error);
   } catch (e) {
     err.push(String(e?.message ?? e));
   }

@@ -7,8 +7,26 @@ import type {
   PackageInfo,
   RunOptions,
 } from "../types";
-import { loadCheerpJ, TOOLS_JAR_VFS_PATH, type CheerpJApi } from "./cheerpj";
+import {
+  CHEERPJ_VERSION,
+  loadCheerpJ,
+  TOOLS_JAR_VFS_PATH,
+  type CheerpJApi,
+} from "./cheerpj";
 import { getClangFormat } from "./clangFormat";
+import {
+  annotateJava8,
+  buildLauncherSource,
+  buildWarmupSource,
+  CLASSES_ROOT,
+  hasJavaMain,
+  LAUNCHER_CLASS,
+  LAUNCHER_FILENAME,
+  resolveEntryPoint,
+  stripSourceDir,
+} from "./javaBuild";
+import { JavaOutputRouter, type JavaChannel } from "./javaOutput";
+import { STDIN_FILENAME } from "./stdinFile";
 
 // Java in the browser via CheerpJ (OpenJDK + JIT in WebAssembly). CheerpJ
 // doesn't ship tools.jar, so a Java 8 tools.jar is fetched from a CDN and
@@ -212,16 +230,6 @@ public class Main {
     entryFilename: "Main.java",
   },
 ];
-
-/** Detect whether a Java source file declares a `public static void main`. */
-function hasJavaMain(source: string): boolean {
-  const cleaned = source
-    .replace(/\/\*[\s\S]*?\*\//g, "")
-    .replace(/\/\/[^\n]*/g, "")
-    .replace(/"(?:\\.|[^"\\])*"/g, '""')
-    .replace(/'(?:\\.|[^'\\])*'/g, "''");
-  return /\b(?:public\s+)?static\s+(?:public\s+)?void\s+main\s*\(/.test(cleaned);
-}
 
 const PACKAGES: PackageInfo[] = [
   // Java 8 stdlib highlights; clicking inserts the `import`.
@@ -432,128 +440,155 @@ public class Main {
   },
 ];
 
-// tools.jar (javac) and /files/ (compiled user code) must both be on the
-// classpath for javac and for running the user's main class.
-const CLASSPATH = `${TOOLS_JAR_VFS_PATH}:/files/`;
 const SOURCE_DIR = "/str/";
-const OUTPUT_DIR = "/files/";
+const COMPILER_MAIN = "com.sun.tools.javac.Main";
+/** Boot warm-up classes: a fixed path, rewritten on every page load. */
+const BOOT_DIR = "/files/ds-boot/";
+/** Where the workspace's `stdin.txt` is staged for the launcher to open. */
+const STDIN_VFS_PATH = `${SOURCE_DIR}__dataslope_stdin`;
+const WARMUP_CLASS = "__DataslopeWarmup";
 
-/** Pick the class with `main` to run; falls back to the first declared
- *  class, then "Main". Defensive against the many shapes user input takes. */
-function findMainClassName(source: string): string {
-  // Strip comments and string/char literals so `class` inside them
-  // doesn't match.
-  const cleaned = source
-    .replace(/\/\*[\s\S]*?\*\//g, "")
-    .replace(/\/\/[^\n]*/g, "")
-    .replace(/"(?:\\.|[^"\\])*"/g, '""')
-    .replace(/'(?:\\.|[^'\\])*'/g, "''");
+/**
+ * How long a run may take before the host stops it.
+ *
+ * CheerpJ executes on the browser's main thread, so this timer only fires
+ * for a program that is *waiting* — the case a Stop button would otherwise
+ * have to be clicked for. A program spinning in `while (true)` holds the
+ * thread and the timer with it; nothing short of running the JVM in a
+ * worker fixes that one, and CheerpJ does not support it.
+ */
+const RUN_TIMEOUT_MS = 20_000;
 
-  const classRegex =
-    /\b(?:public\s+)?(?:final\s+|abstract\s+)?class\s+([A-Za-z_$][\w$]*)/g;
-  const classes: { name: string; start: number; isPublic: boolean }[] = [];
-  for (let m; (m = classRegex.exec(cleaned)) !== null; ) {
-    // Skip nested classes: brace depth > 0 means inside another class body
-    // (literals/comments are already stripped, so braces are structural).
-    const prefix = cleaned.slice(0, m.index);
-    const depth =
-      (prefix.match(/\{/g) ?? []).length - (prefix.match(/\}/g) ?? []).length;
-    if (depth > 0) continue;
-
-    const before = cleaned.slice(Math.max(0, m.index - 16), m.index);
-    classes.push({
-      name: m[1],
-      start: m.index,
-      isPublic:
-        /\bpublic\s+(?:final\s+|abstract\s+)?$/.test(before) ||
-        /\bpublic\s+/.test(cleaned.slice(m.index, m.index + m[0].length)),
-    });
-  }
-  if (classes.length === 0) return "Main";
-
-  // Prefer a class whose "body" (chunk up to the next class declaration)
-  // contains `public static void main(`.
-  for (let i = 0; i < classes.length; i++) {
-    const start = classes[i].start;
-    const end = i + 1 < classes.length ? classes[i + 1].start : cleaned.length;
-    if (
-      /\bpublic\s+static\s+void\s+main\s*\(/.test(cleaned.slice(start, end))
-    ) {
-      return classes[i].name;
-    }
-  }
-
-  // Fall back to the public class, then the first declared.
-  const pub = classes.find((c) => c.isPublic);
-  return (pub ?? classes[0]).name;
+/** Workspace-relative path reduced to the flat name CheerpJ's `/str/` uses. */
+function basename(path: string): string {
+  return path.includes("/") ? path.split("/").pop()! : path;
 }
 
 class JavaRuntime implements LanguageRuntime {
   // /str/ paths staged by prepareFileSystem; run() adds the active file.
   private stagedJavaPaths: string[] = [];
+  /** Staged source text, for the Java 8 notes on a failed compile. */
+  private stagedSources: string[] = [];
+  /** `stdin.txt`, when the workspace has one. */
+  private stdinBytes: Uint8Array | null = null;
   // Warm-up runs once per instance.
   private warmedUp = false;
+  /** Run counter; names this run's class directory. */
+  private runSeq = 0;
+  /** Where CheerpJ's console writes go, or null when no run owns them. */
+  private sink: ((channel: JavaChannel, text: string) => void) | null = null;
+  /** Rejects the run in flight, for Stop and for the timeout. */
+  private abortActiveRun: ((err: Error) => void) | null = null;
 
-  constructor(private api: CheerpJApi) {}
+  constructor(private api: CheerpJApi) {
+    this.interceptConsole();
+  }
 
-  // Capture output by intercepting console.log/error for one cheerpjRunMain
-  // call — CheerpJ's only System.out/System.err sink. Each write arrives as
-  // one console call INCLUDING its own newline bytes, so args are
-  // concatenated verbatim (adding "\n" per call would double-space output).
-  // try/finally ensures the console is never left permanently patched.
-  private async runWithCapture(
-    fn: () => Promise<number>,
-  ): Promise<{ exitCode: number; stdout: string; stderr: string }> {
-    const origLog = console.log;
-    const origErr = console.error;
-    let stdout = "";
-    let stderr = "";
+  /**
+   * Route CheerpJ's only System.out/System.err sink through this runtime.
+   *
+   * Installed once and left in place rather than wrapped around each run:
+   * a run that was stopped or timed out is still executing inside the JVM,
+   * so a `finally` that restored the console would never run, and the next
+   * run would patch the patch. With one permanent hook, dropping `sink` is
+   * enough to disown an abandoned program — whatever it prints afterwards
+   * goes to the browser console, where it came from, instead of into
+   * somebody else's output pane. When no run owns the sink the original
+   * console methods are called, so the page behaves normally.
+   *
+   * Each write arrives as one console call INCLUDING its own newline bytes,
+   * so arguments are concatenated verbatim; adding "\n" per call would
+   * double-space every program's output.
+   */
+  private interceptConsole(): void {
+    const origLog = console.log.bind(console);
+    const origErr = console.error.bind(console);
     console.log = (...args: unknown[]) => {
-      stdout += args.map(String).join(" ");
+      if (!this.sink) {
+        origLog(...args);
+        return;
+      }
+      this.sink("stdout", args.map(String).join(" "));
     };
     console.error = (...args: unknown[]) => {
-      stderr += args.map(String).join(" ");
+      if (!this.sink) {
+        origErr(...args);
+        return;
+      }
+      this.sink("stderr", args.map(String).join(" "));
+    };
+  }
+
+  /** Run one `cheerpjRunMain` with its output collected rather than
+   *  streamed — what javac needs, since a diagnostic is only readable once
+   *  the whole block has arrived. */
+  private async runCollected(
+    fn: () => Promise<number>,
+  ): Promise<{ exitCode: number; text: string }> {
+    let text = "";
+    const previous = this.sink;
+    this.sink = (_channel, chunk) => {
+      text += chunk;
     };
     try {
       const exitCode = await fn();
-      return { exitCode, stdout, stderr };
+      return { exitCode, text };
     } finally {
-      console.log = origLog;
-      console.error = origErr;
+      this.sink = previous;
     }
+  }
+
+  /**
+   * Stop the running program.
+   *
+   * CheerpJ offers no way to interrupt a running JVM, so this disowns the
+   * run rather than killing it: the `run()` promise rejects, the output
+   * already on screen stays (it is the part that says where the program
+   * got to), and anything the abandoned program prints later is no longer
+   * routed to the pane. That is enough for the case this exists for — a
+   * program blocked on input or asleep — and it returns the playground to
+   * the user without a page reload.
+   */
+  async cancelRun(): Promise<void> {
+    const abort = this.abortActiveRun;
+    this.abortActiveRun = null;
+    if (!abort) return;
+    const err = new Error("Run stopped.");
+    err.name = "RunCancelledError";
+    abort(err);
   }
 
   /** Compile and run a throwaway program so the first-use costs (tools.jar,
    *  javac, core class-load + JIT — all lazy on the first cheerpjRunMain)
    *  happen behind the boot animation instead of on the learner's first
-   *  Run. Best-effort: failures are swallowed. */
+   *  Run. It also deletes class files left behind by earlier page loads,
+   *  which is the one moment nothing can be using them. Best-effort:
+   *  failures are swallowed. */
   async warmUp(
     report?: (message: string, fraction?: number) => void,
   ): Promise<void> {
     if (this.warmedUp) return;
     this.warmedUp = true;
     try {
-      const warmupClass = "__DataslopeWarmup";
-      const source = `public class ${warmupClass} { public static void main(String[] args) { System.out.print(""); } }`;
-      const sourcePath = `${SOURCE_DIR}${warmupClass}.java`;
+      const sourcePath = `${SOURCE_DIR}${WARMUP_CLASS}.java`;
       this.api.cheerpjAddStringFile(
         sourcePath,
-        new TextEncoder().encode(source),
+        new TextEncoder().encode(buildWarmupSource(WARMUP_CLASS)),
       );
       report?.("Warming up the Java compiler…", 0.55);
-      const compiled = await this.runWithCapture(() =>
+      const compiled = await this.runCollected(() =>
         this.api.cheerpjRunMain(
-          "com.sun.tools.javac.Main",
-          CLASSPATH,
+          COMPILER_MAIN,
+          `${TOOLS_JAR_VFS_PATH}:${BOOT_DIR}`,
           sourcePath,
           "-d",
-          OUTPUT_DIR,
+          BOOT_DIR,
         ),
       );
       if (compiled.exitCode === 0) {
         report?.("Warming up the Java runtime…", 0.85);
-        await this.runWithCapture(() =>
-          this.api.cheerpjRunMain(warmupClass, CLASSPATH),
+        await this.runCollected(() =>
+          this.api.cheerpjRunMain(WARMUP_CLASS, BOOT_DIR),
         );
       }
     } catch {
@@ -563,14 +598,22 @@ class JavaRuntime implements LanguageRuntime {
 
   async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
     this.stagedJavaPaths = [];
+    this.stagedSources = [];
+    this.stdinBytes = null;
+    const decoder = new TextDecoder();
     for (const [path, bytes] of files) {
-      if (!path.endsWith(".java")) continue;
       // Basename only: CheerpJ's /str/ is a flat virtual filesystem.
-      const filename = path.includes("/") ? path.split("/").pop()! : path;
+      const filename = basename(path);
+      if (filename === STDIN_FILENAME) {
+        this.stdinBytes = bytes;
+        continue;
+      }
+      if (!filename.endsWith(".java")) continue;
       const virtualPath = `${SOURCE_DIR}${filename}`;
       this.api.cheerpjAddStringFile(virtualPath, bytes);
       if (!this.stagedJavaPaths.includes(virtualPath)) {
         this.stagedJavaPaths.push(virtualPath);
+        this.stagedSources.push(decoder.decode(bytes));
       }
     }
   }
@@ -580,66 +623,140 @@ class JavaRuntime implements LanguageRuntime {
     emit: EmitOutput,
     options?: RunOptions,
   ): Promise<void> {
-    // `options.entryFilename` picks the class to execute; when omitted,
-    // detect the main class from `code` (legacy single-file behaviour).
-    let className: string;
-    if (options?.entryFilename) {
-      const base = options.entryFilename.includes("/")
-        ? options.entryFilename.split("/").pop()!
-        : options.entryFilename;
-      className = base.replace(/\.java$/, "");
-    } else {
-      className = findMainClassName(code);
-    }
-    const sourcePath = `${SOURCE_DIR}${className}.java`;
+    // What to launch comes from the source, not the filename: `Main.java`
+    // may declare `class Calculator`, and a `package` line moves the
+    // compiled class somewhere the bare filename does not name.
+    const entry = resolveEntryPoint(code, options?.entryFilename);
+    const entryFilename = options?.entryFilename
+      ? basename(options.entryFilename)
+      : `${entry.className}.java`;
+    const sourcePath = `${SOURCE_DIR}${entryFilename}`;
 
     // Mount the user's source; always update the active file so unsaved
     // edits win over an older prepareFileSystem copy.
     const encoder = new TextEncoder();
     this.api.cheerpjAddStringFile(sourcePath, encoder.encode(code));
 
-    // Staged workspace files plus the active file (which may not be staged
-    // for single-file workspaces).
-    const filesToCompile = [...this.stagedJavaPaths];
-    if (!filesToCompile.includes(sourcePath)) {
-      filesToCompile.push(sourcePath);
+    // A directory of its own per run. `cheerpjAddStringFile` cannot delete,
+    // and `/files/` survives reloads, so a shared output directory meant
+    // javac's fresh `myapp/Main.class` sat beside a stale top-level
+    // `Main.class` and the launcher found the stale one. Nothing an earlier
+    // compile produced is on this run's classpath at all.
+    const runDirName = `r${++this.runSeq}`;
+    const outputDir = `${CLASSES_ROOT}/${runDirName}/`;
+
+    let stdinPath: string | null = null;
+    if (this.stdinBytes) {
+      this.api.cheerpjAddStringFile(STDIN_VFS_PATH, this.stdinBytes);
+      stdinPath = STDIN_VFS_PATH;
     }
 
-    // Compile all .java files in one javac invocation so cross-file
-    // references resolve; `-Xlint` matches JavaFiddle's defaults.
-    const javacResult = await this.runWithCapture(() =>
+    const launcherPath = `${SOURCE_DIR}${LAUNCHER_FILENAME}`;
+    this.api.cheerpjAddStringFile(
+      launcherPath,
+      encoder.encode(
+        buildLauncherSource({
+          binaryName: entry.binaryName,
+          stdinPath,
+          vmVersion: CHEERPJ_VERSION,
+          classesDirName: runDirName,
+        }),
+      ),
+    );
+
+    // Staged workspace files plus the active file (which may not be staged
+    // for single-file workspaces) plus the launcher.
+    const filesToCompile = [
+      ...this.stagedJavaPaths.filter((p) => p !== sourcePath),
+      sourcePath,
+      launcherPath,
+    ];
+
+    // Compile everything in one javac invocation so cross-file references
+    // resolve. `-g:lines,source` is javac's default and is passed anyway,
+    // because a stack trace without line numbers is barely a stack trace.
+    // `-Xlint` matches JavaFiddle's defaults.
+    const javacResult = await this.runCollected(() =>
       this.api.cheerpjRunMain(
-        "com.sun.tools.javac.Main",
-        CLASSPATH,
+        COMPILER_MAIN,
+        `${TOOLS_JAR_VFS_PATH}:${outputDir}`,
         ...filesToCompile,
         "-d",
-        OUTPUT_DIR,
+        outputDir,
+        "-g:lines,source",
         "-Xlint",
       ),
     );
 
     // Treat all javac output as compile diagnostics so warnings show too.
-    const diag = (javacResult.stdout + javacResult.stderr).replace(/\n+$/, "");
-    if (diag) emit({ type: "stderr", content: diag });
+    let diag = stripSourceDir(javacResult.text, SOURCE_DIR).replace(/\n+$/, "");
+    if (javacResult.exitCode !== 0) {
+      diag = annotateJava8(diag, [code, ...this.stagedSources]);
+    }
+    if (diag) emit({ type: "stderr", content: diag }, 0, false);
 
     if (javacResult.exitCode !== 0) {
       // Compilation failed; `diag` already explains why.
       return;
     }
 
-    const runResult = await this.runWithCapture(() =>
-      this.api.cheerpjRunMain(className, CLASSPATH),
+    const router = new JavaOutputRouter(
+      (chunk) =>
+        emit(
+          { type: chunk.channel, content: chunk.content },
+          chunk.seq,
+          chunk.append,
+        ),
+      { firstSeq: diag ? 1 : 0 },
     );
+    this.sink = (channel, text) => router.write(channel, text);
 
-    const stdout = runResult.stdout.replace(/\n+$/, "");
-    const stderr = runResult.stderr.replace(/\n+$/, "");
-    if (stdout) emit({ type: "stdout", content: stdout });
-    if (stderr) emit({ type: "stderr", content: stderr });
-    if (runResult.exitCode !== 0) {
-      emit({
-        type: "stderr",
-        content: `Program exited with code ${runResult.exitCode}.`,
-      });
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const guard = new Promise<never>((_resolve, reject) => {
+      this.abortActiveRun = reject;
+      timer = setTimeout(() => {
+        const seconds = Math.round(RUN_TIMEOUT_MS / 1000);
+        // Disown first: the JVM keeps running, and nothing it prints from
+        // here belongs under a run that has been called off.
+        this.sink = null;
+        router.flush();
+        emit(
+          {
+            type: "stderr",
+            content:
+              `Stopped after ${seconds}s: the program was still running. ` +
+              "Output it produced before then is above.",
+          },
+          router.nextSeq,
+          false,
+        );
+        void this.cancelRun();
+      }, RUN_TIMEOUT_MS);
+    });
+
+    try {
+      const running = this.api.cheerpjRunMain(LAUNCHER_CLASS, outputDir);
+      // A disowned run must not raise an unhandled rejection later.
+      void running.catch(() => {});
+      const exitCode = await Promise.race([running, guard]);
+      router.flush();
+      if (exitCode !== 0) {
+        emit(
+          {
+            type: "stderr",
+            content: `Program exited with code ${exitCode}.`,
+          },
+          router.nextSeq,
+          false,
+        );
+      }
+    } catch (err) {
+      router.flush();
+      throw err;
+    } finally {
+      if (timer !== undefined) clearTimeout(timer);
+      this.abortActiveRun = null;
+      this.sink = null;
     }
   }
 }
@@ -649,14 +766,14 @@ export const javaAdapter: LanguageAdapter = {
   displayName: "Java Playground",
   logoText: "Jv",
   documentTitle: "Java Playground",
-  readyStatus: "Java ready",
+  readyStatus: "Java 8 ready",
   runtimeInfo: {
     language: "Java",
     version: "8 (Update 492)",
     engine: "CheerpJ (OpenJDK + javac, WebAssembly)",
     engineUrl: "https://cheerpj.com/",
     notes:
-      "Java is compiled in your browser by `javac` (com.sun.tools.javac.Main) and the resulting bytecode is then JIT-compiled to JavaScript and executed by CheerpJ, a full OpenJDK runtime in WebAssembly. No server roundtrip. Pure-AOT alternatives like TeaVM aren't a fit for an in-browser playground because they require a JVM at compile time.",
+      "Java is compiled in your browser by `javac` (com.sun.tools.javac.Main) and the resulting bytecode is then JIT-compiled to JavaScript and executed by CheerpJ, a full OpenJDK runtime in WebAssembly. No server roundtrip. Pure-AOT alternatives like TeaVM aren't a fit for an in-browser playground because they require a JVM at compile time.\n\nThe language level is Java 8, so `var`, `List.of`, records and text blocks don't compile.\n\nFor standard input, add a file named `stdin.txt` to the workspace and it is fed to the program as `System.in`. Without one, a read returns end-of-file straight away rather than waiting for input that can never arrive.\n\nThree things this runtime does not do, all of them CheerpJ's rather than the compiler's. Stack traces carry no line numbers, so every frame reads `Unknown Source` (`javac` does emit the line table). Exceptions thrown by the VM itself (`ArithmeticException: / by zero`, `ArrayIndexOutOfBoundsException: 5`) arrive without their detail message, while exceptions constructed in Java code keep theirs. And some runtime checks the language relies on are not enforced: storing an `Integer` into a `String[]` held as `Object[]` should throw `ArrayStoreException` and does not.\n\nJava runs on the browser's main thread. Output appears as the program writes it, and a program that waits can be stopped, or is stopped for you after 20 seconds. A program spinning in a tight loop is the exception: it holds the thread, so nothing repaints and `while (true)` still needs the tab reloaded.",
   },
   // CodeMirror's clike mode handles Java syntax. `text/x-java` is the
   // standard MIME alias for Java inside that mode.
@@ -683,7 +800,11 @@ export const javaAdapter: LanguageAdapter = {
     const out: EntryFileInfo[] = [];
     for (const f of files) {
       if (!f.filename.endsWith(".java")) continue;
-      if (hasJavaMain(f.content)) out.push({ filename: f.filename, kind: "main" });
+      if (!hasJavaMain(f.content)) continue;
+      // Label by the class that will actually be launched, package and
+      // all, rather than by the filename it happens to live in.
+      const { binaryName } = resolveEntryPoint(f.content, f.filename);
+      out.push({ filename: f.filename, kind: "main", label: binaryName });
     }
     return out;
   },

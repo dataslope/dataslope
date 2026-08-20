@@ -537,29 +537,22 @@ cat(as.yaml(data))
 // Minimal shims so we don't need to import from "webr" directly; webr's
 // published types reference DOM globals that can conflict with tsconfig.
 
-interface RObjectProxy {
-  type(): Promise<string>;
-  toJs(): Promise<unknown>;
-}
-interface CaptureROutput {
+/** Message off webR's output queue. `stdout`/`stderr` carry one line of text;
+ *  `canvas` carries a graphics event (a new plot page, or a rendered frame of
+ *  the page being drawn). */
+interface WebROutputMessage {
   type: string;
   data: unknown;
 }
-interface CaptureRResult {
-  output: CaptureROutput[];
-  images: ImageBitmap[];
-  result: RObjectProxy;
+
+/** Options for an evaluation. Leaving the streams and conditions uncaptured
+ *  is what puts output on the queue as it is produced (see `run`). */
+interface EvalOptions {
+  captureStreams?: boolean;
+  captureConditions?: boolean;
+  captureGraphics?: boolean;
 }
-interface ShelterInstance {
-  captureR(
-    code: string,
-    options: { withAutoprint: boolean; captureGraphics: { width: number; height: number } },
-  ): Promise<CaptureRResult>;
-  purge(): Promise<void>;
-}
-interface WebRShelterConstructor {
-  new (): Promise<ShelterInstance>;
-}
+
 interface WebRFS {
   writeFile(path: string, data: Uint8Array): Promise<void>;
   readFile(path: string): Promise<Uint8Array>;
@@ -567,14 +560,18 @@ interface WebRFS {
   unlink(path: string): Promise<void>;
 }
 interface WebRInstance {
-  Shelter: WebRShelterConstructor;
   FS: WebRFS;
   init(): Promise<void>;
-  evalRVoid(code: string): Promise<void>;
-  evalRString(code: string): Promise<string>;
+  evalRVoid(code: string, options?: EvalOptions): Promise<void>;
+  evalRString(code: string, options?: EvalOptions): Promise<string>;
   installPackages(pkgs: string[]): Promise<void>;
-  /** Shuts down the webR session and terminates its worker. */
-  close(): Promise<void>;
+  /** Next message off the output queue; pends until one arrives. */
+  read(): Promise<WebROutputMessage>;
+  /** Drains whatever is already queued, discarding it. */
+  flush(): Promise<WebROutputMessage[]>;
+  /** Shuts down the webR session and terminates its worker. Synchronous:
+   *  webR terminates the worker on the spot. */
+  close(): void;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────
@@ -604,115 +601,171 @@ const R_MAX_DISPLAY_COLS = 20;
 const R_HEAD_COLS = 10;
 const R_TAIL_COLS = 10;
 
-function dataFrameToHtml(rows: Record<string, unknown>[]): string | null {
-  if (rows.length === 0) return null;
-  const allCols = Object.keys(rows[0] ?? {});
-  if (allCols.length === 0) return null;
-  const escape = (v: unknown): string => {
-    const s = v === null || v === undefined ? "" : String(v);
-    return s
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
+// ─── Playground ↔ R control protocol ─────────────────────────────────────
+// R writes ordinary output to stdout/stderr, which reaches the panel as text.
+// A line that starts with RS is a control line for the surface instead: the
+// tag says what it carries, US separates its fields. Both are C0 control
+// characters, and every value R puts on such a line has its own control
+// characters replaced first, so printed data cannot forge one. R writes a
+// newline before each control line, so one is never appended to output that
+// ended mid-line; a cell's trailing whitespace is dropped, so that newline
+// never shows.
+const RS = "\u001e";
+const US = "\u001f";
+/** A rendered data frame: metadata, then the header cells, then row cells. */
+const TAG_DATAFRAME = `${RS}DF`;
+/** The error that ended the run, newlines encoded as US. */
+const TAG_ERROR = `${RS}ERR`;
+/** The run's last line: everything it produced is on the queue ahead of it. */
+const TAG_END = `${RS}END`;
+/** How long to keep waiting for `TAG_END` once the evaluation has returned,
+ *  before publishing what did arrive. Only a broken session gets here. */
+const END_TIMEOUT_MS = 5_000;
+/** Cell value standing in for `NA`, so it stays distinct from `""`. */
+const NA_TOKEN = "\u0011";
+
+/** One auto-printed data frame, already formatted by R (see
+ *  `.pg_emit_dataframe`): every cell is the string `format()` would print,
+ *  `null` for `NA`, sliced down to the head/tail window when truncated. */
+interface DataFramePayload {
+  totalRows: number;
+  totalCols: number;
+  /** Column names of the slice, without the row-name column. */
+  columns: (string | null)[];
+  /** Row-name of each rendered row, paired with that row's cells. */
+  index: (string | null)[];
+  rows: (string | null)[][];
+  rowsTruncated: boolean;
+  colsTruncated: boolean;
+}
+
+/** Parses a `TAG_DATAFRAME` control line; null when it is malformed. */
+function parseDataFramePayload(line: string): DataFramePayload | null {
+  const fields = line.slice(TAG_DATAFRAME.length + US.length).split(US);
+  if (fields.length < 5) return null;
+  const totalRows = Number(fields[0]);
+  const totalCols = Number(fields[1]);
+  const shownCols = Number(fields[2]);
+  const rowsTruncated = fields[3] === "1";
+  const colsTruncated = fields[4] === "1";
+  if (!Number.isFinite(totalRows) || !Number.isFinite(totalCols)) return null;
+  if (!Number.isInteger(shownCols) || shownCols <= 0) return null;
+
+  // Cells arrive row-major, each row prefixed by its row name, header first.
+  const cells = fields.slice(5).map((c) => (c === NA_TOKEN ? null : c));
+  const stride = shownCols + 1;
+  if (cells.length < stride || cells.length % stride !== 0) return null;
+  const columns = cells.slice(1, stride);
+  const index: (string | null)[] = [];
+  const rows: (string | null)[][] = [];
+  for (let i = stride; i < cells.length; i += stride) {
+    index.push(cells[i]);
+    rows.push(cells.slice(i + 1, i + stride));
+  }
+  return {
+    totalRows,
+    totalCols,
+    columns,
+    index,
+    rows,
+    rowsTruncated,
+    colsTruncated,
   };
+}
 
-  const totalRows = rows.length;
-  const totalCols = allCols.length;
-  const rowsTruncated = totalRows > R_MAX_DISPLAY_ROWS;
-  const colsTruncated = totalCols > R_MAX_DISPLAY_COLS;
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
 
-  // Columns to render: real names or null (= the "⋯" marker column).
-  type DisplayCol = string | null;
-  const displayCols: DisplayCol[] = colsTruncated
+/** `NA` is a value, not a blank: rendering it as an empty cell makes it
+ *  indistinguishable from the empty string, and an all-`NA` row reads as a
+ *  rendering glitch rather than as data. */
+function renderCell(value: string | null): string {
+  return value === null
+    ? '<span class="dataframe-na">NA</span>'
+    : escapeHtml(value);
+}
+
+function dataFrameToHtml(df: DataFramePayload): string | null {
+  if (df.rows.length === 0 || df.columns.length === 0) return null;
+
+  // A truncated frame gets an "⋯" marker column / row where the omitted
+  // middle would be; `null` marks that position in the column list.
+  const displayCols: (string | null)[] = df.colsTruncated
     ? [
-        ...allCols.slice(0, R_HEAD_COLS),
+        ...df.columns.slice(0, R_HEAD_COLS),
         null,
-        ...allCols.slice(totalCols - R_TAIL_COLS),
+        ...df.columns.slice(df.columns.length - R_TAIL_COLS),
       ]
-    : allCols;
+    : df.columns;
+  const colOffsets: (number | null)[] = df.colsTruncated
+    ? [
+        ...df.columns.slice(0, R_HEAD_COLS).map((_, i) => i),
+        null,
+        ...df.columns
+          .slice(df.columns.length - R_TAIL_COLS)
+          .map((_, i) => df.columns.length - R_TAIL_COLS + i),
+      ]
+    : df.columns.map((_, i) => i);
 
   const head = displayCols
     .map((c) =>
       c === null
         ? '<th class="dataframe-ellipsis-col">&#x22EF;</th>'
-        : `<th>${escape(c)}</th>`,
+        : `<th>${renderCell(c)}</th>`,
     )
     .join("");
 
-  // Rows to render: real rows or null (= ellipsis row).
-  type DisplayRow = Record<string, unknown> | null;
-  const displayRows: DisplayRow[] = rowsTruncated
+  const rowIndices: (number | null)[] = df.rowsTruncated
     ? [
-        ...rows.slice(0, R_HEAD_ROWS),
+        ...df.rows.slice(0, R_HEAD_ROWS).map((_, i) => i),
         null,
-        ...rows.slice(totalRows - R_TAIL_ROWS),
+        ...df.rows
+          .slice(df.rows.length - R_TAIL_ROWS)
+          .map((_, i) => df.rows.length - R_TAIL_ROWS + i),
       ]
-    : rows;
+    : df.rows.map((_, i) => i);
 
-  const body = displayRows
+  const body = rowIndices
     .map((r) => {
       if (r === null) {
-        return `<tr class="dataframe-ellipsis-row">${displayCols
+        return `<tr class="dataframe-ellipsis-row"><th>&#x22EF;</th>${displayCols
           .map(() => "<td>&#x22EF;</td>")
           .join("")}</tr>`;
       }
-      return `<tr>${displayCols
-        .map((c) =>
-          c === null
-            ? '<td class="dataframe-ellipsis-col">&#x22EF;</td>'
-            : `<td>${escape(r[c])}</td>`,
-        )
-        .join("")}</tr>`;
+      const cells = df.rows[r];
+      return (
+        `<tr><th>${renderCell(df.index[r] ?? null)}</th>` +
+        colOffsets
+          .map((c) =>
+            c === null
+              ? '<td class="dataframe-ellipsis-col">&#x22EF;</td>'
+              : `<td>${renderCell(cells[c] ?? null)}</td>`,
+          )
+          .join("") +
+        `</tr>`
+      );
     })
     .join("");
 
   const footerParts: string[] = [];
-  if (rowsTruncated) {
-    footerParts.push(`${R_HEAD_ROWS + R_TAIL_ROWS} of ${totalRows} rows`);
+  if (df.rowsTruncated) {
+    footerParts.push(`${R_HEAD_ROWS + R_TAIL_ROWS} of ${df.totalRows} rows`);
   }
-  if (colsTruncated) {
-    footerParts.push(`${R_HEAD_COLS + R_TAIL_COLS} of ${totalCols} columns`);
+  if (df.colsTruncated) {
+    footerParts.push(`${R_HEAD_COLS + R_TAIL_COLS} of ${df.totalCols} columns`);
   }
   const footer =
     footerParts.length > 0
-      ? `<tfoot><tr><td colspan="${displayCols.length}" class="dataframe-rows-footer">` +
+      ? `<tfoot><tr><td colspan="${displayCols.length + 1}" class="dataframe-rows-footer">` +
         `Showing ${footerParts.join(" · ")}` +
         `</td></tr></tfoot>`
       : "";
 
-  return `<table class="dataframe"><thead><tr>${head}</tr></thead><tbody>${body}</tbody>${footer}</table>`;
-}
-
-function rowsFromDataFrame(value: unknown): Record<string, unknown>[] | null {
-  if (!value || typeof value !== "object") return null;
-  const v = value as { type?: string; names?: unknown; values?: unknown };
-  if (v.type !== "list") return null;
-  if (!Array.isArray(v.names) || !Array.isArray(v.values)) return null;
-  const names = v.names as string[];
-  const cols = v.values as unknown[];
-  if (cols.length === 0 || cols.length !== names.length) return null;
-  const arrays: unknown[][] = cols.map((c) => {
-    if (Array.isArray(c)) return c as unknown[];
-    if (
-      c &&
-      typeof c === "object" &&
-      Array.isArray((c as { values?: unknown }).values)
-    ) {
-      return (c as { values: unknown[] }).values;
-    }
-    return [c];
-  });
-  const len = arrays[0].length;
-  if (!arrays.every((a) => a.length === len)) return null;
-  const rows: Record<string, unknown>[] = [];
-  for (let i = 0; i < len; i++) {
-    const row: Record<string, unknown> = {};
-    for (let j = 0; j < names.length; j++) {
-      row[names[j]] = arrays[j][i];
-    }
-    rows.push(row);
-  }
-  return rows;
+  return `<table class="dataframe"><thead><tr><th></th>${head}</tr></thead><tbody>${body}</tbody>${footer}</table>`;
 }
 
 // ─── Runtime ─────────────────────────────────────────────────────────────
@@ -723,20 +776,41 @@ function rowsFromDataFrame(value: unknown): Record<string, unknown>[] | null {
 // Working directory inside the WebR Emscripten FS (matches `getwd()` output).
 const WEB_USER_HOME = "/home/web_user";
 
-// Newline-separated absolute paths created during a run (download.file()
-// destinations), read back by collectCreatedFiles() then cleared.
-const CREATED_FILES_PATH = "/tmp/.pg_created_files";
+// The run's source, staged under /tmp so it never shows up in the user's
+// working directory (or in `list.files()`, or in the Files pane).
+const RUN_CODE_PATH = "/tmp/.pg_run_code.R";
 
 // One-time R setup, kept on the search path so it survives the per-run wipe
-// of the global environment. 1. download.file() is wrapped to mirror the
-// destination into the Files pane and print progress to stdout (stderr is
-// styled as an error); CORS still applies. 2. print() is overridden (a
-// search-path lookup, not an S3 method) to truncate plain data.frames;
-// tibbles/data.tables keep their own truncating print methods.
+// of the global environment. 1. download.file() is wrapped to print progress
+// to stdout (stderr is styled as an error); CORS still applies. 2. print() is
+// overridden (a search-path lookup, not an S3 method) to truncate plain
+// data.frames; tibbles/data.tables keep their own truncating print methods.
+// 3. `.pg_run_file` is the run driver: it evaluates the user's file one
+// top-level expression at a time, the way R's own REPL does, so every visible
+// value is displayed, conditions reach the panel as they are raised, and
+// output produced before an error survives the error.
 const R_SESSION_SETUP = String.raw`
 suppressWarnings(dir.create("/tmp", showWarnings = FALSE))
 
+# Coverage-instrumentation droppings from the webR build. Left alone it shows
+# up in the working directory of every fresh session, in list.files() output
+# and in the Files pane, as a file the user never created.
+try(unlink("default.profraw"), silent = TRUE)
+
 local({
+  # The control-line protocol; keep in step with RS / US / NA_TOKEN in
+  # the TypeScript above.
+  RS <- "\u001e"
+  US <- "\u001f"
+  NA_TOKEN <- "\u0011"
+  MAX_ROWS <- ${R_MAX_DISPLAY_ROWS}L
+  HEAD_ROWS <- ${R_HEAD_ROWS}L
+  TAIL_ROWS <- ${R_TAIL_ROWS}L
+  MAX_COLS <- ${R_MAX_DISPLAY_COLS}L
+  HEAD_COLS <- ${R_HEAD_COLS}L
+  TAIL_COLS <- ${R_TAIL_COLS}L
+  CELL_CHARS <- 300L
+
   download_file <- function(url, destfile,
                             method = getOption("download.file.method", "auto"),
                             quiet = FALSE, ...) {
@@ -747,17 +821,184 @@ local({
     if (!isTRUE(quiet)) cat(sprintf("trying URL '%s'\n", url))
     status <- utils::download.file(url, destfile, method = method, quiet = TRUE, ...)
     if (is.character(destfile) && length(destfile) == 1L && nzchar(destfile) &&
-        file.exists(destfile)) {
-      abs <- if (startsWith(destfile, "/")) destfile else file.path(getwd(), destfile)
-      try(cat(abs, "\n", sep = "", file = "/tmp/.pg_created_files", append = TRUE),
-          silent = TRUE)
-      if (!isTRUE(quiet)) {
-        size <- file.info(destfile)$size
-        cat(sprintf("downloaded %s bytes\n",
-                    format(size, big.mark = ",", scientific = FALSE)))
-      }
+        file.exists(destfile) && !isTRUE(quiet)) {
+      size <- file.info(destfile)$size
+      cat(sprintf("downloaded %s bytes\n",
+                  format(size, big.mark = ",", scientific = FALSE)))
     }
     invisible(status)
+  }
+
+  # ── Control lines ──────────────────────────────────────────────────────
+  # Strips the control characters the surface's protocol is built from, so a
+  # value can never look like a control line, and caps runaway cells.
+  clean <- function(v) {
+    v <- as.character(v)
+    out <- gsub("[[:cntrl:]]", " ", v)
+    long <- !is.na(out) & nchar(out) > CELL_CHARS
+    out[long] <- paste0(substr(out[long], 1L, CELL_CHARS), "…")
+    out[is.na(v)] <- NA_TOKEN
+    out
+  }
+
+  # ── Displaying a value ─────────────────────────────────────────────────
+  # A column as print() would show it: factor labels rather than their
+  # integer codes, formatted dates rather than days since the epoch, R's
+  # TRUE/FALSE rather than JavaScript's true/false, and NA kept as NA so the
+  # surface can render it as a value instead of a blank cell.
+  format_column <- function(col) {
+    if (is.factor(col)) return(as.character(col))
+    if (is.character(col)) return(col)
+    if (is.logical(col)) return(ifelse(col, "TRUE", "FALSE"))
+    if (inherits(col, "Date") || inherits(col, "POSIXt")) return(format(col))
+    if (is.list(col)) {
+      return(vapply(col,
+                    function(v) paste(format(v), collapse = ", "),
+                    character(1)))
+    }
+    out <- vapply(col,
+                  function(v) format(v, trim = TRUE, justify = "none")[1],
+                  character(1))
+    # format() spells NA as "NA"; keep the missing values missing. NaN is a
+    # value of its own and keeps the text format() gave it.
+    nan <- if (is.double(col)) is.nan(col) else rep(FALSE, length(col))
+    out[is.na(col) & !nan] <- NA_character_
+    out
+  }
+
+  emit_dataframe <- function(x) {
+    tryCatch({
+      df <- as.data.frame(x, stringsAsFactors = FALSE)
+      n <- nrow(df)
+      p <- ncol(df)
+      if (n == 0L || p == 0L) return(FALSE)
+      rows_trunc <- n > MAX_ROWS
+      ridx <- if (rows_trunc) c(seq_len(HEAD_ROWS), seq.int(n - TAIL_ROWS + 1L, n))
+              else seq_len(n)
+      cols_trunc <- p > MAX_COLS
+      cidx <- if (cols_trunc) c(seq_len(HEAD_COLS), seq.int(p - TAIL_COLS + 1L, p))
+              else seq_len(p)
+      sub <- df[ridx, cidx, drop = FALSE]
+      cols <- lapply(seq_along(cidx), function(j) clean(format_column(sub[[j]])))
+      index <- clean(rownames(sub))
+      cells <- c("", clean(names(sub)))
+      for (i in seq_along(ridx)) {
+        cells <- c(cells, index[i],
+                   vapply(cols, function(col) col[i], character(1)))
+      }
+      cat("\n", RS, "DF", US, n, US, p, US, length(cidx),
+          US, if (rows_trunc) "1" else "0",
+          US, if (cols_trunc) "1" else "0",
+          US, paste(cells, collapse = US), "\n", sep = "")
+      TRUE
+    }, error = function(e) FALSE)
+  }
+
+  show_value <- function(x) {
+    if (is.data.frame(x) && isTRUE(emit_dataframe(x))) return(invisible(NULL))
+    if (isS4(x)) methods::show(x) else print(x)
+    invisible(NULL)
+  }
+
+  # ── Conditions ─────────────────────────────────────────────────────────
+  # Calls belonging to the driver rather than to the user's code; R would
+  # name them in a warning or an error the user never wrote.
+  harness_call <- function(call) {
+    if (is.null(call)) return(TRUE)
+    txt <- paste(deparse(call), collapse = " ")
+    prefixes <- c("eval(", "withVisible(", "withCallingHandlers(", "tryCatch(",
+                  "doTryCatch(", "try(", "parse(", "show_value(",
+                  "emit_dataframe(", ".pg_")
+    any(vapply(prefixes, function(p) startsWith(txt, p), logical(1)))
+  }
+
+  condition_text <- function(cnd, label) {
+    msg <- conditionMessage(cnd)
+    call <- conditionCall(cnd)
+    if (harness_call(call)) {
+      if (identical(label, "Error")) paste0("Error: ", msg)
+      else paste0(label, " message:\n", msg)
+    } else {
+      paste0(label, " in ", paste(deparse(call), collapse = " "), " : ", msg)
+    }
+  }
+
+  # message() is R's neutral channel (package attach notices, progress), so
+  # it goes to stdout; a warning is a diagnostic and keeps stderr's red.
+  on_message <- function(cnd) {
+    cat(conditionMessage(cnd), sep = "")
+    invokeRestart("muffleMessage")
+  }
+
+  on_warning <- function(cnd) {
+    level <- getOption("warn", 0)
+    # warn >= 2 turns warnings into errors: leave it to R. warn < 0 drops
+    # them entirely, which is what the user asked for.
+    if (level >= 2) return(invisible(NULL))
+    if (level < 0) invokeRestart("muffleWarning")
+    cat(condition_text(cnd, "Warning"), "\n", sep = "", file = stderr())
+    invokeRestart("muffleWarning")
+  }
+
+  # ── The run ────────────────────────────────────────────────────────────
+  run_file <- function(path, entry) {
+    on.exit({
+      # A sink the program opened and never closed would swallow the lines
+      # below, and every line of the next run with them.
+      while (sink.number() > 0L) try(sink(NULL), silent = TRUE)
+      # A message sink is a single diversion, and reads back as 2 (stderr)
+      # when there is none.
+      if (sink.number(type = "message") != 2L) {
+        try(sink(NULL, type = "message"), silent = TRUE)
+      }
+      # Each run draws on its own device, so a plot never continues onto the
+      # previous run's page; closing it also flushes its last frame.
+      while (!is.null(dev.list())) try(dev.off(), silent = TRUE)
+      # Everything this run produced is now on the queue, ahead of this line:
+      # the surface waits for it rather than for the call to return, which
+      # says nothing about what the queue still holds.
+      cat("\n", RS, "END", "\n", sep = "")
+      try(flush(stdout()), silent = TRUE)
+    }, add = TRUE)
+
+    fail <- function(cnd) {
+      text <- condition_text(cnd, "Error")
+      # A parse error quotes the path the source was staged at; the user
+      # knows the file by the name in their editor.
+      text <- gsub(path, entry, text, fixed = TRUE)
+      cat("\n", RS, "ERR", US, gsub("\n", US, text, fixed = TRUE), "\n",
+          sep = "")
+      invisible(FALSE)
+    }
+
+    exprs <- tryCatch(parse(file = path, keep.source = FALSE),
+                      error = function(e) e)
+    if (inherits(exprs, "condition")) return(fail(exprs))
+
+    for (i in seq_along(exprs)) {
+      ok <- tryCatch(
+        withCallingHandlers({
+          vr <- withVisible(eval(exprs[[i]], .GlobalEnv))
+          if (vr$visible) show_value(vr$value)
+          TRUE
+        }, message = on_message, warning = on_warning),
+        error = function(e) fail(e))
+      if (!isTRUE(ok)) return(invisible(FALSE))
+    }
+    invisible(TRUE)
+  }
+
+  # Every file in the working directory with its size and mtime, so the
+  # surface can tell which ones a run created or rewrote. Dot-files (webR's
+  # own scratch) and directories are left out.
+  file_stamps <- function(home) {
+    files <- list.files(home, all.files = FALSE, recursive = TRUE, no.. = TRUE)
+    files <- files[!grepl("[[:cntrl:]]", files)]
+    if (length(files) == 0L) return("")
+    if (length(files) > 5000L) files <- files[seq_len(5000L)]
+    info <- file.info(file.path(home, files))
+    paste(paste0(files, US, info$size, US, as.numeric(info$mtime)),
+          collapse = RS)
   }
 
   print_override <- function(x, ...) {
@@ -784,22 +1025,293 @@ local({
   }
 
   while ("webr:playground" %in% search()) detach("webr:playground")
-  attach(list(download.file = download_file, print = print_override),
+  attach(list(download.file = download_file, print = print_override,
+              .pg_run_file = run_file, .pg_file_stamps = file_stamps),
          name = "webr:playground", warn.conflicts = FALSE)
 })
 `;
 
-// Backstop against a run flooding the UI with megabytes of text; keeps head
-// and tail. Data frames are truncated more nicely by the print override.
-const MAX_CELL_TEXT_CHARS = 250_000;
-function capCellText(text: string): string {
-  if (text.length <= MAX_CELL_TEXT_CHARS) return text;
-  const headLen = Math.floor(MAX_CELL_TEXT_CHARS * 0.75);
-  const tailLen = MAX_CELL_TEXT_CHARS - headLen;
-  const head = text.slice(0, headLen);
-  const tail = text.slice(text.length - tailLen);
-  const hidden = text.length - head.length - tail.length;
-  return `${head}\n\n… ${hidden.toLocaleString()} characters of output hidden …\n\n${tail}`;
+// Backstop against one run flooding the UI with megabytes of text. Streamed
+// output can only be capped at the head: by the time the total is known the
+// earlier text is already on screen. Data frames are truncated more nicely by
+// the print override.
+const MAX_RUN_TEXT_CHARS = 250_000;
+const TRUNCATION_NOTE = "\n… further output hidden …\n";
+// Text is handed to the surface in batches, so a print-heavy loop doesn't
+// re-render the panel once per line.
+const TEXT_FLUSH_MS = 60;
+const TEXT_FLUSH_CHARS = 8192;
+// A plot arrives as a sequence of progressively drawn frames. The first is
+// shown as soon as it lands (so a long run's plots appear while it runs) and
+// later frames replace it, at most this often; the final frame always wins.
+const IMAGE_REFRESH_MS = 250;
+/** Ceilings on what one run can hand back to the Files pane, so a program
+ *  that fills the filesystem in a loop can't wedge the tab mirroring it.
+ *  Matches the Python runtime's. */
+const CREATED_FILES_MAX = 50;
+const CREATED_BYTES_MAX = 64 * 1024 * 1024;
+
+/**
+ * Turns one run's webR output messages into output cells, in the order R
+ * produced them.
+ *
+ * Text accumulates into the current cell until something else arrives (a
+ * plot, a table, a switch between stdout and stderr), which is what keeps a
+ * plot sitting between the lines that introduce it rather than after all of
+ * them. Text is streamed stripped — leading whitespace skipped, trailing
+ * whitespace held back until more arrives — so a cell reads the same whether
+ * it was delivered in one piece or twenty.
+ */
+class RunOutputStream {
+  private seq = 0;
+  private text: { type: "stdout" | "stderr"; seq: number; sent: boolean } | null =
+    null;
+  private buffer = "";
+  private held = "";
+  private flushTimer: ReturnType<typeof setTimeout> | null = null;
+  private lastFlush = 0;
+  private image: {
+    seq: number;
+    bitmap: ImageBitmap | null;
+    /** Set when a frame arrived that hasn't been rendered yet. */
+    dirty: boolean;
+    lastRender: number;
+  } | null = null;
+  private chars = 0;
+  private truncated = false;
+  /** The error R reported, if the run ended on one. */
+  error: string | null = null;
+  private ended = false;
+  private onEnd: (() => void) | null = null;
+
+  constructor(private emit: EmitOutput) {}
+
+  /**
+   * Resolves once R's end-of-run line has been handled.
+   *
+   * Evaluating returns over webR's request channel while output is still
+   * travelling up the queue, so the call resolving is not the run being over.
+   * Waiting for the line R prints last is.
+   */
+  waitForEnd(): Promise<void> {
+    if (this.ended) return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      const timer = setTimeout(() => {
+        this.onEnd = null;
+        resolve();
+      }, END_TIMEOUT_MS);
+      this.onEnd = () => {
+        clearTimeout(timer);
+        this.onEnd = null;
+        resolve();
+      };
+    });
+  }
+
+  /** Handles one message off webR's output queue. Awaited by the caller, so
+   *  encoding a plot frame never overlaps with the next message. */
+  async handle(message: WebROutputMessage): Promise<void> {
+    if (message.type === "stdout") {
+      const line = String(message.data);
+      if (line.startsWith(RS)) {
+        await this.control(line);
+        return;
+      }
+      this.write("stdout", `${line}\n`);
+      return;
+    }
+    if (message.type === "stderr") {
+      this.write("stderr", `${String(message.data)}\n`);
+      return;
+    }
+    if (message.type === "canvas") {
+      const data = message.data as { event?: string; image?: ImageBitmap };
+      if (data?.event === "canvasNewPage") await this.newPlot();
+      else if (data?.event === "canvasImage" && data.image) {
+        await this.plotFrame(data.image);
+      }
+    }
+  }
+
+  private async control(line: string): Promise<void> {
+    if (line.startsWith(TAG_DATAFRAME + US)) {
+      const payload = parseDataFramePayload(line);
+      const html = payload ? dataFrameToHtml(payload) : null;
+      if (html) {
+        this.flushText(true);
+        this.emit({ type: "html", content: html }, this.seq++, false);
+      }
+      return;
+    }
+    if (line.startsWith(TAG_ERROR + US)) {
+      this.error = line
+        .slice(TAG_ERROR.length + US.length)
+        .split(US)
+        .join("\n");
+      return;
+    }
+    if (line === TAG_END) {
+      this.ended = true;
+      this.onEnd?.();
+      return;
+    }
+    // Unknown tag: show it rather than swallow it.
+    this.write("stdout", `${line}\n`);
+  }
+
+  private write(type: "stdout" | "stderr", chunk: string): void {
+    if (this.truncated) return;
+    if (this.chars + chunk.length > MAX_RUN_TEXT_CHARS) {
+      chunk = chunk.slice(0, Math.max(0, MAX_RUN_TEXT_CHARS - this.chars));
+      this.truncated = true;
+    }
+    this.chars += chunk.length;
+    if (this.text && this.text.type !== type) this.flushText(true);
+    if (!this.text) this.text = { type, seq: this.seq++, sent: false };
+    this.buffer += chunk;
+    if (this.truncated) this.buffer += TRUNCATION_NOTE;
+    if (this.buffer.length >= TEXT_FLUSH_CHARS) this.flushText(false);
+    else this.scheduleFlush();
+  }
+
+  /** Publishes the buffered text. `end` closes the cell, dropping the
+   *  trailing whitespace that would otherwise render as a blank line. */
+  private flushText(end: boolean): void {
+    if (this.flushTimer !== null) {
+      clearTimeout(this.flushTimer);
+      this.flushTimer = null;
+    }
+    const cell = this.text;
+    if (!cell) return;
+    let pending = this.buffer;
+    this.buffer = "";
+    if (!cell.sent) pending = pending.replace(/^\s+/, "");
+    const trailing = /\s*$/.exec(pending)?.[0] ?? "";
+    const body = pending.slice(0, pending.length - trailing.length);
+    if (body) {
+      this.emit(
+        { type: cell.type, content: this.held + body },
+        cell.seq,
+        cell.sent,
+      );
+      cell.sent = true;
+      this.held = end ? "" : trailing;
+    } else if (!end) {
+      this.held += trailing;
+    }
+    this.lastFlush = Date.now();
+    if (end) {
+      // An all-whitespace cell never got a position of its own; leave the
+      // hole for the surface to skip.
+      this.held = "";
+      this.text = null;
+    }
+  }
+
+  private scheduleFlush(): void {
+    if (this.flushTimer !== null) return;
+    const wait = Math.max(0, TEXT_FLUSH_MS - (Date.now() - this.lastFlush));
+    this.flushTimer = setTimeout(() => {
+      this.flushTimer = null;
+      this.flushText(false);
+    }, wait);
+  }
+
+  /** A new plot page: give it a cell where the output stands today, so later
+   *  text lands below it. */
+  private async newPlot(): Promise<void> {
+    this.flushText(true);
+    // The page being replaced may have drawn more since its last frame was
+    // rendered; that frame is the finished plot.
+    if (this.image?.dirty) await this.render(this.image);
+    this.image?.bitmap?.close();
+    this.image = {
+      seq: this.seq++,
+      bitmap: null,
+      dirty: false,
+      lastRender: 0,
+    };
+  }
+
+  private async plotFrame(bitmap: ImageBitmap): Promise<void> {
+    if (!this.image) await this.newPlot();
+    const slot = this.image!;
+    slot.bitmap?.close();
+    slot.bitmap = bitmap;
+    slot.dirty = true;
+    const now = Date.now();
+    if (slot.lastRender === 0 || now - slot.lastRender >= IMAGE_REFRESH_MS) {
+      await this.render(slot);
+    }
+  }
+
+  private async render(slot: NonNullable<RunOutputStream["image"]>): Promise<void> {
+    const bitmap = slot.bitmap;
+    if (!bitmap) return;
+    try {
+      const png = await imageBitmapToPngBase64(bitmap);
+      this.emit({ type: "image", content: png }, slot.seq, false);
+      slot.dirty = false;
+      slot.lastRender = Date.now();
+    } catch {
+      // A frame that can't be encoded is dropped; the next one replaces it.
+    }
+  }
+
+  /** Publishes everything held back, once the run is over. */
+  async finish(): Promise<void> {
+    this.flushText(true);
+    if (this.image?.dirty) await this.render(this.image);
+    this.dispose();
+  }
+
+  dispose(): void {
+    if (this.flushTimer !== null) {
+      clearTimeout(this.flushTimer);
+      this.flushTimer = null;
+    }
+    this.image?.bitmap?.close();
+    if (this.image) this.image.bitmap = null;
+  }
+}
+
+/** Boots a webR session ready to take runs: graphics on a canvas device that
+ *  streams its frames to the output queue, plus the playground's own R setup.
+ *  Used for the first boot and for the session a Stop stands back up. */
+async function startWebR(): Promise<WebRInstance> {
+  // @ts-expect-error -- webr ships without bundled type declarations
+  const { WebR } = (await import("webr")) as { WebR: new () => WebRInstance };
+  const webR = new WebR();
+  await webR.init();
+  // Let the styler formatter reuse this session instead of a second R.
+  activeWebR = webR;
+
+  // capture = FALSE puts each frame of a plot on the output queue as it is
+  // drawn, so a figure lands between the lines that introduce it. Capturing
+  // instead would hold every plot back until the run ended.
+  await webR.evalRVoid(
+    `options(device = function() webr::canvas(width = 720, height = 432, capture = FALSE))`,
+  );
+
+  // Best-effort: a setup failure shouldn't block startup.
+  try {
+    await webR.evalRVoid(R_SESSION_SETUP);
+  } catch (err) {
+    console.error("[webr] failed to install playground session setup", err);
+  }
+  return webR;
+}
+
+/** Error the surface renders as "Run stopped." rather than as a failure. */
+function cancelledError(): Error {
+  const err = new Error("Run stopped.");
+  err.name = "RunCancelledError";
+  return err;
+}
+
+/** A string literal for R source. JSON escaping is valid in R strings too. */
+function rString(value: string): string {
+  return JSON.stringify(value);
 }
 
 class WebRRuntime implements LanguageRuntime {
@@ -810,15 +1322,95 @@ class WebRRuntime implements LanguageRuntime {
   // One-time `rc.settings` setup for the completion engine; false when
   // it failed (completions then stay empty for the session).
   private completionSetup: Promise<boolean> | null = null;
+  // Working-directory contents as of the last check, keyed by path with a
+  // size/mtime stamp. What changes between runs is what the run created.
+  private fileStamps = new Map<string, string>();
+  // Where the reader loop delivers output while a run is in flight.
+  private sink: ((message: WebROutputMessage) => Promise<void>) | null = null;
+  // Rejects the in-flight run() when Stop tears the session down.
+  private abortActiveRun: ((err: Error) => void) | null = null;
+  // Non-null between the Stop that closed the old session and the moment its
+  // replacement is ready. Every entry point waits on it, so nothing is sent
+  // to a terminated worker (which would never answer).
+  private restartPromise: Promise<void> | null = null;
 
-  constructor(private webR: WebRInstance) {}
+  constructor(private webR: WebRInstance) {
+    this.readOutput(webR);
+  }
+
+  /**
+   * Drains webR's output queue for the session's lifetime, handing each
+   * message to the active run.
+   *
+   * One loop rather than one per run: `read()` resolves with the next
+   * message whenever it arrives, so a loop that stopped between runs would
+   * leave a pending read holding the first message of the next one.
+   */
+  private readOutput(webR: WebRInstance): void {
+    void (async () => {
+      for (;;) {
+        let message: WebROutputMessage;
+        try {
+          message = await webR.read();
+        } catch {
+          return;
+        }
+        // A restart leaves the old worker's loop running until its channel
+        // closes; its messages belong to a session nobody is watching.
+        if (this.webR !== webR) return;
+        if (message.type === "closed") return;
+        try {
+          await this.sink?.(message);
+        } catch {
+          // A message that can't be rendered must not stop the queue.
+        }
+      }
+    })();
+  }
 
   /** Shut the webR session down (registry-eviction hook; unusable after).
    *  Also un-registers from the styler formatter so a later Format click
    *  starts fresh instead of talking to a dead session. */
   dispose(): void {
     releaseFormatterSession(this.webR);
-    void this.webR.close().catch(() => {});
+    this.webR.close();
+  }
+
+  /**
+   * Stop the running program.
+   *
+   * R's interrupt handling needs a SharedArrayBuffer, which needs the
+   * document to be cross-origin isolated, which the site is not — so webR
+   * runs on its PostMessage channel, where `interrupt()` does nothing. The
+   * only lever left is the worker itself: terminate it and stand a new
+   * session up. That costs the session's state, which is wiped between runs
+   * anyway, and its installed packages, which re-install on demand.
+   * Resolves once the replacement is ready to take a run.
+   */
+  async cancelRun(): Promise<void> {
+    if (this.restartPromise) return this.restartPromise;
+    const abort = this.abortActiveRun;
+    this.abortActiveRun = null;
+    this.sink = null;
+    const dead = this.webR;
+    releaseFormatterSession(dead);
+    dead.close();
+    abort?.(cancelledError());
+
+    this.restartPromise = (async () => {
+      try {
+        const webR = await startWebR();
+        this.webR = webR;
+        this.installedPackages.clear();
+        this.stagedPaths.clear();
+        this.fileStamps.clear();
+        this.completionSetup = null;
+        this.readOutput(webR);
+      } finally {
+        this.restartPromise = null;
+      }
+    })();
+    return this.restartPromise;
   }
 
   // ─── Autocomplete via R's own completion engine ───────────────────────
@@ -843,6 +1435,8 @@ class WebRRuntime implements LanguageRuntime {
 
   async complete(request: CompletionRequest): Promise<CompletionResult> {
     const empty: CompletionResult = { list: [], replaceLength: 0 };
+    // Mid-restart the session can't answer; completions are best-effort.
+    if (this.restartPromise) return empty;
     if (!(await this.ensureCompletionSetup())) return empty;
 
     const lineToCursor = request.line.slice(0, request.column);
@@ -917,6 +1511,7 @@ class WebRRuntime implements LanguageRuntime {
   }
 
   async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
+    if (this.restartPromise) await this.restartPromise;
     const fs = this.webR.FS;
     const nextPaths = new Set<string>();
 
@@ -945,6 +1540,11 @@ class WebRRuntime implements LanguageRuntime {
     }
     this.stagedPaths.clear();
     for (const p of nextPaths) this.stagedPaths.add(p);
+
+    // Baseline for collectCreatedFiles(): everything present once staging is
+    // done is the run's input, so only what changes afterwards is its output.
+    const stamps = await this.readFileStamps();
+    if (stamps) this.fileStamps = stamps;
   }
 
   private async ensurePackages(
@@ -974,159 +1574,128 @@ class WebRRuntime implements LanguageRuntime {
     emit: EmitOutput,
     options?: RunOptions,
   ): Promise<void> {
+    // A Stop leaves the runtime rebuilding itself; the next run belongs on
+    // the fresh session, so wait rather than race it.
+    if (this.restartPromise) await this.restartPromise;
     const installWarnings = await this.ensurePackages(code, options?.onStatus);
+    const webR = this.webR;
 
-    await this.webR.evalRVoid(
-      `rm(list = ls(envir = .GlobalEnv, all.names = TRUE), envir = .GlobalEnv)
-unlink("${CREATED_FILES_PATH}")`,
+    await webR.evalRVoid(
+      `rm(list = ls(envir = .GlobalEnv, all.names = TRUE), envir = .GlobalEnv)`,
     );
+    // User code goes in via a VFS file so it never needs escaping into R
+    // source; the driver parses it by path.
+    await webR.FS.writeFile(RUN_CODE_PATH, new TextEncoder().encode(code));
+    // Anything queued before now (webR's startup banner, a package install's
+    // progress) belongs to no run.
+    await webR.flush();
 
-    const shelter: ShelterInstance = await new this.webR.Shelter();
+    const out = new RunOutputStream(emit);
+    // Through the stream, not straight to `emit`: cells are addressed by
+    // position, and an unpositioned cell would be overwritten by the run's
+    // first one.
+    if (installWarnings) {
+      await out.handle({ type: "stderr", data: installWarnings.trim() });
+    }
+    this.sink = (message) => out.handle(message);
     try {
-      // User code goes in via a VFS temp file so it never needs escaping.
-      const tmpPath = `${WEB_USER_HOME}/.pg_run_code.R`;
-      await this.webR.FS.writeFile(tmpPath, new TextEncoder().encode(code));
-
-      // withVisible() tells us whether the last expression should produce
-      // output without letting R auto-print it (which would dump every row
-      // of a large frame). Results are stored in .GlobalEnv for later calls.
-      const result = await shelter.captureR(
-        `.pg_vr <- withVisible(eval(parse(file = "${tmpPath}"), envir = .GlobalEnv))
-.pg_last_visible <- .pg_vr$visible
-.pg_last_result  <- .pg_vr$value
-.pg_vr$value`,
-        { withAutoprint: false, captureGraphics: { width: 720, height: 432 } },
+      // Leaving the streams and conditions uncaptured is what makes this a
+      // live run: R writes to the output queue as it goes, and the reader
+      // loop turns each message into a cell. Graphics capture stays off for
+      // the same reason — the session's canvas device streams its frames to
+      // the same queue, in place, instead of handing them all over at the
+      // end.
+      await this.untilCancelled(
+        webR.evalRVoid(
+          `.pg_run_file(${rString(RUN_CODE_PATH)}, ${rString(
+            options?.entryFilename ?? "main.r",
+          )})`,
+          {
+            captureStreams: false,
+            captureConditions: false,
+            captureGraphics: false,
+          },
+        ),
       );
-
-      let stdoutBuf = "";
-      let stderrBuf = installWarnings;
-      for (const o of result.output) {
-        if (o.type === "stdout") stdoutBuf += String(o.data) + "\n";
-        else if (o.type === "stderr") stderrBuf += String(o.data) + "\n";
-      }
-      if (stdoutBuf.trim())
-        emit({ type: "stdout", content: capCellText(stdoutBuf.trim()) });
-      if (stderrBuf.trim())
-        emit({ type: "stderr", content: capCellText(stderrBuf.trim()) });
-
-      for (const bmp of result.images) {
-        const b64 = await imageBitmapToPngBase64(bmp);
-        emit({ type: "image", content: b64 });
-        bmp.close();
-      }
-
-      // Determine whether the last expression would have auto-printed.
-      let visible = false;
-      try {
-        const visCapture = await shelter.captureR(
-          `cat(as.character(.pg_last_visible), "\n")`,
-          { withAutoprint: false, captureGraphics: { width: 720, height: 432 } },
-        );
-        const visText = visCapture.output
-          .filter((o) => o.type === "stdout")
-          .map((o) => String(o.data))
-          .join("")
-          .trim();
-        visible = visText === "TRUE";
-      } catch {
-        /* default: invisible */
-      }
-
-      if (visible) {
-        // Try to render a data frame as a truncated HTML table.
-        let emittedHtml = false;
-        try {
-          const t = await result.result.type();
-          if (t === "list") {
-            const js = (await result.result.toJs()) as unknown;
-            const rows = rowsFromDataFrame(js);
-            if (rows) {
-              const html = dataFrameToHtml(rows);
-              if (html) {
-                emit({ type: "html", content: html });
-                emittedHtml = true;
-              }
-            }
-          }
-        } catch {
-          /* not a data frame, fall through to text print */
-        }
-
-        if (!emittedHtml) {
-          // Non-data-frame result: print via R so print methods fire.
-          try {
-            const printCapture = await shelter.captureR(`print(.pg_last_result)`, {
-              withAutoprint: false,
-              captureGraphics: { width: 720, height: 432 },
-            });
-            let printStdout = "";
-            let printStderr = "";
-            for (const o of printCapture.output) {
-              if (o.type === "stdout") printStdout += String(o.data) + "\n";
-              else if (o.type === "stderr") printStderr += String(o.data) + "\n";
-            }
-            if (printStdout.trim())
-              emit({ type: "stdout", content: capCellText(printStdout.trim()) });
-            if (printStderr.trim())
-              emit({ type: "stderr", content: capCellText(printStderr.trim()) });
-            for (const bmp of printCapture.images) {
-              const b64 = await imageBitmapToPngBase64(bmp);
-              emit({ type: "image", content: b64 });
-              bmp.close();
-            }
-          } catch {
-            /* print failed, ignore */
-          }
-        }
-      }
+      await out.waitForEnd();
+      // The driver reports the error that ended the run rather than printing
+      // it, so the surface renders it below everything the run produced
+      // first.
+      if (out.error) throw new Error(out.error);
     } finally {
-      await shelter.purge();
+      this.sink = null;
+      // Also on the Stop path: what the program printed before it was
+      // stopped stays on screen.
+      await out.finish();
     }
   }
 
-  /** Files created during the run (download.file() destinations), returned
-   *  relative to the WebR home directory to match the Files pane. The
-   *  tracking list is cleared so each file is reported at most once. */
+  /** Settles with `work`, or rejects if Stop tears the session down first —
+   *  a request to a terminated worker is never answered. */
+  private untilCancelled<T>(work: Promise<T>): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+      this.abortActiveRun = reject;
+      work.then(resolve, reject).finally(() => {
+        this.abortActiveRun = null;
+      });
+    });
+  }
+
+  /** Files the run wrote into the working directory (`write.csv`, `png()`,
+   *  `download.file()`), keyed by workspace-relative path. Comparing stamps
+   *  against the last check is what keeps an unchanged file from being
+   *  reported twice. */
   async collectCreatedFiles(): Promise<Map<string, Uint8Array>> {
     const out = new Map<string, Uint8Array>();
+    // Stop took the filesystem down with the worker; don't stall the run's
+    // tail waiting for a session that is still booting.
+    if (this.restartPromise) return out;
 
-    let listBytes: Uint8Array;
-    try {
-      listBytes = await this.webR.FS.readFile(CREATED_FILES_PATH);
-    } catch {
-      // No download happened this run, the tracking file doesn't exist.
-      return out;
-    }
+    const stamps = await this.readFileStamps();
+    if (!stamps) return out;
 
-    const paths = [
-      ...new Set(
-        new TextDecoder()
-          .decode(listBytes)
-          .split("\n")
-          .map((p) => p.trim())
-          .filter(Boolean),
-      ),
-    ];
-
-    for (const abs of paths) {
+    let bytes = 0;
+    for (const [path, stamp] of stamps) {
+      if (this.fileStamps.get(path) === stamp) continue;
+      // Over the cap the loop stops without stamping, so the files it did
+      // not hand over are still pending rather than silently forgotten.
+      if (out.size >= CREATED_FILES_MAX || bytes >= CREATED_BYTES_MAX) break;
+      this.fileStamps.set(path, stamp);
       try {
-        const bytes = await this.webR.FS.readFile(abs);
-        const rel = abs.startsWith(`${WEB_USER_HOME}/`)
-          ? abs.slice(WEB_USER_HOME.length + 1)
-          : (abs.split("/").pop() ?? abs);
-        if (rel) out.set(rel, bytes);
+        const data = await this.webR.FS.readFile(`${WEB_USER_HOME}/${path}`);
+        bytes += data.length;
+        out.set(path, data);
       } catch {
-        // File was removed before we read it back, skip it.
+        // Removed between listing and reading; skip it.
       }
     }
-
-    try {
-      await this.webR.FS.unlink(CREATED_FILES_PATH);
-    } catch {
-      // Best-effort cleanup; the next run also clears it.
+    // Files the run deleted shouldn't linger in the comparison set.
+    for (const path of [...this.fileStamps.keys()]) {
+      if (!stamps.has(path)) this.fileStamps.delete(path);
     }
-
     return out;
+  }
+
+  /** path → "size:mtime" for everything in the working directory, or null
+   *  when the session can't answer (a run in flight, a dead worker). */
+  private async readFileStamps(): Promise<Map<string, string> | null> {
+    let raw: string;
+    try {
+      raw = await this.webR.evalRString(
+        `.pg_file_stamps(${rString(WEB_USER_HOME)})`,
+      );
+    } catch {
+      return null;
+    }
+    const stamps = new Map<string, string>();
+    if (!raw) return stamps;
+    for (const entry of raw.split(RS)) {
+      if (!entry) continue;
+      const [path, size, mtime] = entry.split(US);
+      if (!path || path.startsWith(".")) continue;
+      stamps.set(path, `${size}:${mtime}`);
+    }
+    return stamps;
   }
 }
 
@@ -1261,7 +1830,8 @@ export const rAdapter: LanguageAdapter = {
     version: "4.6.0",
     engine: "WebR 0.6.0",
     engineUrl: "https://docs.r-wasm.org/webr/latest/",
-    notes: "Runs entirely in the browser via WebAssembly, no server roundtrip.",
+    notes:
+      "Runs in a Web Worker via WebAssembly, so the UI stays responsive. No server roundtrip.",
   },
   codeMirrorMode: "r",
   // R WASM image + base VFS, compressed transfer (webR 0.6).
@@ -1302,28 +1872,10 @@ export const rAdapter: LanguageAdapter = {
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Loading R runtime…", 0.03);
-    // @ts-expect-error -- webr ships without bundled type declarations
-    const { WebR } = (await import("webr")) as { WebR: new () => WebRInstance };
-
     // webR.init() is the heavy stage (~15 MB compressed R WASM image).
     setLoadingMessage("Initialising R runtime…", 0.12);
-    const webR = new WebR();
-    await webR.init();
-    // Let the styler formatter reuse this session instead of a second R.
-    activeWebR = webR;
-
+    const webR = await startWebR();
     setLoadingMessage("Configuring graphics device…", 0.9);
-    await webR.evalRVoid(
-      `options(device = function() webr::canvas(width = 720, height = 432, capture = TRUE))`,
-    );
-
-    // Install R_SESSION_SETUP. Best-effort: failure shouldn't block startup.
-    try {
-      await webR.evalRVoid(R_SESSION_SETUP);
-    } catch (err) {
-      console.error("[webr] failed to install playground session setup", err);
-    }
-
     return new WebRRuntime(webR);
   },
 };

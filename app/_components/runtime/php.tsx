@@ -4,6 +4,7 @@ import type {
   LanguageAdapter,
   LanguageRuntime,
   PackageInfo,
+  RunOptions,
 } from "../types";
 import { getMagoFmt } from "./magoFmt";
 
@@ -190,20 +191,108 @@ type WorkerOutMessage =
   | { kind: "loading"; message: string }
   | { kind: "ready" }
   | { kind: "init-error"; message: string }
-  | { kind: "output"; id: number; cell: { type: string; content: string } }
+  | {
+      kind: "output";
+      id: number;
+      cell: { type: string; content: string };
+      seq: number;
+      append: boolean;
+    }
+  | { kind: "created-files"; id: number; files: Array<[string, Uint8Array]> }
   | { kind: "done"; id: number }
-  | { kind: "error"; id: number; message: string }
+  | { kind: "error"; id: number; message: string; fatal?: boolean }
   | { kind: "prepare-fs-done"; id: number }
   | { kind: "prepare-fs-error"; id: number; message: string };
 
+/**
+ * How long a run may take before the host stops it.
+ *
+ * `max_execution_time` is 0 in this build and php-wasm cannot interrupt a
+ * tight loop from inside, so the cap belongs out here: without one, a
+ * `while (true)` left the playground running forever with no Stop and no
+ * recovery short of reloading the page. Generous, because the first run
+ * after boot competes with the WASM warm-up.
+ */
+const RUN_TIMEOUT_MS = 15_000;
+
+/** A fresh PHP worker, booted and ready to run. */
+function spawnPhpWorker(): Promise<Worker> {
+  const worker = new Worker(new URL("./php-worker.ts", import.meta.url));
+  return new Promise<Worker>((resolve, reject) => {
+    const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+      const msg = ev.data;
+      if (msg.kind === "ready") {
+        worker.removeEventListener("message", onMessage);
+        resolve(worker);
+      } else if (msg.kind === "init-error") {
+        worker.removeEventListener("message", onMessage);
+        worker.terminate();
+        reject(new Error(msg.message));
+      }
+    };
+    worker.addEventListener("message", onMessage);
+    worker.addEventListener("error", (ev) => {
+      worker.removeEventListener("message", onMessage);
+      reject(new Error(ev.message || "PHP worker failed to start"));
+    });
+    worker.postMessage({ kind: "init" });
+  });
+}
+
 class PhpWorkerRuntime implements LanguageRuntime {
   private nextId = 0;
+  /** Rejects the run in flight, for Stop and for the timeout. */
+  private abortActiveRun: ((err: Error) => void) | null = null;
+  /** Set while a replacement worker is booting after a terminate. */
+  private restartPromise: Promise<void> | null = null;
+  /** Files the last run wrote, awaiting collection by the surface. */
+  private createdFiles: Array<[string, Uint8Array]> = [];
 
-    constructor(private worker: Worker) {}
+  constructor(private worker: Worker) {}
 
   /** Terminate the worker (registry-eviction hook; unusable after). */
   dispose(): void {
     this.worker.terminate();
+  }
+
+  /**
+   * Stop the running script.
+   *
+   * PHP cannot be interrupted from inside a tight loop, so stopping means
+   * terminating the worker and standing a fresh one up. Output already
+   * streamed stays on screen, which is the part that says where it hung.
+   */
+  async cancelRun(): Promise<void> {
+    if (this.restartPromise) return this.restartPromise;
+    const abort = this.abortActiveRun;
+    this.abortActiveRun = null;
+    if (abort) {
+      const err = new Error("Run stopped.");
+      err.name = "RunCancelledError";
+      abort(err);
+    }
+    return this.restart();
+  }
+
+  /** Throw the interpreter away and boot a fresh one. */
+  private restart(): Promise<void> {
+    if (this.restartPromise) return this.restartPromise;
+    this.worker.terminate();
+    this.restartPromise = (async () => {
+      try {
+        this.worker = await spawnPhpWorker();
+      } finally {
+        this.restartPromise = null;
+      }
+    })();
+    return this.restartPromise;
+  }
+
+  /** Files the script wrote, for the Files panel. */
+  async collectCreatedFiles(): Promise<Map<string, Uint8Array>> {
+    const collected = new Map(this.createdFiles);
+    this.createdFiles = [];
+    return collected;
   }
 
   async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
@@ -229,23 +318,93 @@ class PhpWorkerRuntime implements LanguageRuntime {
     });
   }
 
-  async run(code: string, emit: EmitOutput): Promise<void> {
+  async run(
+    code: string,
+    emit: EmitOutput,
+    options?: RunOptions,
+  ): Promise<void> {
+    if (this.restartPromise) await this.restartPromise;
+    const entry = options?.entryFilename ?? "index.php";
+    const entryPath = entry.startsWith("/") ? entry : `/${entry}`;
     const id = ++this.nextId;
-    return new Promise<void>((resolve, reject) => {
+    const worker = this.worker;
+    this.createdFiles = [];
+
+    await new Promise<void>((resolve, reject) => {
+      let timer: number | null = null;
+      const finish = (settle: () => void) => {
+        if (timer !== null) window.clearTimeout(timer);
+        worker.removeEventListener("message", onMessage);
+        this.abortActiveRun = null;
+        settle();
+      };
+      this.abortActiveRun = (err) => finish(() => reject(err));
+
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
         const msg = ev.data;
-        if (msg.kind !== "output" && msg.kind !== "done" && msg.kind !== "error") return;
-        if (msg.id !== id) return;
-        if (msg.kind === "output") {
-          emit(msg.cell as Parameters<EmitOutput>[0]);
+        if (msg.kind !== "output" && msg.kind !== "done" && msg.kind !== "error") {
           return;
         }
-        this.worker.removeEventListener("message", onMessage);
-        if (msg.kind === "done") resolve();
-        else reject(new Error(msg.message));
+        if (msg.id !== id) return;
+        if (msg.kind === "output") {
+          emit(
+            msg.cell as Parameters<EmitOutput>[0],
+            msg.seq,
+            msg.append,
+          );
+          return;
+        }
+        if (msg.kind === "done") {
+          finish(resolve);
+        } else if (msg.kind === "error") {
+          // An aborted interpreter cannot run anything else; replace it
+          // rather than leaving the next Run to fail mysteriously.
+          if (msg.fatal) void this.restart();
+          finish(() => reject(new Error(msg.message)));
+        }
       };
-      this.worker.addEventListener("message", onMessage);
-      this.worker.postMessage({ kind: "run", id, code });
+      worker.addEventListener("message", onMessage);
+
+      timer = window.setTimeout(() => {
+        // Whatever the script printed before it hung has already streamed,
+        // so terminating costs the reader nothing but the hang.
+        const seconds = Math.round(RUN_TIMEOUT_MS / 1000);
+        emit({
+          type: "stderr",
+          content:
+            `Stopped after ${seconds}s: the script never finished, so it is probably ` +
+            "stuck in a loop. Output it produced before then is above.",
+        });
+        void this.cancelRun();
+      }, RUN_TIMEOUT_MS);
+
+      worker.postMessage({ kind: "run", id, code, entryPath });
+    });
+
+    // Asked for after the run so a script that wrote a file mid-run still
+    // reports it; a terminated run skips this with its worker.
+    this.createdFiles = await this.requestCreatedFiles();
+  }
+
+  /** Ask the worker for files the run left behind. Best-effort: a worker
+   *  that has gone away answers nothing rather than failing the run. */
+  private requestCreatedFiles(): Promise<Array<[string, Uint8Array]>> {
+    const id = ++this.nextId;
+    const worker = this.worker;
+    return new Promise((resolve) => {
+      const timer = window.setTimeout(() => {
+        worker.removeEventListener("message", onMessage);
+        resolve([]);
+      }, 5_000);
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        if (msg.kind !== "created-files" || msg.id !== id) return;
+        window.clearTimeout(timer);
+        worker.removeEventListener("message", onMessage);
+        resolve(msg.files);
+      };
+      worker.addEventListener("message", onMessage);
+      worker.postMessage({ kind: "collect-created-files", id });
     });
   }
 }
@@ -262,7 +421,18 @@ export const phpAdapter: LanguageAdapter = {
     engine: "php-wasm",
     engineUrl: "https://github.com/seanmorris/php-wasm",
     notes:
-      "PHP compiled to WebAssembly, runs entirely in the browser, no server roundtrip.",
+      "PHP compiled to WebAssembly, runs entirely in the browser, no server roundtrip. " +
+      "This is a 32-bit build: PHP_INT_MAX is 2147483647, so a cast like (int)\"3000000000\" " +
+      "clamps rather than overflowing to float, crc32() returns a negative number, dates past " +
+      "19 January 2038 are out of range, and json_decode() fails on a document containing an " +
+      "integer too large to represent. bcmath is available and unaffected when you need the " +
+      "range. PHP_OS_FAMILY reports Unknown here even though PHP_OS is Linux. " +
+      "Extensions: bcmath, calendar, ctype, date, exif, filter, hash, json, libxml, PDO, pcre, " +
+      "random, Reflection, session, SPL, tokenizer, plus php-wasm's own pib, vrzno and " +
+      "waitline. Notably absent: mbstring, iconv, intl, openssl, zlib, curl, gd, fileinfo, " +
+      "sqlite3 and the DOM/SimpleXML extensions. PDO::getAvailableDrivers() lists pgsql, but " +
+      "no database is wired up and using it fails the run. A script that has not finished " +
+      "after 15 seconds is stopped, and Stop ends one sooner.",
   },
   codeMirrorMode: "php",
   // mago_fmt (PSR-12) (see formatCode), keep in sync.

@@ -19,6 +19,7 @@
 
 import JSZip from "jszip";
 
+import { findWorkspaceEntry } from "./activeWorkspace";
 import { isOpfsSupported } from "./featureDetect";
 import { loadManifest } from "../playgroundTabs";
 import {
@@ -211,8 +212,9 @@ export async function exportWorkspaceToZip(
   workspaceId: string,
 ): Promise<Blob | null> {
   if (!isOpfsSupported()) return null;
-  const registry = getWorkspaceRegistry();
-  const entry = registry.find((e) => e.id === workspaceId);
+  // Drafts included: an unsaved workspace is still a workspace, and for a
+  // multi-file project this ZIP is the only way to get the files out.
+  const entry = findWorkspaceEntry(workspaceId);
   if (!entry) return null;
 
   let wsDir: FileSystemDirectoryHandle;
@@ -263,8 +265,7 @@ export async function downloadWorkspaceZip(
 ): Promise<boolean> {
   const blob = await exportWorkspaceToZip(workspaceId);
   if (!blob) return false;
-  const registry = getWorkspaceRegistry();
-  const entry = registry.find((e) => e.id === workspaceId);
+  const entry = findWorkspaceEntry(workspaceId);
   if (!entry) return false;
   const url = URL.createObjectURL(blob);
   try {

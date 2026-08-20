@@ -22,6 +22,16 @@ import {
   completionPrefixLength,
   referencedLibFiles,
 } from "./tsCompletionKinds";
+import {
+  ambientFilesFor,
+  ANALYZABLE_SOURCE_RE,
+  compilerOptionsFor,
+  libSeedsFor,
+  MAX_DIAGNOSTICS,
+  toDiagnosticMessages,
+  type TsDiagnosticMessage,
+  type TsEnvironment,
+} from "./tsAnalysisConfig";
 
 declare const self: DedicatedWorkerGlobalScope & {
   ts: typeof tsModule;
@@ -37,16 +47,29 @@ interface CompletionItemMessage {
   boost?: number;
 }
 
-type InMessage = {
-  kind: "complete";
-  id: number;
-  /** Workspace snapshot: [path, content] with leading-slash paths. */
-  files: Array<[string, string]>;
-  /** Path of the file the cursor is in. */
-  entry: string;
-  /** 0-based cursor offset within the entry file. */
-  offset: number;
-};
+export type { TsDiagnosticMessage, TsEnvironment } from "./tsAnalysisConfig";
+
+type InMessage =
+  | {
+      kind: "complete";
+      id: number;
+      /** Workspace snapshot: [path, content] with leading-slash paths. */
+      files: Array<[string, string]>;
+      /** Path of the file the cursor is in. */
+      entry: string;
+      /** 0-based cursor offset within the entry file. */
+      offset: number;
+      env?: TsEnvironment;
+    }
+  | {
+      kind: "diagnose";
+      id: number;
+      files: Array<[string, string]>;
+      entry: string;
+      env?: TsEnvironment;
+      /** False for JavaScript, where only parse errors are meaningful. */
+      semantic?: boolean;
+    };
 
 type OutMessage =
   | { kind: "ready" }
@@ -55,6 +78,11 @@ type OutMessage =
       id: number;
       completions: CompletionItemMessage[];
       replaceLength: number;
+    }
+  | {
+      kind: "diagnose-result";
+      id: number;
+      diagnostics: TsDiagnosticMessage[];
     };
 
 function post(msg: OutMessage) {
@@ -64,7 +92,6 @@ function post(msg: OutMessage) {
 // ─── Standard library declarations ─────────────────────────────────────
 
 const libFiles = new Map<string, string>();
-let libsPromise: Promise<void> | null = null;
 
 async function fetchLibClosure(seed: string[]): Promise<void> {
   const pending = new Set(seed);
@@ -89,18 +116,20 @@ async function fetchLibClosure(seed: string[]): Promise<void> {
   }
 }
 
-function ensureLibs(): Promise<void> {
-  if (!libsPromise) {
-    // The default lib references the whole ES chain plus DOM, matching
-    // what almostnode actually provides at runtime.
-    libsPromise = fetchLibClosure([
-      ts.getDefaultLibFileName(COMPILER_OPTIONS),
-    ]).catch((err) => {
-      libsPromise = null; // allow a retry on the next request
+const libsPromises = new Map<TsEnvironment, Promise<void>>();
+
+function ensureLibs(env: TsEnvironment): Promise<void> {
+  let pending = libsPromises.get(env);
+  if (!pending) {
+    // Follow each lib's `/// <reference lib>` graph so the set survives a
+    // TypeScript upgrade.
+    pending = fetchLibClosure(libSeedsFor(ts, env)).catch((err) => {
+      libsPromises.delete(env); // allow a retry on the next request
       throw err;
     });
+    libsPromises.set(env, pending);
   }
-  return libsPromise;
+  return pending;
 }
 
 // ─── React type declarations (TSX entries only) ────────────────────────
@@ -172,19 +201,8 @@ function ensureReactTypes(): Promise<void> {
 
 // ─── Language service host over an in-memory workspace ─────────────────
 
-const COMPILER_OPTIONS: tsModule.CompilerOptions = {
-  target: ts.ScriptTarget.ES2022,
-  // almostnode executes CommonJS output; Node10 resolution makes
-  // `./utils` find /utils.ts without package.json machinery.
-  module: ts.ModuleKind.CommonJS,
-  moduleResolution: ts.ModuleResolutionKind.Node10,
-  allowJs: true,
-  esModuleInterop: true,
-  allowSyntheticDefaultImports: true,
-  // Only changes how .tsx/.jsx parse; the JS/TS adapters are unaffected.
-  jsx: ts.JsxEmit.ReactJSX,
-  noEmit: true,
-};
+/** Environment of the request being served; the host reads it for settings. */
+let environment: TsEnvironment = "dom";
 
 const scripts = new Map<string, { content: string; version: number }>();
 
@@ -199,8 +217,9 @@ const host: tsModule.LanguageServiceHost = {
       : ts.ScriptSnapshot.fromString(content);
   },
   getCurrentDirectory: () => "/",
-  getCompilationSettings: () => COMPILER_OPTIONS,
-  getDefaultLibFileName: (opts) => `/__lib/${ts.getDefaultLibFileName(opts)}`,
+  getCompilationSettings: () => compilerOptionsFor(ts, environment),
+  getDefaultLibFileName: (opts) =>
+    `/__lib/${opts.lib?.[0] ?? ts.getDefaultLibFileName(opts)}`,
   fileExists: (f) => scripts.has(f) || libFiles.has(f) || typeFiles.has(f),
   readFile: (f) =>
     scripts.get(f)?.content ?? libFiles.get(f) ?? typeFiles.get(f),
@@ -232,13 +251,15 @@ function syncScripts(files: Array<[string, string]>): void {
 
 const MAX_COMPLETIONS = 300;
 
-async function complete(msg: InMessage): Promise<void> {
-  await ensureLibs();
+async function complete(msg: Extract<InMessage, { kind: "complete" }>): Promise<void> {
+  const env = msg.env ?? "dom";
+  environment = env;
+  await ensureLibs(env);
   // JSX entries also get React typings, best-effort.
   if (/\.(tsx|jsx)$/i.test(msg.entry)) {
     await ensureReactTypes().catch(() => {});
   }
-  syncScripts(msg.files);
+  syncScripts([...msg.files, ...ambientFilesFor(env)]);
 
   const entryContent = scripts.get(msg.entry)?.content ?? "";
   const info = service.getCompletionsAtPosition(msg.entry, msg.offset, {});
@@ -271,13 +292,53 @@ async function complete(msg: InMessage): Promise<void> {
   });
 }
 
+/**
+ * Type-check the workspace and report what tsc would.
+ *
+ * The TypeScript playground used to run `transpileModule`, which strips
+ * types without checking them, so every type error passed silently — the one
+ * thing that playground exists to catch. The same service that backs
+ * completions answers this, so the checker is already loaded.
+ */
+async function diagnose(msg: Extract<InMessage, { kind: "diagnose" }>): Promise<void> {
+  const env = msg.env ?? "dom";
+  environment = env;
+  await ensureLibs(env);
+  // JSX entries need React's typings for the checker to say anything true
+  // about a component; best-effort, as for completions.
+  if (msg.files.some(([path]) => /\.(tsx|jsx)$/i.test(path))) {
+    await ensureReactTypes().catch(() => {});
+  }
+  syncScripts([...msg.files, ...ambientFilesFor(env)]);
+
+  const diagnostics: TsDiagnosticMessage[] = [];
+  for (const [path] of msg.files) {
+    if (!ANALYZABLE_SOURCE_RE.test(path)) continue;
+    const raw = [
+      ...service.getSyntacticDiagnostics(path),
+      ...(msg.semantic === false ? [] : service.getSemanticDiagnostics(path)),
+    ];
+    diagnostics.push(...toDiagnosticMessages(ts, raw, path));
+    if (diagnostics.length >= MAX_DIAGNOSTICS) break;
+  }
+  diagnostics.length = Math.min(diagnostics.length, MAX_DIAGNOSTICS);
+
+  post({ kind: "diagnose-result", id: msg.id, diagnostics });
+}
+
 self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
   const msg = ev.data;
-  if (msg.kind !== "complete") return;
-  void complete(msg).catch(() => {
-    // Best-effort: analyzer/network hiccups answer empty, never throw.
-    post({ kind: "complete-result", id: msg.id, completions: [], replaceLength: 0 });
-  });
+  if (msg.kind === "complete") {
+    void complete(msg).catch(() => {
+      // Best-effort: analyzer/network hiccups answer empty, never throw.
+      post({ kind: "complete-result", id: msg.id, completions: [], replaceLength: 0 });
+    });
+  } else if (msg.kind === "diagnose") {
+    void diagnose(msg).catch(() => {
+      // A failed analysis must never invent errors in the user's program.
+      post({ kind: "diagnose-result", id: msg.id, diagnostics: [] });
+    });
+  }
 });
 
 post({ kind: "ready" });

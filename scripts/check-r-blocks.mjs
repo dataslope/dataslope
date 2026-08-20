@@ -5,13 +5,14 @@
  * webR is the same package the site loads; `baseUrl` points at
  * `node_modules/webr/dist` so the sweep uses the pinned build with no network
  * — and it must be a plain filesystem path, since webR's Node channel hands
- * it to `new Worker`, which rejects `file://`. The wrapper around each block
- * mirrors `WebRRuntime.run` in `r.tsx` (VFS temp file,
- * `withVisible(eval(parse(...)))`, `withAutoprint: false`), because that
- * wrapper decides whether a top-level expression prints.
+ * it to `new Worker`, which rejects `file://`. Each block is staged and
+ * evaluated the way `WebRRuntime.run` in `r.tsx` stages it (VFS temp file,
+ * sibling files alongside it), but through a plain `captureR` rather than the
+ * playground's run driver: the question here is only "does this raise", and
+ * `captureR` answers it by throwing.
  *
- * Failure is "captureR threw", which throws on an R error but not on a
- * warning or `message()` — keying on stderr would fail every lesson that
+ * Failure is therefore "captureR threw", which throws on an R error but not
+ * on a warning or `message()` — keying on stderr would fail every lesson that
  * deliberately demonstrates a coercion warning.
  *
  * Usage:

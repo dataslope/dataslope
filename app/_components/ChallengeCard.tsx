@@ -798,7 +798,7 @@ export default function ChallengeCard({
             initCode: f.initCode,
           })),
           outputs: outputs
-            .filter((c) => c.type === "stdout" || c.type === "stderr")
+            .filter((c) => c.type === "stdout" || c.type === "stderr" || c.type === "log")
             .map((c) => c.content),
           tests: testResults,
           banner: bannerState,

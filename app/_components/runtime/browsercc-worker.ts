@@ -7,6 +7,17 @@ export {};
 // worker-level, separate from browsercc.ts's main-thread ones (the browser
 // caches the ~95 MB toolchain across both). Protocol: see In/OutMessage.
 
+import {
+  cleanBuildOutput,
+  composeTranslationUnit,
+  describeExit,
+  describeTrap,
+  FLAG_PROBE_SOURCE,
+  OPTIONAL_FLAGS,
+  STDIN_FILENAME,
+  type CFamilyLanguage,
+} from "./browserccBuild";
+
 declare const self: DedicatedWorkerGlobalScope;
 
 const BROWSERCC_VERSION = "0.1.1";
@@ -54,6 +65,7 @@ const PCH_VFS_PATH = "/include/bits/stdc++.h.pch";
 
 // ─── Protocol types ──────────────────────────────────────────────────────
 
+// Mirrors the subset of OutputCellType in ../types these playgrounds use.
 type OutputCellType = "stdout" | "stderr";
 interface OutputCellMessage {
   type: OutputCellType;
@@ -66,9 +78,11 @@ type InMessage =
       kind: "run";
       id: number;
       code: string;
-      language: "c" | "cpp";
+      language: CFamilyLanguage;
+      /** Workspace path of the file Run targets. */
+      entryPath?: string;
       /** Extra workspace files (path → text) so `#include "dog.h"` and
-       *  multi-translation-unit builds work. */
+       *  multi-source builds work. */
       files?: Array<[string, string]>;
     };
 
@@ -77,7 +91,16 @@ type OutMessage =
   | { kind: "ready" }
   | { kind: "init-error"; message: string }
   | { kind: "run-status"; id: number; message: string; preparing: boolean }
-  | { kind: "output"; id: number; cell: OutputCellMessage }
+  | {
+      kind: "output";
+      id: number;
+      cell: OutputCellMessage;
+      /** Position within the run's output. Posted as produced, so one
+       *  `seq` can arrive repeatedly while its cell grows (see `append`). */
+      seq: number;
+      /** True when `cell.content` extends the cell already sent for `seq`. */
+      append: boolean;
+    }
   | { kind: "done"; id: number }
   | { kind: "error"; id: number; message: string };
 
@@ -126,28 +149,40 @@ async function initRuntime(): Promise<void> {
   post({ kind: "ready" });
 }
 
-// ─── WASI runner (mirrors runWasiModule in browsercc.ts) ─────────────────
+// ─── WASI runner ─────────────────────────────────────────────────────────
 
 interface WasiRunResult {
   exitCode: number;
-  stdout: string;
-  stderr: string;
+  /** Set when the instance trapped rather than exiting. */
+  trap: string | null;
 }
 
+/**
+ * Run the compiled module, streaming its output.
+ *
+ * Both descriptors write into one ordered stream. stdout and stderr used
+ * to be collected into separate buffers and concatenated at the end, so a
+ * `std::cerr` line printed between two `std::cout` lines came out after
+ * both, and a message split across the two channels ran together with no
+ * newline. Streaming also means output survives: a program that loops
+ * forever, or traps, has already delivered everything it printed.
+ */
 async function runWasiModule(
   module: WebAssembly.Module,
   shim: WasiShim,
+  stdin: string,
+  write: (channel: OutputCellType, text: string) => void,
 ): Promise<WasiRunResult> {
   const decoder = new TextDecoder("utf-8");
-  let stdout = "";
-  let stderr = "";
 
-  const stdinFd = new shim.OpenFile(new shim.File(new Uint8Array(0)));
+  const stdinFd = new shim.OpenFile(
+    new shim.File(new TextEncoder().encode(stdin)),
+  );
   const stdoutFd = new shim.ConsoleStdout((data: Uint8Array) => {
-    stdout += decoder.decode(data, { stream: true });
+    write("stdout", decoder.decode(data, { stream: true }));
   });
   const stderrFd = new shim.ConsoleStdout((data: Uint8Array) => {
-    stderr += decoder.decode(data, { stream: true });
+    write("stderr", decoder.decode(data, { stream: true }));
   });
 
   const wasi = new shim.WASI([], [], [stdinFd, stdoutFd, stderrFd]);
@@ -155,22 +190,76 @@ async function runWasiModule(
     wasi_snapshot_preview1: wasi.wasiImport,
   });
 
-  let exitCode = 0;
   try {
     const result = wasi.start(instance);
-    if (typeof result === "number") exitCode = result;
+    return { exitCode: typeof result === "number" ? result : 0, trap: null };
   } catch (err) {
+    // A clean `exit(n)` arrives as an exception carrying the status.
     const code = (err as { code?: unknown })?.code;
-    if (typeof code === "number") {
-      exitCode = code;
-    } else {
-      const msg = err instanceof Error ? err.message : String(err);
-      stderr += `Runtime error: ${msg}\n`;
-      exitCode = 1;
-    }
+    if (typeof code === "number") return { exitCode: code, trap: null };
+    // Anything else is a trap: a failed assert(), abort(), a stack
+    // overflow, or a standard-library check that cannot throw. The run
+    // used to report `Done` for these.
+    return {
+      exitCode: 1,
+      trap: err instanceof Error ? err.message : String(err),
+    };
   }
+}
 
-  return { exitCode, stdout, stderr };
+// ─── Optional build flags ────────────────────────────────────────────────
+
+/** Flags this toolchain accepts, learned once per language. */
+const acceptedFlags = new Map<CFamilyLanguage, string[]>();
+
+/**
+ * Keep only the optional flags this build understands.
+ *
+ * The toolchain is a pinned CDN download this code cannot inspect, so
+ * rather than assume, each candidate set is compiled against a trivial
+ * program once. A flag the build rejects costs one probe; assuming
+ * wrongly would break every compile.
+ */
+async function resolveOptionalFlags(
+  api: BrowserccApi,
+  language: CFamilyLanguage,
+  baseFlags: string[],
+): Promise<string[]> {
+  const known = acceptedFlags.get(language);
+  if (known) return known;
+
+  const candidates = OPTIONAL_FLAGS[language];
+  const probe = {
+    source: FLAG_PROBE_SOURCE[language],
+    fileName: language === "c" ? "probe.c" : "probe.cpp",
+  };
+  let accepted: string[] = [];
+  try {
+    const all = await api.compile({
+      ...probe,
+      flags: [...baseFlags, ...candidates],
+    });
+    if (all.module) {
+      accepted = candidates;
+    } else {
+      // Narrow it down: one bad flag should not cost the others.
+      for (const flag of candidates) {
+        try {
+          const one = await api.compile({
+            ...probe,
+            flags: [...baseFlags, ...accepted, flag],
+          });
+          if (one.module) accepted.push(flag);
+        } catch {
+          // Rejected; leave it out.
+        }
+      }
+    }
+  } catch {
+    accepted = [];
+  }
+  acceptedFlags.set(language, accepted);
+  return accepted;
 }
 
 // ─── Compile + run ───────────────────────────────────────────────────────
@@ -178,20 +267,15 @@ async function runWasiModule(
 async function runCode(
   id: number,
   code: string,
-  language: "c" | "cpp",
+  language: CFamilyLanguage,
+  entryPath: string,
   files: Array<[string, string]>,
 ): Promise<void> {
   if (!browserccApi || !wasiShim) throw new Error("Runtime not initialised");
 
-  let flags: string[];
-  let fileName: string;
+  const baseFlags =
+    language === "cpp" ? [...CPP_COMPILE_FLAGS] : [...C_COMPILE_FLAGS];
   const extraFiles: Record<string, string | ArrayBuffer> = {};
-
-  // "Unity build": extra source files are concatenated before the entry
-  // point (headers go in the VFS via extraFiles). browsercc's compile()
-  // doesn't accept extra positional source paths — passing them fails with
-  // "Clang driver failed with code 1".
-  let extraSource = "";
 
   if (language === "cpp") {
     // The PCH may still be downloading on a fast first run; surface the
@@ -204,57 +288,67 @@ async function runCode(
     });
     const pch = await pchPromise;
     post({ kind: "run-status", id, message: "Compiling…", preparing: false });
-    flags = [...CPP_COMPILE_FLAGS];
     if (pch) {
-      flags.push("-include-pch", PCH_VFS_PATH);
+      baseFlags.push("-include-pch", PCH_VFS_PATH);
       extraFiles[PCH_VFS_PATH] = pch;
-    }
-    fileName = "main.cpp";
-    for (const [path, content] of files) {
-      if (path.endsWith(".cpp") || path.endsWith(".cc") || path.endsWith(".cxx")) {
-        extraSource += content + "\n";
-      } else if (path.endsWith(".h") || path.endsWith(".hpp")) {
-        extraFiles[path] = content;
-      }
-    }
-  } else {
-    flags = [...C_COMPILE_FLAGS];
-    fileName = "main.c";
-    for (const [path, content] of files) {
-      if (path.endsWith(".c")) {
-        extraSource += content + "\n";
-      } else if (path.endsWith(".h")) {
-        extraFiles[path] = content;
-      }
     }
   }
 
-  const combinedSource = extraSource ? extraSource + code : code;
+  const unit = composeTranslationUnit({
+    language,
+    entryPath,
+    entryCode: code,
+    files,
+  });
+  for (const [path, content] of Object.entries(unit.extraFiles)) {
+    extraFiles[path] = content;
+  }
+
+  const optional = await resolveOptionalFlags(browserccApi, language, baseFlags);
+  const flags = [...baseFlags, ...optional];
+
+  // Output is addressed by position, and consecutive text on one channel
+  // coalesces, so the pane reads as one stream in the order it happened.
+  let seq = -1;
+  let channel: OutputCellType | null = null;
+  const write = (next: OutputCellType, text: string) => {
+    if (!text) return;
+    const append = next === channel;
+    if (!append) {
+      channel = next;
+      seq += 1;
+    }
+    post({ kind: "output", id, cell: { type: next, content: text }, seq, append });
+  };
 
   const { compileOutput, module } = await browserccApi.compile({
-    source: combinedSource,
-    fileName,
+    source: unit.source,
+    fileName: unit.fileName,
     flags,
     extraFiles: Object.keys(extraFiles).length > 0 ? extraFiles : undefined,
   });
 
-  const trimmedDiag = compileOutput.replace(/\n+$/, "");
-  if (trimmedDiag) {
-    post({ kind: "output", id, cell: { type: "stderr", content: trimmedDiag } });
+  const diagnostics = cleanBuildOutput(compileOutput, entryPath, language)
+    .replace(/\n+$/, "");
+  if (diagnostics) write("stderr", diagnostics + "\n");
+  if (!module) {
+    // A build that produced nothing is a failed run, not a quiet one.
+    throw new Error("Compilation failed.");
   }
-  if (!module) return;
 
-  const { exitCode, stdout, stderr } = await runWasiModule(module, wasiShim);
-  if (stdout)
-    post({ kind: "output", id, cell: { type: "stdout", content: stdout.replace(/\n+$/, "") } });
-  if (stderr)
-    post({ kind: "output", id, cell: { type: "stderr", content: stderr.replace(/\n+$/, "") } });
-  if (exitCode !== 0)
-    post({
-      kind: "output",
-      id,
-      cell: { type: "stderr", content: `Program exited with code ${exitCode}.` },
-    });
+  const stdin = files.find(([path]) => path === STDIN_FILENAME)?.[1] ?? "";
+  const { exitCode, trap } = await runWasiModule(module, wasiShim, stdin, write);
+
+  if (trap) write("stderr", `${describeTrap(trap)}\n`);
+  const exit = describeExit(exitCode);
+  if (exit.message) write("stderr", `${exit.message}\n`);
+  if (trap || exit.failed) {
+    // The run status should say the program did not succeed; the lines
+    // above already explain why.
+    const err = new Error(trap ? describeTrap(trap) : (exit.message ?? "Run failed."));
+    err.name = "ProgramFailed";
+    throw err;
+  }
 }
 
 // Serialise requests, browsercc is not reentrant within a single worker.
@@ -284,10 +378,11 @@ self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
 
   if (msg.kind === "run") {
     const { id, code, language, files = [] } = msg;
+    const entryPath = msg.entryPath || (language === "c" ? "main.c" : "main.cpp");
     enqueue(async () => {
       try {
         if (initPromise) await initPromise;
-        await runCode(id, code, language, files);
+        await runCode(id, code, language, entryPath, files);
         post({ kind: "done", id });
       } catch (err) {
         post({

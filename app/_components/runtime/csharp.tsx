@@ -7,8 +7,28 @@ import type {
   PackageInfo,
   RunOptions,
 } from "../types";
-import { loadDotnet, type DotnetApi } from "./dotnet";
+import {
+  CSHARP_VERSION,
+  DOTNET_VERSION,
+  loadDotnet,
+  type CSharpScriptResult,
+  type DotnetApi,
+} from "./dotnet";
 import { getClangFormat } from "./clangFormat";
+import {
+  allDiagnosticsMapped,
+  composeProgram,
+  describeThrown,
+  EXIT_OUTPUT_NOTE,
+  formatUncaught,
+  hasCSharpExplicitMain,
+  hasCSharpTopLevel,
+  LAST_EXCEPTION_KEY,
+  looksLikeDiagnostics,
+  parseDiagnostics,
+  renderDiagnostics,
+  STDIN_FILENAME,
+} from "./csharpBuild";
 
 // C# in the browser via the .NET WebAssembly runtime (Mono) + Roslyn's
 // scripting engine, fetched from a CDN on first load. Accepts C# script
@@ -168,61 +188,13 @@ Console.WriteLine(g.Bye());
   },
 ];
 
-/** Strip block + line comments and string/char literals so simple
- *  regex probes don't false-match inside them. */
-function stripCSharpNoise(source: string): string {
-  return source
-    .replace(/\/\*[\s\S]*?\*\//g, "")
-    .replace(/\/\/[^\n]*/g, "")
-    .replace(/@?"(?:""|\\.|[^"\\])*"/g, '""')
-    .replace(/'(?:\\.|[^'\\])*'/g, "''");
-}
-
-/** Returns true if `source` declares an explicit `static … Main(` method.
- *  Matches both `Main` and `Main<T>(...)` style entrypoints. */
-function hasCSharpExplicitMain(source: string): boolean {
-  const cleaned = stripCSharpNoise(source);
-  return /\bstatic\s+(?:async\s+)?[\w<>?\[\],.\s]*?\bMain\s*\(/.test(cleaned);
-}
-
-/** True when `source` contains C# top-level statements, i.e. its first
- *  executable token is at file scope. */
-function hasCSharpTopLevel(source: string): boolean {
-  // Find the first non-using/non-comment/non-namespace/non-type line; a
-  // statement-like token there means top-level.
-  const cleaned = stripCSharpNoise(source);
-  // Strip using directives at file scope.
-  const lines = cleaned.split("\n");
-  let depth = 0;
-  for (const raw of lines) {
-    const line = raw.trim();
-    if (!line) continue;
-    if (depth > 0) {
-      // Track brace depth to skip namespace/type bodies.
-      depth += (line.match(/\{/g) ?? []).length - (line.match(/\}/g) ?? []).length;
-      continue;
-    }
-    if (/^(?:global\s+)?using(?:\s+static)?\s.*;$/.test(line)) continue;
-    // Namespace keyword or type declaration (with any modifier keywords)
-    // starts a body we ignore.
-    const NAMESPACE_RE = /^namespace\b/;
-    const TYPE_DECL_RE =
-      /^(?:public\s+|internal\s+|sealed\s+|abstract\s+|static\s+|partial\s+)*(?:class|struct|record|interface|enum)\b/;
-    if (NAMESPACE_RE.test(line) || TYPE_DECL_RE.test(line)) {
-      depth += (line.match(/\{/g) ?? []).length - (line.match(/\}/g) ?? []).length;
-      continue;
-    }
-    // First file-scope executable token = top-level statements.
-    return true;
-  }
-  return false;
-}
-
 const PACKAGES: PackageInfo[] = [
   // .NET base class library highlights; clicking inserts the `using`.
   {
-    cat: "Core", icon: "📦", color: "#34d399", name: "System", ver: ".NET 9",
-    desc: "Console, String, Math, primitive types and exceptions.",
+    cat: "Core", icon: "📦", color: "#34d399", name: "System", ver: `.NET ${DOTNET_VERSION.split(".")[0]}`,
+    desc:
+      "Console, String, Math, primitive types and exceptions, plus DateTime, " +
+      "DateTimeOffset and TimeSpan.",
     example: `using System;
 
 Console.WriteLine($"Hello, {Environment.UserName ?? "world"}!");
@@ -231,7 +203,7 @@ Console.WriteLine($"|-3.5|  = {Math.Abs(-3.5)}");
 `,
   },
   {
-    cat: "Collections", icon: "🗂️", color: "#34d399", name: "System.Collections.Generic", ver: ".NET 9",
+    cat: "Collections", icon: "🗂️", color: "#34d399", name: "System.Collections.Generic", ver: `.NET ${DOTNET_VERSION.split(".")[0]}`,
     desc: "List<T>, Dictionary<TKey, TValue>, HashSet<T>, Queue<T>.",
     example: `using System;
 using System.Collections.Generic;
@@ -246,7 +218,7 @@ foreach (var (name, age) in ages) {
 `,
   },
   {
-    cat: "Collections", icon: "🌊", color: "#34d399", name: "System.Linq", ver: ".NET 9",
+    cat: "Collections", icon: "🌊", color: "#34d399", name: "System.Linq", ver: `.NET ${DOTNET_VERSION.split(".")[0]}`,
     desc: "Where, Select, GroupBy, OrderBy and other LINQ operators.",
     example: `using System;
 using System.Linq;
@@ -260,8 +232,10 @@ Console.WriteLine("avg: "   + numbers.Average());
 `,
   },
   {
-    cat: "Async", icon: "⚡", color: "#a78bfa", name: "System.Threading.Tasks", ver: ".NET 9",
-    desc: "Task, Task<T>, Task.WhenAll, async / await primitives.",
+    cat: "Async", icon: "⚡", color: "#a78bfa", name: "System.Threading.Tasks", ver: `.NET ${DOTNET_VERSION.split(".")[0]}`,
+    desc:
+      "Task, Task<T>, Task.WhenAll, async / await primitives. Single-threaded: " +
+      "continuations run on the same thread and there is no parallelism.",
     example: `using System;
 using System.Threading.Tasks;
 
@@ -275,7 +249,7 @@ Console.WriteLine("squares: " + string.Join(", ", results));
 `,
   },
   {
-    cat: "I/O", icon: "📁", color: "#facc15", name: "System.IO", ver: ".NET 9",
+    cat: "I/O", icon: "📁", color: "#facc15", name: "System.IO", ver: `.NET ${DOTNET_VERSION.split(".")[0]}`,
     desc: "Stream, MemoryStream, StringReader/Writer (no disk access).",
     example: `using System;
 using System.IO;
@@ -291,7 +265,7 @@ Console.WriteLine(r.ReadToEnd());
 `,
   },
   {
-    cat: "Text", icon: "🔤", color: "#fb923c", name: "System.Text", ver: ".NET 9",
+    cat: "Text", icon: "🔤", color: "#fb923c", name: "System.Text", ver: `.NET ${DOTNET_VERSION.split(".")[0]}`,
     desc: "StringBuilder, Encoding, Rune utilities.",
     example: `using System;
 using System.Text;
@@ -305,7 +279,7 @@ Console.WriteLine($"utf-8 bytes: {bytes.Length}");
 `,
   },
   {
-    cat: "Text", icon: "🔍", color: "#fb923c", name: "System.Text.RegularExpressions", ver: ".NET 9",
+    cat: "Text", icon: "🔍", color: "#fb923c", name: "System.Text.RegularExpressions", ver: `.NET ${DOTNET_VERSION.split(".")[0]}`,
     desc: "Regex, Match, MatchCollection.",
     example: `using System;
 using System.Text.RegularExpressions;
@@ -317,7 +291,7 @@ foreach (Match m in Regex.Matches(input, @"\\d+")) {
 `,
   },
   {
-    cat: "Text", icon: "📝", color: "#fb923c", name: "System.Text.Json", ver: ".NET 9",
+    cat: "Text", icon: "📝", color: "#fb923c", name: "System.Text.Json", ver: `.NET ${DOTNET_VERSION.split(".")[0]}`,
     desc: "JsonSerializer, JsonDocument, JsonNode.",
     example: `using System;
 using System.Text.Json;
@@ -329,7 +303,7 @@ Console.WriteLine(json);
 `,
   },
   {
-    cat: "Math", icon: "🎲", color: "#60a5fa", name: "System.Numerics", ver: ".NET 9",
+    cat: "Math", icon: "🎲", color: "#60a5fa", name: "System.Numerics", ver: `.NET ${DOTNET_VERSION.split(".")[0]}`,
     desc: "BigInteger, Complex, Vector<T>.",
     example: `using System;
 using System.Numerics;
@@ -343,7 +317,22 @@ Console.WriteLine($"|3+4i| = {c.Magnitude}");
 `,
   },
   {
-    cat: "Time", icon: "📅", color: "#60a5fa", name: "System.Diagnostics", ver: ".NET 9",
+    cat: "Text", icon: "🌍", color: "#fb923c", name: "System.Globalization", ver: `.NET ${DOTNET_VERSION.split(".")[0]}`,
+    desc:
+      "CultureInfo and friends, but this build is InvariantGlobalization: " +
+      "only the invariant culture exists, and any other one throws.",
+    example: `using System;
+using System.Globalization;
+
+// The invariant culture is the only one this runtime has.
+Console.WriteLine($"current culture = '{CultureInfo.CurrentCulture.Name}'");
+Console.WriteLine(1234.56.ToString("N2", CultureInfo.InvariantCulture));
+
+// new CultureInfo("de-DE") would throw here.
+`,
+  },
+  {
+    cat: "Diagnostics", icon: "⏱️", color: "#60a5fa", name: "System.Diagnostics", ver: `.NET ${DOTNET_VERSION.split(".")[0]}`,
     desc: "Stopwatch and other diagnostics helpers.",
     example: `using System;
 using System.Diagnostics;
@@ -357,41 +346,151 @@ Console.WriteLine($"sum = {sum} ({sw.Elapsed.TotalMilliseconds:F2} ms)");
   },
 ];
 
-/** Strip leading `using` directives so the body can be appended after the
- *  entry file without Roslyn's "A using clause must precede all other
- *  elements" error. Only top-of-file directives are stripped; later ones
- *  are intentionally left in place. */
-function stripCSharpUsings(source: string): { usings: string[]; body: string } {
-  const lines = source.split("\n");
-  const usings: string[] = [];
-  let i = 0;
-  while (i < lines.length) {
-    const trimmed = lines[i].trim();
-    const isUsing =
-      // Matches: using Ns;  using static Ns.T;  using A = Ns;  global using Ns;
-      /^(?:global\s+)?using(?:\s+static)?\s/.test(trimmed) && trimmed.endsWith(";");
-    if (trimmed === "" || trimmed.startsWith("//") || isUsing) {
-      if (isUsing) usings.push(trimmed);
-      i++;
-    } else {
-      break;
-    }
-  }
-  return { usings, body: lines.slice(i).join("\n") };
+/**
+ * How long a run may take before the host stops it.
+ *
+ * .NET holds the browser's main thread while the program executes, so this
+ * timer can only fire while the program is *waiting* — on the compiler's
+ * downloads, or on anything it awaits. A program spinning in a tight loop
+ * holds the thread and the timer with it; that one needs the runtime moved
+ * into a worker, which is not something this host supports today.
+ */
+const RUN_TIMEOUT_MS = 30_000;
+
+/** Workspace-relative path reduced to its filename. */
+function basename(path: string): string {
+  return path.includes("/") ? path.split("/").pop()! : path;
+}
+
+/** What the injected handler parked, and a clean slate for the next run. */
+function takeStashedException(): string | null {
+  if (typeof globalThis === "undefined") return null;
+  const store = globalThis as Record<string, unknown>;
+  const value = store[LAST_EXCEPTION_KEY];
+  delete store[LAST_EXCEPTION_KEY];
+  return typeof value === "string" ? value : null;
 }
 
 class CSharpRuntime implements LanguageRuntime {
-  /** Staged workspace .cs files; every non-entry file is appended after
-   *  the entry code. */
-  private stagedFiles: Map<string, Uint8Array> = new Map();
+  /** Staged workspace `.cs` files, as text. */
+  private stagedFiles = new Map<string, string>();
+  /** Contents of `stdin.txt`, when the workspace has one. */
+  private stdin: string | null = null;
+  /** Rejects the run in flight, for Stop and for the timeout. */
+  private abortActiveRun: ((err: Error) => void) | null = null;
+  /** The script the host is still executing, if any. A second overlapping
+   *  `RunScript` would fight the first over `Console.SetOut`. */
+  private inFlight: Promise<unknown> | null = null;
 
   constructor(private api: DotnetApi) {}
 
   async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
     this.stagedFiles = new Map();
+    this.stdin = null;
+    const decoder = new TextDecoder();
     for (const [path, bytes] of files) {
+      if (basename(path) === STDIN_FILENAME) {
+        this.stdin = decoder.decode(bytes);
+        continue;
+      }
       if (!path.endsWith(".cs")) continue;
-      this.stagedFiles.set(path, bytes);
+      this.stagedFiles.set(path, decoder.decode(bytes));
+    }
+  }
+
+  /**
+   * Stop the running program.
+   *
+   * The host offers no way to interrupt a script once it is executing, so
+   * this disowns the run rather than killing it: the `run()` promise
+   * rejects and the playground comes back, while the abandoned script
+   * finishes into a result nobody reads. The next run waits for it, since
+   * two scripts at once would fight over the captured console.
+   */
+  async cancelRun(): Promise<void> {
+    const abort = this.abortActiveRun;
+    this.abortActiveRun = null;
+    if (!abort) return;
+    const err = new Error("Run stopped.");
+    err.name = "RunCancelledError";
+    abort(err);
+  }
+
+  /** One `RunScript`, with the Stop hook and the wall-clock cap around it. */
+  private async execute(
+    source: string,
+    emit: EmitOutput,
+    options?: RunOptions,
+  ): Promise<CSharpScriptResult> {
+    if (this.inFlight) await this.inFlight.catch(() => {});
+    // The compiler downloads a reference assembly per loaded assembly the
+    // first time it runs, and that used to be an empty output pane and a
+    // spinner for minutes with no way to tell it from a hang. The wait is
+    // the same length; the difference is that it now says what it is.
+    if (!this.api.isWarm()) {
+      options?.onStatus?.("Preparing the C# compiler…", true);
+      await this.api.whenWarm((message) => options?.onStatus?.(message, true));
+    }
+
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const guard = new Promise<never>((_resolve, reject) => {
+      this.abortActiveRun = reject;
+      // Skipped until the compiler is warm: when the boot warm-up could
+      // not run, the first compile still has the whole class library to
+      // fetch and capping that would abort a run that was working.
+      if (!this.api.isWarm()) return;
+      timer = setTimeout(() => {
+        const seconds = Math.round(RUN_TIMEOUT_MS / 1000);
+        emit({
+          type: "stderr",
+          content:
+            `Stopped after ${seconds}s: the program was still running. ` +
+            "A loop that never ends holds the browser's main thread, so this " +
+            "only fires while the program is waiting.",
+        });
+        void this.cancelRun();
+      }, RUN_TIMEOUT_MS);
+    });
+
+    const running = this.api.runScript(source);
+    this.inFlight = running;
+    // A disowned run must not raise an unhandled rejection later, and the
+    // next one must not start until it has actually finished.
+    void running
+      .catch(() => {})
+      .finally(() => {
+        if (this.inFlight === running) this.inFlight = null;
+      });
+    try {
+      return await Promise.race([running, guard]);
+    } finally {
+      if (timer !== undefined) clearTimeout(timer);
+      this.abortActiveRun = null;
+    }
+  }
+
+  /** One attempt at a run, with the two non-result outcomes named. */
+  private async attempt(
+    source: string,
+    emit: EmitOutput,
+    options?: RunOptions,
+  ): Promise<
+    | { kind: "result"; result: CSharpScriptResult }
+    | { kind: "exit"; exitCode: number }
+    | { kind: "failed"; message: string }
+  > {
+    try {
+      return {
+        kind: "result",
+        result: await this.execute(source, emit, options),
+      };
+    } catch (err) {
+      // A Stop is the surface's to render, not ours.
+      if (err instanceof Error && err.name === "RunCancelledError") throw err;
+      const { message, exitCode } = describeThrown(err);
+      return exitCode !== undefined
+        ? { kind: "exit", exitCode }
+        : { kind: "failed", message };
     }
   }
 
@@ -400,52 +499,79 @@ class CSharpRuntime implements LanguageRuntime {
     emit: EmitOutput,
     options?: RunOptions,
   ): Promise<void> {
-    // Append extra .cs files' bodies after the entry code (safe: C#
-    // resolves class references across the whole compilation unit), with
-    // their using directives stripped to satisfy Roslyn's ordering rule.
-    const entry = options?.entryFilename ?? "Program.cs";
-    const decoder = new TextDecoder();
-    const extraBodies: string[] = [];
-    const extraUsings: string[] = [];
-    for (const [path, bytes] of this.stagedFiles) {
-      // The entry file's content already arrives via `code`.
-      if (path === entry) continue;
-      const { usings, body } = stripCSharpUsings(decoder.decode(bytes));
-      extraUsings.push(...usings);
-      if (body.trim()) extraBodies.push(body);
-    }
-    let combined = code;
-    if (extraBodies.length > 0) {
-      // Sibling `using` directives must be HOISTED, not discarded —
-      // dropping them makes unresolved types fail silently (exit code 0,
-      // empty stderr).
-      const hoisted = [...new Set(extraUsings)].filter((u) => !code.includes(u));
-      combined =
-        (hoisted.length > 0 ? `${hoisted.join("\n")}\n` : "") +
-        code +
-        "\n" +
-        extraBodies.join("\n");
+    const entryFilename = options?.entryFilename ?? "Program.cs";
+    const files: Array<[string, string]> = [...this.stagedFiles];
+    // The prelude is statements, so only a program made of top-level
+    // statements has a place to put it.
+    const instrument = hasCSharpTopLevel(code);
+
+    const compose = (withPrelude: boolean) =>
+      composeProgram({
+        entryFilename,
+        entryCode: code,
+        files,
+        stdin: this.stdin,
+        instrument: withPrelude,
+      });
+
+    takeStashedException();
+    let composed = compose(instrument);
+    let attempt = await this.attempt(composed.source, emit, options);
+
+    // A compile error that names none of the reader's files can only have
+    // come from the prelude, so try again without it rather than show a
+    // diagnostic about code they never wrote.
+    if (
+      instrument &&
+      attempt.kind === "result" &&
+      attempt.result.exitCode !== 0 &&
+      looksLikeDiagnostics(attempt.result.stderr) &&
+      !allDiagnosticsMapped(
+        parseDiagnostics(attempt.result.stderr),
+        composed.sources,
+      )
+    ) {
+      composed = compose(false);
+      attempt = await this.attempt(composed.source, emit, options);
     }
 
-    let result;
-    try {
-      result = await this.api.runScript(combined);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      emit({ type: "stderr", content: message });
+    if (attempt.kind === "exit") {
+      this.reportExit(attempt.exitCode, emit);
       return;
     }
+    if (attempt.kind === "failed") {
+      emit({ type: "stderr", content: attempt.message });
+      return;
+    }
+    const result = attempt.result;
 
     const stdout = result.stdout.replace(/\n+$/, "");
-    const stderr = result.stderr.replace(/\n+$/, "");
     if (stdout) emit({ type: "stdout", content: stdout });
-    if (stderr) emit({ type: "stderr", content: stderr });
-    if (result.exitCode !== 0 && !stderr) {
+
+    const stderr = result.stderr.replace(/\n+$/, "");
+    if (stderr) {
       emit({
         type: "stderr",
-        content: `Script exited with code ${result.exitCode}.`,
+        content: looksLikeDiagnostics(stderr)
+          ? renderDiagnostics(parseDiagnostics(stderr), composed.sources)
+          : formatUncaught(stderr, takeStashedException()),
+      });
+    } else if (result.exitCode !== 0) {
+      emit({
+        type: "stderr",
+        content: `Program exited with code ${result.exitCode}.`,
       });
     }
+  }
+
+  /** `Environment.Exit` tore the runtime down mid-run: say what the exit
+   *  code was, and why the output the program produced is not above. */
+  private reportExit(exitCode: number, emit: EmitOutput): void {
+    emit({
+      type: exitCode === 0 ? "log" : "stderr",
+      content: `Program exited with code ${exitCode}.`,
+    });
+    emit({ type: "log", content: EXIT_OUTPUT_NOTE });
   }
 }
 
@@ -454,14 +580,17 @@ export const csharpAdapter: LanguageAdapter = {
   displayName: "C# Playground",
   logoText: "C#",
   documentTitle: "C# Playground",
-  readyStatus: "C# ready",
+  readyStatus: `C# ${CSHARP_VERSION} ready`,
   runtimeInfo: {
     language: "C#",
-    version: "13",
-    engine: "Roslyn (CSharpScript) on Mono / .NET WebAssembly",
+    // Kept a plain literal so `playgroundVersions.test.ts` can read it out
+    // of the source; `csharpBuild.test.ts` ties it to DOTNET_VERSION and
+    // to what the runtime reports about itself.
+    version: "14 (.NET 10.0.7)",
+    engine: "Roslyn on Mono / .NET WebAssembly",
     engineUrl: "https://learn.microsoft.com/dotnet/core/wasm/",
     notes:
-      "Your C# is compiled in your browser by Roslyn (Microsoft.CodeAnalysis.CSharp.Scripting) and the resulting IL is executed by the .NET runtime compiled to WebAssembly, no server roundtrip. Top-level statements and `using` directives are accepted directly (the same surface as `dotnet-script`).",
+      "Your C# is compiled in your browser by Roslyn (Microsoft.CodeAnalysis.CSharp) and the resulting IL is executed by the .NET runtime compiled to WebAssembly, no server roundtrip. Top-level statements and `using` directives are accepted directly (the same surface as `dotnet-script`).\n\nFirst load downloads the runtime and then the class library the compiler references, which is slow and happens once per browser; every run after that compiles and executes in a fraction of a second.\n\nFor standard input, add a file named `stdin.txt` to the workspace and `Console.ReadLine` reads from it. Without one, a read returns null at end of input. There is no way to pass command-line arguments.\n\nThe build is `InvariantGlobalization`, which is what keeps the download to a size worth waiting for: only the invariant culture exists, so `new CultureInfo(\"de-DE\")` throws and culture-specific number, currency and date formatting are unavailable. It is also single-threaded and 32-bit: `Task` and `async`/`await` work, but continuations run on the same thread, `Environment.ProcessorCount` is 1 and there is no parallelism.\n\nTwo things to know about a run. .NET holds the browser's main thread while your program executes, so a loop that never ends freezes the tab; Stop and the 30-second cap can only end a program that is waiting. And `Console.Error` is collected separately from `Console.Out` and printed after it, rather than interleaved where it happened.",
   },
   // CodeMirror's clike mode handles C#. `text/x-csharp` is the
   // standard MIME alias for C# inside that mode.
