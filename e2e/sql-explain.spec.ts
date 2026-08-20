@@ -61,6 +61,23 @@ for (const { id, route } of ENGINES) {
     await expect(plan).not.toHaveText("(no plan returned)");
     await expect(plan).toContainText("widgets");
 
+    // Whatever the engine draws with, the plan is rendered in characters the
+    // site's monospace face actually has. DuckDB returns a box-drawing tree,
+    // and those glyphs come from a wider fallback font, which sheared the
+    // drawing away from the labels it frames; they are redrawn in ASCII.
+    const planText = (await plan.textContent()) ?? "";
+    expect(planText).not.toMatch(/[\u2500-\u257f]/);
+
+    // Every line of a drawn tree is the same width — the borders line up.
+    // Only rows framed on both sides count, so SQLite's `|--SCAN t` detail
+    // lines aren't mistaken for box art.
+    const drawn = planText
+      .split("\n")
+      .filter((line) => /^[+|].*[+|]$/.test(line));
+    if (drawn.length > 1) {
+      expect(new Set(drawn.map((line) => line.length)).size).toBe(1);
+    }
+
     // Closes cleanly (the footer's primary "Close" button).
     await dlg.locator("button.confirm-btn-primary").click();
     await expect(dlg).toHaveCount(0);

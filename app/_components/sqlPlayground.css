@@ -5219,9 +5219,14 @@ html[data-playground-theme="dark"] .sql-result-th-type {
 }
 
 .sql-explain-plan {
-  font-family: var(--font-mono);
+  font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 12.5px;
-  line-height: 1.5;
+  /* Tighter than the dialogs' usual 1.5: DuckDB draws its plan as a tree of
+     boxes, and the taller the line box the bigger the gap between one row's
+     `|` and the next, which turns the sides of every node into a dashed
+     line. Still comfortable for the flat text plans SQLite and Postgres
+     return. */
+  line-height: 1.25;
   color: var(--text);
   background: var(--bg);
   border-top: 1px solid var(--border);
