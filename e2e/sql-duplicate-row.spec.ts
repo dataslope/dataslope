@@ -80,6 +80,11 @@ for (const { id, route } of ENGINES) {
     await expect(
       dialog.getByRole("radio", { name: /Next available number/ }),
     ).toBeChecked();
+    // A sole primary key and a single-column UNIQUE can never keep their
+    // values, so "Keep original" must not be offered here at all.
+    await expect(
+      dialog.getByRole("radio", { name: "Keep original" }),
+    ).toHaveCount(0);
     await page
       .getByLabel("Custom value for email")
       .fill("ada+copy@example.com");
@@ -98,28 +103,47 @@ for (const { id, route } of ENGINES) {
     ).toHaveText("ada+copy@example.com");
   });
 
-  test(`${id}: the dialog refuses a plan that changes nothing`, async ({
+  test(`${id}: a composite key offers keep, but not for every member at once`, async ({
     page,
   }) => {
     test.setTimeout(180_000);
     await page.goto(route);
     await page.locator(".cm-content").waitFor({ timeout: 150_000 });
 
-    await runSql(page, CONFLICTING);
-    await runSql(page, "SELECT * FROM zz_dup_conflict;");
-    (await openRowMenu(page)).click();
+    await runSql(
+      page,
+      [
+        "DROP TABLE IF EXISTS zz_dup_pair;",
+        "CREATE TABLE zz_dup_pair (a INT, b INT, note TEXT, PRIMARY KEY (a, b));",
+        "INSERT INTO zz_dup_pair VALUES (1, 2, 'Ada');",
+      ].join("\n"),
+    );
+    await runSql(page, "SELECT * FROM zz_dup_pair;");
+    await (await openRowMenu(page)).click();
 
     const dialog = page.locator(".sql-duplicate-popup");
     await expect(dialog).toBeVisible();
-    for (const col of ["id", "email"]) {
+    // Both members are asked about, and both may keep their value — one
+    // member changing is enough to make the pair fresh.
+    await expect(
+      dialog.getByRole("radio", { name: "Keep original" }),
+    ).toHaveCount(2);
+    // ...but keeping EVERY member reproduces the copied key, so that plan
+    // stays blocked.
+    for (const col of ["a", "b"]) {
       await page.locator(`input[name="sql-duplicate-${col}"]`).last().check();
     }
     await expect(
       dialog.getByRole("button", { name: "Duplicate row" }),
     ).toBeDisabled();
     await expect(dialog.locator(".sql-duplicate-warning")).toContainText(
-      "At least one column has to change",
+      "At least one key column has to change",
     );
+    // Moving one member back to the generated number unblocks it.
+    await page.locator('input[name="sql-duplicate-a"]').first().check();
+    await expect(
+      dialog.getByRole("button", { name: "Duplicate row" }),
+    ).toBeEnabled();
   });
 }
 

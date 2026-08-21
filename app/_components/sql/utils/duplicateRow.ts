@@ -57,8 +57,9 @@ export function isNumericColumnType(type: string | undefined): boolean {
 export type DuplicateAutoKind = "next-number" | "uuid";
 
 /** What the user picked for one conflicting column. `keep` copies the
- *  original value through, which is only ever legal when some *other*
- *  column of the same key changes (composite primary keys). */
+ *  original value through; it is only offered on composite-primary-key
+ *  members ({@link DuplicateColumnChoice.canKeep}), where changing one
+ *  member is enough to make the whole key fresh. */
 export type DuplicateStrategy = "auto" | "custom" | "null" | "keep";
 
 /** One column that stops the row being copied as-is. */
@@ -76,6 +77,12 @@ export interface DuplicateColumnChoice {
   /** NULLs compare as distinct in a unique index, so clearing a nullable
    *  UNIQUE column is a legal way out. Never true for a primary key. */
   canBeNull: boolean;
+  /** "Keep original" is legal only where changing a *different* column can
+   *  satisfy this one's constraint: a composite-primary-key member with no
+   *  unique constraint of its own. A sole-member key, or any single-column
+   *  UNIQUE, must always change — offering keep there just promises a
+   *  constraint violation. */
+  canKeep: boolean;
 }
 
 /** The engine-facing half of the user's answers. Columns the user chose to
@@ -101,11 +108,17 @@ export function isSqliteRowidAlias(col: {
   singleColumnPk: boolean;
   /** True for a `WITHOUT ROWID` table, which has no rowid to alias. */
   withoutRowid: boolean;
+  /** True when `PRAGMA index_list` shows an origin-'pk' index. A rowid alias
+   *  needs no index at all, so the presence of one is the tell for the
+   *  non-alias forms — most notably `INTEGER PRIMARY KEY DESC`, which SQLite
+   *  deliberately does NOT treat as the rowid. */
+  hasPkIndex: boolean;
 }): boolean {
   return (
     col.pk === 1 &&
     col.singleColumnPk &&
     !col.withoutRowid &&
+    !col.hasPkIndex &&
     /^integer$/i.test(col.type.trim())
   );
 }
@@ -119,16 +132,21 @@ export function isAutoPopulated(info: ColumnConstraintInfo): boolean {
 }
 
 /** The column/value pairs an INSERT that copies `rowValues` should carry.
- *  Columns the database re-populates on its own (a rowid alias, a serial or
- *  IDENTITY column, a UUID default) are dropped so it mints fresh values for
- *  them instead of colliding on the copied ones. */
+ *  Auto-populated columns under a unique constraint (a rowid alias, a serial
+ *  or IDENTITY key, a UUID-default key) are dropped so the database mints
+ *  fresh values for them instead of colliding on the copied ones. An
+ *  auto-populated column that is NOT unique (say, a `uuid()`-default trace
+ *  column) is copied verbatim: nothing can collide, and a duplicate should
+ *  reproduce the row wherever it legally can. */
 export function duplicateInsertColumns(
   columns: readonly string[],
   rowValues: readonly unknown[],
   constraintInfo: readonly ColumnConstraintInfo[] | undefined,
 ): { names: string[]; values: unknown[] } {
   const autoNames = new Set(
-    (constraintInfo ?? []).filter(isAutoPopulated).map((c) => c.name),
+    (constraintInfo ?? [])
+      .filter((c) => (c.isPrimaryKey || c.isUnique) && isAutoPopulated(c))
+      .map((c) => c.name),
   );
   const names: string[] = [];
   const values: unknown[] = [];
@@ -153,11 +171,18 @@ export function conflictingDuplicateColumns(
 ): DuplicateColumnChoice[] {
   if (!constraintInfo || constraintInfo.length === 0) return [];
   const byName = new Map(constraintInfo.map((c) => [c.name, c]));
+  // A composite key with an auto-populated member is already fresh: the
+  // database re-mints that member, so the *pair* can't collide and the other
+  // members only conflict through unique constraints of their own.
+  const pkAuto = constraintInfo.some(
+    (c) => c.isPrimaryKey && isAutoPopulated(c),
+  );
   const out: DuplicateColumnChoice[] = [];
   columns.forEach((name, i) => {
     const info = byName.get(name);
     if (!info) return;
-    if (!info.isPrimaryKey && !info.isUnique) return;
+    const pkConflict = info.isPrimaryKey && !pkAuto;
+    if (!pkConflict && !info.isUnique) return;
     if (isAutoPopulated(info)) return;
     const value = values[i];
     const canBeNull = !info.isPrimaryKey && info.notNull !== true;
@@ -171,8 +196,16 @@ export function conflictingDuplicateColumns(
       originalValue: value,
       autoKind: autoKindFor(type, value),
       canBeNull,
+      canKeep: false,
     });
   });
+  // Keep is only sound for pure composite-PK members: with two or more of
+  // them in play, changing one frees the rest to stay. A member that also
+  // carries its own UNIQUE constraint must change regardless.
+  const pureKeyMembers = out.filter((c) => c.isPrimaryKey && !c.isUnique);
+  if (pureKeyMembers.length >= 2) {
+    for (const member of pureKeyMembers) member.canKeep = true;
+  }
   return out;
 }
 
@@ -249,28 +282,32 @@ export function newUuid(): string {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
-/** A plan is only insertable once at least one conflicting column changes —
- *  otherwise the INSERT reproduces the row it was copied from and trips the
- *  same constraint. Composite keys need exactly one member to move, which is
- *  why "keep" is offered per column rather than forbidden outright. */
+/** A plan is insertable once every constraint in it is satisfiable: every
+ *  custom input is filled, "keep" appears only where it is legal
+ *  ({@link DuplicateColumnChoice.canKeep}), and — where a composite key
+ *  offers keep at all — at least one of its members actually changes,
+ *  otherwise the INSERT reproduces the key it was copied from. */
 export function isDuplicatePlanComplete(
   choices: readonly DuplicateColumnChoice[],
   strategies: Readonly<Record<string, DuplicateStrategy>>,
   customText: Readonly<Record<string, string>>,
 ): boolean {
-  if (choices.length === 0) return true;
-  let changed = 0;
+  const keepOffered = choices.some((c) => c.canKeep);
+  let keyChanged = false;
   for (const choice of choices) {
     const strategy = strategies[choice.name] ?? defaultDuplicateStrategy(choice);
-    if (strategy === "keep") continue;
+    if (strategy === "keep") {
+      if (!choice.canKeep) return false;
+      continue;
+    }
     // An empty input is not "set it to NULL" — "Set to NULL" is its own
     // option, and it isn't offered where NULL is illegal.
     if (strategy === "custom" && (customText[choice.name] ?? "") === "") {
       return false;
     }
-    changed++;
+    if (choice.canKeep) keyChanged = true;
   }
-  return changed > 0;
+  return !keepOffered || keyChanged;
 }
 
 /** Fold the dialog's answers into the plan the playground executes.
@@ -318,7 +355,12 @@ function coerceCustomValue(
   const trimmed = raw.trim();
   if (trimmed === "") return raw;
   const n = Number(trimmed);
-  return Number.isFinite(n) ? n : raw;
+  if (!Number.isFinite(n)) return raw;
+  // An integer past 2^53 would silently round through Number; bind the text
+  // instead — every engine parses a decimal string into its own integer type
+  // (mirrors incrementMaxValue's string fallback).
+  if (/^-?\d+$/.test(trimmed) && !Number.isSafeInteger(n)) return trimmed;
+  return n;
 }
 
 /** Apply a plan to the column/value arrays an INSERT is about to bind.
@@ -370,8 +412,13 @@ export function constraintInfoFromColumns(
   });
 }
 
+/** Sequence-style defaults: `nextval(...)`, plus the `GENERATED ...` text
+ *  some DuckDB builds report as an identity column's default. */
 function defaultGeneratesSequence(
   defaultValue: string | null | undefined,
 ): boolean {
-  return !!defaultValue && /\bnextval\s*\(/i.test(defaultValue);
+  return (
+    !!defaultValue &&
+    (/\bnextval\s*\(/i.test(defaultValue) || /^GENERATED\b/i.test(defaultValue))
+  );
 }

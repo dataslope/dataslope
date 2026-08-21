@@ -69,8 +69,12 @@ export function DuplicateRowDialog({
   // another row never shows the previous row's answers.
   if (request !== seed) {
     setSeed(request);
-    const nextStrategies: Record<string, DuplicateStrategy> = {};
-    const nextText: Record<string, string> = {};
+    // Null-prototype seeds: a column literally named "__proto__" would
+    // otherwise vanish into the prototype setter here. The spreads in the
+    // update paths use computed keys, which always define own properties.
+    const nextStrategies: Record<string, DuplicateStrategy> =
+      Object.create(null);
+    const nextText: Record<string, string> = Object.create(null);
     for (const choice of request?.choices ?? []) {
       nextStrategies[choice.name] = defaultDuplicateStrategy(choice);
       // No UUID is minted here: `newUuid()` is random, and render stays pure.
@@ -209,20 +213,22 @@ export function DuplicateRowDialog({
                         </span>
                       </label>
                     )}
-                    <label className="sql-duplicate-option">
-                      <input
-                        type="radio"
-                        name={radioName}
-                        checked={strategy === "keep"}
-                        onChange={() => selectStrategy(choice, "keep")}
-                      />
-                      <span className="sql-duplicate-option-text">
-                        <span>Keep original</span>
-                        <span className="sql-duplicate-option-hint">
-                          Only works if another column changes
+                    {choice.canKeep && (
+                      <label className="sql-duplicate-option">
+                        <input
+                          type="radio"
+                          name={radioName}
+                          checked={strategy === "keep"}
+                          onChange={() => selectStrategy(choice, "keep")}
+                        />
+                        <span className="sql-duplicate-option-text">
+                          <span>Keep original</span>
+                          <span className="sql-duplicate-option-hint">
+                            Only works if another key column changes
+                          </span>
                         </span>
-                      </span>
-                    </label>
+                      </label>
+                    )}
                   </div>
                   {strategy === "custom" && (
                     <input
@@ -245,12 +251,13 @@ export function DuplicateRowDialog({
           </div>
           {!complete && (
             <p className="confirm-desc sql-duplicate-warning">
-              {choices.every(
+              {choices.some(
                 (c) =>
-                  (strategies[c.name] ?? defaultDuplicateStrategy(c)) === "keep",
+                  (strategies[c.name] ?? defaultDuplicateStrategy(c)) ===
+                    "custom" && !(customText[c.name] ?? ""),
               )
-                ? "At least one column has to change, or the copy collides with the row it came from."
-                : "Fill in every custom value, or pick another option for it."}
+                ? "Fill in every custom value, or pick another option for it."
+                : "At least one key column has to change, or the copy collides with the row it came from."}
             </p>
           )}
           <div className="confirm-actions">

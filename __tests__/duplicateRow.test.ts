@@ -95,6 +95,7 @@ describe("isSqliteRowidAlias", () => {
     pk: 1,
     singleColumnPk: true,
     withoutRowid: false,
+    hasPkIndex: false,
   };
 
   it("accepts a sole INTEGER PRIMARY KEY, in any case", () => {
@@ -117,6 +118,12 @@ describe("isSqliteRowidAlias", () => {
 
   it("rejects a non-key column", () => {
     expect(isSqliteRowidAlias({ ...alias, pk: 0 })).toBe(false);
+  });
+
+  it("rejects a key that needed a real index (INTEGER PRIMARY KEY DESC)", () => {
+    // SQLite deliberately does not alias `INTEGER PRIMARY KEY DESC` to the
+    // rowid; the origin-'pk' autoindex it creates is the tell.
+    expect(isSqliteRowidAlias({ ...alias, hasPkIndex: true })).toBe(false);
   });
 });
 
@@ -154,6 +161,18 @@ describe("duplicateInsertColumns", () => {
       names: ["a", "b"],
       values: [1, 2],
     });
+  });
+
+  it("copies a NON-unique generated-default column instead of regenerating it", () => {
+    // e.g. `trace VARCHAR DEFAULT uuid()`: nothing can collide, so a
+    // faithful duplicate carries the value through.
+    const info = [
+      constraint({ name: "id", isPrimaryKey: true, autoPopulated: true }),
+      constraint({ name: "trace", defaultValue: "uuid()" }),
+    ];
+    expect(
+      duplicateInsertColumns(["id", "trace"], [7, "abc"], info),
+    ).toEqual({ names: ["trace"], values: ["abc"] });
   });
 });
 
@@ -220,7 +239,7 @@ describe("conflictingDuplicateColumns", () => {
     expect(conflictingDuplicateColumns(["email"], [null], info)).toHaveLength(1);
   });
 
-  it("reports every member of a composite primary key", () => {
+  it("reports every member of a composite primary key, all keepable", () => {
     const info = [
       constraint({ name: "order_id", isPrimaryKey: true, type: "INT" }),
       constraint({ name: "product_id", isPrimaryKey: true, type: "INT" }),
@@ -232,6 +251,49 @@ describe("conflictingDuplicateColumns", () => {
       info,
     );
     expect(conflicts.map((c) => c.name)).toEqual(["order_id", "product_id"]);
+    // Composite: changing one member frees the other to keep its value.
+    expect(conflicts.map((c) => c.canKeep)).toEqual([true, true]);
+  });
+
+  it("never offers keep on a sole key or a single-column unique", () => {
+    const sole = conflictingDuplicateColumns(
+      ["id"],
+      [7],
+      [constraint({ name: "id", isPrimaryKey: true, type: "INT" })],
+    );
+    expect(sole[0].canKeep).toBe(false);
+    const unique = conflictingDuplicateColumns(
+      ["email"],
+      ["ada@example.com"],
+      [constraint({ name: "email", isUnique: true, type: "TEXT" })],
+    );
+    expect(unique[0].canKeep).toBe(false);
+  });
+
+  it("keeps a composite-key member with its own UNIQUE constraint unkeepable", () => {
+    const info = [
+      constraint({ name: "a", isPrimaryKey: true, type: "INT" }),
+      constraint({ name: "b", isPrimaryKey: true, isUnique: true, type: "INT" }),
+    ];
+    const conflicts = conflictingDuplicateColumns(["a", "b"], [1, 2], info);
+    // b's own unique constraint must change no matter what a does — and with
+    // only one pure key member left, a can't keep either.
+    expect(conflicts.map((c) => [c.name, c.canKeep])).toEqual([
+      ["a", false],
+      ["b", false],
+    ]);
+  });
+
+  it("skips the other members of a key whose auto member re-mints the pair", () => {
+    // PK (id serial, region): the database regenerates id, so the pair is
+    // fresh whatever region holds — nothing to ask about.
+    const info = [
+      constraint({ name: "id", isPrimaryKey: true, autoPopulated: true }),
+      constraint({ name: "region", isPrimaryKey: true, type: "TEXT" }),
+    ];
+    expect(
+      conflictingDuplicateColumns(["region"], ["eu"], info),
+    ).toEqual([]);
   });
 });
 
@@ -266,6 +328,7 @@ describe("suggestDuplicateText", () => {
     originalValue: 7,
     autoKind: "next-number",
     canBeNull: false,
+    canKeep: false,
   };
 
   it("suggests one past the copied number", () => {
@@ -302,9 +365,12 @@ describe("isDuplicatePlanComplete", () => {
     originalValue: "ada@example.com",
     autoKind: null,
     canBeNull: true,
+    canKeep: false,
   };
 
-  it("refuses a plan where every column keeps its value", () => {
+  it("refuses keep on a column where keep is not legal", () => {
+    // A single-column unique constraint can never keep its value: the copy
+    // would collide with the row it came from.
     expect(isDuplicatePlanComplete([choice], { email: "keep" }, {})).toBe(false);
   });
 
@@ -322,8 +388,19 @@ describe("isDuplicatePlanComplete", () => {
   });
 
   it("accepts a composite key where only one member moves", () => {
-    const a = { ...choice, name: "order_id", autoKind: "next-number" as const };
-    const b = { ...choice, name: "product_id" };
+    const a: DuplicateColumnChoice = {
+      ...choice,
+      name: "order_id",
+      isPrimaryKey: true,
+      isUnique: false,
+      autoKind: "next-number",
+      canKeep: true,
+    };
+    const b: DuplicateColumnChoice = {
+      ...a,
+      name: "product_id",
+      autoKind: null,
+    };
     expect(
       isDuplicatePlanComplete(
         [a, b],
@@ -331,6 +408,22 @@ describe("isDuplicatePlanComplete", () => {
         {},
       ),
     ).toBe(true);
+    // Keeping EVERY member reproduces the key it was copied from.
+    expect(
+      isDuplicatePlanComplete(
+        [a, b],
+        { order_id: "keep", product_id: "keep" },
+        {},
+      ),
+    ).toBe(false);
+    // A changed non-key column doesn't rescue an all-kept key.
+    expect(
+      isDuplicatePlanComplete(
+        [a, b, choice],
+        { order_id: "keep", product_id: "keep", email: "custom" },
+        { email: "x" },
+      ),
+    ).toBe(false);
   });
 });
 
@@ -343,6 +436,7 @@ describe("buildDuplicateRowPlan", () => {
     originalValue: 7,
     autoKind: "next-number",
     canBeNull: false,
+    canKeep: false,
   };
   const emailChoice: DuplicateColumnChoice = {
     name: "email",
@@ -352,6 +446,7 @@ describe("buildDuplicateRowPlan", () => {
     originalValue: "ada@example.com",
     autoKind: null,
     canBeNull: true,
+    canKeep: false,
   };
 
   it("routes an auto number to nextNumber and a typed value to overrides", () => {
@@ -375,6 +470,20 @@ describe("buildDuplicateRowPlan", () => {
       () => "unused",
     );
     expect(plan.overrides).toEqual([{ column: "id", value: 42 }]);
+  });
+
+  it("keeps an integer past 2^53 as text instead of rounding it", () => {
+    const plan = buildDuplicateRowPlan(
+      [{ ...idChoice, type: "BIGINT" }],
+      { id: "custom" },
+      { id: "9007199254740995" },
+      () => "unused",
+    );
+    // Number('9007199254740995') rounds to ...996; the engines all parse a
+    // decimal string into their own integer type, so bind the text.
+    expect(plan.overrides).toEqual([
+      { column: "id", value: "9007199254740995" },
+    ]);
   });
 
   it("mints one UUID per auto UUID column", () => {

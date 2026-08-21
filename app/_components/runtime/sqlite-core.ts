@@ -1459,8 +1459,11 @@ export async function createSqliteEngineInProcess(
         ddlStmt.finalize();
       }
       const hasAutoIncrement = /\bautoincrement\b/i.test(ddlText);
-      // origin = 'u' in index_list means an explicit UNIQUE clause.
+      // origin = 'u' in index_list means an explicit UNIQUE clause; an
+      // origin = 'pk' row means the primary key needed a real index, which a
+      // rowid alias never does (see isSqliteRowidAlias).
       const uniqueColNames = new Set<string>();
+      let hasPkIndex = false;
       const idxListResult = execAll(d, 
         `PRAGMA index_list(${quoteIdent(tableName)})`,
       );
@@ -1469,6 +1472,7 @@ export async function createSqliteEngineInProcess(
           // index_list columns: seq, name, unique, origin, partial
           const isUnique = Number(row[2]) === 1;
           const origin = String(row[3]);
+          if (origin === "pk") hasPkIndex = true;
           if (isUnique && origin === "u") {
             const idxName = String(row[1]);
             const idxInfoResult = execAll(d, 
@@ -1484,8 +1488,13 @@ export async function createSqliteEngineInProcess(
         }
       }
       // A WITHOUT ROWID table has no rowid to alias, so its INTEGER PRIMARY
-      // KEY is an ordinary column the INSERT must supply.
-      const withoutRowid = /\bwithout\s+rowid\b/i.test(ddlText);
+      // KEY is an ordinary column the INSERT must supply. The clause can only
+      // sit among the table options after the column list's closing paren
+      // (the last ')' in the statement), so only that tail is tested — a
+      // CHECK or string literal containing the phrase must not count.
+      const withoutRowid = /\bwithout\s+rowid\b/i.test(
+        ddlText.slice(ddlText.lastIndexOf(")") + 1),
+      );
       const singleColumnPk = cols.filter((col) => col.pk > 0).length === 1;
       return cols.map((c) => {
         // SQLite forbids AUTOINCREMENT on composite PKs, so require a
@@ -1501,6 +1510,7 @@ export async function createSqliteEngineInProcess(
           pk: c.pk,
           singleColumnPk,
           withoutRowid,
+          hasPkIndex,
         });
         return {
           name: c.name,

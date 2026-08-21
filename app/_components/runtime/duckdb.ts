@@ -18,7 +18,7 @@ import {
   type DuckDbSampleDatabase,
 } from "./duckdbSamples";
 import { datasetFileName, fetchDatasetBytes, fetchDatasetText } from "./remoteDatasets";
-import { defaultGeneratesUniqueValue } from "../sql/utils/duplicateRow";
+import { constraintInfoFromColumns } from "../sql/utils/duplicateRow";
 import {
   toDateOnlyString,
   toTimestampString,
@@ -1464,25 +1464,13 @@ export async function createDuckDbEngine(
     },
 
     async getColumnConstraintInfo(tableName, schema = "main") {
-      // `listColumns` already resolves the UNIQUE columns from
-      // duckdb_constraints, so this needs no query of its own.
-      const cols = await engine.listColumns(tableName, schema);
-      return cols.map((col) => {
-        const isAutoIncrement =
-          /nextval\(/i.test(col.defaultValue ?? "") ||
-          /^GENERATED\b/i.test(col.defaultValue ?? "");
-        return {
-          name: col.name,
-          isPrimaryKey: col.pk > 0,
-          isAutoIncrement,
-          isUnique: col.unique === true,
-          autoPopulated:
-            isAutoIncrement || defaultGeneratesUniqueValue(col.defaultValue),
-          type: col.type,
-          notNull: col.notNull,
-          defaultValue: col.defaultValue,
-        };
-      });
+      // `listColumns` already resolves PK and UNIQUE membership from
+      // duckdb_constraints, so the shared column→constraint mapping (also
+      // used by the playground's in-memory path) is all this needs — one
+      // implementation, no drift between the two.
+      return constraintInfoFromColumns(
+        await engine.listColumns(tableName, schema),
+      );
     },
 
     async createTable(name, columns) {
