@@ -22,6 +22,7 @@ import {
 } from "./postgresSamples";
 import { PGLITE_WORKER_CDN } from "./cdn";
 import { topoSortByForeignKeys } from "../sql/utils/exportOrder";
+import { defaultGeneratesUniqueValue } from "../sql/utils/duplicateRow";
 import { fetchDatasetText } from "./remoteDatasets";
 import {
   toDateOnlyString,
@@ -814,6 +815,7 @@ export async function createPostgresEngine(
         column_default: string | null;
         is_generated: string;
         generation_expression: string | null;
+        is_identity: string;
         udt_name: string;
         pk_position: number | null;
       }>(
@@ -827,6 +829,7 @@ export async function createPostgresEngine(
           c.column_default,
           c.is_generated,
           c.generation_expression,
+          c.is_identity,
           c.udt_name,
           kcu.ordinal_position AS pk_position
         FROM information_schema.columns c
@@ -915,6 +918,7 @@ export async function createPostgresEngine(
             ? (enumByType.get(row.udt_name) ?? null)
             : null,
         unique: uniqueColumns.has(row.column_name),
+        identity: row.is_identity === "YES",
       }));
     },
 
@@ -975,14 +979,24 @@ export async function createPostgresEngine(
         [tableName, schema],
       );
       const unique = new Set(uniqueRows.map((row) => row.column_name));
-      return cols.map((col) => ({
-        name: col.name,
-        isPrimaryKey: col.pk > 0,
-        isAutoIncrement: /^nextval\('([^']+)'::regclass\)$/i.test(
-          col.defaultValue ?? "",
-        ),
-        isUnique: unique.has(col.name),
-      }));
+      return cols.map((col) => {
+        // serial/bigserial columns carry a nextval() default; IDENTITY
+        // columns carry none but are assigned all the same.
+        const isAutoIncrement =
+          col.identity === true ||
+          /^nextval\('([^']+)'::regclass\)$/i.test(col.defaultValue ?? "");
+        return {
+          name: col.name,
+          isPrimaryKey: col.pk > 0,
+          isAutoIncrement,
+          isUnique: unique.has(col.name),
+          autoPopulated:
+            isAutoIncrement || defaultGeneratesUniqueValue(col.defaultValue),
+          type: col.type,
+          notNull: col.notNull,
+          defaultValue: col.defaultValue,
+        };
+      });
     },
 
     async createTable(name, columns, schema = "public") {

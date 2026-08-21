@@ -18,6 +18,7 @@ import {
   type DuckDbSampleDatabase,
 } from "./duckdbSamples";
 import { datasetFileName, fetchDatasetBytes, fetchDatasetText } from "./remoteDatasets";
+import { defaultGeneratesUniqueValue } from "../sql/utils/duplicateRow";
 import {
   toDateOnlyString,
   toTimestampString,
@@ -250,6 +251,25 @@ export function toDuckDbListLiteral(arr: readonly unknown[]): string {
     return `'${String(v).replace(/'/g, "''")}'`;
   };
   return `[${arr.map(elem).join(", ")}]`;
+}
+
+/** Normalise `duckdb_constraints().constraint_column_names` (VARCHAR[]),
+ *  which may arrive as a JS array, an Arrow Vector (iterable, but not
+ *  `Array.isArray`), or a stringified list with quoted elements. */
+export function parseConstraintColumnNames(value: unknown): string[] {
+  let raw: unknown[] = [];
+  if (Array.isArray(value)) raw = value;
+  else if (typeof value === "string")
+    raw = value.replace(/^\[|\]$/g, "").split(/,\s*/);
+  else if (
+    value != null &&
+    typeof (value as { [Symbol.iterator]?: unknown })[Symbol.iterator] ===
+      "function"
+  )
+    raw = Array.from(value as Iterable<unknown>);
+  return raw
+    .map((x) => String(x).trim().replace(/^["']|["']$/g, ""))
+    .filter(Boolean);
 }
 
 /** Parse the labels out of a DuckDB enum `data_type` string, e.g.
@@ -1366,34 +1386,24 @@ export async function createDuckDbEngine(
          WHERE schema_name = '${safeSch}' AND table_name = '${safe}'
          ORDER BY column_index`,
       );
-      // PK columns come from duckdb_constraints, not a per-column flag.
-      const pkRows = await rowsFor(
-        `SELECT constraint_column_names
+      // PK and UNIQUE columns come from duckdb_constraints, not per-column
+      // flags. One query covers both, so `unique` costs no extra round trip.
+      const constraintRows = await rowsFor(
+        `SELECT constraint_type, constraint_column_names
          FROM duckdb_constraints()
          WHERE schema_name = '${safeSch}'
            AND table_name = '${safe}'
-           AND constraint_type = 'PRIMARY KEY'
-         LIMIT 1`,
+           AND constraint_type IN ('PRIMARY KEY', 'UNIQUE')`,
       );
-      const pkCols: string[] = (() => {
-        const v = pkRows[0]?.[0];
-        // `constraint_column_names` (VARCHAR[]) may arrive as a JS array, an
-        // Arrow Vector (iterable, not Array.isArray), or a stringified list
-        // with quoted elements. Normalise all three.
-        let raw: unknown[] = [];
-        if (Array.isArray(v)) raw = v;
-        else if (typeof v === "string")
-          raw = v.replace(/^\[|\]$/g, "").split(/,\s*/);
-        else if (
-          v != null &&
-          typeof (v as { [Symbol.iterator]?: unknown })[Symbol.iterator] ===
-            "function"
-        )
-          raw = Array.from(v as Iterable<unknown>);
-        return raw
-          .map((x) => String(x).trim().replace(/^["']|["']$/g, ""))
-          .filter(Boolean);
-      })();
+      const pkRow = constraintRows.find(
+        (row) => String(row[0]).toUpperCase() === "PRIMARY KEY",
+      );
+      const pkCols = parseConstraintColumnNames(pkRow?.[1]);
+      const uniqueCols = new Set(
+        constraintRows
+          .filter((row) => String(row[0]).toUpperCase() === "UNIQUE")
+          .flatMap((row) => parseConstraintColumnNames(row[1])),
+      );
       return rows.map((row) => {
         const colName = String(row[1]);
         const pkIndex = pkCols.indexOf(colName);
@@ -1412,6 +1422,7 @@ export async function createDuckDbEngine(
             ? { expression: "", storageType: "STORED" as const }
             : null,
           enumValues: parseDuckDbEnumValues(dataType),
+          unique: uniqueCols.has(colName),
         };
       });
     },
@@ -1453,34 +1464,25 @@ export async function createDuckDbEngine(
     },
 
     async getColumnConstraintInfo(tableName, schema = "main") {
+      // `listColumns` already resolves the UNIQUE columns from
+      // duckdb_constraints, so this needs no query of its own.
       const cols = await engine.listColumns(tableName, schema);
-      const safe = tableName.replace(/'/g, "''");
-      const safeSch = schema.replace(/'/g, "''");
-      const uniqueRows = await rowsFor(
-        `SELECT constraint_column_names
-         FROM duckdb_constraints()
-         WHERE schema_name = '${safeSch}'
-           AND table_name = '${safe}'
-           AND constraint_type = 'UNIQUE'`,
-      );
-      const unique = new Set<string>();
-      for (const row of uniqueRows) {
-        const v = row[0];
-        if (Array.isArray(v)) v.forEach((x) => unique.add(String(x)));
-        else if (typeof v === "string")
-          v.replace(/^\[|\]$/g, "")
-            .split(/,\s*/)
-            .filter(Boolean)
-            .forEach((x) => unique.add(x));
-      }
-      return cols.map((col) => ({
-        name: col.name,
-        isPrimaryKey: col.pk > 0,
-        isAutoIncrement:
+      return cols.map((col) => {
+        const isAutoIncrement =
           /nextval\(/i.test(col.defaultValue ?? "") ||
-          /^GENERATED\b/i.test(col.defaultValue ?? ""),
-        isUnique: unique.has(col.name),
-      }));
+          /^GENERATED\b/i.test(col.defaultValue ?? "");
+        return {
+          name: col.name,
+          isPrimaryKey: col.pk > 0,
+          isAutoIncrement,
+          isUnique: col.unique === true,
+          autoPopulated:
+            isAutoIncrement || defaultGeneratesUniqueValue(col.defaultValue),
+          type: col.type,
+          notNull: col.notNull,
+          defaultValue: col.defaultValue,
+        };
+      });
     },
 
     async createTable(name, columns) {

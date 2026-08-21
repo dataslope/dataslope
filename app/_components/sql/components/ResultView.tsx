@@ -68,6 +68,15 @@ import type {
   PendingEditsByResult,
 } from "../types";
 import type { ColumnConstraintInfo } from "../../runtime/sqlite";
+import {
+  conflictingDuplicateColumns,
+  duplicateInsertColumns,
+  type DuplicateRowPlan,
+} from "../utils/duplicateRow";
+import {
+  DuplicateRowDialog,
+  type DuplicateRowRequest,
+} from "./DuplicateRowDialog";
 
 /** TanStack Table v9 feature set: only sorting is opted in. `manualSorting`
  *  stays on at the call site (ordering happens upstream against the full
@@ -751,6 +760,9 @@ function ResultViewImpl({
     tableName: string,
     columnNames: string[],
     values: unknown[],
+    /** Present when the user answered the duplicate dialog: how the columns
+     *  under a unique constraint should differ from the copied row. */
+    plan?: DuplicateRowPlan,
   ) => void;
   globalPageSize: number;
   onSetGlobalPageSize: (n: number) => void;
@@ -1936,8 +1948,8 @@ function ResultViewImpl({
                   }
                   onDuplicateRow={
                     sourceTable && onDuplicateRow
-                      ? (columnNames, values) =>
-                          onDuplicateRow(sourceTable, columnNames, values)
+                      ? (columnNames, values, plan) =>
+                          onDuplicateRow(sourceTable, columnNames, values, plan)
                       : undefined
                   }
                   // Virtualize above VIRTUALIZE_ROW_THRESHOLD rows; infinite
@@ -2340,7 +2352,11 @@ export function ResultTableBody({
   onClearPendingEdit: (cellKey: string) => void;
   onSetActiveEditCell: (cellKey: string | null) => void;
   onDeleteSingleRow?: (absoluteRow: number) => void;
-  onDuplicateRow?: (columnNames: string[], values: unknown[]) => void;
+  onDuplicateRow?: (
+    columnNames: string[],
+    values: unknown[],
+    plan?: DuplicateRowPlan,
+  ) => void;
   virtualized?: boolean;
   scrollParentRef?: React.RefObject<HTMLDivElement | null>;
   hasMoreRows?: boolean;
@@ -2371,6 +2387,12 @@ export function ResultTableBody({
   } | null>(null);
   // Validation message for the edit-in-modal dialog (e.g. invalid JSON).
   const [modalError, setModalError] = useState<string | null>(null);
+
+  // Set when "Duplicate row" is asked for on a row whose primary key or
+  // UNIQUE columns the database won't re-generate; null while no such
+  // duplicate is pending.
+  const [duplicateRequest, setDuplicateRequest] =
+    useState<DuplicateRowRequest | null>(null);
 
   // ── Column rename state ────────────────────────────────────────────────
   const [renamedColumns, setRenamedColumns] = useState<Map<number, string>>(
@@ -2506,28 +2528,6 @@ export function ResultTableBody({
     [onSortingChange, sorting],
   );
   handleSortingChangeRef.current = handleSortingChange;
-
-  const { canDuplicate, uniqueConstraintReason } = useMemo(() => {
-    if (!onDuplicateRow) {
-      return { canDuplicate: false, uniqueConstraintReason: "" };
-    }
-    if (!constraintInfo || constraintInfo.length === 0) {
-      return { canDuplicate: true, uniqueConstraintReason: "" };
-    }
-    // Auto-increment / IDENTITY columns regenerate on insert, so PK/UNIQUE
-    // constraints on them don't block duplication.
-    const blocking = constraintInfo.filter(
-      (c) => (c.isPrimaryKey || c.isUnique) && !c.isAutoIncrement,
-    );
-    if (blocking.length > 0) {
-      const names = blocking.map((c) => c.name).join(", ");
-      return {
-        canDuplicate: false,
-        uniqueConstraintReason: `Column${blocking.length > 1 ? "s" : ""} with unique constraint${blocking.length > 1 ? "s" : ""}: ${names}`,
-      };
-    }
-    return { canDuplicate: true, uniqueConstraintReason: "" };
-  }, [onDuplicateRow, constraintInfo]);
 
   const allVisibleSelected =
     deletable &&
@@ -3504,51 +3504,45 @@ export function ResultTableBody({
                 </ContextMenu.Item>
               )}
               {onDuplicateRow &&
-                (canDuplicate ? (
-                  <ContextMenu.Item
-                    className="example-item"
-                    onClick={() => {
-                      const autoIncCols = new Set(
-                        (constraintInfo ?? [])
-                          .filter((c) => c.isAutoIncrement)
-                          .map((c) => c.name),
-                      );
-                      const cols: string[] = [];
-                      const vals: unknown[] = [];
-                      set.columns.forEach((c, i) => {
-                        if (!autoIncCols.has(c)) {
-                          cols.push(c);
-                          vals.push(rowValues[i]);
+                (() => {
+                  // Columns the database re-populates are dropped from the
+                  // INSERT; what's left under a unique constraint is what the
+                  // copy has to answer for, and it depends on this row's
+                  // values (a NULL in a nullable UNIQUE column can't collide).
+                  const { names, values } = duplicateInsertColumns(
+                    set.columns,
+                    rowValues,
+                    constraintInfo,
+                  );
+                  const conflicts = conflictingDuplicateColumns(
+                    names,
+                    values,
+                    constraintInfo,
+                  );
+                  return (
+                    <ContextMenu.Item
+                      className="example-item"
+                      onClick={() => {
+                        if (conflicts.length === 0) {
+                          onDuplicateRow(names, values);
+                          return;
                         }
-                      });
-                      onDuplicateRow(cols, vals);
-                    }}
-                  >
-                    <div className="ex-title">Duplicate row</div>
-                  </ContextMenu.Item>
-                ) : (
-                  <Popover.Root>
-                    <Popover.Trigger
-                      openOnHover
-                      delay={200}
-                      closeDelay={100}
-                      className="example-item sql-ctx-disabled"
-                      nativeButton={false}
-                      render={<div />}
-                      aria-disabled="true"
+                        setDuplicateRequest({
+                          tableName: sourceTable ?? "",
+                          columns: names,
+                          values,
+                          choices: conflicts,
+                        });
+                      }}
                     >
-                      <div className="ex-title">Duplicate row</div>
-                    </Popover.Trigger>
-                    <Popover.Portal>
-                      <Popover.Positioner side="right" sideOffset={8}>
-                        <Popover.Popup className="bui-popup sql-unique-popover">
-                          {uniqueConstraintReason ||
-                            "Cannot duplicate: unique constraint"}
-                        </Popover.Popup>
-                      </Popover.Positioner>
-                    </Popover.Portal>
-                  </Popover.Root>
-                ))}
+                      <div className="ex-title">
+                        {conflicts.length > 0
+                          ? "Duplicate row…"
+                          : "Duplicate row"}
+                      </div>
+                    </ContextMenu.Item>
+                  );
+                })()}
               {onDeleteSingleRow && (
                 <ContextMenu.Item
                   className="example-item sql-ctx-danger"
@@ -3893,6 +3887,18 @@ export function ResultTableBody({
           </Dialog.Popup>
         </Dialog.Portal>
       </Dialog.Root>
+      {/* Duplicate row dialog: only for rows whose unique columns need an
+          answer — an unconstrained row is duplicated straight from the menu. */}
+      <DuplicateRowDialog
+        request={duplicateRequest}
+        onOpenChange={(open) => {
+          if (!open) setDuplicateRequest(null);
+        }}
+        onConfirm={(request, plan) => {
+          onDuplicateRow?.(request.columns, request.values, plan);
+          setDuplicateRequest(null);
+        }}
+      />
       {/* Column statistics dialog */}
       <Dialog.Root
         open={statsDialog !== null}

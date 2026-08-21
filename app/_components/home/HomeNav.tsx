@@ -9,6 +9,7 @@ import {
   LogIn,
   LogOut,
   Menu as Hamburger,
+  Shield,
   SquareTerminal,
   Tag,
   User as UserIcon,
@@ -195,6 +196,12 @@ function MobileAuthSection() {
     );
   }
 
+  // Config-listed admins get `role` promoted at sign-in (lib/auth/server.ts),
+  // so this covers them too; the dashboard's own actions are server-enforced,
+  // and a non-admin who reaches /dashboard/admin just gets the access-denied
+  // card. Same check and same placement as the desktop account menu.
+  const isAdmin = session.user.role === "admin";
+
   return (
     <>
       <div className="px-3 py-1.5 text-xs text-[var(--ds-gray-500)]">
@@ -210,6 +217,15 @@ function MobileAuthSection() {
         <UserIcon size={16} />
         Account
       </Dialog.Close>
+      {isAdmin && (
+        <Dialog.Close
+          render={<Link href="/dashboard/admin" prefetch={false} />}
+          className={rowClass}
+        >
+          <Shield size={16} />
+          Admin
+        </Dialog.Close>
+      )}
       <button
         type="button"
         onClick={() => {
