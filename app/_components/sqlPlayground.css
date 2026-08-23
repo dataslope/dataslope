@@ -3598,17 +3598,18 @@ html[data-playground-theme="dark"] .sql-result-th-type {
 }
 
 .sql-duplicate-body {
-  gap: 10px;
+  gap: 0;
   padding-bottom: 8px;
 }
 
+/* Flat sections divided by rules rather than boxed cards; zero body gap
+   keeps each rule centered in the two 12px paddings it sits between. */
 .sql-duplicate-col {
   display: flex;
   flex-direction: column;
   gap: 7px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 11px 12px;
+  border-top: 1px solid var(--border);
+  padding: 12px 0;
   min-width: 0;
 }
 
@@ -3633,10 +3634,10 @@ html[data-playground-theme="dark"] .sql-result-th-type {
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--text-dim);
-  border: 1px solid var(--border);
+  color: #fff;
+  background: var(--ds-red);
   border-radius: 4px;
-  padding: 1px 5px;
+  padding: 2px 6px;
   white-space: nowrap;
 }
 
