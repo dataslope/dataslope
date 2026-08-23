@@ -8,7 +8,7 @@
 
 import { TOOLS_JAR_CDN } from "./cdn";
 
-const CHEERPJ_VERSION = "4.3";
+export const CHEERPJ_VERSION = "4.3";
 const CHEERPJ_LOADER_URL = `https://cjrtnc.leaningtech.com/${CHEERPJ_VERSION}/loader.js`;
 
 // tools.jar mount point inside CheerpJ's host-populated read-only /str/

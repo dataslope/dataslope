@@ -35,7 +35,10 @@ interface WorkspaceMeta {
 // Constants
 // ---------------------------------------------------------------------------
 
-const REGISTRY_KEY = "playground_workspaces";
+/** localStorage key the workspace registry lives under. Exported so a
+ *  panel can tell a `storage` event about workspaces from any other. */
+export const WORKSPACE_REGISTRY_KEY = "playground_workspaces";
+const REGISTRY_KEY = WORKSPACE_REGISTRY_KEY;
 // Pre-rename key; read as a fallback and migrated forward so old builds'
 // workspace lists survive the upgrade.
 const LEGACY_REGISTRY_KEY = "pg_workspaces";

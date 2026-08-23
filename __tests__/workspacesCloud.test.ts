@@ -15,6 +15,7 @@ import {
 } from "../lib/workspaces/bundleCodec";
 import {
   BUNDLE_FILENAME_MAX,
+  BUNDLE_MAX_DATA_FILES,
   BUNDLE_MAX_FILES,
   CODE_PLAYGROUND_IDS,
   SQL_PLAYGROUND_IDS,
@@ -27,6 +28,7 @@ import {
   validateBundle,
   type WorkspaceBundle,
 } from "../lib/workspaces/types";
+import { base64ToBytes, bytesToBase64 } from "../lib/workspaces/base64";
 import {
   GUEST_SHARE_TTL_DAYS,
   INACTIVITY_EXPIRY_DAYS,
@@ -41,6 +43,9 @@ import {
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const NOW = Date.UTC(2026, 6, 2, 12, 0, 0);
+
+// An uploaded CSV, with a non-ASCII byte so a lossy encode would show.
+const CSV_BYTES = new TextEncoder().encode('city,pop\nParis,2.1\n"Qu\u00e9bec, city",3.5\n');
 
 // A stand-in database image; the codec treats it as opaque bytes.
 const DB_IMAGE = new Uint8Array([0x53, 0x51, 0x4c, 0x69, 0x74, 0x65, 0, 255]);
@@ -373,6 +378,76 @@ describe("validateBundle, openFilenames", () => {
     expect(
       validateBundle(codeBundleWith(Array.from({ length: 201 }, () => "a.py"))),
     ).toBeNull();
+  });
+});
+
+describe("validateBundle, dataFiles", () => {
+  const withData = (dataFiles?: unknown): unknown => ({
+    ...codeBundle(),
+    dataFiles,
+  });
+
+  it("accepts a bundle without any (nothing uploaded, or an older bundle)", () => {
+    expect(validateBundle(withData())).not.toBeNull();
+  });
+
+  it("accepts uploaded data files", () => {
+    expect(
+      validateBundle(withData([{ path: "sales.csv", base64: "YSxiCjEsMgo=" }])),
+    ).not.toBeNull();
+  });
+
+  it("rejects a malformed or oversized list", () => {
+    expect(validateBundle(withData("sales.csv"))).toBeNull();
+    expect(validateBundle(withData([{ path: "sales.csv" }]))).toBeNull();
+    expect(validateBundle(withData([{ path: "", base64: "" }]))).toBeNull();
+    expect(
+      validateBundle(
+        withData(
+          Array.from({ length: BUNDLE_MAX_DATA_FILES + 1 }, () => ({
+            path: "a.csv",
+            base64: "",
+          })),
+        ),
+      ),
+    ).toBeNull();
+  });
+
+  it("round-trips through the codec", async () => {
+    const bundle = codeBundle({
+      dataFiles: [{ path: "sales.csv", base64: bytesToBase64(CSV_BYTES) }],
+    });
+    const decoded = await decodeBundle(await encodeBundle(bundle));
+    expect(decoded.dataFiles).toEqual(bundle.dataFiles);
+    expect(base64ToBytes(decoded.dataFiles![0].base64)).toEqual(CSV_BYTES);
+  });
+
+  it("lists data files alongside code files in the manifest", () => {
+    // The share landing page's file table is built from this, and it was
+    // the one place a recipient could have noticed the CSV was missing.
+    const manifest = manifestForBundle(
+      codeBundle({
+        dataFiles: [{ path: "sales.csv", base64: bytesToBase64(CSV_BYTES) }],
+      }),
+    );
+    expect(manifest.files?.map((f) => f.name)).toEqual([
+      "main.py",
+      "sales.csv",
+    ]);
+    expect(manifest.files?.[1].size).toBe(CSV_BYTES.length);
+  });
+});
+
+describe("base64 for bundle data files", () => {
+  it("round-trips binary bytes, including a payload past the chunk size", () => {
+    const big = new Uint8Array(400_000);
+    for (let i = 0; i < big.length; i += 1) big[i] = i % 256;
+    expect(base64ToBytes(bytesToBase64(big))).toEqual(big);
+  });
+
+  it("round-trips an empty file", () => {
+    expect(bytesToBase64(new Uint8Array(0))).toBe("");
+    expect(base64ToBytes("")).toEqual(new Uint8Array(0));
   });
 });
 

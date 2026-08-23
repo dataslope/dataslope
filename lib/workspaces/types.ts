@@ -91,6 +91,32 @@ export interface BundleCodeFile {
   content: string;
 }
 
+/**
+ * An uploaded data file travelling with a code bundle.
+ *
+ * These are the CSVs and spreadsheets the Files panel lists — not editor
+ * tabs, but every bit as much "the current files" a snapshot promises. A
+ * shared program that reads one used to arrive without it and die on
+ * `FileNotFoundError` the moment the recipient pressed Run.
+ *
+ * Base64 rather than the container's binary section: that section already
+ * carries the SQL playgrounds' single database image, and a code bundle can
+ * hold many files. Bundles are gzipped as a whole, so text data files pay
+ * little for the encoding.
+ */
+export interface BundleDataFile {
+  /** Path as shown in the Files panel, e.g. "sales.csv". */
+  path: string;
+  /** Base64-encoded file contents. */
+  base64: string;
+}
+
+/** Total decoded bytes of data files one bundle may carry. Beyond this the
+ *  sharer is told what was left out rather than publishing a broken copy. */
+export const BUNDLE_MAX_DATA_BYTES = 4 * 1024 * 1024;
+/** Cap on how many data files travel, independent of their size. */
+export const BUNDLE_MAX_DATA_FILES = 50;
+
 export interface BundleSqlTab {
   title: string;
   code: string;
@@ -196,6 +222,9 @@ export interface WorkspaceBundle {
   exportedAt: number;
   /** kind === "code" */
   files?: BundleCodeFile[];
+  /** kind === "code": uploaded data files from the Files panel. Absent in
+   *  older bundles and in workspaces that have none. */
+  dataFiles?: BundleDataFile[];
   activeFilename?: string;
   /** kind === "code": files whose editor tabs are open, in tab order (without
    *  this a reopened copy fans every file open). Filenames, not ids — ids are
@@ -255,6 +284,26 @@ export function validateBundle(value: unknown): WorkspaceBundle | null {
         b.openFilenames.some((name) => typeof name !== "string")
       ) {
         return null;
+      }
+    }
+    if (b.dataFiles !== undefined) {
+      if (
+        !Array.isArray(b.dataFiles) ||
+        b.dataFiles.length > BUNDLE_MAX_DATA_FILES
+      ) {
+        return null;
+      }
+      for (const f of b.dataFiles as unknown[]) {
+        const file = f as Record<string, unknown>;
+        if (
+          !file ||
+          typeof file.path !== "string" ||
+          !file.path.trim() ||
+          file.path.length > BUNDLE_FILENAME_MAX ||
+          typeof file.base64 !== "string"
+        ) {
+          return null;
+        }
       }
     }
     return value as WorkspaceBundle;
@@ -350,13 +399,23 @@ const MANIFEST_MAX_ENTRIES = 200;
 /** Builds a manifest from a bundle (client-side, at upload time). */
 export function manifestForBundle(bundle: WorkspaceBundle): BundleManifest {
   if (bundle.kind === "code") {
-    return {
-      kind: "code",
-      files: (bundle.files ?? []).slice(0, MANIFEST_MAX_ENTRIES).map((f) => ({
-        name: f.filename.slice(0, MANIFEST_NAME_MAX),
-        size: f.content.length,
-      })),
-    };
+    const files = (bundle.files ?? []).map((f) => ({
+      name: f.filename.slice(0, MANIFEST_NAME_MAX),
+      // UTF-8 bytes, so a share's file list agrees with the byte counts
+      // the playground shows (String.length undercounts non-ASCII).
+      size: new TextEncoder().encode(f.content).length,
+    }));
+    // Data files are listed too: the recipient's copy really does contain
+    // them, and the landing page's file table is the only preview of what a
+    // link holds.
+    for (const d of bundle.dataFiles ?? []) {
+      files.push({
+        name: d.path.slice(0, MANIFEST_NAME_MAX),
+        // 4 base64 chars per 3 bytes, minus the "=" padding.
+        size: Math.floor((d.base64.length * 3) / 4) - (d.base64.match(/=+$/)?.[0].length ?? 0),
+      });
+    }
+    return { kind: "code", files: files.slice(0, MANIFEST_MAX_ENTRIES) };
   }
   return {
     kind: "sql",

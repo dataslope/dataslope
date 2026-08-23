@@ -13,6 +13,8 @@ import {
   buildTsCompletionRequest,
   completeWithTsService,
   decodeWorkspaceTextFiles,
+  diagnoseWithTsService,
+  sourceExcerpt,
 } from "./tsLanguageService";
 
 // JavaScript runs in a dedicated Web Worker backed by almostnode (a
@@ -247,14 +249,32 @@ type WorkerOutMessage =
   | { kind: "ready" }
   | { kind: "prepare-fs-done"; id: number }
   | { kind: "prepare-fs-error"; id: number; message: string }
-  | { kind: "stdout"; id: number; content: string }
-  | { kind: "stderr"; id: number; content: string }
-  | { kind: "done"; id: number };
+  | {
+      kind: "output";
+      id: number;
+      channel: "stdout" | "stderr";
+      content: string;
+      seq: number;
+      append: boolean;
+    }
+  | {
+      kind: "done";
+      id: number;
+      error: string | null;
+      createdFiles: Array<[string, Uint8Array]>;
+    };
 
 class JavaScriptWorkerRuntime implements LanguageRuntime {
   private nextId = 0;
   // Last snapshot's text files: cross-file context for completions.
   private stagedText = new Map<string, string>();
+  // Files the last run wrote, handed to the Files panel once collected.
+  private createdFiles: Array<[string, Uint8Array]> = [];
+  /** Rejects the in-flight `run()` when Stop terminates the worker. */
+  private abortActiveRun: ((err: Error) => void) | null = null;
+  /** Non-null between the Stop that killed the worker and its replacement
+   *  reporting ready; every entry point waits on it. */
+  private restartPromise: Promise<void> | null = null;
 
   constructor(private worker: Worker) {}
 
@@ -263,21 +283,89 @@ class JavaScriptWorkerRuntime implements LanguageRuntime {
     this.worker.terminate();
   }
 
+  /**
+   * Stop the running program.
+   *
+   * A Web Worker is the simplest cancellation story on the site: no
+   * interrupt buffer, no cooperative polling — terminate it and stand up a
+   * replacement. Whatever the program printed before the Stop stays on
+   * screen; the run itself rejects with a RunCancelledError, which the
+   * surface renders as "Run stopped.".
+   */
+  async cancelRun(): Promise<void> {
+    if (this.restartPromise) return this.restartPromise;
+    const abort = this.abortActiveRun;
+    this.abortActiveRun = null;
+    this.worker.terminate();
+    if (abort) {
+      const err = new Error("Run stopped.");
+      err.name = "RunCancelledError";
+      abort(err);
+    }
+    this.restartPromise = (async () => {
+      try {
+        this.worker = await spawnJavaScriptWorker();
+      } finally {
+        this.restartPromise = null;
+      }
+    })();
+    return this.restartPromise;
+  }
+
+  /** Files the program wrote (`fs.writeFileSync`, …), for the Files panel. */
+  async collectCreatedFiles(): Promise<Map<string, Uint8Array>> {
+    const created = new Map(this.createdFiles);
+    this.createdFiles = [];
+    return created;
+  }
+
   /** Intellisense via the shared TS language service worker, separate from
    *  execution so analysis never queues behind a running user program. */
   async complete(request: CompletionRequest): Promise<CompletionResult> {
-    return completeWithTsService(
-      buildTsCompletionRequest(
+    return completeWithTsService({
+      ...buildTsCompletionRequest(
         this.stagedText,
         request.doc,
         request.filename,
         "index.js",
         request.offset,
       ),
-    );
+      // Node globals and the shimmed modules, not the DOM: `process` and
+      // `require` exist here, `document` and `alert` do not.
+      env: "node",
+    });
+  }
+
+  /**
+   * A parse error with the location V8 does not give us.
+   *
+   * `eval`-compiled code reports a SyntaxError with no file, line or column
+   * at all, so the message alone leaves a multi-file project with nothing to
+   * go on. The language service parses the same file and knows exactly where
+   * it stopped; V8's wording is kept because it is the better description.
+   */
+  private async locateSyntaxError(
+    message: string,
+    code: string,
+    entry: string,
+  ): Promise<string> {
+    const diagnostics = await diagnoseWithTsService({
+      files: [[entry, code]],
+      entry,
+      // Plain JavaScript has no types to check; only the parse matters.
+      env: "node",
+      semantic: false,
+      timeoutMs: 3000,
+    });
+    const first = diagnostics[0];
+    if (!first) return message;
+    const excerpt = sourceExcerpt(code, first.line, first.column);
+    const location = `${entry}:${first.line}:${first.column}`;
+    return excerpt ? `${location} - ${message}\n${excerpt}` : `${location} - ${message}`;
   }
 
   async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
+    if (this.restartPromise) await this.restartPromise;
     this.stagedText = decodeWorkspaceTextFiles(files);
     const id = ++this.nextId;
     const payload: Array<[string, Uint8Array]> = [];
@@ -303,30 +391,81 @@ class JavaScriptWorkerRuntime implements LanguageRuntime {
     emit: EmitOutput,
     options?: RunOptions,
   ): Promise<void> {
+    // A Stop leaves the runtime rebuilding itself; the next run belongs on
+    // the fresh worker, so wait rather than race it.
+    if (this.restartPromise) await this.restartPromise;
     const id = ++this.nextId;
-    return new Promise<void>((resolve) => {
+    const worker = this.worker;
+    // "index.js" preserves single-file behaviour for callers that don't
+    // supply options.
+    const entryPath = options?.entryFilename ?? "index.js";
+    this.createdFiles = [];
+    return new Promise<void>((resolve, reject) => {
+      const finish = (settle: () => void) => {
+        worker.removeEventListener("message", onMessage);
+        this.abortActiveRun = null;
+        settle();
+      };
+      // Stop terminates the worker, so no `done` ever arrives for this run:
+      // the promise has to be settled from there.
+      this.abortActiveRun = (err) => finish(() => reject(err));
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
         const msg = ev.data;
-        if (msg.kind === "stdout" || msg.kind === "stderr") {
-          if (msg.id === id) emit({ type: msg.kind, content: msg.content });
+        if (msg.kind === "output") {
+          if (msg.id === id) {
+            emit({ type: msg.channel, content: msg.content }, msg.seq, msg.append);
+          }
           return;
         }
         if (msg.kind === "done" && msg.id === id) {
-          this.worker.removeEventListener("message", onMessage);
-          resolve();
+          this.createdFiles = msg.createdFiles;
+          const error = msg.error;
+          if (!error) {
+            finish(resolve);
+            return;
+          }
+          // A parse error is the one failure whose location the runtime
+          // cannot report; ask the parser before giving up on it.
+          if (error.startsWith("SyntaxError")) {
+            const located = this.locateSyntaxError(error, code, entryPath);
+            finish(() => {
+              void located.then(
+                (message) => reject(new Error(message)),
+                () => reject(new Error(error)),
+              );
+            });
+            return;
+          }
+          finish(() => reject(new Error(error)));
         }
       };
-      this.worker.addEventListener("message", onMessage);
-      this.worker.postMessage({
-        kind: "run",
-        id,
-        code,
-        // "index.js" preserves single-file behaviour for callers that
-        // don't supply options.
-        entryPath: options?.entryFilename ?? "index.js",
-      });
+      worker.addEventListener("message", onMessage);
+      worker.postMessage({ kind: "run", id, code, entryPath });
     });
   }
+}
+
+/** Spawn the pre-bundled worker and resolve once it reports ready. Shared
+ *  by the first boot and by the respawn a Stop triggers. */
+function spawnJavaScriptWorker(): Promise<Worker> {
+  // Pre-bundled by scripts/build-almostnode-workers.mjs and loaded via
+  // static URL so Turbopack never sees the import: its worker bundler
+  // chunks almostnode's ~16 MB tree and colliding minified identifiers
+  // throw "Identifier 'e1' has already been declared" at startup.
+  const worker = new Worker("/_workers/javascript-worker.js", { type: "module" });
+  return new Promise<Worker>((resolve, reject) => {
+    const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+      if (ev.data.kind === "ready") {
+        worker.removeEventListener("message", onMessage);
+        resolve(worker);
+      }
+    };
+    worker.addEventListener("message", onMessage);
+    worker.addEventListener("error", (ev) => {
+      worker.removeEventListener("message", onMessage);
+      reject(new Error(ev.message || "JavaScript worker failed to start"));
+    });
+  });
 }
 
 export const javascriptAdapter: LanguageAdapter = {
@@ -383,25 +522,6 @@ export const javascriptAdapter: LanguageAdapter = {
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Starting JavaScript runtime…");
-    // Pre-bundled by scripts/build-almostnode-workers.mjs and loaded via
-    // static URL so Turbopack never sees the import: its worker bundler
-    // chunks almostnode's ~16 MB tree and colliding minified identifiers
-    // throw "Identifier 'e1' has already been declared" at startup.
-    const worker = new Worker("/_workers/javascript-worker.js", {
-      type: "module",
-    });
-    return new Promise<LanguageRuntime>((resolve, reject) => {
-      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
-        if (ev.data.kind === "ready") {
-          worker.removeEventListener("message", onMessage);
-          resolve(new JavaScriptWorkerRuntime(worker));
-        }
-      };
-      worker.addEventListener("message", onMessage);
-      worker.addEventListener("error", (ev) => {
-        worker.removeEventListener("message", onMessage);
-        reject(new Error(ev.message || "JavaScript worker failed to start"));
-      });
-    });
+    return new JavaScriptWorkerRuntime(await spawnJavaScriptWorker());
   },
 };

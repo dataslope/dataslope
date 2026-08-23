@@ -44,6 +44,13 @@ export {};
 // PHP (php-wasm) runs in a dedicated Web Worker so execution and Emscripten
 // init stay off the main thread. Protocol: see In/OutMessage below.
 
+import {
+  buildEntryScript,
+  PGLITE_ABORT_RE,
+  PGLITE_EXPLANATION,
+} from "./phpEntry";
+import { PhpOutputRouter } from "./phpOutput";
+
 declare const self: DedicatedWorkerGlobalScope;
 
 const PHP_WASM_VERSION = "0.1.0";
@@ -62,7 +69,8 @@ interface PhpOutputEvent extends Event {
   detail: string[];
 }
 
-type OutputCellType = "stdout" | "stderr" | "html";
+// Mirrors the subset of OutputCellType in ../types that PHP produces.
+type OutputCellType = "stdout" | "stderr" | "log" | "html";
 interface OutputCellMessage {
   type: OutputCellType;
   content: string;
@@ -70,50 +78,39 @@ interface OutputCellMessage {
 
 type InMessage =
   | { kind: "init" }
-  | { kind: "run"; id: number; code: string }
-  | { kind: "prepare-fs"; id: number; files: Array<[string, Uint8Array]> };
+  | { kind: "run"; id: number; code: string; entryPath: string }
+  | { kind: "prepare-fs"; id: number; files: Array<[string, Uint8Array]> }
+  | { kind: "collect-created-files"; id: number };
 
 type OutMessage =
   | { kind: "loading"; message: string }
   | { kind: "ready" }
   | { kind: "init-error"; message: string }
-  | { kind: "output"; id: number; cell: OutputCellMessage }
+  | {
+      kind: "output";
+      id: number;
+      cell: OutputCellMessage;
+      /** Position of the cell within the run's output. Posted as produced,
+       *  so one `seq` can arrive repeatedly while its cell is still
+       *  growing (see `append`). */
+      seq: number;
+      /** True when `cell.content` extends the cell already sent for `seq`. */
+      append: boolean;
+    }
+  | { kind: "created-files"; id: number; files: Array<[string, Uint8Array]> }
   | { kind: "done"; id: number }
-  | { kind: "error"; id: number; message: string }
+  | {
+      kind: "error";
+      id: number;
+      message: string;
+      /** The runtime is no longer usable and must be replaced. */
+      fatal?: boolean;
+    }
   | { kind: "prepare-fs-done"; id: number }
   | { kind: "prepare-fs-error"; id: number; message: string };
 
 function post(msg: OutMessage) {
   self.postMessage(msg);
-}
-
-// ─── Diagnostic splitter (ported from php.tsx) ──────────────────────────
-
-const PHP_DIAGNOSTIC_RE =
-  /^(PHP\s+)?(Parse error|Fatal error|Warning|Notice|Deprecated|Strict Standards|Catchable fatal error)\b/i;
-
-function splitPhpDiagnostics(raw: string): { stdout: string; stderr: string } {
-  if (!raw) return { stdout: "", stderr: "" };
-  const lines = raw.split("\n");
-  const stdoutLines: string[] = [];
-  const stderrLines: string[] = [];
-  let mode: "stdout" | "stderr" = "stdout";
-  for (const line of lines) {
-    if (PHP_DIAGNOSTIC_RE.test(line)) {
-      mode = "stderr";
-      stderrLines.push(line);
-    } else if (mode === "stderr" && /^\s+\S/.test(line)) {
-      stderrLines.push(line);
-    } else if (mode === "stderr" && line.trim() === "") {
-      mode = "stdout";
-    } else {
-      stdoutLines.push(line);
-    }
-  }
-  return {
-    stdout: stdoutLines.join("\n"),
-    stderr: stderrLines.join("\n"),
-  };
 }
 
 // ─── PHP state ───────────────────────────────────────────────────────────
@@ -141,58 +138,120 @@ async function initPhp(): Promise<void> {
   post({ kind: "ready" });
 }
 
-async function runCode(id: number, code: string): Promise<void> {
+/** Does this text look like a document rather than incidental markup? */
+function looksLikeHtml(text: string): boolean {
+  return (
+    /<!doctype\s+html/i.test(text) ||
+    /<html[\s>]/i.test(text) ||
+    (/<[a-z][a-z0-9]*[\s>/]/i.test(text) && /<\/[a-z][a-z0-9]*>/i.test(text))
+  );
+}
+
+async function runCode(
+  id: number,
+  code: string,
+  entryPath: string,
+): Promise<void> {
   if (!php) throw new Error("PHP runtime is not initialised");
 
-  let outputBuf = "";
-  let errorBuf = "";
+  // Output goes out as it is produced. That matters most when a run does
+  // not finish: a script stuck in a loop is terminated by the host, and
+  // everything it printed first is already on screen, which is what tells
+  // the reader where it hung.
+  let sawPgliteAbort = false;
+  // What each cell holds so far. A cell is addressed by its position, so
+  // re-posting a `seq` replaces it: that is how a run that turned out to
+  // be an HTML document gets re-typed, and how the last cell loses the
+  // trailing newline that would otherwise show as a blank line.
+  const cells = new Map<number, { channel: string; content: string }>();
+  const router = new PhpOutputRouter(
+    (chunk) => {
+      const prev = chunk.append ? (cells.get(chunk.seq)?.content ?? "") : "";
+      cells.set(chunk.seq, {
+        channel: chunk.channel,
+        content: prev + chunk.content,
+      });
+      post({
+        kind: "output",
+        id,
+        cell: { type: chunk.channel, content: chunk.content },
+        seq: chunk.seq,
+        append: chunk.append,
+      });
+    },
+    { entryPath },
+  );
 
   const onOutput = (event: Event) => {
     const detail = (event as PhpOutputEvent).detail;
-    if (detail) outputBuf += detail.join("");
+    if (!detail) return;
+    const text = detail.join("");
+    if (PGLITE_ABORT_RE.test(text)) sawPgliteAbort = true;
+    router.write("stdout", text);
   };
   const onError = (event: Event) => {
     const detail = (event as PhpOutputEvent).detail;
-    if (detail) errorBuf += detail.join("");
+    if (!detail) return;
+    const text = detail.join("");
+    if (PGLITE_ABORT_RE.test(text)) sawPgliteAbort = true;
+    router.write("stderr", text);
   };
 
   php.addEventListener("output", onOutput);
   php.addEventListener("error", onError);
 
+  let thrown: string | null = null;
   try {
     try {
       await php.refresh();
     } catch {
       /* refresh is best-effort */
     }
-    await php.run(code);
+    // The entry runs from the VFS so it has a real path; `code` is written
+    // there first, because the editor's buffer is what Run means.
+    await writeEntryFile(entryPath, code);
+    await php.run(buildEntryScript(entryPath));
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    errorBuf += message + "\n";
+    if (PGLITE_ABORT_RE.test(message)) sawPgliteAbort = true;
+    else thrown = message;
   } finally {
     php.removeEventListener("output", onOutput);
     php.removeEventListener("error", onError);
+    router.flush();
+    finalizeCells();
   }
 
-  const { stdout: splitStdout, stderr: splitStderr } =
-    splitPhpDiagnostics(outputBuf);
-  const stdout = splitStdout.replace(/\n+$/, "");
-  const stderr = [splitStderr, errorBuf]
-    .filter((s) => s)
-    .join("\n")
-    .replace(/\n+$/, "");
-
-  if (stdout) {
-    // Render as "html" only when output looks like a real document, so
-    // incidental angle brackets aren't misclassified.
-    const looksLikeHtml =
-      /<!doctype\s+html/i.test(stdout) ||
-      /<html[\s>]/i.test(stdout) ||
-      (/<[a-z][a-z0-9]*[\s>/]/i.test(stdout) && /<\/[a-z][a-z0-9]*>/i.test(stdout));
-    const cellType: OutputCellType = looksLikeHtml ? "html" : "stdout";
-    post({ kind: "output", id, cell: { type: cellType, content: stdout } });
+  /** Revisions only possible once the run's output is complete: PHP that
+   *  printed a page should render as one, and the last line should not
+   *  leave a blank line under it. */
+  function finalizeCells(): void {
+    const lastSeq = Math.max(-1, ...cells.keys());
+    for (const [seq, cell] of cells) {
+      const isHtml = cell.channel === "stdout" && looksLikeHtml(cell.content);
+      const content =
+        seq === lastSeq ? cell.content.replace(/\n+$/, "") : cell.content;
+      if (!isHtml && content === cell.content) continue;
+      post({
+        kind: "output",
+        id,
+        cell: { type: isHtml ? "html" : (cell.channel as OutputCellType), content },
+        seq,
+        append: false,
+      });
+    }
   }
-  if (stderr) post({ kind: "output", id, cell: { type: "stderr", content: stderr } });
+
+  if (sawPgliteAbort) {
+    // An abort is not a successful run, and the message php-wasm printed
+    // describes its own embedding API rather than anything a PHP author
+    // can act on. The abort also leaves the interpreter unusable, so the
+    // host is told to replace it.
+    const err = new Error(PGLITE_EXPLANATION);
+    err.name = "PhpRuntimeAborted";
+    throw err;
+  }
+  if (thrown) throw new Error(thrown);
 }
 
 // Serialise run requests, Emscripten PHP is not reentrant.
@@ -209,10 +268,18 @@ function enqueue<T>(task: () => Promise<T>): Promise<T> {
 // `/` (the default working directory) so user code can `require`,
 // `include`, and open files with relative paths.
 
+interface PhpFsStat {
+  mode: number;
+}
+
 interface PhpFS {
   writeFile(path: string, data: Uint8Array | string): void;
+  readFile(path: string, opts?: { encoding?: string }): Uint8Array;
   unlink(path: string): void;
   mkdir(path: string): void;
+  readdir(path: string): string[];
+  stat(path: string): PhpFsStat;
+  isDir(mode: number): boolean;
 }
 
 interface PhpBinary {
@@ -243,6 +310,90 @@ function ensureDirs(FS: PhpFS, absFilePath: string): void {
       // Directory already exists -- ignore.
     }
   }
+}
+
+async function phpFs(): Promise<PhpFS> {
+  if (!php) throw new Error("PHP runtime is not initialised");
+  // FS lives on the resolved Emscripten module (await php.binary), not on
+  // the PhpWeb instance.
+  const phpModule = await (php as unknown as { binary: Promise<PhpBinary> }).binary;
+  return phpModule.FS;
+}
+
+/** Write the entry file, so the reader's buffer is what Run executes even
+ *  when staging and the editor have drifted. */
+async function writeEntryFile(entryPath: string, code: string): Promise<void> {
+  const FS = await phpFs();
+  ensureDirs(FS, entryPath);
+  FS.writeFile(entryPath, new TextEncoder().encode(code));
+  stagedPaths.add(entryPath);
+}
+
+// Emscripten's own furniture, plus php-wasm's. None of it is the reader's.
+const SYSTEM_PATHS = new Set([
+  "/dev",
+  "/proc",
+  "/tmp",
+  "/home",
+  "/preload",
+  "/php.ini",
+]);
+
+/** Caps: a runaway script should not be able to push a gigabyte of
+ *  generated files through postMessage. */
+const MAX_CREATED_FILES = 50;
+const MAX_CREATED_BYTES = 64 * 1024 * 1024;
+
+/**
+ * Files the run wrote that are not part of the workspace.
+ *
+ * `file_put_contents('report.csv', …)` succeeded and `scandir` could see
+ * the result, but the Files rail never did, so the output was real and
+ * unreachable, and gone on reload. Generating a file is an ordinary PHP
+ * exercise, so the VFS is diffed against what was staged.
+ */
+async function collectCreatedFiles(): Promise<Array<[string, Uint8Array]>> {
+  const FS = await phpFs();
+  const found: Array<[string, Uint8Array]> = [];
+  let bytes = 0;
+
+  const walk = (dir: string): void => {
+    if (found.length >= MAX_CREATED_FILES || bytes >= MAX_CREATED_BYTES) return;
+    let entries: string[];
+    try {
+      entries = FS.readdir(dir);
+    } catch {
+      return;
+    }
+    for (const name of entries) {
+      if (name === "." || name === "..") continue;
+      const path = dir === "/" ? `/${name}` : `${dir}/${name}`;
+      if (SYSTEM_PATHS.has(path)) continue;
+      let isDir = false;
+      try {
+        isDir = FS.isDir(FS.stat(path).mode);
+      } catch {
+        continue;
+      }
+      if (isDir) {
+        walk(path);
+        continue;
+      }
+      if (stagedPaths.has(path)) continue;
+      try {
+        const data = FS.readFile(path);
+        if (bytes + data.length > MAX_CREATED_BYTES) return;
+        bytes += data.length;
+        found.push([path.replace(/^\//, ""), data]);
+      } catch {
+        // Unreadable (a device node the walk reached anyway); skip it.
+      }
+      if (found.length >= MAX_CREATED_FILES) return;
+    }
+  };
+
+  walk("/");
+  return found;
 }
 
 async function prepareFs(files: Array<[string, Uint8Array]>): Promise<void> {
@@ -314,18 +465,35 @@ self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
     return;
   }
 
+  if (msg.kind === "collect-created-files") {
+    const { id } = msg;
+    enqueue(async () => {
+      let files: Array<[string, Uint8Array]> = [];
+      try {
+        if (initPromise) await initPromise;
+        files = await collectCreatedFiles();
+      } catch {
+        // Best-effort: a run that produced no reachable files is not a
+        // failure of the run.
+      }
+      post({ kind: "created-files", id, files });
+    });
+    return;
+  }
+
   if (msg.kind === "run") {
     const { id, code } = msg;
     enqueue(async () => {
       try {
         if (initPromise) await initPromise;
-        await runCode(id, code);
+        await runCode(id, code, msg.entryPath);
         post({ kind: "done", id });
       } catch (err) {
         post({
           kind: "error",
           id,
           message: err instanceof Error ? err.message : String(err),
+          fatal: err instanceof Error && err.name === "PhpRuntimeAborted",
         });
       }
     });

@@ -79,6 +79,64 @@ test.describe("SQL playgrounds, mobile layout (390×844)", () => {
     });
   }
 
+  // The drawer menu's database selector used to give the page a few pixels of
+  // horizontal scroll: Base UI anchors the dropdown with `left: 0` + a
+  // `translate(x, y)`, so an unconstrained popup shrink-to-fits to the full
+  // viewport width and the translate pushes it off the right edge — dragging
+  // the whole page, sheet included, sideways. It is now capped to the space
+  // Base UI publishes on the positioner and scrolls internally instead.
+  for (const engine of ENGINES) {
+    test(`${engine}: drawer database dropdown fits the viewport`, async ({
+      page,
+    }) => {
+      await gotoPlayground(page, engine);
+
+      await page.locator(".mobile-menu-btn").click();
+      const menu = page.locator(".mobile-menu-drawer[aria-label='Menu']");
+      await expect(menu).toBeVisible();
+
+      // The page can't scroll behind the open sheet: the playground body
+      // keeps `overflow: hidden` and the backdrop swallows touch gestures.
+      const guards = await page.evaluate(() => ({
+        body: getComputedStyle(document.body).overflow,
+        backdrop: getComputedStyle(
+          document.querySelector(".mobile-menu-backdrop")!,
+        ).touchAction,
+        drawerBody: getComputedStyle(
+          document.querySelector(".mobile-menu-drawer-body")!,
+        ).overscrollBehavior,
+      }));
+      expect(guards).toEqual({
+        body: "hidden",
+        backdrop: "none",
+        drawerBody: "contain",
+      });
+
+      await menu.locator(".sql-database-selector").click();
+      const popup = page.locator(".sql-db-popup");
+      await expect(popup).toBeVisible();
+
+      // Neither axis of the document overflows, and the dropdown itself
+      // stays inside the viewport.
+      expect(await hasNoHorizontalOverflow(page)).toBe(true);
+      const fits = await page.evaluate(() => {
+        const de = document.documentElement;
+        const r = document
+          .querySelector(".sql-db-popup")!
+          .getBoundingClientRect();
+        return {
+          verticalOverflow: de.scrollHeight > de.clientHeight,
+          outsideViewport:
+            r.left < 0 ||
+            r.top < 0 ||
+            r.right > de.clientWidth ||
+            r.bottom > de.clientHeight,
+        };
+      });
+      expect(fits).toEqual({ verticalOverflow: false, outsideViewport: false });
+    });
+  }
+
   // Activating a query tab restores that tab's remembered bottom pane, never
   // stranding the user on the disabled Results pane. Full Editor↔Results
   // memory needs a booted engine and is covered by the paneForActivatedTab

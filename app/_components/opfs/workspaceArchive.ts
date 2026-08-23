@@ -1,13 +1,27 @@
 /**
- * Workspace export / import as ZIP. The archive mirrors the OPFS directory
- * tree verbatim plus a top-level `workspace.json` header (name, playground,
- * createdAt). Imports always land under a fresh workspace id so two imports
- * of the same archive don't clash.
+ * Workspace export / import as ZIP.
+ *
+ * The archive carries the same bytes twice, for two different readers:
+ *
+ *  - `meta.json`, `files/`, `db/`, `data/` mirror the OPFS tree verbatim.
+ *    This is what `importWorkspaceFromZip` reads, and only these paths are
+ *    extracted, so anything else in the archive is decoration.
+ *  - `source/<path>` holds a readable copy of each editor file under its
+ *    real name. Editor files live in OPFS under an opaque id (`files/
+ *    f_msu82q36_kfsxf`), which is right for storage and useless to a human:
+ *    "Download copy" promises "workspace files as a .zip", and unzipping it
+ *    used to produce extensionless blobs you had to open one by one to tell
+ *    apart. `workspace.json` additionally records the id → path mapping.
+ *
+ * Imports always land under a fresh workspace id so two imports of the same
+ * archive don't clash.
  */
 
 import JSZip from "jszip";
 
+import { findWorkspaceEntry } from "./activeWorkspace";
 import { isOpfsSupported } from "./featureDetect";
+import { loadManifest } from "../playgroundTabs";
 import {
   createWorkspace,
   getWorkspaceRegistry,
@@ -18,6 +32,13 @@ import {
 
 const WORKSPACES_DIR = "workspaces";
 const ARCHIVE_HEADER_FILE = "workspace.json";
+/** Readable copies of the editor files; not part of the OPFS tree. */
+const ARCHIVE_SOURCE_DIR = "source";
+/** Archive paths that `extractZipIntoDir` restores. Everything else (the
+ *  header, the `source/` copies, anything a user added by hand) is ignored,
+ *  so decoration can be added without polluting the imported workspace. */
+const IMPORTABLE_PREFIXES = ["files/", "db/", "data/"];
+const IMPORTABLE_FILES = ["meta.json"];
 
 interface ArchiveHeader {
   /** Schema marker, bumped if the on-disk layout changes. */
@@ -30,6 +51,9 @@ interface ArchiveHeader {
   createdAt: number;
   /** When the archive was produced. Informational only. */
   exportedAt: number;
+  /** Editor files, mapping the opaque OPFS id under `files/` to the path the
+   *  user sees. Absent in archives written before this field existed. */
+  files?: { id: string; path: string }[];
 }
 
 // ---------------------------------------------------------------------------
@@ -86,6 +110,13 @@ async function extractZipIntoDir(
     if (!path.startsWith(prefix)) return;
     const rel = path.slice(prefix.length);
     if (!rel || rel === ARCHIVE_HEADER_FILE) return;
+    // Allowlist rather than skiplist: the OPFS tree has a known shape, so
+    // anything else in the archive (the readable `source/` copies, notes a
+    // user dropped in, a hostile path) simply isn't restored.
+    const importable =
+      IMPORTABLE_FILES.includes(rel) ||
+      IMPORTABLE_PREFIXES.some((p) => rel.startsWith(p));
+    if (!importable) return;
     entries.push({ path: rel, entry });
   });
 
@@ -153,6 +184,17 @@ async function writeFileTo(
 // Public API
 // ---------------------------------------------------------------------------
 
+/** Keeps a user-chosen filename inside `source/`: no absolute paths, no
+ *  `..` traversal, no control characters. A path that sanitizes to nothing
+ *  falls back to its own name so the entry still appears. */
+function sanitizeArchivePath(path: string): string {
+  const parts = path
+    .split("/")
+    .map((seg) => seg.replace(/[\u0000-\u001f]/g, "").trim())
+    .filter((seg) => seg && seg !== "." && seg !== "..");
+  return parts.join("/") || "unnamed";
+}
+
 /** Suggested download filename for an export. Strips path separators and
  *  control chars that make an invalid Save-As suggestion on Windows. */
 export function suggestExportFilename(entry: WorkspaceEntry): string {
@@ -170,8 +212,9 @@ export async function exportWorkspaceToZip(
   workspaceId: string,
 ): Promise<Blob | null> {
   if (!isOpfsSupported()) return null;
-  const registry = getWorkspaceRegistry();
-  const entry = registry.find((e) => e.id === workspaceId);
+  // Drafts included: an unsaved workspace is still a workspace, and for a
+  // multi-file project this ZIP is the only way to get the files out.
+  const entry = findWorkspaceEntry(workspaceId);
   if (!entry) return null;
 
   let wsDir: FileSystemDirectoryHandle;
@@ -185,12 +228,25 @@ export async function exportWorkspaceToZip(
   const zip = new JSZip();
   await addDirToZip(wsDir, zip);
 
+  // The id → filename mapping lives in localStorage, not OPFS, so the tree
+  // above can't carry it. Without it the archive is a database dump.
+  const manifest = loadManifest(entry.playground, workspaceId);
+  const fileMap = manifest
+    ? manifest.files.map((f) => ({ id: f.id, path: f.filename }))
+    : [];
+  for (const { id, path } of fileMap) {
+    const stored = zip.file(`files/${id}`);
+    if (!stored) continue;
+    zip.file(`${ARCHIVE_SOURCE_DIR}/${sanitizeArchivePath(path)}`, await stored.async("uint8array"));
+  }
+
   const header: ArchiveHeader = {
     version: 1,
     name: entry.name,
     playground: entry.playground,
     createdAt: entry.createdAt,
     exportedAt: Date.now(),
+    ...(fileMap.length > 0 ? { files: fileMap } : {}),
   };
   zip.file(ARCHIVE_HEADER_FILE, JSON.stringify(header, null, 2));
 
@@ -209,8 +265,7 @@ export async function downloadWorkspaceZip(
 ): Promise<boolean> {
   const blob = await exportWorkspaceToZip(workspaceId);
   if (!blob) return false;
-  const registry = getWorkspaceRegistry();
-  const entry = registry.find((e) => e.id === workspaceId);
+  const entry = findWorkspaceEntry(workspaceId);
   if (!entry) return false;
   const url = URL.createObjectURL(blob);
   try {

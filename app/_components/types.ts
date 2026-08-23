@@ -1,6 +1,20 @@
 // Shared types for the playground component and language adapters.
 
-export type OutputCellType = "stdout" | "stderr" | "html" | "image" | "plot";
+/**
+ * `log` is deliberately distinct from `stderr`. In PHP (and in Unix
+ * generally) stderr is a destination, not a severity: `error_log()` and
+ * `fwrite(STDERR, …)` carry progress notes as often as failures. Painting
+ * them the same red as a warning turns a script's debug log into what
+ * looks like a wall of errors, so `log` renders neutrally and does not
+ * mark a run as failed.
+ */
+export type OutputCellType =
+  | "stdout"
+  | "stderr"
+  | "log"
+  | "html"
+  | "image"
+  | "plot";
 
 export interface OutputCell {
   id: number;
@@ -37,6 +51,14 @@ export interface EntryFileInfo {
   /** `"main"` = explicit main()/Main(); `"topLevel"` (C# only) = top-level
    *  statements outside any class. */
   kind: "main" | "topLevel";
+  /**
+   * What the Run button should call this entry point, when the filename is
+   * not it. Java launches the class that declares `main`, which a `package`
+   * line or a class/file mismatch can put somewhere the filename does not
+   * name; a button reading "Run App" for a program that starts
+   * `myapp.Main` is asserting something nobody checked.
+   */
+  label?: string;
 }
 
 export interface ExampleSnippet {
@@ -86,8 +108,21 @@ export interface ExportFormat {
   mimeType: string;
 }
 
-/** Emitter passed to `runtime.run` for streaming cells as they arrive. */
-export type EmitOutput = (cell: Omit<OutputCell, "id" | "elapsed">) => void;
+/**
+ * Emitter passed to `runtime.run` for streaming cells as they arrive.
+ *
+ * With no `seq` the cell is appended, which is all a runtime that emits
+ * once-per-complete-cell needs. Runtimes that stream a cell while it is
+ * still growing (Python's stdout during a long loop) pass `seq`, the cell's
+ * position in the run's output, and set `append` on every chunk after the
+ * first — so the surface can grow one cell instead of accumulating
+ * fragments.
+ */
+export type EmitOutput = (
+  cell: Omit<OutputCell, "id" | "elapsed">,
+  seq?: number,
+  append?: boolean,
+) => void;
 
 /** Per-run context passed to `runtime.run`. */
 export interface RunOptions {
@@ -105,6 +140,12 @@ export interface RunOptions {
    *  installs). `preparing` marks a blocking wait, so the surface shows the
    *  boot notice until execution starts; omit/false for ordinary status. */
   onStatus?: (message: string, preparing?: boolean) => void;
+  /** Report what a type checker finds, and fail the run when it finds
+   *  errors. Set by the full playground; embedded lesson blocks leave it
+   *  off, because a snippet written to illustrate one idea is not a
+   *  standalone program and its dangling references are not the reader's
+   *  bug. Only the TypeScript runtime reads it today. */
+  diagnostics?: boolean;
 }
 
 /** A completion suggestion. Plain strings are accepted anywhere an item is
@@ -165,6 +206,11 @@ export interface LanguageRuntime {
    *  so implementations must clear their tracking after returning to avoid
    *  double-reporting. */
   collectCreatedFiles?(): Promise<Map<string, Uint8Array>>;
+  /** Stop the run in flight, rejecting its `run()` promise with an error
+   *  named `RunCancelledError`, and leave the runtime ready for the next
+   *  run. Implementing this is what puts a Stop control in the surface, so
+   *  omit it unless a runaway program really can be stopped. */
+  cancelRun?(): Promise<void>;
   /** Tear down and free resources (worker, WASM heap); called on registry
    *  eviction, after which the instance must not be used. Runtimes that
    *  can't release resources omit this, which also exempts them from
@@ -218,8 +264,44 @@ export interface LanguageAdapter {
      *  react: no — it boots esbuild-wasm and pulls React from esm.sh. */
     autoPreview?: boolean;
   };
+  /**
+   * A run compiles and executes the whole workspace, not the focused file.
+   *
+   * Output is filed per editor tab by default, which is right when each
+   * file runs on its own. Where it is not (C and C++ build every source
+   * into one program), that split hides results the reader just produced
+   * and gives several runs the same number: clicking another tab showed an
+   * empty pane, and running from there started its own "Run 1" holding the
+   * same program's output. With this set, a run's output belongs to the
+   * entry file, the way it already does in split-editor playgrounds.
+   */
+  projectWideRuns?: boolean;
   /** Formats offered by the "Export" dropdown (client-side download). */
   exportFormats: ExportFormat[];
+  /**
+   * Formats for the file that is actually open, when a workspace holds
+   * more than one kind. Without it, a CSS or JS tab in the web playground
+   * downloads as `script.html` with a `text/html` type: the file renamed,
+   * not converted. Falls back to `exportFormats`.
+   */
+  exportFormatsForFile?: (filename: string) => ExportFormat[] | undefined;
+  /**
+   * The whole workspace as one runnable artifact, when that is a thing the
+   * playground can produce. The web playground composes exactly this
+   * document on every Run, so its natural deliverable is one self-
+   * contained `.html` file.
+   */
+  exportProject?: {
+    label: string;
+    description: string;
+    extension: string;
+    mimeType: string;
+    /** `files` is the workspace; returns the artifact's text. */
+    compose: (
+      files: { filename: string; content: string }[],
+      entryFilename: string,
+    ) => string | null;
+  };
   /** Base filename (without extension) used when exporting, e.g. "script". */
   exportBaseFilename: string;
   /** Default extension (no dot) for new tabs; seeds the initial file and

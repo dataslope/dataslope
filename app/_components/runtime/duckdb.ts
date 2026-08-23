@@ -20,6 +20,9 @@ import {
 import { datasetFileName, fetchDatasetBytes, fetchDatasetText } from "./remoteDatasets";
 import {
   toDateOnlyString,
+  toTimestampString,
+  arrowTimeToString,
+  arrowIntervalToString,
   unscaledDecimalToString,
   unscaledIntegerFrom,
 } from "./valueFormat";
@@ -317,7 +320,13 @@ export function arrowTypeToSqlName(arrowType: string): string {
   if (m) return `${arrowTypeToSqlName(m[1])}[]`;
   // Decimal[38e+2] → DECIMAL(38,2); the exponent part is the scale.
   m = lower.match(/^decimal\[(\d+)e([+-]?\d+)\]/);
-  if (m) return `DECIMAL(${m[1]},${Number(m[2])})`;
+  if (m) {
+    // DuckDB sends HUGEINT over Arrow as a 128-bit decimal with scale 0, so
+    // labelling it `DECIMAL(38,0)` named a type the user never wrote. 38 is
+    // also DuckDB's maximum DECIMAL precision, so nothing else lands here.
+    if (m[1] === "38" && Number(m[2]) === 0) return "HUGEINT";
+    return `DECIMAL(${m[1]},${Number(m[2])})`;
+  }
   // Timestamp<MICROSECOND> → TIMESTAMP; a trailing ", <tz>" marks TIMESTAMPTZ.
   if (lower.startsWith("timestamp")) {
     return lower.includes(",")
@@ -335,6 +344,33 @@ export function arrowTypeToSqlName(arrowType: string): string {
   if (lower.startsWith("struct")) return "STRUCT";
   if (lower.startsWith("map<")) return "MAP";
   return t;
+}
+
+
+/** Read an `Interval<MONTH_DAY_NANO>` cell straight from the Arrow buffer.
+ *
+ *  apache-arrow's `.get()` dispatches this unit to the YEAR_MONTH getter, so
+ *  it hands back `[years, months]` and silently drops the day and time
+ *  components: `INTERVAL '3 days'` arrives as `[0, 0]`. The buffer itself is
+ *  correct — 4 int32s per row, `[months, days, nanosLow, nanosHigh]` — so the
+ *  value is read from there instead. Returns null when the layout is not what
+ *  we expect, leaving the caller on its normal path. */
+function readMonthDayNano(
+  vec: { data?: ReadonlyArray<{ length: number; offset: number; values: Int32Array }> },
+  rowIndex: number,
+): Int32Array | null {
+  const chunks = vec.data;
+  if (!chunks) return null;
+  let idx = rowIndex;
+  for (const chunk of chunks) {
+    if (idx < chunk.length) {
+      const start = (chunk.offset + idx) * 4;
+      const slice = chunk.values.subarray(start, start + 4);
+      return slice.length === 4 ? slice : null;
+    }
+    idx -= chunk.length;
+  }
+  return null;
 }
 
 function arrowToQueryExecResult(
@@ -362,6 +398,35 @@ function arrowToQueryExecResult(
   const columnIsDate: boolean[] = fields.map((f) =>
     /^date/i.test(String(f.type)),
   );
+  // The other time-like Arrow types had no branch at all, so a TIMESTAMP came
+  // through as epoch millis, a TIME as a bare microsecond count, and an
+  // INTERVAL as an index-keyed dump of its Int32Array — on screen *and* in
+  // every export.
+  const columnTemporal = fields.map((f) => {
+    const type = String(f.type);
+    // apache-arrow normalizes every timestamp unit to epoch milliseconds on
+    // the way out, so the unit only matters for TIME and INTERVAL.
+    const ts = /^timestamp/i.test(type);
+    if (ts) return { kind: "timestamp" as const, unit: "", withZone: type.includes(",") };
+    // DuckDB sends TIME as `Time64<MICROSECOND>`, so the digits matter.
+    const time = /^time\d*</i.exec(type);
+    if (time) {
+      return {
+        kind: "time" as const,
+        unit: type.slice(type.indexOf("<") + 1, type.lastIndexOf(">")),
+        withZone: false,
+      };
+    }
+    const interval = /^interval</i.exec(type);
+    if (interval) {
+      return {
+        kind: "interval" as const,
+        unit: type.slice(type.indexOf("<") + 1, type.lastIndexOf(">")),
+        withZone: false,
+      };
+    }
+    return null;
+  });
   const vectors = fields.map((_f, i) => table.getChildAt(i));
   const values: SqlValue[][] = [];
   for (let r = 0; r < table.numRows; r++) {
@@ -374,6 +439,28 @@ function arrowToQueryExecResult(
         row[c] = null;
       } else if (columnIsDate[c]) {
         row[c] = toDateOnlyString(raw) ?? toSqlValue(raw);
+      } else if (columnTemporal[c] !== null) {
+        const spec = columnTemporal[c]!;
+        const formatted =
+          spec.kind === "timestamp"
+            ? toTimestampString(
+                typeof raw === "bigint" ? Number(raw) : raw,
+                spec.withZone,
+              )
+            : spec.kind === "time"
+              ? arrowTimeToString(raw, spec.unit)
+              : arrowIntervalToString(
+                  spec.unit.toUpperCase() === "MONTH_DAY_NANO"
+                    ? ((vec &&
+                        readMonthDayNano(
+                          vec as unknown as Parameters<typeof readMonthDayNano>[0],
+                          r,
+                        )) ??
+                      raw)
+                    : raw,
+                  spec.unit,
+                );
+        row[c] = formatted ?? toSqlValue(raw);
       } else if (scale !== null) {
         // Arrow stores DECIMAL(p,s) as the unscaled integer (BigInt or
         // Decimal object depending on build); re-apply the scale.
@@ -838,6 +925,39 @@ export async function createDuckDbEngine(
       snapshotTimer = null;
       void takeSnapshot();
     }, delayMs);
+  }
+
+  /** Run a pending snapshot now instead of waiting out its debounce.
+   *
+   *  Without this the database was simply not persisted: `writeDatabase`
+   *  flushes on pagehide, but a snapshot taken 1.5s after the statement had
+   *  not called it yet, so a reload within that window found nothing to
+   *  restore and silently dropped every user-created table. Uploaded files go
+   *  straight to `writeDatabase`, which is why those survived and made the
+   *  loss look arbitrary. */
+  function flushPendingSnapshot(): void {
+    if (!workspaceId || destroyed) return;
+    if (snapshotTimer) {
+      clearTimeout(snapshotTimer);
+      snapshotTimer = null;
+    }
+    void takeSnapshot().then(async () => {
+      const { flushDatabaseWrites } = await import("../opfs/databaseStorage");
+      await flushDatabaseWrites();
+    });
+  }
+
+  // `visibilitychange` fires before `pagehide` on a reload, which buys the
+  // snapshot the most time; both are registered because neither is reliable
+  // alone across browsers.
+  const onHide = () => {
+    if (typeof document === "undefined" || document.visibilityState === "hidden") {
+      flushPendingSnapshot();
+    }
+  };
+  if (typeof window !== "undefined" && workspaceId) {
+    window.addEventListener("visibilitychange", onHide);
+    window.addEventListener("pagehide", onHide);
   }
 
   /** Snapshot helper outside the engine surface (usable during construction
@@ -1709,11 +1829,22 @@ export async function createDuckDbEngine(
 
     async destroy() {
       if (destroyed) return;
-      destroyed = true;
+      if (typeof window !== "undefined" && workspaceId) {
+        window.removeEventListener("visibilitychange", onHide);
+        window.removeEventListener("pagehide", onHide);
+      }
       if (snapshotTimer) {
         clearTimeout(snapshotTimer);
         snapshotTimer = null;
+        // A pending snapshot is the user's most recent work; take it before
+        // tearing the connection down rather than dropping it.
+        try {
+          await takeSnapshot();
+        } catch {
+          /* best effort */
+        }
       }
+      destroyed = true;
       try {
         await conn.close();
       } catch {

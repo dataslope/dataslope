@@ -1,13 +1,15 @@
 import type {
-  EmitOutput,
   ExampleSnippet,
   EntryFileInfo,
   LanguageAdapter,
   LanguageRuntime,
   PackageInfo,
-  RunOptions,
 } from "../types";
 import { getClangFormat } from "./clangFormat";
+import {
+  BrowserccRuntime,
+  spawnBrowserccWorker,
+} from "./browserccRuntime";
 
 // C++ runs inside a dedicated Web Worker via browsercc, see browsercc-worker.ts.
 
@@ -487,102 +489,6 @@ int main() {
   },
 ];
 
-// ─── Worker-based runtime ────────────────────────────────────────────────
-
-type WorkerOutMessage =
-  | { kind: "loading"; message: string }
-  | { kind: "ready" }
-  | { kind: "init-error"; message: string }
-  | { kind: "run-status"; id: number; message: string; preparing: boolean }
-  | { kind: "output"; id: number; cell: { type: string; content: string } }
-  | { kind: "done"; id: number }
-  | { kind: "error"; id: number; message: string };
-
-class CppWorkerRuntime implements LanguageRuntime {
-  private nextId = 0;
-  /** Staged workspace files (path → text), so other `.cpp`/`.h`/`.hpp`
-   *  files are available to the compiler. */
-  private stagedFiles: Map<string, string> = new Map();
-
-    constructor(private worker: Worker) {}
-
-  /** Terminate the worker (registry-eviction hook; unusable after). */
-  dispose(): void {
-    this.worker.terminate();
-  }
-
-  async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
-    const decoder = new TextDecoder();
-    this.stagedFiles = new Map();
-    for (const [path, bytes] of files) {
-      // Only stage C++ source and header files for the compiler VFS.
-      if (
-        path.endsWith(".cpp") ||
-        path.endsWith(".cc") ||
-        path.endsWith(".cxx") ||
-        path.endsWith(".h") ||
-        path.endsWith(".hpp")
-      ) {
-        this.stagedFiles.set(path, decoder.decode(bytes));
-      }
-    }
-  }
-
-  async run(
-    code: string,
-    emit: EmitOutput,
-    options?: RunOptions,
-  ): Promise<void> {
-    const id = ++this.nextId;
-    // With `options.entryFilename` (Run on a non-active tab), compile the
-    // staged copy — `code` belongs to a different translation unit.
-    // Without it, ALWAYS use `code`: reading stagedFiles could pick up
-    // stale content from a previous run on the same shared runtime.
-    const explicitEntry = options?.entryFilename;
-    const entry = explicitEntry ?? "main.cpp";
-    const source = explicitEntry
-      ? (this.stagedFiles.get(entry) ?? code)
-      : code;
-    // Non-entry staged files ride along for #include resolution and extra
-    // translation units — but only in explicit multi-file mode, else stale
-    // staged files from a prior run could pollute the build.
-    const files: Array<[string, string]> = [];
-    if (explicitEntry) {
-      for (const [path, content] of this.stagedFiles) {
-        if (path !== entry) files.push([path, content]);
-      }
-    }
-    return new Promise<void>((resolve, reject) => {
-      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
-        const msg = ev.data;
-        if (
-          msg.kind !== "output" &&
-          msg.kind !== "done" &&
-          msg.kind !== "error" &&
-          msg.kind !== "run-status"
-        )
-          return;
-        if (msg.id !== id) return;
-        if (msg.kind === "run-status") {
-          // Mid-run wait (the first C++ run awaiting the precompiled
-          // header), surface the boot notice for the duration.
-          options?.onStatus?.(msg.message, msg.preparing);
-          return;
-        }
-        if (msg.kind === "output") {
-          emit(msg.cell as Parameters<EmitOutput>[0]);
-          return;
-        }
-        this.worker.removeEventListener("message", onMessage);
-        if (msg.kind === "done") resolve();
-        else reject(new Error(msg.message));
-      };
-      this.worker.addEventListener("message", onMessage);
-      this.worker.postMessage({ kind: "run", id, code: source, language: "cpp", files });
-    });
-  }
-}
-
 export const cppAdapter: LanguageAdapter = {
   id: "cpp",
   displayName: "C++ Playground",
@@ -595,7 +501,20 @@ export const cppAdapter: LanguageAdapter = {
     engine: "browsercc (clang + lld + WASI sysroot)",
     engineUrl: "https://github.com/BertalanD/browsercc",
     notes:
-      "C++ is compiled in your browser by a precompiled clang/lld toolchain (browsercc), and the resulting WASI binary is then executed with @bjorn3/browser_wasi_shim, no server roundtrip. Code is built at -O2 with -fno-exceptions, which lets the playground reuse browsercc's prebuilt libc++ precompiled header so iostream- and STL-heavy snippets compile quickly.",
+      "C++ is compiled in your browser by a precompiled clang/lld toolchain (browsercc), and the " +
+      "resulting WASI binary is then executed with @bjorn3/browser_wasi_shim, no server " +
+      "roundtrip. Code is built at -O2 with -fno-exceptions, which lets the playground reuse " +
+      "browsercc's prebuilt libc++ precompiled header so iostream- and STL-heavy snippets " +
+      "compile quickly; there is no way to turn exceptions back on here, so try/throw/catch " +
+      "will not compile and a throwing check like vector::at() stops the program instead. " +
+      "Every source file in the workspace is compiled as one translation unit, so two files " +
+      "cannot each define their own helper in an unnamed namespace. The target is wasm32-wasi " +
+      "(ILP32): long and pointers are 4 bytes, so use long long or <cstdint> for 64-bit " +
+      "values. Nothing traps on a memory error: a null dereference, an out-of-bounds access or " +
+      "a use-after-free reads zero and keeps going rather than crashing, so the compiler " +
+      "warnings are doing the safety work. To give a program input, add a file called " +
+      "stdin.txt to the workspace and it is fed to standard input. A program that has not " +
+      "finished after 20 seconds is stopped, and Stop ends one sooner.",
   },
   // CodeMirror's clike mode handles C++ syntax. `text/x-c++src` is the
   // standard MIME alias for C++ inside that mode.
@@ -609,10 +528,25 @@ export const cppAdapter: LanguageAdapter = {
   indentWidth: 2,
   examples: EXAMPLES,
   packages: PACKAGES,
+  // Only the source. "Export as .hpp" renamed the open file without
+  // turning it into a header: the download held `int main() { … }` under a
+  // name that says otherwise. A header is written, not exported.
   exportFormats: [
     { extension: "cpp", label: "C++ source (.cpp)", mimeType: "text/x-c++src" },
-    { extension: "hpp", label: "C++ header (.hpp)", mimeType: "text/x-c++hdr" },
   ],
+  // A header tab is a header; exporting it as .cpp would be the same
+  // rename in the other direction.
+  exportFormatsForFile(filename) {
+    if (/\.(hpp|hh|hxx|h\+\+)$/i.test(filename)) {
+      return [{ extension: "hpp", label: "C++ header (.hpp)", mimeType: "text/x-c++hdr" }];
+    }
+    if (/\.h$/i.test(filename)) {
+      return [{ extension: "h", label: "C header (.h)", mimeType: "text/x-chdr" }];
+    }
+    return undefined;
+  },
+  // Every source builds into one program, so one run log per workspace.
+  projectWideRuns: true,
   exportBaseFilename: "main",
   defaultFileExtension: "cpp",
   findEntryFiles(files): EntryFileInfo[] {
@@ -654,30 +588,10 @@ export const cppAdapter: LanguageAdapter = {
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Starting C++ runtime…", 0.02);
-    const worker = new Worker(
-      new URL("./browsercc-worker.ts", import.meta.url),
+    // One loading stage: the clang/lld toolchain download.
+    const worker = await spawnBrowserccWorker((message) =>
+      setLoadingMessage(message, 0.1),
     );
-    return new Promise<LanguageRuntime>((resolve, reject) => {
-      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
-        const msg = ev.data;
-        if (msg.kind === "loading") {
-          // One loading stage: the clang/lld toolchain download.
-          setLoadingMessage(msg.message, 0.1);
-        } else if (msg.kind === "ready") {
-          worker.removeEventListener("message", onMessage);
-          resolve(new CppWorkerRuntime(worker));
-        } else if (msg.kind === "init-error") {
-          worker.removeEventListener("message", onMessage);
-          worker.terminate();
-          reject(new Error(msg.message));
-        }
-      };
-      worker.addEventListener("message", onMessage);
-      worker.addEventListener("error", (ev) => {
-        worker.removeEventListener("message", onMessage);
-        reject(new Error(ev.message || "C++ worker failed to start"));
-      });
-      worker.postMessage({ kind: "init" });
-    });
+    return new BrowserccRuntime(worker, "cpp");
   },
 };

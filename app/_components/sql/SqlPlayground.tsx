@@ -258,6 +258,15 @@ type PragmaSettings = {
 };
 
 /** Minimum and maximum valid SQLite page sizes. */
+/** Column affinities offered per column when a CSV/JSON import creates the
+ *  table. Kept in step with the allowlist `sqliteColumnType` enforces. */
+const SQLITE_IMPORT_TYPE_CHOICES = [
+  "TEXT",
+  "INTEGER",
+  "REAL",
+  "NUMERIC",
+  "BLOB",
+] as const;
 const PRAGMA_PAGE_SIZE_MIN = 512;
 const PRAGMA_PAGE_SIZE_MAX = 65536;
 
@@ -675,6 +684,22 @@ function SqlPlaygroundInner() {
   const setCustomDb = useEngineStore((s) => s.setCustomDb);
   const customFilenames = useEngineStore((s) => s.customFilenames);
   const setCustomFilenames = useEngineStore((s) => s.setCustomFilenames);
+  // Imported/renamed database names are UI-only state, so they need writing
+  // back for a reload to show the same label the user left on screen.
+  useEffect(() => {
+    try {
+      if (Object.keys(customFilenames).length === 0) {
+        localStorage.removeItem(storageKey("db_filenames"));
+      } else {
+        localStorage.setItem(
+          storageKey("db_filenames"),
+          JSON.stringify(customFilenames),
+        );
+      }
+    } catch {
+      // ignore
+    }
+  }, [customFilenames]);
 
   // ─── Tab store ───────────────────────────────────────────────────────
   const tabs = useTabStore((s) => s.tabs);
@@ -745,6 +770,18 @@ function SqlPlaygroundInner() {
   const setImportCsvDragging = useDialogStore((s) => s.setImportCsvDragging);
   const importCsvState = useDialogStore((s) => s.importCsvState);
   const setImportCsvState = useDialogStore((s) => s.setImportCsvState);
+  // Override one column's inferred affinity before the table is created.
+  const setImportCsvColumnType = useCallback(
+    (index: number, type: string) => {
+      setImportCsvState((prev) => {
+        if (!prev?.columnTypes) return prev;
+        const next = [...prev.columnTypes];
+        next[index] = type;
+        return { ...prev, columnTypes: next };
+      });
+    },
+    [setImportCsvState],
+  );
   const importJsonOpen = useDialogStore((s) => s.importJsonOpen);
   const setImportJsonOpen = useDialogStore((s) => s.setImportJsonOpen);
   const importJsonDragging = useDialogStore((s) => s.importJsonDragging);
@@ -1390,11 +1427,32 @@ function SqlPlaygroundInner() {
     setClearBeforeRunState(savedClearBeforeRun);
     setPragmaSettingsState(savedPragmas);
     pragmaSettingsRef.current = savedPragmas;
+    // An id naming no sample belongs to an imported database. Keep it:
+    // `findSampleDatabase` falls back to the *first* sample, which restored
+    // that sample's label and query tabs over the imported database's data.
+    const isKnownSample = SQLITE_SAMPLE_DATABASES.some((s) => s.id === savedDb);
     const initialSample = findSampleDatabase(savedDb);
-    setActiveDbId(initialSample.id);
-    const initialTabs = loadTabs(initialSample.id, initialSample.defaultTabs);
+    const initialDbId = isKnownSample ? initialSample.id : savedDb;
+    setActiveDbId(initialDbId);
+    // The display name of an imported database lives only in this map, so it
+    // has to be restored before the selector renders.
+    try {
+      const storedNames = localStorage.getItem(storageKey("db_filenames"));
+      if (storedNames) {
+        const parsed: unknown = JSON.parse(storedNames);
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+          setCustomFilenames(parsed as Record<string, string>);
+        }
+      }
+    } catch {
+      // ignore
+    }
+    const initialTabs = loadTabs(
+      initialDbId,
+      isKnownSample ? initialSample.defaultTabs : [{ title: "Query 1", code: "" }],
+    );
     setTabs(initialTabs);
-    setActiveTabId(loadActiveTabId(initialSample.id, initialTabs));
+    setActiveTabId(loadActiveTabId(initialDbId, initialTabs));
 
     applyMode(savedTheme);
     applyThemePalette(savedTheme);
@@ -2830,6 +2888,31 @@ function SqlPlaygroundInner() {
                               <th key={h}>{h || "(empty)"}</th>
                             ))}
                           </tr>
+                          {importCsvState.targetMode === "new" &&
+                            importCsvState.columnTypes && (
+                              <tr>
+                                {importCsvState.headers.map((h, i) => (
+                                  <th key={h} className="sql-import-type-cell">
+                                    <select
+                                      className="sql-import-type-select"
+                                      value={
+                                        importCsvState.columnTypes?.[i] ?? "TEXT"
+                                      }
+                                      aria-label={`Column type for ${h || "(empty)"}`}
+                                      onChange={(e) =>
+                                        setImportCsvColumnType(i, e.target.value)
+                                      }
+                                    >
+                                      {SQLITE_IMPORT_TYPE_CHOICES.map((t) => (
+                                        <option key={t} value={t}>
+                                          {t}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </th>
+                                ))}
+                              </tr>
+                            )}
                         </thead>
                         <tbody>
                           {importCsvState.rows.slice(0, 5).map((row, i) => (

@@ -42,7 +42,7 @@ const CATEGORIES: Category[] = [
       { id: "c", label: "C", version: "C17" },
       { id: "cpp", label: "C++", version: "C++20" },
       { id: "java", label: "Java", version: "8" },
-      { id: "csharp", label: "C#", version: "13 · .NET 10" },
+      { id: "csharp", label: "C#", version: "14 · .NET 10" },
     ],
   },
   {

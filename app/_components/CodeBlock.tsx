@@ -846,7 +846,7 @@ function CodeBlockInner({
             initCode: f.initCode,
           })),
           outputs: outputs
-            .filter((c) => c.type === "stdout" || c.type === "stderr")
+            .filter((c) => c.type === "stdout" || c.type === "stderr" || c.type === "log")
             .map((c) => c.content),
         }),
       };
@@ -1293,7 +1293,7 @@ function CodeBlockInner({
   // only text is copyable (no base64 PNG / Plotly JSON blobs behind "Copy").
   const outputElapsed = outputs[outputs.length - 1]?.elapsed ?? "";
   const outputCopyText = outputs
-    .filter((c) => c.type === "stdout" || c.type === "stderr")
+    .filter((c) => c.type === "stdout" || c.type === "stderr" || c.type === "log")
     .map((c) => c.content)
     .join("\n");
 

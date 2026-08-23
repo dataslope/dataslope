@@ -984,6 +984,12 @@ body.playground-active {
   animation: playground-spin 0.75s linear infinite;
   fill: none;
 }
+/* Live elapsed time beside "Running…". Tabular figures so the ticking digits
+   don't shift the button's width. */
+.run-btn-elapsed {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
 @keyframes playground-spin {
   to {
     transform: rotate(360deg);
@@ -1107,6 +1113,19 @@ body.playground-active {
 }
 .playground-run-multi.running {
   opacity: 0.75;
+}
+/* A run that can be stopped isn't a dead control, so it keeps full contrast
+   and switches to the danger color — the button is now the way out of a
+   runaway loop, not a progress indicator. */
+.playground-run-multi.running.stoppable {
+  opacity: 1;
+  background: var(--danger);
+}
+.playground-run-multi-main.stop {
+  cursor: pointer;
+}
+.playground-run-multi-main.stop:disabled {
+  cursor: progress;
 }
 .playground-run-multi-main {
   /* Override `.run-btn` background to participate in the shared group
@@ -1404,6 +1423,12 @@ body.playground-active {
 .out-seg-stderr {
   color: var(--red);
 }
+/* A program writing to stderr deliberately (PHP's error_log, fwrite to
+   STDERR) is not reporting a failure; dimmed keeps it distinct from both
+   the program's own output and a real diagnostic. */
+.out-seg-log {
+  color: var(--text-dim);
+}
 .out-seg-image {
   text-align: center;
   white-space: normal;
@@ -1505,6 +1530,12 @@ body.playground-active {
 .dataframe-wrap .dataframe-ellipsis-col {
   text-align: center;
   color: var(--text-dim);
+}
+/* `NA` rendered as a value (R runtime): muted, so it reads as "missing"
+   rather than as text the program printed, and never as an empty cell. */
+.dataframe-wrap .dataframe-na {
+  color: var(--text-dim);
+  font-style: italic;
 }
 /* Footer row that states the full row/column count for truncated frames. */
 .dataframe-wrap .dataframe-rows-footer {
@@ -2099,7 +2130,9 @@ input[type="range"].fs-slider:disabled {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: var(--text);
+  /* Recessive while off: a filled, full-contrast knob on a grey track reads
+     as the *enabled* one when it sits next to a real on switch. */
+  background: var(--text-dim);
   transform: translateX(4px);
   transition:
     transform 0.15s,
@@ -2971,6 +3004,13 @@ input[type="range"].fs-slider:disabled {
   /* Inherits position/color from .pkg-overlay; keep it opaque enough
      that the editor underneath fades away on the small mobile screen. */
   z-index: 320;
+  /* The playground's scrolling lives in inner panes (schema tree, results,
+     editor), not on `body`, so Base UI's modal body-scroll-lock has nothing
+     to lock and a drag over the dimmed area used to scroll the playground
+     behind the open sheet. Swallow the gesture here instead, the same guard
+     `.sql-db-backdrop` uses for the database dropdown. */
+  touch-action: none;
+  overscroll-behavior: contain;
 }
 
 .mobile-drawer-viewport {
@@ -3073,6 +3113,9 @@ input[type="range"].fs-slider:disabled {
      sections (Examples / Export) expand past the drawer cap. */
   min-height: 0;
   overflow-y: auto;
+  /* Keep a flick that runs past the end of the menu inside the sheet
+     instead of chaining it to the playground underneath. */
+  overscroll-behavior: contain;
   padding: 4px 8px 16px;
   display: flex;
   flex-direction: column;
@@ -3450,6 +3493,16 @@ input[type="range"].fs-slider:disabled {
 .confirm-backdrop[data-starting-style],
 .confirm-backdrop[data-ending-style] {
   opacity: 0;
+}
+/* A dismissed dialog is still mounted while it fades out, and until it
+   unmounts it eats the click that follows — the first click on Run after
+   closing an Example confirmation went nowhere. Once it's on the way out
+   it has no business receiving input, so let clicks through immediately.
+   (Also the honest fix for a background tab, where the transition may
+   never run and the exit state can persist indefinitely.) */
+.confirm-backdrop[data-ending-style],
+.confirm-popup[data-ending-style] {
+  pointer-events: none;
 }
 .confirm-popup {
   /* Anchor the whole dialog to the UI font so a styled host (the
@@ -5806,6 +5859,9 @@ html[data-playground-theme="dark"] {
 .run-cell-content .out-seg-stderr {
   color: var(--red);
 }
+.run-cell-content .out-seg-log {
+  color: var(--text-dim);
+}
 .run-history-empty {
   flex: 1;
   display: flex;
@@ -5816,6 +5872,33 @@ html[data-playground-theme="dark"] {
   font-size: 11px;
   color: var(--text-dim);
   text-align: center;
+}
+
+/* Mid-run wait notice (e.g. "Installing data packages, first run only…"),
+   pinned above the run blocks while a run is blocked on something that
+   isn't the user's code. */
+.run-status-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 10px 0;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg2);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.run-status-note::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  border-top-color: transparent;
+  animation: playground-spin 0.75s linear infinite;
 }
 
 /* Right-side header cluster (Save ▾ · Share · ⋯). */
@@ -5885,6 +5968,50 @@ html[data-playground-theme="dark"] {
   flex: none;
   border-top: 1px solid var(--border);
   background: var(--bg);
+  /* The strip stays content-driven: a run that printed one line should not
+     cost the preview a fixed slab of height. The drag handle sets how far
+     the content may grow before it scrolls, not how tall the strip is. */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+/* Drag handle straddling the border, in the gap between preview and
+   console. Double-click restores the default height. */
+.web-console-resizer {
+  position: absolute;
+  top: -3px;
+  left: 0;
+  right: 0;
+  height: 7px;
+  cursor: ns-resize;
+  touch-action: none;
+  z-index: 2;
+}
+.web-console-resizer::after {
+  content: "";
+  position: absolute;
+  inset: 3px 0;
+  background: transparent;
+  transition: background 0.12s ease;
+}
+.web-console-resizer:hover::after,
+.web-console-resizer:active::after {
+  background: var(--primary);
+}
+/* While the console is being dragged, the preview must not take the
+   pointer: an iframe under the cursor captures the move events and the
+   drag stops halfway. */
+body.ds-resizing iframe {
+  pointer-events: none;
+}
+body.ds-resizing {
+  cursor: ns-resize;
+  user-select: none;
+}
+.web-console-time {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
 }
 .web-console-bar {
   display: flex;
@@ -5926,7 +6053,7 @@ html[data-playground-theme="dark"] {
   color: var(--text-dim);
   white-space: pre-wrap;
   word-break: break-word;
-  max-height: 140px;
+  min-height: 0;
   overflow-y: auto;
 }
 .web-console.error .web-console-content {

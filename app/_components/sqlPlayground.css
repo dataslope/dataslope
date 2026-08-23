@@ -115,12 +115,28 @@
   overscroll-behavior: contain;
 }
 
+/* Base UI positions the popup with `position: absolute; left/top: 0` plus a
+   `transform: translate(x, y)`, so its containing block is the viewport: an
+   unconstrained popup shrink-to-fits to the *full* viewport width and the
+   translate then pushes it past the right edge, giving the document a few
+   pixels of horizontal scroll (very visible inside the mobile drawer menu,
+   where the whole page — sheet included — could be dragged sideways). Cap
+   both axes to the space Base UI publishes on the positioner
+   (`--available-width` / `--available-height`, seeded to 100vw/100vh) so the
+   dropdown always fits on screen and scrolls internally instead. */
 .sql-db-positioner {
   z-index: 500;
+  max-width: var(--available-width, 100vw);
 }
 
 .sql-db-popup {
   min-width: 260px;
+  max-width: var(--available-width, 100vw);
+  max-height: var(--available-height, 100vh);
+  overflow-y: auto;
+  /* A long sample list scrolls inside the popup; don't chain that scroll
+     out to the page (or the drawer) behind it. */
+  overscroll-behavior: contain;
   z-index: 500;
   /* Both the database and schema selector dropdowns use this popup; pin
      it to the base surface so it reads a touch darker than the default
@@ -141,6 +157,9 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  /* Let the label/description column shrink below its content width so the
+     capped popup wraps the text instead of widening past the viewport. */
+  min-width: 0;
 }
 
 .sql-db-item-desc {
@@ -587,6 +606,18 @@
   color: var(--accent1);
 }
 
+/* Column type beside the name in a column's context-menu header. */
+.ctx-table-type {
+  margin-left: auto;
+  padding-left: 10px;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 .sql-tree-column-loading {
   font-style: italic;
   color: var(--text-dim);
@@ -770,6 +801,32 @@
   background: var(--bg3);
 }
 
+/* Says why the checkbox column is absent, instead of silently omitting it. */
+.sql-result-nopk-hint {
+  font-size: 11.5px;
+  font-family: var(--font-ui);
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+/* Manual re-run, beside the result pane's Download button. */
+.sql-result-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 6px;
+  border-radius: 6px;
+  color: var(--text-dim);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.sql-result-refresh-btn:hover {
+  color: var(--text);
+  background: var(--bg3);
+}
+
 .sql-result-error-body {
   background: var(--bg2);
   border-radius: 6px;
@@ -787,6 +844,40 @@
   font-size: 12px;
   color: var(--text-dim);
   font-family: var(--font-ui);
+}
+
+/* The SQL that actually ran, under the error. Open by default: with "Run
+   selection" the failing statement is often not what the editor shows, and
+   that is exactly when the message is hardest to place. */
+.sql-result-error-sql {
+  margin-top: 8px;
+}
+
+.sql-result-error-sql > summary {
+  font-size: 12px;
+  font-family: var(--font-ui);
+  color: var(--text-dim);
+  cursor: pointer;
+  user-select: none;
+}
+
+.sql-result-error-sql > summary:hover {
+  color: var(--text);
+}
+
+.sql-result-error-sql > pre {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 6px 0 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-dim);
+  white-space: pre-wrap;
+  overflow-x: auto;
+  max-height: 220px;
 }
 
 .sql-result-ok {
@@ -1006,7 +1097,10 @@
 .sql-result-table tbody td {
   padding: 4px 8px;
   color: var(--text);
-  white-space: nowrap;
+  /* `pre`, not `nowrap`: a SQL workbench has to show that `'  a  '` is not
+     `'a'`. Runs of spaces stay as typed; embedded newlines/tabs are swapped
+     for glyphs upstream (formatCellDisplay), so the row is still one line. */
+  white-space: pre;
   overflow: hidden;
   text-overflow: ellipsis;
   /* Containing block for the absolutely-positioned inline cell editor
@@ -2573,9 +2667,42 @@
   letter-spacing: 0.04em;
 }
 
+.sql-add-row-field-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
 .sql-add-row-field input {
   flex: 1;
   min-width: 0;
+}
+
+/* Per-field NULL / empty-string switch. */
+.sql-add-row-empty-toggle {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1;
+  padding: 5px 7px;
+  border-radius: 5px;
+  color: var(--text-dim);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.sql-add-row-empty-toggle:hover {
+  color: var(--text);
+  background: var(--bg3);
+}
+
+.sql-add-row-empty-toggle.active {
+  color: var(--bg);
+  background: var(--primary);
+  border-color: var(--primary);
 }
 
 .sql-add-row-another {
@@ -2762,8 +2889,57 @@
   text-overflow: ellipsis;
 }
 
+/* Inferred column type, shown under each header when the import creates the
+   table. A select rather than a label: inference is a guess the user can
+   correct before anything is created. */
+.sql-import-preview thead th.sql-import-type-cell {
+  padding: 3px 6px;
+  font-weight: 400;
+  border-bottom: 1px solid var(--border);
+}
+
+.sql-import-type-select {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 3px;
+  max-width: 130px;
+  cursor: pointer;
+}
+
+.sql-import-type-select:hover {
+  color: var(--text);
+  border-color: var(--border-strong, var(--border));
+}
+
 .sql-import-preview tbody tr:nth-child(2n) td {
   background: color-mix(in srgb, var(--text) 2%, transparent);
+}
+
+/* SQL-dump import: where the picked file should land. */
+.sql-import-target-choice {
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg2);
+}
+
+.sql-import-target-file {
+  margin: 0 0 6px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.sql-import-target-hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-dim);
 }
 
 /* Table selector row shown after a file is parsed */
@@ -5012,10 +5188,45 @@ html[data-playground-theme="dark"] .sql-result-th-type {
   text-overflow: ellipsis;
 }
 
-.sql-explain-plan {
+/* EXPLAIN modifiers (Postgres). Re-runs the plan on change. */
+.sql-explain-options {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 0 18px 10px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.sql-explain-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-family: var(--font-mono);
+  cursor: pointer;
+  user-select: none;
+}
+
+.sql-explain-option input {
+  cursor: pointer;
+  margin: 0;
+}
+
+.sql-explain-options-note {
+  color: var(--ds-orange-700, #a35200);
+}
+
+.sql-explain-plan {
+  font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 12.5px;
-  line-height: 1.5;
+  /* Tighter than the dialogs' usual 1.5: DuckDB draws its plan as a tree of
+     boxes, and the taller the line box the bigger the gap between one row's
+     `|` and the next, which turns the sides of every node into a dashed
+     line. Still comfortable for the flat text plans SQLite and Postgres
+     return. */
+  line-height: 1.25;
   color: var(--text);
   background: var(--bg);
   border-top: 1px solid var(--border);

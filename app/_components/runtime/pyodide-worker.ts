@@ -9,6 +9,7 @@
 import type { PyodideInterface } from "pyodide";
 import { POLARS_IMPORT_PATTERN, POLARS_WASM_SHIM } from "./polarsWasm";
 import { toOutputCells } from "./pythonDisplayOutputs";
+import { annotateRunError, cleanPythonTraceback } from "./pythonErrors";
 
 declare const self: DedicatedWorkerGlobalScope;
 
@@ -30,7 +31,8 @@ function loadPyodideModule(): Promise<{
 
 // ─── Output cell shape (mirrors `OutputCell` minus the bookkeeping the
 //     main thread fills in) ───────────────────────────────────────────────
-type OutputCellType = "stdout" | "stderr" | "html" | "image" | "plot";
+// Mirrors OutputCellType in ../types; the worker cannot import it.
+type OutputCellType = "stdout" | "stderr" | "log" | "html" | "image" | "plot";
 interface OutputCellMessage {
   type: OutputCellType;
   content: string;
@@ -51,7 +53,15 @@ interface CompletionItemMessage {
 
 type InMessage =
   | { kind: "init" }
-  | { kind: "run"; id: number; code: string; theme?: "light" | "dark" }
+  | {
+      kind: "run";
+      id: number;
+      code: string;
+      theme?: "light" | "dark";
+      /** Workspace path of the entry file, used as the traceback filename. */
+      entryFilename?: string;
+    }
+  | { kind: "collect-created-files"; id: number }
   | {
       kind: "complete";
       id: number;
@@ -84,11 +94,27 @@ type OutMessage =
   | { kind: "ready" }
   | { kind: "init-error"; message: string }
   | { kind: "run-status"; id: number; message: string; preparing: boolean }
-  | { kind: "output"; id: number; cell: OutputCellMessage }
+  | {
+      kind: "output";
+      id: number;
+      cell: OutputCellMessage;
+      /** Position of the cell within the run's output stream. Cells are
+       *  posted as they are produced, so the same `seq` can arrive more than
+       *  once for a text segment that is still growing (see `append`). */
+      seq: number;
+      /** True when `cell.content` continues the cell already sent for `seq`
+       *  rather than replacing it. */
+      append?: boolean;
+    }
   | { kind: "done"; id: number }
   | { kind: "error"; id: number; message: string }
   | { kind: "prepare-fs-done"; id: number }
   | { kind: "prepare-fs-error"; id: number; message: string }
+  | {
+      kind: "created-files";
+      id: number;
+      files: Array<[string, Uint8Array]>;
+    }
   | {
       kind: "complete-result";
       id: number;
@@ -221,20 +247,115 @@ async function initPyodide(): Promise<void> {
   // matplotlib-free: this script must run on the bare (phase A) interpreter.
   await pyodide.runPythonAsync(`
 import sys, io, base64, json, ast as _ast, re as _re
+from time import monotonic as _pg_monotonic
 from pyodide.code import find_imports as _pg_find_imports
 
 _display_outputs = []
+
+# ─── Incremental output streaming ─────────────────────────────────────
+# Output used to be posted to the surface in one lump after the run
+# finished, so a long loop showed nothing at all until it ended (and a
+# runaway loop showed nothing, ever). The list above is still the
+# authoritative record; these push each segment to the main thread as it
+# is produced, batched on a timer so a print-heavy loop doesn't turn into
+# a postMessage storm.
+#
+# _pg_stream_sink(seq, kind, content, append) is a JS callback installed
+# per run by runCode(). Text segments are streamed *stripped*: leading
+# whitespace is skipped and trailing whitespace is held back until more
+# text arrives, so the streamed concatenation equals the .trim() the
+# non-streaming path applies in toOutputCells().
+_pg_stream_sink = None
+# Per-entry progress: for a text entry, the index in its text up to which
+# content has been sent; for a rich entry, True once posted.
+_pg_sent = []
+# First entry that may still change; everything before it is final.
+_pg_stream_from = 0
+_pg_stream_last = 0.0
+_pg_stream_dirty = 0
+_pg_stream_tick = 0
+_PG_STREAM_INTERVAL = 0.06
+_PG_STREAM_CHARS = 8192
+
+def _pg_stream_reset():
+    global _pg_stream_from, _pg_stream_last, _pg_stream_dirty, _pg_stream_tick
+    _pg_sent.clear()
+    _pg_stream_from = 0
+    _pg_stream_last = _pg_monotonic()
+    _pg_stream_dirty = 0
+    _pg_stream_tick = 0
+
+def _pg_stream_flush(force=False):
+    """Hand everything not yet sent to the surface. Cheap to call often:
+    it walks only from the first entry that can still change, and each
+    character is scanned at most once across the whole run."""
+    global _pg_stream_from, _pg_stream_last, _pg_stream_dirty
+    sink = _pg_stream_sink
+    if sink is None:
+        return
+    now = _pg_monotonic()
+    if not force and (now - _pg_stream_last) < _PG_STREAM_INTERVAL:
+        return
+    _pg_stream_last = now
+    _pg_stream_dirty = 0
+    n = len(_display_outputs)
+    i = _pg_stream_from
+    while i < n:
+        entry = _display_outputs[i]
+        while len(_pg_sent) <= i:
+            _pg_sent.append(None)
+        kind = entry.get("type")
+        if kind == "stdout" or kind == "stderr":
+            text = entry["text"]
+            end = len(text)
+            while end > 0 and text[end - 1].isspace():
+                end -= 1
+            prev = _pg_sent[i]
+            if prev is None:
+                start = 0
+                while start < end and text[start].isspace():
+                    start += 1
+                if start < end:
+                    sink(i, kind, text[start:end], False)
+                    _pg_sent[i] = end
+            elif end > prev:
+                sink(i, kind, text[prev:end], True)
+                _pg_sent[i] = end
+        elif _pg_sent[i] is None:
+            sink(i, kind, json.dumps(entry), False)
+            _pg_sent[i] = True
+        # Only the newest entry can still grow, so skip the rest next time.
+        if i < n - 1:
+            _pg_stream_from = i + 1
+        i += 1
 
 def _pg_emit_text(kind, s):
     """Append stream text to the ordered output list, merging consecutive
     writes of the same stream into one segment (print() emits the text and
     its newline as separate writes)."""
+    global _pg_stream_dirty, _pg_stream_tick
     if not s:
         return
     if _display_outputs and _display_outputs[-1].get("type") == kind:
         _display_outputs[-1]["text"] += s
     else:
         _display_outputs.append({"type": kind, "text": s})
+    # Two triggers, because either alone leaves a hole. The character count
+    # bypasses the timer so a fast loop streams by volume rather than sitting
+    # in the buffer; the tick counter catches a slow loop that never reaches
+    # the threshold, and bounds monotonic() to one call per 64 writes.
+    _pg_stream_dirty += len(s)
+    _pg_stream_tick += 1
+    if _pg_stream_dirty >= _PG_STREAM_CHARS:
+        _pg_stream_flush(True)
+    elif (_pg_stream_tick & 63) == 0:
+        _pg_stream_flush()
+
+def _pg_emit_cell(entry):
+    """Append a rich output cell (table, image, chart) and push it out
+    immediately. These are rare, and worth showing the moment they exist."""
+    _display_outputs.append(entry)
+    _pg_stream_flush(True)
 
 # Tee installed over sys.stdout/sys.stderr while user code runs, so prints
 # land in _display_outputs *in order* with display() tables, figures and
@@ -306,43 +427,65 @@ def display(*objs):
                 # Strip the <style> block pandas injects so it does not
                 # override the playground's own table/th/td styles.
                 h = _strip_html_styles(h)
-            _display_outputs.append({"type": "dataframe", "html": h})
+            _pg_emit_cell({"type": "dataframe", "html": h})
         elif hasattr(obj, "_repr_html_"):
             h = obj._repr_html_()
             if h:
                 # Strip injected <style> blocks (e.g. from polars) so they
                 # do not override the playground's own table styles.
                 h = _strip_html_styles(h)
-                _display_outputs.append({"type": "html", "html": h})
+                _pg_emit_cell({"type": "html", "html": h})
         else:
             _pg_emit_text("stdout", repr(obj) + "\\n")
 
 import builtins
 builtins.display = display
 
+def _pg_input(prompt=""):
+    """Replace builtins.input().
+
+    There is no stdin here: the run happens inside a Web Worker with no
+    channel back to the page mid-execution, and Pyodide's default stdin
+    surfaces that as a bare \`OSError: [Errno 29] I/O error\` *after*
+    printing the prompt, which reads as "the program hung, then crashed".
+    Fail immediately with an explanation and a way forward instead."""
+    if prompt:
+        sys.stdout.write(str(prompt))
+    raise RuntimeError(
+        "input() isn't available in this playground: there's no console to "
+        "type into. Assign the value directly (e.g. name = \\"Ada\\"), or "
+        "upload a file in the Files panel and read it with open()."
+    )
+
+builtins.input = _pg_input
+
 import asyncio as _asyncio
 
-async def _execute_with_last_display(code):
-    """Execute user code, auto-displaying the last expression like Jupyter."""
+async def _execute_with_last_display(code, filename="main.py"):
+    """Execute user code, auto-displaying the last expression like Jupyter.
+
+    \`filename\` is the workspace path of the entry file and becomes the
+    compile-time filename, so tracebacks name the file the user is actually
+    looking at instead of \`<string>\`."""
     _globals = globals()
     _flags = _ast.PyCF_ALLOW_TOP_LEVEL_AWAIT
-    tree = _ast.parse(code)
+    tree = _ast.parse(code, filename=filename)
     if tree.body and isinstance(tree.body[-1], _ast.Expr):
         last_expr = tree.body.pop()
         if tree.body:
             _ast.fix_missing_locations(tree)
-            result = eval(compile(tree, "<string>", "exec", flags=_flags), _globals)
+            result = eval(compile(tree, filename, "exec", flags=_flags), _globals)
             if _asyncio.iscoroutine(result):
                 await result
         expr_tree = _ast.Expression(body=last_expr.value)
         _ast.fix_missing_locations(expr_tree)
-        result = eval(compile(expr_tree, "<string>", "eval", flags=_flags), _globals)
+        result = eval(compile(expr_tree, filename, "eval", flags=_flags), _globals)
         if _asyncio.iscoroutine(result):
             result = await result
         if result is not None:
             display(result)
     else:
-        result = eval(compile(tree, "<string>", "exec", flags=_flags), _globals)
+        result = eval(compile(tree, filename, "exec", flags=_flags), _globals)
         if _asyncio.iscoroutine(result):
             await result
 
@@ -464,12 +607,17 @@ import matplotlib.pyplot as plt
 
 _original_show = plt.show
 def _patched_show(*args, **kwargs):
-    buf = io.BytesIO()
-    plt.savefig(buf, format="png", bbox_inches="tight", dpi=130, facecolor=plt.gcf().get_facecolor())
-    buf.seek(0)
-    img_b64 = base64.b64encode(buf.read()).decode()
-    _display_outputs.append({"type": "image", "data": img_b64})
-    plt.clf()
+    """Render EVERY open figure, the way plt.show() does in a script and
+    the way the matplotlib_inline backend does in a notebook.
+
+    This used to savefig() the *current* figure only and then close them
+    all, so the common "build several figures, show() once at the end"
+    pattern silently threw away everything but the last one."""
+    for _num in plt.get_fignums():
+        _fig = plt.figure(_num)
+        buf = io.BytesIO()
+        _fig.savefig(buf, format="png", bbox_inches="tight", dpi=130, facecolor=_fig.get_facecolor())
+        _pg_emit_cell({"type": "image", "data": base64.b64encode(buf.getvalue()).decode()})
     plt.close("all")
 plt.show = _patched_show
 
@@ -658,6 +806,7 @@ async function runCode(
   id: number,
   code: string,
   theme: "light" | "dark" = "dark",
+  entryFilename = "main.py",
 ): Promise<void> {
   if (!pyodide) throw new Error("Pyodide is not initialised");
 
@@ -727,10 +876,57 @@ async function runCode(
     post({ kind: "run-status", id, message: "Running…", preparing: false });
   }
 
-  await pyodide.runPythonAsync("_pg_reset_user_globals(); _display_outputs.clear()");
+  await pyodide.runPythonAsync(
+    "_pg_reset_user_globals(); _display_outputs.clear(); _pg_stream_reset()",
+  );
+
+  // ─── Live output ────────────────────────────────────────────────────
+  // Cells are posted as Python produces them (see _pg_stream_flush), so a
+  // slow loop shows its progress and a stopped run keeps whatever it had
+  // already printed. `seq` positions each cell in the run's stream; the
+  // JS-level captures below take the first slots.
+  let seq = 0;
+  const postJsCapture = (
+    type: "stdout" | "stderr",
+    text: string,
+  ): void => {
+    if (!text.trim()) return;
+    post({ kind: "output", id, seq: seq++, cell: { type, content: text.trim() } });
+  };
+  postJsCapture("stdout", stdout);
+  postJsCapture("stderr", stderr);
+  stdout = "";
+  stderr = "";
+  const seqOffset = seq;
+
+  const streamSink = (
+    entryIndex: number,
+    type: string,
+    content: string,
+    append: boolean,
+  ): void => {
+    const cellSeq = seqOffset + entryIndex;
+    if (type === "stdout" || type === "stderr") {
+      post({ kind: "output", id, seq: cellSeq, append, cell: { type, content } });
+      return;
+    }
+    // Rich cells arrive as the JSON of one `_display_outputs` entry, so the
+    // shared converter renders them exactly like the batched path did.
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(content);
+    } catch {
+      return;
+    }
+    for (const cell of toOutputCells([parsed])) {
+      post({ kind: "output", id, seq: cellSeq, cell });
+    }
+  };
+  pyodide.globals.set("_pg_stream_sink", streamSink);
 
   // Pass the code as a Python string to avoid template-literal escaping.
   pyodide.globals.set("_user_code_str", code);
+  pyodide.globals.set("_pg_entry_filename", entryFilename);
 
   // Wrap user code with a Plotly show() intercept and Jupyter-style
   // last-expression auto-display. The theme-appropriate Plotly template
@@ -754,14 +950,14 @@ if _plotly is not None:
     # Plotly figures land in the same ordered output list as prints and
     # display() tables, so fig.show() keeps its place in the run's output.
     def _patched_plotly_show(fig, *args, **kwargs):
-        _display_outputs.append({"type": "plot", "json": fig.to_json()})
+        _pg_emit_cell({"type": "plot", "json": fig.to_json()})
 
     _plotly.io.show = _patched_plotly_show
     try:
         import plotly.graph_objects as _go
         _orig_go_show = _go.Figure.show
         def _patched_go_show(self, *args, **kwargs):
-            _display_outputs.append({"type": "plot", "json": self.to_json()})
+            _pg_emit_cell({"type": "plot", "json": self.to_json()})
         _go.Figure.show = _patched_go_show
     except: pass
 
@@ -770,7 +966,7 @@ if _plotly is not None:
 _pg_prev_stdout, _pg_prev_stderr = sys.stdout, sys.stderr
 sys.stdout, sys.stderr = _PgTee("stdout"), _PgTee("stderr")
 try:
-    await _execute_with_last_display(_user_code_str)
+    await _execute_with_last_display(_user_code_str, _pg_entry_filename)
 finally:
     sys.stdout, sys.stderr = _pg_prev_stdout, _pg_prev_stderr
     if _plotly is not None:
@@ -789,32 +985,31 @@ if _plt is not None:
         _fig = _plt.figure(_fig_num)
         _buf = io.BytesIO()
         _fig.savefig(_buf, format="png", bbox_inches="tight", dpi=130, facecolor=_fig.get_facecolor())
-        _display_outputs.append({"type": "image", "data": base64.b64encode(_buf.getvalue()).decode()})
+        _pg_emit_cell({"type": "image", "data": base64.b64encode(_buf.getvalue()).decode()})
     _plt.close("all")
 `;
 
-  // Post the ordered output stream. Runs in a finally so pre-exception
-  // output still renders, followed by the traceback, like a notebook.
+  // Drain whatever Python produced but hasn't streamed yet. Runs in a
+  // finally so pre-exception output still renders, followed by the
+  // traceback, like a notebook.
   const flushOutputs = () => {
     if (!pyodide) return;
-    let displayOutputsRaw: unknown;
+    let entryCount = 0;
     try {
-      const displayProxy = pyodide.globals.get("_display_outputs");
-      displayOutputsRaw = displayProxy.toJs({
-        dict_converter: Object.fromEntries,
-      });
-      displayProxy.destroy();
+      pyodide.runPython("_pg_stream_flush(True)");
+      entryCount = pyodide.runPython("len(_display_outputs)") as number;
     } catch {
-      return;
+      /* The interpreter is wedged; the run's error is the real story. */
     }
-
-    // JS-level captures (output outside the per-run tee window, e.g. the
-    // package-loader failure note) post first.
-    if (stdout.trim()) post({ kind: "output", id, cell: { type: "stdout", content: stdout.trim() } });
-    if (stderr.trim()) post({ kind: "output", id, cell: { type: "stderr", content: stderr.trim() } });
-
-    for (const cell of toOutputCells(displayOutputsRaw)) {
-      post({ kind: "output", id, cell });
+    // Anything written outside the per-run tee window (e.g. a late
+    // package-loader note) lands after the program's own output.
+    seq = seqOffset + entryCount;
+    postJsCapture("stdout", stdout);
+    postJsCapture("stderr", stderr);
+    try {
+      pyodide.runPython("_pg_stream_sink = None");
+    } catch {
+      /* Nothing to detach if the interpreter is gone. */
     }
   };
 
@@ -942,12 +1137,16 @@ async function prepareFs(files: Array<[string, Uint8Array]>): Promise<void> {
   const FS = (pyodide as unknown as { FS: PyodideFS }).FS;
 
   const nextPaths = new Set<string>();
+  // Re-stamp from scratch: a path dropped from the workspace must also drop
+  // out of the "already known" set, or re-uploading it would look unchanged.
+  stagedStamps.clear();
   for (const [relPath, bytes] of files) {
     const abs = joinStagedPath(relPath);
     nextPaths.add(abs);
     ensureDirs(FS, abs);
     try {
       FS.writeFile(abs, bytes);
+      stagedStamps.set(relPath.replace(/^\/+/, ""), statStamp(FS, abs));
     } catch (err) {
       // Include the offending path so invalid filenames are debuggable.
       throw new Error(
@@ -981,9 +1180,104 @@ async function prepareFs(files: Array<[string, Uint8Array]>): Promise<void> {
 
 interface PyodideFS {
   writeFile(path: string, data: Uint8Array | string): void;
+  readFile(path: string): Uint8Array;
   unlink(path: string): void;
   mkdir(path: string): void;
   analyzePath(path: string): { exists: boolean };
+  readdir(path: string): string[];
+  stat(path: string): { mode: number; size: number; mtime: Date };
+  isDir(mode: number): boolean;
+  isFile(mode: number): boolean;
+}
+
+// ─── Files the program wrote ───────────────────────────────────────────
+// `df.to_csv("out.csv")`, `plt.savefig("chart.png")` and friends land in the
+// staged root and used to be invisible: not in the Files panel, not
+// downloadable, gone on reload. After each run the tree is diffed against
+// the snapshot taken at staging time and anything new (or rewritten) is
+// handed to the surface, which persists it like an upload.
+
+/** Size/mtime of each staged file right after `prepareFs` wrote it. */
+const stagedStamps = new Map<string, string>();
+
+/** Ceilings on what one run can hand back, so a program that fills the
+ *  filesystem in a loop can't wedge the tab trying to mirror it. */
+const CREATED_FILES_MAX = 50;
+const CREATED_BYTES_MAX = 64 * 1024 * 1024;
+
+/** Directories that are runtime bookkeeping, not the user's output. */
+function isIgnoredDirName(name: string): boolean {
+  return name === "__pycache__" || name.startsWith(".");
+}
+
+function statStamp(FS: PyodideFS, absPath: string): string {
+  try {
+    const st = FS.stat(absPath);
+    return `${st.size}:${st.mtime instanceof Date ? st.mtime.getTime() : 0}`;
+  } catch {
+    return "";
+  }
+}
+
+/** Every regular file under `dir`, as `[relative path, absolute path]`. */
+function walkStagedTree(
+  FS: PyodideFS,
+  dir: string,
+  relPrefix: string,
+  out: Array<[string, string]>,
+): void {
+  let names: string[];
+  try {
+    names = FS.readdir(dir);
+  } catch {
+    return;
+  }
+  for (const name of names) {
+    if (name === "." || name === "..") continue;
+    if (isIgnoredDirName(name)) continue;
+    const abs = `${dir}/${name}`;
+    const rel = relPrefix ? `${relPrefix}/${name}` : name;
+    let mode: number;
+    try {
+      mode = FS.stat(abs).mode;
+    } catch {
+      continue;
+    }
+    if (FS.isDir(mode)) walkStagedTree(FS, abs, rel, out);
+    else if (FS.isFile(mode)) out.push([rel, abs]);
+    if (out.length > CREATED_FILES_MAX * 4) return;
+  }
+}
+
+/** Files the last run created or rewrote, keyed by workspace-relative path.
+ *  Clearing the stamps afterwards is what stops a file being reported twice:
+ *  the next call re-stamps it as already known. */
+function collectCreatedFiles(): Array<[string, Uint8Array]> {
+  if (!pyodide) return [];
+  const FS = (pyodide as unknown as { FS: PyodideFS }).FS;
+  const found: Array<[string, string]> = [];
+  walkStagedTree(FS, STAGED_ROOT, "", found);
+
+  const created: Array<[string, Uint8Array]> = [];
+  let bytes = 0;
+  for (const [rel, abs] of found) {
+    const stamp = statStamp(FS, abs);
+    if (stagedStamps.get(rel) === stamp) continue;
+    let data: Uint8Array;
+    try {
+      data = FS.readFile(abs);
+    } catch {
+      continue;
+    }
+    if (created.length >= CREATED_FILES_MAX) break;
+    if (bytes + data.length > CREATED_BYTES_MAX) break;
+    bytes += data.length;
+    // Copy out of the Emscripten heap; the view would otherwise be
+    // detached (or reused) by the time the main thread reads it.
+    created.push([rel, new Uint8Array(data)]);
+    stagedStamps.set(rel, stamp);
+  }
+  return created;
 }
 
 function ensureDirs(FS: PyodideFS, absFilePath: string): void {
@@ -1020,19 +1314,35 @@ self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
   }
 
   if (msg.kind === "run") {
-    const { id, code, theme } = msg;
+    const { id, code, theme, entryFilename } = msg;
     enqueue(async () => {
       try {
         if (initPromise) await initPromise;
-        await runCode(id, code, theme);
+        await runCode(id, code, theme, entryFilename);
         post({ kind: "done", id });
       } catch (err) {
+        const raw = err instanceof Error ? err.message : String(err);
         post({
           kind: "error",
           id,
-          message: err instanceof Error ? err.message : String(err),
+          message: annotateRunError(cleanPythonTraceback(raw)),
         });
       }
+    });
+    return;
+  }
+
+  if (msg.kind === "collect-created-files") {
+    const { id } = msg;
+    enqueue(async () => {
+      if (initPromise) await initPromise;
+      let files: Array<[string, Uint8Array]> = [];
+      try {
+        files = collectCreatedFiles();
+      } catch {
+        // Best-effort: a filesystem hiccup must not fail the run.
+      }
+      post({ kind: "created-files", id, files });
     });
     return;
   }

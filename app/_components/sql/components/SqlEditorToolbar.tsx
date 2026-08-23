@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Menu } from "@base-ui/react/menu";
 import { ChevronDown, ListTree, Play } from "lucide-react";
 
@@ -35,6 +36,26 @@ const SPINNER = (
   </svg>
 );
 
+/** `Running… 3.2s`. A long query used to show a motionless spinner with no
+ *  way to tell a slow query from a hung one; the ticking count is the signal
+ *  that work is still happening. Starts counting at half a second so a normal
+ *  fast query doesn't flash a number. */
+function RunningElapsed() {
+  const [elapsedMs, setElapsedMs] = useState(0);
+  useEffect(() => {
+    const startedAt = performance.now();
+    const id = window.setInterval(
+      () => setElapsedMs(performance.now() - startedAt),
+      100,
+    );
+    return () => window.clearInterval(id);
+  }, []);
+  if (elapsedMs < 500) return null;
+  return (
+    <span className="run-btn-elapsed"> {(elapsedMs / 1000).toFixed(1)}s</span>
+  );
+}
+
 interface RunMenuItem {
   label: string;
   kbd: string;
@@ -66,7 +87,14 @@ function RunSplit({
         onClick={onMain}
       >
         {running ? SPINNER : <Play size={10} aria-hidden="true" />}
-        {running ? "Running…" : mainLabel}
+        {running ? (
+          <>
+            Running…
+            <RunningElapsed />
+          </>
+        ) : (
+          mainLabel
+        )}
       </button>
       <span className="run-btn-split-divider" aria-hidden="true" />
       <Menu.Root>
@@ -164,7 +192,14 @@ export function SqlEditorToolbar({
             onClick={onRunAll}
           >
             {running ? SPINNER : <Play size={10} aria-hidden="true" />}
-            {running ? "Running…" : "Run"}
+            {running ? (
+              <>
+                Running…
+                <RunningElapsed />
+              </>
+            ) : (
+              "Run"
+            )}
           </button>
         )}
         <button

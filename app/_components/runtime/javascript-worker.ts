@@ -4,7 +4,13 @@
 // stage into VirtualFS and the entry runs with CommonJS semantics.
 // Protocol: see In/OutMessage below.
 
-import { AlmostNodeRunner, normalizeVfsPath } from "./almostnode-worker-shared";
+import {
+  AlmostNodeRunner,
+  BufferedOutput,
+  installRejectionReporting,
+  normalizeVfsPath,
+  type OutputChunk,
+} from "./almostnode-worker-shared";
 
 declare const self: DedicatedWorkerGlobalScope;
 
@@ -16,9 +22,15 @@ type OutMessage =
   | { kind: "ready" }
   | { kind: "prepare-fs-done"; id: number }
   | { kind: "prepare-fs-error"; id: number; message: string }
-  | { kind: "stdout"; id: number; content: string }
-  | { kind: "stderr"; id: number; content: string }
-  | { kind: "done"; id: number };
+  | ({ kind: "output"; id: number } & OutputChunk)
+  | {
+      kind: "done";
+      id: number;
+      /** Message for a run that ended in an uncaught error, else null. */
+      error: string | null;
+      /** Files the program wrote, for the Files panel. */
+      createdFiles: Array<[string, Uint8Array]>;
+    };
 
 function post(msg: OutMessage): void {
   self.postMessage(msg);
@@ -47,15 +59,19 @@ async function handleRun(
   entryPath: string,
 ): Promise<void> {
   const entryVfsPath = normalizeVfsPath(entryPath);
+  const output = new BufferedOutput((chunk) => post({ kind: "output", id, ...chunk }));
 
   // `code` is always the authoritative entry source; using it directly
   // guarantees a single-file run never executes a leftover entry file.
-  await runner.run(entryVfsPath, () => code, {
-    stdout: (content) => post({ kind: "stdout", id, content }),
-    stderr: (content) => post({ kind: "stderr", id, content }),
-  });
+  const result = await runner.run(entryVfsPath, () => code, output);
+  output.flush();
 
-  post({ kind: "done", id });
+  post({
+    kind: "done",
+    id,
+    error: result.error,
+    createdFiles: result.createdFiles,
+  });
 }
 
 // Serialise requests so async user code can't interleave across runs.
@@ -64,6 +80,7 @@ function enqueue(task: () => Promise<void>): void {
   queue = queue.then(task, task).catch(() => {});
 }
 
+installRejectionReporting();
 post({ kind: "ready" });
 
 self.addEventListener("message", (ev: MessageEvent<InMessage>) => {

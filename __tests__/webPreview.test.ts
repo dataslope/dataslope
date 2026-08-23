@@ -113,7 +113,7 @@ describe("composeWebDocument", () => {
       token,
       textFiles: new Map([["m.js", "export {};"]]),
     });
-    expect(doc).toContain(`<script type="module" data-inlined-from="m.js">`);
+    expect(doc).toContain(`<script type="module" data-inlined-from="m.js" data-source-lines="1">`);
   });
 
   it("wraps classic defer scripts in DOMContentLoaded", () => {
@@ -300,9 +300,13 @@ describe("webAdapter.composeStaticPreview", () => {
       entryHtml: sources[0].source,
       token: TOKEN,
       textFiles,
+      entryFile: sources[0].filename,
     });
     expect(runDoc).toBe(compose());
-    expect(runDoc).toContain(buildPreviewBridge(TOKEN));
+    // The bridge carries this document's own line map, so compare the part
+    // that does not: everything up to where the map is spliced in.
+    const bridgeHead = buildPreviewBridge(TOKEN).split("var SOURCES =")[0];
+    expect(runDoc).toContain(bridgeHead);
   });
 
   it("falls back to the first file when the entry name is unknown", () => {

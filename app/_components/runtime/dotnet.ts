@@ -9,8 +9,22 @@
 // assemblies never fall back to the app origin.
 
 import { CDN_BASE_URL } from "./cdn";
+import { EXCEPTION_HOOK_SOURCE } from "./csharpBuild";
 
 const RUNTIME_BUNDLE_BASE = `${CDN_BASE_URL}/_dotnet/`;
+
+/**
+ * What the bundle actually is, read back from the runtime itself with
+ * `RuntimeInformation.FrameworkDescription` and locked in by
+ * `__tests__/csharpBuild.test.ts`.
+ *
+ * It was hard-coded as ".NET 9" / "C# 13" in two places, understating the
+ * playground by a whole major version — which is the sort of thing that
+ * quietly costs a panel its credibility.
+ */
+export const DOTNET_VERSION = "10.0.7";
+/** The language version that .NET 10's Roslyn compiles by default. */
+export const CSHARP_VERSION = "14";
 const BOOT_SCRIPT_URL = `${RUNTIME_BUNDLE_BASE}dotnet.js`;
 const BOOT_CONFIG_URL = `${RUNTIME_BUNDLE_BASE}dotnet.boot.js`;
 
@@ -25,6 +39,54 @@ export interface DotnetApi {
   /** Compile + run a C# script (top-level statements allowed) via
    *  CSharpScript.RunAsync. */
   runScript(code: string): Promise<CSharpScriptResult>;
+  /** True once the warm-up compile has finished, which is what makes a
+   *  run's duration predictable enough to put a cap on. */
+  isWarm(): boolean;
+  /**
+   * Resolves when the warm-up compile is done, reporting what it is doing
+   * while it runs. Resolves either way: a warm-up that failed leaves the
+   * work to the run that follows, exactly as it was before.
+   *
+   * Awaited at the top of every run, which also keeps two scripts from
+   * being in the host at once — they would fight over the console it
+   * redirects.
+   */
+  whenWarm(onProgress?: (message: string) => void): Promise<void>;
+}
+
+/**
+ * Count the reference assemblies the compiler pulls, for the boot notice.
+ *
+ * The first compile downloads one metadata reference per loaded assembly,
+ * sequentially, from inside .NET. They do not pass through the host's
+ * resource loader — they are `HttpClient` calls, which on this runtime are
+ * `fetch` — so the only place to see them is `fetch` itself. Wrapped for
+ * the duration of the warm-up and put back afterwards.
+ */
+function countBundleFetches(onCount: (count: number) => void): () => void {
+  if (typeof window === "undefined" || typeof window.fetch !== "function") {
+    return () => {};
+  }
+  const original = window.fetch;
+  let count = 0;
+  const patched: typeof window.fetch = (input, init) => {
+    const url =
+      typeof input === "string"
+        ? input
+        : input instanceof URL
+          ? input.href
+          : input.url;
+    if (url.startsWith(RUNTIME_BUNDLE_BASE) && url.endsWith(".dll")) {
+      onCount(++count);
+    }
+    return original(input, init);
+  };
+  window.fetch = patched;
+  return () => {
+    // Only restore what is still ours: another patch layered on top of
+    // this one has its own idea of what the original was.
+    if (window.fetch === patched) window.fetch = original;
+  };
 }
 
 /** dotnet.js exports a `dotnet` DotnetHostBuilder as an ES-module named export. */
@@ -63,6 +125,11 @@ interface DotnetModule {
   dotnet: DotnetHostBuilder;
 }
 
+/** Compiles and runs, touching nothing the reader can see, so the
+ *  reference assemblies are downloaded and Roslyn is warm before Run is
+ *  pressed — and the one AppDomain-lifetime hook is in place. */
+export const WARMUP_SCRIPT = `${EXCEPTION_HOOK_SOURCE}\nSystem.Console.Write("");`;
+
 let dotnetPromise: Promise<DotnetApi> | null = null;
 
 /** Import the boot script once per page, point the runtime at the jsDelivr
@@ -93,7 +160,7 @@ export function loadDotnet(
 
     // create() is the heavy stage: streams the ~35 MB assembly bundle and
     // instantiates the Mono WASM runtime.
-    setLoadingMessage("Initialising C# runtime…", 0.15);
+    setLoadingMessage("Downloading the .NET runtime…", 0.15);
     const host = await dotnetBuilder
       .withConfigSrc(BOOT_CONFIG_URL)
       .withResourceLoader((_type, name) => {
@@ -107,7 +174,7 @@ export function loadDotnet(
       getDotnetBundleBaseUrl: () => RUNTIME_BUNDLE_BASE,
     });
 
-    setLoadingMessage("Preparing C# compiler…", 0.85);
+    setLoadingMessage("Preparing the C# compiler…", 0.6);
     const exports = await host.getAssemblyExports("ScriptRunner");
     const runScriptExport = lookupExport(exports, [
       "ScriptRunner",
@@ -120,12 +187,57 @@ export function loadDotnet(
       );
     }
 
-    return {
-      async runScript(code: string): Promise<CSharpScriptResult> {
-        const raw = (await runScriptExport(code)) as unknown;
-        return parseScriptResult(raw);
+    let warm = false;
+    let reportWarmProgress: ((message: string) => void) | null = null;
+
+    const runScript = async (code: string): Promise<CSharpScriptResult> => {
+      const raw = (await runScriptExport(code)) as unknown;
+      return parseScriptResult(raw);
+    };
+
+    /**
+     * The first compile is the expensive one: it fetches a metadata
+     * reference per loaded assembly, one at a time, and it used to happen
+     * on the reader's first Run — minutes of a blank output pane and a
+     * disabled button, with nothing to distinguish it from a hang.
+     *
+     * Started here so it overlaps with reading and typing, but not
+     * awaited: blocking the boot on it would only move the same wait onto
+     * a disabled Run button, and onto every lesson page with a C# snippet
+     * on it. A run that arrives first joins this and watches it.
+     */
+    const warmUp = (async () => {
+      const stopCounting = countBundleFetches((count) => {
+        reportWarmProgress?.(
+          `Loading the .NET class library… ${count} assemblies`,
+        );
+      });
+      try {
+        await runScript(WARMUP_SCRIPT);
+        warm = true;
+      } catch {
+        // A warm-up that fails costs nothing: the first real Run pays the
+        // download instead, exactly as it did before.
+      } finally {
+        stopCounting();
+      }
+    })();
+    void warmUp;
+
+    setLoadingMessage("C# ready", 1);
+
+    const api: DotnetApi = {
+      runScript,
+      isWarm: () => warm,
+      whenWarm(onProgress?: (message: string) => void) {
+        if (warm) return Promise.resolve();
+        reportWarmProgress = onProgress ?? null;
+        return warmUp.finally(() => {
+          reportWarmProgress = null;
+        });
       },
     };
+    return api;
   })().catch((err) => {
     // Reset the singleton so a retry re-runs the bootstrap.
     dotnetPromise = null;

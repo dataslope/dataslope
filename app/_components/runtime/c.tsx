@@ -1,13 +1,15 @@
 import type {
-  EmitOutput,
   ExampleSnippet,
   EntryFileInfo,
   LanguageAdapter,
   LanguageRuntime,
   PackageInfo,
-  RunOptions,
 } from "../types";
 import { getClangFormat } from "./clangFormat";
+import {
+  BrowserccRuntime,
+  spawnBrowserccWorker,
+} from "./browserccRuntime";
 
 // C runs inside a dedicated Web Worker via browsercc, see browsercc-worker.ts.
 
@@ -244,7 +246,7 @@ const PACKAGES: PackageInfo[] = [
     icon: "🖨️",
     color: "#facc15",
     name: "stdio.h",
-    ver: "C99",
+    ver: "C17",
     desc: "printf, scanf, fopen, fread, fwrite, ...",
     example: `#include <stdio.h>
 
@@ -259,7 +261,7 @@ int main(void) {
     icon: "📦",
     color: "#34d399",
     name: "stdlib.h",
-    ver: "C99",
+    ver: "C17",
     desc: "malloc / free, qsort, atoi, exit, rand.",
     example: `#include <stdio.h>
 #include <stdlib.h>
@@ -278,7 +280,7 @@ int main(void) {
     icon: "🔤",
     color: "#fb923c",
     name: "string.h",
-    ver: "C99",
+    ver: "C17",
     desc: "memcpy, memset, strlen, strcmp, strcpy, ...",
     example: `#include <stdio.h>
 #include <string.h>
@@ -297,7 +299,7 @@ int main(void) {
     icon: "🔠",
     color: "#fb923c",
     name: "ctype.h",
-    ver: "C99",
+    ver: "C17",
     desc: "isalpha, isdigit, tolower, toupper, ...",
     example: `#include <stdio.h>
 #include <ctype.h>
@@ -319,7 +321,7 @@ int main(void) {
     icon: "🎲",
     color: "#60a5fa",
     name: "math.h",
-    ver: "C99",
+    ver: "C17",
     desc: "sin, cos, sqrt, pow, log, M_PI, M_E.",
     example: `#include <stdio.h>
 #include <math.h>
@@ -337,7 +339,7 @@ int main(void) {
     icon: "🔢",
     color: "#60a5fa",
     name: "stdint.h",
-    ver: "C99",
+    ver: "C17",
     desc: "Fixed-width integer types: int32_t, uint64_t, ...",
     example: `#include <stdio.h>
 #include <stdint.h>
@@ -357,7 +359,7 @@ int main(void) {
     icon: "✅",
     color: "#60a5fa",
     name: "stdbool.h",
-    ver: "C99",
+    ver: "C17",
     desc: "The bool, true, and false macros.",
     example: `#include <stdio.h>
 #include <stdbool.h>
@@ -377,7 +379,7 @@ int main(void) {
     icon: "📅",
     color: "#a78bfa",
     name: "time.h",
-    ver: "C99",
+    ver: "C17",
     desc: "time, clock, strftime, struct tm.",
     example: `#include <stdio.h>
 #include <time.h>
@@ -397,7 +399,7 @@ int main(void) {
     icon: "🛑",
     color: "#f472b6",
     name: "assert.h",
-    ver: "C99",
+    ver: "C17",
     desc: "assert(condition) for runtime checks.",
     example: `#include <stdio.h>
 #include <assert.h>
@@ -418,7 +420,7 @@ int main(void) {
     icon: "❗",
     color: "#f472b6",
     name: "errno.h",
-    ver: "C99",
+    ver: "C17",
     desc: "errno + perror for system error reporting.",
     example: `#include <stdio.h>
 #include <errno.h>
@@ -435,87 +437,6 @@ int main(void) {
   },
 ];
 
-// ─── Worker-based runtime ────────────────────────────────────────────────
-
-type WorkerOutMessage =
-  | { kind: "loading"; message: string }
-  | { kind: "ready" }
-  | { kind: "init-error"; message: string }
-  // C never triggers the PCH wait, but the shared worker's message union
-  // includes it.
-  | { kind: "run-status"; id: number; message: string; preparing: boolean }
-  | { kind: "output"; id: number; cell: { type: string; content: string } }
-  | { kind: "done"; id: number }
-  | { kind: "error"; id: number; message: string };
-
-class CWorkerRuntime implements LanguageRuntime {
-  private nextId = 0;
-  /** Staged workspace files (path → text), so other `.c`/`.h` files are
-   *  available to the compiler. */
-  private stagedFiles: Map<string, string> = new Map();
-
-    constructor(private worker: Worker) {}
-
-  /** Terminate the worker (registry-eviction hook; unusable after). */
-  dispose(): void {
-    this.worker.terminate();
-  }
-
-  async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
-    const decoder = new TextDecoder();
-    this.stagedFiles = new Map();
-    for (const [path, bytes] of files) {
-      // Only stage C source and header files for the compiler VFS.
-      if (path.endsWith(".c") || path.endsWith(".h")) {
-        this.stagedFiles.set(path, decoder.decode(bytes));
-      }
-    }
-  }
-
-  async run(
-    code: string,
-    emit: EmitOutput,
-    options?: RunOptions,
-  ): Promise<void> {
-    const id = ++this.nextId;
-    // With `options.entryFilename` (Run on a non-active tab), compile the
-    // staged copy — `code` belongs to a different translation unit.
-    // Without it, ALWAYS use `code`: reading stagedFiles could pick up
-    // stale content from a previous run on the same shared runtime.
-    const explicitEntry = options?.entryFilename;
-    const entry = explicitEntry ?? "main.c";
-    const source = explicitEntry
-      ? (this.stagedFiles.get(entry) ?? code)
-      : code;
-    // Non-entry staged files ride along for #include resolution and extra
-    // translation units — but only in explicit multi-file mode, else stale
-    // staged files from a prior run could pollute the build.
-    const files: Array<[string, string]> = [];
-    if (explicitEntry) {
-      for (const [path, content] of this.stagedFiles) {
-        if (path !== entry) files.push([path, content]);
-      }
-    }
-    return new Promise<void>((resolve, reject) => {
-      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
-        const msg = ev.data;
-        if (msg.kind !== "output" && msg.kind !== "done" && msg.kind !== "error") return;
-        if (msg.id !== id) return;
-        if (msg.kind === "output") {
-          emit(msg.cell as Parameters<EmitOutput>[0]);
-          return;
-        }
-        this.worker.removeEventListener("message", onMessage);
-        if (msg.kind === "done") resolve();
-        else reject(new Error(msg.message));
-      };
-      this.worker.addEventListener("message", onMessage);
-      this.worker.postMessage({ kind: "run", id, code: source, language: "c", files });
-    });
-  }
-}
-
-
 export const cAdapter: LanguageAdapter = {
   id: "c",
   displayName: "C Playground",
@@ -528,7 +449,16 @@ export const cAdapter: LanguageAdapter = {
     engine: "browsercc (clang + lld + WASI sysroot)",
     engineUrl: "https://github.com/BertalanD/browsercc",
     notes:
-      "C is compiled in your browser by a precompiled clang/lld toolchain (browsercc), and the resulting WASI binary is then executed with @bjorn3/browser_wasi_shim, no server roundtrip.",
+      "C is compiled in your browser by a precompiled clang/lld toolchain (browsercc), and the " +
+      "resulting WASI binary is then executed with @bjorn3/browser_wasi_shim, no server " +
+      "roundtrip. Every .c file in the workspace is compiled as one translation unit, so two " +
+      "files cannot each define their own static helper of the same name. The target is " +
+      "wasm32-wasi (ILP32): long and pointers are 4 bytes, so use long long or <stdint.h> for " +
+      "64-bit values. Nothing traps on a memory error: a null dereference, an out-of-bounds " +
+      "access or a use-after-free reads zero and keeps going rather than crashing, so the " +
+      "compiler warnings are doing the safety work. To give a program input, add a file called " +
+      "stdin.txt to the workspace and it is fed to standard input. A program that has not " +
+      "finished after 20 seconds is stopped, and Stop ends one sooner.",
   },
   // CodeMirror's clike mode handles C syntax. `text/x-csrc` is the
   // standard MIME alias for C inside that mode.
@@ -541,10 +471,23 @@ export const cAdapter: LanguageAdapter = {
   indentWidth: 2,
   examples: EXAMPLES,
   packages: PACKAGES,
+  // Only the source. "Export as .h" renamed the open file without turning
+  // it into a header: the download held `int main(void) { … }` and a
+  // static definition, with no include guard, under a name that says
+  // otherwise. A header is written, not exported.
   exportFormats: [
     { extension: "c", label: "C source (.c)", mimeType: "text/x-csrc" },
-    { extension: "h", label: "C header (.h)", mimeType: "text/x-chdr" },
   ],
+  // A .h tab is a header; exporting it as .c would be the same rename in
+  // the other direction.
+  exportFormatsForFile(filename) {
+    if (/\.h$/i.test(filename)) {
+      return [{ extension: "h", label: "C header (.h)", mimeType: "text/x-chdr" }];
+    }
+    return undefined;
+  },
+  // Every source builds into one program, so one run log per workspace.
+  projectWideRuns: true,
   exportBaseFilename: "main",
   defaultFileExtension: "c",
   findEntryFiles(files): EntryFileInfo[] {
@@ -580,30 +523,10 @@ export const cAdapter: LanguageAdapter = {
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Starting C runtime…", 0.02);
-    const worker = new Worker(
-      new URL("./browsercc-worker.ts", import.meta.url),
+    // One loading stage: the clang/lld toolchain download.
+    const worker = await spawnBrowserccWorker((message) =>
+      setLoadingMessage(message, 0.1),
     );
-    return new Promise<LanguageRuntime>((resolve, reject) => {
-      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
-        const msg = ev.data;
-        if (msg.kind === "loading") {
-          // One loading stage: the clang/lld toolchain download.
-          setLoadingMessage(msg.message, 0.1);
-        } else if (msg.kind === "ready") {
-          worker.removeEventListener("message", onMessage);
-          resolve(new CWorkerRuntime(worker));
-        } else if (msg.kind === "init-error") {
-          worker.removeEventListener("message", onMessage);
-          worker.terminate();
-          reject(new Error(msg.message));
-        }
-      };
-      worker.addEventListener("message", onMessage);
-      worker.addEventListener("error", (ev) => {
-        worker.removeEventListener("message", onMessage);
-        reject(new Error(ev.message || "C worker failed to start"));
-      });
-      worker.postMessage({ kind: "init" });
-    });
+    return new BrowserccRuntime(worker, "c");
   },
 };

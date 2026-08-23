@@ -28,6 +28,10 @@ export interface ShareControlsProps {
    *  requesting the author's query history/stars, and this signature keeps
    *  anything under this component from ever asking for it. */
   buildBundle: () => Promise<WorkspaceBundle | null>;
+  /** Workspace files the last `buildBundle` had to leave out (too large,
+   *  too many). Reported next to the link so a snapshot is never quietly
+   *  published without something the program needs. */
+  excludedFiles?: () => string[];
   /** Controlled-optional dialog state (mobile menus open the dialog). */
   shareOpen?: boolean;
   onShareOpenChange?: (open: boolean) => void;
@@ -38,6 +42,7 @@ export interface ShareControlsProps {
 export function ShareControls({
   workspaceName,
   buildBundle,
+  excludedFiles,
   shareOpen: shareOpenProp,
   onShareOpenChange,
   renderTrigger = true,
@@ -72,6 +77,7 @@ export function ShareControls({
         onClose={() => setShareOpen(false)}
         workspaceName={workspaceName}
         buildBundle={buildBundle}
+        excludedFiles={excludedFiles}
       />
     </>
   );
@@ -82,17 +88,20 @@ function ShareDialog({
   onClose,
   workspaceName,
   buildBundle,
+  excludedFiles,
 }: {
   open: boolean;
   onClose: () => void;
   workspaceName: string;
   buildBundle: () => Promise<WorkspaceBundle | null>;
+  excludedFiles?: () => string[];
 }) {
   const { data: session } = useSession();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [url, setUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [omitted, setOmitted] = useState<string[]>([]);
 
   useEffect(() => {
     if (open) {
@@ -102,6 +111,7 @@ function ShareDialog({
       setUrl(null);
       setError(null);
       setCopied(false);
+      setOmitted([]);
     }
   }, [open]);
 
@@ -115,6 +125,7 @@ function ShareDialog({
         return;
       }
       const res = await createShare(bundle);
+      setOmitted(excludedFiles?.() ?? []);
       setUrl(res.url);
     } catch (err) {
       setError(
@@ -123,7 +134,7 @@ function ShareDialog({
     } finally {
       setBusy(false);
     }
-  }, [buildBundle]);
+  }, [buildBundle, excludedFiles]);
 
   const handleCopy = useCallback(async () => {
     if (!url) return;
@@ -138,9 +149,12 @@ function ShareDialog({
     }
   }, [url]);
 
+  // A guest share has no owner row, so there is nothing for a revoke to
+  // authorise against — the link genuinely stands until its TTL runs out.
+  // Say so before the link is created, not after.
   const retentionNote = session
     ? `Free links expire after ${INACTIVITY_EXPIRY_DAYS} days without views; Pro links don't expire. Manage links on your account page.`
-    : `Guest links expire ${GUEST_SHARE_TTL_DAYS} days after creation. Sign in (free) to manage your links or keep them longer.`;
+    : `Guest links stay up for the full ${GUEST_SHARE_TTL_DAYS} days and can't be revoked early. Sign in (free) to keep links longer and be able to revoke them.`;
 
   return (
     <Dialog.Root open={open} onOpenChange={(o) => !o && onClose()}>
@@ -214,6 +228,16 @@ function ShareDialog({
           {error && (
             <p role="alert" className="cloud-error">
               {error}
+            </p>
+          )}
+          {url && omitted.length > 0 && (
+            <p role="alert" className="cloud-error">
+              Too large to include, so the copy won&rsquo;t have{" "}
+              {omitted.length === 1
+                ? omitted[0]
+                : `${omitted.length} data files (${omitted.slice(0, 3).join(", ")}${omitted.length > 3 ? ", …" : ""})`}
+              . Code that reads {omitted.length === 1 ? "it" : "them"} will
+              fail for whoever opens the link.
             </p>
           )}
           <p className="cloud-note">{retentionNote}</p>
