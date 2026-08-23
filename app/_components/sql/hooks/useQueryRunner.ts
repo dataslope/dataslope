@@ -13,6 +13,10 @@ import {
 } from "../../sqlitePlaygroundTabs";
 import { replaceDoc } from "../utils/editorUtils";
 import {
+  applyDuplicateRowPlan,
+  type DuplicateRowPlan,
+} from "../utils/duplicateRow";
+import {
   stripSqlComments,
   isSingleSelectSql,
   hasLimitClause,
@@ -575,7 +579,12 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
   );
 
   const duplicateRowInTable = useCallback(
-    (tableName: string, columnNames: string[], values: unknown[]) => {
+    (
+      tableName: string,
+      columnNames: string[],
+      values: unknown[],
+      plan?: DuplicateRowPlan,
+    ) => {
       const engine = engineRef.current;
       if (!engine) return;
       const tabId = activeTabIdRef.current;
@@ -594,7 +603,20 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       }
       void (async () => {
       try {
-        await engine.insertRow(tableName, filteredNames, filteredValues);
+        // The dialog's answers land here: literal overrides are already
+        // decided, `MAX(col) + 1` has to be read off the live table.
+        const resolved = await applyDuplicateRowPlan(
+          filteredNames,
+          filteredValues,
+          plan,
+          async (column) => {
+            const res = await engine.exec(
+              `SELECT MAX(${quoteIdent(column)}) FROM ${quoteIdent(tableName)}`,
+            );
+            return res[0]?.values?.[0]?.[0] ?? null;
+          },
+        );
+        await engine.insertRow(tableName, resolved.names, resolved.values);
         showToast(`Duplicated row in "${tableName}".`);
         const sql = `SELECT * FROM ${quoteIdent(tableName)};`;
         runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);

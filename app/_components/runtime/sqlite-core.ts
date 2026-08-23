@@ -21,6 +21,10 @@ import {
   type SqliteSampleMetadata,
 } from "./sqliteSamples";
 import { fetchDatasetBytes, fetchDatasetText } from "./remoteDatasets";
+import {
+  defaultGeneratesUniqueValue,
+  isSqliteRowidAlias,
+} from "../sql/utils/duplicateRow";
 
 export type { QueryExecResult } from "./sqlite-wasm";
 
@@ -69,10 +73,14 @@ export interface TableColumnInfo {
    *  SQLite, which has no native enum type. Drives the grid's enum dropdown. */
   enumValues?: string[] | null;
   /** Covered by a single-column UNIQUE constraint (separate from the primary
-   *  key). Reported by Postgres; absent where the engine doesn't supply it.
-   *  A foreign key can only target a PK or unique column, so the structure
-   *  editor uses this to filter the target-column list. */
+   *  key). Reported by Postgres and DuckDB; absent where the engine doesn't
+   *  supply it. A foreign key can only target a PK or unique column, so the
+   *  structure editor uses this to filter the target-column list. */
   unique?: boolean;
+  /** Postgres `GENERATED ... AS IDENTITY` column. The database assigns the
+   *  value, so an INSERT that omits the column still succeeds — which is
+   *  what lets a row with an identity primary key be duplicated. */
+  identity?: boolean;
 }
 
 /** Per-column unique/PK constraint info, used to decide whether a row can
@@ -85,6 +93,20 @@ export interface ColumnConstraintInfo {
   isAutoIncrement: boolean;
   /** Explicit UNIQUE constraint (separate from the primary key). */
   isUnique: boolean;
+  /** The database mints a fresh, distinct value whenever an INSERT leaves
+   *  this column out: AUTOINCREMENT, a SQLite rowid alias, a serial /
+   *  IDENTITY column, or a UUID-generating DEFAULT. A superset of
+   *  `isAutoIncrement`, and the flag that decides whether a unique column
+   *  blocks a row duplicate at all. */
+  autoPopulated?: boolean;
+  /** Declared type, when the engine reports one. Lets the duplicate-row
+   *  dialog pick a sensible generated value (a number vs a UUID). */
+  type?: string;
+  /** True when the column rejects NULL, so the dialog knows whether "Set to
+   *  NULL" is a legal way out of a unique conflict. */
+  notNull?: boolean;
+  /** Column default as the engine reports it, when it reports one. */
+  defaultValue?: string | null;
 }
 
 /** One column-level foreign key, from `PRAGMA foreign_key_list(...)`. */
@@ -1404,10 +1426,19 @@ export async function createSqliteEngineInProcess(
       const tableInfoResult = execAll(d, 
         `PRAGMA table_info(${quoteIdent(tableName)})`,
       );
-      const cols: Array<{ name: string; pk: number }> =
+      const cols: Array<{
+        name: string;
+        type: string;
+        notNull: boolean;
+        defaultValue: string | null;
+        pk: number;
+      }> =
         tableInfoResult.length > 0
           ? tableInfoResult[0].values.map((row) => ({
               name: String(row[1]),
+              type: row[2] == null ? "" : String(row[2]),
+              notNull: Number(row[3]) === 1,
+              defaultValue: row[4] == null ? null : String(row[4]),
               pk: Number(row[5]),
             }))
           : [];
@@ -1428,8 +1459,11 @@ export async function createSqliteEngineInProcess(
         ddlStmt.finalize();
       }
       const hasAutoIncrement = /\bautoincrement\b/i.test(ddlText);
-      // origin = 'u' in index_list means an explicit UNIQUE clause.
+      // origin = 'u' in index_list means an explicit UNIQUE clause; an
+      // origin = 'pk' row means the primary key needed a real index, which a
+      // rowid alias never does (see isSqliteRowidAlias).
       const uniqueColNames = new Set<string>();
+      let hasPkIndex = false;
       const idxListResult = execAll(d, 
         `PRAGMA index_list(${quoteIdent(tableName)})`,
       );
@@ -1438,6 +1472,7 @@ export async function createSqliteEngineInProcess(
           // index_list columns: seq, name, unique, origin, partial
           const isUnique = Number(row[2]) === 1;
           const origin = String(row[3]);
+          if (origin === "pk") hasPkIndex = true;
           if (isUnique && origin === "u") {
             const idxName = String(row[1]);
             const idxInfoResult = execAll(d, 
@@ -1452,17 +1487,45 @@ export async function createSqliteEngineInProcess(
           }
         }
       }
-      return cols.map((c) => ({
-        name: c.name,
-        isPrimaryKey: c.pk > 0,
+      // A WITHOUT ROWID table has no rowid to alias, so its INTEGER PRIMARY
+      // KEY is an ordinary column the INSERT must supply. The clause can only
+      // sit among the table options after the column list's closing paren
+      // (the last ')' in the statement), so only that tail is tested — a
+      // CHECK or string literal containing the phrase must not count.
+      const withoutRowid = /\bwithout\s+rowid\b/i.test(
+        ddlText.slice(ddlText.lastIndexOf(")") + 1),
+      );
+      const singleColumnPk = cols.filter((col) => col.pk > 0).length === 1;
+      return cols.map((c) => {
         // SQLite forbids AUTOINCREMENT on composite PKs, so require a
         // single-column PK before flagging.
-        isAutoIncrement:
-          hasAutoIncrement &&
-          c.pk === 1 &&
-          cols.filter((col) => col.pk > 0).length === 1,
-        isUnique: uniqueColNames.has(c.name),
-      }));
+        const isAutoIncrement =
+          hasAutoIncrement && c.pk === 1 && singleColumnPk;
+        // A rowid alias is assigned by SQLite when the INSERT omits it,
+        // AUTOINCREMENT keyword or not. Treating it as a hard conflict is
+        // what used to make "Duplicate row" refuse the most ordinary schema
+        // there is.
+        const isRowidAlias = isSqliteRowidAlias({
+          type: c.type,
+          pk: c.pk,
+          singleColumnPk,
+          withoutRowid,
+          hasPkIndex,
+        });
+        return {
+          name: c.name,
+          isPrimaryKey: c.pk > 0,
+          isAutoIncrement,
+          isUnique: uniqueColNames.has(c.name),
+          autoPopulated:
+            isAutoIncrement ||
+            isRowidAlias ||
+            defaultGeneratesUniqueValue(c.defaultValue),
+          type: c.type,
+          notNull: c.notNull,
+          defaultValue: c.defaultValue,
+        };
+      });
     },
     insertRow(
       tableName: string,
