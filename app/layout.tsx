@@ -37,6 +37,24 @@ export const metadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   applicationName: "DataSlope",
+  // Every favicon surface paints into a square, and Google's result header
+  // then crops that square to a circle, so all four of these are square:
+  // pointing at the brand mark itself (1087 x 683) got it scaled non-uniformly
+  // and it arrived on the search page visibly squeezed. `scripts/build-favicons.mjs`
+  // re-wraps the mark on a square canvas with a safe margin and emits the set.
+  //
+  // `.ico` first and declared as 48x48 so a browser that understands SVG
+  // prefers `favicon.svg` (which is resolution-independent) while anything
+  // that does not still finds a raster; 48 is also the size Google's own
+  // favicon guidance asks for.
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "48x48", type: "image/x-icon" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   openGraph: {
     type: "website",
     siteName: "DataSlope",
@@ -108,7 +126,6 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <link rel="icon" href="/dataslope-logo-blue.svg" type="image/svg+xml" />
         {/* Warm up the WASM-runtime/dataset CDNs so the first boot skips
             DNS + TLS. Full preconnect for the two hosts almost every page
             hits; cheap dns-prefetch for the language-specific rest. */}
