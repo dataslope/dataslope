@@ -11,17 +11,25 @@
  * single call.
  *
  * `commands` is optional scaffolding rather than the point of the component:
- * a starting script the reader can run in one click before continuing by hand.
+ * a starting script the block plays for itself once the session is up, so the
+ * reader arrives at a session already in progress and carries on from the
+ * prompt at the bottom of it. There is no Run button to press first.
+ *
+ * It is played, not pasted. Each line goes through the same `exec` a typed
+ * line does, so `mkdir myfolder` really creates the directory and the `cd
+ * myfolder` after it really lands in it. A transcript hard-coded into the
+ * page would show the same text and leave the reader in an empty shell.
  *
  * Blocks are isolated unless they share a `dir` id, so exploring in one block
  * cannot disturb another.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Play, RotateCcw } from "lucide-react";
+import { Terminal } from "lucide-react";
+import { SiGnubash } from "react-icons/si";
 import { useGitSession } from "../git/gitRuntime";
 import { GitTerminal, type TranscriptEntry } from "../git/GitTerminal";
-import { BashStateStrip } from "./FileTreePanel";
+import { ShellToolsMenu } from "../shell/ShellToolsMenu";
 import { DEFAULT_BASH_SCENARIO } from "./bashScenarios";
 import "../shell/embeddedShell.css";
 import "./bashPanels.css";
@@ -34,21 +42,19 @@ const SHELL_COMMANDS = [
   "basename", "dirname", "seq", "date", "which", "help",
 ];
 
-/** `/repo` is an implementation detail; the reader sees a home-ish prompt. */
+/** Where a session starts. Never shown: the prompt is a bare `$`, so this
+ *  only ever serves to make tab-completion paths relative. */
 const PROMPT_ROOT = "/repo";
-const displayCwd = (cwd: string) =>
-  cwd === PROMPT_ROOT ? "~" : `~${cwd.slice(PROMPT_ROOT.length)}`;
 
 export interface BashBlockProps {
-  /** Optional starting script, run by the Run button. The prompt stays live
-   *  afterwards, so a reader can keep going from wherever it left them. */
-  commands?: string;
+  /** Optional starting script, played once the session is ready, either as
+   *  one newline-separated string or as a list of lines. The prompt stays live
+   *  afterwards, so a reader keeps going from where it left them. */
+  commands?: string | string[];
   /** Starting filesystem, by scenario id. */
   scenario?: string;
   /** Share a working directory with other blocks carrying the same id. */
   dir?: string;
-  /** Open the file listing on mount. */
-  expandState?: boolean;
   /** Caption in the block header. */
   label?: string;
   /** Rows the terminal shows before it scrolls. */
@@ -59,49 +65,27 @@ export default function BashBlock({
   commands,
   scenario = DEFAULT_BASH_SCENARIO,
   dir,
-  expandState = false,
   label,
   rows = 10,
 }: BashBlockProps) {
-  const script = useMemo(
-    () => (commands ?? "").split("\n").filter((l) => l.trim() !== ""),
-    [commands],
-  );
+  const script = useMemo(() => {
+    const lines = Array.isArray(commands) ? commands : (commands ?? "").split("\n");
+    return lines.map((line) => line.trim()).filter((line) => line !== "");
+  }, [commands]);
 
   const { state, ready, error, exec, reset } = useGitSession(scenario, dir, "bash");
   const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
-  const [ranScript, setRanScript] = useState(false);
-  const [open, setOpen] = useState(expandState);
-  const [changed, setChanged] = useState<Set<string>>(new Set());
   const entryId = useRef(0);
-  const previous = useRef<Map<string, string>>(new Map());
-  /** The prompt each entry was run under, so scrollback shows where it ran. */
-  const promptAt = useRef<Map<number, string>>(new Map());
-
-  // Flag paths whose contents moved, so a pipeline's effect on disk is visible.
-  useEffect(() => {
-    const next = new Map(Object.entries(state.contents ?? {}));
-    for (const path of state.tree) if (!next.has(path)) next.set(path, "");
-    const moved = new Set<string>();
-    for (const [path, body] of next) {
-      if (previous.current.get(path) !== body) moved.add(path);
-    }
-    if (previous.current.size > 0) setChanged(moved);
-    previous.current = next;
-    if (moved.size) {
-      const timer = setTimeout(() => setChanged(new Set()), 1200);
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [state.contents, state.tree]);
+  /** Bumped by Reset, so the starting script plays again on a fresh tree. */
+  const [runToken, setRunToken] = useState(0);
+  const played = useRef(-1);
 
   const append = useCallback(
-    (command: string, result: { stdout: string; stderr: string; exitCode: number }, at: string) => {
+    (command: string, result: { stdout: string; stderr: string; exitCode: number }) => {
       const id = (entryId.current += 1);
-      promptAt.current.set(id, at);
       setTranscript((t) => [...t, { id, command, ...result }]);
     },
     [],
@@ -109,14 +93,13 @@ export default function BashBlock({
 
   const runOne = useCallback(
     async (command: string) => {
-      const at = displayCwd(state.cwd);
       try {
-        append(command, await exec(command), at);
+        append(command, await exec(command));
       } catch (e) {
-        append(command, { stdout: "", stderr: `${(e as Error).message}\n`, exitCode: 1 }, at);
+        append(command, { stdout: "", stderr: `${(e as Error).message}\n`, exitCode: 1 });
       }
     },
-    [append, exec, state.cwd],
+    [append, exec],
   );
 
   const submit = useCallback(
@@ -146,11 +129,20 @@ export default function BashBlock({
         setHistory((h) => [...h, line]);
         await runOne(line);
       }
-      setRanScript(true);
     } finally {
       setBusy(false);
     }
   }, [script, runOne]);
+
+  // The starting script plays itself, so the reader lands on a session already
+  // in progress rather than on a Run button. `played` guards StrictMode's
+  // double effect and `runScript` changing identity mid-play, either of which
+  // would run the example twice into one transcript.
+  useEffect(() => {
+    if (!ready || script.length === 0 || played.current === runToken) return;
+    played.current = runToken;
+    void runScript();
+  }, [ready, runToken, script.length, runScript]);
 
   /** Bash prints the candidates when Tab cannot narrow further; the listing is
    *  scrollback, not a command, so it carries no prompt line. */
@@ -179,82 +171,76 @@ export default function BashBlock({
     return [...words];
   }, [state.tree, state.cwd]);
 
+  /** The scrollback as text: every prompt line and everything it printed,
+   *  which is what a reader who wants to keep a session is actually after. */
+  const copyTranscript = useCallback(() => {
+    const lines: string[] = [];
+    for (const entry of transcript) {
+      if (!entry.note) {
+        for (const line of entry.command.split("\n")) lines.push(`$ ${line}`);
+      }
+      if (entry.stdout) lines.push(entry.stdout.replace(/\n$/, ""));
+      if (entry.stderr) lines.push(entry.stderr.replace(/\n$/, ""));
+    }
+    return lines.join("\n");
+  }, [transcript]);
+
+  const resetBlock = useCallback(() => {
+    setTranscript([]);
+    setInput("");
+    setHistory([]);
+    setRunToken((n) => n + 1);
+    void reset();
+  }, [reset]);
+
   const disabled = busy || !ready;
 
   return (
-    <div className="sblock">
-      <div className="sblock-head">
-        <span className="sblock-tag">bash</span>
-        {label && <span className="sblock-label">{label}</span>}
-        {dir && <span className="sblock-chain">{dir}</span>}
-        <span className="sblock-head-sep" />
-        <button
-          type="button"
-          className="sblock-btn"
-          onClick={() => {
-            setTranscript([]);
-            setInput("");
-            setHistory([]);
-            setRanScript(false);
-            promptAt.current = new Map();
-            previous.current = new Map();
-            void reset();
-          }}
-          disabled={disabled}
-        >
-          <RotateCcw size={12} aria-hidden="true" />
-          <span>Reset</span>
-        </button>
-        {script.length > 0 && (
-          <button
-            type="button"
-            className="sblock-run"
-            onClick={() => void runScript()}
-            disabled={disabled}
-            title={script.join("\n")}
-          >
-            <Play size={12} aria-hidden="true" />
-            <span>{busy ? "Running" : ranScript ? "Run again" : "Run"}</span>
-          </button>
-        )}
+    <div className="sblock-shell ds-striped-shell">
+      <div className="sblock">
+        <div className="sblock-head">
+          <span className="sblock-tag">
+            <Terminal aria-hidden="true" /> Terminal
+          </span>
+          {label && <span className="sblock-label">{label}</span>}
+          {dir && <span className="sblock-chain">{dir}</span>}
+          <span className="sblock-head-sep" />
+          <div className="sblock-head-meta">
+            <span className="sblock-runtime">
+              <SiGnubash aria-hidden="true" /> Bash
+            </span>
+            <ShellToolsMenu
+              onReset={resetBlock}
+              getCopyText={copyTranscript}
+              copyLabel="transcript"
+              copyNote="Every command in this session and what it printed"
+              disabled={disabled}
+            />
+          </div>
+        </div>
+
+        {error && <div className="sblock-notice error">{error}</div>}
+
+        <div className="sblock-terminal" style={{ height: `${rows * 1.55 + 3.2}em` }}>
+          <GitTerminal
+            transcript={transcript}
+            value={input}
+            onValueChange={setInput}
+            onSubmit={(c) => void submit(c)}
+            history={history}
+            busy={disabled}
+            completions={SHELL_COMMANDS}
+            pathCompletions={pathCompletions}
+            // A bare `$` and nothing else, the way just-bash's own terminal
+            // prompts. `pwd` is one keystroke away for a reader who wants to
+            // know where they are.
+            placeholder=""
+            inlineInput
+            onListCompletions={listCompletions}
+            placeholderHint={null}
+          />
+        </div>
       </div>
-
-      {error && <div className="sblock-notice error">{error}</div>}
-
-      <div className="sblock-terminal" style={{ height: `${rows * 1.55 + 3.2}em` }}>
-        <GitTerminal
-          transcript={transcript}
-          value={input}
-          onValueChange={setInput}
-          onSubmit={(c) => void submit(c)}
-          history={history}
-          busy={disabled}
-          completions={SHELL_COMMANDS}
-          pathCompletions={pathCompletions}
-          prompt={displayCwd(state.cwd)}
-          placeholder="ls"
-          inlineInput
-          onListCompletions={listCompletions}
-          promptFor={(entry) => promptAt.current.get(entry.id)}
-          placeholderHint={
-            <p className="git-terminal-hint">
-              {script.length > 0 ? (
-                <>
-                  Press <strong>Run</strong> for the example, or type your own commands. Try{" "}
-                  <code>ls</code>, then <code>cd</code> somewhere.
-                </>
-              ) : (
-                <>
-                  A real shell. Try <code>ls</code>, then <code>cd src</code>, then{" "}
-                  <code>pwd</code>: it remembers where you are.
-                </>
-              )}
-            </p>
-          }
-        />
-      </div>
-
-      <BashStateStrip state={state} open={open} onToggle={() => setOpen((v) => !v)} changed={changed} />
     </div>
   );
 }

@@ -51,6 +51,42 @@
   overflow: hidden;
 }
 
+/* ─── Striped hard-offset elevation ───
+   The same designed shadow the challenge cards and code blocks carry, via the
+   `.ds-striped-shell` utility globals.css extracted from ChallengeCard's
+   `.cardShell`. It has to live on a wrapper for the same reason it does
+   there: the stripe layer hangs past the bottom-right edge, and `.sblock` /
+   `.scard` clip their own children with `overflow: hidden`.
+
+   The bottom margin is larger than the top on purpose. The stripe layer is
+   absolutely positioned and so contributes nothing to layout, meaning it eats
+   `--ds-shell-offset` of whatever follows; the extra bottom margin pays that
+   back so a run of blocks reads as separated cards. */
+.sblock-shell,
+.scard-shell {
+  --ds-shell-radius: 8px; /* matches .sblock / .scard */
+  --ds-shell-border-color: var(--ds-gray-200); /* matches --gb-border */
+}
+
+.sblock-shell {
+  margin: 1.5rem 0 2.25rem;
+}
+
+.scard-shell {
+  margin: 2rem 0 2.75rem;
+}
+
+html:is(.dark, [data-theme="dark"]) .sblock-shell,
+html:is(.dark, [data-theme="dark"]) .scard-shell {
+  --ds-shell-border-color: #232323;
+}
+
+/* The wrapper owns the spacing now, so the card itself sits flush inside it. */
+.sblock-shell > .sblock,
+.scard-shell > .scard {
+  margin: 0;
+}
+
 html:is(.dark, [data-theme="dark"]) .sblock,
 html:is(.dark, [data-theme="dark"]) .scard {
   --gb-bg: var(--color-fd-background, #121212);
@@ -131,14 +167,17 @@ html:is(.dark, [data-theme="dark"]) .scard {
 }
 
 /* ─── Block header ─── */
+/* The code block's header, restated for a global stylesheet: badge on the
+   left, runtime and controls on the right, on the card's own background with
+   no rule beneath it. The surface below (a terminal on `--gb-bg-subtle`, or a
+   challenge card's two columns) supplies its own edge, so a border here only
+   added a second line a few pixels above the first. */
 .sblock-head,
 .scard-head {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 7px 10px;
-  border-bottom: 1px solid var(--gb-border);
-  background: var(--gb-bg-subtle);
+  gap: 12px;
+  padding: 12px 16px;
   flex-wrap: wrap;
 }
 
@@ -146,13 +185,54 @@ html:is(.dark, [data-theme="dark"]) .scard {
   flex: 1;
 }
 
+/* Runtime label plus controls, held together so they travel as one group when
+   the header wraps on a narrow screen. */
+.sblock-head-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+}
+
+/* The engine behind the block, in the slot where a code block names its
+   language and version. */
+.sblock-runtime {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: var(--gb-text-secondary);
+  white-space: nowrap;
+}
+
+.sblock-runtime svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--gb-text);
+}
+
+/* Same badge as the code block and SQL block headers a page above: sentence
+   case at 13px in the UI font, not a mono small-caps label. The four block
+   families sit in the same prose, so they read as one family or as four. */
 .sblock-tag {
-  font-family: var(--gb-font-mono);
-  font-size: 11px;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--gb-accent);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  text-transform: none;
+  letter-spacing: 0;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.sblock-tag svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
 }
 
 .sblock-label,
@@ -327,10 +407,10 @@ html:is(.dark, [data-theme="dark"]) .scard {
 }
 
 .scard-badge {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--gb-accent);
 }
 
@@ -465,14 +545,51 @@ html:is(.dark, [data-theme="dark"]) .scard {
   min-height: 160px;
   max-height: 70vh;
   border-bottom: 1px solid var(--gb-border);
-  background: var(--gb-bg-subtle);
+  background: var(--gb-bg);
+}
+
+/* The bash block ends at the terminal, so its bottom rule would land on the
+   card's own border and read as a 2px line. */
+.sblock-terminal:last-child,
+.sblock-output:last-child {
+  border-bottom: none;
 }
 
 .sblock-terminal .git-terminal-scroll {
-  padding: 12px 14px;
-  font-size: 12.5px;
-}
-
-.sblock-terminal .git-terminal-scroll {
+  padding: 12px 16px;
+  font-size: 13px;
   cursor: text;
+}
+
+/* just-bash's own terminal is plain text on the page: the `$` is not tinted,
+   the echoed command is not dimmed, and nothing is colored unless a command
+   actually emitted an escape sequence for it. The playground keeps the
+   tinted prompt, so these overrides are scoped to the embedded block. */
+.sblock-terminal .git-terminal-command,
+.sblock-terminal .git-terminal-prompt,
+.sblock-terminal .git-terminal-out {
+  color: var(--gb-text);
+}
+
+.sblock-terminal .git-terminal-prompt {
+  font-weight: 400;
+}
+
+/* Output starts at column 0, under the `$` rather than under the command,
+   which is where just-bash's terminal puts it and where a real one does. */
+.sblock-terminal .git-terminal-out,
+.sblock-terminal .git-terminal-err,
+.sblock-terminal .git-terminal-busy {
+  padding-left: 0;
+}
+
+/* One continuous scrollback rather than a stack of command cards. A real
+   terminal has no gap between what you ran and what you ran before it. */
+.sblock-terminal .git-terminal-block {
+  margin-bottom: 0;
+}
+
+.sblock-terminal .git-terminal-out,
+.sblock-terminal .git-terminal-err {
+  margin-top: 0;
 }

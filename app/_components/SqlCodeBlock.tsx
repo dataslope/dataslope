@@ -590,7 +590,7 @@ export default function SqlCodeBlock({
       <div className={`${styles.header} ${styles.headerCompact}`}>
         <div className={styles.headerRow}>
           <div className={styles.badge}>
-            <Database size={9} aria-hidden /> {badge}
+            <Database size={13} aria-hidden /> {badge}
           </div>
           <div className={styles.headerMeta}>
             <SqlCardToolsMenu

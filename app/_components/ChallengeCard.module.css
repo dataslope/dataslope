@@ -179,13 +179,23 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 11.5px;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--ch-badge-color);
   flex-shrink: 0;
   white-space: nowrap;
+}
+
+/* The badge reads as sentence text now rather than as a small-caps label, so
+   the glyph beside it has to grow with it. 13px matches the em box of the
+   text and the runtime label's own icon a few pixels to the right, which is
+   what keeps the header row on one optical line. */
+.badge svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
 }
 
 .title {

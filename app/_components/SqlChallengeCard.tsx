@@ -1576,7 +1576,7 @@ export default function SqlChallengeCard({
       <div className={styles.header}>
         <div className={styles.headerRow}>
           <div className={styles.badge}>
-            <Database size={9} aria-hidden /> {badge}
+            <Database size={13} aria-hidden /> {badge}
           </div>
           <div className={styles.headerMeta}>
             <SqlCardToolsMenu
@@ -2019,7 +2019,7 @@ function SolutionModal({
       >
         <div className={styles.modalHeader}>
           <div className={styles.badge}>
-            <Database size={9} aria-hidden />
+            <Database size={13} aria-hidden />
           </div>
           <div className={styles.modalTitleArea}>
             <div className={styles.modalTitle}>Reference solution</div>

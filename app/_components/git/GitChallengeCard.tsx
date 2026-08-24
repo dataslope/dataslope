@@ -144,109 +144,111 @@ export default function GitChallengeCard({
   const passCount = results.filter((r) => r.passed).length;
 
   return (
-    <div className={solved ? "scard solved" : "scard"}>
-      <div className="scard-head">
-        <span className="scard-badge">Git challenge</span>
-        <h3 className="scard-title">{title}</h3>
-        <span className="sblock-head-sep" />
-        <span className={solved ? "scard-progress solved" : "scard-progress"}>
-          {solved ? (
-            <>
-              <CheckCircle2 size={13} aria-hidden="true" /> Solved
-            </>
-          ) : (
-            `${passCount} of ${results.length}`
-          )}
-        </span>
-      </div>
-
-      <div className="scard-body">
-        <div className="scard-left">
-          <div className="scard-instructions">{renderInstructions(instructions)}</div>
-
-          <div className="scard-terminal">
-            <GitTerminal
-              transcript={transcript}
-              value={input}
-              onValueChange={setInput}
-              onSubmit={(c) => void run(c)}
-              history={history}
-              busy={busy || !ready}
-              completions={[]}
-              inlineInput
-              placeholderHint={
-                <p className="git-terminal-hint">
-                  Type the commands that solve this. Objectives tick as soon as the repository
-                  satisfies them.
-                </p>
-              }
-            />
-          </div>
-
-          {error && <div className="sblock-notice error">{error}</div>}
-
-          <div className="scard-actions">
-            <button
-              type="button"
-              className="sblock-btn"
-              onClick={() => {
-                setTranscript([]);
-                setInput("");
-                setHistory([]);
-                setChecked(false);
-                setShowSolution(false);
-                previous.current = new Map();
-                void reset();
-              }}
-              disabled={busy}
-            >
-              <RotateCcw size={12} aria-hidden="true" />
-              <span>Reset</span>
-            </button>
-            {hint && (
-              <button type="button" className="sblock-btn" onClick={() => setShowHint((v) => !v)}>
-                <Lightbulb size={12} aria-hidden="true" />
-                <span>{showHint ? "Hide hint" : "Hint"}</span>
-              </button>
+    <div className="scard-shell ds-striped-shell">
+      <div className={solved ? "scard solved" : "scard"}>
+        <div className="scard-head">
+          <span className="scard-badge">Git challenge</span>
+          <h3 className="scard-title">{title}</h3>
+          <span className="sblock-head-sep" />
+          <span className={solved ? "scard-progress solved" : "scard-progress"}>
+            {solved ? (
+              <>
+                <CheckCircle2 size={13} aria-hidden="true" /> Solved
+              </>
+            ) : (
+              `${passCount} of ${results.length}`
             )}
-            {solution && (
+          </span>
+        </div>
+
+        <div className="scard-body">
+          <div className="scard-left">
+            <div className="scard-instructions">{renderInstructions(instructions)}</div>
+
+            <div className="scard-terminal">
+              <GitTerminal
+                transcript={transcript}
+                value={input}
+                onValueChange={setInput}
+                onSubmit={(c) => void run(c)}
+                history={history}
+                busy={busy || !ready}
+                completions={[]}
+                inlineInput
+                placeholderHint={
+                  <p className="git-terminal-hint">
+                    Type the commands that solve this. Objectives tick as soon as the repository
+                    satisfies them.
+                  </p>
+                }
+              />
+            </div>
+
+            {error && <div className="sblock-notice error">{error}</div>}
+
+            <div className="scard-actions">
               <button
                 type="button"
                 className="sblock-btn"
-                onClick={() => setShowSolution((v) => !v)}
+                onClick={() => {
+                  setTranscript([]);
+                  setInput("");
+                  setHistory([]);
+                  setChecked(false);
+                  setShowSolution(false);
+                  previous.current = new Map();
+                  void reset();
+                }}
+                disabled={busy}
               >
-                {showSolution ? "Hide solution" : "Show solution"}
+                <RotateCcw size={12} aria-hidden="true" />
+                <span>Reset</span>
               </button>
+              {hint && (
+                <button type="button" className="sblock-btn" onClick={() => setShowHint((v) => !v)}>
+                  <Lightbulb size={12} aria-hidden="true" />
+                  <span>{showHint ? "Hide hint" : "Hint"}</span>
+                </button>
+              )}
+              {solution && (
+                <button
+                  type="button"
+                  className="sblock-btn"
+                  onClick={() => setShowSolution((v) => !v)}
+                >
+                  {showSolution ? "Hide solution" : "Show solution"}
+                </button>
+              )}
+              <button
+                type="button"
+                className="sblock-run"
+                onClick={() => setChecked(true)}
+                disabled={busy || !ready}
+              >
+                Check answer
+              </button>
+            </div>
+
+            {showHint && hint && <p className="scard-hint">{hint}</p>}
+            {showSolution && solution && (
+              <pre className="scard-solution">{solution.trim()}</pre>
             )}
-            <button
-              type="button"
-              className="sblock-run"
-              onClick={() => setChecked(true)}
-              disabled={busy || !ready}
-            >
-              Check answer
-            </button>
+            {checked && !solved && (
+              <p className="scard-verdict">
+                Not there yet. The unticked objectives above say what is still missing.
+              </p>
+            )}
           </div>
 
-          {showHint && hint && <p className="scard-hint">{hint}</p>}
-          {showSolution && solution && (
-            <pre className="scard-solution">{solution.trim()}</pre>
-          )}
-          {checked && !solved && (
-            <p className="scard-verdict">
-              Not there yet. The unticked objectives above say what is still missing.
-            </p>
-          )}
-        </div>
-
-        <div className="scard-right">
-          <TestResultsRail tests={rail} codeLabel="Checks" />
-          <StateStrip
-            state={state}
-            open={open}
-            onToggle={() => setOpen((v) => !v)}
-            changed={changed}
-          />
+          <div className="scard-right">
+            <TestResultsRail tests={rail} codeLabel="Checks" />
+            <StateStrip
+              state={state}
+              open={open}
+              onToggle={() => setOpen((v) => !v)}
+              changed={changed}
+            />
+          </div>
         </div>
       </div>
     </div>

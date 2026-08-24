@@ -56,7 +56,8 @@ interface Props {
   pathCompletions?: string[];
   /** Transcript only, no prompt: a block that runs a fixed script. */
   readOnly?: boolean;
-  /** Replaces the default empty-state copy. */
+  /** Replaces the default empty-state copy. `null` suppresses it entirely,
+   *  for a terminal that should open as a bare prompt and nothing else. */
   placeholderHint?: ReactNode;
   /** Directory shown before the `$`, the way a real prompt does. */
   prompt?: string;
@@ -295,12 +296,14 @@ export function GitTerminal({
         }}
       >
         {transcript.length === 0 &&
-          (placeholderHint ?? (
+          (placeholderHint === undefined ? (
             <p className="git-terminal-hint">
               Type a Git command, or pick one from the panel on the right: it fills the prompt and
               you press Enter. <code>ls</code>, <code>cat</code> and friends work too, so{" "}
               <code>cat .git/HEAD</code> shows you what a branch really is.
             </p>
+          ) : (
+            placeholderHint
           ))}
         {transcript.map((entry) => (
           <div key={entry.id} className="git-terminal-block">

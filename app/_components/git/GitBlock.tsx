@@ -16,8 +16,10 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Play, RotateCcw, ExternalLink } from "lucide-react";
+import { Play, Terminal, ExternalLink } from "lucide-react";
+import { SiGit } from "react-icons/si";
 import Link from "../Link";
+import { ShellToolsMenu } from "../shell/ShellToolsMenu";
 import { useGitSession } from "./gitRuntime";
 import { GitTerminal, type TranscriptEntry } from "./GitTerminal";
 import { StateStrip } from "./StateStrip";
@@ -155,83 +157,96 @@ export default function GitBlock({
 
   const disabled = busy || !ready;
 
+  /** What a reader would paste into a real terminal: the commands as edited,
+   *  not the transcript, because a Git block's value is the sequence. */
+  const copyCommands = useCallback(() => draft.trim(), [draft]);
+
+  const resetBlock = useCallback(() => {
+    setTranscript([]);
+    setHasRun(false);
+    setDraft(script.join("\n"));
+    previous.current = new Map();
+    void reset();
+  }, [reset, script]);
+
   return (
-    <div className="sblock">
-      <div className="sblock-head">
-        <span className="sblock-tag">git</span>
-        {label && <span className="sblock-label">{label}</span>}
-        {repo && <span className="sblock-chain">{`${repo} · step ${stepIndex + 1}`}</span>}
-        <span className="sblock-head-sep" />
-        {!hideOpenInPlayground && (
-          <Link
-            href="/playground/git"
-            className="sblock-open"
-            title="Open the full Git playground"
-          >
-            <ExternalLink size={12} aria-hidden="true" />
-            <span>Playground</span>
-          </Link>
-        )}
-        <button
-          type="button"
-          className="sblock-btn"
-          onClick={() => {
-            setTranscript([]);
-            setHasRun(false);
-            setDraft(script.join("\n"));
-            previous.current = new Map();
-            void reset();
-          }}
-          disabled={disabled}
-        >
-          <RotateCcw size={12} aria-hidden="true" />
-          <span>Reset</span>
-        </button>
-        <button type="button" className="sblock-run" onClick={() => void run()} disabled={disabled}>
-          <Play size={12} aria-hidden="true" />
-          <span>{busy ? "Running" : "Run"}</span>
-        </button>
-      </div>
-
-      <textarea
-        className="sblock-script"
-        value={draft}
-        onChange={(e) => setDraft(e.target.value)}
-        spellCheck={false}
-        rows={Math.min(8, Math.max(1, draft.split("\n").length))}
-        aria-label="Git commands to run"
-        disabled={busy}
-      />
-
-      {needsCatchUp && (
-        <div className="sblock-notice">
-          <span>
-            This continues from step {stepIndex} of <code>{repo}</code>.
+    <div className="sblock-shell ds-striped-shell">
+      <div className="sblock">
+        <div className="sblock-head">
+          <span className="sblock-tag">
+            <Terminal aria-hidden="true" /> Terminal
           </span>
-          <button type="button" className="sblock-btn" onClick={() => void catchUp()} disabled={disabled}>
-            Catch me up
-          </button>
+          {label && <span className="sblock-label">{label}</span>}
+          {repo && <span className="sblock-chain">{`${repo} · step ${stepIndex + 1}`}</span>}
+          <span className="sblock-head-sep" />
+          <div className="sblock-head-meta">
+            <span className="sblock-runtime">
+              <SiGit aria-hidden="true" /> Git
+            </span>
+            {!hideOpenInPlayground && (
+              <Link
+                href="/playground/git"
+                className="sblock-open"
+                title="Open the full Git playground"
+              >
+                <ExternalLink size={12} aria-hidden="true" />
+                <span>Playground</span>
+              </Link>
+            )}
+            <button type="button" className="sblock-run" onClick={() => void run()} disabled={disabled}>
+              <Play size={12} aria-hidden="true" />
+              <span>{busy ? "Running" : "Run"}</span>
+            </button>
+            <ShellToolsMenu
+              onReset={resetBlock}
+              getCopyText={copyCommands}
+              copyLabel="commands"
+              copyNote="The script in this block, as edited"
+              disabled={disabled}
+            />
+          </div>
         </div>
-      )}
 
-      {error && <div className="sblock-notice error">{error}</div>}
+        <textarea
+          className="sblock-script"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          spellCheck={false}
+          rows={Math.min(8, Math.max(1, draft.split("\n").length))}
+          aria-label="Git commands to run"
+          disabled={busy}
+        />
 
-      {(transcript.length > 0 || busy) && (
-        <div className="sblock-output">
-          <GitTerminal
-            transcript={transcript}
-            value=""
-            onValueChange={() => {}}
-            onSubmit={() => {}}
-            history={[]}
-            busy={busy}
-            completions={[]}
-            readOnly
-          />
-        </div>
-      )}
+        {needsCatchUp && (
+          <div className="sblock-notice">
+            <span>
+              This continues from step {stepIndex} of <code>{repo}</code>.
+            </span>
+            <button type="button" className="sblock-btn" onClick={() => void catchUp()} disabled={disabled}>
+              Catch me up
+            </button>
+          </div>
+        )}
 
-      <StateStrip state={state} open={open} onToggle={() => setOpen((v) => !v)} changed={changed} />
+        {error && <div className="sblock-notice error">{error}</div>}
+
+        {(transcript.length > 0 || busy) && (
+          <div className="sblock-output">
+            <GitTerminal
+              transcript={transcript}
+              value=""
+              onValueChange={() => {}}
+              onSubmit={() => {}}
+              history={[]}
+              busy={busy}
+              completions={[]}
+              readOnly
+            />
+          </div>
+        )}
+
+        <StateStrip state={state} open={open} onToggle={() => setOpen((v) => !v)} changed={changed} />
+      </div>
     </div>
   );
 }

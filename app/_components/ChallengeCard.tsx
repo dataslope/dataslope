@@ -1514,7 +1514,7 @@ export default function ChallengeCard({
       <div className={styles.header}>
         <div className={styles.headerRow}>
           <div className={styles.badge}>
-            <Terminal size={9} aria-hidden /> {badge}
+            <Terminal size={13} aria-hidden /> {badge}
           </div>
           <div className={styles.headerMeta}>
             <span className={styles.headerRuntimeLabel}>
@@ -2155,7 +2155,7 @@ function SolutionModal({
       >
         <div className={styles.modalHeader}>
           <div className={styles.badge}>
-            <Terminal size={9} aria-hidden />
+            <Terminal size={13} aria-hidden />
           </div>
           <div className={styles.modalTitleArea}>
             <div className={styles.modalTitle}>Reference solution</div>
