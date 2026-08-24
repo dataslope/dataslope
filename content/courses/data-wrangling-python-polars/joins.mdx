@@ -46,9 +46,19 @@ for how in ["inner", "left", "right", "full", "semi", "anti"]:
 | `anti` | left rows that have **no** match |
 | `cross` | every left row paired with every right row |
 
+<Chart
+  slug="join-types-venn"
+  caption="`how=` picks which *unmatched* keys survive; the matching itself is identical in all four. Two of the table's rows have no shading of their own: `semi` returns the left half of the overlap and none of the right columns, and `cross` matches on nothing at all. Read the circles as sets of keys rather than of rows, since a key present on both sides multiplies."
+/>
+
 `semi` and `anti` are the ones people do not know they wanted. They
 are filters that use another frame as the criterion, and unlike an
 `inner` join they cannot change the row count upward.
+
+<Chart
+  slug="join-anti-venn"
+  caption="`how='anti'` is the left-hand picture, in one word rather than a join plus a filter, and `how='semi'` is its complement: the left rows inside the overlap. Polars has no built-in full anti-join, which is the right-hand picture, a `full` join kept where either key came back null."
+/>
 
 <CodeBlock
   adapter="python"

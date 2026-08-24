@@ -21,6 +21,11 @@ with the `how` parameter.
 | `right` | All rows from the **right** table; left columns are `NaN` where no match exists |
 | `outer` | Every row from **either** table; `NaN` wherever the other side has no match |
 
+<Chart
+  slug="join-types-venn"
+  caption="`how=` picks which *unmatched* keys survive; the matching itself is identical in all four, and pandas spells the last one `how='outer'`. Read the circles as sets of keys rather than of rows: `merge` still multiplies, so a key appearing three times on the left and twice on the right contributes six rows to that overlap, not one."
+/>
+
 ## Setting the stage
 
 <CodeBlock

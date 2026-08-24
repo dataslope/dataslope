@@ -149,6 +149,8 @@ left rows (NULLs where the right has no match); `RIGHT` keeps all right rows;
 `FULL` keeps both sides' unmatched rows. The block below builds two tiny
 tables inline and shows a `LEFT JOIN` keeping a customer who never ordered:
 
+<Chart slug="join-types-venn" />
+
 <SqlCodeBlock
   dialect="duckdb"
   initSql={`CREATE TABLE customers AS SELECT * FROM (VALUES

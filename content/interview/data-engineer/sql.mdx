@@ -407,6 +407,8 @@ When a table is partitioned (e.g., by `event_date`) and a query filters on that 
 - **`RIGHT JOIN`**, all rows from the right table; nulls on the left.
 - **`FULL OUTER JOIN`**, all rows from both; nulls where either side has no match.
 
+<Chart slug="join-types-venn" />
+
 ```sql
 -- LEFT JOIN: all customers returned; order columns are NULL for customers
 -- with no orders (useful to find customers who never ordered).
@@ -473,6 +475,8 @@ A **clustered index** physically orders the table's rows on disk in the index's 
 ### How do you write a query that returns only rows that exist in one table but not another?
 
 Use `LEFT JOIN ... WHERE right_key IS NULL`, `NOT EXISTS`, or `EXCEPT`:
+
+<Chart slug="join-anti-venn" />
 
 ```sql
 -- Option 1: LEFT JOIN anti-join

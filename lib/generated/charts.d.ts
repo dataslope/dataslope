@@ -52,6 +52,20 @@ export interface GeneratedChart {
    * common case.
    */
   minWidth?: number;
+  /**
+   * Widest this chart should be drawn, in px (the spec's `maxWidth` export).
+   *
+   * An inlined SVG scales its type with its width, so a spec laid out narrow
+   * enough to escape the `minWidth` floor above renders its 10px labels at
+   * 21px in an 836px interview column. The cap belongs to the drawing rather
+   * than to the placement, for the same reason `sources` does: it follows the
+   * chart to every lesson instead of being re-typed, and correctly, on each
+   * `<Chart>` tag. A `maxWidth` prop on the tag still wins.
+   *
+   * Absent for the ordinary chart, which is laid out at the content column's
+   * own width and wants all of it.
+   */
+  maxWidth?: number;
   /** Every page that renders this chart. Empty when the spec exists but has
    *  not been placed in a lesson yet. */
   usedBy: ChartUsage[];
