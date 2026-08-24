@@ -28,7 +28,8 @@ interface ChartProps {
   /** Credit line for the chart's numbers. Defaults to the spec's `sources`
    *  export; `null` renders none. */
   sources?: readonly FigureSource[] | null;
-  /** Optional cap on display width in px; omitted = full content column. */
+  /** Cap on display width in px, overriding the spec's own `maxWidth`.
+   *  Omitted and unset on the spec = full content column. */
   maxWidth?: number;
 }
 
@@ -54,11 +55,18 @@ export async function Chart({ slug, caption, sources, maxWidth }: ChartProps) {
 
   const text = caption === undefined ? entry.caption : caption;
   const credits = (sources === undefined ? entry.sources : sources) ?? [];
+  // A spec laid out narrower than the content column publishes the width it
+  // wants to be seen at, because an inlined SVG scales its type along with
+  // its box: the join Venns are 400px of drawing, and stretched to an 836px
+  // interview column their 10px labels arrive at 21px, louder than the
+  // heading above them. Like `sources`, the cap lives on the spec so it
+  // follows the chart to every lesson rather than being re-typed per tag.
+  const cap = maxWidth ?? entry.maxWidth;
 
   return (
     <figure
       className={styles.figure}
-      style={maxWidth ? { maxWidth: `${maxWidth}px` } : undefined}
+      style={cap ? { maxWidth: `${cap}px` } : undefined}
     >
       {/* `--ds-chart-min-width` is the narrowest width the smallest label
           survives (build-computed); on a phone the stylesheet scrolls the

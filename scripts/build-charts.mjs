@@ -369,6 +369,14 @@ for (const file of specs) {
     continue;
   }
 
+  if (mod.maxWidth !== undefined && !(typeof mod.maxWidth === "number" && mod.maxWidth > 0)) {
+    problems.push(
+      `${file}: maxWidth must be a positive number of px, the widest this ` +
+        "chart should be drawn at",
+    );
+    continue;
+  }
+
   const leaked = stringifiedFunctions(svg);
   if (leaked.length > 0) {
     problems.push(
@@ -401,6 +409,8 @@ for (const file of specs) {
     height: Number(el.getAttribute("height")),
     // Omitted when the chart can shrink to any width legibly.
     ...(minWidth ? { minWidth } : {}),
+    // Omitted when the chart is happy at whatever width its column gives it.
+    ...(mod.maxWidth ? { maxWidth: mod.maxWidth } : {}),
     usedBy: usages[slug] ?? [],
     // The markup goes to public/chart-svgs/<slug>.svg; the manifest keeps
     // only its size, for the admin gallery's stats.

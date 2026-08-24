@@ -28,6 +28,8 @@ Retention and funnel queries almost always want a **LEFT JOIN** (or a
 population is often the users who *didn't* come back, and an INNER JOIN
 would silently drop them.
 
+<Chart slug="join-types-venn" />
+
 ### When does an aggregate belong in `WHERE` vs. `HAVING`?
 
 `WHERE` filters rows **before** grouping; `HAVING` filters groups **after**

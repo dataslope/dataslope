@@ -260,6 +260,8 @@ ORDER BY
 
 The kind of join determines what happens. A regular `JOIN` is an inner join: it keeps only matches. Later, a `LEFT JOIN` will keep unmatched rows from one side too.
 
+<Chart slug="join-types-venn" />
+
 ```mermaid
 flowchart LR
     A["matching pair"] -->|"<code>INNER JOIN</code> keeps"| R["result row"]

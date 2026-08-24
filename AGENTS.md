@@ -575,8 +575,9 @@ chart library shipped to the browser.
 
 1. **Author** a spec at `charts/<slug>.mjs`. It exports `title` (the figure's
    accessible name, required), an optional `caption`, an optional `sources`
-   (see [Citations and sources](#citations-and-sources)), and `render()`
-   returning `plot({...})` from `charts/_theme.mjs`.
+   (see [Citations and sources](#citations-and-sources)), an optional
+   `maxWidth` (see [A diagram is drawn small](#a-diagram-is-drawn-small-so-it-fits-a-phone)),
+   and `render()` returning `plot({...})` from `charts/_theme.mjs`.
 2. **Build** — `npm run build:charts` renders every spec into
    `lib/generated/charts.js` (gitignored; its committed `.d.ts` types it). Runs
    from `dev`, `build`, and `postinstall`.
@@ -623,6 +624,36 @@ nothing. `npm run check:charts` renders the set and fails on any unclipped
 geometry outside the box; the tolerance is 2px, `<text>` is exempt, and
 ancestor `translate()`s are accumulated so a faceted mark is judged where it
 actually lands.
+
+### A diagram is drawn small, so it fits a phone
+
+An inlined SVG scales its type along with its box, so `<Chart>` publishes a
+per-chart **minimum width**: `scripts/build-charts.mjs` solves for the width at
+which the smallest `font-size` in the markup reaches 8.5px, and below that the
+stylesheet scrolls the figure sideways instead of shrinking it further. Plot
+writes `font-size="10"` onto the root `<svg>` whatever a spec authors, so a
+chart laid out at the standard 680 has a floor of 578px whether or not it
+carries any 10px type, and a 390px phone shows about two thirds of it.
+
+For a *data* chart that is the right trade: the alternative is illegible.
+For a **comparison diagram** it is not, because a figure whose whole argument
+is four panels read against each other fails if only two are on screen. A
+floor of 340px or less is dropped entirely, so a spec that must stay whole on
+a phone is laid out at **400px or narrower** (`charts/_venn.mjs` is the worked
+example) and scales freely from there.
+
+That leaves the opposite problem, since the SVG then stretches to whatever
+column it lands in: 400px of drawing in an 836px interview column renders its
+10px labels at 21px, louder than the heading above it. So a spec laid out this
+way also exports the width it wants to be seen at:
+
+```js
+export const maxWidth = 560;
+```
+
+Like `sources`, the cap lives on the spec rather than on the tag, so it follows
+the chart to every lesson that places it instead of being re-typed, and
+correctly, at each one. A `maxWidth` prop on `<Chart>` still overrides it.
 
 ### Don't write a label at a round number
 

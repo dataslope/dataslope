@@ -149,6 +149,8 @@ ORDER BY
 
 A `LEFT JOIN` plus `WHERE right_table.id IS NULL` is the classic pattern for "show me the rows with no match."
 
+<Chart slug="join-anti-venn" />
+
 ```mermaid
 flowchart TB
     A["<code>LEFT JOIN</code><br/>keep all customers"] --> B["matched customers<br/>order id present"]
@@ -286,12 +288,7 @@ For beginners, `LEFT JOIN` is the most important outer join. Recent SQLite versi
   caption="Put the table you want to keep on the left and a left join covers most needs."
 />
 
-```mermaid
-flowchart TD
-    I["<code>INNER JOIN</code><br/>only matches"] --- L["<code>LEFT JOIN</code><br/>all left rows"]
-    L --- R["<code>RIGHT JOIN</code><br/>all right rows"]
-    R --- F["<code>FULL OUTER JOIN</code><br/>all rows from both sides"]
-```
+<Chart slug="join-types-venn" />
 
 <Callout type="info" title="How to choose">
 Ask: "Which table's rows must not disappear?" Put that table first, then use `LEFT JOIN`.
