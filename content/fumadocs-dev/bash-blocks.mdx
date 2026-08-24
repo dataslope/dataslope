@@ -1,34 +1,51 @@
 ---
 title: "Bash Blocks"
-description: Sandbox for the `<BashBlock>` component, a real shell and filesystem inside lesson prose.
+description: Sandbox for the `<BashBlock>` component, a real shell you can type into inside lesson prose.
 ---
 
-`<BashBlock>` runs shell commands against a real in-memory filesystem in
-your browser. The engine is just-bash, the same one behind the Git
-playground, so pipes, redirection, globs, loops and functions all work.
-Nothing is saved: a reload starts over.
+`<BashBlock>` is a terminal, not a script runner. Type a command, press
+Enter, read the output, type the next one. The session remembers where you
+are: `cd src` then `ls` lists `src`, a variable you set stays set, and a
+function you define stays defined.
+
+The engine is just-bash over an in-memory filesystem, so pipes,
+redirection, globs, loops and functions all work. Nothing is saved: a
+reload starts over.
 
 Every block gets its own working directory unless it opts into sharing one.
 
-## A block that runs
+## Just type
 
-A scenario to start from, and a command script. The script is editable, so
-a reader can change a flag and re-run.
+No `commands` prop at all. The prompt shows where you are and a block
+cursor blinks where you are typing.
+
+`Tab` completes the way bash does: it fills in the longest common prefix,
+and prints the candidates when the choice is genuinely ambiguous. The first
+word completes against commands, everything after it against files in the
+current directory.
+
+<BashBlock scenario="small-project" label="Have a look around" />
+
+Try `ls`, then `cd src`, then `pwd`. The prompt follows you.
+
+## A block with a starting script
+
+Pass `commands` and the block gains a Run button that plays them into the
+same terminal. The prompt stays live afterwards, so a reader can keep
+going from wherever the script left them.
 
 <BashBlock
-  scenario="small-project"
-  label="Look around"
-  commands={`ls
-ls src`}
+  scenario="log-files"
+  label="Find the failures"
+  commands={`grep ERROR app.log
+grep ERROR app.log | wc -l`}
 />
 
 ## The file strip
 
 Every block carries a one-line summary of the working directory, collapsed
-by default. Click it to see the tree, with the paths your last command
+by default. Open it to see the tree, with the paths your last command
 touched highlighted.
-
-Pass `expandState` where the filesystem *is* the lesson:
 
 <BashBlock
   scenario="small-project"
@@ -38,16 +55,34 @@ Pass `expandState` where the filesystem *is* the lesson:
 cat count.txt`}
 />
 
-## Pipes and filters
+## State really persists
 
-The classic chain. Each stage narrows the last.
+This is the part a textarea cannot do. Run these one at a time and watch
+the prompt change, then define a function and call it on a later line.
 
 <BashBlock
-  scenario="log-files"
-  label="Find the failures"
-  commands={`grep ERROR app.log
-grep ERROR app.log | wc -l
-grep ERROR app.log | cut -d' ' -f4-`}
+  scenario="small-project"
+  label="cd, variables, functions"
+  commands={`cd src
+pwd
+NAME=world
+echo "hi $NAME"
+greet() { echo "hello, $1"; }
+greet there`}
+/>
+
+## Color
+
+just-bash has no `ls --color`, but it passes escape sequences straight
+through, so anything you print with them renders as color. The palette is
+the classic 16 ANSI terminal colors rather than the Dataslope ramp,
+because output colored with `31m` should look the way it looks in a
+terminal.
+
+<BashBlock
+  scenario="empty"
+  label="ANSI escapes"
+  commands={"printf '\\033[31mred\\033[0m \\033[1;32mbold green\\033[0m \\033[33myellow\\033[0m\\n'"}
 />
 
 ## Text processing
@@ -61,29 +96,13 @@ grep ERROR app.log | cut -d' ' -f4-`}
 awk -F, 'NR>1 {sum[$2] += $4} END {for (r in sum) print r, sum[r]}' sales.csv`}
 />
 
-## The shell language
-
-Variables, loops, conditionals and functions, not just a command runner.
-These blocks pass `mode="script"`: without it each line runs in its own
-shell, so a variable set on one line would be gone by the next.
+## Loops and conditionals
 
 <BashBlock
   scenario="messy-names"
   label="A loop over globs"
-  mode="script"
   commands={`for f in *.txt; do echo "found $f"; done
-count=0
-for f in *.txt; do count=$((count + 1)); done
-echo "total: $count"`}
-/>
-
-<BashBlock
-  scenario="empty"
-  label="Functions and conditionals"
-  mode="script"
-  commands={`greet() { echo "hello, $1"; }
-greet world
-if [ 5 -gt 3 ]; then echo "yes"; else echo "no"; fi`}
+if [ -f draft.tmp ]; then echo "scratch file present"; fi`}
 />
 
 ## find and xargs
@@ -99,16 +118,15 @@ find . -type f`}
 
 ## Blocks that share a directory
 
-Blocks with the same `dir` id continue each other in document order.
-Blocks without one are isolated, so re-running an earlier block can never
-corrupt a later one.
+Blocks with the same `dir` id share one working directory, including the
+shell state, so a `cd` in the first is still in effect in the second.
+Blocks without one are isolated.
 
 <BashBlock
   dir="pipeline"
   scenario="log-files"
   label="Step 1: extract"
-  commands={`grep ERROR app.log > errors.log
-cat errors.log`}
+  commands={`grep ERROR app.log > errors.log`}
 />
 
 <BashBlock
@@ -118,9 +136,6 @@ cat errors.log`}
   expandState
   commands={`wc -l < errors.log`}
 />
-
-A reader who runs step 2 first is offered a catch-up rather than an error
-about a missing file.
 
 ## Errors
 
@@ -138,18 +153,28 @@ echo "exit code: $?"`}
 
 | Prop | Type | Default | Notes |
 | --- | --- | --- | --- |
-| `commands` | `string` | required | Newline-separated commands. Editable before running. |
+| `commands` | `string` | none | Optional starting script, played by the Run button. Without it the block is just a prompt. |
 | `scenario` | `string` | `small-project` | `empty`, `small-project`, `log-files`, `sales-csv`, `messy-names`. |
-| `dir` | `string` | none | Share a working directory with other blocks carrying the same id. |
+| `dir` | `string` | none | Share a working directory and shell state with blocks carrying the same id. |
 | `expandState` | `boolean` | `false` | Open the file listing on mount. |
 | `label` | `string` | none | Caption in the block header. |
-| `mode` | `"commands" \| "script"` | `commands` | `commands` pairs each line with its own output; `script` runs the block as one program so variables and functions persist across lines. |
+| `rows` | `number` | `10` | Terminal height, in rows, before it scrolls. |
+
+### Keys
+
+| Key | Does |
+| --- | --- |
+| `Enter` | Run the line. |
+| `↑` / `↓` | Walk back and forward through history. |
+| `Tab` | Complete a command or a filename. |
+| `Ctrl-L` | Clear the scrollback. |
+| `Ctrl-C` | Abandon the line without running it. |
+
+The real `<input>` is off-screen and only holds the value and the caret;
+the line you see is rendered text, which is what lets the cursor be a
+blinking block rather than an I-beam. Clicking anywhere in the terminal
+puts focus back on the prompt.
 
 ```jsx
-<BashBlock
-  scenario="log-files"
-  label="Find the failures"
-  expandState
-  commands={`grep ERROR app.log | wc -l`}
-/>
+<BashBlock scenario="log-files" label="Find the failures" />
 ```

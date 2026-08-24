@@ -456,3 +456,23 @@ html:is(.dark, [data-theme="dark"]) .scard {
     border-top: 1px solid var(--gb-border);
   }
 }
+
+/* ─── Embedded terminal ─── */
+/* A block that is a shell rather than a script runner: the whole surface is
+   the terminal, so clicking anywhere in it focuses the prompt. */
+.sblock-terminal {
+  display: flex;
+  min-height: 160px;
+  max-height: 70vh;
+  border-bottom: 1px solid var(--gb-border);
+  background: var(--gb-bg-subtle);
+}
+
+.sblock-terminal .git-terminal-scroll {
+  padding: 12px 14px;
+  font-size: 12.5px;
+}
+
+.sblock-terminal .git-terminal-scroll {
+  cursor: text;
+}

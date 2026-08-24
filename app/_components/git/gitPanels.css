@@ -93,19 +93,71 @@
 }
 
 .git-terminal-input {
-  flex: 1;
-  min-width: 0;
-  background: transparent;
+  /* Off-screen but focusable: it holds the value and the caret, while the
+     visible line beside it is rendered text so the cursor can be a block. */
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
   border: none;
   outline: none;
-  color: var(--text);
-  font-family: var(--font-mono, monospace);
-  font-size: 13px;
-  padding: 0;
+  opacity: 0;
+  overflow: hidden;
 }
 
-.git-terminal-input::placeholder {
+.git-terminal-line {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.git-terminal-ghost {
   color: var(--text-dim);
+}
+
+/* A block over the character under the caret, inverted the way a terminal
+   cursor is. `step-end` gives the hard on/off of a real cursor rather than a
+   fade. */
+.git-terminal-cursor {
+  display: inline-block;
+  background: var(--text);
+  color: var(--bg);
+  white-space: pre;
+}
+
+.git-terminal-cursor.blink {
+  animation: git-terminal-blink 1s step-end infinite;
+}
+
+/* Unfocused terminals show a hollow cursor, as macOS Terminal does. */
+.git-terminal-cursor.idle {
+  background: transparent;
+  color: inherit;
+  box-shadow: inset 0 0 0 1px var(--text-dim);
+}
+
+@keyframes git-terminal-blink {
+  0%,
+  100% {
+    background: var(--text);
+    color: var(--bg);
+  }
+  50% {
+    background: transparent;
+    color: inherit;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .git-terminal-cursor.blink {
+    animation: none;
+  }
 }
 
 .git-scenario-hint {
@@ -357,3 +409,103 @@
   border-color: color-mix(in srgb, var(--primary) 45%, transparent);
 }
 
+
+/* Directory shown before the `$`. Colored like a real prompt so the path
+   reads as context rather than as part of the command. */
+.git-terminal-cwd {
+  color: var(--term-green);
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+/* The prompt as the terminal's last line rather than a footer: no divider, no
+   panel of its own, so the cursor sits where the next output would appear. */
+.git-terminal-inputrow.inline {
+  border-top: none;
+  background: transparent;
+  padding: 0;
+}
+
+/* ─── ANSI colors ─────────────────────────────────────────────────────── */
+/* The classic 16, not the Dataslope ramp: output colored with an escape
+   sequence should look the way it looks in a terminal. Values are the xterm
+   defaults, with the dark-background set swapped in below — the same two-set
+   arrangement every terminal emulator ships, so `31m` stays legible whether
+   the surface is paper or ink. */
+.git-terminal {
+  --term-black: #1c1c1c;
+  --term-red: #cd0000;
+  --term-green: #00792e;
+  --term-yellow: #8a6d00;
+  --term-blue: #0000cd;
+  --term-magenta: #cd00cd;
+  --term-cyan: #00686b;
+  --term-white: #5c5c5c;
+  --term-bright-black: #7f7f7f;
+  --term-bright-red: #e00000;
+  --term-bright-green: #00a83c;
+  --term-bright-yellow: #a88400;
+  --term-bright-blue: #3b3bff;
+  --term-bright-magenta: #e000e0;
+  --term-bright-cyan: #008b8f;
+  --term-bright-white: #2b2b2b;
+}
+
+html:is(.dark, [data-theme="dark"]) .git-terminal {
+  --term-black: #000000;
+  --term-red: #cd3131;
+  --term-green: #0dbc79;
+  --term-yellow: #e5e510;
+  --term-blue: #2472c8;
+  --term-magenta: #bc3fbc;
+  --term-cyan: #11a8cd;
+  --term-white: #e5e5e5;
+  --term-bright-black: #666666;
+  --term-bright-red: #f14c4c;
+  --term-bright-green: #23d18b;
+  --term-bright-yellow: #f5f543;
+  --term-bright-blue: #3b8eea;
+  --term-bright-magenta: #d670d6;
+  --term-bright-cyan: #29b8db;
+  --term-bright-white: #ffffff;
+}
+
+.ansi-black { color: var(--term-black); }
+.ansi-red { color: var(--term-red); }
+.ansi-green { color: var(--term-green); }
+.ansi-yellow { color: var(--term-yellow); }
+.ansi-blue { color: var(--term-blue); }
+.ansi-magenta { color: var(--term-magenta); }
+.ansi-cyan { color: var(--term-cyan); }
+.ansi-white { color: var(--term-white); }
+.ansi-bright-black { color: var(--term-bright-black); }
+.ansi-bright-red { color: var(--term-bright-red); }
+.ansi-bright-green { color: var(--term-bright-green); }
+.ansi-bright-yellow { color: var(--term-bright-yellow); }
+.ansi-bright-blue { color: var(--term-bright-blue); }
+.ansi-bright-magenta { color: var(--term-bright-magenta); }
+.ansi-bright-cyan { color: var(--term-bright-cyan); }
+.ansi-bright-white { color: var(--term-bright-white); }
+
+.ansi-bg-black { background: var(--term-black); }
+.ansi-bg-red { background: var(--term-red); }
+.ansi-bg-green { background: var(--term-green); }
+.ansi-bg-yellow { background: var(--term-yellow); }
+.ansi-bg-blue { background: var(--term-blue); }
+.ansi-bg-magenta { background: var(--term-magenta); }
+.ansi-bg-cyan { background: var(--term-cyan); }
+.ansi-bg-white { background: var(--term-white); }
+.ansi-bg-bright-black { background: var(--term-bright-black); }
+.ansi-bg-bright-red { background: var(--term-bright-red); }
+.ansi-bg-bright-green { background: var(--term-bright-green); }
+.ansi-bg-bright-yellow { background: var(--term-bright-yellow); }
+.ansi-bg-bright-blue { background: var(--term-bright-blue); }
+.ansi-bg-bright-magenta { background: var(--term-bright-magenta); }
+.ansi-bg-bright-cyan { background: var(--term-bright-cyan); }
+.ansi-bg-bright-white { background: var(--term-bright-white); }
+
+.ansi-bold { font-weight: 700; }
+.ansi-dim { opacity: 0.7; }
+.ansi-italic { font-style: italic; }
+.ansi-underline { text-decoration: underline; }
+.ansi-inverse { background: var(--text); color: var(--bg); }

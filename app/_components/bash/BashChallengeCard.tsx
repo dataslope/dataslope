@@ -178,6 +178,9 @@ export default function BashChallengeCard({
               history={history}
               busy={busy || !ready}
               completions={[]}
+              inlineInput
+              placeholder="ls"
+              prompt={state.cwd === "/repo" ? "~" : `~${state.cwd.slice("/repo".length)}`}
               placeholderHint={
                 <p className="git-terminal-hint">
                   Type the commands that solve this. Objectives tick as soon as the output or the

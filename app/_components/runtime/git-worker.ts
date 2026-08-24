@@ -15,7 +15,7 @@ import { createGitFs } from "../git/gitFs";
 import { createGitCommand } from "../git/gitCommand";
 import { scenarioById } from "../git/scenarios";
 import { bashScenarioById } from "../bash/bashScenarios";
-import { runCommand } from "../git/runCommand";
+import { runCommand, ShellSession } from "../git/runCommand";
 import {
   EMPTY_STATE,
   MAX_SNAPSHOT_FILES,
@@ -46,6 +46,9 @@ type Session = {
   bash: InstanceType<typeof Bash>;
   clock: { commits: number };
   kind: SessionKind;
+  /** Working directory, environment and functions that outlive one exec, so
+   *  the terminal behaves like a terminal. */
+  shell: ShellSession;
 };
 
 /** One repository per session id. The Worker is shared by a whole page; the
@@ -63,7 +66,7 @@ async function createSession(kind: SessionKind): Promise<Session> {
     customCommands: [defineCommand("git", run)],
   });
   await store.mkdir(REPO, { recursive: true });
-  return { store, fs, bash, clock, kind };
+  return { store, fs, bash, clock, kind, shell: new ShellSession(REPO) };
 }
 
 async function seed(scenarioId: string, kind: SessionKind): Promise<Session> {
@@ -129,7 +132,7 @@ async function readState(s: Session): Promise<RepoState> {
       ...EMPTY_STATE,
       kind: "bash",
       tree,
-      cwd: REPO,
+      cwd: s.shell.cwd,
       contents: await snapshot(s, tree),
     };
   }
@@ -140,7 +143,7 @@ async function readState(s: Session): Promise<RepoState> {
   } catch {
     initialized = false;
   }
-  if (!initialized) return { ...EMPTY_STATE, kind: "git", tree, cwd: REPO };
+  if (!initialized) return { ...EMPTY_STATE, kind: "git", tree, cwd: s.shell.cwd };
 
   const branches = await git.listBranches({ fs, dir: REPO });
   let branch: string | null = null;
@@ -224,7 +227,7 @@ async function readState(s: Session): Promise<RepoState> {
     files,
     commits,
     tree,
-    cwd: REPO,
+    cwd: s.shell.cwd,
   };
 }
 
@@ -253,7 +256,7 @@ self.addEventListener("message", (event: MessageEvent<GitWorkerRequest>) => {
         }
         case "exec": {
           const s = await sessionFor(req.session);
-          const result = await runCommand(s.bash, req.command);
+          const result = await s.shell.run(s.bash, req.command);
           post({
             id: req.id,
             ok: true,

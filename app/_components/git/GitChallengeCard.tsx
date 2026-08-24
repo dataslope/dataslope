@@ -173,6 +173,7 @@ export default function GitChallengeCard({
               history={history}
               busy={busy || !ready}
               completions={[]}
+              inlineInput
               placeholderHint={
                 <p className="git-terminal-hint">
                   Type the commands that solve this. Objectives tick as soon as the repository

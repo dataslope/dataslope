@@ -147,6 +147,10 @@ export function useGitSession(
         pending.clear();
         requestSession.clear();
         subscribers.clear();
+        // The sessions died with the worker, so the next mount has to seed
+        // again. Without this a remount attaches to a session that no longer
+        // exists and the learner gets an empty repository.
+        seededRepos.clear();
       }
     };
   }, [sessionId, track]);
