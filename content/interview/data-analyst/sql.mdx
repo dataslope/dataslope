@@ -454,6 +454,13 @@ Some engines (SQL Server, BigQuery, DuckDB) offer a native `PIVOT` syntax.
 
 ### What does GROUP BY ALL or GROUP BY with ROLLUP do?
 
+These are different, dialect-dependent features. In engines that support the
+shorthand, `GROUP BY ALL` groups by every selected expression that is not an
+aggregate. It saves repetition, but an explicit column list is more portable
+and makes the output grain easier to review. In some systems or older SQL
+versions, `GROUP BY ALL` has a different legacy meaning or is unsupported, so
+check the target database.
+
 `ROLLUP` generates **subtotals** at each level of a hierarchy plus a
 grand total. For example, `GROUP BY ROLLUP(region, category)` produces
 rows for every (region, category) pair, then subtotals per region, then a
@@ -464,6 +471,10 @@ SELECT region, category, SUM(amount) AS revenue
 FROM orders
 GROUP BY ROLLUP(region, category);
 ```
+
+Because real grouping keys may themselves be `NULL`, use the engine's
+`GROUPING(region)` / `GROUPING(category)` function when you must distinguish a
+subtotal placeholder from a genuine null-valued key.
 
 ### How do you find duplicate rows in a table?
 

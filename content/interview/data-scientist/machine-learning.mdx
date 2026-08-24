@@ -542,8 +542,14 @@ frequency, with the diagonal marking a model whose 0.7 means 0.7.
 
 ### How would you select between two models?
 
-Compare on a held-out test set (never tuned on) using the metric aligned with the business goal.
-Use cross-validation estimates to avoid lucky splits; check whether the difference is statistically significant (paired t-test on fold scores).
+Use validation data or nested cross-validation to compare candidates with a
+metric aligned to the business goal, then use the untouched test set only for
+the final assessment. Ordinary cross-validation fold scores are dependent
+because their training sets overlap, so a naive paired t-test on those scores
+does not generally have its advertised Type I error. Quantify uncertainty with
+a procedure suited to the resampling design, such as nested CV with repeated
+outer splits, a paired bootstrap on held-out predictions, or a domain-specific
+test on one untouched evaluation set.
 Also consider: inference latency, interpretability requirements, training cost, and performance on important slices.
 Simpler models that perform comparably should be preferred.
 

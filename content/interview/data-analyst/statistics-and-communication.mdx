@@ -118,8 +118,10 @@ for **categorical** or discrete data (e.g., the most common product
 category purchased, the most frequent support ticket type) where mean
 and median have no clear meaning.
 
-When a distribution has two modes, that is usually the finding: it is two
-populations in one column, and no measure of center describes either.
+A distribution with two modes may indicate distinct subpopulations, rounding,
+or a process with two common outcomes. It is a reason to segment and
+investigate, not proof that two populations were mixed. A single measure of
+center can hide this structure.
 
 <Chart slug="modality-is-a-mixture" />
 
@@ -127,9 +129,13 @@ populations in one column, and no measure of center describes either.
 
 A normal (Gaussian) distribution is bell-shaped and symmetric, fully
 described by its mean and standard deviation. Many natural phenomena
-approximate it, and it underpins common statistical tests. In practice,
-analysts care because departures from normality (heavy tails, skew) can
-invalidate assumptions of parametric tests.
+approximate it, and normal models or normal sampling approximations underpin
+many common procedures. A test does not automatically become invalid merely
+because the raw observations are non-normal: what matters is the procedure's
+assumption (often about errors or a sampling distribution), sample size,
+dependence, skew, and outliers. Inspect those conditions and use a
+transformation, robust or resampling method, or a better probability model
+when the approximation is poor.
 
 The three numbers worth knowing cold.
 
@@ -150,9 +156,11 @@ samples agree.
 
 ### What are percentiles and quartiles?
 
-A **percentile** is the value below which a given percentage of
-observations fall: the 90th percentile means 90% of values are below
-that point. **Quartiles** divide data into four equal parts: $Q_1$
+A **percentile** is a threshold at or below which a given percentage of
+observations fall: the 90th percentile is a value for which about 90% of
+observations are at or below that point. Exact answers can differ because
+software uses different interpolation and ranking conventions. **Quartiles**
+divide ordered data into four parts: $Q_1$
 (25th), $Q_2$ (50th = median), $Q_3$ (75th). The interquartile range
 ($\text{IQR} = Q_3 - Q_1$) is a robust measure of spread.
 

@@ -74,12 +74,12 @@ encode your assumptions so bad data fails loudly.
 Use it when a table is large and mostly **appends** (events, logs), so
 full rebuilds are too slow/expensive. The catch: you need a reliable way
 to identify new rows (a timestamp/id via `is_incremental()`), correct
-handling of late-arriving/updated rows, and an occasional **full
-refresh** to repair drift.
+handling of late-arriving/updated rows, and a tested recovery procedure.
+A full refresh can repair divergence, but scheduling one is not a substitute
+for correct incremental logic and may be impractical for the largest models.
 
 Both halves of that answer are in one picture: the saving grows with every
-day the pipeline has run, and the scheduled full refresh is part of the
-design rather than an admission of failure.
+day the pipeline has run, while the cost of a recovery rebuild grows too.
 
 <Chart slug="incremental-vs-full-refresh" />
 
@@ -95,7 +95,13 @@ The guard is what makes the model incremental: on a full refresh the branch is s
   ]}
 />
 
-The `is_incremental()` macro returns `true` only when the model already exists in the warehouse and the run is not a full refresh. You use it in a `WHERE` clause to limit rows to those newer than the max value already loaded.
+The `is_incremental()` macro returns `true` when the target relation exists,
+the model is configured as incremental, and the run is not a full refresh. You
+usually use it to limit source rows. A strict `>` against the target maximum is
+only a simple example: equal timestamps, late events, and corrections to older
+records can be missed. Production models commonly re-read an overlap window
+and merge on a stable key, or consume a source change sequence that is reliably
+monotonic.
 
 Below, the `config()` marks the model `incremental`, and the
 `is_incremental()` guard keeps only `events` rows whose `event_at`
@@ -289,11 +295,17 @@ dbt run --select tag:nightly
 
 ### What is the `unique_key` config on an incremental model, and what does it control?
 
-`unique_key` tells dbt how to **handle duplicate rows** when merging new data into an incremental model. If a new row's key already exists in the target table, dbt will `MERGE`/`UPDATE` (upsert) rather than inserting a duplicate. Without `unique_key`, dbt only appends; with it, dbt uses a MERGE strategy (or DELETE+INSERT on warehouses that lack MERGE).
+`unique_key` identifies corresponding source and target rows for incremental
+strategies that update or replace existing records. It does not validate that
+the key is unique, so duplicate source keys can fail a warehouse `MERGE` or
+produce unexpected results. Add an explicit uniqueness test. The exact SQL and
+whether `unique_key` is used depend on the adapter and configured
+`incremental_strategy`; it does not universally force `MERGE`. Append strategies
+do not update existing rows.
 
-Setting `unique_key='event_id'` in the `config()` below means a
-re-loaded `event_id` upserts in place instead of appending a duplicate
-to `fct_events`:
+With a merge-style incremental strategy, setting `unique_key='event_id'` in
+the config below lets a re-loaded `event_id` match the existing target row for
+an update instead of blindly appending another row:
 
 ```sql
 -- models/fct_events.sql, incremental with upsert on event_id

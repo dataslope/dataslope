@@ -63,10 +63,14 @@ A composite index covers multiple columns in a defined order:
   ]}
 />
 
-It serves queries that filter on a **left prefix**:
+For a conventional B-tree, it efficiently serves predicates constrained by a
+**left prefix**:
 `last_name` alone, or `last_name` **and** `first_name`, but not `first_name`
-alone. This is the **leftmost-prefix rule**. Order the columns by how you
-query them, most-selective and always-present columns first.
+alone in the general case. This is the **leftmost-prefix rule**, though some
+engines can use skip scans or other plans. Order columns around real query
+patterns: equality predicates that appear together, then range and ordering
+needs, plus covering columns where appropriate. "Most selective first" is not
+a universal rule, especially when all equality columns are supplied.
 
 ### How do you read a query plan?
 
@@ -88,11 +92,14 @@ two accounts without ever losing or duplicating it.
 
 ### What are the SQL isolation levels?
 
-From weakest to strongest: **Read Uncommitted**, **Read Committed** (the
-common default), **Repeatable Read**, and **Serializable**. Each stronger
-level prevents more anomalies at the cost of concurrency. Serializable behaves
-as if transactions ran one at a time; Read Committed only guarantees you never
-read uncommitted ("dirty") data.
+The SQL standard names **Read Uncommitted**, **Read Committed**, **Repeatable
+Read**, and **Serializable**. Read Committed is a common default, but defaults
+and implementations vary by database. The names describe prohibited
+phenomena, not one universal locking algorithm, and snapshot-based engines can
+provide different guarantees under the same label. Serializable requires an
+outcome equivalent to some serial ordering, not literal one-at-a-time
+execution. Read Committed prevents dirty reads but still permits values to
+change between statements in the same transaction.
 
 ### What anomalies do isolation levels prevent?
 

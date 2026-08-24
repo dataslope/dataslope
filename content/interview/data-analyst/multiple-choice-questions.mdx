@@ -500,7 +500,7 @@ says otherwise.
 - [o] Every row that contains at least one \`NaN\`, in any column.
   > The defaults are \`axis=0\` and \`how="any"\`. Use \`how="all"\` for rows that are entirely missing, or \`subset=[...]\` to restrict which columns count.
 - Nothing, unless \`inplace=True\` is passed.
-  > It returns a cleaned copy either way; \`inplace\` only controls whether \`df\` itself is rebound.
+  > Without \`inplace=True\`, it returns a cleaned DataFrame and leaves \`df\` unchanged. With \`inplace=True\`, it modifies \`df\` and returns \`None\`; rebinding is not involved.
 - Every column containing at least one \`NaN\` value.
   > Dropping columns requires \`axis=1\`; the default axis is rows.`}
 />

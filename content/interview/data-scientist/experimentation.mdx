@@ -110,7 +110,12 @@ whenever the test is small.
 
 The **randomization unit** is the entity that is independently assigned to control or treatment (typically user, session, or device).
 If the unit is too granular (e.g., request-level) for a feature users see repeatedly, the same user can land in both groups, causing **contamination** that dilutes the measured effect.
-The analysis unit must match or be nested within the randomization unit to keep variance estimates valid.
+The analysis must respect the randomization unit. You may analyze finer-grained
+observations, such as orders within randomized users, but treating those orders
+as independent creates pseudoreplication and standard errors that are too
+small. Aggregate to the assignment unit or use cluster-aware standard errors or
+a hierarchical model. If groups, households, or markets can influence one
+another, randomize and analyze at a level that addresses that interference.
 
 ### How do you calculate sample size for an A/B test?
 
@@ -285,7 +290,9 @@ DiD assumes the **parallel trends** assumption: in the absence of treatment, tre
 
 ### What is the difference between a one-sided and two-sided A/B test?
 
-A **two-sided test** detects an effect in either direction (treatment better or worse); significance requires the p-value to be below `alpha/2` in each tail.
+A **two-sided test** detects an effect in either direction (treatment better or
+worse). The total Type I error `alpha` is usually split across two tails, but a
+reported two-sided p-value is compared directly with `alpha`, not `alpha/2`.
 A **one-sided test** tests only the direction stated in advance (treatment is better); it has more power in that direction but misses regressions.
 For product experiments, two-sided tests are generally preferred because you care about detecting both improvements and regressions.
 
@@ -417,9 +424,15 @@ overstated themselves.
 
 ### What is a sequential probability ratio test (SPRT)?
 
-The **SPRT** is a method for continuous monitoring that maintains a valid `alpha` and power guarantee at any stopping time.
-Unlike peeking at a fixed `alpha` threshold, SPRT computes a likelihood ratio that crosses boundaries only when there is strong evidence for either hypothesis.
-It allows early stopping when an effect is large and clear, while controlling Type I error, making it suitable for high-velocity experimentation platforms.
+The **SPRT** repeatedly compares a likelihood ratio with precomputed stopping
+boundaries for two specified hypotheses. Crossing the upper or lower boundary
+supports one hypothesis; otherwise sampling continues. This planned stopping
+rule controls the target error probabilities under its assumptions, unlike
+repeatedly checking an ordinary fixed-horizon p-value. The classical SPRT is
+not a universal guarantee for arbitrary hypotheses, misspecified data, or any
+unplanned stopping rule. Composite hypotheses and product metrics require an
+appropriate sequential design, such as group-sequential boundaries,
+always-valid inference, or a mixture likelihood method.
 
 ### How do you detect interference between concurrently running experiments?
 

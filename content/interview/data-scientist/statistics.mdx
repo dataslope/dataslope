@@ -34,10 +34,14 @@ $$
 SE = \frac{\sigma}{\sqrt{n}}
 $$
 
-The standard error shrinks as the sample size $n$ grows (you can estimate
-the mean more precisely with more data); the standard deviation does not,
-because it estimates a fixed population property that does not depend on
-$n$.
+This formula assumes independent observations with population standard
+deviation $\sigma$; in practice, $\sigma$ is often replaced by the sample
+standard deviation. Clustering, repeated measurements, time dependence, or
+unequal weights require a standard error that reflects the sampling design.
+Sampling a large fraction of a finite population without replacement also
+introduces a finite-population correction. Under the independent-sampling
+formula, standard error shrinks as $n$ grows; standard deviation describes the
+spread of individual observations and need not shrink with sample size.
 
 How fast it shrinks, which is the part interviewers probe: as the square
 root of n, so four times the data halves it.
@@ -83,12 +87,15 @@ repeat.
 
 ### Why does the Central Limit Theorem matter?
 
-For a large enough sample, the distribution of the **sample mean** is
-approximately normal **regardless of the population's shape**. That's
-what justifies normal-based confidence intervals and z/t-tests for means
-even when the underlying data is skewed. A common rule of thumb is that
-$n \geq 30$ is "large enough" for moderately skewed data; heavier skew
-needs more.
+Under common versions of the Central Limit Theorem, independent and
+identically distributed observations with finite variance produce a
+standardized **sample mean** that approaches a normal distribution as sample
+size grows. It is not unconditional: dependence, an infinite-variance
+population, severe skew, or rare extreme events can make the approximation
+poor or require much more data. The familiar $n \geq 30$ rule is not a
+theorem. Diagnose the data-generating process and the sampling distribution,
+and use design-aware, robust, or resampling methods when the approximation is
+questionable.
 
 Simulated rather than asserted. The population is nothing like a bell
 curve, and the means converge to one anyway.
@@ -149,9 +156,9 @@ In data science it powers spam filters, medical diagnosis, and Bayesian
 inference, where you update a prior distribution over parameters into a
 posterior after observing data.
 
-The code below works the classic medical-test example: even with a 99%
-accurate test, a rare disease (1% prevalence) means a positive result
-still implies a fairly low probability of actually being sick, because
+The code below works the classic medical-test example: even with 99%
+sensitivity, a 5% false-positive rate, and 1% disease prevalence, a positive
+result still implies a fairly low probability of actually being sick, because
 the many false positives from the healthy majority swamp the few true
 positives. It is the canonical demonstration of why base rates matter.
 
