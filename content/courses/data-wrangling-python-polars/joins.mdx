@@ -46,6 +46,8 @@ for how in ["inner", "left", "right", "full", "semi", "anti"]:
 | `anti` | left rows that have **no** match |
 | `cross` | every left row paired with every right row |
 
+<Chart slug="sql-join-types" />
+
 `semi` and `anti` are the ones people do not know they wanted. They
 are filters that use another frame as the criterion, and unlike an
 `inner` join they cannot change the row count upward.

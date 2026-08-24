@@ -292,7 +292,9 @@ const digest = computeDigest(files, usages);
 // that predates the slugs/SVG splits would skip the writes.
 const svgDirCurrent = () => {
   try {
-    return readdirSync(SVG_DIR).filter((f) => f.endsWith(".svg")).length === specs.length;
+    const expected = specs.map((file) => file.replace(/\.mjs$/, ".svg")).sort();
+    const actual = readdirSync(SVG_DIR).filter((file) => file.endsWith(".svg")).sort();
+    return expected.length === actual.length && expected.every((file, i) => file === actual[i]);
   } catch {
     return false;
   }

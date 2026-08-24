@@ -159,13 +159,6 @@ Once `LEFT JOIN` makes sense, its siblings are easy:
   caption="A left join keeps every left-hand row, filling the gaps with `NULL`."
 />
 
-```mermaid
-flowchart TD
-    I["INNER<br/>only matches"] --- LJ["LEFT<br/>all left + matches"]
-    LJ --- RJ["RIGHT<br/>all right + matches"]
-    RJ --- FJ["FULL<br/>everything,<br/>NULLs where unmatched"]
-```
-
 <Callout type="info" title="A simple way to choose">
 Ask: *"whose rows must I keep even without a match?"* Keep the left
 table → `LEFT JOIN`. Keep both → `FULL JOIN`. Keep only matched rows
