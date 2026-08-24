@@ -137,7 +137,16 @@ Writing many tiny files (e.g., one Parquet file per minute instead of one per da
 
 ### What is exactly-once vs at-least-once delivery semantics?
 
-**At-least-once** guarantees every message is delivered, but duplicates are possible on retry. **Exactly-once** guarantees each message is processed precisely once, no duplicates, no loss. Exactly-once is harder to achieve (requires coordination between producer, broker, and consumer) and carries higher latency/overhead. Many production systems accept at-least-once delivery and make the consumer **idempotent** rather than paying the cost of true exactly-once.
+**At-least-once** means the system retries until a message is acknowledged,
+so duplicates are possible. It does not promise delivery through unlimited
+outages or retention expiry. **Exactly-once** means each input has one effect
+on the defined output, not that application code literally executes only once.
+The guarantee has a boundary: a broker transaction may cover consumed offsets
+and produced records while excluding an email, API call, or external database.
+End-to-end exactly-once therefore needs transactional participation or an
+idempotent write at every side effect. Many systems use at-least-once delivery
+with idempotent consumers because that contract is simpler to extend across
+system boundaries.
 
 ### What is Change Data Capture (CDC) and when do you use it?
 
@@ -162,7 +171,14 @@ config:
 
 ### What is a watermark in a streaming pipeline?
 
-A **watermark** is a signal that tells the streaming engine "all events with timestamp before T have arrived." It allows the engine to close and finalize windows without waiting forever. Watermarks are set as `event_time - some_allowed_lateness_margin`. Events that arrive after the watermark has passed are called **late data** and are either dropped, routed to a side output, or used to update (recompute) the window result depending on the system's configuration.
+A **watermark** is the engine's estimate that most or all events earlier than
+an event-time threshold have arrived. It is progress information, not proof:
+networks and producers can still deliver an older event later. A common policy
+derives it from the maximum event time observed minus an allowed delay, though
+the exact algorithm is engine-specific. The watermark lets an engine emit or
+retire window state without waiting forever. An event behind that threshold is
+late and may be dropped, sent to a side output, or used to revise a previously
+emitted result, depending on the trigger, allowed-lateness, and sink settings.
 
 ### How do you handle late-arriving data in streaming?
 
@@ -198,7 +214,15 @@ A **data warehouse** stores structured, processed data in a proprietary format o
 
 ### What is Apache Avro and when is it preferred over Parquet?
 
-Avro is a **row-based**, schema-embedded binary format. It excels at **streaming and serialization** (each record is self-describing) and is the standard format for Kafka messages. Parquet is columnar and better for analytical batch reads. Avro is preferred when you need efficient row-level writes, full-record serialization for message queues, or schema evolution support via a schema registry.
+Avro is a **row-oriented** binary serialization format defined by a writer's
+schema. An Avro object container file stores the schema in its header, but an
+individual binary record is not self-describing and usually carries no field
+names or types. Messaging systems commonly put a schema identifier in an
+envelope and retrieve the schema from a registry. Avro is one popular Kafka
+serialization choice, alongside JSON, Protobuf, and others; Kafka itself does
+not require Avro. Prefer it when compact full-record serialization and explicit
+reader/writer schema evolution matter. Prefer Parquet when queries read a
+subset of columns from analytical data.
 
 ### What is ORC and how does it compare to Parquet?
 

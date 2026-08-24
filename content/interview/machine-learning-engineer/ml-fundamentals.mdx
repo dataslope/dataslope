@@ -335,9 +335,12 @@ What the curve is tracing, and what an AUC of 0.5 looks like.
 
 **RMSE** (root mean squared error) penalizes large errors heavily,
 sensitive to outliers. **MAE** (mean absolute error) treats all errors
-equally, more robust to outliers. **$R^2$** (coefficient of
-determination) measures the fraction of variance explained by the model;
-1.0 is perfect, 0.0 means the model is no better than predicting the mean.
+equally, more robust to outliers. **$R^2$** (coefficient of determination)
+compares squared error with a mean-prediction baseline. A score of 1.0 is
+perfect and 0.0 matches that baseline on the evaluated data. It can be negative
+when the model is worse than the baseline. Describing it as a fraction of
+variance explained is most natural for ordinary least squares with an
+intercept and can be misleading for out-of-sample evaluation or other models.
 
 Why the two error measures disagree: RMSE squares before averaging, so
 one large miss costs far more than several small ones.

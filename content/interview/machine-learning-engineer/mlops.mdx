@@ -129,18 +129,23 @@ retraining and rollback path.
 **Data drift** is the input distribution shifting (a new user segment,
 a changed sensor unit). **Concept drift** is the input→label relationship
 shifting (fraud tactics evolve, so the same features now mean something
-different). **Performance degradation** is the measurable accuracy drop
-that either can cause. Drift is the leading indicator you can watch before
-labels arrive; degradation is confirmed once they do.
+different). **Performance degradation** is the measurable quality drop that either can
+cause. Observable input or prediction drift can be a leading indicator before
+labels arrive, but concept drift and degradation generally need labels or
+outcome measurements to confirm.
 
 ### How do you detect drift when labels are delayed or unavailable?
 
-Watch distributions instead of accuracy. Compare production feature and
+Watch distributions as proxy signals, not as a replacement for accuracy.
+Compare production feature and
 prediction distributions against a training reference using the
 **population stability index (PSI)**, KL divergence, or a
-Kolmogorov–Smirnov test per feature. A PSI above ~0.2 signals a meaningful
-shift worth acting on. These proxy signals fire before the true labels
-(chargebacks, conversions) come back days or weeks later.
+Kolmogorov–Smirnov test per feature. Thresholds such as PSI above 0.2 are
+heuristics and should be calibrated to normal variation, sample size, and
+business impact. These signals can reveal covariate or prediction shift before
+labels arrive, but they cannot by themselves prove concept drift or a loss of
+model quality. Use delayed labels, audits, or randomized outcome measurement
+where possible.
 
 ### What is a shadow deployment?
 

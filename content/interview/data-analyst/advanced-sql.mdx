@@ -98,18 +98,22 @@ SELECT * FROM ranked WHERE rn <= 3;
 
 The frame is the slice of the partition the function sees, relative to
 the current row, e.g. `ROWS BETWEEN 2 PRECEDING AND CURRENT ROW`. `ROWS`
-counts **physical rows**; `RANGE` counts rows with **peer values** in the
-`ORDER BY` (all ties are one unit). Use `ROWS` for a fixed N-row moving
-window; the difference bites when the order column has duplicates.
+counts **physical rows**. `RANGE` defines boundaries in terms of the
+`ORDER BY` value; at a `CURRENT ROW` boundary it includes every peer with the
+same ordering value. With an offset, where the dialect supports one, it means a
+value interval, not that many physical rows. Use `ROWS` for a fixed N-row moving
+window; ties and gaps make the distinction important.
 
 ### What is the default frame, and why does it matter?
 
-When you add `ORDER BY` inside `OVER` without an explicit frame, the
-default is `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`. That
+In major SQL dialects, when you add `ORDER BY` inside `OVER` without an
+explicit frame, the effective default is commonly `RANGE BETWEEN UNBOUNDED
+PRECEDING AND CURRENT ROW` (subject to the function and dialect). That
 turns `SUM(...) OVER (ORDER BY day)` into a **running total**, not the
-partition total, a classic surprise. For a whole-partition total, omit
-`ORDER BY` or write `ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED
-FOLLOWING`.
+partition total, and duplicate `day` values advance together as peers. For
+predictable row-by-row behavior, specify a unique ordering and an explicit
+`ROWS` frame. For a whole-partition total, omit `ORDER BY` or write `ROWS
+BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING`.
 
 ### How do you compute a running total?
 

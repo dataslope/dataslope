@@ -48,12 +48,18 @@ actually worth in a pool of a million and in a pool of twenty.
 
 <Chart slug="prosecutors-fallacy" />
 
-### Why does a 99%-accurate test for a rare disease still produce mostly false positives?
+### Why can a sensitive test for a rare disease still produce mostly false positives?
 
 Because the base rate dominates. With 1% prevalence, 99% sensitivity, and a
 5% false-positive rate, the many healthy people generate far more false
 positives than the few sick people generate true positives. The code walks
 the arithmetic: the posterior comes out near 17%, not 99%.
+
+Calling this test "99% accurate" would be misleading. Sensitivity describes
+performance among people who have the disease, while specificity describes
+performance among those who do not. Overall accuracy additionally depends on
+prevalence and can hide poor minority-class performance. A posterior after a
+positive result needs sensitivity, specificity, and the base rate.
 
 <CodeBlock
   adapter="python"

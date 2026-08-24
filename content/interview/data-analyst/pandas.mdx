@@ -112,13 +112,40 @@ display(df)                           # NaN replaced with 0`,
 
 ### Why can `SettingWithCopyWarning` appear, and how do you avoid it?
 
-It warns that you may be assigning to a **view** (a slice) rather than
-the original frame, so the write might not "stick." Avoid it by doing the
-assignment in one `loc` call on the original:
+It appears when pandas cannot safely tell whether an assignment targets the
+original DataFrame or only an intermediate object. The classic cause is
+**chained indexing**:
 
 ```python
-df.loc[df.region == "North", "amount"] = 0   # clear, in-place
+df[df["region"] == "North"]["amount"] = 0
 ```
+
+Python evaluates that as two separate operations. The first creates an
+intermediate filtered DataFrame; the second assigns to that intermediate.
+Historically, that object could share data with `df` (a view) or own its data
+(a copy), depending on details such as dtypes and the operation used. The
+assignment was therefore ambiguous: it might affect `df`, or it might silently
+affect only a temporary. The warning is about that ambiguity, not the boolean
+mask or the `amount` dtype.
+
+To update the original, select rows and columns in **one operation**:
+
+```python
+mask = df["region"] == "North"
+df.loc[mask, "amount"] = 0
+```
+
+To create and modify an independent subset, make the copy explicit:
+
+```python
+north = df.loc[df["region"] == "North"].copy()
+north["amount"] = 0  # deliberately does not modify df
+```
+
+Do not merely disable the warning: the code remains ambiguous. With pandas'
+newer copy-on-write mode, chained assignment cannot update the original and
+may be reported as `ChainedAssignmentError` instead. One-step `.loc`
+assignment and explicit `.copy()` express the intent under both behaviors.
 
 ### How does boolean filtering work in pandas?
 
@@ -336,9 +363,11 @@ renames the result with `reset_index` and `rename`.
 ### What is the difference between a view and a copy in pandas?
 
 A **view** shares memory with the original DataFrame; modifying it can
-change the original. A **copy** is independent. Slicing with `[]` may
-return either depending on the operation. Use `.copy()` explicitly when
-you need an independent copy to avoid `SettingWithCopyWarning`.
+change the original under pandas' historical behavior. A **copy** is
+independent. Whether a selection shares memory is an implementation detail and
+is not a safe basis for assignment logic; copy-on-write mode also changes when
+shared data is copied. Use `.loc[...] = ...` to update the original, and use
+`.copy()` explicitly when you need an independent object.
 
 <CodeBlock
   adapter="python"

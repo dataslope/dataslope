@@ -154,9 +154,11 @@ ORDER BY region;`}
   ecosystem support (Spark, pandas, DuckDB, BigQuery, Snowflake).
 - **ORC**, also columnar with strong compression and pushdown; originated
   in the Hive/Hadoop world, historically strong there.
-- **Avro**, **row-based**, schema-embedded binary format. Best for
-  streaming/serialization (self-describing records, formal schema
-  evolution via a registry), the standard for Kafka messages.
+- **Avro**, **row-oriented** binary serialization defined by a writer's
+  schema. An object container file includes its schema, while an individual
+  binary record does not. Messaging applications often transmit a schema ID
+  and resolve it through a registry. Avro is common with Kafka, but Kafka does
+  not prescribe a message format.
 
 Rule of thumb: **columnar (Parquet/ORC) for analytics, Avro (row) for
 streaming and record-at-a-time writes**.

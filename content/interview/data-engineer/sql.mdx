@@ -440,7 +440,12 @@ Look at (1) **node types**, sequential scan vs index scan vs hash join vs sort, 
 
 ### What is a correlated subquery, and why can it be slow?
 
-A **correlated subquery** references a column from the outer query. The engine re-executes the subquery for each outer row, making it $O(N \cdot M)$. Rewrite as a `JOIN` or a window function when performance matters.
+A **correlated subquery** references a column from the outer query. Its logical
+meaning is evaluation in the context of each outer row, but a capable optimizer
+may decorrelate it into a join or aggregate and avoid repeated scans. If it
+cannot, the nested execution can be very expensive. Inspect the actual plan
+instead of assuming a fixed $O(N \cdot M)$ cost. A pre-aggregation plus `JOIN`
+or a window function often makes the set-based strategy explicit.
 
 The block below computes each employee's `dept_avg` salary first as a
 correlated subquery (re-run per row) and then as a `dept_avgs` CTE joined
@@ -493,7 +498,16 @@ FROM user_revenue;
 
 ### What is the difference between PERCENT_RANK and CUME_DIST?
 
-Both express a row's relative position in a window as a value between 0 and 1. `PERCENT_RANK` is $\text{PERCENT\_RANK} = \dfrac{\text{rank} - 1}{N - 1}$, the fraction of rows **ranked below** the current row. `CUME_DIST` is $\text{CUME\_DIST} = \dfrac{\text{rank}}{N}$, the fraction of rows with a value **less than or equal to** the current row, where $N$ is the total number of rows. `CUME_DIST` is always $\geq$ `PERCENT_RANK` and the last row always has $\text{CUME\_DIST} = 1$.
+Both describe relative position in an ordered window, but ties differ.
+`PERCENT_RANK` is
+$\text{PERCENT\_RANK} = (\text{rank} - 1)/(N - 1)$ for $N > 1$ and returns
+0 for a one-row partition. Tied rows share the rank of the first peer, so it is
+not literally the fraction of physical rows below the current row.
+`CUME_DIST` is the number of rows that sort before or **tie with** the current
+row, divided by $N$. Equivalently, its numerator is the row position of the
+last peer, not `RANK()`. For values `10, 20, 20, 30`, the two rows at 20 have
+`PERCENT_RANK = 1/3` and `CUME_DIST = 3/4`. The last peer group always has
+`CUME_DIST = 1`.
 
 ### What is a materialized view, and when would you use one?
 
