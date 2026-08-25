@@ -46,6 +46,8 @@ interface Props {
   transcript: TranscriptEntry[];
   value: string;
   onValueChange: (next: string) => void;
+  /** The line the reader pressed Enter on, trimmed. `""` for a blank line,
+   *  which a shell answers with a fresh prompt rather than by ignoring it. */
   onSubmit: (command: string) => void;
   history: string[];
   busy: boolean;
@@ -129,7 +131,10 @@ export function GitTerminal({
   }, [transcript, busy, value]);
 
   useEffect(() => {
-    if (!busy && !readOnly) inputRef.current?.focus();
+    // `preventScroll` matters: the real input is visually hidden, and without
+    // it the browser scrolls the page to wherever that hidden element sits
+    // every time a command finishes and focus comes back.
+    if (!busy && !readOnly) inputRef.current?.focus({ preventScroll: true });
   }, [busy, readOnly]);
 
   const syncCaret = useCallback(() => {
@@ -171,10 +176,11 @@ export function GitTerminal({
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     if (event.key === "Enter") {
       event.preventDefault();
-      const command = value.trim();
-      if (!command || busy) return;
+      if (busy) return;
       historyIndex.current = null;
-      onSubmit(command);
+      // An empty line is something a shell runs: it echoes the prompt and
+      // gives you a fresh one. Hosts get "" and append the bare line.
+      onSubmit(value.trim());
       setCaret(0);
       return;
     }
@@ -241,8 +247,7 @@ export function GitTerminal({
       className={inlineInput ? "git-terminal-inputrow inline" : "git-terminal-inputrow"}
       onSubmit={(e) => {
         e.preventDefault();
-        const command = value.trim();
-        if (command && !busy) onSubmit(command);
+        if (!busy) onSubmit(value.trim());
       }}
     >
       {promptSpan}
@@ -292,7 +297,8 @@ export function GitTerminal({
         // Clicking dead space in a terminal puts the cursor back on the
         // prompt; without this the inline prompt is easy to lose.
         onMouseUp={() => {
-          if (inlineInput && !window.getSelection()?.toString()) inputRef.current?.focus();
+          if (inlineInput && !window.getSelection()?.toString())
+            inputRef.current?.focus({ preventScroll: true });
         }}
       >
         {transcript.length === 0 &&

@@ -101,6 +101,17 @@ export default function GitPlayground() {
         setHistory((h) => [...h, command]);
         return;
       }
+      // A blank line is not a no-op in a shell: it echoes the prompt and
+      // hands back a fresh one. Nothing runs and nothing joins the history,
+      // which is also how bash treats it.
+      if (command === "") {
+        setTranscript((t) => [
+          ...t,
+          { id: (entryId.current += 1), command: "", stdout: "", stderr: "", exitCode: 0 },
+        ]);
+        setInput("");
+        return;
+      }
       setBusy(true);
       setInput("");
       setHistory((h) => [...h, command]);

@@ -90,13 +90,23 @@
   border-top: 1px solid var(--border);
   background: var(--bg);
   flex: none;
+  /* Containing block for the hidden input below, so focusing it can never
+     pull the page somewhere else. */
+  position: relative;
 }
 
 .git-terminal-input {
-  /* Off-screen but focusable: it holds the value and the caret, while the
-     visible line beside it is rendered text so the cursor can be a block. */
+  /* Invisible but focusable: it holds the value and the caret, while the
+     visible line beside it is rendered text so the cursor can be a block.
+
+     Pinned to the top-left of the prompt row rather than parked off-screen.
+     Focus scrolls its target into view, and an input at `left: -9999px`
+     makes that a jump to somewhere the reader has never been: the terminal
+     refocuses after every command, so the page moved on every `ls`. Here
+     the browser's scroll target is the prompt itself. */
   position: absolute;
-  left: -9999px;
+  left: 0;
+  top: 0;
   width: 1px;
   height: 1px;
   padding: 0;
@@ -104,6 +114,7 @@
   border: none;
   outline: none;
   opacity: 0;
+  pointer-events: none;
   overflow: hidden;
 }
 
