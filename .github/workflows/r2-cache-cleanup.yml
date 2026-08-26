@@ -1,9 +1,21 @@
 name: R2 incremental-cache cleanup
 
 # Prunes stale OpenNext incremental-cache build folders from the R2 bucket.
-# Every deploy (production AND every preview) writes a fresh ~2.5 GB folder
-# under `incremental-cache/<buildId>/` and OpenNext never deletes old ones —
-# left alone the bucket grows unbounded (once reached ~78 GB in days).
+# Every deploy (production AND every preview) writes a fresh folder under
+# `incremental-cache/<buildId>/` and OpenNext never deletes old ones — left
+# alone the bucket grows unbounded (once reached ~78 GB in days).
+#
+# Two numbers set the bucket size, and this job only owns one of them:
+#
+#   bucket ≈ (folders retained, THIS JOB) × (bytes per build, THE BUILD PATH)
+#
+# Per-build bytes are ~2.34 GiB of raw JSON, or ~0.147 GiB once
+# scripts/compress-cache.mjs has run — and that script runs from the
+# Cloudflare *build command*, dashboard config outside this repo. So a bucket
+# that looks like a retention failure may be neither: step 7 samples each
+# folder's first four bytes for the brotli magic and says which it is, because
+# the read path accepts both formats and an uncompressed deploy is otherwise
+# completely silent (it was, from 2026-08-15 to 2026-08-26).
 #
 # The build ID IS the deployed commit SHA (next.config.ts generateBuildId =
 # WORKERS_CI_COMMIT_SHA on Workers Builds); that equality is what lets this
@@ -28,7 +40,7 @@ name: R2 incremental-cache cleanup
 #
 # ACTIVE branches, though: Workers Builds does NOT tear a preview down when a
 # PR merges — the alias answers as long as the branch exists, so an
-# unconditioned branch keep set pins ~2.5 GB per merged-but-undeleted branch
+# unconditioned branch keep set pins a build per merged-but-undeleted branch
 # indefinitely. A branch is RETIRED, and claims nothing, when all three hold:
 #
 #   • at least one pull request has this branch as its head,
@@ -48,7 +60,12 @@ name: R2 incremental-cache cleanup
 # The alias is DERIVED from the branch name, never read out of a check run:
 # check runs hang off a COMMIT, and a commit reachable from two branches
 # carries whichever branch's build ran, so reading it can protect the wrong
-# branch.
+# branch. The cost of deriving it is long branch names: past 63 characters
+# Cloudflare truncates and appends a hash it does not publish the recipe for
+# (changelog 2025-08-14), so those branches have a working preview this job
+# cannot name and each falls back to pinning FALLBACK_COMMITS folders. That is
+# the safe direction, and it is not free — keep branch names short, or the
+# fallback is what sets the bucket size.
 #
 # Nothing is retained on age alone: the bucket holds live + incoming
 # production, at most two folders per active branch, plus the GRACE_HOURS
@@ -56,8 +73,8 @@ name: R2 incremental-cache cleanup
 #
 # Deliberate consequence: a merged PR's preview breaks. Once its cache is
 # pruned the alias 500s, and the Cloudflare check-run link on the merged PR
-# still points at it — the alternative is paying ~2.5 GB a branch to keep
-# previews of merged code loadable. GitHub's "Automatically delete head
+# still points at it — the alternative is paying a whole build a branch to
+# keep previews of merged code loadable. GitHub's "Automatically delete head
 # branches" avoids the broken link and retires the branch in the same stroke.
 #
 # Deliberate consequence: NO rollback cover. Rolling the Worker back to a
@@ -103,6 +120,8 @@ on:
     # Every 2 hours, off the top of the hour to avoid scheduler congestion.
     # Cheap: ListObjectsV2 is Class A ($4.50/million — not Class B); ~10 LISTs
     # quiet, ~100 full sweep, ~5,000/month against R2's 1M free Class A ops.
+    # Plus one ranged GET per folder for the format sample — Class B, ~3,000 a
+    # month against 10M free.
     - cron: "17 */2 * * *"
   workflow_dispatch:
     inputs:
@@ -215,6 +234,54 @@ jobs:
           # floating point.
           gb() { awk -v b="${1:-0}" 'BEGIN { printf "%.2f", b / 1e9 }'; }
           pct() { awk -v a="${1:-0}" -v b="${2:-0}" 'BEGIN { printf "%.0f", (b > 0 ? a * 100 / b : 0) }'; }
+
+          # Everything this job needs to know about one folder, in ONE list:
+          # the bytes it occupies, the timestamps that place it in time, and a
+          # key to sample. Rows are "<size>\t<LastModified>\t<key>" — a nested
+          # --query projection prints one object per line, unlike the flat
+          # `Contents[].Size` above, so there is no page batch to flatten. Same
+          # Class A cost as listing the timestamps alone, which is what this
+          # replaced; the sizes and the sample key now ride along for free.
+          folder_rows() {
+            aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$1" \
+              --query 'Contents[].[Size,LastModified,Key]' --output text 2>/dev/null \
+              | grep -vx 'None' || true
+          }
+
+          # Is this build's cache brotli-framed, or the raw JSON that predates
+          # scripts/compress-cache.mjs? Reads the first four bytes of ONE entry
+          # and looks for the magic in lib/cache/brotliCacheFormat.ts. One
+          # sample settles the whole folder: a build's entries are written by a
+          # single populate, so the format is a property of the BUILD, not of
+          # the object. A ranged GET is a Class B op (~8 a run). This only ever
+          # reports — the reader accepts both formats, which is exactly why an
+          # uncompressed deploy is otherwise invisible.
+          cache_format() {
+            local key="$1" tmp magic
+            if [[ -z "$key" ]]; then printf 'unknown'; return 0; fi
+            tmp="$(mktemp)"
+            if ! aws s3api get-object --bucket "$BUCKET" --key "$key" \
+                 --range 'bytes=0-3' "$tmp" >/dev/null 2>&1; then
+              rm -f "$tmp"; printf 'unknown'; return 0
+            fi
+            magic="$(od -An -tx1 -N4 "$tmp" | tr -d ' \n')"
+            rm -f "$tmp"
+            # 00 42 52 31 is `\0BR1`, BROTLI_CACHE_MAGIC.
+            if [[ "$magic" == "00425231" ]]; then printf 'brotli'; else printf 'raw'; fi
+          }
+
+          # How a folder reads in the log: "2.52 GB, UNCOMPRESSED". The size is
+          # on every line, not just on folders being deleted, so a run answers
+          # "why is the bucket this big" without a second look at the bucket.
+          folder_note() {
+            local folder="$1" note
+            note="$(gb "${folder_bytes[$folder]:-0}") GB"
+            case "${folder_format[$folder]:-unknown}" in
+              raw) note="$note, UNCOMPRESSED" ;;
+              brotli) note="$note, brotli" ;;
+            esac
+            printf '%s' "$note"
+          }
 
           # Tolerates R2's transient DeleteObject 500s: `s3 rm` re-lists each
           # attempt, so retries converge. Non-zero only on persistent failure.
@@ -510,11 +577,25 @@ jobs:
           echo "Policy: keep what production and every ACTIVE branch's preview are serving or about to serve, plus anything populated in the last ${GRACE_HOURS}h (since $(date -u -d "@$grace_cutoff" '+%Y-%m-%d %H:%M:%SZ')). A branch whose pull request has merged or closed, with no commits since, keeps nothing."
           echo "Dry run: $DRY_RUN"
 
-          # 6) Date every non-production folder by when it was POPULATED, so
-          #    the grace window means what it says and the MAX_BRANCHES cap
-          #    has a global newest-first order.
+          # 6) Weigh, date and sample every folder in one pass.
+          #
+          #    Size and format are collected for ALL of them, production
+          #    included, because they are what the run log needs to explain
+          #    the bucket. Dates are only collected for the rest: production
+          #    is kept unconditionally, so nothing reads its age.
+          declare -A folder_bytes folder_format folder_gone
           entries=()
           for folder in "${folders[@]}"; do
+            rows="$(folder_rows "$folder")"
+            if [[ -z "$rows" ]]; then
+              folder_bytes["$folder"]=0; folder_format["$folder"]=unknown
+              echo "skip  $folder (empty)"; continue
+            fi
+            folder_bytes["$folder"]="$(
+              printf '%s\n' "$rows" | awk -F'\t' '{ s += $1 } END { printf "%d", s + 0 }'
+            )"
+            folder_format["$folder"]="$(cache_format "$(printf '%s\n' "$rows" | head -n 1 | cut -f3)")"
+
             [[ "$folder" == "$prod_folder" ]] && continue
 
             # MEDIAN LastModified, not the newest: objects can also arrive at
@@ -523,22 +604,14 @@ jobs:
             # The median is immune by construction — a ~1,081-object burst
             # can't be moved by a few late writes — and stays seconds-old
             # during an in-flight populate, which is what the grace window
-            # protects. Pages emit one tab-separated batch each; flatten and
-            # sort (R2's uniform UTC ISO-8601 makes lexical = chronological),
-            # dropping the "None" an empty page emits.
-            mapfile -t stamps < <(
-              aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$folder" \
-                --query 'Contents[].LastModified' --output text 2>/dev/null \
-                | tr '\t' '\n' | sed '/^$/d' | grep -vxF 'None' | sort || true
-            )
-            if [[ ${#stamps[@]} -eq 0 ]]; then
-              echo "skip  $folder (empty)"; continue
-            fi
+            # protects. Sort lexically, which R2's uniform UTC ISO-8601 makes
+            # chronological.
+            mapfile -t stamps < <(printf '%s\n' "$rows" | cut -f2 | sort)
             populated="${stamps[$(( ${#stamps[@]} / 2 ))]}"
             entries+=("$(printf '%s\t%s\t%s' "$(date -u -d "$populated" +%s)" "$populated" "$folder")")
           done
 
-          echo "KEEP  $prod_folder (${keep_reason[$prod_id]})"
+          echo "KEEP  $prod_folder (${keep_reason[$prod_id]}) — $(folder_note "$prod_folder")"
           kept=1; deleted=0; failed=0; branches=0; freed=0
           while IFS=$'\t' read -r ts populated folder; do
             [[ -z "$folder" ]] && continue
@@ -557,38 +630,38 @@ jobs:
                   # promises it unconditionally, and a just-populated folder
                   # may be an in-flight deploy for that very preview.
                   if (( ts >= grace_cutoff )); then
-                    echo "KEEP  $folder (${keep_reason[$sha]}, beyond the branch cap but populated $populated, inside the ${GRACE_HOURS}h grace window)"
+                    echo "KEEP  $folder (${keep_reason[$sha]}, beyond the branch cap but populated $populated, inside the ${GRACE_HOURS}h grace window) — $(folder_note "$folder")"
                     kept=$((kept+1)); continue
                   fi
-                  echo "DELETE $folder (${keep_reason[$sha]}, beyond the $MAX_BRANCHES most recently populated branch builds)"
+                  echo "DELETE $folder (${keep_reason[$sha]}, beyond the $MAX_BRANCHES most recently populated branch builds) — $(folder_note "$folder")"
                 else
-                  echo "KEEP  $folder (${keep_reason[$sha]}, branch ${branches}/${MAX_BRANCHES})"
+                  echo "KEEP  $folder (${keep_reason[$sha]}, branch ${branches}/${MAX_BRANCHES}) — $(folder_note "$folder")"
                   kept=$((kept+1)); continue
                 fi
               else
-                echo "KEEP  $folder (${keep_reason[$sha]})"
+                echo "KEEP  $folder (${keep_reason[$sha]}) — $(folder_note "$folder")"
                 kept=$((kept+1)); continue
               fi
             elif (( ts >= grace_cutoff )); then
               # Deliberately blind: a just-populated deploy may be visible to
               # neither a probe nor a branch head yet.
-              echo "KEEP  $folder (populated $populated, inside the ${GRACE_HOURS}h grace window, possibly an in-flight deploy)"
+              echo "KEEP  $folder (populated $populated, inside the ${GRACE_HOURS}h grace window, possibly an in-flight deploy) — $(folder_note "$folder")"
               kept=$((kept+1)); continue
             else
               # "No active branch", not "nothing is serving it": a retired
               # branch's preview may still be answering from this folder, and
               # taking it down is the intended outcome.
-              echo "DELETE $folder (populated $populated, claimed by no live deployment and no active branch)"
+              echo "DELETE $folder (populated $populated, claimed by no live deployment and no active branch) — $(folder_note "$folder")"
             fi
 
-            # Weigh BEFORE removing — afterwards there's nothing to measure.
-            folder_size="$(bucket_bytes "$folder")"
-            echo "       ($(gb "$folder_size") GB)"
+            # Weighed in step 6, before anything was removed — afterwards
+            # there would be nothing left to measure.
+            folder_size="${folder_bytes[$folder]:-0}"
 
             if [[ "$DRY_RUN" == "true" ]]; then
-              deleted=$((deleted+1)); freed=$((freed + folder_size))
+              deleted=$((deleted+1)); freed=$((freed + folder_size)); folder_gone["$folder"]=1
             elif delete_folder "$folder"; then
-              deleted=$((deleted+1)); freed=$((freed + folder_size))
+              deleted=$((deleted+1)); freed=$((freed + folder_size)); folder_gone["$folder"]=1
             else
               # Persistent failure: keep sweeping the rest, fail the job at
               # the end; the next run retries this folder.
@@ -608,6 +681,32 @@ jobs:
             # failed or a deploy wrote a new folder mid-sweep.
             bytes_after="$(bucket_bytes "$PREFIX")"
             echo "Bucket: $(gb "$bytes_before") GB before -> $(gb "$bytes_after") GB after | freed $(gb "$((bytes_before - bytes_after))") GB ($(pct "$((bytes_before - bytes_after))" "$bytes_before")%)"
+          fi
+
+          # 7) What the retained bytes are made of. Retention is only one of
+          #    the two numbers that set the bucket size; the other is what a
+          #    deploy writes per build, and that one is decided OUTSIDE this
+          #    repo. scripts/compress-cache.mjs runs from the Cloudflare
+          #    Workers Builds *build command* (DEVELOPMENT.md, "Cloudflare
+          #    Workers Builds configuration"), so a deploy path that never got
+          #    it ships ~16x the bytes with a green build and a working site —
+          #    lib/cache/brotliR2IncrementalCache.ts reads raw entries too, by
+          #    design, which is precisely what makes this failure silent. It
+          #    stayed unnoticed from 2026-08-15 to 2026-08-26, at ~2.5 GB per
+          #    retained build instead of ~0.16 GB. Nothing here can fix it;
+          #    this refuses to let it stay invisible.
+          remaining=0; raw_folders=0; raw_bytes=0
+          for folder in "${folders[@]}"; do
+            [[ -n "${folder_gone[$folder]+set}" ]] && continue
+            remaining=$((remaining+1))
+            [[ "${folder_format[$folder]:-}" == "raw" ]] || continue
+            raw_folders=$((raw_folders+1)); raw_bytes=$((raw_bytes + ${folder_bytes[$folder]:-0}))
+          done
+          if (( raw_folders > 0 )); then
+            echo "Uncompressed builds: $raw_folders of $remaining retained folders hold $(gb "$raw_bytes") GB of raw JSON; brotli (~16x, scripts/compress-cache.mjs) would leave about $(gb "$((raw_bytes / 16))") GB."
+          fi
+          if [[ "${folder_format[$prod_folder]:-}" == "raw" ]]; then
+            echo "::warning::The live production build ${prod_id:0:12} was populated WITHOUT scripts/compress-cache.mjs — its cache is $(gb "${folder_bytes[$prod_folder]:-0}") GB where brotli would make it about $(gb "$(( ${folder_bytes[$prod_folder]:-0} / 16 ))") GB, and every preview pays the same. Fix it in Cloudflare: Workers -> dataslope -> Settings -> Build -> Build command = 'npx opennextjs-cloudflare build && node scripts/compress-cache.mjs'. See DEVELOPMENT.md, 'Cloudflare Workers Builds configuration'."
           fi
 
           # Surface persistent delete failures, but only after every folder
