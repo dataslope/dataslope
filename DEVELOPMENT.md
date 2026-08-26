@@ -217,6 +217,18 @@ Gating matters more than the row count suggests. A re-seed deletes and re-insert
 
 Two properties worth keeping if this is ever rewritten: the hash is written **last**, so a partial apply cannot leave a hash claiming to be current and the next deploy retries; and **any uncertainty seeds** — an unreadable remote hash means apply, because a redundant seed costs some written rows while a wrongly skipped one serves stale content. `npm run db:seed:search:remote:force` overrides the check.
 
+### When the apply fails: a resetting D1
+
+The remote apply is the last thing the production deploy command runs, *after* the Worker has shipped. So a failure there fails the whole Workers Build over an index that will be rebuilt on the next deploy anyway — which is exactly what happened on 2026-08-26: the Worker deployed, the R2 cache populated, and the build went red on `✘ [ERROR] {"D1_RESET_DO":true}`.
+
+`D1_RESET_DO` means the Durable Object behind the database was reset. D1 does that on an internal error, a D1 code update, an overloaded or unreachable node, or a write that ran too long, and its [debug table](https://developers.cloudflare.com/d1/observability/debug-d1/) names "attempting a large import" as a way to earn the last one. `seed-search.mjs` retries the family (three attempts, 5s then 10s) rather than failing the build on the first one.
+
+Two things make retrying safe rather than hopeful. The import is atomic — wrangler prints "if the execution fails to complete, your DB will return to its original state and you can safely retry" on the way in — and even a hypothetical partial apply is covered by the hash-written-last property above. Note that D1's *own* automatic retries do not help here: it retries read-only queries only, and never anything that writes.
+
+What is deliberately **not** retried: `Exceeded maximum DB size` and the free-tier daily row limits. Those fail identically on every attempt and want a person, not another 15 seconds.
+
+If the retries stop being enough, the import is probably too large to apply in one shot (it is ~22 MB / 21k rows / 285 batches today) and the fix is to shard the seed into sequential files — which the hash-written-last property already anticipates, since it makes a partial apply a self-correcting state rather than a corrupt one.
+
 Sizing, measured rather than estimated: 8,965 rows over ~890 lessons produce a **~21 MB** database (14.7 MB of stored text so `snippet()` can quote matches, 5.5 MB of actual inverted index). That is 4% of the free plan's 500 MB per-database cap and 0.2% of the paid plan's 10 GB, so storage is not a constraint this index will run into.
 
 ### Two D1 rules the seed generator exists to respect
