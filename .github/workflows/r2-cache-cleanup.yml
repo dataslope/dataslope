@@ -18,15 +18,13 @@ name: R2 incremental-cache cleanup
 # completely silent.
 #
 # It was silent for eleven days. On 2026-08-26 production measured 0.16 GB and
-# every one of the six preview folders 2.52 GB, with the build command
-# carrying `&& node scripts/compress-cache.mjs` the whole time — so the
-# compression is being UNDONE on the preview path, not skipped. `deploy` and
-# `upload` both populate from `.open-next/cache` byte-for-byte and neither
-# rebuilds, while `opennextjs-cloudflare build` wipes that directory
-# (`initOutputDir`) and regenerates it raw. A second build after the build
-# command — a non-production branch deploy command that starts with one — is
-# the shape that produces exactly this split. The half of the deploy path
-# nobody reads the size of was the whole 15 GB.
+# every one of the six preview folders 2.52 GB. The cause is that Workers
+# Builds keeps TWO build configurations behind a Production / Previews Base
+# tab switch, each with its own build command: Production carried
+# `&& node scripts/compress-cache.mjs`, Previews Base was still a bare
+# `npx opennextjs-cloudflare build`. One unedited field on the tab nobody
+# opens, on the path that deploys ~10x more often than production, was 12.6 GB
+# of a 15.44 GB bucket.
 #
 # The build ID IS the deployed commit SHA (next.config.ts generateBuildId =
 # WORKERS_CI_COMMIT_SHA on Workers Builds); that equality is what lets this
@@ -709,23 +707,18 @@ jobs:
           #    per build, and that one is decided OUTSIDE this repo.
           #
           #    scripts/compress-cache.mjs runs from the Cloudflare *build
-          #    command*, which Workers Builds runs for production and
-          #    non-production branches alike — so "is it set" is not the only
-          #    question to ask of it. On 2026-08-26 it WAS set and production
-          #    measured 0.16 GB while all six preview folders measured
-          #    2.52 GB: 12.6 GB of the bucket, compressed at build time and
-          #    then thrown away before the preview populate. `deploy` and
-          #    `upload` both stream `.open-next/cache` byte-for-byte and
-          #    neither rebuilds; `opennextjs-cloudflare build` wipes that
-          #    directory and regenerates it raw. So a second build on one path
-          #    only — a non-production branch deploy command beginning with
-          #    one — undoes it for previews and leaves production correct.
+          #    command*, and there are TWO of those: the Build settings page
+          #    has a Production / Previews Base tab switch and each tab holds
+          #    its own. "Is it set" therefore has two answers, and on
+          #    2026-08-26 they differed — Production compressed (0.16 GB),
+          #    Previews Base did not (2.52 GB x 6, i.e. 12.6 GB of the
+          #    bucket), because only the tab you land on had been edited.
           #
           #    Which is why the report is per folder and the warning fires on
           #    ANY raw build, not just production's: production is the build
-          #    that stays correct under this failure, i.e. the one that hides
-          #    it. The populated-at stamp on each line separates "this path
-          #    never compresses" from "this build predates the fix".
+          #    that stays correct when one tab is missed, i.e. the one that
+          #    hides this. The populated-at stamp on each line separates "this
+          #    path never compresses" from "this build predates the fix".
           remaining=0; raw_folders=0; raw_bytes=0
           for folder in "${folders[@]}"; do
             [[ -n "${folder_gone[$folder]+set}" ]] && continue
@@ -734,7 +727,7 @@ jobs:
             raw_folders=$((raw_folders+1)); raw_bytes=$((raw_bytes + ${folder_bytes[$folder]:-0}))
           done
           if (( raw_folders > 0 )); then
-            echo "::warning::${raw_folders} of ${remaining} retained build folders carry raw JSON, not the brotli scripts/compress-cache.mjs produces: $(gb "$raw_bytes") GB where it would leave about $(gb "$((raw_bytes / 16))") GB. $([[ "${folder_format[$prod_folder]:-}" == "raw" ]] && echo "Production is one of them, so start with the build command: Workers -> dataslope -> Settings -> Build -> Build command = 'npx opennextjs-cloudflare build && node scripts/compress-cache.mjs'." || echo "Production is NOT one of them, so the build command is running compress-cache and something on the preview path is undoing it: check the non-production branch deploy command for a second 'opennextjs-cloudflare build', which wipes and regenerates the cache the build command just compressed.") See DEVELOPMENT.md, 'Cloudflare Workers Builds configuration'."
+            echo "::warning::${raw_folders} of ${remaining} retained build folders carry raw JSON, not the brotli scripts/compress-cache.mjs produces: $(gb "$raw_bytes") GB where it would leave about $(gb "$((raw_bytes / 16))") GB. $([[ "${folder_format[$prod_folder]:-}" == "raw" ]] && echo "Production is one of them, so start with the Production tab: Workers -> dataslope -> Settings -> Build -> Production -> Build command = 'npx opennextjs-cloudflare build && node scripts/compress-cache.mjs'; check the Previews Base tab too, it has its own." || echo "Production is NOT one of them, so the Production tab's build command is running compress-cache and the PREVIEWS BASE tab's is not: Workers -> dataslope -> Settings -> Build -> Previews Base -> Build command = 'npx opennextjs-cloudflare build && node scripts/compress-cache.mjs'.") See DEVELOPMENT.md, 'Cloudflare Workers Builds configuration'."
           fi
 
           # Surface persistent delete failures, but only after every folder

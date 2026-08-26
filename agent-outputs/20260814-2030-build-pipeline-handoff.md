@@ -11,23 +11,23 @@
 > verified in production (see [Where this stands](#where-this-stands)). What remains is **step 4**,
 > the one order-dependent dashboard edit, which is now safe to make.
 
-> **Status, 2026-08-26 — step 4 is applied, and it is not enough.** The build command carries
-> `&& node scripts/compress-cache.mjs`, and production is compressed: live production **0.16 GB,
-> brotli**, `main`'s head **0.16 GB, brotli**. But all six preview builds measure **2.51–2.53 GB of
-> raw JSON** — 12.6 GB of a 15.44 GB bucket. Workers Builds runs one build command for both, so
-> compression is reaching the preview path and being discarded before its populate.
+> **Status, 2026-08-26 — step 4 was applied to one of the two build commands.** This runbook says
+> "the build command" because that is what the Cloudflare docs said; the dashboard has since grown a
+> **Production / Previews Base** tab switch, and *each tab has its own*. Production got the edit and
+> is compressed — live production **0.16 GB, brotli**, `main`'s head **0.16 GB, brotli**. Previews
+> Base was still a bare `npx opennextjs-cloudflare build`, so all six preview builds measure
+> **2.51–2.53 GB of raw JSON**: 12.6 GB of a 15.44 GB bucket, from one unedited field on the tab you
+> do not land on, on the path that deploys far more often than production.
 >
-> One mechanism does that. `deploy` and `upload` both stream `.open-next/cache` byte-for-byte and
-> neither rebuilds; `opennextjs-cloudflare build` wipes `.open-next` (`initOutputDir`) and
-> regenerates the cache raw. **A non-production branch deploy command that begins with a second
-> `opennextjs-cloudflare build` reproduces this split exactly** — check that field. It must stay a
-> bare `npx opennextjs-cloudflare upload --cacheChunkSize 100`, or re-run `compress-cache` after
-> whatever rebuild it does.
+> **Step 4 must be applied twice, once per tab.** See DEVELOPMENT.md, "Cloudflare Workers Builds
+> configuration", which now lists both. The Previews Base *deploy* command stays
+> `npx opennextjs-cloudflare upload --cacheChunkSize 100` — never with the search re-seed appended.
 >
 > Why it went unnoticed for eleven days: the reader accepts raw entries, so previews served
 > normally, builds stayed green, and the retention job pruned correctly throughout. Size was the
 > only symptom and nothing read it. The cleanup run log now prints every folder's size, format and
-> populate time and warns on any raw build, so the next lapse surfaces within two hours.
+> populate time and warns on any raw build, naming which tab to look at, so the next lapse surfaces
+> within two hours.
 
 ---
 

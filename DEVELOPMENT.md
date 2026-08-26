@@ -42,15 +42,32 @@ This is safe here because lesson content only changes on deploy and every asset 
 
 ### Cloudflare Workers Builds configuration
 
-Production and preview deploys run through Cloudflare Workers Builds rather than the local `npm run cf:*` scripts, so its build settings (Workers → the `dataslope` worker → Settings → Build) must populate the R2 cache on **both** paths. The non-production (preview) command — the dashboard labels it **Version command** — is the easy one to get wrong: a bare `npx wrangler versions upload` builds the Worker but skips the cache populate step, leaving previews with an empty cache that 500s the home page and `/courses/*`.
+Production and preview deploys run through Cloudflare Workers Builds rather than the local `npm run cf:*` scripts, so its build settings (Workers → the `dataslope` worker → Settings → Build) must populate the R2 cache on **both** paths.
+
+**There are two build configurations, not one.** The Build settings page has a **Production / Previews Base** tab switch at the top, and each tab holds its own Build command and Deploy command. Older Cloudflare docs describe a single build command plus a "Version command" for non-production branches; that is not this UI. Everything below has to be set **twice**, once per tab, and a field set on Production alone silently does nothing for previews:
+
+**Production tab**
 
 | Field | Value |
 | --- | --- |
 | Build command | `npx opennextjs-cloudflare build && node scripts/compress-cache.mjs` |
 | Deploy command | `npx opennextjs-cloudflare deploy --cacheChunkSize 100 && npm run db:seed:search:remote` |
-| Version command *(the dashboard's label for the non-production branch deploy)* | `npx opennextjs-cloudflare upload --cacheChunkSize 100` |
-| Path | `/` |
+
+**Previews Base tab**
+
+| Field | Value |
+| --- | --- |
+| Build command | `npx opennextjs-cloudflare build && node scripts/compress-cache.mjs` |
+| Deploy command | `npx opennextjs-cloudflare upload --cacheChunkSize 100` |
+
+Shared by both:
+
+| Field | Value |
+| --- | --- |
+| Root directory | `/` |
 | Build variable | `NPM_CONFIG_OMIT` = `dev` |
+
+Two things about the Previews Base deploy command are load-bearing. It must not be a bare `npx wrangler versions upload`: that builds the Worker but skips the cache populate step, leaving previews with an empty cache that 500s the home page and `/courses/*`. And it must **not** carry `npm run db:seed:search:remote` — there is one `dataslope-search` database, so a preview seed overwrites production's index with a feature branch's content and nothing looks broken until someone searches.
 
 **`NPM_CONFIG_OMIT=dev` is why `dependencies` looks the way it does.** Workers Builds runs its own `npm clean-install` and exposes no install command to override, but npm reads `NPM_CONFIG_*` from the environment, and build variables are environment. So everything `npm run build` and the deploy actually load lives in `dependencies` — including `typescript`, `tailwindcss`, `sharp`, `pyodide`, `remark-mdx` and `@cloudflare/workers-types`, several of which are imported by `app/` and `lib/` source and were mis-filed as dev dependencies to begin with. What is left in `devDependencies` is only what CI never runs: the test, lint, e2e and content-sweep tooling.
 
@@ -58,13 +75,13 @@ Measured: **98 s → 62 s** locally (2.1 GB → 1.9 GB of `node_modules`), by no
 
 Forgetting the variable is safe — CI just installs everything and takes the extra ~40 s, which is exactly today's behaviour. Do **not** reach for `NPM_CONFIG_OMIT=optional` instead: npm ships platform-specific native binaries *as* optional dependencies, so it strips them out of unrelated packages and the build dies on `Cannot find native binding` (`@ast-grep/napi`, measured).
 
-Both `deploy` (production) and `upload` (preview versions) populate the R2 cache before shipping, `upload` wraps `wrangler versions upload`, so previews get the same populated cache production does. `Path` is `/` because this Worker lives at the repo root; the CORS proxy under `cloudflare-cors-proxy/` is a separate Worker with its own config.
+Both `deploy` (production) and `upload` (preview versions) populate the R2 cache before shipping, `upload` wraps `wrangler versions upload`, so previews get the same populated cache production does. `Root directory` is `/` because this Worker lives at the repo root; the CORS proxy under `cloudflare-cors-proxy/` is a separate Worker with its own config.
 
 **`scripts/compress-cache.mjs` is why the build command has a second half.** The populate step uploads the files under `.open-next/cache/` to R2 byte-for-byte, so compressing them on disk is the only place that shrinks what a deploy ships. Brotli takes this cache from **2.340 GiB to 0.147 GiB — 15.9×** — for ~15 s of build time on the Workers Builds runner (quality 4, threaded across all cores; see the note on `BROTLI_CACHE_QUALITY`), and the Worker reads them back through `lib/cache/brotliR2IncrementalCache.ts` (wired up in `open-next.config.ts`). Filenames are unchanged, because OpenNext's `getCacheAssets` derives each R2 key from the path and rejects anything not ending in `.cache`.
 
 It is safe to forget. The reader accepts uncompressed entries too, so a deploy that skips this step ships a cache that is merely as large as it used to be, rather than a site that 500s — see the note in `brotliR2IncrementalCache.ts` for why that fallback is load-bearing rather than defensive clutter. Running it twice is a no-op.
 
-**Setting it is necessary and not sufficient — something downstream can undo it.** Measured 2026-08-26 straight out of the bucket, with the build command above set correctly:
+**Setting it on the Production tab is half the job.** Measured 2026-08-26 straight out of the bucket, with Production's build command set correctly and Previews Base's left at a bare `npx opennextjs-cloudflare build`:
 
 | Build folder | Populated | Size | Format |
 | --- | --- | ---: | --- |
@@ -76,15 +93,11 @@ It is safe to forget. The reader accepts uncompressed entries too, so a deploy t
 | preview | 2026-08-25 17:20 | 2.53 GB | **raw JSON** |
 | preview ×3 | 2026-08-24 14:06–15:05 | 2.51–2.52 GB | **raw JSON** |
 
-Read the dates as well as the sizes: production compresses on 08-24 *and* on 08-26, previews compress on neither, and the two interleave through the same afternoon. This splits by **path**, not by timeline — it is not a setting that was changed part-way through. Workers Builds runs **one** build command for production and non-production branches alike and varies only the *deploy* command ([Build branches](https://developers.cloudflare.com/workers/ci-cd/builds/build-branches/)), so the compression is reaching the preview path and being thrown away again before its populate.
-
-There is one mechanism that does that. `deploy` and `upload` are the same code as far as the cache goes: both stream `.open-next/cache` to R2 byte-for-byte and **neither rebuilds**. `opennextjs-cloudflare build`, by contrast, *wipes* `.open-next` (`initOutputDir`) and regenerates the cache assets as fresh raw JSON. So a second `opennextjs-cloudflare build` on one path only — a **non-production branch deploy command** that begins with one — reproduces this split exactly: production ships what the build command compressed, previews ship a regenerated raw copy.
-
-**The Version command must therefore not rebuild.** Keep it at `npx opennextjs-cloudflare upload --cacheChunkSize 100`; if it has to rebuild for some other reason, it must re-run `node scripts/compress-cache.mjs` after doing so.
+Read the dates as well as the sizes: production compresses on 08-24 *and* on 08-26, previews compress on neither, and the two interleave through the same afternoon. It splits by **tab**, not by timeline — 12.6 GB of a 15.44 GB bucket, from one unedited field on a tab nobody had opened. That the two configurations exist at all is the entire trap: the Production tab is the one you land on, the change looks applied, and the deploy path that runs ~10× more often than production keeps shipping raw JSON.
 
 Nothing looked wrong from any other angle, and that is the fallback working as designed: previews served fine, builds were green, and the retention job was pruning correctly the whole time. Size was the only symptom, and nothing was reading it. Two ways to check without opening the dashboard:
 
-- **The cleanup run log** (`.github/workflows/r2-cache-cleanup.yml`, every 2 h) prints every build folder's size, format and populate time — `2.52 GB, UNCOMPRESSED, populated …` versus `0.16 GB, brotli, populated …` — and warns when any retained build is raw. Whether production is among them is the fork in the diagnosis: if it is, suspect the build command; if it is not, suspect the non-production branch deploy command, because production is the build that stays correct under the failure above.
+- **The cleanup run log** (`.github/workflows/r2-cache-cleanup.yml`, every 2 h) prints every build folder's size, format and populate time — `2.52 GB, UNCOMPRESSED, populated …` versus `0.16 GB, brotli, populated …` — and warns when any retained build is raw. Whether production is among them is the fork in the diagnosis: if it is, the Production tab needs the fix; if it is not, the Previews Base tab does, because production is the build that stays correct when only one tab was edited.
 - **The build log** says `[compress-cache] N compressed … 2.340 GiB → 0.147 GiB` when the step ran. No such line means it did not.
 
 **`--cacheChunkSize` is how many cache objects are written to R2 at once, and the default is 25.** That default is not sized for this cache: the populate step ships **1,081 objects / 2.34 GiB on every deploy, production and every preview** (see [Incremental cache cleanup](#incremental-cache-cleanup) for why a full copy goes up each time), and at 25 in flight that is 44 sequential rounds of ~2.2 MB uploads. Both commands accept the flag — it is declared on `deploy` and `upload` alike, and OpenNext's arg parser consumes it rather than forwarding it to `wrangler`, so it cannot confuse the deploy underneath.
