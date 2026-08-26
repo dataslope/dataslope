@@ -125,8 +125,14 @@ scanf("%d", &n);    // read an int into n
 it can *write* the new value into your variable. (When we cover
 pointers, this will make even more sense.)
 
+There is no keyboard to type at inside a lesson, so the block below has
+a **STDIN** panel under the editor holding the text the program reads.
+Edit it and press Run again: it is standard input, exactly as if you had
+typed it at a terminal.
+
 <CodeBlock
   adapter="c"
+  stdin={`30`}
   files={[
     {
       filename: "main.c",
@@ -134,13 +140,10 @@ pointers, this will make even more sense.)
 
 int main(void) {
   int age;
-  printf("Pretend you typed: 30\\n");
-  // In the browser sandbox, stdin is usually empty, but on a real
-  // system this would block until the user typed a number.
   if (scanf("%d", &age) == 1) {
     printf("You are %d years old.\\n", age);
   } else {
-    printf("(no input was provided)\\n");
+    printf("That wasn't a number.\\n");
   }
   return 0;
 }
@@ -153,7 +156,8 @@ int main(void) {
 `scanf()` returns the **number of items it successfully read**. Always
 check it. If the user types `hello` when you asked for a number,
 `scanf()` returns `0` and your variable is unchanged (and probably
-uninitialized!).
+uninitialized!). Put `hello` in the STDIN panel above and run it again
+to watch that happen.
 </Callout>
 
 ### Reading multiple values
@@ -163,6 +167,7 @@ for `%c`).
 
 <CodeBlock
   adapter="c"
+  stdin={`3 4`}
   files={[
     {
       filename: "main.c",
@@ -170,11 +175,10 @@ for `%c`).
 
 int main(void) {
   int a, b;
-  printf("(pretend you typed: 3 4)\\n");
   if (scanf("%d %d", &a, &b) == 2) {
     printf("sum = %d\\n", a + b);
   } else {
-    printf("(no input provided)\\n");
+    printf("expected two numbers\\n");
   }
   return 0;
 }
@@ -182,6 +186,11 @@ int main(void) {
     },
   ]}
 />
+
+The two numbers are on one line here, but `%d` skips whitespace of every
+kind, so putting them on two separate lines in the STDIN panel reads
+exactly the same. That is worth knowing: to `scanf()`, a newline is
+nothing more than another space.
 
 ### `scanf()` and strings
 
@@ -205,6 +214,8 @@ For character-by-character I/O, the standard library offers
 
 <CodeBlock
   adapter="c"
+  stdin={`the quick brown fox
+jumps over the lazy dog`}
   files={[
     {
       filename: "main.c",
@@ -213,9 +224,12 @@ For character-by-character I/O, the standard library offers
 int main(void) {
   // Echo every character from stdin until EOF.
   int c; // int so we can check for EOF
+  int count = 0;
   while ((c = getchar()) != EOF) {
     putchar(c);
+    count++;
   }
+  printf("[%d characters]\\n", count);
   return 0;
 }
 `,
@@ -228,6 +242,11 @@ This is a tiny, classic loop. Why is `c` an `int` rather than a
 "no more input", and `EOF` must be distinguishable from every valid
 character, including `0xFF`. Storing the result in a `char` would
 make that distinction impossible.
+
+`EOF` arrives when the input runs out. Here that is the end of the
+STDIN panel; at a real terminal it is Ctrl-D (Ctrl-Z on Windows), and
+for a program in a pipeline it is the moment the program upstream
+closes its end.
 
 ## Standard streams
 

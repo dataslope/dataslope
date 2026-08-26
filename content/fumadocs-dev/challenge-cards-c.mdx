@@ -380,3 +380,140 @@ void greet(void) { printf("Hello, World!\\n"); }
   ]}
 />
 ```
+
+## Reading standard input
+
+A card takes the same `stdin` prop. On a card the input is part of the
+*question*: the tests grade output produced from it, so the reference
+solution is written against it and Reset restores it after a learner
+experiments in the panel.
+
+<ChallengeCard
+  adapter="c"
+  title="Average the numbers on stdin"
+  stdin={`5
+17
+4
+23
+8
+15`}
+  instructions={`The first line of input is a count \`n\`; the next \`n\` lines each hold one
+integer. Print the count and their mean, rounded to two decimals:
+
+\`\`\`text
+5 values, mean 13.40
+\`\`\``}
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
+
+int main(void) {
+  int n;
+  if (scanf("%d", &n) != 1) return 1;
+  // read n integers, then print the count and the mean
+  return 0;
+}
+`,
+      solutionCode: `#include <stdio.h>
+
+int main(void) {
+  int n;
+  if (scanf("%d", &n) != 1) return 1;
+
+  long total = 0;
+  int read = 0;
+  for (int i = 0; i < n; i++) {
+    int value;
+    if (scanf("%d", &value) != 1) break;
+    total += value;
+    read++;
+  }
+
+  printf("%d values, mean %.2f\\n", read, read ? (double)total / read : 0.0);
+  return 0;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "mean",
+      name: "Prints the count and the mean",
+      description: "Exact stdout match (trimmed)",
+      expect: { stdoutEquals: "5 values, mean 13.40" },
+    },
+    {
+      id: "no_stderr",
+      name: "No diagnostics",
+      description: "Stderr should be empty",
+      expect: { noStderr: true },
+    },
+  ]}
+/>
+
+```jsx
+<ChallengeCard
+  adapter="c"
+  title="Average the numbers on stdin"
+  stdin={`5
+17
+4
+23
+8
+15`}
+  instructions={`The first line of input is a count \`n\`; the next \`n\` lines each hold one
+integer. Print the count and their mean, rounded to two decimals:
+
+\`\`\`text
+5 values, mean 13.40
+\`\`\``}
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
+
+int main(void) {
+  int n;
+  if (scanf("%d", &n) != 1) return 1;
+  // read n integers, then print the count and the mean
+  return 0;
+}
+`,
+      solutionCode: `#include <stdio.h>
+
+int main(void) {
+  int n;
+  if (scanf("%d", &n) != 1) return 1;
+
+  long total = 0;
+  int read = 0;
+  for (int i = 0; i < n; i++) {
+    int value;
+    if (scanf("%d", &value) != 1) break;
+    total += value;
+    read++;
+  }
+
+  printf("%d values, mean %.2f\\n", read, read ? (double)total / read : 0.0);
+  return 0;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "mean",
+      name: "Prints the count and the mean",
+      description: "Exact stdout match (trimmed)",
+      expect: { stdoutEquals: "5 values, mean 13.40" },
+    },
+    {
+      id: "no_stderr",
+      name: "No diagnostics",
+      description: "Stderr should be empty",
+      expect: { noStderr: true },
+    },
+  ]}
+/>
+```

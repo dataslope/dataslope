@@ -17,6 +17,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { normalizeStdin } from "../app/_components/runtime/stdinFile.ts";
 import {
   extractBlocks,
   extractChallengeCards,
@@ -95,9 +96,13 @@ const bcc = await import(pathToFileURL(join(bccRoot, "dist", "index.js")).href);
 const shim = await import(pathToFileURL(join(wasiRoot, "dist", "index.js")).href);
 
 /** Instantiate and run a compiled WASI module, mirroring `runWasiModule` in
- *  runtime/browsercc.ts: empty stdin, captured stdout/stderr, and a
- *  `WASIProcExit`-shaped throw treated as an exit code rather than a crash. */
-async function runWasi(module) {
+ *  runtime/browsercc.ts: the item's stdin on fd 0, captured stdout/stderr, and
+ *  a `WASIProcExit`-shaped throw treated as an exit code rather than a crash.
+ *
+ *  Without the stdin a block that reads input compiles here, runs here on an
+ *  empty stream, and "passes" by taking whatever branch a program takes when
+ *  it is given nothing — which is the one path the lesson is not about. */
+async function runWasi(module, stdin = "") {
   const decoder = new TextDecoder("utf-8");
   let stdout = "";
   let stderr = "";
@@ -105,7 +110,7 @@ async function runWasi(module) {
     [],
     [],
     [
-      new shim.OpenFile(new shim.File(new Uint8Array(0))),
+      new shim.OpenFile(new shim.File(new TextEncoder().encode(stdin))),
       new shim.ConsoleStdout((d) => {
         stdout += decoder.decode(d, { stream: true });
       }),
@@ -184,7 +189,10 @@ for (const [i, item] of runnable.entries()) {
     if (!module) {
       failures.push({ ...describe(item), phase: "compile", error: firstLine(compileOutput) });
     } else {
-      const { stderr, exitCode, crash } = await runWasi(module);
+      const { stderr, exitCode, crash } = await runWasi(
+        module,
+        normalizeStdin(item.stdin ?? ""),
+      );
       if (crash) failures.push({ ...describe(item), phase: "run", error: crash });
       else if (exitCode !== 0) {
         failures.push({

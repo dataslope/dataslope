@@ -701,7 +701,8 @@
 }
 
 .editor :global(.cm-editor .cm-scroller),
-.initEditor :global(.cm-editor .cm-scroller) {
+.initEditor :global(.cm-editor .cm-scroller),
+.stdinEditor :global(.cm-editor .cm-scroller) {
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
@@ -711,24 +712,28 @@
 }
 
 .editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar,
-.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar {
+.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar,
+.stdinEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 .editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-track,
-.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-track {
+.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-track,
+.stdinEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-track {
   background: transparent;
 }
 
 .editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb,
-.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb {
+.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb,
+.stdinEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb {
   background: var(--ch-scrollbar-thumb);
   border-radius: 3px;
 }
 
 .editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb:hover,
-.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb:hover {
+.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb:hover,
+.stdinEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb:hover {
   background: var(--ch-scrollbar-thumb-hover);
 }
 
@@ -811,9 +816,13 @@
 }
 
 .initCaret {
-  display: inline-block;
-  font-size: 9px;
-  width: 10px;
+  display: inline-flex;
+  align-items: center;
+  /* Wins over the row's `align-items`, which is `baseline` on the STDIN
+     toggle: an inline-flex box holding only an SVG has no text baseline of
+     its own and would hang off its bottom edge there. */
+  align-self: center;
+  flex-shrink: 0;
   transition: transform 0.15s ease;
 }
 
@@ -1025,6 +1034,104 @@
   bottom: -1px;
   height: 2px;
   background: var(--ch-accent);
+}
+
+/* ─── STDIN panel ─────────────────────────────────────────────────── */
+/* The editable standard-input drawer `<CodeBlock>` renders under the editor
+   for adapters whose runtime can be fed one (`supportsStdin`). Deliberately
+   quieter than the editor above it: a top border rather than the init
+   panel's diagonal stripes, since this is the same reader's own text, not a
+   read-only region they are being kept out of. */
+
+.stdinWrap {
+  border-top: 1px solid var(--ch-border-light);
+  background: var(--ch-bg);
+}
+
+.stdinToggle {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 14px;
+  background: var(--ch-bg);
+  border: none;
+  color: var(--ch-text-secondary);
+  font-family: var(--ch-font-ui);
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.stdinToggle:hover {
+  color: var(--ch-text);
+  background: var(--ch-bg-hover);
+}
+
+/* A semantic alias, not one of the fixed `--ds-gray-*` brand tokens: those
+   do not flip with the color scheme, and #374151 on the near-black dark
+   surface was unreadable. The init panel next door gets away with them only
+   because it carries a matching set of dark-mode overrides at the bottom of
+   this file; one alias is correct in both schemes. Secondary rather than
+   `--ch-text`, so an 11px uppercase label reads as a section marker instead
+   of competing with the code above it, and it keeps a step of hierarchy
+   above the muted hint beside it. */
+.stdinLabel {
+  flex-shrink: 0;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ch-text-secondary);
+}
+
+/* Truncates rather than wrapping the label onto a second line, so a narrow
+   card keeps STDIN on one row. The panel is self-explanatory once open, so
+   losing the tail of the hint costs nothing. */
+.stdinHint {
+  flex: 1;
+  min-width: 0;
+  color: var(--ch-text-muted);
+  font-size: 12.5px;
+  letter-spacing: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stdinEditorWrap {
+  background: var(--ch-bg);
+  transition: max-height 0.18s ease;
+}
+
+.stdinEditorWrapCollapsed {
+  max-height: 0;
+  overflow: hidden;
+}
+
+.stdinEditorWrapOpen {
+  max-height: 240px;
+  overflow: visible;
+}
+
+.stdinEditor {
+  background: var(--ch-bg);
+  border-top: 1px solid var(--ch-border-light);
+}
+
+.stdinEditor :global(.cm-editor) {
+  height: auto;
+  min-height: 30px;
+  max-height: 200px;
+  font-family: var(--ch-font-mono);
+  font-size: 14px;
+  line-height: 1.7;
+  font-variant-ligatures: none;
+}
+
+.stdinEditor :global(.cm-editor.cm-focused),
+.stdinEditor :global(.cm-editor) {
+  outline: none;
 }
 
 /* ─── Action bar ──────────────────────────────────────────────────── */
@@ -2234,7 +2341,9 @@
 :global(html:is(.dark, [data-theme="dark"])) .initEditor :global(.cm-editor),
 :global(html:is(.dark, [data-theme="dark"])) .initEditor :global(.cm-scroller),
 :global(html:is(.dark, [data-theme="dark"])) .modalEditor :global(.cm-editor),
-:global(html:is(.dark, [data-theme="dark"])) .modalEditor :global(.cm-scroller) {
+:global(html:is(.dark, [data-theme="dark"])) .modalEditor :global(.cm-scroller),
+:global(html:is(.dark, [data-theme="dark"])) .stdinEditor :global(.cm-editor),
+:global(html:is(.dark, [data-theme="dark"])) .stdinEditor :global(.cm-scroller) {
   background-color: var(--ch-bg) !important;
 }
 

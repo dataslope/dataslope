@@ -1171,6 +1171,89 @@ a chart. The JS half of the conversion is *shared* rather than copied
 (`app/_components/runtime/pythonDisplayOutputs.ts`), so only the Python half
 can drift.
 
+### A block that reads stdin gets a STDIN panel
+
+There is no console to type into, so "give this program input" has to mean
+something the page can express. It means a file: every runtime that can be fed
+reads a `stdin.txt` staged through `prepareFileSystem`, and the playground
+surfaces that literally, as a file in the file browser. A lesson block has no
+file browser, so it surfaces the same file as a labelled drawer under the
+editor:
+
+```mdx
+<CodeBlock
+  adapter="c"
+  stdin={`30`}
+  files={[{ filename: "main.c", starterCode: `…scanf("%d", &age)…` }]}
+/>
+```
+
+The prop is the switch. Omit it and there is no panel, which is the right
+answer for the ~3,370 blocks that never read a byte of input; pass `""` for an
+empty box the reader fills in themselves. It is editable and it persists, like
+any other buffer, and Reset restores the authored text along with the code.
+`<ChallengeCard>` takes the same prop, where the input is part of the
+*question*: the tests grade output produced from it, so the reference solution
+is written against it and Reset puts the graded input back.
+
+**The panel's lines are the program's lines.** `normalizeStdin` terminates the
+last one on the way to the runtime, so an authored prop needs no trailing
+newline of its own. Both halves of that matter. Without the termination a
+`fgets` loop silently drops the final entry whenever an author forgets the
+`\n`, and the lesson's code gets the blame; with a trailing newline in the
+prop instead, a one-line input like `30` sits above an empty second line in a
+panel that draws line numbers. Empty input stays empty, because handing a
+program one newline is not the same as handing it nothing.
+
+Four things hold this together, and three of them are silent when they break.
+
+- **`LanguageAdapter.supportsStdin` gates the panel**, and only c, cpp, java
+  and csharp set it. Those are exactly the runtimes whose `prepareFileSystem`
+  looks for `STDIN_FILENAME`; on any other adapter the prop is ignored rather
+  than honoured, because a box the reader can type into that cannot reach the
+  program is worse than no box. `__tests__/blockStdin.test.ts` asserts the set
+  both ways and sweeps `content/` for the prop on an adapter that lacks it.
+- **The staged file set lives on the runtime, not on the block**, and every
+  block of one language shares a runtime. So a stdin-capable adapter stages on
+  *every* run, with an empty map when there is nothing to stage: that call is
+  how a block without stdin drops the input the block above it left behind.
+  `<ChallengeCard>` does the same, for the same reason — it has no panel of its
+  own, but it is downstream of the blocks on its page and would otherwise grade
+  a learner against one of their inputs.
+- **`blockOutputKey` takes the stdin**, because one program prints different
+  things for different input and a prepopulated panel recorded from other
+  bytes is worse than an empty one. It is folded in only when the block
+  declares one, so blocks that predate the panel keep their existing keys —
+  mixing an empty string in unconditionally re-keys the entire manifest and
+  blanks every prepopulated panel on the site until both generators are run
+  again. (The fields are NUL-separated. They look like spaces in an editor.)
+- **The headless mirrors have to be fed too.** `scripts/lib/block-runners.mjs`
+  and `scripts/check-cpp-blocks.mjs` each build their own WASI instance rather
+  than importing the browser's, and both used to hand fd 0 an empty file. A
+  block that reads input then "passes" the sweep by taking the branch a
+  program takes when given nothing, which is the one path the lesson is not
+  about, and records a panel that disagrees with Run. Both call
+  `normalizeStdin` for the same reason: the bytes have to be identical.
+
+### `append` means join with nothing, and one `printf` is several writes
+
+`EmitOutput` takes `(cell, seq, append)`. A runtime that passes `seq` is
+addressing its output, and `append` says "this continues the cell you just
+wrote" — so the pieces join with the empty string. `<CodeBlock>` and
+`<ChallengeCard>` ignored both and collapsed consecutive stdout cells with a
+`"\n"`, which is right for Python and the JS runners (one cell per statement,
+and `console.log` implies a line) and wrong for anything streaming bytes.
+
+C is the case that exposes it. `printf("You are %d years old.\n", age)`
+reaches the WASI shim as **two** `fd_write` calls, `"You are 30"` and
+`" years old.\n"`, so the invented newline chopped one line of output in half.
+On a card it was not cosmetic: those cells become the `cleanStdout` that
+`stdoutEquals` grades, so a correct C answer failed its own test. It stayed
+hidden because a C block usually shows the *prepopulated* panel, and the
+headless generator concatenates into one string before it emits anything.
+`Playground.tsx`'s `emitCell` had it right all along; the two lesson surfaces
+now match it.
+
 ### A web block renders itself, without a manifest and without a Run
 
 Every other language shows its result because a generator ran the code at build

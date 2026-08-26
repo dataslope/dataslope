@@ -265,6 +265,18 @@ export interface LanguageAdapter {
     autoPreview?: boolean;
   };
   /**
+   * The runtime reads standard input from a `stdin.txt` staged through
+   * `prepareFileSystem`.
+   *
+   * Gates `<CodeBlock>`'s STDIN panel: there is no console to type into, so
+   * an adapter that cannot be fed must not offer a box that looks like it
+   * can. It also makes the staged buffer *per block* rather than per
+   * runtime — blocks of one language share a runtime, so a block with no
+   * `stdin` restages an empty file set instead of inheriting the previous
+   * block's input.
+   */
+  supportsStdin?: boolean;
+  /**
    * A run compiles and executes the whole workspace, not the focused file.
    *
    * Output is filed per editor tab by default, which is right when each

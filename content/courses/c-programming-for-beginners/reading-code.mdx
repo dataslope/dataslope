@@ -249,19 +249,24 @@ of "spelling mistakes you can't help noticing".
 
 <CodeBlock
   adapter="c"
+  stdin={`fox
+the quick brown fox
+jumps over the lazy dog
+a second fox appears`}
   files={[
     {
       filename: "main.c",
       starterCode: `#include <stdio.h>
 #include <string.h>
 
-int main(int argc, char **argv) {
-  if (argc < 2) {
-    fprintf(stderr, "usage: %s WORD\\n", argv[0]);
+int main(void) {
+  char needle[64];
+  if (fgets(needle, sizeof needle, stdin) == NULL) {
+    fprintf(stderr, "usage: first line of input is the word to find\\n");
     return 1;
   }
+  needle[strcspn(needle, "\\n")] = '\\0';
 
-  const char *needle = argv[1];
   char line[1024];
   int matches = 0;
 
@@ -285,13 +290,17 @@ does.
 
 ...
 
-Done? Here's mine: *"It's a tiny `grep`. It reads lines from
-standard input, prints those that contain the word given as a
-command-line argument, and exits 0 if at least one line matched."*
+Done? Here's mine: *"It's a tiny `grep`. It takes a word from the first
+line of its input, prints every later line containing that word, and
+exits 0 if at least one line matched."*
 
 Did you spot:
 
-- `argc < 2` is the usage check.
+- The first `fgets` is a guard: no input at all means there is no word
+  to search for, so the program explains itself and gives up.
+- `needle[strcspn(needle, "\n")] = '\0';` chops the trailing newline
+  `fgets` leaves behind. Miss this line and the program searches for
+  `"fox\n"`, which matches nothing in the middle of a line.
 - `strstr` is "substring search".
 - The exit code communicates "found anything?" to the shell.
 

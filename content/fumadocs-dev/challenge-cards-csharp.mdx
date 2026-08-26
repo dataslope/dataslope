@@ -390,3 +390,107 @@ types defined in sibling files.
   ]}
 />
 ```
+
+## Reading standard input
+
+A card takes the same `stdin` prop. The panel is staged as `stdin.txt`
+and read by `Console.ReadLine`, and the tests grade output produced
+from it.
+
+<ChallengeCard
+  adapter="csharp"
+  title="Total an order"
+  stdin={`widget,2,3.50
+gizmo,1,12.00
+sprocket,4,0.75`}
+  instructions={`Each line of input is \`name,quantity,unitPrice\`. Print the order total,
+formatted to two decimals:
+
+\`\`\`text
+Total: $22.00
+\`\`\``}
+  files={[
+    {
+      filename: "Program.cs",
+      starterCode: `using System;
+using System.Globalization;
+
+// read each line, multiply quantity by unit price, print the total
+`,
+      solutionCode: `using System;
+using System.Globalization;
+
+decimal total = 0m;
+string? line;
+while ((line = Console.ReadLine()) != null)
+{
+    var parts = line.Split(',');
+    if (parts.Length != 3) continue;
+    var qty = int.Parse(parts[1], CultureInfo.InvariantCulture);
+    var unit = decimal.Parse(parts[2], CultureInfo.InvariantCulture);
+    total += qty * unit;
+}
+
+Console.WriteLine("Total: $" + total.ToString("0.00", CultureInfo.InvariantCulture));
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "total",
+      name: "Prints the order total",
+      description: "Exact stdout match (trimmed)",
+      expect: { stdoutEquals: "Total: $22.00" },
+    },
+  ]}
+/>
+
+```jsx
+<ChallengeCard
+  adapter="csharp"
+  title="Total an order"
+  stdin={`widget,2,3.50
+gizmo,1,12.00
+sprocket,4,0.75`}
+  instructions={`Each line of input is \`name,quantity,unitPrice\`. Print the order total,
+formatted to two decimals:
+
+\`\`\`text
+Total: $22.00
+\`\`\``}
+  files={[
+    {
+      filename: "Program.cs",
+      starterCode: `using System;
+using System.Globalization;
+
+// read each line, multiply quantity by unit price, print the total
+`,
+      solutionCode: `using System;
+using System.Globalization;
+
+decimal total = 0m;
+string? line;
+while ((line = Console.ReadLine()) != null)
+{
+    var parts = line.Split(',');
+    if (parts.Length != 3) continue;
+    var qty = int.Parse(parts[1], CultureInfo.InvariantCulture);
+    var unit = decimal.Parse(parts[2], CultureInfo.InvariantCulture);
+    total += qty * unit;
+}
+
+Console.WriteLine("Total: $" + total.ToString("0.00", CultureInfo.InvariantCulture));
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "total",
+      name: "Prints the order total",
+      description: "Exact stdout match (trimmed)",
+      expect: { stdoutEquals: "Total: $22.00" },
+    },
+  ]}
+/>
+```

@@ -34,6 +34,10 @@ interface MdxCodeBlockProps {
    *  `CodeBlockProps.autoPreview`. Defaults to the adapter's own answer
    *  (on for web, off for react); pass `false` to opt a block out. */
   autoPreview?: boolean;
+  /** Standard input for the program, shown in an editable STDIN panel and
+   *  staged as `stdin.txt`, see `CodeBlockProps.stdin`. Adapters whose
+   *  runtime can be fed only (c, cpp, java, csharp). */
+  stdin?: string;
 }
 
 export default function MdxCodeBlock({
@@ -48,6 +52,7 @@ export default function MdxCodeBlock({
   expectError,
   previewHeight,
   autoPreview,
+  stdin,
 }: MdxCodeBlockProps) {
   const resolved = getAdapterById(adapter);
   if (!resolved) {
@@ -70,6 +75,7 @@ export default function MdxCodeBlock({
       tailwind={tailwind}
       previewHeight={previewHeight}
       autoPreview={autoPreview}
+      stdin={stdin}
     />
   );
 }

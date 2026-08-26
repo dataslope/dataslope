@@ -342,6 +342,10 @@ export function extractBlocks(root = CONTENT_DIR, adapter = "python") {
       files,
       entry: entry.filename,
       expectError: propFlag(raw, "expectError"),
+      // The block's STDIN panel, or undefined where it has none. `undefined`
+      // and `""` are different blocks to `blockOutputKey`, so the absent case
+      // must not collapse into the empty one.
+      stdin: propText(raw, "stdin"),
       // What Run executes: the hidden setup, then the visible buffer.
       code: `${entry.initCode ? `${entry.initCode}\n` : ""}${entry.starterCode}`,
     });
@@ -389,6 +393,11 @@ export function extractChallengeCards(root = CONTENT_DIR, adapter = "python") {
       files,
       entry: entry.filename,
       tests,
+      // The card's STDIN panel, or undefined where it has none. On a card
+      // this is part of the question: the tests grade output produced from
+      // it, so a sweep that runs the solution on an empty stream grades a
+      // different program than the learner sees.
+      stdin: propText(raw, "stdin"),
       // What Check Answer runs: the hidden setup, then the solution buffer.
       // A card where no file supplies a solution has nothing to verify.
       solution:

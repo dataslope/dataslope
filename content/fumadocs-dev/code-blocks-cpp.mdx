@@ -295,3 +295,84 @@ int main() {
   ]}
 />
 ```
+
+## Standard input
+
+A `stdin` prop renders an editable **STDIN** panel under the editor and
+stages it as `stdin.txt`, which the WASI shim hands the program on fd 0,
+so `std::cin` reads it. The panel's lines are the program's lines: the
+last one is terminated for you, so the prop needs no trailing newline.
+
+<CodeBlock
+  adapter="cpp"
+  stdin={`5
+17 4 23 8 15`}
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <numeric>
+
+int main() {
+  int n;
+  if (!(std::cin >> n)) {
+    std::cout << "expected a count on the first line\\n";
+    return 1;
+  }
+
+  std::vector<int> values;
+  for (int i = 0, v = 0; i < n && std::cin >> v; ++i) values.push_back(v);
+
+  std::sort(values.begin(), values.end());
+  int total = std::accumulate(values.begin(), values.end(), 0);
+
+  std::cout << "read " << values.size() << " values\\n";
+  std::cout << "sorted:";
+  for (int v : values) std::cout << ' ' << v;
+  std::cout << "\\nsum: " << total << "\\n";
+  return 0;
+}
+`,
+    },
+  ]}
+/>
+
+```jsx
+<CodeBlock
+  adapter="cpp"
+  stdin={`5
+17 4 23 8 15`}
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <numeric>
+
+int main() {
+  int n;
+  if (!(std::cin >> n)) {
+    std::cout << "expected a count on the first line\\n";
+    return 1;
+  }
+
+  std::vector<int> values;
+  for (int i = 0, v = 0; i < n && std::cin >> v; ++i) values.push_back(v);
+
+  std::sort(values.begin(), values.end());
+  int total = std::accumulate(values.begin(), values.end(), 0);
+
+  std::cout << "read " << values.size() << " values\\n";
+  std::cout << "sorted:";
+  for (int v : values) std::cout << ' ' << v;
+  std::cout << "\\nsum: " << total << "\\n";
+  return 0;
+}
+`,
+    },
+  ]}
+/>
+```
