@@ -19,6 +19,11 @@ import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+// Shared with `<CodeBlock>`: the panel text and the bytes fd 0 sees are
+// one rule, so a recorded panel cannot disagree with a live Run about
+// where the input ended.
+import { normalizeStdin } from "../../app/_components/runtime/stdinFile.ts";
+
 /** Adapters this module can run. Everything else is browser-only or Python. */
 export const TEXT_ADAPTERS = ["javascript", "typescript", "c", "cpp"];
 
@@ -370,7 +375,7 @@ async function createCppRunner(adapter) {
         if (!module) return cells;
         const { stdout, stderr, exitCode, crash } = await runWasi(
           module,
-          block.stdin ?? "",
+          normalizeStdin(block.stdin ?? ""),
         );
         if (crash) {
           cells.push({ type: "stderr", content: crash });

@@ -271,3 +271,77 @@ int main(void) {
   ]}
 />
 ```
+
+## Standard input
+
+A `stdin` prop renders an editable **STDIN** panel under the editor and
+stages it as `stdin.txt`, which is what the WASI shim hands the program
+on fd 0. The panel's lines are the program's lines: the last one is
+terminated for you, so the prop needs no trailing newline. Omit the prop
+and there is no panel.
+
+<CodeBlock
+  adapter="c"
+  stdin={`Ada Lovelace
+36
+1815`}
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
+
+int main(void) {
+  char name[64];
+  int age, born;
+
+  // %[^\\n] reads the rest of the line, spaces included.
+  if (scanf("%63[^\\n]%*c", name) != 1) {
+    printf("no name on stdin\\n");
+    return 1;
+  }
+  if (scanf("%d %d", &age, &born) != 2) {
+    printf("expected two numbers after the name\\n");
+    return 1;
+  }
+
+  printf("%s was %d, born %d.\\n", name, age, born);
+  return 0;
+}
+`,
+    },
+  ]}
+/>
+
+```jsx
+<CodeBlock
+  adapter="c"
+  stdin={`Ada Lovelace
+36
+1815`}
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
+
+int main(void) {
+  char name[64];
+  int age, born;
+
+  // %[^\\n] reads the rest of the line, spaces included.
+  if (scanf("%63[^\\n]%*c", name) != 1) {
+    printf("no name on stdin\\n");
+    return 1;
+  }
+  if (scanf("%d %d", &age, &born) != 2) {
+    printf("expected two numbers after the name\\n");
+    return 1;
+  }
+
+  printf("%s was %d, born %d.\\n", name, age, born);
+  return 0;
+}
+`,
+    },
+  ]}
+/>
+```

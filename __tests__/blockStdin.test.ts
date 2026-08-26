@@ -14,7 +14,11 @@ import { describe, it, expect } from "vitest";
 import { vi } from "vitest";
 
 import { blockOutputKey } from "../lib/blockOutputKey";
-import { extractBlocks } from "../scripts/lib/mdx-blocks.mjs";
+import { normalizeStdin } from "../app/_components/runtime/stdinFile";
+import {
+  extractBlocks,
+  extractChallengeCards,
+} from "../scripts/lib/mdx-blocks.mjs";
 
 // Adapters reference React JSX (packagesFooter); stub React so they import
 // in Node without a renderer, exactly as adapters.test.ts does.
@@ -69,7 +73,10 @@ describe("supportsStdin", () => {
 
 describe("authored stdin in content", () => {
   const authored = STDIN_ADAPTERS.flatMap((adapter) =>
-    extractBlocks(undefined, adapter)
+    [
+      ...extractBlocks(undefined, adapter),
+      ...extractChallengeCards(undefined, adapter),
+    ]
       .filter((b) => !b.unparsable && b.stdin !== undefined)
       .map((b) => ({ ...b, adapter })),
   );
@@ -89,10 +96,54 @@ describe("authored stdin in content", () => {
     // arrives, which is the failure this whole panel exists to remove.
     const NON_STDIN = ["python", "r", "javascript", "typescript", "php", "web", "react"];
     const stray = NON_STDIN.flatMap((adapter) =>
-      extractBlocks(undefined, adapter)
+      [
+        ...extractBlocks(undefined, adapter),
+        ...extractChallengeCards(undefined, adapter),
+      ]
         .filter((b) => !b.unparsable && b.stdin !== undefined)
         .map((b) => `${b.file}:${b.line} [${adapter}]`),
     );
     expect(stray).toEqual([]);
+  });
+});
+
+describe("normalizeStdin", () => {
+  it("terminates the last line", () => {
+    // The panel draws line numbers, so its last line has to be a line: a
+    // `fgets` loop that drops the final entry because the author forgot a
+    // `\n` gets blamed on the lesson's code.
+    expect(normalizeStdin("30")).toBe("30\n");
+    expect(normalizeStdin("a\nb")).toBe("a\nb\n");
+  });
+
+  it("leaves an already-terminated input alone", () => {
+    expect(normalizeStdin("30\n")).toBe("30\n");
+  });
+
+  it("leaves empty input empty", () => {
+    // Handing a program one newline is not the same as handing it nothing:
+    // `getchar()` returns the newline and then EOF, rather than EOF at once.
+    expect(normalizeStdin("")).toBe("");
+  });
+
+  it("never adds a second blank line", () => {
+    // The regression that started this: `stdin={`30\n`}` showed an empty
+    // line 2 under a one-line input.
+    expect(normalizeStdin(normalizeStdin("30"))).toBe("30\n");
+  });
+});
+
+describe("authored stdin never carries a trailing newline", () => {
+  it("holds across every block and card", () => {
+    // Staging terminates the last line, so a trailing newline in the prop is
+    // the empty row the panel then draws under the real input.
+    const authored = STDIN_ADAPTERS.flatMap((adapter) => [
+      ...extractBlocks(undefined, adapter),
+      ...extractChallengeCards(undefined, adapter),
+    ]).filter((x) => !x.unparsable && x.stdin !== undefined);
+    const trailing = authored
+      .filter((x) => x.stdin.endsWith("\n"))
+      .map((x) => `${x.file}:${x.line}`);
+    expect(trailing).toEqual([]);
   });
 });

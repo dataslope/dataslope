@@ -1068,8 +1068,9 @@
   color: var(--ds-gray-700);
 }
 
-/* The hint is the whole explanation of the feature, so it must survive a
-   phone: it truncates rather than wrapping the label onto a second line. */
+/* Truncates rather than wrapping the label onto a second line, so a narrow
+   card keeps STDIN on one row. The panel is self-explanatory once open, so
+   losing the tail of the hint costs nothing. */
 .stdinHint {
   flex: 1;
   min-width: 0;

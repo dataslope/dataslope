@@ -17,6 +17,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { normalizeStdin } from "../app/_components/runtime/stdinFile.ts";
 import {
   extractBlocks,
   extractChallengeCards,
@@ -188,7 +189,10 @@ for (const [i, item] of runnable.entries()) {
     if (!module) {
       failures.push({ ...describe(item), phase: "compile", error: firstLine(compileOutput) });
     } else {
-      const { stderr, exitCode, crash } = await runWasi(module, item.stdin ?? "");
+      const { stderr, exitCode, crash } = await runWasi(
+        module,
+        normalizeStdin(item.stdin ?? ""),
+      );
       if (crash) failures.push({ ...describe(item), phase: "run", error: crash });
       else if (exitCode !== 0) {
         failures.push({

@@ -62,8 +62,9 @@ import {
   retainRuntime,
   RuntimeScope,
 } from "./runtimeRegistry";
+import { appendOutputCell } from "./outputCells";
 import { mergeInitAndEntry } from "./runtime/mergeInit";
-import { STDIN_FILENAME } from "./runtime/stdinFile";
+import { STDIN_FILENAME, normalizeStdin } from "./runtime/stdinFile";
 import {
   datasetStageFilename,
   fetchDatasetBytes,
@@ -1104,7 +1105,7 @@ function CodeBlockInner({
         if (hasStdin) {
           fileMap.set(
             STDIN_FILENAME,
-            encoder.encode(stdinBufferRef.current ?? ""),
+            encoder.encode(normalizeStdin(stdinBufferRef.current ?? "")),
           );
         }
         try {
@@ -1128,36 +1129,21 @@ function CodeBlockInner({
       try {
         await runtimeRef.current.run(
           code,
-          (cell) => {
+          (cell, seq, append) => {
             if (runSeqRef.current !== mySeq) return;
             const elapsedMs = performance.now() - startedAt;
             const elapsed =
               elapsedMs < 1000
                 ? `${elapsedMs.toFixed(0)}ms`
                 : `${(elapsedMs / 1000).toFixed(2)}s`;
-            setOutputs((prev) => {
-              // Collapse consecutive stdout cells so one console.log per
-              // cell doesn't stack a pile of one-line cells.
-              const last = prev[prev.length - 1];
-              if (
-                cell.type === "stdout" &&
-                last &&
-                last.type === "stdout"
-              ) {
-                const merged: OutputCell = {
-                  ...last,
-                  content: last.content + "\n" + cell.content,
-                  elapsed,
-                };
-                return [...prev.slice(0, -1), merged];
-              }
-              const fullCell: OutputCell = {
-                id: ++nextOutputId,
+            setOutputs((prev) =>
+              appendOutputCell(prev, cell, {
+                seq,
+                append,
                 elapsed,
-                ...cell,
-              };
-              return [...prev, fullCell];
-            });
+                nextId: () => ++nextOutputId,
+              }),
+            );
           },
           {
             entryFilename: isMultiFile ? resolvedEntryFilename : undefined,
@@ -1650,7 +1636,7 @@ function CodeBlockInner({
             </span>
             <span className={challengeStyles.stdinLabel}>STDIN</span>
             <span className={challengeStyles.stdinHint}>
-              Optional input fed to the program on stdin, one line per line.
+              What the program reads. Edit it and Run again.
             </span>
           </button>
           <div

@@ -312,3 +312,138 @@ so `Main` can reference `Dog` directly without any imports.
   ]}
 />
 ```
+
+## Reading standard input
+
+A card takes the same `stdin` prop. The panel is staged as `stdin.txt`
+and opened as `System.in`, and the tests grade output produced from it.
+
+<ChallengeCard
+  adapter="java"
+  title="Count the votes"
+  stdin={`red
+blue
+red
+green
+red
+blue`}
+  instructions={`Each line of input is one vote. Print the winner and its count:
+
+\`\`\`text
+red wins with 3 votes
+\`\`\``}
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.Scanner;
+
+public class Main {
+  public static void main(String[] args) {
+    Scanner in = new Scanner(System.in);
+    // tally the lines, then print the winner
+  }
+}
+`,
+      solutionCode: `import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+public class Main {
+  public static void main(String[] args) {
+    Scanner in = new Scanner(System.in);
+    Map<String, Integer> tally = new LinkedHashMap<>();
+    while (in.hasNextLine()) {
+      String vote = in.nextLine().trim();
+      if (vote.isEmpty()) continue;
+      tally.merge(vote, 1, Integer::sum);
+    }
+
+    String winner = null;
+    int best = 0;
+    for (Map.Entry<String, Integer> e : tally.entrySet()) {
+      if (e.getValue() > best) {
+        best = e.getValue();
+        winner = e.getKey();
+      }
+    }
+    System.out.println(winner + " wins with " + best + " votes");
+  }
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "winner",
+      name: "Prints the winning vote and its count",
+      description: "Exact stdout match (trimmed)",
+      expect: { stdoutEquals: "red wins with 3 votes" },
+    },
+  ]}
+/>
+
+```jsx
+<ChallengeCard
+  adapter="java"
+  title="Count the votes"
+  stdin={`red
+blue
+red
+green
+red
+blue`}
+  instructions={`Each line of input is one vote. Print the winner and its count:
+
+\`\`\`text
+red wins with 3 votes
+\`\`\``}
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.Scanner;
+
+public class Main {
+  public static void main(String[] args) {
+    Scanner in = new Scanner(System.in);
+    // tally the lines, then print the winner
+  }
+}
+`,
+      solutionCode: `import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+public class Main {
+  public static void main(String[] args) {
+    Scanner in = new Scanner(System.in);
+    Map<String, Integer> tally = new LinkedHashMap<>();
+    while (in.hasNextLine()) {
+      String vote = in.nextLine().trim();
+      if (vote.isEmpty()) continue;
+      tally.merge(vote, 1, Integer::sum);
+    }
+
+    String winner = null;
+    int best = 0;
+    for (Map.Entry<String, Integer> e : tally.entrySet()) {
+      if (e.getValue() > best) {
+        best = e.getValue();
+        winner = e.getKey();
+      }
+    }
+    System.out.println(winner + " wins with " + best + " votes");
+  }
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "winner",
+      name: "Prints the winning vote and its count",
+      description: "Exact stdout match (trimmed)",
+      expect: { stdoutEquals: "red wins with 3 votes" },
+    },
+  ]}
+/>
+```

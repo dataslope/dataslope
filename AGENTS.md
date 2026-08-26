@@ -1183,8 +1183,7 @@ editor:
 ```mdx
 <CodeBlock
   adapter="c"
-  stdin={`30
-`}
+  stdin={`30`}
   files={[{ filename: "main.c", starterCode: `…scanf("%d", &age)…` }]}
 />
 ```
@@ -1192,8 +1191,19 @@ editor:
 The prop is the switch. Omit it and there is no panel, which is the right
 answer for the ~3,370 blocks that never read a byte of input; pass `""` for an
 empty box the reader fills in themselves. It is editable and it persists, like
-any other buffer in the block, and Reset restores the authored text along with
-the code.
+any other buffer, and Reset restores the authored text along with the code.
+`<ChallengeCard>` takes the same prop, where the input is part of the
+*question*: the tests grade output produced from it, so the reference solution
+is written against it and Reset puts the graded input back.
+
+**The panel's lines are the program's lines.** `normalizeStdin` terminates the
+last one on the way to the runtime, so an authored prop needs no trailing
+newline of its own. Both halves of that matter. Without the termination a
+`fgets` loop silently drops the final entry whenever an author forgets the
+`\n`, and the lesson's code gets the blame; with a trailing newline in the
+prop instead, a one-line input like `30` sits above an empty second line in a
+panel that draws line numbers. Empty input stays empty, because handing a
+program one newline is not the same as handing it nothing.
 
 Four things hold this together, and three of them are silent when they break.
 
@@ -1222,7 +1232,27 @@ Four things hold this together, and three of them are silent when they break.
   than importing the browser's, and both used to hand fd 0 an empty file. A
   block that reads input then "passes" the sweep by taking the branch a
   program takes when given nothing, which is the one path the lesson is not
-  about, and records a panel that disagrees with Run.
+  about, and records a panel that disagrees with Run. Both call
+  `normalizeStdin` for the same reason: the bytes have to be identical.
+
+### `append` means join with nothing, and one `printf` is several writes
+
+`EmitOutput` takes `(cell, seq, append)`. A runtime that passes `seq` is
+addressing its output, and `append` says "this continues the cell you just
+wrote" — so the pieces join with the empty string. `<CodeBlock>` and
+`<ChallengeCard>` ignored both and collapsed consecutive stdout cells with a
+`"\n"`, which is right for Python and the JS runners (one cell per statement,
+and `console.log` implies a line) and wrong for anything streaming bytes.
+
+C is the case that exposes it. `printf("You are %d years old.\n", age)`
+reaches the WASI shim as **two** `fd_write` calls, `"You are 30"` and
+`" years old.\n"`, so the invented newline chopped one line of output in half.
+On a card it was not cosmetic: those cells become the `cleanStdout` that
+`stdoutEquals` grades, so a correct C answer failed its own test. It stayed
+hidden because a C block usually shows the *prepopulated* panel, and the
+headless generator concatenates into one string before it emits anything.
+`Playground.tsx`'s `emitCell` had it right all along; the two lesson surfaces
+now match it.
 
 ### A web block renders itself, without a manifest and without a Run
 

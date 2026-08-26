@@ -398,3 +398,113 @@ void Greeter::greet() { std::cout << "Hello, World!\\n"; }
   ]}
 />
 ```
+
+## Reading standard input
+
+A card takes the same `stdin` prop, and on a card the input is part of
+the question: the tests grade output produced from it, so the reference
+solution is written against it.
+
+<ChallengeCard
+  adapter="cpp"
+  title="Longest word on stdin"
+  stdin={`the quick brown fox
+jumped over
+a remarkably lazy dog`}
+  instructions={`Read every whitespace-separated word from standard input and print the
+longest one, with its length:
+
+\`\`\`text
+remarkably (10)
+\`\`\`
+
+If two words tie, print the first.`}
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
+#include <string>
+
+int main() {
+  std::string word;
+  // read words until end of input, keep the longest
+  return 0;
+}
+`,
+      solutionCode: `#include <iostream>
+#include <string>
+
+int main() {
+  std::string word;
+  std::string longest;
+  while (std::cin >> word) {
+    if (word.size() > longest.size()) longest = word;
+  }
+  std::cout << longest << " (" << longest.size() << ")\\n";
+  return 0;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "longest",
+      name: "Prints the longest word and its length",
+      description: "Exact stdout match (trimmed)",
+      expect: { stdoutEquals: "remarkably (10)" },
+    },
+  ]}
+/>
+
+```jsx
+<ChallengeCard
+  adapter="cpp"
+  title="Longest word on stdin"
+  stdin={`the quick brown fox
+jumped over
+a remarkably lazy dog`}
+  instructions={`Read every whitespace-separated word from standard input and print the
+longest one, with its length:
+
+\`\`\`text
+remarkably (10)
+\`\`\`
+
+If two words tie, print the first.`}
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
+#include <string>
+
+int main() {
+  std::string word;
+  // read words until end of input, keep the longest
+  return 0;
+}
+`,
+      solutionCode: `#include <iostream>
+#include <string>
+
+int main() {
+  std::string word;
+  std::string longest;
+  while (std::cin >> word) {
+    if (word.size() > longest.size()) longest = word;
+  }
+  std::cout << longest << " (" << longest.size() << ")\\n";
+  return 0;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "longest",
+      name: "Prints the longest word and its length",
+      description: "Exact stdout match (trimmed)",
+      expect: { stdoutEquals: "remarkably (10)" },
+    },
+  ]}
+/>
+```
