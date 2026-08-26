@@ -15,7 +15,12 @@ name: R2 incremental-cache cleanup
 # that looks like a retention failure may be neither: step 7 samples each
 # folder's first four bytes for the brotli magic and says which it is, because
 # the read path accepts both formats and an uncompressed deploy is otherwise
-# completely silent (it was, from 2026-08-15 to 2026-08-26).
+# completely silent.
+#
+# It was silent for eleven days. On 2026-08-26 production measured 0.16 GB and
+# every one of the six preview folders 2.52 GB — compression attached to the
+# production deploy command rather than to the build command both paths share.
+# The half of the deploy path nobody reads the size of was the whole 15 GB.
 #
 # The build ID IS the deployed commit SHA (next.config.ts generateBuildId =
 # WORKERS_CI_COMMIT_SHA on Workers Builds); that equality is what lets this
@@ -594,7 +599,8 @@ jobs:
             folder_bytes["$folder"]="$(
               printf '%s\n' "$rows" | awk -F'\t' '{ s += $1 } END { printf "%d", s + 0 }'
             )"
-            folder_format["$folder"]="$(cache_format "$(printf '%s\n' "$rows" | head -n 1 | cut -f3)")"
+            first_row="${rows%%$'\n'*}"
+            folder_format["$folder"]="$(cache_format "$(printf '%s' "$first_row" | cut -f3)")"
 
             [[ "$folder" == "$prod_folder" ]] && continue
 
@@ -684,17 +690,24 @@ jobs:
           fi
 
           # 7) What the retained bytes are made of. Retention is only one of
-          #    the two numbers that set the bucket size; the other is what a
-          #    deploy writes per build, and that one is decided OUTSIDE this
-          #    repo. scripts/compress-cache.mjs runs from the Cloudflare
-          #    Workers Builds *build command* (DEVELOPMENT.md, "Cloudflare
-          #    Workers Builds configuration"), so a deploy path that never got
-          #    it ships ~16x the bytes with a green build and a working site —
-          #    lib/cache/brotliR2IncrementalCache.ts reads raw entries too, by
-          #    design, which is precisely what makes this failure silent. It
-          #    stayed unnoticed from 2026-08-15 to 2026-08-26, at ~2.5 GB per
-          #    retained build instead of ~0.16 GB. Nothing here can fix it;
-          #    this refuses to let it stay invisible.
+          #    the two numbers that set the bucket size; the other is bytes
+          #    per build, and that one is decided OUTSIDE this repo.
+          #
+          #    scripts/compress-cache.mjs belongs on the Cloudflare *build
+          #    command*, which Workers Builds runs for production and
+          #    non-production branches alike. Attached to the production
+          #    DEPLOY command instead it still works — for production — and
+          #    every preview keeps shipping ~16x the bytes, which is exactly
+          #    the state found on 2026-08-26: production 0.16 GB, all six
+          #    preview folders 2.52 GB, 12.6 GB of the bucket. Nothing looked
+          #    wrong from any other angle, because
+          #    lib/cache/brotliR2IncrementalCache.ts reads raw entries by
+          #    design and previews served fine throughout.
+          #
+          #    So the report is per folder and the warning fires on ANY raw
+          #    build, not just production's: production is the one that would
+          #    have been compressed under either mistake, i.e. the one that
+          #    hides this.
           remaining=0; raw_folders=0; raw_bytes=0
           for folder in "${folders[@]}"; do
             [[ -n "${folder_gone[$folder]+set}" ]] && continue
@@ -703,10 +716,7 @@ jobs:
             raw_folders=$((raw_folders+1)); raw_bytes=$((raw_bytes + ${folder_bytes[$folder]:-0}))
           done
           if (( raw_folders > 0 )); then
-            echo "Uncompressed builds: $raw_folders of $remaining retained folders hold $(gb "$raw_bytes") GB of raw JSON; brotli (~16x, scripts/compress-cache.mjs) would leave about $(gb "$((raw_bytes / 16))") GB."
-          fi
-          if [[ "${folder_format[$prod_folder]:-}" == "raw" ]]; then
-            echo "::warning::The live production build ${prod_id:0:12} was populated WITHOUT scripts/compress-cache.mjs — its cache is $(gb "${folder_bytes[$prod_folder]:-0}") GB where brotli would make it about $(gb "$(( ${folder_bytes[$prod_folder]:-0} / 16 ))") GB, and every preview pays the same. Fix it in Cloudflare: Workers -> dataslope -> Settings -> Build -> Build command = 'npx opennextjs-cloudflare build && node scripts/compress-cache.mjs'. See DEVELOPMENT.md, 'Cloudflare Workers Builds configuration'."
+            echo "::warning::${raw_folders} of ${remaining} retained build folders were populated WITHOUT scripts/compress-cache.mjs: $(gb "$raw_bytes") GB of raw JSON where brotli would leave about $(gb "$((raw_bytes / 16))") GB. The live production build is $([[ "${folder_format[$prod_folder]:-}" == "raw" ]] && echo "one of them" || echo "NOT one of them, so this is the preview path only — compression is attached to the production deploy command instead of the build command"). Fix it in Cloudflare: Workers -> dataslope -> Settings -> Build -> Build command = 'npx opennextjs-cloudflare build && node scripts/compress-cache.mjs', which runs on both paths. See DEVELOPMENT.md, 'Cloudflare Workers Builds configuration'."
           fi
 
           # Surface persistent delete failures, but only after every folder

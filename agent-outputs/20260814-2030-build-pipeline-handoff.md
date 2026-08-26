@@ -11,14 +11,22 @@
 > verified in production (see [Where this stands](#where-this-stands)). What remains is **step 4**,
 > the one order-dependent dashboard edit, which is now safe to make.
 
-> **Status, 2026-08-26 — step 4 is still not made, and it is the entire reason the R2 bucket is
-> ~15 GB.** Every deploy since 2026-08-15 has populated raw JSON: the cleanup job measured a build
-> folder from that morning at **2.52 GB**, against the ~0.16 GB compression produces. Eight retained
-> folders, ~2.5 GB each. The reader's raw fallback is why eleven days of this looked like nothing at
-> all — the site served, the builds were green, and the retention job was pruning correctly the
-> whole time. Nothing in the repo can apply this edit; the cleanup run log now reports each folder's
-> size and format and warns when production is uncompressed, so the next lapse is visible in two
-> hours rather than eleven days.
+> **Status, 2026-08-26 — step 4 landed on the wrong field, and that is why the R2 bucket is
+> ~15 GB.** Measured from the bucket: live production **0.16 GB, brotli**; `main`'s head **0.16 GB,
+> brotli**; all six preview builds **2.51–2.53 GB, raw JSON** — 12.6 GB of the bucket. Workers
+> Builds runs one build command for production and non-production branches alike and varies only
+> the deploy command, so compression can only be attached to the **production deploy command**
+> instead of the **build command** this step names. Production has been fine since 2026-08-15;
+> nothing has ever compressed a preview.
+>
+> **The fix is to move `&& node scripts/compress-cache.mjs` onto the Build command**, where it
+> covers both paths. Everything in step 4 below still applies — including the ordering rule, which
+> is now moot in the safe direction since the reader has been deployed for eleven days.
+>
+> Why it went unnoticed for eleven days: the reader accepts raw entries, so previews served
+> normally, builds stayed green, and the retention job pruned correctly throughout. Size was the
+> only symptom and nothing read it. The cleanup run log now prints every folder's size and format
+> and warns on any raw build, so the next lapse surfaces within two hours.
 
 ---
 
@@ -55,8 +63,9 @@ workerd. The `51400985` bug is fixed in production, not just locally.
 
 The live Worker is currently reading **uncompressed** entries through the raw-JSON fallback, since
 the build command has not been changed yet. That is the fallback doing its job, and incidental
-proof that path works. *(Still true on 2026-08-26 — see the status note at the top. The fallback has
-now proved itself over eleven days and ~15 GB.)*
+proof that path works. *(As of 2026-08-26 production reads compressed entries and every preview
+still reads raw ones — see the status note at the top. The fallback has now proved itself over
+eleven days and ~15 GB.)*
 
 **Still to do: step 4 only** — add `&& node scripts/compress-cache.mjs` to the build command. The
 merged code is on `main`, so it is safe now.
