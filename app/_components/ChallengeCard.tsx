@@ -18,7 +18,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { createPortal } from "react-dom";
-import { RotateCcw, Check, CheckCheck, ListChecks, ListX, X, ChevronDown, ChevronUp, Eye, File, FileInput, Info, Play, Terminal } from "lucide-react";
+import { RotateCcw, Check, CheckCheck, ListChecks, ListX, X, ChevronDown, ChevronRight, ChevronUp, Eye, File, FileInput, Info, Play, Terminal } from "lucide-react";
 import { Menu } from "@base-ui/react/menu";
 import {
   CopyIcon,
@@ -1108,6 +1108,7 @@ export default function ChallengeCard({
       reportPrepare,
       resetPrepare,
       tailwind,
+      hasStdin,
     ],
   );
 
@@ -1746,7 +1747,7 @@ export default function ChallengeCard({
                 }`}
                 aria-hidden
               >
-                ▶
+                <ChevronRight size={13} strokeWidth={2} />
               </span>
               <span className={styles.initLabel}>
                 Initialization code ({adapter.runtimeInfo.language})
@@ -1825,7 +1826,7 @@ export default function ChallengeCard({
               }`}
               aria-hidden
             >
-              ▶
+              <ChevronRight size={13} strokeWidth={2} />
             </span>
             <span className={styles.stdinLabel}>STDIN</span>
             <span className={styles.stdinHint}>

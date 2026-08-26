@@ -10,7 +10,16 @@ import {
   useSyncExternalStore,
 } from "react";
 import { flushSync } from "react-dom";
-import { ChevronDown, ChevronUp, File, Info, Lock, Play, RotateCcw } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  ChevronUp,
+  File,
+  Info,
+  Lock,
+  Play,
+  RotateCcw,
+} from "lucide-react";
 import { Popover } from "@base-ui/react/popover";
 import { Toast } from "@base-ui/react/toast";
 import {
@@ -1537,7 +1546,7 @@ function CodeBlockInner({
                 }`}
                 aria-hidden
               >
-                ▶
+                <ChevronRight size={13} strokeWidth={2} />
               </span>
               <span className={challengeStyles.initLabel}>
                 Initialization code ({adapter.runtimeInfo.language})
@@ -1632,7 +1641,7 @@ function CodeBlockInner({
               }`}
               aria-hidden
             >
-              ▶
+              <ChevronRight size={13} strokeWidth={2} />
             </span>
             <span className={challengeStyles.stdinLabel}>STDIN</span>
             <span className={challengeStyles.stdinHint}>
