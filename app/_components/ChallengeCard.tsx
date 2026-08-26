@@ -895,8 +895,16 @@ export default function ChallengeCard({
       // their source: some runtimes (CheerpJ/Java, .NET/C#) compile the
       // staged file set and, with no `entryFilename`, then can't locate
       // `main`. Staging only dataset files is safe (non-source is ignored).
+      //
+      // A stdin-capable adapter always stages, with nothing to stage if that
+      // is all there is. Cards have no STDIN panel of their own, but they
+      // share a runtime with the `<CodeBlock>`s on the same page, and the
+      // staged file set lives on the runtime: without this call a card below
+      // a stdin block grades the learner against that block's input.
       if (
-        (isMultiFile || datasetFiles.length > 0) &&
+        (isMultiFile ||
+          datasetFiles.length > 0 ||
+          adapter.supportsStdin === true) &&
         runtime.prepareFileSystem
       ) {
         const fileMap = new Map<string, Uint8Array>();

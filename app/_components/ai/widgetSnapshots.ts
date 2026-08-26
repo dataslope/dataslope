@@ -71,6 +71,8 @@ export function describeChallenge(args: {
 export function describeCodeBlock(args: {
   files: SnapshotFile[];
   outputs?: string[];
+  /** Contents of the block's STDIN panel, when it has one. */
+  stdin?: string;
 }): string {
   const parts: string[] = [];
   for (const f of args.files) {
@@ -80,6 +82,11 @@ export function describeCodeBlock(args: {
       );
     }
     parts.push(`User's current code in \`${f.filename}\`:\n${fence(f.code)}`);
+  }
+  // An empty panel still gets reported: "the program is being handed no
+  // input" is the answer to half the questions a stdin block provokes.
+  if (args.stdin !== undefined) {
+    parts.push(`Standard input fed to the program:\n${fence(args.stdin)}`);
   }
   const output = (args.outputs ?? []).filter(Boolean).join("\n");
   if (output.trim()) {

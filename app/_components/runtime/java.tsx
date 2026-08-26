@@ -783,6 +783,8 @@ export const javaAdapter: LanguageAdapter = {
   coldDownloadMB: 30,
   // Compiles (javac) on every run, so later runs are faster, not instant.
   compiled: true,
+  // `stdin.txt` staged into /str/ and opened as System.in by the launcher.
+  supportsStdin: true,
   // clang-format LLVM style (see formatCode), keep in sync.
   indentWidth: 2,
   examples: EXAMPLES,

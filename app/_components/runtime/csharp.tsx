@@ -599,6 +599,8 @@ export const csharpAdapter: LanguageAdapter = {
   coldDownloadMB: 35,
   // Compiles (Roslyn) on every run, so later runs are faster, not instant.
   compiled: true,
+  // `stdin.txt` read by the composed program's Console.ReadLine shim.
+  supportsStdin: true,
   // clang-format Microsoft style (see formatCode), keep in sync.
   indentWidth: 4,
   examples: EXAMPLES,

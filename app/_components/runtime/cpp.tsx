@@ -524,6 +524,8 @@ export const cppAdapter: LanguageAdapter = {
   coldDownloadMB: 45,
   // Compiles (clang) on every run, so later runs are faster, not instant.
   compiled: true,
+  // `stdin.txt` staged into the WASI shim's fd 0 (browserccRuntime).
+  supportsStdin: true,
   // clang-format LLVM style (see formatCode), keep in sync.
   indentWidth: 2,
   examples: EXAMPLES,

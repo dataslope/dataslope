@@ -283,9 +283,14 @@ async function createCppRunner(adapter) {
   }
 
   /** Instantiate and run a compiled WASI module, mirroring `runWasiModule` in
-   *  runtime/browsercc.ts: empty stdin, captured stdout/stderr, and a
-   *  `WASIProcExit`-shaped throw treated as an exit code, not a crash. */
-  async function runWasi(module) {
+   *  runtime/browsercc.ts: the block's stdin on fd 0, captured stdout/stderr,
+   *  and a `WASIProcExit`-shaped throw treated as an exit code, not a crash.
+   *
+   *  `stdin` is the block's STDIN panel. A panel the reader can edit means
+   *  the recorded panel and a real Run only agree while both are fed the
+   *  same bytes, and a prepopulated output that disagrees with Run is worse
+   *  than none — nothing tells the reader which one to believe. */
+  async function runWasi(module, stdin = "") {
     const decoder = new TextDecoder("utf-8");
     let stdout = "";
     let stderr = "";
@@ -293,7 +298,7 @@ async function createCppRunner(adapter) {
       [],
       [],
       [
-        new shim.OpenFile(new shim.File(new Uint8Array(0))),
+        new shim.OpenFile(new shim.File(new TextEncoder().encode(stdin))),
         new shim.ConsoleStdout((d) => {
           stdout += decoder.decode(d, { stream: true });
         }),
@@ -363,7 +368,10 @@ async function createCppRunner(adapter) {
         const trimmedDiag = String(compileOutput ?? "").replace(/\n+$/, "");
         if (trimmedDiag) cells.push({ type: "stderr", content: trimmedDiag });
         if (!module) return cells;
-        const { stdout, stderr, exitCode, crash } = await runWasi(module);
+        const { stdout, stderr, exitCode, crash } = await runWasi(
+          module,
+          block.stdin ?? "",
+        );
         if (crash) {
           cells.push({ type: "stderr", content: crash });
           return cells;

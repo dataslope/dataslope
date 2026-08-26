@@ -342,6 +342,10 @@ export function extractBlocks(root = CONTENT_DIR, adapter = "python") {
       files,
       entry: entry.filename,
       expectError: propFlag(raw, "expectError"),
+      // The block's STDIN panel, or undefined where it has none. `undefined`
+      // and `""` are different blocks to `blockOutputKey`, so the absent case
+      // must not collapse into the empty one.
+      stdin: propText(raw, "stdin"),
       // What Run executes: the hidden setup, then the visible buffer.
       code: `${entry.initCode ? `${entry.initCode}\n` : ""}${entry.starterCode}`,
     });

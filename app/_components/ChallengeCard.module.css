@@ -1027,6 +1027,121 @@
   background: var(--ch-accent);
 }
 
+/* ─── STDIN panel ─────────────────────────────────────────────────── */
+/* The editable standard-input drawer `<CodeBlock>` renders under the editor
+   for adapters whose runtime can be fed one (`supportsStdin`). Deliberately
+   quieter than the editor above it: a top border rather than the init
+   panel's diagonal stripes, since this is the same reader's own text, not a
+   read-only region they are being kept out of. */
+
+.stdinWrap {
+  border-top: 1px solid var(--ch-border-light);
+  background: var(--ch-bg);
+}
+
+.stdinToggle {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 14px;
+  background: var(--ch-bg);
+  border: none;
+  color: var(--ds-gray-700);
+  font-family: var(--ch-font-ui);
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.stdinToggle:hover {
+  color: var(--ds-gray-900);
+  background: var(--ch-bg-hover);
+}
+
+.stdinLabel {
+  flex-shrink: 0;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ds-gray-700);
+}
+
+/* The hint is the whole explanation of the feature, so it must survive a
+   phone: it truncates rather than wrapping the label onto a second line. */
+.stdinHint {
+  flex: 1;
+  min-width: 0;
+  color: var(--ch-text-muted);
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stdinEditorWrap {
+  background: var(--ch-bg);
+  transition: max-height 0.18s ease;
+}
+
+.stdinEditorWrapCollapsed {
+  max-height: 0;
+  overflow: hidden;
+}
+
+.stdinEditorWrapOpen {
+  max-height: 240px;
+  overflow: visible;
+}
+
+.stdinEditor {
+  background: var(--ch-bg);
+  border-top: 1px solid var(--ch-border-light);
+}
+
+.stdinEditor :global(.cm-editor) {
+  height: auto;
+  min-height: 30px;
+  max-height: 200px;
+  font-family: var(--ch-font-mono);
+  font-size: 14px;
+  line-height: 1.7;
+  font-variant-ligatures: none;
+}
+
+.stdinEditor :global(.cm-editor.cm-focused),
+.stdinEditor :global(.cm-editor) {
+  outline: none;
+}
+
+/* CM scroller layout + thin scrollbar, matching `.editor` / `.initEditor`
+   (see the grouped rules above; this one is separate because the panel is
+   added after them). */
+.stdinEditor :global(.cm-editor .cm-scroller) {
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ch-border) transparent;
+}
+
+.stdinEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.stdinEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.stdinEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb {
+  background: var(--ch-border);
+  border-radius: 4px;
+}
+
+.stdinEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb:hover {
+  background: var(--ch-text-muted);
+}
+
 /* ─── Action bar ──────────────────────────────────────────────────── */
 
 .actionBar {

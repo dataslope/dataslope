@@ -61,7 +61,12 @@ for (const adapter of adapters) {
     if (block.unparsable || block.expectError) continue;
     const entry = block.files.find((f) => f.filename === block.entry) ?? block.files[0];
     if (!entry) continue;
-    const key = blockOutputKey(adapter, entry.initCode, entry.starterCode);
+    const key = blockOutputKey(
+      adapter,
+      entry.initCode,
+      entry.starterCode,
+      block.stdin,
+    );
     if (!byKey.has(key)) byKey.set(key, []);
     byKey.get(key).push(block.file);
     selected++;

@@ -1171,6 +1171,59 @@ a chart. The JS half of the conversion is *shared* rather than copied
 (`app/_components/runtime/pythonDisplayOutputs.ts`), so only the Python half
 can drift.
 
+### A block that reads stdin gets a STDIN panel
+
+There is no console to type into, so "give this program input" has to mean
+something the page can express. It means a file: every runtime that can be fed
+reads a `stdin.txt` staged through `prepareFileSystem`, and the playground
+surfaces that literally, as a file in the file browser. A lesson block has no
+file browser, so it surfaces the same file as a labelled drawer under the
+editor:
+
+```mdx
+<CodeBlock
+  adapter="c"
+  stdin={`30
+`}
+  files={[{ filename: "main.c", starterCode: `…scanf("%d", &age)…` }]}
+/>
+```
+
+The prop is the switch. Omit it and there is no panel, which is the right
+answer for the ~3,370 blocks that never read a byte of input; pass `""` for an
+empty box the reader fills in themselves. It is editable and it persists, like
+any other buffer in the block, and Reset restores the authored text along with
+the code.
+
+Four things hold this together, and three of them are silent when they break.
+
+- **`LanguageAdapter.supportsStdin` gates the panel**, and only c, cpp, java
+  and csharp set it. Those are exactly the runtimes whose `prepareFileSystem`
+  looks for `STDIN_FILENAME`; on any other adapter the prop is ignored rather
+  than honoured, because a box the reader can type into that cannot reach the
+  program is worse than no box. `__tests__/blockStdin.test.ts` asserts the set
+  both ways and sweeps `content/` for the prop on an adapter that lacks it.
+- **The staged file set lives on the runtime, not on the block**, and every
+  block of one language shares a runtime. So a stdin-capable adapter stages on
+  *every* run, with an empty map when there is nothing to stage: that call is
+  how a block without stdin drops the input the block above it left behind.
+  `<ChallengeCard>` does the same, for the same reason — it has no panel of its
+  own, but it is downstream of the blocks on its page and would otherwise grade
+  a learner against one of their inputs.
+- **`blockOutputKey` takes the stdin**, because one program prints different
+  things for different input and a prepopulated panel recorded from other
+  bytes is worse than an empty one. It is folded in only when the block
+  declares one, so blocks that predate the panel keep their existing keys —
+  mixing an empty string in unconditionally re-keys the entire manifest and
+  blanks every prepopulated panel on the site until both generators are run
+  again. (The fields are NUL-separated. They look like spaces in an editor.)
+- **The headless mirrors have to be fed too.** `scripts/lib/block-runners.mjs`
+  and `scripts/check-cpp-blocks.mjs` each build their own WASI instance rather
+  than importing the browser's, and both used to hand fd 0 an empty file. A
+  block that reads input then "passes" the sweep by taking the branch a
+  program takes when given nothing, which is the one path the lesson is not
+  about, and records a panel that disagrees with Run.
+
 ### A web block renders itself, without a manifest and without a Run
 
 Every other language shows its result because a generator ran the code at build

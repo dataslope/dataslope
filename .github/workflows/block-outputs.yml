@@ -30,6 +30,7 @@ on:
       - "scripts/lib/python-output-capture.mjs"
       - "scripts/lib/pyodide-runner.mjs"
       - "scripts/lib/block-runners.mjs"
+      - "scripts/lib/mdx-blocks.mjs"
       - "lib/blockOutputKey.ts"
       - "app/_components/runtime/pythonDisplayOutputs.ts"
       - "package-lock.json"
