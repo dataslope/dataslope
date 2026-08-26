@@ -11,22 +11,23 @@
 > verified in production (see [Where this stands](#where-this-stands)). What remains is **step 4**,
 > the one order-dependent dashboard edit, which is now safe to make.
 
-> **Status, 2026-08-26 — step 4 landed on the wrong field, and that is why the R2 bucket is
-> ~15 GB.** Measured from the bucket: live production **0.16 GB, brotli**; `main`'s head **0.16 GB,
-> brotli**; all six preview builds **2.51–2.53 GB, raw JSON** — 12.6 GB of the bucket. Workers
-> Builds runs one build command for production and non-production branches alike and varies only
-> the deploy command, so compression can only be attached to the **production deploy command**
-> instead of the **build command** this step names. Production has been fine since 2026-08-15;
-> nothing has ever compressed a preview.
+> **Status, 2026-08-26 — step 4 is applied, and it is not enough.** The build command carries
+> `&& node scripts/compress-cache.mjs`, and production is compressed: live production **0.16 GB,
+> brotli**, `main`'s head **0.16 GB, brotli**. But all six preview builds measure **2.51–2.53 GB of
+> raw JSON** — 12.6 GB of a 15.44 GB bucket. Workers Builds runs one build command for both, so
+> compression is reaching the preview path and being discarded before its populate.
 >
-> **The fix is to move `&& node scripts/compress-cache.mjs` onto the Build command**, where it
-> covers both paths. Everything in step 4 below still applies — including the ordering rule, which
-> is now moot in the safe direction since the reader has been deployed for eleven days.
+> One mechanism does that. `deploy` and `upload` both stream `.open-next/cache` byte-for-byte and
+> neither rebuilds; `opennextjs-cloudflare build` wipes `.open-next` (`initOutputDir`) and
+> regenerates the cache raw. **A non-production branch deploy command that begins with a second
+> `opennextjs-cloudflare build` reproduces this split exactly** — check that field. It must stay a
+> bare `npx opennextjs-cloudflare upload --cacheChunkSize 100`, or re-run `compress-cache` after
+> whatever rebuild it does.
 >
 > Why it went unnoticed for eleven days: the reader accepts raw entries, so previews served
 > normally, builds stayed green, and the retention job pruned correctly throughout. Size was the
-> only symptom and nothing read it. The cleanup run log now prints every folder's size and format
-> and warns on any raw build, so the next lapse surfaces within two hours.
+> only symptom and nothing read it. The cleanup run log now prints every folder's size, format and
+> populate time and warns on any raw build, so the next lapse surfaces within two hours.
 
 ---
 
@@ -65,7 +66,7 @@ The live Worker is currently reading **uncompressed** entries through the raw-JS
 the build command has not been changed yet. That is the fallback doing its job, and incidental
 proof that path works. *(As of 2026-08-26 production reads compressed entries and every preview
 still reads raw ones — see the status note at the top. The fallback has now proved itself over
-eleven days and ~15 GB.)*
+eleven days and ~15 GB, on the path nobody was watching.)*
 
 **Still to do: step 4 only** — add `&& node scripts/compress-cache.mjs` to the build command. The
 merged code is on `main`, so it is safe now.

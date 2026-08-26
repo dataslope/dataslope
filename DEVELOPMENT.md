@@ -46,7 +46,7 @@ Production and preview deploys run through Cloudflare Workers Builds rather than
 
 | Field | Value |
 | --- | --- |
-| Build command | `npx opennextjs-cloudflare build && node scripts/compress-cache.mjs` ⚠️ **see below — the second half is not on this field today** |
+| Build command | `npx opennextjs-cloudflare build && node scripts/compress-cache.mjs` |
 | Deploy command | `npx opennextjs-cloudflare deploy --cacheChunkSize 100 && npm run db:seed:search:remote` |
 | Version command *(the dashboard's label for the non-production branch deploy)* | `npx opennextjs-cloudflare upload --cacheChunkSize 100` |
 | Path | `/` |
@@ -64,7 +64,7 @@ Both `deploy` (production) and `upload` (preview versions) populate the R2 cache
 
 It is safe to forget. The reader accepts uncompressed entries too, so a deploy that skips this step ships a cache that is merely as large as it used to be, rather than a site that 500s — see the note in `brotliR2IncrementalCache.ts` for why that fallback is load-bearing rather than defensive clutter. Running it twice is a no-op.
 
-**Which field it goes on is the whole point, and it is currently the wrong one.** Measured 2026-08-26, straight out of the bucket:
+**Setting it is necessary and not sufficient — something downstream can undo it.** Measured 2026-08-26 straight out of the bucket, with the build command above set correctly:
 
 | Build folder | Size | Format |
 | --- | ---: | --- |
@@ -72,13 +72,15 @@ It is safe to forget. The reader accepts uncompressed entries too, so a deploy t
 | `main` head (production's incoming build) | 0.16 GB | brotli |
 | all six preview builds | 2.51–2.53 GB each | **raw JSON** |
 
-Production compresses; no preview does. Workers Builds runs **one** build command for production and non-production branches alike and varies only the *deploy* command ([Build branches](https://developers.cloudflare.com/workers/ci-cd/builds/build-branches/)), so a split like that can only mean `compress-cache` is attached to the **production deploy command** rather than to the build command. It has been that way since the code merged on 2026-08-15: 12.6 GB of the ~15 GB bucket is six preview builds shipping ~16× the bytes they need to.
+Production compresses; no preview does — 12.6 GB of a 15.44 GB bucket. Workers Builds runs **one** build command for production and non-production branches alike and varies only the *deploy* command ([Build branches](https://developers.cloudflare.com/workers/ci-cd/builds/build-branches/)), so the compression is reaching the preview path and being thrown away again before its populate.
 
-Moving it to the **build command** fixes both paths at once, which is why it belongs there and not on either deploy command. (Prepending it to the Version command as well would also work, and leaves two places to forget instead of none.)
+There is one mechanism that does that. `deploy` and `upload` are the same code as far as the cache goes: both stream `.open-next/cache` to R2 byte-for-byte and **neither rebuilds**. `opennextjs-cloudflare build`, by contrast, *wipes* `.open-next` (`initOutputDir`) and regenerates the cache assets as fresh raw JSON. So a second `opennextjs-cloudflare build` on one path only — a **non-production branch deploy command** that begins with one — reproduces this split exactly: production ships what the build command compressed, previews ship a regenerated raw copy.
+
+**The Version command must therefore not rebuild.** Keep it at `npx opennextjs-cloudflare upload --cacheChunkSize 100`; if it has to rebuild for some other reason, it must re-run `node scripts/compress-cache.mjs` after doing so.
 
 Nothing looked wrong from any other angle, and that is the fallback working as designed: previews served fine, builds were green, and the retention job was pruning correctly the whole time. Size was the only symptom, and nothing was reading it. Two ways to check without opening the dashboard:
 
-- **The cleanup run log** (`.github/workflows/r2-cache-cleanup.yml`, every 2 h) prints every build folder's size and format — `2.52 GB, UNCOMPRESSED` versus `0.16 GB, brotli` — and warns when any retained build is raw, naming whether production is among them.
+- **The cleanup run log** (`.github/workflows/r2-cache-cleanup.yml`, every 2 h) prints every build folder's size, format and populate time — `2.52 GB, UNCOMPRESSED, populated …` versus `0.16 GB, brotli, populated …` — and warns when any retained build is raw. Whether production is among them is the fork in the diagnosis: if it is, suspect the build command; if it is not, suspect the non-production branch deploy command, because production is the build that stays correct under the failure above.
 - **The build log** says `[compress-cache] N compressed … 2.340 GiB → 0.147 GiB` when the step ran. No such line means it did not.
 
 **`--cacheChunkSize` is how many cache objects are written to R2 at once, and the default is 25.** That default is not sized for this cache: the populate step ships **1,081 objects / 2.34 GiB on every deploy, production and every preview** (see [Incremental cache cleanup](#incremental-cache-cleanup) for why a full copy goes up each time), and at 25 in flight that is 44 sequential rounds of ~2.2 MB uploads. Both commands accept the flag — it is declared on `deploy` and `upload` alike, and OpenNext's arg parser consumes it rather than forwarding it to `wrangler`, so it cannot confuse the deploy underneath.
@@ -109,7 +111,7 @@ bucket ≈ (build folders retained) × (bytes per build)
              ↑ the cleanup job below      ↑ the build command above
 ```
 
-**Bytes per build is ~2.34 GiB raw, or ~0.147 GiB once `compress-cache` has run** — a 16× difference that no amount of retention tuning can substitute for. The 15 GB the bucket sat at through August was 8 retained folders (correct) of which 6 were uncompressed previews (not correct): a build-configuration problem wearing a retention problem's clothes. The cleanup log now prints the size and format of every folder, so the next one is diagnosed from the run log rather than by guessing at the dashboard.
+**Bytes per build is ~2.34 GiB raw, or ~0.147 GiB once `compress-cache` has run** — a 16× difference that no amount of retention tuning can substitute for. The 15 GB the bucket sat at through August was 8 retained folders (correct) of which 6 were uncompressed previews (not correct): a build-configuration problem wearing a retention problem's clothes. The cleanup log now prints every folder's size, format and populate time, so the next one is diagnosed from the run log rather than by guessing at the dashboard.
 
 A scheduled GitHub Action (`.github/workflows/r2-cache-cleanup.yml`) prunes it every 2 hours. It works because the build ID is the deployed commit SHA — `next.config.ts` sets `generateBuildId` to `WORKERS_CI_COMMIT_SHA` on Workers Builds — so a cache folder's name is the commit it was built from, and every folder can be matched against a live deployment.
 
