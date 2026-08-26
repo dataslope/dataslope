@@ -701,7 +701,8 @@
 }
 
 .editor :global(.cm-editor .cm-scroller),
-.initEditor :global(.cm-editor .cm-scroller) {
+.initEditor :global(.cm-editor .cm-scroller),
+.stdinEditor :global(.cm-editor .cm-scroller) {
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
@@ -711,24 +712,28 @@
 }
 
 .editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar,
-.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar {
+.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar,
+.stdinEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 .editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-track,
-.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-track {
+.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-track,
+.stdinEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-track {
   background: transparent;
 }
 
 .editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb,
-.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb {
+.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb,
+.stdinEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb {
   background: var(--ch-scrollbar-thumb);
   border-radius: 3px;
 }
 
 .editor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb:hover,
-.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb:hover {
+.initEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb:hover,
+.stdinEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb:hover {
   background: var(--ch-scrollbar-thumb-hover);
 }
 
@@ -1047,7 +1052,7 @@
   padding: 6px 14px;
   background: var(--ch-bg);
   border: none;
-  color: var(--ds-gray-700);
+  color: var(--ch-text-secondary);
   font-family: var(--ch-font-ui);
   font-size: 12px;
   cursor: pointer;
@@ -1055,17 +1060,25 @@
 }
 
 .stdinToggle:hover {
-  color: var(--ds-gray-900);
+  color: var(--ch-text);
   background: var(--ch-bg-hover);
 }
 
+/* A semantic alias, not one of the fixed `--ds-gray-*` brand tokens: those
+   do not flip with the color scheme, and #374151 on the near-black dark
+   surface was unreadable. The init panel next door gets away with them only
+   because it carries a matching set of dark-mode overrides at the bottom of
+   this file; one alias is correct in both schemes. Secondary rather than
+   `--ch-text`, so an 11px uppercase label reads as a section marker instead
+   of competing with the code above it, and it keeps a step of hierarchy
+   above the muted hint beside it. */
 .stdinLabel {
   flex-shrink: 0;
   font-weight: 600;
   font-size: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--ds-gray-700);
+  color: var(--ch-text-secondary);
 }
 
 /* Truncates rather than wrapping the label onto a second line, so a narrow
@@ -1114,33 +1127,6 @@
 .stdinEditor :global(.cm-editor.cm-focused),
 .stdinEditor :global(.cm-editor) {
   outline: none;
-}
-
-/* CM scroller layout + thin scrollbar, matching `.editor` / `.initEditor`
-   (see the grouped rules above; this one is separate because the panel is
-   added after them). */
-.stdinEditor :global(.cm-editor .cm-scroller) {
-  overflow: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--ch-border) transparent;
-}
-
-.stdinEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.stdinEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.stdinEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb {
-  background: var(--ch-border);
-  border-radius: 4px;
-}
-
-.stdinEditor :global(.cm-editor .cm-scroller)::-webkit-scrollbar-thumb:hover {
-  background: var(--ch-text-muted);
 }
 
 /* ─── Action bar ──────────────────────────────────────────────────── */
@@ -2350,7 +2336,9 @@
 :global(html:is(.dark, [data-theme="dark"])) .initEditor :global(.cm-editor),
 :global(html:is(.dark, [data-theme="dark"])) .initEditor :global(.cm-scroller),
 :global(html:is(.dark, [data-theme="dark"])) .modalEditor :global(.cm-editor),
-:global(html:is(.dark, [data-theme="dark"])) .modalEditor :global(.cm-scroller) {
+:global(html:is(.dark, [data-theme="dark"])) .modalEditor :global(.cm-scroller),
+:global(html:is(.dark, [data-theme="dark"])) .stdinEditor :global(.cm-editor),
+:global(html:is(.dark, [data-theme="dark"])) .stdinEditor :global(.cm-scroller) {
   background-color: var(--ch-bg) !important;
 }
 
