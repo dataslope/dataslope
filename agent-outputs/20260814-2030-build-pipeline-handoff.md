@@ -11,6 +11,15 @@
 > verified in production (see [Where this stands](#where-this-stands)). What remains is **step 4**,
 > the one order-dependent dashboard edit, which is now safe to make.
 
+> **Status, 2026-08-26 — step 4 is still not made, and it is the entire reason the R2 bucket is
+> ~15 GB.** Every deploy since 2026-08-15 has populated raw JSON: the cleanup job measured a build
+> folder from that morning at **2.52 GB**, against the ~0.16 GB compression produces. Eight retained
+> folders, ~2.5 GB each. The reader's raw fallback is why eleven days of this looked like nothing at
+> all — the site served, the builds were green, and the retention job was pruning correctly the
+> whole time. Nothing in the repo can apply this edit; the cleanup run log now reports each folder's
+> size and format and warns when production is uncompressed, so the next lapse is visible in two
+> hours rather than eleven days.
+
 ---
 
 ## TL;DR
@@ -46,7 +55,8 @@ workerd. The `51400985` bug is fixed in production, not just locally.
 
 The live Worker is currently reading **uncompressed** entries through the raw-JSON fallback, since
 the build command has not been changed yet. That is the fallback doing its job, and incidental
-proof that path works.
+proof that path works. *(Still true on 2026-08-26 — see the status note at the top. The fallback has
+now proved itself over eleven days and ~15 GB.)*
 
 **Still to do: step 4 only** — add `&& node scripts/compress-cache.mjs` to the build command. The
 merged code is on `main`, so it is safe now.
