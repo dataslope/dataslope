@@ -5862,18 +5862,6 @@ html[data-playground-theme="dark"] {
 .run-cell-content .out-seg-log {
   color: var(--text-dim);
 }
-.run-history-empty {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--text-dim);
-  text-align: center;
-}
-
 /* Mid-run wait notice (e.g. "Installing data packages, first run only…"),
    pinned above the run blocks while a run is blocked on something that
    isn't the user's code. */
