@@ -1214,6 +1214,15 @@ body.playground-active {
 .playground-run-multi-item:hover {
   background: var(--menu-item-hover);
 }
+/* An entry whose file is blank: `runCode` has nothing to execute, so the row
+   stays visible (it still says which file is empty) but reads as inert. */
+.playground-run-multi-item[data-disabled] {
+  opacity: 0.5;
+  cursor: default;
+}
+.playground-run-multi-item[data-disabled]:hover {
+  background: transparent;
+}
 .playground-run-multi-item-label {
   flex: 1 1 auto;
 }
