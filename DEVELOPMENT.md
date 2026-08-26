@@ -66,13 +66,17 @@ It is safe to forget. The reader accepts uncompressed entries too, so a deploy t
 
 **Setting it is necessary and not sufficient — something downstream can undo it.** Measured 2026-08-26 straight out of the bucket, with the build command above set correctly:
 
-| Build folder | Size | Format |
-| --- | ---: | --- |
-| live production | 0.16 GB | brotli |
-| `main` head (production's incoming build) | 0.16 GB | brotli |
-| all six preview builds | 2.51–2.53 GB each | **raw JSON** |
+| Build folder | Populated | Size | Format |
+| --- | --- | ---: | --- |
+| production | 2026-08-26 11:14 | 0.16 GB | brotli |
+| production (previous) | 2026-08-24 18:22 | 0.16 GB | brotli |
+| `main` head | 2026-08-24 18:21 | 0.16 GB | brotli |
+| preview | 2026-08-26 09:57 | 2.52 GB | **raw JSON** |
+| preview | 2026-08-26 09:39 | 2.52 GB | **raw JSON** |
+| preview | 2026-08-25 17:20 | 2.53 GB | **raw JSON** |
+| preview ×3 | 2026-08-24 14:06–15:05 | 2.51–2.52 GB | **raw JSON** |
 
-Production compresses; no preview does — 12.6 GB of a 15.44 GB bucket. Workers Builds runs **one** build command for production and non-production branches alike and varies only the *deploy* command ([Build branches](https://developers.cloudflare.com/workers/ci-cd/builds/build-branches/)), so the compression is reaching the preview path and being thrown away again before its populate.
+Read the dates as well as the sizes: production compresses on 08-24 *and* on 08-26, previews compress on neither, and the two interleave through the same afternoon. This splits by **path**, not by timeline — it is not a setting that was changed part-way through. Workers Builds runs **one** build command for production and non-production branches alike and varies only the *deploy* command ([Build branches](https://developers.cloudflare.com/workers/ci-cd/builds/build-branches/)), so the compression is reaching the preview path and being thrown away again before its populate.
 
 There is one mechanism that does that. `deploy` and `upload` are the same code as far as the cache goes: both stream `.open-next/cache` to R2 byte-for-byte and **neither rebuilds**. `opennextjs-cloudflare build`, by contrast, *wipes* `.open-next` (`initOutputDir`) and regenerates the cache assets as fresh raw JSON. So a second `opennextjs-cloudflare build` on one path only — a **non-production branch deploy command** that begins with one — reproduces this split exactly: production ships what the build command compressed, previews ship a regenerated raw copy.
 
