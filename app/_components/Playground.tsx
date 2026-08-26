@@ -248,6 +248,8 @@ interface RunDropdownItem {
   label: ReactNode;
   /** Workspace path of the file to execute when this item is clicked. */
   entryFilename: string;
+  /** The file this item would run is blank, so running it does nothing. */
+  disabled: boolean;
 }
 
 /** Result of `computeRunButtonState`; drives the Run button UI. */
@@ -261,18 +263,67 @@ interface RunButtonState {
   /** Items rendered in the chevron dropdown. Empty array → hide
    *  chevron. */
   dropdownItems: RunDropdownItem[];
+  /** False when the file the primary button would execute is blank.
+   *  `runCode` bails on empty source, so the button would otherwise be a
+   *  live control that does nothing. */
+  canRun: boolean;
 }
 
-/** Resolve the Run button's label, primary action, and chevron items.
- *  Adapters with `findEntryFiles` (C/C++/Java/C#) have multiple entry
- *  points; the rest run any file, with the canonical default in the
- *  dropdown. */
+/** `resolveRunTargets`' answer: which file each Run affordance points at,
+ *  before `computeRunButtonState` works out which of them have anything to
+ *  execute. */
+type RunTargets = Omit<RunButtonState, "dropdownItems" | "canRun"> & {
+  dropdownItems: Omit<RunDropdownItem, "disabled">[];
+};
+
+/** The workspace file a run reads its source from. An entry override names
+ *  its own file; everything else executes the active tab, which is what the
+ *  editor holds. Mirrors the resolution `runCode` does for itself. */
+function runSourceFilename(
+  entry: string | null,
+  activeFilename: string | null,
+): string | null {
+  if (entry !== null && entry !== activeFilename) return entry;
+  return activeFilename;
+}
+
+/** Resolve the Run button's label, primary action, and chevron items, then
+ *  mark the targets with nothing to run. Adapters with `findEntryFiles`
+ *  (C/C++/Java/C#) have multiple entry points; the rest run any file, with
+ *  the canonical default in the dropdown. */
 function computeRunButtonState(
   adapter: LanguageAdapter,
   files: PlaygroundFile[],
   activeFileId: string,
   fileContents: Map<string, string>,
 ): RunButtonState {
+  const targets = resolveRunTargets(adapter, files, activeFileId, fileContents);
+  const activeFilename =
+    files.find((f) => f.id === activeFileId)?.filename ?? null;
+  // A target the workspace has no file for counts as blank as well: that is
+  // what `runCode` resolves it to, and it bails on the empty string.
+  const blank = (entry: string | null): boolean => {
+    const source = runSourceFilename(entry, activeFilename);
+    return source === null || (fileContents.get(source) ?? "").trim() === "";
+  };
+  return {
+    ...targets,
+    canRun: !blank(targets.primaryEntry),
+    dropdownItems: targets.dropdownItems.map((item) => ({
+      ...item,
+      disabled: blank(item.entryFilename),
+    })),
+  };
+}
+
+/** Which file each Run affordance points at, and how it is labelled. Knows
+ *  nothing about whether those files hold anything. */
+function resolveRunTargets(
+  adapter: LanguageAdapter,
+  files: PlaygroundFile[],
+  activeFileId: string,
+  fileContents: Map<string, string>,
+): RunTargets {
   const stemFor = adapter.entryLabel ?? entryStem;
   const activeFile = files.find((f) => f.id === activeFileId) ?? null;
   const primary = primaryEntryFilename(adapter);
@@ -630,6 +681,11 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
    *  install), so a multi-second pause explains itself instead of looking
    *  like a slow program. */
   const [runStatusMessage, setRunStatusMessage] = useState<string | null>(null);
+  /** The file whose most recent run finished without producing a single
+   *  output cell. Outputs are per-file, so this holds an id rather than a
+   *  flag: the empty output panel only claims success for the stream it is
+   *  actually showing. */
+  const [emptyRunFileId, setEmptyRunFileId] = useState<string | null>(null);
 
   // ─── UI state ───────────────────────────────────────────────────────────
   const [packagesOpen, setPackagesOpen] = useState(false);
@@ -2083,6 +2139,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         errorResetTimerRef.current = null;
       }
       setStatusState("running");
+      setEmptyRunFileId(null);
 
       if (clearBeforeRun) {
         setOutputsForFile(targetFileId, []);
@@ -2265,6 +2322,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         if (cellCount === 0 && !hasPreview) {
           // Preview adapters "output" the page itself; no toast there.
           showToast("Code ran successfully, no output.");
+          setEmptyRunFileId(targetFileId);
         }
         // Keep the running overlay visible long enough for its CSS
         // transition to be perceptible.
@@ -2337,6 +2395,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     // shows the entry file's stream, not the focused pane's).
     const fileId = outputFileIdRef.current ?? activeFileIdRef.current;
     if (fileId) clearOutputsForFile(fileId);
+    setEmptyRunFileId(null);
     // Also tear down the live preview; removing the iframe kills its
     // document immediately.
     if (hasPreview) previewHostRef.current?.replaceChildren();
@@ -3569,10 +3628,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const [dismissedRuns, setDismissedRuns] = useState<ReadonlySet<number>>(
     () => new Set<number>(),
   );
-  const [outputCleared, setOutputCleared] = useState(false);
-  // A fresh run retires the "cleared" note; adjusted during render rather
-  // than in an effect.
-  if (outputCleared && outputs.length > 0) setOutputCleared(false);
   // Height of the preview playgrounds' console strip. A fixed strip is
   // about eight lines, which is thin for the only surface errors appear
   // on; the drag handle is remembered per browser, not per workspace.
@@ -3689,7 +3744,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const clearRunHistory = useCallback(() => {
     clearOutput();
     setDismissedRuns(new Set());
-    setOutputCleared(true);
   }, [clearOutput]);
 
   // ⋯ menu: labelled sections whose items either act directly or slide to
@@ -3981,6 +4035,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     () => buildCapabilitiesBlurb(adapter.outputCapabilities),
     [adapter.outputCapabilities],
   );
+
+  // A finished run that printed nothing leaves the panel empty, which reads
+  // as "nothing happened"; the welcome state says the run succeeded instead
+  // of inviting a run that already happened.
+  const ranWithoutOutput =
+    emptyRunFileId !== null && emptyRunFileId === outputFileId;
 
   // Shared props for the virtual-filesystem panel (desktop side panel and
   // mobile bottom sheet), so file management is reachable on every
@@ -4767,9 +4827,18 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                               type="button"
                               className={`run-btn playground-run-multi-main${statusState === "running" ? " running" : ""}${runButtonState.dropdownItems.length > 0 ? " has-chevron" : ""}`}
                               // `stopping`: the previous run's Stop is still
-                              // standing a fresh interpreter up.
+                              // standing a fresh interpreter up. `canRun`:
+                              // the file this would execute is blank.
                               disabled={
-                                !loaded || statusState === "running" || stopping
+                                !loaded ||
+                                statusState === "running" ||
+                                stopping ||
+                                !runButtonState.canRun
+                              }
+                              title={
+                                runButtonState.canRun
+                                  ? undefined
+                                  : "Nothing to run: the file is empty"
                               }
                               onClick={() => {
                                 void runCode(
@@ -4823,8 +4892,16 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                               {...props}
                               type="button"
                               className={`run-btn playground-run-multi-chevron${statusState === "running" ? " running" : ""}`}
+                              // Reaching a runnable file is exactly what the
+                              // chevron is for when the active one is blank,
+                              // so it closes only when nothing under it runs.
                               disabled={
-                                !loaded || statusState === "running" || stopping
+                                !loaded ||
+                                statusState === "running" ||
+                                stopping ||
+                                runButtonState.dropdownItems.every(
+                                  (item) => item.disabled,
+                                )
                               }
                               aria-label="More run options"
                             >
@@ -4839,6 +4916,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                                 <Menu.Item
                                   key={item.entryFilename}
                                   className="playground-run-multi-item"
+                                  disabled={item.disabled}
                                   onClick={() => {
                                     void runCode(item.entryFilename);
                                   }}
@@ -5228,19 +5306,22 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                       })()}
                     </>
                   ) : outputs.length === 0 && statusState !== "running" ? (
-                    outputCleared ? (
-                      <div className="run-history-empty">
-                        Output cleared. Press Run to start a new history.
+                    <div className="welcome">
+                      <div className="welcome-icon">
+                        <DiamondMark size={40} />
                       </div>
-                    ) : (
-                      <div className="welcome">
-                        <div className="welcome-icon">
-                          <DiamondMark size={40} />
-                        </div>
-                        <h3>Run your code to see output</h3>
-                        {capabilitiesBlurb && <p>{capabilitiesBlurb}</p>}
-                      </div>
-                    )
+                      {ranWithoutOutput ? (
+                        <>
+                          <h3>Code ran successfully</h3>
+                          <p>No output</p>
+                        </>
+                      ) : (
+                        <>
+                          <h3>Run your code to see output</h3>
+                          {capabilitiesBlurb && <p>{capabilitiesBlurb}</p>}
+                        </>
+                      )}
+                    </div>
                   ) : (
                     <>
                       {/* Mid-run wait notice (package installs), so a multi-second
