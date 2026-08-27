@@ -169,13 +169,27 @@ export default function BashBlock({
     void runScript();
   }, [ready, runToken, script.length, runScript]);
 
-  /** Bash prints the candidates when Tab cannot narrow further; the listing is
-   *  scrollback, not a command, so it carries no prompt line. */
-  const listCompletions = useCallback((matches: string[]) => {
+  /**
+   * Whatever the line editor wants in the scrollback: a completion listing, or
+   * the question it asks before a very long one.
+   *
+   * `echo` reprints the line the reader was editing, which is what puts the
+   * listing *below* their command rather than above it. A `null` echo is bare
+   * output, the way bash prints a list after you answer its question.
+   */
+  const write = useCallback(({ echo, text }: { echo: string | null; text: string }) => {
     const id = (entryId.current += 1);
+    if (echo !== null) promptAt.current.set(id, cwdRef.current);
     setTranscript((t) => [
       ...t,
-      { id, command: "", stdout: matches.join("   "), stderr: "", exitCode: 0, note: true },
+      {
+        id,
+        command: echo ?? "",
+        stdout: text,
+        stderr: "",
+        exitCode: 0,
+        note: echo === null,
+      },
     ]);
   }, []);
 
@@ -189,9 +203,12 @@ export default function BashBlock({
    * current directory. Directories keep their trailing slash so completion
    * knows not to finish the word.
    *
-   * `state.tree` holds files, so directories are inferred from the paths
-   * beneath them. Absolute and `..` paths are left alone; a lesson types
-   * relative ones.
+   * Files and directories both count. `state.tree` holds files, so most
+   * directories could be inferred from the paths beneath them, but an empty
+   * one leaves nothing to infer from: `mkdir test` then `cd te<Tab>` only
+   * works because the session reports its directories too.
+   *
+   * Absolute and `..` paths are left alone; a lesson types relative ones.
    */
   const pathCompletions = useCallback(
     (word: string) => {
@@ -203,16 +220,20 @@ export default function BashBlock({
         : "";
       const base = `${rel ? `${rel}/` : ""}${dir}`;
       const entries = new Set<string>();
-      for (const path of state.tree) {
-        if (!path.startsWith(base)) continue;
+      const consider = (path: string, isDir: boolean) => {
+        if (!path.startsWith(base)) return;
         const under = path.slice(base.length);
         const cut = under.indexOf("/");
-        const entry = cut === -1 ? under : `${under.slice(0, cut)}/`;
-        if (entry && entry.startsWith(stem)) entries.add(dir + entry);
-      }
+        // Anything with a separator still in it lives deeper: only its first
+        // segment belongs here, and that segment is a directory.
+        const entry = cut === -1 ? (isDir ? `${under}/` : under) : `${under.slice(0, cut)}/`;
+        if (entry && entry !== "/" && entry.startsWith(stem)) entries.add(dir + entry);
+      };
+      for (const path of state.tree) consider(path, false);
+      for (const path of state.dirs) consider(path, true);
       return [...entries];
     },
-    [state.tree, state.cwd],
+    [state.tree, state.dirs, state.cwd],
   );
 
   /** The scrollback as text: every prompt line and everything it printed,
@@ -284,7 +305,7 @@ export default function BashBlock({
             promptFor={(entry) => promptAt.current.get(entry.id)}
             placeholder=""
             inlineInput
-            onListCompletions={listCompletions}
+            onWrite={write}
             onScrolledChange={setScrolled}
             placeholderHint={null}
           />

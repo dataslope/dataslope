@@ -36,11 +36,15 @@ far as the candidates agree; if that adds nothing, the second prints them.
 There is no terminal bell here, so that listing is the only signal a reader
 gets that the choice was ambiguous.
 
+The candidates print *below* the line you were editing, and the prompt is
+redrawn with what you had typed, which is where bash puts them.
+
 The first word of a command completes against commands, and so does the word
 after a `|` or a `;`. Everything else completes against the filesystem, one
 directory at a time: `cat sr<Tab>` gives `cat src/`, and the next `Tab` looks
 inside `src` rather than starting over. A finished name gets a space after
-it; a directory keeps its slash so you can carry on typing.
+it; a directory keeps its slash so you can carry on typing. Directories you
+have only just made count, empty ones included.
 
 | You type | `Tab` gives you |
 | --- | --- |
@@ -50,6 +54,17 @@ it; a directory keeps its slash so you can carry on typing.
 | `cat RE` | `cat README.md ` |
 | `cd sr` | `cd src/` |
 | `ls \| gre` | `ls \| grep ` |
+
+Past 100 candidates it asks first, the way readline's `completion-query-items`
+does:
+
+```
+/repo/many $ cat f
+Display all 120 possibilities? (y or n)
+```
+
+`y` prints them, anything else drops it, and either way the line you were
+editing comes back untouched.
 
 ## A block that opens mid-session
 

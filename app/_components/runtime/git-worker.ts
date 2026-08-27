@@ -90,20 +90,25 @@ async function seed(scenarioId: string, kind: SessionKind): Promise<Session> {
 }
 
 /** Working-tree paths, `.git` excluded — that stays explorable via `ls`/`cat`
- *  in the terminal rather than being listed in the UI. */
-async function listTree(s: Session): Promise<string[]> {
-  const paths: string[] = [];
+ *  in the terminal rather than being listed in the UI. Files and directories
+ *  come back separately: the UI lists files, and completion needs both,
+ *  because an empty directory leaves no file to infer it from. */
+async function listTree(s: Session): Promise<{ files: string[]; dirs: string[] }> {
+  const files: string[] = [];
+  const dirs: string[] = [];
   for (const p of await s.store.getAllPaths()) {
     if (!p.startsWith(`${REPO}/`)) continue;
     const rel = p.slice(REPO.length + 1);
     if (rel === ".git" || rel.startsWith(".git/")) continue;
     try {
-      if ((await s.store.stat(p)).isFile) paths.push(rel);
+      const stat = await s.store.stat(p);
+      if (stat.isFile) files.push(rel);
+      else if (stat.isDirectory) dirs.push(rel);
     } catch {
       /* vanished mid-walk */
     }
   }
-  return paths.sort();
+  return { files: files.sort(), dirs: dirs.sort() };
 }
 
 /** Small text files, so a card can grade `fileContains` without a round trip
@@ -125,13 +130,14 @@ async function snapshot(s: Session, tree: string[]): Promise<Record<string, stri
 
 async function readState(s: Session): Promise<RepoState> {
   const fs = s.fs as Parameters<typeof git.log>[0]["fs"];
-  const tree = await listTree(s);
+  const { files: tree, dirs } = await listTree(s);
 
   if (s.kind === "bash") {
     return {
       ...EMPTY_STATE,
       kind: "bash",
       tree,
+      dirs,
       cwd: s.shell.cwd,
       contents: await snapshot(s, tree),
     };
@@ -143,7 +149,7 @@ async function readState(s: Session): Promise<RepoState> {
   } catch {
     initialized = false;
   }
-  if (!initialized) return { ...EMPTY_STATE, kind: "git", tree, cwd: s.shell.cwd };
+  if (!initialized) return { ...EMPTY_STATE, kind: "git", tree, dirs, cwd: s.shell.cwd };
 
   const branches = await git.listBranches({ fs, dir: REPO });
   let branch: string | null = null;
@@ -227,6 +233,7 @@ async function readState(s: Session): Promise<RepoState> {
     files,
     commits,
     tree,
+    dirs,
     cwd: s.shell.cwd,
   };
 }

@@ -38,7 +38,8 @@ export interface TranscriptEntry {
   stdout: string;
   stderr: string;
   exitCode: number;
-  /** Rendered as bare output with no prompt line, for completion listings. */
+  /** Rendered as bare output with no prompt line: the answer to a
+   *  "Display all N possibilities?" question, which bash prints on its own. */
   note?: boolean;
 }
 
@@ -78,13 +79,24 @@ interface Props {
    * clicking anywhere in the terminal focuses it.
    */
   inlineInput?: boolean;
-  /** Called with the candidates when Tab cannot narrow further, so the host
-   *  can print them the way bash does. */
-  onListCompletions?: (matches: string[]) => void;
+  /**
+   * Bash writes into the scrollback while you are still editing a line: the
+   * candidates when Tab cannot narrow further, and the question it asks
+   * before printing a very long list. The host owns the transcript, so it
+   * appends what it is handed.
+   *
+   * `echo` is the line to reprint above the text, the way bash reprints what
+   * you had typed before answering you, or `null` for bare output.
+   */
+  onWrite?: (out: { echo: string | null; text: string }) => void;
   /** True once the scrollback is scrolled off its top, so a host can shade
    *  the header it sits under. */
   onScrolledChange?: (scrolled: boolean) => void;
 }
+
+/** How many candidates bash will print without asking first. Readline calls
+ *  it `completion-query-items`; 100 is its default. */
+const QUERY_ITEMS = 100;
 
 /** Longest string every candidate starts with. */
 function commonPrefix(items: string[]): string {
@@ -125,7 +137,7 @@ export function GitTerminal({
   promptFor,
   placeholder = "git status",
   inlineInput = false,
-  onListCompletions,
+  onWrite,
   onScrolledChange,
 }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -134,6 +146,9 @@ export function GitTerminal({
   /** Consecutive Tab presses, so the second one can list what the first
    *  could not narrow. */
   const tabRun = useRef(0);
+  /** Candidates held back behind "Display all N possibilities?", waiting on a
+   *  y or an n. Non-null means the next keystroke is that answer. */
+  const [pendingList, setPendingList] = useState<string[] | null>(null);
   const [caret, setCaret] = useState(0);
   const [focused, setFocused] = useState(false);
 
@@ -212,12 +227,36 @@ export function GitTerminal({
 
     // Nothing left to add. Print the candidates by their last segment, which
     // is the column of names bash shows rather than a column of full paths.
-    if (matches.length > 1 && run >= 1) {
-      onListCompletions?.(matches.map((m) => m.slice(m.lastIndexOf("/", m.length - 2) + 1)));
+    if (matches.length <= 1 || run < 1) return;
+    const names = matches.map((m) => m.slice(m.lastIndexOf("/", m.length - 2) + 1));
+
+    // A list long enough to bury the session gets a question first, which is
+    // bash's `completion-query-items` and its default of 100.
+    if (names.length > QUERY_ITEMS) {
+      setPendingList(names);
+      onWrite?.({
+        echo: value,
+        text: `Display all ${names.length} possibilities? (y or n)`,
+      });
+      return;
     }
+    onWrite?.({ echo: value, text: names.join("   ") });
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    // Waiting on an answer to "Display all N possibilities?". Bash takes one
+    // key here and echoes neither it nor a fresh prompt, so every key is
+    // swallowed and only `y` prints the list.
+    if (pendingList) {
+      event.preventDefault();
+      if (event.key === "y" || event.key === "Y") {
+        onWrite?.({ echo: null, text: pendingList.join("   ") });
+      }
+      setPendingList(null);
+      tabRun.current = 0;
+      return;
+    }
+
     // Only a run of Tabs with nothing between them earns the listing.
     if (event.key !== "Tab") tabRun.current = 0;
 

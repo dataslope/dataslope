@@ -39,6 +39,12 @@ export interface RepoState {
   commits: CommitNode[];
   /** Working-tree paths outside `.git`, for the file list. */
   tree: string[];
+  /**
+   * Directories, for tab-completion. `tree` holds files, so a directory is
+   * normally inferable from the paths beneath it — but an empty one has no
+   * paths beneath it, and `mkdir test` followed by `cd te<Tab>` has to work.
+   */
+  dirs: string[];
   cwd: string;
   /** Contents of small text files, for grading `fileContains` without a round
    *  trip per assertion. Bash sessions only, and capped (see the limits
@@ -54,6 +60,7 @@ export const EMPTY_STATE: RepoState = {
   files: [],
   commits: [],
   tree: [],
+  dirs: [],
   cwd: "/repo",
 };
 
