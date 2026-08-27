@@ -237,3 +237,76 @@ Console.WriteLine(sb.ToString().Trim());
   ]}
 />
 ```
+
+## Standard input
+
+A `stdin` prop renders an editable **STDIN** panel under the editor and
+stages it as `stdin.txt`, which `Console.ReadLine` reads from. Without a
+panel a read returns `null` at end of input. The panel's lines are the
+program's lines: the last one is terminated for you.
+
+<CodeBlock
+  adapter="csharp"
+  stdin={`apple,3
+banana,12
+cherry,7`}
+  files={[
+    {
+      filename: "Program.cs",
+      starterCode: `using System;
+using System.Collections.Generic;
+
+var rows = new List<(string Name, int Qty)>();
+string? line;
+while ((line = Console.ReadLine()) != null)
+{
+    var parts = line.Split(',');
+    if (parts.Length == 2 && int.TryParse(parts[1], out var qty))
+    {
+        rows.Add((parts[0], qty));
+    }
+}
+
+Console.WriteLine($"read {rows.Count} row(s)");
+foreach (var row in rows)
+{
+    Console.WriteLine($"  {row.Name,-8} {row.Qty,3}");
+}
+`,
+    },
+  ]}
+/>
+
+```jsx
+<CodeBlock
+  adapter="csharp"
+  stdin={`apple,3
+banana,12
+cherry,7`}
+  files={[
+    {
+      filename: "Program.cs",
+      starterCode: `using System;
+using System.Collections.Generic;
+
+var rows = new List<(string Name, int Qty)>();
+string? line;
+while ((line = Console.ReadLine()) != null)
+{
+    var parts = line.Split(',');
+    if (parts.Length == 2 && int.TryParse(parts[1], out var qty))
+    {
+        rows.Add((parts[0], qty));
+    }
+}
+
+Console.WriteLine($"read {rows.Count} row(s)");
+foreach (var row in rows)
+{
+    Console.WriteLine($"  {row.Name,-8} {row.Qty,3}");
+}
+`,
+    },
+  ]}
+/>
+```

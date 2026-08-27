@@ -172,6 +172,7 @@ const cache = freshness(ROOT, "block-outputs", {
     join(ROOT, "scripts", "lib", "python-output-capture.mjs"),
     join(ROOT, "scripts", "lib", "pyodide-runner.mjs"),
     join(ROOT, "scripts", "lib", "block-runners.mjs"),
+    join(ROOT, "scripts", "lib", "mdx-blocks.mjs"),
     join(ROOT, "lib", "blockOutputKey.ts"),
     join(ROOT, "app", "_components", "runtime", "pythonDisplayOutputs.ts"),
     ...collectFiles(join(ROOT, "content"), (f) => f.endsWith(".mdx")).map((rel) =>
@@ -345,7 +346,12 @@ function carryCapturedEntries() {
       if (block.unparsable || block.expectError) continue;
       const entry = block.files.find((f) => f.filename === block.entry) ?? block.files[0];
       if (!entry) continue;
-      const key = blockOutputKey(adapter, entry.initCode, entry.starterCode);
+      const key = blockOutputKey(
+        adapter,
+        entry.initCode,
+        entry.starterCode,
+        block.stdin,
+      );
       const recorded = onDisk[block.file]?.[key];
       if (!recorded) continue;
       // A missing figure would render a 404 and this generator cannot re-run
@@ -372,7 +378,12 @@ for (const [i, block] of blocks.entries()) {
   // a traceback the reader is meant to produce themselves.
   if (block.expectError) continue;
 
-  const key = blockOutputKey("python", entry.initCode, entry.starterCode);
+  const key = blockOutputKey(
+    "python",
+    entry.initCode,
+    entry.starterCode,
+    block.stdin,
+  );
 
   // Reuse: the key is a source hash, so an intact entry cannot be stale, and
   // reusing it keeps an unchanged tree from booting Pyodide at all.
@@ -545,7 +556,12 @@ for (const adapter of textAdapters) {
     if (block.expectError) continue; // the panel would show the error the reader is meant to produce
     const entry =
       block.files.find((f) => f.filename === block.entry) ?? block.files[0];
-    const key = blockOutputKey(adapter, entry.initCode, entry.starterCode);
+    const key = blockOutputKey(
+      adapter,
+      entry.initCode,
+      entry.starterCode,
+      block.stdin,
+    );
     const reusable = previous[block.file]?.[key];
     if (reusable && entryIsIntact(reusable)) {
       (manifest[block.file] ??= {})[key] = reusable;

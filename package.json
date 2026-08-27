@@ -24,6 +24,7 @@
     "build:react-bundles": "node scripts/build-react-bundles.mjs",
     "capture:block-outputs": "node scripts/capture-browser-outputs.mjs",
     "build:og-image": "node scripts/build-og-image.mjs",
+    "build:favicons": "node scripts/build-favicons.mjs",
     "publish:tools-jar": "npm publish ./tools-jar",
     "postinstall": "node scripts/patch-almostnode.mjs && node scripts/postinstall-generate.mjs",
     "start": "next start",

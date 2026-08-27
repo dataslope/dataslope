@@ -149,7 +149,11 @@ import { type PgEntityKind, type PostgresEngine } from "../runtime/postgres";
 
 const POSTGRES_SAMPLE_DATABASES = postgresAdapter.samples;
 const POSTGRES_BLANK_DATABASE = postgresAdapter.blankSample!;
-import type { ForeignKeyInfo, TableColumnInfo } from "../runtime/sqlite";
+import type {
+  ColumnConstraintInfo,
+  ForeignKeyInfo,
+  TableColumnInfo,
+} from "../runtime/sqlite";
 import type { QueryExecResult } from "../runtime/sqlite-wasm";
 import type { QueryTab } from "../sqlitePlaygroundTabs";
 import { newTabId } from "../sqlitePlaygroundTabs";
@@ -215,6 +219,11 @@ import {
 } from "../sql/utils/persistedStorage";
 import { pushTabHistory } from "../sql/utils/tabUtils";
 import { enumHintsFromColumns } from "../sql/utils/cellEditing";
+import {
+  applyDuplicateRowPlan,
+  constraintInfoFromColumns,
+  type DuplicateRowPlan,
+} from "../sql/utils/duplicateRow";
 import { useSqlTabManagement } from "../sql/hooks/useSqlTabManagement";
 import { useViewDataTabAutoRun } from "../sql/hooks/useViewDataTabAutoRun";
 import { useSchemaTree } from "../sql/hooks/useSchemaTree";
@@ -2798,6 +2807,10 @@ function PostgresPlaygroundInner() {
           ),
           enums: enumHintsFromColumns(cols),
         },
+        // Derived from the columns already in memory rather than a second
+        // round trip; it tells the grid which columns a duplicated row has
+        // to change.
+        constraintInfo: constraintInfoFromColumns(cols),
       };
     },
     [columnsByEntity, foreignKeysByEntity],
@@ -2817,6 +2830,13 @@ function PostgresPlaygroundInner() {
       enums: enumHintsFromColumns(cols),
     };
   }, [result, columnsByEntity, foreignKeysByEntity]);
+
+  const resultConstraintInfo = useMemo<ColumnConstraintInfo[] | undefined>(() => {
+    const tableName = result?.sourceTable;
+    if (!tableName) return undefined;
+    const cols = columnsByEntity[tableName];
+    return cols ? constraintInfoFromColumns(cols) : undefined;
+  }, [result, columnsByEntity]);
 
   const exportResultSet = useCallback(
     async (
@@ -3004,19 +3024,25 @@ function PostgresPlaygroundInner() {
   );
 
   const duplicateRowInTable = useCallback(
-    (tableName: string, columnNames: string[], values: unknown[]) => {
+    (
+      tableName: string,
+      columnNames: string[],
+      values: unknown[],
+      plan?: DuplicateRowPlan,
+    ) => {
       const engine = engineRef.current;
       if (!engine) return;
       const tabId = activeTabIdRef.current;
       const schema = selectedSchemaRef.current;
-      // Exclude generated columns and serial/sequence columns, PostgreSQL
-      // forbids explicit values for GENERATED ALWAYS columns and nextval()
-      // PKs will duplicate-key on reuse.
+      // Exclude generated columns and serial / IDENTITY columns: PostgreSQL
+      // forbids explicit values for GENERATED ALWAYS columns, and reusing a
+      // sequence-backed value duplicate-keys.
       const skipCols = new Set(
         (columnsByEntity[tableName] ?? [])
           .filter(
             (col) =>
               col.generated !== null ||
+              col.identity === true ||
               (col.defaultValue !== null &&
                 /nextval\(/i.test(col.defaultValue)),
           )
@@ -3032,7 +3058,20 @@ function PostgresPlaygroundInner() {
       }
       void (async () => {
         try {
-          await engine.insertRow(tableName, filteredNames, filteredValues, schema);
+          // The duplicate dialog's answers land here: literal overrides are
+          // already decided, `MAX(col) + 1` is read off the live table.
+          const resolved = await applyDuplicateRowPlan(
+            filteredNames,
+            filteredValues,
+            plan,
+            async (column) => {
+              const res = await engine.exec(
+                `SELECT MAX(${quoteIdent(column)}) FROM ${quoteIdent(schema)}.${quoteIdent(tableName)}`,
+              );
+              return res[0]?.values?.[0]?.[0] ?? null;
+            },
+          );
+          await engine.insertRow(tableName, resolved.names, resolved.values, schema);
           showToast(`Duplicated row in "${tableName}".`);
           const sql = `SELECT * FROM ${quoteIdent(schema)}.${quoteIdent(tableName)};`;
           void runSqlForTab(tabId, sql, `Table: ${tableName}`, tableName);
@@ -5758,6 +5797,7 @@ function PostgresPlaygroundInner() {
                 engineLabel="PostgreSQL"
                 keyHints={resultKeyHints}
                 sourceTable={result?.sourceTable}
+                constraintInfo={resultConstraintInfo}
                 tableMetaFor={tableMetaFor}
                 onDeleteRows={deleteRowsFromTable}
                 onUpdateRows={updateRowsInTable}

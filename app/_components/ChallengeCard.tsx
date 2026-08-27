@@ -18,7 +18,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { createPortal } from "react-dom";
-import { RotateCcw, Check, CheckCheck, ListChecks, ListX, X, ChevronDown, ChevronUp, Eye, File, FileInput, Info, Play, Terminal } from "lucide-react";
+import { RotateCcw, Check, CheckCheck, ListChecks, ListX, X, ChevronDown, ChevronRight, ChevronUp, Eye, File, FileInput, Info, Play, Terminal } from "lucide-react";
 import { Menu } from "@base-ui/react/menu";
 import {
   CopyIcon,
@@ -99,7 +99,9 @@ import {
   type ChallengeTest,
   type ParsedTestResult,
 } from "./challengeHarness";
+import { appendOutputCell } from "./outputCells";
 import { mergeInitAndEntry } from "./runtime/mergeInit";
+import { STDIN_FILENAME, normalizeStdin } from "./runtime/stdinFile";
 import { PlotlyChart } from "./PlotlyChart";
 
 import styles from "./ChallengeCard.module.css";
@@ -178,6 +180,18 @@ export interface ChallengeCardProps {
   datasets?: DatasetStageSpec[];
   /** Force the file tab bar to render even for a single-file workspace. */
   showFileTabBar?: boolean;
+  /**
+   * Standard input for the learner's program, shown in an editable STDIN
+   * panel under the editor and staged as `stdin.txt` on every run.
+   *
+   * Same contract as `CodeBlockProps.stdin`: presence is the switch, and it
+   * needs `adapter.supportsStdin`. On a card it is also part of the
+   * *question* — the tests grade output produced from this input, so the
+   * reference solution and the recorded expectation are both written against
+   * it. A learner who edits the panel is experimenting, and Reset puts the
+   * graded input back.
+   */
+  stdin?: string;
   /** Tests run when "Check Answer" is pressed. Each test's `code` should
    *  `assert`/`throw`/`stop()` on failure and be silent on success. */
   tests: ChallengeTest[];
@@ -223,6 +237,7 @@ export default function ChallengeCard({
   entryFilename,
   datasets,
   showFileTabBar = false,
+  stdin,
   tests,
   packages,
   tailwind = false,
@@ -230,6 +245,20 @@ export default function ChallengeCard({
 }: ChallengeCardProps) {
   const blockId = useBlockId(adapter);
   const initPanelId = `${blockId}-init`;
+
+  // ─── STDIN ──────────────────────────────────────────────────────────
+  // Mirrors `<CodeBlock>`: a panel only where the runtime can be fed, the
+  // reader's edits in a ref because the CodeMirror doc is the source of
+  // truth. See `CodeBlockProps.stdin`.
+  const hasStdin = stdin !== undefined && adapter.supportsStdin === true;
+  const starterStdin = hasStdin ? stdin : "";
+  const stdinPanelId = `${blockId}-stdin`;
+  const stdinEditorHostRef = useRef<HTMLDivElement | null>(null);
+  const stdinEditorRef = useRef<EditorView | null>(null);
+  const stdinThemeCompRef = useRef<Compartment | null>(null);
+  const stdinBufferRef = useRef<string | null>(null);
+  const stdinSaveTimerRef = useRef<number | null>(null);
+  const [stdinExpanded, setStdinExpanded] = useState(starterStdin.length > 0);
 
   // Guard against an empty `files` array so the rest of the component can
   // assume at least one file.
@@ -336,6 +365,16 @@ export default function ChallengeCard({
       ),
     [adapter.id, title, workspaceFingerprint],
   );
+  // `<stdin>` rather than `stdin.txt`, which a multi-file workspace could
+  // legitimately declare as a real file and would then collide with.
+  const persistedStdinKey = useMemo(
+    () =>
+      persistKey(
+        "challenge",
+        `${adapter.id}|${title}|${workspaceFingerprint}|<stdin>`,
+      ),
+    [adapter.id, title, workspaceFingerprint],
+  );
   // Shared per-adapter runtime, scoped to the fumadocs surface (the
   // Playground uses a separate scope so its installed packages / staged VFS
   // files can't bleed into challenge results). Isolation between cards in
@@ -387,6 +426,16 @@ export default function ChallengeCard({
   const [bannerState, setBannerState] = useState<"pass" | "fail" | null>(null);
   const [isFormatting, setIsFormatting] = useState(false);
   const toasts = useChallengeToasts();
+
+  // Seed the STDIN buffer once, on the first render, the way the file
+  // buffers below read their persisted copies. Nothing rendered on the
+  // server depends on it (it reaches the DOM only when CodeMirror mounts,
+  // in an effect), so reading storage here cannot desync hydration.
+  if (stdinBufferRef.current === null) {
+    stdinBufferRef.current = hasStdin
+      ? (loadPersistedCode(persistedStdinKey) ?? starterStdin)
+      : "";
+  }
 
   // ─── Multi-file workspace state ─────────────────────────────────────
   // Each file has its own buffer + persisted copy; the single editor view
@@ -636,6 +685,7 @@ export default function ChallengeCard({
     reconfigure(editorRef.current, mainThemeCompRef.current);
     reconfigure(initEditorRef.current, initThemeCompRef.current);
     reconfigure(solutionEditorRef.current, solutionThemeCompRef.current);
+    reconfigure(stdinEditorRef.current, stdinThemeCompRef.current);
   }, [cmThemeName]);
 
   // Which file the modal displays: the user's explicit click, else the
@@ -754,6 +804,57 @@ export default function ChallengeCard({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeHasInit, activeTrimmedInit]);
+
+  // Mount the STDIN editor. Mount-once (the doc is seeded from the ref and
+  // Reset dispatches into the live view), kept mounted while collapsed so
+  // the height transition has something to reveal. Mirrors `<CodeBlock>`.
+  useEffect(() => {
+    if (!hasStdin) return;
+    if (!stdinEditorHostRef.current || stdinEditorRef.current) return;
+
+    const themeComp = new Compartment();
+    const view = new EditorView({
+      doc: stdinBufferRef.current ?? "",
+      parent: stdinEditorHostRef.current,
+      extensions: [
+        history(),
+        drawSelection(),
+        dropCursor(),
+        lineNumbersExt(),
+        EditorView.lineWrapping,
+        // No language, no bracket closing, no completion: this is data the
+        // program parses, not code.
+        keymap.of([...defaultKeymap, ...historyKeymap, ...redoKeymap]),
+        themeComp.of(themeFor(cmThemeNameRef.current)),
+        noActiveLine,
+        EditorView.updateListener.of((update) => {
+          if (!update.docChanged) return;
+          const current = update.state.doc.toString();
+          stdinBufferRef.current = current;
+          if (stdinSaveTimerRef.current !== null)
+            window.clearTimeout(stdinSaveTimerRef.current);
+          stdinSaveTimerRef.current = window.setTimeout(() => {
+            stdinSaveTimerRef.current = null;
+            savePersistedCode(persistedStdinKey, current);
+          }, 400);
+        }),
+      ],
+    });
+
+    stdinEditorRef.current = view;
+    stdinThemeCompRef.current = themeComp;
+
+    return () => {
+      if (stdinSaveTimerRef.current !== null) {
+        window.clearTimeout(stdinSaveTimerRef.current);
+        stdinSaveTimerRef.current = null;
+        savePersistedCode(persistedStdinKey, view.state.doc.toString());
+      }
+      view.destroy();
+      stdinEditorRef.current = null;
+      stdinThemeCompRef.current = null;
+    };
+  }, [hasStdin, persistedStdinKey]);
 
   // ─── Execution helpers ─────────────────────────────────────────────
 
@@ -888,23 +989,33 @@ export default function ChallengeCard({
 
       const startedAt = performance.now();
       let nextOutputId = 0;
-      const cells: OutputCell[] = [];
+      // Reassigned per emitted cell: `appendOutputCell` returns a new list
+      // rather than mutating, so the two lesson surfaces share one rule.
+      let cells: OutputCell[] = [];
 
       // Stage remote datasets and (multi-file only) workspace files into the
       // runtime VFS so imports resolve. Single-file cards must NOT pre-stage
       // their source: some runtimes (CheerpJ/Java, .NET/C#) compile the
       // staged file set and, with no `entryFilename`, then can't locate
       // `main`. Staging only dataset files is safe (non-source is ignored).
+      //
+      // A stdin-capable adapter always stages, with nothing to stage if that
+      // is all there is. The staged file set lives on the runtime, and every
+      // card and block of one language shares it, so this call is also how a
+      // card *without* a STDIN panel drops the input a block above it left
+      // behind, rather than grading the learner against it.
       if (
-        (isMultiFile || datasetFiles.length > 0) &&
+        (isMultiFile ||
+          datasetFiles.length > 0 ||
+          adapter.supportsStdin === true) &&
         runtime.prepareFileSystem
       ) {
         const fileMap = new Map<string, Uint8Array>();
         // Dataset bytes first, so a (misauthored) workspace file with
         // the same name deterministically wins.
         for (const f of datasetFiles) fileMap.set(f.filename, f.bytes);
+        const encoder = new TextEncoder();
         if (isMultiFile) {
-          const encoder = new TextEncoder();
           for (const [name, content] of filesSnapshot) {
             fileMap.set(
               name,
@@ -915,6 +1026,14 @@ export default function ChallengeCard({
               ),
             );
           }
+        }
+        // Last, so it wins over a same-named dataset or workspace file: the
+        // panel is what the learner can see and edit, so it is what runs.
+        if (hasStdin) {
+          fileMap.set(
+            STDIN_FILENAME,
+            encoder.encode(normalizeStdin(stdinBufferRef.current ?? "")),
+          );
         }
         try {
           await runtime.prepareFileSystem(fileMap);
@@ -932,34 +1051,19 @@ export default function ChallengeCard({
       try {
         await runtime.run(
           entrySource,
-          (cell) => {
+          (cell, seq, append) => {
             if (runSeqRef.current !== mySeq) return;
             const elapsedMs = performance.now() - startedAt;
             const fmt =
               elapsedMs < 1000
                 ? `${elapsedMs.toFixed(0)}ms`
                 : `${(elapsedMs / 1000).toFixed(2)}s`;
-            // Collapse consecutive stdout cells so one console.log per cell
-            // doesn't stack a pile of one-line cells.
-            const last = cells[cells.length - 1];
-            if (
-              cell.type === "stdout" &&
-              last &&
-              last.type === "stdout"
-            ) {
-              cells[cells.length - 1] = {
-                ...last,
-                content: last.content + "\n" + cell.content,
-                elapsed: fmt,
-              };
-            } else {
-              const full: OutputCell = {
-                id: ++nextOutputId,
-                elapsed: fmt,
-                ...cell,
-              };
-              cells.push(full);
-            }
+            cells = appendOutputCell(cells, cell, {
+              seq,
+              append,
+              elapsed: fmt,
+              nextId: () => ++nextOutputId,
+            });
           },
           {
             entryFilename: isMultiFile ? resolvedEntryFilename : undefined,
@@ -1004,6 +1108,7 @@ export default function ChallengeCard({
       reportPrepare,
       resetPrepare,
       tailwind,
+      hasStdin,
     ],
   );
 
@@ -1253,9 +1358,26 @@ export default function ChallengeCard({
         changes: { from: 0, to: view.state.doc.length, insert: incoming },
       });
     }
+    // Reset means the whole authored card, graded input included.
+    if (hasStdin) {
+      stdinBufferRef.current = starterStdin;
+      clearPersistedCode(persistedStdinKey);
+      const stdinView = stdinEditorRef.current;
+      stdinView?.dispatch({
+        changes: {
+          from: 0,
+          to: stdinView.state.doc.length,
+          insert: starterStdin,
+        },
+      });
+    }
     if (persistSaveTimerRef.current !== null) {
       window.clearTimeout(persistSaveTimerRef.current);
       persistSaveTimerRef.current = null;
+    }
+    if (stdinSaveTimerRef.current !== null) {
+      window.clearTimeout(stdinSaveTimerRef.current);
+      stdinSaveTimerRef.current = null;
     }
     setOutputs([]);
     // Reset also tears down the live preview, removing the iframe
@@ -1270,7 +1392,14 @@ export default function ChallengeCard({
     // (its `finally` is sequence-guarded), so clear it here.
     setActiveAction(null);
     toasts.show("Reset to starter code.");
-  }, [persistedKeyForFile, toasts, workspaceFiles]);
+  }, [
+    persistedKeyForFile,
+    toasts,
+    workspaceFiles,
+    hasStdin,
+    starterStdin,
+    persistedStdinKey,
+  ]);
 
   // ─── Apply solution ────────────────────────────────────────────────
   // Load every solved file's reference solution into the buffers (scaffold
@@ -1618,7 +1747,7 @@ export default function ChallengeCard({
                 }`}
                 aria-hidden
               >
-                ▶
+                <ChevronRight size={13} strokeWidth={2} />
               </span>
               <span className={styles.initLabel}>
                 Initialization code ({adapter.runtimeInfo.language})
@@ -1680,6 +1809,50 @@ export default function ChallengeCard({
         ref={editorHostRef}
         aria-label={`${adapter.runtimeInfo.language} solution editor`}
       />
+
+      {/* ── STDIN ── the input the tests grade against. */}
+      {hasStdin && (
+        <div className={styles.stdinWrap}>
+          <button
+            type="button"
+            className={styles.stdinToggle}
+            aria-expanded={stdinExpanded}
+            aria-controls={stdinPanelId}
+            onClick={() => setStdinExpanded((v) => !v)}
+          >
+            <span
+              className={`${styles.initCaret} ${
+                stdinExpanded ? styles.initCaretOpen : ""
+              }`}
+              aria-hidden
+            >
+              <ChevronRight size={13} strokeWidth={2} />
+            </span>
+            <span className={styles.stdinLabel}>STDIN</span>
+            <span className={styles.stdinHint}>
+              What the program reads. Reset restores it.
+            </span>
+          </button>
+          <div
+            id={stdinPanelId}
+            className={`${styles.stdinEditorWrap} ${
+              stdinExpanded
+                ? styles.stdinEditorWrapOpen
+                : styles.stdinEditorWrapCollapsed
+            }`}
+            // A collapsed panel is not merely invisible: without this a
+            // screen reader still reads the editor out and Tab still lands
+            // the cursor in a box nobody can see.
+            inert={!stdinExpanded}
+          >
+            <div
+              className={styles.stdinEditor}
+              aria-label="Standard input"
+              ref={stdinEditorHostRef}
+            />
+          </div>
+        </div>
+      )}
 
       {/* ── Action bar ── */}
       <div className={styles.actionBar} role="toolbar" aria-label="Challenge controls">

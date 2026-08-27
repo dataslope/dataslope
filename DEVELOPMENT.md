@@ -42,15 +42,32 @@ This is safe here because lesson content only changes on deploy and every asset 
 
 ### Cloudflare Workers Builds configuration
 
-Production and preview deploys run through Cloudflare Workers Builds rather than the local `npm run cf:*` scripts, so its build settings (Workers → the `dataslope` worker → Settings → Build) must populate the R2 cache on **both** paths. The non-production (preview) command — the dashboard labels it **Version command** — is the easy one to get wrong: a bare `npx wrangler versions upload` builds the Worker but skips the cache populate step, leaving previews with an empty cache that 500s the home page and `/courses/*`.
+Production and preview deploys run through Cloudflare Workers Builds rather than the local `npm run cf:*` scripts, so its build settings (Workers → the `dataslope` worker → Settings → Build) must populate the R2 cache on **both** paths.
+
+**There are two build configurations, not one.** The Build settings page has a **Production / Previews Base** tab switch at the top, and each tab holds its own Build command and Deploy command. Older Cloudflare docs describe a single build command plus a "Version command" for non-production branches; that is not this UI. Everything below has to be set **twice**, once per tab, and a field set on Production alone silently does nothing for previews:
+
+**Production tab**
 
 | Field | Value |
 | --- | --- |
 | Build command | `npx opennextjs-cloudflare build && node scripts/compress-cache.mjs` |
 | Deploy command | `npx opennextjs-cloudflare deploy --cacheChunkSize 100 && npm run db:seed:search:remote` |
-| Version command *(the dashboard's label for the non-production branch deploy)* | `npx opennextjs-cloudflare upload --cacheChunkSize 100` |
-| Path | `/` |
+
+**Previews Base tab**
+
+| Field | Value |
+| --- | --- |
+| Build command | `npx opennextjs-cloudflare build && node scripts/compress-cache.mjs` |
+| Deploy command | `npx opennextjs-cloudflare upload --cacheChunkSize 100` |
+
+Shared by both:
+
+| Field | Value |
+| --- | --- |
+| Root directory | `/` |
 | Build variable | `NPM_CONFIG_OMIT` = `dev` |
+
+Two things about the Previews Base deploy command are load-bearing. It must not be a bare `npx wrangler versions upload`: that builds the Worker but skips the cache populate step, leaving previews with an empty cache that 500s the home page and `/courses/*`. And it must **not** carry `npm run db:seed:search:remote` — there is one `dataslope-search` database, so a preview seed overwrites production's index with a feature branch's content and nothing looks broken until someone searches.
 
 **`NPM_CONFIG_OMIT=dev` is why `dependencies` looks the way it does.** Workers Builds runs its own `npm clean-install` and exposes no install command to override, but npm reads `NPM_CONFIG_*` from the environment, and build variables are environment. So everything `npm run build` and the deploy actually load lives in `dependencies` — including `typescript`, `tailwindcss`, `sharp`, `pyodide`, `remark-mdx` and `@cloudflare/workers-types`, several of which are imported by `app/` and `lib/` source and were mis-filed as dev dependencies to begin with. What is left in `devDependencies` is only what CI never runs: the test, lint, e2e and content-sweep tooling.
 
@@ -58,11 +75,30 @@ Measured: **98 s → 62 s** locally (2.1 GB → 1.9 GB of `node_modules`), by no
 
 Forgetting the variable is safe — CI just installs everything and takes the extra ~40 s, which is exactly today's behaviour. Do **not** reach for `NPM_CONFIG_OMIT=optional` instead: npm ships platform-specific native binaries *as* optional dependencies, so it strips them out of unrelated packages and the build dies on `Cannot find native binding` (`@ast-grep/napi`, measured).
 
-Both `deploy` (production) and `upload` (preview versions) populate the R2 cache before shipping, `upload` wraps `wrangler versions upload`, so previews get the same populated cache production does. `Path` is `/` because this Worker lives at the repo root; the CORS proxy under `cloudflare-cors-proxy/` is a separate Worker with its own config.
+Both `deploy` (production) and `upload` (preview versions) populate the R2 cache before shipping, `upload` wraps `wrangler versions upload`, so previews get the same populated cache production does. `Root directory` is `/` because this Worker lives at the repo root; the CORS proxy under `cloudflare-cors-proxy/` is a separate Worker with its own config.
 
 **`scripts/compress-cache.mjs` is why the build command has a second half.** The populate step uploads the files under `.open-next/cache/` to R2 byte-for-byte, so compressing them on disk is the only place that shrinks what a deploy ships. Brotli takes this cache from **2.340 GiB to 0.147 GiB — 15.9×** — for ~15 s of build time on the Workers Builds runner (quality 4, threaded across all cores; see the note on `BROTLI_CACHE_QUALITY`), and the Worker reads them back through `lib/cache/brotliR2IncrementalCache.ts` (wired up in `open-next.config.ts`). Filenames are unchanged, because OpenNext's `getCacheAssets` derives each R2 key from the path and rejects anything not ending in `.cache`.
 
 It is safe to forget. The reader accepts uncompressed entries too, so a deploy that skips this step ships a cache that is merely as large as it used to be, rather than a site that 500s — see the note in `brotliR2IncrementalCache.ts` for why that fallback is load-bearing rather than defensive clutter. Running it twice is a no-op.
+
+**Setting it on the Production tab is half the job.** Measured 2026-08-26 straight out of the bucket, with Production's build command set correctly and Previews Base's left at a bare `npx opennextjs-cloudflare build`:
+
+| Build folder | Populated | Size | Format |
+| --- | --- | ---: | --- |
+| production | 2026-08-26 11:14 | 0.16 GB | brotli |
+| production (previous) | 2026-08-24 18:22 | 0.16 GB | brotli |
+| `main` head | 2026-08-24 18:21 | 0.16 GB | brotli |
+| preview | 2026-08-26 09:57 | 2.52 GB | **raw JSON** |
+| preview | 2026-08-26 09:39 | 2.52 GB | **raw JSON** |
+| preview | 2026-08-25 17:20 | 2.53 GB | **raw JSON** |
+| preview ×3 | 2026-08-24 14:06–15:05 | 2.51–2.52 GB | **raw JSON** |
+
+Read the dates as well as the sizes: production compresses on 08-24 *and* on 08-26, previews compress on neither, and the two interleave through the same afternoon. It splits by **tab**, not by timeline — 12.6 GB of a 15.44 GB bucket, from one unedited field on a tab nobody had opened. That the two configurations exist at all is the entire trap: the Production tab is the one you land on, the change looks applied, and the deploy path that runs ~10× more often than production keeps shipping raw JSON.
+
+Nothing looked wrong from any other angle, and that is the fallback working as designed: previews served fine, builds were green, and the retention job was pruning correctly the whole time. Size was the only symptom, and nothing was reading it. Two ways to check without opening the dashboard:
+
+- **The cleanup run log** (`.github/workflows/r2-cache-cleanup.yml`, every 2 h) prints every build folder's size, format and populate time — `2.52 GB, UNCOMPRESSED, populated …` versus `0.16 GB, brotli, populated …` — and warns when any retained build is raw. Whether production is among them is the fork in the diagnosis: if it is, the Production tab needs the fix; if it is not, the Previews Base tab does, because production is the build that stays correct when only one tab was edited.
+- **The build log** says `[compress-cache] N compressed … 2.340 GiB → 0.147 GiB` when the step ran. No such line means it did not.
 
 **`--cacheChunkSize` is how many cache objects are written to R2 at once, and the default is 25.** That default is not sized for this cache: the populate step ships **1,081 objects / 2.34 GiB on every deploy, production and every preview** (see [Incremental cache cleanup](#incremental-cache-cleanup) for why a full copy goes up each time), and at 25 in flight that is 44 sequential rounds of ~2.2 MB uploads. Both commands accept the flag — it is declared on `deploy` and `upload` alike, and OpenNext's arg parser consumes it rather than forwarding it to `wrangler`, so it cannot confuse the deploy underneath.
 
@@ -83,7 +119,16 @@ The search re-seed is appended to the **production** deploy command only, and th
 
 ### Incremental cache cleanup
 
-OpenNext keys cache objects as `incremental-cache/<buildId>/…`, so **every deploy, production and each preview, writes a fresh copy (~2.5 GB: one `.cache` object per prerendered page, ~1,080 of them averaging ~2.3 MB) under a new build ID, and nothing is pruned automatically.** Left alone the bucket grows by that much per deploy; at active-development velocity it reached 78 GB within days.
+OpenNext keys cache objects as `incremental-cache/<buildId>/…`, so **every deploy, production and each preview, writes a fresh copy (one `.cache` object per prerendered page, ~1,080 of them) under a new build ID, and nothing is pruned automatically.** Left alone the bucket grows by a full copy per deploy; at active-development velocity it reached 78 GB within days.
+
+Two independent numbers set the bucket size, and it is worth keeping them apart when it looks wrong:
+
+```
+bucket ≈ (build folders retained) × (bytes per build)
+             ↑ the cleanup job below      ↑ the build command above
+```
+
+**Bytes per build is ~2.34 GiB raw, or ~0.147 GiB once `compress-cache` has run** — a 16× difference that no amount of retention tuning can substitute for. The 15 GB the bucket sat at through August was 8 retained folders (correct) of which 6 were uncompressed previews (not correct): a build-configuration problem wearing a retention problem's clothes. The cleanup log now prints every folder's size, format and populate time, so the next one is diagnosed from the run log rather than by guessing at the dashboard.
 
 A scheduled GitHub Action (`.github/workflows/r2-cache-cleanup.yml`) prunes it every 2 hours. It works because the build ID is the deployed commit SHA — `next.config.ts` sets `generateBuildId` to `WORKERS_CI_COMMIT_SHA` on Workers Builds — so a cache folder's name is the commit it was built from, and every folder can be matched against a live deployment.
 
@@ -101,7 +146,7 @@ Everything else is deleted. Note it enumerates **branches, not open PRs**: Worke
 
 A branch is **retired**, and keeps nothing, once every PR with that branch as its head has merged or closed *and* no commits have been pushed since. Workers Builds does not tear a preview down when a PR merges — the alias keeps answering for as long as the branch exists — so without this a merged-but-undeleted branch would pin ~2.5 GB indefinitely for a preview nobody will open again. The "no commits since" half is what makes it safe to apply the moment a PR closes: a branch whose head has moved past its closed PR is live work again (reopened, followed up, reused) and stays protected. A branch that never had a PR is *not* retired — that is precisely the pre-PR case above — but it is named in the run log, since only deleting the branch will ever release its folders.
 
-Nothing is retained on age alone, so **deploy velocity no longer sets the bucket size — the number of branches with unfinished work does**: the bucket holds production's two builds plus at most two per active branch, capped by `MAX_BRANCHES`. The flip side is unchanged: a preview URL stops rendering once its folder is pruned (push any commit, or re-run its build, to regenerate it) — which now includes a merged PR's preview, so the check-run link on a merged PR will 500. Enabling GitHub's *Automatically delete head branches* both avoids that dead link and retires the branch here in one move. There is still **no rollback cover** — rolling the Worker back to a build whose cache has been pruned will 500 the site, so revert-and-redeploy (~12 min) is the recovery path.
+Nothing is retained on age alone, so **deploy velocity no longer sets the bucket size — the number of branches with unfinished work does**: the bucket holds production's two builds plus at most two per active branch, capped by `MAX_BRANCHES`. One exception is worth knowing about, because it is the difference between two folders and four: a branch whose name pushes `<branch-slug>-dataslope` past the 63-character DNS limit gets a preview alias Cloudflare [truncates and hashes](https://developers.cloudflare.com/changelog/post/2025-08-08-support-long-branch-names-preview-aliases/), and the recipe for that hash is not published — so the job cannot name the alias, cannot probe it, and falls back to pinning that branch's last `FALLBACK_COMMITS` (3) builds. Two such branches held 3 folders each in August. Short branch names are the whole fix. The flip side is unchanged: a preview URL stops rendering once its folder is pruned (push any commit, or re-run its build, to regenerate it) — which now includes a merged PR's preview, so the check-run link on a merged PR will 500. Enabling GitHub's *Automatically delete head branches* both avoids that dead link and retires the branch here in one move. There is still **no rollback cover** — rolling the Worker back to a build whose cache has been pruned will 500 the site, so revert-and-redeploy (~12 min) is the recovery path.
 
 The job **aborts without deleting anything** if it can't positively identify the live production folder, resolve the default branch, or list the repo's branches — a transient API error must never leave every folder unexplained and therefore deleted. A *preview* probe failing is different: it never aborts the sweep, and that branch alone falls back to keeping its last few commits, so "no answer" is never read as "nothing to keep". A failed *PR* lookup resolves the same way, in the protective direction: that branch is treated as active, because retirement is the one rule here whose job is to delete more and so the one rule that must never fire on a guess. Trigger it manually with `dry_run` to preview deletions.
 
@@ -115,7 +160,7 @@ It needs three repository secrets (Settings → Secrets and variables → Action
 
 The `R2_INC_CACHE_*` pair is named for the bucket it belongs to, because a second R2 credential now exists: `.github/workflows/r2-illustrations-lifecycle.yml` needs an **Admin Read & Write** token (`R2_ADMIN_*`) to edit bucket configuration, which is a tier this job deliberately does not get — it deletes objects unattended every two hours, and admin tokens are account-wide, so one here could destroy `dataslope-workspaces` (live user data) or `dataslope-inc-cache` itself. The job aborts rather than running credential-less, so a missing or half-renamed secret fails loudly instead of reporting a green run that pruned nothing.
 
-There is little left to tune: `MAX_BRANCHES` caps how many branch previews may coexist, and `GRACE_HOURS` sizes the in-flight-deploy safety net. `THRESHOLD_HOURS`, `MAIN_COMMITS`, `PR_COMMITS` and `MIN_CACHE_OBJECTS` were retired on 2026-08-14 — each approximated something the job now measures directly, and the age threshold in particular was the single largest contributor to the 78 GB peak. At ~2.5 GB per retained build, retention is what decides whether the bucket sits near R2's 10 GB free tier or balloons; storage beyond it is cheap ($0.015/GB-month), but there's no reason to pay for dead previews.
+There is little left to tune: `MAX_BRANCHES` caps how many branch previews may coexist, and `GRACE_HOURS` sizes the in-flight-deploy safety net. `THRESHOLD_HOURS`, `MAIN_COMMITS`, `PR_COMMITS` and `MIN_CACHE_OBJECTS` were retired on 2026-08-14 — each approximated something the job now measures directly, and the age threshold in particular was the single largest contributor to the 78 GB peak. Retention decides whether the bucket sits near R2's 10 GB free tier or balloons — but only once bytes-per-build is what it should be: at ~0.147 GiB a build the whole steady-state bucket is well under a gigabyte, and at 2.34 GiB it is over the free tier with three folders. Storage beyond the tier is cheap ($0.015/GB-month), but there's no reason to pay for dead previews or for compression that isn't running.
 
 ## Search
 
@@ -171,6 +216,18 @@ The hash is taken over the **corpus**, not over `content/`, which is what makes 
 Gating matters more than the row count suggests. A re-seed deletes and re-inserts every row, and on an FTS5 table the rows that get written are not the ~9k logical ones — the shadow tables hold ~20k, and D1 meters deletes as writes too, so an unconditional seed spends roughly 40k written rows on a deploy that may have touched no lesson at all.
 
 Two properties worth keeping if this is ever rewritten: the hash is written **last**, so a partial apply cannot leave a hash claiming to be current and the next deploy retries; and **any uncertainty seeds** — an unreadable remote hash means apply, because a redundant seed costs some written rows while a wrongly skipped one serves stale content. `npm run db:seed:search:remote:force` overrides the check.
+
+### When the apply fails: a resetting D1
+
+The remote apply is the last thing the production deploy command runs, *after* the Worker has shipped. So a failure there fails the whole Workers Build over an index that will be rebuilt on the next deploy anyway — which is exactly what happened on 2026-08-26: the Worker deployed, the R2 cache populated, and the build went red on `✘ [ERROR] {"D1_RESET_DO":true}`.
+
+`D1_RESET_DO` means the Durable Object behind the database was reset. D1 does that on an internal error, a D1 code update, an overloaded or unreachable node, or a write that ran too long, and its [debug table](https://developers.cloudflare.com/d1/observability/debug-d1/) names "attempting a large import" as a way to earn the last one. `seed-search.mjs` retries the family (three attempts, 5s then 10s) rather than failing the build on the first one.
+
+Two things make retrying safe rather than hopeful. The import is atomic — wrangler prints "if the execution fails to complete, your DB will return to its original state and you can safely retry" on the way in — and even a hypothetical partial apply is covered by the hash-written-last property above. Note that D1's *own* automatic retries do not help here: it retries read-only queries only, and never anything that writes.
+
+What is deliberately **not** retried: `Exceeded maximum DB size` and the free-tier daily row limits. Those fail identically on every attempt and want a person, not another 15 seconds.
+
+If the retries stop being enough, the import is probably too large to apply in one shot (it is ~22 MB / 21k rows / 285 batches today) and the fix is to shard the seed into sequential files — which the hash-written-last property already anticipates, since it makes a partial apply a self-correcting state rather than a corrupt one.
 
 Sizing, measured rather than estimated: 8,965 rows over ~890 lessons produce a **~21 MB** database (14.7 MB of stored text so `snippet()` can quote matches, 5.5 MB of actual inverted index). That is 4% of the free plan's 500 MB per-database cap and 0.2% of the paid plan's 10 GB, so storage is not a constraint this index will run into.
 

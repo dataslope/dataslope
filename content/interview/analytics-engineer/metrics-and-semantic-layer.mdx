@@ -157,22 +157,27 @@ the latest or an average instead. **Non-additive** metrics (ratios, percentages,
 distinct counts) cannot be summed across any dimension and must be recomputed
 from base rows.
 
-### Why can't you pre-aggregate a distinct count or a ratio?
+### Why can't you simply sum pre-aggregated distinct counts or ratios?
 
 Because they are non-additive. `COUNT(DISTINCT user_id)` per day cannot be summed
 into a monthly figure, a user active on two days would be counted twice, so you
-must recompute over the whole month. A ratio like conversion rate must be
+must recompute over the whole month or merge a suitable distinct-count sketch.
+A ratio like conversion rate must be
 computed as `SUM(numerator) / SUM(denominator)` at the reporting grain, never by
-averaging daily ratios. The semantic layer stores the components and divides at
-query time.
+averaging daily ratios. The numerator and denominator can be pre-aggregated at
+a grain that preserves the requested dimensions, then summed and divided at
+query time. The non-additive result itself is what cannot be rolled up by a
+plain sum or average.
 
 ### How does a semantic layer handle a ratio metric correctly?
 
 It defines the **numerator and denominator as separate measures** and computes
 the division **at query time** for whatever grain is requested, so
 `revenue / orders` is always summed then divided at the reporting level, never
-pre-divided. This guarantees the ratio is correct at every slice and avoids the
-"average of averages" error.
+pre-divided. This avoids the "average of averages" error when the components
+are additive at the requested dimensions and their filters and grains match.
+The semantic layer cannot make an unavailable dimension or an incompatible
+numerator and denominator valid merely by centralizing the formula.
 
 ### What causes two dashboards to report different numbers for the same metric?
 

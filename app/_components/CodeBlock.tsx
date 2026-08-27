@@ -10,7 +10,16 @@ import {
   useSyncExternalStore,
 } from "react";
 import { flushSync } from "react-dom";
-import { ChevronDown, ChevronUp, File, Info, Lock, Play, RotateCcw } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  ChevronUp,
+  File,
+  Info,
+  Lock,
+  Play,
+  RotateCcw,
+} from "lucide-react";
 import { Popover } from "@base-ui/react/popover";
 import { Toast } from "@base-ui/react/toast";
 import {
@@ -62,7 +71,9 @@ import {
   retainRuntime,
   RuntimeScope,
 } from "./runtimeRegistry";
+import { appendOutputCell } from "./outputCells";
 import { mergeInitAndEntry } from "./runtime/mergeInit";
+import { STDIN_FILENAME, normalizeStdin } from "./runtime/stdinFile";
 import {
   datasetStageFilename,
   fetchDatasetBytes,
@@ -129,6 +140,18 @@ interface CodeBlockProps {
   label?: string;
   /** Force the file tab bar to render even for a single-file workspace. */
   showFileTabBar?: boolean;
+  /**
+   * Standard input for the program, shown in an editable STDIN panel under
+   * the editor and staged as `stdin.txt` on every Run.
+   *
+   * Presence is the switch: omit it and there is no panel (the overwhelming
+   * majority of blocks never read stdin, and a permanent empty box below
+   * every one of them is noise). Pass `""` for a panel the reader fills in
+   * themselves. Requires `adapter.supportsStdin`; on any other adapter the
+   * prop is ignored, because a box that cannot reach the program is worse
+   * than no box at all.
+   */
+  stdin?: string;
   /** Extra importable module names to pre-install at warm-up, merged with
    *  the modules found by scanning the block's own code. Escape hatch for
    *  imports the scan can't see. Python only. */
@@ -276,8 +299,18 @@ function CodeBlockInner({
   expectError,
   previewHeight,
   autoPreview,
+  stdin,
 }: CodeBlockProps) {
   const blockId = useBlockId(adapter);
+
+  // ─── STDIN ──────────────────────────────────────────────────────────
+  // The panel exists only where the runtime can actually be fed; see
+  // `LanguageAdapter.supportsStdin`. `starterStdin` is the authored text,
+  // the reader's edits live in `stdinBufferRef` (a ref, not state: the
+  // CodeMirror doc is the source of truth and re-rendering on every
+  // keystroke would fight it, exactly as the code editor does it).
+  const hasStdin = stdin !== undefined && adapter.supportsStdin === true;
+  const starterStdin = hasStdin ? stdin : "";
 
   const toastManager = Toast.useToastManager();
 
@@ -295,6 +328,14 @@ function CodeBlockInner({
   const initEditorHostRef = useRef<HTMLDivElement | null>(null);
   const initEditorRef = useRef<EditorView | null>(null);
   const initThemeCompRef = useRef<Compartment | null>(null);
+  const stdinEditorHostRef = useRef<HTMLDivElement | null>(null);
+  const stdinEditorRef = useRef<EditorView | null>(null);
+  const stdinThemeCompRef = useRef<Compartment | null>(null);
+  // Live STDIN buffer, read at Run time and written by the editor's update
+  // listener. Null until seeded below, which cannot happen here: the seed
+  // reads the persisted copy and the key for it is derived further down.
+  const stdinBufferRef = useRef<string | null>(null);
+  const stdinSaveTimerRef = useRef<number | null>(null);
   const runtimeRef = useRef<LanguageRuntime | null>(null);
   // Outer card element + one-shot guard for the scroll-into-view warm-up.
   const cardRef = useRef<HTMLDivElement | null>(null);
@@ -335,6 +376,9 @@ function CodeBlockInner({
     adapter.id,
     entryFile?.initCode,
     entryFile?.starterCode ?? "",
+    // The *authored* stdin, never the reader's edited buffer: this looks up
+    // what the generator recorded, and the generator only ever saw this.
+    hasStdin ? starterStdin : undefined,
   );
   const prepopulated = usePrepopulatedOutput(outputKey);
   // Negative ids so prepopulated cells never collide with a run's own
@@ -512,8 +556,8 @@ function CodeBlockInner({
     () =>
       workspaceFiles
         .map((f) => `${f.filename}:${f.initCode ?? ""}:${f.starterCode}`)
-        .join("|"),
-    [workspaceFiles],
+        .join("|") + (hasStdin ? `|<stdin>:${starterStdin}` : ""),
+    [workspaceFiles, hasStdin, starterStdin],
   );
   const persistedKeyForFile = useCallback(
     (filename: string) =>
@@ -547,6 +591,30 @@ function CodeBlockInner({
   useEffect(() => {
     activeFilenameRef.current = activeFilename;
   }, [activeFilename]);
+
+  // STDIN persists beside the file buffers, off the same fingerprint, so
+  // editing the lesson retires a saved input the way it retires saved code.
+  // The suffix is `<stdin>` rather than `stdin.txt`, which is a filename a
+  // multi-file workspace could legitimately declare and would then collide.
+  const persistedStdinKey = useMemo(
+    () =>
+      persistKey("codeblock", `${adapter.id}|${workspaceFingerprint}|<stdin>`),
+    [adapter.id, workspaceFingerprint],
+  );
+  // Seed once, on the first render, the way `fileBuffersRef` reads its own
+  // persisted copies. Nothing rendered on the server depends on the result
+  // (the buffer reaches the DOM only when CodeMirror mounts, in an effect),
+  // so reading storage here cannot desync hydration.
+  if (stdinBufferRef.current === null) {
+    stdinBufferRef.current = hasStdin
+      ? (loadPersistedCode(persistedStdinKey) ?? starterStdin)
+      : "";
+  }
+  // Collapsed by default only when the block ships no input to show; an
+  // authored one is part of the lesson and should be visible without a
+  // click. Derived from the *authored* text, so server and client agree.
+  const [stdinExpanded, setStdinExpanded] = useState(starterStdin.length > 0);
+  const stdinPanelId = `${blockId}-stdin`;
 
   // Active file's init code (trimmed) + derived line metrics; the init
   // drawer and line-number offset reconfigure when the active tab changes.
@@ -701,6 +769,11 @@ function CodeBlockInner({
         effects: initThemeCompRef.current.reconfigure(themeFor(cmThemeName)),
       });
     }
+    if (stdinEditorRef.current && stdinThemeCompRef.current) {
+      stdinEditorRef.current.dispatch({
+        effects: stdinThemeCompRef.current.reconfigure(themeFor(cmThemeName)),
+      });
+    }
   }, [cmThemeName]);
 
   // Mount / re-mount the read-only init editor for the active file's init
@@ -753,6 +826,72 @@ function CodeBlockInner({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeHasInit, activeTrimmedInit]);
+
+  // Mount the STDIN editor. Mount-once (the doc is seeded from the ref and
+  // Reset dispatches into the live view), and kept mounted while collapsed
+  // so a CSS height transition has something to reveal.
+  useEffect(() => {
+    if (!hasStdin) return;
+    if (!stdinEditorHostRef.current || stdinEditorRef.current) return;
+
+    const themeComp = new Compartment();
+
+    const view = new EditorView({
+      doc: stdinBufferRef.current ?? "",
+      parent: stdinEditorHostRef.current,
+      extensions: [
+        history(),
+        drawSelection(),
+        dropCursor(),
+        lineNumbersExt(),
+        EditorView.lineWrapping,
+        // No language extension, no bracket closing, no completion: this is
+        // data the program parses, not code. Auto-inserting a `)` into a
+        // line of numbers would be a bug the reader gets blamed for.
+        keymap.of([
+          {
+            key: "Mod-Enter",
+            run: () => {
+              runRef.current();
+              return true;
+            },
+          },
+          ...defaultKeymap,
+          ...historyKeymap,
+          ...redoKeymap,
+        ]),
+        themeComp.of(themeFor(cmThemeNameFor(detectIsDark()))),
+        noActiveLine,
+        EditorView.updateListener.of((update) => {
+          if (!update.docChanged) return;
+          const current = update.state.doc.toString();
+          stdinBufferRef.current = current;
+          if (stdinSaveTimerRef.current !== null)
+            window.clearTimeout(stdinSaveTimerRef.current);
+          stdinSaveTimerRef.current = window.setTimeout(() => {
+            stdinSaveTimerRef.current = null;
+            savePersistedCode(persistedStdinKey, current);
+          }, 400);
+        }),
+      ],
+    });
+
+    stdinEditorRef.current = view;
+    stdinThemeCompRef.current = themeComp;
+
+    return () => {
+      // Flush the pending debounced write, as the code editor does, so the
+      // last keystroke before a navigation isn't the one that gets lost.
+      if (stdinSaveTimerRef.current !== null) {
+        window.clearTimeout(stdinSaveTimerRef.current);
+        stdinSaveTimerRef.current = null;
+        savePersistedCode(persistedStdinKey, view.state.doc.toString());
+      }
+      view.destroy();
+      stdinEditorRef.current = null;
+      stdinThemeCompRef.current = null;
+    };
+  }, [hasStdin, persistedStdinKey]);
 
   // ─── Multi-file tab switching ───────────────────────────────────────
   // Snapshot + persist the outgoing file's buffer, load the incoming one,
@@ -848,6 +987,7 @@ function CodeBlockInner({
           outputs: outputs
             .filter((c) => c.type === "stdout" || c.type === "stderr" || c.type === "log")
             .map((c) => c.content),
+          stdin: hasStdin ? (stdinBufferRef.current ?? "") : undefined,
         }),
       };
     },
@@ -940,16 +1080,24 @@ function CodeBlockInner({
       // the runtime VFS so imports resolve. Single-file blocks without
       // datasets skip the call entirely (see ChallengeCard's `execute` for
       // why their source must not be pre-staged).
+      //
+      // A stdin-capable adapter always stages, even with nothing to stage.
+      // Every block of one language shares a runtime, and the staged file
+      // set lives on the runtime, so the call is also how a block *without*
+      // stdin clears the input a block above it left behind — skip it and
+      // the printf demo starts eating the scanf demo's numbers.
       if (
-        (isMultiFile || datasetFiles.length > 0) &&
+        (isMultiFile ||
+          datasetFiles.length > 0 ||
+          adapter.supportsStdin === true) &&
         runtimeRef.current.prepareFileSystem
       ) {
+        const encoder = new TextEncoder();
         const fileMap = new Map<string, Uint8Array>();
         // Dataset bytes first, so a (misauthored) workspace file with
         // the same name deterministically wins.
         for (const f of datasetFiles) fileMap.set(f.filename, f.bytes);
         if (isMultiFile) {
-          const encoder = new TextEncoder();
           for (const [name, content] of filesSnapshot) {
             fileMap.set(
               name,
@@ -960,6 +1108,14 @@ function CodeBlockInner({
               ),
             );
           }
+        }
+        // Last, so it wins over a same-named dataset or workspace file: the
+        // panel is what the reader can see and edit, so it is what must run.
+        if (hasStdin) {
+          fileMap.set(
+            STDIN_FILENAME,
+            encoder.encode(normalizeStdin(stdinBufferRef.current ?? "")),
+          );
         }
         try {
           await runtimeRef.current.prepareFileSystem(fileMap);
@@ -982,36 +1138,21 @@ function CodeBlockInner({
       try {
         await runtimeRef.current.run(
           code,
-          (cell) => {
+          (cell, seq, append) => {
             if (runSeqRef.current !== mySeq) return;
             const elapsedMs = performance.now() - startedAt;
             const elapsed =
               elapsedMs < 1000
                 ? `${elapsedMs.toFixed(0)}ms`
                 : `${(elapsedMs / 1000).toFixed(2)}s`;
-            setOutputs((prev) => {
-              // Collapse consecutive stdout cells so one console.log per
-              // cell doesn't stack a pile of one-line cells.
-              const last = prev[prev.length - 1];
-              if (
-                cell.type === "stdout" &&
-                last &&
-                last.type === "stdout"
-              ) {
-                const merged: OutputCell = {
-                  ...last,
-                  content: last.content + "\n" + cell.content,
-                  elapsed,
-                };
-                return [...prev.slice(0, -1), merged];
-              }
-              const fullCell: OutputCell = {
-                id: ++nextOutputId,
+            setOutputs((prev) =>
+              appendOutputCell(prev, cell, {
+                seq,
+                append,
                 elapsed,
-                ...cell,
-              };
-              return [...prev, fullCell];
-            });
+                nextId: () => ++nextOutputId,
+              }),
+            );
           },
           {
             entryFilename: isMultiFile ? resolvedEntryFilename : undefined,
@@ -1068,6 +1209,7 @@ function CodeBlockInner({
     reportPrepare,
     resetPrepare,
     tailwind,
+    hasStdin,
   ]);
 
   // Keep the mount-once keymap's closure current.
@@ -1150,12 +1292,29 @@ function CodeBlockInner({
         changes: { from: 0, to: view.state.doc.length, insert: activeStarter },
       });
     }
-    // The dispatch above re-fires the persist listener; cancel its
-    // scheduled write AFTER dispatching so the localStorage entries stay
+    // Reset means the whole authored block, input included.
+    if (hasStdin) {
+      stdinBufferRef.current = starterStdin;
+      clearPersistedCode(persistedStdinKey);
+      const stdinView = stdinEditorRef.current;
+      stdinView?.dispatch({
+        changes: {
+          from: 0,
+          to: stdinView.state.doc.length,
+          insert: starterStdin,
+        },
+      });
+    }
+    // The dispatches above re-fire the persist listeners; cancel their
+    // scheduled writes AFTER dispatching so the localStorage entries stay
     // gone.
     if (persistSaveTimerRef.current !== null) {
       window.clearTimeout(persistSaveTimerRef.current);
       persistSaveTimerRef.current = null;
+    }
+    if (stdinSaveTimerRef.current !== null) {
+      window.clearTimeout(stdinSaveTimerRef.current);
+      stdinSaveTimerRef.current = null;
     }
     // Reset restores the starter, so the prepopulated cells (exactly what
     // the starter prints) come back with it.
@@ -1178,6 +1337,9 @@ function CodeBlockInner({
     toastManager,
     seedOutputs,
     prepopulated,
+    hasStdin,
+    starterStdin,
+    persistedStdinKey,
   ]);
 
   const MIN_FORMAT_MS = 300;
@@ -1384,7 +1546,7 @@ function CodeBlockInner({
                 }`}
                 aria-hidden
               >
-                ▶
+                <ChevronRight size={13} strokeWidth={2} />
               </span>
               <span className={challengeStyles.initLabel}>
                 Initialization code ({adapter.runtimeInfo.language})
@@ -1461,6 +1623,51 @@ function CodeBlockInner({
         ref={editorHostRef}
         aria-label={`${adapter.runtimeInfo.language} source code`}
       />
+
+      {/* ── STDIN ── input goes between the program and Run, which is the
+            order it happens in. */}
+      {hasStdin && (
+        <div className={challengeStyles.stdinWrap}>
+          <button
+            type="button"
+            className={challengeStyles.stdinToggle}
+            aria-expanded={stdinExpanded}
+            aria-controls={stdinPanelId}
+            onClick={() => setStdinExpanded((v) => !v)}
+          >
+            <span
+              className={`${challengeStyles.initCaret} ${
+                stdinExpanded ? challengeStyles.initCaretOpen : ""
+              }`}
+              aria-hidden
+            >
+              <ChevronRight size={13} strokeWidth={2} />
+            </span>
+            <span className={challengeStyles.stdinLabel}>STDIN</span>
+            <span className={challengeStyles.stdinHint}>
+              What the program reads. Edit it and Run again.
+            </span>
+          </button>
+          <div
+            id={stdinPanelId}
+            className={`${challengeStyles.stdinEditorWrap} ${
+              stdinExpanded
+                ? challengeStyles.stdinEditorWrapOpen
+                : challengeStyles.stdinEditorWrapCollapsed
+            }`}
+            // A collapsed panel is not just visually hidden: without this a
+            // screen reader still reads the editor out and Tab still lands
+            // the cursor in a box nobody can see.
+            inert={!stdinExpanded}
+          >
+            <div
+              className={challengeStyles.stdinEditor}
+              aria-label="Standard input"
+              ref={stdinEditorHostRef}
+            />
+          </div>
+        </div>
+      )}
 
       <div
         className={challengeStyles.actionBar}

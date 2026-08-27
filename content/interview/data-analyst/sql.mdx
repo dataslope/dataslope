@@ -53,6 +53,8 @@ All combine rows from two tables on a condition; they differ in which
 - **RIGHT**, all rows from the right table; `NULL`s on the left.
 - **FULL**, all rows from both; `NULL`s wherever either side is missing.
 
+<Chart slug="join-types-venn" />
+
 "List all customers and their orders, *including customers who never
 ordered*" is the classic tell for a `LEFT JOIN`.
 
@@ -110,6 +112,8 @@ the `LEFT JOIN` keeps top-level employees whose `manager_id` is `NULL`.
 The two idiomatic patterns are `LEFT JOIN ... WHERE right.key IS NULL` and
 `NOT EXISTS`. Both produce an anti-join: rows in the left table with no
 corresponding row in the right.
+
+<Chart slug="join-anti-venn" />
 
 ```sql
 -- Pattern 1: LEFT JOIN
@@ -454,6 +458,13 @@ Some engines (SQL Server, BigQuery, DuckDB) offer a native `PIVOT` syntax.
 
 ### What does GROUP BY ALL or GROUP BY with ROLLUP do?
 
+These are different, dialect-dependent features. In engines that support the
+shorthand, `GROUP BY ALL` groups by every selected expression that is not an
+aggregate. It saves repetition, but an explicit column list is more portable
+and makes the output grain easier to review. In some systems or older SQL
+versions, `GROUP BY ALL` has a different legacy meaning or is unsupported, so
+check the target database.
+
 `ROLLUP` generates **subtotals** at each level of a hierarchy plus a
 grand total. For example, `GROUP BY ROLLUP(region, category)` produces
 rows for every (region, category) pair, then subtotals per region, then a
@@ -464,6 +475,10 @@ SELECT region, category, SUM(amount) AS revenue
 FROM orders
 GROUP BY ROLLUP(region, category);
 ```
+
+Because real grouping keys may themselves be `NULL`, use the engine's
+`GROUPING(region)` / `GROUPING(category)` function when you must distinguish a
+subtotal placeholder from a genuine null-valued key.
 
 ### How do you find duplicate rows in a table?
 

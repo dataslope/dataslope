@@ -134,13 +134,15 @@ Pick a key with high cardinality and even access distribution.
 
 ### Explain the CAP theorem.
 
-In the presence of a network **P**artition, a distributed system must choose
-between **C**onsistency (every read sees the latest write) and
-**A**vailability (every request gets a non-error response). You cannot have
-both during a partition. A **CP** system (e.g. a leader-based store) rejects
-requests to stay consistent; an **AP** system (e.g. Dynamo-style) keeps
-serving and reconciles later. Since partitions are unavoidable, CAP is really
-a choice between C and A when one occurs.
+In the presence of a network **P**artition, CAP says a distributed read/write
+register cannot provide both **C**onsistency, specifically a single-copy or
+linearizable view, and **A**vailability, where every request to a non-failing
+node eventually receives a response. A CP design may reject or delay operations
+that cannot be made safe; an AP design continues serving and may expose
+conflicting or stale versions that must later be reconciled. CAP is about the
+partition interval, not a general instruction to label an entire database
+"CP" or "AP". Outside partitions, latency, durability, and consistency still
+have separate trade-offs, often discussed through PACELC.
 
 The theorem is easiest to hold onto as the three pairs you could pick and
 the one that is not actually available to you.

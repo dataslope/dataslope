@@ -36,7 +36,9 @@ change (`PATCH /articles/42 {"status": "published"}`).
 ### Walk through the main HTTP methods and their semantics.
 
 - **GET**, read a resource; **safe** (no side effects) and **idempotent**.
-- **POST**, create a resource or trigger an action; **not** idempotent.
+- **POST**, submit data for resource-specific processing; not idempotent by
+  HTTP semantics, though an application can make a particular operation
+  idempotent with a key or other deduplication contract.
 - **PUT**, replace a resource wholesale; idempotent.
 - **PATCH**, partially update a resource; not necessarily idempotent.
 - **DELETE**, remove a resource; idempotent.
@@ -56,19 +58,22 @@ of parsing error strings.
 
 ### 401 vs 403, what is the difference?
 
-**401 Unauthorized** means "I do not know who you are", authentication failed
-or is missing; the client should log in or send credentials. **403 Forbidden**
-means "I know who you are, but you may not do this", authentication succeeded
-but authorization failed. A common mistake is returning 401 for a permission
-problem, which wrongly signals the credentials are bad.
+**401 Unauthorized** means the request lacks valid authentication credentials
+for the target and normally includes a `WWW-Authenticate` challenge. Despite
+its name, it is an authentication response. **403 Forbidden** means the server
+understood the request but refuses to fulfill it; valid credentials may be
+insufficient, and authenticating again will not necessarily help. The common
+"401 means unknown, 403 means known but disallowed" mnemonic is useful but too
+strict for every case.
 
 ### What is idempotency and why does it matter for APIs?
 
 An idempotent operation produces the same result whether called once or many
 times. It matters because networks are unreliable: a client that times out and
 **retries** must not create a duplicate order or double-charge a card.
-`GET`, `PUT`, and `DELETE` are idempotent by definition; `POST` is not. To
-make a `POST` safe to retry, accept an **idempotency key** (a client-generated
+HTTP defines `GET`, `PUT`, and `DELETE` as idempotent methods; it does not give
+`POST` that semantic guarantee. To make a particular `POST` safe to retry,
+accept an **idempotency key** (a client-generated
 unique ID) and deduplicate on it server-side:
 
 ```text
@@ -104,7 +109,8 @@ Two main patterns. **Offset/limit** (`?limit=20&offset=40`) is simple and
 allows jumping to any page, but it is slow on large offsets and can skip or
 repeat rows when the underlying data changes. **Cursor** (keyset) pagination
 returns an opaque cursor pointing at the last item (`?limit=20&after=eyJ...`);
-it is stable under inserts and efficient at any depth, at the cost of no
+with a unique, deterministic, immutable ordering it avoids offset shifts under
+inserts and is efficient at any depth, at the cost of no
 random page access. Prefer cursors for large or fast-changing datasets.
 
 ```text
@@ -123,20 +129,23 @@ hundred times page one.
 ### Sessions vs JWT vs OAuth, how do they relate?
 
 They answer different questions. **Session cookies**: the server stores
-session state and hands the client an opaque ID in a cookie, easy to revoke,
-but stateful. **JWT** (JSON Web Token): a signed, **self-contained** token the
-client sends in an `Authorization: Bearer` header, stateless and scalable, but
-hard to revoke before expiry. **OAuth 2.0** is not a token format but a
+session state and hands the client an opaque ID, commonly in a cookie. It is
+easy to revoke but requires server-side state. **JWT** (JSON Web Token) is a
+claims format that can be signed and optionally encrypted. A JWT can support
+local verification, but using one does not automatically make an architecture
+secure or stateless, and revocation may still require a lookup. **OAuth 2.0** is
+not a token format but a
 **delegated authorization framework**, "let app X access my data on service Y
-without sharing my password", and it often issues JWTs as access tokens.
+without sharing my password". Its access tokens may be JWTs or opaque strings.
 
 ### When would you choose stateful sessions over stateless JWTs?
 
 Choose **sessions** when you need instant **revocation** (log out, ban a user
 immediately) and can afford a shared session store, the server controls
-validity. Choose **JWTs** when you want **stateless** verification across many
-services without a lookup, and can tolerate that a token stays valid until it
-expires. A common hybrid: short-lived access JWTs plus a revocable, longer-lived
+validity. Choose locally verified **JWTs** when you want verification across
+many services without a per-request session lookup and can tolerate the token's
+validity and revocation policy. A common hybrid uses short-lived access JWTs
+plus a revocable, longer-lived
 **refresh token**.
 
 ### How should an API handle errors?

@@ -285,11 +285,12 @@ training features and online serving features is the core challenge.
 
 ### How do you detect and respond to concept drift?
 
-Monitor the relationship between model inputs and outputs over time.
-Proxy signals (when true labels are delayed): prediction distribution
-shift, input feature distribution shift (population stability index (PSI),
-Kullback–Leibler (KL) divergence, Kolmogorov–Smirnov test). When true
-labels become available: track live accuracy, precision, recall.
+Concept drift is a change in the relationship between inputs and the true
+target, so confirming it requires labels or another outcome signal. When labels
+are delayed, prediction and input-distribution shifts can warn that something
+changed, but they cannot distinguish concept drift from harmless covariate
+shift. Once labels arrive, evaluate time-sliced performance and calibration,
+ideally against stable cohorts or controls.
 Responses range from alerting to automated retraining to feature redesign
 if the drift is structural.
 
@@ -299,8 +300,11 @@ PSI quantifies the shift between a reference distribution (training) and
 a current distribution (production) for a single feature. Buckets are
 defined on the reference; the fraction of examples per bucket is compared
 between reference and current using a symmetric KL-divergence-like formula.
-PSI below 0.1 is stable; 0.1–0.2 warrants monitoring; above 0.2 signals
-significant shift requiring action. Formally, summing over the buckets:
+Rules such as "below 0.1 is stable" and "above 0.2 needs action" are industry
+conventions, not calibrated significance levels. PSI depends on bin boundaries,
+sample size, smoothing, and feature distribution, and it does not say whether a
+shift harms the model. Establish feature-specific baselines and connect alerts
+to performance or operational impact. Formally, summing over the buckets:
 
 $$
 \text{PSI} = \sum_i (\text{cur}_i - \text{ref}_i)\,\ln\frac{\text{cur}_i}{\text{ref}_i}
