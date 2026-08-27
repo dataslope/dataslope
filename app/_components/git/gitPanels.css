@@ -42,15 +42,18 @@
   margin-bottom: 10px;
 }
 
+/* The whole prompt line reads as one thing: working directory, `$`, and the
+   command the reader typed, all in the brand green. Output below it stays
+   body text, which is the contrast that makes a long scrollback scannable. */
 .git-terminal-command {
   display: flex;
   gap: 8px;
-  color: var(--text-dim);
+  color: var(--ds-green);
   word-break: break-word;
 }
 
 .git-terminal-prompt {
-  color: var(--primary);
+  color: inherit;
   flex: none;
   font-weight: 700;
 }
@@ -90,6 +93,9 @@
   border-top: 1px solid var(--border);
   background: var(--bg);
   flex: none;
+  /* The live prompt is the same green as the ones already in the scrollback,
+     so the line does not change color when it is run. */
+  color: var(--ds-green);
   /* Containing block for the hidden input below, so focusing it can never
      pull the page somewhere else. */
   position: relative;
@@ -424,7 +430,7 @@
 /* Directory shown before the `$`. Colored like a real prompt so the path
    reads as context rather than as part of the command. */
 .git-terminal-cwd {
-  color: var(--term-green);
+  color: var(--ds-green);
   font-weight: 600;
   margin-right: 6px;
 }

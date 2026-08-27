@@ -53,9 +53,14 @@ interface Props {
   busy: boolean;
   /** Command names, offered for the first word of a line. */
   completions: string[];
-  /** Paths, offered for every word after the first — as bash does, where the
-   *  first word completes against PATH and the rest against the filesystem. */
-  pathCompletions?: string[];
+  /**
+   * Candidates for a partly typed path, resolved by the host because only it
+   * knows the filesystem. Called with the word under the caret exactly as
+   * typed (`src/ut`) and expected to answer in the same form
+   * (`["src/util.txt"]`), so completion can walk into a directory the way
+   * bash does rather than stopping at the current one.
+   */
+  pathCompletions?: (word: string) => string[];
   /** Transcript only, no prompt: a block that runs a fixed script. */
   readOnly?: boolean;
   /** Replaces the default empty-state copy. `null` suppresses it entirely,
@@ -76,6 +81,9 @@ interface Props {
   /** Called with the candidates when Tab cannot narrow further, so the host
    *  can print them the way bash does. */
   onListCompletions?: (matches: string[]) => void;
+  /** True once the scrollback is scrolled off its top, so a host can shade
+   *  the header it sits under. */
+  onScrolledChange?: (scrolled: boolean) => void;
 }
 
 /** Longest string every candidate starts with. */
@@ -118,17 +126,32 @@ export function GitTerminal({
   placeholder = "git status",
   inlineInput = false,
   onListCompletions,
+  onScrolledChange,
 }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const historyIndex = useRef<number | null>(null);
+  /** Consecutive Tab presses, so the second one can list what the first
+   *  could not narrow. */
+  const tabRun = useRef(0);
   const [caret, setCaret] = useState(0);
   const [focused, setFocused] = useState(false);
+
+  const scrolled = useRef(false);
+  const reportScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const next = el.scrollTop > 0;
+    if (next === scrolled.current) return;
+    scrolled.current = next;
+    onScrolledChange?.(next);
+  }, [onScrolledChange]);
 
   useLayoutEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [transcript, busy, value]);
+    reportScroll();
+  }, [transcript, busy, value, reportScroll]);
 
   useEffect(() => {
     // `preventScroll` matters: the real input is visually hidden, and without
@@ -148,32 +171,56 @@ export function GitTerminal({
     });
   }, []);
 
-  function complete() {
+  /**
+   * One press of Tab.
+   *
+   * `run` is how many Tabs came immediately before this one, because bash
+   * splits the work across two: the first completes as far as the candidates
+   * agree, and the second prints them. There is no terminal bell here, so
+   * that listing is the only signal a reader gets that the choice was
+   * ambiguous.
+   */
+  function complete(run: number) {
     const upto = value.slice(0, caret);
-    const parts = upto.split(/\s+/);
+    // A pipe or a `;` starts a new command, so the word after one completes
+    // against commands again rather than against the filesystem.
+    const segment = upto.split(/[|;&]+/).pop() ?? "";
+    const parts = segment.trimStart().split(/\s+/);
     const word = parts[parts.length - 1] ?? "";
-    // The first word is a command; everything after it is a path. Without this
-    // `cat <Tab>` would offer every command in the shell.
+
+    // The first word of a command is a command; everything after it is a
+    // path. Without this, `cat <Tab>` would offer every command in the shell.
     const pool =
-      parts.length <= 1 ? completions : (pathCompletions ?? completions);
-    const matches = [...new Set(pool.filter((c) => c.startsWith(word)))].sort();
+      parts.length <= 1
+        ? completions.filter((c) => c.startsWith(word))
+        : (pathCompletions?.(word) ?? []);
+    const matches = [...new Set(pool)].sort();
     if (!matches.length) return;
 
+    // A lone match is finished, so bash appends a space and moves you on. A
+    // directory is not finished: the caret stays after the slash so the next
+    // Tab can walk into it.
     const shared = commonPrefix(matches);
-    if (shared.length > word.length) {
-      // One match is finished, so bash adds a space; a directory is not, so it
-      // does not.
-      const finished = matches.length === 1 && !shared.endsWith("/");
-      const insert = shared + (finished ? " " : "");
+    const insert =
+      matches.length === 1 && !shared.endsWith("/") ? `${shared} ` : shared;
+
+    if (insert.length > word.length) {
       onValueChange(value.slice(0, caret - word.length) + insert + value.slice(caret));
       moveCaret(caret - word.length + insert.length);
       return;
     }
-    // Nothing more in common: show the choices, as a second Tab does in bash.
-    if (matches.length > 1) onListCompletions?.(matches);
+
+    // Nothing left to add. Print the candidates by their last segment, which
+    // is the column of names bash shows rather than a column of full paths.
+    if (matches.length > 1 && run >= 1) {
+      onListCompletions?.(matches.map((m) => m.slice(m.lastIndexOf("/", m.length - 2) + 1)));
+    }
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    // Only a run of Tabs with nothing between them earns the listing.
+    if (event.key !== "Tab") tabRun.current = 0;
+
     if (event.key === "Enter") {
       event.preventDefault();
       if (busy) return;
@@ -205,7 +252,8 @@ export function GitTerminal({
 
     if (event.key === "Tab") {
       event.preventDefault();
-      complete();
+      complete(tabRun.current);
+      tabRun.current += 1;
       return;
     }
 
@@ -294,6 +342,7 @@ export function GitTerminal({
       <div
         className="git-terminal-scroll"
         ref={scrollRef}
+        onScroll={reportScroll}
         // Clicking dead space in a terminal puts the cursor back on the
         // prompt; without this the inline prompt is easy to lose.
         onMouseUp={() => {

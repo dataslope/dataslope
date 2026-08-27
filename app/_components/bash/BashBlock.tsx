@@ -42,8 +42,9 @@ const SHELL_COMMANDS = [
   "basename", "dirname", "seq", "date", "which", "help",
 ];
 
-/** Where a session starts. Never shown: the prompt is a bare `$`, so this
- *  only ever serves to make tab-completion paths relative. */
+/** Where a session starts. The prompt shows the working directory in full,
+ *  which is bash's own `\w` and what `pwd` would print; it also makes
+ *  tab-completion paths relative. */
 const PROMPT_ROOT = "/repo";
 
 export interface BashBlockProps {
@@ -55,8 +56,6 @@ export interface BashBlockProps {
   scenario?: string;
   /** Share a working directory with other blocks carrying the same id. */
   dir?: string;
-  /** Caption in the block header. */
-  label?: string;
   /** Rows the terminal shows before it scrolls. */
   rows?: number;
 }
@@ -65,7 +64,6 @@ export default function BashBlock({
   commands,
   scenario = DEFAULT_BASH_SCENARIO,
   dir,
-  label,
   rows = 10,
 }: BashBlockProps) {
   const script = useMemo(() => {
@@ -79,13 +77,22 @@ export default function BashBlock({
   const [history, setHistory] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const entryId = useRef(0);
+  /** The directory each entry ran in, so scrollback shows a `cd` taking
+   *  effect on the line after it rather than rewriting the whole history. */
+  const promptAt = useRef<Map<number, string>>(new Map());
+  /** Where the session is right now. Read from each result rather than from
+   *  React state, which cannot keep up inside a run of commands. */
+  const cwdRef = useRef(PROMPT_ROOT);
   /** Bumped by Reset, so the starting script plays again on a fresh tree. */
   const [runToken, setRunToken] = useState(0);
+  /** Shades the header once the scrollback has content above the fold. */
+  const [scrolled, setScrolled] = useState(false);
   const played = useRef(-1);
 
   const append = useCallback(
-    (command: string, result: { stdout: string; stderr: string; exitCode: number }) => {
+    (command: string, result: { stdout: string; stderr: string; exitCode: number }, at: string) => {
       const id = (entryId.current += 1);
+      promptAt.current.set(id, at);
       setTranscript((t) => [...t, { id, command, ...result }]);
     },
     [],
@@ -93,10 +100,15 @@ export default function BashBlock({
 
   const runOne = useCallback(
     async (command: string) => {
+      // The directory as it was before the command ran: a `cd` belongs to the
+      // prompt of the *next* line, exactly as in a terminal.
+      const at = cwdRef.current;
       try {
-        append(command, await exec(command));
+        const result = await exec(command);
+        cwdRef.current = result.cwd;
+        append(command, result, at);
       } catch (e) {
-        append(command, { stdout: "", stderr: `${(e as Error).message}\n`, exitCode: 1 });
+        append(command, { stdout: "", stderr: `${(e as Error).message}\n`, exitCode: 1 }, at);
       }
     },
     [append, exec],
@@ -114,9 +126,11 @@ export default function BashBlock({
       // hands back a fresh one. Nothing runs and nothing joins the history,
       // which is also how bash treats it.
       if (command === "") {
+        const id = (entryId.current += 1);
+        promptAt.current.set(id, cwdRef.current);
         setTranscript((t) => [
           ...t,
-          { id: (entryId.current += 1), command: "", stdout: "", stderr: "", exitCode: 0 },
+          { id, command: "", stdout: "", stderr: "", exitCode: 0 },
         ]);
         setInput("");
         return;
@@ -165,22 +179,41 @@ export default function BashBlock({
     ]);
   }, []);
 
-  /** Paths as the learner would type them: relative to where they actually
-   *  are, so after `cd src` a bare `b.txt` completes and `src/b.txt` does not. */
-  const pathCompletions = useMemo(() => {
-    const rel = state.cwd.startsWith(PROMPT_ROOT) ? state.cwd.slice(PROMPT_ROOT.length + 1) : "";
-    const prefix = rel ? `${rel}/` : "";
-    const words = new Set<string>();
-    for (const path of state.tree) {
-      if (!path.startsWith(prefix)) continue;
-      const under = path.slice(prefix.length);
-      // Only the next segment: a directory completes to `lib/`, not to every
-      // file beneath it, the way bash walks one level at a time.
-      const slash = under.indexOf("/");
-      words.add(slash === -1 ? under : `${under.slice(0, slash)}/`);
-    }
-    return [...words];
-  }, [state.tree, state.cwd]);
+  /**
+   * What bash would offer for a partly typed path.
+   *
+   * The word is resolved the way the reader typed it: its directory part
+   * against the working directory, then one level of entries inside that.
+   * `cat sr<Tab>` gives `src/`, and a second Tab walks into it, because the
+   * lookup re-runs against `src/` rather than against a list fixed at the
+   * current directory. Directories keep their trailing slash so completion
+   * knows not to finish the word.
+   *
+   * `state.tree` holds files, so directories are inferred from the paths
+   * beneath them. Absolute and `..` paths are left alone; a lesson types
+   * relative ones.
+   */
+  const pathCompletions = useCallback(
+    (word: string) => {
+      const slash = word.lastIndexOf("/");
+      const dir = slash === -1 ? "" : word.slice(0, slash + 1);
+      const stem = slash === -1 ? word : word.slice(slash + 1);
+      const rel = state.cwd.startsWith(PROMPT_ROOT)
+        ? state.cwd.slice(PROMPT_ROOT.length + 1)
+        : "";
+      const base = `${rel ? `${rel}/` : ""}${dir}`;
+      const entries = new Set<string>();
+      for (const path of state.tree) {
+        if (!path.startsWith(base)) continue;
+        const under = path.slice(base.length);
+        const cut = under.indexOf("/");
+        const entry = cut === -1 ? under : `${under.slice(0, cut)}/`;
+        if (entry && entry.startsWith(stem)) entries.add(dir + entry);
+      }
+      return [...entries];
+    },
+    [state.tree, state.cwd],
+  );
 
   /** The scrollback as text: every prompt line and everything it printed,
    *  which is what a reader who wants to keep a session is actually after. */
@@ -188,7 +221,10 @@ export default function BashBlock({
     const lines: string[] = [];
     for (const entry of transcript) {
       if (!entry.note) {
-        for (const line of entry.command.split("\n")) lines.push(`$ ${line}`);
+        const at = promptAt.current.get(entry.id);
+        for (const line of entry.command.split("\n")) {
+          lines.push(`${at ? `${at} ` : ""}$ ${line}`);
+        }
       }
       if (entry.stdout) lines.push(entry.stdout.replace(/\n$/, ""));
       if (entry.stderr) lines.push(entry.stderr.replace(/\n$/, ""));
@@ -200,6 +236,8 @@ export default function BashBlock({
     setTranscript([]);
     setInput("");
     setHistory([]);
+    promptAt.current = new Map();
+    cwdRef.current = PROMPT_ROOT;
     setRunToken((n) => n + 1);
     void reset();
   }, [reset]);
@@ -209,11 +247,10 @@ export default function BashBlock({
   return (
     <div className="sblock-shell ds-striped-shell">
       <div className="sblock">
-        <div className="sblock-head">
+        <div className={scrolled ? "sblock-head scrolled" : "sblock-head"}>
           <span className="sblock-tag">
             <Terminal aria-hidden="true" /> Terminal
           </span>
-          {label && <span className="sblock-label">{label}</span>}
           {dir && <span className="sblock-chain">{dir}</span>}
           <span className="sblock-head-sep" />
           <div className="sblock-head-meta">
@@ -242,12 +279,13 @@ export default function BashBlock({
             busy={disabled}
             completions={SHELL_COMMANDS}
             pathCompletions={pathCompletions}
-            // A bare `$` and nothing else, the way just-bash's own terminal
-            // prompts. `pwd` is one keystroke away for a reader who wants to
-            // know where they are.
+            // bash's own `\w$`: the working directory in full, then the `$`.
+            prompt={state.cwd || PROMPT_ROOT}
+            promptFor={(entry) => promptAt.current.get(entry.id)}
             placeholder=""
             inlineInput
             onListCompletions={listCompletions}
+            onScrolledChange={setScrolled}
             placeholderHint={null}
           />
         </div>

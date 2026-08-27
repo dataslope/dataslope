@@ -177,8 +177,34 @@ html:is(.dark, [data-theme="dark"]) .scard {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 6px 16px;
+  border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
+  /* Above the terminal, so the scrolled-state shadow lands on it rather than
+     under it. */
+  position: relative;
+  z-index: 1;
+}
+
+/* Scrolled away from the top: the header casts a hairline shadow, so the
+   rule beneath it reads as an edge with content behind it rather than as a
+   divider. Nothing at all when the scrollback starts at the top. */
+.sblock-head {
+  transition: box-shadow 0.15s ease;
+}
+
+.sblock-head.scrolled {
+  box-shadow: 0 2px 4px -2px color-mix(in srgb, var(--ds-black) 18%, transparent);
+}
+
+html:is(.dark, [data-theme="dark"]) .sblock-head.scrolled {
+  box-shadow: 0 2px 4px -2px color-mix(in srgb, var(--ds-black) 55%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sblock-head {
+    transition: none;
+  }
 }
 
 .sblock-head-sep {
@@ -222,17 +248,22 @@ html:is(.dark, [data-theme="dark"]) .scard {
   gap: 5px;
   font-size: 13px;
   font-weight: 600;
-  color: var(--gb-accent);
+  /* `--text0` is not defined in this codebase; the fallback is the block's
+     own body text, which is what an undefined token would resolve to here
+     anyway, so the badge reads as a label rather than as a link. */
+  color: var(--text0, var(--gb-text));
   text-transform: none;
   letter-spacing: 0;
   flex-shrink: 0;
   white-space: nowrap;
 }
 
+/* The glyph follows the label rather than keeping the accent to itself. */
 .sblock-tag svg {
   width: 13px;
   height: 13px;
   flex-shrink: 0;
+  color: currentColor;
 }
 
 .sblock-label,
@@ -561,18 +592,20 @@ html:is(.dark, [data-theme="dark"]) .scard {
   cursor: text;
 }
 
-/* just-bash's own terminal is plain text on the page: the `$` is not tinted,
-   the echoed command is not dimmed, and nothing is colored unless a command
-   actually emitted an escape sequence for it. The playground keeps the
-   tinted prompt, so these overrides are scoped to the embedded block. */
-.sblock-terminal .git-terminal-command,
-.sblock-terminal .git-terminal-prompt,
+/* Output is plain text on the page: nothing is colored unless a command
+   actually emitted an escape sequence for it. */
 .sblock-terminal .git-terminal-out {
   color: var(--gb-text);
 }
 
 .sblock-terminal .git-terminal-prompt {
   font-weight: 400;
+}
+
+/* The line you type is the same green as the line it becomes, so pressing
+   Enter does not recolor what is already on screen. */
+.sblock-terminal .git-terminal-line {
+  color: var(--ds-green);
 }
 
 /* Output starts at column 0, under the `$` rather than under the command,

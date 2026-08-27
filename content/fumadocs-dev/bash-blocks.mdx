@@ -14,23 +14,42 @@ reload starts over.
 
 Every block gets its own working directory unless it opts into sharing one.
 
+The prompt is bash's own `\w$`: the working directory in full, then the `$`.
+A `cd` shows up on the line after it, the way it does in a terminal.
+
 The header is the code block header: a **Terminal** badge on the left, the
 engine (**Bash**) on the right, and an ellipsis menu holding **Reset** and
 **Copy transcript**.
 
 ## Just type
 
-No `commands` prop at all. A bare `$` and a block cursor, the way just-bash's
-own terminal opens.
+No `commands` prop at all, so the block opens as a prompt and a block cursor.
 
-`Tab` completes the way bash does: it fills in the longest common prefix,
-and prints the candidates when the choice is genuinely ambiguous. The first
-word completes against commands, everything after it against files in the
-current directory.
-
-<BashBlock scenario="small-project" label="Have a look around" />
+<BashBlock scenario="small-project" />
 
 Try `ls`, then `cd src`, then `pwd`.
+
+### Tab
+
+`Tab` is split across two presses, as it is in bash. The first completes as
+far as the candidates agree; if that adds nothing, the second prints them.
+There is no terminal bell here, so that listing is the only signal a reader
+gets that the choice was ambiguous.
+
+The first word of a command completes against commands, and so does the word
+after a `|` or a `;`. Everything else completes against the filesystem, one
+directory at a time: `cat sr<Tab>` gives `cat src/`, and the next `Tab` looks
+inside `src` rather than starting over. A finished name gets a space after
+it; a directory keeps its slash so you can carry on typing.
+
+| You type | `Tab` gives you |
+| --- | --- |
+| `ec` | `echo ` |
+| `ls` | `ls ` |
+| `c`, then `Tab` again | `cat  cd  clear  cp  cut` |
+| `cat RE` | `cat README.md ` |
+| `cd sr` | `cd src/` |
+| `ls \| gre` | `ls \| grep ` |
 
 ## A block that opens mid-session
 
@@ -43,7 +62,6 @@ comes into view, and the prompt underneath is live.
 
 <BashBlock
   scenario="log-files"
-  label="Find the failures"
   commands={["grep ERROR app.log", "grep ERROR app.log | wc -l"]}
 />
 
@@ -54,7 +72,6 @@ type sees what the script did.
 
 <BashBlock
   scenario="empty"
-  label="Everything below the first line is really there"
   commands={["mkdir myfolder", "cd myfolder", "touch notes.txt", "ls"]}
 />
 
@@ -68,7 +85,6 @@ duplicating them in a panel.
 
 <BashBlock
   scenario="small-project"
-  label="Redirection writes a file"
   commands={`wc -l notes.txt > count.txt
 cat count.txt`}
 />
@@ -81,7 +97,6 @@ block below once it has played.
 
 <BashBlock
   scenario="small-project"
-  label="cd, variables, functions"
   commands={`cd src
 pwd
 NAME=world
@@ -100,7 +115,6 @@ terminal.
 
 <BashBlock
   scenario="empty"
-  label="ANSI escapes"
   commands={"printf '\\033[31mred\\033[0m \\033[1;32mbold green\\033[0m \\033[33myellow\\033[0m\\n'"}
 />
 
@@ -110,7 +124,6 @@ terminal.
 
 <BashBlock
   scenario="sales-csv"
-  label="Revenue by region"
   commands={`cut -d, -f2 sales.csv | tail -n +2 | sort | uniq -c
 awk -F, 'NR>1 {sum[$2] += $4} END {for (r in sum) print r, sum[r]}' sales.csv`}
 />
@@ -119,7 +132,6 @@ awk -F, 'NR>1 {sum[$2] += $4} END {for (r in sum) print r, sum[r]}' sales.csv`}
 
 <BashBlock
   scenario="messy-names"
-  label="A loop over globs"
   commands={`for f in *.txt; do echo "found $f"; done
 if [ -f draft.tmp ]; then echo "scratch file present"; fi`}
 />
@@ -128,7 +140,6 @@ if [ -f draft.tmp ]; then echo "scratch file present"; fi`}
 
 <BashBlock
   scenario="messy-names"
-  label="Clean up the scratch files"
   commands={`find . -name '*.tmp'
 find . -name '*.tmp' | xargs rm
 find . -type f`}
@@ -143,14 +154,12 @@ Blocks without one are isolated.
 <BashBlock
   dir="pipeline"
   scenario="log-files"
-  label="Step 1: extract"
   commands={`grep ERROR app.log > errors.log`}
 />
 
 <BashBlock
   dir="pipeline"
   scenario="log-files"
-  label="Step 2: count what you extracted"
   commands={`wc -l < errors.log`}
 />
 
@@ -161,7 +170,6 @@ same as a terminal.
 
 <BashBlock
   scenario="small-project"
-  label="A file that is not there"
   commands={`cat missing.txt
 echo "exit code: $?"`}
 />
@@ -173,7 +181,6 @@ echo "exit code: $?"`}
 | `commands` | `string \| string[]` | none | Starting script, played line by line once the session is ready. Without it the block opens as a bare prompt. |
 | `scenario` | `string` | `small-project` | `empty`, `small-project`, `log-files`, `sales-csv`, `messy-names`. |
 | `dir` | `string` | none | Share a working directory and shell state with blocks carrying the same id. |
-| `label` | `string` | none | Caption in the block header. |
 | `rows` | `number` | `10` | Terminal height, in rows, before it scrolls. |
 
 ### Keys

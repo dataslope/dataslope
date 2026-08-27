@@ -27,6 +27,14 @@ export interface CommandResult {
   stderr: string;
   exitCode: number;
   content?: string;
+  /**
+   * The working directory the session is in now the command has run. The
+   * subscribed React state carries this too, but a caller running several
+   * commands in a row cannot see it: state does not update until the loop
+   * yields to a render. Reading it off each result is what lets a `cd` show
+   * up on the prompt of the very next line.
+   */
+  cwd: string;
 }
 
 type Pending = { resolve: (r: CommandResult) => void; reject: (e: Error) => void };
@@ -62,6 +70,7 @@ function ensureWorker(): Worker {
       stderr: msg.stderr,
       exitCode: msg.exitCode,
       content: msg.content,
+      cwd: msg.state.cwd,
     });
   });
   w.addEventListener("error", () => {
