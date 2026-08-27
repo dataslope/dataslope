@@ -16,6 +16,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   EMPTY_STATE,
+  SESSION_ROOTS,
   type GitWorkerRequest,
   type GitWorkerResponse,
   type RepoState,
@@ -126,7 +127,13 @@ export function useGitSession(
   kind: SessionKind = "git",
 ): GitSession {
   const [sessionId] = useState(() => repo ?? nextSessionId("block"));
-  const [state, setState] = useState<RepoState>(EMPTY_STATE);
+  // Seeded with the kind's own root so a shell block's prompt does not read
+  // `/repo` for the moment before the worker answers.
+  const [state, setState] = useState<RepoState>(() => ({
+    ...EMPTY_STATE,
+    kind,
+    cwd: SESSION_ROOTS[kind],
+  }));
   const [readyFor, setReadyFor] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const mounted = useRef(true);

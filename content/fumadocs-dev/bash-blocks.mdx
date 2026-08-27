@@ -14,8 +14,14 @@ reload starts over.
 
 Every block gets its own working directory unless it opts into sharing one.
 
-The prompt is bash's own `\w$`: the working directory in full, then the `$`.
-A `cd` shows up on the line after it, the way it does in a terminal.
+The prompt is bash's own `\w$`: the working directory, then the `$`. A shell
+session starts in `/home/user`, so that reads `~`, and `~/src` a `cd` later.
+`pwd` still answers with the full path. A `cd` shows up on the line after it,
+the way it does in a terminal.
+
+A Git session roots at `/repo` instead, because there a repository is the
+whole point. A shell lesson has nothing to do with repositories, so it gets
+a home directory.
 
 The header is the code block header: a **Terminal** badge on the left, the
 engine (**Bash**) on the right, and an ellipsis menu holding **Reset** and
@@ -59,7 +65,7 @@ Past 100 candidates it asks first, the way readline's `completion-query-items`
 does:
 
 ```
-/repo/many $ cat f
+~/many $ cat f
 Display all 120 possibilities? (y or n)
 ```
 

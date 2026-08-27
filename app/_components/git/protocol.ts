@@ -52,6 +52,19 @@ export interface RepoState {
   contents?: Record<string, string>;
 }
 
+/**
+ * Where a session's filesystem starts, by kind.
+ *
+ * A Git session's root is the repository it is teaching, so `/repo` names
+ * exactly what is there. A shell session has nothing to do with
+ * repositories: it gets a home directory, which is what `pwd` should answer
+ * in a lesson about `ls` and `cd`, and what the `user` in `ls -l` implies.
+ */
+export const SESSION_ROOTS: Record<SessionKind, string> = {
+  git: "/repo",
+  bash: "/home/user",
+};
+
 export const EMPTY_STATE: RepoState = {
   kind: "git",
   initialized: false,

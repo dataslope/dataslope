@@ -17,6 +17,7 @@ import { TestResultsRail, renderInstructions, type TestRailEntry } from "../chal
 import { useGitSession } from "../git/gitRuntime";
 import { GitTerminal, type TranscriptEntry } from "../git/GitTerminal";
 import { BashStateStrip } from "./FileTreePanel";
+import { HOME, displayCwd } from "./prompt";
 import { DEFAULT_BASH_SCENARIO } from "./bashScenarios";
 import {
   bashExpectSummary,
@@ -192,7 +193,7 @@ export default function BashChallengeCard({
                 completions={[]}
                 inlineInput
                 placeholder="ls"
-                prompt={state.cwd === "/repo" ? "~" : `~${state.cwd.slice("/repo".length)}`}
+                prompt={displayCwd(state.cwd || HOME)}
                 placeholderHint={
                   <p className="git-terminal-hint">
                     Type the commands that solve this. Objectives tick as soon as the output or the

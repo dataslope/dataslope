@@ -10,7 +10,8 @@ import { Bash } from "just-bash/browser";
 import { createGitFs } from "@/app/_components/git/gitFs";
 import { runCommand, ShellSession } from "@/app/_components/git/runCommand";
 
-const ROOT = "/repo";
+/** The root a shell session gets; see SESSION_ROOTS. */
+const ROOT = "/home/user";
 
 async function session() {
   const { store } = createGitFs();
@@ -71,7 +72,7 @@ describe("ShellSession", () => {
     await run("printf 'made\\n' > made.txt");
     expect((await run("cat made.txt")).stdout.trim()).toBe("made");
     // Written where the learner actually was, not at the root.
-    expect((await run("cat /repo/src/made.txt")).stdout.trim()).toBe("made");
+    expect((await run(`cat ${ROOT}/src/made.txt`)).stdout.trim()).toBe("made");
   });
 
   it("still reports a failed command rather than throwing", async () => {

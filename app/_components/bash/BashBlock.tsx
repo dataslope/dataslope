@@ -31,6 +31,7 @@ import { useGitSession } from "../git/gitRuntime";
 import { GitTerminal, type TranscriptEntry } from "../git/GitTerminal";
 import { ShellToolsMenu } from "../shell/ShellToolsMenu";
 import { DEFAULT_BASH_SCENARIO } from "./bashScenarios";
+import { HOME, displayCwd } from "./prompt";
 import "../shell/embeddedShell.css";
 import "./bashPanels.css";
 
@@ -41,11 +42,6 @@ const SHELL_COMMANDS = [
   "tr", "find", "xargs", "diff", "jq", "tee", "du", "tree", "stat", "clear",
   "basename", "dirname", "seq", "date", "which", "help",
 ];
-
-/** Where a session starts. The prompt shows the working directory in full,
- *  which is bash's own `\w` and what `pwd` would print; it also makes
- *  tab-completion paths relative. */
-const PROMPT_ROOT = "/repo";
 
 export interface BashBlockProps {
   /** Optional starting script, played once the session is ready, either as
@@ -82,7 +78,7 @@ export default function BashBlock({
   const promptAt = useRef<Map<number, string>>(new Map());
   /** Where the session is right now. Read from each result rather than from
    *  React state, which cannot keep up inside a run of commands. */
-  const cwdRef = useRef(PROMPT_ROOT);
+  const cwdRef = useRef(HOME);
   /** Bumped by Reset, so the starting script plays again on a fresh tree. */
   const [runToken, setRunToken] = useState(0);
   /** Shades the header once the scrollback has content above the fold. */
@@ -215,8 +211,8 @@ export default function BashBlock({
       const slash = word.lastIndexOf("/");
       const dir = slash === -1 ? "" : word.slice(0, slash + 1);
       const stem = slash === -1 ? word : word.slice(slash + 1);
-      const rel = state.cwd.startsWith(PROMPT_ROOT)
-        ? state.cwd.slice(PROMPT_ROOT.length + 1)
+      const rel = state.cwd.startsWith(HOME)
+        ? state.cwd.slice(HOME.length + 1)
         : "";
       const base = `${rel ? `${rel}/` : ""}${dir}`;
       const entries = new Set<string>();
@@ -242,10 +238,8 @@ export default function BashBlock({
     const lines: string[] = [];
     for (const entry of transcript) {
       if (!entry.note) {
-        const at = promptAt.current.get(entry.id);
-        for (const line of entry.command.split("\n")) {
-          lines.push(`${at ? `${at} ` : ""}$ ${line}`);
-        }
+        const at = displayCwd(promptAt.current.get(entry.id) ?? HOME);
+        for (const line of entry.command.split("\n")) lines.push(`${at} $ ${line}`);
       }
       if (entry.stdout) lines.push(entry.stdout.replace(/\n$/, ""));
       if (entry.stderr) lines.push(entry.stderr.replace(/\n$/, ""));
@@ -258,7 +252,7 @@ export default function BashBlock({
     setInput("");
     setHistory([]);
     promptAt.current = new Map();
-    cwdRef.current = PROMPT_ROOT;
+    cwdRef.current = HOME;
     setRunToken((n) => n + 1);
     void reset();
   }, [reset]);
@@ -301,8 +295,8 @@ export default function BashBlock({
             completions={SHELL_COMMANDS}
             pathCompletions={pathCompletions}
             // bash's own `\w$`: the working directory in full, then the `$`.
-            prompt={state.cwd || PROMPT_ROOT}
-            promptFor={(entry) => promptAt.current.get(entry.id)}
+            prompt={displayCwd(state.cwd || HOME)}
+            promptFor={(entry) => displayCwd(promptAt.current.get(entry.id) ?? HOME)}
             placeholder=""
             inlineInput
             onWrite={write}

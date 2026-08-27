@@ -21,7 +21,8 @@ import {
   type BashTranscriptEntry,
 } from "@/app/_components/bash/bashExpect";
 
-const REPO = "/repo";
+/** The root a shell session gets; see SESSION_ROOTS. */
+const REPO = "/home/user";
 
 /** Mirrors the worker's bash path, so the tests grade what a card grades. */
 async function harness(scenarioId: string) {

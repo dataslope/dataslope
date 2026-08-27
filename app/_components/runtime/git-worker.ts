@@ -26,9 +26,10 @@ import {
   type GitWorkerRequest,
   type GitWorkerResponse,
   type RepoState,
+  SESSION_ROOTS,
 } from "../git/protocol";
 
-const REPO = "/repo";
+
 
 /** A replayed history is untrusted input (design addendum §5.7.4): the
  *  defaults are sized for server sandboxes, far too generous for a tab. */
@@ -46,6 +47,9 @@ type Session = {
   bash: InstanceType<typeof Bash>;
   clock: { commits: number };
   kind: SessionKind;
+  /** Where this session's filesystem starts. A Git session lives in a
+   *  repository, a shell session in a home directory. */
+  root: string;
   /** Working directory, environment and functions that outlive one exec, so
    *  the terminal behaves like a terminal. */
   shell: ShellSession;
@@ -58,15 +62,19 @@ const sessions = new Map<string, Session>();
 async function createSession(kind: SessionKind): Promise<Session> {
   const { store, fs } = createGitFs();
   const clock = { commits: 0 };
-  const run = createGitCommand({ fs, dir: REPO, clock });
+  const root = SESSION_ROOTS[kind];
+  // Git is bound to the session root rather than to `/repo` outright, so a
+  // `git init` in a shell session initialises the directory the reader is
+  // actually standing in.
+  const run = createGitCommand({ fs, dir: root, clock });
   const bash = new Bash({
     fs: store,
-    cwd: REPO,
+    cwd: root,
     executionLimits: EXECUTION_LIMITS,
     customCommands: [defineCommand("git", run)],
   });
-  await store.mkdir(REPO, { recursive: true });
-  return { store, fs, bash, clock, kind, shell: new ShellSession(REPO) };
+  await store.mkdir(root, { recursive: true });
+  return { store, fs, bash, clock, kind, root, shell: new ShellSession(root) };
 }
 
 async function seed(scenarioId: string, kind: SessionKind): Promise<Session> {
@@ -77,8 +85,9 @@ async function seed(scenarioId: string, kind: SessionKind): Promise<Session> {
     // meant to *see* as a command goes through the shell.
     for (const [path, contents] of Object.entries(scenario.files)) {
       const slash = path.lastIndexOf("/");
-      if (slash > 0) await next.store.mkdir(`${REPO}/${path.slice(0, slash)}`, { recursive: true });
-      await next.store.writeFile(`${REPO}/${path}`, contents);
+      if (slash > 0)
+        await next.store.mkdir(`${next.root}/${path.slice(0, slash)}`, { recursive: true });
+      await next.store.writeFile(`${next.root}/${path}`, contents);
     }
     for (const command of scenario.setup ?? []) await runCommand(next.bash, command);
     return next;
@@ -97,8 +106,8 @@ async function listTree(s: Session): Promise<{ files: string[]; dirs: string[] }
   const files: string[] = [];
   const dirs: string[] = [];
   for (const p of await s.store.getAllPaths()) {
-    if (!p.startsWith(`${REPO}/`)) continue;
-    const rel = p.slice(REPO.length + 1);
+    if (!p.startsWith(`${s.root}/`)) continue;
+    const rel = p.slice(s.root.length + 1);
     if (rel === ".git" || rel.startsWith(".git/")) continue;
     try {
       const stat = await s.store.stat(p);
@@ -118,9 +127,9 @@ async function snapshot(s: Session, tree: string[]): Promise<Record<string, stri
   const out: Record<string, string> = {};
   for (const rel of tree.slice(0, MAX_SNAPSHOT_FILES)) {
     try {
-      const stat = await s.store.stat(`${REPO}/${rel}`);
+      const stat = await s.store.stat(`${s.root}/${rel}`);
       if (stat.size > MAX_SNAPSHOT_FILE_BYTES) continue;
-      out[rel] = await s.store.readFile(`${REPO}/${rel}`);
+      out[rel] = await s.store.readFile(`${s.root}/${rel}`);
     } catch {
       /* binary, or vanished between the walk and the read */
     }
@@ -145,29 +154,29 @@ async function readState(s: Session): Promise<RepoState> {
 
   let initialized = false;
   try {
-    initialized = (await s.store.stat(`${REPO}/.git`)).isDirectory;
+    initialized = (await s.store.stat(`${s.root}/.git`)).isDirectory;
   } catch {
     initialized = false;
   }
   if (!initialized) return { ...EMPTY_STATE, kind: "git", tree, dirs, cwd: s.shell.cwd };
 
-  const branches = await git.listBranches({ fs, dir: REPO });
+  const branches = await git.listBranches({ fs, dir: s.root });
   let branch: string | null = null;
   try {
-    branch = (await git.currentBranch({ fs, dir: REPO, fullname: false })) ?? null;
+    branch = (await git.currentBranch({ fs, dir: s.root, fullname: false })) ?? null;
   } catch {
     branch = null;
   }
   let oid: string | null = null;
   try {
-    oid = await git.resolveRef({ fs, dir: REPO, ref: "HEAD" });
+    oid = await git.resolveRef({ fs, dir: s.root, ref: "HEAD" });
   } catch {
     oid = null;
   }
 
   let files: FileStatus[] = [];
   try {
-    files = (await git.statusMatrix({ fs, dir: REPO })).map(([path, head, workdir, stage]) => ({
+    files = (await git.statusMatrix({ fs, dir: s.root })).map(([path, head, workdir, stage]) => ({
       path: String(path),
       head: Number(head),
       workdir: Number(workdir),
@@ -184,16 +193,16 @@ async function readState(s: Session): Promise<RepoState> {
     refs.set(oid, [...(refs.get(oid) ?? []), label]);
   for (const b of branches) {
     try {
-      const target = await git.resolveRef({ fs, dir: REPO, ref: b });
+      const target = await git.resolveRef({ fs, dir: s.root, ref: b });
       decorate(target, b === branch ? `HEAD -> ${b}` : b);
     } catch {
       /* unborn */
     }
   }
   if (oid && branch === null) decorate(oid, "HEAD");
-  for (const t of await git.listTags({ fs, dir: REPO })) {
+  for (const t of await git.listTags({ fs, dir: s.root })) {
     try {
-      decorate(await git.resolveRef({ fs, dir: REPO, ref: t }), `tag: ${t}`);
+      decorate(await git.resolveRef({ fs, dir: s.root, ref: t }), `tag: ${t}`);
     } catch {
       /* dangling tag */
     }
@@ -206,7 +215,7 @@ async function readState(s: Session): Promise<RepoState> {
   const tips = [...branches, ...(oid && branch === null ? ["HEAD"] : [])];
   for (const ref of tips) {
     try {
-      for (const c of await git.log({ fs, dir: REPO, ref, depth: 60 })) {
+      for (const c of await git.log({ fs, dir: s.root, ref, depth: 60 })) {
         if (seen.has(c.oid)) continue;
         seen.set(c.oid, {
           oid: c.oid,
@@ -276,7 +285,7 @@ self.addEventListener("message", (event: MessageEvent<GitWorkerRequest>) => {
         }
         case "readFile": {
           const s = await sessionFor(req.session);
-          const content = await s.store.readFile(`${REPO}/${req.path}`).catch(() => "");
+          const content = await s.store.readFile(`${s.root}/${req.path}`).catch(() => "");
           post({
             id: req.id,
             ok: true,
@@ -293,7 +302,7 @@ self.addEventListener("message", (event: MessageEvent<GitWorkerRequest>) => {
           let stderr = "";
           let exitCode = 0;
           try {
-            await s.store.writeFile(`${REPO}/${req.path}`, req.content);
+            await s.store.writeFile(`${s.root}/${req.path}`, req.content);
           } catch (e) {
             stderr = `${(e as Error).message}\n`;
             exitCode = 1;
