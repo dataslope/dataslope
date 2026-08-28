@@ -7,6 +7,7 @@ import AskAi from "@/app/_components/ai/AskAi";
 import NavigationLoadingIndicator from "@/app/_components/NavigationLoadingIndicator";
 import SkipToContent from "@/app/_components/SkipToContent";
 import { ReturnToTracker } from "@/app/_components/auth/returnTo";
+import { STALE_BUILD_WATCHER_SCRIPT } from "@/app/_components/staleBuild";
 
 // The app's two typefaces, self-hosted by next/font and published as CSS
 // variables on <html>. This is the ONLY place webfonts load — stylesheets
@@ -136,6 +137,10 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://esm.sh" />
         <link rel="dns-prefetch" href="https://unpkg.com" />
         <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
+        {/* Flags 404s on hashed build assets, which is how a tab left open
+            across a deploy fails. Must run before any chunk loads, and
+            before the error boundaries that read the flag. */}
+        <script dangerouslySetInnerHTML={{ __html: STALE_BUILD_WATCHER_SCRIPT }} />
       </head>
       <body>
         {/* First tab stop on every page, playground headers alone have ~10

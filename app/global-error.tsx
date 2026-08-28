@@ -5,7 +5,16 @@
 // own <html>/<body> because it replaces the layout. Deliberately
 // dependency-free: the less this depends on, the less likely it is to crash
 // while reporting a crash.
-import { useEffect } from "react";
+import { useEffect, useSyncExternalStore } from "react";
+
+// Zero-dependency module (no React, no Next), so importing it here does not
+// widen what has to evaluate correctly for this boundary to render.
+import {
+  isStaleBuildCrash,
+  neverStale,
+  recoverFromStaleBuild,
+  subscribeToStaleBuild,
+} from "@/app/_components/staleBuild";
 
 export default function GlobalError({
   error,
@@ -14,8 +23,17 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  // See app/_components/staleBuild.ts: when the crash is a chunk this deploy
+  // no longer serves, only a reload helps.
+  const stale = useSyncExternalStore(
+    subscribeToStaleBuild,
+    () => isStaleBuildCrash(error),
+    neverStale,
+  );
+
   useEffect(() => {
     console.error("root layout error boundary:", error);
+    recoverFromStaleBuild(error);
   }, [error]);
 
   return (
@@ -68,8 +86,9 @@ export default function GlobalError({
                 color: "#6b7280",
               }}
             >
-              An unexpected error interrupted this page. Your playground work
-              is stored in this browser and is not affected.
+              {stale
+                ? "This page was left open across an update and could not finish loading. Reloading picks up the new version."
+                : "An unexpected error interrupted this page. Your playground work is stored in this browser and is not affected."}
             </p>
             <div
               style={{
@@ -81,7 +100,7 @@ export default function GlobalError({
             >
               <button
                 type="button"
-                onClick={reset}
+                onClick={() => (stale ? window.location.reload() : reset())}
                 style={{
                   border: 0,
                   borderRadius: 8,
@@ -93,7 +112,7 @@ export default function GlobalError({
                   cursor: "pointer",
                 }}
               >
-                Try again
+                {stale ? "Reload" : "Try again"}
               </button>
               {/* Plain <a>, not next/link: this boundary replaces the crashed
                   root layout, so a hard navigation is safer than relying on
