@@ -1,0 +1,334 @@
+---
+title: Views
+description: Storing a query under a name with CREATE VIEW, what a view does and does not cost, and when a materialized view earns its keep.
+---
+
+A CTE names a query for the length of one statement. A **view** names
+one permanently. Once created, it behaves like a table: you select
+from it, join it, filter it, and put a view on top of it. Nothing is
+copied, because a view stores the *query*, not its result.
+
+<Figure
+  slug="sql-views-cutout"
+  alt="Views, an isometric illustration"
+/>
+
+## Creating and using a view
+
+<SyntaxBreakdown
+  parts={[
+    { text: "CREATE VIEW", label: "store a query under a name" },
+    { text: "paid_orders", label: "the name you choose" },
+    { text: "AS SELECT ...", label: "the query it stands for" },
+  ]}
+/>
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="A view over the orders table"
+  initSql={`CREATE TABLE orders (
+  id     INTEGER PRIMARY KEY,
+  region TEXT,
+  status TEXT,
+  amount NUMERIC
+);
+INSERT INTO orders (id, region, status, amount) VALUES
+  (1,'North','new',120), (2,'North','paid',95), (3,'North','shipped',140),
+  (4,'North','cancelled',60), (5,'North','paid',210), (6,'North','shipped',85),
+  (7,'South','new',175), (8,'South','paid',130), (9,'South','shipped',90),
+  (10,'South','new',45), (11,'South','paid',160), (12,'South','cancelled',115),
+  (13,'East','paid',200), (14,'East','shipped',70), (15,'East','new',155),
+  (16,'East','shipped',105), (17,'East','paid',135), (18,'East','shipped',80),
+  (19,'West','new',190), (20,'West','cancelled',125), (21,'West','paid',100),
+  (22,'West','shipped',55), (23,'West','new',145), (24,'West','paid',165);`}
+  starterCode={`CREATE VIEW active_orders AS
+SELECT
+  id,
+  region,
+  status,
+  amount
+FROM
+  orders
+WHERE
+  status <> 'cancelled';
+
+-- From here on it behaves exactly like a table:
+SELECT
+  region,
+  COUNT(*)    AS orders,
+  SUM(amount) AS total
+FROM
+  active_orders
+GROUP BY
+  region
+ORDER BY
+  region;`}
+/>
+
+The view is not a copy. Insert a new order and the next query against
+`active_orders` sees it, because the view runs its `SELECT` fresh each
+time.
+
+## What views are for
+
+Three jobs, in rough order of how often they come up:
+
+- **Naming a definition once.** "Active order" means
+  `status <> 'cancelled'` in eleven queries. Put it in a view and
+  there is one place to change it when the rule changes.
+- **Hiding complexity.** A five-way join with three `CASE`
+  expressions becomes a name that reads like a table, and the people
+  querying it do not have to reconstruct the joins.
+- **Controlling access.** Grant someone `SELECT` on a view that omits
+  the salary column and they can query the rest of the table without
+  seeing it.
+
+## Building on a view
+
+Because a view is just a name for a query, another view can read it,
+which is how a small vocabulary gets built up in layers:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="A view on top of a view"
+  initSql={`CREATE TABLE orders (
+  id     INTEGER PRIMARY KEY,
+  region TEXT,
+  status TEXT,
+  amount NUMERIC
+);
+INSERT INTO orders (id, region, status, amount) VALUES
+  (1,'North','new',120), (2,'North','paid',95), (3,'North','shipped',140),
+  (4,'North','cancelled',60), (5,'North','paid',210), (6,'North','shipped',85),
+  (7,'South','new',175), (8,'South','paid',130), (9,'South','shipped',90),
+  (10,'South','new',45), (11,'South','paid',160), (12,'South','cancelled',115),
+  (13,'East','paid',200), (14,'East','shipped',70), (15,'East','new',155),
+  (16,'East','shipped',105), (17,'East','paid',135), (18,'East','shipped',80),
+  (19,'West','new',190), (20,'West','cancelled',125), (21,'West','paid',100),
+  (22,'West','shipped',55), (23,'West','new',145), (24,'West','paid',165);`}
+  starterCode={`CREATE VIEW active_orders AS
+  SELECT * FROM orders WHERE status <> 'cancelled';
+
+CREATE VIEW regional_totals AS
+  SELECT
+    region,
+    COUNT(*)    AS orders,
+    SUM(amount) AS total,
+    ROUND(AVG(amount), 2) AS avg_order
+  FROM
+    active_orders
+  GROUP BY
+    region;
+
+SELECT
+  region,
+  orders,
+  total,
+  avg_order,
+  ROUND(100 * total / SUM(total) OVER (), 1) AS pct_of_all
+FROM
+  regional_totals
+ORDER BY
+  total DESC;`}
+/>
+
+<Callout type="warn" title="A view costs what its query costs">
+Selecting from a view runs the underlying query every time. Stacking
+five views on top of each other is five queries' worth of work
+expressed as one name, and a slow view is slow at every call site.
+Views organise SQL; they do not make it faster.
+</Callout>
+
+## Replacing and dropping
+
+`CREATE OR REPLACE VIEW` redefines a view in place. It can add columns
+at the end, but it cannot rename, remove or retype the existing ones,
+because anything reading the view depends on that shape.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Redefining a view, then removing it"
+  initSql={`CREATE TABLE orders (
+  id     INTEGER PRIMARY KEY,
+  region TEXT,
+  status TEXT,
+  amount NUMERIC
+);
+INSERT INTO orders (id, region, status, amount) VALUES
+  (1,'North','new',120), (2,'North','paid',95), (3,'North','shipped',140),
+  (4,'North','cancelled',60), (5,'North','paid',210), (6,'North','shipped',85),
+  (7,'South','new',175), (8,'South','paid',130), (9,'South','shipped',90),
+  (10,'South','new',45), (11,'South','paid',160), (12,'South','cancelled',115),
+  (13,'East','paid',200), (14,'East','shipped',70), (15,'East','new',155),
+  (16,'East','shipped',105), (17,'East','paid',135), (18,'East','shipped',80),
+  (19,'West','new',190), (20,'West','cancelled',125), (21,'West','paid',100),
+  (22,'West','shipped',55), (23,'West','new',145), (24,'West','paid',165);`}
+  starterCode={`CREATE VIEW big_orders AS
+  SELECT id, region, amount FROM orders WHERE amount > 100;
+
+-- Same columns, in the same order, plus one at the end:
+CREATE OR REPLACE VIEW big_orders AS
+  SELECT
+    id,
+    region,
+    amount,
+    status
+  FROM
+    orders
+  WHERE
+    amount > 100;
+
+SELECT * FROM big_orders ORDER BY amount DESC;
+
+DROP VIEW big_orders;`}
+/>
+
+## Writing through a view
+
+A view that reads one table, with no aggregation, grouping or
+`DISTINCT`, is **updatable**: `INSERT`, `UPDATE` and `DELETE` against
+it go through to the underlying table.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="An UPDATE that passes through the view"
+  initSql={`CREATE TABLE orders (
+  id     INTEGER PRIMARY KEY,
+  region TEXT,
+  status TEXT,
+  amount NUMERIC
+);
+INSERT INTO orders (id, region, status, amount) VALUES
+  (1,'North','new',120), (2,'North','paid',95), (3,'North','shipped',140),
+  (4,'North','cancelled',60), (5,'North','paid',210), (6,'North','shipped',85),
+  (7,'South','new',175), (8,'South','paid',130), (9,'South','shipped',90),
+  (10,'South','new',45), (11,'South','paid',160), (12,'South','cancelled',115),
+  (13,'East','paid',200), (14,'East','shipped',70), (15,'East','new',155),
+  (16,'East','shipped',105), (17,'East','paid',135), (18,'East','shipped',80),
+  (19,'West','new',190), (20,'West','cancelled',125), (21,'West','paid',100),
+  (22,'West','shipped',55), (23,'West','new',145), (24,'West','paid',165);`}
+  starterCode={`CREATE VIEW north_orders AS
+  SELECT id, region, status, amount
+  FROM orders
+  WHERE region = 'North'
+  WITH LOCAL CHECK OPTION;
+
+UPDATE north_orders SET status = 'paid' WHERE status = 'new';
+
+SELECT id, region, status FROM orders WHERE region = 'North' ORDER BY id;`}
+/>
+
+`WITH LOCAL CHECK OPTION` is the guard rail: without it, an `INSERT`
+through `north_orders` could add a South row that then vanishes from
+the view. With it, the write is rejected instead. A view containing an
+aggregate cannot be written through at all, and the database says so
+rather than guessing.
+
+## Materialized views store the result
+
+A **materialized view** does keep a copy. It runs its query once,
+stores the rows, and serves them until you refresh it. That trades
+freshness for speed, and it is the right trade for an expensive
+summary that nobody needs up to the second:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="A stored summary, and what happens after new data arrives"
+  initSql={`CREATE TABLE orders (
+  id     INTEGER PRIMARY KEY,
+  region TEXT,
+  amount NUMERIC
+);
+INSERT INTO orders (id, region, amount) VALUES
+  (1,'North',120), (2,'North',95), (3,'North',140), (4,'North',60),
+  (5,'North',210), (6,'North',85), (7,'South',175), (8,'South',130),
+  (9,'South',90), (10,'South',45), (11,'South',160), (12,'South',115),
+  (13,'East',200), (14,'East',70), (15,'East',155), (16,'East',105),
+  (17,'East',135), (18,'East',80), (19,'West',190), (20,'West',125),
+  (21,'West',100), (22,'West',55), (23,'West',145), (24,'West',165);`}
+  starterCode={`CREATE MATERIALIZED VIEW region_summary AS
+  SELECT region, COUNT(*) AS orders, SUM(amount) AS total
+  FROM orders
+  GROUP BY region;
+
+INSERT INTO orders (id, region, amount) VALUES (25, 'North', 999);
+
+-- Still the old numbers: the copy has not been rebuilt.
+SELECT 'before refresh' AS state, region, orders, total
+FROM region_summary WHERE region = 'North'
+
+UNION ALL
+
+SELECT 'after refresh', region, orders, total
+FROM (
+  SELECT region, COUNT(*) AS orders, SUM(amount) AS total
+  FROM orders GROUP BY region
+) live
+WHERE region = 'North';`}
+/>
+
+Run `REFRESH MATERIALIZED VIEW region_summary` and the stored copy
+catches up. Until then it serves the numbers from when it was built,
+which is the whole bargain.
+
+<Figure
+  slug="sql-views-fresh-or-stored-inline-cutout"
+  alt="Two taps side by side on a bench, one running straight from the tank standing behind it and the other fed from a bottle that was filled earlier"
+  caption="A plain view draws from the tank on every read; a materialized view pours from a bottle filled once."
+/>
+
+<Callout type="info" title="Which one do you want?">
+A plain view is always current and costs its query on every read. A
+materialized view is instant to read and stale until refreshed. Choose
+the plain one unless you have measured a problem, then materialize the
+few summaries that are expensive and can tolerate being minutes old.
+</Callout>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does \`CREATE VIEW\` actually store?
+
+- A copy of the rows the query returned when it was created.
+  > Storing the rows is what a *materialized* view does.
+- An index that speeds up the query it was built from.
+  > Views create no indexes and change no access paths.
+- [o] The query text, which is run again on every read.
+  > The name stands for the query, so the result reflects the tables as they are now.
+- A scheduled job that keeps a second table in step.
+  > Nothing is scheduled and no second table exists.
+
+That is why a view is always current, and why it costs its query every time.`}
+/>
+
+<MultipleChoice
+  markdown={`Which view can be updated through directly?
+
+- One that groups rows with \`GROUP BY region\`.
+  > An aggregated row does not correspond to any single underlying row, so there is nothing to update.
+- [o] One that selects some columns of a single table with a \`WHERE\` clause.
+  > Each view row maps to exactly one table row, so the write has an unambiguous target.
+- One that combines two tables with \`UNION ALL\`.
+  > A row could have come from either half, leaving the target ambiguous.
+- One that adds \`DISTINCT\` to remove duplicate rows.
+  > Deduplication collapses several rows into one, so a write has no single destination.
+
+The rule is that each view row must trace back to exactly one table row.`}
+/>
+
+<MultipleChoice
+  markdown={`New rows are inserted into a table that a materialized view summarizes. What does the materialized view return?
+
+- The new totals, since it re-runs its query on read.
+  > Re-running on read is a plain view; the materialized one serves its stored copy.
+- An error, because its stored copy is now out of date.
+  > Staleness is expected and is never treated as an error.
+- [o] The totals from when it was last built or refreshed.
+  > The stored rows are served unchanged until \`REFRESH MATERIALIZED VIEW\` rebuilds them.
+- Nothing until it is refreshed.
+  > The old rows remain fully readable in the meantime.
+
+Freshness is traded for speed, and \`REFRESH\` is how you pay it back.`}
+/>
+
+Next: making several statements succeed or fail as one.

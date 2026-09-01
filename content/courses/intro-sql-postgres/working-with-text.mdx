@@ -1,0 +1,352 @@
+---
+title: Working with Text
+description: Concatenation, case conversion, trimming, substrings, splitting and replacing, and the pattern matching that LIKE cannot do.
+---
+
+Most columns in most databases hold text, and most of it arrives
+messy: stray spaces, inconsistent capitalisation, a full name where
+you wanted a first name. PostgreSQL has a deep set of string functions
+for exactly this, and a handful of them cover almost every day's work.
+
+<Figure
+  slug="sql-working-with-text-cutout"
+  alt="Working with text, an isometric illustration"
+/>
+
+## Joining text together
+
+The standard operator is `||`. It joins any number of values, and it
+has one important quirk: joining anything to `NULL` gives `NULL`.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Concatenation, and what NULL does to it"
+  initSql={`CREATE TABLE people (
+  id         INTEGER PRIMARY KEY,
+  first_name TEXT,
+  last_name  TEXT,
+  title      TEXT
+);
+INSERT INTO people (id, first_name, last_name, title) VALUES
+  (1,'Ada','Lovelace','Dr'), (2,'Ben','Ash',NULL),
+  (3,'Cleo','Vance','Prof'), (4,'Dan','Roe',NULL),
+  (5,'Elle','Kim','Dr'), (6,'Finn','Doyle',NULL),
+  (7,'Gia','Mora','Ms'), (8,'Hugo','Pratt',NULL),
+  (9,'Iris','Chen','Dr'), (10,'Jae','Park',NULL),
+  (11,'Kai','Ito','Mr'), (12,'Lena','Ford',NULL),
+  (13,'Mira','Sol','Dr'), (14,'Nils','Berg',NULL),
+  (15,'Omar','Haddad','Prof'), (16,'Pia','Rossi',NULL),
+  (17,'Quinn','Bell','Dr'), (18,'Rui','Tanaka',NULL),
+  (19,'Sana','Malik','Ms'), (20,'Tom','Beck',NULL),
+  (21,'Uma','Devi','Dr'), (22,'Vic','Nolan',NULL),
+  (23,'Wren','Sato','Mx'), (24,'Zoe','Adler',NULL);`}
+  starterCode={`SELECT
+  first_name || ' ' || last_name              AS full_name,
+  title || ' ' || last_name                   AS with_title_broken,
+  CONCAT(title, ' ', last_name)               AS with_title_concat,
+  CONCAT_WS(' ', title, first_name, last_name) AS tidy
+FROM
+  people
+ORDER BY
+  last_name;`}
+/>
+
+Three things to take from that result:
+
+- `||` propagates `NULL`, so half the `with_title_broken` column is
+  empty.
+- `CONCAT` treats `NULL` as an empty string, which fixes the emptiness
+  but leaves a stray leading space.
+- `CONCAT_WS` ("with separator") puts the separator between the
+  arguments that survive, and is usually what you actually wanted.
+
+## Case, length, and trimming
+
+The workhorses. `UPPER`, `LOWER` and `INITCAP` change case; `LENGTH`
+counts characters; the `TRIM` family removes padding.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Cleaning up scruffy input"
+  initSql={`CREATE TABLE signups (
+  id    INTEGER PRIMARY KEY,
+  entry TEXT
+);
+INSERT INTO signups (id, entry) VALUES
+  (1,'  ada lovelace  '), (2,'BEN ASH'), (3,'Cleo   Vance'),
+  (4,'  dan roe'), (5,'ELLE KIM  '), (6,'finn doyle'),
+  (7,'  GIA MORA  '), (8,'hugo pratt'), (9,'Iris Chen'),
+  (10,'  jae park'), (11,'KAI ITO'), (12,'lena ford  '),
+  (13,'Mira Sol'), (14,'  NILS BERG'), (15,'omar haddad'),
+  (16,'PIA ROSSI  '), (17,'quinn bell'), (18,'  Rui Tanaka  '),
+  (19,'SANA MALIK'), (20,'tom beck'), (21,'  Uma Devi'),
+  (22,'VIC NOLAN  '), (23,'wren sato'), (24,'  ZOE ADLER  ');`}
+  starterCode={`SELECT
+  entry,
+  LENGTH(entry)          AS raw_length,
+  TRIM(entry)            AS trimmed,
+  LENGTH(TRIM(entry))    AS trimmed_length,
+  INITCAP(TRIM(entry))   AS tidy,
+  UPPER(TRIM(entry))     AS shouty
+FROM
+  signups
+ORDER BY
+  id;`}
+/>
+
+`TRIM` removes spaces from both ends by default. `LTRIM` and `RTRIM`
+do one end each, and all three can strip other characters:
+`TRIM('0' FROM '00420')` gives `'420'`.
+
+<Callout type="tip" title="Case-insensitive comparison">
+Comparisons in PostgreSQL are case-sensitive, so `'ADA' = 'ada'` is
+false. `LOWER(a) = LOWER(b)` is the portable fix, and `ILIKE` is the
+PostgreSQL-specific one for pattern matches.
+</Callout>
+
+## Taking pieces out of a string
+
+`SUBSTRING`, `LEFT` and `RIGHT` cut by position; `POSITION` finds
+where something starts; `SPLIT_PART` cuts on a separator, which is
+usually the most useful of the four.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Pulling apart an email address"
+  initSql={`CREATE TABLE accounts (
+  id    INTEGER PRIMARY KEY,
+  email TEXT
+);
+INSERT INTO accounts (id, email) VALUES
+  (1,'ada@example.com'), (2,'ben.ash@work.co.uk'),
+  (3,'cleo@school.edu'), (4,'dan.roe@example.com'),
+  (5,'elle@lab.org'), (6,'finn.doyle@work.co.uk'),
+  (7,'gia@example.com'), (8,'hugo@studio.net'),
+  (9,'iris.chen@lab.org'), (10,'jae@example.com'),
+  (11,'kai@studio.net'), (12,'lena.ford@school.edu'),
+  (13,'mira@lab.org'), (14,'nils@example.com'),
+  (15,'omar.haddad@work.co.uk'), (16,'pia@studio.net'),
+  (17,'quinn@school.edu'), (18,'rui@example.com'),
+  (19,'sana.malik@lab.org'), (20,'tom@work.co.uk'),
+  (21,'uma@studio.net'), (22,'vic@example.com'),
+  (23,'wren.sato@school.edu'), (24,'zoe@lab.org');`}
+  starterCode={`SELECT
+  email,
+  SPLIT_PART(email, '@', 1)  AS local_part,
+  SPLIT_PART(email, '@', 2)  AS domain,
+  POSITION('@' IN email)     AS at_position,
+  LEFT(email, 3)             AS first_three,
+  RIGHT(email, 4)            AS last_four,
+  SUBSTRING(email FROM 1 FOR 4) AS chars_1_to_4
+FROM
+  accounts
+ORDER BY
+  domain,
+  email;`}
+/>
+
+`SPLIT_PART(email, '@', 2)` reads as "the second piece when split on
+`@`", which is far easier to get right than counting characters with
+`SUBSTRING` and `POSITION`.
+
+<Figure
+  slug="sql-working-with-text-taking-pieces-inline-cutout"
+  alt="A plain ribbon threaded through a bench machine that lifts out the one section lying between two pegs and lets the rest of the ribbon run on"
+  caption="`SPLIT_PART` cuts on a separator; the position functions cut by counting."
+/>
+
+## Replacing and padding
+
+`REPLACE` swaps every occurrence of one substring for another.
+`LPAD` and `RPAD` bring a value up to a fixed width, which is how you
+turn 42 into `00042`:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Reformatting codes"
+  initSql={`CREATE TABLE items (
+  id   INTEGER PRIMARY KEY,
+  sku  TEXT,
+  slot INTEGER
+);
+INSERT INTO items (id, sku, slot) VALUES
+  (1,'kitchen-kettle',42), (2,'kitchen-blender',7),
+  (3,'kitchen-toaster',315), (4,'lighting-lamp',9),
+  (5,'lighting-bulb',128), (6,'lighting-shade',63),
+  (7,'furniture-chair',4), (8,'furniture-desk',2071),
+  (9,'furniture-shelf',88), (10,'tableware-mug',530),
+  (11,'tableware-plate',16), (12,'tableware-bowl',749),
+  (13,'kitchen-pan',1), (14,'kitchen-ladle',96),
+  (15,'lighting-torch',204), (16,'lighting-dimmer',37),
+  (17,'furniture-stool',612), (18,'furniture-bench',85),
+  (19,'tableware-fork',3), (20,'tableware-glass',450),
+  (21,'kitchen-whisk',178), (22,'lighting-sconce',29),
+  (23,'furniture-table',903), (24,'tableware-spoon',56);`}
+  starterCode={`SELECT
+  sku,
+  REPLACE(sku, '-', ' / ')          AS readable,
+  UPPER(SPLIT_PART(sku, '-', 1))    AS category,
+  LPAD(slot::TEXT, 5, '0')          AS padded_slot,
+  RPAD(SPLIT_PART(sku, '-', 2), 10, '.') AS aligned_name
+FROM
+  items
+ORDER BY
+  sku;`}
+/>
+
+Note `slot::TEXT`: `LPAD` works on text, so the integer has to be
+converted first. The
+[numbers and casting](/courses/intro-sql-postgres/numbers-and-casting)
+lesson covers that syntax properly.
+
+## Matching patterns
+
+You met `LIKE` in the filtering lesson. It has exactly two wildcards,
+`%` for any run of characters and `_` for exactly one, and PostgreSQL
+adds `ILIKE` for a case-insensitive version. For anything more
+demanding, `~` applies a full regular expression:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="LIKE, ILIKE and a regular expression"
+  initSql={`CREATE TABLE accounts (
+  id    INTEGER PRIMARY KEY,
+  email TEXT
+);
+INSERT INTO accounts (id, email) VALUES
+  (1,'ada@example.com'), (2,'ben.ash@work.co.uk'),
+  (3,'Cleo@School.edu'), (4,'dan.roe@example.com'),
+  (5,'elle@lab.org'), (6,'finn.doyle@work.co.uk'),
+  (7,'gia@example.com'), (8,'hugo@studio.net'),
+  (9,'iris.chen@lab.org'), (10,'jae@example.com'),
+  (11,'kai@studio.net'), (12,'lena.ford@school.edu'),
+  (13,'mira@lab.org'), (14,'nils@example.com'),
+  (15,'omar.haddad@work.co.uk'), (16,'pia@studio.net'),
+  (17,'quinn@school.edu'), (18,'rui@example.com'),
+  (19,'sana.malik@lab.org'), (20,'tom@work.co.uk'),
+  (21,'uma@studio.net'), (22,'vic@example.com'),
+  (23,'wren.sato@school.edu'), (24,'zoe@lab.org');`}
+  starterCode={`SELECT
+  email,
+  email LIKE '%@example.com'   AS is_example,
+  email ILIKE '%SCHOOL%'       AS mentions_school_any_case,
+  email ~ '^[a-z]+\\.[a-z]+@'   AS has_dotted_local_part
+FROM
+  accounts
+ORDER BY
+  email;`}
+/>
+
+The regular expression says "letters, a dot, letters, then an `@`",
+which is a rule `LIKE` simply cannot express. Reach for `~` when the
+pattern involves counts, alternatives, or character classes; stay with
+`LIKE` otherwise, because it is clearer and portable.
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Tidy up the names"
+  instructions={`The \`signups\` table has a scruffy \`entry\` column with stray spaces and inconsistent capitalisation. Return \`id\` and a \`clean\` column holding the entry with surrounding spaces removed and each word capitalised. Sort by \`id\`.
+
+\`\`\`sql
+INITCAP(TRIM(entry))
+\`\`\``}
+  initSql={`CREATE TABLE signups (
+  id    SERIAL PRIMARY KEY,
+  entry TEXT NOT NULL
+);
+INSERT INTO signups (entry) VALUES
+  ('  ada lovelace  '), ('BEN ASH'), ('Cleo Vance'),
+  ('  dan roe'), ('ELLE KIM  '), ('finn doyle'),
+  ('  GIA MORA  '), ('hugo pratt'), ('Iris Chen'),
+  ('  jae park'), ('KAI ITO'), ('lena ford  '),
+  ('Mira Sol'), ('  NILS BERG'), ('omar haddad'),
+  ('PIA ROSSI  '), ('quinn bell'), ('  Rui Tanaka  '),
+  ('SANA MALIK'), ('tom beck'), ('  Uma Devi'),
+  ('VIC NOLAN  '), ('wren sato'), ('  ZOE ADLER  ');`}
+  starterCode={`-- Trim the padding, then fix the capitalisation.
+SELECT
+  id,
+  entry
+FROM
+  signups
+ORDER BY
+  id;`}
+  solutionSql={`SELECT
+  id,
+  INITCAP(TRIM(entry)) AS clean
+FROM
+  signups
+ORDER BY
+  id;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Returns id and clean",
+      description: "Two columns, in that order.",
+      expectedColumns: ["id", "clean"],
+    },
+    {
+      id: "row_count",
+      name: "Keeps every signup",
+      description: "Cleaning text does not remove rows.",
+      expectedRowCount: 24,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "'  ada lovelace  ' becomes 'Ada Lovelace'.",
+      matchesSolution: true,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does \`'Dr' || NULL || 'Ash'\` evaluate to?
+
+- \`'DrAsh'\`, with the \`NULL\` skipped.
+  > Skipping \`NULL\` arguments is what \`CONCAT\` does, not \`||\`.
+- \`'Dr NULL Ash'\`, with the word spelled out.
+  > \`NULL\` is a marker for a missing value, never the text "NULL".
+- An error, because \`NULL\` has no text value.
+  > The expression is valid; it simply produces no value.
+- [o] \`NULL\`, because concatenating with \`NULL\` gives \`NULL\`.
+  > The \`||\` operator propagates \`NULL\` through the whole expression.
+
+Use \`CONCAT\` or \`CONCAT_WS\` when a missing piece should not erase the rest.`}
+/>
+
+<MultipleChoice
+  markdown={`Which expression extracts the domain from \`'ada@example.com'\`?
+
+- \`SUBSTRING(email FROM 1 FOR 3)\`
+  > Counting from the left gives the beginning of the local part instead.
+- [o] \`SPLIT_PART(email, '@', 2)\`
+  > Splitting on the separator and taking the second piece returns everything after the \`@\`.
+- \`POSITION('@' IN email)\`
+  > This returns the numeric position of the character, not the text around it.
+- \`REPLACE(email, '@', '')\`
+  > Removing the separator joins the two halves rather than selecting one.
+
+\`SPLIT_PART\` is the direct way to take the *n*th piece of a delimited string.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the difference between \`LIKE\` and \`ILIKE\` in PostgreSQL?
+
+- \`ILIKE\` matches whole words while \`LIKE\` matches any substring.
+  > Both match the pattern anywhere the wildcards allow; neither has a notion of words.
+- \`ILIKE\` accepts regular expressions and \`LIKE\` accepts wildcards.
+  > Regular expressions use the \`~\` operator; \`ILIKE\` uses the same wildcards as \`LIKE\`.
+- [o] \`ILIKE\` ignores case; \`LIKE\` does not.
+  > The leading I stands for insensitive, and it is a PostgreSQL extension.
+- \`ILIKE\` is faster because it can use an index.
+  > Case-insensitive matching is generally harder to index, not easier.
+
+For portable code, \`LOWER(col) LIKE LOWER(pattern)\` does the same job.`}
+/>
+
+Next: the numeric side of the same toolbox.

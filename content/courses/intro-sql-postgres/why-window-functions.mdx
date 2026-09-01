@@ -1,0 +1,255 @@
+---
+title: Why Window Functions Exist
+description: The question aggregates cannot answer, comparing each row to its group, and the OVER clause that answers it without collapsing a single row.
+---
+
+`GROUP BY` answers *"what is the total per region?"* beautifully. It
+cannot answer *"how does this sale compare to its region's total?"*,
+because by the time the total exists, the individual sales are gone.
+**Window functions** are SQL's answer to that second kind of
+question.
+
+<Figure
+  slug="sql-why-window-functions-cutout"
+  alt="Why window functions exist, an isometric illustration"
+/>
+
+## The problem: aggregates destroy the rows
+
+An aggregate is a collapse. Twenty-four sales go in, four regional
+totals come out, and every individual sale has been folded into a
+number. Run this and count the rows:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="GROUP BY collapses 24 rows into 4"
+  initSql={`CREATE TABLE sales (
+  id     INTEGER PRIMARY KEY,
+  region TEXT,
+  rep    TEXT,
+  amount NUMERIC
+);
+INSERT INTO sales (id, region, rep, amount) VALUES
+  (1,'North','Ada',120), (2,'North','Ben',95), (3,'North','Cleo',140),
+  (4,'North','Dan',60), (5,'North','Elle',210), (6,'North','Finn',85),
+  (7,'South','Gia',175), (8,'South','Hugo',130), (9,'South','Iris',90),
+  (10,'South','Jae',45), (11,'South','Kai',160), (12,'South','Lena',115),
+  (13,'East','Mira',200), (14,'East','Nils',70), (15,'East','Omar',155),
+  (16,'East','Pia',105), (17,'East','Quinn',135), (18,'East','Rui',80),
+  (19,'West','Sana',190), (20,'West','Tom',125), (21,'West','Uma',100),
+  (22,'West','Vic',55), (23,'West','Wren',145), (24,'West','Zoe',165);`}
+  starterCode={`SELECT
+  region,
+  SUM(amount) AS region_total
+FROM
+  sales
+GROUP BY
+  region
+ORDER BY
+  region;`}
+/>
+
+Four rows. Useful, and lossy. You can no longer ask which rep is in
+each region, what any single sale was worth, or whether Ada beat her
+region's average, because none of those facts survived the collapse.
+
+## The question that needs both
+
+Real analytical questions almost always want the detail **and** the
+summary in the same row:
+
+- What did this rep sell, *and* what share of the region is that?
+- What did we earn today, *and* what is the running total for the
+  month?
+- Where does this salary sit, *and* what rank is that in the
+  department?
+
+Each of those is one row of detail beside one number computed from a
+*group* of rows. `GROUP BY` cannot produce it, because `GROUP BY`
+returns one row per group by definition.
+
+<Figure
+  slug="sql-why-window-functions-question-needs-both-inline-cutout"
+  alt="A row of parcels along a bench with a wide press coming down and printing the same figure onto every one of them, none taken away"
+  caption="A window function stamps the group's answer onto each row and removes nothing."
+/>
+
+## OVER: the aggregate that keeps its rows
+
+Add `OVER ()` to an aggregate and it stops collapsing. The same
+`SUM(amount)` now runs over a **window** of rows, and the answer is
+attached to every row rather than replacing them:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="The same SUM, once with GROUP BY and once with OVER"
+  initSql={`CREATE TABLE sales (
+  id     INTEGER PRIMARY KEY,
+  region TEXT,
+  rep    TEXT,
+  amount NUMERIC
+);
+INSERT INTO sales (id, region, rep, amount) VALUES
+  (1,'North','Ada',120), (2,'North','Ben',95), (3,'North','Cleo',140),
+  (4,'North','Dan',60), (5,'North','Elle',210), (6,'North','Finn',85),
+  (7,'South','Gia',175), (8,'South','Hugo',130), (9,'South','Iris',90),
+  (10,'South','Jae',45), (11,'South','Kai',160), (12,'South','Lena',115),
+  (13,'East','Mira',200), (14,'East','Nils',70), (15,'East','Omar',155),
+  (16,'East','Pia',105), (17,'East','Quinn',135), (18,'East','Rui',80),
+  (19,'West','Sana',190), (20,'West','Tom',125), (21,'West','Uma',100),
+  (22,'West','Vic',55), (23,'West','Wren',145), (24,'West','Zoe',165);`}
+  starterCode={`SELECT
+  rep,
+  region,
+  amount,
+  SUM(amount) OVER () AS company_total
+FROM
+  sales
+ORDER BY
+  rep;`}
+/>
+
+Twenty-four rows come back, every one of them carrying the same
+`company_total`. Nothing was destroyed. The aggregate ran over a
+window, and the window here was *the whole result set*.
+
+<Callout type="info" title="One word changes everything">
+`SUM(amount)` on its own is an aggregate and collapses rows.
+`SUM(amount) OVER ()` is a **window function** and does not. The
+`OVER` clause is the entire difference, and it is what the rest of
+this section is about.
+</Callout>
+
+## Reading the shape of a window function
+
+Every window function has the same two halves: a function, and an
+`OVER` clause describing which rows it may look at.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "SUM(amount)", label: "the function to compute" },
+    { text: "OVER", label: "makes it a window function" },
+    { text: "( )", label: "which rows it sees (empty = all of them)" },
+    { text: "AS company_total", label: "the name of the new column" },
+  ]}
+/>
+
+Everything you will learn in the next few lessons goes inside those
+parentheses: which rows form a group (`PARTITION BY`), in what order
+they are read (`ORDER BY`), and how much of the group each row may
+see (the frame).
+
+## Detail and summary, side by side
+
+Once both numbers are in the same row, arithmetic between them is
+just arithmetic. Here is each sale as a percentage of the whole
+company:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Each sale as a share of the total"
+  initSql={`CREATE TABLE sales (
+  id     INTEGER PRIMARY KEY,
+  region TEXT,
+  rep    TEXT,
+  amount NUMERIC
+);
+INSERT INTO sales (id, region, rep, amount) VALUES
+  (1,'North','Ada',120), (2,'North','Ben',95), (3,'North','Cleo',140),
+  (4,'North','Dan',60), (5,'North','Elle',210), (6,'North','Finn',85),
+  (7,'South','Gia',175), (8,'South','Hugo',130), (9,'South','Iris',90),
+  (10,'South','Jae',45), (11,'South','Kai',160), (12,'South','Lena',115),
+  (13,'East','Mira',200), (14,'East','Nils',70), (15,'East','Omar',155),
+  (16,'East','Pia',105), (17,'East','Quinn',135), (18,'East','Rui',80),
+  (19,'West','Sana',190), (20,'West','Tom',125), (21,'West','Uma',100),
+  (22,'West','Vic',55), (23,'West','Wren',145), (24,'West','Zoe',165);`}
+  starterCode={`SELECT
+  rep,
+  amount,
+  ROUND(100 * amount / SUM(amount) OVER (), 1) AS pct_of_total
+FROM
+  sales
+ORDER BY
+  pct_of_total DESC;`}
+/>
+
+That single query would take a subquery, a join, or a CTE to write
+without windows. With one, it is a column.
+
+## Where windows sit in the query
+
+Window functions run **after** `WHERE`, `GROUP BY`, and `HAVING`, and
+**before** `ORDER BY` and `LIMIT`. Two consequences follow from that
+sentence, and both trip people up:
+
+```mermaid
+flowchart LR
+    W["WHERE"] --> G["GROUP BY<br/>HAVING"]
+    G --> WF["window functions"]
+    WF --> S["ORDER BY<br/>LIMIT"]
+```
+
+- **A window function cannot go in `WHERE`.** The filter has already
+  finished by the time the window runs. To filter on a window result,
+  compute it in a CTE and filter the CTE.
+- **A window function sees only the rows `WHERE` kept.** Filtering
+  the query changes every window total, which is usually what you
+  want and occasionally a surprise.
+
+<Callout type="warn" title="No window functions in WHERE">
+`WHERE row_number() OVER (...) = 1` is rejected by every SQL database,
+not just PostgreSQL, and the message names the window function. The standard pattern is a CTE: compute
+the window in one step, filter it in the next. The
+[Top N per group](/courses/intro-sql-postgres/top-n-per-group) lesson
+is built entirely around that move.
+</Callout>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the practical difference between \`SUM(amount)\` and \`SUM(amount) OVER ()\`?
+
+- [o] The first collapses the rows into one; the second keeps every row.
+  > Adding \`OVER\` turns the aggregate into a window function, which computes over a set of rows but returns a value for each one.
+- The first works on numbers and the second works on text as well.
+  > Both compute the same numeric sum; the type of the column is unrelated to \`OVER\`.
+- The first is standard SQL and the second is PostgreSQL-specific syntax.
+  > Window functions are part of the SQL standard and work in PostgreSQL, DuckDB, SQLite, MySQL and others.
+- The second is faster because the database can compute it in parallel.
+  > Speed is not the distinction, and a window function often does more work, not less.
+
+\`OVER\` is what stops an aggregate from collapsing its input rows.`}
+/>
+
+<MultipleChoice
+  markdown={`A query has \`WHERE region = 'North'\` and a \`SUM(amount) OVER ()\` column. What does the sum cover?
+
+- Every row in the table, because \`OVER ()\` means "everything".
+  > The empty parentheses mean every row still present at that stage, not every row stored in the table.
+- Only the current row, since no grouping was given.
+  > An empty \`OVER ()\` spans the whole result set rather than a single row.
+- [o] Only the North rows, because \`WHERE\` has already run.
+  > Filtering happens before window functions, so the window sees the filtered rows only.
+- The query is invalid; \`OVER ()\` needs a \`PARTITION BY\`.
+  > An empty \`OVER ()\` is valid and treats the whole result as one window.
+
+Windows are computed over what \`WHERE\` left behind, not over the raw table.`}
+/>
+
+<MultipleChoice
+  markdown={`Why can a window function not be used inside a \`WHERE\` clause?
+
+- Because \`WHERE\` only accepts comparisons against literal values.
+  > \`WHERE\` happily takes expressions and subqueries; the restriction is about ordering, not complexity.
+- Because window functions always return more than one value.
+  > A window function returns exactly one value per row, like any other expression.
+- [o] Because \`WHERE\` runs before window functions are computed.
+  > The row filter finishes first, so the window result does not exist yet and cannot be tested.
+- Because it would make the query ambiguous when two windows disagree.
+  > Multiple windows in one query are perfectly well defined and commonly used together.
+
+The fix is a CTE: compute the window in one step, then filter the named result.`}
+/>
+
+Next: the `OVER` clause itself, and what goes inside those
+parentheses.

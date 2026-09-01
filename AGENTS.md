@@ -81,9 +81,9 @@ background is needed. In code, reference these via the CSS variables
 
 ## Illustrations
 
-How course and interview illustrations get made. Both API keys
-(`OPENAI_API_KEY`, `KIE_API_KEY`) are already present as environment variables
-in Claude Code sessions; do not ask for them and never write them into a file.
+How course and interview illustrations get made. `OPENAI_API_KEY` is already
+present as an environment variable in Claude Code sessions; do not ask for it
+and never write it into a file.
 
 ### The pipeline
 
@@ -92,29 +92,30 @@ in Claude Code sessions; do not ask for them and never write them into a file.
 > real time, prompt-writing guidance, the course id-prefix registry, and copy-paste
 > audits. Read it before a large run.
 
-Five steps, four scripts. Candidates live in R2 until someone picks the
+Four steps, three scripts. Candidates live in R2 until someone picks the
 keepers; only the keepers reach git.
 
 1. **Author** the prompt in `data/illustration-prompts.json` (one source of
    truth: the `/dashboard/admin/illustration-prompts` gallery, the in-lesson
    `<Figure>`, and every script read it). `lesson` must equal the MDX file stem.
 2. **Generate** — `scripts/generate-illustrations.mjs`, OpenAI `gpt-image-2`,
-   **quality `low`**, **size `1536x1024`**, always via the **Batch API**.
-3. **Remove the background** — `scripts/remove-background-kie.mjs`, Recraft
-   `remove-background` through Kie AI. Writes a `-cutout` beside each original.
-   **Never skip this on a regeneration:** pages reference the `-cutout` slug, and
-   promotion silently promotes only the original if no cut-out exists, leaving the
-   page serving the old image.
-4. **Promote** — `scripts/promote-illustrations.mjs` encodes the chosen
+   **quality `low`**, **size `1536x1024`**, **`background: transparent`**,
+   always via the **Batch API**. The model returns a real alpha channel, so
+   what comes back *is* the cut-out: it is written to the run's `cutout`
+   artifact (`<id>-cutout.png` on disk, `…/v<n>/cutout.png` in R2) and there is
+   no separate removal step to forget. An image that comes back with no
+   transparent pixels at all is reported and not written, because a written one
+   would be promoted as a `-cutout` and serve an opaque rectangle.
+3. **Promote** — `scripts/promote-illustrations.mjs` encodes the chosen
    candidates to WebP straight into `public/images/`, the files the site
    serves, and runs `build-images` to record their dimensions. **An id with a
    cut-out promotes the cut-out and nothing else.** Every surface asks for the
-   `-cutout` slug, so the opaque `<id>.webp` beside it renders nowhere and is
+   `-cutout` slug, so an opaque `<id>.webp` beside it renders nowhere and is
    ~0.22 MB of git each; two promotions made before that was the default left
    1,351 of them, 151 MB, and `build-images` now warns if any come back. Pass
    `--with-original` only for art genuinely shown with its background, and
    check something asks for the bare slug first.
-5. **Wire** — `scripts/wire-course-figures.mjs` places one `<Figure>` per page
+4. **Wire** — `scripts/wire-course-figures.mjs` places one `<Figure>` per page
    across a course, clears retired slugs, and is idempotent. Always `--dry-run`
    first. Pass `--collection interview` for an interview-prep track, which pairs
    pages with `interview-thumbnail` / `interview-illustration` prompts under
@@ -127,7 +128,6 @@ node scripts/generate-illustrations.mjs dry-run --only "$IDS"   # cost, no API c
 node scripts/generate-illustrations.mjs submit  --only "$IDS" --sink r2 --run 2026-08-foo
 node scripts/generate-illustrations.mjs status
 node scripts/generate-illustrations.mjs download --sink r2 --run 2026-08-foo
-node scripts/remove-background-kie.mjs --from r2 --run 2026-08-foo --concurrency 8
 node scripts/promote-illustrations.mjs --all --from r2 --run 2026-08-foo
 node scripts/wire-course-figures.mjs <course-dir> --dry-run && \
   node scripts/wire-course-figures.mjs <course-dir>
@@ -135,16 +135,15 @@ node scripts/wire-course-figures.mjs <course-dir> --dry-run && \
 node scripts/wire-course-figures.mjs --collection interview <role-dir> --dry-run
 
 # Local run: everything on disk, nothing touches R2. Fine for one or two images.
-node scripts/generate-illustrations.mjs run
-node scripts/remove-background-kie.mjs                 # adds <id>-cutout.png
+node scripts/generate-illustrations.mjs run            # writes <id>-cutout.png
 node scripts/promote-illustrations.mjs python-basics-loops python-basics-sets
 ```
 
 ### Trimming the blank margins around the artwork
 
-Background removal leaves the subject floating in the frame it was generated
-in, so a promoted cut-out is 1536x1024 of *layout* carrying rather less than
-that of drawing. `<Figure>` renders at the full content width with `height:
+The model composes the subject inside the frame it was asked for, so a
+promoted cut-out is 1536x1024 of *layout* carrying rather less than that of
+drawing. `<Figure>` renders at the full content width with `height:
 auto`, so every transparent row is vertical space a lesson pays for and nobody
 sees — a median 11% of each image's height across the promoted set, over 30% on
 41 of them.
@@ -229,7 +228,7 @@ cut-outs `h-40 w-40` with no `object-fit`.
 access-denied notice rather than the prompt corpus. Its sidebar entry is
 reachable without a session on purpose; following it just shows the notice.
 
-It renders a grid of the **background-removed WebP only** (the file the site
+It renders a grid of the **promoted cut-out WebP only** (the file the site
 serves), each over the live page background so the theme pill is the judgement
 tool, and a click opens the raw image in a new tab. Every card can be marked
 "redraw this" with a one-line note, stored in D1 database
@@ -255,12 +254,12 @@ half of the loop and returns the card to normal.
 > an edit to the old subject (trimming clauses off the old one just brings the
 > failed composition back). Carry over any creature the old subject had (marmot,
 > elephant, panda, penguin, duck) and the idea the lesson needs; invent the rest.
-> Then generate → remove background → promote as usual, and set `marked = 0` and
+> Then generate → promote as usual, and set `marked = 0` and
 > stamp `regenerated_at` for exactly the ids you redrew, so they come back for
 > approval. Never stamp `approved_at` yourself.
 
-All four API keys are already environment variables in Claude Code sessions:
-`OPENAI_API_KEY` and `KIE_API_KEY`. The R2 variables
+`OPENAI_API_KEY` is already an environment variable in Claude Code sessions
+and is the only key the pipeline needs. The R2 variables
 (`R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`,
 `R2_BUCKET=dataslope-illustrations`) are only needed for `--sink r2` /
 `--from r2`; without them, stick to the disk flow, which is fully functional.
@@ -455,13 +454,13 @@ Risograph is what holds the two registers apart on the page, which is the whole
 reason the category exists.
 
 Risograph was in the retired list above, for a real reason: a full-bleed riso
-scene has no isolable subject, so background removal returns the whole
-rectangle. Four constraints in `RISOGRAPH_CONSTRAINTS`
-(`lib/illustrationPrompt.ts`) are what make it work this time, and none of them
-is optional:
+scene has no isolable subject, so it comes back as a whole opaque rectangle.
+Four constraints in `RISOGRAPH_CONSTRAINTS` (`lib/illustrationPrompt.ts`) are
+what make it work this time, and none of them is optional:
 
 - **Blank paper.** No printed panel, no frame, no border, no ground shadow.
-  This is what leaves a subject for the remover to lift, instead of a rectangle.
+  This is what leaves an isolated subject on transparency, instead of a
+  rectangle.
 - **Brand inks, never black.** The transparency constraint again: risograph's
   usual black key line would read on the white page and vanish on the near-black
   one. Flat spot inks from the four primaries, overprinting into a third.
@@ -516,43 +515,55 @@ following line for every figure you place and read the list.
 **Always render in the brand palette** (the four primaries above). This is not
 only aesthetic: see the transparency constraint below.
 
-### Background removal
+### Transparency comes from the model, not a second service
 
-Recraft `remove-background` via Kie AI. It beat both Replicate's
-`851-labs/background-remover` and a local color-key: it isolates a subject out
-of a full-bleed scene rather than dissolving the frame into a ghost matte.
+`gpt-image-2` accepts `background: "transparent"` and returns a real alpha
+channel, so generation and cut-out are one step. `--background` defaults to
+`transparent` for exactly that reason, and the generated file is written as
+the run's **cut-out** artifact: `<id>-cutout.png` on disk,
+`illustrations/<run>/<id>/v<n>/cutout.png` in R2. Promotion, trimming and
+every page then find it where they always did.
 
-Two API details that will otherwise cost an hour:
+Two things this replaced, both gone from the repo:
 
-- **The model input takes a public URL only** — no base64, no data URI. Upload
-  the PNG to Kie's own file endpoint first
-  (`https://kieai.redpandaai.co/api/file-base64-upload`, free, auto-deleted
-  after 24h) and pass the returned `downloadUrl`.
-- **Both Kie hosts sit behind Cloudflare and reject a request with no browser
-  `User-Agent`**, returning a bare 403 with `error code: 1010`. It reads like
-  an auth failure and is not.
+- **`scripts/remove-background-kie.mjs`** (Recraft `remove-background` through
+  Kie AI) and the whole third step it was. It also removed the failure mode
+  that step owned: a regeneration that skipped removal left the page serving
+  the old image, because promotion silently promoted only the original.
+- **`KIE_API_KEY`.** The pipeline needs `OPENAI_API_KEY` and nothing else.
 
-**Kie caps an account at 20 new generation requests per 10 seconds**, and
-rejects the excess with 429 *without queueing it*. `remove-background-kie.mjs`
-admits `createTask` through a shared sliding-window limiter at 18 per 10s, so
-`--concurrency` can be raised freely; a 429 waits out a whole window rather
-than backing off briefly, because the request was dropped, not held.
+**The prompt had to change with it**, and this is the part worth remembering.
+`ISOMETRIC_CONSTRAINTS` used to say "stage everything on a white background",
+which is a contradiction once the API is asked for no background at all. The
+model resolved it by painting a soft grey ground shadow at partial alpha:
+invisible on the white page, a grey smudge on the near-black one. The clause
+now asks for an empty background with no floor, no ground shadow, no glow and
+no vignette, which is the same fix `RISOGRAPH_CONSTRAINTS` has always carried.
+Measured on one subject, partial-alpha pixels fell from **9.3% of the frame to
+1.8%**, the remainder being genuine edge antialiasing.
 
-Flow: upload → `POST https://api.kie.ai/api/v1/jobs/createTask` with
-`{"model": "recraft/remove-background", "input": {"image": "<url>"}}` → poll
-`GET https://api.kie.ai/api/v1/jobs/recordInfo?taskId=…` until
-`state` is `success`, then read `resultJson.resultUrls[0]`. ~1 credit, ~3s each.
+**The generator checks the alpha before it writes** (`alphaStats` in
+`generate-illustrations.mjs`, three fractions of the frame):
 
-**`gpt-image-2` cannot emit transparency itself.** The API rejects
-`background: "transparent"`, and asking for it in the prompt makes the model
-paint a fake checkerboard as real pixels. Removal is always a second step.
+- `clear === 0` is fatal. The model painted a background anyway, and the file
+  is reported and not written: a written one gets promoted as a `-cutout` and
+  serves an opaque rectangle where every surface expects an isolated subject.
+- `soft` over its style's limit is a warning, printed beside the id, because a
+  painted shadow or vignette shows up only on the dark theme. The limit is
+  per style and has to be: isometric art is solid forms with clean edges, so
+  2-3% of a frame is soft and 5% is the bar; risograph is *made* of halftone
+  grain, where the gap between two dots is correctly transparent, and a clean
+  set measures 6-12%, so its bar is 15%.
+
+A healthy isometric cut-out is roughly half clear, 40% solid and 2-3% soft; a
+healthy risograph band is more like 60/30/8.
 
 ### The transparency constraint
 
-Removing the background strips the white field that was making single-tone
+Generating on transparency means there is no white field to make single-tone
 artwork legible. A monochrome cut-out only reads against one of the two page
 backgrounds — black linework is crisp on `#ffffff` and nearly invisible on
-`#121212`. No background remover can fix this; the fix is upstream.
+`#121212`. Nothing downstream can fix this; the fix is in the prompt.
 
 **So: any illustration meant to run transparent must be drawn in the brand
 colors, never in black, white, or a single hue.** Polychrome subjects survive

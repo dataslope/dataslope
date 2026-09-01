@@ -35,12 +35,16 @@
  *   --category <cat>     Only this category (course-thumbnail | course-illustration | ...)
  *   --size <WxH|auto>    Override the per-category size for every prompt
  *   --quality <q>        auto | low | medium | high (default: low — see above)
- *   --background <mode>  auto | opaque (default: auto)
- *                        gpt-image-2 has no transparent background. To get
- *                        cut-outs, run scripts/remove-background-kie.mjs over
- *                        the generated candidates afterwards.
+ *   --background <mode>  transparent | opaque | auto (default: transparent)
+ *                        gpt-image-2 emits a real alpha channel, so a run is
+ *                        already the cut-out the site serves and there is no
+ *                        background-removal step. A transparent image is
+ *                        written as the run's `cutout` artifact and checked
+ *                        for alpha before it is written (see `alphaStats`).
  *   --output-format <f>  png | webp | jpeg (default: png). webp is ~10x smaller
  *                        on disk, which matters over thousands of images.
+ *                        jpeg has no alpha channel and is refused with a
+ *                        transparent background.
  *   --model <name>       Override the model (default: JSON meta.model)
  *   --completion-window  Batch window: 24h (default)
  *   --batch-size <n>     Prompts per batch job (default: 100)
@@ -53,6 +57,11 @@
  *
  * Notes:
  *   - GPT Image 2 returns base64 image data (no URL); it is decoded and written.
+ *   - Transparency comes from the API, not from a second service. An image
+ *     that comes back with no transparent pixels at all is a failed cut-out
+ *     (the model painted a background anyway), and is reported rather than
+ *     written: a written one would be promoted as a `-cutout` and serve an
+ *     opaque rectangle where every surface expects an isolated subject.
  *   - The prompt text is built the same way as lib/illustrationPrompt.ts
  *     (buildIllustrationPrompt). `__tests__/illustrationPrompt.test.ts` asserts
  *     the two agree, so the house style cannot drift between them.
@@ -65,6 +74,7 @@ import {
 } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import sharp from "sharp";
 import { createR2Client, credentialsFromEnv } from "./lib/r2.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -99,7 +109,9 @@ function parseArgs(argv) {
     size: null,
     // Low on purpose: ~28x cheaper than high, holds up for this art style.
     quality: "low",
-    background: "auto",
+    // Transparent by default: this is the pipeline's cut-out step, and an
+    // opaque run would have to be background-removed by something else.
+    background: "transparent",
     outputFormat: "png",
     model: null,
     completionWindow: "24h",
@@ -170,8 +182,11 @@ export function buildPrompt(spec, colors) {
     "Render each object as a solid three-dimensional form with real thickness, " +
     "smooth matte shading, and clean edges; never as a glossy sphere, a ball, or " +
     "a thin round counter. " +
-    "Stage everything light and airy on a white background: pale grey and white " +
-    "platforms, bright brand colors, no dark or black bases. Make every object a " +
+    "Stage everything light and airy on an empty transparent background: pale " +
+    "grey and white platforms, bright brand colors, no dark or black bases. " +
+    "Leave the background fully empty behind, around and beneath the subject: " +
+    "no backdrop, no floor, no ground shadow, no soft glow and no vignette, so " +
+    "the whole subject lifts off the page in one piece. Make every object a " +
     "single solid piece in one flat brand color: never build one object out of " +
     "many small blocks or cubelets, never pack a container with a heap of little " +
     "pieces, and never blend, mix, or bleed two colors into each other. Animals " +
@@ -360,9 +375,82 @@ function decodeImage(respBody) {
   return Buffer.from(b64, "base64");
 }
 
+/**
+ * What an image's alpha channel looks like, as three fractions of the frame.
+ * Used to tell a real cut-out from an opaque rectangle before either is
+ * written; a failed cut-out promoted as one serves a white slab on a page
+ * that expects an isolated subject.
+ *
+ *   - `clear` — fully transparent. A healthy cut-out is roughly half the
+ *     frame; zero means the model painted a background despite being asked
+ *     for none.
+ *   - `solid` — fully opaque: the artwork itself.
+ *   - `soft` — everything between. Edge antialiasing is ~2% of a frame; a
+ *     ground shadow or a vignette pushes it past 5%, which reads as a grey
+ *     smudge on the dark page and is invisible on the light one, so it is
+ *     worth reporting even though it is not fatal.
+ */
+export async function alphaStats(buf) {
+  const { data, info } = await sharp(buf)
+    // Downscaled first: this is a statistic, and a 1536x1024 RGBA raw buffer
+    // is 6 MB per image where 320px wide is 260 kB.
+    .resize({ width: 320 })
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const n = info.width * info.height;
+  let clear = 0;
+  let solid = 0;
+  for (let i = 0; i < n; i++) {
+    const a = data[i * 4 + 3];
+    if (a <= 4) clear++;
+    else if (a >= 250) solid++;
+  }
+  return { clear: clear / n, solid: solid / n, soft: (n - clear - solid) / n };
+}
+
+/**
+ * Soft alpha above this is a painted shadow or vignette rather than edge
+ * antialiasing; warned about, not fatal. Two limits, because the two house
+ * styles put different amounts of the frame at partial alpha by design:
+ *
+ *   - **Isometric** art is solid forms with clean edges, so only the
+ *     antialiased outline is soft. Measured 1.8-3% on clean art, and 9.3% on
+ *     the same subject back when the prompt still asked for a white
+ *     background and got a ground shadow painted at partial alpha.
+ *   - **Risograph** is *made* of halftone grain, and the gap between two dots
+ *     is correctly transparent. Measured 6-12% across a clean set, so the
+ *     isometric limit would flag every band ever drawn.
+ */
+const SOFT_ALPHA_WARN = { "isometric illustration": 0.05, risograph: 0.15 };
+
+/** Prompt styles by id, read once. `writeImage` needs the style to pick a
+ *  soft-alpha limit, and the batch download path has only a custom_id. */
+let styleById = null;
+function softLimitFor(id) {
+  if (!styleById) {
+    styleById = new Map(
+      JSON.parse(readFileSync(DATA_FILE, "utf8")).prompts.map((p) => [
+        p.id,
+        (p.style && p.style.trim()) || "isometric illustration",
+      ]),
+    );
+  }
+  // An unknown id (or a style with no constraint block of its own) is drawn
+  // with the isometric constraints, so it gets the isometric limit too.
+  return SOFT_ALPHA_WARN[styleById.get(id)] ?? SOFT_ALPHA_WARN["isometric illustration"];
+}
+
 /** R2 key for one candidate image. Mirrors promote-illustrations.mjs. */
 export function candidateKey(runId, promptId, variant, kind) {
   return `illustrations/${runId}/${promptId}/v${variant}/${kind}.png`;
+}
+
+/** The artifact kind a run produces: a transparent generation IS the cut-out
+ *  every surface asks for, so it is stored under that name and promotion
+ *  picks it up with no intermediate step. */
+function artifactKind(opts) {
+  return opts.background === "transparent" ? "cutout" : "original";
 }
 
 /**
@@ -372,13 +460,17 @@ export function candidateKey(runId, promptId, variant, kind) {
  */
 function makeSink(opts) {
   const ext = outputExt(opts);
+  const kind = artifactKind(opts);
+  // Disk names a cut-out `<id>-cutout.<ext>`, the suffix promote-illustrations
+  // and trim-cutouts both key on.
+  const stem = (id) => (kind === "cutout" ? `${id}-cutout` : id);
   if (opts.sink === "disk") {
     return {
       describe: opts.out,
-      skip: (id) => !opts.force && existsSync(join(opts.out, `${id}.${ext}`)),
-      label: (id) => `${id}.${ext}`,
+      skip: (id) => !opts.force && existsSync(join(opts.out, `${stem(id)}.${ext}`)),
+      label: (id) => `${stem(id)}.${ext}`,
       init: () => mkdirSync(opts.out, { recursive: true }),
-      write: async (id, buf) => writeFileSync(join(opts.out, `${id}.${ext}`), buf),
+      write: async (id, buf) => writeFileSync(join(opts.out, `${stem(id)}.${ext}`), buf),
     };
   }
   const client = createR2Client(credentialsFromEnv());
@@ -387,11 +479,37 @@ function makeSink(opts) {
     describe: `r2://${client.bucket}/illustrations/${runId}/`,
     // No per-object existence check: re-uploading the same key is idempotent.
     skip: () => false,
-    label: (id) => candidateKey(runId, id, opts.variant, "original"),
+    label: (id) => candidateKey(runId, id, opts.variant, kind),
     init: () => {},
     write: async (id, buf) =>
-      client.put(candidateKey(runId, id, opts.variant, "original"), buf, `image/${opts.outputFormat}`),
+      client.put(candidateKey(runId, id, opts.variant, kind), buf, `image/${opts.outputFormat}`),
   };
+}
+
+/**
+ * Write one generated image, refusing an opaque one on a transparent run.
+ * Both the batch and sync paths go through here so neither can skip the
+ * check; a cut-out with no transparent pixels would be promoted and served
+ * as an opaque rectangle.
+ */
+async function writeImage(sink, id, buf, opts) {
+  if (opts.background !== "transparent") {
+    await sink.write(id, buf);
+    return "";
+  }
+  const a = await alphaStats(buf);
+  const pct = (v) => `${(v * 100).toFixed(0)}%`;
+  if (a.clear === 0) {
+    throw new Error(
+      "came back fully opaque despite background=transparent " +
+        "— the model painted a background; re-run this id",
+    );
+  }
+  await sink.write(id, buf);
+  return a.soft > softLimitFor(id)
+    ? `  (clear ${pct(a.clear)}, but ${pct(a.soft)} soft alpha: check for a ` +
+        `painted shadow or vignette on the dark theme)`
+    : ` (clear ${pct(a.clear)})`;
 }
 
 // ── Commands ─────────────────────────────────────────────────────────────────
@@ -400,11 +518,13 @@ async function cmdDryRun(entries, opts) {
   const batches = chunk(entries, opts.batchSize).length;
   console.log(
     `[dry-run] ${entries.length} prompt(s) · background ${opts.background} · ` +
-      `quality ${opts.quality} · ${ext} · ${batches} batch job(s)\n` +
+      `quality ${opts.quality} · ${ext} · writes the ${artifactKind(opts)} · ` +
+      `${batches} batch job(s)\n` +
       `          ${describeCost(entries, opts, "batch")}\n`,
   );
+  const suffix = artifactKind(opts) === "cutout" ? "-cutout" : "";
   for (const e of entries) {
-    console.log(`── ${e.id}.${ext}  (${opts.size || e.size})`);
+    console.log(`── ${e.id}${suffix}.${ext}  (${opts.size || e.size})`);
     console.log(e.prompt.replace(/^/gm, "   "));
     console.log();
   }
@@ -556,9 +676,9 @@ async function writeBatchOutputs(fileId, opts, key, sink) {
       continue;
     }
     try {
-      await sink.write(row.custom_id, decodeImage(row.response.body));
+      const note = await writeImage(sink, row.custom_id, decodeImage(row.response.body), opts);
       ok++;
-      console.log(`  ✓ ${sink.label(row.custom_id)}`);
+      console.log(`  ✓ ${sink.label(row.custom_id)}${note}`);
     } catch (err) {
       failed++;
       console.error(`  ✗ ${row.custom_id}: ${err.message}`);
@@ -685,9 +805,9 @@ async function cmdSync(entries, opts, model, key) {
           key,
           json: requestBody(e, opts, model),
         });
-        await sink.write(e.id, decodeImage(await res.json()));
+        const note = await writeImage(sink, e.id, decodeImage(await res.json()), opts);
         ok++;
-        console.log(`  ✓ ${sink.label(e.id)}`);
+        console.log(`  ✓ ${sink.label(e.id)}${note}`);
       } catch (err) {
         failed++;
         console.error(`  ✗ ${e.id}: ${err.message}`);
@@ -706,17 +826,21 @@ async function main() {
   const opts = parseArgs(process.argv.slice(2));
   if (opts.help || !opts.command) return printHelp();
 
-  if (opts.background === "transparent") {
+  if (!["transparent", "opaque", "auto"].includes(opts.background)) {
     console.error(
-      "gpt-image-2 does not support transparent backgrounds (the API rejects\n" +
-        'background="transparent", and asking for one in the prompt makes the model\n' +
-        "paint a fake checkerboard). Generate opaque, then remove the background\n" +
-        "afterwards with: node scripts/remove-background-kie.mjs",
+      `Unsupported --background "${opts.background}". Use transparent, opaque, or auto.`,
     );
     process.exit(1);
   }
   if (!["png", "webp", "jpeg"].includes(opts.outputFormat)) {
     console.error(`Unsupported --output-format "${opts.outputFormat}". Use png, webp, or jpeg.`);
+    process.exit(1);
+  }
+  if (opts.background === "transparent" && opts.outputFormat === "jpeg") {
+    console.error(
+      "--output-format jpeg has no alpha channel, so it cannot carry a transparent\n" +
+        "background. Use png (the default) or webp.",
+    );
     process.exit(1);
   }
   if (!["auto", "low", "medium", "high"].includes(opts.quality)) {
@@ -748,7 +872,8 @@ async function main() {
   const mode = opts.command === "sync" ? "sync" : "batch";
   console.log(
     `${entries.length} prompt(s) · model ${model} · background ${opts.background} · ` +
-      `quality ${opts.quality} · ${outputExt(opts)} · out ${opts.out}\n` +
+      `quality ${opts.quality} · ${outputExt(opts)} · writes the ` +
+      `${artifactKind(opts)} · out ${opts.out}\n` +
       `${describeCost(entries, opts, mode)}\n`,
   );
   const key = requireKey();

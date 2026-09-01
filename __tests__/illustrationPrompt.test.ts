@@ -22,8 +22,11 @@ const CONSTRAINTS =
   "Render each object as a solid three-dimensional form with real thickness, " +
   "smooth matte shading, and clean edges; never as a glossy sphere, a ball, or " +
   "a thin round counter. " +
-  "Stage everything light and airy on a white background: pale grey and white " +
-  "platforms, bright brand colors, no dark or black bases. Make every object a " +
+  "Stage everything light and airy on an empty transparent background: pale " +
+  "grey and white platforms, bright brand colors, no dark or black bases. " +
+  "Leave the background fully empty behind, around and beneath the subject: " +
+  "no backdrop, no floor, no ground shadow, no soft glow and no vignette, so " +
+  "the whole subject lifts off the page in one piece. Make every object a " +
   "single solid piece in one flat brand color: never build one object out of " +
   "many small blocks or cubelets, never pack a container with a heap of little " +
   "pieces, and never blend, mix, or bleed two colors into each other. Animals " +

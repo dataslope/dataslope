@@ -1,0 +1,376 @@
+---
+title: Advanced Aggregation
+description: FILTER for conditional aggregates, DISTINCT inside a function, STRING_AGG and ARRAY_AGG for collecting values, and ROLLUP for subtotals.
+---
+
+`COUNT`, `SUM` and `AVG` with a `GROUP BY` cover most reporting. The
+clauses in this lesson cover most of the rest: counting only some
+rows, collecting values into a list instead of reducing them to a
+number, and adding subtotal rows without writing the query twice.
+
+<Figure
+  slug="sql-advanced-aggregation-cutout"
+  alt="Advanced aggregation, an isometric illustration"
+/>
+
+## FILTER: an aggregate over some of the rows
+
+`FILTER (WHERE ...)` restricts a single aggregate to the rows matching
+a condition, while the other aggregates in the same query see
+everything. It is the tidy replacement for `SUM(CASE WHEN ... THEN 1
+ELSE 0 END)`.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "COUNT(*)", label: "the aggregate" },
+    { text: "FILTER", label: "restrict just this one" },
+    { text: "(WHERE status = 'paid')", label: "to the rows matching this" },
+  ]}
+/>
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Four conditional counts in one pass"
+  initSql={`CREATE TABLE orders (
+  id     INTEGER PRIMARY KEY,
+  region TEXT,
+  status TEXT,
+  amount NUMERIC
+);
+INSERT INTO orders (id, region, status, amount) VALUES
+  (1,'North','new',120), (2,'North','paid',95), (3,'North','shipped',140),
+  (4,'North','cancelled',60), (5,'North','paid',210), (6,'North','shipped',85),
+  (7,'South','new',175), (8,'South','paid',130), (9,'South','shipped',90),
+  (10,'South','new',45), (11,'South','paid',160), (12,'South','cancelled',115),
+  (13,'East','paid',200), (14,'East','shipped',70), (15,'East','new',155),
+  (16,'East','shipped',105), (17,'East','paid',135), (18,'East','shipped',80),
+  (19,'West','new',190), (20,'West','cancelled',125), (21,'West','paid',100),
+  (22,'West','shipped',55), (23,'West','new',145), (24,'West','paid',165);`}
+  starterCode={`SELECT
+  region,
+  COUNT(*)                                      AS orders,
+  COUNT(*) FILTER (WHERE status = 'paid')       AS paid,
+  COUNT(*) FILTER (WHERE status = 'cancelled')  AS cancelled,
+  SUM(amount)                                   AS gross,
+  SUM(amount) FILTER (WHERE status <> 'cancelled') AS net
+FROM
+  orders
+GROUP BY
+  region
+ORDER BY
+  region;`}
+/>
+
+Compare that with the `CASE` version from the
+[conditional expressions](/courses/intro-sql-postgres/conditional-expressions)
+lesson: same result, half the noise, and `COUNT(*) FILTER (WHERE ...)`
+says what it means.
+
+<Callout type="info" title="FILTER is not WHERE">
+A `WHERE` clause removes rows from the whole query, so every aggregate
+in it sees the smaller set. `FILTER` narrows **one** aggregate and
+leaves the others alone. That is the entire reason it exists: without
+it, "count everything and also count the paid ones" needs two passes.
+</Callout>
+
+## DISTINCT inside an aggregate
+
+`COUNT(DISTINCT col)` counts different values rather than rows, and
+the same keyword works inside `SUM` and `AVG`:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Rows, values, and distinct values"
+  initSql={`CREATE TABLE visits (
+  id       INTEGER PRIMARY KEY,
+  page     TEXT,
+  visitor  TEXT
+);
+INSERT INTO visits (id, page, visitor) VALUES
+  (1,'/home','ada'), (2,'/home','ben'), (3,'/home','ada'),
+  (4,'/pricing','cleo'), (5,'/pricing','ada'), (6,'/pricing','cleo'),
+  (7,'/docs','dan'), (8,'/docs','elle'), (9,'/docs','dan'),
+  (10,'/docs','finn'), (11,'/home','gia'), (12,'/home','ben'),
+  (13,'/pricing','hugo'), (14,'/pricing','iris'), (15,'/blog','jae'),
+  (16,'/blog','kai'), (17,'/blog','jae'), (18,'/blog','lena'),
+  (19,'/home','mira'), (20,'/docs','nils'), (21,'/docs','elle'),
+  (22,'/pricing','omar'), (23,'/blog','pia'), (24,'/home','ada');`}
+  starterCode={`SELECT
+  page,
+  COUNT(*)                  AS visits,
+  COUNT(DISTINCT visitor)   AS unique_visitors,
+  ROUND(COUNT(*)::NUMERIC / COUNT(DISTINCT visitor), 2) AS visits_per_person
+FROM
+  visits
+GROUP BY
+  page
+ORDER BY
+  visits DESC;`}
+/>
+
+The gap between `visits` and `unique_visitors` is the return-visitor
+story, and it takes one keyword to tell.
+
+## Collecting values instead of reducing them
+
+Not every aggregate has to produce a number. `STRING_AGG` joins the
+group's values into one delimited string, and `ARRAY_AGG` collects
+them into an array. Both accept their own `ORDER BY`:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="One row per group, with the members listed"
+  initSql={`CREATE TABLE staff (
+  id         INTEGER PRIMARY KEY,
+  name       TEXT,
+  department TEXT,
+  salary     NUMERIC
+);
+INSERT INTO staff (id, name, department, salary) VALUES
+  (1,'Ada','Engineering',95000), (2,'Ben','Engineering',88000),
+  (3,'Cleo','Engineering',102000), (4,'Dan','Engineering',76000),
+  (5,'Elle','Engineering',118000), (6,'Finn','Engineering',81000),
+  (7,'Gia','Sales',67000), (8,'Hugo','Sales',72000),
+  (9,'Iris','Sales',59000), (10,'Jae','Sales',84000),
+  (11,'Kai','Sales',63000), (12,'Lena','Sales',91000),
+  (13,'Mira','Support',52000), (14,'Nils','Support',48000),
+  (15,'Omar','Support',56000), (16,'Pia','Support',61000),
+  (17,'Quinn','Support',45000), (18,'Rui','Support',58000),
+  (19,'Sana','Design',78000), (20,'Tom','Design',82000),
+  (21,'Uma','Design',69000), (22,'Vic','Design',74000),
+  (23,'Wren','Design',87000), (24,'Zoe','Design',71000);`}
+  starterCode={`SELECT
+  department,
+  COUNT(*) AS headcount,
+  STRING_AGG(name, ', ' ORDER BY name) AS everyone,
+  STRING_AGG(name, ', ' ORDER BY salary DESC)
+    FILTER (WHERE salary > 80000) AS well_paid
+FROM
+  staff
+GROUP BY
+  department
+ORDER BY
+  department;`}
+/>
+
+Notice `FILTER` working on `STRING_AGG` too. Every aggregate accepts
+it, which makes "list only the ones that qualify" a one-liner.
+
+<Figure
+  slug="sql-advanced-aggregation-collecting-values-inline-cutout"
+  alt="A bench with four open trays, each holding its group's blocks threaded onto one rod rather than melted into a single lump"
+  caption="A collecting aggregate keeps the members instead of reducing them to a number."
+/>
+
+## ROLLUP: subtotals without a second query
+
+`GROUP BY ROLLUP (a, b)` produces the detail rows *and* the subtotals
+*and* the grand total, in one result. The subtotal rows carry `NULL`
+in the columns they are summarizing over:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Region, quarter, and every subtotal"
+  initSql={`CREATE TABLE sales (
+  id      INTEGER PRIMARY KEY,
+  region  TEXT,
+  quarter TEXT,
+  amount  NUMERIC
+);
+INSERT INTO sales (id, region, quarter, amount) VALUES
+  (1,'North','Q1',120), (2,'North','Q1',95), (3,'North','Q2',140),
+  (4,'North','Q2',60), (5,'North','Q3',210), (6,'North','Q3',85),
+  (7,'South','Q1',175), (8,'South','Q1',130), (9,'South','Q2',90),
+  (10,'South','Q2',45), (11,'South','Q3',160), (12,'South','Q3',115),
+  (13,'East','Q1',200), (14,'East','Q1',70), (15,'East','Q2',155),
+  (16,'East','Q2',105), (17,'East','Q3',135), (18,'East','Q3',80),
+  (19,'West','Q1',190), (20,'West','Q1',125), (21,'West','Q2',100),
+  (22,'West','Q2',55), (23,'West','Q3',145), (24,'West','Q3',165);`}
+  starterCode={`SELECT
+  COALESCE(region, 'ALL REGIONS')   AS region,
+  COALESCE(quarter, 'all quarters') AS quarter,
+  SUM(amount)                       AS total
+FROM
+  sales
+GROUP BY
+  ROLLUP (region, quarter)
+ORDER BY
+  region,
+  quarter;`}
+/>
+
+Read the result from the bottom: a grand total, one subtotal per
+region, and the detail rows. `COALESCE` is doing the labelling,
+because a subtotal row's `quarter` really is `NULL`.
+
+## CUBE and GROUPING SETS
+
+`ROLLUP` gives subtotals along one hierarchy, outer column first.
+Two relatives cover the other shapes:
+
+- `CUBE (a, b)` gives **every** combination: by a, by b, by both, and
+  the grand total.
+- `GROUPING SETS ((a), (b), ())` lets you name exactly the groupings
+  you want, with no hierarchy implied.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Naming the groupings you actually want"
+  initSql={`CREATE TABLE sales (
+  id      INTEGER PRIMARY KEY,
+  region  TEXT,
+  quarter TEXT,
+  amount  NUMERIC
+);
+INSERT INTO sales (id, region, quarter, amount) VALUES
+  (1,'North','Q1',120), (2,'North','Q1',95), (3,'North','Q2',140),
+  (4,'North','Q2',60), (5,'North','Q3',210), (6,'North','Q3',85),
+  (7,'South','Q1',175), (8,'South','Q1',130), (9,'South','Q2',90),
+  (10,'South','Q2',45), (11,'South','Q3',160), (12,'South','Q3',115),
+  (13,'East','Q1',200), (14,'East','Q1',70), (15,'East','Q2',155),
+  (16,'East','Q2',105), (17,'East','Q3',135), (18,'East','Q3',80),
+  (19,'West','Q1',190), (20,'West','Q1',125), (21,'West','Q2',100),
+  (22,'West','Q2',55), (23,'West','Q3',145), (24,'West','Q3',165);`}
+  starterCode={`SELECT
+  region,
+  quarter,
+  SUM(amount) AS total,
+  GROUPING(region)  AS region_is_total,
+  GROUPING(quarter) AS quarter_is_total
+FROM
+  sales
+GROUP BY
+  GROUPING SETS ((region), (quarter), ())
+ORDER BY
+  region_is_total,
+  region,
+  quarter;`}
+/>
+
+`GROUPING(col)` returns 1 when the row is a total *over* that column
+and 0 when the column holds a real value. That is how you tell a
+genuine `NULL` in the data apart from the `NULL` a subtotal row puts
+there, and it is the only reliable way to do it.
+
+<Callout type="tip" title="These are what a pivot table does">
+A spreadsheet pivot table with subtotals and a grand total is exactly
+`ROLLUP`. Producing the same thing by hand means a `UNION ALL` of one
+query per level, which is slower and drifts out of step as soon as
+someone edits one branch.
+</Callout>
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Orders and paid orders, side by side"
+  instructions={`The \`orders\` table has \`region\`, \`status\` and \`amount\`. Return one row per region with \`region\`, \`total_orders\` (all orders), and \`paid_orders\` (only those whose \`status\` is \`'paid'\`). Use \`FILTER\` rather than a second query. Sort by \`region\`.
+
+\`\`\`sql
+COUNT(*) FILTER (WHERE status = 'paid')
+\`\`\``}
+  initSql={`CREATE TABLE orders (
+  id     SERIAL PRIMARY KEY,
+  region TEXT NOT NULL,
+  status TEXT NOT NULL,
+  amount NUMERIC(8, 2) NOT NULL
+);
+INSERT INTO orders (region, status, amount) VALUES
+  ('North','new',120), ('North','paid',95), ('North','shipped',140),
+  ('North','cancelled',60), ('North','paid',210), ('North','shipped',85),
+  ('South','new',175), ('South','paid',130), ('South','shipped',90),
+  ('South','new',45), ('South','paid',160), ('South','cancelled',115),
+  ('East','paid',200), ('East','shipped',70), ('East','new',155),
+  ('East','shipped',105), ('East','paid',135), ('East','shipped',80),
+  ('West','new',190), ('West','cancelled',125), ('West','paid',100),
+  ('West','shipped',55), ('West','new',145), ('West','paid',165);`}
+  starterCode={`-- One row per region, with a count of all orders and of paid ones.
+SELECT
+  region,
+  COUNT(*) AS total_orders
+FROM
+  orders
+GROUP BY
+  region
+ORDER BY
+  region;`}
+  solutionSql={`SELECT
+  region,
+  COUNT(*) AS total_orders,
+  COUNT(*) FILTER (WHERE status = 'paid') AS paid_orders
+FROM
+  orders
+GROUP BY
+  region
+ORDER BY
+  region;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Returns region, total_orders, paid_orders",
+      description: "Three columns, in that order.",
+      expectedColumns: ["region", "total_orders", "paid_orders"],
+    },
+    {
+      id: "row_count",
+      name: "One row per region",
+      description: "Four regions appear in the data.",
+      expectedRowCount: 4,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Every region has 6 orders and 2 paid ones.",
+      matchesSolution: true,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`How does \`COUNT(*) FILTER (WHERE status = 'paid')\` differ from adding \`WHERE status = 'paid'\` to the query?
+
+- [o] \`FILTER\` narrows only that aggregate; \`WHERE\` narrows the whole query.
+  > Other aggregates in the same select list keep seeing every row when \`FILTER\` is used.
+- \`FILTER\` runs before grouping and \`WHERE\` runs after it.
+  > \`WHERE\` is the earlier of the two; \`FILTER\` is applied as the aggregate accumulates.
+- \`FILTER\` works only with \`COUNT\`, while \`WHERE\` works with anything.
+  > Every aggregate accepts a \`FILTER\` clause, including \`SUM\` and \`STRING_AGG\`.
+- They are the same, and \`FILTER\` is the newer spelling.
+  > They give different results whenever a query has more than one aggregate.
+
+\`FILTER\` is what lets one pass answer several conditional questions at once.`}
+/>
+
+<MultipleChoice
+  markdown={`A page has 6 visits from 4 different people. What do \`COUNT(*)\` and \`COUNT(DISTINCT visitor)\` return?
+
+- 4 and 4, since duplicates are removed before counting.
+  > \`COUNT(*)\` counts rows and never removes duplicates.
+- 6 and 6, since both count the rows in the group.
+  > The \`DISTINCT\` keyword changes what is counted from rows to values.
+- [o] 6 and 4.
+  > One counts rows in the group, the other counts the different values in the column.
+- 6 and 2, because it counts only the repeated visitors.
+  > \`DISTINCT\` counts each value once, rather than counting only the repeats.
+
+The difference between the two is exactly the repeat traffic.`}
+/>
+
+<MultipleChoice
+  markdown={`In a \`GROUP BY ROLLUP (region, quarter)\` result, what does a row with \`quarter\` set to \`NULL\` mean?
+
+- The source data has orders with no quarter recorded.
+  > That is possible in general, which is precisely why \`GROUPING()\` exists to tell the two apart.
+- The rollup failed to compute that combination.
+  > Every combination in the hierarchy is computed; nothing is left out.
+- [o] It is a subtotal covering every quarter for that region.
+  > \`ROLLUP\` marks the columns a total spans by setting them to \`NULL\`.
+- Nothing special; \`ROLLUP\` never produces \`NULL\` values.
+  > Marking aggregated-away columns with \`NULL\` is exactly how \`ROLLUP\` labels its subtotal rows.
+
+Use \`GROUPING(quarter)\` to distinguish a subtotal marker from a missing value.`}
+/>
+
+Next: stacking the results of two queries on top of each other.

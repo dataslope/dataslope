@@ -1,0 +1,341 @@
+---
+title: Modifying Data with Queries
+description: INSERT from a SELECT, UPDATE from another table, upserts with ON CONFLICT, and RETURNING to see what a write actually did.
+---
+
+You already know `INSERT`, `UPDATE` and `DELETE` with literal values.
+Real work rarely stops there: the rows to insert come from another
+query, the new values come from another table, and "insert it unless
+it already exists" is a daily requirement. All of that is ordinary
+SQL, and it hangs off the statements you know.
+
+<Figure
+  slug="sql-modifying-data-with-queries-cutout"
+  alt="Modifying data with queries, an isometric illustration"
+/>
+
+## INSERT from a SELECT
+
+Replace the `VALUES` list with a `SELECT` and every row the query
+returns is inserted. The columns line up by position, exactly as in a
+set operation:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Archiving the cancelled orders"
+  initSql={`CREATE TABLE orders (
+  id     INTEGER PRIMARY KEY,
+  region TEXT,
+  status TEXT,
+  amount NUMERIC
+);
+CREATE TABLE cancelled_archive (
+  order_id INTEGER PRIMARY KEY,
+  region   TEXT,
+  amount   NUMERIC
+);
+INSERT INTO orders (id, region, status, amount) VALUES
+  (1,'North','new',120), (2,'North','paid',95), (3,'North','shipped',140),
+  (4,'North','cancelled',60), (5,'North','paid',210), (6,'North','shipped',85),
+  (7,'South','new',175), (8,'South','paid',130), (9,'South','cancelled',90),
+  (10,'South','new',45), (11,'South','paid',160), (12,'South','cancelled',115),
+  (13,'East','paid',200), (14,'East','shipped',70), (15,'East','new',155),
+  (16,'East','cancelled',105), (17,'East','paid',135), (18,'East','shipped',80),
+  (19,'West','new',190), (20,'West','cancelled',125), (21,'West','paid',100),
+  (22,'West','shipped',55), (23,'West','new',145), (24,'West','cancelled',165);`}
+  starterCode={`INSERT INTO cancelled_archive (order_id, region, amount)
+SELECT
+  id,
+  region,
+  amount
+FROM
+  orders
+WHERE
+  status = 'cancelled';
+
+SELECT * FROM cancelled_archive ORDER BY order_id;`}
+/>
+
+No `VALUES`, no semicolon between the `INSERT` and the `SELECT`: the
+query *is* the source of rows.
+
+## RETURNING: see what the write did
+
+By default a write statement reports only how many rows it touched.
+`RETURNING` makes it hand back the rows themselves, which is how you
+learn a generated id without a second query:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "INSERT INTO ... VALUES (...)" },
+    { text: "RETURNING", label: "give me the rows back" },
+    { text: "id, created_at", label: "these columns, as they now stand" },
+  ]}
+/>
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="The ids the database just generated"
+  initSql={`CREATE TABLE tasks (
+  id         SERIAL PRIMARY KEY,
+  title      TEXT NOT NULL,
+  priority   INTEGER NOT NULL DEFAULT 3,
+  done       BOOLEAN NOT NULL DEFAULT false
+);
+INSERT INTO tasks (title, priority) VALUES
+  ('Write the brief',1), ('Book the room',2), ('Order lunch',3),
+  ('Draft the slides',1), ('Send invites',2), ('Print handouts',3),
+  ('Check the audio',2), ('Rehearse',1), ('Update the deck',2),
+  ('Confirm catering',3), ('Set up chairs',3), ('Test the screen',2),
+  ('Collect feedback',3), ('Write the recap',1), ('Share the notes',2),
+  ('Archive the files',3), ('Pay the invoice',1), ('Thank the speakers',2),
+  ('Refresh the site',3), ('Post the photos',2), ('Clear the room',3),
+  ('Return the kit',2), ('Close the ticket',1), ('Log the costs',3);`}
+  starterCode={`INSERT INTO tasks (title, priority) VALUES
+  ('Book the venue', 1),
+  ('Draft the agenda', 2)
+RETURNING
+  id,
+  title,
+  priority,
+  done;`}
+/>
+
+`RETURNING` works on `UPDATE` and `DELETE` too, and there it returns
+the rows *after* the change, which makes it an excellent way to check
+a risky statement: run it, read the rows it reports, and you know
+exactly what happened.
+
+<Callout type="tip" title="RETURNING is safer than a follow-up SELECT">
+A `SELECT` after an `UPDATE` can see a different set of rows, because
+something else may have changed them in between. `RETURNING` reports
+what *this statement* did, atomically.
+</Callout>
+
+## UPDATE from another table
+
+`UPDATE ... SET ... FROM other_table WHERE` joins the table being
+updated to another one and takes the new values from it. This is how a
+price list is applied, or a set of corrections merged in:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Applying a price update file"
+  initSql={`CREATE TABLE products (
+  sku   TEXT PRIMARY KEY,
+  name  TEXT,
+  price NUMERIC
+);
+CREATE TABLE price_updates (
+  sku       TEXT PRIMARY KEY,
+  new_price NUMERIC
+);
+INSERT INTO products (sku, name, price) VALUES
+  ('kettle','Kettle',24.00), ('blender','Blender',38.00),
+  ('toaster','Toaster',19.50), ('whisk','Whisk',6.00),
+  ('pan','Pan',42.00), ('ladle','Ladle',8.25),
+  ('lamp','Lamp',31.00), ('bulb','Bulb',4.75),
+  ('shade','Shade',15.00), ('chair','Chair',89.00),
+  ('desk','Desk',210.00), ('stool','Stool',45.00),
+  ('shelf','Shelf',67.00), ('bench','Bench',52.00),
+  ('table','Table',175.00), ('mug','Mug',7.50),
+  ('plate','Plate',9.00), ('bowl','Bowl',11.25),
+  ('fork','Fork',3.40), ('glass','Glass',5.60),
+  ('spoon','Spoon',3.10), ('torch','Torch',18.00),
+  ('dimmer','Dimmer',22.50), ('sconce','Sconce',36.00);
+INSERT INTO price_updates (sku, new_price) VALUES
+  ('kettle',26.50), ('blender',41.00), ('pan',39.50),
+  ('lamp',33.00), ('desk',199.00), ('mug',8.25);`}
+  starterCode={`UPDATE products p
+SET
+  price = u.new_price
+FROM
+  price_updates u
+WHERE
+  p.sku = u.sku
+RETURNING
+  p.sku,
+  p.name,
+  p.price;`}
+/>
+
+Six rows come back, the six that matched. Products with no entry in
+the update file are left exactly as they were, because the `WHERE`
+never matched them.
+
+<Figure
+  slug="sql-modifying-data-with-queries-update-from-inline-cutout"
+  alt="Two rows of blocks on a bench with a short chute carrying pieces from the shorter row across into the matching slots of the longer one"
+  caption="`UPDATE ... FROM` matches rows to a second table and takes its values from there."
+/>
+
+## Upsert: INSERT ... ON CONFLICT
+
+"Insert this row, or update it if it is already there" used to take
+three statements and a race condition. `ON CONFLICT` does it in one,
+atomically:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "INSERT INTO stock ... VALUES ..." },
+    { text: "ON CONFLICT (sku)", label: "when this constraint is violated" },
+    { text: "DO UPDATE SET qty = stock.qty + EXCLUDED.qty", label: "update instead of failing" },
+  ]}
+/>
+
+`EXCLUDED` is the row that *would* have been inserted, so the `SET`
+clause can combine the old value with the new one.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Receiving a delivery into stock"
+  initSql={`CREATE TABLE stock (
+  sku TEXT PRIMARY KEY,
+  qty INTEGER NOT NULL
+);
+INSERT INTO stock (sku, qty) VALUES
+  ('kettle',12), ('blender',5), ('toaster',9), ('whisk',30),
+  ('pan',7), ('ladle',18), ('lamp',4), ('bulb',60),
+  ('shade',11), ('chair',3), ('desk',2), ('stool',8),
+  ('shelf',6), ('bench',1), ('table',2), ('mug',44),
+  ('plate',37), ('bowl',26), ('fork',80), ('glass',52),
+  ('spoon',75), ('torch',14), ('dimmer',10), ('sconce',6);`}
+  starterCode={`INSERT INTO stock (sku, qty) VALUES
+  ('kettle', 20),   -- already in stock: add to it
+  ('griddle', 15),  -- brand new: insert it
+  ('pan', 6)        -- already in stock: add to it
+ON CONFLICT (sku) DO UPDATE
+  SET qty = stock.qty + EXCLUDED.qty
+RETURNING
+  sku,
+  qty;`}
+/>
+
+Kettle goes from 12 to 32, pan from 7 to 13, and griddle is created
+with 15. One statement, no check-then-insert, and nothing to go wrong
+if two deliveries arrive at the same moment.
+
+`DO NOTHING` is the other option, and it means "insert it if it is
+new, otherwise leave the existing row alone":
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Import that skips what already exists"
+  initSql={`CREATE TABLE subscribers (
+  email      TEXT PRIMARY KEY,
+  signed_up  DATE NOT NULL
+);
+INSERT INTO subscribers (email, signed_up) VALUES
+  ('ada@example.com','2025-01-04'), ('ben@example.com','2025-01-19'),
+  ('cleo@example.com','2025-02-02'), ('dan@example.com','2025-02-15'),
+  ('elle@example.com','2025-03-01'), ('finn@example.com','2025-03-15'),
+  ('gia@example.com','2025-03-28'), ('hugo@example.com','2025-04-05'),
+  ('iris@example.com','2025-04-19'), ('jae@example.com','2025-05-01'),
+  ('kai@example.com','2025-05-17'), ('lena@example.com','2025-06-03'),
+  ('mira@example.com','2025-06-21'), ('nils@example.com','2025-07-08'),
+  ('omar@example.com','2025-07-26'), ('pia@example.com','2025-08-09'),
+  ('quinn@example.com','2025-08-23'), ('rui@example.com','2025-09-06'),
+  ('sana@example.com','2025-09-27'), ('tom@example.com','2025-10-11'),
+  ('uma@example.com','2025-10-30'), ('vic@example.com','2025-11-14'),
+  ('wren@example.com','2025-11-29'), ('zoe@example.com','2025-12-13');`}
+  starterCode={`INSERT INTO subscribers (email, signed_up) VALUES
+  ('ada@example.com', '2026-01-01'),
+  ('newcomer@example.com', '2026-01-01')
+ON CONFLICT (email) DO NOTHING
+RETURNING
+  email,
+  signed_up;
+
+SELECT COUNT(*) AS total FROM subscribers;`}
+/>
+
+Only the newcomer is returned, because Ada's row was left untouched.
+Her original signup date survives, which is the point: `DO NOTHING`
+protects existing data from a careless re-import.
+
+## DELETE driven by another table
+
+`DELETE ... USING` is the mirror of `UPDATE ... FROM`:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Removing every order from a blocked customer"
+  initSql={`CREATE TABLE orders (
+  id          INTEGER PRIMARY KEY,
+  customer_id INTEGER,
+  amount      NUMERIC
+);
+CREATE TABLE blocked_customers (
+  customer_id INTEGER PRIMARY KEY,
+  reason      TEXT
+);
+INSERT INTO orders (id, customer_id, amount) VALUES
+  (1,1,120), (2,1,80), (3,2,210), (4,2,95), (5,3,60), (6,3,175),
+  (7,4,45), (8,4,130), (9,5,90), (10,5,160), (11,6,115), (12,6,200),
+  (13,7,70), (14,7,155), (15,8,105), (16,8,135), (17,1,80), (18,2,190),
+  (19,3,125), (20,4,100), (21,5,55), (22,6,145), (23,7,165), (24,8,35);
+INSERT INTO blocked_customers (customer_id, reason) VALUES
+  (3,'chargebacks'), (7,'fraud');`}
+  starterCode={`DELETE FROM orders o
+USING blocked_customers b
+WHERE o.customer_id = b.customer_id
+RETURNING
+  o.id,
+  o.customer_id,
+  o.amount;
+
+SELECT COUNT(*) AS orders_left FROM orders;`}
+/>
+
+Six rows deleted, eighteen left. The `RETURNING` list is the record of
+exactly what went, which is worth capturing before a destructive
+statement rather than after it.
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does \`RETURNING id, title\` add to an \`INSERT\`?
+
+- It inserts the row twice, once per named column.
+  > The clause reports on the insert; it never repeats it.
+- It restricts the insert to rows where those columns are not \`NULL\`.
+  > No filtering happens; \`RETURNING\` only decides what is reported back.
+- It renames the inserted columns in the table.
+  > Column names in the table are unchanged by anything in a \`RETURNING\` list.
+- [o] It returns the inserted rows, including values the database generated.
+  > A generated key or a column default is visible without running a second query.
+
+\`RETURNING\` works on \`UPDATE\` and \`DELETE\` as well, reporting rows after the change.`}
+/>
+
+<MultipleChoice
+  markdown={`In \`ON CONFLICT (sku) DO UPDATE SET qty = stock.qty + EXCLUDED.qty\`, what is \`EXCLUDED\`?
+
+- The row that already exists in the table.
+  > The existing row is reached through the table's own name, \`stock\`.
+- [o] The row that the \`INSERT\` tried to add.
+  > \`EXCLUDED\` names the proposed row, so the update can combine it with the stored one.
+- A list of the rows that were skipped by the statement.
+  > Nothing is skipped in a \`DO UPDATE\`; every proposed row is either inserted or merged.
+- The set of columns excluded from the conflict check.
+  > The conflict target is the parenthesised column list, and \`EXCLUDED\` is not related to it.
+
+Reading it as "the excluded candidate row" makes the name make sense.`}
+/>
+
+<MultipleChoice
+  markdown={`A re-import runs \`INSERT ... ON CONFLICT (email) DO NOTHING\` against a table that already holds one of the emails. What happens?
+
+- Both rows are inserted, leaving a duplicate email.
+  > The primary key would reject that, which is the conflict being handled.
+- The statement fails and no rows are inserted.
+  > Failing is precisely what \`ON CONFLICT\` prevents.
+- The existing row is overwritten with the new values.
+  > Overwriting requires \`DO UPDATE\`; \`DO NOTHING\` leaves the stored row alone.
+- [o] The new rows are inserted and the conflicting one is skipped.
+  > Rows that would violate the constraint are quietly passed over, and the rest go in.
+
+\`DO NOTHING\` is the safe choice when the stored row is the one you trust.`}
+/>
+
+Next: giving a query a permanent name.

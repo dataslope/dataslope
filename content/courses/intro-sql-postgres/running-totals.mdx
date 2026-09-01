@@ -1,0 +1,317 @@
+---
+title: Running Totals
+description: What an ORDER BY inside OVER does to an aggregate, the cumulative sums and running averages it produces, and the default frame that makes it work.
+---
+
+Adding `ORDER BY` inside an `OVER` clause does something surprising to
+an ordinary aggregate: it makes it **accumulate**. `SUM(amount) OVER
+(ORDER BY day)` is not the total, it is the total *so far*, recomputed
+for every row.
+
+<Figure
+  slug="sql-running-totals-cutout"
+  alt="Running totals, an isometric illustration"
+/>
+
+## The same SUM, with and without an order
+
+Run these two columns side by side and watch what the ordering does:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Grand total versus running total"
+  initSql={`CREATE TABLE daily_revenue (
+  day     DATE PRIMARY KEY,
+  revenue NUMERIC
+);
+INSERT INTO daily_revenue (day, revenue) VALUES
+  ('2025-03-01',420), ('2025-03-02',380), ('2025-03-03',510),
+  ('2025-03-04',290), ('2025-03-05',640), ('2025-03-06',455),
+  ('2025-03-07',300), ('2025-03-08',720), ('2025-03-09',610),
+  ('2025-03-10',480), ('2025-03-11',350), ('2025-03-12',560),
+  ('2025-03-13',495), ('2025-03-14',830), ('2025-03-15',275),
+  ('2025-03-16',610), ('2025-03-17',540), ('2025-03-18',390),
+  ('2025-03-19',700), ('2025-03-20',465), ('2025-03-21',520),
+  ('2025-03-22',380), ('2025-03-23',650), ('2025-03-24',590);`}
+  starterCode={`SELECT
+  day,
+  revenue,
+  SUM(revenue) OVER ()               AS month_total,
+  SUM(revenue) OVER (ORDER BY day)   AS running_total
+FROM
+  daily_revenue
+ORDER BY
+  day;`}
+/>
+
+`month_total` is the same number on every row. `running_total` climbs
+from 420 on the first day to that same number on the last. One clause
+separates them.
+
+## Why an ORDER BY makes it accumulate
+
+The reason is a rule you have not met yet: every window has a
+**frame**, the slice of the partition a given row is actually allowed
+to see, and the default frame changes depending on whether the window
+is ordered.
+
+| The window has | Default frame | Effect |
+| --- | --- | --- |
+| no `ORDER BY` | the whole partition | one total, repeated |
+| an `ORDER BY` | the start of the partition up to the current row | a running total |
+
+So `OVER (ORDER BY day)` quietly means *"from the first day through
+today"*, and that is exactly a cumulative sum. The next lesson makes
+that frame explicit and shows how to change it, but the default is
+worth committing to memory now, because it is the source of most
+"why is my window function doing that?" confusion.
+
+<Figure
+  slug="sql-running-totals-order-by-accumulate-inline-cutout"
+  alt="A row of jugs along a bench, each filled a little higher than the one before it, with a ladle pouring into the last one"
+  caption="An ordered window lets each row see everything up to itself, and no further."
+/>
+
+## Any aggregate accumulates
+
+`SUM` is the obvious one, but the rule applies to the whole aggregate
+family. A running count, a running average, a running maximum: all one
+clause away.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Four running aggregates at once"
+  initSql={`CREATE TABLE daily_revenue (
+  day     DATE PRIMARY KEY,
+  revenue NUMERIC
+);
+INSERT INTO daily_revenue (day, revenue) VALUES
+  ('2025-03-01',420), ('2025-03-02',380), ('2025-03-03',510),
+  ('2025-03-04',290), ('2025-03-05',640), ('2025-03-06',455),
+  ('2025-03-07',300), ('2025-03-08',720), ('2025-03-09',610),
+  ('2025-03-10',480), ('2025-03-11',350), ('2025-03-12',560),
+  ('2025-03-13',495), ('2025-03-14',830), ('2025-03-15',275),
+  ('2025-03-16',610), ('2025-03-17',540), ('2025-03-18',390),
+  ('2025-03-19',700), ('2025-03-20',465), ('2025-03-21',520),
+  ('2025-03-22',380), ('2025-03-23',650), ('2025-03-24',590);`}
+  starterCode={`SELECT
+  day,
+  revenue,
+  COUNT(*)     OVER w                AS days_so_far,
+  SUM(revenue) OVER w                AS running_total,
+  ROUND(AVG(revenue) OVER w, 1)      AS running_avg,
+  MAX(revenue) OVER w                AS best_day_so_far
+FROM
+  daily_revenue
+WINDOW
+  w AS (ORDER BY day)
+ORDER BY
+  day;`}
+/>
+
+`best_day_so_far` is worth a second look: it never goes down, because
+a maximum over a growing set can only grow. That is a useful sanity
+check when you are debugging a window.
+
+## Running totals inside groups
+
+Combine `PARTITION BY` with `ORDER BY` and each group gets its own
+accumulation, restarting from zero at every boundary:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="A running total per region"
+  initSql={`CREATE TABLE regional_sales (
+  id     INTEGER PRIMARY KEY,
+  region TEXT,
+  day    DATE,
+  amount NUMERIC
+);
+INSERT INTO regional_sales (id, region, day, amount) VALUES
+  (1,'North','2025-03-01',120), (2,'North','2025-03-02',95),
+  (3,'North','2025-03-03',140), (4,'North','2025-03-04',60),
+  (5,'North','2025-03-05',210), (6,'North','2025-03-06',85),
+  (7,'South','2025-03-01',175), (8,'South','2025-03-02',130),
+  (9,'South','2025-03-03',90), (10,'South','2025-03-04',45),
+  (11,'South','2025-03-05',160), (12,'South','2025-03-06',115),
+  (13,'East','2025-03-01',200), (14,'East','2025-03-02',70),
+  (15,'East','2025-03-03',155), (16,'East','2025-03-04',105),
+  (17,'East','2025-03-05',135), (18,'East','2025-03-06',80),
+  (19,'West','2025-03-01',190), (20,'West','2025-03-02',125),
+  (21,'West','2025-03-03',100), (22,'West','2025-03-04',55),
+  (23,'West','2025-03-05',145), (24,'West','2025-03-06',165);`}
+  starterCode={`SELECT
+  region,
+  day,
+  amount,
+  SUM(amount) OVER (
+    PARTITION BY region
+    ORDER BY day
+  ) AS region_running_total
+FROM
+  regional_sales
+ORDER BY
+  region,
+  day;`}
+/>
+
+Four independent climbs, one per region. This is the shape of almost
+every "cumulative by category" report you will ever be asked for.
+
+<Callout type="warn" title="Ties reset the accumulation in surprising ways">
+The default frame for an ordered window is defined in terms of
+*values*, not rows: all rows with the same `ORDER BY` value share a
+frame and therefore get the **same** running total. If two sales fall
+on the same day, both rows show the total including both. That is
+usually what you want for a daily total, and a surprise when you
+expected step-by-step accumulation. Adding a tiebreaker
+(`ORDER BY day, id`) restores one step per row.
+</Callout>
+
+## A percentage of the running total
+
+Once the accumulation is a column, the arithmetic around it is
+ordinary. Here is how much of the month each day had delivered by the
+end of that day:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Progress through the month"
+  initSql={`CREATE TABLE daily_revenue (
+  day     DATE PRIMARY KEY,
+  revenue NUMERIC
+);
+INSERT INTO daily_revenue (day, revenue) VALUES
+  ('2025-03-01',420), ('2025-03-02',380), ('2025-03-03',510),
+  ('2025-03-04',290), ('2025-03-05',640), ('2025-03-06',455),
+  ('2025-03-07',300), ('2025-03-08',720), ('2025-03-09',610),
+  ('2025-03-10',480), ('2025-03-11',350), ('2025-03-12',560),
+  ('2025-03-13',495), ('2025-03-14',830), ('2025-03-15',275),
+  ('2025-03-16',610), ('2025-03-17',540), ('2025-03-18',390),
+  ('2025-03-19',700), ('2025-03-20',465), ('2025-03-21',520),
+  ('2025-03-22',380), ('2025-03-23',650), ('2025-03-24',590);`}
+  starterCode={`SELECT
+  day,
+  revenue,
+  SUM(revenue) OVER (ORDER BY day) AS running_total,
+  ROUND(
+    100 * SUM(revenue) OVER (ORDER BY day) / SUM(revenue) OVER (),
+    1
+  ) AS pct_of_month
+FROM
+  daily_revenue
+ORDER BY
+  day;`}
+/>
+
+Two windows in one expression: the numerator accumulates, the
+denominator does not.
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="A running balance"
+  instructions={`The \`ledger\` table has \`entry_no\` and \`amount\` (deposits are positive, withdrawals negative). Return \`entry_no\`, \`amount\`, and a \`balance\` column holding the running total of \`amount\` ordered by \`entry_no\`. Keep all 24 rows and sort by \`entry_no\`.
+
+\`\`\`sql
+SUM(amount) OVER (ORDER BY entry_no)
+\`\`\``}
+  initSql={`CREATE TABLE ledger (
+  entry_no INTEGER PRIMARY KEY,
+  amount   NUMERIC(9, 2) NOT NULL
+);
+INSERT INTO ledger (entry_no, amount) VALUES
+  (1,500.00), (2,-120.00), (3,240.00), (4,-75.50),
+  (5,310.00), (6,-40.00), (7,180.25), (8,-260.00),
+  (9,95.00), (10,-33.10), (11,420.00), (12,-150.75),
+  (13,60.00), (14,-88.20), (15,275.00), (16,-19.99),
+  (17,130.40), (18,-205.00), (19,88.00), (20,-64.30),
+  (21,350.00), (22,-110.00), (23,45.60), (24,-28.75);`}
+  starterCode={`-- Add a running balance to every entry.
+SELECT
+  entry_no,
+  amount
+FROM
+  ledger
+ORDER BY
+  entry_no;`}
+  solutionSql={`SELECT
+  entry_no,
+  amount,
+  SUM(amount) OVER (ORDER BY entry_no) AS balance
+FROM
+  ledger
+ORDER BY
+  entry_no;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Returns entry_no, amount, balance",
+      description: "Three columns, in that order.",
+      expectedColumns: ["entry_no", "amount", "balance"],
+    },
+    {
+      id: "row_count",
+      name: "Keeps every entry",
+      description: "A running total adds a column, not rows.",
+      expectedRowCount: 24,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Each balance is the sum of every entry up to and including this one.",
+      matchesSolution: true,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What changes when you add \`ORDER BY day\` inside an \`OVER\` clause on \`SUM(revenue)\`?
+
+- The rows come back sorted by day instead of in table order.
+  > Sorting the output is the job of the query's own \`ORDER BY\`, which is a separate clause.
+- Nothing at all; ordering a window has no effect on an aggregate.
+  > It changes the default frame, which changes every value the aggregate returns.
+- The sum is computed only for the earliest day in the window.
+  > Every row still gets a value, and the values differ from row to row.
+- [o] The default frame narrows to "everything up to this row", so the sum accumulates.
+  > An ordered window frames from the start of the partition through the current row.
+
+An ordered window turns a total into a running total.`}
+/>
+
+<MultipleChoice
+  markdown={`In \`SUM(amount) OVER (PARTITION BY region ORDER BY day)\`, what happens at a region boundary?
+
+- The running total carries over into the next region.
+  > Each partition is computed independently, so nothing crosses the boundary.
+- [o] The accumulation restarts from the first row of the new region.
+  > A partition is a fresh window, so the frame begins again inside it.
+- The query returns one summary row per region.
+  > Partitioning keeps every row; only \`GROUP BY\` reduces them.
+- The rows of the new region are excluded from the result.
+  > Every row of every partition is returned.
+
+A partition is a wall: no frame reaches across it.`}
+/>
+
+<MultipleChoice
+  markdown={`Two sales share the same \`day\`, and the window is \`OVER (ORDER BY day)\`. What running total do those two rows show?
+
+- The first row shows its own amount and the second adds to it.
+  > That is per-row stepping, which needs a tiebreaker in the window's \`ORDER BY\`.
+- Each shows only its own amount, with earlier days excluded.
+  > Earlier days are inside the frame and are always included.
+- [o] Both show the same total, including both of that day's sales.
+  > The default frame groups rows sharing an \`ORDER BY\` value, so tied rows see each other.
+- The query fails, because a window \`ORDER BY\` must be unique.
+  > Duplicate ordering values are allowed and are handled by the frame rules.
+
+Add a tiebreaker such as \`ORDER BY day, id\` when you want one step per row.`}
+/>
+
+Next: making the frame explicit, and the moving averages it makes
+possible.

@@ -21,10 +21,11 @@
  *   node scripts/promote-illustrations.mjs <ids...> [options]
  *   node scripts/promote-illustrations.mjs --all --from <dir>
  *
- * Ids are prompt ids (e.g. `python-basics-loops`). An id whose background has
- * been removed promotes the cut-out and nothing else: every surface on the
- * site asks for the `-cutout` slug, so the opaque original beside it is git
- * weight nothing serves.
+ * Ids are prompt ids (e.g. `python-basics-loops`). An id with a cut-out
+ * promotes the cut-out and nothing else: every surface on the site asks for
+ * the `-cutout` slug, so an opaque original beside it is git weight nothing
+ * serves. Generation writes the cut-out directly (gpt-image-2 returns a real
+ * alpha channel), so most runs have nothing else to promote.
  *
  * Options:
  *   --from <dir|r2>   Source of candidates (default: ./generated-illustrations)
@@ -35,7 +36,7 @@
  *   --max-width <px>  Downscale to at most this width before encoding
  *                     (default: none, the generated size is served). Never
  *                     upscales.
- *   --no-cutout       Promote only the original, not its background-removed pair
+ *   --no-cutout       Promote only the original, ignoring any cut-out beside it
  *   --with-original   Also promote the opaque original beside the cut-out.
  *                     Off by default: nothing on the site renders it. The
  *                     pristine PNG is in R2 regardless, so a later re-promote
@@ -162,12 +163,14 @@ function makeSource(opts) {
       process.exit(1);
     }
     const names = readdirSync(dir).filter((f) => /\.(png|webp)$/i.test(f));
+    // Ids, not file stems: a transparent generation writes only
+    // `<id>-cutout.png`, so listing has to see the id behind the suffix or
+    // `--all` finds nothing on a run with no opaque originals.
+    const idOf = (stem) =>
+      stem.endsWith(CUTOUT_SUFFIX) ? stem.slice(0, -CUTOUT_SUFFIX.length) : stem;
     return {
       describe: dir,
-      list: () =>
-        names
-          .map((f) => basename(f, extname(f)))
-          .filter((s) => !s.endsWith(CUTOUT_SUFFIX)),
+      list: () => [...new Set(names.map((f) => idOf(basename(f, extname(f)))))].sort(),
       has: (stem) => names.some((f) => basename(f, extname(f)) === stem),
       read: async (stem) => {
         const hit = names.find((f) => basename(f, extname(f)) === stem);
@@ -189,7 +192,9 @@ function makeSource(opts) {
       const all = await load();
       const ids = new Set();
       for (const k of all) {
-        const m = /^illustrations\/[^/]+\/([^/]+)\/v\d+\/original\.png$/.exec(k);
+        // Either artifact names the id: a transparent run uploads only
+        // `cutout.png`, an opaque one only `original.png`.
+        const m = /^illustrations\/[^/]+\/([^/]+)\/v\d+\/(?:original|cutout)\.png$/.exec(k);
         if (m) ids.add(m[1]);
       }
       return [...ids].sort();

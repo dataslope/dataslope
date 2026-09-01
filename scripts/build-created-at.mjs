@@ -28,7 +28,8 @@ const OUT = join(ROOT, "lib", "generated", "created-at.js");
  *  only source a shallow build has. Written by this script; never by hand. */
 const SNAPSHOT = join(ROOT, "data", "created-at.json");
 
-/** Suffix the background-removal step writes (scripts/remove-background-kie.mjs).
+/** Suffix the generated transparent artwork carries (written by
+ *  scripts/generate-illustrations.mjs, promoted by promote-illustrations.mjs).
  *  The cut-out is the file the site actually serves, so its birth is the
  *  illustration's birth. */
 const CUTOUT_SUFFIX = "-cutout.webp";

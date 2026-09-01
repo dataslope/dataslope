@@ -94,18 +94,28 @@ By the end of the course you will be able to:
   tables that relate to one another.
 - Read and write SQL queries to **select**, **filter**, **sort**,
   and **summarize** data.
-- Combine data from multiple tables using **joins**.
+- Reach for the right **built-in function**: `CASE`, text and date
+  handling, casting, and the arithmetic rules that surprise people.
+- Combine data from multiple tables using **joins**, and stack
+  results with **set operations**.
+- Use **window functions** to rank rows, build running totals and
+  moving averages, compare a row to its neighbours, and pull the top
+  N out of every group.
 - Reason about **primary keys**, **foreign keys**, and
   **relationships** between tables.
 - Sketch a simple **data model** and read an **entity-relationship
   diagram**.
+- Change data safely with **transactions**, and name a query
+  permanently with a **view**.
 - Think analytically about data, the skill that outlasts any
   particular tool.
 
-This is a **foundations** course about SQL and relational thinking.
-It deliberately spends little time on database administration,
-deployment, replication, tuning, security hardening. Those matter,
-but they make far more sense *after* the ideas taught here.
+This is a **foundations** course about SQL and relational thinking,
+and it carries on far enough into analytical SQL that you can write
+the queries real reporting is made of. It deliberately spends little
+time on database administration, deployment, replication, tuning,
+security hardening. Those matter, but they make far more sense
+*after* the ideas taught here.
 
 ## How the course is organized
 
@@ -115,8 +125,14 @@ about. The first two pages after this one build the conceptual
 ground, what a database actually is, and where SQL and PostgreSQL
 came from (the history is shorter and stranger than you might
 expect). From the third section onward, you are writing queries on
-every page. Near the end, an **Interesting discussions** section
-collects a couple of optional deep-dives, spreadsheets versus
+every page.
+
+The middle of the course is the querying story, filtering, sorting,
+built-in functions, aggregates, joins and data modeling. The later
+sections turn that into analytical SQL: common table expressions,
+then a full run at **window functions**, then the clauses that change
+data rather than read it. Near the end, an **Interesting discussions**
+section collects a couple of optional deep-dives, spreadsheets versus
 databases, and how real applications talk to databases, that are
 worth reading whenever curiosity strikes.
 

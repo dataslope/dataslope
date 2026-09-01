@@ -12,6 +12,21 @@
 >
 > `AGENTS.md` → "Illustrations" is the spec. This is the runbook.
 
+> **Superseded, 2026-09-01: there is no background-removal step any more.**
+> `gpt-image-2` accepts `background: "transparent"` and returns a real alpha
+> channel, so `scripts/generate-illustrations.mjs` produces the cut-out
+> directly and `scripts/remove-background-kie.mjs` has been deleted along with
+> the `KIE_API_KEY` it needed. The command blocks below have had that step
+> removed; the Kie-specific gotchas (4, 5, 6, 14) and the remover comparison in
+> "What was measured" are kept as the record of why it worked that way, and no
+> longer describe anything runnable. Everything else, batch mechanics, prompt
+> guidance, costs, promotion, wiring, trimming, is unchanged. The prompt
+> changed with the step: `ISOMETRIC_CONSTRAINTS` now asks for an empty
+> background rather than a white one, because asking for white while asking
+> the API for transparency got a partial-alpha ground shadow that only shows
+> on the dark theme (9.3% of the frame in partial alpha, against 1.8% with the
+> new wording).
+
 ---
 
 ## TL;DR
@@ -19,7 +34,8 @@
 All **30 courses** carry generated isometric art on **every page** (781/781). `content/`
 has zero inline SVG. Every served image is a single-format WebP encoded exactly once.
 The last run did 337 images + 337 background removals with **zero failures** for
-**$0.80** in 27 minutes.
+**$0.80** in 27 minutes. (Removal is now a property of generation, not a second
+pass; see the note above.)
 
 **Do these after #612 merges:** [Open items](#open-items). #1 is mandatory or R2 grows
 without bound.
@@ -321,11 +337,11 @@ console.log(COURSE,"+"+added,"→",j.prompts.length);'
 ## The pipeline
 
 Keys are already environment variables in Claude Code sessions: `OPENAI_API_KEY`,
-`KIE_API_KEY`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`,
+`R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`,
 `R2_BUCKET`. Verify before a long run:
 
 ```bash
-for v in OPENAI_API_KEY KIE_API_KEY R2_ACCOUNT_ID R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY R2_BUCKET; do
+for v in OPENAI_API_KEY R2_ACCOUNT_ID R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY R2_BUCKET; do
   eval "val=\$$v"; [ -n "$val" ] && echo "$v: set" || echo "$v: MISSING"
 done
 ```
@@ -346,8 +362,6 @@ node scripts/generate-illustrations.mjs submit --only "$IDS" --sink r2 --run 202
 node scripts/generate-illustrations.mjs status
 node scripts/generate-illustrations.mjs download --sink r2 --run 2026-08-<slug>
 
-# 3. background removal (adds cutout.png beside each original in R2)
-node scripts/remove-background-kie.mjs --from r2 --run 2026-08-<slug> --concurrency 8
 
 # 4. promote (q92 WebP straight into public/images, then runs build-images)
 node scripts/promote-illustrations.mjs --all --from r2 --run 2026-08-<slug>
@@ -394,7 +408,6 @@ has the long version.
 node scripts/generate-illustrations.mjs submit --only css-grid --sink r2 --run 2026-08-fix
 node scripts/generate-illustrations.mjs status
 node scripts/generate-illustrations.mjs download --sink r2 --run 2026-08-fix
-node scripts/remove-background-kie.mjs --from r2 --run 2026-08-fix --only css-grid   # ← never skip
 node scripts/promote-illustrations.mjs --from r2 --run 2026-08-fix css-grid
 ```
 
@@ -423,7 +436,8 @@ node scripts/promote-illustrations.mjs --all --from r2 --run <runId> --quality 9
 
 Ordered by likelihood of biting you.
 
-**1. Skipping background removal fails silently — the worst one.**
+**1. Skipping background removal fails silently — the worst one.** *(Historical:
+generation now writes the cut-out itself, so there is no step to skip.)*
 Pages reference `<id>-cutout`. Regenerate an original, skip step 3, and `promote` finds
 no cut-out in the new run so it promotes **only the original**. No warning, no error.
 `<id>.webp` updates, `<id>-cutout.webp` stays stale, and **the page keeps showing the

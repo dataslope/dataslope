@@ -63,13 +63,26 @@ const SHARED_CONSTRAINTS =
  * one piece / one flat color because assemblies of small units render fused
  * with off-palette color bleed; animals are exempt from the color rule
  * because a flat brand color otherwise gets applied to creatures too.
+ *
+ * The empty-background clause is the transparency rule, and it replaced a
+ * "white background" that had become a contradiction: generation now asks
+ * gpt-image-2 for `background: "transparent"` directly, so there is no white
+ * field to stage on. Asking for one anyway got a soft grey ground shadow
+ * painted at partial alpha, which is invisible on the white page and a grey
+ * smudge on the near-black one. Measured on the same subject: 9.3% of the
+ * frame came back partially transparent with the old wording and 1.8% with
+ * this one, the remainder being genuine edge antialiasing. It is the same
+ * fix the risograph block below has always carried.
  */
 const ISOMETRIC_CONSTRAINTS =
   "Render each object as a solid three-dimensional form with real thickness, " +
   "smooth matte shading, and clean edges; never as a glossy sphere, a ball, or " +
   "a thin round counter. " +
-  "Stage everything light and airy on a white background: pale grey and white " +
-  "platforms, bright brand colors, no dark or black bases. Make every object a " +
+  "Stage everything light and airy on an empty transparent background: pale " +
+  "grey and white platforms, bright brand colors, no dark or black bases. " +
+  "Leave the background fully empty behind, around and beneath the subject: " +
+  "no backdrop, no floor, no ground shadow, no soft glow and no vignette, so " +
+  "the whole subject lifts off the page in one piece. Make every object a " +
   "single solid piece in one flat brand color: never build one object out of " +
   "many small blocks or cubelets, never pack a container with a heap of little " +
   "pieces, and never blend, mix, or bleed two colors into each other. Animals " +
@@ -82,11 +95,11 @@ const ISOMETRIC_CONSTRAINTS =
 /**
  * Risograph constraints, for inline historical figures. Flat inks, never
  * volume (asking a riso for volume yields a plastic render with grain on
- * top). Never black: the background is removed after generation, and a
- * dark-ink cutout vanishes on the near-black page. Blank paper — no panel,
- * frame, or shadow — is what makes the subject liftable by background
- * removal. Composed as a wide band to fill the 1536x768 `course-inline`
- * size. No likenesses of real people.
+ * top). Never black: these render transparent, and a dark-ink cutout
+ * vanishes on the near-black page. Blank paper, with no panel, frame, or
+ * shadow, is what leaves the model an isolated subject to draw rather than a
+ * full-bleed rectangle. Composed as a wide band to fill the 1536x768
+ * `course-inline` size. No likenesses of real people.
  */
 const RISOGRAPH_CONSTRAINTS =
   "Print it as a risograph: a few flat spot-color inks, coarse halftone grain " +
@@ -148,7 +161,8 @@ export function illustrationFileSlug(id: string): string {
   return slugify(id);
 }
 
-/** Target asset file name. GPT Image 2 returns raster PNGs. */
+/** Target asset file name. GPT Image 2 returns raster PNGs (RGBA, since
+ *  generation asks for a transparent background). */
 export function illustrationFileName(id: string): string {
   return `${illustrationFileSlug(id)}.png`;
 }

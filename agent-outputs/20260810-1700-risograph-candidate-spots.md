@@ -1,5 +1,10 @@
 # 266 candidate spots for the next wave of risograph bands
 
+> **Superseded, 2026-09-01:** generation now asks `gpt-image-2` for
+> `background: "transparent"` and writes the cut-out itself, so the
+> background-removal command below is gone along with
+> `scripts/remove-background-kie.mjs`. Everything else here still applies.
+
 **Date:** 2026-08-10
 **Status:** queued, not drawn. The prompts are in
 `data/illustration-prompts.json`; no art exists for any of them yet.
@@ -68,7 +73,6 @@ Sections on a page carrying no band at all were taken first.
 # 266 images at 1536x768, batch API, low quality: roughly $0.40
 OPENAI_API_KEY=... node scripts/generate-illustrations.mjs run \
   --category course-inline --sink r2 --run riso-2026-08 --only "$(node -e '…')"
-node scripts/remove-background-kie.mjs --run riso-2026-08
 node scripts/promote-illustrations.mjs --run riso-2026-08
 node scripts/place-inline-figures.mjs --write        # places only what exists
 ```

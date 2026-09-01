@@ -1,0 +1,394 @@
+---
+title: Window Frames
+description: ROWS and RANGE frames, moving averages over a sliding window, and the FIRST_VALUE and LAST_VALUE trap the default frame sets.
+---
+
+A partition says *which* rows belong together. A **frame** says how
+many of them the current row may actually look at. Until now the frame
+has been chosen for you; this lesson takes the wheel, because a
+moving average, a centred window, and a correct `LAST_VALUE` are all
+impossible without it.
+
+<Figure
+  slug="sql-window-frames-cutout"
+  alt="Window frames, an isometric illustration"
+/>
+
+## The shape of a frame clause
+
+A frame clause is written after the window's `ORDER BY` and reads
+almost like English:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "ROWS", label: "count rows (or RANGE, to count values)" },
+    { text: "BETWEEN" },
+    { text: "2 PRECEDING", label: "where the frame starts" },
+    { text: "AND" },
+    { text: "CURRENT ROW", label: "where it ends" },
+  ]}
+/>
+
+Each end can be `UNBOUNDED PRECEDING` (the first row of the
+partition), `n PRECEDING`, `CURRENT ROW`, `n FOLLOWING`, or
+`UNBOUNDED FOLLOWING` (the last row).
+
+## The default frame, written out
+
+You have been using the default frame for two lessons without naming
+it. It is the same clause in both cases, and only its *meaning*
+changes:
+
+| The window | Its default frame | Which comes to |
+| --- | --- | --- |
+| `OVER ()` | `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` | the whole partition |
+| `OVER (ORDER BY day)` | the same clause | everything up to this row's day |
+
+That looks like a contradiction and is not. `CURRENT ROW` under
+`RANGE` means "the current row **and every row that ties with it**".
+With no `ORDER BY`, every row ties with every other, so the frame is
+the entire partition and an aggregate returns one repeated total. Add
+an `ORDER BY` and only the rows sharing this row's value tie, so the
+frame stops there and the aggregate accumulates.
+
+That also explains what the previous lesson observed about ties: the
+default says `RANGE`, not `ROWS`.
+
+## ROWS counts rows, RANGE counts values
+
+This is the single most important distinction in the whole frame
+syntax:
+
+- **`ROWS`** counts physical rows. `2 PRECEDING` means the two rows
+  printed above this one, whatever they contain.
+- **`RANGE`** counts by the `ORDER BY` *value*. Every row sharing the
+  current row's value is inside the frame, and `2 PRECEDING` means a
+  value two units smaller.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="ROWS and RANGE on a table with ties"
+  initSql={`CREATE TABLE readings (
+  id    INTEGER PRIMARY KEY,
+  slot  INTEGER,
+  value INTEGER
+);
+INSERT INTO readings (id, slot, value) VALUES
+  (1,1,10), (2,1,20), (3,2,30), (4,2,40), (5,3,50), (6,3,60),
+  (7,4,70), (8,4,80), (9,5,90), (10,5,100), (11,6,110), (12,6,120),
+  (13,7,130), (14,7,140), (15,8,150), (16,8,160), (17,9,170),
+  (18,9,180), (19,10,190), (20,10,200), (21,11,210), (22,11,220),
+  (23,12,230), (24,12,240);`}
+  starterCode={`SELECT
+  id,
+  slot,
+  value,
+  SUM(value) OVER (ORDER BY slot) AS range_default,
+  SUM(value) OVER (ORDER BY slot ROWS UNBOUNDED PRECEDING) AS rows_frame
+FROM
+  readings
+ORDER BY
+  id;`}
+/>
+
+The two columns disagree on every row. `range_default` jumps two rows
+at a time because both rows in a slot share a value; `rows_frame`
+steps once per row. Neither is wrong, and mixing them up is a common
+source of numbers that are *almost* right.
+
+<Figure
+  slug="sql-window-frames-rows-counts-rows-inline-cutout"
+  alt="A concertina strip of panels laid along a bench with only three panels standing open at once and the rest folded flat"
+  caption="A frame is the part of the partition a row may see: a few panels open, the rest shut."
+/>
+
+## A moving average
+
+The classic use of an explicit frame is smoothing a noisy series. A
+three-day trailing average is a frame two rows back:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Three-day and seven-day moving averages"
+  initSql={`CREATE TABLE daily_revenue (
+  day     DATE PRIMARY KEY,
+  revenue NUMERIC
+);
+INSERT INTO daily_revenue (day, revenue) VALUES
+  ('2025-03-01',420), ('2025-03-02',380), ('2025-03-03',510),
+  ('2025-03-04',290), ('2025-03-05',640), ('2025-03-06',455),
+  ('2025-03-07',300), ('2025-03-08',720), ('2025-03-09',610),
+  ('2025-03-10',480), ('2025-03-11',350), ('2025-03-12',560),
+  ('2025-03-13',495), ('2025-03-14',830), ('2025-03-15',275),
+  ('2025-03-16',610), ('2025-03-17',540), ('2025-03-18',390),
+  ('2025-03-19',700), ('2025-03-20',465), ('2025-03-21',520),
+  ('2025-03-22',380), ('2025-03-23',650), ('2025-03-24',590);`}
+  starterCode={`SELECT
+  day,
+  revenue,
+  ROUND(AVG(revenue) OVER (
+    ORDER BY day
+    ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+  ), 1) AS avg_3d,
+  ROUND(AVG(revenue) OVER (
+    ORDER BY day
+    ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+  ), 1) AS avg_7d
+FROM
+  daily_revenue
+ORDER BY
+  day;`}
+/>
+
+The seven-day line is visibly flatter than the three-day one, which is
+the whole point of smoothing. Note the first rows: with fewer than
+three days available, the average is taken over whatever exists rather
+than returning `NULL`.
+
+## A centred window looks forward too
+
+Nothing stops a frame from reaching *ahead* of the current row. A
+centred five-row average is two back and two forward:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="A centred five-day average"
+  initSql={`CREATE TABLE daily_revenue (
+  day     DATE PRIMARY KEY,
+  revenue NUMERIC
+);
+INSERT INTO daily_revenue (day, revenue) VALUES
+  ('2025-03-01',420), ('2025-03-02',380), ('2025-03-03',510),
+  ('2025-03-04',290), ('2025-03-05',640), ('2025-03-06',455),
+  ('2025-03-07',300), ('2025-03-08',720), ('2025-03-09',610),
+  ('2025-03-10',480), ('2025-03-11',350), ('2025-03-12',560),
+  ('2025-03-13',495), ('2025-03-14',830), ('2025-03-15',275),
+  ('2025-03-16',610), ('2025-03-17',540), ('2025-03-18',390),
+  ('2025-03-19',700), ('2025-03-20',465), ('2025-03-21',520),
+  ('2025-03-22',380), ('2025-03-23',650), ('2025-03-24',590);`}
+  starterCode={`SELECT
+  day,
+  revenue,
+  ROUND(AVG(revenue) OVER (
+    ORDER BY day
+    ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING
+  ), 1) AS centred_5d
+FROM
+  daily_revenue
+ORDER BY
+  day;`}
+/>
+
+<Callout type="warn" title="A forward-looking window is not always allowed">
+Reading rows that come after the current one is fine for a historical
+report and a serious mistake in a feature used to *predict* the
+future: the model would be trained on information it will not have at
+prediction time. Frames that look forward are safe for description
+and dangerous for forecasting.
+</Callout>
+
+## RANGE with a time interval
+
+PostgreSQL lets a `RANGE` frame use an interval when the window is
+ordered by a date or timestamp. That is the correct way to say "the
+last seven days" when some days may be missing from the data:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="A true seven-day window, gaps and all"
+  initSql={`CREATE TABLE visits (
+  day     DATE PRIMARY KEY,
+  people  INTEGER
+);
+INSERT INTO visits (day, people) VALUES
+  ('2025-03-01',40), ('2025-03-02',35), ('2025-03-04',60),
+  ('2025-03-05',52), ('2025-03-06',48), ('2025-03-09',71),
+  ('2025-03-10',65), ('2025-03-11',44), ('2025-03-12',80),
+  ('2025-03-15',39), ('2025-03-16',58), ('2025-03-17',62),
+  ('2025-03-18',47), ('2025-03-21',75), ('2025-03-22',53),
+  ('2025-03-23',41), ('2025-03-25',68), ('2025-03-26',59),
+  ('2025-03-27',72), ('2025-03-29',36), ('2025-03-30',64),
+  ('2025-04-01',49), ('2025-04-02',57), ('2025-04-03',70);`}
+  starterCode={`SELECT
+  day,
+  people,
+  SUM(people) OVER (
+    ORDER BY day
+    RANGE BETWEEN INTERVAL '6 days' PRECEDING AND CURRENT ROW
+  ) AS last_7_days
+FROM
+  visits
+ORDER BY
+  day;`}
+/>
+
+`ROWS BETWEEN 6 PRECEDING` would have counted six *recorded* days,
+which on this table can span more than a fortnight. `RANGE` with an
+interval counts calendar days, which is what "last seven days"
+actually means.
+
+## FIRST_VALUE, LAST_VALUE, and the trap
+
+Three functions read a specific row out of the frame:
+`FIRST_VALUE(col)`, `LAST_VALUE(col)` and `NTH_VALUE(col, n)`. The
+first behaves as you expect. The second catches almost everyone:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Why LAST_VALUE looks broken"
+  initSql={`CREATE TABLE sales (
+  id     INTEGER PRIMARY KEY,
+  region TEXT,
+  rep    TEXT,
+  amount NUMERIC
+);
+INSERT INTO sales (id, region, rep, amount) VALUES
+  (1,'North','Ada',120), (2,'North','Ben',95), (3,'North','Cleo',140),
+  (4,'North','Dan',60), (5,'North','Elle',210), (6,'North','Finn',85),
+  (7,'South','Gia',175), (8,'South','Hugo',130), (9,'South','Iris',90),
+  (10,'South','Jae',45), (11,'South','Kai',160), (12,'South','Lena',115),
+  (13,'East','Mira',200), (14,'East','Nils',70), (15,'East','Omar',155),
+  (16,'East','Pia',105), (17,'East','Quinn',135), (18,'East','Rui',80),
+  (19,'West','Sana',190), (20,'West','Tom',125), (21,'West','Uma',100),
+  (22,'West','Vic',55), (23,'West','Wren',145), (24,'West','Zoe',165);`}
+  starterCode={`SELECT
+  region,
+  rep,
+  amount,
+  FIRST_VALUE(rep) OVER (PARTITION BY region ORDER BY amount DESC) AS top_rep,
+  LAST_VALUE(rep)  OVER (PARTITION BY region ORDER BY amount DESC) AS looks_wrong,
+  LAST_VALUE(rep)  OVER (
+    PARTITION BY region
+    ORDER BY amount DESC
+    ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+  ) AS bottom_rep
+FROM
+  sales
+ORDER BY
+  region,
+  amount DESC;`}
+/>
+
+`looks_wrong` returns the current row's own rep on every row, and it
+is behaving exactly as specified: the default frame ends at the
+current row, so the last row *of the frame* is the current row.
+`bottom_rep` widens the frame to the whole partition and returns what
+you meant.
+
+<Callout type="tip" title="The rule to remember">
+`FIRST_VALUE` is safe with the default frame; `LAST_VALUE` almost
+never is. When you want the extremes of a partition, either write the
+full `UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING` frame, or use
+`FIRST_VALUE` twice with opposite orderings.
+</Callout>
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="A three-month moving average"
+  instructions={`The \`monthly_sales\` table has \`month_no\` and \`total\`. Return \`month_no\`, \`total\`, and \`moving_avg\`: the average of \`total\` over the current month and the two before it, ordered by \`month_no\` and rounded to 2 decimal places. Use a row frame, not a range frame.
+
+\`\`\`sql
+AVG(total) OVER (ORDER BY month_no ROWS BETWEEN ... AND CURRENT ROW)
+\`\`\``}
+  initSql={`CREATE TABLE monthly_sales (
+  month_no INTEGER PRIMARY KEY,
+  total    NUMERIC(10, 2) NOT NULL
+);
+INSERT INTO monthly_sales (month_no, total) VALUES
+  (1,1200.00), (2,1450.00), (3,980.00), (4,1710.00),
+  (5,1330.00), (6,1590.00), (7,2040.00), (8,1120.00),
+  (9,1680.00), (10,1875.00), (11,1240.00), (12,2310.00),
+  (13,1390.00), (14,1520.00), (15,1105.00), (16,1960.00),
+  (17,1430.00), (18,1780.00), (19,2150.00), (20,1290.00),
+  (21,1640.00), (22,1815.00), (23,1370.00), (24,2480.00);`}
+  starterCode={`-- Smooth the series with a trailing three-month average.
+SELECT
+  month_no,
+  total
+FROM
+  monthly_sales
+ORDER BY
+  month_no;`}
+  solutionSql={`SELECT
+  month_no,
+  total,
+  ROUND(AVG(total) OVER (
+    ORDER BY month_no
+    ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+  ), 2) AS moving_avg
+FROM
+  monthly_sales
+ORDER BY
+  month_no;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Returns month_no, total, moving_avg",
+      description: "Three columns, in that order.",
+      expectedColumns: ["month_no", "total", "moving_avg"],
+    },
+    {
+      id: "row_count",
+      name: "Keeps every month",
+      description: "A frame narrows what each row sees, not how many rows return.",
+      expectedRowCount: 24,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Early months average over the rows that exist so far.",
+      matchesSolution: true,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the difference between \`ROWS BETWEEN 2 PRECEDING AND CURRENT ROW\` and \`RANGE BETWEEN 2 PRECEDING AND CURRENT ROW\`?
+
+- [o] \`ROWS\` counts positions; \`RANGE\` counts \`ORDER BY\` values.
+  > One frame takes the two rows above, the other takes every row whose ordering value is within two of this one.
+- \`ROWS\` works only on integers while \`RANGE\` works on any type.
+  > \`ROWS\` is type-independent; it is \`RANGE\` with an offset that needs an orderable, subtractable type.
+- \`ROWS\` includes the current row and \`RANGE\` excludes it.
+  > Both frames end at \`CURRENT ROW\` and both include it.
+- There is no difference; \`RANGE\` is older syntax kept for compatibility.
+  > They give different answers whenever the ordering column has duplicate values.
+
+They agree only when every \`ORDER BY\` value is distinct.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does \`LAST_VALUE(rep) OVER (PARTITION BY region ORDER BY amount DESC)\` return the current row's own rep?
+
+- Because \`LAST_VALUE\` is evaluated before the window is sorted.
+  > The window's ordering is applied first; the problem is where the frame ends.
+- Because the partition is rebuilt for every row, leaving one row in it.
+  > A partition holds all its rows; it is the frame inside it that is narrow.
+- Because \`ORDER BY ... DESC\` reverses which end counts as last.
+  > Reversing the order changes which row is last, not the fact that the frame stops at the current one.
+- [o] Because the default frame ends at the current row, making it the frame's last row.
+  > An ordered window frames from the partition start through the current row unless told otherwise.
+
+Widen the frame to \`UNBOUNDED FOLLOWING\` to reach the real last row.`}
+/>
+
+<MultipleChoice
+  markdown={`Some days are missing from a table. Which frame correctly averages the last seven calendar days?
+
+- \`ROWS BETWEEN 7 PRECEDING AND CURRENT ROW\`
+  > Counting seven stored rows spans more than seven days when days are missing, and it is eight rows besides.
+- \`ROWS BETWEEN 6 PRECEDING AND CURRENT ROW\`
+  > This takes the six previous *recorded* days, which may stretch weeks back.
+- [o] \`RANGE BETWEEN INTERVAL '6 days' PRECEDING AND CURRENT ROW\`
+  > A range frame measures the ordering column itself, so gaps in the data do not stretch the window.
+- \`RANGE BETWEEN 7 PRECEDING AND CURRENT ROW\`
+  > A bare number is not a valid offset against a \`DATE\` column; the offset must be an interval.
+
+Row frames count rows; only a range frame counts time.`}
+/>
+
+Next: comparing a row to its neighbours with `LAG` and `LEAD`.
