@@ -28,8 +28,8 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Suffix on the background-removed variant's slug, mirroring the pipeline
- *  (`scripts/remove-background-kie.mjs` writes `<id>-cutout`). */
+/** Suffix on the transparent variant's slug, mirroring the pipeline
+ *  (`scripts/generate-illustrations.mjs` writes `<id>-cutout`). */
 const CUTOUT_SUFFIX = "-cutout";
 
 /** Shape of public/_gen/illustration-gallery.json (build-images.mjs). */

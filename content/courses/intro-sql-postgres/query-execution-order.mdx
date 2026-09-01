@@ -24,9 +24,10 @@ The order you type is for human readability. The order the database
 3. **`GROUP BY`**, form groups.
 4. **`HAVING`**, filter groups.
 5. **`SELECT`**, choose columns, compute aliases.
-6. **`DISTINCT`**, remove duplicates.
-7. **`ORDER BY`**, sort.
-8. **`LIMIT`**, keep the first N.
+6. **Window functions**, compute anything with an `OVER` clause.
+7. **`DISTINCT`**, remove duplicates.
+8. **`ORDER BY`**, sort.
+9. **`LIMIT`**, keep the first N.
 
 Read the numbers: `FROM` is first, `SELECT` is near the **end**, and
 `LIMIT` is last. The clause you *write* first (`SELECT`) is among the
@@ -40,8 +41,9 @@ actually runs:
     { text: "WHERE ...", label: "runs 2nd" },
     { text: "GROUP BY ...", label: "runs 3rd" },
     { text: "HAVING ...", label: "runs 4th" },
-    { text: "ORDER BY ...", label: "runs 7th" },
-    { text: "LIMIT ...;", label: "runs 8th" },
+    { text: "OVER (...)", label: "runs 6th" },
+    { text: "ORDER BY ...", label: "runs 8th" },
+    { text: "LIMIT ...;", label: "runs 9th" },
   ]}
 />
 
@@ -89,7 +91,7 @@ ORDER BY
 />
 
 **But you *can* use the alias in `ORDER BY`,** because `ORDER BY`
-(step 7) runs *after* `SELECT` (step 5), by which time the alias
+(step 8) runs *after* `SELECT` (step 5), by which time the alias
 exists. The execution order predicts exactly which works.
 
 <Callout type="info" title="A rule you can now derive, not memorize">
@@ -144,8 +146,9 @@ Trace it in execution order:
    small.
 5. **SELECT** `customer_id, SUM(amount) AS total`, compute the
    output, naming the sum `total`.
-6. **ORDER BY** `total DESC`, sort the surviving groups.
-7. **LIMIT 2**, keep the top two.
+6. **Window functions**, none in this query, so nothing happens here.
+7. **ORDER BY** `total DESC`, sort the surviving groups.
+8. **LIMIT 2**, keep the top two.
 
 <Figure
   slug="sql-query-execution-order-inline-cutout"
@@ -156,6 +159,58 @@ Trace it in execution order:
 This is the **query transformation pipeline**: each stage reshapes a
 table and passes it on. Every query you write, however complex,
 flows through these same steps.
+
+## Where window functions fit
+
+Step 6 is the one that explains the rules from the
+[window functions](/courses/intro-sql-postgres/why-window-functions)
+section. Windows are computed *after* grouping and *before* sorting,
+and both halves of that sentence have consequences:
+
+- **A window function cannot appear in `WHERE` or `HAVING`**, because
+  both run before step 6. Filtering on a rank means computing it in a
+  CTE and filtering the CTE, which is exactly the
+  [top N per group](/courses/intro-sql-postgres/top-n-per-group)
+  pattern.
+- **A window function can appear in `ORDER BY`**, because sorting runs
+  after it, in the same way an alias can.
+- **A window sees the grouped rows, not the original ones.** In a
+  query with `GROUP BY region`, `SUM(total) OVER ()` sums the four
+  regional totals, not the twenty-four underlying orders.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="A window over an already-grouped result"
+  initSql={`CREATE TABLE orders (
+  id     INTEGER PRIMARY KEY,
+  region TEXT,
+  amount NUMERIC
+);
+INSERT INTO orders (id, region, amount) VALUES
+  (1,'North',120), (2,'North',95), (3,'North',140), (4,'North',60),
+  (5,'North',210), (6,'North',85), (7,'South',175), (8,'South',130),
+  (9,'South',90), (10,'South',45), (11,'South',160), (12,'South',115),
+  (13,'East',200), (14,'East',70), (15,'East',155), (16,'East',105),
+  (17,'East',135), (18,'East',80), (19,'West',190), (20,'West',125),
+  (21,'West',100), (22,'West',55), (23,'West',145), (24,'West',165);`}
+  starterCode={`SELECT
+  region,
+  SUM(amount) AS region_total,
+  SUM(SUM(amount)) OVER () AS company_total,
+  ROUND(100 * SUM(amount) / SUM(SUM(amount)) OVER (), 1) AS pct
+FROM
+  orders
+GROUP BY
+  region
+ORDER BY
+  region_total DESC;`}
+/>
+
+`SUM(SUM(amount)) OVER ()` looks alarming and is simply the two steps
+in order: the inner `SUM` is the aggregate at step 3, and the outer
+one is a window over its four results at step 6. Nesting an aggregate
+inside a window function is legal for exactly this reason; nesting one
+aggregate inside another is not.
 
 ## WHERE vs. HAVING, settled
 

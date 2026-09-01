@@ -1,0 +1,388 @@
+---
+title: LAG and LEAD
+description: Reading the previous and next row with LAG and LEAD, computing change over time, and filling the gap at the edges with a default.
+---
+
+Some questions are about a row's *neighbours*: how much did revenue
+change since yesterday, how long between two events, did this reading
+go up or down. `LAG` and `LEAD` answer them by reaching into another
+row of the same window and pulling one value across.
+
+<Figure
+  slug="sql-lag-and-lead-cutout"
+  alt="LAG and LEAD, an isometric illustration"
+/>
+
+## Reaching backwards and forwards
+
+`LAG(column)` returns that column's value from the previous row of the
+window. `LEAD(column)` returns it from the next one. Both need an
+`ORDER BY` inside `OVER`, because "previous" is meaningless without an
+order.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "LAG(revenue", label: "the column to read" },
+    { text: ", 1", label: "how many rows back (default 1)" },
+    { text: ", 0)", label: "what to return when there is no such row" },
+    { text: "OVER (ORDER BY day)", label: "the window and its order" },
+  ]}
+/>
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Yesterday, today, tomorrow"
+  initSql={`CREATE TABLE daily_revenue (
+  day     DATE PRIMARY KEY,
+  revenue NUMERIC
+);
+INSERT INTO daily_revenue (day, revenue) VALUES
+  ('2025-03-01',420), ('2025-03-02',380), ('2025-03-03',510),
+  ('2025-03-04',290), ('2025-03-05',640), ('2025-03-06',455),
+  ('2025-03-07',300), ('2025-03-08',720), ('2025-03-09',610),
+  ('2025-03-10',480), ('2025-03-11',350), ('2025-03-12',560),
+  ('2025-03-13',495), ('2025-03-14',830), ('2025-03-15',275),
+  ('2025-03-16',610), ('2025-03-17',540), ('2025-03-18',390),
+  ('2025-03-19',700), ('2025-03-20',465), ('2025-03-21',520),
+  ('2025-03-22',380), ('2025-03-23',650), ('2025-03-24',590);`}
+  starterCode={`SELECT
+  day,
+  LAG(revenue)  OVER (ORDER BY day) AS yesterday,
+  revenue       AS today,
+  LEAD(revenue) OVER (ORDER BY day) AS tomorrow
+FROM
+  daily_revenue
+ORDER BY
+  day;`}
+/>
+
+The first row has no yesterday and the last has no tomorrow, so both
+come back `NULL`. That is honest, and it is often inconvenient.
+
+<Figure
+  slug="sql-lag-and-lead-reaching-backwards-inline-cutout"
+  alt="A row of upright pipes along a bench, one of them with a short branch reaching to the pipe on its left and another to the pipe on its right"
+  caption="`LAG` and `LEAD` reach a neighbour without leaving the current row."
+/>
+
+## Change since the previous row
+
+Subtracting the lagged value from the current one is the single most
+common use of these functions:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Day-over-day change, absolute and percentage"
+  initSql={`CREATE TABLE daily_revenue (
+  day     DATE PRIMARY KEY,
+  revenue NUMERIC
+);
+INSERT INTO daily_revenue (day, revenue) VALUES
+  ('2025-03-01',420), ('2025-03-02',380), ('2025-03-03',510),
+  ('2025-03-04',290), ('2025-03-05',640), ('2025-03-06',455),
+  ('2025-03-07',300), ('2025-03-08',720), ('2025-03-09',610),
+  ('2025-03-10',480), ('2025-03-11',350), ('2025-03-12',560),
+  ('2025-03-13',495), ('2025-03-14',830), ('2025-03-15',275),
+  ('2025-03-16',610), ('2025-03-17',540), ('2025-03-18',390),
+  ('2025-03-19',700), ('2025-03-20',465), ('2025-03-21',520),
+  ('2025-03-22',380), ('2025-03-23',650), ('2025-03-24',590);`}
+  starterCode={`SELECT
+  day,
+  revenue,
+  revenue - LAG(revenue) OVER (ORDER BY day) AS change,
+  ROUND(
+    100 * (revenue - LAG(revenue) OVER (ORDER BY day))
+        / LAG(revenue) OVER (ORDER BY day),
+    1
+  ) AS pct_change
+FROM
+  daily_revenue
+ORDER BY
+  day;`}
+/>
+
+Repeating the whole `LAG(...)` expression three times is noisy. A CTE
+computes it once and keeps the arithmetic readable:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="The same query, one LAG and a CTE"
+  initSql={`CREATE TABLE daily_revenue (
+  day     DATE PRIMARY KEY,
+  revenue NUMERIC
+);
+INSERT INTO daily_revenue (day, revenue) VALUES
+  ('2025-03-01',420), ('2025-03-02',380), ('2025-03-03',510),
+  ('2025-03-04',290), ('2025-03-05',640), ('2025-03-06',455),
+  ('2025-03-07',300), ('2025-03-08',720), ('2025-03-09',610),
+  ('2025-03-10',480), ('2025-03-11',350), ('2025-03-12',560),
+  ('2025-03-13',495), ('2025-03-14',830), ('2025-03-15',275),
+  ('2025-03-16',610), ('2025-03-17',540), ('2025-03-18',390),
+  ('2025-03-19',700), ('2025-03-20',465), ('2025-03-21',520),
+  ('2025-03-22',380), ('2025-03-23',650), ('2025-03-24',590);`}
+  starterCode={`WITH
+  with_previous AS (
+    SELECT
+      day,
+      revenue,
+      LAG(revenue) OVER (ORDER BY day) AS prev_revenue
+    FROM
+      daily_revenue
+  )
+SELECT
+  day,
+  revenue,
+  revenue - prev_revenue AS change,
+  ROUND(100 * (revenue - prev_revenue) / prev_revenue, 1) AS pct_change
+FROM
+  with_previous
+ORDER BY
+  day;`}
+/>
+
+Naming the lagged column is worth doing as soon as you use it twice.
+
+## A default instead of NULL
+
+The third argument replaces the `NULL` at the edge of the window. Give
+it a value that makes the arithmetic behave:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="No NULL on the first row"
+  initSql={`CREATE TABLE daily_revenue (
+  day     DATE PRIMARY KEY,
+  revenue NUMERIC
+);
+INSERT INTO daily_revenue (day, revenue) VALUES
+  ('2025-03-01',420), ('2025-03-02',380), ('2025-03-03',510),
+  ('2025-03-04',290), ('2025-03-05',640), ('2025-03-06',455),
+  ('2025-03-07',300), ('2025-03-08',720), ('2025-03-09',610),
+  ('2025-03-10',480), ('2025-03-11',350), ('2025-03-12',560),
+  ('2025-03-13',495), ('2025-03-14',830), ('2025-03-15',275),
+  ('2025-03-16',610), ('2025-03-17',540), ('2025-03-18',390),
+  ('2025-03-19',700), ('2025-03-20',465), ('2025-03-21',520),
+  ('2025-03-22',380), ('2025-03-23',650), ('2025-03-24',590);`}
+  starterCode={`SELECT
+  day,
+  revenue,
+  LAG(revenue, 1, 0) OVER (ORDER BY day)           AS prev_or_zero,
+  revenue - LAG(revenue, 1, 0) OVER (ORDER BY day) AS change_from_zero,
+  LAG(revenue, 7) OVER (ORDER BY day)              AS same_day_last_week
+FROM
+  daily_revenue
+ORDER BY
+  day;`}
+/>
+
+The second argument is the offset, so `LAG(revenue, 7)` is
+week-over-week comparison in one expression. Nothing stops you from
+using both arguments together.
+
+<Callout type="info" title="A default is a claim about the data">
+`LAG(revenue, 1, 0)` says "before the first day, revenue was zero".
+For a shop that opened on 1 March that is true. For a series that
+simply starts where your extract starts, it is a fabrication that will
+show up as a suspiciously large first-day gain. When in doubt, leave
+the `NULL` and let it propagate.
+</Callout>
+
+## Partitioned neighbours
+
+Like every window function, `LAG` and `LEAD` respect `PARTITION BY`,
+so a per-region series never reads across a boundary:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Change since the region's previous day"
+  initSql={`CREATE TABLE regional_sales (
+  id     INTEGER PRIMARY KEY,
+  region TEXT,
+  day    DATE,
+  amount NUMERIC
+);
+INSERT INTO regional_sales (id, region, day, amount) VALUES
+  (1,'North','2025-03-01',120), (2,'North','2025-03-02',95),
+  (3,'North','2025-03-03',140), (4,'North','2025-03-04',60),
+  (5,'North','2025-03-05',210), (6,'North','2025-03-06',85),
+  (7,'South','2025-03-01',175), (8,'South','2025-03-02',130),
+  (9,'South','2025-03-03',90), (10,'South','2025-03-04',45),
+  (11,'South','2025-03-05',160), (12,'South','2025-03-06',115),
+  (13,'East','2025-03-01',200), (14,'East','2025-03-02',70),
+  (15,'East','2025-03-03',155), (16,'East','2025-03-04',105),
+  (17,'East','2025-03-05',135), (18,'East','2025-03-06',80),
+  (19,'West','2025-03-01',190), (20,'West','2025-03-02',125),
+  (21,'West','2025-03-03',100), (22,'West','2025-03-04',55),
+  (23,'West','2025-03-05',145), (24,'West','2025-03-06',165);`}
+  starterCode={`SELECT
+  region,
+  day,
+  amount,
+  amount - LAG(amount) OVER (
+    PARTITION BY region
+    ORDER BY day
+  ) AS change_in_region
+FROM
+  regional_sales
+ORDER BY
+  region,
+  day;`}
+/>
+
+Each region's first day shows `NULL`, exactly as it should: there is
+no previous row *in that region*.
+
+## Measuring the gap between events
+
+`LAG` is not limited to numbers. Lag a timestamp and subtract, and you
+have the interval between one event and the one before it:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="How long since this customer's last order"
+  initSql={`CREATE TABLE orders (
+  id          INTEGER PRIMARY KEY,
+  customer_id INTEGER,
+  placed_on   DATE
+);
+INSERT INTO orders (id, customer_id, placed_on) VALUES
+  (1,1,'2025-01-04'), (2,1,'2025-01-19'), (3,1,'2025-02-02'),
+  (4,1,'2025-03-15'), (5,1,'2025-03-28'), (6,1,'2025-05-01'),
+  (7,2,'2025-01-07'), (8,2,'2025-01-09'), (9,2,'2025-02-18'),
+  (10,2,'2025-02-25'), (11,2,'2025-04-03'), (12,2,'2025-04-30'),
+  (13,3,'2025-01-12'), (14,3,'2025-02-11'), (15,3,'2025-02-27'),
+  (16,3,'2025-03-06'), (17,3,'2025-04-14'), (18,3,'2025-05-20'),
+  (19,4,'2025-01-22'), (20,4,'2025-03-01'), (21,4,'2025-03-19'),
+  (22,4,'2025-04-08'), (23,4,'2025-04-21'), (24,4,'2025-06-02');`}
+  starterCode={`SELECT
+  customer_id,
+  placed_on,
+  placed_on - LAG(placed_on) OVER (
+    PARTITION BY customer_id
+    ORDER BY placed_on
+  ) AS days_since_last_order
+FROM
+  orders
+ORDER BY
+  customer_id,
+  placed_on;`}
+/>
+
+Subtracting one `DATE` from another gives a whole number of days, so
+the answer needs no formatting at all.
+
+<Callout type="tip" title="LAG ignores the frame">
+`LAG` and `LEAD` are addressed by offset from the current row, so a
+`ROWS BETWEEN` clause has no effect on them. That makes them the
+simplest window functions to reason about: only the partition and the
+order matter.
+</Callout>
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Month-over-month change"
+  instructions={`The \`monthly_sales\` table has \`month_no\` and \`total\`. Return \`month_no\`, \`total\`, and \`change\`: this month's total minus the previous month's, ordered by \`month_no\`. The first month has no previous month, so its \`change\` must be \`NULL\`.
+
+\`\`\`sql
+total - LAG(total) OVER (ORDER BY ...)
+\`\`\``}
+  initSql={`CREATE TABLE monthly_sales (
+  month_no INTEGER PRIMARY KEY,
+  total    NUMERIC(10, 2) NOT NULL
+);
+INSERT INTO monthly_sales (month_no, total) VALUES
+  (1,1200.00), (2,1450.00), (3,980.00), (4,1710.00),
+  (5,1330.00), (6,1590.00), (7,2040.00), (8,1120.00),
+  (9,1680.00), (10,1875.00), (11,1240.00), (12,2310.00),
+  (13,1390.00), (14,1520.00), (15,1105.00), (16,1960.00),
+  (17,1430.00), (18,1780.00), (19,2150.00), (20,1290.00),
+  (21,1640.00), (22,1815.00), (23,1370.00), (24,2480.00);`}
+  starterCode={`-- How much did each month move against the one before it?
+SELECT
+  month_no,
+  total
+FROM
+  monthly_sales
+ORDER BY
+  month_no;`}
+  solutionSql={`SELECT
+  month_no,
+  total,
+  total - LAG(total) OVER (ORDER BY month_no) AS change
+FROM
+  monthly_sales
+ORDER BY
+  month_no;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Returns month_no, total, change",
+      description: "Three columns, in that order.",
+      expectedColumns: ["month_no", "total", "change"],
+    },
+    {
+      id: "row_count",
+      name: "Keeps every month",
+      description: "All 24 rows are returned, including the first.",
+      expectedRowCount: 24,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Month 1 is NULL; every other month is the difference from the one before.",
+      matchesSolution: true,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What does \`LAG(revenue) OVER (ORDER BY day)\` return on the very first row of the window?
+
+- The value from the last row, wrapping around.
+  > Windows do not wrap; there is nothing before the first row.
+- Zero, since there is nothing to read.
+  > Zero appears only if you ask for it with a third argument.
+- [o] \`NULL\`, because no earlier row exists.
+  > With no previous row and no default supplied, the function has nothing to return.
+- The current row's own value, as a safe fallback.
+  > Returning the current value would silently report a change of zero, which the standard avoids.
+
+Supply a third argument, as in \`LAG(revenue, 1, 0)\`, when a value is needed instead.`}
+/>
+
+<MultipleChoice
+  markdown={`Which expression gives each region's change from its own previous day?
+
+- \`amount - LAG(amount) OVER (ORDER BY day)\`
+  > Without a partition, the previous row may belong to a different region.
+- [o] \`amount - LAG(amount) OVER (PARTITION BY region ORDER BY day)\`
+  > Partitioning keeps each region's series separate, so the lag never crosses a boundary.
+- \`amount - LAG(amount) OVER (PARTITION BY day ORDER BY region)\`
+  > This compares regions to each other within a single day, which is a different question.
+- \`amount - MIN(amount) OVER (PARTITION BY region)\`
+  > Subtracting the regional minimum measures distance from the worst day, not day-to-day change.
+
+The partition decides which rows count as neighbours.`}
+/>
+
+<MultipleChoice
+  markdown={`What does the second argument in \`LAG(revenue, 7)\` do?
+
+- It limits the window to the seven most recent rows.
+  > Restricting how many rows are visible is a frame clause, and frames do not affect \`LAG\`.
+- [o] It reads the row seven positions earlier instead of one.
+  > The offset says how far back in the ordered window to reach.
+- It returns 7 whenever the previous row is missing.
+  > The fallback value is the third argument, not the second.
+- It rounds the returned value to seven decimal places.
+  > \`LAG\` returns the stored value unchanged; rounding is a separate function.
+
+\`LAG(col, n)\` is an offset; \`LAG(col, n, d)\` adds a default.`}
+/>
+
+Next: the pattern that combines ranking with a CTE, picking the top N
+rows of every group.

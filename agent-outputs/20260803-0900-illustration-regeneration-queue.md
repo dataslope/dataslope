@@ -1,5 +1,10 @@
 # Illustration regeneration queue
 
+> **Superseded, 2026-09-01:** generation now asks `gpt-image-2` for
+> `background: "transparent"` and writes the cut-out itself, so the
+> background-removal command below is gone along with
+> `scripts/remove-background-kie.mjs`. Everything else here still applies.
+
 **Status:** live. Written 2026-08-03.
 
 The `/illustration-prompts` gallery is where generated art gets judged. This
@@ -247,7 +252,6 @@ original when no cut-out exists, which leaves the page serving the *old* image
 and the review looking like the regeneration did nothing.
 
 ```bash
-node scripts/remove-background-kie.mjs --from r2 --run "$RUN" --concurrency 8
 ```
 
 **5. Promote the keepers.**

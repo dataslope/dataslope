@@ -1,0 +1,360 @@
+---
+title: Ranking Rows
+description: ROW_NUMBER, RANK and DENSE_RANK for positions, NTILE for buckets, and PERCENT_RANK for relative standing.
+---
+
+Once rows sit inside a window, the natural question is *"where does
+this one come in the order?"* SQL has a small family of functions that
+answer it, and they exist **only** inside an `OVER` clause: there is no
+such thing as `ROW_NUMBER()` without a window.
+
+<Figure
+  slug="sql-ranking-rows-cutout"
+  alt="Ranking rows, an isometric illustration"
+/>
+
+## Ranking needs an ORDER BY inside OVER
+
+A rank is a position, and a position needs an order. That order goes
+**inside** the `OVER` clause, and it is a different thing from the
+query's own `ORDER BY`:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "ROW_NUMBER()", label: "no arguments" },
+    { text: "OVER" },
+    { text: "(PARTITION BY region", label: "rank within each region" },
+    { text: "ORDER BY amount DESC)", label: "the order the rank counts along" },
+  ]}
+/>
+
+The `ORDER BY` inside `OVER` decides *what the rank means*. The
+`ORDER BY` at the end of the query decides only how the finished rows
+are printed.
+
+## ROW_NUMBER: a unique position for every row
+
+`ROW_NUMBER()` hands out 1, 2, 3 with no gaps and no repeats, even
+when two rows tie. Which of two tied rows gets the lower number is
+arbitrary unless you break the tie yourself.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Numbering sales from largest to smallest, per region"
+  initSql={`CREATE TABLE sales (
+  id     INTEGER PRIMARY KEY,
+  region TEXT,
+  rep    TEXT,
+  amount NUMERIC
+);
+INSERT INTO sales (id, region, rep, amount) VALUES
+  (1,'North','Ada',120), (2,'North','Ben',95), (3,'North','Cleo',140),
+  (4,'North','Dan',60), (5,'North','Elle',210), (6,'North','Finn',85),
+  (7,'South','Gia',175), (8,'South','Hugo',130), (9,'South','Iris',90),
+  (10,'South','Jae',45), (11,'South','Kai',160), (12,'South','Lena',115),
+  (13,'East','Mira',200), (14,'East','Nils',70), (15,'East','Omar',155),
+  (16,'East','Pia',105), (17,'East','Quinn',135), (18,'East','Rui',80),
+  (19,'West','Sana',190), (20,'West','Tom',125), (21,'West','Uma',100),
+  (22,'West','Vic',55), (23,'West','Wren',145), (24,'West','Zoe',165);`}
+  starterCode={`SELECT
+  region,
+  rep,
+  amount,
+  ROW_NUMBER() OVER (PARTITION BY region ORDER BY amount DESC) AS rn
+FROM
+  sales
+ORDER BY
+  region,
+  rn;`}
+/>
+
+Every region restarts at 1. That restart is the `PARTITION BY` doing
+its work, and it is the foundation of the
+[top N per group](/courses/intro-sql-postgres/top-n-per-group)
+pattern.
+
+## RANK and DENSE_RANK: what to do about ties
+
+The three ranking functions differ only in how they treat equal
+values. Set them side by side on a table with deliberate ties:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="ROW_NUMBER, RANK and DENSE_RANK on tied scores"
+  initSql={`CREATE TABLE scores (
+  id     INTEGER PRIMARY KEY,
+  player TEXT,
+  points INTEGER
+);
+INSERT INTO scores (id, player, points) VALUES
+  (1,'Ada',95), (2,'Ben',95), (3,'Cleo',88), (4,'Dan',88),
+  (5,'Elle',88), (6,'Finn',80), (7,'Gia',76), (8,'Hugo',76),
+  (9,'Iris',71), (10,'Jae',68), (11,'Kai',68), (12,'Lena',64),
+  (13,'Mira',61), (14,'Nils',58), (15,'Omar',58), (16,'Pia',55),
+  (17,'Quinn',52), (18,'Rui',49), (19,'Sana',46), (20,'Tom',46),
+  (21,'Uma',43), (22,'Vic',40), (23,'Wren',37), (24,'Zoe',34);`}
+  starterCode={`SELECT
+  player,
+  points,
+  ROW_NUMBER() OVER (ORDER BY points DESC) AS row_number,
+  RANK()       OVER (ORDER BY points DESC) AS rank,
+  DENSE_RANK() OVER (ORDER BY points DESC) AS dense_rank
+FROM
+  scores
+ORDER BY
+  points DESC,
+  player;`}
+/>
+
+Read the first five rows carefully. Ada and Ben both scored 95:
+
+| Function | Ada | Ben | Cleo | What it does with a tie |
+| --- | --- | --- | --- | --- |
+| `ROW_NUMBER()` | 1 | 2 | 3 | Breaks it arbitrarily; never repeats |
+| `RANK()` | 1 | 1 | 3 | Shares the position, then skips |
+| `DENSE_RANK()` | 1 | 1 | 2 | Shares the position, no gap |
+
+<Callout type="tip" title="Which one do you want?">
+`RANK()` is the sports convention: two golds, no silver.
+`DENSE_RANK()` counts *distinct* values, so it answers "how many
+different scores are above this one?". `ROW_NUMBER()` is what you
+want when you need exactly one row per group and do not care which of
+two identical rows wins.
+</Callout>
+
+<Figure
+  slug="sql-ranking-rows-ties-inline-cutout"
+  alt="Three low podiums side by side, the first with one block on every step, the second with two blocks sharing the top step and the next step left empty, the third with two sharing the top step and the next step filled"
+  caption="The three ranking functions differ only in what happens on a shared step."
+/>
+
+## Making ties deterministic
+
+`ROW_NUMBER()` will pick a winner between two identical rows, but not
+the *same* winner every time: the database is free to return tied rows
+in any order. If the result matters, add a tiebreaker to the window's
+`ORDER BY`:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="A stable numbering, ties broken by name"
+  initSql={`CREATE TABLE scores (
+  id     INTEGER PRIMARY KEY,
+  player TEXT,
+  points INTEGER
+);
+INSERT INTO scores (id, player, points) VALUES
+  (1,'Ada',95), (2,'Ben',95), (3,'Cleo',88), (4,'Dan',88),
+  (5,'Elle',88), (6,'Finn',80), (7,'Gia',76), (8,'Hugo',76),
+  (9,'Iris',71), (10,'Jae',68), (11,'Kai',68), (12,'Lena',64),
+  (13,'Mira',61), (14,'Nils',58), (15,'Omar',58), (16,'Pia',55),
+  (17,'Quinn',52), (18,'Rui',49), (19,'Sana',46), (20,'Tom',46),
+  (21,'Uma',43), (22,'Vic',40), (23,'Wren',37), (24,'Zoe',34);`}
+  starterCode={`SELECT
+  player,
+  points,
+  ROW_NUMBER() OVER (ORDER BY points DESC, player ASC) AS rn
+FROM
+  scores
+ORDER BY
+  rn;`}
+/>
+
+Now the numbering is reproducible: the same data always produces the
+same result.
+
+## NTILE: split the rows into buckets
+
+`NTILE(n)` divides an ordered window into `n` roughly equal groups and
+labels each row with its bucket number. Quartiles are `NTILE(4)`,
+deciles `NTILE(10)`:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Sorting players into quartiles"
+  initSql={`CREATE TABLE scores (
+  id     INTEGER PRIMARY KEY,
+  player TEXT,
+  points INTEGER
+);
+INSERT INTO scores (id, player, points) VALUES
+  (1,'Ada',95), (2,'Ben',93), (3,'Cleo',88), (4,'Dan',86),
+  (5,'Elle',84), (6,'Finn',80), (7,'Gia',76), (8,'Hugo',74),
+  (9,'Iris',71), (10,'Jae',69), (11,'Kai',67), (12,'Lena',64),
+  (13,'Mira',61), (14,'Nils',59), (15,'Omar',57), (16,'Pia',55),
+  (17,'Quinn',52), (18,'Rui',49), (19,'Sana',47), (20,'Tom',45),
+  (21,'Uma',43), (22,'Vic',40), (23,'Wren',37), (24,'Zoe',34);`}
+  starterCode={`SELECT
+  player,
+  points,
+  NTILE(4) OVER (ORDER BY points DESC) AS quartile
+FROM
+  scores
+ORDER BY
+  points DESC;`}
+/>
+
+Twenty-four rows split cleanly into four buckets of six. When the
+count does not divide evenly, the earlier buckets take the extra rows.
+
+## PERCENT_RANK and CUME_DIST: relative standing
+
+Two more functions describe position as a fraction rather than a
+count, which makes them comparable across windows of different sizes:
+
+- `PERCENT_RANK()` runs from 0 for the first row to 1 for the last.
+- `CUME_DIST()` is the fraction of rows at or before this one, so it
+  never returns 0.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Position as a fraction"
+  initSql={`CREATE TABLE scores (
+  id     INTEGER PRIMARY KEY,
+  player TEXT,
+  points INTEGER
+);
+INSERT INTO scores (id, player, points) VALUES
+  (1,'Ada',95), (2,'Ben',93), (3,'Cleo',88), (4,'Dan',86),
+  (5,'Elle',84), (6,'Finn',80), (7,'Gia',76), (8,'Hugo',74),
+  (9,'Iris',71), (10,'Jae',69), (11,'Kai',67), (12,'Lena',64),
+  (13,'Mira',61), (14,'Nils',59), (15,'Omar',57), (16,'Pia',55),
+  (17,'Quinn',52), (18,'Rui',49), (19,'Sana',47), (20,'Tom',45),
+  (21,'Uma',43), (22,'Vic',40), (23,'Wren',37), (24,'Zoe',34);`}
+  starterCode={`SELECT
+  player,
+  points,
+  ROUND((PERCENT_RANK() OVER (ORDER BY points))::numeric, 3) AS pct_rank,
+  ROUND((CUME_DIST()    OVER (ORDER BY points))::numeric, 3) AS cume_dist
+FROM
+  scores
+ORDER BY
+  points;`}
+/>
+
+Notice the ordering is ascending here, so a high `pct_rank` means a
+high score. Both functions read the window's `ORDER BY` and nothing
+else, so flipping it flips their meaning. They return a floating-point
+number rather than an exact one, which is why each is cast with
+`::numeric` before `ROUND` sees it.
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Rank employees inside their department"
+  instructions={`The \`staff\` table has \`name\`, \`department\` and \`salary\`. Return \`name\`, \`department\`, \`salary\`, and a \`dept_rank\` column giving each person's position within their own department, highest salary first, using a function that gives tied salaries the same rank and then skips. Sort by \`department\`, then \`dept_rank\`.
+
+\`\`\`sql
+RANK() OVER (PARTITION BY ... ORDER BY ... DESC)
+\`\`\``}
+  initSql={`CREATE TABLE staff (
+  id         SERIAL PRIMARY KEY,
+  name       TEXT NOT NULL,
+  department TEXT NOT NULL,
+  salary     NUMERIC(9, 2) NOT NULL
+);
+INSERT INTO staff (name, department, salary) VALUES
+  ('Ada','Engineering',95000), ('Ben','Engineering',88000),
+  ('Cleo','Engineering',102000), ('Dan','Engineering',76000),
+  ('Elle','Engineering',118000), ('Finn','Engineering',88000),
+  ('Gia','Sales',67000), ('Hugo','Sales',72000),
+  ('Iris','Sales',59000), ('Jae','Sales',84000),
+  ('Kai','Sales',63000), ('Lena','Sales',91000),
+  ('Mira','Support',52000), ('Nils','Support',48000),
+  ('Omar','Support',56000), ('Pia','Support',61000),
+  ('Quinn','Support',45000), ('Rui','Support',58000),
+  ('Sana','Design',78000), ('Tom','Design',82000),
+  ('Uma','Design',69000), ('Vic','Design',74000),
+  ('Wren','Design',87000), ('Zoe','Design',71000);`}
+  starterCode={`-- One rank per person, restarting in each department.
+SELECT
+  name,
+  department,
+  salary
+FROM
+  staff
+ORDER BY
+  department,
+  salary DESC;`}
+  solutionSql={`SELECT
+  name,
+  department,
+  salary,
+  RANK() OVER (PARTITION BY department ORDER BY salary DESC) AS dept_rank
+FROM
+  staff
+ORDER BY
+  department,
+  dept_rank;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Returns name, department, salary, dept_rank",
+      description: "Four columns, in that order.",
+      expectedColumns: ["name", "department", "salary", "dept_rank"],
+    },
+    {
+      id: "row_count",
+      name: "Keeps every employee",
+      description: "Ranking does not remove rows.",
+      expectedRowCount: 24,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "RANK() restarts per department and shares a position on the tied salary.",
+      matchesSolution: true,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Three rows are tied for first place. Which values does \`DENSE_RANK()\` give to those three rows and the row after them?
+
+- 1, 1, 1, 4
+  > Sharing the position and then skipping to 4 is what \`RANK()\` does.
+- 1, 2, 3, 4
+  > Numbering tied rows separately is \`ROW_NUMBER()\` behaviour.
+- [o] 1, 1, 1, 2
+  > Tied rows share the position and the next distinct value takes the very next number.
+- 1, 1, 1, 3
+  > No ranking function skips exactly one position after a three-way tie.
+
+\`DENSE_RANK()\` counts distinct values, so it never leaves a gap.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does \`ROW_NUMBER() OVER (ORDER BY points DESC)\` sometimes give tied rows different numbers on different runs?
+
+- Because \`ROW_NUMBER()\` includes a random component by design.
+  > Nothing in the function is random; the variation comes from the input order.
+- Because the numbering depends on the query's final \`ORDER BY\` clause.
+  > The window's own ordering decides the numbers, independently of how the result is printed.
+- [o] Because rows with equal \`points\` have no defined order between them.
+  > With nothing to separate the tied rows, the database may hand them to the function in any order.
+- Because \`NUMERIC\` comparisons are approximate for equal values.
+  > Equality on exact numeric types is exact; the ambiguity is about row order, not comparison.
+
+Add a tiebreaker column to the window's \`ORDER BY\` to make it deterministic.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`NTILE(4) OVER (ORDER BY salary)\` return?
+
+- The salary at each of the four quartile boundaries.
+  > It labels rows rather than reporting the boundary values themselves.
+- One row per quartile, with four rows in total.
+  > Window functions keep every input row; nothing is collapsed.
+- The number of rows that share the current row's quartile.
+  > That would be a count; \`NTILE\` reports which bucket a row is in.
+- [o] A bucket number from 1 to 4 for every row.
+  > The ordered window is split into four near-equal groups and each row is labelled with its group.
+
+\`NTILE(n)\` labels; it does not summarize.`}
+/>
+
+Next: the other thing an `ORDER BY` inside `OVER` unlocks, running
+totals.

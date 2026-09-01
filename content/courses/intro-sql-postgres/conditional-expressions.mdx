@@ -1,0 +1,412 @@
+---
+title: Conditional Expressions
+description: CASE for if-then-else inside a query, COALESCE and NULLIF for handling missing values, and GREATEST and LEAST for picking across columns.
+---
+
+Every language you have ever used has an `if`. SQL's version is
+`CASE`, and because SQL has no loops and no variables, `CASE` carries
+more weight than an `if` usually does: it is how a query classifies,
+buckets, relabels, and branches.
+
+<Figure
+  slug="sql-conditional-expressions-cutout"
+  alt="Conditional expressions, an isometric illustration"
+/>
+
+## CASE: if-then-else as a value
+
+A `CASE` expression tests conditions in order, returns the result of
+the first one that is true, and falls back to `ELSE` if none match. It
+produces a **value**, so it can go anywhere a column can.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "CASE", label: "start the expression" },
+    { text: "WHEN age < 13 THEN 'child'", label: "a test and its result" },
+    { text: "WHEN age < 20 THEN 'teen'", label: "checked only if the first failed" },
+    { text: "ELSE 'adult'", label: "the fallback (NULL if omitted)" },
+    { text: "END", label: "close it" },
+  ]}
+/>
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Bucketing a number into labels"
+  initSql={`CREATE TABLE people (
+  id   INTEGER PRIMARY KEY,
+  name TEXT,
+  age  INTEGER
+);
+INSERT INTO people (id, name, age) VALUES
+  (1,'Ada',7), (2,'Ben',12), (3,'Cleo',15), (4,'Dan',19),
+  (5,'Elle',22), (6,'Finn',31), (7,'Gia',44), (8,'Hugo',58),
+  (9,'Iris',66), (10,'Jae',71), (11,'Kai',9), (12,'Lena',17),
+  (13,'Mira',25), (14,'Nils',38), (15,'Omar',47), (16,'Pia',53),
+  (17,'Quinn',62), (18,'Rui',78), (19,'Sana',4), (20,'Tom',14),
+  (21,'Uma',29), (22,'Vic',41), (23,'Wren',55), (24,'Zoe',68);`}
+  starterCode={`SELECT
+  name,
+  age,
+  CASE
+    WHEN age < 13 THEN 'child'
+    WHEN age < 20 THEN 'teen'
+    WHEN age < 65 THEN 'adult'
+    ELSE 'senior'
+  END AS life_stage
+FROM
+  people
+ORDER BY
+  age;`}
+/>
+
+Order matters. The conditions are tested top to bottom and the first
+match wins, so each `WHEN` only has to rule out what the ones above it
+did not catch. Writing `WHEN age < 65` before `WHEN age < 20` would
+label every teenager an adult.
+
+<Figure
+  slug="sql-conditional-expressions-case-gates-inline-cutout"
+  alt="A sloped chute with three side gates one after another, each gate catching the pieces that fit it while the rest carry on to the end"
+  caption="Each `WHEN` is a gate: the first one a row fits takes it, and the gates below never see it."
+/>
+
+<Callout type="warn" title="Without ELSE, unmatched rows get NULL">
+`ELSE` is optional. Leave it out and any row matching no condition
+returns `NULL`, which is easy to miss because nothing complains. If a
+`CASE` should never fall through, write an `ELSE` anyway, even if it
+is only `ELSE 'unknown'`.
+</Callout>
+
+## The short form, for equality tests
+
+When every branch compares the same column against a value, `CASE`
+has a compact form with the column written once:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Two spellings of the same expression"
+  initSql={`CREATE TABLE orders (
+  id     INTEGER PRIMARY KEY,
+  status TEXT
+);
+INSERT INTO orders (id, status) VALUES
+  (1,'new'), (2,'paid'), (3,'shipped'), (4,'cancelled'),
+  (5,'new'), (6,'paid'), (7,'shipped'), (8,'refunded'),
+  (9,'new'), (10,'paid'), (11,'shipped'), (12,'cancelled'),
+  (13,'paid'), (14,'shipped'), (15,'new'), (16,'refunded'),
+  (17,'paid'), (18,'shipped'), (19,'new'), (20,'cancelled'),
+  (21,'paid'), (22,'shipped'), (23,'new'), (24,'paid');`}
+  starterCode={`SELECT
+  status,
+  COUNT(*) AS n,
+  CASE status
+    WHEN 'new'       THEN 'awaiting payment'
+    WHEN 'paid'      THEN 'ready to pack'
+    WHEN 'shipped'   THEN 'on its way'
+    ELSE 'closed'
+  END AS description
+FROM
+  orders
+GROUP BY
+  status
+ORDER BY
+  status;`}
+/>
+
+The short form only tests equality. Anything else, a range, a
+comparison, a `LIKE`, needs the long form.
+
+## CASE inside an aggregate
+
+This combination deserves its own name, because it is how SQL pivots
+rows into columns. Wrapping a `CASE` in `SUM` counts the rows matching
+a condition, and doing it several times produces a small
+cross-tabulation:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Counting statuses side by side"
+  initSql={`CREATE TABLE orders (
+  id     INTEGER PRIMARY KEY,
+  region TEXT,
+  status TEXT
+);
+INSERT INTO orders (id, region, status) VALUES
+  (1,'North','new'), (2,'North','paid'), (3,'North','shipped'),
+  (4,'North','cancelled'), (5,'North','paid'), (6,'North','shipped'),
+  (7,'South','new'), (8,'South','paid'), (9,'South','shipped'),
+  (10,'South','new'), (11,'South','paid'), (12,'South','cancelled'),
+  (13,'East','paid'), (14,'East','shipped'), (15,'East','new'),
+  (16,'East','shipped'), (17,'East','paid'), (18,'East','shipped'),
+  (19,'West','new'), (20,'West','cancelled'), (21,'West','paid'),
+  (22,'West','shipped'), (23,'West','new'), (24,'West','paid');`}
+  starterCode={`SELECT
+  region,
+  COUNT(*) AS total,
+  SUM(CASE WHEN status = 'new'       THEN 1 ELSE 0 END) AS new_orders,
+  SUM(CASE WHEN status = 'paid'      THEN 1 ELSE 0 END) AS paid,
+  SUM(CASE WHEN status = 'shipped'   THEN 1 ELSE 0 END) AS shipped,
+  SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) AS cancelled
+FROM
+  orders
+GROUP BY
+  region
+ORDER BY
+  region;`}
+/>
+
+Four status columns from one pass over the table. The
+[advanced aggregation](/courses/intro-sql-postgres/advanced-aggregation)
+lesson shows a tidier spelling of the same idea using `FILTER`.
+
+## COALESCE: the first value that is not NULL
+
+`COALESCE` takes any number of arguments and returns the first one
+that is not `NULL`. It is the standard way to supply a fallback:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Falling back through three columns"
+  initSql={`CREATE TABLE contacts (
+  id       INTEGER PRIMARY KEY,
+  name     TEXT,
+  nickname TEXT,
+  email    TEXT,
+  phone    TEXT
+);
+INSERT INTO contacts (id, name, nickname, email, phone) VALUES
+  (1,'Ada Lovelace','Ada','ada@example.com',NULL),
+  (2,'Ben Ash',NULL,NULL,'555-0102'),
+  (3,'Cleo Vance','Cleo',NULL,NULL),
+  (4,'Dan Roe',NULL,'dan@example.com','555-0104'),
+  (5,'Elle Kim','El',NULL,'555-0105'),
+  (6,'Finn Doyle',NULL,NULL,NULL),
+  (7,'Gia Mora','Gigi','gia@example.com',NULL),
+  (8,'Hugo Pratt',NULL,'hugo@example.com',NULL),
+  (9,'Iris Chen','Iri',NULL,'555-0109'),
+  (10,'Jae Park',NULL,NULL,'555-0110'),
+  (11,'Kai Ito','K','kai@example.com','555-0111'),
+  (12,'Lena Ford',NULL,NULL,NULL),
+  (13,'Mira Sol','Mim',NULL,NULL),
+  (14,'Nils Berg',NULL,'nils@example.com',NULL),
+  (15,'Omar Haddad','Omi',NULL,'555-0115'),
+  (16,'Pia Rossi',NULL,NULL,'555-0116'),
+  (17,'Quinn Bell','Q','quinn@example.com',NULL),
+  (18,'Rui Tanaka',NULL,NULL,NULL),
+  (19,'Sana Malik','San',NULL,'555-0119'),
+  (20,'Tom Beck',NULL,'tom@example.com','555-0120'),
+  (21,'Uma Devi','U',NULL,NULL),
+  (22,'Vic Nolan',NULL,NULL,'555-0122'),
+  (23,'Wren Sato','Wr','wren@example.com',NULL),
+  (24,'Zoe Adler',NULL,NULL,NULL);`}
+  starterCode={`SELECT
+  name,
+  COALESCE(nickname, name)                       AS display_name,
+  COALESCE(email, phone, 'no contact on file')   AS best_contact
+FROM
+  contacts
+ORDER BY
+  name;`}
+/>
+
+`COALESCE` stops at the first non-`NULL` argument, so ordering the
+arguments is how you express a preference: try the email, then the
+phone, then give up.
+
+## NULLIF: turn a value into NULL
+
+`NULLIF(a, b)` returns `NULL` when the two arguments are equal, and
+`a` otherwise. That sounds obscure until you meet division by zero:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Guarding a division"
+  initSql={`CREATE TABLE campaigns (
+  id          INTEGER PRIMARY KEY,
+  name        TEXT,
+  impressions INTEGER,
+  clicks      INTEGER
+);
+INSERT INTO campaigns (id, name, impressions, clicks) VALUES
+  (1,'Spring',1200,48), (2,'Summer',0,0), (3,'Autumn',900,63),
+  (4,'Winter',1500,30), (5,'Launch',0,0), (6,'Retarget',2400,192),
+  (7,'Brand',800,16), (8,'Promo',0,0), (9,'Email',1100,77),
+  (10,'Social',3200,128), (11,'Search',1750,105), (12,'Video',0,0),
+  (13,'Display',2100,42), (14,'Affiliate',640,32), (15,'Podcast',480,12),
+  (16,'Newsletter',1320,66), (17,'Referral',0,0), (18,'Event',350,28),
+  (19,'Webinar',760,38), (20,'Blog',1900,57), (21,'Partner',1050,84),
+  (22,'Sponsor',0,0), (23,'Outdoor',2750,55), (24,'Radio',1450,29);`}
+  starterCode={`SELECT
+  name,
+  impressions,
+  clicks,
+  ROUND(100.0 * clicks / NULLIF(impressions, 0), 2) AS click_rate_pct
+FROM
+  campaigns
+ORDER BY
+  click_rate_pct DESC NULLS LAST;`}
+/>
+
+Without `NULLIF`, the five campaigns with zero impressions would abort
+the whole query with a division-by-zero error. With it, they divide by
+`NULL`, which yields `NULL`: a missing rate rather than a crash. That
+is exactly the right answer, since a campaign nobody saw has no click
+rate.
+
+<Callout type="tip" title="The pairing to remember">
+`NULLIF` creates a `NULL` where a value would be wrong; `COALESCE`
+removes a `NULL` where a value is needed. Used together they turn
+awkward data into safe arithmetic:
+`COALESCE(a / NULLIF(b, 0), 0)`.
+</Callout>
+
+## GREATEST and LEAST: across columns, not rows
+
+`MAX` compares one column down many rows. `GREATEST` compares many
+columns across one row, and `LEAST` is its opposite:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="The best of three attempts"
+  initSql={`CREATE TABLE attempts (
+  id      INTEGER PRIMARY KEY,
+  student TEXT,
+  try1    INTEGER,
+  try2    INTEGER,
+  try3    INTEGER
+);
+INSERT INTO attempts (id, student, try1, try2, try3) VALUES
+  (1,'Ada',62,71,68), (2,'Ben',55,49,73), (3,'Cleo',88,84,90),
+  (4,'Dan',41,58,52), (5,'Elle',77,79,74), (6,'Finn',66,60,64),
+  (7,'Gia',93,89,95), (8,'Hugo',50,67,59), (9,'Iris',72,70,81),
+  (10,'Jae',45,53,48), (11,'Kai',84,80,86), (12,'Lena',69,75,71),
+  (13,'Mira',58,62,55), (14,'Nils',91,87,88), (15,'Omar',63,68,66),
+  (16,'Pia',76,73,79), (17,'Quinn',52,57,60), (18,'Rui',85,82,90),
+  (19,'Sana',47,44,51), (20,'Tom',70,74,68), (21,'Uma',81,86,83),
+  (22,'Vic',59,63,61), (23,'Wren',96,92,94), (24,'Zoe',65,69,67);`}
+  starterCode={`SELECT
+  student,
+  try1,
+  try2,
+  try3,
+  GREATEST(try1, try2, try3) AS best,
+  LEAST(try1, try2, try3)    AS worst,
+  GREATEST(try1, try2, try3) - LEAST(try1, try2, try3) AS spread
+FROM
+  attempts
+ORDER BY
+  best DESC;`}
+/>
+
+Both ignore `NULL` arguments in PostgreSQL, returning `NULL` only when
+every argument is `NULL`.
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Label each order by size"
+  instructions={`The \`orders\` table has \`id\` and \`amount\`. Return \`id\`, \`amount\`, and a \`size\` column holding \`'small'\` when \`amount\` is under 50, \`'medium'\` when it is under 150, and \`'large'\` otherwise. Sort by \`id\`.
+
+\`\`\`sql
+CASE WHEN ... THEN ... ELSE ... END AS size
+\`\`\``}
+  initSql={`CREATE TABLE orders (
+  id     SERIAL PRIMARY KEY,
+  amount NUMERIC(8, 2) NOT NULL
+);
+INSERT INTO orders (amount) VALUES
+  (20.00), (75.50), (180.00), (49.99), (150.00), (12.25),
+  (240.00), (18.75), (66.00), (91.40), (5.99), (149.99),
+  (33.10), (48.60), (120.75), (27.30), (84.20), (9.50),
+  (199.99), (61.15), (42.80), (7.25), (310.00), (55.45);`}
+  starterCode={`-- Three buckets, in ascending order of threshold.
+SELECT
+  id,
+  amount
+FROM
+  orders
+ORDER BY
+  id;`}
+  solutionSql={`SELECT
+  id,
+  amount,
+  CASE
+    WHEN amount < 50  THEN 'small'
+    WHEN amount < 150 THEN 'medium'
+    ELSE 'large'
+  END AS size
+FROM
+  orders
+ORDER BY
+  id;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Returns id, amount, size",
+      description: "Three columns, in that order.",
+      expectedColumns: ["id", "amount", "size"],
+    },
+    {
+      id: "row_count",
+      name: "Keeps every order",
+      description: "Labelling adds a column, not rows.",
+      expectedRowCount: 24,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "150.00 is large, 149.99 is medium, 49.99 is small.",
+      matchesSolution: true,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`In a \`CASE\` with several \`WHEN\` branches, what happens when a row satisfies two of them?
+
+- Both results are returned, as two columns.
+  > A \`CASE\` expression produces exactly one value.
+- The query fails with an ambiguity error.
+  > Overlapping conditions are legal and common; the order resolves them.
+- The last matching branch wins.
+  > Evaluation stops at the first match, so later branches never run.
+- [o] The first matching branch wins and the rest are skipped.
+  > Conditions are tested top to bottom and evaluation stops at the first true one.
+
+Order your \`WHEN\` clauses from most specific to most general.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`COALESCE(nickname, name, 'anonymous')\` return for a row where \`nickname\` is \`NULL\` and \`name\` is \`'Ada'\`?
+
+- \`NULL\`, because the first argument is \`NULL\`.
+  > A \`NULL\` argument is skipped rather than returned.
+- [o] \`'Ada'\`, the first argument that is not \`NULL\`.
+  > Arguments are read left to right and the first non-\`NULL\` one is returned.
+- \`'anonymous'\`, because a \`NULL\` sends it to the fallback.
+  > The final fallback is used only when every earlier argument is \`NULL\`.
+- The three values concatenated together.
+  > \`COALESCE\` selects one argument; joining text is what \`||\` does.
+
+\`COALESCE\` returns the first argument that has a value, and only then the fallback.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is \`clicks / NULLIF(impressions, 0)\` safer than \`clicks / impressions\`?
+
+- It rounds the result, avoiding a floating-point error.
+  > \`NULLIF\` performs no rounding and does not change the numeric type.
+- It substitutes 1 for a zero denominator so the division succeeds.
+  > It substitutes \`NULL\`, not 1; substituting 1 would invent a wrong ratio.
+- It filters out the rows where impressions are zero.
+  > Those rows are still returned; only their computed value becomes \`NULL\`.
+- [o] It turns a zero denominator into \`NULL\`, so the division yields \`NULL\` instead of erroring.
+  > Any arithmetic with \`NULL\` gives \`NULL\`, which reports "no rate" rather than aborting the query.
+
+Division by zero raises an error in PostgreSQL; division by \`NULL\` does not.`}
+/>
+
+Next: the functions that work on text.

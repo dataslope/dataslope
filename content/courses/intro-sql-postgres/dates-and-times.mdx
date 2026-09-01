@@ -1,0 +1,391 @@
+---
+title: Dates and Times
+description: Date and timestamp types, intervals and date arithmetic, EXTRACT and DATE_TRUNC, and formatting a date for a human to read.
+---
+
+Time is the axis almost every analytical question is asked along:
+per day, since signup, year over year. PostgreSQL takes dates
+seriously, with real date types, real arithmetic, and functions that
+turn a timestamp into the grouping key a report needs.
+
+<Figure
+  slug="sql-dates-and-times-cutout"
+  alt="Dates and times, an isometric illustration"
+/>
+
+## The types, and what they hold
+
+| Type | Holds | Example |
+| --- | --- | --- |
+| `DATE` | a calendar day, no time | `2025-03-14` |
+| `TIME` | a time of day, no date | `09:30:00` |
+| `TIMESTAMP` | a day and a time | `2025-03-14 09:30:00` |
+| `TIMESTAMPTZ` | a moment, anchored to UTC | `2025-03-14 09:30:00+00` |
+| `INTERVAL` | a length of time | `3 days 04:00:00` |
+
+<Callout type="tip" title="Prefer TIMESTAMPTZ for real events">
+`TIMESTAMP` stores wall-clock digits with no idea which clock they
+came from, so two servers in different time zones disagree about what
+it means. `TIMESTAMPTZ` stores an actual moment and renders it in
+whatever zone the reader asks for. Use `DATE` for calendar facts (a
+birthday, an invoice date) and `TIMESTAMPTZ` for things that happened.
+</Callout>
+
+## Today, now, and literals
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Where a date comes from"
+  initSql={`CREATE TABLE noop (id INTEGER);`}
+  starterCode={`SELECT
+  CURRENT_DATE                      AS today,
+  CURRENT_TIME                      AS time_of_day,
+  NOW()                             AS this_moment,
+  DATE '2025-03-14'                 AS a_date_literal,
+  TIMESTAMP '2025-03-14 09:30:00'   AS a_timestamp_literal,
+  INTERVAL '3 days'                 AS an_interval,
+  '2025-03-14'::DATE                AS cast_from_text;`}
+/>
+
+A quoted string becomes a date wherever the context makes the type
+obvious, which is why `WHERE placed_on > '2025-01-01'` works without
+any casting at all.
+
+## Date arithmetic
+
+Adding an interval to a date gives a date. Subtracting two dates gives
+a number of days, which is often exactly what you want:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Adding, subtracting, and measuring"
+  initSql={`CREATE TABLE subscriptions (
+  id         INTEGER PRIMARY KEY,
+  customer   TEXT,
+  started_on DATE,
+  ended_on   DATE
+);
+INSERT INTO subscriptions (id, customer, started_on, ended_on) VALUES
+  (1,'Ada','2024-01-15','2024-11-30'), (2,'Ben','2024-02-01','2025-02-01'),
+  (3,'Cleo','2024-03-20','2024-09-18'), (4,'Dan','2024-04-05','2025-04-05'),
+  (5,'Elle','2024-05-11','2024-08-22'), (6,'Finn','2024-06-30','2025-01-14'),
+  (7,'Gia','2024-07-04','2024-12-25'), (8,'Hugo','2024-08-19','2025-03-08'),
+  (9,'Iris','2024-09-02','2025-06-02'), (10,'Jae','2024-10-13','2024-12-01'),
+  (11,'Kai','2024-11-27','2025-05-17'), (12,'Lena','2024-12-08','2025-02-28'),
+  (13,'Mira','2025-01-03','2025-07-03'), (14,'Nils','2025-01-22','2025-04-30'),
+  (15,'Omar','2025-02-14','2025-08-14'), (16,'Pia','2025-03-01','2025-06-15'),
+  (17,'Quinn','2025-03-29','2025-09-29'), (18,'Rui','2025-04-17','2025-05-31'),
+  (19,'Sana','2025-05-06','2026-05-06'), (20,'Tom','2025-06-21','2025-10-11'),
+  (21,'Uma','2025-07-09','2025-12-09'), (22,'Vic','2025-08-25','2026-02-25'),
+  (23,'Wren','2025-09-12','2025-11-19'), (24,'Zoe','2025-10-30','2026-04-30');`}
+  starterCode={`SELECT
+  customer,
+  started_on,
+  ended_on,
+  ended_on - started_on              AS days_subscribed,
+  started_on + INTERVAL '30 days'    AS trial_ended,
+  started_on + INTERVAL '1 year'     AS anniversary,
+  AGE(ended_on, started_on)          AS readable_length
+FROM
+  subscriptions
+ORDER BY
+  started_on;`}
+/>
+
+`AGE` is the friendly one: it returns an interval expressed in years,
+months and days rather than a raw day count, which is what a person
+would say out loud.
+
+## EXTRACT pulls one field out
+
+`EXTRACT(field FROM value)` returns a single component as a number.
+It is how you group by month without caring about the year, or find
+everything that happened on a weekend:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Slicing a date into its parts"
+  initSql={`CREATE TABLE events (
+  id         INTEGER PRIMARY KEY,
+  name       TEXT,
+  happened_at TIMESTAMP
+);
+INSERT INTO events (id, name, happened_at) VALUES
+  (1,'signup','2025-01-04 09:12:00'), (2,'signup','2025-01-19 14:40:00'),
+  (3,'purchase','2025-02-02 11:05:00'), (4,'signup','2025-02-15 18:22:00'),
+  (5,'purchase','2025-03-01 08:47:00'), (6,'refund','2025-03-15 16:30:00'),
+  (7,'signup','2025-03-28 21:09:00'), (8,'purchase','2025-04-05 07:55:00'),
+  (9,'purchase','2025-04-19 13:18:00'), (10,'signup','2025-05-01 10:02:00'),
+  (11,'refund','2025-05-17 15:44:00'), (12,'purchase','2025-06-03 12:36:00'),
+  (13,'signup','2025-06-21 19:58:00'), (14,'purchase','2025-07-08 06:25:00'),
+  (15,'refund','2025-07-26 17:13:00'), (16,'signup','2025-08-09 09:41:00'),
+  (17,'purchase','2025-08-23 20:07:00'), (18,'signup','2025-09-06 11:52:00'),
+  (19,'purchase','2025-09-27 14:29:00'), (20,'refund','2025-10-11 08:16:00'),
+  (21,'signup','2025-10-30 22:03:00'), (22,'purchase','2025-11-14 10:38:00'),
+  (23,'signup','2025-11-29 15:21:00'), (24,'purchase','2025-12-13 13:47:00');`}
+  starterCode={`SELECT
+  name,
+  happened_at,
+  EXTRACT(YEAR  FROM happened_at)  AS yr,
+  EXTRACT(MONTH FROM happened_at)  AS mon,
+  EXTRACT(DAY   FROM happened_at)  AS dy,
+  EXTRACT(HOUR  FROM happened_at)  AS hr,
+  EXTRACT(DOW   FROM happened_at)  AS day_of_week,
+  EXTRACT(QUARTER FROM happened_at) AS qtr
+FROM
+  events
+ORDER BY
+  happened_at;`}
+/>
+
+`DOW` counts from 0 for Sunday, so `EXTRACT(DOW FROM d) IN (0, 6)`
+selects weekends. Other useful fields are `WEEK`, `DOY` (day of year)
+and `EPOCH` (seconds since 1970).
+
+## DATE_TRUNC flattens to a boundary
+
+`EXTRACT` gives you a number; `DATE_TRUNC` gives you back a date with
+everything below the chosen unit set to zero. That distinction matters
+enormously for grouping:
+
+<SyntaxBreakdown
+  parts={[
+    { text: "DATE_TRUNC(", label: "round a timestamp down..." },
+    { text: "'month'", label: "...to this unit" },
+    { text: ", happened_at)", label: "the value to flatten" },
+  ]}
+/>
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Events per month, the right way"
+  initSql={`CREATE TABLE events (
+  id          INTEGER PRIMARY KEY,
+  name        TEXT,
+  happened_at TIMESTAMP
+);
+INSERT INTO events (id, name, happened_at) VALUES
+  (1,'signup','2025-01-04 09:12:00'), (2,'signup','2025-01-19 14:40:00'),
+  (3,'purchase','2025-02-02 11:05:00'), (4,'signup','2025-02-15 18:22:00'),
+  (5,'purchase','2025-03-01 08:47:00'), (6,'refund','2025-03-15 16:30:00'),
+  (7,'signup','2025-03-28 21:09:00'), (8,'purchase','2025-04-05 07:55:00'),
+  (9,'purchase','2025-04-19 13:18:00'), (10,'signup','2025-05-01 10:02:00'),
+  (11,'refund','2025-05-17 15:44:00'), (12,'purchase','2025-06-03 12:36:00'),
+  (13,'signup','2025-06-21 19:58:00'), (14,'purchase','2025-07-08 06:25:00'),
+  (15,'refund','2025-07-26 17:13:00'), (16,'signup','2025-08-09 09:41:00'),
+  (17,'purchase','2025-08-23 20:07:00'), (18,'signup','2025-09-06 11:52:00'),
+  (19,'purchase','2025-09-27 14:29:00'), (20,'refund','2025-10-11 08:16:00'),
+  (21,'signup','2025-10-30 22:03:00'), (22,'purchase','2025-11-14 10:38:00'),
+  (23,'signup','2025-11-29 15:21:00'), (24,'purchase','2025-12-13 13:47:00');`}
+  starterCode={`SELECT
+  DATE_TRUNC('month', happened_at) AS month,
+  COUNT(*)                          AS events,
+  COUNT(*) FILTER (WHERE name = 'purchase') AS purchases
+FROM
+  events
+GROUP BY
+  DATE_TRUNC('month', happened_at)
+ORDER BY
+  month;`}
+/>
+
+Grouping by `DATE_TRUNC('month', ...)` keeps the year attached, so
+January 2024 and January 2025 stay separate. Grouping by
+`EXTRACT(MONTH ...)` would fold them together, which is occasionally
+what you want and usually a bug.
+
+<Figure
+  slug="sql-dates-and-times-date-trunc-flattens-inline-cutout"
+  alt="A run of blocks standing at many different heights with a wide flat board pressed down across them, bringing each group to one common level"
+  caption="`DATE_TRUNC` flattens every moment in a period onto the same boundary."
+/>
+
+## Formatting for humans
+
+`TO_CHAR` renders a date as text in whatever layout you name. It is
+for display only: sort by the real date column, not by the formatted
+string, or October will come before September.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="One date, several spellings"
+  initSql={`CREATE TABLE invoices (
+  id       INTEGER PRIMARY KEY,
+  issued_on DATE,
+  amount   NUMERIC
+);
+INSERT INTO invoices (id, issued_on, amount) VALUES
+  (1,'2025-01-04',420), (2,'2025-01-19',380), (3,'2025-02-02',510),
+  (4,'2025-02-15',290), (5,'2025-03-01',640), (6,'2025-03-15',455),
+  (7,'2025-03-28',300), (8,'2025-04-05',720), (9,'2025-04-19',610),
+  (10,'2025-05-01',480), (11,'2025-05-17',350), (12,'2025-06-03',560),
+  (13,'2025-06-21',495), (14,'2025-07-08',830), (15,'2025-07-26',275),
+  (16,'2025-08-09',610), (17,'2025-08-23',540), (18,'2025-09-06',390),
+  (19,'2025-09-27',700), (20,'2025-10-11',465), (21,'2025-10-30',520),
+  (22,'2025-11-14',380), (23,'2025-11-29',650), (24,'2025-12-13',590);`}
+  starterCode={`SELECT
+  issued_on,
+  TO_CHAR(issued_on, 'DD Mon YYYY')  AS uk_style,
+  TO_CHAR(issued_on, 'Month YYYY')   AS long_month,
+  TO_CHAR(issued_on, 'YYYY-"Q"Q')    AS quarter_label,
+  TO_CHAR(issued_on, 'Day')          AS weekday_name,
+  TO_CHAR(amount, 'FM999,999.00')    AS money
+FROM
+  invoices
+ORDER BY
+  issued_on;`}
+/>
+
+`TO_CHAR` also formats numbers, which is how the last column gets its
+thousands separator and two fixed decimals.
+
+## Filtering a date range correctly
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="A whole month, without off-by-one errors"
+  initSql={`CREATE TABLE invoices (
+  id        INTEGER PRIMARY KEY,
+  issued_on DATE,
+  amount    NUMERIC
+);
+INSERT INTO invoices (id, issued_on, amount) VALUES
+  (1,'2025-02-26',420), (2,'2025-02-28',380), (3,'2025-03-01',510),
+  (4,'2025-03-05',290), (5,'2025-03-09',640), (6,'2025-03-12',455),
+  (7,'2025-03-15',300), (8,'2025-03-18',720), (9,'2025-03-21',610),
+  (10,'2025-03-24',480), (11,'2025-03-27',350), (12,'2025-03-31',560),
+  (13,'2025-04-01',495), (14,'2025-04-04',830), (15,'2025-04-08',275),
+  (16,'2025-04-12',610), (17,'2025-04-16',540), (18,'2025-04-20',390),
+  (19,'2025-04-24',700), (20,'2025-04-28',465), (21,'2025-05-02',520),
+  (22,'2025-05-06',380), (23,'2025-05-10',650), (24,'2025-05-14',590);`}
+  starterCode={`SELECT
+  issued_on,
+  amount
+FROM
+  invoices
+WHERE
+  issued_on >= DATE '2025-03-01'
+  AND issued_on < DATE '2025-04-01'
+ORDER BY
+  issued_on;`}
+/>
+
+<Callout type="warn" title="Half-open ranges beat BETWEEN on timestamps">
+`BETWEEN '2025-03-01' AND '2025-03-31'` looks right and quietly drops
+everything that happened on 31 March after midnight, because a
+`TIMESTAMP` of `2025-03-31 14:00` is greater than `2025-03-31
+00:00`. The `>= start AND < next_start` form has no such edge and
+needs no thought about month lengths.
+</Callout>
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Revenue by month"
+  instructions={`The \`invoices\` table has \`issued_on\` (a \`DATE\`) and \`amount\`. Return one row per calendar month with columns \`month\` (the first day of that month) and \`total\` (the sum of \`amount\`). Sort by \`month\`.
+
+\`\`\`sql
+DATE_TRUNC('month', issued_on) AS month
+\`\`\``}
+  initSql={`CREATE TABLE invoices (
+  id        SERIAL PRIMARY KEY,
+  issued_on DATE NOT NULL,
+  amount    NUMERIC(9, 2) NOT NULL
+);
+INSERT INTO invoices (issued_on, amount) VALUES
+  ('2025-01-04',420), ('2025-01-19',380), ('2025-01-28',150),
+  ('2025-02-02',510), ('2025-02-15',290), ('2025-02-24',330),
+  ('2025-03-01',640), ('2025-03-15',455), ('2025-03-28',300),
+  ('2025-04-05',720), ('2025-04-19',610), ('2025-04-27',180),
+  ('2025-05-01',480), ('2025-05-17',350), ('2025-05-29',260),
+  ('2025-06-03',560), ('2025-06-21',495), ('2025-06-30',410),
+  ('2025-07-08',830), ('2025-07-26',275), ('2025-07-31',390),
+  ('2025-08-09',610), ('2025-08-23',540), ('2025-08-30',225);`}
+  starterCode={`-- One row per month, with that month's total.
+SELECT
+  issued_on,
+  amount
+FROM
+  invoices
+ORDER BY
+  issued_on;`}
+  solutionSql={`SELECT
+  DATE_TRUNC('month', issued_on) AS month,
+  SUM(amount) AS total
+FROM
+  invoices
+GROUP BY
+  DATE_TRUNC('month', issued_on)
+ORDER BY
+  month;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Returns month and total",
+      description: "Two columns, in that order.",
+      expectedColumns: ["month", "total"],
+    },
+    {
+      id: "row_count",
+      name: "One row per month",
+      description: "The data spans eight months.",
+      expectedRowCount: 8,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Each month's invoices summed onto that month's first day.",
+      matchesSolution: true,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`What is the difference between \`EXTRACT(MONTH FROM d)\` and \`DATE_TRUNC('month', d)\`?
+
+- [o] The first returns a number, the second returns a date at the month's start.
+  > One gives you the field 3, the other gives you \`2025-03-01\` with the year still attached.
+- The first works on timestamps and the second only on dates.
+  > Both accept dates and timestamps alike.
+- The first rounds to the nearest month and the second rounds down.
+  > \`EXTRACT\` does not round anything; it reads a component out.
+- They are equivalent, and \`DATE_TRUNC\` is the newer spelling.
+  > They return different types and group data differently, so they cannot be swapped.
+
+Group by \`DATE_TRUNC\` when the year matters, which is nearly always.`}
+/>
+
+<MultipleChoice
+  markdown={`Which filter reliably selects every row in March 2025 from a \`TIMESTAMP\` column?
+
+- \`BETWEEN '2025-03-01' AND '2025-03-31'\`
+  > Anything recorded during the day on 31 March is greater than midnight and falls outside.
+- \`EXTRACT(MONTH FROM t) = 3\`
+  > This also matches March of every other year in the table.
+- [o] \`t >= '2025-03-01' AND t < '2025-04-01'\`
+  > A half-open range covers the whole month whatever time of day a row carries.
+- \`DATE_TRUNC('month', t) = 3\`
+  > \`DATE_TRUNC\` returns a timestamp, which cannot equal the integer 3.
+
+Half-open ranges are the habit worth forming for every kind of range filter.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`ended_on - started_on\` return when both columns are \`DATE\`?
+
+- An \`INTERVAL\` expressed in years, months and days.
+  > That is what \`AGE()\` returns; plain subtraction is simpler.
+- A \`TIMESTAMP\` at the midpoint of the two dates.
+  > Subtraction measures a distance rather than producing another point in time.
+- [o] An integer: the number of days between them.
+  > Subtracting one \`DATE\` from another yields a plain day count.
+- An error, since dates cannot be subtracted directly.
+  > Date arithmetic is fully supported and this is its most common form.
+
+Subtracting two \`TIMESTAMP\` values, by contrast, gives an \`INTERVAL\`.`}
+/>
+
+Next: back to aggregates, and the clauses that make them do much more.

@@ -1,0 +1,308 @@
+---
+title: Numbers and Casting
+description: Integer division and the surprise it causes, rounding and the rest of the math functions, and converting between types with CAST.
+---
+
+Arithmetic in SQL mostly behaves the way you expect, with one famous
+exception that has produced more wrong reports than any other single
+rule: **dividing two integers gives an integer.** This lesson covers
+that, the rounding functions around it, and the casting syntax that
+fixes it.
+
+<Figure
+  slug="sql-numbers-and-casting-cutout"
+  alt="Numbers and casting, an isometric illustration"
+/>
+
+## Integer division truncates
+
+`7 / 2` is `3`. Not 3.5, and not rounded to 4: the fractional part is
+discarded, because both operands are integers and so the result is an
+integer too.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="The same division, four ways"
+  initSql={`CREATE TABLE tallies (
+  id      INTEGER PRIMARY KEY,
+  passed  INTEGER,
+  total   INTEGER
+);
+INSERT INTO tallies (id, passed, total) VALUES
+  (1,7,10), (2,3,4), (3,45,60), (4,1,3), (5,9,10), (6,22,25),
+  (7,5,8), (8,17,20), (9,2,7), (10,31,40), (11,6,6), (12,13,30),
+  (13,8,9), (14,27,50), (15,4,5), (16,19,24), (17,11,15),
+  (18,38,45), (19,3,10), (20,29,35), (21,14,16), (22,7,21),
+  (23,42,48), (24,1,2);`}
+  starterCode={`SELECT
+  passed,
+  total,
+  passed / total                    AS integer_division,
+  passed::NUMERIC / total           AS cast_one_side,
+  1.0 * passed / total              AS multiply_by_one_point_zero,
+  ROUND(100.0 * passed / total, 1)  AS pct
+FROM
+  tallies
+ORDER BY
+  id;`}
+/>
+
+`integer_division` is 0 on almost every row, which is the shape of the
+bug: a ratio column full of zeroes and ones. Any of the other three
+fixes it, and they all work the same way, by making at least one
+operand non-integer before the division happens.
+
+<Callout type="warn" title="The rule is about the operands, not the result">
+`ROUND(passed / total, 2)` does **not** help. The division runs first,
+truncates to an integer, and `ROUND` then politely rounds `0` to
+`0.00`. The cast has to be inside the division, not outside it.
+</Callout>
+
+## CAST and the :: shorthand
+
+Converting a value from one type to another is called a **cast**. SQL
+has a standard spelling and PostgreSQL has a shorter one; they mean
+the same thing.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "CAST(", label: "standard SQL" },
+    { text: "passed", label: "the value" },
+    { text: "AS NUMERIC)", label: "the target type" },
+    { text: "passed::NUMERIC", label: "the same thing, PostgreSQL style" },
+  ]}
+/>
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Casting between types"
+  initSql={`CREATE TABLE readings (
+  id      INTEGER PRIMARY KEY,
+  label   TEXT,
+  raw     TEXT,
+  measure NUMERIC
+);
+INSERT INTO readings (id, label, raw, measure) VALUES
+  (1,'a','42',3.7), (2,'b','7',12.25), (3,'c','315',0.5),
+  (4,'d','9',88.9), (5,'e','128',4.05), (6,'f','63',19.75),
+  (7,'g','4',256.1), (8,'h','2071',0.99), (9,'i','88',33.33),
+  (10,'j','530',7.5), (11,'k','16',61.2), (12,'l','749',2.75),
+  (13,'m','1',140.6), (14,'n','96',8.25), (15,'o','204',55.5),
+  (16,'p','37',3.14), (17,'q','612',77.7), (18,'r','85',18.18),
+  (19,'s','3',90.09), (20,'t','450',6.6), (21,'u','178',23.45),
+  (22,'v','29',101.5), (23,'w','903',0.25), (24,'x','56',44.44);`}
+  starterCode={`SELECT
+  raw,
+  CAST(raw AS INTEGER)      AS text_to_int,
+  raw::INTEGER * 2          AS doubled,
+  measure,
+  measure::INTEGER          AS numeric_to_int_rounds,
+  TRUNC(measure)            AS numeric_to_int_truncates,
+  measure::TEXT || ' units' AS number_to_text
+FROM
+  readings
+ORDER BY
+  id;`}
+/>
+
+Two details worth noticing. Casting a `NUMERIC` to `INTEGER`
+**rounds**, while `TRUNC` chops, so 3.7 becomes 4 one way and 3 the
+other. And casting text to a number fails loudly if the text is not a
+number, which is the right behaviour: silently returning zero would
+hide a data problem.
+
+## Rounding, and its family
+
+Four functions, four different questions:
+
+| Function | On 3.7 | On -3.7 | Question it answers |
+| --- | --- | --- | --- |
+| `ROUND(x)` | 4 | -4 | nearest whole number |
+| `CEIL(x)` | 4 | -3 | smallest whole number at least x |
+| `FLOOR(x)` | 3 | -4 | largest whole number at most x |
+| `TRUNC(x)` | 3 | -3 | drop the fractional part |
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Four ways to lose the decimals"
+  initSql={`CREATE TABLE amounts (
+  id    INTEGER PRIMARY KEY,
+  value NUMERIC
+);
+INSERT INTO amounts (id, value) VALUES
+  (1,3.7), (2,-3.7), (3,2.5), (4,-2.5), (5,0.1), (6,-0.1),
+  (7,19.99), (8,-19.99), (9,100.5), (10,-100.5), (11,7.25),
+  (12,-7.25), (13,45.678), (14,-45.678), (15,0.999), (16,-0.999),
+  (17,12.0), (18,-12.0), (19,8.049), (20,-8.049), (21,63.5),
+  (22,-63.5), (23,1.4999), (24,-1.4999);`}
+  starterCode={`SELECT
+  value,
+  ROUND(value)     AS rounded,
+  CEIL(value)      AS ceiling,
+  FLOOR(value)     AS floor,
+  TRUNC(value)     AS truncated,
+  ROUND(value, 1)  AS one_decimal
+FROM
+  amounts
+ORDER BY
+  id;`}
+/>
+
+The negative rows are where these come apart. `TRUNC(-3.7)` is -3
+because it moves toward zero; `FLOOR(-3.7)` is -4 because it moves
+down. Confusing the two on a column of refunds is a classic bug.
+
+<Figure
+  slug="sql-numbers-and-casting-rounding-family-inline-cutout"
+  alt="One block carried up onto four different steps of the same short staircase, each by its own separate ramp"
+  caption="Four rounding functions, one value, four different steps to land on."
+/>
+
+## The rest of the arithmetic toolbox
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Absolute value, remainder, powers and roots"
+  initSql={`CREATE TABLE numbers (
+  id INTEGER PRIMARY KEY,
+  n  INTEGER
+);
+INSERT INTO numbers (id, n) VALUES
+  (1,1), (2,2), (3,3), (4,4), (5,5), (6,6), (7,7), (8,8),
+  (9,9), (10,10), (11,11), (12,12), (13,-1), (14,-4), (15,-9),
+  (16,-16), (17,25), (18,36), (19,49), (20,64), (21,81),
+  (22,100), (23,121), (24,144);`}
+  starterCode={`SELECT
+  n,
+  ABS(n)                          AS absolute,
+  MOD(n, 3)                       AS remainder_by_3,
+  POWER(n, 2)                     AS squared,
+  ROUND(SQRT(ABS(n))::NUMERIC, 3) AS root_of_absolute,
+  CASE WHEN MOD(n, 2) = 0 THEN 'even' ELSE 'odd' END AS parity
+FROM
+  numbers
+ORDER BY
+  id;`}
+/>
+
+`MOD` is more useful than it looks: `MOD(n, 2) = 0` is the test for
+even, and `MOD(id, 100)` buckets rows into a hundred groups for
+sampling.
+
+<Callout type="info" title="NUMERIC is exact; DOUBLE PRECISION is not">
+`NUMERIC` stores decimal digits exactly, which is why money belongs in
+it. `DOUBLE PRECISION` stores a binary approximation, fast and
+compact, and `0.1 + 0.2 = 0.3` is false in it. `SQRT`, `LOG` and the
+trigonometric functions return `DOUBLE PRECISION`, which is why the
+query above casts back to `NUMERIC` before rounding: `ROUND(x, n)`
+with two arguments only accepts an exact type.
+</Callout>
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="A pass rate that is not always zero"
+  instructions={`The \`tallies\` table has integer \`passed\` and \`total\` columns. Return \`id\`, \`passed\`, \`total\`, and \`pass_pct\`: passed as a percentage of total, rounded to 1 decimal place. Watch out for integer division. Sort by \`id\`.
+
+\`\`\`sql
+ROUND(100.0 * passed / total, 1)
+\`\`\``}
+  initSql={`CREATE TABLE tallies (
+  id     SERIAL PRIMARY KEY,
+  passed INTEGER NOT NULL,
+  total  INTEGER NOT NULL
+);
+INSERT INTO tallies (passed, total) VALUES
+  (7,10), (3,4), (45,60), (1,3), (9,10), (22,25),
+  (5,8), (17,20), (2,7), (31,40), (6,6), (13,30),
+  (8,9), (27,50), (4,5), (19,24), (11,15), (38,45),
+  (3,10), (29,35), (14,16), (7,21), (42,48), (1,2);`}
+  starterCode={`-- Careful: passed / total is integer division.
+SELECT
+  id,
+  passed,
+  total
+FROM
+  tallies
+ORDER BY
+  id;`}
+  solutionSql={`SELECT
+  id,
+  passed,
+  total,
+  ROUND(100.0 * passed / total, 1) AS pass_pct
+FROM
+  tallies
+ORDER BY
+  id;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Returns id, passed, total, pass_pct",
+      description: "Four columns, in that order.",
+      expectedColumns: ["id", "passed", "total", "pass_pct"],
+    },
+    {
+      id: "row_count",
+      name: "Keeps every row",
+      description: "All 24 tallies are returned.",
+      expectedRowCount: 24,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "7 of 10 is 70.0, not 0.",
+      matchesSolution: true,
+    },
+  ]}
+/>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`In PostgreSQL, what does \`SELECT 7 / 2\` return?
+
+- 3.5, as ordinary arithmetic would give.
+  > A decimal result needs at least one non-integer operand.
+- [o] 3, because both operands are integers.
+  > Integer divided by integer produces an integer, and the fraction is discarded.
+- 4, because the result is rounded to the nearest whole number.
+  > The fractional part is dropped rather than rounded, so 7/2 and 7/3 both give 3.
+- An error, since the division does not divide evenly.
+  > Uneven division is perfectly legal; only division by zero raises an error.
+
+Cast one side, as in \`7::NUMERIC / 2\`, to get 3.5.`}
+/>
+
+<MultipleChoice
+  markdown={`Which expression correctly computes a percentage from two integer columns?
+
+- \`ROUND(passed / total * 100, 1)\`
+  > The division runs first and truncates to zero before the multiplication ever happens.
+- \`ROUND(passed / total, 3) * 100\`
+  > Rounding after an integer division only formats a value that is already wrong.
+- \`passed / total AS pct\`
+  > This is the integer division itself, and gives 0 for every fraction under 1.
+- [o] \`ROUND(100.0 * passed / total, 1)\`
+  > Multiplying by a decimal literal first makes the whole expression non-integer arithmetic.
+
+Get a non-integer into the expression *before* the division.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the difference between \`FLOOR(-3.7)\` and \`TRUNC(-3.7)\`?
+
+- They are the same; \`TRUNC\` is an alias kept for compatibility.
+  > They agree on positive numbers only, and differ on every negative fraction.
+- \`FLOOR\` gives -3 and \`TRUNC\` gives -4.
+  > The two results are the right pair but the wrong way round.
+- [o] \`FLOOR\` gives -4 and \`TRUNC\` gives -3.
+  > Flooring moves down the number line while truncating moves toward zero.
+- \`FLOOR\` returns an integer type and \`TRUNC\` returns text.
+  > Both return a number; neither converts anything to text.
+
+On positive numbers the two agree, which is why the bug hides until a negative value arrives.`}
+/>
+
+Next: dates, times, and the arithmetic that goes with them.

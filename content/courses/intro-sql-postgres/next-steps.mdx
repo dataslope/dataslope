@@ -21,12 +21,20 @@ The course moved deliberately from "why" to "how" to "how to think":
    nightmares, Codd's idea, and PostgreSQL's lineage.
 2. **Relational foundations**, tables, keys, types.
 3. **Querying data**, `SELECT`, `WHERE`, `ORDER BY`.
-4. **Summarizing data**, aggregates, `GROUP BY`, `HAVING`.
-5. **Connecting tables**, foreign keys, joins, many-to-many.
-6. **Data modeling**, entities, entity relationship diagrams,
+4. **Expressions and functions**, `CASE`, text, numbers and casting,
+   dates.
+5. **Summarizing data**, aggregates, `GROUP BY`, `HAVING`, `FILTER`
+   and `ROLLUP`.
+6. **Connecting tables**, foreign keys, joins, many-to-many, set
+   operations.
+7. **Data modeling**, entities, entity relationship diagrams,
    normalization.
-7. **Composing queries**, subqueries, common table expressions,
-   execution order.
+8. **Composing queries**, subqueries, common table expressions,
+   recursion.
+9. **Window functions**, `OVER`, ranking, running totals, frames,
+   `LAG` and `LEAD`, top N per group, and the execution order that
+   explains where they run.
+10. **Changing data**, upserts, views, transactions.
 
 And if you skipped the **Interesting discussions** pages,
 [Spreadsheets vs. Databases](/courses/intro-sql-postgres/spreadsheets-vs-databases)
@@ -37,8 +45,9 @@ can write the queries yourself.
 
 Each layer rested on the one before it. Joins only made sense once
 keys did; normalization only made sense once you felt the pain of
-duplication; the execution order tied the whole querying story
-together.
+duplication; window functions only made sense once aggregates had
+shown you what gets lost when rows collapse; and the execution order
+tied the whole querying story together.
 
 ## The big ideas worth keeping
 
@@ -53,6 +62,9 @@ If you remember only a handful of things, make it these:
   cleanly in separate tables, then join to view it together.
 - **SQL is declarative.** You describe *what* you want; the database
   figures out *how*. The logical execution order explains the rest.
+- **`OVER` is the difference between summarizing and comparing.** An
+  aggregate collapses rows; a window function computes across them
+  and leaves every row standing.
 - **Model before you build.** Naming entities and relationships first
   saves you from tangled tables later.
 
@@ -76,8 +88,8 @@ Concepts solidify by *doing*. A few ways to keep going:
 - **Ask questions of data.** You met the Chinook music store in the
   aggregate and join chapters, go back to those blocks, write five
   questions of your own about its artists and tracks, and answer each
-  with a query. Counts, averages, filters, joins: it can take them
-  all.
+  with a query. Counts, averages, filters, joins, windows: it can
+  take them all.
 
 <SqlCodeBlock
   dialect="postgres"
@@ -104,19 +116,30 @@ INSERT INTO orders (id, customer_id, amount) VALUES
   (121,17,33), (122,18,88), (123,20,16), (124,20,52),
   (125,21,29), (126,22,74), (127,22,21), (128,23,95),
   (129,24,36), (130,1,57), (131,9,40), (132,17,68);`}
-  starterCode={`-- A join, a group, an aggregate, a HAVING filter, and a sort,
--- every major idea from the course in one readable query.
+  starterCode={`-- A CTE, a join, a group, an aggregate, a HAVING filter,
+-- two window functions and a sort: most of the course in one query.
+WITH
+  spend AS (
+    SELECT
+      c.name,
+      COUNT(*)      AS order_count,
+      SUM(o.amount) AS total_spent
+    FROM
+      customers c
+      JOIN orders o ON o.customer_id = c.id
+    GROUP BY
+      c.name
+    HAVING
+      SUM(o.amount) > 50
+  )
 SELECT
-  c.name,
-  COUNT(*) AS order_count,
-  SUM(o.amount) AS total_spent
+  name,
+  order_count,
+  total_spent,
+  RANK() OVER (ORDER BY total_spent DESC) AS rank,
+  ROUND(100 * total_spent / SUM(total_spent) OVER (), 1) AS pct_of_all
 FROM
-  customers c
-  JOIN orders o ON o.customer_id = c.id
-GROUP BY
-  c.name
-HAVING
-  SUM(o.amount) > 50
+  spend
 ORDER BY
   total_spent DESC;`}
 />
@@ -130,13 +153,17 @@ This was a *foundations* course, focused on SQL and relational
 thinking. When you are ready to go further, natural next topics
 include:
 
-- **More SQL depth**, `CASE` expressions, window functions, richer
-  date and text handling, and set operations like `UNION`.
-- **Indexes and performance**, how databases find rows quickly, and
-  when to add an index. (You met the *why*; the *how* is a deep
-  field.)
+- **Indexes and performance**, how databases find rows quickly, when
+  to add an index, and how to read a query plan. (You met the *why*;
+  the *how* is a deep field.)
 - **Designing larger schemas**, modeling real applications with many
-  related entities.
+  related entities. The
+  [Database Design with PostgreSQL](/courses/database-design-postgresql)
+  course picks up exactly there.
+- **Analytical SQL at scale**, the same window functions and grouping
+  sets against columnar data. The
+  [SQL for Data Analysis with DuckDB](/courses/sql-analytics-duckdb)
+  course covers that ground.
 - **Using databases from code**, how applications connect to
   PostgreSQL and run the queries you now understand.
 

@@ -1,0 +1,263 @@
+---
+title: Transactions
+description: Grouping statements so they succeed or fail together, BEGIN, COMMIT and ROLLBACK, savepoints, and what the database guarantees while you are inside one.
+---
+
+Some changes only make sense together. Moving money between two
+accounts is two `UPDATE` statements, and a database that ran the first
+and then crashed would have destroyed money. A **transaction** is how
+SQL says "these statements are one change": either all of them happen,
+or none of them do.
+
+<Figure
+  slug="sql-transactions-cutout"
+  alt="Transactions, an isometric illustration"
+/>
+
+## Every statement is already a transaction
+
+PostgreSQL wraps each statement in a transaction of its own unless you
+say otherwise. That is why a `DELETE` that hits a constraint violation
+halfway through removes nothing at all rather than half the rows: the
+statement failed, so the transaction it was in rolled back.
+
+`BEGIN` is how you widen that boundary to cover several statements.
+
+<SyntaxBreakdown
+  parts={[
+    { text: "BEGIN;", label: "open the transaction" },
+    { text: "UPDATE ...; UPDATE ...;", label: "any number of statements" },
+    { text: "COMMIT;", label: "make it all permanent" },
+    { text: "ROLLBACK;", label: "or throw all of it away" },
+  ]}
+/>
+
+## A transfer that cannot go half-done
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Two updates, one atomic change"
+  initSql={`CREATE TABLE accounts (
+  id      INTEGER PRIMARY KEY,
+  owner   TEXT,
+  balance NUMERIC NOT NULL CHECK (balance >= 0)
+);
+INSERT INTO accounts (id, owner, balance) VALUES
+  (1,'Ada',500), (2,'Ben',300), (3,'Cleo',120), (4,'Dan',940),
+  (5,'Elle',60), (6,'Finn',780), (7,'Gia',210), (8,'Hugo',450),
+  (9,'Iris',35), (10,'Jae',610), (11,'Kai',175), (12,'Lena',820),
+  (13,'Mira',95), (14,'Nils',540), (15,'Omar',280), (16,'Pia',700),
+  (17,'Quinn',150), (18,'Rui',390), (19,'Sana',870), (20,'Tom',245),
+  (21,'Uma',130), (22,'Vic',560), (23,'Wren',410), (24,'Zoe',325);`}
+  starterCode={`BEGIN;
+
+UPDATE accounts SET balance = balance - 200 WHERE owner = 'Ada';
+UPDATE accounts SET balance = balance + 200 WHERE owner = 'Ben';
+
+COMMIT;
+
+SELECT owner, balance FROM accounts WHERE owner IN ('Ada', 'Ben');`}
+/>
+
+Ada is down 200 and Ben is up 200. Had the second `UPDATE` failed, the
+first would have been undone with it, and no money would have gone
+missing.
+
+## ROLLBACK undoes everything since BEGIN
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="A change made and then discarded"
+  initSql={`CREATE TABLE accounts (
+  id      INTEGER PRIMARY KEY,
+  owner   TEXT,
+  balance NUMERIC NOT NULL
+);
+INSERT INTO accounts (id, owner, balance) VALUES
+  (1,'Ada',500), (2,'Ben',300), (3,'Cleo',120), (4,'Dan',940),
+  (5,'Elle',60), (6,'Finn',780), (7,'Gia',210), (8,'Hugo',450),
+  (9,'Iris',35), (10,'Jae',610), (11,'Kai',175), (12,'Lena',820),
+  (13,'Mira',95), (14,'Nils',540), (15,'Omar',280), (16,'Pia',700),
+  (17,'Quinn',150), (18,'Rui',390), (19,'Sana',870), (20,'Tom',245),
+  (21,'Uma',130), (22,'Vic',560), (23,'Wren',410), (24,'Zoe',325);`}
+  starterCode={`BEGIN;
+
+DELETE FROM accounts WHERE balance < 200;
+
+-- Inside the transaction, the rows are already gone:
+SELECT COUNT(*) AS rows_visible_inside FROM accounts;
+
+ROLLBACK;
+
+-- And after the rollback, they never left:
+SELECT COUNT(*) AS rows_after_rollback FROM accounts;`}
+/>
+
+Nine rows disappear and then come back. Inside the transaction your
+own session sees the change; nobody else does, and `ROLLBACK` means
+nobody ever will.
+
+<Callout type="tip" title="BEGIN then SELECT is the safest way to test a DELETE">
+Open a transaction, run the destructive statement, inspect the result,
+and then decide between `COMMIT` and `ROLLBACK`. It is the closest
+thing SQL has to an undo button, and it costs nothing.
+</Callout>
+
+<Figure
+  slug="sql-transactions-rollback-undoes-inline-cutout"
+  alt="A hinged tray held open above a workbench, carrying several blocks that have not yet been tipped down onto it"
+  caption="Work inside a transaction is held aside until `COMMIT` puts it on the bench."
+/>
+
+## What a transaction guarantees
+
+The four properties are traditionally spelled ACID:
+
+| Property | Means |
+| --- | --- |
+| Atomicity | all of the statements, or none of them |
+| Consistency | constraints hold at the end of the transaction |
+| Isolation | concurrent transactions do not see each other's unfinished work |
+| Durability | once committed, it survives a crash |
+
+Isolation is the one that surprises people. Two sessions running the
+same transaction at the same time each behave, by default, as though
+the other one is not there. PostgreSQL's default level, `READ
+COMMITTED`, means a statement sees only data committed before *that
+statement* began, so a long transaction can see different results from
+two identical `SELECT`s. `REPEATABLE READ` and `SERIALIZABLE` tighten
+that, at the cost of more conflicts to retry.
+
+## Savepoints: a partial undo
+
+A `SAVEPOINT` marks a point inside a transaction you can roll back to
+without abandoning the whole thing:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Undoing one step, keeping the rest"
+  initSql={`CREATE TABLE inventory (
+  sku TEXT PRIMARY KEY,
+  qty INTEGER NOT NULL
+);
+INSERT INTO inventory (sku, qty) VALUES
+  ('kettle',12), ('blender',5), ('toaster',9), ('whisk',30),
+  ('pan',7), ('ladle',18), ('lamp',4), ('bulb',60),
+  ('shade',11), ('chair',3), ('desk',2), ('stool',8),
+  ('shelf',6), ('bench',1), ('table',2), ('mug',44),
+  ('plate',37), ('bowl',26), ('fork',80), ('glass',52),
+  ('spoon',75), ('torch',14), ('dimmer',10), ('sconce',6);`}
+  starterCode={`BEGIN;
+
+UPDATE inventory SET qty = qty + 10 WHERE sku = 'kettle';
+
+SAVEPOINT after_kettle;
+
+UPDATE inventory SET qty = 0 WHERE sku = 'blender';  -- a mistake
+
+ROLLBACK TO SAVEPOINT after_kettle;
+
+UPDATE inventory SET qty = qty + 3 WHERE sku = 'blender';
+
+COMMIT;
+
+SELECT sku, qty FROM inventory WHERE sku IN ('kettle', 'blender') ORDER BY sku;`}
+/>
+
+The kettle keeps its 10, the mistaken blender update is discarded, and
+the corrected one lands. Savepoints are how an application recovers
+from one failed step in a long sequence without redoing the sequence.
+
+## An error inside a transaction blocks the rest
+
+PostgreSQL is strict here, and it catches everyone once: after a
+statement fails inside a transaction, every following statement is
+rejected with "current transaction is aborted" until you `ROLLBACK`.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="What an aborted transaction looks like"
+  expectError
+  initSql={`CREATE TABLE accounts (
+  id      INTEGER PRIMARY KEY,
+  owner   TEXT,
+  balance NUMERIC NOT NULL CHECK (balance >= 0)
+);
+INSERT INTO accounts (id, owner, balance) VALUES
+  (1,'Ada',500), (2,'Ben',300), (3,'Cleo',120), (4,'Dan',940),
+  (5,'Elle',60), (6,'Finn',780), (7,'Gia',210), (8,'Hugo',450),
+  (9,'Iris',35), (10,'Jae',610), (11,'Kai',175), (12,'Lena',820),
+  (13,'Mira',95), (14,'Nils',540), (15,'Omar',280), (16,'Pia',700),
+  (17,'Quinn',150), (18,'Rui',390), (19,'Sana',870), (20,'Tom',245),
+  (21,'Uma',130), (22,'Vic',560), (23,'Wren',410), (24,'Zoe',325);`}
+  starterCode={`BEGIN;
+
+-- Iris has 35, so this violates the CHECK (balance >= 0):
+UPDATE accounts SET balance = balance - 100 WHERE owner = 'Iris';
+
+-- This one is perfectly valid, and is rejected anyway:
+UPDATE accounts SET balance = balance + 1 WHERE owner = 'Ada';
+
+COMMIT;`}
+/>
+
+That is the database refusing to let you build on a broken step. The
+recovery is `ROLLBACK` (start again) or, if you planned for it, a
+`SAVEPOINT` taken before the risky statement.
+
+<Callout type="warn" title="Keep transactions short">
+An open transaction holds locks and keeps old row versions alive so
+other sessions can still read them. A transaction left open across a
+user's coffee break blocks writers and bloats the table. Open it,
+do the work, commit or roll back, and never wait for a human inside
+one.
+</Callout>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`A transaction runs two \`UPDATE\` statements and the second one fails. What is the state of the table?
+
+- The first update is kept and the second is skipped.
+  > That would leave exactly the half-finished state transactions exist to prevent.
+- Both updates are applied and an error is logged.
+  > A failed statement is never applied, and the error is not merely logged.
+- [o] Neither update is applied, once the transaction is rolled back.
+  > Atomicity means the whole group succeeds or the whole group is undone.
+- The first is kept until the connection closes, then removed.
+  > Nothing depends on when the connection closes; the rollback decides.
+
+All or nothing is the guarantee, and it is the reason to group the statements.`}
+/>
+
+<MultipleChoice
+  markdown={`What does \`ROLLBACK TO SAVEPOINT s1\` do?
+
+- Ends the transaction and discards everything in it.
+  > Discarding everything is a plain \`ROLLBACK\`, with no savepoint named.
+- Commits the work done before \`s1\` and continues.
+  > Nothing is made permanent until \`COMMIT\`; the transaction is still open.
+- [o] Undoes the work done after \`s1\` and leaves the transaction open.
+  > The savepoint is a marker to rewind to, and statements before it are unaffected.
+- Creates a second transaction starting from \`s1\`.
+  > There is still exactly one transaction; a savepoint is a point inside it.
+
+A savepoint is a partial undo, not a commit and not an exit.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does PostgreSQL reject every statement after an error inside a transaction?
+
+- Because the connection has been closed by the error.
+  > The connection stays open, and \`ROLLBACK\` on it works normally.
+- [o] Because the transaction is aborted, and committing it could save a partly broken state.
+  > Refusing further work is how the database keeps the all-or-nothing guarantee after a failure.
+- Because each statement must succeed before the next one is parsed.
+  > Statements are independent outside a transaction, where one failure does not block the next.
+- Because the error rolled back the transaction automatically.
+  > It is not rolled back automatically; it sits aborted until you issue \`ROLLBACK\`.
+
+Issue \`ROLLBACK\`, or roll back to a savepoint taken before the failure.`}
+/>
+
+Next: everything you have learned, in the order the database runs it.
