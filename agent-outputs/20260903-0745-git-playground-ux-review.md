@@ -178,8 +178,8 @@ Each scenario gets a three-step "Try this" under its description, shown once in 
 
 ### 4.7 Visual system
 
-- **Light by default**, dark following the site theme. Both use the same `--ds-*` tokens the language playgrounds use; no pure black surfaces.
-- **One accent.** Blue for interactive and for the current branch. Green only for the prompt and "staged". Amber for "modified". Red for conflict and deletion. Everything else is ink and muted ink.
+- **Light by default**, dark following the site theme. Every color is a step on the brand ramp in `app/brand.css`, mapped to roles the way `embeddedShell.css` already maps them for the embedded blocks: the gray ramp for neutrals (`--ds-gray-900` ink, `-500` muted, `-200` rules, `-50` ground), the 600 step of each hue on light and the 400 step on dark, and the site's `#121212` / `#1c1c1c` / `#232323` dark surfaces. No pure black.
+- **One accent.** `--ds-blue-600` (dark `-400`) for interactive and for the current branch. `--ds-green-600` / `-400` only for the prompt and "staged". `--ds-yellow-600` for "modified" dots, with `--ds-yellow-800` where it is text. `--ds-red-600` / `-400` for conflict and deletion. Lane colors on the graph come from the categorical wheel (`--ds-teal`, `--ds-purple`, `--ds-orange`), which the brand report reserves for exactly this: telling series apart without meaning. Everything else is ink and muted ink.
 - **Pane heads as eyebrows**, the `</> EDITOR` / `>_ OUTPUT` treatment from the language playground, so the two playgrounds read as siblings.
 - **Type**: UI 13 px, mono 13 px, nothing smaller than 12 px. Panel padding 16 px, rows 32 px.
 - **Words**: "Working directory", "Staging area", "Committed"; "on main"; "1 change staged". `Index`, `refs/heads/main`, object ids and the pointer chain live behind "Show Git's names".
