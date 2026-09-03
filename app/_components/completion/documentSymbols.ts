@@ -958,7 +958,6 @@ function resolveRecordChain(
   let instance = true;
   for (let i = 0; i < chain.length; i++) {
     const segment = chain[i];
-    const isCall = CALL_SUFFIX.test(segment);
     const name = segment.replace(CALL_SUFFIX, "");
     if (i === 0) {
       if (name === "$this" || name === "self" || name === "static") {
