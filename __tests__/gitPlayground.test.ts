@@ -187,6 +187,29 @@ describe("merge bookkeeping", () => {
     expect((await run("git status")).out).not.toContain("unmerged paths");
     expect((await run("git merge --abort")).code).toBe(128);
   });
+
+  it("reports the merge in progress on the command itself, live", async () => {
+    // The worker reads `merging` off the git command after every exec; the
+    // UI's conflict guidance hangs on it. It has to be a live getter: the
+    // first version copied its value once, at creation, and stayed null.
+    const { store, fs } = createGitFs();
+    const cmd = createGitCommand({ fs, dir: REPO, clock: { commits: 0 } });
+    const bash = new Bash({ fs: store as never, cwd: REPO, customCommands: [defineCommand("git", cmd)] });
+    await store.mkdir(REPO, { recursive: true });
+    for (const c of scenarioById("conflict-pending").setup) await runCommand(bash, c);
+
+    expect(cmd.merging).toBeNull();
+    await runCommand(bash, "git merge rename");
+    expect(cmd.merging).toBe("rename");
+    await runCommand(bash, "git merge --abort");
+    expect(cmd.merging).toBeNull();
+
+    await runCommand(bash, "git merge rename");
+    await runCommand(bash, `printf 'title: Final\nauthor: unknown\n' > config.yml`);
+    await runCommand(bash, "git add config.yml");
+    await runCommand(bash, 'git commit -m "Resolve"');
+    expect(cmd.merging).toBeNull();
+  });
 });
 
 describe("change detection", () => {

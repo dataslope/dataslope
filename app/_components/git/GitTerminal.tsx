@@ -21,8 +21,10 @@
  */
 
 import {
+  forwardRef,
   useCallback,
   useEffect,
+  useImperativeHandle,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -43,6 +45,14 @@ export interface TranscriptEntry {
   note?: boolean;
 }
 
+/** What a host can ask the terminal to do from outside: put focus back on
+ *  the prompt after composing a command, or press Tab for a keyboard that
+ *  has no Tab key. */
+export interface GitTerminalHandle {
+  focus: () => void;
+  complete: () => void;
+}
+
 interface Props {
   transcript: TranscriptEntry[];
   value: string;
@@ -54,6 +64,9 @@ interface Props {
   busy: boolean;
   /** Command names, offered for the first word of a line. */
   completions: string[];
+  /** Second words for commands that take one, so `git a<Tab>` offers `add`
+   *  rather than the files in the directory. */
+  subcommands?: Record<string, string[]>;
   /**
    * Candidates for a partly typed path, resolved by the host because only it
    * knows the filesystem. Called with the word under the caret exactly as
@@ -122,7 +135,7 @@ function Output({ text, className }: { text: string; className: string }) {
   );
 }
 
-export function GitTerminal({
+export const GitTerminal = forwardRef<GitTerminalHandle, Props>(function GitTerminal({
   transcript,
   value,
   onValueChange,
@@ -130,6 +143,7 @@ export function GitTerminal({
   history,
   busy,
   completions,
+  subcommands,
   pathCompletions,
   readOnly = false,
   placeholderHint,
@@ -139,7 +153,7 @@ export function GitTerminal({
   inlineInput = false,
   onWrite,
   onScrolledChange,
-}: Props) {
+}: Props, ref) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const historyIndex = useRef<number | null>(null);
@@ -204,11 +218,15 @@ export function GitTerminal({
     const word = parts[parts.length - 1] ?? "";
 
     // The first word of a command is a command; everything after it is a
-    // path. Without this, `cat <Tab>` would offer every command in the shell.
+    // path, unless the command has subcommands and this is its second word.
+    // Without this, `cat <Tab>` would offer every command in the shell.
+    const subs = parts.length === 2 ? subcommands?.[parts[0]] : undefined;
     const pool =
       parts.length <= 1
         ? completions.filter((c) => c.startsWith(word))
-        : (pathCompletions?.(word) ?? []);
+        : subs
+          ? subs.filter((c) => c.startsWith(word))
+          : (pathCompletions?.(word) ?? []);
     const matches = [...new Set(pool)].sort();
     if (!matches.length) return;
 
@@ -242,6 +260,14 @@ export function GitTerminal({
     }
     onWrite?.({ echo: value, text: names.join("   ") });
   }
+
+  useImperativeHandle(ref, () => ({
+    focus: () => inputRef.current?.focus({ preventScroll: true }),
+    complete: () => {
+      complete(tabRun.current);
+      tabRun.current += 1;
+    },
+  }));
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     // Waiting on an answer to "Display all N possibilities?". Bash takes one
@@ -431,4 +457,4 @@ export function GitTerminal({
       {!inlineInput && inputRow}
     </div>
   );
-}
+});

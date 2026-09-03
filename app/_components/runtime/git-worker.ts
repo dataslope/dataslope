@@ -50,6 +50,9 @@ type Session = {
   /** Where this session's filesystem starts. A Git session lives in a
    *  repository, a shell session in a home directory. */
   root: string;
+  /** The `git` command bound to this session, kept so its merge state can be
+   *  read back after each command. */
+  run: ReturnType<typeof createGitCommand>;
   /** Working directory, environment and functions that outlive one exec, so
    *  the terminal behaves like a terminal. */
   shell: ShellSession;
@@ -74,7 +77,7 @@ async function createSession(kind: SessionKind): Promise<Session> {
     customCommands: [defineCommand("git", run)],
   });
   await store.mkdir(root, { recursive: true });
-  return { store, fs, bash, clock, kind, root, shell: new ShellSession(root) };
+  return { store, fs, bash, clock, kind, root, run, shell: new ShellSession(root) };
 }
 
 async function seed(scenarioId: string, kind: SessionKind): Promise<Session> {
@@ -158,7 +161,7 @@ async function readState(s: Session): Promise<RepoState> {
   } catch {
     initialized = false;
   }
-  if (!initialized) return { ...EMPTY_STATE, kind: "git", tree, dirs, cwd: s.shell.cwd };
+  if (!initialized) return { ...EMPTY_STATE, kind: "git", tree, dirs, cwd: s.shell.cwd, merging: null };
 
   const branches = await git.listBranches({ fs, dir: s.root });
   let branch: string | null = null;
@@ -244,6 +247,7 @@ async function readState(s: Session): Promise<RepoState> {
     tree,
     dirs,
     cwd: s.shell.cwd,
+    merging: s.run.merging,
   };
 }
 

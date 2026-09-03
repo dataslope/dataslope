@@ -4,6 +4,8 @@
 **Scope:** `/playground/git` as built on `claude/git-playground-gui-design-5joih7` (PR #669), reviewed against the two design documents (`20260813-1424`, `20260815-0512`), the house chrome in the language playgrounds, and the Git learning tools beginners actually use.
 **Goal from the brief:** a Git playground beginners can experiment in without being scared off; visually clean; usable on a phone, best on a desktop.
 
+**Status (2026-09-03):** Phase 1 is implemented on this branch, plus the Phase 2 items that fell out of the same code: the WIP row, the commit detail card, the conflict banner and editor toolbar, "Try this" per scenario, and the narration line. Still open from Phase 2: CodeMirror for the file editor and share links. Phase 3 is untouched. Every bug in §7 is fixed.
+
 The short version: the runtime is right and the design decisions underneath it are right, but the surface was assembled panel by panel rather than composed as one screen. It looks like a developer tool, defaults to a black terminal even on a light site, buries the two panels that teach under a list of fifteen commands, and on a phone it separates the terminal from the state it changes, which removes the one thing the playground exists to show. Every finding below is fixable without touching the worker or the grading.
 
 ---

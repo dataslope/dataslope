@@ -99,6 +99,7 @@ async function harness(scenarioId: string) {
       commits: [...seen.values()].sort((a, b) => b.timestamp - a.timestamp),
       tree: tree.sort(),
       dirs: [],
+      merging: null,
       cwd: REPO,
     };
   };

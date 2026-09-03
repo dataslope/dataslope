@@ -11,6 +11,12 @@ export interface GitScenario {
   description: string;
   /** Shell commands run at seed time, in order. */
   setup: string[];
+  /**
+   * A suggested first move: a few short steps shown once on load, ticked as
+   * the reader does them. A sandbox with no suggested first move is a blank
+   * page; this is not a level system, just the first things to try.
+   */
+  tryThis: { label: string; command: string }[];
 }
 
 export const SCENARIOS: GitScenario[] = [
@@ -19,6 +25,12 @@ export const SCENARIOS: GitScenario[] = [
     label: "Empty folder",
     description: "No repository yet. Start with git init.",
     setup: [],
+    tryThis: [
+      { label: "Create a repository", command: "git init" },
+      { label: "Create a file", command: "printf 'hello\\n' > notes.txt" },
+      { label: "Stage it", command: "git add notes.txt" },
+      { label: "Commit it", command: 'git commit -m "First commit"' },
+    ],
   },
   {
     id: "linear-history",
@@ -37,6 +49,11 @@ export const SCENARIOS: GitScenario[] = [
       `git commit -m "Ignore node_modules"`,
       `printf '# Project\\n\\nA small demo repository.\\n\\nEdited but not staged.\\n' > README.md`,
     ],
+    tryThis: [
+      { label: "Stage the edit to README.md", command: "git add README.md" },
+      { label: "Commit it", command: 'git commit -m "Describe the edit"' },
+      { label: "See the history", command: "git log --oneline" },
+    ],
   },
   {
     id: "staged-and-unstaged",
@@ -53,6 +70,11 @@ export const SCENARIOS: GitScenario[] = [
       `printf 'const version = 2;\\n' > app.js`,
       `printf 'scratch\\n' > scratch.txt`,
     ],
+    tryThis: [
+      { label: "See where everything is", command: "git status" },
+      { label: "Stage app.js too", command: "git add app.js" },
+      { label: "Commit both", command: 'git commit -m "Bump version"' },
+    ],
   },
   {
     id: "branching",
@@ -68,6 +90,11 @@ export const SCENARIOS: GitScenario[] = [
       "git add feature.js",
       `git commit -m "Add feature flag"`,
       "git checkout main",
+    ],
+    tryThis: [
+      { label: "Look at both branches", command: "git log --oneline --all" },
+      { label: "Switch to feature", command: "git checkout feature" },
+      { label: "Come back and merge it", command: "git merge feature" },
     ],
   },
   {
@@ -87,6 +114,11 @@ export const SCENARIOS: GitScenario[] = [
       `printf 'title: Release\\nauthor: unknown\\n' > config.yml`,
       "git add config.yml",
       `git commit -m "Rename title to Release"`,
+    ],
+    tryThis: [
+      { label: "Merge rename into main", command: "git merge rename" },
+      { label: "Fix config.yml, then mark it resolved", command: "git add config.yml" },
+      { label: "Finish the merge", command: 'git commit -m "Merge rename"' },
     ],
   },
 ];

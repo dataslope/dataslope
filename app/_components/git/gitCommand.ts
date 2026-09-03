@@ -598,7 +598,7 @@ These are the commands this playground supports:
    cat-file   Provide contents or details of repository objects
 `;
 
-  return async (args: string[], ctx: { cwd?: string }): Promise<ExecResult> => {
+  const run = async (args: string[], ctx: { cwd?: string }): Promise<ExecResult> => {
     const cwd = ctx?.cwd ?? dir;
     const [sub, ...rest] = args;
     try {
@@ -677,4 +677,14 @@ These are the commands this playground supports:
       return fail(`fatal: ${message}\n`, 128);
     }
   };
+
+  // The pending merge is read by the worker after every command, so the UI
+  // can say "merge in progress" without parsing `git status` output. A live
+  // getter, defined rather than assigned: `Object.assign` would evaluate it
+  // once and copy the `null` it returned before any merge had happened.
+  Object.defineProperty(run, "merging", {
+    get: (): string | null => pendingMerge?.branch ?? null,
+    enumerable: true,
+  });
+  return run as typeof run & { readonly merging: string | null };
 }

@@ -194,22 +194,30 @@ export function useGitSession(
     };
   }, [scenario, sessionId, repo, kind, track]);
 
+  // The request functions depend only on the session, not on its state, so
+  // they keep their identity across responses. A file editor that reloads
+  // when `readFile` changes would otherwise reset its draft on every command.
+  const exec = useCallback(
+    (command: string) => request({ type: "exec", session: sessionId, command }),
+    [sessionId],
+  );
+  const resetSession = useCallback(() => {
+    seededRepos.delete(`${sessionId}:${scenario}:${kind}`);
+    return request({ type: "reset", session: sessionId, scenario, kind });
+  }, [sessionId, scenario, kind]);
+  const readFile = useCallback(
+    (path: string) => request({ type: "readFile", session: sessionId, path }),
+    [sessionId],
+  );
+  const writeFile = useCallback(
+    (path: string, content: string) =>
+      request({ type: "writeFile", session: sessionId, path, content }),
+    [sessionId],
+  );
+
   return useMemo<GitSession>(
-    () => ({
-      state,
-      ready,
-      error,
-      sessionId,
-      exec: (command) => request({ type: "exec", session: sessionId, command }),
-      reset: () => {
-        seededRepos.delete(`${sessionId}:${scenario}:${kind}`);
-        return request({ type: "reset", session: sessionId, scenario, kind });
-      },
-      readFile: (path) => request({ type: "readFile", session: sessionId, path }),
-      writeFile: (path, content) =>
-        request({ type: "writeFile", session: sessionId, path, content }),
-    }),
-    [state, ready, error, sessionId, scenario, kind],
+    () => ({ state, ready, error, sessionId, exec, reset: resetSession, readFile, writeFile }),
+    [state, ready, error, sessionId, exec, resetSession, readFile, writeFile],
   );
 }
 

@@ -11,6 +11,7 @@
  */
 
 import type { FileStatus } from "./protocol";
+import { isConflicted } from "./repoFacts";
 
 /** `statusMatrix` codes → does this area hold the file? */
 const inHead = (f: FileStatus) => f.head === 1;
@@ -21,7 +22,8 @@ const inWorkdir = (f: FileStatus) => f.workdir !== 0;
 const indexDiffers = (f: FileStatus) => f.stage !== f.head && f.stage !== 0;
 const workdirDiffers = (f: FileStatus) => f.workdir === 2 && f.workdir !== f.stage;
 
-function areaLabel(f: FileStatus): string {
+function areaLabel(f: FileStatus, merging: string | null): string {
+  if (isConflicted(f, merging)) return "conflict";
   if (f.head === 0 && f.stage === 0) return "untracked";
   if (indexDiffers(f) && workdirDiffers(f)) return "staged, then edited";
   if (indexDiffers(f)) return "staged";
@@ -52,10 +54,14 @@ function Dot({
 export function ThreeAreasPanel({
   files,
   changed,
+  merging = null,
 }: {
   files: FileStatus[];
   /** Paths touched by the last command, highlighted for one render. */
   changed: Set<string>;
+  /** The branch a stopped merge is bringing in, so an unmerged file is
+   *  labelled "conflict" rather than "staged, then edited". */
+  merging?: string | null;
 }) {
   const rows = files.filter((f) => f.head !== 1 || f.workdir !== 1 || f.stage !== 1);
   const clean = files.length - rows.length;
@@ -93,7 +99,7 @@ export function ThreeAreasPanel({
                   <span className="git-areas-name" title={f.path}>
                     {f.path}
                   </span>
-                  <span className="git-areas-state">{areaLabel(f)}</span>
+                  <span className="git-areas-state">{areaLabel(f, merging)}</span>
                 </th>
                 <td>
                   <Dot

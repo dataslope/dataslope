@@ -60,7 +60,7 @@ export function StateStrip({
 
       {open && (
         <div className="sblock-panels">
-          <ThreeAreasPanel files={state.files} changed={changed} />
+          <ThreeAreasPanel files={state.files} changed={changed} merging={state.merging} />
           <CommitGraph commits={state.commits} detached={state.head.detached} />
         </div>
       )}

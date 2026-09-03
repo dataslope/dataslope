@@ -46,6 +46,13 @@ export interface RepoState {
    */
   dirs: string[];
   cwd: string;
+  /**
+   * The branch a conflicted merge is waiting to bring in, or null when no
+   * merge is in progress. isomorphic-git never writes MERGE_HEAD, so this is
+   * the only place the UI can learn that `git commit` will finish a merge
+   * and that a file marked "conflict" needs the reader's attention.
+   */
+  merging: string | null;
   /** Contents of small text files, for grading `fileContains` without a round
    *  trip per assertion. Bash sessions only, and capped (see the limits
    *  below) so a session cannot post megabytes back on every command. */
@@ -75,6 +82,7 @@ export const EMPTY_STATE: RepoState = {
   tree: [],
   dirs: [],
   cwd: "/repo",
+  merging: null,
 };
 
 /**

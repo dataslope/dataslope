@@ -1,357 +1,932 @@
 /* ─── Git playground shell ──────────────────────────────────────────────── */
 @import "./gitPanels.css";
 
-/* Layers on playground.css: the chrome (root/app/header/body) is shared, this
-   file only adds the three-pane body, the console, and the state panels. All
-   colors come from the same tokens the language playgrounds use. */
+/* Layers on playground.css: the chrome (root/app/header) is shared, this file
+   adds the two panes, the terminal strip beneath them, and the mobile sheet.
+   Every color is a role token the language playgrounds also read, or a step
+   on the brand ramp; the type floor is 12px and the touch floor 32px. */
 
-.git-body {
+.gitx-body {
   flex-direction: column;
+  --gitx-console-h: 300px;
 }
 
-/* ─── Tabs (mobile) ─── */
-.git-tabs {
-  display: none;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg);
-}
-
-.git-tab {
-  flex: 1;
-  padding: 9px 4px;
-  border: none;
-  border-bottom: 2px solid transparent;
-  background: transparent;
-  color: var(--text-dim);
+/* ─── Header ─── */
+.gitx-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--bg3);
+  color: var(--text-muted);
   font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 600;
+  padding: 4px 10px;
   cursor: pointer;
-}
-
-.git-tab:hover {
-  color: var(--text);
-}
-
-.git-tab.active {
-  color: var(--primary);
-  border-bottom-color: var(--primary);
-}
-
-/* ─── Three-pane body ─── */
-.git-panes {
-  display: grid;
-  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr) minmax(280px, 380px);
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.git-pane {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.git-pane-files {
-  border-right: 1px solid var(--border);
-  background: var(--bg);
-}
-
-.git-pane-terminal {
-  background: var(--bg2);
-}
-
-.git-pane-state {
-  border-left: 1px solid var(--border);
-  background: var(--bg);
-  overflow-y: auto;
-}
-
-/* ─── Pointer chain headline ─── */
-.git-headline {
-  padding: 8px 14px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text-muted);
-  font-family: var(--font-mono, monospace);
-  font-size: 12px;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: none;
+  transition:
+    color 0.12s,
+    background-color 0.12s,
+    border-color 0.12s;
 }
 
-/* ─── Command palette ─── */
-.git-palette-note {
-  margin: -4px 0 8px;
-  color: var(--text-dim);
-  font-family: var(--font-ui);
-  font-size: 11px;
+.gitx-btn:hover:not(:disabled) {
+  color: var(--text);
+  border-color: var(--text-dim);
 }
 
-.git-palette-group {
-  margin-bottom: 10px;
+.gitx-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
 }
 
-.git-palette-group h3 {
-  margin: 0 0 4px;
-  font-family: var(--font-ui);
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--text-dim);
+.gitx-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 
-.git-palette-group ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.gitx-btn.quiet {
+  background: transparent;
+  border-color: transparent;
+}
+
+.gitx-btn.quiet:hover:not(:disabled) {
+  background: var(--menu-item-hover);
+  border-color: transparent;
+}
+
+.gitx-btn.quiet.on {
+  color: var(--primary);
+  background: var(--primary-glow);
+}
+
+.gitx-btn.primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.gitx-btn.primary:hover:not(:disabled) {
+  color: #fff;
+  filter: brightness(1.08);
+}
+
+.gitx-btn.small {
+  min-height: 28px;
+  padding: 2px 8px;
+  font-size: 12.5px;
+}
+
+.gitx-btn.mono {
+  font-family: var(--font-mono, monospace);
+}
+
+.gitx-scenario {
+  gap: 8px;
+}
+
+.gitx-scenario-label {
+  font-weight: 600;
+}
+
+.gitx-scenario-popup {
+  min-width: 260px;
+}
+
+.gitx-scenario-item {
+  align-items: flex-start;
+}
+
+.gitx-scenario-text {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.git-palette-btn {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  width: 100%;
-  text-align: left;
-  border: 1px solid transparent;
-  border-radius: 5px;
-  background: transparent;
-  padding: 4px 7px;
-  cursor: pointer;
-}
-
-.git-palette-btn:hover {
-  background: var(--menu-item-hover);
-  border-color: var(--border);
-}
-
-.git-palette-label {
-  color: var(--text);
-  font-family: var(--font-ui);
+.gitx-scenario-desc {
   font-size: 12px;
-}
-
-.git-palette-cmd {
+  font-weight: 400;
   color: var(--text-dim);
-  font-family: var(--font-mono, monospace);
-  font-size: 10.5px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-/* ─── Working tree ─── */
-.git-files {
-  display: flex;
-  flex-direction: column;
+.gitx-branch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 0 4px;
+}
+
+.gitx-branch span {
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.gitx-branch.detached span {
+  color: var(--ds-orange-600);
+}
+
+/* ─── The stage: two panes ─── */
+.gitx-stage {
   flex: 1;
   min-height: 0;
-  border-bottom: none;
+  display: grid;
+  grid-template-columns: minmax(320px, 400px) minmax(0, 1fr);
 }
 
-.git-file-list {
+.gitx-seg {
+  display: none;
+}
+
+.gitx-pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  background: var(--bg);
+}
+
+.gitx-changes {
+  border-right: 1px solid var(--border);
+}
+
+.gitx-pane-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 4px 12px 4px 16px;
+  border-bottom: 1px solid var(--border);
+  flex: none;
+}
+
+.gitx-pane-sep {
+  flex: 1;
+}
+
+.gitx-pane-sub {
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+
+.gitx-pane-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 14px 16px 18px;
+}
+
+/* ─── New file ─── */
+.gitx-newfile {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.gitx-newfile-input {
+  flex: 1;
+  min-width: 0;
+  min-height: 32px;
+  border: 1px solid var(--primary);
+  border-radius: 7px;
+  background: var(--bg2);
+  color: var(--text);
+  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+  padding: 4px 10px;
+  outline: none;
+}
+
+/* ─── Try this ─── */
+.gitx-try {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg2);
+  padding: 10px 12px 8px;
+  margin-bottom: 14px;
+}
+
+.gitx-try-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.gitx-try-steps {
   list-style: none;
   margin: 0;
   padding: 0;
-  overflow-y: auto;
-  flex: none;
-  max-height: 40%;
+  display: grid;
+  gap: 2px;
 }
 
-.git-file {
-  display: flex;
+.gitx-try-step {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: 8px;
   align-items: center;
-  gap: 7px;
   width: 100%;
+  min-height: 36px;
+  padding: 4px 6px;
   border: none;
-  border-radius: 5px;
+  border-radius: 7px;
   background: transparent;
-  color: var(--text-muted);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.gitx-try-step:hover:not(:disabled) {
+  background: var(--menu-item-hover);
+}
+
+.gitx-try-step:disabled {
+  cursor: default;
+  color: var(--text-dim);
+}
+
+.gitx-try-mark {
+  grid-row: 1 / span 2;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--text-dim);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+.gitx-try-steps li.done .gitx-try-mark {
+  background: var(--ds-green-600);
+  border-color: var(--ds-green-600);
+  color: #fff;
+}
+
+.gitx-try-label {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.gitx-try-steps li.done .gitx-try-label {
+  text-decoration: line-through;
+  font-weight: 500;
+}
+
+.gitx-try-cmd {
   font-family: var(--font-mono, monospace);
   font-size: 12px;
-  padding: 4px 7px;
-  cursor: pointer;
-  text-align: left;
-}
-
-.git-file:hover {
-  background: var(--menu-item-hover);
-  color: var(--text);
-}
-
-.git-file.active {
-  background: var(--primary-glow);
-  color: var(--text);
-}
-
-.git-file-name {
+  color: var(--text-dim);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.git-file-mark {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  flex: none;
-  background: transparent;
-  border: 1px solid var(--text-dim);
+/* ─── Conflict banner ─── */
+.gitx-banner {
+  border: 1px solid color-mix(in srgb, var(--ds-red-500) 45%, transparent);
+  border-left: 4px solid var(--ds-red-500);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--ds-red-500) 8%, var(--bg));
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
 }
 
-.git-file-mark.modified {
-  background: var(--yellow);
-  border-color: var(--yellow);
+.gitx-banner code {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
 }
 
-.git-file-mark.staged {
-  background: var(--green);
-  border-color: var(--green);
-}
-
-.git-editor {
+.gitx-banner-actions {
   display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  margin-top: 10px;
-  border-top: 1px solid var(--border);
-  padding-top: 8px;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
 }
 
-.git-editor-head {
+/* ─── The three boxes ─── */
+.gitx-areas {
+  display: grid;
+  gap: 0;
+  --tone-new: var(--ds-blue-600);
+  --tone-modified: var(--ds-yellow-600);
+  --tone-staged: var(--ds-green-600);
+  --tone-deleted: var(--ds-red-600);
+  --tone-conflict: var(--ds-red-600);
+  --tone-clean: var(--text-dim);
+}
+
+html:is(.dark, [data-theme="dark"]) .gitx-areas {
+  --tone-new: var(--ds-blue-400);
+  --tone-modified: var(--ds-yellow-400);
+  --tone-staged: var(--ds-green-400);
+  --tone-deleted: var(--ds-red-400);
+  --tone-conflict: var(--ds-red-400);
+}
+
+.gitx-box {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.gitx-box.area-stage {
+  border-style: dashed;
+}
+
+.gitx-box.muted {
+  opacity: 0.55;
+}
+
+.gitx-box-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin-bottom: 6px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
 }
 
-.git-editor-head code {
-  color: var(--text-muted);
+.gitx-box-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.gitx-box-count {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.gitx-box-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 12px;
+  min-height: 52px;
+  align-content: flex-start;
+}
+
+.gitx-box-empty {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+
+.gitx-chain {
+  width: 100%;
+  margin: 4px 0 0;
   font-family: var(--font-mono, monospace);
-  font-size: 11px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.gitx-arrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0 2px 16px;
+  height: 30px;
+}
+
+.gitx-arrow-line {
+  width: 2px;
+  height: 100%;
+  background: var(--border);
+  position: relative;
+}
+
+.gitx-arrow-line::after {
+  content: "";
+  position: absolute;
+  left: -3px;
+  bottom: -1px;
+  border: 4px solid transparent;
+  border-top: 5px solid var(--text-dim);
+}
+
+.gitx-arrow-text {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.gitx-arrow-text code {
+  font-family: var(--font-mono, monospace);
+  color: var(--text-muted);
+}
+
+/* A file, as a chip that can move. */
+.gitx-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
+  max-width: 100%;
+  padding: 3px 10px 3px 9px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg2);
+  color: var(--text);
+  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+  will-change: transform;
+}
+
+.gitx-chip:hover {
+  border-color: var(--text-dim);
+}
+
+.gitx-chip:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.gitx-chip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--tone-clean);
+}
+
+.gitx-chip.tone-new .gitx-chip-dot { background: var(--tone-new); }
+.gitx-chip.tone-modified .gitx-chip-dot { background: var(--tone-modified); }
+.gitx-chip.tone-staged .gitx-chip-dot { background: var(--tone-staged); }
+.gitx-chip.tone-deleted .gitx-chip-dot { background: transparent; border: 2px solid var(--tone-deleted); }
+.gitx-chip.tone-conflict .gitx-chip-dot { background: var(--tone-conflict); }
+
+.gitx-chip.tone-conflict {
+  border-color: color-mix(in srgb, var(--tone-conflict) 55%, transparent);
+}
+
+.gitx-chip.tone-deleted .gitx-chip-path {
+  text-decoration: line-through;
+  color: var(--text-dim);
+}
+
+.gitx-chip-path {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.git-editor-area {
-  flex: 1;
-  min-height: 120px;
-  resize: none;
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--text);
-  font-family: var(--font-mono, monospace);
-  font-size: 12px;
-  line-height: 1.5;
-  padding: 8px;
-  outline: none;
+.gitx-chip-word {
+  font-family: var(--font-ui);
+  font-size: 11.5px;
+  color: var(--text-dim);
+  white-space: nowrap;
 }
 
-.git-editor-area:focus {
+.gitx-chip.tone-conflict .gitx-chip-word {
+  color: var(--tone-conflict);
+  font-weight: 600;
+}
+
+/* The one thing lit at a time: the chip that just moved, or just changed. */
+.gitx-chip.moving,
+.gitx-chip.changed {
+  box-shadow: 0 0 0 3px var(--primary-glow);
   border-color: var(--primary);
 }
 
-.git-editor-msg {
-  margin: 5px 0 0;
-  color: var(--text-dim);
-  font-family: var(--font-ui);
-  font-size: 11px;
+.gitx-chip.changed {
+  transition: box-shadow 0.4s ease, border-color 0.4s ease;
 }
 
-/* ─── Header extras ─── */
-.git-scenario {
+.gitx-chip-more {
+  align-self: center;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* ─── File editor ─── */
+.gitx-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  gap: 8px;
+}
+
+.gitx-editor-head {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.git-scenario-label {
-  color: var(--text-dim);
-  font-family: var(--font-ui);
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.git-scenario select {
-  appearance: none;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--text);
-  font-family: var(--font-ui);
-  font-size: 12px;
-  padding: 4px 8px;
-  cursor: pointer;
-}
-
-.git-header-btn {
+.gitx-editor-name {
   display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--bg3);
-  color: var(--text-muted);
-  font-family: var(--font-ui);
-  font-size: 12px;
-  font-weight: 600;
-  padding: 4px 9px;
-  cursor: pointer;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
 }
 
-.git-header-btn:hover:not(:disabled) {
+.gitx-editor-name code {
+  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.gitx-editor-name small {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.gitx-editor-sep {
+  flex: 1;
+}
+
+.gitx-conflict-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--ds-red-500) 45%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--ds-red-500) 8%, var(--bg));
+  font-family: var(--font-ui);
+  font-size: 12.5px;
   color: var(--text);
 }
 
-.git-header-btn:disabled {
+.gitx-conflict-tools code {
+  font-family: var(--font-mono, monospace);
+}
+
+.gitx-conflict-btns {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.gitx-editor-area {
+  flex: 1;
+  min-height: 200px;
+  resize: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg2);
+  color: var(--text);
+  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+  line-height: 1.55;
+  padding: 10px 12px;
+  outline: none;
+  tab-size: 2;
+}
+
+.gitx-editor-area:focus {
+  border-color: var(--primary);
+}
+
+.gitx-editor-area.conflicted {
+  border-color: color-mix(in srgb, var(--ds-red-500) 55%, transparent);
+}
+
+.gitx-editor-note {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* ─── The terminal strip ─── */
+.gitx-console {
+  flex: none;
+  height: var(--gitx-console-h);
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+  position: relative;
+}
+
+.gitx-handle {
+  position: absolute;
+  top: -5px;
+  left: 0;
+  right: 0;
+  height: 10px;
+  border: none;
+  background: transparent;
+  cursor: row-resize;
+  z-index: 2;
+  padding: 0;
+}
+
+.gitx-handle span {
+  display: none;
+}
+
+.gitx-handle:hover,
+.gitx-handle:focus-visible {
+  background: linear-gradient(to bottom, transparent 4px, var(--primary) 4px, var(--primary) 6px, transparent 6px);
+  outline: none;
+}
+
+.gitx-console-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 4px 12px 4px 16px;
+  border-bottom: 1px solid var(--border);
+  flex: none;
+  flex-wrap: wrap;
+}
+
+.gitx-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: 6px;
+}
+
+/* A suggestion: what the palette used to be, as a handful in context. */
+.gitx-step {
+  min-height: 28px;
+  padding: 2px 10px;
+  border: 1px solid color-mix(in srgb, var(--primary) 40%, transparent);
+  border-radius: 999px;
+  background: var(--primary-glow);
+  color: var(--primary);
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.gitx-step:hover:not(:disabled) {
+  border-color: var(--primary);
+}
+
+.gitx-step:disabled {
   opacity: 0.5;
   cursor: default;
 }
 
-/* ─── Mobile: the three panes become tabs, terminal first ─── */
+.gitx-palette-backdrop {
+  position: fixed;
+  inset: 0;
+  border: none;
+  background: transparent;
+  z-index: 20;
+  cursor: default;
+}
+
+.gitx-palette {
+  position: absolute;
+  right: 12px;
+  bottom: calc(100% - 40px);
+  width: min(360px, calc(100vw - 24px));
+  max-height: 60vh;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.35);
+  z-index: 21;
+}
+
+.gitx-palette .git-panel {
+  border: none;
+}
+
+.gitx-console-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  background: var(--bg);
+}
+
+.gitx-console-body .git-terminal-scroll {
+  padding: 10px 16px;
+  cursor: text;
+}
+
+.gitx-console-body .git-terminal-out {
+  color: var(--text);
+}
+
+.gitx-console-body .git-terminal-prompt {
+  font-weight: 400;
+}
+
+.gitx-console-body .git-terminal-out,
+.gitx-console-body .git-terminal-err,
+.gitx-console-body .git-terminal-busy {
+  padding-left: 0;
+}
+
+.gitx-console-body .git-terminal-block {
+  margin-bottom: 0;
+}
+
+.gitx-console-body .git-terminal-out,
+.gitx-console-body .git-terminal-err {
+  margin-top: 0;
+}
+
+.gitx-console-body .git-terminal-line {
+  color: var(--ds-green);
+}
+
+/* The line under the prompt: always-current status, then what just happened.
+   Room on the right for the site's assistant button. */
+.gitx-console-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  padding: 6px 84px 8px 16px;
+  border-top: 1px solid var(--border);
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  color: var(--text-dim);
+  flex: none;
+}
+
+.gitx-narration {
+  color: var(--text);
+}
+
+/* ─── Mobile: one pane at a time, the terminal as a sheet ─── */
 @media (max-width: 860px) {
-  .git-tabs {
-    display: flex;
-  }
-
-  .git-panes {
-    display: block;
-    overflow-y: auto;
-  }
-
-  .git-pane {
+  .gitx-btn-label {
     display: none;
-    height: 100%;
   }
 
-  .git-panes[data-tab="terminal"] .git-pane-terminal,
-  .git-panes[data-tab="state"] .git-pane-state,
-  .git-panes[data-tab="files"] .git-pane-files {
-    display: flex;
+  .gitx-scenario-label {
+    display: none;
   }
 
-  .git-pane-files,
-  .git-pane-state {
+  .gitx-branch {
+    display: none;
+  }
+
+  .gitx-stage {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .gitx-seg {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  .gitx-seg-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 44px;
     border: none;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--text-dim);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
   }
 
-  .git-scenario-label {
+  .gitx-seg-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+  }
+
+  .gitx-pane {
     display: none;
   }
 
-  .git-header-btn span {
+  .gitx-stage[data-pane="changes"] .gitx-changes,
+  .gitx-stage[data-pane="history"] .gitx-history {
+    display: flex;
+  }
+
+  .gitx-changes {
+    border-right: none;
+  }
+
+  .gitx-pane-head .pane-label {
     display: none;
+  }
+
+  .gitx-pane-body {
+    padding: 12px 14px 16px;
+  }
+
+  .gitx-console {
+    min-height: 0;
+    height: 46dvh;
+    transition: height 0.2s ease;
+    box-shadow: 0 -8px 24px -16px rgba(0, 0, 0, 0.4);
+  }
+
+  .gitx-console[data-sheet="peek"] {
+    height: 128px;
+  }
+
+  .gitx-console[data-sheet="full"] {
+    height: calc(100dvh - 44px - 48px);
+  }
+
+  .gitx-handle {
+    position: static;
+    height: 22px;
+    cursor: grab;
+    touch-action: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .gitx-handle:hover,
+  .gitx-handle:focus-visible {
+    background: transparent;
+  }
+
+  .gitx-handle span {
+    display: block;
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+  }
+
+  .gitx-console-head {
+    min-height: 36px;
+    padding: 2px 10px 6px 14px;
+  }
+
+  .gitx-console-head .pane-label {
+    display: none;
+  }
+
+  .gitx-steps {
+    margin-left: 0;
+  }
+
+  .gitx-console-foot {
+    padding-right: 76px;
+  }
+
+  .gitx-palette {
+    right: 8px;
+    left: 8px;
+    width: auto;
+    bottom: calc(100% - 58px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gitx-console,
+  .gitx-chip,
+  .gitx-btn {
+    transition: none;
   }
 }
