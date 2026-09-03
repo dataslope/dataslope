@@ -25,6 +25,10 @@ import {
   makeSqlEditorCompartments,
   makeSqlLangExtension,
 } from "../sql/shared/editorSetup";
+import {
+  DEFAULT_COMPLETION_TRIGGER,
+  setCompletionTrigger,
+} from "../completion/completionPrefs";
 import { Combobox } from "@base-ui/react/combobox";
 import { Dialog } from "@base-ui/react/dialog";
 import { Menu } from "@base-ui/react/menu";
@@ -2734,6 +2738,7 @@ function PostgresPlaygroundInner() {
     setEditorTheme(D.editorTheme);
     setWordWrap(D.wordWrap);
     setClearBeforeRun(D.clearBeforeRun);
+    setCompletionTrigger(DEFAULT_COMPLETION_TRIGGER);
     showToast("Default settings restored.");
   }, [
     setFontSize,

@@ -17,6 +17,12 @@ import {
   STDIN_FILENAME,
   type CFamilyLanguage,
 } from "./browserccBuild";
+import {
+  cc1ArgsFromDriverOutput,
+  identifierStart,
+  parseClangCompletions,
+  tarEntries,
+} from "./clangCompletion";
 
 declare const self: DedicatedWorkerGlobalScope;
 
@@ -40,9 +46,22 @@ interface BrowserccCompileResult {
   module: WebAssembly.Module | null;
 }
 
+/** Emscripten module for the clang binary, from browsercc's `Clang`
+ *  factory (exported beside `compile`). */
+interface ClangModule {
+  FS: {
+    writeFile(path: string, data: string | Uint8Array): void;
+    mkdirTree(path: string): void;
+    analyzePath(path: string): { exists: boolean };
+  };
+  callMain(args: string[]): number;
+}
+type ClangFactory = (options: Record<string, unknown>) => Promise<ClangModule>;
+
 interface BrowserccApi {
   compile(job: BrowserccCompileJob): Promise<BrowserccCompileResult>;
   getPrecompiledHeader(flags: string[]): Promise<ArrayBuffer | null>;
+  Clang?: ClangFactory;
 }
 
 interface WasiInstance {
@@ -84,7 +103,29 @@ type InMessage =
       /** Extra workspace files (path → text) so `#include "dog.h"` and
        *  multi-source builds work. */
       files?: Array<[string, string]>;
+    }
+  | {
+      kind: "complete";
+      id: number;
+      language: CFamilyLanguage;
+      /** The editor's document (with any read-only init code prepended). */
+      doc: string;
+      entryPath?: string;
+      files?: Array<[string, string]>;
+      /** 1-based line and 0-based column of the cursor within `doc`. */
+      lineNumber: number;
+      column: number;
     };
+
+/** Mirrors `CompletionItemDetail` in ../types. */
+interface CompletionItemMessage {
+  label: string;
+  type?: string;
+  detail?: string;
+  info?: string;
+  apply?: string;
+  boost?: number;
+}
 
 type OutMessage =
   | { kind: "loading"; message: string }
@@ -102,7 +143,13 @@ type OutMessage =
       append: boolean;
     }
   | { kind: "done"; id: number }
-  | { kind: "error"; id: number; message: string };
+  | { kind: "error"; id: number; message: string }
+  | {
+      kind: "complete-result";
+      id: number;
+      completions: CompletionItemMessage[];
+      replaceLength: number;
+    };
 
 function post(msg: OutMessage) {
   self.postMessage(msg);
@@ -351,6 +398,213 @@ async function runCode(
   }
 }
 
+// ─── Code completion (clang's own completer) ─────────────────────────────
+// Each request is a fresh clang instance over a module compiled once
+// (~60 ms to instantiate, measured) plus one cc1 run with
+// `-code-completion-at` (~0.1–0.4 s for C, ~0.1 s for C++ with the PCH).
+// The driver's `-###` dry run, which only turns flags into the cc1 vector,
+// is cached per language since only the position argument changes. No
+// download beyond what Run already fetched: clang.wasm, the sysroot's
+// headers, and (for C++) the PCH.
+
+const COMPLETION_AT_PLACEHOLDER = "-code-completion-at=@@";
+
+let clangModulePromise: Promise<WebAssembly.Module | null> | null = null;
+let sysrootHeadersPromise: Promise<Array<[string, Uint8Array]> | null> | null =
+  null;
+const cc1ArgsCache = new Map<string, Promise<string[] | null>>();
+/** The newest completion request; older ones still queued answer empty
+ *  rather than spend a clang run on a cursor that has moved on. */
+let latestCompleteId = 0;
+
+function ensureClangModule(): Promise<WebAssembly.Module | null> {
+  clangModulePromise ??= (async () => {
+    try {
+      const res = await fetch(new URL("clang.wasm", BROWSERCC_URL).href);
+      if (!res.ok) throw new Error(`clang.wasm: HTTP ${res.status}`);
+      return typeof WebAssembly.compileStreaming === "function"
+        ? await WebAssembly.compileStreaming(res)
+        : await WebAssembly.compile(await res.arrayBuffer());
+    } catch (err) {
+      console.warn(
+        "[browsercc-worker] clang module cache failed; completion instantiates per request.",
+        err,
+      );
+      return null;
+    }
+  })();
+  return clangModulePromise;
+}
+
+/** The sysroot's headers, as (path, bytes). Only headers: the libraries
+ *  are for linking, which `-fsyntax-only` never does. */
+function ensureSysrootHeaders(): Promise<Array<[string, Uint8Array]> | null> {
+  sysrootHeadersPromise ??= (async () => {
+    try {
+      const res = await fetch(new URL("sysroot.tar", BROWSERCC_URL).href);
+      if (!res.ok) throw new Error(`sysroot.tar: HTTP ${res.status}`);
+      const headers: Array<[string, Uint8Array]> = [];
+      for (const entry of tarEntries(await res.arrayBuffer())) {
+        if (entry.name.endsWith("/")) continue;
+        if (!/(^|\/)include\//.test(entry.name)) continue;
+        headers.push([entry.name, entry.content]);
+      }
+      return headers;
+    } catch (err) {
+      console.warn("[browsercc-worker] sysroot headers unavailable; no completion.", err);
+      return null;
+    }
+  })();
+  return sysrootHeadersPromise;
+}
+
+async function makeClang(
+  api: BrowserccApi,
+  options: Record<string, unknown>,
+): Promise<ClangModule> {
+  if (!api.Clang) throw new Error("browsercc exposes no Clang factory");
+  const compiled = await ensureClangModule();
+  if (!compiled) return api.Clang(options);
+  return api.Clang({
+    ...options,
+    instantiateWasm: (
+      imports: WebAssembly.Imports,
+      done: (instance: WebAssembly.Instance, mod: WebAssembly.Module) => void,
+    ) => {
+      void WebAssembly.instantiate(compiled, imports).then((instance) =>
+        done(instance, compiled),
+      );
+      return {};
+    },
+  });
+}
+
+function mountFiles(
+  clang: ClangModule,
+  files: Iterable<[string, string | Uint8Array | ArrayBuffer]>,
+): void {
+  for (const [name, content] of files) {
+    const dir = name.split("/").slice(0, -1).join("/");
+    if (dir && !clang.FS.analyzePath(dir).exists) clang.FS.mkdirTree(dir);
+    clang.FS.writeFile(
+      name,
+      content instanceof ArrayBuffer ? new Uint8Array(content) : content,
+    );
+  }
+}
+
+/** The cc1 vector for `flags`, position argument left as a placeholder. */
+function cc1ArgsFor(
+  api: BrowserccApi,
+  unitName: string,
+  flags: string[],
+): Promise<string[] | null> {
+  const key = `${unitName}\0${flags.join("\0")}`;
+  let pending = cc1ArgsCache.get(key);
+  if (!pending) {
+    pending = (async () => {
+      let stderr = "";
+      const clang = await makeClang(api, {
+        thisProgram: "clang++",
+        printErr: (line: string) => {
+          stderr += line + "\n";
+        },
+      });
+      clang.FS.writeFile(unitName, "");
+      // The driver looks for the sysroot's runtime objects; empty
+      // stand-ins satisfy it, as in browsercc's own driver step.
+      mountFiles(clang, [
+        ["/lib/wasm32-wasi/crt1-command.o", new Uint8Array(0)],
+        ["/lib/wasm32-wasi/crt1-reactor.o", new Uint8Array(0)],
+      ]);
+      clang.FS.mkdirTree("/include/c++/v1");
+      const code = clang.callMain([
+        unitName,
+        ...flags,
+        "-fsyntax-only",
+        "-Xclang",
+        COMPLETION_AT_PLACEHOLDER,
+        "-Xclang",
+        "-code-completion-macros",
+        "-###",
+      ]);
+      return code === 0 ? cc1ArgsFromDriverOutput(stderr) : null;
+    })().catch(() => null);
+    cc1ArgsCache.set(key, pending);
+    // A failure is not cached: the next request retries.
+    void pending.then((args) => {
+      if (!args) cc1ArgsCache.delete(key);
+    });
+  }
+  return pending;
+}
+
+async function completeCode(
+  id: number,
+  language: CFamilyLanguage,
+  doc: string,
+  entryPath: string,
+  files: Array<[string, string]>,
+  lineNumber: number,
+  column: number,
+): Promise<void> {
+  const empty = () =>
+    post({ kind: "complete-result", id, completions: [], replaceLength: 0 });
+  const api = browserccApi;
+  if (!api?.Clang || id !== latestCompleteId) return empty();
+  const headers = await ensureSysrootHeaders();
+  if (!headers) return empty();
+
+  const flags =
+    language === "cpp" ? [...CPP_COMPILE_FLAGS] : [...C_COMPILE_FLAGS];
+  const extra: Array<[string, string | ArrayBuffer]> = [];
+  if (language === "cpp") {
+    const pch = pchPromise ? await pchPromise : null;
+    if (pch) {
+      flags.push("-include-pch", PCH_VFS_PATH);
+      extra.push([PCH_VFS_PATH, pch]);
+    }
+  }
+  const unit = composeTranslationUnit({
+    language,
+    entryPath,
+    entryCode: doc,
+    files,
+  });
+  const template = await cc1ArgsFor(api, unit.fileName, flags);
+  if (!template || id !== latestCompleteId) return empty();
+
+  const lineText = doc.split("\n")[lineNumber - 1] ?? "";
+  const { column1, prefixLength } = identifierStart(lineText, column);
+  const args = template.map((arg) =>
+    arg === COMPLETION_AT_PLACEHOLDER
+      ? `-code-completion-at=${entryPath}:${lineNumber}:${column1}`
+      : arg,
+  );
+
+  let stdout = "";
+  const clang = await makeClang(api, {
+    thisProgram: "clang++",
+    print: (line: string) => {
+      stdout += line + "\n";
+    },
+    printErr: () => {},
+  });
+  clang.FS.writeFile(unit.fileName, unit.source);
+  mountFiles(clang, headers);
+  mountFiles(clang, Object.entries(unit.extraFiles));
+  mountFiles(clang, extra);
+  try {
+    clang.callMain(args);
+  } catch {
+    // A parse that traps still printed what it completed first.
+  }
+  const completions = parseClangCompletions(stdout, {
+    typedPrefix: lineText.slice(column - prefixLength, column),
+  });
+  post({ kind: "complete-result", id, completions, replaceLength: prefixLength });
+}
+
 // Serialise requests, browsercc is not reentrant within a single worker.
 let workQueue: Promise<unknown> = Promise.resolve();
 
@@ -373,6 +627,22 @@ self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
         throw err;
       });
     }
+    return;
+  }
+
+  if (msg.kind === "complete") {
+    const { id, language, doc, files = [], lineNumber, column } = msg;
+    const entryPath = msg.entryPath || (language === "c" ? "main.c" : "main.cpp");
+    latestCompleteId = id;
+    enqueue(async () => {
+      try {
+        if (initPromise) await initPromise;
+        await completeCode(id, language, doc, entryPath, files, lineNumber, column);
+      } catch {
+        // Best-effort: a completion that fails shows nothing.
+        post({ kind: "complete-result", id, completions: [], replaceLength: 0 });
+      }
+    });
     return;
   }
 

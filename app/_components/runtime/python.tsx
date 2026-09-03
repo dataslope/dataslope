@@ -2,6 +2,9 @@ import type {
   CompletionListItem,
   CompletionRequest,
   CompletionResult,
+  HoverResult,
+  PositionRequest,
+  SignatureHelpResult,
   EmitOutput,
   ExampleSnippet,
   LanguageAdapter,
@@ -687,6 +690,12 @@ type WorkerOutMessage =
       id: number;
       completions: CompletionListItem[];
       replaceLength: number;
+    }
+  | { kind: "hover-result"; id: number; result: HoverResult | null }
+  | {
+      kind: "signature-result";
+      id: number;
+      result: SignatureHelpResult | null;
     };
 
 /**
@@ -934,6 +943,49 @@ class PyodideWorkerRuntime implements LanguageRuntime {
         column: request.column,
       });
     });
+  }
+
+  /** One jedi position query over the worker; null when the worker is
+   *  restarting or the analyzer has nothing to say. */
+  private positionQuery<T>(
+    kind: "hover" | "signature",
+    request: PositionRequest,
+  ): Promise<T | null> {
+    if (this.restartPromise) return Promise.resolve(null);
+    const id = ++this.nextId;
+    const worker = this.worker;
+    const resultKind = `${kind}-result`;
+    return new Promise<T | null>((resolve) => {
+      const settle = (result: T | null) => {
+        worker.removeEventListener("message", onMessage);
+        this.pendingAborts.delete(release);
+        resolve(result);
+      };
+      const release = () => settle(null);
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        if (msg.kind !== "hover-result" && msg.kind !== "signature-result") return;
+        if (msg.kind !== resultKind || msg.id !== id) return;
+        settle(msg.result as T | null);
+      };
+      this.pendingAborts.add(release);
+      worker.addEventListener("message", onMessage);
+      worker.postMessage({
+        kind,
+        id,
+        doc: request.doc,
+        lineNumber: request.lineNumber,
+        column: request.column,
+      });
+    });
+  }
+
+  hover(request: PositionRequest): Promise<HoverResult | null> {
+    return this.positionQuery<HoverResult>("hover", request);
+  }
+
+  signatureHelp(request: PositionRequest): Promise<SignatureHelpResult | null> {
+    return this.positionQuery<SignatureHelpResult>("signature", request);
   }
 
   async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {

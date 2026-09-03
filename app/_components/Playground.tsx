@@ -44,6 +44,10 @@ import {
   type AiEditSuggestion,
 } from "./ai/editSuggestions";
 import { languageCompletion } from "./completion/languageCompletion";
+import {
+  DEFAULT_COMPLETION_TRIGGER,
+  setCompletionTrigger,
+} from "./completion/completionPrefs";
 
 import type {
   ExampleSnippet,
@@ -1986,6 +1990,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     setEditorTheme(D.editorTheme);
     setWordWrap(D.wordWrap);
     setClearBeforeRun(CODE_CLEAR_BEFORE_RUN_DEFAULT);
+    setCompletionTrigger(DEFAULT_COMPLETION_TRIGGER);
     showToast("Default settings restored.");
   }, [
     setFontSize,

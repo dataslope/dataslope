@@ -37,7 +37,9 @@ export const MERMAID_CDN = `https://cdn.jsdelivr.net/npm/mermaid@${MERMAID_VERSI
 
 // TypeScript compiler for JS/TS intellisense (ts-language-worker.ts),
 // loaded via importScripts so it stays out of the client chunks. Keep
-// TYPESCRIPT_VERSION in sync with `typescript` in package.json.
+// TYPESCRIPT_VERSION in sync with `typescript` in package.json, and keep
+// it on the 5.x/6.x line: typescript@7 on npm is the native (Go) compiler,
+// shipped as platform binaries with no `lib/typescript.js` to import.
 export const TYPESCRIPT_VERSION = "5.9.3";
 export const TYPESCRIPT_CDN_BASE = `https://cdn.jsdelivr.net/npm/typescript@${TYPESCRIPT_VERSION}`;
 

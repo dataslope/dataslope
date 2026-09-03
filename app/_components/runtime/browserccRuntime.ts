@@ -11,6 +11,9 @@
  * worker, stand a fresh one up.
  */
 import type {
+  CompletionItemDetail,
+  CompletionRequest,
+  CompletionResult,
   EmitOutput,
   LanguageRuntime,
   RunOptions,
@@ -30,7 +33,13 @@ export type WorkerOutMessage =
       append: boolean;
     }
   | { kind: "done"; id: number }
-  | { kind: "error"; id: number; message: string };
+  | { kind: "error"; id: number; message: string }
+  | {
+      kind: "complete-result";
+      id: number;
+      completions: CompletionItemDetail[];
+      replaceLength: number;
+    };
 
 /** Files worth handing the compiler, per language, plus the stdin buffer. */
 const STAGED_FILE_RE: Record<CFamilyLanguage, RegExp> = {
@@ -47,6 +56,10 @@ const STAGED_FILE_RE: Record<CFamilyLanguage, RegExp> = {
  * nothing but the hang.
  */
 export const RUN_TIMEOUT_MS = 20_000;
+
+/** A completion queued behind a run waits for it; past this it is a popup
+ *  for a cursor that has long moved on. */
+const COMPLETION_TIMEOUT_MS = RUN_TIMEOUT_MS + 5_000;
 
 /** Boot a browsercc worker and wait for it to be usable. */
 export function spawnBrowserccWorker(
@@ -140,6 +153,54 @@ export class BrowserccRuntime implements LanguageRuntime {
       }
     })();
     return this.restartPromise;
+  }
+
+  /** Intellisense from clang's own completer, run in the worker over the
+   *  same translation unit Run compiles. */
+  async complete(request: CompletionRequest): Promise<CompletionResult> {
+    const empty: CompletionResult = { list: [], replaceLength: 0 };
+    if (this.restartPromise) return empty;
+    const id = ++this.nextId;
+    const worker = this.worker;
+    const keep = STAGED_FILE_RE[this.language];
+    const entryPath =
+      request.filename && keep.test(request.filename)
+        ? request.filename
+        : this.language === "c"
+          ? "main.c"
+          : "main.cpp";
+    const files: Array<[string, string]> = [];
+    for (const [path, content] of this.stagedFiles) {
+      if (path !== entryPath && path !== STDIN_FILENAME) {
+        files.push([path, content]);
+      }
+    }
+    return new Promise<CompletionResult>((resolve) => {
+      let timer: number | null = null;
+      const settle = (result: CompletionResult) => {
+        if (timer !== null) window.clearTimeout(timer);
+        worker.removeEventListener("message", onMessage);
+        resolve(result);
+      };
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        if (msg.kind !== "complete-result" || msg.id !== id) return;
+        settle({ list: msg.completions, replaceLength: msg.replaceLength });
+      };
+      worker.addEventListener("message", onMessage);
+      // A worker terminated by Stop never answers this listener.
+      timer = window.setTimeout(() => settle(empty), COMPLETION_TIMEOUT_MS);
+      worker.postMessage({
+        kind: "complete",
+        id,
+        language: this.language,
+        doc: request.doc,
+        entryPath,
+        files,
+        lineNumber: request.lineNumber,
+        column: request.column,
+      });
+    });
   }
 
   async run(

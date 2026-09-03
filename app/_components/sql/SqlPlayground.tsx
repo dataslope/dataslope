@@ -23,6 +23,10 @@ import {
   makeSqlEditorCompartments,
   makeSqlLangExtension,
 } from "./shared/editorSetup";
+import {
+  DEFAULT_COMPLETION_TRIGGER,
+  setCompletionTrigger,
+} from "../completion/completionPrefs";
 import { Popover } from "@base-ui/react/popover";
 import { Dialog } from "@base-ui/react/dialog";
 import { Tabs } from "@base-ui/react/tabs";
@@ -1302,6 +1306,7 @@ function SqlPlaygroundInner() {
     setEditorTheme(D.editorTheme);
     setWordWrap(D.wordWrap);
     setClearBeforeRun(D.clearBeforeRun);
+    setCompletionTrigger(DEFAULT_COMPLETION_TRIGGER);
     showToast("Default settings restored.");
   }, [
     setFontSize,

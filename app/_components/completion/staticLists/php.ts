@@ -1,5 +1,7 @@
 import type { Completion } from "@codemirror/autocomplete";
 
+import { PHP_BUILTINS } from "./phpBuiltins.generated";
+
 // Static completion tier for PHP: no in-browser language server exists
 // (Intelephense is closed-source, phpactor has no wasm port), so the ceiling
 // is keywords + common builtins with signatures. `$variable` completion
@@ -209,8 +211,32 @@ const PHP_FUNCTIONS: readonly Completion[] = [
   fn("checkdate", "(int $month, int $day, int $year): bool"),
 ];
 
+/** Every internal function php-wasm ships, from the generated catalogue
+ *  (signature as detail, one-line summary as info); the hand-written list
+ *  above only fills in what the stubs lack. */
+function builtinCompletions(): Completion[] {
+  // Language constructs stay keywords even where the stubs spell them as
+  // functions (`clone`, `echo`).
+  const seen = new Set<string>([...PHP_KEYWORDS, ...PHP_CONSTANTS].map((c) => c.label));
+  const out: Completion[] = [];
+  for (const [name, params, returns, summary] of PHP_BUILTINS) {
+    if (seen.has(name)) continue;
+    seen.add(name);
+    out.push({
+      label: name,
+      type: "function",
+      detail: `(${params})${returns ? `: ${returns}` : ""}`,
+      info: summary || undefined,
+    });
+  }
+  for (const c of PHP_FUNCTIONS) {
+    if (!seen.has(c.label)) out.push(c);
+  }
+  return out;
+}
+
 export const PHP_COMPLETIONS: readonly Completion[] = [
   ...PHP_KEYWORDS,
   ...PHP_CONSTANTS,
-  ...PHP_FUNCTIONS,
+  ...builtinCompletions(),
 ];

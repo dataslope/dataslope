@@ -5,6 +5,9 @@ import {
   type CompletionResult,
   type CompletionSource,
 } from "@codemirror/autocomplete";
+import type { Text } from "@codemirror/state";
+
+import { documentIdentifiers, recencyBoost } from "../completion/ranking";
 
 /** Column metadata. Plain strings are accepted everywhere a column is
  *  expected so lightweight callers (and CTE extraction, which only sees
@@ -106,6 +109,11 @@ const sqlIdentifierPattern =
 const qualifiedIdentifierPattern = new RegExp(
   `(${sqlIdentifierPattern})\\.\\s*([A-Za-z_][A-Za-z0-9_$]*)?$`,
 );
+/** `expr AS alias` at the end of a SELECT-list item. */
+const selectAliasPattern = new RegExp(
+  String.raw`\s+AS\s+(${sqlIdentifierPattern})\s*$`,
+  "i",
+);
 // Words that look like identifiers but introduce a new clause and so must
 // never be captured as a table alias, without this guard the alias group
 // would greedily eat the next clause keyword (e.g. "FROM t JOIN" → alias=JOIN)
@@ -183,7 +191,137 @@ const BOOST = {
   tableInKeywordContext: 10,
   typeInColumnDef: 70,
   functionPenalty: 1,
+  // Ordering signals layered on the slot boosts above, small enough to
+  // reorder within a section and never to move one section past another.
+  /** A name already used in the document (locality). */
+  localityBump: 3,
+  /** In ORDER BY / GROUP BY / HAVING, a column the SELECT list uses. */
+  selectListBump: 8,
+  /** A SELECT-list alias offered in ORDER BY / GROUP BY / HAVING: the
+   *  aggregate the query just computed is the likeliest sort key, so it
+   *  sits above even a used, bumped column (90 + 8 + 3). */
+  selectAlias: 102,
+  /** Bumped columns must stay below the join-condition section. */
+  bumpCeiling: 94,
 } as const;
+
+/** Signatures and one-line descriptions for the catalog functions, shown
+ *  as the popup detail and info the way the other languages' completions
+ *  are. Functions missing here fall back to the bare "function" detail. */
+const FUNCTION_META: Record<string, { sig: string; doc?: string }> = {
+  COUNT: { sig: "(expr | *)", doc: "Number of rows, or of non-NULL values of expr." },
+  SUM: { sig: "(expr)", doc: "Sum of the values." },
+  AVG: { sig: "(expr)", doc: "Average of the values." },
+  MIN: { sig: "(expr)", doc: "Smallest value." },
+  MAX: { sig: "(expr)", doc: "Largest value." },
+  ROUND: { sig: "(x, digits)", doc: "Round x to the given number of decimal places." },
+  ABS: { sig: "(x)", doc: "Absolute value." },
+  LOWER: { sig: "(str)", doc: "Lowercase the string." },
+  UPPER: { sig: "(str)", doc: "Uppercase the string." },
+  LENGTH: { sig: "(str)", doc: "Number of characters." },
+  COALESCE: { sig: "(value, ...)", doc: "First non-NULL argument." },
+  NULLIF: { sig: "(a, b)", doc: "NULL when a equals b, else a." },
+  TOTAL: { sig: "(expr)", doc: "Sum as a floating-point number, 0.0 for no rows." },
+  SUBSTR: { sig: "(str, start, length)", doc: "Substring starting at a 1-based position." },
+  SUBSTRING: { sig: "(str FROM start FOR length)", doc: "Substring starting at a 1-based position." },
+  IFNULL: { sig: "(a, b)", doc: "b when a is NULL, else a." },
+  IIF: { sig: "(condition, a, b)", doc: "a when the condition holds, else b." },
+  INSTR: { sig: "(str, substr)", doc: "1-based position of substr in str, 0 when absent." },
+  TRIM: { sig: "(str)", doc: "Strip leading and trailing spaces." },
+  LTRIM: { sig: "(str)", doc: "Strip leading spaces." },
+  RTRIM: { sig: "(str)", doc: "Strip trailing spaces." },
+  GROUP_CONCAT: { sig: "(expr, separator)", doc: "Concatenate the group's values." },
+  STRING_AGG: { sig: "(expr, delimiter)", doc: "Concatenate the group's values." },
+  ARRAY_AGG: { sig: "(expr)", doc: "Collect the group's values into an array." },
+  JSON_AGG: { sig: "(expr)", doc: "Collect the group's values into a JSON array." },
+  JSONB_AGG: { sig: "(expr)", doc: "Collect the group's values into a JSONB array." },
+  JSON_BUILD_OBJECT: { sig: "(key, value, ...)", doc: "JSON object from key/value pairs." },
+  JSONB_BUILD_OBJECT: { sig: "(key, value, ...)", doc: "JSONB object from key/value pairs." },
+  JSON_OBJECT_AGG: { sig: "(key, value)", doc: "JSON object from the group's key/value pairs." },
+  JSONB_OBJECT_AGG: { sig: "(key, value)", doc: "JSONB object from the group's key/value pairs." },
+  DATE: { sig: "(timevalue, modifier...)", doc: "Date part as YYYY-MM-DD." },
+  TIME: { sig: "(timevalue, modifier...)", doc: "Time part as HH:MM:SS." },
+  DATETIME: { sig: "(timevalue, modifier...)", doc: "Date and time as YYYY-MM-DD HH:MM:SS." },
+  STRFTIME: { sig: "(format, timevalue)", doc: "Format a date/time." },
+  STRPTIME: { sig: "(text, format)", doc: "Parse text into a timestamp." },
+  JULIANDAY: { sig: "(timevalue)", doc: "Days since noon in Greenwich on -4714-11-24." },
+  PRINTF: { sig: "(format, ...)", doc: "Format values like C's printf." },
+  RANDOM: { sig: "()", doc: "Pseudo-random integer." },
+  HEX: { sig: "(x)", doc: "Hexadecimal rendering of a blob or string." },
+  TYPEOF: { sig: "(x)", doc: "Datatype of the value: null, integer, real, text, blob." },
+  ROW_NUMBER: { sig: "() OVER (...)", doc: "1, 2, 3, … within the window." },
+  RANK: { sig: "() OVER (...)", doc: "Rank with gaps after ties." },
+  DENSE_RANK: { sig: "() OVER (...)", doc: "Rank without gaps after ties." },
+  NTILE: { sig: "(n) OVER (...)", doc: "Bucket number 1..n within the window." },
+  LAG: { sig: "(expr, offset, default) OVER (...)", doc: "Value from a preceding row." },
+  LEAD: { sig: "(expr, offset, default) OVER (...)", doc: "Value from a following row." },
+  FIRST_VALUE: { sig: "(expr) OVER (...)", doc: "Value from the first row of the frame." },
+  LAST_VALUE: { sig: "(expr) OVER (...)", doc: "Value from the last row of the frame." },
+  NOW: { sig: "()", doc: "Current date and time." },
+  CURRENT_TIMESTAMP: { sig: "", doc: "Current date and time (no parentheses)." },
+  CURRENT_DATE: { sig: "", doc: "Today's date (no parentheses)." },
+  CURRENT_TIME: { sig: "", doc: "Current time (no parentheses)." },
+  AGE: { sig: "(timestamp, timestamp)", doc: "Interval between two timestamps." },
+  EXTRACT: { sig: "(field FROM source)", doc: "A part of a date/time: year, month, day, …" },
+  DATE_TRUNC: { sig: "(field, source)", doc: "Truncate to a precision: 'month', 'day', …" },
+  DATE_PART: { sig: "(field, source)", doc: "A part of a date/time as a number." },
+  DATE_DIFF: { sig: "(part, start, end)", doc: "Number of part boundaries between two dates." },
+  DATE_ADD: { sig: "(date, interval)", doc: "Add an interval to a date." },
+  DATE_SUB: { sig: "(part, start, end)", doc: "Number of complete parts between two dates." },
+  TO_CHAR: { sig: "(value, format)", doc: "Format a number or date/time as text." },
+  TO_DATE: { sig: "(text, format)", doc: "Parse text into a date." },
+  TO_TIMESTAMP: { sig: "(text, format)", doc: "Parse text into a timestamp." },
+  TO_NUMBER: { sig: "(text, format)", doc: "Parse text into a number." },
+  GENERATE_SERIES: { sig: "(start, stop, step)", doc: "A set of values from start to stop." },
+  GREATEST: { sig: "(value, ...)", doc: "Largest of the arguments." },
+  LEAST: { sig: "(value, ...)", doc: "Smallest of the arguments." },
+  POSITION: { sig: "(substring IN string)", doc: "1-based position of a substring." },
+  LPAD: { sig: "(str, length, fill)", doc: "Pad on the left to the length." },
+  RPAD: { sig: "(str, length, fill)", doc: "Pad on the right to the length." },
+  SPLIT_PART: { sig: "(str, delimiter, n)", doc: "The n-th field after splitting." },
+  STRING_SPLIT: { sig: "(str, separator)", doc: "Split into a list." },
+  STRING_TO_ARRAY: { sig: "(str, delimiter)", doc: "Split into an array." },
+  REGEXP_REPLACE: { sig: "(str, pattern, replacement, flags)", doc: "Replace regex matches." },
+  REGEXP_MATCH: { sig: "(str, pattern)", doc: "Captured groups of the first match." },
+  REGEXP_MATCHES: { sig: "(str, pattern)", doc: "Whether the pattern matches." },
+  REGEXP_EXTRACT: { sig: "(str, pattern, group)", doc: "Text captured by the pattern." },
+  CONCAT: { sig: "(str, ...)", doc: "Join the arguments as text." },
+  CONCAT_WS: { sig: "(separator, str, ...)", doc: "Join the arguments with a separator." },
+  CEIL: { sig: "(x)", doc: "Round up to an integer." },
+  FLOOR: { sig: "(x)", doc: "Round down to an integer." },
+  POWER: { sig: "(x, y)", doc: "x raised to the power y." },
+  SQRT: { sig: "(x)", doc: "Square root." },
+  MOD: { sig: "(x, y)", doc: "Remainder of x / y." },
+  INITCAP: { sig: "(str)", doc: "Capitalize each word." },
+  CHAR_LENGTH: { sig: "(str)", doc: "Number of characters." },
+  UNNEST: { sig: "(array)", doc: "One row per array element." },
+  ARRAY_LENGTH: { sig: "(array, dimension)", doc: "Length of an array dimension." },
+  CARDINALITY: { sig: "(array)", doc: "Total number of elements." },
+  LIST: { sig: "(expr)", doc: "Collect the group's values into a list." },
+  LIST_AGG: { sig: "(expr, separator)", doc: "Concatenate the group's values." },
+  LIST_VALUE: { sig: "(value, ...)", doc: "A list from the arguments." },
+  STRUCT_PACK: { sig: "(name := value, ...)", doc: "A struct from named values." },
+  STRUCT_EXTRACT: { sig: "(struct, name)", doc: "One field of a struct." },
+  MAP: { sig: "(keys, values)", doc: "A map from two lists." },
+  RANGE: { sig: "(start, stop, step)", doc: "A list of numbers from start to stop." },
+  EPOCH: { sig: "(timestamp)", doc: "Seconds since 1970-01-01." },
+  EPOCH_MS: { sig: "(timestamp)", doc: "Milliseconds since 1970-01-01." },
+  QUANTILE: { sig: "(expr, fraction)", doc: "The value at a quantile of the group." },
+  MEDIAN: { sig: "(expr)", doc: "Middle value of the group." },
+  MODE: { sig: "(expr)", doc: "Most frequent value of the group." },
+  ARG_MAX: { sig: "(arg, value)", doc: "arg from the row with the largest value." },
+  ARG_MIN: { sig: "(arg, value)", doc: "arg from the row with the smallest value." },
+  LEN: { sig: "(str | list)", doc: "Number of characters or elements." },
+  CONTAINS: { sig: "(str, search)", doc: "Whether search occurs in str." },
+  STARTS_WITH: { sig: "(str, prefix)", doc: "Whether str begins with prefix." },
+  READ_CSV: { sig: "('file.csv')", doc: "Read a CSV file as a table." },
+  READ_CSV_AUTO: { sig: "('file.csv')", doc: "Read a CSV file, detecting its format." },
+  READ_PARQUET: { sig: "('file.parquet')", doc: "Read a Parquet file as a table." },
+  READ_JSON_AUTO: { sig: "('file.json')", doc: "Read a JSON file, detecting its shape." },
+};
+
+/** Functions written without parentheses. */
+const NO_PAREN_FUNCTIONS = new Set(["CURRENT_DATE", "CURRENT_TIME", "CURRENT_TIMESTAMP"]);
 
 // Keywords/functions that show up in essentially every modern SQL dialect.
 // Dialect-specific additions are layered on top via `DIALECT_PROFILES`.
@@ -1556,6 +1694,17 @@ function inferCompletionContext(
 ): SqlCompletionContextInfo | null {
   const statement = statementBefore;
   const word = context.matchBefore(/[A-Za-z_][A-Za-z0-9_$]*/);
+
+  // `expr::|`, a cast: the only thing that fits is a type name.
+  if (dialect !== "sqlite" && /::\s*[A-Za-z_][A-Za-z0-9_$]*$|::\s*$/.test(statement)) {
+    return {
+      mode: "column-def",
+      columnDefSlot: "type",
+      from: word?.from ?? context.pos,
+      keywordContext: { primary: [], restrict: true },
+    };
+  }
+
   const qualified = statement.match(qualifiedIdentifierPattern);
 
   if (qualified) {
@@ -2035,14 +2184,19 @@ function keywordOptions(
   if (emitFunctions) {
     for (const fn of profile.functions) {
       const insert = casing === "lower" ? fn.toLowerCase() : fn;
+      const meta = FUNCTION_META[fn];
+      const base: Completion = {
+        label: fn,
+        detail: meta?.sig || "function",
+        info: meta?.doc,
+        type: "function",
+        section: keywordSection,
+        boost: boost - BOOST.functionPenalty,
+      };
       out.push(
-        snippetCompletion(`${insert}(#{})`, {
-          label: fn,
-          detail: "function",
-          type: "function",
-          section: keywordSection,
-          boost: boost - BOOST.functionPenalty,
-        }),
+        NO_PAREN_FUNCTIONS.has(fn)
+          ? { ...base, apply: insert }
+          : snippetCompletion(`${insert}(#{})`, base),
       );
     }
   }
@@ -2323,6 +2477,151 @@ function schemaNamesFor(
   return names;
 }
 
+const lowercaseIdentifierCache = new WeakMap<Text, Set<string>>();
+
+/** Identifiers in the document, lowercased (SQL names are case-insensitive
+ *  unless quoted), cached per document version. */
+function lowercaseIdentifiers(doc: Text): Set<string> {
+  const cached = lowercaseIdentifierCache.get(doc);
+  if (cached) return cached;
+  const lower = new Set<string>();
+  for (const id of documentIdentifiers(doc)) lower.add(id.toLowerCase());
+  lowercaseIdentifierCache.set(doc, lower);
+  return lower;
+}
+
+type OrderingClause = "order" | "group" | "having" | "qualify";
+
+/** Which of the SELECT-list-aware clauses the cursor sits in, if any:
+ *  scanning back from the cursor, the first clause keyword decides. */
+function orderingClauseOf(statementBefore: string): OrderingClause | null {
+  const tokens = tokenize(statementBefore).map((token) => token.toUpperCase());
+  for (let i = tokens.length - 1; i >= 0; i -= 1) {
+    const token = tokens[i];
+    if (token === "ORDER" || token === "GROUP") {
+      return tokens[i + 1] === "BY" ? (token.toLowerCase() as OrderingClause) : null;
+    }
+    if (token === "HAVING") return "having";
+    if (token === "QUALIFY") return "qualify";
+    if (
+      token === "SELECT" ||
+      token === "FROM" ||
+      token === "WHERE" ||
+      token === "JOIN" ||
+      token === "ON" ||
+      token === "LIMIT" ||
+      token === "UNION" ||
+      token === "SET" ||
+      token === "VALUES"
+    ) {
+      return null;
+    }
+  }
+  return null;
+}
+
+interface SelectListInfo {
+  /** Bare identifiers the SELECT list references, lowercased. */
+  columns: Set<string>;
+  /** Output aliases (`expr AS alias`, `expr alias`) in list order. */
+  aliases: string[];
+}
+
+const SELECT_LIST_KEYWORDS = new Set([
+  "AS", "DISTINCT", "ALL", "CASE", "WHEN", "THEN", "ELSE", "END", "AND",
+  "OR", "NOT", "IS", "NULL", "IN", "LIKE", "ILIKE", "BETWEEN", "OVER",
+  "PARTITION", "BY", "ORDER", "ASC", "DESC", "TRUE", "FALSE", "FROM",
+  "FOR", "FILTER", "WHERE", "EXCLUDE", "REPLACE", "INTERVAL", "CAST",
+]);
+
+/** The outermost SELECT list of the statement: which columns it uses and
+ *  which aliases it defines. Null for `SELECT *` or no SELECT. */
+function parseSelectList(statement: string): SelectListInfo | null {
+  const masked = maskCommentsAndStrings(statement);
+  const start = masked.search(/\bSELECT\b/i);
+  if (start < 0) return null;
+  let depth = 0;
+  let end = masked.length;
+  for (let i = start + 6; i < masked.length; i += 1) {
+    const ch = masked[i];
+    if (ch === "(") depth += 1;
+    else if (ch === ")") depth = Math.max(0, depth - 1);
+    else if (
+      depth === 0 &&
+      /^FROM$/i.test(masked.slice(i, i + 4)) &&
+      /\s/.test(masked[i - 1] ?? " ") &&
+      !/[A-Za-z0-9_$]/.test(masked[i + 4] ?? " ")
+    ) {
+      end = i;
+      break;
+    }
+  }
+  const list = statement.slice(start + 6, end).replace(/^\s*(DISTINCT|ALL)\b/i, "");
+  if (!list.trim() || list.trim() === "*") return null;
+
+  const items: string[] = [];
+  let current = "";
+  depth = 0;
+  for (const ch of list) {
+    if (ch === "(") depth += 1;
+    else if (ch === ")") depth = Math.max(0, depth - 1);
+    if (ch === "," && depth === 0) {
+      items.push(current);
+      current = "";
+    } else {
+      current += ch;
+    }
+  }
+  items.push(current);
+
+  const columns = new Set<string>();
+  const aliases: string[] = [];
+  for (const rawItem of items) {
+    const item = rawItem.trim();
+    if (!item) continue;
+    let expr = item;
+    const asMatch = selectAliasPattern.exec(item);
+    if (asMatch) {
+      aliases.push(normalizeIdentifier(asMatch[1]));
+      expr = item.slice(0, asMatch.index);
+    } else {
+      // `SUM(total) total_sum`, a trailing bare identifier after an
+      // expression (not after a `.`, not a keyword) is an implicit alias.
+      const implicit = /^(.*?\S)\s+([A-Za-z_][A-Za-z0-9_$]*)\s*$/.exec(item);
+      if (
+        implicit &&
+        !/[.\s]$/.test(implicit[1]) &&
+        !SELECT_LIST_KEYWORDS.has(implicit[2].toUpperCase()) &&
+        !/^[A-Za-z_][A-Za-z0-9_$]*$/.test(implicit[1].trim())
+      ) {
+        aliases.push(implicit[2]);
+        expr = implicit[1];
+      }
+    }
+    const exprMasked = maskCommentsAndStrings(expr);
+    const wordPattern = /[A-Za-z_][A-Za-z0-9_$]*/g;
+    let m: RegExpExecArray | null;
+    while ((m = wordPattern.exec(exprMasked))) {
+      const after = exprMasked.slice(m.index + m[0].length).trimStart();
+      if (after.startsWith("(")) continue; // a function name
+      const upper = m[0].toUpperCase();
+      if (SELECT_LIST_KEYWORDS.has(upper)) continue;
+      columns.add(m[0].toLowerCase());
+    }
+  }
+  return { columns, aliases };
+}
+
+/** Whether an alias may be referenced in this clause for the dialect:
+ *  ORDER BY everywhere; GROUP BY and HAVING in SQLite and DuckDB (Postgres
+ *  rejects aliases there); QUALIFY (DuckDB) too. */
+function aliasesAllowedIn(clause: OrderingClause, dialect: SqlDialect): boolean {
+  if (clause === "order") return true;
+  if (clause === "group") return dialect !== "postgres";
+  if (clause === "having") return dialect !== "postgres";
+  return dialect === "duckdb";
+}
+
 function dedupeOptions(options: Completion[]): Completion[] {
   const seen = new Set<string>();
   return options.filter((option) => {
@@ -2438,7 +2737,54 @@ export function createSqlCompletionSource(
       }
     })();
 
-    const uniqueOptions = dedupeOptions(completions);
+    let uniqueOptions = dedupeOptions(completions);
+
+    // ORDER BY / GROUP BY / HAVING: what the SELECT list already names is
+    // the likeliest pick, and its aliases are legal here too.
+    const clause = info.mode === "columns" ? orderingClauseOf(before) : null;
+    const selectList = clause ? parseSelectList(full) : null;
+    if (clause && selectList) {
+      for (const option of uniqueOptions) {
+        if (option.type !== "property") continue;
+        const bare = option.label.slice(option.label.lastIndexOf(".") + 1).toLowerCase();
+        if (selectList.columns.has(bare)) {
+          option.boost = (option.boost ?? 0) + BOOST.selectListBump;
+        }
+      }
+      if (aliasesAllowedIn(clause, dialect)) {
+        const existing = new Set(uniqueOptions.map((o) => o.label.toLowerCase()));
+        const aliasOptions: Completion[] = selectList.aliases
+          .filter((alias) => alias && !existing.has(alias.toLowerCase()))
+          .map((alias) => ({
+            label: alias,
+            apply: quoteIdentifier(alias),
+            detail: "alias",
+            type: "property",
+            section: columnSection,
+            boost: BOOST.selectAlias,
+          }));
+        uniqueOptions = dedupeOptions([...aliasOptions, ...uniqueOptions]);
+      }
+    }
+
+    // Locality and recency: a name already used in the document, or one
+    // the reader accepted a moment ago, edges ahead of its section mates.
+    // Capped below the join-condition section so a well-used column can't
+    // push the ready-made `a.id = b.a_id` off the top of the ON slot.
+    const ids = lowercaseIdentifiers(context.state.doc);
+    const typedLower = typed.toLowerCase();
+    for (const option of uniqueOptions) {
+      const key = option.label.toLowerCase();
+      let bump = recencyBoost(option.label);
+      if (key !== typedLower && ids.has(key)) bump += BOOST.localityBump;
+      if (bump === 0) continue;
+      const base = option.boost ?? 0;
+      option.boost =
+        info.joinConditionSlot && option.type === "property"
+          ? Math.min(base + bump, BOOST.bumpCeiling)
+          : base + bump;
+    }
+
     if (uniqueOptions.length === 0) return null;
     return {
       from: info.from,

@@ -75,6 +75,20 @@ type InMessage =
       column: number;
     }
   | {
+      kind: "hover";
+      id: number;
+      doc: string;
+      lineNumber: number;
+      column: number;
+    }
+  | {
+      kind: "signature";
+      id: number;
+      doc: string;
+      lineNumber: number;
+      column: number;
+    }
+  | {
       kind: "prepare-fs";
       id: number;
       /** Workspace-relative paths → file bytes. */
@@ -120,7 +134,30 @@ type OutMessage =
       id: number;
       completions: Array<string | CompletionItemMessage>;
       replaceLength: number;
+    }
+  | { kind: "hover-result"; id: number; result: HoverMessage | null }
+  | {
+      kind: "signature-result";
+      id: number;
+      result: SignatureHelpMessage | null;
     };
+
+/** Mirrors `HoverResult` in ../types. */
+interface HoverMessage {
+  title?: string;
+  doc?: string;
+}
+
+/** Mirrors `SignatureHelpResult` in ../types. */
+interface SignatureHelpMessage {
+  signatures: Array<{
+    label: string;
+    parameters: string[];
+    documentation?: string;
+  }>;
+  activeSignature: number;
+  activeParameter: number;
+}
 
 function post(msg: OutMessage) {
   self.postMessage(msg);
@@ -693,6 +730,53 @@ _JEDI_TYPE_MAP = {
     "namespace": "namespace",
 }
 
+# Signatures and docstrings cost an inference each, so only the first
+# screenful of a popup gets them (measured: ~10 ms for 30 stdlib names,
+# hundreds of ms for 60); CodeMirror re-queries as the user narrows.
+_JEDI_DETAIL_LIMIT = 30
+
+# What a learner reaches for most; everything else in builtins is a long
+# alphabetical tail of exception classes and rarities.
+_COMMON_BUILTINS = {
+    "print", "len", "range", "str", "int", "float", "list", "dict", "set",
+    "tuple", "input", "open", "sum", "min", "max", "sorted", "enumerate",
+    "zip", "map", "filter", "isinstance", "type", "round", "abs", "any",
+    "all", "bool", "format", "reversed", "next", "iter", "super", "hasattr",
+    "getattr", "id", "help", "repr", "chr", "ord", "divmod", "pow",
+}
+
+def _jedi_boost(c, name):
+    """Ranking nudge (-99..99): names from the reader's own code first."""
+    try:
+        if c.module_name == "__main__":
+            return 4
+    except Exception:
+        pass
+    if c.type == "keyword":
+        return 0
+    if name in _COMMON_BUILTINS:
+        return 2
+    if c.type == "class" and name.endswith(("Error", "Warning", "Exception")):
+        return -2
+    return 0
+
+def _jedi_signature(name):
+    try:
+        sigs = name.get_signatures()
+    except Exception:
+        return None
+    return sigs[0].to_string() if sigs else None
+
+def _jedi_doc(name, limit=400):
+    try:
+        doc = name.docstring(raw=True)
+    except Exception:
+        return None
+    if not doc:
+        return None
+    para = doc.strip().split("\\n\\n")[0].strip()
+    return para[:limit] if para else None
+
 def _python_completions_jedi(doc, line_no, column, line):
     """Complete \`doc\` at 1-based \`line_no\` / 0-based \`column\`.
 
@@ -715,20 +799,86 @@ def _python_completions_jedi(doc, line_no, column, line):
         name = c.name
         if hide_private and name.startswith("_"):
             continue
-        items.append({
+        item = {
             "label": name,
             "type": _JEDI_TYPE_MAP.get(c.type, "variable"),
-        })
+        }
+        boost = _jedi_boost(c, name)
+        if boost:
+            item["boost"] = boost
+        if len(items) < _JEDI_DETAIL_LIMIT and c.type in ("function", "class"):
+            sig = _jedi_signature(c)
+            if sig and sig.startswith(name):
+                item["detail"] = sig[len(name):][:80]
+            info = _jedi_doc(c)
+            if info:
+                item["info"] = info
+        items.append(item)
         # Cap the payload, the popup shows a handful; CodeMirror
         # re-filters as the user types and re-queries past validFor.
         if len(items) >= 200:
             break
     return _json.dumps({"items": items, "replaceLength": prefix_len})
 
+def _python_hover_jedi(doc, line_no, column):
+    """Signature/description and docstring of the name at the cursor,
+    as JSON {"title", "doc"}, or null."""
+    try:
+        names = _jedi.Interpreter(doc, [globals()]).help(
+            line=int(line_no), column=int(column))
+    except Exception:
+        return _json.dumps(None)
+    if not names:
+        return _json.dumps(None)
+    n = names[0]
+    title = _jedi_signature(n)
+    if not title:
+        try:
+            title = n.description or n.name
+        except Exception:
+            title = n.name
+    return _json.dumps({"title": title, "doc": _jedi_doc(n, 600)})
+
+def _python_signatures_jedi(doc, line_no, column):
+    """Signatures of the call around the cursor, as JSON
+    {"signatures": [{label, parameters, documentation}], "activeSignature",
+    "activeParameter"}, or null outside a call."""
+    try:
+        sigs = _jedi.Interpreter(doc, [globals()]).get_signatures(
+            line=int(line_no), column=int(column))
+    except Exception:
+        return _json.dumps(None)
+    if not sigs:
+        return _json.dumps(None)
+    out = []
+    active_param = 0
+    for i, s in enumerate(sigs):
+        params = []
+        for p in s.params:
+            try:
+                params.append(p.to_string())
+            except Exception:
+                params.append(p.name)
+        out.append({
+            "label": s.to_string(),
+            "parameters": params,
+            "documentation": _jedi_doc(s, 300),
+        })
+        if i == 0 and s.index is not None:
+            active_param = int(s.index)
+    return _json.dumps({
+        "signatures": out,
+        "activeSignature": 0,
+        "activeParameter": active_param,
+    })
+
 # These globals postdate setup A's protected-names snapshot, protect
 # them or the per-run global reset would delete them.
 _PG_PROTECTED_NAMES |= {
-    "_json", "_jedi", "_JEDI_TYPE_MAP", "_python_completions_jedi",
+    "_json", "_jedi", "_JEDI_TYPE_MAP", "_JEDI_DETAIL_LIMIT",
+    "_COMMON_BUILTINS", "_jedi_boost",
+    "_jedi_signature", "_jedi_doc", "_python_completions_jedi",
+    "_python_hover_jedi", "_python_signatures_jedi",
 }
 `;
 
@@ -1080,7 +1230,13 @@ async function completeCode(
   )) as string;
 
   let parsed: {
-    items?: Array<{ label?: unknown; type?: unknown }>;
+    items?: Array<{
+      label?: unknown;
+      type?: unknown;
+      detail?: unknown;
+      info?: unknown;
+      boost?: unknown;
+    }>;
     replaceLength?: unknown;
   } | null = null;
   try {
@@ -1101,12 +1257,79 @@ async function completeCode(
     completions.push({
       label: item.label,
       type: typeof item.type === "string" ? item.type : undefined,
+      detail: typeof item.detail === "string" ? item.detail : undefined,
+      info: typeof item.info === "string" ? item.info : undefined,
+      boost: typeof item.boost === "number" ? item.boost : undefined,
     });
   }
   const replaceLength =
     typeof parsed.replaceLength === "number" ? parsed.replaceLength : 0;
 
   post({ kind: "complete-result", id, completions, replaceLength });
+}
+
+/** Run one of the jedi position queries; null when jedi is unavailable or
+ *  the answer is not JSON. Globals carry the request so the user's text
+ *  never needs escaping. */
+async function positionQuery<T>(
+  fn: string,
+  doc: string,
+  lineNumber: number,
+  column: number,
+): Promise<T | null> {
+  if (!pyodide) throw new Error("Pyodide is not initialised");
+  if (!(await ensureJedi())) return null;
+  pyodide.globals.set("_complete_doc", doc);
+  pyodide.globals.set("_complete_line_no", lineNumber);
+  pyodide.globals.set("_complete_column", column);
+  const json = (await pyodide.runPythonAsync(
+    `${fn}(_complete_doc, _complete_line_no, _complete_column)`,
+  )) as string;
+  try {
+    return JSON.parse(json) as T | null;
+  } catch {
+    return null;
+  }
+}
+
+async function hoverCode(
+  id: number,
+  doc: string,
+  lineNumber: number,
+  column: number,
+): Promise<void> {
+  const parsed = await positionQuery<{ title?: unknown; doc?: unknown }>(
+    "_python_hover_jedi",
+    doc,
+    lineNumber,
+    column,
+  );
+  const result: HoverMessage | null = parsed
+    ? {
+        title: typeof parsed.title === "string" ? parsed.title : undefined,
+        doc: typeof parsed.doc === "string" ? parsed.doc : undefined,
+      }
+    : null;
+  post({ kind: "hover-result", id, result });
+}
+
+async function signatureCode(
+  id: number,
+  doc: string,
+  lineNumber: number,
+  column: number,
+): Promise<void> {
+  const parsed = await positionQuery<SignatureHelpMessage>(
+    "_python_signatures_jedi",
+    doc,
+    lineNumber,
+    column,
+  );
+  const result =
+    parsed && Array.isArray(parsed.signatures) && parsed.signatures.length > 0
+      ? parsed
+      : null;
+  post({ kind: "signature-result", id, result });
 }
 
 // Pyodide is not reentrant: serialise all run/complete requests behind one
@@ -1356,6 +1579,23 @@ self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
       } catch {
         // Completions are best-effort; return an empty list.
         post({ kind: "complete-result", id, completions: [], replaceLength: 0 });
+      }
+    });
+    return;
+  }
+
+  if (msg.kind === "hover" || msg.kind === "signature") {
+    const { id, doc, lineNumber, column } = msg;
+    const kind = msg.kind;
+    enqueue(async () => {
+      try {
+        if (initPromise) await initPromise;
+        if (kind === "hover") await hoverCode(id, doc, lineNumber, column);
+        else await signatureCode(id, doc, lineNumber, column);
+      } catch {
+        // Best-effort: an analyzer hiccup shows no tooltip.
+        if (kind === "hover") post({ kind: "hover-result", id, result: null });
+        else post({ kind: "signature-result", id, result: null });
       }
     });
     return;

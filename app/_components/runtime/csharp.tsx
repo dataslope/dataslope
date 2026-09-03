@@ -6,6 +6,9 @@ import type {
   LanguageRuntime,
   PackageInfo,
   RunOptions,
+  CompletionItemDetail,
+  CompletionRequest,
+  CompletionResult,
 } from "../types";
 import {
   CSHARP_VERSION,
@@ -383,6 +386,53 @@ class CSharpRuntime implements LanguageRuntime {
   private inFlight: Promise<unknown> | null = null;
 
   constructor(private api: DotnetApi) {}
+
+  /**
+   * Intellisense from Roslyn's semantic model, over the same reference
+   * assemblies Run compiles against. Waits for nothing: before the warm-up
+   * compile has cached those references a completion would trigger the
+   * whole class-library download, so until then the static tier answers.
+   */
+  async complete(request: CompletionRequest): Promise<CompletionResult> {
+    const empty: CompletionResult = { list: [], replaceLength: 0 };
+    if (!this.api.complete || !this.api.isWarm() || this.inFlight) return empty;
+    const others: Record<string, string> = {};
+    const entry = request.filename ?? "Program.cs";
+    for (const [path, content] of this.stagedFiles) {
+      if (path !== entry) others[path] = content;
+    }
+    let raw: string;
+    try {
+      raw = await this.api.complete(
+        request.doc,
+        request.offset,
+        Object.keys(others).length > 0 ? JSON.stringify(others) : "",
+      );
+    } catch {
+      return empty;
+    }
+    let parsed: { items?: unknown; replaceLength?: unknown; error?: unknown };
+    try {
+      parsed = JSON.parse(raw) as typeof parsed;
+    } catch {
+      return empty;
+    }
+    if (!Array.isArray(parsed.items)) return empty;
+    const list: CompletionItemDetail[] = [];
+    for (const item of parsed.items as Array<Record<string, unknown>>) {
+      if (typeof item?.label !== "string") continue;
+      list.push({
+        label: item.label,
+        type: typeof item.type === "string" ? item.type : undefined,
+        detail: typeof item.detail === "string" && item.detail ? item.detail : undefined,
+      });
+    }
+    return {
+      list,
+      replaceLength:
+        typeof parsed.replaceLength === "number" ? parsed.replaceLength : 0,
+    };
+  }
 
   async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
     this.stagedFiles = new Map();
