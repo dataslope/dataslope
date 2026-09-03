@@ -19,7 +19,7 @@
  */
 
 import { useLayoutEffect, useRef } from "react";
-import { GitCommit, FileText } from "lucide-react";
+import { ArrowDown, GitCommit, FileText } from "lucide-react";
 import type { FileStatus, RepoState } from "./protocol";
 import { isConflicted } from "./repoFacts";
 
@@ -176,7 +176,7 @@ export function AreasBoxes({ state, changed, internals, onOpen }: Props) {
       </section>
 
       <div className="gitx-arrow" aria-hidden="true">
-        <span className="gitx-arrow-line" />
+        <ArrowDown size={14} strokeWidth={2} />
         <span className="gitx-arrow-text">
           <code>git add</code> moves a file here
         </span>
@@ -207,7 +207,7 @@ export function AreasBoxes({ state, changed, internals, onOpen }: Props) {
       </section>
 
       <div className="gitx-arrow" aria-hidden="true">
-        <span className="gitx-arrow-line" />
+        <ArrowDown size={14} strokeWidth={2} />
         <span className="gitx-arrow-text">
           <code>git commit</code> records it
         </span>

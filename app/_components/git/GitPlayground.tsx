@@ -474,7 +474,7 @@ export default function GitPlayground() {
                 </Select.Trigger>
                 <Select.Portal>
                   <Select.Positioner className="playground-lang-switcher-positioner" sideOffset={6}>
-                    <Select.Popup className="playground-lang-switcher-popup">
+                    <Select.Popup className="bui-select-popup playground-lang-switcher-popup">
                       {PLAYGROUNDS.map((p) => {
                         const Icon = LANGUAGE_ICONS[p.id];
                         const factor = LANGUAGE_ICON_SIZE_FACTOR[p.id] ?? 1;
@@ -506,7 +506,7 @@ export default function GitPlayground() {
             </Select.Trigger>
             <Select.Portal>
               <Select.Positioner className="playground-lang-switcher-positioner" sideOffset={6} align="end">
-                <Select.Popup className="playground-lang-switcher-popup gitx-scenario-popup">
+                <Select.Popup className="bui-select-popup playground-lang-switcher-popup gitx-scenario-popup">
                   {SCENARIOS.map((s) => (
                     <Select.Item key={s.id} value={s.id} className="bui-select-item gitx-scenario-item">
                       <span className="gitx-scenario-text">

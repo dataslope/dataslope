@@ -7,27 +7,31 @@
    the touch floor 32px. */
 
 /* ─── Header buttons ─── */
+/* Ghosts, as in the SQL playground's header: text on the page, a tint on
+   hover, no box. */
 .bpg-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   min-height: 32px;
-  border: 1px solid var(--border);
-  border-radius: 7px;
-  background: var(--bg3);
-  color: var(--text-muted);
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
   font-family: var(--font-ui);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   padding: 4px 10px;
   cursor: pointer;
   white-space: nowrap;
-  transition: color 0.12s, border-color 0.12s, background-color 0.12s;
+  transition:
+    color 0.12s,
+    background-color 0.12s;
 }
 
-.bpg-btn:hover:not(:disabled) {
-  color: var(--text);
-  border-color: var(--text-dim);
+.bpg-btn:hover:not(:disabled),
+.bpg-btn[data-popup-open] {
+  background: var(--menu-item-hover);
 }
 
 .bpg-btn:focus-visible {
@@ -38,37 +42,6 @@
 .bpg-btn:disabled {
   opacity: 0.45;
   cursor: default;
-}
-
-.bpg-btn.primary {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: #fff;
-}
-
-.bpg-btn.primary:hover:not(:disabled) {
-  color: #fff;
-  filter: brightness(1.08);
-}
-
-.bpg-scenario-popup {
-  min-width: 260px;
-}
-
-.bpg-scenario-item {
-  align-items: flex-start;
-}
-
-.bpg-scenario-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.bpg-scenario-desc {
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--text-dim);
 }
 
 /* ─── The stage ─── */
@@ -154,7 +127,7 @@
   min-height: 36px;
   padding: 2px 6px 2px 4px;
   border-bottom: 1px solid var(--border);
-  background: var(--bg2);
+  background: var(--bg);
   flex: none;
   /* The focused pane's bar carries the accent. */
   box-shadow: inset 0 2px 0 transparent;
@@ -386,9 +359,8 @@
 
   .bpg-tabs {
     display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 6px 8px;
+    align-items: stretch;
+    padding: 0 8px;
     border-bottom: 1px solid var(--border);
     background: var(--bg);
     overflow-x: auto;
@@ -400,26 +372,24 @@
     display: none;
   }
 
+  /* Underline tabs, the same shape as the Git playground's pane switch. */
   .bpg-tab {
     display: inline-flex;
     align-items: center;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    background: var(--bg2);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
     color: var(--text-dim);
     flex: none;
-    overflow: hidden;
   }
 
   .bpg-tab.active {
-    border-color: var(--primary);
-    background: var(--primary-glow);
+    border-bottom-color: var(--primary);
     color: var(--primary);
   }
 
   .bpg-tab-btn,
   .bpg-tab.add {
-    min-height: 34px;
+    min-height: 40px;
     padding: 4px 12px;
     border: none;
     background: transparent;
@@ -434,7 +404,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 34px;
+    min-width: 40px;
     padding: 0;
     cursor: pointer;
   }
@@ -444,10 +414,10 @@
   }
 
   .bpg-tab-close {
-    min-height: 34px;
-    width: 30px;
+    min-height: 40px;
+    width: 28px;
+    margin-left: -6px;
     border: none;
-    border-left: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
     background: transparent;
     color: inherit;
     cursor: pointer;

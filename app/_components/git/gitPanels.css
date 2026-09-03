@@ -518,13 +518,11 @@
   padding: 0;
 }
 
-/* The card a clicked commit opens. */
+/* The detail a clicked commit opens, under a rule rather than in a card. */
 .git-commit-card {
   margin-top: 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg2);
-  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  padding: 12px 0 0;
   display: grid;
   gap: 8px;
   font-family: var(--font-ui);

@@ -12,30 +12,31 @@
 }
 
 /* ─── Header ─── */
+/* Buttons are ghosts, as in the SQL playground's header: text on the page,
+   a tint on hover, no box. `primary` is the same in the accent color. */
 .gitx-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   min-height: 32px;
-  border: 1px solid var(--border);
-  border-radius: 7px;
-  background: var(--bg3);
-  color: var(--text-muted);
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
   font-family: var(--font-ui);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   padding: 4px 10px;
   cursor: pointer;
   white-space: nowrap;
   transition:
     color 0.12s,
-    background-color 0.12s,
-    border-color 0.12s;
+    background-color 0.12s;
 }
 
-.gitx-btn:hover:not(:disabled) {
-  color: var(--text);
-  border-color: var(--text-dim);
+.gitx-btn:hover:not(:disabled),
+.gitx-btn[data-popup-open] {
+  background: var(--menu-item-hover);
 }
 
 .gitx-btn:focus-visible {
@@ -48,30 +49,18 @@
   cursor: default;
 }
 
-.gitx-btn.quiet {
-  background: transparent;
-  border-color: transparent;
-}
-
-.gitx-btn.quiet:hover:not(:disabled) {
-  background: var(--menu-item-hover);
-  border-color: transparent;
-}
-
 .gitx-btn.quiet.on {
   color: var(--primary);
   background: var(--primary-glow);
 }
 
 .gitx-btn.primary {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: #fff;
+  color: var(--primary);
+  font-weight: 600;
 }
 
 .gitx-btn.primary:hover:not(:disabled) {
-  color: #fff;
-  filter: brightness(1.08);
+  background: var(--primary-glow);
 }
 
 .gitx-btn.small {
@@ -205,12 +194,12 @@
 }
 
 /* ─── Try this ─── */
+/* A block of the pane, not a card: a rule under it separates it from the
+   three areas below. */
 .gitx-try {
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--bg2);
-  padding: 10px 12px 8px;
-  margin-bottom: 14px;
+  padding: 2px 0 10px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border);
 }
 
 .gitx-try-head {
@@ -303,11 +292,8 @@
 
 /* ─── Conflict banner ─── */
 .gitx-banner {
-  border: 1px solid color-mix(in srgb, var(--ds-red-500) 45%, transparent);
-  border-left: 4px solid var(--ds-red-500);
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--ds-red-500) 8%, var(--bg));
-  padding: 10px 12px;
+  border-left: 3px solid var(--ds-red-500);
+  padding: 4px 0 4px 12px;
   margin-bottom: 14px;
   font-family: var(--font-ui);
   font-size: 13px;
@@ -347,17 +333,8 @@ html:is(.dark, [data-theme="dark"]) .gitx-areas {
   --tone-conflict: var(--ds-red-400);
 }
 
-.gitx-box {
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--bg);
-  overflow: hidden;
-}
-
-.gitx-box.area-stage {
-  border-style: dashed;
-}
-
+/* An area is a heading and what is in it. No box around it: the arrows
+   between the three say how they relate, and the chips are the content. */
 .gitx-box.muted {
   opacity: 0.55;
 }
@@ -367,9 +344,7 @@ html:is(.dark, [data-theme="dark"]) .gitx-areas {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg2);
+  padding: 6px 0;
 }
 
 .gitx-box-title {
@@ -393,8 +368,8 @@ html:is(.dark, [data-theme="dark"]) .gitx-areas {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  padding: 10px 12px;
-  min-height: 52px;
+  padding: 4px 0 8px;
+  min-height: 44px;
   align-content: flex-start;
 }
 
@@ -417,25 +392,14 @@ html:is(.dark, [data-theme="dark"]) .gitx-areas {
 .gitx-arrow {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 2px 0 2px 16px;
-  height: 30px;
+  gap: 6px;
+  padding: 4px 0;
+  margin: 2px 0 6px;
+  color: var(--text-dim);
 }
 
-.gitx-arrow-line {
-  width: 2px;
-  height: 100%;
-  background: var(--border);
-  position: relative;
-}
-
-.gitx-arrow-line::after {
-  content: "";
-  position: absolute;
-  left: -3px;
-  bottom: -1px;
-  border: 4px solid transparent;
-  border-top: 5px solid var(--text-dim);
+.gitx-arrow svg {
+  flex: none;
 }
 
 .gitx-arrow-text {
@@ -459,7 +423,7 @@ html:is(.dark, [data-theme="dark"]) .gitx-areas {
   padding: 3px 10px 3px 9px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--bg2);
+  background: var(--bg);
   color: var(--text);
   font-family: var(--font-mono, monospace);
   font-size: 13px;
@@ -684,13 +648,14 @@ html:is(.dark, [data-theme="dark"]) .gitx-areas {
   margin-left: 6px;
 }
 
-/* A suggestion: what the palette used to be, as a handful in context. */
+/* A suggestion: what the palette used to be, as a handful in context. An
+   outline, not a filled pill, so the strip stays quiet. */
 .gitx-step {
   min-height: 28px;
   padding: 2px 10px;
-  border: 1px solid color-mix(in srgb, var(--primary) 40%, transparent);
+  border: 1px solid var(--border);
   border-radius: 999px;
-  background: var(--primary-glow);
+  background: transparent;
   color: var(--primary);
   font-family: var(--font-ui);
   font-size: 12.5px;
@@ -701,6 +666,7 @@ html:is(.dark, [data-theme="dark"]) .gitx-areas {
 
 .gitx-step:hover:not(:disabled) {
   border-color: var(--primary);
+  background: var(--primary-glow);
 }
 
 .gitx-step:disabled {

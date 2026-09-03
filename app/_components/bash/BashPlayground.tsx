@@ -10,8 +10,8 @@
  * learner expects it to mean. A new terminal starts where the one it was
  * split from is standing.
  *
- * Memory-only, and nothing persists: a reload is one terminal and the default
- * scenario. The layout is a binary split tree (`splitTree.ts`); on a phone
+ * Memory-only, and nothing persists: a reload is one terminal and the
+ * starting files. The layout is a binary split tree (`splitTree.ts`); on a phone
  * the same terminals are a tab strip and the tree is kept for when the
  * viewport grows back.
  */
@@ -20,7 +20,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Select } from "@base-ui/react/select";
 import { Menu } from "@base-ui/react/menu";
-import { ChevronDown, LayoutList, Plus, RotateCcw, SplitSquareHorizontal, SplitSquareVertical, X } from "lucide-react";
+import { ChevronDown, Plus, RotateCcw, SplitSquareHorizontal, SplitSquareVertical, X } from "lucide-react";
 import Link from "../Link";
 import { PLAYGROUNDS } from "../playgrounds";
 import { useIsFramed } from "../useIsFramed";
@@ -29,7 +29,7 @@ import { PlaygroundBootOverlay, useBootOverlayVisibility } from "../PlaygroundBo
 import { applyThemePalette, getStoredEditorTheme, applyMode } from "../playgroundTheme";
 import { useGitSession } from "../git/gitRuntime";
 import menuStyles from "../sqlCardTools/SqlCardToolsMenu.module.css";
-import { BASH_SCENARIOS, DEFAULT_BASH_SCENARIO, bashScenarioById } from "./bashScenarios";
+import { DEFAULT_BASH_SCENARIO } from "./bashScenarios";
 import { HOME } from "./prompt";
 import { SplitView, MIN_PANE } from "./SplitView";
 import { TerminalPane, type MoveDir, type PaneDragHandlers } from "./TerminalPane";
@@ -86,8 +86,7 @@ export default function BashPlayground() {
   const router = useRouter();
   const embedded = useIsFramed();
   const mobile = useMediaQuery("(max-width: 860px)");
-  const [scenario, setScenario] = useState(DEFAULT_BASH_SCENARIO);
-  const session = useGitSession(scenario, "bash-playground", "bash");
+  const session = useGitSession(DEFAULT_BASH_SCENARIO, "bash-playground", "bash");
   const { ready, error, reset, openShell, closeShell } = session;
 
   const [tree, setTree] = useState<Node>(() => leaf("t1"));
@@ -101,7 +100,6 @@ export default function BashPlayground() {
   const cwdOf = useRef(new Map<string, string>());
 
   const overlay = useBootOverlayVisibility(ready || Boolean(error));
-  const scenarioDef = bashScenarioById(scenario);
   const order = useMemo(() => leaves(tree), [tree]);
   const count = order.length;
   const canSplit = count < MAX_TERMINALS;
@@ -205,20 +203,16 @@ export default function BashPlayground() {
     [focusId, rects],
   );
 
-  const handleReset = useCallback(
-    async (next: string) => {
-      setNotice(null);
-      if (next === scenario) await reset();
-      else setScenario(next);
-      cwdOf.current = new Map();
-      setPanes((p) => p.map((x) => ({ ...x, startCwd: HOME })));
-      setResetToken((n) => n + 1);
-      // The reseed replaced the session's shells; reopen every extra one at
-      // home so its next command does not land in a directory that is gone.
-      for (const id of order) if (id !== "t1") void openShell(id, HOME);
-    },
-    [openShell, order, reset, scenario],
-  );
+  const handleReset = useCallback(async () => {
+    setNotice(null);
+    await reset();
+    cwdOf.current = new Map();
+    setPanes((p) => p.map((x) => ({ ...x, startCwd: HOME })));
+    setResetToken((n) => n + 1);
+    // The reseed replaced the session's shells; reopen every extra one at
+    // home so its next command does not land in a directory that is gone.
+    for (const id of order) if (id !== "t1") void openShell(id, HOME);
+  }, [openShell, order, reset]);
 
   // ── Drag to rearrange ────────────────────────────────────────────────
   const dragHandlers = useCallback(
@@ -297,7 +291,7 @@ export default function BashPlayground() {
         session={session}
         startCwd={rec.startCwd}
         focused={focusId === id}
-        hint={id === "t1" ? `${scenarioDef.description} Try ls.` : null}
+        hint={id === "t1" ? "A few files to poke at. Try ls, then cat README.md." : null}
         mobile={mobile}
         canClose={count > 1}
         canSplit={canSplit}
@@ -363,7 +357,7 @@ export default function BashPlayground() {
                 </Select.Trigger>
                 <Select.Portal>
                   <Select.Positioner className="playground-lang-switcher-positioner" sideOffset={6}>
-                    <Select.Popup className="playground-lang-switcher-popup">
+                    <Select.Popup className="bui-select-popup playground-lang-switcher-popup">
                       {PLAYGROUNDS.map((p) => {
                         const Icon = LANGUAGE_ICONS[p.id];
                         const factor = LANGUAGE_ICON_SIZE_FACTOR[p.id] ?? 1;
@@ -387,31 +381,9 @@ export default function BashPlayground() {
 
           <div className="header-sep" />
 
-          <Select.Root value={scenario} onValueChange={(v) => v && void handleReset(v)}>
-            <Select.Trigger className="bpg-btn bpg-scenario" aria-label="Scenario">
-              <LayoutList size={14} aria-hidden="true" />
-              <Select.Value className="bpg-btn-label">{scenarioDef.label}</Select.Value>
-              <ChevronDown size={12} aria-hidden="true" />
-            </Select.Trigger>
-            <Select.Portal>
-              <Select.Positioner className="playground-lang-switcher-positioner" sideOffset={6} align="end">
-                <Select.Popup className="playground-lang-switcher-popup bpg-scenario-popup">
-                  {BASH_SCENARIOS.map((s) => (
-                    <Select.Item key={s.id} value={s.id} className="bui-select-item bpg-scenario-item">
-                      <span className="bpg-scenario-text">
-                        <Select.ItemText>{s.label}</Select.ItemText>
-                        <span className="bpg-scenario-desc">{s.description}</span>
-                      </span>
-                    </Select.Item>
-                  ))}
-                </Select.Popup>
-              </Select.Positioner>
-            </Select.Portal>
-          </Select.Root>
-
           <button
             type="button"
-            className="bpg-btn primary"
+            className="bpg-btn"
             onClick={() => addPane(focusId, "row")}
             disabled={!ready || !canSplit}
             title={canSplit ? `New terminal beside ${focusedTitle}` : `Up to ${MAX_TERMINALS} terminals`}
@@ -454,9 +426,9 @@ export default function BashPlayground() {
           <button
             type="button"
             className="bpg-btn"
-            onClick={() => void handleReset(scenario)}
+            onClick={() => void handleReset()}
             disabled={!ready}
-            title="Start this scenario over. Nothing here is saved."
+            title="Start over with the starting files. Nothing here is saved."
             aria-label="Reset"
           >
             <RotateCcw size={14} aria-hidden="true" />
