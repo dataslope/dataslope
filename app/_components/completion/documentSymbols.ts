@@ -244,6 +244,8 @@ const C_RECORD_NODES = new Set([
  *  name a struct/class table is keyed by. */
 export function baseTypeName(type: string): string {
   return type
+    // An inline body (`struct point { int x; } q;`) is not part of the name.
+    .replace(/\{[\s\S]*$/, "")
     .replace(/\b(struct|class|union|enum|const|volatile|static|final|unsigned|signed)\b/g, "")
     .replace(/<.*$/, "")
     .replace(/[*&[\]\s]/g, "")

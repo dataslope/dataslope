@@ -46,7 +46,9 @@ import {
   documentSymbolSource,
   type SymbolLanguage,
 } from "./documentSymbols";
+import { completionPopupTheme } from "./popupTheme";
 import { buildPositionRequest } from "./positionRequest";
+import { RANK, ranked, rememberPickedCompletions } from "./ranking";
 import { runtimeTooltips } from "./runtimeTooltips";
 
 /** The slice of `LanguageRuntime` this module needs, kept structural so
@@ -114,6 +116,9 @@ interface LanguageProfile {
   /** False for packs that decide context themselves (HTML tags after `<`,
    *  CSS values after `:`) and must not be muted in "member" position. */
   guardMembers?: boolean;
+  /** Tier for each pack source (locals, then globals/snippets); defaults
+   *  to `[RANK.local, RANK.keyword]`. */
+  packRanks?: [number, number];
   /** Lazy loader for the curated static builtin/keyword list. */
   staticList?: () => Promise<readonly Completion[]>;
   /** Lazy loader for keywords that stay on beside a runtime that only
@@ -143,6 +148,9 @@ type ProfileSpec = LanguageProfile | ByFileProfile;
 
 const WORD_DEFAULT = /[\w$]*$/;
 const VALID_DEFAULT = /^[\w$]*$/;
+
+/** Snippet templates sort below real symbols, as VS Code orders them. */
+const asSnippet = (c: Completion): Completion => ({ ...c, boost: RANK.snippet });
 
 /** Completions for `$variables` present in the document plus the PHP
  *  superglobals, the only names that make sense right after `$`. */
@@ -183,7 +191,10 @@ const JAVASCRIPT_PROFILE: LanguageProfile = {
     const { JS_KEYWORDS } = await import("./staticLists/javascript");
     return [
       localCompletionSource,
-      ifNotIn(DONT_COMPLETE_IN, completeFromList([...snippets, ...JS_KEYWORDS])),
+      ifNotIn(
+        DONT_COMPLETE_IN,
+        completeFromList([...snippets.map(asSnippet), ...JS_KEYWORDS]),
+      ),
     ];
   },
   langPackAlwaysOn: true,
@@ -203,7 +214,7 @@ const TYPESCRIPT_PROFILE: LanguageProfile = {
       localCompletionSource,
       ifNotIn(
         DONT_COMPLETE_IN,
-        completeFromList([...typescriptSnippets, ...TS_KEYWORDS]),
+        completeFromList([...typescriptSnippets.map(asSnippet), ...TS_KEYWORDS]),
       ),
     ];
   },
@@ -221,6 +232,7 @@ const HTML_PROFILE: LanguageProfile = {
   },
   langPackAlwaysOn: true,
   guardMembers: false,
+  packRanks: [RANK.builtin, RANK.builtin],
 };
 
 const CSS_PROFILE: LanguageProfile = {
@@ -234,6 +246,7 @@ const CSS_PROFILE: LanguageProfile = {
   },
   langPackAlwaysOn: true,
   guardMembers: false,
+  packRanks: [RANK.builtin, RANK.builtin],
 };
 
 const PROFILES: Record<string, ProfileSpec> = {
@@ -472,7 +485,7 @@ export function languageCompletion(cfg: LanguageCompletionConfig): Extension {
 
   const sources: CompletionSource[] = [
     // Never inside a string or comment, whatever the runtime thinks.
-    ifNotIn(DONT_COMPLETE_IN, runtimeSource(cfg, profileFor)),
+    ranked(ifNotIn(DONT_COMPLETE_IN, runtimeSource(cfg, profileFor)), RANK.runtime),
   ];
 
   for (const profile of variantsOf(spec)) {
@@ -481,28 +494,38 @@ export function languageCompletion(cfg: LanguageCompletionConfig): Extension {
     // `printf` isn't offered twice.
     const staticLabels = new Set<string>();
 
-    if (profile.extraSource) sources.push(mine(profile.extraSource));
+    if (profile.extraSource) {
+      sources.push(mine(ranked(profile.extraSource, RANK.documentSymbol, { locality: false })));
+    }
 
     if (profile.langPack) {
       // Packs ship up to two sources; each gets a lazy wrapper sharing one
       // import promise so the chunk loads once.
       let packPromise: Promise<CompletionSource[]> | null = null;
       const loadPack = () => (packPromise ??= profile.langPack!());
-      for (const idx of [0, 1]) {
-        const lazy = lazySource(async () => {
-          const packSources = (await loadPack()).map((s) =>
-            suppressInMemberPosition(s, profile),
-          );
-          return packSources[idx] ?? (() => null);
-        });
+      const packRanks = profile.packRanks ?? [RANK.local, RANK.keyword];
+      for (const idx of [0, 1] as const) {
+        const lazy = ranked(
+          lazySource(async () => {
+            const packSources = (await loadPack()).map((s) =>
+              suppressInMemberPosition(s, profile),
+            );
+            return packSources[idx] ?? (() => null);
+          }),
+          packRanks[idx],
+        );
         sources.push(mine(profile.langPackAlwaysOn ? lazy : unlessRuntime(lazy)));
       }
     }
 
     if (profile.symbols) {
-      const symbolSource = suppressInMemberPosition(
-        ifNotIn(DONT_COMPLETE_IN, documentSymbolSource(profile.symbols)),
-        profile,
+      const symbolSource = ranked(
+        suppressInMemberPosition(
+          ifNotIn(DONT_COMPLETE_IN, documentSymbolSource(profile.symbols)),
+          profile,
+        ),
+        RANK.documentSymbol,
+        { locality: false },
       );
       sources.push(
         mine(profile.symbolsAlwaysOn ? symbolSource : unlessRuntime(symbolSource)),
@@ -512,28 +535,41 @@ export function languageCompletion(cfg: LanguageCompletionConfig): Extension {
     if (profile.keywordsAlwaysOn) {
       sources.push(
         mine(
-          lazySource(async () =>
-            suppressInMemberPosition(
-              ifNotIn(DONT_COMPLETE_IN, completeFromList(await profile.keywordsAlwaysOn!())),
-              profile,
+          ranked(
+            lazySource(async () =>
+              suppressInMemberPosition(
+                ifNotIn(DONT_COMPLETE_IN, completeFromList(await profile.keywordsAlwaysOn!())),
+                profile,
+              ),
             ),
+            RANK.keyword,
           ),
         ),
       );
     }
 
+    // The static list loads once; the doc-word source waits for it so its
+    // filter never races the chunk on the first query (`printf` twice).
+    let staticListPromise: Promise<readonly Completion[]> | null = null;
+    const loadStaticList = (): Promise<readonly Completion[]> =>
+      (staticListPromise ??= profile.staticList!().then((list) => {
+        for (const c of list) staticLabels.add(c.label);
+        return list;
+      }));
+
     if (profile.staticList) {
       sources.push(
         mine(
           unlessRuntime(
-            lazySource(async () => {
-              const list = await profile.staticList!();
-              for (const c of list) staticLabels.add(c.label);
-              return suppressInMemberPosition(
-                ifNotIn(DONT_COMPLETE_IN, completeFromList(list)),
-                profile,
-              );
-            }),
+            ranked(
+              lazySource(async () =>
+                suppressInMemberPosition(
+                  ifNotIn(DONT_COMPLETE_IN, completeFromList(await loadStaticList())),
+                  profile,
+                ),
+              ),
+              RANK.builtin,
+            ),
           ),
         ),
       );
@@ -544,18 +580,34 @@ export function languageCompletion(cfg: LanguageCompletionConfig): Extension {
       // (it knows `s.` is a String); doc words are the fallback for both
       // positions, minus static labels and bare numbers.
       const memberSource = profile.symbols
-        ? ifNotIn(DONT_COMPLETE_IN, documentMemberSource(profile.symbols))
+        ? ranked(
+            ifNotIn(DONT_COMPLETE_IN, documentMemberSource(profile.symbols)),
+            RANK.documentSymbol,
+            { locality: false },
+          )
         : null;
-      const docWordSource = ifNotIn(DONT_COMPLETE_IN, (ctx) => {
-        const res = completeAnyWord(ctx) as CmCompletionResult | null;
-        if (!res) return null;
-        return {
-          ...res,
-          options: res.options.filter(
-            (o) => !staticLabels.has(o.label) && !/^\d/.test(o.label),
-          ),
-        };
-      });
+      const docWordSource = ranked(
+        ifNotIn(DONT_COMPLETE_IN, async (ctx) => {
+          const res = completeAnyWord(ctx) as CmCompletionResult | null;
+          if (!res) return null;
+          if (profile.staticList) {
+            try {
+              await loadStaticList();
+            } catch {
+              // No static list this session; nothing to filter against.
+            }
+            if (ctx.aborted) return null;
+          }
+          return {
+            ...res,
+            options: res.options.filter(
+              (o) => !staticLabels.has(o.label) && !/^\d/.test(o.label),
+            ),
+          };
+        }),
+        RANK.docWord,
+        { locality: false },
+      );
       const combined: CompletionSource = (ctx) => {
         if (
           memberSource &&
@@ -626,7 +678,12 @@ export function languageCompletion(cfg: LanguageCompletionConfig): Extension {
     ];
   };
 
-  return [withCompletionTrigger(build), runtimeTooltips(cfg)];
+  return [
+    withCompletionTrigger(build),
+    completionPopupTheme,
+    rememberPickedCompletions,
+    runtimeTooltips(cfg),
+  ];
 }
 
 /** Test-only handles; not part of the public surface. */

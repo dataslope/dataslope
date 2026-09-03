@@ -120,7 +120,13 @@ export function parseClangCompletions(
       }
     }
 
-    byLabel.set(name, { label: name, type, detail, overloads: 0 });
+    byLabel.set(name, {
+      label: name,
+      type,
+      detail,
+      boost: type === "keyword" ? -1 : undefined,
+      overloads: 0,
+    });
     if (byLabel.size >= limit) break;
   }
 

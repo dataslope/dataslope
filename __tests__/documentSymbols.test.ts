@@ -193,11 +193,17 @@ int main(void) {
     expect(labels(completeAt(state, "  pp->", members))).toEqual(["x", "y"]);
   });
 
+  it("completes fields of a struct declared inline, in an unfinished function", () => {
+    const partial = stateFor("int main(void) {\n  struct point { int x; int y; } q;\n  q.", cpp());
+    expect(labels(completeAt(partial, "  q.", members))).toEqual(["x", "y"]);
+  });
+
   it("strips qualifiers from type names", () => {
     expect(baseTypeName("struct point *")).toBe("point");
     expect(baseTypeName("const std::vector<int>&")).toBe("vector");
     expect(baseTypeName("unsigned int[]")).toBe("int");
     expect(baseTypeName("java.util.List<String>")).toBe("List");
+    expect(baseTypeName("struct point { int x; int y; }")).toBe("point");
   });
 });
 

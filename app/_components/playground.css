@@ -1998,7 +1998,15 @@ body.playground-active {
 }
 
 /* Native <select> for the few enumerated settings (Code Suggestions),
-   drawn as a quiet pill so it sits beside the switches without shouting. */
+   drawn as a quiet pill so it sits beside the switches without shouting.
+   The chevron is a lucide icon laid over the select (a <select> takes no
+   pseudo-elements), in `currentColor` like every other icon here. */
+.setting-select-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+}
 .setting-select {
   appearance: none;
   -webkit-appearance: none;
@@ -2008,16 +2016,15 @@ body.playground-active {
   background: var(--bg2);
   border: 1px solid var(--border);
   border-radius: 6px;
-  padding: 4px 26px 4px 10px;
+  padding: 4px 28px 4px 10px;
   max-width: 100%;
   cursor: pointer;
-  background-image: linear-gradient(45deg, transparent 50%, var(--text-dim) 50%),
-    linear-gradient(135deg, var(--text-dim) 50%, transparent 50%);
-  background-position:
-    calc(100% - 14px) 50%,
-    calc(100% - 9px) 50%;
-  background-size: 5px 5px;
-  background-repeat: no-repeat;
+}
+.setting-select-chevron {
+  position: absolute;
+  right: 8px;
+  pointer-events: none;
+  color: var(--text-dim);
 }
 .setting-select:hover {
   background-color: var(--bg3);

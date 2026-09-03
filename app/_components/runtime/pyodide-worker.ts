@@ -735,6 +735,31 @@ _JEDI_TYPE_MAP = {
 # hundreds of ms for 60); CodeMirror re-queries as the user narrows.
 _JEDI_DETAIL_LIMIT = 30
 
+# What a learner reaches for most; everything else in builtins is a long
+# alphabetical tail of exception classes and rarities.
+_COMMON_BUILTINS = {
+    "print", "len", "range", "str", "int", "float", "list", "dict", "set",
+    "tuple", "input", "open", "sum", "min", "max", "sorted", "enumerate",
+    "zip", "map", "filter", "isinstance", "type", "round", "abs", "any",
+    "all", "bool", "format", "reversed", "next", "iter", "super", "hasattr",
+    "getattr", "id", "help", "repr", "chr", "ord", "divmod", "pow",
+}
+
+def _jedi_boost(c, name):
+    """Ranking nudge (-99..99): names from the reader's own code first."""
+    try:
+        if c.module_name == "__main__":
+            return 4
+    except Exception:
+        pass
+    if c.type == "keyword":
+        return 0
+    if name in _COMMON_BUILTINS:
+        return 2
+    if c.type == "class" and name.endswith(("Error", "Warning", "Exception")):
+        return -2
+    return 0
+
 def _jedi_signature(name):
     try:
         sigs = name.get_signatures()
@@ -778,6 +803,9 @@ def _python_completions_jedi(doc, line_no, column, line):
             "label": name,
             "type": _JEDI_TYPE_MAP.get(c.type, "variable"),
         }
+        boost = _jedi_boost(c, name)
+        if boost:
+            item["boost"] = boost
         if len(items) < _JEDI_DETAIL_LIMIT and c.type in ("function", "class"):
             sig = _jedi_signature(c)
             if sig and sig.startswith(name):
@@ -848,6 +876,7 @@ def _python_signatures_jedi(doc, line_no, column):
 # them or the per-run global reset would delete them.
 _PG_PROTECTED_NAMES |= {
     "_json", "_jedi", "_JEDI_TYPE_MAP", "_JEDI_DETAIL_LIMIT",
+    "_COMMON_BUILTINS", "_jedi_boost",
     "_jedi_signature", "_jedi_doc", "_python_completions_jedi",
     "_python_hover_jedi", "_python_signatures_jedi",
 }
@@ -1206,6 +1235,7 @@ async function completeCode(
       type?: unknown;
       detail?: unknown;
       info?: unknown;
+      boost?: unknown;
     }>;
     replaceLength?: unknown;
   } | null = null;
@@ -1229,6 +1259,7 @@ async function completeCode(
       type: typeof item.type === "string" ? item.type : undefined,
       detail: typeof item.detail === "string" ? item.detail : undefined,
       info: typeof item.info === "string" ? item.info : undefined,
+      boost: typeof item.boost === "number" ? item.boost : undefined,
     });
   }
   const replaceLength =

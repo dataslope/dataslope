@@ -282,6 +282,28 @@ function syncScripts(files: Array<[string, string]>): void {
 
 const MAX_COMPLETIONS = 300;
 
+/** The service's own ranking, as a boost: its `sortText` tiers run from
+ *  "10" (local declarations) through "15" (globals and keywords) to "18",
+ *  with deprecated entries prefixed "z". */
+function boostForSortText(sortText: string): number | undefined {
+  if (sortText.startsWith("z")) return -3;
+  switch (sortText.slice(0, 2)) {
+    case "10":
+      return 6;
+    case "11":
+      return 5;
+    case "12":
+      return 4;
+    case "13":
+    case "14":
+      return 3;
+    case "15":
+      return 1;
+    default:
+      return undefined;
+  }
+}
+
 async function complete(msg: Extract<InMessage, { kind: "complete" }>): Promise<void> {
   const env = msg.env ?? "dom";
   environment = env;
@@ -309,8 +331,7 @@ async function complete(msg: Extract<InMessage, { kind: "complete" }>): Promise<
       label: entry.name,
       type: cmTypeForTsKind(entry.kind),
       apply: entry.insertText,
-      // sortText "11" is the service's "local / most relevant" tier.
-      boost: entry.sortText === "11" ? 2 : undefined,
+      boost: boostForSortText(entry.sortText),
     });
     if (completions.length >= MAX_COMPLETIONS) break;
   }
