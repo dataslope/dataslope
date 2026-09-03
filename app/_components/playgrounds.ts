@@ -31,9 +31,10 @@ export const PLAYGROUNDS: PlaygroundEntry[] = [
   { id: "postgres", label: "PostgreSQL", href: "/playground/postgres" },
   { id: "sqlite", label: "SQLite", href: "/playground/sqlite" },
   { id: "duckdb", label: "DuckDB", href: "/playground/duckdb" },
-  // Memory-only: a repository is derived from the commands run against it, so
-  // there is no workspace to persist.
+  // Memory-only: a repository or a filesystem is derived from the commands run
+  // against it, so there is no workspace to persist.
   { id: "git", label: "Git", href: "/playground/git", ephemeral: true },
+  { id: "bash", label: "Bash", href: "/playground/bash", ephemeral: true },
 ];
 
 /** Playgrounds that own a saveable workspace — the recent-workspace lists,

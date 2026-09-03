@@ -109,7 +109,11 @@ export interface GitSession {
   state: RepoState;
   ready: boolean;
   error: string | null;
-  exec: (command: string) => Promise<CommandResult>;
+  /** Run a line in the session's main shell, or in a named one. */
+  exec: (command: string, shell?: string) => Promise<CommandResult>;
+  /** Open another shell over the same filesystem, optionally in a directory. */
+  openShell: (shell: string, cwd?: string) => Promise<CommandResult>;
+  closeShell: (shell: string) => Promise<CommandResult>;
   reset: () => Promise<CommandResult>;
   readFile: (path: string) => Promise<CommandResult>;
   writeFile: (path: string, content: string) => Promise<CommandResult>;
@@ -198,7 +202,17 @@ export function useGitSession(
   // they keep their identity across responses. A file editor that reloads
   // when `readFile` changes would otherwise reset its draft on every command.
   const exec = useCallback(
-    (command: string) => request({ type: "exec", session: sessionId, command }),
+    (command: string, shell?: string) =>
+      request({ type: "exec", session: sessionId, command, ...(shell ? { shell } : {}) }),
+    [sessionId],
+  );
+  const openShell = useCallback(
+    (shell: string, cwd?: string) =>
+      request({ type: "openShell", session: sessionId, shell, ...(cwd ? { cwd } : {}) }),
+    [sessionId],
+  );
+  const closeShell = useCallback(
+    (shell: string) => request({ type: "closeShell", session: sessionId, shell }),
     [sessionId],
   );
   const resetSession = useCallback(() => {
@@ -216,8 +230,8 @@ export function useGitSession(
   );
 
   return useMemo<GitSession>(
-    () => ({ state, ready, error, sessionId, exec, reset: resetSession, readFile, writeFile }),
-    [state, ready, error, sessionId, exec, resetSession, readFile, writeFile],
+    () => ({ state, ready, error, sessionId, exec, openShell, closeShell, reset: resetSession, readFile, writeFile }),
+    [state, ready, error, sessionId, exec, openShell, closeShell, resetSession, readFile, writeFile],
   );
 }
 

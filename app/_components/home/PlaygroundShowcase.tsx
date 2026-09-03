@@ -101,7 +101,9 @@ export function PlaygroundShowcase() {
     ? `A full in-browser SQL workbench, query, edit schemas, and explore sample databases. Pick any language from the switcher below.`
     : playgroundId === "git"
       ? `A real shell and a real repository in the tab, run Git commands and watch the working tree, index, and commit graph move. Pick any language from the switcher below.`
-      : `A full in-browser ${name} playground, write and run real ${name} instantly. Pick any language from the switcher below.`;
+      : playgroundId === "bash"
+        ? `A real shell in the tab, split it into terminals that share one filesystem and try any command without touching your machine. Pick any language from the switcher below.`
+        : `A full in-browser ${name} playground, write and run real ${name} instantly. Pick any language from the switcher below.`;
 
   return (
     <div className="px-4 sm:px-6">

@@ -55,10 +55,13 @@ const CATEGORIES: Category[] = [
     ],
   },
   {
-    name: "Version Control",
+    name: "Command Line",
     description:
-      "A real shell and a real repository in the tab: run commands and watch the working tree, index, and commit graph move.",
-    items: [{ id: "git", label: "Git", version: "2.43" }],
+      "A real shell and a real repository in the tab: split terminals that share one filesystem, and Git commands that move the working tree, index, and commit graph as you watch.",
+    items: [
+      { id: "bash", label: "Bash", version: "5.1" },
+      { id: "git", label: "Git", version: "2.43" },
+    ],
   },
   {
     name: "SQL Workbench",

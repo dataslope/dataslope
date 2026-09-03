@@ -54,9 +54,44 @@ type Session = {
    *  read back after each command. */
   run: ReturnType<typeof createGitCommand>;
   /** Working directory, environment and functions that outlive one exec, so
-   *  the terminal behaves like a terminal. */
+   *  the terminal behaves like a terminal. This is the main shell; the Git
+   *  playground and the blocks only ever use it. */
   shell: ShellSession;
+  /**
+   * Every shell over this session's filesystem, the main one included. The
+   * Bash playground opens one per terminal: same files, separate working
+   * directory, environment and functions, which is what a split terminal
+   * means everywhere else.
+   */
+  shells: Map<string, ShellSession>;
+  /**
+   * Commands on one session run one at a time. The message handler is async
+   * per message, so two terminals typing at once would otherwise interleave
+   * inside the one `Bash` instance mid-command. Reads queue too, so a
+   * snapshot never sees a filesystem halfway through a write.
+   */
+  queue: Promise<unknown>;
 };
+
+const MAIN_SHELL = "main";
+
+/** The named shell, opened on first use. `cwd` only applies when opening. */
+function shellFor(s: Session, id = MAIN_SHELL, cwd?: string): ShellSession {
+  let shell = s.shells.get(id);
+  if (!shell) {
+    shell = new ShellSession(cwd ?? s.root);
+    s.shells.set(id, shell);
+  }
+  return shell;
+}
+
+/** Run `fn` after everything already queued on the session. A failure does
+ *  not poison the queue: the next job still runs. */
+function enqueue<T>(s: Session, fn: () => Promise<T>): Promise<T> {
+  const job = s.queue.then(fn, fn);
+  s.queue = job.catch(() => undefined);
+  return job;
+}
 
 /** One repository per session id. The Worker is shared by a whole page; the
  *  sessions are not (see GitWorkerRequest). */
@@ -77,7 +112,19 @@ async function createSession(kind: SessionKind): Promise<Session> {
     customCommands: [defineCommand("git", run)],
   });
   await store.mkdir(root, { recursive: true });
-  return { store, fs, bash, clock, kind, root, run, shell: new ShellSession(root) };
+  const shell = new ShellSession(root);
+  return {
+    store,
+    fs,
+    bash,
+    clock,
+    kind,
+    root,
+    run,
+    shell,
+    shells: new Map([[MAIN_SHELL, shell]]),
+    queue: Promise.resolve(),
+  };
 }
 
 async function seed(scenarioId: string, kind: SessionKind): Promise<Session> {
@@ -140,7 +187,9 @@ async function snapshot(s: Session, tree: string[]): Promise<Record<string, stri
   return out;
 }
 
-async function readState(s: Session): Promise<RepoState> {
+/** The session's state as seen from one shell: the filesystem is shared,
+ *  the working directory is the shell's own. */
+async function readState(s: Session, shell: ShellSession = s.shell): Promise<RepoState> {
   const fs = s.fs as Parameters<typeof git.log>[0]["fs"];
   const { files: tree, dirs } = await listTree(s);
 
@@ -150,7 +199,7 @@ async function readState(s: Session): Promise<RepoState> {
       kind: "bash",
       tree,
       dirs,
-      cwd: s.shell.cwd,
+      cwd: shell.cwd,
       contents: await snapshot(s, tree),
     };
   }
@@ -161,7 +210,7 @@ async function readState(s: Session): Promise<RepoState> {
   } catch {
     initialized = false;
   }
-  if (!initialized) return { ...EMPTY_STATE, kind: "git", tree, dirs, cwd: s.shell.cwd, merging: null };
+  if (!initialized) return { ...EMPTY_STATE, kind: "git", tree, dirs, cwd: shell.cwd, merging: null };
 
   const branches = await git.listBranches({ fs, dir: s.root });
   let branch: string | null = null;
@@ -246,7 +295,7 @@ async function readState(s: Session): Promise<RepoState> {
     commits,
     tree,
     dirs,
-    cwd: s.shell.cwd,
+    cwd: shell.cwd,
     merging: s.run.merging,
   };
 }
@@ -276,47 +325,61 @@ self.addEventListener("message", (event: MessageEvent<GitWorkerRequest>) => {
         }
         case "exec": {
           const s = await sessionFor(req.session);
-          const result = await s.shell.run(s.bash, req.command);
+          const shell = shellFor(s, req.shell);
+          const { result, state } = await enqueue(s, async () => ({
+            result: await shell.run(s.bash, req.command),
+            state: await readState(s, shell),
+          }));
           post({
             id: req.id,
             ok: true,
             stdout: result.stdout,
             stderr: result.stderr,
             exitCode: result.exitCode,
-            state: await readState(s),
+            state,
           });
+          return;
+        }
+        case "openShell": {
+          const s = await sessionFor(req.session);
+          const shell = shellFor(s, req.shell, req.cwd);
+          post({ id: req.id, ok: true, stdout: "", stderr: "", exitCode: 0, state: await enqueue(s, () => readState(s, shell)) });
+          return;
+        }
+        case "closeShell": {
+          const s = await sessionFor(req.session);
+          if (req.shell !== MAIN_SHELL) s.shells.delete(req.shell);
+          post({ id: req.id, ok: true, stdout: "", stderr: "", exitCode: 0, state: await enqueue(s, () => readState(s)) });
           return;
         }
         case "readFile": {
           const s = await sessionFor(req.session);
-          const content = await s.store.readFile(`${s.root}/${req.path}`).catch(() => "");
-          post({
-            id: req.id,
-            ok: true,
-            stdout: "",
-            stderr: "",
-            exitCode: 0,
-            content,
+          const { content, state } = await enqueue(s, async () => ({
+            content: await s.store.readFile(`${s.root}/${req.path}`).catch(() => ""),
             state: await readState(s),
-          });
+          }));
+          post({ id: req.id, ok: true, stdout: "", stderr: "", exitCode: 0, content, state });
           return;
         }
         case "writeFile": {
           const s = await sessionFor(req.session);
-          let stderr = "";
-          let exitCode = 0;
-          try {
-            await s.store.writeFile(`${s.root}/${req.path}`, req.content);
-          } catch (e) {
-            stderr = `${(e as Error).message}\n`;
-            exitCode = 1;
-          }
-          post({ id: req.id, ok: true, stdout: "", stderr, exitCode, state: await readState(s) });
+          const { stderr, exitCode, state } = await enqueue(s, async () => {
+            let stderr = "";
+            let exitCode = 0;
+            try {
+              await s.store.writeFile(`${s.root}/${req.path}`, req.content);
+            } catch (e) {
+              stderr = `${(e as Error).message}\n`;
+              exitCode = 1;
+            }
+            return { stderr, exitCode, state: await readState(s) };
+          });
+          post({ id: req.id, ok: true, stdout: "", stderr, exitCode, state });
           return;
         }
         case "attach": {
           const s = await sessionFor(req.session);
-          post({ id: req.id, ok: true, stdout: "", stderr: "", exitCode: 0, state: await readState(s) });
+          post({ id: req.id, ok: true, stdout: "", stderr: "", exitCode: 0, state: await enqueue(s, () => readState(s)) });
           return;
         }
         case "dispose": {

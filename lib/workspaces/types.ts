@@ -57,7 +57,7 @@ export const CODE_PLAYGROUND_IDS: readonly string[] = [
  *  to save that the command history does not already describe. Listed rather
  *  than omitted so the intent is recorded: an id missing from every list is
  *  the bug __tests__/workspacesCloud.test.ts exists to catch. */
-export const EPHEMERAL_PLAYGROUND_IDS: readonly string[] = ["git"];
+export const EPHEMERAL_PLAYGROUND_IDS: readonly string[] = ["git", "bash"];
 
 /** A `/playground/<id>` route exists. */
 export function isKnownPlayground(id: string): boolean {

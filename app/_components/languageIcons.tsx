@@ -21,6 +21,7 @@ import {
   SiCss,
   SiReact,
   SiGit,
+  SiGnubash,
 } from "react-icons/si";
 import { RiPhpFill } from "react-icons/ri";
 
@@ -66,6 +67,7 @@ export const LANGUAGE_ICONS: Record<string, IconType> = {
   web: SiHtml5,
   react: SiReact,
   git: SiGit,
+  bash: SiGnubash,
 };
 
 /** Per-language size multiplier for glyphs that read heavier than the rest;
@@ -93,6 +95,7 @@ export const LANGUAGE_ICON_COLORS: Record<string, string> = {
   web: "#e34f26",
   react: "#61dafb",
   git: "#f05032",
+  bash: "#4eaa25",
 };
 
 /** Neutral database glyph for the "sql" content tag. Deliberately not in

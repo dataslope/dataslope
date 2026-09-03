@@ -156,6 +156,7 @@ export const GitTerminal = forwardRef<GitTerminalHandle, Props>(function GitTerm
 }: Props, ref) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const historyIndex = useRef<number | null>(null);
   /** Consecutive Tab presses, so the second one can list what the first
    *  could not narrow. */
@@ -183,10 +184,21 @@ export const GitTerminal = forwardRef<GitTerminalHandle, Props>(function GitTerm
   }, [transcript, busy, value, reportScroll]);
 
   useEffect(() => {
+    if (busy || readOnly) return;
+    // Several terminals can share a page. One finishing a command takes the
+    // keyboard back unless someone is typing somewhere else: another
+    // terminal's prompt, an editor, a search box.
+    const active = document.activeElement;
+    if (
+      active instanceof HTMLElement &&
+      !rootRef.current?.contains(active) &&
+      active.matches("input, textarea, select, [contenteditable]")
+    )
+      return;
     // `preventScroll` matters: the real input is visually hidden, and without
     // it the browser scrolls the page to wherever that hidden element sits
     // every time a command finishes and focus comes back.
-    if (!busy && !readOnly) inputRef.current?.focus({ preventScroll: true });
+    inputRef.current?.focus({ preventScroll: true });
   }, [busy, readOnly]);
 
   const syncCaret = useCallback(() => {
@@ -403,7 +415,7 @@ export const GitTerminal = forwardRef<GitTerminalHandle, Props>(function GitTerm
   );
 
   return (
-    <div className="git-terminal">
+    <div className="git-terminal" ref={rootRef}>
       <div
         className="git-terminal-scroll"
         ref={scrollRef}

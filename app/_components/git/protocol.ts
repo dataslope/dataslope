@@ -93,7 +93,14 @@ export const EMPTY_STATE: RepoState = {
  */
 export type GitWorkerRequest =
   | { id: number; session: string; type: "init"; scenario: string; kind?: SessionKind }
-  | { id: number; session: string; type: "exec"; command: string }
+  /** `shell` names one of several shells over the session's one filesystem
+   *  (the Bash playground's split terminals); omitted, it is the session's
+   *  main shell. An unknown id is opened at the session root on first use. */
+  | { id: number; session: string; type: "exec"; command: string; shell?: string }
+  /** Open a shell, optionally in a given directory (a split inherits the
+   *  directory of the terminal it was split from). */
+  | { id: number; session: string; type: "openShell"; shell: string; cwd?: string }
+  | { id: number; session: string; type: "closeShell"; shell: string }
   | { id: number; session: string; type: "reset"; scenario: string; kind?: SessionKind }
   | { id: number; session: string; type: "readFile"; path: string }
   | { id: number; session: string; type: "writeFile"; path: string; content: string }

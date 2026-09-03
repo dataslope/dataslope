@@ -4,6 +4,8 @@
 **Builds on:** the shell runtime shipped for the Git playground and the Bash blocks (just-bash in a Worker, `ShellSession`, `GitTerminal`), the redesigned Git playground shell (`agent-outputs/20260903-0745`), and the house playground chrome.
 **Brief:** an in-memory Bash playground with no sharing. Split horizontally and vertically into terminals that share context. Add, close and rearrange terminals; resize them when split.
 
+**Status (2026-09-03):** Phase 1 is implemented on this branch: one session with a shell per terminal (§5.1), the split tree with gutters (§4), drag to rearrange with the five drop zones, the phone's tab strip (§2.2), the keyboard shortcuts (§3), the cap of eight (§6), and the registry and links (§5.4). Two things changed while building. Panes render as one flat list positioned from `layout()` rather than as nested flexbox, because nesting remounted a terminal whenever the tree changed around it, and a split that wiped the scrollback of the terminal being split was worse than no split. And the pane head stays on a phone, minus its grip and close button, so rename, move and clear are reachable there. Phase 2 is untouched.
+
 ---
 
 ## 1. Decisions

@@ -21,28 +21,21 @@
  * page would show the same text and leave the reader in an empty shell.
  *
  * Blocks are isolated unless they share a `dir` id, so exploring in one block
- * cannot disturb another.
+ * cannot disturb another. The terminal itself is `useShellPane`, which the
+ * Bash playground's split terminals share.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Terminal } from "lucide-react";
+import { ExternalLink, Terminal } from "lucide-react";
 import { SiGnubash } from "react-icons/si";
+import Link from "../Link";
 import { useGitSession } from "../git/gitRuntime";
-import { GitTerminal, type TranscriptEntry } from "../git/GitTerminal";
+import { GitTerminal } from "../git/GitTerminal";
 import { ShellToolsMenu } from "../shell/ShellToolsMenu";
 import { DEFAULT_BASH_SCENARIO } from "./bashScenarios";
-import { HOME, displayCwd } from "./prompt";
-import { makePathCompleter } from "../git/pathCompleter";
+import { useShellPane } from "./useShellPane";
 import "../shell/embeddedShell.css";
 import "./bashPanels.css";
-
-/** Commands offered by tab-completion, on top of whatever is in the tree. */
-const SHELL_COMMANDS = [
-  "ls", "cd", "pwd", "cat", "echo", "printf", "touch", "mkdir", "rmdir", "rm",
-  "cp", "mv", "head", "tail", "wc", "grep", "sed", "awk", "sort", "uniq", "cut",
-  "tr", "find", "xargs", "diff", "jq", "tee", "du", "tree", "stat", "clear",
-  "basename", "dirname", "seq", "date", "which", "help",
-];
 
 export interface BashBlockProps {
   /** Optional starting script, played once the session is ready, either as
@@ -55,6 +48,8 @@ export interface BashBlockProps {
   dir?: string;
   /** Rows the terminal shows before it scrolls. */
   rows?: number;
+  /** Hide the link out to the full Bash playground. */
+  hideOpenInPlayground?: boolean;
 }
 
 export default function BashBlock({
@@ -62,166 +57,40 @@ export default function BashBlock({
   scenario = DEFAULT_BASH_SCENARIO,
   dir,
   rows = 10,
+  hideOpenInPlayground = false,
 }: BashBlockProps) {
   const script = useMemo(() => {
     const lines = Array.isArray(commands) ? commands : (commands ?? "").split("\n");
     return lines.map((line) => line.trim()).filter((line) => line !== "");
   }, [commands]);
 
-  const { state, ready, error, exec, reset } = useGitSession(scenario, dir, "bash");
-  const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
-  const [input, setInput] = useState("");
-  const [history, setHistory] = useState<string[]>([]);
-  const [busy, setBusy] = useState(false);
-  const entryId = useRef(0);
-  /** The directory each entry ran in, so scrollback shows a `cd` taking
-   *  effect on the line after it rather than rewriting the whole history. */
-  const promptAt = useRef<Map<number, string>>(new Map());
-  /** Where the session is right now. Read from each result rather than from
-   *  React state, which cannot keep up inside a run of commands. */
-  const cwdRef = useRef(HOME);
+  const session = useGitSession(scenario, dir, "bash");
+  const { ready, error, reset } = session;
+  const pane = useShellPane(session);
   /** Bumped by Reset, so the starting script plays again on a fresh tree. */
   const [runToken, setRunToken] = useState(0);
   /** Shades the header once the scrollback has content above the fold. */
   const [scrolled, setScrolled] = useState(false);
   const played = useRef(-1);
 
-  const append = useCallback(
-    (command: string, result: { stdout: string; stderr: string; exitCode: number }, at: string) => {
-      const id = (entryId.current += 1);
-      promptAt.current.set(id, at);
-      setTranscript((t) => [...t, { id, command, ...result }]);
-    },
-    [],
-  );
-
-  const runOne = useCallback(
-    async (command: string) => {
-      // The directory as it was before the command ran: a `cd` belongs to the
-      // prompt of the *next* line, exactly as in a terminal.
-      const at = cwdRef.current;
-      try {
-        const result = await exec(command);
-        cwdRef.current = result.cwd;
-        append(command, result, at);
-      } catch (e) {
-        append(command, { stdout: "", stderr: `${(e as Error).message}\n`, exitCode: 1 }, at);
-      }
-    },
-    [append, exec],
-  );
-
-  const submit = useCallback(
-    async (command: string) => {
-      if (command === "clear") {
-        setTranscript([]);
-        setInput("");
-        setHistory((h) => [...h, command]);
-        return;
-      }
-      // A blank line is not a no-op in a shell: it echoes the prompt and
-      // hands back a fresh one. Nothing runs and nothing joins the history,
-      // which is also how bash treats it.
-      if (command === "") {
-        const id = (entryId.current += 1);
-        promptAt.current.set(id, cwdRef.current);
-        setTranscript((t) => [
-          ...t,
-          { id, command: "", stdout: "", stderr: "", exitCode: 0 },
-        ]);
-        setInput("");
-        return;
-      }
-      setBusy(true);
-      setInput("");
-      setHistory((h) => [...h, command]);
-      try {
-        await runOne(command);
-      } finally {
-        setBusy(false);
-      }
-    },
-    [runOne],
-  );
-
-  const runScript = useCallback(async () => {
-    setBusy(true);
-    try {
-      for (const line of script) {
-        setHistory((h) => [...h, line]);
-        await runOne(line);
-      }
-    } finally {
-      setBusy(false);
-    }
-  }, [script, runOne]);
-
   // The starting script plays itself, so the reader lands on a session already
   // in progress rather than on a Run button. `played` guards StrictMode's
-  // double effect and `runScript` changing identity mid-play, either of which
+  // double effect and `runLines` changing identity mid-play, either of which
   // would run the example twice into one transcript.
+  const { runLines } = pane;
   useEffect(() => {
     if (!ready || script.length === 0 || played.current === runToken) return;
     played.current = runToken;
-    void runScript();
-  }, [ready, runToken, script.length, runScript]);
-
-  /**
-   * Whatever the line editor wants in the scrollback: a completion listing, or
-   * the question it asks before a very long one.
-   *
-   * `echo` reprints the line the reader was editing, which is what puts the
-   * listing *below* their command rather than above it. A `null` echo is bare
-   * output, the way bash prints a list after you answer its question.
-   */
-  const write = useCallback(({ echo, text }: { echo: string | null; text: string }) => {
-    const id = (entryId.current += 1);
-    if (echo !== null) promptAt.current.set(id, cwdRef.current);
-    setTranscript((t) => [
-      ...t,
-      {
-        id,
-        command: echo ?? "",
-        stdout: text,
-        stderr: "",
-        exitCode: 0,
-        note: echo === null,
-      },
-    ]);
-  }, []);
-
-  /** Paths as the reader would type them, relative to where they are. */
-  const pathCompletions = useMemo(
-    () => makePathCompleter(state.tree, state.dirs, state.cwd, HOME),
-    [state.tree, state.dirs, state.cwd],
-  );
-
-  /** The scrollback as text: every prompt line and everything it printed,
-   *  which is what a reader who wants to keep a session is actually after. */
-  const copyTranscript = useCallback(() => {
-    const lines: string[] = [];
-    for (const entry of transcript) {
-      if (!entry.note) {
-        const at = displayCwd(promptAt.current.get(entry.id) ?? HOME);
-        for (const line of entry.command.split("\n")) lines.push(`${at} $ ${line}`);
-      }
-      if (entry.stdout) lines.push(entry.stdout.replace(/\n$/, ""));
-      if (entry.stderr) lines.push(entry.stderr.replace(/\n$/, ""));
-    }
-    return lines.join("\n");
-  }, [transcript]);
+    void runLines(script);
+  }, [ready, runToken, script, runLines]);
 
   const resetBlock = useCallback(() => {
-    setTranscript([]);
-    setInput("");
-    setHistory([]);
-    promptAt.current = new Map();
-    cwdRef.current = HOME;
+    pane.reset();
     setRunToken((n) => n + 1);
     void reset();
-  }, [reset]);
+  }, [pane, reset]);
 
-  const disabled = busy || !ready;
+  const disabled = pane.busy || !ready;
 
   return (
     <div className="sblock-shell ds-striped-shell">
@@ -236,9 +105,15 @@ export default function BashBlock({
             <span className="sblock-runtime">
               <SiGnubash aria-hidden="true" /> Bash
             </span>
+            {!hideOpenInPlayground && (
+              <Link href="/playground/bash" className="sblock-open" title="Open the full Bash playground">
+                <ExternalLink size={12} aria-hidden="true" />
+                <span>Playground</span>
+              </Link>
+            )}
             <ShellToolsMenu
               onReset={resetBlock}
-              getCopyText={copyTranscript}
+              getCopyText={pane.copyTranscript}
               copyLabel="transcript"
               copyNote="Every command in this session and what it printed"
               disabled={disabled}
@@ -250,20 +125,20 @@ export default function BashBlock({
 
         <div className="sblock-terminal" style={{ height: `${rows * 1.55 + 3.2}em` }}>
           <GitTerminal
-            transcript={transcript}
-            value={input}
-            onValueChange={setInput}
-            onSubmit={(c) => void submit(c)}
-            history={history}
+            transcript={pane.transcript}
+            value={pane.input}
+            onValueChange={pane.setInput}
+            onSubmit={(c) => void pane.submit(c)}
+            history={pane.history}
             busy={disabled}
-            completions={SHELL_COMMANDS}
-            pathCompletions={pathCompletions}
-            // bash's own `\w$`: the working directory in full, then the `$`.
-            prompt={displayCwd(state.cwd || HOME)}
-            promptFor={(entry) => displayCwd(promptAt.current.get(entry.id) ?? HOME)}
+            completions={pane.completions}
+            pathCompletions={pane.pathCompletions}
+            // bash's own `\w$`: the working directory, then the `$`.
+            prompt={pane.prompt}
+            promptFor={pane.promptFor}
             placeholder=""
             inlineInput
-            onWrite={write}
+            onWrite={pane.write}
             onScrolledChange={setScrolled}
             placeholderHint={null}
           />

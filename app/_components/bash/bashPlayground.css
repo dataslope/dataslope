@@ -1,0 +1,504 @@
+/* ─── Bash playground ───────────────────────────────────────────────────── */
+@import "../git/gitPanels.css";
+
+/* Layers on playground.css: the chrome is shared, this file adds the split
+   tree, the pane title bars, the gutters, the drop zones and the phone's tab
+   strip. Colors are the playground role tokens; the type floor is 12px and
+   the touch floor 32px. */
+
+/* ─── Header buttons ─── */
+.bpg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--bg3);
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.12s, border-color 0.12s, background-color 0.12s;
+}
+
+.bpg-btn:hover:not(:disabled) {
+  color: var(--text);
+  border-color: var(--text-dim);
+}
+
+.bpg-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.bpg-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.bpg-btn.primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.bpg-btn.primary:hover:not(:disabled) {
+  color: #fff;
+  filter: brightness(1.08);
+}
+
+.bpg-scenario-popup {
+  min-width: 260px;
+}
+
+.bpg-scenario-item {
+  align-items: flex-start;
+}
+
+.bpg-scenario-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bpg-scenario-desc {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-dim);
+}
+
+/* ─── The stage ─── */
+.bpg-body {
+  flex-direction: column;
+  position: relative;
+}
+
+.bpg-body.dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.bpg-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  background: var(--bg);
+}
+
+/* The tree fills the stage; its panes are placed inside it from the
+   positions SplitView hands each slot as custom properties. */
+.bpg-tree {
+  flex: 1 1 0%;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+}
+
+.bpg-slot {
+  position: absolute;
+  left: var(--l);
+  top: var(--t);
+  width: var(--w);
+  height: var(--h);
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+}
+
+.bpg-slot > * {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* The gutter: a rule on the boundary that becomes a handle on hover. */
+.bpg-gutter {
+  position: absolute;
+  z-index: 1;
+  background: var(--border);
+  transition: background-color 0.12s;
+  touch-action: none;
+}
+
+.bpg-gutter.dir-row {
+  cursor: col-resize;
+}
+
+.bpg-gutter.dir-col {
+  cursor: row-resize;
+}
+
+.bpg-gutter:hover,
+.bpg-gutter:active {
+  background: var(--primary);
+}
+
+/* ─── A pane ─── */
+.bpg-pane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--bg);
+  position: relative;
+}
+
+.bpg-pane-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 2px 6px 2px 4px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  flex: none;
+  /* The focused pane's bar carries the accent. */
+  box-shadow: inset 0 2px 0 transparent;
+  transition: box-shadow 0.12s;
+}
+
+.bpg-pane.focused > .bpg-pane-head {
+  box-shadow: inset 0 2px 0 var(--primary);
+}
+
+.bpg-grip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: grab;
+  touch-action: none;
+  flex: none;
+}
+
+.bpg-grip:hover {
+  background: var(--menu-item-hover);
+  color: var(--text);
+}
+
+.bpg-grip:active {
+  cursor: grabbing;
+}
+
+.bpg-pane-title {
+  border: none;
+  background: transparent;
+  padding: 2px 4px;
+  border-radius: 4px;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: text;
+  white-space: nowrap;
+}
+
+.bpg-pane-rename {
+  min-height: 26px;
+  width: 140px;
+  border: 1px solid var(--primary);
+  border-radius: 5px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 2px 6px;
+  outline: none;
+}
+
+.bpg-pane-cwd {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.bpg-pane-sep {
+  flex: 1;
+}
+
+.bpg-pane-menu {
+  flex: none;
+}
+
+.bpg-pane-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  flex: none;
+}
+
+.bpg-pane-close:hover:not(:disabled) {
+  background: var(--menu-item-hover);
+  color: var(--text);
+}
+
+.bpg-pane-close:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* The terminal fills the pane. Plain text on the page, the prompt line in
+   green, output in body ink, the same as the embedded blocks. */
+.bpg-term {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  background: var(--bg);
+}
+
+.bpg-term .git-terminal-scroll {
+  padding: 10px 14px;
+  font-size: 13px;
+  cursor: text;
+}
+
+.bpg-term .git-terminal-out {
+  color: var(--text);
+}
+
+.bpg-term .git-terminal-prompt {
+  font-weight: 400;
+}
+
+.bpg-term .git-terminal-out,
+.bpg-term .git-terminal-err,
+.bpg-term .git-terminal-busy {
+  padding-left: 0;
+}
+
+.bpg-term .git-terminal-block {
+  margin-bottom: 0;
+}
+
+.bpg-term .git-terminal-out,
+.bpg-term .git-terminal-err {
+  margin-top: 0;
+}
+
+.bpg-term .git-terminal-line {
+  color: var(--ds-green);
+}
+
+.bpg-term .git-terminal-hint {
+  margin: 0 0 6px;
+  font-size: 12.5px;
+}
+
+/* ─── Drag to rearrange ─── */
+.bpg-dropzone {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  z-index: 3;
+}
+
+.bpg-dropzone::before {
+  content: "";
+  position: absolute;
+  background: color-mix(in srgb, var(--primary) 18%, transparent);
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  inset: 4px;
+}
+
+.bpg-dropzone[data-zone="left"]::before { right: 50%; }
+.bpg-dropzone[data-zone="right"]::before { left: 50%; }
+.bpg-dropzone[data-zone="top"]::before { bottom: 50%; }
+.bpg-dropzone[data-zone="bottom"]::before { top: 50%; }
+.bpg-dropzone[data-zone="center"]::before { inset: 25%; border-style: dashed; }
+
+.bpg-dropzone span {
+  position: relative;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.bpg-drag-ghost {
+  position: fixed;
+  left: 50%;
+  top: 8px;
+  transform: translateX(-50%);
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--bg);
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 30;
+  opacity: 0.9;
+}
+
+.bpg-notice {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.35);
+  z-index: 20;
+}
+
+/* ─── Phone: a tab strip, one terminal at a time ─── */
+.bpg-tabs {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  .bpg-btn-label {
+    display: none;
+  }
+
+  .bpg-tabs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    overflow-x: auto;
+    flex: none;
+    scrollbar-width: none;
+  }
+
+  .bpg-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .bpg-tab {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--bg2);
+    color: var(--text-dim);
+    flex: none;
+    overflow: hidden;
+  }
+
+  .bpg-tab.active {
+    border-color: var(--primary);
+    background: var(--primary-glow);
+    color: var(--primary);
+  }
+
+  .bpg-tab-btn,
+  .bpg-tab.add {
+    min-height: 34px;
+    padding: 4px 12px;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .bpg-tab.add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .bpg-tab.add:disabled {
+    opacity: 0.4;
+  }
+
+  .bpg-tab-close {
+    min-height: 34px;
+    width: 30px;
+    border: none;
+    border-left: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* On a phone the tree still exists; only the focused terminal is shown.
+     Every slot stacks in the same cell, and the ones holding a hidden pane
+     let touches through to the one that is showing. */
+  .bpg-gutter {
+    display: none;
+  }
+
+  .bpg-tree {
+    display: grid;
+  }
+
+  .bpg-slot {
+    position: static;
+    grid-area: 1 / 1;
+    pointer-events: none;
+  }
+
+  .bpg-pane {
+    display: none;
+    pointer-events: auto;
+  }
+
+  .bpg-stage[data-focus] .bpg-pane.focused {
+    display: flex;
+  }
+
+  /* The head stays for its directory and its menu, which is where a phone
+     renames, moves, and clears. The grip and the close go: the tab strip is
+     where a phone switches and closes, and there is nothing to drag. */
+  .bpg-grip,
+  .bpg-pane-close {
+    display: none;
+  }
+
+  .bpg-term .git-terminal-scroll {
+    padding: 10px 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bpg-btn,
+  .bpg-gutter,
+  .bpg-pane-head {
+    transition: none;
+  }
+}
