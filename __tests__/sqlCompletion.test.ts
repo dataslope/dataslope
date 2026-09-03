@@ -7,6 +7,7 @@ import {
   type SqlCompletionOptions,
   type SqlCompletionSchema,
 } from "../app/_components/sql/sqlCompletion";
+import { _internal as ranking, rememberPicked } from "../app/_components/completion/ranking";
 
 const schema: SqlCompletionSchema = {
   entities: [
@@ -789,5 +790,92 @@ describe("DuckDB SQL completion source", () => {
     expect(top).toContain("OR");
     expect(top).toContain("REPLACE");
     expect(top).toContain("MATERIALIZED");
+  });
+});
+
+describe("ranking signals layered on the slot boosts", () => {
+  const boostOf = (result: CompletionResult | null, label: string) =>
+    findOption(result, label)?.boost ?? 0;
+
+  it("shows function signatures and descriptions", () => {
+    const result = complete("SELECT COU");
+    const count = findOption(result, "COUNT");
+    expect(count?.detail).toBe("(expr | *)");
+    expect(count?.info).toMatch(/Number of rows/);
+  });
+
+  it("inserts the parenthesis-less functions bare", () => {
+    const pg = makeComplete({ dialect: "postgres" });
+    const result = pg("SELECT CURRENT_D");
+    const current = findOption(result, "CURRENT_DATE");
+    expect(current?.apply).toBe("CURRENT_DATE");
+    const now = findOption(result, "NOW");
+    expect(typeof now?.apply).toBe("function"); // snippet: NOW(#{})
+  });
+
+  it("offers types after a :: cast in Postgres and DuckDB, not SQLite", () => {
+    const pg = makeComplete({ dialect: "postgres" });
+    const cast = pg("SELECT total::|", true);
+    expect(labels(cast)).toEqual(expect.arrayContaining(["INTEGER", "TEXT", "NUMERIC"]));
+    expect(labels(cast)).not.toContain("customers");
+    const typed = pg("SELECT total::nu");
+    expect(labels(typed)).toContain("NUMERIC");
+    const duck = makeComplete({ dialect: "duckdb" })("SELECT total::|", true);
+    expect(labels(duck)).toContain("VARCHAR");
+    expect(labels(complete("SELECT total::|", true))).not.toContain("INTEGER");
+  });
+
+  it("ranks SELECT-list columns first in ORDER BY and offers aliases", () => {
+    const doc =
+      "SELECT name, SUM(total) AS spent FROM customers c JOIN orders o ON o.customer_id = c.id GROUP BY name ORDER BY ";
+    const result = complete(doc);
+    expect(boostOf(result, "name")).toBeGreaterThan(boostOf(result, "email"));
+    const alias = findOption(result, "spent");
+    expect(alias).toMatchObject({ type: "property", detail: "alias" });
+    expect(renderedLabels(result).slice(0, 2)).toEqual(["spent", "name"]);
+  });
+
+  it("reads implicit aliases and keeps function names out of the column set", () => {
+    const doc = "SELECT c.name, COUNT(o.id) order_count FROM customers c JOIN orders o ON o.customer_id = c.id GROUP BY c.name ORDER BY ";
+    const result = complete(doc);
+    expect(findOption(result, "order_count")?.detail).toBe("alias");
+    expect(findOption(result, "COUNT")?.type).toBe("function");
+    expect(boostOf(result, "name")).toBeGreaterThan(boostOf(result, "email"));
+  });
+
+  it("withholds aliases where the dialect rejects them", () => {
+    const doc = "SELECT name AS who FROM customers GROUP BY ";
+    expect(labels(complete(doc))).toContain("who"); // SQLite accepts
+    const pg = makeComplete({ dialect: "postgres" });
+    expect(labels(pg(doc))).not.toContain("who");
+    expect(labels(pg("SELECT name AS who FROM customers ORDER BY "))).toContain("who");
+    expect(labels(pg("SELECT name AS who FROM customers GROUP BY name HAVING "))).not.toContain("who");
+    expect(labels(complete("SELECT name AS who FROM customers GROUP BY name HAVING "))).toContain("who");
+  });
+
+  it("edges a column already used in the document ahead of its neighbours", () => {
+    const result = complete("SELECT email FROM customers WHERE ");
+    expect(boostOf(result, "email")).toBeGreaterThan(boostOf(result, "name"));
+    // The bump reorders within the Columns section, never past it.
+    expect(renderedLabels(result).indexOf("email")).toBeLessThan(renderedLabels(result).indexOf("SELECT"));
+  });
+
+  it("remembers what the reader accepted last", () => {
+    ranking.recent.length = 0;
+    const before = complete("SELECT * FROM customers WHERE ");
+    expect(boostOf(before, "name")).toBe(boostOf(before, "email"));
+    rememberPicked("name");
+    const after = complete("SELECT * FROM customers WHERE ");
+    expect(boostOf(after, "name")).toBeGreaterThan(boostOf(after, "email"));
+    ranking.recent.length = 0;
+  });
+
+  it("keeps the FK join condition above even a well-used column in the ON slot", () => {
+    rememberPicked("customer_id");
+    const result = complete(
+      "SELECT o.customer_id FROM orders o JOIN customers c ON ",
+    );
+    expect(renderedLabels(result)[0]).toBe("c.id = o.customer_id");
+    ranking.recent.length = 0;
   });
 });

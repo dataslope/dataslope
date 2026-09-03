@@ -47,6 +47,18 @@ export const completionPopupTheme = EditorView.theme({
     fontSize: "92%",
     opacity: "0.65",
   },
+  // SQL groups its rows (Columns, Tables, Keywords); the header reads as a
+  // quiet caption, not a row.
+  ".cm-tooltip.cm-tooltip-autocomplete > ul > completion-section": {
+    display: "block",
+    padding: "4px 8px 1px",
+    fontSize: "72%",
+    fontWeight: "600",
+    letterSpacing: "0.06em",
+    textTransform: "uppercase",
+    opacity: "0.55",
+    borderBottom: "none",
+  },
   ".cm-tooltip.cm-completionInfo": {
     maxWidth: "min(28em, 60vw)",
     whiteSpace: "pre-wrap",
