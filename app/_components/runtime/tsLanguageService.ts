@@ -7,7 +7,11 @@
 // (CDN blocked, importScripts failure) the module remembers the failure
 // and answers every request with an empty result instead of respawning.
 
-import type { CompletionResult } from "../types";
+import type {
+  CompletionResult,
+  HoverResult,
+  SignatureHelpResult,
+} from "../types";
 import type { TsDiagnosticMessage, TsEnvironment } from "./tsAnalysisConfig";
 
 export type { TsDiagnosticMessage, TsEnvironment } from "./tsAnalysisConfig";
@@ -31,6 +35,12 @@ type WorkerOutMessage =
       kind: "diagnose-result";
       id: number;
       diagnostics: TsDiagnosticMessage[];
+    }
+  | { kind: "hover-result"; id: number; result: HoverResult | null }
+  | {
+      kind: "signature-result";
+      id: number;
+      result: SignatureHelpResult | null;
     };
 
 /** Analysis request: the workspace, and which globals it runs against. */
@@ -200,6 +210,64 @@ export async function completeWithTsService(
       env: req.env,
     });
   });
+}
+
+/** One position query (hover, signature help) over the worker. Best-effort:
+ *  a dead worker, a boot failure or a request that outlives its wait all
+ *  resolve null. */
+function positionQuery<T>(
+  kind: "hover" | "signature",
+  req: TsCompletionRequest,
+): Promise<T | null> {
+  const w = getWorker();
+  if (!w) return Promise.resolve(null);
+  return ensureReady(w).then((ok) => {
+    if (!ok) return null;
+    const id = ++nextId;
+    const resultKind = `${kind}-result`;
+    return new Promise<T | null>((resolve) => {
+      const settle = (result: T | null) => {
+        clearTimeout(timer);
+        w.removeEventListener("message", onMessage);
+        w.removeEventListener("error", onError);
+        resolve(result);
+      };
+      const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
+        const msg = ev.data;
+        if (msg.kind !== "hover-result" && msg.kind !== "signature-result") return;
+        if (msg.kind !== resultKind || msg.id !== id) return;
+        settle(msg.result as T | null);
+      };
+      const onError = () => settle(null);
+      const timer = setTimeout(() => settle(null), POSITION_QUERY_TIMEOUT_MS);
+      w.addEventListener("message", onMessage);
+      w.addEventListener("error", onError);
+      w.postMessage({
+        kind,
+        id,
+        files: req.files.map(([p, c]) => [normalizePath(p), c]),
+        entry: normalizePath(req.entry),
+        offset: req.offset,
+        env: req.env,
+      });
+    });
+  });
+}
+
+/** A tooltip that arrives after this is a tooltip for a cursor that has
+ *  moved on; the cold lib fetch is the only thing that takes longer. */
+const POSITION_QUERY_TIMEOUT_MS = 8_000;
+
+export function hoverWithTsService(
+  req: TsCompletionRequest,
+): Promise<HoverResult | null> {
+  return positionQuery<HoverResult>("hover", req);
+}
+
+export function signatureHelpWithTsService(
+  req: TsCompletionRequest,
+): Promise<SignatureHelpResult | null> {
+  return positionQuery<SignatureHelpResult>("signature", req);
 }
 
 /** How long to wait for an analysis before running without it. The service

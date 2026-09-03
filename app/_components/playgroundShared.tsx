@@ -7,6 +7,7 @@ import { useCallback, useState, type ReactNode } from "react";
 import { Switch } from "@base-ui/react/switch";
 import { Tabs } from "@base-ui/react/tabs";
 import {
+  Sparkles,
   ALargeSmall,
   Eraser,
   RotateCcw,
@@ -17,6 +18,11 @@ import {
   X,
 } from "lucide-react";
 import { ThemePillToggle } from "./ThemePillToggle";
+import {
+  COMPLETION_TRIGGER_OPTIONS,
+  useCompletionTrigger,
+  type CompletionTriggerMode,
+} from "./completion/completionPrefs";
 import type { RuntimeInfo } from "./types";
 
 /** Copy-to-clipboard glyph; stroked to match the pane-bar icons. */
@@ -274,6 +280,13 @@ export function SettingsPanelContent({
     }
   });
 
+  // Site-wide (every code editor reads it), so it is not part of the
+  // per-language settings props.
+  const [completionTrigger, setCompletionTriggerMode] = useCompletionTrigger();
+  const completionTriggerHelp =
+    COMPLETION_TRIGGER_OPTIONS.find((o) => o.value === completionTrigger)
+      ?.description ?? "";
+
   const handleTabChange = useCallback((v: string | number | null) => {
     const next = String(v);
     setTab(next);
@@ -388,6 +401,35 @@ export function SettingsPanelContent({
                 <Switch.Thumb className="bui-switch-thumb" />
               </Switch.Root>
             </label>
+          </div>
+
+          <div className="setting-row">
+            <label className="setting-switch-row">
+              <span className="setting-switch-label">
+                <Sparkles size={14} aria-hidden="true" />
+                <span>Code Suggestions</span>
+              </span>
+              <select
+                className="setting-select"
+                value={completionTrigger}
+                onChange={(e) =>
+                  setCompletionTriggerMode(
+                    e.target.value as CompletionTriggerMode,
+                  )
+                }
+                aria-label="When to show code suggestions"
+              >
+                {COMPLETION_TRIGGER_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label.replace(/`/g, "")}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <p className="setting-help">
+              {completionTriggerHelp.replace(/`/g, "")} Applies to every code
+              editor on the site.
+            </p>
           </div>
 
           {showClearBeforeRunRow && (

@@ -15,7 +15,7 @@ const fn = (label: string, detail: string): Completion => ({
   detail,
 });
 
-const CSHARP_KEYWORDS: readonly Completion[] = [
+export const CSHARP_KEYWORDS: readonly Completion[] = [
   "abstract", "as", "async", "await", "base", "bool", "break", "byte",
   "case", "catch", "char", "checked", "class", "const", "continue",
   "decimal", "default", "delegate", "do", "double", "dynamic", "else",

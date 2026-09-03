@@ -8,11 +8,16 @@ import type {
   LanguageRuntime,
   PackageInfo,
   RunOptions,
+  HoverResult,
+  PositionRequest,
+  SignatureHelpResult,
 } from "../types";
 import { getWebFmt, WEB_FMT_2SPACE } from "./webFmt";
 import {
   buildTsCompletionRequest,
   completeWithTsService,
+  hoverWithTsService,
+  signatureHelpWithTsService,
 } from "./tsLanguageService";
 import {
   cancelPreviewRun,
@@ -391,21 +396,35 @@ class WebPreviewRuntime implements LanguageRuntime {
     this.stagedBinary = binary;
   }
 
-  /** JS tabs get TypeScript-service completions; HTML/CSS tabs rely on
-   *  CodeMirror's built-in completion sources. */
+  /** JS tabs get TypeScript-service completions, hover and parameter
+   *  hints; HTML/CSS tabs use `@codemirror/lang-html` / `lang-css`'s own
+   *  completion sources (wired per file in languageCompletion.ts). */
   async complete(request: CompletionRequest): Promise<CompletionResult> {
+    const req = this.serviceRequest(request);
+    if (!req) return { list: [], replaceLength: 0 };
+    return completeWithTsService(req);
+  }
+
+  hover(request: PositionRequest): Promise<HoverResult | null> {
+    const req = this.serviceRequest(request);
+    return req ? hoverWithTsService(req) : Promise.resolve(null);
+  }
+
+  signatureHelp(request: PositionRequest): Promise<SignatureHelpResult | null> {
+    const req = this.serviceRequest(request);
+    return req ? signatureHelpWithTsService(req) : Promise.resolve(null);
+  }
+
+  /** Null for anything but a script file. */
+  private serviceRequest(request: PositionRequest) {
     const filename = request.filename ?? "";
-    if (!/\.(js|mjs|cjs)$/i.test(filename)) {
-      return { list: [], replaceLength: 0 };
-    }
-    return completeWithTsService(
-      buildTsCompletionRequest(
-        this.stagedText,
-        request.doc,
-        filename,
-        "script.js",
-        request.offset,
-      ),
+    if (!/\.(js|mjs|cjs)$/i.test(filename)) return null;
+    return buildTsCompletionRequest(
+      this.stagedText,
+      request.doc,
+      filename,
+      "script.js",
+      request.offset,
     );
   }
 

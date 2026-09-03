@@ -8,6 +8,9 @@ import type {
   LanguageRuntime,
   PackageInfo,
   RunOptions,
+  HoverResult,
+  PositionRequest,
+  SignatureHelpResult,
 } from "../types";
 import { getWebFmt, WEB_FMT_2SPACE } from "./webFmt";
 import {
@@ -15,6 +18,8 @@ import {
   completeWithTsService,
   diagnoseWithTsService,
   formatTsDiagnostic,
+  hoverWithTsService,
+  signatureHelpWithTsService,
 } from "./tsLanguageService";
 import { ANALYZABLE_SOURCE_RE } from "./tsAnalysisConfig";
 import { bundleLineOf, inlineSourceMapOf } from "./bundleSourceMap";
@@ -480,14 +485,24 @@ class ReactPreviewRuntime implements LanguageRuntime {
   /** TSX intellisense via the shared TS language-service worker (its
    *  compiler options enable the react-jsx transform). */
   async complete(request: CompletionRequest): Promise<CompletionResult> {
-    return completeWithTsService(
-      buildTsCompletionRequest(
-        this.stagedText,
-        request.doc,
-        request.filename,
-        "main.tsx",
-        request.offset,
-      ),
+    return completeWithTsService(this.serviceRequest(request));
+  }
+
+  hover(request: PositionRequest): Promise<HoverResult | null> {
+    return hoverWithTsService(this.serviceRequest(request));
+  }
+
+  signatureHelp(request: PositionRequest): Promise<SignatureHelpResult | null> {
+    return signatureHelpWithTsService(this.serviceRequest(request));
+  }
+
+  private serviceRequest(request: PositionRequest) {
+    return buildTsCompletionRequest(
+      this.stagedText,
+      request.doc,
+      request.filename,
+      "main.tsx",
+      request.offset,
     );
   }
 

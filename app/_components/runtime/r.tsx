@@ -5,6 +5,8 @@ import type {
   CompletionListItem,
   CompletionRequest,
   CompletionResult,
+  HoverResult,
+  PositionRequest,
   EmitOutput,
   ExampleSnippet,
   LanguageAdapter,
@@ -1314,6 +1316,9 @@ function rString(value: string): string {
   return JSON.stringify(value);
 }
 
+/** Function completions that get an `args()` signature per popup. */
+const R_SIGNATURE_LIMIT = 40;
+
 class WebRRuntime implements LanguageRuntime {
   private installedPackages = new Set<string>();
   // Absolute FS paths written during the previous prepareFileSystem call.
@@ -1485,7 +1490,82 @@ class WebRRuntime implements LanguageRuntime {
       if (!byLabel.has(label)) byLabel.set(label, item);
     }
 
+    // Signatures for the first screenful of functions, one R call (~30 ms
+    // for 40 names, measured); the rest stay bare.
+    const functionLabels = [...byLabel.values()]
+      .filter((item) => typeof item !== "string" && item.type === "function")
+      .map((item) => (item as { label: string }).label)
+      .slice(0, R_SIGNATURE_LIMIT);
+    const signatures = await this.rSignatures(functionLabels);
+    for (const [label, sig] of signatures) {
+      const item = byLabel.get(label);
+      if (item && typeof item !== "string") item.detail = sig;
+    }
+
     return { list: [...byLabel.values()], replaceLength: token.length };
+  }
+
+  /** `args()` deparsed for each name: `(x, na.rm = FALSE, ...)`; names that
+   *  aren't functions are left out. Names come from R's own completer, so
+   *  `pkg::fn` is the only qualified shape and `eval(parse())` resolves it. */
+  private async rSignatures(names: string[]): Promise<Map<string, string>> {
+    const out = new Map<string, string>();
+    if (names.length === 0) return out;
+    const rCode = `local({
+  ns <- strsplit(${JSON.stringify(names.join("\x1f"))}, "\\x1f", fixed = TRUE)[[1]]
+  paste(vapply(ns, function(n) {
+    f <- tryCatch(eval(parse(text = n)), error = function(e) NULL)
+    if (!is.function(f)) return("")
+    a <- tryCatch(paste(deparse(args(f)), collapse = " "), error = function(e) "")
+    a <- sub("^function ", "", a)
+    a <- sub("\\\\s*NULL\\\\s*$", "", a)
+    substr(gsub("\\\\s+", " ", a), 1, 100)
+  }, ""), collapse = "\\x1f")
+})`;
+    let raw: string;
+    try {
+      raw = await this.webR.evalRString(rCode);
+    } catch {
+      return out;
+    }
+    const parts = raw.split("\x1f");
+    names.forEach((name, i) => {
+      if (parts[i]) out.set(name, parts[i]);
+    });
+    return out;
+  }
+
+  async hover(request: PositionRequest): Promise<HoverResult | null> {
+    if (this.restartPromise) return null;
+    const before = /[A-Za-z_.][\w.]*(?:::[A-Za-z_.][\w.]*)?$/.exec(
+      request.line.slice(0, request.column),
+    )?.[0] ?? "";
+    const after = /^[\w.]*/.exec(request.line.slice(request.column))?.[0] ?? "";
+    const name = before + after;
+    if (!name || /^[\d.]+$/.test(name)) return null;
+    const rCode = `local({
+  n <- ${JSON.stringify(name)}
+  x <- tryCatch(eval(parse(text = n)), error = function(e) NULL)
+  if (is.null(x)) return("")
+  if (is.function(x)) {
+    a <- paste(deparse(args(x)), collapse = " ")
+    a <- sub("^function ", n, a)
+    a <- sub("\\\\s*NULL\\\\s*$", "", a)
+    return(paste(gsub("\\\\s+", " ", a), "", sep = "\\x1f"))
+  }
+  s <- tryCatch(utils::capture.output(utils::str(x)), error = function(e) "")
+  paste(paste(n, ":", paste(class(x), collapse = "/")),
+        substr(paste(s, collapse = " "), 1, 300), sep = "\\x1f")
+})`;
+    let raw: string;
+    try {
+      raw = await this.webR.evalRString(rCode);
+    } catch {
+      return null;
+    }
+    if (!raw) return null;
+    const [title, doc] = raw.split("\x1f");
+    return { title: title || undefined, doc: doc || undefined };
   }
 
   private joinStagedPath(relPath: string): string {

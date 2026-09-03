@@ -20,6 +20,7 @@ import {
   indentUnit,
 } from "@codemirror/language";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
+import { withCompletionTrigger } from "../../completion/completionPrefs";
 import {
   Compartment,
   EditorState,
@@ -109,16 +110,23 @@ export function makeSqlAutocompletionExtension(
   schema: SqlCompletionSchema,
   dialect: SqlDialect,
 ): Extension {
-  return autocompletion({
-    activateOnTyping: true,
-    activateOnTypingDelay: AUTOCOMPLETE_DELAY_MS,
-    closeOnBlur: true,
-    // The built-in keymap binds Enter → acceptCompletion at highest
-    // precedence, hijacking newlines while the popup is visible; the
-    // completion keys are registered manually instead.
-    defaultKeymap: false,
-    override: [createSqlCompletionSource(schema, { dialect })],
-  });
+  const source = createSqlCompletionSource(schema, { dialect });
+  // Follows the site-wide "Code Suggestions" setting live: SQL has no
+  // member-access trigger characters, so "after `.`" behaves like manual.
+  return withCompletionTrigger((mode) =>
+    mode === "off"
+      ? []
+      : autocompletion({
+          activateOnTyping: mode === "typing",
+          activateOnTypingDelay: AUTOCOMPLETE_DELAY_MS,
+          closeOnBlur: true,
+          // The built-in keymap binds Enter → acceptCompletion at highest
+          // precedence, hijacking newlines while the popup is visible; the
+          // completion keys are registered manually instead.
+          defaultKeymap: false,
+          override: [source],
+        }),
+  );
 }
 
 /** Build the lang-sql extension for a reconfigure dispatch. Returns a

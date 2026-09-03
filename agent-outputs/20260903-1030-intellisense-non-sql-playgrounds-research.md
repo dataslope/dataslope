@@ -254,3 +254,55 @@ If option (a) for Java proves worthwhile, the same "Lezer tree → declarations 
 Internal: `app/_components/completion/languageCompletion.ts`, `completion/staticLists/*`, `runtime/pyodide-worker.ts`, `runtime/r.tsx`, `runtime/ts-language-worker.ts`, `runtime/tsLanguageService.ts`, `runtime/tsAnalysisConfig.ts`, `runtime/cdn.ts`, `runtime/browsercc-worker.ts`, `runtime/browserccBuild.ts`, `runtime/java.tsx`, `runtime/csharp.tsx`, `runtime/dotnet.ts`, `runtime/php-worker.ts`, `runtime/web.tsx`, `PlaygroundSplitEditors.tsx`, `PlaygroundBootOverlay.tsx`, `script-runner-src/Runner.cs` + `ScriptRunner.csproj`, `cdn-assets/_dotnet/` listing, `__tests__/languageCompletion.test.ts`; PR #551, #571, #673 bodies.
 
 External (checked 2026-09-03): Pyodide `v314.0.4` `pyodide-lock.json` (jedi 0.19.2, parso 0.8.6, mypy 1.19.1); npm registry metadata for `typescript` (7.0.2 latest, 6.0.0-beta), `@codemirror/lsp-client` 6.2.5, `browser-basedpyright` 1.39.10, `@valtown/codemirror-ts` 2.3.1, `browsercc` 0.1.1, `web-tree-sitter` 0.27.0, `tree-sitter-c-sharp` 0.23.5 (5.4 MB wasm), `@lezer/java|cpp|php`; jsDelivr file listings for `typescript@7.0.2` and `browsercc@0.1.1` (clang.wasm 42.5 MB, lld.wasm 23.2 MB, sysroot.tar 28.6 MB, stdc++.h.pch 19.4 MB); `@codemirror/autocomplete@6.20.1`, `lang-html@6.4.11`, `lang-css@6.3.1`, `lang-java@6.0.2`, `lang-cpp@6.0.3`, `lang-php@6.0.2` typings; NuGet package sizes for `Microsoft.CodeAnalysis.{Features,CSharp.Features,Workspaces.Common,CSharp.Workspaces}` 4.14.0; [Roslyn `Recommender`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.recommendations.recommender?view=roslyn-dotnet-4.3.0) and [`SemanticModel.LookupSymbols`](http://source.roslyn.io/Microsoft.CodeAnalysis/R/019112cdb218fa28.html); [DotNetLab](https://github.com/jjonescz/DotNetLab) (Monaco, worker-hosted language services); [clangd-in-browser](https://github.com/Guyutongxue/clangd-in-browser) (SharedArrayBuffer + crossOriginIsolated requirement); clang `-code-completion-at` output format via [clang-completion-mode.el](https://opensource.apple.com/source/lldb/lldb-167.2/llvm/tools/clang/utils/clang-completion-mode.el.auto.html) and the Node experiment above; [CheerpJ 4.3 release notes](https://labs.leaningtech.com/blog/cheerpj-4.3) and [`cheerpjInit` reference](https://cheerpj.com/docs/reference/cheerpjInit) (Java 8/11/17; no statement on `jdk.jshell`); [JavaFiddle README](https://github.com/leaningtech/javafiddle) (no completion); [webR REPL `Editor.tsx`](https://github.com/r-wasm/webr) (the `utils` completion pattern); [php-wasm custom-build docs](https://php-wasm.seanmorr.is/compiling/custom-builds.html) (tokenizer default-on); [georgewfraser/java-language-server](https://github.com/georgewfraser/java-language-server) (javac-API completion); [Intelephense](https://intelephense.com/) (proprietary).
+
+---
+
+## 9. Implementation addendum (2026-09-03, same branch)
+
+Everything in §7 except the C# bundle rebuild is implemented on this branch; this section records what shipped, what was measured, and what still needs a machine this sandbox is not.
+
+### 9.1 Suggestions open as you type, and the reader can change that
+
+- `activateOnTyping` is on by default on every imperative surface (120 ms pause), the SQL editors included. Tab accepts, Enter always inserts a newline, Ctrl-Space still forces the popup.
+- **Settings → Code Suggestions** (every playground's Settings tab, rendered by the shared `SettingsPanelContent`) offers four modes: *As you type*, *After `.` and on Ctrl+Space* (the pre-change behaviour), *Only on Ctrl+Space*, *Off*. The value is one site-wide localStorage key (`editor_completion_trigger`, `completion/completionPrefs.ts`), because lessons mix languages and a reader expects one answer; code blocks and challenge cards follow it too. Every open editor reconfigures live through a compartment that subscribes to the store; other tabs pick it up through the `storage` event. "Restore default settings" resets it.
+- Verified in headless Chromium against `next dev`: typing `Sys` in the Java playground opens the popup after 190 ms in the default mode and never in *manual* / *off*; `.` opens it in *triggers* mode; switching the select to *manual* from the Settings tab stops as-you-type popups on the same page without a reload, and Ctrl-Space still answers.
+
+### 9.2 Shared-extension fixes (§3.2–3.4)
+
+- Lazy chunks are awaited: the first Ctrl-Space on a fresh page now shows the popup once the static list lands (`lazySource` returns the promise; unit-tested).
+- `react` uses the TypeScript profile; `web` picks a profile per file, and the HTML/CSS panes get `htmlCompletionSource` / `cssCompletionSource` back (`<di` lists tags, `col` lists properties, verified in the browser).
+- Document-word completion drops bare numbers; the PHP `$variable` source stays quiet on explicit requests behind a word or after `->` / `::`.
+- Runtime sources no longer fire inside strings and comments.
+
+### 9.3 Hover and parameter hints (new runtime methods)
+
+`LanguageRuntime` gained optional `hover(request)` and `signatureHelp(request)`; `completion/runtimeTooltips.ts` renders them (hover after 450 ms over a word; a parameter hint after `(` and `,`, closed by `)`, Escape, blur or leaving the line). Implemented by:
+
+- **Python** (jedi `help` / `get_signatures`; measured 2–123 ms). The popup's first 30 function/class items also carry their signature as `detail` and the docstring's first paragraph as `info` (12 ms for 30 stdlib names; the cap exists because 60 cost 660 ms).
+- **R** (`args()` deparsed; 30 ms for 40 names, so function completions carry signatures; hover shows `name(args)` or `class` + `str()` for data).
+- **TypeScript service** (`getQuickInfoAtPosition`, `getSignatureHelpItems`) for the JavaScript, TypeScript, React and web-JS runtimes.
+
+### 9.4 C/C++: clang's completer, in production form
+
+`browsercc-worker.ts` answers a `complete` message the way §4.3 measured: the cc1 vector from one cached driver dry run per language, a fresh clang instance per request over a `WebAssembly.Module` compiled once (60–80 ms to instantiate, measured in Node), the sysroot's 1,490 headers mounted (~60 ms), the shipped PCH for C++, `-code-completion-at` pointed at the identifier's first character, and `COMPLETION:` lines parsed by `runtime/clangCompletion.ts` (unit-tested against captured output: overload counting, `[#type#]` result types, keyword/macro/type classification, `_`-prefixed names hidden). A request that is superseded while queued answers empty rather than spending a clang run. `BrowserccRuntime.complete()` feeds it the same translation unit Run compiles, so `#include "util.h"` symbols complete too. Not exercised in this sandbox's browser (no CDN); the parser and the Node measurements are the evidence.
+
+### 9.5 From-scratch tiers: Lezer document symbols and a JDK member table
+
+`completion/documentSymbols.ts` walks the tree the editor already parsed and yields declarations with declared types and signatures for Java, C, C++ and PHP (25 unit tests over the real grammars). Two sources come out of it:
+
+- **Declarations in scope**, plus the members of whichever class/struct body the cursor is inside; the name being declared is never offered back to itself.
+- **Member completion after `.` / `->` / `::` / `$this->`** from the receiver's declared type: Java against `staticLists/javaMembers.ts` (String, StringBuilder, the wrappers, Math, System/PrintStream, Scanner, List/Map/Set families with generic substitution so `List<Integer>.get` reads `(int index): Integer`, Arrays, Collections, Optional, Random, Stream/IntStream, Throwable, Thread; arrays get `length`/`clone`; one call hop such as `s.trim().` or `nums.get(0).`), user classes from the document (instance vs. static), C/C++ struct and class members through typedef aliases and pointers, PHP classes with `new`-typed variables and static access. Verified in the browser: `String s = ""; s.` lists 27 String members with signatures; `xs.` on a `List<Integer>` lists `add(int index, Integer element): void`; `$c->` after `$c = new Cart()` lists `add($x)` and `items`.
+
+### 9.6 PHP builtin catalogue
+
+`scripts/build-php-builtins.mjs` generates `staticLists/phpBuiltins.generated.ts` (700 internal functions with parameter lists, return types and one-line summaries) from JetBrains' phpstorm-stubs (Apache-2.0, credited in `THIRD-PARTY-NOTICES.md`); the hand-written list only fills gaps. `array_` now offers 57 functions with signatures instead of a dozen.
+
+### 9.7 C#: implemented, not yet published
+
+`Runner.cs` gained `[JSExport] Complete(code, position, otherFilesJson)`: `SemanticModel.LookupSymbols` at the cursor, or on the receiver's type after `.` (namespaces, static access through a type name, instance access with reduced extension methods), overloads counted, kinds mapped to popup icons, `ToMinimalDisplayString` as detail. `dotnet.ts` looks the export up at boot and `CSharpRuntime.complete()` uses it once the warm-up compile has cached the reference assemblies. **The published bundle predates the export**, and this sandbox has no .NET SDK: until `cdn-assets/_dotnet/` is rebuilt and `CDN_ASSETS_TAG` bumped (`script-runner-src/README.md` describes the steps), the C# editors keep the static tier plus keywords, which is exactly the fallback the bridge selects when the export is absent. The C# code has not been compiled; review it before publishing.
+
+### 9.8 Verification
+
+- `tsc --noEmit` clean; `eslint` clean on every touched file; `vitest` 134 files / 1,923 tests passing (new: `documentSymbols`, `clangCompletion`, additions to `languageCompletion`).
+- Headless Chromium against `next dev` for the trigger modes, the Settings control, HTML/CSS panes, the PHP catalogue, and Java/PHP member completion (static tiers; no runtime can boot in this sandbox, so jedi/webR/clang numbers come from the Node experiments above).
+- `DEVELOPMENT.md` gained an *Intellisense* section describing the modes, the tiers per language and where to plug a new backend in.

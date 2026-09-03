@@ -364,6 +364,26 @@ AI_FREE_API_KEY="sk-or-…"   # OpenRouter, covers both tiers today
 PRO_USER_EMAILS="you@example.com"   # optional; grants the pro model without billing
 ```
 
+### Intellisense (completion popup, hover, parameter hints)
+
+Every language-runtime CodeMirror editor (`/playground/*`, lesson code blocks, challenge cards, the web playground's split panes) mounts one shared extension, `languageCompletion()` in `app/_components/completion/languageCompletion.ts`, so a completion backend added to a runtime reaches all four surfaces with no editor-side change. The SQL editors have their own schema-aware engine (`app/_components/sql/sqlCompletion.ts`).
+
+**When the popup opens is a site-wide setting** (Settings → *Code Suggestions* in any playground; stored once under `editor_completion_trigger`, `app/_components/completion/completionPrefs.ts`): *as you type* (default), *after `.` and on Ctrl+Space*, *only on Ctrl+Space*, or *off*. Every open editor follows a change live. Tab accepts, Enter always inserts a newline. The pro-only AI ghost text stands down while the popup is open, so members who prefer ghost text over popups switch the setting.
+
+**What each language gets**, in tiers; the static tiers answer until the runtime boots and are then suppressed so the popup never shows duplicates:
+
+| Language | Runtime-backed tier | Editor-side tiers |
+| --- | --- | --- |
+| Python | jedi in the Pyodide worker: whole buffer + live namespace, signatures and docstrings on the first screenful, hover, parameter hints | `@codemirror/lang-python` locals/builtins |
+| R | webR's `utils` completer with `args()` signatures; hover | curated list |
+| JavaScript, TypeScript, React, web (JS panes) | TypeScript language service in its own worker (`runtime/ts-language-worker.ts`): completions, hover, parameter hints, diagnostics | `@codemirror/lang-javascript` locals, snippets, keywords; HTML and CSS panes use `lang-html` / `lang-css` sources |
+| C, C++ | clang's own `-code-completion-at` on the browsercc toolchain Run already downloads (`runtime/browsercc-worker.ts`, parser in `runtime/clangCompletion.ts`); ~0.4 s per request, ~0.35 s for C++ with the shipped PCH | Lezer document symbols (functions, locals, struct fields), curated libc/STL list, document words |
+| C# | Roslyn `SemanticModel.LookupSymbols` via the `Complete` export in `script-runner-src/Runner.cs`, once the published .NET bundle carries it (see that README; the editor keeps the static tier otherwise) | curated list, keywords, document words |
+| Java | none (no browser language server exists) | Lezer document symbols + declared-type member completion against a curated JDK table (`completion/staticLists/javaMembers.ts`): `s.` after `String s` lists String's methods, one call hop deep | 
+| PHP | none | generated catalogue of php-wasm's internal functions with signatures (`scripts/build-php-builtins.mjs`, from phpstorm-stubs), Lezer document symbols with `$this->` / `$x->` / `Class::` member completion, `$variable` scanner |
+
+The Lezer-based tiers live in `completion/documentSymbols.ts`; hover and parameter hints in `completion/runtimeTooltips.ts`, backed by the optional `hover()` / `signatureHelp()` methods on `LanguageRuntime` (`types.ts`). Unit tests: `__tests__/languageCompletion.test.ts`, `documentSymbols.test.ts`, `clangCompletion.test.ts`, `staticCompletionLists.test.ts`, `tsAnalysis.test.ts`.
+
 ### AI inline completion (pro)
 
 Copilot-style ghost-text autocomplete in the language-runtime CodeMirror editors, code blocks, challenge cards, and the `/playground/*` editors (`app/_components/ai/inlineCompletion.ts` + `app/api/ai/complete/route.ts`). After a short typing pause the editor requests a fill-in-the-middle suggestion; **Tab** accepts, **Escape** dismisses, and typing "through" the suggestion consumes it. Challenge/code-block editors send the active file's read-only init code as extra prompt context.

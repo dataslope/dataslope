@@ -39,6 +39,10 @@ export interface DotnetApi {
   /** Compile + run a C# script (top-level statements allowed) via
    *  CSharpScript.RunAsync. */
   runScript(code: string): Promise<CSharpScriptResult>;
+  /** Roslyn completions at a 0-based offset, as the JSON `Complete` in
+   *  Runner.cs returns. Absent when the published bundle predates that
+   *  export, in which case the editor keeps its static tier. */
+  complete?(code: string, position: number, otherFilesJson: string): Promise<string>;
   /** True once the warm-up compile has finished, which is what makes a
    *  run's duration predictable enough to put a cap on. */
   isWarm(): boolean;
@@ -226,8 +230,20 @@ export function loadDotnet(
 
     setLoadingMessage("C# ready", 1);
 
+    const completeExport = lookupExport(exports, [
+      "ScriptRunner",
+      "Runner",
+      "Complete",
+    ]);
+
     const api: DotnetApi = {
       runScript,
+      complete: completeExport
+        ? async (code, position, otherFilesJson) => {
+            const raw = (await completeExport(code, position, otherFilesJson)) as unknown;
+            return typeof raw === "string" ? raw : "";
+          }
+        : undefined,
       isWarm: () => warm,
       whenWarm(onProgress?: (message: string) => void) {
         if (warm) return Promise.resolve();

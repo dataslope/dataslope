@@ -7,6 +7,9 @@ import type {
   LanguageRuntime,
   PackageInfo,
   RunOptions,
+  HoverResult,
+  PositionRequest,
+  SignatureHelpResult,
 } from "../types";
 import { getWebFmt, WEB_FMT_2SPACE } from "./webFmt";
 import {
@@ -15,6 +18,8 @@ import {
   decodeWorkspaceTextFiles,
   diagnoseWithTsService,
   sourceExcerpt,
+  hoverWithTsService,
+  signatureHelpWithTsService,
 } from "./tsLanguageService";
 
 // JavaScript runs in a dedicated Web Worker backed by almostnode (a
@@ -322,7 +327,22 @@ class JavaScriptWorkerRuntime implements LanguageRuntime {
   /** Intellisense via the shared TS language service worker, separate from
    *  execution so analysis never queues behind a running user program. */
   async complete(request: CompletionRequest): Promise<CompletionResult> {
-    return completeWithTsService({
+    return completeWithTsService(this.serviceRequest(request));
+  }
+
+  hover(request: PositionRequest): Promise<HoverResult | null> {
+    return hoverWithTsService(this.serviceRequest(request));
+  }
+
+  signatureHelp(request: PositionRequest): Promise<SignatureHelpResult | null> {
+    return signatureHelpWithTsService(this.serviceRequest(request));
+  }
+
+  /** The workspace as the language service should see it, against Node
+   *  globals and the shimmed modules, not the DOM: `process` and `require`
+   *  exist here, `document` and `alert` do not. */
+  private serviceRequest(request: PositionRequest) {
+    return {
       ...buildTsCompletionRequest(
         this.stagedText,
         request.doc,
@@ -330,10 +350,8 @@ class JavaScriptWorkerRuntime implements LanguageRuntime {
         "index.js",
         request.offset,
       ),
-      // Node globals and the shimmed modules, not the DOM: `process` and
-      // `require` exist here, `document` and `alert` do not.
-      env: "node",
-    });
+      env: "node" as const,
+    };
   }
 
   /**

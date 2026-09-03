@@ -191,11 +191,45 @@ export interface CompletionResult {
   replaceLength: number;
 }
 
+/** Cursor snapshot for the position-based queries (`hover`,
+ *  `signatureHelp`); the completion request minus its trigger flag. */
+export type PositionRequest = Omit<CompletionRequest, "explicit">;
+
+/** What a hover tooltip shows for the symbol under the pointer. */
+export interface HoverResult {
+  /** One-line signature or type, rendered monospace. */
+  title?: string;
+  /** Documentation, plain text; the first paragraph is what fits. */
+  doc?: string;
+}
+
+export interface SignatureInfo {
+  /** The whole signature, e.g. `sqrt(x: SupportsFloat, /) -> float`. */
+  label: string;
+  /** Parameter labels as they appear inside `label`, in order. */
+  parameters: string[];
+  documentation?: string;
+}
+
+/** Signatures of the call the cursor is inside, for the parameter hint
+ *  shown after `(` and `,`. */
+export interface SignatureHelpResult {
+  signatures: SignatureInfo[];
+  activeSignature: number;
+  activeParameter: number;
+}
+
 export interface LanguageRuntime {
   run(code: string, emit: EmitOutput, options?: RunOptions): Promise<void>;
   /** Best-effort completions; resolve with an empty list rather than
    *  rejecting on analyzer errors. */
   complete?(request: CompletionRequest): Promise<CompletionResult>;
+  /** Signature/type and documentation for the symbol at the cursor; null
+   *  when there is nothing to say. Best-effort like `complete`. */
+  hover?(request: PositionRequest): Promise<HoverResult | null>;
+  /** Parameter hints for the call the cursor is inside; null outside a
+   *  call. Best-effort like `complete`. */
+  signatureHelp?(request: PositionRequest): Promise<SignatureHelpResult | null>;
   /** Stage workspace files into the runtime's VFS before `run()`, keyed by
    *  workspace-relative path. Must mirror the snapshot exactly: overwrite
    *  entries present in `files`, remove previously created ones absent from

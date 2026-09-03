@@ -69,7 +69,32 @@ type InMessage =
       env?: TsEnvironment;
       /** False for JavaScript, where only parse errors are meaningful. */
       semantic?: boolean;
+    }
+  | {
+      kind: "hover" | "signature";
+      id: number;
+      files: Array<[string, string]>;
+      entry: string;
+      offset: number;
+      env?: TsEnvironment;
     };
+
+/** Mirrors `HoverResult` in ../types. */
+interface HoverMessage {
+  title?: string;
+  doc?: string;
+}
+
+/** Mirrors `SignatureHelpResult` in ../types. */
+interface SignatureHelpMessage {
+  signatures: Array<{
+    label: string;
+    parameters: string[];
+    documentation?: string;
+  }>;
+  activeSignature: number;
+  activeParameter: number;
+}
 
 type OutMessage =
   | { kind: "ready" }
@@ -83,6 +108,12 @@ type OutMessage =
       kind: "diagnose-result";
       id: number;
       diagnostics: TsDiagnosticMessage[];
+    }
+  | { kind: "hover-result"; id: number; result: HoverMessage | null }
+  | {
+      kind: "signature-result";
+      id: number;
+      result: SignatureHelpMessage | null;
     };
 
 function post(msg: OutMessage) {
@@ -292,6 +323,71 @@ async function complete(msg: Extract<InMessage, { kind: "complete" }>): Promise<
   });
 }
 
+/** Bring the service up to date with a request's workspace: libs and
+ *  React typings fetched, scripts mirrored. */
+async function prepareWorkspace(msg: {
+  files: Array<[string, string]>;
+  entry: string;
+  env?: TsEnvironment;
+}): Promise<void> {
+  const env = msg.env ?? "dom";
+  environment = env;
+  await ensureLibs(env);
+  if (/\.(tsx|jsx)$/i.test(msg.entry)) {
+    await ensureReactTypes().catch(() => {});
+  }
+  syncScripts([...msg.files, ...ambientFilesFor(env)]);
+}
+
+/** Quick info for the symbol at the cursor, as the editor's hover. */
+async function hover(msg: Extract<InMessage, { kind: "hover" | "signature" }>): Promise<void> {
+  await prepareWorkspace(msg);
+  const info = service.getQuickInfoAtPosition(msg.entry, msg.offset);
+  if (!info) {
+    post({ kind: "hover-result", id: msg.id, result: null });
+    return;
+  }
+  const title = ts.displayPartsToString(info.displayParts).trim();
+  const doc = ts.displayPartsToString(info.documentation).trim();
+  post({
+    kind: "hover-result",
+    id: msg.id,
+    result: title || doc ? { title: title || undefined, doc: doc || undefined } : null,
+  });
+}
+
+/** Parameter hints for the call the cursor is inside. */
+async function signature(msg: Extract<InMessage, { kind: "hover" | "signature" }>): Promise<void> {
+  await prepareWorkspace(msg);
+  const help = service.getSignatureHelpItems(msg.entry, msg.offset, {});
+  if (!help || help.items.length === 0) {
+    post({ kind: "signature-result", id: msg.id, result: null });
+    return;
+  }
+  const signatures = help.items.map((item) => {
+    const params = item.parameters.map((p) => ts.displayPartsToString(p.displayParts));
+    const label =
+      ts.displayPartsToString(item.prefixDisplayParts) +
+      params.join(ts.displayPartsToString(item.separatorDisplayParts)) +
+      ts.displayPartsToString(item.suffixDisplayParts);
+    const documentation = ts.displayPartsToString(item.documentation).trim();
+    return {
+      label,
+      parameters: params,
+      documentation: documentation || undefined,
+    };
+  });
+  post({
+    kind: "signature-result",
+    id: msg.id,
+    result: {
+      signatures,
+      activeSignature: help.selectedItemIndex,
+      activeParameter: help.argumentIndex,
+    },
+  });
+}
+
 /**
  * Type-check the workspace and report what tsc would.
  *
@@ -337,6 +433,14 @@ self.addEventListener("message", (ev: MessageEvent<InMessage>) => {
     void diagnose(msg).catch(() => {
       // A failed analysis must never invent errors in the user's program.
       post({ kind: "diagnose-result", id: msg.id, diagnostics: [] });
+    });
+  } else if (msg.kind === "hover") {
+    void hover(msg).catch(() => {
+      post({ kind: "hover-result", id: msg.id, result: null });
+    });
+  } else if (msg.kind === "signature") {
+    void signature(msg).catch(() => {
+      post({ kind: "signature-result", id: msg.id, result: null });
     });
   }
 });

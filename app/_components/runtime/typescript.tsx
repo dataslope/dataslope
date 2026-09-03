@@ -7,6 +7,9 @@ import type {
   LanguageRuntime,
   PackageInfo,
   RunOptions,
+  HoverResult,
+  PositionRequest,
+  SignatureHelpResult,
 } from "../types";
 import { TYPESCRIPT_VERSION } from "./cdn";
 import { getWebFmt, WEB_FMT_2SPACE } from "./webFmt";
@@ -16,6 +19,8 @@ import {
   decodeWorkspaceTextFiles,
   diagnoseWithTsService,
   formatTsDiagnostic,
+  hoverWithTsService,
+  signatureHelpWithTsService,
 } from "./tsLanguageService";
 
 // Runtime-panel compiler version, derived from cdn.ts's single pin so the
@@ -361,7 +366,22 @@ class TypeScriptWorkerRuntime implements LanguageRuntime {
    *  from the execution worker so analysis never queues behind a
    *  long-running user program. */
   async complete(request: CompletionRequest): Promise<CompletionResult> {
-    return completeWithTsService({
+    return completeWithTsService(this.serviceRequest(request));
+  }
+
+  hover(request: PositionRequest): Promise<HoverResult | null> {
+    return hoverWithTsService(this.serviceRequest(request));
+  }
+
+  signatureHelp(request: PositionRequest): Promise<SignatureHelpResult | null> {
+    return signatureHelpWithTsService(this.serviceRequest(request));
+  }
+
+  /** The workspace as the language service should see it, against Node
+   *  globals and the shimmed modules, not the DOM: `process` and `require`
+   *  exist here, `document` and `alert` do not. */
+  private serviceRequest(request: PositionRequest) {
+    return {
       ...buildTsCompletionRequest(
         this.stagedText,
         request.doc,
@@ -369,10 +389,8 @@ class TypeScriptWorkerRuntime implements LanguageRuntime {
         "index.ts",
         request.offset,
       ),
-      // Node globals and the shimmed modules, not the DOM: `process` and
-      // `require` exist here, `document` and `alert` do not.
-      env: "node",
-    });
+      env: "node" as const,
+    };
   }
 
   /** The workspace as the checker should see it: the staged snapshot with
