@@ -28,17 +28,17 @@
 
 **BG-15 / BG-16 / BG-27.** Aliases (above); a note when a command would read stdin (`cat > file`, `read`); stderr from a successful command rendered in its own tone rather than as stdout; the command cap raised (250,000 commands, 100,000 loop iterations, a 20 s wall-clock budget) and its message reworded without option names; `$USER`, `$SHELL`, `$LOGNAME`, `$TERM`, `$LANG` set; echoed commands keep their spaces (`white-space: pre-wrap`).
 
-**BG-17.** The Bash playground has an on-ramp: a scenario picker (five scenarios, each with "Try this" steps), a strip of step chips that tick as they run (in any terminal), an "All commands" palette of coreutils grouped by purpose, and an "About this shell" dialog listing what is installed, what is not, and the stdin / continuation / persistence notes. The strip collapses and remembers it.
+**BG-17.** Deliberately not the scenario-and-chips on-ramp the audit sketched: on review the Bash playground is to open on the starting files and a bare prompt, with no scenario picker, no "Try this" strip and no hint line. What it keeps, in the header's ellipsis menu, is an "All commands" palette of coreutils grouped by purpose (a row fills the focused prompt) and an "About this shell" dialog listing what is installed, what is not, and the stdin / continuation / persistence notes.
 
 **BG-19.** Both playgrounds keep the session in `sessionStorage` (this tab only) and replay it on reload: Git replays its steps on the saved scenario; Bash restores the layout, the panes, and each pane's command history.
 
-**BG-20, BG-22, BG-23, BG-24, BG-25, BG-26.** Enter creates the new file; the commit card clears when its commit is gone and shows git's date format; prompt, command and error colours moved to the brand ramp's ink steps (green 800, red 700, amber 800; the 400s in dark mode) and a test pins them at 4.5:1; the graph rows have accessible names and the Changes/History strip is a tablist; phone targets are 40px, chips scroll in one row, the input carries `enterkeyhint="go"`; a line typed while a command runs is queued and runs next; the layout preference is read after hydration.
+**BG-20, BG-22, BG-23, BG-24, BG-25, BG-26.** Enter creates the new file; the commit card clears when its commit is gone and shows git's date format; the prompt and command line keep the brand green by choice, while error and stderr text moved to the brand ramp's ink steps (red 700, amber 800; the 400s in dark mode) and a test pins those at 4.5:1; the graph rows have accessible names and the Changes/History strip is a tablist; phone targets are 40px, chips scroll in one row, the input carries `enterkeyhint="go"`; a line typed while a command runs is queued and runs next; the layout preference is read after hydration.
 
 ## Tests
 
 - `__tests__/shellSession.test.ts`: the BG-01 regressions from the handoff (`f(){ :; }; echo X >> t` then `wc -l t` prints `1 t`; nothing after `g(){ :; }; echo ONCE` prints ONCE), aliases, `unset`, stdin note, limits wording, every continuation case.
 - `__tests__/gitAudit.test.ts`: BG-02 to BG-11, BG-14, BG-18, one block per finding.
-- `__tests__/gitPaletteStyles.test.ts`: every palette and on-ramp class has a rule; terminal colours clear AA.
+- `__tests__/gitPaletteStyles.test.ts`: every palette and playground class has a rule; the terminal's error colours clear AA.
 - `e2e/bash-git-playground-audit-fixes.spec.ts` (opt-in, like the other playground specs): the same in a browser, plus a 375px pass.
 
 ## Not fixed, and why

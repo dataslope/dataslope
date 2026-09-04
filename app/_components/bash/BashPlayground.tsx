@@ -10,11 +10,11 @@
  * learner expects it to mean. A new terminal starts where the one it was
  * split from is standing.
  *
- * Above the terminals sits the on-ramp the Git playground has and this one
- * lacked: a scenario picker, a "Try this" strip whose steps tick as they are
- * run, an "All commands" palette of coreutils, and a note on what this shell
- * is. Every one of them fills a prompt; nothing runs but what the reader
- * presses Enter on.
+ * The playground opens on the starting files and a bare prompt: no
+ * scenarios, no hints. The header's ellipsis menu holds an "All commands"
+ * palette of coreutils (a row fills the focused prompt; the reader presses
+ * Enter) and an "About this shell" note on what is installed and what the
+ * shell cannot do.
  *
  * The session is the list of commands each terminal ran. That is what a
  * reload restores (from `sessionStorage`, this tab only) and what Reset
@@ -30,17 +30,16 @@ import { Select } from "@base-ui/react/select";
 import { Menu } from "@base-ui/react/menu";
 import { Dialog } from "@base-ui/react/dialog";
 import {
-  Check,
   ChevronDown,
-  ChevronUp,
   Columns2,
   Info,
-  LayoutList,
+  MoreHorizontal,
   PanelTop,
   Plus,
   RotateCcw,
   SplitSquareHorizontal,
   SplitSquareVertical,
+  TerminalSquare,
   X,
 } from "lucide-react";
 import Link from "../Link";
@@ -50,9 +49,9 @@ import { LANGUAGE_ICONS, LANGUAGE_ICON_SIZE_FACTOR } from "../languageIcons";
 import { PlaygroundBootOverlay, useBootOverlayVisibility } from "../PlaygroundBootOverlay";
 import { applyThemePalette, getStoredEditorTheme, applyMode } from "../playgroundTheme";
 import { useGitSession } from "../git/gitRuntime";
-import { stepKey } from "../git/repoFacts";
 import menuStyles from "../sqlCardTools/SqlCardToolsMenu.module.css";
-import { BASH_ABOUT, BASH_SCENARIOS, DEFAULT_BASH_SCENARIO, bashScenarioById } from "./bashScenarios";
+import { BASH_ABOUT } from "./bashAbout";
+import { DEFAULT_BASH_SCENARIO } from "./bashScenarios";
 import { BashCommandPalette } from "./BashCommandPalette";
 import { HOME } from "./prompt";
 import { GUTTER, MIN_PANE, SplitView } from "./SplitView";
@@ -85,8 +84,7 @@ type Layout = "split" | "tabs";
  *  session is saved beyond the tab, but how you like to look at one is not
  *  the session. */
 const LAYOUT_KEY = "bash_playground_layout";
-const GUIDE_KEY = "bash_playground_guide";
-/** This tab's session: the scenario, the terminals, and what each ran. */
+/** This tab's session: the terminals and what each ran. */
 const SESSION_KEY = "bash_playground_session";
 
 function storedLayout(): Layout {
@@ -105,7 +103,6 @@ interface PaneRecord {
 }
 
 interface SavedSession {
-  scenario: string;
   tree: Node;
   panes: PaneRecord[];
   /** Completed command lines per terminal, in order. */
@@ -117,8 +114,7 @@ function readSession(): SavedSession | null {
     const raw = sessionStorage.getItem(SESSION_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<SavedSession>;
-    if (typeof parsed.scenario !== "string" || !Array.isArray(parsed.panes) || !parsed.tree || typeof parsed.ran !== "object") return null;
-    if (!BASH_SCENARIOS.some((s) => s.id === parsed.scenario)) return null;
+    if (!Array.isArray(parsed.panes) || !parsed.tree || typeof parsed.ran !== "object") return null;
     if (!parsed.panes.length || parsed.panes.length > MAX_TERMINALS) return null;
     return parsed as SavedSession;
   } catch {
@@ -171,10 +167,8 @@ export default function BashPlayground() {
       /* a blocked store only costs the preference */
     }
   }, []);
-  const [scenario, setScenario] = useState(DEFAULT_BASH_SCENARIO);
-  const session = useGitSession(scenario, "bash-playground", "bash");
+  const session = useGitSession(DEFAULT_BASH_SCENARIO, "bash-playground", "bash");
   const { ready, error, reset, openShell, closeShell, state } = session;
-  const scenarioDef = bashScenarioById(scenario);
 
   const [tree, setTree] = useState<Node>(() => leaf("t1"));
   const [panes, setPanes] = useState<PaneRecord[]>([{ id: "t1", title: "bash 1", startCwd: HOME }]);
@@ -182,19 +176,18 @@ export default function BashPlayground() {
   const [resetToken, setResetToken] = useState(0);
   const [drag, setDrag] = useState<Drag | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  /** Completed lines per terminal, this session. Feeds the "Try this" ticks,
-   *  the Reset confirmation, and the reload restore. */
+  /** Completed lines per terminal, this session. Feeds the Reset
+   *  confirmation and the reload restore. */
   const [ran, setRan] = useState<Record<string, string[]>>({});
-  const [guideOpen, setGuideOpen] = useState(true);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
-  const [pending, setPending] = useState<{ kind: "reset" } | { kind: "scenario"; id: string } | null>(null);
+  const [confirmReset, setConfirmReset] = useState(false);
   const seq = useRef(1);
   const stage = useRef<HTMLDivElement>(null);
   const cwdOf = useRef(new Map<string, string>());
   const paneRefs = useRef(new Map<string, TerminalPaneHandle | null>());
   /** What a reload found in sessionStorage, played into the panes once the
-   *  session on its scenario is ready. */
+   *  session is ready. */
   const restore = useRef<SavedSession | null>(null);
   const [replay, setReplay] = useState<Record<string, string[]>>({});
   const hydrated = useRef(false);
@@ -203,7 +196,8 @@ export default function BashPlayground() {
   const order = useMemo(() => leaves(tree), [tree]);
   const count = order.length;
   const canSplit = count < MAX_TERMINALS;
-  const anyRan = useMemo(() => Object.values(ran).some((list) => list.length > 0), [ran]);
+  const everything = useMemo(() => Object.values(ran).flat(), [ran]);
+  const anyRan = everything.length > 0;
 
   // The shared editor theme, and the same default as every other playground.
   // Stored preferences are read after hydration so the server and the first
@@ -214,11 +208,6 @@ export default function BashPlayground() {
     applyMode(theme);
     /* eslint-disable react-hooks/set-state-in-effect -- one-time read of stored preferences after hydration */
     setLayoutState(storedLayout());
-    try {
-      setGuideOpen(localStorage.getItem(GUIDE_KEY) !== "closed");
-    } catch {
-      /* default open */
-    }
     const saved = readSession();
     if (saved) {
       restore.current = saved;
@@ -226,46 +215,34 @@ export default function BashPlayground() {
       setTree(saved.tree);
       setPanes(saved.panes);
       setFocusId(leaves(saved.tree)[0] ?? "t1");
-      if (saved.scenario !== DEFAULT_BASH_SCENARIO) setScenario(saved.scenario);
     }
     hydrated.current = true;
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
-  // Once the session is up on the saved scenario, open the extra shells and
-  // hand each pane its history to replay.
+  // Once the session is up, open the extra shells and hand each pane its
+  // history to replay.
   useEffect(() => {
     const saved = restore.current;
-    if (!ready || !saved || saved.scenario !== scenario) return;
+    if (!ready || !saved) return;
     restore.current = null;
     for (const p of saved.panes) if (p.id !== "t1") void openShell(p.id, p.startCwd);
     setReplay(saved.ran);
     setRan(saved.ran);
-  }, [ready, scenario, openShell]);
+  }, [ready, openShell]);
 
   // The session goes to sessionStorage as it changes, so a reload lands
-  // where the reader left off rather than on the seed.
+  // where the reader left off rather than on the starting files.
   useEffect(() => {
     if (!hydrated.current || restore.current) return;
-    writeSession({ scenario, tree, panes, ran });
-  }, [scenario, tree, panes, ran]);
+    writeSession({ tree, panes, ran });
+  }, [tree, panes, ran]);
 
   useEffect(() => {
     if (!notice) return;
     const t = setTimeout(() => setNotice(null), 2200);
     return () => clearTimeout(t);
   }, [notice]);
-
-  const toggleGuide = useCallback(() => {
-    setGuideOpen((v) => {
-      try {
-        localStorage.setItem(GUIDE_KEY, v ? "closed" : "open");
-      } catch {
-        /* preference only */
-      }
-      return !v;
-    });
-  }, []);
 
   /** The rendered rectangle of every pane, for direction-aware focus and for
    *  telling which pane a drag is over. */
@@ -319,7 +296,8 @@ export default function BashPlayground() {
       setTree((t) => remove(t, id));
       setPanes((p) => p.filter((x) => x.id !== id));
       setRan((r) => {
-        const { [id]: _gone, ...rest } = r;
+        const rest = { ...r };
+        delete rest[id];
         return rest;
       });
       cwdOf.current.delete(id);
@@ -381,52 +359,27 @@ export default function BashPlayground() {
     [focusId, rects, setFocusId],
   );
 
-  /** Start over on a scenario: reseed the files, clear every terminal, and
-   *  reopen every extra shell at home. The layout is the reader's and stays. */
-  const startOver = useCallback(
-    async (next: string) => {
-      setPending(null);
-      setNotice(null);
-      setRan({});
-      setReplay({});
-      cwdOf.current = new Map();
-      setPanes((p) => p.map((x) => ({ ...x, startCwd: HOME })));
-      setResetToken((n) => n + 1);
-      if (next !== scenario) {
-        setScenario(next);
-        // The new session opens its shells as the panes ask for them.
-        restore.current = null;
-        return;
-      }
-      await reset();
-      // The reseed replaced the session's shells; reopen every extra one at
-      // home so its next command does not land in a directory that is gone.
-      for (const id of order) if (id !== "t1") void openShell(id, HOME);
-    },
-    [openShell, order, reset, scenario],
-  );
-
-  // After a scenario change the extra shells have to be opened on the new
-  // session too.
-  const lastScenario = useRef(scenario);
-  useEffect(() => {
-    if (!ready || lastScenario.current === scenario) return;
-    lastScenario.current = scenario;
-    if (restore.current) return;
+  /** Start over: reseed the files, clear every terminal, and reopen every
+   *  extra shell at home. The layout is the reader's and stays. */
+  const startOver = useCallback(async () => {
+    setConfirmReset(false);
+    setNotice(null);
+    setRan({});
+    setReplay({});
+    cwdOf.current = new Map();
+    setPanes((p) => p.map((x) => ({ ...x, startCwd: HOME })));
+    setResetToken((n) => n + 1);
+    await reset();
+    // The reseed replaced the session's shells; reopen every extra one at
+    // home so its next command does not land in a directory that is gone.
     for (const id of order) if (id !== "t1") void openShell(id, HOME);
-  }, [ready, scenario, order, openShell]);
+  }, [openShell, order, reset]);
 
-  /** Reset or switch scenario, asking first when a terminal has done work. */
-  const handleReset = useCallback(
-    (next: string) => {
-      if (!anyRan) {
-        void startOver(next);
-        return;
-      }
-      setPending(next === scenario ? { kind: "reset" } : { kind: "scenario", id: next });
-    },
-    [anyRan, scenario, startOver],
-  );
+  /** Reset, asking first when a terminal has done work. */
+  const handleReset = useCallback(() => {
+    if (!anyRan) void startOver();
+    else setConfirmReset(true);
+  }, [anyRan, startOver]);
 
   /** Put a command on the focused terminal's prompt; nothing runs. */
   const compose = useCallback(
@@ -513,17 +466,6 @@ export default function BashPlayground() {
   const titleOf = (id: string) => panes.find((p) => p.id === id)?.title ?? id;
   const focusedTitle = titleOf(focusId);
 
-  // "Try this" steps tick when any terminal has run them, matched the way
-  // the Git playground matches its steps: by command and target.
-  const everything = useMemo(() => Object.values(ran).flat(), [ran]);
-  const tryDone = scenarioDef.tryThis.map((step) => {
-    const key = stepKey(step.command);
-    return everything.some((h) => stepKey(h) === key && (h === step.command || h.split(/\s+/)[0] === step.command.split(/\s+/)[0]));
-  });
-  const tryFinished = tryDone.length > 0 && tryDone.every(Boolean);
-  const nextScenario = BASH_SCENARIOS[(BASH_SCENARIOS.findIndex((s) => s.id === scenario) + 1) % BASH_SCENARIOS.length];
-  const pendingLabel = pending?.kind === "scenario" ? bashScenarioById(pending.id).label : null;
-
   const renderLeaf = (id: string) => {
     const rec = panes.find((p) => p.id === id);
     if (!rec) return null;
@@ -538,7 +480,6 @@ export default function BashPlayground() {
         session={session}
         startCwd={rec.startCwd}
         focused={focusId === id}
-        hint={id === "t1" ? `${scenarioDef.description} Try ${scenarioDef.tryThis[0]?.command ?? "ls"}.` : null}
         tabbed={tabbed}
         moves={() => moves(id)}
         canSwap={count > 1}
@@ -632,28 +573,6 @@ export default function BashPlayground() {
 
           <div className="header-sep" />
 
-          <Select.Root value={scenario} onValueChange={(v) => v && v !== scenario && handleReset(v)}>
-            <Select.Trigger className="bpg-btn bpg-scenario" aria-label="Scenario" disabled={!ready}>
-              <LayoutList size={14} aria-hidden="true" />
-              <Select.Value className="bpg-btn-label">{scenarioDef.label}</Select.Value>
-              <ChevronDown size={12} aria-hidden="true" />
-            </Select.Trigger>
-            <Select.Portal>
-              <Select.Positioner className="playground-lang-switcher-positioner" sideOffset={6} align="end">
-                <Select.Popup className="bui-select-popup playground-lang-switcher-popup gitx-scenario-popup">
-                  {BASH_SCENARIOS.map((s) => (
-                    <Select.Item key={s.id} value={s.id} className="bui-select-item gitx-scenario-item">
-                      <span className="gitx-scenario-text">
-                        <Select.ItemText>{s.label}</Select.ItemText>
-                        <span className="gitx-scenario-desc">{s.description}</span>
-                      </span>
-                    </Select.Item>
-                  ))}
-                </Select.Popup>
-              </Select.Positioner>
-            </Select.Portal>
-          </Select.Root>
-
           {!mobile && (
             <div className="bpg-layout" role="group" aria-label="Layout">
               <button
@@ -691,9 +610,17 @@ export default function BashPlayground() {
             <span className="bpg-btn-label">New</span>
           </button>
 
-          {!tabbed && (
+          {/* Split stays in the header in both layouts, disabled under Tabs,
+              so choosing a layout does not move the buttons beside it. On a
+              phone the header has no room for it. */}
+          {!mobile && (
             <Menu.Root>
-              <Menu.Trigger className="bpg-btn" disabled={!ready || !canSplit} aria-label="Split the focused terminal">
+              <Menu.Trigger
+                className="bpg-btn"
+                disabled={!ready || !canSplit || tabbed}
+                aria-label="Split the focused terminal"
+                title={tabbed ? "Splitting is for the Panes layout" : "Split the focused terminal"}
+              >
                 <SplitSquareHorizontal size={14} aria-hidden="true" />
                 <span className="bpg-btn-label">Split</span>
                 <ChevronDown size={12} aria-hidden="true" />
@@ -724,155 +651,104 @@ export default function BashPlayground() {
           <button
             type="button"
             className="bpg-btn"
-            onClick={() => handleReset(scenario)}
+            onClick={handleReset}
             disabled={!ready}
-            title="Start over with the scenario's files. Asks first when a terminal has done work."
+            title="Start over with the starting files. Asks first when a terminal has done work."
             aria-label="Reset"
           >
             <RotateCcw size={14} aria-hidden="true" />
             <span className="bpg-btn-label">Reset</span>
           </button>
+
+          <Menu.Root>
+            <Menu.Trigger className="bpg-btn bpg-more" aria-label="More" title="More">
+              <MoreHorizontal size={16} aria-hidden="true" />
+            </Menu.Trigger>
+            <Menu.Portal>
+              <Menu.Positioner sideOffset={6} align="end" className={menuStyles.positioner}>
+                <Menu.Popup className={menuStyles.popup}>
+                  <Menu.Item className={menuStyles.item} disabled={!ready} onClick={() => setPaletteOpen(true)}>
+                    <TerminalSquare strokeWidth={1.8} aria-hidden />
+                    <span className={menuStyles.itemLabel}>
+                      All commands
+                      <span className={menuStyles.itemNote}>Fills the prompt. You press Enter.</span>
+                    </span>
+                  </Menu.Item>
+                  <Menu.Item className={menuStyles.item} onClick={() => setAboutOpen(true)}>
+                    <Info strokeWidth={1.8} aria-hidden />
+                    <span className={menuStyles.itemLabel}>
+                      About this shell
+                      <span className={menuStyles.itemNote}>What is installed, and what it cannot do</span>
+                    </span>
+                  </Menu.Item>
+                </Menu.Popup>
+              </Menu.Positioner>
+            </Menu.Portal>
+          </Menu.Root>
         </header>
 
         <h1 className="playground-sr-title">Bash Playground</h1>
 
-        {/* Reset and a scenario change wipe the files and every terminal.
-            With work done they ask first, as every editor playground does. */}
-        <Dialog.Root open={pending !== null} onOpenChange={(open) => { if (!open) setPending(null); }}>
+        {/* Reset wipes the files and every terminal. With work done it asks
+            first, as every editor playground does. */}
+        <Dialog.Root open={confirmReset} onOpenChange={setConfirmReset}>
           <Dialog.Portal>
             <Dialog.Backdrop className="confirm-backdrop" />
             <Dialog.Popup className="confirm-popup" role="alertdialog">
-              <Dialog.Title className="confirm-title">
-                {pending?.kind === "scenario" ? `Switch to “${pendingLabel}”?` : "Start over?"}
-              </Dialog.Title>
+              <Dialog.Title className="confirm-title">Start over?</Dialog.Title>
               <Dialog.Description className="confirm-desc">
-                {pending?.kind === "scenario" ? "Switching scenarios" : "Resetting"} replaces the files with the
-                scenario&apos;s starting set and clears every terminal ({everything.length} command
-                {everything.length === 1 ? "" : "s"} so far). This can&apos;t be undone.
+                Resetting replaces the files with the starting set and clears every terminal ({everything.length}{" "}
+                command{everything.length === 1 ? "" : "s"} so far). This can&apos;t be undone.
               </Dialog.Description>
               <div className="confirm-actions">
                 <Dialog.Close className="confirm-btn confirm-btn-secondary">Cancel</Dialog.Close>
-                <Dialog.Close
-                  className="confirm-btn confirm-btn-danger"
-                  onClick={() => {
-                    if (pending) void startOver(pending.kind === "scenario" ? pending.id : scenario);
-                  }}
-                >
-                  {pending?.kind === "scenario" ? "Switch scenario" : "Reset"}
+                <Dialog.Close className="confirm-btn confirm-btn-danger" onClick={() => void startOver()}>
+                  Reset
                 </Dialog.Close>
               </div>
             </Dialog.Popup>
           </Dialog.Portal>
         </Dialog.Root>
 
+        <Dialog.Root open={aboutOpen} onOpenChange={setAboutOpen}>
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup bpg-about">
+              <Dialog.Title className="confirm-title">About this shell</Dialog.Title>
+              <Dialog.Description className="confirm-desc">{BASH_ABOUT.shell}</Dialog.Description>
+              <p className="bpg-about-label">Installed</p>
+              <p className="bpg-about-list">
+                {BASH_ABOUT.installed.map((c) => (
+                  <code key={c}>{c}</code>
+                ))}
+              </p>
+              <p className="bpg-about-label">Not here</p>
+              <p className="bpg-about-list">
+                {BASH_ABOUT.missing.map((c) => (
+                  <code key={c}>{c}</code>
+                ))}
+              </p>
+              <ul className="bpg-about-notes">
+                {BASH_ABOUT.notes.map((n) => (
+                  <li key={n}>{n}</li>
+                ))}
+              </ul>
+              <div className="confirm-actions">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">Close</Dialog.Close>
+              </div>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+
         <div className={`playground-body bpg-body${drag?.active ? " dragging" : ""}`} ref={stage} data-layout={tabbed ? "tabs" : "split"}>
-          {/* The on-ramp: what to try, every command, and what this shell is.
-              Collapsible, remembered, never deleted by a command. */}
-          <div className={`bpg-guide${guideOpen ? "" : " closed"}`} role="region" aria-label="Try this">
-            <div className="bpg-guide-row">
-              <span className="bpg-guide-title">{tryFinished ? "Done" : "Try this"}</span>
-              {guideOpen && (
-                <div className="bpg-guide-steps" role="group" aria-label="Suggested commands">
-                  {tryFinished ? (
-                    <>
-                      <span className="bpg-guide-done">
-                        <Check size={13} aria-hidden="true" /> Every step of {scenarioDef.label} is done.
-                      </span>
-                      <button type="button" className="bpg-step next" onClick={() => handleReset(nextScenario.id)} disabled={!ready}>
-                        Next: {nextScenario.label}
-                      </button>
-                    </>
-                  ) : (
-                    scenarioDef.tryThis.map((step, i) => (
-                      <button
-                        key={step.command}
-                        type="button"
-                        className={`bpg-step${tryDone[i] ? " done" : ""}`}
-                        onClick={() => compose(step.command)}
-                        title={step.command}
-                        disabled={!ready}
-                      >
-                        <span className="bpg-step-mark" aria-hidden="true">
-                          {tryDone[i] ? <Check size={11} /> : i + 1}
-                        </span>
-                        {step.label}
-                      </button>
-                    ))
-                  )}
-                </div>
-              )}
-              <span className="bpg-pane-sep" />
-              <button
-                type="button"
-                className="bpg-btn small"
-                onClick={() => (paletteOpen ? closePalette() : setPaletteOpen(true))}
-                aria-expanded={paletteOpen}
-                aria-haspopup="dialog"
-                disabled={!ready}
-              >
-                All commands
-              </button>
-              <button
-                type="button"
-                className="bpg-btn small"
-                onClick={() => setAboutOpen(true)}
-                aria-haspopup="dialog"
-                title="What is installed, and what this shell cannot do"
-              >
-                <Info size={14} aria-hidden="true" />
-                <span className="bpg-btn-label">About this shell</span>
-              </button>
-              <button
-                type="button"
-                className="bpg-btn small"
-                onClick={toggleGuide}
-                aria-expanded={guideOpen}
-                aria-label={guideOpen ? "Hide the suggestions" : "Show the suggestions"}
-                title={guideOpen ? "Hide" : "Show"}
-              >
-                {guideOpen ? <ChevronUp size={14} aria-hidden="true" /> : <ChevronDown size={14} aria-hidden="true" />}
-              </button>
-            </div>
-
-            {paletteOpen && (
-              <>
-                <button type="button" className="gitx-palette-backdrop" aria-label="Close the command list" onClick={closePalette} tabIndex={-1} />
-                <div className="bpg-palette" role="dialog" aria-modal="true" aria-label="All commands">
-                  <BashCommandPalette tree={state.tree} dirs={state.dirs} onCompose={compose} onClose={closePalette} />
-                </div>
-              </>
-            )}
-          </div>
-
-          <Dialog.Root open={aboutOpen} onOpenChange={setAboutOpen}>
-            <Dialog.Portal>
-              <Dialog.Backdrop className="confirm-backdrop" />
-              <Dialog.Popup className="confirm-popup bpg-about">
-                <Dialog.Title className="confirm-title">About this shell</Dialog.Title>
-                <Dialog.Description className="confirm-desc">{BASH_ABOUT.shell}</Dialog.Description>
-                <p className="bpg-about-label">Installed</p>
-                <p className="bpg-about-list">
-                  {BASH_ABOUT.installed.map((c) => (
-                    <code key={c}>{c}</code>
-                  ))}
-                </p>
-                <p className="bpg-about-label">Not here</p>
-                <p className="bpg-about-list">
-                  {BASH_ABOUT.missing.map((c) => (
-                    <code key={c}>{c}</code>
-                  ))}
-                </p>
-                <ul className="bpg-about-notes">
-                  {BASH_ABOUT.notes.map((n) => (
-                    <li key={n}>{n}</li>
-                  ))}
-                </ul>
-                <div className="confirm-actions">
-                  <Dialog.Close className="confirm-btn confirm-btn-secondary">Close</Dialog.Close>
-                </div>
-              </Dialog.Popup>
-            </Dialog.Portal>
-          </Dialog.Root>
+          {paletteOpen && (
+            <>
+              <button type="button" className="gitx-palette-backdrop" aria-label="Close the command list" onClick={closePalette} tabIndex={-1} />
+              <div className="bpg-palette" role="dialog" aria-modal="true" aria-label="All commands">
+                <BashCommandPalette tree={state.tree} dirs={state.dirs} onCompose={compose} onClose={closePalette} />
+              </div>
+            </>
+          )}
 
           {tabbed && (
             <nav className="bpg-tabs" aria-label="Terminals">

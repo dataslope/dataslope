@@ -6,22 +6,20 @@
    gitPlayground.css so a docs page does not ship the playground's layout. */
 
 /* ─── Terminal ─── */
-/* The three colours a transcript needs, at the brand ramp's ink steps so the
-   13px prompt and error text clear WCAG AA on the page (the brand green and
-   red themselves are 2.3:1 and 3.2:1 on white). Dark mode takes the lighter
-   steps, which clear it on the dark ground. */
+/* The two tones a transcript uses for standard error, at the brand ramp's
+   ink steps so 13px error text clears WCAG AA on the page (the brand red
+   itself is 3.2:1 on white). Dark mode takes the lighter steps, which clear
+   it on the dark ground. The prompt and command line stay the brand green. */
 .git-terminal {
   display: flex;
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  --git-terminal-prompt: var(--ds-green-800);
   --git-terminal-error: var(--ds-red-700);
   --git-terminal-warn: var(--ds-yellow-800);
 }
 
 html:is(.dark, [data-theme="dark"]) .git-terminal {
-  --git-terminal-prompt: var(--ds-green-400);
   --git-terminal-error: var(--ds-red-400);
   --git-terminal-warn: var(--ds-yellow-400);
 }
@@ -61,7 +59,7 @@ html:is(.dark, [data-theme="dark"]) .git-terminal {
 .git-terminal-command {
   display: flex;
   gap: 8px;
-  color: var(--git-terminal-prompt);
+  color: var(--ds-green);
   word-break: break-word;
   /* What was typed is shown as typed: `echo   two   spaces` keeps its spaces
      in the scrollback, the way the output below it keeps its own. */
@@ -123,7 +121,7 @@ html:is(.dark, [data-theme="dark"]) .git-terminal {
   flex: none;
   /* The live prompt is the same green as the ones already in the scrollback,
      so the line does not change color when it is run. */
-  color: var(--git-terminal-prompt);
+  color: var(--ds-green);
   /* Containing block for the hidden input below, so focusing it can never
      pull the page somewhere else. */
   position: relative;
@@ -590,7 +588,7 @@ html:is(.dark, [data-theme="dark"]) .git-terminal {
 /* Directory shown before the `$`. Colored like a real prompt so the path
    reads as context rather than as part of the command. */
 .git-terminal-cwd {
-  color: var(--git-terminal-prompt);
+  color: var(--ds-green);
   font-weight: 600;
   margin-right: 6px;
 }

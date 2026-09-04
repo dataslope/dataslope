@@ -761,7 +761,7 @@ html:is(.dark, [data-theme="dark"]) .gitx-areas {
 }
 
 .gitx-console-body .git-terminal-line {
-  color: var(--git-terminal-prompt);
+  color: var(--ds-green);
 }
 
 /* The line under the prompt: always-current status, then what just happened.

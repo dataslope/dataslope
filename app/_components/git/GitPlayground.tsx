@@ -1086,7 +1086,7 @@ export default function GitPlayground() {
                 onWrite={write}
                 continuation={continuation.length > 0}
                 onCancel={cancel}
-                queueWhileBusy
+                queueWhileBusy={ready}
                 placeholderHint={null}
               />
             </div>

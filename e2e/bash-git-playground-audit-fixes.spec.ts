@@ -3,7 +3,7 @@
  * 2026, findings BG-01 to BG-27): definitions that persist without replaying
  * their line, the continuation prompt, a diff that marks its changes, a
  * status that tells modified from new, a reset that keeps HEAD attached,
- * chips that leave the caret at the end, a styled command palette, a
+ * fills that leave the caret at the end, a styled command palette, a
  * confirmed reset with Undo behind it, and a session that survives a reload.
  *
  * Opt-in like the other playground specs
@@ -58,29 +58,46 @@ test("Bash: an unfinished line gets a > prompt, aliases work, stdin is explained
   expect(await run(page, "echo $USER $SHELL")).toContain("user /bin/bash");
 });
 
-test("Bash: the on-ramp fills the prompt with the caret at the end, ticks steps, and asks before a reset", async ({ page }) => {
+test("Bash: the menu's palette fills the prompt with the caret at the end, and Reset asks first", async ({ page }) => {
   await open(page, "bash");
-  await page.locator(".bpg-step").first().click();
+  await page.getByRole("button", { name: "More" }).click();
+  await page.getByRole("menuitem", { name: /All commands/ }).click();
+  const row = page.locator(".gitx-palette-btn").first();
+  await expect(row).toBeVisible();
+  // Styled, not the browser's default button chrome.
+  expect(await row.evaluate((el) => getComputedStyle(el).borderStyle)).toBe("none");
+  await row.click();
+  await expect(page.locator(".gitx-palette-btn")).toHaveCount(0);
   const [start, end, value] = await selection(page);
   expect(value.length).toBeGreaterThan(0);
   expect(start).toBe(value.length);
   expect(end).toBe(value.length);
   await page.locator(INPUT).first().press("Enter");
   await page.waitForFunction(() => !document.querySelector(".git-terminal-busy"));
-  await expect(page.locator(".bpg-step.done")).toHaveCount(1);
 
-  await page.getByRole("button", { name: "All commands" }).click();
-  const row = page.locator(".gitx-palette-btn").first();
-  await expect(row).toBeVisible();
-  // Styled, not the browser's default button chrome.
-  expect(await row.evaluate((el) => getComputedStyle(el).borderStyle)).toBe("none");
-  await page.keyboard.press("Escape");
-  await expect(page.locator(".gitx-palette-btn")).toHaveCount(0);
+  await page.getByRole("button", { name: "More" }).click();
+  await page.getByRole("menuitem", { name: /About this shell/ }).click();
+  await expect(page.locator(".bpg-about")).toContainText("no standard input");
+  await page.getByRole("button", { name: "Close" }).click();
 
   await page.getByRole("button", { name: "Reset" }).click();
-  await expect(page.locator(".confirm-popup")).toBeVisible();
+  // The About dialog is still fading out; the open one is the alert.
+  await expect(page.getByRole("alertdialog")).toBeVisible();
   await page.getByRole("button", { name: "Cancel" }).click();
   await expect(page.locator(".git-terminal-block").first()).toBeVisible();
+});
+
+test("Bash: choosing Panes or Tabs does not move the layout buttons", async ({ page }) => {
+  await open(page, "bash");
+  const panes = page.getByRole("button", { name: "Panes" });
+  const before = (await panes.boundingBox())!;
+  await page.getByRole("button", { name: "Tabs" }).click();
+  await expect(page.locator(".bpg-tabs")).toBeVisible();
+  const after = (await panes.boundingBox())!;
+  expect(Math.abs(after.x - before.x)).toBeLessThan(1);
+  await panes.click();
+  await expect(page.locator(".bpg-tabs")).toHaveCount(0);
+  expect(Math.abs((await panes.boundingBox())!.x - before.x)).toBeLessThan(1);
 });
 
 test("Bash: the session survives a reload", async ({ page }) => {
@@ -155,9 +172,8 @@ test.describe("phone", () => {
 
   test("both playgrounds keep their controls reachable at 375px", async ({ page }) => {
     await open(page, "bash");
-    const step = page.locator(".bpg-step").first();
-    expect((await step.boundingBox())!.height).toBeGreaterThanOrEqual(40);
     expect(await page.locator(INPUT).first().getAttribute("enterkeyhint")).toBe("go");
+    expect((await page.locator(".bpg-pane-menu").first().boundingBox())!.height).toBeGreaterThanOrEqual(40);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 
     await open(page, "git");

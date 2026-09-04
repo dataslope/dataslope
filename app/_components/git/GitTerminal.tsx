@@ -129,7 +129,9 @@ interface Props {
   /**
    * Enter while a command is running hands the line to the host, which runs
    * it next, as a real shell would. Off by default: a host that has no
-   * queue would otherwise run two commands at once.
+   * queue would otherwise run two commands at once. Hosts pass their
+   * `ready` flag, so the prompt stays disabled until the runtime is up: a
+   * line sent ahead of the seed would land in an empty session.
    */
   queueWhileBusy?: boolean;
 }

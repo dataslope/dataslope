@@ -55,9 +55,6 @@ interface Props {
   /** Where this shell started; a split inherits its source's directory. */
   startCwd: string;
   focused: boolean;
-  /** The scenario line, shown in the first terminal only, before anything
-   *  has been typed. */
-  hint?: string | null;
   /** True in the tab layout, where moves are left and right along the strip. */
   tabbed: boolean;
   /** Which moves are open to this pane right now; asked as the menu opens,
@@ -93,7 +90,6 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, Props>(function Termi
   session,
   startCwd,
   focused,
-  hint = null,
   tabbed,
   moves,
   canSwap,
@@ -319,8 +315,8 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, Props>(function Termi
           onWrite={pane.write}
           continuation={pane.continuation}
           onCancel={pane.cancel}
-          queueWhileBusy
-          placeholderHint={hint ? <p className="git-terminal-hint">{hint}</p> : null}
+          queueWhileBusy={session.ready}
+          placeholderHint={null}
         />
       </div>
 

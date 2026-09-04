@@ -60,7 +60,7 @@ const contrast = (a: string, b: string) => {
   return (l1 + 0.05) / (l2 + 0.05);
 };
 
-describe("BG-23 · terminal colours clear AA on the page", () => {
+describe("BG-23 · terminal error colours clear AA on the page", () => {
   const brand = read("app/brand.css");
   const token = (name: string) => {
     const m = new RegExp(`${name}:\\s*(#[0-9A-Fa-f]{6})`).exec(brand);
@@ -76,15 +76,15 @@ describe("BG-23 · terminal colours clear AA on the page", () => {
     return token(m[1]);
   };
 
-  it.each(["prompt", "error", "warn"])("%s on white is at least 4.5:1", (role) => {
+  it.each(["error", "warn"])("%s on white is at least 4.5:1", (role) => {
     expect(contrast(pick(light, role), "#ffffff")).toBeGreaterThanOrEqual(4.5);
   });
 
-  it.each(["prompt", "error", "warn"])("%s on a dark ground is at least 4.5:1", (role) => {
+  it.each(["error", "warn"])("%s on a dark ground is at least 4.5:1", (role) => {
     expect(contrast(pick(dark, role), "#111418")).toBeGreaterThanOrEqual(4.5);
   });
 
-  it("no terminal rule still uses the raw brand green or --red", () => {
+  it("no terminal rule still uses the raw --red for errors", () => {
     for (const file of [
       "app/_components/git/gitPanels.css",
       "app/_components/git/gitPlayground.css",
@@ -93,7 +93,7 @@ describe("BG-23 · terminal colours clear AA on the page", () => {
     ]) {
       const css = read(file);
       for (const rule of css.matchAll(/\.git-terminal[a-z-]*[^{]*\{[^}]*\}/g)) {
-        expect(rule[0], `${file}: ${rule[0].split("\n")[0]}`).not.toMatch(/var\(--ds-green\)|var\(--red\)/);
+        expect(rule[0], `${file}: ${rule[0].split("\n")[0]}`).not.toMatch(/var\(--red\)/);
       }
     }
   });

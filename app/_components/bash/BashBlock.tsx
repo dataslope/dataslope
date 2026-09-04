@@ -142,7 +142,7 @@ export default function BashBlock({
             onScrolledChange={setScrolled}
             continuation={pane.continuation}
             onCancel={pane.cancel}
-            queueWhileBusy
+            queueWhileBusy={ready}
             placeholderHint={null}
           />
         </div>
