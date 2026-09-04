@@ -70,7 +70,8 @@ describe("placeFiles", () => {
 
   it("calls a conflicted file a conflict, not staged-then-edited", () => {
     const [chip] = placeFiles([file("config.yml", 1, 2, 3)], "rename");
-    expect(chip).toMatchObject({ area: "stage", word: "conflict", tone: "conflict" });
+    // Unmerged work lives on disk, in the working directory, never "ready".
+    expect(chip).toMatchObject({ area: "work", word: "conflict", tone: "conflict" });
   });
 });
 

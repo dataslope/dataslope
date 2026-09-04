@@ -119,6 +119,9 @@ export type GitWorkerResponse =
       state: RepoState;
       /** Set by `readFile`. */
       content?: string;
+      /** The line was not finished (an open `if`, quote or pipe) and did
+       *  not run; the terminal can ask for the rest. */
+      incomplete?: boolean;
     }
   | { id: number; ok: false; error: string };
 

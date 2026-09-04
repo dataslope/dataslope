@@ -346,7 +346,7 @@
 }
 
 .bpg-term .git-terminal-line {
-  color: var(--ds-green);
+  color: var(--git-terminal-prompt);
 }
 
 .bpg-term .git-terminal-hint {
@@ -553,5 +553,234 @@
   .bpg-gutter,
   .bpg-pane-head {
     transition: none;
+  }
+}
+
+/* ─── The on-ramp ─── */
+/* A strip between the header and the terminals: the scenario's "Try this"
+   steps as chips that tick as they run, the command palette, and a note on
+   what this shell is. It collapses to one row and the choice is remembered. */
+.bpg-guide {
+  flex: none;
+  position: relative;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.bpg-guide-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 4px 10px 4px 16px;
+}
+
+.bpg-guide-title {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  white-space: nowrap;
+  flex: none;
+}
+
+.bpg-guide-steps {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.bpg-guide-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--text);
+}
+
+.bpg-guide-done svg {
+  color: var(--ds-green-600);
+}
+
+.bpg-scenario {
+  gap: 8px;
+}
+
+/* A step: an outlined pill, as the Git playground's suggestions are, with
+   its number in front and a tick once it has been run. */
+.bpg-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
+  padding: 2px 12px 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--primary);
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.bpg-step:hover:not(:disabled) {
+  border-color: var(--primary);
+  background: var(--primary-glow);
+}
+
+.bpg-step:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.bpg-step.done {
+  color: var(--text-dim);
+  text-decoration: line-through;
+}
+
+.bpg-step.next {
+  padding-left: 12px;
+  color: var(--primary);
+}
+
+.bpg-step-mark {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10.5px;
+  font-weight: 700;
+  flex: none;
+}
+
+.bpg-step.done .bpg-step-mark {
+  background: var(--ds-green-600);
+  border-color: var(--ds-green-600);
+  color: #fff;
+}
+
+.bpg-btn.small {
+  min-height: 30px;
+  padding: 2px 8px;
+  font-size: 12.5px;
+}
+
+/* The palette hangs under the strip's right edge. */
+.bpg-palette {
+  position: absolute;
+  right: 10px;
+  top: calc(100% - 4px);
+  width: min(380px, calc(100vw - 24px));
+  max-height: min(62vh, 520px);
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.35);
+  z-index: 21;
+}
+
+/* "About this shell": the confirm dialog's frame with a list in it. */
+.bpg-about {
+  width: min(520px, calc(100vw - 32px));
+}
+
+.bpg-about-label {
+  margin: 4px 0 0;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.bpg-about-list {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.bpg-about-list code {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--bg3);
+  color: var(--text);
+}
+
+.bpg-about-notes {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.bpg-about-notes li + li {
+  margin-top: 4px;
+}
+
+@media (max-width: 860px) {
+  /* On a phone the steps scroll sideways in one row rather than stacking
+     over the terminal, and every control clears 40px for a thumb. */
+  .bpg-guide-row {
+    padding-left: 12px;
+    gap: 6px;
+  }
+
+  .bpg-guide-title {
+    display: none;
+  }
+
+  .bpg-guide-steps {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex: 1;
+    padding: 2px 0;
+  }
+
+  .bpg-guide-steps::-webkit-scrollbar {
+    display: none;
+  }
+
+  .bpg-guide .bpg-pane-sep {
+    display: none;
+  }
+
+  .bpg-step,
+  .bpg-btn.small,
+  .bpg-pane-menu,
+  .bpg-pane-close,
+  .bpg-grip,
+  .bpg-tab-close {
+    min-height: 40px;
+  }
+
+  .bpg-pane-menu,
+  .bpg-pane-close,
+  .bpg-grip {
+    width: 40px;
+    height: 40px;
+  }
+
+  .bpg-palette {
+    right: 8px;
+    left: 8px;
+    width: auto;
   }
 }

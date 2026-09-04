@@ -140,6 +140,9 @@ export default function BashBlock({
             inlineInput
             onWrite={pane.write}
             onScrolledChange={setScrolled}
+            continuation={pane.continuation}
+            onCancel={pane.cancel}
+            queueWhileBusy
             placeholderHint={null}
           />
         </div>

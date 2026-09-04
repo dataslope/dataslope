@@ -605,7 +605,7 @@ html:is(.dark, [data-theme="dark"]) .sblock-head.scrolled {
 /* The line you type is the same green as the line it becomes, so pressing
    Enter does not recolor what is already on screen. */
 .sblock-terminal .git-terminal-line {
-  color: var(--ds-green);
+  color: var(--git-terminal-prompt);
 }
 
 /* Output starts at column 0, under the `$` rather than under the command,
