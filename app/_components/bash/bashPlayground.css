@@ -44,6 +44,17 @@
   cursor: default;
 }
 
+.bpg-btn.on {
+  color: var(--primary);
+  background: var(--primary-glow);
+}
+
+/* Panes or tabs: two ghosts, the chosen one lit. */
+.bpg-layout {
+  display: inline-flex;
+  gap: 2px;
+}
+
 /* ─── The stage ─── */
 .bpg-body {
   flex-direction: column;
@@ -88,26 +99,91 @@
   min-height: 0;
 }
 
-/* The gutter: a rule on the boundary that becomes a handle on hover. */
+/* The gutter, drawn as the code playground's resizer: a hairline on the
+   boundary, a short grip on it so the handle can be found without hovering,
+   and a tint with a longer grip while it is held. */
 .bpg-gutter {
   position: absolute;
   z-index: 1;
-  background: var(--border);
-  transition: background-color 0.12s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  transition: background-color 0.15s;
   touch-action: none;
+}
+
+.bpg-gutter::after {
+  content: "";
+  position: absolute;
+  background: var(--border);
 }
 
 .bpg-gutter.dir-row {
   cursor: col-resize;
 }
 
+.bpg-gutter.dir-row::after {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+}
+
 .bpg-gutter.dir-col {
   cursor: row-resize;
 }
 
+.bpg-gutter.dir-col::after {
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+.bpg-gutter::before {
+  content: "";
+  position: relative;
+  z-index: 1;
+  background: var(--text-dim);
+  opacity: 0.55;
+  border-radius: 1px;
+  transition: all 0.15s;
+}
+
+.bpg-gutter.dir-row::before {
+  width: 2px;
+  height: 36px;
+}
+
+.bpg-gutter.dir-col::before {
+  width: 36px;
+  height: 2px;
+}
+
 .bpg-gutter:hover,
-.bpg-gutter:active {
+.bpg-gutter.dragging {
+  background: var(--primary-glow);
+}
+
+.bpg-gutter:hover::before,
+.bpg-gutter.dragging::before {
   background: var(--primary);
+  opacity: 1;
+}
+
+.bpg-gutter.dir-row:hover::before,
+.bpg-gutter.dir-row.dragging::before {
+  width: 3px;
+  height: 64px;
+}
+
+.bpg-gutter.dir-col:hover::before,
+.bpg-gutter.dir-col.dragging::before {
+  height: 3px;
+  width: 64px;
 }
 
 /* ─── A pane ─── */
@@ -129,13 +205,13 @@
   border-bottom: 1px solid var(--border);
   background: var(--bg);
   flex: none;
-  /* The focused pane's bar carries the accent. */
-  box-shadow: inset 0 2px 0 transparent;
+  /* The focused pane's bar carries a faint accent line. */
+  box-shadow: inset 0 1px 0 transparent;
   transition: box-shadow 0.12s;
 }
 
 .bpg-pane.focused > .bpg-pane-head {
-  box-shadow: inset 0 2px 0 var(--primary);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--primary) 45%, transparent);
 }
 
 .bpg-grip {
@@ -170,7 +246,7 @@
   color: var(--text);
   font-family: var(--font-ui);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: text;
   white-space: nowrap;
 }
@@ -347,116 +423,123 @@
   z-index: 20;
 }
 
-/* ─── Phone: a tab strip, one terminal at a time ─── */
+/* ─── Tabs: one terminal at a time, a strip to switch ─── */
+/* A phone always gets this; a desktop can choose it from the header. The
+   split tree is kept underneath, so switching back shows the same terminals
+   where they were. */
 .bpg-tabs {
+  display: none;
+}
+
+.bpg-body[data-layout="tabs"] .bpg-tabs {
+  display: flex;
+  align-items: stretch;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  overflow-x: auto;
+  flex: none;
+  scrollbar-width: none;
+}
+
+.bpg-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* Underline tabs, the same shape as the Git playground's pane switch. */
+.bpg-tab {
+  display: inline-flex;
+  align-items: center;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  color: var(--text-dim);
+  flex: none;
+}
+
+.bpg-tab.active {
+  border-bottom-color: var(--primary);
+  color: var(--primary);
+}
+
+.bpg-tab-btn,
+.bpg-tab.add {
+  min-height: 40px;
+  padding: 4px 12px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bpg-tab.add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  padding: 0;
+  cursor: pointer;
+}
+
+.bpg-tab.add:disabled {
+  opacity: 0.4;
+}
+
+.bpg-tab-close {
+  min-height: 40px;
+  width: 28px;
+  margin-left: -6px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Every slot stacks in the one cell, sized by it rather than by the split
+   it came from; the ones holding a hidden pane let pointer events through
+   to the one that is showing. */
+.bpg-body[data-layout="tabs"] .bpg-gutter {
+  display: none;
+}
+
+.bpg-body[data-layout="tabs"] .bpg-tree {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.bpg-body[data-layout="tabs"] .bpg-slot {
+  position: static;
+  width: auto;
+  height: auto;
+  grid-area: 1 / 1;
+  pointer-events: none;
+}
+
+.bpg-body[data-layout="tabs"] .bpg-pane {
+  display: none;
+  pointer-events: auto;
+}
+
+.bpg-body[data-layout="tabs"] .bpg-stage[data-focus] .bpg-pane.focused {
+  display: flex;
+}
+
+/* The head stays for its directory and its menu, which is where a tab
+   renames, moves, and clears. The grip and the close go: the strip is where
+   tabs switch and close, and there is nothing to drag. */
+.bpg-body[data-layout="tabs"] .bpg-grip,
+.bpg-body[data-layout="tabs"] .bpg-pane-close {
   display: none;
 }
 
 @media (max-width: 860px) {
   .bpg-btn-label {
-    display: none;
-  }
-
-  .bpg-tabs {
-    display: flex;
-    align-items: stretch;
-    padding: 0 8px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg);
-    overflow-x: auto;
-    flex: none;
-    scrollbar-width: none;
-  }
-
-  .bpg-tabs::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Underline tabs, the same shape as the Git playground's pane switch. */
-  .bpg-tab {
-    display: inline-flex;
-    align-items: center;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    color: var(--text-dim);
-    flex: none;
-  }
-
-  .bpg-tab.active {
-    border-bottom-color: var(--primary);
-    color: var(--primary);
-  }
-
-  .bpg-tab-btn,
-  .bpg-tab.add {
-    min-height: 40px;
-    padding: 4px 12px;
-    border: none;
-    background: transparent;
-    color: inherit;
-    font-family: var(--font-ui);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-
-  .bpg-tab.add {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 40px;
-    padding: 0;
-    cursor: pointer;
-  }
-
-  .bpg-tab.add:disabled {
-    opacity: 0.4;
-  }
-
-  .bpg-tab-close {
-    min-height: 40px;
-    width: 28px;
-    margin-left: -6px;
-    border: none;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* On a phone the tree still exists; only the focused terminal is shown.
-     Every slot stacks in the same cell, and the ones holding a hidden pane
-     let touches through to the one that is showing. */
-  .bpg-gutter {
-    display: none;
-  }
-
-  .bpg-tree {
-    display: grid;
-  }
-
-  .bpg-slot {
-    position: static;
-    grid-area: 1 / 1;
-    pointer-events: none;
-  }
-
-  .bpg-pane {
-    display: none;
-    pointer-events: auto;
-  }
-
-  .bpg-stage[data-focus] .bpg-pane.focused {
-    display: flex;
-  }
-
-  /* The head stays for its directory and its menu, which is where a phone
-     renames, moves, and clears. The grip and the close go: the tab strip is
-     where a phone switches and closes, and there is nothing to drag. */
-  .bpg-grip,
-  .bpg-pane-close {
     display: none;
   }
 

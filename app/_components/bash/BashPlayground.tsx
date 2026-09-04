@@ -11,16 +11,17 @@
  * split from is standing.
  *
  * Memory-only, and nothing persists: a reload is one terminal and the
- * starting files. The layout is a binary split tree (`splitTree.ts`); on a phone
- * the same terminals are a tab strip and the tree is kept for when the
- * viewport grows back.
+ * starting files. The layout is a binary split tree (`splitTree.ts`). The
+ * same terminals can also be a tab strip, one showing at a time: a phone
+ * always gets that, a desktop can choose it, and the tree is kept underneath
+ * so switching back shows everything where it was.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Select } from "@base-ui/react/select";
 import { Menu } from "@base-ui/react/menu";
-import { ChevronDown, Plus, RotateCcw, SplitSquareHorizontal, SplitSquareVertical, X } from "lucide-react";
+import { ChevronDown, Columns2, PanelTop, Plus, RotateCcw, SplitSquareHorizontal, SplitSquareVertical, X } from "lucide-react";
 import Link from "../Link";
 import { PLAYGROUNDS } from "../playgrounds";
 import { useIsFramed } from "../useIsFramed";
@@ -31,7 +32,7 @@ import { useGitSession } from "../git/gitRuntime";
 import menuStyles from "../sqlCardTools/SqlCardToolsMenu.module.css";
 import { DEFAULT_BASH_SCENARIO } from "./bashScenarios";
 import { HOME } from "./prompt";
-import { SplitView, MIN_PANE } from "./SplitView";
+import { GUTTER, MIN_PANE, SplitView } from "./SplitView";
 import { TerminalPane, type MoveDir, type PaneDragHandlers } from "./TerminalPane";
 import {
   dropZone as zoneAt,
@@ -54,6 +55,20 @@ import "./bashPlayground.css";
 /** Past this the split tree is unreadable on any screen, and each terminal
  *  holds a scrollback. One constant, to feel out. */
 export const MAX_TERMINALS = 8;
+
+type Layout = "split" | "tabs";
+
+/** The one preference kept across visits: panes or tabs. Nothing in a
+ *  session is saved, but how you like to look at one is not the session. */
+const LAYOUT_KEY = "bash_playground_layout";
+
+function storedLayout(): Layout {
+  try {
+    return localStorage.getItem(LAYOUT_KEY) === "tabs" ? "tabs" : "split";
+  } catch {
+    return "split";
+  }
+}
 
 interface PaneRecord {
   id: string;
@@ -86,6 +101,17 @@ export default function BashPlayground() {
   const router = useRouter();
   const embedded = useIsFramed();
   const mobile = useMediaQuery("(max-width: 860px)");
+  const [layout, setLayoutState] = useState<Layout>(storedLayout);
+  /** Tabs on a phone always; on a desktop when chosen. */
+  const tabbed = mobile || layout === "tabs";
+  const setLayout = useCallback((next: Layout) => {
+    setLayoutState(next);
+    try {
+      localStorage.setItem(LAYOUT_KEY, next);
+    } catch {
+      /* a blocked store only costs the preference */
+    }
+  }, []);
   const session = useGitSession(DEFAULT_BASH_SCENARIO, "bash-playground", "bash");
   const { ready, error, reset, openShell, closeShell } = session;
 
@@ -140,7 +166,7 @@ export default function BashPlayground() {
       // Refuse a split the pane cannot fit rather than producing one that
       // wraps every word of its prompt.
       const r = rects()[fromId];
-      if (!mobile && r && (dir === "row" ? r.width : r.height) < MIN_PANE[dir] * 2 + 6) {
+      if (!tabbed && r && (dir === "row" ? r.width : r.height) < MIN_PANE[dir] * 2 + GUTTER) {
         setNotice("Not enough room to split this terminal. Resize it or split another.");
         return;
       }
@@ -153,7 +179,7 @@ export default function BashPlayground() {
       setFocusId(id);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps -- paneCwd reads refs and current panes
-    [canSplit, mobile, openShell, rects],
+    [canSplit, tabbed, openShell, rects],
   );
 
   const closePane = useCallback(
@@ -172,7 +198,7 @@ export default function BashPlayground() {
 
   const movePane = useCallback(
     (id: string, dir: MoveDir) => {
-      if (mobile) {
+      if (tabbed) {
         const idx = order.indexOf(id);
         const other = dir === "left" || dir === "up" ? order[idx - 1] : order[idx + 1];
         if (other) setTree((t) => swap(t, id, other));
@@ -183,7 +209,26 @@ export default function BashPlayground() {
       const edge: Edge = dir === "left" ? "left" : dir === "right" ? "right" : dir === "up" ? "top" : "bottom";
       setTree((t) => move(t, id, target, edge));
     },
-    [mobile, order, rects],
+    [tabbed, order, rects],
+  );
+
+  /** Which moves are open to a pane: along the strip in tabs, by geometry
+   *  in panes. A menu asks as it opens. */
+  const moves = useCallback(
+    (id: string): Record<MoveDir, boolean> => {
+      if (tabbed) {
+        const idx = order.indexOf(id);
+        return { left: idx > 0, right: idx < order.length - 1, up: false, down: false };
+      }
+      const r = rects();
+      return {
+        left: neighbor(id, "left", r) !== null,
+        right: neighbor(id, "right", r) !== null,
+        up: neighbor(id, "up", r) !== null,
+        down: neighbor(id, "down", r) !== null,
+      };
+    },
+    [tabbed, order, rects],
   );
 
   const swapNext = useCallback(
@@ -292,7 +337,9 @@ export default function BashPlayground() {
         startCwd={rec.startCwd}
         focused={focusId === id}
         hint={id === "t1" ? "A few files to poke at. Try ls, then cat README.md." : null}
-        mobile={mobile}
+        tabbed={tabbed}
+        moves={() => moves(id)}
+        canSwap={count > 1}
         canClose={count > 1}
         canSplit={canSplit}
         resetToken={resetToken}
@@ -381,6 +428,31 @@ export default function BashPlayground() {
 
           <div className="header-sep" />
 
+          {!mobile && (
+            <div className="bpg-layout" role="group" aria-label="Layout">
+              <button
+                type="button"
+                className={`bpg-btn${layout === "split" ? " on" : ""}`}
+                aria-pressed={layout === "split"}
+                onClick={() => setLayout("split")}
+                title="Terminals side by side, split any way you like"
+              >
+                <Columns2 size={14} aria-hidden="true" />
+                <span className="bpg-btn-label">Panes</span>
+              </button>
+              <button
+                type="button"
+                className={`bpg-btn${layout === "tabs" ? " on" : ""}`}
+                aria-pressed={layout === "tabs"}
+                onClick={() => setLayout("tabs")}
+                title="One terminal at a time, with tabs"
+              >
+                <PanelTop size={14} aria-hidden="true" />
+                <span className="bpg-btn-label">Tabs</span>
+              </button>
+            </div>
+          )}
+
           <button
             type="button"
             className="bpg-btn"
@@ -393,7 +465,7 @@ export default function BashPlayground() {
             <span className="bpg-btn-label">New</span>
           </button>
 
-          {!mobile && (
+          {!tabbed && (
             <Menu.Root>
               <Menu.Trigger className="bpg-btn" disabled={!ready || !canSplit} aria-label="Split the focused terminal">
                 <SplitSquareHorizontal size={14} aria-hidden="true" />
@@ -438,8 +510,8 @@ export default function BashPlayground() {
 
         <h1 className="playground-sr-title">Bash Playground</h1>
 
-        <div className={`playground-body bpg-body${drag?.active ? " dragging" : ""}`} ref={stage}>
-          {mobile && (
+        <div className={`playground-body bpg-body${drag?.active ? " dragging" : ""}`} ref={stage} data-layout={tabbed ? "tabs" : "split"}>
+          {tabbed && (
             <nav className="bpg-tabs" aria-label="Terminals">
               {order.map((id) => (
                 <span key={id} className={`bpg-tab${focusId === id ? " active" : ""}`}>

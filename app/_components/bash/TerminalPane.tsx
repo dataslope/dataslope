@@ -51,8 +51,12 @@ interface Props {
   /** The scenario line, shown in the first terminal only, before anything
    *  has been typed. */
   hint?: string | null;
-  /** True on a phone, where moves are left and right along the tab strip. */
-  mobile: boolean;
+  /** True in the tab layout, where moves are left and right along the strip. */
+  tabbed: boolean;
+  /** Which moves are open to this pane right now; asked as the menu opens,
+   *  so an edge pane shows its dead directions disabled. */
+  moves: () => Record<MoveDir, boolean>;
+  canSwap: boolean;
   canClose: boolean;
   canSplit: boolean;
   /** Bumped by Reset so the pane clears itself. */
@@ -78,7 +82,9 @@ export function TerminalPane({
   startCwd,
   focused,
   hint = null,
-  mobile,
+  tabbed,
+  moves,
+  canSwap,
   canClose,
   canSplit,
   resetToken,
@@ -96,6 +102,7 @@ export function TerminalPane({
   const termRef = useRef<GitTerminalHandle>(null);
   const [renaming, setRenaming] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [can, setCan] = useState<Record<MoveDir, boolean>>({ left: true, right: true, up: true, down: true });
   const lastReset = useRef(resetToken);
 
   // Focus follows the model: when this pane becomes the focused one, its
@@ -182,14 +189,18 @@ export function TerminalPane({
         </span>
         <span className="bpg-pane-sep" />
 
-        <Menu.Root>
+        <Menu.Root
+          onOpenChange={(open) => {
+            if (open) setCan(moves());
+          }}
+        >
           <Menu.Trigger className={`${menuStyles.trigger} bpg-pane-menu`} aria-label={`${title} menu`} title="More">
             <MoreHorizontal size={14} strokeWidth={2.2} aria-hidden />
           </Menu.Trigger>
           <Menu.Portal>
             <Menu.Positioner sideOffset={6} align="end" className={menuStyles.positioner}>
               <Menu.Popup className={menuStyles.popup}>
-                {!mobile && (
+                {!tabbed && (
                   <>
                     <Menu.Item className={menuStyles.item} disabled={!canSplit} onClick={() => onSplit("row")}>
                       <SplitSquareHorizontal strokeWidth={1.8} aria-hidden />
@@ -201,27 +212,27 @@ export function TerminalPane({
                     </Menu.Item>
                   </>
                 )}
-                <Menu.Item className={menuStyles.item} onClick={() => onMove("left")}>
+                <Menu.Item className={menuStyles.item} disabled={!can.left} onClick={() => onMove("left")}>
                   <ArrowLeft strokeWidth={1.8} aria-hidden />
                   <span className={menuStyles.itemLabel}>Move left</span>
                 </Menu.Item>
-                <Menu.Item className={menuStyles.item} onClick={() => onMove("right")}>
+                <Menu.Item className={menuStyles.item} disabled={!can.right} onClick={() => onMove("right")}>
                   <ArrowRight strokeWidth={1.8} aria-hidden />
                   <span className={menuStyles.itemLabel}>Move right</span>
                 </Menu.Item>
-                {!mobile && (
+                {!tabbed && (
                   <>
-                    <Menu.Item className={menuStyles.item} onClick={() => onMove("up")}>
+                    <Menu.Item className={menuStyles.item} disabled={!can.up} onClick={() => onMove("up")}>
                       <ArrowUp strokeWidth={1.8} aria-hidden />
                       <span className={menuStyles.itemLabel}>Move up</span>
                     </Menu.Item>
-                    <Menu.Item className={menuStyles.item} onClick={() => onMove("down")}>
+                    <Menu.Item className={menuStyles.item} disabled={!can.down} onClick={() => onMove("down")}>
                       <ArrowDown strokeWidth={1.8} aria-hidden />
                       <span className={menuStyles.itemLabel}>Move down</span>
                     </Menu.Item>
                   </>
                 )}
-                <Menu.Item className={menuStyles.item} onClick={onSwapNext}>
+                <Menu.Item className={menuStyles.item} disabled={!canSwap} onClick={onSwapNext}>
                   <ArrowLeftRight strokeWidth={1.8} aria-hidden />
                   <span className={menuStyles.itemLabel}>Swap with next</span>
                 </Menu.Item>

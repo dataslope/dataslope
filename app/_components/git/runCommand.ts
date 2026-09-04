@@ -67,11 +67,15 @@ const MAX_FUNCTIONS = 32;
  */
 export class ShellSession {
   cwd: string;
-  env: Record<string, string> = {};
+  env: Record<string, string>;
   private functions = new Map<string, string>();
 
-  constructor(cwd: string) {
+  /** `home` is what `~` and a bare `cd` mean: the session's root unless the
+   *  caller says otherwise. Seeded here because the browser build of
+   *  just-bash defaults HOME to `/` over a custom filesystem. */
+  constructor(cwd: string, home = cwd) {
     this.cwd = cwd;
+    this.env = { HOME: home };
   }
 
   async run(bash: ExecCapable, command: string): Promise<ShellResult> {

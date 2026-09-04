@@ -17,13 +17,25 @@ async function machine() {
   await store.writeFile(`${HOME}/README.md`, "# hi\n");
   const bash = new Bash({ fs: store as never, cwd: HOME });
   const open = (cwd = HOME) => {
-    const s = new ShellSession(cwd);
+    const s = new ShellSession(cwd, HOME);
     return { session: s, run: (cmd: string) => s.run(bash, cmd) };
   };
   return { bash, open };
 }
 
 describe("two shells, one filesystem", () => {
+  it("mean the session's home by ~, whatever the shell started in", async () => {
+    const { open } = await machine();
+    const one = open();
+    expect((await one.run("cd ~/ && pwd")).stdout.trim()).toBe(HOME);
+    expect((await one.run("cd src && cd && pwd")).stdout.trim()).toBe(HOME);
+    expect((await one.run("echo ~/src")).stdout.trim()).toBe(`${HOME}/src`);
+    expect(one.session.cwd).toBe(HOME);
+
+    const two = open(`${HOME}/src`);
+    expect((await two.run("cd ~ && pwd")).stdout.trim()).toBe(HOME);
+  });
+
   it("share files but not the working directory", async () => {
     const { open } = await machine();
     const one = open();

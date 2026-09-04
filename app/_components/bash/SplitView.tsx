@@ -16,13 +16,14 @@
  * the phone stylesheet can ignore them and stack the panes instead.
  */
 
-import { useMemo, useRef, type CSSProperties, type ReactNode } from "react";
+import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { MAX_RATIO, MIN_RATIO, layout, leaves, type Gutter, type Node, type Rect } from "./splitTree";
 
 /** Smallest a pane may be, in px, along the axis being resized. */
 export const MIN_PANE = { row: 220, col: 120 } as const;
-/** Gutter thickness, in px; half of it is taken from each neighbor. */
-const GUTTER = 6;
+/** Gutter thickness, in px; half of it is taken from each neighbor. The
+ *  hairline sits in its middle, as the code playground's resizer does. */
+export const GUTTER = 8;
 
 interface Props {
   node: Node;
@@ -72,6 +73,7 @@ function gutterStyle({ rect: r, ratio, dir }: Gutter): CSSProperties {
 export function SplitView({ node, renderLeaf, onResize }: Props) {
   const stage = useRef<HTMLDivElement>(null);
   const drag = useRef<{ gutter: Gutter; start: number; length: number; pointer: number } | null>(null);
+  const [held, setHeld] = useState<string | null>(null);
   const { panes, gutters } = useMemo(() => layout(node), [node]);
   const order = useMemo(() => leaves(node), [node]);
 
@@ -87,6 +89,7 @@ export function SplitView({ node, renderLeaf, onResize }: Props) {
       length: row ? g.rect.width * s.width : g.rect.height * s.height,
       pointer: e.pointerId,
     };
+    setHeld(g.id);
   };
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     const d = drag.current;
@@ -101,6 +104,7 @@ export function SplitView({ node, renderLeaf, onResize }: Props) {
   };
   const onPointerUp = () => {
     drag.current = null;
+    setHeld(null);
   };
 
   return (
@@ -113,7 +117,7 @@ export function SplitView({ node, renderLeaf, onResize }: Props) {
       {gutters.map((g) => (
         <div
           key={g.id}
-          className={`bpg-gutter ${g.dir === "row" ? "dir-row" : "dir-col"}`}
+          className={`bpg-gutter ${g.dir === "row" ? "dir-row" : "dir-col"}${held === g.id ? " dragging" : ""}`}
           style={gutterStyle(g)}
           role="separator"
           aria-orientation={g.dir === "row" ? "vertical" : "horizontal"}

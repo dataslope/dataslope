@@ -79,7 +79,7 @@ const MAIN_SHELL = "main";
 function shellFor(s: Session, id = MAIN_SHELL, cwd?: string): ShellSession {
   let shell = s.shells.get(id);
   if (!shell) {
-    shell = new ShellSession(cwd ?? s.root);
+    shell = new ShellSession(cwd ?? s.root, s.root);
     s.shells.set(id, shell);
   }
   return shell;
