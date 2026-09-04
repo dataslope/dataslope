@@ -21,7 +21,13 @@
  * throws away, after asking. The layout is a binary split tree
  * (`splitTree.ts`). The same terminals can also be a tab strip, one showing
  * at a time: a phone always gets that, a desktop can choose it, and the tree
- * is kept underneath so switching back shows everything where it was.
+ * is kept underneath so switching back shows everything where it was. The
+ * strip is the same `TabBar` the editor playgrounds use for their files, so
+ * a terminal tab looks and behaves like a file tab: close, rename, drag to
+ * reorder, `+` to add.
+ *
+ * Light and dark follow the site-wide choice, with the same pill toggle the
+ * home page and the editor playgrounds' settings carry.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -39,15 +45,19 @@ import {
   RotateCcw,
   SplitSquareHorizontal,
   SplitSquareVertical,
+  Terminal,
   TerminalSquare,
-  X,
 } from "lucide-react";
 import Link from "../Link";
 import { PLAYGROUNDS } from "../playgrounds";
 import { useIsFramed } from "../useIsFramed";
 import { LANGUAGE_ICONS, LANGUAGE_ICON_SIZE_FACTOR } from "../languageIcons";
 import { PlaygroundBootOverlay, useBootOverlayVisibility } from "../PlaygroundBootOverlay";
-import { applyThemePalette, getStoredEditorTheme, applyMode } from "../playgroundTheme";
+import { applyThemePalette, applyMode, setStoredEditorTheme } from "../playgroundTheme";
+import { usePlaygroundThemeSync } from "../playgroundThemeSync";
+import { ThemePillToggle } from "../ThemePillToggle";
+import { TabBar } from "../tabs/TabBar";
+import type { TabDescriptor } from "../tabs/tabTypes";
 import { useGitSession } from "../git/gitRuntime";
 import menuStyles from "../sqlCardTools/SqlCardToolsMenu.module.css";
 import { BASH_ABOUT } from "./bashAbout";
@@ -199,13 +209,18 @@ export default function BashPlayground() {
   const everything = useMemo(() => Object.values(ran).flat(), [ran]);
   const anyRan = everything.length > 0;
 
-  // The shared editor theme, and the same default as every other playground.
+  // The colour scheme follows the site-wide light/dark choice, as every
+  // other playground's does; the header pill flips it for every surface.
+  const setEditorTheme = useCallback((theme: string) => {
+    applyThemePalette(theme);
+    applyMode(theme);
+    setStoredEditorTheme(theme);
+  }, []);
+  usePlaygroundThemeSync(setEditorTheme);
+
   // Stored preferences are read after hydration so the server and the first
   // client render agree.
   useEffect(() => {
-    const theme = getStoredEditorTheme() ?? "github-light";
-    applyThemePalette(theme);
-    applyMode(theme);
     /* eslint-disable react-hooks/set-state-in-effect -- one-time read of stored preferences after hydration */
     setLayoutState(storedLayout());
     const saved = readSession();
@@ -400,6 +415,30 @@ export default function BashPlayground() {
     setRan((r) => ({ ...r, [id]: [...(r[id] ?? []), command].slice(-400) }));
   }, []);
 
+  const renamePane = useCallback((id: string, title: string) => {
+    const next = title.trim();
+    if (next) setPanes((p) => p.map((x) => (x.id === id ? { ...x, title: next } : x)));
+  }, []);
+
+  /** A drag in the tab strip reorders the terminals. The split tree keeps
+   *  its shape: the leaves are swapped into the new order, so switching back
+   *  to Panes shows the same layout with the terminals rearranged. */
+  const reorderTabs = useCallback(
+    (next: TabDescriptor[]) => {
+      setTree((t) => {
+        let tree = t;
+        const target = next.map((d) => d.id);
+        for (let i = 0; i < target.length; i += 1) {
+          const current = leaves(tree);
+          if (current[i] === target[i] || !current.includes(target[i])) continue;
+          tree = swap(tree, current[i], target[i]);
+        }
+        return tree;
+      });
+    },
+    [setTree],
+  );
+
   // ── Drag to rearrange ────────────────────────────────────────────────
   const dragHandlers = useCallback(
     (id: string): PaneDragHandlers => ({
@@ -465,6 +504,18 @@ export default function BashPlayground() {
 
   const titleOf = (id: string) => panes.find((p) => p.id === id)?.title ?? id;
   const focusedTitle = titleOf(focusId);
+
+  /** The terminals as tabs, for the strip the editor playgrounds use. */
+  const tabDescriptors: TabDescriptor[] = order.map((id) => ({
+    id,
+    kind: "terminal",
+    label: titleOf(id),
+    icon: <Terminal size={12} aria-hidden="true" />,
+    closeable: count > 1,
+    renameable: true,
+    renameDialogTitle: "Rename terminal",
+    renameDialogDescription: "The name shown on the tab and in the terminal's title bar.",
+  }));
 
   const renderLeaf = (id: string) => {
     const rec = panes.find((p) => p.id === id);
@@ -660,6 +711,8 @@ export default function BashPlayground() {
             <span className="bpg-btn-label">Reset</span>
           </button>
 
+          <ThemePillToggle className="bpg-theme" />
+
           <Menu.Root>
             <Menu.Trigger className="bpg-btn bpg-more" aria-label="More" title="More">
               <MoreHorizontal size={16} aria-hidden="true" />
@@ -751,23 +804,16 @@ export default function BashPlayground() {
           )}
 
           {tabbed && (
-            <nav className="bpg-tabs" aria-label="Terminals">
-              {order.map((id) => (
-                <span key={id} className={`bpg-tab${focusId === id ? " active" : ""}`}>
-                  <button type="button" className="bpg-tab-btn" onClick={() => setFocusId(id)} aria-current={focusId === id}>
-                    {titleOf(id)}
-                  </button>
-                  {focusId === id && count > 1 && (
-                    <button type="button" className="bpg-tab-close" onClick={() => closePane(id)} aria-label={`Close ${titleOf(id)}`}>
-                      <X size={12} aria-hidden="true" />
-                    </button>
-                  )}
-                </span>
-              ))}
-              <button type="button" className="bpg-tab add" onClick={() => addPane(focusId, "row")} disabled={!ready || !canSplit} aria-label="New terminal">
-                <Plus size={14} aria-hidden="true" />
-              </button>
-            </nav>
+            <TabBar
+              tabs={tabDescriptors}
+              activeTabId={focusId}
+              onSelectTab={setFocusId}
+              onCloseTab={count > 1 ? closePane : undefined}
+              onAddTab={ready && canSplit ? () => addPane(focusId, "row") : undefined}
+              onRenameTab={renamePane}
+              onReorderTabs={count > 1 ? reorderTabs : undefined}
+              className="bpg-tabbar"
+            />
           )}
 
           <div className="bpg-stage" data-focus={focusId}>

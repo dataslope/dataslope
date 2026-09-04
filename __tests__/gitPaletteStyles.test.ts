@@ -69,7 +69,7 @@ describe("BG-23 · terminal error colours clear AA on the page", () => {
   };
   const panels = read("app/_components/git/gitPanels.css");
   const light = /\.git-terminal \{[^}]*\}/.exec(panels)![0];
-  const dark = /html:is\(\.dark, \[data-theme="dark"\]\) \.git-terminal \{[^}]*\}/.exec(panels)![0];
+  const dark = /html:is\([^)]*\) \.git-terminal \{[^}]*\}/.exec(panels)![0];
   const pick = (block: string, role: string) => {
     const m = new RegExp(`--git-terminal-${role}:\\s*var\\((--ds-[a-z]+-\\d+)\\)`).exec(block);
     if (!m) throw new Error(`no ${role} in ${block}`);

@@ -92,12 +92,39 @@ test("Bash: choosing Panes or Tabs does not move the layout buttons", async ({ p
   const panes = page.getByRole("button", { name: "Panes" });
   const before = (await panes.boundingBox())!;
   await page.getByRole("button", { name: "Tabs" }).click();
-  await expect(page.locator(".bpg-tabs")).toBeVisible();
+  await expect(page.locator(".bpg-tabbar")).toBeVisible();
   const after = (await panes.boundingBox())!;
   expect(Math.abs(after.x - before.x)).toBeLessThan(1);
   await panes.click();
-  await expect(page.locator(".bpg-tabs")).toHaveCount(0);
+  await expect(page.locator(".bpg-tabbar")).toHaveCount(0);
   expect(Math.abs((await panes.boundingBox())!.x - before.x)).toBeLessThan(1);
+});
+
+test("Bash: the Tabs layout uses the editor playgrounds' tab bar", async ({ page }) => {
+  await open(page, "bash");
+  await page.getByRole("button", { name: "New terminal" }).click();
+  await page.getByRole("button", { name: "Tabs" }).click();
+  const strip = page.locator(".bpg-tabbar");
+  await expect(strip).toHaveClass(/playground-tabbar/);
+  await expect(strip.locator(".playground-tab")).toHaveCount(2);
+  await expect(strip.locator(".playground-tab.active")).toContainText("bash 2");
+  await strip.locator(".playground-tab", { hasText: "bash 1" }).click();
+  await expect(strip.locator(".playground-tab.active")).toContainText("bash 1");
+  await strip.locator(".playground-tab-add").click();
+  await expect(strip.locator(".playground-tab")).toHaveCount(3);
+});
+
+test("both playgrounds carry the site's light/dark toggle", async ({ page }) => {
+  for (const which of ["bash", "git"] as const) {
+    await open(page, which);
+    const pill = page.getByRole("switch", { name: "Toggle color theme" });
+    await expect(pill).toBeVisible();
+    const wasDark = await page.evaluate(() => document.documentElement.classList.contains("dark"));
+    await pill.click();
+    await expect.poll(() => page.evaluate(() => document.documentElement.classList.contains("dark"))).toBe(!wasDark);
+    await expect.poll(() => page.evaluate(() => document.documentElement.getAttribute("data-playground-theme"))).toBe(wasDark ? "light" : "dark");
+    await pill.click();
+  }
 });
 
 test("Bash: the session survives a reload", async ({ page }) => {

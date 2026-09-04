@@ -48,7 +48,9 @@ import { PLAYGROUNDS } from "../playgrounds";
 import { useIsFramed } from "../useIsFramed";
 import { LANGUAGE_ICONS, LANGUAGE_ICON_SIZE_FACTOR } from "../languageIcons";
 import { PlaygroundBootOverlay, useBootOverlayVisibility } from "../PlaygroundBootOverlay";
-import { applyThemePalette, getStoredEditorTheme, applyMode } from "../playgroundTheme";
+import { applyThemePalette, applyMode, setStoredEditorTheme } from "../playgroundTheme";
+import { usePlaygroundThemeSync } from "../playgroundThemeSync";
+import { ThemePillToggle } from "../ThemePillToggle";
 import { useGitSession } from "./gitRuntime";
 import { GitTerminal, type GitTerminalHandle, type TranscriptEntry } from "./GitTerminal";
 import { CommitGraph } from "./CommitGraph";
@@ -215,14 +217,19 @@ export default function GitPlayground() {
   const overlay = useBootOverlayVisibility(ready || Boolean(error));
   const scenarioDef = scenarioById(scenario);
 
-  // The shared editor theme, and the same default as every other playground.
+  // The colour scheme follows the site-wide light/dark choice, as every
+  // other playground's does; the header pill flips it for every surface.
+  const setEditorTheme = useCallback((theme: string) => {
+    applyThemePalette(theme);
+    applyMode(theme);
+    setStoredEditorTheme(theme);
+  }, []);
+  usePlaygroundThemeSync(setEditorTheme);
+
   // Preferences are read here rather than in a lazy initializer so the server
   // and the first client render agree; the same arrangement Playground.tsx
   // uses for its own stored settings.
   useEffect(() => {
-    const theme = getStoredEditorTheme() ?? "github-light";
-    applyThemePalette(theme);
-    applyMode(theme);
     /* eslint-disable react-hooks/set-state-in-effect -- one-time read of stored preferences after hydration */
     setInternals(readPref(PREFS.internals, false, (r) => r === "1"));
     setConsoleH(readPref(PREFS.consoleH, 300, (r) => Math.max(160, Number(r) || 300)));
@@ -778,6 +785,8 @@ export default function GitPlayground() {
             <RotateCcw size={14} aria-hidden="true" />
             <span className="gitx-btn-label">Reset</span>
           </button>
+
+          <ThemePillToggle className="gitx-theme" />
         </header>
 
         <h1 className="playground-sr-title">Git Playground</h1>

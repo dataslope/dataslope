@@ -101,6 +101,11 @@
   color: var(--text-dim);
 }
 
+/* The header's theme pill sits with the buttons, a touch of air before it. */
+.gitx-theme {
+  margin-left: 4px;
+}
+
 .gitx-branch {
   display: inline-flex;
   align-items: center;

@@ -430,79 +430,17 @@
 
 /* ─── Tabs: one terminal at a time, a strip to switch ─── */
 /* A phone always gets this; a desktop can choose it from the header. The
-   split tree is kept underneath, so switching back shows the same terminals
-   where they were. */
-.bpg-tabs {
-  display: none;
-}
-
-.bpg-body[data-layout="tabs"] .bpg-tabs {
-  display: flex;
-  align-items: stretch;
-  padding: 0 8px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg);
-  overflow-x: auto;
-  flex: none;
-  scrollbar-width: none;
-}
-
-.bpg-tabs::-webkit-scrollbar {
-  display: none;
-}
-
-/* Underline tabs, the same shape as the Git playground's pane switch. */
-.bpg-tab {
-  display: inline-flex;
-  align-items: center;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  color: var(--text-dim);
+   strip is the editor playgrounds' `TabBar` (`.playground-tabbar` in
+   playground.css), so a terminal tab is a file tab: close, rename, drag to
+   reorder, `+` to add. The split tree is kept underneath, so switching back
+   shows the same terminals where they were. */
+.bpg-tabbar {
   flex: none;
 }
 
-.bpg-tab.active {
-  border-bottom-color: var(--primary);
-  color: var(--primary);
-}
-
-.bpg-tab-btn,
-.bpg-tab.add {
-  min-height: 40px;
-  padding: 4px 12px;
-  border: none;
-  background: transparent;
-  color: inherit;
-  font-family: var(--font-ui);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.bpg-tab.add {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 40px;
-  padding: 0;
-  cursor: pointer;
-}
-
-.bpg-tab.add:disabled {
-  opacity: 0.4;
-}
-
-.bpg-tab-close {
-  min-height: 40px;
-  width: 28px;
-  margin-left: -6px;
-  border: none;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+/* The header's theme pill sits with the buttons, a touch of air before it. */
+.bpg-theme {
+  margin-left: 4px;
 }
 
 /* Every slot stacks in the one cell, sized by it rather than by the split
@@ -626,8 +564,7 @@
   /* Every control clears 40px for a thumb. */
   .bpg-pane-menu,
   .bpg-pane-close,
-  .bpg-grip,
-  .bpg-tab-close {
+  .bpg-grip {
     min-height: 40px;
   }
 

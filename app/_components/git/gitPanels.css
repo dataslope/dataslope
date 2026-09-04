@@ -19,7 +19,7 @@
   --git-terminal-warn: var(--ds-yellow-800);
 }
 
-html:is(.dark, [data-theme="dark"]) .git-terminal {
+html:is(.dark, [data-theme="dark"], [data-playground-theme="dark"]) .git-terminal {
   --git-terminal-error: var(--ds-red-400);
   --git-terminal-warn: var(--ds-yellow-400);
 }

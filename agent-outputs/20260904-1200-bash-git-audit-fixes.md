@@ -32,6 +32,10 @@
 
 **BG-19.** Both playgrounds keep the session in `sessionStorage` (this tab only) and replay it on reload: Git replays its steps on the saved scenario; Bash restores the layout, the panes, and each pane's command history.
 
+**Panes / Tabs.** Choosing Tabs used to remove the Split button from the header, and with the header's spacer on the left everything after it slid right. Split now stays put in both layouts and is disabled under Tabs. The Tabs strip itself is the editor playgrounds' `TabBar` (close, rename, drag to reorder, `+`), with a reorder swapping leaves in the split tree so the Panes layout keeps its shape.
+
+**Appearance.** Both playgrounds carry the site's light/dark pill in the header and follow the site-wide choice through `usePlaygroundThemeSync`, as the editor playgrounds do.
+
 **BG-20, BG-22, BG-23, BG-24, BG-25, BG-26.** Enter creates the new file; the commit card clears when its commit is gone and shows git's date format; the prompt and command line keep the brand green by choice, while error and stderr text moved to the brand ramp's ink steps (red 700, amber 800; the 400s in dark mode) and a test pins those at 4.5:1; the graph rows have accessible names and the Changes/History strip is a tablist; phone targets are 40px, chips scroll in one row, the input carries `enterkeyhint="go"`; a line typed while a command runs is queued and runs next; the layout preference is read after hydration.
 
 ## Tests
