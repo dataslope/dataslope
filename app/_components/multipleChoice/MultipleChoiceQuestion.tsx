@@ -132,7 +132,7 @@ export default function MultipleChoiceQuestion({
     >
       <header className={styles.header}>
         <span className={styles.badge}>
-          <ScrollText size={10} aria-hidden />
+          <ScrollText size={13} aria-hidden />
           {badge}
         </span>
         <span className={styles.modeLabel}>

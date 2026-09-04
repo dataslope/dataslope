@@ -1,0 +1,472 @@
+"use client";
+
+/**
+ * The console. A scrollback of `{command, output}` blocks plus a prompt — no
+ * xterm.js, because there is no TTY to emulate and rich blocks inside the
+ * transcript are worth more than ANSI cursor fidelity.
+ *
+ * Three things make it read as a terminal rather than a form:
+ *
+ * - **A block cursor.** The real `<input>` is visually hidden and only holds
+ *   the value and the caret; the line you see is rendered text with a blinking
+ *   block over the character under the caret. Same approach justbash.dev uses.
+ * - **ANSI output.** just-bash passes escape sequences straight through, so
+ *   anything a learner writes with `printf` or `echo -e` has to render as
+ *   color rather than as escape-code text.
+ * - **Tab completion that behaves.** Longest common prefix first, then a
+ *   listing when the choice is genuinely ambiguous, as bash does.
+ *
+ * The input is controlled from above so a command palette can compose into it
+ * without executing.
+ */
+
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
+import { hasAnsi, parseAnsi } from "./ansi";
+
+export interface TranscriptEntry {
+  id: number;
+  command: string;
+  stdout: string;
+  stderr: string;
+  exitCode: number;
+  /** Rendered as bare output with no prompt line: the answer to a
+   *  "Display all N possibilities?" question, which bash prints on its own. */
+  note?: boolean;
+}
+
+/** What a host can ask the terminal to do from outside: put focus back on
+ *  the prompt after composing a command, or press Tab for a keyboard that
+ *  has no Tab key. */
+export interface GitTerminalHandle {
+  focus: () => void;
+  complete: () => void;
+}
+
+interface Props {
+  transcript: TranscriptEntry[];
+  value: string;
+  onValueChange: (next: string) => void;
+  /** The line the reader pressed Enter on, trimmed. `""` for a blank line,
+   *  which a shell answers with a fresh prompt rather than by ignoring it. */
+  onSubmit: (command: string) => void;
+  history: string[];
+  busy: boolean;
+  /** Command names, offered for the first word of a line. */
+  completions: string[];
+  /** Second words for commands that take one, so `git a<Tab>` offers `add`
+   *  rather than the files in the directory. */
+  subcommands?: Record<string, string[]>;
+  /**
+   * Candidates for a partly typed path, resolved by the host because only it
+   * knows the filesystem. Called with the word under the caret exactly as
+   * typed (`src/ut`) and expected to answer in the same form
+   * (`["src/util.txt"]`), so completion can walk into a directory the way
+   * bash does rather than stopping at the current one.
+   */
+  pathCompletions?: (word: string) => string[];
+  /** Transcript only, no prompt: a block that runs a fixed script. */
+  readOnly?: boolean;
+  /** Replaces the default empty-state copy. `null` suppresses it entirely,
+   *  for a terminal that should open as a bare prompt and nothing else. */
+  placeholderHint?: ReactNode;
+  /** Directory shown before the `$`, the way a real prompt does. */
+  prompt?: string;
+  /** Per-entry prompt, so a `cd` mid-session is visible in the scrollback. */
+  promptFor?: (entry: TranscriptEntry) => string | undefined;
+  /** Ghost text in the empty prompt. */
+  placeholder?: string;
+  /**
+   * Render the prompt as the last line of the scrollback rather than as a
+   * separate footer, so the cursor sits where the next output will appear and
+   * clicking anywhere in the terminal focuses it.
+   */
+  inlineInput?: boolean;
+  /**
+   * Bash writes into the scrollback while you are still editing a line: the
+   * candidates when Tab cannot narrow further, and the question it asks
+   * before printing a very long list. The host owns the transcript, so it
+   * appends what it is handed.
+   *
+   * `echo` is the line to reprint above the text, the way bash reprints what
+   * you had typed before answering you, or `null` for bare output.
+   */
+  onWrite?: (out: { echo: string | null; text: string }) => void;
+  /** True once the scrollback is scrolled off its top, so a host can shade
+   *  the header it sits under. */
+  onScrolledChange?: (scrolled: boolean) => void;
+}
+
+/** How many candidates bash will print without asking first. Readline calls
+ *  it `completion-query-items`; 100 is its default. */
+const QUERY_ITEMS = 100;
+
+/** Longest string every candidate starts with. */
+function commonPrefix(items: string[]): string {
+  if (!items.length) return "";
+  let prefix = items[0];
+  for (const item of items.slice(1)) {
+    while (prefix && !item.startsWith(prefix)) prefix = prefix.slice(0, -1);
+  }
+  return prefix;
+}
+
+function Output({ text, className }: { text: string; className: string }) {
+  const body = text.replace(/\n$/, "");
+  if (!hasAnsi(body)) return <pre className={className}>{body}</pre>;
+  return (
+    <pre className={className}>
+      {parseAnsi(body).map((span, i) => (
+        <span key={i} className={span.classes.map((c) => `ansi-${c}`).join(" ")}>
+          {span.text}
+        </span>
+      ))}
+    </pre>
+  );
+}
+
+export const GitTerminal = forwardRef<GitTerminalHandle, Props>(function GitTerminal({
+  transcript,
+  value,
+  onValueChange,
+  onSubmit,
+  history,
+  busy,
+  completions,
+  subcommands,
+  pathCompletions,
+  readOnly = false,
+  placeholderHint,
+  prompt,
+  promptFor,
+  placeholder = "git status",
+  inlineInput = false,
+  onWrite,
+  onScrolledChange,
+}: Props, ref) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const historyIndex = useRef<number | null>(null);
+  /** Consecutive Tab presses, so the second one can list what the first
+   *  could not narrow. */
+  const tabRun = useRef(0);
+  /** Candidates held back behind "Display all N possibilities?", waiting on a
+   *  y or an n. Non-null means the next keystroke is that answer. */
+  const [pendingList, setPendingList] = useState<string[] | null>(null);
+  const [caret, setCaret] = useState(0);
+  const [focused, setFocused] = useState(false);
+
+  const scrolled = useRef(false);
+  const reportScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const next = el.scrollTop > 0;
+    if (next === scrolled.current) return;
+    scrolled.current = next;
+    onScrolledChange?.(next);
+  }, [onScrolledChange]);
+
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+    reportScroll();
+  }, [transcript, busy, value, reportScroll]);
+
+  useEffect(() => {
+    if (busy || readOnly) return;
+    // Several terminals can share a page. One finishing a command takes the
+    // keyboard back unless someone is typing somewhere else: another
+    // terminal's prompt, an editor, a search box.
+    const active = document.activeElement;
+    if (
+      active instanceof HTMLElement &&
+      !rootRef.current?.contains(active) &&
+      active.matches("input, textarea, select, [contenteditable]")
+    )
+      return;
+    // `preventScroll` matters: the real input is visually hidden, and without
+    // it the browser scrolls the page to wherever that hidden element sits
+    // every time a command finishes and focus comes back.
+    inputRef.current?.focus({ preventScroll: true });
+  }, [busy, readOnly]);
+
+  const syncCaret = useCallback(() => {
+    setCaret(inputRef.current?.selectionStart ?? 0);
+  }, []);
+
+  const moveCaret = useCallback((to: number) => {
+    requestAnimationFrame(() => {
+      inputRef.current?.setSelectionRange(to, to);
+      setCaret(to);
+    });
+  }, []);
+
+  /**
+   * One press of Tab.
+   *
+   * `run` is how many Tabs came immediately before this one, because bash
+   * splits the work across two: the first completes as far as the candidates
+   * agree, and the second prints them. There is no terminal bell here, so
+   * that listing is the only signal a reader gets that the choice was
+   * ambiguous.
+   */
+  function complete(run: number) {
+    const upto = value.slice(0, caret);
+    // A pipe or a `;` starts a new command, so the word after one completes
+    // against commands again rather than against the filesystem.
+    const segment = upto.split(/[|;&]+/).pop() ?? "";
+    const parts = segment.trimStart().split(/\s+/);
+    const word = parts[parts.length - 1] ?? "";
+
+    // The first word of a command is a command; everything after it is a
+    // path, unless the command has subcommands and this is its second word.
+    // Without this, `cat <Tab>` would offer every command in the shell.
+    const subs = parts.length === 2 ? subcommands?.[parts[0]] : undefined;
+    const pool =
+      parts.length <= 1
+        ? completions.filter((c) => c.startsWith(word))
+        : subs
+          ? subs.filter((c) => c.startsWith(word))
+          : (pathCompletions?.(word) ?? []);
+    const matches = [...new Set(pool)].sort();
+    if (!matches.length) return;
+
+    // A lone match is finished, so bash appends a space and moves you on. A
+    // directory is not finished: the caret stays after the slash so the next
+    // Tab can walk into it.
+    const shared = commonPrefix(matches);
+    const insert =
+      matches.length === 1 && !shared.endsWith("/") ? `${shared} ` : shared;
+
+    if (insert.length > word.length) {
+      onValueChange(value.slice(0, caret - word.length) + insert + value.slice(caret));
+      moveCaret(caret - word.length + insert.length);
+      return;
+    }
+
+    // Nothing left to add. Print the candidates by their last segment, which
+    // is the column of names bash shows rather than a column of full paths.
+    if (matches.length <= 1 || run < 1) return;
+    const names = matches.map((m) => m.slice(m.lastIndexOf("/", m.length - 2) + 1));
+
+    // A list long enough to bury the session gets a question first, which is
+    // bash's `completion-query-items` and its default of 100.
+    if (names.length > QUERY_ITEMS) {
+      setPendingList(names);
+      onWrite?.({
+        echo: value,
+        text: `Display all ${names.length} possibilities? (y or n)`,
+      });
+      return;
+    }
+    onWrite?.({ echo: value, text: names.join("   ") });
+  }
+
+  useImperativeHandle(ref, () => ({
+    focus: () => inputRef.current?.focus({ preventScroll: true }),
+    complete: () => {
+      complete(tabRun.current);
+      tabRun.current += 1;
+    },
+  }));
+
+  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    // Waiting on an answer to "Display all N possibilities?". Bash takes one
+    // key here and echoes neither it nor a fresh prompt, so every key is
+    // swallowed and only `y` prints the list.
+    if (pendingList) {
+      event.preventDefault();
+      if (event.key === "y" || event.key === "Y") {
+        onWrite?.({ echo: null, text: pendingList.join("   ") });
+      }
+      setPendingList(null);
+      tabRun.current = 0;
+      return;
+    }
+
+    // Only a run of Tabs with nothing between them earns the listing.
+    if (event.key !== "Tab") tabRun.current = 0;
+
+    if (event.key === "Enter") {
+      event.preventDefault();
+      if (busy) return;
+      historyIndex.current = null;
+      // An empty line is something a shell runs: it echoes the prompt and
+      // gives you a fresh one. Hosts get "" and append the bare line.
+      onSubmit(value.trim());
+      setCaret(0);
+      return;
+    }
+
+    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+      if (!history.length) return;
+      event.preventDefault();
+      const current = historyIndex.current;
+      let next: number | null;
+      if (event.key === "ArrowUp") {
+        next = current === null ? history.length - 1 : Math.max(0, current - 1);
+      } else {
+        next = current === null ? null : current + 1;
+        if (next !== null && next >= history.length) next = null;
+      }
+      historyIndex.current = next;
+      const line = next === null ? "" : history[next];
+      onValueChange(line);
+      moveCaret(line.length);
+      return;
+    }
+
+    if (event.key === "Tab") {
+      event.preventDefault();
+      complete(tabRun.current);
+      tabRun.current += 1;
+      return;
+    }
+
+    if (event.key === "l" && event.ctrlKey) {
+      event.preventDefault();
+      onSubmit("clear");
+      return;
+    }
+
+    // Ctrl-C abandons the line rather than running it, as in a real shell.
+    if (event.key === "c" && event.ctrlKey && value) {
+      event.preventDefault();
+      historyIndex.current = null;
+      onValueChange("");
+      setCaret(0);
+      return;
+    }
+
+    // Let the browser move the caret first, then mirror where it landed.
+    requestAnimationFrame(syncCaret);
+  }
+
+  const promptSpan = useMemo(
+    () => (
+      <span className="git-terminal-prompt" aria-hidden="true">
+        {prompt ? <span className="git-terminal-cwd">{prompt}</span> : null}$
+      </span>
+    ),
+    [prompt],
+  );
+
+  const atEnd = caret >= value.length;
+  const under = atEnd ? " " : value[caret];
+  const cursorClass =
+    !busy && focused ? "git-terminal-cursor blink" : "git-terminal-cursor idle";
+
+  const inputRow = readOnly ? null : (
+    <form
+      className={inlineInput ? "git-terminal-inputrow inline" : "git-terminal-inputrow"}
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (!busy) onSubmit(value.trim());
+      }}
+    >
+      {promptSpan}
+
+      {/* The visible line. The real input sits off to the side holding the
+          value and the caret; this is what the reader sees, so the cursor can
+          be a block that blinks the way a terminal's does. */}
+      <span className="git-terminal-line" aria-hidden="true">
+        <span>{value.slice(0, caret)}</span>
+        <span className={cursorClass}>{under}</span>
+        <span>{atEnd ? "" : value.slice(caret + 1)}</span>
+        {value === "" && !busy && <span className="git-terminal-ghost">{placeholder}</span>}
+      </span>
+
+      <input
+        ref={inputRef}
+        className="git-terminal-input"
+        value={value}
+        onChange={(e) => {
+          onValueChange(e.target.value);
+          requestAnimationFrame(syncCaret);
+        }}
+        onKeyDown={handleKeyDown}
+        onKeyUp={syncCaret}
+        onClick={syncCaret}
+        onSelect={syncCaret}
+        onFocus={() => {
+          setFocused(true);
+          syncCaret();
+        }}
+        onBlur={() => setFocused(false)}
+        disabled={busy}
+        spellCheck={false}
+        autoCapitalize="off"
+        autoCorrect="off"
+        autoComplete="off"
+        aria-label={placeholder === "git status" ? "Git command" : "Shell command"}
+      />
+    </form>
+  );
+
+  return (
+    <div className="git-terminal" ref={rootRef}>
+      <div
+        className="git-terminal-scroll"
+        ref={scrollRef}
+        onScroll={reportScroll}
+        // Clicking dead space in a terminal puts the cursor back on the
+        // prompt; without this the inline prompt is easy to lose.
+        onMouseUp={() => {
+          if (inlineInput && !window.getSelection()?.toString())
+            inputRef.current?.focus({ preventScroll: true });
+        }}
+      >
+        {transcript.length === 0 &&
+          (placeholderHint === undefined ? (
+            <p className="git-terminal-hint">
+              Type a Git command, or pick one from the panel on the right: it fills the prompt and
+              you press Enter. <code>ls</code>, <code>cat</code> and friends work too, so{" "}
+              <code>cat .git/HEAD</code> shows you what a branch really is.
+            </p>
+          ) : (
+            placeholderHint
+          ))}
+        {transcript.map((entry) => (
+          <div key={entry.id} className="git-terminal-block">
+            {/* A script entry carries several lines; each gets its own prompt
+                so the transcript still reads like a terminal. */}
+            {!entry.note &&
+              entry.command.split("\n").map((line, i) => (
+                <div className="git-terminal-command" key={i}>
+                  <span className="git-terminal-prompt" aria-hidden="true">
+                    {i === 0 && promptFor?.(entry) ? (
+                      <span className="git-terminal-cwd">{promptFor(entry)}</span>
+                    ) : null}
+                    $
+                  </span>
+                  <span>{line}</span>
+                </div>
+              ))}
+            {entry.stdout && <Output text={entry.stdout} className="git-terminal-out" />}
+            {entry.stderr && (
+              <Output
+                text={entry.stderr}
+                className={entry.exitCode === 0 ? "git-terminal-out" : "git-terminal-err"}
+              />
+            )}
+          </div>
+        ))}
+        {busy && <div className="git-terminal-busy">working…</div>}
+        {inlineInput && inputRow}
+      </div>
+
+      {!inlineInput && inputRow}
+    </div>
+  );
+});

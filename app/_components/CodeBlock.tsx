@@ -1475,7 +1475,7 @@ function CodeBlockInner({
       <div className={`${challengeStyles.header} ${challengeStyles.headerCompact}`}>
         <div className={challengeStyles.headerRow}>
           <div className={challengeStyles.badge}>
-            <Play size={9} aria-hidden /> Code Block
+            <Play size={13} aria-hidden /> Code Block
           </div>
           <div className={challengeStyles.headerMeta}>
             <span className={challengeStyles.headerRuntimeLabel}>

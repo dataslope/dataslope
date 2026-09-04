@@ -1,0 +1,557 @@
+/* ─── Bash playground ───────────────────────────────────────────────────── */
+@import "../git/gitPanels.css";
+
+/* Layers on playground.css: the chrome is shared, this file adds the split
+   tree, the pane title bars, the gutters, the drop zones and the phone's tab
+   strip. Colors are the playground role tokens; the type floor is 12px and
+   the touch floor 32px. */
+
+/* ─── Header buttons ─── */
+/* Ghosts, as in the SQL playground's header: text on the page, a tint on
+   hover, no box. */
+.bpg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 4px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    color 0.12s,
+    background-color 0.12s;
+}
+
+.bpg-btn:hover:not(:disabled),
+.bpg-btn[data-popup-open] {
+  background: var(--menu-item-hover);
+}
+
+.bpg-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.bpg-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.bpg-btn.on {
+  color: var(--primary);
+  background: var(--primary-glow);
+}
+
+/* Panes or tabs: two ghosts, the chosen one lit. */
+.bpg-layout {
+  display: inline-flex;
+  gap: 2px;
+}
+
+/* ─── The stage ─── */
+.bpg-body {
+  flex-direction: column;
+  position: relative;
+}
+
+.bpg-body.dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.bpg-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  background: var(--bg);
+}
+
+/* The tree fills the stage; its panes are placed inside it from the
+   positions SplitView hands each slot as custom properties. */
+.bpg-tree {
+  flex: 1 1 0%;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+}
+
+.bpg-slot {
+  position: absolute;
+  left: var(--l);
+  top: var(--t);
+  width: var(--w);
+  height: var(--h);
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+}
+
+.bpg-slot > * {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* The gutter, drawn as the code playground's resizer: a hairline on the
+   boundary, a short grip on it so the handle can be found without hovering,
+   and a tint with a longer grip while it is held. */
+.bpg-gutter {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  transition: background-color 0.15s;
+  touch-action: none;
+}
+
+.bpg-gutter::after {
+  content: "";
+  position: absolute;
+  background: var(--border);
+}
+
+.bpg-gutter.dir-row {
+  cursor: col-resize;
+}
+
+.bpg-gutter.dir-row::after {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+}
+
+.bpg-gutter.dir-col {
+  cursor: row-resize;
+}
+
+.bpg-gutter.dir-col::after {
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+.bpg-gutter::before {
+  content: "";
+  position: relative;
+  z-index: 1;
+  background: var(--text-dim);
+  opacity: 0.55;
+  border-radius: 1px;
+  transition: all 0.15s;
+}
+
+.bpg-gutter.dir-row::before {
+  width: 2px;
+  height: 36px;
+}
+
+.bpg-gutter.dir-col::before {
+  width: 36px;
+  height: 2px;
+}
+
+.bpg-gutter:hover,
+.bpg-gutter.dragging {
+  background: var(--primary-glow);
+}
+
+.bpg-gutter:hover::before,
+.bpg-gutter.dragging::before {
+  background: var(--primary);
+  opacity: 1;
+}
+
+.bpg-gutter.dir-row:hover::before,
+.bpg-gutter.dir-row.dragging::before {
+  width: 3px;
+  height: 64px;
+}
+
+.bpg-gutter.dir-col:hover::before,
+.bpg-gutter.dir-col.dragging::before {
+  height: 3px;
+  width: 64px;
+}
+
+/* ─── A pane ─── */
+.bpg-pane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--bg);
+  position: relative;
+}
+
+.bpg-pane-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 2px 6px 2px 4px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  flex: none;
+  /* The focused pane's bar carries a faint accent line. */
+  box-shadow: inset 0 1px 0 transparent;
+  transition: box-shadow 0.12s;
+}
+
+.bpg-pane.focused > .bpg-pane-head {
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--primary) 45%, transparent);
+}
+
+.bpg-grip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: grab;
+  touch-action: none;
+  flex: none;
+}
+
+.bpg-grip:hover {
+  background: var(--menu-item-hover);
+  color: var(--text);
+}
+
+.bpg-grip:active {
+  cursor: grabbing;
+}
+
+.bpg-pane-title {
+  border: none;
+  background: transparent;
+  padding: 2px 4px;
+  border-radius: 4px;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: text;
+  white-space: nowrap;
+}
+
+.bpg-pane-rename {
+  min-height: 26px;
+  width: 140px;
+  border: 1px solid var(--primary);
+  border-radius: 5px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 2px 6px;
+  outline: none;
+}
+
+.bpg-pane-cwd {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.bpg-pane-sep {
+  flex: 1;
+}
+
+.bpg-pane-menu {
+  flex: none;
+}
+
+.bpg-pane-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  flex: none;
+}
+
+.bpg-pane-close:hover:not(:disabled) {
+  background: var(--menu-item-hover);
+  color: var(--text);
+}
+
+.bpg-pane-close:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* The terminal fills the pane. Plain text on the page, the prompt line in
+   green, output in body ink, the same as the embedded blocks. */
+.bpg-term {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  background: var(--bg);
+}
+
+.bpg-term .git-terminal-scroll {
+  padding: 10px 14px;
+  font-size: 13px;
+  cursor: text;
+}
+
+.bpg-term .git-terminal-out {
+  color: var(--text);
+}
+
+.bpg-term .git-terminal-prompt {
+  font-weight: 400;
+}
+
+.bpg-term .git-terminal-out,
+.bpg-term .git-terminal-err,
+.bpg-term .git-terminal-busy {
+  padding-left: 0;
+}
+
+.bpg-term .git-terminal-block {
+  margin-bottom: 0;
+}
+
+.bpg-term .git-terminal-out,
+.bpg-term .git-terminal-err {
+  margin-top: 0;
+}
+
+.bpg-term .git-terminal-line {
+  color: var(--ds-green);
+}
+
+.bpg-term .git-terminal-hint {
+  margin: 0 0 6px;
+  font-size: 12.5px;
+}
+
+/* ─── Drag to rearrange ─── */
+.bpg-dropzone {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  z-index: 3;
+}
+
+.bpg-dropzone::before {
+  content: "";
+  position: absolute;
+  background: color-mix(in srgb, var(--primary) 18%, transparent);
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  inset: 4px;
+}
+
+.bpg-dropzone[data-zone="left"]::before { right: 50%; }
+.bpg-dropzone[data-zone="right"]::before { left: 50%; }
+.bpg-dropzone[data-zone="top"]::before { bottom: 50%; }
+.bpg-dropzone[data-zone="bottom"]::before { top: 50%; }
+.bpg-dropzone[data-zone="center"]::before { inset: 25%; border-style: dashed; }
+
+.bpg-dropzone span {
+  position: relative;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.bpg-drag-ghost {
+  position: fixed;
+  left: 50%;
+  top: 8px;
+  transform: translateX(-50%);
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--bg);
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 30;
+  opacity: 0.9;
+}
+
+.bpg-notice {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.35);
+  z-index: 20;
+}
+
+/* ─── Tabs: one terminal at a time, a strip to switch ─── */
+/* A phone always gets this; a desktop can choose it from the header. The
+   split tree is kept underneath, so switching back shows the same terminals
+   where they were. */
+.bpg-tabs {
+  display: none;
+}
+
+.bpg-body[data-layout="tabs"] .bpg-tabs {
+  display: flex;
+  align-items: stretch;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  overflow-x: auto;
+  flex: none;
+  scrollbar-width: none;
+}
+
+.bpg-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* Underline tabs, the same shape as the Git playground's pane switch. */
+.bpg-tab {
+  display: inline-flex;
+  align-items: center;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  color: var(--text-dim);
+  flex: none;
+}
+
+.bpg-tab.active {
+  border-bottom-color: var(--primary);
+  color: var(--primary);
+}
+
+.bpg-tab-btn,
+.bpg-tab.add {
+  min-height: 40px;
+  padding: 4px 12px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bpg-tab.add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  padding: 0;
+  cursor: pointer;
+}
+
+.bpg-tab.add:disabled {
+  opacity: 0.4;
+}
+
+.bpg-tab-close {
+  min-height: 40px;
+  width: 28px;
+  margin-left: -6px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Every slot stacks in the one cell, sized by it rather than by the split
+   it came from; the ones holding a hidden pane let pointer events through
+   to the one that is showing. */
+.bpg-body[data-layout="tabs"] .bpg-gutter {
+  display: none;
+}
+
+.bpg-body[data-layout="tabs"] .bpg-tree {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.bpg-body[data-layout="tabs"] .bpg-slot {
+  position: static;
+  width: auto;
+  height: auto;
+  grid-area: 1 / 1;
+  pointer-events: none;
+}
+
+.bpg-body[data-layout="tabs"] .bpg-pane {
+  display: none;
+  pointer-events: auto;
+}
+
+.bpg-body[data-layout="tabs"] .bpg-stage[data-focus] .bpg-pane.focused {
+  display: flex;
+}
+
+/* The head stays for its directory and its menu, which is where a tab
+   renames, moves, and clears. The grip and the close go: the strip is where
+   tabs switch and close, and there is nothing to drag. */
+.bpg-body[data-layout="tabs"] .bpg-grip,
+.bpg-body[data-layout="tabs"] .bpg-pane-close {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  .bpg-btn-label {
+    display: none;
+  }
+
+  .bpg-term .git-terminal-scroll {
+    padding: 10px 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bpg-btn,
+  .bpg-gutter,
+  .bpg-pane-head {
+    transition: none;
+  }
+}

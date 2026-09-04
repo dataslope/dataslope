@@ -20,6 +20,8 @@ import {
   CODE_PLAYGROUND_IDS,
   SQL_PLAYGROUND_IDS,
   isKnownPlayground,
+  isPersistablePlayground,
+  EPHEMERAL_PLAYGROUND_IDS,
   manifestForBundle,
   parseManifest,
   sqlTabsForBundle,
@@ -103,8 +105,20 @@ describe("known playgrounds", () => {
   });
 
   it("lists no playground twice or in both families", () => {
-    const all = [...CODE_PLAYGROUND_IDS, ...SQL_PLAYGROUND_IDS];
+    const all = [
+      ...CODE_PLAYGROUND_IDS,
+      ...SQL_PLAYGROUND_IDS,
+      ...EPHEMERAL_PLAYGROUND_IDS,
+    ];
     expect(new Set(all).size).toBe(all.length);
+  });
+
+  it("keeps ephemeral playgrounds out of the save/share path", () => {
+    for (const id of EPHEMERAL_PLAYGROUND_IDS) {
+      expect(isKnownPlayground(id), `route exists for "${id}"`).toBe(true);
+      expect(isPersistablePlayground(id), `"${id}" is not persistable`).toBe(false);
+      expect(validateBundle(codeBundle({ playground: id }))).toBeNull();
+    }
   });
 });
 

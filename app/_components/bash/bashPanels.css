@@ -1,0 +1,64 @@
+/* ─── Shell file listing ────────────────────────────────────────────────── */
+/* The only panel Bash surfaces add on top of the shared chrome. Everything
+   else (header, script, output, strip, card body) comes from
+   embeddedShell.css, and the terminal from gitPanels.css. */
+
+.bash-tree {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.bash-tree-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  line-height: 1.5;
+  transition: background 0.2s;
+}
+
+/* The rows the last command actually touched, so a pipeline's effect on disk
+   is visible without diffing the listing by eye. */
+.bash-tree-row.changed {
+  background: var(--primary-glow);
+}
+
+.bash-tree-name {
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bash-tree-name.dir {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.bash-tree-meta {
+  margin-left: auto;
+  flex: none;
+  color: var(--text-dim);
+  font-family: var(--font-ui, system-ui, sans-serif);
+  font-size: 10.5px;
+}
+
+/* Fumadocs' prose typography claims bare ul/li inside a docs page. */
+.sblock .bash-tree,
+.scard .bash-tree {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sblock .bash-tree-row,
+.scard .bash-tree-row {
+  margin: 0;
+}

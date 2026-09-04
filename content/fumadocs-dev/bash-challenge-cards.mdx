@@ -1,0 +1,220 @@
+---
+title: "Bash Challenge Cards"
+description: Sandbox for `<BashChallengeCard>`, a graded shell challenge with a live objective checklist.
+---
+
+`<BashChallengeCard>` grades on **output and filesystem**, which is the
+difference from its Git sibling. A Git objective reads the repository,
+because what `git commit` printed is beside the point. In a shell lesson
+the printed output often *is* the answer, and just as often the answer is a
+file that now exists, so `BashExpect` reads both.
+
+Objectives are evaluated after every command, so each one ticks the moment
+the learner satisfies it. Check answer stays for the finality moment.
+
+## 1. Filter a log
+
+Output-graded: the deliverable is what the pipeline prints.
+
+<BashChallengeCard
+  title="Count the errors"
+  scenario="log-files"
+  instructions={`\`app.log\` has a few lines at each level.
+
+Print **just the number** of lines containing \`ERROR\`. The last thing you run should output that number and nothing else.`}
+  hint={`grep finds the lines; wc -l counts them. A pipe joins the two.`}
+  solution={`grep ERROR app.log | wc -l`}
+  objectives={[
+    {
+      id: "used-grep",
+      name: "You filtered with grep",
+      description: "This one grades the route, since the lesson is about grep.",
+      expect: { commandMatches: "grep" },
+    },
+    {
+      id: "count",
+      name: "The output is just the count",
+      expect: { stdoutMatches: "^\\s*2\\s*$" },
+    },
+  ]}
+/>
+
+## 2. Write a file
+
+Filesystem-graded: the deliverable is on disk, so what scrolled past does
+not matter.
+
+<BashChallengeCard
+  title="Save the failures"
+  scenario="log-files"
+  instructions={`Write every line of \`app.log\` containing \`ERROR\` into a new file called \`errors.log\`.
+
+Leave \`app.log\` untouched.`}
+  hint={`Redirect with > to send output into a file instead of the terminal.`}
+  solution={`grep ERROR app.log > errors.log`}
+  objectives={[
+    {
+      id: "exists",
+      name: "errors.log exists",
+      expect: { filesExist: ["errors.log"] },
+    },
+    {
+      id: "two-lines",
+      name: "It holds both failures",
+      expect: { fileLineCount: { path: "errors.log", lines: 2 } },
+    },
+    {
+      id: "content",
+      name: "It has the right lines",
+      expect: { fileContains: { path: "errors.log", text: ["timeout", "connection refused"] } },
+    },
+    {
+      id: "source-intact",
+      name: "app.log is still there",
+      expect: { filesExist: ["app.log"] },
+    },
+  ]}
+/>
+
+## 3. Slice a CSV
+
+Several tools composed, graded on the output.
+
+<BashChallengeCard
+  title="List the regions"
+  scenario="sales-csv"
+  instructions={`\`sales.csv\` has a header row and one row per sale. The second column is the region.
+
+Print each distinct region **once**, sorted alphabetically, with no header and nothing else.`}
+  hint={`cut -d, -f2 pulls the column. tail -n +2 drops the header. sort and uniq do the rest.`}
+  solution={`cut -d, -f2 sales.csv | tail -n +2 | sort | uniq`}
+  objectives={[
+    {
+      id: "three-lines",
+      name: "Three regions, one per line",
+      expect: { stdoutLineCount: 3 },
+    },
+    {
+      id: "sorted",
+      name: "Sorted, with no header",
+      expect: { stdoutEquals: "east\nnorth\nsouth" },
+    },
+  ]}
+/>
+
+## 4. Tidy a directory
+
+Combines a filesystem assertion with an absence check.
+
+<BashChallengeCard
+  title="Remove the scratch files"
+  scenario="messy-names"
+  instructions={`This directory has two \`.tmp\` files, one at the top level and one inside \`archive/\`.
+
+Delete both, and leave everything else alone.`}
+  hint={`find can locate them by name, and xargs can hand them to rm.`}
+  solution={`find . -name '*.tmp' | xargs rm`}
+  objectives={[
+    {
+      id: "top-gone",
+      name: "draft.tmp is gone",
+      expect: { fileAbsent: "draft.tmp" },
+    },
+    {
+      id: "nested-gone",
+      name: "archive/old.tmp is gone",
+      expect: { fileAbsent: "archive/old.tmp" },
+    },
+    {
+      id: "reports-intact",
+      name: "The reports survived",
+      expect: {
+        filesExist: [
+          "report-2026-01.txt",
+          "report-2026-02.txt",
+          "report-2026-03.md",
+          "archive/report-2025-12.txt",
+        ],
+      },
+    },
+  ]}
+/>
+
+## 5. Start from nothing
+
+<BashChallengeCard
+  title="Build a small tree"
+  scenario="empty"
+  instructions={`This directory is empty.
+
+Create a directory called \`notes\`, and inside it a file \`todo.md\` whose first line is \`# Todo\`.`}
+  hint={`mkdir makes the directory; a redirect creates the file.`}
+  solution={`mkdir notes
+printf '# Todo\\n' > notes/todo.md`}
+  objectives={[
+    {
+      id: "file",
+      name: "notes/todo.md exists",
+      expect: { filesExist: ["notes/todo.md"] },
+    },
+    {
+      id: "heading",
+      name: "It starts with the heading",
+      expect: { fileMatches: { path: "notes/todo.md", pattern: "^# Todo" } },
+    },
+    {
+      id: "no-errors",
+      name: "Nothing you ran failed",
+      expect: { noErrors: true },
+    },
+  ]}
+/>
+
+## Props
+
+| Prop | Type | Default | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | required | Card heading. |
+| `instructions` | `string` | required | Markdown. |
+| `objectives` | `BashObjective[]` | required | `{ id, name, description?, expect }`. |
+| `scenario` | `string` | `small-project` | Starting filesystem. |
+| `solution` | `string` | none | Commands revealed by Show solution. |
+| `hint` | `string` | none | Revealed by Hint. |
+| `expandState` | `boolean` | `true` | Open the file listing. Defaults on here, the inverse of a demo block. |
+
+### `BashExpect` assertions
+
+All set fields are conjunctive. "Output" means the last command's stdout and
+stderr together, since a learner reading the terminal does not distinguish
+them.
+
+| Field | Type | Checks |
+| --- | --- | --- |
+| `stdoutContains` | `string \| string[]` | The last output contains these. |
+| `stdoutEquals` | `string` | The last output equals this, both sides trimmed. |
+| `stdoutMatches` | `string` | The last output matches this regex. |
+| `stdoutLineCount` | `number` | The last output has this many non-empty lines. |
+| `anyOutputContains` | `string \| string[]` | Anything printed so far contains these. |
+| `exitCode` | `number` | The last command exited with this code. |
+| `noErrors` | `boolean` | No command in the transcript failed. |
+| `filesExist` | `string[]` | These paths exist. |
+| `fileAbsent` | `string` | This path is gone. |
+| `fileContains` | `{ path, text }` | The file contains the substring(s). |
+| `fileMatches` | `{ path, pattern }` | The file matches the regex. |
+| `fileLineCount` | `{ path, lines }` | The file has this many non-empty lines. |
+| `commandMatches` | `string` | A command the learner ran matches this regex. |
+
+`commandMatches` grades the *route* rather than the result. Reach for it
+only when a particular tool is the lesson: a learner who gets the right
+answer another way is not wrong.
+
+```jsx
+<BashChallengeCard
+  title="Count the errors"
+  scenario="log-files"
+  instructions={`Print just the number of ERROR lines.`}
+  objectives={[
+    { id: "count", name: "The output is the count", expect: { stdoutMatches: "^\\s*2\\s*$" } },
+  ]}
+/>
+```

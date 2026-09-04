@@ -55,6 +55,15 @@ const CATEGORIES: Category[] = [
     ],
   },
   {
+    name: "Command Line",
+    description:
+      "A real shell and a real repository in the tab: split terminals that share one filesystem, and Git commands that move the working tree, index, and commit graph as you watch.",
+    items: [
+      { id: "bash", label: "Bash", version: "5.1" },
+      { id: "git", label: "Git", version: "2.43" },
+    ],
+  },
+  {
     name: "SQL Workbench",
     description:
       "Load data, run queries, and inspect results against embedded or remote engines, all in the browser.",

@@ -39,6 +39,7 @@ export const CONTENT_COMPONENTS = new Set([
   "CodeBlock", "SqlCodeBlock", "ChallengeCard", "SqlChallengeCard",
   "MultipleChoice", "Chart", "Figure", "Callout", "Mermaid", "SvgLabel",
   "LivePreview", "ReactPreview", "IllustrationPrompt",
+  "GitBlock", "GitChallengeCard", "BashBlock", "BashChallengeCard",
 ]);
 
 /**

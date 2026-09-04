@@ -1,0 +1,197 @@
+---
+title: "Git Challenge Cards"
+description: Sandbox for `<GitChallengeCard>`, a graded Git challenge with a live objective checklist.
+---
+
+`<GitChallengeCard>` grades on **repository state**, not on printed
+output. The interesting outcome of `git commit` is not what it printed, so
+the assertions read HEAD, the index, the branch list and the commit graph
+instead.
+
+Because repo state is cheap to read after every command, the objectives are
+evaluated continuously. Each one ticks the instant the repository satisfies
+it, so the learner sees *which command* did it. Check answer stays for the
+finality moment rather than being the feedback channel.
+
+There is no command palette here on purpose: grading measures whether the
+learner can compose the command, so the card should not hand it over.
+
+## 1. Stage and commit
+
+The canonical first challenge. Two objectives, both reachable in three
+commands.
+
+<GitChallengeCard
+  title="Commit the README"
+  scenario="linear-history"
+  instructions={`The working tree has an edit to \`README.md\` that has not been staged.
+
+Stage that change and commit it with the message **"Update the README"**.`}
+  hint={`git add the file, then git commit -m "your message"`}
+  solution={`git add README.md
+git commit -m "Update the README"`}
+  objectives={[
+    {
+      id: "staged-or-committed",
+      name: "README.md is committed",
+      description: "Four commits, so the edit landed in history.",
+      expect: { minCommits: 4 },
+    },
+    {
+      id: "message",
+      name: "The message says what changed",
+      expect: { commitMessageMatches: "update the readme" },
+    },
+    {
+      id: "clean",
+      name: "Working tree is clean",
+      expect: { clean: true },
+    },
+  ]}
+/>
+
+## 2. Branch, commit, merge
+
+The classic three-step. The middle objective checks the merge's *effect*
+rather than its existence: `feature.js` only reaches `main`'s working tree
+once the branch is merged. The last one needs `git branch -d`, which
+refuses to drop unmerged work, so it cannot be satisfied out of order.
+
+<GitChallengeCard
+  title="Merge a feature branch"
+  scenario="branching"
+  instructions={`A branch called \`feature\` is one commit ahead of \`main\`, and you are on \`main\`.
+
+Merge \`feature\` into \`main\`, then delete the \`feature\` branch.`}
+  hint={`git merge the branch, then git branch -d to delete it`}
+  solution={`git merge feature
+git branch -d feature`}
+  objectives={[
+    {
+      id: "on-main",
+      name: "You are on main",
+      expect: { headBranch: "main" },
+    },
+    {
+      id: "has-feature-work",
+      name: "feature.js is on main",
+      description: "The merge brought the branch's file into the working tree.",
+      expect: { filesExist: ["feature.js"] },
+    },
+    {
+      id: "branch-gone",
+      name: "The feature branch is deleted",
+      expect: { branchAbsent: "feature" },
+    },
+  ]}
+/>
+
+## 3. Resolve a conflict
+
+The scenario leaves two branches editing the same line. This card cannot be
+solved by clicking anything: the learner has to merge, open the file, pick
+a side, and commit.
+
+<GitChallengeCard
+  title="Resolve the title conflict"
+  scenario="conflict-pending"
+  instructions={`\`main\` and \`rename\` both changed the \`title\` line in \`config.yml\`.
+
+Merge \`rename\` into \`main\`. The merge will conflict. Resolve it so the file reads \`title: Final\`, then commit the result.`}
+  hint={`After the failed merge, cat config.yml to see the markers. Rewrite the file, git add it, then commit.`}
+  solution={`git merge rename
+printf 'title: Final\\nauthor: unknown\\n' > config.yml
+git add config.yml
+git commit -m "Resolve the title conflict"`}
+  objectives={[
+    {
+      id: "merged",
+      name: "The merge is committed",
+      expect: { minCommits: 4 },
+    },
+    {
+      id: "resolved",
+      name: "No conflict markers remain",
+      expect: { clean: true, filesExist: ["config.yml"] },
+    },
+  ]}
+/>
+
+## 4. Start from nothing
+
+`scenario="empty"` gives an empty folder, so `git init` is the first
+objective.
+
+<GitChallengeCard
+  title="Create your first repository"
+  scenario="empty"
+  instructions={`This folder is not a repository yet.
+
+Create one, add a file called \`notes.md\`, and make your first commit.`}
+  hint={`git init, then create the file with printf 'text' > notes.md`}
+  solution={`git init
+printf '# Notes\\n' > notes.md
+git add notes.md
+git commit -m "First commit"`}
+  objectives={[
+    {
+      id: "init",
+      name: "A repository exists",
+      expect: { initialized: true },
+    },
+    {
+      id: "file",
+      name: "notes.md is in the working tree",
+      expect: { filesExist: ["notes.md"] },
+    },
+    {
+      id: "committed",
+      name: "It is committed",
+      expect: { minCommits: 1, clean: true },
+    },
+  ]}
+/>
+
+## Props
+
+| Prop | Type | Default | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | required | Card heading. |
+| `instructions` | `string` | required | Markdown. |
+| `objectives` | `GitObjective[]` | required | `{ id, name, description?, expect }`. |
+| `scenario` | `string` | `linear-history` | Starting repository. |
+| `solution` | `string` | none | Commands revealed by Show solution. |
+| `hint` | `string` | none | Revealed by Hint. |
+| `expandState` | `boolean` | `true` | Open the state panels. Defaults on here, the inverse of a demo block. |
+
+### `GitExpect` assertions
+
+All set fields are conjunctive, and every one reads repo state.
+
+| Field | Type | Checks |
+| --- | --- | --- |
+| `initialized` | `boolean` | A repository exists. |
+| `headBranch` | `string` | HEAD is on this branch. |
+| `isDetached` | `boolean` | HEAD is detached. |
+| `commitCount` | `number` | Exactly this many commits. |
+| `minCommits` | `number` | At least this many. |
+| `commitMessageMatches` | `string` | The tip commit's message matches this regex. |
+| `anyCommitMessageMatches` | `string` | Any commit's message matches. |
+| `staged` | `string[]` | These paths are staged. |
+| `unstaged` | `string[]` | These paths have unstaged changes. |
+| `clean` | `boolean` | Nothing staged, nothing modified. |
+| `branchesExist` | `string[]` | These branches exist. |
+| `branchAbsent` | `string` | This branch does not. |
+| `filesExist` | `string[]` | These paths are in the working tree. |
+| `graphShape` | `"linear" \| "merged"` | Whether a merge commit exists. |
+
+```jsx
+<GitChallengeCard
+  title="Commit the README"
+  scenario="linear-history"
+  instructions={`Stage the edit and commit it.`}
+  objectives={[
+    { id: "committed", name: "It is committed", expect: { minCommits: 4, clean: true } },
+  ]}
+/>
+```

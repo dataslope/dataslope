@@ -25,6 +25,14 @@ export const MdxSqlChallengeCard = lazyWidget(
 export const MdxSqlCodeBlock = lazyWidget(
   () => import("@/app/_components/MdxSqlCodeBlock"),
 );
+export const GitBlock = lazyWidget(() => import("@/app/_components/git/GitBlock"));
+export const GitChallengeCard = lazyWidget(
+  () => import("@/app/_components/git/GitChallengeCard"),
+);
+export const BashBlock = lazyWidget(() => import("@/app/_components/bash/BashBlock"));
+export const BashChallengeCard = lazyWidget(
+  () => import("@/app/_components/bash/BashChallengeCard"),
+);
 export const MdxMultipleChoiceQuestion = lazyWidget(
   () => import("@/app/_components/multipleChoice/MdxMultipleChoiceQuestion"),
 );

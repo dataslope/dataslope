@@ -129,7 +129,7 @@ export default function SqlCardDialogs({
             ? "Reading the schema…"
             : `${tables.length} table${tables.length === 1 ? "" : "s"} in this database`
         }
-        icon={<Network size={9} aria-hidden />}
+        icon={<Network size={13} aria-hidden />}
         onClose={onClose}
       >
         {error ? (
@@ -170,7 +170,7 @@ export default function SqlCardDialogs({
           ? "Reading the schema…"
           : `The CREATE statements behind ${entityCount} object${entityCount === 1 ? "" : "s"}`
       }
-      icon={<FileCode2 size={9} aria-hidden />}
+      icon={<FileCode2 size={13} aria-hidden />}
       onClose={onClose}
       actions={
         ddl ? (

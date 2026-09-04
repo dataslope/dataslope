@@ -12,7 +12,7 @@ import type { R2Bucket } from "@cloudflare/workers-types";
 import type { MemberTier } from "@/lib/ai/types";
 import {
   MANIFEST_MAX_BYTES,
-  isKnownPlayground,
+  isPersistablePlayground,
   parseManifest,
   type BundleManifest,
   type CloudUsage,
@@ -131,7 +131,7 @@ export async function readBundleUpload(
 
   const playground =
     typeof meta.playground === "string" ? meta.playground : "";
-  if (!isKnownPlayground(playground)) {
+  if (!isPersistablePlayground(playground)) {
     return { ok: false, status: 400, message: "Unknown playground." };
   }
   const name = normalizeName(meta.name, "Untitled workspace");

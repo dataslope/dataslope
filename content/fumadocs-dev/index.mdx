@@ -27,6 +27,20 @@ are loaded on demand.
 - Java, javac + the JVM via CheerpJ
 - C#, Roslyn on .NET wasm
 
+## Shell and version control
+
+- Bash, just-bash over an in-memory filesystem. See [Bash Blocks](/fumadocs-dev/bash-blocks)
+  and [Bash Challenge Cards](/fumadocs-dev/bash-challenge-cards).
+- Git, isomorphic-git for the repository over that same shell. See
+  [Git Blocks](/fumadocs-dev/git-blocks) and [Git Challenge Cards](/fumadocs-dev/git-challenge-cards).
+
+These four components run commands rather than source, and their challenge
+cards grade on **state** rather than printed output alone, which lets
+objectives tick live as the learner works. A Git objective reads the
+repository, because what `git commit` printed is beside the point; a shell
+objective reads the output *and* the filesystem, because in a shell lesson
+either one can be the deliverable.
+
 ## How code blocks work
 
 - Each `<CodeBlock>` is independent. State you set in one block is

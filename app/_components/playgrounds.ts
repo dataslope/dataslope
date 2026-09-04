@@ -8,6 +8,10 @@ export interface PlaygroundEntry {
   label: string;
   /** Route the dropdown navigates to. */
   href: string;
+  /** Runs in memory and is never saved or shared, so the workspace surfaces
+   *  (recent lists, cloud storage, orphan recovery) skip it. Mirrors
+   *  EPHEMERAL_PLAYGROUND_IDS in lib/workspaces/types.ts. */
+  ephemeral?: boolean;
 }
 
 export const PLAYGROUNDS: PlaygroundEntry[] = [
@@ -27,4 +31,14 @@ export const PLAYGROUNDS: PlaygroundEntry[] = [
   { id: "postgres", label: "PostgreSQL", href: "/playground/postgres" },
   { id: "sqlite", label: "SQLite", href: "/playground/sqlite" },
   { id: "duckdb", label: "DuckDB", href: "/playground/duckdb" },
+  // Memory-only: a repository or a filesystem is derived from the commands run
+  // against it, so there is no workspace to persist.
+  { id: "git", label: "Git", href: "/playground/git", ephemeral: true },
+  { id: "bash", label: "Bash", href: "/playground/bash", ephemeral: true },
 ];
+
+/** Playgrounds that own a saveable workspace — the recent-workspace lists,
+ *  dashboard grids and orphan recovery all iterate these, never `PLAYGROUNDS`. */
+export const PERSISTENT_PLAYGROUNDS: PlaygroundEntry[] = PLAYGROUNDS.filter(
+  (p) => !p.ephemeral,
+);

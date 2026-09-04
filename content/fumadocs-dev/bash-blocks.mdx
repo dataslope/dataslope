@@ -1,0 +1,228 @@
+---
+title: "Bash Blocks"
+description: Sandbox for the `<BashBlock>` component, a real shell you can type into inside lesson prose.
+---
+
+`<BashBlock>` is a terminal, not a script runner. Type a command, press
+Enter, read the output, type the next one. The session remembers where you
+are: `cd src` then `ls` lists `src`, a variable you set stays set, and a
+function you define stays defined.
+
+The engine is just-bash over an in-memory filesystem, so pipes,
+redirection, globs, loops and functions all work. Nothing is saved: a
+reload starts over.
+
+Every block gets its own working directory unless it opts into sharing one.
+
+The prompt is bash's own `\w$`: the working directory, then the `$`. A shell
+session starts in `/home/user`, so that reads `~`, and `~/src` a `cd` later.
+`pwd` still answers with the full path. A `cd` shows up on the line after it,
+the way it does in a terminal.
+
+A Git session roots at `/repo` instead, because there a repository is the
+whole point. A shell lesson has nothing to do with repositories, so it gets
+a home directory.
+
+The header is the code block header: a **Terminal** badge on the left, the
+engine (**Bash**) on the right, and an ellipsis menu holding **Reset** and
+**Copy transcript**.
+
+## Just type
+
+No `commands` prop at all, so the block opens as a prompt and a block cursor.
+
+<BashBlock scenario="small-project" />
+
+Try `ls`, then `cd src`, then `pwd`.
+
+### Tab
+
+`Tab` is split across two presses, as it is in bash. The first completes as
+far as the candidates agree; if that adds nothing, the second prints them.
+There is no terminal bell here, so that listing is the only signal a reader
+gets that the choice was ambiguous.
+
+The candidates print *below* the line you were editing, and the prompt is
+redrawn with what you had typed, which is where bash puts them.
+
+The first word of a command completes against commands, and so does the word
+after a `|` or a `;`. Everything else completes against the filesystem, one
+directory at a time: `cat sr<Tab>` gives `cat src/`, and the next `Tab` looks
+inside `src` rather than starting over. A finished name gets a space after
+it; a directory keeps its slash so you can carry on typing. Directories you
+have only just made count, empty ones included.
+
+| You type | `Tab` gives you |
+| --- | --- |
+| `ec` | `echo ` |
+| `ls` | `ls ` |
+| `c`, then `Tab` again | `cat  cd  clear  cp  cut` |
+| `cat RE` | `cat README.md ` |
+| `cd sr` | `cd src/` |
+| `ls \| gre` | `ls \| grep ` |
+
+Past 100 candidates it asks first, the way readline's `completion-query-items`
+does:
+
+```
+~/many $ cat f
+Display all 120 possibilities? (y or n)
+```
+
+`y` prints them, anything else drops it, and either way the line you were
+editing comes back untouched.
+
+## A block that opens mid-session
+
+Pass `commands` and the block plays them into its own terminal as soon as
+the session is ready, one after another, as though a reader had typed them.
+There is no Run button: the block is simply already in progress when it
+comes into view, and the prompt underneath is live.
+
+`commands` takes a list of lines or one newline-separated string.
+
+<BashBlock
+  scenario="log-files"
+  commands={["grep ERROR app.log", "grep ERROR app.log | wc -l"]}
+/>
+
+The distinction that matters is that the commands really ran. A transcript
+hard-coded into the page would print the same characters and leave the
+reader in an empty shell; here the state is real, so the next thing they
+type sees what the script did.
+
+<BashBlock
+  scenario="empty"
+  commands={["mkdir myfolder", "cd myfolder", "touch notes.txt", "ls"]}
+/>
+
+Type `pwd` in that block: you are inside `myfolder`, because `cd` ran.
+
+## Seeing what changed on disk
+
+There is no file listing beside the terminal. A shell already has the tools
+for that, so the block leaves it to `ls`, `cat` and `find` rather than
+duplicating them in a panel.
+
+<BashBlock
+  scenario="small-project"
+  commands={`wc -l notes.txt > count.txt
+cat count.txt`}
+/>
+
+## State really persists
+
+Variables set on one line are there on the next, and a function defined in
+the script can be called from the prompt afterwards. Try `greet you` in the
+block below once it has played.
+
+<BashBlock
+  scenario="small-project"
+  commands={`cd src
+pwd
+NAME=world
+echo "hi $NAME"
+greet() { echo "hello, $1"; }
+greet there`}
+/>
+
+## Color
+
+just-bash has no `ls --color`, but it passes escape sequences straight
+through, so anything you print with them renders as color. The palette is
+the classic 16 ANSI terminal colors rather than the Dataslope ramp,
+because output colored with `31m` should look the way it looks in a
+terminal.
+
+<BashBlock
+  scenario="empty"
+  commands={"printf '\\033[31mred\\033[0m \\033[1;32mbold green\\033[0m \\033[33myellow\\033[0m\\n'"}
+/>
+
+## Text processing
+
+`cut`, `sort`, `uniq` and `awk` are all present.
+
+<BashBlock
+  scenario="sales-csv"
+  commands={`cut -d, -f2 sales.csv | tail -n +2 | sort | uniq -c
+awk -F, 'NR>1 {sum[$2] += $4} END {for (r in sum) print r, sum[r]}' sales.csv`}
+/>
+
+## Loops and conditionals
+
+<BashBlock
+  scenario="messy-names"
+  commands={`for f in *.txt; do echo "found $f"; done
+if [ -f draft.tmp ]; then echo "scratch file present"; fi`}
+/>
+
+## find and xargs
+
+<BashBlock
+  scenario="messy-names"
+  commands={`find . -name '*.tmp'
+find . -name '*.tmp' | xargs rm
+find . -type f`}
+/>
+
+## Blocks that share a directory
+
+Blocks with the same `dir` id share one working directory, including the
+shell state, so a `cd` in the first is still in effect in the second.
+Blocks without one are isolated.
+
+<BashBlock
+  dir="pipeline"
+  scenario="log-files"
+  commands={`grep ERROR app.log > errors.log`}
+/>
+
+<BashBlock
+  dir="pipeline"
+  scenario="log-files"
+  commands={`wc -l < errors.log`}
+/>
+
+## Errors
+
+A failing command shows its real message and a non-zero exit code, the
+same as a terminal.
+
+<BashBlock
+  scenario="small-project"
+  commands={`cat missing.txt
+echo "exit code: $?"`}
+/>
+
+## Props
+
+| Prop | Type | Default | Notes |
+| --- | --- | --- | --- |
+| `commands` | `string \| string[]` | none | Starting script, played line by line once the session is ready. Without it the block opens as a bare prompt. |
+| `scenario` | `string` | `small-project` | `empty`, `small-project`, `log-files`, `sales-csv`, `messy-names`. |
+| `dir` | `string` | none | Share a working directory and shell state with blocks carrying the same id. |
+| `rows` | `number` | `10` | Terminal height, in rows, before it scrolls. |
+| `hideOpenInPlayground` | `boolean` | `false` | Hide the link out to `/playground/bash`. |
+
+### Keys
+
+| Key | Does |
+| --- | --- |
+| `Enter` | Run the line. |
+| `↑` / `↓` | Walk back and forward through history. |
+| `Tab` | Complete a command or a filename. |
+| `Ctrl-L` | Clear the scrollback. |
+| `Ctrl-C` | Abandon the line without running it. |
+
+The real `<input>` is off-screen and only holds the value and the caret;
+the line you see is rendered text, which is what lets the cursor be a
+blinking block rather than an I-beam. Clicking anywhere in the terminal
+puts focus back on the prompt.
+
+```jsx
+<BashBlock
+  scenario="empty"
+  commands={["mkdir myfolder", "cd myfolder", "touch notes.txt", "ls"]}
+/>
+```
