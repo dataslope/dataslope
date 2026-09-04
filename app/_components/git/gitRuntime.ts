@@ -28,6 +28,8 @@ export interface CommandResult {
   stderr: string;
   exitCode: number;
   content?: string;
+  /** Nothing ran: the line needs another before it is complete. */
+  incomplete?: boolean;
   /**
    * The working directory the session is in now the command has run. The
    * subscribed React state carries this too, but a caller running several
@@ -71,6 +73,7 @@ function ensureWorker(): Worker {
       stderr: msg.stderr,
       exitCode: msg.exitCode,
       content: msg.content,
+      incomplete: msg.incomplete,
       cwd: msg.state.cwd,
     });
   });

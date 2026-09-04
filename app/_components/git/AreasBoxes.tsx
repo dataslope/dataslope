@@ -37,7 +37,9 @@ export interface Chip {
 /** Which box each file belongs in, and what to call its state there. */
 export function placeFiles(files: FileStatus[], merging: string | null): Chip[] {
   return files.map((f): Chip => {
-    if (isConflicted(f, merging)) return { path: f.path, area: "stage", word: "conflict", tone: "conflict" };
+    // A conflict is unfinished work on disk: the markers are in the working
+    // directory and the index is waiting for `git add`. It is never "ready".
+    if (isConflicted(f, merging)) return { path: f.path, area: "work", word: "conflict", tone: "conflict" };
     if (f.stage !== f.head) {
       const word =
         f.workdir === 0
@@ -130,6 +132,12 @@ export function AreasBoxes({ state, changed, internals, onOpen }: Props) {
   const stage = inArea("stage");
   const head = inArea("head");
   const shownHead = head.slice(0, CLEAN_CAP);
+  const conflicts = work.filter((c) => c.tone === "conflict").length;
+  const workCount = !work.length
+    ? "clean"
+    : conflicts
+      ? `${conflicts} to resolve${work.length > conflicts ? ` · ${work.length - conflicts} changed` : ""}`
+      : `${work.length} file${work.length === 1 ? "" : "s"}`;
 
   const headLine = !state.initialized
     ? "no repository yet"
@@ -160,7 +168,7 @@ export function AreasBoxes({ state, changed, internals, onOpen }: Props) {
             <FileText size={13} aria-hidden="true" />
             {titles.work}
           </span>
-          <span className="gitx-box-count">{work.length ? `${work.length} file${work.length === 1 ? "" : "s"}` : "clean"}</span>
+          <span className={conflicts ? "gitx-box-count conflict" : "gitx-box-count"}>{workCount}</span>
         </header>
         <div className="gitx-box-body">
           {work.length ? (
@@ -168,7 +176,9 @@ export function AreasBoxes({ state, changed, internals, onOpen }: Props) {
           ) : (
             <p className="gitx-box-empty">
               {state.initialized
-                ? "Nothing changed on disk. Open a file and edit it, or create one."
+                ? state.merging
+                  ? "Every conflict is resolved. Finish the merge with git commit."
+                  : "Nothing changed on disk. Open a file and edit it, or create one."
                 : "Empty. Create a file to have something to track."}
             </p>
           )}

@@ -14,6 +14,7 @@
 
 import { useState } from "react";
 import type { CommitNode } from "./protocol";
+import { gitDate } from "./gitCommand";
 
 const SIZES = {
   compact: { row: 30, lane: 18, left: 16, top: 16, r: 5, merge: 6 },
@@ -110,6 +111,9 @@ export function CommitGraph({
 }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
   const S = SIZES[size];
+  // A card for a commit that is no longer in the history (Reset, a scenario
+  // change, an undo past it) would describe something that does not exist.
+  const current = selected && commits.some((c) => c.oid === selected) ? selected : null;
 
   const wrap = (children: React.ReactNode) =>
     framed ? (
@@ -147,7 +151,7 @@ export function CommitGraph({
   const x = (lane: number) => S.left + lane * S.lane;
   const y = (row: number) => S.top + (row + offset) * S.row;
   const headLane = placed.find((c) => c.refs.some((r) => r.startsWith("HEAD")))?.lane ?? 0;
-  const current = selected ? byOid.get(selected) ?? null : null;
+  const open = current ? byOid.get(current) ?? null : null;
 
   return wrap(
     <>
@@ -203,7 +207,7 @@ export function CommitGraph({
               const isHead = commit.refs.some((r) => r.startsWith("HEAD"));
               const color = LANE_COLORS[commit.lane % LANE_COLORS.length];
               const merge = commit.parents.length > 1;
-              const cls = `git-graph-node${isHead ? " head" : ""}${selected === commit.oid ? " selected" : ""}`;
+              const cls = `git-graph-node${isHead ? " head" : ""}${current === commit.oid ? " selected" : ""}`;
               return isHead && detached ? (
                 <rect
                   key={commit.oid}
@@ -244,14 +248,15 @@ export function CommitGraph({
               return (
                 <li
                   key={commit.oid}
-                  className={`git-graph-label${selected === commit.oid ? " selected" : ""}`}
+                  className={`git-graph-label${current === commit.oid ? " selected" : ""}`}
                   style={{ top: y(commit.row) - S.row / 2 - S.top + S.top, height: S.row }}
                 >
                   <button
                     type="button"
                     className="git-graph-row"
                     onClick={() => setSelected((s) => (s === commit.oid ? null : commit.oid))}
-                    aria-expanded={selected === commit.oid}
+                    aria-expanded={current === commit.oid}
+                    aria-label={`Commit ${commit.oid.slice(0, 7)}: ${commit.message}${refs.length ? ` (${refs.map((r) => r.name).join(", ")})` : ""}`}
                   >
                     {showOids && <code className="git-graph-oid">{commit.oid.slice(0, 7)}</code>}
                     {refs
@@ -281,18 +286,19 @@ export function CommitGraph({
         </div>
       </div>
 
-      {current && (
-        <div className="git-commit-card" role="region" aria-label={`Commit ${current.oid.slice(0, 7)}`}>
-          <div className="git-commit-card-msg">{current.message}</div>
+      {open && (
+        <div className="git-commit-card" role="region" aria-label={`Commit ${open.oid.slice(0, 7)}`}>
+          <div className="git-commit-card-msg">{open.message}</div>
           <div className="git-commit-card-meta">
-            <code>{current.oid.slice(0, 7)}</code>
-            <span>{current.author}</span>
-            <span>{new Date(current.timestamp * 1000).toLocaleString()}</span>
-            {current.parents.length > 1 && <span>merge of {current.parents.length} parents</span>}
+            <code>{open.oid.slice(0, 7)}</code>
+            <span>{open.author}</span>
+            {/* The same rendering the terminal uses, so one timestamp has one face. */}
+            <span>{gitDate(open.timestamp)}</span>
+            {open.parents.length > 1 && <span>merge of {open.parents.length} parents</span>}
           </div>
           {onCompose && (
             <div className="git-commit-card-actions">
-              <button type="button" className="gitx-btn" onClick={() => onCompose(`git show ${current.oid.slice(0, 7)}`)}>
+              <button type="button" className="gitx-btn" onClick={() => onCompose(`git show ${open.oid.slice(0, 7)}`)}>
                 Show this commit
               </button>
               <button type="button" className="gitx-btn quiet" onClick={() => setSelected(null)}>

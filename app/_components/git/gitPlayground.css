@@ -101,6 +101,11 @@
   color: var(--text-dim);
 }
 
+/* The header's theme pill sits with the buttons, a touch of air before it. */
+.gitx-theme {
+  margin-left: 4px;
+}
+
 .gitx-branch {
   display: inline-flex;
   align-items: center;
@@ -290,6 +295,29 @@
   white-space: nowrap;
 }
 
+/* Every step done: a nudge to the next scenario rather than a card that
+   vanishes. */
+.gitx-try-done {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 0 4px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.gitx-try-done > svg {
+  color: var(--ds-green-600);
+  flex: none;
+}
+
+.gitx-try-done > span {
+  flex: 1 1 200px;
+}
+
 /* ─── Conflict banner ─── */
 .gitx-banner {
   border-left: 3px solid var(--ds-red-500);
@@ -362,6 +390,11 @@ html:is(.dark, [data-theme="dark"]) .gitx-areas {
   font-size: 12px;
   color: var(--text-dim);
   white-space: nowrap;
+}
+
+.gitx-box-count.conflict {
+  color: var(--tone-conflict);
+  font-weight: 600;
 }
 
 .gitx-box-body {
@@ -697,10 +730,6 @@ html:is(.dark, [data-theme="dark"]) .gitx-areas {
   z-index: 21;
 }
 
-.gitx-palette .git-panel {
-  border: none;
-}
-
 .gitx-console-body {
   flex: 1;
   min-height: 0;
@@ -886,6 +915,43 @@ html:is(.dark, [data-theme="dark"]) .gitx-areas {
     left: 8px;
     width: auto;
     bottom: calc(100% - 58px);
+    max-height: 70vh;
+  }
+
+  /* A thumb needs more than a pointer: every control on the phone layout
+     clears 40px, the chips included, and the chip row scrolls sideways
+     instead of stacking into a third of the terminal. */
+  .gitx-btn,
+  .gitx-btn.small,
+  .gitx-step,
+  .gitx-chip,
+  .gitx-try-step,
+  .gitx-palette-btn,
+  .gitx-newfile-input {
+    min-height: 40px;
+  }
+
+  .gitx-console-head {
+    flex-wrap: nowrap;
+    gap: 6px;
+    overflow: hidden;
+  }
+
+  .gitx-steps {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    min-width: 0;
+    flex: 1;
+    padding: 2px 0;
+  }
+
+  .gitx-steps::-webkit-scrollbar {
+    display: none;
+  }
+
+  .gitx-console-head .gitx-pane-sep {
+    display: none;
   }
 }
 

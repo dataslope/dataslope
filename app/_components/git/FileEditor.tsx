@@ -9,9 +9,14 @@
  * the conflict toolbar lives here: keeping "mine" or "theirs" edits the
  * reader's file, not the repository. The raw markers stay the default view,
  * because a reader who has seen them once is not frightened of them twice.
+ *
+ * Nothing typed here is ever lost to navigation: the draft is written to the
+ * working directory when the textarea loses focus and when the reader goes
+ * back to the Changes pane. Ctrl+S and the Save button save on demand; a
+ * phone, which has neither, still gets the autosave.
  */
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, Save } from "lucide-react";
 import type { CommandResult } from "./gitRuntime";
 import { hasConflictMarkers, resolveConflicts } from "./repoFacts";
@@ -48,6 +53,11 @@ export function FileEditor({ path, word, merging, busy, readFile, writeFile, onS
   }, [path, readFile]);
 
   const dirty = draft !== loaded;
+  /** The latest draft, for the save that runs as the editor is left. */
+  const latest = useRef({ draft, loaded });
+  useEffect(() => {
+    latest.current = { draft, loaded };
+  }, [draft, loaded]);
 
   const save = useCallback(async () => {
     const result = await writeFile(path, draft);
@@ -61,12 +71,30 @@ export function FileEditor({ path, word, merging, busy, readFile, writeFile, onS
     setTimeout(() => setNote(null), 1500);
   }, [draft, onSaved, path, writeFile]);
 
+  /** Save whatever is unsaved, silently; used on blur and on leaving. */
+  const flush = useCallback(async () => {
+    const { draft: d, loaded: l } = latest.current;
+    if (d === l) return;
+    const result = await writeFile(path, d);
+    if (result.exitCode !== 0) {
+      setNote(result.stderr.trim());
+      return;
+    }
+    setLoaded(d);
+    onSaved(path, d);
+  }, [onSaved, path, writeFile]);
+
+  const close = useCallback(() => {
+    void flush();
+    onClose();
+  }, [flush, onClose]);
+
   const conflicted = merging !== null && hasConflictMarkers(draft);
 
   return (
     <div className="gitx-editor">
       <header className="gitx-editor-head">
-        <button type="button" className="gitx-btn quiet" onClick={onClose}>
+        <button type="button" className="gitx-btn quiet" onClick={close}>
           <ArrowLeft size={14} aria-hidden="true" />
           <span>Changes</span>
         </button>
@@ -109,6 +137,7 @@ export function FileEditor({ path, word, merging, busy, readFile, writeFile, onS
         className={`gitx-editor-area${conflicted ? " conflicted" : ""}`}
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
+        onBlur={() => void flush()}
         onKeyDown={(e) => {
           if ((e.metaKey || e.ctrlKey) && e.key === "s") {
             e.preventDefault();
@@ -118,7 +147,9 @@ export function FileEditor({ path, word, merging, busy, readFile, writeFile, onS
         spellCheck={false}
         aria-label={`Contents of ${path}`}
       />
-      <p className="gitx-editor-note">{note ?? (dirty ? "Unsaved. Ctrl+S saves." : "Edits here change the working directory only.")}</p>
+      <p className="gitx-editor-note">
+        {note ?? (dirty ? "Unsaved. Saved when you leave, or press Ctrl+S." : "Edits here change the working directory only.")}
+      </p>
     </div>
   );
 }

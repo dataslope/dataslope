@@ -10,30 +10,62 @@
  * learner expects it to mean. A new terminal starts where the one it was
  * split from is standing.
  *
- * Memory-only, and nothing persists: a reload is one terminal and the
- * starting files. The layout is a binary split tree (`splitTree.ts`). The
- * same terminals can also be a tab strip, one showing at a time: a phone
- * always gets that, a desktop can choose it, and the tree is kept underneath
- * so switching back shows everything where it was.
+ * The playground opens on the starting files and a bare prompt: no
+ * scenarios, no hints. The header's ellipsis menu holds an "All commands"
+ * palette of coreutils (a row fills the focused prompt; the reader presses
+ * Enter) and an "About this shell" note on what is installed and what the
+ * shell cannot do.
+ *
+ * The session is the list of commands each terminal ran. That is what a
+ * reload restores (from `sessionStorage`, this tab only) and what Reset
+ * throws away, after asking. The layout is a binary split tree
+ * (`splitTree.ts`). The same terminals can also be a tab strip, one showing
+ * at a time: a phone always gets that, a desktop can choose it, and the tree
+ * is kept underneath so switching back shows everything where it was. The
+ * strip is the same `TabBar` the editor playgrounds use for their files, so
+ * a terminal tab looks and behaves like a file tab: close, rename, drag to
+ * reorder, `+` to add.
+ *
+ * Light and dark follow the site-wide choice, with the same pill toggle the
+ * home page and the editor playgrounds' settings carry.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Select } from "@base-ui/react/select";
 import { Menu } from "@base-ui/react/menu";
-import { ChevronDown, Columns2, PanelTop, Plus, RotateCcw, SplitSquareHorizontal, SplitSquareVertical, X } from "lucide-react";
+import { Dialog } from "@base-ui/react/dialog";
+import {
+  ChevronDown,
+  Columns2,
+  Info,
+  MoreHorizontal,
+  PanelTop,
+  Plus,
+  RotateCcw,
+  SplitSquareHorizontal,
+  SplitSquareVertical,
+  Terminal,
+  TerminalSquare,
+} from "lucide-react";
 import Link from "../Link";
 import { PLAYGROUNDS } from "../playgrounds";
 import { useIsFramed } from "../useIsFramed";
 import { LANGUAGE_ICONS, LANGUAGE_ICON_SIZE_FACTOR } from "../languageIcons";
 import { PlaygroundBootOverlay, useBootOverlayVisibility } from "../PlaygroundBootOverlay";
-import { applyThemePalette, getStoredEditorTheme, applyMode } from "../playgroundTheme";
+import { applyThemePalette, applyMode, setStoredEditorTheme } from "../playgroundTheme";
+import { usePlaygroundThemeSync } from "../playgroundThemeSync";
+import { ThemePillToggle } from "../ThemePillToggle";
+import { TabBar } from "../tabs/TabBar";
+import type { TabDescriptor } from "../tabs/tabTypes";
 import { useGitSession } from "../git/gitRuntime";
 import menuStyles from "../sqlCardTools/SqlCardToolsMenu.module.css";
+import { BASH_ABOUT } from "./bashAbout";
 import { DEFAULT_BASH_SCENARIO } from "./bashScenarios";
+import { BashCommandPalette } from "./BashCommandPalette";
 import { HOME } from "./prompt";
 import { GUTTER, MIN_PANE, SplitView } from "./SplitView";
-import { TerminalPane, type MoveDir, type PaneDragHandlers } from "./TerminalPane";
+import { TerminalPane, type MoveDir, type PaneDragHandlers, type TerminalPaneHandle } from "./TerminalPane";
 import {
   dropZone as zoneAt,
   leaf,
@@ -59,8 +91,11 @@ export const MAX_TERMINALS = 8;
 type Layout = "split" | "tabs";
 
 /** The one preference kept across visits: panes or tabs. Nothing in a
- *  session is saved, but how you like to look at one is not the session. */
+ *  session is saved beyond the tab, but how you like to look at one is not
+ *  the session. */
 const LAYOUT_KEY = "bash_playground_layout";
+/** This tab's session: the terminals and what each ran. */
+const SESSION_KEY = "bash_playground_session";
 
 function storedLayout(): Layout {
   try {
@@ -75,6 +110,36 @@ interface PaneRecord {
   title: string;
   /** Where the shell was opened; the prompt before its first command. */
   startCwd: string;
+}
+
+interface SavedSession {
+  tree: Node;
+  panes: PaneRecord[];
+  /** Completed command lines per terminal, in order. */
+  ran: Record<string, string[]>;
+}
+
+function readSession(): SavedSession | null {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<SavedSession>;
+    if (!Array.isArray(parsed.panes) || !parsed.tree || typeof parsed.ran !== "object") return null;
+    if (!parsed.panes.length || parsed.panes.length > MAX_TERMINALS) return null;
+    return parsed as SavedSession;
+  } catch {
+    return null;
+  }
+}
+
+function writeSession(session: SavedSession | null) {
+  try {
+    const any = session && Object.values(session.ran).some((list) => list.length);
+    if (session && any) sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    else sessionStorage.removeItem(SESSION_KEY);
+  } catch {
+    /* storage blocked; the session lasts until the tab closes */
+  }
 }
 
 type Drag = {
@@ -101,7 +166,7 @@ export default function BashPlayground() {
   const router = useRouter();
   const embedded = useIsFramed();
   const mobile = useMediaQuery("(max-width: 860px)");
-  const [layout, setLayoutState] = useState<Layout>(storedLayout);
+  const [layout, setLayoutState] = useState<Layout>("split");
   /** Tabs on a phone always; on a desktop when chosen. */
   const tabbed = mobile || layout === "tabs";
   const setLayout = useCallback((next: Layout) => {
@@ -113,7 +178,7 @@ export default function BashPlayground() {
     }
   }, []);
   const session = useGitSession(DEFAULT_BASH_SCENARIO, "bash-playground", "bash");
-  const { ready, error, reset, openShell, closeShell } = session;
+  const { ready, error, reset, openShell, closeShell, state } = session;
 
   const [tree, setTree] = useState<Node>(() => leaf("t1"));
   const [panes, setPanes] = useState<PaneRecord[]>([{ id: "t1", title: "bash 1", startCwd: HOME }]);
@@ -121,21 +186,72 @@ export default function BashPlayground() {
   const [resetToken, setResetToken] = useState(0);
   const [drag, setDrag] = useState<Drag | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  /** Completed lines per terminal, this session. Feeds the Reset
+   *  confirmation and the reload restore. */
+  const [ran, setRan] = useState<Record<string, string[]>>({});
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
   const seq = useRef(1);
   const stage = useRef<HTMLDivElement>(null);
   const cwdOf = useRef(new Map<string, string>());
+  const paneRefs = useRef(new Map<string, TerminalPaneHandle | null>());
+  /** What a reload found in sessionStorage, played into the panes once the
+   *  session is ready. */
+  const restore = useRef<SavedSession | null>(null);
+  const [replay, setReplay] = useState<Record<string, string[]>>({});
+  const hydrated = useRef(false);
 
   const overlay = useBootOverlayVisibility(ready || Boolean(error));
   const order = useMemo(() => leaves(tree), [tree]);
   const count = order.length;
   const canSplit = count < MAX_TERMINALS;
+  const everything = useMemo(() => Object.values(ran).flat(), [ran]);
+  const anyRan = everything.length > 0;
 
-  // The shared editor theme, and the same default as every other playground.
-  useEffect(() => {
-    const theme = getStoredEditorTheme() ?? "github-light";
+  // The colour scheme follows the site-wide light/dark choice, as every
+  // other playground's does; the header pill flips it for every surface.
+  const setEditorTheme = useCallback((theme: string) => {
     applyThemePalette(theme);
     applyMode(theme);
+    setStoredEditorTheme(theme);
   }, []);
+  usePlaygroundThemeSync(setEditorTheme);
+
+  // Stored preferences are read after hydration so the server and the first
+  // client render agree.
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect -- one-time read of stored preferences after hydration */
+    setLayoutState(storedLayout());
+    const saved = readSession();
+    if (saved) {
+      restore.current = saved;
+      seq.current = Math.max(1, ...saved.panes.map((p) => Number(p.id.replace(/\D/g, "")) || 1));
+      setTree(saved.tree);
+      setPanes(saved.panes);
+      setFocusId(leaves(saved.tree)[0] ?? "t1");
+    }
+    hydrated.current = true;
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, []);
+
+  // Once the session is up, open the extra shells and hand each pane its
+  // history to replay.
+  useEffect(() => {
+    const saved = restore.current;
+    if (!ready || !saved) return;
+    restore.current = null;
+    for (const p of saved.panes) if (p.id !== "t1") void openShell(p.id, p.startCwd);
+    setReplay(saved.ran);
+    setRan(saved.ran);
+  }, [ready, openShell]);
+
+  // The session goes to sessionStorage as it changes, so a reload lands
+  // where the reader left off rather than on the starting files.
+  useEffect(() => {
+    if (!hydrated.current || restore.current) return;
+    writeSession({ tree, panes, ran });
+  }, [tree, panes, ran]);
 
   useEffect(() => {
     if (!notice) return;
@@ -182,6 +298,10 @@ export default function BashPlayground() {
     [canSplit, tabbed, openShell, rects],
   );
 
+  // The state setters are listed in the dependency arrays below because the
+  // React Compiler's lint infers them as dependencies here (they are stable,
+  // so nothing changes at runtime) and refuses to preserve the memoization
+  // otherwise.
   const closePane = useCallback(
     (id: string) => {
       if (count <= 1) return;
@@ -190,10 +310,16 @@ export default function BashPlayground() {
       void closeShell(id);
       setTree((t) => remove(t, id));
       setPanes((p) => p.filter((x) => x.id !== id));
+      setRan((r) => {
+        const rest = { ...r };
+        delete rest[id];
+        return rest;
+      });
       cwdOf.current.delete(id);
+      paneRefs.current.delete(id);
       if (focusId === id) setFocusId(next);
     },
-    [closeShell, count, focusId, order],
+    [closeShell, count, focusId, order, setTree, setFocusId],
   );
 
   const movePane = useCallback(
@@ -209,7 +335,7 @@ export default function BashPlayground() {
       const edge: Edge = dir === "left" ? "left" : dir === "right" ? "right" : dir === "up" ? "top" : "bottom";
       setTree((t) => move(t, id, target, edge));
     },
-    [tabbed, order, rects],
+    [tabbed, order, rects, setTree],
   );
 
   /** Which moves are open to a pane: along the strip in tabs, by geometry
@@ -237,7 +363,7 @@ export default function BashPlayground() {
       const other = order[idx + 1] ?? order[idx - 1];
       if (other) setTree((t) => swap(t, id, other));
     },
-    [order],
+    [order, setTree],
   );
 
   const focusDir = useCallback(
@@ -245,19 +371,73 @@ export default function BashPlayground() {
       const target = neighbor(focusId, dir, rects());
       if (target) setFocusId(target);
     },
-    [focusId, rects],
+    [focusId, rects, setFocusId],
   );
 
-  const handleReset = useCallback(async () => {
+  /** Start over: reseed the files, clear every terminal, and reopen every
+   *  extra shell at home. The layout is the reader's and stays. */
+  const startOver = useCallback(async () => {
+    setConfirmReset(false);
     setNotice(null);
-    await reset();
+    setRan({});
+    setReplay({});
     cwdOf.current = new Map();
     setPanes((p) => p.map((x) => ({ ...x, startCwd: HOME })));
     setResetToken((n) => n + 1);
+    await reset();
     // The reseed replaced the session's shells; reopen every extra one at
     // home so its next command does not land in a directory that is gone.
     for (const id of order) if (id !== "t1") void openShell(id, HOME);
   }, [openShell, order, reset]);
+
+  /** Reset, asking first when a terminal has done work. */
+  const handleReset = useCallback(() => {
+    if (!anyRan) void startOver();
+    else setConfirmReset(true);
+  }, [anyRan, startOver]);
+
+  /** Put a command on the focused terminal's prompt; nothing runs. */
+  const compose = useCallback(
+    (command: string) => {
+      setPaletteOpen(false);
+      const target = paneRefs.current.get(focusId) ?? paneRefs.current.get(order[0]);
+      target?.compose(command);
+    },
+    [focusId, order, setPaletteOpen],
+  );
+
+  const closePalette = useCallback(() => {
+    setPaletteOpen(false);
+    paneRefs.current.get(focusId)?.focus();
+  }, [focusId, setPaletteOpen]);
+
+  const recordRan = useCallback((id: string, command: string) => {
+    setRan((r) => ({ ...r, [id]: [...(r[id] ?? []), command].slice(-400) }));
+  }, []);
+
+  const renamePane = useCallback((id: string, title: string) => {
+    const next = title.trim();
+    if (next) setPanes((p) => p.map((x) => (x.id === id ? { ...x, title: next } : x)));
+  }, []);
+
+  /** A drag in the tab strip reorders the terminals. The split tree keeps
+   *  its shape: the leaves are swapped into the new order, so switching back
+   *  to Panes shows the same layout with the terminals rearranged. */
+  const reorderTabs = useCallback(
+    (next: TabDescriptor[]) => {
+      setTree((t) => {
+        let tree = t;
+        const target = next.map((d) => d.id);
+        for (let i = 0; i < target.length; i += 1) {
+          const current = leaves(tree);
+          if (current[i] === target[i] || !current.includes(target[i])) continue;
+          tree = swap(tree, current[i], target[i]);
+        }
+        return tree;
+      });
+    },
+    [setTree],
+  );
 
   // ── Drag to rearrange ────────────────────────────────────────────────
   const dragHandlers = useCallback(
@@ -290,7 +470,7 @@ export default function BashPlayground() {
       },
       onPointerCancel: () => setDrag(null),
     }),
-    [],
+    [setTree, setDrag],
   );
 
   useEffect(() => {
@@ -325,18 +505,32 @@ export default function BashPlayground() {
   const titleOf = (id: string) => panes.find((p) => p.id === id)?.title ?? id;
   const focusedTitle = titleOf(focusId);
 
+  /** The terminals as tabs, for the strip the editor playgrounds use. */
+  const tabDescriptors: TabDescriptor[] = order.map((id) => ({
+    id,
+    kind: "terminal",
+    label: titleOf(id),
+    icon: <Terminal size={12} aria-hidden="true" />,
+    closeable: count > 1,
+    renameable: true,
+    renameDialogTitle: "Rename terminal",
+    renameDialogDescription: "The name shown on the tab and in the terminal's title bar.",
+  }));
+
   const renderLeaf = (id: string) => {
     const rec = panes.find((p) => p.id === id);
     if (!rec) return null;
     return (
       <TerminalPane
         key={id}
+        ref={(handle) => {
+          paneRefs.current.set(id, handle);
+        }}
         id={id}
         title={rec.title}
         session={session}
         startCwd={rec.startCwd}
         focused={focusId === id}
-        hint={id === "t1" ? "A few files to poke at. Try ls, then cat README.md." : null}
         tabbed={tabbed}
         moves={() => moves(id)}
         canSwap={count > 1}
@@ -352,6 +546,8 @@ export default function BashPlayground() {
         onSwapNext={() => swapNext(id)}
         onRename={(title) => setPanes((p) => p.map((x) => (x.id === id ? { ...x, title } : x)))}
         onCwdChange={(cwd) => cwdOf.current.set(id, cwd)}
+        onRan={(command) => recordRan(id, command)}
+        replay={replay[id]}
       />
     );
   };
@@ -465,9 +661,17 @@ export default function BashPlayground() {
             <span className="bpg-btn-label">New</span>
           </button>
 
-          {!tabbed && (
+          {/* Split stays in the header in both layouts, disabled under Tabs,
+              so choosing a layout does not move the buttons beside it. On a
+              phone the header has no room for it. */}
+          {!mobile && (
             <Menu.Root>
-              <Menu.Trigger className="bpg-btn" disabled={!ready || !canSplit} aria-label="Split the focused terminal">
+              <Menu.Trigger
+                className="bpg-btn"
+                disabled={!ready || !canSplit || tabbed}
+                aria-label="Split the focused terminal"
+                title={tabbed ? "Splitting is for the Panes layout" : "Split the focused terminal"}
+              >
                 <SplitSquareHorizontal size={14} aria-hidden="true" />
                 <span className="bpg-btn-label">Split</span>
                 <ChevronDown size={12} aria-hidden="true" />
@@ -498,37 +702,118 @@ export default function BashPlayground() {
           <button
             type="button"
             className="bpg-btn"
-            onClick={() => void handleReset()}
+            onClick={handleReset}
             disabled={!ready}
-            title="Start over with the starting files. Nothing here is saved."
+            title="Start over with the starting files. Asks first when a terminal has done work."
             aria-label="Reset"
           >
             <RotateCcw size={14} aria-hidden="true" />
             <span className="bpg-btn-label">Reset</span>
           </button>
+
+          <ThemePillToggle className="bpg-theme" />
+
+          <Menu.Root>
+            <Menu.Trigger className="bpg-btn bpg-more" aria-label="More" title="More">
+              <MoreHorizontal size={16} aria-hidden="true" />
+            </Menu.Trigger>
+            <Menu.Portal>
+              <Menu.Positioner sideOffset={6} align="end" className={menuStyles.positioner}>
+                <Menu.Popup className={menuStyles.popup}>
+                  <Menu.Item className={menuStyles.item} disabled={!ready} onClick={() => setPaletteOpen(true)}>
+                    <TerminalSquare strokeWidth={1.8} aria-hidden />
+                    <span className={menuStyles.itemLabel}>
+                      All commands
+                      <span className={menuStyles.itemNote}>Fills the prompt. You press Enter.</span>
+                    </span>
+                  </Menu.Item>
+                  <Menu.Item className={menuStyles.item} onClick={() => setAboutOpen(true)}>
+                    <Info strokeWidth={1.8} aria-hidden />
+                    <span className={menuStyles.itemLabel}>
+                      About this shell
+                      <span className={menuStyles.itemNote}>What is installed, and what it cannot do</span>
+                    </span>
+                  </Menu.Item>
+                </Menu.Popup>
+              </Menu.Positioner>
+            </Menu.Portal>
+          </Menu.Root>
         </header>
 
         <h1 className="playground-sr-title">Bash Playground</h1>
 
+        {/* Reset wipes the files and every terminal. With work done it asks
+            first, as every editor playground does. */}
+        <Dialog.Root open={confirmReset} onOpenChange={setConfirmReset}>
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup" role="alertdialog">
+              <Dialog.Title className="confirm-title">Start over?</Dialog.Title>
+              <Dialog.Description className="confirm-desc">
+                Resetting replaces the files with the starting set and clears every terminal ({everything.length}{" "}
+                command{everything.length === 1 ? "" : "s"} so far). This can&apos;t be undone.
+              </Dialog.Description>
+              <div className="confirm-actions">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">Cancel</Dialog.Close>
+                <Dialog.Close className="confirm-btn confirm-btn-danger" onClick={() => void startOver()}>
+                  Reset
+                </Dialog.Close>
+              </div>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+
+        <Dialog.Root open={aboutOpen} onOpenChange={setAboutOpen}>
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup bpg-about">
+              <Dialog.Title className="confirm-title">About this shell</Dialog.Title>
+              <Dialog.Description className="confirm-desc">{BASH_ABOUT.shell}</Dialog.Description>
+              <p className="bpg-about-label">Installed</p>
+              <p className="bpg-about-list">
+                {BASH_ABOUT.installed.map((c) => (
+                  <code key={c}>{c}</code>
+                ))}
+              </p>
+              <p className="bpg-about-label">Not here</p>
+              <p className="bpg-about-list">
+                {BASH_ABOUT.missing.map((c) => (
+                  <code key={c}>{c}</code>
+                ))}
+              </p>
+              <ul className="bpg-about-notes">
+                {BASH_ABOUT.notes.map((n) => (
+                  <li key={n}>{n}</li>
+                ))}
+              </ul>
+              <div className="confirm-actions">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">Close</Dialog.Close>
+              </div>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+
         <div className={`playground-body bpg-body${drag?.active ? " dragging" : ""}`} ref={stage} data-layout={tabbed ? "tabs" : "split"}>
+          {paletteOpen && (
+            <>
+              <button type="button" className="gitx-palette-backdrop" aria-label="Close the command list" onClick={closePalette} tabIndex={-1} />
+              <div className="bpg-palette" role="dialog" aria-modal="true" aria-label="All commands">
+                <BashCommandPalette tree={state.tree} dirs={state.dirs} onCompose={compose} onClose={closePalette} />
+              </div>
+            </>
+          )}
+
           {tabbed && (
-            <nav className="bpg-tabs" aria-label="Terminals">
-              {order.map((id) => (
-                <span key={id} className={`bpg-tab${focusId === id ? " active" : ""}`}>
-                  <button type="button" className="bpg-tab-btn" onClick={() => setFocusId(id)} aria-current={focusId === id}>
-                    {titleOf(id)}
-                  </button>
-                  {focusId === id && count > 1 && (
-                    <button type="button" className="bpg-tab-close" onClick={() => closePane(id)} aria-label={`Close ${titleOf(id)}`}>
-                      <X size={12} aria-hidden="true" />
-                    </button>
-                  )}
-                </span>
-              ))}
-              <button type="button" className="bpg-tab add" onClick={() => addPane(focusId, "row")} disabled={!ready || !canSplit} aria-label="New terminal">
-                <Plus size={14} aria-hidden="true" />
-              </button>
-            </nav>
+            <TabBar
+              tabs={tabDescriptors}
+              activeTabId={focusId}
+              onSelectTab={setFocusId}
+              onCloseTab={count > 1 ? closePane : undefined}
+              onAddTab={ready && canSplit ? () => addPane(focusId, "row") : undefined}
+              onRenameTab={renamePane}
+              onReorderTabs={count > 1 ? reorderTabs : undefined}
+              className="bpg-tabbar"
+            />
           )}
 
           <div className="bpg-stage" data-focus={focusId}>

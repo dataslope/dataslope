@@ -35,8 +35,13 @@ import {
  *  defaults are sized for server sandboxes, far too generous for a tab. */
 const EXECUTION_LIMITS = {
   maxSourceBytes: 64 * 1024,
-  maxCommandCount: 5_000,
-  maxLoopIterations: 10_000,
+  // Sized for a lesson, not a server: a 20,000-step counter loop is an
+  // ordinary exercise ("how long does a loop take?") and costs two commands
+  // per step. The wall-clock budget is what actually keeps the tab
+  // responsive; the counts are a backstop under it.
+  maxCommandCount: 250_000,
+  maxLoopIterations: 100_000,
+  maxExecutionTimeMs: 20_000,
   maxCallDepth: 32,
   maxTraversalEntries: 20_000,
 };
@@ -336,6 +341,7 @@ self.addEventListener("message", (event: MessageEvent<GitWorkerRequest>) => {
             stdout: result.stdout,
             stderr: result.stderr,
             exitCode: result.exitCode,
+            ...(result.incomplete ? { incomplete: true } : {}),
             state,
           });
           return;

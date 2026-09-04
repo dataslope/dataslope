@@ -49,6 +49,11 @@
   background: var(--primary-glow);
 }
 
+/* The header's ellipsis: an icon-only ghost, square. */
+.bpg-more {
+  padding: 4px 6px;
+}
+
 /* Panes or tabs: two ghosts, the chosen one lit. */
 .bpg-layout {
   display: inline-flex;
@@ -425,79 +430,17 @@
 
 /* ─── Tabs: one terminal at a time, a strip to switch ─── */
 /* A phone always gets this; a desktop can choose it from the header. The
-   split tree is kept underneath, so switching back shows the same terminals
-   where they were. */
-.bpg-tabs {
-  display: none;
-}
-
-.bpg-body[data-layout="tabs"] .bpg-tabs {
-  display: flex;
-  align-items: stretch;
-  padding: 0 8px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg);
-  overflow-x: auto;
-  flex: none;
-  scrollbar-width: none;
-}
-
-.bpg-tabs::-webkit-scrollbar {
-  display: none;
-}
-
-/* Underline tabs, the same shape as the Git playground's pane switch. */
-.bpg-tab {
-  display: inline-flex;
-  align-items: center;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  color: var(--text-dim);
+   strip is the editor playgrounds' `TabBar` (`.playground-tabbar` in
+   playground.css), so a terminal tab is a file tab: close, rename, drag to
+   reorder, `+` to add. The split tree is kept underneath, so switching back
+   shows the same terminals where they were. */
+.bpg-tabbar {
   flex: none;
 }
 
-.bpg-tab.active {
-  border-bottom-color: var(--primary);
-  color: var(--primary);
-}
-
-.bpg-tab-btn,
-.bpg-tab.add {
-  min-height: 40px;
-  padding: 4px 12px;
-  border: none;
-  background: transparent;
-  color: inherit;
-  font-family: var(--font-ui);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.bpg-tab.add {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 40px;
-  padding: 0;
-  cursor: pointer;
-}
-
-.bpg-tab.add:disabled {
-  opacity: 0.4;
-}
-
-.bpg-tab-close {
-  min-height: 40px;
-  width: 28px;
-  margin-left: -6px;
-  border: none;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+/* The header's theme pill sits with the buttons, a touch of air before it. */
+.bpg-theme {
+  margin-left: 4px;
 }
 
 /* Every slot stacks in the one cell, sized by it rather than by the split
@@ -553,5 +496,88 @@
   .bpg-gutter,
   .bpg-pane-head {
     transition: none;
+  }
+}
+
+/* ─── All commands, and About this shell ─── */
+/* Both live in the header's ellipsis menu. The palette opens as a panel
+   under the header's right edge, over the terminals. */
+.bpg-palette {
+  position: absolute;
+  right: 10px;
+  top: 8px;
+  width: min(380px, calc(100vw - 24px));
+  max-height: min(70vh, 560px);
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.35);
+  z-index: 21;
+}
+
+/* "About this shell": the confirm dialog's frame with a list in it. */
+.bpg-about {
+  width: min(520px, calc(100vw - 32px));
+}
+
+.bpg-about-label {
+  margin: 4px 0 0;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.bpg-about-list {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.bpg-about-list code {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--bg3);
+  color: var(--text);
+}
+
+.bpg-about-notes {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.bpg-about-notes li + li {
+  margin-top: 4px;
+}
+
+@media (max-width: 860px) {
+  /* Every control clears 40px for a thumb. */
+  .bpg-pane-menu,
+  .bpg-pane-close,
+  .bpg-grip {
+    min-height: 40px;
+  }
+
+  .bpg-pane-menu,
+  .bpg-pane-close,
+  .bpg-grip {
+    width: 40px;
+    height: 40px;
+  }
+
+  .bpg-palette {
+    right: 8px;
+    left: 8px;
+    width: auto;
   }
 }

@@ -9,7 +9,7 @@
  * instead of dragging.
  */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Menu } from "@base-ui/react/menu";
 import {
   ArrowDown,
@@ -34,6 +34,13 @@ import type { Dir } from "./splitTree";
 
 export type MoveDir = "left" | "right" | "up" | "down";
 
+/** What the playground can ask a pane to do: put a command on its prompt
+ *  (a "Try this" step, a palette row), or take the keyboard. */
+export interface TerminalPaneHandle {
+  compose: (command: string) => void;
+  focus: () => void;
+}
+
 export interface PaneDragHandlers {
   onPointerDown: (e: React.PointerEvent<HTMLElement>) => void;
   onPointerMove: (e: React.PointerEvent<HTMLElement>) => void;
@@ -48,9 +55,6 @@ interface Props {
   /** Where this shell started; a split inherits its source's directory. */
   startCwd: string;
   focused: boolean;
-  /** The scenario line, shown in the first terminal only, before anything
-   *  has been typed. */
-  hint?: string | null;
   /** True in the tab layout, where moves are left and right along the strip. */
   tabbed: boolean;
   /** Which moves are open to this pane right now; asked as the menu opens,
@@ -73,15 +77,19 @@ interface Props {
   /** The shell's directory, whenever it changes, so a split from this pane
    *  can start where it is standing. */
   onCwdChange?: (cwd: string) => void;
+  /** Every line that ran to completion, for the session record. */
+  onRan?: (command: string) => void;
+  /** Lines to play once the session is ready: the pane's own history from
+   *  before a reload, so the transcript and the shell come back together. */
+  replay?: string[];
 }
 
-export function TerminalPane({
+export const TerminalPane = forwardRef<TerminalPaneHandle, Props>(function TerminalPane({
   id,
   title,
   session,
   startCwd,
   focused,
-  hint = null,
   tabbed,
   moves,
   canSwap,
@@ -97,9 +105,29 @@ export function TerminalPane({
   onSwapNext,
   onRename,
   onCwdChange,
-}: Props) {
-  const pane = useShellPane(session, { shell: id, startCwd });
+  onRan,
+  replay,
+}: Props, ref) {
+  const pane = useShellPane(session, { shell: id, startCwd, onRan });
   const termRef = useRef<GitTerminalHandle>(null);
+  const replayed = useRef(false);
+
+  useImperativeHandle(ref, () => ({
+    compose: (command: string) => {
+      pane.setInput(command);
+      requestAnimationFrame(() => termRef.current?.focus());
+    },
+    focus: () => termRef.current?.focus(),
+  }));
+
+  // The pane's history from before a reload plays once the shell is up, so
+  // the scrollback and the shell state come back together.
+  const { runLines } = pane;
+  useEffect(() => {
+    if (!session.ready || !replay?.length || replayed.current) return;
+    replayed.current = true;
+    void runLines(replay);
+  }, [session.ready, replay, runLines]);
   const [renaming, setRenaming] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [can, setCan] = useState<Record<MoveDir, boolean>>({ left: true, right: true, up: true, down: true });
@@ -285,7 +313,10 @@ export function TerminalPane({
           placeholder=""
           inlineInput
           onWrite={pane.write}
-          placeholderHint={hint ? <p className="git-terminal-hint">{hint}</p> : null}
+          continuation={pane.continuation}
+          onCancel={pane.cancel}
+          queueWhileBusy={session.ready}
+          placeholderHint={null}
         />
       </div>
 
@@ -296,4 +327,4 @@ export function TerminalPane({
       )}
     </section>
   );
-}
+});

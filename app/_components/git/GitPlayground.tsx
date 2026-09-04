@@ -14,9 +14,11 @@
  * - **The terminal is the only mutator.** Every chip, card and menu item
  *   composes a command into the prompt; the reader presses Enter. The
  *   grading and the transcript depend on that.
- * - **Memory-only.** Nothing is saved. The command history is the work
- *   product, which is also what makes Undo cheap: reset and replay it minus
- *   the last step.
+ * - **The command history is the work product.** Nothing else is saved.
+ *   That is what makes Undo cheap (reset and replay it minus the last step),
+ *   what lets a Reset or a scenario change be undone (the history is kept
+ *   and replayed back), and what survives a reload: the steps go to
+ *   `sessionStorage` and are replayed on the next load of this tab.
  * - **Editing a file is not Git.** The editor writes to the working
  *   directory and is exempt from the rule above; a save is recorded as a
  *   step so Undo can replay it.
@@ -25,7 +27,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Select } from "@base-ui/react/select";
+import { Dialog } from "@base-ui/react/dialog";
 import {
+  ArrowRight,
   Check,
   ChevronDown,
   Code2,
@@ -44,7 +48,9 @@ import { PLAYGROUNDS } from "../playgrounds";
 import { useIsFramed } from "../useIsFramed";
 import { LANGUAGE_ICONS, LANGUAGE_ICON_SIZE_FACTOR } from "../languageIcons";
 import { PlaygroundBootOverlay, useBootOverlayVisibility } from "../PlaygroundBootOverlay";
-import { applyThemePalette, getStoredEditorTheme, applyMode } from "../playgroundTheme";
+import { applyThemePalette, applyMode, setStoredEditorTheme } from "../playgroundTheme";
+import { usePlaygroundThemeSync } from "../playgroundThemeSync";
+import { ThemePillToggle } from "../ThemePillToggle";
 import { useGitSession } from "./gitRuntime";
 import { GitTerminal, type GitTerminalHandle, type TranscriptEntry } from "./GitTerminal";
 import { CommitGraph } from "./CommitGraph";
@@ -55,6 +61,7 @@ import { makePathCompleter } from "./pathCompleter";
 import { changedFiles, isConflicted, narrate, stagedFiles, stepDone, suggest, unstagedFiles } from "./repoFacts";
 import { SCENARIOS, DEFAULT_SCENARIO, scenarioById } from "./scenarios";
 import { SESSION_ROOTS, type FileStatus, type RepoState } from "./protocol";
+import { joinForHistory } from "../bash/useShellPane";
 import "../playground.css";
 import "./gitPlayground.css";
 
@@ -64,17 +71,24 @@ const SHELL_COMMANDS = [
 ];
 const GIT_SUBCOMMANDS = [
   "init", "status", "add", "commit", "log", "diff", "branch", "checkout", "switch",
-  "merge", "reset", "restore", "rm", "show", "tag", "cat-file", "help",
+  "merge", "reset", "restore", "rm", "show", "tag", "cat-file", "config", "help",
 ];
 
 /** One thing the reader did, in the order they did it. Undo replays all but
  *  the last onto a fresh scenario. */
 type Step = { kind: "command"; command: string } | { kind: "write"; path: string; content: string };
+/** A session set aside by Reset or a scenario change, so Undo can bring it
+ *  back: replaying its steps onto its scenario reproduces it exactly. */
+type Shelved = { scenario: string; steps: Step[] };
 type Pane = "changes" | "history";
 type Snap = "peek" | "half" | "full";
+/** A destructive action waiting on the reader's say-so. */
+type Pending = { kind: "reset" } | { kind: "scenario"; id: string };
 
 const ROOT = SESSION_ROOTS.git;
 const PREFS = { internals: "git_playground_internals", consoleH: "git_playground_console_h" };
+/** The tab's own session: scenario plus steps, replayed on the next load. */
+const SESSION_KEY = "git_playground_session";
 const fileKey = (f: FileStatus) => `${f.path}:${f.head}${f.workdir}${f.stage}`;
 
 function useMediaQuery(query: string): boolean {
@@ -104,6 +118,37 @@ function writePref(key: string, value: string) {
   } catch {
     /* private mode; the preference lasts the session */
   }
+}
+
+function readSession(): Shelved | null {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<Shelved>;
+    if (typeof parsed.scenario !== "string" || !Array.isArray(parsed.steps)) return null;
+    if (!SCENARIOS.some((s) => s.id === parsed.scenario)) return null;
+    return { scenario: parsed.scenario, steps: parsed.steps.slice(0, 500) as Step[] };
+  } catch {
+    return null;
+  }
+}
+
+function writeSession(session: Shelved | null) {
+  try {
+    if (session && session.steps.length) sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    else sessionStorage.removeItem(SESSION_KEY);
+  } catch {
+    /* storage blocked; the session lasts until the tab is closed or reloaded */
+  }
+}
+
+/** The stretch of a composed command a reader is meant to replace: the
+ *  message inside `-m "…"`. Null for everything else. */
+export function placeholderRange(command: string): [number, number] | null {
+  const m = /-a?m "([^"]*)"/.exec(command);
+  if (!m || !m[1]) return null;
+  const start = m.index + m[0].indexOf('"') + 1;
+  return [start, start + m[1].length];
 }
 
 /** One line under the prompt, in the reader's words, always current. */
@@ -137,6 +182,7 @@ export default function GitPlayground() {
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<string[]>([]);
   const [steps, setSteps] = useState<Step[]>([]);
+  const [shelved, setShelved] = useState<Shelved[]>([]);
   const [busy, setBusy] = useState(false);
   const [narration, setNarration] = useState<string | null>(null);
   const [changed, setChanged] = useState<Set<string>>(new Set());
@@ -148,6 +194,9 @@ export default function GitPlayground() {
   const [consoleH, setConsoleH] = useState(300);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [tryDismissed, setTryDismissed] = useState(false);
+  const [pending, setPending] = useState<Pending | null>(null);
+  /** Lines waiting at the `>` prompt for the rest of their command. */
+  const [continuation, setContinuation] = useState<string[]>([]);
 
   const entryId = useRef(0);
   const promptAt = useRef(new Map<number, string>());
@@ -155,25 +204,51 @@ export default function GitPlayground() {
   const prevState = useRef<RepoState | null>(null);
   const previousFiles = useRef<Map<string, string>>(new Map());
   const replaying = useRef(false);
+  const busyRef = useRef(false);
+  const queue = useRef<string[]>([]);
+  const continuationRef = useRef<string[]>([]);
   const termRef = useRef<GitTerminalHandle>(null);
   const drag = useRef<{ y: number; h: number } | null>(null);
+  /** Steps saved by an earlier load of this tab, replayed once the session
+   *  they belong to is ready. */
+  const restore = useRef<Shelved | null>(null);
+  const hydrated = useRef(false);
 
   const overlay = useBootOverlayVisibility(ready || Boolean(error));
   const scenarioDef = scenarioById(scenario);
 
-  // The shared editor theme, and the same default as every other playground.
+  // The colour scheme follows the site-wide light/dark choice, as every
+  // other playground's does; the header pill flips it for every surface.
+  const setEditorTheme = useCallback((theme: string) => {
+    applyThemePalette(theme);
+    applyMode(theme);
+    setStoredEditorTheme(theme);
+  }, []);
+  usePlaygroundThemeSync(setEditorTheme);
+
   // Preferences are read here rather than in a lazy initializer so the server
   // and the first client render agree; the same arrangement Playground.tsx
   // uses for its own stored settings.
   useEffect(() => {
-    const theme = getStoredEditorTheme() ?? "github-light";
-    applyThemePalette(theme);
-    applyMode(theme);
     /* eslint-disable react-hooks/set-state-in-effect -- one-time read of stored preferences after hydration */
     setInternals(readPref(PREFS.internals, false, (r) => r === "1"));
     setConsoleH(readPref(PREFS.consoleH, 300, (r) => Math.max(160, Number(r) || 300)));
+    // A reload keeps the session: its steps replay once the runtime is up.
+    const saved = readSession();
+    if (saved) {
+      restore.current = saved;
+      if (saved.scenario !== DEFAULT_SCENARIO) setScenario(saved.scenario);
+    }
+    hydrated.current = true;
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
+
+  // Everything the session is made of goes to sessionStorage as it happens,
+  // so a reload lands where the reader left off rather than on the seed.
+  useEffect(() => {
+    if (!hydrated.current || restore.current) return;
+    writeSession({ scenario, steps });
+  }, [scenario, steps]);
 
   // Ring the chips the last command actually moved, briefly.
   useEffect(() => {
@@ -205,21 +280,31 @@ export default function GitPlayground() {
   }, [state, ready]);
 
   const append = useCallback(
-    (command: string, result: { stdout: string; stderr: string; exitCode: number }, at: string) => {
+    (
+      command: string,
+      result: { stdout: string; stderr: string; exitCode: number },
+      at: string,
+      continued = false,
+    ) => {
       const id = (entryId.current += 1);
       promptAt.current.set(id, at);
-      setTranscript((t) => [...t, { id, command, ...result }]);
+      setTranscript((t) => [...t, { id, command, ...result, ...(continued ? { continuation: true } : {}) }]);
     },
     [],
   );
 
+  /** Run one complete command line (possibly several lines joined) and
+   *  record it. Used by typing, by Undo's replay and by a restore. */
   const runOne = useCallback(
     async (command: string) => {
       const at = cwdRef.current;
       try {
         const result = await exec(command);
         cwdRef.current = result.cwd;
-        append(command, result, at);
+        const lines = command.split("\n");
+        lines.forEach((line, i) => {
+          append(line, i === lines.length - 1 ? result : { stdout: "", stderr: "", exitCode: 0 }, at, i > 0);
+        });
       } catch (e) {
         append(command, { stdout: "", stderr: `${(e as Error).message}\n`, exitCode: 1 }, at);
       }
@@ -227,32 +312,79 @@ export default function GitPlayground() {
     [append, exec],
   );
 
-  const run = useCallback(
-    async (command: string) => {
-      if (command === "clear") {
+  /**
+   * One typed line. With lines waiting at the `>` prompt it is the next piece
+   * of their command; only when the shell says the whole thing is complete
+   * does it run, join the history, and count as a step.
+   */
+  const perform = useCallback(
+    async (line: string) => {
+      const waiting = continuationRef.current;
+      if (line === "clear" && !waiting.length) {
         setTranscript([]);
-        setInput("");
-        setHistory((h) => [...h, command]);
+        setHistory((h) => [...h, line]);
         return;
       }
-      if (command === "") {
+      if (line === "" && !waiting.length) {
         const id = (entryId.current += 1);
         promptAt.current.set(id, cwdRef.current);
         setTranscript((t) => [...t, { id, command: "", stdout: "", stderr: "", exitCode: 0 }]);
-        setInput("");
         return;
       }
-      setBusy(true);
-      setInput("");
-      setHistory((h) => [...h, command]);
-      setSteps((s) => [...s, { kind: "command", command }]);
+      const lines = [...waiting, line];
+      const at = cwdRef.current;
       try {
-        await runOne(command);
+        const result = await exec(lines.join("\n"));
+        if (result.incomplete) {
+          append(line, { stdout: "", stderr: "", exitCode: 0 }, at, waiting.length > 0);
+          continuationRef.current = lines;
+          setContinuation(lines);
+          return;
+        }
+        cwdRef.current = result.cwd;
+        append(line, result, at, waiting.length > 0);
+      } catch (e) {
+        append(line, { stdout: "", stderr: `${(e as Error).message}\n`, exitCode: 1 }, at, waiting.length > 0);
+      }
+      continuationRef.current = [];
+      setContinuation([]);
+      setHistory((h) => [...h, joinForHistory(lines)]);
+      setSteps((s) => [...s, { kind: "command", command: lines.join("\n") }]);
+    },
+    [append, exec],
+  );
+
+  const run = useCallback(
+    async (line: string) => {
+      setInput("");
+      // A line typed while a command runs waits its turn, as in a shell.
+      if (busyRef.current) {
+        queue.current.push(line);
+        return;
+      }
+      busyRef.current = true;
+      setBusy(true);
+      try {
+        await perform(line);
+        while (queue.current.length) await perform(queue.current.shift()!);
       } finally {
+        busyRef.current = false;
         setBusy(false);
       }
     },
-    [runOne],
+    [perform],
+  );
+
+  /** Ctrl-C: echo the abandoned line with `^C` and drop any half-typed
+   *  multi-line command with it. */
+  const cancel = useCallback(
+    (abandoned: string) => {
+      append(`${abandoned}^C`, { stdout: "", stderr: "", exitCode: 130 }, cwdRef.current, continuationRef.current.length > 0);
+      continuationRef.current = [];
+      setContinuation([]);
+      setInput("");
+    },
+    [append],
   );
 
   const clearSession = useCallback(() => {
@@ -264,14 +396,67 @@ export default function GitPlayground() {
     setEditing(null);
     setNewFile(null);
     setTryDismissed(false);
+    setContinuation([]);
+    continuationRef.current = [];
+    queue.current = [];
     promptAt.current = new Map();
     previousFiles.current = new Map();
     prevState.current = null;
     cwdRef.current = ROOT;
   }, []);
 
-  const handleReset = useCallback(
+  /** Replay a list of steps onto the fresh session, quietly. */
+  const replay = useCallback(
+    async (list: Step[]) => {
+      replaying.current = true;
+      try {
+        for (const step of list) {
+          if (step.kind === "command") await runOne(step.command);
+          else await writeFile(step.path, step.content);
+        }
+        // Let the last replayed state commit before narration resumes, so the
+        // replay itself does not narrate.
+        await new Promise((r) => requestAnimationFrame(() => r(null)));
+      } finally {
+        replaying.current = false;
+      }
+    },
+    [runOne, writeFile],
+  );
+
+  // The saved session replays once the runtime is ready on its scenario.
+  useEffect(() => {
+    const saved = restore.current;
+    if (!ready || !saved || saved.scenario !== scenario) return;
+    restore.current = null;
+    if (!saved.steps.length) return;
+    let cancelled = false;
+    setBusy(true);
+    busyRef.current = true;
+    void (async () => {
+      try {
+        await replay(saved.steps);
+        if (!cancelled) {
+          setSteps(saved.steps);
+          setHistory(saved.steps.filter((s) => s.kind === "command").map((s) => joinForHistory((s as { command: string }).command.split("\n"))));
+          setNarration("Restored your session from before the reload.");
+        }
+      } finally {
+        busyRef.current = false;
+        setBusy(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [ready, scenario, replay]);
+
+  /** Start over, or start another scenario. The session being left is
+   *  shelved so Undo can bring it back. */
+  const startOver = useCallback(
     async (next: string) => {
+      setPending(null);
+      if (steps.length) setShelved((s) => [...s.slice(-4), { scenario, steps }]);
       setBusy(true);
       clearSession();
       try {
@@ -281,52 +466,95 @@ export default function GitPlayground() {
         setBusy(false);
       }
     },
-    [clearSession, reset, scenario],
+    [clearSession, reset, scenario, steps],
   );
 
-  /** Reset, then replay every step but the last. Exact, because the scenario
-   *  is itself a replayed script and the session is memory-only. */
+  /** Reset or switch scenario, asking first when there is work to lose. */
+  const handleReset = useCallback(
+    (next: string) => {
+      if (steps.length === 0 || transcript.length === 0) {
+        void startOver(next);
+        return;
+      }
+      setPending(next === scenario ? { kind: "reset" } : { kind: "scenario", id: next });
+    },
+    [scenario, startOver, steps.length, transcript.length],
+  );
+
+  /**
+   * Reset, then replay every step but the last. Exact, because the scenario
+   * is itself a replayed script and the session is memory-only. With no
+   * steps to take back, Undo restores the session a Reset or a scenario
+   * change set aside.
+   */
   const undo = useCallback(async () => {
-    if (!steps.length || busy) return;
+    if (busy) return;
+    if (!steps.length) {
+      const back = shelved[shelved.length - 1];
+      if (!back) return;
+      setShelved((s) => s.slice(0, -1));
+      setBusy(true);
+      busyRef.current = true;
+      clearSession();
+      try {
+        if (back.scenario !== scenario) {
+          // Replay once the other scenario's session is ready.
+          restore.current = { ...back };
+          setScenario(back.scenario);
+          return;
+        }
+        await reset();
+        await replay(back.steps);
+        setSteps(back.steps);
+        setHistory(back.steps.filter((s) => s.kind === "command").map((s) => joinForHistory((s as { command: string }).command.split("\n"))));
+        setNarration("Undid the reset: your session is back.");
+      } finally {
+        busyRef.current = false;
+        setBusy(false);
+      }
+      return;
+    }
     const keep = steps.slice(0, -1);
     setBusy(true);
-    replaying.current = true;
+    busyRef.current = true;
     setTranscript([]);
     setInput("");
     setEditing(null);
     setSteps(keep);
-    setHistory(keep.filter((s) => s.kind === "command").map((s) => (s as { command: string }).command));
+    setHistory(keep.filter((s) => s.kind === "command").map((s) => joinForHistory((s as { command: string }).command.split("\n"))));
     promptAt.current = new Map();
     cwdRef.current = ROOT;
     try {
       await reset();
-      for (const step of keep) {
-        if (step.kind === "command") await runOne(step.command);
-        else await writeFile(step.path, step.content);
-      }
-      // Let the last replayed state commit before narration resumes, so the
-      // replay itself does not narrate.
-      await new Promise((r) => requestAnimationFrame(() => r(null)));
+      await replay(keep);
       const last = steps[steps.length - 1];
       setNarration(
-        last.kind === "command" ? `Undid: ${last.command}` : `Undid the edit to ${last.path}.`,
+        last.kind === "command" ? `Undid: ${last.command.replace(/\n/g, "; ")}` : `Undid the edit to ${last.path}.`,
       );
     } finally {
-      replaying.current = false;
+      busyRef.current = false;
       setBusy(false);
     }
-  }, [busy, reset, runOne, steps, writeFile]);
+  }, [busy, clearSession, replay, reset, scenario, shelved, steps]);
 
-  /** A chip, a card or a menu item composes into the prompt; nothing runs. */
+  /** A chip, a card or a menu item composes into the prompt; nothing runs.
+   *  The caret lands at the end, or on the message a commit chip expects the
+   *  reader to replace. */
   const compose = useCallback(
     (command: string) => {
       setInput(command);
       setPaletteOpen(false);
       if (mobile && snap === "peek") setSnap("half");
-      requestAnimationFrame(() => termRef.current?.focus());
+      const select = placeholderRange(command);
+      requestAnimationFrame(() => termRef.current?.focus(select ? { select } : undefined));
     },
     [mobile, snap],
   );
+
+  const closePalette = useCallback(() => {
+    setPaletteOpen(false);
+    requestAnimationFrame(() => termRef.current?.focus());
+  }, []);
 
   const write = useCallback(({ echo, text }: { echo: string | null; text: string }) => {
     const id = (entryId.current += 1);
@@ -414,11 +642,15 @@ export default function GitPlayground() {
   const conflicted = state.files.find((f) => isConflicted(f, state.merging)) ?? null;
   const tryThis = scenarioDef.tryThis;
   const tryDone = tryThis.map((s) => stepDone(s, history));
-  const showTry = !tryDismissed && tryThis.length > 0 && tryDone.some((d) => !d) && !state.merging;
+  const tryFinished = tryThis.length > 0 && tryDone.every(Boolean);
+  const showTry = !tryDismissed && tryThis.length > 0 && !state.merging;
+  const nextScenario = SCENARIOS[(SCENARIOS.findIndex((s) => s.id === scenario) + 1) % SCENARIOS.length];
   const editingWord = editing
     ? placeFiles(state.files, state.merging).find((c) => c.path === editing)?.word ?? ""
     : "";
   const disabled = busy || !ready;
+  const canUndo = steps.length > 0 || shelved.length > 0;
+  const pendingLabel = pending?.kind === "scenario" ? scenarioById(pending.id).label : null;
 
   const branchChip = !state.initialized
     ? "no repository"
@@ -498,7 +730,7 @@ export default function GitPlayground() {
 
           <div className="header-sep" />
 
-          <Select.Root value={scenario} onValueChange={(v) => v && void handleReset(v)}>
+          <Select.Root value={scenario} onValueChange={(v) => v && v !== scenario && handleReset(v)}>
             <Select.Trigger className="gitx-btn gitx-scenario" aria-label="Scenario" disabled={busy}>
               <LayoutList size={14} aria-hidden="true" />
               <Select.Value className="gitx-scenario-label">{scenarioDef.label}</Select.Value>
@@ -529,8 +761,14 @@ export default function GitPlayground() {
             type="button"
             className="gitx-btn"
             onClick={() => void undo()}
-            disabled={disabled || steps.length === 0}
-            title={steps.length ? "Undo the last thing you did" : "Nothing to undo yet"}
+            disabled={disabled || !canUndo}
+            title={
+              steps.length
+                ? "Undo the last thing you did"
+                : shelved.length
+                  ? "Bring back the session you reset or switched away from"
+                  : "Nothing to undo yet"
+            }
             aria-label="Undo"
           >
             <Undo2 size={14} aria-hidden="true" />
@@ -539,30 +777,78 @@ export default function GitPlayground() {
           <button
             type="button"
             className="gitx-btn"
-            onClick={() => void handleReset(scenario)}
+            onClick={() => handleReset(scenario)}
             disabled={disabled}
-            title="Start this scenario over. Nothing here is saved."
+            title="Start this scenario over. Undo brings the session back."
             aria-label="Reset"
           >
             <RotateCcw size={14} aria-hidden="true" />
             <span className="gitx-btn-label">Reset</span>
           </button>
+
+          <ThemePillToggle className="gitx-theme" />
         </header>
 
         <h1 className="playground-sr-title">Git Playground</h1>
 
+        {/* Reset and a scenario change wipe the repository. With work in it
+            they ask first, as every editor playground does. Undo can still
+            bring the session back afterwards. */}
+        <Dialog.Root open={pending !== null} onOpenChange={(open) => { if (!open) setPending(null); }}>
+          <Dialog.Portal>
+            <Dialog.Backdrop className="confirm-backdrop" />
+            <Dialog.Popup className="confirm-popup" role="alertdialog">
+              <Dialog.Title className="confirm-title">
+                {pending?.kind === "scenario" ? `Switch to “${pendingLabel}”?` : "Start this scenario over?"}
+              </Dialog.Title>
+              <Dialog.Description className="confirm-desc">
+                {pending?.kind === "scenario" ? "Switching scenarios" : "Resetting"} replaces the repository you have
+                built here ({steps.length} step{steps.length === 1 ? "" : "s"}) and clears the terminal. Undo can bring
+                it back until you make new changes.
+              </Dialog.Description>
+              <div className="confirm-actions">
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">Cancel</Dialog.Close>
+                <Dialog.Close
+                  className="confirm-btn confirm-btn-danger"
+                  onClick={() => {
+                    if (pending) void startOver(pending.kind === "scenario" ? pending.id : scenario);
+                  }}
+                >
+                  {pending?.kind === "scenario" ? "Switch scenario" : "Reset"}
+                </Dialog.Close>
+              </div>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+
         <div className="playground-body gitx-body" style={{ "--gitx-console-h": `${consoleH}px` } as React.CSSProperties}>
           <div className="gitx-stage" data-pane={pane}>
-            <nav className="gitx-seg" aria-label="Pane">
-              <button type="button" className={pane === "changes" ? "gitx-seg-btn active" : "gitx-seg-btn"} onClick={() => setPane("changes")} aria-current={pane === "changes"}>
+            <div className="gitx-seg" role="tablist" aria-label="Pane">
+              <button
+                type="button"
+                role="tab"
+                id="gitx-tab-changes"
+                aria-controls="gitx-pane-changes"
+                aria-selected={pane === "changes"}
+                className={pane === "changes" ? "gitx-seg-btn active" : "gitx-seg-btn"}
+                onClick={() => setPane("changes")}
+              >
                 <Files size={14} aria-hidden="true" /> Changes
               </button>
-              <button type="button" className={pane === "history" ? "gitx-seg-btn active" : "gitx-seg-btn"} onClick={() => setPane("history")} aria-current={pane === "history"}>
+              <button
+                type="button"
+                role="tab"
+                id="gitx-tab-history"
+                aria-controls="gitx-pane-history"
+                aria-selected={pane === "history"}
+                className={pane === "history" ? "gitx-seg-btn active" : "gitx-seg-btn"}
+                onClick={() => setPane("history")}
+              >
                 <HistoryIcon size={14} aria-hidden="true" /> History
               </button>
-            </nav>
+            </div>
 
-            <section className="gitx-pane gitx-changes" aria-label="Changes">
+            <section className="gitx-pane gitx-changes" id="gitx-pane-changes" role="tabpanel" aria-labelledby="gitx-tab-changes">
               <header className="gitx-pane-head">
                 <span className="pane-label">
                   <Files size={12} aria-hidden="true" />
@@ -598,10 +884,22 @@ export default function GitPlayground() {
                       className="gitx-newfile-input"
                       value={newFile}
                       onChange={(e) => setNewFile(e.target.value)}
+                      onKeyDown={(e) => {
+                        // Enter creates the file even when the browser does
+                        // not submit the form for it; Escape puts the field
+                        // away.
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          void createFile(newFile);
+                        } else if (e.key === "Escape") {
+                          setNewFile(null);
+                        }
+                      }}
                       placeholder="notes.txt"
                       aria-label="New file name"
                       autoFocus
                       spellCheck={false}
+                      enterKeyHint="done"
                     />
                     <button type="submit" className="gitx-btn primary small" disabled={!newFile.trim()}>
                       Create
@@ -660,24 +958,37 @@ export default function GitPlayground() {
                     {showTry && (
                       <div className="gitx-try" role="region" aria-label="Try this">
                         <header className="gitx-try-head">
-                          <span>Try this</span>
+                          <span>{tryFinished ? "Done" : "Try this"}</span>
                           <button type="button" className="gitx-btn quiet small" onClick={() => setTryDismissed(true)} aria-label="Dismiss">
                             <X size={13} aria-hidden="true" />
                           </button>
                         </header>
-                        <ol className="gitx-try-steps">
-                          {tryThis.map((step, i) => (
-                            <li key={step.command} className={tryDone[i] ? "done" : ""}>
-                              <button type="button" className="gitx-try-step" onClick={() => compose(step.command)} disabled={tryDone[i]}>
-                                <span className="gitx-try-mark" aria-hidden="true">
-                                  {tryDone[i] ? <Check size={12} /> : i + 1}
-                                </span>
-                                <span className="gitx-try-label">{step.label}</span>
-                                <code className="gitx-try-cmd">{step.command}</code>
-                              </button>
-                            </li>
-                          ))}
-                        </ol>
+                        {tryFinished ? (
+                          <p className="gitx-try-done">
+                            <Check size={14} aria-hidden="true" />
+                            <span>
+                              Every step of <strong>{scenarioDef.label}</strong> is done. Keep exploring here, or try the next scenario.
+                            </span>
+                            <button type="button" className="gitx-btn primary small" onClick={() => handleReset(nextScenario.id)} disabled={disabled}>
+                              <span>{nextScenario.label}</span>
+                              <ArrowRight size={13} aria-hidden="true" />
+                            </button>
+                          </p>
+                        ) : (
+                          <ol className="gitx-try-steps">
+                            {tryThis.map((step, i) => (
+                              <li key={step.command} className={tryDone[i] ? "done" : ""}>
+                                <button type="button" className="gitx-try-step" onClick={() => compose(step.command)} disabled={tryDone[i]}>
+                                  <span className="gitx-try-mark" aria-hidden="true">
+                                    {tryDone[i] ? <Check size={12} /> : i + 1}
+                                  </span>
+                                  <span className="gitx-try-label">{step.label}</span>
+                                  <code className="gitx-try-cmd">{step.command}</code>
+                                </button>
+                              </li>
+                            ))}
+                          </ol>
+                        )}
                       </div>
                     )}
 
@@ -687,7 +998,7 @@ export default function GitPlayground() {
               </div>
             </section>
 
-            <section className="gitx-pane gitx-history" aria-label="History">
+            <section className="gitx-pane gitx-history" id="gitx-pane-history" role="tabpanel" aria-labelledby="gitx-tab-history">
               <header className="gitx-pane-head">
                 <span className="pane-label">
                   <HistoryIcon size={12} aria-hidden="true" />
@@ -745,16 +1056,22 @@ export default function GitPlayground() {
                   Tab
                 </button>
               )}
-              <button type="button" className="gitx-btn quiet small" onClick={() => setPaletteOpen((v) => !v)} aria-expanded={paletteOpen}>
+              <button
+                type="button"
+                className="gitx-btn quiet small"
+                onClick={() => (paletteOpen ? closePalette() : setPaletteOpen(true))}
+                aria-expanded={paletteOpen}
+                aria-haspopup="dialog"
+              >
                 All commands
               </button>
             </div>
 
             {paletteOpen && (
               <>
-                <button type="button" className="gitx-palette-backdrop" aria-label="Close the command list" onClick={() => setPaletteOpen(false)} />
-                <div className="gitx-palette" role="dialog" aria-label="All commands">
-                  <CommandPalette state={state} onCompose={compose} />
+                <button type="button" className="gitx-palette-backdrop" aria-label="Close the command list" onClick={closePalette} tabIndex={-1} />
+                <div className="gitx-palette" role="dialog" aria-modal="true" aria-label="All commands">
+                  <CommandPalette state={state} onCompose={compose} onClose={closePalette} />
                 </div>
               </>
             )}
@@ -776,6 +1093,9 @@ export default function GitPlayground() {
                 placeholder=""
                 inlineInput
                 onWrite={write}
+                continuation={continuation.length > 0}
+                onCancel={cancel}
+                queueWhileBusy={ready}
                 placeholderHint={null}
               />
             </div>
