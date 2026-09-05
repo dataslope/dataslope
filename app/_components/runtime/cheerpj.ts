@@ -24,6 +24,66 @@ export interface CheerpJApi {
   /** Add a file to CheerpJ's read-only `/str/` virtual filesystem so
    *  Java code (or javac) can read it as if it were on disk. */
   cheerpjAddStringFile(path: string, data: Uint8Array): void;
+  /** Create `path` and any missing parent under `/files/`, like
+   *  `mkdir -p`. Rejects if the directory could not be created. */
+  mkdirp(path: string): Promise<void>;
+}
+
+/**
+ * CheerpJ's `mkdir`, defined as a page global by `cheerpOS.js` alongside
+ * `cheerpOSAddStringFile`.
+ *
+ * It creates one level, and answers through the object it is handed rather
+ * than through its callback: `exists` comes back 5 (`S_IFDIR`) when a
+ * directory is there afterwards, and 0 when the parent is missing or is not
+ * a directory. The callback carries no arguments and may be called
+ * synchronously.
+ */
+type CheerpOSCreateDir = (
+  path: string,
+  result: { exists?: number },
+  mode: number,
+  done: () => void,
+) => void;
+
+/** CheerpJ's writable mount: IndexedDB-backed, so it survives a reload, and
+ *  empty apart from the mount point itself on a first visit. */
+const FILES_MOUNT = "/files/";
+
+/** `result.exists` when the path holds a directory. */
+const DIR_EXISTS = 5;
+
+/**
+ * `mkdir -p` for `/files/`.
+ *
+ * The playground needs this because javac will not make its own output
+ * directory: `-d` has to name one that already exists (javac creates the
+ * package subdirectories *under* it and nothing else), and a `-d` that does
+ * not exist fails the compile with `javac: directory not found`. CheerpJ's
+ * `mkdir` is one level deep, so walk down from the mount point.
+ */
+function makeMkdirp(createDir: CheerpOSCreateDir) {
+  return async function mkdirp(path: string): Promise<void> {
+    if (!path.startsWith(FILES_MOUNT)) {
+      throw new Error(
+        `Cannot create ${path}: only ${FILES_MOUNT} is writable in CheerpJ.`,
+      );
+    }
+    // "/files/a/b/" → ["a", "b"], starting from the mount point, which
+    // exists from init and is not ours to create.
+    const parts = path.slice(FILES_MOUNT.length).split("/").filter(Boolean);
+    let dir = FILES_MOUNT.slice(0, -1);
+    for (const part of parts) {
+      dir += `/${part}`;
+      const exists = await new Promise<number | undefined>((resolve) => {
+        const result: { exists?: number } = {};
+        createDir(dir, result, 0o777, () => resolve(result.exists));
+      });
+      if (exists !== DIR_EXISTS) {
+        throw new Error(`CheerpJ could not create the directory ${dir}.`);
+      }
+    }
+  };
 }
 
 // ─── Globals injected by loader.js ─────────────────────────────────────
@@ -32,6 +92,7 @@ interface CheerpJWindow extends Window {
   cheerpjInit?: (options?: Record<string, unknown>) => Promise<unknown>;
   cheerpjRunMain?: CheerpJApi["cheerpjRunMain"];
   cheerpjAddStringFile?: CheerpJApi["cheerpjAddStringFile"];
+  cheerpOSCreateDir?: CheerpOSCreateDir;
 }
 
 // ─── Page-lifetime singleton loader ────────────────────────────────────
@@ -70,7 +131,8 @@ export function loadCheerpJ(): Promise<CheerpJApi> {
         await w.cheerpjInit({ status: "none" });
         if (
           typeof w.cheerpjRunMain !== "function" ||
-          typeof w.cheerpjAddStringFile !== "function"
+          typeof w.cheerpjAddStringFile !== "function" ||
+          typeof w.cheerpOSCreateDir !== "function"
         ) {
           throw new Error("CheerpJ globals missing after init.");
         }
@@ -81,6 +143,7 @@ export function loadCheerpJ(): Promise<CheerpJApi> {
         resolve({
           cheerpjRunMain: w.cheerpjRunMain.bind(w),
           cheerpjAddStringFile: w.cheerpjAddStringFile.bind(w),
+          mkdirp: makeMkdirp(w.cheerpOSCreateDir.bind(w)),
         });
       } catch (err) {
         reject(err instanceof Error ? err : new Error(String(err)));
