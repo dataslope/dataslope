@@ -576,6 +576,9 @@ class JavaRuntime implements LanguageRuntime {
         new TextEncoder().encode(buildWarmupSource(WARMUP_CLASS)),
       );
       report?.("Warming up the Java compiler…", 0.55);
+      // javac refuses a `-d` that does not exist, and `/files/` starts out
+      // empty on a first visit.
+      await this.api.mkdirp(BOOT_DIR);
       const compiled = await this.runCollected(() =>
         this.api.cheerpjRunMain(
           COMPILER_MAIN,
@@ -644,6 +647,10 @@ class JavaRuntime implements LanguageRuntime {
     // compile produced is on this run's classpath at all.
     const runDirName = `r${++this.runSeq}`;
     const outputDir = `${CLASSES_ROOT}/${runDirName}/`;
+    // Make it first. javac creates the package subdirectories under `-d`
+    // but never `-d` itself: pointed at a directory that does not exist it
+    // compiles nothing and prints `javac: directory not found`.
+    await this.api.mkdirp(outputDir);
 
     let stdinPath: string | null = null;
     if (this.stdinBytes) {
