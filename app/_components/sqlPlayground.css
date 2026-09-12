@@ -2942,6 +2942,176 @@
   color: var(--text-dim);
 }
 
+/* Import progress: takes the dropzone's place while a file is read and then
+   loaded by the engine, so a multi-second import has something on screen and
+   a second file cannot be dropped onto a database already being replaced. */
+.sql-import-progress {
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg2);
+}
+
+.sql-import-progress-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.sql-import-progress-spinner {
+  color: var(--primary);
+  flex-shrink: 0;
+  animation: sql-import-progress-spin 0.8s linear infinite;
+}
+
+.sql-import-progress-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* The label's trailing ellipsis, cycling one dot to three: a second moving
+   part, so a phase that runs for a minute still reads as alive. All three
+   dots stay laid out and only their opacity animates, mirroring the boot
+   overlay's ellipsis, so nothing to the right of the label shifts. */
+.sql-import-progress-ellipsis span {
+  opacity: 0;
+}
+.sql-import-progress-ellipsis span:nth-child(1) {
+  opacity: 1;
+}
+.sql-import-progress-ellipsis span:nth-child(2) {
+  animation: sql-import-progress-dot-2 1.5s infinite;
+}
+.sql-import-progress-ellipsis span:nth-child(3) {
+  animation: sql-import-progress-dot-3 1.5s infinite;
+}
+
+.sql-import-progress-pct {
+  margin-left: auto;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim);
+}
+
+.sql-import-progress-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--bg3);
+  overflow: hidden;
+}
+
+.sql-import-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--primary);
+  transition: width 0.2s ease;
+}
+
+/* Engine work reports steps, not bytes, so the bar sweeps instead of
+   filling. */
+.sql-import-progress-fill.indeterminate {
+  width: 35%;
+  transition: none;
+  animation: sql-import-progress-sweep 1.3s ease-in-out infinite;
+}
+
+.sql-import-progress-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.sql-import-progress-file {
+  font-family: var(--font-mono);
+  overflow-wrap: anywhere;
+}
+
+.sql-import-progress-elapsed {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.sql-import-progress-hint {
+  margin: 8px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+
+@keyframes sql-import-progress-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes sql-import-progress-dot-2 {
+  0%,
+  33% {
+    opacity: 0;
+  }
+  34%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes sql-import-progress-dot-3 {
+  0%,
+  66% {
+    opacity: 0;
+  }
+  67%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes sql-import-progress-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(285%);
+  }
+}
+
+/* Reduced motion: the phase label, byte counter and elapsed clock already
+   say the import is running, so the decorative movement can stop. The sweep
+   keeps a slow cycle rather than freezing into a bar that looks stalled. */
+@media (prefers-reduced-motion: reduce) {
+  .sql-import-progress-spinner {
+    animation-duration: 1.6s;
+  }
+  .sql-import-progress-ellipsis span {
+    opacity: 1;
+    animation: none;
+  }
+  .sql-import-progress-fill.indeterminate {
+    animation-duration: 3s;
+  }
+}
+
+/* Read failure, e.g. a file the browser handed back with no contents. */
+.sql-import-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--red);
+}
+
+.sql-import-error svg {
+  flex-shrink: 0;
+}
+
 /* Table selector row shown after a file is parsed */
 .sql-import-target-row {
   display: flex;

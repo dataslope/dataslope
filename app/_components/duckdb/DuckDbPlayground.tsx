@@ -112,6 +112,7 @@ import { AddRowDialog } from "../sql/components/AddRowDialog";
 import { SqlPlaygroundShell } from "../sql/components/SqlPlaygroundShell";
 import { SchemaActionDialogs } from "../sql/components/SchemaActionDialogs";
 import { ImportSqlDumpDialog } from "../sql/components/ImportSqlDumpDialog";
+import type { ImportStepReporter } from "../sql/utils/importProgress";
 import { RenameDatabaseDialog } from "../sql/components/RenameDatabaseDialog";
 import { SqlEditorToolbar } from "../sql/components/SqlEditorToolbar";
 import { findDuckDbSampleDatabase } from "../runtime/duckdbSamples";
@@ -2680,13 +2681,14 @@ function DuckDbPlaygroundInner() {
 
   // ─── Import SQL dump ──────────────────────────────────────────────────
   const performImportSqlDump = useCallback(
-    async (sqlText: string, filename: string) => {
+    async (sqlText: string, filename: string, report?: ImportStepReporter) => {
       const engine = engineRef.current;
       if (!engine) return;
       setStatusState("loading");
       try {
         // importSqlDump runs the SQL on a blank schema and restores the
         // previous sample on failure, so a failed import never strands the user.
+        report?.("Restoring dump");
         await engine.importSqlDump(sqlText);
         setTables([]);
         setViews([]);
@@ -2722,6 +2724,7 @@ function DuckDbPlaygroundInner() {
         tabHistoryRef.current = [];
         setActiveTabId(nextActive);
         setResultsByTab({});
+        report?.("Reading schema");
         await refreshSchema();
         setStatusState("ready");
         showToast(`Loaded "${filename}".`);
@@ -4621,7 +4624,9 @@ function DuckDbPlaygroundInner() {
           dragging={importSqlDumpDragging}
           onClose={() => setImportSqlDumpOpen(false)}
           onDraggingChange={setImportSqlDumpDragging}
-          onImport={(sql, filename) => void performImportSqlDump(sql, filename)}
+          onImport={(sql, filename, report) =>
+            performImportSqlDump(sql, filename, report)
+          }
         />
 
         {/* ── Create Schema popover ── */}

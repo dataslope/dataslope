@@ -24,6 +24,10 @@ import {
   isSqliteBinary,
 } from "../utils/importUtils";
 import {
+  yieldToPaint,
+  type ImportStepReporter,
+} from "../utils/importProgress";
+import {
   applyPragmasToEngine,
 } from "../utils/pragmaUtils";
 import {
@@ -195,13 +199,22 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     [applyDbLoad, showToast, engineRef, setCustomFilenames],
   );
 
+  /** Awaited by the import dialog, which keeps its progress panel up until
+   *  this settles and shows whatever `report` names along the way. A 100 MB
+   *  image spends most of its import inside `loadFromBytes`, so the steps
+   *  are the only sign of life the dialog has to show. */
   const performImportSqlite = useCallback(
-    (bytes: Uint8Array, filename: string) => {
+    async (
+      bytes: Uint8Array,
+      filename: string,
+      report?: ImportStepReporter,
+    ) => {
       const engine = engineRef.current;
       if (!engine) return;
-      void (async () => {
       try {
+        report?.("Restoring database");
         const sample = await engine.loadFromBytes(bytes, filename);
+        report?.("Reading schema");
         await applyDbLoad(sample);
         setImportSqliteOpen(false);
         showToast(`Imported ${filename}.`);
@@ -209,32 +222,31 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
         const msg = err instanceof Error ? err.message : String(err);
         showToast(`Import failed: ${msg}`, "warn");
       }
-      })();
     },
     [applyDbLoad, showToast, engineRef, setImportSqliteOpen],
   );
 
   const performImportSqlDump = useCallback(
-    (sqlText: string, filename: string) => {
+    async (sqlText: string, filename: string, report?: ImportStepReporter) => {
       const engine = engineRef.current;
       if (!engine) return;
-      void (async () => {
-        try {
-          // Load a fresh blank database then execute the dump on top of it.
-          const sample = await engine.loadBlankDatabase();
-          // Name it after the file it came from. Clearing the override left
-          // the blank database's own `blank.sqlite` in the selector, which
-          // told the user nothing about what they had just opened.
-          setCustomFilenames((prev) => ({ ...prev, [sample.id]: filename }));
-          await engine.execAll(sqlText);
-          await applyDbLoad(sample);
-          setImportSqliteOpen(false);
-          showToast(`Imported "${filename}".`);
-        } catch (err) {
-          const msg = err instanceof Error ? err.message : String(err);
-          showToast(`Import failed: ${msg}`, "warn");
-        }
-      })();
+      try {
+        // Load a fresh blank database then execute the dump on top of it.
+        const sample = await engine.loadBlankDatabase();
+        // Name it after the file it came from. Clearing the override left
+        // the blank database's own `blank.sqlite` in the selector, which
+        // told the user nothing about what they had just opened.
+        setCustomFilenames((prev) => ({ ...prev, [sample.id]: filename }));
+        report?.("Replaying SQL dump");
+        await engine.execAll(sqlText);
+        report?.("Reading schema");
+        await applyDbLoad(sample);
+        setImportSqliteOpen(false);
+        showToast(`Imported "${filename}".`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Import failed: ${msg}`, "warn");
+      }
     },
     [applyDbLoad, showToast, engineRef, setCustomFilenames, setImportSqliteOpen],
   );
@@ -244,12 +256,20 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
    *  path and the SQL-dump path, so any extension (.sql, .db, .sqlite,
    *  .sqlite3, .db3, …) imports correctly. */
   const performImportDatabaseFile = useCallback(
-    (bytes: Uint8Array, filename: string) => {
+    async (bytes: Uint8Array, filename: string, report?: ImportStepReporter) => {
       if (isSqliteBinary(bytes)) {
-        performImportSqlite(bytes, filename);
-      } else {
-        performImportSqlDump(new TextDecoder().decode(bytes), filename);
+        return performImportSqlite(bytes, filename, report);
       }
+      // Decoding a large dump is the one step that blocks the main thread,
+      // so it is named, and the label is given a frame to paint before the
+      // freeze rather than arriving after it.
+      report?.("Decoding SQL dump");
+      await yieldToPaint();
+      return performImportSqlDump(
+        new TextDecoder().decode(bytes),
+        filename,
+        report,
+      );
     },
     [performImportSqlite, performImportSqlDump],
   );

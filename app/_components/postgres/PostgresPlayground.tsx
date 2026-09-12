@@ -113,6 +113,7 @@ import { AddRowDialog } from "../sql/components/AddRowDialog";
 import { SqlPlaygroundShell } from "../sql/components/SqlPlaygroundShell";
 import { SchemaActionDialogs } from "../sql/components/SchemaActionDialogs";
 import { ImportSqlDumpDialog } from "../sql/components/ImportSqlDumpDialog";
+import type { ImportStepReporter } from "../sql/utils/importProgress";
 import { SqlEditorToolbar } from "../sql/components/SqlEditorToolbar";
 import { RenameDatabaseDialog } from "../sql/components/RenameDatabaseDialog";
 import { findPostgresSampleDatabase } from "../runtime/postgresSamples";
@@ -2457,13 +2458,14 @@ function PostgresPlaygroundInner() {
 
   // ─── Import SQL dump ──────────────────────────────────────────────────
   const performImportSqlDump = useCallback(
-    async (sqlText: string, filename: string) => {
+    async (sqlText: string, filename: string, report?: ImportStepReporter) => {
       const engine = engineRef.current;
       if (!engine) return;
       setStatusState("loading");
       try {
         // Imports into a sandbox worker first; only swaps in on success,
         // so a failed import leaves the existing database intact.
+        report?.("Restoring dump");
         await engine.importSqlDump(sqlText);
         setActiveDbId(POSTGRES_BLANK_DATABASE.id);
         setCustomDbFilename(filename);
@@ -2494,6 +2496,7 @@ function PostgresPlaygroundInner() {
         selectedSchemaRef.current = "public";
         setSelectedSchema("public");
         setExpandedEntities(new Set());
+        report?.("Reading schema");
         const [loadedTables] = await Promise.all([
           refreshSchema(),
           refreshSchemas(),
@@ -2520,12 +2523,13 @@ function PostgresPlaygroundInner() {
    *  offers; importing a dump used to be the one destructive path with no
    *  alternative to overwriting. */
   const performImportSqlDumpInNewWorkspace = useCallback(
-    async (sqlText: string, filename: string) => {
+    async (sqlText: string, filename: string, report?: ImportStepReporter) => {
       const old = engineRef.current;
       if (!old) return;
       setStatusState("loading");
       setDbLoading(true);
       try {
+        report?.("Creating workspace");
         const newWs = await createWorkspace(
           `${filename} Workspace`,
           PLAYGROUND_ID,
@@ -2533,11 +2537,13 @@ function PostgresPlaygroundInner() {
         setActiveWorkspaceId(PLAYGROUND_ID, newWs.id);
         engineRef.current = null;
         await old.close();
+        report?.("Starting Postgres");
         const engine = await postgresAdapter.createEngine(
           POSTGRES_BLANK_DATABASE.id,
           newWs.id,
         );
         engineRef.current = engine;
+        report?.("Restoring dump");
         await engine.importSqlDump(sqlText);
         setActiveWorkspace({ id: newWs.id, name: newWs.name });
         setActiveDbId(POSTGRES_BLANK_DATABASE.id);
@@ -2558,6 +2564,7 @@ function PostgresPlaygroundInner() {
         selectedSchemaRef.current = "public";
         setSelectedSchema("public");
         setExpandedEntities(new Set());
+        report?.("Reading schema");
         const [loadedTables] = await Promise.all([
           refreshSchema(),
           refreshSchemas(),
@@ -4449,9 +4456,11 @@ function PostgresPlaygroundInner() {
           dragging={importSqlDumpDragging}
           onClose={() => setImportSqlDumpOpen(false)}
           onDraggingChange={setImportSqlDumpDragging}
-          onImport={(sql, filename) => void performImportSqlDump(sql, filename)}
-          onImportInNewWorkspace={(sql, filename) =>
-            void performImportSqlDumpInNewWorkspace(sql, filename)
+          onImport={(sql, filename, report) =>
+            performImportSqlDump(sql, filename, report)
+          }
+          onImportInNewWorkspace={(sql, filename, report) =>
+            performImportSqlDumpInNewWorkspace(sql, filename, report)
           }
           persists={activeWorkspace !== null}
         />

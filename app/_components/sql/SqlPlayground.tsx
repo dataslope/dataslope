@@ -2646,8 +2646,8 @@ function SqlPlaygroundInner() {
           dragging={importSqliteDragging}
           onClose={() => setImportSqliteOpen(false)}
           onDraggingChange={setImportSqliteDragging}
-          onImport={(data, filename) =>
-            performImportDatabaseFile(data, filename)
+          onImport={(data, filename, report) =>
+            performImportDatabaseFile(data, filename, report)
           }
           title="Import Database"
           description={

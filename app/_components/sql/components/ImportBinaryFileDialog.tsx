@@ -1,16 +1,26 @@
 "use client";
 
 import { Dialog } from "@base-ui/react/dialog";
-import { TriangleAlert, Upload } from "lucide-react";
+import { CircleAlert, TriangleAlert, Upload } from "lucide-react";
 import type { ReactNode } from "react";
+import { useImportProgress } from "../hooks/useImportProgress";
+import { readFileAsBytes, type ImportStepReporter } from "../utils/importProgress";
+import { ImportProgressPanel } from "./ImportProgressPanel";
 
 export interface ImportBinaryFileDialogProps {
   open: boolean;
   dragging: boolean;
   onClose: () => void;
   onDraggingChange: (dragging: boolean) => void;
-  /** Called with file bytes and the original filename. */
-  onImport: (data: Uint8Array, filename: string) => void;
+  /** Called with file bytes and the original filename. Return the import's
+   *  promise so the dialog keeps its progress panel up until the engine is
+   *  done; `report` names the step the engine is on, which is the only
+   *  feedback a multi-second restore has to offer. */
+  onImport: (
+    data: Uint8Array,
+    filename: string,
+    report: ImportStepReporter,
+  ) => void | Promise<unknown>;
   title: string;
   /** JSX rendered in the description slot (e.g. file extensions). */
   description: ReactNode;
@@ -28,18 +38,6 @@ export interface ImportBinaryFileDialogProps {
   inputAriaLabel: string;
 }
 
-function readFileAsUint8Array(
-  file: File,
-  onLoad: (data: Uint8Array) => void,
-): void {
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    const buf = ev.target?.result;
-    if (buf instanceof ArrayBuffer) onLoad(new Uint8Array(buf));
-  };
-  reader.readAsArrayBuffer(file);
-}
-
 export function ImportBinaryFileDialog({
   open,
   dragging,
@@ -54,14 +52,28 @@ export function ImportBinaryFileDialog({
   accept,
   inputAriaLabel,
 }: ImportBinaryFileDialogProps) {
+  const { progress, readError, working, startRead, cancelRead, reset } =
+    useImportProgress();
+
+  const pickFile = (file: File) => {
+    startRead(file, readFileAsBytes, (bytes, report) =>
+      onImport(bytes, file.name, report),
+    );
+  };
+
   return (
     <Dialog.Root
       open={open}
       onOpenChange={(next) => {
-        if (!next) {
-          onClose();
-          onDraggingChange(false);
-        }
+        if (next) return;
+        // Escape and backdrop clicks are ignored once the engine has the
+        // bytes: the import cannot be called off, and an accidental dismiss
+        // would put the reader right back to guessing whether anything is
+        // running. The footer button below is the deliberate way out.
+        if (working) return;
+        onClose();
+        onDraggingChange(false);
+        reset();
       }}
     >
       <Dialog.Portal>
@@ -79,40 +91,73 @@ export function ImportBinaryFileDialog({
             />
             <span>{warningText}</span>
           </div>
-          <div
-            className={`sql-dropzone${dragging ? " dragging" : ""}`}
-            onDragOver={(e) => {
-              e.preventDefault();
-              onDraggingChange(true);
-            }}
-            onDragLeave={() => onDraggingChange(false)}
-            onDrop={(e) => {
-              e.preventDefault();
-              onDraggingChange(false);
-              const file = e.dataTransfer.files[0];
-              if (!file) return;
-              readFileAsUint8Array(file, (data) => onImport(data, file.name));
-            }}
-          >
-            <Upload size={28} className="sql-dropzone-icon" aria-hidden="true" />
-            <span>{dropText}</span>
-            <span className="sql-dropzone-hint">{browseHint}</span>
-            <input
-              type="file"
-              accept={accept}
-              aria-label={inputAriaLabel}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-                readFileAsUint8Array(file, (data) => onImport(data, file.name));
-                e.target.value = "";
+          {progress ? (
+            <ImportProgressPanel progress={progress} />
+          ) : (
+            <div
+              className={`sql-dropzone${dragging ? " dragging" : ""}`}
+              onDragOver={(e) => {
+                e.preventDefault();
+                onDraggingChange(true);
               }}
-            />
-          </div>
+              onDragLeave={() => onDraggingChange(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                onDraggingChange(false);
+                const file = e.dataTransfer.files[0];
+                if (file) pickFile(file);
+              }}
+            >
+              <Upload size={28} className="sql-dropzone-icon" aria-hidden="true" />
+              <span>{dropText}</span>
+              <span className="sql-dropzone-hint">{browseHint}</span>
+              <input
+                type="file"
+                accept={accept}
+                aria-label={inputAriaLabel}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) pickFile(file);
+                  e.target.value = "";
+                }}
+              />
+            </div>
+          )}
+          {readError && (
+            <p className="sql-import-error" role="alert">
+              <CircleAlert size={14} aria-hidden="true" />
+              {readError}
+            </p>
+          )}
           <div className="confirm-actions" style={{ marginTop: 16 }}>
-            <Dialog.Close className="confirm-btn confirm-btn-secondary">
-              Cancel
-            </Dialog.Close>
+            {progress ? (
+              // A read can be dropped. An import already inside the engine
+              // cannot, so the button offers the only thing it can honestly
+              // do there: put the dialog away and let it finish.
+              <button
+                type="button"
+                className="confirm-btn confirm-btn-secondary"
+                title={
+                  working
+                    ? "The import can't be stopped, it keeps running in the background"
+                    : undefined
+                }
+                onClick={() => {
+                  if (working) {
+                    onClose();
+                    onDraggingChange(false);
+                  } else {
+                    cancelRead();
+                  }
+                }}
+              >
+                {working ? "Hide" : "Cancel"}
+              </button>
+            ) : (
+              <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                Cancel
+              </Dialog.Close>
+            )}
           </div>
         </Dialog.Popup>
       </Dialog.Portal>
