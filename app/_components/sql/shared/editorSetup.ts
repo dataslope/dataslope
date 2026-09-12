@@ -39,6 +39,7 @@ import {
   lineNumbers,
   rectangularSelection,
   tooltips,
+  type KeyBinding,
 } from "@codemirror/view";
 import { themeFor, redoKeymap } from "../../cmExtensions";
 import {
@@ -51,6 +52,28 @@ import { splitSqlStatements, statementAtCursor } from "../utils/sqlAnalysis";
 // 75 ms keeps schema suggestions feeling immediate while coalescing rapid
 // typing (CodeMirror's default is 100 ms).
 const AUTOCOMPLETE_DELAY_MS = 75;
+
+/** Completion keys for every SQL editor: the playgrounds, the challenge
+ *  cards, and the embedded code blocks.
+ *
+ *  Register these ahead of `defaultKeymap` so ArrowUp/Down move the popup
+ *  selection instead of the cursor. Enter and Tab both take the highlighted
+ *  suggestion, the way an editor's intellisense is expected to;
+ *  `acceptCompletion` returns false when no popup is open, so Enter falls
+ *  through to `defaultKeymap`'s newline the rest of the time. A newline is
+ *  not lost to a popup that has only just appeared either: CodeMirror's
+ *  `interactionDelay` (75 ms) refuses an accept that arrives with the popup,
+ *  which is the window a keystroke already in flight lands in.
+ *
+ *  The autocompletion extension's own keymap stays off (`defaultKeymap:
+ *  false`) and its Enter binding is dropped here, because the extension
+ *  registers at the highest precedence: its Enter would sit ahead of each
+ *  editor's own Mod-Enter → Run. */
+export const sqlCompletionKeymap: readonly KeyBinding[] = [
+  ...completionKeymap.filter((b) => b.key !== "Enter"),
+  { key: "Enter", run: acceptCompletion },
+  { key: "Tab", run: acceptCompletion },
+];
 
 export interface SqlEditorCompartments {
   lang: Compartment;
@@ -122,9 +145,10 @@ export function makeSqlAutocompletionExtension(
             activateOnTyping: mode === "typing",
             activateOnTypingDelay: AUTOCOMPLETE_DELAY_MS,
             closeOnBlur: true,
-            // The built-in keymap binds Enter → acceptCompletion at highest
-            // precedence, hijacking newlines while the popup is visible; the
-            // completion keys are registered manually instead.
+            // The built-in keymap registers at the highest precedence, so
+            // its Enter → acceptCompletion would sit ahead of the editor's
+            // own Mod-Enter → Run; the completion keys are registered in
+            // that keymap instead (see makeEditorKeymap).
             defaultKeymap: false,
             override: [source],
           }),
@@ -295,12 +319,7 @@ export function createSqlEditorExtensions(
         },
       },
       ...closeBracketsKeymap,
-      // Completion keys must precede `defaultKeymap` so ArrowUp/Down move the
-      // popup selection, not the cursor. Enter is removed so it always
-      // inserts a newline; Tab accepts the completion instead. Only works
-      // because the extension's own keymap is disabled (defaultKeymap: false).
-      ...completionKeymap.filter((b) => b.key !== "Enter"),
-      { key: "Tab", run: acceptCompletion },
+      ...sqlCompletionKeymap,
       ...defaultKeymap,
       ...searchKeymap,
       ...historyKeymap,
