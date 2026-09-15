@@ -59,9 +59,22 @@ export const completionPopupTheme = EditorView.theme({
     opacity: "0.55",
     borderBottom: "none",
   },
+  // The documentation beside the popup, bounded the way the hover panel is:
+  // an unbounded box around a numpydoc docstring fills the window and pushes
+  // the rows it belongs to off screen.
   ".cm-tooltip.cm-completionInfo": {
+    // Fixed width, like the hover panel: a docstring's underlines and its
+    // doctest output only line up in a monospace font.
+    fontFamily:
+      "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
     maxWidth: "min(28em, 60vw)",
+    maxHeight: "min(18em, 40vh)",
+    overflowY: "auto",
+    overscrollBehavior: "contain",
     whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    lineHeight: "1.5",
     fontSize: "92%",
+    scrollbarWidth: "thin",
   },
 });

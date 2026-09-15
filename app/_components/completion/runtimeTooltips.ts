@@ -23,6 +23,7 @@ import type {
   SignatureHelpResult,
 } from "../types";
 import { getCompletionTrigger } from "./completionPrefs";
+import { docBody, signatureLine } from "./docText";
 import { buildPositionRequest, type PositionContext } from "./positionRequest";
 
 export interface TooltipRuntime {
@@ -39,19 +40,26 @@ const HOVER_DELAY_MS = 450;
 
 // ─── Rendering ────────────────────────────────────────────────────────────
 
+/** A signature line above a scrollable documentation body, the shape every
+ *  notebook inspector uses. Both halves are shaped first: a runtime can hand
+ *  over a whole definition as a "title" (see docText.ts). */
 function renderHover(result: HoverResult): HTMLElement {
   const root = document.createElement("div");
   root.className = "cm-runtime-hover";
-  if (result.title) {
+  const signature = signatureLine(result.title);
+  const body = docBody(result.doc);
+  if (signature) {
     const title = document.createElement("div");
     title.className = "cm-runtime-hover-title";
-    title.textContent = result.title;
+    title.textContent = signature;
     root.appendChild(title);
   }
-  if (result.doc) {
+  if (body) {
     const doc = document.createElement("div");
     doc.className = "cm-runtime-hover-doc";
-    doc.textContent = result.doc;
+    // The body scrolls on its own, so the signature stays in view.
+    doc.tabIndex = 0;
+    doc.textContent = body;
     root.appendChild(doc);
   }
   return root;
@@ -101,31 +109,66 @@ function renderSignature(result: SignatureHelpResult): HTMLElement {
   }
   root.appendChild(line);
 
-  if (sig.documentation) {
+  const documentation = docBody(sig.documentation);
+  if (documentation) {
     const doc = document.createElement("div");
     doc.className = "cm-signature-help-doc";
-    doc.textContent = sig.documentation;
+    doc.textContent = documentation;
     root.appendChild(doc);
   }
   return root;
 }
 
+// A notebook inspector's shape: the signature pinned at the top, a rule
+// under it, and the documentation scrolling below in a box that cannot grow
+// past a fraction of the window. A docstring runs to thousands of characters
+// — pandas' `iloc` alone is 3,300 — so "as tall as it needs" is not a size.
+/** The editor's own stack. A docstring is written for a fixed-width reader:
+ *  numpydoc underlines its sections, doctest examples line their output up,
+ *  and both turn to noise in a proportional font. */
+const MONO =
+  "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace";
+
 const tooltipTheme = EditorView.baseTheme({
   ".cm-tooltip.cm-tooltip-hover .cm-runtime-hover, .cm-tooltip.cm-signature-help-tooltip":
     {
-      padding: "5px 8px",
-      maxWidth: "44em",
+      maxWidth: "min(46em, 92vw)",
       fontSize: "90%",
-      whiteSpace: "pre-wrap",
+      // The halves carry their own padding so a scrollbar sits against the
+      // panel's edge rather than floating inside it.
+      padding: "0",
     },
   ".cm-runtime-hover-title, .cm-signature-help-label": {
-    fontFamily:
-      "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
+    fontFamily: MONO,
+    padding: "6px 10px",
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    lineHeight: "1.45",
   },
+  // Only a hover with both halves needs the divider; a bare signature hint
+  // would otherwise end in a rule with nothing under it.
+  ".cm-runtime-hover-title:not(:last-child), .cm-signature-help-label:not(:last-child)":
+    {
+      borderBottom: "1px solid color-mix(in srgb, currentColor 18%, transparent)",
+    },
   ".cm-runtime-hover-doc, .cm-signature-help-doc": {
-    marginTop: "3px",
-    opacity: "0.78",
+    fontFamily: MONO,
+    fontSize: "95%",
+    padding: "6px 10px",
+    maxHeight: "min(21em, 44vh)",
+    overflowY: "auto",
+    // A docstring's own scroll must not turn into the page's once it ends.
+    overscrollBehavior: "contain",
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    lineHeight: "1.5",
+    opacity: "0.82",
+    scrollbarWidth: "thin",
   },
+  ".cm-runtime-hover-doc:focus-visible": { outline: "none" },
+  // A parameter hint is a glance, not a read: it keeps less of the doc on
+  // screen than a hover does.
+  ".cm-signature-help-doc": { maxHeight: "min(12em, 30vh)" },
   ".cm-signature-help-count": { opacity: "0.6", fontSize: "85%" },
 });
 
@@ -144,7 +187,8 @@ function hoverExtension(cfg: RuntimeTooltipConfig): Extension {
       } catch {
         return null;
       }
-      if (!result || (!result.title && !result.doc)) return null;
+      if (!result) return null;
+      if (!signatureLine(result.title) && !docBody(result.doc)) return null;
       return {
         pos: word.from,
         end: word.to,
