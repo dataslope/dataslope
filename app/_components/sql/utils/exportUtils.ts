@@ -1,5 +1,6 @@
 "use client";
 
+import { WASM_XLSXWRITER_CDN } from "../../runtime/cdn";
 import type { QueryExecResult } from "../../runtime/sqlite-wasm";
 import { ensureParquetWasm } from "./parquetWasm";
 import { formatByteCount } from "./cellUtils";
@@ -59,9 +60,9 @@ export async function initXlsxWasm(): Promise<
   if (!_xlsxWasmInit) {
     _xlsxWasmInit = (async () => {
       const mod = await import("wasm-xlsxwriter/web");
-      await mod.default(
-        "https://cdn.jsdelivr.net/npm/wasm-xlsxwriter@0.13.0/web/wasm_xlsxwriter_bg.wasm",
-      );
+      // The URL's version must match the glue imported above, which is the
+      // installed package — see WASM_XLSXWRITER_CDN.
+      await mod.default(WASM_XLSXWRITER_CDN);
       return mod;
     })();
   }

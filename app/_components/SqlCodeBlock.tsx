@@ -42,16 +42,15 @@ import {
 import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
 import { bracketMatching, indentOnInput, indentUnit } from "@codemirror/language";
 import {
-  acceptCompletion,
   closeBrackets,
   closeBracketsKeymap,
-  completionKeymap,
   startCompletion,
 } from "@codemirror/autocomplete";
 import { themeFor, noActiveLine, redoKeymap } from "./cmExtensions";
 import {
   makeSqlAutocompletionExtension,
   makeSqlLangExtension,
+  sqlCompletionKeymap,
 } from "./sql/shared/editorSetup";
 import { introspectSqlSchemas } from "./sql/shared/schemaIntrospect";
 import { useAskAiSource } from "./ai/contextRegistry";
@@ -227,11 +226,9 @@ export default function SqlCodeBlock({
             },
           },
           ...closeBracketsKeymap,
-          // Completion keys before `defaultKeymap` so arrows move the
-          // popup selection. Enter is removed so it always inserts a
-          // newline; Tab accepts instead, matching the SQL playgrounds.
-          ...completionKeymap.filter((b) => b.key !== "Enter"),
-          { key: "Tab", run: acceptCompletion },
+          // Arrows move the popup selection, Enter and Tab accept the
+          // highlighted suggestion; shared with the SQL playgrounds.
+          ...sqlCompletionKeymap,
           ...defaultKeymap,
           ...historyKeymap,
           ...redoKeymap,

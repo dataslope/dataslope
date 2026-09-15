@@ -767,15 +767,51 @@ def _jedi_signature(name):
         return None
     return sigs[0].to_string() if sigs else None
 
-def _jedi_doc(name, limit=400):
+def _jedi_doc(name, limit=400, whole=False):
+    """Docstring for a completion item (first paragraph, kept short) or for
+    the hover panel (whole, which is bounded and scrolls).
+
+    Line structure is preserved either way: the panel renders it pre-wrapped,
+    and a numpydoc body is unreadable once its sections run together."""
     try:
         doc = name.docstring(raw=True)
     except Exception:
         return None
     if not doc:
         return None
-    para = doc.strip().split("\\n\\n")[0].strip()
-    return para[:limit] if para else None
+    doc = doc.strip()
+    if not whole:
+        # The "blank" line between paragraphs often carries the docstring's
+        # own indentation, so splitting on a bare newline pair would miss it
+        # and hand back the entire docstring as one paragraph.
+        doc = _re.split(r"\\n[ \\t]*\\n", doc)[0].strip()
+    if len(doc) <= limit:
+        return doc or None
+    return doc[:limit].rstrip() + "\\u2026"
+
+def _jedi_title(name):
+    """One line naming what is under the cursor.
+
+    get_signatures() is empty for anything that is not callable - a property,
+    a module, an instance - and jedi's description fallback is the whole
+    source of the definition with its newlines collapsed, docstring and all
+    (pandas' DataFrame.iloc yields 3,000 characters of it). Cutting at the
+    docstring that follows the definition line leaves the signature."""
+    sig = _jedi_signature(name)
+    if sig:
+        return sig
+    try:
+        desc = name.description or ""
+    except Exception:
+        desc = ""
+    for marker in ('\\u0022\\u0022\\u0022', "\\u0027\\u0027\\u0027"):
+        cut = desc.find(marker)
+        if cut != -1:
+            desc = desc[:cut]
+    desc = " ".join(desc.split()).rstrip(":")
+    if len(desc) > 160:
+        desc = desc[:160].rstrip() + "\\u2026"
+    return desc or name.name
 
 def _python_completions_jedi(doc, line_no, column, line):
     """Complete \`doc\` at 1-based \`line_no\` / 0-based \`column\`.
@@ -831,13 +867,12 @@ def _python_hover_jedi(doc, line_no, column):
     if not names:
         return _json.dumps(None)
     n = names[0]
-    title = _jedi_signature(n)
-    if not title:
-        try:
-            title = n.description or n.name
-        except Exception:
-            title = n.name
-    return _json.dumps({"title": title, "doc": _jedi_doc(n, 600)})
+    # The hover panel is bounded and scrolls, so it carries the whole
+    # docstring rather than only its first paragraph.
+    return _json.dumps({
+        "title": _jedi_title(n),
+        "doc": _jedi_doc(n, 4000, whole=True),
+    })
 
 def _python_signatures_jedi(doc, line_no, column):
     """Signatures of the call around the cursor, as JSON
@@ -877,7 +912,8 @@ def _python_signatures_jedi(doc, line_no, column):
 _PG_PROTECTED_NAMES |= {
     "_json", "_jedi", "_JEDI_TYPE_MAP", "_JEDI_DETAIL_LIMIT",
     "_COMMON_BUILTINS", "_jedi_boost",
-    "_jedi_signature", "_jedi_doc", "_python_completions_jedi",
+    "_jedi_signature", "_jedi_doc", "_jedi_title",
+    "_python_completions_jedi",
     "_python_hover_jedi", "_python_signatures_jedi",
 }
 `;

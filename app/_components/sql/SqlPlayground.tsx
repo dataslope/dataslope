@@ -70,7 +70,6 @@ import {
   DEFAULT_PLAYGROUND_SETTINGS,
   DataslopeRunOverlay,
   ErDiagramLoadingFallback,
-  LOADING_QUIPS,
   RuntimeInfoContent,
   detectIsMac,
 } from "../playgroundShared";
@@ -79,6 +78,14 @@ import { SqlSettingsConfirmDialogs } from "./components/SqlSettingsConfirmDialog
 import { DdlViewerDialog } from "./components/DdlViewerDialog";
 import { SwitchDatabaseDialog } from "./components/SwitchDatabaseDialog";
 import { ImportBinaryFileDialog } from "./components/ImportBinaryFileDialog";
+import { SqlFileDropTarget } from "./components/SqlFileDropTarget";
+import { useDropImportPlan } from "./hooks/useDropImportPlan";
+import type { XlsxSheet } from "./utils/xlsxReader";
+import { tableNameFromSheet } from "./utils/workbookImport";
+import {
+  inferCsvColumnTypes,
+  sqliteAffinityFor,
+} from "./utils/importUtils";
 import { RenameDatabaseDialog } from "./components/RenameDatabaseDialog";
 import { SqlEditorToolbar } from "./components/SqlEditorToolbar";
 import { findSampleDatabase } from "../runtime/sqliteSamples";
@@ -822,7 +829,6 @@ function SqlPlaygroundInner() {
   const [engineForRender, setEngineForRender] = useState<SqliteEngine | null>(
     null,
   );
-  const [quipIndex, setQuipIndex] = useState<number>(0);
   // Active workspace surfaced in the header WorkspaceBadge. Resolved
   // asynchronously by the bootstrap effect below.
   const [activeWorkspace, setActiveWorkspace] = useState<{
@@ -875,7 +881,6 @@ function SqlPlaygroundInner() {
   const resizerRef = useRef<HTMLDivElement | null>(null);
   const shellRef = useRef<HTMLDivElement | null>(null);
   const sidebarResizerRef = useRef<HTMLDivElement | null>(null);
-  const quipSeedRef = useRef<number>(-1);
   const settingsOpenRef = useRef<boolean>(false);
 
   const openSettingsTab = useCallback(() => {
@@ -1119,6 +1124,7 @@ function SqlPlaygroundInner() {
   const {
     performDbSwitch,
     performImportDatabaseFile,
+    performImportSqlDump,
     requestDbSwitch,
     exportDatabase,
     exportDatabaseToXlsx,
@@ -2047,26 +2053,6 @@ function SqlPlaygroundInner() {
     };
   }, []);
 
-  // ─── Loading-screen quip rotator ─────────────────────────────────────
-  useEffect(() => {
-    if (quipSeedRef.current < 0) {
-      quipSeedRef.current = Math.floor(Math.random() * LOADING_QUIPS.length);
-    }
-  }, []);
-  useEffect(() => {
-    if (loaded || statusState === "error") return;
-    let tick = 0;
-    const id = window.setInterval(() => {
-      tick += 1;
-      setQuipIndex(
-        tick === 1
-          ? Math.max(0, quipSeedRef.current)
-          : (prev) => (prev + 1) % LOADING_QUIPS.length,
-      );
-    }, 2200);
-    return () => window.clearInterval(id);
-  }, [loaded, statusState]);
-
   // ─── Computed values ─────────────────────────────────────────────────
   const activeSample = useMemo(() => {
     const base =
@@ -2392,6 +2378,50 @@ function SqlPlaygroundInner() {
     />
   );
 
+  // ─── Drop a file anywhere on the playground ──────────────────────────
+  // Every action here routes into the same import the matching menu entry
+  // uses, so a dropped file and a picked one end up in the same place.
+  const planDroppedFile = useDropImportPlan({
+    dialect: "sqlite",
+    engineLabel: "SQLite",
+    databaseKind: "sqlite",
+    importDatabaseImage: (bytes, filename, report) =>
+      performImportDatabaseFile(bytes, filename, report),
+    importSqlScript: (sql, filename, report) =>
+      performImportSqlDump(sql, filename, report),
+    openCsvImport: (file) => {
+      setImportCsvState(null);
+      setImportCsvOpen(true);
+      handleCsvFile(file);
+    },
+    openJsonImport: (file) => {
+      setImportJsonState(null);
+      setImportJsonOpen(true);
+      handleJsonFile(file);
+    },
+    openParquetImport: (file) => {
+      setImportParquetOpen(true);
+      void handleParquetFile(file);
+    },
+    openWorksheetImport: (sheet: XlsxSheet) => {
+      // The worksheet arrives shaped exactly like a parsed CSV, so it goes
+      // through the CSV preview: table name, column types, the lot.
+      setImportCsvState({
+        tableName: tableNameFromSheet(sheet.name),
+        headers: sheet.headers,
+        rows: sheet.rows,
+        rawText: "",
+        targetMode: "new",
+        targetTable: tables[0] ?? "",
+        colCompare: null,
+        columnTypes: inferCsvColumnTypes(sheet.headers, sheet.rows).map(
+          sqliteAffinityFor,
+        ),
+      });
+      setImportCsvOpen(true);
+    },
+  });
+
   return (
     <SqlPlaygroundShell
       playgroundId={PLAYGROUND_ID}
@@ -2404,9 +2434,7 @@ function SqlPlaygroundInner() {
       copyBusy={conflictCopyBusy}
       copyError={conflictCopyError}
       loadingHeroRepeat={4}
-      loadingCaption={
-        statusState === "error" ? loadingMessage : LOADING_QUIPS[quipIndex]
-      }
+      loadingCaption={loadingMessage}
       headerName={
         activeWorkspace ? (
           <>
@@ -2641,13 +2669,19 @@ function SqlPlaygroundInner() {
           </Dialog.Portal>
         </Dialog.Root>
 
+        <SqlFileDropTarget
+          planFor={planDroppedFile}
+          disabled={!loaded}
+          playgroundLabel="SQLite playground"
+        />
+
         <ImportBinaryFileDialog
           open={importSqliteOpen}
           dragging={importSqliteDragging}
           onClose={() => setImportSqliteOpen(false)}
           onDraggingChange={setImportSqliteDragging}
-          onImport={(data, filename) =>
-            performImportDatabaseFile(data, filename)
+          onImport={(data, filename, report) =>
+            performImportDatabaseFile(data, filename, report)
           }
           title="Import Database"
           description={

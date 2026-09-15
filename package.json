@@ -129,7 +129,7 @@
     "lucide-react": "^1.29.0",
     "motion": "^13.0.0",
     "next": "^16.2.4",
-    "parquet-wasm": "^0.7.1",
+    "parquet-wasm": "0.7.2",
     "pyodide": "^314.0.4",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
@@ -147,7 +147,7 @@
     "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.2.4",
     "typescript": "5.9.3",
-    "wasm-xlsxwriter": "^0.13.0",
+    "wasm-xlsxwriter": "0.13.1",
     "webr": "^0.6.0",
     "wrangler": "^4.103.0",
     "zustand": "^5.0.14"
