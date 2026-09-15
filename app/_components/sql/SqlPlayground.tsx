@@ -70,7 +70,6 @@ import {
   DEFAULT_PLAYGROUND_SETTINGS,
   DataslopeRunOverlay,
   ErDiagramLoadingFallback,
-  LOADING_QUIPS,
   RuntimeInfoContent,
   detectIsMac,
 } from "../playgroundShared";
@@ -822,7 +821,6 @@ function SqlPlaygroundInner() {
   const [engineForRender, setEngineForRender] = useState<SqliteEngine | null>(
     null,
   );
-  const [quipIndex, setQuipIndex] = useState<number>(0);
   // Active workspace surfaced in the header WorkspaceBadge. Resolved
   // asynchronously by the bootstrap effect below.
   const [activeWorkspace, setActiveWorkspace] = useState<{
@@ -875,7 +873,6 @@ function SqlPlaygroundInner() {
   const resizerRef = useRef<HTMLDivElement | null>(null);
   const shellRef = useRef<HTMLDivElement | null>(null);
   const sidebarResizerRef = useRef<HTMLDivElement | null>(null);
-  const quipSeedRef = useRef<number>(-1);
   const settingsOpenRef = useRef<boolean>(false);
 
   const openSettingsTab = useCallback(() => {
@@ -2047,26 +2044,6 @@ function SqlPlaygroundInner() {
     };
   }, []);
 
-  // ─── Loading-screen quip rotator ─────────────────────────────────────
-  useEffect(() => {
-    if (quipSeedRef.current < 0) {
-      quipSeedRef.current = Math.floor(Math.random() * LOADING_QUIPS.length);
-    }
-  }, []);
-  useEffect(() => {
-    if (loaded || statusState === "error") return;
-    let tick = 0;
-    const id = window.setInterval(() => {
-      tick += 1;
-      setQuipIndex(
-        tick === 1
-          ? Math.max(0, quipSeedRef.current)
-          : (prev) => (prev + 1) % LOADING_QUIPS.length,
-      );
-    }, 2200);
-    return () => window.clearInterval(id);
-  }, [loaded, statusState]);
-
   // ─── Computed values ─────────────────────────────────────────────────
   const activeSample = useMemo(() => {
     const base =
@@ -2404,9 +2381,7 @@ function SqlPlaygroundInner() {
       copyBusy={conflictCopyBusy}
       copyError={conflictCopyError}
       loadingHeroRepeat={4}
-      loadingCaption={
-        statusState === "error" ? loadingMessage : LOADING_QUIPS[quipIndex]
-      }
+      loadingCaption={loadingMessage}
       headerName={
         activeWorkspace ? (
           <>

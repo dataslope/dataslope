@@ -104,7 +104,6 @@ import {
   CopyIcon,
   DEFAULT_PLAYGROUND_SETTINGS,
   DataslopeRunOverlay,
-  LOADING_QUIPS,
   RuntimeInfoContent,
   SettingsPanelContent,
   detectIsMac,
@@ -3927,35 +3926,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     [playgroundMoreSections, accountSection],
   );
 
-  // Rotate the loading quips while the runtime initialises. Index 0 first
-  // so SSR and the first client paint match; the random offset is captured
-  // once on mount and applied on the first tick, so effect re-runs don't
-  // re-roll the start position.
-  const [quipIndex, setQuipIndex] = useState<number>(0);
-  const quipSeedRef = useRef<number>(-1);
-  useEffect(() => {
-    if (quipSeedRef.current < 0) {
-      quipSeedRef.current = Math.floor(Math.random() * LOADING_QUIPS.length);
-    }
-  }, []);
-  useEffect(() => {
-    if (loaded || statusState === "error") return;
-    let tick = 0;
-    const id = window.setInterval(() => {
-      tick += 1;
-      // First tick jumps to the random starting quip; later ticks advance
-      // by one.
-      setQuipIndex(
-        tick === 1
-          ? Math.max(0, quipSeedRef.current)
-          : (prev) => (prev + 1) % LOADING_QUIPS.length,
-      );
-    }, 2200);
-    return () => {
-      window.clearInterval(id);
-    };
-  }, [loaded, statusState]);
-
   const fileTabDescriptors = useMemo<TabDescriptor[]>(() => {
     // OPEN tabs only, a subset of the workspace files.
     const byId = new Map(files.map((f) => [f.id, f]));
@@ -4071,11 +4041,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       {showLoadingOverlay && (
         <PlaygroundBootOverlay
           title={adapter.displayName.replace(/\s*Playground$/i, "")}
-          statusMessage={
-            statusState === "error"
-              ? loadingMessage
-              : loadingMessage || LOADING_QUIPS[quipIndex]
-          }
+          statusMessage={loadingMessage}
           fraction={bootDisplayFraction}
           error={statusState === "error"}
           className={loadingFading ? "hidden" : ""}

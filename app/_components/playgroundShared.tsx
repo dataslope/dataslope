@@ -57,30 +57,6 @@ export const DEFAULT_PLAYGROUND_SETTINGS = {
   clearBeforeRun: true,
 } as const;
 
-/** One-liners cycled below the loading hero while the runtime initialises. */
-export const LOADING_QUIPS: string[] = [
-  "Bribing the WebAssembly elves with cookies…",
-  "Convincing electrons to behave for a few seconds…",
-  "Polishing semicolons and warming up the runtime…",
-  "Asking the parser nicely to be on its best behavior…",
-  "Inflating bytecode like a tiny digital balloon…",
-  "Negotiating with the JIT for a discount…",
-  "Stretching before the first execution lap…",
-  "Teaching the heap some new manners…",
-  "Wiring up the standard library, one cable at a time…",
-  "Loading dependencies, and a healthy dose of optimism…",
-  "Fetching brain cells from the CDN…",
-  "Spinning up the hamster wheel, please clap…",
-  "Composing a haiku for your first run…",
-  "Reticulating splines (it's a thing)…",
-  "Brewing a fresh pot of bytes…",
-  "Untangling pointers (don't ask)…",
-  "Rolling 1d20 against load times, nat 20!",
-  "Counting to infinity. Twice. Quickly.",
-  "Reading the manual. Don't tell anyone.",
-  "Compressing entropy into adorable little packets…",
-];
-
 /** Detect desktop macOS (for showing ⌘ vs Ctrl in the run shortcut).
  *  False during SSR and on iPhone/iPad. */
 export function detectIsMac(): boolean {
