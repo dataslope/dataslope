@@ -2944,12 +2944,11 @@
 
 /* Import progress: takes the dropzone's place while a file is read and then
    loaded by the engine, so a multi-second import has something on screen and
-   a second file cannot be dropped onto a database already being replaced. */
+   a second file cannot be dropped onto a database already being replaced.
+   No card chrome of its own: it is a status line in the dialog body, and a
+   bordered box inside a bordered dialog only reads as clutter. */
 .sql-import-progress {
-  padding: 14px 16px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg2);
+  padding: 0;
 }
 
 .sql-import-progress-head {
