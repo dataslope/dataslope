@@ -866,6 +866,9 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     buildSqlDumpText,
     performDbSwitch,
     performImportDatabaseFile,
+    // Exposed for the drop target, which builds a script (from a workbook,
+    // say) and needs the same path a dropped .sql file takes.
+    performImportSqlDump,
     requestDbSwitch,
     exportDatabase,
     exportDatabaseToXlsx,

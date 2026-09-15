@@ -114,6 +114,10 @@ import { SqlPlaygroundShell } from "../sql/components/SqlPlaygroundShell";
 import { SchemaActionDialogs } from "../sql/components/SchemaActionDialogs";
 import { ImportSqlDumpDialog } from "../sql/components/ImportSqlDumpDialog";
 import type { ImportStepReporter } from "../sql/utils/importProgress";
+import { SqlFileDropTarget } from "../sql/components/SqlFileDropTarget";
+import { useDropImportPlan } from "../sql/hooks/useDropImportPlan";
+import { tableNameFromSheet } from "../sql/utils/workbookImport";
+import type { XlsxSheet } from "../sql/utils/xlsxReader";
 import { SqlEditorToolbar } from "../sql/components/SqlEditorToolbar";
 import { RenameDatabaseDialog } from "../sql/components/RenameDatabaseDialog";
 import { findPostgresSampleDatabase } from "../runtime/postgresSamples";
@@ -4337,6 +4341,47 @@ function PostgresPlaygroundInner() {
     ? [...baseMoreSections, accountSection]
     : baseMoreSections;
 
+  // ─── Drop a file anywhere on the playground ──────────────────────────
+  // Every action here routes into the same import the matching menu entry
+  // uses, so a dropped file and a picked one end up in the same place.
+  const planDroppedFile = useDropImportPlan({
+    dialect: "postgres",
+    engineLabel: "PostgreSQL",
+    importSqlScript: (sql, filename, report) =>
+      performImportSqlDump(sql, filename, report),
+    importSqlScriptInNewWorkspace: (sql, filename, report) =>
+      performImportSqlDumpInNewWorkspace(sql, filename, report),
+    openCsvImport: (file) => {
+      setImportCsvState(null);
+      setImportCsvOpen(true);
+      handleCsvFile(file);
+    },
+    openJsonImport: (file) => {
+      setImportJsonState(null);
+      setImportJsonOpen(true);
+      handleJsonFile(file);
+    },
+    openParquetImport: (file) => {
+      setImportParquetOpen(true);
+      void handleParquetFile(file);
+    },
+    openWorksheetImport: (sheet: XlsxSheet) => {
+      // The worksheet arrives shaped exactly like a parsed CSV, so it goes
+      // through the CSV preview: table name, column types, the lot.
+      setImportCsvState({
+        tableName: tableNameFromSheet(sheet.name),
+        headers: sheet.headers,
+        rows: sheet.rows,
+        rawText: "",
+        targetMode: "new",
+        targetTable: tables[0] ?? "",
+        colCompare: null,
+        columnTypes: inferCsvColumnTypes(sheet.headers, sheet.rows),
+      });
+      setImportCsvOpen(true);
+    },
+  });
+
   return (
     <SqlPlaygroundShell
       playgroundId={PLAYGROUND_ID}
@@ -4440,6 +4485,12 @@ function PostgresPlaygroundInner() {
         </>
       }
     >
+        <SqlFileDropTarget
+          planFor={planDroppedFile}
+          disabled={!loaded}
+          playgroundLabel="PostgreSQL playground"
+        />
+
         <DdlViewerDialog
           open={ddlDialog !== null}
           onOpenChange={(next) => { if (!next) setDdlDialog(null); }}

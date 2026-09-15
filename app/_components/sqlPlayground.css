@@ -3096,6 +3096,153 @@
   }
 }
 
+/* ─── Drop a file anywhere on the playground ─────────────────────────── */
+
+/* Shown while a file is dragged over the window. Pointer-events off: the
+   drop is handled on `window`, and an overlay that swallowed events would
+   also hide which element the pointer is really over. */
+.sql-drop-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  backdrop-filter: blur(1.5px);
+}
+
+.sql-drop-overlay-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 32px 40px;
+  max-width: min(420px, calc(100vw - 48px));
+  text-align: center;
+  border: 2px dashed var(--primary);
+  border-radius: 14px;
+  background: var(--bg2);
+  color: var(--primary);
+  box-shadow: 0 24px 64px #0009;
+}
+
+.sql-drop-overlay-title {
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.sql-drop-overlay-hint {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+
+/* The dropped file's name and size, above the choices. */
+.sql-drop-file {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.sql-drop-file-name {
+  font-family: var(--font-mono);
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.sql-drop-file-size {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.sql-drop-note {
+  margin: 0 0 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+
+/* An option the actions need before they run, e.g. which worksheet. */
+.sql-drop-choice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.sql-drop-choice-label {
+  flex-shrink: 0;
+}
+
+.sql-drop-choice select {
+  flex: 1;
+  min-width: 0;
+}
+
+/* One button per thing the playground can do with the file. Stacked, since
+   the difference between them is the sentence, not the verb. */
+.sql-drop-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sql-drop-action {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease;
+}
+
+.sql-drop-action:hover {
+  border-color: var(--primary);
+  background: var(--primary-glow);
+}
+
+.sql-drop-action.danger:hover {
+  border-color: var(--danger, #ff4f59);
+  background: color-mix(in srgb, var(--danger, #ff4f59) 12%, transparent);
+}
+
+.sql-drop-action-label {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.sql-drop-action-desc {
+  font-family: var(--font-ui);
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--text-dim);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sql-drop-action {
+    transition: none;
+  }
+}
+
 /* Read failure, e.g. a file the browser handed back with no contents. */
 .sql-import-error {
   display: flex;

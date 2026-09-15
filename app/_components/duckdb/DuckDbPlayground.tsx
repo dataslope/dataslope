@@ -113,6 +113,10 @@ import { SqlPlaygroundShell } from "../sql/components/SqlPlaygroundShell";
 import { SchemaActionDialogs } from "../sql/components/SchemaActionDialogs";
 import { ImportSqlDumpDialog } from "../sql/components/ImportSqlDumpDialog";
 import type { ImportStepReporter } from "../sql/utils/importProgress";
+import { SqlFileDropTarget } from "../sql/components/SqlFileDropTarget";
+import { useDropImportPlan } from "../sql/hooks/useDropImportPlan";
+import { tableNameFromSheet } from "../sql/utils/workbookImport";
+import type { XlsxSheet } from "../sql/utils/xlsxReader";
 import { RenameDatabaseDialog } from "../sql/components/RenameDatabaseDialog";
 import { SqlEditorToolbar } from "../sql/components/SqlEditorToolbar";
 import { findDuckDbSampleDatabase } from "../runtime/duckdbSamples";
@@ -2749,13 +2753,14 @@ function DuckDbPlaygroundInner() {
   // Same flow as performImportSqlDump, but loads a binary .duckdb image
   // (the binary section of a cloud/share bundle) instead of replaying SQL.
   const performImportDuckDbImage = useCallback(
-    async (image: Uint8Array, filename: string) => {
+    async (image: Uint8Array, filename: string, report?: ImportStepReporter) => {
       const engine = engineRef.current;
       if (!engine) return;
       setStatusState("loading");
       try {
         // importBinaryImage copies the image into a blank catalog and
         // restores the previous sample on failure.
+        report?.("Opening database");
         await engine.importBinaryImage(image);
         setTables([]);
         setViews([]);
@@ -2791,6 +2796,7 @@ function DuckDbPlaygroundInner() {
         tabHistoryRef.current = [];
         setActiveTabId(nextActive);
         setResultsByTab({});
+        report?.("Reading schema");
         await refreshSchema();
         setStatusState("ready");
         showToast(`Loaded "${filename}".`);
@@ -4509,6 +4515,47 @@ function DuckDbPlaygroundInner() {
     ? [...baseMoreSections, accountSection]
     : baseMoreSections;
 
+  // ─── Drop a file anywhere on the playground ──────────────────────────
+  // Every action here routes into the same import the matching menu entry
+  // uses, so a dropped file and a picked one end up in the same place.
+  const planDroppedFile = useDropImportPlan({
+    dialect: "duckdb",
+    engineLabel: "DuckDB",
+    databaseKind: "duckdb",
+    importDatabaseImage: (bytes, filename, report) =>
+      performImportDuckDbImage(bytes, filename, report),
+    importSqlScript: (sql, filename, report) =>
+      performImportSqlDump(sql, filename, report),
+    openCsvImport: (file) => {
+      setImportCsvState(null);
+      setImportCsvOpen(true);
+      handleCsvFile(file);
+    },
+    openJsonImport: (file) => {
+      setImportJsonState(null);
+      setImportJsonOpen(true);
+      handleJsonFile(file);
+    },
+    openParquetImport: (file) => {
+      setImportParquetOpen(true);
+      void handleParquetFile(file);
+    },
+    openWorksheetImport: (sheet: XlsxSheet) => {
+      // The worksheet arrives shaped exactly like a parsed CSV, so it goes
+      // through the CSV preview: table name, column types, the lot.
+      setImportCsvState({
+        tableName: tableNameFromSheet(sheet.name),
+        headers: sheet.headers,
+        rows: sheet.rows,
+        rawText: "",
+        targetMode: "new",
+        targetTable: tables[0] ?? "",
+        colCompare: null,
+      });
+      setImportCsvOpen(true);
+    },
+  });
+
   return (
     <SqlPlaygroundShell
       playgroundId={PLAYGROUND_ID}
@@ -4608,6 +4655,12 @@ function DuckDbPlaygroundInner() {
         </>
       }
     >
+      <SqlFileDropTarget
+        planFor={planDroppedFile}
+        disabled={!loaded}
+        playgroundLabel="DuckDB playground"
+      />
+
       <DdlViewerDialog
           open={ddlDialog !== null}
           onOpenChange={(next) => { if (!next) setDdlDialog(null); }}

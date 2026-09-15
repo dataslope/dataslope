@@ -78,6 +78,14 @@ import { SqlSettingsConfirmDialogs } from "./components/SqlSettingsConfirmDialog
 import { DdlViewerDialog } from "./components/DdlViewerDialog";
 import { SwitchDatabaseDialog } from "./components/SwitchDatabaseDialog";
 import { ImportBinaryFileDialog } from "./components/ImportBinaryFileDialog";
+import { SqlFileDropTarget } from "./components/SqlFileDropTarget";
+import { useDropImportPlan } from "./hooks/useDropImportPlan";
+import type { XlsxSheet } from "./utils/xlsxReader";
+import { tableNameFromSheet } from "./utils/workbookImport";
+import {
+  inferCsvColumnTypes,
+  sqliteAffinityFor,
+} from "./utils/importUtils";
 import { RenameDatabaseDialog } from "./components/RenameDatabaseDialog";
 import { SqlEditorToolbar } from "./components/SqlEditorToolbar";
 import { findSampleDatabase } from "../runtime/sqliteSamples";
@@ -1116,6 +1124,7 @@ function SqlPlaygroundInner() {
   const {
     performDbSwitch,
     performImportDatabaseFile,
+    performImportSqlDump,
     requestDbSwitch,
     exportDatabase,
     exportDatabaseToXlsx,
@@ -2369,6 +2378,50 @@ function SqlPlaygroundInner() {
     />
   );
 
+  // ─── Drop a file anywhere on the playground ──────────────────────────
+  // Every action here routes into the same import the matching menu entry
+  // uses, so a dropped file and a picked one end up in the same place.
+  const planDroppedFile = useDropImportPlan({
+    dialect: "sqlite",
+    engineLabel: "SQLite",
+    databaseKind: "sqlite",
+    importDatabaseImage: (bytes, filename, report) =>
+      performImportDatabaseFile(bytes, filename, report),
+    importSqlScript: (sql, filename, report) =>
+      performImportSqlDump(sql, filename, report),
+    openCsvImport: (file) => {
+      setImportCsvState(null);
+      setImportCsvOpen(true);
+      handleCsvFile(file);
+    },
+    openJsonImport: (file) => {
+      setImportJsonState(null);
+      setImportJsonOpen(true);
+      handleJsonFile(file);
+    },
+    openParquetImport: (file) => {
+      setImportParquetOpen(true);
+      void handleParquetFile(file);
+    },
+    openWorksheetImport: (sheet: XlsxSheet) => {
+      // The worksheet arrives shaped exactly like a parsed CSV, so it goes
+      // through the CSV preview: table name, column types, the lot.
+      setImportCsvState({
+        tableName: tableNameFromSheet(sheet.name),
+        headers: sheet.headers,
+        rows: sheet.rows,
+        rawText: "",
+        targetMode: "new",
+        targetTable: tables[0] ?? "",
+        colCompare: null,
+        columnTypes: inferCsvColumnTypes(sheet.headers, sheet.rows).map(
+          sqliteAffinityFor,
+        ),
+      });
+      setImportCsvOpen(true);
+    },
+  });
+
   return (
     <SqlPlaygroundShell
       playgroundId={PLAYGROUND_ID}
@@ -2615,6 +2668,12 @@ function SqlPlaygroundInner() {
             </Dialog.Popup>
           </Dialog.Portal>
         </Dialog.Root>
+
+        <SqlFileDropTarget
+          planFor={planDroppedFile}
+          disabled={!loaded}
+          playgroundLabel="SQLite playground"
+        />
 
         <ImportBinaryFileDialog
           open={importSqliteOpen}
