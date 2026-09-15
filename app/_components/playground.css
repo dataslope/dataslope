@@ -473,7 +473,17 @@ body.playground-active {
   background: var(--menu-item-hover);
   color: var(--text);
 }
+/* A menu item's title row. Flex so a trailing extension badge (or any other
+   trailing marker) sits against the right edge of the panel instead of
+   hugging the end of the title text, which is how the export menus have
+   always read; the import menus used to leave theirs attached to the title.
+   A title with no trailing element is unaffected: one flex item, still
+   left-aligned. */
 .example-item .ex-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   font-weight: 500;
   color: var(--text);
   margin-bottom: 2px;
@@ -2795,12 +2805,6 @@ input[type="range"].fs-slider:disabled {
 
 .export-item-text {
   min-width: 0;
-}
-
-.export-item .ex-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 
 .export-item .ex-desc {
