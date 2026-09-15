@@ -77,6 +77,11 @@ const PINS: { pkg: string; file: string; name: string }[] = [
     name: "SQLITE_WASM_VERSION",
   },
   {
+    pkg: "wasm-xlsxwriter",
+    file: "app/_components/runtime/cdn.ts",
+    name: "WASM_XLSXWRITER_VERSION",
+  },
+  {
     pkg: "typescript",
     file: "app/_components/runtime/cdn.ts",
     name: "TYPESCRIPT_VERSION",
@@ -105,9 +110,11 @@ describe("CDN version pins match the installed packages", () => {
     expect(loader).toContain("PARQUET_WASM_CDN");
   });
 
-  it("pins parquet-wasm exactly, since its glue and binary must be one build", () => {
-    // A caret range lets `npm update` move the glue while the URL stays put,
-    // which is exactly how the LinkError above got shipped.
-    expect(declaredRange("parquet-wasm")).toBe(lockedVersion("parquet-wasm"));
-  });
+  for (const pkg of ["parquet-wasm", "wasm-xlsxwriter"]) {
+    it(`pins ${pkg} exactly, since its glue and binary must be one build`, () => {
+      // A caret range lets `npm update` move the glue while the URL stays
+      // put, which is exactly how the LinkError above got shipped.
+      expect(declaredRange(pkg)).toBe(lockedVersion(pkg));
+    });
+  }
 });

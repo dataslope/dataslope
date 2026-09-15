@@ -69,6 +69,14 @@ export const ESM_SH_ORIGIN = "https://esm.sh";
 export const PARQUET_WASM_VERSION = "0.7.2";
 export const PARQUET_WASM_CDN = `https://cdn.jsdelivr.net/npm/parquet-wasm@${PARQUET_WASM_VERSION}/esm/parquet_wasm_bg.wasm`;
 
+// wasm-xlsxwriter's binary, fetched on demand by the Excel export paths, and
+// the same two-halves-of-one-build arrangement as parquet-wasm above: pinned
+// exactly, checked by `wasmCdnPins.test.ts`. The URL was left at 0.13.0 while
+// npm moved the glue to 0.13.1; that pair happened to still link, which is
+// luck rather than a property of patch releases.
+export const WASM_XLSXWRITER_VERSION = "0.13.1";
+export const WASM_XLSXWRITER_CDN = `https://cdn.jsdelivr.net/npm/wasm-xlsxwriter@${WASM_XLSXWRITER_VERSION}/web/wasm_xlsxwriter_bg.wasm`;
+
 // React type declarations for TSX intellisense, lazily fetched and mounted
 // at node_modules paths by the TS language worker. Keep the majors aligned
 // with REACT_VERSION in esmResolve.ts.
