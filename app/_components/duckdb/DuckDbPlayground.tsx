@@ -113,7 +113,14 @@ import { SqlPlaygroundShell } from "../sql/components/SqlPlaygroundShell";
 import { SchemaActionDialogs } from "../sql/components/SchemaActionDialogs";
 import { ImportSqlDumpDialog } from "../sql/components/ImportSqlDumpDialog";
 import type { ImportStepReporter } from "../sql/utils/importProgress";
+import { ImportBinaryFileDialog } from "../sql/components/ImportBinaryFileDialog";
 import { SqlFileDropTarget } from "../sql/components/SqlFileDropTarget";
+import {
+  routeDatabaseFile,
+  SNIFF_BYTES,
+  sniffDroppedFile,
+} from "../sql/utils/droppedFile";
+import { yieldToPaint } from "../sql/utils/importProgress";
 import { useDropImportPlan } from "../sql/hooks/useDropImportPlan";
 import { tableNameFromSheet } from "../sql/utils/workbookImport";
 import type { XlsxSheet } from "../sql/utils/xlsxReader";
@@ -276,6 +283,12 @@ const DUCKDB_DB_ACTIONS: readonly DatabaseSelectorAction[] = [
     icon: <FilePlus size={14} />,
     label: "New Database",
     description: "Create a blank database",
+  },
+  {
+    id: "__import_duckdb__",
+    icon: <Database size={14} />,
+    label: "Import Database",
+    description: "Open a .duckdb database file",
   },
   {
     id: "__import_sql_dump__",
@@ -1194,6 +1207,8 @@ function DuckDbPlaygroundInner() {
     useState<ParquetImportState | null>(null);
   const [importSqlDumpOpen, setImportSqlDumpOpen] = useState(false);
   const [importSqlDumpDragging, setImportSqlDumpDragging] = useState(false);
+  const [importDuckDbOpen, setImportDuckDbOpen] = useState(false);
+  const [importDuckDbDragging, setImportDuckDbDragging] = useState(false);
 
   // ─── Rename / custom filename state ───────────────────────────────────
   const [renameDbOpen, setRenameDbOpen] = useState(false);
@@ -2818,6 +2833,35 @@ function DuckDbPlaygroundInner() {
     [persistTabs, refreshSchema, showToast],
   );
 
+  /** The "Import Database" dialog's entry point. The file's own bytes decide
+   *  which import runs, the way the SQLite playground's single dialog does:
+   *  a .duckdb saved with a .db name still opens, and a dump picked here
+   *  still replays instead of dead-ending on "not a database". */
+  const performImportDuckDbFile = useCallback(
+    async (bytes: Uint8Array, filename: string, report?: ImportStepReporter) => {
+      // Sniff the head only: decoding a whole multi-gigabyte image to look
+      // for SQL text would cost more than the import.
+      const { kind } = sniffDroppedFile(filename, bytes.subarray(0, SNIFF_BYTES));
+      const route = routeDatabaseFile(kind, filename, "duckdb");
+      if (route.action === "refuse") {
+        showToast(route.message, "warn");
+        return;
+      }
+      if (route.action === "image") {
+        return performImportDuckDbImage(bytes, filename, report);
+      }
+      report?.("Decoding SQL dump");
+      // Give the label a frame to paint: decoding a large dump blocks.
+      await yieldToPaint();
+      return performImportSqlDump(
+        new TextDecoder().decode(bytes),
+        filename,
+        report,
+      );
+    },
+    [performImportDuckDbImage, performImportSqlDump, showToast],
+  );
+
   const {
     addTab,
     openTabAndRun,
@@ -3939,6 +3983,31 @@ function DuckDbPlaygroundInner() {
     }
   }, [tables, buildDuckDbDumpSql, displayFilename, showToast]);
 
+  /** Download the database as a real .duckdb file. The same image the
+   *  workspace snapshots and share bundles already carry, which DuckDB
+   *  builds with `COPY FROM DATABASE`; a build without `copyFileToBuffer`
+   *  says so rather than downloading nothing. */
+  const exportDuckDbBinary = useCallback(async () => {
+    const engine = engineRef.current;
+    if (!engine) return;
+    const baseName = displayFilename.replace(/\.[^.]+$/, "") || "database";
+    const filename = `${baseName}.duckdb`;
+    try {
+      showToast("Preparing the database file…");
+      const image = await engine.exportBinaryImage();
+      triggerDownload(
+        new Blob([image as BlobPart], { type: "application/octet-stream" }),
+        filename,
+      );
+      showToast(`Exported ${filename}.`);
+    } catch (err) {
+      showToast(
+        `Export failed: ${err instanceof Error ? err.message : String(err)}`,
+        "warn",
+      );
+    }
+  }, [displayFilename, showToast]);
+
   // Cloud saves + sharing: a SQL bundle carries the database as its native
   // .duckdb image plus the query tabs; reopening loads the image instead of
   // replaying a dump.
@@ -4308,6 +4377,10 @@ function DuckDbPlaygroundInner() {
           requestDbSwitch(DUCKDB_BLANK_DATABASE.id);
           return;
         }
+        if (value === "__import_duckdb__") {
+          setImportDuckDbOpen(true);
+          return;
+        }
         if (value === "__import_sql_dump__") {
           setImportSqlDumpOpen(true);
           return;
@@ -4425,6 +4498,22 @@ function DuckDbPlaygroundInner() {
                             </div>
                           ) : (
                             <>
+                              <button
+                                type="button"
+                                className="example-item"
+                                onClick={() => {
+                                  close();
+                                  void exportDuckDbBinary();
+                                }}
+                              >
+                                <div className="ex-title">
+                                  DuckDB Database
+                                  <span className="ext-badge">.duckdb</span>
+                                </div>
+                                <div className="ex-desc">
+                                  Native database file, reopened as-is
+                                </div>
+                              </button>
                               <button
                                 type="button"
                                 className="example-item"
@@ -4670,6 +4759,34 @@ function DuckDbPlaygroundInner() {
           isPostgres
           onCopied={() => showToast("Copied DDL to clipboard.")}
           onCopyFailed={() => showToast("Couldn't copy to clipboard.", "warn")}
+        />
+
+        <ImportBinaryFileDialog
+          open={importDuckDbOpen}
+          dragging={importDuckDbDragging}
+          onClose={() => setImportDuckDbOpen(false)}
+          onDraggingChange={setImportDuckDbDragging}
+          onImport={(data, filename, report) =>
+            performImportDuckDbFile(data, filename, report)
+          }
+          title="Import Database"
+          description={
+            <>
+              Open a local DuckDB database file (<code>.duckdb</code>,{" "}
+              <code>.ddb</code>, <code>.db</code>) as this workspace&rsquo;s
+              database. A SQL dump works here too: the file&rsquo;s content
+              decides how it is read.
+            </>
+          }
+          warningText={
+            <>
+              This will replace the current database and reset its query tabs.
+              Your file is never uploaded, it is read in your browser.
+            </>
+          }
+          dropText="Drop a database file here"
+          browseHint="or click to browse, .duckdb, .ddb, .db, .sql"
+          inputAriaLabel="Choose DuckDB database file"
         />
 
         <ImportSqlDumpDialog

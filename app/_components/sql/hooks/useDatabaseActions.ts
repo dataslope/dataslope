@@ -28,6 +28,11 @@ import {
   type ImportStepReporter,
 } from "../utils/importProgress";
 import {
+  routeDatabaseFile,
+  SNIFF_BYTES,
+  sniffDroppedFile,
+} from "../utils/droppedFile";
+import {
   applyPragmasToEngine,
 } from "../utils/pragmaUtils";
 import {
@@ -260,6 +265,16 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       if (isSqliteBinary(bytes)) {
         return performImportSqlite(bytes, filename, report);
       }
+      // A binary of a format this playground knows but cannot open here says
+      // so, instead of failing further in on bytes that were never SQL.
+      // Sniff the head only: decoding a whole image just to classify it would
+      // cost more than the import.
+      const { kind } = sniffDroppedFile(filename, bytes.subarray(0, SNIFF_BYTES));
+      const route = routeDatabaseFile(kind, filename, "sqlite");
+      if (route.action === "refuse") {
+        showToast(route.message, "warn");
+        return;
+      }
       // Decoding a large dump is the one step that blocks the main thread,
       // so it is named, and the label is given a frame to paint before the
       // freeze rather than arriving after it.
@@ -271,7 +286,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
         report,
       );
     },
-    [performImportSqlite, performImportSqlDump],
+    [performImportSqlite, performImportSqlDump, showToast],
   );
 
   /** Terminate a DDL statement, without doubling a semicolon it already has.

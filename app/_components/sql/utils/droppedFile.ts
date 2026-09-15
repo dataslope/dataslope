@@ -199,3 +199,55 @@ export async function readSniffHead(file: File): Promise<Uint8Array> {
   const slice = file.slice(0, SNIFF_BYTES);
   return new Uint8Array(await slice.arrayBuffer());
 }
+
+/** What an "Import Database" dialog should do with the file it was given.
+ *  Both the SQLite and DuckDB dialogs accept a binary image *or* a SQL dump
+ *  and let the content decide, so both ask this. */
+export type DatabaseFileRoute =
+  | { action: "image" }
+  | { action: "dump" }
+  | { action: "refuse"; message: string };
+
+/** The engines that can open a binary database image, and the playground
+ *  that reads each one. */
+const IMAGE_ENGINES: Record<"sqlite" | "duckdb", string> = {
+  sqlite: "SQLite",
+  duckdb: "DuckDB",
+};
+
+/**
+ * Decide how an imported database file should be read by `engine`. A file of
+ * the wrong binary format is refused with a sentence naming where it does
+ * open: without this it went down the dump path and failed on whatever its
+ * bytes happened to decode to, which reads as a corrupt file rather than the
+ * wrong one.
+ */
+export function routeDatabaseFile(
+  kind: DroppedFileKind,
+  filename: string,
+  engine: "sqlite" | "duckdb",
+): DatabaseFileRoute {
+  if (kind === engine) return { action: "image" };
+  if (kind === "sqlite" || kind === "duckdb") {
+    return {
+      action: "refuse",
+      message: `"${filename}" is a ${DROPPED_KIND_LABELS[kind]}. Open it in the ${IMAGE_ENGINES[kind]} playground, or export it as a .sql dump.`,
+    };
+  }
+  if (kind === "parquet") {
+    return {
+      action: "refuse",
+      message: `"${filename}" is a Parquet file. Import it with Import data → from Parquet.`,
+    };
+  }
+  if (kind === "xlsx") {
+    return {
+      action: "refuse",
+      message: `"${filename}" is an Excel workbook. Drop it on the playground to import a worksheet.`,
+    };
+  }
+  // CSV and JSON are legible as text, so they reach the dump path and fail
+  // with the engine's own syntax error, which names the offending line. That
+  // is more useful than a guess about what the file was meant to be.
+  return { action: "dump" };
+}

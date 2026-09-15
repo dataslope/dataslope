@@ -7,6 +7,7 @@
 import { describe, expect, it } from "vitest";
 import {
   fileExtension,
+  routeDatabaseFile,
   sniffDroppedFile,
   type DroppedFileKind,
 } from "../app/_components/sql/utils/droppedFile";
@@ -141,5 +142,52 @@ describe("certainty", () => {
   it("hedges when only the shape of the text suggests an answer", () => {
     expect(sniffDroppedFile("a.txt", text("a,b\n1,2")).certain).toBe(false);
     expect(sniffDroppedFile("a.txt", text('{"a":1}')).certain).toBe(false);
+  });
+});
+
+// ── Which import an "Import Database" dialog runs ────────────────────────
+// Both the SQLite and DuckDB dialogs take a binary image or a SQL dump and
+// let the content decide, so a file of the wrong binary format has to be
+// turned away with something better than a syntax error from deep inside the
+// engine.
+
+describe("routeDatabaseFile", () => {
+  it("opens an image the engine can read", () => {
+    expect(routeDatabaseFile("sqlite", "a.db", "sqlite")).toEqual({
+      action: "image",
+    });
+    expect(routeDatabaseFile("duckdb", "a.duckdb", "duckdb")).toEqual({
+      action: "image",
+    });
+  });
+
+  it("replays anything textual as a dump", () => {
+    for (const kind of ["sqldump", "csv", "json", "unknown"] as const) {
+      expect(routeDatabaseFile(kind, "a.sql", "sqlite").action).toBe("dump");
+      expect(routeDatabaseFile(kind, "a.sql", "duckdb").action).toBe("dump");
+    }
+  });
+
+  it("turns away the other engine's database, naming where it opens", () => {
+    const toDuck = routeDatabaseFile("sqlite", "chinook.db", "duckdb");
+    expect(toDuck.action).toBe("refuse");
+    expect(toDuck.action === "refuse" && toDuck.message).toMatch(
+      /chinook\.db.*SQLite database.*SQLite playground/,
+    );
+    const toSqlite = routeDatabaseFile("duckdb", "warehouse.duckdb", "sqlite");
+    expect(toSqlite.action === "refuse" && toSqlite.message).toMatch(
+      /DuckDB database.*DuckDB playground/,
+    );
+  });
+
+  it("points a data file at the import that handles it", () => {
+    const parquet = routeDatabaseFile("parquet", "part.parquet", "sqlite");
+    expect(parquet.action === "refuse" && parquet.message).toMatch(
+      /Parquet file.*from Parquet/,
+    );
+    const workbook = routeDatabaseFile("xlsx", "sales.xlsx", "duckdb");
+    expect(workbook.action === "refuse" && workbook.message).toMatch(
+      /Excel workbook.*Drop it/,
+    );
   });
 });
