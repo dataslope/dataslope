@@ -5,7 +5,13 @@
  * the course list. Filtering/sorting is client-side over the build-time
  * course array; sidebar counts are totals over the whole catalog.
  */
-import { useMemo, useState, useSyncExternalStore } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { Select } from "@base-ui/react/select";
 import {
   ArrowDownAZ,
@@ -22,6 +28,7 @@ import type { CatalogCourse } from "@/lib/courseCatalog";
 import { LangIcon } from "@/app/_components/languageIcons";
 import { CourseCard, LevelBars } from "./CourseCard";
 import { COURSE_LANGUAGES, readFilters, writeFilters } from "./catalogFilters";
+import { catalogStickyOffset, scrollTopRevealingList } from "./catalogScroll";
 
 const LEVELS = ["beginner", "intermediate", "advanced"] as const;
 type Level = (typeof LEVELS)[number];
@@ -241,8 +248,41 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
     window.history.replaceState(null, "", query ? `${pathname}?${query}` : pathname);
     window.dispatchEvent(new Event(URL_FILTERS_CHANGED));
   };
-  const setLangs = (next: string[]) => setFilters(next, levels);
-  const setLevels = (next: string[]) => setFilters(langs, next);
+  // A filter click can come from any scroll depth and usually shortens the
+  // list, so the results have to be brought back under the sticky header
+  // afterwards; see catalogScroll.ts. The counter defers that to an effect,
+  // which runs once React has committed the filtered list and the browser has
+  // clamped the scroll position to the shorter document, so the measurement
+  // below is of where things actually ended up.
+  const mobileFiltersRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const [revealTick, setRevealTick] = useState(0);
+  const setLangs = (next: string[]) => {
+    setFilters(next, levels);
+    setRevealTick((n) => n + 1);
+  };
+  const setLevels = (next: string[]) => {
+    setFilters(langs, next);
+    setRevealTick((n) => n + 1);
+  };
+
+  useEffect(() => {
+    // 0 is the first render, where the reader has clicked nothing: a
+    // `?lang=` deep link should land on the top of the page as usual.
+    if (revealTick === 0 || !listRef.current) return;
+    const top = scrollTopRevealingList(
+      listRef.current.getBoundingClientRect().top,
+      window.scrollY,
+      // `md:hidden`, so this measures 0 on desktop and the sidebar's offset
+      // is used instead.
+      catalogStickyOffset(mobileFiltersRef.current?.offsetHeight ?? 0),
+    );
+    if (top === null) return;
+    const reduced = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    window.scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
+  }, [revealTick]);
 
   const langCount = (l: string) =>
     courses.filter((c) => c.tags.language?.[0] === l).length;
@@ -296,7 +336,10 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
       {/* Mobile filter bar: the sidebar is desktop-only, so filters collapse
           to sticky dropdowns here. Full-bleed background so scrolled rows
           never show through. */}
-      <div className="sticky top-11 z-30 -mx-4 mt-8 border-b bg-white px-4 py-3 md:hidden dark:bg-[#121212] sm:-mx-6 sm:px-6 border-[var(--ds-gray-100)] dark:border-white/[0.07]">
+      <div
+        ref={mobileFiltersRef}
+        className="sticky top-11 z-30 -mx-4 mt-8 border-b bg-white px-4 py-3 md:hidden dark:bg-[#121212] sm:-mx-6 sm:px-6 border-[var(--ds-gray-100)] dark:border-white/[0.07]"
+      >
         <label
           className={`flex items-center gap-[9px] rounded-lg border px-3 py-2 focus-within:border-[var(--ds-blue-400)] dark:focus-within:border-[var(--ds-blue-500)] ${HAIRLINE}`}
         >
@@ -422,7 +465,7 @@ export function CoursesCatalog({ courses }: { courses: CatalogCourse[] }) {
       </aside>
 
       {/* ── Course list ── */}
-      <div className="flex min-w-0 flex-col">
+      <div ref={listRef} className="flex min-w-0 flex-col">
         <div
           className={`flex items-center gap-2.5 border-b px-0.5 pb-3.5 ${HAIRLINE}`}
         >
