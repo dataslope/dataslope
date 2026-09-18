@@ -41,6 +41,9 @@
   --field: #f4f4f5;
   --divider: rgba(17, 24, 39, 0.08);
   --rail-group: rgba(17, 24, 39, 0.025);
+  /* Unfilled segment of the three-bar difficulty meter. Cool enough to
+     read as "empty" beside the blue fills without matching a border. */
+  --meter-off: #e2e5ea;
   --label-icon: #0064bd;
   --ai: #7a51b6;
   --ai-soft: #f4effe;
@@ -76,6 +79,7 @@
   --field: #232323;
   --divider: rgba(255, 255, 255, 0.09);
   --rail-group: rgba(255, 255, 255, 0.035);
+  --meter-off: #3f3f46;
   --label-icon: #5ba7ff;
   --ai: #bb96fa;
   --ai-soft: rgba(171, 119, 250, 0.16);
@@ -294,6 +298,15 @@
 }
 .ds-page-btn:disabled {
   opacity: 0.4;
+}
+
+/* Catalog table rows. Only a row that leads somewhere lights up, so the
+   hover is not a promise the row cannot keep. */
+.ds-challenge-row {
+  transition: background 0.12s;
+}
+.ds-challenge-row[data-clickable="true"]:hover {
+  background: var(--rail-group);
 }
 
 /* 34×34 top-bar icon buttons (sidebar toggle, full preview). */

@@ -183,10 +183,58 @@ export interface ChallengeStep {
 
 // ─── Challenge ───────────────────────────────────────────────────────
 
+/**
+ * Languages a challenge can be listed under. Finer-grained than
+ * `CodeLanguage`: the list distinguishes SQL dialects, because "PostgreSQL"
+ * and "SQLite" are different filter choices even though the editor calls
+ * both "sql". Ids match `LANGUAGE_ICONS` in `app/_components/languageIcons`.
+ */
+export type IndexLanguage =
+  | "postgres"
+  | "sqlite"
+  | "duckdb"
+  | "python"
+  | "javascript"
+  | "typescript"
+  | "go"
+  | "r";
+
+export const INDEX_LANGUAGE_LABELS: Record<IndexLanguage, string> = {
+  postgres: "PostgreSQL",
+  sqlite: "SQLite",
+  duckdb: "DuckDB",
+  python: "Python",
+  javascript: "JavaScript",
+  typescript: "TypeScript",
+  go: "Go",
+  r: "R",
+};
+
+/** Where the learner stands on a challenge. */
+export type ChallengeStatus = "solved" | "attempted" | "new";
+
+export const CHALLENGE_STATUS_LABELS: Record<ChallengeStatus, string> = {
+  solved: "Solved",
+  attempted: "In progress",
+  new: "Not started",
+};
+
+/** How a challenge appears in the catalog list. */
+export interface ChallengeCatalogMeta {
+  /** The concept the problem drills, shown under the title. */
+  topic: string;
+  langs: IndexLanguage[];
+  status: ChallengeStatus;
+  /** Percent of submissions accepted. */
+  acceptance: number;
+}
+
 export interface Challenge {
   slug: string;
   title: string;
   difficulty: Difficulty;
+  /** This challenge's row in the catalog list. */
+  catalog: ChallengeCatalogMeta;
   /** Subtitle beside the difficulty meter on mobile, e.g. "SQL". */
   languageLabel: string;
   description: string;
@@ -298,6 +346,14 @@ const TOP_PRODUCTS: Challenge = {
   slug: "top-products-by-month",
   title: "Top Products by Month",
   difficulty: "Intermediate",
+  catalog: {
+    topic: "Window functions",
+    // The workspace runs on sqlite, so the row says SQLite. The list mock
+    // said PostgreSQL + DuckDB; the page it links to wins.
+    langs: ["sqlite"],
+    status: "attempted",
+    acceptance: 58,
+  },
   languageLabel: "SQL",
   description:
     "Break a monthly revenue ranking into three gated steps: total revenue per product per month, rank within each month, then cut to the top three.",
@@ -455,6 +511,14 @@ const TOP_K_WORDS: Challenge = {
   slug: "top-k-frequent-words",
   title: "Top K Frequent Words",
   difficulty: "Intermediate",
+  catalog: {
+    topic: "Hash maps",
+    langs: ["python", "javascript", "go"],
+    // The workspace opens on "Attempted · 2 submissions" with a failing
+    // check, so the row cannot say Solved the way the list mock did.
+    status: "attempted",
+    acceptance: 81,
+  },
   languageLabel: "Python",
   description:
     "Return the k most frequent words, most frequent first, breaking ties alphabetically. A single-step problem with a choice of language.",
@@ -623,6 +687,105 @@ k = 2`,
 };
 
 const CHALLENGES: Challenge[] = [TOP_PRODUCTS, TOP_K_WORDS];
+
+// ─── Catalog index ───────────────────────────────────────────────────
+
+/** One row of the challenge list at `/dashboard/challenges`. */
+export interface ChallengeIndexEntry extends ChallengeCatalogMeta {
+  title: string;
+  /** 1 Beginner, 2 Intermediate, 3 Advanced — the filled difficulty bars. */
+  level: number;
+  /** 1 for a single-step problem, otherwise the number of gated steps. */
+  steps: number;
+  /** Set only when a workspace exists at `/challenges/<slug>`. */
+  slug?: string;
+}
+
+/**
+ * Catalog rows with no workspace behind them yet.
+ *
+ * Tuples rather than objects because there are fifty of them and the column
+ * order is fixed; `toEntry` below names the fields. Same provenance as the
+ * rest of this module: authored to exercise the list's filtering, sorting and
+ * pagination, not scraped from a real problem set.
+ *
+ * [title, topic, level, langs, steps, status, acceptance]
+ */
+type CatalogRow = [string, string, number, IndexLanguage[], number, ChallengeStatus, number];
+
+const CATALOG_ONLY: CatalogRow[] = [
+  ["Second Highest Salary", "Subqueries", 1, ["postgres", "sqlite"], 1, "solved", 74],
+  ["Customer Retention Cohorts", "Date math, self joins", 3, ["postgres", "duckdb"], 4, "attempted", 31],
+  ["Running Total of Deposits", "Window functions", 2, ["postgres", "sqlite", "duckdb"], 1, "solved", 66],
+  ["Merge Intervals", "Sorting", 2, ["python", "javascript", "typescript"], 1, "solved", 62],
+  ["Gaps in Sequential IDs", "Gaps and islands", 3, ["postgres"], 2, "new", 29],
+  ["Daily Active Users", "Aggregation", 1, ["postgres", "sqlite", "duckdb"], 1, "new", 79],
+  ["Parse Log Lines", "Regular expressions", 2, ["python", "go"], 2, "new", 55],
+  ["Consecutive Login Streaks", "Gaps and islands", 3, ["postgres", "duckdb"], 3, "new", 27],
+  ["Group Anagrams", "Hash maps", 1, ["python", "javascript"], 1, "new", 77],
+  ["Median Order Value", "Percentiles", 2, ["postgres", "duckdb"], 1, "new", 48],
+  ["Deduplicate Customer Records", "Window functions", 2, ["postgres", "sqlite"], 2, "new", 52],
+  ["Flatten Nested JSON", "Recursion", 2, ["python", "javascript", "typescript"], 1, "new", 59],
+  ["Year-over-Year Growth", "LAG, date math", 2, ["postgres", "duckdb"], 2, "new", 50],
+  ["Moving Average Over a Stream", "Queues", 2, ["python", "go"], 1, "new", 61],
+  ["Employees Earning More Than Managers", "Self joins", 1, ["postgres", "sqlite"], 1, "new", 83],
+  ["Balanced Brackets", "Stacks", 1, ["python", "javascript", "go"], 1, "new", 85],
+  ["Pivot Monthly Sales", "Conditional aggregation", 2, ["postgres", "duckdb"], 2, "new", 44],
+  ["LRU Cache", "Linked lists, hash maps", 3, ["python", "typescript", "go"], 3, "new", 33],
+  ["Sessionize Click Events", "Window functions", 3, ["postgres", "duckdb"], 3, "new", 26],
+  ["Validate ISBN Numbers", "String parsing", 1, ["python", "javascript"], 1, "new", 72],
+  ["Late Shipments by Carrier", "Joins, filtering", 1, ["postgres", "sqlite"], 1, "new", 76],
+  ["Longest Substring Without Repeats", "Sliding window", 2, ["python", "javascript", "go"], 1, "new", 46],
+  ["First Purchase per Customer", "DISTINCT ON, ranking", 1, ["postgres", "duckdb"], 1, "new", 70],
+  ["CSV to Nested Dict", "Parsing", 1, ["python"], 2, "new", 68],
+  ["Inventory Below Reorder Point", "Joins, HAVING", 1, ["postgres", "sqlite", "duckdb"], 1, "new", 80],
+  ["Rate Limiter", "Sliding window", 3, ["python", "go", "typescript"], 3, "new", 30],
+  ["Average Time to Resolve Tickets", "Interval math", 2, ["postgres"], 1, "new", 57],
+  ["Debounce Function", "Closures, timers", 2, ["javascript", "typescript"], 1, "new", 54],
+  ["Products Never Ordered", "Anti joins", 1, ["postgres", "sqlite", "duckdb"], 1, "new", 84],
+  ["Deep Clone Object", "Recursion", 2, ["javascript", "typescript"], 1, "new", 51],
+  ["Percent Change Week over Week", "LAG, date_trunc", 2, ["postgres", "duckdb"], 2, "new", 47],
+  ["Event Emitter", "Classes", 2, ["javascript", "typescript"], 2, "new", 56],
+  ["Funnel Conversion Rates", "Conditional aggregation", 3, ["postgres", "duckdb"], 4, "new", 24],
+  ["Binary Search Tree Insert", "Trees", 2, ["python", "go"], 1, "new", 63],
+  ["Nth Highest Rating", "DENSE_RANK", 2, ["postgres", "sqlite"], 1, "new", 60],
+  ["Reverse a Linked List", "Linked lists", 1, ["python", "javascript", "go"], 1, "new", 78],
+  ["Overlapping Reservations", "Range overlap", 3, ["postgres"], 2, "new", 28],
+  ["Spiral Order Matrix", "Arrays", 2, ["python", "javascript"], 1, "new", 49],
+  ["Fill Missing Dates", "generate_series", 2, ["postgres", "duckdb"], 2, "new", 42],
+  ["Count Islands", "Graph search", 2, ["python", "go", "typescript"], 1, "new", 53],
+  ["Top Referrers per Page", "Ranking", 2, ["postgres", "duckdb"], 2, "new", 45],
+  ["Shortest Path with Dijkstra", "Graphs, heaps", 3, ["python", "go"], 3, "new", 25],
+  ["Churned Subscribers", "Date math, anti joins", 2, ["postgres", "sqlite"], 2, "new", 43],
+  ["Sudoku Validator", "Sets", 1, ["python", "javascript"], 1, "new", 71],
+  ["Kth Largest Element", "Heaps", 2, ["python", "go", "typescript"], 1, "new", 58],
+  ["Summarise Survey Responses", "dplyr, tidyr", 1, ["r"], 1, "new", 73],
+  ["Trie Autocomplete", "Tries", 3, ["python", "typescript"], 3, "new", 32],
+  ["Reshape Wide to Long", "tidyr", 2, ["r"], 1, "new", 61],
+  ["Roman Numerals", "String parsing", 1, ["python", "javascript", "go"], 1, "new", 82],
+  ["Linear Regression by Group", "purrr, broom", 3, ["r"], 2, "new", 35],
+];
+
+function toEntry(row: CatalogRow): ChallengeIndexEntry {
+  const [title, topic, level, langs, steps, status, acceptance] = row;
+  return { title, topic, level, langs, steps, status, acceptance };
+}
+
+/**
+ * Every challenge in the catalog. The built ones come first and derive their
+ * title, level and step count from the challenge itself, so a row can never
+ * disagree with the page it links to.
+ */
+export function getChallengeIndex(): ChallengeIndexEntry[] {
+  const built = CHALLENGES.map((c) => ({
+    ...c.catalog,
+    title: c.title,
+    level: DIFFICULTY_BARS[c.difficulty],
+    steps: Math.max(1, c.steps.length),
+    slug: c.slug,
+  }));
+  return [...built, ...CATALOG_ONLY.map(toEntry)];
+}
 
 export function getChallenge(slug: string): Challenge | undefined {
   return CHALLENGES.find((c) => c.slug === slug);

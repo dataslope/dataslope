@@ -43,7 +43,7 @@ const NAV_SECTIONS: {
 }[] = [
   { href: "/courses", label: "Courses", icon: GraduationCap, prefetch: true },
   // Learn → do → drill, so these two sit between Courses and Interview Prep.
-  { href: "/challenges", label: "Challenges", icon: Code2 },
+  { href: "/dashboard/challenges", label: "Challenges", icon: Code2 },
   { href: "/practice", label: "Practice", icon: ListChecks },
   { href: "/interview-prep", label: "Interview Prep", icon: BriefcaseBusiness },
   { href: "/playground", label: "Playground", icon: SquareTerminal },
