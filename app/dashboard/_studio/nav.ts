@@ -27,6 +27,7 @@ export type StudioRouteKey =
   | "sql"
   | "mcq"
   | "quiz"
+  | "challenges"
   | "playground"
   | "account"
   | "admin";
@@ -127,6 +128,12 @@ export const ADMIN_ITEMS: AdminNavItem[] = [
  *  by the shell. */
 export const PAGE_ITEMS: StudioNavItem[] = [
   {
+    key: "challenges",
+    label: "Challenges",
+    href: "/dashboard/challenges",
+    icon: Code2,
+  },
+  {
     key: "playground",
     label: "Playground",
     href: "/dashboard/playground",
@@ -158,6 +165,7 @@ export function activeKeyForPath(pathname: string): StudioRouteKey {
   if (path.startsWith("/dashboard/create/sql")) return "sql";
   if (path.startsWith("/dashboard/create/mcq")) return "mcq";
   if (path.startsWith("/dashboard/create/quiz")) return "quiz";
+  if (path.startsWith("/dashboard/challenges")) return "challenges";
   if (path.startsWith("/dashboard/playground")) return "playground";
   if (path.startsWith("/dashboard/account")) return "account";
   if (path.startsWith("/dashboard/admin")) return "admin";

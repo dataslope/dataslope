@@ -1,0 +1,1904 @@
+/* Full-page challenge workspace.
+ *
+ * Ported from the Claude Design prototypes (`Challenge - Top Products by
+ * Month`, `Challenge - Top K Frequent Words`, `Challenge Mobile - Top
+ * Products by Month`). Every literal in those files was a hex; all of them
+ * turned out to sit on the brand ramp, so they are expressed here as
+ * `--ds-*` tokens from app/brand.css. The two exceptions are called out
+ * where they are defined.
+ *
+ * Light-only, like the playground shells (`app/_components/playground.css`
+ * carries no dark variant either). The prototypes were authored light-only
+ * and the design review never covered a dark treatment, so rather than
+ * invent one, the route opts out of the site theme.
+ *
+ * Layout: desktop is a resizable three-pane split; below 768px the same
+ * state renders as Problem / Code / Results tabs. Both trees are in the DOM
+ * and swapped by media query rather than by a JS viewport check, so there is
+ * no hydration mismatch and no first-paint flash on a phone. */
+
+.page {
+  /* Semantic aliases over the brand ramp, same pattern as
+     ChallengeCard.module.css. */
+  --cw-bg: var(--ds-white);
+  --cw-bg-muted: var(--ds-gray-50);
+  --cw-bg-hover: var(--ds-gray-100);
+  --cw-border: var(--ds-gray-200);
+  --cw-border-light: var(--ds-gray-100);
+  --cw-border-faint: var(--ds-gray-50);
+  --cw-border-strong: var(--ds-gray-300);
+  --cw-text: var(--ds-gray-800);
+  --cw-text-strong: var(--ds-gray-900);
+  --cw-text-body: var(--ds-gray-700);
+  --cw-text-secondary: var(--ds-gray-600);
+  --cw-text-muted: var(--ds-gray-500);
+  --cw-text-faint: var(--ds-gray-400);
+  /* The near-black the prototypes use for primary buttons and emphasis. It
+     is the same #121212 as the site's dark shell, but that value is not
+     published as a global token — `--ds-shell-base` is defined only inside
+     `.ds-striped-shell` in dark mode — so it is spelled out here. */
+  --cw-ink: #121212;
+  --cw-ink-hover: #2a2a2a;
+  --cw-accent: var(--ds-blue-500);
+  --cw-accent-link: var(--ds-blue-700);
+  --cw-accent-link-hover: var(--ds-blue-800);
+  --cw-accent-tint: var(--ds-blue-50);
+  --cw-pass: var(--ds-green-500);
+  --cw-pass-ink: var(--ds-green-800);
+  --cw-pass-tint: var(--ds-green-50);
+  --cw-fail-ink: var(--ds-red-700);
+  --cw-fail-ink-strong: var(--ds-red-800);
+  --cw-fail-tint: var(--ds-red-50);
+  --cw-fail-badge: var(--ds-red-100);
+  /* Not on the ramp: the unfilled difficulty bar is a cool gray that reads
+     as "empty" beside the blue fills without matching any border token. */
+  --cw-meter-off: #e2e5ea;
+  /* Not on the ramp either: the amber "attempted" dot. The brand yellow
+     (--ds-yellow-500) is too pale to read as a 8px dot on white. */
+  --cw-attempted: #f5b301;
+
+  --cw-font-ui: var(--font-sans, Inter, system-ui, sans-serif);
+  --cw-font-mono: var(--font-mono, "JetBrains Mono", ui-monospace, monospace);
+
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  width: 100%;
+  background: var(--cw-bg);
+  color: var(--cw-text);
+  font-family: var(--cw-font-ui);
+  letter-spacing: -0.015em;
+}
+
+.page code,
+.page pre {
+  font-family: var(--cw-font-mono);
+  letter-spacing: normal;
+}
+
+.page button:not(:disabled) {
+  cursor: pointer;
+}
+
+/* The workspace owns the viewport: its panes scroll, the document does not.
+   Toggled by the component, mirroring `body.playground-active`. */
+:global(body.challenge-active) {
+  overflow: hidden;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Touch-scrollable strips whose scrollbar would sit on top of content. */
+.noScrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+.noScrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ─── Responsive switch ─────────────────────────────────────────────
+   The desktop split needs 300px of instructions plus 460px of workspace
+   before its own drag clamps fight each other, so it starts at 768px. */
+.desktopOnly {
+  display: none;
+  flex: 1;
+  min-height: 0;
+}
+.mobileOnly {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+@media (min-width: 768px) {
+  .desktopOnly {
+    display: flex;
+    flex-direction: column;
+  }
+  .mobileOnly {
+    display: none;
+  }
+}
+
+/* ─── Screen-reader-only heading ────────────────────────────────────
+   The visible title lives in the top bar at 15px, which is chrome rather
+   than a document heading; both layouts render it, so the accessible <h1>
+   is separate and hidden. Standard sr-only recipe (globals.css). */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ─── Top bar (desktop) ─────────────────────────────────────────────── */
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-shrink: 0;
+  height: 56px;
+  border-bottom: 1px solid var(--cw-border);
+  padding: 0 16px;
+}
+
+.topBarLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.topBarRight {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--cw-text-muted);
+  text-decoration: none;
+}
+.backLink:hover {
+  color: var(--cw-ink);
+}
+
+.vDivider {
+  flex-shrink: 0;
+  width: 1px;
+  height: 20px;
+  background: var(--cw-border);
+}
+
+.title {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--cw-text-strong);
+}
+
+.difficulty {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.meter {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.bar {
+  height: 4px;
+  width: 10px;
+  border-radius: 1px;
+  background: var(--cw-meter-off);
+}
+/* Declared next to `.bar` rather than down in the mobile section so that
+   `.barOn` below still wins: these carry equal specificity, so source order
+   decides which background paints. */
+.mBar {
+  height: 3px;
+  width: 9px;
+  border-radius: 1px;
+  background: var(--cw-meter-off);
+}
+.barOn {
+  background: var(--cw-accent);
+}
+
+.difficultyLabel {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--cw-text-secondary);
+}
+
+/* ─── Buttons ───────────────────────────────────────────────────────── */
+
+.ghostBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  padding: 7px 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--cw-text-muted);
+}
+.ghostBtn:hover {
+  color: var(--cw-ink);
+  background: var(--cw-bg-hover);
+}
+
+.secondaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--cw-border-strong);
+  border-radius: 2px;
+  background: var(--cw-bg);
+  padding: 7px 12px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--cw-ink);
+}
+.secondaryBtn:hover {
+  border-color: var(--cw-ink);
+}
+
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 2px;
+  background: var(--cw-ink);
+  padding: 8px 14px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--cw-bg);
+}
+.primaryBtn:hover {
+  background: var(--cw-ink-hover);
+}
+
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: var(--cw-text-muted);
+}
+.iconBtn:hover {
+  background: var(--cw-bg-hover);
+}
+
+.navPair {
+  display: inline-flex;
+  gap: 2px;
+}
+
+/* ─── Split layout ──────────────────────────────────────────────────── */
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(300px, 32%) 5px minmax(0, 1fr);
+  flex: 1;
+  min-height: 0;
+}
+
+.instructionsPane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+
+.instructionsBody {
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 22px 24px 40px;
+}
+
+.colResizer {
+  cursor: col-resize;
+  border: 0;
+  padding: 0;
+  background: var(--cw-border);
+}
+.colResizer:hover,
+.colResizer:focus-visible {
+  background: var(--cw-accent);
+}
+
+.rowResizer {
+  cursor: row-resize;
+  border: 0;
+  padding: 0;
+  background: var(--cw-border);
+}
+.rowResizer:hover,
+.rowResizer:focus-visible {
+  background: var(--cw-accent);
+}
+
+.workspacePane {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) 5px 42%;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.paneColumn {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+
+/* ─── Step stepper (desktop) ────────────────────────────────────────── */
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--cw-border-light);
+  padding: 12px 24px;
+}
+
+.stepItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+.stepItemActive {
+  flex: 1 1 auto;
+}
+
+.stepMark {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: 9999px;
+  font-family: inherit;
+  padding: 0;
+  color: var(--cw-bg);
+  background: var(--cw-accent);
+}
+.stepMarkPassed {
+  background: var(--cw-pass);
+}
+.stepMarkLocked {
+  background: var(--cw-bg-hover);
+  color: var(--cw-text-faint);
+}
+.stepMarkActive {
+  box-shadow: 0 0 0 2.5px var(--cw-accent-tint);
+}
+
+.stepNum {
+  font-family: var(--cw-font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+}
+/* The number stays visible under the check/lock glyph, faded, so the step
+   keeps its identity once it is no longer the open one. */
+.stepNumFaded {
+  opacity: 0.4;
+}
+.stepNumLocked {
+  opacity: 0.45;
+}
+
+.stepGlyph {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--cw-text-strong);
+}
+
+.connector {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 10px;
+  height: 1px;
+  background: var(--cw-border);
+}
+.connectorPassed {
+  background: var(--cw-pass);
+}
+
+/* ─── Instruction blocks ────────────────────────────────────────────── */
+
+
+
+.blockHeading {
+  margin: 18px 0 0;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--cw-text-strong);
+}
+/* A heading that opens the pane has nothing to clear above it. */
+.blockHeading:first-child {
+  margin-top: 0;
+}
+
+.prose {
+  margin: 14px 0 0;
+  font-size: 14.5px;
+  line-height: 1.7;
+  text-wrap: pretty;
+  color: var(--cw-text-body);
+}
+
+.inlineCode {
+  border-radius: 2px;
+  background: var(--cw-bg-hover);
+  padding: 1px 5px;
+  font-size: 13px;
+  color: var(--cw-ink);
+}
+
+.blockLabel {
+  margin: 26px 0 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cw-text-faint);
+}
+
+.card {
+  margin-top: 12px;
+  border: 1px solid var(--cw-border-light);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cardScroll {
+  margin-top: 12px;
+  border: 1px solid var(--cw-border-light);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.cardHead {
+  background: var(--cw-bg-muted);
+  padding: 7px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cw-text-faint);
+}
+
+.columnsHead,
+.columnsRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) 84px;
+  gap: 8px;
+  padding: 8px 12px;
+}
+.columnsHead {
+  background: var(--cw-bg-muted);
+  padding: 7px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cw-text-faint);
+}
+.columnsRow {
+  border-top: 1px solid var(--cw-border-light);
+  font-family: var(--cw-font-mono);
+  font-size: 12.5px;
+  color: var(--cw-text-body);
+}
+.columnsType {
+  color: var(--cw-text-faint);
+}
+
+.previewTable {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--cw-font-mono);
+  font-size: 12px;
+}
+.previewTable th {
+  border-bottom: 1px solid var(--cw-border-light);
+  background: var(--cw-bg-muted);
+  padding: 7px 10px;
+  text-align: left;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--cw-text-muted);
+}
+.previewTable td {
+  border-bottom: 1px solid var(--cw-border-faint);
+  padding: 6px 10px;
+  white-space: nowrap;
+  color: var(--cw-text-body);
+}
+.previewTable tr:last-child td {
+  border-bottom: 0;
+}
+.alignRight {
+  text-align: right;
+}
+
+.signatureBlock {
+  margin: 12px 0 0;
+  overflow-x: auto;
+  border: 1px solid var(--cw-border-light);
+  border-radius: 8px;
+  background: var(--cw-bg-muted);
+  padding: 10px 12px;
+  white-space: pre;
+  font-family: var(--cw-font-mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--cw-text);
+}
+
+.exampleList {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.exampleGrid {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 6px 12px;
+  padding: 10px 12px;
+  font-family: var(--cw-font-mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--cw-text-body);
+}
+.exampleName {
+  color: var(--cw-text-faint);
+}
+.exampleValue {
+  overflow-wrap: anywhere;
+}
+.exampleEmphasis {
+  color: var(--cw-text-strong);
+  font-weight: 500;
+}
+.exampleNote {
+  margin: 0;
+  border-top: 1px solid var(--cw-border-light);
+  padding: 9px 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  text-wrap: pretty;
+  color: var(--cw-text-muted);
+}
+
+.constraints {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--cw-text-body);
+}
+.constraints code {
+  font-size: 12.5px;
+}
+
+.lockedCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  border: 1px solid var(--cw-border);
+  border-radius: 8px;
+  background: var(--cw-bg-muted);
+  padding: 20px;
+}
+.lockedTitle {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--cw-text-strong);
+}
+.lockedText {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.65;
+  text-wrap: pretty;
+  color: var(--cw-text-muted);
+}
+
+/* ─── Schema browser ────────────────────────────────────────────────── */
+
+.schemaList {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.schemaCard {
+  border: 1px solid var(--cw-border-light);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.schemaHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: var(--cw-bg-muted);
+  padding: 8px 12px;
+}
+
+.schemaName {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-family: var(--cw-font-mono);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--cw-ink);
+}
+.schemaName svg {
+  flex-shrink: 0;
+  color: var(--cw-accent);
+}
+
+.schemaRows {
+  font-size: 11.5px;
+  color: var(--cw-text-faint);
+  white-space: nowrap;
+}
+
+/* Phone: the whole head row is the disclosure control, at a 44px target. */
+.schemaToggle {
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  text-align: left;
+  font-family: inherit;
+}
+
+.schemaCaret {
+  margin-left: 8px;
+  vertical-align: middle;
+  transition: transform 0.15s;
+}
+.schemaCaretOpen {
+  transform: rotate(180deg);
+}
+
+.schemaCols {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 0;
+}
+.schemaColsOpen {
+  border-top: 1px solid var(--cw-border-light);
+}
+
+/* The schema heading clears the instruction blocks above it. */
+.schemaLabel {
+  margin-top: 30px;
+}
+
+.schemaCol {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 12px;
+  font-family: var(--cw-font-mono);
+  font-size: 12px;
+  color: var(--cw-text-body);
+}
+.schemaKey,
+.schemaType {
+  color: var(--cw-text-faint);
+}
+
+/* ─── Editor ────────────────────────────────────────────────────────── */
+
+.paneHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+  min-width: 0;
+  overflow: hidden;
+  border-bottom: 1px solid var(--cw-border-light);
+  padding: 0 12px;
+  height: 40px;
+}
+
+/* The language menu is absolutely positioned below this row, so the header
+   that carries the picker must not clip. (The prototypes differ on exactly
+   this line for the same reason.) */
+.paneHeadOverflow {
+  overflow: visible;
+}
+
+.paneHeadRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.editorLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  min-width: 0;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+  color: var(--cw-ink);
+}
+.editorLabel svg {
+  flex-shrink: 0;
+}
+
+.runMeta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--cw-font-mono);
+  font-size: 11.5px;
+  color: var(--cw-text-muted);
+}
+
+.smallGhostBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  padding: 5px 8px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--cw-text-muted);
+}
+.smallGhostBtn:hover {
+  color: var(--cw-ink);
+  background: var(--cw-bg-hover);
+}
+
+.editorScroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 12px 0;
+}
+
+.code {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  font-family: var(--cw-font-mono);
+  font-size: 13.5px;
+  line-height: 1.75;
+}
+
+.gutter {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding-right: 14px;
+  color: var(--cw-border-strong);
+  user-select: none;
+}
+
+.codePre {
+  margin: 0;
+  white-space: pre;
+  color: var(--cw-text);
+}
+/* A passed step's accepted query, shown as read-only history. */
+.codePreMuted {
+  color: var(--cw-text-muted);
+}
+
+/* Token colors. Mirrors the prototypes: the ink shades of the brand hues,
+   all AA on white. */
+.tokKeyword {
+  color: var(--ds-purple-700);
+}
+.tokBuiltin {
+  color: var(--ds-blue-700);
+}
+.tokString {
+  color: var(--ds-green-800);
+}
+.tokNumber {
+  color: var(--ds-orange-700);
+}
+.tokComment {
+  color: var(--cw-text-faint);
+}
+
+.editorEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 100%;
+  padding: 24px;
+  color: var(--cw-border-strong);
+}
+.editorEmptyText {
+  font-size: 13.5px;
+  color: var(--cw-text-faint);
+  text-align: center;
+}
+
+/* ─── Language picker ───────────────────────────────────────────────── */
+
+.langWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.langBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  margin-left: -6px;
+  padding: 5px 6px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--cw-ink);
+  white-space: nowrap;
+}
+.langBtn:hover {
+  background: var(--cw-bg-hover);
+}
+.langCaret {
+  color: var(--cw-text-faint);
+}
+
+.langMenu {
+  position: absolute;
+  top: 100%;
+  left: -6px;
+  z-index: 20;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  border: 1px solid var(--cw-border);
+  border-radius: 4px;
+  background: var(--cw-bg);
+  box-shadow: 0 8px 24px rgb(17 24 39 / 10%);
+  padding: 4px;
+}
+
+.langOption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  padding: 7px 10px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--cw-ink);
+}
+.langOption:hover {
+  background: var(--cw-bg-hover);
+}
+.langOptionLabel {
+  flex: 1;
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* ─── Result tabs ───────────────────────────────────────────────────── */
+
+.tabStrip {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  padding: 6px 10px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--cw-text-muted);
+  white-space: nowrap;
+}
+.tabOn {
+  background: var(--cw-bg-hover);
+  color: var(--cw-ink);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 1px 7px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  background: var(--cw-bg-hover);
+  color: var(--cw-text-muted);
+}
+.badgeFail {
+  background: var(--cw-fail-badge);
+  color: var(--cw-fail-ink);
+}
+
+.resultBody {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+/* ─── Output: result table ──────────────────────────────────────────── */
+
+.outTable {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--cw-font-mono);
+  font-size: 12.5px;
+}
+.outTable th {
+  position: sticky;
+  top: 0;
+  border-bottom: 1px solid var(--cw-border);
+  background: var(--cw-bg-muted);
+  padding: 8px 14px;
+  text-align: left;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--cw-text-muted);
+}
+.outTable td {
+  border-bottom: 1px solid var(--cw-border-faint);
+  padding: 7px 14px;
+  white-space: nowrap;
+  color: var(--cw-text-body);
+}
+
+.outFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--cw-text-faint);
+}
+
+.downloadLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--cw-accent-link);
+  text-decoration: none;
+}
+.downloadLink:hover {
+  color: var(--cw-accent-link-hover);
+}
+.downloadLink svg {
+  color: var(--cw-text-muted);
+}
+
+/* ─── Output: stdin / stdout ────────────────────────────────────────── */
+
+.stdioGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1px;
+  background: var(--cw-border-light);
+}
+
+.stdioCell {
+  display: flex;
+  flex-direction: column;
+  background: var(--cw-bg);
+}
+
+.stdioHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--cw-border-light);
+  background: var(--cw-bg-muted);
+  padding: 7px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cw-text-faint);
+}
+
+.stdioMatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  text-transform: none;
+  letter-spacing: -0.01em;
+  font-size: 11.5px;
+  color: var(--cw-pass-ink);
+}
+
+.stdioPre {
+  margin: 0;
+  overflow-x: auto;
+  padding: 12px 14px;
+  white-space: pre;
+  font-family: var(--cw-font-mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--cw-text-body);
+}
+.stdioPreOut {
+  color: var(--cw-text);
+}
+
+.stdioFooter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  white-space: nowrap;
+  font-family: var(--cw-font-mono);
+  font-size: 11.5px;
+  color: var(--cw-text-faint);
+}
+
+/* ─── Test cases ────────────────────────────────────────────────────── */
+
+.testBanner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--cw-border-light);
+  background: var(--cw-fail-tint);
+  padding: 10px 14px;
+}
+.testBanner svg {
+  flex-shrink: 0;
+  color: var(--cw-fail-ink);
+}
+.testBannerText {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cw-fail-ink);
+}
+.testBannerSub {
+  font-size: 12.5px;
+  white-space: nowrap;
+  color: var(--cw-fail-ink-strong);
+}
+.testBannerPass {
+  background: var(--cw-pass-tint);
+}
+.testBannerPass svg,
+.testBannerPass .testBannerText {
+  color: var(--cw-pass-ink);
+}
+
+.testRow {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  border-bottom: 1px solid var(--cw-border-faint);
+  padding: 12px 14px;
+}
+
+.testIcon {
+  margin-top: 2px;
+}
+.testIconPass {
+  color: var(--cw-pass-ink);
+}
+.testIconFail {
+  color: var(--cw-fail-ink);
+}
+
+.testText {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 5px;
+}
+.testName {
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--cw-text-strong);
+  text-wrap: pretty;
+}
+.testDetail {
+  font-family: var(--cw-font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--cw-text-muted);
+  overflow-wrap: anywhere;
+}
+.testGot {
+  font-family: var(--cw-font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--cw-fail-ink);
+  overflow-wrap: anywhere;
+}
+
+.testBadge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 3px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+.testBadgePass {
+  background: var(--cw-pass-tint);
+  color: var(--cw-pass-ink);
+}
+.testBadgeFail {
+  background: var(--cw-fail-badge);
+  color: var(--cw-fail-ink);
+}
+
+/* ─── Solution ──────────────────────────────────────────────────────── */
+
+.solution {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 14px 24px;
+}
+
+.solutionText {
+  margin: 0;
+  max-width: 620px;
+  font-size: 13.5px;
+  line-height: 1.7;
+  text-wrap: pretty;
+  color: var(--cw-text-body);
+}
+.solutionText code {
+  border-radius: 2px;
+  background: var(--cw-bg-hover);
+  padding: 1px 5px;
+  font-size: 12.5px;
+  color: var(--cw-ink);
+}
+
+.solutionCard {
+  border: 1px solid var(--cw-border-light);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.solutionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--cw-border-light);
+  background: var(--cw-bg-muted);
+  padding: 7px 12px;
+}
+.solutionLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cw-text-faint);
+}
+
+.copyBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--cw-accent-link);
+}
+.copyBtn:hover {
+  color: var(--cw-accent-link-hover);
+}
+
+.solutionPre {
+  margin: 0;
+  overflow-x: auto;
+  padding: 12px;
+  white-space: pre;
+  font-family: var(--cw-font-mono);
+  font-size: 12.5px;
+  line-height: 1.75;
+  color: var(--cw-text);
+}
+
+/* ─── Submissions ───────────────────────────────────────────────────── */
+
+.subsHead,
+.subsRow {
+  display: grid;
+  gap: 12px;
+  padding: 10px 14px;
+}
+.subsHead {
+  border-bottom: 1px solid var(--cw-border-light);
+  background: var(--cw-bg-muted);
+  padding: 8px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cw-text-faint);
+}
+.subsRow {
+  align-items: center;
+  border-bottom: 1px solid var(--cw-border-faint);
+  font-size: 13px;
+  color: var(--cw-text-body);
+}
+.subStep {
+  font-family: var(--cw-font-mono);
+  font-size: 12px;
+  color: var(--cw-text-muted);
+}
+.subResult {
+  font-weight: 500;
+  color: var(--cw-fail-ink);
+}
+.subResultOk {
+  color: var(--cw-pass-ink);
+}
+.subLang {
+  color: var(--cw-text-muted);
+}
+.subRuntime {
+  font-family: var(--cw-font-mono);
+  font-size: 12px;
+  color: var(--cw-text-muted);
+}
+.subWhen {
+  color: var(--cw-text-faint);
+}
+
+/* ─── Mobile ────────────────────────────────────────────────────────── */
+
+.mHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--cw-border-light);
+  /* The prototype hard-coded 60px of top padding for the iOS frame's status
+     bar. In the real app that space is the safe-area inset. */
+  padding: calc(env(safe-area-inset-top, 0px) + 10px) 12px 10px;
+}
+
+.mTitleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.mTitle {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--cw-text-strong);
+}
+
+.mSubtitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.mSubtitleText {
+  font-size: 11.5px;
+  font-weight: 500;
+  /* The review pass caught this wrapping to two lines under the title. */
+  white-space: nowrap;
+  color: var(--cw-text-muted);
+}
+.mIconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: var(--cw-text-muted);
+}
+.mIconBtn:hover {
+  background: var(--cw-bg-hover);
+}
+.mIconBtnLead {
+  margin-left: -6px;
+  color: var(--cw-ink);
+}
+.mIconBtnTrail {
+  margin-right: -6px;
+}
+
+.mStepper {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--cw-border-light);
+  padding: 10px 12px;
+}
+
+.mStep {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-height: 44px;
+  border: 0;
+  border-radius: 9999px;
+  padding: 8px 10px 8px 8px;
+  font-family: inherit;
+  background: transparent;
+}
+.mStepActive {
+  background: var(--cw-accent-tint);
+}
+
+.mStepMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 9999px;
+  background: var(--cw-accent);
+  color: var(--cw-bg);
+}
+.mStepMarkPassed {
+  background: var(--cw-pass);
+}
+.mStepMarkLocked {
+  background: var(--cw-bg-hover);
+}
+
+.mStepNum {
+  font-family: var(--cw-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--cw-bg);
+}
+
+.mStepLabel {
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--cw-text-secondary);
+}
+.mStepLabelActive {
+  color: var(--cw-accent-link);
+}
+.mStepLabelLocked {
+  color: var(--cw-text-faint);
+}
+
+.mConnector {
+  display: block;
+  flex: 1;
+  height: 1px;
+  min-width: 8px;
+  background: var(--cw-border);
+}
+
+.mBody {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.mProblem {
+  padding: 18px 16px 28px;
+}
+.mProblem .blockHeading {
+  font-size: 19px;
+  margin-top: 14px;
+  text-wrap: pretty;
+}
+.mProblem .prose {
+  font-size: 15px;
+  margin-top: 12px;
+}
+.mProblem .blockLabel {
+  font-size: 11px;
+}
+
+.mCodePane {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.mCodeHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--cw-border-light);
+  padding: 8px 14px;
+}
+
+.mCodeHeadRight {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+/* The phone's locked-editor placeholder sits in flow rather than filling a
+   fixed-height pane, so it sets its own breathing room. */
+.mEditorEmpty {
+  height: auto;
+  padding: 60px 24px;
+}
+
+.mAutosaved {
+  font-family: var(--cw-font-mono);
+  font-size: 11px;
+  /* Lifted from --ds-gray-400 in the review pass, for contrast. */
+  color: var(--cw-text-muted);
+}
+
+.mCodeScroll {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  padding: 12px 0;
+}
+
+.mCode {
+  display: grid;
+  grid-template-columns: 38px max-content;
+  width: max-content;
+  font-family: var(--cw-font-mono);
+  font-size: 12.5px;
+  line-height: 1.85;
+}
+.mCode .gutter {
+  padding-right: 10px;
+}
+.mCode .codePre {
+  padding-right: 16px;
+}
+
+.mKeyStrip {
+  position: relative;
+  flex-shrink: 0;
+  width: 100%;
+  min-width: 0;
+  border-top: 1px solid var(--cw-border-light);
+  background: var(--cw-bg-muted);
+}
+.mKeyRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 40px 8px 10px;
+  overflow-x: auto;
+}
+.mKey {
+  flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--cw-border);
+  border-radius: 6px;
+  background: var(--cw-bg);
+  padding: 6px 10px;
+  font-family: var(--cw-font-mono);
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--cw-text-body);
+}
+.mKey:hover {
+  border-color: var(--cw-accent);
+  color: var(--cw-accent-link);
+}
+/* End-of-row cue: without it the strip looks clipped rather than scrollable. */
+.mKeyFade {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 40px;
+  background: linear-gradient(90deg, rgb(249 250 251 / 0%) 0%, var(--cw-bg-muted) 80%);
+  pointer-events: none;
+}
+
+.mResultTabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--cw-border-light);
+  padding: 8px 10px;
+  overflow-x: auto;
+}
+.mTab {
+  min-height: 44px;
+  min-width: 44px;
+  justify-content: center;
+  padding: 7px 10px;
+}
+
+.mTableScroll {
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+}
+.mTableScroll .outTable {
+  min-width: 100%;
+  font-size: 12px;
+}
+.mTableScroll .outTable th,
+.mTableScroll .outTable td {
+  padding: 8px 12px;
+}
+
+.mOutFooter {
+  padding: 12px 14px;
+}
+
+.mTestRow {
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 10px;
+}
+.mTestRow .testDetail {
+  font-size: 11.5px;
+  text-wrap: pretty;
+}
+
+.mSubRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid var(--cw-border-faint);
+  padding: 12px 14px;
+}
+.mSubMain {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.mSubResult {
+  font-size: 13.5px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--cw-fail-ink);
+}
+.mSubResultOk {
+  color: var(--cw-pass-ink);
+}
+.mSubMeta {
+  font-family: var(--cw-font-mono);
+  font-size: 11px;
+  color: var(--cw-text-faint);
+}
+.mSubWhen {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--cw-text-faint);
+}
+
+.mActionBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  border-top: 1px solid var(--cw-border-light);
+  padding: 10px 12px;
+}
+.mActionBtn {
+  flex: 1;
+  min-height: 44px;
+  padding: 11px 14px;
+  font-size: 14px;
+  gap: 7px;
+}
+
+.mNav {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  flex-shrink: 0;
+  border-top: 1px solid var(--cw-border);
+  background: var(--cw-bg);
+  /* 34px in the prototype was the iOS home indicator. */
+  padding: 6px 8px calc(env(safe-area-inset-bottom, 0px) + 10px);
+}
+
+.mNavBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-height: 48px;
+  border: 0;
+  background: transparent;
+  padding: 5px 4px;
+  font-family: inherit;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--cw-text-faint);
+}
+.mNavBtnOn {
+  color: var(--cw-ink);
+}
+
+.mNavIcon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mNavDot {
+  position: absolute;
+  top: -1px;
+  right: -3px;
+  width: 7px;
+  height: 7px;
+  border: 1.5px solid var(--cw-bg);
+  border-radius: 9999px;
+  background: var(--cw-fail-ink);
+}
+
+/* ─── Editor ────────────────────────────────────────────────────────── */
+
+/* CodeMirror's own scroller fills the pane; the surrounding `.editorScroll`
+   keeps its padding but must not double-scroll. */
+.editorHost {
+  height: 100%;
+  min-height: 0;
+}
+.editorHost :global(.cm-editor) {
+  height: 100%;
+}
+.editorHost :global(.cm-editor.cm-focused) {
+  outline: none;
+}
+.editorHost :global(.cm-scroller) {
+  font-family: var(--cw-font-mono);
+  font-size: 13.5px;
+  line-height: 1.75;
+}
+.editorHost :global(.cm-gutters) {
+  border-right: 0;
+  background: transparent;
+  color: var(--cw-border-strong);
+}
+
+/* ─── Run feedback ──────────────────────────────────────────────────── */
+
+/* Shown while a WASM toolchain downloads, so a slow first Run does not look
+   like a dead button. */
+.bootNotice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  border-top: 1px solid var(--cw-border-light);
+  background: var(--cw-bg-muted);
+  padding: 8px 12px;
+  font-size: 12.5px;
+  color: var(--cw-text-muted);
+}
+
+.spin {
+  animation: cw-spin 0.9s linear infinite;
+}
+@keyframes cw-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
+  }
+}
+
+.emptyResults {
+  margin: 0;
+  padding: 16px 14px;
+  font-size: 13px;
+  color: var(--cw-text-faint);
+}
+
+.runError {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  color: var(--cw-fail-ink);
+}
+.runError svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.runErrorText {
+  margin: 0;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family: var(--cw-font-mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--cw-fail-ink);
+}
+
+.stdioPreErr {
+  color: var(--cw-fail-ink);
+}
+
+/* Badge on the Test cases tab: green once every check passes. */
+.badgePass {
+  background: var(--cw-pass-tint);
+  color: var(--cw-pass-ink);
+}
+
+/* "Solved" marker in the top bar, once the challenge is accepted. */
+.solvedPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: var(--cw-pass-tint);
+  padding: 3px 9px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--cw-pass-ink);
+}
+
+/* Disabled Run/Submit while a run is in flight. */
+.secondaryBtn:disabled,
+.primaryBtn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
