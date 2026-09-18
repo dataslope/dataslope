@@ -268,5 +268,297 @@ export const EVENTS: ChallengeDataset = {
   ],
 };
 
+// ─── Subscriptions: a small SaaS billing book ────────────────────────
+//
+// The point of this one is NULL. An open subscription has no `ended_on`
+// and an unpaid invoice has no `paid_on`, so "still running" and "still
+// owed" are absences rather than flags — which is how billing data
+// actually arrives, and what makes `IS NULL`, `COALESCE` and outer joins
+// worth drilling.
+
+const SUBSCRIPTIONS_SQL = `
+CREATE TABLE plans (
+  plan_id       INTEGER PRIMARY KEY,
+  plan_name     TEXT    NOT NULL,
+  monthly_price REAL    NOT NULL
+);
+INSERT INTO plans VALUES
+  (1, 'Starter',  12.00),
+  (2, 'Team',     45.00),
+  (3, 'Business', 120.00);
+
+CREATE TABLE accounts (
+  account_id INTEGER PRIMARY KEY,
+  company    TEXT NOT NULL,
+  country    TEXT NOT NULL,
+  created_on TEXT NOT NULL
+);
+INSERT INTO accounts VALUES
+  (1,  'Northwind Foods', 'US', '2023-01-15'),
+  (2,  'Kestrel Labs',    'US', '2023-02-02'),
+  (3,  'Blue Harbor',     'CA', '2023-03-19'),
+  (4,  'Umbra Design',    'GB', '2023-04-07'),
+  (5,  'Terrafirma',      'DE', '2023-05-23'),
+  (6,  'Sable and Co',    'GB', '2023-06-11'),
+  (7,  'Pinecrest',       'US', '2023-07-30'),
+  (8,  'Lumen Works',     'CA', '2023-08-14'),
+  (9,  'Orchard Bay',     'AU', '2023-09-05'),
+  (10, 'Vireo Health',    'US', '2023-10-21');
+
+CREATE TABLE subscriptions (
+  subscription_id INTEGER PRIMARY KEY,
+  account_id      INTEGER NOT NULL REFERENCES accounts(account_id),
+  plan_id         INTEGER NOT NULL REFERENCES plans(plan_id),
+  started_on      TEXT    NOT NULL,
+  ended_on        TEXT
+);
+INSERT INTO subscriptions VALUES
+  (1,  1,  1, '2023-01-20', '2023-07-19'),
+  (2,  1,  2, '2023-07-20', NULL),
+  (3,  2,  1, '2023-02-05', '2023-02-09'),
+  (4,  2,  2, '2023-02-10', NULL),
+  (5,  3,  1, '2023-03-25', '2023-09-24'),
+  (6,  4,  3, '2023-04-12', NULL),
+  (7,  5,  1, '2023-05-25', '2023-05-31'),
+  (8,  5,  2, '2023-06-01', '2024-01-31'),
+  (9,  6,  1, '2023-06-15', '2023-12-14'),
+  (10, 6,  2, '2023-12-15', NULL),
+  (11, 7,  1, '2023-08-01', NULL),
+  (12, 8,  3, '2023-08-20', NULL),
+  (13, 9,  1, '2023-09-10', '2024-02-09'),
+  (14, 10, 2, '2023-11-01', NULL);
+
+CREATE TABLE invoices (
+  invoice_id INTEGER PRIMARY KEY,
+  account_id INTEGER NOT NULL REFERENCES accounts(account_id),
+  issued_on  TEXT    NOT NULL,
+  amount     REAL    NOT NULL,
+  paid_on    TEXT
+);
+INSERT INTO invoices VALUES
+  (1,  1,  '2024-01-01',  45.00, '2024-01-05'),
+  (2,  1,  '2024-02-01',  45.00, '2024-02-03'),
+  (3,  1,  '2024-03-01',  45.00, NULL),
+  (4,  2,  '2024-01-01',  45.00, '2024-01-02'),
+  (5,  2,  '2024-02-01',  45.00, '2024-02-02'),
+  (6,  2,  '2024-03-01',  45.00, '2024-03-04'),
+  (7,  4,  '2024-01-01', 120.00, '2024-01-15'),
+  (8,  4,  '2024-02-01', 120.00, '2024-02-20'),
+  (9,  4,  '2024-03-01', 120.00, NULL),
+  (10, 5,  '2024-01-01',  45.00, '2024-01-09'),
+  (11, 6,  '2024-01-01',  45.00, '2024-01-06'),
+  (12, 6,  '2024-02-01',  45.00, '2024-02-08'),
+  (13, 6,  '2024-03-01',  45.00, '2024-03-11'),
+  (14, 7,  '2024-01-01',  12.00, '2024-01-03'),
+  (15, 7,  '2024-02-01',  12.00, NULL),
+  (16, 8,  '2024-01-01', 120.00, '2024-01-04'),
+  (17, 8,  '2024-02-01', 120.00, '2024-02-05'),
+  (18, 9,  '2024-01-01',  12.00, '2024-01-20'),
+  (19, 10, '2024-01-01',  45.00, '2024-01-07'),
+  (20, 10, '2024-02-01',  45.00, '2024-02-09');
+`;
+
+export const SUBSCRIPTIONS: ChallengeDataset = {
+  initSql: SUBSCRIPTIONS_SQL,
+  schema: [
+    {
+      name: "accounts",
+      rows: "10",
+      columns: [
+        { name: "account_id", type: "integer", key: "pk" },
+        { name: "company", type: "text" },
+        { name: "country", type: "text" },
+        { name: "created_on", type: "text" },
+      ],
+    },
+    {
+      name: "subscriptions",
+      rows: "14",
+      columns: [
+        { name: "subscription_id", type: "integer", key: "pk" },
+        { name: "account_id", type: "integer", key: "fk" },
+        { name: "plan_id", type: "integer", key: "fk" },
+        { name: "started_on", type: "text" },
+        { name: "ended_on", type: "text" },
+      ],
+    },
+    {
+      name: "invoices",
+      rows: "20",
+      columns: [
+        { name: "invoice_id", type: "integer", key: "pk" },
+        { name: "account_id", type: "integer", key: "fk" },
+        { name: "issued_on", type: "text" },
+        { name: "amount", type: "real" },
+        { name: "paid_on", type: "text" },
+      ],
+    },
+    {
+      name: "plans",
+      rows: "3",
+      columns: [
+        { name: "plan_id", type: "integer", key: "pk" },
+        { name: "plan_name", type: "text" },
+        { name: "monthly_price", type: "real" },
+      ],
+    },
+  ],
+};
+
+// ─── Library: books, authors and loans ───────────────────────────────
+//
+// This one exists for the join shapes the other datasets cannot show: a
+// book has many authors and an author has many books, so every question
+// about either has to go through `book_authors`. One author has written
+// nothing and one book has never been borrowed, which is what gives the
+// anti-join and set-difference challenges something to find.
+
+const LIBRARY_SQL = `
+CREATE TABLE authors (
+  author_id   INTEGER PRIMARY KEY,
+  author_name TEXT NOT NULL,
+  country     TEXT NOT NULL
+);
+INSERT INTO authors VALUES
+  (1, 'Ada Okonjo',      'NG'),
+  (2, 'Marcus Lindt',    'SE'),
+  (3, 'Yuki Tanabe',     'JP'),
+  (4, 'Rosa Delgado',    'MX'),
+  (5, 'Ivan Petrov',     'RU'),
+  (6, 'Claire Beaumont', 'FR'),
+  (7, 'Samuel Reyes',    'PH'),
+  (8, 'Nadia Haddad',    'LB');
+
+CREATE TABLE books (
+  book_id        INTEGER PRIMARY KEY,
+  title          TEXT    NOT NULL,
+  published_year INTEGER NOT NULL,
+  genre          TEXT    NOT NULL
+);
+INSERT INTO books VALUES
+  (1,  'The Salt Road',               2015, 'Fiction'),
+  (2,  'Quiet Machines',              2018, 'Science'),
+  (3,  'Northern Lights Field Guide', 2012, 'Nature'),
+  (4,  'Winter Harbour',              2019, 'Fiction'),
+  (5,  'Small Data',                  2021, 'Science'),
+  (6,  'The Paper Garden',            2016, 'Fiction'),
+  (7,  'Atlas of Rivers',             2014, 'Nature'),
+  (8,  'Signal and Silence',          2020, 'Science'),
+  (9,  'Rooms We Left',               2022, 'Fiction'),
+  (10, 'Field Notes on Bees',         2017, 'Nature'),
+  (11, 'The Long Commute',            2023, 'Fiction'),
+  (12, 'Deep Time',                   2013, 'Science');
+
+CREATE TABLE book_authors (
+  book_id   INTEGER NOT NULL REFERENCES books(book_id),
+  author_id INTEGER NOT NULL REFERENCES authors(author_id)
+);
+INSERT INTO book_authors VALUES
+  (1, 1), (2, 2), (3, 3), (4, 1), (5, 2), (5, 4), (6, 6), (7, 3),
+  (7, 5), (8, 2), (9, 6), (10, 3), (11, 7), (12, 5), (12, 2);
+
+CREATE TABLE members (
+  member_id INTEGER PRIMARY KEY,
+  full_name TEXT NOT NULL,
+  joined_on TEXT NOT NULL
+);
+INSERT INTO members VALUES
+  (1, 'Hana Brennan',    '2023-01-10'),
+  (2, 'Omar Sayed',      '2023-02-14'),
+  (3, 'Freya Lund',      '2023-03-02'),
+  (4, 'Diego Alvarez',   '2023-04-18'),
+  (5, 'Mei Zhang',       '2023-05-06'),
+  (6, 'Paul Achebe',     '2023-06-21'),
+  (7, 'Ingrid Sorensen', '2023-07-09'),
+  (8, 'Leo Fontaine',    '2023-08-27');
+
+CREATE TABLE loans (
+  loan_id     INTEGER PRIMARY KEY,
+  book_id     INTEGER NOT NULL REFERENCES books(book_id),
+  member_id   INTEGER NOT NULL REFERENCES members(member_id),
+  borrowed_on TEXT    NOT NULL,
+  returned_on TEXT
+);
+INSERT INTO loans VALUES
+  (1,  1,  1, '2024-01-03', '2024-01-15'),
+  (2,  2,  2, '2024-01-05', '2024-01-30'),
+  (3,  3,  3, '2024-01-08', '2024-01-20'),
+  (4,  4,  1, '2024-01-12', '2024-01-19'),
+  (5,  5,  4, '2024-01-15', NULL),
+  (6,  6,  5, '2024-01-18', '2024-02-10'),
+  (7,  7,  2, '2024-01-20', '2024-01-28'),
+  (8,  1,  6, '2024-01-22', '2024-02-02'),
+  (9,  8,  7, '2024-01-25', NULL),
+  (10, 9,  3, '2024-01-28', '2024-02-05'),
+  (11, 10, 8, '2024-02-01', '2024-02-14'),
+  (12, 2,  4, '2024-02-03', '2024-02-11'),
+  (13, 12, 5, '2024-02-06', '2024-03-08'),
+  (14, 3,  1, '2024-02-09', '2024-02-18'),
+  (15, 5,  6, '2024-02-12', '2024-02-25'),
+  (16, 4,  7, '2024-02-15', '2024-02-21'),
+  (17, 6,  2, '2024-02-18', NULL),
+  (18, 7,  8, '2024-02-20', '2024-03-01'),
+  (19, 1,  3, '2024-02-23', '2024-03-02'),
+  (20, 9,  4, '2024-02-26', '2024-03-05'),
+  (21, 8,  5, '2024-03-01', '2024-03-09'),
+  (22, 10, 1, '2024-03-04', '2024-03-15'),
+  (23, 12, 6, '2024-03-07', NULL),
+  (24, 2,  7, '2024-03-10', '2024-03-18'),
+  (25, 3,  8, '2024-03-13', '2024-03-21');
+`;
+
+export const LIBRARY: ChallengeDataset = {
+  initSql: LIBRARY_SQL,
+  schema: [
+    {
+      name: "loans",
+      rows: "25",
+      columns: [
+        { name: "loan_id", type: "integer", key: "pk" },
+        { name: "book_id", type: "integer", key: "fk" },
+        { name: "member_id", type: "integer", key: "fk" },
+        { name: "borrowed_on", type: "text" },
+        { name: "returned_on", type: "text" },
+      ],
+    },
+    {
+      name: "books",
+      rows: "12",
+      columns: [
+        { name: "book_id", type: "integer", key: "pk" },
+        { name: "title", type: "text" },
+        { name: "published_year", type: "integer" },
+        { name: "genre", type: "text" },
+      ],
+    },
+    {
+      name: "book_authors",
+      rows: "15",
+      columns: [
+        { name: "book_id", type: "integer", key: "fk" },
+        { name: "author_id", type: "integer", key: "fk" },
+      ],
+    },
+    {
+      name: "authors",
+      rows: "8",
+      columns: [
+        { name: "author_id", type: "integer", key: "pk" },
+        { name: "author_name", type: "text" },
+        { name: "country", type: "text" },
+      ],
+    },
+    {
+      name: "members",
+      rows: "8",
+      columns: [
+        { name: "member_id", type: "integer", key: "pk" },
+        { name: "full_name", type: "text" },
+        { name: "joined_on", type: "text" },
+      ],
+    },
+  ],
+};
+
 /** Every dataset, for the offline verifier to sweep. */
-export const DATASETS = { RETAIL, HR, EVENTS } as const;
+export const DATASETS = { RETAIL, HR, EVENTS, SUBSCRIPTIONS, LIBRARY } as const;

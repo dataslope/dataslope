@@ -16,16 +16,9 @@
  * seed data fails CI.
  */
 
-import { sqlSteps } from "./authoring";
+import { indentSql, sqlSteps } from "./authoring";
 import { EVENTS, HR, RETAIL } from "./datasets";
 import type { Challenge } from "./types";
-
-/** Indent a block so it reads as a nested CTE body. */
-const indent = (sql: string) =>
-  sql
-    .split("\n")
-    .map((l) => (l.trim() ? "  " + l : l))
-    .join("\n");
 
 // ─── Department pay gap ──────────────────────────────────────────────
 
@@ -234,14 +227,14 @@ const FUNNEL_TOTALS_BODY = `SELECT SUM(viewed) AS viewers, SUM(clicked) AS click
 FROM per_user`;
 
 const FUNNEL_TOTALS = `WITH per_user AS (
-${indent(FUNNEL_FLAGS_CTE)}
+${indentSql(FUNNEL_FLAGS_CTE)}
 )
 ${FUNNEL_TOTALS_BODY}`;
 
 const FUNNEL_STAGES_CTE = `WITH per_user AS (
-${indent(FUNNEL_FLAGS_CTE)}
+${indentSql(FUNNEL_FLAGS_CTE)}
 ), totals AS (
-${indent(FUNNEL_TOTALS_BODY)}
+${indentSql(FUNNEL_TOTALS_BODY)}
 )`;
 
 const SIGNUP_FUNNEL = sqlSteps(
@@ -319,7 +312,7 @@ ORDER BY user_id
         { name: "signups", type: "integer" },
       ],
       starter: `WITH per_user AS (
-${indent(FUNNEL_FLAGS_CTE)}
+${indentSql(FUNNEL_FLAGS_CTE)}
 )
 SELECT
 FROM per_user
@@ -417,15 +410,15 @@ const GROWTH_LAG_BODY = `SELECT month, orders, revenue,
 FROM monthly`;
 
 const GROWTH_LAG = `WITH monthly AS (
-${indent(GROWTH_MONTHLY_CTE)}
+${indentSql(GROWTH_MONTHLY_CTE)}
 )
 ${GROWTH_LAG_BODY}
 ORDER BY month`;
 
 const GROWTH_PCT_CTE = `WITH monthly AS (
-${indent(GROWTH_MONTHLY_CTE)}
+${indentSql(GROWTH_MONTHLY_CTE)}
 ), with_prev AS (
-${indent(GROWTH_LAG_BODY)}
+${indentSql(GROWTH_LAG_BODY)}
 )`;
 
 const MONTHLY_ORDER_GROWTH = sqlSteps(
@@ -514,7 +507,7 @@ WHERE o.status = 'completed'
         { name: "prev_revenue", type: "real" },
       ],
       starter: `WITH monthly AS (
-${indent(GROWTH_MONTHLY_CTE)}
+${indentSql(GROWTH_MONTHLY_CTE)}
 )
 SELECT month, orders, revenue
 FROM monthly
@@ -612,13 +605,13 @@ const PARETO_SHARE_BODY = `SELECT full_name, orders, revenue,
 FROM per_customer`;
 
 const PARETO_SHARE = `WITH per_customer AS (
-${indent(PARETO_TOTALS_CTE)}
+${indentSql(PARETO_TOTALS_CTE)}
 )
 ${PARETO_SHARE_BODY}
 ORDER BY revenue DESC`;
 
 const PARETO_TIER_CTE = `WITH per_customer AS (
-${indent(PARETO_TOTALS_CTE)}
+${indentSql(PARETO_TOTALS_CTE)}
 ), shares AS (
   SELECT full_name, revenue,
          ROUND(100.0 * revenue / SUM(revenue) OVER (), 1) AS pct_of_total,
@@ -706,7 +699,7 @@ WHERE o.status = 'completed'
         { name: "pct_of_total", type: "real" },
       ],
       starter: `WITH per_customer AS (
-${indent(PARETO_TOTALS_CTE)}
+${indentSql(PARETO_TOTALS_CTE)}
 )
 SELECT full_name, orders, revenue
 FROM per_customer

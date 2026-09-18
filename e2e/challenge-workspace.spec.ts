@@ -126,13 +126,13 @@ test.describe("Challenge workspace", () => {
     page,
   }) => {
     const slugs = await catalogSlugs(page);
-    expect(slugs.length).toBe(50);
+    expect(slugs.length).toBe(100);
     expect(new Set(slugs).size).toBe(slugs.length);
   });
 
   test("every reference solution passes in the browser", async ({ page }) => {
     // Each challenge is a fresh page load, so every one boots its runtime from
-    // cold. Fifty of those does not fit the file's default timeout.
+    // cold. A hundred of those does not fit the file's default timeout.
     test.setTimeout(45 * 60_000);
     const slugs = await catalogSlugs(page);
     const failures: string[] = [];

@@ -11,27 +11,9 @@
  * grader the browser uses, so a wrong expectation fails CI.
  */
 
-import { sqlChallenge } from "./authoring";
+import { resultShape, sqlChallenge } from "./authoring";
 import { EVENTS, HR, RETAIL } from "./datasets";
 import type { Challenge } from "./types";
-
-/** Checks every SQL challenge wants: the right shape, then the right rows. */
-function shape(columns: string[], rowCount: number, matchNote: string) {
-  return [
-    {
-      id: "columns",
-      name: `Returns ${columns.join(", ")}`,
-      description: "With those names, in that order.",
-      expectedColumns: columns,
-    },
-    {
-      id: "rowcount",
-      name: `Returns ${rowCount} row${rowCount === 1 ? "" : "s"}`,
-      expectedRowCount: rowCount,
-    },
-    { id: "matches", name: "Values match the reference result", description: matchNote, matchesSolution: true },
-  ];
-}
 
 export const SQL_SINGLE: Challenge[] = [
   // ─── Retail ────────────────────────────────────────────────────────
@@ -69,7 +51,7 @@ FROM products p
 LEFT JOIN order_items i ON i.product_id = p.product_id
 WHERE i.product_id IS NULL
 ORDER BY p.product_name`,
-      tests: shape(["product_name"], 1, "Exactly the products with no sales."),
+      tests: resultShape(["product_name"], 1, "Exactly the products with no sales."),
     },
   ),
 
@@ -104,7 +86,7 @@ JOIN products p ON p.product_id = i.product_id
 WHERE o.status = 'completed'
 GROUP BY p.category
 ORDER BY revenue DESC`,
-      tests: shape(["category", "revenue"], 5, "Cancelled orders excluded."),
+      tests: resultShape(["category", "revenue"], 5, "Cancelled orders excluded."),
     },
   ),
 
@@ -136,7 +118,7 @@ JOIN customers c ON c.customer_id = o.customer_id
 WHERE o.status = 'completed'
 GROUP BY c.city
 ORDER BY order_count DESC, c.city`,
-      tests: shape(["city", "order_count"], 3, "Cancelled orders do not count."),
+      tests: resultShape(["city", "order_count"], 3, "Cancelled orders do not count."),
     },
   ),
 
@@ -172,7 +154,7 @@ FROM (
   WHERE o.status = 'completed'
   GROUP BY o.order_id
 )`,
-      tests: shape(["average_order_value"], 1, "Averaged per order, not per line."),
+      tests: resultShape(["average_order_value"], 1, "Averaged per order, not per line."),
     },
   ),
 
@@ -215,7 +197,7 @@ WHERE o.status = 'completed'
 GROUP BY c.customer_id, c.full_name
 HAVING COUNT(*) >= 4
 ORDER BY order_count DESC, c.full_name`,
-      tests: shape(["full_name", "order_count"], 2, "Four or more, completed only."),
+      tests: resultShape(["full_name", "order_count"], 2, "Four or more, completed only."),
     },
   ),
 
@@ -266,7 +248,7 @@ WHERE t.order_total = (
   SELECT MAX(t2.order_total) FROM totals t2 WHERE t2.customer_id = t.customer_id
 )
 ORDER BY c.full_name`,
-      tests: shape(["full_name", "order_id", "order_total"], 5, "One row per customer."),
+      tests: resultShape(["full_name", "order_id", "order_total"], 5, "One row per customer."),
     },
   ),
 
@@ -302,7 +284,7 @@ FROM orders
          1
        ) AS cancelled_pct
 FROM orders`,
-      tests: shape(["cancelled_pct"], 1, "Cancelled as a share of all orders."),
+      tests: resultShape(["cancelled_pct"], 1, "Cancelled as a share of all orders."),
     },
   ),
 
@@ -356,7 +338,7 @@ SELECT month, revenue,
        ROUND(SUM(revenue) OVER (ORDER BY month), 2) AS running_total
 FROM monthly
 ORDER BY month`,
-      tests: shape(["month", "revenue", "running_total"], 3, "The running total accumulates by month."),
+      tests: resultShape(["month", "revenue", "running_total"], 3, "The running total accumulates by month."),
     },
   ),
 
@@ -392,7 +374,7 @@ WHERE e.salary = (
   SELECT MAX(e2.salary) FROM employees e2 WHERE e2.dept_id = e.dept_id
 )
 ORDER BY d.dept_name`,
-      tests: shape(["dept_name", "full_name", "salary"], 4, "One top earner per department."),
+      tests: resultShape(["dept_name", "full_name", "salary"], 4, "One top earner per department."),
     },
   ),
 
@@ -422,7 +404,7 @@ ORDER BY salary DESC
 FROM employees
 WHERE salary > (SELECT AVG(salary) FROM employees)
 ORDER BY salary DESC`,
-      tests: shape(["full_name", "salary"], 6, "Strictly above the average."),
+      tests: resultShape(["full_name", "salary"], 6, "Strictly above the average."),
     },
   ),
 
@@ -460,7 +442,7 @@ FROM employees e
 JOIN employees m ON m.employee_id = e.manager_id
 GROUP BY m.employee_id, m.full_name
 ORDER BY reports DESC, manager`,
-      tests: shape(["manager", "reports"], 5, "Direct reports only."),
+      tests: resultShape(["manager", "reports"], 5, "Direct reports only."),
     },
   ),
 
@@ -499,7 +481,7 @@ GROUP BY band
 FROM employees
 GROUP BY band
 ORDER BY headcount DESC, band`,
-      tests: shape(["band", "headcount"], 3, "Three bands, everyone counted once."),
+      tests: resultShape(["band", "headcount"], 3, "Three bands, everyone counted once."),
     },
   ),
 
@@ -528,7 +510,7 @@ FROM employees
 FROM employees
 ORDER BY hired_on
 LIMIT 3`,
-      tests: shape(["full_name", "hired_on"], 3, "The three earliest hires, in order."),
+      tests: resultShape(["full_name", "hired_on"], 3, "The three earliest hires, in order."),
     },
   ),
 
@@ -561,7 +543,7 @@ FROM employees e
 JOIN employees m ON m.employee_id = e.manager_id
 WHERE e.salary > m.salary
 ORDER BY e.full_name`,
-      tests: shape(["employee", "manager", "salary"], 1, "Strictly more than the manager."),
+      tests: resultShape(["employee", "manager", "salary"], 1, "Strictly more than the manager."),
     },
   ),
 
@@ -599,7 +581,7 @@ ORDER BY day
 FROM events
 GROUP BY day
 ORDER BY day`,
-      tests: shape(["day", "active_users"], 5, "Distinct users, not event counts."),
+      tests: resultShape(["day", "active_users"], 5, "Distinct users, not event counts."),
     },
   ),
 
@@ -631,7 +613,7 @@ FROM events
 WHERE event_name = 'view'
 GROUP BY page
 ORDER BY views DESC, page`,
-      tests: shape(["page", "views"], 3, "Only view events counted."),
+      tests: resultShape(["page", "views"], 3, "Only view events counted."),
     },
   ),
 
@@ -664,7 +646,7 @@ FROM events
            / COUNT(DISTINCT user_id), 1
        ) AS conversion_pct
 FROM events`,
-      tests: shape(["signed_up", "visitors", "conversion_pct"], 1, "Distinct users on both sides."),
+      tests: resultShape(["signed_up", "visitors", "conversion_pct"], 1, "Distinct users on both sides."),
     },
   ),
 
@@ -709,7 +691,7 @@ SELECT user_id, page AS first_page
 FROM ranked
 WHERE rn = 1
 ORDER BY user_id`,
-      tests: shape(["user_id", "first_page"], 6, "One row per user, their earliest event."),
+      tests: resultShape(["user_id", "first_page"], 6, "One row per user, their earliest event."),
     },
   ),
 
@@ -737,7 +719,7 @@ FROM events
 FROM events
 GROUP BY user_id
 ORDER BY event_count DESC, user_id`,
-      tests: shape(["user_id", "event_count"], 6, "Every event counted once."),
+      tests: resultShape(["user_id", "event_count"], 6, "Every event counted once."),
     },
   ),
 
@@ -772,7 +754,7 @@ FROM events
 WHERE event_name = 'click'
   AND user_id NOT IN (SELECT user_id FROM events WHERE event_name = 'signup')
 ORDER BY user_id`,
-      tests: shape(["user_id"], 2, "Clicked, and never signed up."),
+      tests: resultShape(["user_id"], 2, "Clicked, and never signed up."),
     },
   ),
 ];

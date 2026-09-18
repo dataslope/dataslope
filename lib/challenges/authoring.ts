@@ -70,6 +70,60 @@ function examplesBlock(items?: WorkedExample[]): InstructionBlock[] {
   ];
 }
 
+/**
+ * Indent a query so it reads as a nested CTE body.
+ *
+ * Multi-step SQL challenges quote an earlier step's accepted query inside a
+ * `WITH` clause, and that only looks like SQL somebody wrote if it is indented
+ * to match. Blank lines are left alone so the result has no trailing spaces.
+ */
+export function indentSql(sql: string): string {
+  return sql
+    .split("\n")
+    .map((line) => (line.trim() ? "  " + line : line))
+    .join("\n");
+}
+
+/**
+ * The three checks a single-query SQL challenge almost always wants: the
+ * right columns, the right number of rows, then the right values.
+ *
+ * Shared rather than copied into each module because the wording is what a
+ * learner reads on every SQL challenge in the catalog — three copies would
+ * drift apart within a week. `ordered` is for challenges whose prompt asks
+ * for a specific sort; without it the comparison ignores row order, which is
+ * the right default when the prompt does not.
+ */
+export function resultShape(
+  columns: string[],
+  rowCount: number,
+  matchNote: string,
+  ordered = false,
+): SqlChallengeTest[] {
+  return [
+    {
+      id: "columns",
+      name: `Returns ${columns.join(", ")}`,
+      description: "With those names, in that order.",
+      expectedColumns: columns,
+    },
+    {
+      id: "rowcount",
+      name: `Returns ${rowCount} row${rowCount === 1 ? "" : "s"}`,
+      expectedRowCount: rowCount,
+    },
+    {
+      id: "matches",
+      name: ordered
+        ? "Values match the reference result, in order"
+        : "Values match the reference result",
+      description: matchNote,
+      matchesSolution: true,
+      ...(ordered ? { ordered: true } : {}),
+    },
+  ];
+}
+
 // ─── SQL ─────────────────────────────────────────────────────────────
 
 interface SqlTaskSpec {

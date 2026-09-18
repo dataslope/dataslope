@@ -7,7 +7,6 @@ import {
   BriefcaseBusiness,
   Code2,
   GraduationCap,
-  ListChecks,
   LogIn,
   LogOut,
   Menu as Hamburger,
@@ -42,9 +41,11 @@ const NAV_SECTIONS: {
   activeClass?: string;
 }[] = [
   { href: "/courses", label: "Courses", icon: GraduationCap, prefetch: true },
-  // Learn → do → drill, so these two sit between Courses and Interview Prep.
+  // Learn → do → drill, so this sits between Courses and Interview Prep.
   { href: "/dashboard/challenges", label: "Challenges", icon: Code2 },
-  { href: "/practice", label: "Practice", icon: ListChecks },
+  // A "Practice" item belongs here too, but there is no practice surface yet
+  // and `/practice` 404s. Restore it the moment that page exists — the nav
+  // has room for it, which is what the full-bleed header was widened for.
   { href: "/interview-prep", label: "Interview Prep", icon: BriefcaseBusiness },
   { href: "/playground", label: "Playground", icon: SquareTerminal },
   // The "Free" badge stops "Pricing" reading as a paywall.

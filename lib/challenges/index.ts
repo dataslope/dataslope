@@ -29,10 +29,18 @@
  */
 
 import { CODE_ALGORITHMS } from "./code-algorithms";
+import { CODE_CLASSICS } from "./code-classics";
 import { CODE_FUNDAMENTALS } from "./code-fundamentals";
 import { CODE_MULTI_JS } from "./code-multi-js";
+import { CODE_MULTI_JS_WEB } from "./code-multi-js-web";
 import { CODE_MULTI_PYTHON } from "./code-multi-python";
+import { CODE_MULTI_PYTHON_TOOLS } from "./code-multi-python-tools";
+import { CODE_SHAPING } from "./code-shaping";
+import { SQL_LIBRARY } from "./sql-library";
 import { SQL_MULTI } from "./sql-multi";
+import { SQL_MULTI_BILLING } from "./sql-multi-billing";
+import { SQL_MULTI_LIBRARY } from "./sql-multi-library";
+import { SQL_SUBSCRIPTIONS } from "./sql-subscriptions";
 import { SQL_SINGLE } from "./sql-single";
 import { TOP_K_FREQUENT_WORDS } from "./top-k-frequent-words";
 import { TOP_PRODUCTS_BY_MONTH } from "./top-products-by-month";
@@ -50,6 +58,14 @@ const CHALLENGES: Challenge[] = [
   ...CODE_ALGORITHMS,
   ...CODE_MULTI_PYTHON,
   ...CODE_MULTI_JS,
+  ...SQL_SUBSCRIPTIONS,
+  ...SQL_LIBRARY,
+  ...SQL_MULTI_BILLING,
+  ...SQL_MULTI_LIBRARY,
+  ...CODE_SHAPING,
+  ...CODE_CLASSICS,
+  ...CODE_MULTI_PYTHON_TOOLS,
+  ...CODE_MULTI_JS_WEB,
 ];
 
 export function getChallenge(slug: string): Challenge | undefined {

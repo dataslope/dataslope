@@ -26,10 +26,24 @@ import {
 const SLUGS = getChallengeSlugs();
 
 describe("challenge catalog", () => {
-  it("ships the pilot's fifty challenges, at least half single-step", () => {
-    expect(SLUGS.length).toBe(50);
+  it("ships the pilot's hundred challenges, at least half single-step", () => {
+    expect(SLUGS.length).toBe(100);
     const single = SLUGS.filter((s) => !isMultiStep(getChallenge(s)!));
-    expect(single.length).toBeGreaterThanOrEqual(25);
+    expect(single.length).toBeGreaterThanOrEqual(50);
+  });
+
+  /**
+   * The catalog is meant to teach a spread of ideas, not one idea a hundred
+   * times. A collapsing topic count is the cheapest early warning that a batch
+   * was authored without reading what was already there.
+   */
+  it("spreads across topics and difficulties", () => {
+    const challenges = SLUGS.map((s) => getChallenge(s)!);
+    expect(new Set(challenges.map((c) => c.catalog.topic)).size).toBeGreaterThanOrEqual(30);
+    for (const level of ["Beginner", "Intermediate", "Advanced"] as const) {
+      const count = challenges.filter((c) => c.difficulty === level).length;
+      expect(count, `no ${level} challenges`).toBeGreaterThan(0);
+    }
   });
 
   it("covers both SQL and non-SQL languages", () => {
