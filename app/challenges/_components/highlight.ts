@@ -84,16 +84,6 @@ const GRAMMARS: Record<CodeLanguage, Grammar> = {
     lineComment: "//",
     quotes: ['"', "'", "`"],
   },
-  go: {
-    keywords: words(`package import func return for range if else switch case
-      defer go chan select type struct interface var const map`),
-    builtins: words(`string int int64 float64 bool byte rune len cap make new
-      append copy delete sort fmt`),
-    literals: words("nil true false"),
-    phrases: [],
-    lineComment: "//",
-    quotes: ['"', "`"],
-  },
 };
 
 const IDENT = /[A-Za-z_][A-Za-z0-9_]*/y;

@@ -71,16 +71,18 @@ describe("challenge editor highlighter", () => {
   });
 
   it("treats bare literals as values, not control flow", () => {
-    const go = getChallenge("top-k-frequent-words")?.languages.find(
-      (l) => l.id === "go",
+    const python = getChallenge("top-k-frequent-words")?.languages.find(
+      (l) => l.id === "python",
     );
-    if (!go) throw new Error("missing go fixture");
-    const lines = highlight(go.source, "go");
+    if (!python) throw new Error("missing python fixture");
+    // `None`/`True`/`False` are literals, so they take the number color
+    // rather than the keyword color, matching the prototypes.
+    const lines = highlight("x = None\ny = True\n# note", "python");
 
-    expect(kindOf(lines, "func")).toBe("keyword");
-    expect(kindOf(lines, "string")).toBe("builtin");
-    expect(kindOf(lines, "nil")).toBe("number");
-    expect(kindOf(lines, "// your code here")).toBe("comment");
+    expect(kindOf(lines, "None")).toBe("number");
+    expect(kindOf(lines, "True")).toBe("number");
+    expect(kindOf(lines, "# note")).toBe("comment");
+    expect(kindOf(highlight(python.source, "python"), "def")).toBe("keyword");
   });
 
   it("leaves chained JavaScript methods uncolored", () => {

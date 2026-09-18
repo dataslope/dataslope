@@ -88,7 +88,7 @@ export interface SchemaTable {
 
 // ─── Editor ──────────────────────────────────────────────────────────
 
-export type CodeLanguage = "sql" | "python" | "javascript" | "go";
+export type CodeLanguage = "sql" | "python" | "javascript";
 
 /** One selectable language for a challenge whose solution isn't SQL-only. */
 export interface ChallengeLanguage {
@@ -196,7 +196,6 @@ export type IndexLanguage =
   | "python"
   | "javascript"
   | "typescript"
-  | "go"
   | "r";
 
 export const INDEX_LANGUAGE_LABELS: Record<IndexLanguage, string> = {
@@ -206,7 +205,6 @@ export const INDEX_LANGUAGE_LABELS: Record<IndexLanguage, string> = {
   python: "Python",
   javascript: "JavaScript",
   typescript: "TypeScript",
-  go: "Go",
   r: "R",
 };
 
@@ -513,7 +511,7 @@ const TOP_K_WORDS: Challenge = {
   difficulty: "Intermediate",
   catalog: {
     topic: "Hash maps",
-    langs: ["python", "javascript", "go"],
+    langs: ["python", "javascript"],
     // The workspace opens on "Attempted · 2 submissions" with a failing
     // check, so the row cannot say Solved the way the list mock did.
     status: "attempted",
@@ -613,20 +611,6 @@ def top_k_words(words: list[str], k: int) -> list[str]:
     .map(([w]) => w);
 }`,
     },
-    {
-      id: "go",
-      label: "Go 1.22",
-      shortLabel: "Go",
-      runMeta: "go 1.22 · 0.01s · exit 0",
-      runTime: "0.01s",
-      signature: "func topKWords(words []string, k int) []string",
-      source: `package main
-
-func topKWords(words []string, k int) []string {
-    // your code here
-    return nil
-}`,
-    },
   ],
   schema: [],
   output: {
@@ -720,26 +704,26 @@ const CATALOG_ONLY: CatalogRow[] = [
   ["Merge Intervals", "Sorting", 2, ["python", "javascript", "typescript"], 1, "solved", 62],
   ["Gaps in Sequential IDs", "Gaps and islands", 3, ["postgres"], 2, "new", 29],
   ["Daily Active Users", "Aggregation", 1, ["postgres", "sqlite", "duckdb"], 1, "new", 79],
-  ["Parse Log Lines", "Regular expressions", 2, ["python", "go"], 2, "new", 55],
+  ["Parse Log Lines", "Regular expressions", 2, ["python"], 2, "new", 55],
   ["Consecutive Login Streaks", "Gaps and islands", 3, ["postgres", "duckdb"], 3, "new", 27],
   ["Group Anagrams", "Hash maps", 1, ["python", "javascript"], 1, "new", 77],
   ["Median Order Value", "Percentiles", 2, ["postgres", "duckdb"], 1, "new", 48],
   ["Deduplicate Customer Records", "Window functions", 2, ["postgres", "sqlite"], 2, "new", 52],
   ["Flatten Nested JSON", "Recursion", 2, ["python", "javascript", "typescript"], 1, "new", 59],
   ["Year-over-Year Growth", "LAG, date math", 2, ["postgres", "duckdb"], 2, "new", 50],
-  ["Moving Average Over a Stream", "Queues", 2, ["python", "go"], 1, "new", 61],
+  ["Moving Average Over a Stream", "Queues", 2, ["python"], 1, "new", 61],
   ["Employees Earning More Than Managers", "Self joins", 1, ["postgres", "sqlite"], 1, "new", 83],
-  ["Balanced Brackets", "Stacks", 1, ["python", "javascript", "go"], 1, "new", 85],
+  ["Balanced Brackets", "Stacks", 1, ["python", "javascript"], 1, "new", 85],
   ["Pivot Monthly Sales", "Conditional aggregation", 2, ["postgres", "duckdb"], 2, "new", 44],
-  ["LRU Cache", "Linked lists, hash maps", 3, ["python", "typescript", "go"], 3, "new", 33],
+  ["LRU Cache", "Linked lists, hash maps", 3, ["python", "typescript"], 3, "new", 33],
   ["Sessionize Click Events", "Window functions", 3, ["postgres", "duckdb"], 3, "new", 26],
   ["Validate ISBN Numbers", "String parsing", 1, ["python", "javascript"], 1, "new", 72],
   ["Late Shipments by Carrier", "Joins, filtering", 1, ["postgres", "sqlite"], 1, "new", 76],
-  ["Longest Substring Without Repeats", "Sliding window", 2, ["python", "javascript", "go"], 1, "new", 46],
+  ["Longest Substring Without Repeats", "Sliding window", 2, ["python", "javascript"], 1, "new", 46],
   ["First Purchase per Customer", "DISTINCT ON, ranking", 1, ["postgres", "duckdb"], 1, "new", 70],
   ["CSV to Nested Dict", "Parsing", 1, ["python"], 2, "new", 68],
   ["Inventory Below Reorder Point", "Joins, HAVING", 1, ["postgres", "sqlite", "duckdb"], 1, "new", 80],
-  ["Rate Limiter", "Sliding window", 3, ["python", "go", "typescript"], 3, "new", 30],
+  ["Rate Limiter", "Sliding window", 3, ["python", "typescript"], 3, "new", 30],
   ["Average Time to Resolve Tickets", "Interval math", 2, ["postgres"], 1, "new", 57],
   ["Debounce Function", "Closures, timers", 2, ["javascript", "typescript"], 1, "new", 54],
   ["Products Never Ordered", "Anti joins", 1, ["postgres", "sqlite", "duckdb"], 1, "new", 84],
@@ -747,22 +731,22 @@ const CATALOG_ONLY: CatalogRow[] = [
   ["Percent Change Week over Week", "LAG, date_trunc", 2, ["postgres", "duckdb"], 2, "new", 47],
   ["Event Emitter", "Classes", 2, ["javascript", "typescript"], 2, "new", 56],
   ["Funnel Conversion Rates", "Conditional aggregation", 3, ["postgres", "duckdb"], 4, "new", 24],
-  ["Binary Search Tree Insert", "Trees", 2, ["python", "go"], 1, "new", 63],
+  ["Binary Search Tree Insert", "Trees", 2, ["python"], 1, "new", 63],
   ["Nth Highest Rating", "DENSE_RANK", 2, ["postgres", "sqlite"], 1, "new", 60],
-  ["Reverse a Linked List", "Linked lists", 1, ["python", "javascript", "go"], 1, "new", 78],
+  ["Reverse a Linked List", "Linked lists", 1, ["python", "javascript"], 1, "new", 78],
   ["Overlapping Reservations", "Range overlap", 3, ["postgres"], 2, "new", 28],
   ["Spiral Order Matrix", "Arrays", 2, ["python", "javascript"], 1, "new", 49],
   ["Fill Missing Dates", "generate_series", 2, ["postgres", "duckdb"], 2, "new", 42],
-  ["Count Islands", "Graph search", 2, ["python", "go", "typescript"], 1, "new", 53],
+  ["Count Islands", "Graph search", 2, ["python", "typescript"], 1, "new", 53],
   ["Top Referrers per Page", "Ranking", 2, ["postgres", "duckdb"], 2, "new", 45],
-  ["Shortest Path with Dijkstra", "Graphs, heaps", 3, ["python", "go"], 3, "new", 25],
+  ["Shortest Path with Dijkstra", "Graphs, heaps", 3, ["python"], 3, "new", 25],
   ["Churned Subscribers", "Date math, anti joins", 2, ["postgres", "sqlite"], 2, "new", 43],
   ["Sudoku Validator", "Sets", 1, ["python", "javascript"], 1, "new", 71],
-  ["Kth Largest Element", "Heaps", 2, ["python", "go", "typescript"], 1, "new", 58],
+  ["Kth Largest Element", "Heaps", 2, ["python", "typescript"], 1, "new", 58],
   ["Summarise Survey Responses", "dplyr, tidyr", 1, ["r"], 1, "new", 73],
   ["Trie Autocomplete", "Tries", 3, ["python", "typescript"], 3, "new", 32],
   ["Reshape Wide to Long", "tidyr", 2, ["r"], 1, "new", 61],
-  ["Roman Numerals", "String parsing", 1, ["python", "javascript", "go"], 1, "new", 82],
+  ["Roman Numerals", "String parsing", 1, ["python", "javascript"], 1, "new", 82],
   ["Linear Regression by Group", "purrr, broom", 3, ["r"], 2, "new", 35],
 ];
 
