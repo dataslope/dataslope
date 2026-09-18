@@ -8,10 +8,14 @@
  * the DOM and the media query in the stylesheet decides which one paints, so a
  * phone never flashes the desktop layout while a viewport check settles.
  *
- * Everything the panes show comes from `lib/challenges`. Run and Submit
- * select the tab whose canned result answers them; they do not execute the
- * editor's code, and the editor is a highlighted, read-only snapshot rather
- * than CodeMirror. Both are the seams to cut when this gets a real runtime.
+ * Everything the panes show is produced by actually running the learner's
+ * code: `useChallengeRunner` boots an in-browser SQL engine or a WASM language
+ * runtime, and the Output, Test cases and Submissions tabs render what came
+ * back. Nothing is sent to a server.
+ *
+ * Step gating is derived, not authored. A step opens when the one before it
+ * has passed, and "passed" comes from `lib/challenges/progress`, which lives
+ * in localStorage.
  */
 
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
@@ -27,20 +31,35 @@ import {
   Code2,
   Database,
   EllipsisVertical,
+  Loader2,
   Lock,
   Play,
   RotateCcw,
   Table2,
-  Wand2,
 } from "lucide-react";
 import {
-  initialStepIndex,
   isMultiStep,
+  isStepUnlocked,
+  openStepIndex,
   type Challenge,
+  type ChallengeLanguage,
   type ChallengeStep,
+  type ChallengeTask,
+  type CodeLanguage,
+  type OutputPanel,
+  type Submission,
+  type TestOutcome,
 } from "@/lib/challenges";
 import {
-  CodeView,
+  clearSavedCode,
+  markAttempted,
+  markSolved,
+  markStepPassed,
+  readSavedCode,
+  saveCode,
+} from "@/lib/challenges/progress";
+import { useProgress } from "./useProgress";
+import {
   DifficultyMeter,
   InstructionBlocks,
   MobileSubmissions,
@@ -51,6 +70,9 @@ import {
   SubmissionsPanel,
   TestsPanel,
 } from "./parts";
+import { ChallengeEditor } from "./ChallengeEditor";
+import { useChallengeRunner, type RunMode } from "./useChallengeRunner";
+import { registerWorkspaceForTests } from "./testRegistry";
 import s from "./ChallengeWorkspace.module.css";
 
 type ResultTab = "output" | "tests" | "solution" | "subs";
@@ -72,26 +94,97 @@ const MIN_EDITOR = 180;
 /** Pixels a resizer moves per arrow-key press. */
 const KEY_STEP = 24;
 
+function timeAgoLabel(): string {
+  return "just now";
+}
+
 export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
   const multiStep = isMultiStep(challenge);
 
-  const [stepIndex, setStepIndex] = useState(() => initialStepIndex(challenge));
+  // The server snapshot is blank and the stored one arrives at hydration, so
+  // nothing here is copied into state or fetched in an effect.
+  const progress = useProgress(challenge.slug);
+  // The step the learner picked, or null to follow their progress.
+  const [chosenStep, setChosenStep] = useState<number | null>(null);
   const [resultTab, setResultTab] = useState<ResultTab>("output");
-  const [langId, setLangId] = useState(challenge.languages[0]?.id);
+  const [langId, setLangId] = useState<CodeLanguage>(
+    () => challenge.languages[0]?.id ?? "sql",
+  );
   const [langOpen, setLangOpen] = useState(false);
   const [mobileView, setMobileView] = useState<MobileView>("code");
   const [openTable, setOpenTable] = useState<string | null>(null);
+  const [outcome, setOutcome] = useState<{
+    mode: RunMode;
+    output: OutputPanel;
+    tests: TestOutcome[];
+    meta: string;
+  } | null>(null);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
 
   const splitRef = useRef<HTMLDivElement>(null);
   const rowsRef = useRef<HTMLDivElement>(null);
   const langWrapRef = useRef<HTMLDivElement>(null);
 
+  const runner = useChallengeRunner(challenge);
+  const { execute, reset: resetEngine, dispose } = runner;
+
+  const stepIndex = chosenStep ?? openStepIndex(challenge, progress.passedSteps);
+  const setStepIndex = setChosenStep;
+
+  // ─── Which task is on screen ───────────────────────────────────────
+
+  const language: ChallengeLanguage | undefined =
+    challenge.languages.find((l) => l.id === langId) ?? challenge.languages[0];
+  const step: ChallengeStep | undefined = multiStep
+    ? challenge.steps[stepIndex]
+    : undefined;
+  /** A step carries the task on a multi-step challenge; a language otherwise. */
+  const task: ChallengeTask | undefined = multiStep ? step : language;
+  /** Identifies the buffer: the step number, or the language id. */
+  const taskKey = multiStep ? (step?.n ?? "01") : (language?.id ?? "sql");
+  const editorLanguage: CodeLanguage = multiStep
+    ? (challenge.languages[0]?.id ?? "sql")
+    : (language?.id ?? "sql");
+
+  const stepUnlocked = multiStep
+    ? isStepUnlocked(challenge, stepIndex, progress.passedSteps)
+    : true;
+
+  // The editor buffer, re-seeded when the learner moves to another task.
+  //
+  // React's "adjust state when a prop changes" pattern rather than an effect:
+  // the new text is ready on the same render the task changes on, so the
+  // editor never shows the previous task's code for a frame. Seeding reads
+  // localStorage, which differs between server and client — harmless here,
+  // because `code` is never rendered: it reaches the DOM only when CodeMirror
+  // mounts, in an effect.
+  const seed = (key: string) =>
+    readSavedCode(challenge.slug, key) ?? task?.starterCode ?? "";
+  const [code, setCodeState] = useState(() => seed(taskKey));
+  const [seededFor, setSeededFor] = useState(taskKey);
+  if (seededFor !== taskKey) {
+    setSeededFor(taskKey);
+    setCodeState(seed(taskKey));
+    setOutcome(null);
+  }
+
+  const setCode = useCallback(
+    (next: string) => {
+      setCodeState(next);
+      saveCode(challenge.slug, taskKey, next);
+    },
+    [challenge.slug, taskKey],
+  );
+
+  // ─── Lifecycle ─────────────────────────────────────────────────────
+
   // The workspace owns the viewport: the panes scroll, the document does not.
-  // Same contract as the playground shells (`body.playground-active`).
   useEffect(() => {
     document.body.classList.add("challenge-active");
     return () => document.body.classList.remove("challenge-active");
   }, []);
+
+  useEffect(() => dispose, [dispose]);
 
   // Dismiss the language menu on an outside click or Escape.
   useEffect(() => {
@@ -110,36 +203,133 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
     };
   }, [langOpen]);
 
-  const step: ChallengeStep | undefined = multiStep
-    ? challenge.steps[stepIndex]
-    : undefined;
-  const stepLocked = step?.state === "locked";
-  // The step that has to pass before this one opens, for the locked-editor
-  // copy. Trimmed of its leading zero: "step 2", not "step 02".
-  const gatingStep = challenge.steps[stepIndex - 1]?.n.replace(/^0+/, "") ?? "";
+  // ─── Run and submit ────────────────────────────────────────────────
 
-  const language =
-    challenge.languages.find((l) => l.id === langId) ?? challenge.languages[0];
+  const go = useCallback(
+    async (mode: RunMode) => {
+      if (!task || !language || !stepUnlocked) return;
+      setResultTab(mode === "run" ? "output" : "tests");
+      setMobileView("results");
+      setLangOpen(false);
 
-  const instructions = multiStep ? (step?.instructions ?? []) : challenge.instructions;
-  const editorSource = multiStep ? step?.source : language?.source;
-  const editorLanguage = multiStep ? "sql" : (language?.id ?? "sql");
+      const result = await execute(code, mode, task, language);
+      setOutcome({
+        mode,
+        output: result.output,
+        tests: result.tests,
+        meta: result.meta,
+      });
 
-  const goToStep = useCallback((stepNumber: number) => {
-    setStepIndex(stepNumber - 1);
-  }, []);
+      if (mode !== "submit") return;
 
-  const run = useCallback(() => {
-    setResultTab("output");
-    setLangOpen(false);
-    setMobileView("results");
-  }, []);
+      const failed = result.output.kind === "error";
+      const label = failed
+        ? "Runtime error"
+        : result.accepted
+          ? "Accepted"
+          : "Wrong answer";
+      setSubmissions((prev) => [
+        {
+          step: multiStep ? `Step ${Number(taskKey)}` : undefined,
+          result: label,
+          ok: result.accepted,
+          lang: language.label,
+          runtime: `${Math.round(result.elapsedMs)}ms`,
+          when: timeAgoLabel(),
+        },
+        ...prev,
+      ]);
 
-  const submit = useCallback(() => {
-    setResultTab("tests");
-    setLangOpen(false);
-    setMobileView("results");
-  }, []);
+      // Progress only ever moves forward, and only on a real pass. These
+      // write to the store, which re-renders the rail and the catalog.
+      if (result.accepted) {
+        if (multiStep) markStepPassed(challenge.slug, taskKey, challenge.steps.length);
+        else markSolved(challenge.slug);
+      } else {
+        markAttempted(challenge.slug);
+      }
+    },
+    [challenge.slug, challenge.steps.length, code, execute, language, multiStep, stepUnlocked, task, taskKey],
+  );
+
+  const run = useCallback(() => void go("run"), [go]);
+  const submit = useCallback(() => void go("submit"), [go]);
+
+  const resetCode = useCallback(() => {
+    if (!task) return;
+    clearSavedCode(challenge.slug, taskKey);
+    setCodeState(task.starterCode);
+    setOutcome(null);
+    // A fresh database too, so a challenge that wrote rows starts clean.
+    resetEngine();
+  }, [challenge.slug, resetEngine, task, taskKey]);
+
+  // Drive the workspace from Playwright without typing into CodeMirror.
+  //
+  // The handle is registered once and reads through a ref that every render
+  // refreshes. Re-registering a fresh closure instead looked fine but was
+  // subtly broken: a test that grabbed the handle, called submit() and then
+  // read getTestResults() was reading the closure captured *before* the
+  // results arrived, and always saw an empty list.
+  const live = useRef({
+    outcome,
+    busy: runner.busy,
+    task,
+    go,
+    setCode,
+    passedSteps: progress.passedSteps,
+  });
+  useEffect(() => {
+    live.current = {
+      outcome,
+      busy: runner.busy,
+      task,
+      go,
+      setCode,
+      passedSteps: progress.passedSteps,
+    };
+  });
+
+  useEffect(
+    () =>
+      registerWorkspaceForTests(challenge.slug, {
+        slug: challenge.slug,
+        runtimeKind: challenge.runtime.kind,
+        langs: challenge.catalog.langs,
+        taskKeys: multiStep
+          ? challenge.steps.map((st) => st.n)
+          : challenge.languages.map((l) => l.id),
+        isTaskUnlocked: (key) =>
+          !multiStep ||
+          isStepUnlocked(
+            challenge,
+            challenge.steps.findIndex((st) => st.n === key),
+            live.current.passedSteps,
+          ),
+        selectTask: (key) => {
+          if (multiStep) {
+            const i = challenge.steps.findIndex((st) => st.n === key);
+            if (i >= 0) setChosenStep(i);
+          } else {
+            setLangId(key as CodeLanguage);
+          }
+        },
+        setCode: (next) => live.current.setCode(next),
+        loadSolution: () => {
+          const current = live.current.task;
+          if (current) live.current.setCode(current.solutionCode);
+        },
+        submit: () => live.current.go("submit"),
+        getTestResults: () => live.current.outcome?.tests ?? [],
+        getOutputKind: () => live.current.outcome?.output.kind ?? null,
+        getOutputError: () => {
+          const out = live.current.outcome?.output;
+          return out && out.kind === "error" ? out.message : null;
+        },
+        isBusy: () => live.current.busy !== null,
+      }),
+    [challenge, multiStep],
+  );
 
   // ─── Pane resizing ─────────────────────────────────────────────────
   // The grid's inline style is mutated directly rather than held in state:
@@ -162,45 +352,39 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
     el.style.gridTemplateRows = `minmax(0, 1fr) 5px ${clamped}px`;
   }, []);
 
+  const drag = useCallback(
+    (
+      e: React.MouseEvent,
+      el: HTMLElement | null,
+      apply: (rect: DOMRect, ev: MouseEvent) => void,
+    ) => {
+      if (!el) return;
+      e.preventDefault();
+      const rect = el.getBoundingClientRect();
+      const move = (ev: MouseEvent) => apply(rect, ev);
+      const up = () => {
+        window.removeEventListener("mousemove", move);
+        window.removeEventListener("mouseup", up);
+        document.body.style.userSelect = "";
+      };
+      window.addEventListener("mousemove", move);
+      window.addEventListener("mouseup", up);
+      document.body.style.userSelect = "none";
+    },
+    [],
+  );
+
   const startColDrag = useCallback(
-    (e: React.MouseEvent) => {
-      const el = splitRef.current;
-      if (!el) return;
-      e.preventDefault();
-      const left = el.getBoundingClientRect().left;
-      const move = (ev: MouseEvent) => setColumns(ev.clientX - left);
-      const up = () => {
-        window.removeEventListener("mousemove", move);
-        window.removeEventListener("mouseup", up);
-        document.body.style.userSelect = "";
-      };
-      window.addEventListener("mousemove", move);
-      window.addEventListener("mouseup", up);
-      document.body.style.userSelect = "none";
-    },
-    [setColumns],
+    (e: React.MouseEvent) =>
+      drag(e, splitRef.current, (rect, ev) => setColumns(ev.clientX - rect.left)),
+    [drag, setColumns],
   );
-
   const startRowDrag = useCallback(
-    (e: React.MouseEvent) => {
-      const el = rowsRef.current;
-      if (!el) return;
-      e.preventDefault();
-      const bottom = el.getBoundingClientRect().bottom;
-      const move = (ev: MouseEvent) => setRows(bottom - ev.clientY);
-      const up = () => {
-        window.removeEventListener("mousemove", move);
-        window.removeEventListener("mouseup", up);
-        document.body.style.userSelect = "";
-      };
-      window.addEventListener("mousemove", move);
-      window.addEventListener("mouseup", up);
-      document.body.style.userSelect = "none";
-    },
-    [setRows],
+    (e: React.MouseEvent) =>
+      drag(e, rowsRef.current, (rect, ev) => setRows(rect.bottom - ev.clientY)),
+    [drag, setRows],
   );
 
-  // Keyboard equivalents, so the split isn't mouse-only.
   const onColKey = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
@@ -223,21 +407,76 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
     [setRows],
   );
 
-  // ─── Shared fragments ──────────────────────────────────────────────
+  // ─── Derived view state ────────────────────────────────────────────
+
+  const instructions = multiStep ? (step?.instructions ?? []) : challenge.instructions;
+  const tests = outcome?.tests ?? [];
+  const passedCount = tests.filter((t) => t.pass).length;
+  const allPassed = tests.length > 0 && passedCount === tests.length;
+  const testsBadge = tests.length ? `${passedCount}/${tests.length}` : null;
+  const gatingStep = challenge.steps[stepIndex - 1]?.n.replace(/^0+/, "") ?? "";
+  const busy = runner.busy;
 
   const resultPanel = (mobile: boolean) => {
     switch (resultTab) {
       case "output":
-        return <OutputPanelView output={challenge.output} mobile={mobile} />;
-      case "tests":
-        return <TestsPanel challenge={challenge} mobile={mobile} />;
-      case "solution":
-        return <SolutionPanelView solution={challenge.solution} />;
-      case "subs":
-        return mobile ? (
-          <MobileSubmissions challenge={challenge} />
+        return outcome ? (
+          <OutputPanelView output={outcome.output} mobile={mobile} />
         ) : (
-          <SubmissionsPanel challenge={challenge} />
+          <EmptyResults text="Run your code to see its output here." />
+        );
+      case "tests":
+        return tests.length ? (
+          <TestsPanel
+            tests={tests}
+            summary={
+              allPassed
+                ? `All ${tests.length} checks passed`
+                : `${passedCount} of ${tests.length} checks passed`
+            }
+            subtitle={
+              allPassed
+                ? multiStep
+                  ? `Step ${Number(taskKey)} accepted`
+                  : "Accepted"
+                : multiStep
+                  ? `Step ${Number(taskKey)} is not accepted yet`
+                  : "Not accepted yet"
+            }
+            allPassed={allPassed}
+            mobile={mobile}
+          />
+        ) : (
+          <EmptyResults text="Submit to run the checks for this step." />
+        );
+      case "solution":
+        return task ? (
+          <SolutionPanelView
+            note={challenge.solutionNote}
+            source={task.solutionCode}
+            language={editorLanguage}
+            label={
+              multiStep
+                ? `Reference solution · step ${Number(taskKey)}`
+                : `Reference solution · ${language?.shortLabel ?? ""}`
+            }
+          />
+        ) : null;
+      case "subs":
+        return submissions.length ? (
+          mobile ? (
+            <MobileSubmissions
+              submissions={submissions}
+              languageLabel={challenge.languageLabel}
+            />
+          ) : (
+            <SubmissionsPanel
+              submissions={submissions}
+              columns={challenge.submissionColumns}
+            />
+          )
+        ) : (
+          <EmptyResults text="Your submissions this session will appear here." />
         );
     }
   };
@@ -245,7 +484,7 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
   const tabButtons = (mobile: boolean) =>
     RESULT_TABS.map((tab) => {
       const on = resultTab === tab.id;
-      const failing = tab.id === "tests" && challenge.tests.some((t) => !t.pass);
+      const showBadge = tab.id === "tests" && testsBadge !== null;
       return (
         <button
           key={tab.id}
@@ -257,14 +496,47 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
           onClick={() => setResultTab(tab.id)}
         >
           <span>{mobile ? (tab.shortLabel ?? tab.label) : tab.label}</span>
-          {tab.id === "tests" ? (
-            <span className={[s.badge, failing ? s.badgeFail : ""].filter(Boolean).join(" ")}>
-              {challenge.testsBadge}
+          {showBadge ? (
+            <span
+              className={[s.badge, allPassed ? s.badgePass : s.badgeFail]
+                .filter(Boolean)
+                .join(" ")}
+            >
+              {testsBadge}
             </span>
           ) : null}
         </button>
       );
     });
+
+  const editorPane = (mobile: boolean) => {
+    if (multiStep && !stepUnlocked) {
+      return (
+        <div className={mobile ? `${s.editorEmpty} ${s.mEditorEmpty}` : s.editorEmpty}>
+          <Lock size={22} strokeWidth={2} aria-hidden="true" />
+          <span className={s.editorEmptyText}>
+            Editor unlocks when step {gatingStep} passes
+          </span>
+        </div>
+      );
+    }
+    return (
+      <ChallengeEditor
+        value={code}
+        language={editorLanguage}
+        onChange={setCode}
+        taskKey={taskKey}
+      />
+    );
+  };
+
+  const bootNotice = runner.boot ? (
+    <div className={s.bootNotice} role="status">
+      <Loader2 size={14} className={s.spin} aria-hidden="true" />
+      {runner.boot.message}
+      {runner.boot.cold ? " (first run downloads the engine)" : ""}
+    </div>
+  ) : null;
 
   return (
     <div className={s.page}>
@@ -274,9 +546,9 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
       <div className={s.desktopOnly}>
         <header className={s.topBar}>
           <div className={s.topBarLeft}>
-            <Link href="/courses" className={s.backLink}>
+            <Link href="/dashboard/challenges" className={s.backLink}>
               <ArrowLeft size={14} strokeWidth={2} aria-hidden="true" />
-              Courses
+              Challenges
             </Link>
             <span className={s.vDivider} aria-hidden="true" />
             <span className={s.title}>{challenge.title}</span>
@@ -284,19 +556,43 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
               <DifficultyMeter difficulty={challenge.difficulty} />
               <span className={s.difficultyLabel}>{challenge.difficulty}</span>
             </span>
+            {progress.solved ? (
+              <span className={s.solvedPill}>
+                <CheckCircle2 size={13} strokeWidth={2} aria-hidden="true" />
+                Solved
+              </span>
+            ) : null}
           </div>
 
           <div className={s.topBarRight}>
-            <button type="button" className={s.ghostBtn}>
+            <button type="button" className={s.ghostBtn} onClick={resetCode}>
               <RotateCcw size={13} strokeWidth={2} aria-hidden="true" />
               Reset
             </button>
-            <button type="button" className={s.secondaryBtn} onClick={run}>
-              <Play size={13} strokeWidth={2} fill="currentColor" aria-hidden="true" />
+            <button
+              type="button"
+              className={s.secondaryBtn}
+              onClick={run}
+              disabled={busy !== null || !stepUnlocked}
+            >
+              {busy === "run" ? (
+                <Loader2 size={13} className={s.spin} aria-hidden="true" />
+              ) : (
+                <Play size={13} strokeWidth={2} fill="currentColor" aria-hidden="true" />
+              )}
               Run
             </button>
-            <button type="button" className={s.primaryBtn} onClick={submit}>
-              <CheckCircle2 size={13} strokeWidth={2} aria-hidden="true" />
+            <button
+              type="button"
+              className={s.primaryBtn}
+              onClick={submit}
+              disabled={busy !== null || !stepUnlocked}
+            >
+              {busy === "submit" ? (
+                <Loader2 size={13} className={s.spin} aria-hidden="true" />
+              ) : (
+                <CheckCircle2 size={13} strokeWidth={2} aria-hidden="true" />
+              )}
               {challenge.submitLabel}
             </button>
             <span className={s.vDivider} aria-hidden="true" />
@@ -317,8 +613,8 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
               <div className={s.stepper}>
                 {challenge.steps.map((st, i) => {
                   const active = i === stepIndex;
-                  const locked = st.state === "locked";
-                  const passed = st.state === "passed";
+                  const passed = progress.passedSteps.includes(st.n);
+                  const locked = !isStepUnlocked(challenge, i, progress.passedSteps);
                   const tip = `Step ${st.n} · ${st.title}${
                     passed ? " · passed" : locked ? " · locked" : ""
                   }`;
@@ -387,16 +683,37 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
             ) : null}
 
             <div className={s.instructionsBody}>
-              <InstructionBlocks
-                blocks={instructions}
-                signature={language?.signature}
-                onBack={goToStep}
-              />
+              {multiStep && !stepUnlocked ? (
+                <div className={s.lockedCard}>
+                  <Lock
+                    size={18}
+                    strokeWidth={2}
+                    aria-hidden="true"
+                    color="var(--cw-text-faint)"
+                  />
+                  <h2 className={s.lockedTitle}>{step?.title}</h2>
+                  <p className={s.lockedText}>
+                    Opens once step {gatingStep} passes.
+                  </p>
+                  <button
+                    type="button"
+                    className={s.secondaryBtn}
+                    onClick={() =>
+                      setStepIndex(openStepIndex(challenge, progress.passedSteps))
+                    }
+                  >
+                    Back to step {gatingStep}
+                  </button>
+                </div>
+              ) : (
+                <InstructionBlocks
+                  blocks={instructions}
+                  signature={language?.signature}
+                />
+              )}
               {challenge.schema.length > 0 ? (
                 <>
-                  <h3 className={`${s.blockLabel} ${s.schemaLabel}`}>
-                    Schema
-                  </h3>
+                  <h3 className={`${s.blockLabel} ${s.schemaLabel}`}>Schema</h3>
                   <SchemaList tables={challenge.schema} />
                 </>
               ) : null}
@@ -470,30 +787,12 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
                   </span>
                 )}
                 <div className={s.paneHeadRight}>
-                  <span className={s.runMeta}>{language?.runMeta}</span>
-                  <button type="button" className={s.smallGhostBtn} aria-label="Format code">
-                    <Wand2 size={13} strokeWidth={2} aria-hidden="true" />
-                    Format
-                  </button>
+                  <span className={s.runMeta}>{outcome?.meta ?? ""}</span>
                 </div>
               </div>
 
-              <div className={s.editorScroll}>
-                {stepLocked || !editorSource ? (
-                  <div className={s.editorEmpty}>
-                    <Lock size={22} strokeWidth={2} aria-hidden="true" />
-                    <span className={s.editorEmptyText}>
-                      Editor unlocks when step {gatingStep} passes
-                    </span>
-                  </div>
-                ) : (
-                  <CodeView
-                    source={editorSource}
-                    language={editorLanguage}
-                    muted={step?.sourceMuted}
-                  />
-                )}
-              </div>
+              <div className={s.editorScroll}>{editorPane(false)}</div>
+              {bootNotice}
             </div>
 
             <div
@@ -520,9 +819,9 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
       <div className={s.mobileOnly}>
         <header className={s.mHeader}>
           <Link
-            href="/courses"
+            href="/dashboard/challenges"
             className={`${s.mIconBtn} ${s.mIconBtnLead}`}
-            aria-label="Back to courses"
+            aria-label="Back to challenges"
           >
             <ChevronLeft size={18} strokeWidth={2} aria-hidden="true" />
           </Link>
@@ -548,8 +847,8 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
           <div className={s.mStepper}>
             {challenge.steps.map((st, i) => {
               const active = i === stepIndex;
-              const locked = st.state === "locked";
-              const passed = st.state === "passed";
+              const passed = progress.passedSteps.includes(st.n);
+              const locked = !isStepUnlocked(challenge, i, progress.passedSteps);
               return (
                 <Fragment key={st.n}>
                   <button
@@ -558,8 +857,7 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
                     aria-current={active ? "step" : undefined}
                     onClick={() => {
                       setStepIndex(i);
-                      // A locked step has no editor, so land on the brief.
-                      if (st.state === "locked") setMobileView("problem");
+                      if (locked) setMobileView("problem");
                     }}
                     className={[s.mStep, active ? s.mStepActive : ""]
                       .filter(Boolean)
@@ -616,11 +914,23 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
         <div className={`${s.mBody} ${s.noScrollbar}`}>
           {mobileView === "problem" ? (
             <div className={s.mProblem}>
-              <InstructionBlocks
-                blocks={instructions}
-                signature={language?.signature}
-                onBack={goToStep}
-              />
+              {multiStep && !stepUnlocked ? (
+                <div className={s.lockedCard}>
+                  <Lock
+                    size={18}
+                    strokeWidth={2}
+                    aria-hidden="true"
+                    color="var(--cw-text-faint)"
+                  />
+                  <h2 className={s.lockedTitle}>{step?.title}</h2>
+                  <p className={s.lockedText}>Opens once step {gatingStep} passes.</p>
+                </div>
+              ) : (
+                <InstructionBlocks
+                  blocks={instructions}
+                  signature={language?.signature}
+                />
+              )}
               {challenge.schema.length > 0 ? (
                 <>
                   <h3 className={s.blockLabel}>Schema</h3>
@@ -653,43 +963,31 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
                     type="button"
                     className={`${s.mIconBtn} ${s.mIconBtnTrail}`}
                     aria-label="Reset code"
+                    onClick={resetCode}
                   >
                     <RotateCcw size={14} strokeWidth={2} aria-hidden="true" />
                   </button>
                 </span>
               </div>
-
-              {stepLocked || !editorSource ? (
-                <div className={`${s.editorEmpty} ${s.mEditorEmpty}`}>
-                  <Lock size={22} strokeWidth={2} aria-hidden="true" />
-                  <span className={s.editorEmptyText}>
-                    Editor unlocks when step {gatingStep} passes
-                  </span>
-                </div>
-              ) : (
-                <>
-                  <div className={`${s.mCodeScroll} ${s.noScrollbar}`}>
-                    <CodeView
-                      source={editorSource}
-                      language={editorLanguage}
-                      muted={step?.sourceMuted}
-                      mobile
-                    />
+              {editorPane(true)}
+              {bootNotice}
+              {challenge.keyStrip.length > 0 && stepUnlocked ? (
+                <div className={s.mKeyStrip}>
+                  <div className={`${s.mKeyRow} ${s.noScrollbar}`}>
+                    {challenge.keyStrip.map((key) => (
+                      <button
+                        key={key}
+                        type="button"
+                        className={s.mKey}
+                        onClick={() => setCode(`${code}${key} `)}
+                      >
+                        {key}
+                      </button>
+                    ))}
                   </div>
-                  {challenge.keyStrip.length > 0 ? (
-                    <div className={s.mKeyStrip}>
-                      <div className={`${s.mKeyRow} ${s.noScrollbar}`}>
-                        {challenge.keyStrip.map((key) => (
-                          <button key={key} type="button" className={s.mKey}>
-                            {key}
-                          </button>
-                        ))}
-                      </div>
-                      <span aria-hidden="true" className={s.mKeyFade} />
-                    </div>
-                  ) : null}
-                </>
-              )}
+                  <span aria-hidden="true" className={s.mKeyFade} />
+                </div>
+              ) : null}
             </div>
           ) : null}
 
@@ -709,8 +1007,13 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
               type="button"
               className={`${s.secondaryBtn} ${s.mActionBtn}`}
               onClick={run}
+              disabled={busy !== null || !stepUnlocked}
             >
-              <Play size={14} strokeWidth={2} fill="currentColor" aria-hidden="true" />
+              {busy === "run" ? (
+                <Loader2 size={14} className={s.spin} aria-hidden="true" />
+              ) : (
+                <Play size={14} strokeWidth={2} fill="currentColor" aria-hidden="true" />
+              )}
               Run
             </button>
           ) : null}
@@ -718,8 +1021,13 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
             type="button"
             className={`${s.primaryBtn} ${s.mActionBtn}`}
             onClick={submit}
+            disabled={busy !== null || !stepUnlocked}
           >
-            <CheckCircle2 size={14} strokeWidth={2} aria-hidden="true" />
+            {busy === "submit" ? (
+              <Loader2 size={14} className={s.spin} aria-hidden="true" />
+            ) : (
+              <CheckCircle2 size={14} strokeWidth={2} aria-hidden="true" />
+            )}
             {challenge.submitLabel}
           </button>
         </div>
@@ -733,7 +1041,7 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
             ] as const
           ).map(({ id, label, Icon }) => {
             const on = mobileView === id;
-            const dot = id === "results" && challenge.tests.some((t) => !t.pass);
+            const dot = id === "results" && tests.length > 0 && !allPassed;
             return (
               <button
                 key={id}
@@ -754,4 +1062,8 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
       </div>
     </div>
   );
+}
+
+function EmptyResults({ text }: { text: string }) {
+  return <p className={s.emptyResults}>{text}</p>;
 }

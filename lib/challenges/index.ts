@@ -18,8 +18,8 @@
  *    DEVELOPMENT.md on what the search index's seed already costs.
  *
  * Adding a challenge: write `lib/challenges/<slug>.ts` exporting a
- * `Challenge`, add it to `CHALLENGES`, and delete its placeholder tuple from
- * `./catalog-rows` if it had one. No migration, no seed, no generated file.
+ * `Challenge` and add it to `CHALLENGES`. No migration, no seed, no generated
+ * file. `__tests__/challengeSolutions` then holds it to its own checks.
  *
  * **These three accessors are the seam.** Every caller goes through them, so
  * moving definitions into D1 later means reimplementing this file (and making
@@ -28,7 +28,12 @@
  * definitions.
  */
 
-import { CATALOG_ONLY, toEntry } from "./catalog-rows";
+import { CODE_ALGORITHMS } from "./code-algorithms";
+import { CODE_FUNDAMENTALS } from "./code-fundamentals";
+import { CODE_MULTI_JS } from "./code-multi-js";
+import { CODE_MULTI_PYTHON } from "./code-multi-python";
+import { SQL_MULTI } from "./sql-multi";
+import { SQL_SINGLE } from "./sql-single";
 import { TOP_K_FREQUENT_WORDS } from "./top-k-frequent-words";
 import { TOP_PRODUCTS_BY_MONTH } from "./top-products-by-month";
 import { DIFFICULTY_BARS, type Challenge, type ChallengeIndexEntry } from "./types";
@@ -36,7 +41,16 @@ import { DIFFICULTY_BARS, type Challenge, type ChallengeIndexEntry } from "./typ
 export * from "./types";
 
 /** Every challenge with a workspace behind it, in catalog order. */
-const CHALLENGES: Challenge[] = [TOP_PRODUCTS_BY_MONTH, TOP_K_FREQUENT_WORDS];
+const CHALLENGES: Challenge[] = [
+  TOP_PRODUCTS_BY_MONTH,
+  TOP_K_FREQUENT_WORDS,
+  ...SQL_SINGLE,
+  ...SQL_MULTI,
+  ...CODE_FUNDAMENTALS,
+  ...CODE_ALGORITHMS,
+  ...CODE_MULTI_PYTHON,
+  ...CODE_MULTI_JS,
+];
 
 export function getChallenge(slug: string): Challenge | undefined {
   return CHALLENGES.find((c) => c.slug === slug);
@@ -47,19 +61,19 @@ export function getChallengeSlugs(): string[] {
 }
 
 /**
- * Every row of the catalog list. The built challenges come first and derive
- * their title, level and step count from the challenge itself, so a row can
- * never disagree with the page it links to.
+ * Every row of the catalog list, derived from the challenges themselves so a
+ * row can never disagree with the page it links to. `status` is left unset:
+ * the server has no idea how far a learner got, and the list fills it in from
+ * stored progress after mount.
  */
 export function getChallengeIndex(): ChallengeIndexEntry[] {
-  const built = CHALLENGES.map((c) => ({
+  return CHALLENGES.map((c) => ({
     ...c.catalog,
     title: c.title,
     level: DIFFICULTY_BARS[c.difficulty],
     steps: Math.max(1, c.steps.length),
     slug: c.slug,
   }));
-  return [...built, ...CATALOG_ONLY.map(toEntry)];
 }
 
 /** True when this challenge gates its steps behind the previous one. */
@@ -67,8 +81,28 @@ export function isMultiStep(challenge: Challenge): boolean {
   return challenge.steps.length > 0;
 }
 
-/** Index of the step the learner is working on, or 0 for a single-step problem. */
-export function initialStepIndex(challenge: Challenge): number {
-  const active = challenge.steps.findIndex((s) => s.state === "active");
-  return active === -1 ? 0 : active;
+/**
+ * The step to open on: the first one the learner has not passed yet, or the
+ * last step once they have passed them all. Progress comes from the browser,
+ * so this takes it as an argument rather than reading storage itself — which
+ * also keeps it usable from the server and from tests.
+ */
+export function openStepIndex(challenge: Challenge, passedSteps: string[]): number {
+  if (challenge.steps.length === 0) return 0;
+  const next = challenge.steps.findIndex((s) => !passedSteps.includes(s.n));
+  return next === -1 ? challenge.steps.length - 1 : next;
+}
+
+/**
+ * Whether a step is reachable. Step 1 always is; every later step opens only
+ * once the one before it has passed.
+ */
+export function isStepUnlocked(
+  challenge: Challenge,
+  index: number,
+  passedSteps: string[],
+): boolean {
+  if (index <= 0) return true;
+  const previous = challenge.steps[index - 1];
+  return previous ? passedSteps.includes(previous.n) : true;
 }

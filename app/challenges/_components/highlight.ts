@@ -47,13 +47,31 @@ interface Grammar {
 
 const words = (s: string) => new Set(s.split(/\s+/));
 
+/**
+ * JavaScript and TypeScript share a grammar: the keyword sets differ only in
+ * type syntax, which the reference solutions do not use.
+ */
+const JS_GRAMMAR: Grammar = {
+  keywords: words(`function const let var return for of in if else while
+    new class extends import export from default typeof instanceof await
+    async try catch finally throw delete this interface type`),
+  // Constructors and globals only: chained array methods (.sort, .slice,
+  // .map) stay in the body color, as the prototypes had them.
+  builtins: words(`Map Set Array Object JSON Math Number String Boolean
+    Promise console`),
+  literals: words("null undefined true false"),
+  phrases: [],
+  lineComment: "//",
+  quotes: ['"', "'", "`"],
+};
+
 const GRAMMARS: Record<CodeLanguage, Grammar> = {
   sql: {
     keywords: words(`select from join using where group by order partition
       with as on and or not in is case when then else end union all
       desc asc over inner left right outer having limit offset distinct`),
     // Aggregates and window functions only. The prototypes leave scalar
-    // functions (date_trunc, cast, coalesce) in the body color.
+    // functions (strftime, cast, coalesce) in the body color.
     builtins: words(`sum count avg min max rank row_number dense_rank`),
     literals: words("null true false"),
     // Matched before single words, so "group by" wins over "group".
@@ -64,26 +82,16 @@ const GRAMMARS: Record<CodeLanguage, Grammar> = {
     keywords: words(`from import def return lambda for in if elif else while
       class with as pass raise try except finally yield not and or is
       global nonlocal assert del await async`),
-    builtins: words(`Counter list str int float dict set tuple sorted len
-      sum min max range enumerate zip map filter print bool any all`),
+    builtins: words(`Counter defaultdict list str int float dict set tuple
+      sorted len sum min max range enumerate zip map filter print bool any
+      all abs round reversed`),
     literals: words("None True False"),
     phrases: [],
     lineComment: "#",
     quotes: ['"', "'"],
   },
-  javascript: {
-    keywords: words(`function const let var return for of in if else while
-      new class extends import export from default typeof instanceof await
-      async try catch finally throw delete this`),
-    // Constructors and globals only: the prototype leaves chained array
-    // methods (.sort, .slice, .map) uncolored.
-    builtins: words(`Map Set Array Object JSON Math Number String Boolean
-      Promise console`),
-    literals: words("null undefined true false"),
-    phrases: [],
-    lineComment: "//",
-    quotes: ['"', "'", "`"],
-  },
+  javascript: JS_GRAMMAR,
+  typescript: JS_GRAMMAR,
 };
 
 const IDENT = /[A-Za-z_][A-Za-z0-9_]*/y;

@@ -475,33 +475,7 @@
 
 /* ─── Instruction blocks ────────────────────────────────────────────── */
 
-.banner {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border-radius: 2px;
-  background: var(--cw-pass-tint);
-  padding: 8px 10px;
-  font-size: 12.5px;
-  font-weight: 500;
-  color: var(--cw-pass-ink);
-}
 
-.status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12.5px;
-  font-weight: 500;
-  color: var(--cw-text-muted);
-}
-
-.statusDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 9999px;
-  background: var(--cw-attempted);
-}
 
 .blockHeading {
   margin: 18px 0 0;
@@ -1812,4 +1786,119 @@
   border: 1.5px solid var(--cw-bg);
   border-radius: 9999px;
   background: var(--cw-fail-ink);
+}
+
+/* ─── Editor ────────────────────────────────────────────────────────── */
+
+/* CodeMirror's own scroller fills the pane; the surrounding `.editorScroll`
+   keeps its padding but must not double-scroll. */
+.editorHost {
+  height: 100%;
+  min-height: 0;
+}
+.editorHost :global(.cm-editor) {
+  height: 100%;
+}
+.editorHost :global(.cm-editor.cm-focused) {
+  outline: none;
+}
+.editorHost :global(.cm-scroller) {
+  font-family: var(--cw-font-mono);
+  font-size: 13.5px;
+  line-height: 1.75;
+}
+.editorHost :global(.cm-gutters) {
+  border-right: 0;
+  background: transparent;
+  color: var(--cw-border-strong);
+}
+
+/* ─── Run feedback ──────────────────────────────────────────────────── */
+
+/* Shown while a WASM toolchain downloads, so a slow first Run does not look
+   like a dead button. */
+.bootNotice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  border-top: 1px solid var(--cw-border-light);
+  background: var(--cw-bg-muted);
+  padding: 8px 12px;
+  font-size: 12.5px;
+  color: var(--cw-text-muted);
+}
+
+.spin {
+  animation: cw-spin 0.9s linear infinite;
+}
+@keyframes cw-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
+  }
+}
+
+.emptyResults {
+  margin: 0;
+  padding: 16px 14px;
+  font-size: 13px;
+  color: var(--cw-text-faint);
+}
+
+.runError {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  color: var(--cw-fail-ink);
+}
+.runError svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.runErrorText {
+  margin: 0;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family: var(--cw-font-mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--cw-fail-ink);
+}
+
+.stdioPreErr {
+  color: var(--cw-fail-ink);
+}
+
+/* Badge on the Test cases tab: green once every check passes. */
+.badgePass {
+  background: var(--cw-pass-tint);
+  color: var(--cw-pass-ink);
+}
+
+/* "Solved" marker in the top bar, once the challenge is accepted. */
+.solvedPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: var(--cw-pass-tint);
+  padding: 3px 9px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--cw-pass-ink);
+}
+
+/* Disabled Run/Submit while a run is in flight. */
+.secondaryBtn:disabled,
+.primaryBtn:disabled {
+  opacity: 0.55;
+  cursor: default;
 }

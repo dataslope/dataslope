@@ -1,12 +1,28 @@
 /**
  * The shape of a challenge.
  *
- * Split from the data so an authored challenge in this directory can import
- * its own types without a cycle through the catalog's accessors. Nothing here
- * is a runtime contract with a server: the workspace grades in the browser
- * (see `app/_components/challengeHarness.ts`), so these are the shapes an
- * author writes, not the shapes an API returns.
+ * Split from the data so an authored challenge can import its own types
+ * without a cycle through the catalog's accessors.
+ *
+ * A challenge is **executable**: it declares how to run (an in-browser SQL
+ * engine, or a WASM language runtime) and what must be true of the result.
+ * Nothing here describes a server — grading happens in the learner's browser
+ * through the same evaluators the course challenge cards use, so the test
+ * types are imported from those harnesses rather than mirrored. They are
+ * type-only imports: no runtime coupling, and no drift between what an author
+ * writes and what the grader reads.
  */
+
+import type {
+  ChallengeTest as CodeTest,
+  StdoutExpect,
+} from "@/app/_components/challengeHarness";
+import type {
+  SqlChallengeTest,
+  SqlDialect,
+} from "@/app/_components/sqlChallengeHarness";
+
+export type { CodeTest, SqlChallengeTest, SqlDialect, StdoutExpect };
 
 // ─── Prose ───────────────────────────────────────────────────────────
 
@@ -30,7 +46,7 @@ export interface TableColumn {
   align?: "left" | "right";
 }
 
-/** One worked example in a single-step problem's instructions. */
+/** One worked example in a problem's instructions. */
 export interface WorkedExample {
   label: string;
   /** Rendered as a two-column `name → value` grid in the mono face. */
@@ -43,17 +59,13 @@ export interface WorkedExample {
  * across challenges instead of hard-coding one problem's layout.
  */
 export type InstructionBlock =
-  /** Green "you already passed this" banner. */
-  | { kind: "banner"; text: string }
-  /** Amber-dot status line, e.g. "Attempted · 2 submissions". */
-  | { kind: "status"; text: string }
   | { kind: "heading"; text: string }
   | { kind: "prose"; spans: Span[] }
   /** Small uppercase section label. */
   | { kind: "label"; text: string }
   /** "Return these columns" — a name/type list in a bordered card. */
   | { kind: "columns"; rows: { name: string; type: string }[] }
-  /** "Expected, first rows" — a preview table. */
+  /** A preview table, e.g. "Expected, first rows". */
   | { kind: "table"; columns: TableColumn[]; rows: Record<string, string>[] }
   /** A fenced code block. */
   | { kind: "code"; source: string; language: CodeLanguage }
@@ -63,16 +75,7 @@ export type InstructionBlock =
    */
   | { kind: "signature" }
   | { kind: "examples"; items: WorkedExample[] }
-  | { kind: "list"; items: Span[][] }
-  /** The placeholder shown in a locked step's instruction pane. */
-  | {
-      kind: "locked";
-      title: string;
-      text: string;
-      /** Button that returns the learner to the step they can work on. */
-      backTo: number;
-      backLabel: string;
-    };
+  | { kind: "list"; items: Span[][] };
 
 // ─── Schema browser ──────────────────────────────────────────────────
 
@@ -83,36 +86,101 @@ export interface SchemaTable {
   columns: { name: string; type: string; key?: "pk" | "fk" }[];
 }
 
-// ─── Editor ──────────────────────────────────────────────────────────
+// ─── How a challenge runs ────────────────────────────────────────────
 
-export type CodeLanguage = "sql" | "python" | "javascript";
+/** Languages the editor can highlight and CodeMirror can mode. */
+export type CodeLanguage = "sql" | "python" | "javascript" | "typescript";
 
-/** One selectable language for a challenge whose solution isn't SQL-only. */
-export interface ChallengeLanguage {
+/**
+ * What to boot before the learner's code runs.
+ *
+ * `sql` seeds an in-browser engine with `initSql` and grades the last result
+ * set; `code` boots a WASM language runtime and grades stdout or native
+ * assertions. Both are the machinery the course challenge cards already use.
+ */
+export type ChallengeRuntimeSpec =
+  | {
+      kind: "sql";
+      dialect: SqlDialect;
+      /** Schema and seed rows, executed once before the first query. */
+      initSql: string;
+    }
+  /**
+   * A language runtime. Which one follows the language the learner picked —
+   * `ChallengeLanguage.id` doubles as the adapter id in
+   * `app/_components/runtime/adapters` — so a challenge offering Python and
+   * JavaScript boots whichever is on screen, and only that one.
+   */
+  | { kind: "code" };
+
+// ─── A unit of work ──────────────────────────────────────────────────
+
+/**
+ * One editor, one reference solution, one set of checks.
+ *
+ * A multi-step challenge has one per step; a single-step challenge has one
+ * per offered language. Either way the workspace resolves exactly one task at
+ * a time, and everything downstream — editor buffer, Run, Submit, Solution —
+ * reads from it.
+ */
+export interface ChallengeTask {
+  /** What the editor opens with. */
+  starterCode: string;
+  /**
+   * The reference solution. Shown in the Solution tab, compared against by
+   * SQL tests that ask for it, and swept by the e2e solution check — so it
+   * must actually pass every test below.
+   */
+  solutionCode: string;
+  /** Graded checks. SQL challenges use `SqlChallengeTest`, code `CodeTest`. */
+  tests: SqlChallengeTest[] | CodeTest[];
+}
+
+// ─── Steps ───────────────────────────────────────────────────────────
+
+/**
+ * One gated step of a multi-step challenge.
+ *
+ * There is deliberately no authored `state`: whether a step is passed, open
+ * or locked is derived from the learner's stored progress
+ * (`lib/challenges/progress`), because with real grading the answer changes
+ * as they work.
+ */
+export interface ChallengeStep extends ChallengeTask {
+  /** Zero-padded display number, e.g. "01". */
+  n: string;
+  /** Full title, shown beside the active step's mark. */
+  title: string;
+  /** Abbreviated title for the mobile stepper. */
+  short: string;
+  instructions: InstructionBlock[];
+}
+
+// ─── Languages ───────────────────────────────────────────────────────
+
+/** One selectable language for a single-step challenge. */
+export interface ChallengeLanguage extends ChallengeTask {
   id: CodeLanguage;
   /** Menu label, e.g. "Python 3.12". */
   label: string;
-  /** Left-hand editor-header label, e.g. "SQL". */
+  /** Editor-header label, e.g. "Python". */
   shortLabel: string;
-  /** Mono run-meta string shown at the right of the editor header. */
-  runMeta: string;
-  /** Wall-clock figure echoed in the stdout footer. */
-  runTime: string;
   /** Signature line rendered in the instructions, when the problem has one. */
   signature?: string;
-  source: string;
 }
 
-// ─── Results ─────────────────────────────────────────────────────────
+// ─── Results (produced by a run, not authored) ───────────────────────
 
-export interface TestCase {
+/** A graded check, as the results pane shows it. */
+export interface TestOutcome {
   name: string;
   detail: string;
-  /** Second mono line, shown in red under a failing check. */
+  /** Second mono line under a failing check. */
   got?: string;
   pass: boolean;
 }
 
+/** One entry in the session's submission history. */
 export interface Submission {
   /** Present only on multi-step challenges. */
   step?: string;
@@ -127,8 +195,8 @@ export interface Submission {
 export type SubmissionColumn = "step" | "result" | "lang" | "runtime" | "when";
 
 /**
- * The Output tab. SQL challenges return a result set; a program returns
- * stdout for a given stdin, so the pane shape differs per challenge.
+ * The Output tab. A SQL run returns a result set; a program returns stdout,
+ * so the pane shape differs per run.
  */
 export type OutputPanel =
   | {
@@ -140,45 +208,18 @@ export type OutputPanel =
     }
   | {
       kind: "stdio";
-      stdinLabel: string;
-      stdin: string;
+      /** Left pane, when the run was given input worth showing. */
+      stdin?: { label: string; text: string };
       stdout: string;
-      matchesExpected: boolean;
-      /** Mono footer segments, joined with "·", e.g. exit code and memory. */
+      /** Right-hand note on the stdout pane, e.g. "Matches expected". */
+      stdoutNote?: string;
+      stderr?: string;
+      /** Mono footer segments, joined with "·". */
       footer: string[];
-    };
+    }
+  | { kind: "error"; message: string };
 
-export interface SolutionPanel {
-  /** Explanation above the reference code. */
-  spans: Span[];
-  label: string;
-  source: string;
-  language: CodeLanguage;
-}
-
-// ─── Steps ───────────────────────────────────────────────────────────
-
-export type StepState = "passed" | "active" | "locked";
-
-export interface ChallengeStep {
-  /** Zero-padded display number, e.g. "01". */
-  n: string;
-  /** Full title, shown beside the active step's mark. */
-  title: string;
-  /** Abbreviated title for the mobile stepper. */
-  short: string;
-  state: StepState;
-  instructions: InstructionBlock[];
-  /**
-   * Editor contents for this step. A passed step shows its accepted query in
-   * a muted color; a locked step shows no editor at all.
-   */
-  source?: string;
-  /** Renders the step's code muted, as read-only history. */
-  sourceMuted?: boolean;
-}
-
-// ─── Challenge ───────────────────────────────────────────────────────
+// ─── Catalog ─────────────────────────────────────────────────────────
 
 /**
  * Languages a challenge can be listed under. Finer-grained than
@@ -219,10 +260,9 @@ export interface ChallengeCatalogMeta {
   /** The concept the problem drills, shown under the title. */
   topic: string;
   langs: IndexLanguage[];
-  status: ChallengeStatus;
-  /** Percent of submissions accepted. */
-  acceptance: number;
 }
+
+// ─── Challenge ───────────────────────────────────────────────────────
 
 export interface Challenge {
   slug: string;
@@ -233,6 +273,7 @@ export interface Challenge {
   /** Subtitle beside the difficulty meter on mobile, e.g. "SQL". */
   languageLabel: string;
   description: string;
+  runtime: ChallengeRuntimeSpec;
   /**
    * Multi-step challenges break one problem into gated steps — the Dataslope
    * difference. A single-step challenge leaves this empty and uses
@@ -241,19 +282,15 @@ export interface Challenge {
   steps: ChallengeStep[];
   /** Instructions for a single-step challenge. */
   instructions: InstructionBlock[];
-  /** Selectable languages. A one-entry list renders as a static label. */
+  /**
+   * Selectable languages. A multi-step challenge declares exactly one (its
+   * per-step tasks carry the code); a single-step challenge declares one per
+   * language it offers.
+   */
   languages: ChallengeLanguage[];
   schema: SchemaTable[];
-  output: OutputPanel;
-  tests: TestCase[];
-  /** Red banner above the checks, e.g. "2 of 3 checks passed". */
-  testsSummary: string;
-  /** Secondary line beside it, e.g. "Step 2 is not accepted yet". */
-  testsSubtitle?: string;
-  /** Badge on the Test cases tab, e.g. "2/3". */
-  testsBadge: string;
-  solution: SolutionPanel;
-  submissions: Submission[];
+  /** Explanation shown above the reference solution. */
+  solutionNote: Span[];
   submissionColumns: SubmissionColumn[];
   /** Keyword strip above the mobile keyboard. Empty hides the strip. */
   keyStrip: string[];
@@ -270,6 +307,15 @@ export interface ChallengeIndexEntry extends ChallengeCatalogMeta {
   level: number;
   /** 1 for a single-step problem, otherwise the number of gated steps. */
   steps: number;
-  /** Set only when a workspace exists at `/challenges/<slug>`. */
-  slug?: string;
+  /**
+   * The workspace at `/challenges/<slug>`. Every row has one, because the
+   * index is derived from the challenges themselves — a row can never point
+   * at a page that does not exist.
+   */
+  slug: string;
+  /**
+   * Filled in on the client from stored progress. The server renders every
+   * row as "new" and the list upgrades them after mount.
+   */
+  status?: ChallengeStatus;
 }

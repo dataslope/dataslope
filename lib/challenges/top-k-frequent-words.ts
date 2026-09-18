@@ -1,10 +1,10 @@
 /**
  * "Top K Frequent Words" — the single-step challenge.
  *
- * No step rail; instead a language picker over one editor (Python and
- * JavaScript), and stdin/stdout output rather than a result table. Authored
- * as attempted, with one failing check on the alphabetical tiebreak — the
- * mistake the problem is actually about.
+ * No step rail; instead a language picker over one editor. Python and
+ * JavaScript get their own starter, solution and checks, because the idiom
+ * that makes the tiebreak easy differs: a sort key tuple in Python, a
+ * comparator chain in JavaScript.
  */
 
 import type { Challenge } from "./types";
@@ -13,21 +13,17 @@ export const TOP_K_FREQUENT_WORDS: Challenge = {
   slug: "top-k-frequent-words",
   title: "Top K Frequent Words",
   difficulty: "Intermediate",
-  catalog: {
-    topic: "Hash maps",
-    langs: ["python", "javascript"],
-    // The workspace opens on "Attempted · 2 submissions" with a failing
-    // check, so the row cannot say Solved the way the list mock did.
-    status: "attempted",
-    acceptance: 81,
-  },
+  catalog: { topic: "Hash maps", langs: ["python", "javascript"] },
   languageLabel: "Python",
   description:
-    "Return the k most frequent words, most frequent first, breaking ties alphabetically. A single-step problem with a choice of language.",
+    "Return the k most frequent words, most frequent first, breaking ties alphabetically.",
+  runtime: { kind: "code" },
+  schema: [],
   submitLabel: "Submit",
+  submissionColumns: ["result", "lang", "runtime", "when"],
+  keyStrip: [],
   steps: [],
   instructions: [
-    { kind: "status", text: "Attempted · 2 submissions" },
     {
       kind: "prose",
       spans: [
@@ -78,98 +74,158 @@ export const TOP_K_FREQUENT_WORDS: Challenge = {
       kind: "list",
       items: [
         [{ code: "1 ≤ len(words) ≤ 10⁵" }],
-        [{ code: "1 ≤ len(words[i]) ≤ 20" }, ", lowercase and uppercase letters only"],
-        [{ code: "1 ≤ k ≤" }, " number of distinct words"],
-        ["Time limit 1 s, memory limit 256 MB"],
+        [{ code: "1 ≤ k ≤" }, " the number of distinct words"],
+        ["Letters only, and the comparison is case-sensitive"],
       ],
     },
+  ],
+  solutionNote: [
+    "Sort by a tuple so the tiebreak is part of the key: negative count first, then the word itself. Sorting is O(n log n); a heap gets you O(n log k) when ",
+    { code: "k" },
+    " is small.",
   ],
   languages: [
     {
       id: "python",
       label: "Python 3.12",
       shortLabel: "Python",
-      runMeta: "python 3.12 · 0.08s · exit 0",
-      runTime: "0.08s",
       signature: "def top_k_words(words: list[str], k: int) -> list[str]",
-      source: `from collections import Counter
+      starterCode: `from collections import Counter
+
 
 def top_k_words(words: list[str], k: int) -> list[str]:
     counts = Counter(words)
-    ranked = sorted(counts.items(), key=lambda kv: -kv[1])
-    return [w for w, _ in ranked[:k]]`,
+    # Sort so that the most frequent come first, and ties go alphabetically.
+    return []
+`,
+      solutionCode: `from collections import Counter
+
+
+def top_k_words(words: list[str], k: int) -> list[str]:
+    counts = Counter(words)
+    ranked = sorted(counts, key=lambda w: (-counts[w], w))
+    return ranked[:k]
+`,
+      tests: [
+        {
+          id: "example1",
+          name: "Example 1",
+          description: "Counts decide the order.",
+          code: `words = ["the", "sky", "is", "blue", "the", "sun", "is", "sunny", "the"]
+assert top_k_words(words, 2) == ["the", "is"], f"got {top_k_words(words, 2)}"`,
+        },
+        {
+          id: "ties",
+          name: "Ties resolve alphabetically",
+          description: "Every word appears twice, so only the spelling breaks the tie.",
+          code: `assert top_k_words(["b", "a", "c", "b", "a", "c"], 3) == ["a", "b", "c"], \\
+    f'got {top_k_words(["b", "a", "c", "b", "a", "c"], 3)}'`,
+        },
+        {
+          id: "k-one",
+          name: "k = 1 returns a single word",
+          code: `assert top_k_words(["x", "y", "x"], 1) == ["x"]`,
+        },
+        {
+          id: "all-distinct",
+          name: "k equal to the number of distinct words",
+          description: "Returns every word, still in ranked order.",
+          code: `assert top_k_words(["pear", "apple", "fig"], 3) == ["apple", "fig", "pear"]`,
+        },
+        {
+          id: "case-sensitive",
+          name: "Comparison is case-sensitive",
+          description: '"Apple" and "apple" are different words.',
+          code: `assert top_k_words(["Apple", "apple", "apple"], 1) == ["apple"]`,
+        },
+        {
+          id: "large",
+          name: "Handles a large input",
+          description: "10,000 words, still ordered correctly.",
+          code: `big = ["a"] * 5000 + ["b"] * 3000 + ["c"] * 2000
+assert top_k_words(big, 2) == ["a", "b"]`,
+        },
+      ],
     },
     {
       id: "javascript",
-      label: "JavaScript · Node 20",
+      label: "JavaScript · Node",
       shortLabel: "JavaScript",
-      runMeta: "node 20 · 0.05s · exit 0",
-      runTime: "0.05s",
       signature: "function topKWords(words: string[], k: number): string[]",
-      source: `function topKWords(words, k) {
+      starterCode: `function topKWords(words, k) {
   const counts = new Map();
   for (const w of words) counts.set(w, (counts.get(w) ?? 0) + 1);
-  return [...counts]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, k)
-    .map(([w]) => w);
+  // Sort so that the most frequent come first, and ties go alphabetically.
+  return [];
+}
+`,
+      solutionCode: `function topKWords(words, k) {
+  const counts = new Map();
+  for (const w of words) counts.set(w, (counts.get(w) ?? 0) + 1);
+  return [...counts.keys()]
+    .sort((a, b) => counts.get(b) - counts.get(a) || (a < b ? -1 : a > b ? 1 : 0))
+    .slice(0, k);
+}
+`,
+      tests: [
+        {
+          id: "example1",
+          name: "Example 1",
+          description: "Counts decide the order.",
+          code: `const words = ["the", "sky", "is", "blue", "the", "sun", "is", "sunny", "the"];
+const got = topKWords(words, 2);
+if (JSON.stringify(got) !== JSON.stringify(["the", "is"])) {
+  throw new Error("got " + JSON.stringify(got));
 }`,
+        },
+        {
+          id: "ties",
+          name: "Ties resolve alphabetically",
+          description: "Every word appears twice, so only the spelling breaks the tie.",
+          code: `const got = topKWords(["b", "a", "c", "b", "a", "c"], 3);
+if (JSON.stringify(got) !== JSON.stringify(["a", "b", "c"])) {
+  throw new Error("got " + JSON.stringify(got));
+}`,
+        },
+        {
+          id: "k-one",
+          name: "k = 1 returns a single word",
+          code: `const got = topKWords(["x", "y", "x"], 1);
+if (JSON.stringify(got) !== JSON.stringify(["x"])) {
+  throw new Error("got " + JSON.stringify(got));
+}`,
+        },
+        {
+          id: "all-distinct",
+          name: "k equal to the number of distinct words",
+          description: "Returns every word, still in ranked order.",
+          code: `const got = topKWords(["pear", "apple", "fig"], 3);
+if (JSON.stringify(got) !== JSON.stringify(["apple", "fig", "pear"])) {
+  throw new Error("got " + JSON.stringify(got));
+}`,
+        },
+        {
+          id: "case-sensitive",
+          name: "Comparison is case-sensitive",
+          description: '"Apple" and "apple" are different words.',
+          code: `const got = topKWords(["Apple", "apple", "apple"], 1);
+if (JSON.stringify(got) !== JSON.stringify(["apple"])) {
+  throw new Error("got " + JSON.stringify(got));
+}`,
+        },
+        {
+          id: "large",
+          name: "Handles a large input",
+          description: "10,000 words, still ordered correctly.",
+          code: `const big = [].concat(
+  Array(5000).fill("a"), Array(3000).fill("b"), Array(2000).fill("c"),
+);
+const got = topKWords(big, 2);
+if (JSON.stringify(got) !== JSON.stringify(["a", "b"])) {
+  throw new Error("got " + JSON.stringify(got));
+}`,
+        },
+      ],
     },
   ],
-  schema: [],
-  output: {
-    kind: "stdio",
-    stdinLabel: "stdin · example 1",
-    stdin: `words = ["the", "sky", "is", "blue", "the",
-         "sun", "is", "sunny", "the"]
-k = 2`,
-    stdout: '["the", "is"]',
-    matchesExpected: true,
-    footer: ["exit 0", "9.2 MB"],
-  },
-  tests: [
-    {
-      name: "Example 1",
-      detail: 'words = ["the", "sky", "is", "blue", "the", "sun", "is", "sunny", "the"], k = 2',
-      pass: true,
-    },
-    {
-      name: "k equals number of distinct words",
-      detail: "1,000 distinct words, k = 1000",
-      pass: true,
-    },
-    {
-      name: "Ties resolve alphabetically",
-      detail: 'expected ["a", "b", "c"]',
-      got: 'got      ["b", "a", "c"]',
-      pass: false,
-    },
-    {
-      name: "Large input within time limit",
-      detail: "100,000 words · 0.31s of 1.00s",
-      pass: true,
-    },
-  ],
-  testsSummary: "3 of 4 test cases passed",
-  testsSubtitle: "Not accepted yet",
-  testsBadge: "3/4",
-  solution: {
-    spans: [
-      "Sort by a tuple so the tiebreak is part of the key: negative count first, then the word itself. Sorting is O(n log n); a heap gets you O(n log k) if ",
-      { code: "k" },
-      " is small.",
-    ],
-    label: "Reference solution · Python",
-    language: "python",
-    source: `def top_k_words(words, k):
-    counts = Counter(words)
-    ranked = sorted(counts, key=lambda w: (-counts[w], w))
-    return ranked[:k]`,
-  },
-  submissions: [
-    { result: "Wrong answer", ok: false, lang: "Python 3.12", runtime: "0.31s", when: "2 min ago" },
-    { result: "Runtime error", ok: false, lang: "Python 3.12", runtime: "—", when: "9 min ago" },
-  ],
-  submissionColumns: ["result", "lang", "runtime", "when"],
-  keyStrip: [],
 };

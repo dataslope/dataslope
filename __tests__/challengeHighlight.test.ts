@@ -11,6 +11,13 @@ function detokenize(lines: HighlightedLine[]): string {
   return lines.map((tokens) => tokens.map((t) => t.text).join("")).join("\n");
 }
 
+/**
+ * `highlight` drops one trailing newline on purpose, so a file ending in a
+ * newline does not render a phantom last line number. Round-trip comparisons
+ * measure against that same form.
+ */
+const withoutTrailingNewline = (s: string) => s.replace(/\n$/, "");
+
 /** Kinds assigned to each identifier in a line, for spot-checks. */
 function kindOf(lines: HighlightedLine[], text: string): string | undefined {
   for (const tokens of lines) {
@@ -26,19 +33,23 @@ describe("challenge editor highlighter", () => {
     const cases: [string, CodeLanguage][] = [];
     for (const slug of getChallengeSlugs()) {
       const challenge = getChallenge(slug);
-      if (!challenge) throw new Error(`missing fixture: ${slug}`);
+      if (!challenge) throw new Error(`missing challenge: ${slug}`);
+      const editorLanguage = challenge.languages[0]!.id;
       for (const step of challenge.steps) {
-        if (step.source) cases.push([step.source, "sql"]);
+        cases.push([step.starterCode, editorLanguage]);
+        cases.push([step.solutionCode, editorLanguage]);
       }
       for (const lang of challenge.languages) {
-        cases.push([lang.source, lang.id]);
+        cases.push([lang.starterCode, lang.id]);
+        cases.push([lang.solutionCode, lang.id]);
       }
-      cases.push([challenge.solution.source, challenge.solution.language]);
     }
 
     expect(cases.length).toBeGreaterThan(0);
     for (const [source, language] of cases) {
-      expect(detokenize(highlight(source, language))).toBe(source);
+      expect(detokenize(highlight(source, language))).toBe(
+        withoutTrailingNewline(source),
+      );
     }
   });
 
@@ -46,18 +57,20 @@ describe("challenge editor highlighter", () => {
     const python = getChallenge("top-k-frequent-words")?.languages.find(
       (l) => l.id === "python",
     );
-    if (!python) throw new Error("missing python fixture");
+    if (!python) throw new Error("missing python challenge");
 
-    const lines = highlight(python.source, "python");
+    const lines = highlight(python.solutionCode, "python");
     // One entry per source line, including the blank line after the import.
-    expect(lines).toHaveLength(python.source.split("\n").length);
+    expect(lines).toHaveLength(
+      withoutTrailingNewline(python.solutionCode).split("\n").length,
+    );
     expect(lines[1]).toEqual([]);
   });
 
   it("colors SQL the way the design does", () => {
     const step = getChallenge("top-products-by-month")?.steps[1];
-    if (!step?.source) throw new Error("missing step 2 fixture");
-    const lines = highlight(step.source, "sql");
+    if (!step) throw new Error("missing step 2");
+    const lines = highlight(step.solutionCode, "sql");
 
     expect(kindOf(lines, "SELECT")).toBe("keyword");
     expect(kindOf(lines, "GROUP BY")).toBe("keyword");
@@ -66,7 +79,7 @@ describe("challenge editor highlighter", () => {
     expect(kindOf(lines, "RANK")).toBe("builtin");
     expect(kindOf(lines, "'completed'")).toBe("string");
     // Scalar functions and column names stay in the body color.
-    expect(kindOf(lines, "date_trunc")).toBeUndefined();
+    expect(kindOf(lines, "strftime")).toBeUndefined();
     expect(kindOf(lines, "revenue_rank")).toBeUndefined();
   });
 
@@ -74,7 +87,7 @@ describe("challenge editor highlighter", () => {
     const python = getChallenge("top-k-frequent-words")?.languages.find(
       (l) => l.id === "python",
     );
-    if (!python) throw new Error("missing python fixture");
+    if (!python) throw new Error("missing python challenge");
     // `None`/`True`/`False` are literals, so they take the number color
     // rather than the keyword color, matching the prototypes.
     const lines = highlight("x = None\ny = True\n# note", "python");
@@ -82,7 +95,7 @@ describe("challenge editor highlighter", () => {
     expect(kindOf(lines, "None")).toBe("number");
     expect(kindOf(lines, "True")).toBe("number");
     expect(kindOf(lines, "# note")).toBe("comment");
-    expect(kindOf(highlight(python.source, "python"), "def")).toBe("keyword");
+    expect(kindOf(highlight(python.solutionCode, "python"), "def")).toBe("keyword");
   });
 
   it("leaves chained JavaScript methods uncolored", () => {
@@ -90,7 +103,7 @@ describe("challenge editor highlighter", () => {
       (l) => l.id === "javascript",
     );
     if (!js) throw new Error("missing javascript fixture");
-    const lines = highlight(js.source, "javascript");
+    const lines = highlight(js.solutionCode, "javascript");
 
     expect(kindOf(lines, "Map")).toBe("builtin");
     expect(kindOf(lines, "const")).toBe("keyword");

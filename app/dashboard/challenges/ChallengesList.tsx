@@ -8,19 +8,19 @@
  * 1280px content container, so this renders only the page body: heading,
  * filter row, table and pagination.
  *
- * Rows arrive as a prop from the server page. Two of them have a workspace
- * behind them and link to `/challenges/<slug>`; the rest are catalog fixtures
- * with nowhere to go yet, so their titles render as plain text rather than as
- * links that lead nowhere.
+ * Rows arrive as a prop from the server page, derived from the challenges
+ * themselves, so every one links to a workspace that exists.
  *
- * Filtering and paging are client state over the whole list — 52 rows is far
- * too few to justify a round trip, and it keeps the page static.
+ * Filtering and paging are client state over the whole list — fifty rows is
+ * far too few to justify a round trip, and it keeps the page static.
  */
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ChevronDown, Circle, CircleCheckBig, Search, X } from "lucide-react";
 import { LangIcon } from "@/app/_components/languageIcons";
+import { statusOf } from "@/lib/challenges/progress";
+import { useAllProgress } from "@/app/challenges/_components/useProgress";
 import {
   CHALLENGE_STATUS_LABELS,
   INDEX_LANGUAGE_LABELS,
@@ -127,7 +127,9 @@ interface Filters {
 
 const EMPTY: Filters = { q: "", status: "", lang: "", level: "", format: "" };
 
-function matches(entry: ChallengeIndexEntry, f: Filters): boolean {
+type ResolvedEntry = ChallengeIndexEntry & { status: ChallengeStatus };
+
+function matches(entry: ResolvedEntry, f: Filters): boolean {
   const q = f.q.trim().toLowerCase();
   if (
     q &&
@@ -160,7 +162,18 @@ function pageWindow(page: number, pageCount: number): (number | null)[] {
 }
 
 export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) {
-  const all = entries;
+  // Progress lives in the browser, so the server renders every row as "not
+  // started" and the store swaps the real statuses in at hydration.
+  const progress = useAllProgress();
+  const all = useMemo(
+    () =>
+      entries.map((e) => ({
+        ...e,
+        status: (progress[e.slug] ? statusOf(progress[e.slug]) : "new") as ChallengeStatus,
+      })),
+    [entries, progress],
+  );
+
   const [filters, setFilters] = useState<Filters>(EMPTY);
   const [page, setPage] = useState(1);
 
@@ -303,7 +316,7 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
                 </thead>
                 <tbody>
                   {rows.map((entry) => (
-                    <Row key={entry.title} entry={entry} />
+                    <Row key={entry.slug} entry={entry} />
                   ))}
                 </tbody>
               </table>
@@ -376,33 +389,30 @@ function Th({ children, className = "" }: { children?: React.ReactNode; classNam
   );
 }
 
-function Row({ entry }: { entry: ChallengeIndexEntry }) {
+function Row({ entry }: { entry: ResolvedEntry }) {
   const lang = entry.langs[0];
   const more = entry.langs.length - 1;
   return (
     <tr
       className="ds-challenge-row"
-      data-clickable={entry.slug ? "true" : undefined}
+      data-clickable="true"
       style={{ borderTop: "1px solid var(--divider)" }}
     >
       <td className="py-3 pl-4 pr-0 align-middle">
         <StatusIcon status={entry.status} />
       </td>
       <td className="p-3 align-middle">
-        {/* Only the two challenges with a workspace behind them are links;
-            the rest would be a link to nowhere. */}
-        {entry.slug ? (
-          <Link
-            href={`/challenges/${entry.slug}`}
-            className="flex flex-col gap-0.5 text-inherit no-underline"
-          >
-            <RowTitle entry={entry} />
-          </Link>
-        ) : (
-          <span className="flex flex-col gap-0.5">
-            <RowTitle entry={entry} />
+        <Link
+          href={`/challenges/${entry.slug}`}
+          className="flex flex-col gap-0.5 text-inherit no-underline"
+        >
+          <span className="text-sm font-medium leading-tight" style={{ color: "var(--ink)" }}>
+            {entry.title}
           </span>
-        )}
+          <span className="text-[12.5px]" style={{ color: "var(--faint)" }}>
+            {entry.topic}
+          </span>
+        </Link>
       </td>
       <td className="whitespace-nowrap p-3 align-middle">
         <span
@@ -443,15 +453,3 @@ function Row({ entry }: { entry: ChallengeIndexEntry }) {
   );
 }
 
-function RowTitle({ entry }: { entry: ChallengeIndexEntry }) {
-  return (
-    <>
-      <span className="text-sm font-medium leading-tight" style={{ color: "var(--ink)" }}>
-        {entry.title}
-      </span>
-      <span className="text-[12.5px]" style={{ color: "var(--faint)" }}>
-        {entry.topic}
-      </span>
-    </>
-  );
-}

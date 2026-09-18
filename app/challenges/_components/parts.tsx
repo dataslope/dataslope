@@ -13,23 +13,21 @@ import {
   CheckCircle2,
   ChevronDown,
   Copy,
-  Download,
-  Lock,
   Table2,
   XCircle,
 } from "lucide-react";
 import {
   DIFFICULTY_BARS,
-  type Challenge,
   type CodeLanguage,
   type Difficulty,
   type InstructionBlock,
   type OutputPanel,
   type SchemaTable,
-  type SolutionPanel,
   type Span,
+  type Submission,
+  type SubmissionColumn,
   type TableColumn,
-  type TestCase,
+  type TestOutcome,
 } from "@/lib/challenges";
 import { highlight, type TokenKind } from "./highlight";
 import s from "./ChallengeWorkspace.module.css";
@@ -44,49 +42,6 @@ const TOKEN_CLASS: Record<TokenKind, string | undefined> = {
 };
 
 // ─── Code ────────────────────────────────────────────────────────────
-
-/** Highlighted source with a line-number gutter. */
-export function CodeView({
-  source,
-  language,
-  muted,
-  mobile,
-}: {
-  source: string;
-  language: CodeLanguage;
-  muted?: boolean;
-  mobile?: boolean;
-}) {
-  const lines = highlight(source, language);
-  return (
-    <div className={mobile ? `${s.code} ${s.mCode}` : s.code}>
-      <div className={s.gutter} aria-hidden="true">
-        {lines.map((_, i) => (
-          <span key={i}>{i + 1}</span>
-        ))}
-      </div>
-      <pre className={muted ? `${s.codePre} ${s.codePreMuted}` : s.codePre}>
-        {lines.map((tokens, i) => (
-          <Fragment key={i}>
-            {tokens.map((token, j) => {
-              const cls = TOKEN_CLASS[token.kind];
-              return cls ? (
-                <span key={j} className={cls}>
-                  {token.text}
-                </span>
-              ) : (
-                <Fragment key={j}>{token.text}</Fragment>
-              );
-            })}
-            {/* Keeps a blank line's height so the gutter stays aligned. */}
-            {tokens.length === 0 ? " " : null}
-            {i < lines.length - 1 ? "\n" : null}
-          </Fragment>
-        ))}
-      </pre>
-    </div>
-  );
-}
 
 /** Highlighted source with no gutter, for the reference solution. */
 export function CodeBlock({
@@ -167,23 +122,15 @@ export function DifficultyMeter({
 export function InstructionBlocks({
   blocks,
   signature,
-  onBack,
 }: {
   blocks: InstructionBlock[];
   /** Active language's signature, for the `signature` block. */
   signature?: string;
-  /** Sends the learner back to the step they can actually work on. */
-  onBack: (stepNumber: number) => void;
 }) {
   return (
     <>
       {blocks.map((block, i) => (
-        <InstructionBlockView
-          key={i}
-          block={block}
-          signature={signature}
-          onBack={onBack}
-        />
+        <InstructionBlockView key={i} block={block} signature={signature} />
       ))}
     </>
   );
@@ -192,29 +139,11 @@ export function InstructionBlocks({
 function InstructionBlockView({
   block,
   signature,
-  onBack,
 }: {
   block: InstructionBlock;
   signature?: string;
-  onBack: (stepNumber: number) => void;
 }) {
   switch (block.kind) {
-    case "banner":
-      return (
-        <div className={s.banner}>
-          <CheckCircle2 size={14} strokeWidth={2} aria-hidden="true" />
-          {block.text}
-        </div>
-      );
-
-    case "status":
-      return (
-        <div className={s.status}>
-          <span className={s.statusDot} aria-hidden="true" />
-          {block.text}
-        </div>
-      );
-
     case "heading":
       return <h2 className={s.blockHeading}>{block.text}</h2>;
 
@@ -332,21 +261,6 @@ function InstructionBlockView({
         </ul>
       );
 
-    case "locked":
-      return (
-        <div className={s.lockedCard}>
-          <Lock size={18} strokeWidth={2} aria-hidden="true" color="var(--cw-text-faint)" />
-          <h2 className={s.lockedTitle}>{block.title}</h2>
-          <p className={s.lockedText}>{block.text}</p>
-          <button
-            type="button"
-            className={s.secondaryBtn}
-            onClick={() => onBack(block.backTo)}
-          >
-            {block.backLabel}
-          </button>
-        </div>
-      );
   }
 }
 
@@ -488,37 +402,52 @@ export function OutputPanelView({
           table
         )}
         <div className={mobile ? `${s.outFooter} ${s.mOutFooter}` : s.outFooter}>
-          <span>{mobile ? output.footer.replace(/^Showing /, "") : output.footer}</span>
-          <a className={s.downloadLink} href="#">
-            {mobile ? null : <Download size={13} strokeWidth={2} aria-hidden="true" />}
-            Download CSV
-          </a>
+          <span>{output.footer}</span>
         </div>
       </>
+    );
+  }
+
+  if (output.kind === "error") {
+    return (
+      <div className={s.runError}>
+        <XCircle size={15} strokeWidth={2} aria-hidden="true" />
+        <pre className={s.runErrorText}>{output.message}</pre>
+      </div>
     );
   }
 
   return (
     <>
       <div className={s.stdioGrid}>
-        <div className={s.stdioCell}>
-          <div className={s.stdioHead}>
-            <span>{output.stdinLabel}</span>
+        {output.stdin ? (
+          <div className={s.stdioCell}>
+            <div className={s.stdioHead}>
+              <span>{output.stdin.label}</span>
+            </div>
+            <pre className={s.stdioPre}>{output.stdin.text}</pre>
           </div>
-          <pre className={s.stdioPre}>{output.stdin}</pre>
-        </div>
+        ) : null}
         <div className={s.stdioCell}>
           <div className={s.stdioHead}>
             <span>stdout</span>
-            {output.matchesExpected ? (
+            {output.stdoutNote ? (
               <span className={s.stdioMatch}>
                 <Check size={12} strokeWidth={2.5} aria-hidden="true" />
-                Matches expected
+                {output.stdoutNote}
               </span>
             ) : null}
           </div>
           <pre className={`${s.stdioPre} ${s.stdioPreOut}`}>{output.stdout}</pre>
         </div>
+        {output.stderr ? (
+          <div className={s.stdioCell}>
+            <div className={s.stdioHead}>
+              <span>stderr</span>
+            </div>
+            <pre className={`${s.stdioPre} ${s.stdioPreErr}`}>{output.stderr}</pre>
+          </div>
+        ) : null}
       </div>
       <div className={s.stdioFooter}>
         {output.footer.map((part, i) => (
@@ -535,13 +464,18 @@ export function OutputPanelView({
 // ─── Test cases ──────────────────────────────────────────────────────
 
 export function TestsPanel({
-  challenge,
+  tests,
+  summary,
+  subtitle,
+  allPassed,
   mobile,
 }: {
-  challenge: Challenge;
+  tests: TestOutcome[];
+  summary: string;
+  subtitle: string;
+  allPassed: boolean;
   mobile?: boolean;
 }) {
-  const allPassed = challenge.tests.every((t) => t.pass);
   return (
     <div className={s.stack}>
       <div className={[s.testBanner, allPassed ? s.testBannerPass : ""].filter(Boolean).join(" ")}>
@@ -550,19 +484,17 @@ export function TestsPanel({
         ) : (
           <XCircle size={15} strokeWidth={2} aria-hidden="true" />
         )}
-        <span className={s.testBannerText}>{challenge.testsSummary}</span>
-        {!mobile && challenge.testsSubtitle ? (
-          <span className={s.testBannerSub}>{challenge.testsSubtitle}</span>
-        ) : null}
+        <span className={s.testBannerText}>{summary}</span>
+        {!mobile ? <span className={s.testBannerSub}>{subtitle}</span> : null}
       </div>
-      {challenge.tests.map((test) => (
-        <TestRow key={test.name} test={test} mobile={mobile} />
+      {tests.map((test, i) => (
+        <TestRow key={`${test.name}-${i}`} test={test} mobile={mobile} />
       ))}
     </div>
   );
 }
 
-function TestRow({ test, mobile }: { test: TestCase; mobile?: boolean }) {
+function TestRow({ test, mobile }: { test: TestOutcome; mobile?: boolean }) {
   return (
     <div className={mobile ? `${s.testRow} ${s.mTestRow}` : s.testRow}>
       {test.pass ? (
@@ -605,22 +537,30 @@ function TestRow({ test, mobile }: { test: TestCase; mobile?: boolean }) {
 
 // ─── Solution ────────────────────────────────────────────────────────
 
-export function SolutionPanelView({ solution }: { solution: SolutionPanel }) {
+export function SolutionPanelView({
+  note,
+  source,
+  language,
+  label,
+}: {
+  note: Span[];
+  source: string;
+  language: CodeLanguage;
+  label: string;
+}) {
   return (
     <div className={s.solution}>
-      <p className={s.solutionText}>
-        <Spans spans={solution.spans} />
-      </p>
+      {note.length > 0 ? (
+        <p className={s.solutionText}>
+          <Spans spans={note} />
+        </p>
+      ) : null}
       <div className={s.solutionCard}>
         <div className={s.solutionHead}>
-          <span className={s.solutionLabel}>{solution.label}</span>
-          <CopyButton source={solution.source} />
+          <span className={s.solutionLabel}>{label}</span>
+          <CopyButton source={source} />
         </div>
-        <CodeBlock
-          source={solution.source}
-          language={solution.language}
-          className={s.solutionPre}
-        />
+        <CodeBlock source={source} language={language} className={s.solutionPre} />
       </div>
     </div>
   );
@@ -660,8 +600,13 @@ const SUB_WIDTHS: Record<string, string> = {
   when: "90px",
 };
 
-export function SubmissionsPanel({ challenge }: { challenge: Challenge }) {
-  const columns = challenge.submissionColumns;
+export function SubmissionsPanel({
+  submissions,
+  columns,
+}: {
+  submissions: Submission[];
+  columns: SubmissionColumn[];
+}) {
   // The single-step table has no Step column, so Language needs the wider
   // track that the multi-step layout gives to Step + Language together.
   const template = columns
@@ -675,7 +620,7 @@ export function SubmissionsPanel({ challenge }: { challenge: Challenge }) {
           <span key={col}>{SUB_HEADINGS[col]}</span>
         ))}
       </div>
-      {challenge.submissions.map((sub, i) => (
+      {submissions.map((sub, i) => (
         <div key={i} className={s.subsRow} style={{ gridTemplateColumns: template }}>
           {columns.map((col) => {
             switch (col) {
@@ -723,10 +668,16 @@ export function SubmissionsPanel({ challenge }: { challenge: Challenge }) {
 }
 
 /** Phone submissions: a stacked list rather than a four-column table. */
-export function MobileSubmissions({ challenge }: { challenge: Challenge }) {
+export function MobileSubmissions({
+  submissions,
+  languageLabel,
+}: {
+  submissions: Submission[];
+  languageLabel: string;
+}) {
   return (
     <div className={s.stack}>
-      {challenge.submissions.map((sub, i) => (
+      {submissions.map((sub, i) => (
         <div key={i} className={s.mSubRow}>
           <span className={s.mSubMain}>
             <span
@@ -737,7 +688,7 @@ export function MobileSubmissions({ challenge }: { challenge: Challenge }) {
               {sub.result}
             </span>
             <span className={s.mSubMeta}>
-              {[sub.step, challenge.languageLabel].filter(Boolean).join(" · ")}
+              {[sub.step, languageLabel].filter(Boolean).join(" · ")}
             </span>
           </span>
           <span className={s.mSubWhen}>{sub.when}</span>
