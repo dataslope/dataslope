@@ -8,7 +8,7 @@
  * the DOM and the media query in the stylesheet decides which one paints, so a
  * phone never flashes the desktop layout while a viewport check settles.
  *
- * Everything the panes show comes from `lib/challengeCatalog`. Run and Submit
+ * Everything the panes show comes from `lib/challenges`. Run and Submit
  * select the tab whose canned result answers them; they do not execute the
  * editor's code, and the editor is a highlighted, read-only snapshot rather
  * than CodeMirror. Both are the seams to cut when this gets a real runtime.
@@ -38,7 +38,7 @@ import {
   isMultiStep,
   type Challenge,
   type ChallengeStep,
-} from "@/lib/challengeCatalog";
+} from "@/lib/challenges";
 import {
   CodeView,
   DifficultyMeter,

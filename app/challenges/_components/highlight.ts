@@ -12,7 +12,7 @@
  * CodeMirror setup in `challengeShared`, which brings its own highlighting.
  */
 
-import type { CodeLanguage } from "@/lib/challengeCatalog";
+import type { CodeLanguage } from "@/lib/challenges";
 
 export type TokenKind =
   | "plain"

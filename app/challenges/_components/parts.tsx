@@ -30,7 +30,7 @@ import {
   type Span,
   type TableColumn,
   type TestCase,
-} from "@/lib/challengeCatalog";
+} from "@/lib/challenges";
 import { highlight, type TokenKind } from "./highlight";
 import s from "./ChallengeWorkspace.module.css";
 

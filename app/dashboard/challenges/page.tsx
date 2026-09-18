@@ -4,14 +4,14 @@
 // `app/dashboard/layout.tsx`: sidebar, top bar, theme bootstrap and the
 // 1280px content container. The page body is `ChallengesList`.
 //
-// Static: the catalog is a module (`lib/challengeCatalog.ts`), and the
+// Static: the catalog is a module (`lib/challenges`), and the
 // filtering and paging are client state over the full list, so there is no
 // server work per request. Progress (solved / in progress / not started) is
 // part of those fixtures today; it becomes a per-user read when challenges
 // get real submissions.
 
 import type { Metadata } from "next";
-import { getChallengeIndex } from "@/lib/challengeCatalog";
+import { getChallengeIndex } from "@/lib/challenges";
 import { ChallengesList } from "./ChallengesList";
 
 const PAGE_DESCRIPTION =

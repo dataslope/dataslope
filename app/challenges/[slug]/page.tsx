@@ -4,7 +4,7 @@
 // can be broken into gated steps, each with its own brief, editor and checks.
 // Built from the Claude Design handoff; see
 // `app/challenges/_components/ChallengeWorkspace.tsx` for the layout contract
-// and `lib/challengeCatalog.ts` for the content.
+// and `lib/challenges` for the content.
 //
 // Statically rendered: the catalog is a module, so every challenge prerenders
 // and the route ships no server work. When challenges move to a database this
@@ -15,7 +15,7 @@
 
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getChallenge, getChallengeSlugs } from "@/lib/challengeCatalog";
+import { getChallenge, getChallengeSlugs } from "@/lib/challenges";
 import { OG_IMAGE, SITE_URL } from "@/lib/site";
 import { ChallengeWorkspace } from "../_components/ChallengeWorkspace";
 

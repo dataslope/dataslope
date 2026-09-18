@@ -4,7 +4,7 @@ import {
   getChallenge,
   getChallengeSlugs,
   type CodeLanguage,
-} from "@/lib/challengeCatalog";
+} from "@/lib/challenges";
 
 /** Rebuild the source text from its tokens. */
 function detokenize(lines: HighlightedLine[]): string {
