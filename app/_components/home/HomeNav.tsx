@@ -5,7 +5,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { Dialog } from "@base-ui/react/dialog";
 import {
   BriefcaseBusiness,
+  Code2,
   GraduationCap,
+  ListChecks,
   LogIn,
   LogOut,
   Menu as Hamburger,
@@ -40,6 +42,9 @@ const NAV_SECTIONS: {
   activeClass?: string;
 }[] = [
   { href: "/courses", label: "Courses", icon: GraduationCap, prefetch: true },
+  // Learn → do → drill, so these two sit between Courses and Interview Prep.
+  { href: "/challenges", label: "Challenges", icon: Code2 },
+  { href: "/practice", label: "Practice", icon: ListChecks },
   { href: "/interview-prep", label: "Interview Prep", icon: BriefcaseBusiness },
   { href: "/playground", label: "Playground", icon: SquareTerminal },
   // The "Free" badge stops "Pricing" reading as a paywall.
@@ -92,9 +97,11 @@ function NavLink({
       prefetch={prefetch}
       aria-current={active ? "page" : undefined}
       // font-size animates with the color so the step down moves with the
-      // nav's height. Base size targets the tightest desktop band (md–lg).
-      className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 font-medium transition-[color,font-size] duration-200 ${
-        compact ? "text-[13px] lg:text-[14.5px]" : "text-[13px] lg:text-[15px]"
+      // nav's height. Base size and padding target the tightest desktop band,
+      // now lg–xl: that is where six items first have to fit, so the step up
+      // waits for xl rather than lg.
+      className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-2 font-medium transition-[color,font-size] duration-200 xl:px-3 ${
+        compact ? "text-[13px] xl:text-[14.5px]" : "text-[13px] xl:text-[15px]"
       } ${
         active
           ? activeClass
@@ -350,8 +357,12 @@ export function HomeNav() {
           scrolled ? "h-11 md:h-12" : "h-14 md:h-16"
         }`}
       />
+      {/* Full-bleed: no `mx-auto max-w-6xl`, so the bar spans the viewport and
+          the menu keeps its room on wide screens. The desktop columns are
+          `auto 1fr auto` (not `1fr auto 1fr`), which parks the menu against
+          the brand and gives it every spare pixel instead of centering it. */}
       <nav
-        className={`relative mx-auto grid max-w-6xl grid-cols-[1fr_auto] items-center gap-3 px-4 transition-[height] duration-200 sm:px-6 md:grid-cols-[1fr_auto_1fr] ${
+        className={`relative grid w-full grid-cols-[1fr_auto] items-center gap-3 px-4 transition-[height] duration-200 sm:px-6 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:px-8 ${
           scrolled ? "h-11 md:h-12" : "h-14 md:h-16"
         }`}
       >
@@ -362,7 +373,9 @@ export function HomeNav() {
 
         {/* Center: primary menu (desktop only; visibility hardened in
             home.css's `.ds-nav-menu` against a leaked `.hidden`). */}
-        <div className="ds-nav-menu items-center justify-center gap-4 lg:gap-6">
+        {/* `ml-*` is the breathing room between the brand and the first item,
+            on top of the grid's own column gap. */}
+        <div className="ds-nav-menu items-center justify-start gap-0.5 lg:ml-4 xl:ml-8 xl:gap-2">
           {NAV_SECTIONS.map(({ href, label, prefetch, badge, activeClass }) => (
             <NavLink
               key={href}
