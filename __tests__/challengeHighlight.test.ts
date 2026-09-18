@@ -1,0 +1,98 @@
+import { describe, expect, it } from "vitest";
+import { highlight, type HighlightedLine } from "@/app/challenges/_components/highlight";
+import {
+  getChallenge,
+  getChallengeSlugs,
+  type CodeLanguage,
+} from "@/lib/challengeCatalog";
+
+/** Rebuild the source text from its tokens. */
+function detokenize(lines: HighlightedLine[]): string {
+  return lines.map((tokens) => tokens.map((t) => t.text).join("")).join("\n");
+}
+
+/** Kinds assigned to each identifier in a line, for spot-checks. */
+function kindOf(lines: HighlightedLine[], text: string): string | undefined {
+  for (const tokens of lines) {
+    for (const token of tokens) {
+      if (token.text === text) return token.kind;
+    }
+  }
+  return undefined;
+}
+
+describe("challenge editor highlighter", () => {
+  it("never loses or reorders source text", () => {
+    const cases: [string, CodeLanguage][] = [];
+    for (const slug of getChallengeSlugs()) {
+      const challenge = getChallenge(slug);
+      if (!challenge) throw new Error(`missing fixture: ${slug}`);
+      for (const step of challenge.steps) {
+        if (step.source) cases.push([step.source, "sql"]);
+      }
+      for (const lang of challenge.languages) {
+        cases.push([lang.source, lang.id]);
+      }
+      cases.push([challenge.solution.source, challenge.solution.language]);
+    }
+
+    expect(cases.length).toBeGreaterThan(0);
+    for (const [source, language] of cases) {
+      expect(detokenize(highlight(source, language))).toBe(source);
+    }
+  });
+
+  it("keeps the gutter and the code in lockstep, blank lines included", () => {
+    const python = getChallenge("top-k-frequent-words")?.languages.find(
+      (l) => l.id === "python",
+    );
+    if (!python) throw new Error("missing python fixture");
+
+    const lines = highlight(python.source, "python");
+    // One entry per source line, including the blank line after the import.
+    expect(lines).toHaveLength(python.source.split("\n").length);
+    expect(lines[1]).toEqual([]);
+  });
+
+  it("colors SQL the way the design does", () => {
+    const step = getChallenge("top-products-by-month")?.steps[1];
+    if (!step?.source) throw new Error("missing step 2 fixture");
+    const lines = highlight(step.source, "sql");
+
+    expect(kindOf(lines, "SELECT")).toBe("keyword");
+    expect(kindOf(lines, "GROUP BY")).toBe("keyword");
+    expect(kindOf(lines, "PARTITION BY")).toBe("keyword");
+    expect(kindOf(lines, "SUM")).toBe("builtin");
+    expect(kindOf(lines, "RANK")).toBe("builtin");
+    expect(kindOf(lines, "'completed'")).toBe("string");
+    // Scalar functions and column names stay in the body color.
+    expect(kindOf(lines, "date_trunc")).toBeUndefined();
+    expect(kindOf(lines, "revenue_rank")).toBeUndefined();
+  });
+
+  it("treats bare literals as values, not control flow", () => {
+    const go = getChallenge("top-k-frequent-words")?.languages.find(
+      (l) => l.id === "go",
+    );
+    if (!go) throw new Error("missing go fixture");
+    const lines = highlight(go.source, "go");
+
+    expect(kindOf(lines, "func")).toBe("keyword");
+    expect(kindOf(lines, "string")).toBe("builtin");
+    expect(kindOf(lines, "nil")).toBe("number");
+    expect(kindOf(lines, "// your code here")).toBe("comment");
+  });
+
+  it("leaves chained JavaScript methods uncolored", () => {
+    const js = getChallenge("top-k-frequent-words")?.languages.find(
+      (l) => l.id === "javascript",
+    );
+    if (!js) throw new Error("missing javascript fixture");
+    const lines = highlight(js.source, "javascript");
+
+    expect(kindOf(lines, "Map")).toBe("builtin");
+    expect(kindOf(lines, "const")).toBe("keyword");
+    expect(kindOf(lines, "sort")).toBeUndefined();
+    expect(kindOf(lines, "slice")).toBeUndefined();
+  });
+});
