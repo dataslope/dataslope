@@ -55,6 +55,10 @@ const URL_ROUTER = codeSteps(
     {
       title: "Split a path",
       short: "Split",
+      solutionNote: [
+        { code: "filter(Boolean)" },
+        " drops the empty strings that splitting produces at the ends, which is what makes a leading slash, a trailing slash and a doubled slash all stop being special cases. Comparing segment lists rather than doing string surgery is the whole trick.",
+      ],
       signature: "function segments(path: string): string[]",
       prompt: [
         [
@@ -115,6 +119,13 @@ if (JSON.stringify(got) !== '["users","42"]') throw new Error("got " + JSON.stri
     {
       title: "Match a pattern",
       short: "Match",
+      solutionNote: [
+        "Checking the lengths before the contents is what rejects ",
+        { code: '"/users/42/posts"' },
+        " against ",
+        { code: '"/users/:id"' },
+        " — without it, a pattern matches any path that merely starts the same way, which is how a router quietly sends one route's traffic to another.",
+      ],
       signature: "function matchRoute(pattern: string, path: string): boolean",
       prompt: [
         [
@@ -179,6 +190,13 @@ if (matchRoute("/", "/users") !== false) throw new Error("root should not match 
     {
       title: "Pull out the parameters",
       short: "Params",
+      solutionNote: [
+        "Returning ",
+        { code: "null" },
+        ' for no match rather than an empty object is what lets a caller tell "did not match" from "matched, no parameters". Both are falsy-ish in casual use, and conflating them is how a router ends up rendering the wrong page for ',
+        { code: '"/about"' },
+        ".",
+      ],
       signature:
         "function extractParams(pattern: string, path: string): object | null",
       prompt: [
@@ -190,7 +208,9 @@ if (matchRoute("/", "/users") !== false) throw new Error("root should not match 
           ".",
         ],
         [
-          { code: 'extractParams("/users/:id/posts/:postId", "/users/42/posts/7")' },
+          {
+            code: 'extractParams("/users/:id/posts/:postId", "/users/42/posts/7")',
+          },
           " gives ",
           { code: '{ id: "42", postId: "7" }' },
           ". A pattern with no wildcards matches to an empty object, which is not the same as no match at all.",
@@ -237,7 +257,8 @@ if (got.postId !== "7") throw new Error("postId was " + got.postId);`,
         {
           id: "no-match",
           name: "No match returns null",
-          description: "Not an empty object, which means a match with no parameters.",
+          description:
+            "Not an empty object, which means a match with no parameters.",
           code: `if (extractParams("/users/:id", "/posts/42") !== null) throw new Error("expected null");
 if (extractParams("/users/:id", "/users") !== null) throw new Error("expected null");`,
         },
@@ -321,6 +342,17 @@ const QUERY_STRING = codeSteps(
     {
       title: "Split into pairs",
       short: "Split",
+      solutionNote: [
+        "Splitting on the ",
+        { code: "first" },
+        " ",
+        { code: "=" },
+        " rather than all of them is what keeps a value containing an equals sign intact. ",
+        { code: "indexOf" },
+        " plus two slices does that; ",
+        { code: 'split("=")' },
+        " does not, and the bug only shows up on the inputs nobody tests.",
+      ],
       signature: "function parseQuery(query: string): [string, string][]",
       prompt: [
         [
@@ -397,6 +429,13 @@ if (JSON.stringify(parseQuery("a=1&&b=2")) !== '[["a","1"],["b","2"]]') {
     {
       title: "Decode the pieces",
       short: "Decode",
+      solutionNote: [
+        "Decoding has to happen ",
+        { code: "after" },
+        " the split, never before. Decode first and an encoded ",
+        { code: "%3D" },
+        " becomes a separator that was never there — the parser invents a field, and the value it was part of goes missing.",
+      ],
       signature: "function parseQuery(query: string): [string, string][]",
       prompt: [
         [
@@ -453,6 +492,11 @@ if (JSON.stringify(parseQuery("flag")) !== '[["flag",""]]') throw new Error("bar
     {
       title: "Build one back",
       short: "Stringify",
+      solutionNote: [
+        "Encoding both sides is what makes the round trip safe: a value containing an ",
+        { code: "&" },
+        " must not become a separator when it is read back. The test that matters here is the round trip itself, because an encoder and a decoder can each look correct and still disagree.",
+      ],
       signature: "function stringifyQuery(pairs: [string, string][]): string",
       prompt: [
         [
@@ -566,6 +610,17 @@ const RATE_LIMITER = codeSteps(
     {
       title: "Count what is recent",
       short: "Window",
+      solutionNote: [
+        "A strict ",
+        { code: ">" },
+        " on the lower bound and an inclusive ",
+        { code: "<=" },
+        " on ",
+        { code: "now" },
+        " is what makes the window slide cleanly: a request exactly ",
+        { code: "windowSeconds" },
+        " old has just fallen out, and one arriving this instant is inside. Getting the two ends inconsistent is what makes a limiter drift.",
+      ],
       signature:
         "function withinWindow(timestamps: number[], now: number, windowSeconds: number): number",
       prompt: [
@@ -623,6 +678,9 @@ if (withinWindow([1], 10, 10) !== 1) throw new Error("1 at now=10 window=10 shou
     {
       title: "Decide what to accept",
       short: "Accept",
+      solutionNote: [
+        "A rejected request must not count against the window. Recording every arrival makes a caller who keeps retrying stay blocked forever, because their own rejections hold the window full — which is a lockout, not a limiter.",
+      ],
       signature:
         "function allowAll(timestamps: number[], limit: number, windowSeconds: number): boolean[]",
       prompt: [
@@ -690,6 +748,9 @@ if (JSON.stringify(got) !== "[false,false]") throw new Error("got " + JSON.strin
     {
       title: "A budget per caller",
       short: "Per key",
+      solutionNote: [
+        "Each key getting its own window is what stops one noisy caller consuming everybody else's budget. Note that the limiter takes timestamps rather than reading a clock: that is what makes it testable, and what lets the same function replay a log to explain a decision after the fact.",
+      ],
       signature:
         "function allowPerKey(events: [string, number][], limit: number, windowSeconds: number): boolean[]",
       prompt: [

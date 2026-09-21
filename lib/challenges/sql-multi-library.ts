@@ -66,6 +66,11 @@ const OVERDUE_REPORT = sqlSteps(
     {
       title: "How long was each book out",
       short: "Spans",
+      solutionNote: [
+        "Measuring only returned loans is the trap, and it is a subtle one: the longer a member keeps a book, the more likely it is still out, so excluding open loans systematically flatters the worst offenders. ",
+        { code: "COALESCE(returned_on, …)" },
+        " brings them back in.",
+      ],
       prompt: [
         [
           "Work out how many days each loan has run. A book that has not been returned counts up to ",
@@ -114,6 +119,13 @@ JOIN books   b ON b.book_id   = l.book_id
     {
       title: "Flag the late ones",
       short: "Flag",
+      solutionNote: [
+        "Turning the comparison into a 1-or-0 column now is what makes the summary a single ",
+        { code: "SUM" },
+        " in step 3. Note the boundary: ",
+        { code: "> 21" },
+        " means a loan of exactly the lending period is on time, which is the convention a library would actually use.",
+      ],
       prompt: [
         [
           "The lending period is ",
@@ -138,7 +150,13 @@ JOIN books   b ON b.book_id   = l.book_id
         {
           id: "columns",
           name: "Adds a late column",
-          expectedColumns: ["loan_id", "full_name", "title", "days_out", "late"],
+          expectedColumns: [
+            "loan_id",
+            "full_name",
+            "title",
+            "days_out",
+            "late",
+          ],
         },
         {
           id: "rowcount",
@@ -157,6 +175,19 @@ JOIN books   b ON b.book_id   = l.book_id
     {
       title: "Score each member",
       short: "Score",
+      solutionNote: [
+        "With the flag already computed, the whole report is one ",
+        { code: "GROUP BY" },
+        ": ",
+        { code: "COUNT(*)" },
+        " for loans, ",
+        { code: "SUM(late)" },
+        " for the late ones, and their ratio for the rate. The ",
+        { code: "100.0" },
+        " rather than ",
+        { code: "100" },
+        " is what stops integer division rounding every percentage to zero.",
+      ],
       prompt: [
         "Roll it up per member: how many loans they have taken, how many were late, and what percentage that is to 1 decimal place.",
         "Worst offender first, ties by name.",
@@ -247,6 +278,10 @@ const AUTHOR_COLLABORATION = sqlSteps(
     {
       title: "Find the pairs",
       short: "Pairs",
+      solutionNote: [
+        { code: "ba1.author_id < ba2.author_id" },
+        " does two jobs at once: it stops an author pairing with themselves, and it keeps each pair once rather than twice. Joining on the book alone returns fifteen rows here instead of three.",
+      ],
       prompt: [
         [
           "Join ",
@@ -294,6 +329,17 @@ JOIN book_authors ba2
     {
       title: "Name them",
       short: "Names",
+      solutionNote: [
+        "Joining twice to the same table needs two aliases, and that is the whole difficulty — ",
+        { code: "a1" },
+        " and ",
+        { code: "a2" },
+        " are the same table playing two different roles, exactly as ",
+        { code: "ba1" },
+        " and ",
+        { code: "ba2" },
+        " were in step 1.",
+      ],
       prompt: [
         "Ids are no use in a report. Swap them for the book's title and the two authors' names.",
         "Sort by title.",
@@ -338,6 +384,15 @@ ORDER BY b.title`,
     {
       title: "Count each author's collaborators",
       short: "Count",
+      solutionNote: [
+        "The asymmetry that made step 1 clean is what breaks this step: because each pair is stored once, an author only ever appears on one side of it. Stacking the pairs with their mirror image via ",
+        { code: "UNION ALL" },
+        " is what fixes it, and the ",
+        { code: "LEFT JOIN" },
+        " from ",
+        { code: "authors" },
+        " is what keeps the solo writers in the report at 0 instead of dropping them.",
+      ],
       prompt: [
         [
           "Now count how many distinct people each author has written with — every author, including the five who have written alone and the one who has written nothing.",

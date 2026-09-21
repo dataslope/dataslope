@@ -36,6 +36,7 @@ import {
   Play,
   RotateCcw,
   Table2,
+  Undo2,
 } from "lucide-react";
 import {
   isMultiStep,
@@ -121,6 +122,18 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
   } | null>(null);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
 
+  /**
+   * What assistive technology is told after a submission.
+   *
+   * The verdict renders into a panel that a screen reader is never pointed
+   * at, so it is mirrored into a polite live region. Held in state rather
+   * than written to the DOM directly: React owns that node.
+   */
+  const [announcement, setAnnouncement] = useState("");
+  /** The results banner, focused after a submission so Tab continues there. */
+  const bannerRef = useRef<HTMLDivElement>(null);
+  const mobileBannerRef = useRef<HTMLDivElement>(null);
+
   const splitRef = useRef<HTMLDivElement>(null);
   const rowsRef = useRef<HTMLDivElement>(null);
   const langWrapRef = useRef<HTMLDivElement>(null);
@@ -161,11 +174,24 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
   const seed = (key: string) =>
     readSavedCode(challenge.slug, key) ?? task?.starterCode ?? "";
   const [code, setCodeState] = useState(() => seed(taskKey));
+  /**
+   * The buffer Reset threw away, kept so it can be handed back.
+   *
+   * Reset is destructive and sits next to Run, so it is undoable rather than
+   * guarded by a dialog: a confirm prompt on a button people press often gets
+   * clicked through without reading. This is held in memory only until the
+   * learner moves task — long enough to notice the mistake, short enough not
+   * to resurface work they meant to abandon.
+   */
+  const [undoableDraft, setUndoableDraft] = useState<string | null>(null);
   const [seededFor, setSeededFor] = useState(taskKey);
   if (seededFor !== taskKey) {
     setSeededFor(taskKey);
     setCodeState(seed(taskKey));
     setOutcome(null);
+    // A discarded draft belongs to the task it came from; offering it back on
+    // a different step would paste the wrong query into the editor.
+    setUndoableDraft(null);
   }
 
   const setCode = useCallback(
@@ -248,6 +274,17 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
       } else {
         markAttempted(challenge.slug);
       }
+
+      const passed = result.tests.filter((t) => t.pass).length;
+      setAnnouncement(
+        failed
+          ? `Runtime error. ${result.output.kind === "error" ? result.output.message : ""}`.trim()
+          : `${passed} of ${result.tests.length} checks passed. ${label}.`,
+      );
+      // The banner only exists once the results have rendered.
+      requestAnimationFrame(() => {
+        (bannerRef.current ?? mobileBannerRef.current)?.focus();
+      });
     },
     [challenge.slug, challenge.steps.length, code, execute, language, multiStep, stepUnlocked, task, taskKey],
   );
@@ -257,12 +294,21 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
 
   const resetCode = useCallback(() => {
     if (!task) return;
+    const discarded = code;
     clearSavedCode(challenge.slug, taskKey);
     setCodeState(task.starterCode);
     setOutcome(null);
+    // Nothing to offer back when the buffer was already the starter.
+    setUndoableDraft(discarded.trim() === task.starterCode.trim() ? null : discarded);
     // A fresh database too, so a challenge that wrote rows starts clean.
     resetEngine();
-  }, [challenge.slug, resetEngine, task, taskKey]);
+  }, [challenge.slug, code, resetEngine, task, taskKey]);
+
+  const undoReset = useCallback(() => {
+    if (undoableDraft === null) return;
+    setCode(undoableDraft);
+    setUndoableDraft(null);
+  }, [setCode, undoableDraft]);
 
   // Drive the workspace from Playwright without typing into CodeMirror.
   //
@@ -417,6 +463,19 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
   const gatingStep = challenge.steps[stepIndex - 1]?.n.replace(/^0+/, "") ?? "";
   const busy = runner.busy;
 
+  // Passing a step is the highest-momentum moment in the flow, and it used to
+  // dead-end: the only way on was to spot the small numbered circle in the
+  // rail. Offer the next step in the banner instead.
+  const nextStepIndex = multiStep && stepIndex < challenge.steps.length - 1
+    ? stepIndex + 1
+    : null;
+  const goToNextStep = useCallback(() => {
+    if (nextStepIndex === null) return;
+    setStepIndex(nextStepIndex);
+    setResultTab("output");
+    setMobileView("problem");
+  }, [nextStepIndex, setStepIndex]);
+
   const resultPanel = (mobile: boolean) => {
     switch (resultTab) {
       case "output":
@@ -445,14 +504,31 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
             }
             allPassed={allPassed}
             mobile={mobile}
+            bannerRef={mobile ? mobileBannerRef : bannerRef}
+            onContinue={nextStepIndex !== null ? goToNextStep : undefined}
+            continueLabel={
+              nextStepIndex === null
+                ? undefined
+                : `Continue to step ${Number(challenge.steps[nextStepIndex].n)}`
+            }
           />
         ) : (
           <EmptyResults text="Submit to run the checks for this step." />
         );
       case "solution":
+        // Gating the editor but not the answer defeats the whole point of
+        // gating: a locked step used to hand out its own reference solution to
+        // anyone who clicked the tab.
+        if (multiStep && !stepUnlocked) {
+          return (
+            <EmptyResults
+              text={`The reference solution for this step opens once step ${gatingStep} passes.`}
+            />
+          );
+        }
         return task ? (
           <SolutionPanelView
-            note={challenge.solutionNote}
+            note={step?.solutionNote ?? challenge.solutionNote}
             source={task.solutionCode}
             language={editorLanguage}
             label={
@@ -526,6 +602,9 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
         language={editorLanguage}
         onChange={setCode}
         taskKey={taskKey}
+        label={`${multiStep ? challenge.languageLabel : (language?.shortLabel ?? "Code")} editor`}
+        onSubmit={submit}
+        onRun={run}
       />
     );
   };
@@ -541,6 +620,18 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
   return (
     <div className={s.page}>
       <h1 className={s.srOnly}>{challenge.title}</h1>
+      {/* The verdict renders into a panel nothing points a screen reader at,
+          so it is mirrored here. Rendered always and filled after a run: a
+          live region has to be in the DOM before the text arrives, or the
+          announcement is missed. */}
+      <div
+        role="status"
+        aria-live="polite"
+        data-testid="challenge-announcement"
+        className={s.srOnly}
+      >
+        {announcement}
+      </div>
 
       {/* ─── Desktop ─────────────────────────────────────────────── */}
       <div className={s.desktopOnly}>
@@ -565,10 +656,17 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
           </div>
 
           <div className={s.topBarRight}>
-            <button type="button" className={s.ghostBtn} onClick={resetCode}>
-              <RotateCcw size={13} strokeWidth={2} aria-hidden="true" />
-              Reset
-            </button>
+            {undoableDraft === null ? (
+              <button type="button" className={s.ghostBtn} onClick={resetCode}>
+                <RotateCcw size={13} strokeWidth={2} aria-hidden="true" />
+                Reset
+              </button>
+            ) : (
+              <button type="button" className={s.undoBtn} onClick={undoReset}>
+                <Undo2 size={13} strokeWidth={2} aria-hidden="true" />
+                Undo reset
+              </button>
+            )}
             <button
               type="button"
               className={s.secondaryBtn}
@@ -787,6 +885,12 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
                   </span>
                 )}
                 <div className={s.paneHeadRight}>
+                  {/* WCAG 2.1.2 asks that the way out of a keyboard trap be
+                      advertised, not just implemented. */}
+                  <span className={s.editorHint}>
+                    <kbd className={s.kbd}>Esc</kbd> then{" "}
+                    <kbd className={s.kbd}>Tab</kbd> leaves the editor
+                  </span>
                   <span className={s.runMeta}>{outcome?.meta ?? ""}</span>
                 </div>
               </div>
@@ -959,14 +1063,25 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
                 </span>
                 <span className={s.mCodeHeadRight}>
                   <span className={s.mAutosaved}>Autosaved</span>
-                  <button
-                    type="button"
-                    className={`${s.mIconBtn} ${s.mIconBtnTrail}`}
-                    aria-label="Reset code"
-                    onClick={resetCode}
-                  >
-                    <RotateCcw size={14} strokeWidth={2} aria-hidden="true" />
-                  </button>
+                  {undoableDraft === null ? (
+                    <button
+                      type="button"
+                      className={`${s.mIconBtn} ${s.mIconBtnTrail}`}
+                      aria-label="Reset code"
+                      onClick={resetCode}
+                    >
+                      <RotateCcw size={14} strokeWidth={2} aria-hidden="true" />
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className={`${s.mIconBtn} ${s.mIconBtnTrail} ${s.mIconBtnUndo}`}
+                      aria-label="Undo reset and restore your code"
+                      onClick={undoReset}
+                    >
+                      <Undo2 size={14} strokeWidth={2} aria-hidden="true" />
+                    </button>
+                  )}
                 </span>
               </div>
               {editorPane(true)}

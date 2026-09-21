@@ -154,6 +154,15 @@ export interface ChallengeStep extends ChallengeTask {
   /** Abbreviated title for the mobile stepper. */
   short: string;
   instructions: InstructionBlock[];
+  /**
+   * What this step's reference solution is teaching.
+   *
+   * Per step, because each step of a build has its own idea: step 2 is about
+   * the window function, step 3 about the filter. The challenge-level
+   * `solutionNote` is the fallback, and on a multi-step challenge it is the
+   * wrong note on every step but one — so authored steps set this.
+   */
+  solutionNote?: Span[];
 }
 
 // ─── Languages ───────────────────────────────────────────────────────

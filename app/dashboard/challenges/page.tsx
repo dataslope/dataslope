@@ -4,12 +4,12 @@
 // `app/dashboard/layout.tsx`: sidebar, top bar, theme bootstrap and the
 // 1280px content container. The page body is `ChallengesList`.
 //
-// Static: the catalog is a module (`lib/challenges`), and the
-// filtering and paging are client state over the full list, so there is no
-// server work per request. Progress (solved / in progress / not started) is
-// part of those fixtures today; it becomes a per-user read when challenges
-// get real submissions.
+// Static: the catalog is a module (`lib/challenges`), and the filtering and
+// paging happen in the browser over the full list, so there is no server work
+// per request. Progress (solved / in progress / not started) is read from
+// localStorage after hydration.
 
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getChallengeIndex } from "@/lib/challenges";
 import { ChallengesList } from "./ChallengesList";
@@ -26,8 +26,16 @@ export const metadata: Metadata = {
 
 export default function ChallengesPage() {
   // Read on the server and handed over as a prop, so the client bundle carries
-  // the 52 catalog rows rather than the whole catalog module (which also holds
+  // the catalog rows rather than the whole catalog module (which also holds
   // every workspace's instructions, schema and source). This is also where a
   // per-user progress read would go.
-  return <ChallengesList entries={getChallengeIndex()} />;
+  //
+  // The Suspense boundary is what `useSearchParams` needs to keep this page
+  // statically rendered: filters live in the query string, and without it
+  // Next bails the whole route out to dynamic rendering at build time.
+  return (
+    <Suspense fallback={null}>
+      <ChallengesList entries={getChallengeIndex()} />
+    </Suspense>
+  );
 }

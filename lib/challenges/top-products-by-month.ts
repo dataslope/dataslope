@@ -49,7 +49,19 @@ export const TOP_PRODUCTS_BY_MONTH: Challenge = {
   schema: RETAIL.schema,
   submitLabel: "Submit step",
   submissionColumns: ["step", "result", "lang", "when"],
-  keyStrip: ["SELECT", "FROM", "JOIN", "WHERE", "GROUP BY", "OVER", "(", ")", ",", "*", "'"],
+  keyStrip: [
+    "SELECT",
+    "FROM",
+    "JOIN",
+    "WHERE",
+    "GROUP BY",
+    "OVER",
+    "(",
+    ")",
+    ",",
+    "*",
+    "'",
+  ],
   instructions: [],
   languages: [
     {
@@ -73,6 +85,17 @@ export const TOP_PRODUCTS_BY_MONTH: Challenge = {
       n: "01",
       title: "Monthly revenue",
       short: "Revenue",
+      solutionNote: [
+        "SQLite has no ",
+        { code: "date_trunc" },
+        ", so the month comes from ",
+        { code: "strftime" },
+        " — and because that returns text, it groups and sorts correctly only while the format stays ",
+        { code: "YYYY-MM-DD" },
+        ". Grouping by the two select expressions positionally (",
+        { code: "GROUP BY 1, 2" },
+        ") saves repeating them, at the cost of a query that breaks quietly if the select list is reordered.",
+      ],
       instructions: [
         { kind: "heading", text: "Monthly revenue per product" },
         {
@@ -125,7 +148,8 @@ JOIN products p ON p.product_id = i.product_id
         {
           id: "matches",
           name: "Totals match the reference result",
-          description: "Cancelled orders excluded, revenue rounded to 2 places.",
+          description:
+            "Cancelled orders excluded, revenue rounded to 2 places.",
           matchesSolution: true,
         },
       ],
@@ -134,6 +158,13 @@ JOIN products p ON p.product_id = i.product_id
       n: "02",
       title: "Rank in month",
       short: "Rank",
+      solutionNote: [
+        "The tiebreak is the part people miss. ",
+        { code: "RANK()" },
+        " gives tied rows the same number and skips the next one, so without a second sort key two products with equal revenue come back in whatever order the engine chose — and the report changes between runs. Reach for ",
+        { code: "ROW_NUMBER()" },
+        " instead when every row must get a distinct rank.",
+      ],
       instructions: [
         { kind: "heading", text: "Rank products within each month" },
         {
@@ -197,6 +228,15 @@ FROM monthly`,
       n: "03",
       title: "Top three",
       short: "Top 3",
+      solutionNote: [
+        "Filtering on the rank has to happen outside the window: a window function is computed after ",
+        { code: "WHERE" },
+        ", so ",
+        { code: "WHERE revenue_rank <= 3" },
+        " in the same select cannot see it. Wrapping the ranked rows in a CTE and filtering the CTE is the standard way round it — what a database with ",
+        { code: "QUALIFY" },
+        " lets you write in one clause.",
+      ],
       instructions: [
         { kind: "heading", text: "Keep the top three" },
         {

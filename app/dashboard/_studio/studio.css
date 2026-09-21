@@ -309,6 +309,28 @@
   background: var(--rail-group);
 }
 
+/* The whole row is the hit area, not just the title. The row highlights on
+   hover across its full width, so clicking the level, the language or the
+   row's padding has to follow the link — it used to do nothing.
+
+   `position: relative` on a <tr> makes it the containing block, which every
+   current browser honours, so the overlay can simply inset to the row rather
+   than guessing at a width. Any cell that gains its own interactive content
+   needs `position: relative` to sit above this; none has one today. */
+.ds-challenge-row {
+  position: relative;
+}
+.ds-challenge-row .ds-row-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.ds-challenge-row .ds-row-link:focus-visible {
+  outline: 2px solid var(--ds-blue-600);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 /* 34×34 top-bar icon buttons (sidebar toggle, full preview). */
 .ds-topbar-btn {
   display: inline-flex;

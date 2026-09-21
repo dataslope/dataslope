@@ -67,6 +67,11 @@ const DEPARTMENT_PAY_GAP = sqlSteps(
     {
       title: "Department averages",
       short: "Averages",
+      solutionNote: [
+        "Grouping by ",
+        { code: "d.dept_id, d.dept_name" },
+        " rather than the name alone is the habit worth keeping: the id is what guarantees one row per department, and the name only rides along so it can be selected. Two departments sharing a name would collapse into one row otherwise.",
+      ],
       prompt: [
         "Start with the shape of each department: how many people are in it and what they earn on average.",
         [
@@ -106,6 +111,16 @@ JOIN departments d ON d.dept_id = e.dept_id
     {
       title: "Rank inside the department",
       short: "Rank",
+      solutionNote: [
+        { code: "PARTITION BY" },
+        " is what restarts the numbering at each department; without it you get one ranking across the whole company. Which ranking function you want depends on ties: ",
+        { code: "RANK" },
+        " gives equal rows the same number and skips the next, ",
+        { code: "DENSE_RANK" },
+        " does not skip, and ",
+        { code: "ROW_NUMBER" },
+        " refuses to tie at all.",
+      ],
       prompt: [
         [
           "Now go back to individual employees and number them by pay within their own department — highest paid is ",
@@ -152,6 +167,11 @@ ORDER BY d.dept_name
     {
       title: "Gap above the average",
       short: "Gap",
+      solutionNote: [
+        "Two different aggregations of the same table — one row per department, one per employee — is exactly what CTEs are for. Computing the average with a window function instead (",
+        { code: "AVG(salary) OVER (PARTITION BY dept_id)" },
+        ") gets the same answer in one pass, and is worth writing once this version works.",
+      ],
       prompt: [
         "Put the two together. Keep only each department's top earner, attach that department's average salary, and add the difference between the two.",
         [
@@ -250,7 +270,7 @@ const SIGNUP_FUNNEL = sqlSteps(
       { code: "MAX(CASE WHEN … THEN 1 ELSE 0 END)" },
       " is the standard way to collapse an event log into one row per actor: the ",
       { code: "MAX" },
-      " turns \"any row matched\" into a 1. Summing those flags then counts distinct users per stage without a single ",
+      ' turns "any row matched" into a 1. Summing those flags then counts distinct users per stage without a single ',
       { code: "COUNT(DISTINCT …)" },
       ".",
     ],
@@ -259,6 +279,12 @@ const SIGNUP_FUNNEL = sqlSteps(
     {
       title: "Flag each visitor",
       short: "Flags",
+      solutionNote: [
+        { code: "MAX(CASE WHEN … THEN 1 ELSE 0 END)" },
+        " is the standard way to collapse an event log into one row per actor: the ",
+        { code: "MAX" },
+        ' turns "any row matched" into a 1, so a visitor who viewed five pages still scores a single 1 rather than a 5.',
+      ],
       prompt: [
         [
           "The ",
@@ -302,6 +328,13 @@ ORDER BY user_id
     {
       title: "Total the stages",
       short: "Totals",
+      solutionNote: [
+        "Because each flag is already 1 or 0, a plain ",
+        { code: "SUM" },
+        " counts visitors rather than events — no ",
+        { code: "COUNT(DISTINCT …)" },
+        " anywhere, and no second pass over the log. That is the payoff for the shape step 1 put the data into.",
+      ],
       prompt: [
         "Now add the flags up. One row, three numbers: how many visitors viewed, how many clicked, how many signed up.",
         "Because each flag is 1 or 0, a plain sum counts visitors rather than events.",
@@ -339,6 +372,14 @@ FROM per_user
     {
       title: "Report the funnel",
       short: "Funnel",
+      solutionNote: [
+        { code: "UNION ALL" },
+        " pivots one wide row into three tall ones, which is what turns three numbers into something that reads as a funnel. The ",
+        { code: "ord" },
+        " column is not decoration: ",
+        { code: "UNION ALL" },
+        " makes no promise about row order, so without an explicit sort key the stages can come back shuffled.",
+      ],
       prompt: [
         "Three numbers side by side are hard to read as a funnel. Pivot them into three rows — one per stage — with the stage name, the number of visitors, and that stage as a percentage of everyone who viewed.",
         [
@@ -441,6 +482,15 @@ const MONTHLY_ORDER_GROWTH = sqlSteps(
     {
       title: "Monthly totals",
       short: "Totals",
+      solutionNote: [
+        "The join to ",
+        { code: "order_items" },
+        " multiplies each order by its line count, so a plain ",
+        { code: "COUNT(*)" },
+        " would report line items and call them orders. ",
+        { code: "COUNT(DISTINCT o.order_id)" },
+        " is what survives the fan-out, and it is the single most common way a revenue report ends up wrong.",
+      ],
       prompt: [
         [
           "Total the completed orders by calendar month. SQLite has no ",
@@ -490,6 +540,12 @@ WHERE o.status = 'completed'
     {
       title: "Bring the previous month alongside",
       short: "Previous",
+      solutionNote: [
+        { code: "LAG()" },
+        " reaches backwards inside a window, which is why it needs an ",
+        { code: "ORDER BY" },
+        " to know what backwards means. The earliest month's value is NULL because there is genuinely no earlier row, not zero, which would claim the shop took nothing that month.",
+      ],
       prompt: [
         [
           "Add a ",
@@ -538,6 +594,9 @@ ORDER BY month
     {
       title: "Growth rate",
       short: "Growth",
+      solutionNote: [
+        "Dropping the first month is the judgement call. A growth rate against a month that does not exist is undefined rather than 0%, and reporting it as 0% would draw a flat line where the data simply starts.",
+      ],
       prompt: [
         [
           "Finish the report: month, revenue, prev_revenue, and ",
@@ -641,6 +700,11 @@ const CUSTOMER_REVENUE_PARETO = sqlSteps(
     {
       title: "Revenue per customer",
       short: "Revenue",
+      solutionNote: [
+        "Grouping by customer id and name together is what keeps two customers who share a name apart. Counting orders with ",
+        { code: "COUNT(DISTINCT o.order_id)" },
+        " matters for the same reason it does in the monthly report: the item join has already multiplied the rows.",
+      ],
       prompt: [
         "Total what each customer has spent across their completed orders, and how many orders that was.",
         "Revenue is quantity times unit price, summed and rounded to 2 places. Sort by revenue, biggest spender first.",
@@ -680,6 +744,10 @@ WHERE o.status = 'completed'
     {
       title: "Share of total revenue",
       short: "Share",
+      solutionNote: [
+        { code: "SUM(revenue) OVER ()" },
+        " with no partition and no order is the grand total, repeated on every row. That is what lets a share be computed in the same pass that produced the totals, with no self join and no second query.",
+      ],
       prompt: [
         [
           "Add ",
@@ -729,6 +797,11 @@ ORDER BY revenue DESC
     {
       title: "Core and tail",
       short: "Tiers",
+      solutionNote: [
+        "The same window function, now ordered, becomes a running total: an ordered window defaults to a frame covering everything from the start up to the current row. Divide the running total by the grand total and you have the Pareto curve. Adding ",
+        { code: "full_name" },
+        " as a second sort key keeps that running total deterministic when two customers tie.",
+      ],
       prompt: [
         [
           "Add a running share — ",

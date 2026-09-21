@@ -44,7 +44,14 @@ async function catalogSlugs(page: Page): Promise<string[]> {
       .getByRole("navigation", { name: "Pagination" })
       .getByRole("button", { name: "Next", exact: true });
     if ((await next.count()) === 0 || (await next.isDisabled())) break;
+    // Paging is a router navigation now, so wait for the URL to land before
+    // sampling the button again — otherwise `isDisabled` reads the previous
+    // render and the click waits on a button that is already disabled.
+    const before = page.url();
     await next.click();
+    await page.waitForFunction((url) => window.location.href !== url, before, {
+      timeout: 15_000,
+    });
   }
   return slugs;
 }
@@ -224,6 +231,77 @@ test.describe("Challenge workspace", () => {
     expect(after[1]).toBe(true);
     // Step 3 is still behind step 2.
     expect(after[2]).toBe(false);
+  });
+
+
+  test("a locked step does not hand out its own solution", async ({ page }) => {
+    await openWorkspace(page, "matrix-rotation");
+    // Step 2 is locked until step 1 passes.
+    await page.evaluate(() =>
+      window.__dsChallengeWorkspace?.["matrix-rotation"]?.selectTask("02"),
+    );
+    await page.getByRole("button", { name: "Solution", exact: true }).first().click();
+
+    const body = (await page.locator("body").innerText()).toLowerCase();
+    expect(body).toContain("opens once step 1 passes");
+    // The step 2 reference solution reverses each transposed row; if any of it
+    // leaked into the DOM, the gate is not doing its job.
+    expect(body).not.toContain("row.reverse()");
+  });
+
+  test("the editor can be left with the keyboard", async ({ page }) => {
+    await openWorkspace(page, "two-sum");
+    await page.locator(".cm-content").first().click();
+    await expect(page.locator(".cm-content").first()).toBeFocused();
+
+    // Tab alone indents rather than moving focus, which is the trap.
+    await page.keyboard.press("Tab");
+    await expect(page.locator(".cm-content").first()).toBeFocused();
+
+    // Escape releases it, so the next Tab leaves.
+    await page.keyboard.press("Escape");
+    await page.keyboard.press("Tab");
+    await expect(page.locator(".cm-content").first()).not.toBeFocused();
+  });
+
+  test("submitting announces the verdict and moves focus", async ({ page }) => {
+    await openWorkspace(page, "two-sum");
+    await page.evaluate(() => {
+      const handle = window.__dsChallengeWorkspace?.["two-sum"];
+      handle?.selectTask("javascript");
+    });
+    await page.waitForTimeout(50);
+    await page.evaluate((s) => window.__dsChallengeWorkspace?.[s]?.loadSolution(), "two-sum");
+    await page.evaluate((s) => window.__dsChallengeWorkspace?.[s]?.submit(), "two-sum");
+    await page.waitForFunction(
+      () => window.__dsChallengeWorkspace?.["two-sum"]?.isBusy() === false,
+      null,
+      { timeout: 150_000 },
+    );
+
+    // Targeted by test id: Next's own route announcer is also a polite live
+    // region, so an attribute selector matches two elements here.
+    await expect(
+      page.getByTestId("challenge-announcement"),
+    ).toContainText("checks passed");
+    // Focus lands on the results banner rather than dropping to <body>.
+    const focused = await page.evaluate(() => document.activeElement?.tagName ?? "");
+    expect(focused).not.toBe("BODY");
+  });
+
+  test("filters live in the URL and survive a reload", async ({ page }) => {
+    await page.goto("/dashboard/challenges");
+    // The rows are server-rendered, so the select exists before React has
+    // attached to it. Setting it pre-hydration changes the DOM value and
+    // nothing else, so wait for the chunks to land first.
+    await page.waitForLoadState("networkidle");
+    await page.getByLabel("Language").selectOption("python");
+    await expect(page).toHaveURL(/lang=python/);
+
+    const beforeReload = await page.locator("table tbody tr").count();
+    await page.reload();
+    await expect(page.getByLabel("Language")).toHaveValue("python");
+    expect(await page.locator("table tbody tr").count()).toBe(beforeReload);
   });
 
   test("passing every step marks the challenge solved, and it survives a reload", async ({

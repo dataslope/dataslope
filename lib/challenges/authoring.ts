@@ -191,6 +191,8 @@ interface SqlStepSpec extends SqlTaskSpec {
   title: string;
   /** Abbreviated title for the phone's stepper. */
   short: string;
+  /** What this step's solution teaches; falls back to the challenge's note. */
+  solutionNote?: Span[];
 }
 
 /** A SQL challenge broken into gated steps. */
@@ -221,6 +223,7 @@ export function sqlSteps(common: SqlCommon, steps: SqlStepSpec[]): Challenge {
       ],
       starterCode: step.starter,
       solutionCode: step.solution,
+      solutionNote: step.solutionNote,
       tests: step.tests,
     })),
   };
@@ -259,7 +262,9 @@ interface CodeCommon extends CodeMeta {
 }
 
 const LANG_LABELS: Record<"python" | "javascript", { label: string; short: string }> = {
-  python: { label: "Python 3.12", short: "Python" },
+  // Kept in step with `readyStatus` in app/_components/runtime/python.tsx —
+  // the workspace claimed 3.12 while the runtime it boots reported 3.14.2.
+  python: { label: "Python 3.14", short: "Python" },
   javascript: { label: "JavaScript · Node", short: "JavaScript" },
 };
 
@@ -294,6 +299,11 @@ export function codeChallenge(
     ...codeBase(common, ids),
     steps: [],
     instructions: [
+      // The page's only other title is the visually hidden `<h1>` and the top
+      // bar, so without this the section labels below (which render as `<h3>`)
+      // skip a level — and a code challenge looked different from a SQL one,
+      // which does emit a heading. Same component, same shape.
+      { kind: "heading", text: common.title },
       ...prose(common.prompt),
       { kind: "label", text: "Signature" },
       { kind: "signature" },
@@ -321,6 +331,8 @@ interface CodeStepSpec {
   prompt: (Span[] | string)[];
   /** The function this step adds, shown in a fenced block under the prompt. */
   signature?: string;
+  /** What this step's solution teaches; falls back to the challenge's note. */
+  solutionNote?: Span[];
   starter: string;
   solution: string;
   tests: CodeTest[];
@@ -373,6 +385,7 @@ export function codeSteps(
       ],
       starterCode: step.starter,
       solutionCode: step.solution,
+      solutionNote: step.solutionNote,
       tests: step.tests,
     })),
   };

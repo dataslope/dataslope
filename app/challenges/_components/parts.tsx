@@ -12,6 +12,7 @@ import {
   Check,
   CheckCircle2,
   ChevronDown,
+  ChevronRight,
   Copy,
   Table2,
   XCircle,
@@ -469,16 +470,34 @@ export function TestsPanel({
   subtitle,
   allPassed,
   mobile,
+  bannerRef,
+  onContinue,
+  continueLabel,
 }: {
   tests: TestOutcome[];
   summary: string;
   subtitle: string;
   allPassed: boolean;
   mobile?: boolean;
+  /**
+   * Focus moves here after a submission. Without it, submitting drops focus to
+   * `<body>` on two of the three layouts, which sends a keyboard user back to
+   * the top of the document to find out what happened.
+   */
+  bannerRef?: React.Ref<HTMLDivElement>;
+  /** Offered on a pass, when there is somewhere to go next. */
+  onContinue?: () => void;
+  continueLabel?: string;
 }) {
   return (
     <div className={s.stack}>
-      <div className={[s.testBanner, allPassed ? s.testBannerPass : ""].filter(Boolean).join(" ")}>
+      <div
+        ref={bannerRef}
+        tabIndex={-1}
+        className={[s.testBanner, allPassed ? s.testBannerPass : ""]
+          .filter(Boolean)
+          .join(" ")}
+      >
         {allPassed ? (
           <CheckCircle2 size={15} strokeWidth={2} aria-hidden="true" />
         ) : (
@@ -486,6 +505,12 @@ export function TestsPanel({
         )}
         <span className={s.testBannerText}>{summary}</span>
         {!mobile ? <span className={s.testBannerSub}>{subtitle}</span> : null}
+        {onContinue && allPassed && continueLabel ? (
+          <button type="button" className={s.continueBtn} onClick={onContinue}>
+            {continueLabel}
+            <ChevronRight size={13} strokeWidth={2.4} aria-hidden="true" />
+          </button>
+        ) : null}
       </div>
       {tests.map((test, i) => (
         <TestRow key={`${test.name}-${i}`} test={test} mobile={mobile} />

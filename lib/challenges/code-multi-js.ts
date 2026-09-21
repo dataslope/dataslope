@@ -49,6 +49,11 @@ const MATRIX_ROTATION = codeSteps(
     {
       title: "Transpose the grid",
       short: "Transpose",
+      solutionNote: [
+        "Building the output from the input's first row is what makes this work on rectangles: the number of output rows is the number of input ",
+        { code: "columns" },
+        ", not rows. Returning new arrays rather than writing into the original is what lets step 2 compose this safely.",
+      ],
       signature: "function transpose(matrix: number[][]): number[][]",
       prompt: [
         [
@@ -115,6 +120,13 @@ if (JSON.stringify(grid) !== JSON.stringify([[1, 2], [3, 4]])) {
     {
       title: "Turn it a quarter clockwise",
       short: "Rotate",
+      solutionNote: [
+        "A quarter turn clockwise is a transpose followed by reversing each row — two operations you can each check on paper, rather than one index expression you have to trust. The ",
+        { code: "reverse()" },
+        " is safe here only because ",
+        { code: "transpose" },
+        " already returned fresh arrays; calling it on the caller's rows would corrupt them.",
+      ],
       signature: "function rotate(matrix: number[][]): number[][]",
       prompt: [
         [
@@ -181,7 +193,21 @@ if (JSON.stringify(got) !== JSON.stringify([[1, 3], [2, 4]])) {
     {
       title: "Any number of turns",
       short: "Turns",
-      signature: "function rotateTimes(matrix: number[][], k: number): number[][]",
+      solutionNote: [
+        "Reducing ",
+        { code: "k" },
+        " modulo 4 before looping is what makes a million turns instant. The ",
+        { code: "((k % 4) + 4) % 4" },
+        " dance is JavaScript-specific: its ",
+        { code: "%" },
+        " keeps the sign of the left operand, so ",
+        { code: "-1 % 4" },
+        " is ",
+        { code: "-1" },
+        " rather than the 3 you want.",
+      ],
+      signature:
+        "function rotateTimes(matrix: number[][], k: number): number[][]",
       prompt: [
         [
           "Add ",
@@ -309,7 +335,7 @@ const NESTED_LOOKUP = codeSteps(
     solutionNote: [
       "Walking the path with a cursor is what keeps this a loop rather than a pile of ",
       { code: "&&" },
-      " guards. The subtle part is telling \"missing\" apart from \"stored as null\": bailing out when the cursor stops being an object handles the first, and checking for ",
+      ' guards. The subtle part is telling "missing" apart from "stored as null": bailing out when the cursor stops being an object handles the first, and checking for ',
       { code: "undefined" },
       " at the end handles the second — so a stored ",
       { code: "null" },
@@ -322,6 +348,11 @@ const NESTED_LOOKUP = codeSteps(
     {
       title: "Read by path",
       short: "Read",
+      solutionNote: [
+        "Walking the path with a cursor is what keeps this a loop rather than a pile of ",
+        { code: "&&" },
+        " guards. Bailing out when the cursor stops being an object is what stops a path running into a number from throwing, and it costs one check per level.",
+      ],
       signature: "function getPath(object: unknown, path: string): unknown",
       prompt: [
         [
@@ -390,6 +421,17 @@ if (got !== "mug") throw new Error("got " + got);`,
     {
       title: "Fall back when it is missing",
       short: "Fallback",
+      solutionNote: [
+        'Telling "missing" apart from "stored as null" is the subtle part. Checking for ',
+        { code: "undefined" },
+        " at the end rather than for falsiness is what keeps a stored ",
+        { code: "0" },
+        ", ",
+        { code: '""' },
+        " or ",
+        { code: "null" },
+        " from being silently replaced by the fallback — the bug that makes a settings loader quietly ignore every value someone deliberately set to zero.",
+      ],
       signature:
         "function getPath(object: unknown, path: string, fallback?: unknown): unknown",
       prompt: [
@@ -450,6 +492,13 @@ if (got !== "none") throw new Error("got " + got);`,
     {
       title: "Write by path",
       short: "Write",
+      solutionNote: [
+        "Walking to the second-to-last key and assigning to the last is the shape every path-setter has. Replacing a non-object along the way is a real decision rather than an oversight: the alternative is throwing, and a caller who asked to set ",
+        { code: "a.b" },
+        " on ",
+        { code: "{ a: 1 }" },
+        " has already told you what they want to happen to the 1.",
+      ],
       signature:
         "function setPath(object: object, path: string, value: unknown): object",
       prompt: [
@@ -582,7 +631,17 @@ const INVENTORY_LEDGER = codeSteps(
     {
       title: "Total the movements",
       short: "Levels",
-      signature: "function stockLevels(events: [string, number][]): [string, number][]",
+      solutionNote: [
+        "A ",
+        { code: "Map" },
+        " rather than a plain object is what lets an SKU be any string without colliding with ",
+        { code: "Object.prototype" },
+        " — a product literally called ",
+        { code: '"constructor"' },
+        " is unlikely but the failure it causes is baffling. Returning sorted pairs rather than the map keeps the output comparable.",
+      ],
+      signature:
+        "function stockLevels(events: [string, number][]): [string, number][]",
       prompt: [
         [
           "Stock movements arrive as ",
@@ -646,6 +705,11 @@ if (JSON.stringify(got) !== JSON.stringify([["a", -3]])) {
     {
       title: "Find the first oversell",
       short: "Oversell",
+      solutionNote: [
+        "Computing the level the movement ",
+        { code: "would" },
+        " produce, before committing it, is what makes this a check rather than a repair. Note that only the SKU being moved is consulted: stock of one item cannot cover a sale of another, however healthy the total looks.",
+      ],
       signature: "function firstNegative(events: [string, number][]): number",
       prompt: [
         [
@@ -711,7 +775,11 @@ if (JSON.stringify(got) !== JSON.stringify([["a", 2]])) {
     {
       title: "Settle the ledger",
       short: "Settle",
-      signature: "function settle(events: [string, number][]): [string, number][]",
+      solutionNote: [
+        "The three steps are the same fold over the same events; what changes is what the fold does when the running total would go below zero — ignore it, report it, or refuse it. Refusing means a later movement for that SKU still applies against the level it actually had, which is what makes the settled ledger internally consistent.",
+      ],
+      signature:
+        "function settle(events: [string, number][]): [string, number][]",
       prompt: [
         [
           "Add ",
@@ -824,6 +892,9 @@ const PAGINATE_RESULTS = codeSteps(
     {
       title: "Slice one page",
       short: "Slice",
+      solutionNote: [
+        "Pages are 1-based because that is what a reader sees, and array indices are 0-based, so exactly one subtraction bridges them. Getting that in one place rather than in every caller is the entire reason this is a function.",
+      ],
       signature:
         "function pageOf(items: unknown[], page: number, size: number): unknown[]",
       prompt: [
@@ -880,6 +951,9 @@ if (JSON.stringify(pageOf([1, 2], 1, 0)) !== "[]") throw new Error("size 0 shoul
     {
       title: "Count the pages",
       short: "Count",
+      solutionNote: [
+        'Zero items means zero pages, not one empty page. It looks like a nitpick until a UI renders "Page 1 of 1" over an empty list and someone files a bug asking where their data went.',
+      ],
       signature: "function pageCount(total: number, size: number): number",
       prompt: [
         [
@@ -940,6 +1014,11 @@ if (JSON.stringify(got) !== "[3]") throw new Error("got " + JSON.stringify(got))
     {
       title: "Assemble the payload",
       short: "Payload",
+      solutionNote: [
+        "Composing the two functions rather than recomputing the arithmetic is what keeps the payload honest: ",
+        { code: "hasNext" },
+        " and the items can never disagree, because both derive from the same page count. A payload assembled from independent calculations is where off-by-one pagination bugs live.",
+      ],
       signature:
         "function paginate(items: unknown[], page: number, size: number): object",
       prompt: [

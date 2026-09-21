@@ -70,6 +70,13 @@ const INVOICE_AGING = sqlSteps(
     {
       title: "What is still owed",
       short: "Open",
+      solutionNote: [
+        "Filtering to the open invoices first is what keeps the rest simple: everything after this step works on a set that is already the right shape. ",
+        { code: "julianday()" },
+        " turns a text date into a number so two of them can be subtracted, and the ",
+        { code: "CAST" },
+        " is the difference between a report that says 30 days and one that says 30.0.",
+      ],
       prompt: [
         [
           "Start with the open invoices — the ones with no payment date — and measure how long each has been outstanding as of ",
@@ -97,7 +104,12 @@ JOIN accounts a ON a.account_id = i.account_id
         {
           id: "columns",
           name: "Returns invoice_id, company, amount and days_outstanding",
-          expectedColumns: ["invoice_id", "company", "amount", "days_outstanding"],
+          expectedColumns: [
+            "invoice_id",
+            "company",
+            "amount",
+            "days_outstanding",
+          ],
         },
         {
           id: "rowcount",
@@ -116,6 +128,13 @@ JOIN accounts a ON a.account_id = i.account_id
     {
       title: "Put each one in a band",
       short: "Bands",
+      solutionNote: [
+        "The boundaries are a business decision, not a technical one, which is why they belong in one visible ",
+        { code: "CASE" },
+        " rather than scattered across three queries. Note the order of the branches: ",
+        { code: "CASE" },
+        " takes the first match, so the 0-30 test has to come before the 31-60 one or everything lands in the first bucket that is true.",
+      ],
       prompt: [
         [
           "Add a ",
@@ -171,6 +190,11 @@ JOIN accounts a ON a.account_id = i.account_id
     {
       title: "Total each band",
       short: "Summary",
+      solutionNote: [
+        "The 60+ band is missing from the result, and that is correct rather than a bug: a ",
+        { code: "GROUP BY" },
+        " can only return values the data contains. If the report needs every band present at zero, the bands have to come from somewhere other than the invoices, the same way a date spine works.",
+      ],
       prompt: [
         "Now the report itself: one row per band, with how many invoices are in it and how much they add up to. Round the total to 2 decimal places.",
         [
@@ -202,7 +226,8 @@ ORDER BY bucket`,
         {
           id: "rowcount",
           name: "Two bands have invoices in them",
-          description: "Nothing is more than 60 days old, so that band is absent.",
+          description:
+            "Nothing is more than 60 days old, so that band is absent.",
           expectedRowCount: 2,
         },
         {
@@ -244,7 +269,7 @@ const RETENTION_BY_PLAN = sqlSteps(
     solutionNote: [
       "Two tricks carry the whole report. ",
       { code: "COALESCE(ended_on, '" + AS_OF + "')" },
-      " lets a subscription that has not ended still have a length, so your best customers are not silently excluded. And turning \"has it ended\" into a 1-or-0 column means the churn rate is just ",
+      ' lets a subscription that has not ended still have a length, so your best customers are not silently excluded. And turning "has it ended" into a 1-or-0 column means the churn rate is just ',
       { code: "AVG" },
       " of that flag — no second query, no self join.",
     ],
@@ -253,6 +278,10 @@ const RETENTION_BY_PLAN = sqlSteps(
     {
       title: "Measure every subscription",
       short: "Spans",
+      solutionNote: [
+        { code: "COALESCE(ended_on, …)" },
+        " is what lets a subscription that has not ended still have a length. Without it your longest-running customers contribute NULL and vanish from the averages, which biases the number downward exactly where it matters most.",
+      ],
       prompt: [
         [
           "For each subscription, work out how many days it has run and whether it has ended. A subscription still running counts up to ",
@@ -285,7 +314,8 @@ JOIN plans p ON p.plan_id = s.plan_id
         {
           id: "rowcount",
           name: "All fourteen subscriptions",
-          description: "The open ones must not drop out for lacking an end date.",
+          description:
+            "The open ones must not drop out for lacking an end date.",
           expectedRowCount: 14,
         },
         {
@@ -299,6 +329,11 @@ JOIN plans p ON p.plan_id = s.plan_id
     {
       title: "Average by plan",
       short: "Average",
+      solutionNote: [
+        "Rolling the subscriptions up to their plans is an ordinary ",
+        { code: "GROUP BY" },
+        ", and the only thing worth watching is that the average is over subscriptions rather than accounts — an account that switched plans is counted once on each.",
+      ],
       prompt: [
         "Roll the subscriptions up to their plans: how many there have been, and how long they last on average. Round the average to 1 decimal place.",
         "Longest-lived plan first.",
@@ -339,6 +374,11 @@ ORDER BY avg_days DESC`,
     {
       title: "Add the churn rate",
       short: "Churn",
+      solutionNote: [
+        "Because ",
+        { code: "churned" },
+        " is a 1 or a 0, the churn rate is just its average, and summing it counts the churned ones. Turning a yes/no into a number at the point you compute it is what keeps the summary a single pass with no self join.",
+      ],
       prompt: [
         [
           "Add ",
@@ -375,7 +415,12 @@ ORDER BY churn_pct DESC, plan_name`,
         {
           id: "columns",
           name: "Adds a churn_pct column",
-          expectedColumns: ["plan_name", "subscriptions", "avg_days", "churn_pct"],
+          expectedColumns: [
+            "plan_name",
+            "subscriptions",
+            "avg_days",
+            "churn_pct",
+          ],
         },
         {
           id: "rowcount",
@@ -430,6 +475,13 @@ const PLAN_MIX = sqlSteps(
     {
       title: "Customers per plan",
       short: "Count",
+      solutionNote: [
+        "The ",
+        { code: "IS NULL" },
+        " filter is doing the real work: without it this counts every subscription that has ever existed and calls it the current mix. Grouping by ",
+        { code: "plan_id" },
+        " as well as the name keeps two plans that share a name apart.",
+      ],
       prompt: [
         "Count how many live subscriptions each plan has. A subscription that has ended is not on a plan any more.",
         "Most popular plan first, ties by name.",
@@ -465,6 +517,10 @@ JOIN plans p ON p.plan_id = s.plan_id
     {
       title: "Share of customers",
       short: "Share",
+      solutionNote: [
+        { code: "SUM(active) OVER ()" },
+        " — an empty window — is the total on every row, so the share needs no second query and no join back to a totals subquery. It is the cheapest window function there is.",
+      ],
       prompt: [
         [
           "Add ",
@@ -515,6 +571,9 @@ ORDER BY active DESC, plan_name`,
     {
       title: "Share of revenue",
       short: "Revenue",
+      solutionNote: [
+        "This is the step with the lesson in it: the plan with the most customers is not the plan with the most revenue. Two windows in one query give you both shares at once, and reading them side by side is what makes the mix legible rather than just counted.",
+      ],
       prompt: [
         [
           "Now add what each plan actually earns: ",

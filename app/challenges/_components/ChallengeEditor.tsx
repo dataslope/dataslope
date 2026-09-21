@@ -64,22 +64,48 @@ export function ChallengeEditor({
   /** Changes when the learner moves to a different step or language. */
   taskKey,
   readOnly,
+  label,
+  onSubmit,
+  onRun,
 }: {
   value: string;
   language: CodeLanguage;
   onChange: (next: string) => void;
   taskKey: string;
   readOnly?: boolean;
+  /** Accessible name, e.g. "SQL editor". A bare textbox announces as nothing. */
+  label: string;
+  /** Mod-Enter, matching `<ChallengeCard>`'s binding on the lesson pages. */
+  onSubmit?: () => void;
+  /** Mod-Shift-Enter: run without grading. */
+  onRun?: () => void;
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const languageComp = useRef(new Compartment());
   const readOnlyComp = useRef(new Compartment());
-  // Held in a ref so the update listener never closes over a stale callback.
+  /**
+   * Holds `indentWithTab`, so Escape can take it back out.
+   *
+   * `indentWithTab` on its own is a WCAG 2.1.2 keyboard trap: Tab indents
+   * instead of moving focus, and a keyboard-only learner who tabs in can never
+   * reach Run, Submit or the result tabs again. Escape empties this
+   * compartment so the next Tab does the ordinary browser thing, and focusing
+   * the editor again re-arms it — so Tab still indents for everyone who wants
+   * it to.
+   */
+  const tabComp = useRef(new Compartment());
+  /** The accessible name, which follows the language the learner picked. */
+  const labelComp = useRef(new Compartment());
+  // Held in refs so the keymap never closes over a stale callback.
   const onChangeRef = useRef(onChange);
+  const onSubmitRef = useRef(onSubmit);
+  const onRunRef = useRef(onRun);
   useEffect(() => {
     onChangeRef.current = onChange;
-  }, [onChange]);
+    onSubmitRef.current = onSubmit;
+    onRunRef.current = onRun;
+  }, [onChange, onRun, onSubmit]);
   // The text this component last pushed into the view, so an echo of our own
   // change never dispatches a redundant transaction.
   const lastPushed = useRef(value);
@@ -101,12 +127,51 @@ export function ChallengeEditor({
         closeBrackets(),
         EditorView.lineWrapping,
         keymap.of([
+          {
+            // Mirrors the split button's default on `<ChallengeCard>`: submit
+            // is the primary action, so it gets the primary chord.
+            key: "Mod-Enter",
+            run: () => {
+              onSubmitRef.current?.();
+              return true;
+            },
+          },
+          {
+            key: "Mod-Shift-Enter",
+            run: () => {
+              onRunRef.current?.();
+              return true;
+            },
+          },
+          {
+            // Release Tab so the next one leaves the editor. Returning true
+            // stops Escape bubbling, which is what we want: nothing above the
+            // editor uses it.
+            key: "Escape",
+            run: (view) => {
+              view.dispatch({ effects: tabComp.current.reconfigure([]) });
+              return true;
+            },
+          },
           ...closeBracketsKeymap,
           ...defaultKeymap,
           ...historyKeymap,
           ...redoKeymap,
-          indentWithTab,
         ]),
+        tabComp.current.of(keymap.of([indentWithTab])),
+        // Re-arm Tab whenever the editor is entered again, so Escape releases
+        // it for one exit rather than switching it off for the session.
+        EditorView.domEventHandlers({
+          focus: (_event, view) => {
+            view.dispatch({
+              effects: tabComp.current.reconfigure(keymap.of([indentWithTab])),
+            });
+            return false;
+          },
+        }),
+        labelComp.current.of(
+          EditorView.contentAttributes.of({ "aria-label": label }),
+        ),
         languageComp.current.of([]),
         readOnlyComp.current.of([]),
         // The workspace is light-only, like the playground shells.
@@ -150,6 +215,14 @@ export function ChallengeEditor({
       cancelled = true;
     };
   }, [language]);
+
+  useEffect(() => {
+    viewRef.current?.dispatch({
+      effects: labelComp.current.reconfigure(
+        EditorView.contentAttributes.of({ "aria-label": label }),
+      ),
+    });
+  }, [label]);
 
   useEffect(() => {
     viewRef.current?.dispatch({

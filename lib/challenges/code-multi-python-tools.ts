@@ -51,6 +51,9 @@ const MARKDOWN_TABLE = codeSteps(
     {
       title: "Measure the columns",
       short: "Widths",
+      solutionNote: [
+        "You cannot pad a cell until you know the widest value below it, which means a full pass over the data before a single character of output. That is why a terminal table renderer buffers its input instead of streaming it, and why this has to be its own step.",
+      ],
       signature: "def column_widths(rows: list[list[str]]) -> list[int]",
       prompt: [
         "Before anything can be aligned, you need to know how wide each column has to be: the length of the longest cell in it.",
@@ -97,6 +100,12 @@ assert got == [6, 1], f"got {got}"`,
     {
       title: "Render one row",
       short: "Row",
+      solutionNote: [
+        { code: "zip(cells, widths)" },
+        " pairs each cell with its column and stops at the shorter list, so a row with fewer cells renders short rather than raising. ",
+        { code: "ljust" },
+        " leaves a cell already at full width untouched, which is what makes the exact-fit case free.",
+      ],
       signature: "def render_row(cells: list[str], widths: list[int]) -> str",
       prompt: [
         [
@@ -156,6 +165,11 @@ assert got == "|    | x |", f"got {got!r}"`,
     {
       title: "Assemble the table",
       short: "Table",
+      solutionNote: [
+        "Rendering the separator through the same ",
+        { code: "render_row" },
+        " as every other line is what guarantees the pipes line up. Building it as its own string with its own spacing is where hand-written table renderers drift by one character and stop being tables.",
+      ],
       signature: "def render_table(rows: list[list[str]]) -> list[str]",
       prompt: [
         "Put it together: the first row is the header, then a separator row of dashes, then the rest.",
@@ -282,6 +296,13 @@ const ROMAN_NUMERALS = codeSteps(
     {
       title: "Number to numeral",
       short: "Encode",
+      solutionNote: [
+        "Putting the subtractive pairs into the value table as if they were ordinary symbols is what removes every special case: a plain greedy loop then produces ",
+        { code: "CM" },
+        " and ",
+        { code: "IV" },
+        " without knowing they are special. The table is the algorithm; the loop is three lines.",
+      ],
       signature: "def to_roman(n: int) -> str",
       prompt: [
         [
@@ -348,6 +369,9 @@ assert to_roman(3999) == "MMMCMXCIX", f"got {to_roman(3999)!r}"`,
     {
       title: "Numeral to number",
       short: "Decode",
+      solutionNote: [
+        "One rule — subtract when a symbol is worth less than the one after it — covers every subtractive pair without listing any of them. Looking ahead rather than behind is what keeps it a single forward pass.",
+      ],
       signature: "def from_roman(text: str) -> int",
       prompt: [
         [
@@ -408,6 +432,13 @@ assert from_roman("LVIII") == 58`,
     {
       title: "Reject bad numerals",
       short: "Validate",
+      solutionNote: [
+        "Round-tripping is the whole validator: exactly one spelling of each number survives ",
+        { code: "from_roman" },
+        " then ",
+        { code: "to_roman" },
+        ", so anything that comes back different was not canonical. It is far shorter than the regular expression that encodes the same rules, and it cannot disagree with the encoder.",
+      ],
       signature: "def is_valid_roman(text: str) -> bool",
       prompt: [
         [
@@ -512,6 +543,9 @@ const INVENTORY_DIFF = codeSteps(
     {
       title: "Count what is there",
       short: "Tally",
+      solutionNote: [
+        "An empty list tallying to an empty dictionary, rather than to zeros for every item you might have seen, is what keeps this composable: the tally describes what is there, and step 2 is where absence gets a meaning.",
+      ],
       signature: "def tally(items: list[str]) -> dict[str, int]",
       prompt: [
         "Turn a list of item names into a count per name. An item appearing three times counts as three.",
@@ -552,7 +586,13 @@ assert got == {"apple": 2, "pear": 1}, f"got {got}"`,
     {
       title: "Work out what moved",
       short: "Deltas",
-      signature: "def deltas(before: list[str], after: list[str]) -> list[list]",
+      solutionNote: [
+        "Taking the union of both sets of keys is what stops an item that disappeared entirely from being missed — iterating the new tally alone would never mention it. Comparing tallies rather than lists is also what makes this work on quantities: a set difference would say ",
+        { code: "apple" },
+        " is in both and stop there.",
+      ],
+      signature:
+        "def deltas(before: list[str], after: list[str]) -> list[list]",
       prompt: [
         [
           "Compare two stock counts and return ",
@@ -612,6 +652,9 @@ assert got == [["a", 1], ["z", 1]], f"got {got}"`,
     {
       title: "Write it up",
       short: "Report",
+      solutionNote: [
+        "Formatting is deliberately the last step and knows nothing about tallies. That separation is why changing the output to JSON, or to a table, touches one function rather than three.",
+      ],
       signature: "def report(before: list[str], after: list[str]) -> list[str]",
       prompt: [
         [
@@ -720,6 +763,9 @@ const GRAPH_SEARCH = codeSteps(
     {
       title: "Build the adjacency map",
       short: "Adjacency",
+      solutionNote: [
+        "Seeding the map from the node list rather than from the edges is what keeps an isolated node visible; building it from edges alone silently drops anyone with no connections. Adding both directions is what makes the graph undirected — the data only stores each edge once.",
+      ],
       signature:
         "def build_adjacency(nodes: list[str], edges: list[list[str]]) -> dict[str, list[str]]",
       prompt: [
@@ -769,6 +815,11 @@ assert got == {"a": [], "lonely": []}, f"got {got}"`,
     {
       title: "Find what is reachable",
       short: "Reachable",
+      solutionNote: [
+        "Marking a node as seen when it is ",
+        { code: "queued" },
+        " rather than when it is dequeued is the detail that matters: the other way round, a node with several neighbours gets queued repeatedly and on a dense graph the queue explodes. It is also what makes a cycle terminate rather than loop.",
+      ],
       signature:
         "def reachable(nodes: list[str], edges: list[list[str]], start: str) -> list[str]",
       prompt: [
@@ -830,6 +881,11 @@ assert got == ["a", "b", "c"], f"got {got}"`,
     {
       title: "Measure the shortest path",
       short: "Distance",
+      solutionNote: [
+        "Breadth-first search reaches every node by its shortest route, so carrying a distance alongside the queue is enough — there is never a need to compare two paths. A depth-first walk would find ",
+        { code: "a" },
+        " path and cheerfully report the wrong length.",
+      ],
       signature:
         "def shortest_path_length(nodes: list[str], edges: list[list[str]], start: str, goal: str) -> int",
       prompt: [

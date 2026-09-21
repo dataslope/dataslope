@@ -287,11 +287,19 @@ export function useChallengeRunner(challenge: Challenge) {
         });
       }
 
+      // A challenge starter defines a function and calls nothing, so Run on a
+      // fresh buffer produces nothing and reads as a broken button. Say what
+      // happened and what the two buttons are actually for.
+      const emptyRunHint =
+        mode === "run"
+          ? "(no output)\n\nYour code ran, but nothing printed. The starter defines a function without calling it.\nAdd a call to see a value, or press Submit to run the checks."
+          : "(no output)";
+
       return {
         mode,
         output: {
           kind: "stdio",
-          stdout: stdout || "(no output)",
+          stdout: stdout || emptyRunHint,
           stderr: stderr || undefined,
           footer: [stderr ? "exited with errors" : "exit 0", formatElapsed(elapsedMs)],
         },

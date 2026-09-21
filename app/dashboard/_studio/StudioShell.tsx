@@ -155,11 +155,14 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
           onToggleSidebar={toggleSidebar}
           isPhone={isPhone}
         />
-        <div className="flex-1 overflow-y-auto">
+        {/* The site-wide "Skip to main content" link targets #main, and the
+            studio shell had neither the id nor a <main> landmark — so the
+            skip link was focusable and did nothing on every dashboard page. */}
+        <main id="main" className="flex-1 overflow-y-auto">
           <div className="mx-auto max-w-[1280px] px-3.5 pb-16 pt-3.5 sm:px-4 sm:pb-[72px] sm:pt-[18px] min-[900px]:px-8 min-[900px]:pb-24 min-[900px]:pt-7">
             {children}
           </div>
-        </div>
+        </main>
       </div>
 
       {/* AI assist panel (builder routes only, when opened) */}

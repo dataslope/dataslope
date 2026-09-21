@@ -15,8 +15,9 @@
  * far too few to justify a round trip, and it keeps the page static.
  */
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ChevronDown, Circle, CircleCheckBig, Search, X } from "lucide-react";
 import { LangIcon } from "@/app/_components/languageIcons";
 import { statusOf } from "@/lib/challenges/progress";
@@ -125,8 +126,6 @@ interface Filters {
   format: string;
 }
 
-const EMPTY: Filters = { q: "", status: "", lang: "", level: "", format: "" };
-
 type ResolvedEntry = ChallengeIndexEntry & { status: ChallengeStatus };
 
 function matches(entry: ResolvedEntry, f: Filters): boolean {
@@ -174,13 +173,75 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
     [entries, progress],
   );
 
-  const [filters, setFilters] = useState<Filters>(EMPTY);
-  const [page, setPage] = useState(1);
+  // Filters and the page live in the query string rather than in component
+  // state, so a filtered view can be linked and bookmarked, Back undoes a
+  // filter, and a refresh keeps it. The page stays static: this is a client
+  // component reading `useSearchParams`, not a server round trip.
+  const router = useRouter();
+  const pathname = usePathname() ?? "/dashboard/challenges";
+  const params = useSearchParams();
 
-  const set = <K extends keyof Filters>(key: K) => (value: string) => {
-    setFilters((f) => ({ ...f, [key]: value }));
-    setPage(1);
-  };
+  const filters: Filters = useMemo(
+    () => ({
+      q: params?.get("q") ?? "",
+      status: params?.get("status") ?? "",
+      lang: params?.get("lang") ?? "",
+      level: params?.get("level") ?? "",
+      format: params?.get("format") ?? "",
+    }),
+    [params],
+  );
+  const page = Math.max(1, Number(params?.get("page") ?? 1) || 1);
+
+  /**
+   * The state the last write asked for, which is not the same thing as the
+   * state currently rendered.
+   *
+   * A router navigation lands asynchronously, so two clicks in quick
+   * succession would both read the pre-navigation page out of the render
+   * closure — and the second would recompute the same target, swallowing a
+   * page. Writing here synchronously means the second click builds on what
+   * the first asked for. The effect keeps it honest when the URL changes from
+   * somewhere else, which is what Back and forward do.
+   */
+  const requested = useRef({ ...filters, page });
+  useEffect(() => {
+    requested.current = { ...filters, page };
+  }, [filters, page]);
+
+  /**
+   * Rewrite the query string. Empty values are dropped rather than written as
+   * `?q=`, so a cleared filter leaves a clean URL. `replace` rather than
+   * `push`, so paging does not bury the page the learner arrived from under
+   * ten history entries.
+   */
+  const apply = useCallback(
+    (next: Partial<Filters & { page: number }>) => {
+      const merged = { ...requested.current, ...next };
+      requested.current = merged;
+      const query = new URLSearchParams();
+      for (const key of ["q", "status", "lang", "level", "format"] as const) {
+        if (merged[key]) query.set(key, merged[key]);
+      }
+      if (merged.page > 1) query.set("page", String(merged.page));
+      const qs = query.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    },
+    [pathname, router],
+  );
+
+  const set =
+    <K extends keyof Filters>(key: K) =>
+    (value: string) => {
+      // Any filter change resets to page 1: page 7 of a 43-row result is
+      // usually nowhere.
+      apply({ [key]: value, page: 1 } as Partial<Filters> & { page: number });
+    };
+  const setPage = useCallback((next: number) => apply({ page: next }), [apply]);
+  const clearFilters = useCallback(() => {
+    requested.current = { q: "", status: "", lang: "", level: "", format: "", page: 1 };
+    router.replace(pathname, { scroll: false });
+  }, [pathname, router]);
 
   const filtered = useMemo(() => all.filter((e) => matches(e, filters)), [all, filters]);
   const total = filtered.length;
@@ -190,7 +251,7 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
   const start = (current - 1) * PAGE_SIZE;
   const rows = filtered.slice(start, start + PAGE_SIZE);
 
-  const solved = all.filter((e) => e.status === "solved").length;
+  const solvedInView = filtered.filter((e) => e.status === "solved").length;
   const hasFilters = Object.values(filters).some(Boolean);
 
   return (
@@ -257,10 +318,7 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
         {hasFilters ? (
           <button
             type="button"
-            onClick={() => {
-              setFilters(EMPTY);
-              setPage(1);
-            }}
+            onClick={clearFilters}
             className="ds-btn-chip"
           >
             <X size={12} aria-hidden="true" />
@@ -269,12 +327,15 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
         ) : null}
 
         <span className="flex-1" />
+        {/* Scoped to whatever is filtered, because it sits in the same row
+            as "1-10 of 43" and two different totals there read as a bug. */}
         <span
           className="inline-flex items-center gap-2 whitespace-nowrap text-[13px]"
           style={{ color: "var(--muted)" }}
         >
           <CircleCheckBig size={15} aria-hidden="true" style={{ color: "var(--green-text)" }} />
-          {solved} of {all.length} solved
+          {solvedInView} of {total} solved
+          {hasFilters ? <span className="sr-only"> in the current filter</span> : null}
         </span>
       </div>
 
@@ -286,10 +347,7 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
           No challenges match.{" "}
           <button
             type="button"
-            onClick={() => {
-              setFilters(EMPTY);
-              setPage(1);
-            }}
+            onClick={clearFilters}
             className="border-0 bg-transparent p-0 text-sm font-medium underline underline-offset-2"
             style={{ color: "var(--green-text)" }}
           >
@@ -299,8 +357,20 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
         </p>
       ) : (
         <>
+          {/* Narrow viewports get stacked cards, not a 576px table scrolling
+              sideways with its last columns off-screen and nothing saying so.
+              The switch is at 900px rather than a smaller breakpoint because
+              the studio sidebar takes ~300px: at an 800px viewport the content
+              column is still too narrow for five columns, which is where the
+              Format column was being clipped. Same rows, same order. */}
+          <ul className="mt-5 flex list-none flex-col gap-2 p-0 min-[900px]:hidden">
+            {rows.map((entry) => (
+              <MobileRow key={entry.slug} entry={entry} />
+            ))}
+          </ul>
+
           <div
-            className="mt-5 overflow-hidden rounded-[10px]"
+            className="mt-5 hidden overflow-hidden rounded-[10px] min-[900px]:block"
             style={{ border: "1px solid var(--divider)" }}
           >
             <div className="overflow-x-auto">
@@ -389,10 +459,69 @@ function Th({ children, className = "" }: { children?: React.ReactNode; classNam
   );
 }
 
+/**
+ * One challenge as a card, for viewports too narrow for five columns.
+ *
+ * Level, language and format collapse into a single metadata line under the
+ * title — the same facts the table's last three columns carry, in the order
+ * the table shows them.
+ */
+function MobileRow({ entry }: { entry: ResolvedEntry }) {
+  return (
+    <li
+      className="rounded-[10px] p-3"
+      style={{ border: "1px solid var(--divider)" }}
+    >
+      <Link
+        href={`/challenges/${entry.slug}`}
+        className="flex items-start gap-2.5 text-inherit no-underline"
+      >
+        <span className="mt-0.5 shrink-0">
+          <StatusIcon status={entry.status} />
+        </span>
+        <span className="flex min-w-0 flex-col gap-1">
+          <span
+            className="text-sm font-medium leading-tight"
+            style={{ color: "var(--ink)" }}
+          >
+            {entry.title}
+          </span>
+          <span className="text-[12.5px]" style={{ color: "var(--muted)" }}>
+            {entry.topic}
+          </span>
+          <span
+            className="mt-0.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[12px]"
+            style={{ color: "var(--text)" }}
+          >
+            <span className="inline-flex items-center gap-1.5">
+              <LevelBars level={entry.level} />
+              {LEVELS[entry.level - 1]}
+            </span>
+            <span aria-hidden="true" style={{ color: "var(--faint)" }}>
+              ·
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <LangIcon id={entry.langs[0]} size={13} />
+              {entry.langs.map((l) => INDEX_LANGUAGE_LABELS[l]).join(", ")}
+            </span>
+            <span aria-hidden="true" style={{ color: "var(--faint)" }}>
+              ·
+            </span>
+            <span>{entry.steps > 1 ? `${entry.steps} steps` : "Single step"}</span>
+          </span>
+        </span>
+      </Link>
+    </li>
+  );
+}
+
 function Row({ entry }: { entry: ResolvedEntry }) {
   const lang = entry.langs[0];
   const more = entry.langs.length - 1;
   return (
+    // `.ds-challenge-row` in studio.css makes the row the containing block
+    // and stretches the title link's ::after across it, so the whole row is
+    // the hit area — matching the full-width hover.
     <tr
       className="ds-challenge-row"
       data-clickable="true"
@@ -404,12 +533,14 @@ function Row({ entry }: { entry: ResolvedEntry }) {
       <td className="p-3 align-middle">
         <Link
           href={`/challenges/${entry.slug}`}
-          className="flex flex-col gap-0.5 text-inherit no-underline"
+          className="ds-row-link flex flex-col gap-0.5 text-inherit no-underline"
         >
           <span className="text-sm font-medium leading-tight" style={{ color: "var(--ink)" }}>
             {entry.title}
           </span>
-          <span className="text-[12.5px]" style={{ color: "var(--faint)" }}>
+          {/* --muted, not --faint: the topic is the only place a challenge's
+              subject appears, and --faint is 2.42:1 on white. */}
+          <span className="text-[12.5px]" style={{ color: "var(--muted)" }}>
             {entry.topic}
           </span>
         </Link>
@@ -444,7 +575,9 @@ function Row({ entry }: { entry: ResolvedEntry }) {
       <td className="whitespace-nowrap p-3 align-middle">
         <span
           className="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold"
-          style={{ background: "var(--chip-bg)", color: "var(--muted)" }}
+          // 11px bold does not qualify as large text, so this needs the full
+          // 4.5:1 rather than --muted's 4.17:1 against the chip.
+          style={{ background: "var(--chip-bg)", color: "var(--text)" }}
         >
           {entry.steps > 1 ? `${entry.steps} steps` : "Single step"}
         </span>

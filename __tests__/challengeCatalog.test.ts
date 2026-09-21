@@ -127,6 +127,26 @@ describe("challenge catalog", () => {
     }
   });
 
+  /**
+   * A multi-step challenge's `solutionNote` is about the build as a whole, so
+   * falling back to it on every step puts the wrong explanation beside two of
+   * every three reference solutions. Each step explains its own answer.
+   */
+  it("explains every step's reference solution separately", () => {
+    for (const slug of SLUGS.filter((s) => isMultiStep(getChallenge(s)!))) {
+      const challenge = getChallenge(slug)!;
+      const notes = new Set<string>();
+      for (const step of challenge.steps) {
+        const note = step.solutionNote;
+        expect(note?.length, `${slug}/${step.n}: no solution note`).toBeGreaterThan(0);
+        notes.add(JSON.stringify(note));
+      }
+      expect(notes.size, `${slug}: steps share a solution note`).toBe(
+        challenge.steps.length,
+      );
+    }
+  });
+
   it("numbers multi-step challenges in order, and gates them", () => {
     for (const slug of SLUGS.filter((s) => isMultiStep(getChallenge(s)!))) {
       const challenge = getChallenge(slug)!;

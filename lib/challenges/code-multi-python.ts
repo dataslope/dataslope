@@ -51,6 +51,9 @@ const WORD_FREQUENCY_PIPELINE = codeSteps(
     {
       title: "Split text into words",
       short: "Tokenize",
+      solutionNote: [
+        "Lowercasing before the match rather than after is what keeps the pattern to a single character class. The regular expression is also the specification: it says a word is letters and nothing else, so digits and apostrophes are separators by definition rather than by accident.",
+      ],
       signature: "def tokenize(text: str) -> list[str]",
       prompt: [
         [
@@ -104,6 +107,12 @@ assert tokenize("... !!!") == []`,
     {
       title: "Count the words",
       short: "Count",
+      solutionNote: [
+        { code: "counts.get(word, 0) + 1" },
+        " is the idiom worth internalising — it handles the first sighting of a word without a membership test. ",
+        { code: "collections.Counter" },
+        " does the same thing in one call, and is what you would reach for outside an exercise.",
+      ],
       signature: "def count_words(text: str) -> dict[str, int]",
       prompt: [
         [
@@ -153,6 +162,11 @@ assert got == {"the": 3, "cat": 1, "hat": 1}, f"got {got}"`,
     {
       title: "Format the report",
       short: "Report",
+      solutionNote: [
+        "Sorting by a tuple is what makes the tiebreak part of the key rather than a second pass: ",
+        { code: "(-counts[word], word)" },
+        ' reads as "most frequent first, then alphabetical". Negating the count is the trick that gets a descending sort out of an ascending one without sorting twice.',
+      ],
       signature: "def report(text: str, n: int) -> list[str]",
       prompt: [
         [
@@ -260,6 +274,14 @@ const CSV_REPORT_BUILDER = codeSteps(
     {
       title: "Parse the rows",
       short: "Parse",
+      solutionNote: [
+        { code: "zip(header, cells)" },
+        " pairs the two lists positionally and stops at the shorter one, which is why a short row loses its trailing fields rather than raising. Parsing into dictionaries first is what makes step 2 readable: ",
+        { code: 'record["category"]' },
+        " says what it means where ",
+        { code: "cells[2]" },
+        " does not.",
+      ],
       signature: "def parse(rows: list[str]) -> list[dict]",
       prompt: [
         "The first line is the header. Turn every line after it into a dictionary keyed by the header's column names.",
@@ -308,6 +330,9 @@ assert got == [{"a": "1", "b": "2"}], f"got {got}"`,
     {
       title: "Total one column by another",
       short: "Total",
+      solutionNote: [
+        "This is a GROUP BY written by hand, and the shape is the same one SQL uses: one entry per distinct group, each holding a running total. Guarding the blank cell before converting it is what keeps a real-world CSV from raising halfway through the file.",
+      ],
       signature:
         "def total_by(records: list[dict], group_col: str, value_col: str) -> dict[str, float]",
       prompt: [
@@ -361,6 +386,12 @@ assert total_by(records, "g", "v") == {"a": 0.3}, f"got {total_by(records, 'g', 
     {
       title: "Format the report",
       short: "Report",
+      solutionNote: [
+        { code: 'format(total, ".2f")' },
+        " rather than ",
+        { code: "str(total)" },
+        ' is what stops a total of 10.0 printing as "10.0" in a column of two-decimal money. Composing the three functions rather than reimplementing them is the point of having split them.',
+      ],
       signature:
         "def report(rows: list[str], group_col: str, value_col: str) -> list[str]",
       prompt: [
@@ -480,6 +511,11 @@ const RPN_CALCULATOR = codeSteps(
     {
       title: "Tokenize the expression",
       short: "Tokenize",
+      solutionNote: [
+        "Checking for an exact match against the operator list, rather than testing the first character, is what keeps ",
+        { code: '"-2"' },
+        " a number. It is the kind of shortcut that works on every input you think of and fails on the first negative literal.",
+      ],
       signature: "def tokenize(expression: str) -> list",
       prompt: [
         [
@@ -533,6 +569,13 @@ assert tokenize("   ") == []`,
     {
       title: "Evaluate with a stack",
       short: "Evaluate",
+      solutionNote: [
+        "Postfix needs no precedence rules and no parentheses, which is why a stack is all it takes. The ordering trap is subtraction and division: the first value popped is the ",
+        { code: "right" },
+        " operand, so popping into ",
+        { code: "left" },
+        " first computes the expression backwards.",
+      ],
       signature: "def evaluate(expression: str)",
       prompt: [
         [
@@ -595,6 +638,13 @@ def evaluate(expression: str):
     {
       title: "Reject malformed input",
       short: "Errors",
+      solutionNote: [
+        "Every bad expression leaving as the same exception type is what makes this usable by a caller. A stray ",
+        { code: "IndexError" },
+        " from an empty stack or a ",
+        { code: "ZeroDivisionError" },
+        " from the divide are implementation details leaking out — the caller cannot reasonably be asked to catch them.",
+      ],
       signature: "def evaluate(expression: str)",
       prompt: [
         [
@@ -733,6 +783,11 @@ const BINARY_SEARCH_TREE = codeSteps(
     {
       title: "Insert a value",
       short: "Insert",
+      solutionNote: [
+        "Returning the node rather than mutating in place is what makes the empty case work: inserting into ",
+        { code: "None" },
+        " has nothing to attach to, so the new node has to travel back up to whoever called. That single decision removes every special case around the root.",
+      ],
       signature: "def insert(node: dict | None, value: int) -> dict",
       prompt: [
         [
@@ -788,6 +843,9 @@ assert root["left"] is None and root["right"] is None, f"got {root}"`,
     {
       title: "Look a value up",
       short: "Contains",
+      solutionNote: [
+        "The same comparison that decided where to put a value decides where to look for it, so only one branch is ever searched. That is the entire value of the tree: on a balanced one it is O(log n), and on the degenerate tree that inserting sorted data produces it degrades to a linked list.",
+      ],
       signature: "def contains(node: dict | None, value: int) -> bool",
       prompt: [
         [
@@ -844,6 +902,11 @@ assert contains(root, 100) is False`,
     {
       title: "Read the tree back sorted",
       short: "Traverse",
+      solutionNote: [
+        "Left, then the node, then right. Because everything on the left is smaller and everything on the right is larger, that walk produces the values in ascending order — sorted output with no call to ",
+        { code: "sorted" },
+        " anywhere, which is the invariant paying for itself.",
+      ],
       signature: "def in_order(node: dict | None) -> list[int]",
       prompt: [
         [
@@ -962,7 +1025,13 @@ const LRU_CACHE = codeSteps(
     {
       title: "Store and fetch",
       short: "Store",
-      signature: "class LRUCache:  # __init__(capacity), get(key), put(key, value)",
+      solutionNote: [
+        "Returning ",
+        { code: "-1" },
+        " for a miss rather than raising is a deliberate interface choice: a cache miss is an ordinary outcome, not an error, and a caller that has to wrap every read in a try block will eventually stop checking.",
+      ],
+      signature:
+        "class LRUCache:  # __init__(capacity), get(key), put(key, value)",
       prompt: [
         [
           "Start with the plain map. ",
@@ -1024,6 +1093,11 @@ assert [cache.get(k) for k in "abc"] == [1, 2, 3]`,
     {
       title: "Evict the oldest",
       short: "Evict",
+      solutionNote: [
+        "A Python dictionary preserves insertion order, which is most of an LRU for free — the oldest key is the first one ",
+        { code: "iter" },
+        " yields. Deleting before re-inserting an existing key is what moves it to the back; assigning to it in place leaves the order untouched.",
+      ],
       signature: "def put(self, key, value) -> None",
       prompt: [
         [
@@ -1085,6 +1159,9 @@ assert cache.get("b") == 2`,
     {
       title: "A read counts as use",
       short: "Refresh",
+      solutionNote: [
+        "This one line is the whole difference between a FIFO cache and an LRU one. Refreshing on reads as well as writes is what lets a hot key survive indefinitely, no matter how long ago it was first stored — which is the behaviour anyone asking for an LRU actually wants.",
+      ],
       signature: "def get(self, key)",
       prompt: [
         [
@@ -1213,6 +1290,11 @@ const LOG_LEVEL_SUMMARY = codeSteps(
     {
       title: "Parse one line",
       short: "Parse",
+      solutionNote: [
+        "Returning ",
+        { code: "None" },
+        " for a line that does not fit, rather than raising, is what lets the caller skip junk and keep going — a real log file always has a truncated last line or a stack trace in the middle. Capping the split at four pieces is what keeps the message's own spaces.",
+      ],
       signature: "def parse_line(line: str) -> dict | None",
       prompt: [
         [
@@ -1276,6 +1358,11 @@ assert parse_line("") is None`,
     {
       title: "Count the levels",
       short: "Count",
+      solutionNote: [
+        "Skipping the unparseable lines here rather than filtering them earlier keeps the two functions independent: ",
+        { code: "parse_line" },
+        " decides what a line means, and this decides what to do about the ones that mean nothing.",
+      ],
       signature: "def count_levels(lines: list[str]) -> dict[str, int]",
       prompt: [
         [
@@ -1328,6 +1415,9 @@ assert got == {"WARN": 1}, f"got {got}"`,
     {
       title: "Format the summary",
       short: "Summary",
+      solutionNote: [
+        "Absent levels stay absent rather than appearing at zero, which is the right default for a log summary — a report that lists DEBUG: 0 on a service that has never logged a debug line is noise. Sorting by count then name is what keeps the output stable between runs.",
+      ],
       signature: "def summary(lines: list[str]) -> list[str]",
       prompt: [
         [

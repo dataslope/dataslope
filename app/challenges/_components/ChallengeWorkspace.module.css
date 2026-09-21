@@ -40,6 +40,8 @@
   --cw-ink: #121212;
   --cw-ink-hover: #2a2a2a;
   --cw-accent: var(--ds-blue-500);
+  /* The designed focus ring, replacing Chrome's default blue outline. */
+  --cw-focus: var(--ds-blue-600);
   --cw-accent-link: var(--ds-blue-700);
   --cw-accent-link-hover: var(--ds-blue-800);
   --cw-accent-tint: var(--ds-blue-50);
@@ -259,6 +261,30 @@
 .ghostBtn:hover {
   color: var(--cw-ink);
   background: var(--cw-bg-hover);
+}
+
+/* Replaces Reset for as long as a discarded draft is still recoverable, so
+   the recovery sits exactly where the mistake was made. */
+.undoBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--cw-pass-ink);
+  border-radius: 2px;
+  background: var(--cw-pass-tint);
+  padding: 6px 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--cw-pass-ink);
+}
+.undoBtn:hover {
+  background: var(--cw-pass-ink);
+  color: #fff;
+}
+.mIconBtnUndo {
+  color: var(--cw-pass-ink);
 }
 
 .secondaryBtn {
@@ -599,7 +625,10 @@
   border-radius: 8px;
   background: var(--cw-bg-muted);
   padding: 10px 12px;
-  white-space: pre;
+  /* `pre-wrap`, not `pre`: a signature that runs past the pane used to clip
+     with no scrollbar on desktop, so it simply looked truncated. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   font-family: var(--cw-font-mono);
   font-size: 12.5px;
   line-height: 1.6;
@@ -1187,6 +1216,66 @@
 .testBannerPass svg,
 .testBannerPass .testBannerText {
   color: var(--cw-pass-ink);
+}
+
+/* The next step, offered at the moment of highest momentum. Pushed right so
+   it reads as the banner's action rather than part of the verdict text. */
+.continueBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  border: 0;
+  border-radius: 3px;
+  background: var(--cw-pass-ink);
+  padding: 5px 9px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+  color: #fff;
+}
+.continueBtn svg {
+  color: #fff;
+}
+.continueBtn:hover {
+  filter: brightness(1.12);
+}
+
+/* The banner takes focus after a submission (see `bannerRef`), so it needs a
+   focus ring of its own — it is not otherwise interactive. */
+.testBanner:focus-visible {
+  outline: 2px solid var(--cw-focus);
+  outline-offset: -2px;
+}
+
+/* The keyboard escape hatch, advertised beside the run meta. Hidden on the
+   narrowest desktop band, where the pane header has no room — the editor is
+   not a trap there either, since the same Escape binding applies. */
+.editorHint {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  white-space: nowrap;
+  color: var(--cw-text-muted);
+}
+@media (min-width: 1180px) {
+  .editorHint {
+    display: inline-flex;
+  }
+}
+.kbd {
+  border: 1px solid var(--cw-border);
+  border-bottom-width: 2px;
+  border-radius: 3px;
+  background: var(--cw-bg-muted);
+  padding: 0 4px;
+  font-family: var(--cw-font-mono);
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: var(--cw-text-secondary);
 }
 
 .testRow {
