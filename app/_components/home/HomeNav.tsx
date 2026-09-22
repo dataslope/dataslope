@@ -43,9 +43,12 @@ const NAV_SECTIONS: {
   { href: "/courses", label: "Courses", icon: GraduationCap, prefetch: true },
   // Learn → do → drill, so this sits between Courses and Interview Prep.
   { href: "/dashboard/challenges", label: "Challenges", icon: Code2 },
-  // A "Practice" item belongs here too, but there is no practice surface yet
-  // and `/practice` 404s. Restore it the moment that page exists — the nav
-  // has room for it, which is what the full-bleed header was widened for.
+  // The slot after this one is reserved for a sixth item, a "Projects" page,
+  // to be added once that surface exists. It replaces an earlier "Practice"
+  // plan, dropped because Challenges is already the practice surface and two
+  // items for one idea would only read as a duplicate. The nav has room,
+  // which is what the full-bleed header was widened for: measured at 1024,
+  // six items still clear the brand and the auth cluster by 17px a side.
   { href: "/interview-prep", label: "Interview Prep", icon: BriefcaseBusiness },
   { href: "/playground", label: "Playground", icon: SquareTerminal },
   // The "Free" badge stops "Pricing" reading as a paywall.

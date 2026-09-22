@@ -60,7 +60,7 @@ html.dark .ds-home {
 /* Primary nav menu: hidden below lg, flex from lg up. Replaces `hidden lg:flex`
  * so a leaked `.hidden` can't keep it collapsed on desktop.
  *
- * lg, not md: six items (Courses, Challenges, Practice, Interview Prep,
+ * lg, not md: six items (Courses, Challenges, Projects, Interview Prep,
  * Playground, Pricing) plus the brand and the right-hand controls do not fit
  * the 768–1024 band. Measured at 768px the menu overflowed its grid track by
  * 81px and ran under the auth control. Below lg the hamburger drawer carries
