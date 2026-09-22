@@ -124,11 +124,9 @@ export const PAGE_ITEMS: StudioNavItem[] = [
   { key: "admin", label: "Admin", href: "/dashboard/admin", icon: Shield },
 ];
 
-const ALL_ITEMS = PAGE_ITEMS;
-
 /** Human breadcrumb label for a route key. */
 export function crumbFor(key: StudioRouteKey): string {
-  return ALL_ITEMS.find((i) => i.key === key)?.label ?? "Challenges";
+  return PAGE_ITEMS.find((i) => i.key === key)?.label ?? "Challenges";
 }
 
 /**

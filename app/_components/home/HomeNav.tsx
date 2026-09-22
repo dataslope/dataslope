@@ -43,9 +43,12 @@ const NAV_SECTIONS: {
   { href: "/courses", label: "Courses", icon: GraduationCap, prefetch: true },
   // Learn → do → drill, so this sits between Courses and Interview Prep.
   { href: "/dashboard/challenges", label: "Challenges", icon: Code2 },
-  // A "Practice" item belongs here too, but there is no practice surface yet
-  // and `/practice` 404s. Restore it the moment that page exists — the nav
-  // has room for it, which is what the full-bleed header was widened for.
+  // The slot after this one is reserved for a sixth item, a "Projects" page,
+  // to be added once that surface exists. It replaces an earlier "Practice"
+  // plan, dropped because Challenges is already the practice surface and two
+  // items for one idea would only read as a duplicate. The nav has room,
+  // which is what the full-bleed header was widened for: measured at 1024,
+  // six items still clear the brand and the auth cluster by 17px a side.
   { href: "/interview-prep", label: "Interview Prep", icon: BriefcaseBusiness },
   { href: "/playground", label: "Playground", icon: SquareTerminal },
   // The "Free" badge stops "Pricing" reading as a paywall.
@@ -161,10 +164,15 @@ function BrandLogo({ compact }: { compact?: boolean }) {
         }`}
         aria-hidden="true"
       />
-      {/* Wordmark hidden in the tightest desktop band (md–lg), where it
-          pushes "Sign in" into wrapping. */}
+      {/* Shown at every width. This used to hide across md–lg, where the
+          wordmark pushed "Sign in" into wrapping, but neither half of that
+          still holds: the button carries `whitespace-nowrap` now, and the
+          inline menu waits for lg, so md–lg has an empty centre column.
+          Measured at 768, the band's tightest point: the wordmark costs
+          91.5px and leaves 379px free, with the button one line at 28px
+          and no overflow. */}
       <span
-        className={`font-semibold tracking-tight text-[#121212] transition-[transform,font-size] duration-200 will-change-transform group-hover:translate-x-0.5 md:hidden lg:inline dark:text-white ${
+        className={`font-semibold tracking-tight text-[#121212] transition-[transform,font-size] duration-200 will-change-transform group-hover:translate-x-0.5 dark:text-white ${
           compact ? "text-[17px]" : "text-lg"
         }`}
       >
@@ -381,7 +389,19 @@ export function HomeNav() {
         {/* No side margin: the grid's equal `1fr` edges do the centring, and
             a margin on this column would shift the menu off the centre line
             by half of it. */}
-        <div className="ds-nav-menu items-center justify-center gap-0.5 xl:gap-2">
+        {/* The gap ramps with the viewport because the menu's own width does
+            not: past xl the item spacing used to freeze at 32px between
+            labels (8px gap + the links' 12px padding either side) however
+            wide the screen got, which reads as cramped on a large display.
+            Measured headroom — twice the slack on the tighter flexible edge,
+            since a centred menu spends it on both — is 262px at 1280, 518px
+            at 1536 and 902px at 1920, against the +32px and +64px these two
+            steps cost. lg–xl steps the least because it is the tight band:
+            120px of headroom at 1024, and the one a sixth item has to fit.
+            6px is what that affords. Measured at 1024 with a real sixth
+            item injected (not the widest label as a proxy, which is 40px
+            pessimistic): 6px clears by 17px a side, 8px by 12px. */}
+        <div className="ds-nav-menu items-center justify-center gap-1.5 xl:gap-4 2xl:gap-6">
           {NAV_SECTIONS.map(({ href, label, prefetch, badge, activeClass }) => (
             <NavLink
               key={href}

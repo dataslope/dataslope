@@ -331,7 +331,7 @@
   border-radius: 4px;
 }
 
-/* 34×34 top-bar icon buttons (sidebar toggle, full preview). */
+/* 34×34 top-bar icon button (sidebar toggle). */
 .ds-topbar-btn {
   display: inline-flex;
   height: 34px;
