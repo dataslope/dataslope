@@ -1744,11 +1744,10 @@ sets that read as a sorted numeric sequence. Every rewrite is verified by
 re-parsing the block, so a question that cannot be permuted safely is skipped
 rather than mangled.
 
-Two corpora are out of scope. `content/fumadocs-dev/multiple-choice.mdx`
+One corpus is out of scope. `content/fumadocs-dev/multiple-choice.mdx`
 documents the authoring syntax by pairing each rendered question with a
 ````markdown fence showing its source, and only the rendered half is a template
-literal, so a rewrite would leave the two disagreeing. Custom content authored
-in the dashboard MCQ builder is user data and is never rewritten.
+literal, so a rewrite would leave the two disagreeing.
 
 `scripts/check-mcq.mjs` guards the result: across the whole corpus, no slot may
 hold more than 35% of the correct answers (chance is 25% with four options; it

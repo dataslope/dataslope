@@ -1,11 +1,10 @@
 "use client";
 
 /**
- * The /dashboard "Studio" shell: persistent sidebar + top bar wrapping the hub
- * and every builder. Active nav/breadcrumb derive from the pathname, so the
+ * The /dashboard "Studio" shell: persistent sidebar + top bar wrapping every
+ * dashboard page. Active nav/breadcrumb derive from the pathname, so the
  * shell stays mounted across navigations. Breakpoints: full 264px sidebar on
- * wide viewports; icon rail below 900px (1240px while a builder previews);
- * hamburger + drawer below 640px.
+ * wide viewports; icon rail below 900px; hamburger + drawer below 640px.
  */
 
 import { useState } from "react";
@@ -18,7 +17,6 @@ import {
   LogOut,
   Menu,
   PanelLeft,
-  Plus,
   Shield,
 } from "lucide-react";
 import { signOut, useSession } from "@/lib/auth/client";
