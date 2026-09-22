@@ -164,10 +164,15 @@ function BrandLogo({ compact }: { compact?: boolean }) {
         }`}
         aria-hidden="true"
       />
-      {/* Wordmark hidden in the tightest desktop band (md–lg), where it
-          pushes "Sign in" into wrapping. */}
+      {/* Shown at every width. This used to hide across md–lg, where the
+          wordmark pushed "Sign in" into wrapping, but neither half of that
+          still holds: the button carries `whitespace-nowrap` now, and the
+          inline menu waits for lg, so md–lg has an empty centre column.
+          Measured at 768, the band's tightest point: the wordmark costs
+          91.5px and leaves 379px free, with the button one line at 28px
+          and no overflow. */}
       <span
-        className={`font-semibold tracking-tight text-[#121212] transition-[transform,font-size] duration-200 will-change-transform group-hover:translate-x-0.5 md:hidden lg:inline dark:text-white ${
+        className={`font-semibold tracking-tight text-[#121212] transition-[transform,font-size] duration-200 will-change-transform group-hover:translate-x-0.5 dark:text-white ${
           compact ? "text-[17px]" : "text-lg"
         }`}
       >
