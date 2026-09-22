@@ -96,7 +96,7 @@ const nextConfig: NextConfig = {
   // (see there for why ambiguous slugs deliberately 404); redirects run
   // before the catch-all route can reject them.
   redirects: async () => [
-    { source: "/dashboard", destination: "/dashboard/create", permanent: false },
+    { source: "/dashboard", destination: "/dashboard/challenges", permanent: false },
     ...courseAliasRedirects(),
   ],
   rewrites: async () => ({

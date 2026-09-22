@@ -23,11 +23,9 @@ export default function robots(): MetadataRoute.Robots {
           "/dashboard/account",
           "/dashboard/admin",
           "/reset-password",
-          // Shared playgrounds, challenges, and quizzes: user content behind
-          // unguessable slugs, never index (also noindex in their metadata).
+          // Shared playgrounds: user content behind unguessable slugs,
+          // never index (also noindex in their metadata).
           "/s/",
-          "/c/",
-          "/quiz/",
           "/fumadocs-dev",
           "/courses/*.md$",
         ],

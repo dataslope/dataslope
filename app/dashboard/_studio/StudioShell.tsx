@@ -14,12 +14,9 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   ChevronRight,
   ExternalLink,
-  Eye,
   LogIn,
   LogOut,
-  Maximize,
   Menu,
-  Minimize,
   PanelLeft,
   Plus,
   Shield,
@@ -31,33 +28,25 @@ import {
   activeKeyForPath,
   adminCrumbFor,
   ADMIN_ITEMS,
-  BUILDER_KEYS,
-  CREATE_ITEMS,
   crumbFor,
   PAGE_ITEMS,
   type StudioNavItem,
   type StudioRouteKey,
 } from "./nav";
 import { useViewportWidth } from "./useViewportWidth";
-import { StudioAiPanel } from "./StudioAiPanel";
-import { useStudioPreview } from "./StudioPreviewContext";
 
 export function StudioShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname() ?? "/dashboard/create";
+  const pathname = usePathname() ?? "/dashboard/challenges";
   const active = activeKeyForPath(pathname);
-  const isBuilder = BUILDER_KEYS.includes(active);
   const { data: session } = useSession();
-  const { previewOpen } = useStudioPreview();
 
   const winW = useViewportWidth();
-  // With a side-by-side preview open, the sidebar gives way to the rail earlier.
-  const narrowLimit = isBuilder && previewOpen ? 1240 : 900;
+  const narrowLimit = 900;
   const isPhone = winW < 640;
   const isNarrow = winW < narrowLimit;
 
   const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [createOpen, setCreateOpen] = useState(true);
   // The Admin group starts open only on an admin route.
   const [adminOpen, setAdminOpen] = useState(active === "admin");
 
@@ -106,8 +95,6 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
         <FullSidebar
           active={active}
           pathname={pathname}
-          createOpen={createOpen}
-          onToggleCreate={() => setCreateOpen((o) => !o)}
           adminOpen={adminOpen}
           onToggleAdmin={() => setAdminOpen((o) => !o)}
           showAdmin={showAdmin}
@@ -130,8 +117,6 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
           <FullSidebar
             active={active}
             pathname={pathname}
-            createOpen={createOpen}
-            onToggleCreate={() => setCreateOpen((o) => !o)}
             adminOpen={adminOpen}
             onToggleAdmin={() => setAdminOpen((o) => !o)}
             showAdmin={showAdmin}
@@ -151,7 +136,6 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
         <TopBar
           active={active}
           pathname={pathname}
-          isBuilder={isBuilder}
           onToggleSidebar={toggleSidebar}
           isPhone={isPhone}
         />
@@ -164,9 +148,6 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
           </div>
         </main>
       </div>
-
-      {/* AI assist panel (builder routes only, when opened) */}
-      <StudioAiPanel />
     </div>
   );
 }
@@ -180,8 +161,6 @@ type SessionData = ReturnType<typeof useSession>["data"];
 function FullSidebar({
   active,
   pathname,
-  createOpen,
-  onToggleCreate,
   adminOpen,
   onToggleAdmin,
   showAdmin,
@@ -192,8 +171,6 @@ function FullSidebar({
 }: {
   active: StudioRouteKey;
   pathname: string;
-  createOpen: boolean;
-  onToggleCreate: () => void;
   adminOpen: boolean;
   onToggleAdmin: () => void;
   showAdmin: boolean;
@@ -234,41 +211,6 @@ function FullSidebar({
       </Link>
 
       <nav className="mt-6 flex flex-col gap-0.5">
-        <button
-          type="button"
-          onClick={onToggleCreate}
-          className="ds-nav-item w-full text-left"
-          style={{ border: "none", background: "transparent" }}
-        >
-          <Plus size={17} style={{ color: "var(--muted)" }} />
-          Create
-          <ChevronRight
-            size={14}
-            className="ml-auto transition-transform"
-            style={{
-              color: "var(--faint)",
-              transform: createOpen ? "rotate(90deg)" : "none",
-            }}
-          />
-        </button>
-
-        {createOpen ? (
-          <div
-            className="mb-1 ml-[18px] mt-0.5 flex flex-col gap-0.5 pl-[9px]"
-            style={{ borderLeft: "1px solid var(--divider)" }}
-          >
-            {CREATE_ITEMS.map((item) => (
-              <NavLink
-                key={item.key}
-                item={item}
-                active={active === item.key}
-                onNavigate={onNavigate}
-                small
-              />
-            ))}
-          </div>
-        ) : null}
-
         {pageItems.map((item) => (
           <NavLink
             key={item.key}
@@ -407,15 +349,7 @@ function RailSidebar({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/dataslope-logo-blue.svg" alt="Dataslope" className="h-[15px] w-auto" />
       </Link>
-      <div
-        className="flex flex-col gap-0.5 rounded-2xl p-1"
-        style={{ background: "var(--rail-group)" }}
-      >
-        {CREATE_ITEMS.map((item) => (
-          <RailLink key={item.key} item={item} active={active === item.key} />
-        ))}
-      </div>
-      <div className="mt-1 flex flex-col gap-0.5">
+      <div className="flex flex-col gap-0.5">
         {railItems.map((item) => (
           <RailLink key={item.key} item={item} active={active === item.key} />
         ))}
@@ -536,17 +470,14 @@ function UserFooter({ session }: { session: SessionData }) {
 function TopBar({
   active,
   pathname,
-  isBuilder,
   onToggleSidebar,
   isPhone,
 }: {
   active: StudioRouteKey;
   pathname: string;
-  isBuilder: boolean;
   onToggleSidebar: () => void;
   isPhone: boolean;
 }) {
-  const showPrefix = active === "hub" || isBuilder;
   // The breadcrumb names the admin section: "Admin / AI Usage".
   const adminCrumb = active === "admin" ? adminCrumbFor(pathname) : null;
   return (
@@ -561,12 +492,6 @@ function TopBar({
         {isPhone ? <Menu size={18} /> : <PanelLeft size={16} />}
       </button>
       <div className="flex min-w-0 items-center gap-2 text-sm">
-        {showPrefix ? (
-          <>
-            <span style={{ color: "var(--faint)" }}>Create</span>
-            <span style={{ color: "var(--faint)" }}>/</span>
-          </>
-        ) : null}
         {adminCrumb ? (
           <>
             <span style={{ color: "var(--faint)" }}>{crumbFor(active)}</span>
@@ -582,58 +507,8 @@ function TopBar({
         )}
       </div>
       <div className="flex-1" />
-      {isBuilder ? <PreviewControls /> : null}
       <ThemePillToggle />
     </div>
   );
 }
 
-/** The "Live Preview" switch + full-preview expand button (builders only). */
-function PreviewControls() {
-  const { previewOpen, fullPreview, togglePreview, toggleFullPreview } =
-    useStudioPreview();
-  return (
-    <>
-      <button
-        type="button"
-        onClick={togglePreview}
-        role="switch"
-        aria-checked={previewOpen}
-        title="Show or hide live preview"
-        className="flex h-[34px] items-center gap-2 rounded-[7px] border-none bg-transparent px-1.5 transition-colors hover:bg-[var(--panel)]"
-      >
-        <span
-          className="inline-flex items-center gap-1.5 text-[13px] font-medium"
-          style={{ color: "var(--muted)" }}
-        >
-          <Eye size={14} />
-          <span className="hidden sm:inline">Live Preview</span>
-        </span>
-        <span
-          className="relative inline-flex h-5 w-[34px] flex-shrink-0 rounded-full transition-colors"
-          style={{
-            background: previewOpen ? "var(--green-btn)" : "rgba(120,120,128,0.32)",
-          }}
-        >
-          <span
-            className="absolute top-0.5 h-4 w-4 rounded-full bg-white transition-[left]"
-            style={{
-              left: previewOpen ? 16 : 2,
-              boxShadow: "0 1px 2px rgba(0,0,0,0.15)",
-            }}
-          />
-        </span>
-      </button>
-      <button
-        type="button"
-        onClick={toggleFullPreview}
-        title={fullPreview ? "Exit full preview" : "Full preview"}
-        aria-label={fullPreview ? "Exit full preview" : "Full preview"}
-        data-active={fullPreview || undefined}
-        className="ds-topbar-btn"
-      >
-        {fullPreview ? <Minimize size={15} /> : <Maximize size={15} />}
-      </button>
-    </>
-  );
-}

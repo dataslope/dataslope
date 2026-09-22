@@ -4,12 +4,8 @@ import {
   BookOpen,
   ChartSpline,
   Code2,
-  Database,
   FlaskConical,
   Image,
-  Layers,
-  LayoutGrid,
-  ListTodo,
   Mail,
   Palette,
   Shield,
@@ -22,11 +18,6 @@ import {
 } from "lucide-react";
 
 export type StudioRouteKey =
-  | "hub"
-  | "code"
-  | "sql"
-  | "mcq"
-  | "quiz"
   | "challenges"
   | "playground"
   | "account"
@@ -40,15 +31,6 @@ export interface StudioNavItem {
   /** Leaves the Studio shell; opens in a new tab. */
   external?: boolean;
 }
-
-/** The "Create" group: the hub plus the four builders. */
-export const CREATE_ITEMS: StudioNavItem[] = [
-  { key: "hub", label: "My Creations", href: "/dashboard/create", icon: LayoutGrid },
-  { key: "code", label: "Code Challenge", href: "/dashboard/create/challenge", icon: Code2 },
-  { key: "sql", label: "SQL Challenge", href: "/dashboard/create/sql", icon: Database },
-  { key: "mcq", label: "Multiple Choice", href: "/dashboard/create/mcq", icon: ListTodo },
-  { key: "quiz", label: "Quiz Set", href: "/dashboard/create/quiz", icon: Layers },
-];
 
 /**
  * The "Admin" group, in two bands: `data` — account tools whose endpoints are
@@ -124,8 +106,7 @@ export const ADMIN_ITEMS: AdminNavItem[] = [
   },
 ];
 
-/** Standalone dashboard pages linked below the Create group. Admin is filtered
- *  by the shell. */
+/** The sidebar's dashboard pages. Admin is filtered by the shell. */
 export const PAGE_ITEMS: StudioNavItem[] = [
   {
     key: "challenges",
@@ -143,33 +124,23 @@ export const PAGE_ITEMS: StudioNavItem[] = [
   { key: "admin", label: "Admin", href: "/dashboard/admin", icon: Shield },
 ];
 
-const ALL_ITEMS = [...CREATE_ITEMS, ...PAGE_ITEMS];
+const ALL_ITEMS = PAGE_ITEMS;
 
 /** Human breadcrumb label for a route key. */
 export function crumbFor(key: StudioRouteKey): string {
-  return ALL_ITEMS.find((i) => i.key === key)?.label ?? "My Creations";
+  return ALL_ITEMS.find((i) => i.key === key)?.label ?? "Challenges";
 }
 
-/** The builder routes (used for "Create / …" breadcrumb prefix + AI panel). */
-export const BUILDER_KEYS: StudioRouteKey[] = ["code", "sql", "mcq", "quiz"];
-
 /**
- * Resolve the active route key from a pathname. Longest-prefix match so
- * `/create/challenge?edit=…` still lights up Code Challenge, and `/create`
- * exactly is the hub.
+ * Resolve the active route key from a pathname. Longest-prefix match, so a
+ * nested route still lights up the section it belongs to.
  */
 export function activeKeyForPath(pathname: string): StudioRouteKey {
   const path = pathname.replace(/\/+$/, "") || "/";
-  if (path === "/dashboard/create") return "hub";
-  if (path.startsWith("/dashboard/create/challenge")) return "code";
-  if (path.startsWith("/dashboard/create/sql")) return "sql";
-  if (path.startsWith("/dashboard/create/mcq")) return "mcq";
-  if (path.startsWith("/dashboard/create/quiz")) return "quiz";
-  if (path.startsWith("/dashboard/challenges")) return "challenges";
   if (path.startsWith("/dashboard/playground")) return "playground";
   if (path.startsWith("/dashboard/account")) return "account";
   if (path.startsWith("/dashboard/admin")) return "admin";
-  return "hub";
+  return "challenges";
 }
 
 /** The admin sub-item a pathname is on, or null. `/dashboard/admin` is the

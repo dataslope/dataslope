@@ -14,8 +14,8 @@ expected.
 Three databases rather than one is deliberate, and the reasons differ:
 
 - **`auth`** holds accounts, sessions, plans, AI usage counters, cloud-workspace
-  metadata and custom content. It is the only one whose rows cannot be rebuilt
-  from anything in this repository.
+  metadata and playground shares. It is the only one whose rows cannot be
+  rebuilt from anything in this repository.
 - **`illustrations`** holds authoring state: the illustration and chart review
   queues written from the admin galleries. Kept separate so a coding agent can
   read and wipe the whole queue without being anywhere near accounts or

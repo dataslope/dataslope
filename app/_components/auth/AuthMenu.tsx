@@ -128,7 +128,7 @@ export function AuthMenu({ compact }: { compact?: boolean } = {}) {
             </div>
             <Menu.Item
               className="mt-1 flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[var(--ds-gray-900)] outline-none transition-colors data-[highlighted]:bg-[var(--ds-gray-100)] dark:text-white dark:data-[highlighted]:bg-white/10"
-              render={<Link href="/dashboard/create" />}
+              render={<Link href="/dashboard/challenges" />}
             >
               <LayoutDashboard size={16} />
               Dashboard
