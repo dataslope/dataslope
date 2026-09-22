@@ -381,7 +381,16 @@ export function HomeNav() {
         {/* No side margin: the grid's equal `1fr` edges do the centring, and
             a margin on this column would shift the menu off the centre line
             by half of it. */}
-        <div className="ds-nav-menu items-center justify-center gap-0.5 xl:gap-2">
+        {/* The gap ramps with the viewport because the menu's own width does
+            not: past xl the item spacing used to freeze at 32px between
+            labels (8px gap + the links' 12px padding either side) however
+            wide the screen got, which reads as cramped on a large display.
+            Measured headroom — twice the slack on the tighter flexible edge,
+            since a centred menu spends it on both — is 262px at 1280, 518px
+            at 1536 and 902px at 1920, against the +32px and +64px these two
+            steps cost. lg–xl keeps the tight 2px: that band has only 120px
+            of headroom at 1024 and is the one a sixth item has to fit. */}
+        <div className="ds-nav-menu items-center justify-center gap-0.5 xl:gap-4 2xl:gap-6">
           {NAV_SECTIONS.map(({ href, label, prefetch, badge, activeClass }) => (
             <NavLink
               key={href}
