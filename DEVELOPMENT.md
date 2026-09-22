@@ -275,7 +275,7 @@ Key files:
 | `app/sign-in/`, `app/account/` | Sign-in screen (Google/GitHub) and a gated account area. |
 | `app/admin/` | Gated admin dashboard (list / remove / ban users), built on the shadcn UI primitives in `components/ui`. See [Admin dashboard](#admin-dashboard). |
 | `migrations/` | D1 schema, one subfolder per database: `auth/`, `illustrations/`, `search/`. Each is a `migrations_dir` in `wrangler.jsonc` with its own numbering and its own `d1_migrations` table. See `migrations/README.md` for which command applies which, and why there are three databases rather than one. |
-| `migrations/auth/` | `dataslope-auth`: Better Auth core tables plus the admin plugin's `role`/`ban` fields, plans, AI usage counters, cloud-workspace metadata and custom content. Applied with `npm run db:migrate[:remote]`. |
+| `migrations/auth/` | `dataslope-auth`: Better Auth core tables plus the admin plugin's `role`/`ban` fields, plans, AI usage counters, cloud-workspace metadata and playground shares. Applied with `npm run db:migrate[:remote]`. |
 | `migrations/illustrations/` | `dataslope-illustrations`, a second database holding the illustration and chart regeneration queues written from the admin-only `/dashboard/admin/illustration-prompts` and `/dashboard/admin/charts` galleries. Applied with `npm run db:migrate:illustrations[:remote]`; see `agent-outputs/20260803-0900-illustration-regeneration-queue.md`. |
 | `migrations/search/` | `dataslope-search`: the lesson full-text index read by `/api/search`. Applied with `npm run db:migrate:search[:remote]`, seeded with `npm run db:seed:search[:remote]`. |
 

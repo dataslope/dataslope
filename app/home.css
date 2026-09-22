@@ -57,23 +57,31 @@ html.dark .ds-home {
   --color-fd-background: #121212;
 }
 
-/* Center nav menu: hidden below md, flex from md up. Replaces `hidden md:flex`
- * so a leaked `.hidden` can't keep it collapsed on desktop. */
+/* Primary nav menu: hidden below lg, flex from lg up. Replaces `hidden lg:flex`
+ * so a leaked `.hidden` can't keep it collapsed on desktop.
+ *
+ * lg, not md: six items (Courses, Challenges, Practice, Interview Prep,
+ * Playground, Pricing) plus the brand and the right-hand controls do not fit
+ * the 768–1024 band. Measured at 768px the menu overflowed its grid track by
+ * 81px and ran under the auth control. Below lg the hamburger drawer carries
+ * the same list. Only this inline menu waits for lg; the theme, GitHub and
+ * auth controls still appear from md up. */
 .ds-home .ds-nav-menu {
   display: none;
 }
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .ds-home .ds-nav-menu {
     display: flex;
   }
 }
 
-/* Mobile hamburger: shown below md, hidden from md up. Replaces `md:hidden`
- * so a leaked `.inline-flex` can't force it visible on desktop. */
+/* Hamburger: shown below lg, hidden from lg up, matching the menu it stands
+ * in for. Replaces `lg:hidden` so a leaked `.inline-flex` can't force it
+ * visible on desktop. */
 .ds-home .ds-mobile-trigger {
   display: inline-flex;
 }
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .ds-home .ds-mobile-trigger {
     display: none;
   }
