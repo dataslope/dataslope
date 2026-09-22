@@ -234,19 +234,28 @@ test.describe("Challenge workspace", () => {
   });
 
 
-  test("a locked step does not hand out its own solution", async ({ page }) => {
+  test("a locked step shows its solution but keeps the editor locked", async ({
+    page,
+  }) => {
     await openWorkspace(page, "matrix-rotation");
     // Step 2 is locked until step 1 passes.
     await page.evaluate(() =>
       window.__dsChallengeWorkspace?.["matrix-rotation"]?.selectTask("02"),
     );
-    await page.getByRole("button", { name: "Solution", exact: true }).first().click();
+    expect(
+      await page.evaluate(() =>
+        window.__dsChallengeWorkspace?.["matrix-rotation"]?.isTaskUnlocked("02"),
+      ),
+    ).toBe(false);
 
-    const body = (await page.locator("body").innerText()).toLowerCase();
-    expect(body).toContain("opens once step 1 passes");
-    // The step 2 reference solution reverses each transposed row; if any of it
-    // leaked into the DOM, the gate is not doing its job.
-    expect(body).not.toContain("row.reverse()");
+    // The editor is still gated: no CodeMirror, just the locked placeholder.
+    await expect(page.locator(".cm-content")).toHaveCount(0);
+    await expect(page.locator("body")).toContainText("Editor unlocks when step 1 passes");
+
+    // The solution is readable in advance, by design — step 2's answer
+    // reverses each transposed row.
+    await page.getByRole("button", { name: "Solution", exact: true }).first().click();
+    await expect(page.locator("body")).toContainText("row.reverse()");
   });
 
   test("the editor can be left with the keyboard", async ({ page }) => {

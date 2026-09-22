@@ -360,10 +360,14 @@ export function HomeNav() {
       />
       {/* Full-bleed: no `mx-auto max-w-6xl`, so the bar spans the viewport and
           the menu keeps its room on wide screens. The desktop columns are
-          `auto 1fr auto` (not `1fr auto 1fr`), which parks the menu against
-          the brand and gives it every spare pixel instead of centering it. */}
+          `1fr auto 1fr`: the two flexible edges are equal by definition, so
+          the middle column lands on the viewport's centre line whatever the
+          brand and the icon cluster happen to measure. Centring the menu
+          inside an `auto 1fr auto` grid instead would only centre it between
+          those two clusters, which sits visibly right of true centre because
+          the right-hand side is the wider of the two. */}
       <nav
-        className={`relative grid w-full grid-cols-[1fr_auto] items-center gap-3 px-4 transition-[height] duration-200 sm:px-6 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:px-8 ${
+        className={`relative grid w-full grid-cols-[1fr_auto] items-center gap-3 px-4 transition-[height] duration-200 sm:px-6 lg:grid-cols-[1fr_auto_1fr] lg:px-8 ${
           scrolled ? "h-11 md:h-12" : "h-14 md:h-16"
         }`}
       >
@@ -374,9 +378,10 @@ export function HomeNav() {
 
         {/* Center: primary menu (desktop only; visibility hardened in
             home.css's `.ds-nav-menu` against a leaked `.hidden`). */}
-        {/* `ml-*` is the breathing room between the brand and the first item,
-            on top of the grid's own column gap. */}
-        <div className="ds-nav-menu items-center justify-start gap-0.5 lg:ml-4 xl:ml-8 xl:gap-2">
+        {/* No side margin: the grid's equal `1fr` edges do the centring, and
+            a margin on this column would shift the menu off the centre line
+            by half of it. */}
+        <div className="ds-nav-menu items-center justify-center gap-0.5 xl:gap-2">
           {NAV_SECTIONS.map(({ href, label, prefetch, badge, activeClass }) => (
             <NavLink
               key={href}

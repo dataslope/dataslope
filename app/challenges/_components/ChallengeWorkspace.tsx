@@ -516,16 +516,11 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
           <EmptyResults text="Submit to run the checks for this step." />
         );
       case "solution":
-        // Gating the editor but not the answer defeats the whole point of
-        // gating: a locked step used to hand out its own reference solution to
-        // anyone who clicked the tab.
-        if (multiStep && !stepUnlocked) {
-          return (
-            <EmptyResults
-              text={`The reference solution for this step opens once step ${gatingStep} passes.`}
-            />
-          );
-        }
+        // Readable on every step, including the ones still locked. The gate is
+        // on the editor, not on the explanation: a learner who wants to read
+        // ahead is allowed to, and someone stuck on step 1 can see where the
+        // build is going before committing to it. Deliberate product choice —
+        // `e2e/challenge-workspace` pins both halves of it.
         return task ? (
           <SolutionPanelView
             note={step?.solutionNote ?? challenge.solutionNote}
