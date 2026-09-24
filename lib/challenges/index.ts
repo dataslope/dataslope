@@ -43,10 +43,12 @@ import { CODE_NUMBERS } from "./code-numbers";
 import { CODE_RECURSION_GRAPHS } from "./code-recursion-graphs";
 import { CODE_SHAPING } from "./code-shaping";
 import { CODE_STRINGS } from "./code-strings";
+import { SQL_FLIGHTS } from "./sql-flights";
 import { SQL_LEAGUE } from "./sql-league";
 import { SQL_LIBRARY } from "./sql-library";
 import { SQL_MULTI } from "./sql-multi";
 import { SQL_MULTI_BILLING } from "./sql-multi-billing";
+import { SQL_MULTI_FLIGHTS } from "./sql-multi-flights";
 import { SQL_MULTI_LEAGUE } from "./sql-multi-league";
 import { SQL_MULTI_LIBRARY } from "./sql-multi-library";
 import { SQL_MULTI_MUSIC } from "./sql-multi-music";
@@ -54,6 +56,7 @@ import { SQL_MULTI_RIDES } from "./sql-multi-rides";
 import { SQL_MULTI_SCHOOL } from "./sql-multi-school";
 import { SQL_MULTI_SUPPORT } from "./sql-multi-support";
 import { SQL_MULTI_WAREHOUSE } from "./sql-multi-warehouse";
+import { SQL_MULTI_WEATHER } from "./sql-multi-weather";
 import { SQL_MUSIC } from "./sql-music";
 import { SQL_RIDES } from "./sql-rides";
 import { SQL_SCHOOL } from "./sql-school";
@@ -61,6 +64,7 @@ import { SQL_SINGLE } from "./sql-single";
 import { SQL_SUBSCRIPTIONS } from "./sql-subscriptions";
 import { SQL_SUPPORT } from "./sql-support";
 import { SQL_WAREHOUSE } from "./sql-warehouse";
+import { SQL_WEATHER } from "./sql-weather";
 import { TOP_K_FREQUENT_WORDS } from "./top-k-frequent-words";
 import { TOP_PRODUCTS_BY_MONTH } from "./top-products-by-month";
 import { DIFFICULTY_BARS, type Challenge, type ChallengeIndexEntry } from "./types";
@@ -86,6 +90,7 @@ const CHALLENGES: Challenge[] = [
   ...CODE_MULTI_PYTHON_TOOLS,
   ...CODE_MULTI_JS_WEB,
   // The second hundred and the third, mixed so neither kind clumps in the list.
+  ...SQL_FLIGHTS,
   ...CODE_STRINGS,
   ...SQL_SCHOOL,
   ...CODE_ARRAYS,
@@ -93,15 +98,18 @@ const CHALLENGES: Challenge[] = [
   ...CODE_MAPS,
   ...SQL_MUSIC,
   ...CODE_NUMBERS,
+  ...SQL_WEATHER,
   ...SQL_SUPPORT,
   ...CODE_RECURSION_GRAPHS,
   ...SQL_RIDES,
   ...SQL_LEAGUE,
+  ...SQL_MULTI_FLIGHTS,
   ...SQL_MULTI_SCHOOL,
   ...CODE_MULTI_PYTHON_APPS,
   ...SQL_MULTI_WAREHOUSE,
   ...SQL_MULTI_MUSIC,
   ...CODE_MULTI_JS_APPS,
+  ...SQL_MULTI_WEATHER,
   ...SQL_MULTI_SUPPORT,
   ...SQL_MULTI_RIDES,
   ...SQL_MULTI_LEAGUE,

@@ -133,7 +133,7 @@ test.describe("Challenge workspace", () => {
     page,
   }) => {
     const slugs = await catalogSlugs(page);
-    expect(slugs.length).toBe(261);
+    expect(slugs.length).toBe(285);
     expect(new Set(slugs).size).toBe(slugs.length);
   });
 

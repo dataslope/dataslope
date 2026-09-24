@@ -18,12 +18,14 @@
  * types stops a challenge from asking for DuckDB or Postgres later.
  */
 
+import { FLIGHTS } from "./dataset-flights";
 import { LEAGUE } from "./dataset-league";
 import { MUSIC } from "./dataset-music";
 import { RIDES } from "./dataset-rides";
 import { SCHOOL } from "./dataset-school";
 import { SUPPORT } from "./dataset-support";
 import { WAREHOUSE } from "./dataset-warehouse";
+import { WEATHER } from "./dataset-weather";
 import type { SchemaTable } from "./types";
 
 export interface ChallengeDataset {
@@ -573,6 +575,8 @@ export const DATASETS = {
   EVENTS,
   SUBSCRIPTIONS,
   LIBRARY,
+  FLIGHTS,
+  WEATHER,
   SCHOOL,
   SUPPORT,
   WAREHOUSE,
@@ -581,4 +585,4 @@ export const DATASETS = {
   LEAGUE,
 } as const;
 
-export { LEAGUE, MUSIC, RIDES, SCHOOL, SUPPORT, WAREHOUSE };
+export { FLIGHTS, LEAGUE, MUSIC, RIDES, SCHOOL, SUPPORT, WAREHOUSE, WEATHER };
