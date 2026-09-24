@@ -38,19 +38,19 @@ import {
   Table2,
   Undo2,
 } from "lucide-react";
-import {
-  isMultiStep,
-  isStepUnlocked,
-  openStepIndex,
-  type Challenge,
-  type ChallengeLanguage,
-  type ChallengeStep,
-  type ChallengeTask,
-  type CodeLanguage,
-  type OutputPanel,
-  type Submission,
-  type TestOutcome,
-} from "@/lib/challenges";
+// Not "@/lib/challenges": that module imports every challenge, and this is
+// client code. See lib/challenges/steps.ts.
+import { isMultiStep, isStepUnlocked, openStepIndex } from "@/lib/challenges/steps";
+import type {
+  Challenge,
+  ChallengeLanguage,
+  ChallengeStep,
+  ChallengeTask,
+  CodeLanguage,
+  OutputPanel,
+  Submission,
+  TestOutcome,
+} from "@/lib/challenges/types";
 import {
   clearSavedCode,
   markAttempted,

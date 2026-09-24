@@ -11,7 +11,7 @@
  * already render, and the page works identically with nothing attached.
  */
 
-import type { IndexLanguage, TestOutcome } from "@/lib/challenges";
+import type { IndexLanguage, TestOutcome } from "@/lib/challenges/types";
 
 export interface WorkspaceTestHandle {
   slug: string;

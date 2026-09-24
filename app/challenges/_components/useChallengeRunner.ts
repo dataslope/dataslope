@@ -52,7 +52,7 @@ import type {
   ChallengeTask,
   OutputPanel,
   TestOutcome,
-} from "@/lib/challenges";
+} from "@/lib/challenges/types";
 
 /** How many result rows the Output tab renders before truncating. */
 const MAX_OUTPUT_ROWS = 200;

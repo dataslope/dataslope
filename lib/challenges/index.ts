@@ -42,6 +42,7 @@ import { CODE_MULTI_PYTHON_TOOLS } from "./code-multi-python-tools";
 import { CODE_NUMBERS } from "./code-numbers";
 import { CODE_RECURSION_GRAPHS } from "./code-recursion-graphs";
 import { CODE_SHAPING } from "./code-shaping";
+import { CODE_STACKS_SEARCH } from "./code-stacks-search";
 import { CODE_STRINGS } from "./code-strings";
 import { SQL_FLIGHTS } from "./sql-flights";
 import { SQL_LEAGUE } from "./sql-league";
@@ -69,6 +70,7 @@ import { TOP_K_FREQUENT_WORDS } from "./top-k-frequent-words";
 import { TOP_PRODUCTS_BY_MONTH } from "./top-products-by-month";
 import { DIFFICULTY_BARS, type Challenge, type ChallengeIndexEntry } from "./types";
 
+export * from "./steps";
 export * from "./types";
 
 /** Every challenge with a workspace behind it, in catalog order. */
@@ -99,6 +101,7 @@ const CHALLENGES: Challenge[] = [
   ...SQL_MUSIC,
   ...CODE_NUMBERS,
   ...SQL_WEATHER,
+  ...CODE_STACKS_SEARCH,
   ...SQL_SUPPORT,
   ...CODE_RECURSION_GRAPHS,
   ...SQL_RIDES,
@@ -137,35 +140,4 @@ export function getChallengeIndex(): ChallengeIndexEntry[] {
     steps: Math.max(1, c.steps.length),
     slug: c.slug,
   }));
-}
-
-/** True when this challenge gates its steps behind the previous one. */
-export function isMultiStep(challenge: Challenge): boolean {
-  return challenge.steps.length > 0;
-}
-
-/**
- * The step to open on: the first one the learner has not passed yet, or the
- * last step once they have passed them all. Progress comes from the browser,
- * so this takes it as an argument rather than reading storage itself — which
- * also keeps it usable from the server and from tests.
- */
-export function openStepIndex(challenge: Challenge, passedSteps: string[]): number {
-  if (challenge.steps.length === 0) return 0;
-  const next = challenge.steps.findIndex((s) => !passedSteps.includes(s.n));
-  return next === -1 ? challenge.steps.length - 1 : next;
-}
-
-/**
- * Whether a step is reachable. Step 1 always is; every later step opens only
- * once the one before it has passed.
- */
-export function isStepUnlocked(
-  challenge: Challenge,
-  index: number,
-  passedSteps: string[],
-): boolean {
-  if (index <= 0) return true;
-  const previous = challenge.steps[index - 1];
-  return previous ? passedSteps.includes(previous.n) : true;
 }

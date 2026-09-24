@@ -29,7 +29,7 @@ import {
   type SubmissionColumn,
   type TableColumn,
   type TestOutcome,
-} from "@/lib/challenges";
+} from "@/lib/challenges/types";
 import { highlight, type TokenKind } from "./highlight";
 import s from "./ChallengeWorkspace.module.css";
 

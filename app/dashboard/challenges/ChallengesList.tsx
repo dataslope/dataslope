@@ -28,7 +28,7 @@ import {
   type ChallengeIndexEntry,
   type ChallengeStatus,
   type IndexLanguage,
-} from "@/lib/challenges";
+} from "@/lib/challenges/types";
 
 const PAGE_SIZE = 10;
 
