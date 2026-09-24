@@ -113,14 +113,14 @@ interface CodeRun {
   stderr: string;
 }
 
-function runPython(source: string): CodeRun {
+function runPython(source: string, timeout = 30_000): CodeRun {
   const dir = mkdtempSync(join(tmpdir(), "ds-challenge-"));
   const file = join(dir, "main.py");
   writeFileSync(file, source);
   try {
     const stdout = execFileSync("python3", [file], {
       encoding: "utf8",
-      timeout: 30_000,
+      timeout,
       stdio: ["ignore", "pipe", "pipe"],
     });
     return { stdout, stderr: "" };
@@ -130,7 +130,7 @@ function runPython(source: string): CodeRun {
   }
 }
 
-function runJavaScript(source: string): CodeRun {
+function runJavaScript(source: string, timeout = 30_000): CodeRun {
   const dir = mkdtempSync(join(tmpdir(), "ds-challenge-"));
   // `.mjs` so the harness's top-level `await` is legal, exactly as it is in
   // the browser runtime.
@@ -139,7 +139,7 @@ function runJavaScript(source: string): CodeRun {
   try {
     const stdout = execFileSync(process.execPath, [file], {
       encoding: "utf8",
-      timeout: 30_000,
+      timeout,
       stdio: ["ignore", "pipe", "pipe"],
     });
     return { stdout, stderr: "" };
@@ -204,6 +204,56 @@ function checkCodeTask(lang: ChallengeLanguage, label: string) {
   }
 }
 
+// ─── Starters must not already pass ──────────────────────────────────
+
+/**
+ * Whether a task's starter code already passes every check. The catalog test
+ * only asserts that the starter's *text* differs from the solution's; this
+ * runs it. A starter that passes is a challenge the learner completes by
+ * pressing Submit, and it is an easy mistake when the starter carries most of
+ * the answer and the checks are loose.
+ */
+async function starterPassesSql(challenge: Challenge, task: ChallengeTask): Promise<boolean> {
+  if (challenge.runtime.kind !== "sql") throw new Error("not a sql challenge");
+  const engine = nodeSqlEngine(challenge.runtime.initSql);
+  let finalResult: SqlResult | null = null;
+  try {
+    const results = await engine.exec(task.starterCode);
+    finalResult = [...results].reverse().find((r) => r.columns.length > 0) ?? null;
+  } catch {
+    return false;
+  }
+  const solutionResults = await nodeSqlEngine(challenge.runtime.initSql).exec(task.solutionCode);
+  const solutionResult =
+    [...solutionResults].reverse().find((r) => r.columns.length > 0) ?? null;
+  for (const test of task.tests as SqlChallengeTest[]) {
+    const { pass } = await evaluateSqlTest(test, { engine, finalResult, solutionResult });
+    if (!pass) return false;
+  }
+  return true;
+}
+
+const STARTER_TIMEOUT_MS = 4_000;
+
+function starterPassesCode(lang: ChallengeLanguage): boolean {
+  const tests = lang.tests as CodeTest[];
+  const harness = buildHarness(lang.id, tests);
+  const source = harness ? `${lang.starterCode}\n${harness}` : lang.starterCode;
+  // Some starters loop until the learner fills the loop in. A hang passes
+  // nothing, so a short kill is enough to see that.
+  const { stdout, stderr } =
+    lang.id === "python"
+      ? runPython(source, STARTER_TIMEOUT_MS)
+      : runJavaScript(source, STARTER_TIMEOUT_MS);
+  const out = parseHarnessOutput(stdout);
+  const parsed: ParsedTestResult[] = [...out.results];
+  for (const t of tests) {
+    if (isStdoutTest(t)) parsed.push(evaluateStdoutExpect(t, out.clean, stderr));
+  }
+  const byId = new Map(parsed.map((r) => [r.id, r]));
+  return tests.every((t) => byId.get(t.id)?.pass === true);
+}
+
 // ─── The sweep ───────────────────────────────────────────────────────
 
 const SLUGS = getChallengeSlugs();
@@ -249,5 +299,73 @@ describe("challenge reference solutions", () => {
         });
       }
     }
+  }
+});
+
+describe("challenge starters", () => {
+  for (const slug of SLUGS) {
+    const challenge = getChallenge(slug)!;
+    const tasks: { key: string; task: ChallengeTask; lang: ChallengeLanguage }[] =
+      isMultiStep(challenge)
+        ? challenge.steps.map((step) => ({
+            key: `step ${step.n}`,
+            task: step,
+            lang: { ...challenge.languages[0], ...step },
+          }))
+        : challenge.languages.map((lang) => ({ key: lang.shortLabel, task: lang, lang }));
+
+    for (const { key, task, lang } of tasks) {
+      it(`${slug} · ${key} starter fails at least one check`, async () => {
+        const passes =
+          challenge.runtime.kind === "sql"
+            ? await starterPassesSql(challenge, task)
+            : starterPassesCode(lang);
+        expect(passes, `${slug} · ${key}: the starter code already passes every check`).toBe(false);
+      });
+    }
+  }
+});
+
+/**
+ * The schema browser is authored by hand beside the seed it describes, so the
+ * two can disagree: a column renamed in the `CREATE TABLE` but not in the
+ * browser, or a row count left over from before a few inserts were added.
+ * The learner reads the browser, then writes a query against the seed.
+ */
+describe("challenge datasets", () => {
+  const seen = new Set<string>();
+  for (const slug of SLUGS) {
+    const challenge = getChallenge(slug)!;
+    if (challenge.runtime.kind !== "sql") continue;
+    const initSql = challenge.runtime.initSql;
+    if (seen.has(initSql)) continue;
+    seen.add(initSql);
+
+    it(`${slug}'s dataset matches its schema browser`, () => {
+      const db = new DatabaseSync(":memory:");
+      db.exec(initSql);
+      const tables = (
+        db
+          .prepare("SELECT name FROM sqlite_schema WHERE type = 'table' ORDER BY name")
+          .all() as { name: string }[]
+      ).map((t) => t.name);
+      expect(tables, `${slug}: tables`).toEqual(
+        challenge.schema.map((t) => t.name).sort(),
+      );
+      for (const table of challenge.schema) {
+        const columns = (
+          db.prepare(`PRAGMA table_info(${table.name})`).all() as { name: string }[]
+        ).map((c) => c.name);
+        expect(columns, `${slug}: ${table.name} columns`).toEqual(
+          table.columns.map((c) => c.name),
+        );
+        const { n } = db.prepare(`SELECT COUNT(*) AS n FROM ${table.name}`).get() as {
+          n: number;
+        };
+        expect(n, `${slug}: ${table.name} row count`).toBe(
+          Number(table.rows.replace(/,/g, "")),
+        );
+      }
+    });
   }
 });
