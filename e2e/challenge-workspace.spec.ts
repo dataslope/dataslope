@@ -129,18 +129,19 @@ async function submitSolution(
 }
 
 test.describe("Challenge workspace", () => {
-  test("the catalog lists the pilot and links every row to a workspace", async ({
+  test("the catalog lists every challenge and links every row to a workspace", async ({
     page,
   }) => {
     const slugs = await catalogSlugs(page);
-    expect(slugs.length).toBe(100);
+    expect(slugs.length).toBe(198);
     expect(new Set(slugs).size).toBe(slugs.length);
   });
 
   test("every reference solution passes in the browser", async ({ page }) => {
     // Each challenge is a fresh page load, so every one boots its runtime from
-    // cold. A hundred of those does not fit the file's default timeout.
-    test.setTimeout(45 * 60_000);
+    // cold. Three hundred of those does not fit the file's default timeout;
+    // the hundred-challenge pilot needed 45 minutes, so this scales that.
+    test.setTimeout(135 * 60_000);
     const slugs = await catalogSlugs(page);
     const failures: string[] = [];
     let swept = 0;

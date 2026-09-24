@@ -29,19 +29,29 @@
  */
 
 import { CODE_ALGORITHMS } from "./code-algorithms";
+import { CODE_ARRAYS } from "./code-arrays";
 import { CODE_CLASSICS } from "./code-classics";
 import { CODE_FUNDAMENTALS } from "./code-fundamentals";
+import { CODE_MAPS } from "./code-maps";
 import { CODE_MULTI_JS } from "./code-multi-js";
+import { CODE_MULTI_JS_APPS } from "./code-multi-js-apps";
 import { CODE_MULTI_JS_WEB } from "./code-multi-js-web";
 import { CODE_MULTI_PYTHON } from "./code-multi-python";
+import { CODE_MULTI_PYTHON_APPS } from "./code-multi-python-apps";
 import { CODE_MULTI_PYTHON_TOOLS } from "./code-multi-python-tools";
+import { CODE_NUMBERS } from "./code-numbers";
 import { CODE_SHAPING } from "./code-shaping";
+import { CODE_STRINGS } from "./code-strings";
+import { SQL_LEAGUE } from "./sql-league";
 import { SQL_LIBRARY } from "./sql-library";
 import { SQL_MULTI } from "./sql-multi";
 import { SQL_MULTI_BILLING } from "./sql-multi-billing";
+import { SQL_MULTI_LEAGUE } from "./sql-multi-league";
 import { SQL_MULTI_LIBRARY } from "./sql-multi-library";
-import { SQL_SUBSCRIPTIONS } from "./sql-subscriptions";
+import { SQL_MULTI_MUSIC } from "./sql-multi-music";
+import { SQL_MUSIC } from "./sql-music";
 import { SQL_SINGLE } from "./sql-single";
+import { SQL_SUBSCRIPTIONS } from "./sql-subscriptions";
 import { TOP_K_FREQUENT_WORDS } from "./top-k-frequent-words";
 import { TOP_PRODUCTS_BY_MONTH } from "./top-products-by-month";
 import { DIFFICULTY_BARS, type Challenge, type ChallengeIndexEntry } from "./types";
@@ -66,6 +76,17 @@ const CHALLENGES: Challenge[] = [
   ...CODE_CLASSICS,
   ...CODE_MULTI_PYTHON_TOOLS,
   ...CODE_MULTI_JS_WEB,
+  // The second hundred and the third, mixed so neither kind clumps in the list.
+  ...CODE_STRINGS,
+  ...CODE_ARRAYS,
+  ...CODE_MAPS,
+  ...SQL_MUSIC,
+  ...CODE_NUMBERS,
+  ...SQL_LEAGUE,
+  ...CODE_MULTI_PYTHON_APPS,
+  ...SQL_MULTI_MUSIC,
+  ...CODE_MULTI_JS_APPS,
+  ...SQL_MULTI_LEAGUE,
 ];
 
 export function getChallenge(slug: string): Challenge | undefined {
