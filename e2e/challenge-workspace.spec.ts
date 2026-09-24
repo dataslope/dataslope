@@ -79,6 +79,32 @@ function handleOf(page: Page, slug: string) {
   };
 }
 
+/**
+ * Put code in the editor and wait until the workspace will grade it.
+ *
+ * `submit` grades the buffer as of the last render, so submitting in the same
+ * tick as a `setCode` or `loadSolution` grades whatever was there before. On a
+ * challenge's first task that is the starter, which made the sweep report
+ * reference solutions failing their own checks, and made a wrong answer
+ * "fail" by grading the starter instead. `"solution"` loads the task's
+ * reference.
+ */
+async function fillEditor(page: Page, slug: string, code: string | "solution") {
+  const expected = await page.evaluate(
+    ([s, c]) => {
+      const handle = window.__dsChallengeWorkspace?.[s];
+      if (c === "solution") return handle?.loadSolution() ?? "";
+      handle?.setCode(c);
+      return c;
+    },
+    [slug, code] as const,
+  );
+  await page.waitForFunction(
+    ([s, c]) => window.__dsChallengeWorkspace?.[s]?.getCode() === c,
+    [slug, expected] as const,
+  );
+}
+
 /** Load a task's reference solution, submit it, and report what the UI says. */
 async function submitSolution(
   page: Page,
@@ -95,7 +121,7 @@ async function submitSolution(
   // selectTask re-seeds the editor from the new task, so the solution has to
   // be loaded after React has committed that swap.
   await page.waitForTimeout(50);
-  await page.evaluate((s) => window.__dsChallengeWorkspace?.[s]?.loadSolution(), slug);
+  await fillEditor(page, slug, "solution");
   await page.evaluate((s) => window.__dsChallengeWorkspace?.[s]?.submit(), slug);
   await page.waitForFunction(
     (s) => window.__dsChallengeWorkspace?.[s]?.isBusy() === false,
@@ -191,11 +217,8 @@ test.describe("Challenge workspace", () => {
       handle?.selectTask("javascript");
     });
     await page.waitForTimeout(50);
-    await page.evaluate(() => {
-      const handle = window.__dsChallengeWorkspace?.["two-sum"];
-      handle?.setCode("function twoSum(nums, target) {\n  return [];\n}\n");
-      return handle?.submit();
-    });
+    await fillEditor(page, "two-sum", "function twoSum(nums, target) {\n  return [];\n}\n");
+    await page.evaluate(() => window.__dsChallengeWorkspace?.["two-sum"]?.submit());
     await page.waitForFunction(
       () => window.__dsChallengeWorkspace?.["two-sum"]?.isBusy() === false,
       null,
@@ -281,7 +304,7 @@ test.describe("Challenge workspace", () => {
       handle?.selectTask("javascript");
     });
     await page.waitForTimeout(50);
-    await page.evaluate((s) => window.__dsChallengeWorkspace?.[s]?.loadSolution(), "two-sum");
+    await fillEditor(page, "two-sum", "solution");
     await page.evaluate((s) => window.__dsChallengeWorkspace?.[s]?.submit(), "two-sum");
     await page.waitForFunction(
       () => window.__dsChallengeWorkspace?.["two-sum"]?.isBusy() === false,

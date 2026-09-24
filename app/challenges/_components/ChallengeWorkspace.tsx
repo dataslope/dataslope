@@ -324,6 +324,7 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
     go,
     setCode,
     passedSteps: progress.passedSteps,
+    code,
   });
   useEffect(() => {
     live.current = {
@@ -333,6 +334,7 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
       go,
       setCode,
       passedSteps: progress.passedSteps,
+      code,
     };
   });
 
@@ -361,9 +363,12 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
           }
         },
         setCode: (next) => live.current.setCode(next),
+        getCode: () => live.current.code,
         loadSolution: () => {
           const current = live.current.task;
-          if (current) live.current.setCode(current.solutionCode);
+          if (!current) return "";
+          live.current.setCode(current.solutionCode);
+          return current.solutionCode;
         },
         submit: () => live.current.go("submit"),
         getTestResults: () => live.current.outcome?.tests ?? [],

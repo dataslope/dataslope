@@ -31,8 +31,17 @@ export interface WorkspaceTestHandle {
   selectTask(key: string): void;
   /** Replace the editor buffer. */
   setCode(code: string): void;
-  /** Load the current task's reference solution into the editor. */
-  loadSolution(): void;
+  /**
+   * The buffer as of the last render, which is what `submit` grades. A
+   * `setCode` or `loadSolution` shows up here only once React has committed
+   * it, so a driver waits for this to change before submitting.
+   */
+  getCode(): string;
+  /**
+   * Load the current task's reference solution into the editor, and return
+   * it so a driver can wait for `getCode` to catch up.
+   */
+  loadSolution(): string;
   /** Run the checks; resolves when grading has finished. */
   submit(): Promise<void>;
   getTestResults(): TestOutcome[];
