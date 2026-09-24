@@ -802,6 +802,7 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
                 <InstructionBlocks
                   blocks={instructions}
                   signature={language?.signature}
+                  language={language?.id}
                 />
               )}
               {challenge.schema.length > 0 ? (
@@ -1028,6 +1029,7 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
                 <InstructionBlocks
                   blocks={instructions}
                   signature={language?.signature}
+                  language={language?.id}
                 />
               )}
               {challenge.schema.length > 0 ? (

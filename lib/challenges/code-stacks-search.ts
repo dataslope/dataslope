@@ -114,8 +114,8 @@ const REMOVE_ADJACENT_DUPLICATES = dualChallenge({
       name: "200,000 letters, one pair at a time",
       description:
         "Each removal exposes exactly one new pair in the middle, so rescanning after every removal is too slow.",
-      pyArgs: `"x" + "ab" * 50000 + "ba" * 50000 + "y"`,
-      jsArgs: `"x" + "ab".repeat(50000) + "ba".repeat(50000) + "y"`,
+      pyArgs: `"x" + "ab" * 49999 + "aa" + "ba" * 49999 + "y"`,
+      jsArgs: `"x" + "ab".repeat(49999) + "aa" + "ba".repeat(49999) + "y"`,
       expected: "xy",
     },
   ],
@@ -371,10 +371,12 @@ const CUSTOM_SORT_ORDER = dualChallenge({
       name: "100,000 items, 50,000-entry order",
       description:
         "Searching the order list for every item is far too slow at this size; look positions up in a map.",
-      pyArgs: `["zeta", "alpha"] + [f"sku-{49999 - i % 500}" for i in range(100000)], [f"sku-{i}" for i in range(50000)]`,
-      jsArgs: `["zeta", "alpha", ...Array.from({ length: 100000 }, (_, i) => "sku-" + (49999 - (i % 500)))], Array.from({ length: 50000 }, (_, i) => "sku-" + i)`,
-      pyExpected: `[f"sku-{k}" for k in range(49500, 50000) for _ in range(200)] + ["alpha", "zeta"]`,
-      jsExpected: `[...Array.from({ length: 100000 }, (_, j) => "sku-" + (49500 + Math.floor(j / 200))), "alpha", "zeta"]`,
+      pyArgs: `["zeta", "alpha"] + [f"sku-{49999 - i % 500}" for i in range(99998)], [f"sku-{i}" for i in range(50000)]`,
+      jsArgs: `["zeta", "alpha", ...Array.from({ length: 99998 }, (_, i) => "sku-" + (49999 - (i % 500)))], Array.from({ length: 50000 }, (_, i) => "sku-" + i)`,
+      // 99,998 listed items cycle through the last 500 skus: sku-49500 and
+      // sku-49501 come round 199 times, the rest 200.
+      pyExpected: `[f"sku-{k}" for k in range(49500, 50000) for _ in range(199 if k < 49502 else 200)] + ["alpha", "zeta"]`,
+      jsExpected: `[...Array.from({ length: 500 }, (_, j) => new Array(j < 2 ? 199 : 200).fill("sku-" + (49500 + j))).flat(), "alpha", "zeta"]`,
     },
   ],
 });
@@ -390,7 +392,7 @@ const DAYS_UNTIL_WARMER = dualChallenge({
   prompt: [
     "`temps` holds one temperature reading per day, in degrees Celsius. For each day, return how many days you would wait for a strictly warmer reading. If no later day is warmer, that day's answer is 0. The result has the same length as `temps`.",
     "A day with the same temperature does not count as warmer.",
-    "Scanning forward from every day is O(n²). The last check has 100,000 days at the same temperature before the first warmer one, so every forward scan runs to the end. Solve it in one pass.",
+    "Scanning forward from every day is O(n²). The last check has 100,000 days, all at the same temperature until a warmer last one, so every forward scan runs to the end. Solve it in one pass.",
   ],
   params: ["temps"],
   constraints: ["`0 ≤ len(temps) ≤ 10⁵`", "`-60 ≤ temps[i] ≤ 60`"],
@@ -470,10 +472,10 @@ const DAYS_UNTIL_WARMER = dualChallenge({
       name: "A 100,000-day cold spell",
       description:
         "Every day waits until the very last one, so a forward scan from each day is too slow.",
-      pyArgs: `[4] * 100000 + [5]`,
-      jsArgs: `[...new Array(100000).fill(4), 5]`,
-      pyExpected: `list(range(100000, 0, -1)) + [0]`,
-      jsExpected: `[...Array.from({ length: 100000 }, (_, i) => 100000 - i), 0]`,
+      pyArgs: `[4] * 99999 + [5]`,
+      jsArgs: `[...new Array(99999).fill(4), 5]`,
+      pyExpected: `list(range(99999, 0, -1)) + [0]`,
+      jsExpected: `[...Array.from({ length: 99999 }, (_, i) => 99999 - i), 0]`,
     },
   ],
 });

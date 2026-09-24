@@ -79,7 +79,7 @@ const LISTENING_RECAP = sqlSteps(
     description:
       "Build a per-listener recap with a top artist and a persona, keeping the listener who has played nothing.",
     solutionNote:
-      "The recap is only right if the listener with no plays survives every stage: a `LEFT JOIN` in step 1, the `rn = 1` condition in the join rather than the `WHERE` in step 2, and a `CASE` branch of their own, placed first, in step 3. Drop them at any stage and the report quietly covers seven listeners out of eight.",
+      "The recap is only right if the listener with no plays survives every stage: a `LEFT JOIN` in step 1, the `rn = 1` condition in the join rather than the `WHERE` in step 2, and a `CASE` branch of their own, placed first, in step 3. Miss either of the first two and the report quietly covers seven listeners out of eight; miss the third and it calls a listener who has played nothing `Casual`.",
   },
   [
     {

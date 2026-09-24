@@ -253,10 +253,20 @@ export function jsCases(fn: string, cases: CallCase[]): CodeTest[] {
 }
 
 /**
+ * A value in Python's spelling, plus JavaScript's where the two differ, so a
+ * worked example reads `null` rather than `None` once the learner switches
+ * language.
+ */
+function spelled(py: string, js: string) {
+  return py === js ? { value: py } : { value: py, byLanguage: { javascript: js } };
+}
+
+/**
  * Worked examples from the cases marked `example`, so the instructions show
- * exactly the inputs the first checks grade. Values are written the way the
- * existing challenges write them: Python literals, since Python is the
- * language a two-language challenge opens on.
+ * exactly the inputs the first checks grade. Each value is written the way
+ * the language on screen would write it: Python by default, since Python is
+ * the language a two-language challenge opens on, and JavaScript's spelling
+ * when that is picked.
  */
 export function examplesFromCases(
   params: string[],
@@ -273,17 +283,24 @@ export function examplesFromCases(
           `cases: example "${c.id}" has ${c.args.length} args for ${params.length} params`,
         );
       }
+      const output = c.throws
+        ? { name: "output", value: "raises an error", emphasis: true }
+        : {
+            name: "output",
+            ...spelled(
+              c.pyExpected ?? pyLiteral(c.expected ?? null),
+              c.jsExpected ?? jsLiteral(c.expected ?? null),
+            ),
+            emphasis: true,
+          };
       return {
         label: `Example ${i + 1}`,
         fields: [
-          ...params.map((name, j) => ({ name, value: pyLiteral(c.args![j]) })),
-          c.throws
-            ? { name: "output", value: "raises an error", emphasis: true }
-            : {
-                name: "output",
-                value: c.pyExpected ?? pyLiteral(c.expected ?? null),
-                emphasis: true,
-              },
+          ...params.map((name, j) => ({
+            name,
+            ...spelled(pyLiteral(c.args![j]), jsLiteral(c.args![j])),
+          })),
+          output,
         ],
         note: c.example,
       };

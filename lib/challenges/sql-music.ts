@@ -144,7 +144,7 @@ ORDER BY SUM(t.duration_s) DESC, al.album_title`,
       dataset: MUSIC,
       description: "Find the tracks nobody has listened to past the 30-second mark.",
       solutionNote:
-        "The condition on `ms_played` has to live inside the `NOT EXISTS` (or in the `ON` clause of a `LEFT JOIN`), because it says which plays count. Put it in the outer `WHERE` after a `LEFT JOIN` and it throws away the very rows the anti join was looking for, so Bloom Again, skipped once and never finished, goes missing.",
+        "The condition on `ms_played` has to live inside the `NOT EXISTS` (or in the `ON` clause of a `LEFT JOIN`), because it says which plays count. Put it in the outer `WHERE` after a `LEFT JOIN` and it throws away the very NULL rows the anti join was looking for, so nothing comes back at all; leave it out and Bloom Again, skipped once and never finished, goes missing.",
     },
     {
       prompt: [

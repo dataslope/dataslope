@@ -167,7 +167,7 @@ ORDER BY d.ticket_id
         "Dividing by the decided tickets rather than all of them keeps a ticket that is still on the clock from counting as a success, and `100.0` keeps the division out of integer arithmetic. The Unassigned row is the point of the report: its two breaches are tickets nobody has answered, which a report built from response times could never show.",
       prompt: [
         "Summarise per `agent`, with `Unassigned` as a row of its own: `decided`, the tickets whose outcome is known (met or breached); `breached`; and `breach_pct`, breached as a percentage of decided, rounded to 1 decimal place.",
-        "A `waiting` ticket has neither met nor missed its deadline yet, so it belongs in neither count.",
+        "A `waiting` ticket has neither met nor missed its deadline yet, so it belongs in neither count. An agent who holds no tickets at all has nothing to rate and gets no row.",
         "Worst rate first, ties by `agent`.",
       ],
       columns: [

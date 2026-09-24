@@ -90,7 +90,7 @@ const PUNCTUALITY_LEAGUE = sqlSteps(
     description:
       "Label every flight on time, late or cancelled, then rank the routes by how reliably they arrive.",
     solutionNote:
-      "The league only works if a cancellation counts against a route. An average of delays skips cancelled flights entirely, because their delay is NULL, which would put Tollmere to Bramwick near the top despite losing a flight. Labelling every scheduled flight and dividing by all of them makes a cancellation cost exactly what a late arrival costs.",
+      "The league only works if a cancellation counts against a route. Any average over the flights that arrived skips cancelled flights entirely, because their delay is NULL: an on-time share computed that way gives Tollmere to Bramwick 3 out of 3 and a share of first place despite losing a flight. Labelling every scheduled flight and dividing by all of them makes a cancellation cost exactly what a late arrival costs.",
   },
   [
     {

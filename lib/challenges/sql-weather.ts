@@ -79,7 +79,7 @@ ORDER BY range_c DESC, s.station_name`,
     },
     {
       prompt: [
-        "For each station, report how many days it sent a reading, on how many of those its rain gauge measured something, and its average daily rainfall rounded to 2 decimal places.",
+        "For each station, report how many days it sent a reading, on how many of those its rain gauge worked (a `precip_mm` that is not NULL, 0 mm included), and its average daily rainfall rounded to 2 decimal places.",
         "A NULL `precip_mm` means the gauge failed that day, not that it stayed dry. Average over the days that were measured, and do not count the failed days as 0 mm.",
         "Only stations with readings appear. Wettest first; ties by `station_name`.",
       ],

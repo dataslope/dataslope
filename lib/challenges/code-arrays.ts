@@ -704,7 +704,7 @@ const SHORTEST_SUBARRAY_AT_LEAST = dualChallenge({
   description: "Find the fewest consecutive values whose sum reaches a target.",
   prompt: [
     "Given a list of positive integers and a `target`, return the length of the shortest run of consecutive values whose sum is at least `target`. If no run reaches it, not even the whole list, return `0`.",
-    "Every value being positive is what makes this tractable: a longer run always has a larger sum. Trying every start and extending until the target is reached is O(n²) on the large check, where the shortest qualifying run is fifty thousand values long.",
+    "Every value being positive is what makes this tractable: a longer run always has a larger sum. Trying every start and extending until the target is reached is O(n²) on the large check, where the shortest qualifying run is just over fifty thousand values long.",
   ],
   params: ["nums", "target"],
   constraints: [

@@ -1292,7 +1292,8 @@ const NEAREST_RANK_PERCENTILE = dualChallenge({
   description:
     "Pick the value at a given percentile, the way a latency report computes p50 and p95.",
   prompt: [
-    "Return the `p`th percentile of `values` by the nearest-rank method: sort the values and take the one at rank `ceil(p / 100 × n)`, where `n` is the number of values and ranks count from 1.",
+    "Return the `p`th percentile of `values` by the nearest-rank method: sort the values and take the one at rank `ceil(p × n / 100)`, where `n` is the number of values and ranks count from 1.",
+    "Work the rank out from the whole number `p × n`. Dividing `p` by 100 first goes through a fraction such as `0.07` that floating point cannot hold exactly, and the rank can come out one too high.",
     "The answer is always one of the values, never an average of two. `p` is a whole number from 1 to 100, so the 100th percentile is the largest value. An empty list has no percentile: return `None` in Python and `null` in JavaScript. Leave `values` unchanged.",
   ],
   params: ["values", "p"],
@@ -1338,7 +1339,7 @@ const NEAREST_RANK_PERCENTILE = dualChallenge({
       name: "The 30th percentile of five values",
       args: [[15, 20, 35, 40, 50], 30],
       expected: 20,
-      example: "Rank ceil(0.3 × 5) = 2, the second smallest.",
+      example: "Rank ceil(30 × 5 / 100) = 2, the second smallest.",
     },
     {
       id: "example2",

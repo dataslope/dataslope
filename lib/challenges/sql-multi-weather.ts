@@ -194,7 +194,7 @@ ORDER BY streak_start, station_name`,
         ["station_name", "streak_start", "streak_end", "days", "peak_c"],
         2,
         "Two heatwaves",
-        "Saltmarsh Point and Brackenridge; Harbour Mill's hot days are not consecutive.",
+        "Saltmarsh Point and Brackenridge; Harbour Mill's three hot days are never three in a row.",
         "Heatwaves match the reference result",
       ),
     },
@@ -227,7 +227,7 @@ const STATION_DATA_QUALITY = sqlSteps(
     description:
       "Work out which days each station owed, find the ones it missed, and score its coverage for temperature and rain separately.",
     solutionNote:
-      "Missing data comes in two shapes: a row that is not there, and a row that is there with a hole in it. The first can only be seen against a calendar, which a recursive CTE builds because nothing in the table lists the days that are absent; the second needs `COUNT(column)` rather than `COUNT(*)`. A report that checks only one of them calls Saltmarsh Point and Kestrel Fell complete.",
+      "Missing data comes in two shapes: a row that is not there, and a row that is there with a hole in it. The first can only be seen against a calendar, which a recursive CTE builds because nothing in the table lists the days that are absent; the second needs `COUNT(column)` rather than `COUNT(*)`. A report that checks only for missing rows calls Saltmarsh Point and Kestrel Fell complete.",
   },
   [
     {

@@ -157,7 +157,7 @@ assert sum(got.values()) == 0, f"balances sum to {sum(got.values())}, not 0: {go
       signature: "def settle(expenses: list[list]) -> list[list]",
       prompt: [
         "Now settle up. Return a list of transfers `[from, to, cents]` that brings every balance to zero.",
-        "Build it greedily: the person who owes the most pays the person who is owed the most, as much as can pass between them (the smaller of the two amounts). Repeat until everyone is square. When two people owe, or are owed, the same amount, the alphabetically first name goes first.",
+        "Build it greedily: the person who owes the most pays the person who is owed the most, as much as can pass between them (the smaller of the two amounts). Then choose the pair again from the updated balances, and repeat until everyone is square: after a partial payment, the person who now owes the most may be someone else. When two people owe, or are owed, the same amount, the alphabetically first name goes first.",
         "Someone whose balance is already zero never appears in a transfer, and no expenses means no transfers.",
       ],
       starter: `${EXPENSE_BALANCES}
@@ -183,7 +183,7 @@ def settle(expenses: list[list]) -> list[list]:
           {
             id: "split-payment",
             name: "A debt can be paid to two people",
-            description: "caz owes more than dev is still owed after ben pays, so the rest goes to eli.",
+            description: "caz owes more than dev is still owed after ben pays, so caz's last 250 goes to eli, after ana, who by then owes more.",
             args: [CABIN],
             expected: [
               ["ben", "dev", 5000],

@@ -121,7 +121,7 @@ ORDER BY stock_value DESC`,
     {
       prompt: [
         "A purchase order records how many units were ordered and how many have been received so far. `received_qty` stays NULL until the first delivery arrives, so an order can be waiting in two ways: nothing received yet, or less received than ordered.",
-        "Return each outstanding order's `po_id`, the supplier's name, the `sku`, `ordered_qty`, `received_qty` and the `outstanding` quantity still to come. An order with nothing received is owed all of it. Sort by `po_id`.",
+        "Return each outstanding order's `po_id`, the supplier's name, the `sku`, `ordered_qty`, `received_qty` as stored (NULL when nothing has arrived) and the `outstanding` quantity still to come. An order with nothing received is owed all of it. Sort by `po_id`.",
       ],
       columns: [
         { name: "po_id", type: "text" },

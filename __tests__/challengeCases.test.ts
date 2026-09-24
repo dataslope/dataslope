@@ -79,7 +79,8 @@ describe("examplesFromCases", () => {
       fields: [
         { name: "nums", value: "[1, 2]" },
         { name: "k", value: "3" },
-        { name: "output", value: "True", emphasis: true },
+        // Spelled per language only where the two differ.
+        { name: "output", value: "True", byLanguage: { javascript: "true" }, emphasis: true },
       ],
       note: "Shown.",
     });

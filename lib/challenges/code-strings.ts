@@ -691,7 +691,7 @@ const ISOMORPHIC_STRINGS = dualChallenge({
     "Case matters: `a` and `A` are different characters",
   ],
   solutionNote:
-    "Checking only that each character of `s` always maps to the same character of `t` is half the rule, and `\"badc\"` against `\"baba\"` passes it while sending both `b` and `d` to `b`. The mapping has to hold in both directions: keep two dictionaries, or note that `s`, `t` and the pairs `zip(s, t)` must all have the same number of distinct elements.",
+    "Checking only that each character of `s` always maps to the same character of `t` is half the rule, and `\"badc\"` against `\"baba\"` passes it while sending both `b` and `d` to `b`. The mapping has to hold in both directions: keep two dictionaries, or note that, once the lengths match, `s`, `t` and the pairs `zip(s, t)` must all have the same number of distinct elements. The length check is not optional there, because `zip` stops at the shorter string and would pair `\"ab\"` with `\"aba\"` without complaint.",
   python: {
     fn: "is_isomorphic",
     signature: "def is_isomorphic(s: str, t: str) -> bool",
@@ -744,7 +744,13 @@ const ISOMORPHIC_STRINGS = dualChallenge({
     { id: "one-to-two", name: "One character, two names", args: ["foo", "bar"], expected: false },
     { id: "longer", name: "A longer match", args: ["paper", "title"], expected: true },
     { id: "swap", name: "Characters can swap names", args: ["ab", "ba"], expected: true },
-    { id: "lengths", name: "Different lengths", args: ["ab", "abc"], expected: false },
+    {
+      id: "lengths",
+      name: "Different lengths",
+      description: "Every pair that lines up is consistent, but t has a character left over.",
+      args: ["ab", "aba"],
+      expected: false,
+    },
     { id: "empty", name: "Two empty strings", args: ["", ""], expected: true },
   ],
 });
@@ -769,7 +775,7 @@ const WRAP_TEXT = dualChallenge({
     "Words are separated by spaces only",
   ],
   solutionNote:
-    "Keep the current line and ask of each word whether `len(line) + 1 + len(word)` still fits; if not, close the line and start the next with that word, which is also what puts an overlong word on a line of its own. The traps are at the ends: emitting an empty first line when the first word is already too long, and forgetting the last line after the loop. Python's `textwrap.wrap` splits long words and breaks at hyphens by default, so it only matches with `break_long_words=False` and `break_on_hyphens=False`.",
+    "Keep the current line and ask of each word whether `len(line) + 1 + len(word)` still fits; if not, close the line and start the next with that word, which is also what puts an overlong word on a line of its own. The traps are at the ends: emitting an empty first line when the first word is already too long, and forgetting the last line after the loop. Python's `textwrap.wrap` splits long words and breaks at hyphens by default, and it keeps runs of spaces inside a line, so it only matches with `break_long_words=False` and `break_on_hyphens=False` on text whose words have already been rejoined with single spaces.",
   python: {
     fn: "wrap_text",
     signature: "def wrap_text(text: str, width: int) -> list[str]",
@@ -864,7 +870,7 @@ const ALMOST_PALINDROME = dualChallenge({
   prompt: [
     "Return whether `s` reads the same forwards and backwards after deleting at most one character. `\"abca\"` qualifies (delete the `b` or the `c`); `\"abc\"` does not, since no single deletion leaves a palindrome. A string that is already a palindrome qualifies without deleting anything.",
     "Every character counts: the input is lowercase letters only, and nothing is skipped or ignored.",
-    "Strings run to a hundred thousand characters, so trying each deletion in turn and re-checking the whole string, which is O(n²), is too slow. Walk inwards from both ends instead.",
+    "Strings run to two hundred thousand characters, so trying each deletion in turn and re-checking the whole string, which is O(n²), is too slow. Walk inwards from both ends instead.",
   ],
   params: ["s"],
   constraints: ["`0 ≤ len(s) ≤ 2 × 10⁵`", "Lowercase letters `a` to `z` only"],
