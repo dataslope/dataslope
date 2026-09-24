@@ -33,7 +33,7 @@ describe("challenge catalog", () => {
    * wanting one problem, and a gated build is the exception.
    */
   it("ships three hundred challenges, at least four in five single-step", () => {
-    expect(SLUGS.length).toBe(198);
+    expect(SLUGS.length).toBe(261);
     const single = SLUGS.filter((s) => !isMultiStep(getChallenge(s)!));
     expect(single.length).toBeGreaterThanOrEqual(50);
   });

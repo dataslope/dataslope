@@ -20,6 +20,10 @@
 
 import { LEAGUE } from "./dataset-league";
 import { MUSIC } from "./dataset-music";
+import { RIDES } from "./dataset-rides";
+import { SCHOOL } from "./dataset-school";
+import { SUPPORT } from "./dataset-support";
+import { WAREHOUSE } from "./dataset-warehouse";
 import type { SchemaTable } from "./types";
 
 export interface ChallengeDataset {
@@ -569,8 +573,12 @@ export const DATASETS = {
   EVENTS,
   SUBSCRIPTIONS,
   LIBRARY,
+  SCHOOL,
+  SUPPORT,
+  WAREHOUSE,
+  RIDES,
   MUSIC,
   LEAGUE,
 } as const;
 
-export { LEAGUE, MUSIC };
+export { LEAGUE, MUSIC, RIDES, SCHOOL, SUPPORT, WAREHOUSE };
