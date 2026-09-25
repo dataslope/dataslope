@@ -14,7 +14,7 @@
  * it falls while every individual cohort improves, which is Simpson's paradox
  * arriving through the back door of a growth dashboard.
  */
-import { Plot, plot, ACCENT, HALO, MUTED, SERIES } from "./_theme.mjs";
+import { Plot, plot, HALO, MUTED, SERIES } from "./_theme.mjs";
 
 export const title =
   "Retention curves for five signup cohorts over twelve weeks, each later cohort holding a higher share of its signups than the one before it.";

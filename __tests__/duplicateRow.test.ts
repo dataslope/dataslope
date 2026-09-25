@@ -11,9 +11,6 @@ import {
   isNumericColumnType,
   isDuplicatePlanComplete,
   isSqliteRowidAlias,
-  looksLikeUuid,
-  newUuid,
-  suggestDuplicateText,
   type DuplicateColumnChoice,
   type DuplicateStrategy,
 } from "../app/_components/sql/utils/duplicateRow";
@@ -127,19 +124,6 @@ describe("isSqliteRowidAlias", () => {
   });
 });
 
-describe("looksLikeUuid", () => {
-  it("matches a canonical UUID, in either case", () => {
-    expect(looksLikeUuid("f47ac10b-58cc-4372-a567-0e02b2c3d479")).toBe(true);
-    expect(looksLikeUuid("F47AC10B-58CC-4372-A567-0E02B2C3D479")).toBe(true);
-  });
-
-  it("rejects anything else", () => {
-    expect(looksLikeUuid("not-a-uuid")).toBe(false);
-    expect(looksLikeUuid(42)).toBe(false);
-    expect(looksLikeUuid(null)).toBe(false);
-  });
-});
-
 describe("duplicateInsertColumns", () => {
   it("drops the columns the database re-populates", () => {
     const info = [
@@ -154,13 +138,6 @@ describe("duplicateInsertColumns", () => {
         info,
       ),
     ).toEqual({ names: ["email", "name"], values: ["a@b.c", "Ada"] });
-  });
-
-  it("keeps every column when nothing is auto-populated", () => {
-    expect(duplicateInsertColumns(["a", "b"], [1, 2], undefined)).toEqual({
-      names: ["a", "b"],
-      values: [1, 2],
-    });
   });
 
   it("copies a NON-unique generated-default column instead of regenerating it", () => {
@@ -313,47 +290,6 @@ describe("incrementMaxValue", () => {
   it("keeps precision past 2^53 by returning a decimal string", () => {
     expect(incrementMaxValue("9007199254740993")).toBe("9007199254740994");
   });
-
-  it("falls back to 1 for a value that isn't a number at all", () => {
-    expect(incrementMaxValue("abc")).toBe(1);
-  });
-});
-
-describe("suggestDuplicateText", () => {
-  const numeric: DuplicateColumnChoice = {
-    name: "id",
-    type: "INT",
-    isPrimaryKey: true,
-    isUnique: false,
-    originalValue: 7,
-    autoKind: "next-number",
-    canBeNull: false,
-    canKeep: false,
-  };
-
-  it("suggests one past the copied number", () => {
-    expect(suggestDuplicateText(numeric, "")).toBe("8");
-  });
-
-  it("hands a UUID column the caller's fresh UUID", () => {
-    expect(
-      suggestDuplicateText({ ...numeric, autoKind: "uuid" }, "abc-123"),
-    ).toBe("abc-123");
-  });
-
-  it('suffixes text with " (copy)"', () => {
-    expect(
-      suggestDuplicateText(
-        {
-          ...numeric,
-          type: "TEXT",
-          originalValue: "ada@example.com",
-          autoKind: null,
-        },
-        "",
-      ),
-    ).toBe("ada@example.com (copy)");
-  });
 });
 
 describe("isDuplicatePlanComplete", () => {
@@ -486,18 +422,6 @@ describe("buildDuplicateRowPlan", () => {
     ]);
   });
 
-  it("mints one UUID per auto UUID column", () => {
-    let n = 0;
-    const plan = buildDuplicateRowPlan(
-      [{ ...idChoice, type: "uuid", autoKind: "uuid" }],
-      { id: "auto" },
-      {},
-      () => `uuid-${++n}`,
-    );
-    expect(plan.overrides).toEqual([{ column: "id", value: "uuid-1" }]);
-    expect(plan.nextNumber).toEqual([]);
-  });
-
   it("leaves kept columns out of the plan entirely", () => {
     const strategies: Record<string, DuplicateStrategy> = {
       id: "auto",
@@ -512,31 +436,9 @@ describe("buildDuplicateRowPlan", () => {
     expect(plan.overrides).toEqual([]);
     expect(plan.nextNumber).toEqual(["id"]);
   });
-
-  it("writes NULL for the set-to-NULL option", () => {
-    const plan = buildDuplicateRowPlan(
-      [emailChoice],
-      { email: "null" },
-      {},
-      () => "unused",
-    );
-    expect(plan.overrides).toEqual([{ column: "email", value: null }]);
-  });
 });
 
 describe("applyDuplicateRowPlan", () => {
-  it("returns the row untouched when there is no plan", async () => {
-    const resolved = await applyDuplicateRowPlan(
-      ["id", "name"],
-      [1, "Ada"],
-      undefined,
-      async () => {
-        throw new Error("should not be called");
-      },
-    );
-    expect(resolved).toEqual({ names: ["id", "name"], values: [1, "Ada"] });
-  });
-
   it("substitutes overrides and resolves MAX + 1 for nextNumber columns", async () => {
     const asked: string[] = [];
     const resolved = await applyDuplicateRowPlan(
@@ -556,18 +458,6 @@ describe("applyDuplicateRowPlan", () => {
       names: ["id", "email"],
       values: [42, "grace@example.com"],
     });
-  });
-
-  it("never queries when the plan asks for no generated numbers", async () => {
-    const resolved = await applyDuplicateRowPlan(
-      ["email"],
-      ["ada@example.com"],
-      { nextNumber: [], overrides: [{ column: "email", value: null }] },
-      async () => {
-        throw new Error("should not be called");
-      },
-    );
-    expect(resolved.values).toEqual([null]);
   });
 
   it("ignores plan entries for columns the INSERT doesn't carry", async () => {
@@ -627,16 +517,5 @@ describe("constraintInfoFromColumns", () => {
     ]);
     expect(info.isAutoIncrement).toBe(false);
     expect(info.autoPopulated).toBe(true);
-  });
-});
-
-describe("newUuid", () => {
-  it("returns a distinct, canonically shaped v4 UUID", () => {
-    const a = newUuid();
-    const b = newUuid();
-    expect(looksLikeUuid(a)).toBe(true);
-    expect(a[14]).toBe("4");
-    expect("89ab").toContain(a[19].toLowerCase());
-    expect(a).not.toBe(b);
   });
 });

@@ -55,7 +55,6 @@ const ORDER = ROWS.map((d) => d.key);
 const THRESHOLD = 0.1; // the usual "balanced" cutoff for a standardised difference
 const OVER = ROWS.filter((d) => d.selected > THRESHOLD).length;
 const OVER_RAND = ROWS.filter((d) => d.randomised > THRESHOLD).length;
-const UNMEASURED = ROWS.filter((d) => d.unmeasured);
 
 export const caption = `Ten covariates and the standardised gap between two arms on each. Under self-selection ${OVER} of the ten exceed the usual 0.1 threshold for balance; under randomization ${OVER_RAND} do.`;
 

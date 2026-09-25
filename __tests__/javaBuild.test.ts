@@ -272,8 +272,8 @@ describe("annotateJava8", () => {
 /**
  * The launcher is the part of this playground that is Java rather than
  * TypeScript, and every claim it makes — the thread is named `main`,
- * `System.in` ends, a missing class is a message rather than a crash — is a
- * claim about a JVM. So it is compiled and run on one.
+ * `System.in` ends, a stack trace reads as the JVM's own — is a claim about a
+ * JVM. So it is compiled and run on one.
  */
 describe("against a real JDK", () => {
   const jdk = (() => {
@@ -326,20 +326,6 @@ describe("against a real JDK", () => {
       env,
     });
   }
-
-  it.skipIf(!jdk)("compiles clean under -Xlint at Java 8", () => {
-    const dir = mkdtempSync(join(tmpdir(), "ds-java-"));
-    const diagnostics = compile(dir, {
-      [LAUNCHER_FILENAME]: buildLauncherSource({
-        binaryName: "myapp.Main",
-        stdinPath: join(dir, "stdin"),
-        vmVersion: "4.3",
-        classesDirName: "r1",
-      }),
-      "__DataslopeWarmup.java": buildWarmupSource("__DataslopeWarmup"),
-    });
-    expect(diagnostics).toBe("");
-  });
 
   it.skipIf(!jdk)(
     "runs a class in a package, and names the thread main",
@@ -404,8 +390,11 @@ public class Main {
   it.skipIf(!jdk)("reads stdin from the file the workspace supplies", () => {
     const dir = mkdtempSync(join(tmpdir(), "ds-java-"));
     writeFileSync(join(dir, "stdin"), "Ada\n42\n");
+    // Every compile here runs under -Xlint at Java 8 and must be clean; the
+    // warmup class rides along so it is held to the same bar.
     expect(
       compile(dir, {
+        "__DataslopeWarmup.java": buildWarmupSource("__DataslopeWarmup"),
         "Main.java": `import java.util.Scanner;
 
 public class Main {
@@ -425,43 +414,6 @@ public class Main {
       }),
     ).toBe("");
     expect(run(dir, LAUNCHER_CLASS).stdout).toBe("name = Ada\nn = 84\n");
-  });
-
-  it.skipIf(!jdk)(
-    "says so when the class it was told to launch is absent",
-    () => {
-      const dir = mkdtempSync(join(tmpdir(), "ds-java-"));
-      expect(
-        compile(dir, {
-          [LAUNCHER_FILENAME]: buildLauncherSource({
-            binaryName: "Nowhere",
-            stdinPath: null,
-            vmVersion: "4.3",
-            classesDirName: "r1",
-          }),
-        }),
-      ).toBe("");
-      const result = run(dir, LAUNCHER_CLASS);
-      expect(result.stderr).toContain(
-        "could not find or load main class Nowhere",
-      );
-      expect(result.status).toBe(1);
-    },
-  );
-
-  it.skipIf(!jdk)("leaves System.exit's code alone", () => {
-    const dir = mkdtempSync(join(tmpdir(), "ds-java-"));
-    compile(dir, {
-      "Main.java":
-        "public class Main { public static void main(String[] a) { System.exit(3); } }\n",
-      [LAUNCHER_FILENAME]: buildLauncherSource({
-        binaryName: "Main",
-        stdinPath: null,
-        vmVersion: "4.3",
-        classesDirName: "r1",
-      }),
-    });
-    expect(run(dir, LAUNCHER_CLASS).status).toBe(3);
   });
 
   it.skipIf(!jdk)("prints the trace the JVM would have printed", () => {

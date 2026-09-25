@@ -516,8 +516,3 @@ export function canRunTests(
   const hasNative = tests.some(isNativeTest);
   return !hasNative || hasNativeHarness(adapterId);
 }
-
-/** Backwards-compatible alias for `hasNativeHarness`. */
-export function hasHarness(adapterId: string): boolean {
-  return hasNativeHarness(adapterId);
-}

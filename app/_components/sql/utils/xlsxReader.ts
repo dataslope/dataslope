@@ -355,15 +355,3 @@ export async function readXlsxWorkbook(
   }
   return sheets;
 }
-
-/** Sheet names alone, for a picker, without materialising every row. */
-export async function readXlsxSheetNames(
-  input: File | Uint8Array,
-): Promise<string[]> {
-  const bytes =
-    input instanceof Uint8Array
-      ? input
-      : new Uint8Array(await input.arrayBuffer());
-  const zip = await loadZip(bytes);
-  return (await sheetParts(zip)).map((s) => s.name);
-}

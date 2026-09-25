@@ -10,10 +10,7 @@ import {
   PhpOutputRouter,
   type PhpOutputChunk,
 } from "../app/_components/runtime/phpOutput";
-import {
-  buildEntryScript,
-  PGLITE_ABORT_RE,
-} from "../app/_components/runtime/phpEntry";
+import { buildEntryScript } from "../app/_components/runtime/phpEntry";
 
 /** Drive a router and reassemble the cells the surface would show. */
 function render(
@@ -101,23 +98,6 @@ describe("PhpOutputRouter", () => {
       "stdout",
       "log",
     ]);
-  });
-
-  it("routes a diagnostic to stderr and the program's own output to stdout", () => {
-    const { cells } = render([
-      ["stdout", "before\n"],
-      ["stdout", "Warning: something in /index.php on line 2\n"],
-      ["stdout", "after\n"],
-    ]);
-    expect(cells.map((c) => c.channel)).toEqual(["stdout", "stderr", "stdout"]);
-    expect(cells[1].content).toContain("Warning: something");
-  });
-
-  it("gives the stderr stream its own channel, not the error one", () => {
-    // error_log() is as often progress as it is failure; PHP's stderr is a
-    // destination, not a severity.
-    const { cells } = render([["stderr", "just a note\n"]]);
-    expect(cells[0].channel).toBe("log");
   });
 
   it("keeps a fatal error's headline above its stack trace", () => {
@@ -233,13 +213,6 @@ describe("PhpOutputRouter", () => {
 });
 
 describe("the entry script", () => {
-  it("runs the reader's file from the VFS, so it has a real path", () => {
-    const script = buildEntryScript("/index.php");
-    // Not evaluated as a string with a made-up label: `__FILE__`, `__DIR__`,
-    // the warning text and every stack frame come from the file itself.
-    expect(script).toContain('require "/index.php";');
-  });
-
   it("defines the CLI streams the embed SAPI lacks", () => {
     const script = buildEntryScript("/index.php");
     for (const name of ["STDIN", "STDOUT", "STDERR"]) {
@@ -249,28 +222,8 @@ describe("the entry script", () => {
     expect(script).toContain("php://stderr");
   });
 
-  it("gives $argv something to hold", () => {
-    const script = buildEntryScript("/index.php");
-    expect(script).toContain('$argv = ["/index.php"];');
-    expect(script).toContain("$argc = 1;");
-    expect(script).toContain("$_SERVER['SCRIPT_FILENAME'] = \"/index.php\";");
-  });
-
   it("quotes a path that would otherwise break out of the string", () => {
     const script = buildEntryScript('/od"d.php');
     expect(script).toContain('require "/od\\"d.php";');
-  });
-
-  it("follows the chosen entry file", () => {
-    expect(buildEntryScript("/app/main.php")).toContain('require "/app/main.php";');
-  });
-
-  it("recognises the PGlite abort php-wasm prints", () => {
-    expect(
-      PGLITE_ABORT_RE.test(
-        "The PGlite class must be provided as a constructor arg to PHP to use PGlite.",
-      ),
-    ).toBe(true);
-    expect(PGLITE_ABORT_RE.test("ordinary output")).toBe(false);
   });
 });

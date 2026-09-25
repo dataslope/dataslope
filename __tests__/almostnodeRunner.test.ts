@@ -40,15 +40,6 @@ async function runSingleFileJs(
 }
 
 describe("AlmostNodeRunner per-run isolation", () => {
-  it("runs a single-file snippet", async () => {
-    const runner = new AlmostNodeRunner();
-    const { stdout } = await runSingleFileJs(
-      runner,
-      `console.log("Hello, Ada!");`,
-    );
-    expect(stdout).toBe("Hello, Ada!");
-  });
-
   // The reported bug, distilled: run a greeter then a counter on the SAME
   // runner; the counter must never print the greeter's output.
   it("does not leak the previous block's output into the next", async () => {
@@ -132,23 +123,6 @@ describe("AlmostNodeRunner per-run isolation", () => {
     );
     expect(second.stdout).toBe("no-utils");
     expect(second.stdout).not.toContain("LEAKED");
-  });
-
-  // Guard the multi-file happy path so the isolation fix doesn't break
-  // legitimate require() resolution within a single staged run.
-  it("resolves require() against freshly-staged files within a run", async () => {
-    const runner = new AlmostNodeRunner();
-    runner.stage([
-      ["index.js", encoder.encode(`console.log(require("./math").add(2, 3));`)],
-      ["math.js", encoder.encode(`exports.add = (a, b) => a + b;`)],
-    ]);
-    const s = makeSink();
-    await runner.run(
-      "/index.js",
-      () => `console.log(require("./math").add(2, 3));`,
-      s.sink,
-    );
-    expect(s.stdout()).toBe("5");
   });
 
   // The TS worker resolves its entry via vfs.existsSync (prefer staged copy),

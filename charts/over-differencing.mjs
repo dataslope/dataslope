@@ -24,7 +24,7 @@
  * the world.
  */
 import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, mean, rng } from "./_theme.mjs";
-import { panel, panelAxis, panelBaseline, panelSpace, panelTitle } from "./_panels.mjs";
+import { panel, panelSpace, panelTitle } from "./_panels.mjs";
 
 export const title =
   "One series with a linear trend, differenced zero, once and twice, with the variance of each printed. The first difference removes the trend and cuts the variance; the second adds variance back and puts a large negative correlation at lag one that was never in the data.";

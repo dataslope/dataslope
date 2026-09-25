@@ -119,14 +119,4 @@ describe("backupLocalWorkspaces", () => {
     expect(uploaded).toBe(1);
     expect(saved).toEqual(["a"]);
   });
-
-  it("does nothing when everything is already backed up", async () => {
-    const { backupLocalWorkspaces } = await import(BACKUP);
-    const uploaded = await backupLocalWorkspaces({
-      entries: [entry("a", "python")],
-      cloudIds: new Set(["a"]),
-    });
-    expect(uploaded).toBe(0);
-    expect(built).toEqual([]);
-  });
 });

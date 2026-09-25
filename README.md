@@ -79,10 +79,10 @@ challenges.
 | <img src="https://cdn.simpleicons.org/c/a8b9cc" width="18" alt=""> | **C** | C17 | Clang, compiled to WASM in the tab |
 | <img src="https://cdn.simpleicons.org/cplusplus/00599c" width="18" alt=""> | **C++** | C++20 | Clang, compiled to WASM in the tab |
 | <img src="https://cdn.simpleicons.org/openjdk/ed8b00" width="18" alt=""> | **Java** | 8 | CheerpJ (OpenJDK) |
-| <img src="https://cdn.simpleicons.org/sharp/9b4f96" width="18" alt=""> | **C#** | 13 on .NET 10 | Roslyn on .NET WebAssembly |
+| <img src="https://cdn.simpleicons.org/sharp/9b4f96" width="18" alt=""> | **C#** | 14 on .NET 10 | Roslyn on .NET WebAssembly |
 | <img src="https://cdn.simpleicons.org/html5/e34f26" width="18" alt=""> | **HTML / CSS** | HTML5, CSS3 | Live preview of your own markup |
-| <img src="https://cdn.simpleicons.org/react/61dafb" width="18" alt=""> | **React** | 19.2 | JSX bundled in the browser |
-| <img src="https://cdn.simpleicons.org/postgresql/4169E1" width="18" alt=""> | **PostgreSQL** | 17 | PGlite |
+| <img src="https://cdn.simpleicons.org/react/61dafb" width="18" alt=""> | **React** | 19.3 | JSX bundled in the browser |
+| <img src="https://cdn.simpleicons.org/postgresql/4169E1" width="18" alt=""> | **PostgreSQL** | 18 | PGlite |
 | <img src="https://cdn.simpleicons.org/sqlite/003b57" width="18" alt=""> | **SQLite** | 3.53 | The official SQLite WASM build |
 | <img src="https://cdn.simpleicons.org/duckdb/FFBE11" width="18" alt=""> | **DuckDB** | 1.32 | DuckDB-Wasm |
 

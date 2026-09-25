@@ -89,20 +89,3 @@ export function loadActiveTabId(dbId: string, tabs: QueryTab[]): string {
   if (saved && tabs.some((t) => t.id === saved)) return saved;
   return tabs[0].id;
 }
-
-export function tabsAreDirty(
-  tabs: QueryTab[],
-  defaults: QueryTabSeed[],
-): boolean {
-  // Dirty = the user added/removed tabs or edited any tab's contents.
-  if (tabs.length !== defaults.length) return true;
-  for (let i = 0; i < tabs.length; i += 1) {
-    if (
-      tabs[i].title !== defaults[i].title ||
-      tabs[i].code !== defaults[i].code
-    ) {
-      return true;
-    }
-  }
-  return false;
-}

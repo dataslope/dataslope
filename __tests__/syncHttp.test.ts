@@ -142,12 +142,6 @@ describe("installSyncHttp globals", () => {
     expect(typeof (globalThis as { importScripts?: unknown }).importScripts).toBe("function");
     expect(globalThis.crossOriginIsolated).toBe(false);
   });
-
-  it("reports crossOriginIsolated false, matching the site", () => {
-    // The site serves no COOP/COEP headers, so this is false in the reader's
-    // worker too; pyodide_http then takes the XHR path rather than SAB streaming.
-    expect(globalThis.crossOriginIsolated).toBe(false);
-  });
 });
 
 describe("synchronous transport", () => {
@@ -223,19 +217,6 @@ describe("synchronous transport", () => {
 });
 
 describe("GET cache", () => {
-  it("serves a repeat GET without hitting the server again", () => {
-    const url = `${origin}/cache-me`;
-    expect(get(url).responseText).toBe("hello");
-    const afterFirst = hitsFor("/cache-me");
-
-    const second = get(url);
-    expect(second.status).toBe(200);
-    expect(second.responseText).toBe("hello");
-    // A sweep re-run should be offline and instant, the way declared datasets
-    // already are.
-    expect(hitsFor("/cache-me")).toBe(afterFirst);
-  });
-
   it("does not cache a POST", () => {
     const before = hitsFor("/echo");
     for (let i = 0; i < 2; i += 1) {

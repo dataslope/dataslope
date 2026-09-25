@@ -1,46 +1,8 @@
+// Every non-React package is pinned to share the one React instance through
+// `?deps`: two copies of React on a page break hooks ("Invalid hook call").
 import { describe, it, expect } from "vitest";
 
-import {
-  esmShUrlFor,
-  isBareSpecifier,
-  REACT_VERSION,
-  splitPackageSpecifier,
-} from "../app/_components/runtime/esmResolve";
-
-describe("isBareSpecifier", () => {
-  it("accepts package names and scoped packages", () => {
-    expect(isBareSpecifier("react")).toBe(true);
-    expect(isBareSpecifier("react-dom/client")).toBe(true);
-    expect(isBareSpecifier("@tanstack/react-table")).toBe(true);
-  });
-
-  it("rejects relative, absolute, and URL specifiers", () => {
-    expect(isBareSpecifier("./App")).toBe(false);
-    expect(isBareSpecifier("../util")).toBe(false);
-    expect(isBareSpecifier("/main.tsx")).toBe(false);
-    expect(isBareSpecifier("https://esm.sh/react")).toBe(false);
-  });
-});
-
-describe("splitPackageSpecifier", () => {
-  it("splits plain packages with subpaths", () => {
-    expect(splitPackageSpecifier("react-dom/client")).toEqual({
-      packageName: "react-dom",
-      subpath: "/client",
-    });
-  });
-
-  it("splits scoped packages", () => {
-    expect(splitPackageSpecifier("@scope/pkg/sub/deep")).toEqual({
-      packageName: "@scope/pkg",
-      subpath: "/sub/deep",
-    });
-    expect(splitPackageSpecifier("@scope/pkg")).toEqual({
-      packageName: "@scope/pkg",
-      subpath: "",
-    });
-  });
-});
+import { esmShUrlFor, REACT_VERSION } from "../app/_components/runtime/esmResolve";
 
 describe("esmShUrlFor", () => {
   it("pins react itself with no deps parameter", () => {
@@ -59,6 +21,9 @@ describe("esmShUrlFor", () => {
   it("passes other packages through unpinned but react-deduped", () => {
     expect(esmShUrlFor("canvas-confetti")).toBe(
       `https://esm.sh/canvas-confetti?deps=react@${REACT_VERSION}`,
+    );
+    expect(esmShUrlFor("@tanstack/react-table")).toBe(
+      `https://esm.sh/@tanstack/react-table?deps=react@${REACT_VERSION}`,
     );
   });
 });

@@ -150,7 +150,7 @@ async function createPostgresEngine() {
   const db = await PGlite.create();
   return {
     label: "PostgreSQL",
-    version: "17",
+    version: "18",
     async exec(sql) {
       // PGlite runs a multi-statement string itself and returns one result per
       // statement, which is what the browser adapter relies on too.

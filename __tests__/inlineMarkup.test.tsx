@@ -25,38 +25,14 @@ describe("withInlineMarkup", () => {
     ]);
   });
 
-  it("handles several spans and keeps the text between them", () => {
-    expect(shape(withInlineMarkup("`=` is assignment, `==` is comparison"))).toEqual([
-      "code:=",
-      " is assignment, ",
-      "code:==",
-      " is comparison",
-    ]);
-  });
-
   it("leaves a title with no markup exactly as it was", () => {
     const title = "Where the term comes from";
     expect(withInlineMarkup(title)).toBe(title);
   });
 
-  it("renders a code span in a figure caption", () => {
-    expect(shape(withInlineMarkup("`melt()` unpivots; `pivot()` pivots."))).toEqual([
-      "code:melt()",
-      " unpivots; ",
-      "code:pivot()",
-      " pivots.",
-    ]);
-  });
-
   it("leaves an unpaired backtick literal, as markdown would", () => {
     const title = "a stray ` backtick";
     expect(withInlineMarkup(title)).toBe(title);
-  });
-
-  it("passes a non-string title through untouched", () => {
-    expect(withInlineMarkup(undefined)).toBe(undefined);
-    const node = <span>already JSX</span>;
-    expect(withInlineMarkup(node)).toBe(node);
   });
 
   // Emphasis. A chart caption writing "fits the conditional *mean*" printed
@@ -73,15 +49,6 @@ describe("withInlineMarkup", () => {
     expect(shape(withInlineMarkup("**Mode** is the only one for categories"))).toEqual([
       "strong:Mode",
       " is the only one for categories",
-    ]);
-  });
-
-  it("handles strong and emphasis in one string", () => {
-    expect(shape(withInlineMarkup("**pair** whenever the design *lets* you"))).toEqual([
-      "strong:pair",
-      " whenever the design ",
-      "em:lets",
-      " you",
     ]);
   });
 

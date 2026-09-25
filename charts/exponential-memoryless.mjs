@@ -64,7 +64,7 @@ export function render() {
       // then overlapped in the flat right-hand stretch where there is least
       // room. The repeated half now sits once, in the corner note below, and
       // each mark carries only what differs.
-      ...conditionals.map((c, i) =>
+      ...conditionals.map((c) =>
         Plot.text([c], {
           x: "t1",
           y: "s1",

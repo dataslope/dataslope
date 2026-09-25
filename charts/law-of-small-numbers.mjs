@@ -27,7 +27,7 @@
  * interesting. A point at the top of a ranking is not, until you know how big
  * it is.
  */
-import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, PRIMARY, rng } from "./_theme.mjs";
+import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, rng } from "./_theme.mjs";
 
 export const title =
   "Eighteen hundred simulated counties, all with exactly the same true rate, plotted as observed rate against population. The result is a funnel, and both the highest and the lowest observed rates belong to the smallest counties.";

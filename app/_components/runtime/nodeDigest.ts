@@ -51,23 +51,6 @@ const ALGORITHMS: Record<string, NobleHash> = {
   rmd160: ripemd160,
 };
 
-/** Names `crypto.getHashes()` should report, in Node's spelling. */
-export const SUPPORTED_ALGORITHMS = [
-  "md5",
-  "ripemd160",
-  "sha1",
-  "sha224",
-  "sha256",
-  "sha384",
-  "sha512",
-  "sha512-224",
-  "sha512-256",
-  "sha3-224",
-  "sha3-256",
-  "sha3-384",
-  "sha3-512",
-];
-
 /** The hash for a Node algorithm name, or null when there isn't one. */
 export function resolveDigest(name: string): NobleHash | null {
   if (typeof name !== "string") return null;

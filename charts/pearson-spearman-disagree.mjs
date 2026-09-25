@@ -28,7 +28,7 @@
  * anything about cause. Both are unitless numbers between minus one and one
  * describing how tidy a pattern is.
  */
-import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, mean, normalSamples, rng } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, PRIMARY, mean, normalSamples, rng } from "./_theme.mjs";
 import { panel, panelAxis, panelSpace, panelTitle } from "./_panels.mjs";
 
 export const title =

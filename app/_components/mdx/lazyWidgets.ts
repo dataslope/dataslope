@@ -39,9 +39,6 @@ export const MdxMultipleChoiceQuestion = lazyWidget(
 export const Mermaid = lazyWidget(() =>
   import("@/app/_components/mdx/mermaid").then((mod) => mod.Mermaid),
 );
-export const IllustrationPrompt = lazyWidget(
-  () => import("@/app/_components/mdx/IllustrationPrompt"),
-);
 export const LoadingAnimationsGallery = lazyWidget(
   () => import("@/app/_components/mdx/loadingAnimations"),
 );

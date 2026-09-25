@@ -35,7 +35,6 @@ import {
   ArrowDownToLine,
   Share2,
   ArrowUpFromLine,
-  CircleHelp,
   FolderOpen,
   Info,
   Database,
@@ -47,7 +46,6 @@ import {
   History,
   Network,
   Pencil,
-  RotateCcw,
   Settings2,
   Table,
   TriangleAlert,
@@ -55,6 +53,7 @@ import {
   Wand2,
   X,
 } from "lucide-react";
+import { SQLITE_WASM_VERSION } from "../runtime/cdn";
 import type { RuntimeInfo } from "../types";
 import { modifyDialogSignature } from "./types";
 import {
@@ -148,7 +147,17 @@ import { ToastList } from "./components/ToastList";
 import { QueryHistoryPane } from "./components/QueryHistoryPane";
 import type { SqlCompletionSchema } from "./sqlCompletion";
 import { useSettingsStore } from "./stores/useSettingsStore";
-import { usePragmaStore } from "./stores/usePragmaStore";
+import {
+  DEFAULT_PRAGMA_SETTINGS,
+  type PragmaSettings,
+  usePragmaStore,
+} from "./stores/usePragmaStore";
+import { PragmaSettingsTab } from "./components/PragmaSettingsTab";
+import {
+  applyPragmasToEngine,
+  PRAGMA_PAGE_SIZE_MAX,
+  PRAGMA_PAGE_SIZE_MIN,
+} from "./utils/pragmaUtils";
 import { useSqlPlaygroundStore } from "./stores/useSqlPlaygroundStore";
 import { useEngineStore } from "./stores/useEngineStore";
 import { useTabStore } from "./stores/useTabStore";
@@ -225,7 +234,7 @@ const SQLITE_DB_ACTIONS: readonly DatabaseSelectorAction[] = [
 const RUNTIME_INFO: RuntimeInfo = {
   language: "SQLite",
   version: "3.53",
-  engine: "@sqlite.org/sqlite-wasm 3.53.0",
+  engine: `@sqlite.org/sqlite-wasm ${SQLITE_WASM_VERSION.replace(/-build\d+$/, "")}`,
   engineUrl: "https://sqlite.org/wasm",
   notes:
     "Official SQLite build compiled to WebAssembly. Each sample database is rebuilt in memory on every page load.",
@@ -243,29 +252,6 @@ interface ColumnKeyHints {
   fk: Map<string, ForeignKeyInfo>;
 }
 
-// ─── Pragma settings ─────────────────────────────────────────────────────
-
-/** Pragma defaults when no saved preferences exist. `foreignKeys` is ON
- *  because the engine already enables it in `build()`. */
-const DEFAULT_PRAGMA_SETTINGS = {
-  foreignKeys: true,
-  journalMode: "delete",
-  synchronous: "full",
-  pageSize: 4096,
-  automaticIndex: true,
-  caseSensitiveLike: false,
-} as const;
-
-type PragmaSettings = {
-  foreignKeys: boolean;
-  journalMode: string;
-  synchronous: string;
-  pageSize: number;
-  automaticIndex: boolean;
-  caseSensitiveLike: boolean;
-};
-
-/** Minimum and maximum valid SQLite page sizes. */
 /** Column affinities offered per column when a CSV/JSON import creates the
  *  table. Kept in step with the allowlist `sqliteColumnType` enforces. */
 const SQLITE_IMPORT_TYPE_CHOICES = [
@@ -275,38 +261,6 @@ const SQLITE_IMPORT_TYPE_CHOICES = [
   "NUMERIC",
   "BLOB",
 ] as const;
-const PRAGMA_PAGE_SIZE_MIN = 512;
-const PRAGMA_PAGE_SIZE_MAX = 65536;
-
-/** Human-readable `synchronous` names → PRAGMA integer values. */
-const PRAGMA_SYNC_MAP: Record<string, string> = {
-  off: "0",
-  normal: "1",
-  full: "2",
-};
-
-/** Apply pragma settings to an initialised engine (after boot and on save).
- *  Errors are swallowed so one unsupported pragma doesn't block the rest. */
-async function applyPragmasToEngine(
-  engine: import("../runtime/sqlite").SqliteEngine,
-  p: PragmaSettings,
-): Promise<void> {
-  const statements: string[] = [
-    `PRAGMA foreign_keys = ${p.foreignKeys ? "ON" : "OFF"}`,
-    `PRAGMA journal_mode = ${p.journalMode}`,
-    `PRAGMA synchronous = ${PRAGMA_SYNC_MAP[p.synchronous] ?? "2"}`,
-    `PRAGMA page_size = ${Math.max(PRAGMA_PAGE_SIZE_MIN, Math.min(PRAGMA_PAGE_SIZE_MAX, p.pageSize))}`,
-    `PRAGMA automatic_index = ${p.automaticIndex ? "ON" : "OFF"}`,
-    `PRAGMA case_sensitive_like = ${p.caseSensitiveLike ? "ON" : "OFF"}`,
-  ];
-  for (const sql of statements) {
-    try {
-      await engine.exec(sql);
-    } catch {
-      // Silently ignore unsupported pragmas (e.g. page_size on a non-empty db).
-    }
-  }
-}
 
 // ────────────────────────────────────────────────────────────────────────
 // Component
@@ -322,230 +276,6 @@ export default function SqlPlayground() {
         </Toast.Viewport>
       </Toast.Portal>
     </Toast.Provider>
-  );
-}
-
-// ─── Pragma descriptions shown in each row's info popover ────────────────────
-
-const PRAGMA_DESCRIPTIONS: Record<keyof PragmaSettings, string> = {
-  foreignKeys:
-    "Enforces referential integrity for foreign key constraints. When ON, SQLite raises an error on inserts or updates that would violate a declared FOREIGN KEY relationship.",
-  journalMode:
-    "Controls how the rollback journal file is managed after a commit. DELETE (default) removes the journal each time. WAL (Write-Ahead Log) allows concurrent reads while a write is in progress.",
-  synchronous:
-    "Controls how aggressively SQLite syncs data to disk. FULL (default) is safest; NORMAL reduces sync calls; OFF skips syncing entirely and is fastest but risks corruption on an OS crash.",
-  pageSize:
-    "Size in bytes of each page in the database file. Must be a power of 2 between 512 and 65536. Can only be changed before the first table is created in a new database.",
-  automaticIndex:
-    "When ON (default), SQLite may automatically create temporary indexes during query planning to speed up full-table scans. Disabling reduces memory overhead at the cost of potentially slower queries.",
-  caseSensitiveLike:
-    "When ON, the LIKE operator distinguishes uppercase and lowercase ASCII letters. By default (OFF), LIKE is case-insensitive for ASCII characters.",
-};
-
-function PragmaInfoButton({ pragma }: { pragma: keyof PragmaSettings }) {
-  return (
-    <Popover.Root>
-      <Popover.Trigger
-        className="pragma-info-btn"
-        aria-label="More info"
-        openOnHover
-        delay={80}
-        closeDelay={120}
-      >
-        <CircleHelp size={13} aria-hidden="true" />
-      </Popover.Trigger>
-      <Popover.Portal>
-        <Popover.Positioner
-          className="pragma-info-positioner"
-          sideOffset={6}
-          align="start"
-        >
-          <Popover.Popup className="bui-popup pragma-info-popup">
-            <p className="pragma-info-text">{PRAGMA_DESCRIPTIONS[pragma]}</p>
-          </Popover.Popup>
-        </Popover.Positioner>
-      </Popover.Portal>
-    </Popover.Root>
-  );
-}
-
-// ─── Pragma settings tab ─────────────────────────────────────────────────────
-
-function PragmaSettingsTab({
-  savedPragmas,
-  onSave,
-}: {
-  savedPragmas: PragmaSettings;
-  onSave: (p: PragmaSettings) => void;
-}) {
-  const [draft, setDraft] = useState<PragmaSettings>({ ...savedPragmas });
-
-  const hasChanges =
-    draft.foreignKeys !== savedPragmas.foreignKeys ||
-    draft.journalMode !== savedPragmas.journalMode ||
-    draft.synchronous !== savedPragmas.synchronous ||
-    draft.pageSize !== savedPragmas.pageSize ||
-    draft.automaticIndex !== savedPragmas.automaticIndex ||
-    draft.caseSensitiveLike !== savedPragmas.caseSensitiveLike;
-
-  return (
-    <Tabs.Panel value="pragmas" className="settings-panel-pane">
-      <div className="settings-body pragma-settings-body">
-        {/* Foreign keys */}
-        <div className="pragma-row">
-          <div className="pragma-label-wrap">
-            <span className="pragma-label">Foreign Keys</span>
-            <PragmaInfoButton pragma="foreignKeys" />
-          </div>
-          <label className="setting-checkbox-row pragma-checkbox-row">
-            <input
-              type="checkbox"
-              checked={draft.foreignKeys}
-              onChange={(e) =>
-                setDraft((d) => ({ ...d, foreignKeys: e.target.checked }))
-              }
-            />
-            <span className="pragma-checkbox-label">
-              {draft.foreignKeys ? "Enabled" : "Disabled"}
-            </span>
-          </label>
-        </div>
-
-        {/* Journal mode */}
-        <div className="pragma-row">
-          <div className="pragma-label-wrap">
-            <span className="pragma-label">Journal Mode</span>
-            <PragmaInfoButton pragma="journalMode" />
-          </div>
-          <div className="pragma-select-wrap">
-            <select
-              className="pragma-select"
-              value={draft.journalMode}
-              onChange={(e) =>
-                setDraft((d) => ({ ...d, journalMode: e.target.value }))
-              }
-            >
-              <option value="delete">Delete</option>
-              <option value="truncate">Truncate</option>
-              <option value="persist">Persist</option>
-              <option value="memory">Memory</option>
-              <option value="wal">WAL</option>
-              <option value="off">Off</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Synchronous */}
-        <div className="pragma-row">
-          <div className="pragma-label-wrap">
-            <span className="pragma-label">Synchronous</span>
-            <PragmaInfoButton pragma="synchronous" />
-          </div>
-          <div className="pragma-select-wrap">
-            <select
-              className="pragma-select"
-              value={draft.synchronous}
-              onChange={(e) =>
-                setDraft((d) => ({ ...d, synchronous: e.target.value }))
-              }
-            >
-              <option value="off">Off</option>
-              <option value="normal">Normal</option>
-              <option value="full">Full</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Page size */}
-        <div className="pragma-row">
-          <div className="pragma-label-wrap">
-            <span className="pragma-label">Page Size (bytes)</span>
-            <PragmaInfoButton pragma="pageSize" />
-          </div>
-          <div className="pragma-select-wrap">
-            <select
-              className="pragma-select"
-              value={draft.pageSize}
-              onChange={(e) =>
-                setDraft((d) => ({ ...d, pageSize: Number(e.target.value) }))
-              }
-            >
-              <option value={512}>512</option>
-              <option value={1024}>1024</option>
-              <option value={2048}>2048</option>
-              <option value={4096}>4096</option>
-              <option value={8192}>8192</option>
-              <option value={16384}>16384</option>
-              <option value={32768}>32768</option>
-              <option value={65536}>65536</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Automatic index */}
-        <div className="pragma-row">
-          <div className="pragma-label-wrap">
-            <span className="pragma-label">Automatic Index</span>
-            <PragmaInfoButton pragma="automaticIndex" />
-          </div>
-          <label className="setting-checkbox-row pragma-checkbox-row">
-            <input
-              type="checkbox"
-              checked={draft.automaticIndex}
-              onChange={(e) =>
-                setDraft((d) => ({ ...d, automaticIndex: e.target.checked }))
-              }
-            />
-            <span className="pragma-checkbox-label">
-              {draft.automaticIndex ? "Enabled" : "Disabled"}
-            </span>
-          </label>
-        </div>
-
-        {/* Case sensitive LIKE */}
-        <div className="pragma-row">
-          <div className="pragma-label-wrap">
-            <span className="pragma-label">Case Sensitive LIKE</span>
-            <PragmaInfoButton pragma="caseSensitiveLike" />
-          </div>
-          <label className="setting-checkbox-row pragma-checkbox-row">
-            <input
-              type="checkbox"
-              checked={draft.caseSensitiveLike}
-              onChange={(e) =>
-                setDraft((d) => ({
-                  ...d,
-                  caseSensitiveLike: e.target.checked,
-                }))
-              }
-            />
-            <span className="pragma-checkbox-label">
-              {draft.caseSensitiveLike ? "Enabled" : "Disabled"}
-            </span>
-          </label>
-        </div>
-
-        {/* Bottom actions */}
-        <div className="pragma-actions">
-          <button
-            type="button"
-            className="pragma-reset-btn"
-            onClick={() => setDraft({ ...DEFAULT_PRAGMA_SETTINGS })}
-          >
-            <RotateCcw size={14} aria-hidden="true" />
-            <span>Reset to defaults</span>
-          </button>
-          <button
-            type="button"
-            className="pragma-save-btn"
-            disabled={!hasChanges}
-            onClick={() => onSave(draft)}
-          >
-            Save
-          </button>
-        </div>
-      </div>
-    </Tabs.Panel>
   );
 }
 
@@ -4226,10 +3956,12 @@ function SqlPlaygroundInner() {
                         </>
                       ),
                       panel: (
-                        <PragmaSettingsTab
-                          savedPragmas={pragmaSettings}
-                          onSave={savePragmaSettings}
-                        />
+                        <Tabs.Panel value="pragmas" className="settings-panel-pane">
+                          <PragmaSettingsTab
+                            savedPragmas={pragmaSettings}
+                            onSave={savePragmaSettings}
+                          />
+                        </Tabs.Panel>
                       ),
                     },
                   ]}

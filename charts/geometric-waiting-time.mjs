@@ -30,7 +30,7 @@
  * happening, and then the tail is heavier than this and a fixed retry budget
  * is even less safe.
  */
-import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, PRIMARY, SERIES } from "./_theme.mjs";
+import { Plot, plot, HALO, MUTED, SERIES } from "./_theme.mjs";
 
 export const title =
   "The geometric distribution at success rates of 0.5, 0.2 and 0.08, with the mean 1/p marked on each. The most likely number of attempts is always one, and the mean sits far out in a long right tail.";

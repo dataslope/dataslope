@@ -16,7 +16,7 @@
  * two cannot drift apart, and the exaggeration factor in the caption is
  * computed rather than asserted.
  */
-import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, MUTED } from "./_theme.mjs";
 
 const BARS = [
   { team: "Team A", value: 94.1 },

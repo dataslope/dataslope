@@ -16,7 +16,7 @@
  * threshold at which it diverges (a rate of 1) is a property of that function
  * and is annotated as such.
  */
-import { Plot, plot, ACCENT, HALO, MUTED, SERIES } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, SERIES } from "./_theme.mjs";
 
 export const title =
   "Loss against step for gradient descent at three learning rates on the same quadratic: one barely moving, one converging within about ten steps, and one climbing away by orders of magnitude.";

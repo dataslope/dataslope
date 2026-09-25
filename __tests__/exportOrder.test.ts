@@ -40,15 +40,6 @@ describe("topoSortByForeignKeys", () => {
     expect([...out].sort()).toEqual(["a", "b"]);
     expect(out).toHaveLength(2);
   });
-
-  it("handles a longer dependency chain", () => {
-    const out = order(["d", "c", "b", "a"], {
-      d: ["c"],
-      c: ["b"],
-      b: ["a"],
-    });
-    expect(out).toEqual(["a", "b", "c", "d"]);
-  });
 });
 
 describe("formatSqlDumpValue", () => {

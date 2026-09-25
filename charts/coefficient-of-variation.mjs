@@ -29,8 +29,8 @@
  * Where all three hold, the CV is the right way to say "which of these is more
  * variable" across quantities that share no units at all.
  */
-import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, mean, normalSamples } from "./_theme.mjs";
-import { panel, panelAxis, panelBaseline, panelSpace, panelTitle } from "./_panels.mjs";
+import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, normalSamples } from "./_theme.mjs";
+import { panel, panelSpace, panelTitle } from "./_panels.mjs";
 
 export const title =
   "Two filling machines: one dosing 50 g with a standard deviation of 3 g, one dosing 10,000 g with a standard deviation of 60 g. The second has twenty times the standard deviation and a tenth the coefficient of variation, and it is the steadier machine.";

@@ -69,7 +69,9 @@ const config = defineCloudflareConfig({
 // (brotliDecompressSync verified there). Same mechanism the framework uses
 // for `node:crypto` — PRESERVE the existing entries, `ensure-cf-config`
 // fails if `node:crypto` is dropped.
-export default {
+const openNextConfig = {
   ...config,
   edgeExternals: [...(config.edgeExternals ?? []), "node:zlib"],
 };
+
+export default openNextConfig;

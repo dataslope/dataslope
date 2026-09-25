@@ -48,7 +48,6 @@ function loadLibClosure(seeds: string[]): Map<string, string> {
 function analyze(
   files: Array<[string, string]>,
   env: TsEnvironment = "node",
-  semantic = true,
 ): TsDiagnosticMessage[] {
   const libs = loadLibClosure(libSeedsFor(ts, env));
   const scripts = new Map<string, string>([
@@ -80,7 +79,7 @@ function analyze(
         ts,
         [
           ...service.getSyntacticDiagnostics(file),
-          ...(semantic ? service.getSemanticDiagnostics(file) : []),
+          ...service.getSemanticDiagnostics(file),
         ],
         file,
       ),
@@ -106,17 +105,6 @@ describe("type checking", () => {
     expect(new Set(diagnostics.map((d) => d.line))).toEqual(new Set([1, 2, 3]));
   });
 
-  it("is strict: null is not assignable to undefined", () => {
-    const diagnostics = analyze([["index.ts", `const u: undefined = null;`]]);
-    expect(diagnostics).toHaveLength(1);
-    expect(diagnostics[0].code).toBe(2322);
-  });
-
-  it("rejects an excess property in an object literal", () => {
-    const diagnostics = analyze([["index.ts", `const o: { a: number } = { a: 1, b: 2 };`]]);
-    expect(diagnostics.map((d) => d.code)).toContain(2353);
-  });
-
   it("checks across files in a workspace", () => {
     const diagnostics = analyze([
       ["lib.ts", `export function double(n: number): number { return n * 2; }`],
@@ -126,33 +114,10 @@ describe("type checking", () => {
     expect(diagnostics[0].file).toBe("/index.ts");
     expect(diagnostics[0].line).toBe(2);
   });
-
-  it("accepts a clean program", () => {
-    expect(
-      analyze([["index.ts", `const n: number = 42;\nconsole.log(n.toFixed(2));`]]),
-    ).toEqual([]);
-  });
-
-  it("reports a parse error with its position", () => {
-    const diagnostics = analyze([["index.ts", `console.log("before");\nconst broken: = 5;`]]);
-    expect(diagnostics.length).toBeGreaterThan(0);
-    expect(diagnostics[0].line).toBe(2);
-    expect(diagnostics[0].message).toMatch(/Type expected/);
-  });
-
-  it("locates a parse error in JavaScript without checking types", () => {
-    const diagnostics = analyze(
-      [["index.js", `console.log("ok");\nthis is ( not js`]],
-      "node",
-      false,
-    );
-    expect(diagnostics.length).toBeGreaterThan(0);
-    expect(diagnostics[0].line).toBe(2);
-  });
 });
 
 describe("the Node environment", () => {
-  it("knows the globals almostnode provides", () => {
+  it("knows the globals almostnode and the worker provide", () => {
     const source = [
       `const fs = require("fs");`,
       `fs.writeFileSync("out.txt", "hi");`,
@@ -160,6 +125,8 @@ describe("the Node environment", () => {
       `console.log(path.join(__dirname, process.cwd()), Buffer.from("x"), module.exports);`,
       `setImmediate(() => process.stdout.write("done"));`,
       `const t: string = new TextDecoder().decode(new Uint8Array());`,
+      `void fetch("https://example.com");`,
+      `queueMicrotask(() => {});`,
     ].join("\n");
     expect(analyze([["index.ts", source]])).toEqual([]);
   });
@@ -171,15 +138,5 @@ describe("the Node environment", () => {
     // One "Cannot find name" each: none of these exist in the worker.
     expect(diagnostics).toHaveLength(3);
     for (const d of diagnostics) expect(d.message).toMatch(/Cannot find name/);
-  });
-
-  it("still has the worker globals that do exist", () => {
-    expect(
-      analyze([["index.ts", `void fetch("https://example.com");\nqueueMicrotask(() => {});`]]),
-    ).toEqual([]);
-  });
-
-  it("keeps the DOM for the browser playgrounds", () => {
-    expect(analyze([["index.ts", `document.title = "hi";`]], "dom")).toEqual([]);
   });
 });

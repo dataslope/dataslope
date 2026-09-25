@@ -7,9 +7,12 @@ const PRAGMA_SYNC_MAP: Record<string, string> = {
   full: "2",
 };
 
-const PRAGMA_PAGE_SIZE_MIN = 512;
-const PRAGMA_PAGE_SIZE_MAX = 65536;
+/** The range of page sizes SQLite accepts. */
+export const PRAGMA_PAGE_SIZE_MIN = 512;
+export const PRAGMA_PAGE_SIZE_MAX = 65536;
 
+/** Apply pragma settings to an initialised engine (after boot and on save).
+ *  Errors are swallowed so one unsupported pragma doesn't block the rest. */
 export async function applyPragmasToEngine(
   engine: SqliteEngine,
   p: PragmaSettings,

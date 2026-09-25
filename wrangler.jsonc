@@ -15,7 +15,7 @@
   // OpenNext writes it to the R2 incremental cache below, and the worker runs
   // ahead of the CDN cache, so every page view costs one worker invocation.
   // `withRegionalCache` (open-next.config.ts) avoids a per-visitor R2 read;
-  // skipping the invocation itself needs an origin Cache Rule (see README.md).
+  // skipping the invocation itself needs an origin Cache Rule (see DEVELOPMENT.md).
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
@@ -29,7 +29,7 @@
   "r2_buckets": [
     { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "dataslope-inc-cache" },
     // Cloud-saved playground workspaces + shared snapshots (gzipped JSON
-    // bundles; lib/workspaces/bundle.ts). D1 holds only metadata rows —
+    // bundles; lib/workspaces/bundleCodec.ts). D1 holds only metadata rows —
     // payloads routinely exceed D1's 2 MB row cap, and R2 reads are
     // egress-free. Create once:
     // `npx wrangler r2 bucket create dataslope-workspaces`.

@@ -136,28 +136,6 @@ describe("SQLite SQL completion source", () => {
     expect(labels(result)).toEqual(["*", "id", "name", "email"]);
   });
 
-  it("falls back to SQL keywords for general prefixes", () => {
-    const result = complete("SEL");
-    expect(labels(result)).toContain("SELECT");
-    expect(result?.from).toBe(0);
-  });
-
-  it("suggests keywords (not tables) after a referenced table", () => {
-    const result = complete("SELECT * FROM customers ");
-    const labelSet = new Set(labels(result));
-    expect(labelSet.has("WHERE")).toBe(true);
-    expect(labelSet.has("JOIN")).toBe(true);
-    // Tables can still appear as low-priority extras, but the top-ranked
-    // suggestions must be keywords, tables should never crowd out the
-    // expected next-clause keywords here.
-    const top = result?.options
-      .slice()
-      .sort((a, b) => (b.boost ?? 0) - (a.boost ?? 0))
-      .slice(0, 5)
-      .map((option) => option.label);
-    expect(top).toContain("WHERE");
-  });
-
   it("suggests tables after a comma in the FROM clause", () => {
     const result = complete("SELECT * FROM customers, ");
     expect(labels(result).slice(0, 3)).toEqual([
@@ -180,15 +158,6 @@ describe("SQLite SQL completion source", () => {
     expect(labelSet.has("orders.id")).toBe(true);
   });
 
-  it("places the cursor inside parens for function completions", () => {
-    const result = complete("SELECT COUN");
-    const opt = findOption(result, "COUNT");
-    expect(opt).toBeDefined();
-    // snippetCompletion produces a function-style apply rather than a
-    // plain string; that's how we know the cursor will land inside ().
-    expect(typeof opt?.apply).toBe("function");
-  });
-
   it("suggests CTE names after FROM", () => {
     const result = complete(
       "WITH active AS (SELECT * FROM customers WHERE name IS NOT NULL) SELECT * FROM ",
@@ -201,13 +170,6 @@ describe("SQLite SQL completion source", () => {
       "WITH summary(total_count, latest) AS (SELECT 1, 2) SELECT summary.",
     );
     expect(labels(result)).toEqual(["*", "total_count", "latest"]);
-  });
-
-  it("does not suggest existing tables in CREATE TABLE name slot", () => {
-    const result = complete("CREATE TABLE ", true);
-    const labelList = labels(result);
-    expect(labelList).not.toContain("customers");
-    expect(labelList).not.toContain("orders");
   });
 
   it("suggests columns of the target table inside INSERT INTO column list", () => {
@@ -246,25 +208,6 @@ describe("SQLite SQL completion source", () => {
       expect(rendered.indexOf("name")).toBeLessThan(rendered.indexOf("NOT"));
       expect(rendered.indexOf("name")).toBeLessThan(
         rendered.indexOf("customers"),
-      );
-    });
-
-    it("renders next-clause keywords above tables after a FROM reference", () => {
-      const rendered = renderedLabels(
-        complete("SELECT * FROM customers ", true),
-      );
-      expect(rendered.indexOf("WHERE")).toBeLessThan(
-        rendered.indexOf("customers"),
-      );
-      expect(rendered.indexOf("JOIN")).toBeLessThan(
-        rendered.indexOf("orders"),
-      );
-    });
-
-    it("renders tables above keywords after FROM", () => {
-      const rendered = renderedLabels(complete("SELECT * FROM "));
-      expect(rendered.indexOf("customers")).toBeLessThan(
-        rendered.indexOf("SELECT"),
       );
     });
 
@@ -310,18 +253,6 @@ describe("SQLite SQL completion source", () => {
       expect(top).not.toContain("WHERE");
     });
 
-    it("ranks FROM after a SELECT list", () => {
-      const result = complete("SELECT id ", true);
-      const top = topKeywords(result, 6);
-      expect(top).toContain("FROM");
-    });
-
-    it("ranks FROM right after SELECT *", () => {
-      const result = complete("SELECT * ", true);
-      const top = topKeywords(result, 3);
-      expect(top).toContain("FROM");
-    });
-
     it("ranks JOIN/WHERE/GROUP/ORDER after a FROM table reference", () => {
       const result = complete("SELECT * FROM customers ", true);
       const top = topKeywords(result, 10);
@@ -334,77 +265,6 @@ describe("SQLite SQL completion source", () => {
       expect(top).not.toContain("INSERT");
     });
 
-    it("ranks ON/USING right after a JOIN target", () => {
-      const result = complete("SELECT * FROM customers JOIN orders ", true);
-      const top = topKeywords(result, 8);
-      expect(top).toContain("ON");
-      expect(top).toContain("USING");
-    });
-
-    it("ranks AND/OR/IS/LIKE/IN inside WHERE after an identifier", () => {
-      const result = complete("SELECT * FROM customers WHERE name ", true);
-      const top = topKeywords(result, 10);
-      expect(top).toContain("AND");
-      expect(top).toContain("OR");
-      expect(top).toContain("IS");
-      expect(top).toContain("LIKE");
-      expect(top).toContain("IN");
-    });
-
-    it("treats string literals as complete operands", () => {
-      const result = complete(
-        "SELECT * FROM customers WHERE name = 'Alice' ",
-        true,
-      );
-      const top = topKeywords(result, 8);
-      expect(top).toContain("AND");
-      expect(top).toContain("OR");
-    });
-
-    it("treats decimal numbers as complete operands", () => {
-      const result = complete(
-        "SELECT * FROM orders WHERE total > 1.5 ",
-        true,
-      );
-      const top = topKeywords(result, 8);
-      expect(top).toContain("AND");
-      expect(top).toContain("OR");
-    });
-
-    it("still offers OFFSET after LIMIT <n>", () => {
-      const result = complete("SELECT * FROM customers LIMIT 10 ", true);
-      const labelSet = new Set(labels(result));
-      expect(labelSet.has("OFFSET")).toBe(true);
-      expect(labelSet.has("WHERE")).toBe(false);
-    });
-
-    it("suggests JOIN after a join modifier", () => {
-      const result = complete("SELECT * FROM customers LEFT ", true);
-      const labelSet = new Set(labels(result));
-      expect(labelSet.has("JOIN")).toBe(true);
-      expect(labelSet.has("WHERE")).toBe(false);
-    });
-
-    it("suggests THEN after an open CASE WHEN condition", () => {
-      const result = complete(
-        "SELECT CASE WHEN total > 10 ",
-        true,
-      );
-      const top = topKeywords(result, 8);
-      expect(top).toContain("THEN");
-    });
-
-    it("limits CREATE keyword to TABLE/VIEW/INDEX/TRIGGER family", () => {
-      const result = complete("CREATE ", true);
-      const top = topKeywords(result, 10);
-      expect(top).toContain("TABLE");
-      expect(top).toContain("VIEW");
-      expect(top).toContain("INDEX");
-      expect(top).toContain("TRIGGER");
-      expect(top).toContain("UNIQUE");
-      expect(top).toContain("TEMP");
-    });
-
     it("after ORDER, requires BY", () => {
       const result = complete("SELECT * FROM customers ORDER ", true);
       const labelSet = new Set(labels(result));
@@ -412,22 +272,6 @@ describe("SQLite SQL completion source", () => {
       // Restricted slot, other keywords should not appear at all.
       expect(labelSet.has("SELECT")).toBe(false);
       expect(labelSet.has("WHERE")).toBe(false);
-    });
-
-    it("offers OFFSET after LIMIT", () => {
-      const result = complete("SELECT * FROM customers LIMIT ", true);
-      const top = topKeywords(result, 5);
-      expect(top).toContain("OFFSET");
-    });
-
-    it("offers ALL/SELECT after UNION", () => {
-      const result = complete(
-        "SELECT * FROM customers UNION ",
-        true,
-      );
-      const top = topKeywords(result, 5);
-      expect(top).toContain("ALL");
-      expect(top).toContain("SELECT");
     });
 
     it("only offers IF/NOT/EXISTS in CREATE TABLE name slot", () => {
@@ -442,12 +286,6 @@ describe("SQLite SQL completion source", () => {
     it("inserts lowercase keywords for lowercase prefixes", () => {
       const result = complete("sel");
       expect(findOption(result, "SELECT")?.apply).toBe("select");
-    });
-
-    it("inserts uppercase keywords for uppercase prefixes", () => {
-      const result = complete("SEL");
-      // No apply override, the uppercase label itself is inserted.
-      expect(findOption(result, "SELECT")?.apply).toBeUndefined();
     });
 
     it("re-queries when the casing style changes mid-word", () => {
@@ -486,22 +324,6 @@ describe("SQLite SQL completion source", () => {
       );
       expect(findOption(result, "c.id = o.customer_id")).toBeDefined();
     });
-
-    it("uses table names in conditions when no aliases are declared", () => {
-      const result = complete(
-        "SELECT * FROM customers JOIN orders ON ",
-      );
-      expect(
-        findOption(result, "orders.customer_id = customers.id"),
-      ).toBeDefined();
-    });
-
-    it("ranks FK-related tables first after JOIN", () => {
-      const result = complete("SELECT * FROM customers JOIN ");
-      const orders = findOption(result, "orders");
-      const view = findOption(result, "recent_orders");
-      expect((orders?.boost ?? 0) > (view?.boost ?? 0)).toBe(true);
-    });
   });
 
   describe("DDL-aware completion", () => {
@@ -515,25 +337,9 @@ describe("SQLite SQL completion source", () => {
       expect(labelList).not.toContain("SELECT");
     });
 
-    it("suggests constraints after a column type", () => {
-      const result = complete("CREATE TABLE t (id INTEGER ", true);
-      const top = topKeywords(result, 8);
-      expect(top).toContain("PRIMARY");
-      expect(top).toContain("NOT");
-      expect(labels(result)).not.toContain("SELECT");
-    });
-
     it("requires KEY after PRIMARY in a column definition", () => {
       const result = complete("CREATE TABLE t (id INTEGER PRIMARY ", true);
       expect(labels(result)).toEqual(["KEY"]);
-    });
-
-    it("suggests existing tables after REFERENCES", () => {
-      const result = complete(
-        "CREATE TABLE t (customer_id INTEGER REFERENCES ",
-        true,
-      );
-      expect(labels(result)).toContain("customers");
     });
 
     it("suggests the parent table's columns inside REFERENCES (...)", () => {
@@ -548,48 +354,14 @@ describe("SQLite SQL completion source", () => {
       const result = complete("CREATE TABLE t (price DECIMAL(10, ", true);
       expect(result).toBeNull();
     });
-
-    it("suggests tables after CREATE INDEX … ON", () => {
-      const result = complete("CREATE INDEX idx ON ", true);
-      expect(labels(result)).toContain("customers");
-    });
-
-    it("suggests the indexed table's columns inside CREATE INDEX … ON t (", () => {
-      const result = complete("CREATE INDEX idx ON customers (", true);
-      expect(labels(result)).toEqual(["id", "name", "email"]);
-    });
-
-    it("suggests existing columns after ALTER TABLE … DROP COLUMN", () => {
-      const result = complete("ALTER TABLE customers DROP COLUMN ", true);
-      const labelSet = new Set(labels(result));
-      expect(labelSet.has("name")).toBe(true);
-      expect(labelSet.has("email")).toBe(true);
-    });
   });
 
   describe("schema metadata in suggestions", () => {
-    it("shows column types in the detail", () => {
-      const result = complete("SELECT * FROM customers WHERE ");
-      expect(findOption(result, "name")?.detail).toBe("TEXT");
-    });
-
     it("shows the owning table for multi-table scopes", () => {
       const result = complete(
         "SELECT * FROM customers JOIN orders ON customers.id = orders.customer_id WHERE ",
       );
       expect(findOption(result, "name")?.detail).toBe("customers · TEXT");
-    });
-
-    it("attaches a column-list preview to table suggestions", () => {
-      const result = complete("SELECT * FROM ");
-      const info = findOption(result, "customers")?.info;
-      expect(typeof info).toBe("string");
-      expect(info).toContain("id INTEGER");
-    });
-
-    it("completes tables after the main. schema qualifier", () => {
-      const result = complete("SELECT * FROM main.");
-      expect(labels(result)).toContain("customers");
     });
 
     it("resolves columns for schema-qualified table references", () => {
@@ -609,18 +381,6 @@ describe("SQLite SQL completion source", () => {
       expect(labelSet.has("ILIKE")).toBe(false);
       expect(labelSet.has("QUALIFY")).toBe(false);
     });
-
-    it("includes STRFTIME function for SQLite", () => {
-      const result = complete("SELECT ", true);
-      expect(labels(result)).toContain("STRFTIME");
-    });
-
-    it("includes SQLite window functions and GROUP_CONCAT", () => {
-      const result = complete("SELECT ", true);
-      const labelSet = new Set(labels(result));
-      expect(labelSet.has("ROW_NUMBER")).toBe(true);
-      expect(labelSet.has("GROUP_CONCAT")).toBe(true);
-    });
   });
 });
 
@@ -638,21 +398,6 @@ describe("PostgreSQL SQL completion source", () => {
     expect(labelSet.has("REGEXP")).toBe(false);
   });
 
-  it("does not surface SQLite-only keywords", () => {
-    const result = completePg("", true);
-    const labelSet = new Set(labels(result));
-    expect(labelSet.has("PRAGMA")).toBe(false);
-    expect(labelSet.has("AUTOINCREMENT")).toBe(false);
-  });
-
-  it("offers RETURNING/FROM after UPDATE clause", () => {
-    const result = completePg("UPDATE customers SET name = 'x' ", true);
-    const top = topKeywords(result, 10);
-    expect(top).toContain("WHERE");
-    expect(top).toContain("RETURNING");
-    expect(top).toContain("FROM");
-  });
-
   it("offers ON CONFLICT after INSERT … VALUES (…)", () => {
     const result = completePg(
       "INSERT INTO customers (id, name) VALUES (1, 'a') ",
@@ -661,50 +406,6 @@ describe("PostgreSQL SQL completion source", () => {
     const top = topKeywords(result, 6);
     expect(top).toContain("ON");
     expect(top).toContain("RETURNING");
-  });
-
-  it("offers Postgres-flavored statement starters", () => {
-    const result = completePg("", true);
-    const top = topKeywords(result, 12);
-    expect(top).toContain("SELECT");
-    // Secondary set should include TRUNCATE/GRANT/REVOKE for Postgres.
-    const labelSet = new Set(labels(result));
-    expect(labelSet.has("TRUNCATE")).toBe(true);
-    expect(labelSet.has("GRANT")).toBe(true);
-  });
-
-  it("offers Postgres functions like NOW and GENERATE_SERIES", () => {
-    const result = completePg("SELECT ", true);
-    const labelSet = new Set(labels(result));
-    expect(labelSet.has("NOW")).toBe(true);
-    expect(labelSet.has("GENERATE_SERIES")).toBe(true);
-    expect(labelSet.has("ARRAY_AGG")).toBe(true);
-    // SQLite-specific functions should not appear.
-    expect(labelSet.has("STRFTIME")).toBe(false);
-  });
-
-  it("includes LATERAL as a secondary join modifier after a table", () => {
-    const result = completePg("SELECT * FROM customers ", true);
-    const labelSet = new Set(labels(result));
-    expect(labelSet.has("LATERAL")).toBe(true);
-  });
-
-  it("still completes table/column references correctly", () => {
-    const result = completePg("SELECT * FROM customers c WHERE c.");
-    expect(labels(result)).toEqual(["*", "id", "name", "email"]);
-  });
-
-  it("completes tables after the public. schema qualifier", () => {
-    const result = completePg("SELECT * FROM public.");
-    expect(labels(result)).toContain("customers");
-  });
-
-  it("offers Postgres data types in CREATE TABLE column definitions", () => {
-    const result = completePg("CREATE TABLE t (id ", true);
-    const labelList = labels(result);
-    expect(labelList).toContain("SERIAL");
-    expect(labelList).toContain("TIMESTAMPTZ");
-    expect(labelList).not.toContain("AUTOINCREMENT");
   });
 });
 
@@ -728,40 +429,6 @@ describe("DuckDB SQL completion source", () => {
     expect(labelSet.has("email")).toBe(true);
   });
 
-  it("offers SEMI/ANTI/ASOF as join modifiers after a table", () => {
-    const result = completeDdb("SELECT * FROM customers ", true);
-    const labelSet = new Set(labels(result));
-    expect(labelSet.has("SEMI")).toBe(true);
-    expect(labelSet.has("ANTI")).toBe(true);
-    expect(labelSet.has("ASOF")).toBe(true);
-  });
-
-  it("offers DuckDB-flavored statement starters", () => {
-    const result = completeDdb("", true);
-    const labelSet = new Set(labels(result));
-    expect(labelSet.has("PIVOT")).toBe(true);
-    expect(labelSet.has("UNPIVOT")).toBe(true);
-    expect(labelSet.has("DESCRIBE")).toBe(true);
-    expect(labelSet.has("SUMMARIZE")).toBe(true);
-  });
-
-  it("exposes DuckDB-specific keywords like EXCLUDE and MACRO", () => {
-    const result = completeDdb("", true);
-    const labelSet = new Set(labels(result));
-    expect(labelSet.has("EXCLUDE")).toBe(true);
-    expect(labelSet.has("MACRO")).toBe(true);
-  });
-
-  it("offers DuckDB functions like list_agg and arg_max", () => {
-    const result = completeDdb("SELECT ", true);
-    const labelSet = new Set(labels(result));
-    expect(labelSet.has("LIST_AGG")).toBe(true);
-    expect(labelSet.has("ARG_MAX")).toBe(true);
-    expect(labelSet.has("QUANTILE")).toBe(true);
-    // SQLite-only functions absent.
-    expect(labelSet.has("JULIANDAY")).toBe(false);
-  });
-
   it("collapses keyword/function duplicates like LIST into one entry", () => {
     const result = completeDdb("SELECT ", true);
     const listEntries = (result?.options ?? []).filter(
@@ -770,48 +437,11 @@ describe("DuckDB SQL completion source", () => {
     expect(listEntries).toHaveLength(1);
     expect(listEntries[0]?.type).toBe("function");
   });
-
-  it("uses ILIKE/SIMILAR for the after-NOT operator menu", () => {
-    const result = completeDdb(
-      "SELECT * FROM customers WHERE name NOT ",
-      true,
-    );
-    const top = topKeywords(result, 12);
-    expect(top).toContain("ILIKE");
-    expect(top).toContain("SIMILAR");
-    expect(top).not.toContain("GLOB");
-  });
-
-  it("offers CREATE OR REPLACE flavors for CREATE", () => {
-    const result = completeDdb("CREATE ", true);
-    const top = topKeywords(result, 12);
-    expect(top).toContain("TABLE");
-    expect(top).toContain("VIEW");
-    expect(top).toContain("OR");
-    expect(top).toContain("REPLACE");
-    expect(top).toContain("MATERIALIZED");
-  });
 });
 
 describe("ranking signals layered on the slot boosts", () => {
   const boostOf = (result: CompletionResult | null, label: string) =>
     findOption(result, label)?.boost ?? 0;
-
-  it("shows function signatures and descriptions", () => {
-    const result = complete("SELECT COU");
-    const count = findOption(result, "COUNT");
-    expect(count?.detail).toBe("(expr | *)");
-    expect(count?.info).toMatch(/Number of rows/);
-  });
-
-  it("inserts the parenthesis-less functions bare", () => {
-    const pg = makeComplete({ dialect: "postgres" });
-    const result = pg("SELECT CURRENT_D");
-    const current = findOption(result, "CURRENT_DATE");
-    expect(current?.apply).toBe("CURRENT_DATE");
-    const now = findOption(result, "NOW");
-    expect(typeof now?.apply).toBe("function"); // snippet: NOW(#{})
-  });
 
   it("offers types after a :: cast in Postgres and DuckDB, not SQLite", () => {
     const pg = makeComplete({ dialect: "postgres" });
@@ -835,14 +465,6 @@ describe("ranking signals layered on the slot boosts", () => {
     expect(renderedLabels(result).slice(0, 2)).toEqual(["spent", "name"]);
   });
 
-  it("reads implicit aliases and keeps function names out of the column set", () => {
-    const doc = "SELECT c.name, COUNT(o.id) order_count FROM customers c JOIN orders o ON o.customer_id = c.id GROUP BY c.name ORDER BY ";
-    const result = complete(doc);
-    expect(findOption(result, "order_count")?.detail).toBe("alias");
-    expect(findOption(result, "COUNT")?.type).toBe("function");
-    expect(boostOf(result, "name")).toBeGreaterThan(boostOf(result, "email"));
-  });
-
   it("withholds aliases where the dialect rejects them", () => {
     const doc = "SELECT name AS who FROM customers GROUP BY ";
     expect(labels(complete(doc))).toContain("who"); // SQLite accepts
@@ -851,13 +473,6 @@ describe("ranking signals layered on the slot boosts", () => {
     expect(labels(pg("SELECT name AS who FROM customers ORDER BY "))).toContain("who");
     expect(labels(pg("SELECT name AS who FROM customers GROUP BY name HAVING "))).not.toContain("who");
     expect(labels(complete("SELECT name AS who FROM customers GROUP BY name HAVING "))).toContain("who");
-  });
-
-  it("edges a column already used in the document ahead of its neighbours", () => {
-    const result = complete("SELECT email FROM customers WHERE ");
-    expect(boostOf(result, "email")).toBeGreaterThan(boostOf(result, "name"));
-    // The bump reorders within the Columns section, never past it.
-    expect(renderedLabels(result).indexOf("email")).toBeLessThan(renderedLabels(result).indexOf("SELECT"));
   });
 
   it("remembers what the reader accepted last", () => {

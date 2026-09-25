@@ -27,9 +27,9 @@ const eslintConfig = [
       // Generated, minified worker bundles (build-almostnode-workers.mjs;
       // gitignored).
       "public/_workers/**",
-      // Generated brand-token fallback map (build-brand-fallbacks.mjs;
-      // gitignored). The committed .d.ts sibling is linted normally.
-      "lib/generated/brand-fallbacks.js",
+      // Generator output (scripts/build-*.mjs), some of it committed. Each
+      // committed .d.ts sibling is linted normally.
+      "lib/generated/*.js",
     ],
   },
   {

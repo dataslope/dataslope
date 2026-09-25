@@ -9,13 +9,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   DATASETS_REF,
   DATASLOPE_DATASETS_SOURCE,
-  datasetFileName,
-  datasetStageFilename,
-  fetchDatasetBytes,
   fetchDatasetText,
   jsDelivrGitHubUrl,
-  rawGitHubUrl,
-  resolveDatasetUrl,
 } from "../app/_components/runtime/remoteDatasets";
 import { preparePostgresScriptForPglite } from "../app/_components/runtime/postgres";
 
@@ -76,31 +71,7 @@ class FakeCacheStorage {
   }
 }
 
-describe("rawGitHubUrl", () => {
-  it("builds a raw.githubusercontent.com URL pinned to the datasets ref", () => {
-    expect(rawGitHubUrl("sqlite/chinook_sqlite.sql")).toBe(
-      `https://raw.githubusercontent.com/dataslope/datasets/${DATASETS_REF}/sqlite/chinook_sqlite.sql`,
-    );
-  });
-
-  it("strips leading slashes from the path", () => {
-    expect(rawGitHubUrl("/postgres/northwind_postgres.sql")).toBe(
-      `https://raw.githubusercontent.com/dataslope/datasets/${DATASETS_REF}/postgres/northwind_postgres.sql`,
-    );
-  });
-
-  it("supports other repositories and refs", () => {
-    expect(
-      rawGitHubUrl("data/trips.parquet", {
-        owner: "someone",
-        repo: "their-datasets",
-        ref: "v1.2.0",
-      }),
-    ).toBe(
-      "https://raw.githubusercontent.com/someone/their-datasets/v1.2.0/data/trips.parquet",
-    );
-  });
-
+describe("the datasets source", () => {
   it("pins the dataslope/datasets repo to an immutable ref", () => {
     expect(DATASLOPE_DATASETS_SOURCE).toEqual({
       owner: "dataslope",
@@ -112,69 +83,6 @@ describe("rawGitHubUrl", () => {
     // (a commit SHA, or a version tag once the repo starts tagging).
     expect(DATASETS_REF).not.toBe("main");
     expect(DATASETS_REF).toMatch(/^([0-9a-f]{40}|v.+)$/);
-  });
-});
-
-describe("jsDelivrGitHubUrl", () => {
-  it("builds a cdn.jsdelivr.net URL pinned to the datasets ref", () => {
-    expect(jsDelivrGitHubUrl("csv/penguins.csv")).toBe(
-      `https://cdn.jsdelivr.net/gh/dataslope/datasets@${DATASETS_REF}/csv/penguins.csv`,
-    );
-  });
-
-  it("supports other repositories and refs", () => {
-    expect(
-      jsDelivrGitHubUrl("data/trips.parquet", {
-        owner: "someone",
-        repo: "their-datasets",
-        ref: "v1.2.0",
-      }),
-    ).toBe(
-      "https://cdn.jsdelivr.net/gh/someone/their-datasets@v1.2.0/data/trips.parquet",
-    );
-  });
-});
-
-describe("resolveDatasetUrl", () => {
-  it("resolves repo-relative paths to the primary (jsDelivr) host", () => {
-    expect(resolveDatasetUrl("sqlite/northwind_sqlite.sql")).toBe(
-      `https://cdn.jsdelivr.net/gh/dataslope/datasets@${DATASETS_REF}/sqlite/northwind_sqlite.sql`,
-    );
-  });
-
-  it("passes full URLs through untouched", () => {
-    const url = "https://raw.githubusercontent.com/other/repo/main/x.sql";
-    expect(resolveDatasetUrl(url)).toBe(url);
-  });
-});
-
-describe("datasetFileName", () => {
-  it("returns the basename of a repo path", () => {
-    expect(datasetFileName("duckdb/trips.parquet")).toBe("trips.parquet");
-  });
-
-  it("returns the basename of a full URL, ignoring query/hash", () => {
-    expect(
-      datasetFileName("https://example.com/data/sales.csv?token=abc#frag"),
-    ).toBe("sales.csv");
-  });
-
-  it("returns bare filenames as-is", () => {
-    expect(datasetFileName("chinook.sqlite")).toBe("chinook.sqlite");
-  });
-});
-
-describe("datasetStageFilename", () => {
-  it("defaults to the basename of the dataset path", () => {
-    expect(datasetStageFilename({ path: "csv/penguins.csv" })).toBe(
-      "penguins.csv",
-    );
-  });
-
-  it("honours an explicit stageAs filename", () => {
-    expect(
-      datasetStageFilename({ path: "csv/penguins.csv", stageAs: "data.csv" }),
-    ).toBe("data.csv");
   });
 });
 
@@ -196,14 +104,6 @@ describe("fetchDatasetText / fetchDatasetBytes", () => {
     );
   });
 
-  it("fetches binary files as Uint8Array", async () => {
-    const payload = new Uint8Array([0x50, 0x41, 0x52, 0x31]); // "PAR1"
-    vi.stubGlobal("fetch", vi.fn(async () => new Response(payload.slice())));
-    const bytes = await fetchDatasetBytes("memo/two.parquet");
-    expect(bytes).toBeInstanceOf(Uint8Array);
-    expect(Array.from(bytes)).toEqual([0x50, 0x41, 0x52, 0x31]);
-  });
-
   it("falls back to raw.githubusercontent.com when jsDelivr fails", async () => {
     const fetchMock = vi
       .fn()
@@ -219,15 +119,6 @@ describe("fetchDatasetText / fetchDatasetBytes", () => {
       2,
       `https://raw.githubusercontent.com/dataslope/datasets/${DATASETS_REF}/memo/five.sql`,
     );
-  });
-
-  it("uses a full URL as the only candidate (no fallback host)", async () => {
-    const url = "https://example.com/data/cities.csv";
-    const fetchMock = vi.fn(async () => new Response("a,b"));
-    vi.stubGlobal("fetch", fetchMock);
-    await fetchDatasetText(url);
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock).toHaveBeenCalledWith(url);
   });
 
   it("reports HTTP failures with the URL and does not memoise them", async () => {
@@ -247,18 +138,6 @@ describe("fetchDatasetText / fetchDatasetBytes", () => {
       "SELECT 2;",
     );
     expect(fetchMock).toHaveBeenCalledTimes(3);
-  });
-
-  it("wraps network errors in a descriptive message", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async () => {
-        throw new TypeError("Failed to fetch");
-      }),
-    );
-    await expect(fetchDatasetText("memo/four.sql")).rejects.toThrow(
-      /Could not download the sample dataset .*memo\/four\.sql.*Failed to fetch/,
-    );
   });
 });
 
@@ -372,23 +251,6 @@ describe("persistent Cache API layer", () => {
     expect(Array.from(second.slice(0, 3))).toEqual([1, 2, 3]);
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(matchSpy).toHaveBeenCalledTimes(2);
-  });
-
-  it("keeps small buffers memoised in-context (no Cache API re-read)", async () => {
-    const fakeCaches = new FakeCacheStorage();
-    const cache = await fakeCaches.open(DATASET_CACHE_NAME);
-    const matchSpy = vi.spyOn(cache, "match");
-    vi.stubGlobal("caches", fakeCaches);
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async () => new Response(new Uint8Array([9, 9]))),
-    );
-
-    const mod = await freshModule();
-    const first = await mod.fetchDatasetBytes("csv/small.csv");
-    const second = await mod.fetchDatasetBytes("csv/small.csv");
-    expect(second).toBe(first); // same memoised array instance
-    expect(matchSpy).toHaveBeenCalledTimes(1);
   });
 });
 

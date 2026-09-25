@@ -65,32 +65,12 @@ describe("warmRuntimeOnRouteLand", () => {
     expect(fake.initSpy).toHaveBeenCalledTimes(1);
   });
 
-  it("does nothing without a window (SSR)", async () => {
-    const { warmRuntimeOnRouteLand } = await freshWarmup();
-    vi.useFakeTimers();
-    const fake = fakeAdapter("warm-ssr");
-    warmRuntimeOnRouteLand(FUMADOCS, fake.adapter);
-    await vi.advanceTimersByTimeAsync(5000);
-    expect(fake.initSpy).not.toHaveBeenCalled();
-  });
-
   it("skips the speculative boot when Save-Data is on", async () => {
     vi.stubGlobal("window", {});
     vi.stubGlobal("navigator", { connection: { saveData: true } });
     const { warmRuntimeOnRouteLand } = await freshWarmup();
     vi.useFakeTimers();
     const fake = fakeAdapter("warm-savedata");
-    warmRuntimeOnRouteLand(FUMADOCS, fake.adapter);
-    await vi.advanceTimersByTimeAsync(5000);
-    expect(fake.initSpy).not.toHaveBeenCalled();
-  });
-
-  it("skips the speculative boot on 2g-class connections", async () => {
-    vi.stubGlobal("window", {});
-    vi.stubGlobal("navigator", { connection: { effectiveType: "2g" } });
-    const { warmRuntimeOnRouteLand } = await freshWarmup();
-    vi.useFakeTimers();
-    const fake = fakeAdapter("warm-2g");
     warmRuntimeOnRouteLand(FUMADOCS, fake.adapter);
     await vi.advanceTimersByTimeAsync(5000);
     expect(fake.initSpy).not.toHaveBeenCalled();

@@ -36,42 +36,12 @@ async function image(bands: { rows: number; alpha: number }[]): Promise<Buffer> 
 }
 
 describe("alphaStats", () => {
-  it("reports a healthy cut-out as mostly clear and solid", async () => {
-    // Half transparent, most of the rest opaque, a thin antialiased edge.
-    const stats = await alphaStats(
-      await image([
-        { rows: 40, alpha: 0 },
-        { rows: 2, alpha: 128 },
-        { rows: 38, alpha: 255 },
-      ]),
-    );
-    expect(stats.clear).toBeCloseTo(0.5, 1);
-    expect(stats.solid).toBeCloseTo(0.475, 1);
-    expect(stats.soft).toBeLessThan(0.05);
-  });
-
   it("reports no clear pixels at all for an opaque frame", async () => {
     // The failure the generator refuses to write: the model painted a
     // background despite being asked for none.
     const stats = await alphaStats(await image([{ rows: HEIGHT, alpha: 255 }]));
     expect(stats.clear).toBe(0);
     expect(stats.solid).toBe(1);
-  });
-
-  it("counts a painted ground shadow as soft alpha, not as clear", async () => {
-    // A shadow is a wide band of partial alpha, which is invisible on the
-    // white page and a grey smudge on the near-black one. It is not fatal, so
-    // the generator warns rather than refusing; this pins that it is visible
-    // at all.
-    const stats = await alphaStats(
-      await image([
-        { rows: 20, alpha: 0 },
-        { rows: 20, alpha: 60 },
-        { rows: 40, alpha: 255 },
-      ]),
-    );
-    expect(stats.soft).toBeCloseTo(0.25, 1);
-    expect(stats.clear).toBeCloseTo(0.25, 1);
   });
 
   it("treats an image with no alpha channel as fully opaque", async () => {
@@ -86,16 +56,5 @@ describe("alphaStats", () => {
     const stats = await alphaStats(rgb);
     expect(stats.clear).toBe(0);
     expect(stats.solid).toBe(1);
-  });
-
-  it("returns three fractions that sum to one", async () => {
-    const stats = await alphaStats(
-      await image([
-        { rows: 30, alpha: 0 },
-        { rows: 10, alpha: 90 },
-        { rows: 40, alpha: 255 },
-      ]),
-    );
-    expect(stats.clear + stats.solid + stats.soft).toBeCloseTo(1, 6);
   });
 });

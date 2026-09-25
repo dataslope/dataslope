@@ -219,8 +219,9 @@ async function createJsRunner(adapter) {
 
 // ─── c / cpp ────────────────────────────────────────────────────────────
 
-/** Keep in step with `check-cpp-blocks.mjs` and `runtime/browsercc.ts`. The
- *  cache directory is shared so the ~114 MB download is not duplicated. */
+/** Keep in step with `check-cpp-blocks.mjs` and `runtime/browsercc-worker.ts`
+ *  (`wasmCdnPins.test.ts`). The cache directory is shared so the ~114 MB
+ *  download is not duplicated. */
 const BROWSERCC_VERSION = "0.1.1";
 const WASI_SHIM_VERSION = "0.4.2";
 const CACHE = ".browsercc-cache";

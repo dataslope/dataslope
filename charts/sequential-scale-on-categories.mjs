@@ -46,10 +46,7 @@ const CATEGORIES = [
 
 const N = CATEGORIES.length;
 const MAX = 420;
-const alphabetical = CATEGORIES.map((d) => d.key);
 const bySize = [...CATEGORIES].sort((a, b) => b.tickets - a.tickets).map((d) => d.key);
-/** How far the ramp's implied ranking is from the real one. */
-const MISLED = alphabetical.filter((k, i) => bySize[i] !== k).length;
 
 const RAMP = panel(0, { y: [0, MAX] });
 const HUES = panel(1, { y: [0, MAX] });

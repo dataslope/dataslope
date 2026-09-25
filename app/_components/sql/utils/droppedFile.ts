@@ -35,7 +35,7 @@ const ZIP_MAGIC = [0x50, 0x4b]; // "PK", the local file header of any zip
 const DUCKDB_MAGIC = "DUCK";
 
 /** Lower-case extension without the dot, or "" when there is none. */
-export function fileExtension(filename: string): string {
+function fileExtension(filename: string): string {
   const base = filename.split(/[\\/]/).pop() ?? filename;
   const dot = base.lastIndexOf(".");
   return dot <= 0 ? "" : base.slice(dot + 1).toLowerCase();

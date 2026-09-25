@@ -14,7 +14,7 @@
  * The ceilings are computed from the serial fractions, so the labels and the
  * lines cannot disagree.
  */
-import { Plot, plot, linspace, ACCENT, GUIDE, HALO, MUTED, SERIES } from "./_theme.mjs";
+import { Plot, plot, linspace, HALO, MUTED, SERIES } from "./_theme.mjs";
 
 export const title =
   "Speedup against core count for programs that are 1, 5 and 25 percent serial, on a log core axis. Each curve rises and then flattens at its own ceiling: a hundred times, twenty times, and four times.";

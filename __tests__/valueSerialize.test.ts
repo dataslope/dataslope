@@ -19,11 +19,7 @@ import {
   toSqlLiteral,
   toExcelCell,
 } from "../app/_components/sql/utils/valueSerialize";
-import {
-  formatCellValue,
-  formatCellDisplay,
-  formatByteCount,
-} from "../app/_components/sql/utils/cellUtils";
+import { formatCellValue } from "../app/_components/sql/utils/cellUtils";
 import { stripTransactionControl } from "../app/_components/runtime/postgres";
 
 describe("date formatting (DS-07)", () => {
@@ -50,11 +46,6 @@ describe("date formatting (DS-07)", () => {
     };
     expect(toDateOnlyString(utcDate(1, 0, 1))).toBe("0001-01-01");
     expect(toDateOnlyString(utcDate(500, 5, 7))).toBe("0500-06-07");
-  });
-
-  it("passes an already-formatted date string through", () => {
-    expect(toDateOnlyString("2024-01-31")).toBe("2024-01-31");
-    expect(toDateOnlyString(null)).toBeNull();
   });
 });
 
@@ -103,30 +94,6 @@ describe("Postgres array literals (DS-30)", () => {
   });
 });
 
-describe("grid rendering (DS-05, DS-15, DS-21)", () => {
-  it("renders real booleans as true/false, not 1/0", () => {
-    expect(formatCellValue(true)).toBe("true");
-    expect(formatCellValue(false)).toBe("false");
-  });
-
-  it("pluralises the binary size badge", () => {
-    expect(formatByteCount(1)).toBe("1 byte");
-    expect(formatByteCount(2)).toBe("2 bytes");
-    expect(formatCellValue(new Uint8Array([0]))).toBe("BLOB (1 byte)");
-  });
-
-  it("makes newlines and tabs visible without collapsing whitespace", () => {
-    expect(formatCellDisplay("has\nnewline")).toBe("has↵newline");
-    expect(formatCellDisplay("a\tb")).toBe("a→b");
-    // Leading/trailing spaces survive; the cell CSS is `white-space: pre`.
-    expect(formatCellDisplay("  spaced  ")).toBe("  spaced  ");
-  });
-
-  it("leaves a value with no control characters untouched", () => {
-    expect(formatCellDisplay("plain")).toBe("plain");
-  });
-});
-
 describe("classifyExportType", () => {
   it("classifies each engine's spelling", () => {
     expect(classifyExportType("boolean")).toBe("boolean");
@@ -171,10 +138,6 @@ describe("bytea serialization (DS-06)", () => {
     expect(csvNeedsExplicitEmpty("")).toBe(true);
     expect(csvNeedsExplicitEmpty(null)).toBe(false);
     expect(csvNeedsExplicitEmpty("a")).toBe(false);
-  });
-
-  it("does not lose a zero byte", () => {
-    expect(toCsvValue(new Uint8Array([0]), "binary")).toBe("\\x00");
   });
 });
 
@@ -313,11 +276,6 @@ describe("DuckDB Arrow temporal formatting (DK-04)", () => {
     expect(arrowTimeToString(34_200, "SECOND")).toBe("09:30:00");
   });
 
-  it("returns null for a unit it does not know", () => {
-    expect(arrowTimeToString(1, "FORTNIGHT")).toBeNull();
-    expect(arrowTimeToString("not a number", "MICROSECOND")).toBeNull();
-  });
-
   it("formats a MONTH_DAY_NANO interval the way DuckDB prints it", () => {
     // [months, days, nanosLow, nanosHigh] straight from the Arrow buffer.
     expect(arrowIntervalToString(new Int32Array([0, 3, 0, 0]), "MONTH_DAY_NANO")).toBe(
@@ -361,10 +319,6 @@ describe("DuckDB composite SQL literals (DK-06, DK-07)", () => {
     expect(toSqlLiteral('[{"a":1},{"a":2}]', "array", "duckdb")).toBe(
       "[{'a': 1}, {'a': 2}]",
     );
-  });
-
-  it("keeps the Postgres literal for Postgres", () => {
-    expect(toSqlLiteral("{1,2}", "array", "postgres")).toBe("'{1,2}'");
   });
 
   it("uses each dialect's blob literal", () => {

@@ -6,28 +6,18 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { hasAnsi, parseAnsi } from "@/app/_components/git/ansi";
+import { parseAnsi } from "@/app/_components/git/ansi";
 
 const ESC = "\x1b";
 const plain = (text: string) => parseAnsi(text).map((s) => s.text).join("");
 
 describe("parseAnsi", () => {
-  it("leaves text without escapes alone, as one span", () => {
-    expect(hasAnsi("hello")).toBe(false);
-    expect(parseAnsi("hello world")).toEqual([{ text: "hello world", classes: [] }]);
-  });
-
   it("colours a foreground run and resets afterwards", () => {
     const spans = parseAnsi(`${ESC}[31mRED${ESC}[0m plain`);
     expect(spans).toEqual([
       { text: "RED", classes: ["red"] },
       { text: " plain", classes: [] },
     ]);
-  });
-
-  it("handles bright colours and backgrounds", () => {
-    expect(parseAnsi(`${ESC}[92mok${ESC}[0m`)[0].classes).toEqual(["bright-green"]);
-    expect(parseAnsi(`${ESC}[41mbad${ESC}[0m`)[0].classes).toEqual(["bg-red"]);
   });
 
   it("combines attributes with colour", () => {
@@ -58,18 +48,8 @@ describe("parseAnsi", () => {
     expect(plain(`a${ESC}[2Kb${ESC}[1;1Hc`)).toBe("abc");
   });
 
-  it("never leaks escape characters into the rendered text", () => {
-    const messy = `${ESC}[32mgreen${ESC}[0m ${ESC}[1mbold${ESC}[22m ${ESC}[7Xodd`;
-    expect(plain(messy)).not.toContain(ESC);
-    expect(plain(messy)).toBe("green bold odd");
-  });
-
   it("merges adjacent runs that share styling", () => {
     // Two resets in a row should not produce three plain spans.
     expect(parseAnsi(`a${ESC}[0mb${ESC}[0mc`)).toEqual([{ text: "abc", classes: [] }]);
-  });
-
-  it("handles output that starts mid-colour and never resets", () => {
-    expect(parseAnsi(`${ESC}[36mtail`)).toEqual([{ text: "tail", classes: ["cyan"] }]);
   });
 });

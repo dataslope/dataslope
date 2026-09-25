@@ -26,7 +26,7 @@
  * for the bullet when there is a target and a range; reach for the number when
  * there is not.
  */
-import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, SERIES } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 import { panel, panelSpace, panelTitle } from "./_panels.mjs";
 
 export const title =

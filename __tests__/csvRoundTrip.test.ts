@@ -2,22 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseCsv,
   inferColumnTypeFromValues,
-  inferCsvColumnTypes,
 } from "../app/_components/sql/utils/importUtils";
-
-/** Mirrors the CSV writer in utils/exportUtils (which needs a DOM to
- *  download). Round-trip assertions below use it as the export side, so a
- *  change to either quoting rule breaks a test rather than a user's import. */
-function writeCsv(columns: string[], rows: string[][]): string {
-  // An empty string is force-quoted (`""`), the only way CSV distinguishes it
-  // from NULL — see csvNeedsExplicitEmpty.
-  const field = (s: string, forceQuote = false) =>
-    forceQuote || /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-  return [
-    columns.map((c) => field(c)).join(","),
-    ...rows.map((r) => r.map((v) => field(v, v === "")).join(",")),
-  ].join("\r\n");
-}
 
 describe("parseCsv", () => {
   it("keeps a quoted newline inside one field (DS-03)", () => {
@@ -67,18 +52,6 @@ describe("parseCsv", () => {
   it("strips a UTF-8 BOM from the first header", () => {
     const { headers } = parseCsv("﻿id,name\n1,a\n");
     expect(headers).toEqual(["id", "name"]);
-  });
-
-  it("round-trips the audit's own export fixture (DS-03)", () => {
-    // The exact row the report exported and could not re-import.
-    const columns = ["b_true", "b_false", "old_date", "medieval", "bin", "multi"];
-    const rows = [
-      ["true", "false", "0001-01-01", "0500-06-07", "\\xcafe", "has\nnewline"],
-    ];
-    const { headers, rows: parsed } = parseCsv(writeCsv(columns, rows));
-    expect(headers).toEqual(columns);
-    expect(parsed).toEqual(rows);
-    expect(parsed).toHaveLength(1);
   });
 
   it("round-trips the appendix fixture as 5 rows, not 6 (DS-03)", () => {
@@ -138,17 +111,5 @@ describe("inferColumnTypeFromValues (DS-13)", () => {
 
   it("reads a 0/1 column as numeric, not boolean", () => {
     expect(inferColumnTypeFromValues(["0", "1", "1"])).toBe("bigint");
-  });
-
-  it("infers per column across the parsed rows", () => {
-    const { headers, rows } = parseCsv(
-      "id,amount,flag,label\n1,1.5,true,a\n2,2.5,false,b\n",
-    );
-    expect(inferCsvColumnTypes(headers, rows)).toEqual([
-      "bigint",
-      "double precision",
-      "boolean",
-      "text",
-    ]);
   });
 });

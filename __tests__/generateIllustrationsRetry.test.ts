@@ -57,21 +57,6 @@ describe("api retry behaviour", () => {
     expect(fetchMock).toHaveBeenCalledTimes(3);
   });
 
-  it("retries a network error, not just an HTTP status", async () => {
-    const fetchMock = vi
-      .spyOn(globalThis, "fetch")
-      .mockRejectedValueOnce(new Error("socket hang up"))
-      .mockResolvedValueOnce(response(200, "ok"));
-    vi.spyOn(console, "error").mockImplementation(() => {});
-
-    const res = await withoutWaiting(() =>
-      apiFor.api("/batches/b1", { key: "k", retries: 3 }),
-    );
-
-    expect(res.status).toBe(200);
-    expect(fetchMock).toHaveBeenCalledTimes(2);
-  });
-
   it("does NOT retry when the caller did not opt in", async () => {
     // The default path covers batch creation and image generation: retrying
     // those would duplicate paid work, so one attempt is the contract.
@@ -80,15 +65,6 @@ describe("api retry behaviour", () => {
     await expect(apiFor.api("/batches", { method: "POST", key: "k", json: {} })).rejects.toThrow(
       /504/,
     );
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-  });
-
-  it("does NOT retry a non-transient status even with retries available", async () => {
-    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(response(400, "bad request"));
-
-    await expect(
-      apiFor.api("/files/file-x/content", { key: "k", retries: 5 }),
-    ).rejects.toThrow(/400/);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 

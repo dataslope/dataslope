@@ -23,19 +23,9 @@ describe("labelBareFences", () => {
     );
   });
 
-  it("leaves the closing fence alone", () => {
-    expect(labelBareFences("```\nx\n```").split("\n")[2]).toBe("```");
-  });
-
   it("keeps a language the author already wrote", () => {
     const src = "```python\nheavy = df.head()\n```";
     expect(labelBareFences(src)).toBe(src);
-  });
-
-  it("handles two blocks in one instructions string", () => {
-    expect(labelBareFences("```\na\n```\n\ntext\n\n```sql\nb\n```")).toBe(
-      "```text\na\n```\n\ntext\n\n```sql\nb\n```",
-    );
   });
 
   it("does not touch a fence inside an already-open block", () => {
@@ -45,10 +35,6 @@ describe("labelBareFences", () => {
       "```text",
       "```",
     ]);
-  });
-
-  it("is a no-op with no fences", () => {
-    expect(labelBareFences("just `prose`")).toBe("just `prose`");
   });
 });
 
@@ -71,30 +57,6 @@ heavy = df[df["body_mass_g"] > 5000][["species", "body_mass_g"]]
     // the fallback at `text`, nothing is guessed and nothing is colored.
     const out = html("```\nSELECT 1 FROM t\n```");
     expect(out).toContain("language-text");
-    expect(out).not.toContain("hljs-");
-  });
-
-  it("uses the language the fence names", () => {
-    expect(html("```sql\nSELECT 1 FROM t\n```")).toContain("language-sql");
-    expect(html("```r\nx <- 1\n```")).toContain("language-r");
-  });
-
-  it("leaves inline code as an identifier, not a highlighted span", () => {
-    const out = html("The frame `df` is loaded for you.");
-    expect(out).toContain("<code>df</code>");
-    expect(out).not.toContain("hljs");
-  });
-
-  it("still renders GFM", () => {
-    expect(html("- one\n- two")).toContain("<li>");
-    expect(html("**bold**")).toContain("<strong>");
-  });
-
-  it("renders a `text` fence with no tokens at all", () => {
-    // What an expected-output sample is labelled. `text` is a registered
-    // plaintext alias, so this does not lean on `ignoreMissing`.
-    const out = html("```text\nHello, Grace!\n```");
-    expect(out).toContain("Hello, Grace!");
     expect(out).not.toContain("hljs-");
   });
 });

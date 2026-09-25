@@ -40,7 +40,7 @@ const SQL_KEYS = [
  * backticks. Text without backticks passes through untouched, and an odd
  * backtick with no partner stays literal.
  */
-export function ticks(text: string): Span[] {
+function ticks(text: string): Span[] {
   const out: Span[] = [];
   const re = /`([^`]+)`/g;
   let last = 0;

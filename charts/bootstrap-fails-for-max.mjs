@@ -28,7 +28,7 @@
  * clear case, and the right tool for them is extreme value theory, which models
  * the tail rather than resampling it.
  */
-import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, mean, normalSamples, rng } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, PRIMARY, mean, normalSamples, rng } from "./_theme.mjs";
 import { panel, panelAxis, panelBaseline, panelSpace, panelTitle } from "./_panels.mjs";
 
 export const title =

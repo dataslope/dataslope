@@ -27,7 +27,7 @@
  * intervals for the question you are asking of it.
  */
 import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, PRIMARY } from "./_theme.mjs";
-import { panel, panelAxis, panelSpace, panelTitle } from "./_panels.mjs";
+import { panel, panelSpace, panelTitle } from "./_panels.mjs";
 
 export const title =
   "Two group means with overlapping 95 per cent intervals, beside the 95 per cent interval for their difference, which excludes zero. Comparing two intervals by eye is a stricter test than the one people believe they are applying.";
@@ -43,9 +43,6 @@ const DIFF = B.mean - A.mean;
 const SE_DIFF = Math.sqrt(A.se ** 2 + B.se ** 2);
 const D_LO = DIFF - Z * SE_DIFF;
 const D_HI = DIFF + Z * SE_DIFF;
-const ZSTAT = DIFF / SE_DIFF;
-/** What comparing the two intervals by eye would demand instead. */
-const NAIVE_GAP = Z * (A.se + B.se);
 
 const LEFT = panel(0, { x: [86, 126], y: [0, 1] });
 const RIGHT = panel(1, { x: [-6, 26], y: [0, 1] });

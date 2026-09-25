@@ -1,5 +1,5 @@
 /**
- * The table-driven case builder and the prose helpers in `lib/challenges`.
+ * The table-driven case builder in `lib/challenges`.
  *
  * `challengeSolutions.test.ts` already runs every generated check for real,
  * against every reference solution, so a builder that emitted broken code
@@ -14,33 +14,13 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { buildHarness, parseHarnessOutput } from "@/app/_components/challengeHarness";
-import { dualChallenge, ticks } from "@/lib/challenges/authoring";
+import { dualChallenge } from "@/lib/challenges/authoring";
 import {
   examplesFromCases,
   jsLiteral,
   pyLiteral,
   type CallCase,
 } from "@/lib/challenges/cases";
-
-describe("ticks", () => {
-  it("turns backtick runs into code spans", () => {
-    expect(ticks("Sort by `full_name`, then `id`.")).toEqual([
-      "Sort by ",
-      { code: "full_name" },
-      ", then ",
-      { code: "id" },
-      ".",
-    ]);
-  });
-
-  it("leaves text without backticks alone", () => {
-    expect(ticks("No code here.")).toEqual(["No code here."]);
-  });
-
-  it("keeps an unpaired backtick literal", () => {
-    expect(ticks("a ` b")).toEqual(["a ` b"]);
-  });
-});
 
 describe("literals", () => {
   const value = { a: [1, -2.5, "x\ny"], "not an id": null, t: true, f: false };

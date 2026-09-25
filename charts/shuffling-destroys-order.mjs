@@ -28,7 +28,7 @@
  * that is not the task (extend the end).
  */
 import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, mean, rng } from "./_theme.mjs";
-import { panel, panelAxis, panelBaseline, panelSpace, panelTitle } from "./_panels.mjs";
+import { panel, panelSpace, panelTitle } from "./_panels.mjs";
 
 export const title =
   "One autocorrelated series and the same values shuffled. The two have identical means, standard deviations and histograms; the autocorrelation plots underneath show a slow decay in one and nothing at all in the other.";

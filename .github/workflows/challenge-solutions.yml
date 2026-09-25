@@ -1,0 +1,58 @@
+name: Challenge solutions
+
+# Runs __tests__/challengeSolutions.test.ts (`npm run test:challenges`): every
+# /challenges reference solution must pass its own checks and every starter
+# must fail at least one, on real python3 / node / node:sqlite. It takes about
+# a minute and nothing outside the paths below can change its result, so it
+# is kept out of `npm test` (checks.yml) and runs here instead.
+#
+# The weekly run covers the one input that is not in the repo: the runner's
+# python3 and node, which the harnesses execute learner-shaped code on.
+
+on:
+  pull_request:
+    paths:
+      - "lib/challenges/**"
+      - "app/_components/challengeHarness.ts"
+      - "app/_components/sqlChallengeHarness.ts"
+      - "__tests__/challengeSolutions.test.ts"
+      - "vitest.config.ts"
+      - "vitest.challenges.config.ts"
+      - ".github/workflows/challenge-solutions.yml"
+  push:
+    branches: [main]
+    paths:
+      - "lib/challenges/**"
+      - "app/_components/challengeHarness.ts"
+      - "app/_components/sqlChallengeHarness.ts"
+      - "__tests__/challengeSolutions.test.ts"
+  schedule:
+    # 05:10 UTC Sundays, off the hour, before the content sweeps.
+    - cron: "10 5 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: challenge-solutions-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  solutions:
+    name: Challenge solutions
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+
+      # postinstall's generator chain is not needed here: the test reads
+      # lib/challenges directly and nothing under lib/generated.
+      - run: npm ci --ignore-scripts
+
+      - run: npm run test:challenges

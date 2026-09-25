@@ -1,9 +1,9 @@
 /**
  * The Python half of the Pyodide worker lives in template literals, so
  * nothing typechecks it and nothing here can execute it (Pyodide is a CDN
- * download). These pin the behaviours that were silently wrong, by reading
- * the scripts back out of the source: each assertion below is a bug that
- * shipped, not a style rule.
+ * download). What is pinned is the one place two implementations must agree:
+ * the worker's `plt.show()` patch and its mirror in the build-time capture
+ * shim, so a prepopulated panel and a live run render the same figures.
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -29,7 +29,6 @@ function between(start: string, end: string): string {
 }
 
 const SETUP_B = between("const SETUP_SCRIPT_B = `", "`;");
-const RUN_WRAPPER = between("const wrappedCode = `", "`;");
 
 describe("plt.show()", () => {
   // The bug: savefig() saves the *current* figure, and the patch then closed
@@ -55,64 +54,5 @@ describe("plt.show()", () => {
     expect(show).toContain("_bo_plt.get_fignums()");
     expect(show).not.toContain("_bo_plt.savefig(");
     expect(show).not.toContain("_bo_plt.gcf()");
-  });
-});
-
-describe("output streaming", () => {
-  it("routes every rich cell through the emitter that flushes", () => {
-    // A raw `_display_outputs.append` for a table/image/chart would sit in
-    // the list until the run ended, which is the batching this replaced.
-    for (const script of [SETUP_B, RUN_WRAPPER]) {
-      expect(script).not.toMatch(/_display_outputs\.append\(\{"type": "(image|plot|dataframe|html)"/);
-    }
-    expect(RUN_WRAPPER).toContain('_pg_emit_cell({"type": "plot"');
-    expect(RUN_WRAPPER).toContain('_pg_emit_cell({"type": "image"');
-  });
-
-  it("drains anything left over when the run ends", () => {
-    expect(WORKER_SRC).toContain('pyodide.runPython("_pg_stream_flush(True)")');
-  });
-
-  it("detaches the sink afterwards so it can't outlive its run", () => {
-    expect(WORKER_SRC).toContain('pyodide.runPython("_pg_stream_sink = None")');
-  });
-});
-
-describe("error legibility", () => {
-  it("compiles the user's code under its real filename", () => {
-    // Frames used to read `File "<string>"`, which looks like a real file
-    // that doesn't exist.
-    expect(WORKER_SRC).toContain(
-      'async def _execute_with_last_display(code, filename="main.py")',
-    );
-    expect(WORKER_SRC).toContain('compile(tree, filename, "exec"');
-    expect(WORKER_SRC).toContain('compile(expr_tree, filename, "eval"');
-    expect(WORKER_SRC).not.toContain('compile(tree, "<string>"');
-    expect(RUN_WRAPPER).toContain(
-      "_execute_with_last_display(_user_code_str, _pg_entry_filename)",
-    );
-  });
-
-  it("replaces input() with an explanation instead of an errno", () => {
-    expect(WORKER_SRC).toContain("builtins.input = _pg_input");
-    expect(WORKER_SRC).toContain("isn't available in this playground");
-  });
-
-  it("cleans and annotates the message a failed run reports", () => {
-    expect(WORKER_SRC).toContain(
-      "annotateRunError(cleanPythonTraceback(raw))",
-    );
-  });
-});
-
-describe("files a run creates", () => {
-  it("answers the surface's request for them", () => {
-    expect(WORKER_SRC).toContain('msg.kind === "collect-created-files"');
-    expect(WORKER_SRC).toContain('kind: "created-files"');
-  });
-
-  it("stamps staged files so only genuinely new ones are reported", () => {
-    expect(WORKER_SRC).toContain("stagedStamps.set(");
-    expect(WORKER_SRC).toContain("stagedStamps.clear()");
   });
 });

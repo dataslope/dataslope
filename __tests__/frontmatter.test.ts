@@ -23,20 +23,30 @@ async function mdxFiles(dir: string): Promise<string[]> {
 }
 
 describe("authored MDX frontmatter", () => {
-  it("parses as YAML on every page", async () => {
+  it("parses as YAML and gives a title and a description on every page", async () => {
     const files = await mdxFiles(CONTENT_DIR);
     expect(files.length).toBeGreaterThan(500);
 
     const failures: string[] = [];
+    const missing: string[] = [];
     for (const file of files) {
-      const source = await readFile(file, "utf-8");
+      const rel = path.relative(process.cwd(), file);
+      let data: { title?: unknown; description?: unknown };
       try {
-        frontmatter(source);
+        data = frontmatter(await readFile(file, "utf-8")).data as typeof data;
       } catch (error) {
         const reason =
           error instanceof Error ? error.message.split("\n")[0] : String(error);
-        failures.push(`  ${path.relative(process.cwd(), file)}: ${reason}`);
+        failures.push(`  ${rel}: ${reason}`);
+        continue;
       }
+      const gaps = [
+        typeof data.title === "string" && data.title.trim() ? null : "title",
+        typeof data.description === "string" && data.description.trim()
+          ? null
+          : "description",
+      ].filter(Boolean);
+      if (gaps.length) missing.push(`  ${rel}: missing ${gaps.join(", ")}`);
     }
 
     expect(
@@ -44,39 +54,8 @@ describe("authored MDX frontmatter", () => {
       `frontmatter that fails the build's YAML parse:\n${failures.join("\n")}\n\n` +
         "Quote any value containing a colon-space.",
     ).toEqual([]);
-  });
-
-  it("gives every page a title and a description", async () => {
-    const files = await mdxFiles(CONTENT_DIR);
-    const missing: string[] = [];
-    for (const file of files) {
-      const { data } = frontmatter(await readFile(file, "utf-8"));
-      const meta = data as { title?: unknown; description?: unknown };
-      const gaps = [
-        typeof meta.title === "string" && meta.title.trim() ? null : "title",
-        typeof meta.description === "string" && meta.description.trim()
-          ? null
-          : "description",
-      ].filter(Boolean);
-      if (gaps.length) {
-        missing.push(
-          `  ${path.relative(process.cwd(), file)}: missing ${gaps.join(", ")}`,
-        );
-      }
-    }
     expect(missing, `pages with incomplete frontmatter:\n${missing.join("\n")}`).toEqual(
       [],
     );
-  });
-
-  // The rule that keeps the first test useful rather than mysterious: an
-  // unquoted colon-space is what actually broke the build.
-  it("fails an unquoted value containing a colon-space", () => {
-    expect(() =>
-      frontmatter("---\ntitle: A page\ndescription: One principle: risk first\n---\n"),
-    ).toThrow();
-    expect(() =>
-      frontmatter('---\ntitle: A page\ndescription: "One principle: risk first"\n---\n'),
-    ).not.toThrow();
   });
 });

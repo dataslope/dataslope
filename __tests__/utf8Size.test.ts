@@ -18,30 +18,11 @@ describe("utf8ByteLength", () => {
       "em — dash",
       "# main.py — café 你好 \u{1F600}\nprint('hi')\n",
       "mixed ascii/é/你/😀 in one line",
+      // A lone surrogate: encoders emit U+FFFD, 3 bytes.
+      "\uD83D",
     ];
     for (const s of samples) {
       expect(utf8ByteLength(s)).toBe(new TextEncoder().encode(s).length);
     }
-  });
-
-  it("counts the characters the audit measured", () => {
-    // "—" is 3 bytes (+2 over its 1 UTF-16 unit), "é" 2 (+1), "你" and "好"
-    // 3 each (+2 each): 7 bytes more than String.length, which is exactly
-    // the gap the panel used to under-report.
-    const s = "—é你好";
-    expect(s.length).toBe(4);
-    expect(utf8ByteLength(s)).toBe(11);
-  });
-
-  it("counts a surrogate pair once, as four bytes", () => {
-    expect("😀".length).toBe(2);
-    expect(utf8ByteLength("😀")).toBe(4);
-  });
-
-  it("handles a lone surrogate the way an encoder does", () => {
-    const lone = "\uD83D";
-    expect(utf8ByteLength(lone)).toBe(
-      new TextEncoder().encode(lone).length,
-    );
   });
 });

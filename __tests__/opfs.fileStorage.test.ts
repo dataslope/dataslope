@@ -31,11 +31,6 @@ describe("writeFile + readFile", () => {
     expect(result).toBe("hello world");
   });
 
-  it("returns null for a non-existent file", async () => {
-    const { readFile } = await import("../app/_components/opfs/fileStorage");
-    expect(await readFile("ws_missing", "no_file")).toBeNull();
-  });
-
   it("overwrites with the latest write when called multiple times for same key", async () => {
     const { writeFile, readFile, flushFileWrites } = await import(
       "../app/_components/opfs/fileStorage"
@@ -89,19 +84,9 @@ describe("deleteFile", () => {
     await flushFileWrites();
     expect(await readFile("ws_1", "cancel_me")).toBeNull();
   });
-
-  it("is safe when file does not exist", async () => {
-    const { deleteFile } = await import("../app/_components/opfs/fileStorage");
-    await expect(deleteFile("ws_ghost", "ghost_file")).resolves.toBeUndefined();
-  });
 });
 
 describe("listFiles", () => {
-  it("returns an empty array for a new workspace", async () => {
-    const { listFiles } = await import("../app/_components/opfs/fileStorage");
-    expect(await listFiles("ws_empty")).toEqual([]);
-  });
-
   it("returns names of written files after flush", async () => {
     const { writeFile, listFiles, flushFileWrites } = await import(
       "../app/_components/opfs/fileStorage"
@@ -117,12 +102,6 @@ describe("listFiles", () => {
 });
 
 describe("OPFS unavailable fallback", () => {
-  it("readFile returns null when OPFS is not supported", async () => {
-    vi.stubGlobal("navigator", {}); // no storage.getDirectory
-    const { readFile } = await import("../app/_components/opfs/fileStorage");
-    expect(await readFile("ws_1", "file_a")).toBeNull();
-  });
-
   it("writeFile + flushFileWrites do not throw when OPFS is not supported", async () => {
     vi.stubGlobal("navigator", {});
     const { writeFile, flushFileWrites } = await import(

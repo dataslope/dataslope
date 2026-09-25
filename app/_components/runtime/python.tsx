@@ -13,6 +13,7 @@ import type {
   PlotlyFigure,
   RunOptions,
 } from "../types";
+import { PYODIDE_VERSION } from "./cdn";
 import { getRuffFmt } from "./ruffFmt";
 
 // Pyodide loads inside a dedicated module Web Worker (see
@@ -1033,8 +1034,7 @@ export const pythonAdapter: LanguageAdapter = {
   runtimeInfo: {
     language: "Python",
     version: "3.14.2",
-    // Keep in sync with PYODIDE_VERSION in pyodide-worker.ts.
-    engine: "Pyodide 314.0.4",
+    engine: `Pyodide ${PYODIDE_VERSION}`,
     engineUrl: "https://pyodide.org",
     notes: "Runs in a Web Worker so the UI stays responsive while your code executes.",
   },

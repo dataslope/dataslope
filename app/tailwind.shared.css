@@ -4,8 +4,8 @@
  * ----------------------------------------------------------------------------
  * This app has two Tailwind roots (files that `@import "tailwindcss"`):
  *
- *   - app/tailwind.css      → home, /pricing, /account, /admin, legal pages
- *   - app/docs.css   → /learn and /interview (adds Fumadocs UI)
+ *   - app/tailwind.css → home, /pricing, /dashboard, legal pages
+ *   - app/docs.css     → /courses and /interview-prep (adds Fumadocs UI)
  *
  * Next.js scopes each stylesheet to the routes that import it, but after a
  * client-side navigation BOTH can be applied to the document at once, and the
@@ -53,9 +53,9 @@
    under home/) because the playground and Fumadocs surfaces render it too;
    scan it explicitly so its utilities generate for BOTH Tailwind roots. */
 @source "./_components/ThemePillToggle.tsx";
-/* Shared segment-level error/loading surfaces (used by quiz/[id], c/[id],
-   s/[shareId], and the dashboard shell). They live at the _components root,
-   which is otherwise unscanned, so list them explicitly. */
+/* Shared segment-level error/loading surfaces (used by s/[shareId] and the
+   dashboard shell). They live at the _components root, which is otherwise
+   unscanned, so list them explicitly. */
 @source "./_components/SegmentError.tsx";
 @source "./_components/SegmentLoading.tsx";
 /* The site-wide 404. It sits at the app root, which no glob above covers, so
@@ -84,12 +84,6 @@
 @source "./pricing/**/*.{ts,tsx}";
 @source "./privacy/**/*.{ts,tsx}";
 @source "./terms/**/*.{ts,tsx}";
-/* The dev-only /email-preview page + its client island. Without this glob its
-   utilities (the send-control card's `p-4`/`rounded-xl`, the CTA's
-   `bg-[var(--ds-blue-700)]`, the subtle `border-[var(--ds-gray-200)]`) never
-   generate under `source(none)`, so the button loses its background and the
-   borders fall back to `currentColor` — the same collapse the globs above fix. */
-@source "./email-preview/**/*.{ts,tsx}";
 /* The /courses catalog index page + its client components (the course
    lessons under courses/[...slug] render Fumadocs chrome with inline
    styles, so scanning them too is harmless). */
@@ -108,20 +102,17 @@
    tracking-[0.08em], …) never generate under `source(none)`, collapsing the
    layout, the same failure the courses/interview-prep globs above fix. */
 @source "./playground/**/*.{ts,tsx}";
-/* The /dashboard shell + everything under it: the Studio sidebar/top-bar
-   chrome (_studio), the create builders + hub, and the account and admin
-   sections (all moved here from /create, /account, /admin). Classes unique
-   to these files, especially the shell's arbitrary values (`w-[264px]`,
+/* The /dashboard shell and everything under it: the Studio sidebar/top-bar
+   chrome (_studio) and the challenges, playground, account and admin
+   sections (admin includes the /email-preview tool). Classes unique to these
+   files, especially the shell's arbitrary values (`w-[264px]`,
    `text-[13px]`, `rounded-[10px]`, `max-w-[1280px]`, …) never generate
    without this glob, so the production build purges them and the dashboard
-   layout collapses even though dev's incremental crawl emits them. Also
-   covers the /c and /quiz viewers and the /s share landing page. */
+   layout collapses even though dev's incremental crawl emits them. The /s
+   share landing page is listed beside it. */
 @source "./dashboard/**/*.{ts,tsx}";
-@source "./c/**/*.{ts,tsx}";
-@source "./quiz/**/*.{ts,tsx}";
 @source "./s/**/*.{ts,tsx}";
-@source "./_components/customContent/**/*.{ts,tsx}";
-/* Fumadocs UI's prebuilt components (the /learn & /interview chrome). The
+/* Fumadocs UI's prebuilt components (the /courses & /interview-prep chrome). The
    non-learn root needs these too, that is the point of the union: the home/
    admin sheet must carry Fumadocs's `md:hidden`/`max-xl:hidden`/… pairs so
    that when it is ordered after the learn sheet, its later `flex`/`grid`

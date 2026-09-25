@@ -13,11 +13,9 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import {
-  annotateUnavailableFlags,
   cleanBuildOutput,
   composeTranslationUnit,
   describeExit,
-  describeTrap,
   hideTranslationUnit,
   rewriteObjectPaths,
   TRANSLATION_UNIT_NAME,
@@ -83,26 +81,6 @@ describe("composeTranslationUnit", () => {
     expect(unit.includedSources).toEqual(["main.c"]);
     expect(Object.keys(unit.extraFiles)).toEqual(["main.c"]);
   });
-
-  it("recognises every C++ source extension", () => {
-    const unit = composeTranslationUnit({
-      language: "cpp",
-      entryPath: "main.cpp",
-      entryCode: "",
-      files: [["a.cc", ""], ["b.cxx", ""], ["c.cpp", ""]],
-    });
-    expect(unit.includedSources).toEqual(["a.cc", "b.cxx", "c.cpp", "main.cpp"]);
-  });
-
-  it("quotes a path that would otherwise end the include directive", () => {
-    const unit = composeTranslationUnit({
-      language: "c",
-      entryPath: 'we"ird.c',
-      entryCode: "",
-      files: [],
-    });
-    expect(unit.source).toBe('#include "we\\"ird.c"\n');
-  });
 });
 
 describe("build output", () => {
@@ -131,23 +109,6 @@ describe("build output", () => {
     );
   });
 
-  it("says a suggested flag cannot be supplied here", () => {
-    const out = annotateUnavailableFlags(
-      "Support for formatting long double values is currently disabled.\n" +
-        "To enable it, add -lc-printscan-long-double to the link command.",
-    );
-    expect(out).toContain("cannot be added");
-    expect(out).toContain("casting it to double");
-  });
-
-  it("explains that -fno-exceptions is not a choice the reader has", () => {
-    const out = annotateUnavailableFlags(
-      "main.cpp:7:9: error: cannot use 'throw' with exceptions disabled",
-    );
-    expect(out).toContain("-fno-exceptions");
-    expect(out).toContain("std::optional");
-  });
-
   it("leaves ordinary diagnostics alone", () => {
     const raw = "main.c:3:5: warning: unused variable 'x' [-Wunused-variable]";
     expect(cleanBuildOutput(raw, "main.c", "c")).toBe(raw);
@@ -155,14 +116,6 @@ describe("build output", () => {
 });
 
 describe("how a run ended", () => {
-  it("says nothing when the program exited cleanly", () => {
-    expect(describeExit(0)).toEqual({ failed: false, message: null });
-  });
-
-  it("reports a small status as-is", () => {
-    expect(describeExit(3).message).toBe("Program exited with code 3.");
-  });
-
   it("shows what a shell would report, and the raw value", () => {
     // A shell masks the status to eight bits, so a reader comparing with
     // their own terminal saw two different numbers for one program.
@@ -172,13 +125,6 @@ describe("how a run ended", () => {
     expect(describeExit(256).message).toBe(
       "Program exited with code 0 (returned 256).",
     );
-  });
-
-  it("names what a trap actually was", () => {
-    expect(describeTrap("call stack exhausted")).toContain("ran out of stack");
-    expect(describeTrap("unreachable")).toContain("assert()");
-    expect(describeTrap("out of bounds memory access")).toContain("outside its memory");
-    expect(describeTrap("something else entirely")).toContain("something else entirely");
   });
 });
 

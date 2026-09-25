@@ -23,7 +23,6 @@ import {
   type InstructionBlock,
   type Span,
 } from "@/lib/challenges";
-import { ticks } from "@/lib/challenges/authoring";
 import { AI_FILLER } from "../scripts/check-prose.mjs";
 
 const BANNED: [RegExp, string][] = [
@@ -191,22 +190,5 @@ describe("challenge prose", () => {
       }
     }
     expect(found, found.join("\n")).toEqual([]);
-  });
-});
-
-describe("ticks", () => {
-  it("splits backtick runs into code spans", () => {
-    expect(ticks("Count rows whose `status` is `completed`.")).toEqual([
-      "Count rows whose ",
-      { code: "status" },
-      " is ",
-      { code: "completed" },
-      ".",
-    ]);
-  });
-
-  it("leaves plain text and an unpaired backtick alone", () => {
-    expect(ticks("no code here")).toEqual(["no code here"]);
-    expect(ticks("a lone ` stays")).toEqual(["a lone ` stays"]);
   });
 });

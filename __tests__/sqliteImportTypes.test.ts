@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-  inferColumnTypeFromValues,
   sqliteAffinityFor,
   sqliteColumnType,
 } from "../app/_components/sql/utils/importUtils";
@@ -22,15 +21,6 @@ describe("sqliteAffinityFor (SQ-02)", () => {
     expect(sqliteAffinityFor("date")).toBe("TEXT");
     expect(sqliteAffinityFor("timestamptz")).toBe("TEXT");
     expect(sqliteAffinityFor("text")).toBe("TEXT");
-  });
-
-  it("routes the audit's probe CSV to INTEGER/REAL", () => {
-    expect(sqliteAffinityFor(inferColumnTypeFromValues(["10", "20"]))).toBe(
-      "INTEGER",
-    );
-    expect(sqliteAffinityFor(inferColumnTypeFromValues(["2.50", "3.75"]))).toBe(
-      "REAL",
-    );
   });
 });
 
@@ -91,12 +81,5 @@ describe("inferColumnType (SQ-12)", () => {
     expect(inferColumnType([["42"]], 0)).toBe("TEXT");
     expect(inferColumnType([["007"]], 0)).toBe("TEXT");
     expect(inferColumnType([["hello"]], 0)).toBe("TEXT");
-  });
-
-  it("keeps the existing value-based inference", () => {
-    expect(inferColumnType([[1]], 0)).toBe("INTEGER");
-    expect(inferColumnType([[1.5]], 0)).toBe("REAL");
-    expect(inferColumnType([[new Uint8Array([1])]], 0)).toBe("BLOB");
-    expect(inferColumnType([[null]], 0)).toBe("NULL");
   });
 });

@@ -100,7 +100,6 @@ const STRAYS = PACF.map((v, k) => ({ v, k }))
 /** The indirect path: how much of the lag-2 correlation a chain through lag 1
  *  accounts for on its own. */
 const INDIRECT = ACF[1] * ACF[1];
-const DIRECT = ACF[2] - INDIRECT;
 
 const Y = [-0.25, 1.35];
 const TICKS = [-0.25, 0, 0.25, 0.5, 0.75, 1];

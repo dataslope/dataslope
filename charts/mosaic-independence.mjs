@@ -24,7 +24,7 @@
  * which is what a contingency table is, and the flat divider is a chi-squared
  * test you can do with your eye.
  */
-import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, PRIMARY, SERIES } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 import { panel, panelSpace, panelTitle } from "./_panels.mjs";
 
 export const title =

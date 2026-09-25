@@ -147,7 +147,7 @@ const UNAVAILABLE_FLAG_NOTES: Array<{ match: RegExp; note: string }> = [
 ];
 
 /** Append a note wherever a diagnostic recommends something unreachable. */
-export function annotateUnavailableFlags(text: string): string {
+function annotateUnavailableFlags(text: string): string {
   const notes = UNAVAILABLE_FLAG_NOTES.filter(({ match }) => match.test(text))
     .map(({ note }) => note);
   if (notes.length === 0) return text;

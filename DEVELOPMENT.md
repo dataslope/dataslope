@@ -162,6 +162,34 @@ The `R2_INC_CACHE_*` pair is named for the bucket it belongs to, because a secon
 
 There is little left to tune: `MAX_BRANCHES` caps how many branch previews may coexist, and `GRACE_HOURS` sizes the in-flight-deploy safety net. `THRESHOLD_HOURS`, `MAIN_COMMITS`, `PR_COMMITS` and `MIN_CACHE_OBJECTS` were retired on 2026-08-14 — each approximated something the job now measures directly, and the age threshold in particular was the single largest contributor to the 78 GB peak. Retention decides whether the bucket sits near R2's 10 GB free tier or balloons — but only once bytes-per-build is what it should be: at ~0.147 GiB a build the whole steady-state bucket is well under a gigabyte, and at 2.34 GiB it is over the free tier with three folders. Storage beyond the tier is cheap ($0.015/GB-month), but there's no reason to pay for dead previews or for compression that isn't running.
 
+### Worker size
+
+Cloudflare refuses a Worker script over **10 MiB gzipped**. Static files (`/_next/static`, `public/`) are served by the `ASSETS` binding and the prerendered pages by the R2 incremental cache, so neither counts; what does is everything the server runs: Next's runtime, every route's server chunks, and the lesson pipeline those chunks carry, since lesson MDX compiles at request time (`dynamic: true` in `source.config.ts`) with its remark, rehype, KaTeX and Shiki stack. Measure after a build:
+
+```bash
+npx opennextjs-cloudflare build
+npm run cf:size                    # upload, gzip, headroom
+npm run cf:size -- --top 30        # plus the largest modules inside it
+npm run cf:size -- --budget 8192   # exit 1 above a gzipped budget
+```
+
+The totals come from `wrangler deploy --dry-run`, the same check a deploy runs. Measured 2026-09-25:
+
+| | Upload | Gzipped | Of the limit | Headroom |
+| --- | ---: | ---: | ---: | ---: |
+| Before | 41,125 KiB | 8,146 KiB | 79.6% | 2,094 KiB |
+| After | 38,426 KiB | 7,475 KiB | 73.0% | 2,765 KiB |
+
+What went, with the gzipped saving of each:
+
+- **Every Lucide icon, ~260 KiB.** Fumadocs' `lucideIconsPlugin()` resolves page-tree icon names through lucide-react's `icons` map, which imports all ~1,600 of them, and no page names an icon. `lib/source.ts` no longer loads it; if content ever names an icon, map those few explicitly there rather than bringing the plugin back.
+- **Image content hashes, ~240 KiB.** `lib/generated/images.js` carried a 64-character SHA-256 per image that only `scripts/build-images.mjs` reads. They moved to `lib/generated/image-hashes.json`, which nothing at runtime imports.
+- **The illustration-prompt corpus, ~176 KiB.** An unused `<IllustrationPrompt>` MDX component imported the whole 1.4 MB `data/illustration-prompts.json` into the lesson renderer. The admin gallery's API route still carries one copy, by design (the corpus is admin-only, so it can't be a public asset).
+
+**Server code is compiled once per layer.** Pages (`.next/server/chunks/ssr/`) and route handlers (`app/api/**`, `sitemap.ts`, in `.next/server/chunks/`) are separate Turbopack graphs, so a module imported from both ships twice. That is why the image manifest and the challenge catalog each appear twice: the catalog (~300 KiB gzipped a copy) is imported by the challenge pages and by `/api/challenges/progress` and `sitemap.ts`, which only need its slugs. Before a route handler imports a large module, check whether a page already carries it, or read the data at request time as a static asset through `lib/serverAssets.ts`.
+
+The same shape of problem shows up in any "resolve by name" map, which drags in the whole set it can resolve: the `shiki` alias in `next.config.ts` exists for the same reason the Lucide plugin is gone.
+
 ## Search
 
 Site search is a **SQLite FTS5 index on D1** (`dataslope-search`), built from `content/` at build time and queried by `app/api/search/route.ts`. It replaced an in-Worker Orama index, which had to be fetched, parsed and re-tokenised on the first search in every fresh isolate — a cost paid per data centre, per deploy, and growing with the content. An FTS5 query is a `SELECT` against an index that already exists, so there is nothing to warm up.
@@ -272,8 +300,8 @@ Key files:
 | `lib/auth/server.ts` | `createAuth(env, request)`, a **per-request** Better Auth factory bound to that request's D1 (a shared connection across requests is the classic Workers footgun). |
 | `app/api/auth/[...all]/route.ts` | Catch-all handler for `/api/auth/*` (sign-in, OAuth callbacks, session, sign-out). |
 | `lib/auth/client.ts` | Browser client + `useSession` / `signIn` / `signOut`. |
-| `app/sign-in/`, `app/account/` | Sign-in screen (Google/GitHub) and a gated account area. |
-| `app/admin/` | Gated admin dashboard (list / remove / ban users), built on the shadcn UI primitives in `components/ui`. See [Admin dashboard](#admin-dashboard). |
+| `app/sign-in/`, `app/dashboard/account/` | Sign-in screen (Google/GitHub) and a gated account area. |
+| `app/dashboard/admin/` | Gated admin dashboard (list / remove / ban users), built on the shadcn UI primitives in `components/ui`. See [Admin dashboard](#admin-dashboard). |
 | `migrations/` | D1 schema, one subfolder per database: `auth/`, `illustrations/`, `search/`. Each is a `migrations_dir` in `wrangler.jsonc` with its own numbering and its own `d1_migrations` table. See `migrations/README.md` for which command applies which, and why there are three databases rather than one. |
 | `migrations/auth/` | `dataslope-auth`: Better Auth core tables plus the admin plugin's `role`/`ban` fields, plans, cloud-workspace metadata, playground shares and challenge progress. Applied with `npm run db:migrate[:remote]`. |
 | `migrations/illustrations/` | `dataslope-illustrations`, a second database holding the illustration and chart regeneration queues written from the admin-only `/dashboard/admin/illustration-prompts` and `/dashboard/admin/charts` galleries. Applied with `npm run db:migrate:illustrations[:remote]`; see `agent-outputs/20260803-0900-illustration-regeneration-queue.md`. |
@@ -330,7 +358,7 @@ GOOGLE_CLIENT_SECRET="…"
 GITHUB_CLIENT_ID="…"
 GITHUB_CLIENT_SECRET="…"
 RESEND_API_KEY="…"     # optional; enables email verification + password reset
-ADMIN_EMAILS="…"       # optional; comma-separated emails granted /admin access
+ADMIN_EMAILS="…"       # optional; comma-separated emails granted /dashboard/admin access
 ADMIN_USER_IDS="…"     # optional; same, but by user id instead of email
 ```
 
@@ -370,7 +398,7 @@ Paid Pro memberships run on [Polar](https://polar.sh) as **merchant of record**,
 - `GET|POST /api/auth/customer/portal`, Polar's customer portal (invoices, payment method, cancel/renew) for the signed-in user.
 - `POST /api/auth/polar/webhooks`, Polar → us, signature-verified (standardwebhooks HMAC; pure-JS crypto, Workers-safe). **This is the only billing writer of `user.plan`.**
 
-**How plan sync works.** Checkout is created with `externalCustomerId = user.id`, so every webhook's customer carries our user id. We key everything off the `customer.state_changed` event, it fires on every subscription transition and carries the full current state, so the plan is a pure function of the latest event (`derivePlanFromCustomerState`): Pro while any active subscription matches a configured Pro product, free otherwise. One indexed D1 `UPDATE user SET plan` per event; no extra tables. An admin's manual plan switch for a *paying* customer is overwritten by the next state event (billing owns paid status); comped users (`PRO_USER_EMAILS`, admins, admin-set plan on non-customers) are untouched. After checkout the buyer lands on `/account?checkout=success`, which polls the session with the cookie cache bypassed until the webhook's flip is visible.
+**How plan sync works.** Checkout is created with `externalCustomerId = user.id`, so every webhook's customer carries our user id. We key everything off the `customer.state_changed` event, it fires on every subscription transition and carries the full current state, so the plan is a pure function of the latest event (`derivePlanFromCustomerState`): Pro while any active subscription matches a configured Pro product, free otherwise. One indexed D1 `UPDATE user SET plan` per event; no extra tables. An admin's manual plan switch for a *paying* customer is overwritten by the next state event (billing owns paid status); comped users (`PRO_USER_EMAILS`, admins, admin-set plan on non-customers) are untouched. After checkout the buyer lands on `/dashboard/account?checkout=success`, which polls the session with the cookie cache bypassed until the webhook's flip is visible.
 
 **Setup.** Billing is inert until configured (like social login / email):
 
@@ -379,7 +407,7 @@ Paid Pro memberships run on [Polar](https://polar.sh) as **merchant of record**,
 3. Secrets: `npx wrangler secret put POLAR_ACCESS_TOKEN` (org access token) and, after creating a webhook endpoint in Polar pointing at `https://dataslope.com/api/auth/polar/webhooks` (subscribe it to at least `customer.state_changed`), `npx wrangler secret put POLAR_WEBHOOK_SECRET`.
 4. Local dev: same four values in `.dev.vars`.
 
-Client side, `app/_components/billing/proCheckout.ts` drives the flow (upgrade button on `/account`, the Pro CTA on `/pricing`, which sends signed-out visitors to sign-in first). It deliberately calls the endpoints via `authClient.$fetch` instead of registering `polarClient()`, keeping Polar's checkout-embed library out of the shared auth bundle.
+Client side, `app/_components/billing/proCheckout.ts` drives the flow (upgrade button on `/dashboard/account`, the Pro CTA on `/pricing`, which sends signed-out visitors to sign-in first). It deliberately calls the endpoints via `authClient.$fetch` instead of registering `polarClient()`, keeping Polar's checkout-embed library out of the shared auth bundle.
 
 ### Cloud saves & playground sharing
 
@@ -388,7 +416,7 @@ Workspaces can be pushed to the account ("Cloud" button in every playground head
 - **Endpoints:** `GET/PUT/DELETE /api/workspaces[/:id[/bundle]]` (owner-only) and `POST/GET/DELETE /api/shares[/:id[/bundle]]` (share reads are public, the slug is the capability). Share links land on `/s/<id>` (noindex, disallowed in robots).
 - **Retention (read-time, no cron):** guest share links carry a fixed ~30-day expiry; free members' saves + links expire after ~30 days of inactivity (opening / viewing resets the clock); Pro storage doesn't expire. Expired rows are never served and are purged lazily by whichever route encounters them. Policy numbers live in `lib/workspaces/policy.ts` and are what `/pricing` documents.
 - **Quotas:** free 100 MB / Pro 10 GB, account-wide across saves + shares; per-bundle caps (guest 10 MB, free 25 MB, pro 100 MB compressed); guest share creation is metered per salted-IP hash + a global daily backstop (`share_usage_daily`, no raw IPs stored).
-- **Management:** `/account` gains a "Cloud storage" card listing every save + share link (open / delete / copy / revoke).
+- **Management:** `/dashboard/account` gains a "Cloud storage" card listing every save + share link (open / delete / copy / revoke).
 
 **One-time setup**, create the bucket and apply the migration; the feature answers 503 until both exist:
 
@@ -402,16 +430,16 @@ Optional hardening: an R2 **lifecycle rule** on the `share/` prefix (e.g. delete
 
 ### Admin dashboard
 
-`/admin` is a gated dashboard with a sidebar, powered by Better Auth's [`admin` plugin](https://www.better-auth.com/docs/plugins/admin) (`lib/auth/server.ts` + `lib/auth/client.ts`). The shell lives in `app/admin/layout.tsx`; adding a section is one route folder plus one entry in `app/admin/_components/AdminSidebar.tsx`. Current sections:
+`/dashboard/admin` is a gated section of the Studio dashboard, powered by Better Auth's [`admin` plugin](https://www.better-auth.com/docs/plugins/admin) (`lib/auth/server.ts` + `lib/auth/client.ts`). Adding a section is one route folder under `app/dashboard/admin/` plus one entry in `ADMIN_ITEMS` (`app/dashboard/_studio/nav.ts`); the Studio shell draws the sidebar from that list. Current sections:
 
-- **Users** (`/admin`), lists every account with per-row actions:
+- **Users** (`/dashboard/admin`), lists every account with per-row actions:
   - **Plan switch**, flips `free` ↔ `pro` via `admin.updateUser` (an already-signed-in session can lag up to five minutes behind, from the session cookie cache; impersonation and fresh sign-ins see the new plan immediately).
-  - **Impersonate**, become that user in this browser (refused for admins server-side). Come back to `/admin` and the access-denied card offers **Stop impersonating**.
+  - **Impersonate**, become that user in this browser (refused for admins server-side). Come back to `/dashboard/admin` and the access-denied card offers **Stop impersonating**.
   - **Remove**, a **hard delete**. It drops the `user` row, which cascades to that user's `session` and `account` rows (the `ON DELETE CASCADE` in `migrations/auth/0001`) and frees their unique email. **The person can then sign up again** from scratch with OAuth or email/password. Use this for the "let me start over" / account-reset case, e.g. someone who created an unverified email/password account and now can't sign in with Google (see [Account linking](#account-linking)).
   - **Ban**, the soft alternative. Blocks sign-in but keeps the account (and its email) in place; reversible with **Unban**.
-- **Test users** (`/admin/test-users`), creates disposable accounts for testing member-gated features (storage quotas, retention). They're created through `admin.createUser` with `data: { plan, emailVerified: true }`, so they're born verified (no verification email is sent on this path) on the chosen plan, no billing involved. Test accounts are identified purely by their reserved `@dataslope.test` email domain (RFC 6761 `.test` can never receive mail), which is what the list and the "Test" badges key on. Passwords show once at creation; use Impersonate for existing ones.
+- **Test users** (`/dashboard/admin/test-users`), creates disposable accounts for testing member-gated features (storage quotas, retention). They're created through `admin.createUser` with `data: { plan, emailVerified: true }`, so they're born verified (no verification email is sent on this path) on the chosen plan, no billing involved. Test accounts are identified purely by their reserved `@dataslope.test` email domain (RFC 6761 `.test` can never receive mail), which is what the list and the "Test" badges key on. Passwords show once at creation; use Impersonate for existing ones.
 
-Authorization is enforced **server-side** on every `admin.*` endpoint (and `requireAdmin` on our own `/api/admin/*` routes), so the pages themselves stay statically-prerendered, client-read screens like `/account` (the "auth gates actions, not content" rule): a non-admin who opens `/admin` just gets an access-denied notice and can read or change nothing. The dashboard refuses destructive actions on your own row, so you can't lock yourself out.
+Authorization is enforced **server-side** on every `admin.*` endpoint (and `requireAdmin` on our own `/api/admin/*` routes), so the pages themselves stay statically-prerendered, client-read screens like `/dashboard/account` (the "auth gates actions, not content" rule): a non-admin who opens `/dashboard/admin` just gets an access-denied notice and can read or change nothing. The dashboard refuses destructive actions on your own row, so you can't lock yourself out.
 
 The admin plugin adds `role` / `banned` / `banReason` / `banExpires` to `user` and `impersonatedBy` to `session`; that delta is `migrations/auth/0002_add_admin_plugin_fields.sql`, applied by the same `wrangler d1 migrations apply` command as the rest.
 
@@ -432,7 +460,7 @@ The admin plugin adds `role` / `banned` / `banReason` / `banExpires` to `user` a
    npx wrangler secret put ADMIN_USER_IDS   # e.g. "abc123,def456"
    ```
 
-3. **By role:** an existing admin can promote another account by setting its `role` to `admin` (directly in D1, or via the plugin's `setRole`). Role-based admins also see an **Admin** link in the account menu; email/id-based admins reach the dashboard at `/admin` directly.
+3. **By role:** an existing admin can promote another account by setting its `role` to `admin` (directly in D1, or via the plugin's `setRole`). Role-based admins also see an **Admin** link in the account menu; email/id-based admins reach it at `/dashboard/admin` directly.
 
 ### Account linking
 

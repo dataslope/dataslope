@@ -1,10 +1,10 @@
 /**
- * Data layer for the illustration-prompts review gallery and the in-lesson
- * `<IllustrationPrompt>` card. Turns each raw definition from
- * `data/illustration-prompts.json` into a fully-built entry (exact prompt,
- * target file name, lesson deep link) so the gallery, the card, and the
- * generator agree. Free of Node/DOM APIs so both server and client components
- * can import it.
+ * Data layer for the illustration-prompts review gallery. Turns each raw
+ * definition from `data/illustration-prompts.json` into a fully-built entry
+ * (exact prompt, target file name, lesson deep link) so the gallery and the
+ * generator agree. Server-only in practice: the corpus is admin-only and is
+ * served by `app/api/admin/illustration-prompts/route.ts`, never shipped to a
+ * browser.
  */
 import promptsData from "@/data/illustration-prompts.json";
 import {

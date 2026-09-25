@@ -90,7 +90,6 @@ const named = (id) => DIAG.find((d) => d.id === id);
 const HIDDEN = named("hidden");
 const OUTLIER = named("outlier");
 const BOTH = named("both");
-const LEV_RATIO = (HIDDEN.h / OUTLIER.h).toFixed(0);
 const INFLUENCE_RATIO = (HIDDEN.cook / OUTLIER.cook).toFixed(0);
 
 export const caption = `Standardised residual against leverage, with Cook's distance contours. The obvious outlier at the top left has a Cook's distance of ${OUTLIER.cook.toFixed(2)}; the unremarkable-looking point on the right has ${HIDDEN.cook.toFixed(2)}, so it moves the fitted line about ${INFLUENCE_RATIO} times as much.`;

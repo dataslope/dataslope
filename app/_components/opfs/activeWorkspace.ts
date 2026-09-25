@@ -15,7 +15,6 @@ import {
   workspaceExistsInOpfs,
   type WorkspaceEntry,
 } from "./workspace";
-import { isOpfsSupported } from "./featureDetect";
 
 const SESSION_KEY_PREFIX = "playground_active_ws_";
 // Per-tab draft (unsaved) workspace, stored as the full entry so a reload
@@ -268,160 +267,6 @@ export function findWorkspaceEntry(
   }
 }
 
-// ---------------------------------------------------------------------------
-// Sign-in resume handoff
-// ---------------------------------------------------------------------------
-// Signing in navigates the tab away and can return without the per-tab
-// sessionStorage pointer, so a guest's draft (still in OPFS) would look lost.
-// A durable single-use handoff in localStorage, written just before the auth
-// navigation, lets the first bootstrap after returning re-adopt the workspace.
-
-const RESUME_STASH_KEY = "playground_signin_resume";
-// Older stashes are treated as abandoned so they can't hijack a later visit.
-const RESUME_STASH_TTL_MS = 24 * 60 * 60 * 1000;
-
-interface ResumeStash {
-  playground: string;
-  id: string;
-  name: string;
-  createdAt: number;
-  /** When the stash was written, for TTL expiry. */
-  ts: number;
-}
-
-function writeResumeStash(stash: ResumeStash): void {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(RESUME_STASH_KEY, JSON.stringify(stash));
-  } catch {
-    /* storage unavailable (private mode / quota); resume just won't happen. */
-  }
-}
-
-function readResumeStash(): ResumeStash | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.localStorage.getItem(RESUME_STASH_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as ResumeStash;
-    if (
-      parsed &&
-      typeof parsed.playground === "string" &&
-      typeof parsed.id === "string"
-    ) {
-      return parsed;
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-function clearResumeStash(): void {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.removeItem(RESUME_STASH_KEY);
-  } catch {
-    /* ignore */
-  }
-}
-
-/** True when localStorage is writable (false in private mode / when blocked). */
-function canWriteLocalStorage(): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    const probe = "__ds_persist_probe__";
-    window.localStorage.setItem(probe, "1");
-    window.localStorage.removeItem(probe);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Whether guest work can survive a sign-in round trip: OPFS must hold the
- * content and localStorage must be writable for the resume handoff.
- */
-export function canPersistGuestWork(): boolean {
-  return isOpfsSupported() && canWriteLocalStorage();
-}
-
-/**
- * True when signing in would lose the guest's playground work (browser can't
- * persist it across the auth navigation). False when there is no active
- * workspace.
- */
-export function guestWorkNeedsSignInWarning(playgroundId: string): boolean {
-  if (!playgroundId) return false;
-  if (getActiveWorkspaceId(playgroundId) == null) return false;
-  return !canPersistGuestWork();
-}
-
-/**
- * Records a durable, single-use pointer to the active workspace so it can be
- * resumed after sign-in. Call right before navigating to the auth pages.
- * No-op when there is no active workspace or OPFS can't hold the content.
- */
-export function stashActiveWorkspaceForResume(playgroundId: string): void {
-  if (!playgroundId || typeof window === "undefined") return;
-  const activeId = getActiveWorkspaceId(playgroundId);
-  if (!activeId) return;
-  if (!isOpfsSupported()) return;
-  const saved = getWorkspaceRegistry().find((e) => e.id === activeId);
-  const draft = getDraftWorkspace(playgroundId);
-  const source = saved ?? (draft && draft.id === activeId ? draft : null);
-  const name =
-    source?.name ?? DEFAULT_NAMES[playgroundId] ?? `Default ${playgroundId}`;
-  const createdAt = source?.createdAt ?? Date.now();
-  writeResumeStash({
-    playground: playgroundId,
-    id: activeId,
-    name,
-    createdAt,
-    ts: Date.now(),
-  });
-}
-
-/**
- * Consumes a pending sign-in resume handoff and re-adopts the stashed
- * workspace. Single-use: cleared up front so it can't hijack a later open.
- * Null when there's no valid unexpired stash or its content is gone.
- */
-async function consumeResumeStash(
-  playgroundId: string,
-): Promise<ActiveWorkspace | null> {
-  const stash = readResumeStash();
-  if (!stash || stash.playground !== playgroundId) return null;
-  clearResumeStash();
-  if (Date.now() - (stash.ts ?? 0) > RESUME_STASH_TTL_MS) return null;
-
-  // A saved (registry) workspace: re-point this tab at it and reuse.
-  const saved = getWorkspaceRegistry().find(
-    (e) => e.id === stash.id && e.playground === playgroundId,
-  );
-  if (saved) {
-    setActiveWorkspaceId(playgroundId, saved.id);
-    const opened = await openWorkspace(saved.id);
-    return { ...(opened ?? saved), saved: true };
-  }
-
-  // Unsaved draft: resumable only while its OPFS content is still present.
-  if (await workspaceExistsInOpfs(stash.id)) {
-    const entry: WorkspaceEntry = {
-      id: stash.id,
-      name: stash.name,
-      playground: playgroundId,
-      createdAt: stash.createdAt,
-      lastUsedAt: Date.now(),
-    };
-    setActiveWorkspaceId(playgroundId, entry.id);
-    setDraftWorkspace(playgroundId, entry);
-    return { ...entry, saved: false };
-  }
-  return null;
-}
-
 /**
  * Re-adopts the workspace this device last opened when this tab has no
  * pointer of its own. Deliberately declines when another tab holds the
@@ -470,11 +315,6 @@ async function resumeLastWorkspace(
 export async function ensureActiveWorkspace(
   playgroundId: string,
 ): Promise<ActiveWorkspace> {
-  // A guest who just signed in resumes the workspace they left, even if the
-  // per-tab pointer didn't survive the round trip.
-  const resumed = await consumeResumeStash(playgroundId);
-  if (resumed) return resumed;
-
   const storedId = getActiveWorkspaceId(playgroundId);
   if (storedId) {
     const registry = getWorkspaceRegistry();

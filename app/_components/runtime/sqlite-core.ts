@@ -174,8 +174,8 @@ function runStatements(db: Database, sql: string): SqliteRunDetail {
     const stmt = next.value;
     index += 1;
     try {
-      // sqlite-wasm 3.53.0-build1's `getColumnNames()` throws when
-      // `columnCount === 0`, so check columnCount first.
+      // sqlite-wasm's `getColumnNames()` throws on a zero-column statement
+      // ("Column index 0 is out of range"), so check columnCount first.
       if (stmt.columnCount === 0) {
         // Non-SELECT statement (INSERT, UPDATE, CREATE TABLE, …)
         while (stmt.step()) {

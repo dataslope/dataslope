@@ -4,11 +4,11 @@
  * Why a separate stylesheet?
  *
  * Outside of the Tailwind-opt-in routes (home, /courses index, /pricing,
- * /account, /admin, legal, see app/tailwind.css) this app uses CSS modules +
+ * /dashboard, legal, see app/tailwind.css) this app uses CSS modules +
  * plain CSS. By importing Tailwind's preflight (`@import 'tailwindcss'`)
  * and the Fumadocs UI presets only from the docs-route layouts
  * (app/courses/[...slug]/layout.tsx, app/fumadocs-dev/layout.tsx,
- * app/interview-prep/layout.tsx), Next.js scopes this stylesheet to those
+ * app/interview-prep/[...slug]/layout.tsx), Next.js scopes this stylesheet to those
  * chunks and keeps it out of the /playground bundle. Utility-class
  * generation is driven by the @source list in app/tailwind.shared.css,
  * shared with the app/tailwind.css root so both roots emit identical

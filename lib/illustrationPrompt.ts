@@ -157,7 +157,7 @@ export function slugify(value: string): string {
 }
 
 /** Stable file stem (no extension) for a prompt id. */
-export function illustrationFileSlug(id: string): string {
+function illustrationFileSlug(id: string): string {
   return slugify(id);
 }
 

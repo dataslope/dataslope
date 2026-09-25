@@ -1,5 +1,4 @@
 /* ─── Playground (Python / R) shared styles ─────────────────────────────── */
-/* Extracted from public/python.html so the React component can reuse them. */
 
 /* Shared run-overlay keyframes (ds-run-*), also used by CodeBlock and
    ChallengeCard. */

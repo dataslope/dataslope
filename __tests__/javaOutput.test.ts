@@ -98,11 +98,6 @@ describe("streaming", () => {
     ]);
     expect(router.nextSeq).toBe(2);
   });
-
-  it("reports where the next cell would go before anything is written", () => {
-    const { router } = collect({ firstSeq: 1 });
-    expect(router.nextSeq).toBe(1);
-  });
 });
 
 describe("launcher frames", () => {

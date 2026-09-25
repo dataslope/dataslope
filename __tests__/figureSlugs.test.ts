@@ -2,15 +2,12 @@
 // generated image renders nothing in production (by design, so placements can
 // precede artwork), so a typo'd slug ships an invisibly missing image. Every
 // placed slug must be in the generated manifest or the assets/images/README
-// pending table; also enforces required alt and pins the slugify rules.
+// pending table; also enforces required alt.
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import imageManifest from "../lib/generated/images";
-// build-images.mjs only runs its build when executed directly, so importing
-// the helper here is side-effect free.
-import { slugify } from "../scripts/build-images.mjs";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 const README_FILE = path.join(process.cwd(), "assets", "images", "README.md");
@@ -35,7 +32,7 @@ async function mdxFiles(dir: string): Promise<string[]> {
 
 /** Every `<Figure …>` opening tag across content/ (JSX attribute blocks
  *  contain no `>`, so `[^>]*` matches multi-line tags). Read once and shared:
- *  all four tests want the same list, and re-walking content/ per test blew
+ *  every test wants the same list, and re-walking content/ per test blew
  *  the 5 s default timeout under disk contention. */
 let cached: Promise<Placement[]> | null = null;
 function figurePlacements(): Promise<Placement[]> {
@@ -94,25 +91,5 @@ describe("<Figure> placements", () => {
           `it would silently render nothing in production`,
       ).toBe(true);
     }
-  });
-
-  it("uses slugs already in canonical form (what a source filename maps to)", async () => {
-    for (const p of await figurePlacements()) {
-      if (!p.slug) continue;
-      expect(slugify(p.slug), `non-canonical slug in ${p.file}`).toBe(p.slug);
-    }
-  });
-});
-
-describe("slugify", () => {
-  it("lowercases, strips diacritics, and hyphenates", () => {
-    expect(slugify("Café Été")).toBe("cafe-ete");
-    expect(slugify("US Map (v2)")).toBe("us-map-v2");
-    expect(slugify("  panda__in--shades  ")).toBe("panda-in-shades");
-  });
-
-  it("trims leading/trailing separators", () => {
-    expect(slugify("--penguins--")).toBe("penguins");
-    expect(slugify("(playground)")).toBe("playground");
   });
 });

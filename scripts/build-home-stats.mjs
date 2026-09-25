@@ -28,7 +28,7 @@ const countMatches = (texts, pattern) =>
   texts.reduce((total, text) => total + (text.match(pattern)?.length ?? 0), 0);
 
 /** Exported so the freshness test can re-derive without duplicating the rules. */
-export function readHomeStats() {
+function readHomeStats() {
   // What a learner can open: courses and interview prep. Not fumadocs-dev,
   // the noindexed component gallery, whose 130-odd demo cards are not
   // lessons anyone takes.

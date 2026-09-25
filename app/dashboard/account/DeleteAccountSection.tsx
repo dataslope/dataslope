@@ -5,7 +5,7 @@
  * configured the server emails a confirmation link and deletes nothing until
  * clicked; without one deletion is immediate but requires a fresh session
  * (stale → SESSION_EXPIRED, translated to a "sign out and back in" prompt).
- * Deletion cascades to sessions, accounts, saves, shares, and custom content;
+ * Deletion cascades to sessions, accounts, saves, shares, and challenge progress;
  * the beforeDelete hook purges the R2 payloads.
  */
 

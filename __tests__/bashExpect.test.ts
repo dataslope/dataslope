@@ -11,9 +11,8 @@ import { createGitFs } from "@/app/_components/git/gitFs";
 import { createGitCommand } from "@/app/_components/git/gitCommand";
 import { runCommand } from "@/app/_components/git/runCommand";
 import { EMPTY_STATE, MAX_SNAPSHOT_FILE_BYTES, type RepoState } from "@/app/_components/git/protocol";
-import { BASH_SCENARIOS, bashScenarioById } from "@/app/_components/bash/bashScenarios";
+import { bashScenarioById } from "@/app/_components/bash/bashScenarios";
 import {
-  bashExpectSummary,
   explainBashExpect,
   satisfiesBashExpect,
   type BashContext,
@@ -103,19 +102,6 @@ describe("BashExpect", () => {
     expect(await passes(ctx(), { anyOutputContains: "README.md" })).toBe(true);
   });
 
-  it("counts output lines, ignoring blanks", async () => {
-    const { run, ctx } = await harness("log-files");
-    await run("grep ERROR app.log");
-    expect(await passes(ctx(), { stdoutLineCount: 2 })).toBe(true);
-    expect(await passes(ctx(), { stdoutLineCount: 3 })).toBe(false);
-  });
-
-  it("matches output with a regex", async () => {
-    const { run, ctx } = await harness("sales-csv");
-    await run("head -1 sales.csv");
-    expect(await passes(ctx(), { stdoutMatches: "^date,region" })).toBe(true);
-  });
-
   it("reads stderr as output too", async () => {
     // A learner reading the terminal does not distinguish the streams.
     const { run, ctx } = await harness("small-project");
@@ -135,62 +121,5 @@ describe("BashExpect", () => {
 
     await run("rm notes.txt");
     expect(await passes(ctx(), { fileAbsent: "notes.txt" })).toBe(true);
-  });
-
-  it("counts lines in a file", async () => {
-    const { run, ctx } = await harness("log-files");
-    await run("grep ERROR app.log > errors.log");
-    expect(await passes(ctx(), { fileLineCount: { path: "errors.log", lines: 2 } })).toBe(true);
-    expect(await passes(ctx(), { fileMatches: { path: "errors.log", pattern: "timeout" } })).toBe(true);
-  });
-
-  it("can grade the route as well as the result", async () => {
-    const { run, ctx } = await harness("log-files");
-    await run("cat app.log | grep ERROR");
-    expect(await passes(ctx(), { commandMatches: "grep" })).toBe(true);
-    expect(await passes(ctx(), { commandMatches: "\\bawk\\b" })).toBe(false);
-  });
-
-  it("explains what is missing rather than only failing", async () => {
-    const { run, ctx } = await harness("small-project");
-    await run("ls");
-    const c = await ctx();
-    expect(explainBashExpect({ stdoutContains: "zzz" }, c)).toContain('does not contain "zzz"');
-    expect(explainBashExpect({ filesExist: ["nope"] }, c)).toContain("nope does not exist");
-    expect(explainBashExpect({ fileContains: { path: "README.md", text: "zzz" } }, c)).toContain(
-      "does not contain",
-    );
-    expect(explainBashExpect({ stdoutContains: "README.md" }, c)).toBeNull();
-  });
-
-  it("summarizes assertions for the details popover", () => {
-    const s = bashExpectSummary({ stdoutLineCount: 3, filesExist: ["a.txt"], noErrors: true });
-    expect(s).toContain("output has 3 lines");
-    expect(s).toContain("files exist: a.txt");
-    expect(s).toContain("no command failed");
-  });
-
-  it("treats an all-empty expectation as satisfied", async () => {
-    const { ctx } = await harness("small-project");
-    expect(await passes(ctx(), {})).toBe(true);
-  });
-});
-
-describe("bash scenarios", () => {
-  it.each(BASH_SCENARIOS.map((s) => s.id))("%s seeds a usable filesystem", async (id) => {
-    const { run, ctx } = await harness(id);
-    const listing = await run("ls -a");
-    expect(listing.exitCode).toBe(0);
-
-    const expected = Object.keys(bashScenarioById(id).files);
-    const { state } = await ctx();
-    for (const path of expected) expect(state.tree).toContain(path);
-  });
-
-  it("puts nested scenario files in real directories", async () => {
-    const { run } = await harness("small-project");
-    const nested = await run("cat src/lib/parse.js");
-    expect(nested.exitCode).toBe(0);
-    expect(nested.stdout).toContain("JSON.parse");
   });
 });

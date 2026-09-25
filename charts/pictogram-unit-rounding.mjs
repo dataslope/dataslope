@@ -61,7 +61,6 @@ const BARS = panel(1, { y: [0, 720] });
 
 const ROW_TOP = 0.78;
 const ROW_STEP = 0.135;
-const ICON_R = 0.021;
 const ICON_STEP = 0.058;
 
 const dots = GROUPS.flatMap((d, row) =>

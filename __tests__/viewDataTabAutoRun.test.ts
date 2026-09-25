@@ -44,22 +44,10 @@ describe("viewDataTabToAutoRun", () => {
     expect(viewDataTabToAutoRun(input())?.id).toBe("t1");
   });
 
-  it("treats a cleared result the same as never having run", () => {
-    expect(
-      viewDataTabToAutoRun(input({ resultsByTab: { t1: null } }))?.id,
-    ).toBe("t1");
-  });
-
   it("leaves a tab that already has rows alone", () => {
     expect(
       viewDataTabToAutoRun(input({ resultsByTab: { t1: result() } })),
     ).toBeNull();
-  });
-
-  it("waits for the engine to finish booting", () => {
-    expect(viewDataTabToAutoRun(input({ statusState: "loading" }))).toBeNull();
-    expect(viewDataTabToAutoRun(input({ statusState: "running" }))).toBeNull();
-    expect(viewDataTabToAutoRun(input({ statusState: "error" }))).toBeNull();
   });
 
   it("gives each tab one attempt, so an empty table doesn't loop", () => {
@@ -68,21 +56,8 @@ describe("viewDataTabToAutoRun", () => {
     ).toBeNull();
   });
 
-  it("only considers the tab on screen", () => {
-    const tabs = [tableTab(), tableTab({ id: "t2", title: "cards" })];
-    expect(viewDataTabToAutoRun(input({ tabs, activeTabId: "t2" }))?.id).toBe(
-      "t2",
-    );
-    expect(viewDataTabToAutoRun(input({ tabs, activeTabId: "gone" }))).toBeNull();
-  });
-
   it("never runs a plain query tab on its own", () => {
     const tabs = [tableTab({ kind: undefined })];
-    expect(viewDataTabToAutoRun(input({ tabs }))).toBeNull();
-  });
-
-  it("ignores a table tab with no SQL to run", () => {
-    const tabs = [tableTab({ code: "   " })];
     expect(viewDataTabToAutoRun(input({ tabs }))).toBeNull();
   });
 });

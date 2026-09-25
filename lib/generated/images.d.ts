@@ -11,15 +11,15 @@
  * `created-at.d.ts`).
  *
  * Keys are image slugs (the source filename without extension, e.g. `panda`);
- * values carry the source content hash (used for incremental re-encoding), the
- * optimized image's intrinsic pixel size, and the emitted formats — a WebP
- * plus a raster fallback, e.g. `["webp", "png"]` or `["webp", "jpg"]`, ordered
- * so the last entry is the `<img>` fallback. `<Figure>` uses the size to
- * reserve layout space and the presence of a key to decide whether the image
- * exists yet.
+ * values carry the optimized image's intrinsic pixel size and the emitted
+ * formats — a WebP plus a raster fallback, e.g. `["webp", "png"]` or
+ * `["webp", "jpg"]`, ordered so the last entry is the `<img>` fallback.
+ * `<Figure>` uses the size to reserve layout space and the presence of a key
+ * to decide whether the image exists yet. The source content hashes that
+ * drive incremental re-encoding live in `image-hashes.json` beside it, which
+ * nothing at runtime imports.
  */
 export interface ImageManifestEntry {
-  hash: string;
   width: number;
   height: number;
   formats: string[];

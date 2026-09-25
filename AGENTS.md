@@ -1400,7 +1400,7 @@ Four things hold this together:
   `ESBUILD_WASM_VERSION` from jsDelivr; the generator uses the `esbuild-wasm`
   devDependency. The generator exits non-zero if they disagree, and
   `__tests__/reactBundles.test.ts` additionally requires the devDependency to
-  be an **exact** version, not a caret range — `^0.28.1` would let `npm ci`
+  be an **exact** version, not a caret range — `^0.28.2` would let `npm ci`
   install 0.28.9 on a runner and silently change every bundle on the site.
   (That test caught exactly that, the first time it ran.)
 - **The generator's app imports must be dynamic.** A static `import`
@@ -1534,13 +1534,14 @@ Two places where the surrounding syntax decides the spelling:
   LaTeX command needs its backslash doubled: `$O(n \\log n)$`. A single one is
   eaten by the literal and KaTeX receives `log`, which it sets as three italic
   variables rather than the operator.
-- **Not every prop renders math.** `<MultipleChoice>` does (its own
-  ReactMarkdown pipeline carries `remarkMath` + `rehypeKatex`). A challenge
-  card's `instructions` does *not*: `renderMarkdownInstructions` in
-  `app/_components/challengeShared.tsx` runs `remarkGfm` plus
-  `rehypeHighlight` and no math plugins, so `$…$` there reaches the reader as
-  dollar signs. Leave those as plain text. Fenced code *is* highlighted — see
-  below for the label it needs.
+- **Props that bypass MDX bring their own math.** `<MultipleChoice>` and a
+  challenge card's `instructions` each run their own ReactMarkdown pipeline
+  with `remarkMath` + `rehypeKatex` (`renderMarkdownInstructions` in
+  `app/_components/challengeShared.tsx`), so `$…$` renders there too. The
+  cost is that two literal dollar signs in one paragraph ("$5 off, or $10 for
+  members") read as a math span; `__tests__/challengeInstructionsMath.test.ts`
+  checks the instructions in `content/` for that. Fenced code is highlighted
+  as well; see below for the label it needs.
 
 ### A fence in a card's instructions names its language
 

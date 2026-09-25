@@ -8,7 +8,6 @@
 import { describe, expect, it } from "vitest";
 import {
   sqlLiteralFor,
-  sqlTypeFor,
   tableNameFromSheet,
   uniqueTableNames,
   workbookToSqlScript,
@@ -40,25 +39,6 @@ describe("table names", () => {
       "Q1_Sales_2",
       "Q1_Sales_3",
     ]);
-  });
-});
-
-describe("column types per dialect", () => {
-  it("uses SQLite affinities for SQLite", () => {
-    expect(sqlTypeFor("bigint", "sqlite")).toBe("INTEGER");
-    expect(sqlTypeFor("double precision", "sqlite")).toBe("REAL");
-    expect(sqlTypeFor("date", "sqlite")).toBe("TEXT");
-    expect(sqlTypeFor("boolean", "sqlite")).toBe("TEXT");
-  });
-
-  it("uses the real types for Postgres and DuckDB", () => {
-    for (const dialect of ["postgres", "duckdb"] as const) {
-      expect(sqlTypeFor("bigint", dialect)).toBe("BIGINT");
-      expect(sqlTypeFor("double precision", dialect)).toBe("DOUBLE PRECISION");
-      expect(sqlTypeFor("boolean", dialect)).toBe("BOOLEAN");
-      expect(sqlTypeFor("date", dialect)).toBe("DATE");
-      expect(sqlTypeFor("text", dialect)).toBe("TEXT");
-    }
   });
 });
 

@@ -73,8 +73,17 @@ const PINS: { pkg: string; file: string; name: string }[] = [
   },
   {
     pkg: "@sqlite.org/sqlite-wasm",
-    file: "app/_components/runtime/sqlite-wasm.ts",
+    file: "app/_components/runtime/cdn.ts",
     name: "SQLITE_WASM_VERSION",
+  },
+  {
+    // Not split glue/binary like the rest, but the same drift in a different
+    // costume: the browser loads this pin while the block-output generator
+    // executes lessons on the npm package, so a mismatch means a lesson's
+    // prepopulated output came from a different Python than the reader's Run.
+    pkg: "pyodide",
+    file: "app/_components/runtime/cdn.ts",
+    name: "PYODIDE_VERSION",
   },
   {
     pkg: "wasm-xlsxwriter",
@@ -108,6 +117,19 @@ describe("CDN version pins match the installed packages", () => {
     const loader = read("app/_components/sql/utils/parquetWasm.ts");
     expect(loader).not.toMatch(/parquet-wasm@[\d.]+/);
     expect(loader).toContain("PARQUET_WASM_CDN");
+  });
+
+  it("pins one browsercc toolchain for the browser and both headless runners", () => {
+    // The C/C++ block-output generator and content sweep compile lessons with
+    // their own download of the toolchain; a different clang there would
+    // record output the reader's Run does not reproduce.
+    const worker = "app/_components/runtime/browsercc-worker.ts";
+    for (const name of ["BROWSERCC_VERSION", "WASI_SHIM_VERSION"]) {
+      const pinned = constant(worker, name);
+      for (const script of ["scripts/check-cpp-blocks.mjs", "scripts/lib/block-runners.mjs"]) {
+        expect(constant(script, name), `${name} in ${script}`).toBe(pinned);
+      }
+    }
   });
 
   for (const pkg of ["parquet-wasm", "wasm-xlsxwriter"]) {

@@ -26,7 +26,7 @@
  * the sort of set it claims to be, and those are different questions with
  * different failure modes.
  */
-import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, PRIMARY, rng } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, rng } from "./_theme.mjs";
 
 export const title =
   "Benford's expected first-digit distribution against a real ledger and a fabricated one. The fabricated ledger contains no unusual single value, so no outlier rule flags it, and its distribution of leading digits is visibly flat.";

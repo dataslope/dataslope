@@ -1,14 +1,13 @@
-// Shared chrome for every /create route: the "Studio" dashboard shell
-// (persistent sidebar + top bar), replacing the old
-// HomeNav/HomeFooter CreatePageShell. Server component so it can render the
-// pre-hydration theme script (no light/dark flash) and load the CSS the shell
-// needs; the client shell lives in StudioProviders.
+// Shared chrome for every /dashboard route: the "Studio" shell (persistent
+// sidebar + top bar). A server component so it can render the pre-hydration
+// theme script (no light/dark flash) and load the CSS the shell needs; the
+// shell itself is the client component StudioShell.
 import "@/app/tailwind.css";
 import "./_studio/studio.css";
 import { THEME_BOOTSTRAP } from "@/app/_components/home/themeBootstrap";
-import { StudioProviders } from "./_studio/StudioProviders";
+import { StudioShell } from "./_studio/StudioShell";
 
-export default function CreateLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -16,7 +15,7 @@ export default function CreateLayout({
   return (
     <>
       <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
-      <StudioProviders>{children}</StudioProviders>
+      <StudioShell>{children}</StudioShell>
     </>
   );
 }

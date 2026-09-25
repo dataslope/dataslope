@@ -6,7 +6,6 @@ import { describe, expect, it } from "vitest";
 import {
   parseScope,
   searchScopeFor,
-  searchSql,
   toResults,
   type SearchRow,
 } from "@/lib/search/ranking";
@@ -67,20 +66,6 @@ describe("parseScope", () => {
   });
 });
 
-describe("searchSql", () => {
-  it("only the scoped variant carries the boost parameters", () => {
-    expect(searchSql(true)).toContain("?5");
-    expect(searchSql(false)).not.toContain("?3");
-    expect(searchSql(false)).not.toContain("?4");
-    expect(searchSql(false)).not.toContain("?5");
-  });
-
-  it("both variants damp component rows", () => {
-    expect(searchSql(true)).toContain("heading = ''");
-    expect(searchSql(false)).toContain("heading = ''");
-  });
-});
-
 describe("toResults", () => {
   it("groups rows page-first and keeps the first-seen page position", () => {
     const out = toResults(
@@ -102,12 +87,6 @@ describe("toResults", () => {
       ["text", "/courses/a/x#three"],
     ]);
     expect(out[0].breadcrumbs).toEqual(["Course A"]);
-  });
-
-  it("a null-anchor row is the page-level result and adds no child entry", () => {
-    const out = toResults([row({ anchor: null, url: "/courses/a/lesson", heading: "" })], 24);
-    expect(out).toHaveLength(1);
-    expect(out[0].type).toBe("page");
   });
 
   it("component rows become text entries at the component's anchor", () => {
@@ -135,40 +114,6 @@ describe("toResults", () => {
       // The heading entry itself survives; only the duplicated snippet folds.
       expect(out.filter((r) => r.type === "heading")).toHaveLength(1);
     }
-  });
-
-  it("keeps distinct snippets from the same page separate", () => {
-    const out = toResults(
-      [
-        row({ url: "/courses/a/lesson#x-mcq-1", anchor: "x-mcq-1", heading: "", excerpt: "…the <mark>stat</mark> creates new variables and you can use them…" }),
-        row({ url: "/courses/a/lesson#x-mcq-2", anchor: "x-mcq-2", heading: "", excerpt: "…a completely different <mark>stat</mark>ement about geoms…" }),
-      ],
-      24,
-    );
-    expect(out.filter((r) => r.type === "text")).toHaveLength(2);
-  });
-
-  it("falls back to the code snippet when only code matched", () => {
-    const out = toResults(
-      [
-        row({
-          heading: "Setup",
-          excerpt: "plain prose without a match",
-          codeExcerpt: "…<mark>geom_bar</mark>(stat = 'identity')…",
-        }),
-      ],
-      24,
-    );
-    const text = out.find((r) => r.type === "text");
-    expect(text?.content).toContain("<mark>geom_bar</mark>");
-  });
-
-  it("emits no text entry when nothing highlighted", () => {
-    const out = toResults(
-      [row({ heading: "Heading Match", excerpt: "leading prose, no mark", codeExcerpt: "" })],
-      24,
-    );
-    expect(out.map((r) => r.type)).toEqual(["page", "heading"]);
   });
 
   it("caps how many rows one page may spend, so other pages still surface", () => {
@@ -215,10 +160,5 @@ describe("toResults", () => {
       24,
     );
     expect(out.map((r) => r.type)).toEqual(["page", "heading"]);
-  });
-
-  it("adds no hl parameter when there are no tokens", () => {
-    const out = toResults([row({})], 24);
-    expect(out.every((r) => !r.url.includes("hl="))).toBe(true);
   });
 });

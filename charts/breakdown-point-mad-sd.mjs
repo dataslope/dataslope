@@ -25,7 +25,7 @@
  * why robust estimates are used to *find* outliers rather than the other way
  * round.
  */
-import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, PRIMARY, SERIES, mean, normalSamples } from "./_theme.mjs";
+import { Plot, plot, ACCENT, GUIDE, HALO, PRIMARY, SERIES, mean, normalSamples } from "./_theme.mjs";
 
 export const title =
   "Standard deviation, interquartile range and median absolute deviation as points in a clean sample are replaced by extreme values one at a time. The SD moves on the first corrupted point; the IQR holds to a quarter; the MAD holds to a half.";

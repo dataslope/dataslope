@@ -39,12 +39,8 @@ const series = ["disease", "wounds"].map((cause) => {
 
 const rows = series.flatMap((s) => s.points);
 const END = Object.fromEntries(series.map((s) => [s.cause, s.points.at(-1).total]));
-const AT_COMMISSION = Object.fromEntries(
-  series.map((s) => [s.cause, s.points[COMMISSION_INDEX].total]),
-);
 const COLOR = { disease: SERIES[0], wounds: ACCENT };
 const YMAX = Math.ceil(END.disease / 2000) * 2000 + 1000;
-const afterShare = Math.round(((END.disease - AT_COMMISSION.disease) / END.disease) * 100);
 const ratio = (END.disease / END.wounds).toFixed(1);
 
 export const caption = `The same table as the rose, adding the deaths up rather than averaging them. Across the two years ${END.disease.toLocaleString()} men died of preventable disease and ${END.wounds.toLocaleString()} of wounds and injuries, a ratio of ${ratio} to one.`;

@@ -25,7 +25,7 @@ export interface IntrospectedSchemas {
   langSchema: Record<string, string[]>;
 }
 
-export const EMPTY_SCHEMAS: IntrospectedSchemas = {
+const EMPTY_SCHEMAS: IntrospectedSchemas = {
   completion: { entities: [] },
   langSchema: {},
 };

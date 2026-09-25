@@ -3,11 +3,12 @@
 // fetches modules directly inside the preview iframe. React is pinned, and
 // every OTHER package gets `?deps=react@<pin>` so transitive react peers
 // resolve to the same instance — two copies break hooks ("Invalid hook
-// call"). Keep REACT_VERSION in step with the react major in package.json.
+// call"). This is the React that lesson previews and the React playground
+// run, independent of the React the site itself is built with.
 
 import { ESM_SH_ORIGIN } from "./cdn";
 
-export const REACT_VERSION = "19.2.8";
+export const REACT_VERSION = "19.3.0";
 
 /** Exact pins for these packages; everything else resolves to latest
  *  (course content should stick to the pinned set). */
@@ -25,7 +26,7 @@ export function isBareSpecifier(specifier: string): boolean {
 }
 
 /** Split `@scope/pkg/sub/path` into package name and subpath. */
-export function splitPackageSpecifier(specifier: string): {
+function splitPackageSpecifier(specifier: string): {
   packageName: string;
   subpath: string;
 } {

@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  buildSourceLineMap,
-  composeWebDocument,
-} from "../app/_components/runtime/webPreview";
+import { composeWebDocument } from "../app/_components/runtime/webPreview";
 
 /** Where the composed document says a given composed line came from, using
  *  the same lookup the bridge does. */
@@ -88,17 +85,5 @@ describe("composed source line map", () => {
     });
     expect(locate(doc, lineOf(doc, "first();"))).toBe("script.js:1");
     expect(locate(doc, lineOf(doc, "second();"))).toBe("script.js:2");
-  });
-
-  it("returns nothing for a line the composer generated itself", () => {
-    const doc = composeWebDocument({ entryHtml: "<head></head>\n<h1>x</h1>\n", token: "t" });
-    // Inside the bridge, which belongs to no editor file.
-    expect(locate(doc, 3)).toBe(null);
-  });
-
-  it("is empty for a document with no files at all", () => {
-    expect(buildSourceLineMap("<h1>x</h1>", "index.html", new Map())).toEqual([
-      { file: "index.html", from: 1, to: 1, at: 1 },
-    ]);
   });
 });

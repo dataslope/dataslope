@@ -32,7 +32,7 @@ const BROWSERCC_URL = `https://cdn.jsdelivr.net/npm/browsercc@${BROWSERCC_VERSIO
 const WASI_SHIM_VERSION = "0.4.2";
 const WASI_SHIM_URL = `https://esm.sh/@bjorn3/browser_wasi_shim@${WASI_SHIM_VERSION}`;
 
-// ─── Type shims (mirrors browsercc.ts) ──────────────────────────────────
+// ─── Type shims ─────────────────────────────────────────────────────────
 
 interface BrowserccCompileJob {
   source: string;

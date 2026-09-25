@@ -231,7 +231,7 @@ function toSqlValue(value: unknown): SqlValue {
 /** Normalize a JS value for binding as a DuckDB prepared-statement
  *  parameter. Scalars and bigint bind directly; `Date` becomes an ISO string
  *  DuckDB casts to a timestamp; other objects fall back to string form. */
-export function toBindParam(value: unknown): unknown {
+function toBindParam(value: unknown): unknown {
   if (value === undefined) return null;
   if (value instanceof Date) return value.toISOString();
   if (value !== null && typeof value === "object") return String(value);

@@ -43,7 +43,7 @@ describe("the esbuild pin", () => {
     const pkg = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8"));
     const dep: string = pkg.devDependencies["esbuild-wasm"];
     expect(dep, "esbuild-wasm must be a devDependency").toBeTruthy();
-    // Exact pin, no range: `^0.28.1` would let `npm ci` install 0.28.9 and
+    // Exact pin, no range: `^0.28.2` would let `npm ci` install 0.28.9 and
     // silently change every bundle on the site.
     expect(dep).toBe(ESBUILD_WASM_VERSION);
   });

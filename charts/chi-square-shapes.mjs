@@ -12,7 +12,7 @@
  * table. Percentiles are found by integrating the drawn density, so the marker
  * really is the area cut off by the curve.
  */
-import { Plot, plot, linspace, ACCENT, HALO, MUTED, SERIES } from "./_theme.mjs";
+import { Plot, plot, linspace, HALO, MUTED, SERIES } from "./_theme.mjs";
 
 export const title =
   "Chi-square densities at one, three and eight degrees of freedom, each with its 95th percentile marked. The shape moves from a cliff at zero to a broad, nearly symmetric hump as the degrees of freedom rise.";

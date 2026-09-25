@@ -39,7 +39,6 @@ import {
   BashChallengeCard,
   MdxMultipleChoiceQuestion,
   Mermaid,
-  IllustrationPrompt,
   LoadingAnimationsGallery,
   RuntimeLoadingStates,
   LivePreview,
@@ -67,7 +66,6 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     Callout: withSearchAnchor(CalloutWithCodeTitle),
     Mermaid,
     SvgLabel,
-    IllustrationPrompt,
     Figure: withSearchAnchor(Figure),
     Chart: withSearchAnchor(Chart),
     // Lesson diagrams (see app/_components/mdx/diagrams.tsx); Server

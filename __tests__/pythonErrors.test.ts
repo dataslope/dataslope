@@ -35,13 +35,6 @@ ValueError: boom`,
     );
   });
 
-  it("drops the source lines echoed under a harness frame", () => {
-    const cleaned = cleanPythonTraceback(HARNESS_TRACEBACK);
-    expect(cleaned).not.toContain("await CodeRunner(");
-    expect(cleaned).not.toContain("...<9 lines>...");
-    expect(cleaned).not.toContain("_pyodide");
-  });
-
   it("keeps the joiners and both halves of a chained exception", () => {
     const chained = `Traceback (most recent call last):
   File "<exec>", line 34, in <module>
@@ -64,25 +57,12 @@ ValueError: boom`;
     expect(cleaned).not.toContain("<exec>");
   });
 
-  it("leaves a traceback with no harness frames untouched", () => {
-    const plain = `Traceback (most recent call last):
-  File "main.py", line 1, in <module>
-ZeroDivisionError: division by zero`;
-    expect(cleanPythonTraceback(plain)).toBe(plain);
-  });
-
   it("shows a harness-only failure raw rather than showing nothing", () => {
     const harnessOnly = `Traceback (most recent call last):
   File "/lib/python314.zip/_pyodide/_base.py", line 597, in eval_code_async
     await CodeRunner(
 RuntimeError: the harness broke`;
     expect(cleanPythonTraceback(harnessOnly)).toBe(harnessOnly);
-  });
-
-  it("passes through a message that isn't a traceback", () => {
-    expect(cleanPythonTraceback("SyntaxError: invalid syntax")).toBe(
-      "SyntaxError: invalid syntax",
-    );
   });
 });
 

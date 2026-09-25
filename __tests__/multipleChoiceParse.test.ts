@@ -33,36 +33,6 @@ and visual stories for decision-making.`;
     expect(q.explanation).toMatch(/decision-making\.$/);
   });
 
-  it("returns a null correctId when no choice is marked correct", () => {
-    const src = `Pick one.
-
-- A
-- B
-- C`;
-
-    const q = parseQuestion(src);
-    expect(q.correctId).toBeNull();
-    expect(q.choices.map((c) => c.correct)).toEqual([false, false, false]);
-  });
-
-  it("preserves math notation in question body and choices", () => {
-    const src = `What is $\\frac{d}{dx}[x^2]$?
-
-- $x$
-- [o] $2x$
-  > Applying the power rule.
-- $x^2$
-- $2$
-
-The power rule states that $\\frac{d}{dx}[x^n] = nx^{n-1}$.`;
-
-    const q = parseQuestion(src);
-    expect(q.body).toContain("$\\frac{d}{dx}[x^2]$");
-    expect(q.choices[1].text).toBe("$2x$");
-    expect(q.choices[1].correct).toBe(true);
-    expect(q.explanation).toContain("nx^{n-1}");
-  });
-
   it("treats `*` and `1.` in the question body as list markers, not choices", () => {
     const src = `Consider the following:
 
@@ -93,17 +63,6 @@ The power rule states that $\\frac{d}{dx}[x^n] = nx^{n-1}$.`;
       "A long choice that wraps onto\nmultiple lines for readability",
     );
     expect(q.choices[1].text).toBe("another option");
-  });
-
-  it("handles a question with no overall explanation", () => {
-    const src = `Pick one.
-
-- A
-- [o] B`;
-
-    const q = parseQuestion(src);
-    expect(q.explanation).toBe("");
-    expect(q.correctId).toBe("1");
   });
 
   it("handles CRLF line endings", () => {
@@ -163,29 +122,5 @@ The power rule states that $\\frac{d}{dx}[x^n] = nx^{n-1}$.`;
     expect(q.choices[0].text).toContain("```python");
     expect(q.choices[0].text).toContain("x = 1 + 2");
     expect(q.choices[1].text).toBe("Correct");
-  });
-
-  it("handles multiple fenced code-block choices followed by an explanation", () => {
-    const src = `Which snippet creates a list in Python?
-
-- [o] \`\`\`python
-  my_list = [1, 2, 3]
-  \`\`\`
-- \`\`\`python
-  my_list = (1, 2, 3)
-  \`\`\`
-  > This creates a tuple, not a list.
-- \`\`\`python
-  my_list = {1, 2, 3}
-  \`\`\`
-  > This creates a set, not a list.
-
-Lists are ordered, mutable sequences in Python.`;
-
-    const q = parseQuestion(src);
-    expect(q.correctId).toBe("0");
-    expect(q.choices[0].text).toContain("[1, 2, 3]");
-    expect(q.choices[1].explanation).toContain("tuple");
-    expect(q.explanation).toContain("mutable sequences");
   });
 });

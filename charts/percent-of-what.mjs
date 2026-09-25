@@ -48,8 +48,6 @@ const TOTAL_N = SEGMENTS.reduce((s, d) => s + d.n, 0);
 
 const SMALLEST = SEGMENTS.reduce((a, b) => (b.n < a.n ? b : a));
 const LARGEST = SEGMENTS.reduce((a, b) => (b.n > a.n ? b : a));
-/** Standard error of a 50% share at the smallest n, in percentage points. */
-const NOISE = Math.round(100 * Math.sqrt(0.25 / SMALLEST.n));
 
 const EQUAL = panel(0, { y: [0, 100] });
 

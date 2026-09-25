@@ -50,7 +50,6 @@ const LEGEND = [
 // vanished from the first render that way.
 ].map((d, k) => ({ ...d, i: MONTHS[0].i, y: 1195 - k * 76 }));
 
-const COMMISSION = MONTHS[COMMISSION_INDEX];
 const LAST = MONTHS.at(-1);
 const ratio = Math.round(PEAK.disease / (PEAK.wounds || 1));
 

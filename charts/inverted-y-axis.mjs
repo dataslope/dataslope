@@ -26,7 +26,7 @@
  * of them cost the reader a correction they will not always make.
  */
 import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
-import { panel, panelAxis, panelBaseline, panelSpace, panelTitle } from "./_panels.mjs";
+import { panel, panelAxis, panelSpace, panelTitle } from "./_panels.mjs";
 
 export const title =
   "One rising series drawn twice: with the vertical axis inverted so that the line falls, and the honest way up. The axis numbers are correct in both panels, and the two shapes say opposite things.";

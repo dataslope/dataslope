@@ -1,8 +1,8 @@
 /**
- * Tests for app/_components/opfs/activeWorkspace.ts — the sign-in resume
- * handoff that keeps a guest's unsaved playground work across signing in.
- * The "lost per-tab pointer" scenario is simulated by clearing sessionStorage
- * while localStorage + OPFS survive.
+ * Tests for app/_components/opfs/activeWorkspace.ts: reopening the workspace
+ * this device last used when a new tab has no pointer of its own. The lost
+ * per-tab pointer is simulated by clearing sessionStorage while localStorage
+ * and OPFS survive.
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
@@ -33,12 +33,9 @@ function makeStorageStub() {
 let local: ReturnType<typeof makeStorageStub>;
 let session: ReturnType<typeof makeStorageStub>;
 
-/** `opfs: false` drops `navigator.storage.getDirectory`, so isOpfsSupported()
- *  reports false (an environment where content can't be persisted).
- *  `heldLocks` stands in for the Web Locks API, listing workspace ids another
+/** `heldLocks` stands in for the Web Locks API, listing workspace ids another
  *  live tab currently holds. */
-function setupStubs(opts: { opfs?: boolean; heldLocks?: string[] } = {}) {
-  const opfs = opts.opfs ?? true;
+function setupStubs(opts: { heldLocks?: string[] } = {}) {
   local = makeStorageStub();
   session = makeStorageStub();
   const root = makeOpfsRoot();
@@ -53,12 +50,10 @@ function setupStubs(opts: { opfs?: boolean; heldLocks?: string[] } = {}) {
           }),
       }
     : undefined;
-  vi.stubGlobal(
-    "navigator",
-    opfs
-      ? { storage: { getDirectory: () => Promise.resolve(root) }, locks }
-      : { locks },
-  );
+  vi.stubGlobal("navigator", {
+    storage: { getDirectory: () => Promise.resolve(root) },
+    locks,
+  });
   vi.stubGlobal("localStorage", local); // workspace.ts registry uses bare localStorage
   vi.stubGlobal("sessionStorage", session);
   vi.stubGlobal("window", {
@@ -69,106 +64,9 @@ function setupStubs(opts: { opfs?: boolean; heldLocks?: string[] } = {}) {
   });
 }
 
-/**
- * Forget the durable "last opened" pointer, leaving the sign-in stash as the
- * only way back — without this, durable resume would answer first and the
- * stash tests would pass for the wrong reason.
- */
-function clearDeviceResume(playgroundId: string) {
-  local.removeItem(`playground_last_ws_${playgroundId}`);
-  local.removeItem(`playground_last_draft_ws_${playgroundId}`);
-}
-
 beforeEach(() => {
   setupStubs();
   vi.resetModules();
-});
-
-// ---------------------------------------------------------------------------
-// Resume handoff
-// ---------------------------------------------------------------------------
-
-describe("sign-in resume handoff", () => {
-  it("resumes the stashed draft after the per-tab pointer is lost", async () => {
-    const aw = await import(ACTIVE_WS);
-    const ws1 = await aw.ensureActiveWorkspace("sqlite");
-    expect(ws1.saved).toBe(false);
-
-    // User clicks "Sign in": stash, then the auth round trip drops this tab's
-    // sessionStorage (fresh tab / re-mounted embed).
-    aw.stashActiveWorkspaceForResume("sqlite");
-    session.clear();
-
-    const ws2 = await aw.ensureActiveWorkspace("sqlite");
-    expect(ws2.id).toBe(ws1.id);
-    expect(ws2.saved).toBe(false);
-  });
-
-  it("resumes a saved workspace, preserving its saved flag", async () => {
-    const aw = await import(ACTIVE_WS);
-    const ws1 = await aw.ensureActiveWorkspace("sqlite");
-    const saved = aw.saveDraftWorkspace("sqlite", "My Workspace");
-    expect(saved?.id).toBe(ws1.id);
-
-    aw.stashActiveWorkspaceForResume("sqlite");
-    session.clear();
-
-    const ws2 = await aw.ensureActiveWorkspace("sqlite");
-    expect(ws2.id).toBe(ws1.id);
-    expect(ws2.saved).toBe(true);
-  });
-
-  it("is single-use: the stash cannot resume a second bootstrap", async () => {
-    const aw = await import(ACTIVE_WS);
-    const ws1 = await aw.ensureActiveWorkspace("sqlite");
-    aw.stashActiveWorkspaceForResume("sqlite");
-
-    session.clear();
-    const ws2 = await aw.ensureActiveWorkspace("sqlite");
-    expect(ws2.id).toBe(ws1.id); // resumed
-
-    session.clear();
-    clearDeviceResume("sqlite");
-    const ws3 = await aw.ensureActiveWorkspace("sqlite");
-    expect(ws3.id).not.toBe(ws1.id); // stash already consumed → new draft
-    expect(local.getItem("playground_signin_resume")).toBeNull();
-  });
-
-  it("ignores a stash for a different playground", async () => {
-    const aw = await import(ACTIVE_WS);
-    const sqlite = await aw.ensureActiveWorkspace("sqlite");
-    aw.stashActiveWorkspaceForResume("sqlite");
-    session.clear();
-
-    // Opening a *different* playground must not adopt sqlite's workspace.
-    const python = await aw.ensureActiveWorkspace("python");
-    expect(python.id).not.toBe(sqlite.id);
-  });
-
-  it("ignores an expired stash", async () => {
-    const aw = await import(ACTIVE_WS);
-    const ws1 = await aw.ensureActiveWorkspace("sqlite");
-    aw.stashActiveWorkspaceForResume("sqlite");
-
-    // Age the stash beyond the 24h TTL.
-    const raw = JSON.parse(local.getItem("playground_signin_resume")!);
-    raw.ts = Date.now() - 25 * 60 * 60 * 1000;
-    local.setItem("playground_signin_resume", JSON.stringify(raw));
-
-    session.clear();
-    clearDeviceResume("sqlite");
-    const ws2 = await aw.ensureActiveWorkspace("sqlite");
-    expect(ws2.id).not.toBe(ws1.id);
-  });
-
-  it("does not stash when OPFS is unavailable (nothing to resume)", async () => {
-    setupStubs({ opfs: false });
-    vi.resetModules();
-    const aw = await import(ACTIVE_WS);
-    await aw.ensureActiveWorkspace("python");
-    aw.stashActiveWorkspaceForResume("python");
-    expect(local.getItem("playground_signin_resume")).toBeNull();
-  });
 });
 
 // ---------------------------------------------------------------------------
@@ -250,32 +148,5 @@ describe("resuming the last workspace", () => {
     session.clear();
     expect((await aw.ensureActiveWorkspace("sqlite")).id).toBe(sqlite.id);
     expect((await aw.ensureActiveWorkspace("python")).id).toBe(python.id);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Persistence assessment (drives the confirmation dialog)
-// ---------------------------------------------------------------------------
-
-describe("guestWorkNeedsSignInWarning", () => {
-  it("is false when there is no active workspace", async () => {
-    const aw = await import(ACTIVE_WS);
-    expect(aw.guestWorkNeedsSignInWarning("python")).toBe(false);
-  });
-
-  it("is false when the active workspace can be persisted", async () => {
-    const aw = await import(ACTIVE_WS);
-    await aw.ensureActiveWorkspace("python");
-    expect(aw.canPersistGuestWork()).toBe(true);
-    expect(aw.guestWorkNeedsSignInWarning("python")).toBe(false);
-  });
-
-  it("is true when the active workspace cannot be persisted (no OPFS)", async () => {
-    setupStubs({ opfs: false });
-    vi.resetModules();
-    const aw = await import(ACTIVE_WS);
-    await aw.ensureActiveWorkspace("python");
-    expect(aw.canPersistGuestWork()).toBe(false);
-    expect(aw.guestWorkNeedsSignInWarning("python")).toBe(true);
   });
 });

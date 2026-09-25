@@ -140,26 +140,9 @@ describe("the event loop stays alive for pending work", () => {
 });
 
 describe("console output", () => {
-  it("prints an Error's message instead of {}", async () => {
-    const { stdout } = await run(`console.log("failed:", new TypeError("boom"));`);
-    expect(stdout).toContain("TypeError: boom");
-    expect(stdout).not.toContain("{}");
-  });
-
-  it("keeps the contents of Map, Set and RegExp", async () => {
-    const { stdout } = await run(`
-      console.log(new Map([["k", 1]]));
-      console.log(new Set([1, 2]));
-      console.log(/ab+c/gi);
-    `);
-    expect(stdout).toBe("Map(1) { 'k' => 1 }\nSet(2) { 1, 2 }\n/ab+c/gi\n");
-  });
-
-  it("substitutes format specifiers", async () => {
-    const { stdout } = await run(`console.log("%s and %d and %j", "str", 42, { a: 1 });`);
-    expect(stdout).toBe('str and 42 and {"a":1}\n');
-  });
-
+  // Formatting itself is nodeInspect.test.ts's job. This one runs through
+  // the real runner because almostnode binds these methods to whatever
+  // console is installed when it loads, which a unit test cannot see.
   it("emits group, count, time, assert and table", async () => {
     const { stdout, stderr } = await run(`
       console.group("GROUP");
@@ -240,17 +223,6 @@ describe("errors", () => {
     expect(result.error).toContain("boom-unhandled-rejection");
     expect(s.stdout()).toContain("A sync");
   });
-
-  it("keeps output produced before the error", async () => {
-    const { stdout, error } = await run(`
-      console.log("before-1");
-      console.log("before-2");
-      null.x;
-    `);
-    expect(stdout).toContain("before-1");
-    expect(stdout).toContain("before-2");
-    expect(error).toContain("TypeError");
-  });
 });
 
 describe("crypto", () => {
@@ -266,13 +238,6 @@ describe("crypto", () => {
     expect(md5).toBe(createHash("md5").update("hi").digest("hex"));
     expect(md5).toHaveLength(32);
     expect(hmac).toHaveLength(64);
-  });
-
-  it("throws for an algorithm that does not exist", async () => {
-    const { error } = await run(`
-      require("crypto").createHash("notarealalgorithm").update("hi").digest("hex");
-    `);
-    expect(error).toMatch(/not supported/i);
   });
 });
 

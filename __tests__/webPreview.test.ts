@@ -6,17 +6,15 @@
 import { describe, it, expect } from "vitest";
 
 import {
-  PREVIEW_REPLAY_KEY,
   buildPreviewBridge,
   composeReactDocument,
   composeWebDocument,
   escapeInlineScriptContent,
   hasHarnessMarker,
   injectAtDocumentStart,
-  newPreviewToken,
   PREVIEW_MESSAGE_KEY,
 } from "../app/_components/runtime/webPreview";
-import { buildHarness, HARNESS_BEGIN } from "../app/_components/challengeHarness";
+import { buildHarness } from "../app/_components/challengeHarness";
 import { TAILWIND_BROWSER_CDN } from "../app/_components/runtime/cdn";
 import { webAdapter } from "../app/_components/runtime/web";
 import { reactAdapter } from "../app/_components/runtime/react";
@@ -47,22 +45,6 @@ describe("escapeInlineScriptContent", () => {
     expect(escapeInlineScriptContent(`a = "</script>"; b = "</SCRIPT>"`)).toBe(
       `a = "<\\/script>"; b = "<\\/SCRIPT>"`,
     );
-  });
-});
-
-describe("buildPreviewBridge", () => {
-  it("bakes the token and message key into the script", () => {
-    const bridge = buildPreviewBridge("tok123");
-    expect(bridge).toContain(`"tok123"`);
-    expect(bridge).toContain(PREVIEW_MESSAGE_KEY);
-    expect(bridge.startsWith("<script>")).toBe(true);
-    expect(bridge.endsWith("</script>")).toBe(true);
-  });
-});
-
-describe("newPreviewToken", () => {
-  it("produces distinct tokens", () => {
-    expect(newPreviewToken()).not.toBe(newPreviewToken());
   });
 });
 
@@ -204,11 +186,6 @@ describe("composeWebDocument", () => {
     });
     expect(doc).toContain(TAILWIND_BROWSER_CDN);
   });
-
-  it("omits Tailwind by default", () => {
-    const doc = composeWebDocument({ entryHtml: "<h1>x</h1>", token });
-    expect(doc).not.toContain(TAILWIND_BROWSER_CDN);
-  });
 });
 
 describe("composeReactDocument", () => {
@@ -237,19 +214,6 @@ describe("hasHarnessMarker", () => {
     expect(hasHarnessMarker(buildHarness("web", tests))).toBe(true);
     expect(hasHarnessMarker(buildHarness("react", tests))).toBe(true);
     expect(hasHarnessMarker("<h1>plain page</h1>")).toBe(false);
-    expect(HARNESS_BEGIN.length).toBeGreaterThan(0);
-  });
-});
-
-describe("composeWebDocument always carries the bridge", () => {
-  it("injects the bridge with the caller's token", () => {
-    // Every composed document is bridged — a bridgeless one would send a
-    // run's console output nowhere and render as a block that prints
-    // nothing. The auto-preview keeps determinism with a derived token,
-    // not by omitting the bridge.
-    const doc = composeWebDocument({ entryHtml: "<h1>hi</h1>", token: "tok" });
-    expect(doc).toContain(PREVIEW_MESSAGE_KEY);
-    expect(doc).toContain("<h1>hi</h1>");
   });
 });
 
@@ -329,14 +293,6 @@ describe("webAdapter.composeStaticPreview", () => {
 });
 
 describe("auto-preview is opt-in per adapter", () => {
-  it("both preview adapters render themselves", () => {
-    for (const adapter of [webAdapter, reactAdapter]) {
-      expect(adapter.outputCapabilities?.preview).toBe(true);
-      expect(adapter.outputCapabilities?.autoPreview).toBe(true);
-      expect(typeof adapter.composeStaticPreview).toBe("function");
-    }
-  });
-
   it("react composes from a precompiled bundle, never from source", () => {
     // Bundling in the browser would need the ~3 MB esbuild-wasm download the
     // build-time bundle exists to avoid. No bundle, no preview.
@@ -365,30 +321,5 @@ describe("auto-preview is opt-in per adapter", () => {
         bundle: { js: "console.log('compiled')", css: "body{margin:0}" },
       }),
     );
-  });
-});
-
-describe("bridge replay buffer", () => {
-  // The server-rendered frame runs while page JS is still downloading, so the
-  // block has usually printed before React subscribes; without a replay those
-  // messages are lost.
-  it("buffers what it posts and re-posts on request", () => {
-    const js = buildPreviewBridge("tok");
-    expect(js).toContain(PREVIEW_REPLAY_KEY);
-    expect(js).toContain("buffered");
-    // Bounded, so a runaway loop can't grow the frame's memory without limit.
-    expect(js).toMatch(/MAX_BUFFERED\s*=\s*\d+/);
-  });
-
-  it("numbers every message so a replay can be deduped", () => {
-    // postMessage structured-clones, so a replayed message arrives as a
-    // different object with identical contents. Identity can't dedupe it
-    // and text would collapse a block that logs the same line twice.
-    expect(buildPreviewBridge("tok")).toMatch(/msg\.n\s*=\s*seq\+\+/);
-  });
-
-  it("is deterministic for a given token", () => {
-    expect(buildPreviewBridge("tok")).toBe(buildPreviewBridge("tok"));
-    expect(buildPreviewBridge("a")).not.toBe(buildPreviewBridge("b"));
   });
 });

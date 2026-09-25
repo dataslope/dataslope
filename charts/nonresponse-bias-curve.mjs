@@ -28,7 +28,7 @@
  * year when owning either correlated with how you voted, and no sample size
  * fixes a frame like that.
  */
-import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, PRIMARY, SERIES, linspace } from "./_theme.mjs";
+import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, PRIMARY, linspace } from "./_theme.mjs";
 
 export const title =
   "Total estimation error against response rate for a mildly biased survey and a strongly biased one. The mild curve falls steadily; the strong one flattens almost at once, because extra responses reduce noise and leave the bias untouched.";

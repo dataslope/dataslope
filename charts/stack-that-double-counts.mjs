@@ -46,10 +46,6 @@ const TOOLS = [
 const TOTAL = TOOLS.reduce((s, d) => s + d.pct, 0);
 const N = TOOLS.length;
 const AVG_PICKS = (TOTAL / 100).toFixed(1);
-const SECOND = TOOLS[1];
-/** What the second segment looks like it is worth, if the bar is read as a
- *  whole, which is how a stack is read. */
-const MISREAD = Math.round((SECOND.pct / TOTAL) * 100);
 
 const STACK = panel(0, { y: [0, TOTAL * 1.06] });
 const BARS = panel(1, { y: [0, 88] });

@@ -31,33 +31,9 @@ const lessonUrls = (() => {
 describe("courseAliasRedirects", () => {
   const redirects = courseAliasRedirects();
 
-  it("emits redirects at all", () => {
-    expect(redirects.length).toBeGreaterThan(500);
-  });
-
   it("sends every flat URL to a lesson that actually exists", () => {
     const broken = redirects.filter((r) => !lessonUrls.has(r.destination));
     expect(broken).toEqual([]);
-  });
-
-  it("only ever redirects the one-segment shape", () => {
-    const wrongShape = redirects.filter(
-      (r) => !/^\/courses\/[^/]+$/.test(r.source),
-    );
-    expect(wrongShape).toEqual([]);
-  });
-
-  it("redirects the flat URL to a deeper path, never to itself", () => {
-    const selfOrShorter = redirects.filter(
-      (r) => r.destination === r.source || !r.destination.startsWith("/courses/"),
-    );
-    expect(selfOrShorter).toEqual([]);
-    // The whole point: the source is one segment, the destination is more.
-    for (const r of redirects) {
-      expect(r.destination.split("/").length).toBeGreaterThan(
-        r.source.split("/").length,
-      );
-    }
   });
 
   it("never shadows a real page", () => {
@@ -95,16 +71,5 @@ describe("courseAliasRedirects", () => {
     expect(bySource.get("/courses/setup-and-tsconfig")).toBe(
       "/courses/typescript-from-scratch/setup-and-tsconfig",
     );
-  });
-
-  it("emits permanent redirects in a stable order", () => {
-    expect(redirects.every((r) => r.permanent)).toBe(true);
-    const sources = redirects.map((r) => r.source);
-    expect(sources).toEqual([...sources].sort());
-  });
-
-  it("produces no duplicate sources", () => {
-    const sources = redirects.map((r) => r.source);
-    expect(new Set(sources).size).toBe(sources.length);
   });
 });

@@ -168,9 +168,6 @@ const clock = (t) => {
   return `${String(m === 60 ? h + 1 : h).padStart(2, "0")}:${String(m === 60 ? 0 : m).padStart(2, "0")}`;
 };
 
-const NEAREST = STATIONS.reduce((a, b) =>
-  Math.abs(b.km - MEETING.km) < Math.abs(a.km - MEETING.km) ? b : a,
-);
 const EXPRESS_HOURS = TRAINS[0].arrive - 19;
 const OMNIBUS_HOURS = TRAINS[1].arrive - 18.33;
 

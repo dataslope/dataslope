@@ -13,7 +13,7 @@
  * from the distributions rather than asserted, which is the entire argument
  * for preferring p.
  */
-import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, PRIMARY } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 
 export const title =
   "Sorted token probabilities for a confident step and an uncertain one, with the top-k cutoff at the same rank in both and the top-p nucleus covering two tokens in the first and many in the second.";

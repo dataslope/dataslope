@@ -31,7 +31,6 @@ import {
 } from "../completion/completionPrefs";
 import { Combobox } from "@base-ui/react/combobox";
 import { Dialog } from "@base-ui/react/dialog";
-import { Menu } from "@base-ui/react/menu";
 import { Popover } from "@base-ui/react/popover";
 import { Select } from "@base-ui/react/select";
 import { Switch } from "@base-ui/react/switch";
@@ -246,6 +245,7 @@ import type {
   ResultSetExportScope,
   ResultSetExportSnapshot,
 } from "../sql/types";
+import { PGLITE_VERSION } from "../runtime/cdn";
 import type { RuntimeInfo } from "../types";
 import type { SqlCompletionSchema } from "../sql/sqlCompletion";
 import { usePostgresSettingsStore } from "./stores/usePostgresSettingsStore";
@@ -915,8 +915,8 @@ const DEFAULT_PAGE_SIZE = 50;
 
 const RUNTIME_INFO: RuntimeInfo = {
   language: "PostgreSQL",
-  version: "17",
-  engine: "PGlite 0.4.5",
+  version: "18",
+  engine: `PGlite ${PGLITE_VERSION}`,
   engineUrl: "https://pglite.dev/",
   notes:
     "Pure-WASM build of PostgreSQL that runs entirely in your browser. Each sample database is rebuilt in memory on every page load.",
@@ -1227,7 +1227,6 @@ function PostgresPlaygroundInner() {
   >(null);
   const addTableBodyRef = useRef<HTMLDivElement | null>(null);
   const [addRowDialog, setAddRowDialog] = useState<AddRowDialogState | null>(null);
-  const [exportNoTabsHover, setExportNoTabsHover] = useState(false);
   const pgStructureSensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {

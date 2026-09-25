@@ -7,14 +7,12 @@
 // The worker speaks the request/response protocol defined below.
 
 import type { PyodideInterface } from "pyodide";
+import { PYODIDE_INDEX_URL } from "./cdn";
 import { POLARS_IMPORT_PATTERN, POLARS_WASM_SHIM } from "./polarsWasm";
 import { toOutputCells } from "./pythonDisplayOutputs";
 import { annotateRunError, cleanPythonTraceback } from "./pythonErrors";
 
 declare const self: DedicatedWorkerGlobalScope;
-
-const PYODIDE_VERSION = "v314.0.4";
-const PYODIDE_INDEX_URL = `https://cdn.jsdelivr.net/pyodide/${PYODIDE_VERSION}/full/`;
 
 /** Load Pyodide's ES-module entry point from the CDN, outside the
  *  bundler's sight. Called once from initPyodide. */

@@ -14,6 +14,8 @@ import type {
   Sqlite3Static,
 } from "@sqlite.org/sqlite-wasm";
 
+import { SQLITE_WASM_CDN } from "./cdn";
+
 export type { Database, PreparedStatement, Sqlite3Static, BindingSpec };
 
 // ---------------------------------------------------------------------------
@@ -42,12 +44,6 @@ export interface QueryExecResult {
 // ---------------------------------------------------------------------------
 // sqlite-wasm module loader (memoised, CDN-hosted)
 // ---------------------------------------------------------------------------
-
-// IMPORTANT: keep in sync with the `@sqlite.org/sqlite-wasm` version in
-// package.json — npm only supplies the type declarations; the runtime is
-// fetched from jsDelivr.
-const SQLITE_WASM_VERSION = "3.53.0-build1";
-const SQLITE_WASM_CDN = `https://cdn.jsdelivr.net/npm/@sqlite.org/sqlite-wasm@${SQLITE_WASM_VERSION}/dist/index.mjs`;
 
 type Sqlite3InitFn = (config?: {
   print?: (msg: string) => void;
@@ -348,8 +344,8 @@ export function execAll(db: Database, sql: string): QueryExecResult[] {
   const out: QueryExecResult[] = [];
   for (const stmt of iterateStatements(db, sql)) {
     try {
-      // sqlite-wasm 3.53.0-build1's `getColumnNames()` throws when
-      // `columnCount === 0`; guard so DDL/DML drains cleanly.
+      // sqlite-wasm's `getColumnNames()` throws on a zero-column statement
+      // ("Column index 0 is out of range"), so DDL/DML drains here instead.
       if (stmt.columnCount === 0) {
         while (stmt.step()) {
           /* drain */

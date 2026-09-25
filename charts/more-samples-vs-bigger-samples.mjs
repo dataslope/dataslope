@@ -24,7 +24,7 @@
  * cannot manufacture information the sample does not contain. Sampling error
  * is a fact about n.
  */
-import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, mean, normalSamples, rng } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, PRIMARY, mean, rng } from "./_theme.mjs";
 import { panel, panelAxis, panelBaseline, panelSpace, panelTitle } from "./_panels.mjs";
 
 export const title =

@@ -63,7 +63,6 @@ const ORDER = rows.map((d) => d.name);
 
 /** A country gains less than this and the bar is worth explaining. */
 const STALLED = 8;
-const stalled = rows.filter((d) => d.gain < STALLED);
 
 const sd = (xs) => {
   const m = mean(xs);

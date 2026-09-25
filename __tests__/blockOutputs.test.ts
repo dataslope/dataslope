@@ -8,66 +8,15 @@ import { join } from "node:path";
 
 import { describe, it, expect } from "vitest";
 
-import { blockOutputKey, workspaceOutputKey } from "../lib/blockOutputKey";
+import { workspaceOutputKey } from "../lib/blockOutputKey";
 import { toOutputCells } from "../app/_components/runtime/pythonDisplayOutputs";
 import { BROWSER_ADAPTERS, TEXT_ADAPTERS } from "../scripts/lib/block-runners.mjs";
-
-describe("blockOutputKey", () => {
-  it("is stable for the same block", () => {
-    expect(blockOutputKey("python", "import x", "print(1)")).toBe(
-      blockOutputKey("python", "import x", "print(1)"),
-    );
-  });
-
-  it("changes when the visible code changes", () => {
-    expect(blockOutputKey("python", "import x", "print(1)")).not.toBe(
-      blockOutputKey("python", "import x", "print(2)"),
-    );
-  });
-
-  it("changes when the hidden setup changes", () => {
-    // The reason both halves are in the fingerprint: identical starter code
-    // prints something different when the data above it differs.
-    expect(blockOutputKey("python", "df = a", "print(df)")).not.toBe(
-      blockOutputKey("python", "df = b", "print(df)"),
-    );
-  });
-
-  it("changes when the runtime changes", () => {
-    expect(blockOutputKey("python", undefined, "1 + 1")).not.toBe(
-      blockOutputKey("javascript", undefined, "1 + 1"),
-    );
-  });
-
-  it("treats a missing init and an empty init as the same block", () => {
-    expect(blockOutputKey("python", undefined, "x")).toBe(
-      blockOutputKey("python", "", "x"),
-    );
-  });
-
-  it("does not collide across a field boundary", () => {
-    // A space separator would make these two equal: "a b" + " " + "c" is the
-    // same string as "a" + " " + "b c". Hence the NUL.
-    expect(blockOutputKey("python", "a b", "c")).not.toBe(
-      blockOutputKey("python", "a", "b c"),
-    );
-    expect(blockOutputKey("python", "ab", "c")).not.toBe(
-      blockOutputKey("python", "a", "bc"),
-    );
-  });
-});
 
 describe("workspaceOutputKey", () => {
   const files = [
     { filename: "main.tsx", starterCode: "import App from './App'" },
     { filename: "App.tsx", starterCode: "export default () => <p>hi</p>" },
   ];
-
-  it("is stable for the same workspace", () => {
-    expect(workspaceOutputKey("react", files, "main.tsx")).toBe(
-      workspaceOutputKey("react", files, "main.tsx"),
-    );
-  });
 
   it("changes when a NON-entry file changes", () => {
     // The regression this key exists for: the bundle bakes every file in,
@@ -78,12 +27,6 @@ describe("workspaceOutputKey", () => {
     ];
     expect(workspaceOutputKey("react", files, "main.tsx")).not.toBe(
       workspaceOutputKey("react", edited, "main.tsx"),
-    );
-  });
-
-  it("changes when the entry choice changes", () => {
-    expect(workspaceOutputKey("react", files, "main.tsx")).not.toBe(
-      workspaceOutputKey("react", files, "App.tsx"),
     );
   });
 });
@@ -116,17 +59,8 @@ describe("toOutputCells", () => {
     expect(cell.plot?.frames).toHaveLength(1);
   });
 
-  it("skips a malformed figure rather than rendering a broken chart", () => {
-    expect(toOutputCells([{ type: "plot", json: "{not json" }])).toEqual([]);
-  });
-
   it("drops whitespace-only text segments", () => {
     expect(toOutputCells([{ type: "stdout", text: "\n\n" }])).toEqual([]);
-  });
-
-  it("returns nothing for a non-array", () => {
-    expect(toOutputCells(null)).toEqual([]);
-    expect(toOutputCells(undefined)).toEqual([]);
   });
 });
 

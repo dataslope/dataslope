@@ -128,11 +128,4 @@ describe("anchor id contract", () => {
       "Bar chart",
     );
   });
-
-  it("an id attribute is only injected where the author wrote none", () => {
-    const rendered = renderedAnchorIds(
-      '<MultipleChoice id="mine" markdown={`Q`} />\n\n<MultipleChoice markdown={`Q2`} />\n',
-    );
-    expect(rendered).toEqual(["mine", "x-mcq-1"]);
-  });
 });

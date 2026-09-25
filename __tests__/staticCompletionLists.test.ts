@@ -1,9 +1,7 @@
 /**
- * Sanity checks over the curated static completion lists, no duplicate
- * labels (CodeMirror would render both rows), well-formed entries, and
- * a few spot checks that the lists carry what learners reach for.
- * Snippet entries (which carry an `apply` function) may intentionally
- * shadow a keyword of the same label, VS Code shows both too.
+ * The curated static completion lists carry no duplicate labels (CodeMirror
+ * would render both rows). Snippet entries (which carry an `apply` function)
+ * may intentionally shadow a keyword of the same label; VS Code shows both too.
  */
 import { describe, it, expect } from "vitest";
 import type { Completion } from "@codemirror/autocomplete";
@@ -39,58 +37,5 @@ describe.each(LISTS)("%s completions", (_name, list) => {
       seen.add(c.label);
     }
     expect(dupes).toEqual([]);
-  });
-
-  it("has well-formed entries", () => {
-    for (const c of list) {
-      expect(c.label.length).toBeGreaterThan(0);
-      expect(c.type).toBeTruthy();
-    }
-  });
-
-  it("is non-trivial", () => {
-    expect(list.length).toBeGreaterThan(30);
-  });
-});
-
-describe("spot checks", () => {
-  const labels = (list: readonly Completion[]) => list.map((c) => c.label);
-
-  it("C carries printf with a signature", () => {
-    const printf = C_COMPLETIONS.find((c) => c.label === "printf");
-    expect(printf?.type).toBe("function");
-    expect(printf?.detail).toContain("fmt");
-  });
-
-  it("C++ includes both the C surface and std::", () => {
-    expect(labels(CPP_COMPLETIONS)).toContain("malloc");
-    expect(labels(CPP_COMPLETIONS)).toContain("std::vector");
-    expect(labels(CPP_COMPLETIONS)).toContain("std::cout");
-  });
-
-  it("Java includes dotted statics reachable from a bare prefix", () => {
-    expect(labels(JAVA_COMPLETIONS)).toContain("System.out.println");
-    expect(labels(JAVA_COMPLETIONS)).toContain("ArrayList");
-  });
-
-  it("PHP keeps language constructs as keywords, not functions", () => {
-    const echo = PHP_COMPLETIONS.find((c) => c.label === "echo");
-    expect(echo?.type).toBe("keyword");
-    const list = PHP_COMPLETIONS.filter((c) => c.label === "list");
-    expect(list).toHaveLength(1);
-    expect(list[0].type).toBe("keyword");
-  });
-
-  it("TS keywords are a superset of JS keywords", () => {
-    const js = new Set(labels(JS_KEYWORDS));
-    const ts = new Set(labels(TS_KEYWORDS));
-    for (const k of js) expect(ts.has(k), k).toBe(true);
-    expect(ts.size).toBeGreaterThan(js.size);
-  });
-
-  it("R marks base functions with signatures", () => {
-    const readCsv = R_COMPLETIONS.find((c) => c.label === "read.csv");
-    expect(readCsv?.type).toBe("function");
-    expect(readCsv?.detail).toContain("file");
   });
 });

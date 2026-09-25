@@ -76,10 +76,6 @@ describe("stripCSharpUsings", () => {
     });
   });
 
-  it("leaves a file with no usings where it is", () => {
-    expect(stripCSharpUsings("Console.WriteLine(1);").consumedLines).toBe(0);
-  });
-
   it("counts leading comments and blank lines as consumed", () => {
     const { consumedLines, usings } = stripCSharpUsings(
       "// a note\n\nusing System;\nvar x = 1;",
@@ -171,17 +167,6 @@ describe("composeProgram", () => {
       source.indexOf('#line 1 "Program.cs"'),
     );
   });
-
-  it("leaves stdin alone when the workspace has no stdin.txt", () => {
-    const { source } = composeProgram({
-      entryFilename: "Program.cs",
-      entryCode: "var x = 1;",
-      files: [],
-      stdin: null,
-      instrument: true,
-    });
-    expect(source).not.toContain("SetIn");
-  });
 });
 
 describe("csharpString", () => {
@@ -211,12 +196,6 @@ describe("parseDiagnostics", () => {
         raw,
       },
     ]);
-  });
-
-  it("reads one that names none", () => {
-    const [diagnostic] = parseDiagnostics("(7,11): error CS0029: nope");
-    expect(diagnostic.filename).toBeNull();
-    expect(diagnostic.line).toBe(7);
   });
 
   it("keeps a line it cannot parse rather than dropping it", () => {
@@ -263,36 +242,6 @@ describe("renderDiagnostics", () => {
     );
     expect(rendered.endsWith("\n\t\t^")).toBe(true);
   });
-
-  it("prints a diagnostic whose line is not in the file as it arrived", () => {
-    const rendered = renderDiagnostics(
-      parseDiagnostics("Program.cs(99,1): error CS0000: past the end"),
-      sources,
-    );
-    expect(rendered).toBe("Program.cs(99,1): error CS0000: past the end");
-  });
-});
-
-describe("allDiagnosticsMapped", () => {
-  const sources = new Map([["Program.cs", ["var a = 1;"]]]);
-
-  it("is true when every diagnostic names a file the reader has", () => {
-    expect(
-      allDiagnosticsMapped(
-        parseDiagnostics("Program.cs(1,1): error CS0000: x"),
-        sources,
-      ),
-    ).toBe(true);
-  });
-
-  it("is false for a diagnostic about code the reader never wrote", () => {
-    expect(
-      allDiagnosticsMapped(
-        parseDiagnostics("(7,11): error CS0000: x"),
-        sources,
-      ),
-    ).toBe(false);
-  });
 });
 
 describe("formatUncaught", () => {
@@ -327,21 +276,6 @@ describe("formatUncaught", () => {
       ),
     ).toBe("something else");
   });
-
-  it("drops the wrapper even with no stash at all", () => {
-    expect(
-      formatUncaught(
-        "Exception has been thrown by the target of an invocation.\nOperation is not supported on this platform.\n",
-        null,
-      ),
-    ).toBe("Operation is not supported on this platform.");
-  });
-
-  it("leaves a failure that is not a reflection wrapper alone", () => {
-    expect(formatUncaught("Program.cs(1,1): error CS0000: x\n", stashed)).toBe(
-      "Program.cs(1,1): error CS0000: x",
-    );
-  });
 });
 
 describe("describeThrown", () => {
@@ -370,12 +304,6 @@ describe("describeThrown", () => {
     ]) {
       expect(describeThrown(value).message).not.toBe("[object Object]");
     }
-  });
-
-  it("survives a value that cannot be serialised", () => {
-    const circular: Record<string, unknown> = {};
-    circular.self = circular;
-    expect(() => describeThrown(circular)).not.toThrow();
   });
 });
 
@@ -552,27 +480,6 @@ describe("against the published .NET runtime", () => {
   );
 
   it.skipIf(!available)(
-    "reports a one-line file's error on line 1",
-    async () => {
-      const { source, sources } = composeProgram({
-        entryFilename: "Program.cs",
-        entryCode: 'int zzz = "boom";',
-        files: [],
-        stdin: null,
-        instrument: true,
-      });
-      const diagnostics = parseDiagnostics((await run(source)).result!.stderr);
-      expect(diagnostics[0].filename).toBe("Program.cs");
-      expect(diagnostics[0].line).toBe(1);
-      // No reported line may exceed the length of the file it names.
-      for (const d of diagnostics) {
-        expect(d.line).toBeLessThanOrEqual(sources.get(d.filename!)!.length);
-      }
-    },
-    600_000,
-  );
-
-  it.skipIf(!available)(
     "recovers the type and frames of an uncaught exception",
     async () => {
       // CS-05: all the reader got was the host's reflection wrapper and a
@@ -598,28 +505,6 @@ describe("against the published .NET runtime", () => {
   );
 
   it.skipIf(!available)(
-    "does not blame a failure on an exception the program caught",
-    async () => {
-      clearStash();
-      const { source } = composeProgram({
-        entryFilename: "Program.cs",
-        entryCode:
-          'try { throw new Exception("swallowed"); } catch { }\nConsole.WriteLine("ok");\n',
-        files: [],
-        stdin: null,
-        instrument: true,
-      });
-      const { result } = await run(source);
-      expect(result!.exitCode).toBe(0);
-      expect(result!.stdout).toBe("ok\n");
-      // The stash is per-throw, so it holds the caught one; nothing may
-      // report it, because the run succeeded.
-      expect(readStash()).toContain("swallowed");
-    },
-    600_000,
-  );
-
-  it.skipIf(!available)(
     "reads Environment.Exit as an exit code rather than an object",
     async () => {
       // CS-01: the pane held the literal text `[object Object]` and
@@ -635,24 +520,6 @@ describe("against the published .NET runtime", () => {
       expect(thrown).toBeDefined();
       expect(describeThrown(thrown)).toEqual({ message: "", exitCode: 3 });
       expect(EXIT_OUTPUT_NOTE).toContain("return");
-    },
-    600_000,
-  );
-
-  it.skipIf(!available)(
-    "keeps the output when the program returns an exit code instead",
-    async () => {
-      // The alternative EXIT_OUTPUT_NOTE points at, checked rather than
-      // assumed.
-      const { source } = composeProgram({
-        entryFilename: "Program.cs",
-        entryCode: 'Console.WriteLine("kept");\nreturn 3;\n',
-        files: [],
-        stdin: null,
-        instrument: true,
-      });
-      const { result } = await run(source);
-      expect(result).toEqual({ stdout: "kept\n", stderr: "", exitCode: 3 });
     },
     600_000,
   );

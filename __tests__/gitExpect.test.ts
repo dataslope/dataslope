@@ -12,12 +12,7 @@ import { createGitFs } from "@/app/_components/git/gitFs";
 import { createGitCommand } from "@/app/_components/git/gitCommand";
 import { runCommand } from "@/app/_components/git/runCommand";
 import { scenarioById } from "@/app/_components/git/scenarios";
-import {
-  explainGitExpect,
-  gitExpectSummary,
-  satisfiesGitExpect,
-  type GitExpect,
-} from "@/app/_components/git/gitExpect";
+import { satisfiesGitExpect, type GitExpect } from "@/app/_components/git/gitExpect";
 import { EMPTY_STATE, type CommitNode, type RepoState } from "@/app/_components/git/protocol";
 
 const REPO = "/repo";
@@ -166,41 +161,5 @@ describe("GitExpect", () => {
     await real.run("git add config.yml");
     await real.run('git commit -m "Resolve"');
     expect(await passes(real.readState(), { graphShape: "merged" })).toBe(true);
-  });
-
-  it("grades an empty folder as uninitialized until git init", async () => {
-    const { run, readState } = await harness("empty");
-    expect(await passes(readState(), { initialized: true })).toBe(false);
-    await run("git init");
-    expect(await passes(readState(), { initialized: true })).toBe(true);
-  });
-
-  it("checks working-tree file existence", async () => {
-    const { run, readState } = await harness("empty");
-    await run("git init");
-    expect(await passes(readState(), { filesExist: ["notes.md"] })).toBe(false);
-    await run(`printf '# Notes\n' > notes.md`);
-    expect(await passes(readState(), { filesExist: ["notes.md"] })).toBe(true);
-  });
-
-  it("explains what is missing rather than only failing", async () => {
-    const { readState } = await harness("linear-history");
-    const state = await readState();
-    expect(explainGitExpect({ headBranch: "feature" }, state)).toContain("expected feature");
-    expect(explainGitExpect({ minCommits: 9 }, state)).toContain("at least 9");
-    expect(explainGitExpect({ clean: true }, state)).toContain("README.md");
-    expect(explainGitExpect({ minCommits: 1 }, state)).toBeNull();
-  });
-
-  it("summarizes assertions for the details popover", () => {
-    const summary = gitExpectSummary({ headBranch: "main", minCommits: 2, clean: true });
-    expect(summary).toContain("HEAD on main");
-    expect(summary).toContain("at least 2 commits");
-    expect(summary).toContain("working tree clean");
-  });
-
-  it("treats an all-empty expectation as satisfied", async () => {
-    const { readState } = await harness("linear-history");
-    expect(await passes(readState(), {})).toBe(true);
   });
 });

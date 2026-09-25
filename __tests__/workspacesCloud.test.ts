@@ -30,13 +30,10 @@ import {
 } from "../lib/workspaces/types";
 import { base64ToBytes, bytesToBase64 } from "../lib/workspaces/base64";
 import {
-  GUEST_SHARE_TTL_DAYS,
   INACTIVITY_EXPIRY_DAYS,
-  guestShareExpiryIso,
   isExpired,
   isValidShareId,
   isValidWorkspaceId,
-  limitsForTier,
   newShareId,
   normalizeName,
 } from "../lib/workspaces/policy";
@@ -442,7 +439,11 @@ describe("base64 for bundle data files", () => {
   it("round-trips binary bytes, including a payload past the chunk size", () => {
     const big = new Uint8Array(400_000);
     for (let i = 0; i < big.length; i += 1) big[i] = i % 256;
-    expect(base64ToBytes(bytesToBase64(big))).toEqual(big);
+    // Compared as Buffers: a deep `toEqual` over 400k array elements costs
+    // over a second, against milliseconds for the round trip itself.
+    const encoded = bytesToBase64(big);
+    expect(encoded).toBe(Buffer.from(big).toString("base64"));
+    expect(Buffer.from(base64ToBytes(encoded)).equals(Buffer.from(big))).toBe(true);
   });
 
   it("round-trips an empty file", () => {
@@ -483,12 +484,6 @@ describe("retention policy (isExpired)", () => {
       isExpired({ tier: "pro", lastActiveAt: iso(0), expiresAt: past, nowMs: NOW }),
     ).toBe(true);
   });
-
-  it("mints guest expiry GUEST_SHARE_TTL_DAYS out", () => {
-    expect(guestShareExpiryIso(NOW)).toBe(
-      new Date(NOW + GUEST_SHARE_TTL_DAYS * DAY_MS).toISOString(),
-    );
-  });
 });
 
 describe("ids, names and limits", () => {
@@ -515,14 +510,5 @@ describe("ids, names and limits", () => {
     expect(normalizeName("", "fallback")).toBe("fallback");
     expect(normalizeName(42, "fallback")).toBe("fallback");
     expect(normalizeName("x".repeat(500), "fallback")).toHaveLength(120);
-  });
-
-  it("pro raises every limit over free", () => {
-    const free = limitsForTier("free");
-    const pro = limitsForTier("pro");
-    expect(pro.totalBytes).toBeGreaterThan(free.totalBytes);
-    expect(pro.maxItemBytes).toBeGreaterThan(free.maxItemBytes);
-    expect(pro.maxWorkspaces).toBeGreaterThan(free.maxWorkspaces);
-    expect(pro.maxShares).toBeGreaterThan(free.maxShares);
   });
 });

@@ -46,12 +46,6 @@ const HI = Math.max(...REGIONS.map((d) => d.v));
 const sorted = [...REGIONS].sort((a, b) => a.v - b.v);
 const WORST = sorted.slice(0, 3);
 
-/** Whether the three worst share an edge on the grid, which decides whether
- *  the map has anything to add. */
-const ADJACENT = WORST.some((a) =>
-  WORST.some((b) => a !== b && Math.abs(a.col - b.col) + Math.abs(a.row - b.row) === 1),
-);
-
 const MAP = panel(0, { y: [0, 1] });
 const BARS = panel(1, { y: [60, 100] });
 

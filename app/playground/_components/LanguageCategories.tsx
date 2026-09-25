@@ -51,7 +51,7 @@ const CATEGORIES: Category[] = [
       "A live HTML, CSS, and JavaScript preview, plus React with instant in-browser JSX transpilation.",
     items: [
       { id: "web", label: "HTML", version: "HTML5 · CSS3" },
-      { id: "react", label: "React", version: "19.2" },
+      { id: "react", label: "React", version: "19.3" },
     ],
   },
   {
@@ -69,7 +69,7 @@ const CATEGORIES: Category[] = [
       "Load data, run queries, and inspect results against embedded or remote engines, all in the browser.",
     items: [
       // Same order as `PLAYGROUNDS`: PostgreSQL · SQLite · DuckDB.
-      { id: "postgres", label: "PostgreSQL", version: "17" },
+      { id: "postgres", label: "PostgreSQL", version: "18" },
       { id: "sqlite", label: "SQLite", version: "3.53" },
       { id: "duckdb", label: "DuckDB", version: "1.32" },
     ],

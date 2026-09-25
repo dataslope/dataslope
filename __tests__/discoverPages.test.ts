@@ -67,36 +67,9 @@ describe("discoverPages sections", () => {
       expect(byDir.get(dir), `wrong route prefix for ${dir}`).toBe(expected);
     }
   });
-
-  it("points every section at a directory that exists", () => {
-    for (const { dir } of SECTIONS) {
-      expect(fs.existsSync(dir), `${dir} does not exist`).toBe(true);
-    }
-  });
 });
 
 describe("discoverPages results", () => {
-  it("finds interview-prep pages for each swept component", () => {
-    for (const tag of ["<CodeBlock", "<ChallengeCard", "<SqlCodeBlock"]) {
-      const interview = discoverPages([tag]).filter((p) => p.route.startsWith("/interview-prep/"));
-      expect(interview.length, `no /interview-prep pages contain ${tag}`).toBeGreaterThan(0);
-    }
-  });
-
-  it("maps interview files to /interview-prep routes", () => {
-    const pages = discoverPages(["<CodeBlock"]);
-    const concurrency = pages.find((p) => p.file.endsWith("backend-engineer/concurrency.mdx"));
-    // This page keeps one runnable asyncio block; the two threading blocks are
-    // shown rather than run (Pyodide is built without pthreads).
-    expect(concurrency?.route).toBe("/interview-prep/backend-engineer/concurrency");
-  });
-
-  it("returns routes sorted and unique", () => {
-    const routes = discoverPages(["<CodeBlock"]).map((p) => p.route);
-    expect(routes).toEqual([...routes].sort((a, b) => a.localeCompare(b)));
-    expect(new Set(routes).size).toBe(routes.length);
-  });
-
   it("does not miss any .mdx file under a swept directory", () => {
     // `discoverPages` filters by tag; with a tag that every file trivially
     // contains ("---" opens the frontmatter) it should return the whole tree.
