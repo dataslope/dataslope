@@ -245,6 +245,7 @@ import type {
   ResultSetExportScope,
   ResultSetExportSnapshot,
 } from "../sql/types";
+import { PGLITE_VERSION } from "../runtime/cdn";
 import type { RuntimeInfo } from "../types";
 import type { SqlCompletionSchema } from "../sql/sqlCompletion";
 import { usePostgresSettingsStore } from "./stores/usePostgresSettingsStore";
@@ -914,8 +915,8 @@ const DEFAULT_PAGE_SIZE = 50;
 
 const RUNTIME_INFO: RuntimeInfo = {
   language: "PostgreSQL",
-  version: "17",
-  engine: "PGlite 0.4.5",
+  version: "18",
+  engine: `PGlite ${PGLITE_VERSION}`,
   engineUrl: "https://pglite.dev/",
   notes:
     "Pure-WASM build of PostgreSQL that runs entirely in your browser. Each sample database is rebuilt in memory on every page load.",

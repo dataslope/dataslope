@@ -219,7 +219,7 @@ async function createPostgresChallengeEngine(): Promise<SqlEngineLike> {
       );
     },
     label: "PostgreSQL",
-    version: "17",
+    version: "18",
   };
 }
 
@@ -256,7 +256,7 @@ function defaultSqlEngineLabel(dialect: SqlDialect): string {
     ? "SQLite 3.53"
     : dialect === "duckdb"
       ? `DuckDB ${DUCKDB_VERSION}`
-      : "PostgreSQL 17";
+      : "PostgreSQL 18";
 }
 
 // Dialects that booted at least once this page session, so the boot

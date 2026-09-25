@@ -9,12 +9,23 @@ export const CDN_ASSETS_TAG = "v1.0.4-cdn-assets";
 
 export const CDN_BASE_URL = `https://cdn.jsdelivr.net/gh/dataslope/dataslope@${CDN_ASSETS_TAG}/cdn-assets`;
 
-// IMPORTANT: keep PGLITE_VERSION in sync with @electric-sql/pglite in
-// package.json — npm only supplies types; the runtime is fetched from
-// jsDelivr.
-export const PGLITE_VERSION = "0.5.4";
+// Pyodide (CPython 3.14 in WASM), loaded by pyodide-worker.ts. The `pyodide`
+// npm package is the headless runtime the block-output generator executes
+// lessons with, so the two must agree (`wasmCdnPins.test.ts`): a lesson's
+// prepopulated output and the reader's own Run come from the same build.
+export const PYODIDE_VERSION = "314.0.7";
+export const PYODIDE_INDEX_URL = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/`;
+
+// PGlite (PostgreSQL 18 in WASM). npm supplies only the types; the runtime
+// is fetched from jsDelivr. Kept equal to the lockfile by `wasmCdnPins.test.ts`.
+export const PGLITE_VERSION = "0.5.8";
 export const PGLITE_CDN = `https://cdn.jsdelivr.net/npm/@electric-sql/pglite@${PGLITE_VERSION}/dist/index.js`;
 export const PGLITE_WORKER_CDN = `https://cdn.jsdelivr.net/npm/@electric-sql/pglite@${PGLITE_VERSION}/dist/worker/index.js`;
+
+// The official SQLite WASM build. As with PGlite, npm supplies only the types
+// and the runtime comes from jsDelivr; `wasmCdnPins.test.ts` keeps the two equal.
+export const SQLITE_WASM_VERSION = "3.53.4-build1";
+export const SQLITE_WASM_CDN = `https://cdn.jsdelivr.net/npm/@sqlite.org/sqlite-wasm@${SQLITE_WASM_VERSION}/dist/index.mjs`;
 
 // Java's tools.jar (~18 MB), published as the `dataslope-tools-jar` npm
 // package and fetched from unpkg — jsDelivr returns 403 for .jar files and
@@ -44,9 +55,11 @@ export const TYPESCRIPT_VERSION = "5.9.3";
 export const TYPESCRIPT_CDN_BASE = `https://cdn.jsdelivr.net/npm/typescript@${TYPESCRIPT_VERSION}`;
 
 // esbuild-wasm powers the React/TSX transform + bundle step (see
-// esbuild-worker.ts); pulled via importScripts on first boot. NOT in
-// package.json — this pin is the single source of truth.
-export const ESBUILD_WASM_VERSION = "0.28.1";
+// esbuild-worker.ts); pulled via importScripts on first boot. The
+// `esbuild-wasm` devDependency is pinned to the same exact version, because
+// scripts/build-react-bundles.mjs precompiles lesson previews with it and
+// refuses to run on a mismatch.
+export const ESBUILD_WASM_VERSION = "0.28.2";
 export const ESBUILD_WASM_CDN_BASE = `https://cdn.jsdelivr.net/npm/esbuild-wasm@${ESBUILD_WASM_VERSION}`;
 
 // Tailwind's in-browser compiler, injected into web previews that opt in
@@ -80,6 +93,6 @@ export const WASM_XLSXWRITER_CDN = `https://cdn.jsdelivr.net/npm/wasm-xlsxwriter
 // React type declarations for TSX intellisense, lazily fetched and mounted
 // at node_modules paths by the TS language worker. Keep the majors aligned
 // with REACT_VERSION in esmResolve.ts.
-export const REACT_TYPES_VERSION = "19.2.18";
-export const REACT_DOM_TYPES_VERSION = "19.2.4";
+export const REACT_TYPES_VERSION = "19.3.0";
+export const REACT_DOM_TYPES_VERSION = "19.3.0";
 export const CSSTYPE_VERSION = "3.2.3";

@@ -53,6 +53,7 @@ import {
   Wand2,
   X,
 } from "lucide-react";
+import { SQLITE_WASM_VERSION } from "../runtime/cdn";
 import type { RuntimeInfo } from "../types";
 import { modifyDialogSignature } from "./types";
 import {
@@ -233,7 +234,7 @@ const SQLITE_DB_ACTIONS: readonly DatabaseSelectorAction[] = [
 const RUNTIME_INFO: RuntimeInfo = {
   language: "SQLite",
   version: "3.53",
-  engine: "@sqlite.org/sqlite-wasm 3.53.0",
+  engine: `@sqlite.org/sqlite-wasm ${SQLITE_WASM_VERSION.replace(/-build\d+$/, "")}`,
   engineUrl: "https://sqlite.org/wasm",
   notes:
     "Official SQLite build compiled to WebAssembly. Each sample database is rebuilt in memory on every page load.",

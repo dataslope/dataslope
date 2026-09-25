@@ -156,13 +156,13 @@ describe("module preflight", () => {
 
   it("finds the packages a bundle imports", () => {
     const bundle = [
-      'import { jsx } from "https://esm.sh/react@19.2.8/jsx-runtime";',
+      'import { jsx } from "https://esm.sh/react@19.3.0/jsx-runtime";',
       'import clsx from "clsx";',
       'import "./local.css";',
       'const lazy = await import("dayjs");',
     ].join("\n");
     const urls = externalSpecifiers(bundle);
-    expect(urls).toContain("https://esm.sh/react@19.2.8/jsx-runtime");
+    expect(urls).toContain("https://esm.sh/react@19.3.0/jsx-runtime");
     expect(urls.some((u) => u.includes("/clsx"))).toBe(true);
     expect(urls.some((u) => u.includes("/dayjs"))).toBe(true);
     expect(urls.some((u) => u.includes("local.css"))).toBe(false);
@@ -170,7 +170,7 @@ describe("module preflight", () => {
 
   it("names the package a 404 came from", async () => {
     const failures = await preflightModules(
-      ["https://esm.sh/this-package-does-not-exist-abc123?deps=react@19.2.8"],
+      ["https://esm.sh/this-package-does-not-exist-abc123?deps=react@19.3.0"],
       (async () => new Response(null, { status: 404 })) as unknown as typeof fetch,
     );
     expect(failures).toHaveLength(1);
@@ -183,7 +183,7 @@ describe("module preflight", () => {
 
   it("says a blocked network is a network problem, not a missing package", async () => {
     const failures = await preflightModules(
-      ["https://esm.sh/clsx?deps=react@19.2.8"],
+      ["https://esm.sh/clsx?deps=react@19.3.0"],
       (async () => {
         throw new TypeError("Failed to fetch");
       }) as unknown as typeof fetch,
@@ -199,15 +199,15 @@ describe("module preflight", () => {
       calls += 1;
       return new Response(null, { status: 200 });
     }) as unknown as typeof fetch;
-    const url = "https://esm.sh/clsx?deps=react@19.2.8";
+    const url = "https://esm.sh/clsx?deps=react@19.3.0";
     expect(await preflightModules([url], ok)).toEqual([]);
     expect(await preflightModules([url], ok)).toEqual([]);
     expect(calls).toBe(1);
   });
 
   it("reads a package name out of an esm.sh URL", () => {
-    expect(packageNameFromUrl("https://esm.sh/clsx?deps=react@19.2.8")).toBe("clsx");
-    expect(packageNameFromUrl("https://esm.sh/react@19.2.8/jsx-runtime")).toBe("react");
+    expect(packageNameFromUrl("https://esm.sh/clsx?deps=react@19.3.0")).toBe("clsx");
+    expect(packageNameFromUrl("https://esm.sh/react@19.3.0/jsx-runtime")).toBe("react");
     expect(packageNameFromUrl("https://esm.sh/@scope/pkg@1.0.0/sub")).toBe("@scope/pkg");
   });
 });

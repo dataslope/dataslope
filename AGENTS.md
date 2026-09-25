@@ -1400,7 +1400,7 @@ Four things hold this together:
   `ESBUILD_WASM_VERSION` from jsDelivr; the generator uses the `esbuild-wasm`
   devDependency. The generator exits non-zero if they disagree, and
   `__tests__/reactBundles.test.ts` additionally requires the devDependency to
-  be an **exact** version, not a caret range — `^0.28.1` would let `npm ci`
+  be an **exact** version, not a caret range — `^0.28.2` would let `npm ci`
   install 0.28.9 on a runner and silently change every bundle on the site.
   (That test caught exactly that, the first time it ran.)
 - **The generator's app imports must be dynamic.** A static `import`

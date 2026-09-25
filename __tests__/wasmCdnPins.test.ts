@@ -73,8 +73,17 @@ const PINS: { pkg: string; file: string; name: string }[] = [
   },
   {
     pkg: "@sqlite.org/sqlite-wasm",
-    file: "app/_components/runtime/sqlite-wasm.ts",
+    file: "app/_components/runtime/cdn.ts",
     name: "SQLITE_WASM_VERSION",
+  },
+  {
+    // Not split glue/binary like the rest, but the same drift in a different
+    // costume: the browser loads this pin while the block-output generator
+    // executes lessons on the npm package, so a mismatch means a lesson's
+    // prepopulated output came from a different Python than the reader's Run.
+    pkg: "pyodide",
+    file: "app/_components/runtime/cdn.ts",
+    name: "PYODIDE_VERSION",
   },
   {
     pkg: "wasm-xlsxwriter",
@@ -121,6 +130,14 @@ describe("CDN version pins match the installed packages", () => {
         expect(constant(script, name), `${name} in ${script}`).toBe(pinned);
       }
     }
+  });
+
+  it("names the webR that npm installs in the R adapter's engine label", () => {
+    // webR is bundled from npm and fetches its R build from its own versioned
+    // base URL, so the lockfile is the version that runs.
+    const src = read("app/_components/runtime/r.tsx");
+    const label = /engine:\s*"WebR ([^"]+)"/.exec(src)?.[1];
+    expect(label).toBe(lockedVersion("webr"));
   });
 
   for (const pkg of ["parquet-wasm", "wasm-xlsxwriter"]) {

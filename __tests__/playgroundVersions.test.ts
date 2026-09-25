@@ -65,7 +65,7 @@ describe("/playground version captions", () => {
   it("Python matches the Pyodide build actually loaded", () => {
     // Pyodide's version tracks the CPython it embeds: v314.x ships 3.14.
     const pyodide = digits(
-      constant("app/_components/runtime/pyodide-worker.ts", "PYODIDE_VERSION"),
+      constant("app/_components/runtime/cdn.ts", "PYODIDE_VERSION"),
     );
     const major = pyodide.slice(0, 1);
     const minor = pyodide.slice(1, 3).replace(/^0/, "");
@@ -88,10 +88,7 @@ describe("/playground version captions", () => {
   });
 
   it("SQLite matches the sqlite-wasm pin", () => {
-    const pinned = constant(
-      "app/_components/runtime/sqlite-wasm.ts",
-      "SQLITE_WASM_VERSION",
-    );
+    const pinned = constant("app/_components/runtime/cdn.ts", "SQLITE_WASM_VERSION");
     expectStartsWith(pinned, hub.sqlite, "sqlite");
   });
 

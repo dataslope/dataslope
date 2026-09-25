@@ -47,7 +47,7 @@ export function packageNameFromUrl(url: string): string {
   const name = path.startsWith("@")
     ? segments.slice(0, 2).join("/")
     : segments[0];
-  // Strip the version pin: "react@19.2.8" reads better as "react".
+  // Strip the version pin: "react@19.3.0" reads better as "react".
   return name.replace(/@[^@/]+$/, "");
 }
 
