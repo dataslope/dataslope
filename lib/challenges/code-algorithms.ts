@@ -25,7 +25,7 @@ const GROUP_ANAGRAMS = codeChallenge(
     description:
       "Collect words that are rearrangements of each other, using a canonical key.",
     prompt: [
-      "Group the words that are anagrams of one another — same letters, any order.",
+      "Group the words that are anagrams of one another: same letters, any order.",
       "Sort the words inside each group alphabetically, and sort the groups by their first word. Comparing every word against every other is O(n²); find a key that equal-letter words share instead.",
     ],
     examples: [
@@ -59,7 +59,7 @@ const GROUP_ANAGRAMS = codeChallenge(
       ["Duplicate words stay in their group, twice"],
     ],
     solutionNote: [
-      "The key is the word with its letters sorted: every anagram of a word produces the same key, so one pass fills a dictionary of key → words. Sorting the letters of each word costs O(k log k) on word length, which is nothing next to the O(n²) pairwise comparison it replaces.",
+      "The key is the word with its letters sorted: every anagram of a word produces the same key, so one pass fills a dictionary from each key to its words. Sorting the letters of each word costs O(k log k) on word length, which is nothing next to the O(n²) pairwise comparison it replaces.",
     ],
   },
   {
@@ -212,7 +212,7 @@ const MERGE_INTERVALS = codeChallenge(
         { code: "[start, end]" },
         " intervals, merge every pair that overlaps and return the result sorted by start.",
       ],
-      "Intervals that merely touch — one ends where the next begins — count as overlapping. The input is not sorted.",
+      "Intervals that merely touch (one ends where the next begins) count as overlapping. The input is not sorted.",
     ],
     examples: [
       {
@@ -240,7 +240,7 @@ const MERGE_INTERVALS = codeChallenge(
     solutionNote: [
       "Sorting by start is what turns this into one sweep: once the list is ordered, an interval can only ever overlap the one currently being built, so a single comparison per interval is enough. Extend with ",
       { code: "max(end, current_end)" },
-      " rather than the incoming end — otherwise a fully contained interval shrinks the range it sits inside.",
+      " rather than the incoming end; otherwise a fully contained interval shrinks the range it sits inside.",
     ],
   },
   {
@@ -421,7 +421,7 @@ const MAX_SUBARRAY_SUM = codeChallenge(
       { code: "value" },
       " and ",
       { code: "running + value" },
-      ". Seeding both the running and the best total with the first element — rather than 0 — is what makes the all-negative case come out right.",
+      ". Seeding both the running and the best total with the first element, rather than 0, is what makes the all-negative case come out right.",
     ],
   },
   {
@@ -731,7 +731,7 @@ const SEARCH_INSERT_POSITION = codeChallenge(
     description:
       "Locate a value in a sorted list, or the position it would take if it were inserted.",
     prompt: [
-      "The list is sorted ascending and holds no duplicates. Return the index of the target, or — when it is not there — the index it would occupy if inserted.",
+      "The list is sorted ascending and holds no duplicates. Return the index of the target, or (when it is not there) the index it would occupy if inserted.",
       "The answer is always a valid insertion point, including one past the end. Do it in O(log n).",
     ],
     examples: [
@@ -765,11 +765,11 @@ const SEARCH_INSERT_POSITION = codeChallenge(
       { code: "hi" },
       " starting at ",
       { code: "len(nums)" },
-      " is what lets the same loop answer both questions: when the target is absent the range closes on the insertion point, and when it is present it closes on its index. Note the asymmetry — ",
+      " is what lets the same loop answer both questions: when the target is absent the range closes on the insertion point, and when it is present it closes on its index. Note the asymmetry: ",
       { code: "lo = mid + 1" },
       " but ",
       { code: "hi = mid" },
-      " — which is what keeps the loop from spinning.",
+      ", which is what keeps the loop from spinning.",
     ],
   },
   {
@@ -916,7 +916,7 @@ const LATEST_RECORD_PER_KEY = codeChallenge(
       [
         "A change log arrives as ",
         { code: "[key, timestamp, value]" },
-        " records, in no particular order. Return the current state: one record per key — the one with the highest timestamp — sorted by key.",
+        " records, in no particular order. Return the current state: one record per key (the one with the highest timestamp) sorted by key.",
       ],
       "When two records for the same key share a timestamp, the one that appears later in the input wins.",
     ],
@@ -955,8 +955,8 @@ const LATEST_RECORD_PER_KEY = codeChallenge(
     ],
     solutionNote: [
       "This is what a SQL ",
-      { code: "ROW_NUMBER() … QUALIFY rn = 1" },
-      " does, written by hand. Keeping a dictionary of key → best record needs one pass and no sort of the records themselves; only the keys get sorted at the end. Comparing with ",
+      { code: "ROW_NUMBER() ... QUALIFY rn = 1" },
+      " does, written by hand. Keeping a dictionary from each key to its best record needs one pass and no sort of the records themselves; only the keys get sorted at the end. Comparing with ",
       { code: ">=" },
       " rather than ",
       { code: ">" },
@@ -1143,7 +1143,7 @@ const SESSIONIZE_EVENTS = codeChallenge(
       ["The counts always add up to the number of events"],
     ],
     solutionNote: [
-      'This is the "gap and island" pattern: walk the timeline once, and every time the gap exceeds the threshold, start a new island. The boundary is the part worth getting exactly right — ',
+      'This is the "gap and island" pattern: walk the timeline once, and every time the gap exceeds the threshold, start a new island. The boundary is the part worth getting exactly right: ',
       { code: "strictly greater" },
       " means a gap equal to the threshold keeps the session alive, which is the convention most analytics tools use.",
     ],

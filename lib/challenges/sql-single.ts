@@ -129,14 +129,14 @@ ORDER BY order_count DESC, c.city`,
       difficulty: "Intermediate",
       topic: "Nested aggregation",
       dataset: RETAIL,
-      description: "Average the per-order total — an aggregate over an aggregate.",
+      description: "Average the per-order total: an aggregate over an aggregate.",
       solutionNote: [
         "You cannot average the item rows directly: that would weight big baskets by how many lines they have. Total each order first in a subquery, then average those totals.",
       ],
     },
     {
       prompt: [
-        "What is the average value of a completed order? Total each order first, then average those totals — averaging the item rows directly gives a different (and wrong) answer.",
+        "What is the average value of a completed order? Total each order first, then average those totals; averaging the item rows directly gives a different (and wrong) answer.",
         "Round to 2 decimal places.",
       ],
       columns: [{ name: "average_order_value", type: "real" }],
@@ -273,7 +273,7 @@ ORDER BY c.full_name`,
     {
       prompt: [
         "What percentage of all orders were cancelled? Count cancelled orders as a share of every order in the table, rounded to 1 decimal place.",
-        "Do it in a single pass — no subquery needed.",
+        "Do it in a single pass: no subquery needed.",
       ],
       columns: [{ name: "cancelled_pct", type: "real" }],
       starter: `SELECT ROUND(0, 1) AS cancelled_pct
@@ -457,7 +457,7 @@ ORDER BY reports DESC, manager`,
     },
     {
       prompt: [
-        "Bucket everyone into a salary band — `senior` at 150,000 and above, `mid` at 100,000 and above, `junior` below that — and count how many people are in each.",
+        "Bucket everyone into a salary band (`senior` at 150,000 and above, `mid` at 100,000 and above, `junior` below that) and count how many people are in each.",
         "Sort by headcount, biggest first, then by band name.",
       ],
       columns: [
@@ -596,7 +596,7 @@ ORDER BY day`,
     },
     {
       prompt: [
-        "Count the `view` events for each page — clicks and signups do not count.",
+        "Count the `view` events for each page; clicks and signups do not count.",
         "Sort by views with the most-viewed page first, breaking ties by page.",
       ],
       columns: [
@@ -629,7 +629,7 @@ ORDER BY views DESC, page`,
     {
       prompt: [
         "In one row, report how many distinct users signed up, how many distinct users appear at all, and the conversion rate as a percentage rounded to 1 decimal place.",
-        "A `CASE` inside `COUNT(DISTINCT …)` counts only the users that match, because a `CASE` with no `ELSE` yields NULL and `COUNT` skips NULLs.",
+        "A `CASE` inside `COUNT(DISTINCT ...)` counts only the users that match, because a `CASE` with no `ELSE` yields NULL and `COUNT` skips NULLs.",
       ],
       columns: [
         { name: "signed_up", type: "integer" },

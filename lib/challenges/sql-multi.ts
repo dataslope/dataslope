@@ -58,7 +58,7 @@ const DEPARTMENT_PAY_GAP = sqlSteps(
     description:
       "Build a pay report in three passes: department averages, a salary rank inside each department, then how far each department's top earner sits above its average.",
     solutionNote: [
-      "Two different aggregations over the same table — one per department, one per employee — is what CTEs are for. Computing the average with a window function instead (",
+      "Two different aggregations over the same table (one per department, one per employee) is what CTEs are for. Computing the average with a window function instead (",
       { code: "AVG(salary) OVER (PARTITION BY dept_id)" },
       ") gets the same answer in one pass, and is worth writing out once you have this version working.",
     ],
@@ -123,7 +123,7 @@ JOIN departments d ON d.dept_id = e.dept_id
       ],
       prompt: [
         [
-          "Now go back to individual employees and number them by pay within their own department — highest paid is ",
+          "Now go back to individual employees and number them by pay within their own department: highest paid is ",
           { code: "pay_rank" },
           " 1, and the numbering restarts for every department.",
         ],
@@ -168,7 +168,7 @@ ORDER BY d.dept_name
       title: "Gap above the average",
       short: "Gap",
       solutionNote: [
-        "Two different aggregations of the same table — one row per department, one per employee — is exactly what CTEs are for. Computing the average with a window function instead (",
+        "Two different aggregations of the same table (one row per department, one per employee) is exactly what CTEs are for. Computing the average with a window function instead (",
         { code: "AVG(salary) OVER (PARTITION BY dept_id)" },
         ") gets the same answer in one pass, and is worth writing once this version works.",
       ],
@@ -267,11 +267,11 @@ const SIGNUP_FUNNEL = sqlSteps(
     description:
       "Turn a flat event log into a three-stage funnel: flag what each visitor did, total the stages, then report each stage as a share of everyone who looked.",
     solutionNote: [
-      { code: "MAX(CASE WHEN … THEN 1 ELSE 0 END)" },
+      { code: "MAX(CASE WHEN ... THEN 1 ELSE 0 END)" },
       " is the standard way to collapse an event log into one row per actor: the ",
       { code: "MAX" },
       ' turns "any row matched" into a 1. Summing those flags then counts distinct users per stage without a single ',
-      { code: "COUNT(DISTINCT …)" },
+      { code: "COUNT(DISTINCT ...)" },
       ".",
     ],
   },
@@ -280,7 +280,7 @@ const SIGNUP_FUNNEL = sqlSteps(
       title: "Flag each visitor",
       short: "Flags",
       solutionNote: [
-        { code: "MAX(CASE WHEN … THEN 1 ELSE 0 END)" },
+        { code: "MAX(CASE WHEN ... THEN 1 ELSE 0 END)" },
         " is the standard way to collapse an event log into one row per actor: the ",
         { code: "MAX" },
         ' turns "any row matched" into a 1, so a visitor who viewed five pages still scores a single 1 rather than a 5.',
@@ -331,8 +331,8 @@ ORDER BY user_id
       solutionNote: [
         "Because each flag is already 1 or 0, a plain ",
         { code: "SUM" },
-        " counts visitors rather than events — no ",
-        { code: "COUNT(DISTINCT …)" },
+        " counts visitors rather than events: no ",
+        { code: "COUNT(DISTINCT ...)" },
         " anywhere, and no second pass over the log. That is the payoff for the shape step 1 put the data into.",
       ],
       prompt: [
@@ -381,7 +381,7 @@ FROM per_user
         " makes no promise about row order, so without an explicit sort key the stages can come back shuffled.",
       ],
       prompt: [
-        "Three numbers side by side are hard to read as a funnel. Pivot them into three rows — one per stage — with the stage name, the number of visitors, and that stage as a percentage of everyone who viewed.",
+        "Three numbers side by side are hard to read as a funnel. Pivot them into three rows (one per stage) with the stage name, the number of visitors, and that stage as a percentage of everyone who viewed.",
         [
           "Stack the three stages with ",
           { code: "UNION ALL" },
@@ -475,7 +475,7 @@ const MONTHLY_ORDER_GROWTH = sqlSteps(
       { code: "LAG()" },
       " reaches backwards inside a window, which is why the first month's ",
       { code: "prev_revenue" },
-      " is NULL rather than zero — there is no earlier row to read. Filtering that row out in the last step is deliberate: a growth rate against nothing is not 0%, it is undefined.",
+      " is NULL rather than zero: there is no earlier row to read. Filtering that row out in the last step is deliberate: a growth rate against nothing is not 0%, it is undefined.",
     ],
   },
   [
@@ -554,7 +554,7 @@ WHERE o.status = 'completed'
           { code: "LAG()" },
           " over the months in date order does it without a self join.",
         ],
-        "The earliest month has nothing before it, so its value is NULL. Leave it that way — step 3 deals with it.",
+        "The earliest month has nothing before it, so its value is NULL. Leave it that way; step 3 deals with it.",
       ],
       columns: [
         { name: "month", type: "text" },
@@ -601,7 +601,7 @@ ORDER BY month
         [
           "Finish the report: month, revenue, prev_revenue, and ",
           { code: "growth_pct" },
-          " — the change from the previous month as a percentage of it, rounded to 1 decimal place.",
+          " (the change from the previous month as a percentage of it, rounded to 1 decimal place).",
         ],
         "Drop the earliest month, which has nothing to compare against. Sort by month.",
       ],
@@ -755,9 +755,9 @@ WHERE o.status = 'completed'
           ": each customer's revenue as a percentage of revenue from everyone, rounded to 1 decimal place.",
         ],
         [
-          "You need the grand total on every row. A window function with an empty frame — ",
+          "You need the grand total on every row. A window function with an empty frame, ",
           { code: "SUM(revenue) OVER ()" },
-          " — gives you exactly that, with no second pass over the table.",
+          ", gives you exactly that, with no second pass over the table.",
         ],
       ],
       columns: [
@@ -804,9 +804,9 @@ ORDER BY revenue DESC
       ],
       prompt: [
         [
-          "Add a running share — ",
+          "Add a running share (",
           { code: "cumulative_pct" },
-          ", the percentage of revenue accounted for by this customer and everyone above them — and label each row ",
+          ", the percentage of revenue accounted for by this customer and everyone above them) and label each row ",
           { code: "'core'" },
           " while that running share is at or below 80, ",
           { code: "'tail'" },
@@ -817,7 +817,7 @@ ORDER BY revenue DESC
           { code: "SUM(revenue) OVER (ORDER BY revenue DESC, full_name)" },
           ". Drop the ",
           { code: "orders" },
-          " column — the finished report is name, revenue, share, running share, tier.",
+          " column: the finished report is name, revenue, share, running share, tier.",
         ],
       ],
       columns: [

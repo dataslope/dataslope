@@ -44,7 +44,7 @@ const MARKDOWN_TABLE = codeSteps(
     description:
       "Render rows as an aligned Markdown table: measure the columns, pad a row, then assemble the whole thing.",
     solutionNote: [
-      "Measuring every column before drawing anything is what makes the table line up — you cannot pad a cell until you know the widest value below it, which means a full pass over the data before a single character of output. It is the same reason a terminal table renderer buffers its input instead of streaming it.",
+      "Measuring every column before drawing anything is what makes the table line up: you cannot pad a cell until you know the widest value below it, which means a full pass over the data before a single character of output. It is the same reason a terminal table renderer buffers its input instead of streaming it.",
     ],
   },
   [
@@ -174,7 +174,7 @@ assert got == "|    | x |", f"got {got!r}"`,
       prompt: [
         "Put it together: the first row is the header, then a separator row of dashes, then the rest.",
         [
-          "Each separator cell is as many dashes as the column is wide, formatted the same way as any other row. Return the lines as a list, not one joined string — the caller decides how to end them.",
+          "Each separator cell is as many dashes as the column is wide, formatted the same way as any other row. Return the lines as a list, not one joined string: the caller decides how to end them.",
         ],
       ],
       starter: `${RENDER_ROW}
@@ -283,13 +283,13 @@ const ROMAN_NUMERALS = codeSteps(
     description:
       "Convert numbers to Roman numerals and back, then use the round trip to tell a valid numeral from a plausible-looking one.",
     solutionNote: [
-      "Putting the subtractive pairs — ",
+      "Putting the subtractive pairs (",
       { code: "CM" },
       ", ",
       { code: "XL" },
       ", ",
       { code: "IV" },
-      " — into the value table as if they were ordinary symbols is what removes every special case from the encoder: a plain greedy loop then produces them without knowing they are special. Validation falls out of the same table, because exactly one spelling of each number survives a round trip.",
+      ") into the value table as if they were ordinary symbols is what removes every special case from the encoder: a plain greedy loop then produces them without knowing they are special. Validation falls out of the same table, because exactly one spelling of each number survives a round trip.",
     ],
   },
   [
@@ -310,17 +310,17 @@ const ROMAN_NUMERALS = codeSteps(
         ],
         [
           "The subtractive pairs are already in the table above the function: ",
-          { code: "900 → CM" },
+          { code: '(900, "CM")' },
           ", ",
-          { code: "400 → CD" },
+          { code: '(400, "CD")' },
           ", ",
-          { code: "90 → XC" },
+          { code: '(90, "XC")' },
           ", ",
-          { code: "40 → XL" },
+          { code: '(40, "XL")' },
           ", ",
-          { code: "9 → IX" },
+          { code: '(9, "IX")' },
           ", ",
-          { code: "4 → IV" },
+          { code: '(4, "IV")' },
           ". Because they are in the table, the greedy loop handles them with no extra code.",
         ],
       ],
@@ -370,19 +370,19 @@ assert to_roman(3999) == "MMMCMXCIX", f"got {to_roman(3999)!r}"`,
       title: "Numeral to number",
       short: "Decode",
       solutionNote: [
-        "One rule — subtract when a symbol is worth less than the one after it — covers every subtractive pair without listing any of them. Looking ahead rather than behind is what keeps it a single forward pass.",
+        "One rule (subtract when a symbol is worth less than the one after it) covers every subtractive pair without listing any of them. Looking ahead rather than behind is what keeps it a single forward pass.",
       ],
       signature: "def from_roman(text: str) -> int",
       prompt: [
         [
-          "Now the other direction. Walk the numeral left to right and add each symbol's value — unless the symbol is worth less than the one after it, in which case subtract it.",
+          "Now the other direction. Walk the numeral left to right and add each symbol's value, unless the symbol is worth less than the one after it, in which case subtract it.",
         ],
         [
           "That single rule handles every subtractive pair: in ",
           { code: "IX" },
           " the ",
           { code: "I" },
-          " comes before a larger symbol, so it counts as −1.",
+          " comes before a larger symbol, so it counts as -1.",
         ],
       ],
       starter: `${TO_ROMAN}
@@ -587,7 +587,7 @@ assert got == {"apple": 2, "pear": 1}, f"got {got}"`,
       title: "Work out what moved",
       short: "Deltas",
       solutionNote: [
-        "Taking the union of both sets of keys is what stops an item that disappeared entirely from being missed — iterating the new tally alone would never mention it. Comparing tallies rather than lists is also what makes this work on quantities: a set difference would say ",
+        "Taking the union of both sets of keys is what stops an item that disappeared entirely from being missed: iterating the new tally alone would never mention it. Comparing tallies rather than lists is also what makes this work on quantities: a set difference would say ",
         { code: "apple" },
         " is in both and stop there.",
       ],
@@ -600,7 +600,7 @@ assert got == {"apple": 2, "pear": 1}, f"got {got}"`,
           " for every item whose count changed, sorted by item.",
         ],
         [
-          "The change is positive when there are more than before and negative when there are fewer. Items whose count is unchanged do not appear, and an item that is only in one of the two lists still has to be found — so take the union of both sets of keys, not just one.",
+          "The change is positive when there are more than before and negative when there are fewer. Items whose count is unchanged do not appear, and an item that is only in one of the two lists still has to be found, so take the union of both sets of keys, not just one.",
         ],
       ],
       starter: `${TALLY}
@@ -756,7 +756,7 @@ const GRAPH_SEARCH = codeSteps(
     description:
       "Search an undirected graph: build the adjacency map, find everything reachable, then measure the shortest hop count.",
     solutionNote: [
-      "The same breadth-first walk answers both questions, and the difference is only what you carry along. Marking a node as seen the moment it is queued — not when it is dequeued — is the detail that matters: do it the other way and a node with several neighbours gets queued repeatedly, and on a dense graph the queue explodes.",
+      "The same breadth-first walk answers both questions, and the difference is only what you carry along. Marking a node as seen the moment it is queued, not when it is dequeued, is the detail that matters: do it the other way and a node with several neighbours gets queued repeatedly, and on a dense graph the queue explodes.",
     ],
   },
   [
@@ -764,7 +764,7 @@ const GRAPH_SEARCH = codeSteps(
       title: "Build the adjacency map",
       short: "Adjacency",
       solutionNote: [
-        "Seeding the map from the node list rather than from the edges is what keeps an isolated node visible; building it from edges alone silently drops anyone with no connections. Adding both directions is what makes the graph undirected — the data only stores each edge once.",
+        "Seeding the map from the node list rather than from the edges is what keeps an isolated node visible; building it from edges alone silently drops anyone with no connections. Adding both directions is what makes the graph undirected: the data only stores each edge once.",
       ],
       signature:
         "def build_adjacency(nodes: list[str], edges: list[list[str]]) -> dict[str, list[str]]",
@@ -775,7 +775,7 @@ const GRAPH_SEARCH = codeSteps(
           " edges into a map from each node to its neighbours, sorted.",
         ],
         [
-          "The graph is undirected, so every edge goes in both directions. A node with no edges is still in the map, with an empty list — dropping it would make it invisible to everything downstream.",
+          "The graph is undirected, so every edge goes in both directions. A node with no edges is still in the map, with an empty list; dropping it would make it invisible to everything downstream.",
         ],
       ],
       starter: `def build_adjacency(nodes: list[str], edges: list[list[str]]) -> dict[str, list[str]]:
@@ -882,7 +882,7 @@ assert got == ["a", "b", "c"], f"got {got}"`,
       title: "Measure the shortest path",
       short: "Distance",
       solutionNote: [
-        "Breadth-first search reaches every node by its shortest route, so carrying a distance alongside the queue is enough — there is never a need to compare two paths. A depth-first walk would find ",
+        "Breadth-first search reaches every node by its shortest route, so carrying a distance alongside the queue is enough: there is never a need to compare two paths. A depth-first walk would find ",
         { code: "a" },
         " path and cheerfully report the wrong length.",
       ],
@@ -899,7 +899,7 @@ assert got == ["a", "b", "c"], f"got {got}"`,
           " when there is no path. A node is zero edges from itself.",
         ],
         [
-          "Breadth-first search reaches every node by its shortest route, so carrying a distance alongside the queue is enough — no need to compare paths. A depth-first walk would find ",
+          "Breadth-first search reaches every node by its shortest route, so carrying a distance alongside the queue is enough: no need to compare paths. A depth-first walk would find ",
           { code: "a" },
           " path, but not the shortest one.",
         ],
