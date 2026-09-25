@@ -12,7 +12,7 @@
  * so the spread widens as the square root of λ, which is why a busier queue is
  * absolutely more variable and relatively less so.
  */
-import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, PRIMARY } from "./_theme.mjs";
 
 export const title =
   "Poisson probability mass at rates of 0.8, 4 and 12, drawn as three panels: a spike at zero with a long tail, a visibly skewed hump, and a nearly symmetric bell.";

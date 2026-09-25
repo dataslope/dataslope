@@ -29,7 +29,7 @@
  * with higher average income have higher turnout" and "richer people vote more"
  * are separate claims, and the first is no evidence at all for the second.
  */
-import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, PRIMARY, SERIES, mean, normalSamples, rng } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, SERIES, mean, normalSamples } from "./_theme.mjs";
 import { panel, panelAxis, panelSpace, panelTitle } from "./_panels.mjs";
 
 export const title =
@@ -37,7 +37,6 @@ export const title =
 
 const DISTRICTS = 6;
 const PER = 55;
-const u = rng(1_517);
 
 /** Districts are not on an exact line: a perfect r reads as construction
  *  rather than as data, and the point does not need one. */

@@ -27,7 +27,7 @@
  * mistake with a categorical variable is an operation from a higher rung
  * applied to a lower one, and none of them raises an error.
  */
-import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, SERIES } from "./_theme.mjs";
+import { Plot, plot, HALO, MUTED, PRIMARY, SERIES } from "./_theme.mjs";
 
 export const title =
   "The four measurement scales as a ladder from nominal to ratio, with the operations each one licenses. Each rung keeps everything below it and adds one question: are these the same, which is more, how much more, how many times more.";

@@ -104,7 +104,7 @@ export function render() {
           { x: "x", y: "y", stroke: ACCENT, strokeWidth: 1.2, strokeDasharray: "4,3", clip: true },
         ),
       ),
-      ...[OK, FAN].map((p, k) =>
+      ...[OK, FAN].map((p) =>
         Plot.text([{}], {
           x: (p.left + p.right) / 2,
           y: p.bottom,

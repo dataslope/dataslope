@@ -13,7 +13,7 @@
  * so the curves are the arithmetic. The interval quoted in the caption is the
  * central 95% of the final posterior, found by integrating the drawn density.
  */
-import { Plot, plot, linspace, ACCENT, GUIDE, HALO, MUTED, PRIMARY } from "./_theme.mjs";
+import { Plot, plot, linspace, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 
 export const title =
   "A Beta prior over a conversion rate updated with ten, a hundred and a thousand visitors. The curve barely moves after ten, narrows and shifts after a hundred, and becomes a tight spike after a thousand.";

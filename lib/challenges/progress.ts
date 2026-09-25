@@ -201,11 +201,6 @@ export function readProgress(slug: string): ChallengeProgress {
   return getProgressSnapshot()[slug] ?? NO_PROGRESS;
 }
 
-/** Stored progress for every challenge the learner has touched. */
-export function readAllProgress(): ProgressMap {
-  return getProgressSnapshot();
-}
-
 /** Apply a change to one challenge's record and persist it. */
 export function updateProgress(
   slug: string,
@@ -250,16 +245,6 @@ export function markStepPassed(
 /** Record a single-step challenge as accepted. */
 export function markSolved(slug: string): ChallengeProgress {
   return updateProgress(slug, (p) => ({ ...p, attempted: true, solved: true }));
-}
-
-/**
- * Forget one challenge's progress in this browser (the workspace's Reset does
- * not do this). Local only: the account's copy only ever moves forward.
- */
-export function clearProgress(slug: string): void {
-  const all = { ...getProgressSnapshot() };
-  delete all[slug];
-  writeAll(all);
 }
 
 /** How a challenge's progress reads in the catalog's status column. */

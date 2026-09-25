@@ -31,7 +31,7 @@ export type AnyNode = Record<string, unknown> & {
 // FNV-1a 32-bit hash → 6 lowercase hex chars (the low 24 bits). Deterministic
 // and dependency-free; 24 bits is ample to distinguish the handful of graphics
 // on a page while staying short and opaque.
-export function hash6(input: string): string {
+function hash6(input: string): string {
   let h = 0x811c9dc5;
   for (let i = 0; i < input.length; i++) {
     h ^= input.charCodeAt(i);
@@ -43,10 +43,8 @@ export function hash6(input: string): string {
 // Derive a page slug from a lesson's absolute .mdx path: drop everything up
 // to and including the content section dir (`content/courses/`,
 // `content/fumadocs-dev/`, …), strip the extension and a trailing
-// `/index`, then flatten to a dash-delimited lowercase slug. Exported so the
-// build-time SVG gallery (lib/svgGallery.ts) can reproduce the exact same IDs
-// this plugin stamps onto the rendered pages.
-export function pageSlugFromPath(raw: string): string {
+// `/index`, then flatten to a dash-delimited lowercase slug.
+function pageSlugFromPath(raw: string): string {
   const marker = /content\/[^/]+\//.exec(raw);
   const rel = marker ? raw.slice(marker.index + marker[0].length) : raw;
   const slug = rel
@@ -74,7 +72,7 @@ function isGraphic(node: AnyNode): boolean {
 // Mermaid's `chart` attribute, else the authored source sliced via position
 // offsets, else a structural serialization. Whitespace is collapsed so
 // reindenting a graphic doesn't change its ID.
-export function graphicSignature(node: AnyNode, source: string): string {
+function graphicSignature(node: AnyNode, source: string): string {
   let raw: string | undefined;
 
   if (node.name === "Mermaid") {
@@ -134,5 +132,3 @@ export function remarkSvgLabels() {
     walk(tree as unknown as AnyNode);
   };
 }
-
-export default remarkSvgLabels;

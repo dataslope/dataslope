@@ -57,10 +57,6 @@ script-runner-src/__pycache__/
 # `scripts/build-almostnode-workers.mjs` on postinstall + build + dev).
 /public/_workers/
 
-# Static data behind /svg-gallery (rebuilt by
-# `scripts/build-svg-gallery-data.mjs` on build + dev).
-/public/svg-gallery/
-
 # Raw-Markdown mirrors of the course lessons (rebuilt by
 # `scripts/build-course-md.mjs` on build + dev; served as static assets at
 # `/courses/<lesson>.md`).

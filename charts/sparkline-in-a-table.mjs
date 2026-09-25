@@ -58,7 +58,6 @@ const REGIONS = [
   return { ...r, series, latest: series.at(-1) };
 });
 
-const ORDER = REGIONS.map((r) => r.key);
 const TROUBLE = REGIONS.find((r) => r.trouble);
 const TROUBLE_DROP = Math.round(
   ((TROUBLE.series[0] - TROUBLE.latest) / TROUBLE.series[0]) * 100,

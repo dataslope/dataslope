@@ -12,7 +12,7 @@
  * matters" rule. A channel that pops out can carry an alert; a channel that
  * has to be searched cannot, however carefully it is labelled.
  */
-import { Plot, plot, linspace, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 
 export const title =
   "Three grids of forty marks, each hiding one odd mark. In the first the target is a different color and in the second a different size, and both jump out immediately. In the third the target differs only in shape, and has to be searched for.";

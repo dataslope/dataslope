@@ -12,7 +12,7 @@
  * because the alignment is the argument: every feature of the box has to be
  * readable directly above the data it came from.
  */
-import { Plot, plot, linspace, normalSamples, ACCENT, HALO, MUTED, PRIMARY, SERIES } from "./_theme.mjs";
+import { Plot, plot, normalSamples, ACCENT, HALO, MUTED, PRIMARY, SERIES } from "./_theme.mjs";
 
 export const title =
   "Two box plots that look nearly identical, drawn above histograms of the same two groups. The first histogram is a single mound; the second is two separate peaks with a gap in the middle, exactly where its box draws the median.";

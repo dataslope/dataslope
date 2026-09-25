@@ -8,7 +8,7 @@
 //
 // Statically rendered: the catalog is a module, so every challenge prerenders
 // and the route ships no server work. When challenges move to a database this
-// grows a loader, the same way /quiz/<id> reads D1.
+// grows a loader.
 //
 // Deliberately no HomeNav/HomeFooter: the workspace is a full-viewport tool
 // with its own top bar, like the playground routes.

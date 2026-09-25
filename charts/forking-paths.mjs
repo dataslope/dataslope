@@ -28,7 +28,7 @@
  * is fixed before the data is seen, or report the whole tree, which is what a
  * multiverse or specification-curve analysis does.
  */
-import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, PRIMARY, rng } from "./_theme.mjs";
+import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, rng } from "./_theme.mjs";
 
 export const title =
   "Thirty-two analyses of one dataset, produced by five defensible binary choices, with the ones reaching p below 0.05 marked. No test was run twice: each branch is a decision an analyst makes once and would defend.";
@@ -61,7 +61,6 @@ const PATHS = Array.from({ length: N_PATHS }, (_, i) => {
 });
 
 const HITS = PATHS.filter((d) => d.sig).length;
-const INDEPENDENT = Math.round((1 - 0.95 ** N_PATHS) * 100);
 
 const COLS = 8;
 const ROWS = N_PATHS / COLS;

@@ -61,7 +61,6 @@ const R1 = rankOf("after");
  *  nothing. */
 const BIG_MOVE = 3;
 const moved = (d) => Math.abs(R0[d.key] - R1[d.key]) >= BIG_MOVE;
-const MOVERS = LINES.filter(moved);
 const CLIMBER = LINES.reduce((a, b) =>
   R0[b.key] - R1[b.key] > R0[a.key] - R1[a.key] ? b : a,
 );

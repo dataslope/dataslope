@@ -45,7 +45,6 @@ const VALUES = [
 ];
 
 const N = VALUES.length;
-const TOTAL = VALUES.reduce((s, d) => s + d.v, 0);
 /** The four the question is about: close in value, far apart in shape. */
 const MIDDLE = VALUES.slice(2, 6);
 const SPREAD = Math.round(

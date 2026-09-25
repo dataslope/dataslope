@@ -321,17 +321,6 @@ export function FormatIcon() {
   return <Wand2 size={13} aria-hidden />;
 }
 
-/** Stable, deterministic short id for a card, derived from React useId(). */
-export function useShortId(prefix: string): string {
-  const reactId = useId();
-  let h = 0;
-  for (let i = 0; i < reactId.length; i++) {
-    h = (h * 31 + reactId.charCodeAt(i)) >>> 0;
-  }
-  const suffix = h.toString(16).slice(0, 4).padStart(4, "0");
-  return `${prefix}-${suffix}`;
-}
-
 // ─── Test results rail ───────────────────────────────────────────────
 // Shared pass/fail readout: circles on a vertical rail, with details
 // (description, code/checks, error) in a click-popover per row.

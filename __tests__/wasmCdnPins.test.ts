@@ -110,6 +110,19 @@ describe("CDN version pins match the installed packages", () => {
     expect(loader).toContain("PARQUET_WASM_CDN");
   });
 
+  it("pins one browsercc toolchain for the browser and both headless runners", () => {
+    // The C/C++ block-output generator and content sweep compile lessons with
+    // their own download of the toolchain; a different clang there would
+    // record output the reader's Run does not reproduce.
+    const worker = "app/_components/runtime/browsercc-worker.ts";
+    for (const name of ["BROWSERCC_VERSION", "WASI_SHIM_VERSION"]) {
+      const pinned = constant(worker, name);
+      for (const script of ["scripts/check-cpp-blocks.mjs", "scripts/lib/block-runners.mjs"]) {
+        expect(constant(script, name), `${name} in ${script}`).toBe(pinned);
+      }
+    }
+  });
+
   for (const pkg of ["parquet-wasm", "wasm-xlsxwriter"]) {
     it(`pins ${pkg} exactly, since its glue and binary must be one build`, () => {
       // A caret range lets `npm update` move the glue while the URL stays

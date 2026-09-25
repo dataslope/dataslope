@@ -24,7 +24,7 @@
  * measured. "How many users do I need" has no answer; "how many users to
  * detect a one-point change in a 4% rate" has one.
  */
-import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, PRIMARY, SERIES, linspace } from "./_theme.mjs";
+import { Plot, plot, ACCENT, GUIDE, HALO, SERIES, linspace } from "./_theme.mjs";
 
 export const title =
   "The standard error of a proportion against the proportion itself, at three sample sizes. Every curve peaks at exactly one half, so a 50 per cent rate is the noisiest quantity to measure and a 2 per cent rate the quietest.";

@@ -213,7 +213,7 @@ export function render() {
         ]),
         {
           x: "x",
-          y: (d) => STACK.bottom,
+          y: () => STACK.bottom,
           text: "text",
           fill: "currentColor",
           fillOpacity: 0.62,

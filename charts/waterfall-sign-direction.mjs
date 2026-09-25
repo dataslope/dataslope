@@ -50,7 +50,6 @@ const closing = (signed) =>
   );
 const TRUE_CLOSE = closing(true);
 const DRAWN_CLOSE = closing(false);
-const ERROR = DRAWN_CLOSE - TRUE_CLOSE;
 
 const MAX = 360;
 const WRONG = panel(0, { y: [0, MAX] });

@@ -35,7 +35,7 @@ export const caption =
 
 // Each row is drawn in its own fraction of a shared 0-1 axis, so three
 // different units can share one frame without pretending to be comparable.
-const rows = METRICS.map((m, i) => ({ ...m, y: m.key, frac: (v) => v / m.max }));
+const rows = METRICS.map((m) => ({ ...m, y: m.key, frac: (v) => v / m.max }));
 
 const bands = rows.flatMap((m) => [
   { y: m.y, x1: 0, x2: m.frac(m.good), fill: GOOD, label: "good" },

@@ -14,7 +14,7 @@
  *
  * The floors are computed from the correlations rather than drawn.
  */
-import { Plot, plot, ACCENT, HALO, MUTED, SERIES } from "./_theme.mjs";
+import { Plot, plot, HALO, MUTED, SERIES } from "./_theme.mjs";
 
 export const title =
   "Variance of an averaged prediction against the number of models, for error correlations of zero, 0.3 and 0.6. Each curve falls and then flattens at a floor set by the correlation.";

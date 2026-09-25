@@ -28,7 +28,7 @@
  * error appears in medical screening, fraud detection and every alerting system
  * with a low base rate.
  */
-import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, PRIMARY } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 import { panel, panelSpace, panelTitle } from "./_panels.mjs";
 
 export const title =
@@ -58,7 +58,6 @@ const grid = Array.from({ length: MATCHES }, (_, i) => ({
   col: i % COLS,
   row: Math.floor(i / COLS),
 }));
-const ROWS = Math.ceil(MATCHES / COLS);
 const CELL = 0.055;
 const GAP = 0.012;
 const ORIGIN_X = (RIGHT.left + RIGHT.right) / 2 - (COLS * (CELL + GAP)) / 2;

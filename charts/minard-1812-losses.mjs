@@ -113,23 +113,6 @@ const START = ADVANCE[0].men;
 const AT_MOSCOW = ADVANCE.at(-1).men;
 const HOME = RETREAT.at(-1).men;
 
-/** The single worst stretch of the retreat, found rather than asserted, and
- *  the city it happened nearest to, so editing the table cannot make the
- *  caption point at the wrong place. */
-const WORST = RETREAT.reduce(
-  (worst, d, i) => {
-    if (i === 0) return worst;
-    const lost = RETREAT[i - 1].men - d.men;
-    return lost > worst.lost ? { lost, from: RETREAT[i - 1], to: d } : worst;
-  },
-  { lost: -1 },
-);
-const NEAREST = CITIES.reduce((a, b) =>
-  Math.abs(b.lon - WORST.to.lon) < Math.abs(a.lon - WORST.to.lon) ? b : a,
-);
-
-const pct = (n) => Math.round((n / START) * 100);
-
 export const caption = `Minard's plate of 1869 with the map taken away and the arithmetic kept: ${START.toLocaleString()} men crossed into Russia, ${AT_MOSCOW.toLocaleString()} reached Moscow, ${HOME.toLocaleString()} came back. The strip below is his own temperature record, on the Réaumur scale he used and aligned to the same longitudes.`;
 
 export function render() {

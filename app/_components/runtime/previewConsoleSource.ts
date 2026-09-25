@@ -5,8 +5,8 @@
  * It has to be text: the frame is an opaque-origin `srcdoc` document with
  * no module graph of its own, so everything it runs arrives inline in the
  * composed HTML. That makes it the one piece of this codebase a type
- * checker never sees, which is why `__tests__/previewConsole.test.ts`
- * evaluates this source against a fake window and asserts what it posts.
+ * checker never sees, and no unit test evaluates it either: a change here
+ * is verified by running a web or React preview.
  *
  * Deliberately ES5-flavoured: it runs inside arbitrary learner documents,
  * including quirks-mode ones, before anything else on the page.

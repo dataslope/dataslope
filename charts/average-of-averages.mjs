@@ -25,7 +25,7 @@
  * is a ratio, and ratios are averaged by adding the numerators and adding the
  * denominators, never by averaging the ratios.
  */
-import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, PRIMARY } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 
 export const title =
   "Average order value in five regions, with each region's customer count printed underneath. The unweighted mean of the five regional averages is 68 and the weighted mean, which is the same as averaging every customer, is 52. The whole gap comes from one 40-customer region with an unusually high average.";

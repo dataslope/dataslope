@@ -26,7 +26,7 @@ import {
 } from "./lib/mdx-blocks.mjs";
 
 /** Kept in step with `BROWSERCC_VERSION` / `WASI_SHIM_VERSION` in
- *  `app/_components/runtime/browsercc.ts`. */
+ *  `app/_components/runtime/browsercc-worker.ts` (`wasmCdnPins.test.ts`). */
 const BROWSERCC_VERSION = "0.1.1";
 const WASI_SHIM_VERSION = "0.4.2";
 const CACHE = ".browsercc-cache";

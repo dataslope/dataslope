@@ -31,7 +31,6 @@ import {
 } from "../completion/completionPrefs";
 import { Combobox } from "@base-ui/react/combobox";
 import { Dialog } from "@base-ui/react/dialog";
-import { Menu } from "@base-ui/react/menu";
 import { Popover } from "@base-ui/react/popover";
 import { Select } from "@base-ui/react/select";
 import { Switch } from "@base-ui/react/switch";
@@ -1227,7 +1226,6 @@ function PostgresPlaygroundInner() {
   >(null);
   const addTableBodyRef = useRef<HTMLDivElement | null>(null);
   const [addRowDialog, setAddRowDialog] = useState<AddRowDialogState | null>(null);
-  const [exportNoTabsHover, setExportNoTabsHover] = useState(false);
   const pgStructureSensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {

@@ -250,18 +250,6 @@ function resultToQueryExecResult(result: PgliteResult): QueryExecResult & { colu
   };
 }
 
-function rowsToQueryExecResult(
-  columns: string[],
-  rows: ReadonlyArray<Record<string, unknown>>,
-): QueryExecResult[] {
-  return [
-    {
-      columns,
-      values: rows.map((row) => columns.map((column) => toSqlValue(row[column]))),
-    },
-  ];
-}
-
 /** Schema objects the sidebar lists and can drop. `function` covers
  *  procedures too; its `name` carries the argument list (`f(integer)`) so
  *  overloads stay addressable. */
@@ -1576,11 +1564,4 @@ export async function createPostgresEngine(
   };
 
   return engine;
-}
-
-export function resultFromRows(
-  columns: string[],
-  rows: ReadonlyArray<Record<string, unknown>>,
-): QueryExecResult[] {
-  return rowsToQueryExecResult(columns, rows);
 }

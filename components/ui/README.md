@@ -6,22 +6,22 @@ Tailwind + Motion React components (the same delivery model as shadcn/ui).
 ## Using them in a route
 
 Magic UI components are built from Tailwind utility classes, and this app does
-**not** load Tailwind globally (only `/learn` does, for Fumadocs). To render
-Magic UI components in any other route, import the shared stylesheet once from
-that route's `layout.tsx` (or page):
+**not** load Tailwind globally (the Fumadocs routes load it through
+`app/docs.css`). To render Magic UI components in any other route, import the
+shared stylesheet once from that route's `layout.tsx` (or page):
 
 ```tsx
 import "@/app/tailwind.css";
 ```
 
 This is scoped by Next.js to that route's bundle, so other routes stay
-Tailwind-free. See `app/magicui-demo/` for a working example, live at
-`/magicui-demo`.
+Tailwind-free. The home page (`app/_components/home/`) is the working example.
 
-`app/tailwind.css` intentionally includes Tailwind's Preflight reset and uses
-`@source "..."` globbing (Tailwind's automatic content scan is disabled with
+`app/tailwind.css` intentionally includes Tailwind's Preflight reset, and
+classes are generated only for the files matched by the `@source` globs in
+`app/tailwind.shared.css` (Tailwind's automatic content scan is disabled with
 `source(none)` for compile speed). **If you use Tailwind/Magic UI classes in a
-new directory, add an `@source` line for it in `app/tailwind.css`.**
+new directory, add an `@source` line for it in `app/tailwind.shared.css`.**
 
 ## Adding more components
 

@@ -116,12 +116,6 @@ function loadLangSql(): Promise<LangSqlModule> {
   }
   return _langSqlPromise;
 }
-/** Returns a Promise that resolves to the `@codemirror/lang-sql`
- *  module. Cached so concurrent callers share one fetch. */
-export function ensureLangSqlLoaded(): Promise<LangSqlModule> {
-  return loadLangSql();
-}
-
 /** Dialect argument for lang-sql's `sql({ dialect })`. DuckDB has no native
  *  descriptor, so it falls back to the generic SQL grammar. */
 function pickLangDialect(mod: LangSqlModule, dialect: SqlDialect) {

@@ -1,10 +1,10 @@
 "use client";
 
-// Shared card for segment-level error boundaries (quiz/[id], c/[id],
-// s/[shareId], dashboard). Mirrors app/error.tsx's self-contained styling —
-// the fewer dependencies an error surface has, the less likely it is to crash
-// while reporting a crash — but lets each segment supply copy that fits its
-// content instead of the root boundary's playground-centric message.
+// Shared card for segment-level error boundaries (s/[shareId], dashboard).
+// Mirrors app/error.tsx's self-contained styling (the fewer dependencies an
+// error surface has, the less likely it is to crash while reporting a crash)
+// but lets each segment supply copy that fits its content instead of the root
+// boundary's playground-centric message.
 //
 // NOTE: this file has its own entry in app/tailwind.shared.css's @source
 // list (both Tailwind roots compile with source(none)); if it moves,

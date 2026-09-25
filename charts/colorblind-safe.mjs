@@ -39,7 +39,6 @@ function deuteranope(hex) {
   const lin = srgb.map((c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
   const [r, g, b] = lin;
   const L = 17.8824 * r + 43.5161 * g + 4.11935 * b;
-  const M = 3.45565 * r + 27.1554 * g + 3.86714 * b;
   const S = 0.0299566 * r + 0.184309 * g + 1.46709 * b;
   // The deuteranope plane: M is reconstructed from L and S.
   const M2 = 0.494207 * L + 1.24827 * S;
@@ -59,7 +58,7 @@ const ROWS = [
   { key: "As a deuteranope sees it", transform: deuteranope },
 ];
 
-const swatches = PAIRS.flatMap((pair, p) =>
+const swatches = PAIRS.flatMap((pair) =>
   ROWS.flatMap((row, r) =>
     pair.colors.map((c, i) => ({
       panel: pair.key,

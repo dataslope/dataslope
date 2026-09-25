@@ -153,10 +153,10 @@ export function verifyEmail(url: string): Omit<SendArgs, "to"> {
 export function deleteAccountEmail(url: string): Omit<SendArgs, "to"> {
   return {
     subject: "Confirm your Dataslope account deletion",
-    text: `Confirm that you want to permanently delete your Dataslope account, including your cloud saves, share links, and custom content, by opening this link:\n\n${url}\n\nThis cannot be undone. If you didn't request this, ignore this email and your account stays exactly as it is.`,
+    text: `Confirm that you want to permanently delete your Dataslope account, including your cloud saves, share links, and challenge progress, by opening this link:\n\n${url}\n\nThis cannot be undone. If you didn't request this, ignore this email and your account stays exactly as it is.`,
     html: layout({
       heading: "Confirm account deletion",
-      body: "Click below to permanently delete your Dataslope account, including your cloud saves, share links, and custom content. This can&rsquo;t be undone.",
+      body: "Click below to permanently delete your Dataslope account, including your cloud saves, share links, and challenge progress. This can&rsquo;t be undone.",
       cta: "Delete my account",
       url,
     }),

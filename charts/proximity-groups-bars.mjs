@@ -25,7 +25,7 @@
  * something. The only question is whether it is saying what you meant.
  */
 import { Plot, plot, HALO, MUTED, PRIMARY } from "./_theme.mjs";
-import { panel, panelAxis, panelBaseline, panelSpace, panelTitle } from "./_panels.mjs";
+import { panel, panelAxis, panelSpace } from "./_panels.mjs";
 
 export const title =
   "Twelve bars drawn twice. In the top row the spacing between every pair is equal and the chart reads as one list of twelve. In the bottom row the only change is that the gaps at the group boundaries are wider, and the same bars read as four groups of three.";

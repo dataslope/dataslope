@@ -34,7 +34,7 @@
  * the light surface (#ffffff) and the dark one (#121212), using the WCAG 2.1
  * relative-luminance formula.
  */
-import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, SERIES } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, SERIES } from "./_theme.mjs";
 
 export const title =
   "Contrast ratios for this site's seven chart colors. Used as designed, each theme's own value on its own background, all fourteen clear the 3:1 threshold. Swapped, so that one palette serves both backgrounds, all fourteen fall below it, and the dark palette on white bottoms out at 1.25 to 1.";

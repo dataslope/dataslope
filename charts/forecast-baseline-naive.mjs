@@ -59,8 +59,8 @@ const DRIFT = 0.42;
 
 /**
  * A daily volume series: a level that drifts and also wanders, the weekly
- * cycle, and a little measurement noise. `wander` is the only thing that
- * changes between the two scenarios below.
+ * cycle, and a little measurement noise. `wander` is the spread of the
+ * level's daily steps.
  */
 function makeSeries(wander) {
   const steps = normalSamples(N, DRIFT, wander, 6_101);
@@ -127,9 +127,6 @@ function evaluate(rows) {
 
 const WANDERING = makeSeries(4.2);
 const MAIN = evaluate(WANDERING);
-/** The same model, the same baseline, the same code, on a series whose level
- *  holds still. The gap between the two gains is a property of the data. */
-const STEADY_GAIN = evaluate(makeSeries(0)).gain;
 
 const Y_DOMAIN = [130, 275];
 

@@ -14,7 +14,7 @@
  * numbers, which is the point: the shape of this curve is a fact about the
  * hardware rather than about the program.
  */
-import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, PRIMARY } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 
 export const title =
   "Time per element against stride on log axes: flat while the stride fits inside a cache line, then a step up to a plateau once every access costs its own cache miss.";

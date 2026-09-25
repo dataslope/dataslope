@@ -27,7 +27,7 @@
  * second parameter for the extra variance, and switching to it changes nothing
  * about the mean and everything about the intervals.
  */
-import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, mean, rng } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, MUTED, mean, rng } from "./_theme.mjs";
 
 export const title =
   "Observed daily counts against a Poisson fitted to the same mean. The fit is far too narrow: it puts too much probability in the middle and almost none past twenty, where the data has several days a year.";

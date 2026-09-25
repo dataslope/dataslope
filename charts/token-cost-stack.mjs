@@ -13,7 +13,7 @@
  * those three numbers rather than asserted, so the totals in the annotations
  * cannot drift from the bars.
  */
-import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, MUTED } from "./_theme.mjs";
 
 export const title =
   "Billed input tokens per turn across ten turns of a conversation, as a rising staircase. A thin band at the top of each bar is the new message; the grey bulk beneath it is resent history, which grows to dominate by the last turn.";

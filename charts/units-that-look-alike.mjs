@@ -54,7 +54,6 @@ const bars = (p, field) =>
   }));
 
 const SHARE_TOTAL = REGIONS.reduce((s, d) => s + d.share, 0);
-const CLASH = REGIONS.find((d) => d.change === 20);
 
 export const caption = `Two panels of five regions, both with axes labelled in per cent. The first is each region's share of revenue, adding to ${SHARE_TOTAL}; the second is its change in share in percentage points, which can be negative. The same tick value means two unrelated things.`;
 

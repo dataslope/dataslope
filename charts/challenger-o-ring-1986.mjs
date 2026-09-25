@@ -87,7 +87,6 @@ const rows = [...stacked(damaged, SHOWN), ...stacked(FLIGHTS, NOT_SHOWN)];
 const COLDEST = Math.min(...FLIGHTS.map((d) => d.temp));
 const cold = FLIGHTS.filter((d) => d.temp < 65);
 const warm = FLIGHTS.filter((d) => d.temp >= 65);
-const coldHit = cold.filter((d) => d.damaged > 0).length;
 const warmHit = warm.filter((d) => d.damaged > 0).length;
 
 export const caption = `The flights NASA was faxed the night before the launch, beside the same table with the other sixteen rows put back. All ${cold.length} launches below 65°F had O-ring damage and ${warmHit} of the ${warm.length} above it did; *Challenger* went up at ${CHALLENGER_TEMP}°F, ${COLDEST - CHALLENGER_TEMP} degrees colder than anything that had flown.`;

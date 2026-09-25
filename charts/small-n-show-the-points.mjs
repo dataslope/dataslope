@@ -55,14 +55,12 @@ const stats = GROUPS.map((g) => {
 const AS_BARS = "Bar and error bar";
 const AS_POINTS = "The four numbers";
 const ORDER = GROUPS.map((g) => g.key);
-const N = GROUPS[0].values.length;
 
 const barRows = stats.map((d) => ({ ...d, panel: AS_BARS }));
 const pointRows = GROUPS.flatMap((g) =>
   g.values.map((v, i) => ({ key: g.key, v, i, panel: AS_POINTS })),
 );
 
-const SPREAD = stats.reduce((a, b) => (b.se < a.se ? b : a));
 const BIMODAL = GROUPS.find((g) => g.key === "B");
 const RANGE = Math.max(...BIMODAL.values) - Math.min(...BIMODAL.values);
 

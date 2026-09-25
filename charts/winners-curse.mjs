@@ -28,7 +28,7 @@
  * The fixes are structural rather than statistical: power the study, and
  * pre-register so that the non-significant runs are visible too.
  */
-import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, PRIMARY, mean, normalSamples } from "./_theme.mjs";
+import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, mean, normalSamples } from "./_theme.mjs";
 
 export const title =
   "The true effect against the average published effect, by statistical power. At 80 per cent power the published effect is about right; at 20 per cent it is roughly twice the truth, purely because only estimates large enough to be significant get published.";

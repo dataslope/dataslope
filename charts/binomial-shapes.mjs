@@ -8,7 +8,7 @@
  * p, which is what shows that a binomial is symmetric at p = 0.5 and skewed
  * away from whichever end p sits near.
  */
-import { Plot, plot, HALO, PRIMARY } from "./_theme.mjs";
+import { Plot, plot, PRIMARY } from "./_theme.mjs";
 
 export const title =
   "Three binomial probability mass functions as bar charts: ten trials at p = 0.5 (symmetric), thirty trials at p = 0.5 (symmetric and narrower relative to its range), and thirty trials at p = 0.15 (piled up near zero with a tail to the right).";

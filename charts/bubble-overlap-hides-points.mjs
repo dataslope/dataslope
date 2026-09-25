@@ -23,7 +23,7 @@
  * size, area stops being a comparison anybody can make and starts being a
  * territory that hides the data behind it.
  */
-import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, normalSamples, rng } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, rng } from "./_theme.mjs";
 
 export const title =
   "Forty bubbles drawn opaque and drawn with transparency and an outline. In the opaque panel nine discs are completely covered by larger ones and leave no trace, so the chart appears to show thirty-one points.";

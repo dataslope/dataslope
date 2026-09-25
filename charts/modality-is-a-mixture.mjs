@@ -26,7 +26,7 @@
  * because a two-component fit will happily split a distribution that is merely
  * skewed.
  */
-import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, PRIMARY, mean, normalSamples } from "./_theme.mjs";
+import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, mean, normalSamples } from "./_theme.mjs";
 import { panel, panelAxis, panelBaseline, panelSpace, panelTitle } from "./_panels.mjs";
 
 export const title =

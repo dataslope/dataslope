@@ -93,16 +93,3 @@ export function createTabStorage(
     copyScopedKeys: scope.copyScopedKeys,
   };
 }
-
-/** Pure helper: true when tabs differ from the defaults (title, code, or count). */
-export function tabsAreDirty(
-  tabs: QueryTab[],
-  defaults: { title: string; code: string }[],
-): boolean {
-  if (tabs.length !== defaults.length) return true;
-  for (let i = 0; i < tabs.length; i += 1) {
-    if (tabs[i].title !== defaults[i].title || tabs[i].code !== defaults[i].code)
-      return true;
-  }
-  return false;
-}

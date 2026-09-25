@@ -31,7 +31,7 @@
  * and you do not.**
  */
 import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY, rng } from "./_theme.mjs";
-import { panel, panelAxis, panelBaseline, panelSpace, panelTitle } from "./_panels.mjs";
+import { panel, panelSpace, panelTitle } from "./_panels.mjs";
 
 export const title =
   "Daily orders (a flow) and daily inventory (a stock) resampled to monthly by both sum and mean. Summing the flow is right and summing the stock produces a number thirty times too large with no meaning; the mean is right for the stock and answers the wrong question for the flow.";
@@ -68,7 +68,7 @@ const SERIES = [
   },
 ].map((s) => ({ ...s, sum: monthly(s.daily, "sum"), mean: monthly(s.daily, "mean") }));
 
-const [FLOW, STOCK] = SERIES;
+const STOCK = SERIES[1];
 const BLOWUP = Math.round(STOCK.sum[0] / STOCK.mean[0]);
 
 const PANELS = SERIES.map((_, k) => panel(k, { y: [0, 1] }));

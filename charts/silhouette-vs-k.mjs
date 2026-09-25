@@ -25,7 +25,6 @@ import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, PRIMARY, rng } from "./_theme.m
 export const title =
   "Average silhouette score against the number of clusters, rising to a clear maximum at four and falling away on both sides. A second line tracks the worst individual cluster's score, which collapses well before the average does.";
 
-const TRUE_K = 4;
 const u = rng(20260808);
 function gauss() {
   const a = Math.max(u(), Number.EPSILON);

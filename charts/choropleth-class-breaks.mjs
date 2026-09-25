@@ -118,7 +118,6 @@ const MOVER = REGIONS.map((d) => {
 }).reduce((a, b) => (b.span > a.span ? b : a));
 
 const shade = (cls) => 0.12 + (cls / (K - 1)) * 0.78;
-const bottomCount = (breaks) => REGIONS.filter((d) => classOf(d.v, breaks) === 0).length;
 
 export const caption = `The same ${REGIONS.length} regions under three class-break schemes. Region ${MOVER.key}, at ${MOVER.v}, sits in class ${MOVER.classes[0] + 1} on the first map and class ${MOVER.classes[2] + 1} on the third.`;
 

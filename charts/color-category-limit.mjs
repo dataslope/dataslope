@@ -27,7 +27,7 @@
  * the reader; reducing the number of categories is the one fix that helps every
  * reader at once.
  */
-import { Plot, plot, HALO, MUTED, SERIES, rng } from "./_theme.mjs";
+import { Plot, plot, HALO, MUTED, SERIES } from "./_theme.mjs";
 
 export const title =
   "The same scatter drawn three times, colored by four, eight and sixteen categories. With four the groups are easy to separate; with eight it takes effort; with sixteen the palette has cycled and separate groups share a color.";
