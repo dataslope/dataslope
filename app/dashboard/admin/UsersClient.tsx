@@ -18,7 +18,8 @@ import {
   Trash2,
   VenetianMask,
 } from "lucide-react";
-import { authClient, useSession } from "@/lib/auth/client";
+import { authClient, isSessionUnavailable, useSession } from "@/lib/auth/client";
+import { SessionUnavailable } from "@/app/_components/auth/SessionUnavailable";
 import { clampPage, pageCount, pageItems, pageRange } from "@/lib/pagination";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -78,7 +79,7 @@ const SEARCH_LIMIT = 200;
 const SEARCH_DEBOUNCE_MS = 300;
 
 export function UsersClient() {
-  const { data: session, isPending: sessionPending } = useSession();
+  const { data: session, isPending: sessionPending, error: sessionError } = useSession();
   // Browse mode holds one page; search mode holds every match (client-sliced).
   const [users, setUsers] = useState<AdminUser[]>([]);
   // Server-reported total in browse mode, match count while searching.
@@ -508,6 +509,7 @@ export function UsersClient() {
   }
 
   if (!session) {
+    if (isSessionUnavailable(sessionError)) return <SessionUnavailable />;
     return <SignInPrompt />;
   }
 

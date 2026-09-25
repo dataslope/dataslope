@@ -18,7 +18,8 @@ import {
   Trash2,
   VenetianMask,
 } from "lucide-react";
-import { authClient, useSession } from "@/lib/auth/client";
+import { authClient, isSessionUnavailable, useSession } from "@/lib/auth/client";
+import { SessionUnavailable } from "@/app/_components/auth/SessionUnavailable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -81,7 +82,7 @@ function randomSlug(length = 5): string {
 }
 
 export function TestUsersClient() {
-  const { data: session, isPending: sessionPending } = useSession();
+  const { data: session, isPending: sessionPending, error: sessionError } = useSession();
 
   // --- Creation form -------------------------------------------------------
   const [plan, setPlan] = useState<"free" | "pro">("pro");
@@ -353,7 +354,10 @@ export function TestUsersClient() {
   // --- Gating states -------------------------------------------------------
 
   if (sessionPending) return <CenteredNote>Loading…</CenteredNote>;
-  if (!session) return <SignInPrompt />;
+  if (!session) {
+    if (isSessionUnavailable(sessionError)) return <SessionUnavailable />;
+    return <SignInPrompt />;
+  }
   if (denied) {
     return (
       <AccessDeniedCard

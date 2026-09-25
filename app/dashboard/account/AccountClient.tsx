@@ -2,7 +2,9 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
-import { signOut, useSession } from "@/lib/auth/client";
+import { isSessionUnavailable, signOut, useSession } from "@/lib/auth/client";
+import { SessionUnavailable } from "@/app/_components/auth/SessionUnavailable";
+import { effectivePlan, planLabel, type PlanUser } from "@/lib/plan";
 import {
   type CheckoutPeriod,
   openBillingPortal,
@@ -25,7 +27,7 @@ import { GuestAccount } from "./GuestAccount";
 const noSubscribe = () => () => {};
 
 export function AccountClient() {
-  const { data: session, isPending } = useSession();
+  const { data: session, isPending, error: sessionError } = useSession();
   /**
    * False on the server and during hydration, true after. The session can
    * settle before React hydrates (a fast or failed `get-session`), so the
@@ -98,16 +100,25 @@ export function AccountClient() {
     );
   }
 
+  // The session read failed: we do not know who this is, so neither the guest
+  // pitch nor a sign-in prompt is honest. Offer a retry.
+  if (!session && isSessionUnavailable(sessionError)) {
+    return (
+      <div className="rounded-2xl p-6" style={{ background: "var(--panel)" }}>
+        <SessionUnavailable />
+      </div>
+    );
+  }
+
   // Not signed in: explain what an account adds rather than redirect, so a
   // shared or bookmarked link lands somewhere intelligible.
   if (!session) return <GuestAccount />;
 
   const { user } = session;
   // `plan` is a server-defined additional field, not on the client's user
-  // type. Admins are treated as Pro everywhere (lib/ai/tier.ts).
-  const plan = ((user as { plan?: string }).plan ?? "free").toLowerCase();
-  const isAdmin = (user as { role?: string }).role === "admin";
-  const isPro = plan === "pro" || isAdmin;
+  // type. Admins are treated as Pro everywhere (lib/plan.ts).
+  const plan = ((user as PlanUser).plan ?? "free").toLowerCase();
+  const isPro = effectivePlan(user as PlanUser) === "pro";
 
   async function handleSignOut() {
     setSigningOut(true);
@@ -175,7 +186,7 @@ export function AccountClient() {
         <div className="flex justify-between gap-4">
           <dt className="text-[var(--ds-gray-500)]">Plan</dt>
           <dd className="font-medium text-[var(--ds-gray-900)] dark:text-white">
-            {isPro ? (plan === "pro" ? "Pro" : "Pro (admin)") : "Free"}
+            {planLabel(user as PlanUser)}
           </dd>
         </div>
         <div className="flex justify-between gap-4">

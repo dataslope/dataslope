@@ -19,7 +19,9 @@ import {
   PanelLeft,
   Shield,
 } from "lucide-react";
-import { signOut, useSession } from "@/lib/auth/client";
+import { isSessionUnavailable, signOut, useSession } from "@/lib/auth/client";
+import { SessionUnavailable } from "@/app/_components/auth/SessionUnavailable";
+import { effectivePlan, isAdminUser, type PlanUser } from "@/lib/plan";
 import { ThemePillToggle } from "@/app/_components/ThemePillToggle";
 import {
   activeAdminItem,
@@ -28,6 +30,7 @@ import {
   ADMIN_ITEMS,
   crumbFor,
   PAGE_ITEMS,
+  SITE_ITEMS,
   type StudioNavItem,
   type StudioRouteKey,
 } from "./nav";
@@ -60,7 +63,7 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
   const showRail = !isPhone && !showFullSidebar;
 
   // `role` is an auth additionalField, not on the inferred client session type.
-  const isAdmin = (session?.user as { role?: string } | undefined)?.role === "admin";
+  const isAdmin = isAdminUser(session?.user as PlanUser | undefined);
   // On localhost the Admin group is always reachable (it carries sessionless
   // build/design tools); deployed it stays admin-only. Data pages inside are
   // gated server-side either way — this only decides what the sidebar offers.
@@ -273,6 +276,15 @@ function FullSidebar({
             ) : null}
           </>
         ) : null}
+
+        <span
+          aria-hidden="true"
+          className="mx-2.5 my-2 block h-px"
+          style={{ background: "var(--divider)" }}
+        />
+        {SITE_ITEMS.map((item) => (
+          <NavLink key={item.key} item={item} active={false} onNavigate={onNavigate} />
+        ))}
       </nav>
 
       <div className="flex-1" />
@@ -351,6 +363,14 @@ function RailSidebar({
         {railItems.map((item) => (
           <RailLink key={item.key} item={item} active={active === item.key} />
         ))}
+        <span
+          aria-hidden="true"
+          className="mx-auto my-1.5 block h-px w-6"
+          style={{ background: "var(--divider)" }}
+        />
+        {SITE_ITEMS.map((item) => (
+          <RailLink key={item.key} item={item} active={false} />
+        ))}
       </div>
       <div className="flex-1" />
       {user ? (
@@ -397,13 +417,14 @@ function RailLink({ item, active }: { item: StudioNavItem; active: boolean }) {
 
 function UserFooter({ session }: { session: SessionData }) {
   const router = useRouter();
-  const { isPending } = useSession();
+  const { isPending, error } = useSession();
   const [signingOut, setSigningOut] = useState(false);
   const user = session?.user;
   // Nothing while the first session read is in flight, so a signed-in visitor
   // doesn't see "Sign in" flash before their account appears.
   if (!user) {
     if (isPending) return null;
+    if (isSessionUnavailable(error)) return <SessionUnavailable compact />;
     return (
       <Link href="/sign-in" className="ds-nav-item mt-1">
         <LogIn size={17} style={{ color: "var(--muted)" }} />
@@ -412,8 +433,9 @@ function UserFooter({ session }: { session: SessionData }) {
     );
   }
   const initial = (user.name?.trim()?.[0] ?? user.email?.[0] ?? "?").toUpperCase();
-  const rawPlan = (user as { plan?: string }).plan ?? "";
-  const plan = rawPlan.toLowerCase() === "pro" ? "Pro plan" : "Free plan";
+  // Same rule as the account page and the pricing CTAs, so an admin is not
+  // "Free plan" here and "Pro (admin)" there.
+  const plan = effectivePlan(user as PlanUser) === "pro" ? "Pro plan" : "Free plan";
 
   const handleSignOut = async () => {
     setSigningOut(true);

@@ -119,22 +119,23 @@ export function useMidRunPreparing(): MidRunPreparing {
 }
 
 // ─── Dark mode detection ─────────────────────────────────────────────
-// Fumadocs toggles a `dark` class on <html>; fall back to the OS preference
-// outside /learn.
+// The site toggles a `dark` / `light` class on <html>; fall back to the OS
+// preference when neither is set.
 
 function detectIsDark(): boolean {
-  if (typeof document === "undefined") return true;
+  if (typeof document === "undefined") return false;
   const root = document.documentElement;
   if (root.classList.contains("dark")) return true;
   if (root.classList.contains("light")) return false;
   if (typeof window !== "undefined" && window.matchMedia) {
     return window.matchMedia("(prefers-color-scheme: dark)").matches;
   }
-  return true;
+  return false;
 }
 
-/** Subscribe to the document's color scheme. SSR snapshot defaults to dark
- *  to match the site's dark default. */
+/** Subscribe to the document's color scheme. The SSR snapshot is light, the
+ *  site's default (a missing stored theme resolves to light in the root
+ *  layout's bootstrap), so most first paints need no correction. */
 export function useIsDark(): boolean {
   return useSyncExternalStore(
     (notify) => {
@@ -155,7 +156,7 @@ export function useIsDark(): boolean {
       };
     },
     () => detectIsDark(),
-    () => true,
+    () => false,
   );
 }
 

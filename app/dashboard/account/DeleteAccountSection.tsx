@@ -12,6 +12,7 @@
 import { useState } from "react";
 
 import { deleteUser } from "@/lib/auth/client";
+import { forgetProgressOwner } from "@/lib/challenges/progress";
 
 export function DeleteAccountSection({
   email,
@@ -58,6 +59,9 @@ export function DeleteAccountSection({
         setBusy(false);
         return;
       }
+      // The account's challenge progress went with it; drop this browser's
+      // cached copy too rather than leave it behind under a dead user id.
+      forgetProgressOwner({ purge: true });
       window.location.assign("/");
     } catch {
       setError(
@@ -73,15 +77,15 @@ export function DeleteAccountSection({
         Delete account
       </h2>
       <p className="mt-1 text-sm text-[var(--ds-gray-600)] dark:text-[var(--ds-gray-400)]">
-        Permanently delete your account and everything tied to it, your
-        sign-in methods, cloud saves, share links, and custom challenges. This
-        can&rsquo;t be undone.
+        Permanently delete your account and everything tied to it: your
+        sign-in methods, cloud saves, share links, and challenge progress.
+        This can&rsquo;t be undone.
       </p>
 
       {isPaidPro && (
         <p className="mt-4 rounded-xl bg-amber-500/[0.10] px-4 py-3 text-sm text-amber-800 dark:bg-amber-500/[0.12] dark:text-amber-200">
           You have an active Pro subscription. Deleting your account here
-          doesn&rsquo;t cancel billing, cancel it first with{" "}
+          doesn&rsquo;t cancel billing, so cancel it first with{" "}
           <span className="font-medium">Manage subscription</span> above, or you
           may continue to be charged.
         </p>
@@ -92,7 +96,7 @@ export function DeleteAccountSection({
           role="status"
           className="mt-4 rounded-xl bg-[var(--ds-blue-600)]/10 px-4 py-3 text-sm text-[var(--ds-blue-600)]"
         >
-          Check your email, we&rsquo;ve sent a confirmation link. Your account
+          Check your email: we&rsquo;ve sent a confirmation link. Your account
           stays active until you open it, and the link expires in 24 hours.
         </p>
       ) : !open ? (

@@ -170,7 +170,7 @@ export function CloudStorageSection() {
       // Clipboard unavailable (e.g. denied permission): surface it instead
       // of letting the button appear to silently succeed.
       setError(
-        "Couldn't copy the link, your browser blocked clipboard access.",
+        "Couldn't copy the link: your browser blocked clipboard access.",
       );
     }
   }, []);
@@ -277,7 +277,7 @@ export function CloudStorageSection() {
         <p className="mt-2 text-sm text-[var(--ds-gray-500)]">Loading…</p>
       ) : shares.length === 0 ? (
         <p className="mt-2 text-sm text-[var(--ds-gray-500)]">
-          No share links yet, use the Share button in any playground.
+          No share links yet. Use the Share button in any playground to create one.
         </p>
       ) : (
         <ul className="mt-1 divide-y divide-[var(--ds-gray-100)] dark:divide-white/5">
