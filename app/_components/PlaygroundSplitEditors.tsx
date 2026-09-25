@@ -21,7 +21,6 @@ import { Wand2 } from "lucide-react";
 
 import { loadLanguage, themeFor, redoKeymap } from "./cmExtensions";
 import { languageCompletion } from "./completion/languageCompletion";
-import { aiInlineCompletion } from "./ai/inlineCompletion";
 import { CopyIcon } from "./playgroundShared";
 import type { PlaygroundFile } from "./playgroundTabs";
 import type { LanguageAdapter, LanguageRuntime } from "./types";
@@ -212,10 +211,6 @@ function SplitEditor({
           getRuntime: () => getRuntimeRef.current(),
           getFilename: () => file.filename,
         }),
-        aiInlineCompletion({
-          language: adapter.id,
-          filename: () => file.filename,
-        }),
         keymap.of([
           {
             key: "Mod-Enter",
@@ -296,8 +291,8 @@ function SplitEditor({
     }
   }, [wordWrap]);
 
-  // External buffer changes (example load, workspace hydration, an
-  // AI-suggestion revert) → replace the doc. User edits round-trip
+  // External buffer changes (example load, workspace hydration, a
+  // reset) → replace the doc. User edits round-trip
   // through the store and compare equal here, so this never fights the
   // cursor.
   const bufferValue = buffers.get(file.id);

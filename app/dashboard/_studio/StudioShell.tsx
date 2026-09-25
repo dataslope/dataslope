@@ -498,7 +498,7 @@ function TopBar({
   onToggleSidebar: () => void;
   isPhone: boolean;
 }) {
-  // The breadcrumb names the admin section: "Admin / AI Usage".
+  // The breadcrumb names the admin section: "Admin / Test Users".
   const adminCrumb = active === "admin" ? adminCrumbFor(pathname) : null;
   return (
     <div className="flex h-14 flex-shrink-0 items-center gap-3 px-2 sm:px-3.5 min-[900px]:px-6">

@@ -11,7 +11,6 @@ import {
   Mail,
   Palette,
   Shield,
-  Sparkle,
   SquareTerminal,
   User,
   Users,
@@ -51,13 +50,6 @@ export const ADMIN_ITEMS: AdminNavItem[] = [
     label: "Test Users",
     href: "/dashboard/admin/test-users",
     icon: FlaskConical,
-    band: "data",
-  },
-  {
-    key: "admin-ai-usage",
-    label: "AI Usage",
-    href: "/dashboard/admin/ai-usage",
-    icon: Sparkle,
     band: "data",
   },
   {

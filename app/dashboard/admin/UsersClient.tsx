@@ -753,8 +753,8 @@ export function UsersClient() {
             sign-in but keeps the account.{" "}
             <strong className="font-medium text-foreground">Plan</strong> and{" "}
             <strong className="font-medium text-foreground">Role</strong>{" "}
-            changes (and bans) reach the AI and admin endpoints immediately,
-            they read the session fresh, but the person&apos;s
+            changes (and bans) reach the storage and admin endpoints
+            immediately, since they read the session fresh, but the person&apos;s
             header/account display can lag up to five minutes (the session
             cookie cache). Demoting an admin who is still listed in
             ADMIN_EMAILS / ADMIN_USER_IDS only lasts until their next sign-in

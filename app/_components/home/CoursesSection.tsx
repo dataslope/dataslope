@@ -53,8 +53,7 @@ const MIN_TOPIC_COURSES = 3;
 /** …and we show at most this many topic buttons. */
 const MAX_TOPICS = 6;
 
-/** Leading glyph per topic option; fallback is a book. Sparkles is avoided —
- *  reserved for AI features. */
+/** Leading glyph per topic option; fallback is a book. */
 const DOMAIN_ICONS: Record<string, LucideIcon> = {
   "programming-fundamentals": Code2,
   "computational-thinking": Brain,

@@ -135,9 +135,7 @@ const PLANS: Plan[] = [
   // Pro is intentionally hidden (SHOW_PRO_PLAN below) but its plan object and
   // all billing wiring (ProCheckoutCta, startProCheckout, Polar checkout) are
   // deliberately left in place — do not delete. To restore: flip
-  // SHOW_PRO_PLAN, re-add the "AI-suggested autocomplete" rows that its badge
-  // promises (bumping FEATURE_COUNT), and widen the grid (see grid-cols /
-  // subgrid-row comments).
+  // SHOW_PRO_PLAN and widen the grid (see grid-cols / subgrid-row comments).
   {
     name: "Pro",
     iconSlug: "pricing-pro",
@@ -171,7 +169,7 @@ const PLANS: Plan[] = [
     cta: "Go Pro",
     href: "/courses",
     highlighted: true,
-    badge: "AI autocomplete",
+    badge: "10 GB storage",
     checkout: true,
   },
 ];

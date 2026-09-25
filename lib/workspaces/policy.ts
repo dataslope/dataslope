@@ -6,7 +6,7 @@
  * module: no D1/R2 access.
  */
 
-import type { MemberTier } from "@/lib/ai/types";
+import type { MemberTier } from "@/lib/plan";
 
 const MB = 1024 * 1024;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -47,9 +47,14 @@ export const GUEST_SHARE_TTL_DAYS = 30;
 export const INACTIVITY_EXPIRY_DAYS = 30;
 
 /** Guest share-creation rate limits (per salted-IP hash + a global backstop,
- *  both per UTC day, the ai_usage_daily pattern from migration 0003). */
+ *  both per UTC day; see `share_usage_daily` in migration 0005). */
 export const GUEST_SHARES_PER_IP_PER_DAY = 10;
 export const GUEST_SHARES_GLOBAL_PER_DAY = 500;
+
+/** The UTC calendar day ('YYYY-MM-DD') the daily share counters are keyed by. */
+export function utcDay(nowMs: number): string {
+  return new Date(nowMs).toISOString().slice(0, 10);
+}
 
 /** Display-name ceiling for workspaces + shares. */
 export const NAME_MAX_LENGTH = 120;

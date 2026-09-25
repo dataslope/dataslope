@@ -263,7 +263,7 @@ To enable verification + reset:
 
    For local dev, add `RESEND_API_KEY` (and optionally `EMAIL_FROM`) to `.dev.vars`. Before a domain is verified, Resend only delivers to your own account address via the `onboarding@resend.dev` sandbox From.
 
-Auth gates **actions, never content**: every `/courses` lesson, exercise, and playground stays free and statically prerendered with no session. Signing in only unlocks per-user features (cloud saves, sharing, AI). The session is read client-side (`lib/auth/client.ts`), so anonymous readers still receive the exact same cached static HTML.
+Auth gates **actions, never content**: every `/courses` lesson, exercise, and playground stays free and statically prerendered with no session. Signing in only unlocks per-user features (cloud saves, sharing, synced challenge progress). The session is read client-side (`lib/auth/client.ts`), so anonymous readers still receive the exact same cached static HTML.
 
 Key files:
 
@@ -275,7 +275,7 @@ Key files:
 | `app/sign-in/`, `app/account/` | Sign-in screen (Google/GitHub) and a gated account area. |
 | `app/admin/` | Gated admin dashboard (list / remove / ban users), built on the shadcn UI primitives in `components/ui`. See [Admin dashboard](#admin-dashboard). |
 | `migrations/` | D1 schema, one subfolder per database: `auth/`, `illustrations/`, `search/`. Each is a `migrations_dir` in `wrangler.jsonc` with its own numbering and its own `d1_migrations` table. See `migrations/README.md` for which command applies which, and why there are three databases rather than one. |
-| `migrations/auth/` | `dataslope-auth`: Better Auth core tables plus the admin plugin's `role`/`ban` fields, plans, AI usage counters, cloud-workspace metadata and playground shares. Applied with `npm run db:migrate[:remote]`. |
+| `migrations/auth/` | `dataslope-auth`: Better Auth core tables plus the admin plugin's `role`/`ban` fields, plans, cloud-workspace metadata, playground shares and challenge progress. Applied with `npm run db:migrate[:remote]`. |
 | `migrations/illustrations/` | `dataslope-illustrations`, a second database holding the illustration and chart regeneration queues written from the admin-only `/dashboard/admin/illustration-prompts` and `/dashboard/admin/charts` galleries. Applied with `npm run db:migrate:illustrations[:remote]`; see `agent-outputs/20260803-0900-illustration-regeneration-queue.md`. |
 | `migrations/search/` | `dataslope-search`: the lesson full-text index read by `/api/search`. Applied with `npm run db:migrate:search[:remote]`, seeded with `npm run db:seed:search[:remote]`. |
 
@@ -340,7 +340,7 @@ The Cloudflare bindings interface (`CloudflareEnv`, used by `getCloudflareContex
 
 Every language-runtime CodeMirror editor (`/playground/*`, lesson code blocks, challenge cards, the web playground's split panes) mounts one shared extension, `languageCompletion()` in `app/_components/completion/languageCompletion.ts`, so a completion backend added to a runtime reaches all four surfaces with no editor-side change. The SQL editors have their own schema-aware engine (`app/_components/sql/sqlCompletion.ts`).
 
-**When the popup opens is a site-wide setting** (Settings → *Code Suggestions* in any playground; stored once under `editor_completion_trigger`, `app/_components/completion/completionPrefs.ts`): *as you type* (default), *after `.` and on Ctrl+Space*, *only on Ctrl+Space*, or *off*. Every open editor follows a change live. Tab accepts, Enter always inserts a newline. The pro-only AI ghost text stands down while the popup is open, so members who prefer ghost text over popups switch the setting.
+**When the popup opens is a site-wide setting** (Settings → *Code Suggestions* in any playground; stored once under `editor_completion_trigger`, `app/_components/completion/completionPrefs.ts`): *as you type* (default), *after `.` and on Ctrl+Space*, *only on Ctrl+Space*, or *off*. Every open editor follows a change live. Tab accepts, Enter always inserts a newline.
 
 **What each language gets**, in tiers; the static tiers answer until the runtime boots and are then suppressed so the popup never shows duplicates:
 
@@ -356,29 +356,11 @@ Every language-runtime CodeMirror editor (`/playground/*`, lesson code blocks, c
 
 The Lezer-based tiers live in `completion/documentSymbols.ts`; hover and parameter hints in `completion/runtimeTooltips.ts`, backed by the optional `hover()` / `signatureHelp()` methods on `LanguageRuntime` (`types.ts`). Unit tests: `__tests__/languageCompletion.test.ts`, `documentSymbols.test.ts`, `clangCompletion.test.ts`, `staticCompletionLists.test.ts`, `tsAnalysis.test.ts`.
 
-### AI inline completion (pro)
+### Membership tier
 
-Copilot-style ghost-text autocomplete in the language-runtime CodeMirror editors, code blocks, challenge cards, and the `/playground/*` editors (`app/_components/ai/inlineCompletion.ts` + `app/api/ai/complete/route.ts`). After a short typing pause the editor requests a fill-in-the-middle suggestion; **Tab** accepts, **Escape** dismisses, and typing "through" the suggestion consumes it. Challenge/code-block editors send the active file's read-only init code as extra prompt context.
+A user's tier comes from the `plan` column (`migrations/auth/0003`, default `'free'`); admins and any address in `PRO_USER_EMAILS` are treated as Pro as a bootstrap before billing exists (`resolveTier` in `lib/plan.ts`, whose `effectivePlan` is the same rule minus the server-only allowlists, for display). The tier decides the cloud-storage limits in `lib/workspaces/policy.ts`.
 
-**Pro members only, enforced server-side.** The endpoint returns 401 for guests and 403 for signed-in free members, the client gate (a `GET /api/ai/complete` capability probe the extension fires once per page) is only there to avoid doomed requests. A user's tier comes from the `plan` column (`migrations/auth/0003`, default `'free'`); admins and any address in `PRO_USER_EMAILS` are treated as Pro as a bootstrap before billing exists (`lib/ai/tier.ts`).
-
-**Provider config.** Base URL + model id are non-secret `vars` in `wrangler.jsonc` (`AI_FREE_BASE_URL` / `AI_FREE_MODEL` / `AI_PRO_BASE_URL` / `AI_PRO_MODEL`), there's no hardcoded fallback (`lib/ai/models.ts`), so a tier needs its base URL, model id, and API key all set to be usable. Completions resolve the **pro** tier, which falls back to the free tier's config when its own is incomplete; with neither fully configured the endpoint answers 503. Both tiers currently point at **OpenRouter**'s **DeepSeek V4 Flash** model, called through the OpenAI-compatible `/chat/completions` adapter (`lib/ai/provider.ts`), non-streaming with a small output cap (`lib/ai/completion.ts`). The API key is a secret:
-
-```bash
-npx wrangler secret put AI_FREE_API_KEY   # OpenRouter key, covers both tiers today
-npx wrangler secret put AI_PRO_API_KEY    # optional: only needed if pro should use a separate key
-```
-
-For local dev, add the keys to `.dev.vars`:
-
-```
-AI_FREE_API_KEY="sk-or-…"   # OpenRouter, covers both tiers today
-PRO_USER_EMAILS="you@example.com"   # optional; grants Pro (and so autocomplete) without billing
-```
-
-**Cost / abuse controls.** Per-user daily request + token counters (the `completions` / `completion_*_tok` columns of `ai_usage_daily`, `migrations/auth/0004`) and a global daily token ceiling in `ai_usage_global` (`AI_DAILY_GLOBAL_TOKEN_CAP`, default 5M) bound spend regardless of account/IP rotation (`lib/ai/limits.ts`). The code sent for a suggestion and the suggestion itself are never stored; only those counters are written, which is what `/privacy` promises.
-
-**Legacy AI data.** Part of what the AI migrations created belonged to an in-app chat assistant that has since been removed: the `requests` / `input_tok` / `output_tok` and `suggests` / `suggest_*_tok` columns of `ai_usage_daily`, and the whole `ai_answer_feedback` table (`migrations/auth/0008`). No code reads or writes them any more. They are left in place rather than dropped by a migration, since production still holds rows in them, and `ai_answer_feedback` still cascades on user deletion.
+The site has no AI features. An in-app chat assistant ("Ask AI") and a Pro-only AI autocomplete used to exist; both were removed, and `migrations/auth/0011` drops the tables they wrote (`ai_usage_daily`, `ai_usage_global`, `ai_answer_feedback`). If the worker still has `AI_FREE_API_KEY` / `AI_PRO_API_KEY` secrets set, they are unused and can be deleted with `npx wrangler secret delete`.
 
 ### Pro subscriptions (Polar)
 
@@ -390,7 +372,7 @@ Paid Pro memberships run on [Polar](https://polar.sh) as **merchant of record**,
 
 **How plan sync works.** Checkout is created with `externalCustomerId = user.id`, so every webhook's customer carries our user id. We key everything off the `customer.state_changed` event, it fires on every subscription transition and carries the full current state, so the plan is a pure function of the latest event (`derivePlanFromCustomerState`): Pro while any active subscription matches a configured Pro product, free otherwise. One indexed D1 `UPDATE user SET plan` per event; no extra tables. An admin's manual plan switch for a *paying* customer is overwritten by the next state event (billing owns paid status); comped users (`PRO_USER_EMAILS`, admins, admin-set plan on non-customers) are untouched. After checkout the buyer lands on `/account?checkout=success`, which polls the session with the cookie cache bypassed until the webhook's flip is visible.
 
-**Setup.** Billing is inert until configured (like social login / email / AI):
+**Setup.** Billing is inert until configured (like social login / email):
 
 1. Create a Polar organization (start on `sandbox.polar.sh`), a Pro product (e.g. $4.99/mo), and optionally an annual product.
 2. `wrangler.jsonc` vars: `POLAR_PRO_PRODUCT_ID` (+ `POLAR_PRO_ANNUAL_PRODUCT_ID` for the yearly slug), `POLAR_SERVER` (`"sandbox"` while testing; empty = production).
@@ -427,8 +409,7 @@ Optional hardening: an R2 **lifecycle rule** on the `share/` prefix (e.g. delete
   - **Impersonate**, become that user in this browser (refused for admins server-side). Come back to `/admin` and the access-denied card offers **Stop impersonating**.
   - **Remove**, a **hard delete**. It drops the `user` row, which cascades to that user's `session` and `account` rows (the `ON DELETE CASCADE` in `migrations/auth/0001`) and frees their unique email. **The person can then sign up again** from scratch with OAuth or email/password. Use this for the "let me start over" / account-reset case, e.g. someone who created an unverified email/password account and now can't sign in with Google (see [Account linking](#account-linking)).
   - **Ban**, the soft alternative. Blocks sign-in but keeps the account (and its email) in place; reversible with **Unban**.
-- **Test users** (`/admin/test-users`), creates disposable accounts for testing member-gated features (AI autocomplete, storage quotas). They're created through `admin.createUser` with `data: { plan, emailVerified: true }`, so they're born verified (no verification email is sent on this path) on the chosen plan, no billing involved. Test accounts are identified purely by their reserved `@dataslope.test` email domain (RFC 6761 `.test` can never receive mail), which is what the list and the "Test" badges key on. Passwords show once at creation; use Impersonate for existing ones.
-- **AI usage** (`/admin/ai-usage`), per-user and site-wide AI autocomplete counters for a chosen UTC window (Day / Week / Month / Total, anchored by an "as of" date), against the global daily cap. Backed by `GET /api/admin/ai-usage?start&end` (inclusive UTC-day range; `start` omitted ⇒ all-time), a custom route gated by `requireAdmin` (`lib/auth/admin.ts`) since it isn't a Better Auth endpoint.
+- **Test users** (`/admin/test-users`), creates disposable accounts for testing member-gated features (storage quotas, retention). They're created through `admin.createUser` with `data: { plan, emailVerified: true }`, so they're born verified (no verification email is sent on this path) on the chosen plan, no billing involved. Test accounts are identified purely by their reserved `@dataslope.test` email domain (RFC 6761 `.test` can never receive mail), which is what the list and the "Test" badges key on. Passwords show once at creation; use Impersonate for existing ones.
 
 Authorization is enforced **server-side** on every `admin.*` endpoint (and `requireAdmin` on our own `/api/admin/*` routes), so the pages themselves stay statically-prerendered, client-read screens like `/account` (the "auth gates actions, not content" rule): a non-admin who opens `/admin` just gets an access-denied notice and can read or change nothing. The dashboard refuses destructive actions on your own row, so you can't lock yourself out.
 

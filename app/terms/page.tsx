@@ -64,15 +64,6 @@ export default function TermsPage() {
         work from the playground at any time.
       </p>
 
-      <h2>AI autocomplete</h2>
-      <p>
-        Where AI autocomplete is available on your account, it sends the code
-        around your cursor to a third-party AI provider to generate a
-        suggestion. Suggestions may be inaccurate, incomplete, or insecure, so
-        review any suggested code before you rely on it. Please don&apos;t put
-        sensitive personal information in your code.
-      </p>
-
       <h2>Acceptable use</h2>
       <p>You agree not to:</p>
       <ul>
@@ -82,8 +73,8 @@ export default function TermsPage() {
         </li>
         <li>
           attempt to disrupt, overload, or compromise the Service, its hosting,
-          or the third-party services it relies on, including abusing AI
-          autocomplete with automated or bulk requests;
+          or the third-party services it relies on, for example with
+          automated or bulk requests;
         </li>
         <li>
           misrepresent the Service or remove or obscure any notices it displays.

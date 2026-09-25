@@ -80,17 +80,6 @@
     // Must be a Resend-verified domain. RESEND_API_KEY is a secret; email
     // verification and password reset stay off until it's set.
     "EMAIL_FROM": "Dataslope <no-reply@dataslope.com>",
-    // AI autocomplete model selection (non-secret). No hardcoded fallback
-    // (lib/ai/models.ts), so model ids change here without a code change.
-    // Autocomplete is Pro-only and uses the pro-tier config, falling back to
-    // the free tier's when the pro tier is incomplete. Keys are secrets:
-    // AI_FREE_API_KEY alone covers both via that fallback (add AI_PRO_API_KEY
-    // for a separate pro key). Autocomplete stays inert (503) until a tier has
-    // key + base URL + model set.
-    "AI_FREE_BASE_URL": "https://openrouter.ai/api/v1",
-    "AI_FREE_MODEL": "deepseek/deepseek-v4-flash",
-    "AI_PRO_BASE_URL": "https://openrouter.ai/api/v1",
-    "AI_PRO_MODEL": "deepseek/deepseek-v4-flash",
     // Polar billing for Pro (non-secret half; lib/billing/polar.ts + README).
     // Inert until POLAR_PRO_PRODUCT_ID and the POLAR_ACCESS_TOKEN secret are
     // set; the webhook also needs the POLAR_WEBHOOK_SECRET secret.

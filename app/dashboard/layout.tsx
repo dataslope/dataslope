@@ -1,5 +1,5 @@
 // Shared chrome for every /create route: the "Studio" dashboard shell
-// (persistent sidebar + top bar + AI assist), replacing the old
+// (persistent sidebar + top bar), replacing the old
 // HomeNav/HomeFooter CreatePageShell. Server component so it can render the
 // pre-hydration theme script (no light/dark flash) and load the CSS the shell
 // needs; the client shell lives in StudioProviders.

@@ -3,7 +3,7 @@
  *
  * One instance per request: the D1 binding only exists at request time, so
  * this is a factory — call `createAuth(env, request)` per request, never a
- * module-level singleton. Auth gates *actions* (save, share, AI autocomplete),
+ * module-level singleton. Auth gates *actions* (save, share),
  * never *content*: lessons stay statically prerendered and are read with no
  * session.
  * Keep auth out of middleware.ts (rough edges on the Workers runtime).
@@ -267,7 +267,7 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
         },
       },
     },
-    // Membership tier, surfaced on the session (see lib/ai/tier.ts). `plan`
+    // Membership tier, surfaced on the session (see lib/plan.ts). `plan`
     // column from migrations/auth/0003; `input: false` so users can't set
     // their own plan — it's changed server-side only.
     user: {

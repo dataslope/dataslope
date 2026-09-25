@@ -54,7 +54,6 @@ import {
 } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { loadLanguage, themeFor, noActiveLine, redoKeymap } from "./cmExtensions";
-import { aiInlineCompletion } from "./ai/inlineCompletion";
 import { languageCompletion } from "./completion/languageCompletion";
 
 import type {
@@ -694,15 +693,6 @@ function CodeBlockInner({
         languageComp.of([]),
         themeComp.of(themeFor(cmThemeNameFor(detectIsDark()))),
         noActiveLine,
-        // AI ghost-text completion (pro members only, the extension gates
-        // itself and stays inert for guests/free members). The active file's
-        // read-only init code travels as extra prompt prefix so suggestions
-        // can use the names it defines.
-        aiInlineCompletion({
-          language: adapter.id,
-          filename: () => activeFilenameRef.current,
-          contextPrefix: () => initForFile(activeFilenameRef.current),
-        }),
         // Debounce-persist the active file's buffer so reloads restore
         // in-progress code; the filename is read through the ref so the
         // mount-once listener stays correct after tab switches.

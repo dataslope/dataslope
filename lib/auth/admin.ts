@@ -2,8 +2,8 @@
  * Admin authorization for custom `/api/admin/*` routes.
  *
  * Better Auth's own `admin.*` endpoints authorize themselves (the plugin in
- * lib/auth/server.ts), but routes we write by hand, e.g. the AI usage
- * report, need the same check. A user is an admin when ANY of these hold,
+ * lib/auth/server.ts), but routes we write by hand, e.g. the illustration
+ * prompts API, need the same check. A user is an admin when ANY of these hold,
  * mirroring `resolveAdminUserIds` in lib/auth/server.ts:
  *   - their `role` column is 'admin' (set by an existing admin);
  *   - their email is in the ADMIN_EMAILS allowlist;

@@ -1,5 +1,5 @@
 // /admin/test-users, create disposable, pre-verified accounts on either
-// plan for exercising member-gated features (AI autocomplete, storage quotas).
+// plan for exercising member-gated features (storage quotas, retention).
 import type { Metadata } from "next";
 import { AdminNarrow } from "../_components/shared";
 import { TestUsersClient } from "./TestUsersClient";

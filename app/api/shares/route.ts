@@ -7,7 +7,7 @@
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createAuth } from "@/lib/auth/server";
-import { resolveTier } from "@/lib/ai/tier";
+import { resolveTier } from "@/lib/plan";
 import {
   isSameOrigin,
   json,
@@ -32,7 +32,7 @@ import {
   sweepExpiredGuestShares,
   type ShareRow,
 } from "@/lib/workspaces/store";
-import { utcDay } from "@/lib/ai/limits";
+import { utcDay } from "@/lib/workspaces/policy";
 import {
   BUNDLE_CONTENT_TYPE,
   type CreateShareResponse,

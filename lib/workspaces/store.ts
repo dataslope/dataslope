@@ -7,7 +7,7 @@
  */
 
 import type { R2Bucket } from "@cloudflare/workers-types";
-import type { MemberTier } from "@/lib/ai/types";
+import type { MemberTier } from "@/lib/plan";
 import { isExpired } from "./policy";
 
 // ---------------------------------------------------------------------------

@@ -389,7 +389,7 @@ export function TestUsersClient() {
     <>
       <AdminPageHeader
         title="Test users"
-        description="Disposable, pre-verified accounts for testing member-gated features like AI autocomplete."
+        description="Disposable, pre-verified accounts for testing member-gated features like the Pro storage quota."
       />
       <div className="flex flex-col gap-5 sm:gap-6">
         <Panel>
@@ -678,8 +678,8 @@ export function TestUsersClient() {
             <p className="text-xs leading-relaxed text-muted-foreground">
               Test users are ordinary accounts identified by the reserved
               @{TEST_EMAIL_DOMAIN} domain, safe to remove at any time. Plan
-              changes reach the AI endpoints immediately, they read the
-              session fresh, but the account&apos;s header/plan display can
+              changes reach the storage endpoints immediately, since they read
+              the session fresh, but the account&apos;s header/plan display can
               lag up to five minutes (the session cookie cache).
             </p>
           </PanelBody>

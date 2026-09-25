@@ -62,22 +62,6 @@ export default function PrivacyPage() {
         challenge is not uploaded: it stays in your browser.
       </p>
 
-      <h2>AI autocomplete</h2>
-      <p>
-        Where it is available on your account, AI autocomplete suggests code as
-        you type in an editor. To make a suggestion, the code around your cursor
-        in the file you&apos;re editing (including any read-only setup code
-        shown above it), the file&apos;s name, and its language are sent through
-        our servers to a third-party AI provider. Please don&apos;t put
-        sensitive personal information in your code.
-      </p>
-      <p>
-        <strong>We don&apos;t keep your code or the suggestions.</strong>{" "}
-        What we do record is a daily count of how many suggestions your account
-        requested and how large they were, which is how the daily limits and our
-        own costs are managed; those counters hold no part of your code.
-      </p>
-
       <h2>Data stored on your device</h2>
       <p>
         To make the product usable, your browser&apos;s <strong>local
@@ -95,8 +79,7 @@ export default function PrivacyPage() {
         Every language and database runs locally in your browser through
         WebAssembly. The code you write, the queries you run, and any files you
         load are processed on your machine, and are only sent to us if you save
-        them to the cloud or share them. If you have AI autocomplete, the code
-        around your cursor is also sent, as described above.
+        them to the cloud or share them.
       </p>
 
       <h2>Third-party services</h2>
@@ -119,11 +102,6 @@ export default function PrivacyPage() {
         <li>
           <strong>An email provider</strong> delivers the transactional account
           emails described above.
-        </li>
-        <li>
-          <strong>An AI provider</strong>{" "}generates AI autocomplete
-          suggestions from the code described above, for accounts that have
-          the feature.
         </li>
         <li>
           <strong>Our hosting provider</strong> runs the site and may keep

@@ -117,9 +117,9 @@ export default function PricingPage() {
                   (see SHOW_PRO_PLAN in PricingSection). These footnotes have
                   been trimmed to describe only the Guest and Free Member plans,
                   everything is free today. When Pro is restored, re-add the
-                  Pro-specific notes (AI autocomplete, monthly/annual billing,
-                  cancelling a plan) and the 10 GB / "Upgrade to Pro" clauses
-                  removed below. */}
+                  Pro-specific notes (monthly/annual billing, cancelling a
+                  plan) and the 10 GB / "Upgrade to Pro" clauses removed
+                  below. */}
               <ol className="mt-8 space-y-6">
                 <Footnote n={1} lead="Free to learn, always.">
                   Courses, interview prep, and the playgrounds, including
