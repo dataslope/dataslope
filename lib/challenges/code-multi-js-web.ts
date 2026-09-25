@@ -42,7 +42,7 @@ const URL_ROUTER = codeSteps(
     description:
       "Build the matcher at the heart of every web framework: split a path, match it against a pattern, then pull out the named parameters.",
     solutionNote: [
-      "Comparing segment lists rather than doing string surgery is what makes the trailing slash, the double slash and the empty path stop being special cases — ",
+      "Comparing segment lists rather than doing string surgery is what makes the trailing slash, the double slash and the empty path stop being special cases: ",
       { code: "filter(Boolean)" },
       " drops the empty strings that splitting produces at the ends, so ",
       { code: '"/users/42"' },
@@ -71,7 +71,7 @@ const URL_ROUTER = codeSteps(
         [
           "A trailing slash, a leading slash and a doubled slash all produce empty pieces when you split on ",
           { code: '"/"' },
-          " — drop them, so the root path ",
+          "; drop them, so the root path ",
           { code: '"/"' },
           " has no segments at all.",
         ],
@@ -124,7 +124,7 @@ if (JSON.stringify(got) !== '["users","42"]') throw new Error("got " + JSON.stri
         { code: '"/users/42/posts"' },
         " against ",
         { code: '"/users/:id"' },
-        " — without it, a pattern matches any path that merely starts the same way, which is how a router quietly sends one route's traffic to another.",
+        "; without it, a pattern matches any path that merely starts the same way, which is how a router quietly sends one route's traffic to another.",
       ],
       signature: "function matchRoute(pattern: string, path: string): boolean",
       prompt: [
@@ -201,9 +201,9 @@ if (matchRoute("/", "/users") !== false) throw new Error("root should not match 
         "function extractParams(pattern: string, path: string): object | null",
       prompt: [
         [
-          "When a path matches, return an object mapping each wildcard's name — the part after the ",
+          "When a path matches, return an object mapping each wildcard's name (the part after the ",
           { code: ":" },
-          " — to the segment it matched. When it does not match, return ",
+          ") to the segment it matched. When it does not match, return ",
           { code: "null" },
           ".",
         ],
@@ -331,7 +331,7 @@ const QUERY_STRING = codeSteps(
       { code: "first" },
       " ",
       { code: "=" },
-      " rather than all of them is what keeps an encoded value intact — and the reason it matters is that percent-decoding has to happen ",
+      " rather than all of them is what keeps an encoded value intact, and the reason it matters is that percent-decoding has to happen ",
       { code: "after" },
       " the split, never before. Decode first and an encoded ",
       { code: "%3D" },
@@ -434,7 +434,7 @@ if (JSON.stringify(parseQuery("a=1&&b=2")) !== '[["a","1"],["b","2"]]') {
         { code: "after" },
         " the split, never before. Decode first and an encoded ",
         { code: "%3D" },
-        " becomes a separator that was never there — the parser invents a field, and the value it was part of goes missing.",
+        " becomes a separator that was never there: the parser invents a field, and the value it was part of goes missing.",
       ],
       signature: "function parseQuery(query: string): [string, string][]",
       prompt: [
@@ -448,7 +448,7 @@ if (JSON.stringify(parseQuery("a=1&&b=2")) !== '[["a","1"],["b","2"]]') {
         [
           "Decode ",
           { code: "after" },
-          " splitting, never before — an encoded ",
+          " splitting, never before: an encoded ",
           { code: "%3D" },
           " is a literal equals sign inside a value, and decoding it first would split the pair in the wrong place.",
         ],
@@ -511,7 +511,7 @@ if (JSON.stringify(parseQuery("flag")) !== '[["flag",""]]') throw new Error("bar
           ".",
         ],
         [
-          "Encoding both sides is what makes the round trip safe — a value containing an ",
+          "Encoding both sides is what makes the round trip safe: a value containing an ",
           { code: "&" },
           " must not become a separator when it is read back.",
         ],
@@ -603,7 +603,7 @@ const RATE_LIMITER = codeSteps(
     description:
       "Build a sliding-window rate limiter: count recent requests, decide which to accept, then keep a separate budget per caller.",
     solutionNote: [
-      "The subtle rule is that a rejected request must not count against the window. Recording every arrival makes a caller who keeps hammering a blocked endpoint stay blocked forever, because their own rejections hold the window full — which is the difference between a limiter and a lockout.",
+      "The subtle rule is that a rejected request must not count against the window. Recording every arrival makes a caller who keeps hammering a blocked endpoint stay blocked forever, because their own rejections hold the window full, which is the difference between a limiter and a lockout.",
     ],
   },
   [
@@ -679,7 +679,7 @@ if (withinWindow([1], 10, 10) !== 1) throw new Error("1 at now=10 window=10 shou
       title: "Decide what to accept",
       short: "Accept",
       solutionNote: [
-        "A rejected request must not count against the window. Recording every arrival makes a caller who keeps retrying stay blocked forever, because their own rejections hold the window full — which is a lockout, not a limiter.",
+        "A rejected request must not count against the window. Recording every arrival makes a caller who keeps retrying stay blocked forever, because their own rejections hold the window full, which is a lockout, not a limiter.",
       ],
       signature:
         "function allowAll(timestamps: number[], limit: number, windowSeconds: number): boolean[]",
@@ -692,7 +692,7 @@ if (withinWindow([1], 10, 10) !== 1) throw new Error("1 at now=10 window=10 shou
           { code: "limit" },
           " ",
           { code: "accepted" },
-          " requests fall in its window. Rejected requests do not count — otherwise a caller who keeps retrying can never get back in.",
+          " requests fall in its window. Rejected requests do not count; otherwise a caller who keeps retrying can never get back in.",
         ],
       ],
       starter: `${WITHIN_WINDOW}
@@ -757,7 +757,7 @@ if (JSON.stringify(got) !== "[false,false]") throw new Error("got " + JSON.strin
         [
           "Real limiters are per API key. Events now arrive as ",
           { code: "[key, timestamp]" },
-          " pairs, still in ascending time order — return a boolean for each.",
+          " pairs, still in ascending time order; return a boolean for each.",
         ],
         [
           "Each key gets its own window and its own budget, so one noisy caller cannot use up everyone else's. Keep the rule from step 2: only accepted requests count.",

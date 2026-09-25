@@ -24,7 +24,7 @@ const CHUNK_LIST = codeChallenge(
     prompt: [
       "Split a list into consecutive pieces of a given size. The last piece is whatever is left over, so it may be shorter.",
       [
-        "A size below 1 has no sensible answer — return an empty list rather than looping forever.",
+        "A size below 1 has no sensible answer: return an empty list rather than looping forever.",
       ],
     ],
     examples: [
@@ -314,7 +314,7 @@ const PAIRS_TO_GROUPS = codeChallenge(
     title: "Pairs to Groups",
     difficulty: "Beginner",
     topic: "Grouping",
-    description: "Collect key–value pairs into one entry per key.",
+    description: "Collect key-value pairs into one entry per key.",
     prompt: [
       [
         "Given a list of ",
@@ -348,7 +348,7 @@ const PAIRS_TO_GROUPS = codeChallenge(
       ["Within a key, preserve the input order"],
     ],
     solutionNote: [
-      "One pass to build the groups, one sort at the end over the keys only — never a sort of the pairs themselves, which would be more work and would destroy the arrival order you were asked to preserve.",
+      "One pass to build the groups, one sort at the end over the keys only, never a sort of the pairs themselves, which would be more work and would destroy the arrival order you were asked to preserve.",
     ],
   },
   {
@@ -472,7 +472,7 @@ const HISTOGRAM_BUCKETS = codeChallenge(
         { code: "[bucket_start, count]" },
         ".",
       ],
-      "A bucket with nothing in it still appears — a histogram that silently drops its empty bars is a lie about the distribution.",
+      "A bucket with nothing in it still appears: a histogram that silently drops its empty bars is a lie about the distribution.",
     ],
     examples: [
       {
@@ -773,7 +773,7 @@ const NORMALIZE_WHITESPACE = codeChallenge(
     description:
       "Collapse every run of whitespace to one space and trim the ends.",
     prompt: [
-      "Collapse runs of whitespace — spaces, tabs, newlines — into a single space, and remove any at the start or end.",
+      "Collapse runs of whitespace (spaces, tabs, newlines) into a single space, and remove any at the start or end.",
       "A string of nothing but whitespace normalizes to an empty string.",
     ],
     examples: [
@@ -1059,7 +1059,7 @@ const IS_PALINDROME = codeChallenge(
       ["Comparison ignores case"],
     ],
     solutionNote: [
-      "Filtering to the characters that matter first, then comparing the result to its reverse, is the version you can read. The two-pointer walk that skips junk in place saves the copy and is worth writing once you have this working — but it is three chances to get an index wrong, and this is not where you want them.",
+      "Filtering to the characters that matter first, then comparing the result to its reverse, is the version you can read. The two-pointer walk that skips junk in place saves the copy and is worth writing once you have this working. But it is three chances to get an index wrong, and this is not where you want them.",
     ],
   },
   {
@@ -1191,9 +1191,9 @@ const DIGITAL_ROOT = codeChallenge(
     solutionNote: [
       "A ",
       { code: "while" },
-      " loop over the digits is the honest answer and the one to write. There is also a closed form — the digital root of a positive number is ",
+      " loop over the digits is the honest answer and the one to write. There is also a closed form: the digital root of a positive number is ",
       { code: "1 + (n - 1) % 9" },
-      " — which is worth knowing precisely because it is the kind of clever that needs a comment next to it.",
+      ", which is worth knowing precisely because it is the kind of clever that needs a comment next to it.",
     ],
   },
   {

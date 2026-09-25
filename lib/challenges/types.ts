@@ -50,7 +50,18 @@ export interface TableColumn {
 export interface WorkedExample {
   label: string;
   /** Rendered as a two-column `name → value` grid in the mono face. */
-  fields: { name: string; value: string; emphasis?: boolean }[];
+  fields: {
+    name: string;
+    value: string;
+    emphasis?: boolean;
+    /**
+     * The value as the named language would write it, where that differs
+     * from `value`: `null` rather than `None`, `true` rather than `True`.
+     * The example follows the language picker the way the signature does;
+     * a language with no entry here shows `value`.
+     */
+    byLanguage?: Partial<Record<CodeLanguage, string>>;
+  }[];
   note?: string;
 }
 

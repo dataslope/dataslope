@@ -79,6 +79,32 @@ function handleOf(page: Page, slug: string) {
   };
 }
 
+/**
+ * Put code in the editor and wait until the workspace will grade it.
+ *
+ * `submit` grades the buffer as of the last render, so submitting in the same
+ * tick as a `setCode` or `loadSolution` grades whatever was there before. On a
+ * challenge's first task that is the starter, which made the sweep report
+ * reference solutions failing their own checks, and made a wrong answer
+ * "fail" by grading the starter instead. `"solution"` loads the task's
+ * reference.
+ */
+async function fillEditor(page: Page, slug: string, code: string | "solution") {
+  const expected = await page.evaluate(
+    ([s, c]) => {
+      const handle = window.__dsChallengeWorkspace?.[s];
+      if (c === "solution") return handle?.loadSolution() ?? "";
+      handle?.setCode(c);
+      return c;
+    },
+    [slug, code] as const,
+  );
+  await page.waitForFunction(
+    ([s, c]) => window.__dsChallengeWorkspace?.[s]?.getCode() === c,
+    [slug, expected] as const,
+  );
+}
+
 /** Load a task's reference solution, submit it, and report what the UI says. */
 async function submitSolution(
   page: Page,
@@ -95,7 +121,7 @@ async function submitSolution(
   // selectTask re-seeds the editor from the new task, so the solution has to
   // be loaded after React has committed that swap.
   await page.waitForTimeout(50);
-  await page.evaluate((s) => window.__dsChallengeWorkspace?.[s]?.loadSolution(), slug);
+  await fillEditor(page, slug, "solution");
   await page.evaluate((s) => window.__dsChallengeWorkspace?.[s]?.submit(), slug);
   await page.waitForFunction(
     (s) => window.__dsChallengeWorkspace?.[s]?.isBusy() === false,
@@ -129,18 +155,19 @@ async function submitSolution(
 }
 
 test.describe("Challenge workspace", () => {
-  test("the catalog lists the pilot and links every row to a workspace", async ({
+  test("the catalog lists every challenge and links every row to a workspace", async ({
     page,
   }) => {
     const slugs = await catalogSlugs(page);
-    expect(slugs.length).toBe(100);
+    expect(slugs.length).toBe(300);
     expect(new Set(slugs).size).toBe(slugs.length);
   });
 
   test("every reference solution passes in the browser", async ({ page }) => {
     // Each challenge is a fresh page load, so every one boots its runtime from
-    // cold. A hundred of those does not fit the file's default timeout.
-    test.setTimeout(45 * 60_000);
+    // cold. Three hundred of those does not fit the file's default timeout;
+    // the hundred-challenge pilot needed 45 minutes, so this scales that.
+    test.setTimeout(135 * 60_000);
     const slugs = await catalogSlugs(page);
     const failures: string[] = [];
     let swept = 0;
@@ -190,11 +217,8 @@ test.describe("Challenge workspace", () => {
       handle?.selectTask("javascript");
     });
     await page.waitForTimeout(50);
-    await page.evaluate(() => {
-      const handle = window.__dsChallengeWorkspace?.["two-sum"];
-      handle?.setCode("function twoSum(nums, target) {\n  return [];\n}\n");
-      return handle?.submit();
-    });
+    await fillEditor(page, "two-sum", "function twoSum(nums, target) {\n  return [];\n}\n");
+    await page.evaluate(() => window.__dsChallengeWorkspace?.["two-sum"]?.submit());
     await page.waitForFunction(
       () => window.__dsChallengeWorkspace?.["two-sum"]?.isBusy() === false,
       null,
@@ -280,7 +304,7 @@ test.describe("Challenge workspace", () => {
       handle?.selectTask("javascript");
     });
     await page.waitForTimeout(50);
-    await page.evaluate((s) => window.__dsChallengeWorkspace?.[s]?.loadSolution(), "two-sum");
+    await fillEditor(page, "two-sum", "solution");
     await page.evaluate((s) => window.__dsChallengeWorkspace?.[s]?.submit(), "two-sum");
     await page.waitForFunction(
       () => window.__dsChallengeWorkspace?.["two-sum"]?.isBusy() === false,
@@ -296,6 +320,29 @@ test.describe("Challenge workspace", () => {
     // Focus lands on the results banner rather than dropping to <body>.
     const focused = await page.evaluate(() => document.activeElement?.tagName ?? "");
     expect(focused).not.toBe("BODY");
+  });
+
+  test("lists 50 a page, and changing the size keeps your place", async ({ page }) => {
+    await page.goto("/dashboard/challenges?page=3");
+    await page.waitForLoadState("networkidle");
+    const perPage = page.getByLabel("Challenges per page");
+    await expect(perPage).toHaveValue("50");
+    await expect(page.locator("table tbody tr")).toHaveCount(50);
+    await expect(page.getByText("101–150 of 300")).toBeVisible();
+
+    // Row 101 was at the top; at 10 a page it lives on page 11.
+    await perPage.selectOption("10");
+    await expect(page).toHaveURL(/page=11/);
+    await expect(page).toHaveURL(/per=10/);
+    await expect(page.locator("table tbody tr")).toHaveCount(10);
+    await expect(page.getByText("101–110 of 300")).toBeVisible();
+
+    await page.reload();
+    await expect(page.getByLabel("Challenges per page")).toHaveValue("10");
+
+    // The default is left out of the URL, like an empty filter.
+    await page.getByLabel("Challenges per page").selectOption("50");
+    await expect(page).not.toHaveURL(/per=/);
   });
 
   test("filters live in the URL and survive a reload", async ({ page }) => {

@@ -13,6 +13,7 @@
  * and anything a builder does not cover can be spread over the top.
  */
 
+import { examplesFromCases, jsCases, pyCases, type CallCase } from "./cases";
 import type { ChallengeDataset } from "./datasets";
 import type {
   Challenge,
@@ -32,11 +33,36 @@ const SQL_KEYS = [
   "(", ")", ",", "*", "'",
 ];
 
+/**
+ * Split backtick runs out of authored text into code spans, so
+ * "Sort by `name`." renders `name` in the code face rather than showing the
+ * backticks. Text without backticks passes through untouched, and an odd
+ * backtick with no partner stays literal.
+ */
+export function ticks(text: string): Span[] {
+  const out: Span[] = [];
+  const re = /`([^`]+)`/g;
+  let last = 0;
+  for (let m = re.exec(text); m; m = re.exec(text)) {
+    if (m.index > last) out.push(text.slice(last, m.index));
+    out.push({ code: m[1] });
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) out.push(text.slice(last));
+  return out;
+}
+
+/** Apply `ticks` to every string in a paragraph that may already hold spans. */
+function spans(p: Span[] | string): Span[] {
+  const parts = typeof p === "string" ? [p] : p;
+  return parts.flatMap((part) => (typeof part === "string" ? ticks(part) : [part]));
+}
+
 /** Turn one or more paragraphs into prose blocks. */
 function prose(paragraphs: (Span[] | string)[]): InstructionBlock[] {
   return paragraphs.map((p) => ({
     kind: "prose" as const,
-    spans: typeof p === "string" ? [p] : p,
+    spans: spans(p),
   }));
 }
 
@@ -57,7 +83,7 @@ function constraintsBlock(items?: (Span[] | string)[]): InstructionBlock[] {
     { kind: "label", text: "Constraints" },
     {
       kind: "list",
-      items: items.map((i) => (typeof i === "string" ? [i] : i)),
+      items: items.map(spans),
     },
   ];
 }
@@ -144,7 +170,7 @@ interface SqlCommon {
   dataset: ChallengeDataset;
   /** One-line catalog description. */
   description: string;
-  solutionNote?: Span[];
+  solutionNote?: Span[] | string;
 }
 
 function sqlBase(common: SqlCommon): Omit<Challenge, "steps" | "instructions" | "languages"> {
@@ -157,7 +183,7 @@ function sqlBase(common: SqlCommon): Omit<Challenge, "steps" | "instructions" | 
     description: common.description,
     runtime: { kind: "sql", dialect: "sqlite", initSql: common.dataset.initSql },
     schema: common.dataset.schema,
-    solutionNote: common.solutionNote ?? [],
+    solutionNote: spans(common.solutionNote ?? []),
     submissionColumns: ["result", "lang", "runtime", "when"],
     keyStrip: SQL_KEYS,
     submitLabel: "Submit",
@@ -192,7 +218,7 @@ interface SqlStepSpec extends SqlTaskSpec {
   /** Abbreviated title for the phone's stepper. */
   short: string;
   /** What this step's solution teaches; falls back to the challenge's note. */
-  solutionNote?: Span[];
+  solutionNote?: Span[] | string;
 }
 
 /** A SQL challenge broken into gated steps. */
@@ -223,7 +249,7 @@ export function sqlSteps(common: SqlCommon, steps: SqlStepSpec[]): Challenge {
       ],
       starterCode: step.starter,
       solutionCode: step.solution,
-      solutionNote: step.solutionNote,
+      solutionNote: step.solutionNote === undefined ? undefined : spans(step.solutionNote),
       tests: step.tests,
     })),
   };
@@ -247,7 +273,7 @@ interface CodeMeta {
   difficulty: Difficulty;
   topic: string;
   description: string;
-  solutionNote?: Span[];
+  solutionNote?: Span[] | string;
 }
 
 /**
@@ -281,7 +307,7 @@ function codeBase(
     description: common.description,
     runtime: { kind: "code" },
     schema: [],
-    solutionNote: common.solutionNote ?? [],
+    solutionNote: spans(common.solutionNote ?? []),
     submissionColumns: ["result", "lang", "runtime", "when"],
     keyStrip: [],
     submitLabel: "Submit",
@@ -332,7 +358,7 @@ interface CodeStepSpec {
   /** The function this step adds, shown in a fenced block under the prompt. */
   signature?: string;
   /** What this step's solution teaches; falls back to the challenge's note. */
-  solutionNote?: Span[];
+  solutionNote?: Span[] | string;
   starter: string;
   solution: string;
   tests: CodeTest[];
@@ -385,8 +411,71 @@ export function codeSteps(
       ],
       starterCode: step.starter,
       solutionCode: step.solution,
-      solutionNote: step.solutionNote,
+      solutionNote: step.solutionNote === undefined ? undefined : spans(step.solutionNote),
       tests: step.tests,
     })),
   };
+}
+
+// ─── Code, table-driven ──────────────────────────────────────────────
+
+/** One language's half of a `dualChallenge`: everything but the checks. */
+export interface DualVariant {
+  /** The function the checks call, e.g. `two_sum` / `twoSum`. */
+  fn: string;
+  signature: string;
+  starter: string;
+  solution: string;
+  /** Hand-written checks to run after the shared cases. */
+  extra?: CodeTest[];
+}
+
+interface DualSpec extends CodeCommon {
+  /**
+   * Parameter names, in order, used to label the worked examples derived
+   * from cases marked `example`. Needed only when some case is.
+   */
+  params?: string[];
+  python: DualVariant;
+  javascript: DualVariant;
+  /** Checks shared by both languages, rendered into each. */
+  cases: CallCase[];
+}
+
+/**
+ * A single-step code challenge in Python and JavaScript, graded on one shared
+ * set of cases.
+ *
+ * `codeChallenge` takes a separate list of checks per language, which is
+ * right when the two genuinely test different things and a liability when
+ * they should not: nothing stops the Python side from gaining an edge case the
+ * JavaScript side never checks. Here the cases are written once, as values,
+ * and `./cases` renders them into both, so the two variants cannot drift.
+ * Worked examples come from the same cases when the spec does not author its
+ * own, so the first thing a learner reads is what the first checks run.
+ */
+export function dualChallenge(spec: DualSpec): Challenge {
+  const { python, javascript, cases, params, ...common } = spec;
+  const examples =
+    common.examples ??
+    (cases.some((c) => c.example !== undefined)
+      ? examplesFromCases(params ?? [], cases)
+      : undefined);
+  return codeChallenge(
+    { ...common, examples },
+    {
+      python: {
+        signature: python.signature,
+        starter: python.starter,
+        solution: python.solution,
+        tests: [...pyCases(python.fn, cases), ...(python.extra ?? [])],
+      },
+      javascript: {
+        signature: javascript.signature,
+        starter: javascript.starter,
+        solution: javascript.solution,
+        tests: [...jsCases(javascript.fn, cases), ...(javascript.extra ?? [])],
+      },
+    },
+  );
 }

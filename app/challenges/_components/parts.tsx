@@ -29,7 +29,7 @@ import {
   type SubmissionColumn,
   type TableColumn,
   type TestOutcome,
-} from "@/lib/challenges";
+} from "@/lib/challenges/types";
 import { highlight, type TokenKind } from "./highlight";
 import s from "./ChallengeWorkspace.module.css";
 
@@ -123,15 +123,23 @@ export function DifficultyMeter({
 export function InstructionBlocks({
   blocks,
   signature,
+  language,
 }: {
   blocks: InstructionBlock[];
   /** Active language's signature, for the `signature` block. */
   signature?: string;
+  /** Active language, so worked examples can spell values its way. */
+  language?: CodeLanguage;
 }) {
   return (
     <>
       {blocks.map((block, i) => (
-        <InstructionBlockView key={i} block={block} signature={signature} />
+        <InstructionBlockView
+          key={i}
+          block={block}
+          signature={signature}
+          language={language}
+        />
       ))}
     </>
   );
@@ -140,9 +148,11 @@ export function InstructionBlocks({
 function InstructionBlockView({
   block,
   signature,
+  language,
 }: {
   block: InstructionBlock;
   signature?: string;
+  language?: CodeLanguage;
 }) {
   switch (block.kind) {
     case "heading":
@@ -240,7 +250,7 @@ function InstructionBlockView({
                         .filter(Boolean)
                         .join(" ")}
                     >
-                      {field.value}
+                      {(language && field.byLanguage?.[language]) ?? field.value}
                     </span>
                   </Fragment>
                 ))}

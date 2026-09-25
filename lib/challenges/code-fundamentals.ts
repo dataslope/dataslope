@@ -32,7 +32,7 @@ const TWO_SUM = codeChallenge(
         { code: "[i, j]" },
         " positions of the two values that add up to the target, smaller index first.",
       ],
-      "Exactly one pair works, and you may not use the same position twice. The obvious nested loop is O(n²) — do it in one pass instead.",
+      "Exactly one pair works, and you may not use the same position twice. The obvious nested loop is O(n²); do it in one pass instead.",
     ],
     examples: [
       {
@@ -60,7 +60,7 @@ const TWO_SUM = codeChallenge(
       ["Exactly one valid pair exists"],
     ],
     solutionNote: [
-      "Walk the list once, and before storing each value ask whether the number that would complete the pair has already been seen. The dictionary holds value → index, so the lookup is O(1) and the whole scan is O(n).",
+      "Walk the list once, and before storing each value ask whether the number that would complete the pair has already been seen. The dictionary maps each value to its index, so the lookup is O(1) and the whole scan is O(n).",
     ],
   },
   {
@@ -703,7 +703,7 @@ const MOVING_AVERAGE = codeChallenge(
       [{ code: "k > len(values)" }, " returns an empty list"],
     ],
     solutionNote: [
-      "Re-summing each window is O(n·k); carrying a running total and adjusting it by the two values at the window's edges is O(n). With integer inputs the running total stays exact, so nothing drifts as the window slides.",
+      "Re-summing each window is O(n × k); carrying a running total and adjusting it by the two values at the window's edges is O(n). With integer inputs the running total stays exact, so nothing drifts as the window slides.",
     ],
   },
   {
@@ -875,7 +875,7 @@ const MEDIAN_VALUE = codeChallenge(
       { code: "n // 2 - 1" },
       " and ",
       { code: "n // 2" },
-      " — not the single index the odd case uses.",
+      ", not the single index the odd case uses.",
     ],
   },
   {
@@ -977,7 +977,7 @@ if (got !== -3) throw new Error("got " + got);`,
         {
           id: "no-mutation",
           name: "The caller's array is left alone",
-          description: "Array.prototype.sort sorts in place — copy first.",
+          description: "Array.prototype.sort sorts in place; copy first.",
           code: `const values = [3, 1, 2];
 median(values);
 if (JSON.stringify(values) !== "[3,1,2]") {
@@ -1008,7 +1008,7 @@ const CSV_COLUMN_TOTAL = codeChallenge(
       "Sum one named column of a small CSV, treating blank cells as zero.",
     prompt: [
       [
-        "You are given a CSV as a list of lines — the first line is the header — and the name of a column. Return the sum of that column, rounded to 2 decimal places.",
+        "You are given a CSV as a list of lines (the first line is the header) and the name of a column. Return the sum of that column, rounded to 2 decimal places.",
       ],
       [
         "Blank cells count as zero. When the column is not in the header, or the CSV has no data rows, return ",
@@ -1039,7 +1039,7 @@ const CSV_COLUMN_TOTAL = codeChallenge(
       },
     ],
     constraints: [
-      ["Cells contain no quoted commas — a plain split is enough"],
+      ["Cells contain no quoted commas: a plain split is enough"],
       ["Values may be integers or decimals"],
       ["Round the total to 2 decimal places"],
     ],

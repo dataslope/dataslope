@@ -45,7 +45,7 @@ const ONE_LINE_DISPLAY_MATH = /^\s*\$\$.+\$\$\s*$/;
 /** colour, colours, coloured, colouring, colourful, watercolour, discolour. */
 const BRITISH_COLOUR = /\b[a-z]*colour[a-z]*\b/i;
 
-const AI_FILLER = [
+export const AI_FILLER = [
   [/\bdelve[sd]? into\b/i, "delve into"],
   [/\bin today's (fast-paced|digital|data-driven|modern)\b/i, "in today's ..."],
   [/\ba testament to\b/i, "a testament to"],

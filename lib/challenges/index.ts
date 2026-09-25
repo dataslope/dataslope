@@ -29,23 +29,48 @@
  */
 
 import { CODE_ALGORITHMS } from "./code-algorithms";
+import { CODE_ARRAYS } from "./code-arrays";
 import { CODE_CLASSICS } from "./code-classics";
 import { CODE_FUNDAMENTALS } from "./code-fundamentals";
+import { CODE_MAPS } from "./code-maps";
 import { CODE_MULTI_JS } from "./code-multi-js";
+import { CODE_MULTI_JS_APPS } from "./code-multi-js-apps";
 import { CODE_MULTI_JS_WEB } from "./code-multi-js-web";
 import { CODE_MULTI_PYTHON } from "./code-multi-python";
+import { CODE_MULTI_PYTHON_APPS } from "./code-multi-python-apps";
 import { CODE_MULTI_PYTHON_TOOLS } from "./code-multi-python-tools";
+import { CODE_NUMBERS } from "./code-numbers";
+import { CODE_RECURSION_GRAPHS } from "./code-recursion-graphs";
 import { CODE_SHAPING } from "./code-shaping";
+import { CODE_STACKS_SEARCH } from "./code-stacks-search";
+import { CODE_STRINGS } from "./code-strings";
+import { SQL_FLIGHTS } from "./sql-flights";
+import { SQL_LEAGUE } from "./sql-league";
 import { SQL_LIBRARY } from "./sql-library";
 import { SQL_MULTI } from "./sql-multi";
 import { SQL_MULTI_BILLING } from "./sql-multi-billing";
+import { SQL_MULTI_FLIGHTS } from "./sql-multi-flights";
+import { SQL_MULTI_LEAGUE } from "./sql-multi-league";
 import { SQL_MULTI_LIBRARY } from "./sql-multi-library";
-import { SQL_SUBSCRIPTIONS } from "./sql-subscriptions";
+import { SQL_MULTI_MUSIC } from "./sql-multi-music";
+import { SQL_MULTI_RIDES } from "./sql-multi-rides";
+import { SQL_MULTI_SCHOOL } from "./sql-multi-school";
+import { SQL_MULTI_SUPPORT } from "./sql-multi-support";
+import { SQL_MULTI_WAREHOUSE } from "./sql-multi-warehouse";
+import { SQL_MULTI_WEATHER } from "./sql-multi-weather";
+import { SQL_MUSIC } from "./sql-music";
+import { SQL_RIDES } from "./sql-rides";
+import { SQL_SCHOOL } from "./sql-school";
 import { SQL_SINGLE } from "./sql-single";
+import { SQL_SUBSCRIPTIONS } from "./sql-subscriptions";
+import { SQL_SUPPORT } from "./sql-support";
+import { SQL_WAREHOUSE } from "./sql-warehouse";
+import { SQL_WEATHER } from "./sql-weather";
 import { TOP_K_FREQUENT_WORDS } from "./top-k-frequent-words";
 import { TOP_PRODUCTS_BY_MONTH } from "./top-products-by-month";
 import { DIFFICULTY_BARS, type Challenge, type ChallengeIndexEntry } from "./types";
 
+export * from "./steps";
 export * from "./types";
 
 /** Every challenge with a workspace behind it, in catalog order. */
@@ -66,6 +91,31 @@ const CHALLENGES: Challenge[] = [
   ...CODE_CLASSICS,
   ...CODE_MULTI_PYTHON_TOOLS,
   ...CODE_MULTI_JS_WEB,
+  // The second hundred and the third, mixed so neither kind clumps in the list.
+  ...SQL_FLIGHTS,
+  ...CODE_STRINGS,
+  ...SQL_SCHOOL,
+  ...CODE_ARRAYS,
+  ...SQL_WAREHOUSE,
+  ...CODE_MAPS,
+  ...SQL_MUSIC,
+  ...CODE_NUMBERS,
+  ...SQL_WEATHER,
+  ...CODE_STACKS_SEARCH,
+  ...SQL_SUPPORT,
+  ...CODE_RECURSION_GRAPHS,
+  ...SQL_RIDES,
+  ...SQL_LEAGUE,
+  ...SQL_MULTI_FLIGHTS,
+  ...SQL_MULTI_SCHOOL,
+  ...CODE_MULTI_PYTHON_APPS,
+  ...SQL_MULTI_WAREHOUSE,
+  ...SQL_MULTI_MUSIC,
+  ...CODE_MULTI_JS_APPS,
+  ...SQL_MULTI_WEATHER,
+  ...SQL_MULTI_SUPPORT,
+  ...SQL_MULTI_RIDES,
+  ...SQL_MULTI_LEAGUE,
 ];
 
 export function getChallenge(slug: string): Challenge | undefined {
@@ -90,35 +140,4 @@ export function getChallengeIndex(): ChallengeIndexEntry[] {
     steps: Math.max(1, c.steps.length),
     slug: c.slug,
   }));
-}
-
-/** True when this challenge gates its steps behind the previous one. */
-export function isMultiStep(challenge: Challenge): boolean {
-  return challenge.steps.length > 0;
-}
-
-/**
- * The step to open on: the first one the learner has not passed yet, or the
- * last step once they have passed them all. Progress comes from the browser,
- * so this takes it as an argument rather than reading storage itself — which
- * also keeps it usable from the server and from tests.
- */
-export function openStepIndex(challenge: Challenge, passedSteps: string[]): number {
-  if (challenge.steps.length === 0) return 0;
-  const next = challenge.steps.findIndex((s) => !passedSteps.includes(s.n));
-  return next === -1 ? challenge.steps.length - 1 : next;
-}
-
-/**
- * Whether a step is reachable. Step 1 always is; every later step opens only
- * once the one before it has passed.
- */
-export function isStepUnlocked(
-  challenge: Challenge,
-  index: number,
-  passedSteps: string[],
-): boolean {
-  if (index <= 0) return true;
-  const previous = challenge.steps[index - 1];
-  return previous ? passedSteps.includes(previous.n) : true;
 }

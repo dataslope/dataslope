@@ -44,7 +44,7 @@ const WORD_FREQUENCY_PIPELINE = codeSteps(
     description:
       "Build a word-frequency report in three stages: split text into words, count them, then format the top few.",
     solutionNote: [
-      "Splitting the work at the seams — tokenize, count, format — is what makes each piece testable on its own. It is also what lets you swap the tokenizer for one that keeps hyphens, or the formatter for JSON, without touching the other two.",
+      "Splitting the work at the seams (tokenize, count, format) is what makes each piece testable on its own. It is also what lets you swap the tokenizer for one that keeps hyphens, or the formatter for JSON, without touching the other two.",
     ],
   },
   [
@@ -57,7 +57,7 @@ const WORD_FREQUENCY_PIPELINE = codeSteps(
       signature: "def tokenize(text: str) -> list[str]",
       prompt: [
         [
-          "Turn a block of text into a list of lowercase words. A word is a run of letters: anything else — punctuation, digits, whitespace — separates words and is thrown away.",
+          "Turn a block of text into a list of lowercase words. A word is a run of letters: anything else (punctuation, digits, whitespace) separates words and is thrown away.",
         ],
         [
           "A regular expression does this in one line. ",
@@ -109,7 +109,7 @@ assert tokenize("... !!!") == []`,
       short: "Count",
       solutionNote: [
         { code: "counts.get(word, 0) + 1" },
-        " is the idiom worth internalising — it handles the first sighting of a word without a membership test. ",
+        " is the idiom worth internalising: it handles the first sighting of a word without a membership test. ",
         { code: "collections.Counter" },
         " does the same thing in one call, and is what you would reach for outside an exercise.",
       ],
@@ -123,7 +123,7 @@ assert tokenize("... !!!") == []`,
         [
           "Keep ",
           { code: "tokenize" },
-          " exactly as it is — the new function calls it rather than repeating the regular expression.",
+          " exactly as it is: the new function calls it rather than repeating the regular expression.",
         ],
       ],
       starter: `${TOKENIZE}
@@ -286,7 +286,7 @@ const CSV_REPORT_BUILDER = codeSteps(
       prompt: [
         "The first line is the header. Turn every line after it into a dictionary keyed by the header's column names.",
         [
-          "Strip whitespace from names and values. A CSV with no data rows — or no rows at all — parses to an empty list. Cells contain no quoted commas, so ",
+          "Strip whitespace from names and values. A CSV with no data rows, or no rows at all, parses to an empty list. Cells contain no quoted commas, so ",
           { code: 'line.split(",")' },
           " is enough.",
         ],
@@ -500,7 +500,7 @@ const RPN_CALCULATOR = codeSteps(
     description:
       "Evaluate postfix arithmetic with a stack: tokenize the expression, run the operators, then reject malformed input.",
     solutionNote: [
-      "Postfix needs no precedence rules and no parentheses, which is why a stack is all it takes: operands pile up, and an operator consumes the top two. The ordering trap is subtraction and division — the first value popped is the ",
+      "Postfix needs no precedence rules and no parentheses, which is why a stack is all it takes: operands pile up, and an operator consumes the top two. The ordering trap is subtraction and division: the first value popped is the ",
       { code: "right" },
       " operand, so popping into ",
       { code: "left" },
@@ -528,7 +528,7 @@ const RPN_CALCULATOR = codeSteps(
           { code: "+ - * /" },
           ". A negative number like ",
           { code: '"-2"' },
-          " is a number, not an operator — check for an exact match against the operator list rather than a leading character.",
+          " is a number, not an operator; check for an exact match against the operator list rather than a leading character.",
         ],
       ],
       starter: `OPERATORS = ("+", "-", "*", "/")
@@ -643,7 +643,7 @@ def evaluate(expression: str):
         { code: "IndexError" },
         " from an empty stack or a ",
         { code: "ZeroDivisionError" },
-        " from the divide are implementation details leaking out — the caller cannot reasonably be asked to catch them.",
+        " from the divide are implementation details leaking out: the caller cannot reasonably be asked to catch them.",
       ],
       signature: "def evaluate(expression: str)",
       prompt: [
@@ -657,7 +657,7 @@ def evaluate(expression: str):
           { code: "ZeroDivisionError" },
           " or ",
           { code: "IndexError" },
-          " escaping the function counts as a failure — every bad expression must come back as a ",
+          " escaping the function counts as a failure: every bad expression must come back as a ",
           { code: "ValueError" },
           ".",
         ],
@@ -774,7 +774,7 @@ const BINARY_SEARCH_TREE = codeSteps(
     description:
       "Build a search tree from nothing: insert values in order, look them up, then walk the tree to read them back sorted.",
     solutionNote: [
-      "Every function here is the same three-line shape — handle the empty node, compare, recurse left or right — because that invariant (everything left is smaller, everything right is larger) is the only thing a BST guarantees. Notice what falls out of it: an in-order walk returns the values sorted without ever calling ",
+      "Every function here is the same three-line shape (handle the empty node, compare, recurse left or right) because that invariant (everything left is smaller, everything right is larger) is the only thing a BST guarantees. Notice what falls out of it: an in-order walk returns the values sorted without ever calling ",
       { code: "sorted" },
       ".",
     ],
@@ -800,7 +800,7 @@ const BINARY_SEARCH_TREE = codeSteps(
         [
           "Smaller values go left, larger go right, and a value already in the tree changes nothing. Inserting into ",
           { code: "None" },
-          " creates a new node — which is what makes the recursion terminate.",
+          " creates a new node, which is what makes the recursion terminate.",
         ],
       ],
       starter: `def insert(node: dict | None, value: int) -> dict:
@@ -903,7 +903,7 @@ assert contains(root, 100) is False`,
       title: "Read the tree back sorted",
       short: "Traverse",
       solutionNote: [
-        "Left, then the node, then right. Because everything on the left is smaller and everything on the right is larger, that walk produces the values in ascending order — sorted output with no call to ",
+        "Left, then the node, then right. Because everything on the left is smaller and everything on the right is larger, that walk produces the values in ascending order: sorted output with no call to ",
         { code: "sorted" },
         " anywhere, which is the invariant paying for itself.",
       ],
@@ -915,7 +915,7 @@ assert contains(root, 100) is False`,
           ", which returns every value in the tree as a list.",
         ],
         [
-          "Visit the left subtree, then the node, then the right subtree. Because of the ordering invariant, that walk produces the values in ascending order — no call to ",
+          "Visit the left subtree, then the node, then the right subtree. Because of the ordering invariant, that walk produces the values in ascending order: no call to ",
           { code: "sorted" },
           " anywhere.",
         ],
@@ -1018,7 +1018,7 @@ const LRU_CACHE = codeSteps(
     solutionNote: [
       "A Python dictionary preserves insertion order, which is most of an LRU for free: the oldest key is the first one ",
       { code: "iter" },
-      " yields. The work is keeping that order honest — deleting and re-inserting a key on every use is what moves it to the back, and doing it on reads as well as writes is the difference between least-recently-*inserted* and least-recently-*used*.",
+      " yields. The work is keeping that order honest: deleting and re-inserting a key on every use is what moves it to the back, and doing it on reads as well as writes is the difference between least-recently-*inserted* and least-recently-*used*.",
     ],
   },
   [
@@ -1044,7 +1044,7 @@ const LRU_CACHE = codeSteps(
           { code: "-1" },
           ".",
         ],
-        "Ignore the capacity for now — step 2 puts it to work. Storing a key twice replaces the value.",
+        "Ignore the capacity for now; step 2 puts it to work. Storing a key twice replaces the value.",
       ],
       starter: `class LRUCache:
     def __init__(self, capacity: int):
@@ -1094,7 +1094,7 @@ assert [cache.get(k) for k in "abc"] == [1, 2, 3]`,
       title: "Evict the oldest",
       short: "Evict",
       solutionNote: [
-        "A Python dictionary preserves insertion order, which is most of an LRU for free — the oldest key is the first one ",
+        "A Python dictionary preserves insertion order, which is most of an LRU for free: the oldest key is the first one ",
         { code: "iter" },
         " yields. Deleting before re-inserting an existing key is what moves it to the back; assigning to it in place leaves the order untouched.",
       ],
@@ -1160,7 +1160,7 @@ assert cache.get("b") == 2`,
       title: "A read counts as use",
       short: "Refresh",
       solutionNote: [
-        "This one line is the whole difference between a FIFO cache and an LRU one. Refreshing on reads as well as writes is what lets a hot key survive indefinitely, no matter how long ago it was first stored — which is the behaviour anyone asking for an LRU actually wants.",
+        "This one line is the whole difference between a FIFO cache and an LRU one. Refreshing on reads as well as writes is what lets a hot key survive indefinitely, no matter how long ago it was first stored, which is the behaviour anyone asking for an LRU actually wants.",
       ],
       signature: "def get(self, key)",
       prompt: [
@@ -1281,7 +1281,7 @@ const LOG_LEVEL_SUMMARY = codeSteps(
     solutionNote: [
       "Returning ",
       { code: "None" },
-      " for a line that does not parse, rather than raising, is what lets the caller skip junk and keep going — a log file always has a truncated last line or a stack trace in the middle. Splitting with ",
+      " for a line that does not parse, rather than raising, is what lets the caller skip junk and keep going: a log file always has a truncated last line or a stack trace in the middle. Splitting with ",
       { code: 'split(" ", 3)' },
       " caps the split at four pieces so the message keeps its own spaces.",
     ],
@@ -1293,7 +1293,7 @@ const LOG_LEVEL_SUMMARY = codeSteps(
       solutionNote: [
         "Returning ",
         { code: "None" },
-        " for a line that does not fit, rather than raising, is what lets the caller skip junk and keep going — a real log file always has a truncated last line or a stack trace in the middle. Capping the split at four pieces is what keeps the message's own spaces.",
+        " for a line that does not fit, rather than raising, is what lets the caller skip junk and keep going: a real log file always has a truncated last line or a stack trace in the middle. Capping the split at four pieces is what keeps the message's own spaces.",
       ],
       signature: "def parse_line(line: str) -> dict | None",
       prompt: [
@@ -1311,7 +1311,7 @@ const LOG_LEVEL_SUMMARY = codeSteps(
         [
           "Return ",
           { code: "None" },
-          " for anything that does not fit — too few pieces, or a level that is not one of ",
+          " for anything that does not fit: too few pieces, or a level that is not one of ",
           { code: "DEBUG INFO WARN ERROR" },
           ". The message keeps its own spaces, so cap the split at four pieces.",
         ],
@@ -1416,7 +1416,7 @@ assert got == {"WARN": 1}, f"got {got}"`,
       title: "Format the summary",
       short: "Summary",
       solutionNote: [
-        "Absent levels stay absent rather than appearing at zero, which is the right default for a log summary — a report that lists DEBUG: 0 on a service that has never logged a debug line is noise. Sorting by count then name is what keeps the output stable between runs.",
+        "Absent levels stay absent rather than appearing at zero, which is the right default for a log summary: a report that lists DEBUG: 0 on a service that has never logged a debug line is noise. Sorting by count then name is what keeps the output stable between runs.",
       ],
       signature: "def summary(lines: list[str]) -> list[str]",
       prompt: [

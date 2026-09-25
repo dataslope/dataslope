@@ -38,7 +38,7 @@ const MATRIX_ROTATION = codeSteps(
     description:
       "Rotate a grid a quarter turn at a time: transpose it, turn that into a rotation, then apply any number of turns.",
     solutionNote: [
-      "A quarter turn clockwise is a transpose followed by reversing each row — two operations you can each check on paper, rather than one index expression you have to trust. Reducing ",
+      "A quarter turn clockwise is a transpose followed by reversing each row: two operations you can each check on paper, rather than one index expression you have to trust. Reducing ",
       { code: "k" },
       " modulo 4 before looping is what keeps ",
       { code: "rotateTimes(grid, 1000000)" },
@@ -121,7 +121,7 @@ if (JSON.stringify(grid) !== JSON.stringify([[1, 2], [3, 4]])) {
       title: "Turn it a quarter clockwise",
       short: "Rotate",
       solutionNote: [
-        "A quarter turn clockwise is a transpose followed by reversing each row — two operations you can each check on paper, rather than one index expression you have to trust. The ",
+        "A quarter turn clockwise is a transpose followed by reversing each row: two operations you can each check on paper, rather than one index expression you have to trust. The ",
         { code: "reverse()" },
         " is safe here only because ",
         { code: "transpose" },
@@ -137,7 +137,7 @@ if (JSON.stringify(grid) !== JSON.stringify([[1, 2], [3, 4]])) {
         [
           "Check it on ",
           { code: "[[1, 2], [3, 4]]" },
-          " — the top-left 1 should end up top-right, giving ",
+          ": the top-left 1 should end up top-right, giving ",
           { code: "[[3, 1], [4, 2]]" },
           ".",
         ],
@@ -216,7 +216,7 @@ if (JSON.stringify(got) !== JSON.stringify([[1, 3], [2, 4]])) {
           { code: "k" },
           " quarter turns clockwise. Four turns is the identity, so reduce ",
           { code: "k" },
-          " modulo 4 before doing any work — a million turns should be as fast as one.",
+          " modulo 4 before doing any work: a million turns should be as fast as one.",
         ],
         [
           { code: "k" },
@@ -337,7 +337,7 @@ const NESTED_LOOKUP = codeSteps(
       { code: "&&" },
       ' guards. The subtle part is telling "missing" apart from "stored as null": bailing out when the cursor stops being an object handles the first, and checking for ',
       { code: "undefined" },
-      " at the end handles the second — so a stored ",
+      " at the end handles the second, so a stored ",
       { code: "null" },
       " comes back as ",
       { code: "null" },
@@ -363,7 +363,7 @@ const NESTED_LOOKUP = codeSteps(
         [
           "Return ",
           { code: "undefined" },
-          " when the path runs out — including when it runs into a value that is not an object, as ",
+          " when the path runs out, including when it runs into a value that is not an object, as ",
           { code: '"a.b"' },
           " does on ",
           { code: "{ a: 1 }" },
@@ -430,7 +430,7 @@ if (got !== "mug") throw new Error("got " + got);`,
         { code: '""' },
         " or ",
         { code: "null" },
-        " from being silently replaced by the fallback — the bug that makes a settings loader quietly ignore every value someone deliberately set to zero.",
+        " from being silently replaced by the fallback: the bug that makes a settings loader quietly ignore every value someone deliberately set to zero.",
       ],
       signature:
         "function getPath(object: unknown, path: string, fallback?: unknown): unknown",
@@ -508,7 +508,7 @@ if (got !== "none") throw new Error("got " + got);`,
           ", which stores a value at a dotted path and returns the same object it was given.",
         ],
         [
-          "Missing levels along the way are created as empty objects, and a level that holds something which is not an object is replaced by one — so ",
+          "Missing levels along the way are created as empty objects, and a level that holds something which is not an object is replaced by one, so ",
           { code: 'setPath({ a: 1 }, "a.b", 2)' },
           " ends up as ",
           { code: "{ a: { b: 2 } }" },
@@ -620,7 +620,7 @@ const INVENTORY_LEDGER = codeSteps(
     description:
       "Replay a stream of stock movements: total them per item, find the first one that oversells, then settle the ledger by refusing it.",
     solutionNote: [
-      "All three steps are the same fold over the same events; what changes is what the fold does when the running total would go below zero — ignore it, report it, or refuse it. Keeping the running totals in a ",
+      "All three steps are the same fold over the same events; what changes is what the fold does when the running total would go below zero: ignore it, report it, or refuse it. Keeping the running totals in a ",
       { code: "Map" },
       " rather than a plain object is what lets an SKU be any string without colliding with ",
       { code: "Object.prototype" },
@@ -636,7 +636,7 @@ const INVENTORY_LEDGER = codeSteps(
         { code: "Map" },
         " rather than a plain object is what lets an SKU be any string without colliding with ",
         { code: "Object.prototype" },
-        " — a product literally called ",
+        ": a product literally called ",
         { code: '"constructor"' },
         " is unlikely but the failure it causes is baffling. Returning sorted pairs rather than the map keeps the output comparable.",
       ],
@@ -646,7 +646,7 @@ const INVENTORY_LEDGER = codeSteps(
         [
           "Stock movements arrive as ",
           { code: "[sku, delta]" },
-          " pairs — positive for a delivery, negative for a sale. Replay them and return the level of every SKU as ",
+          " pairs: positive for a delivery, negative for a sale. Replay them and return the level of every SKU as ",
           { code: "[sku, quantity]" },
           " pairs, sorted by SKU.",
         ],
@@ -719,7 +719,7 @@ if (JSON.stringify(got) !== JSON.stringify([["a", -3]])) {
           { code: "-1" },
           " when the ledger is clean.",
         ],
-        "Landing exactly on zero is fine — you can sell the last one. Only the SKU being moved matters; another SKU sitting at zero is not a problem.",
+        "Landing exactly on zero is fine: you can sell the last one. Only the SKU being moved matters; another SKU sitting at zero is not a problem.",
       ],
       starter: `${STOCK_LEVELS}
 function firstNegative(events) {
@@ -776,7 +776,7 @@ if (JSON.stringify(got) !== JSON.stringify([["a", 2]])) {
       title: "Settle the ledger",
       short: "Settle",
       solutionNote: [
-        "The three steps are the same fold over the same events; what changes is what the fold does when the running total would go below zero — ignore it, report it, or refuse it. Refusing means a later movement for that SKU still applies against the level it actually had, which is what makes the settled ledger internally consistent.",
+        "The three steps are the same fold over the same events; what changes is what the fold does when the running total would go below zero: ignore it, report it, or refuse it. Refusing means a later movement for that SKU still applies against the level it actually had, which is what makes the settled ledger internally consistent.",
       ],
       signature:
         "function settle(events: [string, number][]): [string, number][]",
@@ -786,7 +786,7 @@ if (JSON.stringify(got) !== JSON.stringify([["a", 2]])) {
           { code: "settle" },
           ", which replays the ledger but refuses any movement that would take an SKU below zero, and returns the final levels in the same shape as step 1.",
         ],
-        "A refused movement is skipped entirely — later movements for that SKU still apply against the level it actually had. An SKU whose only movement was refused never enters the ledger at all.",
+        "A refused movement is skipped entirely; later movements for that SKU still apply against the level it actually had. An SKU whose only movement was refused never enters the ledger at all.",
       ],
       starter: `${FIRST_NEGATIVE}
 function settle(events) {
@@ -883,9 +883,9 @@ const PAGINATE_RESULTS = codeSteps(
     description:
       "Build the pagination an API response needs: the slice for one page, how many pages there are, then the payload around them.",
     solutionNote: [
-      "Pages are 1-based because that is what a reader sees, and array indices are 0-based, so exactly one subtraction — ",
+      "Pages are 1-based because that is what a reader sees, and array indices are 0-based, so exactly one subtraction, ",
       { code: "(page - 1) * size" },
-      " — bridges them. Getting that in one place, rather than in every caller, is the entire reason this is a function.",
+      ", bridges them. Getting that in one place, rather than in every caller, is the entire reason this is a function.",
     ],
   },
   [
@@ -962,7 +962,7 @@ if (JSON.stringify(pageOf([1, 2], 1, 0)) !== "[]") throw new Error("size 0 shoul
           ", which says how many pages a total of items fills at a given page size. A partial last page still counts.",
         ],
         [
-          "No items means no pages — ",
+          "No items means no pages: ",
           { code: "0" },
           ", not ",
           { code: "1" },

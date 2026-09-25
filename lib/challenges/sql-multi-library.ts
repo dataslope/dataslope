@@ -68,14 +68,14 @@ const OVERDUE_REPORT = sqlSteps(
       short: "Spans",
       solutionNote: [
         "Measuring only returned loans is the trap, and it is a subtle one: the longer a member keeps a book, the more likely it is still out, so excluding open loans systematically flatters the worst offenders. ",
-        { code: "COALESCE(returned_on, …)" },
+        { code: "COALESCE(returned_on, ...)" },
         " brings them back in.",
       ],
       prompt: [
         [
           "Work out how many days each loan has run. A book that has not been returned counts up to ",
           { code: "'" + AS_OF + "'" },
-          " — it is still out, not excluded.",
+          ": it is still out, not excluded.",
         ],
         [
           "All twenty-five loans should appear. Sort by ",
@@ -134,7 +134,7 @@ JOIN books   b ON b.book_id   = l.book_id
           { code: "late" },
           " column that is 1 when a loan ran longer than that and 0 otherwise.",
         ],
-        "Keep all twenty-five rows — this step labels, it does not filter.",
+        "Keep all twenty-five rows; this step labels, it does not filter.",
       ],
       columns: [
         { name: "loan_id", type: "integer" },
@@ -265,13 +265,13 @@ const AUTHOR_COLLABORATION = sqlSteps(
     topic: "Self joins",
     dataset: LIBRARY,
     description:
-      "Find who writes with whom, then count each author's collaborators — including the ones who have none.",
+      "Find who writes with whom, then count each author's collaborators, including the ones who have none.",
     solutionNote: [
       "Two ideas, and the second is the one people miss. ",
       { code: "ba1.author_id < ba2.author_id" },
       " is what stops every pair appearing twice and every author pairing with themselves. But that same asymmetry means an author only ever shows up on one side, so counting partners needs the pairs flipped and stacked with ",
       { code: "UNION ALL" },
-      " first — otherwise whoever sorts later alphabetically appears to have no collaborators at all.",
+      " first; otherwise whoever sorts later alphabetically appears to have no collaborators at all.",
     ],
   },
   [
@@ -330,7 +330,7 @@ JOIN book_authors ba2
       title: "Name them",
       short: "Names",
       solutionNote: [
-        "Joining twice to the same table needs two aliases, and that is the whole difficulty — ",
+        "Joining twice to the same table needs two aliases, and that is the whole difficulty: ",
         { code: "a1" },
         " and ",
         { code: "a2" },
@@ -395,7 +395,7 @@ ORDER BY b.title`,
       ],
       prompt: [
         [
-          "Now count how many distinct people each author has written with — every author, including the five who have written alone and the one who has written nothing.",
+          "Now count how many distinct people each author has written with: every author, including the five who have written alone and the one who has written nothing.",
         ],
         [
           "The pairs from step 1 only list each author on one side, so stack them with their mirror image using ",

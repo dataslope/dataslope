@@ -38,19 +38,19 @@ import {
   Table2,
   Undo2,
 } from "lucide-react";
-import {
-  isMultiStep,
-  isStepUnlocked,
-  openStepIndex,
-  type Challenge,
-  type ChallengeLanguage,
-  type ChallengeStep,
-  type ChallengeTask,
-  type CodeLanguage,
-  type OutputPanel,
-  type Submission,
-  type TestOutcome,
-} from "@/lib/challenges";
+// Not "@/lib/challenges": that module imports every challenge, and this is
+// client code. See lib/challenges/steps.ts.
+import { isMultiStep, isStepUnlocked, openStepIndex } from "@/lib/challenges/steps";
+import type {
+  Challenge,
+  ChallengeLanguage,
+  ChallengeStep,
+  ChallengeTask,
+  CodeLanguage,
+  OutputPanel,
+  Submission,
+  TestOutcome,
+} from "@/lib/challenges/types";
 import {
   clearSavedCode,
   markAttempted,
@@ -324,6 +324,7 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
     go,
     setCode,
     passedSteps: progress.passedSteps,
+    code,
   });
   useEffect(() => {
     live.current = {
@@ -333,6 +334,7 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
       go,
       setCode,
       passedSteps: progress.passedSteps,
+      code,
     };
   });
 
@@ -361,9 +363,12 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
           }
         },
         setCode: (next) => live.current.setCode(next),
+        getCode: () => live.current.code,
         loadSolution: () => {
           const current = live.current.task;
-          if (current) live.current.setCode(current.solutionCode);
+          if (!current) return "";
+          live.current.setCode(current.solutionCode);
+          return current.solutionCode;
         },
         submit: () => live.current.go("submit"),
         getTestResults: () => live.current.outcome?.tests ?? [],
@@ -802,6 +807,7 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
                 <InstructionBlocks
                   blocks={instructions}
                   signature={language?.signature}
+                  language={language?.id}
                 />
               )}
               {challenge.schema.length > 0 ? (
@@ -1028,6 +1034,7 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
                 <InstructionBlocks
                   blocks={instructions}
                   signature={language?.signature}
+                  language={language?.id}
                 />
               )}
               {challenge.schema.length > 0 ? (

@@ -180,7 +180,7 @@ const PRODUCT_EXCEPT_SELF = codeChallenge(
     difficulty: "Advanced",
     topic: "Prefix and suffix passes",
     description:
-      "For each position, multiply every other value — without using division.",
+      "For each position, multiply every other value, without using division.",
     prompt: [
       "Return a list where each position holds the product of every value except the one at that position.",
       "Division is not allowed, which rules out the obvious trick of multiplying everything and dividing. Two passes over the list are enough.",
@@ -192,7 +192,7 @@ const PRODUCT_EXCEPT_SELF = codeChallenge(
           { name: "nums", value: "[1, 2, 3, 4]" },
           { name: "output", value: "[24, 12, 8, 6]", emphasis: true },
         ],
-        note: "2·3·4, 1·3·4, 1·2·4, 1·2·3.",
+        note: "2 × 3 × 4, 1 × 3 × 4, 1 × 2 × 4, 1 × 2 × 3.",
       },
       {
         label: "With a zero",
@@ -357,7 +357,7 @@ const ROTATE_ARRAY = codeChallenge(
       ],
       [
         { code: "k" },
-        " can be larger than the list — rotating a list of 5 by 7 is the same as by 2 — and it can be negative, which rotates left.",
+        " can be larger than the list (rotating a list of 5 by 7 is the same as by 2) and it can be negative, which rotates left.",
       ],
     ],
     examples: [
@@ -386,7 +386,7 @@ const ROTATE_ARRAY = codeChallenge(
     solutionNote: [
       "Reducing ",
       { code: "k" },
-      " modulo the length first is what makes a rotation by a million instant, and it is also what makes the negative case free — in Python ",
+      " modulo the length first is what makes a rotation by a million instant, and it is also what makes the negative case free: in Python ",
       { code: "-1 % 5" },
       " is already 4. JavaScript's ",
       { code: "%" },
@@ -528,7 +528,7 @@ const COIN_CHANGE = codeChallenge(
         { code: "-1" },
         " when no combination works.",
       ],
-      "You have unlimited coins of each denomination. Taking the largest coin that fits at each step is the obvious approach and it is wrong — with coins of 1, 3 and 4, making 6 that way takes three coins when two would do.",
+      "You have unlimited coins of each denomination. Taking the largest coin that fits at each step is the obvious approach and it is wrong: with coins of 1, 3 and 4, making 6 that way takes three coins when two would do.",
     ],
     examples: [
       {
@@ -1070,7 +1070,7 @@ const SUBARRAY_SUM_COUNT = codeChallenge(
           { name: "k", value: "2" },
           { name: "output", value: "2", emphasis: true },
         ],
-        note: "Positions 0–1 and 1–2 both work.",
+        note: "Positions 0 and 1, or 1 and 2: both work.",
       },
       {
         label: "With a zero sum",
@@ -1090,7 +1090,7 @@ const SUBARRAY_SUM_COUNT = codeChallenge(
     solutionNote: [
       "Carry a running total, and for each position ask how many earlier positions had a running total of ",
       { code: "total - k" },
-      " — each one marks a run ending here that sums to ",
+      ": each one marks a run ending here that sums to ",
       { code: "k" },
       ". Seeding the map with ",
       { code: "{0: 1}" },
@@ -1240,7 +1240,7 @@ const INNER_JOIN_ROWS = codeChallenge(
         { code: "[key, left_value, right_value]" },
         ", sorted.",
       ],
-      "A key on both sides more than once produces every pairing, which is exactly what a SQL inner join does. Scanning the right-hand list once per left row is O(n·m); index it first and the join is O(n + m).",
+      "A key on both sides more than once produces every pairing, which is exactly what a SQL inner join does. Scanning the right-hand list once per left row is O(n × m); index it first and the join is O(n + m).",
     ],
     examples: [
       {
@@ -1445,7 +1445,7 @@ const TOPOLOGICAL_ORDER = codeChallenge(
         " edges, return an order in which every node appears after everything it depends on.",
       ],
       [
-        "Where several nodes are ready at once, take the alphabetically first, so the answer is deterministic. When the dependencies form a cycle no order exists — return an empty list.",
+        "Where several nodes are ready at once, take the alphabetically first, so the answer is deterministic. When the dependencies form a cycle no order exists: return an empty list.",
       ],
     ],
     examples: [
@@ -1477,7 +1477,7 @@ const TOPOLOGICAL_ORDER = codeChallenge(
       ["A cycle returns an empty list"],
     ],
     solutionNote: [
-      "Count how many things each node is waiting on, start with the ones waiting on nothing, and each time you place a node decrement its dependants. The cycle check is the elegant part: nodes inside a cycle never reach a count of zero, so if the order is shorter than the node list, something is stuck — no separate cycle detection pass needed.",
+      "Count how many things each node is waiting on, start with the ones waiting on nothing, and each time you place a node decrement its dependants. The cycle check is the elegant part: nodes inside a cycle never reach a count of zero, so if the order is shorter than the node list, something is stuck; no separate cycle detection pass needed.",
     ],
   },
   {

@@ -61,7 +61,7 @@ const INVOICE_AGING = sqlSteps(
     description:
       "Build the aging report collections teams live on: what is still owed, how long it has been owed, and how much sits in each age band.",
     solutionNote: [
-      "An aging report is three ideas stacked: filter to what is open, measure how old it is, then bucket the measurement. Buckets are where judgement lives — the boundaries are a business decision, not a technical one, and writing them as a ",
+      "An aging report is three ideas stacked: filter to what is open, measure how old it is, then bucket the measurement. Buckets are where judgement lives: the boundaries are a business decision, not a technical one, and writing them as a ",
       { code: "CASE" },
       " keeps them in one visible place instead of scattered across three queries.",
     ],
@@ -79,7 +79,7 @@ const INVOICE_AGING = sqlSteps(
       ],
       prompt: [
         [
-          "Start with the open invoices — the ones with no payment date — and measure how long each has been outstanding as of ",
+          "Start with the open invoices (the ones with no payment date) and measure how long each has been outstanding as of ",
           { code: "'" + AS_OF + "'" },
           ".",
         ],
@@ -148,7 +148,7 @@ JOIN accounts a ON a.account_id = i.account_id
           " beyond that.",
         ],
         [
-          "Keep every open invoice and every column from step 1 — this step labels the rows, it does not filter them.",
+          "Keep every open invoice and every column from step 1; this step labels the rows, it does not filter them.",
         ],
       ],
       columns: [
@@ -198,7 +198,7 @@ JOIN accounts a ON a.account_id = i.account_id
       prompt: [
         "Now the report itself: one row per band, with how many invoices are in it and how much they add up to. Round the total to 2 decimal places.",
         [
-          "Sort by band name. Bands with nothing in them simply do not appear — a ",
+          "Sort by band name. Bands with nothing in them simply do not appear: a ",
           { code: "GROUP BY" },
           " can only return what the data contains.",
         ],
@@ -271,7 +271,7 @@ const RETENTION_BY_PLAN = sqlSteps(
       { code: "COALESCE(ended_on, '" + AS_OF + "')" },
       ' lets a subscription that has not ended still have a length, so your best customers are not silently excluded. And turning "has it ended" into a 1-or-0 column means the churn rate is just ',
       { code: "AVG" },
-      " of that flag — no second query, no self join.",
+      " of that flag: no second query, no self join.",
     ],
   },
   [
@@ -279,7 +279,7 @@ const RETENTION_BY_PLAN = sqlSteps(
       title: "Measure every subscription",
       short: "Spans",
       solutionNote: [
-        { code: "COALESCE(ended_on, …)" },
+        { code: "COALESCE(ended_on, ...)" },
         " is what lets a subscription that has not ended still have a length. Without it your longest-running customers contribute NULL and vanish from the averages, which biases the number downward exactly where it matters most.",
       ],
       prompt: [
@@ -291,7 +291,7 @@ const RETENTION_BY_PLAN = sqlSteps(
         [
           "Make ",
           { code: "churned" },
-          " a 1 or a 0 rather than a date — step 3 will average it. Sort by subscription id.",
+          " a 1 or a 0 rather than a date; step 3 will average it. Sort by subscription id.",
         ],
       ],
       columns: [
@@ -332,7 +332,7 @@ JOIN plans p ON p.plan_id = s.plan_id
       solutionNote: [
         "Rolling the subscriptions up to their plans is an ordinary ",
         { code: "GROUP BY" },
-        ", and the only thing worth watching is that the average is over subscriptions rather than accounts — an account that switched plans is counted once on each.",
+        ", and the only thing worth watching is that the average is over subscriptions rather than accounts: an account that switched plans is counted once on each.",
       ],
       prompt: [
         "Roll the subscriptions up to their plans: how many there have been, and how long they last on average. Round the average to 1 decimal place.",
@@ -468,7 +468,7 @@ const PLAN_MIX = sqlSteps(
     solutionNote: [
       "The lesson is in the last step: the plan with the most customers is not the plan with the most revenue. Getting both shares in one query needs the grand total on every row, which is what ",
       { code: "SUM(x) OVER ()" },
-      " — a window with no partition and no order — gives you, without a second pass or a subquery.",
+      ", a window with no partition and no order, gives you, without a second pass or a subquery.",
     ],
   },
   [
@@ -519,7 +519,7 @@ JOIN plans p ON p.plan_id = s.plan_id
       short: "Share",
       solutionNote: [
         { code: "SUM(active) OVER ()" },
-        " — an empty window — is the total on every row, so the share needs no second query and no join back to a totals subquery. It is the cheapest window function there is.",
+        ", an empty window, is the total on every row, so the share needs no second query and no join back to a totals subquery. It is the cheapest window function there is.",
       ],
       prompt: [
         [
@@ -530,7 +530,7 @@ JOIN plans p ON p.plan_id = s.plan_id
         [
           "You need the total on every row. ",
           { code: "SUM(active) OVER ()" },
-          " — an empty window — is exactly that, and it costs no extra pass over the data.",
+          ", an empty window, is exactly that, and it costs no extra pass over the data.",
         ],
       ],
       columns: [
@@ -585,7 +585,7 @@ ORDER BY active DESC, plan_name`,
         [
           "Round money to 2 places and percentages to 1. Sort by ",
           { code: "mrr" },
-          " descending — and notice that it is not the same order as step 2.",
+          " descending, and notice that it is not the same order as step 2.",
         ],
       ],
       columns: [

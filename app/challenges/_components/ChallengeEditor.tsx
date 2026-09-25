@@ -37,7 +37,7 @@ import {
   redoKeymap,
   themeFor,
 } from "@/app/_components/cmExtensions";
-import type { CodeLanguage } from "@/lib/challenges";
+import type { CodeLanguage } from "@/lib/challenges/types";
 import s from "./ChallengeWorkspace.module.css";
 
 /** Spaces per indent level, per language. */
