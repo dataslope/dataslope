@@ -23,6 +23,7 @@ import {
   type InstructionBlock,
   type Span,
 } from "@/lib/challenges";
+import { ticks } from "@/lib/challenges/authoring";
 import { AI_FILLER } from "../scripts/check-prose.mjs";
 
 const BANNED: [RegExp, string][] = [
@@ -102,6 +103,50 @@ function learnerText(slug: string): [string, string][] {
   return out;
 }
 
+/**
+ * Every string the workspace renders as plain text, which is everything but
+ * code: the `{ code }` spans of a paragraph, and the editor, signature, code
+ * block and example values, where a backtick is JavaScript.
+ */
+function renderedText(slug: string): [string, string][] {
+  const c = getChallenge(slug)!;
+  const plain = (spans: Span[] = []) =>
+    spans.filter((s): s is string => typeof s === "string");
+  const out: [string, string][] = [
+    ["title", c.title],
+    ["description", c.description],
+    ["topic", c.catalog.topic],
+    ...plain(c.solutionNote).map((t): [string, string] => ["solution note", t]),
+  ];
+  const blocks = (where: string, list: InstructionBlock[]) => {
+    for (const b of list) {
+      if (b.kind === "heading" || b.kind === "label") out.push([where, b.text]);
+      if (b.kind === "prose") for (const t of plain(b.spans)) out.push([where, t]);
+      if (b.kind === "list") {
+        for (const item of b.items) for (const t of plain(item)) out.push([where, t]);
+      }
+      if (b.kind === "examples") {
+        for (const e of b.items) out.push([where, e.label], [where, e.note ?? ""]);
+      }
+      if (b.kind === "table") for (const row of b.rows) out.push(...Object.values(row).map((t): [string, string] => [where, t]));
+      if (b.kind === "columns") for (const row of b.rows) out.push([where, row.name], [where, row.type]);
+    }
+  };
+  blocks("instructions", c.instructions);
+  for (const s of c.steps) {
+    out.push(["step title", s.title], ["step short title", s.short]);
+    for (const t of plain(s.solutionNote)) out.push([`step ${s.n} note`, t]);
+    blocks(`step ${s.n}`, s.instructions);
+  }
+  for (const task of [...c.steps, ...c.languages]) {
+    for (const t of task.tests) {
+      out.push(["check name", t.name]);
+      if (t.description) out.push(["check description", t.description]);
+    }
+  }
+  return out;
+}
+
 describe("challenge prose", () => {
   const slugs = getChallengeSlugs();
 
@@ -120,6 +165,22 @@ describe("challenge prose", () => {
     expect(found, `${found.length} found:\n${found.join("\n")}`).toEqual([]);
   });
 
+  /**
+   * Prompts are authored in markdown-ish strings, and the builders split
+   * `` `name` `` out into a code span (`ticks` in lib/challenges/authoring).
+   * A backtick that survives to a plain-text field is one the learner sees
+   * literally, which is how ten SQL prompts shipped.
+   */
+  it("leaves no literal backtick in text the workspace renders as prose", () => {
+    const found: string[] = [];
+    for (const slug of slugs) {
+      for (const [where, text] of renderedText(slug)) {
+        if (text.includes("`")) found.push(`${slug} · ${where}: ${text.slice(0, 120)}`);
+      }
+    }
+    expect(found, `${found.length} found:\n${found.join("\n")}`).toEqual([]);
+  });
+
   it("uses none of the filler phrases the lesson linter bans", () => {
     const found: string[] = [];
     for (const slug of slugs) {
@@ -130,5 +191,22 @@ describe("challenge prose", () => {
       }
     }
     expect(found, found.join("\n")).toEqual([]);
+  });
+});
+
+describe("ticks", () => {
+  it("splits backtick runs into code spans", () => {
+    expect(ticks("Count rows whose `status` is `completed`.")).toEqual([
+      "Count rows whose ",
+      { code: "status" },
+      " is ",
+      { code: "completed" },
+      ".",
+    ]);
+  });
+
+  it("leaves plain text and an unpaired backtick alone", () => {
+    expect(ticks("no code here")).toEqual(["no code here"]);
+    expect(ticks("a lone ` stays")).toEqual(["a lone ` stays"]);
   });
 });

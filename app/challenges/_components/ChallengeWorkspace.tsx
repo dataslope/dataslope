@@ -18,7 +18,15 @@
  * in localStorage.
  */
 
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -30,7 +38,8 @@ import {
   ChevronRight,
   Code2,
   Database,
-  EllipsisVertical,
+  Eye,
+  History,
   Loader2,
   Lock,
   Play,
@@ -44,6 +53,7 @@ import { isMultiStep, isStepUnlocked, openStepIndex } from "@/lib/challenges/ste
 import type {
   Challenge,
   ChallengeLanguage,
+  ChallengeLink,
   ChallengeStep,
   ChallengeTask,
   CodeLanguage,
@@ -58,8 +68,9 @@ import {
   markStepPassed,
   readSavedCode,
   saveCode,
+  subscribeToProgress,
 } from "@/lib/challenges/progress";
-import { useProgress } from "./useProgress";
+import { useProgress, useProgressOwner } from "./useProgress";
 import {
   DifficultyMeter,
   InstructionBlocks,
@@ -67,11 +78,14 @@ import {
   OutputPanelView,
   SchemaAccordion,
   SchemaList,
+  SolutionGate,
   SolutionPanelView,
   SubmissionsPanel,
+  SubmitErrorPanel,
   TestsPanel,
 } from "./parts";
 import { ChallengeEditor } from "./ChallengeEditor";
+import { MoreMenu, type MoreMenuItem } from "./MoreMenu";
 import { useChallengeRunner, type RunMode } from "./useChallengeRunner";
 import { registerWorkspaceForTests } from "./testRegistry";
 import s from "./ChallengeWorkspace.module.css";
@@ -99,7 +113,21 @@ function timeAgoLabel(): string {
   return "just now";
 }
 
-export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
+/** Focus whichever of the two layouts' copies of an element is on screen. */
+function focusVisible(...els: (HTMLElement | null)[]) {
+  els.find((el) => el && el.offsetParent !== null)?.focus();
+}
+
+export function ChallengeWorkspace({
+  challenge,
+  prev,
+  next,
+}: {
+  challenge: Challenge;
+  /** The challenges either side of this one in catalog order. */
+  prev: ChallengeLink | null;
+  next: ChallengeLink | null;
+}) {
   const multiStep = isMultiStep(challenge);
 
   // The server snapshot is blank and the stored one arrives at hydration, so
@@ -112,8 +140,11 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
     () => challenge.languages[0]?.id ?? "sql",
   );
   const [langOpen, setLangOpen] = useState(false);
-  const [mobileView, setMobileView] = useState<MobileView>("code");
+  // The phone tab the learner picked, or null for the default (see below).
+  const [mobileChoice, setMobileView] = useState<MobileView | null>(null);
   const [openTable, setOpenTable] = useState<string | null>(null);
+  /** Tasks whose reference solution the learner asked to see this session. */
+  const [revealed, setRevealed] = useState<string[]>([]);
   const [outcome, setOutcome] = useState<{
     mode: RunMode;
     output: OutputPanel;
@@ -133,6 +164,11 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
   /** The results banner, focused after a submission so Tab continues there. */
   const bannerRef = useRef<HTMLDivElement>(null);
   const mobileBannerRef = useRef<HTMLDivElement>(null);
+  /** The result panels, which take focus when the solution is revealed. */
+  const panelRef = useRef<HTMLDivElement>(null);
+  const mobilePanelRef = useRef<HTMLDivElement>(null);
+  /** Ids for the result tabs; both layouts render a set, so each gets a prefix. */
+  const tabsId = useId();
 
   const splitRef = useRef<HTMLDivElement>(null);
   const rowsRef = useRef<HTMLDivElement>(null);
@@ -163,7 +199,11 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
     ? isStepUnlocked(challenge, stepIndex, progress.passedSteps)
     : true;
 
-  // The editor buffer, re-seeded when the learner moves to another task.
+  // The editor buffer, re-seeded when the learner moves to another task, or
+  // when the session settles on a different learner than the one this page
+  // started with (a first sign-in on this browser, an expired session): saved
+  // code is kept per learner, so the buffer on screen may belong to someone
+  // else's copy.
   //
   // React's "adjust state when a prop changes" pattern rather than an effect:
   // the new text is ready on the same render the task changes on, so the
@@ -171,6 +211,8 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
   // localStorage, which differs between server and client — harmless here,
   // because `code` is never rendered: it reaches the DOM only when CodeMirror
   // mounts, in an effect.
+  const codeOwner = useProgressOwner();
+  const seedKey = `${codeOwner}\u0000${taskKey}`;
   const seed = (key: string) =>
     readSavedCode(challenge.slug, key) ?? task?.starterCode ?? "";
   const [code, setCodeState] = useState(() => seed(taskKey));
@@ -184,23 +226,53 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
    * to resurface work they meant to abandon.
    */
   const [undoableDraft, setUndoableDraft] = useState<string | null>(null);
-  const [seededFor, setSeededFor] = useState(taskKey);
-  if (seededFor !== taskKey) {
-    setSeededFor(taskKey);
+  /**
+   * Whether this buffer has been saved since it was seeded. The phone's
+   * "Autosaved" label waits for it: shown on a buffer nobody has touched, it
+   * claimed a save that had not happened.
+   */
+  const [savedHere, setSavedHere] = useState(false);
+  const [seededFor, setSeededFor] = useState(seedKey);
+  if (seededFor !== seedKey) {
+    setSeededFor(seedKey);
     setCodeState(seed(taskKey));
     setOutcome(null);
     // A discarded draft belongs to the task it came from; offering it back on
     // a different step would paste the wrong query into the editor.
     setUndoableDraft(null);
+    setSavedHere(false);
   }
 
   const setCode = useCallback(
     (next: string) => {
       setCodeState(next);
       saveCode(challenge.slug, taskKey, next);
+      setSavedHere(true);
     },
     [challenge.slug, taskKey],
   );
+
+  /**
+   * The phone opens on the Problem tab for a challenge the learner has not
+   * started, and on Code once they have (a submission, or saved code for this
+   * task): a first visit wants the prompt, a return visit wants the work.
+   *
+   * Both halves come from browser storage, which the server cannot see, so
+   * this is an external store with a server answer of "not started". The
+   * prerendered page therefore opens on Problem, which is right for most
+   * visits, and a returning learner is moved to Code once at hydration. The
+   * choice is derived rather than copied into state, so a session that settles
+   * on another learner after mount is followed too, until the learner picks a
+   * tab themselves.
+   */
+  const hasSavedCode = useSyncExternalStore(
+    subscribeToProgress,
+    () => readSavedCode(challenge.slug, taskKey) !== null,
+    () => false,
+  );
+  const started =
+    progress.attempted || progress.solved || progress.passedSteps.length > 0 || hasSavedCode;
+  const mobileView: MobileView = mobileChoice ?? (started ? "code" : "problem");
 
   // ─── Lifecycle ─────────────────────────────────────────────────────
 
@@ -234,6 +306,13 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
   const go = useCallback(
     async (mode: RunMode) => {
       if (!task || !language || !stepUnlocked) return;
+      // Hold the step on screen. With nothing picked, the step follows
+      // progress, so recording this pass below used to move the page to the
+      // next step before the results rendered: the "Step 1 accepted" banner
+      // and its Continue button were never seen. The Continue button is what
+      // moves on, when the learner is ready. A fresh page load still opens on
+      // the first step not yet passed.
+      if (mode === "submit" && multiStep) setChosenStep(stepIndex);
       setResultTab(mode === "run" ? "output" : "tests");
       setMobileView("results");
       setLangOpen(false);
@@ -281,12 +360,24 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
           ? `Runtime error. ${result.output.kind === "error" ? result.output.message : ""}`.trim()
           : `${passed} of ${result.tests.length} checks passed. ${label}.`,
       );
-      // The banner only exists once the results have rendered.
+      // The banner only exists once the results have rendered. Both layouts
+      // render one, and the hidden layout's copy cannot take focus.
       requestAnimationFrame(() => {
-        (bannerRef.current ?? mobileBannerRef.current)?.focus();
+        focusVisible(bannerRef.current, mobileBannerRef.current);
       });
     },
-    [challenge.slug, challenge.steps.length, code, execute, language, multiStep, stepUnlocked, task, taskKey],
+    [
+      challenge.slug,
+      challenge.steps.length,
+      code,
+      execute,
+      language,
+      multiStep,
+      stepIndex,
+      stepUnlocked,
+      task,
+      taskKey,
+    ],
   );
 
   const run = useCallback(() => void go("run"), [go]);
@@ -325,6 +416,7 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
     setCode,
     passedSteps: progress.passedSteps,
     code,
+    taskKey,
   });
   useEffect(() => {
     live.current = {
@@ -335,6 +427,7 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
       setCode,
       passedSteps: progress.passedSteps,
       code,
+      taskKey,
     };
   });
 
@@ -362,6 +455,7 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
             setLangId(key as CodeLanguage);
           }
         },
+        currentTaskKey: () => live.current.taskKey,
         setCode: (next) => live.current.setCode(next),
         getCode: () => live.current.code,
         loadSolution: () => {
@@ -481,6 +575,31 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
     setMobileView("problem");
   }, [nextStepIndex, setStepIndex]);
 
+  /** What the checks and the solution are for, in the learner's words. */
+  const scope = multiStep ? "this step" : "this challenge";
+  /**
+   * The last task was just accepted, so the way on is the next challenge:
+   * offered in the results banner, and on desktop beside Submit.
+   */
+  const finished =
+    outcome?.mode === "submit" && allPassed && nextStepIndex === null && next !== null;
+  const nextChallengeLabel = next ? `Next challenge: ${next.title}` : "";
+
+  /**
+   * A solution the learner has earned is shown straight away: the task has
+   * passed, or they already asked for it this session. Otherwise the tab asks
+   * first (see `SolutionGate`).
+   */
+  const taskPassed = multiStep
+    ? step !== undefined && progress.passedSteps.includes(step.n)
+    : progress.solved;
+  const solutionOpen = taskPassed || revealed.includes(taskKey);
+  const revealSolution = useCallback(() => {
+    setRevealed((keys) => (keys.includes(taskKey) ? keys : [...keys, taskKey]));
+    // The button that had focus is gone; the panel it opened takes it.
+    requestAnimationFrame(() => focusVisible(panelRef.current, mobilePanelRef.current));
+  }, [taskKey]);
+
   const resultPanel = (mobile: boolean) => {
     switch (resultTab) {
       case "output":
@@ -490,6 +609,18 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
           <EmptyResults text="Run your code to see its output here." />
         );
       case "tests":
+        // Code that throws before the harness runs leaves nothing to list.
+        if (outcome?.mode === "submit" && outcome.output.kind === "error") {
+          return (
+            <SubmitErrorPanel
+              message={outcome.output.message}
+              scope={scope}
+              mobile={mobile}
+              bannerRef={mobile ? mobileBannerRef : bannerRef}
+              onShowOutput={() => setResultTab("output")}
+            />
+          );
+        }
         return tests.length ? (
           <TestsPanel
             tests={tests}
@@ -511,22 +642,30 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
             mobile={mobile}
             bannerRef={mobile ? mobileBannerRef : bannerRef}
             onContinue={nextStepIndex !== null ? goToNextStep : undefined}
+            continueHref={next ? `/challenges/${next.slug}` : undefined}
             continueLabel={
-              nextStepIndex === null
-                ? undefined
-                : `Continue to step ${Number(challenge.steps[nextStepIndex].n)}`
+              nextStepIndex !== null
+                ? `Continue to step ${Number(challenge.steps[nextStepIndex].n)}`
+                : next
+                  ? "Next challenge"
+                  : undefined
             }
+            continueAriaLabel={nextStepIndex === null && next ? nextChallengeLabel : undefined}
           />
         ) : (
-          <EmptyResults text="Submit to run the checks for this step." />
+          <EmptyResults text={`Submit to run the checks for ${scope}.`} />
         );
       case "solution":
         // Readable on every step, including the ones still locked. The gate is
         // on the editor, not on the explanation: a learner who wants to read
         // ahead is allowed to, and someone stuck on step 1 can see where the
         // build is going before committing to it. Deliberate product choice —
-        // `e2e/challenge-workspace` pins both halves of it.
-        return task ? (
+        // `e2e/challenge-workspace` pins both halves of it. The one thing in
+        // the way is `SolutionGate`, which asks once, so a stray click on the
+        // tab does not spoil the problem.
+        if (!task) return null;
+        if (!solutionOpen) return <SolutionGate scope={scope} onReveal={revealSolution} />;
+        return (
           <SolutionPanelView
             note={step?.solutionNote ?? challenge.solutionNote}
             source={task.solutionCode}
@@ -537,7 +676,7 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
                 : `Reference solution · ${language?.shortLabel ?? ""}`
             }
           />
-        ) : null;
+        );
       case "subs":
         return submissions.length ? (
           mobile ? (
@@ -557,33 +696,145 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
     }
   };
 
-  const tabButtons = (mobile: boolean) =>
-    RESULT_TABS.map((tab) => {
-      const on = resultTab === tab.id;
-      const showBadge = tab.id === "tests" && testsBadge !== null;
-      return (
-        <button
-          key={tab.id}
-          type="button"
-          className={[s.tab, mobile ? s.mTab : "", on ? s.tabOn : ""]
-            .filter(Boolean)
-            .join(" ")}
-          aria-current={on ? "true" : undefined}
-          onClick={() => setResultTab(tab.id)}
-        >
-          <span>{mobile ? (tab.shortLabel ?? tab.label) : tab.label}</span>
-          {showBadge ? (
-            <span
-              className={[s.badge, allPassed ? s.badgePass : s.badgeFail]
-                .filter(Boolean)
-                .join(" ")}
-            >
-              {testsBadge}
-            </span>
-          ) : null}
-        </button>
-      );
-    });
+  // Both layouts render a tab set, so every id carries the layout too.
+  const tabId = (mobile: boolean, id: ResultTab) => `${tabsId}${mobile ? "m" : "d"}-tab-${id}`;
+  const panelId = (mobile: boolean) => `${tabsId}${mobile ? "m" : "d"}-panel`;
+
+  /**
+   * The result tabs, as an ARIA tab set: one tab stop for the strip, the
+   * arrow keys (and Home and End) move between tabs, and moving selects.
+   * They were plain buttons, which a screen reader announced as four
+   * unrelated controls with no sense of which one was showing.
+   */
+  const resultTabs = (mobile: boolean) => (
+    <div
+      role="tablist"
+      aria-label="Results"
+      className={mobile ? `${s.mResultTabs} ${s.noScrollbar}` : `${s.tabStrip} ${s.noScrollbar}`}
+      onKeyDown={(e) => {
+        const at = RESULT_TABS.findIndex((t) => t.id === resultTab);
+        const to =
+          e.key === "ArrowRight"
+            ? (at + 1) % RESULT_TABS.length
+            : e.key === "ArrowLeft"
+              ? (at - 1 + RESULT_TABS.length) % RESULT_TABS.length
+              : e.key === "Home"
+                ? 0
+                : e.key === "End"
+                  ? RESULT_TABS.length - 1
+                  : null;
+        if (to === null) return;
+        e.preventDefault();
+        const id = RESULT_TABS[to].id;
+        setResultTab(id);
+        document.getElementById(tabId(mobile, id))?.focus();
+      }}
+    >
+      {RESULT_TABS.map((tab) => {
+        const on = resultTab === tab.id;
+        const showBadge = tab.id === "tests" && testsBadge !== null;
+        return (
+          <button
+            key={tab.id}
+            type="button"
+            role="tab"
+            id={tabId(mobile, tab.id)}
+            aria-selected={on}
+            aria-controls={panelId(mobile)}
+            tabIndex={on ? 0 : -1}
+            className={[s.tab, mobile ? s.mTab : "", on ? s.tabOn : ""]
+              .filter(Boolean)
+              .join(" ")}
+            onClick={() => setResultTab(tab.id)}
+          >
+            <span>{mobile ? (tab.shortLabel ?? tab.label) : tab.label}</span>
+            {showBadge ? (
+              <span
+                className={[s.badge, allPassed ? s.badgePass : s.badgeFail]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+                {testsBadge}
+              </span>
+            ) : null}
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  /** Everything the phone header cannot fit, for the More menu. */
+  const moreItems: MoreMenuItem[] = [
+    ...(!multiStep && challenge.languages.length > 1
+      ? [
+          {
+            kind: "radios" as const,
+            label: "Language",
+            options: challenge.languages.map((l) => ({
+              id: l.id,
+              label: l.label,
+              checked: l.id === language?.id,
+              onSelect: () => setLangId(l.id),
+            })),
+          },
+          { kind: "separator" as const },
+        ]
+      : []),
+    undoableDraft === null
+      ? {
+          kind: "action" as const,
+          label: "Reset code",
+          icon: <RotateCcw size={15} strokeWidth={2} aria-hidden="true" />,
+          onSelect: resetCode,
+        }
+      : {
+          kind: "action" as const,
+          label: "Undo reset",
+          icon: <Undo2 size={15} strokeWidth={2} aria-hidden="true" />,
+          onSelect: undoReset,
+        },
+    {
+      kind: "action",
+      label: "Solution",
+      icon: <Eye size={15} strokeWidth={2} aria-hidden="true" />,
+      onSelect: () => {
+        setResultTab("solution");
+        setMobileView("results");
+      },
+    },
+    {
+      kind: "action",
+      label: "Submissions",
+      icon: <History size={15} strokeWidth={2} aria-hidden="true" />,
+      onSelect: () => {
+        setResultTab("subs");
+        setMobileView("results");
+      },
+    },
+    ...(prev || next ? [{ kind: "separator" as const }] : []),
+    ...(prev
+      ? [
+          {
+            kind: "link" as const,
+            label: `Previous: ${prev.title}`,
+            ariaLabel: `Previous challenge: ${prev.title}`,
+            icon: <ChevronLeft size={15} strokeWidth={2} aria-hidden="true" />,
+            href: `/challenges/${prev.slug}`,
+          },
+        ]
+      : []),
+    ...(next
+      ? [
+          {
+            kind: "link" as const,
+            label: `Next: ${next.title}`,
+            ariaLabel: nextChallengeLabel,
+            icon: <ChevronRight size={15} strokeWidth={2} aria-hidden="true" />,
+            href: `/challenges/${next.slug}`,
+          },
+        ]
+      : []),
+  ];
 
   const editorPane = (mobile: boolean) => {
     if (multiStep && !stepUnlocked) {
@@ -637,7 +888,8 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
       <div className={s.desktopOnly}>
         <header className={s.topBar}>
           <div className={s.topBarLeft}>
-            <Link href="/dashboard/challenges" className={s.backLink}>
+            {/* Not prefetched: see the mobile back link. */}
+            <Link href="/dashboard/challenges" prefetch={false} className={s.backLink}>
               <ArrowLeft size={14} strokeWidth={2} aria-hidden="true" />
               Challenges
             </Link>
@@ -682,7 +934,9 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
             </button>
             <button
               type="button"
-              className={s.primaryBtn}
+              // Once the last task is accepted, Submit steps back and the way
+              // on takes the primary slot.
+              className={finished ? s.secondaryBtn : s.primaryBtn}
               onClick={submit}
               disabled={busy !== null || !stepUnlocked}
             >
@@ -693,15 +947,21 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
               )}
               {challenge.submitLabel}
             </button>
+            {finished && next ? (
+              <Link
+                href={`/challenges/${next.slug}`}
+                className={s.primaryBtn}
+                aria-label={nextChallengeLabel}
+              >
+                Next challenge
+                <ChevronRight size={13} strokeWidth={2} aria-hidden="true" />
+              </Link>
+            ) : null}
             <span className={s.vDivider} aria-hidden="true" />
-            <span className={s.navPair}>
-              <button type="button" className={s.iconBtn} aria-label="Previous problem">
-                <ChevronLeft size={15} strokeWidth={2} aria-hidden="true" />
-              </button>
-              <button type="button" className={s.iconBtn} aria-label="Next problem">
-                <ChevronRight size={15} strokeWidth={2} aria-hidden="true" />
-              </button>
-            </span>
+            <nav className={s.navPair} aria-label="Other challenges">
+              <NeighbourLink target={prev} direction="previous" />
+              <NeighbourLink target={next} direction="next" />
+            </nav>
           </div>
         </header>
 
@@ -911,10 +1171,19 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
             />
 
             <div className={s.paneColumn}>
-              <div className={s.paneHead}>
-                <div className={`${s.tabStrip} ${s.noScrollbar}`}>{tabButtons(false)}</div>
+              <div className={s.paneHead}>{resultTabs(false)}</div>
+              <div
+                ref={panelRef}
+                role="tabpanel"
+                id={panelId(false)}
+                aria-labelledby={tabId(false, resultTab)}
+                // A scrolling panel with nothing focusable in it (the Output
+                // tab, often) must still be reachable to scroll by keyboard.
+                tabIndex={0}
+                className={s.resultBody}
+              >
+                {resultPanel(false)}
               </div>
-              <div className={s.resultBody}>{resultPanel(false)}</div>
             </div>
           </section>
         </div>
@@ -923,8 +1192,13 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
       {/* ─── Mobile ──────────────────────────────────────────────── */}
       <div className={s.mobileOnly}>
         <header className={s.mHeader}>
+          {/* Not prefetched. The catalog carries every row of the list, the
+              workspace is a page people stay on, and this link and the
+              desktop one both point there: a prefetch on every visit bought
+              nothing. */}
           <Link
             href="/dashboard/challenges"
+            prefetch={false}
             className={`${s.mIconBtn} ${s.mIconBtnLead}`}
             aria-label="Back to challenges"
           >
@@ -939,13 +1213,7 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
               </span>
             </span>
           </div>
-          <button
-            type="button"
-            className={`${s.mIconBtn} ${s.mIconBtnTrail}`}
-            aria-label="More"
-          >
-            <EllipsisVertical size={18} strokeWidth={2} aria-hidden="true" />
-          </button>
+          <MoreMenu items={moreItems} className={`${s.mIconBtn} ${s.mIconBtnTrail}`} />
         </header>
 
         {multiStep ? (
@@ -1064,7 +1332,7 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
                   {language?.shortLabel}
                 </span>
                 <span className={s.mCodeHeadRight}>
-                  <span className={s.mAutosaved}>Autosaved</span>
+                  {savedHere ? <span className={s.mAutosaved}>Autosaved</span> : null}
                   {undoableDraft === null ? (
                     <button
                       type="button"
@@ -1110,8 +1378,17 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
 
           {mobileView === "results" ? (
             <div className={s.stack}>
-              <div className={`${s.mResultTabs} ${s.noScrollbar}`}>{tabButtons(true)}</div>
-              {resultPanel(true)}
+              {resultTabs(true)}
+              <div
+                ref={mobilePanelRef}
+                role="tabpanel"
+                id={panelId(true)}
+                aria-labelledby={tabId(true, resultTab)}
+                tabIndex={0}
+                className={s.mResultPanel}
+              >
+                {resultPanel(true)}
+              </div>
             </div>
           ) : null}
         </div>
@@ -1183,4 +1460,41 @@ export function ChallengeWorkspace({ challenge }: { challenge: Challenge }) {
 
 function EmptyResults({ text }: { text: string }) {
   return <p className={s.emptyResults}>{text}</p>;
+}
+
+/**
+ * The top bar's previous and next chevrons: links to the neighbouring
+ * challenges in catalog order, named for where they go. At either end of the
+ * catalog there is nowhere to go, so the control stays in place, disabled,
+ * rather than shifting its partner sideways.
+ */
+function NeighbourLink({
+  target,
+  direction,
+}: {
+  target: ChallengeLink | null;
+  direction: "previous" | "next";
+}) {
+  const Icon = direction === "previous" ? ChevronLeft : ChevronRight;
+  const word = direction === "previous" ? "Previous" : "Next";
+  if (!target) {
+    return (
+      <button type="button" className={s.iconBtn} disabled aria-label={`No ${direction} challenge`}>
+        <Icon size={15} strokeWidth={2} aria-hidden="true" />
+      </button>
+    );
+  }
+  return (
+    <Link
+      href={`/challenges/${target.slug}`}
+      // A workspace page carries its whole challenge; fetching two more on
+      // every visit, for controls most visits never use, is not worth it.
+      prefetch={false}
+      className={s.iconBtn}
+      aria-label={`${word} challenge: ${target.title}`}
+      title={`${word}: ${target.title}`}
+    >
+      <Icon size={15} strokeWidth={2} aria-hidden="true" />
+    </Link>
+  );
 }

@@ -41,6 +41,7 @@
   color: var(--cb-text-dim);
   cursor: pointer;
   padding: 5px 7px;
+  min-height: 24px;
   border-radius: 5px;
   display: inline-flex;
   align-items: center;
@@ -128,6 +129,15 @@
   cursor: pointer;
   flex-shrink: 0;
   transition: color 0.15s, background 0.15s;
+  position: relative;
+}
+
+/* The glyph stays 16px; the hit area is 24px (WCAG 2.2 target size). */
+.previewInfoBtn::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
 }
 
 .previewInfoBtn:hover,

@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./brand.css";
 import "./globals.css";
-import { OG_IMAGE, SITE_URL } from "@/lib/site";
-import AskAi from "@/app/_components/ai/AskAi";
+import { OG_IMAGE, SITE_NAME, SITE_URL } from "@/lib/site";
 import NavigationLoadingIndicator from "@/app/_components/NavigationLoadingIndicator";
 import SkipToContent from "@/app/_components/SkipToContent";
 import { ReturnToTracker } from "@/app/_components/auth/returnTo";
@@ -26,18 +25,19 @@ const jetbrainsMono = JetBrains_Mono({
 
 const SITE_DESCRIPTION =
   "Free, interactive, no sign-up. Browser-based playgrounds and courses for Python, SQL, C++, and more, all running on WebAssembly.";
+const DEFAULT_TITLE = `${SITE_NAME}: Learn Python, SQL, C++ in your browser`;
 
 // `metadataBase` resolves relative OG/canonical URLs to absolute production
-// URLs; `title.template` appends "· DataSlope". Routes without their own
+// URLs; `title.template` appends "· Dataslope". Routes without their own
 // openGraph/twitter inherit this site-level card, so every page is shareable.
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "DataSlope, Learn Python, SQL, C++ in your browser",
-    template: "%s · DataSlope",
+    default: DEFAULT_TITLE,
+    template: `%s · ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
-  applicationName: "DataSlope",
+  applicationName: SITE_NAME,
   // Every favicon surface paints into a square, and Google's result header
   // then crops that square to a circle, so all four of these are square:
   // pointing at the brand mark itself (1087 x 683) got it scaled non-uniformly
@@ -58,15 +58,15 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    siteName: "DataSlope",
+    siteName: SITE_NAME,
     url: SITE_URL,
-    title: "DataSlope, Learn Python, SQL, C++ in your browser",
+    title: DEFAULT_TITLE,
     description: SITE_DESCRIPTION,
     images: [OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    title: "DataSlope, Learn Python, SQL, C++ in your browser",
+    title: DEFAULT_TITLE,
     description: SITE_DESCRIPTION,
     images: [OG_IMAGE],
   },
@@ -147,9 +147,6 @@ export default function RootLayout({
             stops before the editor. Visually hidden until focused. */}
         <SkipToContent />
         {children}
-        {/* "Ask AI" chat pane; pathname-gated inside to /learn and
-            /playground, heavy deps dynamically imported. */}
-        <AskAi />
         {/* Corner badge with the brand diamond loader, shown while a slow
             client-side navigation (playgrounds, course pages) is pending. */}
         <NavigationLoadingIndicator />

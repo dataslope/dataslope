@@ -29,9 +29,11 @@ const countMatches = (texts, pattern) =>
 
 /** Exported so the freshness test can re-derive without duplicating the rules. */
 export function readHomeStats() {
+  // What a learner can open: courses and interview prep. Not fumadocs-dev,
+  // the noindexed component gallery, whose 130-odd demo cards are not
+  // lessons anyone takes.
   const allMdx = [
     ...readMdxFiles(join(CONTENT, "courses")),
-    ...readMdxFiles(join(CONTENT, "fumadocs-dev")),
     ...readMdxFiles(join(CONTENT, "interview")),
   ];
 
@@ -40,8 +42,10 @@ export function readHomeStats() {
     runnableCodeBlocks:
       countMatches(allMdx, /<CodeBlock[\s/>]/g) +
       countMatches(allMdx, /<SqlCodeBlock[\s/>]/g),
-    // Auto-graded challenges: `<ChallengeCard>` + `<SqlChallengeCard>`.
-    codeChallenges:
+    // Auto-graded exercises inside lessons: `<ChallengeCard>` +
+    // `<SqlChallengeCard>`. Not the Challenges catalog, which is a module
+    // (lib/challenges) that app/page.tsx counts directly.
+    lessonExercises:
       countMatches(allMdx, /<ChallengeCard[\s/>]/g) +
       countMatches(allMdx, /<SqlChallengeCard[\s/>]/g),
     // Interview-prep role tracks: top-level dirs under content/interview.
@@ -76,6 +80,6 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   );
   console.log(
     `build-home-stats: ${stats.runnableCodeBlocks} runnable blocks, ` +
-      `${stats.codeChallenges} challenges, ${stats.interviewRoles} roles → ${OUT_FILE}`,
+      `${stats.lessonExercises} lesson exercises, ${stats.interviewRoles} roles → ${OUT_FILE}`,
   );
 }

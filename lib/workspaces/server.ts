@@ -9,7 +9,7 @@
  */
 
 import type { R2Bucket } from "@cloudflare/workers-types";
-import type { MemberTier } from "@/lib/ai/types";
+import type { MemberTier } from "@/lib/plan";
 import {
   MANIFEST_MAX_BYTES,
   isPersistablePlayground,
@@ -19,7 +19,7 @@ import {
   type CloudWorkspaceMeta,
   type ShareMeta,
 } from "./types";
-import { resolveTier } from "@/lib/ai/tier";
+import { resolveTier } from "@/lib/plan";
 import { isExpired, limitsForTier, normalizeName } from "./policy";
 import {
   deleteShares,

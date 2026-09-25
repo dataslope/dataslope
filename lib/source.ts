@@ -11,6 +11,7 @@
  * All coexist with the plain-CSS `/playground` routes.
  */
 import { loader } from "fumadocs-core/source";
+import type { Node, Root } from "fumadocs-core/page-tree";
 import { lucideIconsPlugin } from "fumadocs-core/source/plugins/lucide-icons";
 // `dynamic` mode (see `source.config.ts`) emits each collection from
 // `.source/dynamic`, where a page body is compiled on demand from disk at
@@ -37,3 +38,29 @@ export const interviewSource = loader({
   source: interview.toFumadocsSource(),
   plugins: [lucideIconsPlugin()],
 });
+
+/**
+ * A section's page tree cut down to the one top-level folder (a course, or an
+ * interview-prep role) holding the pages under `prefix`, e.g.
+ * `/courses/python-basics`. `<DocsLayout>` is a client component, so the tree
+ * it is handed is serialized into every page's HTML, and the whole course
+ * tree is ~370 KB (every lesson of every course, descriptions included) where
+ * the sidebar only ever draws one course: each course folder is a Fumadocs
+ * root. Nothing else reads the rest. The layout re-renders on every lesson
+ * anyway, since its segment is the whole catch-all.
+ *
+ * The root gets its own `$id` because Fumadocs memoizes the tree on it. A
+ * prefix that matches no folder keeps the full tree.
+ */
+export function scopedPageTree(tree: Root, prefix: string): Root {
+  const owns = (node: Node): boolean =>
+    node.type === "page"
+      ? node.url === prefix || node.url.startsWith(`${prefix}/`)
+      : node.type === "folder" &&
+        ((node.index ? owns(node.index) : false) || node.children.some(owns));
+  const folder = tree.children.find(
+    (node) => node.type === "folder" && owns(node),
+  );
+  if (!folder) return tree;
+  return { ...tree, $id: `${tree.$id ?? "root"}:${prefix}`, children: [folder] };
+}

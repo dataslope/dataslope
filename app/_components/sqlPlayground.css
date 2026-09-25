@@ -1818,6 +1818,16 @@
   margin: 0 1px;
 }
 
+/* On a phone the group covers the end of the first line, which is where a
+   short query's own text runs out to. Push the text below it instead of
+   narrowing every line: CodeMirror measures its content padding, so the
+   gutter's line numbers follow. */
+@media (max-width: 640px) {
+  .sql-editor-pane .cm-editor .cm-content {
+    padding-top: 42px;
+  }
+}
+
 /* Positioner for editor-corner tooltip popovers. z-index: 500 ensures they
    appear above the editor pane contents but below the portalled
    Import / Export / Settings menus which use bui-popup (z-index: 9999). */

@@ -206,10 +206,31 @@ export function PlaygroundWorkspaces() {
     };
   }, []);
 
-  // Signed-in: pull the account's cloud workspaces + usage. 401/503 degrade
-  // silently to the local-only view.
+  // Keyed on the signed-in USER, not the `session` object. Better Auth hands
+  // back a new session object whenever a read extends the session's expiry,
+  // and an effect keyed on that identity cancelled its own in-flight list:
+  // the response landed after the cleanup and was dropped, so cloud-only
+  // workspaces never appeared and backed-up rows showed their local size.
+  const userId = session?.user.id ?? null;
+  const [cloudError, setCloudError] = useState<string | null>(null);
+  const [cloudAttempt, setCloudAttempt] = useState(0);
+
+  // A different account (or none) owns a different cloud inventory; drop
+  // the previous one during render rather than after a paint that shows it.
+  const [cloudOwner, setCloudOwner] = useState(userId);
+  if (cloudOwner !== userId) {
+    setCloudOwner(userId);
+    setCloudMetas([]);
+    setCloudUsage(null);
+    setCloudLoaded(false);
+    setCloudError(null);
+  }
+
+  // Signed-in: pull the account's cloud workspaces + usage. 401 (signed out
+  // meanwhile) and 503 (cloud saves not configured) degrade silently to the
+  // local-only view; anything else is said, with a retry.
   useEffect(() => {
-    if (!session || !isCloudSupported()) return;
+    if (!userId || !isCloudSupported()) return;
     let cancelled = false;
     void (async () => {
       try {
@@ -218,24 +239,27 @@ export function PlaygroundWorkspaces() {
         setCloudMetas(res.workspaces);
         setCloudUsage(res.usage);
         setCloudLoaded(true);
+        setCloudError(null);
       } catch (err) {
         if (cancelled) return;
-        if (!(err instanceof CloudApiError)) {
-          // Transient/network error, leave the local list as-is.
+        if (err instanceof CloudApiError && (err.status === 401 || err.status === 503)) {
+          return;
         }
+        console.warn("[workspaces] cloud list failed", err);
+        setCloudError("Couldn't load your cloud workspaces. Only this device's are listed.");
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [session]);
+  }, [userId, cloudAttempt]);
 
   // Post-sign-in bulk backup: browser-saved work uploads to the account
   // automatically. Shared with the /playground index; runs once per page
   // view. Waits for the orphan sweep and, if a dep change cancels it
   // mid-upload, releases the once-latch so the re-run finishes the job.
   useEffect(() => {
-    if (!session || !cloudLoaded || !orphanSweepDone || bulkRanRef.current)
+    if (!userId || !cloudLoaded || !orphanSweepDone || bulkRanRef.current)
       return;
     const cloudIds = new Set(cloudMetas.map((m) => m.id));
     if (pendingBackupCandidates(localEntries, cloudIds).length === 0) return;
@@ -266,7 +290,7 @@ export function PlaygroundWorkspaces() {
     return () => {
       cancelled = true;
     };
-  }, [session, cloudLoaded, orphanSweepDone, cloudMetas, localEntries]);
+  }, [userId, cloudLoaded, orphanSweepDone, cloudMetas, localEntries]);
 
   // Estimate on-device sizes; backed-up rows already carry a cloud size.
   useEffect(() => {
@@ -382,6 +406,26 @@ export function PlaygroundWorkspaces() {
         </span>
         Your workspaces
       </h2>
+
+      {cloudError && (
+        <p
+          role="alert"
+          className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-lg px-3 py-2 text-[13px]"
+          style={{ background: "var(--danger-soft)", color: "var(--danger)" }}
+        >
+          {cloudError}
+          <button
+            type="button"
+            onClick={() => {
+              setCloudError(null);
+              setCloudAttempt((n) => n + 1);
+            }}
+            className="font-semibold underline underline-offset-2"
+          >
+            Retry
+          </button>
+        </p>
+      )}
 
       {!mounted ? (
         <WorkspacesSkeleton />

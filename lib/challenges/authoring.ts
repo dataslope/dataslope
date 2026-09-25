@@ -15,6 +15,7 @@
 
 import { examplesFromCases, jsCases, pyCases, type CallCase } from "./cases";
 import type { ChallengeDataset } from "./datasets";
+import { jsSignature } from "./signatures";
 import type {
   Challenge,
   ChallengeStep,
@@ -259,7 +260,11 @@ export function sqlSteps(common: SqlCommon, steps: SqlStepSpec[]): Challenge {
 
 /** One language's take on a code problem. */
 export interface CodeVariant {
-  /** Shown in the instructions under "Signature". */
+  /**
+   * Shown in the instructions under "Signature". A JavaScript signature may
+   * be written with TypeScript annotations; it is shown as JavaScript with
+   * JSDoc types (see `./signatures`).
+   */
   signature: string;
   starter: string;
   solution: string;
@@ -342,7 +347,7 @@ export function codeChallenge(
         id,
         label: LANG_LABELS[id].label,
         shortLabel: LANG_LABELS[id].short,
-        signature: v.signature,
+        signature: id === "javascript" ? jsSignature(v.signature) : v.signature,
         starterCode: v.starter,
         solutionCode: v.solution,
         tests: v.tests,
@@ -355,7 +360,10 @@ interface CodeStepSpec {
   title: string;
   short: string;
   prompt: (Span[] | string)[];
-  /** The function this step adds, shown in a fenced block under the prompt. */
+  /**
+   * The function this step adds, shown in a fenced block under the prompt.
+   * On a JavaScript build, annotations become JSDoc, as for `CodeVariant`.
+   */
   signature?: string;
   /** What this step's solution teaches; falls back to the challenge's note. */
   solutionNote?: Span[] | string;
@@ -405,7 +413,14 @@ export function codeSteps(
         ...(step.signature
           ? ([
               { kind: "label", text: "Signature" },
-              { kind: "code", source: step.signature, language: common.language },
+              {
+                kind: "code",
+                source:
+                  common.language === "javascript"
+                    ? jsSignature(step.signature)
+                    : step.signature,
+                language: common.language,
+              },
             ] as InstructionBlock[])
           : []),
       ],

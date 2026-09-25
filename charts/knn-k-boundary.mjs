@@ -59,13 +59,27 @@ function classify(px, py, k) {
   return ones * 2 > k ? 1 : 0;
 }
 
+const STEP = (9.5 - 0.5) / (GRID_N - 1);
+
+/** The classified grid, with each column's consecutive same-class cells
+ *  merged into one rect. The union is the same surface, but drawn as ~6,300
+ *  separate cells it was ~540 KB of SVG, inlined twice into every page that
+ *  places the chart; merged it is a few hundred rects, and the hairline seams
+ *  between translucent neighbours go with them. */
 const cells = KS.flatMap((k) =>
-  AXIS.flatMap((px) => AXIS.map((py) => ({ panel: `k = ${k}`, px, py, pred: classify(px, py, k) }))),
+  AXIS.flatMap((px) => {
+    const runs = [];
+    for (const py of AXIS) {
+      const pred = classify(px, py, k);
+      const run = runs.at(-1);
+      if (run?.pred === pred) run.y2 = py + STEP / 2;
+      else runs.push({ panel: `k = ${k}`, px, pred, y1: py - STEP / 2, y2: py + STEP / 2 });
+    }
+    return runs;
+  }),
 );
 
 const training = KS.flatMap((k) => points.map((p) => ({ ...p, panel: `k = ${k}` })));
-
-const STEP = (9.5 - 0.5) / (GRID_N - 1);
 
 export function render() {
   return plot({
@@ -81,8 +95,8 @@ export function render() {
       Plot.rect(cells, {
         x1: (d) => d.px - STEP / 2,
         x2: (d) => d.px + STEP / 2,
-        y1: (d) => d.py - STEP / 2,
-        y2: (d) => d.py + STEP / 2,
+        y1: "y1",
+        y2: "y2",
         fx: "panel",
         fill: (d) => (d.pred === 1 ? SERIES[1] : SERIES[0]),
         fillOpacity: 0.16,

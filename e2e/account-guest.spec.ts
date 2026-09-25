@@ -15,7 +15,7 @@ test.describe("Account page, signed out", () => {
     const main = page.getByRole("main");
     await expect(main.getByRole("heading", { name: "You're browsing as a guest" })).toBeVisible();
     await expect(main.getByRole("heading", { name: "What an account adds" })).toBeVisible();
-    for (const perk of ["Cloud saves", "Share links you control", "Ask AI"]) {
+    for (const perk of ["Cloud saves", "Share links you control"]) {
       await expect(main.getByRole("heading", { name: perk })).toBeVisible();
     }
 

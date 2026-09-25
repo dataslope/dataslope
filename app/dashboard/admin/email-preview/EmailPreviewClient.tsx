@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useSession } from "@/lib/auth/client";
+import { isAdminUser, type PlanUser } from "@/lib/plan";
 import type { PreviewKey } from "./samples";
 
 /**
@@ -40,6 +42,18 @@ type Status =
   | { type: "sending" }
   | { type: "ok"; msg: string }
   | { type: "error"; msg: string };
+
+/**
+ * Renders its children for a signed-in admin only. The previews themselves
+ * are public on purpose (they render repo templates, not anyone's data), but
+ * a "Send test email" form shown to a guest reads as an open relay even
+ * though the endpoint refuses them, so it is not offered at all.
+ */
+export function AdminOnly({ children }: { children: React.ReactNode }) {
+  const { data: session } = useSession();
+  if (!isAdminUser(session?.user as PlanUser | undefined)) return null;
+  return <>{children}</>;
+}
 
 /**
  * "Send test email" control for the preview page. POSTs the chosen template to

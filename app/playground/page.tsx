@@ -11,25 +11,29 @@ import { HomeNav } from "../_components/home/HomeNav";
 import { HomeFooter } from "../_components/home/HomeFooter";
 import { JsonLd } from "../_components/JsonLd";
 import { PLAYGROUNDS } from "../_components/playgrounds";
-import { OG_IMAGE, SITE_URL } from "@/lib/site";
+import { OG_IMAGE, SITE_NAME, SITE_URL } from "@/lib/site";
 import { absUrl, breadcrumbLd } from "@/lib/structuredData";
 import { LanguageCategories } from "./_components/LanguageCategories";
 import { PlaygroundHero } from "./_components/PlaygroundHero";
 import { RecentWorkspaces } from "./_components/RecentWorkspaces";
 
-const PAGE_TITLE = "Playground, Dataslope";
-const PAGE_DESCRIPTION =
-  "Free online coding playgrounds that run entirely in your browser: Python, R, SQL, JavaScript, TypeScript, HTML/CSS, React, PHP, C, C++, Java, and C#. No sign-up, no install, powered by WebAssembly.";
+const PAGE_TITLE = `Playground · ${SITE_NAME}`;
+// Named from the registry, like the count on the page, so neither can fall
+// behind when a playground is added.
+const PLAYGROUND_NAMES = new Intl.ListFormat("en", {
+  type: "conjunction",
+}).format(PLAYGROUNDS.map((p) => p.label));
+const PAGE_DESCRIPTION = `Free online coding playgrounds that run entirely in your browser: ${PLAYGROUND_NAMES}. No sign-up, no install, powered by WebAssembly.`;
 
 export const metadata: Metadata = {
-  // Bare string so the root layout's template renders "Playground · DataSlope".
+  // Bare string so the root layout's template renders "Playground · Dataslope".
   title: "Playground",
   description: PAGE_DESCRIPTION,
   alternates: { canonical: "/playground" },
   openGraph: {
     type: "website",
     url: `${SITE_URL}/playground`,
-    siteName: "DataSlope",
+    siteName: SITE_NAME,
     title: PAGE_TITLE,
     description: PAGE_DESCRIPTION,
     images: [OG_IMAGE],
@@ -86,8 +90,9 @@ export default function PlaygroundPage() {
                 Playground
               </h1>
               <p className="mt-6 text-base text-[var(--ds-gray-900)] [text-wrap:pretty] sm:text-lg dark:text-white">
-                Full code editors that run entirely in your browser. Fourteen
-                languages, free, no setup, no sign-up.
+                Full code editors for {PLAYGROUNDS.length} languages and
+                tools, running entirely in your browser. Free, no setup, no
+                sign-up.
               </p>
             </div>
 

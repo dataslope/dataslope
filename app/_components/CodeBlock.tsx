@@ -54,9 +54,6 @@ import {
 } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { loadLanguage, themeFor, noActiveLine, redoKeymap } from "./cmExtensions";
-import { useAskAiSource } from "./ai/contextRegistry";
-import { describeCodeBlock } from "./ai/widgetSnapshots";
-import { aiInlineCompletion } from "./ai/inlineCompletion";
 import { languageCompletion } from "./completion/languageCompletion";
 
 import type {
@@ -175,20 +172,20 @@ interface CodeBlockProps {
 // Detect the active color scheme from the `dark`/`light` class next-themes
 // puts on <html>, falling back to the OS preference. Deliberately does NOT
 // read `data-theme`: the playground sets it and it can transiently persist
-// during SPA navigation, giving /learn CodeBlocks the wrong theme.
+// during SPA navigation, giving lesson CodeBlocks the wrong theme.
 function detectIsDark(): boolean {
-  if (typeof document === "undefined") return true;
+  if (typeof document === "undefined") return false;
   const root = document.documentElement;
   if (root.classList.contains("dark")) return true;
   if (root.classList.contains("light")) return false;
   if (typeof window !== "undefined" && window.matchMedia) {
     return window.matchMedia("(prefers-color-scheme: dark)").matches;
   }
-  return true;
+  return false;
 }
 
 // Subscribe to <html> class mutations to re-render on docs theme toggles;
-// SSR snapshot defaults to dark.
+// SSR snapshot is light, the site's default theme.
 function useIsDark(): boolean {
   return useSyncExternalStore(
     (notify) => {
@@ -209,7 +206,7 @@ function useIsDark(): boolean {
       };
     },
     () => detectIsDark(),
-    () => true,
+    () => false,
   );
 }
 
@@ -696,15 +693,6 @@ function CodeBlockInner({
         languageComp.of([]),
         themeComp.of(themeFor(cmThemeNameFor(detectIsDark()))),
         noActiveLine,
-        // AI ghost-text completion (pro members only, the extension gates
-        // itself and stays inert for guests/free members). The active file's
-        // read-only init code travels as extra prompt prefix so suggestions
-        // can use the names it defines.
-        aiInlineCompletion({
-          language: adapter.id,
-          filename: () => activeFilenameRef.current,
-          contextPrefix: () => initForFile(activeFilenameRef.current),
-        }),
         // Debounce-persist the active file's buffer so reloads restore
         // in-progress code; the filename is read through the ref so the
         // mount-once listener stays correct after tab switches.
@@ -966,32 +954,6 @@ function CodeBlockInner({
     }
     return out;
   }, [workspaceFiles]);
-
-  // Ask AI context: the block registers itself so the assistant can see the
-  // code (with the user's live edits) and output of blocks on screen.
-  useAskAiSource({
-    kind: "code-block",
-    label: `${adapter.runtimeInfo.language} code block: ${workspaceFiles
-      .map((f) => f.filename)
-      .join(", ")}`,
-    elementRef: cardRef,
-    getSnapshot: () => {
-      const buffers = snapshotAllFiles();
-      return {
-        content: describeCodeBlock({
-          files: workspaceFiles.map((f) => ({
-            filename: f.filename,
-            code: buffers.get(f.filename) ?? "",
-            initCode: f.initCode,
-          })),
-          outputs: outputs
-            .filter((c) => c.type === "stdout" || c.type === "stderr" || c.type === "log")
-            .map((c) => c.content),
-          stdin: hasStdin ? (stdinBufferRef.current ?? "") : undefined,
-        }),
-      };
-    },
-  });
 
   // Build a file's effective source for a run: its read-only init code
   // (if any) prepended to the editable buffer, via the adapter-aware

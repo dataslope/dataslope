@@ -1,6 +1,6 @@
 /**
  * Raw Markdown endpoint for `/fumadocs-dev` pages: serves the unprocessed
- * `.mdx` source as `text/markdown` for the page-action buttons and Ask AI.
+ * `.mdx` source as `text/markdown` for the page-action buttons.
  * Reached via the `.md` rewrites in next.config.ts. (Course lessons' `.md`
  * mirrors are static assets from `scripts/build-course-md.mjs` instead.)
  */

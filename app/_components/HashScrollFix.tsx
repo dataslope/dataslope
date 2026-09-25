@@ -14,8 +14,8 @@ import { usePathname } from "next/navigation";
 /** How long after arrival late-mounting components may still shift layout. */
 const SETTLE_MS = 3000;
 
-/** Keys that express scroll intent; anything else (typing in Ask AI, tabbing)
- *  should not cancel the correction window. */
+/** Keys that express scroll intent; anything else (typing in an editor,
+ *  tabbing) should not cancel the correction window. */
 const SCROLL_KEYS = new Set([
   "ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " ", "Spacebar",
 ]);

@@ -1451,6 +1451,11 @@
   align-items: center;
   gap: 5px;
   padding: 5px 8px;
+  /* WCAG 2.2 target size (2.5.8). Icon-only on phones, where the label is
+     hidden and the padding alone came to 23px. */
+  min-width: 24px;
+  min-height: 24px;
+  justify-content: center;
   border-radius: 5px;
   font-family: var(--ch-font-ui);
   transition: color 0.15s, background 0.15s;
@@ -1472,6 +1477,7 @@
   color: var(--ch-text-muted);
   cursor: pointer;
   padding: 5px 7px;
+  min-height: 24px;
   border-radius: 5px;
   display: inline-flex;
   align-items: center;

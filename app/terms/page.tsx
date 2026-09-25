@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function TermsPage() {
   return (
-    <LegalShell title="Terms of Service" updated="August 12, 2026">
+    <LegalShell title="Terms of Service" updated="September 25, 2026">
       <p>
         These terms govern your use of Dataslope (the &ldquo;Service&rdquo;). By
         using the Service, you agree to them. If you don&apos;t agree, please
@@ -64,15 +64,6 @@ export default function TermsPage() {
         work from the playground at any time.
       </p>
 
-      <h2>Ask AI</h2>
-      <p>
-        The optional &ldquo;Ask AI&rdquo; assistant sends your question and
-        relevant page context to a third-party AI provider to generate a
-        response. AI responses may be inaccurate or incomplete, don&apos;t rely
-        on them as professional advice, and always verify important answers.
-        Please don&apos;t submit sensitive personal information in your prompts.
-      </p>
-
       <h2>Acceptable use</h2>
       <p>You agree not to:</p>
       <ul>
@@ -82,8 +73,8 @@ export default function TermsPage() {
         </li>
         <li>
           attempt to disrupt, overload, or compromise the Service, its hosting,
-          or the third-party services it relies on, including abusing the AI
-          assistant with automated or bulk requests;
+          or the third-party services it relies on, for example with
+          automated or bulk requests;
         </li>
         <li>
           misrepresent the Service or remove or obscure any notices it displays.
@@ -134,12 +125,11 @@ export default function TermsPage() {
         Free plans depend on available capacity, and the account features that
         come with them are provided on that basis. Where capacity requires it,
         we may, at any time and without notice, withdraw or restrict features,
-        reduce quotas, including cloud storage and the &ldquo;Ask AI&rdquo;
-        allowance, and remove cloud workspaces or share links, including before
-        the inactivity period described above. This does not change the
-        commitment in the paragraph above: the learning content that is free
-        today, the courses, the interview tracks, and running code in the
-        playgrounds, stays free. Workspaces saved locally in your browser are
+        reduce quotas such as cloud storage, and remove cloud workspaces or
+        share links, including before the inactivity period described above.
+        This does not change the commitment in the paragraph above: the
+        learning content that is free today, the courses, the interview
+        tracks, and running code in the playgrounds, stays free. Workspaces saved locally in your browser are
         not affected, and you can export your work from any playground at any
         time.
       </p>

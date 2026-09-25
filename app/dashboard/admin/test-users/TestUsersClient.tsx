@@ -18,7 +18,8 @@ import {
   Trash2,
   VenetianMask,
 } from "lucide-react";
-import { authClient, useSession } from "@/lib/auth/client";
+import { authClient, isSessionUnavailable, useSession } from "@/lib/auth/client";
+import { SessionUnavailable } from "@/app/_components/auth/SessionUnavailable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -81,7 +82,7 @@ function randomSlug(length = 5): string {
 }
 
 export function TestUsersClient() {
-  const { data: session, isPending: sessionPending } = useSession();
+  const { data: session, isPending: sessionPending, error: sessionError } = useSession();
 
   // --- Creation form -------------------------------------------------------
   const [plan, setPlan] = useState<"free" | "pro">("pro");
@@ -353,7 +354,10 @@ export function TestUsersClient() {
   // --- Gating states -------------------------------------------------------
 
   if (sessionPending) return <CenteredNote>Loading…</CenteredNote>;
-  if (!session) return <SignInPrompt />;
+  if (!session) {
+    if (isSessionUnavailable(sessionError)) return <SessionUnavailable />;
+    return <SignInPrompt />;
+  }
   if (denied) {
     return (
       <AccessDeniedCard
@@ -385,7 +389,7 @@ export function TestUsersClient() {
     <>
       <AdminPageHeader
         title="Test users"
-        description="Disposable, pre-verified accounts for testing member-gated features like AI autocomplete."
+        description="Disposable, pre-verified accounts for testing member-gated features like the Pro storage quota."
       />
       <div className="flex flex-col gap-5 sm:gap-6">
         <Panel>
@@ -674,8 +678,8 @@ export function TestUsersClient() {
             <p className="text-xs leading-relaxed text-muted-foreground">
               Test users are ordinary accounts identified by the reserved
               @{TEST_EMAIL_DOMAIN} domain, safe to remove at any time. Plan
-              changes reach the AI endpoints immediately, they read the
-              session fresh, but the account&apos;s header/plan display can
+              changes reach the storage endpoints immediately, since they read
+              the session fresh, but the account&apos;s header/plan display can
               lag up to five minutes (the session cookie cache).
             </p>
           </PanelBody>

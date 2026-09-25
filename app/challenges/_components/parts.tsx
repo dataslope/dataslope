@@ -8,12 +8,14 @@
  */
 
 import { Fragment } from "react";
+import Link from "next/link";
 import {
   Check,
   CheckCircle2,
   ChevronDown,
   ChevronRight,
   Copy,
+  Eye,
   Table2,
   XCircle,
 } from "lucide-react";
@@ -482,7 +484,9 @@ export function TestsPanel({
   mobile,
   bannerRef,
   onContinue,
+  continueHref,
   continueLabel,
+  continueAriaLabel,
 }: {
   tests: TestOutcome[];
   summary: string;
@@ -497,7 +501,15 @@ export function TestsPanel({
   bannerRef?: React.Ref<HTMLDivElement>;
   /** Offered on a pass, when there is somewhere to go next. */
   onContinue?: () => void;
+  /**
+   * Where the pass leads when it is off this page: the next challenge, once
+   * the last step (or the only one) is accepted. Used when `onContinue` is
+   * not given.
+   */
+  continueHref?: string;
   continueLabel?: string;
+  /** Accessible name for the action, when the visible label is not enough. */
+  continueAriaLabel?: string;
 }) {
   return (
     <div className={s.stack}>
@@ -515,16 +527,73 @@ export function TestsPanel({
         )}
         <span className={s.testBannerText}>{summary}</span>
         {!mobile ? <span className={s.testBannerSub}>{subtitle}</span> : null}
-        {onContinue && allPassed && continueLabel ? (
-          <button type="button" className={s.continueBtn} onClick={onContinue}>
+        {allPassed && continueLabel && onContinue ? (
+          <button
+            type="button"
+            className={s.continueBtn}
+            onClick={onContinue}
+            aria-label={continueAriaLabel}
+          >
             {continueLabel}
             <ChevronRight size={13} strokeWidth={2.4} aria-hidden="true" />
           </button>
+        ) : allPassed && continueLabel && continueHref ? (
+          <Link href={continueHref} className={s.continueBtn} aria-label={continueAriaLabel}>
+            {continueLabel}
+            <ChevronRight size={13} strokeWidth={2.4} aria-hidden="true" />
+          </Link>
         ) : null}
       </div>
       {tests.map((test, i) => (
         <TestRow key={`${test.name}-${i}`} test={test} mobile={mobile} />
       ))}
+    </div>
+  );
+}
+
+/**
+ * The Test cases tab after a submission that never reached its checks.
+ *
+ * When the learner's code throws before the harness runs, there are no
+ * results to list, and the tab used to fall back to its "Submit to run the
+ * checks" placeholder, which reads as though nothing happened. The error was
+ * only on the Output tab. This says what went wrong where the learner is
+ * already looking, and offers the way to the full output.
+ */
+export function SubmitErrorPanel({
+  message,
+  scope,
+  mobile,
+  bannerRef,
+  onShowOutput,
+}: {
+  message: string;
+  /** "this step" or "this challenge". */
+  scope: string;
+  mobile?: boolean;
+  bannerRef?: React.Ref<HTMLDivElement>;
+  onShowOutput: () => void;
+}) {
+  return (
+    <div className={s.stack}>
+      <div ref={bannerRef} tabIndex={-1} className={s.testBanner}>
+        <XCircle size={15} strokeWidth={2} aria-hidden="true" />
+        <span className={s.testBannerText}>The checks did not run</span>
+        {!mobile ? (
+          <span className={s.testBannerSub}>Your code raised an error first</span>
+        ) : null}
+        <button type="button" className={s.errorBtn} onClick={onShowOutput}>
+          Open Output
+        </button>
+      </div>
+      <p className={s.submitErrorLead}>
+        Your code stopped with an error before the checks for {scope} could run.
+        Fix it and submit again.
+      </p>
+      <div className={s.runError}>
+        <XCircle size={15} strokeWidth={2} aria-hidden="true" />
+        <pre className={s.runErrorText}>{message}</pre>
+      </div>
     </div>
   );
 }
@@ -571,6 +640,39 @@ function TestRow({ test, mobile }: { test: TestOutcome; mobile?: boolean }) {
 }
 
 // ─── Solution ────────────────────────────────────────────────────────
+
+/**
+ * What the Solution tab shows until the learner asks for the answer.
+ *
+ * One click used to put the whole reference solution on screen, which is an
+ * easy way to spoil a problem by accident while looking for the Submissions
+ * tab. Asking once more, in place rather than in a dialog, is enough to make
+ * it a decision. Nothing is locked: a step the learner has not reached yet
+ * can still be read ahead, as before.
+ */
+export function SolutionGate({
+  scope,
+  onReveal,
+}: {
+  /** "this step" or "this challenge". */
+  scope: string;
+  onReveal: () => void;
+}) {
+  return (
+    <div className={s.solutionGate}>
+      <p className={s.solutionGateTitle}>Reveal the reference solution?</p>
+      <p className={s.solutionGateText}>
+        It shows a complete answer to {scope}. If a check is failing, the Test
+        cases tab says which one and what came back, which is often enough to
+        find the bug yourself.
+      </p>
+      <button type="button" className={s.secondaryBtn} onClick={onReveal}>
+        <Eye size={13} strokeWidth={2} aria-hidden="true" />
+        Reveal solution
+      </button>
+    </div>
+  );
+}
 
 export function SolutionPanelView({
   note,

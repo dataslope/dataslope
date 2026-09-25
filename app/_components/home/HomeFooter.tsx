@@ -134,16 +134,22 @@ export function HomeFooter() {
               aria-label="Dataslope home"
               className="ds-logo-hover inline-flex"
             >
+              {/* Lazy, which is also what stops React preloading both
+                  marks from every page's <head>: this footer is part of the
+                  root not-found boundary, which is rendered into every
+                  route. The theme's `hidden` one is then never fetched. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/logo-files/SVG/dataslope-logo-black.svg"
                 alt="Dataslope"
+                loading="lazy"
                 className="ds-logo-mark block h-5 w-auto dark:hidden"
               />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/logo-files/SVG/dataslope-logo-white.svg"
                 alt="Dataslope"
+                loading="lazy"
                 className="ds-logo-mark hidden h-5 w-auto dark:block"
               />
             </Link>

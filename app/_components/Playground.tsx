@@ -11,8 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import "./playground.css";
-import { EditorState, Compartment, StateEffect } from "@codemirror/state";
-import { unifiedMergeView } from "@codemirror/merge";
+import { EditorState, Compartment } from "@codemirror/state";
 import {
   EditorView,
   keymap,
@@ -38,11 +37,6 @@ import {
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
 import { loadLanguage, themeFor, redoKeymap } from "./cmExtensions";
-import { aiInlineCompletion } from "./ai/inlineCompletion";
-import {
-  registerAiEditHandler,
-  type AiEditSuggestion,
-} from "./ai/editSuggestions";
 import { languageCompletion } from "./completion/languageCompletion";
 import {
   DEFAULT_COMPLETION_TRIGGER,
@@ -929,12 +923,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const suppressPersistRef = useRef(false);
 
   const [workspaceReady, setWorkspaceReady] = useState(false);
-  // Mirrored into a ref for callbacks registered outside the render cycle
-  // (e.g. the Ask AI edit handler in ai/editSuggestions.ts).
-  const workspaceReadyRef = useRef(false);
-  useEffect(() => {
-    workspaceReadyRef.current = workspaceReady;
-  }, [workspaceReady]);
 
   // ─── Open editor tabs ───────────────────────────────────────────────
   // The tab strip shows a SUBSET of the workspace's files: closing a tab
@@ -1735,16 +1723,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           languageComp.of([]),
           themeComp.of(themeFor(initialTheme)),
           wrapComp.of(initialWordWrap ? EditorView.lineWrapping : []),
-          // AI ghost-text completion (pro members only, the extension gates
-          // itself and stays inert for guests/free members). Filename is read
-          // through refs so tab switches don't rebuild the editor extensions,
-          // matching how the persist listener works.
-          aiInlineCompletion({
-            language: adapter.id,
-            filename: () =>
-              filesRef.current.find((f) => f.id === activeFileIdRef.current)
-                ?.filename,
-          }),
           persistListener,
         ],
       });
@@ -3353,209 +3331,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     [adapter, showToast],
   );
 
-  // ─── AI-suggested edit review (Ask AI panel → in-editor diff) ──────────
-  // Ask AI can propose new contents for a workspace file; we open a
-  // CodeMirror unified merge view (doc = proposal, baseline = previous
-  // contents) with per-chunk Accept/Reject, plus a banner to finish or
-  // revert the review.
-  interface AiReviewState {
-    fileId: string;
-    filename: string;
-    /** The file's contents when the review opened, "Revert all" target. */
-    original: string;
-    /** Compartment holding the merge extension in the target view. */
-    comp: Compartment;
-    /** Which editor family hosted the review (split pane vs tabbed). */
-    split: boolean;
-  }
-  const [aiReview, setAiReview] = useState<AiReviewState | null>(null);
-  const aiReviewRef = useRef<AiReviewState | null>(null);
-  useEffect(() => {
-    aiReviewRef.current = aiReview;
-  }, [aiReview]);
-  // A suggestion accepted by the handler but not yet materialized in an
-  // editor, applied by the effect below AFTER the tab-switch doc sync.
-  const [pendingAiEdit, setPendingAiEdit] = useState<{
-    fileId: string;
-    filename: string;
-    content: string;
-  } | null>(null);
-
-  /** The live EditorView showing `fileId`, if any. */
-  const viewForFile = useCallback((fileId: string): EditorView | null => {
-    if (splitActiveRef.current) {
-      return splitViewsRef.current.get(fileId) ?? null;
-    }
-    return activeFileIdRef.current === fileId ? editorRef.current : null;
-  }, []);
-
-  const endAiReview = useCallback(
-    (keep: boolean) => {
-      const review = aiReviewRef.current;
-      if (!review) return;
-      const view = viewForFile(review.fileId);
-      if (view) {
-        if (!keep) {
-          view.dispatch({
-            changes: {
-              from: 0,
-              to: view.state.doc.length,
-              insert: review.original,
-            },
-          });
-        }
-        view.dispatch({ effects: review.comp.reconfigure([]) });
-        view.focus();
-      } else if (!keep) {
-        // The review's editor is gone; restore the buffer directly.
-        updateDirtyBuffer(review.fileId, review.original);
-        const wsId = workspaceIdRef.current;
-        if (wsId) opfsWriteFile(wsId, review.fileId, review.original);
-      }
-      setAiReview(null);
-    },
-    [updateDirtyBuffer, viewForFile],
-  );
-
-  // Materialize a pending suggestion once the target editor is showing the
-  // file (the tab-switch doc sync above runs first, effect order matters).
-  useEffect(() => {
-    if (!pendingAiEdit) return;
-    const view = viewForFile(pendingAiEdit.fileId);
-    if (!view) return; // wait for the view to mount / tab to activate
-    const original = view.state.doc.toString();
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- consume-once queue: the pending suggestion is cleared the moment it materializes
-    setPendingAiEdit(null);
-    if (original === pendingAiEdit.content) {
-      showToast("The file already matches the AI suggestion.");
-      return;
-    }
-    const comp = new Compartment();
-    // Baseline first, then swap the doc to the proposal; the persist
-    // listeners treat the proposal like any edit (so Run previews it).
-    view.dispatch({
-      effects: StateEffect.appendConfig.of(
-        comp.of(unifiedMergeView({ original, mergeControls: true })),
-      ),
-    });
-    view.dispatch({
-      changes: {
-        from: 0,
-        to: view.state.doc.length,
-        insert: pendingAiEdit.content,
-      },
-    });
-    setAiReview({
-      fileId: pendingAiEdit.fileId,
-      filename: pendingAiEdit.filename,
-      original,
-      comp,
-      split: splitActiveRef.current,
-    });
-  }, [pendingAiEdit, activeFileId, splitActive, showToast, viewForFile]);
-
-  // A review can't survive its editor: switching tabs away (tabbed mode)
-  // or toggling the split/tabbed layout replaces or remounts the view, so
-  // treat either as "revert the suggestion".
-  useEffect(() => {
-    const review = aiReviewRef.current;
-    if (!review) return;
-    const detached =
-      review.split !== splitActive ||
-      (!review.split && activeFileId !== review.fileId) ||
-      !files.some((f) => f.id === review.fileId);
-    if (!detached) return;
-    // The tabbed editor may now show ANOTHER file with the merge extension
-    // still attached, strip it before restoring the reviewed file's buffer.
-    if (!review.split && editorRef.current) {
-      editorRef.current.dispatch({ effects: review.comp.reconfigure([]) });
-    }
-    updateDirtyBuffer(review.fileId, review.original);
-    const wsId = workspaceIdRef.current;
-    if (wsId && files.some((f) => f.id === review.fileId)) {
-      opfsWriteFile(wsId, review.fileId, review.original);
-    }
-    setAiReview(null);
-  }, [activeFileId, splitActive, files, updateDirtyBuffer]);
-
-  // Filenames the model may create when the user asked for a new file.
-  const SAFE_NEW_FILENAME = /^[A-Za-z0-9_][A-Za-z0-9._/-]{0,99}$/;
-
-  useEffect(() => {
-    return registerAiEditHandler(adapter.id, (suggestion: AiEditSuggestion) => {
-      if (!workspaceReadyRef.current) {
-        return { ok: false, reason: "unavailable" };
-      }
-      if (aiReviewRef.current) return { ok: false, reason: "busy" };
-      const existing =
-        filesRef.current.find((f) => f.filename === suggestion.filename) ??
-        filesRef.current.find(
-          (f) => f.filename.split("/").pop() === suggestion.filename,
-        );
-      flushActiveFileToBuffer();
-      if (!existing) {
-        // Brand-new file: no baseline to diff, create and open it.
-        if (
-          !SAFE_NEW_FILENAME.test(suggestion.filename) ||
-          suggestion.filename.includes("..") ||
-          filesRef.current.length >= 50
-        ) {
-          return { ok: false, reason: "unavailable" };
-        }
-        const wsId = workspaceIdRef.current;
-        const id = newFileId();
-        const file: PlaygroundFile = {
-          id,
-          filename: suggestion.filename,
-          pristineFilename: suggestion.filename,
-        };
-        const next = [...filesRef.current, file];
-        filesRef.current = next;
-        setFiles(next);
-        setOpenTabIds((prev) => [...prev, id]);
-        updateDirtyBuffer(id, suggestion.content);
-        if (wsId) opfsWriteFile(wsId, id, suggestion.content);
-        markDirty();
-        activeFileIdRef.current = id;
-        setActiveFileId(id);
-        setActiveTabId(id);
-        showToast(
-          `Created ${suggestion.filename} from the AI suggestion.`,
-          "info",
-        );
-        return { ok: true };
-      }
-      const current = dirtyBuffersRef.current.get(existing.id) ?? "";
-      if (current === suggestion.content) {
-        return { ok: false, reason: "unchanged" };
-      }
-      if (splitActiveRef.current) {
-        focusSplitFile(existing.id);
-      } else {
-        activeFileIdRef.current = existing.id;
-        setActiveFileId(existing.id);
-        setActiveTabId(existing.id);
-      }
-      setPendingAiEdit({
-        fileId: existing.id,
-        filename: existing.filename,
-        content: suggestion.content,
-      });
-      return { ok: true };
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    adapter.id,
-    flushActiveFileToBuffer,
-    focusSplitFile,
-    markDirty,
-    setActiveFileId,
-    setActiveTabId,
-    setFiles,
-    showToast,
-    updateDirtyBuffer,
-  ]);
-
   // Auto-scroll output on new cells.
   useEffect(() => {
     scrollToLatestOutput();
@@ -4909,37 +4684,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     )}
                   </div>
                 </div>
-                {aiReview && (
-                  <div
-                    className="ai-review-bar"
-                    role="region"
-                    aria-label="AI suggested changes"
-                  >
-                    <Wand2 size={13} aria-hidden="true" />
-                    <span className="ai-review-text">
-                      AI suggested changes to <code>{aiReview.filename}</code>,
-                      accept or reject each chunk in the editor.
-                    </span>
-                    <div className="ai-review-actions">
-                      <button
-                        type="button"
-                        className="ai-review-btn ai-review-keep"
-                        onClick={() => endAiReview(true)}
-                        title="Finish the review, keeping the changes as shown in the editor"
-                      >
-                        Keep result
-                      </button>
-                      <button
-                        type="button"
-                        className="ai-review-btn ai-review-revert"
-                        onClick={() => endAiReview(false)}
-                        title="Restore the file to how it was before the suggestion"
-                      >
-                        Revert all
-                      </button>
-                    </div>
-                  </div>
-                )}
                 {splitActive ? (
                   // CodePen-style split: panes write through to the dirty
                   // buffers, so Run/Format/Copy read the same state as tabs.

@@ -8,7 +8,7 @@
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createAuth } from "@/lib/auth/server";
-import { resolveTier } from "@/lib/ai/tier";
+import { resolveTier } from "@/lib/plan";
 import {
   isSameOrigin,
   json,

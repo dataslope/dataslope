@@ -4,7 +4,12 @@ import "@/app/tailwind.css";
 import "@/app/home.css";
 import Link from "next/link";
 
-import { GraduationCap, House, SquareTerminal } from "lucide-react";
+import {
+  BriefcaseBusiness,
+  Code2,
+  GraduationCap,
+  SquareTerminal,
+} from "lucide-react";
 
 import imageManifest from "@/lib/generated/images";
 import { HomeNav } from "@/app/_components/home/HomeNav";
@@ -13,11 +18,22 @@ import { THEME_BOOTSTRAP } from "@/app/_components/home/themeBootstrap";
 
 const ART_SLUG = "error-404-cutout";
 
+/** The outlined buttons; the primary one (courses) is filled green. */
+const SECONDARY =
+  "inline-flex items-center gap-2 rounded-lg border border-[var(--ds-gray-200)] px-4 py-2 text-sm font-semibold text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-50)] dark:border-white/10 dark:text-[var(--ds-gray-200)] dark:hover:bg-white/5";
+
 /** Renders nothing when the slug has no manifest entry, so a tree without the
  *  asset shows the page without art. The cutout carries symmetric transparent
  *  padding (~21.6% per side), so the nudges are transforms — they resolve
  *  against the element's own box and hold the inset at any size — and
- *  `left-1/2` centres the visible art, not merely the box. */
+ *  `left-1/2` centres the visible art, not merely the box.
+ *
+ *  `fetchPriority="low"` is what keeps this image off every other page. This
+ *  component is the root not-found boundary, so the server renders it into
+ *  every route's payload, and React turns any `<img>` it renders there into a
+ *  `<link rel="preload">` in the document head unless the image is lazy or
+ *  low priority. Low rather than lazy: on the 404 itself it is in view at
+ *  once and should not wait for layout. */
 function NotFoundArt() {
   const entry = imageManifest[ART_SLUG];
   if (!entry) return null;
@@ -30,6 +46,7 @@ function NotFoundArt() {
       alt=""
       aria-hidden="true"
       decoding="async"
+      fetchPriority="low"
       className="absolute bottom-0 left-1/2 w-[clamp(8rem,44vw,260px)] -translate-x-1/2 translate-y-[32%] md:left-auto md:right-0 md:w-[300px] md:translate-x-[70%] md:translate-y-[14%]"
     />
   );
@@ -68,31 +85,29 @@ export default function NotFound() {
               </h1>
               <p className="mt-4 text-base leading-relaxed text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
                 The address may be mistyped, or the page may have moved.
-                Everything on DataSlope is reachable from the courses catalog
-                and the playgrounds below.
+                Everything on Dataslope can be reached from one of these.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href="/courses"
                   className="inline-flex items-center gap-2 rounded-lg bg-[var(--ds-green-600)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--ds-green-700)]"
                 >
-                  {/* Same icons the home page uses for these destinations. */}
+                  {/* The nav's sections, with its labels and icons. Home is
+                      the logo above, as on every page. */}
                   <GraduationCap size={16} aria-hidden="true" />
-                  Browse courses
+                  Courses
                 </Link>
-                <Link
-                  href="/playground"
-                  className="inline-flex items-center gap-2 rounded-lg border border-[var(--ds-gray-200)] px-4 py-2 text-sm font-semibold text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-50)] dark:border-white/10 dark:text-[var(--ds-gray-200)] dark:hover:bg-white/5"
-                >
+                <Link href="/dashboard/challenges" className={SECONDARY}>
+                  <Code2 size={16} aria-hidden="true" />
+                  Challenges
+                </Link>
+                <Link href="/interview-prep" className={SECONDARY}>
+                  <BriefcaseBusiness size={16} aria-hidden="true" />
+                  Interview Prep
+                </Link>
+                <Link href="/playground" className={SECONDARY}>
                   <SquareTerminal size={16} aria-hidden="true" />
-                  Open a playground
-                </Link>
-                <Link
-                  href="/"
-                  className="inline-flex items-center gap-2 rounded-lg border border-[var(--ds-gray-200)] px-4 py-2 text-sm font-semibold text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-50)] dark:border-white/10 dark:text-[var(--ds-gray-200)] dark:hover:bg-white/5"
-                >
-                  <House size={16} aria-hidden="true" />
-                  Home
+                  Playground
                 </Link>
               </div>
             </div>

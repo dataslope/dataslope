@@ -23,6 +23,10 @@ export interface ImageManifestEntry {
   width: number;
   height: number;
   formats: string[];
+  /** Downscaled WebP copies under `public/images/sized/`, ascending, each
+   *  narrower than `width`. Only thumbnails carry them; see
+   *  lib/imageVariants.ts. */
+  widths?: number[];
 }
 
 declare const imageManifest: Record<string, ImageManifestEntry>;

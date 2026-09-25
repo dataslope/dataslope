@@ -73,7 +73,7 @@ export async function generateMetadata({
     return { title: "Shared playground", robots: { index: false } };
   }
   const title = `${share.name}, shared ${share.playgroundLabel} playground`;
-  const description = `Open your own copy of “${share.name}”, a ${share.playgroundLabel} playground shared on DataSlope. Runs entirely in your browser.`;
+  const description = `Open your own copy of “${share.name}”, a ${share.playgroundLabel} playground shared on Dataslope. Runs entirely in your browser.`;
   return {
     title: { absolute: title },
     description,
@@ -190,7 +190,7 @@ export default async function SharePage({
               <ManifestSummary manifest={share.manifest} />
 
               <p className="mt-8 text-sm leading-relaxed text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
-                DataSlope playgrounds run entirely in your browser, nothing to
+                Dataslope playgrounds run entirely in your browser: nothing to
                 install, no server executing your code. This link holds a
                 snapshot the sharer chose to publish; it may stop working if
                 they revoke it or it expires.

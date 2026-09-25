@@ -340,6 +340,17 @@
 .iconBtn:hover {
   background: var(--cw-bg-hover);
 }
+/* The chevrons are links when there is a neighbour to go to. */
+a.iconBtn,
+a.primaryBtn {
+  text-decoration: none;
+}
+/* The end of the catalog: kept in place so its partner does not move. */
+.iconBtn:disabled {
+  opacity: 0.4;
+  background: transparent;
+  cursor: default;
+}
 
 .navPair {
   display: inline-flex;
@@ -1046,6 +1057,10 @@
   background: var(--cw-bg-hover);
   color: var(--cw-ink);
 }
+.tab:focus-visible {
+  outline: 2px solid var(--cw-focus);
+  outline-offset: -2px;
+}
 
 .badge {
   display: inline-flex;
@@ -1067,6 +1082,13 @@
   flex: 1;
   min-height: 0;
   overflow: auto;
+}
+/* The result panels take focus: to scroll by keyboard, and after the
+   solution is revealed. */
+.resultBody:focus-visible,
+.mResultPanel:focus-visible {
+  outline: 2px solid var(--cw-focus);
+  outline-offset: -2px;
 }
 
 /* ─── Output: result table ──────────────────────────────────────────── */
@@ -1214,7 +1236,8 @@
   background: var(--cw-pass-tint);
 }
 .testBannerPass svg,
-.testBannerPass .testBannerText {
+.testBannerPass .testBannerText,
+.testBannerPass .testBannerSub {
   color: var(--cw-pass-ink);
 }
 
@@ -1239,8 +1262,43 @@
 .continueBtn svg {
   color: #fff;
 }
+/* The last step's "Next challenge" is a link to another page. */
+a.continueBtn {
+  text-decoration: none;
+}
 .continueBtn:hover {
   filter: brightness(1.12);
+}
+
+/* The banner's action when the submission never reached its checks: the
+   way to the full output, in the banner's own red rather than the pass
+   green, since nothing here passed. */
+.errorBtn {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+  border: 1px solid var(--cw-fail-ink);
+  border-radius: 3px;
+  background: var(--cw-bg);
+  padding: 4px 9px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+  color: var(--cw-fail-ink);
+}
+.errorBtn:hover {
+  background: var(--cw-fail-ink);
+  color: #fff;
+}
+
+.submitErrorLead {
+  margin: 0;
+  padding: 12px 14px 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--cw-text-body);
 }
 
 /* The banner takes focus after a submission (see `bannerRef`), so it needs a
@@ -1351,6 +1409,29 @@
   flex-direction: column;
   gap: 14px;
   padding: 16px 14px 24px;
+}
+
+/* Asked before the reference solution is shown (see `SolutionGate`). */
+.solutionGate {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 18px 14px 24px;
+}
+.solutionGateTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cw-text-strong);
+}
+.solutionGateText {
+  margin: 0 0 4px;
+  max-width: 560px;
+  font-size: 13px;
+  line-height: 1.65;
+  text-wrap: pretty;
+  color: var(--cw-text-body);
 }
 
 .solutionText {
@@ -1751,6 +1832,11 @@
   padding: 7px 10px;
 }
 
+.mResultPanel {
+  display: flex;
+  flex-direction: column;
+}
+
 .mTableScroll {
   width: 100%;
   min-width: 0;
@@ -1990,4 +2076,86 @@
 .primaryBtn:disabled {
   opacity: 0.55;
   cursor: default;
+}
+
+/* ─── Phone overflow menu ───────────────────────────────────────────── */
+
+.menuWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: -6px;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  min-width: 220px;
+  max-width: min(320px, calc(100vw - 24px));
+  border: 1px solid var(--cw-border);
+  border-radius: 8px;
+  background: var(--cw-bg);
+  box-shadow: 0 8px 24px rgb(17 24 39 / 12%);
+  padding: 4px;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  padding: 0 12px 0 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  text-align: left;
+  text-decoration: none;
+  color: var(--cw-ink);
+}
+.menuItem:hover,
+.menuItem:focus-visible {
+  background: var(--cw-bg-hover);
+  outline: none;
+}
+.menuItem:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--cw-focus);
+}
+
+.menuIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  color: var(--cw-text-muted);
+}
+
+/* A neighbouring challenge's title can be long; it gets one line. */
+.menuItemText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menuLabel {
+  padding: 8px 8px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cw-text-muted);
+}
+
+.menuSep {
+  height: 1px;
+  margin: 4px 0;
+  background: var(--cw-border-light);
 }

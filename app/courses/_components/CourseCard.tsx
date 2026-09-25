@@ -8,6 +8,7 @@ import { LangIcon } from "@/app/_components/languageIcons";
 import { formatTagLabel } from "@/lib/tagLabels";
 import type { CatalogCourse } from "@/lib/courseCatalog";
 import imageManifest from "@/lib/generated/images";
+import { imageSrcSet } from "@/lib/imageVariants";
 import { CourseGlyph } from "./courseArt";
 
 const HEADING = "text-[var(--ds-gray-900)] dark:text-white";
@@ -56,14 +57,18 @@ const THUMB_MIME: Record<string, string> = {
  * catalog degrades a row at a time). Cut-outs sit on the row background in
  * both themes and are cropped to the artwork on both axes
  * (`scripts/lib/cutouts.mjs`), so transparent margins don't shrink the painted
- * subject. Width comes from `LAYOUT`.
+ * subject. Width comes from `LAYOUT`, and so does `sizes`, which lets the
+ * browser take a downscaled variant (lib/imageVariants.ts) instead of the
+ * 1,500px original.
  */
 function CourseThumb({
   course,
   thumbClass,
+  sizes,
 }: {
   course: CatalogCourse;
   thumbClass: string;
+  sizes: string;
 }) {
   const slug = `${course.slug}-thumbnail-cutout`;
   const entry = imageManifest[slug];
@@ -88,6 +93,8 @@ function CourseThumb({
       ))}
       <img
         src={`/images/${slug}.${fallback}`}
+        srcSet={imageSrcSet(slug, entry)}
+        sizes={sizes}
         width={entry.width}
         height={entry.height}
         alt=""
@@ -115,6 +122,7 @@ const LAYOUT = {
     // 65% centred when stacked on a phone; on desktop `w-full` fills the
     // 104px column and the auto margins do nothing.
     thumb: "w-[65%] mx-auto sm:w-full",
+    sizes: "(min-width: 640px) 104px, 65vw",
     title: "text-[18px] leading-[1.7] tracking-[-0.02em]",
     desc: "line-clamp-2 text-[16px] leading-[1.7] sm:line-clamp-none",
   },
@@ -122,6 +130,7 @@ const LAYOUT = {
     row: "grid-cols-[84px_1fr] gap-5 py-6",
     text: "gap-[5px]",
     thumb: "w-full",
+    sizes: "84px",
     title: "text-[17px] tracking-[-0.01em]",
     desc: "line-clamp-2 text-[15px] leading-[1.6]",
   },
@@ -144,7 +153,7 @@ export function CourseCard({
       prefetch={false}
       className={`group -mx-3 grid items-start px-3 ${l.row}`}
     >
-      <CourseThumb course={course} thumbClass={l.thumb} />
+      <CourseThumb course={course} thumbClass={l.thumb} sizes={l.sizes} />
       <span className={`flex min-w-0 flex-col ${l.text}`}>
         <span
           className={`font-semibold ${l.title} ${HEADING} ${HOVER_TEXT}`}

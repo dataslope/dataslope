@@ -61,9 +61,6 @@ import {
 } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { loadLanguage, themeFor, noActiveLine, redoKeymap } from "./cmExtensions";
-import { aiInlineCompletion } from "./ai/inlineCompletion";
-import { useAskAiSource } from "./ai/contextRegistry";
-import { describeChallenge } from "./ai/widgetSnapshots";
 import { languageCompletion } from "./completion/languageCompletion";
 import type {
   LanguageAdapter,
@@ -559,15 +556,6 @@ export default function ChallengeCard({
         languageComp.of([]),
         themeComp.of(themeFor(cmThemeNameRef.current)),
         noActiveLine,
-        // AI ghost-text completion (pro members only, the extension gates
-        // itself and stays inert for guests/free members). The active file's
-        // read-only init code travels as extra prompt prefix so suggestions
-        // can use the names it defines.
-        aiInlineCompletion({
-          language: adapter.id,
-          filename: () => activeFilenameRef.current,
-          contextPrefix: () => initForFile(activeFilenameRef.current),
-        }),
         // Debounced persist of the user's buffer so reloads /
         // navigation away and back restore their in-progress attempt.
         EditorView.updateListener.of((update) => {
@@ -874,39 +862,6 @@ export default function ChallengeCard({
     }
     return out;
   }, [workspaceFiles]);
-
-  // Ask AI context: the card registers itself so the assistant can see the
-  // challenge the user is looking at, instructions, their current code,
-  // output, and test results. Snapshots are pulled only at send time.
-  useAskAiSource({
-    kind: "challenge",
-    label: `${badge}: ${title}`,
-    elementRef: cardRef,
-    getSnapshot: () => {
-      const instructionsText =
-        typeof instructions === "string"
-          ? instructions
-          : (cardRef.current
-              ?.querySelector("[data-askai-instructions]")
-              ?.textContent ?? "");
-      const buffers = snapshotAllFiles();
-      return {
-        content: describeChallenge({
-          instructions: instructionsText,
-          files: workspaceFiles.map((f) => ({
-            filename: f.filename,
-            code: buffers.get(f.filename) ?? "",
-            initCode: f.initCode,
-          })),
-          outputs: outputs
-            .filter((c) => c.type === "stdout" || c.type === "stderr" || c.type === "log")
-            .map((c) => c.content),
-          tests: testResults,
-          banner: bannerState,
-        }),
-      };
-    },
-  });
 
   // Build a file's effective source for a run: its read-only init code
   // (if any) prepended to the editable buffer, via the adapter-aware
@@ -1682,9 +1637,7 @@ export default function ChallengeCard({
 
       {/* ── Instructions ── */}
       <div className={styles.instructions}>
-        {/* data-askai-instructions lets the Ask AI snapshot read the rendered
-            instructions text when `instructions` is JSX rather than a string. */}
-        <div className={styles.instructionsBody} data-askai-instructions>
+        <div className={styles.instructionsBody}>
           {renderInstructions(instructions)}
         </div>
       </div>

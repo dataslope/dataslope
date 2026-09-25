@@ -25,7 +25,8 @@ import {
   TriangleAlert,
 } from "lucide-react";
 import Link from "@/app/_components/Link";
-import { useSession } from "@/lib/auth/client";
+import { isSessionUnavailable, useSession } from "@/lib/auth/client";
+import { SessionUnavailable } from "@/app/_components/auth/SessionUnavailable";
 import type {
   GalleryEntry,
   IllustrationGallery,
@@ -347,7 +348,7 @@ function Notice({ children }: { children: React.ReactNode }) {
 }
 
 export function IllustrationPromptsClient() {
-  const { data: session, isPending: sessionPending } = useSession();
+  const { data: session, isPending: sessionPending, error: sessionError } = useSession();
 
   const [gallery, setGallery] = useState<IllustrationGallery | null>(null);
   const [marks, setMarks] = useState<Record<string, MarkState>>({});
@@ -666,6 +667,7 @@ export function IllustrationPromptsClient() {
     // `useSession` goes pending on every tab refocus, and swapping the grid
     // for a spinner then would lose the scroll position.
     if (!sessionPending && !session) {
+      if (isSessionUnavailable(sessionError)) return <SessionUnavailable />;
       return (
         <Notice>
           <p>This page is for site admins.</p>

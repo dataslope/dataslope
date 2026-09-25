@@ -18,7 +18,7 @@ import {
   PanelHeader,
 } from "../_components/shared";
 import { EMAIL_TEMPLATES, SAMPLE_URL } from "./samples";
-import { PreviewFrame, SendTestEmail } from "./EmailPreviewClient";
+import { AdminOnly, PreviewFrame, SendTestEmail } from "./EmailPreviewClient";
 
 export const dynamic = "force-static";
 
@@ -59,17 +59,19 @@ export default function EmailPreviewPage() {
         description="The transactional auth emails from lib/auth/email.ts, rendered exactly as they're sent via Resend. Links use a sample, non-functional token."
       />
 
-      <Panel>
-        <PanelHeader
-          title="Send a live test"
-          description="Delivers the real email to your own inbox, so you can check how a client renders it."
-        />
-        <PanelBody>
-          <SendTestEmail
-            templates={EMAIL_TEMPLATES.map((t) => ({ key: t.key, name: t.name }))}
+      <AdminOnly>
+        <Panel>
+          <PanelHeader
+            title="Send a live test"
+            description="Delivers the real email to your own inbox, so you can check how a client renders it."
           />
-        </PanelBody>
-      </Panel>
+          <PanelBody>
+            <SendTestEmail
+              templates={EMAIL_TEMPLATES.map((t) => ({ key: t.key, name: t.name }))}
+            />
+          </PanelBody>
+        </Panel>
+      </AdminOnly>
 
       <div className="mt-6 flex flex-col gap-6">
         {previews.map((p) => (

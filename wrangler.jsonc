@@ -80,16 +80,6 @@
     // Must be a Resend-verified domain. RESEND_API_KEY is a secret; email
     // verification and password reset stay off until it's set.
     "EMAIL_FROM": "Dataslope <no-reply@dataslope.com>",
-    // "Ask AI" + inline-completion model selection (non-secret). No hardcoded
-    // fallback (lib/ai/models.ts) — change model ids here without a code
-    // change. Keys are secrets: AI_FREE_API_KEY covers both tiers via
-    // resolveModel's fallback (add AI_PRO_API_KEY for a separate pro key).
-    // Ask AI stays inert (503) until a tier has key + base URL + model set;
-    // inline completion (pro members only) uses the pro-tier config.
-    "AI_FREE_BASE_URL": "https://openrouter.ai/api/v1",
-    "AI_FREE_MODEL": "deepseek/deepseek-v4-flash",
-    "AI_PRO_BASE_URL": "https://openrouter.ai/api/v1",
-    "AI_PRO_MODEL": "deepseek/deepseek-v4-flash",
     // Polar billing for Pro (non-secret half; lib/billing/polar.ts + README).
     // Inert until POLAR_PRO_PRODUCT_ID and the POLAR_ACCESS_TOKEN secret are
     // set; the webhook also needs the POLAR_WEBHOOK_SECRET secret.

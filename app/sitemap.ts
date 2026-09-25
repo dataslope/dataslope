@@ -1,13 +1,14 @@
 /**
  * XML sitemap at `/sitemap.xml`, generated at build time: home, catalog
- * indexes, every prerendered lesson, and the playground landing pages. The
- * raw-Markdown mirrors and dev-only `/fumadocs-dev` gallery are intentionally
- * omitted, consistent with `app/robots.ts`.
+ * indexes, every prerendered lesson, every challenge, and the playground
+ * landing pages. The raw-Markdown mirrors and dev-only `/fumadocs-dev`
+ * gallery are intentionally omitted, consistent with `app/robots.ts`.
  */
 import type { MetadataRoute } from "next";
 import { courseSource, interviewSource } from "@/lib/source";
 import { SITE_URL } from "@/lib/site";
 import { getPlaygroundPaths } from "@/lib/playgrounds";
+import { getChallengeSlugs } from "@/lib/challenges";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const abs = (path: string) => new URL(path, SITE_URL).toString();
@@ -55,6 +56,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url,
       changeFrequency: "monthly",
       priority: 0.7,
+    });
+  }
+
+  // The challenge catalog and every workspace. The catalog stays at its
+  // /dashboard URL (`/challenges` only redirects there), and every slug is
+  // prerendered, so each entry here is a real page.
+  entries.set(abs("/dashboard/challenges"), {
+    url: abs("/dashboard/challenges"),
+    changeFrequency: "weekly",
+    priority: 0.9,
+  });
+
+  for (const slug of getChallengeSlugs()) {
+    const url = abs(`/challenges/${slug}`);
+    entries.set(url, {
+      url,
+      changeFrequency: "monthly",
+      priority: 0.6,
     });
   }
 

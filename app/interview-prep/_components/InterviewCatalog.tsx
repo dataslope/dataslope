@@ -9,6 +9,7 @@
 import { Layers } from "lucide-react";
 import Link from "@/app/_components/Link";
 import imageManifest from "@/lib/generated/images";
+import { imageSrcSet } from "@/lib/imageVariants";
 import type { InterviewTrack } from "@/lib/interviewCatalog";
 
 interface Presentation {
@@ -87,6 +88,9 @@ function TrackThumb({ slug, alt }: { slug: string; alt: string }) {
       ))}
       <img
         src={`/images/${slug}.${fallback}`}
+        // Downscaled variants first (lib/imageVariants.ts), so a phone is not
+        // sent the 1,500px original.
+        srcSet={imageSrcSet(slug, entry)}
         alt={alt}
         width={entry.width}
         height={entry.height}

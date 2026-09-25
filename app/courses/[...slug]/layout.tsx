@@ -7,16 +7,19 @@
 import "../../docs.css";
 import type { ReactNode } from "react";
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
-import { courseSource } from "@/lib/source";
+import { courseSource, scopedPageTree } from "@/lib/source";
 import { ThemePillToggleSlot } from "@/app/_components/ThemePillToggle";
 import { DocsRootProvider } from "@/app/_components/DocsRootProvider";
 import { DocsFooter } from "@/app/_components/DocsFooter";
 
-export default function CourseLessonLayout({
+export default async function CourseLessonLayout({
   children,
+  params,
 }: {
   children: ReactNode;
+  params: Promise<{ slug: string[] }>;
 }) {
+  const { slug } = await params;
   return (
     // Theme must match the rest of the site, which treats `theme` as a binary
     // "light" | "dark" with a light default (siteTheme.ts) — without this a
@@ -24,7 +27,9 @@ export default function CourseLessonLayout({
     // DocsRootProvider (not bare RootProvider) so search knows the course.
     <DocsRootProvider theme={{ defaultTheme: "light", enableSystem: false }}>
       <DocsLayout
-        tree={courseSource.pageTree}
+        // Only this lesson's course: the full tree is ~370 KB of every
+        // course, serialized into every page for a sidebar that draws one.
+        tree={scopedPageTree(courseSource.pageTree, `/courses/${slug[0]}`)}
         tabs={false}
         // The site's shared pill toggle instead of Fumadocs's segmented switch.
         slots={{ themeSwitch: ThemePillToggleSlot }}

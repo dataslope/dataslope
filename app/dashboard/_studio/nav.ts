@@ -2,16 +2,16 @@
 // labels + icons, and pathname → active-entry mapping.
 import {
   BookOpen,
+  BriefcaseBusiness,
   ChartSpline,
   Code2,
   FlaskConical,
+  GraduationCap,
   Image,
   Mail,
   Palette,
   Shield,
-  Sparkle,
   SquareTerminal,
-  ThumbsUp,
   User,
   Users,
   type LucideIcon,
@@ -50,20 +50,6 @@ export const ADMIN_ITEMS: AdminNavItem[] = [
     label: "Test Users",
     href: "/dashboard/admin/test-users",
     icon: FlaskConical,
-    band: "data",
-  },
-  {
-    key: "admin-ai-usage",
-    label: "AI Usage",
-    href: "/dashboard/admin/ai-usage",
-    icon: Sparkle,
-    band: "data",
-  },
-  {
-    key: "admin-ai-feedback",
-    label: "AI Feedback",
-    href: "/dashboard/admin/ai-feedback",
-    icon: ThumbsUp,
     band: "data",
   },
   {
@@ -122,6 +108,22 @@ export const PAGE_ITEMS: StudioNavItem[] = [
   },
   { key: "account", label: "Account", href: "/dashboard/account", icon: User },
   { key: "admin", label: "Admin", href: "/dashboard/admin", icon: Shield },
+];
+
+/**
+ * The rest of the site, listed under the dashboard pages. The header's
+ * "Challenges" link lands inside this shell, and without these the only way
+ * back to Courses or Interview Prep was the logo. They leave the shell (the
+ * main site has its own layout) but stay in this tab.
+ */
+export const SITE_ITEMS: StudioNavItem[] = [
+  { key: "courses", label: "Courses", href: "/courses", icon: GraduationCap },
+  {
+    key: "interview-prep",
+    label: "Interview Prep",
+    href: "/interview-prep",
+    icon: BriefcaseBusiness,
+  },
 ];
 
 /** Human breadcrumb label for a route key. */

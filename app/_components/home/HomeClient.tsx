@@ -16,6 +16,13 @@ import { PlaygroundShowcase } from "./PlaygroundShowcase";
 import { PricingSection } from "./PricingSection";
 import { Faq } from "./Faq";
 import { HomeFooter } from "./HomeFooter";
+import { PLAYGROUNDS } from "../playgrounds";
+
+// Every playground by name, from the registry the /playground page counts, so
+// the list can't fall behind the languages the site actually runs.
+const PLAYGROUND_NAMES = new Intl.ListFormat("en", {
+  type: "conjunction",
+}).format(PLAYGROUNDS.map((p) => p.label));
 
 function SectionHeading({
   title,
@@ -63,7 +70,7 @@ export function HomeClient({
           {/* The visible "heading" is the marquee; give screen readers a
                 real h1. */}
           <h1 className="sr-only">
-            Dataslope, learn Python, SQL, R, JavaScript and more in your browser
+            Dataslope: learn Python, SQL, R, JavaScript, and more in your browser
           </h1>
           <AnimationPauseGate>
             <BlurFade delay={0.05}>
@@ -105,10 +112,9 @@ export function HomeClient({
             title="Everything runs in your browser"
             subtitle={
               <>
-                Python, R, JavaScript, TypeScript, PHP, C, C++, Java, C#,
-                SQLite, Postgres, and DuckDB,{" "}
+                {PLAYGROUND_NAMES}.{" "}
                 <Highlighter action="underline" color={underlineColor} isView>
-                  free
+                  Free
                 </Highlighter>
                 ,{" "}
                 <Highlighter action="underline" color={underlineColor} isView>
