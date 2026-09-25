@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
-import Link from "@/app/_components/Link";
 import { signOut, useSession } from "@/lib/auth/client";
 import {
   type CheckoutPeriod,
@@ -14,6 +13,7 @@ import {
 import { CloudStorageSection } from "./CloudStorageSection";
 import { ConnectedAccountsSection } from "./ConnectedAccountsSection";
 import { DeleteAccountSection } from "./DeleteAccountSection";
+import { GuestAccount } from "./GuestAccount";
 
 /**
  * Account page, read client-side from the session. Plan comes off
@@ -21,8 +21,20 @@ import { DeleteAccountSection } from "./DeleteAccountSection";
  * button, Pro members the billing portal. Returning from checkout
  * (`?checkout=success`) polls until the webhook's plan flip is visible.
  */
+/** Nothing to subscribe to: the value only differs between server and client. */
+const noSubscribe = () => () => {};
+
 export function AccountClient() {
   const { data: session, isPending } = useSession();
+  /**
+   * False on the server and during hydration, true after. The session can
+   * settle before React hydrates (a fast or failed `get-session`), so the
+   * first client render would show the guest or profile card where the
+   * server rendered the loading card, and React would throw the markup away.
+   * Holding the loading card until hydration has finished keeps the two in
+   * step.
+   */
+  const hydrated = useSyncExternalStore(noSubscribe, () => true, () => false);
   const router = useRouter();
   const [signingOut, setSigningOut] = useState(false);
   const [billingBusy, setBillingBusy] = useState(false);
@@ -65,29 +77,30 @@ export function AccountClient() {
     };
   }, []);
 
-  if (isPending) {
+  // The session resolves on the client, so hold the profile card's place
+  // rather than printing "Loading…" and then pushing the page down.
+  if (isPending || !hydrated) {
     return (
-      <p className="text-center text-sm text-[var(--ds-gray-500)]">Loading…</p>
-    );
-  }
-
-  // Not signed in: prompt rather than redirect, so a shared/bookmarked link
-  // lands somewhere intelligible.
-  if (!session) {
-    return (
-      <div className="text-center">
-        <p className="text-[15px] text-[var(--ds-gray-700)] dark:text-[var(--ds-gray-300)]">
-          Sign in to view your account.
-        </p>
-        <Link
-          href="/sign-in"
-          className="mt-5 inline-flex items-center justify-center rounded-xl bg-[var(--ds-blue-600)] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--ds-blue-700)]"
-        >
-          Sign in
-        </Link>
+      <div
+        role="status"
+        aria-label="Loading your account"
+        className="rounded-2xl p-6"
+        style={{ background: "var(--panel)" }}
+      >
+        <div className="ds-pulse flex items-center gap-4" aria-hidden="true">
+          <span className="size-14 shrink-0 rounded-full" style={{ background: "var(--panel-hover)" }} />
+          <div className="flex-1">
+            <span className="block h-4 w-40 rounded" style={{ background: "var(--panel-hover)" }} />
+            <span className="mt-2 block h-3 w-56 max-w-full rounded" style={{ background: "var(--panel-hover)" }} />
+          </div>
+        </div>
       </div>
     );
   }
+
+  // Not signed in: explain what an account adds rather than redirect, so a
+  // shared or bookmarked link lands somewhere intelligible.
+  if (!session) return <GuestAccount />;
 
   const { user } = session;
   // `plan` is a server-defined additional field, not on the client's user
