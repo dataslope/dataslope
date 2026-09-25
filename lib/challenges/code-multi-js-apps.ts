@@ -153,9 +153,13 @@ if (JSON.stringify(items) !== '[{"sku":"TEA-01","priceCents":450,"qty":2}]') {
       short: "Discount",
       solutionNote:
         "Multiply before you divide: `Math.floor(subtotal * percent / 100)` floors an exact integer product, where `subtotal * (percent / 100)` first turns 35% into `0.35`, which a double cannot hold exactly, and `1400 * 0.35` comes out as `489.99999999999994`. `Math.max(0, ...)` is the other half: a fixed code worth more than the cart must not become a refund.",
-      signature: `type Discount =
-  | { type: "percent", percent: number }  // a whole percentage, 1 to 100
-  | { type: "fixed", cents: number };
+      // A JSDoc typedef rather than a TypeScript `type`: this is shown on a
+      // JavaScript tab, and `jsSignature` rewrites functions, not types.
+      signature: `/**
+ * A whole percentage from 1 to 100, or a fixed amount in cents.
+ * @typedef {{ type: "percent", percent: number }
+ *   | { type: "fixed", cents: number }} Discount
+ */
 
 function discountedCents(subtotal: number, discount: Discount | null): number`,
       prompt: [
@@ -402,9 +406,11 @@ class Editor {
 }
 `;
 
-const OP_TYPE = `type Op =
-  | { type: "insert", at: number, text: string }
-  | { type: "delete", from: number, to: number };`;
+// A JSDoc typedef, since it is shown on a JavaScript tab (see `./signatures`).
+const OP_TYPE = `/**
+ * @typedef {{ type: "insert", at: number, text: string }
+ *   | { type: "delete", from: number, to: number }} Op
+ */`;
 
 const TEXT_EDITOR_HISTORY = codeSteps(
   {

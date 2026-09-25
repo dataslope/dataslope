@@ -7,6 +7,7 @@
  * comparator chain in JavaScript.
  */
 
+import { jsSignature } from "./signatures";
 import type { Challenge } from "./types";
 
 export const TOP_K_FREQUENT_WORDS: Challenge = {
@@ -151,7 +152,7 @@ assert top_k_words(big, 2) == ["a", "b"]`,
       id: "javascript",
       label: "JavaScript · Node",
       shortLabel: "JavaScript",
-      signature: "function topKWords(words: string[], k: number): string[]",
+      signature: jsSignature("function topKWords(words: string[], k: number): string[]"),
       starterCode: `function topKWords(words, k) {
   const counts = new Map();
   for (const w of words) counts.set(w, (counts.get(w) ?? 0) + 1);

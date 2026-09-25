@@ -91,6 +91,25 @@ function cellText(v: unknown): string {
   return String(v);
 }
 
+/**
+ * Drop the stack frames that point past the learner's own code.
+ *
+ * Submit runs what the learner wrote with the check harness appended, so an
+ * error raised inside their function arrives with frames below it that
+ * point into the harness (`at /index.js:38:3`), at lines they never wrote
+ * and cannot see. A frame is dropped only when its line number is past the
+ * end of their code; everything else, including the message and their own
+ * frames, is left exactly as the runtime reported it.
+ */
+export function trimHarnessFrames(message: string, learnerLines: number): string {
+  const lines = message.split("\n");
+  const kept = lines.filter((line) => {
+    const frame = /^\s+at\s.*:(\d+):\d+\)?\s*$/.exec(line);
+    return !frame || Number(frame[1]) <= learnerLines;
+  });
+  return kept.join("\n");
+}
+
 /** The last statement that actually returned columns. */
 function lastResultSet(results: SqlResult[]): SqlResult | null {
   for (let i = results.length - 1; i >= 0; i--) {
@@ -239,14 +258,21 @@ export function useChallengeRunner(challenge: Challenge) {
       let cells: OutputCell[] = [];
       let nextId = 0;
       const started = performance.now();
-      await runtime.run(combined, (cell, seq, append) => {
-        cells = appendOutputCell(cells, cell, {
-          seq,
-          append,
-          elapsed: "",
-          nextId: () => nextId++,
+      try {
+        await runtime.run(combined, (cell, seq, append) => {
+          cells = appendOutputCell(cells, cell, {
+            seq,
+            append,
+            elapsed: "",
+            nextId: () => nextId++,
+          });
         });
-      });
+      } catch (err) {
+        if (harness && err instanceof Error) {
+          throw new Error(trimHarnessFrames(err.message, code.split("\n").length));
+        }
+        throw err;
+      }
       const elapsedMs = performance.now() - started;
 
       // Split harness sentinel lines out of stdout so the learner never sees

@@ -11,13 +11,15 @@
  * Rows arrive as a prop from the server page, derived from the challenges
  * themselves, so every one links to a workspace that exists.
  *
- * Filtering and paging are client state over the whole list — fifty rows is
- * far too few to justify a round trip, and it keeps the page static.
+ * Filtering and paging are client state over the whole list: three hundred
+ * rows are far too few to justify a round trip, and it keeps the page static.
+ * The server renders the unfiltered first page (`ChallengesListFallback`), so
+ * the HTML carries real links before any of this runs.
  */
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { ChevronDown, Circle, CircleCheckBig, Search, X } from "lucide-react";
 import { LangIcon } from "@/app/_components/languageIcons";
 import { statusOf } from "@/lib/challenges/progress";
@@ -181,7 +183,229 @@ function pageWindow(page: number, pageCount: number): (number | null)[] {
   );
 }
 
+/** How long typing has to pause before the search reaches the URL. */
+const SEARCH_DEBOUNCE_MS = 250;
+
+const NO_FILTERS: Filters = { q: "", status: "", lang: "", level: "", format: "" };
+
+/** What a write to the query string carries. */
+type Requested = Filters & { page: number; per: number };
+
+/**
+ * The catalog, driven by the query string.
+ *
+ * Filters and the page live in the URL rather than in component state, so a
+ * filtered view can be linked and bookmarked, a refresh keeps it, and Back to
+ * this page from a challenge lands where the learner left. The page stays
+ * static: this is a client component reading `useSearchParams`, and every
+ * write goes through `history.replaceState`, which Next keeps
+ * `useSearchParams` in sync with and which costs no server round trip.
+ */
 export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) {
+  const pathname = usePathname() ?? "/dashboard/challenges";
+  const params = useSearchParams();
+
+  const urlFilters: Filters = useMemo(
+    () => ({
+      q: params?.get("q") ?? "",
+      status: params?.get("status") ?? "",
+      lang: params?.get("lang") ?? "",
+      level: params?.get("level") ?? "",
+      format: params?.get("format") ?? "",
+    }),
+    [params],
+  );
+  const urlPage = Math.max(1, Number(params?.get("page") ?? 1) || 1);
+  const pageSize = pageSizeFrom(params?.get("per"));
+
+  /**
+   * The search box's own text.
+   *
+   * The box used to render `?q=` directly, and each keystroke navigated. Until
+   * that navigation landed, every render put the old URL value back in the
+   * field, so typing at normal speed kept only the last letter. The field now
+   * owns its text and the URL follows it after a pause.
+   *
+   * `written` is the value this component last put in the URL, so that its
+   * own write arriving is not mistaken for an outside change. Anything else
+   * that moves `?q=` (Back, Forward, a link to a filtered view) is adopted:
+   * React's "adjust state when a prop changes" pattern rather than an effect,
+   * so the field and the list change in the same render.
+   */
+  const [query, setQuery] = useState(urlFilters.q);
+  const [written, setWritten] = useState(urlFilters.q);
+  const [seen, setSeen] = useState(urlFilters.q);
+  if (seen !== urlFilters.q) {
+    setSeen(urlFilters.q);
+    if (urlFilters.q !== written) {
+      setQuery(urlFilters.q);
+      setWritten(urlFilters.q);
+    }
+  }
+
+  // Typed text that has not reached the URL yet is still a new search, so the
+  // list shows its first page rather than the page number of the old one.
+  const page = query === urlFilters.q ? urlPage : 1;
+  // The list trails the field by a render when filtering is slow, so a
+  // keystroke never waits on three hundred rows.
+  const deferredQuery = useDeferredValue(query);
+  const filters: Filters = useMemo(
+    () => ({ ...urlFilters, q: deferredQuery }),
+    [urlFilters, deferredQuery],
+  );
+
+  /**
+   * The state the last write asked for, which is not the same thing as the
+   * state currently rendered.
+   *
+   * A URL change lands asynchronously, so two clicks in quick succession would
+   * both read the pre-navigation page out of the render closure, and the
+   * second would recompute the same target, swallowing a page. Writing here
+   * synchronously means the second click builds on what the first asked for.
+   * The effect keeps it honest when the URL changes from somewhere else.
+   */
+  const requested = useRef<Requested>({ ...urlFilters, q: query, page, per: pageSize });
+  useEffect(() => {
+    requested.current = { ...urlFilters, q: query, page, per: pageSize };
+  }, [urlFilters, query, page, pageSize]);
+
+  const searchTimer = useRef<number | undefined>(undefined);
+  // A write still pending when the learner leaves would rewrite the URL of
+  // whatever page they went to.
+  useEffect(() => () => window.clearTimeout(searchTimer.current), []);
+
+  /**
+   * Rewrite the query string. Empty values are dropped rather than written as
+   * `?q=`, so a cleared filter leaves a clean URL, and so is the default page
+   * size. Replaced rather than pushed, so paging does not bury the page the
+   * learner arrived from under ten history entries.
+   */
+  const write = useCallback(
+    (state: Requested) => {
+      window.clearTimeout(searchTimer.current);
+      setWritten(state.q);
+      const out = new URLSearchParams();
+      for (const key of ["q", "status", "lang", "level", "format"] as const) {
+        if (state[key]) out.set(key, state[key]);
+      }
+      if (state.page > 1) out.set("page", String(state.page));
+      if (state.per !== DEFAULT_PAGE_SIZE) out.set("per", String(state.per));
+      const qs = out.toString();
+      window.history.replaceState(null, "", qs ? `${pathname}?${qs}` : pathname);
+    },
+    [pathname],
+  );
+
+  const apply = useCallback(
+    (next: Partial<Requested>) => {
+      const merged = { ...requested.current, ...next };
+      requested.current = merged;
+      write(merged);
+    },
+    [write],
+  );
+
+  const search = useCallback(
+    (value: string) => {
+      setQuery(value);
+      // Held here at once, so a filter changed before the pause is over
+      // carries the text as typed rather than the text last written.
+      requested.current = { ...requested.current, q: value, page: 1 };
+      window.clearTimeout(searchTimer.current);
+      searchTimer.current = window.setTimeout(
+        () => write({ ...requested.current, q: value }),
+        SEARCH_DEBOUNCE_MS,
+      );
+    },
+    [write],
+  );
+
+  const setFilter = useCallback(
+    (key: Exclude<keyof Filters, "q">) => (value: string) =>
+      // Any filter change resets to page 1: page 7 of a 43-row result is
+      // usually nowhere.
+      apply({ [key]: value, page: 1 }),
+    [apply],
+  );
+  const setPage = useCallback((next: number) => apply({ page: next }), [apply]);
+  // The page size is a display preference, not a filter, so Clear keeps it.
+  const clearFilters = useCallback(() => {
+    setQuery("");
+    apply({ ...NO_FILTERS, page: 1 });
+  }, [apply]);
+
+  return (
+    <CatalogView
+      entries={entries}
+      filters={filters}
+      query={query}
+      page={page}
+      pageSize={pageSize}
+      onSearch={search}
+      onFilter={setFilter}
+      onPage={setPage}
+      onPageSize={(per, start) => apply({ per, page: Math.floor(start / per) + 1 })}
+      onClear={clearFilters}
+    />
+  );
+}
+
+/**
+ * The unfiltered first page, for the server.
+ *
+ * `useSearchParams` cannot be answered while the page is prerendered, so
+ * `ChallengesList` renders on the client only, and its Suspense fallback is
+ * what the static HTML carries. That fallback used to be nothing, which left
+ * crawlers (and anyone before hydration) a page with no challenges on it.
+ * This is the same view with no filters applied, so the swap at hydration is
+ * invisible on the plain URL; a filtered link shows the full list for a
+ * moment before its filters apply.
+ */
+export function ChallengesListFallback({ entries }: { entries: ChallengeIndexEntry[] }) {
+  return (
+    <CatalogView
+      entries={entries}
+      filters={NO_FILTERS}
+      query=""
+      page={1}
+      pageSize={DEFAULT_PAGE_SIZE}
+    />
+  );
+}
+
+/** One language the catalog offers, with how many challenges use it. */
+interface LanguageOption {
+  id: IndexLanguage;
+  count: number;
+}
+
+function CatalogView({
+  entries,
+  filters,
+  query,
+  page,
+  pageSize,
+  onSearch,
+  onFilter,
+  onPage,
+  onPageSize,
+  onClear,
+}: {
+  entries: ChallengeIndexEntry[];
+  /** What the list is filtered by. `q` may trail `query` by a render. */
+  filters: Filters;
+  /** The search box's text. */
+  query: string;
+  page: number;
+  pageSize: number;
+  /** Absent on the server fallback, which is replaced before anyone types. */
+  onSearch?: (value: string) => void;
+  onFilter?: (key: Exclude<keyof Filters, "q">) => (value: string) => void;
+  onPage?: (page: number) => void;
+  /** The new size, and the index of the first row on screen. */
+  onPageSize?: (per: number, start: number) => void;
+  onClear?: () => void;
+}) {
   // Progress lives in the browser, so the server renders every row as "not
   // started" and the store swaps the real statuses in at hydration.
   const progress = useAllProgress();
@@ -194,78 +418,21 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
     [entries, progress],
   );
 
-  // Filters and the page live in the query string rather than in component
-  // state, so a filtered view can be linked and bookmarked, Back undoes a
-  // filter, and a refresh keeps it. The page stays static: this is a client
-  // component reading `useSearchParams`, not a server round trip.
-  const router = useRouter();
-  const pathname = usePathname() ?? "/dashboard/challenges";
-  const params = useSearchParams();
+  // Only languages some challenge is written in, with how many: a filter
+  // choice that always answers "No challenges match" is a dead end. A
+  // language linked to directly (`?lang=r`) is still listed, at zero, so the
+  // select shows what the list is filtered by.
+  const languages: LanguageOption[] = useMemo(() => {
+    const counts = new Map<IndexLanguage, number>();
+    for (const e of entries) {
+      for (const l of e.langs) counts.set(l, (counts.get(l) ?? 0) + 1);
+    }
+    return (Object.keys(INDEX_LANGUAGE_LABELS) as IndexLanguage[])
+      .filter((id) => counts.has(id) || id === filters.lang)
+      .map((id) => ({ id, count: counts.get(id) ?? 0 }));
+  }, [entries, filters.lang]);
 
-  const filters: Filters = useMemo(
-    () => ({
-      q: params?.get("q") ?? "",
-      status: params?.get("status") ?? "",
-      lang: params?.get("lang") ?? "",
-      level: params?.get("level") ?? "",
-      format: params?.get("format") ?? "",
-    }),
-    [params],
-  );
-  const page = Math.max(1, Number(params?.get("page") ?? 1) || 1);
-  const pageSize = pageSizeFrom(params?.get("per"));
-
-  /**
-   * The state the last write asked for, which is not the same thing as the
-   * state currently rendered.
-   *
-   * A router navigation lands asynchronously, so two clicks in quick
-   * succession would both read the pre-navigation page out of the render
-   * closure — and the second would recompute the same target, swallowing a
-   * page. Writing here synchronously means the second click builds on what
-   * the first asked for. The effect keeps it honest when the URL changes from
-   * somewhere else, which is what Back and forward do.
-   */
-  const requested = useRef({ ...filters, page, per: pageSize });
-  useEffect(() => {
-    requested.current = { ...filters, page, per: pageSize };
-  }, [filters, page, pageSize]);
-
-  /**
-   * Rewrite the query string. Empty values are dropped rather than written as
-   * `?q=`, so a cleared filter leaves a clean URL, and so is the default page
-   * size. `replace` rather than `push`, so paging does not bury the page the
-   * learner arrived from under ten history entries.
-   */
-  const apply = useCallback(
-    (next: Partial<Filters & { page: number; per: number }>) => {
-      const merged = { ...requested.current, ...next };
-      requested.current = merged;
-      const query = new URLSearchParams();
-      for (const key of ["q", "status", "lang", "level", "format"] as const) {
-        if (merged[key]) query.set(key, merged[key]);
-      }
-      if (merged.page > 1) query.set("page", String(merged.page));
-      if (merged.per !== DEFAULT_PAGE_SIZE) query.set("per", String(merged.per));
-      const qs = query.toString();
-      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-    },
-    [pathname, router],
-  );
-
-  const set =
-    <K extends keyof Filters>(key: K) =>
-    (value: string) => {
-      // Any filter change resets to page 1: page 7 of a 43-row result is
-      // usually nowhere.
-      apply({ [key]: value, page: 1 } as Partial<Filters> & { page: number });
-    };
-  const setPage = useCallback((next: number) => apply({ page: next }), [apply]);
-  // The page size is a display preference, not a filter, so Clear keeps it.
-  const clearFilters = useCallback(
-    () => apply({ q: "", status: "", lang: "", level: "", format: "", page: 1 }),
-    [apply],
-  );
+  const filterBy = (key: Exclude<keyof Filters, "q">) => onFilter?.(key) ?? (() => {});
 
   const filtered = useMemo(() => all.filter((e) => matches(e, filters)), [all, filters]);
   const total = filtered.length;
@@ -275,16 +442,8 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
   const start = (current - 1) * pageSize;
   const rows = filtered.slice(start, start + pageSize);
 
-  // Changing the size keeps the first row on screen in view, rather than
-  // jumping back to the top: row 120 of 300 at 10 a page is page 12, and at
-  // 50 a page it is on page 3, not page 1.
-  const setPageSize = useCallback(
-    (next: number) => apply({ per: next, page: Math.floor(start / next) + 1 }),
-    [apply, start],
-  );
-
   const solvedInView = filtered.filter((e) => e.status === "solved").length;
-  const hasFilters = Object.values(filters).some(Boolean);
+  const hasFilters = Boolean(query) || Object.values({ ...filters, q: "" }).some(Boolean);
 
   return (
     <div>
@@ -305,8 +464,8 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
           <Search size={15} aria-hidden="true" className="shrink-0" style={{ color: "var(--muted)" }} />
           <input
             type="text"
-            value={filters.q}
-            onChange={(e) => set("q")(e.target.value)}
+            value={query}
+            onChange={(e) => onSearch?.(e.target.value)}
             placeholder="Search challenges…"
             aria-label="Search challenges"
             className="min-w-0 flex-1 border-none bg-transparent text-sm outline-none"
@@ -314,7 +473,7 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
           />
         </label>
 
-        <Select value={filters.status} onChange={set("status")} label="Status">
+        <Select value={filters.status} onChange={filterBy("status")} label="Status">
           <option value="">All statuses</option>
           {(["solved", "attempted", "new"] as const).map((s) => (
             <option key={s} value={s}>
@@ -323,16 +482,16 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
           ))}
         </Select>
 
-        <Select value={filters.lang} onChange={set("lang")} label="Language">
+        <Select value={filters.lang} onChange={filterBy("lang")} label="Language">
           <option value="">All languages</option>
-          {(Object.keys(INDEX_LANGUAGE_LABELS) as IndexLanguage[]).map((id) => (
+          {languages.map(({ id, count }) => (
             <option key={id} value={id}>
-              {INDEX_LANGUAGE_LABELS[id]}
+              {INDEX_LANGUAGE_LABELS[id]} ({count})
             </option>
           ))}
         </Select>
 
-        <Select value={filters.level} onChange={set("level")} label="Level">
+        <Select value={filters.level} onChange={filterBy("level")} label="Level">
           <option value="">All levels</option>
           {LEVELS.map((label, i) => (
             <option key={label} value={String(i + 1)}>
@@ -341,7 +500,7 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
           ))}
         </Select>
 
-        <Select value={filters.format} onChange={set("format")} label="Format">
+        <Select value={filters.format} onChange={filterBy("format")} label="Format">
           <option value="">Any format</option>
           <option value="single">Single step</option>
           <option value="multi">Multi-step</option>
@@ -350,7 +509,7 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
         {hasFilters ? (
           <button
             type="button"
-            onClick={clearFilters}
+            onClick={onClear}
             className="ds-btn-chip"
           >
             <X size={12} aria-hidden="true" />
@@ -379,7 +538,7 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
           No challenges match.{" "}
           <button
             type="button"
-            onClick={clearFilters}
+            onClick={onClear}
             className="border-0 bg-transparent p-0 text-sm font-medium underline underline-offset-2"
             style={{ color: "var(--green-text)" }}
           >
@@ -439,7 +598,10 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
                 <span aria-hidden="true">Show</span>
                 <Select
                   value={String(pageSize)}
-                  onChange={(v) => setPageSize(Number(v))}
+                  // Changing the size keeps the first row on screen in view,
+                  // rather than jumping back to the top: row 120 of 300 at 10
+                  // a page is page 12, and at 50 a page it is on page 3.
+                  onChange={(v) => onPageSize?.(Number(v), start)}
                   label="Challenges per page"
                   compact
                 >
@@ -458,7 +620,7 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
                   type="button"
                   className="ds-page-btn"
                   disabled={current <= 1}
-                  onClick={() => setPage(Math.max(1, current - 1))}
+                  onClick={() => onPage?.(Math.max(1, current - 1))}
                 >
                   Previous
                 </button>
@@ -476,7 +638,7 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
                     <button
                       key={n}
                       type="button"
-                      onClick={() => setPage(n)}
+                      onClick={() => onPage?.(n)}
                       aria-label={`Page ${n}`}
                       aria-current={n === current ? "page" : undefined}
                       data-active={n === current || undefined}
@@ -490,7 +652,7 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
                   type="button"
                   className="ds-page-btn"
                   disabled={current >= pageCount}
-                  onClick={() => setPage(Math.min(pageCount, current + 1))}
+                  onClick={() => onPage?.(Math.min(pageCount, current + 1))}
                 >
                   Next
                 </button>
@@ -529,6 +691,8 @@ function MobileRow({ entry }: { entry: ResolvedEntry }) {
     >
       <Link
         href={`/challenges/${entry.slug}`}
+        // See `Row`.
+        prefetch={false}
         className="flex items-start gap-2.5 text-inherit no-underline"
       >
         <span className="mt-0.5 shrink-0">
@@ -588,6 +752,10 @@ function Row({ entry }: { entry: ResolvedEntry }) {
       <td className="p-3 align-middle">
         <Link
           href={`/challenges/${entry.slug}`}
+          // Fifty rows a page, each a whole workspace (prompt, dataset,
+          // reference solutions): prefetching every row that scrolls into
+          // view fetched far more than anyone opens. See app/_components/Link.tsx.
+          prefetch={false}
           className="ds-row-link flex flex-col gap-0.5 text-inherit no-underline"
         >
           <span className="text-sm font-medium leading-tight" style={{ color: "var(--ink)" }}>

@@ -277,8 +277,11 @@ test.describe("Challenge workspace", () => {
     await expect(page.locator("body")).toContainText("Editor unlocks when step 1 passes");
 
     // The solution is readable in advance, by design — step 2's answer
-    // reverses each transposed row.
-    await page.getByRole("button", { name: "Solution", exact: true }).first().click();
+    // reverses each transposed row. It is one confirmation away (CH-9), not
+    // one click: the tab asks first, then shows it.
+    await page.getByRole("tab", { name: "Solution", exact: true }).click();
+    await expect(page.locator("body")).not.toContainText("row.reverse()");
+    await page.getByRole("button", { name: "Reveal solution" }).click();
     await expect(page.locator("body")).toContainText("row.reverse()");
   });
 
@@ -340,7 +343,10 @@ test.describe("Challenge workspace", () => {
     await page.reload();
     await expect(page.getByLabel("Challenges per page")).toHaveValue("10");
 
-    // The default is left out of the URL, like an empty filter.
+    // The default is left out of the URL, like an empty filter. The select is
+    // server-rendered, so wait for hydration before changing it (see the
+    // next test): a change before React attaches is a DOM change only.
+    await page.waitForLoadState("networkidle");
     await page.getByLabel("Challenges per page").selectOption("50");
     await expect(page).not.toHaveURL(/per=/);
   });
@@ -387,4 +393,231 @@ test.describe("Challenge workspace", () => {
     });
     expect(unlocked.every(Boolean)).toBe(true);
   });
+
+  // ─── Audit regressions (CH-1 to CH-4, CH-7 to CH-9, A11Y-1, SEO-1) ────
+
+  test("CH-1: the search box keeps every keystroke, and the URL follows", async ({ page }) => {
+    await page.goto("/dashboard/challenges");
+    // Typing before hydration goes to the server-rendered copy, which React
+    // replaces; wait for the chunks so the keystrokes reach the real list.
+    await page.waitForLoadState("networkidle");
+    const search = page.getByLabel("Search challenges");
+    await search.click();
+    // A normal typing speed, which used to leave only the last letter.
+    await search.pressSequentially("coh", { delay: 30 });
+    // Let the first write land mid-word, then keep typing: its arrival must
+    // not put "coh" back over the letters typed since.
+    await page.waitForTimeout(400);
+    await search.pressSequentially("ort", { delay: 30 });
+    await expect(search).toHaveValue("cohort");
+    await expect(page).toHaveURL(/[?&]q=cohort(&|$)/);
+
+    const titles = page.locator("table tbody tr");
+    await expect(titles.first()).toContainText(/cohort/i);
+    for (const text of await titles.allTextContents()) expect(text).toMatch(/cohort/i);
+
+    // Leave for a challenge and come back: the search comes back with it.
+    await titles.first().locator("a").click();
+    await expect(page).toHaveURL(/\/challenges\//);
+    await page.goBack();
+    await expect(page.getByLabel("Search challenges")).toHaveValue("cohort");
+  });
+
+  test("CH-7: the language filter offers only languages with challenges, with counts", async ({
+    page,
+  }) => {
+    await page.goto("/dashboard/challenges");
+    const labels = await page.getByLabel("Language").locator("option").allTextContents();
+    expect(labels[0]).toBe("All languages");
+    for (const label of labels.slice(1)) expect(label).toMatch(/^[\w+#. ]+ \(\d+\)$/);
+    expect(labels.some((l) => l.startsWith("Python ("))).toBe(true);
+    expect(labels.some((l) => l.startsWith("PostgreSQL"))).toBe(false);
+    expect(labels.some((l) => l.startsWith("DuckDB"))).toBe(false);
+  });
+
+  test("CH-2: passing a step shows the verdict and waits for Continue", async ({ page }) => {
+    await openWorkspace(page, "matrix-rotation");
+    const handle = () =>
+      page.evaluate(() => window.__dsChallengeWorkspace?.["matrix-rotation"]?.currentTaskKey());
+    expect(await handle()).toBe("01");
+
+    // No step picked: the page is following progress, which is the state the
+    // jump happened in. Submit through the real button.
+    await fillEditor(page, "matrix-rotation", "solution");
+    await page.getByRole("button", { name: "Submit step" }).click();
+
+    const panel = page.getByRole("tabpanel");
+    await expect(panel).toContainText(/All \d+ checks passed/, { timeout: 150_000 });
+    await expect(panel).toContainText("Step 1 accepted");
+    const cont = page.getByRole("button", { name: "Continue to step 2" });
+    await expect(cont).toBeVisible();
+    expect(await handle()).toBe("01");
+
+    await cont.click();
+    await expect.poll(handle).toBe("02");
+    await expect(page.locator(".cm-content").first()).toBeVisible();
+
+    // A fresh load opens on the first step not yet passed.
+    await page.reload();
+    await page.waitForFunction(() => !!window.__dsChallengeWorkspace?.["matrix-rotation"]);
+    expect(await handle()).toBe("02");
+  });
+
+  test("CH-3: a submission that throws says so in Test cases", async ({ page }) => {
+    await openWorkspace(page, "two-sum");
+    await page.evaluate(() => window.__dsChallengeWorkspace?.["two-sum"]?.selectTask("javascript"));
+    await page.waitForTimeout(50);
+    await fillEditor(
+      page,
+      "two-sum",
+      "function twoSum(nums, target) {\n  return [];\n}\noops();\n",
+    );
+    await page.evaluate(() => window.__dsChallengeWorkspace?.["two-sum"]?.submit());
+    await page.waitForFunction(
+      () => window.__dsChallengeWorkspace?.["two-sum"]?.isBusy() === false,
+      null,
+      { timeout: 150_000 },
+    );
+
+    await expect(page.getByRole("tab", { name: /^Test cases/ })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    const panel = page.getByRole("tabpanel");
+    await expect(panel).toContainText("The checks did not run");
+    await expect(panel).toContainText("before the checks for this challenge could run");
+    await expect(panel).toContainText("oops is not defined");
+    // The harness appended after the learner's four lines is not theirs to
+    // debug, so no frame points past them.
+    const message = (await panel.locator("pre").textContent()) ?? "";
+    for (const m of message.matchAll(/:(\d+):\d+\)?\s*$/gm)) {
+      expect(Number(m[1])).toBeLessThanOrEqual(4);
+    }
+
+    await panel.getByRole("button", { name: "Open Output" }).click();
+    await expect(page.getByRole("tab", { name: "Output" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await expect(page.getByRole("tabpanel")).toContainText("oops is not defined");
+  });
+
+  test("CH-4: the previous and next chevrons go to the neighbouring challenges", async ({
+    page,
+  }) => {
+    await openWorkspace(page, "two-sum");
+    const nextLink = page.getByRole("link", { name: /^Next challenge: / });
+    const name = (await nextLink.getAttribute("aria-label")) ?? "";
+    await nextLink.focus();
+    await page.keyboard.press("Enter");
+    await expect(page).not.toHaveURL(/\/challenges\/two-sum$/);
+    await expect(page.locator("h1")).toHaveText(name.replace(/^Next challenge: /, ""));
+
+    await page.getByRole("link", { name: /^Previous challenge: / }).click();
+    await expect(page).toHaveURL(/\/challenges\/two-sum$/);
+
+    // The first challenge in the catalog has nowhere to go back to.
+    await openWorkspace(page, "top-products-by-month");
+    await expect(page.getByRole("button", { name: "No previous challenge" })).toBeDisabled();
+  });
+
+  test("CH-4: the phone's More menu opens and its items work", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openWorkspace(page, "two-sum");
+    const more = page.getByRole("button", { name: "More" });
+    await more.click();
+    const menu = page.getByRole("menu", { name: "More" });
+    await expect(menu).toBeVisible();
+    // Focus moves into the menu, the arrows move through it, Escape leaves.
+    await expect(menu.getByRole("menuitemradio").first()).toBeFocused();
+    await page.keyboard.press("End");
+    await expect(menu.getByRole("menuitem").last()).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(menu).toBeHidden();
+    await expect(more).toBeFocused();
+
+    // Switching language from the menu.
+    await more.click();
+    await menu.getByRole("menuitemradio", { name: /JavaScript/ }).click();
+    await expect.poll(() =>
+      page.evaluate(() => window.__dsChallengeWorkspace?.["two-sum"]?.currentTaskKey()),
+    ).toBe("javascript");
+
+    // Solution opens the results on that tab, behind its confirmation.
+    await more.click();
+    await menu.getByRole("menuitem", { name: "Solution" }).click();
+    await expect(page.getByRole("tab", { name: "Solution" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await expect(page.getByRole("button", { name: "Reveal solution" })).toBeVisible();
+
+    // And the next challenge.
+    await more.click();
+    await menu.getByRole("menuitem", { name: /^Next challenge: / }).click();
+    await expect(page).not.toHaveURL(/\/challenges\/two-sum$/);
+  });
+
+  test("CH-8: the phone opens a new challenge on Problem, and a started one on Code", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openWorkspace(page, "two-sum");
+    const nav = (name: string) => page.getByRole("button", { name, exact: true });
+    await expect(nav("Problem")).toHaveAttribute("aria-current", "page");
+
+    await nav("Code").click();
+    await expect(page.getByText("Autosaved")).toHaveCount(0);
+    await fillEditor(page, "two-sum", "def two_sum(nums, target):\n    return []\n");
+    await expect(page.getByText("Autosaved")).toBeVisible();
+
+    await page.reload();
+    await page.waitForFunction(() => !!window.__dsChallengeWorkspace?.["two-sum"]);
+    await expect(nav("Code")).toHaveAttribute("aria-current", "page");
+  });
+
+  test("A11Y-1: the result tabs are a tab set", async ({ page }) => {
+    await openWorkspace(page, "two-sum");
+    const tabs = page.getByRole("tablist", { name: "Results" }).getByRole("tab");
+    await expect(tabs).toHaveCount(4);
+    const output = page.getByRole("tab", { name: "Output" });
+    await expect(output).toHaveAttribute("aria-selected", "true");
+    const panelId = await output.getAttribute("aria-controls");
+    await expect(page.locator(`[id="${panelId}"]`)).toHaveAttribute("role", "tabpanel");
+
+    await output.focus();
+    await page.keyboard.press("ArrowRight");
+    const tests = page.getByRole("tab", { name: /^Test cases/ });
+    await expect(tests).toBeFocused();
+    await expect(tests).toHaveAttribute("aria-selected", "true");
+    await page.keyboard.press("End");
+    await expect(page.getByRole("tab", { name: "Submissions" })).toBeFocused();
+    await page.keyboard.press("ArrowRight");
+    await expect(output).toBeFocused();
+
+    // Ids are unique across the desktop and phone trees.
+    const duplicates = await page.evaluate(() => {
+      const ids = [...document.querySelectorAll("[id]")].map((el) => el.id);
+      return ids.filter((id, i) => ids.indexOf(id) !== i);
+    });
+    expect(duplicates).toEqual([]);
+  });
+
+  test("SEO-1: the catalog's HTML carries challenge links, and the sitemap lists them", async ({
+    browser,
+    request,
+  }) => {
+    // No JavaScript: what a crawler that does not render gets.
+    const context = await browser.newContext({ javaScriptEnabled: false });
+    const page = await context.newPage();
+    await page.goto("/dashboard/challenges");
+    expect(await page.locator('a[href^="/challenges/"]').count()).toBeGreaterThanOrEqual(10);
+    await context.close();
+
+    const sitemap = await (await request.get("/sitemap.xml")).text();
+    expect(sitemap).toContain("/dashboard/challenges</loc>");
+    expect(sitemap).toContain("/challenges/two-sum</loc>");
+    expect(sitemap.match(/\/challenges\/[a-z0-9-]+<\/loc>/g)?.length).toBe(300);
+  });
 });
+

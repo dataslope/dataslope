@@ -29,6 +29,8 @@ export interface WorkspaceTestHandle {
   isTaskUnlocked(key: string): boolean;
   /** Move to a step or language by key. */
   selectTask(key: string): void;
+  /** The step or language on screen, as of the last render. */
+  currentTaskKey(): string;
   /** Replace the editor buffer. */
   setCode(code: string): void;
   /**

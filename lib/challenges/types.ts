@@ -318,6 +318,12 @@ export interface Challenge {
   submitLabel: string;
 }
 
+/** Enough of another challenge to link to it. */
+export interface ChallengeLink {
+  slug: string;
+  title: string;
+}
+
 // ─── Catalog index ───────────────────────────────────────────────────
 
 /** One row of the challenge list at `/dashboard/challenges`. */

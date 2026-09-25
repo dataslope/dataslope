@@ -15,8 +15,8 @@
 
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getChallenge, getChallengeSlugs } from "@/lib/challenges";
-import { OG_IMAGE, SITE_URL } from "@/lib/site";
+import { getChallenge, getChallengeNeighbours, getChallengeSlugs } from "@/lib/challenges";
+import { OG_IMAGE, SITE_NAME, SITE_URL } from "@/lib/site";
 import { ChallengeWorkspace } from "../_components/ChallengeWorkspace";
 
 export function generateStaticParams() {
@@ -34,14 +34,14 @@ export async function generateMetadata({
 
   const title = `${challenge.title}, ${challenge.difficulty} ${challenge.languageLabel} challenge`;
   return {
-    // Bare string so the root template renders "… · DataSlope".
+    // Bare string so the root template renders "… · Dataslope".
     title: challenge.title,
     description: challenge.description,
     alternates: { canonical: `/challenges/${challenge.slug}` },
     openGraph: {
       type: "website",
       url: `${SITE_URL}/challenges/${challenge.slug}`,
-      siteName: "DataSlope",
+      siteName: SITE_NAME,
       title,
       description: challenge.description,
       images: [OG_IMAGE],
@@ -63,10 +63,13 @@ export default async function ChallengePage({
   const { slug } = await params;
   const challenge = getChallenge(slug);
   if (!challenge) notFound();
+  // Catalog order, resolved here: the workspace is client code, and asking it
+  // to find its own neighbours would ship it the whole catalog.
+  const { prev, next } = getChallengeNeighbours(slug);
 
   return (
     <main id="main">
-      <ChallengeWorkspace challenge={challenge} />
+      <ChallengeWorkspace challenge={challenge} prev={prev} next={next} />
     </main>
   );
 }

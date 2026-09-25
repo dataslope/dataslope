@@ -68,7 +68,12 @@ import { SQL_WAREHOUSE } from "./sql-warehouse";
 import { SQL_WEATHER } from "./sql-weather";
 import { TOP_K_FREQUENT_WORDS } from "./top-k-frequent-words";
 import { TOP_PRODUCTS_BY_MONTH } from "./top-products-by-month";
-import { DIFFICULTY_BARS, type Challenge, type ChallengeIndexEntry } from "./types";
+import {
+  DIFFICULTY_BARS,
+  type Challenge,
+  type ChallengeIndexEntry,
+  type ChallengeLink,
+} from "./types";
 
 export * from "./steps";
 export * from "./types";
@@ -140,4 +145,20 @@ export function getChallengeIndex(): ChallengeIndexEntry[] {
     steps: Math.max(1, c.steps.length),
     slug: c.slug,
   }));
+}
+
+/**
+ * The challenges either side of this one in catalog order, for the
+ * workspace's previous and next controls. Resolved here, on the server, so
+ * the workspace is handed two titles rather than the catalog.
+ */
+export function getChallengeNeighbours(slug: string): {
+  prev: ChallengeLink | null;
+  next: ChallengeLink | null;
+} {
+  const i = CHALLENGES.findIndex((c) => c.slug === slug);
+  const link = (c: Challenge | undefined): ChallengeLink | null =>
+    c ? { slug: c.slug, title: c.title } : null;
+  if (i === -1) return { prev: null, next: null };
+  return { prev: link(CHALLENGES[i - 1]), next: link(CHALLENGES[i + 1]) };
 }
