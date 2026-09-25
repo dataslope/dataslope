@@ -1,4 +1,5 @@
-// Resolve a signed-in user's membership tier for model selection.
+// Resolve a signed-in user's membership tier, which gates AI autocomplete and
+// selects the cloud storage quotas.
 //
 // A user is "pro" when ANY of these hold:
 //   - their `user.plan` column is 'pro' (the real membership field, set by a
@@ -6,7 +7,7 @@
 //   - their email is in the `PRO_USER_EMAILS` allowlist (bootstrap before a
 //     billing system exists, mirroring how ADMIN_EMAILS grants admin);
 //   - they're an admin (role 'admin' or in the ADMIN_EMAILS allowlist), admins
-//     get the better model for free.
+//     get Pro for free.
 // Everyone else (including users with no session) is "free".
 import type { MemberTier } from "./types";
 

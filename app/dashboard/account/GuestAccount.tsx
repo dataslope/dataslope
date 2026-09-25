@@ -1,4 +1,4 @@
-import { Cloud, Link2, LogIn, Sparkles, UserRound } from "lucide-react";
+import { Cloud, Link2, LogIn, UserRound } from "lucide-react";
 import Link from "@/app/_components/Link";
 import { FREE_LIMITS, GUEST_SHARE_TTL_DAYS } from "@/lib/workspaces/policy";
 
@@ -20,13 +20,6 @@ const PERKS = [
     title: "Share links you control",
     body: `Copy or revoke a link any time. Links shared as a guest expire after ${GUEST_SHARE_TTL_DAYS} days.`,
     tint: { background: "var(--chip-bg)", color: "var(--label-icon)" },
-  },
-  {
-    icon: Sparkles,
-    title: "Ask AI",
-    body: "Get help from the assistant in lessons, playgrounds and challenges, with a daily allowance.",
-    // The AI accent the rest of the studio uses for AI features.
-    tint: { background: "var(--ai-soft)", color: "var(--ai)" },
   },
 ] as const;
 
@@ -66,8 +59,8 @@ export function GuestAccount() {
           className="mt-5 pt-5 text-[15px] leading-relaxed [text-wrap:pretty]"
           style={{ borderTop: "1px solid var(--divider)", color: "var(--text)" }}
         >
-          Sign in to keep your playground work in the cloud, manage the links you
-          share, and ask the AI assistant for help.
+          Sign in to keep your playground work in the cloud and manage the links
+          you share.
         </p>
 
         <div className="mt-5 flex flex-wrap items-center gap-2.5">

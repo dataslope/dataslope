@@ -48,11 +48,11 @@ This is a commitment, not a current state of affairs. From the
 > additional or optional paid features in the future, but doing so will not require
 > payment to access the content that is currently free.
 
-An account is optional and free. It adds cloud saves for your workspaces, manageable
-share links, and a small daily allowance of the in-app "Ask AI" assistant. That is
-the entire difference. There is no paid tier today, and the learning content is not
-what a paid tier would ever be for. The details, including the storage limits and the
-capacity caveats, are spelled out on the [pricing page](https://dataslope.com/pricing).
+An account is optional and free. It adds cloud saves for your workspaces and
+manageable share links. That is the entire difference. There is no paid tier today,
+and the learning content is not what a paid tier would ever be for. The details,
+including the storage limits and the capacity caveats, are spelled out on the
+[pricing page](https://dataslope.com/pricing).
 
 ## Unlimited code executions
 
@@ -210,8 +210,8 @@ files. There is a Solution button when you want it.
 
 <img src="docs/screenshots/course-quiz.webp" alt="Multiple-choice questions at the end of a Python lesson">
 
-Course pages also have full-text search across the whole site, per-lesson Markdown
-export, and an optional AI assistant that can see the lesson you are on.
+Course pages also have full-text search across the whole site and per-lesson
+Markdown export.
 
 ## Interview prep
 

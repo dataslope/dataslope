@@ -12,10 +12,10 @@ import { resolveModel } from "@/lib/ai/models";
 import {
   COMPLETION_LIMITS,
   buildCompletionMessages,
+  estimateTokens,
   postProcessCompletion,
   trimContext,
 } from "@/lib/ai/completion";
-import { estimateTokens } from "@/lib/ai/context";
 import { checkCompletionBudget, recordCompletionUsage, utcDay } from "@/lib/ai/limits";
 import { completeChat } from "@/lib/ai/provider";
 import { isSameOrigin } from "@/lib/workspaces/server";

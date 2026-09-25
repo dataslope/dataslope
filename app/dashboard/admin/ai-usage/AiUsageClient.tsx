@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * AI usage per user and site-wide over a chosen window, from
+ * AI autocomplete usage per user and site-wide over a chosen window, from
  * GET /api/admin/ai-usage?start&end (admin-enforced server-side). Date math is
  * UTC to match server-side bucketing (`ai_usage_daily.day` is a UTC
  * 'YYYY-MM-DD'). Usage is recorded post-response via waitUntil, so very
@@ -108,15 +108,17 @@ function StatTile({
   label,
   value,
   detail,
+  className,
   children,
 }: {
   label: string;
   value: string;
   detail?: string;
+  className?: string;
   children?: React.ReactNode;
 }) {
   return (
-    <Panel className="flex flex-col gap-1 p-4 sm:p-5">
+    <Panel className={cn("flex flex-col gap-1 p-4 sm:p-5", className)}>
       <span className="text-sm text-muted-foreground">{label}</span>
       <span className="text-2xl font-semibold">{value}</span>
       {detail && <span className="text-xs text-muted-foreground">{detail}</span>}
@@ -278,7 +280,6 @@ export function AiUsageClient() {
 
   const hasTokenData = (report?.activeDays ?? 0) > 0;
   const capPct = report ? Math.round((report.peakDayTok / report.globalCap) * 100) : 0;
-  const chatRequests = report?.users.reduce((s, u) => s + u.requests, 0) ?? 0;
   const completions = report?.users.reduce((s, u) => s + u.completions, 0) ?? 0;
 
   const tokenDetail = !report
@@ -296,7 +297,7 @@ export function AiUsageClient() {
     <>
       <AdminPageHeader
         title="AI usage"
-        description="Ask AI chat, inline-completion, and suggested-question spend, per user and site-wide."
+        description="AI autocomplete spend, per user and site-wide."
       />
       <div className="flex flex-col gap-5 sm:gap-6">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
@@ -336,20 +337,18 @@ export function AiUsageClient() {
 
         {error && <ErrorNote>{error}</ErrorNote>}
 
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+          {/* Full width on phones: it carries the meter and the longest detail. */}
           <StatTile
             label="Tokens used"
             value={loading ? "…" : hasTokenData ? compact.format(report!.totalTok) : "—"}
             detail={tokenDetail}
+            className="col-span-2 sm:col-span-1"
           >
             {report && hasTokenData && (
               <CapMeter fraction={report.peakDayTok / report.globalCap} />
             )}
           </StatTile>
-          <StatTile
-            label="Chat requests"
-            value={loading ? "…" : compact.format(chatRequests)}
-          />
           <StatTile
             label="Completions"
             value={loading ? "…" : compact.format(completions)}
@@ -366,7 +365,7 @@ export function AiUsageClient() {
             description={
               loading
                 ? "Loading…"
-                : `${userCount} ${userCount === 1 ? "user" : "users"} with AI activity · ${label}`
+                : `${userCount} ${userCount === 1 ? "user" : "users"} with autocomplete activity · ${label}`
             }
           />
           <PanelBody>
@@ -377,7 +376,7 @@ export function AiUsageClient() {
               </p>
             ) : !report || report.users.length === 0 ? (
               <p className="py-12 text-center text-sm text-muted-foreground">
-                No AI activity in this window.
+                No autocomplete activity in this window.
               </p>
             ) : (
               <Table>
@@ -386,22 +385,10 @@ export function AiUsageClient() {
                     <TableHead className={theadClass}>User</TableHead>
                     <TableHead className={theadClass}>Plan</TableHead>
                     <TableHead className={`${theadClass} text-right`}>
-                      Chat requests
-                    </TableHead>
-                    <TableHead className={`${theadClass} text-right`}>
-                      Chat tokens
-                    </TableHead>
-                    <TableHead className={`${theadClass} text-right`}>
                       Completions
                     </TableHead>
                     <TableHead className={`${theadClass} text-right`}>
                       Completion tokens
-                    </TableHead>
-                    <TableHead className={`${theadClass} text-right`}>
-                      Suggestions
-                    </TableHead>
-                    <TableHead className={`${theadClass} text-right`}>
-                      Suggestion tokens
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -432,22 +419,10 @@ export function AiUsageClient() {
                         <PlanBadge plan={u.plan} />
                       </TableCell>
                       <TableCell className={`${cellClass} text-right tabular-nums`}>
-                        {full.format(u.requests)}
-                      </TableCell>
-                      <TableCell className={`${cellClass} text-right tabular-nums`}>
-                        {full.format(u.inputTok + u.outputTok)}
-                      </TableCell>
-                      <TableCell className={`${cellClass} text-right tabular-nums`}>
                         {full.format(u.completions)}
                       </TableCell>
                       <TableCell className={`${cellClass} text-right tabular-nums`}>
                         {full.format(u.completionInTok + u.completionOutTok)}
-                      </TableCell>
-                      <TableCell className={`${cellClass} text-right tabular-nums`}>
-                        {full.format(u.suggests)}
-                      </TableCell>
-                      <TableCell className={`${cellClass} text-right tabular-nums`}>
-                        {full.format(u.suggestInTok + u.suggestOutTok)}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -467,7 +442,7 @@ export function AiUsageClient() {
         <Panel>
           <PanelHeader
             title="Daily totals"
-            description="Site-wide token total per day against the global daily cap."
+            description="Site-wide completion tokens per day against the global daily cap."
           />
           <PanelBody>
             {loading ? (

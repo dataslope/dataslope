@@ -8,22 +8,22 @@ import Link from "../_components/Link";
 import { HomeNav } from "../_components/home/HomeNav";
 import { PricingSection } from "../_components/home/PricingSection";
 import { HomeFooter } from "../_components/home/HomeFooter";
-import { OG_IMAGE, SITE_URL } from "@/lib/site";
+import { OG_IMAGE, SITE_NAME, SITE_URL } from "@/lib/site";
 
 const PAGE_TITLE = "Pricing, Dataslope";
 const PAGE_DESCRIPTION =
-  "Dataslope pricing in detail. Every course, interview track, and playground is free. Compare the Guest and Free Member plans, with footnotes covering cloud storage, sharing, AI usage, and billing.";
+  "Dataslope pricing in detail. Every course, interview track, and playground is free. Compare the Guest and Free Member plans, with footnotes covering cloud storage, sharing, and capacity.";
 
 export const metadata: Metadata = {
-  // A bare string here lets the root layout's "%s · DataSlope" template render
-  // the tab title as "Pricing · DataSlope".
+  // A bare string here lets the root layout's "%s · Dataslope" template render
+  // the tab title as "Pricing · Dataslope".
   title: "Pricing",
   description: PAGE_DESCRIPTION,
   alternates: { canonical: "/pricing" },
   openGraph: {
     type: "website",
     url: `${SITE_URL}/pricing`,
-    siteName: "DataSlope",
+    siteName: SITE_NAME,
     title: PAGE_TITLE,
     description: PAGE_DESCRIPTION,
     images: [OG_IMAGE],
@@ -116,9 +116,9 @@ export default function PricingPage() {
                   (see SHOW_PRO_PLAN in PricingSection). These footnotes have
                   been trimmed to describe only the Guest and Free Member plans,
                   everything is free today. When Pro is restored, re-add the
-                  Pro-specific notes (unlimited Ask AI fair-use, autocomplete,
-                  monthly/annual billing, cancelling a plan) and the 10 GB /
-                  "Upgrade to Pro" clauses removed below. */}
+                  Pro-specific notes (AI autocomplete, monthly/annual billing,
+                  cancelling a plan) and the 10 GB / "Upgrade to Pro" clauses
+                  removed below. */}
               <ol className="mt-8 space-y-6">
                 <Footnote n={1} lead="Free to learn, always.">
                   Courses, interview prep, and the playgrounds, including
@@ -182,27 +182,18 @@ export default function PricingPage() {
                   toward your storage quota (note 5).
                 </Footnote>
 
-                <Footnote n={7} lead="“Ask AI” messages.">
-                  “Ask AI” is the in-app assistant available inside playgrounds,
-                  challenges, code blocks, and lessons. It needs an account:
-                  guests get none, and Free Members up to 10, counted across all
-                  of those surfaces on a rolling 24-hour window. A rolling
-                  window means each message frees up again 24 hours after you
-                  send it, rather than all resetting at a fixed time of day.
-                </Footnote>
-
-                <Footnote n={8} lead="Free plans depend on available capacity.">
+                <Footnote n={7} lead="Free plans depend on available capacity.">
                   Everything above is free because it runs on a limited pool of
                   shared capacity, and it is provided on that basis. Where
                   capacity requires it we may, at any time and without notice,
-                  withdraw or restrict features, lower quotas, including cloud
-                  storage and the &ldquo;Ask AI&rdquo; allowance, and remove
-                  cloud workspaces or share links, including before the
-                  one-month inactivity window in note 4. The learning content
-                  itself stays free, that commitment is in note 1 and in the
-                  terms. Local saves in your browser aren&apos;t affected, and
-                  you can export your work from any playground at any time, so
-                  keep your own copy of anything you&apos;d be sorry to lose.
+                  withdraw or restrict features, lower quotas such as cloud
+                  storage, and remove cloud workspaces or share links,
+                  including before the one-month inactivity window in note 4.
+                  The learning content itself stays free, that commitment is in
+                  note 1 and in the terms. Local saves in your browser
+                  aren&apos;t affected, and you can export your work from any
+                  playground at any time, so keep your own copy of anything
+                  you&apos;d be sorry to lose.
                   The{" "}
                   <Link
                     href="/terms"

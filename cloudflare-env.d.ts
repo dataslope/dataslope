@@ -46,22 +46,22 @@ declare global {
     // domains. See `trustedOrigins` in lib/auth/server.ts.
     TRUSTED_ORIGINS?: string;
 
-    // --- "Ask AI" model config (vars; see lib/ai/models.ts) ---
+    // --- AI autocomplete model config (vars; see lib/ai/models.ts) ---
     // Base URL + model id per membership tier, no hardcoded fallback, so a
     // tier needs its base URL, model id, AND API key (below) all set to be
-    // usable. Both providers must speak the OpenAI /chat/completions
-    // streaming API. Currently both tiers point at OpenRouter's DeepSeek V4
-    // Flash model (see wrangler.jsonc). Fallback is asymmetric, by cost
-    // (resolveModel): pro degrades to the free provider when unconfigured,
-    // but free never silently upgrades to the pro provider.
+    // usable. Both providers must speak the OpenAI /chat/completions API.
+    // Currently both tiers point at OpenRouter's DeepSeek V4 Flash model (see
+    // wrangler.jsonc). Autocomplete is Pro-only and resolves the pro tier,
+    // which degrades to the free provider when unconfigured (resolveModel);
+    // free never silently upgrades to the pro provider.
     AI_FREE_BASE_URL?: string;
     AI_FREE_MODEL?: string;
     AI_PRO_BASE_URL?: string;
     AI_PRO_MODEL?: string;
     // Global per-day token ceiling (bounded-downside backstop). Defaults to 5M.
     AI_DAILY_GLOBAL_TOKEN_CAP?: string;
-    // Comma-separated emails granted the pro model before billing exists
-    // (bootstrap; mirrors ADMIN_EMAILS). See lib/ai/tier.ts.
+    // Comma-separated emails granted Pro before billing exists (bootstrap;
+    // mirrors ADMIN_EMAILS). See lib/ai/tier.ts.
     PRO_USER_EMAILS?: string;
 
     // --- Polar billing (Pro subscriptions; see lib/billing/polar.ts) ---
@@ -95,9 +95,10 @@ declare global {
     GITHUB_CLIENT_SECRET?: string;
     // Resend API key; when set, email verification + password reset turn on.
     RESEND_API_KEY?: string;
-    // "Ask AI" provider API keys (secrets). Set with `wrangler secret put`.
-    // Free tier calls AI_FREE_BASE_URL with this key; pro tier calls
-    // AI_PRO_BASE_URL. If only one is set, both tiers use it (see resolveModel).
+    // AI autocomplete provider API keys (secrets). Set with `wrangler secret
+    // put`. Free tier calls AI_FREE_BASE_URL with this key; pro tier calls
+    // AI_PRO_BASE_URL, or the free tier's config when its own is incomplete
+    // (see resolveModel).
     AI_FREE_API_KEY?: string;
     AI_PRO_API_KEY?: string;
     // Polar billing secrets (see lib/billing/polar.ts): the organization

@@ -1,10 +1,13 @@
 /**
- * Admin-only AI usage report backing /admin/ai-usage: per-user rows over an
- * inclusive [start, end] UTC-day window plus site-wide per-day totals and the
- * daily cap. Params (all optional, UTC 'YYYY-MM-DD'): `start` (omitted ⇒
- * all-time), `end` (omitted ⇒ today), `day` legacy single-day shorthand kept
- * for older cached clients. Invalid values fall back to defaults and an
- * inverted range is clamped, so this never 400s on picker input.
+ * Admin-only AI autocomplete usage report backing /admin/ai-usage: per-user
+ * rows over an inclusive [start, end] UTC-day window plus site-wide per-day
+ * totals and the daily cap. Everything is read from the completion columns of
+ * `ai_usage_daily`: `ai_usage_global` also holds tokens from the retired chat
+ * assistant for older days, so it would overstate autocomplete there. Params
+ * (all optional, UTC 'YYYY-MM-DD'): `start` (omitted ⇒ all-time), `end`
+ * (omitted ⇒ today), `day` legacy single-day shorthand kept for older cached
+ * clients. Invalid values fall back to defaults and an inverted range is
+ * clamped, so this never 400s on picker input.
  */
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { requireAdmin } from "@/lib/auth/admin";
@@ -25,15 +28,9 @@ export interface AiUsageUserRow {
   email: string;
   name: string;
   plan: string;
-  requests: number;
-  inputTok: number;
-  outputTok: number;
   completions: number;
   completionInTok: number;
   completionOutTok: number;
-  suggests: number;
-  suggestInTok: number;
-  suggestOutTok: number;
 }
 
 export interface AiUsageReport {
@@ -44,10 +41,10 @@ export interface AiUsageReport {
   end: string;
   /** Per-user totals over [start, end], busiest first. */
   users: AiUsageUserRow[];
-  /** Site-wide token total per day within the window (newest first, capped at
-   *  DAILY_ROWS_LIMIT). */
+  /** Site-wide completion-token total per day within the window (newest
+   *  first, capped at DAILY_ROWS_LIMIT). */
   daily: { day: string; totalTok: number }[];
-  /** Site-wide token total across the whole window. */
+  /** Site-wide completion-token total across the whole window. */
   totalTok: number;
   /** Largest single-day site-wide total in the window (for cap context). */
   peakDayTok: number;
@@ -89,25 +86,27 @@ export async function GET(request: Request): Promise<Response> {
     start ? `${col} <= ? AND ${col} >= ?` : `${col} <= ?`;
   const binds: string[] = start ? [end, start] : [end];
 
+  // Per-day completion totals. A day counts only when it saw a completion,
+  // so rows holding nothing but the retired chat counters are skipped.
+  const perDay = `SELECT day,
+              SUM(completion_in_tok + completion_out_tok) AS total_tok
+       FROM ai_usage_daily
+       WHERE ${bound("day")}
+       GROUP BY day
+       HAVING SUM(completions) > 0`;
+
   try {
     const users = await env.DB.prepare(
       `SELECT a.user_id, u.email, u.name, u.plan,
-              SUM(a.requests)            AS requests,
-              SUM(a.input_tok)           AS input_tok,
-              SUM(a.output_tok)          AS output_tok,
               SUM(a.completions)         AS completions,
               SUM(a.completion_in_tok)   AS completion_in_tok,
-              SUM(a.completion_out_tok)  AS completion_out_tok,
-              SUM(a.suggests)            AS suggests,
-              SUM(a.suggest_in_tok)      AS suggest_in_tok,
-              SUM(a.suggest_out_tok)     AS suggest_out_tok
+              SUM(a.completion_out_tok)  AS completion_out_tok
        FROM ai_usage_daily a
        JOIN user u ON u.id = a.user_id
        WHERE ${bound("a.day")}
        GROUP BY a.user_id
-       ORDER BY (SUM(a.input_tok) + SUM(a.output_tok)
-                 + SUM(a.completion_in_tok) + SUM(a.completion_out_tok)
-                 + SUM(a.suggest_in_tok) + SUM(a.suggest_out_tok)) DESC
+       HAVING SUM(a.completions) > 0
+       ORDER BY (SUM(a.completion_in_tok) + SUM(a.completion_out_tok)) DESC
        LIMIT 200`,
     )
       .bind(...binds)
@@ -116,20 +115,13 @@ export async function GET(request: Request): Promise<Response> {
         email: string;
         name: string;
         plan: string;
-        requests: number;
-        input_tok: number;
-        output_tok: number;
         completions: number;
         completion_in_tok: number;
         completion_out_tok: number;
-        suggests: number;
-        suggest_in_tok: number;
-        suggest_out_tok: number;
       }>();
 
     const daily = await env.DB.prepare(
-      `SELECT day, total_tok FROM ai_usage_global
-       WHERE ${bound("day")}
+      `${perDay}
        ORDER BY day DESC
        LIMIT ${DAILY_ROWS_LIMIT}`,
     )
@@ -140,8 +132,7 @@ export async function GET(request: Request): Promise<Response> {
       `SELECT COALESCE(SUM(total_tok), 0) AS total_tok,
               COALESCE(MAX(total_tok), 0) AS peak_tok,
               COUNT(*)                    AS active_days
-       FROM ai_usage_global
-       WHERE ${bound("day")}`,
+       FROM (${perDay})`,
     )
       .bind(...binds)
       .first<{ total_tok: number; peak_tok: number; active_days: number }>();
@@ -159,15 +150,9 @@ export async function GET(request: Request): Promise<Response> {
         email: r.email,
         name: r.name,
         plan: r.plan || "free",
-        requests: r.requests,
-        inputTok: r.input_tok,
-        outputTok: r.output_tok,
         completions: r.completions,
         completionInTok: r.completion_in_tok,
         completionOutTok: r.completion_out_tok,
-        suggests: r.suggests,
-        suggestInTok: r.suggest_in_tok,
-        suggestOutTok: r.suggest_out_tok,
       })),
       daily: (daily.results ?? []).map((r) => ({
         day: r.day,

@@ -17,10 +17,6 @@ const FAQS: { q: string; a: string }[] = [
     a: "No learning content is ever gated behind it, but a free account lets you save your workspaces to the cloud, pick them up on another device, and manage your share links. You can sign up with Google, GitHub, or an email address.",
   },
   {
-    q: "What if I want to use more prompts?",
-    a: "Ask AI has a daily allowance that refreshes on a rolling 24-hour basis, so prompts you use free up again over the following day. For now Dataslope only offers free memberships, so there's no paid upgrade for extra prompts, everyone gets the same free allowance. We may add more options in the future.",
-  },
-  {
     q: "Why learn the basics when AI can do the heavy lifting?",
     a: "Because someone still has to judge what comes back. AI is fastest in the hands of people who can read the code it writes, spot the wrong join or the off-by-one, and say precisely what they wanted instead, and that judgment only comes from having written enough of it yourself. The playgrounds are here so you can run things and see the result for yourself rather than take anyone's word for it.",
   },

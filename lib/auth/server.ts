@@ -3,8 +3,9 @@
  *
  * One instance per request: the D1 binding only exists at request time, so
  * this is a factory — call `createAuth(env, request)` per request, never a
- * module-level singleton. Auth gates *actions* (save, share, AI), never
- * *content*: lessons stay statically prerendered and are read with no session.
+ * module-level singleton. Auth gates *actions* (save, share, AI autocomplete),
+ * never *content*: lessons stay statically prerendered and are read with no
+ * session.
  * Keep auth out of middleware.ts (rough edges on the Workers runtime).
  */
 import { betterAuth } from "better-auth";

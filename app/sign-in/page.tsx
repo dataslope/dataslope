@@ -6,7 +6,7 @@ import { SignInClient } from "./SignInClient";
 import { AuthPageShell } from "../_components/auth/AuthPageShell";
 
 const PAGE_DESCRIPTION =
-  "Sign in to Dataslope with Google or GitHub to sync your playground workspaces across devices, share them, and use AI. All courses and playgrounds stay free without an account.";
+  "Sign in to Dataslope with Google or GitHub to sync your playground workspaces across devices and share them. All courses and playgrounds stay free without an account.";
 
 export const metadata: Metadata = {
   title: "Sign in",

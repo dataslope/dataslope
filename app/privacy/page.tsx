@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function PrivacyPage() {
   return (
-    <LegalShell title="Privacy Policy" updated="August 9, 2026">
+    <LegalShell title="Privacy Policy" updated="September 25, 2026">
       <p>
         Dataslope is a free, browser-based platform for learning programming and
         data skills. We built it to need as little of your data as possible. You
@@ -53,34 +53,29 @@ export default function PrivacyPage() {
         you&apos;re comfortable making accessible. You can delete cloud saves and
         revoke share links from your account page.
       </p>
+      <p>
+        When you&apos;re signed in, your progress on the coding challenges
+        (which challenges and steps you&apos;ve passed or attempted) is also
+        stored with your account, so it follows you to other devices. If you
+        solved challenges as a guest in the same browser before signing in,
+        that progress is added to your account. The code you write for a
+        challenge is not uploaded: it stays in your browser.
+      </p>
 
-      <h2>Ask AI</h2>
+      <h2>AI autocomplete</h2>
       <p>
-        When you use the optional &ldquo;Ask AI&rdquo; assistant, your question
-        along with relevant context from the page (such as the lesson text, the
-        code or queries in the playground you&apos;re working in, and any text
-        you&apos;ve highlighted) is sent to a third-party AI provider so it can
-        generate a response. Please don&apos;t include sensitive personal
-        information in your prompts.
+        Where it is available on your account, AI autocomplete suggests code as
+        you type in an editor. To make a suggestion, the code around your cursor
+        in the file you&apos;re editing (including any read-only setup code
+        shown above it), the file&apos;s name, and its language are sent through
+        our servers to a third-party AI provider. Please don&apos;t put
+        sensitive personal information in your code.
       </p>
       <p>
-        <strong>We don&apos;t keep your conversations.</strong>{" "}Ask AI
-        questions and answers pass through our servers to the provider and are
-        not stored by us. What we do record is the running count of how many
-        requests your account has made each day, which is how the daily limits
-        and our own costs are managed; those counters hold no part of what you
-        asked or what you were told.
-      </p>
-      <p>
-        <strong>Rating an answer is the one exception, and it is yours to
-        make.</strong>{" "}Each answer carries a thumbs-up and a thumbs-down
-        button. If you press one, we save that rating together with the question
-        and the answer it refers to, which page you were on, and which model
-        replied, so we can find where the assistant is getting things wrong and
-        improve it. Nothing is saved unless you press one of those buttons.
-        Pressing it again withdraws the rating and deletes what was saved with
-        it, and deleting your account removes your ratings along with the rest
-        of your data.
+        <strong>We don&apos;t keep your code or the suggestions.</strong>{" "}
+        What we do record is a daily count of how many suggestions your account
+        requested and how large they were, which is how the daily limits and our
+        own costs are managed; those counters hold no part of your code.
       </p>
 
       <h2>Data stored on your device</h2>
@@ -89,8 +84,10 @@ export default function PrivacyPage() {
         storage</strong>{" "}keeps things like your theme preference and the code,
         queries, and progress in your playgrounds and lessons. This stays on
         your device and in your browser, and clearing your browser&apos;s site
-        data removes it. Local saves are separate from cloud saves, they are not
-        transmitted to us unless you explicitly save to the cloud.
+        data removes it. Local saves are separate from cloud saves: they are not
+        transmitted to us unless you explicitly save to the cloud. The one
+        exception is challenge progress while you&apos;re signed in, described
+        above.
       </p>
 
       <h2>Code execution</h2>
@@ -98,7 +95,8 @@ export default function PrivacyPage() {
         Every language and database runs locally in your browser through
         WebAssembly. The code you write, the queries you run, and any files you
         load are processed on your machine, and are only sent to us if you save
-        them to the cloud, share them, or ask the AI assistant about them.
+        them to the cloud or share them. If you have AI autocomplete, the code
+        around your cursor is also sent, as described above.
       </p>
 
       <h2>Third-party services</h2>
@@ -123,8 +121,9 @@ export default function PrivacyPage() {
           emails described above.
         </li>
         <li>
-          <strong>An AI provider</strong>{" "}generates &ldquo;Ask AI&rdquo;
-          responses from the context described above.
+          <strong>An AI provider</strong>{" "}generates AI autocomplete
+          suggestions from the code described above, for accounts that have
+          the feature.
         </li>
         <li>
           <strong>Our hosting provider</strong> runs the site and may keep
@@ -150,10 +149,8 @@ export default function PrivacyPage() {
         You can use Dataslope as a guest without giving us any personal
         information. If you have an account, you can delete individual cloud
         saves and share links at any time, or delete your entire account from
-        your account page, doing so removes your profile and the cloud saves,
-        shares, and Ask AI answer ratings associated with it. A single rating
-        can be withdrawn on its own by pressing the same thumbs button again,
-        which deletes the exchange saved with it.
+        your account page, which removes your profile and the cloud saves,
+        shares, and challenge progress associated with it.
       </p>
 
       <h2>Children&apos;s privacy</h2>

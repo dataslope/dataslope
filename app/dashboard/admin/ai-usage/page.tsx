@@ -1,5 +1,5 @@
-// /admin/ai-usage, per-user and site-wide AI spend (Ask AI chat + inline
-// completions), backed by the admin-only /api/admin/ai-usage endpoint.
+// /admin/ai-usage, per-user and site-wide AI autocomplete spend, backed by
+// the admin-only /api/admin/ai-usage endpoint.
 import type { Metadata } from "next";
 import { AdminNarrow } from "../_components/shared";
 import { AiUsageClient } from "./AiUsageClient";

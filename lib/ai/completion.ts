@@ -26,6 +26,12 @@ export const COMPLETION_LIMITS = {
   filenameMaxLength: 120,
 } as const;
 
+/** Rough char/4 token estimate, used to bill a request when the provider
+ *  doesn't report usage. */
+export function estimateTokens(text: string): number {
+  return Math.ceil(text.length / 4);
+}
+
 /** Cursor marker used in the prompt. Chosen to be extremely unlikely to occur
  *  in learner code so the model can't confuse document text with the marker. */
 const CURSOR = "<|cursor|>";

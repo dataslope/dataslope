@@ -1,4 +1,4 @@
-// Per-tier model + provider resolution for "Ask AI".
+// Per-tier provider + model resolution for AI autocomplete.
 //
 // Base URL, model id, and API key are all required per tier, there are no
 // hardcoded fallbacks, so the actual provider/model lives entirely in env
@@ -6,55 +6,17 @@
 // for the API key) and can change without touching this file. A tier missing
 // any of the three is treated as unconfigured (see resolveModel below).
 //
-// Both providers must speak the OpenAI `/chat/completions` streaming API, so
-// the same adapter (lib/ai/provider.ts) drives whichever ones are configured.
+// Both providers must speak the OpenAI `/chat/completions` API, so the same
+// adapter (lib/ai/provider.ts) drives whichever ones are configured.
 import type { MemberTier } from "./types";
 
 export interface ResolvedModel {
-  /** The requesting member's tier (what to report back + which budgets apply). */
-  tier: MemberTier;
   /** OpenAI-compatible base URL, e.g. https://openrouter.ai/api/v1. */
   baseUrl: string;
   /** Provider API key (a secret). */
   apiKey: string;
   /** Model id, e.g. "deepseek/deepseek-v4-flash" (OpenRouter). */
   model: string;
-  /** Max output tokens, the single biggest per-request cost lever. */
-  maxTokens: number;
-  /** Approx per-day token budget (input + output) for this tier. */
-  dailyTokenBudget: number;
-  /** Max Ask AI requests per day for this tier. */
-  dailyRequestBudget: number;
-  /** Approx input-context packing budget, in tokens. */
-  contextBudget: number;
-}
-
-export type TierLimits = Pick<
-  ResolvedModel,
-  "maxTokens" | "dailyTokenBudget" | "dailyRequestBudget" | "contextBudget"
->;
-
-/** Non-secret per-tier limits. Provider/model have no defaults, see wrangler.jsonc. */
-const LIMITS: Record<MemberTier, TierLimits> = {
-  free: {
-    maxTokens: 800,
-    dailyTokenBudget: 60_000,
-    dailyRequestBudget: 40,
-    contextBudget: 8_000,
-  },
-  pro: {
-    maxTokens: 1_200,
-    dailyTokenBudget: 400_000,
-    dailyRequestBudget: 400,
-    contextBudget: 12_000,
-  },
-};
-
-/** A tier's non-secret limits, independent of provider configuration,
- *  used by the usage endpoint to report "prompts left today" even in
- *  environments where the provider vars aren't set. */
-export function limitsForTier(tier: MemberTier): TierLimits {
-  return LIMITS[tier];
 }
 
 /** Build a tier's provider config from env, or null if key/base URL/model isn't all set. */
@@ -64,8 +26,6 @@ function tierConfig(tier: MemberTier, env: CloudflareEnv): ResolvedModel | null 
       return null;
     }
     return {
-      ...LIMITS.pro,
-      tier,
       apiKey: env.AI_PRO_API_KEY,
       baseUrl: env.AI_PRO_BASE_URL,
       model: env.AI_PRO_MODEL,
@@ -75,8 +35,6 @@ function tierConfig(tier: MemberTier, env: CloudflareEnv): ResolvedModel | null 
     return null;
   }
   return {
-    ...LIMITS.free,
-    tier,
     apiKey: env.AI_FREE_API_KEY,
     baseUrl: env.AI_FREE_BASE_URL,
     model: env.AI_FREE_MODEL,
@@ -84,11 +42,11 @@ function tierConfig(tier: MemberTier, env: CloudflareEnv): ResolvedModel | null 
 }
 
 /**
- * Resolve the model for `tier`. Fallback is asymmetric, by cost: a
- * half-configured pro tier degrades to the FREE provider (keeping pro
- * budgets), while a free member never silently upgrades to the pro provider —
- * that would be a cost fail-open on misconfiguration. Returns null when the
- * tier can't be served → the caller should 503.
+ * Resolve the provider for `tier`. Fallback is asymmetric, by cost: a
+ * half-configured pro tier degrades to the FREE provider, while a free tier
+ * never silently upgrades to the pro provider, which would be a cost
+ * fail-open on misconfiguration. Returns null when the tier can't be served →
+ * the caller should 503.
  */
 export function resolveModel(
   tier: MemberTier,
@@ -97,14 +55,5 @@ export function resolveModel(
   const primary = tierConfig(tier, env);
   if (primary) return primary;
   if (tier !== "pro") return null;
-
-  const fallback = tierConfig("free", env);
-  if (!fallback) return null;
-
-  // Use the free provider, but keep pro's limits.
-  return {
-    ...fallback,
-    tier,
-    ...LIMITS.pro,
-  };
+  return tierConfig("free", env);
 }

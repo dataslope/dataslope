@@ -45,10 +45,6 @@
      read as "empty" beside the blue fills without matching a border. */
   --meter-off: #e2e5ea;
   --label-icon: #0064bd;
-  --ai: #7a51b6;
-  --ai-soft: #f4effe;
-  --ai-text: #634094;
-  --ai-btn-fg: #ffffff;
 
   color: var(--text);
   background: var(--page-bg);
@@ -81,10 +77,6 @@
   --rail-group: rgba(255, 255, 255, 0.035);
   --meter-off: #3f3f46;
   --label-icon: #5ba7ff;
-  --ai: #bb96fa;
-  --ai-soft: rgba(171, 119, 250, 0.16);
-  --ai-text: #ccb3fb;
-  --ai-btn-fg: #121212;
 }
 
 /* Slim, unobtrusive scrollbars inside the shell, matching the mockup. */

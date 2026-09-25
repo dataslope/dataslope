@@ -10,7 +10,6 @@ import {
   HardDrive,
   Play,
   Share2,
-  Sparkle,
   SquareTerminal,
   X,
   type LucideIcon,
@@ -21,6 +20,7 @@ import { fadedbar } from "tabbied/patterns";
 import Link from "../Link";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth/client";
+import { effectivePlan, type PlanUser } from "@/lib/plan";
 import { Highlighter } from "@/components/ui/highlighter";
 import { PatternBackdrop } from "../PatternBackdrop";
 import { stashCheckoutPeriod, startProCheckout } from "../billing/proCheckout";
@@ -52,6 +52,9 @@ interface Plan {
   features: Feature[];
   cta: string;
   href: string;
+  /** Label + destination for a signed-in visitor, when they differ from the
+   *  signed-out `cta`/`href` (a member has no use for "Sign up"). */
+  memberCta?: { label: string; href: string };
   /** The promoted tier, green CTA + inline badge (no border/shadow). */
   highlighted?: boolean;
   badge?: string;
@@ -62,7 +65,7 @@ interface Plan {
 // Feature rows per plan. If you change this, also update the hardcoded
 // subgrid row counts in the render below (FEATURE_COUNT + 3) — Tailwind
 // needs literal class strings.
-const FEATURE_COUNT = 8;
+const FEATURE_COUNT = 7;
 
 const PLANS: Plan[] = [
   {
@@ -89,7 +92,6 @@ const PLANS: Plan[] = [
         text: "Share playgrounds",
         note: "Share links expire 30 days after creation",
       },
-      { text: "No “Ask AI” messages", included: false },
     ],
     cta: "Get started",
     href: "/courses",
@@ -122,14 +124,10 @@ const PLANS: Plan[] = [
         text: "Share playgrounds",
         note: "Shared playgrounds deleted after a month of inactivity",
       },
-      {
-        icon: Sparkle,
-        text: "Up to 10 “Ask AI” messages every 24 hours",
-        note: "Across playgrounds, challenges, code blocks & lessons",
-      },
     ],
     cta: "Sign up for free",
     href: "/sign-up",
+    memberCta: { label: "Go to your account", href: "/dashboard/account" },
     // Promoted tier: green CTA, green icon, and a "Recommended" badge.
     highlighted: true,
     badge: "Recommended",
@@ -137,8 +135,9 @@ const PLANS: Plan[] = [
   // Pro is intentionally hidden (SHOW_PRO_PLAN below) but its plan object and
   // all billing wiring (ProCheckoutCta, startProCheckout, Polar checkout) are
   // deliberately left in place — do not delete. To restore: flip
-  // SHOW_PRO_PLAN, re-add the "AI-suggested autocomplete" rows (bumping
-  // FEATURE_COUNT), and widen the grid (see grid-cols / subgrid-row comments).
+  // SHOW_PRO_PLAN, re-add the "AI-suggested autocomplete" rows that its badge
+  // promises (bumping FEATURE_COUNT), and widen the grid (see grid-cols /
+  // subgrid-row comments).
   {
     name: "Pro",
     iconSlug: "pricing-pro",
@@ -168,17 +167,11 @@ const PLANS: Plan[] = [
         text: "Share playgrounds",
         note: "Shared playgrounds never deleted while subscribed",
       },
-      {
-        icon: Sparkle,
-        text: "Unlimited “Ask AI” messages",
-        note: "Fair use policy applies",
-        highlight: "Unlimited",
-      },
     ],
     cta: "Go Pro",
     href: "/courses",
     highlighted: true,
-    badge: "Unlimited AI Chat",
+    badge: "AI autocomplete",
     checkout: true,
   },
 ];
@@ -270,14 +263,9 @@ function ProCheckoutCta({ plan, annual }: { plan: Plan; annual: boolean }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const sessionUser = session?.user as
-    | { plan?: string; role?: string }
-    | undefined;
-  // Admins are treated as Pro everywhere (lib/ai/tier.ts): route to account,
-  // not into a checkout for a plan they effectively have.
-  const isPro =
-    (sessionUser?.plan ?? "").toLowerCase() === "pro" ||
-    sessionUser?.role === "admin";
+  // Admins count as Pro (lib/plan.ts): route to account, not into a
+  // checkout for a plan they effectively have.
+  const isPro = effectivePlan(session?.user as PlanUser | undefined) === "pro";
 
   async function handleClick() {
     setError(null);
@@ -322,6 +310,53 @@ function ProCheckoutCta({ plan, annual }: { plan: Plan; annual: boolean }) {
   );
 }
 
+/** The free tiers' link button: solid green on the promoted tier, tinted
+ *  otherwise. */
+function linkCtaClass(plan: Plan): string {
+  return `my-3 inline-flex w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors ${
+    plan.highlighted
+      ? "bg-[var(--ds-green-600)] text-white hover:bg-[var(--ds-green-700)]"
+      : "bg-[var(--ds-green-50)] text-[var(--ds-green-700)] hover:bg-[var(--ds-green-100)] dark:bg-[var(--ds-green-500)]/10 dark:text-[var(--ds-green-300)] dark:hover:bg-[var(--ds-green-500)]/15"
+  }`;
+}
+
+/**
+ * Link CTA for a plan that reads differently to a signed-in visitor: "Sign up
+ * for free" is the wrong offer to someone who already has the account. Until
+ * the session resolves a size-matched skeleton holds the button's place, so
+ * neither label flashes before the other.
+ */
+function MemberAwareCta({
+  plan,
+  memberCta,
+}: {
+  plan: Plan;
+  memberCta: { label: string; href: string };
+}) {
+  const { data: session, isPending } = useSession();
+
+  if (isPending) {
+    return (
+      <span
+        aria-hidden="true"
+        className="my-3 inline-flex w-full animate-pulse items-center justify-center rounded-lg bg-[var(--ds-gray-100)] px-4 py-2.5 text-sm font-semibold dark:bg-white/10"
+      >
+        {/* Invisible text sizes the skeleton exactly like the real button. */}
+        <span className="invisible">{plan.cta}</span>
+      </span>
+    );
+  }
+
+  return (
+    <Link
+      href={session ? memberCta.href : plan.href}
+      className={linkCtaClass(plan)}
+    >
+      {session ? memberCta.label : plan.cta}
+    </Link>
+  );
+}
+
 function PlanColumn({
   plan,
   annual,
@@ -343,7 +378,7 @@ function PlanColumn({
     // align across plans. Vertical padding stays off the subgrid container
     // (it would offset the shared row tracks).
     <div
-      className={`flex flex-col gap-3 px-6 py-6 lg:row-span-11 lg:row-start-1 lg:grid lg:grid-rows-subgrid lg:px-8 lg:py-0 ${colClass}`}
+      className={`flex flex-col gap-3 px-6 py-6 lg:row-span-10 lg:row-start-1 lg:grid lg:grid-rows-subgrid lg:px-8 lg:py-0 ${colClass}`}
     >
       {/* `relative` so the marmot is lifted out of flow below — in flow a
           120px image would set the row height and break column alignment. */}
@@ -394,15 +429,10 @@ function PlanColumn({
       {/* Extra breathing room above and below the button. */}
       {plan.checkout ? (
         <ProCheckoutCta plan={plan} annual={annual} />
+      ) : plan.memberCta ? (
+        <MemberAwareCta plan={plan} memberCta={plan.memberCta} />
       ) : (
-        <Link
-          href={plan.href}
-          className={`my-3 inline-flex w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors ${
-            plan.highlighted
-              ? "bg-[var(--ds-green-600)] text-white hover:bg-[var(--ds-green-700)]"
-              : "bg-[var(--ds-green-50)] text-[var(--ds-green-700)] hover:bg-[var(--ds-green-100)] dark:bg-[var(--ds-green-500)]/10 dark:text-[var(--ds-green-300)] dark:hover:bg-[var(--ds-green-500)]/15"
-          }`}
-        >
+        <Link href={plan.href} className={linkCtaClass(plan)}>
           {plan.cta}
         </Link>
       )}
@@ -546,7 +576,7 @@ export function PricingSection({
             {/* Subgrid row count is FEATURE_COUNT + 3 (header/price/CTA),
                 as literal class strings for Tailwind's JIT. */}
             <div
-              className={`grid grid-cols-1 divide-y divide-[var(--ds-gray-200)] lg:grid-rows-[repeat(11,auto)] lg:gap-y-3 lg:divide-x lg:divide-y-0 dark:divide-white/10 ${
+              className={`grid grid-cols-1 divide-y divide-[var(--ds-gray-200)] lg:grid-rows-[repeat(10,auto)] lg:gap-y-3 lg:divide-x lg:divide-y-0 dark:divide-white/10 ${
                 SHOW_PRO_PLAN ? "lg:grid-cols-3" : "lg:grid-cols-2"
               }`}
             >

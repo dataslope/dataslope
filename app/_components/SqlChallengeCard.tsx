@@ -76,10 +76,6 @@ import {
   sqlCompletionKeymap,
 } from "./sql/shared/editorSetup";
 import { introspectSqlSchemas } from "./sql/shared/schemaIntrospect";
-import { useAskAiSource } from "./ai/contextRegistry";
-import { describeSqlSurface } from "./ai/widgetSnapshots";
-import { formatSqlSchemaText } from "./ai/sqlSchemaText";
-import type { SqlCompletionSchema } from "./sql/sqlCompletion";
 import { DUCKDB_VERSION } from "./runtime/duckdb";
 import {
   clearPersistedCode,
@@ -717,10 +713,6 @@ export default function SqlChallengeCard({
   const completionCompRef = useRef<Compartment | null>(null);
   // Debounce handle for localStorage persistence (see editor mount).
   const persistSaveTimerRef = useRef<number | null>(null);
-  // Root card element (Ask AI visibility tracking) and the latest
-  // introspected completion schema (reused as the Ask AI schema snapshot).
-  const cardRef = useRef<HTMLDivElement | null>(null);
-  const askAiSchemaRef = useRef<SqlCompletionSchema | null>(null);
 
   // Stable localStorage key. `dialect` is in the fingerprint because the
   // same starter SQL can mean different things across engines; `title`
@@ -906,7 +898,6 @@ export default function SqlChallengeCard({
     async (engine: SqlEngineLike) => {
       try {
         const schemas = await introspectSqlSchemas(engine.exec, dialect);
-        askAiSchemaRef.current = schemas.completion;
         const view = editorRef.current;
         const completionComp = completionCompRef.current;
         const langComp = langCompRef.current;
@@ -926,37 +917,6 @@ export default function SqlChallengeCard({
     },
     [dialect],
   );
-
-  // Ask AI context: the card registers itself so the assistant can see the
-  // challenge the user is looking at, instructions, their current SQL, the
-  // last error/result, test results, and the live database schema.
-  useAskAiSource({
-    kind: "challenge",
-    label: `${badge}: ${title}`,
-    elementRef: cardRef,
-    getSnapshot: () => {
-      const instructionsText =
-        typeof instructions === "string"
-          ? instructions
-          : (cardRef.current
-              ?.querySelector("[data-askai-instructions]")
-              ?.textContent ?? "");
-      return {
-        content: describeSqlSurface({
-          dialect,
-          sql: editorRef.current?.state.doc.toString() ?? "",
-          instructions: instructionsText,
-          error: resultError,
-          resultSummary: resultSet
-            ? `${resultSet.values.length} row(s): ${resultSet.columns.join(", ")}`
-            : resultMessage,
-          tests: testResults,
-          banner: bannerState,
-        }),
-        schema: formatSqlSchemaText(askAiSchemaRef.current),
-      };
-    },
-  });
 
   // Sync the CodeMirror theme whenever the docs color scheme toggles.
   useEffect(() => {
@@ -1556,7 +1516,6 @@ export default function SqlChallengeCard({
   return (
     <div className={styles.cardShell}>
     <div
-      ref={cardRef}
       className={styles.card}
       data-flavor="sql"
       data-testid="sql-challenge-card"
@@ -1620,9 +1579,7 @@ export default function SqlChallengeCard({
 
       {/* ── Instructions ── */}
       <div className={styles.instructions}>
-        {/* data-askai-instructions lets the Ask AI snapshot read the rendered
-            instructions text when `instructions` is JSX rather than a string. */}
-        <div className={styles.instructionsBody} data-askai-instructions>
+        <div className={styles.instructionsBody}>
           {renderInstructions(instructions)}
         </div>
       </div>

@@ -1,5 +1,5 @@
 /**
- * Tier resolution + per-tier model/provider selection for "Ask AI".
+ * Tier resolution + per-tier model/provider selection for AI autocomplete.
  *
  * Pure functions (no D1, no network), so they run in Node. The env objects are
  * partial `CloudflareEnv`s cast through `unknown` since only a few fields matter.
@@ -60,19 +60,14 @@ describe("resolveModel", () => {
     expect(free.baseUrl).toBe("https://openrouter.ai/api/v1");
     expect(free.model).toBe("deepseek/deepseek-v4-flash");
     expect(free.apiKey).toBe("or-key");
-    expect(free.tier).toBe("free");
 
     const pro = resolveModel("pro", bothTiers)!;
     expect(pro.baseUrl).toBe("https://api.openai.com/v1");
     expect(pro.model).toBe("gpt-4o");
     expect(pro.apiKey).toBe("oai-key");
-    expect(pro.tier).toBe("pro");
-    // Pro gets a larger output cap + budget than free.
-    expect(pro.maxTokens).toBeGreaterThan(free.maxTokens);
-    expect(pro.dailyTokenBudget).toBeGreaterThan(free.dailyTokenBudget);
   });
 
-  it("degrades pro to the free provider when only free is fully configured, keeping pro budgets", () => {
+  it("degrades pro to the free provider when only free is fully configured", () => {
     const e = env({
       AI_FREE_API_KEY: "or-key",
       AI_FREE_BASE_URL: "https://openrouter.ai/api/v1",
@@ -81,22 +76,12 @@ describe("resolveModel", () => {
     const pro = resolveModel("pro", e)!;
     expect(pro.apiKey).toBe("or-key");
     expect(pro.baseUrl).toBe("https://openrouter.ai/api/v1");
-    expect(pro.tier).toBe("pro"); // still reported as pro
-    expect(pro.maxTokens).toBe(
-      resolveModel(
-        "pro",
-        env({
-          AI_PRO_API_KEY: "x",
-          AI_PRO_BASE_URL: "https://api.openai.com/v1",
-          AI_PRO_MODEL: "gpt-4o",
-        }),
-      )!.maxTokens,
-    );
+    expect(pro.model).toBe("deepseek/deepseek-v4-flash");
   });
 
   it("never upgrades free to the pro provider (cost fail-closed)", () => {
     // Only the expensive pro provider is configured: free-tier requests must
-    // get "not configured" (503 at the route), not the pricey model.
+    // get "not configured", not the pricey model.
     const e = env({
       AI_PRO_API_KEY: "oai-key",
       AI_PRO_BASE_URL: "https://api.openai.com/v1",
