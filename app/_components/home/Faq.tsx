@@ -22,7 +22,7 @@ const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "Which languages and databases are supported?",
-    a: "Python, R, JavaScript, TypeScript, HTML/CSS, React, PHP, C, C++, Java, and C#, plus PostgreSQL, SQLite, and DuckDB for SQL.",
+    a: "Python, R, JavaScript, TypeScript, HTML/CSS, React, PHP, C, C++, Java, and C#, plus PostgreSQL, SQLite, and DuckDB for SQL, and a Git and Bash playground for the command line.",
   },
   {
     q: "Is my work saved?",

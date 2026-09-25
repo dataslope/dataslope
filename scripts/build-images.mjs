@@ -59,6 +59,23 @@ const MAX_EDGE = 1600;
 // Bump after changing the encode settings below to force a full re-encode.
 const ENCODER_VERSION = "2";
 
+// Downscaled copies of the course and interview-prep thumbnails. Promotion
+// writes them at 1229-1536px, and the catalogs paint them at 84-104px on a
+// desktop and about 240px on a phone, so `/courses` downloaded ~3 MB of
+// pixels nobody saw. 256 covers a 2x desktop, 512 a 2x phone and 768 a 3x
+// one. Each variant is one resize of the served WebP, written to
+// `public/images/sized/` (a subdirectory, so the adopt and prune passes below
+// never mistake one for a promoted image) and listed in the entry's `widths`
+// for the cards' `srcset`, with the original as the largest candidate.
+// Committed like the rest of `public/images/`; regenerated only when the
+// thumbnail's hash or the width list changes. To change the encode settings,
+// delete `sized/` and rerun.
+const VARIANT_DIR = join(OUT_DIR, "sized");
+const VARIANT_WIDTHS = [256, 512, 768];
+const hasVariants = (slug) => slug.endsWith("-thumbnail-cutout");
+/** Mirrors `imageVariantSrc` in lib/imageVariants.ts. */
+const variantFile = (slug, width) => `${slug}-${width}w.webp`;
+
 /** Lowercase, strip diacritics, and hyphenate to a URL/file-safe slug.
  *  Exported for the vitest suite (__tests__/figureSlugs.test.ts). */
 export function slugify(value) {
@@ -285,6 +302,49 @@ async function main() {
     adopted += 1;
   }
 
+  // Thumbnail variants (see VARIANT_WIDTHS). Reused while the source hash and
+  // the width list match what produced them and every file is still there.
+  mkdirSync(VARIANT_DIR, { recursive: true });
+  const expectedVariants = new Set();
+  let resized = 0;
+  for (const [slug, entry] of Object.entries(manifest)) {
+    if (!hasVariants(slug) || entry.formats.join() !== "webp") continue;
+    // Never upscale: a width at or past the original adds nothing to srcset.
+    const widths = VARIANT_WIDTHS.filter((w) => w < entry.width);
+    const files = widths.map((w) => variantFile(slug, w));
+    files.forEach((file) => expectedVariants.add(file));
+    const next = { ...entry };
+    delete next.widths;
+    if (widths.length > 0) next.widths = widths;
+    manifest[slug] = next;
+    if (
+      prior[slug]?.hash === entry.hash &&
+      (prior[slug].widths ?? []).join() === widths.join() &&
+      files.every((file) => existsSync(join(VARIANT_DIR, file)))
+    ) {
+      continue;
+    }
+    const s = await ensureSharp();
+    const input = readFileSync(join(OUT_DIR, `${slug}.webp`));
+    for (const w of widths) {
+      // effort 4, not 6: measured on these thumbnails, 6 is ~30x slower for
+      // files ~5% smaller.
+      const out = await s(input)
+        .resize({ width: w })
+        .webp({ quality: 85, alphaQuality: 100, effort: 4 })
+        .toBuffer();
+      writeFileSync(join(VARIANT_DIR, variantFile(slug, w)), out);
+      resized += 1;
+    }
+  }
+  let prunedVariants = 0;
+  for (const file of readdirSync(VARIANT_DIR)) {
+    if (!expectedVariants.has(file)) {
+      rmSync(join(VARIANT_DIR, file));
+      prunedVariants += 1;
+    }
+  }
+
   // Prune any optimized file that isn't an expected output of a current slug
   // (source removed, renamed, or its fallback format changed).
   const expected = new Set();
@@ -339,7 +399,8 @@ async function main() {
 
   console.log(
     `build-images: ${encoded} encoded, ${adopted} adopted, ${cached} cached, ` +
-      `${pruned} pruned (${Object.keys(manifest).length} image(s) total)`,
+      `${pruned} pruned (${Object.keys(manifest).length} image(s) total); ` +
+      `${resized} thumbnail variant(s) resized, ${prunedVariants} pruned`,
   );
 
   // An opaque original beside its own cut-out is git weight nothing renders

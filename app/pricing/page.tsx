@@ -9,6 +9,7 @@ import { HomeNav } from "../_components/home/HomeNav";
 import { PricingSection } from "../_components/home/PricingSection";
 import { HomeFooter } from "../_components/home/HomeFooter";
 import { OG_IMAGE, SITE_NAME, SITE_URL } from "@/lib/site";
+import { PLAYGROUNDS } from "../_components/playgrounds";
 
 const PAGE_TITLE = "Pricing, Dataslope";
 const PAGE_DESCRIPTION =
@@ -122,9 +123,9 @@ export default function PricingPage() {
               <ol className="mt-8 space-y-6">
                 <Footnote n={1} lead="Free to learn, always.">
                   Courses, interview prep, and the playgrounds, including
-                  unlimited code executions across all 11 languages, are
-                  completely free on every tier, including as a guest with no
-                  sign-in. Creating a free account only adds cloud storage and
+                  unlimited code executions across all {PLAYGROUNDS.length}{" "}
+                  playgrounds, are completely free on every tier, including as
+                  a guest with no sign-in. Creating a free account only adds cloud storage and
                   sharing; it never puts learning content behind a paywall.
                 </Footnote>
 

@@ -11,11 +11,17 @@ import {
 } from "@/app/_components/languageIcons";
 import { PlaygroundWorkspaces } from "./PlaygroundWorkspaces";
 
-const PLAYGROUND_DESCRIPTION =
-  "Free online coding playgrounds that run entirely in your browser, Python, R, SQL, JavaScript, TypeScript, HTML/CSS, React, PHP, C, C++, Java, and C#. No sign-up, no install, powered by WebAssembly.";
+// Named from the registry, like /playground's own description, so neither
+// falls behind when a playground is added.
+const PLAYGROUND_DESCRIPTION = `Start a playground or reopen one of your saved workspaces: ${new Intl.ListFormat(
+  "en",
+  { type: "conjunction" },
+).format(PLAYGROUNDS.map((p) => p.label))}, all running in your browser.`;
 
 export const metadata: Metadata = {
-  title: "Playground",
+  // Not bare "Playground": that is the public /playground page's title, and
+  // this is the dashboard view built around the learner's own workspaces.
+  title: "Playground workspaces",
   description: PLAYGROUND_DESCRIPTION,
   // The public `/playground` landing page is the canonical, indexable surface;
   // this personalized dashboard view points at it to consolidate signals.

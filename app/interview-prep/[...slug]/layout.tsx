@@ -7,18 +7,30 @@
 import "../../docs.css";
 import type { ReactNode } from "react";
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
-import { interviewSource } from "@/lib/source";
+import { interviewSource, scopedPageTree } from "@/lib/source";
 import { ThemePillToggleSlot } from "@/app/_components/ThemePillToggle";
 import { DocsRootProvider } from "@/app/_components/DocsRootProvider";
 import { DocsFooter } from "@/app/_components/DocsFooter";
 
-export default function InterviewLayout({ children }: { children: ReactNode }) {
+export default async function InterviewLayout({
+  children,
+  params,
+}: {
+  children: ReactNode;
+  params: Promise<{ slug: string[] }>;
+}) {
+  const { slug } = await params;
   return (
     // Match the site-wide binary light/dark contract (light default); see
     // app/courses/[...slug]/layout.tsx.
     <DocsRootProvider theme={{ defaultTheme: "light", enableSystem: false }}>
       <DocsLayout
-        tree={interviewSource.pageTree}
+        // Only this page's role, which is all the sidebar draws (see
+        // scopedPageTree).
+        tree={scopedPageTree(
+          interviewSource.pageTree,
+          `/interview-prep/${slug[0]}`,
+        )}
         tabs={false}
         // The site's shared pill toggle instead of Fumadocs's segmented switch.
         slots={{ themeSwitch: ThemePillToggleSlot }}

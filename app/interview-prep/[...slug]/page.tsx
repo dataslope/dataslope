@@ -19,8 +19,12 @@ import { BlockOutputsProvider } from "@/app/_components/mdx/BlockOutputs";
 import { ReactBundlesProvider } from "@/app/_components/mdx/ReactBundles";
 import { lessonBlockOutputs } from "@/lib/blockOutputs";
 import { lessonReactBundles } from "@/lib/reactBundles";
-import { OG_IMAGE } from "@/lib/site";
-import { getCourseMeta } from "@/lib/courseMeta";
+import { OG_IMAGE, SITE_NAME } from "@/lib/site";
+import {
+  getCourseMeta,
+  interviewTrackName,
+  sectionPageTitle,
+} from "@/lib/courseMeta";
 import { JsonLd } from "@/app/_components/JsonLd";
 import { MarkdownDescription } from "@/app/_components/MarkdownDescription";
 import {
@@ -70,7 +74,7 @@ export default async function InterviewPage(props: InterviewPageProps) {
   if (isRoleIndex && roleMeta) {
     structuredData.push(
       courseLd({
-        name: `${roleMeta.title} Interview Prep`,
+        name: interviewTrackName(roleMeta.title),
         description: roleMeta.description ?? page.data.description,
         url: absUrl(page.url),
       }),
@@ -121,8 +125,18 @@ export async function generateMetadata(
   const page = interviewSource.getPage(params.slug);
   if (!page) return {};
 
-  const { title, description } = page.data;
+  const { description } = page.data;
   const url = page.url;
+  // "SQL · Data Analyst Interview Prep": every role has its own "SQL" and
+  // "Multiple Choice Questions" page (see sectionPageTitle).
+  const roleMeta = page.slugs[0]
+    ? await getCourseMeta(page.slugs[0], "interview")
+    : null;
+  const title = sectionPageTitle(
+    page.data.title,
+    roleMeta ? interviewTrackName(roleMeta.title) : null,
+    page.slugs.length === 1,
+  );
 
   return {
     title,
@@ -131,7 +145,7 @@ export async function generateMetadata(
     openGraph: {
       type: "article",
       url,
-      siteName: "DataSlope",
+      siteName: SITE_NAME,
       title,
       description,
       images: [OG_IMAGE],

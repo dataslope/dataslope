@@ -5,7 +5,9 @@ import { AdminNarrow } from "./_components/shared";
 import { UsersClient } from "./UsersClient";
 
 export const metadata: Metadata = {
-  title: "Users",
+  // Spelled out: the layout's "%s · Admin" template only reaches child
+  // segments, and this page shares the layout's segment.
+  title: { absolute: "Users · Admin" },
 };
 
 export default function AdminUsersPage() {

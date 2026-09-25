@@ -84,7 +84,7 @@ const COPY: Record<
 };
 
 /** Browser-tab title per mode; switching modes doesn't navigate, so Next
- *  never re-applies the route metadata (root layout appends "· DataSlope"). */
+ *  never re-applies the route metadata (root layout appends "· Dataslope"). */
 const DOC_TITLE: Record<Mode, string> = {
   signin: "Sign in",
   signup: "Create your account",
@@ -154,7 +154,7 @@ export function SignInClient({
   // `go()` swaps the URL with replaceState (no navigation), so Next won't
   // re-apply the route's metadata title, do it here.
   useEffect(() => {
-    document.title = `${DOC_TITLE[mode]} · DataSlope`;
+    document.title = `${DOC_TITLE[mode]} · Dataslope`;
   }, [mode]);
 
   if (!isPending && session) {

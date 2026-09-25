@@ -18,6 +18,30 @@ export interface CourseMeta {
   root: boolean;
 }
 
+/** An interview-prep role as a product name ("Data Analyst Interview Prep"),
+ *  shared by the page titles and the role's Course JSON-LD. */
+export function interviewTrackName(roleTitle: string): string {
+  return `${roleTitle} Interview Prep`;
+}
+
+/**
+ * The document title for a course or interview-prep page. Frontmatter titles
+ * are only unique within their own course: every landing page is "Welcome",
+ * and lessons like "Next Steps" or "Strings" recur across courses. So the
+ * landing page takes the course's name, and a lesson is qualified with it
+ * ("Variables · Python Basics"). The root layout's title template appends the
+ * brand. A page outside any course (`course` null) keeps its own title.
+ * `__tests__/pageTitles.test.ts` holds the result unique across the corpus.
+ */
+export function sectionPageTitle(
+  pageTitle: string,
+  course: string | null,
+  isLanding: boolean,
+): string {
+  if (!course) return pageTitle;
+  return isLanding ? course : `${pageTitle} · ${course}`;
+}
+
 export async function getCourseMeta(
   courseSlug: string,
   section = "courses",

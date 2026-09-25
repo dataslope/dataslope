@@ -10,23 +10,23 @@ import { HomeNav } from "../_components/home/HomeNav";
 import { HomeFooter } from "../_components/home/HomeFooter";
 import { JsonLd } from "../_components/JsonLd";
 import { getInterviewTracks } from "@/lib/interviewCatalog";
-import { OG_IMAGE, SITE_URL } from "@/lib/site";
+import { OG_IMAGE, SITE_NAME, SITE_URL } from "@/lib/site";
 import { absUrl, breadcrumbLd } from "@/lib/structuredData";
 import { InterviewCatalog } from "./_components/InterviewCatalog";
 
-const PAGE_TITLE = "Interview Prep, Dataslope";
+const PAGE_TITLE = `Interview Prep · ${SITE_NAME}`;
 const PAGE_DESCRIPTION =
   "Free, hands-on interview prep for six data and software roles. Every SQL, coding, and concept question runs live in your browser, no setup, no sign-up.";
 
 export const metadata: Metadata = {
-  // Bare string so the root template renders "Interview Prep · DataSlope".
+  // Bare string so the root template renders "Interview Prep · Dataslope".
   title: "Interview Prep",
   description: PAGE_DESCRIPTION,
   alternates: { canonical: "/interview-prep" },
   openGraph: {
     type: "website",
     url: `${SITE_URL}/interview-prep`,
-    siteName: "DataSlope",
+    siteName: SITE_NAME,
     title: PAGE_TITLE,
     description: PAGE_DESCRIPTION,
     images: [OG_IMAGE],

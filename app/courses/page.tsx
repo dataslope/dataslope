@@ -6,22 +6,22 @@ import type { Metadata } from "next";
 import { HomeNav } from "../_components/home/HomeNav";
 import { HomeFooter } from "../_components/home/HomeFooter";
 import { getCourseCatalog } from "@/lib/courseCatalog";
-import { OG_IMAGE, SITE_URL } from "@/lib/site";
+import { OG_IMAGE, SITE_NAME, SITE_URL } from "@/lib/site";
 import { CoursesCatalog } from "./_components/CoursesCatalog";
 
-const PAGE_TITLE = "Courses, Dataslope";
+const PAGE_TITLE = `Courses · ${SITE_NAME}`;
 const PAGE_DESCRIPTION =
   "Hands-on, browser-based tracks across data and engineering. Every lesson runs live, no setup, no sign-up.";
 
 export const metadata: Metadata = {
-  // Bare string so the root template renders "Courses · DataSlope".
+  // Bare string so the root template renders "Courses · Dataslope".
   title: "Courses",
   description: PAGE_DESCRIPTION,
   alternates: { canonical: "/courses" },
   openGraph: {
     type: "website",
     url: `${SITE_URL}/courses`,
-    siteName: "DataSlope",
+    siteName: SITE_NAME,
     title: PAGE_TITLE,
     description: PAGE_DESCRIPTION,
     images: [OG_IMAGE],

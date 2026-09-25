@@ -21,8 +21,8 @@ import { BlockOutputsProvider } from "@/app/_components/mdx/BlockOutputs";
 import { ReactBundlesProvider } from "@/app/_components/mdx/ReactBundles";
 import { lessonBlockOutputs } from "@/lib/blockOutputs";
 import { lessonReactBundles } from "@/lib/reactBundles";
-import { OG_IMAGE } from "@/lib/site";
-import { getCourseMeta } from "@/lib/courseMeta";
+import { OG_IMAGE, SITE_NAME } from "@/lib/site";
+import { getCourseMeta, sectionPageTitle } from "@/lib/courseMeta";
 import { JsonLd } from "@/app/_components/JsonLd";
 import { MarkdownDescription } from "@/app/_components/MarkdownDescription";
 import {
@@ -152,9 +152,17 @@ export async function generateMetadata(
   const page = courseSource.getPage(params.slug);
   if (!page) return {};
 
-  const { title, description } = page.data;
+  const { description } = page.data;
   // Relative canonical; Next resolves it against `metadataBase` (app/layout.tsx).
   const url = page.url;
+  // Qualified with the course name, since frontmatter titles repeat across
+  // courses (see sectionPageTitle). Same scoping as the breadcrumb above.
+  const courseMeta = page.slugs[0] ? await getCourseMeta(page.slugs[0]) : null;
+  const title = sectionPageTitle(
+    page.data.title,
+    courseMeta?.root ? courseMeta.title : null,
+    page.slugs.length === 1,
+  );
 
   return {
     title,
@@ -163,7 +171,7 @@ export async function generateMetadata(
     openGraph: {
       type: "article",
       url,
-      siteName: "DataSlope",
+      siteName: SITE_NAME,
       title,
       description,
       images: [OG_IMAGE],

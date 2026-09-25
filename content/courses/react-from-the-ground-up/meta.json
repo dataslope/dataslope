@@ -1,6 +1,6 @@
 {
     "title": "React from the Ground Up",
-    "description": "Learn React by building it up one idea at a time, components and JSX, props, state, lists, events, controlled forms, effects and data fetching, composition, and custom hooks, finishing with a real todo app. Every lesson compiles TSX live in your browser.",
+    "description": "Learn React by building it up one idea at a time: components and JSX, props, state, lists, events, controlled forms, effects and data fetching, composition, and custom hooks, finishing with a real todo app. Every lesson compiles TSX live in your browser.",
     "root": true,
     "tags": {
         "language": [

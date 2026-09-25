@@ -10,22 +10,23 @@ import { getCourseCatalog, type CatalogCourse } from "@/lib/courseCatalog";
 import generatedStats from "@/lib/generated/home-stats";
 import type { HomeStats } from "./_components/home/StatsBento";
 import { JsonLd } from "./_components/JsonLd";
-import { OG_IMAGE, SITE_URL } from "@/lib/site";
+import { OG_IMAGE, SITE_NAME, SITE_URL } from "@/lib/site";
 import { organizationLd, websiteLd } from "@/lib/structuredData";
+import { getChallengeSlugs } from "@/lib/challenges";
 
-const HOME_TITLE = "Dataslope, Learn Python, SQL, C++ in your browser";
+const HOME_TITLE = `${SITE_NAME}: Learn Python, SQL, C++ in your browser`;
 const HOME_DESCRIPTION =
   "Interactive, no sign-up, free. Browser-based playgrounds and courses for Python, SQL, C++, and more, all running on WebAssembly.";
 
 export const metadata: Metadata = {
-  // `absolute` opts out of the root layout's "%s · DataSlope" template.
+  // `absolute` opts out of the root layout's "%s · Dataslope" template.
   title: { absolute: HOME_TITLE },
   description: HOME_DESCRIPTION,
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     url: SITE_URL,
-    siteName: "DataSlope",
+    siteName: SITE_NAME,
     title: HOME_TITLE,
     description: HOME_DESCRIPTION,
     images: [OG_IMAGE],
@@ -43,16 +44,19 @@ export const metadata: Metadata = {
 // scheme-detecting components from falling back to the OS preference.
 const THEME_BOOTSTRAP = `(function(){try{var d=localStorage.getItem('theme')==='dark';var r=document.documentElement;r.classList.toggle('dark',d);r.classList.toggle('light',!d);}catch(e){}})();`;
 
-// Figures for the home page's bento grid. Raw counts come from
+// Figures for the home page's bento grid. Corpus counts come from
 // `scripts/build-home-stats.mjs` at build time — keep this path free of
-// `node:fs`, which does not exist on Cloudflare Workers. Flooring is a
-// display choice; the grid appends "+" so the figure stays honest.
+// `node:fs`, which does not exist on Cloudflare Workers. The challenge count
+// is the catalog module itself, the same list /dashboard/challenges renders.
+// Flooring is a display choice; the grid appends "+" so the figure stays
+// honest.
 function getHomeStats(courses: CatalogCourse[]): HomeStats {
   const floorTo = (n: number, step: number) => Math.floor(n / step) * step;
 
   return {
     runnableCodeBlocks: floorTo(generatedStats.runnableCodeBlocks, 100),
-    codeChallenges: floorTo(generatedStats.codeChallenges, 50),
+    lessonExercises: floorTo(generatedStats.lessonExercises, 50),
+    challenges: floorTo(getChallengeSlugs().length, 50),
     interviewRoles: generatedStats.interviewRoles,
     courses: courses.length,
   };

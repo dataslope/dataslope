@@ -630,6 +630,16 @@ code.hljs {
   letter-spacing: -0.011em;
 }
 
+/* The collapsed TOC bar on narrow screens shows the page title or the current
+   heading: Fumadocs stacks both in one grid cell and swaps them by sliding
+   each a full line up or down. Nothing clipped the slide, so mid-swap (or
+   frozen there, in a tab whose transitions are throttled) the heading sat a
+   line below the title, cut in half by the bar's bottom edge. Clipping the
+   cell keeps both inside the one line the 40px bar has room for. */
+[data-toc-popover-trigger] > span {
+  overflow: hidden;
+}
+
 /* ── Page-footer navigation (prev / next) ────────────────────────────────
    The footer <a> links each contain <p> elements for the page name and
    the "Previous / Next page" label. They live inside a <div> that is a

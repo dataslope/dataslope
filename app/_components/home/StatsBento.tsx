@@ -50,10 +50,13 @@ const ICON_SIZE = "mb-3 h-40 w-40 scale-100 object-contain";
 const ICON_SIZE_LG_140 = `${ICON_SIZE} lg:h-[140px] lg:w-[140px]`;
 
 export interface HomeStats {
-  /** Runnable `<CodeBlock>` + `<SqlCodeBlock>` blocks across all content. */
+  /** Runnable `<CodeBlock>` + `<SqlCodeBlock>` blocks in courses and
+   *  interview prep. */
   runnableCodeBlocks: number;
-  /** `<ChallengeCard>` + `<SqlChallengeCard>` auto-graded challenges. */
-  codeChallenges: number;
+  /** `<ChallengeCard>` + `<SqlChallengeCard>` graded exercises in lessons. */
+  lessonExercises: number;
+  /** Entries in the Challenges catalog (`lib/challenges`). */
+  challenges: number;
   /** Interview-prep role tracks (data analyst, data scientist, …). */
   interviewRoles: number;
   /** Free, browser-based courses with interactive code blocks. */
@@ -91,11 +94,14 @@ export function StatsBento({
       background: <TypingBackground />,
     },
     {
-      // Link-less card (T8): no CTA.
+      // Two different things, kept apart: the catalog's standalone problems
+      // are the headline and the link, and the exercises embedded in lessons
+      // (counted from content/) are the second figure.
       Icon: ChallengesIcon,
-      name: `${stats.codeChallenges.toLocaleString()}+ code challenges`,
-      description:
-        "Coding and SQL challenges with instant, test-driven feedback.",
+      name: `${stats.challenges.toLocaleString()}+ code challenges`,
+      description: `Graded SQL and coding problems, plus ${stats.lessonExercises.toLocaleString()}+ in-lesson exercises.`,
+      href: "/dashboard/challenges",
+      cta: "Browse challenges",
       className: "col-span-3 lg:col-span-1",
       iconClassName: ICON_SIZE,
       background: <TestRailBackground />,
@@ -105,7 +111,7 @@ export function StatsBento({
       Icon: CodeBlocksIcon,
       name: `${stats.runnableCodeBlocks.toLocaleString()}+ runnable code blocks`,
       description:
-        "Run every example inline, Python, R, C, C++, Java, C#, JS/TS, and SQL across SQLite, Postgres & DuckDB. No setup.",
+        "Run every example inline: Python, R, C, C++, Java, C#, JS/TS, and SQL across SQLite, Postgres & DuckDB. No setup.",
       className: "col-span-3 lg:col-span-2",
       iconClassName: ICON_SIZE,
       background: <DiamondBackground />,

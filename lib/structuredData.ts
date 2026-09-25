@@ -12,9 +12,9 @@
  *  - Course on course landing pages (Course rich-result eligibility), marked
  *    free to match the site's "everything is free" positioning.
  */
-import { SITE_URL } from "@/lib/site";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 
-const ORG_NAME = "DataSlope";
+const ORG_NAME = SITE_NAME;
 const SITE_DESCRIPTION =
   "Free, interactive, no sign-up. Browser-based playgrounds and courses for Python, SQL, C++, and more, all running on WebAssembly.";
 

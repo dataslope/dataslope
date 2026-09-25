@@ -290,6 +290,16 @@ today; the two-format path only comes back if someone adds a raster source under
 `assets/images/`. Measured on the Python Basics batch, a 1536x1024 illustration
 is ~1.4 MB as PNG and ~130 kB as WebP.
 
+**Thumbnails are the one exception to "one file per image".** A
+`*-thumbnail-cutout` is promoted at up to 1536px and painted at 84-104px in the
+catalogs, so `build-images` also writes 256, 512 and 768px copies into
+`public/images/sized/`, lists them in the entry's `widths`, and the course and
+interview-prep cards offer them through `srcset` (`lib/imageVariants.ts`).
+That took `/courses` from ~3 MB of thumbnails to ~200 kB on a desktop. The
+copies are committed like the rest of `public/images/` and regenerate only
+when a thumbnail's hash changes, so promoting or trimming one is still the
+whole job; `__tests__/imageVariants.test.ts` fails if they fall behind.
+
 Pristine PNGs stay in R2 for the retention window, so a run can be re-promoted
 at a different quality without regenerating. Bump `ENCODER_VERSION` in
 `build-images.mjs` when encoder settings change; it invalidates every cached

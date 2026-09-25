@@ -49,7 +49,7 @@ export default function GlobalError({
       >
         <div className="w-full max-w-md text-center">
           <p className="text-xs font-semibold uppercase tracking-wide text-[var(--ds-green-600)] dark:text-[var(--ds-green-400)]">
-            DataSlope
+            Dataslope
           </p>
           <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[var(--ds-gray-900)] dark:text-white">
             Something went wrong

@@ -65,7 +65,7 @@ export default function GlobalError({
                 color: "#16a34a",
               }}
             >
-              DataSlope
+              Dataslope
             </p>
             <h1
               style={{

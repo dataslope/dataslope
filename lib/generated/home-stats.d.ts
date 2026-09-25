@@ -12,7 +12,7 @@
  */
 export interface GeneratedHomeStats {
   runnableCodeBlocks: number;
-  codeChallenges: number;
+  lessonExercises: number;
   interviewRoles: number;
 }
 
