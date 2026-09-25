@@ -1939,7 +1939,7 @@ def cheapest_route(n: int, edges: list[list[int]], source: int, target: int) -> 
         3,
       ],
       expected: 4,
-      example: "0 → 2 → 1 → 3 costs 1 + 2 + 1; the two-hop routes cost 5 and 6.",
+      example: "The route 0, 2, 1, 3 costs 1 + 2 + 1; the two-hop routes cost 5 and 6.",
     },
     {
       id: "example2",

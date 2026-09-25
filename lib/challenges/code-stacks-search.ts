@@ -1002,7 +1002,7 @@ const KTH_LARGEST = dualChallenge({
   description: "Pick the value that would sit at position k in descending order.",
   prompt: [
     "Return the `k`-th largest value in `nums`, counting duplicates: in `[5, 5, 4]` the largest and second largest are both 5, and the third largest is 4. `k` counts from 1 and is never more than the length of the list.",
-    "Leave `nums` unchanged. Removing the maximum `k` times is O(n·k), which is too slow for the last check: 200,000 values with `k` = 80,000.",
+    "Leave `nums` unchanged. Removing the maximum `k` times is O(n × k), which is too slow for the last check: 200,000 values with `k` = 80,000.",
   ],
   params: ["nums", "k"],
   constraints: ["`1 ≤ k ≤ len(nums) ≤ 2 × 10⁵`", "`-10⁹ ≤ nums[i] ≤ 10⁹`"],

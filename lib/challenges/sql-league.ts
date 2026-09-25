@@ -293,7 +293,7 @@ ORDER BY goals DESC, m.played_on, p.player_name`,
       dataset: LEAGUE,
       description: "Count the goals in each 15-minute band of a match, stoppage time included.",
       solutionNote:
-        "Integer division buckets numbers, but only after shifting them to start at zero: `(minute - 1) / 15` puts minutes 1 to 15 in band 0 and 76 to 90 in band 5, where `minute / 15` pushes minutes 30, 45, 60 and 90 into the next band up. The two-argument `MIN(…, 5)` then folds stoppage time into the last band.",
+        "Integer division buckets numbers, but only after shifting them to start at zero: `(minute - 1) / 15` puts minutes 1 to 15 in band 0 and 76 to 90 in band 5, where `minute / 15` pushes minutes 30, 45, 60 and 90 into the next band up. The two-argument `MIN(..., 5)` then folds stoppage time into the last band.",
     },
     {
       prompt: [

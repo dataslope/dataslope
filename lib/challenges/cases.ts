@@ -38,7 +38,7 @@ export interface CallCase {
   /**
    * Argument source per language, in place of `args`, for inputs too big to
    * write out (`list(range(10**5))` / `Array.from(...)`). The failure message
-   * then shows `f(…)` rather than the whole input.
+   * then shows `f(...)` rather than the whole input.
    */
   pyArgs?: string;
   jsArgs?: string;
@@ -132,7 +132,7 @@ const PY_CLOSE = `def _close(a, b, tol):
 
 function pyCaseCode(fn: string, c: CallCase): string {
   const argSrc = c.pyArgs ?? (c.args ?? []).map(pyLiteral).join(", ");
-  const shown = c.pyArgs !== undefined ? `${fn}(…)` : `${fn}(${argSrc})`;
+  const shown = c.pyArgs !== undefined ? `${fn}(...)` : `${fn}(${argSrc})`;
   const call = c.noMutation ? `${fn}(*_args)` : `${fn}(${argSrc})`;
   const lines: string[] = [];
   if (c.noMutation) lines.push(`_args = [${argSrc}]`);
@@ -194,7 +194,7 @@ const JS_CLOSE = `const close = (a, b, tol) => {
 
 function jsCaseCode(fn: string, c: CallCase): string {
   const argSrc = c.jsArgs ?? (c.args ?? []).map(jsLiteral).join(", ");
-  const shown = c.jsArgs !== undefined ? `${fn}(…)` : `${fn}(${argSrc})`;
+  const shown = c.jsArgs !== undefined ? `${fn}(...)` : `${fn}(${argSrc})`;
   const call = c.noMutation ? `${fn}(...args)` : `${fn}(${argSrc})`;
   const lines: string[] = [JS_CANON];
   if (c.noMutation) lines.push(`const args = [${argSrc}];`);

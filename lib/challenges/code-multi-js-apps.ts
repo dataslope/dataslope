@@ -1261,14 +1261,14 @@ const LINE_DIFF = codeSteps(
     description:
       "Compare two versions of a file line by line: measure what they share, list the edits, then print a compact diff.",
     solutionNote:
-      "One table does all the work: `table[i][j]` holds the LCS length of the remainders `a.slice(i)` and `b.slice(j)`, filled from the back in O(n·m). Walking it from the front turns lengths into edits, keeping a line whenever the two agree and otherwise stepping whichever way loses nothing, so the diff comes out minimal without any search.",
+      "One table does all the work: `table[i][j]` holds the LCS length of the remainders `a.slice(i)` and `b.slice(j)`, filled from the back in O(n × m). Walking it from the front turns lengths into edits, keeping a line whenever the two agree and otherwise stepping whichever way loses nothing, so the diff comes out minimal without any search.",
   },
   [
     {
       title: "Measure what is shared",
       short: "LCS",
       solutionNote:
-        "Each cell looks at one pair of lines: if `a[i]` equals `b[j]` the pair extends the answer for both remainders, `table[i + 1][j + 1] + 1`, and otherwise the best is the larger of dropping a line from either side, `table[i + 1][j]` or `table[i][j + 1]`. That is O(n·m), about four million cells for 2,000 lines a side, where recursion without the table solves the same subproblems over and over, exponentially.",
+        "Each cell looks at one pair of lines: if `a[i]` equals `b[j]` the pair extends the answer for both remainders, `table[i + 1][j + 1] + 1`, and otherwise the best is the larger of dropping a line from either side, `table[i + 1][j]` or `table[i][j + 1]`. That is O(n × m), about four million cells for 2,000 lines a side, where recursion without the table solves the same subproblems over and over, exponentially.",
       signature: "function lcsLength(a: string[], b: string[]): number",
       prompt: [
         'Two versions of a file arrive as arrays of lines. Return the length of their longest common subsequence: the most lines you can pick from both, in the same order, without the picks having to be next to each other. `["a", "b", "c", "d"]` and `["a", "c", "d", "e"]` share `a`, `c` and `d`, so the answer is `3`.',
