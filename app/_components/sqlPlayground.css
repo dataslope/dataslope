@@ -1824,7 +1824,7 @@
    gutter's line numbers follow. */
 @media (max-width: 640px) {
   .sql-editor-pane .cm-editor .cm-content {
-    padding-top: 36px;
+    padding-top: 42px;
   }
 }
 
