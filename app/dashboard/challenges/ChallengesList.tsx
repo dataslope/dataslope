@@ -30,7 +30,19 @@ import {
   type IndexLanguage,
 } from "@/lib/challenges/types";
 
-const PAGE_SIZE = 10;
+/**
+ * Rows per page on offer. The default sits high because the catalog is long
+ * (300 challenges) and a learner scanning it for a topic wants to scroll, not
+ * click through thirty pages; 10 stays available for a short screen.
+ */
+const PAGE_SIZES = [10, 25, 50, 100] as const;
+const DEFAULT_PAGE_SIZE = 50;
+
+/** The `per` query value, or the default when it is missing or not offered. */
+function pageSizeFrom(raw: string | null | undefined): number {
+  const n = Number(raw);
+  return (PAGE_SIZES as readonly number[]).includes(n) ? n : DEFAULT_PAGE_SIZE;
+}
 
 const LEVELS = ["Beginner", "Intermediate", "Advanced"];
 
@@ -86,16 +98,22 @@ function StatusIcon({ status }: { status: ChallengeStatus }) {
   return <Circle size={17} strokeWidth={2} aria-label={label} style={{ color: "var(--ds-gray-300)" }} />;
 }
 
-/** A `<select>` with the chevron the design draws over it. */
+/**
+ * A `<select>` with the chevron the design draws over it. `compact` matches
+ * the 32px pagination buttons it sits beside in the footer; the filter row's
+ * 38px is the design's field height.
+ */
 function Select({
   value,
   onChange,
   label,
+  compact,
   children,
 }: {
   value: string;
   onChange: (value: string) => void;
   label: string;
+  compact?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -105,13 +123,16 @@ function Select({
         aria-label={label}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        // Inline, because `.ds-select` is unlayered CSS and outranks a
+        // Tailwind height utility.
+        style={compact ? { height: 32, fontSize: 13 } : undefined}
       >
         {children}
       </select>
       <ChevronDown
         size={14}
         aria-hidden="true"
-        className="pointer-events-none absolute right-[11px] top-3"
+        className={`pointer-events-none absolute right-[11px] ${compact ? "top-[9px]" : "top-3"}`}
         style={{ color: "var(--muted)" }}
       />
     </span>
@@ -192,6 +213,7 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
     [params],
   );
   const page = Math.max(1, Number(params?.get("page") ?? 1) || 1);
+  const pageSize = pageSizeFrom(params?.get("per"));
 
   /**
    * The state the last write asked for, which is not the same thing as the
@@ -204,19 +226,19 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
    * the first asked for. The effect keeps it honest when the URL changes from
    * somewhere else, which is what Back and forward do.
    */
-  const requested = useRef({ ...filters, page });
+  const requested = useRef({ ...filters, page, per: pageSize });
   useEffect(() => {
-    requested.current = { ...filters, page };
-  }, [filters, page]);
+    requested.current = { ...filters, page, per: pageSize };
+  }, [filters, page, pageSize]);
 
   /**
    * Rewrite the query string. Empty values are dropped rather than written as
-   * `?q=`, so a cleared filter leaves a clean URL. `replace` rather than
-   * `push`, so paging does not bury the page the learner arrived from under
-   * ten history entries.
+   * `?q=`, so a cleared filter leaves a clean URL, and so is the default page
+   * size. `replace` rather than `push`, so paging does not bury the page the
+   * learner arrived from under ten history entries.
    */
   const apply = useCallback(
-    (next: Partial<Filters & { page: number }>) => {
+    (next: Partial<Filters & { page: number; per: number }>) => {
       const merged = { ...requested.current, ...next };
       requested.current = merged;
       const query = new URLSearchParams();
@@ -224,6 +246,7 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
         if (merged[key]) query.set(key, merged[key]);
       }
       if (merged.page > 1) query.set("page", String(merged.page));
+      if (merged.per !== DEFAULT_PAGE_SIZE) query.set("per", String(merged.per));
       const qs = query.toString();
       router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
     },
@@ -238,18 +261,27 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
       apply({ [key]: value, page: 1 } as Partial<Filters> & { page: number });
     };
   const setPage = useCallback((next: number) => apply({ page: next }), [apply]);
-  const clearFilters = useCallback(() => {
-    requested.current = { q: "", status: "", lang: "", level: "", format: "", page: 1 };
-    router.replace(pathname, { scroll: false });
-  }, [pathname, router]);
+  // The page size is a display preference, not a filter, so Clear keeps it.
+  const clearFilters = useCallback(
+    () => apply({ q: "", status: "", lang: "", level: "", format: "", page: 1 }),
+    [apply],
+  );
 
   const filtered = useMemo(() => all.filter((e) => matches(e, filters)), [all, filters]);
   const total = filtered.length;
-  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const pageCount = Math.max(1, Math.ceil(total / pageSize));
   // The current page can fall past the end when a filter shrinks the list.
   const current = Math.min(page, pageCount);
-  const start = (current - 1) * PAGE_SIZE;
-  const rows = filtered.slice(start, start + PAGE_SIZE);
+  const start = (current - 1) * pageSize;
+  const rows = filtered.slice(start, start + pageSize);
+
+  // Changing the size keeps the first row on screen in view, rather than
+  // jumping back to the top: row 120 of 300 at 10 a page is page 12, and at
+  // 50 a page it is on page 3, not page 1.
+  const setPageSize = useCallback(
+    (next: number) => apply({ per: next, page: Math.floor(start / next) + 1 }),
+    [apply, start],
+  );
 
   const solvedInView = filtered.filter((e) => e.status === "solved").length;
   const hasFilters = Object.values(filters).some(Boolean);
@@ -397,8 +429,31 @@ export function ChallengesList({ entries }: { entries: ChallengeIndexEntry[] }) 
             <span className="whitespace-nowrap text-[13px]" style={{ color: "var(--muted)" }}>
               {start + 1}–{start + rows.length} of {total}
             </span>
+            {/* Hidden when every size would show the same thing: one page of
+                ten or fewer. */}
+            {total > PAGE_SIZES[0] ? (
+              <span
+                className="ml-3 inline-flex items-center gap-2 whitespace-nowrap text-[13px]"
+                style={{ color: "var(--muted)" }}
+              >
+                <span aria-hidden="true">Show</span>
+                <Select
+                  value={String(pageSize)}
+                  onChange={(v) => setPageSize(Number(v))}
+                  label="Challenges per page"
+                  compact
+                >
+                  {PAGE_SIZES.map((n) => (
+                    <option key={n} value={String(n)}>
+                      {n}
+                    </option>
+                  ))}
+                </Select>
+                <span aria-hidden="true">per page</span>
+              </span>
+            ) : null}
             {pageCount > 1 ? (
-              <nav aria-label="Pagination" className="ml-auto flex items-center gap-1.5">
+              <nav aria-label="Pagination" className="ml-auto flex flex-wrap items-center gap-1.5">
                 <button
                   type="button"
                   className="ds-page-btn"

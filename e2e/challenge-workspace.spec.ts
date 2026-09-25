@@ -322,6 +322,29 @@ test.describe("Challenge workspace", () => {
     expect(focused).not.toBe("BODY");
   });
 
+  test("lists 50 a page, and changing the size keeps your place", async ({ page }) => {
+    await page.goto("/dashboard/challenges?page=3");
+    await page.waitForLoadState("networkidle");
+    const perPage = page.getByLabel("Challenges per page");
+    await expect(perPage).toHaveValue("50");
+    await expect(page.locator("table tbody tr")).toHaveCount(50);
+    await expect(page.getByText("101–150 of 300")).toBeVisible();
+
+    // Row 101 was at the top; at 10 a page it lives on page 11.
+    await perPage.selectOption("10");
+    await expect(page).toHaveURL(/page=11/);
+    await expect(page).toHaveURL(/per=10/);
+    await expect(page.locator("table tbody tr")).toHaveCount(10);
+    await expect(page.getByText("101–110 of 300")).toBeVisible();
+
+    await page.reload();
+    await expect(page.getByLabel("Challenges per page")).toHaveValue("10");
+
+    // The default is left out of the URL, like an empty filter.
+    await page.getByLabel("Challenges per page").selectOption("50");
+    await expect(page).not.toHaveURL(/per=/);
+  });
+
   test("filters live in the URL and survive a reload", async ({ page }) => {
     await page.goto("/dashboard/challenges");
     // The rows are server-rendered, so the select exists before React has
