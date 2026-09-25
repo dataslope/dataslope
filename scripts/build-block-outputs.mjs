@@ -24,6 +24,7 @@ import {
   readdirSync,
   unlinkSync,
   writeFileSync,
+  writeSync,
 } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -65,31 +66,40 @@ function writeManifestFile(data) {
   writeFileSync(OUT_FILE, JSON.stringify(data));
 }
 
+// Captured before any block runs. The JS runner swaps `process.exit` for one
+// that throws, wraps the global timers for the rest of the process (a timer
+// set while a block is running counts as the block's own), and installs a
+// console that drops host output mid-run.
+const exitProcess = process.exit.bind(process);
+const { setTimeout: realSetTimeout, clearTimeout: realClearTimeout } = globalThis;
+
 /**
- * Prepopulated output is a nicety; any unhandled failure must leave the
- * committed manifest alone and exit 0 (consumers treat missing entries as "no
- * output"). Loud on the way out, so a silent stop is distinguishable from
- * "nothing changed".
+ * Any unhandled failure leaves the committed manifest alone (consumers treat
+ * missing entries as "no output") and fails the job. Only block-outputs.yml
+ * runs this, so an exit 0 here would be a failure nobody sees: every block
+ * edited since would quietly keep its empty panel.
  */
 function failSoft(err) {
-  console.error(`build-block-outputs: FAILED (${err?.message ?? err})`);
+  // Straight to fd 2: `console` may be the runner's, muted mid-block.
+  const say = (line) => writeSync(2, `${line}\n`);
+  say(`build-block-outputs: FAILED (${err?.stack ?? err?.message ?? err})`);
   // Never overwrite an existing manifest with `{}` — one transient failure
   // would wipe every lesson's output. Only a tree with no manifest at all
   // gets an empty one, so the build has something to read.
   if (existsSync(OUT_FILE)) {
-    console.error(
+    say(
       "build-block-outputs: keeping the committed manifest; only blocks added " +
         "since it was generated will show an empty output panel.",
     );
   } else {
-    console.error("build-block-outputs: no manifest on disk, writing an empty one.");
+    say("build-block-outputs: no manifest on disk, writing an empty one.");
     try {
       writeManifestFile({});
     } catch {
       /* nothing more we can do; the consumer treats a missing file as empty too */
     }
   }
-  process.exit(0);
+  exitProcess(1);
 }
 process.on("uncaughtException", failSoft);
 process.on("unhandledRejection", failSoft);
@@ -527,11 +537,11 @@ async function runBounded(runner, block) {
     return await Promise.race([
       runner.run(block),
       new Promise((resolve) => {
-        timer = setTimeout(() => resolve(null), BLOCK_TIMEOUT_MS);
+        timer = realSetTimeout(() => resolve(null), BLOCK_TIMEOUT_MS);
       }),
     ]);
   } finally {
-    clearTimeout(timer);
+    realClearTimeout(timer);
   }
 }
 
@@ -718,8 +728,8 @@ if (droppedByCap > 0) {
 }
 if (stats.timedOut > 0) {
   console.log(
-    `build-block-outputs: ${stats.timedOut} block(s) hit the ${BLOCK_TIMEOUT_MS / 1000}s ` +
-      `timeout and were left empty` +
+    `build-block-outputs: ${stats.timedOut} block(s) hit their time limit ` +
+      `and were left empty` +
       (timedOutExamples.length ? `, e.g. ${timedOutExamples.join(", ")}` : ""),
   );
 }
@@ -732,6 +742,5 @@ if (stats.unstable > 0) {
 }
 
 // A lesson may leave an interval running and almostnode keeps the handle, so
-// the event loop never drains; exit explicitly. The runners have restored
-// `process.exit` by now, so this is the real one.
-process.exit(0);
+// the event loop never drains; exit explicitly, through the real `exit`.
+exitProcess(0);
