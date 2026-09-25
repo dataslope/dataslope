@@ -10,9 +10,11 @@
  *
  * `createRunner(adapter)` resolves to `{ run(block), dispose() }`. `run`
  * returns `{ type, content }` cells in the order and at the granularity the
- * language's browser worker posts them (js: one cell per `console.*` call;
+ * language's browser worker posts them (js: one cell per unbroken run of one
+ * channel, as `BufferedOutput` splits them, then the uncaught error if any;
  * c/cpp: one cell for all of stdout, trailing newlines trimmed) and never
- * throws. Runners boot lazily and are reused across a language's blocks.
+ * throws; a js run can also resolve `null`, meaning it hit the time limit.
+ * Runners boot lazily and are reused across a language's blocks.
  */
 import { existsSync, mkdirSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
@@ -44,60 +46,18 @@ export function fileBody(f) {
 // Snapshot what this module needs from the real `process` at module load:
 // almostnode mutates the host process on first run and never restores it
 // (`process.exit` throws on any code, `process.cwd()` re-bases to its VFS
-// root, `getActiveResourcesInfo` disappears). Reading these off the global
-// later is a bug.
+// root). Reading these off the global later is a bug.
 const exitProcess = process.exit.bind(process);
 const realCwd = process.cwd();
-const getActiveResources = process.getActiveResourcesInfo.bind(process);
 
-/** Timers and immediates the process is currently holding open. */
-
-function pendingTimers() {
-  return getActiveResources().filter(
-    (r) => r === "Timeout" || r === "Immediate",
-  ).length;
-}
-
-/** How long a block may keep emitting after its top level returns, and how
- *  much silence ends the wait. 10s sits under the generator's 20s per-block
- *  ceiling, so a runaway interval is stopped here without discarding the
- *  block's output. */
-const DRAIN_LIMIT_MS = 10_000;
-const DRAIN_IDLE_MS = 600;
-
-/** Source that could still emit after its top level returns; anything
- *  without one of these skips the drain wait entirely. */
-const ASYNC_SOURCE =
-  /\bawait\b|\basync\b|\bsetTimeout\b|\bsetInterval\b|\bsetImmediate\b|\bPromise\b|\.then\s*\(|queueMicrotask|nextTick/;
-
-/**
- * Wait for output that arrives after the entry module returns —
- * `runner.run()` resolves when the top level finishes, so async blocks would
- * otherwise record blank panels. The idle window restarts on every new cell
- * (catches chained awaits); a pending timer keeps a silent block waiting
- * (catches an unfired `setTimeout`), but cannot hold the wait past
- * `DRAIN_IDLE_MS` of silence — an interval that only ticks would never end.
- */
-async function drain(baseline, count) {
-  const deadline = Date.now() + DRAIN_LIMIT_MS;
-  let seen = count();
-  let lastChange = Date.now();
-  for (;;) {
-    if (count() !== seen) {
-      seen = count();
-      lastChange = Date.now();
-    }
-    const idleFor = Date.now() - lastChange;
-    const pending = pendingTimers() > baseline;
-    if (!pending) return; // nothing outstanding: it cannot speak again
-    if (idleFor >= DRAIN_IDLE_MS) return; // holding a timer, but saying nothing
-    if (Date.now() >= deadline) return;
-    await new Promise((resolve) => setTimeout(resolve, 15));
-  }
-}
+/** Wall-clock ceiling handed to the runner. The runner itself keeps a block
+ *  alive while it holds timers, as Node does, so this is what ends a lesson
+ *  that demonstrates an interval it never clears. It sits under the
+ *  generator's 20s per-block ceiling so the runner always stops first. */
+const RUN_LIMIT_MS = 10_000;
 
 async function createJsRunner(adapter) {
-  const { AlmostNodeRunner, normalizeVfsPath } =
+  const { AlmostNodeRunner, BufferedOutput, normalizeVfsPath } =
     await import("../../app/_components/runtime/almostnode-worker-shared.ts");
   const { isTsPath, transpileTs, tsToJsPath } =
     await import("../../app/_components/runtime/tsTranspile.ts");
@@ -155,12 +115,23 @@ async function createJsRunner(adapter) {
       const entryFile = files.find((f) => f.filename === entryName) ?? files[0];
       const entrySource = entryFile ? fileBody(entryFile) : (block.code ?? "");
 
-      // One cell per console call, matching `javascript-worker.ts`.
+      // The worker's own sink, so cells break exactly where a Run's do: a new
+      // cell when the channel changes, text joined verbatim within one (the
+      // `append` rule `<CodeBlock>` applies to what the worker posts).
       const cells = [];
-      const diagnostics = [];
-      // After the drain gives up, a never-cleared `setInterval` must not keep
-      // pushing into an array already bound for the manifest.
+      // Set once the run returns: a promise the block left dangling can still
+      // reach `process.stdout.write`, and must not append to cells already
+      // bound for the manifest.
       let closed = false;
+      const output = new BufferedOutput(({ channel, content, append }) => {
+        if (closed) return;
+        const last = cells[cells.length - 1];
+        if (append && last?.type === channel) last.content += content;
+        else cells.push({ type: channel, content });
+      }, 0);
+      const diagnostics = [];
+      const startedAt = Date.now();
+      let error = null;
       try {
         // Multi-file blocks stage their siblings; a single-file block gets a
         // fresh empty VFS from the runner, which keeps one block's leftovers
@@ -174,13 +145,11 @@ async function createJsRunner(adapter) {
         const entryVfsPath = normalizeVfsPath(
           isTs ? tsToJsPath(entryName) : entryName,
         );
-        // Timers the harness holds (e.g. `runBounded`'s deadline) predate the
-        // block and must not count as its own.
-        const baseline = pendingTimers();
-        const mayRunOn = files.some((f) => ASYNC_SOURCE.test(fileBody(f)))
-          || ASYNC_SOURCE.test(entrySource);
-        await muted(async () => {
-          await runner.run(
+        // The runner drains the block's own timers before it returns and
+        // reports an uncaught error rather than throwing it, so whatever the
+        // block printed first is kept.
+        const result = await muted(() =>
+          runner.run(
             entryVfsPath,
             (vfs) => {
               if (!isTs) return entrySource;
@@ -193,18 +162,23 @@ async function createJsRunner(adapter) {
               for (const d of diags) diagnostics.push(`TS: ${d}`);
               return outputText;
             },
-            {
-              stdout: (c) => closed || cells.push({ type: "stdout", content: c }),
-              stderr: (c) => closed || cells.push({ type: "stderr", content: c }),
-            },
-          );
-          if (mayRunOn) await drain(baseline, () => cells.length);
-        });
-        closed = true;
+            output,
+            { timeLimitMs: RUN_LIMIT_MS },
+          ),
+        );
+        output.flush();
+        error = result.error;
       } catch (e) {
-        closed = true;
-        cells.push({ type: "stderr", content: String(e?.message ?? e) });
+        error = String(e?.message ?? e);
       }
+      closed = true;
+      // Past the limit, the runner stopped it with timers still pending (the
+      // browser would go on for its full 30s and say so, which a 10s recording
+      // cannot match) or it is too slow to be a lesson block. Either way it is
+      // a timeout, which records nothing.
+      if (Date.now() - startedAt > RUN_LIMIT_MS) return null;
+      // `<CodeBlock>` shows an uncaught error as its own cell after the output.
+      if (error) cells.push({ type: "stderr", content: error });
       // Transpiler diagnostics first, as in the worker.
       return diagnostics
         .map((d) => ({ type: "stderr", content: d }))

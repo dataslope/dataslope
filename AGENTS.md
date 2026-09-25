@@ -1135,18 +1135,37 @@ re-bases every path resolved afterwards, so `eachTag` files lessons under
 up; and `process` itself is swapped for a shim that does not carry Node's whole
 surface, so a method read off the global after a block has run may simply not
 be there. Everything the runner needs is bound before the first block and
-restored around each run.
+restored around each run. That includes the generator's own crash handler,
+which exits through a `process.exit` captured at load and writes to fd 2
+rather than `console` (the runner's console drops host output while a block
+is in flight). Before it did, one uncaught error in a JavaScript block reached
+the build log as almostnode's `Process exited with code 0` and nothing else.
 
-**A block is not finished when its top level returns.** `runner.run()` resolves
-when the entry module's top level does, which for an async lesson is before it
-has printed anything — seven of the ten blocks in `promises-and-async-await`
-recorded a blank panel while their real output arrived milliseconds later and
-went to the build log. The runner therefore drains: while the block still holds
-a timer of its own (`process.getActiveResourcesInfo()`, against a baseline
-taken before it started, so the harness's own timers do not count) or is still
-producing cells, it waits, and it gives up after ten seconds because a lesson
-is free to demonstrate an interval that never ends. A synchronous block holds
-nothing and leaves on the first check.
+**A block is not finished when its top level returns.** For an async lesson
+the entry module's top level returns before it has printed anything: seven of
+the ten blocks in `promises-and-async-await` once recorded a blank panel while
+their real output arrived milliseconds later and went to the build log.
+`AlmostNodeRunner.run()` handles this itself, the same way for the worker and
+the generator: its event-loop keeper counts every timer a block sets, and the
+run resolves only once none is left. Two things follow from that:
+
+- **The keeper wraps the global timers for the rest of the process**, so any
+  timer the *generator* sets while a block is in flight counts as the block's
+  own and holds it open. `runBounded` therefore uses the real `setTimeout`,
+  captured before the first block; with the patched one, every block ran to
+  the time limit below and was recorded as a timeout, including ones that
+  print a single line.
+- **A lesson that demonstrates an interval it never clears is a timeout**, not
+  its first ten seconds of output. The runner stops it at `RUN_LIMIT_MS` and
+  the generator records nothing, because the browser runs the same block for
+  30 seconds and then says it stopped it, which a shorter recording cannot
+  match.
+
+The runner writes through a `ConsoleSink`, and the generator hands it the
+worker's own `BufferedOutput`, so cells break where a Run's do. #673 changed
+that signature, updated `check-js-blocks.mjs` and missed `block-runners.mjs`;
+every JavaScript block's first `console.log` then threw `sink.write is not a
+function`, and the workflow failed on every push to `main` from 2026-08-20.
 
 **A narrowed run adds; it never replaces.** `--adapter` and `--filter` both
 start from the manifest on disk and skip the asset prune and the freshness
