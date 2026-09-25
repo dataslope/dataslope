@@ -54,7 +54,7 @@ export function compareCreated(a: Orderable, b: Orderable, direction: 1 | -1 = 1
 
 /** The comparator for one ordering. Every one falls back to `id`, so a sort is
  *  stable and two runs over the same data agree. */
-export function comparatorFor(ordering: Ordering): (a: Orderable, b: Orderable) => number {
+function comparatorFor(ordering: Ordering): (a: Orderable, b: Orderable) => number {
   switch (ordering) {
     case "newest":
       return (a, b) => compareCreated(a, b, -1);

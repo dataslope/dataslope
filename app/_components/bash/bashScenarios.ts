@@ -37,7 +37,7 @@ const LOG = `2026-01-06 08:12:04 INFO  starting scheduler
 2026-01-06 08:16:00 INFO  scheduler idle
 `;
 
-export const BASH_SCENARIOS: BashScenario[] = [
+const BASH_SCENARIOS: BashScenario[] = [
   {
     id: "empty",
     label: "Empty directory",

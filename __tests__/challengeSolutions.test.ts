@@ -14,8 +14,10 @@
  *    worker would.
  *
  * That makes an authoring mistake — a solution that does not actually solve
- * the problem, a check that can never pass, a typo in a seed — a failing unit
- * test in CI rather than something a learner discovers. `e2e/challenge-
+ * the problem, a check that can never pass, a typo in a seed — a failing test
+ * in CI rather than something a learner discovers. It is too slow for every
+ * `npm test`, so it runs as `npm run test:challenges`, from its own workflow
+ * whenever a challenge or a harness changes (see vitest.config.ts). `e2e/challenge-
  * workspace.spec.ts` covers the other half: that the workspace really drives
  * these runtimes in a browser.
  */
@@ -233,7 +235,9 @@ async function starterPassesSql(challenge: Challenge, task: ChallengeTask): Prom
   return true;
 }
 
-const STARTER_TIMEOUT_MS = 4_000;
+// The slowest starter that finishes takes ~0.3 s; six loop forever on purpose,
+// and at 4 s each they were over a third of this file's time.
+const STARTER_TIMEOUT_MS = 1_500;
 
 function starterPassesCode(lang: ChallengeLanguage): boolean {
   const tests = lang.tests as CodeTest[];

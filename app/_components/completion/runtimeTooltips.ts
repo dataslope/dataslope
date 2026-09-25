@@ -354,6 +354,3 @@ export function runtimeTooltips(cfg: RuntimeTooltipConfig): Extension {
     signatureKeymap,
   ];
 }
-
-/** Test-only handles. */
-export const _internal = { renderSignature, signatureField, setSignature };

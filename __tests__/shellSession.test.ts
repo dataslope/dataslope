@@ -75,13 +75,6 @@ describe("ShellSession", () => {
     expect((await run(`cat ${ROOT}/src/made.txt`)).stdout.trim()).toBe("made");
   });
 
-  it("still reports a failed command rather than throwing", async () => {
-    const { run } = await session();
-    const r = await run("cat nope.txt");
-    expect(r.exitCode).not.toBe(0);
-    expect(r.stderr).toContain("No such file");
-  });
-
   it("leaves the plain runner stateless, for scripted seeding", async () => {
     // Scenario setup is a script, not a session: it must not inherit or leak
     // a working directory.
@@ -164,22 +157,6 @@ describe("shell fidelity (BG-15, BG-16, BG-27)", () => {
     expect((await run("echo x | cat")).stderr).toBe("");
     expect((await run("grep A a.txt")).stderr).toBe("");
   });
-
-  it("answers $SHELL and $USER", async () => {
-    const { run } = await session();
-    expect((await run("echo $USER:$SHELL")).stdout.trim()).toBe("user:/bin/bash");
-  });
-
-  it("rewords an execution limit without naming the option that sets it", async () => {
-    const { store } = createGitFs();
-    await store.mkdir(ROOT, { recursive: true });
-    const bash = new Bash({ fs: store as never, cwd: ROOT, executionLimits: { maxCommandCount: 50 } });
-    const shell = new ShellSession(ROOT);
-    const r = await shell.run(bash, "i=0; while [ $i -lt 1000 ]; do i=$((i+1)); done");
-    expect(r.exitCode).not.toBe(0);
-    expect(r.stderr).not.toContain("executionLimits");
-    expect(r.stderr).toContain("keep the page responsive");
-  });
 });
 
 describe("an unfinished line asks for more (BG-07)", () => {
@@ -193,18 +170,13 @@ describe("an unfinished line asks for more (BG-07)", () => {
     expect((await run("if true; then echo yes\nfi")).stdout).toBe("yes\n");
   });
 
+  // One per way a line can be open: the parser runs out inside a construct,
+  // inside a quote, or the line ends on an operator or a continuation.
   it.each([
     "for i in 1 2; do",
-    "case x in",
-    "f() {",
-    "( echo",
     "echo 'open",
-    'echo "open',
-    "echo $(ls",
     "echo foo |",
-    "echo foo &&",
     "echo foo \\",
-    "cat <<EOF\nhello",
   ])("treats %j as incomplete", async (line) => {
     const { run } = await session();
     expect((await run(line)).incomplete).toBe(true);

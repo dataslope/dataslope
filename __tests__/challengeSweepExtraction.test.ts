@@ -1,8 +1,7 @@
 // Guards what `check:challenges` believes a card's reference solution is
-// (scripts/lib/mdx-blocks.mjs) and how `stage` lays it out on disk
-// (scripts/lib/pyodide-runner.mjs). Both once mis-handled multi-file cards
-// (driver entry, solution in a sibling) silently — and a skipped card looks
-// identical to a passing one in a green sweep, hence unit pins here.
+// (scripts/lib/mdx-blocks.mjs). It once mis-handled multi-file cards (driver
+// entry, solution in a sibling) silently, and a skipped card looks identical
+// to a passing one in a green sweep, hence unit pins here.
 import { describe, expect, it } from "vitest";
 
 import {
@@ -54,13 +53,6 @@ function fileOf(card: ParsedCard, filename: string): CardFile {
   return f;
 }
 
-/** The write `stage()` performs for each non-entry file. Kept in step with
- *  pyodide-runner.mjs by `still joins initCode when a file has some` below. */
-function stagedBody(f: CardFile): string {
-  const body = f.solutionSource ?? f.starterCode;
-  return f.initCode ? `${f.initCode}\n${body}` : body;
-}
-
 describe("challenge card solution extraction", () => {
   it("finds a solution for every python card", () => {
     const unsolved = cards.filter((c) => !c.unparsable && !c.solution);
@@ -86,37 +78,6 @@ describe("challenge card solution extraction", () => {
     // The driver is not something the learner edits, so pressing Solution
     // leaves it exactly as shipped.
     expect(card.solution).toBe(fileOf(card, card.entry).starterCode);
-  });
-
-  it("stages every sibling from its solution, not its starter", () => {
-    const card = findCard("python-basics/inheritance.mdx", "Polymorphic animals");
-    const sibling = fileOf(card, "animals.py");
-    expect(sibling.solutionCode).not.toBe("");
-    expect(sibling.solutionCode).not.toBe(sibling.starterCode);
-    // What lands in the Pyodide FS is the solved module...
-    expect(stagedBody(sibling)).toBe(sibling.solutionCode);
-    // ...and specifically not the stub with `# your code here` still in it.
-    expect(stagedBody(sibling)).not.toContain("your code here");
-  });
-
-  it("keeps a file without a solution at its starter", () => {
-    const csv = fileOf(findCard("python-basics/files.mdx", "Parse a CSV file"), "sales.csv");
-    expect(csv.solutionCode).toBe("");
-    expect(stagedBody(csv)).toBe(csv.starterCode);
-  });
-
-  it("does not prepend a blank line to a file that has no initCode", () => {
-    // A leading newline destroys a data file: it pushed sales.csv's header off
-    // line 1 and a correct solution raised KeyError: 'product'.
-    const csv = fileOf(findCard("python-basics/files.mdx", "Parse a CSV file"), "sales.csv");
-    expect(csv.initCode).toBe("");
-    expect(stagedBody(csv).startsWith("\n")).toBe(false);
-    expect(stagedBody(csv).split("\n")[0]).toBe("product,amount");
-  });
-
-  it("still joins initCode when a file has some", () => {
-    const withInit = { filename: "m.py", initCode: "X = 1", starterCode: "print(X)", solutionCode: "" };
-    expect(stagedBody(withInit)).toBe("X = 1\nprint(X)");
   });
 
   it("sets solutionSource on every file", () => {

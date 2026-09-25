@@ -26,7 +26,7 @@ export function isBareSpecifier(specifier: string): boolean {
 }
 
 /** Split `@scope/pkg/sub/path` into package name and subpath. */
-export function splitPackageSpecifier(specifier: string): {
+function splitPackageSpecifier(specifier: string): {
   packageName: string;
   subpath: string;
 } {

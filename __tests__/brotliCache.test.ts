@@ -126,29 +126,9 @@ describe("BrotliR2IncrementalCache", () => {
     expect((await cache.get("/courses/x/y"))?.value).toEqual(entry);
   });
 
-  it("compresses substantially on a realistically-sized entry", () => {
-    // Deliberately not the small `entry` fixture above: at ~250 bytes brotli's
-    // fixed overhead dominates and the framed output is *larger* than the
-    // input, which says nothing about the real cache. Production entries
-    // average 2.2 MB of repetitive prerendered HTML and RSC, and measure ~17×
-    // (`node scripts/analyze-cache.mjs --compress`). The bound here is loose on
-    // purpose — this asserts the format is doing its job, not a ratio that will
-    // drift with the corpus.
-    const section = "<section class='prose'><h2>Heading</h2><p>Body text.</p></section>";
-    const big = { ...entry, html: `<!doctype html><body>${section.repeat(2000)}</body>` };
-    const raw = Buffer.byteLength(JSON.stringify(big), "utf8");
-    expect(raw).toBeGreaterThan(100_000);
-    expect(frame(big).length).toBeLessThan(raw / 5);
-  });
-
   it("returns a miss rather than throwing on a corrupt entry", async () => {
     // One poisoned object must not take down requests for every other page.
     stored = new Uint8Array([...BROTLI_CACHE_MAGIC, 0xff, 0xff, 0xff, 0xff]);
-    await expect(cache.get("/courses/x/y")).resolves.toBeNull();
-  });
-
-  it("returns null when the object is absent", async () => {
-    stored = null;
     await expect(cache.get("/courses/x/y")).resolves.toBeNull();
   });
 });

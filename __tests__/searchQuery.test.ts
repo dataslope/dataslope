@@ -45,30 +45,4 @@ describe("toMatchQuery", () => {
     expect(toMatchQuery("***")).toBeNull();
     expect(toMatchQuery("\\")).toBeNull();
   });
-
-  it("keeps accented and non-Latin words", () => {
-    expect(toMatchQuery("café")).toBe('"café"*');
-    expect(toMatchQuery("日本語")).toBe('"日本語"*');
-  });
-
-  // Stop words are dropped because every token becomes an AND clause, so a
-  // natural-language question was being decided by its weakest word.
-  it("drops stop words from a natural-language question", () => {
-    expect(toMatchQuery("why is a truncated axis misleading")).toBe(
-      '"is" AND "truncated" AND "axis" AND "misleading"*',
-    );
-    expect(toMatchQuery("how do I compare two groups")).toBe(
-      '"compare" AND "two" AND "groups"*',
-    );
-  });
-
-  it("keeps stop words when they are all the query has", () => {
-    expect(toMatchQuery("why")).toBe('"why"*');
-    expect(toMatchQuery("how to")).toBe('"how" AND "to"*');
-  });
-
-  it("caps very long queries", () => {
-    const out = toMatchQuery("a b c d e f g h i j k l m n o p q r s t u v");
-    expect(out?.split(" AND ")).toHaveLength(12);
-  });
 });

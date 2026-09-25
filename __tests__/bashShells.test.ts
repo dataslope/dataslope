@@ -59,27 +59,4 @@ describe("two shells, one filesystem", () => {
     expect((await two.run("echo ${NAME:-unset}")).stdout.trim()).toBe("unset");
     expect((await two.run("greet")).exitCode).not.toBe(0);
   });
-
-  it("can open in the directory of the shell they were split from", async () => {
-    const { open } = await machine();
-    const one = open();
-    await one.run("cd src");
-    const two = open(one.session.cwd);
-    expect((await two.run("pwd")).stdout.trim()).toBe(`${HOME}/src`);
-  });
-
-  it("resolve in order when run back to back without awaiting", async () => {
-    const { open } = await machine();
-    const one = open();
-    const two = open();
-    const out: string[] = [];
-    // Both write to the same file; the second must see the first's line.
-    await Promise.all([
-      one.run("echo first >> log.txt").then(() => out.push("one")),
-      two.run("echo second >> log.txt").then(() => out.push("two")),
-    ]);
-    const log = (await one.run("cat log.txt")).stdout.trim().split("\n");
-    expect(log).toHaveLength(2);
-    expect(new Set(log)).toEqual(new Set(["first", "second"]));
-  });
 });

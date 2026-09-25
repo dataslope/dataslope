@@ -11,7 +11,7 @@
 /** Characters kept in the signature line above a hover's documentation.
  *  Long enough for a real Python signature with type hints, short enough
  *  that a runtime handing back a whole file cannot take over the panel. */
-export const MAX_SIGNATURE_CHARS = 200;
+const MAX_SIGNATURE_CHARS = 200;
 
 /** Characters kept in a documentation body. The panel scrolls, so this is
  *  only a stop against a pathological docstring (some numpy entries run past

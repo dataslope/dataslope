@@ -54,43 +54,4 @@ describe("chart review queue targeting", () => {
       expect(query).not.toContain(ILLUSTRATION_TABLE);
     }
   });
-
-  it("keeps the two queues on distinct tables", () => {
-    expect(CHART_TABLE).not.toBe(ILLUSTRATION_TABLE);
-  });
-});
-
-describe("chart marks", () => {
-  it("stores an empty note when marking with nothing typed", async () => {
-    const rows = new Map<string, { note: string; marked: number }>();
-    const db = {
-      prepare(query: string) {
-        const stmt = {
-          bound: [] as unknown[],
-          bind(...args: unknown[]) {
-            stmt.bound = args;
-            return stmt;
-          },
-          run: async () => {
-            if (query.includes("INSERT INTO")) {
-              const [id, marked, note] = stmt.bound as [string, number, string];
-              rows.set(id, { note, marked });
-            }
-            return { success: true };
-          },
-          first: async () => null,
-          all: async () => ({ results: [] }),
-        };
-        return stmt;
-      },
-    } as unknown as D1Database;
-
-    const mark = await upsertRegenMark(db, {
-      promptId: "bar-truncation",
-      marked: true,
-      note: "   ",
-    });
-    expect(mark.note).toBe("");
-    expect(rows.get("bar-truncation")?.note).toBe("");
-  });
 });

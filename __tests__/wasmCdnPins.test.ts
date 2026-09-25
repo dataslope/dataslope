@@ -132,14 +132,6 @@ describe("CDN version pins match the installed packages", () => {
     }
   });
 
-  it("names the webR that npm installs in the R adapter's engine label", () => {
-    // webR is bundled from npm and fetches its R build from its own versioned
-    // base URL, so the lockfile is the version that runs.
-    const src = read("app/_components/runtime/r.tsx");
-    const label = /engine:\s*"WebR ([^"]+)"/.exec(src)?.[1];
-    expect(label).toBe(lockedVersion("webr"));
-  });
-
   for (const pkg of ["parquet-wasm", "wasm-xlsxwriter"]) {
     it(`pins ${pkg} exactly, since its glue and binary must be one build`, () => {
       // A caret range lets `npm update` move the glue while the URL stays

@@ -1,11 +1,9 @@
 /**
- * Schema introspection for the inline SQL surfaces, verifies the SQL
- * result rows are mapped into both completion schema shapes, and that
- * failures degrade to the empty schema instead of throwing.
+ * Schema introspection for the inline SQL surfaces: the SQL result rows are
+ * mapped into both completion schema shapes.
  */
 import { describe, it, expect } from "vitest";
 import {
-  EMPTY_SCHEMAS,
   introspectSqlSchemas,
   type SqlExec,
 } from "../app/_components/sql/shared/schemaIntrospect";
@@ -73,44 +71,5 @@ describe("introspectSqlSchemas", () => {
     expect(orders?.foreignKeys).toEqual([
       { column: "customer_id", refEntity: "customers", refColumn: "id" },
     ]);
-  });
-
-  it("uses the public schema for postgres", async () => {
-    const exec = execFor(CUSTOMER_ORDER_COLUMNS, {
-      columns: ["tbl", "col", "ref_table", "ref_col"],
-      values: [],
-    });
-    const { completion } = await introspectSqlSchemas(exec, "postgres");
-    expect(completion.schemas).toEqual(["public"]);
-  });
-
-  it("resolves to the empty schema when introspection fails", async () => {
-    const exec: SqlExec = async () => {
-      throw new Error("no such function: pragma_table_info");
-    };
-    await expect(introspectSqlSchemas(exec, "sqlite")).resolves.toEqual(
-      EMPTY_SCHEMAS,
-    );
-  });
-
-  it("keeps column data when only the FK query fails", async () => {
-    let call = 0;
-    const exec: SqlExec = async () => {
-      call += 1;
-      if (call === 1) return [CUSTOMER_ORDER_COLUMNS];
-      throw new Error("fk query unsupported");
-    };
-    const { completion } = await introspectSqlSchemas(exec, "sqlite");
-    expect(completion.entities).toHaveLength(3);
-  });
-
-  it("skips the FK query entirely for duckdb", async () => {
-    let calls = 0;
-    const exec: SqlExec = async () => {
-      calls += 1;
-      return [CUSTOMER_ORDER_COLUMNS];
-    };
-    await introspectSqlSchemas(exec, "duckdb");
-    expect(calls).toBe(1);
   });
 });

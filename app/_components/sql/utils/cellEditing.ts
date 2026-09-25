@@ -200,15 +200,6 @@ export function fromDateEditorValue(
   return `${d}T${newTime}`;
 }
 
-/** Hex-encode bytes as a continuous lowercase string (no separators). */
-export function bytesToHex(bytes: Uint8Array): string {
-  let out = "";
-  for (let i = 0; i < bytes.length; i++) {
-    out += bytes[i].toString(16).padStart(2, "0");
-  }
-  return out;
-}
-
 /** Hex dump for the BLOB viewer: space-separated byte pairs, 16 per line. */
 export function formatBytesHex(bytes: Uint8Array): string {
   const rows: string[] = [];

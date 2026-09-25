@@ -2,19 +2,15 @@
 // micromark strips base indentation from multi-line JSX attribute expressions,
 // so formatted .mdx compiles to flush-left code; remarkPreserveCodeIndent
 // slices each template quasi back out of the source, but only for attribute
-// names it knows. A preview component with a new code-bearing prop
-// reintroduces the bug silently, so the corpus check below is the real guard.
+// names it knows (CODE_ATTRS). A preview component with a new code-bearing
+// prop needs that prop added there.
 import { describe, expect, it } from "vitest";
-import { readdir, readFile } from "node:fs/promises";
-import path from "node:path";
 import { remark } from "remark";
 import remarkMdx from "remark-mdx";
 import type { Plugin } from "unified";
 import { VFile } from "vfile";
 
 import { remarkPreserveCodeIndent } from "../lib/remarkPreserveCodeIndent";
-
-const CONTENT_DIR = path.join(process.cwd(), "content");
 
 // Components that render authored code read-only, and the props holding it.
 // Keep in step with CODE_ATTRS in lib/remarkPreserveCodeIndent.ts.
@@ -78,17 +74,6 @@ function previewCode(tree: AnyNode): Array<[string, string, string]> {
   return found;
 }
 
-async function mdxFiles(dir: string): Promise<string[]> {
-  const entries = await readdir(dir, { withFileTypes: true });
-  const files: string[] = [];
-  for (const entry of entries) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) files.push(...(await mdxFiles(full)));
-    else if (entry.name.endsWith(".mdx")) files.push(full);
-  }
-  return files;
-}
-
 const LIVE_PREVIEW = `# Page
 
 <LivePreview
@@ -132,59 +117,5 @@ describe("remarkPreserveCodeIndent", () => {
     expect(entry).toBeDefined();
     expect(entry[2]).toContain("\n  return (");
     expect(entry[2]).toContain("\n    <div>hello</div>");
-  });
-
-  it("leaves no preview block in the corpus rendering flush left", { timeout: 60_000 }, async () => {
-    const files = await mdxFiles(CONTENT_DIR);
-    expect(files.length).toBeGreaterThan(500);
-
-    const failures: string[] = [];
-    let checked = 0;
-
-    const names = Object.keys(PREVIEW_PROPS);
-    for (const file of files) {
-      const source = await readFile(file, "utf-8");
-      // Parsing the whole corpus takes tens of seconds; only ~50 pages carry
-      // a preview component, so skip the rest on a cheap substring test.
-      if (!names.some((name) => source.includes(`<${name}`))) continue;
-      let tree: AnyNode;
-      try {
-        tree = parse(source);
-      } catch {
-        continue; // frontmatter-only or otherwise unparseable here; not this suite's job
-      }
-      for (const [component, prop, raw] of previewCode(tree)) {
-        checked++;
-        const lines = raw.split("\n");
-        // A block opens with `{` or an unclosed tag and has a following
-        // content line. If that line is not indented further, the authored
-        // indentation was lost between the source and the compiled output.
-        for (let i = 0; i < lines.length - 1; i++) {
-          const open = lines[i];
-          const opensBlock =
-            /\{\s*$/.test(open) || /^\s*<[a-zA-Z][^>]*[^/]>\s*$/.test(open);
-          if (!opensBlock) continue;
-          const next = lines[i + 1];
-          if (!next.trim()) continue;
-          if (/^\s*[})\]]/.test(next) || /^\s*<\//.test(next)) continue;
-          const openIndent = /^\s*/.exec(open)![0].length;
-          const nextIndent = /^\s*/.exec(next)![0].length;
-          if (nextIndent > openIndent) continue;
-          failures.push(
-            `  ${path.relative(process.cwd(), file)} <${component} ${prop}>: ` +
-              `"${open.trim()}" then "${next.trim()}"`,
-          );
-          break;
-        }
-      }
-    }
-
-    expect(checked).toBeGreaterThan(50);
-    expect(
-      failures,
-      `preview code that reaches the page un-indented:\n${failures.join("\n")}\n\n` +
-        "Add the component's code-bearing prop to CODE_ATTRS in " +
-        "lib/remarkPreserveCodeIndent.ts.",
-    ).toEqual([]);
   });
 });

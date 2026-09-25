@@ -41,7 +41,7 @@ export interface PreflightFailure {
 
 /** Package name inside an esm.sh URL, for a message that reads like the
  *  import the user wrote. */
-export function packageNameFromUrl(url: string): string {
+function packageNameFromUrl(url: string): string {
   const path = url.replace(/^https?:\/\/[^/]+\//, "").split("?")[0];
   const segments = path.split("/");
   const name = path.startsWith("@")

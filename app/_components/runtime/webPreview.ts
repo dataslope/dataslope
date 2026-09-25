@@ -21,7 +21,7 @@ export const PREVIEW_MESSAGE_KEY = "__dsWebPreview__";
 /** Stamped on a message *into* the frame to ask the bridge to re-post
  *  everything sent so far — how a late subscriber sees a server-rendered
  *  frame's early output. */
-export const PREVIEW_REPLAY_KEY = "__dsWebPreviewReplay__";
+const PREVIEW_REPLAY_KEY = "__dsWebPreviewReplay__";
 
 /** Class applied to preview iframes for surface styling. */
 export const PREVIEW_IFRAME_CLASS = "ds-web-preview-frame";
@@ -107,7 +107,7 @@ const COMPOSED_BLOCK_RE =
  * blocks: an inlined `<script src>` replaces the tag's line or lines with
  * the file's contents, so the entry's own numbering resumes past them.
  */
-export function buildSourceLineMap(
+function buildSourceLineMap(
   composed: string,
   entryFile: string,
   /** Entry lines each inlined tag replaced, in document order per file. */

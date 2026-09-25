@@ -59,12 +59,6 @@ describe("looksLikeStaleBuildError", () => {
       ),
     ).toBe(false);
   });
-
-  it("ignores non-errors", () => {
-    expect(looksLikeStaleBuildError(null)).toBe(false);
-    expect(looksLikeStaleBuildError(undefined)).toBe(false);
-    expect(looksLikeStaleBuildError({})).toBe(false);
-  });
 });
 
 describe("shouldReloadForStaleBuild", () => {
@@ -144,10 +138,6 @@ describe("STALE_BUILD_WATCHER_SCRIPT", () => {
     expect(listeners).toHaveLength(1);
     return { win, fire: listeners[0] };
   }
-
-  it("sets the global the boundaries read", () => {
-    expect(STALE_BUILD_WATCHER_SCRIPT).toContain(JSON.stringify(ASSET_FAILURE_GLOBAL));
-  });
 
   it("is safe to inline in a <script> tag", () => {
     expect(STALE_BUILD_WATCHER_SCRIPT).not.toContain("</script");

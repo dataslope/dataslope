@@ -182,7 +182,7 @@ The totals come from `wrangler deploy --dry-run`, the same check a deploy runs. 
 
 What went, with the gzipped saving of each:
 
-- **Every Lucide icon, ~260 KiB.** Fumadocs' `lucideIconsPlugin()` resolves page-tree icon names through lucide-react's `icons` map, which imports all ~1,600 of them, and no page names an icon. `lib/source.ts` no longer loads it; `__tests__/pageTreeIcons.test.ts` fails if content starts relying on icons.
+- **Every Lucide icon, ~260 KiB.** Fumadocs' `lucideIconsPlugin()` resolves page-tree icon names through lucide-react's `icons` map, which imports all ~1,600 of them, and no page names an icon. `lib/source.ts` no longer loads it; if content ever names an icon, map those few explicitly there rather than bringing the plugin back.
 - **Image content hashes, ~240 KiB.** `lib/generated/images.js` carried a 64-character SHA-256 per image that only `scripts/build-images.mjs` reads. They moved to `lib/generated/image-hashes.json`, which nothing at runtime imports.
 - **The illustration-prompt corpus, ~176 KiB.** An unused `<IllustrationPrompt>` MDX component imported the whole 1.4 MB `data/illustration-prompts.json` into the lesson renderer. The admin gallery's API route still carries one copy, by design (the corpus is admin-only, so it can't be a public asset).
 

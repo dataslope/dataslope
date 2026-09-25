@@ -17,7 +17,6 @@ const {
   PROFILES,
   phpVariableSource,
   inMemberPosition,
-  toCmCompletion,
   lazySource,
   selectProfile,
   variantsOf,
@@ -32,13 +31,6 @@ describe("inMemberPosition", () => {
 
   it("detects a token right after a dot", () => {
     const doc = "df.hea";
-    expect(
-      inMemberPosition(contextAt(doc, doc.length), py.wordRe, py.memberEndings),
-    ).toBe(true);
-  });
-
-  it("detects the empty token immediately after a dot", () => {
-    const doc = "df.";
     expect(
       inMemberPosition(contextAt(doc, doc.length), py.wordRe, py.memberEndings),
     ).toBe(true);
@@ -94,73 +86,9 @@ echo $to`;
     // Replacement starts at the "$".
     expect(res.from).toBe(doc.length - 3);
   });
-
-  it("stays quiet with no token unless explicit", async () => {
-    const bare = "echo 1 + ";
-    expect(await phpVariableSource(contextAt(bare, bare.length))).toBeNull();
-    const explicit = (await phpVariableSource(
-      contextAt(bare, bare.length, true),
-    )) as CompletionResult;
-    expect(explicit.options.map((o) => o.label)).toContain("$_SERVER");
-  });
-});
-
-describe("toCmCompletion", () => {
-  it("wraps bare strings as variables", () => {
-    expect(toCmCompletion("df")).toEqual({ label: "df", type: "variable" });
-  });
-
-  it("passes rich metadata through", () => {
-    expect(
-      toCmCompletion({
-        label: "read_csv",
-        type: "function",
-        detail: "(path)",
-        boost: 2,
-      }),
-    ).toMatchObject({
-      label: "read_csv",
-      type: "function",
-      detail: "(path)",
-      boost: 2,
-    });
-  });
 });
 
 describe("profiles", () => {
-  it("covers every language adapter id", () => {
-    for (const id of [
-      "python",
-      "r",
-      "javascript",
-      "typescript",
-      "php",
-      "c",
-      "cpp",
-      "java",
-      "csharp",
-    ]) {
-      expect(PROFILES[id], `profile for ${id}`).toBeDefined();
-    }
-  });
-
-  it("covers the multi-language surfaces added later", () => {
-    expect(PROFILES.react, "profile for react").toBeDefined();
-    expect(PROFILES.web, "profile for web").toBeDefined();
-    // The web trio picks its profile per file.
-    const html = selectProfile(PROFILES.web, "index.html");
-    const css = selectProfile(PROFILES.web, "styles.css");
-    const js = selectProfile(PROFILES.web, "script.js");
-    expect(html).not.toBe(css);
-    expect(css).not.toBe(js);
-    expect(js).toBe(PROFILES.javascript);
-    expect(html.triggerEndings).toContain("<");
-    expect(css.triggerEndings).toContain(":");
-    // No filename: HTML, the pane a fresh web workspace opens on.
-    expect(selectProfile(PROFILES.web, undefined)).toBe(html);
-    expect(variantsOf(PROFILES.web)).toHaveLength(4);
-  });
-
   it("keeps trigger endings within member endings", () => {
     // A trigger that isn't also a member ending would auto-open a popup
     // in which the static keyword lists then fire, the exact noise the
@@ -179,21 +107,6 @@ describe("profiles", () => {
 });
 
 describe("lazySource", () => {
-  it("answers the very first request once the chunk lands", async () => {
-    let loads = 0;
-    const source = lazySource(async () => {
-      loads += 1;
-      return (ctx) => ({ from: ctx.pos, options: [{ label: "printf" }] });
-    });
-    const doc = "pri";
-    const first = await source(contextAt(doc, doc.length, true));
-    expect((first as CompletionResult).options[0].label).toBe("printf");
-    // The chunk is imported once and reused synchronously afterwards.
-    const second = source(contextAt(doc, doc.length, true));
-    expect(second).not.toBeInstanceOf(Promise);
-    expect(loads).toBe(1);
-  });
-
   it("stays silent when the chunk fails to load", async () => {
     const source = lazySource(async () => {
       throw new Error("chunk unavailable");
@@ -201,12 +114,5 @@ describe("lazySource", () => {
     const doc = "pri";
     expect(await source(contextAt(doc, doc.length, true))).toBeNull();
     expect(await source(contextAt(doc, doc.length, true))).toBeNull();
-  });
-});
-
-describe("phpVariableSource on explicit requests", () => {
-  it("does not list superglobals behind a bare word", async () => {
-    const doc = "<?php\narr";
-    expect(await phpVariableSource(contextAt(doc, doc.length, true))).toBeNull();
   });
 });

@@ -1,6 +1,6 @@
 /**
  * Course-card artwork: a single lucide line icon, unique per course via
- * `COURSE_MOTIFS` (uniqueness enforced by __tests__/courseArt.test.ts). A
+ * `COURSE_MOTIFS` (keep each motif to one course). A
  * course missing from the map falls back to its domain tag's motif — add a
  * bespoke entry when a new course lands.
  */
@@ -71,7 +71,7 @@ const MOTIFS: Record<string, string> = {
 };
 
 /** One motif per course, no repeats. */
-export const COURSE_MOTIFS: Record<string, string> = {
+const COURSE_MOTIFS: Record<string, string> = {
   "python-basics": "snake",
   "data-analysis-python-pandas": "bars",
   "data-wrangling-python-polars": "columns",
@@ -107,7 +107,7 @@ export const COURSE_MOTIFS: Record<string, string> = {
 };
 
 /** Each motif kind maps to a distinct lucide icon, so every course still gets
- *  its own glyph (uniqueness enforced by __tests__/courseArt.test.ts). */
+ *  its own glyph. */
 const KIND_ICONS: Record<string, LucideIcon> = {
   snake: Terminal,
   bars: ChartColumn,
@@ -145,19 +145,13 @@ const KIND_ICONS: Record<string, LucideIcon> = {
 };
 
 /** Resolves a course's motif: bespoke per-slug shape first, then the domain
- *  fallback, then "stairs". Exported for the uniqueness test. */
-export function motifForCourse(slug: string, tags: CourseTags): string {
+ *  fallback, then "stairs". */
+function motifForCourse(slug: string, tags: CourseTags): string {
   return (
     COURSE_MOTIFS[slug] ??
     (tags.domain ?? []).map((d) => MOTIFS[d]).find(Boolean) ??
     "stairs"
   );
-}
-
-/** The lucide icon for a motif kind (null for an unknown kind). Exported for
- *  the "every assigned motif draws something" test. */
-export function motifIcon(kind: string): LucideIcon | null {
-  return KIND_ICONS[kind] ?? null;
 }
 
 /** The course-card glyph: a single lucide line icon that inherits the row's
@@ -173,8 +167,8 @@ export function CourseGlyph({
   size?: number;
   className?: string;
 }) {
-  // Direct map lookup (not the motifIcon() call) so the icon reads as a
-  // stable component reference, mirroring LANGUAGE_ICONS[id] elsewhere.
+  // A direct map lookup, so the icon reads as a stable component reference,
+  // mirroring LANGUAGE_ICONS[id] elsewhere.
   const Icon = KIND_ICONS[motifForCourse(slug, tags)] ?? TrendingUp;
   return (
     <span className={`inline-flex shrink-0 ${className}`} aria-hidden="true">

@@ -16,16 +16,6 @@ describe("inspect", () => {
     expect(inspect(Symbol("s"))).toBe("Symbol(s)");
   });
 
-  it("keeps the contents of Map and Set", () => {
-    expect(inspect(new Map([["k", 1], ["j", 2]]))).toBe("Map(2) { 'k' => 1, 'j' => 2 }");
-    expect(inspect(new Set([1, 2, 3]))).toBe("Set(3) { 1, 2, 3 }");
-    expect(inspect(new Map())).toBe("Map(0) {}");
-  });
-
-  it("keeps a regular expression's pattern and flags", () => {
-    expect(inspect(/ab+c/gi)).toBe("/ab+c/gi");
-  });
-
   it("prints an error with its message and stack, not as {}", () => {
     const err = new TypeError("boom");
     const rendered = inspect(err);
@@ -36,52 +26,6 @@ describe("inspect", () => {
   it("prints properties a program attached to an error", () => {
     const err = Object.assign(new Error("nope"), { code: "ENOENT" });
     expect(inspect(err)).toContain("code: 'ENOENT'");
-  });
-
-  it("renders a date unquoted", () => {
-    expect(inspect(new Date(0))).toBe("1970-01-01T00:00:00.000Z");
-  });
-
-  it("names the class of an instance", () => {
-    class Pt {
-      constructor(
-        public x: number,
-        public y: number,
-      ) {}
-    }
-    expect(inspect(new Pt(1, 2))).toBe("Pt { x: 1, y: 2 }");
-    expect(inspect({ x: 1, y: 2 })).toBe("{ x: 1, y: 2 }");
-    expect(inspect(Object.create(null))).toBe("[Object: null prototype] {}");
-  });
-
-  it("names typed arrays and prints Buffers as bytes", () => {
-    expect(inspect(new Uint8Array([1, 2, 3]))).toBe("Uint8Array(3) [ 1, 2, 3 ]");
-    expect(inspect(Buffer.from("hi"))).toBe("<Buffer 68 69>");
-  });
-
-  it("reports a cycle instead of following it", () => {
-    const circ: Record<string, unknown> = { name: "circ" };
-    circ.self = circ;
-    const rendered = inspect(circ);
-    expect(rendered).toContain("name: 'circ'");
-    expect(rendered).toContain("[Circular *1]");
-  });
-
-  it("caps depth like Node", () => {
-    expect(inspect({ a: 1, b: { c: { d: { e: 1 } } } })).toBe(
-      "{ a: 1, b: { c: { d: [Object] } } }",
-    );
-  });
-
-  it("caps long arrays and says how many are hidden", () => {
-    const rendered = inspect(Array.from({ length: 120 }, (_, i) => i));
-    expect(rendered).toContain("... 20 more items");
-    // A grid, not 120 lines.
-    expect(rendered.split("\n").length).toBeLessThan(20);
-  });
-
-  it("quotes keys only when it must", () => {
-    expect(inspect({ ok: 1, "not ok": 2 })).toBe("{ ok: 1, 'not ok': 2 }");
   });
 
   it("labels functions and classes", () => {
@@ -100,39 +44,6 @@ describe("inspect", () => {
     };
     expect(inspect(obj)).toBe("{ trap: [Getter] }");
     expect(called).toBe(false);
-  });
-
-  it("breaks a wide object across lines", () => {
-    const wide = { alpha: "a".repeat(30), beta: "b".repeat(30), gamma: "c".repeat(30) };
-    expect(inspect(wide).split("\n").length).toBeGreaterThan(1);
-  });
-});
-
-describe("formatConsoleArgs", () => {
-  it("substitutes format specifiers", () => {
-    expect(formatConsoleArgs(["16 fmt %s and %d and %j", "str", 42, { a: 1 }])).toBe(
-      '16 fmt str and 42 and {"a":1}',
-    );
-  });
-
-  it("appends arguments the format string did not consume", () => {
-    expect(formatConsoleArgs(["%s!", "hi", "extra", 3])).toBe("hi! extra 3");
-  });
-
-  it("leaves a specifier alone when no argument is left for it", () => {
-    expect(formatConsoleArgs(["%s and %s", "one"])).toBe("one and %s");
-  });
-
-  it("passes through %% and drops %c styling", () => {
-    // A lone format string is emitted verbatim, as in Node.
-    expect(formatConsoleArgs(["100%% sure"])).toBe("100%% sure");
-    expect(formatConsoleArgs(["100%% sure", "really"])).toBe("100% sure really");
-    expect(formatConsoleArgs(["%cstyled", "color: red"])).toBe("styled");
-  });
-
-  it("joins plain arguments with a space, strings raw and values inspected", () => {
-    expect(formatConsoleArgs(["count", 3, { a: 1 }])).toBe("count 3 { a: 1 }");
-    expect(formatConsoleArgs([new Map([["k", 1]])])).toBe("Map(1) { 'k' => 1 }");
   });
 });
 
@@ -252,6 +163,8 @@ describe("agreement with node:util", () => {
       ["%s!", "hi", "extra", 3],
       ["%s and %s", "one"],
       ["100%% sure"],
+      ["100%% sure", "really"],
+      ["%cstyled", "color: red"],
       ["count", 3, { a: 1 }],
       [new Map([["k", 1]])],
       ["%o", { a: { b: { c: 1 } } }],

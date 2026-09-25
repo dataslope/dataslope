@@ -244,7 +244,7 @@ export function tableNameFromFilename(filename: string): string {
  *  i.e. `SELECT * FROM 'file.ext'` works without an explicit `read_*`
  *  wrapper. Used by the Files panel to decide whether to offer a
  *  "Create Table" action for a given file. */
-export const DUCKDB_READABLE_EXTENSIONS = [
+const DUCKDB_READABLE_EXTENSIONS = [
   "csv",
   "tsv",
   "json",

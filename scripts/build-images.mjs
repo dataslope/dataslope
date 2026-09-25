@@ -83,9 +83,8 @@ const hasVariants = (slug) => slug.endsWith("-thumbnail-cutout");
 /** Mirrors `imageVariantSrc` in lib/imageVariants.ts. */
 const variantFile = (slug, width) => `${slug}-${width}w.webp`;
 
-/** Lowercase, strip diacritics, and hyphenate to a URL/file-safe slug.
- *  Exported for the vitest suite (__tests__/figureSlugs.test.ts). */
-export function slugify(value) {
+/** Lowercase, strip diacritics, and hyphenate to a URL/file-safe slug. */
+function slugify(value) {
   return value
     .normalize("NFKD")
     // Combining-diacritics block, as escapes so a formatter can't mangle it.
@@ -459,14 +458,7 @@ async function main() {
   }
 }
 
-// Run only when executed directly (`node scripts/build-images.mjs`), so the
-// vitest suite can import the exported helpers without triggering a build.
-if (
-  process.argv[1] &&
-  import.meta.url === pathToFileURL(process.argv[1]).href
-) {
-  main().catch((err) => {
-    console.error(err);
-    process.exit(1);
-  });
-}
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

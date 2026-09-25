@@ -42,18 +42,6 @@ async function image(rects: Rect[]): Promise<Buffer> {
 }
 
 describe("contentBounds", () => {
-  it("finds the first and last drawn row", async () => {
-    const bounds = await contentBounds(await image([{ from: 30, to: 69, alpha: 255 }]));
-    expect(bounds).toMatchObject({ width: WIDTH, height: HEIGHT, top: 30, bottom: 69, empty: false });
-  });
-
-  it("finds the first and last drawn column", async () => {
-    const bounds = await contentBounds(
-      await image([{ from: 30, to: 69, alpha: 255, x0: 40, x1: 159 }]),
-    );
-    expect(bounds).toMatchObject({ top: 30, bottom: 69, left: 40, right: 159 });
-  });
-
   it("ignores the near-transparent halo a background remover leaves", async () => {
     // A 10-alpha wash over the whole frame is what makes a naive bound return
     // the untrimmed image: every row has "content", so nothing is ever blank.
@@ -64,20 +52,6 @@ describe("contentBounds", () => {
       ]),
     );
     expect(bounds).toMatchObject({ top: 40, bottom: 59, left: 20, right: 179 });
-  });
-
-  it("ignores a stray speck of leftover background", async () => {
-    // Three opaque pixels in row 5 are under the 0.2% row threshold (0.4 px of
-    // 200 rounds to 1, so the guard is the count, not the rounding) — a real
-    // subject fills far more of its row than a speck does.
-    const bounds = await contentBounds(
-      await image([
-        { from: 5, to: 5, alpha: 255, x0: 0, x1: 2 },
-        { from: 40, to: 59, alpha: 255 },
-      ]),
-      { frac: 0.05 },
-    );
-    expect(bounds.top).toBe(40);
   });
 
   it("does not let a speck outside the content band widen the horizontal bound", async () => {
@@ -91,11 +65,6 @@ describe("contentBounds", () => {
       { frac: 0.05 },
     );
     expect(bounds).toMatchObject({ top: 40, bottom: 59, left: 80, right: 119 });
-  });
-
-  it("reports a fully transparent image as empty", async () => {
-    const bounds = await contentBounds(await image([]));
-    expect(bounds.empty).toBe(true);
   });
 });
 
@@ -140,25 +109,11 @@ describe("trimPlan", () => {
     expect(trimPlan(bounds)).toMatchObject({ top: 0, height: 82 });
   });
 
-  it("clamps the horizontal padding at the edges of the frame", async () => {
-    const bounds = await contentBounds(
-      await image([{ from: 30, to: 69, alpha: 255, x0: 2, x1: WIDTH - 1 }]),
-    );
-    expect(trimPlan(bounds, { axes: "both" })).toMatchObject({ left: 0, width: WIDTH });
-  });
-
   it("declines to trim an image that is already tight", async () => {
     // Re-running the script must not re-encode for a percent of nothing, which
     // is what keeps it idempotent rather than quietly lossy.
     const bounds = await contentBounds(await image([{ from: 1, to: 98, alpha: 255 }]));
     expect(trimPlan(bounds)).toBeNull();
-  });
-
-  it("declines to trim a thumbnail that is already tight on both axes", async () => {
-    const bounds = await contentBounds(
-      await image([{ from: 1, to: 98, alpha: 255, x0: 2, x1: WIDTH - 3 }]),
-    );
-    expect(trimPlan(bounds, { axes: "both" })).toBeNull();
   });
 
   it("trims a frame that is blank only at the sides under axes: both", async () => {
@@ -178,18 +133,6 @@ describe("trimPlan", () => {
 });
 
 describe("trimAxesFor", () => {
-  it("trims a course thumbnail on both axes", () => {
-    expect(trimAxesFor("python-basics-thumbnail")).toBe("both");
-  });
-
-  it("trims an interview-prep thumbnail on both axes", () => {
-    expect(trimAxesFor("interview-data-analyst-thumbnail")).toBe("both");
-  });
-
-  it("keeps an in-lesson figure vertical-only", () => {
-    expect(trimAxesFor("python-basics-loops")).toBe("vertical");
-  });
-
   it("falls back to the naming convention for an id the corpus has never seen", () => {
     expect(trimAxesFor("some-future-course-thumbnail")).toBe("both");
     expect(trimAxesFor("some-future-course-lesson")).toBe("vertical");

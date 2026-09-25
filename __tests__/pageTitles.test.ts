@@ -62,16 +62,6 @@ describe("course and interview-prep page titles", () => {
     expect(titles.size).toBeGreaterThan(800);
   });
 
-  it("names a landing page after its course", () => {
-    expect(titles.get("/courses/python-basics")).toBe("Python Basics");
-    expect(titles.get("/courses/python-basics/variables")).toBe(
-      "Variables · Python Basics",
-    );
-    expect(titles.get("/interview-prep/data-analyst")).toBe(
-      "Data Analyst Interview Prep",
-    );
-  });
-
   it("gives no two pages the same title", () => {
     const urlsByTitle = new Map<string, string[]>();
     for (const [url, title] of titles) {

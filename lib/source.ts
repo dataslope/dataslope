@@ -19,9 +19,10 @@ import { courses, fumadocsDev, interview } from "@/.source/dynamic";
 
 // No `lucideIconsPlugin()`: it resolves page-tree icon names through
 // lucide-react's `icons` map, which imports every icon (~1 MB, ~260 KB gzipped
-// across its two copies in the Worker) for a feature no page uses.
-// `__tests__/pageTreeIcons.test.ts` fails if content starts naming icons; map
-// the few it needs explicitly then, rather than bringing the plugin back.
+// across its two copies in the Worker) for a feature no page uses. Without it
+// an `icon` in frontmatter or meta.json reaches the sidebar as a bare string,
+// so if content ever names one, map the few it needs explicitly here rather
+// than bringing the plugin back.
 export const courseSource = loader({
   baseUrl: "/courses",
   source: courses.toFumadocsSource(),

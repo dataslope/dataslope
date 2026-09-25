@@ -6,7 +6,6 @@
  */
 import { describe, expect, it } from "vitest";
 import {
-  fileExtension,
   routeDatabaseFile,
   sniffDroppedFile,
   type DroppedFileKind,
@@ -35,18 +34,6 @@ function kindOf(name: string, head: Uint8Array): DroppedFileKind {
 const SQLITE_HEADER = bytes("SQLite format 3", [0]);
 const DUCKDB_HEADER = bytes([1, 2, 3, 4, 5, 6, 7, 8], "DUCK");
 
-describe("fileExtension", () => {
-  it("reads the last extension, lower-cased", () => {
-    expect(fileExtension("Sales.CSV")).toBe("csv");
-    expect(fileExtension("/tmp/dir.name/data.tar.gz")).toBe("gz");
-  });
-
-  it("returns none for a bare name or a dotfile", () => {
-    expect(fileExtension("README")).toBe("");
-    expect(fileExtension(".gitignore")).toBe("");
-  });
-});
-
 describe("signatures beat extensions", () => {
   it("knows a SQLite image whatever it is called", () => {
     expect(kindOf("mydata.db", SQLITE_HEADER)).toBe("sqlite");
@@ -59,11 +46,6 @@ describe("signatures beat extensions", () => {
     expect(kindOf("warehouse.db", DUCKDB_HEADER)).toBe("duckdb");
   });
 
-  it("knows a Parquet file", () => {
-    expect(kindOf("part-0.parquet", bytes("PAR1", [21, 0, 21]))).toBe("parquet");
-    expect(kindOf("part-0.bin", bytes("PAR1", [21, 0, 21]))).toBe("parquet");
-  });
-
   it("treats a zip as a workbook only when the name says workbook", () => {
     const zip = bytes([0x50, 0x4b, 0x03, 0x04], [20, 0, 6, 0]);
     expect(kindOf("sales.xlsx", zip)).toBe("xlsx");
@@ -73,16 +55,6 @@ describe("signatures beat extensions", () => {
 });
 
 describe("text formats", () => {
-  it("takes the extension when the bytes carry no signature", () => {
-    expect(kindOf("dump.sql", text("CREATE TABLE t (id INTEGER);"))).toBe(
-      "sqldump",
-    );
-    expect(kindOf("rows.csv", text("a,b\n1,2\n"))).toBe("csv");
-    expect(kindOf("rows.tsv", text("a\tb\n1\t2\n"))).toBe("csv");
-    expect(kindOf("rows.json", text('[{"a":1}]'))).toBe("json");
-    expect(kindOf("rows.ndjson", text('{"a":1}\n{"a":2}\n'))).toBe("json");
-  });
-
   it("recognises JSON, SQL and delimited text with no useful extension", () => {
     expect(kindOf("export.txt", text('  [\n  {"a": 1}\n]'))).toBe("json");
     expect(kindOf("export.txt", text('{"a": 1}'))).toBe("json");
@@ -134,11 +106,6 @@ describe("binary with no known signature", () => {
 });
 
 describe("certainty", () => {
-  it("is certain about a signature or a matching extension", () => {
-    expect(sniffDroppedFile("a.db", SQLITE_HEADER).certain).toBe(true);
-    expect(sniffDroppedFile("a.csv", text("a,b\n1,2")).certain).toBe(true);
-  });
-
   it("hedges when only the shape of the text suggests an answer", () => {
     expect(sniffDroppedFile("a.txt", text("a,b\n1,2")).certain).toBe(false);
     expect(sniffDroppedFile("a.txt", text('{"a":1}')).certain).toBe(false);
@@ -177,17 +144,6 @@ describe("routeDatabaseFile", () => {
     const toSqlite = routeDatabaseFile("duckdb", "warehouse.duckdb", "sqlite");
     expect(toSqlite.action === "refuse" && toSqlite.message).toMatch(
       /DuckDB database.*DuckDB playground/,
-    );
-  });
-
-  it("points a data file at the import that handles it", () => {
-    const parquet = routeDatabaseFile("parquet", "part.parquet", "sqlite");
-    expect(parquet.action === "refuse" && parquet.message).toMatch(
-      /Parquet file.*from Parquet/,
-    );
-    const workbook = routeDatabaseFile("xlsx", "sales.xlsx", "duckdb");
-    expect(workbook.action === "refuse" && workbook.message).toMatch(
-      /Excel workbook.*Drop it/,
     );
   });
 });

@@ -1,97 +1,12 @@
-// Pins math support in a challenge card's `instructions` prop: it is a plain
-// string prop the source.config.ts pipeline never touches, and GFM-only
-// parsing once printed raw LaTeX on the page. The fix (remarkMath +
-// rehypeKatex) risks the mirror image — a pair of literal dollars ("$5 off,
-// or $10 for members") read as a math span — which the content guard below
-// checks against the real content.
+// A challenge card's `instructions` prop renders through remarkMath +
+// rehypeKatex (renderMarkdownInstructions in app/_components/challengeShared.tsx).
+// The risk that brings is a pair of literal dollars ("$5 off, or $10 for
+// members") read as a math span, which this content guard checks against the
+// real content.
 import fs from "node:fs";
 import path from "node:path";
 
 import { describe, expect, it } from "vitest";
-import rehypeKatex from "rehype-katex";
-import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
-import remarkParse from "remark-parse";
-import remarkRehype from "remark-rehype";
-import { unified } from "unified";
-
-/** The math half of renderMarkdownInstructions' plugin list, mirrored by hand
- *  (react-markdown needs a DOM; these tests run under Node). rehypeHighlight
- *  and labelBareFences are deliberately absent — covered by
- *  challengeInstructionsHighlight.test.tsx, and neither can affect a math
- *  span. The tree is inspected directly, so no HTML stringifier is needed. */
-const pipeline = unified()
-  .use(remarkParse)
-  .use(remarkGfm)
-  .use(remarkMath)
-  .use(remarkRehype)
-  .use(rehypeKatex, { throwOnError: false, errorColor: "#ef4444" });
-
-interface Rendered {
-  /** Every text node, concatenated. */
-  text: string;
-  /** Every class name anywhere in the tree. */
-  classes: string[];
-}
-
-function render(source: string): Rendered {
-  const tree = pipeline.runSync(pipeline.parse(source)) as unknown;
-  const out: Rendered = { text: "", classes: [] };
-
-  const walk = (node: unknown): void => {
-    if (!node || typeof node !== "object") return;
-    const n = node as {
-      type?: string;
-      value?: string;
-      properties?: { className?: unknown };
-      children?: unknown[];
-    };
-    if (n.type === "text" && typeof n.value === "string") out.text += n.value;
-    const cn = n.properties?.className;
-    if (Array.isArray(cn)) out.classes.push(...cn.map(String));
-    else if (typeof cn === "string") out.classes.push(cn);
-    for (const child of n.children ?? []) walk(child);
-  };
-
-  walk(tree);
-  return out;
-}
-
-describe("challenge instructions markdown", () => {
-  it("renders inline LaTeX to KaTeX markup", () => {
-    const { text, classes } = render(
-      "Recall that $\\int_{-1}^{1} \\sqrt{1 - x^2}\\,dx = \\pi/2$ (a half-disk).",
-    );
-    expect(classes).toContain("katex");
-    // Rendered glyphs, not the source: the reported symptom was the raw
-    // `$\int_{-1}^{1} …$` appearing on the page.
-    expect(text).toContain("\u222b");
-    expect(text).toContain("\u03c0");
-    expect(text).not.toContain("$");
-    // KaTeX's <annotation> keeps the original TeX inside .katex (for screen
-    // readers/copy), so its presence in the concatenated text is not a leak.
-  });
-
-  it("renders display LaTeX", () => {
-    const { classes } = render("$$\n\\mathrm{Var}(x) = \\frac{1}{n} \\sum_i x_i^2\n$$");
-    expect(classes).toContain("katex-display");
-  });
-
-  it("leaves a lone currency dollar alone", () => {
-    const { text, classes } = render("`FLAT5` gives $5 off the subtotal.");
-    expect(text).toContain("$5 off");
-    expect(classes).not.toContain("katex");
-  });
-
-  it("does not read dollars inside code as math", () => {
-    const { text, classes } = render("Plot `airquality$Ozone` against `women$weight`.");
-    expect(text).toContain("airquality$Ozone");
-    expect(text).toContain("women$weight");
-    expect(classes).not.toContain("katex");
-  });
-});
-
-// ── The content guard ────────────────────────────────────────────────────
 
 function mdxFiles(dir: string): string[] {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {

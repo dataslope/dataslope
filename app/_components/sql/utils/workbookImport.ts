@@ -53,7 +53,7 @@ export function uniqueTableNames(sheetNames: readonly string[]): string[] {
 }
 
 /** The column type each dialect should be given for an inferred type. */
-export function sqlTypeFor(
+function sqlTypeFor(
   type: InferredColumnType,
   dialect: SqlDialect,
 ): string {

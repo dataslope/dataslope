@@ -35,7 +35,7 @@ const UUID_RE =
 
 /** True when the stored value is itself a UUID, which is the tell for a
  *  `TEXT`/`VARCHAR` column holding UUIDs (SQLite has no uuid type). */
-export function looksLikeUuid(value: unknown): boolean {
+function looksLikeUuid(value: unknown): boolean {
   return typeof value === "string" && UUID_RE.test(value.trim());
 }
 

@@ -1018,6 +1018,3 @@ export function documentMemberSource(language: SymbolLanguage): CompletionSource
     return { from: query.from, options, validFor: /^\$?[\w$]*$/ };
   };
 }
-
-/** Test-only handles. */
-export const _internal = { parseMemberQuery, resolveJava, splitGenerics };

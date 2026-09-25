@@ -36,7 +36,7 @@ function cleanDatasetPath(path: string): string {
 }
 
 /** Build the raw.githubusercontent.com URL for a file in a GitHub repo. */
-export function rawGitHubUrl(
+function rawGitHubUrl(
   path: string,
   source: RemoteDatasetSource = DATASLOPE_DATASETS_SOURCE,
 ): string {
@@ -50,12 +50,6 @@ export function jsDelivrGitHubUrl(
   source: RemoteDatasetSource = DATASLOPE_DATASETS_SOURCE,
 ): string {
   return `https://cdn.jsdelivr.net/gh/${source.owner}/${source.repo}@${source.ref}/${cleanDatasetPath(path)}`;
-}
-
-/** Resolve a dataset reference (repo path or full https URL) to its
- *  canonical URL, which doubles as the cache key in every layer. */
-export function resolveDatasetUrl(pathOrUrl: string): string {
-  return datasetUrlCandidates(pathOrUrl)[0];
 }
 
 /** Candidate download URLs in try-order: jsDelivr first, raw GitHub as

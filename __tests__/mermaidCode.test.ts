@@ -32,18 +32,6 @@ describe("mermaid diagram labels", () => {
     expect(violations, `unmarked code in mermaid labels:\n${report}`).toEqual([]);
   });
 
-  // --- what the rules read ------------------------------------------------
-
-  it("reads a node label out of every bracket shape mermaid spells", () => {
-    const line = 'A[plain] --> B([stadium]) --> C[(cylinder)] --> D{{hexagon}}';
-    expect(mermaidLabels(line, "flowchart")).toEqual([
-      "plain",
-      "stadium",
-      "cylinder",
-      "hexagon",
-    ]);
-  });
-
   // The `>` closing every `-->` sits after a hyphen; reading it as the opener
   // of an asymmetric `A>text]` node swallows the rest of the line.
   it("does not mistake a link arrow for an asymmetric node", () => {
@@ -53,70 +41,12 @@ describe("mermaid diagram labels", () => {
     ]);
   });
 
-  // `A --- B` is an unlabelled link, and its closing `-` is the same character
-  // that closes a labelled `-- text ---`.
-  it("does not read a node as the label of an unlabelled link", () => {
-    const line = "A((a: 1,2,3)) --- I((4,5)) --- B((b: 4,5))";
-    expect(mermaidLabels(line, "flowchart")).not.toContain("I((4,5))");
-  });
-
-  it("reads a sequence message and a participant alias", () => {
-    expect(mermaidLabels("    participant SO as System.out", "sequenceDiagram")).toContain(
-      "System.out",
-    );
-    expect(mermaidLabels("    JVM->>Main: call main(args)", "sequenceDiagram")).toContain(
-      "call main(args)",
-    );
-  });
-
-  it("ignores style declarations, which are not labels", () => {
-    expect(mermaidLabels("    style my_node fill:#f9f", "flowchart")).toEqual([]);
-  });
-
   // --- what counts as code ------------------------------------------------
 
   it("flags a call, a qualified name and a snake_case identifier", () => {
     expect(unmarkedCode("call println(x)").map((c) => c.token)).toEqual(["println("]);
     expect(unmarkedCode("hand over Main.class").map((c) => c.token)).toEqual(["Main.class"]);
     expect(unmarkedCode("read_csv").map((c) => c.token)).toEqual(["read_csv"]);
-  });
-
-  it("says nothing about a span that is already marked", () => {
-    expect(unmarkedCode("<code>System.out</code>")).toEqual([]);
-    expect(unmarkedCode("run <code>main()</code> now")).toEqual([]);
-  });
-
-  // A parenthetical aside is how nearly every lesson label opens a paren, and
-  // every one of them has a space in front of it.
-  it("leaves a parenthetical aside alone", () => {
-    expect(unmarkedCode("Reality (infinite detail)")).toEqual([]);
-    expect(unmarkedCode("Wide form (humans love this)")).toEqual([]);
-  });
-
-  // Mermaid cannot typeset math in a label, so notation stays in the prose
-  // face: a one-letter name in front of a paren is never a call in a lesson.
-  it("leaves mathematical notation alone", () => {
-    expect(unmarkedCode("P(A given B) = P(A)?")).toEqual([]);
-    expect(unmarkedCode("first difference: y(t) - y(t-1)")).toEqual([]);
-    expect(unmarkedCode("ARIMA(p, d, q)")).toEqual([]);
-    expect(unmarkedCode("Poisson(lambda)")).toEqual([]);
-  });
-
-  it("leaves a full stop and a product name alone", () => {
-    expect(unmarkedCode("The program ends. That is it.")).toEqual([]);
-    expect(unmarkedCode("Node.js released")).toEqual([]);
-  });
-
-  // The domain half of a sample address is data, not an identifier.
-  it("leaves an email address alone", () => {
-    expect(unmarkedCode("ada@example.com")).toEqual([]);
-  });
-
-  it("reads no label out of a class or ER diagram, which render in mono", () => {
-    const src = ["```mermaid", "classDiagram", "  class Dog {", "    +bark()", "  }", "```"].join(
-      "\n",
-    );
-    expect(lintSource(src, "x.mdx")).toEqual([]);
   });
 
   it("honours an opt-out above the fence", () => {

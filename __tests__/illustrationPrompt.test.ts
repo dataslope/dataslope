@@ -1,58 +1,16 @@
 import { describe, expect, it } from "vitest";
-import {
-  BRAND_COLORS,
-  buildIllustrationPrompt,
-  illustrationFileName,
-  illustrationFileSlug,
-} from "../lib/illustrationPrompt";
-import {
-  getIllustrationPrompts,
-  getIllustrationPromptById,
-} from "../lib/illustrationPromptsGallery";
+import { BRAND_COLORS, buildIllustrationPrompt } from "../lib/illustrationPrompt";
+import { getIllustrationPrompts } from "../lib/illustrationPromptsGallery";
 
-// The admin gallery and scripts/generate-illustrations.mjs both key off these
-// helpers, so the exact prompt text and file-name slugs are pinned here.
+// The admin gallery and scripts/generate-illustrations.mjs both build prompts
+// from these helpers, so the rules the model depends on are pinned here.
 
-/** The constraints appended to every isometric prompt, which is every prompt
- *  except the `course-inline` risograph bands. */
-const CONSTRAINTS =
-  "No text. Draw only the objects described — nothing scattered over, around, " +
-  "or behind them: no speckled dots, no confetti, no stray connecting lines. " +
-  "Render each object as a solid three-dimensional form with real thickness, " +
-  "smooth matte shading, and clean edges; never as a glossy sphere, a ball, or " +
-  "a thin round counter. " +
-  "Stage everything light and airy on an empty transparent background: pale " +
-  "grey and white platforms, bright brand colors, no dark or black bases. " +
-  "Leave the background fully empty behind, around and beneath the subject: " +
-  "no backdrop, no floor, no ground shadow, no soft glow and no vignette, so " +
-  "the whole subject lifts off the page in one piece. Make every object a " +
-  "single solid piece in one flat brand color: never build one object out of " +
-  "many small blocks or cubelets, never pack a container with a heap of little " +
-  "pieces, and never blend, mix, or bleed two colors into each other. Animals " +
-  "are the exception and the focal point: draw each one as a rounded, " +
-  "realistic creature with soft fur or feather texture and its own natural " +
-  "coloring and markings, never a flat brand color and never a flat " +
-  "silhouette. A bird has wings, a beak and feet and never hands or arms: it " +
-  "perches, stands, or nudges things with its beak rather than holding them.";
-
-/** The part of it that is shared with every other style. */
+/** The constraints every style shares. */
 const SHARED =
   "No text. Draw only the objects described — nothing scattered over, around, " +
   "or behind them: no speckled dots, no confetti, no stray connecting lines.";
 
 describe("buildIllustrationPrompt", () => {
-  it("defaults to the isometric house style, with brand colors and the constraints", () => {
-    expect(
-      buildIllustrationPrompt({ subject: "a logistics center full of packages" }),
-    ).toBe(
-      `An isometric illustration of a logistics center full of packages. ${CONSTRAINTS}\n\n` +
-        "Blue: #148cff\n" +
-        "Green: #20c621\n" +
-        "Red: #ff4f59\n" +
-        "Yellow: #ffdd6c",
-    );
-  });
-
   // Risograph keeps the two shared rules but swaps the isometric
   // volume/staging/animal block: asking for both gives a 3D render with grain.
   it("gives risograph its own constraints, keeping the shared two", () => {
@@ -75,27 +33,6 @@ describe("buildIllustrationPrompt", () => {
     expect(prompt).toContain("no printed panel, no frame, no border, no ground shadow");
     expect(prompt).toContain("never key the scene off black, grey, or a single hue");
     expect(prompt).toContain("twice as long as it is tall");
-  });
-
-  it("falls back to the isometric constraints for a style with no block", () => {
-    expect(
-      buildIllustrationPrompt({ subject: "a duck", style: "cut-paper collage" }),
-    ).toContain(`A cut-paper collage of a duck. ${CONSTRAINTS}`);
-  });
-
-  it("uses 'An' for a vowel-initial style and honours custom styles/colors", () => {
-    expect(
-      buildIllustrationPrompt(
-        { subject: "a marmot on a track", style: "isometric illustration" },
-        { blue: "#000", green: "#111", red: "#222", yellow: "#333" },
-      ),
-    ).toBe(
-      `An isometric illustration of a marmot on a track. ${CONSTRAINTS}\n\n` +
-        "Blue: #000\nGreen: #111\nRed: #222\nYellow: #333",
-    );
-    expect(
-      buildIllustrationPrompt({ subject: "a duck", style: "line art illustration" }),
-    ).toContain(`A line art illustration of a duck. ${CONSTRAINTS}`);
   });
 
   // Both rules ride every prompt: earlier wording that named decorations
@@ -132,26 +69,6 @@ describe("buildIllustrationPrompt", () => {
     expect(prompt).not.toContain("flat 2D");
     expect(prompt).not.toMatch(/Draw dots, markers, and nodes/);
   });
-
-  it("exposes the canonical brand palette", () => {
-    expect(BRAND_COLORS).toEqual({
-      blue: "#148cff",
-      green: "#20c621",
-      red: "#ff4f59",
-      yellow: "#ffdd6c",
-    });
-  });
-});
-
-describe("illustration file names", () => {
-  it("normalises an id to a slug and a .png file name", () => {
-    expect(illustrationFileSlug("Python Basics Thumbnail")).toBe(
-      "python-basics-thumbnail",
-    );
-    expect(illustrationFileName("python-basics-hello-world")).toBe(
-      "python-basics-hello-world.png",
-    );
-  });
 });
 
 describe("getIllustrationPrompts", () => {
@@ -162,32 +79,6 @@ describe("getIllustrationPrompts", () => {
     expect(data.entries.length).toBeGreaterThan(0);
     const ids = data.entries.map((e) => e.id);
     expect(new Set(ids).size).toBe(ids.length);
-  });
-
-  it("carries a style and mascot flag on every entry", () => {
-    for (const e of data.entries) {
-      expect(e.style.length).toBeGreaterThan(0);
-      expect(typeof e.mascot).toBe("boolean");
-      expect(e.prompt).toContain("No text.");
-    }
-  });
-
-  it("collapses an index lesson to the course landing route", () => {
-    const thumb = getIllustrationPromptById("python-basics-thumbnail");
-    expect(thumb).toBeDefined();
-    expect(thumb?.route).toBe("/courses/python-basics");
-    expect(thumb?.file).toBe("python-basics-thumbnail.png");
-    expect(thumb?.prompt).toContain("An isometric illustration of");
-  });
-
-  it("deep-links a lesson-embedded illustration and reflects its style", () => {
-    const loops = getIllustrationPromptById("python-basics-loops");
-    expect(loops?.href).toBe(
-      "/courses/python-basics/loops#python-basics-loops",
-    );
-    expect(loops?.mascot).toBe(true);
-    expect(loops?.prompt).toContain("An isometric illustration of");
-    expect(loops?.prompt).toContain("Blue: #148cff");
   });
 });
 

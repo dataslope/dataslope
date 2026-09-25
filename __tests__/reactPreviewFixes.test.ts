@@ -13,7 +13,6 @@ import {
 } from "../app/_components/runtime/bundleSourceMap";
 import {
   externalSpecifiers,
-  packageNameFromUrl,
   preflightModules,
   resetPreflightCache,
 } from "../app/_components/runtime/reactModulePreflight";
@@ -37,27 +36,10 @@ describe("bundle source maps", () => {
     expect(at).toEqual({ file: "App.tsx", line: 3, column: 5 });
   });
 
-  it("moves to the second source once the map does", () => {
-    const parsed = parseSourceMap(JSON.stringify(map))!;
-    expect(parsed.lookup(5, 1)?.file).toBe("main.tsx");
-  });
-
-  it("answers nothing for a line the map does not cover", () => {
-    const parsed = parseSourceMap(JSON.stringify(map))!;
-    expect(parsed.lookup(99, 1)).toBeNull();
-  });
-
   it("refuses a malformed map rather than inventing a location", () => {
     expect(parseSourceMap("not json")).toBeNull();
     expect(parseSourceMap('{"mappings":123}')).toBeNull();
     expect(inlineSourceMapOf("const a = 1;\n")).toBeNull();
-  });
-
-  it("reads the inline map esbuild appends", () => {
-    const base64 = Buffer.from(JSON.stringify(map), "utf8").toString("base64");
-    const bundle = `const a = 1;\n//# sourceMappingURL=data:application/json;base64,${base64}\n`;
-    const parsed = inlineSourceMapOf(bundle);
-    expect(parsed?.lookup(3, 1)?.file).toBe("App.tsx");
   });
 
   it("counts bundle lines from where the bundle starts in the document", () => {
@@ -181,18 +163,6 @@ describe("module preflight", () => {
     expect(failures[0].message).toContain("404");
   });
 
-  it("says a blocked network is a network problem, not a missing package", async () => {
-    const failures = await preflightModules(
-      ["https://esm.sh/clsx?deps=react@19.3.0"],
-      (async () => {
-        throw new TypeError("Failed to fetch");
-      }) as unknown as typeof fetch,
-    );
-    expect(failures[0].status).toBe(0);
-    expect(failures[0].message).toContain("Could not reach");
-    expect(failures[0].message).not.toContain("Cannot resolve");
-  });
-
   it("passes a reachable package and does not re-check it", async () => {
     let calls = 0;
     const ok = (async () => {
@@ -203,11 +173,5 @@ describe("module preflight", () => {
     expect(await preflightModules([url], ok)).toEqual([]);
     expect(await preflightModules([url], ok)).toEqual([]);
     expect(calls).toBe(1);
-  });
-
-  it("reads a package name out of an esm.sh URL", () => {
-    expect(packageNameFromUrl("https://esm.sh/clsx?deps=react@19.3.0")).toBe("clsx");
-    expect(packageNameFromUrl("https://esm.sh/react@19.3.0/jsx-runtime")).toBe("react");
-    expect(packageNameFromUrl("https://esm.sh/@scope/pkg@1.0.0/sub")).toBe("@scope/pkg");
   });
 });

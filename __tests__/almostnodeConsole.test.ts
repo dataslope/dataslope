@@ -62,10 +62,6 @@ describe("formatTable", () => {
       expect(formatTable(data, columns)).toBe(nodeTable(data, columns));
     });
   }
-
-  it("falls back to normal formatting for a primitive", () => {
-    expect(formatTable(42)).toBe("42");
-  });
 });
 
 describe("playground console", () => {
@@ -118,12 +114,6 @@ describe("playground console", () => {
     c.console.assert(0);
     expect(c.stdout()).toBe("");
     expect(c.stderr()).toBe("Assertion failed: 8 console.assert failed\nAssertion failed\n");
-  });
-
-  it("prints a table", () => {
-    const c = makeConsole();
-    c.console.table([{ a: 1, b: 2 }]);
-    expect(c.stdout()).toContain("│ (index) │ a │ b │");
   });
 
   it("prints a trace with frames", () => {

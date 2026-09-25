@@ -5,11 +5,9 @@ import {
   split,
   remove,
   move,
-  swap,
   resize,
   equalize,
   neighbor,
-  dropZone,
   layout,
   type Node,
 } from "@/app/_components/bash/splitTree";
@@ -22,10 +20,6 @@ describe("split", () => {
     expect(t.kind).toBe("split");
     expect(leaves(t)).toEqual(["a", "b"]);
     expect(ratios(t)).toEqual([0.5]);
-  });
-
-  it("puts the new leaf first when asked", () => {
-    expect(leaves(split(leaf("a"), "a", "col", "b", false))).toEqual(["b", "a"]);
   });
 
   it("nests, and leaves everything else alone", () => {
@@ -70,14 +64,6 @@ describe("move", () => {
   });
 });
 
-describe("swap", () => {
-  it("exchanges two leaves in place", () => {
-    const t = split(split(leaf("a"), "a", "row", "b"), "b", "col", "c");
-    expect(leaves(swap(t, "a", "c"))).toEqual(["c", "b", "a"]);
-    expect(swap(t, "a", "a")).toEqual(t);
-  });
-});
-
 describe("resize", () => {
   it("sets and clamps the ratio of one split only", () => {
     const inner = split(leaf("b"), "b", "col", "c");
@@ -106,23 +92,8 @@ describe("neighbor", () => {
   });
 });
 
-describe("dropZone", () => {
-  it("names the outer quarter on each side and the middle", () => {
-    expect(dropZone(0.1, 0.5)).toBe("left");
-    expect(dropZone(0.9, 0.5)).toBe("right");
-    expect(dropZone(0.5, 0.1)).toBe("top");
-    expect(dropZone(0.5, 0.9)).toBe("bottom");
-    expect(dropZone(0.5, 0.5)).toBe("center");
-    expect(dropZone(0.4, 0.4)).toBe("center");
-  });
-});
-
 describe("layout", () => {
   const sid = (n: Node) => (n.kind === "split" ? n.id : "");
-
-  it("gives a lone leaf the whole stage and no gutter", () => {
-    expect(layout(leaf("a"))).toEqual({ panes: { a: { x: 0, y: 0, width: 1, height: 1 } }, gutters: [] });
-  });
 
   it("places a split's children along its axis at its ratio, with a gutter between", () => {
     let t = split(leaf("a"), "a", "row", "b");

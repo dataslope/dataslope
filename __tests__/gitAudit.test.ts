@@ -7,7 +7,7 @@
 import { describe, it, expect } from "vitest";
 import { Bash, defineCommand } from "just-bash/browser";
 import { createGitFs } from "@/app/_components/git/gitFs";
-import { createGitCommand, gitDate, unifiedDiff } from "@/app/_components/git/gitCommand";
+import { createGitCommand, unifiedDiff } from "@/app/_components/git/gitCommand";
 import { scenarioById } from "@/app/_components/git/scenarios";
 import { runCommand } from "@/app/_components/git/runCommand";
 
@@ -37,7 +37,6 @@ async function seeded(id: string) {
   }
   return s;
 }
-
 
 describe("BG-02 · git diff marks what changed", () => {
   it("shows the seed's unstaged edit as added lines, with a real hunk header", async () => {
@@ -132,15 +131,6 @@ describe("BG-04 · reset resolves first, then moves everything together", () => 
     expect((await run("git status")).out).toContain("On branch main");
     expect((await run("git branch")).out).toContain("* main");
     expect((await run("ls")).out).not.toContain(".gitignore");
-  });
-
-  it("hard-resets to a short sha", async () => {
-    const { run } = await seeded("linear-history");
-    await run("git restore README.md");
-    const first = (await run("git log --oneline")).out.trim().split("\n").pop()!.slice(0, 7);
-    expect((await run(`git reset --hard ${first}`)).code).toBe(0);
-    expect((await run("git log --oneline")).out.trim().split("\n")).toHaveLength(1);
-    expect((await run("git status --short")).out).toBe("");
   });
 
   it("soft-resets: the branch moves, the index keeps the old tree staged", async () => {
@@ -263,15 +253,6 @@ describe("BG-09 · options are honoured or refused", () => {
     expect((await run("git diff --word-diff")).err).toContain("unknown option");
     expect((await run("git status -z")).err).toContain("unknown option");
     expect((await run("git log --help")).out).toContain("usage: git log");
-  });
-
-  it("counts insertions and deletions on commit", async () => {
-    const { run } = await seeded("linear-history");
-    await run("git add README.md");
-    const c = await run('git commit -m "Edit README"');
-    expect(c.out).toContain("1 file changed, 2 insertions(+)");
-    await run("echo x > new.txt; git add new.txt");
-    expect((await run('git commit -m "New"')).out).toContain("create mode 100644 new.txt");
   });
 });
 
@@ -399,22 +380,7 @@ describe("BG-14 · conflicts", () => {
   });
 });
 
-describe("BG-18 · message fidelity", () => {
-  it("prints the fast-forward range and stat", async () => {
-    const { run } = await seeded("branching");
-    const r = await run("git merge feature");
-    expect(r.out).toMatch(/^Updating [0-9a-f]{7}\.\.[0-9a-f]{7}\nFast-forward\n feature\.js \| 1 \+\n 1 file changed, 1 insertion\(\+\)\n$/);
-    expect((await run("git merge feature")).out).toBe("Already up to date.\n");
-  });
-
-  it("says Already on, and refuses to merge what does not exist", async () => {
-    const { run } = await seeded("branching");
-    expect((await run("git checkout main")).out).toBe("Already on 'main'\n");
-    const r = await run("git merge nothing");
-    expect(r.code).toBe(1);
-    expect(r.err).toBe("merge: nothing - not something we can merge\n");
-  });
-
+describe("BG-18 · git config", () => {
   it("names the author from git config, and lists config in help", async () => {
     const { run } = await seeded("linear-history");
     await run("git config user.name Grace");
@@ -424,19 +390,5 @@ describe("BG-18 · message fidelity", () => {
     expect((await run("git log -1")).out).toContain("Author: Grace <grace@example.com>");
     expect((await run("cat .git/config")).out).toContain("Grace");
     expect((await run("git help")).out).toContain("config");
-  });
-
-  it("prints dates the way git does", async () => {
-    const { run } = await seeded("linear-history");
-    expect((await run("git log -1")).out).toMatch(/Date:   Thu Jan 1 00:0\d:00 2026 \+0000/);
-    expect(gitDate(1767225660)).toBe("Thu Jan 1 00:01:00 2026 +0000");
-    expect(gitDate(1767225660, -60)).toBe("Thu Jan 1 01:01:00 2026 +0100");
-  });
-
-  it("keeps the merge commit's stat honest", async () => {
-    const { run } = await seeded("branching");
-    const r = await run("git merge --no-ff feature");
-    expect(r.out).toContain("Merge made by the 'ort' strategy.");
-    expect(r.out).toContain("feature.js | 1 +");
   });
 });

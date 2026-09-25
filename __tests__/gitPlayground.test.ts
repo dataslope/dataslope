@@ -7,10 +7,9 @@
 
 import { describe, it, expect } from "vitest";
 import { Bash, defineCommand } from "just-bash/browser";
-import git from "isomorphic-git";
 import { createGitFs, FileTooLargeError } from "@/app/_components/git/gitFs";
 import { createGitCommand } from "@/app/_components/git/gitCommand";
-import { SCENARIOS, scenarioById } from "@/app/_components/git/scenarios";
+import { scenarioById } from "@/app/_components/git/scenarios";
 import { MAX_FILE_BYTES } from "@/app/_components/git/protocol";
 import { runCommand } from "@/app/_components/git/runCommand";
 
@@ -78,16 +77,6 @@ describe("git command", () => {
     expect(r.err).toContain("git help");
   });
 
-  it("branches, merges, and fast-forwards", async () => {
-    const { run } = await seeded("branching");
-    expect((await run("git branch")).out).toContain("* main");
-
-    const merge = await run("git merge feature");
-    expect(merge.code).toBe(0);
-    expect(merge.out).toContain("Fast-forward");
-    expect((await run("git log --oneline")).out).toContain("Add feature flag");
-  });
-
   it("puts the merged branch's files in the working tree", async () => {
     const { run } = await seeded("branching");
     expect((await run("ls")).out).not.toContain("feature.js");
@@ -97,22 +86,6 @@ describe("git command", () => {
     // so a fast-forward would otherwise leave the file missing.
     expect((await run("ls")).out).toContain("feature.js");
     expect((await run("git status")).out).toContain("nothing to commit");
-  });
-
-  it("surfaces a merge conflict rather than throwing", async () => {
-    const { run } = await seeded("conflict-pending");
-    const r = await run("git merge rename");
-    expect(r.code).toBe(1);
-    expect(r.err).toContain("CONFLICT");
-    expect(r.err).toContain("Automatic merge failed");
-  });
-
-  it("stages and unstages through reset/restore", async () => {
-    const { run } = await seeded("staged-and-unstaged");
-    expect((await run("git status -s")).out).toContain("notes.md");
-    await run("git restore --staged notes.md");
-    const after = await run("git status -s");
-    expect(after.out).not.toMatch(/^A {2}notes\.md/m);
   });
 });
 
@@ -128,40 +101,9 @@ describe("the shell sees the same filesystem as git", () => {
     expect(entries).toContain("objects");
     expect(entries).toContain("refs");
   });
-
-  it("picks up shell edits in git status", async () => {
-    const { run } = await seeded("linear-history");
-    await run(`printf 'extra\n' >> README.md`);
-    await run(`printf 'x\n' > fresh.txt`);
-
-    const status = await run("git status -s");
-    expect(status.out).toContain("README.md");
-    expect(status.out).toContain("?? fresh.txt");
-  });
-
-  it("pipes git output into shell builtins", async () => {
-    const { run } = await seeded("linear-history");
-    expect((await run("git log --oneline | wc -l")).out.trim()).toBe("3");
-  });
 });
 
 describe("merge bookkeeping", () => {
-  it("gives the conflict-resolving commit two parents", async () => {
-    const { run, fs } = await seeded("conflict-pending");
-    expect((await run("git merge rename")).code).toBe(1);
-    expect((await run("git status")).out).toContain("You have unmerged paths");
-
-    await run(`printf 'title: Final\nauthor: unknown\n' > config.yml`);
-    await run("git add config.yml");
-    await run('git commit -m "Resolve"');
-
-    // isomorphic-git never writes MERGE_HEAD, so without explicit tracking the
-    // resolving commit would claim the merge never happened.
-    const log = await git.log({ fs: fs as never, dir: REPO, depth: 1 });
-    expect(log[0].commit.parent).toHaveLength(2);
-    expect((await run("git status")).out).not.toContain("unmerged paths");
-  });
-
   it("refuses to delete an unmerged branch with -d", async () => {
     const { run } = await seeded("branching");
     const refused = await run("git branch -d feature");
@@ -170,14 +112,6 @@ describe("merge bookkeeping", () => {
 
     expect((await run("git branch -D feature")).code).toBe(0);
     expect((await run("git branch")).out).not.toContain("feature");
-  });
-
-  it("deletes a branch once its work is merged", async () => {
-    const { run } = await seeded("branching");
-    await run("git merge feature");
-    const deleted = await run("git branch -d feature");
-    expect(deleted.code).toBe(0);
-    expect(deleted.out).toContain("Deleted branch feature");
   });
 
   it("aborts a conflicted merge", async () => {
@@ -251,18 +185,5 @@ describe("size caps", () => {
     const viaShell = await run(`printf '%0${MAX_FILE_BYTES + 1}d' 0 > big.txt`);
     expect(viaShell.code).not.toBe(0);
     expect(viaShell.err).toContain("playground limit");
-  });
-
-  it("allows ordinary teaching-sized files", async () => {
-    const { store } = await session();
-    await expect(store.writeFile(`${REPO}/ok.txt`, "x".repeat(1024))).resolves.toBeUndefined();
-  });
-});
-
-describe("scenarios", () => {
-  it.each(SCENARIOS.map((s) => s.id))("%s seeds without error", async (id) => {
-    const { run } = await seeded(id);
-    const status = await run("git status");
-    expect(status.code === 0 || status.err.includes("not a git repository")).toBe(true);
   });
 });

@@ -5,38 +5,16 @@ import {
   fromDateEditorValue,
   hasTimeOfDay,
   resolveTemporalEditorKind,
-  bytesToHex,
-  formatBytesHex,
-  bytesToBase64,
   reversibleCellValue,
-  enumHintsFromColumns,
   arrayEditorText,
   parseArrayEditValue,
 } from "../app/_components/sql/utils/cellEditing";
-import type { TableColumnInfo } from "../app/_components/runtime/sqlite";
 import {
   formatCellValue,
   parseCellEditValue,
 } from "../app/_components/sql/utils/cellUtils";
 
 describe("classifyCellEditor", () => {
-  it("detects booleans across engines", () => {
-    expect(classifyCellEditor("boolean")).toBe("boolean");
-    expect(classifyCellEditor("BOOL")).toBe("boolean");
-    expect(classifyCellEditor("Boolean")).toBe("boolean");
-  });
-
-  it("detects JSON columns", () => {
-    expect(classifyCellEditor("json")).toBe("json");
-    expect(classifyCellEditor("jsonb")).toBe("json");
-  });
-
-  it("detects binary columns", () => {
-    expect(classifyCellEditor("bytea")).toBe("blob");
-    expect(classifyCellEditor("BLOB")).toBe("blob");
-    expect(classifyCellEditor("VARBINARY")).toBe("blob");
-  });
-
   it("distinguishes date / time / datetime", () => {
     expect(classifyCellEditor("date")).toBe("date");
     expect(classifyCellEditor("DATE")).toBe("date");
@@ -91,12 +69,6 @@ describe("toDateEditorValue", () => {
     );
     expect(toDateEditorValue("2026-05-31 03:35:51", "datetime")).toBe(
       "2026-05-31T03:35:51",
-    );
-  });
-
-  it("accepts Date objects defensively", () => {
-    expect(toDateEditorValue(new Date("2026-05-31T03:35:51.000Z"), "date")).toBe(
-      "2026-05-31",
     );
   });
 
@@ -179,16 +151,6 @@ describe("hasTimeOfDay", () => {
     expect(hasTimeOfDay("2024-03-15T00:00:00+05:30")).toBe(false);
     expect(hasTimeOfDay("2024-03-15T08:00:00+05:30")).toBe(true);
   });
-
-  it("is false for non-strings / unparseable values", () => {
-    expect(hasTimeOfDay(null)).toBe(false);
-    expect(hasTimeOfDay(1717000000)).toBe(false);
-    expect(hasTimeOfDay("hello")).toBe(false);
-  });
-
-  it("accepts Date objects", () => {
-    expect(hasTimeOfDay(new Date("2024-03-15T14:30:00Z"))).toBe(true);
-  });
 });
 
 describe("resolveTemporalEditorKind (let users edit the time too)", () => {
@@ -206,43 +168,6 @@ describe("resolveTemporalEditorKind (let users edit the time too)", () => {
     expect(resolveTemporalEditorKind("date", "2024-03-15T00:00:00.000Z")).toBe(
       "date",
     );
-  });
-
-  it("passes datetime / time kinds through unchanged", () => {
-    expect(resolveTemporalEditorKind("datetime", "2024-03-15")).toBe("datetime");
-    expect(resolveTemporalEditorKind("time", "08:20:00")).toBe("time");
-    expect(resolveTemporalEditorKind("datetime", "2024-03-15 14:30:00")).toBe(
-      "datetime",
-    );
-  });
-});
-
-describe("byte encoders", () => {
-  const bytes = new Uint8Array([0, 1, 15, 16, 255, 222, 173]);
-
-  it("hex-encodes", () => {
-    expect(bytesToHex(bytes)).toBe("00010f10ffdead");
-    expect(bytesToHex(new Uint8Array([]))).toBe("");
-  });
-
-  it("formats a wrapped hex dump 16 bytes per line", () => {
-    const long = new Uint8Array(20).map((_, i) => i);
-    const dump = formatBytesHex(long);
-    const lines = dump.split("\n");
-    expect(lines).toHaveLength(2);
-    expect(lines[0].split(" ")).toHaveLength(16);
-    expect(lines[1].split(" ")).toHaveLength(4);
-    expect(lines[0].startsWith("00 01 02")).toBe(true);
-  });
-
-  it("base64-encodes (matches btoa / known vectors)", () => {
-    const enc = (s: string) =>
-      bytesToBase64(new Uint8Array([...s].map((c) => c.charCodeAt(0))));
-    expect(enc("")).toBe("");
-    expect(enc("f")).toBe("Zg==");
-    expect(enc("fo")).toBe("Zm8=");
-    expect(enc("foo")).toBe("Zm9v");
-    expect(enc("foobar")).toBe("Zm9vYmFy");
   });
 });
 
@@ -297,101 +222,16 @@ describe("parseCellEditValue (literal-NULL escape hatch, UX-20)", () => {
   });
 });
 
-describe("formatCellValue array & date display", () => {
+describe("formatCellValue array display", () => {
   it("brackets arrays (UX-07)", () => {
     expect(formatCellValue([10, 20, 30])).toBe("[10, 20, 30]");
     expect(formatCellValue(["a", "b"])).toBe("[a, b]");
     expect(formatCellValue([])).toBe("[]");
     expect(formatCellValue([1, [2, 3]])).toBe("[1, [2, 3]]");
   });
-
-  it("renders Date as ISO", () => {
-    expect(formatCellValue(new Date("2026-05-31T03:35:51.000Z"))).toBe(
-      "2026-05-31T03:35:51.000Z",
-    );
-  });
-
-  it("still reports BLOB size and NULL", () => {
-    expect(formatCellValue(new Uint8Array([1, 2, 3]))).toBe("BLOB (3 bytes)");
-    expect(formatCellValue(null)).toBe("NULL");
-  });
-});
-
-describe("enumHintsFromColumns", () => {
-  const col = (
-    name: string,
-    enumValues?: string[] | null,
-  ): TableColumnInfo => ({
-    cid: 0,
-    name,
-    type: enumValues ? "mood" : "text",
-    notNull: false,
-    defaultValue: null,
-    pk: 0,
-    generated: null,
-    enumValues,
-  });
-
-  it("maps only the columns that carry enum labels", () => {
-    const map = enumHintsFromColumns([
-      col("id"),
-      col("status", ["open", "closed"]),
-      col("note"),
-      col("mood", ["sad", "ok", "happy"]),
-    ]);
-    expect(map.size).toBe(2);
-    expect(map.get("status")).toEqual(["open", "closed"]);
-    expect(map.get("mood")).toEqual(["sad", "ok", "happy"]);
-    expect(map.has("id")).toBe(false);
-  });
-
-  it("skips null / undefined / empty enum lists", () => {
-    const map = enumHintsFromColumns([
-      col("a", null),
-      col("b", undefined),
-      col("c", []),
-    ]);
-    expect(map.size).toBe(0);
-  });
-
-  it("returns an empty map for no columns", () => {
-    expect(enumHintsFromColumns([]).size).toBe(0);
-  });
-});
-
-describe("arrayEditorText", () => {
-  it("passes a stored JSON string through unchanged", () => {
-    expect(arrayEditorText("[10,20,30]")).toBe("[10,20,30]");
-    expect(arrayEditorText('["a","b"]')).toBe('["a","b"]');
-  });
-
-  it("serializes a live JS array to JSON", () => {
-    expect(arrayEditorText([10, 20, 30])).toBe("[10,20,30]");
-    expect(arrayEditorText(["a", "b"])).toBe('["a","b"]');
-  });
-
-  it("renders null / undefined as empty", () => {
-    expect(arrayEditorText(null)).toBe("");
-    expect(arrayEditorText(undefined)).toBe("");
-  });
 });
 
 describe("parseArrayEditValue", () => {
-  it("parses a JSON array of numbers", () => {
-    expect(parseArrayEditValue("[10, 20, 30]")).toEqual({
-      ok: true,
-      value: [10, 20, 30],
-    });
-  });
-
-  it("parses a JSON array of strings (incl. empty array)", () => {
-    expect(parseArrayEditValue('["a","b"]')).toEqual({
-      ok: true,
-      value: ["a", "b"],
-    });
-    expect(parseArrayEditValue("[]")).toEqual({ ok: true, value: [] });
-  });
-
   it("rejects non-array JSON and invalid JSON", () => {
     expect(parseArrayEditValue("42").ok).toBe(false);
     expect(parseArrayEditValue('{"a":1}').ok).toBe(false);

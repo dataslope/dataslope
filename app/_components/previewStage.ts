@@ -9,7 +9,7 @@
 import type { CSSProperties } from "react";
 
 /** Custom property `.previewSlot` reads its height from. */
-export const PREVIEW_HEIGHT_VAR = "--ch-preview-height";
+const PREVIEW_HEIGHT_VAR = "--ch-preview-height";
 
 /** Style object setting the preview stage's height, or `undefined` to use the
  *  stylesheet default. Bare numbers mean px; strings pass through ("50vh"). */

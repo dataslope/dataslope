@@ -68,7 +68,7 @@ jobs:
         if: ${{ !cancelled() }}
         run: npx tsc --noEmit
 
-      # Errors fail the job; the ~156 pre-existing warnings do not. Adding
+      # Errors fail the job; the ~53 pre-existing warnings do not. Adding
       # `--max-warnings 0` is the natural next step once that backlog is
       # cleared — until then it would make this job permanently red and
       # therefore ignored.

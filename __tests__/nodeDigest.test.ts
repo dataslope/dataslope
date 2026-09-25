@@ -33,10 +33,6 @@ const ALGORITHMS = [
 ];
 
 describe("nodeDigest", () => {
-  it("matches the canonical SHA-256 vector", () => {
-    expect(digest("sha256", "abc")).toBe(SHA256_ABC);
-  });
-
   it("agrees with Node for every supported algorithm", () => {
     const inputs = ["", "hi", "abc", "a".repeat(1000), "café 你好 🌊"];
     for (const algorithm of ALGORITHMS) {

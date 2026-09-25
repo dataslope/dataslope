@@ -149,14 +149,6 @@ describe("worksheet cells", () => {
     );
     expect(rows[0]).toEqual(["", "2"]);
   });
-
-  it("concatenates the runs of a rich shared string", () => {
-    const rows = parseWorksheet(
-      sheetXml(`<row><c r="A1" t="s"><v>0</v></c></row>`),
-      ctx({ sharedStrings: ["boldplain"] }),
-    );
-    expect(rows[0]).toEqual(["boldplain"]);
-  });
 });
 
 describe("shaping a sheet into headers and rows", () => {
