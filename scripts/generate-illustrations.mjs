@@ -2,8 +2,8 @@
 /**
  * Batch-generate the Dataslope course/interview illustrations with OpenAI's
  * GPT Image 2. Reads prompt definitions from `data/illustration-prompts.json`
- * (the same source the admin gallery and `<IllustrationPrompt>` cards render),
- * builds each prompt in the house style, and writes one PNG per prompt.
+ * (the same source the admin gallery renders), builds each prompt in the house
+ * style, and writes one PNG per prompt.
  *
  * Defaults to the Batch API (~50% cheaper, async) at **low** quality: image
  * output tokens dominate the bill and `low` (196 tokens per 1024x1024 vs 5488

@@ -162,6 +162,34 @@ The `R2_INC_CACHE_*` pair is named for the bucket it belongs to, because a secon
 
 There is little left to tune: `MAX_BRANCHES` caps how many branch previews may coexist, and `GRACE_HOURS` sizes the in-flight-deploy safety net. `THRESHOLD_HOURS`, `MAIN_COMMITS`, `PR_COMMITS` and `MIN_CACHE_OBJECTS` were retired on 2026-08-14 — each approximated something the job now measures directly, and the age threshold in particular was the single largest contributor to the 78 GB peak. Retention decides whether the bucket sits near R2's 10 GB free tier or balloons — but only once bytes-per-build is what it should be: at ~0.147 GiB a build the whole steady-state bucket is well under a gigabyte, and at 2.34 GiB it is over the free tier with three folders. Storage beyond the tier is cheap ($0.015/GB-month), but there's no reason to pay for dead previews or for compression that isn't running.
 
+### Worker size
+
+Cloudflare refuses a Worker script over **10 MiB gzipped**. Static files (`/_next/static`, `public/`) are served by the `ASSETS` binding and the prerendered pages by the R2 incremental cache, so neither counts; what does is everything the server runs: Next's runtime, every route's server chunks, and the lesson pipeline those chunks carry, since lesson MDX compiles at request time (`dynamic: true` in `source.config.ts`) with its remark, rehype, KaTeX and Shiki stack. Measure after a build:
+
+```bash
+npx opennextjs-cloudflare build
+npm run cf:size                    # upload, gzip, headroom
+npm run cf:size -- --top 30        # plus the largest modules inside it
+npm run cf:size -- --budget 8192   # exit 1 above a gzipped budget
+```
+
+The totals come from `wrangler deploy --dry-run`, the same check a deploy runs. Measured 2026-09-25:
+
+| | Upload | Gzipped | Of the limit | Headroom |
+| --- | ---: | ---: | ---: | ---: |
+| Before | 41,125 KiB | 8,146 KiB | 79.6% | 2,094 KiB |
+| After | 38,426 KiB | 7,475 KiB | 73.0% | 2,765 KiB |
+
+What went, with the gzipped saving of each:
+
+- **Every Lucide icon, ~260 KiB.** Fumadocs' `lucideIconsPlugin()` resolves page-tree icon names through lucide-react's `icons` map, which imports all ~1,600 of them, and no page names an icon. `lib/source.ts` no longer loads it; `__tests__/pageTreeIcons.test.ts` fails if content starts relying on icons.
+- **Image content hashes, ~240 KiB.** `lib/generated/images.js` carried a 64-character SHA-256 per image that only `scripts/build-images.mjs` reads. They moved to `lib/generated/image-hashes.json`, which nothing at runtime imports.
+- **The illustration-prompt corpus, ~176 KiB.** An unused `<IllustrationPrompt>` MDX component imported the whole 1.4 MB `data/illustration-prompts.json` into the lesson renderer. The admin gallery's API route still carries one copy, by design (the corpus is admin-only, so it can't be a public asset).
+
+**Server code is compiled once per layer.** Pages (`.next/server/chunks/ssr/`) and route handlers (`app/api/**`, `sitemap.ts`, in `.next/server/chunks/`) are separate Turbopack graphs, so a module imported from both ships twice. That is why the image manifest and the challenge catalog each appear twice: the catalog (~300 KiB gzipped a copy) is imported by the challenge pages and by `/api/challenges/progress` and `sitemap.ts`, which only need its slugs. Before a route handler imports a large module, check whether a page already carries it, or read the data at request time as a static asset through `lib/serverAssets.ts`.
+
+The same shape of problem shows up in any "resolve by name" map, which drags in the whole set it can resolve: the `shiki` alias in `next.config.ts` exists for the same reason the Lucide plugin is gone.
+
 ## Search
 
 Site search is a **SQLite FTS5 index on D1** (`dataslope-search`), built from `content/` at build time and queried by `app/api/search/route.ts`. It replaced an in-Worker Orama index, which had to be fetched, parsed and re-tokenised on the first search in every fresh isolate — a cost paid per data centre, per deploy, and growing with the content. An FTS5 query is a `SELECT` against an index that already exists, so there is nothing to warm up.

@@ -10,9 +10,8 @@ import {
   getIllustrationPromptById,
 } from "../lib/illustrationPromptsGallery";
 
-// The admin gallery, the in-lesson <IllustrationPrompt> card, and
-// scripts/generate-illustrations.mjs all key off these helpers, so the exact
-// prompt text and file-name slugs are pinned here.
+// The admin gallery and scripts/generate-illustrations.mjs both key off these
+// helpers, so the exact prompt text and file-name slugs are pinned here.
 
 /** The constraints appended to every isometric prompt, which is every prompt
  *  except the `course-inline` risograph bands. */

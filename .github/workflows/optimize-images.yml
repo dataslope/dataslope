@@ -8,8 +8,8 @@ name: Optimize images
 # scripts/build-images.mjs) and is marked `[skip ci]`.
 #
 # No loop: triggers only on assets/images/** + the optimizer, while the
-# commit touches only public/images/** + the manifest (and GITHUB_TOKEN
-# pushes can't retrigger Actions anyway).
+# commit touches only public/images/** + the manifest and its hashes (and
+# GITHUB_TOKEN pushes can't retrigger Actions anyway).
 #
 # Runs on every branch including main. Caveat: if main gains push protection,
 # a stale-outputs push to main fails this job's push step — regenerate
@@ -56,7 +56,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/images lib/generated/images.js
+          git add public/images lib/generated/images.js lib/generated/image-hashes.json
           if git diff --cached --quiet; then
             echo "Optimized images already up to date, nothing to commit."
             exit 0

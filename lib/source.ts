@@ -12,31 +12,29 @@
  */
 import { loader } from "fumadocs-core/source";
 import type { Node, Root } from "fumadocs-core/page-tree";
-import { lucideIconsPlugin } from "fumadocs-core/source/plugins/lucide-icons";
 // `dynamic` mode (see `source.config.ts`) emits each collection from
 // `.source/dynamic`, where a page body is compiled on demand from disk at
 // request time instead of being bundled into the route graph.
 import { courses, fumadocsDev, interview } from "@/.source/dynamic";
 
+// No `lucideIconsPlugin()`: it resolves page-tree icon names through
+// lucide-react's `icons` map, which imports every icon (~1 MB, ~260 KB gzipped
+// across its two copies in the Worker) for a feature no page uses.
+// `__tests__/pageTreeIcons.test.ts` fails if content starts naming icons; map
+// the few it needs explicitly then, rather than bringing the plugin back.
 export const courseSource = loader({
   baseUrl: "/courses",
   source: courses.toFumadocsSource(),
-  // Convert `icon: "Cpu"` (frontmatter) and `---[Layers]Section---`
-  // (meta.json separator) icon names into Lucide React elements at
-  // build time, per https://www.fumadocs.dev/docs/page-conventions.
-  plugins: [lucideIconsPlugin()],
 });
 
 export const devSource = loader({
   baseUrl: "/fumadocs-dev",
   source: fumadocsDev.toFumadocsSource(),
-  plugins: [lucideIconsPlugin()],
 });
 
 export const interviewSource = loader({
   baseUrl: "/interview-prep",
   source: interview.toFumadocsSource(),
-  plugins: [lucideIconsPlugin()],
 });
 
 /**

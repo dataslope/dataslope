@@ -36,8 +36,7 @@
   color: var(--color-fd-muted-foreground);
 }
 
-/* Dev-only "artwork not generated yet" hint. Mirrors the dashed treatment of
-   the <IllustrationPrompt> placeholder so the two read as the same family. */
+/* Dev-only "artwork not generated yet" hint. */
 .pending {
   display: flex;
   align-items: center;
