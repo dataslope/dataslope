@@ -688,9 +688,8 @@ html:is(.dark, [data-theme="dark"]) .git-terminal {
 
 /* ─── All commands: the composed-command palette ─── */
 /* Groups of two-column buttons: a label in the UI face, the command it fills
-   in mono. Every class the component emits has a rule here; a stylesheet test
-   (`__tests__/gitPaletteStyles.test.ts`) keeps it that way, because the last
-   rename of this component dropped the rules and shipped browser defaults. */
+   in mono. Every class the component emits needs a rule here: the last rename
+   of this component dropped the rules and shipped browser defaults. */
 .gitx-palette-panel {
   display: flex;
   flex-direction: column;
