@@ -880,13 +880,19 @@
   max-height: 220px;
 }
 
+/* Success, not a dimmed placeholder: the text and its CheckCircle (which
+   paints in currentColor) both take the brand green. The 500 is only 2.3:1
+   on a light theme's near-white, so light themes use the AA ink shade. */
 .sql-result-ok {
   padding: 16px;
-  color: var(--text-dim);
-  font-style: italic;
+  color: var(--green);
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+html[data-playground-theme="light"] .sql-result-ok {
+  color: var(--ds-green-ink);
 }
 
 .sql-result-sets {
