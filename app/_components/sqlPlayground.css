@@ -129,9 +129,12 @@
   max-width: var(--available-width, 100vw);
 }
 
+/* Capped at 320px so one long description can't stretch the whole menu
+   across the editor; longer text wraps inside it. The descriptions are
+   written to fit that width on one line, so wrapping is the fallback. */
 .sql-db-popup {
   min-width: 260px;
-  max-width: var(--available-width, 100vw);
+  max-width: min(320px, var(--available-width, 100vw));
   max-height: var(--available-height, 100vh);
   overflow-y: auto;
   /* A long sample list scrolls inside the popup; don't chain that scroll
@@ -160,6 +163,8 @@
   /* Let the label/description column shrink below its content width so the
      capped popup wraps the text instead of widening past the viewport. */
   min-width: 0;
+  /* A renamed filename or schema name has no spaces to break at. */
+  overflow-wrap: anywhere;
 }
 
 .sql-db-item-desc {
