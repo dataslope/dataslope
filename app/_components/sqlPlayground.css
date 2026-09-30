@@ -2940,14 +2940,9 @@ html[data-playground-theme="light"] .sql-result-ok {
   background: color-mix(in srgb, var(--text) 2%, transparent);
 }
 
-/* SQL-dump import: where the picked file should land. */
-.sql-import-target-choice {
-  padding: 14px 16px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg2);
-}
-
+/* SQL-dump import: where the picked file should land. Plain text in the
+   dialog body (.sql-import-target-choice has no rule): a bordered card
+   inside a bordered dialog only reads as clutter. */
 .sql-import-target-file {
   margin: 0 0 6px;
   font-family: var(--font-mono);
