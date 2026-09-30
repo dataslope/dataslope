@@ -3673,16 +3673,24 @@ input[type="range"].fs-slider:disabled {
     0 0 0 2px var(--bg2),
     0 0 0 4px var(--text-muted);
 }
-/* On narrow screens a row of three workspace-choice buttons ("Cancel",
-   "Open in new workspace", "Overwrite this workspace") no longer fits:
-   the labels wrap to several lines and the buttons stretch to uneven
-   heights. Stack them full-width so each label sits on one line and the
-   spacing reads evenly. Opt-in via .confirm-actions-stack so two-button
-   confirms keep their compact row. */
-@media (max-width: 768px) {
-  .confirm-actions-stack {
-    flex-direction: column;
-  }
+/* The workspace-choice buttons ("Open in new workspace", "Overwrite this
+   workspace", "Cancel") do not fit a row even at the dialog's full 420px:
+   the labels wrap to two lines and the buttons stretch to uneven heights.
+   Stack them full-width at every size, each label on one line beside its
+   icon, with Cancel last in the markup so it sits at the bottom. Opt-in via
+   .confirm-actions-stack so two-button confirms keep their compact row. */
+.confirm-actions-stack {
+  flex-direction: column;
+}
+.confirm-actions-stack .confirm-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-block: 9px;
+}
+.confirm-actions-stack .confirm-btn svg {
+  flex-shrink: 0;
 }
 
 /* ─── Tab rename dialog (used by the generic TabBar across every

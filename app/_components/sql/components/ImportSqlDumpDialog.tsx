@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import { Dialog } from "@base-ui/react/dialog";
-import { CircleAlert, TriangleAlert, Upload } from "lucide-react";
+import {
+  CircleAlert,
+  FolderPlus,
+  Replace,
+  TriangleAlert,
+  Upload,
+  X,
+} from "lucide-react";
 import { useImportProgress } from "../hooks/useImportProgress";
 import {
   formatFileSize,
@@ -210,15 +217,13 @@ export function ImportSqlDumpDialog({
               </button>
             ) : (
               <>
-                <Dialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </Dialog.Close>
                 {picked && onImportInNewWorkspace && (
                   <button
                     type="button"
                     className="confirm-btn confirm-btn-secondary"
                     onClick={() => runPicked(picked, onImportInNewWorkspace)}
                   >
+                    <FolderPlus size={15} aria-hidden="true" />
                     Open in new workspace
                   </button>
                 )}
@@ -228,9 +233,14 @@ export function ImportSqlDumpDialog({
                     className="confirm-btn confirm-btn-danger"
                     onClick={() => runPicked(picked, onImport)}
                   >
+                    <Replace size={15} aria-hidden="true" />
                     Overwrite this workspace
                   </button>
                 )}
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                  {picked && <X size={15} aria-hidden="true" />}
+                  Cancel
+                </Dialog.Close>
               </>
             )}
           </div>
