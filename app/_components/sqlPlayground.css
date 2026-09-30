@@ -2940,22 +2940,20 @@ html[data-playground-theme="light"] .sql-result-ok {
   background: color-mix(in srgb, var(--text) 2%, transparent);
 }
 
-/* SQL-dump import: where the picked file should land. Plain text in the
-   dialog body (.sql-import-target-choice has no rule): a bordered card
+/* SQL-dump import: one sentence asking where the picked file should land,
+   its name inline. Plain text in the dialog body, not a card: a bordered box
    inside a bordered dialog only reads as clutter. */
-.sql-import-target-file {
-  margin: 0 0 6px;
-  font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--text);
-  overflow-wrap: anywhere;
-}
-
 .sql-import-target-hint {
   margin: 0;
   font-size: 12px;
   line-height: 1.5;
   color: var(--text-dim);
+}
+
+.sql-import-target-hint code {
+  color: var(--text);
+  /* A long filename has no spaces to break at. */
+  overflow-wrap: anywhere;
 }
 
 /* Import progress: takes the dropzone's place while a file is read and then

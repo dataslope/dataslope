@@ -138,16 +138,12 @@ export function ImportSqlDumpDialog({
           {progress ? (
             <ImportProgressPanel progress={progress} />
           ) : picked ? (
-            <div className="sql-import-target-choice">
-              <p className="sql-import-target-file">
-                <strong>{picked.filename}</strong>
-                {picked.sizeBytes > 0 && ` · ${formatFileSize(picked.sizeBytes)}`}
-              </p>
-              <p className="sql-import-target-hint">
-                Where should it go? Overwriting replaces this workspace&apos;s
-                database and closes its query tabs.
-              </p>
-            </div>
+            <p className="sql-import-target-hint">
+              Where should <code>{picked.filename}</code>
+              {picked.sizeBytes > 0 && ` (${formatFileSize(picked.sizeBytes)})`}{" "}
+              go? Overwriting replaces this workspace&apos;s database and closes
+              its query tabs.
+            </p>
           ) : (
             <div
               className={`sql-dropzone${dragging ? " dragging" : ""}`}
