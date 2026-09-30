@@ -129,9 +129,12 @@
   max-width: var(--available-width, 100vw);
 }
 
+/* Capped at 320px so one long description can't stretch the whole menu
+   across the editor; longer text wraps inside it. The descriptions are
+   written to fit that width on one line, so wrapping is the fallback. */
 .sql-db-popup {
   min-width: 260px;
-  max-width: var(--available-width, 100vw);
+  max-width: min(320px, var(--available-width, 100vw));
   max-height: var(--available-height, 100vh);
   overflow-y: auto;
   /* A long sample list scrolls inside the popup; don't chain that scroll
@@ -160,6 +163,8 @@
   /* Let the label/description column shrink below its content width so the
      capped popup wraps the text instead of widening past the viewport. */
   min-width: 0;
+  /* A renamed filename or schema name has no spaces to break at. */
+  overflow-wrap: anywhere;
 }
 
 .sql-db-item-desc {
@@ -880,13 +885,19 @@
   max-height: 220px;
 }
 
+/* Success, not a dimmed placeholder: the text and its CheckCircle (which
+   paints in currentColor) both take the brand green. The 500 is only 2.3:1
+   on a light theme's near-white, so light themes use the AA ink shade. */
 .sql-result-ok {
   padding: 16px;
-  color: var(--text-dim);
-  font-style: italic;
+  color: var(--green);
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+html[data-playground-theme="light"] .sql-result-ok {
+  color: var(--ds-green-ink);
 }
 
 .sql-result-sets {
@@ -2929,27 +2940,20 @@
   background: color-mix(in srgb, var(--text) 2%, transparent);
 }
 
-/* SQL-dump import: where the picked file should land. */
-.sql-import-target-choice {
-  padding: 14px 16px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg2);
-}
-
-.sql-import-target-file {
-  margin: 0 0 6px;
-  font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--text);
-  overflow-wrap: anywhere;
-}
-
+/* SQL-dump import: one sentence asking where the picked file should land,
+   its name inline. Plain text in the dialog body, not a card: a bordered box
+   inside a bordered dialog only reads as clutter. */
 .sql-import-target-hint {
   margin: 0;
   font-size: 12px;
   line-height: 1.5;
   color: var(--text-dim);
+}
+
+.sql-import-target-hint code {
+  color: var(--text);
+  /* A long filename has no spaces to break at. */
+  overflow-wrap: anywhere;
 }
 
 /* Import progress: takes the dropzone's place while a file is read and then

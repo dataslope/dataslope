@@ -1,6 +1,8 @@
 "use client";
 
+import { useRef } from "react";
 import { Dialog } from "@base-ui/react/dialog";
+import { FolderPlus, Replace, X } from "lucide-react";
 
 export interface SwitchDatabaseDialogProps {
   open: boolean;
@@ -23,11 +25,15 @@ export function SwitchDatabaseDialog({
   onOverwrite,
   onCreateNew,
 }: SwitchDatabaseDialogProps) {
+  // Cancel sits at the bottom of the stack, so it is no longer the first
+  // tabbable button Base UI would focus by default. Keep it focused on open
+  // so a reflexive Enter still dismisses rather than acting.
+  const cancelRef = useRef<HTMLButtonElement>(null);
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Backdrop className="confirm-backdrop" />
-        <Dialog.Popup className="confirm-popup">
+        <Dialog.Popup className="confirm-popup" initialFocus={cancelRef}>
           <Dialog.Title className="confirm-title">
             Switch to <strong>{newDbFilename}</strong>?
           </Dialog.Title>
@@ -36,20 +42,26 @@ export function SwitchDatabaseDialog({
             <strong>{currentWorkspaceName}</strong>.
           </Dialog.Description>
           <div className="confirm-actions confirm-actions-stack">
-            <Dialog.Close className="confirm-btn confirm-btn-secondary">
-              Cancel
-            </Dialog.Close>
             <Dialog.Close
               className="confirm-btn confirm-btn-secondary"
               onClick={() => { void onCreateNew().catch(console.error); }}
             >
+              <FolderPlus size={15} aria-hidden="true" />
               Open in new workspace
             </Dialog.Close>
             <Dialog.Close
               className="confirm-btn confirm-btn-danger"
               onClick={onOverwrite}
             >
+              <Replace size={15} aria-hidden="true" />
               Overwrite this workspace
+            </Dialog.Close>
+            <Dialog.Close
+              ref={cancelRef}
+              className="confirm-btn confirm-btn-secondary"
+            >
+              <X size={15} aria-hidden="true" />
+              Cancel
             </Dialog.Close>
           </div>
         </Dialog.Popup>

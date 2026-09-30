@@ -132,8 +132,13 @@ describe("how a run ended", () => {
  * The claim this whole approach rests on is about clang's behaviour, not
  * about string assembly, so it is checked against a real clang when one is
  * on the machine. browsercc's clang is the same compiler built for wasm.
+ *
+ * The first compile pays clang's cold start (binary and system headers off
+ * a fresh runner's disk, while the rest of the suite competes for the CPU):
+ * 7.4 s on CI, against 54 ms for the one after it, which blew vitest's 5 s
+ * default. Hence the explicit timeout.
  */
-describe("against a real clang", () => {
+describe("against a real clang", { timeout: 30_000 }, () => {
   const clang = (() => {
     try {
       execFileSync("clang", ["--version"], { stdio: "pipe" });

@@ -3673,16 +3673,60 @@ input[type="range"].fs-slider:disabled {
     0 0 0 2px var(--bg2),
     0 0 0 4px var(--text-muted);
 }
-/* On narrow screens a row of three workspace-choice buttons ("Cancel",
-   "Open in new workspace", "Overwrite this workspace") no longer fits:
-   the labels wrap to several lines and the buttons stretch to uneven
-   heights. Stack them full-width so each label sits on one line and the
-   spacing reads evenly. Opt-in via .confirm-actions-stack so two-button
-   confirms keep their compact row. */
-@media (max-width: 768px) {
-  .confirm-actions-stack {
-    flex-direction: column;
-  }
+/* The workspace-choice buttons ("Open in new workspace", "Overwrite this
+   workspace", "Cancel") do not fit a row even at the dialog's full 420px:
+   the labels wrap to two lines and the buttons stretch to uneven heights.
+   Stack them full-width at every size, each label on one line beside its
+   icon, with Cancel last in the markup so it sits at the bottom. Opt-in via
+   .confirm-actions-stack so two-button confirms keep their compact row.
+
+   The stack is one control, not three: no gap between the buttons, one
+   shared 1px rule between neighbours, and only the outer corners rounded.
+   The destructive choice is marked by red text rather than a red fill, so
+   it doesn't outweigh the two safe choices it sits between. */
+.confirm-actions-stack {
+  flex-direction: column;
+  gap: 0;
+}
+.confirm-actions-stack .confirm-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-block: 9px;
+  border-color: var(--border);
+  border-radius: 0;
+}
+.confirm-actions-stack .confirm-btn + .confirm-btn {
+  border-top-width: 0;
+}
+.confirm-actions-stack .confirm-btn:first-child {
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+.confirm-actions-stack .confirm-btn:last-child {
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+/* Lift the focused button so its ring isn't cut by the neighbour below. */
+.confirm-actions-stack .confirm-btn:focus-visible {
+  position: relative;
+  z-index: 1;
+}
+.confirm-actions-stack .confirm-btn svg {
+  flex-shrink: 0;
+}
+.confirm-actions-stack .confirm-btn-danger {
+  background: transparent;
+  color: var(--red);
+}
+/* The brand 500 is ~3:1 on a light theme's near-white; use the AA ink. */
+html[data-playground-theme="light"] .confirm-actions-stack .confirm-btn-danger {
+  color: var(--ds-red-ink);
+}
+.confirm-actions-stack .confirm-btn-danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--red) 8%, transparent);
+  filter: none;
 }
 
 /* ─── Tab rename dialog (used by the generic TabBar across every

@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import { Dialog } from "@base-ui/react/dialog";
-import { CircleAlert, TriangleAlert, Upload } from "lucide-react";
+import {
+  CircleAlert,
+  FolderPlus,
+  Replace,
+  TriangleAlert,
+  Upload,
+  X,
+} from "lucide-react";
 import { useImportProgress } from "../hooks/useImportProgress";
 import {
   formatFileSize,
@@ -131,16 +138,12 @@ export function ImportSqlDumpDialog({
           {progress ? (
             <ImportProgressPanel progress={progress} />
           ) : picked ? (
-            <div className="sql-import-target-choice">
-              <p className="sql-import-target-file">
-                <strong>{picked.filename}</strong>
-                {picked.sizeBytes > 0 && ` · ${formatFileSize(picked.sizeBytes)}`}
-              </p>
-              <p className="sql-import-target-hint">
-                Where should it go? Overwriting replaces this workspace&apos;s
-                database and closes its query tabs.
-              </p>
-            </div>
+            <p className="sql-import-target-hint">
+              Where should <code>{picked.filename}</code>
+              {picked.sizeBytes > 0 && ` (${formatFileSize(picked.sizeBytes)})`}{" "}
+              go? Overwriting replaces this workspace&apos;s database and closes
+              its query tabs.
+            </p>
           ) : (
             <div
               className={`sql-dropzone${dragging ? " dragging" : ""}`}
@@ -210,15 +213,13 @@ export function ImportSqlDumpDialog({
               </button>
             ) : (
               <>
-                <Dialog.Close className="confirm-btn confirm-btn-secondary">
-                  Cancel
-                </Dialog.Close>
                 {picked && onImportInNewWorkspace && (
                   <button
                     type="button"
                     className="confirm-btn confirm-btn-secondary"
                     onClick={() => runPicked(picked, onImportInNewWorkspace)}
                   >
+                    <FolderPlus size={15} aria-hidden="true" />
                     Open in new workspace
                   </button>
                 )}
@@ -228,9 +229,14 @@ export function ImportSqlDumpDialog({
                     className="confirm-btn confirm-btn-danger"
                     onClick={() => runPicked(picked, onImport)}
                   >
+                    <Replace size={15} aria-hidden="true" />
                     Overwrite this workspace
                   </button>
                 )}
+                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                  {picked && <X size={15} aria-hidden="true" />}
+                  Cancel
+                </Dialog.Close>
               </>
             )}
           </div>

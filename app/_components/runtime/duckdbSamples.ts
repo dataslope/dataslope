@@ -254,7 +254,7 @@ export const DUCKDB_SAMPLE_DATABASES: DuckDbSampleDatabase[] = [
     id: "ecommerce",
     label: "E-Commerce",
     filename: "ecommerce.duckdb",
-    description: "Customers, products, orders, and a STORED generated column.",
+    description: "Orders and a STORED generated column.",
     sql: ECOMMERCE_SQL,
     defaultTabs: ECOMMERCE_TABS,
   },
@@ -262,8 +262,7 @@ export const DUCKDB_SAMPLE_DATABASES: DuckDbSampleDatabase[] = [
     id: "analytics",
     label: "Analytics events",
     filename: "analytics.duckdb",
-    description:
-      "Tiny events table that exercises DuckDB STRUCT, PIVOT, and LIST.",
+    description: "Events with STRUCT, LIST, and PIVOT.",
     sql: ANALYTICS_SQL,
     defaultTabs: ANALYTICS_TABS,
   },
@@ -271,8 +270,7 @@ export const DUCKDB_SAMPLE_DATABASES: DuckDbSampleDatabase[] = [
     id: "parquet_demo",
     label: "Parquet / CSV demo",
     filename: "parquet_demo.duckdb",
-    description:
-      "Inline measurements with examples of read_parquet / read_csv_auto.",
+    description: "Examples of read_parquet and read_csv_auto.",
     sql: PARQUET_DEMO_SQL,
     defaultTabs: PARQUET_DEMO_TABS,
   },
@@ -280,8 +278,7 @@ export const DUCKDB_SAMPLE_DATABASES: DuckDbSampleDatabase[] = [
     id: "lending_club",
     label: "Lending Club loans",
     filename: "lending_club.duckdb",
-    description:
-      "~205k real consumer loans, credit grade, rate, purpose, and default.",
+    description: "~205k real consumer loans and defaults.",
     remoteFiles: [
       { path: LENDING_CLUB_PARQUET_URL, registerAs: "loans.parquet" },
     ],
