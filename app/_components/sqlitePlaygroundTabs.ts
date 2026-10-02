@@ -15,6 +15,9 @@ export const dbScopedKey = (dbId: string, k: string) =>
   tabScope.scopedKey(dbId, k);
 export const setTabWorkspaceScope = tabScope.setWorkspaceScope;
 export const copyTabWorkspaceKeys = tabScope.copyScopedKeys;
+// The database each workspace holds (see createTabScope).
+export const readActiveDbId = tabScope.readActiveDbId;
+export const writeActiveDbId = tabScope.writeActiveDbId;
 
 export interface QueryTab {
   /** Stable client-generated id, used as the React key. */

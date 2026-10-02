@@ -8,11 +8,11 @@ import type {
 } from "../../runtime/sqlite";
 import type { SqliteSampleMetadata } from "../../runtime/sqliteSamples";
 import { SQLITE_SAMPLE_DATABASES } from "../../runtime/sqliteSamples";
-import { storageKey } from "../../sqlitePlaygroundTabs";
+import { readActiveDbId } from "../../sqlitePlaygroundTabs";
 
 function readInitialActiveDbId(): string {
   if (typeof window === "undefined") return SQLITE_SAMPLE_DATABASES[0].id;
-  return localStorage.getItem(storageKey("db")) ?? SQLITE_SAMPLE_DATABASES[0].id;
+  return readActiveDbId() ?? SQLITE_SAMPLE_DATABASES[0].id;
 }
 
 interface EngineState {

@@ -87,7 +87,11 @@ import {
 } from "./utils/importUtils";
 import { RenameDatabaseDialog } from "./components/RenameDatabaseDialog";
 import { SqlEditorToolbar } from "./components/SqlEditorToolbar";
-import { findSampleDatabase } from "../runtime/sqliteSamples";
+import {
+  findSampleDatabase,
+  isSqliteSampleId,
+  sqliteDatabaseForId,
+} from "../runtime/sqliteSamples";
 import { sqliteAdapter } from "./sqliteAdapter";
 import { DROP_KIND_LABELS, IMPORT_COL_STATUS_LABEL } from "./constants";
 import { computeImportColComparison } from "./utils/importUtils";
@@ -173,6 +177,8 @@ import {
 import { useSidebarActions } from "./hooks/useSidebarActions";
 import { useDatabaseActions } from "./hooks/useDatabaseActions";
 import { useQueryHistory } from "./hooks/useQueryHistory";
+import { useEditorResultsSplit } from "./hooks/useEditorResultsSplit";
+import { EDITOR_SPLIT_STORAGE_SUFFIX } from "./utils/editorSplit";
 import { ModifyStructureForm } from "./components/ModifyStructureForm";
 import { ResultView } from "./components/ResultView";
 import { SchemaItem } from "./components/SchemaItem";
@@ -193,12 +199,14 @@ import {
   dbScopedKey,
   loadActiveTabId,
   loadTabs,
+  readActiveDbId,
   saveTabs,
   setTabWorkspaceScope,
   storageKey,
+  writeActiveDbId,
   type QueryTab,
 } from "../sqlitePlaygroundTabs";
-import { tabsForAdoptedScope } from "./shared/tabScope";
+import { stateForAdoptedWorkspace } from "./shared/tabScope";
 import { readQueryLog, restoreQueryLog } from "./utils/queryLogBundle";
 import { themeFor } from "../cmExtensions";
 
@@ -714,17 +722,21 @@ function SqlPlaygroundInner() {
     else runActiveTab();
   }, [runActiveTab, runSelection]);
 
-  // Tabs are read on mount, before the workspace bootstrap has resolved, so
-  // they can come from the wrong workspace's keys. Once the real one is known,
-  // move onto its keys and re-read if it moved.
-  const adoptWorkspaceTabScope = useCallback(
-    (workspaceId: string) => {
-      const dbId = activeDbIdRef.current;
-      const adopted = tabsForAdoptedScope({
+  // The database and its tabs are read on mount, before the workspace
+  // bootstrap has resolved, so they can belong to the wrong workspace. Once
+  // the real one is known, move onto its keys and its database, and re-read
+  // the tabs if either moved. Returns the database the engine should boot.
+  const adoptWorkspace = useCallback(
+    (workspaceId: string): string => {
+      const currentDbId = activeDbIdRef.current;
+      const adopted = stateForAdoptedWorkspace({
         setWorkspaceScope: setTabWorkspaceScope,
         workspaceId,
-        readTabs: () => loadTabs(dbId, findSampleDatabase(dbId).defaultTabs),
-        readActiveTabId: () => {
+        currentDbId,
+        readDbId: () => readActiveDbId() ?? SQLITE_SAMPLE_DATABASES[0].id,
+        readTabs: (dbId) =>
+          loadTabs(dbId, sqliteDatabaseForId(dbId).defaultTabs),
+        readActiveTabId: (dbId) => {
           try {
             return localStorage.getItem(dbScopedKey(dbId, "active_tab"));
           } catch {
@@ -732,15 +744,18 @@ function SqlPlaygroundInner() {
           }
         },
       });
-      if (!adopted) return;
+      if (!adopted) return currentDbId;
+      activeDbIdRef.current = adopted.dbId;
+      setActiveDbId(adopted.dbId);
       tabsRef.current = adopted.tabs;
       setTabs(adopted.tabs);
-      saveTabs(dbId, adopted.tabs);
+      saveTabs(adopted.dbId, adopted.tabs);
       activeTabIdRef.current = adopted.activeTabId;
       setActiveTabId(adopted.activeTabId);
       setResultsByTab({});
+      return adopted.dbId;
     },
-    [setTabs, setActiveTabId, setResultsByTab],
+    [setActiveDbId, setTabs, setActiveTabId, setResultsByTab],
   );
 
   // Table tabs restored from a previous session have no result until they are
@@ -1129,8 +1144,9 @@ function SqlPlaygroundInner() {
       localStorage.getItem(storageKey("wordwrap")) !== "false";
     const savedClearBeforeRun =
       localStorage.getItem(storageKey("clearbeforerun")) === "true";
-    const savedDb =
-      localStorage.getItem(storageKey("db")) ?? SQLITE_SAMPLE_DATABASES[0].id;
+    // The database this workspace holds (as far as the not-yet-resolved
+    // workspace pointer can tell; `adoptWorkspace` corrects it on boot).
+    const savedDb = readActiveDbId() ?? SQLITE_SAMPLE_DATABASES[0].id;
 
     // ─── Hydrate pragma settings ─────────────────────────────────────
     const DP = DEFAULT_PRAGMA_SETTINGS;
@@ -1163,12 +1179,12 @@ function SqlPlaygroundInner() {
     setClearBeforeRunState(savedClearBeforeRun);
     setPragmaSettingsState(savedPragmas);
     pragmaSettingsRef.current = savedPragmas;
-    // An id naming no sample belongs to an imported database. Keep it:
-    // `findSampleDatabase` falls back to the *first* sample, which restored
-    // that sample's label and query tabs over the imported database's data.
-    const isKnownSample = SQLITE_SAMPLE_DATABASES.some((s) => s.id === savedDb);
-    const initialSample = findSampleDatabase(savedDb);
-    const initialDbId = isKnownSample ? initialSample.id : savedDb;
+    // An id naming no sample belongs to a blank or imported database. Keep
+    // it: `findSampleDatabase` falls back to the *first* sample, which
+    // restored that sample's label and query tabs over the database's data.
+    const initialSample = sqliteDatabaseForId(savedDb);
+    const initialDbId = initialSample.id;
+    activeDbIdRef.current = initialDbId;
     setActiveDbId(initialDbId);
     // The display name of an imported database lives only in this map, so it
     // has to be restored before the selector renders.
@@ -1183,10 +1199,7 @@ function SqlPlaygroundInner() {
     } catch {
       // ignore
     }
-    const initialTabs = loadTabs(
-      initialDbId,
-      isKnownSample ? initialSample.defaultTabs : [{ title: "Query 1", code: "" }],
-    );
+    const initialTabs = loadTabs(initialDbId, initialSample.defaultTabs);
     setTabs(initialTabs);
     setActiveTabId(loadActiveTabId(initialDbId, initialTabs));
 
@@ -1269,9 +1282,7 @@ function SqlPlaygroundInner() {
     (async () => {
       try {
         setLoadingMessage("Loading SQLite engine…");
-        const initialSampleId =
-          localStorage.getItem(storageKey("db")) ??
-          SQLITE_SAMPLE_DATABASES[0].id;
+        let initialSampleId = activeDbIdRef.current;
         // Resolve (or auto-create) the active workspace so the engine can
         // persist to OPFS; without OPFS it falls back to in-memory mode.
         let workspaceId: string | null = null;
@@ -1280,7 +1291,7 @@ function SqlPlaygroundInner() {
           workspaceId = workspace.id;
           setActiveWorkspace({ id: workspace.id, name: workspace.name });
           setWorkspaceSaved(workspace.saved);
-          adoptWorkspaceTabScope(workspace.id);
+          initialSampleId = adoptWorkspace(workspace.id);
           try {
             const hasLock = await acquireWorkspaceLock(workspace.id, {
               signal: lockController.signal,
@@ -1322,7 +1333,14 @@ function SqlPlaygroundInner() {
         await applyPragmasToEngine(engine, pragmaSettingsRef.current);
 
         const sample = await engine.activeSample();
+        activeDbIdRef.current = sample.id;
         setActiveDbId(sample.id);
+        // A blank or imported database has no sample to name it; without
+        // this the selector fell back to the first sample's label.
+        setCustomDb(isSqliteSampleId(sample.id) ? null : sample);
+        // Pin the workspace to its database, so it reopens on this one
+        // whatever is chosen elsewhere on the device in the meantime.
+        writeActiveDbId(sample.id);
         const [nextTables, nextViews, nextIndexes, nextTriggers] = await Promise.all([
           engine.listTables(),
           engine.listViews(),
@@ -1644,63 +1662,15 @@ function SqlPlaygroundInner() {
   ]);
 
   // ─── Resizer (vertical, between results panel and editor) ────────────
-  useEffect(() => {
-    const resizer = resizerRef.current;
-    const panes = panesRef.current;
-    const editorPane = editorPaneRef.current;
-    const resultsPane = resultsPaneRef.current;
-    if (!resizer || !panes || !editorPane || !resultsPane) return;
-    let dragging = false;
-    let startY = 0;
-    let startEditorH = 0;
-    let startResultsH = 0;
-    const onDown = (e: MouseEvent) => {
-      dragging = true;
-      startY = e.clientY;
-      startEditorH = editorPane.offsetHeight;
-      startResultsH = resultsPane.offsetHeight;
-      resizer.classList.add("dragging");
-      document.body.style.cursor = "row-resize";
-      document.body.style.userSelect = "none";
-    };
-    const onMove = (e: MouseEvent) => {
-      if (!dragging) return;
-      const total = startEditorH + startResultsH;
-      if (total <= 0) return;
-      const dy = e.clientY - startY;
-      const editorH = Math.min(
-        total - Math.round(total * 0.15),
-        Math.max(Math.round(total * 0.15), startEditorH + dy),
-      );
-      const editorFrac = editorH / total;
-      panes.style.gridTemplateRows = `auto minmax(0, ${editorFrac}fr) 6px minmax(0, ${1 - editorFrac}fr)`;
-    };
-    const onUp = () => {
-      if (!dragging) return;
-      dragging = false;
-      resizer.classList.remove("dragging");
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-    };
-    resizer.addEventListener("mousedown", onDown);
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onUp);
-    return () => {
-      resizer.removeEventListener("mousedown", onDown);
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
-    };
-  }, []);
-
-  // Clear any inline gridTemplateRows set by the resizer when entering
-  // view-data or er-diagram mode.
-  useEffect(() => {
-    const panes = panesRef.current;
-    if (!panes) return;
-    if (activeTab?.kind === "view-data" || activeTab?.kind === "er-diagram") {
-      panes.style.gridTemplateRows = "";
-    }
-  }, [activeTab?.kind]);
+  const panesSplitStyle = useEditorResultsSplit(
+    {
+      resizer: resizerRef,
+      panes: panesRef,
+      editorPane: editorPaneRef,
+      resultsPane: resultsPaneRef,
+    },
+    storageKey(EDITOR_SPLIT_STORAGE_SUFFIX),
+  );
 
   // ─── Sidebar resizer (horizontal, between sidebar and panes) ─────────
   useEffect(() => {
@@ -1764,7 +1734,7 @@ function SqlPlaygroundInner() {
   // ─── Computed values ─────────────────────────────────────────────────
   const activeSample = useMemo(() => {
     const base =
-      customDb?.id === activeDbId ? customDb : findSampleDatabase(activeDbId);
+      customDb?.id === activeDbId ? customDb : sqliteDatabaseForId(activeDbId);
     const overrideName = customFilenames[activeDbId];
     if (overrideName) return { ...base, filename: overrideName };
     return base;
@@ -2245,13 +2215,12 @@ function SqlPlaygroundInner() {
           }}
           onCreateNew={async () => {
             if (!pendingDbId) return;
-            try {
-              localStorage.setItem(storageKey("db"), pendingDbId);
-            } catch { /* ignore */ }
             const label = pendingDbId === "__blank__"
               ? "New SQLite Database"
               : findSampleDatabase(pendingDbId).label;
             const newWs = await createWorkspace(`${label} Workspace`, PLAYGROUND_ID);
+            // Recorded against the new workspace only: this one keeps its own.
+            writeActiveDbId(pendingDbId, newWs.id);
             setPendingDbId(null);
             switchActiveWorkspace(PLAYGROUND_ID, newWs.id);
           }}
@@ -3658,6 +3627,7 @@ function SqlPlaygroundInner() {
             className={`sql-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}${activeTab?.kind === "er-diagram" ? " sql-panes--er-diagram" : ""}${activeTab?.kind === "query-history" ? " sql-panes--query-history" : ""}${isSettingsTabActive ? " sql-panes--settings" : ""}`}
             role="main"
             ref={panesRef}
+            style={panesSplitStyle}
           >
             <h1 className="playground-sr-title">SQLite playground</h1>
             <SqlTabBar

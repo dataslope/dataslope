@@ -168,7 +168,7 @@ import { newTabId } from "../sqlitePlaygroundTabs";
 import {
   createTabStorage,
 } from "../sql/shared/tabStorageUtils";
-import { tabsForAdoptedScope } from "../sql/shared/tabScope";
+import { stateForAdoptedWorkspace } from "../sql/shared/tabScope";
 import { readQueryLog, restoreQueryLog } from "../sql/utils/queryLogBundle";
 import { SqlTabBar } from "../sql/components/SqlTabBar";
 import { SETTINGS_TAB_ID } from "../playgroundTabs";
@@ -235,6 +235,8 @@ import {
 import { useSqlTabManagement } from "../sql/hooks/useSqlTabManagement";
 import { useViewDataTabAutoRun } from "../sql/hooks/useViewDataTabAutoRun";
 import { useSchemaTree } from "../sql/hooks/useSchemaTree";
+import { useEditorResultsSplit } from "../sql/hooks/useEditorResultsSplit";
+import { EDITOR_SPLIT_STORAGE_SUFFIX } from "../sql/utils/editorSplit";
 import type {
   AddRowDialogState,
   ColumnKeyHints,
@@ -261,8 +263,41 @@ import { computeVisibleTypeGroups } from "../sql/utils/columnTypeSelector";
 
 const PLAYGROUND_ID = postgresAdapter.playgroundId;
 const STORAGE_PREFIX = postgresAdapter.storagePrefix;
-const { dbScopedKey, loadTabs, saveTabs, setWorkspaceScope, copyScopedKeys } =
-  createTabStorage(STORAGE_PREFIX, PLAYGROUND_ID);
+const {
+  dbScopedKey,
+  loadTabs,
+  saveTabs,
+  seedTabs,
+  loadActiveTabId,
+  setWorkspaceScope,
+  copyScopedKeys,
+  readActiveDbId,
+  writeActiveDbId,
+} = createTabStorage(STORAGE_PREFIX, PLAYGROUND_ID);
+
+/** The database this workspace holds, as far as storage says; an id naming
+ *  nothing known resolves to the first sample, as the engine would. */
+function storedDbId(): string {
+  return findPostgresSampleDatabase(
+    readActiveDbId() ?? POSTGRES_SAMPLE_DATABASES[0].id,
+  ).id;
+}
+
+// The display name of the blank/imported database. Scoped to the workspace
+// (it names *its* database); the device-wide key it replaces is read once,
+// for a workspace that predates the scoping, and dropped on the next write.
+const LEGACY_DB_FILENAME_KEY = `${STORAGE_PREFIX}db_filename`;
+function readCustomDbFilename(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return (
+      localStorage.getItem(dbScopedKey(POSTGRES_BLANK_DATABASE.id, "filename")) ??
+      localStorage.getItem(LEGACY_DB_FILENAME_KEY)
+    );
+  } catch {
+    return null;
+  }
+}
 
 const POSTGRES_DB_ACTIONS: readonly DatabaseSelectorAction[] = [
   {
@@ -1019,16 +1054,25 @@ function PostgresPlaygroundInner() {
   );
 
   // ─── Engine / UI state ───────────────────────────────────────────────
-  const initialDbId =
+  // Read once: the boot corrects it (`adoptWorkspace`) when the resolved
+  // workspace turns out to hold a different database.
+  const [initialDbId] = useState(() =>
     typeof window === "undefined"
       ? POSTGRES_SAMPLE_DATABASES[0].id
-      : (localStorage.getItem(storageKey("db")) ??
-        POSTGRES_SAMPLE_DATABASES[0].id);
+      : storedDbId(),
+  );
   const [activeDbId, setActiveDbId] = useState(initialDbId);
   const [tabs, setTabs] = useState<QueryTab[]>(() =>
     loadTabs(initialDbId, findPostgresSampleDatabase(initialDbId).defaultTabs),
   );
-  const [activeTabId, setActiveTabId] = useState(() => tabs[0]?.id ?? "");
+  // Restored here rather than in an effect: the effect that persists the
+  // active tab runs first on mount, and used to overwrite the remembered tab
+  // with the first one before anything read it.
+  const [activeTabId, setActiveTabId] = useState(() =>
+    typeof window === "undefined"
+      ? (tabs[0]?.id ?? "")
+      : loadActiveTabId(initialDbId, tabs),
+  );
   const [resultsByTab, setResultsByTab] = useState<
     Record<string, QueryRunResult | null>
   >({});
@@ -1187,20 +1231,15 @@ function PostgresPlaygroundInner() {
   // database kept its label only in memory, so a reload silently relabelled it
   // `untitled.pg` while the data underneath was unchanged.
   const [customDbFilename, setCustomDbFilenameState] = useState<string | null>(
-    () => {
-      if (typeof window === "undefined") return null;
-      try {
-        return localStorage.getItem(storageKey("db_filename"));
-      } catch {
-        return null;
-      }
-    },
+    readCustomDbFilename,
   );
   const setCustomDbFilename = useCallback((filename: string | null) => {
     setCustomDbFilenameState(filename);
     try {
-      if (filename === null) localStorage.removeItem(storageKey("db_filename"));
-      else localStorage.setItem(storageKey("db_filename"), filename);
+      const key = dbScopedKey(POSTGRES_BLANK_DATABASE.id, "filename");
+      if (filename === null) localStorage.removeItem(key);
+      else localStorage.setItem(key, filename);
+      localStorage.removeItem(LEGACY_DB_FILENAME_KEY);
     } catch {
       /* ignore */
     }
@@ -1414,18 +1453,22 @@ function PostgresPlaygroundInner() {
     [],
   );
 
-  // Tabs are read in a `useState` initializer, before the workspace bootstrap
-  // has resolved, so they can come from the wrong workspace's keys. Once the
-  // real one is known, move onto its keys and re-read if it moved.
-  const adoptWorkspaceTabScope = useCallback(
-    (workspaceId: string) => {
-      const dbId = activeDbIdRef.current;
-      const adopted = tabsForAdoptedScope({
+  // The database and its tabs are read in `useState` initializers, before
+  // the workspace bootstrap has resolved, so they can belong to the wrong
+  // workspace. Once the real one is known, move onto its keys and its
+  // database, and re-read the tabs if either moved. Returns the database the
+  // engine should boot.
+  const adoptWorkspace = useCallback(
+    (workspaceId: string): string => {
+      const currentDbId = activeDbIdRef.current;
+      const adopted = stateForAdoptedWorkspace({
         setWorkspaceScope,
         workspaceId,
-        readTabs: () =>
+        currentDbId,
+        readDbId: storedDbId,
+        readTabs: (dbId) =>
           loadTabs(dbId, findPostgresSampleDatabase(dbId).defaultTabs),
-        readActiveTabId: () => {
+        readActiveTabId: (dbId) => {
           try {
             return localStorage.getItem(dbScopedKey(dbId, "active_tab"));
           } catch {
@@ -1433,11 +1476,16 @@ function PostgresPlaygroundInner() {
           }
         },
       });
-      if (!adopted) return;
-      persistTabs(adopted.tabs, dbId);
+      if (!adopted) return currentDbId;
+      activeDbIdRef.current = adopted.dbId;
+      setActiveDbId(adopted.dbId);
+      setCustomDbFilenameState(readCustomDbFilename());
+      persistTabs(adopted.tabs, adopted.dbId);
       tabHistoryRef.current = [];
+      activeTabIdRef.current = adopted.activeTabId;
       setActiveTabId(adopted.activeTabId);
       setResultsByTab({});
+      return adopted.dbId;
     },
     [persistTabs],
   );
@@ -1951,28 +1999,11 @@ function PostgresPlaygroundInner() {
       `${savedOutputFontEnabled ? savedOutputSize : savedSize}px`,
     );
 
-    // Restore the active tab id for this database.
-    try {
-      const savedActiveTab = localStorage.getItem(
-        dbScopedKey(initialDbId, "active_tab"),
-      );
-      if (
-        savedActiveTab &&
-        tabsRef.current.some((tab) => tab.id === savedActiveTab)
-      ) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setActiveTabId(savedActiveTab);
-      }
-    } catch {
-      /* ignore */
-    }
-
     return () => {
       document.body.classList.remove("playground-active");
       clearThemePalette();
     };
   }, [
-    initialDbId,
     setClearBeforeRunState,
     setEditorThemeState,
     setFontSizeState,
@@ -2030,12 +2061,13 @@ function PostgresPlaygroundInner() {
         // Resolve (or auto-create) the active workspace so PGlite can persist
         // its data directory to OPFS. Best-effort: falls back to in-memory.
         let workspaceId: string | null = null;
+        let bootDbId = activeDbIdRef.current;
         try {
           const workspace = await ensureActiveWorkspace(PLAYGROUND_ID);
           workspaceId = workspace.id;
           setActiveWorkspace({ id: workspace.id, name: workspace.name });
           setWorkspaceSaved(workspace.saved);
-          adoptWorkspaceTabScope(workspace.id);
+          bootDbId = adoptWorkspace(workspace.id);
           try {
             const hasLock = await acquireWorkspaceLock(workspace.id, {
               signal: lockController.signal,
@@ -2060,7 +2092,7 @@ function PostgresPlaygroundInner() {
         }
         if (cancelled) return;
         const engine = await postgresAdapter.createEngine(
-          initialDbId,
+          bootDbId,
           workspaceId,
         );
         if (cancelled) {
@@ -2071,6 +2103,9 @@ function PostgresPlaygroundInner() {
           return;
         }
         engineRef.current = engine;
+        // Pin the workspace to its database, so it reopens on this one
+        // whatever is chosen elsewhere on the device in the meantime.
+        writeActiveDbId(bootDbId);
         await Promise.all([refreshSchema(), refreshSchemas()]);
         setLoaded(true);
         setStatusState("ready");
@@ -2279,27 +2314,14 @@ function PostgresPlaygroundInner() {
         // The label belonged to the database being replaced; keeping it would
         // show a stale name over the new one (and over a later New Database).
         setCustomDbFilename(null);
-        try {
-          localStorage.setItem(storageKey("db"), sample.id);
-        } catch {
-          /* ignore */
-        }
-        const nextTabs = loadTabs(sample.id, sample.defaultTabs);
+        writeActiveDbId(sample.id);
+        // The workspace's database was just replaced, so its tabs start over.
+        // Restoring the ones last saved for this id brought back queries
+        // written against an earlier copy of it.
+        const nextTabs = seedTabs(sample.defaultTabs);
         persistTabs(nextTabs, sample.id);
-        // Try to restore active tab id for this DB.
-        let nextActive = nextTabs[0]?.id ?? "";
-        try {
-          const savedActive = localStorage.getItem(
-            dbScopedKey(sample.id, "active_tab"),
-          );
-          if (savedActive && nextTabs.some((tab) => tab.id === savedActive)) {
-            nextActive = savedActive;
-          }
-        } catch {
-          /* ignore */
-        }
         tabHistoryRef.current = [];
-        setActiveTabId(nextActive);
+        setActiveTabId(nextTabs[0]?.id ?? "");
         setResultsByTab({});
         // Reset to public schema on database switch.
         selectedSchemaRef.current = "public";
@@ -2338,19 +2360,22 @@ function PostgresPlaygroundInner() {
           PLAYGROUND_ID,
         );
         setActiveWorkspaceId(PLAYGROUND_ID, newWs.id);
+        // This switch happens in place, so the tab keys have to follow it:
+        // left on the old scope, the new workspace read and rewrote the old
+        // one's tabs, and showed defaults again after a reload.
+        setWorkspaceScope(newWs.id);
         engineRef.current = null;
         await old.close();
         const engine = await postgresAdapter.createEngine(nextId, newWs.id);
         engineRef.current = engine;
         setActiveWorkspace({ id: newWs.id, name: newWs.name });
+        // `createWorkspace` registers it; Save must not register the draft
+        // this tab was on before.
+        setWorkspaceSaved(true);
         setActiveDbId(sample.id);
         setCustomDbFilename(null);
-        try {
-          localStorage.setItem(storageKey("db"), sample.id);
-        } catch {
-          /* ignore */
-        }
-        const nextTabs = loadTabs(sample.id, sample.defaultTabs);
+        writeActiveDbId(sample.id);
+        const nextTabs = seedTabs(sample.defaultTabs);
         persistTabs(nextTabs, sample.id);
         tabHistoryRef.current = [];
         setActiveTabId(nextTabs[0]?.id ?? "");
@@ -2450,29 +2475,13 @@ function PostgresPlaygroundInner() {
         await engine.importSqlDump(sqlText);
         setActiveDbId(POSTGRES_BLANK_DATABASE.id);
         setCustomDbFilename(filename);
-        try {
-          localStorage.setItem(storageKey("db"), POSTGRES_BLANK_DATABASE.id);
-        } catch {
-          /* ignore */
-        }
-        const nextTabs = loadTabs(
-          POSTGRES_BLANK_DATABASE.id,
-          POSTGRES_BLANK_DATABASE.defaultTabs,
-        );
+        writeActiveDbId(POSTGRES_BLANK_DATABASE.id);
+        // A fresh start, as for a sample: the tabs saved for the blank slot
+        // belong to whatever database last occupied it.
+        const nextTabs = seedTabs(POSTGRES_BLANK_DATABASE.defaultTabs);
         persistTabs(nextTabs, POSTGRES_BLANK_DATABASE.id);
-        let nextActive = nextTabs[0]?.id ?? "";
-        try {
-          const savedActive = localStorage.getItem(
-            dbScopedKey(POSTGRES_BLANK_DATABASE.id, "active_tab"),
-          );
-          if (savedActive && nextTabs.some((tab) => tab.id === savedActive)) {
-            nextActive = savedActive;
-          }
-        } catch {
-          /* ignore */
-        }
         tabHistoryRef.current = [];
-        setActiveTabId(nextActive);
+        setActiveTabId(nextTabs[0]?.id ?? "");
         setResultsByTab({});
         selectedSchemaRef.current = "public";
         setSelectedSchema("public");
@@ -2516,6 +2525,8 @@ function PostgresPlaygroundInner() {
           PLAYGROUND_ID,
         );
         setActiveWorkspaceId(PLAYGROUND_ID, newWs.id);
+        // In place, like performNewWorkspaceSwitch: move the tab keys too.
+        setWorkspaceScope(newWs.id);
         engineRef.current = null;
         await old.close();
         report?.("Starting Postgres");
@@ -2527,17 +2538,11 @@ function PostgresPlaygroundInner() {
         report?.("Restoring dump");
         await engine.importSqlDump(sqlText);
         setActiveWorkspace({ id: newWs.id, name: newWs.name });
+        setWorkspaceSaved(true);
         setActiveDbId(POSTGRES_BLANK_DATABASE.id);
         setCustomDbFilename(filename);
-        try {
-          localStorage.setItem(storageKey("db"), POSTGRES_BLANK_DATABASE.id);
-        } catch {
-          /* ignore */
-        }
-        const nextTabs = loadTabs(
-          POSTGRES_BLANK_DATABASE.id,
-          POSTGRES_BLANK_DATABASE.defaultTabs,
-        );
+        writeActiveDbId(POSTGRES_BLANK_DATABASE.id);
+        const nextTabs = seedTabs(POSTGRES_BLANK_DATABASE.defaultTabs);
         persistTabs(nextTabs, POSTGRES_BLANK_DATABASE.id);
         tabHistoryRef.current = [];
         setActiveTabId(nextTabs[0]?.id ?? "");
@@ -2580,11 +2585,9 @@ function PostgresPlaygroundInner() {
         await engine.importDataDir(new Blob([image as BlobPart]));
         setActiveDbId(POSTGRES_BLANK_DATABASE.id);
         setCustomDbFilename(filename);
-        try {
-          localStorage.setItem(storageKey("db"), POSTGRES_BLANK_DATABASE.id);
-        } catch {
-          /* ignore */
-        }
+        writeActiveDbId(POSTGRES_BLANK_DATABASE.id);
+        // Only a cloud/share bundle lands here, and it saved the bundle's own
+        // tabs under the blank slot first: those are the ones to restore.
         const nextTabs = loadTabs(
           POSTGRES_BLANK_DATABASE.id,
           POSTGRES_BLANK_DATABASE.defaultTabs,
@@ -3296,63 +3299,15 @@ function PostgresPlaygroundInner() {
   );
 
   // ─── Resizer (vertical, between results panel and editor) ────────────
-  useEffect(() => {
-    const resizer = resizerRef.current;
-    const panes = panesRef.current;
-    const editorPane = editorPaneRef.current;
-    const resultsPane = resultsPaneRef.current;
-    if (!resizer || !panes || !editorPane || !resultsPane) return;
-    let dragging = false;
-    let startY = 0;
-    let startEditorH = 0;
-    let startResultsH = 0;
-    const onDown = (e: MouseEvent) => {
-      dragging = true;
-      startY = e.clientY;
-      startEditorH = editorPane.offsetHeight;
-      startResultsH = resultsPane.offsetHeight;
-      resizer.classList.add("dragging");
-      document.body.style.cursor = "row-resize";
-      document.body.style.userSelect = "none";
-    };
-    const onMove = (e: MouseEvent) => {
-      if (!dragging) return;
-      const total = startEditorH + startResultsH;
-      if (total <= 0) return;
-      const dy = e.clientY - startY;
-      const editorH = Math.min(
-        total - Math.round(total * 0.15),
-        Math.max(Math.round(total * 0.15), startEditorH + dy),
-      );
-      const editorFrac = editorH / total;
-      panes.style.gridTemplateRows = `auto minmax(0, ${editorFrac}fr) 6px minmax(0, ${1 - editorFrac}fr)`;
-    };
-    const onUp = () => {
-      if (!dragging) return;
-      dragging = false;
-      resizer.classList.remove("dragging");
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-    };
-    resizer.addEventListener("mousedown", onDown);
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onUp);
-    return () => {
-      resizer.removeEventListener("mousedown", onDown);
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
-    };
-  }, []);
-
-  // Clear any inline gridTemplateRows set by the resizer when entering
-  // view-data or er-diagram mode.
-  useEffect(() => {
-    const panes = panesRef.current;
-    if (!panes) return;
-    if (activeTab?.kind === "view-data" || activeTab?.kind === "er-diagram") {
-      panes.style.gridTemplateRows = "";
-    }
-  }, [activeTab?.kind]);
+  const panesSplitStyle = useEditorResultsSplit(
+    {
+      resizer: resizerRef,
+      panes: panesRef,
+      editorPane: editorPaneRef,
+      resultsPane: resultsPaneRef,
+    },
+    storageKey(EDITOR_SPLIT_STORAGE_SUFFIX),
+  );
 
   // ─── Sidebar resizer (horizontal, between sidebar and panes) ─────────
   useEffect(() => {
@@ -5522,6 +5477,7 @@ function PostgresPlaygroundInner() {
           />
           <main
             ref={panesRef}
+            style={panesSplitStyle}
             className={`sql-panes postgres-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}${activeTab?.kind === "er-diagram" ? " sql-panes--er-diagram" : ""}${activeTab?.kind === "query-history" ? " sql-panes--query-history" : ""}${isSettingsTabActive ? " sql-panes--settings" : ""}`}
           >
             <h1 className="playground-sr-title">PostgreSQL playground</h1>

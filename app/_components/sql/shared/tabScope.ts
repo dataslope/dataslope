@@ -7,6 +7,12 @@
  * playgrounds read tabs in a `useState` initializer, before the async
  * workspace bootstrap resolves; when the bootstrap lands elsewhere it calls
  * `setWorkspaceScope`, which reports the change so the caller re-reads.
+ *
+ * The database a workspace holds is scoped the same way
+ * (`<prefix>ws_<workspaceId>_active_db`). It used to be one device-wide
+ * `<prefix>db` key, so opening a workspace paired its data with whichever
+ * database was chosen last anywhere on the device: the wrong label, and the
+ * tabs of a database the workspace does not contain.
  */
 
 import { peekActiveWorkspaceId } from "../../opfs/activeWorkspace";
@@ -21,6 +27,14 @@ export interface TabScope {
   /** Copy one workspace's tab keys onto another's (workspace duplication —
    *  the OPFS copy carries the database, not these keys). Returns the count. */
   copyScopedKeys: (fromWorkspaceId: string, toWorkspaceId: string) => number;
+  /** The database id the active workspace holds, else the device-wide id that
+   *  predates per-workspace selection (a workspace never opened since, or a
+   *  new one), else null. */
+  readActiveDbId: () => string | null;
+  /** Record the database `workspaceId` (default: the active workspace) holds.
+   *  Also kept as the device-wide id, which is what a brand-new workspace
+   *  starts from. */
+  writeActiveDbId: (dbId: string, workspaceId?: string) => void;
 }
 
 /** `undefined` means "not resolved yet", `null` means "resolved, and there is
@@ -73,6 +87,10 @@ export function createTabScope(
     return scope;
   }
 
+  const legacyActiveDbKey = `${storagePrefix}db`;
+  const activeDbKey = (workspaceId: string) =>
+    `${storagePrefix}ws_${workspaceId}_active_db`;
+
   return {
     scopedKey(dbId, k) {
       const workspaceId = resolveScope();
@@ -119,30 +137,61 @@ export function createTabScope(
         return 0;
       }
     },
+    readActiveDbId() {
+      if (typeof window === "undefined") return null;
+      const workspaceId = resolveScope();
+      try {
+        return (
+          (workspaceId
+            ? window.localStorage.getItem(activeDbKey(workspaceId))
+            : null) ?? window.localStorage.getItem(legacyActiveDbKey)
+        );
+      } catch {
+        return null;
+      }
+    },
+    writeActiveDbId(dbId, workspaceId) {
+      if (typeof window === "undefined") return;
+      const target = workspaceId ?? resolveScope();
+      try {
+        if (target) window.localStorage.setItem(activeDbKey(target), dbId);
+        window.localStorage.setItem(legacyActiveDbKey, dbId);
+      } catch {
+        /* quota / private mode: the next boot falls back to the default. */
+      }
+    },
   };
 }
 
 /**
- * Move a playground onto its resolved workspace's tab keys; null when the
- * peeked scope was already right. Otherwise the on-screen tabs belong to a
- * different workspace, so they are re-read under the right keys — safe during
- * boot because the pane is still behind the loading overlay. Returns the
- * tabs to show plus which one to activate.
+ * Move a playground onto its resolved workspace: its tab keys and the
+ * database it holds. Both were guessed before the bootstrap resolved (the tab
+ * scope from the workspace pointer, the database from that guess), so when
+ * either turns out wrong the tabs are re-read for the right pair (safe during
+ * boot, because the pane is still behind the loading overlay). Null when the
+ * guess was right on both counts; otherwise the database to boot, the tabs to
+ * show and which one to activate.
  */
-export function tabsForAdoptedScope(opts: {
+export function stateForAdoptedWorkspace(opts: {
   setWorkspaceScope: (workspaceId: string) => boolean;
   workspaceId: string;
-  /** Read the tab list under the (now current) scope, defaults included. */
-  readTabs: () => QueryTab[];
-  /** Read the persisted active tab id under the (now current) scope. */
-  readActiveTabId: () => string | null;
-}): { tabs: QueryTab[]; activeTabId: string } | null {
-  if (!opts.setWorkspaceScope(opts.workspaceId)) return null;
-  const tabs = opts.readTabs();
-  const remembered = opts.readActiveTabId();
+  /** The database the on-screen tabs were read for. */
+  currentDbId: string;
+  /** The database the (now current) workspace holds, already validated. */
+  readDbId: () => string;
+  /** Read the tab list for `dbId` under the current scope, defaults included. */
+  readTabs: (dbId: string) => QueryTab[];
+  /** Read the persisted active tab id for `dbId` under the current scope. */
+  readActiveTabId: (dbId: string) => string | null;
+}): { dbId: string; tabs: QueryTab[]; activeTabId: string } | null {
+  const scopeMoved = opts.setWorkspaceScope(opts.workspaceId);
+  const dbId = opts.readDbId();
+  if (!scopeMoved && dbId === opts.currentDbId) return null;
+  const tabs = opts.readTabs(dbId);
+  const remembered = opts.readActiveTabId(dbId);
   const activeTabId =
     remembered && tabs.some((tab) => tab.id === remembered)
       ? remembered
       : (tabs[0]?.id ?? "");
-  return { tabs, activeTabId };
+  return { dbId, tabs, activeTabId };
 }
