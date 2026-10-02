@@ -8,9 +8,39 @@ const STORAGE_PREFIX = "playground_sqlite_";
 // Keys are namespaced so they don't collide with other playgrounds.
 export const storageKey = (k: string) => `${STORAGE_PREFIX}${k}`;
 
+// Database names used to live in one device-wide map, keyed by database id,
+// so renaming a blank database in one workspace renamed it in all of them.
+// Read until a workspace claims its entry (see createTabScope).
+const LEGACY_DB_FILENAMES_KEY = `${STORAGE_PREFIX}db_filenames`;
+function readLegacyDbFilenames(): Record<string, string> {
+  const raw = localStorage.getItem(LEGACY_DB_FILENAMES_KEY);
+  if (!raw) return {};
+  const parsed: unknown = JSON.parse(raw);
+  return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+    ? (parsed as Record<string, string>)
+    : {};
+}
+
 // Per-database keys are also scoped to the active workspace, so two workspaces
 // built from the same sample database keep their own tabs (see createTabScope).
-const tabScope = createTabScope(STORAGE_PREFIX, "sqlite");
+const tabScope = createTabScope(STORAGE_PREFIX, "sqlite", {
+  legacyDbFilenames: {
+    read: (dbId) => {
+      const name = readLegacyDbFilenames()[dbId];
+      return typeof name === "string" ? name : null;
+    },
+    forget: (dbId) => {
+      const names = readLegacyDbFilenames();
+      if (!(dbId in names)) return;
+      delete names[dbId];
+      if (Object.keys(names).length === 0) {
+        localStorage.removeItem(LEGACY_DB_FILENAMES_KEY);
+      } else {
+        localStorage.setItem(LEGACY_DB_FILENAMES_KEY, JSON.stringify(names));
+      }
+    },
+  },
+});
 export const dbScopedKey = (dbId: string, k: string) =>
   tabScope.scopedKey(dbId, k);
 export const setTabWorkspaceScope = tabScope.setWorkspaceScope;
@@ -18,6 +48,10 @@ export const copyTabWorkspaceKeys = tabScope.copyScopedKeys;
 // The database each workspace holds (see createTabScope).
 export const readActiveDbId = tabScope.readActiveDbId;
 export const writeActiveDbId = tabScope.writeActiveDbId;
+// The name the user gave each workspace's database (see createTabScope).
+export const readDbFilename = tabScope.readDbFilename;
+export const claimDbFilename = tabScope.claimDbFilename;
+export const writeDbFilename = tabScope.writeDbFilename;
 
 export interface QueryTab {
   /** Stable client-generated id, used as the React key. */

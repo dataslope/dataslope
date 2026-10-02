@@ -13,6 +13,12 @@
  * `<prefix>db` key, so opening a workspace paired its data with whichever
  * database was chosen last anywhere on the device: the wrong label, and the
  * tabs of a database the workspace does not contain.
+ *
+ * So is the name the user gave that database (an imported file's name, or a
+ * rename), at `<prefix>ws_<workspaceId>_db_<dbId>_filename`. SQLite kept these
+ * in one device-wide map and DuckDB not at all; Postgres had one device-wide
+ * key. Each playground hands its pre-scoping storage over as
+ * `legacyDbFilenames`, read until a workspace claims it.
  */
 
 import { peekActiveWorkspaceId } from "../../opfs/activeWorkspace";
@@ -35,6 +41,28 @@ export interface TabScope {
    *  Also kept as the device-wide id, which is what a brand-new workspace
    *  starts from. */
   writeActiveDbId: (dbId: string, workspaceId?: string) => void;
+  /** The name the user gave database `dbId` in the active workspace, else
+   *  null (it goes by its own filename). Falls back to the device-wide name
+   *  that predates scoping until a workspace claims it. */
+  readDbFilename: (dbId: string) => string | null;
+  /** `readDbFilename`, except that a name found only in the device-wide
+   *  storage moves into the active workspace and leaves that storage, so no
+   *  other workspace inherits it. Call once the workspace has resolved. */
+  claimDbFilename: (dbId: string) => string | null;
+  /** Record the name of `dbId` for `workspaceId` (default: the active one);
+   *  null records that it has none, which also stops the device-wide
+   *  fallback from naming it. */
+  writeDbFilename: (
+    dbId: string,
+    filename: string | null,
+    workspaceId?: string,
+  ) => void;
+}
+
+/** Where a playground kept database names before they were scoped. */
+export interface LegacyDbFilenames {
+  read: (dbId: string) => string | null;
+  forget: (dbId: string) => void;
 }
 
 /** `undefined` means "not resolved yet", `null` means "resolved, and there is
@@ -45,8 +73,10 @@ type Scope = string | null | undefined;
 export function createTabScope(
   storagePrefix: string,
   playgroundId: string,
+  options: { legacyDbFilenames?: LegacyDbFilenames } = {},
 ): TabScope {
   let scope: Scope;
+  const legacyDbFilenames = options.legacyDbFilenames;
 
   /**
    * Copy pre-scoping keys under the first workspace this device resolves, so
@@ -90,6 +120,41 @@ export function createTabScope(
   const legacyActiveDbKey = `${storagePrefix}db`;
   const activeDbKey = (workspaceId: string) =>
     `${storagePrefix}ws_${workspaceId}_active_db`;
+  const dbFilenameKey = (dbId: string, workspaceId: string | null) =>
+    workspaceId
+      ? `${storagePrefix}ws_${workspaceId}_db_${dbId}_filename`
+      : `${storagePrefix}db_${dbId}_filename`;
+
+  /** The workspace's own record: a name, "" for "none", null for no record. */
+  function scopedDbFilename(dbId: string): string | null {
+    try {
+      return window.localStorage.getItem(dbFilenameKey(dbId, resolveScope()));
+    } catch {
+      return null;
+    }
+  }
+
+  function readLegacyDbFilename(dbId: string): string | null {
+    try {
+      return legacyDbFilenames?.read(dbId) || null;
+    } catch {
+      return null;
+    }
+  }
+
+  function writeDbFilename(
+    dbId: string,
+    filename: string | null,
+    workspaceId?: string,
+  ): void {
+    if (typeof window === "undefined") return;
+    const target = workspaceId ?? resolveScope();
+    try {
+      window.localStorage.setItem(dbFilenameKey(dbId, target), filename ?? "");
+    } catch {
+      /* quota / private mode: the label reverts to the filename on reload. */
+    }
+  }
 
   return {
     scopedKey(dbId, k) {
@@ -160,6 +225,27 @@ export function createTabScope(
         /* quota / private mode: the next boot falls back to the default. */
       }
     },
+    readDbFilename(dbId) {
+      if (typeof window === "undefined") return null;
+      const own = scopedDbFilename(dbId);
+      if (own !== null) return own || null;
+      return readLegacyDbFilename(dbId);
+    },
+    claimDbFilename(dbId) {
+      if (typeof window === "undefined") return null;
+      const own = scopedDbFilename(dbId);
+      if (own !== null) return own || null;
+      const legacy = readLegacyDbFilename(dbId);
+      if (legacy === null || !resolveScope()) return legacy;
+      writeDbFilename(dbId, legacy);
+      try {
+        legacyDbFilenames?.forget(dbId);
+      } catch {
+        /* the copy is made; a leftover original only costs a fallback. */
+      }
+      return legacy;
+    },
+    writeDbFilename,
   };
 }
 

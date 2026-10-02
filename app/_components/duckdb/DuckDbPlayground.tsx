@@ -281,6 +281,9 @@ const {
   setWorkspaceScope,
   readActiveDbId,
   writeActiveDbId,
+  readDbFilename,
+  claimDbFilename,
+  writeDbFilename,
 } = createTabStorage(STORAGE_PREFIX, PLAYGROUND_ID);
 
 /** The database this workspace holds, as far as storage says; an id naming
@@ -1235,8 +1238,22 @@ function DuckDbPlaygroundInner() {
   const [renameDbOpen, setRenameDbOpen] = useState(false);
   const [renameDbName, setRenameDbName] = useState("");
   const [renameDbExt, setRenameDbExt] = useState(".duckdb");
-  // Overrides the display name for the blank/imported database slot.
-  const [customDbFilename, setCustomDbFilename] = useState<string | null>(null);
+  // The name the user gave this workspace's database (an import's file
+  // name, or a rename). Persisted per workspace: it used to live in memory
+  // only, so every reload relabelled an imported database `untitled.duckdb`.
+  const [customDbFilename, setCustomDbFilenameState] = useState<string | null>(
+    () => readDbFilename(initialDbId),
+  );
+  /** Name `dbId`, the database that is (or is about to be) active. Taken
+   *  explicitly: where the database just changed, the active-id state and
+   *  its ref are still a render behind. */
+  const setCustomDbFilename = useCallback(
+    (filename: string | null, dbId: string) => {
+      setCustomDbFilenameState(filename);
+      writeDbFilename(dbId, filename);
+    },
+    [],
+  );
 
   // ─── View Structure drawer state ──────────────────────────────────────
   const [viewStructureDialog, setViewStructureDialog] =
@@ -1428,11 +1445,9 @@ function DuckDbPlaygroundInner() {
   }, [setSettingsOpen, setActiveTabId]);
   const result = activeTab ? (resultsByTab[activeTab.id] ?? null) : null;
   const activeSample = findDuckDbSampleDatabase(activeDbId);
-  // customDbFilename applies only for the blank/imported database slot.
-  const displayFilename =
-    activeDbId === DUCKDB_BLANK_DATABASE.id && customDbFilename !== null
-      ? customDbFilename
-      : activeSample.filename;
+  // Any database can be renamed. This used to apply to the blank/imported
+  // slot only, so renaming a sample toasted "Renamed" and changed nothing.
+  const displayFilename = customDbFilename ?? activeSample.filename;
   // Tab reordering is delegated to the generic TabBar; `setDraggingTabId`
   // remains in the hook signature only, passed a no-op.
   const setDraggingTabId = useCallback(() => {}, []);
@@ -2085,6 +2100,7 @@ function DuckDbPlaygroundInner() {
         // Pin the workspace to its database, so it reopens on this one
         // whatever is chosen elsewhere on the device in the meantime.
         writeActiveDbId(bootDbId);
+        setCustomDbFilenameState(claimDbFilename(bootDbId));
         await refreshSchemas();
         await refreshSchema();
         setLoaded(true);
@@ -2324,7 +2340,10 @@ function DuckDbPlaygroundInner() {
   const performDbSwitch = useCallback(
     async (nextId: string) => {
       const engine = engineRef.current;
-      if (!engine || nextId === activeDbIdRef.current) return;
+      // "New Database" over the blank slot is a real overwrite: that slot
+      // also holds imports, and skipping it left their data and name in place.
+      if (!engine) return;
+      if (nextId !== DUCKDB_BLANK_DATABASE.id && nextId === activeDbIdRef.current) return;
       // Persist pending edits before the outgoing database's tabs go out of scope.
       flushPendingSave();
       setStatusState("loading");
@@ -2350,6 +2369,9 @@ function DuckDbPlaygroundInner() {
             : await engine.loadSampleDatabase(nextId);
         setActiveDbId(sample.id);
         writeActiveDbId(sample.id);
+        // The name belonged to the database being replaced. Kept, it showed
+        // over the new one, and over a later New Database.
+        setCustomDbFilename(null, sample.id);
         // The workspace's database was just replaced, so its tabs start over.
         // Restoring the ones last saved for this id brought back queries
         // written against an earlier copy of it.
@@ -2703,7 +2725,7 @@ function DuckDbPlaygroundInner() {
         setRowCountByTable({});
         setExpandedEntities(new Set());
         setActiveDbId(DUCKDB_BLANK_DATABASE.id);
-        setCustomDbFilename(filename);
+        setCustomDbFilename(filename, DUCKDB_BLANK_DATABASE.id);
         writeActiveDbId(DUCKDB_BLANK_DATABASE.id);
         // A fresh start, as for a sample: the tabs saved for the blank slot
         // belong to whatever database last occupied it.
@@ -2762,7 +2784,7 @@ function DuckDbPlaygroundInner() {
         setRowCountByTable({});
         setExpandedEntities(new Set());
         setActiveDbId(DUCKDB_BLANK_DATABASE.id);
-        setCustomDbFilename(filename);
+        setCustomDbFilename(filename, DUCKDB_BLANK_DATABASE.id);
         writeActiveDbId(DUCKDB_BLANK_DATABASE.id);
         const nextTabs = restoreSavedTabs
           ? loadTabs(DUCKDB_BLANK_DATABASE.id, DUCKDB_BLANK_DATABASE.defaultTabs)
@@ -4777,7 +4799,7 @@ function DuckDbPlaygroundInner() {
           onExtChange={setRenameDbExt}
           onClose={() => setRenameDbOpen(false)}
           onConfirm={(newFilename) => {
-            setCustomDbFilename(newFilename);
+            setCustomDbFilename(newFilename, activeDbId);
             showToast(`Renamed to "${newFilename}".`);
             setRenameDbOpen(false);
           }}
@@ -4797,7 +4819,9 @@ function DuckDbPlaygroundInner() {
             const label = findDuckDbSampleDatabase(pendingDbId).label;
             const newWs = await createWorkspace(`${label} Workspace`, PLAYGROUND_ID);
             // Recorded against the new workspace only: this one keeps its own.
+            // So is "no name": the new copy goes by its own filename.
             writeActiveDbId(pendingDbId, newWs.id);
+            writeDbFilename(pendingDbId, null, newWs.id);
             setPendingDbId(null);
             switchActiveWorkspace(PLAYGROUND_ID, newWs.id);
           }}

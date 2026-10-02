@@ -82,7 +82,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
   );
 
   const activeDbId = useEngineStore((s) => s.activeDbId);
-  const customFilenames = useEngineStore((s) => s.customFilenames);
+  const customDbFilename = useEngineStore((s) => s.customDbFilename);
   const tables = useEngineStore((s) => s.tables);
   const setTables = useEngineStore((s) => s.setTables);
   const setViews = useEngineStore((s) => s.setViews);
@@ -92,7 +92,9 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
   const setForeignKeysByEntity = useEngineStore((s) => s.setForeignKeysByEntity);
   const setActiveDbId = useEngineStore((s) => s.setActiveDbId);
   const setCustomDb = useEngineStore((s) => s.setCustomDb);
-  const setCustomFilenames = useEngineStore((s) => s.setCustomFilenames);
+  const recordCustomDbFilename = useEngineStore(
+    (s) => s.recordCustomDbFilename,
+  );
 
   const setTabs = useTabStore((s) => s.setTabs);
   const setActiveTabId = useTabStore((s) => s.setActiveTabId);
@@ -112,8 +114,12 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     [],
   );
 
+  /** Show a database that just replaced the workspace's contents. `filename`
+   *  is what to call it (an import's own name); a sample or blank database
+   *  goes by its filename, and a rename of what it replaced does not carry
+   *  over to it. */
   const applyDbLoad = useCallback(
-    async (sample: SqliteSampleMetadata) => {
+    async (sample: SqliteSampleMetadata, filename: string | null = null) => {
       const engine = engineRef.current;
       if (!engine) return;
       saveTabs(activeDbIdRef.current, tabsRef.current);
@@ -122,6 +128,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       setCustomDb(isCustom ? sample : null);
       setActiveDbId(sample.id);
       activeDbIdRef.current = sample.id;
+      recordCustomDbFilename(sample.id, filename);
       // Imported databases are persisted too. Skipping them left the *old*
       // sample's id in storage, so a reload restored that sample's label and
       // query tabs over the imported database's own data. Recorded against
@@ -163,6 +170,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       activeDbIdRef,
       pragmaSettingsRef,
       setCustomDb,
+      recordCustomDbFilename,
       setActiveDbId,
       setTables,
       setViews,
@@ -183,12 +191,6 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       void (async () => {
         if (nextId === "__blank__") {
           const sample = await engine.loadBlankDatabase();
-          setCustomFilenames((prev) => {
-            if (!(sample.id in prev)) return prev;
-            const next = { ...prev };
-            delete next[sample.id];
-            return next;
-          });
           await applyDbLoad(sample);
           showToast("Created blank database.");
         } else {
@@ -198,7 +200,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
         }
       })();
     },
-    [applyDbLoad, showToast, engineRef, setCustomFilenames],
+    [applyDbLoad, showToast, engineRef],
   );
 
   /** Awaited by the import dialog, which keeps its progress panel up until
@@ -217,7 +219,8 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
         report?.("Restoring database");
         const sample = await engine.loadFromBytes(bytes, filename);
         report?.("Reading schema");
-        await applyDbLoad(sample);
+        // Named, so a reload does not fall back to `database.sqlite`.
+        await applyDbLoad(sample, filename);
         setImportSqliteOpen(false);
         showToast(`Imported ${filename}.`);
       } catch (err) {
@@ -235,14 +238,13 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       try {
         // Load a fresh blank database then execute the dump on top of it.
         const sample = await engine.loadBlankDatabase();
-        // Name it after the file it came from. Clearing the override left
-        // the blank database's own `blank.sqlite` in the selector, which
-        // told the user nothing about what they had just opened.
-        setCustomFilenames((prev) => ({ ...prev, [sample.id]: filename }));
         report?.("Replaying SQL dump");
         await engine.execAll(sqlText);
         report?.("Reading schema");
-        await applyDbLoad(sample);
+        // Name it after the file it came from. Clearing the override left
+        // the blank database's own `blank.sqlite` in the selector, which
+        // told the user nothing about what they had just opened.
+        await applyDbLoad(sample, filename);
         setImportSqliteOpen(false);
         showToast(`Imported "${filename}".`);
       } catch (err) {
@@ -250,7 +252,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
         showToast(`Import failed: ${msg}`, "warn");
       }
     },
-    [applyDbLoad, showToast, engineRef, setCustomFilenames, setImportSqliteOpen],
+    [applyDbLoad, showToast, engineRef, setImportSqliteOpen],
   );
 
   /** Unified entry point for the single "import a database file" dialog.
@@ -396,9 +398,9 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     const engine = engineRef.current;
     if (!engine) return "database";
     const sample = await engine.activeSample();
-    const overriddenFilename = customFilenames[activeDbId];
+    const overriddenFilename = customDbFilename;
     return overriddenFilename ?? sample.filename ?? sample.id ?? "database";
-  }, [activeDbId, customFilenames, engineRef]);
+  }, [customDbFilename, engineRef]);
 
   /** Serializes the active database to a SQLite file image (the raw bytes a
    *  `.sqlite` download would contain), the binary payload of a cloud/share
@@ -420,7 +422,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       const engine = engineRef.current;
       if (!engine) throw new Error("The SQL engine isn't ready yet.");
       const sample = await engine.loadFromBytes(image, label);
-      await applyDbLoad(sample);
+      await applyDbLoad(sample, label);
       const newTabs = tabSeeds.map((seed) => ({
         title: seed.title,
         code: seed.code,
@@ -459,7 +461,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
         const sqlText = await buildSqlDumpText();
         if (sqlText === null) return;
         const sample = await engine.activeSample();
-        const overriddenFilename = customFilenames[activeDbId];
+        const overriddenFilename = customDbFilename;
         const effectiveFilename = overriddenFilename ?? sample.filename ?? "";
         const baseName = effectiveFilename
           ? effectiveFilename.replace(/\.[^.]+$/, "")
@@ -481,7 +483,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
         showToast(`Export failed: ${msg}`, "warn");
       }
     })();
-  }, [activeDbId, buildSqlDumpText, customFilenames, showToast, engineRef]);
+  }, [buildSqlDumpText, customDbFilename, showToast, engineRef]);
 
   const requestDbSwitch = useCallback(
     (nextId: string) => {
@@ -500,7 +502,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     try {
       const bytes = await engine.exportDatabase();
       const sample = await engine.activeSample();
-      const overriddenFilename = customFilenames[activeDbId];
+      const overriddenFilename = customDbFilename;
       const effectiveFilename = overriddenFilename ?? sample.filename ?? "";
       const baseName = effectiveFilename
         ? effectiveFilename.replace(/\.[^.]+$/, "")
@@ -523,7 +525,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       showToast(`Export failed: ${msg}`, "warn");
     }
     })();
-  }, [activeDbId, customFilenames, showToast, engineRef]);
+  }, [customDbFilename, showToast, engineRef]);
 
   const exportDatabaseToXlsx = useCallback(() => {
     const engine = engineRef.current;
@@ -532,7 +534,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     (async () => {
       try {
         const sample = await engine.activeSample();
-        const overriddenFilename = customFilenames[activeDbId];
+        const overriddenFilename = customDbFilename;
         const effectiveFilename = overriddenFilename ?? sample.filename ?? "";
         const baseName = effectiveFilename
           ? effectiveFilename.replace(/\.[^.]+$/, "")
@@ -571,7 +573,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
         showToast(`Export failed: ${msg}`, "warn");
       }
     })();
-  }, [activeDbId, customFilenames, tables, quoteIdent, showToast, engineRef]);
+  }, [customDbFilename, tables, quoteIdent, showToast, engineRef]);
 
   // ─── CSV parse helper ─────────────────────────────────────────────
   const handleCsvFile = useCallback(

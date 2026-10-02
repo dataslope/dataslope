@@ -186,6 +186,117 @@ describe("the database a workspace holds", () => {
   });
 });
 
+describe("the name a workspace gives its database", () => {
+  it("belongs to that workspace alone", async () => {
+    // SQLite kept one device-wide map: renaming the blank database in one
+    // workspace renamed it in every other workspace on a blank database.
+    const { createTabScope } = await import(TAB_SCOPE);
+    const scope = createTabScope(PREFIX, "postgres");
+    scope.setWorkspaceScope("ws_1");
+    scope.writeDbFilename("__blank__", "sales.pg");
+    expect(scope.readDbFilename("__blank__")).toBe("sales.pg");
+
+    scope.setWorkspaceScope("ws_2");
+    expect(scope.readDbFilename("__blank__")).toBeNull();
+  });
+
+  it("can be cleared, which also stops the pre-scoping name showing through", async () => {
+    const legacy = new Map([["__blank__", "old.pg"]]);
+    const { createTabScope } = await import(TAB_SCOPE);
+    const scope = createTabScope(PREFIX, "postgres", {
+      legacyDbFilenames: {
+        read: (dbId: string) => legacy.get(dbId) ?? null,
+        forget: (dbId: string) => legacy.delete(dbId),
+      },
+    });
+    scope.setWorkspaceScope("ws_1");
+    expect(scope.readDbFilename("__blank__")).toBe("old.pg");
+    // "New Database": a fresh blank database goes by its own filename.
+    scope.writeDbFilename("__blank__", null);
+    expect(scope.readDbFilename("__blank__")).toBeNull();
+    expect(scope.claimDbFilename("__blank__")).toBeNull();
+  });
+
+  it("is claimed from the pre-scoping storage by one workspace only", async () => {
+    const legacy = new Map([["__blank__", "renamed.sqlite"]]);
+    const { createTabScope } = await import(TAB_SCOPE);
+    const scope = createTabScope(PREFIX, "postgres", {
+      legacyDbFilenames: {
+        read: (dbId: string) => legacy.get(dbId) ?? null,
+        forget: (dbId: string) => legacy.delete(dbId),
+      },
+    });
+    scope.setWorkspaceScope("ws_1");
+    expect(scope.claimDbFilename("__blank__")).toBe("renamed.sqlite");
+    expect(legacy.has("__blank__")).toBe(false);
+    expect(scope.readDbFilename("__blank__")).toBe("renamed.sqlite");
+
+    scope.setWorkspaceScope("ws_2");
+    expect(scope.claimDbFilename("__blank__")).toBeNull();
+  });
+
+  it("is not claimed before a workspace has resolved", async () => {
+    const legacy = new Map([["__blank__", "renamed.sqlite"]]);
+    const { createTabScope } = await import(TAB_SCOPE);
+    const scope = createTabScope(PREFIX, "postgres", {
+      legacyDbFilenames: {
+        read: (dbId: string) => legacy.get(dbId) ?? null,
+        forget: (dbId: string) => legacy.delete(dbId),
+      },
+    });
+    expect(scope.claimDbFilename("__blank__")).toBe("renamed.sqlite");
+    expect(legacy.has("__blank__")).toBe(true);
+  });
+
+  it("can be cleared for a workspace other than the active one", async () => {
+    // "Open in new workspace": the new copy starts under its own filename,
+    // whatever the pre-scoping storage says.
+    const legacy = new Map([["northwind", "renamed.db"]]);
+    const { createTabScope } = await import(TAB_SCOPE);
+    const scope = createTabScope(PREFIX, "postgres", {
+      legacyDbFilenames: {
+        read: (dbId: string) => legacy.get(dbId) ?? null,
+        forget: (dbId: string) => legacy.delete(dbId),
+      },
+    });
+    scope.setWorkspaceScope("ws_1");
+    scope.writeDbFilename("northwind", null, "ws_new");
+    scope.setWorkspaceScope("ws_new");
+    expect(scope.claimDbFilename("northwind")).toBeNull();
+    expect(legacy.get("northwind")).toBe("renamed.db");
+  });
+
+  it("travels with a workspace's other keys when it is copied", async () => {
+    const { createTabScope } = await import(TAB_SCOPE);
+    const scope = createTabScope(PREFIX, "postgres");
+    scope.writeDbFilename("__blank__", "sales.pg", "ws_1");
+    scope.copyScopedKeys("ws_1", "ws_copy");
+    scope.setWorkspaceScope("ws_copy");
+    expect(scope.readDbFilename("__blank__")).toBe("sales.pg");
+  });
+});
+
+describe("SQLite's device-wide name map", () => {
+  it("hands each entry to the first workspace that opens on that database", async () => {
+    local.setItem(
+      "playground_sqlite_db_filenames",
+      JSON.stringify({ __blank__: "mine.sqlite", northwind: "nw.db" }),
+    );
+    const tabs = await import("../app/_components/sqlitePlaygroundTabs");
+    tabs.setTabWorkspaceScope("ws_1");
+    expect(tabs.claimDbFilename("__blank__")).toBe("mine.sqlite");
+    expect(
+      JSON.parse(local.getItem("playground_sqlite_db_filenames") ?? "{}"),
+    ).toEqual({ northwind: "nw.db" });
+
+    tabs.setTabWorkspaceScope("ws_2");
+    expect(tabs.readDbFilename("__blank__")).toBeNull();
+    expect(tabs.claimDbFilename("northwind")).toBe("nw.db");
+    // Emptied, so it is gone rather than left as "{}".
+    expect(local.getItem("playground_sqlite_db_filenames")).toBeNull();
+  });
+});
+
 describe("stateForAdoptedWorkspace", () => {
   const tab = (id: string) => ({
     id,
