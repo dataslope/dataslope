@@ -273,7 +273,24 @@ const {
   copyScopedKeys,
   readActiveDbId,
   writeActiveDbId,
-} = createTabStorage(STORAGE_PREFIX, PLAYGROUND_ID);
+  readDbFilename,
+  claimDbFilename,
+  writeDbFilename,
+} = createTabStorage(STORAGE_PREFIX, PLAYGROUND_ID, {
+  // Before names were scoped there was one device-wide key, and it only ever
+  // named the blank/imported slot.
+  legacyDbFilenames: {
+    read: (dbId) =>
+      dbId === POSTGRES_BLANK_DATABASE.id
+        ? localStorage.getItem(`${STORAGE_PREFIX}db_filename`)
+        : null,
+    forget: (dbId) => {
+      if (dbId === POSTGRES_BLANK_DATABASE.id) {
+        localStorage.removeItem(`${STORAGE_PREFIX}db_filename`);
+      }
+    },
+  },
+});
 
 /** The database this workspace holds, as far as storage says; an id naming
  *  nothing known resolves to the first sample, as the engine would. */
@@ -281,22 +298,6 @@ function storedDbId(): string {
   return findPostgresSampleDatabase(
     readActiveDbId() ?? POSTGRES_SAMPLE_DATABASES[0].id,
   ).id;
-}
-
-// The display name of the blank/imported database. Scoped to the workspace
-// (it names *its* database); the device-wide key it replaces is read once,
-// for a workspace that predates the scoping, and dropped on the next write.
-const LEGACY_DB_FILENAME_KEY = `${STORAGE_PREFIX}db_filename`;
-function readCustomDbFilename(): string | null {
-  if (typeof window === "undefined") return null;
-  try {
-    return (
-      localStorage.getItem(dbScopedKey(POSTGRES_BLANK_DATABASE.id, "filename")) ??
-      localStorage.getItem(LEGACY_DB_FILENAME_KEY)
-    );
-  } catch {
-    return null;
-  }
 }
 
 const POSTGRES_DB_ACTIONS: readonly DatabaseSelectorAction[] = [
@@ -1225,25 +1226,24 @@ function PostgresPlaygroundInner() {
   const [renameDbOpen, setRenameDbOpen] = useState(false);
   const [renameDbName, setRenameDbName] = useState("");
   const [renameDbExt, setRenameDbExt] = useState(".pg");
-  // Overrides the display name for the blank/imported database without
-  // touching the sample-database metadata.
-  // Persisted alongside the active database id: an imported or renamed
-  // database kept its label only in memory, so a reload silently relabelled it
-  // `untitled.pg` while the data underneath was unchanged.
+  // The name the user gave this workspace's database (an import's file
+  // name, or a rename) without touching the sample-database metadata.
+  // Persisted per workspace: an imported or renamed database kept its label
+  // only in memory, so a reload silently relabelled it `untitled.pg` while
+  // the data underneath was unchanged.
   const [customDbFilename, setCustomDbFilenameState] = useState<string | null>(
-    readCustomDbFilename,
+    () => readDbFilename(initialDbId),
   );
-  const setCustomDbFilename = useCallback((filename: string | null) => {
-    setCustomDbFilenameState(filename);
-    try {
-      const key = dbScopedKey(POSTGRES_BLANK_DATABASE.id, "filename");
-      if (filename === null) localStorage.removeItem(key);
-      else localStorage.setItem(key, filename);
-      localStorage.removeItem(LEGACY_DB_FILENAME_KEY);
-    } catch {
-      /* ignore */
-    }
-  }, []);
+  /** Name `dbId`, the database that is (or is about to be) active. Taken
+   *  explicitly: where the database just changed, the active-id state and
+   *  its ref are still a render behind. */
+  const setCustomDbFilename = useCallback(
+    (filename: string | null, dbId: string) => {
+      setCustomDbFilenameState(filename);
+      writeDbFilename(dbId, filename);
+    },
+    [],
+  );
 
   // ─── View Structure drawer state ──────────────────────────────────────
   const [viewStructureDialog, setViewStructureDialog] =
@@ -1435,11 +1435,9 @@ function PostgresPlaygroundInner() {
   }, [setSettingsOpen, setActiveTabId]);
   const result = activeTab ? (resultsByTab[activeTab.id] ?? null) : null;
   const activeSample = findPostgresSampleDatabase(activeDbId);
-  // customDbFilename applies only for the blank/imported database slot.
-  const displayFilename =
-    activeDbId === POSTGRES_BLANK_DATABASE.id && customDbFilename !== null
-      ? customDbFilename
-      : activeSample.filename;
+  // Any database can be renamed. This used to apply to the blank/imported
+  // slot only, so renaming a sample toasted "Renamed" and changed nothing.
+  const displayFilename = customDbFilename ?? activeSample.filename;
   // Tab reordering is delegated to the generic TabBar; `setDraggingTabId`
   // remains in the hook signature only, passed a no-op.
   const setDraggingTabId = useCallback(() => {}, []);
@@ -1479,7 +1477,6 @@ function PostgresPlaygroundInner() {
       if (!adopted) return currentDbId;
       activeDbIdRef.current = adopted.dbId;
       setActiveDbId(adopted.dbId);
-      setCustomDbFilenameState(readCustomDbFilename());
       persistTabs(adopted.tabs, adopted.dbId);
       tabHistoryRef.current = [];
       activeTabIdRef.current = adopted.activeTabId;
@@ -2106,6 +2103,7 @@ function PostgresPlaygroundInner() {
         // Pin the workspace to its database, so it reopens on this one
         // whatever is chosen elsewhere on the device in the meantime.
         writeActiveDbId(bootDbId);
+        setCustomDbFilenameState(claimDbFilename(bootDbId));
         await Promise.all([refreshSchema(), refreshSchemas()]);
         setLoaded(true);
         setStatusState("ready");
@@ -2302,7 +2300,10 @@ function PostgresPlaygroundInner() {
   const performDbSwitch = useCallback(
     async (nextId: string) => {
       const engine = engineRef.current;
-      if (!engine || nextId === activeDbIdRef.current) return;
+      // "New Database" over the blank slot is a real overwrite: that slot
+      // also holds imports, and skipping it left their data and name in place.
+      if (!engine) return;
+      if (nextId !== POSTGRES_BLANK_DATABASE.id && nextId === activeDbIdRef.current) return;
       setStatusState("loading");
       setDbLoading(true);
       try {
@@ -2313,7 +2314,7 @@ function PostgresPlaygroundInner() {
         setActiveDbId(sample.id);
         // The label belonged to the database being replaced; keeping it would
         // show a stale name over the new one (and over a later New Database).
-        setCustomDbFilename(null);
+        setCustomDbFilename(null, sample.id);
         writeActiveDbId(sample.id);
         // The workspace's database was just replaced, so its tabs start over.
         // Restoring the ones last saved for this id brought back queries
@@ -2373,7 +2374,7 @@ function PostgresPlaygroundInner() {
         // this tab was on before.
         setWorkspaceSaved(true);
         setActiveDbId(sample.id);
-        setCustomDbFilename(null);
+        setCustomDbFilename(null, sample.id);
         writeActiveDbId(sample.id);
         const nextTabs = seedTabs(sample.defaultTabs);
         persistTabs(nextTabs, sample.id);
@@ -2474,7 +2475,7 @@ function PostgresPlaygroundInner() {
         report?.("Restoring dump");
         await engine.importSqlDump(sqlText);
         setActiveDbId(POSTGRES_BLANK_DATABASE.id);
-        setCustomDbFilename(filename);
+        setCustomDbFilename(filename, POSTGRES_BLANK_DATABASE.id);
         writeActiveDbId(POSTGRES_BLANK_DATABASE.id);
         // A fresh start, as for a sample: the tabs saved for the blank slot
         // belong to whatever database last occupied it.
@@ -2540,7 +2541,7 @@ function PostgresPlaygroundInner() {
         setActiveWorkspace({ id: newWs.id, name: newWs.name });
         setWorkspaceSaved(true);
         setActiveDbId(POSTGRES_BLANK_DATABASE.id);
-        setCustomDbFilename(filename);
+        setCustomDbFilename(filename, POSTGRES_BLANK_DATABASE.id);
         writeActiveDbId(POSTGRES_BLANK_DATABASE.id);
         const nextTabs = seedTabs(POSTGRES_BLANK_DATABASE.defaultTabs);
         persistTabs(nextTabs, POSTGRES_BLANK_DATABASE.id);
@@ -2584,7 +2585,7 @@ function PostgresPlaygroundInner() {
       try {
         await engine.importDataDir(new Blob([image as BlobPart]));
         setActiveDbId(POSTGRES_BLANK_DATABASE.id);
-        setCustomDbFilename(filename);
+        setCustomDbFilename(filename, POSTGRES_BLANK_DATABASE.id);
         writeActiveDbId(POSTGRES_BLANK_DATABASE.id);
         // Only a cloud/share bundle lands here, and it saved the bundle's own
         // tabs under the blank slot first: those are the ones to restore.
@@ -4457,7 +4458,7 @@ function PostgresPlaygroundInner() {
           onExtChange={setRenameDbExt}
           onClose={() => setRenameDbOpen(false)}
           onConfirm={(newFilename) => {
-            setCustomDbFilename(newFilename);
+            setCustomDbFilename(newFilename, activeDbId);
             showToast(`Renamed to "${newFilename}".`);
             setRenameDbOpen(false);
           }}

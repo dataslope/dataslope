@@ -2,7 +2,7 @@
 
 import { newTabId } from "../../sqlitePlaygroundTabs";
 import type { QueryTab } from "../../sqlitePlaygroundTabs";
-import { createTabScope } from "./tabScope";
+import { createTabScope, type LegacyDbFilenames } from "./tabScope";
 
 export interface TabStorageUtils {
   dbScopedKey: (dbId: string, k: string) => string;
@@ -27,6 +27,16 @@ export interface TabStorageUtils {
   readActiveDbId: () => string | null;
   /** See `createTabScope`: records the database a workspace holds. */
   writeActiveDbId: (dbId: string, workspaceId?: string) => void;
+  /** See `createTabScope`: the name the user gave a workspace's database. */
+  readDbFilename: (dbId: string) => string | null;
+  /** See `createTabScope`: `readDbFilename`, taking over a pre-scoping name. */
+  claimDbFilename: (dbId: string) => string | null;
+  /** See `createTabScope`: records (or with null, clears) that name. */
+  writeDbFilename: (
+    dbId: string,
+    filename: string | null,
+    workspaceId?: string,
+  ) => void;
 }
 
 /**
@@ -37,8 +47,9 @@ export interface TabStorageUtils {
 export function createTabStorage(
   storagePrefix: string,
   playgroundId: string,
+  options: { legacyDbFilenames?: LegacyDbFilenames } = {},
 ): TabStorageUtils {
-  const scope = createTabScope(storagePrefix, playgroundId);
+  const scope = createTabScope(storagePrefix, playgroundId, options);
 
   function dbScopedKey(dbId: string, k: string): string {
     return scope.scopedKey(dbId, k);
@@ -121,5 +132,8 @@ export function createTabStorage(
     copyScopedKeys: scope.copyScopedKeys,
     readActiveDbId: scope.readActiveDbId,
     writeActiveDbId: scope.writeActiveDbId,
+    readDbFilename: scope.readDbFilename,
+    claimDbFilename: scope.claimDbFilename,
+    writeDbFilename: scope.writeDbFilename,
   };
 }

@@ -140,4 +140,79 @@ for (const { id, route, playground } of ENGINES) {
     await expect(dbLabel(page)).toHaveText(sampleLabel);
     await expect(page.locator(".cm-content")).toContainText("second workspace");
   });
+
+  // The name given to a database (a rename, or an import's file name) is the
+  // workspace's: SQLite kept one device-wide map of them and DuckDB kept none,
+  // and Postgres and DuckDB ignored a rename of anything but the blank slot.
+  test(`${id}: a database's name stays with its workspace`, async ({
+    context,
+  }) => {
+    test.setTimeout(420_000);
+    const pointer = `playground_active_ws_${playground}`;
+    const rename = async (page: Page, name: string) => {
+      await dbLabel(page).click();
+      await page.getByRole("option", { name: /Rename Current Database/ }).click();
+      await page.getByRole("textbox", { name: "Database name" }).fill(name);
+      await page.getByRole("button", { name: "Rename", exact: true }).click();
+      await expect(dbLabel(page)).toContainText(name);
+    };
+    const newDatabase = async (page: Page, choice: string) => {
+      await dbLabel(page).click();
+      await page.getByRole("option", { name: /New Database/ }).click();
+      await page.getByRole("button", { name: choice }).click();
+    };
+
+    // A renamed sample keeps its name across sessions.
+    let page = await open(context, route);
+    await rename(page, "sample_renamed");
+    await page.close();
+    page = await open(context, route);
+    await expect(dbLabel(page)).toContainText("sample_renamed");
+
+    // Replacing the database drops the name it had.
+    await newDatabase(page, "Overwrite this workspace");
+    await expect(dbLabel(page)).not.toContainText("sample_renamed", {
+      timeout: 60_000,
+    });
+    await expect(runButton(page)).toBeEnabled({ timeout: 60_000 });
+    const blankLabel = (await dbLabel(page).innerText()).trim();
+
+    // So does "New Database" over a blank one, which also empties it.
+    await replaceEditor(page, "CREATE TABLE probe (id INTEGER);");
+    await runButton(page).click();
+    await expect(page.locator(".run-btn-spinner")).toHaveCount(0, {
+      timeout: 60_000,
+    });
+    await expect(page.locator(".sql-tree-entity", { hasText: "probe" })).toHaveCount(1);
+    await rename(page, "blank_renamed");
+    await newDatabase(page, "Overwrite this workspace");
+    await expect(dbLabel(page)).toHaveText(blankLabel, { timeout: 60_000 });
+    await expect(page.locator(".sql-tree-entity", { hasText: "probe" })).toHaveCount(0, {
+      timeout: 60_000,
+    });
+
+    // Another workspace on a blank database does not inherit this one's name.
+    await rename(page, "blank_renamed");
+    const first = await page.evaluate((k) => sessionStorage.getItem(k), pointer);
+    await newDatabase(page, "Open in new workspace");
+    // SQLite and DuckDB reload into it; a read mid-navigation just retries.
+    await expect
+      .poll(
+        () =>
+          page
+            .evaluate((k) => sessionStorage.getItem(k), pointer)
+            .catch(() => first),
+        { timeout: 150_000 },
+      )
+      .not.toBe(first);
+    await expect(runButton(page)).toBeEnabled({ timeout: 150_000 });
+    await expect(dbLabel(page)).toHaveText(blankLabel);
+
+    // And this one still has it.
+    await page.evaluate(([k, v]) => sessionStorage.setItem(k, v), [pointer, first ?? ""]);
+    await page.goto("about:blank");
+    await page.goto(route);
+    await expect(runButton(page)).toBeEnabled({ timeout: 150_000 });
+    await expect(dbLabel(page)).toContainText("blank_renamed");
+  });
 }

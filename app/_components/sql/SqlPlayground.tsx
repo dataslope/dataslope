@@ -198,12 +198,15 @@ import {
   copyTabWorkspaceKeys,
   dbScopedKey,
   loadActiveTabId,
+  claimDbFilename,
   loadTabs,
   readActiveDbId,
+  readDbFilename,
   saveTabs,
   setTabWorkspaceScope,
   storageKey,
   writeActiveDbId,
+  writeDbFilename,
   type QueryTab,
 } from "../sqlitePlaygroundTabs";
 import { stateForAdoptedWorkspace } from "./shared/tabScope";
@@ -428,24 +431,14 @@ function SqlPlaygroundInner() {
   const setActiveDbId = useEngineStore((s) => s.setActiveDbId);
   const customDb = useEngineStore((s) => s.customDb);
   const setCustomDb = useEngineStore((s) => s.setCustomDb);
-  const customFilenames = useEngineStore((s) => s.customFilenames);
-  const setCustomFilenames = useEngineStore((s) => s.setCustomFilenames);
-  // Imported/renamed database names are UI-only state, so they need writing
-  // back for a reload to show the same label the user left on screen.
-  useEffect(() => {
-    try {
-      if (Object.keys(customFilenames).length === 0) {
-        localStorage.removeItem(storageKey("db_filenames"));
-      } else {
-        localStorage.setItem(
-          storageKey("db_filenames"),
-          JSON.stringify(customFilenames),
-        );
-      }
-    } catch {
-      // ignore
-    }
-  }, [customFilenames]);
+  // The name the user gave this workspace's database (an import's file
+  // name, or a rename). Persisted per workspace where it is set
+  // (`recordCustomDbFilename`), never as a device-wide map.
+  const customDbFilename = useEngineStore((s) => s.customDbFilename);
+  const setCustomDbFilename = useEngineStore((s) => s.setCustomDbFilename);
+  const recordCustomDbFilename = useEngineStore(
+    (s) => s.recordCustomDbFilename,
+  );
 
   // ─── Tab store ───────────────────────────────────────────────────────
   const tabs = useTabStore((s) => s.tabs);
@@ -1186,19 +1179,10 @@ function SqlPlaygroundInner() {
     const initialDbId = initialSample.id;
     activeDbIdRef.current = initialDbId;
     setActiveDbId(initialDbId);
-    // The display name of an imported database lives only in this map, so it
-    // has to be restored before the selector renders.
-    try {
-      const storedNames = localStorage.getItem(storageKey("db_filenames"));
-      if (storedNames) {
-        const parsed: unknown = JSON.parse(storedNames);
-        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-          setCustomFilenames(parsed as Record<string, string>);
-        }
-      }
-    } catch {
-      // ignore
-    }
+    // An imported or renamed database's name lives only in storage, so it
+    // has to be restored before the selector renders. The boot reads it
+    // again once the workspace has resolved.
+    setCustomDbFilename(readDbFilename(initialDbId));
     const initialTabs = loadTabs(initialDbId, initialSample.defaultTabs);
     setTabs(initialTabs);
     setActiveTabId(loadActiveTabId(initialDbId, initialTabs));
@@ -1227,6 +1211,7 @@ function SqlPlaygroundInner() {
     setPragmaSettingsState,
     setWordWrapState,
     setActiveDbId,
+    setCustomDbFilename,
     setTabs,
     setActiveTabId,
   ]);
@@ -1338,6 +1323,7 @@ function SqlPlaygroundInner() {
         // A blank or imported database has no sample to name it; without
         // this the selector fell back to the first sample's label.
         setCustomDb(isSqliteSampleId(sample.id) ? null : sample);
+        setCustomDbFilename(claimDbFilename(sample.id));
         // Pin the workspace to its database, so it reopens on this one
         // whatever is chosen elsewhere on the device in the meantime.
         writeActiveDbId(sample.id);
@@ -1735,18 +1721,18 @@ function SqlPlaygroundInner() {
   const activeSample = useMemo(() => {
     const base =
       customDb?.id === activeDbId ? customDb : sqliteDatabaseForId(activeDbId);
-    const overrideName = customFilenames[activeDbId];
-    if (overrideName) return { ...base, filename: overrideName };
+    if (customDbFilename) return { ...base, filename: customDbFilename };
     return base;
-  }, [activeDbId, customDb, customFilenames]);
+  }, [activeDbId, customDb, customDbFilename]);
 
   // Filename of the pending database (shown in the switch-database dialog).
+  // Its own: the switch loads a fresh copy, which a rename of an earlier one
+  // does not carry over to.
   const pendingDbFilename = useMemo(() => {
     if (!pendingDbId) return "";
     if (pendingDbId === "__blank__") return "blank.sqlite";
-    const sample = findSampleDatabase(pendingDbId);
-    return customFilenames[pendingDbId] ?? sample.filename;
-  }, [pendingDbId, customFilenames]);
+    return findSampleDatabase(pendingDbId).filename;
+  }, [pendingDbId]);
 
   // Resolve PK / FK / constraint hints for any table by name, so each result
   // set of a multi-statement run is editable against its own table.
@@ -2220,7 +2206,9 @@ function SqlPlaygroundInner() {
               : findSampleDatabase(pendingDbId).label;
             const newWs = await createWorkspace(`${label} Workspace`, PLAYGROUND_ID);
             // Recorded against the new workspace only: this one keeps its own.
+            // So is "no name": the new copy goes by its own filename.
             writeActiveDbId(pendingDbId, newWs.id);
+            writeDbFilename(pendingDbId, null, newWs.id);
             setPendingDbId(null);
             switchActiveWorkspace(PLAYGROUND_ID, newWs.id);
           }}
@@ -2396,10 +2384,7 @@ function SqlPlaygroundInner() {
           onClose={() => setRenameDbOpen(false)}
           description="Choose a new filename for the current database."
           onConfirm={(newFilename) => {
-            setCustomFilenames((prev) => ({
-              ...prev,
-              [activeDbId]: newFilename,
-            }));
+            recordCustomDbFilename(activeDbId, newFilename);
             if (customDb?.id === activeDbId) {
               setCustomDb((prev) =>
                 prev ? { ...prev, filename: newFilename } : prev,

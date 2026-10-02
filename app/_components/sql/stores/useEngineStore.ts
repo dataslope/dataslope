@@ -8,7 +8,7 @@ import type {
 } from "../../runtime/sqlite";
 import type { SqliteSampleMetadata } from "../../runtime/sqliteSamples";
 import { SQLITE_SAMPLE_DATABASES } from "../../runtime/sqliteSamples";
-import { readActiveDbId } from "../../sqlitePlaygroundTabs";
+import { readActiveDbId, writeDbFilename } from "../../sqlitePlaygroundTabs";
 
 function readInitialActiveDbId(): string {
   if (typeof window === "undefined") return SQLITE_SAMPLE_DATABASES[0].id;
@@ -30,7 +30,9 @@ interface EngineState {
   viewsSectionExpanded: boolean;
   activeDbId: string;
   customDb: SqliteSampleMetadata | null;
-  customFilenames: Record<string, string>;
+  /** The name the user gave the active database in this workspace (an
+   *  imported file's name, or a rename); null means its own filename. */
+  customDbFilename: string | null;
   // Setters
   setLoaded: (loaded: boolean) => void;
   setStatusState: (status: "loading" | "ready" | "running" | "error") => void;
@@ -69,11 +71,11 @@ interface EngineState {
       | null
       | ((prev: SqliteSampleMetadata | null) => SqliteSampleMetadata | null),
   ) => void;
-  setCustomFilenames: (
-    updater:
-      | ((prev: Record<string, string>) => Record<string, string>)
-      | Record<string, string>,
-  ) => void;
+  /** Show a name restored from storage (does not write it back). */
+  setCustomDbFilename: (filename: string | null) => void;
+  /** Name database `dbId`, which is (or is about to be) the active one, and
+   *  persist it for this workspace. Null goes back to its own filename. */
+  recordCustomDbFilename: (dbId: string, filename: string | null) => void;
 }
 
 export const useEngineStore = create<EngineState>((set) => ({
@@ -91,7 +93,7 @@ export const useEngineStore = create<EngineState>((set) => ({
   viewsSectionExpanded: true,
   activeDbId: readInitialActiveDbId(),
   customDb: null,
-  customFilenames: {},
+  customDbFilename: null,
   setLoaded: (loaded) => set({ loaded }),
   setStatusState: (statusState) => set({ statusState }),
   setTables: (tables) => set({ tables }),
@@ -140,9 +142,9 @@ export const useEngineStore = create<EngineState>((set) => ({
       customDb:
         typeof updater === "function" ? updater(state.customDb) : updater,
     })),
-  setCustomFilenames: (updater) =>
-    set((state) => ({
-      customFilenames:
-        typeof updater === "function" ? updater(state.customFilenames) : updater,
-    })),
+  setCustomDbFilename: (customDbFilename) => set({ customDbFilename }),
+  recordCustomDbFilename: (dbId, customDbFilename) => {
+    writeDbFilename(dbId, customDbFilename);
+    set({ customDbFilename });
+  },
 }));
