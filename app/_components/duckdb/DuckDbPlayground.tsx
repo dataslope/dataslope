@@ -181,7 +181,7 @@ import { newTabId } from "../sqlitePlaygroundTabs";
 import {
   createTabStorage,
 } from "../sql/shared/tabStorageUtils";
-import { tabsForAdoptedScope } from "../sql/shared/tabScope";
+import { stateForAdoptedWorkspace } from "../sql/shared/tabScope";
 import { readQueryLog, restoreQueryLog } from "../sql/utils/queryLogBundle";
 import { SqlTabBar } from "../sql/components/SqlTabBar";
 import { SETTINGS_TAB_ID } from "../playgroundTabs";
@@ -245,6 +245,8 @@ import {
 import { useSqlTabManagement } from "../sql/hooks/useSqlTabManagement";
 import { useViewDataTabAutoRun } from "../sql/hooks/useViewDataTabAutoRun";
 import { useSchemaTree } from "../sql/hooks/useSchemaTree";
+import { useEditorResultsSplit } from "../sql/hooks/useEditorResultsSplit";
+import { EDITOR_SPLIT_STORAGE_SUFFIX } from "../sql/utils/editorSplit";
 import type {
   AddRowDialogState,
   ColumnKeyHints,
@@ -270,8 +272,24 @@ import { computeVisibleTypeGroups } from "../sql/utils/columnTypeSelector";
 
 const PLAYGROUND_ID = duckdbAdapter.playgroundId;
 const STORAGE_PREFIX = duckdbAdapter.storagePrefix;
-const { dbScopedKey, loadTabs, saveTabs, setWorkspaceScope } =
-  createTabStorage(STORAGE_PREFIX, PLAYGROUND_ID);
+const {
+  dbScopedKey,
+  loadTabs,
+  saveTabs,
+  seedTabs,
+  loadActiveTabId,
+  setWorkspaceScope,
+  readActiveDbId,
+  writeActiveDbId,
+} = createTabStorage(STORAGE_PREFIX, PLAYGROUND_ID);
+
+/** The database this workspace holds, as far as storage says; an id naming
+ *  nothing known resolves to the first sample, as the engine would. */
+function storedDbId(): string {
+  return findDuckDbSampleDatabase(
+    readActiveDbId() ?? DUCKDB_SAMPLE_DATABASES[0].id,
+  ).id;
+}
 
 const DUCKDB_DB_ACTIONS: readonly DatabaseSelectorAction[] = [
   {
@@ -1040,16 +1058,23 @@ function DuckDbPlaygroundInner() {
   );
 
   // ─── Engine / UI state ───────────────────────────────────────────────
-  const initialDbId =
-    typeof window === "undefined"
-      ? DUCKDB_SAMPLE_DATABASES[0].id
-      : (localStorage.getItem(storageKey("db")) ??
-        DUCKDB_SAMPLE_DATABASES[0].id);
+  // Read once: the boot corrects it (`adoptWorkspace`) when the resolved
+  // workspace turns out to hold a different database.
+  const [initialDbId] = useState(() =>
+    typeof window === "undefined" ? DUCKDB_SAMPLE_DATABASES[0].id : storedDbId(),
+  );
   const [activeDbId, setActiveDbId] = useState(initialDbId);
   const [tabs, setTabs] = useState<QueryTab[]>(() =>
     loadTabs(initialDbId, findDuckDbSampleDatabase(initialDbId).defaultTabs),
   );
-  const [activeTabId, setActiveTabId] = useState(() => tabs[0]?.id ?? "");
+  // Restored here rather than in an effect: the effect that persists the
+  // active tab runs first on mount, and used to overwrite the remembered tab
+  // with the first one before anything read it.
+  const [activeTabId, setActiveTabId] = useState(() =>
+    typeof window === "undefined"
+      ? (tabs[0]?.id ?? "")
+      : loadActiveTabId(initialDbId, tabs),
+  );
   const [resultsByTab, setResultsByTab] = useState<
     Record<string, QueryRunResult | null>
   >({});
@@ -1461,18 +1486,24 @@ function DuckDbPlaygroundInner() {
     [],
   );
 
-  // Tabs are read in a `useState` initializer, before the workspace bootstrap
-  // has resolved, so they can come from the wrong workspace's keys. Once the
-  // real one is known, move onto its keys and re-read if it moved.
-  const adoptWorkspaceTabScope = useCallback(
-    (workspaceId: string) => {
-      const dbId = activeDbIdRef.current;
-      const adopted = tabsForAdoptedScope({
+  // The database and its tabs are read in `useState` initializers, before
+  // the workspace bootstrap has resolved, so they can belong to the wrong
+  // workspace. Once the real one is known, move onto its keys and its
+  // database, and re-read the tabs if either moved. Returns the database the
+  // engine should boot.
+  const adoptWorkspace = useCallback(
+    (workspaceId: string): string => {
+      // A debounced save still pending belongs to the scope it was made in.
+      flushPendingSave();
+      const currentDbId = activeDbIdRef.current;
+      const adopted = stateForAdoptedWorkspace({
         setWorkspaceScope,
         workspaceId,
-        readTabs: () =>
+        currentDbId,
+        readDbId: storedDbId,
+        readTabs: (dbId) =>
           loadTabs(dbId, findDuckDbSampleDatabase(dbId).defaultTabs),
-        readActiveTabId: () => {
+        readActiveTabId: (dbId) => {
           try {
             return localStorage.getItem(dbScopedKey(dbId, "active_tab"));
           } catch {
@@ -1480,13 +1511,17 @@ function DuckDbPlaygroundInner() {
           }
         },
       });
-      if (!adopted) return;
-      persistTabs(adopted.tabs, dbId);
+      if (!adopted) return currentDbId;
+      activeDbIdRef.current = adopted.dbId;
+      setActiveDbId(adopted.dbId);
+      persistTabs(adopted.tabs, adopted.dbId);
       tabHistoryRef.current = [];
+      activeTabIdRef.current = adopted.activeTabId;
       setActiveTabId(adopted.activeTabId);
       setResultsByTab({});
+      return adopted.dbId;
     },
-    [persistTabs],
+    [flushPendingSave, persistTabs],
   );
 
   const refreshSchema = useCallback(async () => {
@@ -1946,28 +1981,11 @@ function DuckDbPlaygroundInner() {
       `${savedOutputFontEnabled ? savedOutputSize : savedSize}px`,
     );
 
-    // Restore the active tab id for this database.
-    try {
-      const savedActiveTab = localStorage.getItem(
-        dbScopedKey(initialDbId, "active_tab"),
-      );
-      if (
-        savedActiveTab &&
-        tabsRef.current.some((tab) => tab.id === savedActiveTab)
-      ) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setActiveTabId(savedActiveTab);
-      }
-    } catch {
-      /* ignore */
-    }
-
     return () => {
       document.body.classList.remove("playground-active");
       clearThemePalette();
     };
   }, [
-    initialDbId,
     setClearBeforeRunState,
     setEditorThemeState,
     setFontSizeState,
@@ -2025,12 +2043,13 @@ function DuckDbPlaygroundInner() {
         // Resolve (or auto-create) the active workspace so DuckDB can restore
         // OPFS state. Best-effort: no OPFS just means purely in-memory.
         let workspaceId: string | null = null;
+        let bootDbId = activeDbIdRef.current;
         try {
           const workspace = await ensureActiveWorkspace(PLAYGROUND_ID);
           workspaceId = workspace.id;
           setActiveWorkspace({ id: workspace.id, name: workspace.name });
           setWorkspaceSaved(workspace.saved);
-          adoptWorkspaceTabScope(workspace.id);
+          bootDbId = adoptWorkspace(workspace.id);
           const noticeKey = `playground_ws_warned_${workspace.id}`;
           try {
             if (window.sessionStorage.getItem(noticeKey) !== "1") {
@@ -2052,7 +2071,7 @@ function DuckDbPlaygroundInner() {
           /* proceed in-memory */
         }
         const engine = await duckdbAdapter.createEngine(
-          initialDbId,
+          bootDbId,
           workspaceId,
           setBootRawFraction,
         );
@@ -2063,6 +2082,9 @@ function DuckDbPlaygroundInner() {
           return;
         }
         engineRef.current = engine;
+        // Pin the workspace to its database, so it reopens on this one
+        // whatever is chosen elsewhere on the device in the meantime.
+        writeActiveDbId(bootDbId);
         await refreshSchemas();
         await refreshSchema();
         setLoaded(true);
@@ -2327,27 +2349,14 @@ function DuckDbPlaygroundInner() {
             ? await engine.loadBlankDatabase()
             : await engine.loadSampleDatabase(nextId);
         setActiveDbId(sample.id);
-        try {
-          localStorage.setItem(storageKey("db"), sample.id);
-        } catch {
-          /* ignore */
-        }
-        const nextTabs = loadTabs(sample.id, sample.defaultTabs);
+        writeActiveDbId(sample.id);
+        // The workspace's database was just replaced, so its tabs start over.
+        // Restoring the ones last saved for this id brought back queries
+        // written against an earlier copy of it.
+        const nextTabs = seedTabs(sample.defaultTabs);
         persistTabs(nextTabs, sample.id);
-        // Try to restore active tab id for this DB.
-        let nextActive = nextTabs[0]?.id ?? "";
-        try {
-          const savedActive = localStorage.getItem(
-            dbScopedKey(sample.id, "active_tab"),
-          );
-          if (savedActive && nextTabs.some((tab) => tab.id === savedActive)) {
-            nextActive = savedActive;
-          }
-        } catch {
-          /* ignore */
-        }
         tabHistoryRef.current = [];
-        setActiveTabId(nextActive);
+        setActiveTabId(nextTabs[0]?.id ?? "");
         setResultsByTab({});
         selectedSchemaRef.current = "main";
         setSelectedSchema("main");
@@ -2695,29 +2704,13 @@ function DuckDbPlaygroundInner() {
         setExpandedEntities(new Set());
         setActiveDbId(DUCKDB_BLANK_DATABASE.id);
         setCustomDbFilename(filename);
-        try {
-          localStorage.setItem(storageKey("db"), DUCKDB_BLANK_DATABASE.id);
-        } catch {
-          /* ignore */
-        }
-        const nextTabs = loadTabs(
-          DUCKDB_BLANK_DATABASE.id,
-          DUCKDB_BLANK_DATABASE.defaultTabs,
-        );
+        writeActiveDbId(DUCKDB_BLANK_DATABASE.id);
+        // A fresh start, as for a sample: the tabs saved for the blank slot
+        // belong to whatever database last occupied it.
+        const nextTabs = seedTabs(DUCKDB_BLANK_DATABASE.defaultTabs);
         persistTabs(nextTabs, DUCKDB_BLANK_DATABASE.id);
-        let nextActive = nextTabs[0]?.id ?? "";
-        try {
-          const savedActive = localStorage.getItem(
-            dbScopedKey(DUCKDB_BLANK_DATABASE.id, "active_tab"),
-          );
-          if (savedActive && nextTabs.some((tab) => tab.id === savedActive)) {
-            nextActive = savedActive;
-          }
-        } catch {
-          /* ignore */
-        }
         tabHistoryRef.current = [];
-        setActiveTabId(nextActive);
+        setActiveTabId(nextTabs[0]?.id ?? "");
         setResultsByTab({});
         report?.("Reading schema");
         await refreshSchema();
@@ -2744,7 +2737,14 @@ function DuckDbPlaygroundInner() {
   // Same flow as performImportSqlDump, but loads a binary .duckdb image
   // (the binary section of a cloud/share bundle) instead of replaying SQL.
   const performImportDuckDbImage = useCallback(
-    async (image: Uint8Array, filename: string, report?: ImportStepReporter) => {
+    async (
+      image: Uint8Array,
+      filename: string,
+      report?: ImportStepReporter,
+      /** A cloud/share bundle saves its own tabs under the blank slot before
+       *  importing; restore those instead of starting over. */
+      restoreSavedTabs = false,
+    ) => {
       const engine = engineRef.current;
       if (!engine) return;
       setStatusState("loading");
@@ -2763,29 +2763,17 @@ function DuckDbPlaygroundInner() {
         setExpandedEntities(new Set());
         setActiveDbId(DUCKDB_BLANK_DATABASE.id);
         setCustomDbFilename(filename);
-        try {
-          localStorage.setItem(storageKey("db"), DUCKDB_BLANK_DATABASE.id);
-        } catch {
-          /* ignore */
-        }
-        const nextTabs = loadTabs(
-          DUCKDB_BLANK_DATABASE.id,
-          DUCKDB_BLANK_DATABASE.defaultTabs,
-        );
+        writeActiveDbId(DUCKDB_BLANK_DATABASE.id);
+        const nextTabs = restoreSavedTabs
+          ? loadTabs(DUCKDB_BLANK_DATABASE.id, DUCKDB_BLANK_DATABASE.defaultTabs)
+          : seedTabs(DUCKDB_BLANK_DATABASE.defaultTabs);
         persistTabs(nextTabs, DUCKDB_BLANK_DATABASE.id);
-        let nextActive = nextTabs[0]?.id ?? "";
-        try {
-          const savedActive = localStorage.getItem(
-            dbScopedKey(DUCKDB_BLANK_DATABASE.id, "active_tab"),
-          );
-          if (savedActive && nextTabs.some((tab) => tab.id === savedActive)) {
-            nextActive = savedActive;
-          }
-        } catch {
-          /* ignore */
-        }
         tabHistoryRef.current = [];
-        setActiveTabId(nextActive);
+        setActiveTabId(
+          restoreSavedTabs
+            ? loadActiveTabId(DUCKDB_BLANK_DATABASE.id, nextTabs)
+            : (nextTabs[0]?.id ?? ""),
+        );
         setResultsByTab({});
         report?.("Reading schema");
         await refreshSchema();
@@ -3558,63 +3546,15 @@ function DuckDbPlaygroundInner() {
   );
 
   // ─── Resizer (vertical, between results panel and editor) ────────────
-  useEffect(() => {
-    const resizer = resizerRef.current;
-    const panes = panesRef.current;
-    const editorPane = editorPaneRef.current;
-    const resultsPane = resultsPaneRef.current;
-    if (!resizer || !panes || !editorPane || !resultsPane) return;
-    let dragging = false;
-    let startY = 0;
-    let startEditorH = 0;
-    let startResultsH = 0;
-    const onDown = (e: MouseEvent) => {
-      dragging = true;
-      startY = e.clientY;
-      startEditorH = editorPane.offsetHeight;
-      startResultsH = resultsPane.offsetHeight;
-      resizer.classList.add("dragging");
-      document.body.style.cursor = "row-resize";
-      document.body.style.userSelect = "none";
-    };
-    const onMove = (e: MouseEvent) => {
-      if (!dragging) return;
-      const total = startEditorH + startResultsH;
-      if (total <= 0) return;
-      const dy = e.clientY - startY;
-      const editorH = Math.min(
-        total - Math.round(total * 0.15),
-        Math.max(Math.round(total * 0.15), startEditorH + dy),
-      );
-      const editorFrac = editorH / total;
-      panes.style.gridTemplateRows = `auto minmax(0, ${editorFrac}fr) 6px minmax(0, ${1 - editorFrac}fr)`;
-    };
-    const onUp = () => {
-      if (!dragging) return;
-      dragging = false;
-      resizer.classList.remove("dragging");
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-    };
-    resizer.addEventListener("mousedown", onDown);
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onUp);
-    return () => {
-      resizer.removeEventListener("mousedown", onDown);
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
-    };
-  }, []);
-
-  // Clear any inline gridTemplateRows set by the resizer when entering
-  // view-data or er-diagram mode.
-  useEffect(() => {
-    const panes = panesRef.current;
-    if (!panes) return;
-    if (activeTab?.kind === "view-data" || activeTab?.kind === "er-diagram") {
-      panes.style.gridTemplateRows = "";
-    }
-  }, [activeTab?.kind]);
+  const panesSplitStyle = useEditorResultsSplit(
+    {
+      resizer: resizerRef,
+      panes: panesRef,
+      editorPane: editorPaneRef,
+      resultsPane: resultsPaneRef,
+    },
+    storageKey(EDITOR_SPLIT_STORAGE_SUFFIX),
+  );
 
   // ─── Sidebar resizer (horizontal, between sidebar and panes) ─────────
   useEffect(() => {
@@ -4063,6 +4003,8 @@ function DuckDbPlaygroundInner() {
         await performImportDuckDbImage(
           bundle.database,
           bundle.sql.databaseLabel ?? bundle.name,
+          undefined,
+          true,
         );
         // A cloud save is the owner's own; a share is someone else's copy,
         // whose `personal` section is not ours to absorb.
@@ -4852,11 +4794,10 @@ function DuckDbPlaygroundInner() {
           }}
           onCreateNew={async () => {
             if (!pendingDbId) return;
-            try {
-              localStorage.setItem(storageKey("db"), pendingDbId);
-            } catch { /* ignore */ }
             const label = findDuckDbSampleDatabase(pendingDbId).label;
             const newWs = await createWorkspace(`${label} Workspace`, PLAYGROUND_ID);
+            // Recorded against the new workspace only: this one keeps its own.
+            writeActiveDbId(pendingDbId, newWs.id);
             setPendingDbId(null);
             switchActiveWorkspace(PLAYGROUND_ID, newWs.id);
           }}
@@ -5744,6 +5685,7 @@ function DuckDbPlaygroundInner() {
           />
           <main
             ref={panesRef}
+            style={panesSplitStyle}
             className={`sql-panes duckdb-panes${activeTab?.kind === "view-data" ? " sql-panes--view-data" : ""}${activeTab?.kind === "er-diagram" ? " sql-panes--er-diagram" : ""}${activeTab?.kind === "query-history" ? " sql-panes--query-history" : ""}${isSettingsTabActive ? " sql-panes--settings" : ""}`}
           >
             <h1 className="playground-sr-title">DuckDB playground</h1>

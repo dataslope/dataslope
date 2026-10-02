@@ -487,3 +487,38 @@ export const SQLITE_SAMPLE_DATABASES: SqliteSampleDatabase[] = [
 export function findSampleDatabase(id: string): SqliteSampleDatabase {
   return findSqlSampleById(id, SQLITE_SAMPLE_DATABASES);
 }
+
+/** Id of the empty database "New Database" creates. */
+export const SQLITE_BLANK_DATABASE_ID = "__blank__";
+
+export function isSqliteSampleId(id: string): boolean {
+  return SQLITE_SAMPLE_DATABASES.some((s) => s.id === id);
+}
+
+/**
+ * The identity of a database id that names no sample: the blank database, or
+ * one imported from a file (`__imported_<name>__`). Never seeded. Anything
+ * that has to turn a persisted id back into a database goes through
+ * `sqliteDatabaseForId` rather than `findSampleDatabase`, whose fallback to
+ * the first sample relabelled a blank or imported workspace as that sample
+ * (and seeded it, when the file was still empty).
+ */
+export function sqliteNonSampleDatabase(id: string): SqliteSampleDatabase {
+  const blank = id === SQLITE_BLANK_DATABASE_ID;
+  return {
+    id,
+    label: blank ? "Blank Database" : "Imported Database",
+    filename: blank ? "blank.sqlite" : "database.sqlite",
+    description: blank ? "Empty database" : "Imported database",
+    schema: "",
+    seed: () => {},
+    defaultTabs: [{ title: "Query 1", code: "" }],
+  };
+}
+
+/** The sample `id` names, else its non-sample identity. */
+export function sqliteDatabaseForId(id: string): SqliteSampleDatabase {
+  return isSqliteSampleId(id)
+    ? findSampleDatabase(id)
+    : sqliteNonSampleDatabase(id);
+}

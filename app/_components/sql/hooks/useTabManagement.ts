@@ -9,7 +9,7 @@ import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import type { QueryTab } from "../../sqlitePlaygroundTabs";
 import { newTabId, saveTabs } from "../../sqlitePlaygroundTabs";
-import { findSampleDatabase } from "../../runtime/sqliteSamples";
+import { sqliteDatabaseForId } from "../../runtime/sqliteSamples";
 import { replaceDoc } from "../utils/editorUtils";
 import { pickFallbackTab, pushTabHistory } from "../utils/tabUtils";
 import { useEngineStore } from "../stores/useEngineStore";
@@ -330,7 +330,7 @@ export function useTabManagement(
 
   const resetTabsForCurrentDb = useCallback(() => {
     const sample =
-      customDb?.id === activeDbId ? customDb : findSampleDatabase(activeDbId);
+      customDb?.id === activeDbId ? customDb : sqliteDatabaseForId(activeDbId);
     const fresh = sample.defaultTabs.map((seed) => ({
       ...seed,
       id: newTabId(),

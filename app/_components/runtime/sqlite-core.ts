@@ -16,7 +16,10 @@ import {
 } from "./sqlite-wasm";
 import {
   findSampleDatabase,
-  SQLITE_SAMPLE_DATABASES,
+  isSqliteSampleId,
+  sqliteDatabaseForId,
+  sqliteNonSampleDatabase,
+  SQLITE_BLANK_DATABASE_ID,
   type SqliteSampleDatabase,
   type SqliteSampleMetadata,
 } from "./sqliteSamples";
@@ -649,7 +652,12 @@ export async function createSqliteEngineInProcess(
 ): Promise<InProcessSqliteEngine> {
   const sqlite3 = await loadSqlite3();
   let db: Database | null = null;
-  let active: SqliteSampleDatabase = findSampleDatabase(initialSampleId);
+  // A persisted id that names no sample is a blank or imported database. It
+  // used to resolve through `findSampleDatabase`, i.e. to the first sample:
+  // every reload relabelled the workspace as that sample (seeding it, if the
+  // file was still empty) and the UI then saved its tabs under that sample's
+  // keys, so the next reload restored an older set of tabs.
+  let active: SqliteSampleDatabase = sqliteDatabaseForId(initialSampleId);
 
   // With an OPFS-backed VFS the file is opened once and reused; sample
   // switches wipe the schema so the on-disk file tracks the active sample.
@@ -771,7 +779,9 @@ export async function createSqliteEngineInProcess(
     active = sample;
   }
 
-  await build(active, { skipSeed: openOptions.skipSeed });
+  await build(active, {
+    skipSeed: openOptions.skipSeed || !isSqliteSampleId(active.id),
+  });
 
   function require(): Database {
     if (!db) throw new Error("SQLite database is not initialised");
@@ -806,17 +816,8 @@ export async function createSqliteEngineInProcess(
       // *first* sample, which on boot relabelled a restored workspace with a
       // database it does not contain. Adopt the blank identity instead and
       // leave the persisted file untouched.
-      const known = SQLITE_SAMPLE_DATABASES.some((s) => s.id === id);
-      if (!known) {
-        active = {
-          id,
-          label: "Imported Database",
-          filename: "database.sqlite",
-          description: "Imported database",
-          schema: "",
-          seed: () => {},
-          defaultTabs: [{ title: "Query 1", code: "" }],
-        };
+      if (!isSqliteSampleId(id)) {
+        active = sqliteNonSampleDatabase(id);
         if (!db) db = openFresh();
         db.exec("PRAGMA foreign_keys = ON;");
         const { seed: _seed, ...meta } = active;
@@ -1386,16 +1387,7 @@ export async function createSqliteEngineInProcess(
         db = openFresh();
       }
       db!.exec("PRAGMA foreign_keys = ON;");
-      const blank: SqliteSampleDatabase = {
-        id: "__blank__",
-        label: "Blank Database",
-        filename: "blank.sqlite",
-        description: "Empty database",
-        schema: "",
-        seed: () => {},
-        defaultTabs: [{ title: "Query 1", code: "" }],
-      };
-      active = blank;
+      active = sqliteNonSampleDatabase(SQLITE_BLANK_DATABASE_ID);
       const { seed: _seed, ...meta } = active;
       return meta;
     },

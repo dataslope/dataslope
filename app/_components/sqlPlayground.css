@@ -684,8 +684,14 @@
      → drag handle (6px) → results (resizable). The two `1fr` tracks
      are wrapped with `minmax(0, …)` so each pane can shrink below its
      content's intrinsic size and lets its inner scroll containers
-     handle overflow correctly. */
-  grid-template-rows: auto minmax(0, 0.55fr) 6px minmax(0, 1.45fr);
+     handle overflow correctly. The drag handle moves the split through
+     the two custom properties (`useEditorResultsSplit`) rather than an
+     inline track list, so the `--view-data` / `--er-diagram` / … layouts
+     below override the tracks without discarding the split, and a query
+     tab comes back at the height it was left. */
+  grid-template-rows:
+    auto minmax(0, var(--sql-editor-fr, 0.55fr)) 6px
+    minmax(0, var(--sql-results-fr, 1.45fr));
   min-height: 0;
   /* Same rationale as `.sql-editor-pane min-width: 0` below, keep this
      grid track inside its parent so children become the scroll
@@ -4457,7 +4463,9 @@ html[data-playground-theme="dark"] .sql-result-th-type {
 }
 
 .postgres-panes {
-  grid-template-rows: auto minmax(0, 0.55fr) 6px minmax(0, 1.45fr);
+  grid-template-rows:
+    auto minmax(0, var(--sql-editor-fr, 0.55fr)) 6px
+    minmax(0, var(--sql-results-fr, 1.45fr));
 }
 
 /* In view-data mode the editor and resizer are hidden; collapse their

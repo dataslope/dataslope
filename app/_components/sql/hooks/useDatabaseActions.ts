@@ -9,7 +9,7 @@ import type { QueryTab } from "../../sqlitePlaygroundTabs";
 import {
   newTabId,
   saveTabs,
-  storageKey,
+  writeActiveDbId,
 } from "../../sqlitePlaygroundTabs";
 import { SQLITE_SAMPLE_DATABASES } from "../../runtime/sqliteSamples";
 import { replaceDoc } from "../utils/editorUtils";
@@ -122,14 +122,11 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
       setCustomDb(isCustom ? sample : null);
       setActiveDbId(sample.id);
       activeDbIdRef.current = sample.id;
-      try {
-        // Imported databases are persisted too. Skipping them left the *old*
-        // sample's id in storage, so a reload restored that sample's label and
-        // query tabs over the imported database's own data.
-        localStorage.setItem(storageKey("db"), sample.id);
-      } catch {
-        // ignore
-      }
+      // Imported databases are persisted too. Skipping them left the *old*
+      // sample's id in storage, so a reload restored that sample's label and
+      // query tabs over the imported database's own data. Recorded against
+      // this workspace, which is the one whose file was just overwritten.
+      writeActiveDbId(sample.id);
       await applyPragmasToEngine(engine, pragmaSettingsRef.current);
       const [nextTables, nextViews, nextIndexes, nextTriggers] = await Promise.all([
         engine.listTables(),
