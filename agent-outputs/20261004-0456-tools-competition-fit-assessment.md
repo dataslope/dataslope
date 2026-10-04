@@ -1,6 +1,6 @@
 # Tools Competition: Is Dataslope a Candidate?
 
-**Date:** 2026-10-04 (revised the same day with the owner's answers: US-based, ~100 members, ~50 unique visits a day, willing to log research data and update the privacy policy)
+**Date:** 2026-10-04 (revised the same day with the owner's answers: US-based, ~100 members, ~50 unique visits a day, willing to log research data and update the privacy policy; revised again after the owner asked whether re-adding AI could be the new feature)
 **Question:** Could Dataslope apply to the Tools Competition (<https://tools-competition.org/>), and with what?
 **Method:** the competition's public pages for the 2027 cycle (overview, official rules, FAQ, the four track pages, the learning-engineering page), read against what this repository says Dataslope is and does.
 
@@ -11,7 +11,7 @@
 - **No partner is required.** Not a community college, not an employer, not a researcher, at any level, in any track (§3.1). A partner helps the equity and demand scores; its absence does not disqualify.
 - **The research-data condition is met** by the owner's willingness to add opt-in logging and change the privacy policy.
 
-What is left is **novelty**. A Catalyst proposal "must detail how funding will be used to create or develop the tool", so the money has to build something that does not exist yet. §6 works through the candidate ideas and recommends one.
+What is left is **novelty**. A Catalyst proposal "must detail how funding will be used to create or develop the tool", so the money has to build something that does not exist yet. §6 works through the candidate ideas. The recommendation is to **re-add AI, rebuilt as hints designed for learning**: offered only after a failed attempt, checked by running a hidden fix in the learner's browser before they are shown, and judged by what learners can then do without them (§6.3). AI autocomplete stays out. Work-sample skill checks (§6.4) remain the alternative.
 
 The Phase I abstract is due **Tuesday 13 October 2026**. Phase II (the full proposal, by invitation) is due 21 January 2027.
 
@@ -59,10 +59,10 @@ The rules also give the competition the right to "publish and communicate to the
 ## 2. Dataslope, as this repository describes it
 
 - **What it is.** "Courses and coding playgrounds that run entirely in your browser. No install, no setup, no sign-up, no paywall." (`README.md`). 32 courses (~850 pages across Python and data science, SQL, R, JavaScript/TypeScript/React/CSS, C, C++, Java, C#, and `how-llms-work`) and 6 role-based interview tracks (data analyst, data scientist, data engineer, analytics engineer, ML engineer, backend engineer).
-- **How it teaches.** ~3,900 runnable code blocks, ~3,270 multiple-choice checks with per-choice explanations, and roughly a thousand auto-graded challenges (§7.1). 14 language runtimes execute in WebAssembly on the learner's device, plus Git and Bash playgrounds.
+- **How it teaches.** ~3,900 runnable code blocks, ~3,270 multiple-choice checks with per-choice explanations, and roughly a thousand auto-graded challenges (§7). 14 language runtimes execute in WebAssembly on the learner's device, plus Git and Bash playgrounds.
 - **The SQL workbench.** Not a query box: a schema tree with tables, views, indexes and triggers; multiple query tabs; a sortable, filterable, editable result grid; `EXPLAIN`; import and export; three real engines (PostgreSQL via PGlite, DuckDB, SQLite) with sample databases loaded (`README.md`, "SQL workbench"; `app/playground/{postgres,duckdb,sqlite}`).
 - **Price.** Free with or without an account; the terms commit that free content stays free. A Pro tier exists in code but is hidden (`SHOW_PRO_PLAN = false`).
-- **AI.** None. An assistant and AI autocomplete were built and removed (`DEVELOPMENT.md`).
+- **AI.** None today. An "Ask AI" chat (signed-in only, answering with the lesson page as context) and a Pro-only AI autocomplete were built, then removed on 2026-09-25 in #696; at removal their usage tables held 14 + 14 daily counter rows and 2 rated answers (`DEVELOPMENT.md`, `migrations/auth/0011_drop_ai_tables.sql`).
 - **Learner data.** Deliberately minimal: signed-in users sync only a verdict per challenge (`migrations/auth/0010_create_challenge_progress.sql`, "Only the verdicts are stored, not the learner's code"); analytics are cookieless and aggregate.
 - **Educators.** No teacher or classroom features.
 - **Licensing.** Code MIT; learning content CC BY-NC 4.0, classroom use explicitly allowed (`LICENSE`, `LICENSE-CONTENT`).
@@ -78,7 +78,7 @@ The rules also give the competition the right to "publish and communicate to the
 | Reimagining K-12 Assessment | Primarily K-12 | Worldwide | Weak |
 | Strengthening K-12 Teaching | K-12 educators | Worldwide | None |
 
-The postsecondary track targets learners who "are often working or raising families, are the first in their families to attend college, and have limited financial resources", including people "transitioning between education and work", and wants them to build "durable, technical, and AI-related skills". It has three lanes: *Teaching, Learning and Skill Development*; *Assessment and Skills Recognition* (formative assessment, portfolios, digital credentials, competency-based education); and *Learner Success and Pathways*. Dataslope's content sits in the first, and the recommended proposal (§6) puts the new work in the second.
+The postsecondary track targets learners who "are often working or raising families, are the first in their families to attend college, and have limited financial resources", including people "transitioning between education and work", and wants them to build "durable, technical, and AI-related skills". It has three lanes: *Teaching, Learning and Skill Development*; *Assessment and Skills Recognition* (formative assessment, portfolios, digital credentials, competency-based education); and *Learner Success and Pathways*. Dataslope's content sits in the first, and so does the recommended proposal (§6.3); the alternative (§6.4) sits in the second.
 
 ### 3.1 Without a community-college partner
 
@@ -100,12 +100,12 @@ This track funds "data collection and processing, limiting product development",
 
 | Criterion | Dataslope today | With the proposal in §6 |
 | --- | --- | --- |
-| Novelty | Low. A strong free course site in a crowded category; its real differentiators (14 runtimes client-side, the SQL workbench, no login) already exist, so a grant cannot fund them. | Medium to high: authentic, workplace-realistic skill checks with verifiable results are not what free coding sites offer. |
+| Novelty | Low. A strong free course site in a crowded category; its real differentiators (14 runtimes client-side, the SQL workbench, no login) already exist, so a grant cannot fund them. | Medium. AI coding help is crowded, so novelty rests on hints checked by execution and on measuring unassisted learning (§6.3). |
 | Impact | Unknown. No efficacy evidence. | To be measured; the proposal should say how. |
 | Equity | Medium. Free and account-free; but English only, heavy first downloads, no outreach. | Medium to high with a named learner group and a low-bandwidth plan. |
 | Demand | Low: ~100 members, ~50 visits a day. Acceptable at Catalyst, which needs no users. | Strengthen with learner interviews or a waitlist before Phase II. |
-| Learning engineering | Low today, by design. | High: browser execution makes rich process data cheap to capture, and the owner has committed to collecting it. |
-| Scalability | High. Edge-served, client-executed, near-zero marginal cost, open licences. | Unchanged. |
+| Learning engineering | Low today, by design. | High: a randomized study of hint designs with an unassisted outcome is learning engineering in the competition's own terms. |
+| Scalability | High. Edge-served, client-executed, near-zero marginal cost, open licences. | Still high for practice. AI hints add the one per-learner cost, which §6.3 bounds. |
 
 ## 5. Remaining gaps, most expensive first
 
@@ -114,7 +114,8 @@ This track funds "data collection and processing, limiting product development",
 3. **Learning engineering.** Committed in principle. The proposal needs to name what will be logged, the consent flow, how researchers get access, and two or three research questions.
 4. **Demand.** Low but adequate for Catalyst. Anything that shows learners want the new thing helps: a waitlist, a short survey of current members, a few quotes.
 5. **Equity targeting.** Name the learners, address bandwidth (a service worker that caches runtimes; steering a first visit to the lighter runtimes), and say how the work reaches people who would not find it on their own.
-6. **Content licence (minor).** CC BY-NC supports the public-goods argument and allows classroom use, but bars commercial reuse. Worth one sentence; see §7.4 for the case where it matters.
+6. **AI cost and trust** (if §6.3). The only per-learner cost in the product, and learner code sent to a model provider. §6.3 covers both; the abstract should too.
+7. **Content licence (minor).** CC BY-NC supports the public-goods argument and allows classroom use, but bars commercial reuse. Worth one sentence.
 
 ## 6. Making it new
 
@@ -126,84 +127,89 @@ The competition funds what the money creates, and judges its novelty against wha
 
 | Idea | Exists? | As the novelty | Where it belongs in the proposal |
 | --- | --- | --- | --- |
-| WASM runtimes: unlimited execution, no login | Yes | No. In-browser runtimes are established (Pyodide, JupyterLite, DuckDB-WASM), and the grant cannot fund what is built. | **The enabler.** It is the scalability and equity argument: practice costs nothing to serve, and nobody has to sign up. |
-| Embedded exercises, including SQL | Yes | No. Embedded auto-graded exercises are the norm. Reviewers from the learning-engineering community will also know Runestone Academy: free, open-source interactive CS textbooks with runnable code, an instructor side, and its own Learning Engineering and Analytics Portal. "Free interactive textbook with research data" is taken. | The raw material: ~1,000 tasks with tests and reference solutions (§7.1). |
-| Full-IDE SQL workbench, three engines | Yes, and unusual | Not on its own: it is built, and browser SQL tools exist outside education. But **it is the best foundation for something that is new** (§6.3): it is the difference between a query box and the environment a junior analyst actually works in. | The assessment environment. |
-| Programmatic videos with Remotion | No | Weak as the centerpiece. It changes how lessons are produced, not what a learner can do, and video is a passive format the rubric's "likelihood to improve learning" will not favour over practice. | **The experiment.** Generating a worked-example video for every task is what makes a large randomized comparison (video vs. text vs. none) affordable. Phase 2 material, not the pitch. |
+| WASM runtimes: unlimited execution, no login | Yes | No. In-browser runtimes are established (Pyodide, JupyterLite, DuckDB-WASM), and the grant cannot fund what is built. | **The enabler.** It is the scalability and equity argument: practice costs nothing to serve, and nobody has to sign up. It is also what makes the hint check in §6.3 free. |
+| Embedded exercises, including SQL | Yes | No. Embedded auto-graded exercises are the norm. Reviewers from the learning-engineering community will also know Runestone Academy: free, open-source interactive CS textbooks with runnable code, an instructor side, and its own Learning Engineering and Analytics Portal. "Free interactive textbook with research data" is taken. | The raw material: ~1,000 challenges with tests and reference solutions (§7). |
+| Full-IDE SQL workbench, three engines | Yes, and unusual | Not on its own: it is built, and browser SQL tools exist outside education. | The environment for §6.4, and a strong "why us". |
+| Programmatic videos with Remotion | No | Weak as the centerpiece. It changes how lessons are produced, not what a learner can do, and video is a passive format the rubric's "likelihood to improve learning" will not favour over practice. | A later experiment arm (video vs. text worked examples), not the pitch. |
+| **Ask AI and AI autocomplete, re-added for learning** | Removed | **Yes, if rebuilt as a different feature** (§6.3). AI coding help as such is the most crowded idea in the category; the novelty has to come from how the help is checked and from measuring what learners can do without it. Leave autocomplete out. | **The recommended core.** |
 
-### 6.3 Recommended: work-sample skill checks for entry-level data jobs
+### 6.3 Recommended: AI hints built for learning
 
-**One sentence:** free, browser-based work-sample assessments for entry-level data roles, done in a real SQL and Python workbench, auto-scored, verifiable, and instrumented for research, so a career changer can prove they can do the job without paying for a bootcamp or a certificate.
+**Verdict.** Re-adding AI can be the new feature, and the 2027 cycle invites it. The overview says "The strongest proposals will show not only what AI can enable, but how it can be responsibly used, trusted, and sustained in real learning environments", asks entrants to "Embed safety, privacy, and responsibility into tool design and implementation", and calls this "a critical moment to build tools steeped in evidence that people can trust". Three conditions decide whether a re-added AI counts as new.
 
-**What is new**, each piece something Dataslope does not have today:
+**1. It must be a different feature from the one removed.** The old Ask AI (removed 2026-09-25 in #696) was a general chat that answered questions with the lesson page as context, for signed-in users only; the autocomplete was Pro-only ghost text. Neither was designed around learning, and when they were removed the usage tables held 14 + 14 daily counter rows and 2 rated answers. Re-adding either as it was would read as a feature, not a tool, and the old usage cannot be offered as demand.
 
-1. **Authentic tasks, not exercises.** A "skill check" is a short, realistic job task in the full workbench: a messy table to clean, a stakeholder question to answer with a query, a slow query to diagnose with `EXPLAIN`, a CSV to import and join. Scored on the result, not on matching a reference query. Starts with one role (data analyst), mapped to a published competency list.
-2. **AI-era tasks.** A family of checks where the learner is handed an AI-written query or analysis with a subtle error and must find and fix it. Checking AI output is a core skill for "an increasingly AI-driven world", the track's own phrase. The flawed artefacts are generated once, offline, so no model runs per learner and the zero-marginal-cost property survives.
-3. **Results others can verify.** Practice stays in the browser and free. Claiming a result re-runs the learner's final submission once, server-side, against hidden tests. The pieces exist: the repo already runs lesson code headlessly for prepopulated outputs (`scripts/lib/block-runners.mjs`), and PGlite and DuckDB run under Node. The learner gets a shareable record (task, date, evidence) that an advisor or employer can check, which is the *Assessment and Skills Recognition* lane exactly.
-4. **A research instrument underneath.** Opt-in, consented logging of every run, error, test result and workbench action (tables browsed, tabs opened, `EXPLAIN` used); de-identified releases in an open format (ProgSnap2 is the established one for programming-process data); and an A/B hook. Research questions it can answer: which errors predict a learner giving up; whether worked examples help adult career changers more than hints; how learners debug AI-written code, and whether that is teachable.
+**2. Leave AI autocomplete out.** The evidence runs against it for beginners:
 
-**Why Dataslope can do it for $50,000:** the runtimes, the workbench, the grading harnesses and ~1,000 validated tasks already exist, and serving a learner costs nothing. The grant pays for task design, the verification service, the logging and consent work, and a first study.
+- Prather et al. (ICER 2024) observed 21 novices programming with generative AI. Those already doing well went faster; those who were struggling picked up new metacognitive difficulties on top of the old ones: interruption from frequent AI suggestions, misleading code suggestions, and a false sense of progress. Ghost-text autocomplete is the form that delivers all three.
+- Bastani et al. (PNAS 2025), a field experiment with nearly a thousand high-school maths students: unrestricted GPT-4 raised practice performance by 48% and lowered exam performance by 17% once access was removed. A version with guardrails raised practice performance by 127% and left exam performance about where the control group's was. **The guardrails removed the harm; they did not produce a gain.**
 
-**Public goods:** the task bank with its scoring harness (§7), the de-identified process dataset, and the competency map.
+The language autocomplete that is not AI (clang, Roslyn, the TypeScript service, the static lists) is unaffected and stays.
 
-### 6.4 A draft pitch paragraph
+**3. The novelty must come from what only Dataslope can do, and from the evidence.** Pedagogically guarded chat already exists (CS50's duck, presented at SIGCSE 2024), and generating hints from failing tests and then validating them is published work (Phung et al., LAK 2024, validate hints with a simulated student model). What Dataslope adds:
 
-The abstract form's questions and word limit are not on the public pages, so this is a starting point to cut to fit, not a finished answer:
+- **Hints checked by execution.** With each hint the model also writes a hidden candidate fix. The learner's own browser runs that fix against the challenge's tests in the runtime already loaded, and the hint is shown only if the fix passes. Help that is confidently wrong, Prather's "misleading code suggestions", is filtered out before the learner sees it, in all 14 runtimes, at no server cost for the check. Model-written code runs in the same sandbox as the learner's own.
+- **Grounded in what actually happened.** The hint is written from the challenge, the learner's code, and the real test results and errors of the run they just made, not from the model's guess at what the code would do.
+- **Measured on work done without it.** Courses revisit skills, so tagging challenges by skill turns a later one into a ready-made unassisted post-test. That puts Bastani's question to a population with much less evidence behind it: self-directed adults learning on their own, outside a classroom. Most of the published studies are classroom studies.
 
-> Career changers trying to move into data work have two ways to show they are ready: a paid certificate that tests recall, or a portfolio nobody verifies. Dataslope will build free work-sample skill checks for entry-level data roles: short, realistic tasks done in a full SQL and Python workbench that runs entirely in the learner's browser, with no install, no account and no cost to serve. Tasks include checking and correcting AI-generated analyses, a core skill in AI-assisted workplaces. Results are verified by re-running the final submission server-side and can be shared with advisors and employers. With learner consent, every run, error and workbench action is logged and released de-identified, together with the task bank and its scoring harness, so researchers can study how adults learn to do authentic technical work, and test which feedback helps them.
+**What the $50,000 builds:**
 
-## 7. Publishing the challenge set as a public benchmark
+- **Help after an attempt, on that attempt.** A "Get a hint" button on a failing test, not a chat box. Nothing before the first run.
+- **A ladder, one rung at a time:** what the failing test expected and what it got; which concept is involved, posed as a question; which line to look at; a worked example on a different problem. Never the solution code: the existing "Reveal solution?" button stays the separate, explicit way out.
+- **A line of self-explanation** before the third rung: the learner writes what they think is wrong.
+- **Fading:** fewer rungs offered as a learner shows mastery of a skill.
+- **A fallback:** if no verified fix can be found, say so and offer the first rung only, rather than an unchecked hint.
+- **Opt-in logging:** attempt, rung shown, verified or rejected, next edit, pass or fail, and the later unassisted result.
 
-### 7.1 What a benchmark is
+**The study (the learning-engineering core).** Randomize consenting learners, per skill, between no AI hints, AI hints, and execution-verified AI hints. Measure practice success, success on the later same-skill challenge with no help available, and return within seven days. Leave out an unrestricted-chat arm: Bastani has already shown it harms, and an ethics board will ask why it is there. The question, in one line: **can AI help be designed to improve what learners can do without it, not merely avoid harming it?**
 
-A benchmark is a **fixed, versioned set of tasks plus an automatic scorer**, published so that anyone can run their own system on the same tasks and compare results. The tasks are the questions; the scorer turns an attempt into a number with no human in the loop; and the version freezes both, so a number reported in 2027 still means the same thing in 2029. Well-known examples in code are HumanEval (164 Python problems with unit tests) and MBPP (about 1,000 short Python problems); researchers use them to measure code-generation models.
+**Running cost: the part reviewers will probe hardest.** Everything else in Dataslope costs nothing per learner; AI does not, and the competition's word is "sustained".
 
-Dataslope already has the expensive half. Counted in this repository:
+- Hints only after a failed attempt, short, from a small model, under per-user daily caps and a global daily ceiling. Both caps were designed and built before (`agent-outputs/20260701-1107-ask-ai-cloudflare-implementation.md`).
+- **Cache by failure signature.** Learners fail the same test the same way. Key verified hints on challenge, failing test and error signature, and reuse them. Every new learner raises the hit rate, so the cost per learner should fall as use grows. That is a hypothesis to measure, and a good one to state.
+- Pre-generate and verify hints offline for the most common failures, starting with the biggest courses.
+- Keep "no sign-up": guests get a few hints a day behind Cloudflare Turnstile, which the old design also covered.
 
-| Source | Count | Has tests | Has a reference solution |
-| --- | --- | --- | --- |
-| Challenge catalog (`lib/challenges/`) | ~300 | yes | yes (`solutionCode`, per language) |
-| In-lesson code challenge cards (`content/`) | ~640 | yes | yes (`solutionCode`) |
-| In-lesson SQL challenge cards | ~57 | yes | yes (`solutionSql`) |
+**Trust and privacy.** Learner code goes to a model provider, so the privacy policy, a consent step, and a provider whose terms exclude training on and retaining the data all need to be in place. The old design's rule that code, program output and lesson text are data, never instructions, carries over.
 
-The reference solutions are already submitted and checked against their own tests by an end-to-end sweep (`e2e/challenge-solutions.spec.ts` for the lesson cards), which is the property a benchmark most needs and most often gets wrong.
+**Public goods.** The hint system, released under MIT like the rest of the code, and a de-identified dataset of challenge, code, failing test, rung shown, verification result, outcome and later unassisted result. Real attempts paired with the hints given and what happened next are scarce, and AI-tutoring research needs them. This meets the public-goods rule without the benchmark (§7).
 
-### 7.2 Why it matters to this competition
+**Draft pitch paragraph.** The abstract form's questions and word limit are not on the public pages, so this is a starting point to cut to fit:
 
-The official rules ask every entrant for "public goods and shared infrastructure, such as datasets, benchmarks, and evaluation frameworks". A published task bank answers that directly. It is also more useful to education researchers than another "can a model solve it" set, because frontier models already solve beginner problems. Two more useful uses:
+> AI makes beginners faster at practice and, without guardrails, worse on their own: in a field experiment, students who practised with unrestricted GPT-4 scored 17% lower once it was taken away, and guardrails only brought them back to even. Dataslope, a free platform where Python, SQL and a dozen other languages run entirely in the learner's browser, will build AI hints designed to leave career changers able to code without them. Help is offered only after a failed attempt, one step at a time, and never as the answer. Each hint is backed by a hidden fix that the learner's own browser runs against the challenge's tests before the hint is shown, so wrong help never reaches the learner, at no server cost. With consent, we will randomize hint designs and measure what matters: whether learners then solve a later problem on the same skill with no help at all. The hint system and a de-identified dataset of attempts, hints and outcomes will be released openly.
 
-- **An item bank for assessment research.** Once learners attempt the tasks, each one gets a measured difficulty and a list of common wrong answers. Calibrated, open, auto-scored items are reusable by anyone building an assessment.
-- **A benchmark for AI feedback.** Pair each task with real wrong attempts from consenting learners and their test results, and the question becomes: given this learner's broken code, does a tutor's hint lead them to a fix without giving the answer away? That is a question AI-tutoring researchers need answered and have few open datasets for, and it only exists if the logging in §6.3 exists.
+### 6.4 Alternative: work-sample skill checks for entry-level data jobs
 
-### 7.3 How to publish it
+Still sound, and the better choice if AI's running cost or the provider question is a dealbreaker. **One sentence:** free, browser-based work-sample assessments for entry-level data roles, done in the SQL and Python workbench, auto-scored, verifiable, and instrumented for research.
 
-1. **Export.** A script that walks `lib/challenges/` and the challenge cards in `content/` and writes one JSON record per task: id, language or SQL dialect, instructions, starter code, reference solution, tests, setup data (`initSql`, datasets), difficulty, skill tags, and the source lesson's URL.
-2. **Scorer.** A command-line harness that runs a submission against a task's tests headlessly, reusing the runners and harnesses the site already has, packaged as a container so results reproduce.
-3. **Validate.** Every reference solution passes and every starter fails; drop or fix the tasks that do not.
-4. **Split.** Publish most tasks openly and hold a test split back, scoring it on request; anything public ends up in model training data, which quietly inflates scores. Add a canary string to the released files so model builders can filter them out.
-5. **Document.** A datasheet: what the tasks are, where they came from, who wrote them, intended uses, known limits.
-6. **Host and cite.** A GitHub repository for the code, a Hugging Face dataset for the tasks, and a Zenodo DOI so papers can cite a specific version.
-7. **Baselines.** Run a few open models and report the scores, so the first user has something to compare against.
+1. **Authentic tasks, not exercises.** A short, realistic job task in the full workbench: a messy table to clean, a stakeholder question to answer with a query, a slow query to diagnose with `EXPLAIN`, a CSV to import and join. Scored on the result. One role first (data analyst), mapped to a published competency list.
+2. **AI-era tasks.** The learner is handed an AI-written query or analysis with a subtle error and must find and fix it. The flawed artefacts are generated once, offline, so nothing runs per learner. These fit inside §6.3 too, as one more kind of challenge.
+3. **Results others can verify.** Claiming a result re-runs the final submission once, server-side, against hidden tests, reusing the headless runners in `scripts/lib/block-runners.mjs` (PGlite and DuckDB also run under Node). This is the *Assessment and Skills Recognition* lane.
+4. **A research instrument underneath.** The same opt-in logging, plus workbench actions (tables browsed, tabs opened, `EXPLAIN` used).
 
-### 7.4 The licence question
+It costs nothing per learner to run, but needs new tasks written, and its research question is less sharp than §6.3's.
 
-The content is CC BY-NC 4.0. Fine for academic research; but whether evaluating a commercial model counts as commercial use is unclear, and that ambiguity alone stops some labs and companies from using an NC benchmark. If wide use matters more than the restriction, release the benchmark subset under CC BY 4.0 and keep the course content as it is. That is a decision for the owner, not something the competition requires.
+## 7. The public benchmark (set aside)
+
+The owner is not pursuing this. For reference: a benchmark is a fixed, versioned set of tasks plus an automatic scorer, published so others can compare their systems on the same tasks. Dataslope's challenges would be most of one: ~300 in the catalog (`lib/challenges/`), ~640 code and ~57 SQL challenge cards in lessons, all with tests and reference solutions, which an end-to-end sweep already checks (`e2e/challenge-solutions.spec.ts`). The competition does not require a benchmark; §6.3's dataset and open-source hint system meet the public-goods rule.
 
 ## 8. Before 13 October
 
 - [x] Confirm the applicant's base: US. Track: Navigating Postsecondary Learning and Work.
 - [x] Choose the level: Catalyst.
+- [ ] Decide between §6.3 (AI hints, recommended) and §6.4 (work-sample checks).
 - [ ] Take the eligibility quiz to confirm: <https://toolscompetition.fillout.com/27-eligibility-quiz>.
 - [ ] Read the abstract form's actual questions, word limit and deadline time zone: <https://tools-competition.org/27-submissions/>.
-- [ ] Write the abstract around §6.3, with the learning-engineering intention and the public goods (§7) stated explicitly. State the current numbers plainly; Catalyst does not penalise a small base.
+- [ ] Write the abstract around the chosen concept, stating the research intention, the public goods, and (for §6.3) how cost and privacy are handled. State the current numbers plainly; Catalyst does not penalise a small base.
 - [ ] Optional but useful: book office hours (<https://toolscompetition.fillout.com/office-hours>) and ask whether a second entry in Building Better Datasets is allowed.
-- [ ] After submitting: start on a research partner (the competition's researcher database) and some evidence of demand, both for Phase II in January.
+- [ ] After submitting: find a research partner (the competition's researcher database), who will also carry the ethics review the study in §6.3 needs, and gather some evidence of demand, both for Phase II in January.
 
 ## Caveats
 
 - Competition facts come from its own pages, read on 2026-10-04. Some fetches returned text from the previous cycle ("Phase II is now closed"); the dates above come from the homepage, the 2027 official rules and the 2027 track pages, which agree with each other. Confirm on the site.
 - The postsecondary page mentions a supplemental Open edX Deployment Prize (up to $100,000) that was not corroborated elsewhere. Dataslope is not built on Open edX, so it is unlikely to apply.
-- Challenge counts in §7.1 are from grepping this repository and are approximate.
+- Challenge counts are from grepping this repository and are approximate.
+- The research findings in §6.3 are summarised from the papers' abstracts and coverage; read the papers before quoting their numbers in a proposal.
 - Nothing here measures Dataslope's efficacy; there is no data on it yet.
 
 ## Sources
@@ -218,4 +224,9 @@ The content is CC BY-NC 4.0. Fine for academic research; but whether evaluating 
 - Strengthening K-12 Teaching: <https://tools-competition.org/27-teaching/>
 - Learning engineering: <https://tools-competition.org/learning-engineering/>
 - Runestone Academy, Learning Engineering and Analytics Portal: <https://guide.runestone.academy/Introduction.html>
+- Bastani et al., "Generative AI without guardrails can harm learning: Evidence from high school mathematics", PNAS 2025: <https://papers.ssrn.com/abstract=4895486>
+- Prather et al., "The Widening Gap: The Benefits and Harms of Generative AI for Novice Programmers", ICER 2024: <https://arxiv.org/abs/2405.17739>
+- Liu et al., "Teaching CS50 with AI", SIGCSE 2024: <https://cs.harvard.edu/malan/publications/V1fp0567-liu.pdf>
+- Phung et al., "Automating Human Tutor-Style Programming Feedback: Leveraging GPT-4 Tutor Model for Hint Generation and GPT-3.5 Student Model for Hint Validation", LAK 2024: <https://arxiv.org/abs/2310.03780>
+- The PR that removed both AI features: <https://github.com/dataslope/dataslope/pull/696>
 - Announcement (third party, dated 2026-09-11): <https://opportunitiesforyouth.org/2026/09/11/2027-tools-competition-multi-million-dollar-funding-opportunity-for-innovative-education-technology-ai-tools-and-learning-datasets/>
