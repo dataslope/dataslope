@@ -2,6 +2,7 @@
 
 **Date:** 2026-10-04 (revised the same day with the owner's answers: US-based, ~100 members, ~50 unique visits a day, willing to log research data and update the privacy policy; revised again after the owner asked whether re-adding AI could be the new feature)
 **Question:** Could Dataslope apply to the Tools Competition (<https://tools-competition.org/>), and with what?
+**Next:** the application strategy, built from past winners, is `agent-outputs/20261004-2210-tools-competition-application-strategy.md`.
 **Method:** the competition's public pages for the 2027 cycle (overview, official rules, FAQ, the four track pages, the learning-engineering page), read against what this repository says Dataslope is and does.
 
 **Short answer:** yes. Enter the **Navigating Postsecondary Learning and Work** track at the **Catalyst** level ($50,000).
