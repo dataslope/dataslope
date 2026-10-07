@@ -19,13 +19,14 @@ Per **million tokens** (MTok), the standard unit:
 | Number | What it is | Typical relationship |
 | --- | --- | --- |
 | **Input** | Tokens you send | The baseline |
-| **Output** | Tokens generated | **5 to 6 times input** |
-| **Cached input** | Repeated prefix, already processed | **About 10% of input** |
+| **Output** | Tokens generated | **5 times input, sometimes more** |
+| **Cached input** | Repeated prefix, already processed | **10% of input or less** |
 | **Cache write** | Storing a prefix for reuse | Slightly above input |
 | **Batch** | Asynchronous, hours not seconds | **About 50% off** |
 
 Those relationships are remarkably stable across vendors and across
-years, even as the absolute prices fall.
+years, even as the absolute prices fall. The one that has moved, the
+cache discount, has only moved in your favor.
 
 ## Why output costs more than input
 
@@ -46,8 +47,8 @@ previous token, so none of it can be parallelized within a single
 response. The hardware spends most of its time moving weights around
 rather than computing.
 
-A five-to-six-fold price difference is the market's reflection of a
-real efficiency gap.
+A price difference of five times or more is the market's reflection of
+a real efficiency gap.
 
 ## Why cached input is so cheap
 
@@ -55,6 +56,12 @@ If you send the same 50,000-token prefix on every turn, the provider
 can store its processed internal state and skip recomputing it. What
 you pay for is retrieving that state rather than producing it, which
 is roughly a tenth of the work.
+
+A tenth of the input price was the standard rate for years, and during
+2026 some providers went further. As of October 2026, Anthropic's
+Claude Opus 5.5 and Sonnet 5.5 and OpenAI's GPT-6.1 Sol charge a
+twentieth of the input price for a cache hit, and Claude Fable 5.1
+charges a fortieth.
 
 <Figure
   slug="llm-pricing-structure-cached-input-so-inline-cutout"
@@ -67,40 +74,53 @@ match on an **exact prefix**. A single changed byte anywhere in the
 prefix invalidates everything after it, which is why putting a
 timestamp at the top of a system prompt quietly costs a fortune.
 
-## The landscape, August 2026
+## The landscape, October 2026
 
-Illustrative published rates, USD per million tokens. Treat these as a
+Illustrative published rates, USD per million tokens, for prompts below
+each model's long-prompt threshold (next section). Treat these as a
 snapshot of *shape*, not as current figures.
 
 | Model | Input | Output | Ratio |
 | --- | --- | --- | --- |
-| Claude Opus 5 | $5.00 | $25.00 | 5x |
-| Claude Sonnet 5 | $3.00 | $15.00 | 5x |
-| Claude Haiku 4.5 | $1.00 | $5.00 | 5x |
-| GPT-5.6 (frontier tier) | $5.00 | $30.00 | 6x |
-| GPT-5.6 (mid tier) | $2.00 | $12.00 | 6x |
-| GPT-5.6 (small tier) | $0.20 | $1.20 | 6x |
-| Gemini 3.5 Flash | $1.50 | $9.00 | 6x |
-| Gemini 3.1 Flash-Lite | $0.25 | $1.50 | 6x |
+| Claude Fable 5.1 | $10.00 | $50.00 | 5x |
+| Claude Opus 5.5 | $4.00 | $20.00 | 5x |
+| Claude Sonnet 5.5 | $2.00 | $10.00 | 5x |
+| Claude Haiku 5.5 | $0.10 | $0.50 | 5x |
+| GPT-6 Astra | $10.00 | $50.00 | 5x |
+| GPT-6.1 Sol | $2.00 | $10.00 | 5x |
+| GPT-6 Luna | $0.10 | $0.50 | 5x |
+| Gemini 3.1 Pro (preview) | $2.00 | $12.00 | 6x |
+| Gemini 3.8 Flash | $0.75 | $3.75 | 5x |
+| Gemini 3.5 Flash-Lite | $0.30 | $2.50 | 8x |
 
-Two things to notice. The output-to-input ratio is 5x or 6x in every
-single row, across three vendors. And the spread from cheapest to most
-expensive is a factor of about 25, which means **model selection is
-usually a bigger cost lever than prompt optimization**.
+Three things to notice. The output-to-input ratio is 5x in eight of the
+ten rows, across three vendors, and never lower. The spread from
+cheapest to most expensive is a factor of 100, which means **model
+selection is usually a bigger cost lever than prompt optimization**.
+(This course's August 2026 snapshot showed about 25; since then the
+cheapest Claude tier has fallen tenfold, and OpenAI has joined
+Anthropic in selling a \$10 tier.) And a price can carry an expiry
+date: the Gemini 3.8 Flash rate is a promotion that ends on December
+31, 2026, when it doubles to \$1.50 and \$7.50.
+
+A per-token price is also only half a comparison, because the same text
+is a different number of tokens on different models. *Token Counts in
+Practice* shows by how much.
 
 <CodeBlock
   adapter="python"
   files={[
     {
       filename: "main.py",
-      starterCode: `# Published rates, USD per million tokens (August 2026 snapshot).
+      starterCode: `# Published rates, USD per million tokens (October 2026 snapshot).
 MODELS = {
-    "opus-tier":     {"in": 5.00, "out": 25.00},
-    "frontier-gpt":  {"in": 5.00, "out": 30.00},
-    "sonnet-tier":   {"in": 3.00, "out": 15.00},
-    "flash-tier":    {"in": 1.50, "out": 9.00},
-    "haiku-tier":    {"in": 1.00, "out": 5.00},
-    "lite-tier":     {"in": 0.25, "out": 1.50},
+    "fable-tier":    {"in": 10.00, "out": 50.00},
+    "opus-tier":     {"in": 4.00, "out": 20.00},
+    "pro-tier":      {"in": 2.00, "out": 12.00},
+    "sonnet-tier":   {"in": 2.00, "out": 10.00},
+    "flash-tier":    {"in": 0.75, "out": 3.75},
+    "flash-lite":    {"in": 0.30, "out": 2.50},
+    "haiku-tier":    {"in": 0.10, "out": 0.50},
 }
 
 # A typical request: long prompt, short answer.
@@ -122,12 +142,32 @@ print(f"Spread across tiers: {spread:.0f}x for the same request.")
   ]}
 />
 
+## Watch for a length threshold
+
+Half the rows in that table are flat: a 900,000-token prompt pays the
+same per-token rate as a 9,000-token one. The other half are not. Once
+a prompt passes a threshold, the whole request is billed at a higher
+rate:
+
+| Model (October 2026) | Threshold | Input rate above it | Output rate above it |
+| --- | --- | --- | --- |
+| Claude Haiku 5.5 | 100,000 tokens | 5x | 5x |
+| Gemini 3.1 Pro (preview) | 200,000 tokens | 2x | 1.5x |
+| OpenAI GPT-6 family | 272,000 tokens | 2x | 1.5x |
+
+The threshold is part of the price. A workload that sends the occasional
+huge document can cost several times what the headline rate suggests,
+and splitting or trimming that one request below the line can be worth
+more than any other optimization on it.
+
 <Callout type="info" title="Prices fall, structure does not">
 Per-token prices dropped by roughly 80% between early 2025 and early
-2026, and comparable falls happened in the years before. What did not
-move: the output multiple, the caching discount, and the batch
-discount. Build your cost model on the structure and it will survive
-the next price cut.
+2026, and they kept falling: between this course's August and October
+2026 snapshots, the cheapest Claude tier went from \$1.00 to \$0.10 per
+million input tokens. What did not move: the output multiple and the
+batch discount. The caching discount moved in one direction only, from
+a tenth toward a twentieth or a fortieth. Build your cost model on the
+structure and it will survive the next price cut.
 </Callout>
 
 ## Concept check
@@ -151,17 +191,17 @@ between the two phases.`}
 <MultipleChoice
   markdown={`Cached input typically costs what fraction of normal input?
 
-- About half.
+- About half, in exchange for the storage.
   > The discount is considerably deeper than this.
-- About a quarter.
+- About a quarter, on every provider.
   > Still short of the usual figure.
-- It is free once cached.
+- Nothing, once the prefix is stored.
   > Retrieval has a real cost, just a small one.
-- [o] About a tenth.
-  > Retrieving stored internal state is roughly a tenth of the work of computing it.
+- [o] A tenth, and less on some newer models.
+  > Retrieving stored state is roughly a tenth of the work of computing it, and several 2026 models price a hit at a twentieth or a fortieth.
 
-A tenth is the number to remember, and it is consistent across
-providers.`}
+A tenth is the number to remember as the ceiling. The newest models have
+gone below it.`}
 />
 
 <MultipleChoice
@@ -180,16 +220,16 @@ Exact-prefix matching is what makes a variable header so expensive.`}
 />
 
 <MultipleChoice
-  markdown={`In the August 2026 snapshot, what was true of every model listed?
+  markdown={`In the October 2026 snapshot, what was true of every model listed?
 
 - All had the same input price.
-  > Input prices ranged over a factor of twenty.
-- All offered a one-million-token context window.
-  > Window sizes varied by model.
-- [o] All had output priced at 5x or 6x their input.
-  > The ratio held across three vendors and every tier, which is why it is the structural fact worth learning.
-- All were priced above $1 per million input tokens.
-  > The lite tier was $0.25.
+  > Input prices ranged over a factor of a hundred.
+- All charged one rate whatever the prompt length.
+  > Claude Haiku 5.5, Gemini 3.1 Pro, and the GPT-6 family charge more past a threshold.
+- [o] All had output priced at 5x their input or more.
+  > The ratio was 5x in eight rows and higher in the other two, across three vendors, which is why it is the structural fact worth learning.
+- All were priced above \\$1 per million input tokens.
+  > The cheapest tiers were \\$0.10.
 
 Absolute prices vary widely; the output multiple barely varies at all.`}
 />
@@ -198,7 +238,7 @@ Absolute prices vary widely; the output multiple barely varies at all.`}
   markdown={`Which lever usually reduces cost most?
 
 - [o] Moving suitable traffic to a cheaper model tier.
-  > The spread between tiers is roughly 25x, which dwarfs what prompt trimming can achieve.
+  > The spread between tiers is roughly 100x, which dwarfs what prompt trimming can achieve.
 - Rewriting the prompt to be 20% shorter.
   > Worthwhile, and a modest saving compared with the alternative.
 - Reducing the requested output length by 20%.
@@ -225,19 +265,35 @@ You trade latency for roughly half the price.`}
 />
 
 <MultipleChoice
-  markdown={`Per-token prices fell about 80% between early 2025 and early 2026. What did not change?
+  markdown={`Per-token prices fell steeply through 2025 and 2026. Which parts of the structure held?
 
-- [o] The output multiple, the caching discount, and the batch discount.
-  > These structural ratios have held steady across several rounds of price cuts.
+- [o] The output multiple and the batch discount.
+  > Both held across every round of price cuts, which is why a cost model built on them lasts.
+- The caching discount, fixed at a tenth.
+  > It moved, and only downward: several 2026 models charge a twentieth or a fortieth.
 - The context window sizes on offer.
-  > Windows grew substantially over the same period.
+  > Windows grew substantially, and the small tiers caught up with the large ones.
 - The absolute cost of a typical request.
   > That fell along with the per-token prices.
-- The set of vendors in the market.
-  > The competitive landscape shifted.
 
 Building your cost model on ratios rather than absolute prices makes it
-durable.`}
+durable, as long as you re-check the one ratio that moves.`}
+/>
+
+<MultipleChoice
+  markdown={`A workload occasionally sends a 300,000-token prompt to a model whose price list has a 272,000-token threshold. What happens to that request's bill?
+
+- Only the 28,000 tokens past the line are billed at the higher rate.
+  > The threshold reprices the whole request, not just the overflow.
+- The request is rejected until the prompt is shortened.
+  > It fits the window and is accepted; it is simply priced differently.
+- [o] The whole request is billed at the higher long-prompt rate.
+  > Crossing the line moves every token of that request to the long-prompt rate, which can be double the headline input price.
+- Nothing, since thresholds apply to monthly volume.
+  > The threshold is per request and measured on prompt length.
+
+A threshold is part of the price, and the occasional oversized request
+is where it bites.`}
 />
 
 <MultipleChoice

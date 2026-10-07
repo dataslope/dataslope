@@ -14,8 +14,8 @@ try them in.
 
 ## 1. Route to the cheapest model that passes
 
-The spread between tiers is roughly 25x. No amount of prompt trimming
-competes with that.
+The spread between tiers is roughly 100x as of October 2026. No amount
+of prompt trimming competes with that.
 
 The mistake is choosing one model for everything, usually the best one,
 because it is the one that passed the hardest test case. Most
@@ -31,8 +31,9 @@ guessing.
   files={[
     {
       filename: "main.py",
-      starterCode: `PRICE = {"lite": (0.25, 1.50), "haiku": (1.00, 5.00),
-         "sonnet": (3.00, 15.00), "opus": (5.00, 25.00)}
+      starterCode: `# USD per million tokens (input, output), October 2026 snapshot.
+PRICE = {"haiku": (0.10, 0.50), "sonnet": (2.00, 10.00),
+         "opus": (4.00, 20.00), "fable": (10.00, 50.00)}
 
 def month(model, in_tok, out_tok, per_day):
     pin, pout = PRICE[model]
@@ -44,7 +45,7 @@ for m in PRICE:
     print(f"  {m:>7}: \${month(m, 600, 15, 50_000):>9,.2f} / month")
 
 everything_on_opus = month("opus", 600, 15, 50_000)
-routed = month("lite", 600, 15, 50_000)
+routed = month("haiku", 600, 15, 50_000)
 print()
 print(f"Saving from routing this one workload: \${everything_on_opus - routed:,.2f}/month")
 `,
@@ -61,7 +62,8 @@ cost is not linear in the saving.
 ## 2. Cache the stable prefix
 
 If a long system prompt, schema, or document repeats across requests,
-caching cuts it to about a tenth.
+caching cuts it to a tenth of the input price, or to a twentieth or a
+fortieth on some of the newest models.
 
 <Figure
   slug="llm-controlling-cost-2-cache-stable-inline-cutout"
@@ -110,8 +112,8 @@ print("Timestamp last   -> everything before it can be cached")
 
 ## 3. Cut output, not input
 
-Output costs 5 to 6 times more per token, so a token saved on the
-output side is worth five or six saved on the input side.
+Output costs five or more times as much per token, so a token saved
+on the output side is worth at least five saved on the input side.
 
 * Ask for the answer only, not the explanation, when you do not need
   the explanation.
@@ -123,7 +125,7 @@ output side is worth five or six saved on the input side.
 <Figure
   slug="llm-controlling-cost-inline-cutout"
   alt="A hopper with an adjustable gate limiting how many chips reach the machine per pass"
-  caption="Every token you do not ask for is one you do not pay for, and an output token costs five or six times an input one."
+  caption="Every token you do not ask for is one you do not pay for, and an output token costs five or more times an input one."
 />
 
 ## 4. Lower the reasoning effort
@@ -158,7 +160,7 @@ expensive.
   markdown={`Which lever typically saves the most?
 
 - [o] Routing suitable traffic to a cheaper model tier.
-  > The roughly 25x spread between tiers dominates every other adjustment.
+  > The roughly 100x spread between tiers dominates every other adjustment.
 - Shortening prompts by removing redundant instructions.
   > Real but small next to the alternatives.
 - Switching from streaming to non-streaming responses.
@@ -191,8 +193,8 @@ Exact matching is what makes deterministic serialization a cost issue.`}
   > Caching applies only to repeated prefixes and does not explain the general rule.
 - Output tokens are counted twice by most providers.
   > They are counted once.
-- [o] Output is priced at 5 to 6 times the input rate.
-  > The ratio means one output token saved equals five or six input tokens saved.
+- [o] Output is priced at five or more times the input rate.
+  > The ratio means one output token saved equals at least five input tokens saved.
 - Output tokens are larger on average.
   > Token size does not differ by side.
 

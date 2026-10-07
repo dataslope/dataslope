@@ -12,10 +12,15 @@ documents, and the output, all counted together.
   alt="A long scroll of content fed through a rectangular viewing frame, with the portions at the two ends brightly lit and the middle section noticeably dimmed, and content beyond the frame edges cut off entirely"
 />
 
-As of August 2026, frontier models advertise windows around one
-million tokens, with output capped separately at a much lower figure
-(commonly around 128,000). Those are two distinct limits and it is
-worth keeping them apart.
+As of October 2026, frontier models advertise windows around one
+million tokens (1.05 million on OpenAI's GPT-6 family), with output
+capped separately at a much lower figure (commonly 128,000, and about
+65,000 on Google's Gemini 3.8 Flash). Those are two distinct limits and
+it is worth keeping them apart.
+
+The window stopped being a premium feature during 2026. Claude Haiku
+5.5, Anthropic's cheapest current model, accepts the same million
+tokens as its flagship, where its predecessor stopped at 200,000.
 
 ## The window is a hard boundary
 
@@ -72,7 +77,12 @@ Two costs, both real.
 
 **Money.** You pay for every input token on every turn. A 500,000-token
 document in a ten-turn conversation is five million billed input
-tokens unless caching intervenes.
+tokens unless caching intervenes. On some models it is also billed at a
+higher rate: as of October 2026, a prompt past 272,000 tokens on
+OpenAI's GPT-6 family or past 200,000 on Gemini 3.1 Pro pays double the
+input rate for the whole request, and past 100,000 on Claude Haiku 5.5
+it pays five times as much. (*Pricing Structure*, later in the course,
+has the full table.)
 
 **Attention quality.** This is the one people underestimate.
 Performance on retrieving a specific fact is not uniform across

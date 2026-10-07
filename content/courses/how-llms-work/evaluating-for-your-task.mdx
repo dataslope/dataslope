@@ -154,11 +154,12 @@ approaches, in order of preference:
     {
       filename: "main.py",
       starterCode: `# Accuracy alone does not choose a model. Cost per correct answer does.
+# Prices: USD per million tokens, October 2026. Accuracies: illustrative.
 options = {
-    "lite":   {"accuracy": 0.86, "in": 0.25, "out": 1.50},
-    "haiku":  {"accuracy": 0.91, "in": 1.00, "out": 5.00},
-    "sonnet": {"accuracy": 0.94, "in": 3.00, "out": 15.00},
-    "opus":   {"accuracy": 0.95, "in": 5.00, "out": 25.00},
+    "haiku":  {"accuracy": 0.91, "in": 0.10, "out": 0.50},
+    "sonnet": {"accuracy": 0.94, "in": 2.00, "out": 10.00},
+    "opus":   {"accuracy": 0.95, "in": 4.00, "out": 20.00},
+    "fable":  {"accuracy": 0.95, "in": 10.00, "out": 50.00},
 }
 IN_TOK, OUT_TOK, VOLUME = 700, 25, 1_000_000
 
@@ -170,8 +171,9 @@ for name, o in options.items():
     print(f"{name:<8}{o['accuracy']:>6.0%}\${monthly:>11,.0f}\${per_correct:>13.6f}")
 
 print()
-print("Opus buys 1 extra point over sonnet for 67% more money.")
-print("Whether that is worth it depends on what an error costs you.")
+print("Opus buys 1 extra point over sonnet for twice the money,")
+print("and fable buys nothing over opus on this task at 2.5x the price.")
+print("Whether a point is worth it depends on what an error costs you.")
 `,
     },
   ]}
@@ -286,7 +288,7 @@ comparable.`}
 />
 
 <MultipleChoice
-  markdown={`What question decides whether a one-point accuracy gain is worth 67% more cost?
+  markdown={`What question decides whether a one-point accuracy gain is worth twice the cost?
 
 - Whether your budget has room for the increase.
   > Affordability is a constraint rather than a justification.

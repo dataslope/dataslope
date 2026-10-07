@@ -67,8 +67,9 @@ Hold onto that. It explains a great deal of behavior later.
 ## A distribution, not a word
 
 The real model does not return `"cat"`. It returns a score for
-**every token in its vocabulary**, typically 50,000 to 200,000 of
-them. Something like:
+**every token in its vocabulary**, typically 100,000 to 260,000 of
+them in current models (early ones made do with about 50,000).
+Something like:
 
 | Token | Probability |
 | --- | --- |
@@ -220,8 +221,8 @@ There is no internal flag separating "recalled" from "constructed".`}
   > Too small to cover common words efficiently.
 - Around 26, one per letter.
   > Character-level vocabularies exist but are not what production models use.
-- [o] Roughly 50,000 to 200,000.
-  > This range balances covering common words as single tokens against the cost of a very wide output layer.
+- [o] Roughly 100,000 to 260,000.
+  > This range balances covering common words as single tokens against the cost of a very wide output layer, and it has grown as models took on more languages.
 - Several million, one per word in every language.
   > A per-word vocabulary is impractically large and still fails on unseen words.
 

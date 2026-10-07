@@ -19,11 +19,12 @@ easy to model.
   files={[
     {
       filename: "main.py",
-      initCode: `PRICES = {
-    "opus":   {"in": 5.00, "out": 25.00, "cached": 0.50},
-    "sonnet": {"in": 3.00, "out": 15.00, "cached": 0.30},
-    "haiku":  {"in": 1.00, "out":  5.00, "cached": 0.10},
-    "lite":   {"in": 0.25, "out":  1.50, "cached": 0.025},
+      initCode: `# USD per million tokens, October 2026 snapshot.
+PRICES = {
+    "fable":  {"in": 10.00, "out": 50.00, "cached": 0.25},
+    "opus":   {"in":  4.00, "out": 20.00, "cached": 0.20},
+    "sonnet": {"in":  2.00, "out": 10.00, "cached": 0.10},
+    "haiku":  {"in":  0.10, "out":  0.50, "cached": 0.01},
 }
 
 def cost(model, input_tokens=0, output_tokens=0, cached_tokens=0):
@@ -42,7 +43,7 @@ for model in PRICES:
           f"= \${c * 100_000:,.2f} per 100k requests")
 
 print()
-print("Same task, same tokens, 20x cost spread across tiers.")
+print("Same task, same tokens, 100x cost spread across tiers.")
 `,
     },
   ]}
@@ -75,22 +76,25 @@ This is where estimates go wrong. Every turn resends everything.
   files={[
     {
       filename: "main.py",
-      initCode: `PRICES = {
-    "opus":   {"in": 5.00, "out": 25.00, "cached": 0.50},
-    "sonnet": {"in": 3.00, "out": 15.00, "cached": 0.30},
-    "haiku":  {"in": 1.00, "out":  5.00, "cached": 0.10},
-    "lite":   {"in": 0.25, "out":  1.50, "cached": 0.025},
+      initCode: `# USD per million tokens, October 2026 snapshot.
+PRICES = {
+    "fable":  {"in": 10.00, "out": 50.00, "cached": 0.25},
+    "opus":   {"in":  4.00, "out": 20.00, "cached": 0.20},
+    "sonnet": {"in":  2.00, "out": 10.00, "cached": 0.10},
+    "haiku":  {"in":  0.10, "out":  0.50, "cached": 0.01},
 }
 
 def conversation_cost(model, turns, system=2000, user=150, reply=400, cached=False):
     p = PRICES[model]
-    total, history = 0.0, system
+    total, history, seen = 0.0, system, 0
     for _ in range(turns):
         history += user
         if cached:
-            # The stable system prefix is cached; the rest is fresh.
-            total += (system / 1e6 * p["cached"]
-                      + (history - system) / 1e6 * p["in"])
+            # Everything sent last turn is read back from the cache;
+            # only what is new since then pays the full input rate.
+            total += (seen / 1e6 * p["cached"]
+                      + (history - seen) / 1e6 * p["in"])
+            seen = history
         else:
             total += history / 1e6 * p["in"]
         total += reply / 1e6 * p["out"]
@@ -115,6 +119,12 @@ Doubling the turns more than doubles the cost. That is the quadratic
 term, and it is why a 40-turn conversation can cost more than eight
 separate 5-turn ones covering the same ground.
 
+The cached column assumes the whole conversation so far is cached,
+which is what the automatic caching modes providers now offer do:
+everything sent on the previous turn is read back at the cache rate,
+and only the newest reply and message pay full price. The first turn
+has nothing to reuse, and every turn after it has more.
+
 ## Thinking tokens
 
 Reasoning output is billed as output, at the output rate, and it is
@@ -125,7 +135,7 @@ usually several times longer than the visible answer.
   files={[
     {
       filename: "main.py",
-      initCode: `PRICES = {"opus": {"in": 5.00, "out": 25.00}, "sonnet": {"in": 3.00, "out": 15.00}}
+      initCode: `PRICES = {"opus": {"in": 4.00, "out": 20.00}, "sonnet": {"in": 2.00, "out": 10.00}}
 
 def request_cost(model, in_tok, visible_out, thinking_out=0):
     p = PRICES[model]
@@ -153,11 +163,12 @@ print("Reasoning effort is the whole difference.")
   files={[
     {
       filename: "main.py",
-      initCode: `PRICES = {
-    "opus":   {"in": 5.00, "out": 25.00, "cached": 0.50},
-    "sonnet": {"in": 3.00, "out": 15.00, "cached": 0.30},
-    "haiku":  {"in": 1.00, "out":  5.00, "cached": 0.10},
-    "lite":   {"in": 0.25, "out":  1.50, "cached": 0.025},
+      initCode: `# USD per million tokens, October 2026 snapshot.
+PRICES = {
+    "fable":  {"in": 10.00, "out": 50.00, "cached": 0.25},
+    "opus":   {"in":  4.00, "out": 20.00, "cached": 0.20},
+    "sonnet": {"in":  2.00, "out": 10.00, "cached": 0.10},
+    "haiku":  {"in":  0.10, "out":  0.50, "cached": 0.01},
 }
 
 def monthly(workloads):
@@ -171,7 +182,7 @@ def monthly(workloads):
         total += month
     return rows, total`,
       starterCode: `workloads = {
-    "ticket classification": {"model": "lite",   "in": 800,   "out": 20,   "per_day": 40_000},
+    "ticket classification": {"model": "haiku",  "in": 800,   "out": 20,   "per_day": 40_000},
     "support replies":       {"model": "haiku",  "in": 2_000, "out": 350,  "per_day": 6_000},
     "document summaries":    {"model": "sonnet", "in": 12_000,"out": 800,  "per_day": 900},
     "code review":           {"model": "opus",   "in": 20_000,"out": 2_000,"per_day": 200},
@@ -232,15 +243,15 @@ invoice.`}
 />
 
 <MultipleChoice
-  markdown={`A workload sends 40,000 requests per day at 800 input tokens each, on a $0.25/MTok tier. Roughly what is the monthly input cost?
+  markdown={`A workload sends 40,000 requests per day at 800 input tokens each, on a \\$0.25/MTok tier. Roughly what is the monthly input cost?
 
-- [o] About $240.
-  > 40,000 times 800 is 32 million tokens per day, or 960 million per month, which at $0.25 per million is around $240.
-- About $2.
+- [o] About \\$240.
+  > 40,000 times 800 is 32 million tokens per day, or 960 million per month, which at \\$0.25 per million is around \\$240.
+- About \\$2.
   > This is off by roughly two orders of magnitude.
-- About $24.
+- About \\$24.
   > Closer, and still an order of magnitude low.
-- About $2,400.
+- About \\$2,400.
   > This would require ten times the volume or ten times the rate.
 
 High volume at a low rate still adds up, which is why the cheap tier
@@ -286,7 +297,7 @@ one intuition picks.`}
 - Because cached tokens are not processed at all.
   > They are processed; the stored state is retrieved rather than recomputed.
 - Because the cache rate includes the input rate already.
-  > The cache rate is roughly a tenth of input, not a superset of it.
+  > The cache rate is a tenth of input or less, not a superset of it.
 - [o] Because they represent the same tokens at a discounted rate.
   > A cached prefix token is charged once, at the cache rate, not at both rates.
 
@@ -294,15 +305,15 @@ Cached input is a price for the same tokens, not an extra line item.`}
 />
 
 <MultipleChoice
-  markdown={`Your per-request cost is $0.00004 and you serve 2 million requests a month. What is the monthly cost?
+  markdown={`Your per-request cost is \\$0.00004 and you serve 2 million requests a month. What is the monthly cost?
 
-- [o] About $80.
-  > Two million multiplied by $0.00004 is $80.
-- About $800.
+- [o] About \\$80.
+  > Two million multiplied by \\$0.00004 is \\$80.
+- About \\$800.
   > This would need ten times the volume.
-- About $8,000.
+- About \\$8,000.
   > This is off by two orders of magnitude.
-- About $8.
+- About \\$8.
   > This underestimates by an order of magnitude.
 
 Negligible-looking per-request costs become real budget lines at

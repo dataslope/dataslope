@@ -19,6 +19,12 @@ being informative once everyone scores near its ceiling.** MMLU is the
 canonical case. The frontier moved past what the test can measure, and
 the reported numbers now differ by less than the measurement error.
 
+It is also happening faster. GPQA Diamond, built to replace MMLU, was
+saturated by 2026, and ARC-AGI-2 went from real headroom at its March
+2025 launch to verified scores above 90% by mid-2026. A benchmark
+in a launch table may have been informative when the table's template
+was first drawn up and not since.
+
 <Figure
   slug="llm-benchmark-pitfalls-1-saturation-inline-cutout"
   alt="A test rig whose gauge is pinned hard at its top stop, three different machines all reading the same"
@@ -44,6 +50,14 @@ test was designed to measure.
 This is rarely deliberate and is very hard to rule out, because
 nobody can fully audit a multi-trillion-token corpus for overlap with
 every benchmark.
+
+It is also not hypothetical. SWE-bench Verified was the coding
+benchmark everyone reported, and was considered hard to contaminate
+because it grades a patch by running the project's tests. In February
+2026 OpenAI stopped reporting it after finding that frontier models
+could reproduce some of its reference fixes from memory (see the
+previous chapter). Running the tests verifies that the patch works; it
+cannot tell you whether the model wrote it or remembered it.
 
 <CodeBlock
   adapter="python"
@@ -93,10 +107,19 @@ The diagnostic questions:
   different reasoning-effort settings can differ by many points, and
   a comparison that runs one model at maximum effort against another
   at default is not a comparison of models.
+* Was it run in the standard harness? Agentic benchmarks wrap the
+  model in a harness that decides what it remembers between steps, and
+  the harness can matter more than the model.
 
-That last one matters more since reasoning effort became tunable. Two
-numbers produced under different budgets are not measuring the same
-thing.
+Those last two matter more every year. The clearest example so far is
+from September 2026: ARC Prize ran OpenAI's GPT-6 Astra on ARC-AGI-3 in
+two harnesses. In ARC's own standard harness, which carries forward
+only the notes the model chooses to keep, it scored 62.7%. In OpenAI's
+harness, which preserves the model's hidden reasoning between moves,
+it scored 99.9%, and for less money.[^arc-astra] Same model, same
+benchmark, same week. Two numbers produced under different
+configurations are not measuring the same thing, and only one of them
+is comparable with other providers' scores.
 
 ## 4. Construct mismatch
 
@@ -129,6 +152,7 @@ which is the next chapter.
     ("Are the standard benchmarks present?", "if not, ask what is missing"),
     ("Are competitor versions current?", "stale comparisons inflate the gap"),
     ("Is the effort or config disclosed?", "undisclosed means not comparable"),
+    ("Is it the standard harness?", "a vendor harness can swing it 30+ points"),
     ("Does the task resemble yours?", "if not, the score does not transfer"),
 ]
 
@@ -212,6 +236,21 @@ quantity.`}
 />
 
 <MultipleChoice
+  markdown={`A launch post reports 99.9% on an agentic benchmark, run in the vendor's own harness. The benchmark's standard harness gave the same model 62.7%. Which number compares with other providers' scores?
+
+- [o] The standard-harness score, since every provider is run the same way.
+  > A shared harness is what makes the comparison apples to apples; the vendor's harness measures its own context-management features too.
+- The vendor-harness score, since it shows the model's real ceiling.
+  > It shows the model plus its vendor's tooling, which other providers were not tested with.
+- Their average, since neither harness is neutral on its own.
+  > Averaging two incomparable numbers produces a third incomparable one.
+- Neither, since agentic benchmarks cannot be compared at all.
+  > They can be, when every model is run in the same harness.
+
+Ask which harness produced a number before comparing it with anything.`}
+/>
+
+<MultipleChoice
   markdown={`What is construct mismatch?
 
 - [o] A benchmark measuring something that does not resemble your task.
@@ -271,3 +310,9 @@ Scale, not secrecy, is the primary barrier.`}
 Relevance is about similarity of task, and it is the question people
 skip.`}
 />
+
+[^arc-astra]:
+    ARC Prize, ["OpenAI's GPT-6 Astra on ARC-AGI-3"](https://arcprize.org/blog/astra),
+    September 3, 2026: 62.7% at maximum effort in ARC's standard harness
+    (\$26,098), and 99.9% at high effort in OpenAI's Provider Adapter
+    harness (\$18,817).
