@@ -20,7 +20,8 @@ You opened the box. Here is what was inside, compressed.
    builds an updated representation from a weighted blend. Cost is
    quadratic in length.
 4. **Layers.** Attention and feed-forward, stacked dozens deep, with
-   most parameters in the feed-forward halves.
+   most parameters in the feed-forward halves, which the largest open
+   models now split into experts that each token only partly uses.
 5. **Softmax and sampling.** Scores become a distribution, and a
    configurable draw picks one token. Then the whole thing repeats.
 
@@ -30,14 +31,15 @@ You opened the box. Here is what was inside, compressed.
 | --- | --- |
 | Cannot count letters in a word | It receives tokens, not characters |
 | Non-English text costs more | The tokenizer was fitted mostly to English |
-| Output costs 5 to 6x input | Input is parallel, output is sequential |
-| Cached input costs a tenth | Stored state is retrieved, not recomputed |
+| Output costs 5x input or more | Input is parallel, output is sequential |
+| Cached input costs a tenth or less | Stored state is retrieved, not recomputed |
 | Same prompt, different answers | Sampling draws from a distribution |
 | Confident hallucinations | Plausible continuation is the only objective |
 | Facts in mid-context get missed | Recall is U-shaped across position |
 | Long conversations cost more than they look | Every turn resends the whole history |
 | Reasoning helps math and not recall | Extra compute restructures, it does not retrieve |
 | Leaderboard rank misses your task | Benchmarks measure benchmarks |
+| One model, two very different scores on one benchmark | The scaffolding around the model is part of the measurement |
 
 ## Three things to actually do
 
@@ -83,7 +85,7 @@ The useful behavior and the dangerous one are the same behavior.`}
 />
 
 <MultipleChoice
-  markdown={`Why is cached input roughly a tenth the price of fresh input?
+  markdown={`Why is cached input a tenth the price of fresh input, or less?
 
 - [o] The processed internal state is retrieved rather than recomputed.
   > Retrieval is roughly a tenth of the work of running the prefix through the model again.
@@ -131,13 +133,13 @@ Measuring your own task beats reading about someone else's.`}
   markdown={`What does this course's material suggest about the durability of specific model names and prices?
 
 - [o] They change quickly, while the structural ratios behind them do not.
-  > The output multiple, the caching discount, and the batch discount have held across multiple rounds of price cuts.
+  > The output multiple and the batch discount have held across many rounds of price cuts, and the caching discount has only grown.
 - They are irrelevant, since only architecture matters.
   > Prices and capabilities matter a great deal for practical decisions.
 - They change only when a new architecture is introduced.
   > Prices change without architectural change.
 - They are stable enough to plan around for several years.
-  > Prices fell roughly 80% in a single year and names change faster.
+  > Prices fell roughly 80% in a single year, the cheapest tiers fell tenfold in two months of 2026, and names change faster.
 
 Learn the ratios and the mechanisms, and re-check the numbers when they
 matter.`}

@@ -148,10 +148,21 @@ times a direct one for the same visible text.
   caption="The reasoning tokens are billed whether or not you ever see them."
 />
 
-Providers expose a control over this: an *effort* level, a thinking
-budget, or a distinct model tier. The specific parameter names change
-frequently, but the concept is stable, and the right default for most
-production work is **the lowest setting that passes your evaluation**.
+Providers expose a control over this. For a while it came in three
+forms (an *effort* level, a thinking budget in tokens, or a distinct
+model tier), and by October 2026 the effort level has largely won.
+Anthropic's newest models reject a fixed thinking budget outright, and
+several flagships no longer let you switch thinking off at all: Claude
+Opus 5.5 and Fable 5.1 always think, and OpenAI's GPT-6 Astra does not
+offer a "none" setting. On those models the lowest effort level is the
+floor.
+
+Defaults move too. Claude Opus 5.5 defaults to a lower effort than the
+Opus 5 it replaced, so the same request can produce a different number
+of thinking tokens after a model swap even at an identical price. The
+specific parameter names change frequently, but the concept is stable,
+and the right default for most production work is **the lowest setting
+that passes your evaluation**, set explicitly rather than inherited.
 
 <Callout type="warn" title="A common and expensive mistake">
 Running every request at maximum reasoning effort because it scores
@@ -264,11 +275,27 @@ The saturation is what makes maximum effort a poor default.`}
 - [o] The lowest setting that passes your evaluation.
   > This captures the steep early gains while avoiding the flat, expensive part of the curve.
 - The provider's default, whatever it happens to be.
-  > Defaults are tuned for general use rather than for your task mix.
+  > Defaults are tuned for general use rather than for your task mix, and they change between model versions.
 - Whichever setting the leading benchmark used.
   > Benchmark configurations optimize for scores, not for your cost profile.
 
 Route by task, and let your own evaluation set the level.`}
+/>
+
+<MultipleChoice
+  markdown={`You move a classification workload to a 2026 flagship that always thinks. How do you keep thinking costs down?
+
+- Set the thinking budget to zero tokens.
+  > The newest models reject a fixed thinking budget, so the request fails instead.
+- Disable thinking in the request parameters.
+  > On these models that setting is refused; thinking is always on.
+- [o] Set the lowest effort level explicitly.
+  > Effort is the remaining control, and it is the floor on models where thinking cannot be switched off.
+- Lower the temperature to make answers shorter.
+  > Temperature does not control how much the model thinks, and many such models reject it anyway.
+
+Effort is the control that survived. Set it on purpose rather than
+inheriting a default.`}
 />
 
 <MultipleChoice

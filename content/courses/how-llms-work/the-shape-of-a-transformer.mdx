@@ -139,6 +139,46 @@ Neither substitutes for the other. A very wide, shallow model has rich
 representations it cannot refine; a very deep, narrow one refines
 repeatedly but has little room to hold intermediate conclusions.
 
+## Mixture of experts: not every parameter runs
+
+Most of the largest open-weight models released since late 2024 change
+one thing about this picture. The feed-forward half of each block is
+split into many smaller networks called **experts**, and a small
+router picks a few of them for each token. The rest of that layer's
+feed-forward parameters sit idle for that token.
+
+So a model now has two parameter counts. DeepSeek-V3 has 671 billion
+parameters and uses 37 billion of them for each token,[^deepseek-v3]
+and OpenAI's open-weight gpt-oss-120b has 117 billion and uses about
+5 billion.[^gpt-oss] The total sets how much the model can store and
+how much memory it takes to serve. The active count sets how much
+computation each token costs. (The closed frontier models do not
+publish their architectures, so neither number is known for them.)
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# A mixture-of-experts feed-forward stack, with illustrative sizes:
+# many experts stored in every layer, a few used for each token.
+d_model, d_ff = 4096, 2048
+n_layers, n_experts, active_per_token = 36, 128, 4
+
+per_expert = 2 * d_model * d_ff          # up and down projections
+stored = n_layers * n_experts * per_expert
+used = n_layers * active_per_token * per_expert
+
+print(f"feed-forward parameters stored:         {stored/1e9:6.1f}B")
+print(f"feed-forward parameters used per token: {used/1e9:6.1f}B")
+print(f"share used per token: {used/stored:.1%}")
+print()
+print("Memory scales with what is stored; compute per token with what is used.")
+`,
+    },
+  ]}
+/>
+
 ## What this does not include
 
 Two things people assume are in the architecture and are not:
@@ -276,3 +316,27 @@ whole stack.`}
 
 Going in and coming out both require a vocabulary-sized matrix.`}
 />
+
+<MultipleChoice
+  markdown={`A mixture-of-experts model has 671 billion parameters and uses 37 billion of them for each token. What does the 37 billion determine?
+
+- How much memory it takes to serve the model.
+  > Every expert has to be loaded, so memory tracks the 671 billion.
+- How many facts the model can store.
+  > Storage capacity tracks the total parameter count.
+- [o] How much computation each token costs.
+  > Only the selected experts run for a token, so the work per token tracks the active count.
+- The size of the context window.
+  > Window size is unrelated to how many experts run.
+
+A mixture-of-experts model is large to store and comparatively cheap to
+run, and its two parameter counts answer those two questions.`}
+/>
+
+[^deepseek-v3]:
+    DeepSeek-AI, *DeepSeek-V3 Technical Report*
+    ([arXiv:2412.19437](https://arxiv.org/abs/2412.19437)), December 2024.
+
+[^gpt-oss]:
+    OpenAI, [gpt-oss-120b model card](https://huggingface.co/openai/gpt-oss-120b)
+    on Hugging Face, August 2025.

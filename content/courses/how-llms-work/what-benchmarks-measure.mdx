@@ -31,32 +31,54 @@ and documented label errors in the dataset cap the achievable score
 near 95%. A benchmark where everyone scores within a few points of
 each other and of the ceiling cannot distinguish anything.
 
-**GPQA Diamond** is the successor for hard reasoning: graduate-level
+**GPQA Diamond** was the successor for hard reasoning: graduate-level
 biology, chemistry, and physics questions written so that non-expert
-PhD holders with web access score only around 34%. It still separates
-models across the 60% to 90% range, though the top of the frontier is
-approaching saturation here too.
+PhD holders with web access score only around 34%. For a while it
+separated models across the 60% to 90% range. By October 2026 it has
+gone the way of MMLU: the leading systems score around 95%, and about
+two dozen of the models one public leaderboard tracks score above
+90%.[^vals-gpqa]
 
 ### Coding
 
-**SWE-bench Verified** is the important one. It presents real GitHub
+**SWE-bench Verified** was the important one, and what happened to it
+is the most instructive story in this chapter. It presents real GitHub
 issues from real repositories and requires a patch that makes the
-repository's own tests pass. It is hard to contaminate at scale,
-because solutions are repository-specific and are verified by actually
-running code rather than by matching text.
+repository's own tests pass. Because success is checked by running
+code rather than by matching text, it was long considered hard to
+contaminate.
 
-This is the benchmark that best predicts agentic coding ability,
-because the task shape matches the real one: read a codebase, make a
-multi-file change, verify it.
+It was not hard enough. In February 2026 OpenAI stopped reporting it,
+after finding that frontier models from several labs could reproduce
+some of its reference fixes from memory, and that most of the hard
+tasks its own models kept failing had tests that rejected correct
+fixes.[^openai-verified] It recommended **SWE-bench Pro** instead, then
+withdrew that recommendation in July 2026 when an audit found roughly
+30% of Pro's tasks broken.[^openai-pro]
+
+The task shape is still the right one: read a codebase, make a
+multi-file change, verify it. That is why repository-patch benchmarks
+remain the best predictor of agentic coding ability. What changed is
+how much trust any single public set of them deserves. Running the
+tests guards against matching text, but not against a model that has
+already seen the patch, and not against a test that is itself wrong.
 
 ### Abstract reasoning
 
 **ARC-AGI-2** presents grid puzzles where you infer a transformation
 rule from a few examples and apply it to a new case. Tasks are
 adversarially filtered so that memorized pattern-matching does not
-solve them, and the evaluation set is kept private. It retains real
-headroom above current models, which makes it one of the few
-benchmarks still measuring something with room to grow.
+solve them, and the evaluation set is kept private. It launched in
+2025 with real headroom above every model, and the best verified
+scores passed 90% during 2026.[^arc-opus5]
+
+Its successor, **ARC-AGI-3**, launched in March 2026 and changes the
+format rather than only the difficulty. Instead of a static grid, the
+system is dropped into a small interactive game and has to work out
+the goal and the rules by playing it. Every frontier model scored under
+1% at launch.[^arc3] By September 2026 the best result on ARC Prize's
+standard harness was 62.7%, which still makes it one of the few
+benchmarks measuring something with room to grow.[^arc-astra]
 
 ### Contamination-resistant suites
 
@@ -73,6 +95,11 @@ evaluations are designed to resist it:
 The shared design principle: **the answers must not be findable in the
 training corpus.**
 
+Resisting contamination does not stop a benchmark from being outgrown.
+HLE was released in January 2025 with every frontier model scoring
+under 10%; by September 2026 the best published scores were around
+60%.[^hle]
+
 ## How to read a score
 
 <CodeBlock
@@ -83,8 +110,8 @@ training corpus.**
       starterCode: `# Whether a gap is meaningful depends on the ceiling and the spread.
 benchmarks = {
     "MMLU":         {"model_a": 0.923, "model_b": 0.917, "ceiling": 0.95},
-    "GPQA Diamond": {"model_a": 0.784, "model_b": 0.742, "ceiling": 1.00},
-    "SWE-bench V":  {"model_a": 0.671, "model_b": 0.598, "ceiling": 1.00},
+    "GPQA Diamond": {"model_a": 0.960, "model_b": 0.954, "ceiling": 1.00},
+    "ARC-AGI-3":    {"model_a": 0.627, "model_b": 0.302, "ceiling": 1.00},
 }
 
 for name, r in benchmarks.items():
@@ -122,7 +149,7 @@ correlate loosely at best.
 - It only measures knowledge from before 2023.
   > Knowledge recency is not what saturation refers to.
 - [o] Top models cluster near the achievable ceiling, so it no longer distinguishes them.
-  > Every frontier system scores above 92% against a ceiling near 95%, leaving no room to separate them.
+  > Every frontier system scores above 92% against a ceiling near 95%, leaving no room to separate them. GPQA Diamond reached the same state in 2026.
 - Models have memorized the entire test set.
   > Contamination is a separate concern from saturation.
 - The benchmark has been withdrawn by its authors.
@@ -132,19 +159,19 @@ A test everyone passes tells you nothing about who is better.`}
 />
 
 <MultipleChoice
-  markdown={`Why is SWE-bench Verified hard to contaminate?
+  markdown={`Why did OpenAI stop reporting SWE-bench Verified in February 2026?
 
-- It changes its problem set every week.
-  > That describes LiveBench rather than SWE-bench.
-- Its problems are generated synthetically at evaluation time.
+- It changes its problem set every week, so scores were not comparable.
+  > That describes LiveBench, and it is not what happened.
+- Its problems are generated synthetically, not drawn from real code.
   > They are drawn from real repository history.
-- Its answers are encrypted in the published dataset.
-  > The dataset is openly available.
-- [o] Solutions are repository-specific and verified by running tests.
-  > A memorized patch does not transfer, and success requires code that actually passes the project's own test suite.
+- [o] Models had seen its fixes, and many hard tasks had broken tests.
+  > Frontier models could reproduce some reference fixes from memory, and most of the hard tasks they kept failing had tests that rejected correct code.
+- Every model already scored 100%, so it could no longer separate them.
+  > The problem was contamination and broken tests, not a perfect score.
 
-Execution-based verification against specific repositories is what
-resists memorization.`}
+Running the tests guards against matching text. It does not guard
+against a model that has already seen the answer.`}
 />
 
 <MultipleChoice
@@ -179,18 +206,19 @@ points.`}
 />
 
 <MultipleChoice
-  markdown={`What makes ARC-AGI-2 unusual among current benchmarks?
+  markdown={`What does ARC-AGI-3 change compared with ARC-AGI-2?
 
-- It is the only benchmark using multiple-choice format.
-  > It uses grid transformations rather than multiple choice.
-- It tests knowledge of recent events.
-  > It tests abstract reasoning with no knowledge component.
-- [o] It retains substantial headroom above current model performance.
-  > Adversarial filtering and a private evaluation set keep it from being solved by pattern matching, so there is still room to improve.
-- It is scored by human judges rather than automatically.
-  > Grid answers are checked automatically.
+- It switches to multiple-choice questions for faster scoring.
+  > It moved away from static answers, not toward multiple choice.
+- [o] Systems must learn interactive games by playing them.
+  > Instead of answering a static grid puzzle, the system explores an unfamiliar game and works out its goal and rules, which every frontier model failed at launch.
+- It adds questions about recent events to block memorization.
+  > It has no knowledge component at all.
+- It has human judges score each answer by hand.
+  > Progress through a game is checked automatically.
 
-Most benchmarks are running out of room. This one still has some.`}
+When a benchmark saturates, the useful successor changes what is
+measured, not only how hard it is.`}
 />
 
 <MultipleChoice
@@ -212,11 +240,11 @@ level.`}
 <MultipleChoice
   markdown={`Which benchmark best predicts agentic coding performance?
 
-- [o] SWE-bench Verified, since its task shape matches the real one.
-  > Reading a codebase, making a multi-file change, and passing the project's tests is what the work actually involves.
-- ARC-AGI-2, since it measures abstract problem solving.
-  > Grid puzzles share little structure with codebase work.
-- GPQA Diamond, since it measures hard reasoning.
+- [o] A SWE-bench-style task, since its shape matches the job.
+  > Reading a codebase, making a multi-file change, and passing the project's tests is what the work involves, though any one public set of such tasks can be contaminated.
+- ARC-AGI-3, since adapting to a new environment is what agents do.
+  > Learning a puzzle game shares little structure with codebase work.
+- GPQA Diamond, since it measures hard scientific reasoning.
   > It measures scientific reasoning rather than software work.
 - MMLU, since it covers computer science topics.
   > Multiple-choice knowledge questions do not resemble the task.
@@ -239,3 +267,36 @@ Predictive validity comes from the task resembling the job.`}
 Ideal conditions are what makes a benchmark measurable and what makes
 it unrepresentative.`}
 />
+
+[^vals-gpqa]:
+    Vals AI, [GPQA Diamond leaderboard](https://www.vals.ai/benchmarks/gpqa),
+    updated September 1, 2026, which reported 24 of the 136 models it had
+    tested at 90% or higher.
+
+[^openai-verified]:
+    OpenAI, ["Why we no longer evaluate SWE-bench Verified"](https://openai.com/index/why-we-no-longer-evaluate-swe-bench-verified/),
+    February 23, 2026.
+
+[^openai-pro]:
+    OpenAI, ["Separating signal from noise in coding evaluations"](https://openai.com/index/separating-signal-from-noise-coding-evaluations/),
+    July 8, 2026.
+
+[^arc-opus5]:
+    ARC Prize, [Claude Opus 5 results](https://arcprize.org/results/anthropic-claude-opus-5),
+    July 24, 2026: 90.4% on the ARC-AGI-2 semi-private set at maximum
+    reasoning effort.
+
+[^arc3]:
+    *ARC-AGI-3: A New Challenge for Frontier Agentic Intelligence*
+    ([arXiv:2603.24621](https://arxiv.org/abs/2603.24621)), March 2026,
+    which reports the launch-day scores.
+
+[^arc-astra]:
+    ARC Prize, ["OpenAI's GPT-6 Astra on ARC-AGI-3"](https://arcprize.org/blog/astra),
+    September 3, 2026.
+
+[^hle]:
+    Phan et al., *Humanity's Last Exam* ([arXiv:2501.14249](https://arxiv.org/abs/2501.14249)),
+    January 2025, for the launch scores, and Scale AI's
+    [HLE leaderboard](https://labs.scale.com/leaderboard/humanitys_last_exam)
+    for the current ones.

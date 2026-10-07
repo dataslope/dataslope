@@ -5,9 +5,10 @@
 // without `npm run build` still get the full pass so a fresh checkout
 // typechecks and tests out of the box.
 //
-// NOTE: scripts/patch-almostnode.mjs is NOT gated here — it patches
-// node_modules in place and must run after every install (package.json runs
-// it before this script).
+// NOTE: scripts/patch-almostnode.mjs and scripts/patch-opennext.mjs are NOT
+// gated here — they patch node_modules in place and must run after every
+// install, Workers Builds included (package.json runs them before this
+// script).
 import { spawnSync } from "node:child_process";
 import { join, dirname, delimiter } from "node:path";
 import { fileURLToPath } from "node:url";
