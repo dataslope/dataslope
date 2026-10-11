@@ -6,7 +6,8 @@
  * hits a server-authorized endpoint (Better Auth `admin.*` or requireAdmin),
  * so a non-admin can't read or mutate anything from these.
  */
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { Dialog } from "@base-ui/react/dialog";
 import { CircleAlert, Loader2, LogOut } from "lucide-react";
 import Link from "@/app/_components/Link";
 import { authClient } from "@/lib/auth/client";
@@ -107,6 +108,81 @@ export function ErrorNote({ children }: { children: React.ReactNode }) {
       <CircleAlert className="size-4 shrink-0" />
       {children}
     </p>
+  );
+}
+
+/** Modal "are you sure?" for a row action that changes someone's account.
+ *  Focus starts on Cancel, so a stray Enter backs out rather than confirming,
+ *  and the dialog can't be dismissed while `busy`: it closes once the caller's
+ *  request settles. Uses only root-level tokens, since the popup portals to
+ *  `document.body`, outside any dashboard wrapper. */
+export function ConfirmDialog({
+  open,
+  onOpenChange,
+  title,
+  children,
+  confirmLabel,
+  onConfirm,
+  busy = false,
+  danger = false,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: React.ReactNode;
+  children: React.ReactNode;
+  confirmLabel: string;
+  onConfirm: () => void;
+  busy?: boolean;
+  /** Red confirm button, for the changes worth slowing down for. */
+  danger?: boolean;
+}) {
+  const cancelRef = useRef<HTMLButtonElement>(null);
+  return (
+    <Dialog.Root
+      open={open}
+      onOpenChange={(next) => {
+        if (!busy) onOpenChange(next);
+      }}
+    >
+      <Dialog.Portal>
+        <Dialog.Backdrop className="fixed inset-0 z-[60] bg-black/45 backdrop-blur-[2px]" />
+        <Dialog.Popup
+          role="alertdialog"
+          initialFocus={cancelRef}
+          className="fixed top-1/2 left-1/2 z-[61] w-[min(28rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-zinc-500/10 bg-popover p-5 text-popover-foreground shadow-2xl outline-none sm:p-6 dark:border-white/10"
+        >
+          <Dialog.Title className="text-[15px] font-semibold">
+            {title}
+          </Dialog.Title>
+          <Dialog.Description
+            render={<div />}
+            className="mt-3 flex flex-col gap-3 text-sm leading-relaxed text-muted-foreground"
+          >
+            {children}
+          </Dialog.Description>
+          <div className="mt-5 flex justify-end gap-2">
+            <Button
+              ref={cancelRef}
+              variant="ghost"
+              size="sm"
+              onClick={() => onOpenChange(false)}
+              disabled={busy}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant={danger ? "destructive" : "default"}
+              size="sm"
+              onClick={onConfirm}
+              disabled={busy}
+            >
+              {busy && <Loader2 className="animate-spin" />}
+              {confirmLabel}
+            </Button>
+          </div>
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
 

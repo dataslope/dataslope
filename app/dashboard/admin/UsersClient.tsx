@@ -36,6 +36,7 @@ import {
   AccessDeniedCard,
   AdminPageHeader,
   CenteredNote,
+  ConfirmDialog,
   ErrorNote,
   Panel,
   PanelBody,
@@ -69,6 +70,59 @@ interface AdminUser {
   createdAt: string | Date;
 }
 
+/** A plan or role switch waiting on the confirmation dialog. */
+interface PendingChange {
+  kind: "plan" | "role";
+  user: AdminUser;
+}
+
+/** What each toggle switches the user to. */
+function nextPlan(user: AdminUser): "free" | "pro" {
+  return (user.plan ?? "").toLowerCase() === "pro" ? "free" : "pro";
+}
+
+function nextRole(user: AdminUser): "user" | "admin" {
+  return user.role === "admin" ? "user" : "admin";
+}
+
+/** The dialog's copy for a pending switch. Granting admin is the one marked
+ *  danger: it hands over every control on this page. */
+function describeChange({ kind, user }: PendingChange): {
+  title: string;
+  body: string;
+  confirmLabel: string;
+  danger: boolean;
+} {
+  if (kind === "plan") {
+    return nextPlan(user) === "pro"
+      ? {
+          title: "Switch this user to Pro?",
+          body: "They get every Pro feature without paying. Nothing is created in Polar, so nothing is billed.",
+          confirmLabel: "Switch to Pro",
+          danger: false,
+        }
+      : {
+          title: "Switch this user to Free?",
+          body: "They lose Pro features. This doesn't cancel a Polar subscription: if they're paying, the next billing event puts them back on Pro.",
+          confirmLabel: "Switch to Free",
+          danger: false,
+        };
+  }
+  return nextRole(user) === "admin"
+    ? {
+        title: "Grant this user admin access?",
+        body: "They'll be able to see every account, change plans and roles, impersonate, ban and remove users, and use every other admin tool.",
+        confirmLabel: "Grant admin access",
+        danger: true,
+      }
+    : {
+        title: "Remove this user's admin access?",
+        body: "They lose the admin dashboard and its endpoints. If they're listed in ADMIN_EMAILS or ADMIN_USER_IDS, the config keeps making them an admin, so take them off that list too.",
+        confirmLabel: "Remove admin access",
+        danger: false,
+      };
+}
+
 /** Rows per page. Browse pages are fetched one at a time (server-side
  *  `offset`); search results are sliced from the matches held in memory. */
 const PAGE_SIZE = 25;
@@ -93,6 +147,12 @@ export function UsersClient() {
   // User-id with an action mid-flight / with a pending "confirm remove".
   const [busyId, setBusyId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
+  // Plan and role switches go through a dialog first. The change outlives
+  // `confirmOpen` so the dialog keeps its text while it closes.
+  const [pendingChange, setPendingChange] = useState<PendingChange | null>(
+    null,
+  );
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   // Monotonic sequence: a slow stale response must not overwrite a newer one.
   const loadSeq = useRef(0);
@@ -282,7 +342,7 @@ export function UsersClient() {
   }
 
   async function handleTogglePlan(user: AdminUser) {
-    const next = (user.plan ?? "").toLowerCase() === "pro" ? "free" : "pro";
+    const next = nextPlan(user);
     setBusyId(user.id);
     setError(null);
     const planError = await setUserPlan(user.id, next);
@@ -297,7 +357,7 @@ export function UsersClient() {
   }
 
   async function handleToggleRole(user: AdminUser) {
-    const next = user.role === "admin" ? "user" : "admin";
+    const next = nextRole(user);
     setBusyId(user.id);
     setError(null);
     try {
@@ -316,6 +376,20 @@ export function UsersClient() {
       setError("Couldn't reach the server. Please try again.");
     }
     setBusyId(null);
+  }
+
+  function requestChange(change: PendingChange) {
+    setPendingChange(change);
+    setConfirmOpen(true);
+  }
+
+  /** Runs what the dialog described: its snapshot of the user, so a refresh
+   *  that lands while it is open can't flip which way the switch goes. */
+  async function handleConfirmChange() {
+    if (!pendingChange) return;
+    const { kind, user } = pendingChange;
+    await (kind === "plan" ? handleTogglePlan(user) : handleToggleRole(user));
+    setConfirmOpen(false);
   }
 
   async function handleImpersonate(user: AdminUser) {
@@ -378,13 +452,9 @@ export function UsersClient() {
         variant="ghost"
         size="icon"
         className={`size-7 ${quietActionClass}`}
-        onClick={() => void handleTogglePlan(user)}
+        onClick={() => requestChange({ kind: "plan", user })}
         disabled={isBusy}
-        title={
-          (user.plan ?? "").toLowerCase() === "pro"
-            ? "Switch to free"
-            : "Switch to pro"
-        }
+        title={nextPlan(user) === "free" ? "Switch to free" : "Switch to pro"}
       >
         <ArrowRightLeft className="size-3.5" />
         <span className="sr-only">Switch plan</span>
@@ -410,10 +480,10 @@ export function UsersClient() {
           variant="ghost"
           size="icon"
           className={`size-7 ${quietActionClass}`}
-          onClick={() => void handleToggleRole(user)}
+          onClick={() => requestChange({ kind: "role", user })}
           disabled={isBusy}
           title={
-            user.role === "admin"
+            nextRole(user) === "user"
               ? "Demote to regular user"
               : "Grant admin access"
           }
@@ -539,6 +609,7 @@ export function UsersClient() {
   // Only the first load blanks the panel; later ones (refresh, page step) keep
   // the rows on screen so the table doesn't flash empty.
   const firstLoad = loading && users.length === 0;
+  const pendingCopy = pendingChange ? describeChange(pendingChange) : null;
 
   return (
     <>
@@ -757,11 +828,33 @@ export function UsersClient() {
             immediately, since they read the session fresh, but the person&apos;s
             header/account display can lag up to five minutes (the session
             cookie cache). Demoting an admin who is still listed in
-            ADMIN_EMAILS / ADMIN_USER_IDS only lasts until their next sign-in
-, remove them from the config too.
+            ADMIN_EMAILS / ADMIN_USER_IDS only lasts until their next sign-in,
+            so remove them from the config too.
           </p>
         </PanelBody>
       </Panel>
+
+      {pendingChange && pendingCopy && (
+        <ConfirmDialog
+          open={confirmOpen}
+          onOpenChange={setConfirmOpen}
+          title={pendingCopy.title}
+          confirmLabel={pendingCopy.confirmLabel}
+          danger={pendingCopy.danger}
+          busy={busyId === pendingChange.user.id}
+          onConfirm={() => void handleConfirmChange()}
+        >
+          {/* Who it applies to, avatar and email included, so a click on the
+              wrong row is caught here rather than after the fact. */}
+          <div className="rounded-xl bg-zinc-500/[0.06] p-3 text-foreground dark:bg-white/[0.045]">
+            {renderIdentity(
+              pendingChange.user,
+              pendingChange.user.id === session.user.id,
+            )}
+          </div>
+          <p>{pendingCopy.body}</p>
+        </ConfirmDialog>
+      )}
     </>
   );
 }
