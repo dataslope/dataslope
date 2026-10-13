@@ -1,0 +1,65 @@
+---
+title: Common Failure Modes
+description: Invented functions, weakened tests, swallowed errors, changes nobody asked for, and a confident summary of work that did not happen.
+---
+
+{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
+
+Agent mistakes are not random. The same handful turn up across every
+tool and every model, and each one has a quick check that catches it.
+
+{/*
+- Shape for every section below: what it looks like (a short snippet or
+  ```diff fence), why it happens, and the check that catches it.
+- This lesson is the overview. A later course, "Reviewing AI-Written
+  Code", would give each one a full lesson with graded exercises.
+*/}
+
+## Functions that do not exist
+
+{/*
+- A plausible method name on a real library, with the wrong signature
+  or none at all.
+- Why: plausible continuation, not lookup (link How LLMs Work, "Why
+  Models Hallucinate", /courses/how-llms-work/why-models-hallucinate).
+- Check: it runs, or the type checker accepts it. Reading is not enough.
+*/}
+
+## Tests weakened to pass
+
+{/*
+- Cross-reference Verifying with Tests.
+*/}
+
+## Errors swallowed
+
+{/*
+- A broad try/except that turns a crash into a silent wrong answer.
+- Check: search the diff for new exception handlers and ask what each
+  one hides.
+*/}
+
+## Changes nobody asked for
+
+{/*
+- Reformatting, renaming, "while I was here" refactors. Each one is
+  diff you have to review for no benefit to the task.
+- Check: the file list (Reading the Diff); the fix is a constraint in
+  the request (Writing a Task).
+*/}
+
+## A new helper beside an existing one
+
+{/*
+- The agent did not search, so it wrote a second date formatter next
+  to the first.
+- Check: search the codebase for the new function's job before
+  accepting it.
+*/}
+
+## A summary that does not match the diff
+
+{/*
+- "Added tests for the edge cases" over a diff with no new tests.
+- Check: read the diff before the summary, not after.
+*/}

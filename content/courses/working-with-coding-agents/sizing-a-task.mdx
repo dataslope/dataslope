@@ -1,0 +1,51 @@
+---
+title: Sizing a Task
+description: Why a task you can review in ten minutes beats one that takes an afternoon, and how to cut a big change into steps an agent can finish one at a time.
+---
+
+{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
+
+The size of a task decides two things: how likely the agent is to
+finish it, and how likely you are to review it properly. Both get worse
+faster than the task gets bigger.
+
+## Review effort grows with the diff
+
+{/*
+- Small diffs get read; large ones get skimmed.
+- A chart could go here (charts/<slug>.mjs, AGENTS.md "Charts"), but
+  only with a cited source for the data. Do not invent the curve.
+*/}
+
+## One concern per session
+
+{/*
+- A bug fix and a refactor in one session produce one diff where you
+  cannot tell which change did what.
+- Links to What the Agent Sees: a session about one thing keeps its
+  context about one thing.
+*/}
+
+## Cutting a feature into steps
+
+{/*
+- Worked example: "add CSV export" becomes (1) the function that
+  formats rows, with tests, (2) the command that calls it, (3) the
+  documentation. Each step is reviewable and leaves the code working.
+- Each step ends at a commit (see Undoing Changes).
+*/}
+
+## Signs the task is too big
+
+{/*
+- You cannot write the test for done in one sentence.
+- The request needs the word "and" more than once.
+- You would not review the same change from a colleague in one sitting.
+*/}
+
+## Concept check
+
+{/*
+- MultipleChoice: pick the best first step out of a large feature
+  request.
+*/}

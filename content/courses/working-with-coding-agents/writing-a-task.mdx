@@ -1,0 +1,70 @@
+---
+title: Writing a Task
+description: A goal, the context the agent cannot guess, the constraints, and a test for done. The four parts of a request an agent can finish.
+---
+
+{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
+
+An agent will attempt whatever you type. Whether it finishes the task
+you meant depends on four things you can put in the request: what you
+want, what it cannot find out on its own, what it must not do, and how
+anyone will know it is done.
+
+## The goal
+
+{/*
+- State the outcome, not the activity. "Make parse_date read 03/04/2026
+  as 3 April" rather than "look at the date code".
+- One goal per request (see Sizing a Task).
+*/}
+
+## Context it cannot discover
+
+{/*
+- What the agent can read for itself: the code. What it cannot: why
+  the code is like that, what the users expect, which of two behaviors
+  is the bug.
+- Point at files and functions by name. It saves a search and anchors
+  the change.
+*/}
+
+## Constraints
+
+{/*
+- What must not change: public function signatures, other modules,
+  dependencies, the database schema.
+- Without them, "done" can include a refactor you did not ask for
+  (see Common Failure Modes, scope creep).
+*/}
+
+## A test for done
+
+{/*
+- The part most requests leave out. A command that passes, a test that
+  exists, an output that matches.
+- An agent that can run the check will usually run it. One that cannot
+  will declare success by its own standard.
+*/}
+
+## Same request, four versions
+
+{/*
+- The MultipleChoice below is the worked example. Add two or three
+  more in the same shape, varying which of the four parts is missing.
+*/}
+
+<MultipleChoice
+  markdown={`Which request is most likely to come back finished and easy to review?
+
+- Fix the date bug.
+  > It names a symptom and nothing else. The agent has to guess which bug, what correct means, and how much it may change.
+- Fix the date bug in \`parse_date\`; \`03/04/2026\` should parse as 3 April.
+  > The goal is clear now, but nothing says how to confirm it or what is off limits.
+- [o] Make \`parse_date\` read \`03/04/2026\` as 3 April, add a test, and change only \`dates.py\`.
+  > It has a goal, a constraint, and a check the agent can run before it reports back.
+- Rewrite the date handling so it is correct for every format a user might ever type in.
+  > The scope is unbounded, so there is no point at which the agent, or you, can say it is done.
+
+A request that says what done looks like gets a session that stops at
+done.`}
+/>

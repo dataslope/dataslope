@@ -1,0 +1,68 @@
+---
+title: What a Coding Agent Is
+description: A language model, a set of tools, and a loop that connects them. Everything an agent does comes from one of those three.
+---
+
+{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
+
+Take away the interface and a coding agent is three things: a language
+model, a set of tools it can ask for, and a loop that runs those tools
+and feeds the results back. Every behavior you will see from an agent,
+good or bad, comes from one of the three.
+
+## The model only produces text
+
+{/*
+- Callback to How LLMs Work, "What a Language Model Is": the model
+  predicts the next token, nothing more (/courses/how-llms-work/what-a-language-model-is).
+- A tool call is text in an agreed format (a name plus arguments). The
+  model cannot execute anything; it can only write a request to.
+- So the model never "sees" your repository. It sees text that tools
+  returned.
+*/}
+
+## The harness runs the tools
+
+{/*
+- The program around the model (Claude Code, the Codex CLI, Cursor's
+  agent, Copilot's agent mode) parses the tool call, runs it, and appends
+  the result to the conversation.
+- The harness, not the model, owns the file system, the shell and the
+  permission prompts. Two agents on the same model behave differently
+  because their harnesses differ.
+- Interactive: extend the loop from the Welcome page with a tool that
+  fails (a missing file) and show the error coming back as just more
+  text the model has to react to.
+*/}
+
+## The loop ends when the model says so
+
+{/*
+- Stop conditions: the model writes a final answer instead of a tool
+  call, the harness hits a step or budget limit, or you interrupt.
+- Consequence: "done" is the model's judgment, not a check. Nothing
+  forces a final test run. This is the thread through the whole course.
+- Interactive: add a step limit to the loop and give it a script that
+  never finishes.
+*/}
+
+## Completion, chat and agents
+
+{/*
+- Inline completion: predicts the next few lines as you type. No loop,
+  no tools.
+- Chat: answers in a side panel. You copy, paste and run.
+- Agent: runs the tools itself, inside the loop.
+- The useful distinction is who runs the tools: you, or the harness.
+  Kinds of Coding Tools maps real products onto this.
+*/}
+
+## Concept check
+
+{/*
+- Two or three MultipleChoice questions. Candidates:
+  - Which part of the system writes to your disk? (the harness)
+  - An agent reports success but never ran the tests. Which part of the
+    loop allowed that? (the stop condition is the model's choice)
+- Keep the correct option off the longest slot (see AGENTS.md, "Option length").
+*/}

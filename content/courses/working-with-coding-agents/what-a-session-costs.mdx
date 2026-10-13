@@ -1,0 +1,57 @@
+---
+title: What a Session Costs
+description: Why an agent session uses far more tokens than the conversation suggests, what caching does to the bill, and a calculator for your own sessions.
+---
+
+{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
+
+A short request can start a session that reads thirty files and runs
+the tests six times. Each of those steps resends the whole conversation
+so far, so the input a session consumes grows much faster than the
+session itself.
+
+## Every step resends the context
+
+{/*
+- Step n sends everything from steps 1 to n-1 again. Twenty steps of
+  a growing context is far more than twenty times the first request.
+- Link How LLMs Work, "Pricing Structure" and "Estimating Cost"
+  (/courses/how-llms-work/pricing-structure,
+  /courses/how-llms-work/estimating-cost).
+*/}
+
+## What caching changes
+
+{/*
+- Repeated prefixes are cached, and cached input costs a tenth or less
+  (How LLMs Work, "Controlling Cost"). Most of an agent's resent
+  context is a repeated prefix, which is why sessions are affordable
+  at all.
+- Volatile content early in the context breaks the cache for everything
+  after it.
+*/}
+
+## A calculator for your own sessions
+
+{/*
+- Interactive: a Python CodeBlock that takes steps, tokens added per
+  step, input/output/cached prices, and a cache hit rate, and prints
+  the session's total with and without caching.
+- Take prices from How LLMs Work so the two courses agree, and date
+  them (October 2026).
+*/}
+
+## Subscriptions and pay-per-token
+
+{/*
+- Several tools are sold as a subscription with usage limits rather
+  than per token. VERIFY current plans before writing this section,
+  and keep product specifics in Kinds of Coding Tools.
+*/}
+
+## Cheaper sessions
+
+{/*
+- Smaller tasks, fresh sessions, quieter tool output (a test runner's
+  summary rather than its full log), and a shorter instruction file.
+*/}

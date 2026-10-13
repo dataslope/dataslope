@@ -1,0 +1,55 @@
+---
+title: Reading the Diff
+description: The closing summary is the agent's account of what it did, and the diff is what it did. How to read one quickly, and what to look at first.
+---
+
+{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
+
+When an agent finishes, it tells you what it did. Treat that message as
+a claim. The diff is the record, and reading it is the habit that
+separates using an agent from trusting one.
+
+## Start with the list of files
+
+{/*
+- `git diff --stat` or `--name-only` first. A file you did not expect
+  is the cheapest red flag to spot.
+- Lockfiles, config, CI workflows and test fixtures deserve a second
+  look even when expected.
+*/}
+
+## Then the tests
+
+{/*
+- Did any test change? Was an assertion loosened, a case deleted, a
+  test skipped? (Detail in Verifying with Tests.)
+- New tests: do they test the change, or just run it?
+*/}
+
+## Then the logic
+
+{/*
+- Read the change against the request: does it do what was asked, and
+  only that?
+- Look for new helpers that duplicate existing ones, and broad
+  exception handlers (Common Failure Modes).
+*/}
+
+## Reading a diff in Git
+
+{/*
+- `git diff`, `git diff --staged`, `git show <commit>`, `git log -p`.
+- Interactive: a GitBlock over a repository holding a recorded agent
+  session (three commits, one of which also touches a file outside the
+  task). NEEDS A NEW SCENARIO in app/_components/git/scenarios.ts; none
+  of the existing five models agent work. `diff`, `show`, `log` and
+  `--stat`/`--name-only` are all supported by the engine.
+- Diffs shown as text can use a ```diff fence.
+*/}
+
+## Concept check
+
+{/*
+- MultipleChoice over a short diff in a ```diff fence: which line
+  should stop the review?
+*/}

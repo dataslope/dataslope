@@ -1,0 +1,43 @@
+---
+title: Plan Before Code
+description: Ask for a plan, correct it while it is still cheap, and only then let the agent edit files.
+---
+
+{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
+
+A wrong plan costs a sentence to fix. The same mistake, carried out
+across a dozen files, costs a diff to fix. Most agents can be asked to
+plan first, and several have a mode that refuses to edit anything until
+you approve the plan.
+
+## What a good plan contains
+
+{/*
+- The files it will touch, the approach, the tests it will add or run,
+  and the questions it could not answer from the code.
+- A plan with no open questions on a vague task is a warning sign.
+*/}
+
+## Reviewing a plan
+
+{/*
+- Look for: the wrong file, a function that does not exist, no test,
+  work outside the request.
+- Interactive: a recorded plan for a small task with one planted flaw;
+  MultipleChoice asking which step to correct.
+*/}
+
+## Plan modes
+
+{/*
+- Several tools have a read-only planning mode. Name them in Kinds of
+  Coding Tools rather than here, and verify the current names.
+- Without one, ask in the request: "propose a plan and wait".
+*/}
+
+## When to skip the plan
+
+{/*
+- A one-line fix with an obvious test. Planning overhead has to pay for
+  itself.
+*/}

@@ -1,0 +1,62 @@
+---
+title: Tools and Permissions
+description: What an agent can read, change and run, who approves each action, and why that matters as much as which model you picked.
+---
+
+{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
+
+An agent can do exactly what its tools allow, and nothing else. Reading
+a file, editing one, running a shell command and fetching a web page
+are four different powers, and every agent lets you grant them
+separately.
+
+## The common toolset
+
+{/*
+- Read and search files, edit files, run shell commands, fetch web
+  pages.
+- Integrations through MCP servers (issue trackers, databases,
+  browsers). Each one is another tool with its own reach.
+- Point: the toolset, not the model, decides what a mistake can damage.
+*/}
+
+## Approval modes
+
+{/*
+- The spectrum: ask before every action, allow edits but ask before
+  commands, allow a list of commands, run unattended.
+- Every product names these differently. Describe the spectrum here and
+  leave the product names to Kinds of Coding Tools.
+- Verify current settings for each product before publishing.
+*/}
+
+## The shell is the big one
+
+{/*
+- A shell command can do anything you can: delete files, push to a
+  remote, send a file over the network.
+- Why "allow all commands" is a different decision from "allow edits":
+  edits show up in the diff, side effects of a command may not.
+- Interactive idea: a BashBlock (scenario "small-project") where the
+  reader runs a harmless command and a destructive one in the throwaway
+  sandbox, then answers which belonged on an allowlist.
+*/}
+
+## Local, sandboxed and cloud
+
+{/*
+- A local agent runs as you, with your credentials and your files.
+- A sandboxed or containerized agent can only reach what the sandbox
+  exposes.
+- A cloud agent runs in a disposable container and returns a branch or
+  a pull request. Its blast radius is the repository and whatever
+  secrets the environment was given.
+*/}
+
+## Concept check
+
+{/*
+- MultipleChoice: which of four commands is safe to allow without
+  asking (for example the test runner) and which is not (anything that
+  pushes, deletes or uploads).
+*/}

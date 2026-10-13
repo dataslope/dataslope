@@ -1,0 +1,57 @@
+---
+title: Instruction Files
+description: AGENTS.md, CLAUDE.md, Cursor rules and Copilot's instructions file. What belongs in the file every session reads first, and the rules that backfire.
+---
+
+{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
+
+Every agent reads some file before it reads your request: `AGENTS.md`,
+`CLAUDE.md`, a Cursor rules file or `.github/copilot-instructions.md`,
+depending on the tool. Whatever is in it is in the context of every
+session, which makes it the cheapest place to fix a mistake that keeps
+coming back.
+
+## What goes in
+
+{/*
+- How to build, test and lint, as exact commands.
+- Conventions that differ from the defaults the model would assume.
+- Things that broke before, with the reason, so the rule can be judged
+  rather than obeyed blindly.
+*/}
+
+## What stays out
+
+{/*
+- Anything the agent can read from the code itself.
+- Long essays: the file is resent every step (What a Session Costs).
+- Secrets, ever (Staying Safe).
+*/}
+
+## Rules that backfire
+
+{/*
+- Naming a thing in a negative rule puts it in the context. Source
+  material: this repository's own AGENTS.md, "Illustrations" > "Style",
+  where "draw dots as flat circles" made the model add dots everywhere.
+  Quote only passages that are fine to publish.
+- Vague rules ("write clean code") cost tokens and change nothing.
+- Two rules that contradict each other: the model picks one, and you do
+  not get to know which.
+*/}
+
+## Keeping it current
+
+{/*
+- Add a rule the second time the same mistake happens, not the first.
+- Review changes to it like code; it changes the behavior of every
+  session.
+*/}
+
+## One file, several tools
+
+{/*
+- Several tools now read AGENTS.md; others have their own file name.
+  VERIFY which tools read which file as of October 2026 and keep the
+  product list in Kinds of Coding Tools.
+*/}

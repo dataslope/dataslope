@@ -1,0 +1,61 @@
+---
+title: What the Agent Sees
+description: Instruction files, the files it read, every tool result. What fills an agent's context, what falls out, and why a fresh session often beats a long one.
+---
+
+{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
+
+An agent knows what is in its context window and nothing else. It has
+not read your codebase. It has read the files it opened during this
+session, plus whatever its tool loaded for it before your request
+arrived.
+
+## What is there before you type
+
+{/*
+- The harness's own system prompt, the tool definitions, any
+  instruction files (AGENTS.md, CLAUDE.md and the like), then your
+  request.
+- None of it is free: it is resent with every step (see What a Session
+  Costs).
+*/}
+
+## What piles up
+
+{/*
+- Every file read, every search result, every command output is
+  appended to the conversation.
+- A full test log or a large file can be tens of thousands of tokens in
+  one step.
+- Interactive: a Python calculator modeled on the one in How LLMs Work,
+  "Context Windows" (/courses/how-llms-work/context-windows), that adds
+  up a session step by step and shows when it fills the window.
+*/}
+
+## When the window fills
+
+{/*
+- Harnesses summarize ("compact") older turns to make room. Detail is
+  lost, and the model is not told what.
+- Recall is weakest in the middle of a long context (link the
+  U-shaped recall section of Context Windows).
+- Symptoms: the agent re-reads files, forgets a constraint you gave at
+  the start, or reintroduces a bug it already fixed.
+*/}
+
+## A fresh session is a feature
+
+{/*
+- One task per session keeps the context about that task.
+- Restarting with a better request often beats correcting a long
+  session, because the failed attempts are part of the context too
+  (see Steering a Session).
+*/}
+
+## Concept check
+
+{/*
+- MultipleChoice: an agent ignores a constraint you gave forty steps
+  ago. Most likely reason? (it was summarized away or lost mid-context,
+  not "the model forgot on purpose")
+*/}

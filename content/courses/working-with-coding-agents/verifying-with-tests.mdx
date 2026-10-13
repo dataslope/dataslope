@@ -1,0 +1,48 @@
+---
+title: Verifying with Tests
+description: Run the tests yourself, check that they cover the change, and write the one the agent did not.
+---
+
+{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
+
+"All tests pass" tells you that the tests pass. It does not tell you
+that any of them exercise the change, that the agent ran the whole
+suite, or that it left the assertions as it found them.
+
+## Run them yourself
+
+{/*
+- The agent's report of a test run is text in a summary. Your own run
+  is evidence.
+- Run the full suite, not the one file the agent mentioned.
+*/}
+
+## Does any test cover the change?
+
+{/*
+- Quick check: undo or break the change and rerun. If nothing fails,
+  nothing tests it.
+- Interactive: a Python CodeBlock with a function, its tests, and a
+  one-line "break it" edit for the reader to try.
+*/}
+
+## The test that was edited to pass
+
+{/*
+- An expected value updated to match the new (wrong) output, a case
+  removed, a skip marker added.
+- Why it happens: the request said "make the tests pass", and editing
+  the test does.
+- The fix is in the request: say which tests must not change.
+*/}
+
+## Writing the missing test
+
+{/*
+- Interactive: a Python ChallengeCard. The reader gets an agent's
+  function plus its claim that all tests pass, and writes the test that
+  exposes the bug (an edge case the agent skipped: empty input,
+  boundary value, wrong rounding).
+- Graded by the card's own test harness (see
+  content/fumadocs-dev/challenge-cards-python.mdx for the format).
+*/}

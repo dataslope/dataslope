@@ -1,0 +1,36 @@
+---
+title: Steering a Session
+description: Correcting an agent mid-task, interrupting it before it goes further, and deciding between continuing and starting over.
+---
+
+{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
+
+Most sessions need at least one correction. How you give it decides
+whether the agent fixes the problem or apologizes and repeats it.
+
+## Specific feedback beats "that's wrong"
+
+{/*
+- Say what is wrong, where, and what right looks like: "the total
+  should exclude refunded orders; see the status column".
+- Paste the actual error or the failing output rather than describing
+  it.
+- Interactive: MultipleChoice choosing between three corrections for
+  the same recorded mistake.
+*/}
+
+## Interrupt early
+
+{/*
+- When the plan or the first edit goes in the wrong direction, stop it
+  there. Every further step builds on the mistake and adds to the diff.
+*/}
+
+## Continue or start over
+
+{/*
+- A long session carries every failed attempt in its context (What the
+  Agent Sees).
+- Rule of thumb to write up: after two corrections on the same point,
+  restart with a better request that includes what you learned.
+*/}

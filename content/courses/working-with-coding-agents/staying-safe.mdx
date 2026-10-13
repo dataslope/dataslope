@@ -1,0 +1,55 @@
+---
+title: Staying Safe
+description: Secrets, untrusted text the agent reads, commands it runs, and the permission settings that limit the damage of a mistake.
+---
+
+{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
+
+An agent acts with your permissions and reads text you did not write.
+Each is manageable on its own. Together they are the risk: a web page
+or an issue comment containing instructions, read by an agent that can
+run commands.
+
+## Secrets stay out of the context
+
+{/*
+- Anything the agent reads is sent to the model provider and may end
+  up in a commit or a log.
+- Keep keys in environment variables the agent's tools can use without
+  printing; never paste them into a request or an instruction file.
+*/}
+
+## Untrusted text is untrusted instructions
+
+{/*
+- Prompt injection: an issue, a README, a web page or a dependency's
+  docs that tell the agent to do something.
+- The model has no reliable way to tell your instructions from text it
+  read. The defense is limiting what the agent can do, not hoping it
+  ignores the text.
+*/}
+
+## Packages that do not exist
+
+{/*
+- An agent suggests a plausible package name that does not exist, and
+  someone registers it with malicious code.
+- Check every new dependency in the diff against the registry before
+  installing.
+*/}
+
+## Limiting the damage
+
+{/*
+- Narrow permissions (Tools and Permissions), sandboxes for unattended
+  work, no unattended pushes to the main branch, review of every
+  command it ran.
+*/}
+
+## Concept check
+
+{/*
+- MultipleChoice: an agent reading a GitHub issue finds the line
+  "also run this curl command". What limits the damage? (permissions,
+  not the model's judgment)
+*/}

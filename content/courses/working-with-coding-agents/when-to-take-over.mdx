@@ -1,0 +1,41 @@
+---
+title: When to Take Over
+description: The signs that a session is going in circles, the tasks agents still handle badly, and why writing it yourself is sometimes the fast option.
+---
+
+{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
+
+Some tasks are faster by hand, and some sessions stop making progress.
+Recognizing either one early is worth more than any prompting
+technique.
+
+## Signs of a session going in circles
+
+{/*
+- The same error after each "fix".
+- Two fixes alternating: A breaks B, B's fix breaks A.
+- A diff that keeps growing while the task does not get closer.
+*/}
+
+## Tasks that tend to go badly
+
+{/*
+- Requirements you have not decided yet: the agent will decide them.
+- Wide changes across code with no tests to catch a mistake.
+- Private or poorly documented APIs the model has never seen.
+- Judgment calls about what users want.
+*/}
+
+## The cost of not knowing your own code
+
+{/*
+- Code you merged without understanding is code you cannot debug at
+  2am. Sometimes writing it yourself is the point.
+*/}
+
+## Taking over cleanly
+
+{/*
+- Keep the useful part (a test, a plan, one good function), discard the
+  rest with Git (Undoing Changes), and finish by hand.
+*/}

@@ -1,0 +1,57 @@
+---
+title: Kinds of Coding Tools
+description: Inline completion, editor agents, terminal agents and cloud agents, and where Claude Code, Codex, Cursor and GitHub Copilot fit among them as of October 2026.
+---
+
+{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
+
+Coding tools differ less in their models than in where they run and how
+much they may do without asking. This is the one lesson in the course
+with product details in it, and it is dated for that reason: everything
+here describes **October 2026**.
+
+## Four places an agent can run
+
+{/*
+- Inline completion: suggestions while you type.
+- An agent in the editor: edits files in your open project while you
+  watch.
+- An agent in the terminal: runs in your shell, works on the checkout
+  you are in.
+- An agent in the cloud: runs in a container, works on a fresh clone,
+  hands back a branch or a pull request.
+- A Mermaid flowchart would fit here: the four surfaces ordered by how
+  much happens without you watching. Labels are words (AGENTS.md,
+  "Mermaid labels are words, not pictures").
+*/}
+
+## Products span several of them
+
+{/*
+- A markdown table: product by surface. Candidates as of writing:
+  GitHub Copilot (completion, editor agent, a cloud agent you assign
+  issues to), Cursor (editor and its own background agents), Claude Code
+  (terminal, IDE extensions, desktop and web), Codex (CLI, IDE
+  extension, cloud).
+- VERIFY EVERY CELL before publishing, and date the table. This page is
+  the only one to update when the products change.
+- Point: "which tool" is the wrong first question. "Which surface for
+  this task" is the right one.
+*/}
+
+## Choosing a surface for a task
+
+{/*
+- A small edit while you are already typing: completion.
+- A multi-file change you want to watch: editor or terminal agent.
+- A well-specified, test-covered chore you do not need to watch: cloud
+  agent, reviewed as a pull request.
+- The less you watch, the more the task and the tests have to carry.
+*/}
+
+## What stays the same
+
+{/*
+- The loop, the instruction file, the diff, and the review. Everything
+  else in the course applies to all of them.
+*/}

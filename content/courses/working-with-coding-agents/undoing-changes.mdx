@@ -1,0 +1,65 @@
+---
+title: Undoing Changes
+description: Commit before the session starts, keep each task on its own branch, and know which Git command undoes which mistake.
+---
+
+{/* SCAFFOLD: outline only, plus one working GitBlock. Replace each section's notes with prose, then delete this line. */}
+
+An agent session is safest when it starts from a clean commit. Then
+every change it makes is a diff against something you trust, and
+throwing the whole session away is one command.
+
+## Start clean
+
+{/*
+- `git status` before the session. Commit or set aside anything
+  unfinished, or the agent's edits and yours end up mixed in one diff.
+*/}
+
+## A branch per task
+
+{/*
+- One task, one branch. Abandoning the task is deleting the branch.
+- Worktrees, for running several agents at once, are worth a mention
+  but cannot be shown here: the in-browser Git engine has no
+  `worktree` command.
+*/}
+
+## Throwing away what you have not committed
+
+{/*
+- `git restore <file>` for one file; `git restore .` for everything.
+- Write the prose around the block below: README.md has an edit that
+  is not staged, `restore` drops it, and `status` confirms the tree is
+  clean.
+*/}
+
+<GitBlock
+  scenario="linear-history"
+  label="Discard an unstaged edit, then drop the last commit"
+  expandState
+  commands={`git status --short
+git restore README.md
+git status --short
+git log --oneline
+git reset --hard HEAD~1
+git log --oneline`}
+/>
+
+## Undoing a commit
+
+{/*
+- `git reset --hard HEAD~1` drops the last commit on a branch nobody
+  else has (shown above).
+- `git revert` is the right tool for a commit that is already shared,
+  but the in-browser engine does not support it yet; adding it to
+  app/_components/git/gitCommand.ts would let this lesson show both.
+*/}
+
+## Concept check
+
+{/*
+- MultipleChoice: four situations (uncommitted edit, committed and
+  unshared, already pushed, one bad file in a good commit) matched to
+  the right command.
+*/}
