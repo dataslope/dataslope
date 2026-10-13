@@ -4,9 +4,11 @@
  * Worker, and the full shiki bundle statically references every grammar
  * (~1.3 MiB gzipped against the Worker's 10 MiB ceiling), so this exposes
  * the same runtime surface with the registry restricted to what content
- * actually fences. A language outside the list renders unhighlighted
- * (Fumadocs skips missing grammars); fence a new language in content/, add
- * it here. ```mermaid``` fences never reach Shiki. Build-time highlighting
+ * actually fences. A language outside the list does not fall back to plain
+ * text: the page throws `ShikiError: Language "…" not found` at request time
+ * and renders as a 500. Fence a new language in content/, add it here
+ * (__tests__/shikiLanguages.test.ts fails until you do). ```mermaid```
+ * fences never reach Shiki. Build-time highlighting
  * resolves the REAL shiki package — the alias applies only to the Next.js
  * bundle.
  */
@@ -41,6 +43,7 @@ export const bundledLanguages = {
   csharp: () => import("@shikijs/langs/csharp"),
   cs: () => import("@shikijs/langs/csharp"),
   css: () => import("@shikijs/langs/css"),
+  diff: () => import("@shikijs/langs/diff"),
   haskell: () => import("@shikijs/langs/haskell"),
   html: () => import("@shikijs/langs/html"),
   java: () => import("@shikijs/langs/java"),
