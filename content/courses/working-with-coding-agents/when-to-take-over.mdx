@@ -3,39 +3,277 @@ title: When to Take Over
 description: The signs that a session is going in circles, the tasks agents still handle badly, and why writing it yourself is sometimes the fast option.
 ---
 
-{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
-
 Some tasks are faster by hand, and some sessions stop making progress.
 Recognizing either one early is worth more than any prompting
 technique.
 
 ## Signs of a session going in circles
 
-{/*
-- The same error after each "fix".
-- Two fixes alternating: A breaks B, B's fix breaks A.
-- A diff that keeps growing while the task does not get closer.
-*/}
+A session that has stopped making progress rarely says so. The agent
+keeps announcing that it has found the problem, and each step looks
+reasonable on its own. The pattern only shows when you look at several
+steps together, and three patterns cover most of it:
+
+* **The same error after each "fix".** The agent edits, runs the tests,
+  and the failure that comes back is the one it started with. Each
+  attempt is a new guess, and the guesses are not converging.
+* **Two fixes taking turns.** Fixing test A breaks test B, and fixing B
+  breaks A again. No edit satisfies both, usually because the two want
+  incompatible things.
+* **A diff that grows while the task gets no closer.** Each attempt
+  leaves its code behind: a special case, a flag, a helper for the
+  helper. The change gets bigger and the failure does not change.
+
+A fourth sign is the agent going after the check instead of the code: an
+expected value edited to match, a broad `try`/`except` around the
+failing call, a test marked as skipped. That is the session conceding
+the task while reporting success (see
+[Common Failure Modes](/courses/working-with-coding-agents/common-failure-modes)).
+
+All of these are visible in the transcript before they are visible in
+the code, which means you can check for them mechanically. Here is a
+recorded session, reduced to one line per step (the log format is made
+up for this lesson; real transcripts are longer and say the same
+things), and a short scan for the first three patterns:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# A recorded session, one line per step. The request was:
+#   "Make parse_date read 03/04/2026 as 3 April, and keep the tests passing."
+LOG = """
+run_tests  FAILED test_day_first: got 2026-03-04, expected 2026-04-03
+edit       dates.py +3 -1
+run_tests  FAILED test_us_export: got 2026-04-03, expected 2026-03-04
+edit       dates.py +7 -2
+run_tests  FAILED test_day_first: got 2026-03-04, expected 2026-04-03
+edit       dates.py +12 -4
+run_tests  FAILED test_us_export: got 2026-04-03, expected 2026-03-04
+edit       importers.py +18 -5
+run_tests  FAILED test_day_first: got 2026-03-04, expected 2026-04-03
+"""
+
+first_seen = {}   # failure text -> the step where it first appeared
+failures = []     # the result of every test run: its failure, or None
+edited = 0        # lines added plus lines removed, so far
+
+for step, line in enumerate(LOG.strip().splitlines(), start=1):
+    tool, detail = line.split(maxsplit=1)
+    if tool == "edit":
+        path, added, removed = detail.split()
+        edited += int(added[1:]) + int(removed[1:])
+        continue
+    if not detail.startswith("FAILED"):
+        failures.append(None)
+        print(f"step {step}: tests pass, after {edited} edited lines")
+        continue
+    failures.append(detail)
+    if detail in first_seen:
+        print(f"step {step}: same failure as step {first_seen[detail]}, "
+              f"after {edited} edited lines")
+    else:
+        first_seen[detail] = step
+
+a, b, c, d = ([None] * 4 + failures)[-4:]
+if None not in (a, b) and a == c and b == d and a != b:
+    print()
+    print("Two failures are taking turns: each fix breaks the other test.")
+`,
+    },
+  ]}
+/>
+
+Read the output against the three patterns. The same two failures come
+back again and again, they alternate, and by step 9 the agent has edited
+52 lines across two files to arrive exactly where it started. Change the
+last line of the log to `run_tests  PASSED 12 tests` and run it again to
+see what a session that got somewhere looks like; then try a log where
+every run fails the same way.
+
+The alternation here is not a bug the agent failed to find. One test
+says `03/04/2026` is 3 April, because that is what the request asked
+for. Another, older test says it is 4 March, because the project
+imports files exported from a system that writes dates month first.
+Both tests are right about something, and no edit to `parse_date` can
+satisfy both while it has one meaning for that string. The answer is not in the code,
+so the agent cannot find it there. Someone has to decide: a format
+argument, a separate parser for the import, or a change to the import
+itself. Once that is decided, this is a small task again.
 
 ## Tasks that tend to go badly
 
-{/*
-- Requirements you have not decided yet: the agent will decide them.
-- Wide changes across code with no tests to catch a mistake.
-- Private or poorly documented APIs the model has never seen.
-- Judgment calls about what users want.
-*/}
+Some tasks go in circles more often than others, and you can usually
+tell before the session starts.
+
+| The task | Why it goes badly | What to do first |
+| --- | --- | --- |
+| Requirements you have not decided | The agent decides them, and its choice arrives in the diff looking like a fact | Decide, and put the decision in the request |
+| A wide change across code with no tests | Nothing catches a mistake in file 14 of 30, and a 30-file review will not either | Add tests for the behavior first, or cut the change into checkable pieces |
+| A private or poorly documented API | The model has not seen it, so it writes calls that look plausible | Put the docs or the source in front of it, or write those calls yourself |
+| A judgment call about users | The agent produces an answer, and the answer is a guess about people it has never met | Make the call yourself, then let the agent do the typing |
+
+**Undecided requirements** often hide inside a request that sounds
+complete, and the parse_date session above is one. An agent asked to "handle dates
+properly" will pick a meaning for "properly" and write tests that agree
+with its pick. The tests pass, the summary sounds confident, and you
+learn what was decided by reading the code.
+
+**A wide change without tests** fails differently: the session may well
+finish, and you have no way to tell whether it finished correctly. An
+agent can rename a function across thirty files quickly. Checking
+that it found every call site, including the one built from a string at
+runtime, is the part that takes the time, and without tests it is all
+yours.
+
+**Private APIs** are where invented functions come from. A model writes
+the call it would expect such a library to have, which is fluent and
+often wrong (How LLMs Work explains why in
+[Why Models Hallucinate](/courses/how-llms-work/why-models-hallucinate)).
+If the API's source is in the repository, point the agent at it and the
+problem mostly goes away. The hard cases are the internal service known
+only from its network behavior, the vendor SDK that ships compiled, and
+the release that came out after the model was trained.
+
+**Judgment calls about users** look like small tasks: the wording of an
+error message, the default for a setting, which field a form asks for
+first. An agent will happily make every one of them, and none of its
+choices will be wrong in a way a test can catch. That is exactly why they
+should be yours.
 
 ## The cost of not knowing your own code
 
-{/*
-- Code you merged without understanding is code you cannot debug at
-  2am. Sometimes writing it yourself is the point.
-*/}
+Code you merged without understanding is code you cannot debug at 2am.
+When it breaks, the agent's summary is not there to help, the session
+that wrote it is gone, and the person reading the stack trace is you.
+
+Reviewing a diff is not the same as understanding it. You can read a
+change, find nothing wrong, and still be unable to say what it does with
+an input nobody tested. That is fine for a change you could rebuild in
+ten minutes. It is not fine for the code that handles money, permissions
+or customer data, or for the parts of the system you will be asked to
+change next month.
+
+Sometimes writing it yourself is the point:
+
+* **The code you are responsible for when it fails.** The understanding
+  you build while writing it is what you will be debugging with later.
+* **The thing you are trying to learn.** If the task is how you get
+  better at recursion, SQL joins or a new framework, an agent doing it
+  for you skips the part you wanted.
+* **The change smaller than its description.** If explaining what you
+  want takes longer than typing it, type it.
+
+A simple check before merging: could you explain this change to a
+colleague without the agent's summary open? Could you say what it does
+for an input the tests do not cover? If not, keep reading until you can,
+or write it yourself. Both are fine. Merging without either is the
+expensive option, and the bill arrives later.
 
 ## Taking over cleanly
 
-{/*
-- Keep the useful part (a test, a plan, one good function), discard the
-  rest with Git (Undoing Changes), and finish by hand.
-*/}
+Taking over does not mean throwing everything away. Most sessions that
+went wrong leave something worth keeping: a test that pins down the
+requirement, a plan that was right even though the code was not, one
+function that works. Keep that, discard the rest with Git, and finish by
+hand. [Undoing Changes](/courses/working-with-coding-agents/undoing-changes)
+introduced the restores; here is the whole take-over of the discount
+session, through to the commit.
+
+Its three commits split cleanly. The first got the code wrong and the
+test right. The second "fixed" the test to match the bug. The third
+changed two files nobody asked about. So the part worth keeping is the
+agent's original threshold test, and the part left to you is one
+character of code:
+
+<GitBlock
+  scenario="agent-session"
+  label="Keep the agent's first test, drop the rest, fix one line by hand"
+  expandState
+  commands={`git restore --source=HEAD~3 format.py report.py
+git restore --source=HEAD~2 test_pricing.py
+git status --short
+git diff test_pricing.py
+sed -i 's/total > DISCOUNT_THRESHOLD/total >= DISCOUNT_THRESHOLD/' pricing.py
+git diff pricing.py
+git add .
+git commit -m "Discount orders at exactly the threshold; undo the tidy-up"
+git diff HEAD~4 --stat`}
+/>
+
+What each step does:
+
+1. `git restore --source=HEAD~3` puts the two tidied files back the way
+   they were in the commit before the session started.
+2. `git restore --source=HEAD~2` brings back `test_pricing.py` as the
+   agent's first commit wrote it, the version that expects 9,000. The
+   `git diff` after it shows that this undoes the second commit's edit
+   and nothing else.
+3. `sed` makes the fix: `>` becomes `>=`. In your own editor you would
+   just type it; the sandbox has no editor, so a one-line `sed` stands in
+   for one.
+4. The last command compares the result with the commit before the
+   session (`HEAD~4` now, because your commit added one more). Two files
+   changed, and they are the two the request was about.
+
+The agent's three commits are still in the history, followed by yours.
+On a branch nobody else has, you could also squash them into one clean
+commit. On a shared one, leave them: rewriting history other people
+have already pulled causes more trouble than an untidy log.
+
+Finishing by hand is not the only way to take over. Often the useful
+thing you contribute is the decision, not the code. For the parse_date
+session, deciding that month-first exports get their own parser turns a
+session going in circles into a one-sentence task, and a fresh session
+with that sentence in the request
+([Steering a Session](/courses/working-with-coding-agents/steering-a-session))
+may well finish it in a few steps.
+
+## Concept check
+
+<MultipleChoice
+  markdown={`An agent's last four test runs failed with failure A, then B, then A, then B. What is the most likely explanation?
+
+- The tests are flaky, and rerunning them would settle it.
+  > Flaky tests fail at random. A strict alternation that follows each edit points at the edits, not at chance.
+- [o] Two requirements conflict, and no single edit satisfies both.
+  > Each fix moves the code toward one test and away from the other. That is a decision to make, not a bug to find.
+- The agent's context window is too small to hold both test files.
+  > Both failures are short and recent; the agent can see them. It cannot see which test is right.
+- The agent has not yet opened the file where the bug is.
+  > An unread file would give the same failure every time, not two failures taking turns.
+
+Alternating failures usually mean the task has an open question in it.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of these tasks is most likely to go well with an agent?
+
+- Choose the wording for the message users see when a payment fails.
+  > Every option passes every test; the right one depends on users the agent knows nothing about.
+- Move forty modules to a new logging call in a codebase with no tests.
+  > It will probably finish, and nothing will tell you whether it finished correctly.
+- Integrate with an internal billing service that has no published docs.
+  > The model has never seen the service, so it will write calls that look plausible.
+- [o] Add a function that has a written spec and tests you can run.
+  > The requirements are decided, the scope is small, and there is a check that does not depend on the agent's word.
+
+The tasks that go well have their decisions made before the session
+starts.`}
+/>
+
+<MultipleChoice
+  markdown={`You are taking over the discount session. Which part of it is worth keeping?
+
+- [o] The agent's original threshold test, the one expecting 9,000.
+  > It captures the requirement correctly. Restoring it from the first commit gives you a failing test that your one-character fix then makes pass.
+- The second commit, since it makes the whole suite pass.
+  > It makes the suite pass by asserting the bug. Keeping it keeps the bug.
+- The tidy-up, since type hints and a thousands separator are improvements.
+  > Nobody asked for it. Even if you want it, it belongs in its own reviewed change.
+- The closing summary, reused as the commit message for your fix.
+  > It describes what the agent believed it did, which is not what the history shows.
+
+Keep what is right, whoever wrote it, and discard the rest.`}
+/>

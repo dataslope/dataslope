@@ -3,8 +3,6 @@ title: What a Session Costs
 description: Why an agent session uses far more tokens than the conversation suggests, what caching does to the bill, and a calculator for your own sessions.
 ---
 
-{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
-
 A short request can start a session that reads thirty files and runs
 the tests six times. Each of those steps resends the whole conversation
 so far, so the input a session consumes grows much faster than the
@@ -12,46 +10,319 @@ session itself.
 
 ## Every step resends the context
 
-{/*
-- Step n sends everything from steps 1 to n-1 again. Twenty steps of
-  a growing context is far more than twenty times the first request.
-- Link How LLMs Work, "Pricing Structure" and "Estimating Cost"
-  (/courses/how-llms-work/pricing-structure,
-  /courses/how-llms-work/estimating-cost).
-*/}
+Each step of the agent loop is one request to the model, and the model
+keeps nothing between requests. Whatever it needs to know at step 20 has
+to be in the request for step 20: the harness's system prompt, the tool
+definitions, the instruction file, your request, and every tool call and
+tool result from steps 1 to 19. So step 20 sends all of that, and step 21
+sends all of it again plus whatever step 20 added.
+
+This is the conversation resend from How LLMs Work's
+[Estimating Cost](/courses/how-llms-work/estimating-cost), with two
+differences that make it bigger. An agent takes many more steps than a
+person takes turns, because it calls a tool where a person would think
+for a moment. And what each step adds is a file, a search result or a
+test log, not a sentence.
+
+Here is the arithmetic with no prices in it yet. Suppose the session
+starts with 20,000 tokens of context (system prompt, tools, instruction
+file and request) and each step adds 2,800 (the model's tool call plus
+what the tool returned):
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `START = 20_000      # system prompt, tool definitions, instruction file, request
+PER_STEP = 2_800    # what each step appends: the model's tool call plus its result
+
+print(f"{'steps':>5} {'context at end':>15} {'input sent':>12} {'ratio':>6}")
+for steps in [5, 10, 20, 40, 80]:
+    sent = 0
+    context = START
+    for _ in range(steps):
+        sent += context          # every step sends the whole context so far
+        context += PER_STEP      # and leaves it a little longer
+    print(f"{steps:>5} {context:>15,} {sent:>12,} {sent / context:>5.0f}x")
+`,
+    },
+  ]}
+/>
+
+At 20 steps the context has grown to 76,000 tokens, which sounds
+modest, and the session has sent 932,000. Double the steps and the input
+sent more than triples, to almost 3 million. The last column is the gap
+between what the session looks like (its final size) and what it
+consumed, and it widens with every step.
+
+That gap is why per-token prices mislead people about agents. The price
+per token is the same as for a chat
+([Pricing Structure](/courses/how-llms-work/pricing-structure) has the
+October 2026 rates); the number of tokens is not.
 
 ## What caching changes
 
-{/*
-- Repeated prefixes are cached, and cached input costs a tenth or less
-  (How LLMs Work, "Controlling Cost"). Most of an agent's resent
-  context is a repeated prefix, which is why sessions are affordable
-  at all.
-- Volatile content early in the context breaks the cache for everything
-  after it.
-*/}
+Look at what step 21 actually sends: everything step 20 sent, unchanged,
+followed by a few thousand new tokens. Almost all of every request is a
+**repeated prefix**, and a repeated prefix is exactly what prompt caching
+discounts. The provider keeps the processed state of the prefix for a
+few minutes, and a request that starts with the same bytes reads it back
+instead of paying to process it again.
+
+The discount is large. A tenth of the input price was the standard rate
+for years, and as of October 2026 several models charge less: on the
+Sonnet-tier prices this course borrows from How LLMs Work, input is
+\$2.00 per million tokens and a cache hit is \$0.10, a twentieth. In an
+agent session, where most input is resent prefix, that is the difference
+between \$3.73 and \$0.79 for the session in the calculator below. It is
+why agent sessions are affordable at all.
+
+The cache has the same two conditions described in
+[Controlling Cost](/courses/how-llms-work/controlling-cost), and an
+agent session can break either one:
+
+* **The prefix must match byte for byte.** One changed byte invalidates
+  the cache from that point on. Anything volatile near the top of the
+  context (a date or a generated status line in an instruction file, say)
+  makes every step pay full price for everything after it. The same goes
+  for a harness that summarizes older turns to make room: the summary is
+  new text, so the step after it pays full price for the summary and
+  everything that follows it.
+* **The cache expires.** On most providers the default lifetime is
+  minutes. Leave a
+  session waiting on a question while you get lunch, and the next step
+  pays full price for the whole context once before the cache is warm
+  again.
 
 ## A calculator for your own sessions
 
-{/*
-- Interactive: a Python CodeBlock that takes steps, tokens added per
-  step, input/output/cached prices, and a cache hit rate, and prints
-  the session's total with and without caching.
-- Take prices from How LLMs Work so the two courses agree, and date
-  them (October 2026).
-*/}
+The calculator below prices a session from six numbers. The prices are
+the Sonnet-tier row from How LLMs Work's October 2026 snapshot, so the
+two courses agree; the comment says where to find the other tiers.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Prices in USD per million tokens: the Sonnet-tier row of How LLMs Work's
+# October 2026 snapshot. Opus tier: 4.00 / 0.20 / 20.00.
+# Haiku tier: 0.10 / 0.01 / 0.50. Or use your own model's price list.
+INPUT_PRICE = 2.00
+CACHED_PRICE = 0.10
+OUTPUT_PRICE = 10.00
+
+# The session.
+STEPS = 30               # requests to the model before it says it is done
+START_TOKENS = 20_000    # system prompt, tool definitions, instruction file, request
+ADDED_PER_STEP = 2_500   # tool results appended each step: files read, test output
+OUTPUT_PER_STEP = 300    # tokens the model writes each step: a tool call, a note
+CACHE_HIT_RATE = 0.9     # share of each resent prefix read back from the cache
+
+
+def session(hit_rate):
+    """Tokens billed at each rate over the whole session."""
+    full = cached = output = 0
+    context = START_TOKENS   # what the next request sends
+    prefix = 0               # how much of it the previous request already sent
+    for _ in range(STEPS):
+        hits = prefix * hit_rate
+        cached += hits
+        full += context - hits
+        output += OUTPUT_PER_STEP
+        prefix = context
+        context += OUTPUT_PER_STEP + ADDED_PER_STEP
+    return full, cached, output
+
+
+def cost(tokens, price):
+    return tokens / 1_000_000 * price
+
+
+plain = session(0.0)
+warm = session(CACHE_HIT_RATE)
+last = START_TOKENS + (STEPS - 1) * (OUTPUT_PER_STEP + ADDED_PER_STEP)
+
+print(f"{STEPS} steps. The last request sent {last:,} tokens;")
+print(f"the session sent {sum(plain[:2]):,.0f} input tokens in all.")
+print(f"Cache hit rate: {CACHE_HIT_RATE:.0%}")
+print()
+print(f"{'':<20}{'no cache':>10}{'with cache':>12}")
+labels = ["input, full price", "input, cached", "output"]
+prices = [INPUT_PRICE, CACHED_PRICE, OUTPUT_PRICE]
+totals = [0.0, 0.0]
+for label, price, a, b in zip(labels, prices, plain, warm):
+    ca, cb = cost(a, price), cost(b, price)
+    totals[0] += ca
+    totals[1] += cb
+    print(f"{label:<20}{'$' + format(ca, '.2f'):>10}{'$' + format(cb, '.2f'):>12}")
+print(f"{'session total':<20}{'$' + format(totals[0], '.2f'):>10}{'$' + format(totals[1], '.2f'):>12}")
+`,
+    },
+  ]}
+/>
+
+With the numbers as given, thirty steps cost \$3.73 without caching and
+\$0.79 with it. Then try these, one at a time, and run after each:
+
+* **Set `STEPS = 60`.** The uncached total goes from \$3.73 to \$12.49,
+  more than three times as much for twice the steps. That is the resend
+  again, now in dollars.
+* **Set `CACHE_HIT_RATE = 1.0`.** A cache that never misses brings the
+  session to \$0.46. Missing one time in ten, the default, costs about
+  70% more than that, which is why the two conditions in the last
+  section are worth caring about.
+* **Set `ADDED_PER_STEP = 10_000`.** That is roughly what happens when
+  every test run dumps its full log into the context. The cached total
+  nearly triples.
+* **Look at the output line.** Without caching, output is a few percent
+  of the bill. With caching it becomes a real share, because the input
+  got cheap and the output did not.
+
+Three things the calculator leaves out, all of them in How LLMs Work:
+writing to the cache costs slightly more than plain input; thinking
+tokens are billed as output, so a model that reasons at length before
+each step needs a bigger `OUTPUT_PER_STEP`; and some models charge a
+higher rate for every request past a length threshold, which a long
+session can cross partway through. The numbers in `START_TOKENS` and
+`ADDED_PER_STEP` are assumptions too. If your tool shows the token
+counts of a real session, those are the numbers to put in.
 
 ## Subscriptions and pay-per-token
 
-{/*
-- Several tools are sold as a subscription with usage limits rather
-  than per token. VERIFY current plans before writing this section,
-  and keep product specifics in Kinds of Coding Tools.
-*/}
+Not every tool bills you by the token. Several are sold as a monthly
+plan with usage limits, and some of those can also be pointed at an API
+key and billed per token instead.[^plans] Which plans exist, what they
+include and how their limits are counted change often, so those details
+live in [Kinds of Coding Tools](/courses/working-with-coding-agents/kinds-of-coding-tools).
+
+What does not change is the arithmetic underneath. A plan turns a
+variable bill into a fixed one with a ceiling, and the ceiling is what
+the resend now spends. At least one vendor's plan page says so
+directly: how much you can do depends on the model and on the size and
+complexity of your tasks.[^limits] A session that resends a 100,000-token
+context thirty times uses more of an allowance than one that stays
+small, just as it would cost more per token.
+
+So the comparison comes down to two failure modes and a sum:
+
+* **On a plan**, the usual risk is hitting the limit halfway through a
+  task. The surprise is in the timing more than in the bill.
+* **On pay-per-token**, the risk is the bill. Set a spending limit if
+  your provider offers one, and price a typical session with the
+  calculator before you run a hundred of them.
+* **The sum:** the calculator's per-session total, times the sessions
+  you run in a month, against the plan's price. Which side wins depends
+  entirely on how you work, and it is worth redoing when either side
+  changes.
+
+Either way, the habits in the next section are the same. On a plan they
+decide how far into the week your allowance lasts, and per token they
+decide what the invoice says.
 
 ## Cheaper sessions
 
-{/*
-- Smaller tasks, fresh sessions, quieter tool output (a test runner's
-  summary rather than its full log), and a shorter instruction file.
-*/}
+Everything that makes a session cheaper works by sending fewer tokens,
+fewer times.
+
+**Smaller tasks.** Because the input grows faster than the step count,
+two short sessions cost less than one long one doing the same work. In
+the first block, one 40-step session sends almost 3 million tokens; two
+20-step sessions send under 1.9 million between them. A task sized for
+one sitting is also easier to review
+([Sizing a Task](/courses/working-with-coding-agents/sizing-a-task)).
+
+**Fresh sessions.** Starting the next task in the same session means
+paying to resend the previous task at every step of the new one, with
+no benefit: the old task's files and test runs are clutter for the new
+one. One task per session keeps the context, and the bill, about that
+task ([What the Agent Sees](/courses/working-with-coding-agents/what-the-agent-sees)).
+
+**Quieter tool output.** Whatever a tool prints stays in the context and
+is resent at every later step. A test run that dumps 10,000 tokens of
+passing tests at step 5 of 30 is resent 25 more times, a quarter of a
+million tokens for a log that said "everything passed" in its last line.
+Ask for the summary instead: many test runners have a quiet mode, and
+pointing the agent at it, in the request or the instruction file, is
+one line. For pytest:
+
+```bash
+pytest -q --tb=short
+```
+
+**A shorter instruction file.** It sits near the top of every request,
+so a 4,000-token file is 120,000 tokens over a 30-step session. With
+caching that comes to a cent or two at the Sonnet-tier rate, so the
+money is small; the bigger cost is the room it takes and the attention it
+competes for. [Instruction Files](/courses/working-with-coding-agents/instruction-files)
+covers what is worth keeping in it.
+
+**A cheaper model for routine work.** The spread between model tiers is
+far larger than any of the savings above (How LLMs Work puts it at about
+100x in [Controlling Cost](/courses/how-llms-work/controlling-cost)).
+Several tools let you choose the model per session, and a rename or a
+test fix rarely needs the most expensive one.
+
+## Concept check
+
+<MultipleChoice
+  markdown={`A 30-step session's last request sent 100,000 tokens, and its first sent 20,000. Roughly how many input tokens did the whole session send?
+
+- About 100,000, the size of the final request.
+  > That is one request. Every earlier step sent its own copy of the context too.
+- About 3,000,000, thirty times the final request.
+  > That overcounts: the early requests were much smaller than the last one.
+- [o] Nearer 2,000,000, the sum of all thirty requests.
+  > Thirty requests that grow steadily from 20,000 to 100,000 average about 60,000 each, which is around 1.8 million in all.
+- About 130,000, the final request plus everything the model wrote.
+  > The model's output is small next to the input that every step resends.
+
+Total input is the sum of every request, not the size of the last one.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does prompt caching cut an agent session's bill so sharply?
+
+- [o] Most of each request is the previous request, resent unchanged.
+  > Each step appends to the context rather than rewriting it, so nearly all of its input is a prefix the cache has already processed.
+- Agents write very little output, and caching applies mainly to output.
+  > Caching discounts input. Output is billed at the full output rate either way.
+- Cached tokens do not count against the model's context window.
+  > They count in full. Caching changes the price of a token, not the size of the context.
+- The cache stores the model's earlier answers and replays them.
+  > It stores the processed prefix of the request, not answers. Every step is still computed.
+
+Caching pays in proportion to how much of each request repeats, and in
+an agent session almost all of it does.`}
+/>
+
+<MultipleChoice
+  markdown={`At step 5 of a 30-step session, a test run prints a 10,000-token log. Why does that log cost more than its 10,000 tokens?
+
+- Tool output is billed at the output rate.
+  > Tool results are input. Only what the model itself writes is output.
+- Tool output is never eligible for caching.
+  > From the next step on, the log is part of the prefix and can be cached like anything else.
+- The model has to run the tests again before it can read the log.
+  > The log is text in the context; nothing is rerun to read it.
+- [o] Every later step sends it again.
+  > It is sent once at step 5 and again in each of the 25 requests after it, cached or not.
+
+Whatever a tool prints is paid for at every step that follows, which is
+why quiet output is a cost habit and not just a tidiness one.`}
+/>
+
+[^plans]:
+    Two examples, both vendor pages checked in October 2026. Anthropic,
+    [*Use Claude Code with your Pro or Max plan*](https://support.claude.com/en/articles/11145838-using-claude-code-with-your-pro-or-max-plan)
+    (Claude Help Center), describes using the agent under a subscription
+    with usage limits, or with an API key billed at API rates instead.
+    OpenAI's [Codex pricing page](https://learn.chatgpt.com/docs/pricing)
+    describes Codex as included in ChatGPT plans, with an option to pay
+    by API usage instead.
+
+[^limits]:
+    OpenAI, [Codex pricing](https://learn.chatgpt.com/docs/pricing): the
+    number of messages you can send "depends on the model used, size and
+    complexity of your tasks."

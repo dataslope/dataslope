@@ -1,36 +1,284 @@
 ---
 title: Steering a Session
-description: Correcting an agent mid-task, interrupting it before it goes further, and deciding between continuing and starting over.
+description: Correcting an agent mid-task with feedback it can act on, interrupting it before a mistake grows, and deciding between continuing and starting over.
 ---
-
-{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
 
 Most sessions need at least one correction. How you give it decides
 whether the agent fixes the problem or apologizes and repeats it.
 
 ## Specific feedback beats "that's wrong"
 
-{/*
-- Say what is wrong, where, and what right looks like: "the total
-  should exclude refunded orders; see the status column".
-- Paste the actual error or the failing output rather than describing
-  it.
-- Interactive: MultipleChoice choosing between three corrections for
-  the same recorded mistake.
-*/}
+Here is the session this course keeps coming back to. You asked:
+
+> Give orders of \$100 or more a 10% discount, with tests. Don't change
+> anything else.
+
+The agent's first commit compared the total with `>` where the request
+said "or more", so an order of exactly \$100 gets no discount. Its own
+test at the threshold caught that, and the agent then changed the test
+instead of the code. (The full session is in
+[Reading the Diff](/courses/working-with-coding-agents/reading-the-diff).)
+
+Suppose you spot the problem and reply "that's wrong, fix it". From the
+agent's side, that message says the last thing it did was wrong and
+nothing more. Which part? The comparison, the rounding, the test, the
+formatting tidy-up? The model has to guess, and the guess that makes a
+failure go away fastest is often an edit to the test.
+
+There is a second pull in the same direction. Language models tend to
+agree with whoever pushes back. In a study published in 2023, AI
+assistants challenged with "I don't think that's right. Are you sure?"
+frequently admitted to mistakes they had not made, and often swapped a
+correct answer for a wrong one.[^sycophancy] A bare "that's wrong"
+invites exactly that: an apology and a change, whether or not the
+change is the right one.
+
+A correction the agent can act on says three things:
+
+* **What is wrong**, as behavior: an order of exactly 10,000 cents gets
+  no discount.
+* **Where**: the comparison in `order_total`, in `pricing.py`.
+* **What right looks like**: a 10,000-cent order comes to 9,000, and
+  the test at the threshold expects 9,000.
+
+The third part is the one most often left out, and it matters most.
+Without it the agent knows what to move away from but not where to go,
+and "away from the failure" includes editing the test.
+
+### Paste the real error
+
+When something failed, paste the failure instead of your summary of it.
+The output names the test, the call, the value it expected and the value
+that came back. That is everything the agent needs, and none of it has
+passed through your memory on the way. "The threshold test fails" is a
+description; the failure output is a fact.
+
+Here is the agent's first version of the code, run against its own first
+two tests:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# pricing.py, as the agent's first commit left it.
+DISCOUNT_THRESHOLD = 10_000  # cents
+DISCOUNT_RATE = 0.10
+
+
+def order_total(items):
+    """Total of price * qty for each item, in cents, after any discount."""
+    total = sum(item["price"] * item["qty"] for item in items)
+    if total > DISCOUNT_THRESHOLD:
+        total = round(total * (1 - DISCOUNT_RATE))
+    return total
+
+
+# The agent's two tests, before its second commit edited the second one.
+# Each is a name, the call it makes, and the value it expects.
+TESTS = [
+    ("test_discount_above_threshold", 'order_total([{"price": 6_000, "qty": 2}])', 10_800),
+    ("test_discount_at_threshold", 'order_total([{"price": 5_000, "qty": 2}])', 9_000),
+]
+
+for name, call, expected in TESTS:
+    got = eval(call)
+    if got == expected:
+        print(f"PASSED {name}")
+    else:
+        print(f"FAILED {name}")
+        print(f"    assert {call} == {expected:_}")
+        print(f"    got {got:_}")
+`,
+    },
+  ]}
+/>
+
+The last three lines are the part to paste. They say which test,
+which input, and that `10_000` came back where `9_000` was expected, with no
+room for the agent to read "the test is wrong" into them.
+
+Now change `>` to `>=` on the `if` line and run it again. Both tests
+pass, and neither test changed. That is the fix the correction should
+produce, and a correction that names the target makes it easy for the
+agent to check that it got there.
+
+<MultipleChoice
+  markdown={`You have found the \`>\` in the agent's first commit. Which reply is most likely to get it fixed properly in one step?
+
+- That's wrong. Please fix the discount.
+  > It says something is wrong and nothing about what, where, or what right looks like. The agent has to guess, and editing the test is the cheapest guess.
+- Something seems off with the discount around the threshold, so please look into it again carefully.
+  > It narrows the area but leaves the agent to decide what correct means, and "carefully" gives it nothing to check its fix against.
+- [o] An order of exactly 10,000 cents gets no discount. Use \`>=\` in \`order_total\`; expect 9,000.
+  > It names the behavior, the place, and the target value, so the agent can make the change and confirm it with the test that already exists.
+- Rewrite \`pricing.py\` from scratch, with tests for every order size, discount rate and rounding mode.
+  > It throws away the parts that were right and replaces one small mistake with a large, unreviewed diff.
+
+A useful correction gives the agent something to check its next attempt
+against.`}
+/>
 
 ## Interrupt early
 
-{/*
-- When the plan or the first edit goes in the wrong direction, stop it
-  there. Every further step builds on the mistake and adds to the diff.
-*/}
+The recorded agent committed after each piece of work, which makes it
+easy to find the moment this session went wrong for good. Run this block and
+read the second command's output:
+
+<GitBlock
+  scenario="agent-session"
+  label="The step to interrupt: a test edited to match the code"
+  commands={`git log --oneline
+git diff HEAD~2 HEAD~1`}
+/>
+
+One file, one line, and the line is an expected value. The test had just
+done its job by failing, and this edit undid that. If you had been
+watching, this is where to stop the agent: not at the end, when you read
+the summary, but the moment it opened a test file after that test
+failed.
+
+Every step after a wrong one builds on it. The recorded agent took one
+more step: it renamed and reformatted the formatting helpers, which
+nobody asked for, and then reported "All tests pass". By the end, the
+bug had a passing test protecting it and the diff had two more files to
+review. Each of those steps also became part of the context the agent
+reasoned from next, and each one resent everything before it (see
+[What a Session Costs](/courses/working-with-coding-agents/what-a-session-costs)).
+
+Some things are worth stopping for the moment you see them:
+
+* An edit to a test right after that test failed.
+* A file the request did not mention.
+* A plan, or a first edit, aimed at the wrong function.
+* A new dependency, or a command you would not have run yourself.
+* Anything introduced with "while I'm here".
+
+Stopping is cheap. Most tools let you interrupt the current step, keep
+the work done so far, and type a correction (the controls differ by
+product; see [Kinds of Coding Tools](/courses/working-with-coding-agents/kinds-of-coding-tools)).
+The correction you type is the same kind as above, and it is easier to
+write now: the mistake is one edit old, not buried under the rest of the
+session.
+
+<Callout type="tip" title="Interrupt at the plan if you can">
+The cheapest place to interrupt is before any file changes. An agent
+asked to plan first shows you the approach while a correction still costs
+a sentence; see [Plan Before Code](/courses/working-with-coding-agents/plan-before-code).
+</Callout>
 
 ## Continue or start over
 
-{/*
-- A long session carries every failed attempt in its context (What the
-  Agent Sees).
-- Rule of thumb to write up: after two corrections on the same point,
-  restart with a better request that includes what you learned.
-*/}
+A correction does not erase anything. After two rounds, the agent's
+context holds the original request, the first attempt, your correction,
+its apology, the second attempt, your second correction, and the third
+attempt, all of it resent at every step. From the model's side, a long
+session with several failed attempts is a long document about doing the
+task the wrong way, and the request you care about is the oldest thing in
+it. [What the Agent Sees](/courses/working-with-coding-agents/what-the-agent-sees)
+covers what that does to recall and why a fresh session often beats a
+long one.
+
+So here is a rule of thumb: **after two corrections on the same point,
+start over.** Anthropic's guidance for its own agent gives the same
+number.[^two-corrections] It is a heuristic drawn from experience, not a
+measured threshold. Its job is to make you notice when correcting has
+stopped working, and the second failed correction is a reasonable place
+to notice.
+
+Start over with a better request, not the same one. The failed session
+was not wasted: it showed you what the first request left open. Put that
+into the new one. For the discount, a restart might read:
+
+```text
+Give orders of $100 or more a 10% discount in order_total (pricing.py).
+"Or more" includes exactly $100: an order of 10,000 cents comes to 9,000.
+Add tests below, at, and above the threshold. If a test fails, fix
+pricing.py, not the test. Change no other files.
+```
+
+Almost every sentence in it answers a mistake the first session made:
+the boundary, the edited test, the tidy-up in other files. That is what
+you learned from the failed session, and it costs a few lines to carry
+forward.
+
+Start the new session from clean code as well. Either reset to the
+commit before the session
+([Undoing Changes](/courses/working-with-coding-agents/undoing-changes)),
+or keep the parts worth keeping and discard the rest
+([When to Take Over](/courses/working-with-coding-agents/when-to-take-over)).
+A fresh context on top of the old attempt's code is only half a restart.
+
+Continuing is still the right call more often than not, as long as each
+correction is new information:
+
+| Keep the session when | Start a fresh one when |
+| --- | --- |
+| Your correction tells it something it could not have known | You are repeating a correction it already had |
+| It has read files you would otherwise point it at again | Its context holds several abandoned approaches |
+| What is left is small and on the same point | The task itself has changed since the request |
+| Each attempt gets visibly closer | Each attempt fails in a new way |
+
+## Concept check
+
+<MultipleChoice
+  markdown={`Why paste the failing test's output into a correction instead of describing the failure?
+
+- [o] It is exact: the test, the input and both values.
+  > The output says which test failed, on which call, and what came back against what was expected. A description drops some of that and adds your interpretation.
+- It is always shorter than a description of the same failure.
+  > It is often longer. Length is not the point; precision is.
+- The agent cannot run the tests itself, so it needs your copy.
+  > Most agents can run the tests. Pasting the output still anchors the correction to a specific failure.
+- Pasted output makes the model treat the correction as more urgent.
+  > Tone and urgency are not what help. The facts in the output are.
+
+A failure output is evidence; a summary of it is a claim about evidence.`}
+/>
+
+<MultipleChoice
+  markdown={`The tests have just failed, and you see the agent open \`test_pricing.py\` and change an expected value. When should you interrupt?
+
+- After it finishes, so you can review the whole diff at once.
+  > By then later steps have been built on the edit, and the summary will report passing tests.
+- After the next test run, to see whether the change made it pass.
+  > It will pass. Editing the expected value to match the code is guaranteed to make that test pass.
+- Only if it goes on to edit a file outside the request as well.
+  > The test edit is the problem on its own; waiting for a second warning sign lets the first one settle in.
+- [o] Now, before the next step builds on the edit.
+  > A test edited right after it failed is one of the clearest signs to stop for. One edit is cheap to correct; three commits are not.
+
+The earlier the interruption, the smaller the mistake you have to undo.`}
+/>
+
+<MultipleChoice
+  markdown={`You have corrected the same threshold bug twice, and the third attempt is wrong again. What does this lesson's rule of thumb suggest?
+
+- Repeat the correction a third time, in stronger and clearer words.
+  > The context already holds two corrections on this point; a third adds to the pile of failed attempts without adding information.
+- [o] Start fresh, with a request that includes what you learned.
+  > A clean context, plus a request that names the boundary and forbids editing the test, removes both the clutter and the ambiguity that caused it.
+- Keep the session, and paste the complete test log into it too.
+  > The log is useful evidence, and it does not remove the failed attempts the model keeps reading.
+- Turn off the failing test so the agent can finish the task.
+  > That makes the session end, not the bug go away. The test is the only thing that caught it.
+
+Two corrections is a heuristic, not a law. Its purpose is to make you
+notice that correcting has stopped working.`}
+/>
+
+[^sycophancy]:
+    Mrinank Sharma and others,
+    ["Towards Understanding Sycophancy in Language Models"](https://arxiv.org/abs/2310.13548),
+    ICLR 2024. Section 3.2 challenges five AI assistants with "I don't
+    think that's right. Are you sure?" and finds they frequently admit
+    to mistakes they did not make. The models tested were 2023
+    assistants; the tendency it measures is the one a bare "that's
+    wrong" leans on.
+
+[^two-corrections]:
+    Anthropic, [*Best practices for Claude Code*](https://code.claude.com/docs/en/best-practices),
+    "Course-correct early and often": "If you've corrected Claude more
+    than twice on the same issue in one session, the context is
+    cluttered with failed approaches." It recommends starting fresh with
+    a more specific prompt that incorporates what you learned.
