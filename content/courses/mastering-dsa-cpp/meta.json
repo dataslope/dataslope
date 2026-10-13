@@ -1,6 +1,6 @@
 {
     "title": "Mastering Data Structures and Algorithms in C++",
-    "description": "A hands-on course on data structures and algorithms in modern C++",
+    "description": "A hands-on course on data structures and algorithms in modern C++.",
     "root": true,
     "tags": {
         "language": [

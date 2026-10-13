@@ -1,6 +1,6 @@
 {
     "title": "Data Wrangling with Python Polars",
-    "description": "A hands-on course on Polars, the fast DataFrame library built on Apache Arrow. Learn to think in expressions, lazy query plans, and columnar memory, with every example running in your browser.",
+    "description": "Fast DataFrames with Polars: expressions, lazy queries and columnar memory.",
     "root": true,
     "tags": {
         "language": [

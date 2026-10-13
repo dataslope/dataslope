@@ -1,6 +1,6 @@
 {
     "title": "C# LINQ and Functional Patterns",
-    "description": "A computer science course on declarative data processing, functional thinking, and LINQ pipelines in modern C#",
+    "description": "Declarative data processing in modern C#, from functional thinking to LINQ.",
     "root": true,
     "tags": {
         "language": [

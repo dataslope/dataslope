@@ -1,6 +1,6 @@
 {
     "title": "How Large Language Models Work",
-    "description": "A hands-on tour of what an LLM actually does: tokens, embeddings, attention, sampling, what a request costs, and what benchmark numbers really mean.",
+    "description": "What an LLM actually does: tokens, attention, sampling, costs and benchmarks.",
     "root": true,
     "tags": {
         "language": [

@@ -1,6 +1,6 @@
 {
     "title": "Working with Coding Agents",
-    "description": "A practical course on getting real work out of coding agents such as Claude Code, Codex, Cursor and GitHub Copilot: how the agent loop works, how to write a task an agent can finish, and how to check, test and undo what it did.",
+    "description": "Get real work out of coding agents: write tasks they can finish, then check them.",
     "root": true,
     "tags": {
         "language": [
