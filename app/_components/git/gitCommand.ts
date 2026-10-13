@@ -864,6 +864,10 @@ export function createGitCommand(opts: GitCommandOptions) {
     const staged = flags.has("staged");
     const worktree = flags.has("worktree") || !staged;
     const matrix = await git.statusMatrix({ fs, dir });
+    // `checkout` writes the index as well as the working tree. Restoring the
+    // working tree alone from another commit must leave the index as it was,
+    // or the restored file shows up staged where real git shows it modified.
+    const indexBefore = source && !staged ? await indexEntries() : null;
     for (const raw of rest) {
       const rel = relToRepo(dir, cwd, raw);
       const under = matrix.filter(([f]) => String(f) === rel || String(f).startsWith(`${rel}/`));
@@ -876,6 +880,11 @@ export function createGitCommand(opts: GitCommandOptions) {
         if (worktree) {
           if (h === 0 && s === 0 && !source) continue; // untracked: nothing to restore from
           await git.checkout({ fs, dir, ref: source ?? undefined, force: true, filepaths: [path], noUpdateHead: true });
+          if (indexBefore) {
+            const prior = indexBefore.get(path);
+            if (prior) await git.updateIndex({ fs, dir, filepath: path, oid: prior, add: true });
+            else await git.remove({ fs, dir, filepath: path });
+          }
           if (!source && !staged) {
             // `checkout` restores from a commit; the working tree is meant to
             // come from the index, which may hold a newer staged version.
