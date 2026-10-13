@@ -1,0 +1,161 @@
+---
+title: Welcome
+description: A practical course on working with coding agents such as Claude Code, Codex, Cursor and GitHub Copilot, built around the parts of the job that stay yours.
+---
+
+Welcome to **Working with Coding Agents**. A coding agent will read your
+code, edit files, run your tests and tell you it is finished. This
+course is about everything that happens around that: deciding what to
+ask for, checking what came back, and getting out cleanly when it went
+wrong.
+
+<Figure
+  slug="working-with-coding-agents-thumbnail-cutout"
+  alt="A friendly corgi sitting on a thick blue platform, watching a chunky green robot arm lower one large solid yellow block into an open red crate"
+  priority
+/>
+
+## Why bother
+
+Typing a request into an agent is easy. Getting work you can merge out
+of one is a skill, and most of it is not about the agent at all:
+
+* **Saying what "done" means.** An agent stops when it believes the task
+  is finished. If you never said what finished looks like, it decides.
+* **Checking the work, not the summary.** The closing message is the
+  agent's description of what it did. The diff is what it did. They do
+  not always agree.
+* **Keeping the change small enough to review.** A thousand-line diff
+  gets skimmed, and a skimmed diff is an unreviewed one.
+* **Being able to undo it.** An agent that can edit every file in a
+  repository can break every file in a repository. Git is the safety
+  net, as long as you set it up before the session starts.
+* **Knowing when to stop.** Some sessions go in circles. Recognizing one
+  early, and taking over, is cheaper than a fifth retry.
+
+Every lesson comes back to the same idea: the agent does the typing, and
+the judgment stays with you.
+
+## Try it right now
+
+Under the chat window, every coding agent is the same small loop. The
+model never touches your files directly. It asks for a tool ("run the
+tests", "read this file", "replace these lines"), the program around it
+runs that tool, and the result goes back into the conversation for the
+next step. Run this to watch one fix a bug:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# A coding agent is a language model in a loop. The model never touches
+# your files itself: it asks for a tool, the harness runs that tool, and
+# the result goes back into the conversation for the next step.
+#
+# The "model" below is a script, so every run is identical. A real one
+# chooses each step by reading everything in the transcript so far.
+
+files = {"calc.py": "def add(a, b):\\n    return a - b\\n"}
+
+def read_file(path):
+    return files[path]
+
+def edit_file(path, old, new):
+    files[path] = files[path].replace(old, new)
+    return f"edited {path}"
+
+def run_tests():
+    namespace = {}
+    exec(files["calc.py"], namespace)
+    result = namespace["add"](2, 3)
+    if result == 5:
+        return "1 passed"
+    return f"1 failed: add(2, 3) returned {result}"
+
+TOOLS = {"read_file": read_file, "edit_file": edit_file, "run_tests": run_tests}
+
+SCRIPT = [
+    ("run_tests", ()),
+    ("read_file", ("calc.py",)),
+    ("edit_file", ("calc.py", "a - b", "a + b")),
+    ("run_tests", ()),
+    ("finish", ("Fixed add(): it subtracted instead of adding.",)),
+]
+
+def model(transcript):
+    """Stands in for the language model: returns the next action."""
+    steps_taken = len(transcript) - 1
+    return SCRIPT[steps_taken]
+
+transcript = ["user: the tests are failing, please fix them"]
+print(transcript[0])
+
+while True:
+    tool, args = model(transcript)
+    if tool == "finish":
+        print(f"agent: {args[0]}")
+        break
+    result = TOOLS[tool](*args)
+    print(f"  tool  {tool}({', '.join(map(repr, args))})")
+    for line in result.splitlines():
+        print(f"        {line}")
+    transcript.append((tool, args, result))
+`,
+    },
+  ]}
+/>
+
+Now delete the second `("run_tests", ())` line from `SCRIPT` and run it
+again. The agent sends the same confident closing message, and this
+time nothing checked it. Nothing in the loop *requires* the agent to
+verify its own work; it verifies when it decides to. That gap is where
+most of this course lives.
+
+## What you will practice
+
+The agent itself cannot run inside this page, but everything around it
+can. Lessons show you a recorded agent session (the request, the tool
+calls, the diff it produced) and then hand the human half of the job to
+you:
+
+* **Writing tasks** with a goal, constraints and a test for "done", and
+  choosing between task descriptions that look alike and behave
+  differently.
+* **Reading diffs** in a real Git repository in your browser, and
+  undoing the commit that should not have happened.
+* **Writing the test that catches it**, when the agent says every test
+  passes and the code is still wrong.
+* **Estimating what a session costs**, with a calculator you can feed
+  your own numbers.
+* **Spotting the common failure modes** before they reach a pull
+  request: invented functions, weakened tests, and changes nobody asked
+  for.
+
+## What you need
+
+Some programming experience in any language, and enough Python to read
+short programs: functions, lists, dictionaries, loops. The exercises are
+in Python because Python runs in your browser, but nothing in the course
+is specific to it.
+
+You do not need an account with any agent, and you do not need to have
+used one. If you have, you will recognize most of the failure modes.
+
+<Callout type="info" title="A good companion course">
+[How Large Language Models Work](/courses/how-llms-work) explains the
+model inside the loop: why it hallucinates, what a context window holds,
+and what a request costs. This course assumes none of it, and links to
+the relevant lesson wherever one helps.
+</Callout>
+
+## A note on tools and dates
+
+The course names real products (Claude Code, Codex, Cursor, GitHub
+Copilot) because those are what you will be using. Their features change
+every few weeks, so product details live in one lesson,
+*Kinds of Coding Tools*, dated **October 2026**. Everything else is
+about the loop they all share, which changes far more slowly and is
+what the exercises teach.
+
+Let us start with what is actually running when you press Enter.

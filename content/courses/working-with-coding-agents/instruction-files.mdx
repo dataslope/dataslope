@@ -1,0 +1,377 @@
+---
+title: Instruction Files
+description: AGENTS.md, CLAUDE.md, Cursor rules and Copilot's instructions file. What belongs in the file every session reads first, and the rules that backfire.
+---
+
+Every agent reads some file before it reads your request: `AGENTS.md`,
+`CLAUDE.md`, a Cursor rules file or `.github/copilot-instructions.md`,
+depending on the tool. Whatever is in it is in the context of every
+session, which makes it the cheapest place to fix a mistake that keeps
+coming back.
+
+<Figure
+  slug="agent-instruction-files-cutout"
+  alt="A sturdy blue lectern on a thick platform with a closed chunky yellow handbook resting on it, and a friendly red robot standing in front of the lectern"
+/>
+
+## What goes in
+
+An instruction file is a standing request: the part of every request
+you would otherwise retype. Three kinds of line earn a place in it.
+
+**How to build, test and lint, as exact commands.** "Run the tests"
+leaves the agent to guess the runner, the flags and the directory.
+`python -m pytest -q` leaves nothing to guess. This is the line that
+does the most work, because it turns "with tests" in every request into
+a command the agent can actually run, which is the test for done from
+[Writing a Task](/courses/working-with-coding-agents/writing-a-task)
+supplied once for all of them.
+
+**Conventions that differ from what the model would assume.** A model
+defaults to what is common in the code it learned from. Your project's
+exceptions to the common case are what the file is for: amounts in
+integer cents, tests beside the code rather than in a `tests/` folder,
+one way of doing a thing where the language offers three.
+
+**Things that broke before, with the reason.** A rule with its reason
+can be judged. When the agent meets a case the rule did not foresee,
+the reason tells it which way to lean. A bare rule can only be obeyed
+or ignored, and the agent cannot tell which a new case calls for.
+
+Here is an instruction file for the shop from the running example:
+
+```markdown
+# Shop
+
+Order totals and reports for a small online shop, in plain Python with
+no dependencies beyond pytest.
+
+## Commands
+
+- Run every test: `python -m pytest -q`
+- Run one file: `python -m pytest -q test_pricing.py`
+
+Run the tests before you call a change finished, and quote the last
+line of their output in your summary.
+
+## Conventions
+
+- Money is an integer number of cents. A calculation may pass through a
+  float (a discount rate, say), but it rounds back to whole cents once,
+  at the end, with `round()`.
+- Tests sit beside the code as `test_<module>.py` and use plain `assert`.
+
+## Rules, and why
+
+- Do not rename anything in `format.py` or change its signatures. The
+  invoice emails import it from another repository, so nothing in this
+  one would fail if they broke.
+- If a test fails, fix the code or stop and ask. Do not edit a test's
+  expected value unless the request says that value is wrong: a failing
+  discount test was once "fixed" that way, and it ended up asserting
+  the bug.
+- Change only what the request asks for. Mention anything else you
+  noticed in your summary instead of fixing it.
+```
+
+Every line is either something the agent could not learn from the code
+or a rule with its reason attached. The rules come from experience, and
+in this case the experience is the running example: its second commit
+edited a test to agree with a bug, and its third tidied up files nobody
+had asked about.
+
+## What stays out
+
+**Anything the agent can read from the code.** "`pricing.py` contains
+`order_total`" tells the agent what one search would, and stays true
+only until someone moves the function. A file that describes the code
+goes out of date with every refactor, and then it misleads.
+
+**Long essays.** The file is part of the context at every step of every
+session (see
+[What the Agent Sees](/courses/working-with-coding-agents/what-the-agent-sees)),
+so every paragraph is paid for again and again, and competes for
+attention with the task itself. The vendors' own guidance points the
+same way. Claude Code's documentation suggests keeping each `CLAUDE.md`
+under 200 lines, because longer files consume more context and reduce
+adherence.[^claude-memory] Cursor's suggests keeping rules under 500
+lines.[^cursor-rules] Codex, by default, stops adding instruction files
+once their combined size reaches 32 KiB, so anything past that point is
+never read.[^codex-agents]
+
+**Secrets, ever.** The file is committed to the repository and sent to
+the model provider at every step. An API key in it is an API key in
+your Git history and in someone else's logs.
+[Staying Safe](/courses/working-with-coding-agents/staying-safe) covers
+where keys belong instead.
+
+### Audit a file
+
+The block below runs a crude audit over an instruction file. It holds a
+first draft for the shop with five problems in nine lines. Run it, then
+rewrite the draft until the audit has nothing left to say, or paste in
+the file above to compare. Then paste in your own.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# A crude audit for an instruction file (AGENTS.md, CLAUDE.md and the like).
+# It matches words and patterns, nothing more: it cannot tell whether a
+# rule is right, whether a convention is real, or whether the file is out
+# of date. A quiet audit means none of its patterns matched, which is not
+# the same as a good file.
+import re
+
+# Paste your own instruction file between the triple quotes and run it.
+FILE = """\\
+# Shop
+
+This is a small shop. pricing.py contains order_total, which adds up
+price times qty for each item. format.py has cents_to_str.
+
+Write clean, well-structured code and follow best practices.
+Never use floats for money.
+Run the tests before you finish.
+Payments sandbox: PAYMENTS_API_KEY=pk-test-not-a-real-key
+"""
+
+STEPS = 40  # model calls in one session; change it to match your own
+
+RESTATES_CODE = r"\\w+\\.py\\b.*\\b(contains|has|defines|holds|is where)\\b"
+VAGUE = r"\\b(clean|best practices?|well-structured|readable|maintainable|properly|elegant)\\b"
+RULE = r"^(- )?(never|don't|do not|always|avoid|must)\\b"
+REASON = r"\\b(because|since|so that|otherwise)\\b|[:;]|\\.\\s+\\S"
+SECRET = r"(api[_-]?key|secret|token|password)\\s*[=:]\\s*\\S+"
+TEST_COMMAND = r"\\x60[^\\x60]*test[^\\x60]*\\x60"
+
+def items(text):
+    """Each line, with a bullet's indented continuation lines joined on."""
+    found = []
+    for number, line in enumerate(text.splitlines(), start=1):
+        if line.startswith("  ") and found:
+            first, joined = found[-1]
+            found[-1] = (first, joined + " " + line.strip())
+        elif line.strip():
+            found.append((number, line.strip()))
+    return found
+
+notes = []
+for number, text in items(FILE):
+    if re.search(RESTATES_CODE, text, re.IGNORECASE):
+        notes.append((number, "describes the code, which the agent can read for itself"))
+    vague = re.search(VAGUE, text, re.IGNORECASE)
+    if vague:
+        notes.append((number, f"{vague.group(0)!r} is not something anyone can check"))
+    if re.search(RULE, text, re.IGNORECASE) and not re.search(REASON, text, re.IGNORECASE):
+        notes.append((number, "a rule with no reason, so it cannot be judged, only obeyed"))
+    if re.search(SECRET, text, re.IGNORECASE):
+        notes.append((number, "looks like a secret; it would be sent to the model and committed"))
+
+if not re.search(TEST_COMMAND, FILE, re.IGNORECASE):
+    notes.append((None, "no test command in backticks; give the exact one"))
+
+for number, note in notes:
+    where = f"line {number}" if number else "whole file"
+    print(f"{where:<11} {note}")
+if not notes:
+    print("No pattern matched. Now read it yourself.")
+
+characters = len(FILE)
+tokens = characters // 4  # about four characters per token for English
+print()
+print(f"{len(FILE.splitlines())} lines, {characters:,} characters, about {tokens:,} tokens.")
+print(f"Read again at every step: about {tokens * STEPS:,} tokens over {STEPS} steps.")
+`,
+    },
+  ]}
+/>
+
+The size line at the bottom uses the rule of thumb from
+[Tokens](/courses/how-llms-work/tokens): about four characters per
+token for English. The example file above comes to roughly 300
+tokens. Because the file sits at the start of the context, the copies
+resent at each step can come from the cache and cost little (see
+[What a Session Costs](/courses/working-with-coding-agents/what-a-session-costs)).
+The cost that caching does not remove is attention: every rule in the
+file is one more thing the task has to compete with.
+
+## Rules that backfire
+
+A rule in an instruction file does not act like a setting. It is text
+in the context, and the model responds to all of the text, including
+the parts you meant only as a warning.
+
+### A named thing is content
+
+A real example, from a project that generates illustrations with an
+image model. Every prompt in the project, 879 of them, carried the same
+list of style rules, and one rule meant to keep the pictures tidy told
+the model to draw any dots, markers and nodes as flat 2D circles. The
+subjects of most prompts had no dots, markers or nodes in them at all.
+The rule put all three into every prompt anyway, and the model drew
+them: a chest of drawers came back with a colored dot on each corner,
+and an elephant resting a foot on a cube came back surrounded by webs of
+dots and connecting lines. The word "flat" spread too, and whole scenes
+came back flattened.
+
+The fix was to stop naming things. The replacement tells the model to
+draw nothing beyond the objects each subject names, and lists only the
+kinds of clutter to leave out (speckle, confetti, stray connecting
+lines), never a thing to draw. The project's notes put the lesson in
+one line: a named noun is content, even inside a negative rule.
+
+An image model makes the effect easy to see, because you can count the
+dots. A coding agent's model reads its instruction file the same way,
+as context that shapes everything it writes next, so write rules about
+what to do rather than lists of things to avoid. "Report progress with
+the `logging` module" gives the model something to write. "Never use
+`print`" gives it the word `print` and nothing to write instead. The
+same idea appears in How LLMs Work as giving the model an exit (see
+[Why Models Hallucinate](/courses/how-llms-work/why-models-hallucinate)):
+an instruction that offers a specific alternative works better than
+one that only forbids.
+
+### A vague rule changes nothing
+
+"Write clean, maintainable code" costs tokens at every step and changes
+nothing, because the model was already trying to, and nobody can check
+whether it did. Claude Code's documentation makes the same point with
+pairs of examples: "Use 2-space indentation" instead of "Format code
+properly", "Run `npm test` before committing" instead of "Test your
+changes".[^claude-memory] A rule earns its place by being specific
+enough that a reviewer could catch a violation.
+
+### Two rules that disagree
+
+Suppose one line says "Change only what the request asks for", and
+another, added months later by someone else, says "Add type hints to
+every function you touch". The first forbids the second's work on any
+function the request did not ask about. The model will follow one of
+them, and you do not get to know which in advance: Claude Code's
+documentation warns that when two instructions contradict each other,
+Claude may pick one arbitrarily.[^claude-memory] The running example's
+tidy-up added type hints to a function nobody asked about, which is
+the kind of change a rule like the second one invites.
+
+### A rule is not a lock
+
+Everything above is advice the model reads, and at least one vendor
+says so outright: Claude Code's documentation says Claude treats these
+files "as context, not enforced configuration".[^claude-memory] If something must
+never happen (a push to the main branch, a write outside the project),
+an instruction file is the wrong place to stop it. That belongs to the
+tool's permissions, covered in
+[Tools and Permissions](/courses/working-with-coding-agents/tools-and-permissions).
+
+## Keeping it current
+
+**Add a rule the second time, not the first.** One mistake may be a
+one-off, and a rule written in response to it may never be needed
+again. The second time it is a pattern, and you now know exactly what
+the rule should say. Claude Code's documentation lists the same mistake
+happening a second time as one of the moments to add an
+instruction.[^claude-memory]
+
+**Review changes to it like code.** A new line in this file changes the
+behavior of every session that follows, for everyone on the project.
+That is a bigger change than most code changes, so it gets the same
+review. Agents can draft an instruction file for you, and several tools
+offer to; if one does, read the draft like any other diff and cut what
+the code already says.
+
+**Delete what is no longer true.** A stale command is worse than a
+missing one. If the file still says `python -m pytest -q` after the
+project moved to `make test`, the agent will run the old command,
+meet a failure that has nothing to do with its task, and spend steps on
+it.
+
+## One file, several tools
+
+Each tool has its own file name, but the names have been converging on
+one. `AGENTS.md` is an open format that many tools now read,[^agentsmd]
+and as of October 2026, all four tools this course names read it in at
+least some situations:
+
+| File | Read by |
+| --- | --- |
+| `AGENTS.md` | Codex.[^codex-agents] Cursor, in the project root and in subdirectories.[^cursor-rules] GitHub Copilot, where the nearest `AGENTS.md` in the directory tree takes precedence.[^copilot-instructions] Claude Code, when the project has no `CLAUDE.md`.[^claude-memory] |
+| `CLAUDE.md` | Claude Code.[^claude-memory] GitHub Copilot also accepts a single `CLAUDE.md` at the repository root in place of `AGENTS.md`.[^copilot-instructions] |
+| `.cursor/rules/*.mdc` | Cursor. A rule there must use the `.mdc` extension, and can be set to apply always, when the agent judges it relevant, to matching files, or only when mentioned.[^cursor-rules] |
+| `.github/copilot-instructions.md` | GitHub Copilot, for every request made in the context of the repository.[^copilot-instructions] |
+
+Several of these tools also read an `AGENTS.md` placed in a
+subdirectory, for work inside it, which suits a repository that holds
+more than one project.
+
+The practical advice is to keep **one** file as the source and point
+the others at it. Two files that drift apart are two sets of rules that
+contradict each other, which is the backfire from the previous section
+with a file name attached. Write `AGENTS.md`. If you also need a
+`CLAUDE.md`, for instance to hold notes only Claude Code should see,
+Claude Code's documentation suggests starting it with the line
+`@AGENTS.md`, which imports the shared file, and adding the extra notes
+below it.[^claude-memory] Tool-specific files such as Cursor's
+file-scoped rules can then hold only what is genuinely specific to that
+tool.
+
+Which other products read which file, and what else they load,
+changes often.
+[Kinds of Coding Tools](/courses/working-with-coding-agents/kinds-of-coding-tools)
+keeps the product details; the file itself, and what belongs in it,
+changes far more slowly.
+
+## Concept check
+
+<MultipleChoice
+  markdown={`Which line belongs in the shop's instruction file?
+
+- \`order_total\` in \`pricing.py\` adds up price times qty for every item.
+  > The agent can learn this from one search, and the line goes stale the day the function moves.
+- [o] Run the tests with \`python -m pytest -q\` before calling a change done.
+  > An exact command is something the agent cannot be sure of otherwise, and it gives every request a test it can run.
+- Always write clean, well-structured and maintainable code in every file.
+  > Nobody can check it, and the model was already trying to. It costs tokens at every step and changes nothing.
+- The payments sandbox key is \`PAYMENTS_API_KEY=pk-test-not-a-real-key\`.
+  > A secret never goes in this file. It is committed to the repository and sent to the model provider.`}
+/>
+
+<MultipleChoice
+  markdown={`A style rule told an image model to draw "dots, markers, and nodes as flat 2D circles". Pictures whose subjects had none came back covered in dots. Why?
+
+- The rule was too long, so the model ignored it.
+  > The model did the opposite of ignoring it.
+- Image models cannot follow rules about shapes.
+  > It followed the rule's words closely, and that was the problem.
+- The rule contradicted another rule in the prompt.
+  > No contradiction was involved. One rule did all of it.
+- [o] Naming the shapes put them in every prompt.
+  > Text in the context shapes what comes next. Naming the shapes made them part of every picture's content, even though the rule was about how to draw them.
+
+Write rules about what to do, and when you must list things to avoid,
+name kinds of clutter rather than things.`}
+/>
+
+<MultipleChoice
+  markdown={`Your instruction file says "Change only what the request asks for" near the top and "Add type hints to every function you touch" near the bottom. What should you expect?
+
+- The agent follows whichever rule comes first in the file.
+  > Nothing guarantees that. Position in the file is not a dependable way to settle a conflict.
+- The agent stops and asks which rule you meant before it starts.
+  > It may not notice the conflict at all, since each rule reads as reasonable on its own.
+- [o] Either rule may win, and you cannot tell which in advance.
+  > Two instructions that contradict each other leave the choice to the model. Remove the conflict instead.
+- The agent applies both, which is the safest reading of the file.
+  > Applying both breaks the first rule whenever the second one fires.`}
+/>
+
+[^claude-memory]: Anthropic, [*How Claude remembers your project*](https://code.claude.com/docs/en/memory), Claude Code documentation (accessed October 2026). Reading `AGENTS.md` directly needs Claude Code v2.1.277 or later; by default it is read only when there is no `CLAUDE.md` or `CLAUDE.local.md` in the working directory or above it.
+
+[^codex-agents]: OpenAI, [*Custom instructions with AGENTS.md*](https://learn.chatgpt.com/docs/agent-configuration/agents-md), Codex documentation (accessed October 2026). The size limit is the `project_doc_max_bytes` setting.
+
+[^cursor-rules]: Cursor, [*Rules*](https://cursor.com/docs/context/rules), Cursor documentation (accessed October 2026).
+
+[^copilot-instructions]: GitHub, [*Adding repository custom instructions for GitHub Copilot*](https://docs.github.com/en/copilot/how-tos/configure-custom-instructions/add-repository-instructions), GitHub Docs (accessed October 2026).
+
+[^agentsmd]: [*AGENTS.md*](https://agents.md/), the format's own site, which lists the tools that support it.

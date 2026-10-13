@@ -1,0 +1,58 @@
+{
+    "title": "Working with Coding Agents",
+    "description": "Get real work out of coding agents: write tasks they can finish, then check them.",
+    "root": true,
+    "tags": {
+        "language": [
+            "python"
+        ],
+        "libraries": [],
+        "domain": [
+            "ai-tools",
+            "software-engineering"
+        ],
+        "skills": [
+            "ai-assisted-development",
+            "task-specification",
+            "code-review",
+            "testing",
+            "version-control"
+        ],
+        "tools": [
+            "claude-code",
+            "codex",
+            "cursor",
+            "github-copilot",
+            "git"
+        ],
+        "level": [
+            "beginner"
+        ]
+    },
+    "pages": [
+        "index",
+        "---",
+        "what-a-coding-agent-is",
+        "tools-and-permissions",
+        "what-the-agent-sees",
+        "kinds-of-coding-tools",
+        "---",
+        "writing-a-task",
+        "sizing-a-task",
+        "plan-before-code",
+        "instruction-files",
+        "---",
+        "reading-the-diff",
+        "verifying-with-tests",
+        "common-failure-modes",
+        "undoing-changes",
+        "---",
+        "steering-a-session",
+        "when-to-take-over",
+        "what-a-session-costs",
+        "staying-safe",
+        "---",
+        "project-a-small-feature",
+        "next-steps"
+    ]
+}

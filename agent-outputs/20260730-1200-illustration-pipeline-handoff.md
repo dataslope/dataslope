@@ -65,6 +65,13 @@ Violating any of these has already been tried and rejected. Don't re-litigate.
 - `gpt-image-2`, **quality `low`**, **size `1536x1024`**, **always the Batch API**.
   Low is the default in the script for a reason: image output tokens dominate the bill
   and the tiers are 158 vs 1372 vs 5488 tokens.
+  One course departs from the model on request: `working-with-coding-agents`
+  (2026-10-13) was generated with `gpt-image-2.5-flare` via `--model`. At `low` and
+  1536x1024 it bills the same 158 output tokens, accepts `background: "transparent"`,
+  and draws solid pixels at alpha 253 rather than 255, which `alphaStats` already
+  counts as solid (its cut-off is 250). The Batch API accepted a 19-request job for
+  it but left it `in_progress` at 0/19 for 45 minutes, so that batch was cancelled
+  (nothing billed) and the course was generated with `sync` (~$0.09).
 - **Isometric** is the house style. Permanently retired: flat geometric, line art,
   blueprint schematic, cut-paper collage, and SVG. Risograph is allowed only for a
   simple mascot moment and hasn't been used since the pilot.
@@ -189,7 +196,7 @@ set that shipped:
   red fox (R), owl (statistics), capybara (DSA), beaver (systems C, data engineering),
   quokka (C++), brown bear (Java), grey rabbit (C#), otter (TypeScript), canary
   (JavaScript), red panda (React), golden hamster (SQLite), koala (time series), raccoon
-  (LLMs), tabby cat (CSS/web). A page that already has a creature **keeps it** — add the
+  (LLMs), tabby cat (CSS/web), corgi (coding agents). A page that already has a creature **keeps it** — add the
   course animal alongside rather than swapping it out.
 
   **Retired by the reviewer, never reintroduce:** squirrel (use a chipmunk; capybaras
@@ -267,6 +274,7 @@ leading word (`mastering-`, `intro-`, `java-`), which is why prefixes are hand-a
 | `java-programming-for-beginners` | `java-` | `systems-programming-c` | `sysc-` |
 | `machine-learning-scikit-learn` | `ml-` | `time-series-analysis-python` | `tsa-` |
 | `mastering-dsa-cpp` | `dsa-` | `typescript-from-scratch` | `tsx-` |
+| `how-llms-work` | `llm-` | `working-with-coding-agents` | `agent-` |
 
 ### Site chrome: the `home` and `auth` collections
 
@@ -599,7 +607,7 @@ const j=require("./data/illustration-prompts.json");
 const CREATURES=["marmot","panda","penguin","duck","duckling","elephant","otter","beaver",
   "capybara","chipmunk","raccoon","koala","hamster","quokka","hedgehog","rabbit","squirrel",
   "bear","fox","foxes","owl","bird","canary","canaries","parrot","peacock","cat","kitten",
-  "mouse","mice","frog","dolphin","predator"];
+  "mouse","mice","frog","dolphin","predator","corgi"];
 const re=new RegExp("\\b(?:"+CREATURES.join("|")+")s?\\b","i");
 const TOYS=/rubber ducks?/gi;   // a desk toy, not a creature
 const bad=j.prompts.filter(p=>p.mascot!==re.test(p.subject.replace(TOYS,"")));

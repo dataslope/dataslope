@@ -1,6 +1,6 @@
 {
     "title": "TypeScript from Scratch",
-    "description": "A computer-science-flavored journey from plain JavaScript to type-driven, statically-analyzed application design",
+    "description": "From plain JavaScript to type-driven application design in TypeScript.",
     "root": true,
     "tags": {
         "language": [

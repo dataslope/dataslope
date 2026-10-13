@@ -1,0 +1,391 @@
+---
+title: "Project: Ship a Small Feature"
+description: One task from start to finish. Write the request, review the plan, read the diff, write the missing test, then merge the result or throw it away.
+---
+
+This project puts the whole course to work on one realistic task. You
+get a small Python project and a recorded agent session, and every
+decision along the way is yours: what to ask for, whether the plan is
+right, whether the diff matches the plan, and whether the result gets
+merged at all.
+
+<Figure
+  slug="agent-project-a-small-feature-cutout"
+  alt="A friendly corgi sitting beside one chunky red shipping crate with its lid closed on a thick blue loading dock, a green ramp leading down from the dock"
+/>
+
+## The project
+
+A shop's pricing module. Totals are in cents, every order pays a flat
+$4.99 shipping, and there is one test. Run it to see where things stand
+before anyone changes anything:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# pricing.py
+SHIPPING = 499  # cents, flat rate
+
+def order_total(items):
+    """Items at price * qty, plus shipping, in cents."""
+    subtotal = sum(item["price"] * item["qty"] for item in items)
+    return subtotal + SHIPPING
+
+# test_pricing.py
+def test_total_includes_shipping():
+    assert order_total([{"price": 250, "qty": 2}]) == 999
+
+# A tiny test runner: call every function whose name starts with test_.
+for name, test in list(globals().items()):
+    if name.startswith("test_"):
+        test()
+        print(f"PASS {name}")
+`,
+    },
+  ]}
+/>
+
+The feature: marketing wants a `SAVE10` coupon. It takes 10% off the
+items in the order. It does not touch shipping, because the shop pays
+the courier the same $4.99 either way.
+
+## Write the request
+
+Before reading on, draft the request you would send. Use the four parts
+from [Writing a Task](/courses/working-with-coding-agents/writing-a-task):
+the goal, the context the agent cannot find in the code, the
+constraints, and a check for done. Then compare it with these:
+
+<MultipleChoice
+  markdown={`Which request gives the agent the best chance of finishing the right feature?
+
+- [o] Add a \`SAVE10\` coupon to \`order_total\`: 10% off the items, never shipping. Add tests; edit only \`pricing.py\` and its tests.
+  > It states the goal, the one fact the code cannot tell the agent (shipping is excluded), a constraint, and something to check.
+- Add coupon support to the shop so customers can save money at checkout.
+  > This names a direction rather than a feature. The agent has to invent the codes, the amounts and the rules.
+- Add a \`SAVE10\` coupon that takes 10% off the order total, and add a test for it.
+  > "The order total" includes shipping, so this request asks for the wrong feature, and a test written to it would agree.
+- Build a flexible discount engine with percentage and fixed-amount coupons, stacking rules, expiry dates and an admin page for them.
+  > The scope is unbounded. Nothing in it says when the session is finished, so the agent decides.
+
+The third option is the instructive one: it reads as specific, and the
+word that makes it wrong is easy to skim past.`}
+/>
+
+The session below was started with this request:
+
+> Add a `SAVE10` coupon to `order_total` in `pricing.py`: 10% off the
+> items, rounded to the nearest cent. Shipping is never discounted. Add
+> tests for both, run them, and change nothing outside `pricing.py` and
+> `test_pricing.py`. Propose a plan first and wait.
+
+The last sentence asks for a plan before any edit, which is the habit
+from [Plan Before Code](/courses/working-with-coding-agents/plan-before-code).
+
+## Review the plan
+
+The agent read both files and came back with this:
+
+> 1. Add `COUPONS = {"SAVE10": 0.10}` to `pricing.py`.
+> 2. Give `order_total` an optional `coupon` argument, defaulting to
+>    `None`, so existing callers are unaffected.
+> 3. Apply the coupon's rate to the order total and round to the nearest
+>    cent.
+> 4. Add a test for an order that uses `SAVE10`.
+> 5. Run the tests.
+
+<MultipleChoice
+  markdown={`Which step should you correct before approving the plan?
+
+- Step 1, because coupons belong in a database, not in a constant.
+  > The request did not ask for storage, and a constant is the smallest change that works. Asking for more is scope creep from your side.
+- Step 2, because a new argument will break existing calls to \`order_total\`.
+  > A default of \`None\` keeps every existing call working, and the plan says so.
+- [o] Step 3, because "the order total" already includes shipping.
+  > Discounting the total discounts the shipping too, which is the one thing the request ruled out. The rate belongs on the items' subtotal.
+- Step 5, because the agent should not run the tests itself.
+  > Running the tests is exactly what you want from it. You will still run them yourself afterwards.
+
+Step 4 is thin as well: a test that only checks "an order with SAVE10"
+cannot tell the right behavior from the wrong one unless it asserts
+what happens to shipping.`}
+/>
+
+A useful correction says what is wrong and what right looks like:
+
+> In step 3, apply the rate to the items' subtotal only, then add
+> shipping. In step 4, assert the exact total for a 1,000-cent order with
+> `SAVE10`, which is 900 plus 499.
+
+In this recording, the plan was approved as it stood. Here is what came
+back.
+
+## Review the diff
+
+The agent's closing message:
+
+> Added the `SAVE10` coupon: 10% off the items, with shipping left at
+> full price. Added a test, and all tests pass.
+
+Its work is on a branch called `agent/coupon`, and `main` is untouched.
+Review it in the order from
+[Reading the Diff](/courses/working-with-coding-agents/reading-the-diff):
+files, then tests, then logic.
+
+<GitBlock
+  scenario="agent-branch"
+  label="The agent's branch against main"
+  commands={`git log --oneline --all
+git diff main..agent/coupon --stat
+git diff main..agent/coupon`}
+/>
+
+**Files.** Two, both allowed by the request. Nothing to object to yet.
+
+**Tests.** One new test, asserting that a 1,000-cent order with `SAVE10`
+costs 1,349. Work out what the request says it should cost: 1,000 cents
+of items less 10% is 900, plus 499 shipping, is 1,399. The test expects
+something else.
+
+**Logic.** `total = subtotal + SHIPPING` comes *before* the discount, so
+the discount is taken off all 1,499 cents. Ninety percent of 1,499 is
+1,349.1, which rounds to 1,349. That is step 3 of the plan, carried out
+exactly as written.
+
+The closing message says shipping was left at full price. The diff says
+it was not. The claim that all tests pass, on the other hand, is true:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# pricing.py, as the agent left it
+SHIPPING = 499  # cents, flat rate
+COUPONS = {"SAVE10": 0.10}
+
+def order_total(items, coupon=None):
+    """Items at price * qty, plus shipping, less any coupon, in cents."""
+    subtotal = sum(item["price"] * item["qty"] for item in items)
+    total = subtotal + SHIPPING
+    if coupon in COUPONS:
+        total = round(total * (1 - COUPONS[coupon]))
+    return total
+
+# test_pricing.py, as the agent left it
+def test_total_includes_shipping():
+    assert order_total([{"price": 250, "qty": 2}]) == 999
+
+def test_save10_coupon():
+    assert order_total([{"price": 1_000, "qty": 1}], coupon="SAVE10") == 1_349
+
+for name, test in list(globals().items()):
+    if name.startswith("test_"):
+        test()
+        print(f"PASS {name}")
+`,
+    },
+  ]}
+/>
+
+Both pass. The agent's test was written by running its own code and
+recording the answer, so it checks that the code does what the code
+does. A test only counts as evidence when its expected value comes from
+the request.
+
+## Test it
+
+Write the test the agent should have written: one that **fails** against
+the agent's `order_total` and would **pass** against a correct one. The
+agent's version is already loaded as `order_total`, along with
+`SHIPPING`.
+
+<ChallengeCard
+  adapter="python"
+  title="Catch the shipping discount"
+  instructions={`\`order_total\` is the agent's version from the diff above. \`SHIPPING\` is 499.
+
+Fill in **\`test_save10_leaves_shipping_alone\`** so that it:
+
+- **fails** (raises \`AssertionError\`) against the agent's \`order_total\`, and
+- **passes** against a correct version that discounts only the items.
+
+Work out the expected total from the request, not from running the code.`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `SHIPPING = 499
+COUPONS = {"SAVE10": 0.10}
+
+def _agent_order_total(items, coupon=None):
+    subtotal = sum(item["price"] * item["qty"] for item in items)
+    total = subtotal + SHIPPING
+    if coupon in COUPONS:
+        total = round(total * (1 - COUPONS[coupon]))
+    return total
+
+def _fixed_order_total(items, coupon=None):
+    subtotal = sum(item["price"] * item["qty"] for item in items)
+    if coupon in COUPONS:
+        subtotal = round(subtotal * (1 - COUPONS[coupon]))
+    return subtotal + SHIPPING
+
+order_total = _agent_order_total
+`,
+      starterCode: `def test_save10_leaves_shipping_alone():
+    items = [{"price": 1_000, "qty": 1}]
+    total = order_total(items, coupon="SAVE10")
+    # Replace this line with an assertion about what total should be.
+    assert True
+
+# Try your test against the agent's code.
+try:
+    test_save10_leaves_shipping_alone()
+    print("Passes against the agent's code, so it does not catch the bug yet.")
+except AssertionError:
+    print("Fails against the agent's code: it catches the bug.")
+`,
+      solutionCode: `def test_save10_leaves_shipping_alone():
+    items = [{"price": 1_000, "qty": 1}]
+    total = order_total(items, coupon="SAVE10")
+    assert total == 900 + SHIPPING, f"expected {900 + SHIPPING}, got {total}"
+
+# Try your test against the agent's code.
+try:
+    test_save10_leaves_shipping_alone()
+    print("Passes against the agent's code, so it does not catch the bug yet.")
+except AssertionError:
+    print("Fails against the agent's code: it catches the bug.")
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "defined",
+      name: "The test function exists",
+      description: "A function named test_save10_leaves_shipping_alone is defined",
+      code: `assert callable(globals().get("test_save10_leaves_shipping_alone")), "Define test_save10_leaves_shipping_alone"`,
+    },
+    {
+      id: "catches_bug",
+      name: "It fails against the agent's code",
+      description: "Run against the agent's order_total, your test raises AssertionError",
+      code: `globals()["order_total"] = _agent_order_total
+try:
+    test_save10_leaves_shipping_alone()
+except AssertionError:
+    pass
+else:
+    raise AssertionError("Your test passes against the agent's version, so it does not catch the bug yet.")`,
+    },
+    {
+      id: "passes_fix",
+      name: "It passes against a correct version",
+      description: "Run against an order_total that discounts only the items, your test passes",
+      code: `globals()["order_total"] = _fixed_order_total
+try:
+    test_save10_leaves_shipping_alone()
+except AssertionError as e:
+    raise AssertionError("Your test also fails against a correct version: " + str(e))`,
+    },
+  ]}
+/>
+
+The second requirement matters as much as the first. A test that fails
+against everything, `assert False` for instance, catches the bug and
+every correct fix with it.
+
+## Merge it, or throw it away
+
+You have found the bug, and you have a test for it. There are two good
+endings from here, and choosing between them is the last judgment call
+of the project.
+
+### Fix it and merge
+
+The fix is two lines, so finishing by hand is faster than another round
+with the agent: switch to the branch, move shipping out of the
+discounted amount, correct the test's expected value, commit, and merge.
+
+<GitBlock
+  scenario="agent-branch"
+  label="Fix the branch by hand, then merge it"
+  commands={`git switch agent/coupon
+sed -i 's/total = subtotal + SHIPPING/total = subtotal/' pricing.py
+sed -i 's/    return total$/    return total + SHIPPING/' pricing.py
+sed -i 's/== 1_349/== 1_399/' test_pricing.py
+git diff
+git commit -am "Keep shipping out of the SAVE10 discount"
+git switch main
+git merge agent/coupon
+git log --oneline`}
+/>
+
+Look at the last `sed` line. It edits a test's expected value, which is
+exactly what the agent did in
+[Reading the Diff](/courses/working-with-coding-agents/reading-the-diff),
+where "Fix failing discount test" changed 9,000 to 10,000. The edit is
+the same kind; the direction is opposite. The agent moved the test to
+match its code. You are moving it to match the request, and you can say
+where 1,399 comes from without running anything. In a real repository
+you would also commit the test you wrote in the card above, since it
+says what the feature is for in a way `1_399` does not.
+
+### Throw it away
+
+Deleting the branch is the right ending when the fix would be bigger
+than the feature, or when you would rather send a better request than
+repair a weak result. `main` never saw the agent's work, so there is
+nothing else to undo:
+
+<GitBlock
+  scenario="agent-branch"
+  label="Delete the agent's branch"
+  commands={`git branch -D agent/coupon
+git log --oneline --all`}
+/>
+
+If you take this route, start a fresh session rather than continuing the
+old one, and put what you learned into the request: here, that step 3 of
+the plan is where it went wrong.
+[Steering a Session](/courses/working-with-coding-agents/steering-a-session)
+explains why a fresh start often beats a long correction.
+
+## What you just did
+
+Every stage of this project had a chance to catch the same mistake. A
+request that said "the order total" would have asked for it. The plan
+spelled it out in step 3. The diff showed it in one line. The agent's
+test agreed with it, and its summary denied it. Any one of those checks,
+done properly, was enough, and none of them needed you to write the
+feature yourself.
+
+## Concept check
+
+<MultipleChoice
+  markdown={`The agent's test asserted \`1_349\` and passed. Why was it no evidence that the feature worked?
+
+- The agent wrote it, and only a person's tests count.
+  > Agents can write good tests. The trouble is where this one's expected value came from, not who typed it.
+- [o] Its expected value came from the code, not the request.
+  > A value recorded from the code's own output can only confirm that the code does what it does.
+- It covered one coupon code instead of several different ones.
+  > More coupon codes tested the same way would agree with the same bug.
+- It never checked the rounding to the nearest cent.
+  > Rounding was not the defect here. Shipping was being discounted.`}
+/>
+
+<MultipleChoice
+  markdown={`You changed the expected value from \`1_349\` to \`1_399\`. Why is that not the same mistake as the agent's "Fix failing discount test" commit?
+
+- It is the same mistake, and the test should have been left as it was.
+  > Leaving it alone would keep a test that asserts the bug. Some test edits are the fix.
+- Your commit also edited \`pricing.py\`, which makes the test edit legitimate.
+  > Editing code in the same commit does not make a test edit right or wrong.
+- The agent's edit was made in a different file from yours.
+  > Both edits were to the test file. The file is not the difference.
+- [o] 1,399 follows from the request; 10,000 followed from the code.
+  > 900 for the items plus 499 for shipping comes from the task itself, without running anything. The agent's new value came from its own output.`}
+/>

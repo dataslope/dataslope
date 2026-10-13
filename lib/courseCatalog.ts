@@ -31,6 +31,7 @@ const POPULARITY_ORDER: string[] = [
   "modern-css-layout",
   "machine-learning-scikit-learn",
   "how-llms-work",
+  "working-with-coding-agents",
   "sqlite-for-beginners",
   "java-programming-for-beginners",
   "from-zero-to-cpp",

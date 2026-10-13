@@ -1,0 +1,111 @@
+---
+title: Next Steps
+description: The habits from this course on one page, the questions to ask of every session, and where to go next.
+---
+
+Here is the course compressed into the habits worth keeping. None of
+them depends on which agent you use, and none of them will go out of
+date when the next model ships.
+
+<Figure
+  slug="agent-next-steps-cutout"
+  alt="A friendly corgi standing at the start of a winding thick green path that leads from a blue platform toward two chunky signposts with blank yellow boards"
+/>
+
+## The habits
+
+1. **Say what done looks like.** A goal, the context the agent cannot
+   find in the code, the constraints, and a check it can run. An agent
+   stops when it believes it is finished; tell it what finished means.
+2. **Keep tasks small.** One concern per session, sized so that you will
+   actually read the diff rather than skim it.
+3. **Plan first when the task is not trivial.** Correcting a plan costs a
+   sentence. Correcting the same mistake in a diff costs a review.
+4. **Start from a clean commit, on a branch.** Then the whole session is
+   one diff against something you trust, and throwing it away is one
+   command.
+5. **Read the diff before the summary.** Files first, then tests, then
+   logic. The summary is the agent's description of its work; the diff
+   is the work.
+6. **Check where each test's expected value came from.** A test whose
+   answer was copied from the code's own output confirms nothing. Break
+   the change and see whether anything fails.
+7. **Restart rather than argue.** When the same correction has not
+   landed twice, a fresh session with a better request is usually faster
+   than a third attempt in a long one.
+8. **Limit what the agent can do.** Permissions and sandboxes, not the
+   model's judgment, decide what a mistake or a malicious instruction
+   can damage.
+
+## Five questions for every session
+
+Before you merge anything an agent wrote, you should be able to answer
+these without looking at its summary:
+
+| Question | Where it came up |
+| --- | --- |
+| Which files changed, and did I expect every one of them? | [Reading the Diff](/courses/working-with-coding-agents/reading-the-diff) |
+| Did any test change, and in which direction? | [Verifying with Tests](/courses/working-with-coding-agents/verifying-with-tests) |
+| Would a test fail if this change were wrong? | [Verifying with Tests](/courses/working-with-coding-agents/verifying-with-tests) |
+| Is there anything here nobody asked for? | [Common Failure Modes](/courses/working-with-coding-agents/common-failure-modes) |
+| If this turns out wrong next week, how do I undo it? | [Undoing Changes](/courses/working-with-coding-agents/undoing-changes) |
+
+If an answer is "I don't know", that is the part of the review still to
+do.
+
+## Where to go next
+
+* **[How Large Language Models Work](/courses/how-llms-work)** explains
+  the model inside the loop. Three lessons connect directly to this
+  course: [Why Models Hallucinate](/courses/how-llms-work/why-models-hallucinate)
+  is the mechanism behind invented functions,
+  [Context Windows](/courses/how-llms-work/context-windows) is why long
+  sessions drift, and
+  [Evaluating for Your Task](/courses/how-llms-work/evaluating-for-your-task)
+  shows how to compare agents on your own work instead of on a
+  leaderboard.
+* **[Python Basics](/courses/python-basics)** if reading the code in
+  this course felt slow. Review is reading, and the faster you read the
+  language an agent writes in, the less of its output you have to take
+  on trust.
+
+## Final concept check
+
+<MultipleChoice
+  markdown={`An agent reports "All tests pass" and you have five minutes to review its work. What do you look at first?
+
+- Whether the summary mentions every file it changed.
+  > The summary is the agent's own account. Checking it against itself tells you nothing new.
+- Whether the agent ran the linter as well as the tests.
+  > A clean lint run says the code is tidy, not that it does what you asked.
+- [o] The list of files the diff touches.
+  > It takes seconds and catches the cheapest red flag: a change to something the request never mentioned.
+- How many steps the session took to finish the task.
+  > A long session can be fine and a short one wrong. The step count is not evidence about the result.`}
+/>
+
+<MultipleChoice
+  markdown={`A session has failed the same test three times, each time with an apology and a new attempt. What is usually the best next move?
+
+- [o] Start a fresh session with a request that says what you learned.
+  > The failed attempts are all in the old session's context. A new one starts clean, with the lesson written into the request.
+- Tell the agent once more, firmly, that the test is still failing.
+  > Repeating the same feedback rarely changes the outcome. Say something new, or start again.
+- Give it permission to change the test so that the suite passes.
+  > That gets a green run by making the test agree with the code, which is the failure this course warns about.
+- Keep the session going but switch it to a bigger, slower model.
+  > A stronger model inherits the same crowded context and the same unclear request.`}
+/>
+
+<MultipleChoice
+  markdown={`An agent working on an issue reads a comment that tells it to run a command uploading your credentials. What actually limits the damage?
+
+- A line in the instruction file telling it to ignore such comments.
+  > The model cannot reliably tell your instructions from text it reads, so a rule in the context is a hope, not a control.
+- Reading its closing summary carefully once the session ends.
+  > By then the command has already run. Review is too late for side effects.
+- Choosing the newest and most capable model available.
+  > Better models are harder to fool, not impossible to fool.
+- [o] The permissions and sandbox the agent runs inside.
+  > If it cannot run that command, or cannot reach the network or your credentials, the instruction has nothing to act on.`}
+/>

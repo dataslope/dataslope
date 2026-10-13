@@ -387,6 +387,24 @@
     "zipf-law": "2026-08-07T22:00:22.000Z"
   },
   "illustrations": {
+    "agent-common-failure-modes": "2026-10-13T21:21:53.000Z",
+    "agent-instruction-files": "2026-10-13T21:21:53.000Z",
+    "agent-kinds-of-coding-tools": "2026-10-13T21:21:53.000Z",
+    "agent-next-steps": "2026-10-13T21:21:53.000Z",
+    "agent-plan-before-code": "2026-10-13T21:21:53.000Z",
+    "agent-project-a-small-feature": "2026-10-13T21:21:53.000Z",
+    "agent-reading-the-diff": "2026-10-13T21:21:53.000Z",
+    "agent-sizing-a-task": "2026-10-13T21:21:53.000Z",
+    "agent-staying-safe": "2026-10-13T21:21:53.000Z",
+    "agent-steering-a-session": "2026-10-13T21:21:53.000Z",
+    "agent-tools-and-permissions": "2026-10-13T21:21:53.000Z",
+    "agent-undoing-changes": "2026-10-13T21:21:53.000Z",
+    "agent-verifying-with-tests": "2026-10-13T21:21:53.000Z",
+    "agent-what-a-session-costs": "2026-10-13T21:21:53.000Z",
+    "agent-what-is-an-agent": "2026-10-13T21:21:53.000Z",
+    "agent-what-the-agent-sees": "2026-10-13T21:21:53.000Z",
+    "agent-when-to-take-over": "2026-10-13T21:21:53.000Z",
+    "agent-writing-a-task": "2026-10-13T21:21:53.000Z",
     "auth-pin-ai": "2026-07-31T16:10:04.000Z",
     "auth-pin-blocks": "2026-07-31T16:10:04.000Z",
     "auth-pin-charts": "2026-07-31T16:10:04.000Z",
@@ -3194,6 +3212,7 @@
     "web-project-scoreboard": "2026-07-30T14:03:31.000Z",
     "web-react-first-components": "2026-07-30T14:03:31.000Z",
     "web-react-first-components-state-scoreboard-react-way-inline": "2026-08-10T19:14:10.000Z",
-    "web-tailwind-quickstart": "2026-07-30T14:03:31.000Z"
+    "web-tailwind-quickstart": "2026-07-30T14:03:31.000Z",
+    "working-with-coding-agents-thumbnail": "2026-10-13T21:21:53.000Z"
   }
 }

@@ -1,0 +1,302 @@
+---
+title: What the Agent Sees
+description: Instruction files, the files it read, every tool result. What fills an agent's context, what falls out, and why a fresh session often beats a long one.
+---
+
+An agent knows what is in its context window and nothing else. It has
+not read your codebase. It has read the files it opened during this
+session, plus whatever its tool loaded for it before your request
+arrived.
+
+<Figure
+  slug="agent-what-the-agent-sees-cutout"
+  alt="A thick blue desk on a platform with three open green folders lying on it in a short row, and a tall red filing cabinet behind the desk with every drawer shut"
+/>
+
+## What is there before you type
+
+By the time your request reaches the model, the harness has already
+filled the start of the context. Roughly in this order:
+
+| Layer | Written by | What it holds |
+| --- | --- | --- |
+| The harness's own instructions | The tool's makers | How to behave, how to call tools, house rules about safety and style |
+| Tool definitions | The tool's makers, and each MCP server's authors | A name, a description and the arguments for every tool the model may call |
+| Instruction files | You and your team | Project rules from files such as `AGENTS.md` or `CLAUDE.md` |
+| Your request | You | The task, in your words |
+
+None of this is free, in two senses. It takes up room in the window
+before any work has happened, and it is sent again with every step of
+the loop, because each step sends the whole context to the model.
+A 15,000-token start costs 15,000 input tokens on every step of the
+session;
+[What a Session Costs](/courses/working-with-coding-agents/what-a-session-costs)
+does that arithmetic.
+
+Two layers are worth keeping an eye on. Every connected MCP server can
+add the descriptions of all its tools, whether or not today's task
+needs any of them (some tools now load those descriptions only when
+they are needed, but do not assume yours does). And the instruction
+file is in the context of every single session, which makes it the
+cheapest place to put a rule that keeps being broken and the most
+expensive place to put an essay.
+[Instruction Files](/courses/working-with-coding-agents/instruction-files)
+is about telling the two apart.
+
+Several tools have a command that breaks the current context down by
+layer, so you do not have to guess
+([Kinds of Coding Tools](/courses/working-with-coding-agents/kinds-of-coding-tools)
+lists them). It is worth running once in a fresh session, just to see
+how much is there before you have typed a word.
+
+## What piles up
+
+Every tool call, and every result that comes back, is appended to the
+conversation. Nothing leaves on its own. A file read at step 3 is
+still there at step 30, and if the agent reads it again, it is there
+twice.
+
+Some steps are tiny: an edit, a short search, your one-line correction.
+Others are enormous. Using the rough rule of three characters per
+token for code and logs from
+[Token Counts in Practice](/courses/how-llms-work/token-counts-in-practice):
+
+* A 400-line Python file at about 40 characters a line is 16,000
+  characters, roughly **5,000 tokens**.
+* `pytest -v` on a suite of 2,000 tests prints a line per test. At
+  about 90 characters a line that is roughly **60,000 tokens**, in a
+  single step.
+* `pytest -q` on the same suite prints a row of dots and a short
+  summary: a few hundred tokens for the same information about
+  whether the tests passed.
+
+The calculator below adds up a made-up session on a real-sized
+version of the shop codebase, step by step, the way the harness would.
+It uses a 200,000-token window. Models reached a million tokens during
+2026 (see [Context Windows](/courses/how-llms-work/context-windows)),
+but the window a tool actually works in can be smaller, and several
+tools let you choose its size or summarize well before the limit.
+Partway through, you add a rule: don't change `format.py`.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Adds up an agent's context, step by step, for a made-up session on a
+# real-sized version of the shop codebase. Every size is an assumption:
+# change any of them and run it again.
+
+WINDOW = 200_000       # tokens this session can hold
+COMPACT_AT = 0.75      # this harness summarizes once the window is 75% full
+SUMMARY = 6_000        # tokens in the summary that replaces the history
+VERBOSE_TESTS = True   # False: the agent asks the test runner for a summary
+
+CHARS_PER_TOKEN = 3    # roughly right for code and logs
+
+def tokens(lines, chars_per_line=40):
+    return lines * chars_per_line // CHARS_PER_TOKEN
+
+test_run = tokens(2_000, 90) if VERBOSE_TESTS else tokens(15, 60)
+RULE = "you: don't change format.py"
+
+# What is there before you type.
+START = [
+    ("harness prompt and tool definitions", 14_000),
+    ("instruction file", 1_500),
+    ("your request", 60),
+]
+
+# What piles up: every tool call and its result, plus anything you add.
+STEPS = [
+    ("search for 'discount'", tokens(60, 90)),
+    ("read pricing.py", tokens(400)),
+    ("read orders.py", tokens(1_200)),
+    ("run the test suite", test_run),
+    (RULE, 15),
+    ("edit pricing.py", 300),
+    ("run the test suite", test_run),
+    ("read test_pricing.py", tokens(800)),
+    ("edit test_pricing.py", 400),
+    ("run the test suite", test_run),
+    ("read report.py", tokens(600)),
+    ("read format.py", tokens(300)),
+    ("edit format.py", 300),
+    ("run the test suite", test_run),
+]
+
+start = sum(size for _, size in START)
+history = []           # everything since the start, or since the last summary
+sent = 0               # input tokens sent to the model, summed over steps
+
+print(f"{'':>2}  {'step':<32} {'context':>7}  {'full':>4}  added")
+print(f"{'':>2}  {'before you type':<32} {start:>7,}  {start / WINDOW:>4.0%}")
+for n, (label, size) in enumerate(STEPS, 1):
+    history.append((label, size))
+    used = start + sum(s for _, s in history)
+    sent += used
+    print(f"{n:>2}  {label:<32} {used:>7,}  {used / WINDOW:>4.0%}  +{size:,}")
+    if used >= COMPACT_AT * WINDOW:
+        history = [("summary of the steps so far", SUMMARY)]
+        print(f"    compacted: {used - start:,} tokens of history became a "
+              f"{SUMMARY:,}-token summary")
+
+print()
+labels = [label for label, _ in history]
+if RULE in labels:
+    used = start + sum(s for _, s in history)
+    before = start + sum(s for _, s in history[:labels.index(RULE)])
+    print(f"Your rule about format.py sits {before / used:.0%} of the way "
+          f"into a {used:,}-token context.")
+else:
+    print("Your rule about format.py is no longer in the context word for")
+    print("word. It survives only if the summary happened to keep it.")
+print(f"Input tokens sent to the model over the session: {sent:,}")
+`,
+    },
+  ]}
+/>
+
+The two big jumps are the verbose test runs, and after the second one
+the session is past the point where this harness summarizes. The
+history collapses into a 6,000-token summary, and with it goes your
+rule about `format.py`, word for word. At step 13 the agent edits
+`format.py`. A real agent might or might not; the point is that
+nothing in its context forbids it any more, unless the summary happened
+to keep the rule.
+
+Now change the inputs and run it again:
+
+* Set `VERBOSE_TESTS = False`. The agent does exactly the same work and
+  the context never passes a third of the window. No summary, and the
+  rule is still there at the end.
+* Set `WINDOW = 1_000_000`. Nothing gets summarized, but look at the
+  last line: the input sent over the session nearly doubles, because a
+  window that never empties is resent in full at every step.
+* Add a step of your own, such as reading the same 1,200-line file
+  again, and watch it cost exactly what it cost the first time.
+
+## When the window fills
+
+Content outside the window is not degraded, it is gone
+([Context Windows](/courses/how-llms-work/context-windows#the-window-is-a-hard-boundary)
+explains why). So when a session approaches the limit, the harness has
+to make room, and coding agents mostly do it by **compaction**: a model
+writes a summary of the conversation so far, and the summary replaces
+the history. Several tools do this automatically and also let you ask
+for it, sometimes with a hint about what to keep.
+
+A summary is shorter than what it replaces, so detail is lost: the
+exact error message, the contents of a file it read, the reason an
+approach was abandoned, a constraint the summary did not think
+important. The model is not told what was dropped. On the next step it
+reads the summary the way it reads everything else, as the whole story.
+
+Compaction is not the only way to lose track of something. Even when
+everything still fits, recall is weakest in the middle of a long
+context and strongest at its two ends
+([Context Windows](/courses/how-llms-work/context-windows#filling-the-window-is-not-free)
+shows the U-shaped curve). Run the calculator with
+`VERBOSE_TESTS = False` and look at where the rule ends up: about 60%
+of the way in, right in the weak stretch. A correction you gave at
+step 5 of 40 lives in exactly that region.
+
+The symptoms look like forgetfulness, and that is a fair description
+of the effect, if not the cause:
+
+* The agent re-reads files it has already read.
+* It breaks a constraint you gave early in the session.
+* It reintroduces a bug it already fixed, or retries an approach that
+  already failed.
+* Its closing summary covers the start and the end of the session and
+  is vague about the middle.
+
+When you see them, three things help. Rules that must hold for the
+whole session belong in the instruction file, which is part of the
+starting context rather than the history that gets summarized (Kinds of
+Coding Tools notes what two tools document about this).
+A constraint that matters right now is worth repeating near the end,
+where recall is strong ("still don't touch `format.py`"). And when the
+session is long and you want to keep going, compacting it yourself,
+with a note about what to keep, beats waiting for the harness to pick
+for you.
+
+## A fresh session is a feature
+
+The cheapest way to keep the context about the task is to start every
+task with a new one. A fresh session holds the starting layers, your
+request and nothing else: no files from the last task, no test logs,
+no half-relevant decisions. **One task per session** is the simplest
+habit in this course, and one of the most effective.
+
+It matters even more after things go wrong. Every failed attempt is
+part of the context too. Three wrong fixes in, the transcript is
+mostly about wrong fixes, and the model writes its next step
+conditioned on all of them. Restarting with a sharper request that
+includes what you learned often beats a fourth correction:
+
+> Orders of exactly \$100 must get the discount. The bug is the
+> comparison in `order_total`, which uses `>` where it needs `>=`.
+> Add a test at exactly 10,000 cents expecting 9,000. Change nothing
+> else.
+
+That request carries the useful part of the failed session forward in
+four sentences and leaves the rest behind.
+[Steering a Session](/courses/working-with-coding-agents/steering-a-session)
+covers when to correct and when to restart.
+
+What you lose by starting over is what the agent learned by reading.
+Sometimes that is worth keeping, and then the move is to keep it
+deliberately: a few lines in the new request, or a rule in the
+instruction file if it will matter next week too. What you should not
+keep is the transcript itself, just because it is already there.
+
+## Concept check
+
+<MultipleChoice
+  markdown={`Early in a long session you told the agent not to change \`format.py\`. Forty steps later it edits \`format.py\`. What is the most likely reason?
+
+- The model decided the rule no longer applied to the task.
+  > The model does not keep a list of rules it has weighed and retired. It works from whatever text is in front of it.
+- The harness deletes your messages after a fixed number of steps.
+  > Harnesses remove history to make room, not on a timer, and usually by summarizing it.
+- [o] It was summarized away, or is buried mid-context.
+  > Either compaction dropped it, or it is still there but in the stretch of a long context that is recalled least well.
+- The model's memory of the rule faded a little with each step.
+  > The model has no memory that fades. Each step reads the current context from scratch.
+
+Rules that must hold all session belong in the instruction file, and
+a rule that matters now is worth repeating near the end.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of these is likely to add the most to an agent's context in a single step?
+
+- A read of a 30-line configuration file.
+  > At three characters per token, 30 short lines is a few hundred tokens.
+- [o] A verbose run of a large test suite.
+  > One line per test across thousands of tests can be tens of thousands of tokens in one step.
+- Your one-line correction to the agent.
+  > A sentence is a handful of tokens, whatever its importance.
+- The agent's next request for a tool.
+  > A tool call is a name and a few arguments: tiny next to its result.
+
+Tool output, not conversation, is what fills an agent's window. Asking
+for quiet output is one of the cheapest fixes available.`}
+/>
+
+<MultipleChoice
+  markdown={`After three wrong fixes, you start a new session with a sharper request instead of correcting the agent again. Why does that often work better?
+
+- A new session switches to a larger, more capable model.
+  > The model is whatever you chose. A new session changes the context, not the model.
+- A new session skips the instruction file and so runs faster.
+  > The instruction file loads at the start of every session, new ones included.
+- The step limit was the real problem, and a new session resets it.
+  > Three attempts would rarely reach a step limit. The attempts themselves were the problem.
+- [o] The failed attempts are no longer in the context.
+  > The model stops conditioning on three wrong fixes, and your new request carries forward only what you learned.
+
+A fresh session keeps the context about the task. What you learned
+travels in the request; the failed transcript stays behind.`}
+/>

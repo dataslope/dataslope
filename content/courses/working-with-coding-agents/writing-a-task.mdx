@@ -1,0 +1,337 @@
+---
+title: Writing a Task
+description: A goal, the context the agent cannot guess, the constraints, and a test for done. The four parts of a request an agent can finish.
+---
+
+An agent will attempt whatever you type. Whether it finishes the task
+you meant depends on four things you can put in the request: what you
+want, what it cannot find out on its own, what it must not do, and how
+anyone will know it is done.
+
+<Figure
+  slug="agent-writing-a-task-cutout"
+  alt="A chunky blue clipboard standing upright on a thick platform with four large solid tabs sticking out of its right edge, one green, one yellow, one red and one blue"
+/>
+
+## The goal
+
+State the outcome, not the activity. "Look at the date code" is an
+activity: the agent will look, and then do whatever the looking
+suggested. "Make `parse_date` read `03/04/2026` as 3 April" is an
+outcome. There is a moment when it becomes true, and both you and the
+agent can tell when that moment arrives.
+
+An outcome usually carries a concrete value: an input and what it should
+turn into, a number, a line of output that should appear. If you cannot
+write one down, you are not ready to hand the task over yet. You are
+still deciding what you want, and an agent given an open question will
+answer it for you.
+
+Keep it to one goal. "Fix the date parsing and tidy up the error
+messages" is two tasks sharing a session, and they come back as one diff
+in which you cannot tell which change served which goal.
+[Sizing a Task](/courses/working-with-coding-agents/sizing-a-task) is
+about cutting work down to one goal at a time.
+
+## Context it cannot discover
+
+The agent can read your code. With a search tool it will find
+`parse_date` faster than you could describe where it lives. What it
+cannot read is everything that never made it into the code:
+
+* **Why the code is like that.** "The old two-digit years still turn up
+  in exports from before 2020."
+* **What the users expect.** "Our customers are in the UK, so dates are
+  day first."
+* **Which behavior is the bug.** When the code and a test disagree,
+  nothing in the repository says which one is right.
+* **Anything outside the repository.** Another team's service, the
+  format a supplier sends, a decision made in a meeting.
+
+Leave these out and the agent does not stop to ask. It fills the gap
+with the most plausible guess, for the same reason a model will invent a
+citation (see
+[Why Models Hallucinate](/courses/how-llms-work/why-models-hallucinate)),
+and the guess goes into the code looking exactly like knowledge.
+
+Naming files and functions helps in a different way. The agent could
+find them itself, but a name saves it a search, and it anchors the
+change to the place you meant rather than to the first plausible match
+the search turned up. "In `dates.py`, `parse_date`" costs you three words.
+
+## Constraints
+
+Say what must not change. The usual list is short: public function
+signatures, other modules, dependencies, the database schema, and the
+tests that already pass.
+
+Without constraints, the agent's idea of done can include work you did
+not ask for: a rename here, a reformatted file there, a new library
+because it made the change shorter. Each one is more diff to review, and
+none of it helps the task.
+[Common Failure Modes](/courses/working-with-coding-agents/common-failure-modes)
+calls these changes nobody asked for, and a constraint in the request is
+the cheapest defense against them.
+
+Write constraints a reviewer can check. "Change only `dates.py` and its
+tests" can be confirmed with one Git command. "Keep the change small"
+cannot be confirmed at all.
+
+## A test for done
+
+This is the part most requests leave out, and it matters most. An agent
+stops when it believes the task is finished. If the request says what
+finished looks like, the agent can check. If it does not, the agent
+decides by its own standard, which tends to be "the code I wrote looks
+right to me".
+
+A test for done is something that can be run or compared:
+
+* **A command that passes.** "`python -m pytest -q` passes."
+* **A test that exists.** "Add a test that `parse_date("03/04/2026")`
+  returns 3 April."
+* **An output that matches.** "`summary` returns `Total: $5.00` for two
+  items at 250 cents."
+
+An agent that can run the check will usually run it, and will usually
+tell you when it fails. One that cannot run anything will report success
+anyway, as the loop on the
+[course's first page](/courses/working-with-coding-agents) showed once
+its second test run was deleted.
+
+The strongest tests for done come from the request, not from the code.
+"An order of exactly \$100 gets the discount" is a fact about the shop.
+A test whose expected value was copied from whatever the code printed is
+a fact about the code, and
+[Verifying with Tests](/courses/working-with-coding-agents/verifying-with-tests)
+shows why that kind proves nothing.
+
+## The running example
+
+This course follows one request from start to finish, sent to an agent
+working on a tiny shop codebase that stores every amount in cents:
+
+> Give orders of \$100 or more a 10% discount, with tests. Don't change
+> anything else.
+
+Measured against the four parts, it does well:
+
+| Part | Where it is in the request |
+| --- | --- |
+| Goal | A 10% discount on orders of \$100 or more. "Or more" settles what happens at exactly \$100. |
+| Context | Little is needed. The code already says amounts are in cents, and the shop has five files. |
+| Constraints | "Don't change anything else." |
+| Test for done | "With tests." |
+
+It is a good request, and the session still went wrong. The agent wrote
+`total > DISCOUNT_THRESHOLD`, which leaves out exactly \$100, where "or
+more" needed `>=`. Its own test at exactly \$100 failed, so it changed the
+test's expected value to match the code. Then it renamed a formatting
+helper in two files that have nothing to do with discounts. Its closing
+summary said all tests pass, which was true. Run this to see what the
+session left behind:
+
+<GitBlock
+  scenario="agent-session"
+  label="What the running example's session committed"
+  commands={`git log --oneline
+git diff HEAD~3 --stat`}
+/>
+
+The bottom commit is the human starting point; the agent made the
+three above it. Between them they changed four files, and two of those
+files were never part of the task.
+[Reading the Diff](/courses/working-with-coding-agents/reading-the-diff)
+walks through each commit. The point here is narrower: a good request
+lowers the odds of a bad result. It does not remove the need to check,
+because the request is what goes into a session and the diff is what
+comes out, and only the diff gets merged.
+
+The session also shows how this request could be stronger. Two
+additions would each have closed a door this agent walked through:
+
+* Pin the boundary in the test for done: "including an order of exactly
+  \$100, which comes to \$90."
+* Say what a failing test means: "If a test fails, fix the code, not the
+  test."
+
+Neither would make reading the diff optional.
+
+## Check a request yourself
+
+The four parts are easy to forget when you are in a hurry, and a missing
+one is easier to spot with a reminder. The block below is a checker for
+exactly that, and it is crude on purpose: it searches the request for
+words that tend to come with each part. It cannot read meaning.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# A deliberately crude request checker. It looks for WORDS, not meaning:
+# it cannot tell a clear goal from a vague one, it has never seen your
+# code, and a request can tick all four boxes and still be a bad one.
+# Use it to notice a part you forgot. Never treat it as proof that a
+# request is good; that judgment is yours.
+import re
+
+# Edit this, then run the block again.
+REQUEST = "Give orders of $100 or more a 10% discount, with tests. Don't change anything else."
+
+# The clues each part leaves behind, as regular expressions.
+CLUES = {
+    "goal": [
+        r"[$]?\\d[\\d,./%]*",          # a concrete value: 10%, $100, 03/04/2026
+        r"\\bshould\\b", r"\\bso that\\b", r"\\binstead of\\b",
+    ],
+    "context": [
+        r"\\w+\\.(py|js|ts|json|toml|csv)\\b",   # a file name
+        r"\\w+\\(\\)",                           # a function name, like f()
+        r"\\bbecause\\b", r"\\bcustomers\\b", r"\\busers\\b",
+    ],
+    "constraints": [
+        r"\\bdon'?t\\b", r"\\bdo not\\b", r"\\bonly\\b", r"\\bwithout\\b",
+        r"\\bnever\\b", r"\\bleave\\b", r"\\bkeep\\b",
+    ],
+    "test for done": [
+        r"\\btests?\\b", r"\\bpytest\\b", r"\\bpasses\\b", r"\\bprints?\\b",
+        r"\\breturns?\\b", r"\\bexpect",
+    ],
+}
+
+def first_clue(text, patterns):
+    for pattern in patterns:
+        match = re.search(pattern, text, re.IGNORECASE)
+        if match:
+            return match.group(0)
+    return None
+
+print("Request:", REQUEST)
+print()
+found = 0
+for part, patterns in CLUES.items():
+    clue = first_clue(REQUEST, patterns)
+    if clue:
+        found += 1
+        print(f"  found    {part:<14} clue: {clue!r}")
+    else:
+        print(f"  missing  {part}")
+
+print()
+print(f"{found} of 4 parts left a clue. A missing part deserves a second")
+print("look. A found one proves nothing: the checker only matched a word.")
+`,
+    },
+  ]}
+/>
+
+On the running example it finds three parts and reports context
+missing. That is a call the checker cannot make: in a five-file shop
+nothing the agent needs is missing, while in a large codebase the same
+request might need to say where the pricing code lives.
+
+Now set `REQUEST` to `"Make it better, keep it fast, and make sure the
+tests pass."` The checker finds a constraint and a test for done, and
+neither is really there. "Keep it fast" gives no number to check, and
+"make sure the tests pass" is satisfied by changing nothing at all.
+Then try a request for a change you actually want to make, and see which
+part it leaves out.
+
+## Spot the missing part
+
+A weak request is often a good one with a part missing. Each question
+below varies which part.
+
+<MultipleChoice
+  markdown={`Which request is most likely to come back finished and easy to review?
+
+- Fix the date bug that customers keep reporting in their order history.
+  > It names a symptom and nothing else. The agent has to guess which bug, what correct means, and how much it may change.
+- Fix the date bug in \`parse_date\`, so that \`03/04/2026\` is read as 3 April from now on.
+  > The goal is clear now, but nothing says how to confirm it or what is off limits.
+- [o] Make \`parse_date\` read \`03/04/2026\` as 3 April, add a test, and edit only \`dates.py\`.
+  > It has a goal, a constraint, and a check the agent can run before it reports back.
+- Rewrite the date handling so it is correct for every format a user might ever type in.
+  > The scope is unbounded, so there is no point at which the agent, or you, can say it is done.
+
+A request that says what done looks like gets a session that stops at
+done.`}
+/>
+
+<MultipleChoice
+  markdown={`This request has three of the four parts. Which one is missing?
+
+*Show report totals with a thousands separator, so 125,000 cents reads \`$1,250.00\`. The invoice emails import \`cents_to_str\` from another repository, so keep its name and signature.*
+
+- The goal, meaning what the report should show.
+  > The goal is there, with a concrete before and after.
+- Context the agent could not find in the code.
+  > The invoice emails live in another repository, which the agent cannot see. The request says so.
+- A constraint on what must not change.
+  > Keeping the name and signature of \`cents_to_str\` is the constraint.
+- [o] A test for done that anyone can run.
+  > Nothing says which test proves the new format, so the agent will decide for itself when it has finished.
+
+Adding "with a test that \`summary\` returns \`Total: $1,250.00\` for a 125,000-cent order" would complete it.`}
+/>
+
+<MultipleChoice
+  markdown={`The shop sends a nightly export to a warehouse. Which request gives the agent what it cannot find in the code?
+
+- [o] Make \`export_orders\` write \`sku,qty\` rows, no header, as the warehouse requires; add a test.
+  > The format comes from outside the repository, so the request supplies it, and the test can check it.
+- Make the order export match what the warehouse expects, and add a test that checks the output.
+  > The agent has never seen the warehouse's import. It will guess a format and write a test that agrees with its guess.
+- Make \`export_orders\` in \`export.py\` match the warehouse format exactly. Change no other file.
+  > It names the function and sets a constraint, but the one fact the change depends on is in nobody's code.
+- Look up the warehouse import format online and make \`export_orders\` produce it, with tests.
+  > The format belongs to another company's private system. There is nothing to look up, so the agent will find something plausible instead.
+
+Context is the part only you can supply, because it is everything the
+repository does not contain.`}
+/>
+
+## Concept check
+
+<MultipleChoice
+  markdown={`Why does a test for done matter more with an agent than with a colleague who could ask you?
+
+- Agents cannot run tests unless the request includes one.
+  > Most agents can run tests whenever their permissions allow it. The question is what they compare the result against.
+- [o] An agent stops when it believes it is done, by its own standard.
+  > Without a check in the request, its standard is its own judgment of its own code.
+- A test for done makes the session cheaper, which is its main purpose.
+  > A clear stopping point can save steps, but the purpose is knowing whether the work is right.
+- Colleagues never need one, because they understand the codebase.
+  > A colleague benefits from one too. The difference is that a colleague will usually ask when it is missing.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of these states a goal rather than an activity?
+
+- Look into why the discount sometimes seems to be wrong.
+  > "Look into" describes something to do, with no moment at which it is finished.
+- Refactor the pricing module so that it is a lot cleaner.
+  > "Cleaner" has no value anyone could check.
+- Investigate the discount threshold logic in pricing.
+  > This is an activity. The agent will investigate and then decide for itself what to do about it.
+- [o] Make an order of exactly 10,000 cents total 9,000.
+  > It names an input and the result it should produce, so both you and the agent can tell when it is true.
+
+An outcome contains something you could check. An activity only
+describes effort.`}
+/>
+
+<MultipleChoice
+  markdown={`You sent a request with a clear goal, the context, constraints and a test for done. The agent reports success. What is left for you to do?
+
+- [o] Read the diff and run the checks, as you would anyway.
+  > A good request lowers the odds of a bad result. The running example's request was good, and its session still changed a test to match a bug.
+- Nothing, because a complete request guarantees a correct result.
+  > No request can guarantee that. The agent can still misread a part of it or ignore one.
+- Read the agent's summary to confirm it covered all four parts.
+  > The summary is the agent's description of its work, not the work. It said "all tests pass" over a test that asserted the bug.
+- Rewrite the request more precisely and run the session a second time.
+  > There is no evidence yet that anything went wrong. Check what came back before deciding.`}
+/>

