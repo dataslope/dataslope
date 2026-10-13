@@ -9,6 +9,12 @@ course is about everything that happens around that: deciding what to
 ask for, checking what came back, and getting out cleanly when it went
 wrong.
 
+<Figure
+  slug="working-with-coding-agents-thumbnail-cutout"
+  alt="A friendly corgi sitting on a thick blue platform, watching a chunky green robot arm lower one large solid yellow block into an open red crate"
+  priority
+/>
+
 ## Why bother
 
 Typing a request into an agent is easy. Getting work you can merge out
@@ -52,15 +58,12 @@ next step. Run this to watch one fix a bug:
 
 files = {"calc.py": "def add(a, b):\\n    return a - b\\n"}
 
-
 def read_file(path):
     return files[path]
-
 
 def edit_file(path, old, new):
     files[path] = files[path].replace(old, new)
     return f"edited {path}"
-
 
 def run_tests():
     namespace = {}
@@ -69,7 +72,6 @@ def run_tests():
     if result == 5:
         return "1 passed"
     return f"1 failed: add(2, 3) returned {result}"
-
 
 TOOLS = {"read_file": read_file, "edit_file": edit_file, "run_tests": run_tests}
 
@@ -81,12 +83,10 @@ SCRIPT = [
     ("finish", ("Fixed add(): it subtracted instead of adding.",)),
 ]
 
-
 def model(transcript):
     """Stands in for the language model: returns the next action."""
     steps_taken = len(transcript) - 1
     return SCRIPT[steps_taken]
-
 
 transcript = ["user: the tests are failing, please fix them"]
 print(transcript[0])

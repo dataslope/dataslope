@@ -8,6 +8,11 @@ the tests six times. Each of those steps resends the whole conversation
 so far, so the input a session consumes grows much faster than the
 session itself.
 
+<Figure
+  slug="agent-what-a-session-costs-cutout"
+  alt="A solid blue meter box on a thick platform with one red dial on its front, and a tray in front of it holding three large low solid yellow discs"
+/>
+
 ## Every step resends the context
 
 Each step of the agent loop is one request to the model, and the model
@@ -120,7 +125,6 @@ ADDED_PER_STEP = 2_500   # tool results appended each step: files read, test out
 OUTPUT_PER_STEP = 300    # tokens the model writes each step: a tool call, a note
 CACHE_HIT_RATE = 0.9     # share of each resent prefix read back from the cache
 
-
 def session(hit_rate):
     """Tokens billed at each rate over the whole session."""
     full = cached = output = 0
@@ -135,10 +139,8 @@ def session(hit_rate):
         context += OUTPUT_PER_STEP + ADDED_PER_STEP
     return full, cached, output
 
-
 def cost(tokens, price):
     return tokens / 1_000_000 * price
-
 
 plain = session(0.0)
 warm = session(CACHE_HIT_RATE)

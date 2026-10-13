@@ -6,6 +6,11 @@ description: Invented functions, weakened tests, swallowed errors, changes nobod
 Agent mistakes are not random. The same handful turn up across every
 tool and every model, and each one has a quick check that catches it.
 
+<Figure
+  slug="agent-common-failure-modes-cutout"
+  alt="A sturdy blue shelf on a platform holding three flawed objects: a yellow gear with one missing tooth, a green key with a bent tip, and a red mug with a large crack"
+/>
+
 This lesson is the overview. For each failure: what it looks like in a
 diff, why it happens, and the check that catches it. Three of the six
 have already turned up in the discount session from
@@ -113,7 +118,6 @@ session, with a broad `except` that returns a default or does nothing:
         return round(float(text.strip("$")) * 100)
     except Exception:
         return 0
-
 
 prices = ["$12.50", "$3.00", "$1,299.00"]
 total = sum(parse_price(price) for price in prices)

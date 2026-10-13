@@ -7,6 +7,11 @@ description: Run the tests yourself, check that they cover the change, and write
 that any of them exercise the change, that the agent ran the whole
 suite, or that it left the assertions as it found them.
 
+<Figure
+  slug="agent-verifying-with-tests-cutout"
+  alt="A chunky green test bench on a platform holding one solid blue gear in a thick yellow clamp, with a large red gauge with a blank face standing beside it"
+/>
+
 ## Run them yourself
 
 An agent's report of a test run is a sentence in its summary. Your own
@@ -78,7 +83,6 @@ print(f"{len(tests) - failed} passed, {failed} failed")
       starterCode: `DISCOUNT_THRESHOLD = 10_000  # cents
 DISCOUNT_RATE = 0.10
 
-
 def order_total(items):
     """Total of price * qty for each item, in cents, after any discount."""
     total = sum(item["price"] * item["qty"] for item in items)
@@ -91,14 +95,11 @@ def order_total(items):
       filename: "test_pricing.py",
       starterCode: `from pricing import order_total
 
-
 def test_total():
     assert order_total([{"price": 250, "qty": 2}]) == 500
 
-
 def test_discount_above_threshold():
     assert order_total([{"price": 6_000, "qty": 2}]) == 10_800
-
 
 def test_discount_at_threshold():
     assert order_total([{"price": 5_000, "qty": 2}]) == 10_000
@@ -236,7 +237,6 @@ Check Answer runs your test against two versions of \`order_total\`:
 DISCOUNT_THRESHOLD = 10_000  # cents
 DISCOUNT_RATE = 0.10
 
-
 def order_total(items):
     """Total of price * qty for each item, in cents, after any discount."""
     total = sum(item["price"] * item["qty"] for item in items)
@@ -249,7 +249,6 @@ def order_total(items):
     # and assert the total the request asks for.
     pass
 
-
 # Run your test against the agent's code, the way its test run did.
 try:
     test_discount_at_threshold()
@@ -261,7 +260,6 @@ except AssertionError:
     # Exactly 10_000 cents is "or more", so the discount applies.
     order = [{"price": 5_000, "qty": 2}]
     assert order_total(order) == 9_000
-
 
 # Run your test against the agent's code, the way its test run did.
 try:

@@ -6,6 +6,11 @@ description: Correcting an agent mid-task with feedback it can act on, interrupt
 Most sessions need at least one correction. How you give it decides
 whether the agent fixes the problem or apologizes and repeats it.
 
+<Figure
+  slug="agent-steering-a-session-cutout"
+  alt="A chunky red toy car on a curved thick green track, with a large blue steering wheel mounted on a short post at the side of the track"
+/>
+
 ## Specific feedback beats "that's wrong"
 
 Here is the session this course keeps coming back to. You asked:
@@ -65,14 +70,12 @@ two tests:
 DISCOUNT_THRESHOLD = 10_000  # cents
 DISCOUNT_RATE = 0.10
 
-
 def order_total(items):
     """Total of price * qty for each item, in cents, after any discount."""
     total = sum(item["price"] * item["qty"] for item in items)
     if total > DISCOUNT_THRESHOLD:
         total = round(total * (1 - DISCOUNT_RATE))
     return total
-
 
 # The agent's two tests, before its second commit edited the second one.
 # Each is a name, the call it makes, and the value it expects.

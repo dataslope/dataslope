@@ -8,6 +8,11 @@ you meant depends on four things you can put in the request: what you
 want, what it cannot find out on its own, what it must not do, and how
 anyone will know it is done.
 
+<Figure
+  slug="agent-writing-a-task-cutout"
+  alt="A chunky blue clipboard standing upright on a thick platform with four large solid tabs sticking out of its right edge, one green, one yellow, one red and one blue"
+/>
+
 ## The goal
 
 State the outcome, not the activity. "Look at the date code" is an
@@ -195,14 +200,12 @@ CLUES = {
     ],
 }
 
-
 def first_clue(text, patterns):
     for pattern in patterns:
         match = re.search(pattern, text, re.IGNORECASE)
         if match:
             return match.group(0)
     return None
-
 
 print("Request:", REQUEST)
 print()

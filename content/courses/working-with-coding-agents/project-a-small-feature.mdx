@@ -9,6 +9,11 @@ decision along the way is yours: what to ask for, whether the plan is
 right, whether the diff matches the plan, and whether the result gets
 merged at all.
 
+<Figure
+  slug="agent-project-a-small-feature-cutout"
+  alt="A friendly corgi sitting beside one chunky red shipping crate with its lid closed on a thick blue loading dock, a green ramp leading down from the dock"
+/>
+
 ## The project
 
 A shop's pricing module. Totals are in cents, every order pays a flat
@@ -23,17 +28,14 @@ before anyone changes anything:
       starterCode: `# pricing.py
 SHIPPING = 499  # cents, flat rate
 
-
 def order_total(items):
     """Items at price * qty, plus shipping, in cents."""
     subtotal = sum(item["price"] * item["qty"] for item in items)
     return subtotal + SHIPPING
 
-
 # test_pricing.py
 def test_total_includes_shipping():
     assert order_total([{"price": 250, "qty": 2}]) == 999
-
 
 # A tiny test runner: call every function whose name starts with test_.
 for name, test in list(globals().items()):
@@ -164,7 +166,6 @@ it was not. The claim that all tests pass, on the other hand, is true:
 SHIPPING = 499  # cents, flat rate
 COUPONS = {"SAVE10": 0.10}
 
-
 def order_total(items, coupon=None):
     """Items at price * qty, plus shipping, less any coupon, in cents."""
     subtotal = sum(item["price"] * item["qty"] for item in items)
@@ -173,15 +174,12 @@ def order_total(items, coupon=None):
         total = round(total * (1 - COUPONS[coupon]))
     return total
 
-
 # test_pricing.py, as the agent left it
 def test_total_includes_shipping():
     assert order_total([{"price": 250, "qty": 2}]) == 999
 
-
 def test_save10_coupon():
     assert order_total([{"price": 1_000, "qty": 1}], coupon="SAVE10") == 1_349
-
 
 for name, test in list(globals().items()):
     if name.startswith("test_"):
@@ -221,7 +219,6 @@ Work out the expected total from the request, not from running the code.`}
       initCode: `SHIPPING = 499
 COUPONS = {"SAVE10": 0.10}
 
-
 def _agent_order_total(items, coupon=None):
     subtotal = sum(item["price"] * item["qty"] for item in items)
     total = subtotal + SHIPPING
@@ -229,13 +226,11 @@ def _agent_order_total(items, coupon=None):
         total = round(total * (1 - COUPONS[coupon]))
     return total
 
-
 def _fixed_order_total(items, coupon=None):
     subtotal = sum(item["price"] * item["qty"] for item in items)
     if coupon in COUPONS:
         subtotal = round(subtotal * (1 - COUPONS[coupon]))
     return subtotal + SHIPPING
-
 
 order_total = _agent_order_total
 `,
@@ -244,7 +239,6 @@ order_total = _agent_order_total
     total = order_total(items, coupon="SAVE10")
     # Replace this line with an assertion about what total should be.
     assert True
-
 
 # Try your test against the agent's code.
 try:
@@ -257,7 +251,6 @@ except AssertionError:
     items = [{"price": 1_000, "qty": 1}]
     total = order_total(items, coupon="SAVE10")
     assert total == 900 + SHIPPING, f"expected {900 + SHIPPING}, got {total}"
-
 
 # Try your test against the agent's code.
 try:

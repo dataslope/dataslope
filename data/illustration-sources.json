@@ -1,5 +1,131 @@
 {
   "sources": {
+    "agent-common-failure-modes": {
+      "run": "2026-10-coding-agents",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-coding-agents/agent-common-failure-modes/v1/cutout.png",
+      "matchDb": 53,
+      "servedSha": "02b70d30bf0deda972ccfbf4452968ce95b23d537b5572543725c5af14761945"
+    },
+    "agent-instruction-files": {
+      "run": "2026-10-coding-agents",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-coding-agents/agent-instruction-files/v1/cutout.png",
+      "matchDb": 52,
+      "servedSha": "852aed32bd6bdb1921e04681984ab8e80bfdd5a8f7dd7f1134608e2d3135a361"
+    },
+    "agent-kinds-of-coding-tools": {
+      "run": "2026-10-coding-agents",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-coding-agents/agent-kinds-of-coding-tools/v1/cutout.png",
+      "matchDb": 55,
+      "servedSha": "6383a0cbcde24495eae69296ef267d405714b3b31a767042560555e78a2bca93"
+    },
+    "agent-next-steps": {
+      "run": "2026-10-coding-agents",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-coding-agents/agent-next-steps/v1/cutout.png",
+      "matchDb": 56,
+      "servedSha": "ac3449c3eecda28b0bd620d60dc78c9bd25007ae163d9ce2ccd11e559a418b64"
+    },
+    "agent-plan-before-code": {
+      "run": "2026-10-coding-agents",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-coding-agents/agent-plan-before-code/v1/cutout.png",
+      "matchDb": 54,
+      "servedSha": "8ae48257176931e05b6b75d86fa0f91e7c9efbd514e082dbdd0801e7b24c657b"
+    },
+    "agent-project-a-small-feature": {
+      "run": "2026-10-coding-agents",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-coding-agents/agent-project-a-small-feature/v1/cutout.png",
+      "matchDb": 54,
+      "servedSha": "64d5123f318215657aadded91185aa75ac0578410c8a6cca5a7f25f08fcbac86"
+    },
+    "agent-reading-the-diff": {
+      "run": "2026-10-coding-agents",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-coding-agents/agent-reading-the-diff/v1/cutout.png",
+      "matchDb": 53,
+      "servedSha": "12b12b9a4ec098085133c07db2866de49b8a499536b691adc86ca113084b6a35"
+    },
+    "agent-sizing-a-task": {
+      "run": "2026-10-coding-agents",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-coding-agents/agent-sizing-a-task/v1/cutout.png",
+      "matchDb": 54,
+      "servedSha": "c2e93fe5679c8316c92fe88d451218fae10b9f46fea41cb1e4ede62e9e015cb9"
+    },
+    "agent-staying-safe": {
+      "run": "2026-10-coding-agents",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-coding-agents/agent-staying-safe/v1/cutout.png",
+      "matchDb": 53,
+      "servedSha": "8f2e4f28b02d0b37caa517921feb37cff38c522761285d852a65ef9f55b5912a"
+    },
+    "agent-steering-a-session": {
+      "run": "2026-10-coding-agents",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-coding-agents/agent-steering-a-session/v1/cutout.png",
+      "matchDb": 54,
+      "servedSha": "51172eaa25339dedcb386ba2e65023ad192c51a6a8fffa77cee5257daaf3a297"
+    },
+    "agent-tools-and-permissions": {
+      "run": "2026-10-coding-agents",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-coding-agents/agent-tools-and-permissions/v1/cutout.png",
+      "matchDb": 54,
+      "servedSha": "1f21091e96ac1b97ede8b3085ec5053e4de341d28f5cef74892badac0280753e"
+    },
+    "agent-undoing-changes": {
+      "run": "2026-10-coding-agents",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-coding-agents/agent-undoing-changes/v1/cutout.png",
+      "matchDb": 52,
+      "servedSha": "793f11314e606529c231b8ca9b561b518d283138c2754586306317d9d3ae6f08"
+    },
+    "agent-verifying-with-tests": {
+      "run": "2026-10-coding-agents",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-coding-agents/agent-verifying-with-tests/v1/cutout.png",
+      "matchDb": 53,
+      "servedSha": "ef1388995c6d71916b51c7afeca84a66bd92c2a3ccdf79bf9c366595ba7d435e"
+    },
+    "agent-what-a-session-costs": {
+      "run": "2026-10-coding-agents",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-coding-agents/agent-what-a-session-costs/v1/cutout.png",
+      "matchDb": 54,
+      "servedSha": "5b6c9e579afd9c9b2622e67784d18e4b2603d95e7dea459d68b6775795364577"
+    },
+    "agent-what-is-an-agent": {
+      "run": "2026-10-coding-agents",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-coding-agents/agent-what-is-an-agent/v1/cutout.png",
+      "matchDb": 55,
+      "servedSha": "dd980df88b60602e1dc5c96c00e98b3fa5e385ec44c7a1bac83d191ecce39f24"
+    },
+    "agent-what-the-agent-sees": {
+      "run": "2026-10-coding-agents",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-coding-agents/agent-what-the-agent-sees/v1/cutout.png",
+      "matchDb": 54,
+      "servedSha": "224d32d59cbf7bada488ad1c7b2b655bba0c1fa37e355fe9a9def34e72c9ff7c"
+    },
+    "agent-when-to-take-over": {
+      "run": "2026-10-coding-agents",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-coding-agents/agent-when-to-take-over/v1/cutout.png",
+      "matchDb": 54,
+      "servedSha": "8c6f4183db4377dceeec50df85d9e7e8d5c81291a3a728403ab36471fd28c147"
+    },
+    "agent-writing-a-task": {
+      "run": "2026-10-coding-agents",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-coding-agents/agent-writing-a-task/v1/cutout.png",
+      "matchDb": 52,
+      "servedSha": "7021e6518622c0689b3412368f28e46cadad00a40dab75d701a47a7e7e685621"
+    },
     "auth-pin-ai": {
       "run": "2026-07-31-auth-globe-pins",
       "variant": 1,
@@ -7327,6 +7453,13 @@
       "original": "illustrations/2026-08-batch20/web-tailwind-quickstart/v1/original.png",
       "matchDb": 55,
       "servedSha": "38ed64d661fe5f18810f5da5fcc969496905a1ba8d541a59822b1243efeaf123"
+    },
+    "working-with-coding-agents-thumbnail": {
+      "run": "2026-10-coding-agents",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-coding-agents/working-with-coding-agents-thumbnail/v1/cutout.png",
+      "matchDb": 54,
+      "servedSha": "fe067d1c421bad6a45bbd51165a6e3b31fe4e32bca5cbe30748bcddaa269156d"
     }
   },
   "unresolved": {}

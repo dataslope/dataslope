@@ -9,6 +9,11 @@ depending on the tool. Whatever is in it is in the context of every
 session, which makes it the cheapest place to fix a mistake that keeps
 coming back.
 
+<Figure
+  slug="agent-instruction-files-cutout"
+  alt="A sturdy blue lectern on a thick platform with a closed chunky yellow handbook resting on it, and a friendly red robot standing in front of the lectern"
+/>
+
 ## What goes in
 
 An instruction file is a standing request: the part of every request
@@ -141,7 +146,6 @@ REASON = r"\\b(because|since|so that|otherwise)\\b|[:;]|\\.\\s+\\S"
 SECRET = r"(api[_-]?key|secret|token|password)\\s*[=:]\\s*\\S+"
 TEST_COMMAND = r"\\x60[^\\x60]*test[^\\x60]*\\x60"
 
-
 def items(text):
     """Each line, with a bullet's indented continuation lines joined on."""
     found = []
@@ -152,7 +156,6 @@ def items(text):
         elif line.strip():
             found.append((number, line.strip()))
     return found
-
 
 notes = []
 for number, text in items(FILE):

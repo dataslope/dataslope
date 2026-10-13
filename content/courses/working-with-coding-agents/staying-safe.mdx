@@ -8,6 +8,11 @@ Each is manageable on its own. Together they are the risk: a web page
 or an issue comment containing instructions, read by an agent that can
 run commands.
 
+<Figure
+  slug="agent-staying-safe-cutout"
+  alt="A deep blue safe with a thick green door shut tight on a platform, and a red traffic cone standing beside it"
+/>
+
 ## Secrets stay out of the context
 
 Everything the agent reads goes into its context, and the context is
@@ -184,11 +189,9 @@ REQUESTED = [
 # Commands that run without asking. Everything else waits for you.
 ALLOW = ["pytest", "git status", "git diff"]
 
-
 def allowed(command):
     """True if the command starts with an allowed rule."""
     return any(command == rule or command.startswith(rule + " ") for rule in ALLOW)
-
 
 for command in REQUESTED:
     verdict = "runs" if allowed(command) else "ASKS"

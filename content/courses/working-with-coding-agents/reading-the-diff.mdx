@@ -7,6 +7,11 @@ When an agent finishes, it tells you what it did. Treat that message as
 a claim. The diff is the record, and reading it is the habit that
 separates using an agent from trusting one.
 
+<Figure
+  slug="agent-reading-the-diff-cutout"
+  alt="Two solid blue cabinets side by side on a platform, the left one with a red drawer pulled half out and the right one with a new green drawer, and a large yellow magnifying glass on a short stand between them"
+/>
+
 ## The session you are reviewing
 
 An agent cannot run inside this page, so this lesson uses a session that
@@ -53,7 +58,6 @@ index 7ad6232..c801fc4 100644
 -from format import cents_to_str
 +from format import format_cents
  from pricing import order_total
-
 
  def summary(items):
 -    return "Total: " + cents_to_str(order_total(items))

@@ -8,6 +8,11 @@ finish it, and how likely you are to review it properly. Both get worse
 as the task grows, and the second is the one that is easy to forget,
 because the agent's half of the work gets faster while yours does not.
 
+<Figure
+  slug="agent-sizing-a-task-cutout"
+  alt="One large rough red boulder on the left of a thick platform and four neat solid yellow blocks in a row on the right, with a small blue wheelbarrow carrying a single yellow block between them"
+/>
+
 ## Review effort grows with the diff
 
 An agent can produce a 600-line diff in a few minutes. Reading it
@@ -109,21 +114,17 @@ Take the expected output from the request, not from running the code: a header r
       initCode: `import csv
 import io
 
-
 def _write(rows):
     out = io.StringIO()
     csv.writer(out, lineterminator="\\n").writerows(rows)
     return out.getvalue()
 
-
 def _agent_version(items):
     header = [["name", "qty", "price", "total"]]
     return _write(header + [[i["name"], i["qty"], i["price"], i["price"] * i["qty"]] for i in items])
 
-
 def _no_header(items):
     return _write([[i["name"], i["qty"], i["price"], i["price"] * i["qty"]] for i in items])
-
 
 def _unquoted(items):
     lines = ["name,qty,price,total"]
@@ -131,14 +132,12 @@ def _unquoted(items):
         lines.append(f'{i["name"]},{i["qty"]},{i["price"]},{i["price"] * i["qty"]}')
     return "\\n".join(lines) + "\\n"
 
-
 def _ignores_qty(items):
     header = [["name", "qty", "price", "total"]]
     return _write(header + [[i["name"], i["qty"], i["price"], i["price"]] for i in items])
 `,
       starterCode: `import csv
 import io
-
 
 # export.py, step 1, as the agent delivered it
 def items_to_csv(items):
@@ -151,12 +150,10 @@ def items_to_csv(items):
         writer.writerow([item["name"], item["qty"], item["price"], total])
     return out.getvalue()
 
-
 print(items_to_csv([
     {"name": "Tea towel", "price": 450, "qty": 3},
     {"name": "Mug, large", "price": 1_250, "qty": 2},
 ]))
-
 
 # test_export.py, step 1's test for done
 def test_items_to_csv():
@@ -164,7 +161,6 @@ def test_items_to_csv():
     result = items_to_csv(items)
     # Replace this line with an assertion about what result should be.
     assert True
-
 
 # Try your test against the agent's version.
 try:
@@ -176,7 +172,6 @@ except AssertionError as error:
       solutionCode: `import csv
 import io
 
-
 # export.py, step 1, as the agent delivered it
 def items_to_csv(items):
     """One CSV row per item: name, qty, price and line total, in cents."""
@@ -188,19 +183,16 @@ def items_to_csv(items):
         writer.writerow([item["name"], item["qty"], item["price"], total])
     return out.getvalue()
 
-
 print(items_to_csv([
     {"name": "Tea towel", "price": 450, "qty": 3},
     {"name": "Mug, large", "price": 1_250, "qty": 2},
 ]))
-
 
 # test_export.py, step 1's test for done
 def test_items_to_csv():
     items = [{"name": "Mug, large", "price": 1_250, "qty": 2}]
     result = items_to_csv(items)
     assert result == 'name,qty,price,total\\n"Mug, large",2,1250,2500\\n', result
-
 
 # Try your test against the agent's version.
 try:

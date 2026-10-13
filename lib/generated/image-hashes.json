@@ -1,4 +1,22 @@
 {
+  "agent-common-failure-modes-cutout": "8c099e6b25079a4a0cc2f03899b1c3fd89fd591252ec218bbc0e262e545f3259",
+  "agent-instruction-files-cutout": "11a29511e7cccd6ea3734da027b9eed9a5ba50b921ffb9fd7ae9f2336db64077",
+  "agent-kinds-of-coding-tools-cutout": "9cde726c8eabe14026267cb69c313751d4da8845a11c6078066cd3215af021dd",
+  "agent-next-steps-cutout": "75286895e55fbf5f01d854973d9fc1375397ac3d33a20a6a960b2f8cb3dfb663",
+  "agent-plan-before-code-cutout": "776579da611c2fb03ac0275988889727b06f9fa57380f3210e995419a5aac5f6",
+  "agent-project-a-small-feature-cutout": "70fd71a96ad1242e48ce86bbb1418e9efecaa945708a8af068185cb3c3d168de",
+  "agent-reading-the-diff-cutout": "9c3b08f9226898a963f20a126936afabeea71fb5e944b698b068797b0be660a0",
+  "agent-sizing-a-task-cutout": "76f5c600b658a5c25a5fd55038afbbfff12b6de836165055b6ffa9dc90dbbef4",
+  "agent-staying-safe-cutout": "4be32cc7ef2e92f1ed044397b7afdf616ba94afa0a91a5ab64f542e69ea7c3f1",
+  "agent-steering-a-session-cutout": "073d2632efc549faf6e63dd6c7e391db311623de66b43f2b565766808a277ea7",
+  "agent-tools-and-permissions-cutout": "239a9d12fa014629c5f49945b8c2bf8824d458e48f9cb1821f2150a7d7d0873b",
+  "agent-undoing-changes-cutout": "14633d9292c35259eeae3882270a170cf590ae705b5e4ee9abcab05d203ebcf3",
+  "agent-verifying-with-tests-cutout": "1f396b0f63cb7f4607dd5dfc955295da51525717168dcde10db958f992f442c3",
+  "agent-what-a-session-costs-cutout": "da8c6582fdc85770c2a7091796c2346f232c0bbeb5fd76e84ecc86a39f268564",
+  "agent-what-is-an-agent-cutout": "7e8b87f2a02ad760605b4b0a32c70cdb97fe284842fb9e3d5dcf98d1c6719424",
+  "agent-what-the-agent-sees-cutout": "ceeee0d78dbbcd6180e29c5a498af5a9ce5f0c01ff43a9a7eee196900f71184d",
+  "agent-when-to-take-over-cutout": "d27ff42ae93a4ce7023600942022223760dd3ffb73378bc1e500e7cd1ddc09b0",
+  "agent-writing-a-task-cutout": "e7aafe88352f563f39b54a40cb1e411ae79bdf0838997e9afe09025abee0f86a",
   "auth-pin-ai-cutout": "2e1f3bfc57e982fcb27ed62ca3489be4961c029239b97ad47a232b8e8decae1c",
   "auth-pin-blocks-cutout": "9acf594731b440aa313b02bf59072222a174e49a939367110cf640a5104175ca",
   "auth-pin-charts-cutout": "35df1be4a296299dbd97a7637d09bec417cabe07f5c6b42c6c7b4bbd1f734101",
@@ -2806,5 +2824,6 @@
   "web-project-scoreboard-cutout": "c70b68b8c88bdc861ab359fddbd09e0455a412e937953d79e3045417f5a9bead",
   "web-react-first-components-cutout": "7f012375f2ebbcef66c25f9824a96c0a81adc797238225e056db2314c0cd8cbd",
   "web-react-first-components-state-scoreboard-react-way-inline-cutout": "c8243153734d1f570423879692b93a944f535be6ffc40b73ad3ed91e22955fc5",
-  "web-tailwind-quickstart-cutout": "24b5a7a2981457f98eda822ab14fcdd022dd4e74a9b4afce17162a2d13ec96cd"
+  "web-tailwind-quickstart-cutout": "24b5a7a2981457f98eda822ab14fcdd022dd4e74a9b4afce17162a2d13ec96cd",
+  "working-with-coding-agents-thumbnail-cutout": "52ab7fec4f83829b7424af059fa99eb9ef590c271ba98b8411c92daf2469c62d"
 }
