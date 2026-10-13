@@ -67,9 +67,11 @@ Violating any of these has already been tried and rejected. Don't re-litigate.
   and the tiers are 158 vs 1372 vs 5488 tokens.
   One course departs from the model on request: `working-with-coding-agents`
   (2026-10-13) was generated with `gpt-image-2.5-flare` via `--model`. At `low` and
-  1536x1024 it bills the same 158 output tokens, accepts `background: "transparent"`
-  and the Batch API, and draws solid pixels at alpha 253 rather than 255, which
-  `alphaStats` already counts as solid (its cut-off is 250).
+  1536x1024 it bills the same 158 output tokens, accepts `background: "transparent"`,
+  and draws solid pixels at alpha 253 rather than 255, which `alphaStats` already
+  counts as solid (its cut-off is 250). The Batch API accepted a 19-request job for
+  it but left it `in_progress` at 0/19 for 45 minutes, so that batch was cancelled
+  (nothing billed) and the course was generated with `sync` (~$0.09).
 - **Isometric** is the house style. Permanently retired: flat geometric, line art,
   blueprint schematic, cut-paper collage, and SVG. Risograph is allowed only for a
   simple mascot moment and hasn't been used since the pilot.
