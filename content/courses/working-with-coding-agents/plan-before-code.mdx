@@ -3,8 +3,6 @@ title: Plan Before Code
 description: Ask for a plan, correct it while it is still cheap, and only then let the agent edit files.
 ---
 
-{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
-
 A wrong plan costs a sentence to fix. The same mistake, carried out
 across a dozen files, costs a diff to fix. Most agents can be asked to
 plan first, and several have a mode that refuses to edit anything until
@@ -12,32 +10,216 @@ you approve the plan.
 
 ## What a good plan contains
 
-{/*
-- The files it will touch, the approach, the tests it will add or run,
-  and the questions it could not answer from the code.
-- A plan with no open questions on a vague task is a warning sign.
-*/}
+A plan is the agent's reading of your request, written down before it
+acts on it. It is the cheapest moment in the whole session to find out
+that the two of you understood different things. To be useful, it
+should say:
+
+* **The files it will touch,** and the ones it read to decide. A file
+  you did not expect is as much a red flag here as it is in a diff, and
+  far cheaper to act on.
+* **The approach,** in enough detail that you could disagree with it:
+  which function changes, and how. "Update the pricing logic" is not an
+  approach. "Apply the discount in `order_total`, after the sum" is.
+* **The tests** it will add or run, with the values they will check.
+* **What it will leave alone,** which lets you hold it to the
+  constraints in your request.
+* **The questions it could not answer from the code.** These are the
+  gaps in your request, found before the agent fills them.
+
+That last item deserves a second look. On a precise request, a plan with
+no questions is normal. On a vague one, the gaps are still there, and a
+plan that never mentions them has filled them with guesses without
+saying so. The model's guesses read exactly like its knowledge (see
+[Why Models Hallucinate](/courses/how-llms-work/why-models-hallucinate)),
+so a vague task that comes back with a confident, question-free plan is
+a warning sign, not a relief.
+
+To get a plan like that, ask for each part by name:
+
+> Before you edit anything, propose a plan: the files you will change,
+> the approach, the tests you will add or run, and anything you could not
+> work out from the code. Then wait for my go-ahead.
 
 ## Reviewing a plan
 
-{/*
-- Look for: the wrong file, a function that does not exist, no test,
-  work outside the request.
-- Interactive: a recorded plan for a small task with one planted flaw;
-  MultipleChoice asking which step to correct.
-*/}
+Read a plan the way you will later read the diff, against the request
+rather than against itself. Most flawed plans fail in one of a few ways:
+
+* **The wrong file.** The change lands somewhere other than where the
+  behavior lives, often in a new helper beside an existing one.
+* **A function that does not exist.** A plan can name a plausible method
+  as easily as a diff can. Search the code for anything it calls that
+  you do not recognize.
+* **No test, or a test that cannot fail.** If the plan's tests would pass
+  whether or not the change works, they are not a check.
+* **Work outside the request.** "While I'm there, I'll also..." is scope
+  creep, announced in advance. Strike it now.
+* **A step that contradicts the request.** The subtlest of the five,
+  because each step reads as reasonable on its own.
+
+Here is a plan for the running example's request (*Give orders of \$100
+or more a 10% discount, with tests. Don't change anything else.*), as an
+agent might return it after reading the shop's code. It has one flaw.
+
+```markdown
+## Plan: 10% discount on orders of $100 or more
+
+I read pricing.py, test_pricing.py and report.py. Amounts are integer
+cents throughout.
+
+1. Add DISCOUNT_THRESHOLD = 10_000 and DISCOUNT_RATE = 0.10 at the top
+   of pricing.py.
+2. In order_total, after summing the items, apply the discount when
+   total > DISCOUNT_THRESHOLD, rounding to whole cents with round().
+3. Add two tests to test_pricing.py: an order of 12,000 cents comes to
+   10,800, and an order of exactly 10,000 cents comes to 9,000.
+4. Run the tests and report the result.
+
+I will not touch format.py, report.py or README.md.
+
+Open question: round() sends a half cent to the even neighbor, so
+10,005 cents becomes 9,004 and 10,015 becomes 9,014. Is that
+acceptable, or should halves always round up?
+```
+
+<MultipleChoice
+  markdown={`Which step should you correct before approving this plan?
+
+- Step 1, because the threshold and rate belong in a configuration file.
+  > The request did not ask for configuration. Two constants are the smallest change that works, and asking for more would be scope creep from your side.
+- [o] Step 2, because "greater than" excludes an order of exactly 10,000.
+  > The request says "or more", so the comparison has to be \`>=\`. Step 3 already expects the discount at exactly 10,000 cents, and step 2 as written would make that test fail.
+- Step 3, because an order of exactly 10,000 cents should stay at 10,000.
+  > This makes the plan agree with itself by making it wrong: it follows step 2 instead of the request.
+- Step 4, because running the tests should be left to you, not the agent.
+  > Running the tests is what you want the agent to do. You will still run them yourself afterwards.
+
+Steps 2 and 3 disagree, and only the request can say which one is
+right. The plan's open question is a good one too, and deserves an
+answer before you approve.`}
+/>
+
+The correction is one sentence: *"In step 2, use `>=`: the request says
+\$100 or more."*
+
+Now look at the same mistake after it has been carried out. The running
+example's session never showed a plan, but its first commit does steps
+1 to 3 exactly as written above:
+
+<GitBlock
+  scenario="agent-session"
+  label="Step 2 of the plan, carried out"
+  commands={`git log --oneline
+git show HEAD~2:pricing.py`}
+/>
+
+The comparison is `total > DISCOUNT_THRESHOLD`. The boundary test from
+step 3 failed against it, and the agent's next commit, "Fix failing
+discount test", resolved the disagreement between steps 2 and 3 the way
+the third answer above does: it changed the test. At the plan stage the
+fix was a sentence. After the session it is a wrong comparison, a test
+that now asserts the bug, and a review to find both (see
+[Reading the Diff](/courses/working-with-coding-agents/reading-the-diff)).
+
+Notice the third commit, too. The plan above promises to leave
+`format.py` and `report.py` alone, and the session renamed a function
+in both. An approved plan is a statement of what the agent
+intends to do. The diff is still the record of what it did, and it still
+needs reading.
 
 ## Plan modes
 
-{/*
-- Several tools have a read-only planning mode. Name them in Kinds of
-  Coding Tools rather than here, and verify the current names.
-- Without one, ask in the request: "propose a plan and wait".
-*/}
+Several tools have a planning mode, in which the agent explores the
+code and writes a plan before it changes anything, and in some of them
+the tool also blocks edits until you approve the plan.
+[Kinds of Coding Tools](/courses/working-with-coding-agents/kinds-of-coding-tools)
+lists which tools have one, what each calls it, and which of them block
+edits.
+
+The difference between a blocking mode and a sentence in your request is
+who enforces it. The mode is enforced by the tool, which holds back the
+edits. A sentence such as "propose a plan and wait" is an instruction to
+the model, which it will usually follow. Usually is good enough for most
+tasks, and it works in every tool, so without a planning mode, put the
+request for a plan in the request itself:
+
+> Propose a plan first and wait. Don't edit any files until I reply.
+
+When the plan comes back, answer in the same session, so the agent
+works from the version you corrected:
+
+> Go ahead, with one change: in step 2, use `>=`. Round halves the way
+> `round()` does.
+
+If your corrections amount to a different task, start a fresh session
+with a better request instead. A session that has argued its way through
+a wrong plan carries that plan in its context (see
+[Steering a Session](/courses/working-with-coding-agents/steering-a-session)).
 
 ## When to skip the plan
 
-{/*
-- A one-line fix with an obvious test. Planning overhead has to pay for
-  itself.
-*/}
+A plan costs a round trip: one more message from the agent, one more
+read and reply from you. It has to pay for itself, and sometimes it
+does not:
+
+* **A one-line fix with an obvious test.** A typo in an error message
+  does not need a plan. The plan would be longer than the diff, and
+  reading the diff is just as quick.
+* **You already know the plan.** Then write it into the request: "In
+  `order_total`, after the sum, apply the discount when the total is at
+  least `DISCOUNT_THRESHOLD`; add tests at 12,000 and at exactly
+  10,000." The request is now the plan, and you reviewed it as you wrote
+  it.
+* **A throwaway experiment.** If you only want to see whether an idea
+  works and will delete the result either way, the diff is the answer
+  you are after.
+
+Ask for a plan whenever the opposite is true: the change will touch
+several files, it involves a judgment call such as a boundary or a
+rounding rule, you do not know the code well, or the session will run
+without you watching it.
+
+## Concept check
+
+<MultipleChoice
+  markdown={`You asked an agent to "make the reports faster". Its plan lists six confident steps and no open questions. What does that most likely mean?
+
+- The task was simpler than it looked, so the plan can be approved.
+  > A vague request does not become precise because the plan sounds sure of itself.
+- The agent has read the whole codebase and found every answer it needs.
+  > It has read what it opened during this session. Which reports, and how fast is fast enough, are not in the code.
+- [o] It has filled the request's gaps with guesses and not said so.
+  > "Faster" by how much, and for which reports? Those gaps are still there. A plan that skips them answered them silently.
+- The agent's planning mode is not switched on, so it skipped the questions.
+  > Open questions come from the request's gaps, not from a mode. Any plan can and should list them.
+
+On a precise task, a plan without questions is normal. On a vague one,
+it is a warning sign.`}
+/>
+
+<MultipleChoice
+  markdown={`What does a planning mode that blocks edits give you that writing "propose a plan and wait" in the request does not?
+
+- [o] The tool itself holds back file edits until you approve the plan.
+  > A mode is enforced around the model. A sentence in the request is an instruction the model usually follows.
+- A plan that is guaranteed to be correct once you have approved it.
+  > A plan from a mode can be as wrong as any other. Approving it does not check it.
+- A plan the agent is bound to, so its diff needs less careful review.
+  > The diff is still the record. The running example's session changed files no plan would have listed.
+- A longer, more detailed plan than any request could ever ask for.
+  > A request can ask for exactly the parts it wants. The difference is enforcement, not detail.`}
+/>
+
+<MultipleChoice
+  markdown={`In which of these cases is skipping the plan reasonable?
+
+- A change to how discounts round, touching \`pricing.py\` and two reports.
+  > Several files and a judgment call about rounding: exactly what a plan is for.
+- A task in a part of the codebase you have never read yourself.
+  > If you do not know the code, the plan is your first chance to learn what the change will touch.
+- A well-tested chore that a cloud agent will run while you are out.
+  > The less you watch a session, the more its plan matters, because the plan is the last point at which you can steer it cheaply.
+- [o] Fixing a typo in one error message, checked by an existing test.
+  > The plan would be longer than the diff. Read the diff instead.`}
+/>

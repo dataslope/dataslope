@@ -3,49 +3,347 @@ title: Sizing a Task
 description: Why a task you can review in ten minutes beats one that takes an afternoon, and how to cut a big change into steps an agent can finish one at a time.
 ---
 
-{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
-
 The size of a task decides two things: how likely the agent is to
 finish it, and how likely you are to review it properly. Both get worse
-faster than the task gets bigger.
+as the task grows, and the second is the one that is easy to forget,
+because the agent's half of the work gets faster while yours does not.
 
 ## Review effort grows with the diff
 
-{/*
-- Small diffs get read; large ones get skimmed.
-- A chart could go here (charts/<slug>.mjs, AGENTS.md "Charts"), but
-  only with a cited source for the data. Do not invent the curve.
-*/}
+An agent can produce a 600-line diff in a few minutes. Reading it
+properly takes far longer than that. The work in a large task
+does not disappear when an agent does the typing: it moves into the
+review, which is the half of the job that stays yours.
+
+Small diffs get read. Large ones get skimmed, because the reviewer's
+attention runs out before the diff does, and a skimmed diff is an
+unreviewed one. Two widely cited sources on code review put rough
+numbers on it. Google's guide for its own engineers says 100 lines is
+usually a reasonable size for a change and 1,000 lines is usually too
+large, and gives among its reasons that small changes are reviewed more
+quickly and more thoroughly and are simpler to roll back.[^google] A
+SmartBear study of a programming team at Cisco recommends reviewing no
+more than 200 to 400 lines at a time, and reports that past 400 lines
+the ability to find defects diminishes.[^smartbear]
+
+Both were written about changes made by people. Nothing about an agent
+being the author makes a long diff quicker to read, and the agent's own
+odds get worse with size too: a bigger task means more files opened and
+more tool output piling into its context, where a constraint you gave
+at the start has more to compete with (see
+[What the Agent Sees](/courses/working-with-coding-agents/what-the-agent-sees)).
 
 ## One concern per session
 
-{/*
-- A bug fix and a refactor in one session produce one diff where you
-  cannot tell which change did what.
-- Links to What the Agent Sees: a session about one thing keeps its
-  context about one thing.
-*/}
+A bug fix and a refactor in one session produce one diff, and in that
+diff you cannot tell which change did what. If a test starts failing,
+was it the fix or the rename? If the fix is wrong, can you keep the
+refactor without it? Google's guide gives the same advice for human
+changes: refactorings go in a separate change from feature work and bug
+fixes.[^google]
+
+The running example has a small case of it. The request was a discount,
+and the session's third commit, "Tidy up formatting helpers", renamed a
+function across two files that have nothing to do with discounts. It
+landed in a commit of its own and in files the discount never touched,
+which is why undoing it takes a single command (see
+[Undoing Changes](/courses/working-with-coding-agents/undoing-changes)).
+Had the agent made the rename in `pricing.py` while adding the discount,
+the two would have been one change.
+
+One concern per session also keeps the context about one thing.
+Everything a session reads stays in its context until the window fills,
+so the files opened for one job are still there, competing for
+attention, while the agent works on the next. When a task is finished,
+start the next one in a fresh session.
 
 ## Cutting a feature into steps
 
-{/*
-- Worked example: "add CSV export" becomes (1) the function that
-  formats rows, with tests, (2) the command that calls it, (3) the
-  documentation. Each step is reviewable and leaves the code working.
-- Each step ends at a commit (see Undoing Changes).
-*/}
+"Add CSV export" sounds like one task. For the shop, it is at least
+three, and each can be its own request, its own review and its own
+commit:
+
+| Step | The request | Done when |
+| --- | --- | --- |
+| 1 | Add `items_to_csv(items)` to a new `export.py`: a header row, then one row per item with name, qty, price and line total, in cents. Add tests. | Its tests pass, including one for a name that contains a comma. |
+| 2 | Add a command, `python export.py order.json`, that reads an order from a JSON file and prints its CSV using `items_to_csv`. Change no other file. | Run on a sample order, it prints the same rows the step 1 tests expect. |
+| 3 | Document the command in `README.md`. | The example in the README runs as written. |
+
+Every step leaves the code working. After step 1 nothing calls
+`items_to_csv` yet, but it exists, it is tested, and every old test
+still passes; you could stop there and lose nothing. After step 2 the
+feature works. After step 3 someone else can find it. If step 2 goes
+badly, you throw away step 2 and keep step 1.
+
+The order runs from the inside out. The formatting function holds the
+edge cases (a comma inside a name, a line total that has to multiply by
+the quantity), so it goes first, in a diff small enough to read line by
+line. Once it exists, the command around it is thin. The documentation
+comes last because it should describe what was built, not what was
+planned.
+
+Each step ends at a commit, made after you have reviewed it. That
+commit is the point you return to when the next step goes wrong, and it
+keeps one step's diff from blurring into the next one's.
+
+### Write step 1's test for done
+
+Here is the function from step 1 as an agent might hand it back. At
+this size you can say exactly what done means, so say it as a test:
+write the test that step 1 should have come with.
+
+<ChallengeCard
+  adapter="python"
+  title="Step 1's test for done"
+  instructions={`\`items_to_csv\` is step 1 of the CSV export, as the agent delivered it.
+
+Fill in **\`test_items_to_csv\`** so that it:
+
+- **passes** against the agent's \`items_to_csv\`, and
+- **fails** (raises \`AssertionError\`) against three broken versions the checker swaps in: one with no header row, one that does not quote a name containing a comma, and one that forgets to multiply by \`qty\`.
+
+Take the expected output from the request, not from running the code: a header row \`name,qty,price,total\`, then one row per item, with amounts in cents. Item names can contain commas, as in \`Mug, large\`.`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import csv
+import io
+
+
+def _write(rows):
+    out = io.StringIO()
+    csv.writer(out, lineterminator="\\n").writerows(rows)
+    return out.getvalue()
+
+
+def _agent_version(items):
+    header = [["name", "qty", "price", "total"]]
+    return _write(header + [[i["name"], i["qty"], i["price"], i["price"] * i["qty"]] for i in items])
+
+
+def _no_header(items):
+    return _write([[i["name"], i["qty"], i["price"], i["price"] * i["qty"]] for i in items])
+
+
+def _unquoted(items):
+    lines = ["name,qty,price,total"]
+    for i in items:
+        lines.append(f'{i["name"]},{i["qty"]},{i["price"]},{i["price"] * i["qty"]}')
+    return "\\n".join(lines) + "\\n"
+
+
+def _ignores_qty(items):
+    header = [["name", "qty", "price", "total"]]
+    return _write(header + [[i["name"], i["qty"], i["price"], i["price"]] for i in items])
+`,
+      starterCode: `import csv
+import io
+
+
+# export.py, step 1, as the agent delivered it
+def items_to_csv(items):
+    """One CSV row per item: name, qty, price and line total, in cents."""
+    out = io.StringIO()
+    writer = csv.writer(out, lineterminator="\\n")
+    writer.writerow(["name", "qty", "price", "total"])
+    for item in items:
+        total = item["price"] * item["qty"]
+        writer.writerow([item["name"], item["qty"], item["price"], total])
+    return out.getvalue()
+
+
+print(items_to_csv([
+    {"name": "Tea towel", "price": 450, "qty": 3},
+    {"name": "Mug, large", "price": 1_250, "qty": 2},
+]))
+
+
+# test_export.py, step 1's test for done
+def test_items_to_csv():
+    items = [{"name": "Tea towel", "price": 450, "qty": 3}]
+    result = items_to_csv(items)
+    # Replace this line with an assertion about what result should be.
+    assert True
+
+
+# Try your test against the agent's version.
+try:
+    test_items_to_csv()
+    print("Passes against the agent's version.")
+except AssertionError as error:
+    print("Fails against the agent's version:", error)
+`,
+      solutionCode: `import csv
+import io
+
+
+# export.py, step 1, as the agent delivered it
+def items_to_csv(items):
+    """One CSV row per item: name, qty, price and line total, in cents."""
+    out = io.StringIO()
+    writer = csv.writer(out, lineterminator="\\n")
+    writer.writerow(["name", "qty", "price", "total"])
+    for item in items:
+        total = item["price"] * item["qty"]
+        writer.writerow([item["name"], item["qty"], item["price"], total])
+    return out.getvalue()
+
+
+print(items_to_csv([
+    {"name": "Tea towel", "price": 450, "qty": 3},
+    {"name": "Mug, large", "price": 1_250, "qty": 2},
+]))
+
+
+# test_export.py, step 1's test for done
+def test_items_to_csv():
+    items = [{"name": "Mug, large", "price": 1_250, "qty": 2}]
+    result = items_to_csv(items)
+    assert result == 'name,qty,price,total\\n"Mug, large",2,1250,2500\\n', result
+
+
+# Try your test against the agent's version.
+try:
+    test_items_to_csv()
+    print("Passes against the agent's version.")
+except AssertionError as error:
+    print("Fails against the agent's version:", error)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "defined",
+      name: "The test function exists",
+      description: "A function named test_items_to_csv is defined",
+      code: `assert callable(globals().get("test_items_to_csv")), "Define test_items_to_csv"`,
+    },
+    {
+      id: "passes_agent",
+      name: "It passes against the agent's version",
+      description: "Run against the delivered items_to_csv, your test passes",
+      code: `globals()["items_to_csv"] = _agent_version
+try:
+    test_items_to_csv()
+except AssertionError as e:
+    raise AssertionError("Your test fails against the agent's version, which meets the request: " + str(e))`,
+    },
+    {
+      id: "catches_no_header",
+      name: "It catches a missing header row",
+      description: "Run against a version with no header row, your test raises AssertionError",
+      code: `globals()["items_to_csv"] = _no_header
+try:
+    test_items_to_csv()
+except AssertionError:
+    pass
+else:
+    raise AssertionError("Your test passes against a version with no header row.")`,
+    },
+    {
+      id: "catches_unquoted",
+      name: "It catches an unquoted comma",
+      description: "Run against a version that writes Mug, large without quotes, your test raises AssertionError",
+      code: `globals()["items_to_csv"] = _unquoted
+try:
+    test_items_to_csv()
+except AssertionError:
+    pass
+else:
+    raise AssertionError("Your test passes against a version that does not quote commas. Try a name that contains one.")`,
+    },
+    {
+      id: "catches_ignored_qty",
+      name: "It catches a line total that ignores qty",
+      description: "Run against a version whose total is just the price, your test raises AssertionError",
+      code: `globals()["items_to_csv"] = _ignores_qty
+try:
+    test_items_to_csv()
+except AssertionError:
+    pass
+else:
+    raise AssertionError("Your test passes against a version whose total ignores qty. Use a qty other than 1.")`,
+    },
+  ]}
+/>
+
+One assertion is enough to say step 1 is done, and it is short enough
+to check against the request by eye. "Add CSV export" as a single
+request has no test like that. Its test for done is all three rows of
+the table at once, and a session that did all three would hand you one
+diff to check against every row together.
 
 ## Signs the task is too big
 
-{/*
-- You cannot write the test for done in one sentence.
-- The request needs the word "and" more than once.
-- You would not review the same change from a colleague in one sitting.
-*/}
+None of these is a rule, but each one is cheap to notice before the
+session starts:
+
+* **You cannot write the test for done in one sentence.** If done needs
+  a paragraph, the task is several tasks.
+* **The request needs "and" more than once.** "Add CSV export and a JSON
+  export and email the file every night" is three requests sharing a
+  sentence.
+* **You would not review the same change from a colleague in one
+  sitting.** The agent's diff deserves the same reading a colleague's
+  would get, and it is no shorter.
+* **You cannot say which files it should touch.** Asking for a plan will
+  tell you (see
+  [Plan Before Code](/courses/working-with-coding-agents/plan-before-code)),
+  and a plan that lists a dozen files is a sign of its own.
+
+When one of these fires, look for the smallest piece that is useful on
+its own and can be tested on its own, usually the thing every later step
+depends on. Ask for that first.
+
+The opposite mistake exists too. If writing the request takes longer
+than making the change, make the change yourself;
+[When to Take Over](/courses/working-with-coding-agents/when-to-take-over)
+has more on that call.
 
 ## Concept check
 
-{/*
-- MultipleChoice: pick the best first step out of a large feature
-  request.
-*/}
+<MultipleChoice
+  markdown={`The request is "Add gift cards: customers can buy them, redeem them at checkout and see their balance." Which is the best first step to hand an agent?
+
+- Build the whole feature on one branch and review all of it at the end.
+  > That is the original request with a branch around it. The diff at the end is as large as before.
+- [o] A function that takes a card's balance off an order, with tests.
+  > Everything else depends on it, it can be tested alone, and it leaves the code working when it is merged.
+- The checkout page where customers type in a gift card code.
+  > The page needs the redemption logic underneath it, so it cannot be finished or tested first.
+- Documentation describing how gift cards will work once they exist.
+  > Documentation should describe what was built. Written first, it is a guess that later steps have to match.
+
+Start with the piece the other steps depend on and that can be tested
+without them.`}
+/>
+
+<MultipleChoice
+  markdown={`An agent fixes a bug and, in the same session, renames a module "while it was there". What is the main cost?
+
+- The rename makes the session use more tokens than the fix alone would.
+  > It does, but tokens are the cheap part. The expensive part is the review.
+- Renaming a module is always a mistake in a codebase that has tests.
+  > Renames are often worth doing. The trouble is doing one inside another task.
+- [o] One diff mixes two changes that you cannot judge or undo apart.
+  > If a test fails, you cannot tell which change broke it, and you cannot keep the fix without the rename.
+- The agent will forget the bug fix while it carries out the rename.
+  > It may or may not. Either way, the diff you get back is harder to review.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of these is the clearest sign that a task should be cut into smaller ones?
+
+- The agent asks you a clarifying question before it starts.
+  > A question at the start usually means the request left a gap, which is cheaper to fill now than later.
+- The task touches a file you have not opened for a long time.
+  > Unfamiliar code is a reason to read the diff carefully, not a measure of the task's size.
+- The task needs a test before anyone could call it finished.
+  > Every task should have one. Needing one says nothing about size.
+- [o] You need a paragraph to say what would show it is done.
+  > If done takes a paragraph to describe, the task is several tasks, each of which has a one-sentence test.`}
+/>
+
+[^google]: Google, [*Small CLs*](https://google.github.io/eng-practices/review/developer/small-cls.html), in *Google Engineering Practices Documentation*. A CL ("changelist") is one self-contained change submitted for review.
+
+[^smartbear]: SmartBear, [*Best Practices for Code Review*](https://smartbear.com/learn/code-review/best-practices-for-peer-code-review/), describing a SmartBear study of a Cisco Systems programming team.
