@@ -3,36 +3,100 @@ title: Undoing Changes
 description: Commit before the session starts, keep each task on its own branch, and know which Git command undoes which mistake.
 ---
 
-{/* SCAFFOLD: outline only, plus one working GitBlock. Replace each section's notes with prose, then delete this line. */}
-
 An agent session is safest when it starts from a clean commit. Then
 every change it makes is a diff against something you trust, and
 throwing the whole session away is one command.
 
 ## Start clean
 
-{/*
-- `git status` before the session. Commit or set aside anything
-  unfinished, or the agent's edits and yours end up mixed in one diff.
-*/}
+Before a session, run `git status`. If it lists anything, deal with it
+first: commit it, or set it aside with `git stash` (which the sandboxes
+on this page do not run).
+
+Start with uncommitted work and the agent's edits land on top of yours.
+Afterwards, `git diff` shows one mixed change with nothing in it to say
+which lines were yours. Reviewing it means remembering your own work
+line by line, and undoing the agent's part means picking it out by hand.
+Start from a clean commit instead, and the same `git diff` is exactly the
+agent's work, and every command in this lesson can throw the session
+away without touching anything of yours.
+
+A clean start also gives the review a fixed point to measure from. In
+[Reading the Diff](/courses/working-with-coding-agents/reading-the-diff),
+that point was `HEAD~3`, the last commit before the agent's three. On
+your own machine, it is the commit you made just before you started the
+session, and `git log -1 --oneline` prints its id if you want to write
+it down.
 
 ## A branch per task
 
-{/*
-- One task, one branch. Abandoning the task is deleting the branch.
-- Worktrees, for running several agents at once, are worth a mention
-  but cannot be shown here: the in-browser Git engine has no
-  `worktree` command.
-*/}
+Then give the task a branch of its own:
+
+```bash
+git switch -c agent/discount
+```
+
+Everything the agent commits lands on `agent/discount`, and `main` stays
+where it was. If the work is good, you merge it. If it is not,
+abandoning it is two commands: switch back to `main`, and delete the
+branch. Try the second half on a repository whose `feature` branch is
+one commit ahead of `main`:
+
+<GitBlock
+  scenario="branching"
+  label="Abandon a task by deleting its branch"
+  commands={`git log --oneline --all
+git branch -D feature
+git log --oneline --all`}
+/>
+
+`git log --oneline --all` shows every branch, not only the one you are
+on. Before the deletion it lists the commit on `feature`; after it, only
+`main` is left, and `main` never saw the task. Capital `-D` deletes a
+branch even when its commits were never merged. Lowercase `-d` refuses
+in that case, which makes it the safer habit when you are not sure you
+are finished with a branch.
+
+One task per branch also keeps reviews apart. A branch that carries a
+bug fix and an unrelated refactor produces one diff in which you cannot
+tell which change did what (see
+[Sizing a Task](/courses/working-with-coding-agents/sizing-a-task)).
+
+### Worktrees, for several agents at once
+
+Branches share one working directory: switch branches and the files on
+disk change under you. Two agents working in the same directory at the
+same time would be editing the same files. A *worktree* is a second
+checkout of the same repository in another directory, on its own
+branch:
+
+```bash
+git worktree add -b agent/discount ../shop-discount
+```
+
+That creates the directory `../shop-discount` with a new branch,
+`agent/discount`, checked out in it, and leaves your own directory
+alone. Run one agent in each worktree and they cannot tread on each
+other's files, while both commit to the same repository, so either
+branch merges as usual. By default Git refuses to check out the same
+branch in two worktrees, and `git worktree remove ../shop-discount`
+deletes the directory when the task is done.[^worktree] The Git sandbox
+on this page has no `worktree` command, so this one stays on paper.
 
 ## Throwing away what you have not committed
 
-{/*
-- `git restore <file>` for one file; `git restore .` for everything.
-- Write the prose around the block below: README.md has an edit that
-  is not staged, `restore` drops it, and `status` confirms the tree is
-  clean.
-*/}
+Some changes never reach a commit. The agent edited some files, you read
+the diff, and you want none of it. `git restore` puts a file back the
+way it was at the last commit:
+
+```bash
+git restore report.py   # one file
+git restore .           # every changed file under this directory
+```
+
+The block below starts from a repository with three commits and an edit
+to `README.md` that has not been staged. Its state panel is already
+open: watch the working tree as you run it.
 
 <GitBlock
   scenario="linear-history"
@@ -46,20 +110,226 @@ git reset --hard HEAD~1
 git log --oneline`}
 />
 
+The first three lines are the restore:
+
+1. `git status --short` prints ` M README.md`. The `M` sits in the
+   second column, which means modified in the working tree and not
+   staged. An `M` in the first column would mean staged.
+2. `git restore README.md` replaces the file with the committed version.
+   It prints nothing.
+3. `git status --short` prints nothing at all, which is how Git says the
+   working tree matches the last commit.
+
+`restore` is the undo to be careful with. The edit it throws away was
+never in Git, so Git has no copy of it and nothing brings it back. Be
+sure there is nothing of yours in a file before you restore it, which is
+the other reason to start clean.
+
+It also only touches files Git already tracks. A file the agent created
+is untracked, and `git restore .` leaves it where it is: `git status`
+lists it with `??`. Delete it yourself, or use `git clean`, where
+`git clean -n` lists what it would delete and `git clean -f` deletes it.
+The sandbox does not run `clean` either.
+
 ## Undoing a commit
 
-{/*
-- `git reset --hard HEAD~1` drops the last commit on a branch nobody
-  else has (shown above).
-- `git revert` is the right tool for a commit that is already shared,
-  but the in-browser engine does not support it yet; adding it to
-  app/_components/git/gitCommand.ts would let this lesson show both.
-*/}
+The last three lines of the same block drop a commit:
+
+* `git log --oneline` lists three commits, newest first.
+* `git reset --hard HEAD~1` moves the branch back one commit, to
+  `HEAD~1`, and makes every file match it. It prints `HEAD is now at`
+  and the commit it landed on.
+* `git log --oneline` lists two. "Ignore node_modules" is no longer on
+  the branch, and `.gitignore`, the file it added, is gone from the
+  directory.
+
+`--hard` is what makes the files match. Without it, the commit leaves
+the branch but its changes stay in your files, ready to be committed
+again. `--hard` also throws away any uncommitted change, with no copy
+kept, which is one more reason to start every session clean.
+
+Only reset commits that nobody else has. `reset` rewrites the branch:
+the commit you dropped is no longer part of it. If you had already
+pushed the branch and a teammate had pulled it, their copy still has the
+commit and yours does not, and pushing yours would need a force push
+that overwrites the shared history. The section after next has the
+command for that case.
+
+## Undoing part of a session
+
+Most sessions are not all bad. In the discount session from Reading the
+Diff, the discount is worth keeping (after a one-character fix) and the
+formatting tidy-up is not: nobody asked for it, and it changed the
+report's output. You can keep one and throw away the other.
+
+`git restore` takes a `--source` that says which commit to restore from.
+`HEAD~3` is the last commit before the session, so this puts `format.py`
+and `report.py` back exactly as they were before the agent started, and
+leaves every other file alone:
+
+<GitBlock
+  scenario="agent-session"
+  label="Undo the tidy-up, keep the discount"
+  expandState
+  commands={`git restore --source=HEAD~3 format.py report.py
+git status --short
+git diff
+cat format.py`}
+/>
+
+`git status --short` shows ` M format.py` and ` M report.py`: modified
+in the working tree, not staged. The restored versions are uncommitted
+changes like any other, and `git diff` shows them as the tidy-up in
+reverse.
+
+The block is editable, so undo one more thing. Add
+`git restore --source=HEAD~2 test_pricing.py` as its second line.
+`HEAD~2` is the agent's first commit, where the threshold test still
+expected 9,000 cents, before the agent changed it to match the code.
+Restoring it brings the honest test back. The suite then fails, because
+the code is still wrong, and a failing test on a real bug is what you
+want: the fix left is the one-character change from `>` to `>=` in
+`pricing.py`, and the test will tell you when it is right.
+
+To keep the result, stage and commit it: add
+`git add format.py report.py test_pricing.py` and
+`git commit -m "Undo unrequested changes"` at the end, and run the block
+again. Put them after the restores, not before. `HEAD~2` counts back
+from the commit you are on, so once you make a new commit, `HEAD~2`
+names a different one.
+
+In this session there is a shorter way to drop the tidy-up, because it
+happens to be the last commit and is alone in it:
+
+<GitBlock
+  scenario="agent-session"
+  label="Or drop the last commit"
+  commands={`git reset --hard HEAD~1
+git log --oneline
+cat format.py`}
+/>
+
+Both leave `format.py` as it was before the session, and the difference
+is what each depends on. `reset` removes whole commits from the end of
+the branch, so it only works when the unwanted work is in the last
+commits and nothing you want is mixed in with it. `restore --source`
+works file by file, whichever commit changed them, so it still works
+when the agent did everything in one commit, or when the unwanted change
+sits in the middle of the history. When a session is part good and part
+not, it is the one to reach for.
+
+## Undoing a commit that is already shared
+
+Once a commit has been pushed and others may have pulled it, do not
+reset it away. Make a new commit that undoes it:
+
+```bash
+git revert HEAD          # undo the most recent commit
+git revert 1a2b3c4       # undo an older commit, by the id git log --oneline shows
+```
+
+`git revert` works out the reverse of a commit's changes and records it
+as a new commit.[^revert] The history keeps both, the original and its
+undoing, one after the other. Nobody's copy is contradicted, because
+nothing was removed: everyone who pulls gets the undo as one more
+commit. That is also its cost. The mistake stays in the history for
+good, which is why `reset` is the better tool while a commit is still
+only yours.
+
+The sandbox on this page does not run `git revert`, so this one has no
+block. On your own machine it needs a clean working tree, which by now
+should go without saying.
+
+## The tool's own undo
+
+Several agent tools keep checkpoints of the files the agent edits and
+can rewind a session to one (see
+[Kinds of Coding Tools](/courses/working-with-coding-agents/kinds-of-coding-tools)).
+They are a quick way back from the last step or two, and their own
+documentation presents them as a session-level undo, not as version
+control.[^checkpoints] A checkpoint covers what that tool recorded. Git
+covers every file you commit, whatever changed it, and keeps the history
+after the session ends. Use checkpoints for a quick step back,
+and Git for everything in this lesson.
+
+## Which command for which mistake
+
+| Situation | Command |
+| --- | --- |
+| Uncommitted edits to one file | `git restore <file>` |
+| Uncommitted edits everywhere | `git restore .`, then delete any new files yourself |
+| A committed file the agent should not have touched | `git restore --source=<commit> <file>` from a commit before the change, then commit |
+| A wrong last commit that nobody else has | `git reset --hard HEAD~1` |
+| A whole task you want to abandon, on its own branch | `git switch main`, then `git branch -D <branch>` |
+| A wrong commit that is already shared | `git revert <commit>`, then push |
 
 ## Concept check
 
-{/*
-- MultipleChoice: four situations (uncommitted edit, committed and
-  unshared, already pushed, one bad file in a good commit) matched to
-  the right command.
-*/}
+<MultipleChoice
+  markdown={`The agent edited three files that were already in the repository, and nothing has been committed since your last commit before the session. You want all of it gone. Which command?
+
+- [o] \`git restore .\`
+  > It puts every tracked file back as it was in the last commit, which is the clean commit you started from.
+- \`git revert HEAD\`
+  > Revert undoes commits, and the agent's edits were never committed. Git refuses to revert with them still in the working tree, and without them it would undo your own last commit.
+- \`git branch -D main\`
+  > Git refuses to delete the branch you are on, and deleting a branch never touches the working tree anyway.
+- \`git reset --hard HEAD~1\`
+  > It throws away the edits, and it also drops your own last commit, which was not the agent's.
+
+Uncommitted changes are undone with \`restore\`; commits are undone
+with \`reset\` or \`revert\`.`}
+/>
+
+<MultipleChoice
+  markdown={`The agent's last commit added a discount you want to keep, and also reformatted \`report.py\`, which you did not ask for. Nothing has been pushed. How do you drop only the \`report.py\` change?
+
+- \`git reset --hard HEAD~1\`, then ask for the discount again
+  > That removes the whole commit, discount included, and pays for the session twice.
+- \`git restore report.py\`, then commit the result
+  > Without \`--source\`, restore copies from the index, which already matches the agent's commit, so nothing changes.
+- [o] \`git restore --source=HEAD~1 report.py\`, then commit
+  > It brings back the version from before the agent's commit for that one file, and the new commit records the undo.
+- \`git revert HEAD\`, then add the discount back by hand
+  > Revert undoes the whole commit, so you would be retyping the part you wanted to keep.
+
+\`restore --source\` works on files, so it can split a commit that
+\`reset\` and \`revert\` can only take or leave whole.`}
+/>
+
+<MultipleChoice
+  markdown={`An agent's commit broke the build, and it is already on the shared \`main\` branch that your teammates pull from. What undoes it?
+
+- \`git reset --hard HEAD~1\`, then force-push
+  > It rewrites the shared branch, so everyone who already pulled now has a history that disagrees with \`main\`.
+- [o] \`git revert <commit>\`, then push
+  > It adds a new commit that reverses the bad one, so history only grows and every copy stays consistent.
+- \`git restore .\`, then push
+  > Restore only touches uncommitted changes, and there are none, so the bad commit stays.
+- \`git branch -D main\`, then push
+  > Deleting \`main\` locally does nothing to the commit on the shared copy.
+
+Once a commit is shared, undo it with a new commit instead of removing
+it.`}
+/>
+
+[^worktree]:
+    Git documentation, [git-worktree](https://git-scm.com/docs/git-worktree):
+    `add` "refuses to create a new worktree when *commit-ish* is a branch
+    name and is already checked out by another worktree" unless forced,
+    and a finished linked worktree is removed with `git worktree remove`.
+
+[^revert]:
+    Git documentation, [git-revert](https://git-scm.com/docs/git-revert):
+    revert is "used to record some new commits to reverse the effect of
+    some earlier commits", and it "requires your working tree to be
+    clean".
+
+[^checkpoints]:
+    Claude Code docs, [Checkpointing](https://code.claude.com/docs/en/checkpointing):
+    "Checkpoints are designed for quick, session-level recovery. For
+    permanent version history and collaboration, continue using version
+    control"; it also notes that files changed by shell commands are not
+    tracked. Cursor docs, [Checkpoints](https://cursor.com/docs/agent/chat/checkpoints):
+    checkpoints are "stored locally and separate from Git", and are for
+    undoing agent changes, with Git for permanent version control.

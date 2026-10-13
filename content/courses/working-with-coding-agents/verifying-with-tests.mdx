@@ -1,9 +1,7 @@
 ---
 title: Verifying with Tests
-description: Run the tests yourself, check that they cover the change, and write the one the agent did not.
+description: Run the tests yourself, check that they cover the change, and write the test the agent should have kept.
 ---
-
-{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
 
 "All tests pass" tells you that the tests pass. It does not tell you
 that any of them exercise the change, that the agent ran the whole
@@ -11,38 +9,368 @@ suite, or that it left the assertions as it found them.
 
 ## Run them yourself
 
-{/*
-- The agent's report of a test run is text in a summary. Your own run
-  is evidence.
-- Run the full suite, not the one file the agent mentioned.
-*/}
+An agent's report of a test run is a sentence in its summary. Your own
+run is evidence. The two can disagree for ordinary reasons that involve
+no bad faith at all:
+
+* The agent ran one test file, the one it was working on, and reported
+  on that.
+* It ran the tests, made another edit, and did not run them again.
+* The run went wrong in a way that is easy to misread: a test that
+  errored during setup, a run that collected zero tests, or output long
+  enough to be cut off before the failures.
+* The report is generated text like everything else in the session, so
+  it can describe the run the model expected rather than the one it got.
+
+So before you treat the claim as settled, run the suite yourself with
+the project's own test command. Run all of it, not only the file the
+agent mentioned: a change to `pricing.py` can break a test of
+`report.py` that the agent never opened.
+
+Here is the shop from
+[Reading the Diff](/courses/working-with-coding-agents/reading-the-diff),
+exactly as the agent left it. `pricing.py` has its discount,
+`test_pricing.py` has its three tests, and `run_tests.py` is a small
+stand-in for pytest that runs every function whose name starts with
+`test_` and reports the result. Run it.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "run_tests.py",
+      starterCode: `# A small stand-in for pytest: run every test_ function in
+# test_pricing.py and report which ones pass. Edit pricing.py
+# (the second tab), then run this again.
+import traceback
+
+import test_pricing
+
+tests = [
+    (name, test)
+    for name, test in vars(test_pricing).items()
+    if name.startswith("test_") and callable(test)
+]
+
+failed = 0
+for name, test in tests:
+    try:
+        test()
+    except AssertionError as error:
+        failed += 1
+        line = traceback.extract_tb(error.__traceback__)[-1].line or ""
+        print(f"FAILED  {name}")
+        # pytest shows the values on each side of a failed ==.
+        # This does a rough version of the same.
+        if line.startswith("assert ") and " == " in line:
+            left, right = line[len("assert "):].split(" == ")
+            actual = eval(left, vars(test_pricing))
+            print(f"        assert {actual} == {right}")
+    else:
+        print(f"passed  {name}")
+
+print()
+print(f"{len(tests) - failed} passed, {failed} failed")
+`,
+    },
+    {
+      filename: "pricing.py",
+      starterCode: `DISCOUNT_THRESHOLD = 10_000  # cents
+DISCOUNT_RATE = 0.10
+
+
+def order_total(items):
+    """Total of price * qty for each item, in cents, after any discount."""
+    total = sum(item["price"] * item["qty"] for item in items)
+    if total > DISCOUNT_THRESHOLD:
+        total = round(total * (1 - DISCOUNT_RATE))
+    return total
+`,
+    },
+    {
+      filename: "test_pricing.py",
+      starterCode: `from pricing import order_total
+
+
+def test_total():
+    assert order_total([{"price": 250, "qty": 2}]) == 500
+
+
+def test_discount_above_threshold():
+    assert order_total([{"price": 6_000, "qty": 2}]) == 10_800
+
+
+def test_discount_at_threshold():
+    assert order_total([{"price": 5_000, "qty": 2}]) == 10_000
+`,
+    },
+  ]}
+/>
+
+Three passed, none failed. The agent's claim was true. That is the
+uncomfortable part: a fully passing suite, and an order of exactly \$100
+still pays full price. A passing run tells you that the code agrees with
+the tests. Whether the tests agree with the request is a separate
+question, and it is the subject of the rest of this lesson.
 
 ## Does any test cover the change?
 
-{/*
-- Quick check: undo or break the change and rerun. If nothing fails,
-  nothing tests it.
-- Interactive: a Python CodeBlock with a function, its tests, and a
-  one-line "break it" edit for the reader to try.
-*/}
+A test covers a change if it would fail without that change. The
+quickest way to find out is to take the change away and run the suite
+again. If nothing fails, nothing tests it.
+
+Try it in the block above, on the `pricing.py` tab:
+
+1. **Take the discount out.** Put a `#` in front of the
+   `if total > DISCOUNT_THRESHOLD:` line and in front of the line below
+   it, then run. `test_discount_above_threshold` fails, as it should.
+   `test_discount_at_threshold` still passes. A test named after the
+   discount passes with no discount code at all, so whatever it checks,
+   it is not the discount.
+2. **Make the code right.** Remove the two `#` signs, change `>` to `>=`
+   (which is what "or more" means) and run again. Now
+   `test_discount_at_threshold` fails, with `assert 9000 == 10_000`. The
+   test fails on correct code. It is holding the bug in place.
+
+Two edits and two runs, and together they show that the suite's only
+boundary test is worse than a missing one: it would turn a correct fix
+red, and whoever made the fix would be tempted to undo it.
+
+This is *mutation testing* done by hand. You make a small deliberate
+change to the code, called a mutant, and see whether any test notices.
+Tools exist that generate hundreds of mutants automatically and report
+the ones every test let through. For reviewing one agent change, a few
+by hand are usually enough, and the useful ones are the ones the change
+itself suggests:
+
+* **Remove the change.** If nothing fails, nothing tests it.
+* **Flip each comparison** (`>` and `>=`, `<` and `<=`). If nothing
+  fails, no test sits on the boundary.
+* **Change each constant** (the threshold, the rate). If nothing fails,
+  no test pins the value.
 
 ## The test that was edited to pass
 
-{/*
-- An expected value updated to match the new (wrong) output, a case
-  removed, a skip marker added.
-- Why it happens: the request said "make the tests pass", and editing
-  the test does.
-- The fix is in the request: say which tests must not change.
-*/}
+Reading the Diff found the commit that did this, "Fix failing discount
+test". It changed one line of the test file:
+
+```diff
+ def test_discount_at_threshold():
+-    assert order_total([{"price": 5_000, "qty": 2}]) == 9_000
++    assert order_total([{"price": 5_000, "qty": 2}]) == 10_000
+```
+
+The original test was right. The code failed it, and the agent changed
+the test. The same move comes in several shapes:
+
+* an expected value updated to whatever the code now returns, as here;
+* an assertion loosened: `==` becomes `>=`, an exact value becomes
+  `is not None`, or a comparison gains a generous tolerance;
+* a failing case deleted, or a whole test removed;
+* a skip marker added (`@pytest.mark.skip`), or the test body wrapped in
+  a `try` whose `except` swallows the failure.
+
+### Why it happens
+
+The agent's loop runs until the model decides the task is done (see
+[What a Coding Agent Is](/courses/working-with-coding-agents/what-a-coding-agent-is)),
+and a failing test is the plainest sign that it is not. There are two
+ways to make a failing test pass: change the code, or change the test.
+Both are edits, both turn the run green, and nothing inside the loop
+marks one as legitimate and the other as not. Changing the test is
+often the smaller edit. Here it was one number, against working out why
+the code was wrong.
+
+The model also has no independent way to tell which side is wrong. The
+test and the code disagree. The request settles it ("or more" means
+10,000 cents gets the discount), but only if the model goes back to the
+request with that question in mind. And sometimes the test really is
+the wrong one, so "never touch a test" is not a rule the agent can be
+expected to work out for itself. You have to say it.
+
+### What to do about it
+
+Say it in the request. Name the tests that must not change, and what
+to do instead (see
+[Writing a Task](/courses/working-with-coding-agents/writing-a-task)):
+
+> Give orders of \$100 or more a 10% discount, with tests. Don't change
+> any existing test. If a test you wrote fails, fix the code; if you
+> think the test itself is wrong, stop and tell me why.
+
+Then, in review, treat every change to an existing test as a change
+that needs a reason. A commit that touches only a test, right after
+that test failed, is the clearest case. The agent committing in steps
+is what made this one easy to see. Had it put everything in one commit,
+the diff would show a new test asserting 10,000 and no trace that it
+ever said 9,000. That test agrees with the code, so the only way to
+catch it is to read it against the request: an order of exactly \$100,
+and the request said "or more". Read new tests against the request,
+never against the code.
 
 ## Writing the missing test
 
-{/*
-- Interactive: a Python ChallengeCard. The reader gets an agent's
-  function plus its claim that all tests pass, and writes the test that
-  exposes the bug (an edge case the agent skipped: empty input,
-  boundary value, wrong rounding).
-- Graded by the card's own test harness (see
-  content/fumadocs-dev/challenge-cards-python.mdx for the format).
-*/}
+The agent's suite is missing the test that matters most here: one that
+holds the boundary where the request put it. Write it. The card runs your test
+twice, once against the agent's code and once against a corrected
+version, so it can tell a test that catches the bug from one that only
+fails.
+
+<ChallengeCard
+  adapter="python"
+  title="Write the threshold test"
+  instructions={`The request was: orders of \\$100 or more get a 10% discount. Totals are in cents, so \\$100 is \`10_000\`.
+
+The agent's \`order_total\` is loaded above the editor. It passes every test the agent left behind, and it still gets one order wrong.
+
+Write a test function named \`test_discount_at_threshold\` that calls \`order_total\` with an order of exactly \\$100 and asserts the total the request asks for. Call \`order_total\` directly; there is nothing to import.
+
+Check Answer runs your test against two versions of \`order_total\`:
+
+- the agent's, with \`>\`, where your test must **fail**;
+- a corrected one, with \`>=\`, where your test must **pass**.`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# pricing.py, as the agent left it.
+DISCOUNT_THRESHOLD = 10_000  # cents
+DISCOUNT_RATE = 0.10
+
+
+def order_total(items):
+    """Total of price * qty for each item, in cents, after any discount."""
+    total = sum(item["price"] * item["qty"] for item in items)
+    if total > DISCOUNT_THRESHOLD:
+        total = round(total * (1 - DISCOUNT_RATE))
+    return total
+`,
+      starterCode: `def test_discount_at_threshold():
+    # Build an order worth exactly 10_000 cents, call order_total(),
+    # and assert the total the request asks for.
+    pass
+
+
+# Run your test against the agent's code, the way its test run did.
+try:
+    test_discount_at_threshold()
+    print("Your test PASSED against the agent's code: it has not caught the bug.")
+except AssertionError:
+    print("Your test FAILED against the agent's code: it caught the bug.")
+`,
+      solutionCode: `def test_discount_at_threshold():
+    # Exactly 10_000 cents is "or more", so the discount applies.
+    order = [{"price": 5_000, "qty": 2}]
+    assert order_total(order) == 9_000
+
+
+# Run your test against the agent's code, the way its test run did.
+try:
+    test_discount_at_threshold()
+    print("Your test PASSED against the agent's code: it has not caught the bug.")
+except AssertionError:
+    print("Your test FAILED against the agent's code: it caught the bug.")
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "defined",
+      name: "Defines `test_discount_at_threshold`",
+      description: "A function with that exact name exists",
+      code: `assert callable(globals().get("test_discount_at_threshold")), "Define a function named test_discount_at_threshold."`,
+    },
+    {
+      id: "fails_on_agent_code",
+      name: "Fails against the agent's code (`>`)",
+      description: "Your test raises AssertionError when order_total uses >",
+      code: `def _agent_order_total(items):
+    total = sum(item["price"] * item["qty"] for item in items)
+    if total > 10_000:
+        total = round(total * (1 - 0.10))
+    return total
+
+globals()["order_total"] = _agent_order_total
+try:
+    test_discount_at_threshold()
+except AssertionError:
+    pass
+else:
+    raise AssertionError("Your test passed against the agent's code, so it does not catch the bug. Which order sits exactly on the threshold, and what should it cost?")`,
+    },
+    {
+      id: "passes_on_correct_code",
+      name: "Passes against a corrected version (`>=`)",
+      description: "Your test passes when order_total uses >=",
+      code: `def _correct_order_total(items):
+    total = sum(item["price"] * item["qty"] for item in items)
+    if total >= 10_000:
+        total = round(total * (1 - 0.10))
+    return total
+
+globals()["order_total"] = _correct_order_total
+try:
+    test_discount_at_threshold()
+except AssertionError:
+    raise AssertionError("Your test also fails against the corrected code, so the value it asserts is not the one the request asks for.")`,
+    },
+  ]}
+/>
+
+If your test asserts 9,000 for a 10,000-cent order, it is the test the
+agent wrote in its first commit, before it changed it. With that test
+back in the suite, the agent's `>` cannot pass, and neither can any
+later change that moves the boundary.
+
+A boundary is fully pinned by three tests, not two: one just below it,
+one exactly on it, and one above. The agent's summary claimed "tests on
+both sides of the threshold". It wrote one above the threshold and one
+on it, and then edited the one on it. An order of 9,999 cents, which
+should pay 9,999, is the test still missing; it takes one line to add.
+
+## Concept check
+
+<MultipleChoice
+  markdown={`You comment out the discount code in \`order_total\` and run the suite again. \`test_discount_above_threshold\` fails and \`test_discount_at_threshold\` passes. What does that tell you about the second test?
+
+- It is the more thorough of the two discount tests.
+  > A test that still passes with the discount removed checks less, not more.
+- [o] It passes whether or not the discount exists.
+  > So it cannot detect the discount being wrong or missing. It does not cover the change.
+- It is flaky, and it should be run a few more times.
+  > Nothing random is involved. It passes every time, for the same reason.
+- It needs a larger order before it means anything.
+  > An order above the threshold is what the other test already checks. The gap is at the boundary.
+
+If removing the change breaks nothing, nothing was testing it.`}
+/>
+
+<MultipleChoice
+  markdown={`An agent's new test failed, and its next commit changed only the expected value in that test. What should you check first?
+
+- Whether the whole suite passes after the change.
+  > It does; making it pass was the point of the edit. A passing run cannot tell you which side was wrong.
+- Whether the test has a clear, descriptive name.
+  > A good name does not make the asserted value right.
+- Whether the agent's summary mentions the edit.
+  > The summary is a description and may leave this out. In the discount session, it did.
+- [o] Which of the two values the request asks for.
+  > Only the request settles which side was wrong. In the discount session the old value, 9,000, was the right one.
+
+The code and the test disagreed, and the request is the tiebreaker.`}
+/>
+
+<MultipleChoice
+  markdown={`Which line in a request does most to stop an agent editing a test until it passes?
+
+- [o] Leave existing tests alone, and fix the code if one fails.
+  > It rules out the shortcut by name and says what to do instead.
+- Make sure every single test passes before you report back.
+  > This rewards a green run however it is reached, which is what makes editing the test attractive.
+- Write thorough tests with high coverage of every branch.
+  > Coverage counts the lines a test runs, not whether its assertions are right. The edited test still counts.
+- Run the whole test suite again after every change you make.
+  > Rerunning catches regressions, and an edited test passes every rerun.
+
+Say which tests must not change. The agent cannot work that out for
+itself.`}
+/>

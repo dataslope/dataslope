@@ -3,63 +3,314 @@ title: Common Failure Modes
 description: Invented functions, weakened tests, swallowed errors, changes nobody asked for, and a confident summary of work that did not happen.
 ---
 
-{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
-
 Agent mistakes are not random. The same handful turn up across every
 tool and every model, and each one has a quick check that catches it.
 
-{/*
-- Shape for every section below: what it looks like (a short snippet or
-  ```diff fence), why it happens, and the check that catches it.
-- This lesson is the overview. A later course, "Reviewing AI-Written
-  Code", would give each one a full lesson with graded exercises.
-*/}
+This lesson is the overview. For each failure: what it looks like in a
+diff, why it happens, and the check that catches it. Three of the six
+have already turned up in the discount session from
+[Reading the Diff](/courses/working-with-coding-agents/reading-the-diff),
+a session about one small discount.
 
 ## Functions that do not exist
 
-{/*
-- A plausible method name on a real library, with the wrong signature
-  or none at all.
-- Why: plausible continuation, not lookup (link How LLMs Work, "Why
-  Models Hallucinate", /courses/how-llms-work/why-models-hallucinate).
-- Check: it runs, or the type checker accepts it. Reading is not enough.
-*/}
+**What it looks like.** A call to a method that reads naturally and is
+not there: a name borrowed from another language, from an older version
+of the library, or from a neighboring library with a similar API. The
+arguments usually look right too. Nothing on the line looks wrong,
+because looking right is how it got there.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Four calls an agent could plausibly write. Every name is real
+# somewhere. Run it to see which ones are real here.
+attempts = [
+    ('"shop".startswith("sh")', lambda: "shop".startswith("sh")),
+    ("[1, 2].push(3)", lambda: [1, 2].push(3)),
+    ('{"a": 1}.has_key("a")', lambda: {"a": 1}.has_key("a")),
+    ('"shop".contains("h")', lambda: "shop".contains("h")),
+]
+
+for source, attempt in attempts:
+    try:
+        attempt()
+        print(f"ran     {source}")
+    except AttributeError as error:
+        print(f"failed  {source}")
+        print(f"        {error}")
+`,
+    },
+  ]}
+/>
+
+Only the first one runs. The other three are names the model has seen
+many times, just not on these types: `push` is how JavaScript appends to
+an array, `has_key` was a real dictionary method until Python 3 removed
+it, and pandas gives a column of strings a `.str.contains` that a plain
+`str` does not have.
+
+**Why it happens.** The model writes a plausible continuation; it does
+not look anything up (see
+[Why Models Hallucinate](/courses/how-llms-work/why-models-hallucinate)).
+A method name that fits the code around it is a plausible continuation
+whether or not it exists in the version you have installed. Exact names,
+exact keyword arguments and exact versions are where this concentrates,
+because the shape is easy and the specifics are not.
+
+**The check.** It runs, or a type checker accepts it. Reading is not
+enough, since the name was produced for looking right. Python raises
+`AttributeError` the first time the line runs, which only helps if
+something runs the line: make sure a test reaches the new call, because
+a call on a rarely used path (an error handler, say) can sit in the code
+for months. A type checker (mypy or pyright for Python, `tsc` for
+TypeScript) catches most of these without running anything. And when
+the call needs a package the project does not depend on yet, check that
+the package exists before installing it;
+[Staying Safe](/courses/working-with-coding-agents/staying-safe)
+explains why an invented package name is a security problem as well as
+a bug.
 
 ## Tests weakened to pass
 
-{/*
-- Cross-reference Verifying with Tests.
-*/}
+**What it looks like.** An existing test changed in the same session as
+the code it tests: an expected value changed, an assertion loosened, a
+case removed, a skip marker added. From the discount session:
+
+```diff
+ def test_discount_at_threshold():
+-    assert order_total([{"price": 5_000, "qty": 2}]) == 9_000
++    assert order_total([{"price": 5_000, "qty": 2}]) == 10_000
+```
+
+**Why it happens.** A failing test stands between the agent and "done",
+and changing the test makes it pass as surely as changing the code,
+usually with a smaller edit.
+
+**The check.** Look for `-` lines inside tests: in a test that existed
+before the session, or in one the session wrote and then changed. Each
+one needs a reason, and the reason has to hold up against the request,
+not against the code.
+[Verifying with Tests](/courses/working-with-coding-agents/verifying-with-tests)
+covers this one in full, including how to find out whether any test
+covers the change at all.
 
 ## Errors swallowed
 
-{/*
-- A broad try/except that turns a crash into a silent wrong answer.
-- Check: search the diff for new exception handlers and ask what each
-  one hides.
-*/}
+**What it looks like.** A `try` around code that failed during the
+session, with a broad `except` that returns a default or does nothing:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def parse_price(text):
+    """Turn a price such as "$12.50" into cents."""
+    try:
+        return round(float(text.strip("$")) * 100)
+    except Exception:
+        return 0
+
+
+prices = ["$12.50", "$3.00", "$1,299.00"]
+total = sum(parse_price(price) for price in prices)
+print(f"total: {total} cents")
+`,
+    },
+  ]}
+/>
+
+The total comes out at 1,550 cents for an order worth 131,450. The third
+price has a thousands separator, `float()` refused it, and the handler
+turned the refusal into zero. Nothing crashed and nothing was printed,
+so the first sign of trouble is a wrong number somewhere downstream.
+
+Now delete the `try:` line, the `except Exception:` line and the
+`return 0` under it, move the remaining `return` back four spaces, and
+run it again. This time it stops with a `ValueError` that names the
+exact input it could not read. A crash that points at its cause is far
+cheaper than a wrong answer that does not.
+
+(The third price is in the format the agent's tidied-up `format_cents`
+now prints. Between them, a "harmless" formatting change and a broad
+`except` are enough to sell a \$1,299 item for nothing.)
+
+**Why it happens.** The same pressure as a weakened test. Something
+raised an exception during the session, the exception was in the way of
+finishing, and wrapping it is the smallest edit that makes it go away.
+A handler that catches everything is also the easiest one to write: it
+makes any error disappear without anyone having to work out which error
+it was.
+
+**The check.** Search the diff for new exception handlers (`except` in
+Python, `catch` in JavaScript and Java) and ask what each one hides.
+With the last commit before the session as the starting point:
+
+```bash
+git diff HEAD~3 | grep -n "except"
+```
+
+A good handler catches a specific exception (`ValueError`, not
+`Exception`), does something deliberate with it, and lets everything
+else crash. One that catches everything and returns a default has not
+fixed the crash. It has moved it somewhere harder to find.
 
 ## Changes nobody asked for
 
-{/*
-- Reformatting, renaming, "while I was here" refactors. Each one is
-  diff you have to review for no benefit to the task.
-- Check: the file list (Reading the Diff); the fix is a constraint in
-  the request (Writing a Task).
-*/}
+**What it looks like.** Reformatting, renaming, reordered imports,
+"while I was here" refactors. From the discount session, where the
+request ended "Don't change anything else":
+
+```diff
+-def cents_to_str(cents):
+-    return "$" + format(cents / 100, ".2f")
++def format_cents(cents: int) -> str:
++    """Render a number of cents as dollars, e.g. 1050 -> $10.50."""
++    return f"${cents / 100:,.2f}"
+```
+
+As code, this is arguably an improvement. As a change, it costs three
+things. It renamed a function that other code may call: the agent
+updated `report.py`, but it cannot know about a script in another
+repository or a teammate's branch that still calls `cents_to_str`. It
+changed behavior: the `,` in the format string turns \$1234.50 into
+\$1,234.50 everywhere a total is printed. And it is diff you now have to
+review for no benefit to the task.
+
+**Why it happens.** The model has a strong sense of what tidy code looks
+like, and the file was in front of it. From where it sits, every one of
+these changes is an improvement, and nothing in the loop weighs that
+improvement against the cost of reviewing it. A constraint in the
+request lowers the odds without removing them: this session had one.
+
+**The check.** The file list. A file outside the task is a question to
+answer before reading anything else. Then two remedies: a constraint in
+the request that names what must not change (see
+[Writing a Task](/courses/working-with-coding-agents/writing-a-task)),
+and, when it happens anyway, undoing just those files (see
+[Undoing Changes](/courses/working-with-coding-agents/undoing-changes)).
 
 ## A new helper beside an existing one
 
-{/*
-- The agent did not search, so it wrote a second date formatter next
-  to the first.
-- Check: search the codebase for the new function's job before
-  accepting it.
-*/}
+**What it looks like.** A new function for a job the codebase already
+has a function for. Suppose a later session asks the agent to show the
+discount in the report, and its diff to `pricing.py` includes this:
+
+```diff
++def dollars(cents):
++    return "$" + str(cents / 100)
+```
+
+`format.py` already does this job, and the two disagree before anyone
+has used them: `dollars(10800)` returns `$108.0`, where the existing
+helper returns `$108.00`. The project now has two answers to one
+question, and every later fix has to be made twice, by someone who knows
+there are two.
+
+**Why it happens.** The agent works from what is in its context (see
+[What the Agent Sees](/courses/working-with-coding-agents/what-the-agent-sees)).
+If it never opened `format.py` or searched for a formatter, the existing
+one does not exist as far as the model is concerned, and writing a new
+one is quicker than looking.
+
+**The check.** For every new function in the diff, search the codebase
+for its job before accepting it. Search for what it does rather than
+its name, because a duplicate rarely shares one:
+
+```bash
+grep -rn "/ 100" --include="*.py" .
+```
+
+In a codebase that keeps money in cents, dividing by 100 is what a
+dollar formatter does, so this finds most of them (spacing varies, so
+try `/100` too). If the search turns up an
+existing helper, ask the agent to use it and tell it where it is.
 
 ## A summary that does not match the diff
 
-{/*
-- "Added tests for the edge cases" over a diff with no new tests.
-- Check: read the diff before the summary, not after.
-*/}
+**What it looks like.** A closing message that describes work the diff
+does not contain, or describes it more generously than the diff does.
+The discount session's summary promised "tests on both sides of the
+threshold" over a diff with one test above the threshold, one exactly on
+it and none below; said "All tests pass", which was true because one
+test had been edited until it did; and called a rename with an output
+change "tidied up".
+
+**Why it happens.** The summary is generated by the same model, from the
+same transcript, as one more plausible continuation. At the end of a
+session about a threshold, "tests on both sides of the threshold" is
+what a good summary sounds like. It reflects what the model set out to
+do, or believes it did, and nothing in the loop checks it against the
+diff before it is printed.
+
+**The check.** Read the diff before the summary. Read the summary first
+and it tells you what to expect, and you will tend to find it. Read the
+diff first and the summary becomes a list of claims to check one at a
+time, which is how Reading the Diff ends.
+
+## The checks, side by side
+
+| Failure | What it looks like | The check |
+| --- | --- | --- |
+| Functions that do not exist | a plausible call that never ran | run it, or type-check it |
+| Tests weakened to pass | a `-` line inside an existing test | read every test change against the request |
+| Errors swallowed | a new broad `except` returning a default | ask what each new handler hides |
+| Changes nobody asked for | a file outside the task in the file list | read the file list first |
+| A new helper beside an existing one | a new function for a job the code already does | search the codebase for the job |
+| A summary that does not match | a claim with nothing in the diff behind it | read the diff before the summary |
+
+None of these checks needs you to understand the whole change, and most
+take a minute. That is what makes them worth doing every time, and why
+they belong at the start of a review rather than the end.
+
+## Concept check
+
+<MultipleChoice
+  markdown={`An agent's diff calls \`client.fetch_all(retries=3)\` on a library your project uses. You have never seen that method. What settles whether it exists?
+
+- Asking the agent to confirm that the method exists.
+  > The answer comes from the same process that produced the call, so it is just as plausible and just as unverified.
+- Reading the line carefully in the context around it.
+  > The name was produced for fitting the code around it, so reading is the check it is best at passing.
+- Finding similar calls in other projects on the web.
+  > Other projects may use another version, or another library with a similar API.
+- [o] Running that code path, or a type checker over it.
+  > The interpreter and the type checker both consult the library you actually have installed, which is where the answer lives.
+
+Plausible and real are different properties, and only running or
+checking the code tells them apart.`}
+/>
+
+<MultipleChoice
+  markdown={`Which addition to a diff is most likely to turn a crash into a quiet wrong answer?
+
+- A new \`if not items: return 0\` at the top of \`order_total\`.
+  > An empty order really does total zero, so this returns the right answer early and hides nothing.
+- [o] A new \`except Exception: return 0\` around a price parser.
+  > Every failure to parse, for any reason, becomes a price of zero, and the total is wrong with no error anywhere.
+- A new \`-> int\` return type hint on \`order_total\`.
+  > A hint documents the type and lets a checker verify it. It changes nothing at run time.
+- A renamed loop variable inside the body of \`order_total\`.
+  > Renaming a local variable changes no behavior, as long as every use of it was renamed.
+
+A broad handler that returns a default moves the crash somewhere harder
+to find.`}
+/>
+
+<MultipleChoice
+  markdown={`The summary says the agent added "tests on both sides of the threshold". The diff adds one test at 12,000 cents and one at exactly 10,000. Which test is missing?
+
+- One above the threshold.
+  > 12,000 cents is above it.
+- One exactly at the threshold.
+  > 10,000 cents is exactly at it, although that test was later edited to expect no discount.
+- [o] One below the threshold.
+  > Nothing checks an order under 10,000 cents, so "both sides" describes a test that does not exist.
+- None; the summary matches the diff.
+  > Above the threshold and on it are one side and the edge, not both sides.
+
+Read the diff first, and the summary becomes a list of claims to check.`}
+/>

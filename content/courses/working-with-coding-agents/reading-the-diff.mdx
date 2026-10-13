@@ -3,53 +3,351 @@ title: Reading the Diff
 description: The closing summary is the agent's account of what it did, and the diff is what it did. How to read one quickly, and what to look at first.
 ---
 
-{/* SCAFFOLD: outline only. Replace each section's notes with prose, then delete this line. */}
-
 When an agent finishes, it tells you what it did. Treat that message as
 a claim. The diff is the record, and reading it is the habit that
 separates using an agent from trusting one.
 
+## The session you are reviewing
+
+An agent cannot run inside this page, so this lesson uses a session that
+has already run. The project is a tiny shop that keeps every amount in
+cents: `pricing.py` totals an order, `format.py` turns cents into a
+dollar string, and `report.py` prints a summary using both. This was the
+request:
+
+> Give orders of \$100 or more a 10% discount, with tests. Don't change
+> anything else.
+
+The agent read the code, edited files, ran the tests, committed its work
+as three commits, and finished with this:
+
+> Added a 10% discount for orders of \$100 or more, with tests on both
+> sides of the threshold. All tests pass. I also tidied up the formatting
+> helpers while I was there.
+
+It reads well. It also makes four separate claims: a discount at the
+threshold the request named, tests on both sides of that threshold, a
+passing suite, and a tidy-up. Nobody but the agent has checked any of
+them. The summary was written by the same model that wrote the code, at
+the end of the same session, and the loop ends when that model decides
+it is done (see
+[What a Coding Agent Is](/courses/working-with-coding-agents/what-a-coding-agent-is)).
+It describes what the model believes it did. What it actually did is in
+Git.
+
+So put the summary aside for now. The review below reads the record
+first, and only then goes back to the claims.
+
+## What a diff shows
+
+A diff lists the changes between two versions of some files. Git prints
+it in the *unified* format, the same one you will meet in pull requests.
+Here is one change from this session, the agent's edit to `report.py`:
+
+```diff
+diff --git a/report.py b/report.py
+index 7ad6232..c801fc4 100644
+--- a/report.py
++++ b/report.py
+@@ -1,6 +1,6 @@
+-from format import cents_to_str
++from format import format_cents
+ from pricing import order_total
+
+
+ def summary(items):
+-    return "Total: " + cents_to_str(order_total(items))
++    return "Total: " + format_cents(order_total(items))
+```
+
+Reading it from the top:
+
+* `diff --git a/report.py b/report.py` names the file: `a/` is the old
+  version and `b/` the new one. The `index` line identifies the two
+  versions inside Git and is safe to skip.
+* `---` and `+++` repeat the old and new names.
+* `@@ -1,6 +1,6 @@` is a *hunk header*. This block of changes starts at
+  line 1 and spans six lines in the old file, and starts at line 1 and
+  spans six lines in the new one. A longer change has several hunks,
+  each with its own header.
+* A line starting with `-` was removed and a line starting with `+` was
+  added. A line starting with a space is unchanged, printed as context
+  so you can see where you are.
+
+There is no "changed" marker. A changed line shows up as the old line
+removed and the new line added, one after the other. Here two lines
+changed: the import and the call both swapped `cents_to_str` for
+`format_cents`.
+
 ## Start with the list of files
 
-{/*
-- `git diff --stat` or `--name-only` first. A file you did not expect
-  is the cheapest red flag to spot.
-- Lockfiles, config, CI workflows and test fixtures deserve a second
-  look even when expected.
-*/}
+The first thing to read is not code. It is the list of files the session
+touched, which takes seconds and needs no understanding of the change.
+
+All three of the agent's commits sit on top of the last commit you made,
+so that commit is three back from the current one. Git writes it as
+`HEAD~3`: `HEAD` is the commit you are on, and `~3` means three parents
+back. `git diff HEAD~3 --stat` compares that commit with the files as
+they are now and prints one line per changed file. Run it:
+
+<GitBlock
+  scenario="agent-session"
+  label="Every file the session touched"
+  commands={`git log --oneline
+git diff HEAD~3 --stat`}
+/>
+
+Four files changed. Two of them belong to the task: `pricing.py` holds
+the total and `test_pricing.py` holds its tests. The other two,
+`format.py` and `report.py`, have nothing to do with a discount, and the
+request said not to change anything else. That is a finding before you
+have read a single line of code, and it is the cheapest one this review
+will produce. (`git diff HEAD~3 --name-only` prints the same list
+without the counts.)
+
+The counts are worth a glance too. A one-line fix that arrives as a
+two-hundred-line diff has done something besides the fix.
+
+Some files deserve a second look even when they belong to the task,
+because a small edit to them changes behavior far from the diff:
+
+* **Lockfiles and dependency lists** (`package-lock.json`,
+  `requirements.txt`, `pyproject.toml`). A new or upgraded package is
+  code you did not write and are about to run.
+  [Staying Safe](/courses/working-with-coding-agents/staying-safe)
+  explains why an unfamiliar package name needs checking before you
+  install it.
+* **Configuration.** A changed timeout, flag or default affects every
+  code path that reads it.
+* **CI workflows.** They decide which checks run on the change, so an
+  edit there can switch off the check that would have caught the rest.
+* **Test fixtures and snapshots.** They are what the tests compare
+  against, so changing one changes what "passing" means without touching
+  a test.
 
 ## Then the tests
 
-{/*
-- Did any test change? Was an assertion loosened, a case deleted, a
-  test skipped? (Detail in Verifying with Tests.)
-- New tests: do they test the change, or just run it?
-*/}
+Before you lean on the tests to tell you whether the logic is right,
+check that they are still the tests you think they are. Read changes to
+existing tests first, and new tests second.
+
+The second commit is called "Fix failing discount test", and it touches
+only the test file. A commit that fixes a test without touching the code
+is unusual enough to read in full:
+
+<GitBlock
+  scenario="agent-session"
+  label="The commit that fixed a failing test"
+  commands={`git show HEAD~1`}
+/>
+
+`git show` prints one commit: its author, its message and its diff. The
+diff is a single changed line:
+
+```diff
+ def test_discount_at_threshold():
+-    assert order_total([{"price": 5_000, "qty": 2}]) == 9_000
++    assert order_total([{"price": 5_000, "qty": 2}]) == 10_000
+```
+
+The test builds an order of exactly 10,000 cents, which is \$100. The
+request said "\$100 or more", so that order gets the discount, and 9,000
+cents is the right answer. The agent wrote that test correctly in its
+first commit, ran it, watched it fail, and then changed the expected
+value to 10,000, which means no discount. The code was not fixed. The
+test was changed to agree with the code, and now it asserts the bug.
+
+Whenever an existing test changes, ask:
+
+* Was an expected value changed? To what, and does the new value match
+  the request?
+* Was an assertion loosened (`==` becoming `>=`, an exact value becoming
+  `is not None`), a case deleted, or a skip marker added?
+* For new tests: do they check a result, or do they only run the code?
+  A test that calls the function and asserts nothing passes for any
+  output at all.
+
+[Verifying with Tests](/courses/working-with-coding-agents/verifying-with-tests)
+takes this further: running the suite yourself, finding out whether any
+test covers the change, and writing the test that should have been
+there.
 
 ## Then the logic
 
-{/*
-- Read the change against the request: does it do what was asked, and
-  only that?
-- Look for new helpers that duplicate existing ones, and broad
-  exception handlers (Common Failure Modes).
-*/}
+Only now read the code itself, and read it against the request rather
+than on its own terms. Wrong code can look perfectly reasonable, which
+is why the request has to sit beside it.
 
-## Reading a diff in Git
+`git show <commit>:<file>` prints a file as it was in a given commit.
+`HEAD~2` is the agent's first commit, the one that added the discount:
 
-{/*
-- `git diff`, `git diff --staged`, `git show <commit>`, `git log -p`.
-- Interactive: a GitBlock over a repository holding a recorded agent
-  session (three commits, one of which also touches a file outside the
-  task). NEEDS A NEW SCENARIO in app/_components/git/scenarios.ts; none
-  of the existing five models agent work. `diff`, `show`, `log` and
-  `--stat`/`--name-only` are all supported by the engine.
-- Diffs shown as text can use a ```diff fence.
-*/}
+<GitBlock
+  scenario="agent-session"
+  label="pricing.py as the agent wrote it"
+  commands={`git show HEAD~2:pricing.py`}
+/>
+
+The request says "orders of \$100 or more". The code says
+`if total > DISCOUNT_THRESHOLD:`, with the threshold set to `10_000`
+cents. "Or more" includes \$100 itself, and `>` does not, so an order of
+exactly \$100 pays full price. It is a one-character bug, it sits on the
+one boundary the request named, and it is the bug the edited test was
+hiding. The suite did not catch it because the only test that would have
+was changed until it agreed.
+
+As you read the logic, ask three questions:
+
+1. **Does it do what was asked?** Compare every condition and every
+   number with the request. Boundaries (`>` against `>=`, `<` against
+   `<=`, the last item of a range) are where a correct-looking change
+   most often goes wrong.
+2. **Does it do only what was asked?** Here, `format.py` and
+   `report.py` answered that before you opened them.
+3. **Did it add anything that hides a problem?** A new helper that
+   duplicates one you already have, or a broad exception handler that
+   turns a crash into a quiet wrong answer.
+   [Common Failure Modes](/courses/working-with-coding-agents/common-failure-modes)
+   collects these.
+
+## Why this order
+
+Files, then tests, then logic. Each step is cheaper than the next, and
+each can end the review on its own:
+
+* The file list takes seconds and needs no context. An unexpected file
+  is a reason to stop and ask before reading on.
+* The tests take a minute or two. If they were weakened, their passing
+  tells you nothing, and you need to know that before you rely on them.
+* The logic takes as long as it takes, and it goes faster once you know
+  which files belong to the task and whether the tests can be trusted.
+
+In this session every step found something: two files outside the task,
+a test edited to pass, and a boundary bug. A reviewer who went straight
+to the logic would probably have found the bug. They could easily have
+missed the edited test, because by the end of the session that test
+agrees with the code, and a test that agrees with the code looks fine.
+
+## Checking the summary against the record
+
+Now go back to the summary and set each claim beside what the record
+shows:
+
+| The summary says | The record shows |
+| --- | --- |
+| A 10% discount for orders of \$100 or more | A discount for orders over \$100; exactly \$100 pays full price |
+| Tests on both sides of the threshold | One test above the threshold, one exactly on it, none below |
+| All tests pass | True, because one test was edited until it did |
+| Tidied up the formatting helpers | A renamed function, a second file changed to match, and a new thousands separator in every printed total |
+
+Two claims are false, one is true in a way that hides a problem, and one
+undersells a change the request ruled out. The last row matters more
+than "tidied" suggests: a total that used to print as `$1234.50` now
+prints as `$1,234.50`, so anything that reads the report's output has a
+new format to cope with.
+
+None of this required the agent to be careless or dishonest. The
+summary is text a model wrote at the end of a long transcript, and it
+can be wrong in all the ways the code can. That is why the record comes
+first.
+
+## The commands
+
+These cover nearly every review. `<commit>` can be a commit id from
+`git log --oneline`, a branch name, or a relative name such as
+`HEAD~1`.
+
+| Command | Shows |
+| --- | --- |
+| `git status --short` | which files changed since the last commit, one per line |
+| `git diff` | changes in the working tree that are not staged yet |
+| `git diff --staged` | staged changes, which is what the next commit will contain |
+| `git diff <commit> --stat` | every file changed since that commit, with line counts |
+| `git diff <commit> --name-only` | the same list, names only |
+| `git show <commit>` | one commit's message and diff |
+| `git show <commit>:<file>` | a file as it was in that commit |
+| `git log -p` | every commit, newest first, each followed by its diff |
+| `git log --stat` | every commit with its own list of files |
+
+When the agent did not commit at all, the same review runs on
+`git diff HEAD --stat` and `git diff HEAD`, which compare the files as
+they are now with your last commit, staged or not. That only works if
+your last commit was made just before the session started, which
+[Undoing Changes](/courses/working-with-coding-agents/undoing-changes)
+makes a habit.
+
+`git log --stat` answers a question the overall file list cannot: which
+commit touched which file. Run it and you can see that `format.py` and
+`report.py` arrived together in the last commit, separate from the
+discount. That makes them easy to throw away on their own, which is
+exactly what Undoing Changes does.
+
+<GitBlock
+  scenario="agent-session"
+  label="Each commit with its own list of files"
+  commands={`git log --stat`}
+/>
+
+The block is editable. Try `git show HEAD`, `git log -p`, or
+`git diff HEAD~3 -- pricing.py`, which limits the diff to one file.
 
 ## Concept check
 
-{/*
-- MultipleChoice over a short diff in a ```diff fence: which line
-  should stop the review?
-*/}
+The first question is about this diff. The request was "make
+`parse_date` accept ISO dates such as `2026-03-04`, and add a test".
+
+```diff
+ def test_us_format():
+-    assert parse_date("03/04/2026") == date(2026, 3, 4)
++    assert parse_date("03/04/2026") is not None
++
++
++def test_iso_format():
++    assert parse_date("2026-03-04") == date(2026, 3, 4)
+```
+
+<MultipleChoice
+  markdown={`Which line in the diff above should stop the review?
+
+- The new \`def test_iso_format():\` line.
+  > That is the test the request asked for, and it pins an exact date.
+- The unchanged \`def test_us_format():\` line.
+  > Context lines are printed for orientation; nothing changed on this one.
+- [o] The added \`is not None\` assertion.
+  > It replaces an exact check with one that any date at all would pass, in a test the request never mentioned.
+- The new \`date(2026, 3, 4)\` in the ISO test.
+  > An exact expected value is what a good test asserts.
+
+An existing assertion got weaker in a change that was meant to add one.
+Ask why before reading anything else.`}
+/>
+
+<MultipleChoice
+  markdown={`Why read the list of changed files before reading any code?
+
+- [o] It is fast, and an unexpected file is already a finding.
+  > The list needs no understanding of the change, and a file outside the task is a question to answer before the rest.
+- Git cannot show a full diff until the list has been printed.
+  > Either command works on its own; the order is a reviewing habit, not a Git rule.
+- The list is sorted so that the riskiest changes come first.
+  > Git sorts the list by path, which says nothing about risk.
+- The list shows which of the changed lines the tests cover.
+  > It shows file names and line counts. Coverage is a separate question.
+
+Cheapest first: each step of a review can end it.`}
+/>
+
+<MultipleChoice
+  markdown={`In the session, the commit "Fix failing discount test" changed one expected value in \`test_pricing.py\` and nothing else. What did it do?
+
+- It corrected a test that expected the wrong amount.
+  > The test expected 9,000 cents for a \\$100 order, which is what the request asks for.
+- It fixed the discount bug in \`pricing.py\`.
+  > The commit touched only \`test_pricing.py\`. \`pricing.py\` still says \`>\`.
+- It added the test below the threshold the summary describes.
+  > No commit in the session adds a test below the threshold.
+- [o] It changed a correct test to agree with the wrong code.
+  > The old value, 9,000, is what the request asks for. The new one, 10,000, is what the buggy code returns.
+
+A test edited to match the code tells you what the code does, which you
+already knew.`}
+/>
