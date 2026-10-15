@@ -15,7 +15,7 @@ export const VIDEO = "java-equality";
  * java-equality` has written both WebPs. Every frame is laid out with room
  * for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 /** "21.0.12.1", and the major version the notes print. */
 export const JAVA_VERSION = m.meta.javaVersion;

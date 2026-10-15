@@ -17,7 +17,7 @@ export const VIDEO = "window-functions";
  * window-functions` has written both WebPs. Every frame is laid out with room
  * for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 export type Result = { columns: string[]; rows: string[][] };
 
