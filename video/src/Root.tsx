@@ -14,6 +14,8 @@ import { script as floatingPointScript } from "./videos/floating-point/script";
 import { EDITORIAL_DEFAULTS, type EditorialProps } from "./editorial/Page";
 import { CentralLimitTheorem } from "./videos/central-limit-theorem/Video";
 import { script as centralLimitTheoremScript } from "./videos/central-limit-theorem/script";
+import { ListVsSet } from "./videos/list-vs-set/Video";
+import { script as listVsSetScript } from "./videos/list-vs-set/script";
 import { SimpsonsParadox } from "./videos/simpsons-paradox/Video";
 import { script as simpsonsParadoxScript } from "./videos/simpsons-paradox/script";
 import { LlmTokens } from "./videos/llm-tokens/Video";
@@ -59,6 +61,16 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 60}
         defaultProps={EDITORIAL_DEFAULTS}
         calculateMetadata={narratedMetadata<EditorialProps>(centralLimitTheoremScript)}
+      />
+      <Composition
+        id="ListVsSet"
+        component={ListVsSet}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={EDITORIAL_DEFAULTS}
+        calculateMetadata={narratedMetadata<EditorialProps>(listVsSetScript)}
       />
       <Composition
         id="EventLoop"
