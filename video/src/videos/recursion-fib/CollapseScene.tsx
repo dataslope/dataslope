@@ -95,7 +95,11 @@ export const CollapseScene: React.FC = () => {
         at={start - 10}
         value={count}
         color={count === MEMO_CALLS ? MEMO_INK : NAIVE_INK}
-        caption={`calls for fibMemo(${TREE_N})`}
+        caption={
+          <>
+            calls for <Mono>{`fibMemo(${TREE_N})`}</Mono>
+          </>
+        }
         hot={ease(frame, nineAt - 2, 10)}
       />
       <Note at={nineAt + 6} x={SIDE_X} y={y(COUNTER_TOP) + 200} from="up" width={330}>

@@ -16,12 +16,12 @@ export const NAIVE_LINES = [
   "  return fib(n - 1) + fib(n - 2);",
   "}",
 ] as const;
-const SIZE = 34;
+const SIZE = 38;
 const LIST_X = 120;
-const LIST_W = 860;
-const LIST_TOP = 372;
+const LIST_W = 900;
+const LIST_TOP = 400;
 /** The column beside the listing: what fib(40) returned, and what it cost. */
-const SIDE_X = 1090;
+const SIDE_X = 1130;
 
 /**
  * Hook: the lesson's naive fib, straight from the definition, and the one
@@ -90,7 +90,7 @@ export const CodeScene: React.FC = () => {
         />
       ) : null}
 
-      <Fig n="1" at={open + 6} x={LIST_X} y={y(316)}>
+      <Fig n="1" at={open + 6} x={LIST_X} y={y(342)}>
         The lesson&apos;s <Mono>fib</Mono>, straight from the definition
       </Fig>
       <Listing
@@ -108,7 +108,7 @@ export const CodeScene: React.FC = () => {
       </Note>
 
       {/* fib(40): the answer, then the bill. */}
-      <div style={{ position: "absolute", left: SIDE_X, top: top + 6, display: "flex", flexDirection: "column", gap: 30 }}>
+      <div style={{ position: "absolute", left: SIDE_X, top: top + 40, display: "flex", flexDirection: "column", gap: 34 }}>
         <Ink at={correctAt - 4} dur={14} style={{ position: "relative" }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: "0.45em", ...label(24, INK_SOFT) }}>
             <Mono color={INK}>fib(40)</Mono>
@@ -135,8 +135,10 @@ export const CodeScene: React.FC = () => {
           </div>
         </Ink>
       </div>
-      <Note at={callsAt + 8} x={SIDE_X} y={listingBottom + 22} from="up" width={680}>
-        <span style={note(21, INK_SOFT)}>Counted by a copy of fib that adds one to a counter on every call.</span>
+      <Note at={callsAt + 8} x={SIDE_X} y={listingBottom + 22} from="up" width={660}>
+        <span style={note(21, INK_SOFT)}>
+          Counted by a copy of <Mono>fib</Mono> that adds one to a counter on every call.
+        </span>
       </Note>
     </AbsoluteFill>
   );

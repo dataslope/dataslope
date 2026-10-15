@@ -14,7 +14,7 @@ import { Counter, NODE_H, TreeEdge, TreeNode } from "./tree";
 /** The stack column: frame height and gap, in layout units, and its base. */
 const FRAME_H = 50;
 const FRAME_GAP = 8;
-const STACK_BASE = 742;
+const STACK_BASE = 800;
 
 /**
  * Every call naive fib(5) makes, as a tree drawn in the order the calls
@@ -66,7 +66,7 @@ export const TreeScene: React.FC = () => {
             from={pos[c.parent]}
             to={pos[c.i]}
             draw={ease(frame, appearAt(c.i) - 3, 8)}
-            color={onPath.has(c.i) ? INK : INK_SOFT}
+            color={onPath.has(c.i) && frame >= pathAt - 2 ? INK : INK_SOFT}
             width={onPath.has(c.i) ? 1.8 + 2.2 * ease(frame, pathAt + DEEP_PATH.indexOf(c.i) * pathStep, 8) : 1.8}
           />
         ),
@@ -101,12 +101,16 @@ export const TreeScene: React.FC = () => {
         at={everyAt - 6}
         value={shown}
         color={NAIVE_INK}
-        caption={`calls for fib(${TREE_N})`}
+        caption={
+          <>
+            calls for <Mono>{`fib(${TREE_N})`}</Mono>
+          </>
+        }
         hot={ease(frame, countAt - 2, 10)}
       />
 
       {/* The stack at its deepest: the calls open on that one path. */}
-      <Ink at={pathAt - 6} dur={14} style={{ left: SIDE_X, top: y(404), width: SIDE_W, opacity: 1 - stackDim * 0.6 }}>
+      <Ink at={pathAt - 6} dur={14} style={{ left: SIDE_X, top: y(452), width: SIDE_W, opacity: 1 - stackDim * 0.6 }}>
         <span style={label(22, INK_SOFT)}>The call stack, at its deepest</span>
       </Ink>
       {DEEP_PATH.map((i, k) => {

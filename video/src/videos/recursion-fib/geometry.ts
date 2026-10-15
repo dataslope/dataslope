@@ -7,7 +7,7 @@ export const SLOT = 150;
 export const NAIVE_X0 = 205;
 /** The top of depth 1, and the step down per level. */
 export const LEVEL_TOP = 216;
-export const LEVEL_STEP = 122;
+export const LEVEL_STEP = 138;
 /** The right-hand column: the call counter, and the stack under it. */
 export const SIDE_X = 1452;
 export const SIDE_W = 330;

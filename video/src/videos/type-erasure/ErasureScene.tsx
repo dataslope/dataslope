@@ -151,13 +151,13 @@ export const ErasureScene: React.FC = () => {
         x={JS_X}
         top={runTop}
         width={JS_W}
-        at={compilerAt - 4}
+        at={jsAt - 4}
         rows={[
           {
             kind: "cmd",
             text: tscCommand("user"),
-            at: compilerAt,
-            tag: { text: "no output, no errors", at: compilerAt + 12, color: OK_INK },
+            at: jsAt,
+            tag: { text: "no output, no errors", at: jsAt + 14, color: OK_INK },
           },
           { kind: "cmd", text: "node user.js", at: plainAt - 4 },
           { kind: "out", text: USER_RUN, at: plainAt + 6 },

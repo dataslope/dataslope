@@ -156,10 +156,10 @@ export const Listing: React.FC<{
             style={{
               position: "absolute",
               // In em of the code's own size, so it spans the characters.
-              left: `calc(${codeLeft(size)}px + ${from * 0.6 - 0.35}em)`,
+              left: `calc(${codeLeft(size)}px + ${from * 0.6 - 0.2}em)`,
               top: g.padY + m.line * g.lineH + g.lineH * 0.12,
               height: g.lineH * 0.76,
-              width: `${(chars * 0.6 + 0.7) * w}em`,
+              width: `${(chars * 0.6 + 0.4) * w}em`,
               fontSize: size,
               background: m.color ?? HIGHLIGHT,
               opacity: 1 - o,

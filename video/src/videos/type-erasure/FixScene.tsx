@@ -84,7 +84,7 @@ export const FixScene: React.FC = () => {
       </svg>
       <Note at={fieldAt + 4} x={NOTE_X} y={(testsTop + testsBottom) / 2 - 30} width={NOTE_W}>
         <div style={note(22, INK)}>Each test runs at runtime, on the real value.</div>
-        <div style={{ ...note(20, INK_SOFT), marginTop: 6 }}>
+        <div style={{ ...note(21, INK_SOFT), marginTop: 6 }}>
           When <Mono>isUser</Mono> returns true, TypeScript treats <Mono>x</Mono> as a <Mono>User</Mono>.
         </div>
       </Note>
