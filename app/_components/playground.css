@@ -10,11 +10,11 @@
   --bg3: #1e2535;
   --border: #2a3347;
   --text: #e2e8f0;
-  /* Fixed neutral secondary-text tones computed from the default dark palette.
-     These stay constant across themes so secondary UI text remains legible
-     without inheriting editor syntax-highlight hues. The editor palette
-     (`palette.dim` / `palette.muted` in `playgroundTheme.ts`) is separate
-     and is only used for CodeMirror token coloring. */
+  /* Neutral secondary-text tones, the defaults for the dark palette.
+     `applyThemePalette` sets them per theme from neutral greys
+     (`palette.dim` / `palette.textMuted` in `playgroundTheme.ts`), never from
+     a syntax-highlight hue, so secondary UI text stays grey in every theme.
+     `palette.muted` is the editor's number color and only colors tokens. */
   --text-muted: #b4b9c0;
   --text-dim: #83878e;
   /* Complementary accent drawn from the theme's function-highlight color,
@@ -4915,7 +4915,11 @@ html[data-playground-theme="light"] .playground-tab-add svg {
   color: var(--text-dim);
 }
 .workspace-manager-cloud-note a {
-  color: var(--text-muted);
+  color: var(--primary);
+  text-decoration: none;
+}
+.workspace-manager-cloud-note a:hover {
+  text-decoration: underline;
 }
 
 /* ───────────────────────────────────────────────────────────────────────

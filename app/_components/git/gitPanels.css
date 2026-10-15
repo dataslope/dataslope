@@ -89,8 +89,7 @@ html:is(.dark, [data-theme="dark"], [data-playground-theme="dark"]) .git-termina
 
 .git-terminal-out {
   /* Command output is the payload, so it takes the primary foreground the way
-     a real terminal does. Not --text-muted: applyThemePalette rebinds that to
-     the active editor theme's syntax hue, which would tint stdout blue. */
+     a real terminal does, not the secondary --text-muted. */
   color: var(--text);
 }
 
