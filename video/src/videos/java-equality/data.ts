@@ -31,6 +31,10 @@ export const FIG1 = {
 /** Fig. 2: four strings and where each one's reference points. */
 export const FIG2 = { lines: m.fig2.lines };
 
+// Fig. 2 draws the string pool as a region of the heap. Equality.java checks
+// that: interning a string built at run time stores that very heap object.
+if (!m.pool["built.intern() == built"]) throw new Error("the pool did not keep the heap object");
+
 /** One of the comparisons Equality.java ran on Fig. 2's strings. */
 export const compared = (expr: string): boolean => {
   const hit = m.fig2.compare.find((c) => c.expr === expr);

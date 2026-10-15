@@ -17,6 +17,8 @@ import { MONO } from "../../theme/fonts";
 /** Content: the blue of the data on this page. */
 export const CONTENT_FILL = `color-mix(in srgb, ${ds("blue", 500)} 24%, ${PAPER})`;
 export const CONTENT_INK = BLUE_INK;
+/** A hairline round the content, so two boxes side by side stay two. */
+const CONTENT_EDGE = `color-mix(in srgb, ${ds("blue", 500)} 60%, ${PAPER})`;
 /** Padding: green, the box's own background, set apart from the content. */
 export const PADDING_FILL = `color-mix(in srgb, ${ds("green", 500)} 26%, ${PAPER})`;
 export const PADDING_INK = ds("green", 800);
@@ -345,7 +347,16 @@ export const BoxDrawing: React.FC<{
         {border > 0 ? <rect x={br.x} y={br.y} width={br.w} height={br.h} fill={BORDER_FILL} /> : null}
         {padding > 0 ? <rect x={pr.x} y={pr.y} width={pr.w} height={pr.h} fill={PADDING_FILL} /> : null}
         {content > 0 ? (
-          <rect x={c.x} y={c.y} width={c.w} height={c.h} fill={CONTENT_FILL} opacity={Math.min(1, content * 1.5)} />
+          <rect
+            x={c.x + 0.75}
+            y={c.y + 0.75}
+            width={c.w - 1.5}
+            height={c.h - 1.5}
+            fill={CONTENT_FILL}
+            stroke={CONTENT_EDGE}
+            strokeWidth={1.5}
+            opacity={Math.min(1, content * 1.5)}
+          />
         ) : null}
       </svg>
       {children ? (

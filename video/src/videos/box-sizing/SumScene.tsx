@@ -24,9 +24,9 @@ import {
 /** Fig. 2 is the box at twice its CSS size, on the right of the listing. */
 const K = 2;
 const BOX_X = 1000;
-const BOX_TOP = 300;
+const BOX_TOP = 330;
 const LIST_X = 120;
-const LIST_TOP = 262;
+const LIST_TOP = 290;
 const LIST_W = 690;
 const CODE = 30;
 const LINES = [
@@ -37,6 +37,11 @@ const LINES = [
   `  /* box-sizing: ${BOX.boxSizing} */`,
   "}",
 ] as const;
+
+/** The sum's columns: every term as wide as the widest, so the signs fall
+ *  at an even pitch whatever the numbers are. */
+const TERM_W = 96;
+const OP_W = 34;
 
 const LAYER_INK = { border: BORDER_INK, padding: PADDING_INK, content: CONTENT_INK } as const;
 
@@ -66,7 +71,6 @@ export const SumScene: React.FC = () => {
     n.word("sum", "five", { nth: 2 }),
   ];
   const totalAt = n.word("sum", "three hundred and fifty");
-  const wideAt = n.word("sum", "wide");
 
   const shape = boxAt(BOX_X, y(BOX_TOP), BOX.content * K, h(BOX.contentHeight * K), BOX.padding * K, BOX.border * K);
   const o = outer(shape);
@@ -172,7 +176,7 @@ export const SumScene: React.FC = () => {
       </Dim>
 
       {/* The sum, term by term in the layer's own ink, under the box. */}
-      <div style={{ position: "absolute", left: o.x, top: y(690), display: "flex", alignItems: "baseline", gap: 12 }}>
+      <div style={{ position: "absolute", left: o.x, top: y(730), display: "flex", alignItems: "baseline" }}>
         {TERMS.map((t, i) => (
           <React.Fragment key={i}>
             {i > 0 ? <Op at={termAt[i] - 4} text="+" /> : null}
@@ -183,7 +187,7 @@ export const SumScene: React.FC = () => {
         <Term at={totalAt - 2} value={TERMS_SUM} color={ACCENT_INK} sub="the box" />
       </div>
 
-      <Note at={wideAt + 4} x={LIST_X} y={listBottom + 34} from="up">
+      <Note at={totalAt + 8} x={LIST_X} y={listBottom + 34} from="up">
         <div style={{ ...note(21, INK_SOFT), width: LIST_W }}>
           Read back in {BROWSER}: <Mono>getBoundingClientRect()</Mono> gives {BOX.rendered}, a child filling the content
           box gives {BOX.content}.
@@ -195,14 +199,18 @@ export const SumScene: React.FC = () => {
 
 /** One number of the sum, with the layer it measures under it. */
 const Term: React.FC<{ at: number; value: number; color: string; sub: string }> = ({ at, value, color, sub }) => (
-  <Ink at={at} dur={12} style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center" }}>
+  <Ink
+    at={at}
+    dur={12}
+    style={{ position: "relative", width: TERM_W, display: "flex", flexDirection: "column", alignItems: "center" }}
+  >
     <span style={{ ...headline(56), color, fontVariantNumeric: "tabular-nums lining-nums" }}>{value}</span>
     <span style={{ ...note(20, INK_SOFT), marginTop: 10 }}>{sub}</span>
   </Ink>
 );
 
 const Op: React.FC<{ at: number; text: string }> = ({ at, text }) => (
-  <Ink at={at} dur={10} style={{ position: "relative" }}>
+  <Ink at={at} dur={10} style={{ position: "relative", width: OP_W, textAlign: "center" }}>
     <span style={{ ...headline(48), color: INK, opacity: 0.7 }}>{text}</span>
   </Ink>
 );

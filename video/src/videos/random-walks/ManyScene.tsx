@@ -70,7 +70,7 @@ export const ManyScene: React.FC = () => {
         base={base}
         unit={unit}
         color={COLOR.a}
-        grow={(i) => ease(frame, pairsAt - 4 + Math.abs(i - (HIST.walks.length - 1) / 2) * 1.1, 12)}
+        grow={() => ease(frame, pairsAt - 4, 20)}
       />
       <Bars
         counts={HIST.walks.map((c, i) => (beyond(i, 0.5) ? c : 0))}

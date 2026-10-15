@@ -121,7 +121,7 @@ export const PayoffScene: React.FC = () => {
     <AbsoluteFill>
       <Headline kicker="Two more columns, from one query" line1="A share of the region," line2="and a running total." at={open + 2} />
       <Fig n="4" at={open + 6} y={y(FIG_Y)}>
-        A share and a running total, beside the rows
+        Two windows over the same six rows
       </Fig>
 
       <Listing

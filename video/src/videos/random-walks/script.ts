@@ -15,7 +15,8 @@ import type { NarrationScript } from "../../narration/types";
  *     seed, so it is the first pair drawn rather than a chosen one; its first
  *     walk ends 26 steps up after 300 flips, its highest point;
  *   - the two walks of that pair correlate at r = 0.844; their differences at
- *     r = 0.038;
+ *     r = 0.038; 7.4% of all pairs are past 0.8, so it is a strong pair but
+ *     far from a freak, and the narration asks rather than asserts;
  *   - across 10,000 independent pairs, 39.3% of walk correlations are beyond
  *     plus or minus 0.5 ("two in five"), and 70.2% beyond 0.25 ("seven in
  *     ten");
@@ -55,7 +56,7 @@ export const script: NarrationScript = {
     { id: "corr", text: "Yet their correlation is zero point eight four.", pauseAfter: 0.6 },
     {
       id: "many",
-      text: "That is not bad luck. Here are ten thousand pairs of independent walks.",
+      text: "Was that a fluke? Here are ten thousand pairs of independent walks.",
       pauseAfter: 0.3,
     },
     {
@@ -70,7 +71,7 @@ export const script: NarrationScript = {
     },
     {
       id: "why",
-      text: "Correlation treats every point as fresh evidence. But each point of a walk is the last one plus one flip.",
+      text: "Three hundred points feel like plenty of evidence. But each point of a walk is the last one plus one flip.",
       pauseAfter: 0.35,
     },
     {

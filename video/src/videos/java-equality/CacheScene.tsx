@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, HAIRLINE, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { MONO } from "../../theme/fonts";
@@ -114,7 +114,7 @@ export const CacheScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Fig n="4" at={start - 2} x={LEFT} y={y(108)}>
+      <Fig n="4" at={start - 5} x={LEFT} y={y(108)}>
         What autoboxing hands back
       </Fig>
 
@@ -216,12 +216,14 @@ export const CacheScene: React.FC = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          ...headline(48),
-          color: INK_SOFT,
+          gap: 10,
           opacity: ease(frame, cachedAt + 4, 12),
         }}
       >
-        …
+        {/* The values the strip leaves out, as three dots centred on the boxes. */}
+        {[0, 1, 2].map((k) => (
+          <span key={k} style={{ width: 8, height: 8, borderRadius: "50%", background: INK_SOFT }} />
+        ))}
       </div>
 
       {/* a and b: both references land on the cached 127. */}

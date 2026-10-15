@@ -385,6 +385,9 @@ export const Table: React.FC<{
   const lefts = widths.map((_, i) => widths.slice(0, i).reduce((s, w) => s + w, 0));
   const { tops, bottom } = tableRows(top, size, rs);
   const pad = 14;
+  /** Type is gone before its row or column is half closed, so a closing row
+   *  never prints over its neighbours. */
+  const vis = (k: number) => Math.max(0, (k - 0.5) / 0.5);
   const cell = (i: number): React.CSSProperties => ({
     left: x + lefts[i] + pad,
     width: cols[i].width - pad * 2,
@@ -457,7 +460,7 @@ export const Table: React.FC<{
             key={i}
             at={colAt?.[i] ?? at + 4}
             dur={12}
-            style={{ ...cell(i), top: top + 2, height: g.headH - 2, opacity: cs[i] }}
+            style={{ ...cell(i), top: top + 2, height: g.headH - 2, opacity: vis(cs[i]) }}
           >
             <span
               style={{
@@ -485,7 +488,7 @@ export const Table: React.FC<{
                     ...cell(ci),
                     top: tops[ri],
                     height: g.rowH * rs[ri],
-                    opacity: rs[ri] * cs[ci] * dimOf(ri),
+                    opacity: vis(rs[ri]) * vis(cs[ci]) * dimOf(ri),
                   }}
                 >
                   <span style={{ fontFamily: MONO, fontSize: size, whiteSpace: "nowrap", fontVariantLigatures: "none" }}>
@@ -510,7 +513,7 @@ export const Table: React.FC<{
               height: s.weight ?? 3,
               borderRadius: 2,
               background: s.color ?? LOST,
-              opacity: rs[s.row],
+              opacity: vis(rs[s.row]),
             }}
           />
         );

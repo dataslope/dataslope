@@ -3,8 +3,8 @@
 // same place, so the memoized tree collapses out of the naive one.
 
 /** Width of one leaf slot, and the x of slot 0 for the naive tree. */
-export const SLOT = 150;
-export const NAIVE_X0 = 205;
+export const SLOT = 160;
+export const NAIVE_X0 = 190;
 /** The top of depth 1, and the step down per level. */
 export const LEVEL_TOP = 216;
 export const LEVEL_STEP = 138;

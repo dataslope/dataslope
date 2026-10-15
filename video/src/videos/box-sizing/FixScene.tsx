@@ -1,12 +1,12 @@
 import React from "react";
-import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
-import { ease } from "../../components/motion";
+import { AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig } from "remotion";
+import { Illustration } from "../../components/Illustration";
+import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
-import { ds } from "../../theme/brand";
-import { BORDER_BOX, BOX, CONTENT_BOX, FILLED, ROW, UNIVERSAL } from "./data";
+import { BORDER_BOX, BOX, CONTENT_BOX, FILLED, ILLUSTRATIONS, ROW, UNIVERSAL, VIDEO } from "./data";
 import { Dim, DimLabel, Fig, Listing, listingHeight, Mono } from "./kit";
 import { CODE, column, Column, LINES, LIST_TOP, LIST_W, ROW_X, RowFrame, rowGeometry } from "./row";
 
@@ -24,6 +24,7 @@ const OK_INK = "var(--ds-green-ink)";
  */
 export const FixScene: React.FC = () => {
   const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
   const n = useNarration();
   const layout = useLayout();
   const { y } = layout;
@@ -38,6 +39,7 @@ export const FixScene: React.FC = () => {
   const fitAt = n.word("shrink", "both fit");
   const everyAt = n.word("rule", "every element");
   const topAt = n.word("rule", "top of your stylesheet");
+  const onceAt = n.word("rule", "once");
   const seeAt = n.word("rule", "width you see");
 
   const [cb1, cb2] = g.contentBox;
@@ -58,6 +60,7 @@ export const FixScene: React.FC = () => {
   const halfY = g.top - 26;
   const ruleBottom = y(LIST_TOP) + listingHeight(RULE.length, RULE_CODE);
   const seen = ease(frame, seeAt - 2, 10);
+  const art = pop(frame, onceAt - 4, fps, 16);
 
   return (
     <AbsoluteFill>
@@ -110,24 +113,19 @@ export const FixScene: React.FC = () => {
       </Note>
 
       <RowFrame g={g} height={frameH} opacity={1} />
-      <Dim x0={ROW_X} x1={ROW_X + g.width} y={halfY} at={start - 40} out={includesAt - 2}>
+      <Dim x0={ROW_X} x1={ROW_X + g.width} y={halfY} at={start - 40} out={includesAt - 10}>
         <DimLabel value={String(ROW.width)}>the row</DimLabel>
       </Dim>
       {/* What 50% means now: half the row, to each column's outer edge. */}
       {[bb1, bb2].map((b, i) => (
-        <Dim key={i} x0={b.x} x1={b.x + b.w} y={halfY} at={includesAt + i * 4}>
+        <Dim key={i} x0={b.x} x1={b.x + b.w} y={halfY} at={includesAt + 2 + i * 6}>
           <span style={{ padding: "0 6px", background: seen > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${seen * 100}%, transparent)` : undefined }}>
             <DimLabel value={String(BORDER_BOX.cols[i].width)}>
-              <Mono>{`${ROW.pct}%`}</Mono>
+              {ROW.pct}% of the row
             </DimLabel>
           </span>
         </Dim>
       ))}
-      <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: split * (1 - ease(frame, shrinkAt, 10)) }}>
-        {/* Until the columns shrink, they still run past their half. */}
-        <line x1={bb1.x + bb1.w} x2={bb1.x + bb1.w} y1={halfY + 10} y2={g.top + g.colH * 2} stroke={ACCENT_INK} strokeWidth={2} strokeDasharray="6 5" />
-      </svg>
-
       <Column
         shape={column(g, cb1.x, g.top, contentW)}
         value={CONTENT_BOX.cols[0].content}
@@ -140,6 +138,19 @@ export const FixScene: React.FC = () => {
         next={m2.content}
         swapAt={twoFiftyAt - 2}
       />
+
+      {/* Where each column now has to end, until the columns shrink to it. */}
+      <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: split * (1 - ease(frame, shrinkAt + 14, 10)) }}>
+        <line
+          x1={bb1.x + bb1.w}
+          x2={bb1.x + bb1.w}
+          y1={halfY + 12}
+          y2={g.top + g.colH * CONTENT_BOX.lines + 10}
+          stroke={ACCENT}
+          strokeWidth={3}
+          strokeDasharray="8 5"
+        />
+      </svg>
 
       <Dim
         x0={ROW_X}
@@ -160,12 +171,23 @@ export const FixScene: React.FC = () => {
           {m1.content} + {2 * BOX.padding} + {2 * BOX.border} = <b style={{ color: INK }}>{m1.width}px</b>
         </div>
       </Note>
-      <Note at={fitAt} x={RULE_X} y={g.top + 118}>
-        <div style={{ ...label(22, INK) }}>Side by side</div>
-        <div style={{ ...note(22, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>
-          {m1.width} + {m2.width} = <b style={{ color: ds("green", 800) }}>{FILLED}px</b>, the whole row
-        </div>
-      </Note>
+
+      {/* The framed picture again: a box is the size you see it. */}
+      {ILLUSTRATIONS ? (
+        <Illustration
+          video={VIDEO}
+          id="box-sizing-frame"
+          style={{
+            position: "absolute",
+            left: 1500,
+            top: y(640),
+            width: 230,
+            height: 300,
+            opacity: art,
+            transform: `translateY(${bob(frame, 5, 110) + (1 - art) * 30}px)`,
+          }}
+        />
+      ) : null}
     </AbsoluteFill>
   );
 };

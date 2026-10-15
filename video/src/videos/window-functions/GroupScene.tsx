@@ -75,7 +75,7 @@ export const GroupScene: React.FC = () => {
   // total's column closes the gap the days left.
   const dayGone = ease(frame, foldAt - 2, 12);
   const move = ease(frame, foldAt + 2, 24);
-  const others = ease(frame, foldAt + 4, 18);
+  const others = ease(frame, foldAt + 2, 14);
   // The amounts leave before the total arrives, so the two never overprint.
   const unmerge = ease(frame, foldAt + 14, 8);
   const merge = ease(frame, foldAt + 22, 10);

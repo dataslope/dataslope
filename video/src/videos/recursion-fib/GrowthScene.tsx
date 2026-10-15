@@ -82,19 +82,28 @@ export const GrowthScene: React.FC = () => {
         const isLast = i === last;
         return (
           <React.Fragment key={r.n}>
-            {i > 0 ? (
-              <div
-                style={{
-                  position: "absolute",
-                  left: LEFT,
-                  top: rowTop(i),
-                  width: (RIGHT - LEFT) * ease(frame, at - 6, 12),
-                  height: 1,
-                  background: HAIRLINE,
-                  opacity: 0.5,
-                }}
-              />
-            ) : null}
+            {/* Row rules break around the brackets, so no rule runs through a ratio. */}
+            {i > 0
+              ? (
+                  [
+                    [LEFT, BRACKET_X - 16],
+                    [BRACKET_X + 140, RIGHT],
+                  ] as const
+                ).map(([x0, x1]) => (
+                  <div
+                    key={x0}
+                    style={{
+                      position: "absolute",
+                      left: x0,
+                      top: rowTop(i),
+                      width: (x1 - x0) * ease(frame, at - 6, 12),
+                      height: 1,
+                      background: HAIRLINE,
+                      opacity: 0.5,
+                    }}
+                  />
+                ))
+              : null}
             <Ink at={at - 6} dur={12} style={{ ...cell(i), left: LEFT, width: N_R - LEFT, justifyContent: "flex-end" }}>
               <span style={{ ...headline(56), color: INK_SOFT, fontVariantNumeric: "tabular-nums lining-nums" }}>{r.n}</span>
             </Ink>
@@ -130,7 +139,7 @@ export const GrowthScene: React.FC = () => {
 
       {/* Each row over the one above it: a bracket from row to row. */}
       {RATIOS.map((ratio, i) => {
-        const p = ease(frame, multipliesAt - 4 + i * 4, 12);
+        const p = ease(frame, Math.max(multipliesAt - 4 + i * 4, rowAt[i + 1] - 2), 12);
         if (p <= 0) return null;
         const y0 = rowTop(i) + rowH / 2;
         const y1 = rowTop(i + 1) + rowH / 2;
@@ -162,11 +171,14 @@ export const GrowthScene: React.FC = () => {
         );
       })}
 
-      <Note at={billionAt} x={LEFT} y={rowTop(ROWS.length) + h(26)} from="up">
-        <span style={note(21, INK_SOFT)}>
-          Calls counted by a copy of <Mono>fib</Mono> with a counter. Times: {MACHINE.compiler} with -O2, one core of a
-          shared cloud machine ({MACHINE.cpu}), the best of {MACHINE.rounds} runs ({MACHINE.roundsSlow} for n = 50).
-        </span>
+      <Note at={billionAt} x={LEFT} y={rowTop(ROWS.length) + h(26)} from="up" width={RIGHT - LEFT}>
+        <div style={note(21, INK_SOFT)}>
+          Calls counted by a copy of <Mono>fib</Mono> that adds one to a counter on every call.
+        </div>
+        <div style={{ ...note(21, INK_SOFT), marginTop: 6 }}>
+          Times: {MACHINE.compiler} with -O2 on one core of a shared cloud machine ({MACHINE.cpu}), the best of{" "}
+          {MACHINE.rounds} timing rounds, or {MACHINE.roundsSlow} for n&nbsp;=&nbsp;{ROWS[last].n}.
+        </div>
       </Note>
     </AbsoluteFill>
   );

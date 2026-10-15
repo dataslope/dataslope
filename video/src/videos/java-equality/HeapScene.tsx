@@ -99,13 +99,13 @@ export const HeapScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Fig n="2" at={start - 2} x={LEFT} y={y(108)}>
+      <Fig n="2" at={start - 5} x={LEFT} y={y(108)}>
         What a <Mono>String</Mono> variable holds
       </Fig>
 
       {/* Column heads and the line between stack and heap. */}
-      <Ink at={Math.max(start - 2, variableAt - 6)} dur={14} style={{ left: CELL_X - 18, top: y(HEADS) }}>
-        <span style={label(21, INK_SOFT)}>Stack frame of main</span>
+      <Ink at={Math.max(start - 5, variableAt - 6)} dur={14} style={{ left: CELL_X - 18, top: y(HEADS) }}>
+        <span style={label(21, INK_SOFT)}>Stack frame</span>
       </Ink>
       <Ink at={heapAt - 4} dur={14} style={{ left: HEAP_X, top: y(HEADS) }}>
         <span style={label(21, INK_SOFT)}>Heap</span>
@@ -116,7 +116,7 @@ export const HeapScene: React.FC = () => {
           left: DIVIDE,
           top: y(HEADS),
           width: 1,
-          height: (rowTop(3) + rowH + 10 - y(HEADS)) * ease(frame, Math.max(start - 2, variableAt - 4), 20),
+          height: (rowTop(3) + rowH + 10 - y(HEADS)) * ease(frame, Math.max(start - 5, variableAt - 4), 20),
           background: HAIRLINE,
         }}
       />
@@ -132,7 +132,7 @@ export const HeapScene: React.FC = () => {
           border: `1.5px solid ${HAIRLINE}`,
           borderRadius: 8,
           background: `color-mix(in srgb, ${INK} 2%, ${PAPER})`,
-          opacity: ease(frame, Math.max(start - 2, variableAt - 6), 14),
+          opacity: ease(frame, Math.max(start - 5, variableAt - 6), 14),
         }}
       />
 

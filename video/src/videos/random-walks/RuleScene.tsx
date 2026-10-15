@@ -9,7 +9,7 @@ import { ADF_DIFF, ADF_WALK, dec, DIFF_A, WALK_A } from "./data";
 import { COLOR, PASS_INK, prose, Spot } from "./parts";
 
 const LEFT = 120;
-const COL = { name: LEFT + 230, p: 700, verdict: 960 };
+const COL = { name: LEFT + 230, p: 700, verdict: 1000 };
 const SPARK_W = 190;
 const SPARK_H = 56;
 /** The thumbnail of the differences shows the first flips, at a width where
@@ -63,8 +63,8 @@ export const RuleScene: React.FC = () => {
   const diffsAt = n.word("rule", "Its differences");
   const passAt = n.word("rule", "pass");
 
-  const head = y(370);
-  const row = (i: number) => y(440) + i * 104;
+  const head = y(400);
+  const row = (i: number) => y(470) + i * 104;
   const rows = [
     { at: walkAt, verdictAt: failsAt, spark: "walk" as const, name: "Walk a", p: dec(ADF_WALK), verdict: "non-stationary", ink: ACCENT_INK },
     {
@@ -110,7 +110,7 @@ export const RuleScene: React.FC = () => {
             </div>
             <div style={{ height: 1, background: HAIRLINE, marginTop: 14 }} />
           </Ink>
-          <Note at={r.verdictAt} x={COL.verdict} y={row(i) + 20}>
+          <Note at={r.verdictAt} x={COL.verdict} y={row(i) + 13}>
             <span style={{ ...headline(44, true), color: r.ink, whiteSpace: "nowrap" }}>{r.verdict}</span>
           </Note>
         </React.Fragment>

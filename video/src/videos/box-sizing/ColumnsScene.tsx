@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
@@ -204,7 +204,7 @@ export const ColumnsScene: React.FC = () => {
           style={{
             position: "absolute",
             left: 1330,
-            top: y(660),
+            top: y(720),
             width: 460,
             height: 206,
             opacity: art,
@@ -227,11 +227,17 @@ const Overflow: React.FC<{ x0: number; x1: number; top: number; height: number; 
   out,
 }) => {
   const frame = useCurrentFrame();
+  const hatch = useId().replace(/:/g, "");
   const p = ease(frame, at, 10) * (1 - ease(frame, out, 12));
   if (p <= 0) return null;
   return (
     <svg width={W} height={H} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: p }}>
-      <rect x={x0} y={top} width={x1 - x0} height={height} fill={`color-mix(in srgb, ${ACCENT} 30%, transparent)`} />
+      <defs>
+        <pattern id={hatch} width={12} height={12} patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+          <line x1={0} y1={0} x2={0} y2={12} stroke={ACCENT} strokeWidth={3} />
+        </pattern>
+      </defs>
+      <rect x={x0} y={top} width={x1 - x0} height={height} fill={`url(#${hatch})`} opacity={0.75} />
       <line x1={x0} x2={x0} y1={top - 12} y2={top + height + 12} stroke={ACCENT} strokeWidth={3} strokeDasharray="8 5" />
     </svg>
   );

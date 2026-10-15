@@ -6,6 +6,9 @@ import { MEMO, MEMO_INK, NAIVE, NAIVE_INK } from "./kit";
 
 /** One call in a drawn call tree: a pill with `fib(n)` set in mono. */
 export const NODE_W = 112;
+/** A node renamed `fibMemo(n)` is this wide, its text this size. */
+export const MEMO_NODE_W = 146;
+const MEMO_TEXT = 21;
 export const NODE_H = 46;
 const TEXT = 24;
 
@@ -23,7 +26,8 @@ const LOOK: Record<NodeLook, { fill: string; stroke: string; ink: string; dash?:
  * A node, centred on `x` with its top at `top` (page px, already through the
  * layout). `look` fades from `from` to `to` by `mix` (0..1), so a node can
  * turn red or blue in place. `ring` (0..1) draws an accent ring around it;
- * `glow` (0..1) lays a highlighter wash behind it.
+ * `glow` (0..1) lays a highlighter wash behind it. `rename` (0..1) turns its
+ * label from `fib(n)` into `fibMemo(n)`, widening the pill to fit.
  */
 export const TreeNode: React.FC<{
   n: number;
@@ -36,8 +40,10 @@ export const TreeNode: React.FC<{
   ring?: number;
   glow?: number;
   opacity?: number;
-}> = ({ n, x, top, appear, from = "call", to, mix = 0, ring = 0, glow = 0, opacity = 1 }) => {
+  rename?: number;
+}> = ({ n, x, top, appear, from = "call", to, mix = 0, ring = 0, glow = 0, opacity = 1, rename = 0 }) => {
   if (appear <= 0 || opacity <= 0) return null;
+  const w = NODE_W + (MEMO_NODE_W - NODE_W) * rename;
   const a = LOOK[from];
   const b = LOOK[to ?? from];
   const m = Math.round(Math.min(1, Math.max(0, mix)) * 100);
@@ -47,9 +53,9 @@ export const TreeNode: React.FC<{
     <div
       style={{
         position: "absolute",
-        left: x - NODE_W / 2,
+        left: x - w / 2,
         top,
-        width: NODE_W,
+        width: w,
         height: NODE_H,
         opacity: appear * opacity,
         transform: `scale(${0.86 + 0.14 * appear})`,
@@ -66,11 +72,11 @@ export const TreeNode: React.FC<{
           }}
         />
       ) : null}
-      <svg width={NODE_W} height={NODE_H} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
+      <svg width={w} height={NODE_H} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
         <rect
           x={1.5}
           y={1.5}
-          width={NODE_W - 3}
+          width={w - 3}
           height={NODE_H - 3}
           rx={(NODE_H - 3) / 2}
           fill={blend(a.fill, b.fill)}
@@ -82,7 +88,7 @@ export const TreeNode: React.FC<{
           <rect
             x={-6}
             y={-6}
-            width={NODE_W + 12}
+            width={w + 12}
             height={NODE_H + 12}
             rx={(NODE_H + 12) / 2}
             fill="none"
@@ -93,23 +99,34 @@ export const TreeNode: React.FC<{
           />
         ) : null}
       </svg>
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontFamily: MONO,
-          fontSize: TEXT,
-          fontWeight: 500,
-          fontVariantLigatures: "none",
-          color: blend(a.ink, b.ink),
-          whiteSpace: "pre",
-        }}
-      >
-        fib({n})
-      </div>
+      {(
+        [
+          ["fib", TEXT, 1 - rename],
+          ["fibMemo", MEMO_TEXT, rename],
+        ] as const
+      ).map(([name, size, o]) =>
+        o <= 0 ? null : (
+          <div
+            key={name}
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontFamily: MONO,
+              fontSize: size,
+              fontWeight: 500,
+              fontVariantLigatures: "none",
+              color: blend(a.ink, b.ink),
+              whiteSpace: "pre",
+              opacity: o,
+            }}
+          >
+            {name}({n})
+          </div>
+        ),
+      )}
     </div>
   );
 };

@@ -19,15 +19,15 @@ export const MEMO_LINES = [
   "  return memo[n] = fibMemo(n - 1, memo) + fibMemo(n - 2, memo);",
   "}",
 ] as const;
-const SIZE = 28;
+const SIZE = 30;
 const LIST_X = 120;
-const LIST_W = 1180;
+const LIST_W = 1250;
 const LIST_TOP = 352;
 /** The memo vector, drawn as a column of cells to the right. */
-const TABLE_X = 1420;
+const TABLE_X = 1440;
 const INDEX_W = 130;
 const CELL_W = 120;
-const CELL_H = 52;
+const CELL_H = 56;
 
 /**
  * The fix: the lesson's memoized fibMemo, the two lines that check the table

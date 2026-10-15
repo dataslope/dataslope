@@ -30,6 +30,7 @@ export const CollapseScene: React.FC = () => {
   const nineAt = n.word("collapse", "nine");
 
   const cut = ease(frame, branchAt - 2, 16);
+  const rename = ease(frame, branchAt + 8, 14);
   const turn = ease(frame, tableAt - 4, 12);
   const close = ease(frame, collapsesAt - 4, 22);
 
@@ -85,6 +86,7 @@ export const CollapseScene: React.FC = () => {
             to={hit ? "lookup" : m ? "call" : "repeat"}
             mix={turn}
             opacity={m ? 1 : 1 - cut}
+            rename={m ? rename : 0}
           />
         );
       })}

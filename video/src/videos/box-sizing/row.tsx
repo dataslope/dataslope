@@ -15,8 +15,8 @@ import { boxAt, BoxDrawing, type BoxShape, CONTENT_INK } from "./kit";
 export const K = 1.6;
 export const ROW_X = 120;
 /** The row's top, before `y()`. */
-const ROW_TOP = 480;
-export const LIST_TOP = 250;
+const ROW_TOP = 540;
+export const LIST_TOP = 268;
 export const CODE = 26;
 export const LIST_W = 980;
 export const LINES = [

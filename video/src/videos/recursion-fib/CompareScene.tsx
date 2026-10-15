@@ -89,8 +89,8 @@ export const CompareScene: React.FC = () => {
       {/* Group headings, each with a rule in its series color. */}
       {(
         [
-          ["naive", "Naive fib", NAIVE, NAIVE_INK, start - 10],
-          ["memo", "With the memo", MEMO, MEMO_INK, ninetyAt - 8],
+          ["naive", <>Naive <Mono>fib</Mono></>, NAIVE, NAIVE_INK, start - 10],
+          ["memo", <>With the memo</>, MEMO, MEMO_INK, ninetyAt - 8],
         ] as const
       ).map(([key, title, color, ink, at]) => (
         <Ink key={key} at={at} dur={14} style={{ left: GROUP[key][0], top: y(GROUP_Y), width: GROUP[key][1] - GROUP[key][0] }}>
@@ -176,7 +176,7 @@ export const CompareScene: React.FC = () => {
       </Note>
       <Note at={microAt + 10} x={LEFT} y={y(FOOT_Y)} from="up">
         <span style={note(20, INK_SOFT)}>
-          Same machine and method as Fig. 3: {MACHINE.compiler}, -O2, best of {MACHINE.rounds} runs. Memo times include
+          Same machine and method as Fig. 3: {MACHINE.compiler}, -O2, best of {MACHINE.rounds} timing rounds. Memo times include
           making the table.
         </span>
       </Note>
@@ -186,7 +186,8 @@ export const CompareScene: React.FC = () => {
         <div style={{ height: 2, background: INK, width: 140, marginBottom: 24 }} />
         <div style={{ ...label(22, ACCENT_INK), marginBottom: 14 }}>The seed of dynamic programming</div>
         <div style={{ ...headline(52, true), color: INK, lineHeight: 1.14 }}>
-          When a recursion asks the same question twice, keep the first answer.
+          <div>When a recursion asks the same question twice,</div>
+          <div>keep the first answer.</div>
         </div>
       </Ink>
       {ILLUSTRATIONS ? (

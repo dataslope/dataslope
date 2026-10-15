@@ -32,7 +32,7 @@ export const WhyScene: React.FC = () => {
   const { y, h } = useLayout();
   const yOf = useValueY(WALK);
   const start = n.beat("why").from;
-  const everyAt = n.word("why", "every point");
+  const everyAt = n.word("why", "Three hundred points");
   const eachAt = n.word("why", "each point");
   const plusAt = n.word("why", "plus one flip");
   const subtractAt = n.word("diff", "Subtract");
@@ -54,18 +54,24 @@ export const WhyScene: React.FC = () => {
       <FigLabel n="4" title="Walk a, and its differences" at={start - 2} x={120} y={y(196)} out={leave} />
 
       <ValueGrid scale={X} spec={WALK} at={start - 2} title="Walk a, steps from the start" />
-      {/* The worked example's stretch, as one band through both panels. */}
-      <div
-        style={{
-          position: "absolute",
-          left: sx(X, 0) - 8,
-          width: sx(X, SHOWN - 1) - sx(X, 0) + 16,
-          top: y(WALK.top) - 10,
-          height: y(WALK.bottom) - y(WALK.top) + 30 + (mid + half - y(WALK.bottom)) * ease(frame, flipsAt - 8, 10),
-          background: HIGHLIGHT,
-          opacity: shown * 0.6,
-        }}
-      />
+      {/* The worked example's stretch, marked in both panels. */}
+      {[
+        { top: y(WALK.top) - 10, bottom: y(WALK.bottom) + 10, p: shown },
+        { top: mid - half - 10, bottom: mid + half + 10, p: shown * ease(frame, flipsAt - 8, 10) },
+      ].map((b, i) => (
+        <div
+          key={i}
+          style={{
+            position: "absolute",
+            left: sx(X, 0) - 8,
+            width: sx(X, SHOWN - 1) - sx(X, 0) + 16,
+            top: b.top,
+            height: b.bottom - b.top,
+            background: HIGHLIGHT,
+            opacity: b.p * 0.6,
+          }}
+        />
+      ))}
       <Layer>
         <path
           d={walkD(WALK_A, X, yOf, STEPS * ease(frame, start - 2, 24))}
@@ -198,7 +204,7 @@ export const WhyScene: React.FC = () => {
         </div>
       </Note>
       <Note at={backAt + 10} x={RIGHT} y={mid + 90} width={540}>
-        <span style={prose(20)}>{STEPS} differences, and each one is exactly a flip of the coin.</span>
+        <span style={prose(20)}>{STEPS} differences, each one exactly a flip.</span>
       </Note>
     </AbsoluteFill>
   );
