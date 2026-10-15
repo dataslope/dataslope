@@ -42,13 +42,12 @@ export const body = (size: number, italic = false): React.CSSProperties => ({
   color: INK_SOFT,
 });
 
-/** Inter small caps: kickers, figure labels and axis titles. */
-export const smallCaps = (size = 17, color: string = INK_SOFT): React.CSSProperties => ({
+/** Inter semibold in sentence case: kickers, figure numbers and axis
+ *  titles. Never tracked capitals, which shout and blur at small sizes. */
+export const label = (size = 21, color: string = INK_SOFT): React.CSSProperties => ({
   fontFamily: SANS,
   fontSize: size,
   fontWeight: 650,
-  letterSpacing: "0.16em",
-  textTransform: "uppercase",
   color,
 });
 

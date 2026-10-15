@@ -7,18 +7,21 @@ import { NarrationAudio } from "../../narration/NarrationAudio";
 import { NarrationProvider, useNarration } from "../../narration/NarrationContext";
 import { ds } from "../../theme/brand";
 import { BuildScene } from "./BuildScene";
-import { OutroScene } from "./OutroScene";
 import { ShapesScene } from "./ShapesScene";
 import { SpreadScene } from "./SpreadScene";
 import { ThumbScene } from "./ThumbScene";
 import { SERIF } from "./fonts";
 import { INK, PAPER } from "./style";
-import { Masthead, Paper } from "./ui";
+import { Paper } from "./ui";
 
 /** Frames a scene is up before its beat's first word. */
 const LEAD = 8;
 /** Frames each scene stays up into the next, so cuts cross-fade. */
 const OVERLAP = 6;
+/** How far every scene sits above where it was laid out, in px. The pages
+ *  were drawn under a running head; without one, the content and the
+ *  captions move up a little and the top of the page gets the air. */
+const LIFT = 24;
 
 /**
  * "The Central Limit Theorem" (16:9), as a print magazine's science pages:
@@ -44,11 +47,8 @@ const Scenes: React.FC = () => {
       <Scene from={cut("thumb")} to={until(cut("spread"))} fade={6}>
         <ThumbScene />
       </Scene>
-      <Scene from={cut("spread")} to={until(cut("outro"))} fade={6}>
+      <Scene from={cut("spread")} to={durationInFrames + OVERLAP} fade={6}>
         <SpreadScene />
-      </Scene>
-      <Scene from={cut("outro")} to={durationInFrames + OVERLAP} fade={6}>
-        <OutroScene />
       </Scene>
     </>
   );
@@ -60,8 +60,9 @@ export const CentralLimitTheorem: React.FC<NarratedProps> = ({ timeline, caption
     <NarrationProvider timeline={timeline}>
       <AbsoluteFill style={{ background: PAPER }}>
         <Paper />
-        <Masthead />
-        <Scenes />
+        <AbsoluteFill style={{ transform: `translateY(${-LIFT}px)` }}>
+          <Scenes />
+        </AbsoluteFill>
         <NarrationAudio />
         {captions ? (
           <Captions
@@ -74,7 +75,7 @@ export const CentralLimitTheorem: React.FC<NarratedProps> = ({ timeline, caption
               highlight: "var(--ds-blue-ink)",
               background: `color-mix(in srgb, ${PAPER} 94%, transparent)`,
               radius: 0,
-              bottom: 34,
+              bottom: 52,
               maxWidth: 1480,
               box: {
                 padding: "12px 44px 14px",

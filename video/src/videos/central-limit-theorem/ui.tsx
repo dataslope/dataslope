@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { ds } from "../../theme/brand";
 import { SERIF } from "./fonts";
-import { ACCENT_INK, HAIRLINE, INK, INK_SOFT, PAPER, smallCaps } from "./style";
+import { ACCENT_INK, INK, PAPER, label } from "./style";
 
 export const W = 1920;
 export const H = 1080;
@@ -48,6 +48,9 @@ export const Paper: React.FC = () => (
   </AbsoluteFill>
 );
 
+/** Room the ink-in mask leaves around its glyphs, in px. */
+const INK_BLEED = 40;
+
 /**
  * A soft left-to-right wipe with a brief blur, the way ink soaks into paper.
  * `out` (optional) fades the block away again.
@@ -70,6 +73,16 @@ export const Ink: React.FC<{
     <div
       style={{
         position: "absolute",
+        // A mask paints only inside the element's own box, and type set at a
+        // line height near 1 hangs its descenders (g, p, y) and italic
+        // overhangs outside it, so they were invisible until the reveal
+        // finished and the mask came off. The bleed grows the box around the
+        // glyphs without moving them. content-box keeps a caller's `width`
+        // the width of the text: under border-box the padding came out of
+        // it, and every sized block lost 80px.
+        padding: INK_BLEED,
+        margin: -INK_BLEED,
+        boxSizing: "content-box",
         WebkitMaskImage: p < 1 ? mask : undefined,
         maskImage: p < 1 ? mask : undefined,
         filter: p < 1 ? `blur(${(1 - p) * 1.6}px)` : undefined,
@@ -172,7 +185,7 @@ export const Leader: React.FC<{
   );
 };
 
-/** "FIG. 1" and its title, the way a magazine numbers its figures. */
+/** "Fig. 1" and its title, the way a magazine numbers its figures. */
 export const FigLabel: React.FC<{
   n: string;
   title: string;
@@ -181,9 +194,9 @@ export const FigLabel: React.FC<{
   y: number;
   out?: number;
   size?: number;
-}> = ({ n, title, at, x, y, out, size = 25 }) => (
+}> = ({ n, title, at, x, y, out, size = 28 }) => (
   <Ink at={at} out={out} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16 }}>
-    <span style={{ ...smallCaps(15, ACCENT_INK), fontWeight: 750, letterSpacing: "0.2em" }}>Fig. {n}</span>
+    <span style={{ ...label(21, ACCENT_INK), fontWeight: 750 }}>Fig. {n}</span>
     <span
       style={{
         fontFamily: SERIF,
@@ -198,66 +211,3 @@ export const FigLabel: React.FC<{
     </span>
   </Ink>
 );
-
-/** The running head at the top of every page: a section name, the story's
- *  title and a thick-over-thin rule that draws in on the first frames. */
-export const Masthead: React.FC<{ fade?: number }> = ({ fade = 1 }) => {
-  const frame = useCurrentFrame();
-  const rule = ease(frame, 0, 22);
-  const text = ease(frame, 6, 16);
-  const span = W - MARGIN * 2;
-  return (
-    <AbsoluteFill style={{ opacity: fade, pointerEvents: "none" }}>
-      <div
-        style={{
-          position: "absolute",
-          left: MARGIN,
-          top: 40,
-          width: span,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "baseline",
-          opacity: text,
-        }}
-      >
-        <span style={{ ...smallCaps(15, INK), fontWeight: 800, letterSpacing: "0.24em" }}>
-          Dataslope <span style={{ color: INK_SOFT, fontWeight: 600 }}>· Statistics</span>
-        </span>
-        <span
-          style={{
-            fontFamily: SERIF,
-            fontStyle: "italic",
-            fontSize: 21,
-            fontVariationSettings: `"opsz" 24`,
-            color: INK_SOFT,
-          }}
-        >
-          The Central Limit Theorem
-        </span>
-        <span style={{ ...smallCaps(15, INK_SOFT), letterSpacing: "0.2em" }}>
-          Sampling distributions
-        </span>
-      </div>
-      <div
-        style={{
-          position: "absolute",
-          left: MARGIN,
-          top: 72,
-          width: span * rule,
-          height: 2.5,
-          background: INK,
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          left: MARGIN + span * (1 - rule),
-          top: 78,
-          width: span * rule,
-          height: 1,
-          background: HAIRLINE,
-        }}
-      />
-    </AbsoluteFill>
-  );
-};

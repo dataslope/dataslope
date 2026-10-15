@@ -5,7 +5,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Axis, Bars, NormalCurve, sx, type XScale } from "./charts";
 import { histogram, INCOME_MEANS, MEANS_30, mean, SAMPLE_COUNT, sd, skew } from "./data";
 import { SERIF } from "./fonts";
-import { ACCENT, ACCENT_INK, body, fmt, halo, headline, INK, INK_SOFT, note, smallCaps } from "./style";
+import { ACCENT, ACCENT_INK, body, fmt, halo, headline, INK, INK_SOFT, note, label } from "./style";
 import { FigLabel, Ink, Leader, Note } from "./ui";
 
 const X0 = 980;
@@ -85,7 +85,7 @@ export const ThumbScene: React.FC = () => {
     <AbsoluteFill>
       {/* The pull quote, and its correction. */}
       <Ink at={start - 14} dur={14} style={{ left: 196, top: 112 }}>
-        <span style={smallCaps(16, ACCENT_INK)}>What you will hear</span>
+        <span style={label(20, ACCENT_INK)}>What you will hear</span>
       </Ink>
       <Ink at={start - 12} dur={14} style={{ left: 84, top: 150, ...headline(240), color: ACCENT, opacity: 0.85 }}>
         “
@@ -111,7 +111,7 @@ export const ThumbScene: React.FC = () => {
         enough.”
       </Ink>
       <Note at={alwaysAt + 2} x={200} y={356}>
-        <span style={note(19, INK_SOFT)}>the n ≥ 30 rule</span>
+        <span style={note(22, INK_SOFT)}>the n ≥ 30 rule</span>
       </Note>
       <Ink at={thumbAt - 2} dur={18} style={{ left: 196, top: 430, ...headline(50) }}>
         A rule of thumb,
@@ -120,13 +120,13 @@ export const ThumbScene: React.FC = () => {
         not a law.
       </Ink>
       <Ink at={lawAt + 8} dur={18} style={{ left: 198, top: 584, width: 620 }}>
-        <div style={{ ...body(25), color: INK }}>
+        <div style={{ ...body(27), color: INK }}>
           How much averaging the bell needs depends on the population. A mild skew settles near thirty. A
           heavy tail can need hundreds.
         </div>
       </Ink>
 
-      <FigLabel n="4" title="Averages against the normal curve" at={start - 12} x={X0} y={104} size={24} />
+      <FigLabel n="4" title="Averages against the normal curve" at={start - 12} x={X0} y={104} size={27} />
       {ROWS.map((r, i) => {
         const c = cues[i];
         const t = tags[i];
@@ -135,12 +135,12 @@ export const ThumbScene: React.FC = () => {
         return (
           <React.Fragment key={r.letter}>
             <Ink at={c.at - 6} dur={14} style={{ left: X0, top: r.top, whiteSpace: "nowrap" }}>
-              <span style={{ ...smallCaps(14, ACCENT_INK), marginRight: 12 }}>{r.letter}</span>
-              <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 26, color: INK }}>{r.title}</span>
+              <span style={{ ...label(19, ACCENT_INK), marginRight: 12 }}>{r.letter}</span>
+              <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 28, color: INK }}>{r.title}</span>
             </Ink>
             {r.off > 0 ? (
               <Note at={c.tag + 8} x={X1} y={r.top + 6} align="right">
-                <span style={note(15, INK_SOFT)}>{r.off} averages run past the right edge</span>
+                <span style={note(20, INK_SOFT)}>{r.off} averages run past the right edge</span>
               </Note>
             ) : null}
             <Bars
@@ -152,7 +152,7 @@ export const ThumbScene: React.FC = () => {
               unit={r.unit}
               grow={(b) => ease(frame, c.at + b * 0.6, 12)}
             />
-            <Axis scale={r.scale} base={r.base} ticks={r.ticks} format={r.format} at={c.at - 4} size={15} />
+            <Axis scale={r.scale} base={r.base} ticks={r.ticks} format={r.format} at={c.at - 4} size={20} />
             <NormalCurve
               scale={r.scale}
               base={r.base}
@@ -175,8 +175,8 @@ export const ThumbScene: React.FC = () => {
               />
             ) : null}
             <Note at={c.tag} x={tagX} y={r.base - 150}>
-              <div style={{ ...smallCaps(14, t.tone), ...halo }}>{t.head}</div>
-              <div style={{ ...note(16, INK_SOFT), ...halo }}>{t.sub(r)}</div>
+              <div style={{ ...label(19, t.tone), ...halo }}>{t.head}</div>
+              <div style={{ ...note(20, INK_SOFT), ...halo }}>{t.sub(r)}</div>
             </Note>
           </React.Fragment>
         );

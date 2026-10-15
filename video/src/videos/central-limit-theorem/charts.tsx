@@ -63,7 +63,7 @@ export const Axis: React.FC<{
   at: number;
   opacity?: number;
   size?: number;
-}> = ({ scale, base, ticks, format = (v) => String(v), title, at, opacity = 1, size = 17 }) => {
+}> = ({ scale, base, ticks, format = (v) => String(v), title, at, opacity = 1, size = 21 }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 16);
   const t = ease(frame, at + 6, 12);
@@ -101,10 +101,8 @@ export const Axis: React.FC<{
             textAnchor="end"
             style={{
               fontFamily: SANS,
-              fontSize: 14,
+              fontSize: 19,
               fontWeight: 650,
-              letterSpacing: "0.16em",
-              textTransform: "uppercase",
               fill: INK_SOFT,
             }}
           >

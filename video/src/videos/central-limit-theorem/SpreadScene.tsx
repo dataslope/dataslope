@@ -17,7 +17,7 @@ import {
   INK,
   INK_SOFT,
   note,
-  smallCaps,
+  label,
 } from "./style";
 import { FigLabel, Ink, Leader, Note } from "./ui";
 
@@ -69,7 +69,7 @@ export const SpreadScene: React.FC = () => {
       >
         the tighter the pile.
       </Ink>
-      <FigLabel n="5" title="Average wait, samples of 5, 30 and 100" at={start - 8} x={120} y={186} size={23} />
+      <FigLabel n="5" title="Average wait, samples of 5, 30 and 100" at={start - 8} x={120} y={186} size={26} />
 
       {ROWS.map((r, i) => {
         const at = start - 10 + i * 6;
@@ -101,7 +101,7 @@ export const SpreadScene: React.FC = () => {
               ticks={i === 2 ? TICKS : []}
               format={(v) => (v === 25 ? "25 min" : String(v))}
               at={at - 2}
-              size={16}
+              size={20}
             />
             {b > 0 ? (
               <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
@@ -113,7 +113,7 @@ export const SpreadScene: React.FC = () => {
               </svg>
             ) : null}
             <Note at={bracketAt + 8} x={x1 + 12} y={y - 13}>
-              <span style={{ ...note(18, said > 0 ? ACCENT_INK : INK_SOFT), ...halo }}>± {fmt(r.spread)}</span>
+              <span style={{ ...note(22, said > 0 ? ACCENT_INK : INK_SOFT), ...halo }}>± {fmt(r.spread)}</span>
             </Note>
           </React.Fragment>
         );
@@ -132,14 +132,14 @@ export const SpreadScene: React.FC = () => {
         dash="7 6"
       />
       <Note at={tenAt + 2} x={sx(X, 10) + 10} y={BASES[0] - ROW_H - 22}>
-        <span style={note(17, ACCENT_INK)}>10 min</span>
+        <span style={note(21, ACCENT_INK)}>10 min</span>
       </Note>
 
       {/* The table: simulated spread beside the theorem's prediction. */}
       <Ink at={start + 14} dur={16} style={{ left: TABLE_X, top: TABLE_TOP, width: 530 }}>
         <div style={{ position: "relative", height: 34 }}>
-          <span style={{ ...smallCaps(14, INK_SOFT), position: "absolute", left: 0 }}>Sample size</span>
-          <span style={{ ...smallCaps(14, INK_SOFT), position: "absolute", left: COLS[1] - TABLE_X }}>
+          <span style={{ ...label(19, INK_SOFT), position: "absolute", left: 0 }}>Sample size</span>
+          <span style={{ ...label(19, INK_SOFT), position: "absolute", left: COLS[1] - TABLE_X }}>
             Simulated spread
           </span>
           <span
@@ -149,8 +149,9 @@ export const SpreadScene: React.FC = () => {
               top: -10,
               fontFamily: SERIF,
               fontStyle: "italic",
-              fontSize: 26,
+              fontSize: 28,
               color: INK,
+              whiteSpace: "nowrap",
             }}
           >
             σ ÷ √n
@@ -219,22 +220,22 @@ export const SpreadScene: React.FC = () => {
         );
       })}
       <Note at={numbersFrom + 10} x={TABLE_X} y={TABLE_TOP + 44 + 3 * ROW_STEP + 12} width={530}>
-        <span style={note(16, INK_SOFT)}>
-          Standard deviation of 2,000 sample averages, in minutes.
+        <span style={note(20, INK_SOFT)}>
+          Standard deviation of 2,000 averages, in minutes.
         </span>
       </Note>
 
       {/* The rule. */}
       <Ink at={ruleFrom - 4} dur={18} style={{ left: TABLE_X, top: 548, width: 530 }}>
         <div style={{ height: 1, background: INK, marginBottom: 18 }} />
-        <div style={smallCaps(15, ACCENT_INK)}>The rule</div>
+        <div style={label(20, ACCENT_INK)}>The rule</div>
         <div style={{ ...body(30), color: INK, marginTop: 10 }}>
           Spread of the average
         </div>
         <div style={{ ...headline(76, true), marginTop: 6 }}>
           = σ ÷ √<span style={{ fontStyle: "italic" }}>n</span>
         </div>
-        <div style={{ ...note(17, INK_SOFT), marginTop: 8 }}>
+        <div style={{ ...note(21, INK_SOFT), marginTop: 8 }}>
           σ, the population&apos;s spread, is {fmt(WAIT_SD)} min.
         </div>
       </Ink>

@@ -70,6 +70,23 @@ Register a new composition in `src/Root.tsx` with
 `calculateMetadata={narratedMetadata(script)}` so its length follows the
 narration.
 
+## What goes on screen
+
+`CentralLimitTheorem` follows these rules; the six earlier videos predate them.
+
+- **Content only.** No running head or masthead, and no branded end card. The
+  video starts on its first idea and stops on its last.
+- **No tracked capitals.** Kickers, figure numbers and axis titles are set in
+  sentence case. All caps with wide letter spacing shouts, and it blurs at
+  small sizes.
+- **Nothing under 19px** on the 1080p layout, which is about the smallest that
+  still reads on a phone. Running text and notes sit at 20px and up.
+- **Reveals keep their descenders.** A mask paints only inside its element's
+  box, and a line box set near `line-height: 1` cuts off g, p and y until the
+  mask comes off. Give a masked wrapper some padding with a matching negative
+  margin, and set `box-sizing: content-box` so a `width` on it still means
+  the width of the text.
+
 ## Narration and timing
 
 A script is a list of **beats**, each a sentence or two with a stable `id`.

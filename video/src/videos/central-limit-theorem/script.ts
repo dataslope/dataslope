@@ -80,11 +80,6 @@ export const script: NarrationScript = {
     {
       id: "rule",
       text: "The spread is the population's spread over the square root of n. Four times the data halves it.",
-      pauseAfter: 0.6,
-    },
-    {
-      id: "outro",
-      text: "Run the simulation yourself in the Dataslope lesson on the Central Limit Theorem.",
     },
   ],
 };
