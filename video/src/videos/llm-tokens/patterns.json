@@ -1,0 +1,21 @@
+{
+  "$comment": "Tabbied (tabbied.com) patterns for this video, rendered by `npm run patterns`. Two uses, both decoration: the neon tube band behind the hook's top edge and the same band on the end card. The wall color is transparent so the video's own night background shows through.",
+  "patterns": [
+    {
+      "name": "neon-band",
+      "design": "neon",
+      "seed": "llm-tokens-hook",
+      "size": "1080x360",
+      "palette": ["transparent", "blue-400", "purple-400", "teal-400", "yellow"],
+      "options": "grid: 6x9; frequency: 0.5"
+    },
+    {
+      "name": "neon-end",
+      "design": "neon",
+      "seed": "llm-tokens-end",
+      "size": "1080x360",
+      "palette": ["transparent", "blue-400", "purple-400", "teal-400", "yellow"],
+      "options": "grid: 6x9; frequency: 0.5"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "model": "gpt-image-2.5-flare",
+    "brandColors": {
+      "blue": "#148cff",
+      "green": "#20c621",
+      "red": "#ff4f59",
+      "yellow": "#ffdd6c"
+    },
+    "sizes": {
+      "video-hero": "1536x1024",
+      "video-icon": "1024x1024"
+    },
+    "styles": {
+      "claymation sculpture": {
+        "constraints": "Sculpt it by hand from plasticine: soft rounded forms with real weight and thickness, shallow fingerprints and small tool marks pressed into every surface, slightly uneven hand-rolled edges, and a matte clay finish under soft even studio light. Model each object as one smooth solid lump of clay in a single brand color: never build an object out of many tiny pieces, never pile up a heap of little bits, and never marble, smear or blend two colors into each other. Keep the scene to a few large chunky forms. No glossy highlights, no plastic sheen, no photographic realism, no drawn outlines, and never black or grey clay. Animals are the exception and the focal point: sculpt each one in its own natural clay coloring, rounded and friendly, with the clay texture still visible. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no floor, no ground shadow, no soft glow and no vignette, so the whole sculpture lifts off the page in one piece.",
+        "softAlphaWarn": 0.06
+      }
+    }
+  },
+  "prompts": [
+    {
+      "id": "tok-strawberry",
+      "category": "video-icon",
+      "style": "claymation sculpture",
+      "subject": "one chunky oversized strawberry in red clay, plump and rounded with shallow seed dimples pressed into it by a fingertip, topped with a thick leafy crown of green clay"
+    },
+    {
+      "id": "tok-robot",
+      "category": "video-icon",
+      "style": "claymation sculpture",
+      "subject": "a friendly little robot in blue clay with a chunky rounded boxy head and two stubby arms, squinting one eye shut as it peers through a big magnifying glass with a thick yellow clay rim and handle, held up close to its face"
+    },
+    {
+      "id": "tok-blocks",
+      "category": "video-hero",
+      "style": "claymation sculpture",
+      "subject": "three chunky rounded blocks of clay in a single row, one blue, one yellow and one red, pulled apart with wide gaps between them as if one long bar had just been torn into three pieces, each with soft ragged torn ends where it separated"
+    },
+    {
+      "id": "tok-marmot",
+      "category": "video-icon",
+      "style": "claymation sculpture",
+      "subject": "the Dataslope marmot mascot, a friendly round alpine marmot with a cream belly, rosy cheeks, and small rounded ears, sculpted in warm golden-brown clay with a pale cream muzzle, two little white front teeth showing in a happy smile, small ears set low on the sides of its broad head, and a short bushy tail curled at its side, sitting up on its haunches and hugging one chunky red clay strawberry with a green leafy top against its belly"
+    }
+  ]
+}
