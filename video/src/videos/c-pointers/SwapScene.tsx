@@ -141,7 +141,6 @@ export const SwapScene: React.FC<{ variant: Variant }> = ({ variant }) => {
   const c = useCues(variant);
   const isPtr = variant === "pointer";
   const fig = isPtr ? FIG3 : FIG2;
-  const end = c.doneAt + 1000;
 
   const mainBoxTop = y(MAIN_BOX);
   const swapBoxTop = y(SWAP_BOX);
@@ -159,7 +158,7 @@ export const SwapScene: React.FC<{ variant: Variant }> = ({ variant }) => {
 
   // Highlights that tie an address to the pointer holding it (Fig. 3 only).
   const ampAt = c.ampAt;
-  const linkOut = c.reachAt === null ? end : c.reachAt + 40;
+  const linkOut = c.reachAt === null ? undefined : c.reachAt + 40;
   const addrMark = (i: 0 | 1) => (ampAt ? markP(frame, ampAt[i] + 2, linkOut) : 0);
   const holdMark = (i: 0 | 1) => (isPtr ? markP(frame, c.valuesAt[i] + 4, linkOut) : 0);
 
@@ -444,7 +443,7 @@ export const SwapScene: React.FC<{ variant: Variant }> = ({ variant }) => {
         </span>
       </Ink>
       <Note at={c.namesAt + 14} x={FRAME_L} y={y(NOTE_Y)} from="up">
-        <span style={note(20, INK_SOFT)}>
+        <span style={note(21, INK_SOFT)}>
           Addresses from one run, printed with <Mono>%p</Mono>. They change on every run.
         </span>
       </Note>

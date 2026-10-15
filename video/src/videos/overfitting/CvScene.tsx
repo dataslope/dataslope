@@ -10,6 +10,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import {
   BEST,
   DEGREES,
+  exitDegree,
   FOLDS,
   ILLUSTRATIONS,
   MAX_DEGREE,
@@ -71,7 +72,7 @@ export const CvScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <div style={{ position: "absolute", left: 116, top: y(104), display: "flex", gap: "0.26em", ...headline(56) }}>
-        <Ink at={start - 12} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
+        <Ink at={start - 2} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Keep some data back,
         </Ink>
         <Ink
@@ -177,10 +178,11 @@ export const CvScene: React.FC = () => {
           lowest, {fmt(best.cv, 3)} at degree {best.degree}
         </span>
       </Note>
-      <Note at={againAt} x={X.x1 + 6} y={box.top + 4} align="right" from="right">
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", ...halo }}>
-          the new points agree: degree {BEST.test}
-        </span>
+      <Note at={againAt} x={sx(X, exitDegree("cv", TOP_VALUE)) + 22} y={by(box, 0.3) - 14}>
+        <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", ...halo }}>the new points agree:</div>
+        <div style={{ ...note(21, NEW_INK), fontWeight: 650, whiteSpace: "nowrap", marginTop: 4, ...halo }}>
+          lowest at degree {BEST.test}
+        </div>
       </Note>
 
       <Note at={fourAt + 6} x={120} y={y(860)}>

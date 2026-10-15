@@ -17,13 +17,14 @@ import type { NarrationScript } from "../../narration/types";
  *     deviation of 0.25, x in [0, 4], seed 0;
  *   - the degree-eleven fit passes through all twelve: training error 0 (to
  *     floating point), and it leaves the chart before the first point and
- *     after the last (it reaches -15.4 at x = 0 and 45.1 at x = 4);
+ *     after the last (it reaches -15.4 at x = 0 and 45.0 at x = 4);
  *   - training error never rises as the degree goes from one to eleven
  *     (0.152 at degree one, 0.0195 at three, 0 at eleven; measure.py asserts
  *     it);
- *   - on 1,000 new points from the same source, error falls to its lowest at
- *     degree three (0.107) and climbs after it, to 26.4 at degree eleven,
- *     247.8 times the degree-three error: "nearly two hundred and fifty";
+ *   - on 1,000 new points from the same source, error is lowest at degree
+ *     three (0.107; degrees one and two are 0.259 and 0.263) and rises at
+ *     every degree after it, to 26.4 at degree eleven, 247.8 times the
+ *     degree-three error: "nearly two hundred and fifty";
  *   - five-fold cross-validation on the twelve training points alone gives
  *     its lowest average error at degree three too (0.052).
  *
@@ -51,10 +52,10 @@ export const script: NarrationScript = {
     { id: "train", text: "On the twelve training points, it falls all the way to zero.", pauseAfter: 0.3 },
     {
       id: "test",
-      text: "On a thousand new points from the same curve, it falls until degree three, then climbs.",
+      text: "On a thousand new points from the same curve, it drops to its lowest at degree three, then climbs.",
       pauseAfter: 0.2,
     },
-    { id: "worse", text: "At degree eleven, it is nearly two hundred and fifty times worse.", pauseAfter: 0.5 },
+    { id: "worse", text: "At degree eleven, it is nearly two hundred and fifty times worse than at three.", pauseAfter: 0.5 },
     { id: "blind", text: "So the training error cannot warn you. It only ever improves.", pauseAfter: 0.6 },
     { id: "holdout", text: "Keep some data back, and score the model on that.", pauseAfter: 0.3 },
     {

@@ -9,6 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import {
   BEST,
   DEGREES,
+  exitDegree,
   MAX_DEGREE,
   N_TEST,
   N_TRAIN,
@@ -24,15 +25,8 @@ import { type Box, by, Curve, Grid, prose, Swatch, toPage } from "./parts";
 
 const X = { lo: 1, hi: MAX_DEGREE, x0: 330, x1: 1430 };
 const TOP_VALUE = 0.35;
-
-/** The degree, between two measured ones, at which the error on new points
- *  crosses the top of the chart: where its line leaves the page. */
-const firstOff = SWEEP.findIndex((r) => r.test > TOP_VALUE);
-const EXIT_DEGREE =
-  firstOff > 0
-    ? SWEEP[firstOff - 1].degree +
-      (TOP_VALUE - SWEEP[firstOff - 1].test) / (SWEEP[firstOff].test - SWEEP[firstOff - 1].test)
-    : MAX_DEGREE;
+/** Where the error on new points leaves the top of the chart. */
+const EXIT_DEGREE = exitDegree("test", TOP_VALUE);
 
 /**
  * Sweep, train, test, worse, blind: every degree from one to eleven, scored on
@@ -102,7 +96,7 @@ export const ErrorScene: React.FC = () => {
         </Ink>
       </div>
 
-      <FigLabel n="2" title="Mean squared error by polynomial degree" at={start - 8} x={120} y={y(196)} />
+      <FigLabel n="2" title="Mean squared error by polynomial degree" at={start - 2} x={120} y={y(196)} />
       {/* The legend, at the right end of the label's line. */}
       <div
         style={{

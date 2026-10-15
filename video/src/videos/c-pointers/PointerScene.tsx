@@ -178,9 +178,10 @@ export const PointerScene: React.FC = () => {
         top={top}
         width={LIST_W}
         size={SIZE}
-        at={boxAt - 2}
-        lineAt={[holdsAt - 2, intStarAt - 2, readingAt - 2, writingAt - 2, itselfAt - 4]}
+        at={boxAt - 4}
+        lineAt={[boxAt + 2, intStarAt - 2, readingAt - 2, writingAt - 2, itselfAt - 4]}
         marks={[
+          { line: 0, col: 8, chars: 2, at: holdsAt + 2, out: ampAt - 4 },
           { line: 1, col: 9, chars: 2, at: setToAt - 2, out: starFrom - 8 },
           { line: 2, col: 15, chars: 2, at: readStarAt - 2, out: writingAt - 6 },
           { line: 3, col: 0, chars: 2, at: writingAt, out: n.beat("sizes").from - 6 },
@@ -262,7 +263,7 @@ export const PointerScene: React.FC = () => {
         name="n"
         addr={FIG1.n}
         at={addressAt - 2}
-        nameAt={holdsAt}
+        nameAt={boxAt + 6}
         mark={addrMark}
         tag={{ text: "&n", at: ampAt - 2, out: starFrom - 8 }}
       />
@@ -352,12 +353,12 @@ export const PointerScene: React.FC = () => {
       ))}
 
       <Note at={machineAt - 2} x={STRIP_L} y={y(NOTE_Y)} from="up">
-        <span style={note(20, INK_SOFT)}>
+        <span style={note(21, INK_SOFT)}>
           Sizes from <Mono>sizeof</Mono> on x86-64 Linux, gcc 13.
         </span>
       </Note>
       <Note at={changeAt - 2} x={STRIP_L} y={y(NOTE_Y) + 34} from="up">
-        <span style={note(20, INK_SOFT)}>
+        <span style={note(21, INK_SOFT)}>
           Addresses from one run, printed with <Mono>%p</Mono>. They change on every run.
         </span>
       </Note>

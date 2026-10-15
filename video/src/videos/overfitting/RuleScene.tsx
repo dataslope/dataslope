@@ -21,10 +21,10 @@ export const RuleScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Ink at={start - 10} dur={16} style={{ left: 120, top: y(300), width: 1100 }}>
+      <Ink at={start - 2} dur={16} style={{ left: 120, top: y(300), width: 1100 }}>
         <div style={{ height: 2, background: INK, width: 140 }} />
       </Ink>
-      <Ink at={start - 8} dur={22} style={{ left: 114, top: y(340), ...headline(92), whiteSpace: "nowrap" }}>
+      <Ink at={start} dur={22} style={{ left: 114, top: y(340), ...headline(92), whiteSpace: "nowrap" }}>
         Judge a model by data
       </Ink>
       <Ink

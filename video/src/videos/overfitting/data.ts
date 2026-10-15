@@ -50,6 +50,16 @@ export const row = (degree: number) => {
   return r;
 };
 
+/** The degree, between two measured ones, at which an error's line crosses
+ *  `top` on its way up: where it leaves a chart that stops there. */
+export const exitDegree = (key: "test" | "cv", top: number) => {
+  const i = SWEEP.findIndex((r) => r[key] > top);
+  if (i <= 0) return MAX_DEGREE;
+  const a = SWEEP[i - 1];
+  const b = SWEEP[i];
+  return a.degree + ((top - a[key]) / (b[key] - a[key])) * (b.degree - a.degree);
+};
+
 /** Where each error is lowest, and how much worse new data does at eleven. */
 export const BEST = m.best;
 export const RATIO = m.ratio11to3;

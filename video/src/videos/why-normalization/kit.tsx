@@ -6,6 +6,7 @@ import {
   ACCENT,
   ACCENT_INK,
   BAR,
+  BLUE_INK,
   HAIRLINE,
   HIGHLIGHT,
   INK,
@@ -51,7 +52,7 @@ export const MARK = HIGHLIGHT;
 export const MARK_BAD = `color-mix(in srgb, ${ACCENT} 26%, transparent)`;
 /** The foreign key and the key it points at share the data blue. */
 export const KEY = BAR;
-export const KEY_INK = "var(--ds-blue-ink)";
+export const KEY_INK = BLUE_INK;
 export const MARK_KEY = `color-mix(in srgb, ${BAR} 18%, transparent)`;
 
 /** The listing's tinted paper and the SQL token inks. */
