@@ -1,5 +1,5 @@
 import React from "react";
-import { Composition, Folder } from "remotion";
+import { Composition, Folder, Still } from "remotion";
 import "./theme/brand";
 import "./theme/fonts";
 import { narratedMetadata, type NarratedProps } from "./narration/metadata";
@@ -12,6 +12,7 @@ import { script as binarySearchScript } from "./videos/binary-search/script";
 import { FloatingPoint } from "./videos/floating-point/Video";
 import { script as floatingPointScript } from "./videos/floating-point/script";
 import { EDITORIAL_DEFAULTS, type EditorialProps } from "./editorial/Page";
+import { H as PAGE_H, PaperSource, W as PAGE_W } from "./editorial/ui";
 import { CentralLimitTheorem } from "./videos/central-limit-theorem/Video";
 import { script as centralLimitTheoremScript } from "./videos/central-limit-theorem/script";
 import { ListVsSet } from "./videos/list-vs-set/Video";
@@ -304,6 +305,10 @@ export const RemotionRoot: React.FC = () => (
         defaultProps={{ timeline: null, captions: true } satisfies NarratedProps}
         calculateMetadata={narratedMetadata<NarratedProps>(llmTokensScript)}
       />
+    </Folder>
+    <Folder name="Assets">
+      {/* The editorial page's grain, rendered to public/editorial/ by `npm run paper`. */}
+      <Still id="PaperTexture" component={PaperSource} width={PAGE_W} height={PAGE_H} />
     </Folder>
   </>
 );

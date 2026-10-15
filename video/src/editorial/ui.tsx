@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Img, staticFile, useCurrentFrame } from "remotion";
 import { ease } from "../components/motion";
 import { ds } from "../theme/brand";
 import { ACCENT_INK, INK, PAPER, label } from "./style";
@@ -12,11 +12,36 @@ export const MARGIN = 96;
 export type Pt = readonly [number, number];
 
 /**
- * The page: warm paper with a whisper of grain. The grain is two seeded
- * feTurbulence fields (fine tooth, and a broad uneven tone) composited
- * through brand inks, so it is identical on every frame and machine.
+ * The page: warm paper with a whisper of grain, as pre-rendered images of
+ * <PaperSource> below. Drawing the two full-frame noise filters live made
+ * every frame of every editorial video about 3.6x slower to render, for a
+ * picture that never changes.
+ *
+ * The 2x file is chosen whenever the render is scaled up (a 4K render is
+ * --scale=2), so the grain stays at device resolution instead of being
+ * stretched. Both come from `npm run paper`, which must be re-run after any
+ * change to PaperSource, PAPER, INK or the yellow tone.
  */
-export const Paper: React.FC = () => (
+export const Paper: React.FC = () => {
+  const dpr = typeof window === "undefined" ? 1 : window.devicePixelRatio;
+  return (
+    <AbsoluteFill style={{ background: PAPER }}>
+      <Img
+        src={staticFile(dpr > 1 ? "editorial/paper@2x.webp" : "editorial/paper@1x.webp")}
+        alt=""
+        style={{ position: "absolute", inset: 0, width: W, height: H }}
+      />
+    </AbsoluteFill>
+  );
+};
+
+/**
+ * The source of the paper images: two seeded feTurbulence fields (fine
+ * tooth, and a broad uneven tone) composited through brand inks, so it is
+ * identical on every machine. Rendered by the PaperTexture still, never
+ * placed in a video directly.
+ */
+export const PaperSource: React.FC = () => (
   <AbsoluteFill style={{ background: PAPER }}>
     <svg width={W} height={H} style={{ position: "absolute", inset: 0, willChange: "transform" }}>
       <filter id="ed-tooth" x="0" y="0" width="100%" height="100%">

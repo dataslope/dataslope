@@ -22,8 +22,8 @@ All of them render at 4K: 3840x2160 for 16:9, or 2160x3840 for 9:16.
 
 ### The editorial videos
 
-`CentralLimitTheorem` and `SimpsonsParadox` share one look, the shared
-editorial kit in `src/editorial/`: warm paper, numbered figures with Inter
+The eighteen editorial videos share one look, the shared editorial kit in
+`src/editorial/`: warm paper, numbered figures with Inter
 labels, ink-wipe reveals, watercolor spot illustrations, and Source Serif 4
 headlines with no burned-in captions. That setting was chosen from a
 side-by-side trial of five faces with and without captions. A new video in
@@ -40,6 +40,18 @@ Two props keep the alternatives a click away in the Studio's props panel:
   lower third and the page compresses vertically to make room for it
   (`src/editorial/layout.ts`). Scenes therefore pass every vertical position
   through `useLayout().y()` and every vertical length through `h()`.
+
+The paper's grain is two full-frame SVG noise filters (`PaperSource` in
+`src/editorial/ui.tsx`), but a page never draws them. Drawn live they made
+every frame about three times slower to render (450 frames at 1080p: 125 s
+against 42 s; 150 frames at 4K: 148 s against 37 s), for a picture that
+never changes. `<Paper>` shows `public/editorial/paper@1x.webp` instead, or
+`paper@2x.webp` whenever the render is scaled up, so a 4K render gets grain
+at full resolution rather than a stretched 1080p copy. Both are lossless, and
+a page renders the same either way: identical pixels in the frames checked,
+apart from antialiasing on a few edge pixels of BaseRate's 10,000-dot grid.
+Re-run `npm run paper` after changing `PaperSource`, `PAPER`, `INK` or the
+yellow tone.
 
 ## Quick start
 
