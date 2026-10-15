@@ -158,7 +158,7 @@ ORDER BY
 Four independent climbs, one per region. This is the shape of almost
 every "cumulative by category" report you will ever be asked for.
 
-<Callout type="warn" title="Ties reset the accumulation in surprising ways">
+<Callout type="warn" title="Tied rows share one running total">
 The default frame for an ordered window is defined in terms of
 *values*, not rows: all rows with the same `ORDER BY` value share a
 frame and therefore get the **same** running total. If two sales fall
