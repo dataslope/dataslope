@@ -78,12 +78,3 @@ export const NEW_INK = ds("orange", 700);
 /** "−1": numbers on the page take a real minus sign. */
 export const signed = (v: number, digits = 0) => `${v < 0 ? "−" : ""}${Math.abs(v).toFixed(digits)}`;
 
-// `node src/videos/overfitting/data.ts` prints what the narration quotes.
-const runAsScript =
-  typeof process !== "undefined" &&
-  typeof process.argv?.[1] === "string" &&
-  process.argv[1].endsWith("data.ts");
-if (runAsScript) {
-  for (const r of SWEEP) console.log(`degree ${r.degree}: train ${r.train} test ${r.test} cv ${r.cv}`);
-  console.log(`best test ${BEST.test}, best cv ${BEST.cv}, test 11/3 = ${RATIO}`);
-}
