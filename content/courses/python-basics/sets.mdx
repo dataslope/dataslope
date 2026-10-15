@@ -24,7 +24,7 @@ flowchart LR
 ```
 
 <Callout type="info">
-Sets and dicts share the same underlying implementation: hash tables. A set is like a dict where you only care about the keys. This is why both require hashable elements/keys and both give $O(1)$ average-case lookups.
+Sets and dicts are both built on hash tables. CPython implements them separately, but on the same idea: a set is like a dict where you only care about the keys. This is why both require hashable elements/keys and both give $O(1)$ average-case lookups.
 </Callout>
 
 ## Creating sets
@@ -277,25 +277,35 @@ walk itself. Over a million items the difference is not subtle:
   files={[
     {
       filename: "main.py",
-      starterCode: `import time
+      starterCode: `import timeit
 
 big_list = list(range(1_000_000))
 big_set = set(big_list)
 
-t0 = time.perf_counter()
-result1 = 999_999 in big_list
-t1 = time.perf_counter()
-result2 = 999_999 in big_set
-t2 = time.perf_counter()
+# timeit runs a statement many times and returns the total seconds.
+# Dividing by the count gives the time for one run.
+list_time = timeit.timeit("999_999 in big_list", globals=globals(), number=20) / 20
+set_time = timeit.timeit("999_999 in big_set", globals=globals(), number=100_000) / 100_000
+build_time = timeit.timeit("set(big_list)", globals=globals(), number=5) / 5
 
-print(f"list: {(t1 - t0) * 1000:.2f} ms")
-print(f"set:  {(t2 - t1) * 1000:.4f} ms")
+print(f"list lookup: {list_time * 1000:.2f} ms")
+print(f"set lookup:  {set_time * 1e9:.0f} ns, about {list_time / set_time:,.0f}x faster")
+print(f"building the set: {build_time * 1000:.1f} ms, as long as {build_time / list_time:.1f} list lookups")
 `,
     },
   ]}
 />
 
-Rule of thumb: if you are checking membership more than once or twice, convert to a set first.
+A set lookup takes less time than reading the clock, so a single lookup timed
+on its own with `time.perf_counter()` reports mostly noise. That is why the
+block repeats each statement many times and divides by the count.
+
+The last line is the catch. Building the set walks the whole list and hashes
+every item, so it costs as much as a few list lookups before it saves anything.
+
+Rule of thumb: convert to a set when you will test membership repeatedly, for
+example inside a loop over another collection. For one or two checks, `in` on
+the list is already the fastest option.
 
 ## Items must be hashable
 
