@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "model": "gpt-image-2.5-flare",
+    "brandColors": {
+      "blue": "#148cff",
+      "green": "#20c621",
+      "red": "#ff4f59",
+      "yellow": "#ffdd6c"
+    },
+    "sizes": {
+      "video-hero": "1536x1024",
+      "video-icon": "1024x1024"
+    },
+    "styles": {
+      "watercolor illustration": {
+        "constraints": "Paint it in loose, transparent watercolor: soft washes that feather and bleed at their edges, darker pigment pooling where a wash has dried, gentle blooms inside each shape, and the tooth of cold-press paper visible only inside the paint. Build the scene from a few large, simple shapes rather than many small pieces, and let the washes define the forms instead of hard outlines. Lay every wash in the brand colors below and let two overlapping washes mix into a third; never outline in black, never shade with grey or black, and never paint the whole subject in one hue. An animal keeps its own natural coloring, painted in warm earthy washes with soft fur texture. Draw any person as an anonymous stylized figure with no facial features and no resemblance to a real individual. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no paper texture outside the paint, no floor, no ground shadow, no frame or border, no soft glow and no vignette, so the whole subject lifts off the page in one piece.",
+        "softAlphaWarn": 0.3
+      }
+    }
+  },
+  "prompts": [
+    {
+      "id": "clt-coffee-queue",
+      "category": "video-hero",
+      "style": "watercolor illustration",
+      "subject": "a large takeaway coffee cup with a snug lid and a thick sleeve standing in the foreground on the left, and beside it a short queue of three anonymous figures standing one behind another, waiting their turn"
+    },
+    {
+      "id": "clt-dice",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a pair of large dice tumbling together mid-roll, one blue and one red, each showing a few round white pips on its faces"
+    },
+    {
+      "id": "clt-brass-bell",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a single polished brass hand bell with a rounded wooden handle, tilted mid-swing as it rings, its flared rim catching the light"
+    },
+    {
+      "id": "clt-marmot-reader",
+      "category": "video-hero",
+      "style": "watercolor illustration",
+      "subject": "the Dataslope marmot mascot, a friendly round alpine marmot with a cream belly, rosy cheeks, and small rounded ears, sitting upright and reading a large open broadsheet newspaper held wide in both paws, its pages showing only soft blocks of blue and yellow wash where the columns and pictures would be"
+    }
+  ]
+}
