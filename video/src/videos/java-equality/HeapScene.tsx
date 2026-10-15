@@ -83,7 +83,7 @@ export const HeapScene: React.FC = () => {
   const dot = (i: number): Pt => cellDot(CELL_X, rowTop(i), CELL_W, rowH);
 
   const poolTop = y(POOL_TOP);
-  const poolBottom = rowTop(0) + rowH + 16;
+  const poolBottom = rowTop(0) + rowH + 34;
   const poolMid = POOL_X + OBJ_W / 2;
   const pool = ease(frame, internedAt - 2, 16);
 
@@ -99,12 +99,12 @@ export const HeapScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Fig n="2" at={start - 14} x={LEFT} y={y(108)}>
+      <Fig n="2" at={start - 2} x={LEFT} y={y(108)}>
         What a <Mono>String</Mono> variable holds
       </Fig>
 
       {/* Column heads and the line between stack and heap. */}
-      <Ink at={variableAt - 6} dur={14} style={{ left: CELL_X - 18, top: y(HEADS) }}>
+      <Ink at={Math.max(start - 2, variableAt - 6)} dur={14} style={{ left: CELL_X - 18, top: y(HEADS) }}>
         <span style={label(21, INK_SOFT)}>Stack frame of main</span>
       </Ink>
       <Ink at={heapAt - 4} dur={14} style={{ left: HEAP_X, top: y(HEADS) }}>
@@ -116,7 +116,7 @@ export const HeapScene: React.FC = () => {
           left: DIVIDE,
           top: y(HEADS),
           width: 1,
-          height: (rowTop(3) + rowH + 10 - y(HEADS)) * ease(frame, variableAt - 4, 20),
+          height: (rowTop(3) + rowH + 10 - y(HEADS)) * ease(frame, Math.max(start - 2, variableAt - 4), 20),
           background: HAIRLINE,
         }}
       />
@@ -132,7 +132,7 @@ export const HeapScene: React.FC = () => {
           border: `1.5px solid ${HAIRLINE}`,
           borderRadius: 8,
           background: `color-mix(in srgb, ${INK} 2%, ${PAPER})`,
-          opacity: ease(frame, variableAt - 6, 14),
+          opacity: ease(frame, Math.max(start - 2, variableAt - 6), 14),
         }}
       />
 
@@ -151,7 +151,16 @@ export const HeapScene: React.FC = () => {
             opacity: pool,
           }}
         >
-          <span style={{ ...label(20, INK_SOFT), position: "absolute", left: 16, top: 8 }}>String pool</span>
+          <span
+            style={{
+              ...label(20, INK_SOFT),
+              position: "absolute",
+              left: 16,
+              top: 8,
+            }}
+          >
+            String pool
+          </span>
         </div>
       ) : null}
 
@@ -160,7 +169,13 @@ export const HeapScene: React.FC = () => {
           <Ink
             at={at}
             dur={14}
-            style={{ right: 1920 - CODE_R, top: rowTop(i), height: rowH, display: "flex", alignItems: "center" }}
+            style={{
+              right: 1920 - CODE_R,
+              top: rowTop(i),
+              height: rowH,
+              display: "flex",
+              alignItems: "center",
+            }}
           >
             <Code line={LINE[v]} size={CODE} />
           </Ink>
@@ -239,7 +254,15 @@ export const HeapScene: React.FC = () => {
           background: HAIRLINE,
         }}
       />
-      <div style={{ position: "absolute", left: LEFT, top: y(VERDICTS), display: "flex", gap: 84 }}>
+      <div
+        style={{
+          position: "absolute",
+          left: LEFT,
+          top: y(VERDICTS),
+          display: "flex",
+          gap: 84,
+        }}
+      >
         <InkSlot at={trueAt - 6}>
           <Verdict expr="a == c" value={compared("a == c")} size={30} outAt={trueAt} />
         </InkSlot>

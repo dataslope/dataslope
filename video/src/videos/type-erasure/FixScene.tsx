@@ -49,18 +49,18 @@ export const FixScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Fig n="4" at={start - 12} x={LEFT} y={y(FIG_Y)}>
+      <Fig n="4" at={start - 6} x={LEFT} y={y(FIG_Y)}>
         Parse into <Mono>unknown</Mono>, then check
       </Fig>
-      <FileTab at={start - 8} x={LEFT} y={y(TAB_Y)} name="guard.ts" />
+      <FileTab at={start - 3} x={LEFT} y={y(TAB_Y)} name="guard.ts" />
       <Listing
         lines={GUARD_TS}
         x={LEFT}
         top={top}
         width={LIST_W}
         size={SIZE}
-        at={start - 8}
-        lineAt={GUARD_TS.map((_, i) => start - 4 + i * 2)}
+        at={start - 3}
+        lineAt={GUARD_TS.map((_, i) => start + i * 2)}
         marks={[
           { ...GUARD_UNKNOWN, at: unknownAt - 2 },
           ...GUARD_TESTS.map((line, k) => ({ line, at: fieldAt + k * 4 })),

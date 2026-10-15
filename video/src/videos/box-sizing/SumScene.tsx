@@ -58,7 +58,6 @@ export const SumScene: React.FC = () => {
   const onlyAt = n.word("default", "only the content");
   const sidePadAt = n.word("default", "padding");
   const sideBorderAt = n.word("default", "border");
-  const bothAt = n.word("default", "both sides");
   const termAt = [
     n.word("sum", "Five"),
     n.word("sum", "twenty"),
@@ -162,9 +161,9 @@ export const SumScene: React.FC = () => {
       ) : null}
 
       <Dim x0={c.x} x1={c.x + c.w} y={o.y - 26} at={onlyAt - 2}>
-        <span style={{ ...note(22, CONTENT_INK), fontWeight: 600 }}>
-          <Mono>width</Mono> = {BOX.content}px of content
-        </span>
+        <DimLabel value={String(BOX.content)} color={CONTENT_INK}>
+          the content only
+        </DimLabel>
       </Dim>
       <Dim x0={o.x} x1={o.x + o.w} y={o.y + o.h + 26} at={totalAt - 4} side="below" color={ACCENT_INK}>
         <DimLabel value={String(BOX.rendered)} color={ACCENT_INK} size={26}>
@@ -173,7 +172,7 @@ export const SumScene: React.FC = () => {
       </Dim>
 
       {/* The sum, term by term in the layer's own ink, under the box. */}
-      <div style={{ position: "absolute", left: o.x, top: y(690), display: "flex", alignItems: "flex-start", gap: 12 }}>
+      <div style={{ position: "absolute", left: o.x, top: y(690), display: "flex", alignItems: "baseline", gap: 12 }}>
         {TERMS.map((t, i) => (
           <React.Fragment key={i}>
             {i > 0 ? <Op at={termAt[i] - 4} text="+" /> : null}

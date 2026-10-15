@@ -70,8 +70,20 @@ export const tokenize = (line: string): Token[] => {
 };
 
 /** One line of code, colored. */
-export const Code: React.FC<{ line: string; size?: number; style?: React.CSSProperties }> = ({ line, size, style }) => (
-  <span style={{ fontFamily: MONO, fontSize: size, whiteSpace: "pre", fontVariantLigatures: "none", ...style }}>
+export const Code: React.FC<{
+  line: string;
+  size?: number;
+  style?: React.CSSProperties;
+}> = ({ line, size, style }) => (
+  <span
+    style={{
+      fontFamily: MONO,
+      fontSize: size,
+      whiteSpace: "pre",
+      fontVariantLigatures: "none",
+      ...style,
+    }}
+  >
     {tokenize(line).map((t, i) => (
       <span key={i} style={{ color: t.color, fontWeight: t.weight ?? 400 }}>
         {t.text}
@@ -82,9 +94,21 @@ export const Code: React.FC<{ line: string; size?: number; style?: React.CSSProp
 
 /** A highlighter stroke behind one listing line, wiped in from the left. By
  *  default it spans the line's code; `col` and `chars` narrow it to a span. */
-export type LineMark = { line: number; at: number; out?: number; color?: string; col?: number; chars?: number };
+export type LineMark = {
+  line: number;
+  at: number;
+  out?: number;
+  color?: string;
+  col?: number;
+  chars?: number;
+};
 
-export type ListingGeometry = { size: number; lineH: number; padY: number; gutter: number };
+export type ListingGeometry = {
+  size: number;
+  lineH: number;
+  padY: number;
+  gutter: number;
+};
 export const listingGeometry = (size: number): ListingGeometry => ({
   size,
   lineH: Math.round(size * 1.82),
@@ -190,26 +214,25 @@ export const Listing: React.FC<{
       })}
       {lines.map((line, i) => (
         <React.Fragment key={i}>
-          {line ? (
-            <div
-              style={{
-                position: "absolute",
-                left: 0,
-                width: g.gutter - size * 0.5,
-                top: g.padY + i * g.lineH,
-                height: g.lineH,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-end",
-                fontFamily: MONO,
-                fontSize: Math.max(20, size * 0.68),
-                color: INK_SOFT,
-                opacity: ease(frame, lineAt[i] - 4, 10),
-              }}
-            >
-              {i + 1}
-            </div>
-          ) : null}
+          {/* Every line is numbered, blank ones too, as an editor shows them. */}
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              width: g.gutter - size * 0.5,
+              top: g.padY + i * g.lineH,
+              height: g.lineH,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              fontFamily: MONO,
+              fontSize: Math.max(20, size * 0.68),
+              color: INK_SOFT,
+              opacity: ease(frame, lineAt[i] - 4, 10),
+            }}
+          >
+            {i + 1}
+          </div>
           {line ? (
             <Ink
               at={lineAt[i]}
@@ -232,34 +255,54 @@ export const Listing: React.FC<{
 };
 
 /** "Fig. 2" and a title that may hold code: the shared FigLabel, widened. */
-export const Fig: React.FC<{ n: string; at: number; x: number; y: number; children: React.ReactNode }> = ({
-  n,
-  at,
-  x,
-  y,
-  children,
-}) => (
-  <Ink at={at} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
+export const Fig: React.FC<{
+  n: string;
+  at: number;
+  x: number;
+  y: number;
+  children: React.ReactNode;
+}> = ({ n, at, x, y, children }) => (
+  <Ink
+    at={at}
+    style={{
+      left: x,
+      top: y,
+      whiteSpace: "nowrap",
+      display: "flex",
+      alignItems: "baseline",
+      gap: 12,
+    }}
+  >
     <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>Fig. {n}</span>
     <span style={{ ...label(24, INK), fontWeight: 560 }}>{children}</span>
   </Ink>
 );
 
 /** Code set inside running text or a label, at the text's own size. */
-export const Mono: React.FC<{ children: string; color?: string; weight?: number }> = ({ children, color, weight }) => (
+export const Mono: React.FC<{
+  children: string;
+  color?: string;
+  weight?: number;
+}> = ({ children, color, weight }) => (
   <span
-    style={{ fontFamily: MONO, fontSize: "0.94em", fontWeight: weight ?? 500, color, fontVariantLigatures: "none" }}
+    style={{
+      fontFamily: MONO,
+      fontSize: "0.94em",
+      fontWeight: weight ?? 500,
+      color,
+      fontVariantLigatures: "none",
+    }}
   >
     {children}
   </span>
 );
 
 /** A highlighter stroke behind inline text, `p` of the way across. */
-export const Marked: React.FC<{ p: number; color?: string; children: React.ReactNode }> = ({
-  p,
-  color = HIGHLIGHT,
-  children,
-}) => (
+export const Marked: React.FC<{
+  p: number;
+  color?: string;
+  children: React.ReactNode;
+}> = ({ p, color = HIGHLIGHT, children }) => (
   <span style={{ position: "relative", display: "inline-block" }}>
     {p > 0 ? (
       <span
@@ -276,6 +319,12 @@ export const Marked: React.FC<{ p: number; color?: string; children: React.React
     ) : null}
     <span style={{ position: "relative" }}>{children}</span>
   </span>
+);
+
+/** Punctuation that follows a Marked span. It is positioned so it paints
+ *  above the highlight's overhang instead of under it. */
+export const After: React.FC<{ children: string }> = ({ children }) => (
+  <span style={{ position: "relative" }}>{children}</span>
 );
 
 /** How strongly a highlight shows: in at `at`, gone again by `out`. */
@@ -299,15 +348,23 @@ export const Out: React.FC<{ value: boolean; size: number }> = ({ value, size })
 );
 
 /** A comparison and what it printed, on one line: `a == c  true`. */
-export const Verdict: React.FC<{ expr: string; value: boolean; size: number; outAt?: number }> = ({
-  expr,
-  value,
-  size,
-  outAt,
-}) => {
+export const Verdict: React.FC<{
+  expr: string;
+  value: boolean;
+  size: number;
+  outAt?: number;
+}> = ({ expr, value, size, outAt }) => {
   const frame = useCurrentFrame();
   return (
-    <span style={{ display: "inline-flex", alignItems: "baseline", gap: "0.7em", whiteSpace: "nowrap" }}>
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "baseline",
+        gap: "0.7em",
+        whiteSpace: "nowrap",
+        fontSize: size,
+      }}
+    >
       <Code line={expr} size={size} />
       <span style={{ opacity: outAt === undefined ? 1 : ease(frame, outAt, 8) }}>
         <Out value={value} size={size} />
@@ -362,10 +419,20 @@ export const RefArrow: React.FC<{
   const [lx, ly] = points[n - 2];
   const len = Math.hypot(ex - lx, ey - ly);
   const [ux, uy] = [(ex - lx) / len, (ey - ly) / len];
-  const wing = (side: 1 | -1) => `${ex - ux * HEAD_LEN + side * uy * HEAD_HALF},${ey - uy * HEAD_LEN - side * ux * HEAD_HALF}`;
+  const wing = (side: 1 | -1) =>
+    `${ex - ux * HEAD_LEN + side * uy * HEAD_HALF},${ey - uy * HEAD_LEN - side * ux * HEAD_HALF}`;
   const head = `M${wing(1)} L${ex},${ey} L${wing(-1)}`;
   return (
-    <svg width={W} height={H} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: 1 - d }}>
+    <svg
+      width={W}
+      height={H}
+      style={{
+        position: "absolute",
+        inset: 0,
+        overflow: "visible",
+        opacity: 1 - d,
+      }}
+    >
       <circle cx={points[0][0]} cy={points[0][1]} r={7} fill={color} opacity={dot} />
       {p > 0 ? (
         <path
@@ -503,7 +570,17 @@ export const HeapObj: React.FC<{
           gap: 2,
         }}
       >
-        <span style={{ fontFamily: SANS, fontSize: 20, fontWeight: 600, color: INK_SOFT, lineHeight: 1.1 }}>{type}</span>
+        <span
+          style={{
+            fontFamily: SANS,
+            fontSize: 20,
+            fontWeight: 600,
+            color: INK_SOFT,
+            lineHeight: 1.1,
+          }}
+        >
+          {type}
+        </span>
         <span
           style={{
             fontFamily: MONO,
@@ -526,7 +603,11 @@ export const HeapObj: React.FC<{
  * An Ink reveal that holds its place in a flowing line before it shows, so
  * its neighbours never move when it inks in, whatever order they arrive in.
  */
-export const InkSlot: React.FC<{ at: number; dur?: number; children: React.ReactNode }> = ({ at, dur = 14, children }) => (
+export const InkSlot: React.FC<{
+  at: number;
+  dur?: number;
+  children: React.ReactNode;
+}> = ({ at, dur = 14, children }) => (
   <span style={{ position: "relative", display: "inline-block" }}>
     <span style={{ visibility: "hidden", display: "inline-block" }}>{children}</span>
     <Ink at={at} dur={dur} style={{ left: 0, top: 0 }}>

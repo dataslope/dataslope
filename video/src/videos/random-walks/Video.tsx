@@ -8,9 +8,8 @@ import { PairScene } from "./PairScene";
 import { RuleScene } from "./RuleScene";
 import { WalkScene } from "./WalkScene";
 import { WhyScene } from "./WhyScene";
+import { LEAD } from "./parts";
 
-/** Frames a scene is up before its beat's first word. */
-const LEAD = 8;
 /** Frames each scene stays up into the next, so cuts cross-fade. */
 const OVERLAP = 6;
 

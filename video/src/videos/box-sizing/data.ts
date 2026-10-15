@@ -12,7 +12,7 @@ export const VIDEO = "box-sizing";
  * box-sizing` has written both WebPs. Every frame is laid out with room for
  * them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 /** "Chromium 141", the browser every number was read from. */
 export const BROWSER = M.browser.replace(/^(Chromium \d+).*$/, "$1");

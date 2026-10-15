@@ -55,6 +55,10 @@ for i, row in df.iterrows():
     assert transform[i] == agg[row["dept"]]
 # Each group's shares add up to one.
 assert (share.groupby(df["dept"]).sum().round(12) == 1).all()
+# The row the narration reads: engineering's largest salary, 140 of its 388.
+example = df[df["dept"] == "Eng"]["salary"].idxmax()
+assert df.loc[example, "salary"] == 140 and transform[example] == 388
+assert round(share[example] * 100) == 36
 
 out = {
     "meta": {

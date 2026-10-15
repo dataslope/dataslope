@@ -53,7 +53,11 @@ export const BOXED = {
 
 /** The ints for which two autoboxings give one object, scanned from
  *  -100,000 to 100,000. */
-export const CACHE = { low: m.cache.low, high: m.cache.high, count: m.cache.shared };
+export const CACHE = {
+  low: m.cache.low,
+  high: m.cache.high,
+  count: m.cache.shared,
+};
 if (CACHE.count !== CACHE.high - CACHE.low + 1) throw new Error("the cached values are not one run");
 
 /** The same scan with -XX:AutoBoxCacheMax=1000, and Fig. 3 run that way. */

@@ -22,16 +22,17 @@ export const RuleScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Ink at={start - 12} dur={14} style={{ left: LEFT + 4, top: y(270) }}>
+      <Ink at={start - 6} dur={14} style={{ left: LEFT + 4, top: y(270) }}>
         <span style={label(22, ACCENT_INK)}>Compile time and runtime</span>
       </Ink>
-      <Ink at={start - 10} dur={22} style={{ left: LEFT - 2, top: y(314), ...headline(84), whiteSpace: "nowrap" }}>
+      <Ink at={start - 4} dur={22} style={{ left: LEFT - 2, top: y(314), ...headline(84), whiteSpace: "nowrap" }}>
         Types describe what you expect.
       </Ink>
       <Ink at={onlyAt - 6} dur={22} style={{ left: LEFT, top: y(490), width: 1080 }}>
         <div style={{ height: 2, background: INK, width: 140, marginBottom: 34 }} />
         <div style={{ ...headline(64, true), color: ACCENT_INK, lineHeight: 1.12 }}>
-          Only a runtime check can tell you what actually arrived.
+          <div>Only a runtime check can tell you</div>
+          <div>what actually arrived.</div>
         </div>
       </Ink>
       {ILLUSTRATIONS ? (

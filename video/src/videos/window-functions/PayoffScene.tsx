@@ -19,6 +19,7 @@ import {
   LIST_W,
   Listing,
   MARK,
+  PartitionBar,
   REGION_WASH,
   Ring,
   Rules,
@@ -50,6 +51,9 @@ export const PayoffScene: React.FC = () => {
   const overAt = n.word("running", "starts over");
   const restartAt = n.word("running", "one hundred seventy-five");
 
+  /** The six rows and their region washes are the ones the last scene closed
+   *  on, so they are already printed when this scene fades in. */
+  const base = open - 40;
   const top = y(BODY_Y);
   const g = useTable(PAYOFF.columns, top);
   const AMOUNT = PAYOFF.columns.indexOf("amount");
@@ -57,6 +61,11 @@ export const PayoffScene: React.FC = () => {
   const RUN = PAYOFF.columns.indexOf("running_total");
   const rows = PAYOFF.rows.length;
   const [north, south] = PARTITIONS;
+  /** The table's width so far: each new column's room opens as it arrives. */
+  const tableW =
+    g.width -
+    COL_W.pct * (1 - ease(frame, divisionAt - 10, 14)) -
+    COL_W.running_total * (1 - ease(frame, orderAt - 6, 14));
 
   // When the running sum reaches each row: North as the narration says
   // "each sum stops at the current row", South once it "starts over".
@@ -129,16 +138,25 @@ export const PayoffScene: React.FC = () => {
       />
 
       {PARTITIONS.map((p) => (
-        <Wash key={p.region} g={g} from={p.first} to={p.last} color={REGION_WASH[p.region]} at={open + 10} dur={16} />
+        <React.Fragment key={p.region}>
+          <Wash g={g} from={p.first} to={p.last} color={REGION_WASH[p.region]} at={base} dur={16} rowWidth={tableW} />
+          <PartitionBar g={g} from={p.first} to={p.last} region={p.region} at={base} />
+        </React.Fragment>
       ))}
       {band(north, overAt - 4)}
       {band(south)}
 
-      <Rules g={g} rows={rows} at={open + 4} />
+      {/* The rules widen for each new column as it arrives. */}
+      <Rules
+        g={g}
+        rows={rows}
+        at={base}
+        width={tableW}
+      />
       {PAYOFF.columns.map((c, ci) => (
         <Ink
           key={c}
-          at={ci === PCT ? divisionAt - 6 : ci === RUN ? orderAt - 2 : open + 8}
+          at={ci === PCT ? divisionAt - 6 : ci === RUN ? orderAt - 2 : base}
           dur={12}
           style={cellBox(g, ci, top + 2, g.headH - 2)}
         >
@@ -149,7 +167,7 @@ export const PayoffScene: React.FC = () => {
         row.map((v, ci) => (
           <Ink
             key={`${i}-${ci}`}
-            at={ci === PCT ? divisionAt + i * 3 : ci === RUN ? runAt(i) : open + 10 + i * 2}
+            at={ci === PCT ? divisionAt + i * 3 : ci === RUN ? runAt(i) : base}
             dur={12}
             style={cellBox(g, ci, g.rowTop(i), g.rowH)}
           >

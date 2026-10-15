@@ -1,4 +1,4 @@
-/* global console, process */
+/* global console, process, document, getComputedStyle */
 // Measures every pixel value the BoxSizing video shows, by rendering real
 // HTML in Chromium and reading what the browser laid out. data.ts imports the
 // output, measurements.json. From video/, through the shared render queue

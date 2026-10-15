@@ -33,7 +33,11 @@ export const script: NarrationScript = {
   leadIn: 0.5,
   tail: 2.4,
   beats: [
-    { id: "hook", text: "These two Java strings hold the same two letters.", pauseAfter: 0.35 },
+    {
+      id: "hook",
+      text: "These two Java strings hold the same two letters.",
+      pauseAfter: 0.35,
+    },
     {
       id: "verdict",
       text: "Ask with equals equals, and Java prints false. Ask with dot equals, and it prints true.",

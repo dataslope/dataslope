@@ -3,17 +3,17 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, HAIRLINE, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { dec, DIFF_A, LAG1_FLIPS, LAG1_WALK, STEPS, WALK_A } from "./data";
-import { COLOR, COLOR_INK, Headline, Layer, ValueGrid, useValueY, walkD } from "./parts";
+import { COLOR, COLOR_INK, Headline, Layer, leaveAt, prose, ValueGrid, useValueY, walkD } from "./parts";
 
 const X: XScale = { lo: 0, hi: 300, x0: 200, x1: 1150 };
-const WALK = { lo: -5, hi: 30, top: 300, bottom: 470, ticks: [0, 10, 20, 30] } as const;
+const WALK = { lo: -5, hi: 30, top: 300, bottom: 520, ticks: [0, 10, 20, 30] } as const;
 /** The flips: a tick up or down from a centre line. */
-const FLIPS_MID = 664;
-const FLIPS_HALF = 44;
+const FLIPS_MID = 720;
+const FLIPS_HALF = 50;
 /** How many values the worked example spells out. */
 const SHOWN = 6;
 
@@ -39,23 +39,36 @@ export const WhyScene: React.FC = () => {
   const afterAt = n.word("diff", "one after it");
   const flipsAt = n.word("diff", "coin flips");
   const backAt = n.word("diff", "come back");
+  const leave = leaveAt(n.beat("collapse").from);
 
   const dots = ease(frame, everyAt - 2, 16);
   const shown = ease(frame, subtractAt - 4, 12);
   const flips = ease(frame, flipsAt - 6, 22);
   const mid = y(FLIPS_MID);
   const half = h(FLIPS_HALF);
-  const tableTop = y(470);
+  const tableTop = y(500);
 
   return (
     <AbsoluteFill>
-      <Headline first="Each point is the last one" second="plus one flip." at={start - 14} secondAt={plusAt - 2} />
-      <FigLabel n="4" title="Walk a, and its differences" at={start - 8} x={120} y={y(196)} />
+      <Headline first="Each point is the last one" second="plus one flip." at={start - 4} secondAt={plusAt - 2} out={leave} />
+      <FigLabel n="4" title="Walk a, and its differences" at={start - 2} x={120} y={y(196)} out={leave} />
 
-      <ValueGrid scale={X} spec={WALK} at={start - 10} title="Walk a, steps from the start" />
+      <ValueGrid scale={X} spec={WALK} at={start - 2} title="Walk a, steps from the start" />
+      {/* The worked example's stretch, as one band through both panels. */}
+      <div
+        style={{
+          position: "absolute",
+          left: sx(X, 0) - 8,
+          width: sx(X, SHOWN - 1) - sx(X, 0) + 16,
+          top: y(WALK.top) - 10,
+          height: y(WALK.bottom) - y(WALK.top) + 30 + (mid + half - y(WALK.bottom)) * ease(frame, flipsAt - 8, 10),
+          background: HIGHLIGHT,
+          opacity: shown * 0.6,
+        }}
+      />
       <Layer>
         <path
-          d={walkD(WALK_A, X, yOf)}
+          d={walkD(WALK_A, X, yOf, STEPS * ease(frame, start - 2, 24))}
           fill="none"
           stroke={COLOR.a}
           strokeWidth={2.6}
@@ -91,7 +104,7 @@ export const WhyScene: React.FC = () => {
 
       {/* The flips: one tick per step, up or down. */}
       <Ink at={flipsAt - 8} dur={14} style={{ left: 200, top: mid - half - 64 }}>
-        <span style={note(20, INK_SOFT)}>Its differences, one per step</span>
+        <span style={prose(20)}>Its differences, one per step</span>
       </Ink>
       <Layer opacity={ease(frame, flipsAt - 8, 10)}>
         <line x1={X.x0} x2={X.x1} y1={mid} y2={mid} stroke={INK} strokeWidth={1.6} />
@@ -185,9 +198,7 @@ export const WhyScene: React.FC = () => {
         </div>
       </Note>
       <Note at={backAt + 10} x={RIGHT} y={mid + 90} width={540}>
-        <span style={note(20, INK_SOFT)}>
-          {STEPS} differences, and each one is exactly a flip of the coin.
-        </span>
+        <span style={prose(20)}>{STEPS} differences, and each one is exactly a flip of the coin.</span>
       </Note>
     </AbsoluteFill>
   );

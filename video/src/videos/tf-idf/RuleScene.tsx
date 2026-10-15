@@ -34,6 +34,10 @@ export const RuleScene: React.FC = () => {
         <div style={{ ...label(21, INK_SOFT), marginBottom: 14 }}>The lesson&apos;s formula</div>
         <div style={{ display: "flex", alignItems: "center", ...headline(44), whiteSpace: "nowrap" }}>
           <span>
+            <V>tf-idf</V>(<V>w</V>, <V>d</V>)
+          </span>
+          <span style={{ margin: "0 0.3em" }}>=</span>
+          <span>
             <V>tf</V>(<V>w</V>, <V>d</V>)
           </span>
           <span style={{ margin: "0 0.3em" }}>×</span>

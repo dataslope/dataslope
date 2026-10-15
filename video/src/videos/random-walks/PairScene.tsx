@@ -7,7 +7,21 @@ import { ACCENT_INK, halo, headline, INK_SOFT, label, note, PAPER } from "../../
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { dec, R_WALKS, STEPS, WALK_A, WALK_B } from "./data";
-import { COLOR, COLOR_INK, Headline, Layer, Spot, ValueGrid, WALK_X, WALK_Y, useValueY, walkD, walkTip } from "./parts";
+import {
+  COLOR,
+  COLOR_INK,
+  Headline,
+  Layer,
+  leaveAt,
+  prose,
+  Spot,
+  ValueGrid,
+  WALK_X,
+  WALK_Y,
+  useValueY,
+  walkD,
+  walkTip,
+} from "./parts";
 
 /**
  * Pair, corr: a second walk from its own coin draws itself over the first,
@@ -23,6 +37,7 @@ export const PairScene: React.FC = () => {
   const nothingAt = n.word("pair", "nothing to do");
   const corrAt = n.word("corr", "correlation");
   const numberAt = n.word("corr", "zero point");
+  const leave = leaveAt(n.beat("many").from);
 
   const drawnB = STEPS * ease(frame, secondAt - 4, n.beat("pair").to - secondAt);
   const [tipX, tipY] = walkTip(WALK_B, WALK_X, yOf, drawnB);
@@ -30,8 +45,8 @@ export const PairScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Headline first="Two coins, nothing shared," second={`correlated at ${dec(R_WALKS)}.`} at={start - 14} secondAt={corrAt - 2} />
-      <FigLabel n="2" title="Two independent random walks, 300 flips each" at={start - 8} x={120} y={y(196)} />
+      <Headline first="Two coins, nothing shared," second={`correlated at ${dec(R_WALKS)}.`} at={start - 4} secondAt={corrAt - 2} out={leave} />
+      <FigLabel n="2" title="Two independent random walks, 300 flips each" at={start - 2} x={120} y={y(196)} out={leave} />
 
       <ValueGrid scale={WALK_X} spec={WALK_Y} at={start - 30} title="Steps from the start" />
       <Axis
@@ -79,14 +94,14 @@ export const PairScene: React.FC = () => {
       <Ink at={numberAt - 2} dur={18} style={{ left: 1464, top: y(380) + 44 }}>
         <span style={{ ...headline(120), color: ACCENT_INK }}>{dec(R_WALKS)}</span>
       </Ink>
-      <Note at={numberAt + 14} x={1470} y={y(380) + 186} width={340}>
-        <span style={note(20, INK_SOFT)}>0 is no straight-line relation, 1 is a perfect one</span>
+      <Note at={numberAt + 14} x={1470} y={y(380) + 186} width={350}>
+        <span style={prose(20)}>0 means no linear relation, 1 means a perfect one.</span>
       </Note>
 
       <Spot
         id="random-walks-balloons"
         at={nothingAt - 4}
-        box={{ left: 1440, top: y(640), width: 380, height: y(880) - y(640) }}
+        box={{ left: 1440, top: y(660), width: 380, height: y(890) - y(660) }}
       />
     </AbsoluteFill>
   );

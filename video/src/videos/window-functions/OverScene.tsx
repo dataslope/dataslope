@@ -10,6 +10,7 @@ import {
   BODY_Y,
   CellText,
   cellBox,
+  COL_W,
   Fig,
   FIG_Y,
   HeadText,
@@ -18,7 +19,6 @@ import {
   LIST_W,
   Listing,
   listingHeight,
-  MARK,
   Mono,
   PartitionBar,
   REGION_WASH,
@@ -61,15 +61,16 @@ export const OverScene: React.FC = () => {
     return writesAt + p * 12 + (i - PARTITIONS[p].first) * 3;
   };
   const listBottom = top + listingHeight(OVER_SQL.length, LIST_SIZE);
-  const fresh = ease(frame, writesAt - 4, 10) * (1 - ease(frame, nothingAt + 10, 14));
+  /** The table's width so far: the new column's room opens as it arrives. */
+  const tableW = g.width - COL_W.region_total * (1 - ease(frame, writesAt - 10, 14));
 
   return (
     <AbsoluteFill>
       <Headline
-        kicker="The same sum, as a window function"
+        kicker="Window functions in SQL"
         line1="Each region's total,"
         line2="beside every sale."
-        at={open + 2}
+        at={open - 40}
         mark={{ kind: "under", at: besideAt - 2 }}
       />
       <Fig n="3" at={open + 6} y={y(FIG_Y)}>
@@ -92,26 +93,25 @@ export const OverScene: React.FC = () => {
       {/* Each region's rows, lit as one partition. */}
       {PARTITIONS.map((p) => (
         <React.Fragment key={p.region}>
-          <Wash g={g} from={p.first} to={p.last} color={REGION_WASH[p.region]} at={shareAt + (p.first ? 6 : 0)} dur={16} />
+          <Wash
+            g={g}
+            from={p.first}
+            to={p.last}
+            color={REGION_WASH[p.region]}
+            at={shareAt + (p.first ? 6 : 0)}
+            dur={16}
+            rowWidth={tableW}
+          />
           <PartitionBar g={g} from={p.first} to={p.last} region={p.region} at={shareAt + (p.first ? 6 : 0)} />
         </React.Fragment>
       ))}
-      {/* The new column, while it is new. */}
-      {fresh > 0 ? (
-        <div
-          style={{
-            position: "absolute",
-            left: g.colX[TOTAL_COL],
-            top: top + 3,
-            width: g.x + g.width - g.colX[TOTAL_COL],
-            height: g.rowTop(rows) - top - 6,
-            background: MARK,
-            opacity: fresh * 0.75,
-          }}
-        />
-      ) : null}
-
-      <Rules g={g} rows={rows} at={keepsAt - 10} />
+      {/* The rules widen for the new column as it arrives. */}
+      <Rules
+        g={g}
+        rows={rows}
+        at={keepsAt - 10}
+        width={tableW}
+      />
       {WINDOWED.columns.map((c, ci) => (
         <Ink
           key={c}

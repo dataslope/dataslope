@@ -7,12 +7,12 @@ import { ACCENT, ACCENT_INK, body, headline, INK, INK_SOFT, label, note } from "
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { FIG1, ILLUSTRATIONS, JAVA_MAJOR, VIDEO } from "./data";
-import { colOf, Fig, lineTop, Listing, listingGeometry, listingHeight, Marked, markP, Mono, Out } from "./kit";
+import { After, colOf, Fig, lineTop, Listing, listingGeometry, listingHeight, Marked, markP, Mono, Out } from "./kit";
 
 const LEFT = 120;
-const SIZE = 34;
+const SIZE = 36;
 const LIST_W = 820;
-const LIST_TOP = 356;
+const LIST_TOP = 392;
 /** The two columns beside the listing: what each line printed, and the
  *  question its comparison asks. */
 const OUT_X = LEFT + LIST_W + 50;
@@ -73,7 +73,14 @@ export const CodeScene: React.FC = () => {
       <Ink
         at={open + 2}
         dur={22}
-        style={{ left: LEFT - 2, top: y(150), ...headline(88), whiteSpace: "nowrap", display: "flex", gap: "0.24em" }}
+        style={{
+          left: LEFT - 2,
+          top: y(150),
+          ...headline(88),
+          whiteSpace: "nowrap",
+          display: "flex",
+          gap: "0.24em",
+        }}
       >
         <span>Same letters,</span>
         <span style={{ position: "relative", ...headline(88, true) }}>
@@ -119,7 +126,7 @@ export const CodeScene: React.FC = () => {
         />
       ) : null}
 
-      <Fig n="1" at={stringsAt - 8} x={LEFT} y={y(296)}>
+      <Fig n="1" at={stringsAt - 8} x={LEFT} y={y(330)}>
         Two strings that both spell <Mono>&quot;hi&quot;</Mono>
       </Fig>
       <Listing
@@ -131,10 +138,32 @@ export const CodeScene: React.FC = () => {
         at={stringsAt - 6}
         lineAt={L.map((_, i) => (i === SAME_LINE ? eqAt - 6 : i === EQUALS_LINE ? dotAt - 6 : stringsAt - 2 + i * 6))}
         marks={[
-          { line: 0, col: hi0, chars: 4, at: lettersAt - 2, out: verdictFrom - 4 },
-          { line: 1, col: hi1, chars: 4, at: lettersAt + 4, out: verdictFrom - 4 },
-          { line: SAME_LINE, col: colOf(L[SAME_LINE], "a == b"), chars: 6, at: eqAt },
-          { line: EQUALS_LINE, col: colOf(L[EQUALS_LINE], "a.equals(b)"), chars: 11, at: dotAt },
+          {
+            line: 0,
+            col: hi0,
+            chars: 4,
+            at: lettersAt - 2,
+            out: verdictFrom - 4,
+          },
+          {
+            line: 1,
+            col: hi1,
+            chars: 4,
+            at: lettersAt + 4,
+            out: verdictFrom - 4,
+          },
+          {
+            line: SAME_LINE,
+            col: colOf(L[SAME_LINE], "a == b"),
+            chars: 6,
+            at: eqAt,
+          },
+          {
+            line: EQUALS_LINE,
+            col: colOf(L[EQUALS_LINE], "a.equals(b)"),
+            chars: 11,
+            at: dotAt,
+          },
         ]}
       />
 
@@ -154,12 +183,14 @@ export const CodeScene: React.FC = () => {
       )}
       <Ink at={sameObjectAt - 2} dur={18} style={{ ...row(SAME_LINE), left: ASK_X }}>
         <span style={{ ...body(36, true), color: INK }}>
-          is this the <Marked p={markP(frame, objectAt)}>same object</Marked>?
+          is this the <Marked p={markP(frame, objectAt)}>same object</Marked>
+          <After>?</After>
         </span>
       </Ink>
       <Ink at={contentsAskAt - 2} dur={18} style={{ ...row(EQUALS_LINE), left: ASK_X }}>
         <span style={{ ...body(36, true), color: INK }}>
-          do they hold the <Marked p={markP(frame, contentsAt)}>same contents</Marked>?
+          do they hold the <Marked p={markP(frame, contentsAt)}>same contents</Marked>
+          <After>?</After>
         </span>
       </Ink>
 

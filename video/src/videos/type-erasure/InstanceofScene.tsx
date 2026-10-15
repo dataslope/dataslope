@@ -47,18 +47,18 @@ export const InstanceofScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Fig n="2" at={start - 12} x={LEFT} y={y(FIG_Y)}>
+      <Fig n="2" at={start - 6} x={LEFT} y={y(FIG_Y)}>
         Asking whether a value is a <Mono>User</Mono>
       </Fig>
-      <FileTab at={start - 8} x={LEFT} y={y(TAB_Y)} name="check.ts" />
+      <FileTab at={start - 3} x={LEFT} y={y(TAB_Y)} name="check.ts" />
       <Listing
         lines={CHECK_TS}
         x={LEFT}
         top={top}
         width={TS_W}
         size={SIZE}
-        at={start - 8}
-        lineAt={CHECK_TS.map((_, i) => start - 4 + i * 2)}
+        at={start - 3}
+        lineAt={CHECK_TS.map((_, i) => start + i * 2)}
         marks={[{ ...CHECK_INSTANCEOF, at: askAt - 2 }]}
         squiggles={[{ ...CHECK_ERROR_SPAN, at: flagsAt + 4 }]}
       />

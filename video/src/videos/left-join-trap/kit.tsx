@@ -18,7 +18,7 @@ import type { Value } from "./data";
 /** NULL takes the amber "look here" ink everywhere: in the code, in the
  *  tables and in the notes. */
 export const NULL_INK = "var(--ds-amber-ink)";
-export const NULL_RING = ds("yellow", 600);
+export const NULL_RING = NULL_INK;
 /** What survives, and what was lost by mistake. */
 export const KEPT_INK = "var(--ds-green-ink)";
 export const KEPT_WASH = `color-mix(in srgb, ${ds("green", 200)} 60%, transparent)`;
@@ -211,7 +211,8 @@ export const Listing: React.FC<{
                 opacity: ease(frame, lineAt[i] - 4, 10),
               }}
             >
-              {i + 1}
+              {/* A line below a half-open insert keeps its old number until the gap is mostly open. */}
+              {insert && i > insert.line && open < 0.5 ? i : i + 1}
             </div>
             {gone < 1 ? (
               <Ink
@@ -288,7 +289,9 @@ export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?
   color,
   weight = 400,
 }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: weight, color, fontVariantLigatures: "none" }}>
+  <span
+    style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: weight, fontStyle: "normal", color, fontVariantLigatures: "none" }}
+  >
     {children}
   </span>
 );
@@ -584,14 +587,14 @@ export const rowCount = (n: number) => `(${n} row${n === 1 ? "" : "s"})`;
  *  query: the listing on the left, its result on the right. */
 export const STAGE = {
   listX: 120,
-  listW: 800,
+  listW: 860,
   /** The listing's and the table's top rule, before `y()`. */
-  top: 256,
-  codeSize: 28,
-  tableX: 1000,
-  tableSize: 28,
+  top: 262,
+  codeSize: 30,
+  tableX: 1040,
+  tableSize: 30,
 } as const;
 /** name, order_id and amount, then the WHERE test when it is shown. */
-export const JOIN_WIDTHS = [170, 180, 160, 230] as const;
+export const JOIN_WIDTHS = [170, 190, 170, 220] as const;
 export const joinCols = (fields: readonly string[]): Column[] =>
   fields.map((f, i) => ({ title: f, width: JOIN_WIDTHS[i], align: i === 0 || i === 3 ? "left" : "right" }));

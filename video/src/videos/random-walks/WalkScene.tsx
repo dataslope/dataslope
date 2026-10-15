@@ -3,11 +3,26 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, headline, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { END_A, FIRST_FLIPS, STEPS, TREND, WALK_A } from "./data";
-import { COLOR, COLOR_INK, Headline, Key, Layer, Spot, ValueGrid, WALK_X, WALK_Y, useValueY, walkD, walkTip } from "./parts";
+import {
+  COLOR,
+  COLOR_INK,
+  Headline,
+  Key,
+  Layer,
+  leaveAt,
+  prose,
+  Spot,
+  ValueGrid,
+  WALK_X,
+  WALK_Y,
+  useValueY,
+  walkD,
+  walkTip,
+} from "./parts";
 
 /** Where the brackets and notes of the right-hand column start. */
 const RIGHT = 1340;
@@ -32,6 +47,7 @@ export const WalkScene: React.FC = () => {
   const wanderFrom = n.beat("wander").from;
   const upAt = n.word("wander", "twenty-six");
   const trendAt = n.word("wander", "trend");
+  const leave = leaveAt(n.beat("pair").from);
 
   // The walk draws itself while the hook is spoken.
   const drawn = STEPS * ease(frame, hook.from - 4, coinFrom - hook.from);
@@ -45,8 +61,8 @@ export const WalkScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Headline first="Going somewhere?" second="Three hundred coin flips." at={2} secondAt={flipAt - 2} />
-      <FigLabel n="1" title="One random walk, 300 flips of a coin" at={6} x={120} y={y(196)} />
+      <Headline first="Going somewhere?" second="Three hundred coin flips." at={2} secondAt={flipAt - 2} out={leave} />
+      <FigLabel n="1" title="One random walk, 300 flips of a coin" at={6} x={120} y={y(196)} out={leave} />
 
       {/* The first flips, spelled out as the narration describes a step. */}
       <Ink at={stepAt - 6} dur={14} style={{ left: 200, top: y(258) + 9, whiteSpace: "nowrap" }}>
@@ -128,24 +144,16 @@ export const WalkScene: React.FC = () => {
             <line x1={x1 + 24} x2={x1 + 24} y1={yOf(0)} y2={yOf(0) + (yOf(END_A) - yOf(0)) * bracket} />
             <line x1={x1 + 16} x2={x1 + 32} y1={yOf(0)} y2={yOf(0)} />
             {bracket >= 1 ? <line x1={x1 + 16} x2={x1 + 32} y1={yOf(END_A)} y2={yOf(END_A)} /> : null}
-            <line
-              x1={x1 + 8}
-              x2={x1 + 16}
-              y1={yOf(0)}
-              y2={yOf(0)}
-              stroke={HAIRLINE}
-              strokeDasharray="2 3"
-            />
           </g>
         ) : null}
       </Layer>
 
       <Note at={upAt + 2} x={RIGHT + 30} y={(yOf(0) + yOf(END_A)) / 2 - 52}>
         <div style={{ ...headline(64), color: COLOR_INK.a }}>+{END_A}</div>
-        <div style={{ ...note(21, INK_SOFT), marginTop: 6, whiteSpace: "nowrap" }}>steps after {STEPS} flips</div>
+        <div style={{ ...prose(21), marginTop: 6, whiteSpace: "nowrap" }}>steps after {STEPS} flips</div>
       </Note>
       <Note at={trendAt} x={RIGHT + 30} y={yOf(0) + 40}>
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 12, whiteSpace: "nowrap", ...note(21, INK) }}>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 12, whiteSpace: "nowrap", ...prose(21, INK) }}>
           <Key color={ACCENT} kind="dash" />
           the trend the eye sees
         </span>

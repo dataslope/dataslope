@@ -6,8 +6,8 @@ import { useNarration } from "../../narration/NarrationContext";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, headline, INK_SOFT, label } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
-import { ILLUSTRATIONS, USER_JS, USER_RUN, USER_TS, VIDEO } from "./data";
-import { Arrow, Fig, FileTab, Listing, listingHeight, lineTop, Mono, Terminal } from "./kit";
+import { ILLUSTRATIONS, tscCommand, USER_JS, USER_RUN, USER_TS, VIDEO } from "./data";
+import { Arrow, Fig, FileTab, Listing, listingHeight, lineTop, Mono, OK_INK, Terminal } from "./kit";
 
 const LEFT = 110;
 const TS_W = 790;
@@ -151,8 +151,14 @@ export const ErasureScene: React.FC = () => {
         x={JS_X}
         top={runTop}
         width={JS_W}
-        at={plainAt - 6}
+        at={compilerAt - 4}
         rows={[
+          {
+            kind: "cmd",
+            text: tscCommand("user"),
+            at: compilerAt,
+            tag: { text: "no output, no errors", at: compilerAt + 12, color: OK_INK },
+          },
           { kind: "cmd", text: "node user.js", at: plainAt - 4 },
           { kind: "out", text: USER_RUN, at: plainAt + 6 },
         ]}

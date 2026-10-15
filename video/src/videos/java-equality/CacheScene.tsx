@@ -13,6 +13,7 @@ import {
   Fig,
   FRESH_TINT,
   HeapObj,
+  InkSlot,
   Marked,
   markP,
   Mono,
@@ -37,7 +38,10 @@ const STEP = 132;
 const GAP = 90;
 const RUN = 3;
 const STRIP = [
-  ...Array.from({ length: RUN }, (_, k) => ({ value: CACHE.low + k, x: STRIP_X + k * STEP })),
+  ...Array.from({ length: RUN }, (_, k) => ({
+    value: CACHE.low + k,
+    x: STRIP_X + k * STEP,
+  })),
   ...Array.from({ length: RUN }, (_, k) => ({
     value: CACHE.high - RUN + 1 + k,
     x: STRIP_X + RUN * STEP + GAP + k * STEP,
@@ -110,7 +114,7 @@ export const CacheScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Fig n="4" at={start - 14} x={LEFT} y={y(108)}>
+      <Fig n="4" at={start - 2} x={LEFT} y={y(108)}>
         What autoboxing hands back
       </Fig>
 
@@ -156,7 +160,7 @@ export const CacheScene: React.FC = () => {
           left: DIVIDE,
           top: y(HEADS),
           width: 1,
-          height: (frameBottom - y(HEADS)) * ease(frame, cachedAt - 10, 20),
+          height: (frameBottom - y(HEADS)) * ease(frame, insideAt - 8, 20),
           background: HAIRLINE,
         }}
       />
@@ -179,7 +183,10 @@ export const CacheScene: React.FC = () => {
       <Ink at={cachedAt - 4} dur={16} style={{ left: STRIP_X, top: y(CACHE_LABEL), whiteSpace: "nowrap" }}>
         <span style={label(21, INK)}>Integer cache</span>
         <span style={{ ...note(21, INK_SOFT), marginLeft: "0.7em" }}>
-          one object for each of {CACHE.count} values, from {CACHE.low} to {CACHE.high}
+          one object for each of {CACHE.count} values
+          <InkSlot at={lowAt}>
+            , from {CACHE.low} to {CACHE.high}
+          </InkSlot>
         </span>
       </Ink>
       {STRIP.map((c, k) => {
@@ -221,7 +228,12 @@ export const CacheScene: React.FC = () => {
       <VarCell x={CELL_X} top={rowTop("a")} width={CELL_W} height={rowH} name="a" at={insideAt - 2} />
       <VarCell x={CELL_X} top={rowTop("b")} width={CELL_W} height={rowH} name="b" at={insideAt + 2} />
       <RefArrow points={[dot("a"), [ELBOW.a, mid("a")], [ELBOW.a, under]]} dotAt={insideAt + 6} at={bothAt} dur={20} />
-      <RefArrow points={[dot("b"), [ELBOW.b, mid("b")], [ELBOW.b, under]]} dotAt={insideAt + 8} at={bothAt + 6} dur={20} />
+      <RefArrow
+        points={[dot("b"), [ELBOW.b, mid("b")], [ELBOW.b, under]]}
+        dotAt={insideAt + 8}
+        at={bothAt + 6}
+        dur={20}
+      />
       <Note at={sameAt + 4} x={LAST.x + BOX_W + 40} y={mid("a") - 22}>
         <Verdict expr="a == b" value={BOXED.aSameB} size={30} />
         <div style={{ ...note(20, INK_SOFT), marginTop: 12 }}>one cached object</div>
@@ -260,10 +272,10 @@ export const CacheScene: React.FC = () => {
         </div>
       </Note>
 
-      <Note at={differAt + 24} x={LEFT} y={y(FOOT)}>
+      <Note at={highAt + 24} x={LEFT} y={y(FOOT)}>
         <span style={note(20, INK_SOFT)}>
           The default range on OpenJDK {JAVA_MAJOR}. Run with <Mono>{CACHE_RAISED.flag}</Mono> and it reaches{" "}
-          {CACHE_RAISED.high}, so <Mono>x == y</Mono> prints <Mono>{String(CACHE_RAISED.xEqualsY)}</Mono>.
+          {CACHE_RAISED.high}, so <Mono>x == y</Mono> in Fig. 3 prints <Mono>{String(CACHE_RAISED.xEqualsY)}</Mono>.
         </span>
       </Note>
     </AbsoluteFill>

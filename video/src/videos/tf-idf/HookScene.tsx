@@ -29,8 +29,8 @@ export const HookScene: React.FC = () => {
   const { y } = useLayout();
   const figAt = n.word("hook", "three tiny");
   const docsAt = n.word("hook", "documents");
-  const theAt = n.word("hook", "the word the");
-  const noteAt = n.word("hook", "word the", { edge: "end" });
+  const everyAt = n.word("hook", "In every one");
+  const commonAt = n.word("hook", "most common");
   const cat = pop(frame, docsAt + 4, fps, 16);
 
   return (
@@ -61,7 +61,7 @@ export const HookScene: React.FC = () => {
             <span style={{ ...slip, padding: "14px 30px 16px", ...body(46), color: INK, whiteSpace: "nowrap" }}>
               {words.map((w, k) => {
                 const isThe = w === "the";
-                const at = isThe ? theAt - 2 + i * 5 + theSeen++ * 3 : 0;
+                const at = isThe ? everyAt - 2 + i * 5 + theSeen++ * 3 : 0;
                 const p = isThe ? ease(frame, at, 10) : 0;
                 return (
                   <React.Fragment key={k}>
@@ -84,7 +84,7 @@ export const HookScene: React.FC = () => {
         );
       })}
 
-      <Note at={noteAt + 4} x={SLIP_X} y={y(SLIP_Y(2)) + 128}>
+      <Note at={commonAt + 6} x={SLIP_X} y={y(SLIP_Y(2) + 126)}>
         <span style={note(22, INK_SOFT)}>
           In every document, <i>the</i> appears {THE_COUNTS.map(times).join(" or ")}. No other word appears more
           than {times(OTHER_MAX)}.

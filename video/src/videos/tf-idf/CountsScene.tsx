@@ -5,6 +5,7 @@ import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, body, headline, INK, INK_SOFT, note } from "../../editorial/style";
 import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { MONO } from "../../theme/fonts";
 import { COUNTS, LENGTHS, spell, THE } from "./data";
 import { colMid, colX, DocTable, TABLE_BOTTOM } from "./parts";
 
@@ -78,7 +79,7 @@ export const CountsScene: React.FC = () => {
             The same in all three rows, so this column cannot tell Doc 1 from Doc 3.
           </div>
           <div style={{ ...note(21, INK_SOFT), marginTop: 18 }}>
-            Counts of the lesson&apos;s <span style={{ color: INK }}>.split()</span> tokens.
+            Counts of the lesson&apos;s <span style={{ fontFamily: MONO, color: INK }}>.split()</span> tokens.
             {LENGTH ? ` Every document is ${spell(LENGTH)} words long.` : null}
           </div>
         </Ink>

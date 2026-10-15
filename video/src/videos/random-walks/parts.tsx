@@ -25,7 +25,21 @@ export const WALK_Y = { lo: -15, hi: 30, top: 370, bottom: 800, ticks: [-10, 0, 
 export const HIST_X: XScale = { lo: -1, hi: 1, x0: 200, x1: 1300 };
 export const HIST_BASE = 790;
 /** The tallest bar of a histogram, in layout px. */
-export const HIST_TALL = 400;
+export const HIST_TALL = 450;
+
+/** Frames a scene is up before its first beat (Video.tsx), so a scene can
+ *  clear its headline before the next one is drawn over it. */
+export const LEAD = 8;
+/** When a scene's headline and figure label start to leave: they are gone
+ *  by the time the next scene appears at `nextFrom - LEAD`. */
+export const leaveAt = (nextFrom: number) => nextFrom - LEAD - 12;
+
+/** Running text in Inter. `note()` sets tabular figures, which in Inter
+ *  also widen the hyphen, so prose takes proportional ones. */
+export const prose = (size = 21, color: string = INK_SOFT): React.CSSProperties => ({
+  ...note(size, color),
+  fontVariantNumeric: "lining-nums",
+});
 
 /** Maps a value on a vertical domain to a page y, in px. */
 export const useValueY = (spec: { lo: number; hi: number; top: number; bottom: number }) => {
@@ -123,21 +137,23 @@ export const ValueGrid: React.FC<{
 
 /** One headline in two inks: the second half follows the first in the flow,
  *  so it sits a word space after it in any face. */
-export const Headline: React.FC<{ first: string; second: string; at: number; secondAt: number }> = ({
+export const Headline: React.FC<{ first: string; second: string; at: number; secondAt: number; out?: number }> = ({
   first,
   second,
   at,
   secondAt,
+  out,
 }) => {
   const { y } = useLayout();
   return (
     <div style={{ position: "absolute", left: 116, top: y(104), display: "flex", gap: "0.26em", ...headline(56) }}>
-      <Ink at={at} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
+      <Ink at={at} dur={20} out={out} style={{ position: "relative", whiteSpace: "nowrap" }}>
         {first}
       </Ink>
       <Ink
         at={secondAt}
         dur={18}
+        out={out}
         style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
       >
         {second}

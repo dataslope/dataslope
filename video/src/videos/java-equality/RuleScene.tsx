@@ -7,7 +7,7 @@ import { ACCENT_INK, headline, INK, label } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { ILLUSTRATIONS, VIDEO } from "./data";
-import { Code, Marked, markP } from "./kit";
+import { After, Code, Marked, markP } from "./kit";
 
 const LEFT = 120;
 const TEXT_X = 520;
@@ -29,20 +29,25 @@ export const RuleScene: React.FC = () => {
   const dotAt = n.word("rule", "dot equals");
   const mugs = pop(frame, start + 4, fps, 16);
 
-  const codeCell: React.CSSProperties = { left: LEFT, display: "flex", alignItems: "center" };
+  const codeCell: React.CSSProperties = {
+    left: LEFT,
+    display: "flex",
+    alignItems: "center",
+  };
 
   return (
     <AbsoluteFill>
-      <Ink at={start - 12} dur={14} style={{ left: LEFT + 4, top: y(150) }}>
+      <Ink at={start - 2} dur={14} style={{ left: LEFT + 4, top: y(262) }}>
         <span style={label(22, ACCENT_INK)}>The rule</span>
       </Ink>
 
-      <Ink at={eqAt - 4} dur={16} style={{ ...codeCell, top: y(218) }}>
+      <Ink at={eqAt - 4} dur={16} style={{ ...codeCell, top: y(330) }}>
         <Code line="a == b" size={CODE} />
       </Ink>
-      <Ink at={primitivesAt - 6} dur={22} style={{ left: TEXT_X, top: y(212), width: TEXT_W }}>
+      <Ink at={primitivesAt - 6} dur={22} style={{ left: TEXT_X, top: y(324), width: TEXT_W }}>
         <div style={{ ...headline(64), color: INK, lineHeight: 1.1 }}>
-          for primitives, or when you mean the <Marked p={markP(frame, objectAt)}>same object</Marked>.
+          for primitives, or when you mean the <Marked p={markP(frame, objectAt)}>same object</Marked>
+          <After>.</After>
         </div>
       </Ink>
 
@@ -50,19 +55,20 @@ export const RuleScene: React.FC = () => {
         style={{
           position: "absolute",
           left: LEFT,
-          top: y(430),
+          top: y(536),
           width: 140,
           height: 2,
           background: INK,
           opacity: markP(frame, contentsAt - 10),
         }}
       />
-      <Ink at={contentsAt - 4} dur={16} style={{ ...codeCell, top: y(484) }}>
+      <Ink at={contentsAt - 4} dur={16} style={{ ...codeCell, top: y(590) }}>
         <Code line="a.equals(b)" size={CODE} />
       </Ink>
-      <Ink at={contentsAt} dur={22} style={{ left: TEXT_X, top: y(478), width: TEXT_W }}>
+      <Ink at={contentsAt} dur={22} style={{ left: TEXT_X, top: y(584), width: TEXT_W }}>
         <div style={{ ...headline(64, true), color: ACCENT_INK, lineHeight: 1.1 }}>
-          to compare <Marked p={markP(frame, dotAt)}>contents</Marked>.
+          to compare <Marked p={markP(frame, dotAt)}>contents</Marked>
+          <After>.</After>
         </div>
       </Ink>
 
@@ -73,7 +79,7 @@ export const RuleScene: React.FC = () => {
           style={{
             position: "absolute",
             left: 1330,
-            top: y(250),
+            top: y(330),
             width: 470,
             height: 320,
             opacity: mugs,

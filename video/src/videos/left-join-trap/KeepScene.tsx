@@ -10,11 +10,11 @@ import { useNarration } from "../../narration/NarrationContext";
 import { CUSTOMERS, ILLUSTRATIONS, NO_ORDER_IDS, NO_ORDERS, ORDER_CUSTOMER_IDS, ORDERS, VIDEO } from "./data";
 import { Fig, Mono, noteText, Table, tableGeometry, Underline } from "./kit";
 
-const SIZE = 28;
+const SIZE = 30;
 const CUST_X = 120;
-const ORD_X = 480;
-const NOTE_X = 1060;
-const TABLE_TOP = 474;
+const ORD_X = 500;
+const NOTE_X = 1100;
+const TABLE_TOP = 490;
 
 /**
  * Hook and tables: the promise a LEFT JOIN makes, and the lesson's four
@@ -68,14 +68,14 @@ export const KeepScene: React.FC = () => {
         />
       ) : null}
 
-      <Fig n="1" at={figAt - 6} x={CUST_X} y={y(372)}>
+      <Fig n="1" at={figAt - 6} x={CUST_X} y={y(380)}>
         Four of the lesson&apos;s customers, and every order they placed
       </Fig>
       {[
         { x: CUST_X, name: "customers", at: custAt - 4 },
         { x: ORD_X, name: "orders", at: ordAt - 4 },
       ].map((t) => (
-        <Ink key={t.name} at={t.at} dur={14} style={{ left: t.x + 14, top: y(TABLE_TOP - 44) }}>
+        <Ink key={t.name} at={t.at} dur={14} style={{ left: t.x + 14, top: y(TABLE_TOP - 46) }}>
           <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK }}>{t.name}</span>
         </Ink>
       ))}
@@ -84,7 +84,7 @@ export const KeepScene: React.FC = () => {
         top={top}
         size={SIZE}
         at={custAt}
-        cols={CUSTOMERS.fields.map((f, i) => ({ title: f, width: i === 0 ? 90 : 170, align: i === 0 ? "right" : "left" }))}
+        cols={CUSTOMERS.fields.map((f, i) => ({ title: f, width: i === 0 ? 90 : 180, align: i === 0 ? "right" : "left" }))}
         rows={CUSTOMERS.rows}
         marks={noOrderRows.map((row, k) => ({ row, at: linusAt + k * 4, color: HIGHLIGHT }))}
       />
@@ -93,11 +93,11 @@ export const KeepScene: React.FC = () => {
         top={top}
         size={SIZE}
         at={ordAt}
-        cols={ORDERS.fields.map((f, i) => ({ title: f, width: [110, 210, 160][i], align: "right" }))}
+        cols={ORDERS.fields.map((f, i) => ({ title: f, width: [120, 230, 170][i], align: "right" }))}
         rows={ORDERS.rows}
         marks={ORDERS.rows.map((_, row) => ({ row, col: 1, at: neverAt + row * 2, color: HIGHLIGHT }))}
       />
-      <Note at={neverAt + 4} x={NOTE_X} y={top + g.headH + 4} width={720}>
+      <Note at={neverAt + 4} x={NOTE_X} y={top + g.headH + 6} width={700}>
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <span style={noteText(24, INK)}>
             Every order&apos;s <Mono>customer_id</Mono> is {ORDER_CUSTOMER_IDS.join(" or ")}.

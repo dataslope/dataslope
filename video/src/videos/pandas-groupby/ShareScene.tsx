@@ -58,11 +58,11 @@ export const ShareScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Ink at={start - 12} dur={14} style={{ left: 124, top: y(112) }}>
+      <Ink at={start - 2} dur={14} style={{ left: 124, top: y(112) }}>
         <span style={label(21, ACCENT_INK)}>Transform, then divide</span>
       </Ink>
       <div style={{ position: "absolute", left: 118, top: y(146), display: "flex", gap: "0.26em", ...headline(66) }}>
-        <Ink at={start - 10} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
+        <Ink at={start + 2} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Salary over group total
         </Ink>
         <Ink at={shareAt - 2} dur={18} style={{ position: "relative", ...headline(66, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
@@ -70,7 +70,7 @@ export const ShareScene: React.FC = () => {
         </Ink>
       </div>
 
-      <Fig n="3" at={start - 8} x={124} y={y(250)}>
+      <Fig n="3" at={start} x={124} y={y(250)}>
         <Code
           parts={[
             { text: 'df["salary"]', mark: { at: lineAt - 2, out: shareAt } },
@@ -152,10 +152,10 @@ export const ShareScene: React.FC = () => {
           id="pandas-groupby-cake-slice"
           style={{
             position: "absolute",
-            left: 1440,
-            top: y(560),
-            width: 330,
-            height: 300,
+            left: 1400,
+            top: y(380),
+            width: 380,
+            height: 400,
             opacity: cake,
             transform: `translateY(${bob(frame, 4, 120) + (1 - cake) * 26}px)`,
           }}

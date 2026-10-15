@@ -10,9 +10,9 @@ import { FIG3, ILLUSTRATIONS, JAVA_MAJOR, VIDEO } from "./data";
 import { colOf, Fig, lineTop, Listing, listingGeometry, listingHeight, Out } from "./kit";
 
 const LEFT = 120;
-const SIZE = 34;
+const SIZE = 36;
 const LIST_W = 820;
-const LIST_TOP = 356;
+const LIST_TOP = 392;
 const OUT_X = LEFT + LIST_W + 50;
 
 const L = FIG3.lines;
@@ -55,7 +55,11 @@ export const BoxScene: React.FC = () => {
     whiteSpace: "nowrap",
   });
   const shelf = pop(frame, intsAt - 6, fps, 16);
-  const outAt: Record<number, number> = { [SAME_127]: trueAt, [SAME_128]: falseAt, [EQUALS_128]: stillTrueAt };
+  const outAt: Record<number, number> = {
+    [SAME_127]: trueAt,
+    [SAME_128]: falseAt,
+    [EQUALS_128]: stillTrueAt,
+  };
   const lineAt = L.map((_, i) =>
     i === BOX_127
       ? boxAt - 4
@@ -72,13 +76,20 @@ export const BoxScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Ink at={start - 12} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
+      <Ink at={start - 2} dur={14} style={{ left: LEFT + 4, top: y(112) }}>
         <span style={label(21, ACCENT_INK)}>Comparing Integers</span>
       </Ink>
       <Ink
         at={trapAt - 6}
         dur={22}
-        style={{ left: LEFT - 2, top: y(150), ...headline(88), whiteSpace: "nowrap", display: "flex", gap: "0.24em" }}
+        style={{
+          left: LEFT - 2,
+          top: y(150),
+          ...headline(88),
+          whiteSpace: "nowrap",
+          display: "flex",
+          gap: "0.24em",
+        }}
       >
         <span>True at 127,</span>
         <span style={{ position: "relative", ...headline(88, true) }}>
@@ -109,10 +120,10 @@ export const BoxScene: React.FC = () => {
         </span>
       </Ink>
 
-      <Fig n="3" at={boxAt - 8} x={LEFT} y={y(296)}>
+      <Fig n="3" at={boxAt - 8} x={LEFT} y={y(330)}>
         Two boxings of 127, then two of 128
       </Fig>
-      <Ink at={trueAt - 8} dur={12} style={{ left: OUT_X, top: y(296) }}>
+      <Ink at={trueAt - 8} dur={12} style={{ left: OUT_X, top: y(330) }}>
         <span style={label(21, INK_SOFT)}>Prints</span>
       </Ink>
       <Listing
@@ -124,11 +135,36 @@ export const BoxScene: React.FC = () => {
         at={boxAt - 6}
         lineAt={lineAt}
         marks={[
-          { line: BOX_127, col: colOf(L[BOX_127], "127"), chars: span127.length - 1, at: n127At },
-          { line: SAME_127, col: colOf(L[SAME_127], "a == b"), chars: 6, at: eqAt },
-          { line: BOX_128, col: colOf(L[BOX_128], "128"), chars: span128.length - 1, at: n128At },
-          { line: SAME_128, col: colOf(L[SAME_128], "x == y"), chars: 6, at: falseAt - 6 },
-          { line: EQUALS_128, col: colOf(L[EQUALS_128], "x.equals(y)"), chars: 11, at: dotAt },
+          {
+            line: BOX_127,
+            col: colOf(L[BOX_127], "127"),
+            chars: span127.length - 1,
+            at: n127At,
+          },
+          {
+            line: SAME_127,
+            col: colOf(L[SAME_127], "a == b"),
+            chars: 6,
+            at: eqAt,
+          },
+          {
+            line: BOX_128,
+            col: colOf(L[BOX_128], "128"),
+            chars: span128.length - 1,
+            at: n128At,
+          },
+          {
+            line: SAME_128,
+            col: colOf(L[SAME_128], "x == y"),
+            chars: 6,
+            at: falseAt - 6,
+          },
+          {
+            line: EQUALS_128,
+            col: colOf(L[EQUALS_128], "x.equals(y)"),
+            chars: 11,
+            at: dotAt,
+          },
         ]}
       />
       {FIG3.prints.map((v, i) =>
@@ -149,7 +185,7 @@ export const BoxScene: React.FC = () => {
           style={{
             position: "absolute",
             left: 1330,
-            top: y(372),
+            top: y(400),
             width: 420,
             height: 380,
             opacity: shelf,

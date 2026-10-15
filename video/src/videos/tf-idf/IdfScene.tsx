@@ -5,21 +5,18 @@ import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, body, HAIRLINE, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
-import { CAT, DF, IDF, N, num, spell, THE, VOCAB } from "./data";
+import { CAT, DF, IDF, N, num, THE, VOCAB } from "./data";
 import { DocPips, dfText, Frac, V } from "./parts";
 
 /** Rows of Fig. 3, in layout units. */
 const FORMULA_Y = 262;
 const RULE_Y = 452;
-const ROW_Y = { the: 492, cat: 646 } as const;
+const ROW_Y = { the: 500, cat: 668 } as const;
 const ROW_H = 104;
 /** The idf bars: zero at BAR_X0, this many px per unit of idf. */
 const BAR_X0 = 1260;
 const PER_UNIT = 400;
 const BAR_H = 40;
-
-/** Words in exactly one document, besides "cat": each gets cat's idf. */
-const LIKE_CAT = VOCAB.filter((_, j) => j !== CAT && DF[j] === DF[CAT]).length;
 
 /** ln, then N over df, as one line of type with a stacked fraction. */
 const Ln: React.FC<{ top: React.ReactNode; bottom: React.ReactNode }> = ({ top, bottom }) => (
@@ -27,6 +24,14 @@ const Ln: React.FC<{ top: React.ReactNode; bottom: React.ReactNode }> = ({ top, 
     <span style={{ marginRight: "0.12em" }}>ln</span>
     <Frac top={top} bottom={bottom} />
   </>
+);
+
+/** "= value", with the sign set apart from what it equals. */
+const Eq: React.FC<{ color?: string; children: React.ReactNode }> = ({ color, children }) => (
+  <span style={{ color }}>
+    <span style={{ marginRight: "0.3em" }}>=</span>
+    {children}
+  </span>
 );
 
 /** One fade-in piece of a worked line. */
@@ -59,7 +64,6 @@ export const IdfScene: React.FC = () => {
   const justAt = n.word("idf-cat", "just one");
   const logAt = n.word("idf-cat", "log of three");
   const valueAt = n.word("idf-cat", "one point one");
-  const restAt = n.word("idf-cat", "one point one", { edge: "end" });
 
   const zeroLine = ease(frame, theFrom - 4, 16);
   const catBar = ease(frame, valueAt - 4, 20);
@@ -73,8 +77,8 @@ export const IdfScene: React.FC = () => {
       // ln 3/3 = ln 1 = 0
       parts: [
         { p: ease(frame, overAt - 2, 12), el: <Ln top={N} bottom={DF[THE]} /> },
-        { p: ease(frame, isOneAt, 12), el: <>= ln {N / DF[THE]}</> },
-        { p: ease(frame, zeroAt - 2, 12), el: <span style={{ color: ACCENT_INK }}>= {num(IDF[THE])}</span> },
+        { p: ease(frame, isOneAt, 12), el: <Eq>ln {N / DF[THE]}</Eq> },
+        { p: ease(frame, zeroAt - 2, 12), el: <Eq color={ACCENT_INK}>{num(IDF[THE])}</Eq> },
       ],
     },
     {
@@ -85,8 +89,8 @@ export const IdfScene: React.FC = () => {
       // ln 3/1 = ln 3 = 1.10
       parts: [
         { p: ease(frame, logAt - 4, 12), el: <Ln top={N} bottom={DF[CAT]} /> },
-        { p: ease(frame, logAt + 6, 12), el: <>= ln {N / DF[CAT]}</> },
-        { p: ease(frame, valueAt - 2, 12), el: <span style={{ color: BLUE_INK }}>= {num(IDF[CAT])}</span> },
+        { p: ease(frame, logAt + 6, 12), el: <Eq>ln {N / DF[CAT]}</Eq> },
+        { p: ease(frame, valueAt - 2, 12), el: <Eq color={BLUE_INK}>{num(IDF[CAT])}</Eq> },
       ],
     },
   ];
@@ -225,12 +229,6 @@ export const IdfScene: React.FC = () => {
         <span style={{ ...headline(46), color: BLUE_INK }}>{num(IDF[CAT])}</span>
       </Note>
 
-      <Note at={restAt + 4} x={120} y={y(ROW_Y.cat + ROW_H + 50)}>
-        <span style={note(22, INK_SOFT)}>
-          The other {spell(LIKE_CAT)} words are each in one document too, so each gets {num(IDF[CAT])}. The log of{" "}
-          {N} is {IDF[CAT].toFixed(4)}.
-        </span>
-      </Note>
     </AbsoluteFill>
   );
 };

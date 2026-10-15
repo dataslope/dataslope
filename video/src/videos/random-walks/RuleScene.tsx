@@ -2,14 +2,14 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, HAIRLINE, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, body, HAIRLINE, headline, INK, INK_SOFT, label } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { ADF_DIFF, ADF_WALK, dec, DIFF_A, WALK_A } from "./data";
-import { COLOR, PASS_INK, Spot } from "./parts";
+import { COLOR, PASS_INK, prose, Spot } from "./parts";
 
 const LEFT = 120;
-const COL = { name: LEFT + 230, p: 760, verdict: 1040 };
+const COL = { name: LEFT + 230, p: 700, verdict: 960 };
 const SPARK_W = 190;
 const SPARK_H = 56;
 /** The thumbnail of the differences shows the first flips, at a width where
@@ -63,8 +63,8 @@ export const RuleScene: React.FC = () => {
   const diffsAt = n.word("rule", "Its differences");
   const passAt = n.word("rule", "pass");
 
-  const head = y(456);
-  const row = (i: number) => y(530) + i * 104;
+  const head = y(370);
+  const row = (i: number) => y(440) + i * 104;
   const rows = [
     { at: walkAt, verdictAt: failsAt, spark: "walk" as const, name: "Walk a", p: dec(ADF_WALK), verdict: "non-stationary", ink: ACCENT_INK },
     {
@@ -80,10 +80,10 @@ export const RuleScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Ink at={start - 12} dur={14} style={{ left: LEFT, top: y(140) }}>
+      <Ink at={start - 4} dur={14} style={{ left: LEFT, top: y(140) }}>
         <span style={label(22, ACCENT_INK)}>Before you trust a correlation</span>
       </Ink>
-      <Ink at={start - 10} dur={22} style={{ left: LEFT - 6, top: y(184), width: 1180, ...headline(84), lineHeight: 1.08 }}>
+      <Ink at={start - 2} dur={22} style={{ left: LEFT - 6, top: y(184), width: 1180, ...headline(84), lineHeight: 1.08 }}>
         Test each series for stationarity.
       </Ink>
 
@@ -117,9 +117,8 @@ export const RuleScene: React.FC = () => {
       ))}
 
       <Note at={passAt + 10} x={LEFT} y={row(2) + 20} width={1100}>
-        <span style={note(21, INK_SOFT)}>
-          The lesson&apos;s rule: a p-value under 0.05 rejects the unit root, so the series counts as stationary.
-          Correlate the stationary versions.
+        <span style={prose(21)}>
+          The lesson’s rule: a p-value under 0.05 rejects the unit root, so the series counts as stationary.
         </span>
       </Note>
 

@@ -478,14 +478,17 @@ export const Wash: React.FC<{
   at: number;
   out?: number;
   dur?: number;
-}> = ({ g, from, to, col, cols = 1, color, at, out, dur = 12 }) => {
+  /** For a whole-row wash: how far it reaches, when the table is still
+   *  growing new columns (defaults to the full table). */
+  rowWidth?: number;
+}> = ({ g, from, to, col, cols = 1, color, at, out, dur = 12, rowWidth = g.width }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, dur);
   const o = out === undefined ? 0 : ease(frame, out, 10);
   if (p <= 0 || o >= 1) return null;
   const left = col === undefined ? g.x : g.colX[col];
   const width =
-    col === undefined ? g.width : g.cols.slice(col, col + cols).reduce((s, c) => s + COL_W[c], 0);
+    col === undefined ? rowWidth : g.cols.slice(col, col + cols).reduce((s, c) => s + COL_W[c], 0);
   const top = g.rowTop(from) + 3;
   return (
     <div

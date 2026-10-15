@@ -41,7 +41,7 @@ export const OnScene: React.FC = () => {
   const top = y(STAGE.top);
   const lines = SQL_LINES.where;
   const listBottom = top + listingHeight(lines.length, STAGE.codeSize);
-  const swapAt = onAt - 6;
+  const swapAt = moveAt + 6;
   // The ON clause runs from its ON line to the moved condition.
   const onLine = SQL_LINES.on.findIndex((l) => l.trimStart().startsWith("ON "));
   const onSpan = FILTER_LINE - onLine + 1;
@@ -81,7 +81,7 @@ export const OnScene: React.FC = () => {
         swaps={[{ line: FILTER_LINE, text: SQL_LINES.on[FILTER_LINE], at: swapAt }]}
         marks={[
           { line: FILTER_LINE, at: pre, out: moveAt, color: HIGHLIGHT },
-          { line: onLine, lines: onSpan, start: indent, chars: onChars, at: onAt + 8, color: KEPT_WASH },
+          { line: onLine, lines: onSpan, start: indent, chars: onChars, at: onAt, color: KEPT_WASH },
         ]}
         strikes={[{ line: JOIN_LINE, start: 0, chars: 4, at: pre, out: swapAt + 10 }]}
       />

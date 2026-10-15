@@ -80,6 +80,8 @@ export const WhereScene: React.FC = () => {
   const testCol = ease(frame, testAt - 4, 14) * (1 - ease(frame, collapseAt, 14));
   const rowScale = TESTED.rows.map((_, i) => (TEST_TRUE.includes(i) ? 1 : 1 - ease(frame, collapseAt + 4, 16)));
   const full = tableRows(top, STAGE.tableSize, TESTED.rows.map(() => 1));
+  /** The sieve rides under the table as its failed rows close up. */
+  const now = tableRows(top, STAGE.tableSize, rowScale);
   const out = collapseAt - 2;
   const ring = (row: number, col: number, at: number, color?: string): CellMark => ({ row, col, at, out, ring: true, color });
   const sieve = pop(frame, whereKeepsAt - 4, fps, 16);
@@ -150,10 +152,10 @@ export const WhereScene: React.FC = () => {
           id="ljt-sieve"
           style={{
             position: "absolute",
-            left: 1530,
-            top: full.bottom + h(56),
-            width: 210,
-            height: 210,
+            left: 1570,
+            top: now.bottom + h(56),
+            width: 190,
+            height: 190,
             opacity: sieve,
             transformOrigin: "50% 40%",
             transform: `translateY(${bob(frame, 4, 100) + (1 - sieve) * 26}px) rotate(${(1 - sieve) * -14 + Math.sin(frame / 36) * 1.5}deg)`,
@@ -164,7 +166,10 @@ export const WhereScene: React.FC = () => {
       <div style={{ position: "absolute", left: STAGE.listX, top: listBottom + h(44), display: "flex", flexDirection: "column", gap: 14 }}>
         <Ink at={notTrueAt - 2} dur={14} style={{ position: "relative" }}>
           <span style={noteText(24, INK)}>
-            <Mono color={NULL_INK} weight={700}>NULL</Mono> <Mono>&gt; 50</Mono> is <Mono color={NULL_INK} weight={700}>NULL</Mono>: unknown, not true.
+            <Mono>
+              <span style={{ color: NULL_INK, fontWeight: 700 }}>NULL</span> &gt; 50
+            </Mono>{" "}
+            is <Mono color={NULL_INK} weight={700}>NULL</Mono>: unknown, not true.
           </span>
         </Ink>
         <Ink at={whereKeepsAt - 2} dur={14} style={{ position: "relative" }}>

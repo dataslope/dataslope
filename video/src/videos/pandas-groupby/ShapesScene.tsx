@@ -65,12 +65,12 @@ export const ShapesScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Ink at={start - 12} dur={14} style={{ left: 124, top: y(112) }}>
+      <Ink at={start - 2} dur={14} style={{ left: 124, top: y(112) }}>
         <span style={label(21, ACCENT_INK)}>The part most people miss</span>
       </Ink>
       {/* One line in two inks; the second half follows the first in the flow. */}
       <div style={{ position: "absolute", left: 118, top: y(146), display: "flex", gap: "0.26em", ...headline(66) }}>
-        <Ink at={start - 6} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
+        <Ink at={start + 2} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           One row per group,
         </Ink>
         <Ink at={transAt - 2} dur={18} style={{ position: "relative", ...headline(66, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
@@ -78,7 +78,7 @@ export const ShapesScene: React.FC = () => {
         </Ink>
       </div>
 
-      <Fig n="2" at={start - 8} x={124} y={y(250)}>
+      <Fig n="2" at={start} x={124} y={y(250)}>
         The same sum, through <Mono>agg</Mono> and through <Mono>transform</Mono>
       </Fig>
 
@@ -95,7 +95,7 @@ export const ShapesScene: React.FC = () => {
       </Note>
 
       {/* ── agg: three rows ── */}
-      <Ink at={start - 10} dur={12} style={{ left: D_X, top: y(LABEL_Y) }}>
+      <Ink at={start} dur={12} style={{ left: D_X, top: y(LABEL_Y) }}>
         <Code parts={[{ text: '.agg("sum")', mark: { at: groupAt - 2, out: transAt - 4 } }]} size={24} />
       </Ink>
       <Header x={D_X} top={y(D_HEADER)} width={D_W} at={start - 14} cols={KEY_COLS} />

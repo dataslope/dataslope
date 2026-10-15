@@ -8,7 +8,7 @@ import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { ds } from "../../theme/brand";
 import { BIN, dec, DIFFS_PAST_25, HIST, LO, PAIRS, pct, R_DIFFS, R_WALKS, SHARE } from "./data";
-import { COLOR, COLOR_INK, Headline, HIST_BASE, HIST_TALL, HIST_X, Key, Layer } from "./parts";
+import { COLOR, COLOR_INK, Headline, HIST_BASE, HIST_TALL, HIST_X, Key, Layer, leaveAt, prose } from "./parts";
 
 const TICKS = [-1, -0.5, 0, 0.5, 1];
 const CUT = 0.25;
@@ -18,8 +18,9 @@ const beyond = (i: number) => {
 };
 /** The walks' histogram, faded behind the differences'. */
 const GHOST = ds("blue", 200);
-const TABLE_X = 1400;
-const COL = [TABLE_X, TABLE_X + 190, TABLE_X + 300];
+const TABLE_X = 1370;
+const COL = [TABLE_X, TABLE_X + 180, TABLE_X + 290];
+const TABLE_W = 440;
 
 /**
  * Collapse: the same ten thousand pairs, differenced. The wide spread of
@@ -34,6 +35,7 @@ export const CollapseScene: React.FC = () => {
   const zeroAt = n.word("collapse", "nearly zero");
   const sevenAt = n.word("collapse", "seven in ten");
   const twoAt = n.word("collapse", "two in ten thousand");
+  const leave = leaveAt(n.beat("rule").from);
 
   const base = y(HIST_BASE);
   const top = base - h(HIST_TALL);
@@ -44,12 +46,12 @@ export const CollapseScene: React.FC = () => {
   const k = ease(frame, sameAt - 2, 26);
   const unit = wideUnit + (narrowUnit - wideUnit) * k;
   const cut = ease(frame, sevenAt - 4, 14);
-  const row = (i: number) => y(380) + i * 80;
+  const row = (i: number) => y(340) + i * 80;
 
   return (
     <AbsoluteFill>
-      <Headline first="Difference each walk," second="and the correlation is gone." at={start - 14} secondAt={zeroAt - 2} />
-      <FigLabel n="5" title="Correlation of the same 10,000 pairs, after differencing" at={start - 8} x={120} y={y(196)} />
+      <Headline first="Difference each walk," second="and the correlation is gone." at={start - 4} secondAt={zeroAt - 2} out={leave} />
+      <FigLabel n="5" title="Correlation of the same 10,000 pairs, after differencing" at={start - 2} x={120} y={y(196)} out={leave} />
 
       <Bars
         counts={HIST.walks}
@@ -59,6 +61,7 @@ export const CollapseScene: React.FC = () => {
         base={base}
         unit={unit}
         color={`color-mix(in srgb, ${COLOR.a} ${Math.round((1 - k) * 100)}%, ${GHOST})`}
+        opacity={ease(frame, start - 2, 10)}
       />
       <Bars
         counts={HIST.walks.map((c, i) => (beyond(i) ? c : 0))}
@@ -80,8 +83,8 @@ export const CollapseScene: React.FC = () => {
         color={COLOR.a}
         grow={() => k}
       />
-      <Axis scale={HIST_X} base={base} ticks={TICKS} format={(v) => (v === 0 ? "0" : dec(v, v % 1 ? 1 : 0))} at={start - 30} size={20} />
-      <Note at={start - 20} x={(HIST_X.x0 + HIST_X.x1) / 2} y={base + 48} style={{ transform: "translateX(-50%)" }}>
+      <Axis scale={HIST_X} base={base} ticks={TICKS} format={(v) => (v === 0 ? "0" : dec(v, v % 1 ? 1 : 0))} at={start - 2} size={20} />
+      <Note at={start - 2} x={(HIST_X.x0 + HIST_X.x1) / 2} y={base + 48} style={{ transform: "translateX(-50%)" }}>
         <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>Correlation of the two series in a pair, r</span>
       </Note>
 
@@ -108,10 +111,10 @@ export const CollapseScene: React.FC = () => {
         <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>Differences</span>
       </Note>
       <Layer opacity={ease(frame, start, 12)}>
-        <line x1={TABLE_X} x2={TABLE_X + 420} y1={row(0) - 18} y2={row(0) - 18} stroke={INK} strokeWidth={1.6} />
+        <line x1={TABLE_X} x2={TABLE_X + TABLE_W} y1={row(0) - 18} y2={row(0) - 18} stroke={INK} strokeWidth={1.6} />
         <line
           x1={TABLE_X}
-          x2={TABLE_X + 420}
+          x2={TABLE_X + TABLE_W}
           y1={row(1) - 18}
           y2={row(1) - 18}
           stroke={HAIRLINE}
@@ -121,8 +124,8 @@ export const CollapseScene: React.FC = () => {
       </Layer>
 
       <Note at={start} x={COL[0]} y={row(0)}>
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 10, ...note(21, INK), whiteSpace: "nowrap" }}>
-          Fig. 2&apos;s pair
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 10, ...prose(21, INK), whiteSpace: "nowrap" }}>
+          Fig. 2’s pair
         </span>
       </Note>
       <Note at={start} x={COL[1]} y={row(0) - 6}>
@@ -145,8 +148,8 @@ export const CollapseScene: React.FC = () => {
         </span>
       </Note>
 
-      <Note at={sameAt + 20} x={TABLE_X} y={row(2) + 10} width={420}>
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 12, ...note(20, INK_SOFT) }}>
+      <Note at={sameAt + 20} x={TABLE_X} y={row(2) + 10} width={TABLE_W}>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 12, ...prose(20) }}>
           <Key color={GHOST} kind="box" />
           the walks, from Fig. 3
           <span style={{ width: 8 }} />

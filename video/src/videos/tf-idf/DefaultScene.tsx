@@ -52,7 +52,7 @@ export const DefaultScene: React.FC = () => {
   const theseAt = n.word("sklearn", "On these three");
   const topAt = n.word("sklearn", "stays on top");
 
-  const a = ease(frame, textbookAt - 4, 14);
+  const a = ease(frame, start + 2, 14);
   const b = ease(frame, smoothsAt - 4, 14);
   const plusOne = ease(frame, addsAt - 2, 12);
   const bVals = ease(frame, addsAt + 8, 12);
@@ -97,7 +97,7 @@ export const DefaultScene: React.FC = () => {
       <div style={{ position: "absolute", left: COL_B, top: y(HEAD_Y), opacity: b, ...label(21, INK_SOFT) }}>
         <Code>TfidfVectorizer()</Code> default
       </div>
-      <Ink at={textbookAt - 2} dur={18} style={{ left: COL_A, top: y(FORMULA_Y), ...headline(42), whiteSpace: "nowrap" }}>
+      <Ink at={start + 4} dur={18} style={{ left: COL_A, top: y(FORMULA_Y), ...headline(42), whiteSpace: "nowrap" }}>
         <span style={{ display: "inline-flex", alignItems: "center" }}>
           <span style={{ marginRight: "0.12em" }}>ln</span>
           <Frac top={<V>N</V>} bottom={<V>df</V>} />
@@ -177,14 +177,13 @@ export const DefaultScene: React.FC = () => {
         {DOC1.map((d, k) => {
           const bh = h(MAX_H) * (d.v / TOP_V) * ease(frame, theseAt + k * 3, 20);
           return (
-            <rect
-              key={d.w}
-              x={CHART_X + k * STEP}
-              y={y(BASE_Y) - bh}
-              width={BAR_W}
-              height={bh}
-              fill={d.j === THE ? `color-mix(in srgb, ${ACCENT} ${top * 100}%, ${BAR})` : BAR}
-            />
+            <React.Fragment key={d.w}>
+              <rect x={CHART_X + k * STEP} y={y(BASE_Y) - bh} width={BAR_W} height={bh} fill={BAR} />
+              {/* "the" turns to the accent from the baseline up as it is named. */}
+              {d.j === THE && top > 0 ? (
+                <rect x={CHART_X + k * STEP} y={y(BASE_Y) - bh * top} width={BAR_W} height={bh * top} fill={ACCENT} />
+              ) : null}
+            </React.Fragment>
           );
         })}
       </svg>

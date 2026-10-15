@@ -21,7 +21,7 @@ export const VIDEO = "tf-idf";
  * has written both WebPs. Every frame is laid out with room for them either
  * way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 /** The lesson's three documents, as written and as `.split()` tokens. */
 export const CORPUS: readonly string[] = m.corpus;

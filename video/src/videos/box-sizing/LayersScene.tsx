@@ -86,10 +86,10 @@ export const LayersScene: React.FC = () => {
           id="box-sizing-frame"
           style={{
             position: "absolute",
-            left: 1370,
-            top: y(100),
-            width: 420,
-            height: 290,
+            left: 1430,
+            top: y(92),
+            width: 330,
+            height: 430,
             opacity: frameArt,
             transform: `translateY(${bob(frame, 5, 110) + (1 - frameArt) * 30}px)`,
           }}

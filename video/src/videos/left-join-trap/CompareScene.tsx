@@ -132,19 +132,22 @@ export const CompareScene: React.FC = () => {
               rowAt={t.rows.map((_, r) => t.at + 6 + r * 2)}
               marks={t.marks}
             />
-            {/* The row count, the way psql prints it, marked as it is spoken. */}
-            <div
-              style={{
-                position: "absolute",
-                left: x + 8,
-                top: bottoms[i] + 8,
-                height: countH - 6,
-                width: 132 * count,
-                background: HIGHLIGHT,
-              }}
-            />
+            {/* The row count, the way psql prints it, marked as it is spoken:
+                the wash is the span's own background, so it fits the words. */}
             <Ink at={t.at + 10} dur={12} style={{ left: x + 14, top: bottoms[i] + 8, height: countH - 6, display: "flex", alignItems: "center" }}>
-              <span style={{ fontFamily: MONO, fontSize: 21, color: count > 0.5 ? INK : INK_SOFT, whiteSpace: "nowrap" }}>
+              <span
+                style={{
+                  fontFamily: MONO,
+                  fontSize: 21,
+                  color: count > 0.5 ? INK : INK_SOFT,
+                  whiteSpace: "nowrap",
+                  padding: "2px 0.4em",
+                  margin: "0 -0.4em",
+                  backgroundImage: `linear-gradient(${HIGHLIGHT}, ${HIGHLIGHT})`,
+                  backgroundSize: `${count * 100}% 100%`,
+                  backgroundRepeat: "no-repeat",
+                }}
+              >
                 {rowCount(t.rows.length)}
               </span>
             </Ink>
@@ -201,12 +204,16 @@ export const CompareScene: React.FC = () => {
 
       <Ink at={ruleAt - 6} dur={22} style={{ left: X0, top: ruleTop, width: 1220 }}>
         <div style={{ height: 2, background: INK, width: 140, marginBottom: 26 }} />
+        {/* Broken by sense, not by width: the condition, then the rule. */}
         <div style={{ ...headline(46, true), color: INK, lineHeight: 1.16 }}>
-          To keep every row on the left, filter the right table{" "}
-          <Underline at={inOnAt - 2} color={KEPT_INK}>
-            in <Mono weight={600}>ON</Mono>
-          </Underline>
-          , not in <Mono weight={600}>WHERE</Mono>.
+          <div>To keep every row on the left,</div>
+          <div>
+            filter the right table{" "}
+            <Underline at={inOnAt - 2} color={KEPT_INK}>
+              in <Mono weight={600}>ON</Mono>
+            </Underline>
+            , not in <Mono weight={600}>WHERE</Mono>.
+          </div>
         </div>
       </Ink>
       {ILLUSTRATIONS ? (

@@ -118,10 +118,10 @@ export const SplitScene: React.FC = () => {
           id="pandas-groupby-sorting-bowls"
           style={{
             position: "absolute",
-            left: 1480,
-            top: y(88),
-            width: 330,
-            height: 200,
+            left: 1440,
+            top: y(84),
+            width: 360,
+            height: 220,
             opacity: panda,
             transform: `translateY(${bob(frame, 4, 110) + (1 - panda) * 26}px)`,
           }}

@@ -115,7 +115,7 @@ export const Code: React.FC<{
               style={{
                 position: "absolute",
                 left: "-0.06em",
-                top: "0.6em",
+                top: "0.68em",
                 height: "0.09em",
                 width: `calc(${p} * (100% + 0.12em))`,
                 background: ACCENT,
@@ -223,10 +223,10 @@ export const Listing: React.FC<{
             style={{
               position: "absolute",
               // In em of the code's own size, so it spans the characters.
-              left: left + (col * ADVANCE - 0.2) * size,
+              left: left + (col * ADVANCE - 0.15) * size,
               top: g.padY + m.line * g.lineH + g.lineH * 0.14,
               height: g.lineH * 0.72,
-              width: `${(chars * ADVANCE + 0.4) * w}em`,
+              width: `${(chars * ADVANCE + 0.3) * w}em`,
               fontSize: size,
               background: m.color ?? HIGHLIGHT,
               opacity: 1 - o,

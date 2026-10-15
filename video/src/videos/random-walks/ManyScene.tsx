@@ -7,7 +7,7 @@ import { ACCENT, ACCENT_INK, HAIRLINE, halo, headline, INK, INK_SOFT, label, not
 import { FigLabel, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { BIN, dec, HIST, LO, LONG_STEPS, pct, R_WALKS, SHARE, STEPS } from "./data";
-import { COLOR, Headline, HIST_BASE, HIST_TALL, HIST_X, Key, Layer } from "./parts";
+import { COLOR, Headline, HIST_BASE, HIST_TALL, HIST_X, Key, Layer, leaveAt, prose } from "./parts";
 
 const TICKS = [-1, -0.5, 0, 0.5, 1];
 /** Bins past plus or minus a half: [-1, -0.5) and [0.5, 1). */
@@ -28,7 +28,8 @@ export const ManyScene: React.FC = () => {
   const n = useNarration();
   const { y, h } = useLayout();
   const start = n.beat("many").from;
-  const pairsAt = n.word("many", "ten thousand");
+  const pairsAt = n.word("many", "Here are");
+  const leave = leaveAt(n.beat("why").from);
   const overAt = n.word("spread", "all over");
   const fiveAt = n.word("spread", "Two in five");
   const longAt = n.word("longer", "ten times");
@@ -54,12 +55,12 @@ export const ManyScene: React.FC = () => {
     return `${d} V${base}`;
   })();
 
-  const row = (i: number) => y(372) + i * 82;
+  const row = (i: number) => y(330) + i * 82;
 
   return (
     <AbsoluteFill>
-      <Headline first="Ten thousand independent pairs," second="correlated all over the place." at={start - 14} secondAt={overAt - 2} />
-      <FigLabel n="3" title="Correlation of each pair of walks, 10,000 pairs" at={start - 8} x={120} y={y(196)} />
+      <Headline first="Ten thousand independent pairs," second="correlated all over the place." at={start - 4} secondAt={overAt - 2} out={leave} />
+      <FigLabel n="3" title="Correlation of each pair of walks, 10,000 pairs" at={start - 2} x={120} y={y(196)} out={leave} />
 
       <Bars
         counts={HIST.walks}
@@ -69,7 +70,7 @@ export const ManyScene: React.FC = () => {
         base={base}
         unit={unit}
         color={COLOR.a}
-        grow={(i) => ease(frame, pairsAt - 4 + i * 0.7, 12)}
+        grow={(i) => ease(frame, pairsAt - 4 + Math.abs(i - (HIST.walks.length - 1) / 2) * 1.1, 12)}
       />
       <Bars
         counts={HIST.walks.map((c, i) => (beyond(i, 0.5) ? c : 0))}
@@ -81,7 +82,7 @@ export const ManyScene: React.FC = () => {
         color={ACCENT}
         opacity={tail}
       />
-      <Axis scale={HIST_X} base={base} ticks={TICKS} format={(v) => (v === 0 ? "0" : dec(v, v % 1 ? 1 : 0))} at={start - 6} size={20} />
+      <Axis scale={HIST_X} base={base} ticks={TICKS} format={(v) => (v === 0 ? "0" : dec(v, v % 1 ? 1 : 0))} at={start - 4} size={20} />
       <Note at={start} x={(HIST_X.x0 + HIST_X.x1) / 2} y={base + 48} style={{ transform: "translateX(-50%)" }}>
         <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>Correlation of the two walks in a pair, r</span>
       </Note>
@@ -107,7 +108,7 @@ export const ManyScene: React.FC = () => {
       {/* The pair from Fig. 2, found among the ten thousand. */}
       <Note at={pairsAt + 20} x={mx} y={labelTop} align="left" style={{ transform: "translateX(-50%)" }}>
         <span style={{ ...note(20, INK), whiteSpace: "nowrap", ...halo }}>
-          Fig. 2&apos;s pair, <b style={{ fontWeight: 650 }}>{dec(R_WALKS)}</b>
+          Fig. 2’s pair, <b style={{ fontWeight: 650 }}>{dec(R_WALKS)}</b>
         </span>
       </Note>
       <Leader points={[[mx, labelTop + 34], [mx, barTop - 8]]} at={pairsAt + 22} dur={12} color={INK} />
@@ -147,7 +148,7 @@ export const ManyScene: React.FC = () => {
         </Note>
       ))}
       <Note at={wideAt} x={TABLE_X} y={row(2) + 6} width={TABLE_W}>
-        <span style={note(20, INK_SOFT)}>Ten times the data, the same spread.</span>
+        <span style={prose(20)}>Ten times the data, the same spread.</span>
       </Note>
     </AbsoluteFill>
   );

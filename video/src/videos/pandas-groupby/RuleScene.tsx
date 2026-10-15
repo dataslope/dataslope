@@ -35,10 +35,10 @@ export const RuleScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Ink at={start - 12} dur={22} style={{ left: 118, top: y(146), ...headline(66), whiteSpace: "nowrap" }}>
+      <Ink at={start - 2} dur={22} style={{ left: 118, top: y(146), ...headline(66), whiteSpace: "nowrap" }}>
         Pick the one whose shape you need.
       </Ink>
-      <FigLabel n="4" title="The same seven salaries, summed both ways" at={start - 8} x={124} y={y(250)} />
+      <FigLabel n="4" title="The same seven salaries, summed both ways" at={start + 2} x={124} y={y(250)} />
       <div
         style={{
           position: "absolute",

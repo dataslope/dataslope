@@ -2,7 +2,7 @@ import React from "react";
 import { useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { colors } from "../../theme/brand";
 import { COUNTS, DF, IDF, MAX_COUNT, MAX_TFIDF, N, num, OWNER, TFIDF, THE, VOCAB } from "./data";
 
@@ -370,27 +370,6 @@ export const DocPips: React.FC<{ word: number; p: number; size?: number }> = ({ 
 
 /** "in 3 of 3": how many documents hold the word. */
 export const dfText = (j: number) => `in ${DF[j]} of ${N} documents`;
-
-/** One operand of a worked product: a small caption over a large value. */
-export const Term: React.FC<{ cap: string; color?: string; size?: number; opacity?: number; children: React.ReactNode }> = ({
-  cap,
-  color = INK,
-  size = 46,
-  opacity = 1,
-  children,
-}) => (
-  <span style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 8, opacity }}>
-    <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>{cap}</span>
-    <span style={{ ...headline(size), color, whiteSpace: "nowrap" }}>{children}</span>
-  </span>
-);
-
-/** An operator between Terms, sitting on the values' line. */
-export const Op: React.FC<{ children: React.ReactNode; size?: number; opacity?: number }> = ({
-  children,
-  size = 46,
-  opacity = 1,
-}) => <span style={{ ...headline(size), color: INK_SOFT, opacity, padding: "0 0.1em" }}>{children}</span>;
 
 /** A light card a document is printed on. */
 export const slip: React.CSSProperties = {
