@@ -32,36 +32,45 @@ export const script: NarrationScript = {
     },
     {
       id: "tabs-case",
+      scene: true,
       text: "Team tabs: one character per level, and every reader picks their own width, which helps people with low vision.",
       pauseAfter: 0.4,
     },
     {
       id: "spaces-case",
+      scene: true,
       text: "Team spaces: the file looks the same everywhere, in diffs, terminals and reviews, and wrapped lines align exactly.",
-      pauseAfter: 0.45,
+      // The pattern wipe into "python" starts 19 frames ahead of it, not the
+      // usual 6, so this cut needs more than the scene gap to hold as long.
+      pauseAfter: 2.0,
     },
     {
       id: "python",
+      scene: true,
       text: "In Python, PEP 8 says four spaces per level, and inconsistent mixing raises a TabError.",
       pauseAfter: 0.3,
     },
     {
       id: "go",
+      scene: true,
       text: "In Go, the formatter uses tabs.",
       pauseAfter: 0.45,
     },
     {
       id: "answer",
+      scene: true,
       text: "The real answer: pick one per project, and let a formatter and EditorConfig enforce it.",
       pauseAfter: 0.3,
     },
     {
       id: "mixing",
+      scene: true,
       text: "The only wrong answer is mixing them.",
       pauseAfter: 0.5,
     },
     {
       id: "outro",
+      scene: true,
       text: "Learn how Python reads indentation on Dataslope.",
     },
   ],

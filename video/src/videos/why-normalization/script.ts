@@ -44,6 +44,7 @@ export const script: NarrationScript = {
     { id: "traps", text: "One fact in two places invites three traps, called anomalies.", pauseAfter: 0.6 },
     {
       id: "update",
+      scene: true,
       text: "First, the update anomaly. Ada changes her email, and a rushed update fixes only order one.",
       pauseAfter: 0.3,
     },
@@ -52,15 +53,20 @@ export const script: NarrationScript = {
       text: "Now the table holds two emails for Ada, and nothing says which is right.",
       pauseAfter: 0.6,
     },
-    { id: "insert", text: "Second, the insertion anomaly. Alan signs up but hasn't ordered yet.", pauseAfter: 0.3 },
+    {
+      id: "insert",
+      scene: true,
+      text: "Second, the insertion anomaly. Alan signs up but hasn't ordered yet.",
+      pauseAfter: 0.3,
+    },
     { id: "refused", text: "Every row here is an order, so a row with no order ID is refused.", pauseAfter: 0.6 },
-    { id: "delete", text: "Third, the deletion anomaly. Grace cancels her only order.", pauseAfter: 0.3 },
+    { id: "delete", scene: true, text: "Third, the deletion anomaly. Grace cancels her only order.", pauseAfter: 0.3 },
     {
       id: "gone",
       text: "Delete that row, and her name and email go with it. The shop has forgotten Grace.",
       pauseAfter: 0.6,
     },
-    { id: "split", text: "Normalization fixes all three by splitting the table in two.", pauseAfter: 0.3 },
+    { id: "split", scene: true, text: "Normalization fixes all three by splitting the table in two.", pauseAfter: 0.3 },
     { id: "customers", text: "Customers stores each customer once.", pauseAfter: 0.25 },
     {
       id: "fk",
@@ -75,6 +81,7 @@ export const script: NarrationScript = {
     },
     {
       id: "join",
+      scene: true,
       text: "Need the wide view back? A join rebuilds it. Ada's email repeats in the result, but it is stored only once.",
     },
   ],

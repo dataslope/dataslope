@@ -46,6 +46,7 @@ export const script: NarrationScript = {
     },
     {
       id: "ask",
+      scene: true,
       text: "Now give a box a width of three hundred pixels, twenty pixels of padding, and a five pixel border.",
       pauseAfter: 0.3,
     },
@@ -59,7 +60,7 @@ export const script: NarrationScript = {
       text: "Five, plus twenty, plus three hundred, plus twenty, plus five. The box is three hundred and fifty pixels wide.",
       pauseAfter: 0.6,
     },
-    { id: "columns", text: "That is why two columns at fifty percent can break a row.", pauseAfter: 0.3 },
+    { id: "columns", scene: true, text: "That is why two columns at fifty percent can break a row.", pauseAfter: 0.3 },
     {
       id: "overflow",
       text: "In a six hundred pixel row, fifty percent is three hundred. With padding and border, each column is three hundred and fifty. Together they need seven hundred, so the second one wraps to the next line.",
@@ -67,6 +68,7 @@ export const script: NarrationScript = {
     },
     {
       id: "fix",
+      scene: true,
       text: "Box sizing border box changes what width means. The width now includes the padding and the border.",
       pauseAfter: 0.3,
     },

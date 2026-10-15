@@ -34,11 +34,13 @@ export const script: NarrationScript = {
     },
     {
       id: "sees",
+      scene: true,
       text: "That's because a model never reads letters. It reads tokens.",
       pauseAfter: 0.3,
     },
     {
       id: "split",
+      scene: true,
       text: "Run strawberry through the GPT-4o tokenizer, and it splits into three chunks.",
       pauseAfter: 0.2,
     },
@@ -49,31 +51,37 @@ export const script: NarrationScript = {
     },
     {
       id: "sentence",
+      scene: true,
       text: "Inside a question, with its leading space, the whole word is just one token.",
       pauseAfter: 0.3,
     },
     {
       id: "why",
+      scene: true,
       text: "So to count the R's, it has to recall how that token is spelled, instead of looking.",
       pauseAfter: 0.35,
     },
     {
       id: "spell",
+      scene: true,
       text: "Newer models often get it right. Spell the word out, and every letter becomes its own token.",
       pauseAfter: 0.4,
     },
     {
       id: "rule",
+      scene: true,
       text: "For English, one token is about four characters, or three quarters of a word.",
       pauseAfter: 0.25,
     },
     {
       id: "units",
+      scene: true,
       text: "Tokens are also what you pay for, and what context limits are measured in.",
       pauseAfter: 0.45,
     },
     {
       id: "outro",
+      scene: true,
       text: "Learn how tokens work, on Dataslope.",
     },
   ],

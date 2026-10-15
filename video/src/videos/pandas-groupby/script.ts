@@ -50,7 +50,12 @@ export const script: NarrationScript = {
       text: "Third, combine. The answers are stacked into one new result, with a row per department. Seven rows went in. Three came out.",
       pauseAfter: 0.6,
     },
-    { id: "miss", text: "Now the part most people miss. Agg gives you one row per group.", pauseAfter: 0.3 },
+    {
+      id: "miss",
+      scene: true,
+      text: "Now the part most people miss. Agg gives you one row per group.",
+      pauseAfter: 0.3,
+    },
     {
       id: "transform",
       text: "Transform runs the same sum, then hands each total back to every row of its group. Seven rows in, seven rows out, in the original order.",
@@ -58,6 +63,7 @@ export const script: NarrationScript = {
     },
     {
       id: "share",
+      scene: true,
       text: "The totals now line up with the salaries, so you can divide one by the other. That gives each row's share of its group.",
       pauseAfter: 0.3,
     },
@@ -68,6 +74,7 @@ export const script: NarrationScript = {
     },
     {
       id: "rule",
+      scene: true,
       text: "So use agg when you want a summary, and transform when you want the answer back on every row.",
     },
   ],

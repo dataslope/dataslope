@@ -36,7 +36,7 @@ export const script: NarrationScript = {
       text: "In its six largest departments, forty-five percent of the men who applied got in. For women, it was thirty percent.",
       pauseAfter: 0.6,
     },
-    { id: "split", text: "Now take the departments one at a time.", pauseAfter: 0.35 },
+    { id: "split", scene: true, text: "Now take the departments one at a time.", pauseAfter: 0.35 },
     {
       id: "four",
       text: "In four of the six, women were admitted at a higher rate than men. In department A, eighty-two percent of women got in, against sixty-two percent of men.",
@@ -45,6 +45,7 @@ export const script: NarrationScript = {
     { id: "two", text: "In the other two, men were ahead by less than four points.", pauseAfter: 0.6 },
     {
       id: "question",
+      scene: true,
       text: "So how do women do better in most departments, and worse overall?",
       pauseAfter: 0.3,
     },
@@ -61,6 +62,7 @@ export const script: NarrationScript = {
     },
     {
       id: "average",
+      scene: true,
       text: "An overall rate is an average of the department rates, weighted by where people applied.",
       pauseAfter: 0.25,
     },
@@ -72,6 +74,7 @@ export const script: NarrationScript = {
     },
     {
       id: "name",
+      scene: true,
       text: "This is Simpson's paradox. A comparison that holds inside the groups can reverse once the groups are pooled.",
       pauseAfter: 0.4,
     },

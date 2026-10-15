@@ -9,6 +9,11 @@ export type Beat = {
   text: string;
   /** Silence after this beat, in seconds. */
   pauseAfter?: number;
+  /** A new scene opens on this beat. The timeline then leaves at least the
+   *  script's `sceneGap` of silence before it, so the scene that ends here
+   *  stays on screen, finished, before it cross-fades away. Every beat a
+   *  Video.tsx cuts to must say so; src/narration/scenes.test.ts checks. */
+  scene?: boolean;
 };
 
 export type NarrationScript = {
@@ -18,6 +23,11 @@ export type NarrationScript = {
   leadIn?: number;
   /** Time after the last beat, in seconds, for the end card to breathe. */
   tail?: number;
+  /** Minimum silence, in seconds, before a beat marked `scene`. Defaults to
+   *  1.6, which holds a finished scene about 1.3 s past its last word in a
+   *  video whose cuts start 8 frames early. Raise it for a video whose exits
+   *  start earlier than that (a wipe, or text that fades ahead of the cut). */
+  sceneGap?: number;
   beats: Beat[];
 };
 

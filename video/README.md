@@ -158,6 +158,27 @@ Timing comes from one of two places:
   covers is timed from it and its audio plays at that moment. Nothing in the
   scenes changes.
 
+### Time to take a scene in
+
+A beat that a scene opens on is marked `scene: true`. The timeline then
+leaves at least the script's `sceneGap` of silence before it (1.6 s by
+default), so the scene that ends there stays on screen, finished, before it
+goes. With an ordinary beat pause the cut came 0.1 to 0.4 s after the last
+word, which was too soon to read the finished figure. It now comes at least
+1.3 s after, in all 24 videos.
+
+How long the finished scene holds is the gap minus how early the video's exit
+starts. Most cut 6 or 8 frames before the next beat. A video whose exits start
+earlier raises its `sceneGap`: RandomWalks fades its text 20 frames early,
+FloatingPoint's eraser sweeps for 20, and SqlExecutionOrder's pattern wipe
+takes 14. TabsVsSpaces' one wipe instead gets a longer `pauseAfter` on the
+beat before it, which the gap never shortens.
+
+`src/narration/scenes.test.ts` fails if a Video.tsx cuts to a beat with
+`cut("…")` that is not marked, or if the timeline leaves less than the gap
+before a marked beat. Mark beats the same way when a scene opens on a beat
+some other way, such as a wipe or an eraser keyed to `beat("…").from`.
+
 ### Adding the voice-over later
 
 Generate one audio file per beat with ElevenLabs

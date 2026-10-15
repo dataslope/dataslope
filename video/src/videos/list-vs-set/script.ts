@@ -54,6 +54,7 @@ export const script: NarrationScript = {
     },
     {
       id: "scan",
+      scene: true,
       text: "A list has no idea where a value lives. So Python starts at the front and compares, one item at a time.",
       pauseAfter: 0.2,
     },
@@ -70,12 +71,14 @@ export const script: NarrationScript = {
     { id: "jump", text: "It goes straight to that bucket and makes one comparison.", pauseAfter: 0.6 },
     {
       id: "grow",
+      scene: true,
       text: "Now grow them both. Each time the list doubles, its lookup time doubles too.",
       pauseAfter: 0.3,
     },
     { id: "flat", text: "The set stays flat, near twenty-three nanoseconds at every size.", pauseAfter: 0.6 },
     {
       id: "rule",
+      scene: true,
       text: "So if you test membership again and again, turn the list into a set once.",
       pauseAfter: 0.3,
     },

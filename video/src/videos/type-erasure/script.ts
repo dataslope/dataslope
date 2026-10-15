@@ -50,11 +50,13 @@ export const script: NarrationScript = {
     },
     {
       id: "instanceof",
+      scene: true,
       text: "So you cannot ask whether a value is an instance of User. The compiler flags it, and the JavaScript it writes anyway has no User to ask about.",
       pauseAfter: 0.6,
     },
     {
       id: "claim",
+      scene: true,
       text: "It also means a type on outside data is only a claim. JSON dot parse returns any, so the compiler accepts whatever type you give it.",
       pauseAfter: 0.35,
     },
@@ -65,6 +67,7 @@ export const script: NarrationScript = {
     },
     {
       id: "fix",
+      scene: true,
       text: "The fix is a check that actually runs. Parse into unknown, and the compiler will not let you use the value until you test it.",
       pauseAfter: 0.3,
     },
@@ -75,6 +78,7 @@ export const script: NarrationScript = {
     },
     {
       id: "rule",
+      scene: true,
       text: "Types describe what you expect. Only a runtime check can tell you what actually arrived.",
     },
   ],

@@ -82,3 +82,22 @@ test("captions carry leading spaces and break pages at every beat", () => {
     [false, false, true, false, true],
   );
 });
+
+test("leaves the scene gap before a beat that opens a scene, and never shortens a longer pause", () => {
+  const t = buildTimeline(
+    {
+      id: "s",
+      leadIn: 0,
+      sceneGap: 1.5,
+      beats: [
+        { id: "a", text: "First scene ends here.", pauseAfter: 0.3 },
+        { id: "b", text: "A new scene opens.", scene: true, pauseAfter: 2 },
+        { id: "c", text: "And another.", scene: true },
+      ],
+    },
+    null,
+  );
+  const [a, b, c] = t.beats;
+  assert.ok(Math.abs(b.start - (a.end + 1.5)) < 1e-9);
+  assert.ok(Math.abs(c.start - (b.end + 2)) < 1e-9);
+});

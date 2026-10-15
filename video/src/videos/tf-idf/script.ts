@@ -47,11 +47,13 @@ export const script: NarrationScript = {
     },
     {
       id: "counts",
+      scene: true,
       text: "Here are the counts. The scores two in every row, more than any other word. But a column that is the same in every row cannot tell the documents apart.",
       pauseAfter: 0.6,
     },
     {
       id: "idf",
+      scene: true,
       text: "Inverse document frequency fixes that. Divide the number of documents by how many contain the word, and take the natural log.",
       pauseAfter: 0.35,
     },
@@ -59,6 +61,7 @@ export const script: NarrationScript = {
     { id: "idf-cat", text: "Cat is in just one, so it gets the log of three, about one point one.", pauseAfter: 0.6 },
     {
       id: "tf",
+      scene: true,
       text: "Now multiply by term frequency, each word's share of its document. Cat is one word in six, so it scores about zero point one eight.",
       pauseAfter: 0.3,
     },
@@ -70,11 +73,13 @@ export const script: NarrationScript = {
     },
     {
       id: "sklearn",
+      scene: true,
       text: "One warning. This is the textbook formula. Scikit-learn's default smooths it and adds one, so the never reaches zero. On these three documents, it even stays on top.",
       pauseAfter: 0.6,
     },
     {
       id: "rule",
+      scene: true,
       text: "Raw counts reward common words. TF-IDF rewards the words that are frequent here and rare elsewhere.",
     },
   ],

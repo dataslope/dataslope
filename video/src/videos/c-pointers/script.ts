@@ -54,7 +54,12 @@ export const script: NarrationScript = {
       text: "On this machine, an int takes four bytes and a pointer takes eight. The addresses change on every run, but p always holds the address of n.",
       pauseAfter: 0.7,
     },
-    { id: "trap", text: "Now the classic trap. This swap takes two ints and trades them.", pauseAfter: 0.35 },
+    {
+      id: "trap",
+      scene: true,
+      text: "Now the classic trap. This swap takes two ints and trades them.",
+      pauseAfter: 0.35,
+    },
     {
       id: "copies",
       text: "But C passes copies. Swap gets two new boxes, a and b, holding one and two.",
@@ -63,6 +68,7 @@ export const script: NarrationScript = {
     { id: "nothing", text: "The copies trade, and x and y stay exactly as they were.", pauseAfter: 1.0 },
     {
       id: "fix",
+      scene: true,
       text: "So pass the addresses instead. Call swap with ampersand x and ampersand y, and a and b now hold where x and y live.",
       pauseAfter: 0.35,
     },
@@ -71,6 +77,10 @@ export const script: NarrationScript = {
       text: "Star a and star b reach back into main's boxes, so x and y really trade.",
       pauseAfter: 1.5,
     },
-    { id: "rule", text: "That is all a pointer is. Ampersand asks where a variable lives, and star goes there." },
+    {
+      id: "rule",
+      scene: true,
+      text: "That is all a pointer is. Ampersand asks where a variable lives, and star goes there.",
+    },
   ],
 };

@@ -57,6 +57,7 @@ export const script: NarrationScript = {
     },
     {
       id: "three",
+      scene: true,
       text: "SQL logic has three values. True, false, and unknown.",
       pauseAfter: 0.3,
     },
@@ -72,6 +73,7 @@ export const script: NarrationScript = {
     },
     {
       id: "expand",
+      scene: true,
       text: "Now, NOT IN is shorthand. For Grace, it means two is not one, and two is not three, and two is not NULL.",
       pauseAfter: 0.3,
     },
@@ -87,6 +89,7 @@ export const script: NarrationScript = {
     },
     {
       id: "exists",
+      scene: true,
       text: "One fix is NOT EXISTS, which only ever answers yes or no.",
       pauseAfter: 0.3,
     },

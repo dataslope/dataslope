@@ -24,6 +24,10 @@ import type {
 const DEFAULT_LEAD_IN = 0.6;
 const DEFAULT_TAIL = 1.6;
 const DEFAULT_PAUSE = 0.35;
+/** Silence before a beat that opens a new scene (see `Beat.scene`). A cut
+ *  that follows the last word by a beat's ordinary 0.35-0.6 s pause leaves
+ *  the finished scene on screen for a third of a second or less. */
+export const DEFAULT_SCENE_GAP = 1.6;
 
 // Reading-speed model, calibrated to ElevenLabs' narration voices at default
 // speed (about 160 words a minute once sentence pauses are counted).
@@ -110,7 +114,12 @@ export function buildTimeline(
   alignmentFile: NarrationAlignmentFile | null,
 ): Timeline {
   let cursor = script.leadIn ?? DEFAULT_LEAD_IN;
+  const sceneGap = script.sceneGap ?? DEFAULT_SCENE_GAP;
+  let previousEnd: number | null = null;
   const beats: TimedBeat[] = script.beats.map((beat) => {
+    if (beat.scene && previousEnd !== null) {
+      cursor = Math.max(cursor, previousEnd + sceneGap);
+    }
     const entry = alignmentFile?.beats[beat.id];
     const usable = entry && matches(beat, entry);
     const timed = usable
@@ -123,6 +132,7 @@ export function buildTimeline(
       end: start + w.end,
     }));
     cursor = start + timed.duration + (beat.pauseAfter ?? DEFAULT_PAUSE);
+    previousEnd = start + timed.duration;
     return {
       id: beat.id,
       text: beat.text,

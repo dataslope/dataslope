@@ -37,6 +37,7 @@ export const script: NarrationScript = {
   id: "floating-point",
   leadIn: 0.7,
   tail: 2.6,
+  sceneGap: 2.0,
   beats: [
     { id: "hook", text: "Ask Python for point one plus point two.", pauseAfter: 0.3 },
     {
@@ -51,6 +52,7 @@ export const script: NarrationScript = {
     },
     {
       id: "third",
+      scene: true,
       text: "Here's why. Write one third as a decimal: point three three three, and the threes never end.",
       pauseAfter: 0.3,
     },
@@ -61,11 +63,13 @@ export const script: NarrationScript = {
     },
     {
       id: "binary",
+      scene: true,
       text: "Computers write fractions in binary, out of halves, quarters and eighths. In binary, one tenth never ends either: the block zero zero one one repeats forever.",
       pauseAfter: 0.82,
     },
     {
       id: "bits",
+      scene: true,
       text: "A float keeps 53 significant bits and rounds off the rest.",
       pauseAfter: 0.35,
     },
@@ -76,6 +80,7 @@ export const script: NarrationScript = {
     },
     {
       id: "pair",
+      scene: true,
       text: "Point two is stored a hair high too. But point three is stored a hair low.",
       pauseAfter: 0.45,
     },
@@ -86,6 +91,7 @@ export const script: NarrationScript = {
     },
     {
       id: "isclose",
+      scene: true,
       text: "So never test floats for exact equality. Ask if they're close, with math.isclose.",
       pauseAfter: 0.35,
     },
@@ -101,6 +107,7 @@ export const script: NarrationScript = {
     },
     {
       id: "outro",
+      scene: true,
       text: "Floats aren't broken. They just think in binary. Learn more in the Numbers lesson on Dataslope.",
     },
   ],

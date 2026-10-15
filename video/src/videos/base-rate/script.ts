@@ -41,6 +41,7 @@ export const script: NarrationScript = {
     },
     {
       id: "crowd",
+      scene: true,
       text: "Picture ten thousand people. One in a thousand has the condition, so about ten of them.",
       pauseAfter: 0.3,
     },
@@ -62,6 +63,7 @@ export const script: NarrationScript = {
     { id: "share", text: "One in eleven. About nine percent.", pauseAfter: 0.6 },
     {
       id: "bayes",
+      scene: true,
       text: "That is Bayes' rule. Of everyone who tests positive, what share really has it? The true positives, divided by all the positives.",
       pauseAfter: 0.4,
     },
@@ -70,7 +72,12 @@ export const script: NarrationScript = {
       text: "The false alarms win because healthy people outnumber sick ones nearly a thousand to one. Forgetting that is base-rate neglect.",
       pauseAfter: 0.6,
     },
-    { id: "again", text: "So test the positives again, with a second, independent test.", pauseAfter: 0.3 },
+    {
+      id: "again",
+      scene: true,
+      text: "So test the positives again, with a second, independent test.",
+      pauseAfter: 0.3,
+    },
     {
       id: "again-result",
       text: "The real cases test positive again. Of the hundred false alarms, only about one does.",

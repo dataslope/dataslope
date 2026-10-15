@@ -53,12 +53,14 @@ export const script: NarrationScript = {
     },
     {
       id: "any-shape",
+      scene: true,
       text: "And it isn't about wait times. Die rolls are flat, and this population has two humps.",
       pauseAfter: 0.25,
     },
     { id: "any-bell", text: "Average thirty from either one, and the same bell appears.", pauseAfter: 0.55 },
     {
       id: "thumb",
+      scene: true,
       text: "You will hear that thirty is always enough. That is a rule of thumb, not a law.",
       pauseAfter: 0.3,
     },
@@ -69,6 +71,7 @@ export const script: NarrationScript = {
     },
     {
       id: "spread",
+      scene: true,
       text: "What sample size does control is the spread. They all center on ten, but bigger samples pile up tighter.",
       pauseAfter: 0.3,
     },

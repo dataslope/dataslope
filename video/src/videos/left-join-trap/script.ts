@@ -47,11 +47,13 @@ export const script: NarrationScript = {
     },
     {
       id: "left",
+      scene: true,
       text: "A LEFT JOIN keeps all four customers. Where no order matches, the order columns come back NULL.",
       pauseAfter: 0.6,
     },
     {
       id: "filter",
+      scene: true,
       text: "Now say we only want orders over fifty. So we add a WHERE clause on the amount.",
       pauseAfter: 0.35,
     },
@@ -70,13 +72,13 @@ export const script: NarrationScript = {
       text: "So this LEFT JOIN now returns exactly what an inner join would.",
       pauseAfter: 0.6,
     },
-    { id: "fix", text: "The fix is to move the condition into the ON clause.", pauseAfter: 0.3 },
+    { id: "fix", scene: true, text: "The fix is to move the condition into the ON clause.", pauseAfter: 0.3 },
     {
       id: "on",
       text: "There, it only decides which orders count as a match. All four customers come back, with NULLs where nothing matched.",
       pauseAfter: 0.6,
     },
-    { id: "compare", text: "Same data, three answers. Seven rows, then two, then four.", pauseAfter: 0.5 },
+    { id: "compare", scene: true, text: "Same data, three answers. Seven rows, then two, then four.", pauseAfter: 0.5 },
     {
       id: "rule",
       text: "So to keep every row on the left, filter the right table in ON, not in WHERE.",

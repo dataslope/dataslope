@@ -50,6 +50,7 @@ export const script: NarrationScript = {
     },
     {
       id: "refs",
+      scene: true,
       text: "A string variable never holds the letters. It holds a reference, an arrow to an object on the heap.",
       pauseAfter: 0.35,
     },
@@ -65,6 +66,7 @@ export const script: NarrationScript = {
     },
     {
       id: "boxing",
+      scene: true,
       text: "Numbers hide a sharper trap. Box one hundred twenty-seven into two Integers, and equals equals says true.",
       pauseAfter: 0.3,
     },
@@ -75,6 +77,7 @@ export const script: NarrationScript = {
     },
     {
       id: "cache",
+      scene: true,
       text: "Autoboxing calls Integer dot value of. It keeps one cached object for each value from minus one hundred twenty-eight to one hundred twenty-seven.",
       pauseAfter: 0.3,
     },
@@ -85,6 +88,7 @@ export const script: NarrationScript = {
     },
     {
       id: "rule",
+      scene: true,
       text: "So save equals equals for primitives, or for when you mean the same object. To compare contents, call dot equals.",
     },
   ],

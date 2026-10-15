@@ -48,7 +48,12 @@ export const script: NarrationScript = {
       text: "Degree eleven threads all twelve points, so its training error is zero. But between them it wobbles, and past the ends it flies off.",
       pauseAfter: 0.6,
     },
-    { id: "sweep", text: "Now fit every degree from one to eleven, and measure the error twice.", pauseAfter: 0.3 },
+    {
+      id: "sweep",
+      scene: true,
+      text: "Now fit every degree from one to eleven, and measure the error twice.",
+      pauseAfter: 0.3,
+    },
     { id: "train", text: "On the twelve training points, it falls all the way to zero.", pauseAfter: 0.3 },
     {
       id: "test",
@@ -57,7 +62,7 @@ export const script: NarrationScript = {
     },
     { id: "worse", text: "At degree eleven, it is nearly two hundred and fifty times worse than at three.", pauseAfter: 0.5 },
     { id: "blind", text: "So the training error cannot warn you. It only ever improves.", pauseAfter: 0.6 },
-    { id: "holdout", text: "Keep some data back, and score the model on that.", pauseAfter: 0.3 },
+    { id: "holdout", scene: true, text: "Keep some data back, and score the model on that.", pauseAfter: 0.3 },
     {
       id: "cv",
       text: "Or cross-validate. Split the training points into five folds. Train on four, score on the fifth, and rotate.",
@@ -68,6 +73,6 @@ export const script: NarrationScript = {
       text: "Averaged over the five rounds, the error is lowest at degree three again.",
       pauseAfter: 0.6,
     },
-    { id: "rule", text: "Judge a model by data it has never seen." },
+    { id: "rule", scene: true, text: "Judge a model by data it has never seen." },
   ],
 };

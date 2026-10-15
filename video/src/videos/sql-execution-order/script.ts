@@ -20,9 +20,10 @@ export const script: NarrationScript = {
   id: "sql-execution-order",
   leadIn: 0.5,
   tail: 2.4,
+  sceneGap: 1.8,
   beats: [
     { id: "hook", text: "Here's a SQL fact that trips up almost everyone.", pauseAfter: 0.5 },
-    { id: "written", text: "You write a query starting with SELECT." },
+    { id: "written", scene: true, text: "You write a query starting with SELECT." },
     { id: "not-there", text: "But Postgres doesn't start there.", pauseAfter: 0.45 },
     {
       id: "reorder",
@@ -43,7 +44,12 @@ export const script: NarrationScript = {
     },
     { id: "order-by", text: "ORDER BY sorts by total,", pauseAfter: 0.15 },
     { id: "limit", text: "and LIMIT keeps the top two.", pauseAfter: 0.7 },
-    { id: "error-setup", text: "Now the classic error. Try filtering on total in WHERE,", pauseAfter: 0.15 },
+    {
+      id: "error-setup",
+      scene: true,
+      text: "Now the classic error. Try filtering on total in WHERE,",
+      pauseAfter: 0.15,
+    },
     { id: "error", text: "and Postgres says column total does not exist.", pauseAfter: 0.45 },
     {
       id: "why",
@@ -61,11 +67,13 @@ export const script: NarrationScript = {
     },
     {
       id: "rule",
+      scene: true,
       text: "So you don't have to memorize where an alias works. Just read it off the order.",
       pauseAfter: 0.5,
     },
     {
       id: "outro",
+      scene: true,
       text: "Read your query from FROM down, not from SELECT across. The full order has two more steps, window functions and DISTINCT, and the Dataslope lesson covers both.",
     },
   ],

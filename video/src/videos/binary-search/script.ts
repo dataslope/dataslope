@@ -31,6 +31,7 @@ export const script: NarrationScript = {
     },
     {
       id: "linear",
+      scene: true,
       text: "Guessing one at a time could take all 100.",
       pauseAfter: 0.3,
     },
@@ -71,21 +72,25 @@ export const script: NarrationScript = {
     },
     {
       id: "why",
+      scene: true,
       text: "Why 7? Two to the seventh is 128, and that covers 100.",
       pauseAfter: 0.4,
     },
     {
       id: "scale",
+      scene: true,
       text: "A million numbers? 20 guesses, tops. A billion? Just 30.",
       pauseAfter: 0.4,
     },
     {
       id: "catch",
+      scene: true,
       text: "The catch: it only works on sorted data. Shuffled, higher or lower can point the wrong way.",
       pauseAfter: 0.45,
     },
     {
       id: "outro",
+      scene: true,
       text: "Learn binary search on Dataslope.",
     },
   ],

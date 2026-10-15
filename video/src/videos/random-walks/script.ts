@@ -36,6 +36,7 @@ export const script: NarrationScript = {
   id: "random-walks",
   leadIn: 0.5,
   tail: 2.6,
+  sceneGap: 2.0,
   beats: [
     { id: "hook", text: "This line looks like it is going somewhere.", pauseAfter: 0.3 },
     {
@@ -50,12 +51,14 @@ export const script: NarrationScript = {
     },
     {
       id: "pair",
+      scene: true,
       text: "Now flip a second coin for a second walk. The two have nothing to do with each other.",
       pauseAfter: 0.3,
     },
     { id: "corr", text: "Yet their correlation is zero point eight four.", pauseAfter: 0.6 },
     {
       id: "many",
+      scene: true,
       text: "Was that a fluke? Here are ten thousand pairs of independent walks.",
       pauseAfter: 0.3,
     },
@@ -71,6 +74,7 @@ export const script: NarrationScript = {
     },
     {
       id: "why",
+      scene: true,
       text: "Three hundred points feel like plenty of evidence. But each point of a walk is the last one plus one flip.",
       pauseAfter: 0.35,
     },
@@ -81,11 +85,13 @@ export const script: NarrationScript = {
     },
     {
       id: "collapse",
+      scene: true,
       text: "Now the same pairs correlate at nearly zero. Before, seven in ten passed a quarter. Now, two in ten thousand do.",
       pauseAfter: 0.6,
     },
     {
       id: "rule",
+      scene: true,
       text: "That is why time-series work tests for stationarity before trusting a correlation. This walk fails the test. Its differences pass.",
     },
   ],

@@ -46,7 +46,7 @@ export const script: NarrationScript = {
       text: "It is correct, but fib of forty takes three hundred thirty-one million calls.",
       pauseAfter: 0.6,
     },
-    { id: "tree", text: "Here is every call for fib of five. Fifteen in all.", pauseAfter: 0.3 },
+    { id: "tree", scene: true, text: "Here is every call for fib of five. Fifteen in all.", pauseAfter: 0.3 },
     {
       id: "repeat",
       text: "Fib of three is computed twice, and fib of two three times. Each repeat redoes its whole branch.",
@@ -60,6 +60,7 @@ export const script: NarrationScript = {
     { id: "point", text: "Depth is not the problem. The count is.", pauseAfter: 0.5 },
     {
       id: "count",
+      scene: true,
       text: "Fib of ten makes one hundred seventy-seven calls. Twenty, about twenty-two thousand. Thirty, two point seven million.",
       pauseAfter: 0.3,
     },
@@ -75,16 +76,19 @@ export const script: NarrationScript = {
     },
     {
       id: "fix",
+      scene: true,
       text: "The fix is to write each answer down. Check a table before computing, and store the result after.",
       pauseAfter: 0.4,
     },
     {
       id: "collapse",
+      scene: true,
       text: "Now each repeated branch is read from the table instead. The tree collapses to one path, and fib of five takes nine calls.",
       pauseAfter: 0.5,
     },
     {
       id: "linear",
+      scene: true,
       text: "Fib of fifty now takes ninety-nine calls, two more for each step up in n, and under a microsecond.",
       pauseAfter: 0.4,
     },

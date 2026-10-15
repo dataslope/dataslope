@@ -56,6 +56,7 @@ export const script: NarrationScript = {
     },
     {
       id: "divide",
+      scene: true,
       text: "Temperature divides every score before the softmax. The order never changes. Only the shape does.",
       pauseAfter: 0.4,
     },
@@ -76,6 +77,7 @@ export const script: NarrationScript = {
     },
     {
       id: "draw",
+      scene: true,
       text: "Now draw twenty tokens at each setting, from the same twenty random numbers.",
       pauseAfter: 0.3,
     },
@@ -87,6 +89,7 @@ export const script: NarrationScript = {
     },
     {
       id: "topp",
+      scene: true,
       text: "Top p adds a guard. Keep the likeliest tokens until they cover ninety percent, and drop the rest.",
       pauseAfter: 0.3,
     },
@@ -97,6 +100,7 @@ export const script: NarrationScript = {
     },
     {
       id: "rule",
+      scene: true,
       text: "So turn temperature down when there is one right answer, like extraction or code. Turn it up when you want variety.",
     },
   ],

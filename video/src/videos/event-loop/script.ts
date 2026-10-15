@@ -38,10 +38,16 @@ export const script: NarrationScript = {
     },
     {
       id: "machine",
+      scene: true,
       text: "To see why, meet the machinery: a call stack, a task queue, a microtask queue, and the event loop that moves work between them.",
       pauseAfter: 0.5,
     },
-    { id: "stack", text: "The whole script runs on the call stack. Line one logs right away.", pauseAfter: 0.4 },
+    {
+      id: "stack",
+      scene: true,
+      text: "The whole script runs on the call stack. Line one logs right away.",
+      pauseAfter: 0.4,
+    },
     {
       id: "timeout",
       text: "Set timeout does not run its callback now. It hands it to the host's timer, and when the timer fires, the callback waits in the task queue.",
@@ -62,6 +68,7 @@ export const script: NarrationScript = {
     },
     {
       id: "replay",
+      scene: true,
       text: "Once more, in order. Script start. Script end. Promise microtask. Set timeout callback.",
       pauseAfter: 0.6,
     },
@@ -72,6 +79,7 @@ export const script: NarrationScript = {
     },
     {
       id: "outro",
+      scene: true,
       text: "The Dataslope lesson, How JavaScript Runs, walks through it with code you can run.",
     },
   ],

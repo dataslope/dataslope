@@ -44,6 +44,7 @@ export const script: NarrationScript = {
     },
     {
       id: "over",
+      scene: true,
       text: "A window function adds up the same rows, but keeps every one of them.",
       pauseAfter: 0.3,
     },
@@ -59,6 +60,7 @@ export const script: NarrationScript = {
     },
     {
       id: "share",
+      scene: true,
       text: "With the total on every row, a share is one division away. The first North sale is about a third of its region.",
       pauseAfter: 0.5,
     },
@@ -74,6 +76,7 @@ export const script: NarrationScript = {
     },
     {
       id: "rule",
+      scene: true,
       text: "So GROUP BY gives you one row per group. A window function gives you every row, with its group beside it.",
     },
   ],
