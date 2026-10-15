@@ -1,0 +1,53 @@
+{
+  "compiler": "g++ 13.3.0",
+  "flags": "-std=c++17 -O2 -Wall",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+  "treeN": 5,
+  "treeValue": 5,
+  "naiveTree": [
+    { "n": 5, "parent": -1, "depth": 1, "kind": "compute" },
+    { "n": 4, "parent": 0, "depth": 2, "kind": "compute" },
+    { "n": 3, "parent": 1, "depth": 3, "kind": "compute" },
+    { "n": 2, "parent": 2, "depth": 4, "kind": "compute" },
+    { "n": 1, "parent": 3, "depth": 5, "kind": "base" },
+    { "n": 0, "parent": 3, "depth": 5, "kind": "base" },
+    { "n": 1, "parent": 2, "depth": 4, "kind": "base" },
+    { "n": 2, "parent": 1, "depth": 3, "kind": "compute" },
+    { "n": 1, "parent": 7, "depth": 4, "kind": "base" },
+    { "n": 0, "parent": 7, "depth": 4, "kind": "base" },
+    { "n": 3, "parent": 0, "depth": 2, "kind": "compute" },
+    { "n": 2, "parent": 10, "depth": 3, "kind": "compute" },
+    { "n": 1, "parent": 11, "depth": 4, "kind": "base" },
+    { "n": 0, "parent": 11, "depth": 4, "kind": "base" },
+    { "n": 1, "parent": 10, "depth": 3, "kind": "base" }
+  ],
+  "memoTree": [
+    { "n": 5, "parent": -1, "depth": 1, "kind": "compute" },
+    { "n": 4, "parent": 0, "depth": 2, "kind": "compute" },
+    { "n": 3, "parent": 1, "depth": 3, "kind": "compute" },
+    { "n": 2, "parent": 2, "depth": 4, "kind": "compute" },
+    { "n": 1, "parent": 3, "depth": 5, "kind": "base" },
+    { "n": 0, "parent": 3, "depth": 5, "kind": "base" },
+    { "n": 1, "parent": 2, "depth": 4, "kind": "base" },
+    { "n": 2, "parent": 1, "depth": 3, "kind": "hit" },
+    { "n": 3, "parent": 0, "depth": 2, "kind": "hit" }
+  ],
+  "memoWrites": [{ "n": 2, "value": 1 }, { "n": 3, "value": 2 }, { "n": 4, "value": 3 }, { "n": 5, "value": 5 }],
+  "memoTable": [-1, -1, 1, 2, 3, 5],
+  "counts": [
+    { "n": 10, "value": 55, "memoValue": 55, "naiveCalls": 177, "naiveBases": 89, "naiveDepth": 10, "memoCalls": 19, "memoHits": 7, "memoBases": 3, "memoDepth": 10 },
+    { "n": 20, "value": 6765, "memoValue": 6765, "naiveCalls": 21891, "naiveBases": 10946, "naiveDepth": 20, "memoCalls": 39, "memoHits": 17, "memoBases": 3, "memoDepth": 20 },
+    { "n": 30, "value": 832040, "memoValue": 832040, "naiveCalls": 2692537, "naiveBases": 1346269, "naiveDepth": 30, "memoCalls": 59, "memoHits": 27, "memoBases": 3, "memoDepth": 30 },
+    { "n": 40, "value": 102334155, "memoValue": 102334155, "naiveCalls": 331160281, "naiveBases": 165580141, "naiveDepth": 40, "memoCalls": 79, "memoHits": 37, "memoBases": 3, "memoDepth": 40 },
+    { "n": 50, "value": 12586269025, "memoValue": 12586269025, "naiveCalls": 40730022147, "naiveBases": 20365011074, "naiveDepth": 50, "memoCalls": 99, "memoHits": 47, "memoBases": 3, "memoDepth": 50 }
+  ],
+  "rounds": 21,
+  "roundsSlow": 3,
+  "times": [
+    { "n": 10, "naiveSeconds": 7.68051e-08, "naiveReps": 60827, "memoSeconds": 4.46815e-08, "memoReps": 638724 },
+    { "n": 20, "naiveSeconds": 1.19017e-05, "naiveReps": 3390, "memoSeconds": 1.15184e-07, "memoReps": 432761 },
+    { "n": 30, "naiveSeconds": 0.00141402, "naiveReps": 35, "memoSeconds": 2.34444e-07, "memoReps": 179237 },
+    { "n": 40, "naiveSeconds": 0.185041, "naiveReps": 1, "memoSeconds": 3.4803e-07, "memoReps": 121866 },
+    { "n": 50, "naiveSeconds": 24.9921, "naiveReps": 1, "memoSeconds": 4.71616e-07, "memoReps": 104248 }
+  ]
+}

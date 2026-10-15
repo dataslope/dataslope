@@ -1,0 +1,257 @@
+{
+  "browser": "Chromium 141.0.7390.37",
+  "css": {
+    "box": "width: 300px; padding: 20px; border: 5px solid; margin: 20px;",
+    "col": "width: 50%; padding: 20px; border: 5px solid;",
+    "row": "display: flex; flex-wrap: wrap; width: 600px;"
+  },
+  "single": {
+    "rect": {
+      "x": 20,
+      "y": 60,
+      "width": 350,
+      "height": 150
+    },
+    "content": {
+      "x": 45,
+      "y": 85,
+      "width": 300,
+      "height": 100
+    },
+    "boxSizing": "content-box",
+    "computedWidth": "300px",
+    "padding": 20,
+    "border": 5,
+    "margin": 20,
+    "clientWidth": 340,
+    "offsetWidth": 350,
+    "marginLeftMeasured": 20,
+    "gapToNext": 20
+  },
+  "singleBorderBox": {
+    "rect": {
+      "x": 20,
+      "y": 500,
+      "width": 300,
+      "height": 150
+    },
+    "content": {
+      "x": 45,
+      "y": 525,
+      "width": 250,
+      "height": 100
+    },
+    "boxSizing": "border-box",
+    "computedWidth": "300px",
+    "padding": 20,
+    "border": 5,
+    "margin": 20,
+    "clientWidth": 290,
+    "offsetWidth": 300
+  },
+  "rows": {
+    "flexWrap": {
+      "width": 600,
+      "height": 180,
+      "cols": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 350,
+          "height": 90,
+          "contentWidth": 300,
+          "contentX": 25,
+          "computedWidth": "300px",
+          "boxSizing": "content-box"
+        },
+        {
+          "x": 0,
+          "y": 90,
+          "width": 350,
+          "height": 90,
+          "contentWidth": 300,
+          "contentX": 25,
+          "computedWidth": "300px",
+          "boxSizing": "content-box"
+        }
+      ]
+    },
+    "flexWrapBorderBox": {
+      "width": 600,
+      "height": 90,
+      "cols": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 300,
+          "height": 90,
+          "contentWidth": 250,
+          "contentX": 25,
+          "computedWidth": "300px",
+          "boxSizing": "border-box"
+        },
+        {
+          "x": 300,
+          "y": 0,
+          "width": 300,
+          "height": 90,
+          "contentWidth": 250,
+          "contentX": 25,
+          "computedWidth": "300px",
+          "boxSizing": "border-box"
+        }
+      ]
+    },
+    "float": {
+      "width": 600,
+      "height": 180,
+      "cols": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 350,
+          "height": 90,
+          "contentWidth": 300,
+          "contentX": 25,
+          "computedWidth": "300px",
+          "boxSizing": "content-box"
+        },
+        {
+          "x": 0,
+          "y": 90,
+          "width": 350,
+          "height": 90,
+          "contentWidth": 300,
+          "contentX": 25,
+          "computedWidth": "300px",
+          "boxSizing": "content-box"
+        }
+      ]
+    },
+    "floatBorderBox": {
+      "width": 600,
+      "height": 90,
+      "cols": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 300,
+          "height": 90,
+          "contentWidth": 250,
+          "contentX": 25,
+          "computedWidth": "300px",
+          "boxSizing": "border-box"
+        },
+        {
+          "x": 300,
+          "y": 0,
+          "width": 300,
+          "height": 90,
+          "contentWidth": 250,
+          "contentX": 25,
+          "computedWidth": "300px",
+          "boxSizing": "border-box"
+        }
+      ]
+    },
+    "flexNoWrap": {
+      "width": 600,
+      "height": 90,
+      "cols": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 300,
+          "height": 90,
+          "contentWidth": 250,
+          "contentX": 25,
+          "computedWidth": "250px",
+          "boxSizing": "content-box"
+        },
+        {
+          "x": 300,
+          "y": 0,
+          "width": 300,
+          "height": 90,
+          "contentWidth": 250,
+          "contentX": 25,
+          "computedWidth": "250px",
+          "boxSizing": "content-box"
+        }
+      ]
+    }
+  },
+  "lesson": {
+    "lesson-prose": {
+      "width": 244,
+      "boxSizing": "content-box"
+    },
+    "lesson-prose-bb": {
+      "width": 200,
+      "boxSizing": "border-box"
+    },
+    "lesson-preview": {
+      "width": 272,
+      "boxSizing": "content-box"
+    },
+    "lesson-preview-bb": {
+      "width": 220,
+      "boxSizing": "border-box"
+    },
+    "lesson-challenge": {
+      "width": 350,
+      "boxSizing": "content-box"
+    },
+    "lesson-challenge-bb": {
+      "width": 300,
+      "boxSizing": "border-box"
+    }
+  },
+  "paint": {
+    "samples": {
+      "content": [
+        200,
+        220,
+        255
+      ],
+      "padding": [
+        200,
+        220,
+        255
+      ],
+      "border": [
+        40,
+        40,
+        40
+      ],
+      "margin": [
+        255,
+        255,
+        255
+      ]
+    },
+    "contentIsBoxBackground": true,
+    "paddingIsBoxBackground": true,
+    "borderIsBorderColor": true,
+    "marginIsPageBackground": true
+  },
+  "universalRule": {
+    "html": "border-box",
+    "col": "border-box",
+    "deep": "border-box",
+    "before": "border-box",
+    "after": "border-box",
+    "cols": [
+      {
+        "x": 0,
+        "y": 0,
+        "width": 300
+      },
+      {
+        "x": 300,
+        "y": 0,
+        "width": 300
+      }
+    ]
+  }
+}

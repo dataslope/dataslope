@@ -1,0 +1,89 @@
+{
+  "meta": {
+    "javaVersion": "21.0.12.1",
+    "vm": "OpenJDK 64-Bit Server VM",
+    "javapFig3ValueOfCalls": 4
+  },
+  "fig1": {
+    "lines": [
+      "String a = \"hi\";",
+      "String b = new String(\"hi\");",
+      "",
+      "System.out.println(a == b);",
+      "System.out.println(a.equals(b));"
+    ],
+    "printed": [
+      false,
+      true
+    ]
+  },
+  "fig2": {
+    "lines": [
+      "String a = \"hi\";",
+      "String b = new String(\"hi\");",
+      "String c = \"hi\";",
+      "String d = \"HI\".toLowerCase();"
+    ],
+    "compare": [
+      {
+        "expr": "a == c",
+        "value": true
+      },
+      {
+        "expr": "a == b",
+        "value": false
+      },
+      {
+        "expr": "a == d",
+        "value": false
+      },
+      {
+        "expr": "b == d",
+        "value": false
+      },
+      {
+        "expr": "a.equals(b)",
+        "value": true
+      },
+      {
+        "expr": "a.equals(d)",
+        "value": true
+      },
+      {
+        "expr": "a == \"hi\".intern()",
+        "value": true
+      }
+    ]
+  },
+  "fig3": {
+    "lines": [
+      "Integer a = 127, b = 127;",
+      "System.out.println(a == b);",
+      "Integer x = 128, y = 128;",
+      "System.out.println(x == y);",
+      "System.out.println(x.equals(y));"
+    ],
+    "printed": [
+      true,
+      false,
+      true
+    ],
+    "printedWithCacheMax1000": [
+      true,
+      true,
+      true
+    ]
+  },
+  "cache": {
+    "low": -128,
+    "high": 127,
+    "shared": 256
+  },
+  "cacheWithCacheMax1000": {
+    "low": -128,
+    "high": 1000
+  },
+  "pool": {
+    "built.intern() == built": true
+  }
+}

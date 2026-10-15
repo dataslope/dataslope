@@ -1,0 +1,154 @@
+{
+  "meta": {
+    "pandas": "3.0.5",
+    "source": "content/courses/data-analysis-python-pandas/groupby-operations.mdx"
+  },
+  "rows": [
+    {
+      "index": 0,
+      "dept": "Eng",
+      "salary": 120
+    },
+    {
+      "index": 1,
+      "dept": "Sales",
+      "salary": 95
+    },
+    {
+      "index": 2,
+      "dept": "Eng",
+      "salary": 140
+    },
+    {
+      "index": 3,
+      "dept": "Ops",
+      "salary": 80
+    },
+    {
+      "index": 4,
+      "dept": "Eng",
+      "salary": 128
+    },
+    {
+      "index": 5,
+      "dept": "Sales",
+      "salary": 110
+    },
+    {
+      "index": 6,
+      "dept": "Ops",
+      "salary": 92
+    }
+  ],
+  "pieces": [
+    {
+      "dept": "Eng",
+      "index": [
+        0,
+        2,
+        4
+      ],
+      "salary": [
+        120,
+        140,
+        128
+      ]
+    },
+    {
+      "dept": "Ops",
+      "index": [
+        3,
+        6
+      ],
+      "salary": [
+        80,
+        92
+      ]
+    },
+    {
+      "dept": "Sales",
+      "index": [
+        1,
+        5
+      ],
+      "salary": [
+        95,
+        110
+      ]
+    }
+  ],
+  "agg": [
+    {
+      "dept": "Eng",
+      "salary": 388
+    },
+    {
+      "dept": "Ops",
+      "salary": 172
+    },
+    {
+      "dept": "Sales",
+      "salary": 205
+    }
+  ],
+  "transform": [
+    {
+      "index": 0,
+      "salary": 388
+    },
+    {
+      "index": 1,
+      "salary": 205
+    },
+    {
+      "index": 2,
+      "salary": 388
+    },
+    {
+      "index": 3,
+      "salary": 172
+    },
+    {
+      "index": 4,
+      "salary": 388
+    },
+    {
+      "index": 5,
+      "salary": 205
+    },
+    {
+      "index": 6,
+      "salary": 172
+    }
+  ],
+  "share": [
+    {
+      "index": 0,
+      "share": 0.30927835051546393
+    },
+    {
+      "index": 1,
+      "share": 0.4634146341463415
+    },
+    {
+      "index": 2,
+      "share": 0.36082474226804123
+    },
+    {
+      "index": 3,
+      "share": 0.46511627906976744
+    },
+    {
+      "index": 4,
+      "share": 0.32989690721649484
+    },
+    {
+      "index": 5,
+      "share": 0.5365853658536586
+    },
+    {
+      "index": 6,
+      "share": 0.5348837209302325
+    }
+  ]
+}

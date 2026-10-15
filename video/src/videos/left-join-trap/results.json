@@ -1,0 +1,272 @@
+{
+  "version": "PostgreSQL 18.3 (PGlite 0.5.8) on wasm32-unknown-emscripten, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 3.1.74 (1092ec30a3fb1d46b1782ff1b4db5094d3d06ae5), 32-bit",
+  "sql": {
+    "customers": "SELECT id, name FROM customers ORDER BY id;",
+    "orders": "SELECT id, customer_id, amount FROM orders ORDER BY id;",
+    "left": "SELECT c.name, o.id AS order_id, o.amount\nFROM customers c\nLEFT JOIN orders o\n  ON o.customer_id = c.id\nORDER BY c.name, o.id;",
+    "where": "SELECT c.name, o.id AS order_id, o.amount\nFROM customers c\nLEFT JOIN orders o\n  ON o.customer_id = c.id\nWHERE o.amount > 50\nORDER BY c.name, o.id;",
+    "on": "SELECT c.name, o.id AS order_id, o.amount\nFROM customers c\nLEFT JOIN orders o\n  ON o.customer_id = c.id\n  AND o.amount > 50\nORDER BY c.name, o.id;",
+    "inner": "SELECT c.name, o.id AS order_id, o.amount\nFROM customers c\nJOIN orders o\n  ON o.customer_id = c.id\nWHERE o.amount > 50\nORDER BY c.name, o.id;",
+    "test": "SELECT c.name, o.id AS order_id, o.amount, o.amount > 50 AS \"o.amount > 50\"\nFROM customers c\nLEFT JOIN orders o\n  ON o.customer_id = c.id\nORDER BY c.name, o.id;",
+    "nullGt": "SELECT NULL::numeric > 50 AS v;",
+    "whereNull": "SELECT 'kept' AS r WHERE NULL::boolean;",
+    "whereFalse": "SELECT 'kept' AS r WHERE false;",
+    "whereTrue": "SELECT 'kept' AS r WHERE true;"
+  },
+  "results": {
+    "customers": {
+      "fields": [
+        "id",
+        "name"
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "name": "Ada"
+        },
+        {
+          "id": 2,
+          "name": "Grace"
+        },
+        {
+          "id": 3,
+          "name": "Linus"
+        },
+        {
+          "id": 4,
+          "name": "Mae"
+        }
+      ]
+    },
+    "orders": {
+      "fields": [
+        "id",
+        "customer_id",
+        "amount"
+      ],
+      "rows": [
+        {
+          "id": 101,
+          "customer_id": 1,
+          "amount": "42"
+        },
+        {
+          "id": 102,
+          "customer_id": 1,
+          "amount": "18"
+        },
+        {
+          "id": 103,
+          "customer_id": 2,
+          "amount": "99"
+        },
+        {
+          "id": 104,
+          "customer_id": 2,
+          "amount": "15"
+        },
+        {
+          "id": 130,
+          "customer_id": 1,
+          "amount": "57"
+        }
+      ]
+    },
+    "left": {
+      "fields": [
+        "name",
+        "order_id",
+        "amount"
+      ],
+      "rows": [
+        {
+          "name": "Ada",
+          "order_id": 101,
+          "amount": "42"
+        },
+        {
+          "name": "Ada",
+          "order_id": 102,
+          "amount": "18"
+        },
+        {
+          "name": "Ada",
+          "order_id": 130,
+          "amount": "57"
+        },
+        {
+          "name": "Grace",
+          "order_id": 103,
+          "amount": "99"
+        },
+        {
+          "name": "Grace",
+          "order_id": 104,
+          "amount": "15"
+        },
+        {
+          "name": "Linus",
+          "order_id": null,
+          "amount": null
+        },
+        {
+          "name": "Mae",
+          "order_id": null,
+          "amount": null
+        }
+      ]
+    },
+    "where": {
+      "fields": [
+        "name",
+        "order_id",
+        "amount"
+      ],
+      "rows": [
+        {
+          "name": "Ada",
+          "order_id": 130,
+          "amount": "57"
+        },
+        {
+          "name": "Grace",
+          "order_id": 103,
+          "amount": "99"
+        }
+      ]
+    },
+    "on": {
+      "fields": [
+        "name",
+        "order_id",
+        "amount"
+      ],
+      "rows": [
+        {
+          "name": "Ada",
+          "order_id": 130,
+          "amount": "57"
+        },
+        {
+          "name": "Grace",
+          "order_id": 103,
+          "amount": "99"
+        },
+        {
+          "name": "Linus",
+          "order_id": null,
+          "amount": null
+        },
+        {
+          "name": "Mae",
+          "order_id": null,
+          "amount": null
+        }
+      ]
+    },
+    "inner": {
+      "fields": [
+        "name",
+        "order_id",
+        "amount"
+      ],
+      "rows": [
+        {
+          "name": "Ada",
+          "order_id": 130,
+          "amount": "57"
+        },
+        {
+          "name": "Grace",
+          "order_id": 103,
+          "amount": "99"
+        }
+      ]
+    },
+    "test": {
+      "fields": [
+        "name",
+        "order_id",
+        "amount",
+        "o.amount > 50"
+      ],
+      "rows": [
+        {
+          "name": "Ada",
+          "order_id": 101,
+          "amount": "42",
+          "o.amount > 50": false
+        },
+        {
+          "name": "Ada",
+          "order_id": 102,
+          "amount": "18",
+          "o.amount > 50": false
+        },
+        {
+          "name": "Ada",
+          "order_id": 130,
+          "amount": "57",
+          "o.amount > 50": true
+        },
+        {
+          "name": "Grace",
+          "order_id": 103,
+          "amount": "99",
+          "o.amount > 50": true
+        },
+        {
+          "name": "Grace",
+          "order_id": 104,
+          "amount": "15",
+          "o.amount > 50": false
+        },
+        {
+          "name": "Linus",
+          "order_id": null,
+          "amount": null,
+          "o.amount > 50": null
+        },
+        {
+          "name": "Mae",
+          "order_id": null,
+          "amount": null,
+          "o.amount > 50": null
+        }
+      ]
+    },
+    "nullGt": {
+      "fields": [
+        "v"
+      ],
+      "rows": [
+        {
+          "v": null
+        }
+      ]
+    },
+    "whereNull": {
+      "fields": [
+        "r"
+      ],
+      "rows": []
+    },
+    "whereFalse": {
+      "fields": [
+        "r"
+      ],
+      "rows": []
+    },
+    "whereTrue": {
+      "fields": [
+        "r"
+      ],
+      "rows": [
+        {
+          "r": "kept"
+        }
+      ]
+    }
+  },
+  "whereEqualsInner": true
+}
