@@ -16,6 +16,16 @@ import { CentralLimitTheorem } from "./videos/central-limit-theorem/Video";
 import { script as centralLimitTheoremScript } from "./videos/central-limit-theorem/script";
 import { ListVsSet } from "./videos/list-vs-set/Video";
 import { script as listVsSetScript } from "./videos/list-vs-set/script";
+import { SqlNullTrap } from "./videos/sql-null-trap/Video";
+import { script as sqlNullTrapScript } from "./videos/sql-null-trap/script";
+import { WhyNormalization } from "./videos/why-normalization/Video";
+import { script as whyNormalizationScript } from "./videos/why-normalization/script";
+import { BaseRate } from "./videos/base-rate/Video";
+import { script as baseRateScript } from "./videos/base-rate/script";
+import { Overfitting } from "./videos/overfitting/Video";
+import { script as overfittingScript } from "./videos/overfitting/script";
+import { CPointers } from "./videos/c-pointers/Video";
+import { script as cPointersScript } from "./videos/c-pointers/script";
 import { SimpsonsParadox } from "./videos/simpsons-paradox/Video";
 import { script as simpsonsParadoxScript } from "./videos/simpsons-paradox/script";
 import { LlmTokens } from "./videos/llm-tokens/Video";
@@ -71,6 +81,56 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 60}
         defaultProps={EDITORIAL_DEFAULTS}
         calculateMetadata={narratedMetadata<EditorialProps>(listVsSetScript)}
+      />
+      <Composition
+        id="SqlNullTrap"
+        component={SqlNullTrap}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={EDITORIAL_DEFAULTS}
+        calculateMetadata={narratedMetadata<EditorialProps>(sqlNullTrapScript)}
+      />
+      <Composition
+        id="WhyNormalization"
+        component={WhyNormalization}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={EDITORIAL_DEFAULTS}
+        calculateMetadata={narratedMetadata<EditorialProps>(whyNormalizationScript)}
+      />
+      <Composition
+        id="BaseRate"
+        component={BaseRate}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={EDITORIAL_DEFAULTS}
+        calculateMetadata={narratedMetadata<EditorialProps>(baseRateScript)}
+      />
+      <Composition
+        id="Overfitting"
+        component={Overfitting}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={EDITORIAL_DEFAULTS}
+        calculateMetadata={narratedMetadata<EditorialProps>(overfittingScript)}
+      />
+      <Composition
+        id="CPointers"
+        component={CPointers}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={EDITORIAL_DEFAULTS}
+        calculateMetadata={narratedMetadata<EditorialProps>(cPointersScript)}
       />
       <Composition
         id="EventLoop"
