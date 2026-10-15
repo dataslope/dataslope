@@ -1,0 +1,35 @@
+{
+  "$comment": "Tabbied (tabbied.com) patterns for the arcade short, rendered by `npm run patterns`. Two uses, both decoration and both blocky: a glyph band across the top of the title screen, and a cascade (8-bit staircase) band above and below the win screen. Neither sits behind text.",
+  "patterns": [
+    {
+      "name": "title-band",
+      "design": "glyph",
+      "seed": "bs-title",
+      "size": "1080x216",
+      "palette": [
+        "transparent",
+        "blue-800",
+        "blue",
+        "green",
+        "red",
+        "yellow"
+      ],
+      "options": "grid: 10x15"
+    },
+    {
+      "name": "win-band",
+      "design": "cascade",
+      "seed": "bs-win",
+      "size": "1080x108",
+      "palette": [
+        "transparent",
+        "blue-800",
+        "blue",
+        "green",
+        "red",
+        "yellow"
+      ],
+      "options": "grid: 10x15"
+    }
+  ]
+}

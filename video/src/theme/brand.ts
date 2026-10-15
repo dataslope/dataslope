@@ -15,7 +15,24 @@ export type Hue =
   | "purple"
   | "orange"
   | "gray";
-export type Step = 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
+/** Every step app/brand.css defines. Blue alone has the 550-950 half-steps
+ *  and 950; the rest stop at 900. */
+export type Step =
+  | 50
+  | 100
+  | 200
+  | 300
+  | 400
+  | 500
+  | 550
+  | 600
+  | 650
+  | 700
+  | 750
+  | 800
+  | 850
+  | 900
+  | 950;
 
 /**
  * The roles the videos share. Green, red and yellow keep their site meaning
