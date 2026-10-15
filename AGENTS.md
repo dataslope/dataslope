@@ -602,9 +602,13 @@ file:
   `app/brand.css`; no hex values in a scene.
 - **Images go through the illustration pipeline.** Run `npm run illustrations
   -- <video>` from `video/`. It calls `scripts/generate-illustrations.mjs
-  --prompts` (house style, Batch API, quality `low`, transparent background)
-  on the video's own `illustrations.json`, never on
-  `data/illustration-prompts.json`.
+  --prompts` (Batch API, quality `low`, transparent background, the alpha
+  check) on the video's own `illustrations.json`, never on
+  `data/illustration-prompts.json`. A video may draw in a style of its own
+  (pixel art, chalk, watercolor…) by defining it in that file's
+  `meta.styles`. The "Every other style is retired" rule above is about the
+  site's lesson art, which must hold one style across two page themes; a
+  video has a fixed background and its own look.
 - **Tabbied patterns sparingly.** They are pre-rendered to SVG from each
   video's `patterns.json`, with brand token names as the palette, and only
   ever used as decoration: a band on a title or end card, or one transition.

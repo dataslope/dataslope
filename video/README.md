@@ -142,6 +142,40 @@ The prompts stay in `src/videos/<video>/illustrations.json`, never in
 `data/illustration-prompts.json`, so video art doesn't show up in the site's
 gallery.
 
+### A video's own image style
+
+A prompt with no `style` is drawn in the site's isometric house style. A
+video can define its own style instead (pixel art, chalk, watercolor,
+claymation, blueprint linework…) in its file's `meta.styles`, and point
+prompts at it:
+
+```json
+{
+  "meta": {
+    "styles": {
+      "chalk drawing": {
+        "constraints": "Draw it in rough dry-chalk strokes… Leave the background fully empty and transparent: no board, no frame, no shadow.",
+        "softAlphaWarn": 0.35
+      }
+    }
+  },
+  "prompts": [{ "id": "…", "category": "video-icon", "style": "chalk drawing", "subject": "…" }]
+}
+```
+
+Each prompt then reads "A chalk drawing of <subject>." It starts with the
+shared rules ("No text. Draw only the objects described…"), then has the
+style's `constraints` where the house constraints would be, then the brand
+colors. `softAlphaWarn` is the partial-alpha share above which the generator
+warns. Grainy media (chalk, watercolor, fine linework) are soft by nature,
+so they need a higher bar.
+
+Write the constraints the way the house ones are written. Keep them
+prohibitive, because a noun named inside a "no …" clause still gets drawn.
+Always ask for an empty transparent background. Keep it to a few large
+objects. A monochrome style is fine in a video, since its background never
+changes, which the site's two themes can't promise.
+
 ```bash
 # needs the repo root's `npm install` (for sharp) and OPENAI_API_KEY
 npm run illustrations -- sql-execution-order --dry-run   # prompts and cost
