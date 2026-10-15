@@ -146,8 +146,8 @@ export function buildTimeline(
       endMs: Math.round(w.end * 1000),
       timestampMs: Math.round(((w.start + w.end) / 2) * 1000),
       confidence: null,
-      // A beat never shares a caption page with the next one.
-      pageBreakAfter: i === beat.words.length - 1,
+      // A caption page never runs on past a sentence, or into the next beat.
+      pageBreakAfter: i === beat.words.length - 1 || /[.!?]["')]?$/.test(w.text),
     })),
   );
 

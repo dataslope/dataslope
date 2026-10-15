@@ -60,6 +60,17 @@ test("falls back to the estimate for a beat edited after its audio", () => {
   assert.equal(t.beats[0].audio, null);
 });
 
+test("captions break pages at sentence ends inside a beat", () => {
+  const { captions } = buildTimeline(
+    { id: "s", beats: [{ id: "a", text: "It moves. Spaces stay put." }] },
+    null,
+  );
+  assert.deepEqual(
+    captions.map((c) => Boolean(c.pageBreakAfter)),
+    [false, true, false, false, true],
+  );
+});
+
 test("captions carry leading spaces and break pages at every beat", () => {
   const { captions } = buildTimeline(script, null);
   assert.deepEqual(

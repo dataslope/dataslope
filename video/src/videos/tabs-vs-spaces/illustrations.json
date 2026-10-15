@@ -1,0 +1,42 @@
+{
+  "meta": {
+    "model": "gpt-image-2.5-flare",
+    "brandColors": {
+      "blue": "#148cff",
+      "green": "#20c621",
+      "red": "#ff4f59",
+      "yellow": "#ffdd6c"
+    },
+    "sizes": {
+      "video-hero": "1536x1024",
+      "video-icon": "1024x1024"
+    }
+  },
+  "prompts": [
+    {
+      "id": "tvs-tab-key",
+      "category": "video-icon",
+      "subject": "a single chunky oversized keyboard key in brand blue, a thick square keycap with deep sides, carrying one bold raised arrow in brand yellow on its top face that points right into a short upright bar"
+    },
+    {
+      "id": "tvs-space-bar",
+      "category": "video-hero",
+      "subject": "a single long chunky keyboard space bar in brand yellow, one thick rounded keycap many times wider than it is deep, with deep solid sides, seen from a low angle"
+    },
+    {
+      "id": "tvs-marmot-glasses",
+      "category": "video-icon",
+      "subject": "the Dataslope marmot mascot, a friendly round alpine marmot with a cream belly, rosy cheeks, and small rounded ears, wearing big round glasses and leaning in toward a thick blue computer monitor with a blank pale screen, one paw lifted to its glasses"
+    },
+    {
+      "id": "tvs-formatter",
+      "category": "video-hero",
+      "subject": "a chunky boxy machine in brand blue with a thick conveyor belt running through it, one crooked yellow block tilted on the belt going in on the left and one neatly squared green block coming out on the right"
+    },
+    {
+      "id": "tvs-marmot-outro",
+      "category": "video-hero",
+      "subject": "the Dataslope marmot mascot, a friendly round alpine marmot with a cream belly, rosy cheeks, and small rounded ears, sitting happily on top of a long chunky yellow keyboard space bar and hugging one chunky blue keyboard key in its arms"
+    }
+  ]
+}
