@@ -38,10 +38,9 @@ const LINES = [
   "}",
 ] as const;
 
-/** The sum's columns: every term as wide as the widest, so the signs fall
- *  at an even pitch whatever the numbers are. */
-const TERM_W = 96;
-const OP_W = 34;
+/** The space either side of every sign in the sum. The terms flow at their own
+ *  widths, so a three-digit number gets the same room as a one-digit one. */
+const SUM_GAP = 22;
 
 const LAYER_INK = { border: BORDER_INK, padding: PADDING_INK, content: CONTENT_INK } as const;
 
@@ -176,7 +175,9 @@ export const SumScene: React.FC = () => {
       </Dim>
 
       {/* The sum, term by term in the layer's own ink, under the box. */}
-      <div style={{ position: "absolute", left: o.x, top: y(730), display: "flex", alignItems: "baseline" }}>
+      <div
+        style={{ position: "absolute", left: o.x, top: y(730), display: "flex", alignItems: "baseline", gap: SUM_GAP }}
+      >
         {TERMS.map((t, i) => (
           <React.Fragment key={i}>
             {i > 0 ? <Op at={termAt[i] - 4} text="+" /> : null}
@@ -202,7 +203,7 @@ const Term: React.FC<{ at: number; value: number; color: string; sub: string }> 
   <Ink
     at={at}
     dur={12}
-    style={{ position: "relative", width: TERM_W, display: "flex", flexDirection: "column", alignItems: "center" }}
+    style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center" }}
   >
     <span style={{ ...headline(56), color, fontVariantNumeric: "tabular-nums lining-nums" }}>{value}</span>
     <span style={{ ...note(20, INK_SOFT), marginTop: 10 }}>{sub}</span>
@@ -210,7 +211,7 @@ const Term: React.FC<{ at: number; value: number; color: string; sub: string }> 
 );
 
 const Op: React.FC<{ at: number; text: string }> = ({ at, text }) => (
-  <Ink at={at} dur={10} style={{ position: "relative", width: OP_W, textAlign: "center" }}>
+  <Ink at={at} dur={10} style={{ position: "relative" }}>
     <span style={{ ...headline(48), color: INK, opacity: 0.7 }}>{text}</span>
   </Ink>
 );
