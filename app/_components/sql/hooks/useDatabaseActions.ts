@@ -612,7 +612,8 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     const state = useDialogStore.getState().importCsvState;
     const currentTables = useEngineStore.getState().tables;
     if (!engine || !state) return;
-    void (async () => {
+    // Handed back so the dialog can stay busy until the rows are in.
+    return (async () => {
     const { headers, rows, targetMode, targetTable, tableName } = state;
     const resolvedTarget = targetTable || currentTables[0] || "";
     const isExisting = targetMode === "existing" && resolvedTarget;
@@ -734,7 +735,8 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     const state = useDialogStore.getState().importJsonState;
     const currentTables = useEngineStore.getState().tables;
     if (!engine || !state) return;
-    void (async () => {
+    // Handed back so the dialog can stay busy until the rows are in.
+    return (async () => {
     const { headers, rows, targetMode, targetTable, tableName } = state;
     const resolvedTarget = targetTable || currentTables[0] || "";
     const isExisting = targetMode === "existing" && resolvedTarget;
@@ -816,7 +818,8 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     const state = useDialogStore.getState().importParquetState;
     const currentTables = useEngineStore.getState().tables;
     if (!engine || !state) return;
-    void (async () => {
+    // Handed back so the dialog can stay busy until the rows are in.
+    return (async () => {
     const { columns, rows, targetMode, targetTable, tableName } = state;
     const resolvedTarget = targetTable || currentTables[0] || "";
     const isExisting = targetMode === "existing" && resolvedTarget;

@@ -114,6 +114,8 @@ import { ImportSqlDumpDialog } from "../sql/components/ImportSqlDumpDialog";
 import type { ImportStepReporter } from "../sql/utils/importProgress";
 import { ImportBinaryFileDialog } from "../sql/components/ImportBinaryFileDialog";
 import { SqlFileDropTarget } from "../sql/components/SqlFileDropTarget";
+import { ImportSubmitButton } from "../sql/components/ImportSubmitButton";
+import { useImportSubmit } from "../sql/hooks/useImportSubmit";
 import {
   routeDatabaseFile,
   SNIFF_BYTES,
@@ -5384,7 +5386,7 @@ function DuckDbPlaygroundInner() {
           // eslint-disable-next-line react-hooks/refs
           engine={engineRef.current}
           onPickFile={handleCsvFile}
-          onSubmit={() => void submitImport("csv")}
+          onSubmit={() => submitImport("csv")}
           onError={(msg) => showToast(msg, "warn")}
         />
 
@@ -5407,7 +5409,7 @@ function DuckDbPlaygroundInner() {
           // eslint-disable-next-line react-hooks/refs
           engine={engineRef.current}
           onPickFile={handleJsonFile}
-          onSubmit={() => void submitImport("json")}
+          onSubmit={() => submitImport("json")}
           onError={(msg) => showToast(msg, "warn")}
         />
 
@@ -5430,7 +5432,7 @@ function DuckDbPlaygroundInner() {
           // eslint-disable-next-line react-hooks/refs
           engine={engineRef.current}
           onPickFile={(f) => void handleParquetFile(f)}
-          onSubmit={() => void submitImport("parquet")}
+          onSubmit={() => submitImport("parquet")}
           onError={(msg) => showToast(msg, "warn")}
         />
 
@@ -6068,7 +6070,8 @@ interface ImportDialogProps<
   tables: string[];
   engine: DuckDbEngine | null;
   onPickFile: (file: File) => void;
-  onSubmit: () => void;
+  /** Runs the import; the dialog stays busy until the promise settles. */
+  onSubmit: () => Promise<unknown>;
   onError: (message: string) => void;
 }
 
@@ -6088,6 +6091,7 @@ function ImportDialog<
   onSubmit,
   onError,
 }: ImportDialogProps<S>) {
+  const { importing, submit } = useImportSubmit(onSubmit);
   const flavorConfig = useMemo(() => {
     if (flavor === "csv") {
       return {
@@ -6216,7 +6220,9 @@ function ImportDialog<
     <Dialog.Root
       open={open}
       onOpenChange={(next) => {
-        if (!next) onClose();
+        // The engine is already writing rows and cannot be called off, so
+        // the dialog stays up until it reports how that went.
+        if (!next && !importing) onClose();
       }}
     >
       <Dialog.Portal>
@@ -6279,6 +6285,7 @@ function ImportDialog<
                   <button
                     type="button"
                     className={`sql-import-mode-btn${state.targetMode === "new" ? " active" : ""}`}
+                    disabled={importing}
                     onClick={() => setTargetMode("new")}
                   >
                     New table
@@ -6286,7 +6293,7 @@ function ImportDialog<
                   <button
                     type="button"
                     className={`sql-import-mode-btn${state.targetMode === "existing" ? " active" : ""}`}
-                    disabled={tables.length === 0}
+                    disabled={importing || tables.length === 0}
                     onClick={() => setTargetMode("existing")}
                   >
                     Existing table
@@ -6298,6 +6305,7 @@ function ImportDialog<
                     value={state.tableName}
                     onChange={(e) => setNewTableName(e.target.value)}
                     placeholder="Table name"
+                    disabled={importing}
                     autoFocus
                   />
                 ) : (
@@ -6305,6 +6313,7 @@ function ImportDialog<
                     className="sql-import-target-select"
                     value={state.targetTable}
                     onChange={(e) => setTargetTable(e.target.value)}
+                    disabled={importing}
                     autoFocus
                   >
                     {tables.map((t) => (
@@ -6384,17 +6393,14 @@ function ImportDialog<
             </Fragment>
           )}
           <div className="confirm-actions" style={{ marginTop: 16 }}>
-            <Dialog.Close className="confirm-btn confirm-btn-secondary">
+            <Dialog.Close
+              className="confirm-btn confirm-btn-secondary"
+              disabled={importing}
+            >
               Cancel
             </Dialog.Close>
             {state && (
-              <button
-                type="button"
-                className="confirm-btn confirm-btn-primary"
-                onClick={onSubmit}
-              >
-                Import
-              </button>
+              <ImportSubmitButton importing={importing} onClick={submit} />
             )}
           </div>
         </Dialog.Popup>

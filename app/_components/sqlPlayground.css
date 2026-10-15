@@ -3100,11 +3100,30 @@ html[data-playground-theme="light"] .sql-result-ok {
   }
 }
 
+/* The CSV / JSON / Parquet dialogs' Import button while the rows are being
+   written: disabled, with a spinner before "Importing…". It is busy rather
+   than unavailable, so it keeps more of its color than a plain disabled
+   button does. */
+.sql-import-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.sql-import-submit[aria-busy="true"]:disabled {
+  opacity: 0.75;
+  cursor: progress;
+}
+.sql-import-submit-spinner {
+  flex-shrink: 0;
+  animation: sql-import-progress-spin 0.8s linear infinite;
+}
+
 /* Reduced motion: the phase label, byte counter and elapsed clock already
    say the import is running, so the decorative movement can stop. The sweep
    keeps a slow cycle rather than freezing into a bar that looks stalled. */
 @media (prefers-reduced-motion: reduce) {
-  .sql-import-progress-spinner {
+  .sql-import-progress-spinner,
+  .sql-import-submit-spinner {
     animation-duration: 1.6s;
   }
   .sql-import-progress-ellipsis span {
