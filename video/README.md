@@ -9,8 +9,15 @@ site's `tsconfig.json` and ESLint config ignore it.
 
 | Composition | Format | About |
 | --- | --- | --- |
-| `SqlExecutionOrder` | 16:9, 3840x2160 | "SQL doesn't run in the order you write it", after the lesson `intro-sql-postgres/query-execution-order` |
-| `TabsVsSpaces` | 9:16, 2160x3840 | The tabs vs spaces debate, for YouTube Shorts and TikTok |
+| `SqlExecutionOrder` | 16:9 | "SQL doesn't run in the order you write it" (`intro-sql-postgres/query-execution-order`), house isometric style |
+| `TabsVsSpaces` | 9:16 | The tabs vs spaces debate, for YouTube Shorts and TikTok, house isometric style |
+| `BinarySearch` | 9:16 | Guessing 1 to 100 in seven tries, as an 8-bit arcade game with pixel-art sprites |
+| `FloatingPoint` | 16:9 | Why 0.1 + 0.2 isn't 0.3, as a chalkboard lecture with chalk drawings |
+| `CentralLimitTheorem` | 16:9 | The Central Limit Theorem as a magazine science page, with watercolors |
+| `LlmTokens` | 9:16 | Why "strawberry" trips up a language model, in neon with claymation figures |
+| `EventLoop` | 16:9 | The JavaScript ordering puzzle as an engineering blueprint |
+
+All of them render at 4K: 3840x2160 for 16:9, or 2160x3840 for 9:16.
 
 ## Quick start
 
