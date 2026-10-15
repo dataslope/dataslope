@@ -7,6 +7,16 @@ import { SqlExecutionOrder } from "./videos/sql-execution-order/Video";
 import { script as sqlScript } from "./videos/sql-execution-order/script";
 import { TabsVsSpaces } from "./videos/tabs-vs-spaces/Video";
 import { script as tabsScript } from "./videos/tabs-vs-spaces/script";
+import { BinarySearch } from "./videos/binary-search/Video";
+import { script as binarySearchScript } from "./videos/binary-search/script";
+import { FloatingPoint } from "./videos/floating-point/Video";
+import { script as floatingPointScript } from "./videos/floating-point/script";
+import { CentralLimitTheorem } from "./videos/central-limit-theorem/Video";
+import { script as centralLimitTheoremScript } from "./videos/central-limit-theorem/script";
+import { LlmTokens } from "./videos/llm-tokens/Video";
+import { script as llmTokensScript } from "./videos/llm-tokens/script";
+import { EventLoop } from "./videos/event-loop/Video";
+import { script as eventLoopScript } from "./videos/event-loop/script";
 
 // Every composition is laid out in 1080p CSS pixels and rendered with
 // `--scale=2` for 4K (3840x2160, or 2160x3840 for vertical). Duration comes
@@ -27,6 +37,36 @@ export const RemotionRoot: React.FC = () => (
         defaultProps={{ timeline: null, captions: true } satisfies NarratedProps}
         calculateMetadata={narratedMetadata<NarratedProps>(sqlScript)}
       />
+      <Composition
+        id="FloatingPoint"
+        component={FloatingPoint}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ timeline: null, captions: true } satisfies NarratedProps}
+        calculateMetadata={narratedMetadata<NarratedProps>(floatingPointScript)}
+      />
+      <Composition
+        id="CentralLimitTheorem"
+        component={CentralLimitTheorem}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ timeline: null, captions: true } satisfies NarratedProps}
+        calculateMetadata={narratedMetadata<NarratedProps>(centralLimitTheoremScript)}
+      />
+      <Composition
+        id="EventLoop"
+        component={EventLoop}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ timeline: null, captions: true } satisfies NarratedProps}
+        calculateMetadata={narratedMetadata<NarratedProps>(eventLoopScript)}
+      />
     </Folder>
     <Folder name="Vertical">
       <Composition
@@ -38,6 +78,26 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 45}
         defaultProps={{ timeline: null, captions: true } satisfies NarratedProps}
         calculateMetadata={narratedMetadata<NarratedProps>(tabsScript)}
+      />
+      <Composition
+        id="BinarySearch"
+        component={BinarySearch}
+        width={1080}
+        height={1920}
+        fps={FPS}
+        durationInFrames={FPS * 45}
+        defaultProps={{ timeline: null, captions: true } satisfies NarratedProps}
+        calculateMetadata={narratedMetadata<NarratedProps>(binarySearchScript)}
+      />
+      <Composition
+        id="LlmTokens"
+        component={LlmTokens}
+        width={1080}
+        height={1920}
+        fps={FPS}
+        durationInFrames={FPS * 45}
+        defaultProps={{ timeline: null, captions: true } satisfies NarratedProps}
+        calculateMetadata={narratedMetadata<NarratedProps>(llmTokensScript)}
       />
     </Folder>
   </>

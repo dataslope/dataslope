@@ -176,8 +176,13 @@ function printHelp() {
 
 // ── Prompt building (mirror of lib/illustrationPrompt.ts) ────────────────────
 /** Exported so `__tests__/illustrationPrompt.test.ts` can assert this stays
- *  byte-identical to the TypeScript `buildIllustrationPrompt`. */
-export function buildPrompt(spec, colors) {
+ *  byte-identical to the TypeScript `buildIllustrationPrompt`.
+ *
+ *  `styles` is a prompt file's own `meta.styles`, `{ "<style>": { constraints,
+ *  softAlphaWarn? } }`: a video can define an image style the site never uses
+ *  (pixel art, chalk, watercolor…) without adding it to the house set. The
+ *  site's corpus has none, so its prompts are unchanged. */
+export function buildPrompt(spec, colors, styles = {}) {
   // Mirror of DEFAULT_STYLE in lib/illustrationPrompt.ts (pinned by a parity test).
   const style = (spec.style && spec.style.trim()) || "isometric illustration";
   const article = /^[aeiou]/i.test(style) ? "An" : "A";
@@ -218,7 +223,8 @@ export function buildPrompt(spec, colors) {
     "rather than centered in the middle. Draw any person as a small stylized " +
     "figure with minimal facial detail and no resemblance to a real individual.";
   const byStyle = { "isometric illustration": isometric, risograph };
-  const constraints = `${shared} ${byStyle[style] ?? isometric}`;
+  const own = Object.hasOwn(styles, style) ? styles[style].constraints : null;
+  const constraints = `${shared} ${own ?? byStyle[style] ?? isometric}`;
   return (
     `${article} ${style} of ${spec.subject}. ${constraints}\n\n` +
     `Blue: ${colors.blue}\n` +
@@ -365,7 +371,7 @@ function selectEntries(data, opts) {
     id: p.id,
     category: p.category,
     size: (meta.sizes && meta.sizes[p.category]) || "1024x1024",
-    prompt: buildPrompt(p, meta.brandColors),
+    prompt: buildPrompt(p, meta.brandColors, meta.styles),
   }));
 }
 
@@ -436,18 +442,24 @@ const SOFT_ALPHA_WARN = { "isometric illustration": 0.05, risograph: 0.15 };
 /** Prompt styles by id, read once. `writeImage` needs the style to pick a
  *  soft-alpha limit, and the batch download path has only a custom_id. */
 let styleById = null;
+let fileStyles = {};
 function softLimitFor(id) {
   if (!styleById) {
+    const data = JSON.parse(readFileSync(dataFile, "utf8"));
+    fileStyles = data.meta?.styles ?? {};
     styleById = new Map(
-      JSON.parse(readFileSync(dataFile, "utf8")).prompts.map((p) => [
-        p.id,
-        (p.style && p.style.trim()) || "isometric illustration",
-      ]),
+      data.prompts.map((p) => [p.id, (p.style && p.style.trim()) || "isometric illustration"]),
     );
   }
-  // An unknown id (or a style with no constraint block of its own) is drawn
-  // with the isometric constraints, so it gets the isometric limit too.
-  return SOFT_ALPHA_WARN[styleById.get(id)] ?? SOFT_ALPHA_WARN["isometric illustration"];
+  // A style a prompt file defines brings its own limit (watercolor and chalk
+  // are soft by nature). An unknown id, or a style with no constraint block
+  // of its own, is drawn with the isometric constraints and gets their limit.
+  const style = styleById.get(id);
+  return (
+    (Object.hasOwn(fileStyles, style) ? fileStyles[style].softAlphaWarn : undefined) ??
+    SOFT_ALPHA_WARN[style] ??
+    SOFT_ALPHA_WARN["isometric illustration"]
+  );
 }
 
 /** R2 key for one candidate image. Mirrors promote-illustrations.mjs. */
