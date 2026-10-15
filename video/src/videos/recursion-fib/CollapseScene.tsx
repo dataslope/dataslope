@@ -104,13 +104,11 @@ export const CollapseScene: React.FC = () => {
         }
         hot={ease(frame, nineAt - 2, 10)}
       />
-      <Note at={nineAt + 6} x={SIDE_X} y={y(COUNTER_TOP) + 200} from="up" width={330}>
-        <span style={{ ...note(22, INK_SOFT) }}>
-          {NAIVE_CALLS} without the table.{" "}
-          <span style={{ color: INK }}>
-            {MEMO_HITS} of these {MEMO_CALLS} only read it.
-          </span>
-        </span>
+      <Note at={nineAt + 6} x={SIDE_X} y={y(COUNTER_TOP) + 200} from="up" width={340}>
+        <div style={note(22, INK_SOFT)}>{NAIVE_CALLS} without the table.</div>
+        <div style={{ ...note(22, INK), marginTop: 6 }}>
+          {MEMO_HITS} of the {MEMO_CALLS} just read it.
+        </div>
       </Note>
     </AbsoluteFill>
   );
