@@ -4,7 +4,7 @@ import { Illustration } from "../../../components/Illustration";
 import { ease } from "../../../components/motion";
 import { Scene } from "../../../components/Scene";
 import { useNarration } from "../../../narration/NarrationContext";
-import { ArrowHead, Balloon, CropMarks, DASH, Layer, Leader, Letter, Seg } from "../draw";
+import { ArrowHead, Balloon, CropMarks, DASH, Layer, Leader, Letter, Seg, type Pt } from "../draw";
 import { Gear, Lane, Tube } from "../parts";
 import { BP, VIDEO } from "../theme";
 
@@ -16,6 +16,24 @@ const VIEWS: Record<"stack" | "loop" | "queues", View> = {
 };
 const NAME_Y = 606;
 const SYM_Y = 772;
+
+/**
+ * The two flow curves from the queues into the loop, as cubic Béziers
+ * (start y, last control point y, end y). Each head points along its curve's
+ * end tangent, which runs from the last control point to the end, and is
+ * centred on the end so it straddles the line rather than floating off it.
+ */
+const FLOW_HEAD = 16;
+const FLOWS = [
+  [SYM_Y - 46, SYM_Y - 20, SYM_Y - 12],
+  [SYM_Y + 50, SYM_Y + 20, SYM_Y + 12],
+].map(([y0, yc, y1]) => {
+  const c2: Pt = [980, yc];
+  const end: Pt = [900, y1];
+  const angle = Math.atan2(end[1] - c2[1], end[0] - c2[0]);
+  const tip: Pt = [end[0] + (Math.cos(angle) * FLOW_HEAD) / 2, end[1] + (Math.sin(angle) * FLOW_HEAD) / 2];
+  return { d: `M 1160 ${y0} C 1010 ${y0}, ${c2[0]} ${c2[1]}, ${end[0]} ${end[1]}`, tip, angle };
+});
 
 /**
  * "Meet the machinery" as a parts list: each part drawn in a detail view,
@@ -134,22 +152,12 @@ export const PartsSheet: React.FC<{ from: number; to: number }> = ({ from, to })
 
         {/* "…moves work between them": queues into the loop, loop onto the stack. */}
         <g opacity={flow}>
-          <path
-            d={`M 1160 ${SYM_Y - 46} C 1010 ${SYM_Y - 46}, 980 ${SYM_Y - 20}, 900 ${SYM_Y - 12}`}
-            fill="none"
-            stroke={BP.cyan}
-            strokeWidth={2.5}
-            strokeDasharray={DASH.phantom}
-          />
-          <path
-            d={`M 1160 ${SYM_Y + 50} C 1010 ${SYM_Y + 50}, 980 ${SYM_Y + 20}, 900 ${SYM_Y + 12}`}
-            fill="none"
-            stroke={BP.cyan}
-            strokeWidth={2.5}
-            strokeDasharray={DASH.phantom}
-          />
-          <ArrowHead tip={[892, SYM_Y - 11]} angle={Math.PI - 0.12} color={BP.cyan} />
-          <ArrowHead tip={[892, SYM_Y + 11]} angle={Math.PI + 0.12} color={BP.cyan} />
+          {FLOWS.map((f) => (
+            <path key={f.d} d={f.d} fill="none" stroke={BP.cyan} strokeWidth={2.5} strokeDasharray={DASH.phantom} />
+          ))}
+          {FLOWS.map((f) => (
+            <ArrowHead key={f.d} tip={f.tip} angle={f.angle} size={FLOW_HEAD} color={BP.cyan} />
+          ))}
         </g>
         <Seg a={[740, SYM_Y]} b={[352, SYM_Y]} p={ease(frame, movesAt + 8, 16)} color={BP.cyan} width={2.5} dash={DASH.phantom} />
         <ArrowHead tip={[350, SYM_Y]} angle={Math.PI} color={BP.cyan} opacity={ease(frame, movesAt + 20, 6)} />
