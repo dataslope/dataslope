@@ -21,7 +21,7 @@ export const VIDEO = "left-join-trap";
  * left-join-trap` has written both WebPs; every frame is laid out with room
  * for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 /** A value as PGlite hands it back: numeric arrives as a string. */
 export type Value = string | number | boolean | null;

@@ -14,7 +14,7 @@ export const VIDEO = "overfitting";
  * overfitting` has written both WebPs. Every frame is laid out with room for
  * them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 export const N_TRAIN = m.meta.nTrain;
 export const N_TEST = m.meta.nTest;

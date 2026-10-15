@@ -11,7 +11,7 @@ export const VIDEO = "random-walks";
  * Whether public/images/random-walks/ holds both watercolors from
  * illustrations.json. Every frame is laid out with room for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 /** Flips per walk, and how many independent pairs were counted. */
 export const STEPS = m.steps;
