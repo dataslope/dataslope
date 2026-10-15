@@ -28,7 +28,8 @@ already puzzled by:
   continuations, and a plausible continuation of a question is an
   answer, whether or not one is available.
 * **Why does it fail at counting letters?** Because it never sees
-  letters. It sees tokens, and "strawberry" may be two of them.
+  letters. It sees tokens, and inside a sentence "strawberry" can be
+  just one.
 * **Why does output cost five times as much as input?** Because
   producing tokens and reading tokens are computationally different
   operations.
@@ -53,28 +54,28 @@ other side:
   files={[
     {
       filename: "main.py",
-      starterCode: `# A crude stand-in for how a tokenizer chops text into pieces.
-# Real vocabularies are learned; this one is hand-written to show
-# the shape of the problem.
-vocab = ["straw", "berry", "straw berry", " the", "count", "ing", " r"]
-
+      starterCode: `# How a real tokenizer cuts up the word: OpenAI's o200k_base, the one
+# GPT-4o uses. The pieces and their ids are copied from a run of it.
 text = "strawberry"
-pieces = ["straw", "berry"]
+pieces = ["st", "raw", "berry"]
+ids = [302, 1618, 19772]
 
 print("What you see:  ", list(text))
-print("What it sees:  ", pieces)
+print("What it sees:  ", ids)
+print("Those ids are: ", pieces)
 print()
 print("Number of 'r' characters you can count:", text.count("r"))
-print("Number of pieces the model can count: ", len(pieces))
+print("Number of its pieces that are a letter:", sum(len(p) == 1 for p in pieces))
 `,
     },
   ]}
 />
 
-The model is asked "how many r's are in strawberry" and is looking at
-two opaque symbols. It answers from what it has read *about* the word,
-not from inspecting it, because inspecting it is not an operation
-available to it.
+On its own the word is three opaque ids. Ask the model "how many r's
+are in strawberry" and it is looking at fewer still: after a space,
+`" strawberry"` is a single id, the whole word in one number. It
+answers from what it has read *about* the word, not from inspecting
+it, because inspecting it is not an operation available to it.
 
 ## What you will build
 
