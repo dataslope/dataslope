@@ -133,8 +133,9 @@ export const MixScene: React.FC = () => {
                       position: "absolute",
                       left: x,
                       width: roomy ? w - 3 : undefined,
-                      // A sliver too thin to hold its letter is labelled just outside the bar.
-                      top: roomy ? top + h(BAR_H) / 2 - 20 : g === "men" ? top - 34 : top + h(BAR_H) + 6,
+                      // A sliver too thin to hold its letter is labelled just outside
+                      // the bar, on the side away from that bar's bracket.
+                      top: roomy ? top + h(BAR_H) / 2 - 20 : g === "men" ? top + h(BAR_H) + 6 : top - 30,
                       textAlign: roomy ? "center" : "left",
                       opacity: ease(frame, whereAt + gi * 6 + i * 3 + 8, 10),
                       ...label(roomy ? 26 : 20, roomy ? (onLight(d) ? INK : PAPER) : INK_SOFT),

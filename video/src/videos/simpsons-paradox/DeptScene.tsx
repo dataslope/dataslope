@@ -10,7 +10,9 @@ import { Gridlines, RateScale, Swatch } from "./parts";
 
 const PX0 = 300;
 const PX1 = 1300;
-const ROW_Y = (i: number) => 300 + i * 100;
+/** Rows start below the column header and the label row, with room for
+ *  department A's highlight band between them. */
+const ROW_Y = (i: number) => 316 + i * 98;
 const GAP_X = 1440;
 const px = (rate: number) => PX0 + (PX1 - PX0) * rate;
 /** Dot area grows with the number of applicants. */
@@ -77,7 +79,7 @@ export const DeptScene: React.FC = () => {
         }}
       />
 
-      <Ink at={fourAt - 4} dur={14} style={{ left: GAP_X, top: y(248) }}>
+      <Ink at={fourAt - 4} dur={14} style={{ left: GAP_X, top: y(240) }}>
         <span style={label(20, INK_SOFT)}>Women minus men</span>
       </Ink>
 
@@ -90,6 +92,9 @@ export const DeptScene: React.FC = () => {
         // The larger dot is drawn first so the smaller one stays visible.
         const order: Group[] = d.men.applied >= d.women.applied ? ["men", "women"] : ["women", "men"];
         const gapAt = d.gap > 0 ? fourAt + 8 + i * 4 : otherAt + 4 + i * 3;
+        // A label that would run into the 0% line goes above its dot instead.
+        const trailX = px(d[trail].rate) - radius(d[trail].applied) - 10;
+        const trailAbove = trailX < PX0 + 56;
         return (
           <React.Fragment key={d.dept}>
             <Ink at={at - 4} dur={12} style={{ left: 128, top: cy - 30 }}>
@@ -117,7 +122,13 @@ export const DeptScene: React.FC = () => {
               ))}
             </svg>
             {/* Each pair's labels open away from each other. */}
-            <Note at={at + 6} x={px(d[trail].rate) - radius(d[trail].applied) - 10} y={cy - 14} align="right">
+            <Note
+              at={at + 6}
+              x={trailAbove ? px(d[trail].rate) : trailX}
+              y={trailAbove ? cy - radius(d[trail].applied) - 32 : cy - 14}
+              align={trailAbove ? "left" : "right"}
+              style={trailAbove ? { transform: "translateX(-50%)" } : undefined}
+            >
               <span style={{ ...note(21, COLOR_INK[trail]), fontWeight: 600 }}>{Math.round(d[trail].rate * 100)}%</span>
             </Note>
             <Note at={at + 6} x={px(d[lead].rate) + radius(d[lead].applied) + 10} y={cy - 14}>

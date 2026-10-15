@@ -10,10 +10,10 @@ import { COLOR, COLOR_INK, type Dept, DEPTS, EASY_SHARE, type Group, pct, share,
 import { Gridlines, RateScale } from "./parts";
 
 const SCALE = { x0: 420, x1: 1620 };
-const BAR_H = 84;
+const BAR_H = 92;
 const ROWS = [
-  { mix: "women" as Group, top: 392, rate: TOTAL.women.rate, head: "Where women applied", sub: "the mix they actually sent" },
-  { mix: "men" as Group, top: 568, rate: WOMEN_AT_MEN_MIX, head: "Where men applied", sub: "the men's mix instead" },
+  { mix: "women" as Group, top: 404, rate: TOTAL.women.rate, head: "Where women applied", sub: "the mix they actually sent" },
+  { mix: "men" as Group, top: 596, rate: WOMEN_AT_MEN_MIX, head: "Where men applied", sub: "the men's mix instead" },
 ];
 const px = (rate: number) => SCALE.x0 + (SCALE.x1 - SCALE.x0) * rate;
 const shade = (d: Dept): Step => (d.rate >= 0.5 ? 300 : d.rate >= 0.3 ? 500 : d.rate >= 0.2 ? 700 : 900);
@@ -70,8 +70,8 @@ export const WeightScene: React.FC = () => {
       </Ink>
       <FigLabel n="4" title="Women's own department rates, averaged two ways" at={start - 6} x={120} y={y(270)} />
 
-      <Gridlines x0={SCALE.x0} x1={SCALE.x1} top={y(360)} bottom={y(680)} at={start} />
-      <RateScale x0={SCALE.x0} x1={SCALE.x1} top={y(692)} at={start + 4} />
+      <Gridlines x0={SCALE.x0} x1={SCALE.x1} top={y(372)} bottom={y(716)} at={start} />
+      <RateScale x0={SCALE.x0} x1={SCALE.x1} top={y(728)} at={start + 4} />
 
       {ROWS.map((r, i) => {
         const top = y(r.top);
@@ -80,11 +80,11 @@ export const WeightScene: React.FC = () => {
         const w = (px(r.rate) - SCALE.x0) * grow;
         return (
           <React.Fragment key={r.mix}>
-            <Ink at={at} dur={14} style={{ left: 120, top: top + 2, width: 260 }}>
+            <Ink at={at} dur={14} style={{ left: 120, top: top + 2, whiteSpace: "nowrap" }}>
               <div style={{ ...body(28), color: INK, lineHeight: 1.15 }}>{r.head}</div>
               <div style={{ ...note(20, INK_SOFT), marginTop: 4 }}>{r.sub}</div>
             </Ink>
-            <Note at={at + 6} x={120} y={top + 78}>
+            <Note at={at + 6} x={120} y={top + 82}>
               <MixStrip group={r.mix} x={0} top={0} width={240} />
             </Note>
             <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
@@ -113,7 +113,7 @@ export const WeightScene: React.FC = () => {
       })}
 
       {/* The leaning: almost all of the women's weight sat on C to F. */}
-      <Note at={leanedAt - 2} x={SCALE.x0} y={y(ROWS[0].top) + h(BAR_H) + 12}>
+      <Note at={leanedAt - 2} x={SCALE.x0 + 14} y={y(ROWS[0].top) + h(BAR_H) + 12}>
         <span style={note(22, COLOR_INK.women)}>
           <b>{pct(1 - EASY_SHARE.women, 0)}</b> of the weight on C to F, the four hardest
         </span>
@@ -124,14 +124,14 @@ export const WeightScene: React.FC = () => {
         <line
           x1={menX}
           x2={menX}
-          y1={y(352)}
-          y2={y(352) + (y(668) - y(352)) * ease(frame, weightedAt, 18)}
+          y1={y(364)}
+          y2={y(364) + (y(708) - y(364)) * ease(frame, weightedAt, 18)}
           stroke={COLOR.men}
           strokeWidth={3}
           strokeDasharray="9 7"
         />
       </svg>
-      <Note at={weightedAt + 6} x={menX} y={y(318)} align="left" style={{ transform: "translateX(-50%)" }}>
+      <Note at={weightedAt + 6} x={menX} y={y(328)} align="left" style={{ transform: "translateX(-50%)" }}>
         <span style={{ ...label(21, COLOR_INK.men), whiteSpace: "nowrap" }}>Men, {pct(TOTAL.men.rate)}</span>
       </Note>
       <Note at={aheadAt} x={px(WOMEN_AT_MEN_MIX) + 190} y={y(ROWS[1].top) + h(BAR_H) / 2 - 14}>
