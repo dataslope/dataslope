@@ -3,7 +3,7 @@ import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK_SOFT } from "../../editorial/sty
 export const VIDEO = "base-rate";
 
 /** Flip to true once public/images/base-rate/ holds both cut-outs. */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 /**
  * The lesson's own inputs (conditional-probability.mdx, "The centerpiece: a

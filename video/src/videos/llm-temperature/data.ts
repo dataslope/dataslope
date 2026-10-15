@@ -12,7 +12,7 @@ export const VIDEO = "llm-temperature";
  * llm-temperature` has written both WebPs. Every frame is laid out with room
  * for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 /** The lesson's four candidate tokens, in score order, and their scores. */
 export const TOKENS: readonly string[] = m.tokens;
