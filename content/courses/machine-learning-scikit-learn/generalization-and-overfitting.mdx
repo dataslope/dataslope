@@ -67,6 +67,13 @@ noise instead of the true pattern, and the only way to point at that
 distinction is to know the true pattern exactly. With real data the truth is
 hidden, so we generate it ourselves and then watch which models recover it.
 
+The pipeline below starts with `MinMaxScaler(feature_range=(-1, 1))`, which
+rescales $x$ into $[-1, 1]$ before the powers are built. Every power of a
+number in that range stays in it, whereas $4^{15}$ is about a billion. At that
+spread of sizes the least-squares solver runs out of precision, and without the
+rescaling a degree-15 fit can come out *worse* on its own training data than a
+simpler one.
+
 <CodeBlock
   adapter="python"
   files={[
@@ -74,7 +81,7 @@ hidden, so we generate it ourselves and then watch which models recover it.
       filename: "main.py",
       starterCode: `import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import PolynomialFeatures
+from sklearn.preprocessing import MinMaxScaler, PolynomialFeatures
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import make_pipeline
 
@@ -92,7 +99,9 @@ grid = np.linspace(0, 4, 300).reshape(-1, 1)
 
 fig, axes = plt.subplots(1, 3, figsize=(13, 4))
 for ax, degree, label in zip(axes, [1, 4, 15], ["Underfit", "Good fit", "Overfit"]):
-    model = make_pipeline(PolynomialFeatures(degree), LinearRegression())
+    model = make_pipeline(
+        MinMaxScaler(feature_range=(-1, 1)), PolynomialFeatures(degree), LinearRegression()
+    )
     model.fit(X, y)
     ax.scatter(x, y, s=18, color="#4f8ef7", label="training data")
     ax.plot(
@@ -116,15 +125,16 @@ Look at the three panels:
   some regions, below it in others. This is **high bias**.
 - **Degree 4 (good fit).** The curve tracks the true green pattern closely
   without chasing individual dots. This generalizes.
-- **Degree 15 (overfit).** The wild orange curve passes through nearly
-  every training dot, including the noisy ones, and lurches violently
-  between them. It has memorized the sample, not the pattern. This is
-  **high variance**.
+- **Degree 15 (overfit).** The wiggly orange curve bends toward
+  individual training dots, including the noisy ones, and picks up bumps
+  the true pattern does not have. It is fitting the sample, not the
+  pattern. This is **high variance**.
 
 <Callout type="warn" title="Overfitting looks like success on the training data">
-The degree-15 model has the *lowest* error on the training points, it
-nearly touches every one. If training error were your scorecard, you would
-pick the worst model. This is exactly why we hold data back.
+The degree-15 model has the *lowest* error on the training points of the
+three, because it bends to meet the noisy ones. If training error were your
+scorecard, you would pick the wrong model. This is exactly why we hold data
+back.
 </Callout>
 
 ## The complexity–error curve
@@ -135,7 +145,7 @@ on a held-out test set, and the two errors part company:
 
 <Chart slug="bias-variance" />
 
-Run it yourself and watch the same two curves appear:
+Run it yourself and compare the real curves with the sketch:
 
 <CodeBlock
   adapter="python"
@@ -144,7 +154,7 @@ Run it yourself and watch the same two curves appear:
       filename: "main.py",
       starterCode: `import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import PolynomialFeatures
+from sklearn.preprocessing import MinMaxScaler, PolynomialFeatures
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.model_selection import train_test_split
@@ -160,7 +170,9 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_
 degrees = range(1, 16)
 train_err, test_err = [], []
 for d in degrees:
-    model = make_pipeline(PolynomialFeatures(d), LinearRegression())
+    model = make_pipeline(
+        MinMaxScaler(feature_range=(-1, 1)), PolynomialFeatures(d), LinearRegression()
+    )
     model.fit(X_train, y_train)
     train_err.append(mean_squared_error(y_train, model.predict(X_train)))
     test_err.append(mean_squared_error(y_test, model.predict(X_test)))
@@ -170,8 +182,8 @@ plt.plot(list(degrees), train_err, "o-", color="#4f8ef7", label="training error"
 plt.plot(list(degrees), test_err, "o-", color="#f59e0b", label="test error")
 plt.xlabel("Model complexity (polynomial degree)")
 plt.ylabel("Mean squared error")
-plt.title("Training error keeps dropping; test error is U-shaped")
-plt.ylim(0, 1.0)
+plt.title("Training error keeps dropping; test error bottoms out, then creeps up")
+plt.ylim(0, 0.35)
 plt.legend()
 plt.show()
 
@@ -188,11 +200,13 @@ Notice the two curves behave completely differently:
 - **Training error (blue) falls monotonically.** More flexibility always
   lets the model fit the training data better. Training error alone can
   *never* warn you about overfitting, it only ever improves.
-- **Test error (orange) is U-shaped.** It drops as the model gains enough
-  flexibility to capture the real pattern, bottoms out at the sweet spot,
-  then rises as the model starts fitting noise.
+- **Test error (orange) bottoms out, then creeps back up.** It drops as the
+  model gains enough flexibility to capture the real pattern, bottoms out at
+  the sweet spot (degree 5), then drifts higher as the model starts fitting
+  noise. The rise is gentler than the U in the sketch above, but no degree
+  past 5 matches it on the test set.
 
-The bottom of the U is the model you want. To the left of it you are
+The bottom of the test curve is the model you want. To the left of it you are
 underfitting; to the right you are overfitting.
 
 <Callout type="danger" title="The single most useful diagnostic">
@@ -352,7 +366,7 @@ model that quietly stops working.
 train and test sets (\`X_train, X_test, y_train, y_test\`).
 
 For each polynomial degree in \`degrees = range(1, 11)\`:
-1. Build \`make_pipeline(PolynomialFeatures(degree), LinearRegression())\`.
+1. Build \`make_pipeline(MinMaxScaler(feature_range=(-1, 1)), PolynomialFeatures(degree), LinearRegression())\`.
 2. Fit it on the training set.
 3. Record the **test** mean squared error in a list called \`test_errors\`
    (same order as \`degrees\`).
@@ -365,7 +379,7 @@ is the argmin (it should land between 3 and 6, not at 1 and not at 10).`}
     {
       filename: "main.py",
       initCode: `import numpy as np
-from sklearn.preprocessing import PolynomialFeatures
+from sklearn.preprocessing import MinMaxScaler, PolynomialFeatures
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.model_selection import train_test_split
@@ -387,7 +401,9 @@ print("best_degree:", best_degree)
 `,
       solutionCode: `test_errors = []
 for degree in degrees:
-    model = make_pipeline(PolynomialFeatures(degree), LinearRegression())
+    model = make_pipeline(
+        MinMaxScaler(feature_range=(-1, 1)), PolynomialFeatures(degree), LinearRegression()
+    )
     model.fit(X_train, y_train)
     test_errors.append(mean_squared_error(y_test, model.predict(X_test)))
 
