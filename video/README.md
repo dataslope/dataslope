@@ -19,6 +19,7 @@ cd video
 npm install
 npm run studio                               # preview and scrub in the browser
 npm run render -- SqlExecutionOrder          # 4K → out/SqlExecutionOrder.mp4
+npm run render:fhd -- SqlExecutionOrder out/SqlExecutionOrder-fhd.mp4   # 1920x1080
 npm run render:preview -- SqlExecutionOrder out/sql-preview.mp4   # half size, fast
 npm run still -- SqlExecutionOrder out/frame.png --frame=600
 npm run cues -- sql-execution-order          # when each beat is spoken
@@ -34,8 +35,8 @@ one under `/opt/pw-browsers/chromium_headless_shell-*/chrome-linux/`).
 Every composition is laid out at 1920x1080 (or 1080x1920) CSS pixels and
 rendered with `--scale=2`, which `npm run render` passes. Text, SVG and the
 patterns are drawn at 4K directly, so nothing is upscaled, and every size in
-the source stays in the familiar 1080p range. `npm run render:preview` passes
-`--scale=0.5` instead.
+the source stays in the familiar 1080p range. `npm run render:fhd` renders the
+same layout at 1080p (`--scale=1`), and `npm run render:preview` at half that.
 
 ## How a video is put together
 
