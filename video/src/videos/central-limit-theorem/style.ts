@@ -19,25 +19,29 @@ export const ACCENT_INK = "var(--ds-red-ink)";
 export const BLUE_INK = "var(--ds-blue-ink)";
 export const HIGHLIGHT = `color-mix(in srgb, ${ds("yellow", 400)} 80%, transparent)`;
 
-/** Display headlines: Fraunces at its largest optical size. */
+/** Display headlines, in the variant's face (typefaces.ts). Sizes are
+ *  written for Fraunces; the face's own scale brings it to the same x-height. */
 export const headline = (size: number, italic = false): React.CSSProperties => ({
   fontFamily: SERIF,
-  fontSize: size,
-  fontWeight: italic ? 480 : 560,
+  fontSize: `calc(${size}px * var(--clt-head-scale))`,
+  fontWeight: italic ? "var(--clt-head-italic-wght)" : "var(--clt-head-wght)",
   fontStyle: italic ? "italic" : "normal",
-  fontVariationSettings: `"opsz" 144, "SOFT" 40, "WONK" 0`,
+  fontVariationSettings: "var(--clt-head-axes)",
   lineHeight: 1.02,
-  letterSpacing: "-0.022em",
+  letterSpacing: "var(--clt-head-tracking)",
+  // Playfair defaults to old-style figures; numbers in a chart stand level.
+  fontVariantNumeric: "lining-nums",
   color: INK,
 });
 
-/** Body serif: decks, standfirsts and the lower-third captions. */
+/** Body face: decks, standfirsts, figure notes and chart row titles. */
 export const body = (size: number, italic = false): React.CSSProperties => ({
   fontFamily: SERIF,
-  fontSize: size,
+  fontSize: `calc(${size}px * var(--clt-body-scale))`,
   fontWeight: 400,
   fontStyle: italic ? "italic" : "normal",
-  fontVariationSettings: `"opsz" ${Math.min(72, size)}, "SOFT" 50`,
+  fontVariationSettings: "var(--clt-body-axes)",
+  fontVariantNumeric: "lining-nums",
   lineHeight: 1.25,
   color: INK_SOFT,
 });

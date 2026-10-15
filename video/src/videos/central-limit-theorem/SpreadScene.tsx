@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
 import { Axis, Bars, sx, type XScale } from "./charts";
 import { histogram, SPREADS, WAIT_SD } from "./data";
-import { SERIF } from "./fonts";
+import { useLayout } from "./layout";
 import {
   ACCENT,
   ACCENT_INK,
@@ -47,6 +47,7 @@ const ROW_STEP = 64;
 export const SpreadScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
+  const { y: Y, h, pts } = useLayout();
   const start = n.beat("spread").from;
   const spreadAt = n.word("spread", "spread");
   const tenAt = n.word("spread", "ten");
@@ -59,17 +60,21 @@ export const SpreadScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Ink at={start - 14} dur={20} style={{ left: 116, top: 104, ...headline(56), whiteSpace: "nowrap" }}>
-        The bigger the sample,
-      </Ink>
-      <Ink
-        at={spreadAt - 4}
-        dur={18}
-        style={{ left: 600, top: 104, ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
-      >
-        the tighter the pile.
-      </Ink>
-      <FigLabel n="5" title="Average wait, samples of 5, 30 and 100" at={start - 8} x={120} y={186} size={26} />
+      {/* One line in two inks: the second half follows the first in the flow,
+          so it sits a word space after it in any face. */}
+      <div style={{ position: "absolute", left: 116, top: Y(104), display: "flex", gap: "0.26em", ...headline(56) }}>
+        <Ink at={start - 14} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
+          The bigger the sample,
+        </Ink>
+        <Ink
+          at={spreadAt - 4}
+          dur={18}
+          style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}
+        >
+          the tighter the pile.
+        </Ink>
+      </div>
+      <FigLabel n="5" title="Average wait, samples of 5, 30 and 100" at={start - 8} x={120} y={Y(196)} />
 
       {ROWS.map((r, i) => {
         const at = start - 10 + i * 6;
@@ -81,8 +86,8 @@ export const SpreadScene: React.FC = () => {
         const b = ease(frame, bracketAt, 14);
         return (
           <React.Fragment key={r.n}>
-            <Ink at={at - 4} dur={14} style={{ left: 120, top: r.base - ROW_H - 18 }}>
-              <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 34, color: INK }}>
+            <Ink at={at - 4} dur={14} style={{ left: 120, top: Y(r.base - ROW_H - 18) }}>
+              <span style={{ ...body(34, true), color: INK }}>
                 n = {r.n}
               </span>
             </Ink>
@@ -91,13 +96,13 @@ export const SpreadScene: React.FC = () => {
               lo={0}
               bin={BIN}
               scale={X}
-              base={r.base}
-              unit={r.unit}
+              base={Y(r.base)}
+              unit={h(r.unit)}
               grow={(k) => ease(frame, at + Math.abs(k * BIN - 10) * 0.9, 12)}
             />
             <Axis
               scale={X}
-              base={r.base}
+              base={Y(r.base)}
               ticks={i === 2 ? TICKS : []}
               format={(v) => (v === 25 ? "25 min" : String(v))}
               at={at - 2}
@@ -106,13 +111,13 @@ export const SpreadScene: React.FC = () => {
             {b > 0 ? (
               <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
                 <g stroke={said > 0 ? ACCENT : INK} strokeWidth={2 + said * 1.2}>
-                  <line x1={x0} x2={x0 + (x1 - x0) * b} y1={y} y2={y} />
-                  <line x1={x0} x2={x0} y1={y - 8} y2={y + 8} />
-                  {b >= 1 ? <line x1={x1} x2={x1} y1={y - 8} y2={y + 8} /> : null}
+                  <line x1={x0} x2={x0 + (x1 - x0) * b} y1={Y(y)} y2={Y(y)} />
+                  <line x1={x0} x2={x0} y1={Y(y) - 8} y2={Y(y) + 8} />
+                  {b >= 1 ? <line x1={x1} x2={x1} y1={Y(y) - 8} y2={Y(y) + 8} /> : null}
                 </g>
               </svg>
             ) : null}
-            <Note at={bracketAt + 8} x={x1 + 12} y={y - 13}>
+            <Note at={bracketAt + 8} x={x1 + 12} y={Y(y) - 13}>
               <span style={{ ...note(22, said > 0 ? ACCENT_INK : INK_SOFT), ...halo }}>± {fmt(r.spread)}</span>
             </Note>
           </React.Fragment>
@@ -120,10 +125,10 @@ export const SpreadScene: React.FC = () => {
       })}
 
       <Leader
-        points={[
+        points={pts([
           [sx(X, 10), BASES[2]],
           [sx(X, 10), BASES[0] - ROW_H - 10],
-        ]}
+        ])}
         at={tenAt - 4}
         dur={16}
         dot={false}
@@ -131,12 +136,12 @@ export const SpreadScene: React.FC = () => {
         width={2}
         dash="7 6"
       />
-      <Note at={tenAt + 2} x={sx(X, 10) + 10} y={BASES[0] - ROW_H - 22}>
+      <Note at={tenAt + 2} x={sx(X, 10) + 10} y={Y(BASES[0] - ROW_H - 22)}>
         <span style={note(21, ACCENT_INK)}>10 min</span>
       </Note>
 
       {/* The table: simulated spread beside the theorem's prediction. */}
-      <Ink at={start + 14} dur={16} style={{ left: TABLE_X, top: TABLE_TOP, width: 530 }}>
+      <Ink at={start + 14} dur={16} style={{ left: TABLE_X, top: Y(TABLE_TOP), width: 530 }}>
         <div style={{ position: "relative", height: 34 }}>
           <span style={{ ...label(19, INK_SOFT), position: "absolute", left: 0 }}>Sample size</span>
           <span style={{ ...label(19, INK_SOFT), position: "absolute", left: COLS[1] - TABLE_X }}>
@@ -147,9 +152,7 @@ export const SpreadScene: React.FC = () => {
               position: "absolute",
               left: COLS[2] - TABLE_X,
               top: -10,
-              fontFamily: SERIF,
-              fontStyle: "italic",
-              fontSize: 28,
+              ...body(28, true),
               color: INK,
               whiteSpace: "nowrap",
             }}
@@ -161,6 +164,7 @@ export const SpreadScene: React.FC = () => {
       </Ink>
       {ROWS.map((r, i) => {
         const y = TABLE_TOP + 44 + i * ROW_STEP;
+        const top = (dy: number) => Y(y + dy);
         const rowIn = ease(frame, start + 20 + i * 5, 12);
         const said = ease(frame, sayAt[i] - 2, 10);
         const theory = ease(frame, rootAt + i * 6, 10);
@@ -170,21 +174,21 @@ export const SpreadScene: React.FC = () => {
               style={{
                 position: "absolute",
                 left: TABLE_X,
-                top: y,
+                top: top(0),
                 width: 530,
-                height: ROW_STEP,
+                height: h(ROW_STEP),
                 borderBottom: `1px solid ${HAIRLINE}`,
                 opacity: rowIn,
               }}
             />
-            <div style={{ position: "absolute", left: COLS[0], top: y + 8, opacity: rowIn, ...headline(40) }}>
+            <div style={{ position: "absolute", left: COLS[0], top: top(8), opacity: rowIn, ...headline(40) }}>
               {r.n}
             </div>
             <div
               style={{
                 position: "absolute",
                 left: COLS[1] - 8,
-                top: y + 12,
+                top: top(12),
                 width: 150 * said,
                 height: 40,
                 background: HIGHLIGHT,
@@ -194,7 +198,7 @@ export const SpreadScene: React.FC = () => {
               style={{
                 position: "absolute",
                 left: COLS[1],
-                top: y + 8,
+                top: top(8),
                 opacity: said,
                 ...headline(40),
                 fontVariantNumeric: "tabular-nums lining-nums",
@@ -206,7 +210,7 @@ export const SpreadScene: React.FC = () => {
               style={{
                 position: "absolute",
                 left: COLS[2],
-                top: y + 8,
+                top: top(8),
                 opacity: theory,
                 transform: `translateX(${(1 - theory) * 14}px)`,
                 ...headline(40),
@@ -219,14 +223,14 @@ export const SpreadScene: React.FC = () => {
           </React.Fragment>
         );
       })}
-      <Note at={numbersFrom + 10} x={TABLE_X} y={TABLE_TOP + 44 + 3 * ROW_STEP + 12} width={530}>
+      <Note at={numbersFrom + 10} x={TABLE_X} y={Y(TABLE_TOP + 44 + 3 * ROW_STEP + 12)} width={530}>
         <span style={note(20, INK_SOFT)}>
           Standard deviation of 2,000 averages, in minutes.
         </span>
       </Note>
 
       {/* The rule. */}
-      <Ink at={ruleFrom - 4} dur={18} style={{ left: TABLE_X, top: 548, width: 530 }}>
+      <Ink at={ruleFrom - 4} dur={18} style={{ left: TABLE_X, top: Y(548), width: 530 }}>
         <div style={{ height: 1, background: INK, marginBottom: 18 }} />
         <div style={label(20, ACCENT_INK)}>The rule</div>
         <div style={{ ...body(30), color: INK, marginTop: 10 }}>
@@ -239,7 +243,7 @@ export const SpreadScene: React.FC = () => {
           σ, the population&apos;s spread, is {fmt(WAIT_SD)} min.
         </div>
       </Ink>
-      <Ink at={fourAt - 2} dur={16} style={{ left: TABLE_X, top: 800, width: 530 }}>
+      <Ink at={fourAt - 2} dur={16} style={{ left: TABLE_X, top: Y(800), width: 530 }}>
         <span style={{ ...body(30, true), color: ACCENT_INK }}>Four times the data, half the spread.</span>
       </Ink>
     </AbsoluteFill>

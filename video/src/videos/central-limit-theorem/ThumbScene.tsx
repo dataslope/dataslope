@@ -4,15 +4,16 @@ import { ease } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
 import { Axis, Bars, NormalCurve, sx, type XScale } from "./charts";
 import { histogram, INCOME_MEANS, MEANS_30, mean, SAMPLE_COUNT, sd, skew } from "./data";
-import { SERIF } from "./fonts";
+import { useLayout } from "./layout";
 import { ACCENT, ACCENT_INK, body, fmt, halo, headline, INK, INK_SOFT, note, label } from "./style";
 import { FigLabel, Ink, Leader, Note } from "./ui";
 
 const X0 = 980;
 const X1 = 1780;
-const ROW_H = 140;
+const ROW_H = 136;
 const BINS = 35;
-const TOPS = [150, 394, 638];
+/** Row titles, 248px apart, starting clear of the figure label at 104. */
+const TOPS = [160, 408, 656];
 
 /**
  * Each row spans the same stretch of its own standard deviations (2.4 below
@@ -31,7 +32,7 @@ const row = (values: readonly number[], top: number, ticks: number[], unit: (v: 
   const peak = (SAMPLE_COUNT * bin) / (s * Math.sqrt(2 * Math.PI));
   return {
     top,
-    base: top + 186,
+    base: top + 187,
     mu,
     s,
     bin,
@@ -57,6 +58,7 @@ const ROWS = [
 export const ThumbScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
+  const { y, h, pts } = useLayout();
   const start = n.beat("thumb").from;
   const thirtyAt = n.word("thumb", "thirty");
   const alwaysAt = n.word("thumb", "always");
@@ -84,18 +86,29 @@ export const ThumbScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* The pull quote, and its correction. */}
-      <Ink at={start - 14} dur={14} style={{ left: 196, top: 112 }}>
+      <Ink at={start - 14} dur={14} style={{ left: 196, top: y(112) }}>
         <span style={label(20, ACCENT_INK)}>What you will hear</span>
       </Ink>
-      <Ink at={start - 12} dur={14} style={{ left: 84, top: 150, ...headline(240), color: ACCENT, opacity: 0.85 }}>
+      <Ink at={start - 12} dur={14} style={{ left: 84, top: y(150), ...headline(240), color: ACCENT, opacity: 0.85 }}>
         “
       </Ink>
-      <Ink at={start - 10} dur={22} style={{ left: 196, top: 160, ...headline(84, true), lineHeight: 1.06 }}>
+      <Ink at={start - 10} dur={22} style={{ left: 196, top: y(160), ...headline(84, true), lineHeight: 1.06 }}>
         Thirty is
         <br />
         <span style={{ position: "relative" }}>
           <span style={{ opacity: 1 - strike * 0.45 }}>always</span>
-          <svg width={280} height={40} style={{ position: "absolute", left: -8, top: 40, overflow: "visible" }}>
+          {/* Sized in em and to the word, so it strikes it in any face. */}
+          <svg
+            viewBox="0 0 280 40"
+            style={{
+              position: "absolute",
+              left: -8,
+              top: "0.48em",
+              width: "calc(100% + 16px)",
+              height: "auto",
+              overflow: "visible",
+            }}
+          >
             <path
               d="M2,22 C70,14 160,26 262,12"
               fill="none"
@@ -110,23 +123,23 @@ export const ThumbScene: React.FC = () => {
         </span>{" "}
         enough.”
       </Ink>
-      <Note at={alwaysAt + 2} x={200} y={356}>
+      <Note at={alwaysAt + 2} x={200} y={y(358)}>
         <span style={note(22, INK_SOFT)}>the n ≥ 30 rule</span>
       </Note>
-      <Ink at={thumbAt - 2} dur={18} style={{ left: 196, top: 430, ...headline(50) }}>
+      <Ink at={thumbAt - 2} dur={18} style={{ left: 196, top: y(432), ...headline(50) }}>
         A rule of thumb,
       </Ink>
-      <Ink at={lawAt - 4} dur={14} style={{ left: 196, top: 488, ...headline(50, true), color: ACCENT_INK }}>
+      <Ink at={lawAt - 4} dur={14} style={{ left: 196, top: y(490), ...headline(50, true), color: ACCENT_INK }}>
         not a law.
       </Ink>
-      <Ink at={lawAt + 8} dur={18} style={{ left: 198, top: 584, width: 620 }}>
+      <Ink at={lawAt + 8} dur={18} style={{ left: 198, top: y(588), width: 620 }}>
         <div style={{ ...body(27), color: INK }}>
           How much averaging the bell needs depends on the population. A mild skew settles near thirty. A
           heavy tail can need hundreds.
         </div>
       </Ink>
 
-      <FigLabel n="4" title="Averages against the normal curve" at={start - 12} x={X0} y={104} size={27} />
+      <FigLabel n="4" title="Averages against the normal curve" at={start - 12} x={X0} y={y(104)} />
       {ROWS.map((r, i) => {
         const c = cues[i];
         const t = tags[i];
@@ -134,12 +147,12 @@ export const ThumbScene: React.FC = () => {
         const tailX = sx(r.scale, r.mu + 2.8 * r.s);
         return (
           <React.Fragment key={r.letter}>
-            <Ink at={c.at - 6} dur={14} style={{ left: X0, top: r.top, whiteSpace: "nowrap" }}>
+            <Ink at={c.at - 6} dur={14} style={{ left: X0, top: y(r.top), whiteSpace: "nowrap" }}>
               <span style={{ ...label(19, ACCENT_INK), marginRight: 12 }}>{r.letter}</span>
-              <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 28, color: INK }}>{r.title}</span>
+              <span style={{ ...body(28, true), color: INK }}>{r.title}</span>
             </Ink>
             {r.off > 0 ? (
-              <Note at={c.tag + 8} x={X1} y={r.top + 6} align="right">
+              <Note at={c.tag + 8} x={X1} y={y(r.top + 6)} align="right">
                 <span style={note(20, INK_SOFT)}>{r.off} averages run past the right edge</span>
               </Note>
             ) : null}
@@ -148,15 +161,15 @@ export const ThumbScene: React.FC = () => {
               lo={r.lo}
               bin={r.bin}
               scale={r.scale}
-              base={r.base}
-              unit={r.unit}
+              base={y(r.base)}
+              unit={h(r.unit)}
               grow={(b) => ease(frame, c.at + b * 0.6, 12)}
             />
-            <Axis scale={r.scale} base={r.base} ticks={r.ticks} format={r.format} at={c.at - 4} size={20} />
+            <Axis scale={r.scale} base={y(r.base)} ticks={r.ticks} format={r.format} at={c.at - 4} size={20} />
             <NormalCurve
               scale={r.scale}
-              base={r.base}
-              unit={r.unit}
+              base={y(r.base)}
+              unit={h(r.unit)}
               mu={r.mu}
               sd={r.s}
               count={SAMPLE_COUNT}
@@ -167,14 +180,14 @@ export const ThumbScene: React.FC = () => {
             />
             {i === 1 ? (
               <Leader
-                points={[
+                points={pts([
                   [tagX + 30, r.base - 104],
                   [tailX + 20, r.base - 14],
-                ]}
+                ])}
                 at={c.tag - 4}
               />
             ) : null}
-            <Note at={c.tag} x={tagX} y={r.base - 150}>
+            <Note at={c.tag} x={tagX} y={y(r.base - 150)}>
               <div style={{ ...label(19, t.tone), ...halo }}>{t.head}</div>
               <div style={{ ...note(20, INK_SOFT), ...halo }}>{t.sub(r)}</div>
             </Note>

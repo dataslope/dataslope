@@ -15,11 +15,12 @@ export const MONO = '"JetBrains Mono", ui-monospace, monospace';
  * once something asks for it, so a frame can otherwise be captured in the
  * fallback font. A video with its own faces imports their @fontsource CSS and
  * calls this once at module level with the weights it uses, e.g.
- * `waitForFonts("Pixel font", ['400 48px "Press Start 2P"'])`.
+ * `waitForFonts("Pixel font", ['400 48px "Press Start 2P"'])`. `text` picks
+ * which subsets load: pass the characters a non-Latin subset covers.
  */
-export function waitForFonts(label: string, fonts: string[]) {
+export function waitForFonts(label: string, fonts: string[], text = "AaZz09") {
   const handle = delayRender(`Loading ${label}`);
-  Promise.all(fonts.map((font) => document.fonts.load(font, "AaZz09")))
+  Promise.all(fonts.map((font) => document.fonts.load(font, text)))
     .then(() => continueRender(handle))
     .catch((err) => cancelRender(err));
 }

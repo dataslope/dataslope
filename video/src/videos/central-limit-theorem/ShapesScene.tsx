@@ -17,14 +17,19 @@ import {
   VIDEO,
   WAITS,
 } from "./data";
-import { SERIF } from "./fonts";
+import { useLayout } from "./layout";
 import { ACCENT, ACCENT_INK, BAR, body, fmt, HAIRLINE, headline, INK_SOFT, note, label } from "./style";
 import { FigLabel, Ink, Note } from "./ui";
 
-const POP_BASE = 470;
-const POP_H = 170;
-const MEANS_BASE = 862;
-const MEANS_H = 250;
+/** The figure label's row; the column heads start well clear of it. */
+const LABEL_Y = 104;
+const HEAD_Y = 178;
+const POP_BASE = 494;
+const POP_H = 160;
+/** The "averages of 30" rule between the two rows of charts. */
+const STEP_Y = 558;
+const MEANS_BASE = 874;
+const MEANS_H = 236;
 const COL_W = 500;
 const colX = (c: number) => 120 + c * 580;
 
@@ -72,7 +77,7 @@ const COLUMNS: Column[] = [
   {
     letter: "B",
     title: "One die",
-    sub: "flat: every face equally likely",
+    sub: "flat: each face 1 in 6",
     pop: DIE_ROLLS,
     popLo: 0.5,
     popHi: 6.5,
@@ -133,6 +138,7 @@ export const ShapesScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const n = useNarration();
+  const { y, h } = useLayout();
   const start = n.beat("any-shape").from;
   // The scene window opens 8 frames before the beat; its first marks start
   // inking a little before that, so the cut is a true cross-fade.
@@ -145,7 +151,16 @@ export const ShapesScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <FigLabel n="3" title="Three populations, each averaged thirty at a time" at={open} x={120} y={104} />
+      <FigLabel n="3" title="Three populations, each averaged thirty at a time" at={open} x={120} y={y(LABEL_Y)} />
+      {/* The legend for the red curves, at the right end of the label row. */}
+      <Note at={sameAt + 12} x={1780} y={y(LABEL_Y) + 2} align="right" from="right">
+        <span style={{ ...note(22, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 12 }}>
+          <svg width={36} height={10} style={{ overflow: "visible" }}>
+            <line x1={2} x2={34} y1={5} y2={5} stroke={ACCENT} strokeWidth={3} strokeLinecap="round" />
+          </svg>
+          the normal curve the theorem predicts
+        </span>
+      </Note>
 
       {PREPARED.map((c, i) => {
         const at = appear[i];
@@ -155,7 +170,7 @@ export const ShapesScene: React.FC = () => {
         const centre = (c.mCounts.length - 1) / 2;
         return (
           <React.Fragment key={c.letter}>
-            <Ink at={at - 2} dur={16} style={{ left: colX(i), top: 158, whiteSpace: "nowrap" }}>
+            <Ink at={at - 2} dur={16} style={{ left: colX(i), top: y(HEAD_Y), whiteSpace: "nowrap" }}>
               <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
                 <span style={label(20, ACCENT_INK)}>{c.letter}</span>
                 <span style={headline(46)}>{c.title}</span>
@@ -167,14 +182,14 @@ export const ShapesScene: React.FC = () => {
               lo={c.popLo}
               bin={c.popBin}
               scale={c.popScale}
-              base={POP_BASE}
-              unit={c.popUnit}
+              base={y(POP_BASE)}
+              unit={h(c.popUnit)}
               grow={(b) => ease(frame, at + b * 0.6, 12)}
             />
-            <Axis scale={c.popScale} base={POP_BASE} ticks={c.popTicks} format={c.popFmt} at={at} size={20} />
+            <Axis scale={c.popScale} base={y(POP_BASE)} ticks={c.popTicks} format={c.popFmt} at={at} size={20} />
 
             {/* The step between the rows: "average thirty". */}
-            <Ink at={mAt - 6} dur={14} style={{ left: colX(i), top: 528, width: COL_W }}>
+            <Ink at={mAt - 6} dur={14} style={{ left: colX(i), top: y(STEP_Y), width: COL_W }}>
               <div style={{ height: 1, background: HAIRLINE, marginBottom: 12 }} />
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                 <span style={label(19, INK_SOFT)}>↓ Averages of 30</span>
@@ -188,16 +203,16 @@ export const ShapesScene: React.FC = () => {
               lo={c.mLo}
               bin={c.mBin}
               scale={c.mScale}
-              base={MEANS_BASE}
-              unit={c.mUnit}
+              base={y(MEANS_BASE)}
+              unit={h(c.mUnit)}
               color={BAR}
               grow={(b) => ease(frame, mAt + Math.abs(b - centre) * 0.7, 12)}
             />
-            <Axis scale={c.mScale} base={MEANS_BASE} ticks={c.mTicks} format={c.mFmt} at={mAt - 4} size={20} />
+            <Axis scale={c.mScale} base={y(MEANS_BASE)} ticks={c.mTicks} format={c.mFmt} at={mAt - 4} size={20} />
             <NormalCurve
               scale={c.mScale}
-              base={MEANS_BASE}
-              unit={c.mUnit}
+              base={y(MEANS_BASE)}
+              unit={h(c.mUnit)}
               mu={c.mu}
               sd={c.spread}
               count={SAMPLE_COUNT}
@@ -210,23 +225,15 @@ export const ShapesScene: React.FC = () => {
         );
       })}
 
-      {/* Under the axes, not above the curves: column C's bell peaks right
-          where a note at the top of the panel would sit. */}
-      <Note at={sameAt + 12} x={1780} y={904} align="right" from="right">
-        <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 27, color: ACCENT_INK }}>
-          red: the normal curve the theorem predicts
-        </span>
-      </Note>
-
       <Illustration
         video={VIDEO}
         id="clt-dice"
         style={{
           position: "absolute",
-          left: colX(1) + 360,
-          top: 130,
-          width: 140,
-          height: 136,
+          left: colX(1) + 372,
+          top: y(HEAD_Y - 18),
+          width: 132,
+          height: 128,
           opacity: diceIn,
           transform: `translateY(${bob(frame, 4, 80)}px) rotate(${(1 - diceIn) * -40}deg) scale(${0.6 + diceIn * 0.4})`,
         }}
@@ -236,10 +243,10 @@ export const ShapesScene: React.FC = () => {
         id="clt-coffee-queue"
         style={{
           position: "absolute",
-          left: colX(0) + 330,
-          top: 150,
-          width: 170,
-          height: 118,
+          left: colX(0) + 336,
+          top: y(HEAD_Y - 4),
+          width: 164,
+          height: 114,
           opacity: cupIn,
           transform: `translateY(${bob(frame + 30, 4, 90) + (1 - cupIn) * 20}px)`,
         }}

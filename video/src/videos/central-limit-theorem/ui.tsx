@@ -2,7 +2,6 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { ds } from "../../theme/brand";
-import { SERIF } from "./fonts";
 import { ACCENT_INK, INK, PAPER, label } from "./style";
 
 export const W = 1920;
@@ -185,7 +184,12 @@ export const Leader: React.FC<{
   );
 };
 
-/** "Fig. 1" and its title, the way a magazine numbers its figures. */
+/** Figure labels share one size so the number and the title read as one
+ *  line; the number takes the accent. */
+const FIG_SIZE = 24;
+
+/** "Fig. 1" and its title, set the way a data desk titles a chart: Inter,
+ *  one size, the number in the accent. */
 export const FigLabel: React.FC<{
   n: string;
   title: string;
@@ -193,21 +197,9 @@ export const FigLabel: React.FC<{
   x: number;
   y: number;
   out?: number;
-  size?: number;
-}> = ({ n, title, at, x, y, out, size = 28 }) => (
-  <Ink at={at} out={out} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16 }}>
-    <span style={{ ...label(21, ACCENT_INK), fontWeight: 750 }}>Fig. {n}</span>
-    <span
-      style={{
-        fontFamily: SERIF,
-        fontStyle: "italic",
-        fontSize: size,
-        fontWeight: 420,
-        fontVariationSettings: `"opsz" 36, "SOFT" 50`,
-        color: INK,
-      }}
-    >
-      {title}
-    </span>
+}> = ({ n, title, at, x, y, out }) => (
+  <Ink at={at} out={out} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
+    <span style={{ ...label(FIG_SIZE, ACCENT_INK), fontWeight: 700 }}>Fig. {n}</span>
+    <span style={{ ...label(FIG_SIZE, INK), fontWeight: 560 }}>{title}</span>
   </Ink>
 );

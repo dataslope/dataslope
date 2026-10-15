@@ -19,6 +19,24 @@ site's `tsconfig.json` and ESLint config ignore it.
 
 All of them render at 4K: 3840x2160 for 16:9, or 2160x3840 for 9:16.
 
+`CentralLimitTheorem` also has five design variations in the Studio's
+`CLT-variations` folder. Each changes one thing from the default (Fraunces,
+captions on):
+
+| Composition | Change |
+| --- | --- |
+| `CentralLimitTheorem-NoCaptions` | No captions; the figures take the space they used |
+| `CentralLimitTheorem-Inter` | Inter throughout (headlines from its Display cut) |
+| `CentralLimitTheorem-Newsreader` | Newsreader headlines and captions |
+| `CentralLimitTheorem-SourceSerif` | Source Serif 4 headlines and captions |
+| `CentralLimitTheorem-Playfair` | Playfair headlines and captions |
+
+They are the same composition with two props, `typeface` and `captions`, so
+any pairing can be tried from the Studio's props panel. The faces are defined
+in `typefaces.ts`; each is scaled to Fraunces's x-height, so changing the face
+never moves the layout. Turning captions off stretches the page vertically
+(`layout.ts`) instead of leaving a blank band at the bottom.
+
 ## Quick start
 
 ```bash
@@ -81,6 +99,15 @@ narration.
   small sizes.
 - **Nothing under 19px** on the 1080p layout, which is about the smallest that
   still reads on a phone. Running text and notes sit at 20px and up.
+- **Room between neighbours.** A figure label, the heading under it and an
+  illustration beside them each get clear space: about 25px between rows of
+  text, more between text and a chart. Figure labels are one line of Inter at
+  one size ("Fig. 3" in the accent, the title in ink), and a chart's legend
+  goes at the right end of that line rather than over the data.
+- **Text that follows text flows.** A second phrase on the same line, an
+  underline or a strike-through is laid out against the words (flex, `em`,
+  `100%`), never at a pixel offset measured in one font, so the line still
+  works when the face changes.
 - **Reveals keep their descenders.** A mask paints only inside its element's
   box, and a line box set near `line-height: 1` cuts off g, p and y until the
   mask comes off. Give a masked wrapper some padding with a matching negative

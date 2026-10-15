@@ -18,7 +18,7 @@ import {
   WAIT_SD,
   WAITS,
 } from "./data";
-import { SERIF } from "./fonts";
+import { useLayout } from "./layout";
 import {
   ACCENT,
   ACCENT_INK,
@@ -75,6 +75,7 @@ export const BuildScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const n = useNarration();
+  const { y, h, pts } = useLayout();
 
   // ── Cues ──
   const lopsidedAt = n.word("hook", "lopsided");
@@ -143,20 +144,27 @@ export const BuildScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── P1: headline, deck and the population at full size ── */}
-      <Ink at={2} dur={14} out={p1Out} style={{ left: 96, top: 116 }}>
+      <Ink at={2} dur={14} out={p1Out} style={{ left: 96, top: y(112) }}>
         <span style={label(20, ACCENT_INK)}>Waiting in line</span>
       </Ink>
-      <Ink at={4} dur={20} out={p1Out} style={{ left: 92, top: 146, ...headline(92), whiteSpace: "nowrap" }}>
+      <Ink at={4} dur={20} out={p1Out} style={{ left: 92, top: y(150), ...headline(92), whiteSpace: "nowrap" }}>
         Waiting for coffee
       </Ink>
-      <Ink at={10} dur={20} out={p1Out} style={{ left: 92, top: 240, ...headline(92), whiteSpace: "nowrap" }}>
+      <Ink at={10} dur={20} out={p1Out} style={{ left: 92, top: y(246), ...headline(92), whiteSpace: "nowrap" }}>
         is{" "}
-        <span style={{ position: "relative", fontStyle: "italic", fontWeight: 480 }}>
+        <span style={{ position: "relative", fontStyle: "italic", fontWeight: "var(--clt-head-italic-wght)" }}>
           lopsided.
+          {/* Sized in em and to the word, so it underlines it in any face. */}
           <svg
-            width={380}
-            height={30}
-            style={{ position: "absolute", left: -6, top: 86, overflow: "visible" }}
+            viewBox="0 0 380 30"
+            style={{
+              position: "absolute",
+              left: -6,
+              top: "0.93em",
+              width: "calc(100% + 12px)",
+              height: "auto",
+              overflow: "visible",
+            }}
           >
             <path
               d="M4,18 C80,8 190,6 372,14"
@@ -177,7 +185,7 @@ export const BuildScene: React.FC = () => {
         style={{
           position: "absolute",
           left: 1380,
-          top: 104,
+          top: y(104),
           width: 420,
           height: 291,
           opacity: pop(frame, coffeeAt - 6, fps, 16) * (1 - ease(frame, p1Out, 12)),
@@ -191,7 +199,7 @@ export const BuildScene: React.FC = () => {
         title="Ten thousand coffee shop waits, in minutes"
         at={14}
         x={160}
-        y={lerp(368, 150, m)}
+        y={y(lerp(384, 150, m))}
       />
 
       {/* ── The population ── */}
@@ -200,30 +208,30 @@ export const BuildScene: React.FC = () => {
         lo={0}
         bin={1}
         scale={X}
-        base={popBase}
-        unit={popUnit}
+        base={y(popBase)}
+        unit={h(popUnit)}
         grow={(i) => ease(frame, 6 + i * 1.1, 16)}
       />
-      <Axis scale={X} base={popBase} ticks={TICKS} at={4} format={minutes} />
-      <Note at={20} x={1762} y={popBase - 46} align="right" out={p1Out} style={note(20, INK_SOFT)}>
+      <Axis scale={X} base={y(popBase)} ticks={TICKS} at={4} format={minutes} />
+      <Note at={20} x={1762} y={y(popBase - 46)} align="right" out={p1Out} style={note(20, INK_SOFT)}>
         {OVER_50} waits ran past 50 min
       </Note>
 
       {/* "Most wait a few minutes." */}
-      <Leader points={[[560, 526], [390, 526], [292, 580]]} at={fewAt} out={avgAt} />
-      <Note at={fewAt} x={568} y={500} out={avgAt}>
+      <Leader points={pts([[560, 526], [390, 526], [292, 580]])} at={fewAt} out={avgAt} />
+      <Note at={fewAt} x={568} y={y(500)} out={avgAt}>
         <div style={{ ...body(30, true), color: INK }}>Most wait a few minutes.</div>
         <div style={note(23, INK_SOFT)}>Half of all waits are under {fmt(MEDIAN, 1)} min.</div>
       </Note>
 
       {/* "About one in twenty waits half an hour or more." */}
       <Leader
-        points={[
+        points={pts([
           [sx(X, 30), 812],
           [sx(X, 30), 798],
           [sx(X, 50), 798],
           [sx(X, 50), 812],
-        ]}
+        ])}
         at={twentyAt - 4}
         dur={16}
         dot={false}
@@ -231,7 +239,7 @@ export const BuildScene: React.FC = () => {
         width={2}
         out={p1Out}
       />
-      <Note at={twentyAt} x={sx(X, 30)} y={704} out={p1Out}>
+      <Note at={twentyAt} x={sx(X, 30)} y={y(704)} out={p1Out}>
         <div style={{ ...body(30, true), color: INK }}>About one in twenty waits 30 min or more.</div>
         <div style={note(23, INK_SOFT)}>
           {fmt(SHARE_30 * 100, 1)}% of the {POP_SIZE.toLocaleString("en-US")} customers
@@ -240,10 +248,10 @@ export const BuildScene: React.FC = () => {
 
       {/* Average and spread. */}
       <Leader
-        points={[
+        points={pts([
           [sx(X, WAIT_MU), 860],
           [sx(X, WAIT_MU), 444],
-        ]}
+        ])}
         at={avgAt - 4}
         dur={14}
         dot={false}
@@ -252,12 +260,12 @@ export const BuildScene: React.FC = () => {
         dash="7 6"
         out={p1Out}
       />
-      <Note at={avgAt} x={sx(X, WAIT_MU) + 14} y={428} out={p1Out}>
+      <Note at={avgAt} x={sx(X, WAIT_MU) + 14} y={y(428)} out={p1Out}>
         <span style={{ ...body(30, true), color: INK }}>Average </span>
         <span style={{ ...note(28, ACCENT_INK), fontWeight: 700 }}>{fmt(WAIT_MU)} min</span>
       </Note>
-      <SpreadArrow from={sx(X, WAIT_MU)} to={sx(X, WAIT_MU + WAIT_SD)} y={546} at={spreadAt - 2} out={p1Out} />
-      <Note at={spreadAt + 2} x={sx(X, WAIT_MU) + 14} y={560} out={p1Out}>
+      <SpreadArrow from={sx(X, WAIT_MU)} to={sx(X, WAIT_MU + WAIT_SD)} y={y(546)} at={spreadAt - 2} out={p1Out} />
+      <Note at={spreadAt + 2} x={sx(X, WAIT_MU) + 14} y={y(560)} out={p1Out}>
         <span style={{ ...note(25, INK) }}>
           Spread <span style={{ fontWeight: 700, color: ACCENT_INK }}>{fmt(WAIT_SD)} min</span>
         </span>
@@ -265,13 +273,13 @@ export const BuildScene: React.FC = () => {
       </Note>
 
       {/* ── P2: the sample strip, the averages, the second figure ── */}
-      <Ink at={morphAt + 4} dur={20} out={cltFrom} style={{ left: 1180, top: 130, ...headline(54), lineHeight: 1.08 }}>
+      <Ink at={morphAt + 4} dur={20} out={cltFrom} style={{ left: 1180, top: y(130), ...headline(54), lineHeight: 1.08 }}>
         Average thirty waits.
       </Ink>
-      <Ink at={pick2 - 4} dur={18} out={cltFrom} style={{ left: 1180, top: 188, ...headline(54, true), color: ACCENT_INK }}>
+      <Ink at={pick2 - 4} dur={18} out={cltFrom} style={{ left: 1180, top: y(188), ...headline(54, true), color: ACCENT_INK }}>
         Then do it again.
       </Ink>
-      <Ink at={theoremAt - 4} dur={22} style={{ left: 1180, top: 120, ...headline(60), lineHeight: 1.04 }}>
+      <Ink at={theoremAt - 4} dur={22} style={{ left: 1180, top: y(120), ...headline(60), lineHeight: 1.04 }}>
         The Central
         <br />
         Limit Theorem
@@ -280,15 +288,15 @@ export const BuildScene: React.FC = () => {
       {active >= 0 ? <SampleDots step={steps[active]} index={active} /> : null}
       {fastSample >= 0 ? <FastDots index={fastSample} /> : null}
 
-      <FigLabel n="2" title="The average wait in each sample of 30" at={figTwoAt} x={160} y={560} />
-      <Axis scale={X} base={MEANS_BASE} ticks={TICKS} at={figTwoAt} opacity={meansFig} format={minutes} />
+      <FigLabel n="2" title="The average wait in each sample of 30" at={figTwoAt} x={160} y={y(560)} />
+      <Axis scale={X} base={y(MEANS_BASE)} ticks={TICKS} at={figTwoAt} opacity={meansFig} format={minutes} />
       <Bars
         counts={counts}
         lo={0}
         bin={MEAN_BIN}
         scale={X}
-        base={MEANS_BASE}
-        unit={unit}
+        base={y(MEANS_BASE)}
+        unit={h(unit)}
         overlay={frame < fastTo + 6 ? { counts: recent, color: ACCENT } : undefined}
       />
       {steps.map((st, i) => (
@@ -296,7 +304,7 @@ export const BuildScene: React.FC = () => {
       ))}
 
       {/* Counter, right column. */}
-      <div style={{ position: "absolute", left: 1010, top: 612, opacity: counter }}>
+      <div style={{ position: "absolute", left: 1010, top: y(612), opacity: counter }}>
         <div style={label(20, INK_SOFT)}>Samples drawn</div>
         <div
           style={{
@@ -310,15 +318,15 @@ export const BuildScene: React.FC = () => {
         </div>
         <div style={{ ...body(28, true), marginTop: 6 }}>of 30 customers each</div>
       </div>
-      <Note at={thousandAt} x={1012} y={822} from="up" out={centeredAt}>
+      <Note at={thousandAt} x={1012} y={y(822)} from="up" out={centeredAt}>
         <span style={note(22, INK_SOFT)}>each one a different 30 of the 10,000</span>
       </Note>
 
       {/* The bell. */}
       <NormalCurve
         scale={X}
-        base={MEANS_BASE}
-        unit={finalUnit}
+        base={y(MEANS_BASE)}
+        unit={h(finalUnit)}
         mu={WAIT_MU}
         sd={WAIT_SD / Math.sqrt(30)}
         count={SAMPLE_COUNT}
@@ -328,10 +336,10 @@ export const BuildScene: React.FC = () => {
       />
       <BrassBell at={bellAt} />
       <Leader
-        points={[
+        points={pts([
           [sx(X, N30.center), MEANS_BASE],
           [sx(X, N30.center), 236],
-        ]}
+        ])}
         at={centeredAt - 2}
         dur={18}
         dot={false}
@@ -339,7 +347,7 @@ export const BuildScene: React.FC = () => {
         width={2}
         dash="7 6"
       />
-      <Note at={centeredAt + 4} x={sx(X, N30.center) + 14} y={512}>
+      <Note at={centeredAt + 4} x={sx(X, N30.center) + 14} y={y(512)}>
         <span style={note(23, ACCENT_INK)}>
           <b>Centered on {fmt(N30.center)} min.</b>{" "}
           <span style={{ color: INK_SOFT }}>The population average is {fmt(WAIT_MU)}.</span>
@@ -347,12 +355,12 @@ export const BuildScene: React.FC = () => {
       </Note>
 
       {/* The theorem, in two tags. */}
-      <Leader points={[[742, 318], [700, 318], [652, 372]]} at={stayAt - 2} />
-      <Note at={stayAt} x={752} y={304}>
+      <Leader points={pts([[742, 318], [700, 318], [652, 372]])} at={stayAt - 2} />
+      <Note at={stayAt} x={752} y={y(304)}>
         <span style={label(20, INK)}>The waits: still lopsided</span>
       </Note>
-      <Leader points={[[690, 708], [640, 708], [578, 772]]} at={normalAt - 2} color={ACCENT} />
-      <Note at={normalAt} x={700} y={694}>
+      <Leader points={pts([[690, 708], [640, 708], [578, 772]])} at={normalAt - 2} color={ACCENT} />
+      <Note at={normalAt} x={700} y={y(694)}>
         <span style={label(20, ACCENT_INK)}>Their averages: normal</span>
       </Note>
     </AbsoluteFill>
@@ -387,6 +395,7 @@ type Step = { s: number; c: number; d: number; stagger: number; collapse: number
  *  together into their average. */
 const SampleDots: React.FC<{ step: Step; index: number }> = ({ step, index }) => {
   const frame = useCurrentFrame();
+  const { y } = useLayout();
   const sample = SAMPLES_30[index];
   const mx = sx(X, sample.mean);
   const c = ease(frame, step.c, step.collapse);
@@ -399,12 +408,11 @@ const SampleDots: React.FC<{ step: Step; index: number }> = ({ step, index }) =>
           const appear = ease(frame, step.s + j * step.stagger, 6);
           if (appear <= 0 || c >= 1) return null;
           const x = lerp(sx(X, Math.min(v, 50)), mx, c);
-          const y = lerp(STRIP_Y + JITTER[j] * 44, STRIP_Y + 22, c);
           return (
             <circle
               key={j}
               cx={x}
-              cy={y}
+              cy={y(lerp(STRIP_Y + JITTER[j] * 44, STRIP_Y + 22, c))}
               r={6.5 * appear}
               fill={ACCENT}
               stroke={PAPER}
@@ -416,19 +424,17 @@ const SampleDots: React.FC<{ step: Step; index: number }> = ({ step, index }) =>
       </svg>
       {index === 0 ? (
         <>
-          <Note at={step.s + 4} x={1180} y={STRIP_Y + 62} out={step.c}>
+          <Note at={step.s + 4} x={1180} y={y(STRIP_Y + 62)} out={step.c}>
             <span style={label(20, ACCENT_INK)}>30 customers, picked at random</span>
           </Note>
           <div
             style={{
               position: "absolute",
               left: mx + 16,
-              top: STRIP_Y + 4,
+              top: y(STRIP_Y + 4),
               opacity: labelIn * (1 - labelOut),
               whiteSpace: "nowrap",
-              fontFamily: SERIF,
-              fontStyle: "italic",
-              fontSize: 28,
+              ...body(28, true),
               color: ACCENT_INK,
             }}
           >
@@ -441,18 +447,22 @@ const SampleDots: React.FC<{ step: Step; index: number }> = ({ step, index }) =>
 };
 
 /** During the fast build, the newest sample's dots, swapped every frame. */
-const FastDots: React.FC<{ index: number }> = ({ index }) => (
-  <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: 0.55 }}>
-    {SAMPLES_30[index].values.map((v, j) => (
-      <circle key={j} cx={sx(X, Math.min(v, 50))} cy={STRIP_Y + JITTER[j] * 44} r={5} fill={ACCENT} />
-    ))}
-  </svg>
-);
+const FastDots: React.FC<{ index: number }> = ({ index }) => {
+  const { y } = useLayout();
+  return (
+    <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: 0.55 }}>
+      {SAMPLES_30[index].values.map((v, j) => (
+        <circle key={j} cx={sx(X, Math.min(v, 50))} cy={y(STRIP_Y + JITTER[j] * 44)} r={5} fill={ACCENT} />
+      ))}
+    </svg>
+  );
+};
 
 /** The average, as one block: it forms where the dots met and falls into its
  *  bin in FIG. 2. Gone once it has landed (the bars take over). */
 const FallingBlock: React.FC<{ step: Step; index: number; drop: number }> = ({ step, index, drop }) => {
   const frame = useCurrentFrame();
+  const { y, h } = useLayout();
   const formed = ease(frame, step.c + step.collapse - 4, 6);
   if (formed <= 0 || frame >= step.d + drop) return null;
   const mean = SAMPLES_30[index].mean;
@@ -464,10 +474,10 @@ const FallingBlock: React.FC<{ step: Step; index: number; drop: number }> = ({ s
   const endY = MEANS_BASE - (below + 1) * BLOCK;
   const t = Math.max(0, Math.min(1, (frame - step.d) / drop));
   // Falls under gravity: slow off the strip, fast into the bin.
-  const y = startY + (endY - startY) * t * t;
+  const top = startY + (endY - startY) * t * t;
   return (
     <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
-      <rect x={x} y={y} width={w} height={BLOCK * formed} fill={ACCENT} />
+      <rect x={x} y={y(top)} width={w} height={h(BLOCK * formed)} fill={ACCENT} />
     </svg>
   );
 };
@@ -476,6 +486,7 @@ const FallingBlock: React.FC<{ step: Step; index: number; drop: number }> = ({ s
 const BrassBell: React.FC<{ at: number }> = ({ at }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+  const { y } = useLayout();
   const p = pop(frame, at - 4, fps, 13);
   if (p <= 0.001) return null;
   const t = Math.max(0, frame - at);
@@ -487,7 +498,7 @@ const BrassBell: React.FC<{ at: number }> = ({ at }) => {
       style={{
         position: "absolute",
         left: 1520,
-        top: 590,
+        top: y(590),
         width: 220,
         height: 262,
         opacity: p,

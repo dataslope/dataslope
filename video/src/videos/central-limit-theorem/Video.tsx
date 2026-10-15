@@ -11,8 +11,15 @@ import { ShapesScene } from "./ShapesScene";
 import { SpreadScene } from "./SpreadScene";
 import { ThumbScene } from "./ThumbScene";
 import { SERIF } from "./fonts";
+import { LayoutContext, layoutFor } from "./layout";
 import { INK, PAPER } from "./style";
+import { type TypefaceId, TYPEFACES, typefaceVars } from "./typefaces";
 import { Paper } from "./ui";
+
+export type CltProps = NarratedProps & {
+  /** The face for headlines, decks and captions (typefaces.ts). */
+  typeface: TypefaceId;
+};
 
 /** Frames a scene is up before its beat's first word. */
 const LEAD = 8;
@@ -25,8 +32,12 @@ const LIFT = 24;
 
 /**
  * "The Central Limit Theorem" (16:9), as a print magazine's science pages:
- * warm paper, Fraunces headlines, numbered figures drawn from a seeded
+ * warm paper, serif headlines, numbered figures drawn from a seeded
  * simulation (data.ts), and the narration as a serif lower third.
+ *
+ * Two props make the variants in Root.tsx: `typeface` swaps the headline and
+ * caption face, and turning `captions` off hands their space to the figures
+ * (layout.ts).
  *
  * Every scene boundary is a narration cue: a scene starts just before its
  * beat and stays up a few frames into the next, so new audio re-times the
@@ -54,40 +65,43 @@ const Scenes: React.FC = () => {
   );
 };
 
-export const CentralLimitTheorem: React.FC<NarratedProps> = ({ timeline, captions }) => {
+export const CentralLimitTheorem: React.FC<CltProps> = ({ timeline, captions, typeface }) => {
   if (!timeline) return <AbsoluteFill style={{ background: PAPER }} />;
+  const face = TYPEFACES[typeface];
   return (
     <NarrationProvider timeline={timeline}>
-      <AbsoluteFill style={{ background: PAPER }}>
-        <Paper />
-        <AbsoluteFill style={{ transform: `translateY(${-LIFT}px)` }}>
-          <Scenes />
+      <LayoutContext.Provider value={layoutFor(captions)}>
+        <AbsoluteFill style={{ background: PAPER, ...typefaceVars(face) }}>
+          <Paper />
+          <AbsoluteFill style={{ transform: `translateY(${-LIFT}px)` }}>
+            <Scenes />
+          </AbsoluteFill>
+          <NarrationAudio />
+          {captions ? (
+            <Captions
+              variant="landscape"
+              look={{
+                fontFamily: SERIF,
+                fontWeight: face.captionWeight,
+                fontSize: Math.round(36 * face.bodyScale),
+                color: INK,
+                highlight: "var(--ds-blue-ink)",
+                background: `color-mix(in srgb, ${PAPER} 94%, transparent)`,
+                radius: 0,
+                bottom: 52,
+                maxWidth: 1480,
+                box: {
+                  padding: "12px 44px 14px",
+                  borderTop: `2px solid ${INK}`,
+                  borderBottom: `1px solid color-mix(in srgb, ${INK} 45%, transparent)`,
+                  fontVariationSettings: face.bodyAxes,
+                  boxShadow: `0 -18px 30px -24px color-mix(in srgb, ${ds("yellow", 900)} 30%, transparent)`,
+                },
+              }}
+            />
+          ) : null}
         </AbsoluteFill>
-        <NarrationAudio />
-        {captions ? (
-          <Captions
-            variant="landscape"
-            look={{
-              fontFamily: SERIF,
-              fontWeight: 430,
-              fontSize: 36,
-              color: INK,
-              highlight: "var(--ds-blue-ink)",
-              background: `color-mix(in srgb, ${PAPER} 94%, transparent)`,
-              radius: 0,
-              bottom: 52,
-              maxWidth: 1480,
-              box: {
-                padding: "12px 44px 14px",
-                borderTop: `2px solid ${INK}`,
-                borderBottom: `1px solid color-mix(in srgb, ${INK} 45%, transparent)`,
-                fontVariationSettings: `"opsz" 36, "SOFT" 50`,
-                boxShadow: `0 -18px 30px -24px color-mix(in srgb, ${ds("yellow", 900)} 30%, transparent)`,
-              },
-            }}
-          />
-        ) : null}
-      </AbsoluteFill>
+      </LayoutContext.Provider>
     </NarrationProvider>
   );
 };
