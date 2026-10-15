@@ -294,10 +294,10 @@ export const MechanismScene: React.FC = () => {
           id="lvs-card-catalog"
           style={{
             position: "absolute",
-            left: 1520,
-            top: y(526),
-            width: 250,
-            height: 132,
+            left: 1510,
+            top: y(500),
+            width: 270,
+            height: 150,
             opacity: catalog,
             transform: `translateY(${bob(frame + 20, 4, 96) + (1 - catalog) * 24}px)`,
           }}

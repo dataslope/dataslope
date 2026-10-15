@@ -25,7 +25,7 @@ export const VIDEO = "list-vs-set";
  * has written both WebPs, set this to true. Every frame is laid out with room
  * for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 export type Row = {
   /** Items in the list, and in the set built from it. */
