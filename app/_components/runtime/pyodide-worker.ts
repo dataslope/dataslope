@@ -640,6 +640,20 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+# matplotlib 3.10's own Agg backend passes a float text position to its C
+# renderer and then warns about it ("The x parameter as float was
+# deprecated..."), so every figure with text printed that above itself.
+# Nothing a reader writes causes it or can fix it. Only that message is
+# ignored: deprecations raised by the reader's own calls still show.
+# Mirrored in scripts/lib/python-output-capture.mjs.
+import warnings as _pg_warnings
+_pg_warnings.filterwarnings(
+    "ignore",
+    message=r"The [xy] parameter as float was deprecated",
+    category=matplotlib.MatplotlibDeprecationWarning,
+)
+del _pg_warnings
+
 _original_show = plt.show
 def _patched_show(*args, **kwargs):
     """Render EVERY open figure, the way plt.show() does in a script and

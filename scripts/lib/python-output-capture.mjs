@@ -91,6 +91,16 @@ try:
     matplotlib.use("Agg")
     import matplotlib.pyplot as _bo_plt
 
+    # Mirrors SETUP_SCRIPT_B: matplotlib's own Agg text renderer warns about
+    # a float it passes itself, which would otherwise be recorded above
+    # every figure. Only that message; the reader's own deprecations show.
+    import warnings as _bo_warnings
+    _bo_warnings.filterwarnings(
+        "ignore",
+        message=r"The [xy] parameter as float was deprecated",
+        category=matplotlib.MatplotlibDeprecationWarning,
+    )
+
     def _bo_show(*a, **k):
         # Every open figure, not just the current one: a block that builds
         # two and calls show() once must render two, the way a script and a

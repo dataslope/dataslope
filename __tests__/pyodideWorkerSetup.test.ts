@@ -56,3 +56,22 @@ describe("plt.show()", () => {
     expect(show).not.toContain("_bo_plt.gcf()");
   });
 });
+
+describe("matplotlib's own renderer warning", () => {
+  // matplotlib 3.10's Agg backend warns about a float it passes its own C
+  // renderer, so every figure with text printed a MatplotlibDeprecationWarning
+  // above itself, on Run and in the prepopulated panel alike.
+  const FILTER = 'message=r"The [xy] parameter as float was deprecated"';
+
+  it("is filtered by its message, not by its whole category", () => {
+    expect(SETUP_B).toContain(FILTER);
+    expect(SETUP_B).toContain("category=matplotlib.MatplotlibDeprecationWarning");
+    // Ignoring the category would hide the reader's own deprecations too.
+    expect(SETUP_B).not.toMatch(/filterwarnings\(\s*"ignore",\s*category=/);
+  });
+
+  it("is filtered the same way by the build-time capture path", () => {
+    expect(CAPTURE_SRC).toContain(FILTER);
+    expect(CAPTURE_SRC).toContain("category=matplotlib.MatplotlibDeprecationWarning");
+  });
+});
