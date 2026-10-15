@@ -25,6 +25,12 @@ export interface ThemePalette {
   border: string;
   text: string;
   dim: string;
+  /** Secondary UI text (`--text-muted`): a neutral grey between `text` and
+   *  `dim`. Kept apart from `muted`, which is a syntax color. */
+  textMuted: string;
+  /** The editor's number / atom token color, a blue. Syntax only: as
+   *  `--text-muted` it turned every note, menu item and hint in the chrome
+   *  blue. */
   muted: string;
   kw: string;
   fn: string;
@@ -45,6 +51,7 @@ export const THEME_PALETTES: Record<string, ThemePalette> = {
     border: "#2a2a2a",
     text: "#c9d1d9",
     dim: "#8b949e",
+    textMuted: "#b1bac4",
     muted: "#79c0ff",
     kw: "#ff7b72",
     fn: "#d2a8ff",
@@ -60,6 +67,7 @@ export const THEME_PALETTES: Record<string, ThemePalette> = {
     border: "#d0d7de",
     text: "#24292f",
     dim: "#6e7781",
+    textMuted: "#57606a",
     muted: "#0550ae",
     kw: "#cf222e",
     fn: "#8250df",
@@ -80,7 +88,7 @@ export function applyThemePalette(theme: string): void {
   root.style.setProperty("--border", p.border);
   root.style.setProperty("--text", p.text);
   root.style.setProperty("--text-dim", p.dim);
-  root.style.setProperty("--text-muted", p.muted);
+  root.style.setProperty("--text-muted", p.textMuted);
   root.style.setProperty("--text-complementary", p.fn);
   root.style.setProperty("--theme-primary", p.kw);
   root.style.setProperty("--accent1", p.accent1);

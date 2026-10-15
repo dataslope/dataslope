@@ -93,8 +93,8 @@ const themeBootstrapScript = `
     var dark = stored === "dark" ||
       (stored !== "light" && document.documentElement.classList.contains("dark"));
     var p = dark
-      ? {bg:"#121212",bg2:"#0a0a0a",bg3:"#1c1c1c",border:"#2a2a2a",text:"#c9d1d9",dim:"#8b949e",muted:"#79c0ff",fn:"#d2a8ff",kw:"#ff7b72",a1:"#d2a8ff",a2:"#79c0ff"}
-      : {bg:"#ffffff",bg2:"#f6f8fa",bg3:"#eaeef2",border:"#d0d7de",text:"#24292f",dim:"#6e7781",muted:"#0550ae",fn:"#8250df",kw:"#cf222e",a1:"#8250df",a2:"#0550ae"};
+      ? {bg:"#121212",bg2:"#0a0a0a",bg3:"#1c1c1c",border:"#2a2a2a",text:"#c9d1d9",dim:"#8b949e",textMuted:"#b1bac4",fn:"#d2a8ff",kw:"#ff7b72",a1:"#d2a8ff",a2:"#79c0ff"}
+      : {bg:"#ffffff",bg2:"#f6f8fa",bg3:"#eaeef2",border:"#d0d7de",text:"#24292f",dim:"#6e7781",textMuted:"#57606a",fn:"#8250df",kw:"#cf222e",a1:"#8250df",a2:"#0550ae"};
     var r = document.documentElement;
     r.classList.toggle("dark", dark);
     r.classList.toggle("light", !dark);
@@ -105,7 +105,7 @@ const themeBootstrapScript = `
     r.style.setProperty("--border", p.border);
     r.style.setProperty("--text", p.text);
     r.style.setProperty("--text-dim", p.dim);
-    r.style.setProperty("--text-muted", p.muted);
+    r.style.setProperty("--text-muted", p.textMuted);
     r.style.setProperty("--text-complementary", p.fn);
     r.style.setProperty("--theme-primary", p.kw);
     r.style.setProperty("--accent1", p.a1);

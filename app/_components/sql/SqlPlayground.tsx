@@ -78,6 +78,8 @@ import { DdlViewerDialog } from "./components/DdlViewerDialog";
 import { SwitchDatabaseDialog } from "./components/SwitchDatabaseDialog";
 import { ImportBinaryFileDialog } from "./components/ImportBinaryFileDialog";
 import { SqlFileDropTarget } from "./components/SqlFileDropTarget";
+import { ImportSubmitButton } from "./components/ImportSubmitButton";
+import { useImportSubmit } from "./hooks/useImportSubmit";
 import { useDropImportPlan } from "./hooks/useDropImportPlan";
 import type { XlsxSheet } from "./utils/xlsxReader";
 import { tableNameFromSheet } from "./utils/workbookImport";
@@ -872,6 +874,11 @@ function SqlPlaygroundInner() {
     handleParquetFile,
     submitParquetImport,
   } = useDatabaseActions({ ...queryRunnerRefs, pragmaSettingsRef });
+  // Each import dialog's Import button stays disabled, with a spinner, until
+  // its rows are in.
+  const csvImport = useImportSubmit(submitCsvImport);
+  const jsonImport = useImportSubmit(submitJsonImport);
+  const parquetImport = useImportSubmit(submitParquetImport);
 
   // Cloud saves + sharing: a SQL bundle carries the database as its native
   // SQLite file image plus the query tabs; reopening loads the image
@@ -2399,7 +2406,9 @@ function SqlPlaygroundInner() {
         <Dialog.Root
           open={importCsvOpen}
           onOpenChange={(next) => {
-            if (!next) {
+            // The engine is already writing rows and cannot be called off,
+            // so the dialog stays up until it reports how that went.
+            if (!next && !csvImport.importing) {
               setImportCsvOpen(false);
               setImportCsvState(null);
               setImportCsvDragging(false);
@@ -2469,6 +2478,7 @@ function SqlPlaygroundInner() {
                       <button
                         type="button"
                         className={`sql-import-mode-btn${importCsvState.targetMode === "new" ? " active" : ""}`}
+                        disabled={csvImport.importing}
                         onClick={() =>
                           setImportCsvState((prev) =>
                             prev
@@ -2482,7 +2492,7 @@ function SqlPlaygroundInner() {
                       <button
                         type="button"
                         className={`sql-import-mode-btn${importCsvState.targetMode === "existing" ? " active" : ""}`}
-                        disabled={tables.length === 0}
+                        disabled={csvImport.importing || tables.length === 0}
                         onClick={() => {
                           void (async () => {
                             const targetTable =
@@ -2521,12 +2531,14 @@ function SqlPlaygroundInner() {
                           )
                         }
                         placeholder="Table name"
+                        disabled={csvImport.importing}
                         autoFocus
                       />
                     ) : (
                       <select
                         className="sql-import-target-select"
                         value={importCsvState.targetTable}
+                        disabled={csvImport.importing}
                         onChange={(e) => {
                           const newTable = e.target.value;
                           void (async () => {
@@ -2600,6 +2612,7 @@ function SqlPlaygroundInner() {
                                         importCsvState.columnTypes?.[i] ?? "TEXT"
                                       }
                                       aria-label={`Column type for ${h || "(empty)"}`}
+                                      disabled={csvImport.importing}
                                       onChange={(e) =>
                                         setImportCsvColumnType(i, e.target.value)
                                       }
@@ -2645,17 +2658,17 @@ function SqlPlaygroundInner() {
                 </>
               )}
               <div className="confirm-actions" style={{ marginTop: 16 }}>
-                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                <Dialog.Close
+                  className="confirm-btn confirm-btn-secondary"
+                  disabled={csvImport.importing}
+                >
                   Cancel
                 </Dialog.Close>
                 {importCsvState && (
-                  <button
-                    type="button"
-                    className="confirm-btn confirm-btn-primary"
-                    onClick={submitCsvImport}
-                  >
-                    Import
-                  </button>
+                  <ImportSubmitButton
+                    importing={csvImport.importing}
+                    onClick={csvImport.submit}
+                  />
                 )}
               </div>
             </Dialog.Popup>
@@ -2666,7 +2679,7 @@ function SqlPlaygroundInner() {
         <Dialog.Root
           open={importJsonOpen}
           onOpenChange={(next) => {
-            if (!next) {
+            if (!next && !jsonImport.importing) {
               setImportJsonOpen(false);
               setImportJsonState(null);
               setImportJsonDragging(false);
@@ -2736,6 +2749,7 @@ function SqlPlaygroundInner() {
                       <button
                         type="button"
                         className={`sql-import-mode-btn${importJsonState.targetMode === "new" ? " active" : ""}`}
+                        disabled={jsonImport.importing}
                         onClick={() =>
                           setImportJsonState((prev) =>
                             prev
@@ -2749,7 +2763,7 @@ function SqlPlaygroundInner() {
                       <button
                         type="button"
                         className={`sql-import-mode-btn${importJsonState.targetMode === "existing" ? " active" : ""}`}
-                        disabled={tables.length === 0}
+                        disabled={jsonImport.importing || tables.length === 0}
                         onClick={() => {
                           void (async () => {
                             const targetTable =
@@ -2788,12 +2802,14 @@ function SqlPlaygroundInner() {
                           )
                         }
                         placeholder="Table name"
+                        disabled={jsonImport.importing}
                         autoFocus
                       />
                     ) : (
                       <select
                         className="sql-import-target-select"
                         value={importJsonState.targetTable}
+                        disabled={jsonImport.importing}
                         onChange={(e) => {
                           const newTable = e.target.value;
                           void (async () => {
@@ -2887,17 +2903,17 @@ function SqlPlaygroundInner() {
                 </>
               )}
               <div className="confirm-actions" style={{ marginTop: 16 }}>
-                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                <Dialog.Close
+                  className="confirm-btn confirm-btn-secondary"
+                  disabled={jsonImport.importing}
+                >
                   Cancel
                 </Dialog.Close>
                 {importJsonState && (
-                  <button
-                    type="button"
-                    className="confirm-btn confirm-btn-primary"
-                    onClick={submitJsonImport}
-                  >
-                    Import
-                  </button>
+                  <ImportSubmitButton
+                    importing={jsonImport.importing}
+                    onClick={jsonImport.submit}
+                  />
                 )}
               </div>
             </Dialog.Popup>
@@ -2908,7 +2924,7 @@ function SqlPlaygroundInner() {
         <Dialog.Root
           open={importParquetOpen}
           onOpenChange={(next) => {
-            if (!next) {
+            if (!next && !parquetImport.importing) {
               setImportParquetOpen(false);
               setImportParquetState(null);
               setImportParquetDragging(false);
@@ -2978,6 +2994,7 @@ function SqlPlaygroundInner() {
                       <button
                         type="button"
                         className={`sql-import-mode-btn${importParquetState.targetMode === "new" ? " active" : ""}`}
+                        disabled={parquetImport.importing}
                         onClick={() =>
                           setImportParquetState((prev) =>
                             prev
@@ -2991,7 +3008,7 @@ function SqlPlaygroundInner() {
                       <button
                         type="button"
                         className={`sql-import-mode-btn${importParquetState.targetMode === "existing" ? " active" : ""}`}
-                        disabled={tables.length === 0}
+                        disabled={parquetImport.importing || tables.length === 0}
                         onClick={() => {
                           void (async () => {
                             const targetTable =
@@ -3030,12 +3047,14 @@ function SqlPlaygroundInner() {
                           )
                         }
                         placeholder="Table name"
+                        disabled={parquetImport.importing}
                         autoFocus
                       />
                     ) : (
                       <select
                         className="sql-import-target-select"
                         value={importParquetState.targetTable}
+                        disabled={parquetImport.importing}
                         onChange={(e) => {
                           const newTable = e.target.value;
                           void (async () => {
@@ -3131,17 +3150,17 @@ function SqlPlaygroundInner() {
                 </>
               )}
               <div className="confirm-actions" style={{ marginTop: 16 }}>
-                <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                <Dialog.Close
+                  className="confirm-btn confirm-btn-secondary"
+                  disabled={parquetImport.importing}
+                >
                   Cancel
                 </Dialog.Close>
                 {importParquetState && (
-                  <button
-                    type="button"
-                    className="confirm-btn confirm-btn-primary"
-                    onClick={submitParquetImport}
-                  >
-                    Import
-                  </button>
+                  <ImportSubmitButton
+                    importing={parquetImport.importing}
+                    onClick={parquetImport.submit}
+                  />
                 )}
               </div>
             </Dialog.Popup>
