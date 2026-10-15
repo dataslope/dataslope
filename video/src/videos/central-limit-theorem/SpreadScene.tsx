@@ -2,9 +2,9 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
-import { Axis, Bars, sx, type XScale } from "./charts";
+import { Axis, Bars, sx, type XScale } from "../../editorial/charts";
 import { histogram, SPREADS, WAIT_SD } from "./data";
-import { useLayout } from "./layout";
+import { useLayout } from "../../editorial/layout";
 import {
   ACCENT,
   ACCENT_INK,
@@ -18,8 +18,8 @@ import {
   INK_SOFT,
   note,
   label,
-} from "./style";
-import { FigLabel, Ink, Leader, Note } from "./ui";
+} from "../../editorial/style";
+import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 
 const X: XScale = { lo: 0, hi: 25, x0: 120, x1: 1160 };
 const BIN = 0.5;

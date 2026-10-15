@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
-import { Axis, Bars, NormalCurve, sx, type XScale } from "./charts";
+import { Axis, Bars, NormalCurve, sx, type XScale } from "../../editorial/charts";
 import {
   histogram,
   mulberry32,
@@ -18,7 +18,7 @@ import {
   WAIT_SD,
   WAITS,
 } from "./data";
-import { useLayout } from "./layout";
+import { useLayout } from "../../editorial/layout";
 import {
   ACCENT,
   ACCENT_INK,
@@ -31,8 +31,8 @@ import {
   note,
   PAPER,
   label,
-} from "./style";
-import { FigLabel, Ink, Leader, Note } from "./ui";
+} from "../../editorial/style";
+import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 
 /** One x-axis for both figures, so an average falls straight down from the
  *  population to the place it lands. */

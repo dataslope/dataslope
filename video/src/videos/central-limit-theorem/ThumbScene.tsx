@@ -2,11 +2,11 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
-import { Axis, Bars, NormalCurve, sx, type XScale } from "./charts";
+import { Axis, Bars, NormalCurve, sx, type XScale } from "../../editorial/charts";
 import { histogram, INCOME_MEANS, MEANS_30, mean, SAMPLE_COUNT, sd, skew } from "./data";
-import { useLayout } from "./layout";
-import { ACCENT, ACCENT_INK, body, fmt, halo, headline, INK, INK_SOFT, note, label } from "./style";
-import { FigLabel, Ink, Leader, Note } from "./ui";
+import { useLayout } from "../../editorial/layout";
+import { ACCENT, ACCENT_INK, body, fmt, halo, headline, INK, INK_SOFT, note, label } from "../../editorial/style";
+import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 
 const X0 = 980;
 const X1 = 1780;

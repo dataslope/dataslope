@@ -16,26 +16,30 @@ site's `tsconfig.json` and ESLint config ignore it.
 | `CentralLimitTheorem` | 16:9 | The Central Limit Theorem as a magazine science page, with watercolors |
 | `LlmTokens` | 9:16 | Why "strawberry" trips up a language model, in neon with claymation figures |
 | `EventLoop` | 16:9 | The JavaScript ordering puzzle as an engineering blueprint |
+| `SimpsonsParadox` | 16:9 | Berkeley's 1973 admissions and Simpson's paradox, on the same editorial page as `CentralLimitTheorem` |
 
 All of them render at 4K: 3840x2160 for 16:9, or 2160x3840 for 9:16.
 
-`CentralLimitTheorem` also has five design variations in the Studio's
-`CLT-variations` folder. Each changes one thing from the default (Fraunces,
-captions on):
+### The editorial videos
 
-| Composition | Change |
-| --- | --- |
-| `CentralLimitTheorem-NoCaptions` | No captions; the figures take the space they used |
-| `CentralLimitTheorem-Inter` | Inter throughout (headlines from its Display cut) |
-| `CentralLimitTheorem-Newsreader` | Newsreader headlines and captions |
-| `CentralLimitTheorem-SourceSerif` | Source Serif 4 headlines and captions |
-| `CentralLimitTheorem-Playfair` | Playfair headlines and captions |
+`CentralLimitTheorem` and `SimpsonsParadox` share one look, the shared
+editorial kit in `src/editorial/`: warm paper, numbered figures with Inter
+labels, ink-wipe reveals, watercolor spot illustrations, and Source Serif 4
+headlines with no burned-in captions. That setting was chosen from a
+side-by-side trial of five faces with and without captions. A new video in
+this style wraps its scenes in `<EditorialPage>` and registers with
+`defaultProps={EDITORIAL_DEFAULTS}`.
 
-They are the same composition with two props, `typeface` and `captions`, so
-any pairing can be tried from the Studio's props panel. The faces are defined
-in `typefaces.ts`; each is scaled to Fraunces's x-height, so changing the face
-never moves the layout. Turning captions off stretches the page vertically
-(`layout.ts`) instead of leaving a blank band at the bottom.
+Two props keep the alternatives a click away in the Studio's props panel:
+
+- `typeface`: `"source-serif"` (default), `"fraunces"`, `"newsreader"`,
+  `"playfair"` or `"inter"`. The faces are defined in
+  `src/editorial/typefaces.ts`, each scaled to the same x-height, so changing
+  the face never moves the layout.
+- `captions`: off by default. Turned on, the narration appears as a serif
+  lower third and the page compresses vertically to make room for it
+  (`src/editorial/layout.ts`). Scenes therefore pass every vertical position
+  through `useLayout().y()` and every vertical length through `h()`.
 
 ## Quick start
 
@@ -83,6 +87,8 @@ Shared building blocks:
   `motion` helpers.
 - `src/theme/`: the site's brand tokens (imported from `app/brand.css`) and
   its fonts (Inter, JetBrains Mono).
+- `src/editorial/`: the editorial look (page, typefaces, layout, figure
+  labels, reveals, histogram and axis primitives) shared by the videos in it.
 
 Register a new composition in `src/Root.tsx` with
 `calculateMetadata={narratedMetadata(script)}` so its length follows the

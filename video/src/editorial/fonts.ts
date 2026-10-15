@@ -1,5 +1,5 @@
-// Every face the typeface variants can set the headlines, decks and captions
-// in (typefaces.ts). Inter, from the shared theme, carries the labels, figure
+// Every face an editorial video can set its headlines, decks and captions in
+// (typefaces.ts). Inter, from the shared theme, carries the labels, figure
 // titles and chart numbers in all of them.
 import "@fontsource-variable/fraunces/full.css";
 import "@fontsource-variable/fraunces/full-italic.css";
@@ -13,10 +13,10 @@ import interGreekItalic from "@fontsource-variable/inter/files/inter-greek-opsz-
 import interGreek from "@fontsource-variable/inter/files/inter-greek-opsz-normal.woff2";
 import interLatinItalic from "@fontsource-variable/inter/files/inter-latin-opsz-italic.woff2";
 import interLatin from "@fontsource-variable/inter/files/inter-latin-opsz-normal.woff2";
-import { waitForFonts } from "../../theme/fonts";
+import { waitForFonts } from "../theme/fonts";
 
 /** The headline, deck and caption face, set per variant on the root. */
-export const SERIF = "var(--clt-serif)";
+export const SERIF = "var(--ed-serif)";
 
 /**
  * Inter with its optical-size axis, so a headline is drawn from Inter
@@ -40,7 +40,7 @@ for (const [url, style, unicodeRange] of [
 
 const faces = ['"Fraunces Variable"', '"Newsreader Variable"', '"Playfair Variable"', '"Source Serif 4 Variable"', `"${INTER_OPTICAL}"`];
 waitForFonts(
-  "the CLT typefaces",
+  "the editorial typefaces",
   faces.flatMap((f) => [`400 48px ${f}`, `600 48px ${f}`, `italic 400 48px ${f}`, `italic 600 48px ${f}`]),
 );
 // σ is drawn from a Greek subset, which @font-face only fetches on demand.

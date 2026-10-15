@@ -1,6 +1,6 @@
 import type React from "react";
-import { colors, ds } from "../../theme/brand";
-import { SANS } from "../../theme/fonts";
+import { colors, ds } from "../theme/brand";
+import { SANS } from "../theme/fonts";
 import { SERIF } from "./fonts";
 
 /**
@@ -23,12 +23,12 @@ export const HIGHLIGHT = `color-mix(in srgb, ${ds("yellow", 400)} 80%, transpare
  *  written for Fraunces; the face's own scale brings it to the same x-height. */
 export const headline = (size: number, italic = false): React.CSSProperties => ({
   fontFamily: SERIF,
-  fontSize: `calc(${size}px * var(--clt-head-scale))`,
-  fontWeight: italic ? "var(--clt-head-italic-wght)" : "var(--clt-head-wght)",
+  fontSize: `calc(${size}px * var(--ed-head-scale))`,
+  fontWeight: italic ? "var(--ed-head-italic-wght)" : "var(--ed-head-wght)",
   fontStyle: italic ? "italic" : "normal",
-  fontVariationSettings: "var(--clt-head-axes)",
+  fontVariationSettings: "var(--ed-head-axes)",
   lineHeight: 1.02,
-  letterSpacing: "var(--clt-head-tracking)",
+  letterSpacing: "var(--ed-head-tracking)",
   // Playfair defaults to old-style figures; numbers in a chart stand level.
   fontVariantNumeric: "lining-nums",
   color: INK,
@@ -37,10 +37,10 @@ export const headline = (size: number, italic = false): React.CSSProperties => (
 /** Body face: decks, standfirsts, figure notes and chart row titles. */
 export const body = (size: number, italic = false): React.CSSProperties => ({
   fontFamily: SERIF,
-  fontSize: `calc(${size}px * var(--clt-body-scale))`,
+  fontSize: `calc(${size}px * var(--ed-body-scale))`,
   fontWeight: 400,
   fontStyle: italic ? "italic" : "normal",
-  fontVariationSettings: "var(--clt-body-axes)",
+  fontVariationSettings: "var(--ed-body-axes)",
   fontVariantNumeric: "lining-nums",
   lineHeight: 1.25,
   color: INK_SOFT,

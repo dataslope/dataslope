@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { ease } from "../../components/motion";
-import { ds } from "../../theme/brand";
+import { ease } from "../components/motion";
+import { ds } from "../theme/brand";
 import { ACCENT_INK, INK, PAPER, label } from "./style";
 
 export const W = 1920;
@@ -19,7 +19,7 @@ export type Pt = readonly [number, number];
 export const Paper: React.FC = () => (
   <AbsoluteFill style={{ background: PAPER }}>
     <svg width={W} height={H} style={{ position: "absolute", inset: 0, willChange: "transform" }}>
-      <filter id="clt-tooth" x="0" y="0" width="100%" height="100%">
+      <filter id="ed-tooth" x="0" y="0" width="100%" height="100%">
         <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="11" result="noise" />
         <feColorMatrix
           in="noise"
@@ -30,7 +30,7 @@ export const Paper: React.FC = () => (
         <feFlood style={{ floodColor: INK }} result="ink" />
         <feComposite in="ink" in2="mask" operator="in" />
       </filter>
-      <filter id="clt-tone" x="0" y="0" width="100%" height="100%">
+      <filter id="ed-tone" x="0" y="0" width="100%" height="100%">
         <feTurbulence type="fractalNoise" baseFrequency="0.0045" numOctaves="3" seed="4" result="noise" />
         <feColorMatrix
           in="noise"
@@ -41,8 +41,8 @@ export const Paper: React.FC = () => (
         <feFlood style={{ floodColor: ds("yellow", 300) }} result="tone" />
         <feComposite in="tone" in2="mask" operator="in" />
       </filter>
-      <rect width={W} height={H} filter="url(#clt-tone)" opacity={0.16} />
-      <rect width={W} height={H} filter="url(#clt-tooth)" opacity={0.075} />
+      <rect width={W} height={H} filter="url(#ed-tone)" opacity={0.16} />
+      <rect width={W} height={H} filter="url(#ed-tooth)" opacity={0.075} />
     </svg>
   </AbsoluteFill>
 );

@@ -55,9 +55,6 @@ export function histogram(xs: readonly number[], lo: number, hi: number, width: 
   return counts;
 }
 
-export const normalPdf = (x: number, mu: number, s: number) =>
-  Math.exp(-0.5 * ((x - mu) / s) ** 2) / (s * Math.sqrt(2 * Math.PI));
-
 /** `k` distinct indices out of `n`: one sample without replacement, as the
  *  lesson's `rng.choice(population, size=n, replace=False)`. */
 function pick(rng: Rng, n: number, k: number) {

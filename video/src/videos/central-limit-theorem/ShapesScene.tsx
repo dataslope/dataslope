@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
-import { Axis, Bars, NormalCurve, type XScale } from "./charts";
+import { Axis, Bars, NormalCurve, type XScale } from "../../editorial/charts";
 import {
   DIE_MEANS_30,
   DIE_ROLLS,
@@ -17,9 +17,9 @@ import {
   VIDEO,
   WAITS,
 } from "./data";
-import { useLayout } from "./layout";
-import { ACCENT, ACCENT_INK, BAR, body, fmt, HAIRLINE, headline, INK_SOFT, note, label } from "./style";
-import { FigLabel, Ink, Note } from "./ui";
+import { useLayout } from "../../editorial/layout";
+import { ACCENT, ACCENT_INK, BAR, body, fmt, HAIRLINE, headline, INK_SOFT, note, label } from "../../editorial/style";
+import { FigLabel, Ink, Note } from "../../editorial/ui";
 
 /** The figure label's row; the column heads start well clear of it. */
 const LABEL_Y = 104;

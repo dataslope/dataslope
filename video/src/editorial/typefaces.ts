@@ -90,12 +90,12 @@ export const TYPEFACES: Record<TypefaceId, Typeface> = {
 /** The custom properties style.ts reads, set once on the composition root. */
 export const typefaceVars = (t: Typeface) =>
   ({
-    "--clt-serif": t.family,
-    "--clt-head-scale": t.headScale,
-    "--clt-body-scale": t.bodyScale,
-    "--clt-head-wght": t.headWeight,
-    "--clt-head-italic-wght": t.headItalicWeight,
-    "--clt-head-tracking": t.headTracking,
-    "--clt-head-axes": t.headAxes,
-    "--clt-body-axes": t.bodyAxes,
+    "--ed-serif": t.family,
+    "--ed-head-scale": t.headScale,
+    "--ed-body-scale": t.bodyScale,
+    "--ed-head-wght": t.headWeight,
+    "--ed-head-italic-wght": t.headItalicWeight,
+    "--ed-head-tracking": t.headTracking,
+    "--ed-head-axes": t.headAxes,
+    "--ed-body-axes": t.bodyAxes,
   }) as React.CSSProperties;

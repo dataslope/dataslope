@@ -1,10 +1,12 @@
 import React from "react";
 import { useCurrentFrame } from "remotion";
-import { ease } from "../../components/motion";
-import { SANS } from "../../theme/fonts";
-import { normalPdf } from "./data";
+import { ease } from "../components/motion";
+import { SANS } from "../theme/fonts";
 import { BAR, INK, INK_SOFT } from "./style";
 import { H, W } from "./ui";
+
+export const normalPdf = (x: number, mu: number, s: number) =>
+  Math.exp(-0.5 * ((x - mu) / s) ** 2) / (s * Math.sqrt(2 * Math.PI));
 
 /** A linear x-scale from data units to frame pixels. */
 export type XScale = { lo: number; hi: number; x0: number; x1: number };
