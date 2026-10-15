@@ -34,7 +34,7 @@ export const Outro: React.FC<{ from: number; to: number }> = ({ from, to }) => {
         <Pattern video={VIDEO} name="neon-end" style={{ width: W, height: 360 }} />
       </div>
 
-      <Clay id="tok-marmot" at={learn} left={(W - 440) / 2} top={290} width={440} height={555} rim="yellow" seed={2} bob={8} />
+      <Clay id="tok-marmot" at={learn} left={(W - 395) / 2} top={318} width={395} height={498} rim="yellow" seed={2} bob={8} />
 
       <div style={{ position: "absolute", left: 0, top: 878, width: W, display: "flex", justifyContent: "center", opacity: flicker(frame, learn + 4) }}>
         <Logo size={58} tone="light" />

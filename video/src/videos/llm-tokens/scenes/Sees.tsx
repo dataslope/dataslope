@@ -34,7 +34,7 @@ export const Sees: React.FC<{ from: number; to: number }> = ({ from, to }) => {
         ]}
       />
 
-      <Clay id="tok-robot" at={model} left={(W - 500) / 2} top={420} width={500} height={557} seed={11} />
+      <Clay id="tok-robot" at={model} left={(W - 457) / 2} top={444} width={457} height={509} seed={11} />
 
       {rowGone < 1 ? (
         <LetterRow
@@ -46,7 +46,7 @@ export const Sees: React.FC<{ from: number; to: number }> = ({ from, to }) => {
         />
       ) : null}
 
-      <Clay id="tok-blocks" at={tokens} left={(W - 880) / 2} top={ROW_TOP - 30} width={880} height={227} rim="yellow" seed={5} bob={6} />
+      <Clay id="tok-blocks" at={tokens} left={(W - 762) / 2} top={ROW_TOP - 15} width={762} height={197} rim="yellow" seed={5} bob={6} />
     </Scene>
   );
 };

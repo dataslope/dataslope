@@ -90,10 +90,11 @@ export const OutroSheet: React.FC<{ from: number; to: number }> = ({ from, to })
         id="el-marmot"
         style={{
           position: "absolute",
-          left: 1170,
-          top: 170,
-          width: 690,
-          height: 580,
+          // 553x463: its 1107x926 pixels cover a 4K render without stretching.
+          left: 1238,
+          top: 228,
+          width: 553,
+          height: 463,
           opacity: art,
           transform: `translateY(${bob(frame, 6, 100) + (1 - art) * 40}px)`,
         }}

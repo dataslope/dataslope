@@ -73,7 +73,7 @@ export const BitsBoard: React.FC = () => {
       </Hand>
 
       {/* A hair past the mark. */}
-      <Drawing id="fp-tape" at={hair - 6} x={160} y={392} w={860} h={285} dur={18} drift={3} />
+      <Drawing id="fp-tape" at={hair - 6} x={206} y={407} w={768} h={254} dur={18} drift={3} />
       <Hand at={tenth} x={590} y={664} size={46} align="center" speed={1}>
         1/10
       </Hand>

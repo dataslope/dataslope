@@ -217,9 +217,10 @@ export const TitleSheet: React.FC<{ from: number; to: number }> = ({ from, to })
         style={{
           position: "absolute",
           left: 1010,
-          top: 200,
+          // 463 tall: its 926 pixels cover a 4K render without stretching.
+          top: 248,
           width: 840,
-          height: 560,
+          height: 463,
           opacity: art,
           clipPath: `inset(0 0 ${(1 - ease(frame, 10, 30)) * 100}% 0)`,
           transform: `translateY(${bob(frame, 5, 110)}px)`,

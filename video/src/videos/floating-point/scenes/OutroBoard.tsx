@@ -57,7 +57,7 @@ export const OutroBoard: React.FC = () => {
       {/* Class dismissed: the URL underlined, the claim ticked. */}
       <Chalk strokes={[line(172, 700, 176 + URL.length * 19.2, 696, 721, { bow: -2 })]} at={dataslope + 8} dur={12} color={INK.yellow} width={4} />
       <Chalk strokes={check(1040, 118, 64, 731)} at={dataslope + 30} dur={8} color={INK.green} width={7} />
-      <Drawing id="fp-marmot" at={floats + 4} x={1290} y={330} w={450} h={520} flip dur={22} />
+      <Drawing id="fp-marmot" at={floats + 4} x={1299} y={341} w={432} h={498} flip dur={22} />
     </>
   );
 };

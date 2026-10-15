@@ -79,6 +79,18 @@ patterns are drawn at 4K directly, so nothing is upscaled, and every size in
 the source stays in the familiar 1080p range. `npm run render:fhd` renders the
 same layout at 1080p (`--scale=1`), and `npm run render:preview` at half that.
 
+The one thing a scaled-up render can't redraw is a raster image, and every
+illustration is one: the image model returns at most 1536x1024, and trimming
+leaves less. At 4K, an illustration drawn 620 px tall needs 1240 pixels of
+height. `npm run check:4k` walks every composition at `--scale=2`, a frame
+every half second, writing nothing to disk (about 4 minutes for all 24), and
+fails if any illustration is drawn across more device pixels than it has.
+`<Illustration>` logs the figure as it loads, so the check sees exactly what a
+render does. All 71 pass. Nine were drawn up to 26% larger than that, and are
+now drawn at the size their pixels cover. The paper grain has a 2x image of
+its own (see the editorial section), and text, SVG, patterns and the logo are
+vector.
+
 ## How a video is put together
 
 ```
@@ -299,5 +311,6 @@ put one behind text the viewer has to read.
 ```bash
 npm run typecheck
 npm run lint
-npm test          # the timing model
+npm test          # the timing model, and scene cuts against their scripts
+npm run check:4k  # every illustration sharp at --scale=2 (about 4 minutes)
 ```

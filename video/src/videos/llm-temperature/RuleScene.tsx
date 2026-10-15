@@ -84,9 +84,10 @@ export const RuleScene: React.FC = () => {
           style={{
             position: "absolute",
             left: 1400,
-            top: y(170),
+            // 445 tall: its 1016 pixels cover a 4K render without stretching.
+            top: y(170) + h(57),
             width: 380,
-            height: h(560),
+            height: h(445),
             opacity: thermo,
             transform: `translateY(${bob(frame, 5, 110) + (1 - thermo) * 30}px)`,
           }}

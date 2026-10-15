@@ -15,6 +15,7 @@
     "illustrations": "node scripts/illustrations.mjs",
     "paper": "node scripts/paper.mjs",
     "cues": "node scripts/cues.mjs",
+    "check:4k": "node scripts/check-4k.mjs",
     "test": "node --test src/narration/timeline.test.ts src/narration/scenes.test.ts",
     "render:fhd": "remotion render --scale=1"
   },

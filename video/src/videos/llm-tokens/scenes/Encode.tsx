@@ -178,7 +178,7 @@ export const Encode: React.FC<{ from: number; to: number }> = ({ from, to }) => 
           need the room. */}
       {grow < 1 ? (
         <div style={{ position: "absolute", inset: 0, opacity: 1 - grow }}>
-          <Clay id="tok-blocks" at={splits} left={(W - 820) / 2} top={TERM_TOP + TERM_H0 + 50} width={820} height={212} rim="yellow" seed={9} bob={6} />
+          <Clay id="tok-blocks" at={splits} left={(W - 762) / 2} top={TERM_TOP + TERM_H0 + 57} width={762} height={197} rim="yellow" seed={9} bob={6} />
         </div>
       ) : null}
 

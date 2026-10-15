@@ -104,10 +104,10 @@ export const Hook: React.FC<{ from: number; to: number }> = ({ from, to }) => {
       <Clay
         id="tok-strawberry"
         at={from}
-        left={(W - 400) / 2}
-        top={505}
-        width={400}
-        height={515}
+        left={(W - 382) / 2}
+        top={516}
+        width={382}
+        height={492}
         rim="red"
         style={{ filter: `${fringe(Math.round(burst * 10))} drop-shadow(0 0 18px ${mix(ds("red", 400), 38)})` }}
       />

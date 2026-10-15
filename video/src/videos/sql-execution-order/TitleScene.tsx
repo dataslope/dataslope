@@ -94,10 +94,11 @@ export const TitleScene: React.FC = () => {
         id="sql-eo-hero"
         style={{
           position: "absolute",
-          left: 1060,
-          top: 230,
-          width: 780,
-          height: 620,
+          // 617x465: its 1235x931 pixels cover a 4K render without stretching.
+          left: 1141,
+          top: 307,
+          width: 617,
+          height: 465,
           opacity: hero,
           transform: `translateY(${bob(frame) + (1 - hero) * 60}px) scale(${0.9 + hero * 0.1})`,
         }}
