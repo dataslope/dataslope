@@ -231,9 +231,10 @@ beginners often think of it as primitive. Worth knowing:
   caption="The eight primitives are values themselves, not references to anything."
 />
 
-> **Never** use `==` to compare strings. `==` compares references
-> (addresses), not contents. Use `s.equals(other)`. This is one of
-> the most common beginner bugs in Java.
+> **Never** use `==` to compare strings. `==` checks whether both
+> variables refer to the same object, not whether their contents
+> match. Use `s.equals(other)`. This is one of the most common
+> beginner bugs in Java.
 
 <CodeBlock
   adapter="java"
@@ -292,7 +293,7 @@ compiler can see and check it.
 - [o] \`a.equals(b)\`
   > \`equals()\` on String compares the actual character contents.
 - \`a.compareTo(b) == 1\`
-  > That is true only for a specific ordering, not equality.
+  > \`compareTo\` returns \`0\` for equal strings and otherwise any negative or positive number, not just \`1\`: \`"pear".compareTo("apple")\` is \`15\`. Equality would be \`a.compareTo(b) == 0\`.
 - \`a + b\`
   > That concatenates, it doesn't compare.
 - \`a == b\`

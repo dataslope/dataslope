@@ -119,16 +119,16 @@ Now `width` means the **total** width including padding and border. Set
 `width: 200px` and the box is 200px, full stop. Nearly every real
 project puts this rule at the top of its stylesheet.
 
-Both boxes below ask for `width: 220px` and add `24px` of padding. The
-first uses `content-box` (the default) and overflows to 268px; the
-second uses `border-box` and stays exactly 220px. The gridlines are
-`20px` apart so you can measure the difference:
+Both boxes below ask for `width: 220px` and add `24px` of padding and a
+`2px` border. The first uses `content-box` (the default) and overflows to
+272px; the second uses `border-box` and stays exactly 220px. The
+gridlines are `20px` apart so you can measure the difference:
 
 <LivePreview
   height={268}
   title="content-box vs border-box, same width declared"
   html={`<div class="ruler">
-  <div class="box content">content-box → 268px wide</div>
+  <div class="box content">content-box → 272px wide</div>
   <div class="box border">border-box → 220px wide</div>
 </div>`}
   css={`.ruler {
@@ -146,7 +146,7 @@ second uses `border-box` and stays exactly 220px. The gridlines are
   background: #f1f5f9;
   color: #0f172a;
 }
-.content { box-sizing: content-box; }   /* width + padding + border = 268px */
+.content { box-sizing: content-box; }   /* width + padding + border = 272px */
 .border  { box-sizing: border-box; }    /* total stays 220px */`}
 />
 
@@ -166,7 +166,7 @@ jump to the first one's width:
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="a">content-box: actually 240px wide</div>
+    <div class="a">content-box: actually 244px wide</div>
     <div class="b">border-box: exactly 200px wide</div>
   </body>
 </html>
