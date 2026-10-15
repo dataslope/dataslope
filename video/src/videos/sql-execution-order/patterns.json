@@ -1,0 +1,26 @@
+{
+  "$comment": "Tabbied (tabbied.com) patterns for this video, rendered by `npm run patterns`. Three uses, all decoration: the title card's band, the one transition wipe, and the end card's band.",
+  "patterns": [
+    {
+      "name": "title-band",
+      "design": "bluff",
+      "seed": "sql-eo-title",
+      "size": "1920x150",
+      "palette": ["transparent", "blue", "green", "red", "yellow"]
+    },
+    {
+      "name": "wipe",
+      "design": "ziggurat",
+      "seed": "sql-eo-wipe",
+      "size": "1920x1080",
+      "palette": ["blue-50", "blue", "green", "red", "yellow"]
+    },
+    {
+      "name": "outro-band",
+      "design": "bangle",
+      "seed": "sql-eo-outro",
+      "size": "1920x150",
+      "palette": ["transparent", "blue", "green", "red", "yellow"]
+    }
+  ]
+}

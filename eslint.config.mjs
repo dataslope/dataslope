@@ -30,6 +30,9 @@ const eslintConfig = [
       // Generator output (scripts/build-*.mjs), some of it committed. Each
       // committed .d.ts sibling is linted normally.
       "lib/generated/*.js",
+      // The Remotion video project is its own package with its own
+      // dependencies and `npm run lint` (video/eslint.config.mjs).
+      "video/**",
     ],
   },
   {

@@ -46,6 +46,11 @@
  *                        jpeg has no alpha channel and is refused with a
  *                        transparent background.
  *   --model <name>       Override the model (default: JSON meta.model)
+ *   --prompts <file>     Read prompts from this JSON instead of
+ *                        data/illustration-prompts.json. Same {meta, prompts}
+ *                        shape; the video project keeps its art here
+ *                        (video/src/videos/<id>/illustrations.json) so it never
+ *                        enters the site's gallery or manifest.
  *   --completion-window  Batch window: 24h (default)
  *   --batch-size <n>     Prompts per batch job (default: 100)
  *   --max-in-flight <n>  Batches submitted at once during `run` (default: 4)
@@ -72,13 +77,15 @@ import {
   mkdirSync,
   existsSync,
 } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import sharp from "sharp";
 import { createR2Client, credentialsFromEnv } from "./lib/r2.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
-const DATA_FILE = join(ROOT, "data", "illustration-prompts.json");
+const DEFAULT_DATA_FILE = join(ROOT, "data", "illustration-prompts.json");
+// The prompt corpus this run reads; `--prompts` points it elsewhere.
+let dataFile = DEFAULT_DATA_FILE;
 const API_BASE = "https://api.openai.com/v1";
 // Two spellings, not interchangeable: `api()` joins IMAGES_PATH onto
 // API_BASE (which already carries /v1), while a Batch JSONL line names the
@@ -114,6 +121,7 @@ function parseArgs(argv) {
     background: "transparent",
     outputFormat: "png",
     model: null,
+    prompts: null,
     completionWindow: "24h",
     batchSize: 100,
     maxInFlight: 4,
@@ -138,6 +146,7 @@ function parseArgs(argv) {
       case "--background": opts.background = next(); break;
       case "--output-format": opts.outputFormat = next(); break;
       case "--model": opts.model = next(); break;
+      case "--prompts": opts.prompts = next(); break;
       case "--completion-window": opts.completionWindow = next(); break;
       case "--batch-size": opts.batchSize = Math.max(1, Number(next()) || 100); break;
       case "--max-in-flight": opts.maxInFlight = Math.max(1, Number(next()) || 4); break;
@@ -430,7 +439,7 @@ let styleById = null;
 function softLimitFor(id) {
   if (!styleById) {
     styleById = new Map(
-      JSON.parse(readFileSync(DATA_FILE, "utf8")).prompts.map((p) => [
+      JSON.parse(readFileSync(dataFile, "utf8")).prompts.map((p) => [
         p.id,
         (p.style && p.style.trim()) || "isometric illustration",
       ]),
@@ -858,7 +867,8 @@ async function main() {
     console.log(`No --run given; using run id ${opts.run}`);
   }
 
-  const data = JSON.parse(readFileSync(DATA_FILE, "utf8"));
+  if (opts.prompts) dataFile = resolve(process.cwd(), opts.prompts);
+  const data = JSON.parse(readFileSync(dataFile, "utf8"));
   const model = opts.model || data.meta.model;
 
   // Commands that operate on an existing batch don't need the prompt set.

@@ -23,9 +23,10 @@ export default defineConfig({
     // buys nothing and makes it hunt for a source map the bundle does not
     // ship, which it then complains about on every run.
     server: { deps: { external: [/[\\/]cdn-assets[\\/]/] } },
-    // e2e/ belongs to Playwright (`npm run test:e2e`). `**/node_modules/**`
-    // also matches nested ones (e.g. cloudflare-cors-proxy/node_modules) so
+    // e2e/ belongs to Playwright (`npm run test:e2e`) and video/ to its own
+    // package (`npm test` there, on node:test). `**/node_modules/**` also
+    // matches nested ones (e.g. cloudflare-cors-proxy/node_modules) so
     // third-party package tests are never collected.
-    exclude: ["**/node_modules/**", "dist/**", ".next/**", "e2e/**", CHALLENGE_SOLUTIONS],
+    exclude: ["**/node_modules/**", "dist/**", ".next/**", "e2e/**", "video/**", CHALLENGE_SOLUTIONS],
   },
 });

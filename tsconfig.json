@@ -41,6 +41,7 @@
   ],
   "exclude": [
     "node_modules",
-    "cloudflare-cors-proxy"
+    "cloudflare-cors-proxy",
+    "video"
   ]
 }
