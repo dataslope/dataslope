@@ -18,7 +18,7 @@ export const VIDEO = "sql-null-trap";
  * sql-null-trap` has written both WebPs; every frame is laid out with room
  * for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 /** A SQL boolean as Postgres returns it: NULL is the unknown. */
 export type Truth = boolean | null;

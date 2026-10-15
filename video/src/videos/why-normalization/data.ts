@@ -17,7 +17,7 @@ export const VIDEO = "why-normalization";
  * set this to true once `npm run illustrations -- why-normalization` has
  * written both WebPs.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 /** A value as Postgres returned it; null is SQL NULL. */
 export type Cell = string | null;

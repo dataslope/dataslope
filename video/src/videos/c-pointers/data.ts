@@ -19,7 +19,7 @@ export const VIDEO = "c-pointers";
  * set this to true once `npm run illustrations -- c-pointers` has written
  * both WebPs.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 /** `sizeof(int)` and `sizeof(int *)`, printed by the Fig. 1 run. */
 export const SIZEOF_INT = 4;
