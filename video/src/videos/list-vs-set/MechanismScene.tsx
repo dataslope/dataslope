@@ -7,7 +7,7 @@ import { useLayout } from "../../editorial/layout";
 import { body, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
-import { TABLE_SLOTS, VIDEO } from "./data";
+import { ILLUSTRATIONS, TABLE_SLOTS, VIDEO } from "./data";
 import { Code, commas, Fig, LIST, LIST_INK, Mono, SET, SET_INK } from "./kit";
 
 const LEFT = 120;
@@ -288,19 +288,21 @@ export const MechanismScene: React.FC = () => {
         </span>
       </Note>
 
-      <Illustration
-        video={VIDEO}
-        id="lvs-card-catalog"
-        style={{
-          position: "absolute",
-          left: 1520,
-          top: y(526),
-          width: 250,
-          height: 132,
-          opacity: catalog,
-          transform: `translateY(${bob(frame + 20, 4, 96) + (1 - catalog) * 24}px)`,
-        }}
-      />
+      {ILLUSTRATIONS ? (
+        <Illustration
+          video={VIDEO}
+          id="lvs-card-catalog"
+          style={{
+            position: "absolute",
+            left: 1520,
+            top: y(526),
+            width: 250,
+            height: 132,
+            opacity: catalog,
+            transform: `translateY(${bob(frame + 20, 4, 96) + (1 - catalog) * 24}px)`,
+          }}
+        />
+      ) : null}
     </AbsoluteFill>
   );
 };

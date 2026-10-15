@@ -6,7 +6,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, body, fmt, HAIRLINE, headline, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
-import { MILLION, RATIO, VIDEO } from "./data";
+import { ILLUSTRATIONS, MILLION, RATIO, VIDEO } from "./data";
 import { Code, Fig, LIST_INK, Listing, lineTop, listingGeometry, SET_INK } from "./kit";
 
 const LINES = [
@@ -97,20 +97,22 @@ export const CodeScene: React.FC = () => {
           </svg>
         </span>
       </Ink>
-      <Illustration
-        video={VIDEO}
-        id="lvs-stopwatch"
-        style={{
-          position: "absolute",
-          left: 1556,
-          top: y(92),
-          width: 236,
-          height: 236,
-          opacity: watch,
-          transformOrigin: "50% 60%",
-          transform: `translateY(${bob(frame, 4, 100) + (1 - watch) * 26}px) rotate(${(1 - watch) * -18 + Math.sin(frame / 40) * 1.5}deg)`,
-        }}
-      />
+      {ILLUSTRATIONS ? (
+        <Illustration
+          video={VIDEO}
+          id="lvs-stopwatch"
+          style={{
+            position: "absolute",
+            left: 1556,
+            top: y(92),
+            width: 236,
+            height: 236,
+            opacity: watch,
+            transformOrigin: "50% 60%",
+            transform: `translateY(${bob(frame, 4, 100) + (1 - watch) * 26}px) rotate(${(1 - watch) * -18 + Math.sin(frame / 40) * 1.5}deg)`,
+          }}
+        />
+      ) : null}
 
       <Fig n="1" at={open + 6} x={LIST_X} y={y(276)}>
         The lesson&apos;s lookup, on a million numbers

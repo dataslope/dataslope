@@ -17,6 +17,16 @@
 
 export const VIDEO = "list-vs-set";
 
+/**
+ * Whether public/images/list-vs-set/ holds the two watercolors from
+ * illustrations.json. Their batch was still queued at OpenAI when this was
+ * rendered, so the scenes leave them out; once
+ * `npm run illustrations -- list-vs-set` (or `--import` after a `download`)
+ * has written both WebPs, set this to true. Every frame is laid out with room
+ * for them either way.
+ */
+export const ILLUSTRATIONS = false;
+
 export type Row = {
   /** Items in the list, and in the set built from it. */
   n: number;
