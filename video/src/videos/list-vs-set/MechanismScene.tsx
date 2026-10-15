@@ -134,7 +134,16 @@ export const MechanismScene: React.FC = () => {
   const pipeY = y(PIPE);
   const arcFrom: [number, number] = [resultX + 3 * CODE * 0.6, pipeY + 52];
   const arcTo: [number, number] = [TARGET_BUCKET.x + CELL_W / 2, y(B_CELLS) - 42];
-  const arc = `M${arcFrom[0]},${arcFrom[1]} C${arcFrom[0] + 40},${arcFrom[1] + 130} ${arcTo[0] - 120},${arcTo[1] - 110} ${arcTo[0]},${arcTo[1]}`;
+  const arcCtrl: [number, number] = [arcTo[0] - 120, arcTo[1] - 110];
+  const arc = `M${arcFrom[0]},${arcFrom[1]} C${arcFrom[0] + 40},${arcFrom[1] + 130} ${arcCtrl[0]},${arcCtrl[1]} ${arcTo[0]},${arcTo[1]}`;
+  // The head points along the curve where it lands: a cubic's end tangent runs
+  // from its last control point to its end. A fixed downward V met the curve
+  // at an angle and read as a tick.
+  const [hx, hy] = [arcTo[0] - arcCtrl[0], arcTo[1] - arcCtrl[1]];
+  const hl = Math.hypot(hx, hy);
+  const [ux, uy] = [hx / hl, hy / hl];
+  const wing = (side: 1 | -1) => `${arcTo[0] - ux * 15 + side * uy * 9},${arcTo[1] - uy * 15 - side * ux * 9}`;
+  const head = `M${wing(1)} L${arcTo[0]},${arcTo[1]} L${wing(-1)}`;
 
   return (
     <AbsoluteFill>
@@ -272,7 +281,7 @@ export const MechanismScene: React.FC = () => {
             strokeDasharray={`${jump} 1`}
           />
           <path
-            d={`M${arcTo[0] - 9},${arcTo[1] - 13} L${arcTo[0]},${arcTo[1]} L${arcTo[0] + 9},${arcTo[1] - 13}`}
+            d={head}
             fill="none"
             stroke={SET}
             strokeWidth={3}
