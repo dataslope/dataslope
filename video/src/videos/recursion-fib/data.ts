@@ -65,16 +65,24 @@ const place = (calls: readonly Call[]): { nodes: Placed[]; leaves: number } => {
 
 export const TREE_N = M.treeN;
 
-/** Naive fib(5), every call. A call is a repeat when an earlier call already
- *  worked out the same n. */
+/**
+ * Naive fib(5), every call. A call redoes earlier work when it computes an n
+ * (2 or more: 0 and 1 are answered on the spot) that an earlier call already
+ * computed, and so does every call beneath it. `repeat` marks that whole
+ * branch; `branchRoot` marks the call that starts it.
+ */
 const naive = place(M.naiveTree);
+const recomputes = (c: Placed) => c.n >= 2 && M.naiveTree.slice(0, c.i).some((d) => d.n === c.n);
+const inRepeat = (i: number): boolean => i >= 0 && (recomputes(naive.nodes[i]) || inRepeat(naive.nodes[i].parent));
 export const NAIVE_TREE = naive.nodes.map((c) => ({
   ...c,
-  repeat: M.naiveTree.slice(0, c.i).some((d) => d.n === c.n),
+  repeat: inRepeat(c.i),
+  branchRoot: recomputes(c) && !inRepeat(c.parent),
 }));
 export const NAIVE_LEAVES = naive.leaves;
 export const NAIVE_CALLS = NAIVE_TREE.length;
 export const DISTINCT = new Set(NAIVE_TREE.map((c) => c.n)).size;
+/** Calls inside a repeated branch. */
 export const REPEATS = NAIVE_TREE.filter((c) => c.repeat).length;
 /** How many times each n is called in fib(5). */
 export const TIMES_CALLED = (n: number) => NAIVE_TREE.filter((c) => c.n === n).length;
@@ -95,6 +103,17 @@ export const MEMO_LEAVES = memo.leaves;
 export const MEMO_CALLS = MEMO_TREE.length;
 export const MEMO_HITS = MEMO_TREE.filter((c) => c.kind === "hit").length;
 export const memoAt = (path: string) => MEMO_TREE.find((c) => c.path === path);
+
+// The memo answers exactly the calls that started a repeated branch, and
+// makes every other call the naive version made outside those branches.
+{
+  const kept = NAIVE_TREE.filter((c) => !c.repeat || c.branchRoot).map((c) => c.path);
+  const hits = NAIVE_TREE.filter((c) => c.branchRoot).map((c) => c.path);
+  const same = (a: string[], b: string[]) => a.length === b.length && a.every((p) => b.includes(p));
+  if (!same(kept, MEMO_TREE.map((c) => c.path)) || !same(hits, MEMO_TREE.filter((c) => c.kind === "hit").map((c) => c.path))) {
+    throw new Error("the memoized tree is not the naive tree with its repeated branches cut");
+  }
+}
 
 /** The memo vector after fibMemo(5): -1 where nothing was stored. */
 export const MEMO_TABLE = M.memoTable;

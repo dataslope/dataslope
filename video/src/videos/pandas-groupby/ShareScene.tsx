@@ -63,10 +63,10 @@ export const ShareScene: React.FC = () => {
       </Ink>
       <div style={{ position: "absolute", left: 118, top: y(146), display: "flex", gap: "0.26em", ...headline(66) }}>
         <Ink at={start - 10} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
-          Each row gets
+          Salary over group total
         </Ink>
         <Ink at={shareAt - 2} dur={18} style={{ position: "relative", ...headline(66, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
-          its share of the group.
+          is each row&apos;s share.
         </Ink>
       </div>
 
@@ -87,6 +87,20 @@ export const ShareScene: React.FC = () => {
       <Header x={A_X} top={y(HEADER_Y)} width={CARD_W} at={start - 14} cols={FRAME_COLS} />
       <Header x={T_X} top={y(HEADER_Y)} width={T_W} at={start - 14} cols={[{ text: "group total", right: 18 }]} />
       <Header x={S_X} top={y(HEADER_Y)} width={S_W} at={divideAt - 4} cols={[{ text: "share", right: 18 }]} />
+      {/* The row the narration reads, marked across all three columns: a
+          highlighter stroke laid down behind the cards, so it shows around them. */}
+      {band > 0 ? (
+        <div
+          style={{
+            position: "absolute",
+            left: A_X - 16,
+            top: exMid - cardH / 2 - 9,
+            width: (S_X + S_W + 16 - (A_X - 16)) * band,
+            height: cardH + 18,
+            background: HIGHLIGHT,
+          }}
+        />
+      ) : null}
       {ROWS.map((r, i) => {
         const top = y(ROW0 + i * RH);
         const s = ease(frame, divideAt + i * 4, 12);
@@ -116,27 +130,12 @@ export const ShareScene: React.FC = () => {
         );
       })}
 
-      {/* The row the narration reads, marked across all three columns. */}
-      {band > 0 ? (
-        <div
-          style={{
-            position: "absolute",
-            left: A_X - 14,
-            top: exMid - cardH / 2 - 7,
-            width: (S_X + S_W + 14 - (A_X - 14)) * band,
-            height: cardH + 14,
-            background: HIGHLIGHT,
-            mixBlendMode: "multiply",
-            opacity: 0.6,
-          }}
-        />
-      ) : null}
       <Leader points={[[NOTE_X - 16, exMid], [S_X + S_W + 10, exMid]]} at={pctAt - 6} dur={10} />
       <Note at={pctAt - 4} x={NOTE_X} y={exMid - 44}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 16, whiteSpace: "nowrap" }}>
           <span style={{ ...headline(64), color: DEPT_INK[EXAMPLE.dept] }}>{pct(SHARES[ex])}</span>
           <span style={{ ...body(30), opacity: ease(frame, engAt - 4, 12) }}>
-            {EXAMPLE.salary} of the {TOTALS[ex]} engineering pays
+            {EXAMPLE.salary} of engineering&apos;s {TOTALS[ex]}
           </span>
         </div>
       </Note>

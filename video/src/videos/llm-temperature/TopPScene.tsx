@@ -48,14 +48,14 @@ export const TopPScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <div style={{ position: "absolute", left: 116, top: y(104), display: "flex", gap: "0.26em", ...headline(56) }}>
-        <Ink at={start - 14} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
-          Top p cuts the tail
+        <Ink at={start - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
+          Top-p cuts the tail
         </Ink>
         <Ink at={dropAt - 2} dur={18} style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
           before the draw.
         </Ink>
       </div>
-      <FigLabel n="4" title={`Top p of ${TOP_P}, applied after temperature ${HOT.t}`} at={start - 8} x={120} y={y(196)} />
+      <FigLabel n="4" title={`Top-p of ${TOP_P}, applied after temperature ${HOT.t}`} at={start} x={120} y={y(196)} />
 
       {/* Bar A: the distribution at T = 1.5, one segment per token. */}
       <Ink at={start - 4} dur={14} style={{ left: X0, top: barA - 50 }}>

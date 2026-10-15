@@ -70,7 +70,7 @@ export const ShapesScene: React.FC = () => {
       </Ink>
       {/* One line in two inks; the second half follows the first in the flow. */}
       <div style={{ position: "absolute", left: 118, top: y(146), display: "flex", gap: "0.26em", ...headline(66) }}>
-        <Ink at={groupAt - 6} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
+        <Ink at={start - 6} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           One row per group,
         </Ink>
         <Ink at={transAt - 2} dur={18} style={{ position: "relative", ...headline(66, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>

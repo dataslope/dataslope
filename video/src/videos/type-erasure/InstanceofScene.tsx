@@ -23,9 +23,9 @@ const JS_W = 770;
 const RIGHT = 1810;
 const SIZE = 26;
 /** Layout rows, before `y()`. */
-const FIG_Y = 112;
-const TAB_Y = 168;
-const LIST_Y = 214;
+const FIG_Y = 150;
+const TAB_Y = 206;
+const LIST_Y = 252;
 
 /**
  * `x instanceof User` against an interface: tsc reports TS2693, still writes
@@ -77,7 +77,9 @@ export const InstanceofScene: React.FC = () => {
         marks={[{ ...CHECK_RUN_SPAN, at: noUserAt - 2, color: `color-mix(in srgb, ${ACCENT} 26%, transparent)` }]}
       />
       <Note at={noUserAt + 4} x={JS_X} y={top + listingHeight(CHECK_JS.length, SIZE) + 26} width={JS_W}>
-        <span style={note(21, INK_SOFT)}>The interface was erased, so nothing in check.js defines User.</span>
+        <span style={note(21, INK_SOFT)}>
+          The interface was erased, so nothing in <Mono>check.js</Mono> defines <Mono>User</Mono>.
+        </span>
       </Note>
 
       <Terminal

@@ -34,6 +34,7 @@ import {
   listingHeight,
   MARK,
   Mono,
+  REGION_WASH,
   RowCount,
   Rules,
   useTable,
@@ -57,6 +58,7 @@ export const GroupScene: React.FC = () => {
   const regionsAt = n.word("rows", "two regions");
   const daysAt = n.word("rows", "three days");
   const askAt = n.word("ask", "Say");
+  const eachAt = n.word("ask", "each region's total");
   const groupAt = n.word("group", "GROUP BY");
   const foldAt = n.word("group", "folding");
   const inAt = n.word("lost", "Six rows go in");
@@ -74,7 +76,9 @@ export const GroupScene: React.FC = () => {
   const dayGone = ease(frame, foldAt - 2, 12);
   const move = ease(frame, foldAt + 2, 24);
   const others = ease(frame, foldAt + 4, 18);
-  const merge = ease(frame, foldAt + 18, 12);
+  // The amounts leave before the total arrives, so the two never overprint.
+  const unmerge = ease(frame, foldAt + 14, 8);
+  const merge = ease(frame, foldAt + 22, 10);
   const shift = ease(frame, foldAt + 22, 16);
   const amountX = g.colX[AMOUNT] - shift * COL_W.day;
   const bodyRows = TABLE.rows.length + (GROUPED.rows.length - TABLE.rows.length) * move;
@@ -123,6 +127,19 @@ export const GroupScene: React.FC = () => {
       {/* "two regions", "three days": each column lit while it is named. */}
       <Wash g={g} from={0} to={TABLE.rows.length - 1} col={REGION} color={MARK} at={regionsAt - 2} out={daysAt - 4} />
       <Wash g={g} from={0} to={TABLE.rows.length - 1} col={DAY} color={MARK} at={daysAt - 2} out={askAt} />
+      {/* "each region's total": the rows each total would gather, lit by region. */}
+      {PARTITIONS.map((p) => (
+        <Wash
+          key={p.region}
+          g={g}
+          from={p.first}
+          to={p.last}
+          color={REGION_WASH[p.region]}
+          at={eachAt + (p.first ? 6 : 0)}
+          out={foldAt - 2}
+          dur={16}
+        />
+      ))}
 
       <Rules g={g} rows={bodyRows} at={sixAt - 10} width={g.width - shift * COL_W.day} />
       <Ink at={sixAt - 6} dur={12} style={cellBox(g, REGION, top + 2, g.headH - 2)}>
@@ -131,7 +148,7 @@ export const GroupScene: React.FC = () => {
       <Ink at={sixAt - 6} dur={12} style={{ ...cellBox(g, DAY, top + 2, g.headH - 2), opacity: 1 - dayGone }}>
         <HeadText>{TABLE.columns[DAY]}</HeadText>
       </Ink>
-      <Ink at={sixAt - 6} dur={12} style={{ ...cellBox(g, AMOUNT, top + 2, g.headH - 2, amountX), opacity: 1 - merge }}>
+      <Ink at={sixAt - 6} dur={12} style={{ ...cellBox(g, AMOUNT, top + 2, g.headH - 2, amountX), opacity: 1 - unmerge }}>
         <HeadText>{TABLE.columns[AMOUNT]}</HeadText>
       </Ink>
       {merge > 0 ? (
@@ -158,7 +175,7 @@ export const GroupScene: React.FC = () => {
             <Ink
               at={rowAt(i)}
               dur={12}
-              style={{ ...cellBox(g, AMOUNT, rt, g.rowH, amountX), opacity: fade * (lead ? 1 - merge : 1) }}
+              style={{ ...cellBox(g, AMOUNT, rt, g.rowH, amountX), opacity: fade * (lead ? 1 - unmerge : 1) }}
             >
               <CellText col="amount" value={row[AMOUNT]} />
             </Ink>
@@ -172,7 +189,7 @@ export const GroupScene: React.FC = () => {
       })}
 
       <div style={{ position: "absolute", left: g.x + 14, top: g.rowTop(bodyRows) + 12 }}>
-        <Ink at={sixAt + 18} dur={12} style={{ left: 0, top: 0, opacity: 1 - merge }}>
+        <Ink at={sixAt + 18} dur={12} style={{ left: 0, top: 0, opacity: 1 - unmerge }}>
           <RowCount n={TABLE.rows.length} />
         </Ink>
         {merge > 0 ? (

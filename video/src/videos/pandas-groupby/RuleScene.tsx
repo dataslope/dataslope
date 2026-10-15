@@ -3,15 +3,15 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, HAIRLINE, headline, INK } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { AGG, ROWS, TOTALS } from "./data";
 import { Arrow, Code, ValueCell } from "./kit";
 
 /** The two panels, and the bars inside each. */
 const PANELS = [
-  { x: 150, code: '.agg("sum")', cue: "agg", caption: "A summary: one row per group.", captionCue: "summary" },
-  { x: 1010, code: '.transform("sum")', cue: "transform", caption: "The answer, back on every row.", captionCue: "every row" },
+  { x: 255, code: '.agg("sum")', cue: "agg", caption: "A summary: one row per group.", captionCue: "summary" },
+  { x: 1215, code: '.transform("sum")', cue: "transform", caption: "The answer, back on every row.", captionCue: "every row" },
 ] as const;
 const BAR_W = 150;
 const PITCH = 46;
@@ -38,10 +38,11 @@ export const RuleScene: React.FC = () => {
       <Ink at={start - 12} dur={22} style={{ left: 118, top: y(146), ...headline(66), whiteSpace: "nowrap" }}>
         Pick the one whose shape you need.
       </Ink>
+      <FigLabel n="4" title="The same seven salaries, summed both ways" at={start - 8} x={124} y={y(250)} />
       <div
         style={{
           position: "absolute",
-          left: 940,
+          left: 960,
           top: y(CODE_Y),
           width: 1,
           height: (y(CAPTION_Y + 60) - y(CODE_Y)) * ease(frame, start - 6, 18),

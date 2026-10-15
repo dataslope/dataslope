@@ -57,7 +57,7 @@ export const RuleScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Ink at={start - 12} dur={14} style={{ left: 120, top: y(150) }}>
+      <Ink at={start - 2} dur={14} style={{ left: 120, top: y(150) }}>
         <span style={label(22, ACCENT_INK)}>Choosing a temperature</span>
       </Ink>
 

@@ -52,14 +52,14 @@ export const DrawScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <div style={{ position: "absolute", left: 116, top: y(104), display: "flex", gap: "0.26em", ...headline(56) }}>
-        <Ink at={start - 14} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
+        <Ink at={start - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Twenty draws per temperature,
         </Ink>
         <Ink at={sameAt - 2} dur={18} style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
           the same random numbers.
         </Ink>
       </div>
-      <FigLabel n="3" title={`The token each draw picks (numpy, seed ${SEED})`} at={start - 8} x={120} y={y(196)} />
+      <FigLabel n="3" title={`The token each draw picks (numpy, seed ${SEED})`} at={start} x={120} y={y(196)} />
       <Note at={start} x={1800} y={y(196) + 2} align="right" from="right">
         <Legend />
       </Note>

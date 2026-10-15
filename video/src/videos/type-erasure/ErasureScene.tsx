@@ -15,9 +15,9 @@ const JS_X = 1040;
 const JS_W = 770;
 const SIZE = 25;
 /** Layout rows, before `y()`. */
-const FIG_Y = 290;
-const TAB_Y = 338;
-const LIST_Y = 384;
+const FIG_Y = 310;
+const TAB_Y = 360;
+const LIST_Y = 406;
 
 /**
  * Hook to "plain JavaScript": the same file before and after tsc, with every

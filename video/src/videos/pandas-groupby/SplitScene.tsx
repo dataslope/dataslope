@@ -201,7 +201,7 @@ export const SplitScene: React.FC = () => {
         const go = ease(frame, stackedAt + k * 5, 24);
         const chipPose =
           go > 0
-            ? fly(go, [C_X, mid - cardH / 2], [D_X, y(D_ROW0 + k * RH)], 40)
+            ? fly(go, [C_X, mid - cardH / 2], [D_X, y(D_ROW0 + k * RH)], 10)
             : { x: C_X - (1 - a) * 18, top: mid - cardH / 2, opacity: a };
         const engMark = k === 0 ? ease(frame, engSumAt - 2, 12) * (1 - ease(frame, combineAt - 6, 10)) : 0;
         return (

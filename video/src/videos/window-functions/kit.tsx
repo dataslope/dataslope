@@ -280,8 +280,9 @@ export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?
   </span>
 );
 
-/** A hand-drawn red stroke through (`strike`) or under (`under`) the words it
- *  wraps, sized in em and to the words, so it follows them in any face. */
+/** A red stroke through (`strike`) or under (`under`) the words it wraps,
+ *  drawn in from the left. Its box is the words' own (an inline-block one line
+ *  high), and every offset is in em, so it follows them in any face. */
 export const Stroke: React.FC<{ kind: "strike" | "under"; at: number; children: React.ReactNode }> = ({
   kind,
   at,
@@ -290,32 +291,22 @@ export const Stroke: React.FC<{ kind: "strike" | "under"; at: number; children: 
   const frame = useCurrentFrame();
   const p = ease(frame, at, 14);
   return (
-    <span style={{ position: "relative" }}>
+    <span style={{ position: "relative", display: "inline-block" }}>
       {children}
-      <svg
-        viewBox="0 0 400 30"
-        preserveAspectRatio="none"
+      <span
         style={{
           position: "absolute",
-          left: "-0.06em",
-          width: "calc(100% + 0.12em)",
-          top: kind === "strike" ? "0.38em" : "0.86em",
-          height: "0.3em",
-          overflow: "visible",
+          left: "-0.05em",
+          right: "-0.05em",
+          top: kind === "strike" ? "0.6em" : "0.98em",
+          height: "0.06em",
+          borderRadius: "0.03em",
+          background: ACCENT,
+          transformOrigin: "0 50%",
+          transform: `rotate(${kind === "strike" ? -1.2 : -0.6}deg) scaleX(${p})`,
+          opacity: p > 0 ? 1 : 0,
         }}
-      >
-        <path
-          d={kind === "strike" ? "M4,19 C110,13 250,14 396,9" : "M4,18 C80,9 190,7 396,13"}
-          fill="none"
-          stroke={ACCENT}
-          strokeWidth={5}
-          strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
-          pathLength={1}
-          strokeDasharray={`${p} 1`}
-          opacity={p > 0 ? 1 : 0}
-        />
-      </svg>
+      />
     </span>
   );
 };

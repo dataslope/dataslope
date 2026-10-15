@@ -15,6 +15,7 @@ import {
   CRASH_TS,
   ILLUSTRATIONS,
   JSON_PARSE_RETURNS,
+  plain,
   tscCommand,
   VIDEO,
 } from "./data";
@@ -55,9 +56,9 @@ export const ClaimScene: React.FC = () => {
   const top = y(LIST_Y);
   const g = listingGeometry(SIZE);
   const parcel = pop(frame, onlyAt - 4, fps, 16);
-  // The leader runs from the note to the end of `JSON.parse(text)`.
+  // The leader runs from the note to the end of the line that parses.
   const parseMid = lineTop(top, CRASH_PARSE.line, SIZE) + g.lineH / 2;
-  const parseEnd = LEFT + codeLeft(SIZE) + (CRASH_PARSE.col + CRASH_PARSE.chars) * ADVANCE * SIZE + 10;
+  const parseEnd = LEFT + codeLeft(SIZE) + plain(CRASH_TS[CRASH_PARSE.line]).length * ADVANCE * SIZE + 12;
   const termTop = top + listingHeight(CRASH_TS.length, SIZE) + 36;
 
   return (

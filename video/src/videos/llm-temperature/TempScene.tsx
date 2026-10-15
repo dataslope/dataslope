@@ -64,14 +64,14 @@ export const TempScene: React.FC = () => {
     <AbsoluteFill>
       {/* One line in two inks; the second half follows the first in the flow. */}
       <div style={{ position: "absolute", left: 116, top: y(104), display: "flex", gap: "0.26em", ...headline(56) }}>
-        <Ink at={start - 14} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
+        <Ink at={start - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Temperature divides the scores
         </Ink>
         <Ink at={beforeAt - 2} dur={18} style={{ position: "relative", ...headline(56, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
           before the softmax.
         </Ink>
       </div>
-      <FigLabel n="2" title="Probability of each token at temperature T" at={start - 8} x={120} y={y(196)} />
+      <FigLabel n="2" title="Probability of each token at temperature T" at={start} x={120} y={y(196)} />
 
       {/* Faint rules at 0, 25, 50, 75 and 100%, the baseline in ink. */}
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: chart }}>
@@ -199,20 +199,20 @@ export const TempScene: React.FC = () => {
       ))}
 
       {/* What each stretch of the dial does, one note at a time. */}
-      <Ink at={orderAt - 4} out={belowAt - 6} dur={16} style={{ left: PANEL, top: y(690), width: 590 }}>
-        <div style={{ ...body(30), color: INK }}>The order never changes. Only the shape does.</div>
+      <Ink at={orderAt - 4} out={belowAt - 6} dur={16} style={{ left: PANEL, top: y(690), width: 570 }}>
+        <div style={{ ...body(30), color: INK, textWrap: "balance" }}>The order never changes. Only the shape does.</div>
       </Ink>
-      <Ink at={belowAt + 2} out={zeroAt - 6} dur={16} style={{ left: PANEL, top: y(690), width: 590 }}>
-        <div style={{ ...body(30), color: INK }}>Below 1, the gaps between scores grow, and the top token pulls ahead.</div>
+      <Ink at={belowAt + 2} out={zeroAt - 6} dur={16} style={{ left: PANEL, top: y(690), width: 570 }}>
+        <div style={{ ...body(30), color: INK, textWrap: "balance" }}>Below 1, the gaps between scores grow, and the top token pulls ahead.</div>
       </Ink>
-      <Ink at={zeroAt + 2} out={aboveAt - 6} dur={16} style={{ left: PANEL, top: y(690), width: 590 }}>
-        <div style={{ ...body(30), color: INK }}>
+      <Ink at={zeroAt + 2} out={aboveAt - 6} dur={16} style={{ left: PANEL, top: y(690), width: 570 }}>
+        <div style={{ ...body(30), color: INK, textWrap: "balance" }}>
           At 0, there is no draw: always the top token.{" "}
           <span style={{ color: ACCENT_INK, opacity: ease(frame, greedyAt - 4, 12) }}>Greedy decoding.</span>
         </div>
       </Ink>
-      <Ink at={aboveAt + 2} dur={16} style={{ left: PANEL, top: y(690), width: 590 }}>
-        <div style={{ ...body(30), color: INK }}>Above 1, the gaps shrink, and the bars even out.</div>
+      <Ink at={aboveAt + 2} dur={16} style={{ left: PANEL, top: y(690), width: 570 }}>
+        <div style={{ ...body(30), color: INK, textWrap: "balance" }}>Above 1, the gaps shrink, and the bars even out.</div>
       </Ink>
     </AbsoluteFill>
   );

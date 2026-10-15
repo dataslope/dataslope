@@ -15,15 +15,17 @@ import type { NarrationScript } from "../../narration/types";
  * output, measurements.json, in data.ts:
  *   - fib(40) returns 102,334,155 after 331,160,281 calls;
  *   - fib(5) makes 15 calls: fib(3) twice, fib(2) three times; six distinct
- *     values, so nine calls repeat earlier work;
+ *     values. The second fib(3) and second fib(2) start branches that redo
+ *     work already done, 8 of the 15 calls;
  *   - at most 5 calls of fib(5) are open at once (the deepest the stack
  *     gets), and the deepest is n for every n measured, naive or memoized;
  *   - naive calls for n = 10, 20, 30, 40, 50: 177; 21,891; 2,692,537;
  *     331,160,281; 40,730,022,147. Each row is about 123 times the last;
  *   - naive fib(50) took 25.0 s, the best of 3 runs, on one core of a
  *     shared 2.80 GHz Xeon (cloud container);
- *   - with the memo, fib(5) makes 9 calls, two of them answered from the
- *     table, and fib(n) makes 2n - 1 calls: 99 for n = 50;
+ *   - with the memo, fib(5) makes 9 calls, and the two calls that began
+ *     those branches are answered from the table; fib(n) makes 2n - 1
+ *     calls: 99 for n = 50;
  *   - memoized fib(50) took 472 ns, making the table included (best of
  *     21 rounds of about 100,000 calls each): under a microsecond.
  *
@@ -41,7 +43,7 @@ export const script: NarrationScript = {
     },
     {
       id: "calls",
-      text: "It is correct. But to get fib of forty, it makes three hundred thirty-one million calls.",
+      text: "It is correct, but fib of forty takes three hundred thirty-one million calls.",
       pauseAfter: 0.6,
     },
     { id: "tree", text: "Here is every call for fib of five. Fifteen in all.", pauseAfter: 0.3 },
@@ -63,7 +65,7 @@ export const script: NarrationScript = {
     },
     {
       id: "factor",
-      text: "Every ten more multiplies the work by about a hundred and twenty-three.",
+      text: "Every ten more multiplies the calls by about a hundred and twenty-three.",
       pauseAfter: 0.3,
     },
     {
@@ -78,7 +80,7 @@ export const script: NarrationScript = {
     },
     {
       id: "collapse",
-      text: "Every repeat becomes a lookup, and the tree collapses to one path. Fib of five takes nine calls.",
+      text: "Now each repeated branch is read from the table instead. The tree collapses to one path, and fib of five takes nine calls.",
       pauseAfter: 0.5,
     },
     {

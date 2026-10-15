@@ -1,6 +1,7 @@
 import React from "react";
 import { MONO } from "../../theme/fonts";
-import { HIGHLIGHT, INK, INK_SOFT, PAPER } from "../../editorial/style";
+import { headline, HIGHLIGHT, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
+import { Ink } from "../../editorial/ui";
 import { MEMO, MEMO_INK, NAIVE, NAIVE_INK } from "./kit";
 
 /** One call in a drawn call tree: a pill with `fib(n)` set in mono. */
@@ -139,3 +140,37 @@ export const TreeEdge: React.FC<{
     </svg>
   );
 };
+
+/**
+ * The running call count beside a tree: a big number in the series ink, a
+ * caption under it, and a highlighter wash when the narration leans on it.
+ */
+export const Counter: React.FC<{
+  x: number;
+  top: number;
+  at: number;
+  value: number;
+  color: string;
+  caption: React.ReactNode;
+  hot?: number;
+}> = ({ x, top, at, value, color, caption, hot = 0 }) => (
+  <Ink at={at} dur={14} style={{ left: x, top }}>
+    <div style={{ position: "relative", display: "inline-block" }}>
+      <span
+        style={{
+          position: "absolute",
+          left: "-0.08em",
+          right: `calc(${1 - hot} * (100% + 0.16em) - 0.08em)`,
+          top: "0.12em",
+          bottom: "0.02em",
+          background: HIGHLIGHT,
+          opacity: hot > 0 ? 1 : 0,
+        }}
+      />
+      <span style={{ position: "relative", ...headline(120), color, fontVariantNumeric: "tabular-nums lining-nums" }}>
+        {value}
+      </span>
+    </div>
+    <div style={{ ...label(22, INK_SOFT), marginTop: 10 }}>{caption}</div>
+  </Ink>
+);
