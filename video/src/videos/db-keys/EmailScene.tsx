@@ -27,8 +27,8 @@ import {
 
 const USERS_Y = 420;
 const ORDERS_Y = 640;
-const HEAD_H = 46;
-const ROW_H = 56;
+const HEAD_H = 50;
+const ROW_H = 60;
 const SQL_X = 1000;
 const SQL_Y = 352;
 const SIZE = 24;

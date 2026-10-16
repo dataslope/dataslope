@@ -141,24 +141,24 @@ export const WalletScene: React.FC = () => {
         </Note>
 
         {/* ── What broke ── */}
-        <Note at={uniqueAt - 4} x={T0} y={y(640)}>
+        <Note at={uniqueAt - 4} x={T0} y={y(662)}>
           <div style={{ ...body(36), color: INK, whiteSpace: "nowrap" }}>
             <Strike at={uniqueAt + 2}>Unique</Strike>
             <span style={{ opacity: ease(frame, sharedAt - 2, 10), color: ACCENT_INK, fontStyle: "italic" }}> shared by thousands</span>
           </div>
         </Note>
-        <Note at={permanentAt - 4} x={T0} y={y(712)}>
+        <Note at={permanentAt - 4} x={T0} y={y(734)}>
           <div style={{ ...body(36), color: INK, whiteSpace: "nowrap" }}>
             <Strike at={permanentAt + 2}>Permanent</Strike>
             <span style={{ opacity: ease(frame, cancelledAt - 2, 10), color: ACCENT_INK, fontStyle: "italic" }}> cancelled</span>
           </div>
         </Note>
-        <Ink at={betsAt - 6} dur={20} style={{ left: 120, top: y(800), whiteSpace: "nowrap" }}>
+        <Ink at={betsAt - 6} dur={20} style={{ left: 120, top: y(818), whiteSpace: "nowrap" }}>
           <span style={{ ...body(40, true), color: INK }}>
             A natural key bets on <Mark at={controlAt - 6}>promises you don&apos;t control.</Mark>
           </span>
         </Ink>
-        <Ink at={fiveAt + 10} dur={14} style={{ right: 1920 - 1824, top: y(560), whiteSpace: "nowrap" }}>
+        <Ink at={fiveAt + 10} dur={14} style={{ right: 1920 - 1824, top: y(610), whiteSpace: "nowrap" }}>
           <span style={{ ...label(19, INK_SOFT), fontWeight: 500 }}>Figures: {WALLET.source}</span>
         </Ink>
       </Drift>

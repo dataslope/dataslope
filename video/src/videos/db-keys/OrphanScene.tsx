@@ -30,8 +30,8 @@ const SQL_Y = 330;
 const SIZE = 24;
 const TABLE_Y = 560;
 const CUSTOMERS_X = 1180;
-const HEAD_H = 46;
-const ROW_H = 56;
+const HEAD_H = 50;
+const ROW_H = 60;
 const ERROR_Y = 780;
 
 /**

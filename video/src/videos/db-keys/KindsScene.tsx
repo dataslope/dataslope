@@ -12,9 +12,11 @@ import { DataTable, Drift, Headline, KEY_INK, Kicker, MARK, MARK_KEY, Mark, Mono
 const LEFT_X = 120;
 const RIGHT_X = 1000;
 const PANEL_Y = 318;
-const TABLE_Y = 470;
-const HEAD_H = 46;
-const ROW_H = 56;
+const TABLE_Y = 486;
+const HEAD_H = 52;
+const ROW_H = 70;
+/** Two short tables on a half page each: set large. */
+const SIZES = { headSize: 24, bodySize: 32, pad: 22 };
 
 /**
  * Part 2 opens: the two kinds of key. A natural key is a value the thing
@@ -42,14 +44,14 @@ export const KindsScene: React.FC = () => {
   const end = n.beat("surrogate").to;
 
   const countryCols = [{ name: "code", ink: KEY_INK, tag: { text: "PK", at: codeAt + 6 } }, { name: "name" }];
-  const countries = tableGeometry({ x: LEFT_X, top: y(TABLE_Y), cols: countryCols, rows: COUNTRIES.rows, headH: h(HEAD_H), rowH: h(ROW_H) });
+  const countries = tableGeometry({ x: LEFT_X, top: y(TABLE_Y), cols: countryCols, rows: COUNTRIES.rows, headH: h(HEAD_H), rowH: h(ROW_H), ...SIZES });
   const customerCols = [
     { name: "customer_id", numeric: true, ink: KEY_INK, tag: { text: "PK", at: makesAt + 4 } },
     { name: "full_name" },
   ];
-  const customers = tableGeometry({ x: RIGHT_X, top: y(TABLE_Y), cols: customerCols, rows: IDENTITY.slim.rows, headH: h(HEAD_H), rowH: h(ROW_H) });
+  const customers = tableGeometry({ x: RIGHT_X, top: y(TABLE_Y), cols: customerCols, rows: IDENTITY.slim.rows, headH: h(HEAD_H), rowH: h(ROW_H), ...SIZES });
   const jp = COUNTRIES.rows.findIndex((r) => r[0] === "JP");
-  const below = (g: typeof countries) => g.rowTop(g === countries ? COUNTRIES.rows.length : IDENTITY.slim.rows.length) + 30;
+  const below = (g: typeof countries) => g.rowTop(g === countries ? COUNTRIES.rows.length : IDENTITY.slim.rows.length) + 34;
   const divider = ease(frame, surrogateAt - 10, 16);
 
   return (
@@ -100,7 +102,7 @@ export const KindsScene: React.FC = () => {
             left: 900,
             top: y(PANEL_Y),
             width: 1.5,
-            height: (y(800) - y(PANEL_Y)) * divider,
+            height: (y(830) - y(PANEL_Y)) * divider,
             background: `color-mix(in srgb, ${INK} 30%, transparent)`,
           }}
         />

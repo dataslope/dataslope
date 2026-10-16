@@ -28,8 +28,8 @@ const ORDERS_X = X0;
 const ORDERS_Y = 500;
 const CUSTOMERS_X = 860;
 const CUSTOMERS_Y = 420;
-const HEAD_H = 46;
-const ROW_H = 54;
+const HEAD_H = 50;
+const ROW_H = 60;
 
 /**
  * Part 1 opens on Unit 3's bridge: a line between tables lands on one row.

@@ -25,8 +25,8 @@ import {
 } from "./parts";
 
 const TABLE_Y = 430;
-const HEAD_H = 46;
-const ROW_H = 56;
+const HEAD_H = 50;
+const ROW_H = 62;
 const RIGHT_X = 700;
 const SIZE = 24;
 const FIRST_Y = 352;

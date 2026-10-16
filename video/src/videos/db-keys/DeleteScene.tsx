@@ -32,7 +32,7 @@ const TAG_Y = 296;
 const PARENT_Y = 372;
 const HEAD_H = 40;
 const ROW_H = 48;
-const SIZES = { headSize: 19, bodySize: 23, pad: 14 };
+const SIZES = { headSize: 20, bodySize: 24, pad: 14 };
 /** Room between a parent table's bottom rule and its child's top rule. */
 const STACK = 66;
 
@@ -118,6 +118,7 @@ export const DeleteScene: React.FC = () => {
   const keptPost = CASCADE.posts.rows.findIndex((_, i) => !gonePosts.includes(i));
   const postOf = (row: number) => CASCADE.posts.rows.findIndex((p) => p[0] === CASCADE.comments.rows[row][1]);
   const collapseAt = tooAt + 4;
+  const closed = (goneComments.length + gonePosts.length) * h(ROW_H) * ease(frame, collapseAt + 4, 12);
   const rightLoop = (crow: number, prow: number) =>
     [
       [k.c.right + 6, k.c.rowMid(crow)],
@@ -149,9 +150,20 @@ export const DeleteScene: React.FC = () => {
           <Ink key={kind.name} at={deletingAt - 4 + i * 4} dur={14} style={{ left: COL_X[i], top: y(TAG_Y), whiteSpace: "nowrap" }}>
             <span style={{ fontFamily: MONO, fontSize: 25, fontWeight: 700, color: INK_SOFT }}>
               ON DELETE{" "}
-              <span style={{ color: ACCENT_INK, opacity: ease(frame, kind.at - 4, 10) }}>{kind.name}</span>
-              <span style={{ color: INK_SOFT, opacity: ease(frame, choiceAt - 2, 10) * (1 - ease(frame, kind.at - 6, 6)) }}>
-                {frame < kind.at - 2 ? "?" : ""}
+              {/* "?" until the narration names this one, then its name in the same place. */}
+              <span style={{ position: "relative", display: "inline-block" }}>
+                <span style={{ color: ACCENT_INK, opacity: ease(frame, kind.at - 4, 10) }}>{kind.name}</span>
+                <span
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    color: INK_SOFT,
+                    opacity: ease(frame, choiceAt - 2, 10) * (1 - ease(frame, kind.at - 8, 6)),
+                  }}
+                >
+                  ?
+                </span>
               </span>
             </span>
           </Ink>
@@ -229,10 +241,13 @@ export const DeleteScene: React.FC = () => {
         <ElbowArrow points={rightLoop(keptComment, keptPost)} at={arrowsAt[1] + 6} out={collapseAt - 4} />
         {/* Once the deleted rows close up, comment 12 and post 2 are each the first row. */}
         <ElbowArrow points={rightLoop(0, 0)} at={collapseAt + 18} />
-        <Ink at={deleteAt - 4} dur={12} style={{ left: COL_X[1], top: k.below, whiteSpace: "nowrap" }}>
-          <Code line={CASCADE.del.lines[0]} size={19} />
-        </Ink>
-        <Reply x={COL_X[1]} top={k.below + 40} at={tooAt + 8} tag={CASCADE.del.tag} size={20} />
+        {/* The statement and its answer follow the closing rows up. */}
+        <div style={{ position: "absolute", inset: 0, transform: `translateY(${-closed}px)` }}>
+          <Ink at={deleteAt - 4} dur={12} style={{ left: COL_X[1], top: k.below, whiteSpace: "nowrap" }}>
+            <Code line={CASCADE.del.lines[0]} size={19} />
+          </Ink>
+          <Reply x={COL_X[1]} top={k.below + 40} at={tooAt + 8} tag={CASCADE.del.tag} size={20} />
+        </div>
 
         {/* ── SET NULL: employees and tickets ── */}
         <TableName g={s.p} at={tablesAt[2]}>

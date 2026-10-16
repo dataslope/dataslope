@@ -26,8 +26,8 @@ import {
 const ERD_Y = 296;
 const TABLE_X = 560;
 const TABLE_Y = 588;
-const HEAD_H = 44;
-const ROW_H = 50;
+const HEAD_H = 46;
+const ROW_H = 52;
 const ERR_X = 960;
 
 /**
