@@ -118,14 +118,20 @@ say(f"  trend: min {metric.min():.1f} (month {months[metric.argmin()]}), max {me
 # ── Part 2. The survey (why-statistics-matters, prose) ──────────────────────
 SURVEYED, CUSTOMERS = 500, 300_000
 assert CUSTOMERS % SURVEYED == 0
+# The field on screen: one dot per 50 customers, so the 500 surveyed are ten
+# dots, picked at random (seeded, for the layout only) from the 6,000.
+PER_DOT = 50
+dots = CUSTOMERS // PER_DOT
+picked = np.random.default_rng(500).choice(dots, size=SURVEYED // PER_DOT, replace=False)
 out["survey"] = {
     "surveyed": SURVEYED,
     "customers": CUSTOMERS,
-    # The grid on screen: one square per 500 customers.
-    "squares": CUSTOMERS // SURVEYED,
-    "perSquare": SURVEYED,
+    "oneIn": CUSTOMERS // SURVEYED,
+    "perDot": PER_DOT,
+    "dots": dots,
+    "picked": sorted(int(i) for i in picked),
 }
-say(f"  survey: {SURVEYED} of {CUSTOMERS:,} is one in {CUSTOMERS // SURVEYED}")
+say(f"  survey: {SURVEYED} of {CUSTOMERS:,} is one in {CUSTOMERS // SURVEYED}; {dots} dots of {PER_DOT}, {len(picked)} picked")
 
 # ── Part 2. A known population (populations-and-samples, seed 42) ───────────
 MU_TRUE = 100.0
@@ -219,10 +225,17 @@ out["zips"] = {
     "ratingMedian": r(df["rating_1to5"].median()),
     "prices": [r(v, 2) for v in df["price_usd"]],
     "priceMean": round(float(df["price_usd"].mean()), 2),
-    # Doubling a price means something: the video shows one of the lesson's.
+    # Doubling a price means something; doubling a zip code does not. The
+    # video doubles one of each from the lesson's frame.
+    "price": r(df["price_usd"].iloc[2], 2),
     "priceDoubled": r(df["price_usd"].iloc[2] * 2, 2),
+    "zip": int(df["zip_code"].iloc[2]),
+    "zipDoubled": int(df["zip_code"].iloc[2] * 2),
 }
-say(f"  dtypes {out['zips']['dtypes']}; ${df['price_usd'].iloc[2]:.2f} doubled is ${df['price_usd'].iloc[2] * 2:.2f}")
+say(
+    f"  dtypes {out['zips']['dtypes']}; ${df['price_usd'].iloc[2]:.2f} doubled is ${df['price_usd'].iloc[2] * 2:.2f}; "
+    f"{df['zip_code'].iloc[2]} doubled is {df['zip_code'].iloc[2] * 2}"
+)
 
 json.dump(out, sys.stdout, separators=(",", ":"))
 sys.stdout.write("\n")

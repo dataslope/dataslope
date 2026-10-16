@@ -210,7 +210,7 @@ export const script: NarrationScript = {
     },
     {
       id: "labels",
-      text: "Labels split again. Nominal ones have no order, like countries. Ordinal ones do, like shirt sizes, but the gaps between them aren't equal.",
+      text: "Labels split again. Nominal ones have no order, like countries. Ordinal ones do, like shirt sizes, but the gaps between them can be uneven.",
       pauseAfter: 0.4,
     },
     { id: "numbers", text: "Numbers split into counts, like logins, and measurements, like price." },
