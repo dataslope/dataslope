@@ -38,8 +38,8 @@ import type { NarrationScript } from "../../narration/types";
  *     p. 40; P. Squire, "Why the 1936 Literary Digest Poll Failed", Public
  *     Opinion Quarterly 52:1 (1988), pp. 125-133);
  *   - the Digest's final returns, Landon 1,293,669 and Roosevelt 972,897
- *     (Literary Digest, 31 October 1936), give Roosevelt 42.9% of the two,
- *     "forty-three percent";
+ *     (Literary Digest, 31 October 1936), give Landon 57.1% and Roosevelt
+ *     42.9% of the two, "fifty-seven to forty-three";
  *   - Gallup forecast 55.7% of the two-party vote for Roosevelt (G. Gallup,
  *     The Gallup Poll: Public Opinion 1935-1971, 1972, p. 215, quoted in
  *     Lusinchi 2012, p. 44), from a quota sample built to match the
@@ -123,7 +123,7 @@ export const script: NarrationScript = {
       text: "Nearly two point four million came back. A huge sample... but the people who chose to reply leaned toward the challenger, Alf Landon.",
       pauseAfter: 0.35,
     },
-    { id: "call", text: "So the Digest called it for Landon, with Roosevelt on just forty-three percent.", pauseAfter: 0.35 },
+    { id: "call", text: "So the Digest called it for Landon, fifty-seven to forty-three.", pauseAfter: 0.35 },
     {
       id: "gallup",
       text: "George Gallup asked far fewer people, chosen to mirror the voters, and put Roosevelt on fifty-six.",

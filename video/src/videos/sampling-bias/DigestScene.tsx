@@ -141,6 +141,18 @@ export const DigestScene: React.FC = () => {
           {v}%
         </div>
       ))}
+      <div
+        style={{
+          position: "absolute",
+          right: 1920 - SHARE.x1,
+          top: y(SCALE_Y) + 44,
+          opacity: scaleIn,
+          whiteSpace: "nowrap",
+          ...note(20, INK_SOFT),
+        }}
+      >
+        Roosevelt&apos;s share of the two-party vote
+      </div>
       <Note at={callFrom + 6} x={px(50) + 10} y={y(ROWS.digest - 62)} out={lessonFrom - 6}>
         <span style={{ ...note(20, INK_SOFT), ...halo }}>Roosevelt wins</span>
       </Note>
@@ -157,6 +169,7 @@ export const DigestScene: React.FC = () => {
         value={H.digestRooseveltShare}
         color={EASY}
         ink={EASY_INK}
+        named
       />
       <Row
         y={ROWS.gallup}
@@ -264,7 +277,9 @@ const Row: React.FC<{
   value: number;
   color: string;
   ink: string;
-}> = ({ y: rowY, at, dotAt, name, sub, subAt, value, color, ink }) => {
+  /** Name whose share the value is, left of the dot. */
+  named?: boolean;
+}> = ({ y: rowY, at, dotAt, name, sub, subAt, value, color, ink, named = false }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const { y } = useLayout();
@@ -282,16 +297,20 @@ const Row: React.FC<{
         <line x1={SHARE.x0} x2={SHARE.x1} y1={y(rowY)} y2={y(rowY)} stroke={HAIRLINE} strokeWidth={1} opacity={0.6} />
         {dot > 0.01 ? <circle cx={x} cy={y(rowY)} r={12 * dot} fill={color} /> : null}
       </svg>
+      {/* A share under 50% sits on the "Landon wins" side, where a bare
+          42.9% reads as Landon's. So that row says whose share it is, and
+          sits left of its dot, clear of the 50% line. */}
       <div
         style={{
           position: "absolute",
-          left: x + 22,
+          ...(named ? { right: 1920 - (x - 22) } : { left: x + 22 }),
           top: y(rowY) - 17,
           opacity: ease(frame, dotAt + 6, 10),
           whiteSpace: "nowrap",
           ...halo,
         }}
       >
+        {named ? <span style={note(22, INK_SOFT)}>Roosevelt </span> : null}
         <span style={{ ...note(26, ink), fontWeight: 700 }}>{fmt(value, 1)}%</span>
       </div>
     </>
