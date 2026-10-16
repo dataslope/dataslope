@@ -237,10 +237,10 @@ export const Bell: React.FC<{
   const line = pts.map(([a, b], i) => `${i ? "L" : "M"}${a.toFixed(1)},${b.toFixed(1)}`).join(" ");
   const x0 = x(lo);
   const x1 = x(hi);
-  const shown = x0 + (x1 - x0) * p;
   return (
     <Svg opacity={(1 - o) * opacity}>
-      <g style={{ clipPath: `inset(0 ${1920 - shown}px 0 0)` }}>
+      {/* An inset on a group is measured against its own box, which spans x0 to x1. */}
+      <g style={{ clipPath: `inset(-4px ${(1 - p) * 100}% -4px -4px)` }}>
         <path d={`${line} L${x1},${base} L${x0},${base} Z`} fill={`color-mix(in srgb, ${INK} 6%, transparent)`} />
         <path d={line} fill="none" stroke={`color-mix(in srgb, ${INK} 52%, transparent)`} strokeWidth={1.8} strokeDasharray="6 5" />
       </g>
