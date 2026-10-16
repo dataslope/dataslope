@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill } from "remotion";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, INK } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
@@ -17,6 +18,7 @@ type Part = string | { t: string; kind: "noun" | "verb" | "fact" };
  * narration names them.
  */
 export const RequirementsScene: React.FC = () => {
+  const frame = useCurrentFrame();
   const n = useNarration();
   const { y } = useLayout();
 
@@ -27,6 +29,8 @@ export const RequirementsScene: React.FC = () => {
     n.word("reqs", "Categories"),
     n.word("contains", "an order"),
   ];
+  // The third sentence's second clause arrives as it is read.
+  const severalAt = n.word("reqs", "and a product");
   const quantityAt = n.word("contains", "quantity");
   const chargedAt = n.word("contains", "price charged");
   const nounsAt = n.word("nouns", "nouns");
@@ -36,7 +40,7 @@ export const RequirementsScene: React.FC = () => {
   const sentences: Part[][] = [
     ["A ", { t: "customer", kind: "noun" }, " ", { t: "places", kind: "verb" }, " orders."],
     ["A ", { t: "product", kind: "noun" }, " ", { t: "has", kind: "verb" }, " a name and a price."],
-    [{ t: "Categories", kind: "noun" }, " ", { t: "group", kind: "verb" }, " products, and a product can ", { t: "sit in", kind: "verb" }, " several."],
+    [{ t: "Categories", kind: "noun" }, " ", { t: "group", kind: "verb" }, " products,", " and a product can ", { t: "sit in", kind: "verb" }, " several."],
     ["An ", { t: "order", kind: "noun" }, " ", { t: "contains", kind: "verb" }, " products, each with a ", { t: "quantity", kind: "fact" }, " and ", { t: "the price charged", kind: "fact" }, "."],
   ];
 
@@ -44,6 +48,31 @@ export const RequirementsScene: React.FC = () => {
   let verb = 0;
   let fact = 0;
   const factAt = [quantityAt - 2, chargedAt - 2];
+
+  const part = (p: Part, k: number) => {
+    if (typeof p === "string") return <React.Fragment key={k}>{p}</React.Fragment>;
+    if (p.kind === "noun") {
+      const at = nounsAt + 4 + noun++ * 5;
+      return (
+        <Mark key={k} at={at} color={MARK_KEY}>
+          {p.t}
+        </Mark>
+      );
+    }
+    if (p.kind === "verb") {
+      const at = verbsAt + 2 + verb++ * 5;
+      return (
+        <Underline key={k} at={at}>
+          {p.t}
+        </Underline>
+      );
+    }
+    return (
+      <Mark key={k} at={factAt[fact++]}>
+        {p.t}
+      </Mark>
+    );
+  };
 
   return (
     <AbsoluteFill>
@@ -62,27 +91,14 @@ export const RequirementsScene: React.FC = () => {
         <Ink key={i} at={sentenceAt[i] - 4} dur={22} style={{ left: 120, top: y(330 + i * 92), whiteSpace: "nowrap" }}>
           <span style={{ ...body(40), color: INK }}>
             {parts.map((p, k) => {
-              if (typeof p === "string") return <React.Fragment key={k}>{p}</React.Fragment>;
-              if (p.kind === "noun") {
-                const at = nounsAt + 4 + noun++ * 5;
-                return (
-                  <Mark key={k} at={at} color={MARK_KEY}>
-                    {p.t}
-                  </Mark>
-                );
-              }
-              if (p.kind === "verb") {
-                const at = verbsAt + 2 + verb++ * 5;
-                return (
-                  <Underline key={k} at={at}>
-                    {p.t}
-                  </Underline>
-                );
-              }
+              const late = i === 2 && k >= 4;
+              const el = part(p, k);
+              if (!late) return el;
+              const q = ease(frame, severalAt - 4, 16);
               return (
-                <Mark key={k} at={factAt[fact++]}>
-                  {p.t}
-                </Mark>
+                <span key={k} style={{ opacity: q, filter: q < 1 ? `blur(${(1 - q) * 1.4}px)` : undefined }}>
+                  {el}
+                </span>
               );
             })}
           </span>

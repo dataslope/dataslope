@@ -39,7 +39,7 @@ export const SqlScene: React.FC = () => {
   const doubtedAt = n.word("doubt", "doubted");
   const matchingAt = n.word("doubt", "matching values");
   const fastAt = n.word("doubt", "fast");
-  const builtAt = n.word("systemr", "built");
+  const sanJoseAt = n.word("systemr", "San Jose");
   const systemRAt = n.word("systemr", "System R");
   const findAt = n.word("systemr", "find out");
   const couldAt = n.word("systemr", "It could");
@@ -56,6 +56,7 @@ export const SqlScene: React.FC = () => {
   const sqlAt = n.word("vowels", "S-Q-L");
   const diedAt = n.word("boyce", "died");
   const twentiesAt = n.word("boyce", "twenties");
+  const seventyFourAt = n.word("boyce", "nineteen seventy-four");
   const livesAt = n.word("boyce", "lives on");
   const normalAt = n.word("boyce", "Boyce-Codd");
   // The three letters that stayed swell once more as the scene closes.
@@ -135,7 +136,7 @@ export const SqlScene: React.FC = () => {
         top={y(600)}
         width={560}
         height={150}
-        at={builtAt - 4}
+        at={sanJoseAt - 4}
         titleAt={systemRAt - 2}
         title="System R"
         titleSize={40}
@@ -225,7 +226,7 @@ export const SqlScene: React.FC = () => {
       />
       <Ink at={diedAt - 2} dur={16} style={{ left: 96, top: y(782), whiteSpace: "nowrap" }}>
         <span style={{ ...body(30, true), color: INK }}>
-          Raymond Boyce died in 1974, still in his <Mark at={twentiesAt - 2}>twenties</Mark>.
+          Raymond Boyce died in <Mark at={seventyFourAt - 2}>1974</Mark>, still in his <Mark at={twentiesAt - 2}>twenties</Mark>.
         </span>
       </Ink>
       <Ink at={livesAt - 2} dur={18} style={{ left: 96, top: y(842), whiteSpace: "nowrap" }}>

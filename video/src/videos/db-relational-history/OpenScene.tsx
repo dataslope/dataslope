@@ -5,7 +5,7 @@ import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Headline, Kicker, PaperPage } from "./parts";
+import { Headline, Kicker, Mark, PaperPage } from "./parts";
 
 /**
  * Part 1 opens on the bridge from Unit 8: the course's own two tables build
@@ -23,6 +23,7 @@ export const OpenScene: React.FC = () => {
   const keyAt = n.word("hook", "key");
   const joinAt = n.word("hook", "join");
   const noneAt = n.word("hook", "none");
+  const obviousAt = n.word("hook", "obvious");
   const paperAt = n.word("paper", "one paper");
   const seventyAt = n.word("paper", "nineteen seventy");
   const whatAt = n.word("paper", "So what");
@@ -70,7 +71,15 @@ export const OpenScene: React.FC = () => {
 
       <Kicker at={hookFrom - 10}>The relational revolution</Kicker>
 
-      <Headline at={noneAt - 4} lead="None of it was obvious once." out={whatAt - 6} />
+      <Headline
+        at={noneAt - 4}
+        lead={
+          <>
+            None of it was <Mark at={obviousAt - 2}>obvious</Mark> once.
+          </>
+        }
+        out={whatAt - 6}
+      />
       <Headline at={whatAt - 2} lead="So what came before it?" />
 
       <AbsoluteFill

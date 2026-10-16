@@ -9,7 +9,7 @@ import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
 import { FIRST_DDL_LINE } from "./data";
-import { Kicker, Spot, Strike, Underline } from "./parts";
+import { Kicker, Mark, Spot, Strike } from "./parts";
 
 /**
  * Part 1 opens on Unit 7's bridge: the rules are half of design, a process is
@@ -23,6 +23,7 @@ export const OpenScene: React.FC = () => {
   const { y } = useLayout();
 
   const openFrom = n.beat("open").from;
+  const halfwayAt = n.word("open", "halfway");
   const otherAt = n.word("open", "other half");
   const applyingAt = n.word("open", "applying");
   const changingAt = n.word("open", "changing");
@@ -55,7 +56,7 @@ export const OpenScene: React.FC = () => {
 
       <Kicker at={openFrom - 10}>The design process</Kicker>
       <Ink at={openFrom - 8} dur={20} style={{ left: 92, top: y(150), ...headline(72), whiteSpace: "nowrap" }}>
-        The rules get you halfway.
+        The rules get you <Mark at={halfwayAt - 2} dur={14}>halfway.</Mark>
       </Ink>
       <Ink at={otherAt - 4} dur={20} style={{ left: 92, top: y(236), ...headline(72, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
         The other half is a process,
@@ -67,7 +68,7 @@ export const OpenScene: React.FC = () => {
             for{" "}
             {i === 1 ? (
               <>
-                changing a <Underline at={liveAt - 2}>live</Underline> design
+                changing a <Mark at={liveAt - 2}>live</Mark> design
               </>
             ) : (
               h.text

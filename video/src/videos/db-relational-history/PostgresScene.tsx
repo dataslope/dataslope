@@ -23,8 +23,9 @@ export const PostgresScene: React.FC = () => {
   const { y, h } = useLayout();
 
   // ── Cues ──
-  const postgresFrom = n.beat("postgres").from;
   const eightySixAt = n.word("postgres", "eighty-six");
+  const overAt = n.word("postgres", "started over");
+  const databaseAt = n.word("postgres", "database");
   const extendAt = n.word("postgres", "extend");
   const typesAt = n.word("postgres", "your own types");
   const nameAt = n.word("postgres", "Postgres");
@@ -50,7 +51,7 @@ export const PostgresScene: React.FC = () => {
   const nickAt = n.word("rename", "Postgres");
 
   const TOP = y(400);
-  const H = h(200);
+  const H = h(218);
   const W = 520;
   const XS = [96, 700, 1304];
   const mid = TOP + H / 2;
@@ -74,7 +75,7 @@ export const PostgresScene: React.FC = () => {
       ))}
       <Sfx name="el-pop" at={mostAt - 4} level={-30} />
 
-      <Headline at={postgresFrom - 4} lead="Stonebraker started over." out={studentsAt - 6} />
+      <Headline at={overAt - 8} lead="Stonebraker started over." out={studentsAt - 6} />
       <Headline at={studentsAt - 2} lead="Two grad students" turn="gave it SQL." turnAt={gaveAt - 4} out={volunteersAt - 6} />
       <Headline at={volunteersAt - 2} lead="Volunteers kept it going." />
 
@@ -111,7 +112,15 @@ export const PostgresScene: React.FC = () => {
         }
         lines={[
           { at: eightySixAt, children: "UC Berkeley, 1986" },
-          { at: typesAt - 4, children: <Mark at={extendAt - 2} out={catchAt}>built to be extended, with your own types</Mark> },
+          {
+            at: databaseAt - 2,
+            children: (
+              <>
+                built to be <Mark at={extendAt - 2} out={catchAt}>extended</Mark>,
+              </>
+            ),
+          },
+          { at: typesAt - 2, children: <Mark at={typesAt + 2} out={catchAt}>with data types of your own</Mark> },
           {
             at: speakAt - 4,
             children: (

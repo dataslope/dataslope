@@ -33,6 +33,7 @@ export const TabScene: React.FC = () => {
   const tellsAt = n.word("version", "tells");
   const eighteenAt = n.word("version", "eighteen");
   const upbringingAt = n.word("upbringing", "upbringing");
+  const keptAt = n.word("upbringing", "kept");
   const labAt = n.word("upbringing", "lab");
   const volunteersAt = n.word("upbringing", "volunteers");
   const salesAt = n.word("upbringing", "sales team");
@@ -99,8 +100,8 @@ export const TabScene: React.FC = () => {
       <Sfx name="el-scratch" at={noAt + 2} level={-30} />
       <Sfx name="el-chime" at={doesAt + 8} level={-32} />
 
-      <Headline at={browserAt - 6} lead="Postgres, in your browser." out={upbringingAt - 6} />
-      <Headline at={upbringingAt - 2} lead="It kept its upbringing." out={takesAt - 6} />
+      <Headline at={browserAt - 6} lead="Postgres, in your browser." out={keptAt - 6} />
+      <Headline at={keptAt - 2} lead="It kept its upbringing." out={takesAt - 6} />
       <Headline at={takesAt - 2} lead="It takes your rules" turn="seriously." turnAt={seriouslyAt - 4} out={knowAt - 6} />
       <Headline at={knowAt - 2} lead="Now you know" turn="why this one does." turnAt={knowAt + 8} />
 
