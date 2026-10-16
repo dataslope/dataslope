@@ -18,8 +18,9 @@
  * spoken, a value counting, an annotation arriving, a slow drift.
  *
  * Exits non-zero if any stretch lasts --max seconds (default 3) or longer.
- * The preview is rendered to out/<id>-preview.mp4 and kept, so a second run
- * can pass it with --file.
+ * The preview is rendered to out/<id>-preview.mp4, with its sound (the
+ * effects, and the narration once there is some), and kept: it is also the
+ * quick way to watch a video, and a second run can pass it with --file.
  *
  * Needs a Node that strips TypeScript types (22.18 or later), like cues.mjs.
  */
@@ -59,7 +60,6 @@ if (!file) {
     inputProps: {},
     codec: "h264",
     scale: 0.5,
-    muted: true,
     outputLocation: file,
     browserExecutable,
     onProgress: ({ progress }) => {
