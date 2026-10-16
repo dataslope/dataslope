@@ -282,7 +282,7 @@ scene is for, never a recap of the one just finished.
 npm run narrate -- c-pointers --dry-run   # the text it would send
 npm run narrate -- c-pointers             # a take, or the beats not yet voiced
 npm run narrate -- c-pointers --only star # re-voice one edited beat
-npm run narrate -- c-pointers --force     # a whole new take
+npm run narrate -- c-pointers --force     # new takes of everything (ask first)
 npm run narrate -- c-pointers --recut     # cut the kept take again, no API call
 npm run cues -- c-pointers                # the timing it produced
 npm run check:sync -- c-pointers          # and that the voice really starts there
@@ -326,10 +326,26 @@ committed audio is in a different voice from the one its script names.
 id; to keep the result, set `voice` in the script (or add the voice to
 `voices.ts` first).
 
-**A video is voiced as one take.** When every beat needs voicing (the first
-run, a new voice, or `--force`), the whole script goes in a single request:
-beats joined by a space, and a paragraph break before each beat that opens a
-scene. The take is then cut into beats at the middle of the longest silence
+**A video is voiced in takes, one request per part.** `planTakes()`
+(`src/narration/takes.ts`) splits the script at scene beats, grouping scenes
+until a take holds about 1,800 characters (`takeChars` in the script changes
+that; a beat marked `take: true` always starts one). A two-minute video is one
+take; a unit video like ThinkingStatistically is three. Each take is one
+request, its beats joined by a space with a paragraph break before each beat
+that opens a scene, and it carries the two beats on either side as
+`previous_text` and `next_text`, so the voice runs on across the seam. The
+seam always falls at a scene change, the longest pause in the video. Several
+takes rather than one because a request is capped at 10,000 characters, the
+character times drift over a long take (ThinkingStatistically's single take
+ran half a second late by 2:30), and a part that needs redoing then costs that
+part, not the video.
+
+`npm run narrate -- <video> --dry-run` prints the plan: each take, its beats
+and characters, and whether it will be recorded, re-cut from the kept copy or
+left alone. A take whose beats all need voicing (the first run, a part
+rewritten, a new voice, or `--force`) is recorded; a take with only some
+beats changed has just those re-voiced, one at a time. Every take is then cut
+into beats at the middle of the longest silence
 between the start of one beat's last word and the end of the next beat's
 first word, so no cut lands in a word. The window is that wide because the
 character times can be well off at a sentence end: StandardError's stretched
@@ -343,8 +359,13 @@ over the end of the beat before.
 
 That is most of the difference between narration and text-to-speech. Voiced
 one request per beat, every sentence started cold, on the same contour, with
-the same energy. In one take, a question lifts and its answer comes down,
+the same energy. Within a take, a question lifts and its answer comes down,
 and one sentence runs into the next.
+
+**The model is always `eleven_v4_turbo`** (`NARRATION_MODEL` in
+`src/narration/voices.ts`). `narrate` refuses any other, the plain
+`eleven_v4` included, and `npm test` fails if any committed narration or take
+was recorded on another.
 
 Where each beat's first word starts is read from the sound, not the
 character times. Those are only good to about 80 ms, and worse in two
@@ -360,13 +381,15 @@ from:
 
 - `public/narration/<script id>/`: one MP3 per beat and `alignment.json`.
   This is what a video plays, about 1.1 MB a video.
-- `takes/<script id>/`: the raw take (`take.mp3`) and its alignment
-  (`take.json`), about 1.3 MB. The beats are cut from it, so `--recut` can
-  cut them again, for instance after a change to the cutting, without paying
-  for another take, and a plain run reuses it when its text and voice still
-  match. A re-cut is deterministic: cutting an unchanged take reproduces the
-  committed beats byte for byte. `npm test` fails if a voiced video has lost
-  its take.
+- `takes/<script id>/`: the raw takes (`take-1.mp3`, `take-2.mp3`, …) and
+  their alignment (`take-1.json`, …), about 1.3 MB for two minutes of speech.
+  The beats are cut from them, so `--recut` can cut them again, for instance
+  after a change to the cutting, without paying for another take, and a plain
+  run reuses a take when its text and voice still match. A re-cut is
+  deterministic: cutting an unchanged take reproduces the committed beats
+  byte for byte. Videos voiced before takes were split keep a single
+  `take.mp3`/`take.json`, which `--recut` still cuts while it matches the
+  script. `npm test` fails if a voiced video has lost its takes.
 
 A beat whose text has changed since its audio was made is reported as `stale`
 by `npm run cues` and falls back to the estimate, so an edited sentence can't

@@ -17,6 +17,10 @@ export type Beat = {
    *  stays on screen, finished, before it cross-fades away. Every beat a
    *  Video.tsx cuts to must say so; src/narration/scenes.test.ts checks. */
   scene?: boolean;
+  /** Start a new take here: a separate recording request, whatever the size
+   *  of the one before. Takes otherwise start only at scene beats, grouped up
+   *  to the script's `takeChars` (src/narration/takes.ts). */
+  take?: boolean;
 };
 
 export type NarrationScript = {
@@ -33,6 +37,9 @@ export type NarrationScript = {
    *  video whose cuts start 8 frames early. Raise it for a video whose exits
    *  start earlier than that (a wipe, or text that fades ahead of the cut). */
   sceneGap?: number;
+  /** About how many characters one take holds before the next scene starts a
+   *  new one (src/narration/takes.ts). Defaults to TAKE_CHARS. */
+  takeChars?: number;
   beats: Beat[];
 };
 
