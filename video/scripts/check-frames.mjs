@@ -20,14 +20,14 @@
  * Exits non-zero if any image is stretched, any arrowhead sits on a bend, or
  * any relationship end sits on too short a straight stretch.
  */
-import { bundle } from "@remotion/bundler";
 import { getCompositions, renderFrames } from "@remotion/renderer";
 import path from "node:path";
 import { MAX_HEAD_BEND } from "../src/components/arrow.ts";
+import { bundleVideo } from "./lib/bundle.mjs";
 
 const only = process.argv[2]?.split(",");
 const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE ?? null;
-const serveUrl = await bundle({ entryPoint: path.resolve("src/index.ts") });
+const serveUrl = await bundleVideo(path.resolve("src/index.ts"));
 const compositions = (await getCompositions(serveUrl, { browserExecutable, inputProps: {} })).filter(
   (c) => c.durationInFrames > 1 && (!only || only.includes(c.id)),
 );

@@ -28,6 +28,7 @@ import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { videoNames } from "./lib/audio.mjs";
+import { bundleVideo } from "./lib/bundle.mjs";
 import { frameChanges, staticSpans } from "./lib/motion.mjs";
 
 const VIDEO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -46,10 +47,9 @@ const { id, folder } = videoNames(args[0]);
 
 let file = given && path.resolve(given);
 if (!file) {
-  const { bundle } = await import("@remotion/bundler");
   const { renderMedia, selectComposition } = await import("@remotion/renderer");
   const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE ?? null;
-  const serveUrl = await bundle({ entryPoint: path.join(VIDEO_ROOT, "src", "index.ts") });
+  const serveUrl = await bundleVideo(path.join(VIDEO_ROOT, "src", "index.ts"));
   const composition = await selectComposition({ serveUrl, id, inputProps: {}, browserExecutable });
   file = path.join(VIDEO_ROOT, "out", `${id}-preview.mp4`);
   mkdirSync(path.dirname(file), { recursive: true });

@@ -57,10 +57,10 @@ let serveUrl;
  */
 export async function renderAudio(compositionId, { tag, inputProps = {} }) {
   // Loaded here rather than at the top, so the measurements import without them.
-  const { bundle } = await import("@remotion/bundler");
   const { renderMedia, selectComposition } = await import("@remotion/renderer");
   const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE ?? null;
-  serveUrl ??= await bundle({ entryPoint: path.join(VIDEO_ROOT, "src", "index.ts") });
+  const { bundleVideo } = await import("./bundle.mjs");
+  serveUrl ??= await bundleVideo(path.join(VIDEO_ROOT, "src", "index.ts"));
   const composition = await selectComposition({ serveUrl, id: compositionId, inputProps, browserExecutable });
   const outputLocation = path.join(VIDEO_ROOT, "out", `${compositionId}-${tag}.wav`);
   mkdirSync(path.dirname(outputLocation), { recursive: true });
