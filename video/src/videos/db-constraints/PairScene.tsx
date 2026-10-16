@@ -15,9 +15,11 @@ import {
   HEAD_H,
   Kicker,
   MARK_BAD,
+  Pill,
   ROW_H,
   RuleTags,
   tableGeometry,
+  Tick,
   X0,
 } from "./parts";
 
@@ -41,6 +43,7 @@ export const PairScene: React.FC = () => {
   const hasAt = n.word("pair", "has");
   const studentsAt = n.word("pair", "many students");
   const bothAt = n.word("pair", "both");
+  const soAt = n.word("pair", "So");
   const repeatAt = n.word("pair", "repeat");
   const eachPairAt = n.word("pair", "each pair");
   const enrollAt = n.word("again", "Enroll");
@@ -54,6 +57,8 @@ export const PairScene: React.FC = () => {
   const mostAt = n.word("oneone", "at most");
   const oneToOneAt = n.word("oneone", "one to one");
   const coversAt = n.word("check-in", "covers");
+  const missingAt = n.word("check-in", "missing");
+  const repeatedAt = n.word("check-in", "repeated");
   const valuesAt = n.word("check-in", "values");
   const wrongAt = n.word("check-in", "wrong");
 
@@ -143,7 +148,12 @@ export const PairScene: React.FC = () => {
 
       {/* ── Fig. A: many to many ── */}
       <Entity layout={students} at={studentAt - 4} out={outA} />
-      <Entity layout={enrollments} at={takesAt - 2} out={outA} />
+      <Entity
+        layout={enrollments}
+        at={takesAt - 2}
+        marks={{ student_id: { at: soAt, out: eachPairAt + 8 }, course_id: { at: soAt + 5, out: eachPairAt + 8 } }}
+        out={outA}
+      />
       <Entity layout={courses} at={courseAt - 4} out={outA} />
       <Relation
         name="students in enrollments"
@@ -208,8 +218,9 @@ export const PairScene: React.FC = () => {
         from="exactly-one"
         to="zero-or-one"
         at={eachUserAt}
-        label="has at most one"
+        label="at most one"
         labelAt={mostAt}
+        labelPos={[users.right + 40, users.anchor("right", "id")[1] - 40]}
         dim={coversAt}
       />
       <ErrorBox
@@ -224,6 +235,15 @@ export const PairScene: React.FC = () => {
         dim={coversAt}
       />
 
+      {/* ── Missing and repeated are covered; wrong values are next ── */}
+      <Pill x={1250} y={y(850) - 54} at={missingAt - 2}>
+        NOT NULL
+      </Pill>
+      <Pill x={1400} y={y(850) - 54} at={repeatedAt - 2}>
+        UNIQUE
+      </Pill>
+      <Tick x={1380} y={y(850) - 54} at={missingAt + 6} size={18} />
+      <Tick x={1518} y={y(850) - 54} at={repeatedAt + 6} size={18} />
       {/* ── What about values that are just wrong? ── */}
       {(
         [

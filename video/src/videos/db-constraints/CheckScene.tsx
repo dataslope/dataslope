@@ -52,6 +52,7 @@ export const CheckScene: React.FC = () => {
   const endAt = n.word("dates", "end");
   const startsAt = n.word("dates", "starts");
   const neverAt = n.word("dates", "never");
+  const backwardsAt = n.word("dates", "backwards");
   const getsAt = n.word("dates", "gets in");
 
   const card = useEntityLayout({
@@ -163,6 +164,7 @@ export const CheckScene: React.FC = () => {
         marks={[
           { row: 0, col: 3, at: endAt, color: MARK_BAD },
           { row: 0, col: 2, at: startsAt, color: MARK },
+          { row: 0, col: 1, at: backwardsAt },
         ]}
       />
       <ErrorBox

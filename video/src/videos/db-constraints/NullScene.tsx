@@ -51,6 +51,7 @@ export const NullScene: React.FC = () => {
   const knowAt = n.word("ask", "know");
   const statusAt = n.word("default", "status");
   const defaultAt = n.word("default", "default");
+  const fallbackAt = n.word("default", "fallback");
   const leaveAt = n.word("default", "Leave");
   const activeAt = n.word("default", "active");
   const noEmailAt = n.word("email", "no email");
@@ -91,7 +92,7 @@ export const NullScene: React.FC = () => {
         <Sfx key={k.word} name="el-tap" at={kindAt[i] - 2} level={-29} />
       ))}
       <Sfx name="el-pop" at={everyColAt - 4} level={-30} />
-      <Sfx name="el-pencil" at={defaultAt} level={-33} />
+      <Sfx name="el-pencil" at={fallbackAt - 2} level={-33} />
       <Sfx name="el-pencil" at={notNullAt} level={-33} />
       <Sfx name="el-scratch" at={refusedAt + 2} level={-30} />
 
@@ -165,7 +166,7 @@ export const NullScene: React.FC = () => {
         layout={card}
         row="status"
         chips={[
-          { code: "DEFAULT 'active'", at: defaultAt - 2, pulses: [activeAt] },
+          { code: "DEFAULT 'active'", at: fallbackAt - 2, pulses: [defaultAt, activeAt] },
           { code: "NOT NULL", at: notNullAt + 8 },
         ]}
       />

@@ -2,6 +2,8 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { Entity, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
+import { BLUE_INK, note } from "../../editorial/style";
+import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { UNIQUE } from "./data";
@@ -42,6 +44,7 @@ export const UniqueScene: React.FC = () => {
   const oneAccountAt = n.word("dup", "one account");
   const primaryAt = n.word("many", "primary key");
   const distinctAt = n.word("many", "distinct");
+  const rowsAt = n.word("many", "rows");
   const uniqueAt = n.word("many", "Unique");
   const everythingAt = n.word("many", "everything");
   const repeatAt = n.word("many", "repeat");
@@ -71,7 +74,7 @@ export const UniqueScene: React.FC = () => {
       <Sfx name="el-pencil" at={everythingAt - 2} level={-34} />
 
       <Kicker at={open - 10}>No repeats</Kicker>
-      <Head lead="Two accounts, one email?" at={open - 6} out={dupFrom - 4} />
+      <Head lead="Two accounts, one email?" at={open - 6} out={oneEmailAt - 10} />
       <Head lead="One email," at={oneEmailAt - 4} turn="one account." turnAt={oneAccountAt - 4} />
 
       <Entity
@@ -99,6 +102,9 @@ export const UniqueScene: React.FC = () => {
         dim={evenAt}
       />
 
+      <Note at={distinctAt - 2} x={card.right + 14} y={card.rows[0].mid - 15} dim={evenAt}>
+        <span style={{ ...note(22, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>never repeats</span>
+      </Note>
       <DbTable
         g={g}
         cols={UNIQUE.cols}
@@ -112,7 +118,7 @@ export const UniqueScene: React.FC = () => {
           { row: 0, col: 1, at: herAt, out: primaryAt },
           { row: ghost, col: 1, at: herAt + 4, color: MARK_BAD },
           { row: ghost, col: 2, at: usernameAt },
-          { row: 0, col: 0, at: distinctAt - 4, color: MARK_KEY, out: uniqueAt + 6 },
+          { row: 0, col: 0, at: rowsAt, color: MARK_KEY, out: uniqueAt + 6 },
         ]}
         dim={evenAt}
       />

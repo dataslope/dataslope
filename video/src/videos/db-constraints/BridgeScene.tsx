@@ -3,8 +3,8 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Entity, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, note } from "../../editorial/style";
-import { NextLine, Note } from "../../editorial/ui";
+import { ACCENT, ACCENT_INK, body, INK, note } from "../../editorial/style";
+import { Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { FLAT } from "./data";
@@ -98,6 +98,9 @@ export const BridgeScene: React.FC = () => {
 
       <Kicker at={open - 10}>Where constraints stop</Kicker>
       <Head lead="Some mistakes pass every rule." at={open - 6} />
+      <Ink at={badValuesAt - 4} dur={16} style={{ left: 96, top: y(252), whiteSpace: "nowrap" }}>
+        <span style={{ ...body(34, true), color: INK }}>Constraints stop bad values, not bad structure.</span>
+      </Ink>
 
       <Entity
         layout={card}

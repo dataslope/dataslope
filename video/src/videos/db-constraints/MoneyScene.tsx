@@ -11,7 +11,7 @@ import { MONEY } from "./data";
 import { Head, Kicker, Mark, MARK, MARK_BAD, OK_INK, pulse, Spot, X0 } from "./parts";
 
 const SIZE = 40;
-const COL = { type: X0, sum: 520, eq: 800, result: 860, test: 1330, verdict: 1500 } as const;
+const COL = { type: X0, sum: 520, eq: 800, result: 860, test: 1366, verdict: 1546 } as const;
 
 /**
  * Part 2, money: 0.1 + 0.2 as a float is 0.30000000000000004 and not equal
@@ -119,7 +119,7 @@ export const MoneyScene: React.FC = () => {
           position: "absolute",
           left: X0,
           top: y(420) + 40,
-          width: (1700 - X0) * ease(frame, tenAt - 4, 20),
+          width: (1680 - X0) * ease(frame, tenAt - 4, 20),
           height: 1,
           background: HAIRLINE,
         }}
@@ -131,7 +131,7 @@ export const MoneyScene: React.FC = () => {
           position: "absolute",
           left: X0 - 16,
           top: rowB - lineH / 2,
-          width: (1700 - X0 + 32) * bandB,
+          width: (1680 - X0 + 32) * bandB,
           height: lineH,
           background: MARK,
           opacity: bandB > 0 ? 0.8 : 0,
@@ -142,7 +142,7 @@ export const MoneyScene: React.FC = () => {
       {/* ── As a float ── */}
       {cell(COL.type, rowA, floatsAt - 2, <span style={{ fontSize: 30, color: INK_SOFT }}>double precision</span>, dimAll)}
       {cell(COL.sum, rowA, tenAt, "0.1", dimAll)}
-      {cell(COL.sum + 72, rowA, twentyAt, "+ 0.2", dimAll)}
+      {cell(COL.sum + 96, rowA, twentyAt, "+ 0.2", dimAll)}
       {cell(COL.eq, rowA, falseAt - 4, "=", dimAll)}
       {typed > 0 ? (
         <div
@@ -193,7 +193,7 @@ export const MoneyScene: React.FC = () => {
       {/* ── As numeric ── */}
       {cell(COL.type, rowB, numericAt - 2, <span style={{ fontSize: 30, color: INK_SOFT }}>numeric</span>, dimAll)}
       {cell(COL.sum, rowB, numericAt + 2, "0.1", dimAll)}
-      {cell(COL.sum + 72, rowB, numericAt + 5, "+ 0.2", dimAll)}
+      {cell(COL.sum + 96, rowB, numericAt + 5, "+ 0.2", dimAll)}
       {cell(COL.eq, rowB, exactAt - 4, "=", dimAll)}
       {cell(COL.result, rowB, exactAt - 2, MONEY.exact, dimAll)}
       {cell(COL.test, rowB, exactAt + 6, "= 0.3", dimAll)}
@@ -218,7 +218,7 @@ export const MoneyScene: React.FC = () => {
         <span style={{ ...note(26, INK), fontStyle: "italic", whiteSpace: "nowrap" }}>And if there's no value at all?</span>
       </Ink>
 
-      <Spot id="db-constraints-coins" at={open - 6} left={1460} top={y(700)} width={300} height={260} dim={kindAt} />
+      <Spot id="db-constraints-coins" at={open - 6} left={1470} top={y(730)} width={270} height={230} dim={kindAt} />
     </AbsoluteFill>
   );
 };

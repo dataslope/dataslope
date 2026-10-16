@@ -2,8 +2,8 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { Entity, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { body, INK, INK_SOFT, label } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { body, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { PRICE } from "./data";
@@ -22,6 +22,7 @@ import {
   TABLE_X,
   TABLE_Y,
   tableGeometry,
+  Tick,
   TypeMark,
   X0,
 } from "./parts";
@@ -40,6 +41,7 @@ export const SchemaScene: React.FC = () => {
   const open = n.beat("schema").from;
   const schemaAt = n.word("schema", "schema");
   const constraintAt = n.word("schema", "constraint");
+  const thatsAt = n.word("schema", "That's");
   const everyAt = n.word("schema", "every write");
   const whoeverAt = n.word("schema", "whoever's");
   const priceAt = n.word("reject", "Price");
@@ -51,8 +53,10 @@ export const SchemaScene: React.FC = () => {
   const neverAt = n.word("stored", "never");
   const notebookAt = n.word("stored", "notebook's");
   const onlyAt = n.word("stored", "only");
+  const productAt = n.word("stored", "product");
   const errorAt = n.word("door", "error");
   const failureAt = n.word("door", "failure");
+  const mistakeAt = n.word("door", "mistake");
   const doorAt = n.word("door", "door");
   const cheapAt = n.word("door", "cheap");
   const everyColAt = n.word("types-in", "every column");
@@ -96,7 +100,7 @@ export const SchemaScene: React.FC = () => {
         <span style={{ ...body(34, true), color: INK }}>while the mistake is still cheap to fix</span>
       </Ink>
 
-      <Entity layout={card} at={schemaAt - 6} />
+      <Entity layout={card} at={schemaAt - 6} marks={{ price: { at: thatsAt, out: zeroAt } }} />
       <RuleTags
         layout={card}
         row="price"
@@ -151,6 +155,10 @@ export const SchemaScene: React.FC = () => {
         nameAt={namingAt}
         dim={neverAt + 6}
       />
+      <Tick x={g.x + g.width + 18} y={g.rowMid(0)} at={productAt - 2} />
+      <Note at={mistakeAt - 2} x={TABLE_X} y={g.rowTop(2) + h(36) + 150}>
+        <span style={{ ...note(24, INK), fontStyle: "italic", whiteSpace: "nowrap" }}>caught on the write, not found months later</span>
+      </Note>
       <Spot id="db-constraints-door" at={doorAt - 4} left={770} top={y(600)} width={200} height={320} />
     </AbsoluteFill>
   );

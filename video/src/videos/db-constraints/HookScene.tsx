@@ -43,6 +43,7 @@ export const HookScene: React.FC = () => {
   const linksAt = n.word("hook", "links");
   const betweenAt = n.word("hook", "between");
   const intoAt = n.word("hook", "INTO");
+  const tablesAt = n.word("hook", "tables");
   const productAt = n.word("bad", "product");
   const minusAt = n.word("bad", "minus");
   const dollarsAt = n.word("bad", "dollars");
@@ -54,6 +55,7 @@ export const HookScene: React.FC = () => {
   const oneWriterAt = n.word("app", "writer");
   const named = WRITERS.map((w) => n.word("writers", w.word));
   const rememberAt = n.word("writers", "remember");
+  const eachAt = n.word("writers", "Each one");
   const ruleAt = n.word("writers", "rule");
   const oneAt = n.word("forgets", "one");
   const forgetsAt = n.word("forgets", "forgets");
@@ -116,7 +118,7 @@ export const HookScene: React.FC = () => {
       <Kicker at={open - 10}>Why constraints</Kicker>
       <Head lead="Keys guard the links." at={open - 8} turn="What guards the rest?" turnAt={intoAt - 4} />
 
-      <FigLabel n="1" title="Two tables, and the key between them" at={open - 4} x={470} y={y(350)} out={appAt} />
+      <FigLabel n="1" title="Two tables, and the key between them" at={tablesAt - 2} x={470} y={y(350)} out={appAt} />
 
       {/* ── The ERD from Unit 5: two tables and their key ── */}
       <Entity
@@ -185,7 +187,7 @@ export const HookScene: React.FC = () => {
       {/* ── The writers, each with the rule to remember ── */}
       {WRITERS.map((w, i) => {
         const forgot = i === FORGETS;
-        const named2 = pulse(frame, i === 0 ? named[0] : -100, 20);
+        const named2 = Math.max(pulse(frame, i === 0 ? named[0] : -100, 20), pulse(frame, eachAt + i * 4, 18));
         return (
           <React.Fragment key={w.name}>
             <Ink at={writerAt(i)} dur={12} style={{ left: WRITER_X, top: rowY(i) - 17, whiteSpace: "nowrap" }}>
