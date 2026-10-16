@@ -8,7 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { POWER, POWER_BY_N } from "./data";
-import { Arrow, Count, DATA, DATA_INK, Greek, Head, Label, lerp, pct, pulse, RAW, STAT, STAT_INK, Svg } from "./parts";
+import { Arrow, Count, DATA, DATA_INK, DATA_WASH, Greek, Head, Label, lerp, pct, pulse, RAW, STAT, STAT_INK, Svg } from "./parts";
 
 /** The 2,000 experiments, fifty to a row. */
 const GRID_X = 160;
@@ -43,6 +43,10 @@ export const PowerScene: React.FC = () => {
   const reallyAt = n.word("coinflip", "really there");
   const fixedAt = n.word("trade", "sample fixed");
   const designedAt = n.word("target", "designed");
+  const countingAt = n.word("sim", "counting");
+  const catchesAt = n.word("more", "catches");
+  const timeAt = n.word("more", "time");
+  const studiesAt = n.word("target", "Studies");
   const lowerAt = n.word("trade", "Lower");
   const missAt = n.word("trade", "miss");
   const pushingAt = n.word("trade", "pushing");
@@ -65,8 +69,10 @@ export const PowerScene: React.FC = () => {
   const schematic = 1 - ease(frame, onlyAt - 6, 14);
   const aDown = ease(frame, lowerAt, 18);
   const bUp = ease(frame, missAt - 2, 18);
-  const aH = h(220) * lerp(0.62, 0.3, aDown);
-  const bH = h(220) * lerp(0.5, 0.86, bUp);
+  const aDown2 = ease(frame, pushingAt + 6, 14);
+  const bUp2 = ease(frame, upAt - 4, 14);
+  const aH = h(220) * (lerp(0.62, 0.3, aDown) - 0.14 * aDown2);
+  const bH = h(220) * (lerp(0.5, 0.82, bUp) + 0.16 * bUp2);
   const SEE_BASE = y(760);
 
   // Power against n.
@@ -76,6 +82,9 @@ export const PowerScene: React.FC = () => {
   const at40 = pulse(frame, sixtyAt - 2, 26);
   const at80 = pulse(frame, ninetyAt - 2, 26);
   const target = ease(frame, designedAt - 4, 20);
+  const shadeTo = lerp(10, 40, ease(frame, catchesAt - 2, 16)) + 40 * ease(frame, eightyAt - 2, 16);
+  const zone = ease(frame, studiesAt - 2, 14);
+  const timeGlow = pulse(frame, timeAt - 2, 24);
 
   return (
     <AbsoluteFill>
@@ -98,6 +107,9 @@ export const PowerScene: React.FC = () => {
           <span style={{ opacity: ease(frame, thirtyAt - 2, 10) }}>, {POWER.n} per group</span>
         </Label>
       </Ink>
+      <Svg opacity={0.35 * ease(frame, countingAt - 2, 12)}>
+        <rect x={GRID_X} y={y(GRID_Y) + 22} width={COLS * CELL_W - 2.5} height={40 * CELL_H - 2.5} fill={RAW} />
+      </Svg>
       <Svg>
         {POWER.flags.slice(0, done).map((hit, i) => {
           const c = i % COLS;
@@ -177,6 +189,30 @@ export const PowerScene: React.FC = () => {
         {[0.25, 0.5, 0.75, 1].map((v) => (
           <line key={v} x1={L.x0} x2={L.x1} y1={py(v)} y2={py(v)} stroke={HAIRLINE} strokeWidth={1} opacity={0.3} />
         ))}
+        {zone > 0 ? <rect x={L.x0} y={py(1)} width={L.x1 - L.x0} height={py(0.8) - py(1)} fill={DATA_WASH} opacity={zone} /> : null}
+        {shadeTo > 10 ? (
+          <path
+            d={(() => {
+              const pts = POWER_BY_N.sizes
+                .map((s, i) => [s, POWER_BY_N.power[i]] as const)
+                .filter(([s]) => s <= shadeTo);
+              const last = pts[pts.length - 1];
+              const next = POWER_BY_N.sizes.findIndex((s) => s > last[0]);
+              // Interpolate to the shaded edge, on the log axis the curve is drawn on.
+              const edge =
+                next > 0 && shadeTo > last[0]
+                  ? (() => {
+                      const s1 = POWER_BY_N.sizes[next];
+                      const f = (Math.log2(shadeTo) - Math.log2(last[0])) / (Math.log2(s1) - Math.log2(last[0]));
+                      return [[shadeTo, lerp(last[1], POWER_BY_N.power[next], f)] as const];
+                    })()
+                  : [];
+              const all = [...pts, ...edge];
+              return `M${px(all[0][0])},${py(0)} ${all.map(([s, p]) => `L${px(s).toFixed(1)},${py(p).toFixed(1)}`).join(" ")} L${px(all[all.length - 1][0])},${py(0)}Z`;
+            })()}
+            fill={DATA_WASH}
+          />
+        ) : null}
         {target > 0 ? (
           <line x1={L.x0} x2={L.x0 + (L.x1 - L.x0) * target} y1={py(0.8)} y2={py(0.8)} stroke={INK} strokeWidth={2.2} strokeDasharray="8 6" />
         ) : null}
@@ -205,14 +241,24 @@ export const PowerScene: React.FC = () => {
         </div>
       ))}
       {[
-        [40, fortyAt],
-        [80, eightyAt],
-      ].map(([s, at]) => {
+        [40, fortyAt, sixtyAt],
+        [80, eightyAt, ninetyAt],
+      ].map(([s, at, shareAt]) => {
         const i = POWER_BY_N.sizes.indexOf(s);
         return (
           <Note key={s} at={at - 2} x={px(s) + 16} y={py(POWER_BY_N.power[i]) + 4}>
-            <span style={{ ...note(24, DATA_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>
-              {s} per group: {pct(POWER_BY_N.power[i], 0)}
+            <span
+              style={{
+                ...note(24, DATA_INK),
+                fontWeight: 700,
+                ...halo,
+                whiteSpace: "nowrap",
+                display: "inline-block",
+                transform: s === 40 ? `scale(${1 + 0.12 * timeGlow})` : undefined,
+                transformOrigin: "0 50%",
+              }}
+            >
+              {s} per group<span style={{ opacity: ease(frame, shareAt - 2, 10) }}>: {pct(POWER_BY_N.power[i], 0)}</span>
             </span>
           </Note>
         );
