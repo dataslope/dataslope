@@ -130,6 +130,11 @@ export const CherryScene: React.FC = () => {
         ) : null}
         <Dashed x0={X0} y0={py(S[0])} x1={X1} y1={py(S[0])} at={startedAt - 6} dur={22} color={INK_SOFT} width={2} />
         <Bracket x0={X0} x1={X1} y={py(HI) - 16} at={tenYearsAt - 4} up={false} tick={12} />
+        <Note at={tenYearsAt} x={(X0 + X1) / 2} y={py(HI) - 52} from="up">
+          <span style={{ ...note(21, INK), fontWeight: 600, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", background: PAPER, padding: "0 10px" }}>
+            ten years
+          </span>
+        </Note>
         <Svg>
           {draw > 0 ? <path d={partial(pts, draw)} fill="none" stroke={DATA} strokeWidth={3} strokeLinejoin="round" /> : null}
           {lit > 0 ? <path d={partial(winPts, lit)} fill="none" stroke={STAT} strokeWidth={6} strokeLinejoin="round" strokeLinecap="round" /> : null}

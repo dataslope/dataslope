@@ -66,9 +66,10 @@ export const DigestScene: React.FC = () => {
       <Sfx name="swish-long" at={sixtyAt + 8} level={-37} />
       <Sfx name="swish" at={lessonFrom - 2} level={-34} />
 
-      <Ink at={digestFrom - 4} dur={14} style={{ left: 96, top: y(112) }}>
+      {/* The race, as its year is said. */}
+      <Ink at={yearAt - 4} dur={14} style={{ left: 96, top: y(112) }}>
         <span style={label(20, INK_SOFT)}>
-          The <Marker at={yearAt - 2}>1936</Marker> presidential race
+          The <Marker at={yearAt + 4}>1936</Marker> presidential race
         </span>
       </Ink>
       <Ink at={digestFrom - 2} dur={20} style={{ left: 92, top: y(150), ...headline(84), whiteSpace: "nowrap" }}>

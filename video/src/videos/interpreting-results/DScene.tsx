@@ -289,7 +289,7 @@ export const DScene: React.FC = () => {
           only a start: <Marker at={stakeAt - 2}>what&apos;s at stake</Marker> decides big
         </span>
       </Note>
-      <Spot id="interpreting-results-caliper" at={bigAt - 4} left={1620} top={y(640)} width={140} height={360} />
+      <Spot id="interpreting-results-caliper" at={bigAt - 4} left={1700} top={y(600)} width={120} height={310} />
       <Ring x={(sx(X, 0) + sx(X, d)) / 2} y={peakY - 52} at={sizeAt - 2} r0={30} r1={90} />
       <Ring x={TABLE_X + 200} y={y(TABLE_Y) + 56 + 3 * ROW + 60} at={haveAt - 2} r0={30} r1={120} />
       <Note at={unlikeAt - 2} x={TABLE_X} y={y(TABLE_Y) + 56 + 3 * ROW + 46}>

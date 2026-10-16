@@ -128,7 +128,7 @@ export const script: NarrationScript = {
     },
     {
       id: "null",
-      text: "Leave the id off? Refused again. No pointer can mean maybe this one, maybe that one.",
+      text: "Leave the ID off? Refused again. No pointer can mean maybe this one, maybe that one.",
     },
 
     {
@@ -139,7 +139,7 @@ export const script: NarrationScript = {
     },
     {
       id: "pair",
-      text: "Neither id is unique, but the pair is: seven in forty-two, only once.",
+      text: "Neither ID is unique, but the pair is: seven in forty-two, only once.",
       pauseAfter: 0.4,
     },
     { id: "stable", text: "And a key should almost never change, because other tables point at it.", pauseAfter: 0.3 },
@@ -190,7 +190,7 @@ export const script: NarrationScript = {
     {
       id: "fk",
       scene: true,
-      text: "An order belongs to a customer, so it stores the customer's key, in customer id. That's a foreign key.",
+      text: "An order belongs to a customer, so it stores the customer's key, in customer ID. That's a foreign key.",
       pauseAfter: 0.3,
     },
     {
@@ -198,7 +198,7 @@ export const script: NarrationScript = {
       text: "The table it points at is the parent. The one holding the pointer is the child.",
       pauseAfter: 0.3,
     },
-    { id: "many", text: "It lives on the many side, and it copies nothing else. Just the id." },
+    { id: "many", text: "It lives on the many side, and it copies nothing else. Just the ID." },
 
     {
       id: "defend",

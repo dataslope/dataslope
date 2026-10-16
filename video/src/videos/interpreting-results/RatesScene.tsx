@@ -115,7 +115,7 @@ export const RatesScene: React.FC = () => {
               key={v}
               x1={sx(RX, v)}
               x2={sx(RX, v)}
-              y1={y(BAR_Y[0]) - 44}
+              y1={y(BAR_Y[0]) - 18}
               y2={y(BAR_Y[1]) + BAR_H + 10}
               stroke={v === 0 ? INK : HAIRLINE}
               strokeWidth={v === 0 ? 1.6 : 1}

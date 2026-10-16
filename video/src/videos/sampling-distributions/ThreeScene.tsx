@@ -37,7 +37,7 @@ import {
   VIDEO,
 } from "./data";
 import { Bracket, money, POP_FILL, Rule, SAMPLE_FILL } from "./parts";
-import { countTo, flash, swell } from "../sampling/emphasis";
+import { flash, swell } from "../sampling/emphasis";
 
 // ── Layout, in the page's layout coordinates (through y() and h()) ──────────
 
@@ -148,6 +148,7 @@ export const ThreeScene: React.FC = () => {
   const eachAt = n.word("data", "one per customer");
   const dollarsAt = n.word("third", "dollars");
   const becomesAt = n.word("block", "becomes");
+  const thatAverageAt = n.word("block", "That average");
   const theseAt = n.word("compare", "these three");
   const rawPopAt = n.word("raw", "population");
   const rawSampleAt = n.word("raw", "sample");
@@ -395,7 +396,14 @@ export const ThreeScene: React.FC = () => {
         gap={2}
         overlay={frame < fastTo + 6 ? { counts: recent, color: ds("red", 800) } : undefined}
       />
-      <Averaging averageAt={averageAt} numberAt={numberAt} blockAt={blockAt} dollarsAt={dollarsAt} becomesAt={becomesAt} />
+      <Averaging
+        averageAt={averageAt}
+        numberAt={numberAt}
+        blockAt={blockAt}
+        dollarsAt={dollarsAt}
+        becomesAt={becomesAt}
+        thatAverageAt={thatAverageAt}
+      />
       {steps.map((st, i) => (
         <StripSample key={i} index={i + 1} step={st} popBase={y(popBase)} />
       ))}
@@ -552,13 +560,14 @@ const SampleBlocks: React.FC<{ pickAt: number; fallAt: number; popBase: number; 
 
 /** "Average those forty": a red copy of each block slides into the average,
  *  which becomes one block and falls into row 3. */
-const Averaging: React.FC<{ averageAt: number; numberAt: number; blockAt: number; dollarsAt: number; becomesAt: number }> = ({
-  averageAt,
-  numberAt,
-  blockAt,
-  dollarsAt,
-  becomesAt,
-}) => {
+const Averaging: React.FC<{
+  averageAt: number;
+  numberAt: number;
+  blockAt: number;
+  dollarsAt: number;
+  becomesAt: number;
+  thatAverageAt: number;
+}> = ({ averageAt, numberAt, blockAt, dollarsAt, becomesAt, thatAverageAt }) => {
   const frame = useCurrentFrame();
   const { y, h } = useLayout();
   const c = ease(frame, averageAt, 18);
@@ -574,7 +583,10 @@ const Averaging: React.FC<{ averageAt: number; numberAt: number; blockAt: number
   const labelIn = ease(frame, numberAt - 2, 10) * (1 - ease(frame, blockAt - 4, 6));
   const becoming = ease(frame, becomesAt - 2, 12);
   // The average counts up to its value as the narration reads it.
-  const shown = countTo(frame, numberAt - 2, Math.max(10, dollarsAt - numberAt + 2), 0, SAMPLE.mean);
+  // Linear, so it is still counting when "forty-seven" is said.
+  const span = Math.max(10, dollarsAt - numberAt + 2);
+  const shown = SAMPLE.mean * Math.max(0, Math.min(1, (frame - numberAt + 2) / span));
+  const named = swell(frame, thatAverageAt - 2, 0.22, 22);
   return (
     <>
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
@@ -619,6 +631,8 @@ const Averaging: React.FC<{ averageAt: number; numberAt: number; blockAt: number
           ...note(26, ACCENT_INK),
           fontWeight: 700,
           ...halo,
+          transformOrigin: "left center",
+          transform: `scale(${named})`,
         }}
       >
         ${fmt(shown)}

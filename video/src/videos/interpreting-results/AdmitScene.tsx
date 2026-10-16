@@ -75,7 +75,7 @@ export const AdmitScene: React.FC = () => {
     { name: "Easy", sub: "department", cells: DEPTS[0], at: { men: easyAt + 2, women: sixtyFiveAt - 4 }, gapAt: bothAt - 2 },
     { name: "Hard", sub: "department", cells: DEPTS[1], at: { men: hardAt + 2, women: againAt - 4 }, gapAt: bothAt + 4 },
   ];
-  const grid = ease(frame, twoAt - 2, 16);
+  const grid = ease(frame, from - 2, 16);
   const mixLit = (g: Group) => ease(frame, g === "women" ? sevenAt - 6 : menMixAt - 6, 10) * (1 - ease(frame, nameAt - 6, 12) * 0.5);
 
   return (

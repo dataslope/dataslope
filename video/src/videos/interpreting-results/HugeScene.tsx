@@ -231,7 +231,7 @@ export const HugeScene: React.FC = () => {
               x={RIGHT - 26}
               y={top}
               width={540}
-              height={lerp(232, 218, move)}
+              height={lerp(232, 256, move)}
               rx={10}
               fill="none"
               stroke={INK}

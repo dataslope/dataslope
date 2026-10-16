@@ -104,19 +104,19 @@ export const SweepScene: React.FC = () => {
         <FigLabel n="3" title={`A true d of ${fmt(SWEEP.trueD, 1)}, at five sample sizes`} at={from - 4} x={160} y={y(258)} />
 
         {/* ── Panel titles ── */}
-        <Ink at={growAt - 6} dur={14} style={{ left: P.x0, top: y(318), whiteSpace: "nowrap" }}>
+        <Ink at={from - 2} dur={14} style={{ left: P.x0, top: y(318), whiteSpace: "nowrap" }}>
           <span style={label(24, STAT_INK)}>
             <Marker at={sampleAt - 4}>p-value</Marker>
           </span>
         </Ink>
-        <Ink at={growAt - 2} dur={14} style={{ left: D.x0, top: y(318), whiteSpace: "nowrap" }}>
+        <Ink at={from + 2} dur={14} style={{ left: D.x0, top: y(318), whiteSpace: "nowrap" }}>
           <span style={label(24, DATA_INK)}>
             <Marker at={worldAt - 4}>Cohen&apos;s d</Marker>
           </span>
         </Ink>
 
         {/* ── Axes ── */}
-        <Svg opacity={ease(frame, growAt - 4, 14)}>
+        <Svg opacity={ease(frame, from - 4, 14)}>
           {PANELS.map((p, k) => (
             <g key={k}>
               <line x1={p.x0} x2={p.x0} y1={top} y2={bottom} stroke={INK} strokeWidth={1.4} />
@@ -142,7 +142,7 @@ export const SweepScene: React.FC = () => {
                 left: nx(p, t),
                 top: bottom + 14,
                 transform: "translateX(-50%)",
-                opacity: ease(frame, growAt, 12),
+                opacity: ease(frame, from, 12),
                 ...note(20, INK_SOFT),
               }}
             >
@@ -164,7 +164,7 @@ export const SweepScene: React.FC = () => {
               position: "absolute",
               right: 1920 - P.x0 + 12,
               top: lerp(top, bottom, e / P_DECADES) - 13,
-              opacity: ease(frame, growAt, 12),
+              opacity: ease(frame, from, 12),
               ...note(20, INK_SOFT),
               whiteSpace: "nowrap",
             }}
@@ -179,7 +179,7 @@ export const SweepScene: React.FC = () => {
               position: "absolute",
               right: 1920 - D.x0 + 12,
               top: dY(v) - 13,
-              opacity: ease(frame, growAt, 12),
+              opacity: ease(frame, from, 12),
               ...note(20, INK_SOFT),
             }}
           >

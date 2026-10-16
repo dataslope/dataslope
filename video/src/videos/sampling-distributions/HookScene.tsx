@@ -60,6 +60,7 @@ export const HookScene: React.FC = () => {
   const { y, h } = useLayout();
   const threeAt = n.word("hook", "three distributions");
   const alikeAt = n.word("hook", "alike");
+  const answeringAt = n.word("hook", "Answering");
   const sideAt = n.word("hook", "side by side");
   const mixingAt = n.word("apart", "mixing");
   const intervalsAt = n.word("apart", "confidence intervals");
@@ -101,7 +102,7 @@ export const HookScene: React.FC = () => {
           that look alike.
         </Ink>
       </div>
-      <FigLabel n="1" title="Three distributions, each drawn on its own axis" at={10} x={150} y={y(figY)} />
+      <FigLabel n="1" title="Three distributions, each drawn on its own axis" at={answeringAt - 4} x={150} y={y(figY)} />
 
       {PANELS.map((p, c) => {
         const at = 8 + c * 8;

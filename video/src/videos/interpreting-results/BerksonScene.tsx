@@ -135,7 +135,7 @@ export const BerksonScene: React.FC = () => {
         {/* Weak interview, strong ability: the corner that remains. */}
         {weak > 0 ? (
           <Svg opacity={weak}>
-            <ellipse cx={px(IN, 82)} cy={py(36)} rx={70} ry={46} fill={HIGHLIGHT} opacity={0.6} />
+            <ellipse cx={px(IN, 82)} cy={py(42)} rx={64} ry={44} fill={HIGHLIGHT} opacity={0.6} />
           </Svg>
         ) : null}
 
@@ -181,7 +181,7 @@ export const BerksonScene: React.FC = () => {
             {BERKSON.admitted.length} of {BERKSON.n} get in
           </span>
         </Note>
-        <Note at={abilityInAt - 4} x={IN.x1 + 20} y={py(36) - 16}>
+        <Note at={abilityInAt - 4} x={IN.x1 + 20} y={py(42) - 16}>
           <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>weak interview,</span>
           <div style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>so strong ability</div>
         </Note>

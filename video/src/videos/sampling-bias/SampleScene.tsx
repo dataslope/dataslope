@@ -244,9 +244,11 @@ export const SampleScene: React.FC = () => {
         <span style={{ ...note(24, INK), fontWeight: 700 }}>{SHOWN.truth}</span>
       </div>
 
-      <Note at={elevenAt - 4} x={sx(X1, THRESHOLD) + 14} y={y(popTop - 76)}>
+      {/* "anyone above seventy-five", then "eleven times as likely". */}
+      <Note at={aboveAt - 2} x={sx(X1, THRESHOLD) + 14} y={y(popTop - 76)}>
         <span style={{ ...label(21, INK), ...halo }}>
-          Above {THRESHOLD}: picked {LIKELIER} times as often
+          Above {THRESHOLD}:{" "}
+          <span style={{ opacity: ease(frame, elevenAt - 4, 12) }}>picked {LIKELIER} times as often</span>
         </span>
       </Note>
 

@@ -6,6 +6,7 @@ import { Sfx } from "../../sound/Sfx";
 import { useMergedPart } from "../sampling/merged";
 import { Axis, Bars, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
+import { ds } from "../../theme/brand";
 import {
   ACCENT,
   ACCENT_INK,
@@ -23,7 +24,7 @@ import {
 import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
 import { ANY_N, ANY_SAMPLES, LOPSIDED, peak, STATS } from "./data";
 import { Bracket, POP_FILL, Rule } from "./parts";
-import { Marker, swell } from "../sampling/emphasis";
+import { flash, Marker, swell } from "../sampling/emphasis";
 
 /** One axis for the population and all three statistics. */
 const X: XScale = { lo: 0, hi: 300, x0: 330, x1: 1490 };
@@ -66,7 +67,8 @@ export const AnyScene: React.FC = () => {
   const meanShapeAt = n.word("next", "mean's shape");
   const surpriseAt = n.word("next", "surprise");
   const tailAt = n.word("next", "lopsided");
-  const meanRow = ease(frame, meanShapeAt - 2, 16);
+  const meanRow = ease(frame, meanShapeAt - 2, 22);
+  const surprise = flash(frame, surpriseAt - 2, 26);
   // Built and pointed at as the narration names each part.
   const sixtyAt = n.word("kinds", "samples of sixty");
   const incomesAt = n.word("kinds", "incomes");
@@ -130,7 +132,23 @@ export const AnyScene: React.FC = () => {
         <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap" }}>Standard error</span>
       </div>
 
-      {/* The mean's row, as the bridge asks about its shape. */}
+      {/* The mean's row, as the bridge asks about its shape: lit, and ringed. */}
+      {meanRow > 0 ? (
+        <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
+          <rect
+            x={ROW_X - 22}
+            y={y(STAT_ROWS[0] - STAT_H - 22)}
+            width={COL_SPREAD + 150 - ROW_X}
+            height={y(STAT_ROWS[0] + 14) - y(STAT_ROWS[0] - STAT_H - 22)}
+            rx={6}
+            fill="none"
+            stroke={ACCENT}
+            strokeWidth={2.2}
+            pathLength={1}
+            strokeDasharray={`${meanRow} 1`}
+          />
+        </svg>
+      ) : null}
       <div
         style={{
           position: "absolute",
@@ -172,7 +190,7 @@ export const AnyScene: React.FC = () => {
         const at = statAt[r];
         const last = r === STATS.length - 1;
         const unit =
-          (STAT_H / peak(s.hist)) * (r === 0 ? swell(frame, surpriseAt - 2, 0.12, 22) : last ? swell(frame, wideAt - 2, 0.14, 22) : 1);
+          (STAT_H / peak(s.hist)) * (r === 0 ? swell(frame, surpriseAt - 2, 0.3, 26) : last ? swell(frame, wideAt - 2, 0.14, 22) : 1);
         const mid = s.center;
         const bracketY = y(base - STAT_H * AT_SD);
         return (
@@ -194,7 +212,7 @@ export const AnyScene: React.FC = () => {
               scale={X}
               base={y(base)}
               unit={h(unit)}
-              color={ACCENT}
+              color={r === 0 && surprise > 0 ? `color-mix(in srgb, ${ds("red", 800)} ${Math.round(surprise * 100)}%, ${ACCENT})` : ACCENT}
               gap={1.5}
               grow={(i) => ease(frame, at - 2 + Math.abs(s.hist.lo + (i + 0.5) * s.hist.bin - mid) * 0.12, 12)}
             />

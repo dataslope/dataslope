@@ -28,7 +28,6 @@ export const QuestionsScene: React.FC = () => {
   const hardAt = n.word("what", "hard");
   const softwareAt = n.word("what", "software");
   const inconsistentlyAt = n.word("what", "inconsistently");
-  const sqlAt = n.word("sql", "SQL");
   const writeAt = n.word("sql", "write");
   const downAt = n.word("sql", "down");
   const isntAt = n.word("sql", "isn't");
@@ -51,7 +50,8 @@ export const QuestionsScene: React.FC = () => {
   const rowY = (i: number) => y(ROW_Y0 + i * ROW_STEP);
   const toSql = (i: number) => writeAt - 2 + i * 4;
   const heads = ease(frame, ROWS[0].at - 10, 12);
-  const sqlHead = ease(frame, sqlAt - 2, 12);
+  // The heading turns with the first answer, not before it.
+  const sqlHead = ease(frame, writeAt - 2, 12);
 
   return (
     <AbsoluteFill>

@@ -184,7 +184,16 @@ export const BiggerScene: React.FC = () => {
         <span style={{ ...note(22, RANDOM_INK), fontWeight: 700, ...halo }}>random {fmt(LARGEST.random.center)}</span>
       </Note>
       <Note at={wrongAt - 2} x={PX.x1 + 56} y={y(ly(LARGEST.convenience.center)) - 16}>
-        <span style={{ ...note(22, EASY_INK), fontWeight: 700, ...halo }}>
+        <span
+          style={{
+            ...note(22, EASY_INK),
+            fontWeight: 700,
+            ...halo,
+            display: "inline-block",
+            transformOrigin: "left center",
+            transform: `scale(${swell(frame, rockAt - 2, 0.18, 22)})`,
+          }}
+        >
           easy way {fmt(LARGEST.convenience.center)}
         </span>
       </Note>
