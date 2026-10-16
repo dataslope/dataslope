@@ -91,7 +91,7 @@ export const ShapesScene: React.FC = () => {
       ))}
       <Sfx name="el-pencil" at={selfAt} level={-33} />
 
-      <Kicker at={from - 10}>Relationship patterns</Kicker>
+      <Kicker at={from - 10}>Four shapes</Kicker>
       <Head lead="Links come in" leadAt={from - 6} turn="a few shapes." turnAt={shapesAt - 4} />
 
       {/* ── With keys, one row can point at another ── */}
