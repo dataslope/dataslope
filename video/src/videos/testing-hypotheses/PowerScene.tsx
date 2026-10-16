@@ -135,7 +135,15 @@ export const PowerScene: React.FC = () => {
         </Label>
       </div>
       <Note at={fortySevenAt - 4} x={GRID_X + 40} y={y(GRID_Y) + 22 + 40 * CELL_H + 64}>
-        <span style={{ ...note(40, DATA_INK), fontWeight: 700 }}>
+        <span
+          style={{
+            ...note(40, DATA_INK),
+            fontWeight: 700,
+            display: "inline-block",
+            transform: `scale(${1 + 0.1 * pulse(frame, reallyAt - 2, 24)})`,
+            transformOrigin: "0 60%",
+          }}
+        >
           <Count at={fortySevenAt - 4} to={POWER.power} dur={20} format={(v) => pct(v, 1)} />
         </span>
         <span style={{ ...body(34, true), color: INK, marginLeft: 18, display: "inline-block", transform: `scale(${1 + 0.06 * flipGlow})` }}>
