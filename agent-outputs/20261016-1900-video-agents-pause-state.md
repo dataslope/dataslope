@@ -90,7 +90,9 @@ which does not survive the container. Copies of every small script in both
 (the render queue `render-slot.sh`, `variants.mjs`, Unit 5's
 `Sampling-motion.mjs` / `Sampling-sync.mjs`, the agents' job scripts) are in
 `agent-outputs/20261016-video-scratch/`; copy them back before resuming in a
-fresh container.
+fresh container. The code files carry an extra `.txt` suffix so the site's
+`tsc` and ESLint (which cover everything outside `video/`) skip them; drop it
+when restoring.
 
 ## Finished after the pause notes
 - Stats Unit 3 `Probability` (7:33): voiced (4 takes, 6,093 chars), check:motion (2.8 s), check:sync (+0.08 s), check:mix (19.9 LU under), check:frames all pass.
