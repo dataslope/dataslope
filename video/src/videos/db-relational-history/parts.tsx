@@ -610,7 +610,7 @@ export const MovingTable: React.FC<{
               top: rowTop,
               width,
               height: rowH,
-              opacity: inP * (1 - lift * 0.35),
+              opacity: inP * (1 - lift * 0.6),
               transform: `translateX(${(1 - inP) * -12 + aside}px)`,
               zIndex: lift > 0.01 ? 2 : 1,
             }}
