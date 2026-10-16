@@ -107,3 +107,17 @@ fresh container.
   - charts/simpsons-paradox-trend.mjs caption: "falls by about 2.7 mmHg per extra hour" is the generating constant; the fitted lines fall 1.4, 1.2, 1.5, 3.4.
   - charts/ecological-fallacy.mjs comment: within-district lines said to show "about flat" but are drawn flat by construction (district r: 0.06, 0.05, −0.04, 0.01, 0.03, 0.33).
   - effect-sizes.mdx, correlation block (seed 5): comment "moderate real relationship" but r = 0.59 is "strong" by the lesson's own table.
+- Stats Unit 9 `StatisticsInPractice` (4:51): voiced (3 takes, 3,826 chars), check:motion (2.5 s), check:sync (+0.06 s), check:mix (19.1 LU under), check:frames all pass. Closes the course (no NextLine).
+  Lesson discrepancies:
+  - ab-testing.mdx, third quiz question: "With 5 million users… 8.00% to 8.02%… 95% CI [0.005pp, 0.035pp]" don't fit: with 2.5M per arm the CI is about [−0.028, +0.068] pp (p ≈ 0.41); the stated CI needs ~25M per arm.
+  - charts/ab-test-peeking.mjs title (alt text): "dips below the 0.05 line several times"; its own caption and a re-run give 2 dips.
+  - exploratory-statistical-analysis.mdx, outliers block prints "These look like genuine big-party bills"; 4 of the 9 flagged are parties of 2 or 3 (the largest, $50.81, a party of 3). Minor.
+- Stats Unit 2 `DescribingData` (7:20): voiced (4 takes, 5,845 chars), check:motion (2.0 s), check:sync (+0.03 s), check:mix (20.4 LU under), check:frames all pass.
+  Lesson discrepancies:
+  - visualizing-distributions, "Why summaries lie": says the three samples share "(about) the same mean and std" and prints "Nearly identical mean and std"; the code prints SDs 14.9, 20.8, 15.0.
+  - charts/histogram-bin-width.mjs: title "The wide binning hides the two peaks", comment "fuse into one lump"; at bins of 4 the counts are [50, 499, 174, 256, 21], two humps still visible.
+  - measures-of-spread, opening: "swings from 5 minutes to an hour"; data tops out at 55 and the page's mermaid says "5 to 55".
+  - measures-of-center, CEO block: comment says the mean "jumped by ~85k"; actual 86.0k (53.7 to 139.7). Minor.
+  - statistical-fallacies, Datasaurus: "standard deviations around 17 and 26" (code prints 26.9); "to two decimal places" but the code's rounding shows 16.76 vs 16.77, −0.06 vs −0.07 (agree within 0.01).
+  - shape-and-outliers, two-group heights: mean "describes nobody", "no actual person is near it"; 83 of 3,000 heights within 1 cm of 175.0.
+  - shape-and-outliers, z-score quiz explanation: extremes inflate the SD "so those very points fall short of it"; in the lesson's own example the z rule flags exactly the two planted extremes (120, 200); it misses 54.6 and 61.7.
