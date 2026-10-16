@@ -90,7 +90,7 @@ export const ChiScene: React.FC = () => {
         <FigLabel n="18" title={`Device and churn for ${fmt(CHI.n, 0)} users`} at={categoriesAt} x={LABEL_X} y={y(290)} />
         <Ink at={sixAt - 4} dur={14} style={{ left: LABEL_X, top: y(290) + 40, whiteSpace: "nowrap" }}>
           <Label size={21} color={INK_SOFT} weight={520}>
-            bars: users counted; ticks: what independence predicts
+            bars: users counted; dashed boxes: what independence predicts
           </Label>
         </Ink>
         {(["stayed", "churned"] as Col[]).map((c) => (
