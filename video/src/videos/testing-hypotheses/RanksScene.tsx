@@ -110,9 +110,9 @@ export const RanksScene: React.FC = () => {
           {ease(frame, farAt - 2, 12) > 0 ? (
             <rect
               x={sx(X, 270)}
-              y={y(ROWS[0]) - h(50)}
+              y={y(ROWS[0]) - h(30)}
               width={(sx(X, 420) - sx(X, 270)) * ease(frame, farAt - 2, 12)}
-              height={y(ROWS[1]) - y(ROWS[0]) + h(100)}
+              height={y(ROWS[1]) - y(ROWS[0]) + h(60)}
               fill={STAT_WASH}
               opacity={0.8}
             />
@@ -146,6 +146,21 @@ export const RanksScene: React.FC = () => {
               />
             ) : null,
           )}
+          {/* Where every ticket was, left behind faintly once it moves to its rank. */}
+          {ALL.map((d, k) => {
+            const t = toRanks(k);
+            if (t <= 0) return null;
+            return (
+              <circle
+                key={`g${k}`}
+                cx={sx(X, d.v)}
+                cy={y(ROWS[d.g]) + h((JIT[d.g][d.i] - 0.5) * 36)}
+                r={isOutlier(d) ? 8 : 6.5}
+                fill={d.g ? DATA : DOT}
+                opacity={0.22 * t}
+              />
+            );
+          })}
           {ALL.map((d, k) => {
             const a = ease(frame, queuesAt - 4 + d.g * 6 + d.i * 0.25, 6);
             if (a <= 0) return null;
@@ -212,7 +227,7 @@ export const RanksScene: React.FC = () => {
             three tickets each that ran for hours
           </Label>
         </Note>
-        <Note at={nothingAt - 4} x={sx(X, 110)} y={y(ROWS[1]) + 46}>
+        <Note at={nothingAt - 4} x={sx(X, 110)} y={y(AXIS) + 46}>
           <span style={{ ...note(26, INK), fontWeight: 650, ...halo, whiteSpace: "nowrap" }}>
             means {fmt(MWU.meanA, 0)} and {fmt(MWU.meanB, 0)}: Welch&apos;s t-test, p = <Mark at={sevenAt - 2}>{fmt(MWU.welchP, 2)}</Mark>
           </span>
@@ -222,7 +237,7 @@ export const RanksScene: React.FC = () => {
             the means
           </Label>
         </Note>
-        <Note at={p033At - 4} x={rankX(MEAN_RANK[1]) + 16} y={y(RANK_Y) - 4}>
+        <Note at={p033At - 4} x={rankX(MEAN_RANK[1]) + 16} y={y(RANK_Y) - 116}>
           <span style={{ ...note(26, DATA_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>
             Mann-Whitney, p = {fmt(MWU.mwuP, 3)}
           </span>

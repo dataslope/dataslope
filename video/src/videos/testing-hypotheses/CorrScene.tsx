@@ -223,10 +223,12 @@ export const CorrScene: React.FC = () => {
           the same points, as ranks
         </Label>
       </Note>
-      <Note at={thoughAt - 2} x={BOX.x1 - 10} y={py(U_FIT.a + U_FIT.b * 4.8, U.ylo, U.yhi) + 10} align="right">
-        <Label size={21} color={STAT_INK} style={halo}>
-          the best straight line: flat
-        </Label>
+      <Note at={thoughAt - 2} x={px(0, U.xlo, U.xhi)} y={py(U_FIT.a, U.ylo, U.yhi) - 40} from="up">
+        <span style={{ display: "inline-block", transform: "translateX(-50%)" }}>
+          <Label size={21} color={STAT_INK} style={halo}>
+            the best straight line: flat
+          </Label>
+        </span>
       </Note>
       <Note at={uAt} x={BOX.x0} y={top - 44}>
         <Label size={21} color={INK_SOFT} weight={520} style={halo}>
