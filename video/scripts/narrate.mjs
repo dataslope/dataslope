@@ -52,6 +52,8 @@ const FADE = 0.008;
 /** The shortest pause a cut is trusted to sit in. Below it, the longest
  *  quiet stretch may be the closure of a "t" inside a word. */
 const MIN_PAUSE = 0.15;
+/** How far outside the words' window to look for a pause they missed, in s. */
+const PAUSE_SLACK = 0.8;
 
 const VIDEO_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const args = process.argv.slice(2);
@@ -238,6 +240,31 @@ function cutPoint(samples, lo, hi, loudest) {
 }
 
 
+/** The quiet run of at least MIN_PAUSE in [from, to] nearest the window
+ *  [lo, hi] (the longer one on a tie), as { at: its middle, quiet: its length },
+ *  or null if there is none. */
+function nearestPause(samples, from, to, lo, hi, loudest) {
+  const frame = Math.round(0.01 * SAMPLE_RATE);
+  const a = Math.max(0, Math.round(from * SAMPLE_RATE));
+  const b = Math.min(samples.length, Math.round(to * SAMPLE_RATE));
+  const runs = [];
+  let run = null;
+  for (let t = a; t + frame <= b; t += frame) {
+    if (rms(samples, t, frame) < 0.03 * loudest) run = run ? { ...run, to: t + frame } : { from: t, to: t + frame };
+    else if (run) (runs.push(run), (run = null));
+  }
+  if (run) runs.push(run);
+  let best = null;
+  for (const r of runs) {
+    const start = r.from / SAMPLE_RATE;
+    const end = r.to / SAMPLE_RATE;
+    if (end - start < MIN_PAUSE) continue;
+    const gap = Math.max(0, lo - end, start - hi);
+    if (!best || gap < best.gap || (gap === best.gap && end - start > best.quiet)) best = { at: (start + end) / 2, quiet: end - start, gap };
+  }
+  return best && { at: best.at, quiet: best.quiet };
+}
+
 function rms(samples, from, n) {
   let e = 0;
   for (let k = 0; k < n; k++) e += samples[from + k] * samples[from + k];
@@ -316,7 +343,22 @@ function cutTake(take) {
   const cuts = spans.slice(1).map((_, i) => {
     const lo = starts[wordEdge(text, ...spans[i], true)];
     const hi = ends[wordEdge(text, ...spans[i + 1], false)];
-    const { at, quiet } = cutPoint(samples, lo, Math.max(hi, lo + 0.1), loudest);
+    let { at, quiet } = cutPoint(samples, lo, Math.max(hi, lo + 0.1), loudest);
+    if (quiet < MIN_PAUSE) {
+      // Deep into a long take the character times can run half a second late
+      // (ThinkingStatistically's did, at 2:30), so the pause sits just outside
+      // the words' window. Take the nearest clear one within PAUSE_SLACK,
+      // never past the two beats' own first and last letters.
+      const near = nearestPause(
+        samples,
+        Math.max(starts[spans[i][0]], lo - PAUSE_SLACK),
+        Math.min(ends[spans[i + 1][1] - 1], hi + PAUSE_SLACK),
+        lo,
+        hi,
+        loudest,
+      );
+      if (near) ({ at, quiet } = near);
+    }
     if (quiet < MIN_PAUSE) {
       console.warn(
         `  ! ${script.beats[i].id} → ${script.beats[i + 1].id}: no clear pause (longest quiet ${quiet.toFixed(2)} s); the cut may clip a word`,
