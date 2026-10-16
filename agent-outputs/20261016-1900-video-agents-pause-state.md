@@ -132,3 +132,4 @@ when restoring.
   - errors-and-power: effect 0 prints power 0.06 where the prose says "near 0.05". Minor.
 - DB Unit 2 `DbDesign-2-Entities` (2:54): FINISHED after resume. check:motion (no stretch of 2 s), check:sync (+0.03 s), check:mix (23.8 LU under), check:frames pass. Lesson discrepancies as listed above.
 - DB Unit 5 `DbDesign-5-RelationshipPatterns` (4:05): FINISHED after resume. check:motion (2.0 s), check:sync (+0.05 s), check:mix (24.2 LU under), check:frames pass.
+- DB Unit 4 `DbDesign-4-Keys` (3:40): FINISHED after resume. check:motion (2.3 s), check:sync (+0.03 s), check:mix (23.3 LU under), check:frames pass.
