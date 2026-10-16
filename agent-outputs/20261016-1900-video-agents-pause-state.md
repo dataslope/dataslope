@@ -91,3 +91,12 @@ which does not survive the container. Copies of every small script in both
 `Sampling-motion.mjs` / `Sampling-sync.mjs`, the agents' job scripts) are in
 `agent-outputs/20261016-video-scratch/`; copy them back before resuming in a
 fresh container.
+
+## Finished after the pause notes
+- Stats Unit 3 `Probability` (7:33): voiced (4 takes, 6,093 chars), check:motion (2.8 s), check:sync (+0.08 s), check:mix (19.9 LU under), check:frames all pass.
+  Lesson discrepancies:
+  - conditional-probability.mdx, after the table block: "Free users churn at more than five times the rate of paid users"; code prints 0.060 vs 0.240, four times.
+  - probability-basics.mdx, odds block prints `'3 to 1 against' -> P(win) = 0.250  (NOT 0.25)` (self-contradicting; the trap is 1/3). Callout "Misconception: odds and probability are the same number" has draft text: "a probability of 0.25... wait, even that's a common slip."
+  - probability-basics.mdx, law of large numbers block (seed 1) prints 0.500, 0.500, 0.496 at 10, 100, 5,000 flips: the checkpoints don't show the convergence the prose describes.
+  - statistical-fallacies.mdx base-rate block uses sensitivity 1.00 (9.1%) while conditional-probability uses 0.99 (9.0%) for the same "99% accurate" test.
+  Tooling: n.word() silently takes the first case-insensitive match ("A hundred" matched "Walk a hundred thousand"); warn when a phrase matches more than once without nth.

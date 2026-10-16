@@ -39,7 +39,8 @@ export const PowerScene: React.FC = () => {
   const repeatAt = n.word("sim", "repeat");
   const fortySevenAt = n.word("coinflip", "Forty-seven");
   const flipAt = n.word("coinflip", "coin flip");
-  const runsRejectAt = n.word("coinflip", "reject");
+  const runsRejectAt = n.word("coinflip", "runs");
+  const findingAt = n.word("coinflip", "Finding");
   const reallyAt = n.word("coinflip", "really there");
   const fixedAt = n.word("trade", "sample fixed");
   const designedAt = n.word("target", "designed");
@@ -62,7 +63,7 @@ export const PowerScene: React.FC = () => {
   const fill = ease(frame, repeatAt - 2, 70);
   const done = Math.round(fill * POWER.runs);
   const caught = POWER.flags.slice(0, done).filter(Boolean).length;
-  const reveal = ease(frame, runsRejectAt - 4, 14);
+  const reveal = ease(frame, runsRejectAt - 2, 8);
   const flipGlow = pulse(frame, flipAt, 26);
 
   // The seesaw: alpha falls, beta rises.
@@ -122,7 +123,7 @@ export const PowerScene: React.FC = () => {
               width={CELL_W - 2.5}
               height={CELL_H - 2.5}
               fill={hit ? DATA : RAW}
-              opacity={hit ? 1 : 0.55 + 0.45 * (1 - reveal)}
+              opacity={hit ? 1 : 1 - 0.8 * reveal}
             />
           );
         })}
@@ -138,7 +139,7 @@ export const PowerScene: React.FC = () => {
           <Count at={fortySevenAt - 4} to={POWER.power} dur={20} format={(v) => pct(v, 1)} />
         </span>
         <span style={{ ...body(34, true), color: INK, marginLeft: 18, display: "inline-block", transform: `scale(${1 + 0.06 * flipGlow})` }}>
-          <span style={{ opacity: ease(frame, reallyAt - 4, 12) }}>
+          <span style={{ opacity: ease(frame, findingAt - 2, 10) }}>
             caught it<span style={{ opacity: ease(frame, flipAt - 4, 12) }}>: a coin flip</span>
           </span>
         </span>

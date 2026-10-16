@@ -83,7 +83,8 @@ export const CorrScene: React.FC = () => {
   const toRank = ease(frame, ranksAt - 4, 24);
   const curveOut = ease(frame, n.beat("ushape").from - 2, 16);
   const uIn = (i: number) => ease(frame, noRelAt - 4 + (i / USHAPE.x.length) * 24, 8);
-  const parabola = ease(frame, dependsAt - 4, 24);
+  // Drawn across the rest of the sentence, so the finished U arrives with its last word.
+  const parabola = ease(frame, dependsAt - 4, Math.max(24, n.beat("ushape").to - dependsAt + 8));
   const scaleIn = ease(frame, minusAt - 4, 16);
   // Where the scale's marker sits: r, then rho, then the U's r.
   const marker = frame < nineAt - 4 ? CURVE.pearson : frame < minusZeroAt - 6 ? lerp(CURVE.pearson, CURVE.spearman, ease(frame, nineAt - 4, 16)) : lerp(CURVE.spearman, USHAPE.r, ease(frame, minusZeroAt - 6, 20));
