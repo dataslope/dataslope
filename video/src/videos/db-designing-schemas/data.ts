@@ -39,19 +39,26 @@ const cells = (r: Ok, fields = r.fields): Cell[][] => r.rows.map((row) => fields
 
 // ── The store's entities (case-study-ecommerce) ─────────────────────────────
 
-export type Column = { name: string; key?: "PK" | "FK" | "PK, FK" };
+export type Column = { name: string; key?: "PK" | "FK" | "UK" | "PK, FK" | "FK, UK" };
+
+/** A UK badge must be a UNIQUE constraint the catalog lists. */
+const checkUnique = (table: string, cols: readonly Column[], unique: readonly string[]) => {
+  for (const c of cols) if (c.key?.includes("UK") && !unique.includes(`${table}.${c.name}`)) throw new Error(`${table}.${c.name} is not UNIQUE`);
+};
 
 /** The columns a box shows, each one checked against the catalog. */
 const entity = (table: string, cols: readonly Column[]) => {
   const have = new Set(ok(`columns_${table}`).rows.map((r) => r.column_name as string));
   for (const c of cols) if (!have.has(c.name)) throw new Error(`${table} has no column ${c.name}`);
+  checkUnique(table, cols, results.uniqueStore);
   return { name: table, columns: cols };
 };
 
 /** The store's six tables. Products leaves out its sku and active flag, and
  *  orders its timestamp: neither is part of the argument. */
 export const STORE = {
-  customers: entity("customers", [{ name: "id", key: "PK" }, { name: "email" }, { name: "full_name" }]),
+  // email and a category's name are UNIQUE in the lesson's DDL, and UK in its ER diagram.
+  customers: entity("customers", [{ name: "id", key: "PK" }, { name: "email", key: "UK" }, { name: "full_name" }]),
   orders: entity("orders", [{ name: "id", key: "PK" }, { name: "customer_id", key: "FK" }, { name: "status" }]),
   orderItems: entity("order_items", [
     { name: "order_id", key: "PK, FK" },
@@ -60,7 +67,7 @@ export const STORE = {
     { name: "unit_price" },
   ]),
   products: entity("products", [{ name: "id", key: "PK" }, { name: "name" }, { name: "current_price" }]),
-  categories: entity("categories", [{ name: "id", key: "PK" }, { name: "name" }]),
+  categories: entity("categories", [{ name: "id", key: "PK" }, { name: "name", key: "UK" }]),
   productCategories: entity("product_categories", [
     { name: "product_id", key: "PK, FK" },
     { name: "category_id", key: "PK, FK" },
@@ -154,7 +161,7 @@ ok("contract");
 if (!before.has("owner_id") || after.has("owner_id")) throw new Error("owner_id should be there before and gone after");
 
 export const ASSIGN = {
-  users: { name: "users", columns: [{ name: "id", key: "PK" }, { name: "email" }] as Column[] },
+  users: { name: "users", columns: [{ name: "id", key: "PK" }, { name: "email", key: "UK" }] as Column[] },
   tasks: {
     name: "tasks",
     columns: [{ name: "id", key: "PK" }, { name: "owner_id", key: "FK" }, { name: "title" }] as Column[],
@@ -170,4 +177,5 @@ export const ASSIGN = {
   },
 };
 for (const c of ASSIGN.tasks.columns) if (!before.has(c.name)) throw new Error(`tasks has no ${c.name}`);
+checkUnique("users", ASSIGN.users.columns, results.uniqueAssignees);
 for (const c of ASSIGN.tasksAfter.columns) if (!after.has(c.name)) throw new Error(`tasks lost ${c.name}`);

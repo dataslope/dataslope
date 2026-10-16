@@ -353,7 +353,7 @@ export const GhostRow: React.FC<{ e: EntityLayout; index: number; name: string; 
         display: "flex",
         alignItems: "center",
         // Where the box sets its names: after the key badge, as erd.tsx sizes it.
-        paddingLeft: ENTITY.pad + (e.columns.some((c) => c.key === "PK, FK") ? 74 : e.columns.some((c) => c.key) ? 32 : 0) + ENTITY.gap - 4,
+        paddingLeft: ENTITY.pad + (e.columns.some((c) => c.key?.includes(",")) ? 74 : e.columns.some((c) => c.key) ? 32 : 0) + ENTITY.gap - 4,
         opacity: p * (1 - o),
         transform: `translateX(${(1 - p) * -12}px)`,
         fontFamily: MONO,

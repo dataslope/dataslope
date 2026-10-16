@@ -86,7 +86,7 @@ export const RandomizeScene: React.FC = () => {
             const p = ease(frame, at - 4, 14);
             const off = ease(frame, coinAt - 6, 14);
             if (p <= 0 || off >= 1) return null;
-            const x0 = LABEL_RIGHT - 150;
+            const x0 = LABEL_RIGHT - 200;
             const x1 = sx(X, r.selected) + 18;
             return (
               <rect

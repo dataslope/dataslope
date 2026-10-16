@@ -73,7 +73,7 @@ export const BadgeScene: React.FC = () => {
     y: y(560),
     width: 340,
     name: "badges",
-    columns: [{ name: "id", key: "PK" }, { name: "employee_id", key: "FK", type: "unique" }],
+    columns: [{ name: "id", key: "PK" }, { name: "employee_id", key: "FK, UK" }],
   });
   const e1 = emp.anchor("right");
   const d1 = dev.anchor("left");

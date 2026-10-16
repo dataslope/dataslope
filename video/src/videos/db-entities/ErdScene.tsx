@@ -160,7 +160,7 @@ export const ErdScene: React.FC = () => {
         {/* The key markers, read. */}
         <Note at={primaryAt - 2} x={CUSTOMERS_X} y={customers.bottom + 22} from="up">
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            PK <span style={{ color: INK_SOFT }}>primary key</span>
+            PK <span style={{ color: INK_SOFT }}>primary key,</span> UK <span style={{ color: INK_SOFT }}>unique</span>
           </span>
         </Note>
         <Note at={foreignAt - 2} x={ORDERS_X} y={orders.bottom + 22} from="up">

@@ -238,7 +238,7 @@ export const PeekScene: React.FC = () => {
       <Note at={noiseAt - 4} x={pts[FIRST][0] + 12} y={py(0.47)}>
         <span style={{ ...note(22, STAT_INK), whiteSpace: "nowrap", ...halo }}>and you ship noise</span>
       </Note>
-      <Note at={nineteenAt - 4} x={pts[last][0] - 18} y={pts[last][1] - 48} align="right">
+      <Note at={nineteenAt - 4} x={pts[last][0] - 16} y={pts[last][1] + 14} align="right">
         <span style={{ ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap", ...halo }}>p = {fmt(PEEKING.final)}</span>
       </Note>
       <Ring x={pts[last][0]} y={pts[last][1]} at={numberAt - 2} color={INK} />

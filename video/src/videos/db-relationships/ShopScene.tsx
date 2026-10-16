@@ -82,7 +82,7 @@ export const ShopScene: React.FC = () => {
     y: y(TOP_Y),
     width: 330,
     name: "customers",
-    columns: [{ name: "id", key: "PK" }, { name: "name" }, { name: "email", type: "unique" }],
+    columns: [{ name: "id", key: "PK" }, { name: "name" }, { name: "email", key: "UK" }],
   });
   const ord = useEntityLayout({
     x: RIGHT_BOX_X,

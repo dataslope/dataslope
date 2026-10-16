@@ -132,14 +132,18 @@ export const PHONES_COL = PACKED.cols.indexOf("phone_numbers");
 
 // ── Part 3. The ER diagram (entity-relationship-diagrams) ───────────────────
 
-type Key = "PK" | "FK" | "PK, FK";
+type Key = "PK" | "FK" | "UK" | "PK, FK" | "FK, UK";
 const erdColumns = F.erd.columns as Record<"customers" | "orders", Column[]>;
 const erdConstraints = F.erd.constraints as Record<"customers" | "orders", Constraint[]>;
 const keyOf = (table: "customers" | "orders", col: string): Key | undefined => {
   const cs = erdConstraints[table];
   const pk = cs.some((c) => c.kind === "p" && c.cols.includes(col));
   const fk = cs.some((c) => c.kind === "f" && c.cols.includes(col));
-  return pk && fk ? "PK, FK" : pk ? "PK" : fk ? "FK" : undefined;
+  // A unique constraint on this column alone (customers_email_key).
+  const uk = cs.some((c) => c.kind === "u" && c.cols.length === 1 && c.cols[0] === col);
+  if (pk) return fk ? "PK, FK" : "PK";
+  if (fk) return uk ? "FK, UK" : "FK";
+  return uk ? "UK" : undefined;
 };
 const erdEntity = (table: "customers" | "orders") =>
   erdColumns[table].map((c) => ({ name: c.column_name, type: c.data_type, key: keyOf(table, c.column_name) }));

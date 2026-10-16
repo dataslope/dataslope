@@ -204,7 +204,7 @@ export const DesignScene: React.FC = () => {
             );
           })}
         </div>
-        <Ink at={movesAt - 2} dur={14} style={{ left: 1010, top: y(870), whiteSpace: "nowrap" }}>
+        <Ink at={movesAt - 2} dur={14} style={{ left: 1010, top: y(838), whiteSpace: "nowrap" }}>
           <span style={{ ...note(22, STAT_INK), fontWeight: 650 }}>and cheer the one that moved</span>
         </Ink>
       </div>

@@ -157,6 +157,15 @@ const run = async (db, sql) => {
   }
 };
 
+/** Every single-column UNIQUE constraint, as "table.column". */
+const uniques = async (db) =>
+  (
+    await db.query(`SELECT tc.table_name, kcu.column_name
+FROM information_schema.table_constraints tc
+JOIN information_schema.key_column_usage kcu ON kcu.constraint_name = tc.constraint_name
+WHERE tc.constraint_type = 'UNIQUE' ORDER BY 1, 2;`)
+  ).rows.map((r) => `${r.table_name}.${r.column_name}`);
+
 /** The columns of a table, as the catalog lists them. */
 const columns = (db, table) =>
   run(
@@ -174,6 +183,7 @@ const R = out.results;
   for (const t of ["customers", "products", "categories", "product_categories", "orders", "order_items"]) {
     R[`columns_${t}`] = await columns(db, t);
   }
+  out.uniqueStore = await uniques(db);
   R.customers = await run(db, "SELECT id, email, full_name FROM customers ORDER BY id;");
   R.products = await run(db, "SELECT id, sku, name, current_price, active FROM products ORDER BY id;");
   R.categories = await run(db, "SELECT id, name FROM categories ORDER BY id;");
@@ -250,6 +260,7 @@ GROUP BY o.id ORDER BY order_id;`,
 {
   const db = await fresh(ASSIGNEES_SETUP);
   R.assigneesBefore = await columns(db, "tasks");
+  out.uniqueAssignees = await uniques(db);
   // Expand: the new table beside the old column; both shapes work.
   R.expand = await run(
     db,

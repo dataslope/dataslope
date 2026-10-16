@@ -44,7 +44,8 @@ import type { NarrationScript } from "../../narration/types";
  *     '555-2222' returns no rows; one number per row, the same search returns
  *     one.
  *   - entity-relationship-diagrams: customers is id integer (primary key),
- *     name text, email text; orders is id integer (primary key), customer_id
+ *     name text, email text (unique, customers_email_key, marked UK as the
+ *     lesson's first diagram marks it); orders is id integer (primary key), customer_id
  *     integer (foreign key to customers.id, NOT NULL), placed_on date, status
  *     text. The line's ends, tried: a customer with no orders goes in (zero),
  *     a second order for Ada goes in (many), an order with no customer is
