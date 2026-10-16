@@ -231,6 +231,7 @@ export const PairScene: React.FC = () => {
             to="zero-or-many"
             at={productsAt + 2}
             label="appears"
+            labelPos={[ip[0] + 16, ip[1] + 8]}
           />
           <Listing
             lines={RENAME_GOOD.lines}
