@@ -21,10 +21,33 @@ export const folderOf = (compositionId) =>
 /** "thinking-statistically" → "ThinkingStatistically", its composition. */
 export const compositionOf = (folder) => folder.split("-").map((w) => w[0].toUpperCase() + w.slice(1)).join("");
 
+/**
+ * Every registered video, read from src/Root.tsx: which composition id renders
+ * the Video.tsx in which folder. A composition's id need not follow its
+ * folder's name (the Statistics course's carry a "Stats-<unit>-" prefix), so
+ * the registry is the authority, not the spelling.
+ */
+export function registry(root = VIDEO_ROOT) {
+  const src = readFileSync(path.join(root, "src", "Root.tsx"), "utf8");
+  const folderOfComponent = new Map(
+    [...src.matchAll(/import \{ (\w+) \} from "\.\/videos\/([a-z0-9-]+)\/Video";/g)].map((m) => [m[1], m[2]]),
+  );
+  const videos = [];
+  for (const m of src.matchAll(/<Composition\s+id="([^"]+)"\s+component=\{(\w+)\}/g)) {
+    const folder = folderOfComponent.get(m[2]);
+    if (folder) videos.push({ id: m[1], folder });
+  }
+  return videos;
+}
+
 /** Either name for a video (the composition, or the folder that narrate and
- *  cues take) as both. */
-export const videoNames = (name) =>
-  /^[a-z0-9-]+$/.test(name) ? { id: compositionOf(name), folder: name } : { id: name, folder: folderOf(name) };
+ *  cues take) as both. Registered videos are looked up; anything else falls
+ *  back to the naming convention. */
+export const videoNames = (name, videos = registry()) => {
+  const hit = videos.find((v) => v.id === name) ?? videos.find((v) => v.folder === name);
+  if (hit) return { id: hit.id, folder: hit.folder };
+  return /^[a-z0-9-]+$/.test(name) ? { id: compositionOf(name), folder: name } : { id: name, folder: folderOf(name) };
+};
 
 let serveUrl;
 /**
