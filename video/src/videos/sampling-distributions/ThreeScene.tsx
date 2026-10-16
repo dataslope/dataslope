@@ -329,7 +329,7 @@ export const ThreeScene: React.FC = () => {
         y1={y(MEANS_BASE - MEANS_H - 14)}
         at={fiftyAt - 4}
         dur={16}
-        color={ACCENT}
+        color={INK}
         width={2}
       />
       <Bracket

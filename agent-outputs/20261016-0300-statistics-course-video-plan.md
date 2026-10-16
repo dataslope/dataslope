@@ -78,10 +78,10 @@ A video per page, narrating about 40% of each page, came to 34 videos and 123 mi
 | # | Video | Min | Covers | Embeds at | Status |
 | --- | --- | --- | --- | --- | --- |
 | 5.1 | Bigger and biased is still biased | 2.5 | sampling-and-bias: why the method is everything, convenience sampling, the punchline, bias vs. variance | sampling-and-bias, "The punchline: a bigger biased sample does not help" | in progress (`SamplingBias`) |
-| 5.2 | Survivorship bias | 1.5 | sampling-and-bias and statistical-fallacies: survivorship bias | both lessons' "Survivorship bias" sections | in progress (`SurvivorshipBias`) |
+| 5.2 | Survivorship bias | 1.5 | sampling-and-bias and statistical-fallacies: survivorship bias | both lessons' "Survivorship bias" sections | done, voiced, 1:37 (`SurvivorshipBias`) |
 | 5.3 | The three distributions to keep apart | 2.5 | sampling-distributions: the three distributions, building one by hand, more samples vs. larger samples, any statistic | sampling-distributions, "The three distributions you must keep separate" | in progress (`SamplingDistributions`) |
-| 5.4 | ★ The central limit theorem | 1.5 | central-limit-theorem | central-limit-theorem, "Watch it happen from a skewed population" | built; needs a voice-over (`CentralLimitTheorem`) |
-| 5.5 | Standard error and the √n law | 2 | standard-error; the √n sections of populations-and-samples and sampling-distributions | standard-error, "Standard deviation vs. standard error" | in progress (`StandardError`) |
+| 5.4 | ★ The central limit theorem | 1.5 | central-limit-theorem | central-limit-theorem, "Watch it happen from a skewed population" | done, voiced, 1:27 (`CentralLimitTheorem`) |
+| 5.5 | Standard error and the √n law | 2 | standard-error; the √n sections of populations-and-samples and sampling-distributions | standard-error, "Standard deviation vs. standard error" | done, voiced, 2:10 (`StandardError`) |
 
 The CLT video already ends on "four times the data, half the spread", so 5.5 starts from there rather than repeating it: SD against SE, estimating SE from one sample and checking it against the simulated spread, what diminishing returns cost, and SE as the ruler every interval and test is built from.
 
