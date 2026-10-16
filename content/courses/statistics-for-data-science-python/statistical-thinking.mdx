@@ -89,7 +89,7 @@ for week in range(5):
         f"(min {times.min():5.1f}, max {times.max():5.1f})"
     )
 
-print("\\nSame system every week. The mean still wanders by several ms.")
+print("\\nSame system every week. The mean still moves from week to week.")
 print("If you reported just one week's mean as THE number, you'd be")
 print("hiding how much it was free to move.")
 `,
@@ -171,8 +171,9 @@ print("...but the generating process was flat the entire time.")
   ]}
 />
 
-If you squint at that chart you will *see* stories: a dip around month
-8, a recovery, a strong finish. Every one of them is noise. Now imagine
+If you squint at that chart you will *see* stories: a crash in month 2,
+a spike in month 10, a late rally that peaks in month 22 and then gives
+way. Every one of them is noise. Now imagine
 that chart in a quarterly review with a confident narrator. The skill
 statistical thinking builds is the reflex to ask, before believing any
 pattern, **"is this bigger than what randomness alone produces?"**
@@ -356,7 +357,10 @@ print(
 
 That histogram is the heart of the course in one picture. The point
 estimate is a single dot; the distribution shows *all the values that
-plausibly could have come out* of the same process. Confidence
+plausibly could have come out* of the same process. Look where this run's
+own sample landed: 196.70 ms, just outside the range that 95% of the
+resampled means fall in. About one sample in twenty does that, and nothing
+in the sample itself warns you. Confidence
 intervals (see *Confidence Intervals*), standard errors, and p-values
 are all just disciplined ways of describing that distribution from a
 single sample you actually have.
@@ -391,7 +395,7 @@ the easiest person to fool."* Statistical thinking is, more than
 anything, a set of habits for not fooling yourself.
 
 The danger is that our brains are pattern-finding machines that run
-*before* skepticism kicks in. We see the dip at month 8 and invent a
+*before* skepticism kicks in. We see the spike in month 10 and invent a
 cause. We notice Group A is ahead and feel certain. Left unchecked,
 this turns noise into narrative every time. A few concrete defenses:
 
