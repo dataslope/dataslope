@@ -199,6 +199,17 @@ export const SampleScene: React.FC = () => {
       {/* The window Fig. 2 enlarges. */}
       <ZoomFan at={fig2At} base={base} />
 
+      <Bars
+        counts={POP_HIST}
+        lo={0}
+        bin={POP_BIN}
+        scale={X1}
+        base={y(base)}
+        unit={h(unit)}
+        color={RAW}
+        grow={(i) => ease(frame, 4 + i * 0.7, 16)}
+      />
+      <Axis scale={X1} base={y(base)} ticks={[0, 25, 50, 75, 100]} at={4} />
       {/* "a satisfaction score out of a hundred": the scale drawn over in the
           accent as it is named, then handed back to the ink. */}
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, averageAt - 16, 16) }}>
@@ -213,17 +224,6 @@ export const SampleScene: React.FC = () => {
           opacity={ease(frame, scoreAt - 2, 4)}
         />
       </svg>
-      <Bars
-        counts={POP_HIST}
-        lo={0}
-        bin={POP_BIN}
-        scale={X1}
-        base={y(base)}
-        unit={h(unit)}
-        color={RAW}
-        grow={(i) => ease(frame, 4 + i * 0.7, 16)}
-      />
-      <Axis scale={X1} base={y(base)} ticks={[0, 25, 50, 75, 100]} at={4} />
 
       {/* The truth. */}
       <TruthLine x={truthX} bottom={y(base)} top={y(popTop - 22)} at={averageAt - 4} />

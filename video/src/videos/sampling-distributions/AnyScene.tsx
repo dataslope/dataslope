@@ -132,7 +132,7 @@ export const AnyScene: React.FC = () => {
           top: y(STAT_ROWS[0] - STAT_H - 22),
           height: y(STAT_ROWS[0] + 14) - y(STAT_ROWS[0] - STAT_H - 22),
           background: HIGHLIGHT,
-          opacity: 0.4 * meanRow,
+          opacity: 0.55 * meanRow,
           transformOrigin: "left center",
           transform: `scaleX(${0.4 + 0.6 * meanRow})`,
         }}
@@ -169,7 +169,14 @@ export const AnyScene: React.FC = () => {
         return (
           <React.Fragment key={s.key}>
             <Ink at={meanFirstAt + 6 + r * 6} dur={14} style={{ left: ROW_X, top: y(base - 44) }}>
-              <span style={{ ...body(32, true), color: INK }}>{s.name}</span>
+              <span
+                style={{
+                  ...body(32, true),
+                  color: r === 0 && meanRow > 0 ? `color-mix(in srgb, ${ACCENT_INK} ${Math.round(meanRow * 100)}%, ${INK})` : INK,
+                }}
+              >
+                {s.name}
+              </span>
             </Ink>
             <Bars
               counts={s.hist.counts}

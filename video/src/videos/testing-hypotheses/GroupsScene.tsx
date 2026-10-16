@@ -51,6 +51,7 @@ export const GroupsScene: React.FC = () => {
   const fAt = n.word("ftest", "F statistic");
   const betweenAt = n.word("ftest", "between");
   const withinAt = n.word("ftest", "within");
+  const groupMeansAt = n.word("ftest", "group means");
   const wareAt = n.word("warehouses", "warehouses'");
   const twelveAt = n.word("warehouses", "twelve");
   const differsAt = n.word("warehouses", "differs");
@@ -174,7 +175,7 @@ export const GroupsScene: React.FC = () => {
         <span style={{ ...body(64, true), color: INK }}>F =</span>
         <span style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
           <span style={{ ...body(32, true), color: STAT_INK, opacity: ease(frame, betweenAt - 4, 12) }}>
-            <Mark at={twelveAt - 18}>spread between the group means</Mark>
+            <Mark at={groupMeansAt}>spread between the group means</Mark>
           </span>
           <span style={{ width: 470, height: 3, background: INK }} />
           <span style={{ ...body(32, true), color: INK, opacity: ease(frame, withinAt - 4, 12) }}>spread within the groups</span>

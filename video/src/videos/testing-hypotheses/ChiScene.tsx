@@ -49,6 +49,8 @@ export const ChiScene: React.FC = () => {
   const expectedAt = n.word("related", "expected");
   const corrFrom = n.beat("corr-in").from;
   const bothNumbersAt = n.word("corr-in", "numbers");
+  const whetherAt = n.word("corr-in", "whether");
+  const mobileAt = n.word("expected", "mobile");
   const togetherAt = n.word("corr-in", "together");
 
   const rowY = (i: number) => y(ROW_Y0 + i * ROW_DY);
@@ -63,7 +65,13 @@ export const ChiScene: React.FC = () => {
   const expIn = (k: number) => ease(frame, noDiffAt - 2 + k * 3, 12);
   const mobileGlow = pulse(frame, eightyAt - 2, 26);
   const total = ease(frame, twelveAt - 8, 20);
-  const dim = 1 - 0.2 * ease(frame, corrFrom - 4, 14) - 0.15 * ease(frame, bothNumbersAt - 4, 14) - 0.2 * ease(frame, togetherAt - 4, 14);
+  const dim =
+    1 -
+    0.15 * ease(frame, corrFrom - 4, 14) -
+    0.12 * ease(frame, bothNumbersAt - 4, 14) -
+    0.12 * ease(frame, whetherAt - 4, 14) -
+    0.15 * ease(frame, togetherAt - 4, 14);
+  const mobileGlowRow = pulse(frame, mobileAt - 2, 26);
   const churnGlow = pulse(frame, churnedAt - 2, 24);
   const expGlow = pulse(frame, expectedAt - 2, 24);
 
@@ -104,7 +112,17 @@ export const ChiScene: React.FC = () => {
         {CHI.rows.map((row, i) => (
           <React.Fragment key={row}>
             <Ink at={deviceAt + i * 4} dur={12} style={{ left: LABEL_X, top: rowY(i) + 14, whiteSpace: "nowrap" }}>
-              <span style={{ ...body(38, true), color: INK }}>{row[0].toUpperCase() + row.slice(1)}</span>
+              <span
+                style={{
+                  ...body(38, true),
+                  color: row === "mobile" && mobileGlowRow > 0.1 ? STAT_INK : INK,
+                  display: "inline-block",
+                  transform: row === "mobile" ? `scale(${1 + 0.08 * mobileGlowRow})` : undefined,
+                  transformOrigin: "0 50%",
+                }}
+              >
+                {row[0].toUpperCase() + row.slice(1)}
+              </span>
             </Ink>
             <div
               style={{
@@ -137,6 +155,10 @@ export const ChiScene: React.FC = () => {
           return (
             <React.Fragment key={`${row}-${col}`}>
               <Svg>
+                {e > 0 ? (
+                  <rect x={x0} y={top - 6} width={exp * PER * e} height={barH + 12} fill="none" stroke={INK_SOFT} strokeWidth={2} strokeDasharray="6 4" opacity={0.8} />
+                ) : null}
+                {e > 0 ? <rect x={x0} y={top - 6} width={exp * PER * e} height={barH + 12} fill={INK_SOFT} opacity={0.12 * e} /> : null}
                 {g > 0 ? <rect x={x0} y={top} width={obs * PER * g} height={barH} fill={DATA} opacity={0.8} /> : null}
                 {g > 0 && showGap > 0 ? (
                   <rect

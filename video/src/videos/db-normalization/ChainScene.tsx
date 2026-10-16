@@ -14,7 +14,6 @@ import {
   HEAD_H,
   Headline,
   Listing,
-  listingHeight,
   MARK_BAD,
   MARK_KEY,
   Mono,
@@ -75,7 +74,6 @@ export const ChainScene: React.FC = () => {
   const center = (j: number) => g.xs[j] + g.widths[j] / 2;
   const bottom = g.bottom(CITY_BAD.rows.length);
   const ada = CITY_BAD.rows.map((r, i) => (r[K.name] === "Ada" ? i : -1)).filter((i) => i >= 0);
-  const listH = listingHeight(CITY_UPDATE.lines.length, LIST_SIZE);
   const tg = tableGeometry({ x: RIGHT, top: y(TWO_Y), cols: CITY_TWO.cols, rows: CITY_TWO.rows, headH: h(HEAD_H), rowH: h(ROW_H) });
   const twoAda = CITY_TWO.rows.map((r, i) => (r[1] === "Ada" ? i : -1)).filter((i) => i >= 0);
   const oxfordOrders = CITY_JOIN.rows.filter((r) => r[2] === NEW_CITY).length;
@@ -195,7 +193,7 @@ export const ChainScene: React.FC = () => {
             {CITY_UPDATE.tag}
           </Reply>
           <Ink at={livesAt - 6} dur={12} style={{ left: RIGHT, top: tg.top - 40, whiteSpace: "nowrap" }}>
-            <span style={label(21, INK_SOFT)}>Where does customer 1 live?</span>
+            <span style={label(21, INK_SOFT)}>Grouped by customer and city</span>
           </Ink>
           <DbTable
             g={tg}
@@ -206,8 +204,6 @@ export const ChainScene: React.FC = () => {
             marks={twoAda.map((row, k) => ({ row, col: 2, at: citiesAt + k * 6, color: MARK_BAD }))}
           />
         </Fade>
-        {/* Below the table, room for the listing's height; it sits beside it. */}
-        <div style={{ display: "none" }}>{listH}</div>
 
         {/* Customers in a table of their own: one row to change. */}
         <Fade at={giveAt}>

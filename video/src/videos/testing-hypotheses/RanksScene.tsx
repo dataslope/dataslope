@@ -8,7 +8,7 @@ import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { jitter, MWU } from "./data";
-import { Bracket, DATA, DATA_INK, DOT, Head, Label, lerp, Mark, pulse, STAT, STAT_INK, Svg } from "./parts";
+import { Bracket, DATA, DATA_INK, DOT, Head, Label, lerp, Mark, pulse, STAT, STAT_INK, STAT_WASH, Svg } from "./parts";
 
 /** Minutes to resolve a ticket. */
 const X: XScale = { lo: 0, hi: 420, x0: 260, x1: 1740 };
@@ -63,6 +63,7 @@ export const RanksScene: React.FC = () => {
   const farAt = n.word("line", "how far out");
   const standsAt = n.word("line", "stands in line");
   const doesntAt = n.word("line", "doesn't");
+  const onlyWhereAt = n.word("line", "only where");
   const everyAt = n.word("next", "Every test");
   const answersAt = n.word("next", "answers");
   const couldAt = n.word("next", "could");
@@ -104,6 +105,30 @@ export const RanksScene: React.FC = () => {
             {t}
           </div>
         ))}
+        <Svg>
+          {/* However far out on the minutes, only the last places on the rank line. */}
+          {ease(frame, farAt - 2, 12) > 0 ? (
+            <rect
+              x={sx(X, 270)}
+              y={y(ROWS[0]) - h(50)}
+              width={(sx(X, 420) - sx(X, 270)) * ease(frame, farAt - 2, 12)}
+              height={y(ROWS[1]) - y(ROWS[0]) + h(100)}
+              fill={STAT_WASH}
+              opacity={0.8}
+            />
+          ) : null}
+          {ease(frame, onlyWhereAt - 2, 12) > 0 ? (
+            <rect
+              x={rankX(Math.min(...OUT_RANKS)) - 12}
+              y={y(RANK_Y) - 36}
+              width={(rankX(Math.max(...OUT_RANKS)) - rankX(Math.min(...OUT_RANKS)) + 24) * ease(frame, onlyWhereAt - 2, 12)}
+              height={72}
+              fill={STAT_WASH}
+              opacity={0.9}
+              rx={8}
+            />
+          ) : null}
+        </Svg>
         <Svg>
           {/* Each queue's mean, dragged right by its three monsters. */}
           {[MWU.meanA, MWU.meanB].map((m, g) =>
