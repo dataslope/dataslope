@@ -91,6 +91,11 @@ test("every registered video resolves from its id and from its folder", () => {
     id: "Stats-1-ThinkingStatistically",
     folder: "thinking-statistically",
   });
+  // So is the name the id was before it was prefixed.
+  assert.deepEqual(videoNames("ThinkingStatistically", [{ id: "Stats-1-ThinkingStatistically", folder: "thinking-statistically" }]), {
+    id: "Stats-1-ThinkingStatistically",
+    folder: "thinking-statistically",
+  });
   assert.deepEqual(videoNames("thinking-statistically", [{ id: "Stats-1-ThinkingStatistically", folder: "thinking-statistically" }]), {
     id: "Stats-1-ThinkingStatistically",
     folder: "thinking-statistically",

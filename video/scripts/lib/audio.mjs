@@ -44,7 +44,12 @@ export function registry(root = VIDEO_ROOT) {
  *  cues take) as both. Registered videos are looked up; anything else falls
  *  back to the naming convention. */
 export const videoNames = (name, videos = registry()) => {
-  const hit = videos.find((v) => v.id === name) ?? videos.find((v) => v.folder === name);
+  const hit =
+    videos.find((v) => v.id === name) ??
+    videos.find((v) => v.folder === name) ??
+    // A name its folder was made from ("SamplingBias" for Stats-5-1-SamplingBias,
+    // the id it had before the Statistics videos were prefixed).
+    videos.find((v) => v.folder === folderOf(name));
   if (hit) return { id: hit.id, folder: hit.folder };
   return /^[a-z0-9-]+$/.test(name) ? { id: compositionOf(name), folder: name } : { id: name, folder: folderOf(name) };
 };

@@ -11,7 +11,6 @@ Every video is 16:9 and drawn in the **editorial** style described below.
 
 | Composition | About |
 | --- | --- |
-| `CentralLimitTheorem` | Lopsided wait times whose averages still pile up into a bell |
 | `ListVsSet` | `999_999 in big_list` against the same lookup in a set |
 | `SqlNullTrap` | Three-valued logic, and `NOT IN` over a subquery that yields a `NULL` |
 | `WhyNormalization` | The three anomalies of one wide table, and the split that fixes them |
@@ -29,6 +28,18 @@ Every video is 16:9 and drawn in the **editorial** style described below.
 | `TfIdf` | Term frequency, inverse document frequency, and the word that scores zero |
 | `JavaEquality` | `==` or `.equals()`, with the stack, the heap and the `Integer` cache |
 | `SimpsonsParadox` | Berkeley's 1973 admissions: women ahead in most departments, behind overall |
+
+Two courses have one video per unit, each in its own Studio folder, with
+ids that sort in course order:
+
+| Folder | Compositions |
+| --- | --- |
+| `Statistics` | `Stats-1-ThinkingStatistically` to `Stats-9-StatisticsInPractice`. Unit 5 is `Stats-5-Sampling`, one video made of its five parts, `Stats-5-1-SamplingBias` to `Stats-5-5-StandardError`, which also render on their own |
+| `Database-Design` | `DbDesign-1-WhyDesign` to `DbDesign-9-RelationalHistory` |
+
+A course video's id is not its folder name (`Stats-2-DescribingData` lives in
+`src/videos/describing-data/`). The check scripts take either; `remotion
+render` and `check:frames` take the id.
 
 Each follows the lesson it is named after (the header of its `script.ts` says
 which), and each renders at 4K: 3840x2160.
@@ -245,8 +256,11 @@ ThinkingStatistically is the worked example.
   `public/brand/` is the same file), drawn inline so each half can move, with
   the blue as a brand token.
 - **The intro is its own scene from frame 0**, ending where the first
-  content scene's cut begins, and the script's `leadIn` is at least
-  `INTRO_SECONDS` (4.4 s) so the first word waits for it. Anything the first
+  content scene's cut begins, and the script sets `leadIn: INTRO_LEAD_IN`
+  (4.6 s, just past the intro's 4.4) so the first word waits for it. Both
+  numbers live in `src/editorial/intro.ts`, so a change to the intro's length
+  is one edit that moves every course video, and `src/editorial/intro.test.ts`
+  fails any course script that types its own lead-in. Anything the first
   scene used to show at fixed frames is re-cued to its first beat
   (`n.beat(id).from`), or it plays under the logo. The first beat is
   `scene: true`, since a cut is cued from it.
