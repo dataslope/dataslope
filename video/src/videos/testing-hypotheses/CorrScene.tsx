@@ -8,7 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CURVE, USHAPE } from "./data";
-import { DATA, DATA_INK, DOT, Greek, Head, Kicker, Label, lerp, pulse, STAT, STAT_INK, Svg } from "./parts";
+import { DATA, DATA_INK, DATA_WASH, DOT, Greek, Head, Kicker, Label, lerp, pulse, STAT, STAT_INK, Svg } from "./parts";
 
 /** The scatter's box, in frame x and page y. */
 const BOX = { x0: 220, x1: 1000, top: 380, bottom: 830 };
@@ -74,6 +74,7 @@ export const CorrScene: React.FC = () => {
   const uAt = n.word("ushape", "U-shape");
   const minusZeroAt = n.word("ushape", "minus point zero three");
   const dependsAt = n.word("ushape", "depends entirely");
+  const onXAt = n.word("ushape", "on x");
 
   const top = y(BOX.top);
   const bottom = y(BOX.bottom);
@@ -84,6 +85,10 @@ export const CorrScene: React.FC = () => {
   const curveOut = ease(frame, n.beat("ushape").from - 2, 16);
   const uIn = (i: number) => ease(frame, noRelAt - 4 + (i / USHAPE.x.length) * 24, 8);
   // Drawn across the rest of the sentence, so the finished U arrives with its last word.
+  const PARABOLA = Array.from({ length: 81 }, (_, k) => {
+    const xv = -5 + (10 * k) / 80;
+    return `${px(xv, U.xlo, U.xhi).toFixed(1)},${py(xv * xv, U.ylo, U.yhi).toFixed(1)}`;
+  }).join(" ");
   const parabola = ease(frame, dependsAt - 4, Math.max(24, n.beat("ushape").to - dependsAt + 8));
   const scaleIn = ease(frame, minusAt - 4, 16);
   // Where the scale's marker sits: r, then rho, then the U's r.
@@ -197,10 +202,19 @@ export const CorrScene: React.FC = () => {
         ) : null}
         {parabola > 0 ? (
           <polyline
-            points={Array.from({ length: 81 }, (_, k) => {
-              const xv = -5 + (10 * k) / 80;
-              return `${px(xv, U.xlo, U.xhi).toFixed(1)},${py(xv * xv, U.ylo, U.yhi).toFixed(1)}`;
-            }).join(" ")}
+            points={PARABOLA}
+            fill="none"
+            stroke={DATA_WASH}
+            strokeWidth={26}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            pathLength={1}
+            strokeDasharray={`${parabola} 1`}
+          />
+        ) : null}
+        {parabola > 0 ? (
+          <polyline
+            points={PARABOLA}
             fill="none"
             stroke={DATA}
             strokeWidth={3.2}
@@ -236,6 +250,9 @@ export const CorrScene: React.FC = () => {
           a U: y is x squared, plus a little noise
         </Label>
       </Note>
+      <Ink at={onXAt - 2} dur={14} style={{ left: px(0, U.xlo, U.xhi), top: py(19, U.ylo, U.yhi), whiteSpace: "nowrap" }}>
+        <span style={{ display: "inline-block", transform: "translateX(-50%)", ...note(40, DATA_INK), fontWeight: 700 }}>y = x²</span>
+      </Ink>
     </AbsoluteFill>
   );
 };
