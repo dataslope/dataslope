@@ -199,18 +199,20 @@ export const SampleScene: React.FC = () => {
       {/* The window Fig. 2 enlarges. */}
       <ZoomFan at={fig2At} base={base} />
 
-      {/* "a satisfaction score out of a hundred": the range, under the axis. */}
-      <div
-        style={{
-          position: "absolute",
-          left: X1.x0 - 12,
-          top: y(base) + 6,
-          width: (X1.x1 - X1.x0 + 24) * ease(frame, scoreAt - 2, Math.max(8, outOfAt - scoreAt)),
-          height: 36,
-          background: HIGHLIGHT,
-          opacity: 0.6 * (1 - ease(frame, averageAt - 4, 14)),
-        }}
-      />
+      {/* "a satisfaction score out of a hundred": the scale drawn over in the
+          accent as it is named, then handed back to the ink. */}
+      <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, averageAt - 16, 16) }}>
+        <line
+          x1={X1.x0}
+          x2={X1.x0 + (X1.x1 - X1.x0) * ease(frame, scoreAt - 2, Math.max(8, outOfAt - scoreAt))}
+          y1={y(base)}
+          y2={y(base)}
+          stroke={EASY}
+          strokeWidth={3.5}
+          strokeLinecap="round"
+          opacity={ease(frame, scoreAt - 2, 4)}
+        />
+      </svg>
       <Bars
         counts={POP_HIST}
         lo={0}

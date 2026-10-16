@@ -67,7 +67,7 @@ export const CurseScene: React.FC = () => {
 
       <div style={{ position: "absolute", inset: 0, opacity: outDim }}>
         <Drift from={twelveAt} to={n.beat("t-in").to + 30} scale={0.02} origin="40% 80%">
-          <FigLabel n="14" title={`${fmt(CURSE.runs, 0)} estimates of one real effect`} at={curseFrom} x={160} y={y(290)} />
+          <FigLabel n="15" title={`${fmt(CURSE.runs, 0)} estimates of one real effect`} at={curseFrom} x={160} y={y(290)} />
           <Ink at={fifteenAt - 4} dur={14} style={{ left: 160, top: y(290) + 40, whiteSpace: "nowrap" }}>
             <Label size={21} color={INK_SOFT} weight={520}>
               true effect {CURSE.effect}, {CURSE.n} per group, the estimate from each run

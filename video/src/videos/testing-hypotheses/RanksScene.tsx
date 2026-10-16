@@ -97,7 +97,7 @@ export const RanksScene: React.FC = () => {
       <Head a="Could the effect be zero?" at={couldAt - 6} />
 
       <div style={{ position: "absolute", inset: 0, opacity: fade }}>
-        <FigLabel n="19" title="Two support queues: minutes to resolve each ticket" at={ranksFrom} x={160} y={y(290)} />
+        <FigLabel n="20" title="Two support queues: minutes to resolve each ticket" at={ranksFrom} x={160} y={y(290)} />
         <Axis scale={X} base={y(AXIS)} ticks={[0, 60, 120, 180, 240, 300, 360, 420]} at={ranksFrom + 2} opacity={1 - 0.6 * ease(frame, ranksAt - 6, 16)} />
         {["Queue A", "Queue B"].map((t, g) => (
           <div key={t} style={{ position: "absolute", left: 120, top: y(ROWS[g]) - 15, opacity: ease(frame, queuesAt - 4 + g * 6, 12), ...label(22, g ? DATA_INK : INK) }}>

@@ -19,11 +19,12 @@ import {
   ZERO_QUANTITY,
 } from "./data";
 import { DbTable, ErrorBox, Head, Mark, MARK_BAD, Strike, tableGeometry } from "./parts";
-import { STORE_BOTTOM, STORE_TOP, STORE_X, STORE_W } from "./StoreErd";
+import { STORE_BOTTOM, STORE_TOP, STORE_X } from "./StoreErd";
 
 /** Where Postgres's answers sit: under the diagram, across its width. */
 const ERROR_Y = 806;
-const ERROR_W = STORE_X[2] + STORE_W - STORE_X[0];
+/** Out to the page margin: the rail ends above this band. */
+const ERROR_W = 1824 - STORE_X[0];
 
 /**
  * The foreground of Part 2's diagram scenes. The diagram itself and the step

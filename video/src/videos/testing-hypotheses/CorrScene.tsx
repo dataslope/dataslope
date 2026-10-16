@@ -151,7 +151,7 @@ export const CorrScene: React.FC = () => {
       ))}
 
       {/* ── Fig. 18: the scatter ── */}
-      <FigLabel n="18" title="Two numbers, one point per row" at={corrFrom} x={160} y={y(300)} />
+      <FigLabel n="19" title="Two numbers, one point per row" at={corrFrom} x={160} y={y(300)} />
       <Svg>
         <line x1={BOX.x0} x2={BOX.x1} y1={bottom} y2={bottom} stroke={INK} strokeWidth={1.6} opacity={ease(frame, corrFrom + 2, 12)} />
         <line x1={BOX.x0} x2={BOX.x0} y1={bottom} y2={top} stroke={INK} strokeWidth={1.6} opacity={ease(frame, corrFrom + 2, 12)} />

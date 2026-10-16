@@ -58,12 +58,11 @@ export const NounsScene: React.FC = () => {
   );
   const orders = layouts[1];
 
-  // The status chip: set down below the boxes on "status", then carried up
-  // into the orders box on "describes", where it lands as the box's first row.
+  // The status chip: set down under orders on "status", then carried up
+  // into the box on "describes", where it lands as the box's first row.
   const chipIn = ease(frame, statusAt - 2, 12);
   const lift = ease(frame, describesAt, 20);
   const landed = describesAt + 18;
-  const chipX = lerp(orders.x, orders.x, lift);
   const chipY = lerp(y(CHIP_Y), orders.rows[0].top, lift);
   const chipOp = chipIn * (1 - ease(frame, landed, 6));
 
@@ -158,7 +157,7 @@ export const NounsScene: React.FC = () => {
           <div
             style={{
               position: "absolute",
-              left: chipX,
+              left: orders.x,
               top: chipY,
               width: BOX_W,
               height: orders.row,

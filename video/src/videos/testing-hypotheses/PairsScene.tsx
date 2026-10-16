@@ -81,7 +81,7 @@ export const PairsScene: React.FC = () => {
       <Head a="Pair" b="what's paired." at={pairsFrom - 6} bAt={ownAt - 6} />
 
       <div style={{ position: "absolute", inset: 0, opacity: outDim }}>
-        <FigLabel n="15" title={`Blood pressure of ${PAIRED.n} patients, before and after`} at={looksAt - 4} x={160} y={y(280)} />
+        <FigLabel n="16" title={`Blood pressure of ${PAIRED.n} patients, before and after`} at={looksAt - 4} x={160} y={y(280)} />
 
         {/* ── Two columns of the same people ── */}
         <Svg opacity={ease(frame, patientsAt - 4, 14)}>
@@ -165,7 +165,7 @@ export const PairsScene: React.FC = () => {
         </Note>
 
         {/* ── Fig. 16: the changes alone ── */}
-        <FigLabel n="16" title="Each patient's own change, before minus after" at={ownAt + 4} x={D.x0} y={y(400)} />
+        <FigLabel n="17" title="Each patient's own change, before minus after" at={ownAt + 4} x={D.x0} y={y(400)} />
         <Axis scale={D} base={y(D_AXIS)} ticks={[0, 5, 10, 15, 20]} at={ownAt + 6} />
         <Note at={ownAt + 10} x={D.x1} y={y(D_AXIS) + 40} align="right">
           <Label size={21} color={INK_SOFT} weight={520}>

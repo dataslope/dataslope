@@ -91,7 +91,7 @@ export const PowerScene: React.FC = () => {
       <Head a="Only more data" b="shrinks both." at={onlyAt - 4} bAt={onlyAt + 10} />
 
       {/* ── Fig. 11: 2,000 experiments with a real effect ── */}
-      <FigLabel n="11" title="2,000 experiments, each one square" at={simFrom} x={GRID_X} y={y(300)} />
+      <FigLabel n="12" title="2,000 experiments, each one square" at={simFrom} x={GRID_X} y={y(300)} />
       <Ink at={halfAt - 4} dur={14} style={{ left: GRID_X, top: y(300) + 40, whiteSpace: "nowrap" }}>
         <Label size={21} color={INK_SOFT} weight={520}>
           a real effect of {POWER.effect} SD
@@ -159,7 +159,7 @@ export const PowerScene: React.FC = () => {
       </div>
 
       {/* ── Fig. 12: power against the sample size ── */}
-      <FigLabel n="12" title={`Power to catch the same ${POWER_BY_N.effect} effect`} at={onlyAt + 2} x={L.x0 - 40} y={y(300)} />
+      <FigLabel n="13" title={`Power to catch the same ${POWER_BY_N.effect} effect`} at={onlyAt + 2} x={L.x0 - 40} y={y(300)} />
       <Axis
         scale={L}
         base={y(P_BASE)}

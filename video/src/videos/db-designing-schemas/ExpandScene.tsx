@@ -182,7 +182,7 @@ export const ExpandScene: React.FC = () => {
         );
       })}
 
-      <Spot id="db-designing-schemas-bridge" at={expandAt - 6} left={1210} top={y(700)} width={540} height={300} />
+      <Spot id="db-designing-schemas-bridge" at={expandAt - 6} left={1240} top={y(650)} width={480} height={280} />
     </AbsoluteFill>
   );
 };

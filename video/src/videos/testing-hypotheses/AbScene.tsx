@@ -64,7 +64,7 @@ export const AbScene: React.FC = () => {
       <Head a="Size it" b="before it starts." at={abFrom - 6} bAt={sizedAt - 2} />
 
       <Drift from={abFrom} to={n.beat("halve").to + 40} scale={0.02} origin="30% 60%">
-        <FigLabel n="13" title="Users needed in each arm, from a 10% baseline" at={abFrom} x={160} y={y(300)} />
+        <FigLabel n="14" title="Users needed in each arm, from a 10% baseline" at={abFrom} x={160} y={y(300)} />
         <Ink at={powerAt - 4} dur={14} style={{ left: 160, top: y(300) + 44, whiteSpace: "nowrap" }}>
           <Label size={22} color={INK_SOFT} weight={520}>
             for 80% power at <Greek>α</Greek> = 0.05

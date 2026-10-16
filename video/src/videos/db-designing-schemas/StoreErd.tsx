@@ -4,7 +4,7 @@ import type { Pt } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, body, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -255,12 +255,12 @@ export const StoreErd: React.FC = () => {
         <RowWash key={k} e={e} rows={e.columns.map((_, i) => i).filter((i) => i > 0)} at={everyFactAt + k * 4} out={everyFactAt + k * 4 + 24} />
       ))}
 
-      {/* ── Step seven: the one fact kept twice ── */}
-      <Note at={todayAt - 2} x={L.products.right + 16} y={rowBox(L.products, 2).mid + 14} out={leaveAt + 40}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the price now</span>
+      {/* ── Step seven: the one fact kept twice, tagged inside its rows (the rail is beside them) ── */}
+      <Note at={todayAt - 2} x={L.products.right - 14} y={rowBox(L.products, 2).mid - 16} align="right" from="right" out={leaveAt + 40}>
+        <span style={{ ...body(24, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>today</span>
       </Note>
-      <Note at={chargedAt - 2} x={SIDE_X + 14} y={rowBox(L.orderItems, 3).mid - 15} out={leaveAt + 40}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the price charged</span>
+      <Note at={chargedAt - 2} x={L.orderItems.right - 14} y={rowBox(L.orderItems, 3).mid - 16} align="right" from="right" out={leaveAt + 40}>
+        <span style={{ ...body(24, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>then</span>
       </Note>
     </AbsoluteFill>
   );
