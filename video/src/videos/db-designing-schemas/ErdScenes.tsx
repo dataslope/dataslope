@@ -134,7 +134,7 @@ export const PriceScene: React.FC = () => {
   const { y, h } = useLayout();
 
   const copyFrom = n.beat("copy").from;
-  const copiesAt = n.word("copy", "copies one fact");
+  const purposeAt = n.word("copy", "on purpose");
   const mugFrom = n.beat("mug").from;
   const tenAt = n.word("mug", "ten dollars");
   const twelveAt = n.word("mug", "twelve");
@@ -170,7 +170,9 @@ export const PriceScene: React.FC = () => {
   const walk = (k: number) => walkAt + k * 7;
   const breaksAt = n.word("review", "breaks");
   const nowAt = n.word("then", "today");
-  const thenAt = n.word("then", "charged");
+  const thenAt = n.word("then", "back then");
+  const productsAt = n.word("then", "Products");
+  const itemsAt = n.word("then", "Order items");
   const tagsOut = mugFrom - 6;
 
   return (
@@ -182,7 +184,7 @@ export const PriceScene: React.FC = () => {
       <Sfx name="el-scratch" at={rewriteAt} level={-30} />
       <Sfx name="el-chime" at={reviewFrom - 14} level={-33} />
 
-      <Head at={copyFrom - 6} second={copiesAt} out={reviewFrom - 6} italic="copied on purpose.">
+      <Head at={copyFrom - 6} second={purposeAt - 4} out={reviewFrom - 6} italic="copied on purpose.">
         One fact,
       </Head>
       <Head at={reviewFrom - 2} second={walkAt} italic="walk real rows through it.">
@@ -213,14 +215,14 @@ export const PriceScene: React.FC = () => {
       />
 
       {/* "Products holds the price today. Order items holds the price charged." */}
-      <Ink at={nowAt - 4} dur={16} out={tagsOut} style={{ left: STORE_X[0], top: y(800), whiteSpace: "nowrap" }}>
+      <Ink at={productsAt - 4} dur={16} out={tagsOut} style={{ left: STORE_X[0], top: y(800), whiteSpace: "nowrap" }}>
         <span style={{ ...body(32), color: INK }}>
-          <Mono>products.current_price</Mono> is the price <Mark at={nowAt + 6}>today</Mark>
+          <Mono>products.current_price</Mono> is the price <Mark at={nowAt - 2}>today</Mark>
         </span>
       </Ink>
-      <Ink at={thenAt - 4} dur={16} out={tagsOut} style={{ left: STORE_X[0], top: y(856), whiteSpace: "nowrap" }}>
+      <Ink at={itemsAt - 4} dur={16} out={tagsOut} style={{ left: STORE_X[0], top: y(856), whiteSpace: "nowrap" }}>
         <span style={{ ...body(32), color: INK }}>
-          <Mono>order_items.unit_price</Mono> is the price charged, <Mark at={thenAt + 10}>back then</Mark>
+          <Mono>order_items.unit_price</Mono> is the price charged, <Mark at={thenAt - 2}>back then</Mark>
         </span>
       </Ink>
       {/* "Walk real rows through the design": each stored row lit across, in turn. */}

@@ -9,7 +9,7 @@ import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { STORE } from "./data";
-import { Chip, GhostRow, KEY, PathArrow, Ping, rowBox, RowWash } from "./parts";
+import { Chip, GhostRow, KEY, PathArrow, rowBox, RowWash } from "./parts";
 
 /** The store's diagram on the page: two rows of three boxes, in layout units. */
 export const STORE_TOP = 320;
@@ -86,6 +86,7 @@ export const StoreErd: React.FC = () => {
   const placesAt = n.word("relate", "places");
   const manyOrdersAt = n.word("relate", "many orders");
   const exactlyAt = n.word("relate", "exactly one");
+  const eachOrderAt = n.word("relate", "each order");
   const bothSidesAt = n.word("pairs", "both sides");
   const pairsAt = n.word("pairs", "pairs");
   const pcAt = n.word("pairs", "product categories");
@@ -182,8 +183,10 @@ export const StoreErd: React.FC = () => {
         labelPos={[L.customers.right + 10, lines.places[0][1] - 38]}
         {...fx(0)}
       />
-      <Ping x={lines.places[3][0] - 18} y={lines.places[3][1]} at={manyOrdersAt} />
-      <Ping x={lines.places[0][0] + 14} y={lines.places[0][1]} at={exactlyAt} />
+      {/* "Many orders", "each order", "exactly one customer": each side lit as it is named. */}
+      <RowWash e={L.orders} rows={all(L.orders)} at={manyOrdersAt - 2} out={manyOrdersAt + 24} />
+      <RowWash e={L.orders} rows={[1]} at={eachOrderAt - 2} out={exactlyAt + 30} color={KEY_WASH} />
+      <RowWash e={L.customers} rows={all(L.customers)} at={exactlyAt - 2} out={exactlyAt + 30} />
 
       {/* Products and categories: many on both sides, until a table of pairs meets them. */}
       <Relation

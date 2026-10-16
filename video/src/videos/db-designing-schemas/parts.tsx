@@ -280,10 +280,17 @@ export const PathArrow: React.FC<{
   }
   const dAttr = drawn.map(([x, yy], i) => `${i ? "L" : "M"}${x.toFixed(1)},${yy.toFixed(1)}`).join(" ");
   const head = 15;
+  // The head only rides the last straight stretch: while the tip is still on
+  // a corner it would sit across the bend, so it waits until the drawn line
+  // is a head and a bit past the last corner's arc.
+  const [pa, pb] = [points[points.length - 2], points[points.length - 1]];
+  const lastLen = Math.hypot(pb[0] - pa[0], pb[1] - pa[1]);
+  const straight = points.length > 2 ? lastLen - Math.min(radius, lastLen / 2) : lastLen;
+  const headFrom = total - straight + head * 1.4;
   return (
     <Svg opacity={(1 - o) * (1 - d)}>
       <path d={dAttr} fill="none" stroke={color} strokeWidth={width} strokeLinecap="round" strokeLinejoin="round" strokeDasharray={dash} />
-      {want > head * 1.4 ? (
+      {want > headFrom ? (
         <path
           d={arrowHead(drawn, head, head * 0.6)}
           fill="none"
