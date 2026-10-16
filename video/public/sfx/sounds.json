@@ -1,0 +1,23 @@
+{
+  "tock-low": 0.3,
+  "tock-mid": 0.3,
+  "tock-high": 0.3,
+  "pip-1": 0.16,
+  "pip-2": 0.16,
+  "pip-3": 0.16,
+  "pip-4": 0.16,
+  "pip-5": 0.16,
+  "pip-6": 0.16,
+  "sprinkle-1": 0.8,
+  "sprinkle-2": 0.8,
+  "sprinkle-3": 0.8,
+  "gather": 0.5,
+  "swish": 0.45,
+  "swish-long": 0.75,
+  "slide": 0.9,
+  "tighten": 1.1,
+  "riffle": 1.4,
+  "fill-roll": 1.21,
+  "chime": 1.8,
+  "chime-low": 1.8
+}

@@ -339,6 +339,59 @@ script text exactly as written.
 Captions are off by default (`EDITORIAL_DEFAULTS`). Switch them on in the
 Studio's props panel, or with `--props='{"captions":true}'`.
 
+## Sound effects (an experiment, in SamplingBias)
+
+Sound effects are small, soft sounds tied to what moves on screen: a block
+knocking into place, dots appearing in a sprinkle, a pen stroke under a word.
+They make a video feel made by hand without competing with the narrator.
+They are off unless a composition turns them on: SamplingBias sets
+`sfx: true` in its `defaultProps`, and `--props='{"sfx":false}'` renders it
+dry.
+
+```tsx
+<Sfx name="tock-mid" at={steps.random.d + DROP - 1} level={-23} />
+```
+
+- **Cue from the animation, not from a word.** Put `<Sfx>` in the scene,
+  next to the animation it belongs to, and use the same frame expression the
+  animation uses. If you cue a landing from the word that starts the fall,
+  the sound plays while the block is still in the air.
+- **`level` is the sound's peak in dBFS.** Every file is normalized to a
+  0 dBFS peak. The narration's speech runs about -25 dBFS RMS, with peaks
+  near -4, so:
+  - knocks peak around -23;
+  - sprinkles and grains around -31;
+  - pen strokes and slides around -34 to -37.
+- **A scene's sounds stop with it.** A sound still playing at a cut ends there
+  abruptly. The bells are 1.8 s long so that they finish inside the hold
+  before a cut.
+- **Many events thin out.** RepeatScene's hundred landing averages play one
+  pip at most every 2.5 frames, and each pip is quieter as they come faster.
+  The fall then reads as a patter that holds a steady level.
+
+**The sounds are synthesized, not recorded or generated.**
+`npm run sfx` (`scripts/sfx.mjs`) builds all 21 from damped sines and
+filtered noise into `public/sfx/`, with `sounds.json` listing each length.
+That makes them free, unlicensed and byte-identical on every run.
+`src/sound/sfx.test.ts` keeps the list and the files in step.
+
+The palette is wooden knocks (`tock-*`, `pip-*`), pen strokes (`swish*`),
+grains (`sprinkle-*`, `riffle`), paper taps (`fill-roll`), sweeps (`gather`,
+`slide`, `tighten`) and two bells (`chime`, `chime-low`). Most of the energy
+sits above 2 kHz or in short transients, out of the way of the voice.
+
+**Measure the mix rather than guess it.** Render the audio twice, with and
+without the effects, and subtract the two to get the effects alone:
+
+```bash
+npx remotion render SamplingBias wet.wav --codec=wav
+npx remotion render SamplingBias dry.wav --codec=wav --props='{"sfx":false}'
+```
+
+SamplingBias's effects layer measures -42.4 LUFS against the narration's
+-24.8, which is 17.6 LU under it, with peaks at -23 dBFS. Wherever both are
+sounding, the speech is a median 20 dB above the effects (in 50 ms windows).
+
 ## Images
 
 Illustrations come from the site's own pipeline

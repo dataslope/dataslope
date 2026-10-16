@@ -6,6 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { body, fmt, halo, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { CLOSE, shapeOf, TRUE_MEAN, type Spread } from "./data";
 import { Arrow, Bracket, between, EASY, EASY_INK, RANDOM_INK, TruthLine } from "./parts";
 
@@ -91,6 +92,15 @@ export const CloseScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* The pile rises, its spread is marked, it tightens, its bias is drawn,
+          and a better method slides it home, where the conclusion rings. */}
+      <Sfx name="slide" at={twoFrom + 4} level={-37} />
+      <Sfx name="swish" at={scatterAt - 4} level={-34} />
+      <Sfx name="tighten" at={squeezeFrom - 2} level={-33} />
+      <Sfx name="swish-long" at={biasAt + 2} level={-35} />
+      <Sfx name="slide" at={betterAt - 4} level={-33} />
+      <Sfx name="chime" at={movesAt - 2} level={-29} />
+
       <Ink at={twoFrom - 4} dur={18} style={{ left: 92, top: y(150), ...headline(84), whiteSpace: "nowrap" }}>
         Two ways to miss.
       </Ink>

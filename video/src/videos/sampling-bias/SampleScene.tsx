@@ -7,6 +7,7 @@ import { useLayout } from "../../editorial/layout";
 import { body, fmt, halo, headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import {
   FIRST_EASY,
   FIRST_RANDOM,
@@ -121,6 +122,18 @@ export const SampleScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: each cued from the frame of the animation it belongs to ── */}
+      <Sfx name="riffle" at={4} level={-38} />
+      <Sfx name="swish" at={whichAt} level={-34} />
+      <Sfx name="slide" at={morphAt} level={-36} />
+      <Sfx name="sprinkle-1" at={steps.random.s} level={-31} />
+      <Sfx name="gather" at={steps.random.c} level={-33} />
+      <Sfx name="tock-mid" at={steps.random.d + DROP - 1} level={-23} />
+      <Sfx name="sprinkle-2" at={steps.easy.s} level={-31} />
+      <Sfx name="gather" at={steps.easy.c} level={-33} />
+      <Sfx name="tock-high" at={steps.easy.d + DROP - 1} level={-23} />
+      <Sfx name="swish" at={tenAt - 4} level={-34} />
+
       {/* ── P1: the question, over the population at full size ── */}
       <Ink at={2} dur={14} out={p1Out} style={{ left: 96, top: y(112) }}>
         <span style={label(20, INK_SOFT)}>A satisfaction survey</span>

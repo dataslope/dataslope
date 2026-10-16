@@ -1,0 +1,28 @@
+import React, { createContext, useContext } from "react";
+import { Html5Audio, Sequence, staticFile, useVideoConfig } from "remotion";
+import SOUNDS from "../../public/sfx/sounds.json" with { type: "json" };
+
+/** A sound in public/sfx/, made by `npm run sfx` (scripts/sfx.mjs). */
+export type SoundName = keyof typeof SOUNDS;
+
+/** Whether this video plays its sound effects: the `sfx` prop of an
+ *  editorial video, provided by EditorialPage. */
+export const SfxContext = createContext(false);
+
+/**
+ * One sound effect, starting at frame `at` and peaking at `level` dBFS in the
+ * mix (every file is normalized to a 0 dBFS peak). The narration's speech
+ * sits around -25 dBFS RMS with peaks near -4, so a level of -24 or below
+ * stays under the voice. Place it in the scene, beside the animation it
+ * belongs to, and cue it from the same frame, so the two cannot drift apart.
+ */
+export const Sfx: React.FC<{ name: SoundName; at: number; level: number }> = ({ name, at, level }) => {
+  const on = useContext(SfxContext);
+  const { fps } = useVideoConfig();
+  if (!on || !Number.isFinite(at) || at < 0) return null;
+  return (
+    <Sequence from={Math.round(at)} durationInFrames={Math.ceil(SOUNDS[name] * fps) + 1} layout="none">
+      <Html5Audio src={staticFile(`sfx/${name}.wav`)} volume={10 ** (level / 20)} />
+    </Sequence>
+  );
+};

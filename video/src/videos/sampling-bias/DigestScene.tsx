@@ -6,6 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { body, fmt, halo, HAIRLINE, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { H, ILLUSTRATIONS, PER_SQUARE, RETURNED_SQUARES, SQUARES, VIDEO } from "./data";
 import { Bracket, DOT, EASY, EASY_INK, RANDOM, RANDOM_INK, RAW, Underline } from "./parts";
 
@@ -50,6 +51,17 @@ export const DigestScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* The ballots riffle out, the replies tap in one square at a time, each
+          forecast and the result land on the scale, and the gap is drawn. */}
+      <Sfx name="riffle" at={tenAt - 4} level={-31} />
+      <Sfx name="swish" at={leanedAt} level={-34} />
+      <Sfx name="fill-roll" at={backFrom + 6} level={-29} />
+      <Sfx name="tock-high" at={fortyAt - 2} level={-24} />
+      <Sfx name="tock-mid" at={fiftyAt - 2} level={-24} />
+      <Sfx name="tock-low" at={sixtyAt - 2} level={-24} />
+      <Sfx name="swish-long" at={sixtyAt + 8} level={-37} />
+      <Sfx name="swish" at={lessonFrom - 2} level={-34} />
+
       <Ink at={digestFrom - 4} dur={14} style={{ left: 96, top: y(112) }}>
         <span style={label(20, INK_SOFT)}>The 1936 presidential race</span>
       </Ink>

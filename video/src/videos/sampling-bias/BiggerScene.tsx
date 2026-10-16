@@ -6,6 +6,7 @@ import { fmt, halo, headline, INK, INK_SOFT, label, note } from "../../editorial
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { LARGEST, mulberry32, POP_SIZE, SIZES, SWEEP, TIGHTENING, TRUE_MEAN, type Spread } from "./data";
 import { EASY, EASY_INK, RANDOM, RANDOM_INK, Underline } from "./parts";
 
@@ -54,6 +55,13 @@ export const BiggerScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* A sprinkle as each sample size's averages pop in, a stroke for each line drawn. */}
+      {SIZES.map((size, i) => (
+        <Sfx key={size} name={i % 2 ? "sprinkle-2" : "sprinkle-3"} at={columnAt(i)} level={-31} />
+      ))}
+      <Sfx name="swish" at={wrongAt} level={-34} />
+      <Sfx name="swish" at={steadyFrom + 4} level={-34} />
+
       <Ink at={askAt - 6} dur={18} style={{ left: 92, top: y(150), ...headline(84), whiteSpace: "nowrap" }}>
         Ask more people.
       </Ink>

@@ -4,6 +4,7 @@ import { Captions } from "../narration/Captions";
 import type { NarratedProps } from "../narration/metadata";
 import { NarrationAudio } from "../narration/NarrationAudio";
 import { NarrationProvider } from "../narration/NarrationContext";
+import { SfxContext } from "../sound/Sfx";
 import { ds } from "../theme/brand";
 import { SERIF } from "./fonts";
 import { LayoutContext, layoutFor } from "./layout";
@@ -15,6 +16,8 @@ import { Paper } from "./ui";
 export type EditorialProps = NarratedProps & {
   /** The face for headlines, decks and captions (typefaces.ts). */
   typeface: TypefaceId;
+  /** Play the scenes' sound effects (src/sound/Sfx.tsx). Off by default. */
+  sfx?: boolean;
 };
 
 /** The house setting: Source Serif 4, and the figures get the whole page. */
@@ -41,42 +44,45 @@ export const EditorialPage: React.FC<EditorialProps & { children: React.ReactNod
   timeline,
   captions,
   typeface,
+  sfx = false,
   children,
 }) => {
   if (!timeline) return <AbsoluteFill style={{ background: PAPER }} />;
   const face = TYPEFACES[typeface];
   return (
     <NarrationProvider timeline={timeline}>
-      <LayoutContext.Provider value={layoutFor(captions)}>
-        <AbsoluteFill style={{ background: PAPER, ...typefaceVars(face) }}>
-          <Paper />
-          <AbsoluteFill style={{ transform: `translateY(${-LIFT}px)` }}>{children}</AbsoluteFill>
-          <NarrationAudio />
-          {captions ? (
-            <Captions
-              variant="landscape"
-              look={{
-                fontFamily: SERIF,
-                fontWeight: face.captionWeight,
-                fontSize: Math.round(36 * face.bodyScale),
-                color: INK,
-                highlight: "var(--ds-blue-ink)",
-                background: `color-mix(in srgb, ${PAPER} 94%, transparent)`,
-                radius: 0,
-                bottom: 52,
-                maxWidth: 1480,
-                box: {
-                  padding: "12px 44px 14px",
-                  borderTop: `2px solid ${INK}`,
-                  borderBottom: `1px solid color-mix(in srgb, ${INK} 45%, transparent)`,
-                  fontVariationSettings: face.bodyAxes,
-                  boxShadow: `0 -18px 30px -24px color-mix(in srgb, ${ds("yellow", 900)} 30%, transparent)`,
-                },
-              }}
-            />
-          ) : null}
-        </AbsoluteFill>
-      </LayoutContext.Provider>
+      <SfxContext.Provider value={sfx}>
+        <LayoutContext.Provider value={layoutFor(captions)}>
+          <AbsoluteFill style={{ background: PAPER, ...typefaceVars(face) }}>
+            <Paper />
+            <AbsoluteFill style={{ transform: `translateY(${-LIFT}px)` }}>{children}</AbsoluteFill>
+            <NarrationAudio />
+            {captions ? (
+              <Captions
+                variant="landscape"
+                look={{
+                  fontFamily: SERIF,
+                  fontWeight: face.captionWeight,
+                  fontSize: Math.round(36 * face.bodyScale),
+                  color: INK,
+                  highlight: "var(--ds-blue-ink)",
+                  background: `color-mix(in srgb, ${PAPER} 94%, transparent)`,
+                  radius: 0,
+                  bottom: 52,
+                  maxWidth: 1480,
+                  box: {
+                    padding: "12px 44px 14px",
+                    borderTop: `2px solid ${INK}`,
+                    borderBottom: `1px solid color-mix(in srgb, ${INK} 45%, transparent)`,
+                    fontVariationSettings: face.bodyAxes,
+                    boxShadow: `0 -18px 30px -24px color-mix(in srgb, ${ds("yellow", 900)} 30%, transparent)`,
+                  },
+                }}
+              />
+            ) : null}
+          </AbsoluteFill>
+        </LayoutContext.Provider>
+      </SfxContext.Provider>
     </NarrationProvider>
   );
 };

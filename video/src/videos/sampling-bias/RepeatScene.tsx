@@ -6,6 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { body, fmt, halo, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx, type SoundName } from "../../sound/Sfx";
 import {
   binsOf,
   EASY_MAX,
@@ -35,6 +36,26 @@ const UNIT = Math.min(16, PILE_H / Math.max(...RANDOM_BINS.counts, ...EASY_BINS.
 const EASY_CENTER = mean(REPEAT_EASY);
 const RANDOM_TOP = BASE - Math.max(...RANDOM_BINS.counts) * UNIT;
 const EASY_TOP = BASE - Math.max(...EASY_BINS.counts) * UNIT;
+const PIPS: readonly SoundName[] = ["pip-1", "pip-2", "pip-3", "pip-4", "pip-5", "pip-6"];
+
+/**
+ * A pip for each pair of averages that lands (both methods at once, one
+ * pile on each side of the stereo field), thinned to one every 2.5 frames
+ * once they come faster than that, so the end of the fall reads as a patter
+ * rather than a buzz. Each halving of the gap takes 4.5 dB off a pip, which
+ * keeps the patter about as loud as the first slow drops.
+ */
+const pipsFor = (hits: readonly number[]) => {
+  const out: { at: number; name: SoundName; level: number }[] = [];
+  let last = -Infinity;
+  hits.forEach((at, i) => {
+    const gap = at - last;
+    if (gap < 2.5) return;
+    out.push({ at, name: PIPS[(i * 5 + Math.floor(i / 3)) % PIPS.length], level: -27 - Math.min(7, Math.max(0, 4.5 * Math.log2(8 / gap))) });
+    last = at;
+  });
+  return out;
+};
 
 /**
  * "Was that just bad luck?" to "It's bias": a hundred samples of 500 by each
@@ -64,12 +85,22 @@ export const RepeatScene: React.FC = () => {
   const span = Math.max(40, eachAt + 8 - start);
   const land = (i: number) => (i === 0 ? -Infinity : start + span * (i / (REPEAT_COUNT - 1)) ** 0.42);
   const k = Array.from({ length: REPEAT_COUNT }, (_, i) => i).filter((i) => frame >= land(i)).length;
+  // A block lands FALL frames after it starts to fall.
+  const pips = pipsFor(Array.from({ length: REPEAT_COUNT - 1 }, (_, i) => land(i + 1) + FALL - 1));
 
   const truthX = sx(X, TRUE_MEAN);
   const easyX = sx(X, EASY_CENTER);
 
   return (
     <AbsoluteFill>
+      <Sfx name="swish" at={hundredAt} level={-34} />
+      {pips.map((p) => (
+        <Sfx key={p.at} name={p.name} at={p.at} level={p.level} />
+      ))}
+      <Sfx name="swish" at={timeAt - 4} level={-34} />
+      <Sfx name="swish-long" at={nameFrom + 6} level={-35} />
+      <Sfx name="chime-low" at={biasAt - 2} level={-30} />
+
       <Ink at={againFrom - 4} dur={18} style={{ left: 92, top: y(150), ...headline(84), whiteSpace: "nowrap" }}>
         Was that just bad luck?
       </Ink>

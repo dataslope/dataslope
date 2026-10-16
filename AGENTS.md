@@ -624,6 +624,11 @@ over from the rest of this file:
   turned 29 degrees under it. `npm run check:frames` fails any arrow that
   turns more than 10 degrees under its head, and `npm test` fails a head
   built anywhere else.
+- **Sound effects are synthesized, never downloaded or generated.** `npm run
+  sfx` builds the palette into `public/sfx/` for free. A composition opts in
+  with `sfx: true`, and each `<Sfx>` sits beside the animation it belongs to,
+  cued from the same frame. They stay well under the voice (see "Sound
+  effects" in `video/README.md`).
 - **Tabbied patterns sparingly.** They are pre-rendered to SVG from each
   video's `patterns.json`, with brand token names as the palette, and only
   ever used as decoration: a band on a title or end card, or one transition.
