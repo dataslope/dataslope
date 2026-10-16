@@ -130,3 +130,4 @@ when restoring.
   - t-tests, latency block (seed 7): loc 212 gives sample mean 200.3, p = 0.954; prose "a bit above 200" undersells it.
   - t-tests, Welch block: "the two p-values differ" but they are 0.7871 and 0.7804.
   - errors-and-power: effect 0 prints power 0.06 where the prose says "near 0.05". Minor.
+- DB Unit 2 `DbDesign-2-Entities` (2:54): FINISHED after resume. check:motion (no stretch of 2 s), check:sync (+0.03 s), check:mix (23.8 LU under), check:frames pass. Lesson discrepancies as listed above.
