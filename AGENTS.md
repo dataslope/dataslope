@@ -601,6 +601,8 @@ over from the rest of this file:
   word is spoken (`useNarration().word(beat, phrase)`). Timing is estimated
   until there is audio, then comes from ElevenLabs alignment in
   `public/narration/<id>/alignment.json`, with no change to the scenes.
+  After voicing, `npm run check:sync -- <video>` renders the soundtrack and
+  confirms every beat's speech starts where its cue says.
 - **Two house narrators.** A script names its voice, `"drew"` or `"hope"`
   (`video/src/narration/voices.ts`), and `npm run narrate -- <video>` records
   the whole script as one take on `eleven_v4_turbo` and cuts it into beats.
@@ -630,8 +632,9 @@ over from the rest of this file:
   prompts in `video/sfx/elevenlabs.json`, which spends credits from the same
   pool as the narration and so only generates what is missing. A composition
   opts in with `sfx: true`, and each `<Sfx>` sits beside the animation it
-  belongs to, cued from the same frame. They stay well under the voice (see
-  "Sound effects" in `video/README.md`).
+  belongs to, cued from the same frame. They stay well under the voice,
+  which `npm run check:mix -- <video>` measures (see "Sound effects" in
+  `video/README.md`).
 - **Tabbied patterns sparingly.** They are pre-rendered to SVG from each
   video's `patterns.json`, with brand token names as the palette, and only
   ever used as decoration: a band on a title or end card, or one transition.
