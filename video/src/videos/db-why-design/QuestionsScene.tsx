@@ -85,7 +85,8 @@ export const QuestionsScene: React.FC = () => {
         <div style={{ position: "absolute", left: X0, top: rowY(0) - 26, width: 1680 * heads, height: 2, background: INK }} />
 
         {ROWS.map((r, i) => {
-          const sw = ease(frame, toSql(i), 12);
+          const gone = ease(frame, toSql(i), 8);
+          const sw = ease(frame, toSql(i) + 6, 12);
           return (
             <React.Fragment key={r.q}>
               <Ink at={r.at - 6} dur={14} style={{ left: X0, top: rowY(i) + 4, whiteSpace: "nowrap" }}>
@@ -96,7 +97,7 @@ export const QuestionsScene: React.FC = () => {
                   <Mark at={designAt - 4 + i * 4}>{r.q}</Mark>
                 </span>
               </Ink>
-              <Ink at={r.key - 2} dur={14} style={{ left: R_X, top: rowY(i) + 2, whiteSpace: "nowrap", opacity: 1 - sw }}>
+              <Ink at={r.key - 2} dur={14} style={{ left: R_X, top: rowY(i) + 2, whiteSpace: "nowrap", opacity: 1 - gone }}>
                 <span style={{ ...label(28, INK), fontWeight: 600 }}>{r.decides}</span>
               </Ink>
               {sw > 0 ? (

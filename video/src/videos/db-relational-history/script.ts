@@ -74,10 +74,12 @@ import type { NarrationScript } from "../../narration/types";
  *     fee; Robert Epstein, its chief programmer, co-founded Sybase (1984),
  *     whose SQL Server Microsoft licensed, shipping SQL Server 1.0 in 1989
  *     (Wikipedia, "Ingres (database)", "Sybase").
- *   - POSTGRES: implementation began in 1986 (PostgreSQL documentation,
- *     "A Brief History of PostgreSQL"; Stonebraker and Rowe, "The Design of
- *     POSTGRES", 1986), built for user-defined types and rules; "post
- *     Ingres"; its language was POSTQUEL.
+ *   - POSTGRES: "the successor to the INGRES relational database system",
+ *     built for "user extendibility for data types", named "POSTGRES (POST
+ *     inGRES)" (Stonebraker and Rowe, "The Design of POSTGRES", ERL memo
+ *     M85/95); implementation began in 1986 (PostgreSQL documentation,
+ *     "A Brief History of PostgreSQL"); its language was POSTQUEL. The same
+ *     memo dates Ingres's implementation to 1975 to 1977.
  *   - "In 1994, Andrew Yu and Jolly Chen added an SQL language interpreter
  *     to POSTGRES", released as Postgres95; "By 1996 ... we chose a new
  *     name, PostgreSQL", with version numbers starting at 6.0 (the same

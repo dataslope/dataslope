@@ -31,7 +31,7 @@ export const OrbiterScene: React.FC = () => {
   // ── Cues ──
   const orbFrom = n.beat("orbiter").from;
   const ruleAt = n.word("orbiter", "rule");
-  const yearAt = n.word("orbiter", "1999");
+  const yearAt = n.word("orbiter", "nineteen");
   const marsAt = n.word("orbiter", "Mars");
   const wroteAt = n.word("orbiter", "wrote");
   const poundAt = n.word("orbiter", "pound-force");

@@ -166,7 +166,7 @@ export const script: NarrationScript = {
     {
       id: "orbiter",
       scene: true,
-      text: "Even a type is a rule. In 1999, NASA lost the Mars Climate Orbiter because one program wrote pound-force seconds and another read newton-seconds.",
+      text: "Even a type is a rule. In nineteen ninety-nine, NASA lost the Mars Climate Orbiter because one program wrote pound-force seconds and another read newton-seconds.",
       pauseAfter: 0.4,
     },
     { id: "factor", text: "The numbers were just numbers. Nothing said which.", pauseAfter: 0.7 },
