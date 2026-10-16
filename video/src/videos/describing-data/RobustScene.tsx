@@ -74,7 +74,7 @@ export const RobustScene: React.FC = () => {
     <AbsoluteFill>
       {/* ── Sound: the incomes, the wild one, the box, the distances ── */}
       <Sfx name="el-sprinkle" at={nineAt - 4} level={-34} />
-      <Sfx name="el-pop" at={tenthAt - 2} level={-29} />
+      <Sfx name="el-pop" at={tenthAt - 2} level={-31} />
       <Sfx name="el-whoosh" at={leapsAt - 4} level={-33} />
       <Sfx name="el-pencil" at={halfAt - 4} level={-33} />
       <Sfx name="el-tap" at={fourteenAt - 4} level={-29} />
@@ -230,8 +230,8 @@ export const RobustScene: React.FC = () => {
               key={c.text}
               style={{
                 position: "absolute",
-                left: 1180,
-                top: y(870) + i * 46,
+                left: 1000,
+                top: y(380) + i * 46,
                 opacity: p,
                 transform: `translateX(${(1 - p) * 20}px)`,
                 whiteSpace: "nowrap",

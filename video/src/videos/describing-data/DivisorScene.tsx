@@ -90,7 +90,7 @@ export const DivisorScene: React.FC = () => {
       {/* ── Sound: the five values, the squares, the two bars, the code ── */}
       <Sfx name="el-sprinkle" at={distancesAt - 6} level={-34} />
       <Sfx name="el-pencil" at={closerAt - 4} level={-34} />
-      <Sfx name="el-whoosh" at={insteadAt - 2} level={-34} />
+      <Sfx name="el-whoosh" at={insteadAt - 2} level={-36} />
       <Sfx name="el-tap" at={byNAt - 2} level={-29} />
       <Sfx name="el-tap" at={byN1At} level={-29} />
       <Sfx name="el-pop" at={pandasAt - 2} level={-30} />

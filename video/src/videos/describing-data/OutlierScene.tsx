@@ -179,8 +179,8 @@ export const OutlierScene: React.FC = () => {
         <Tag x={sx(X, 160)} y={strip + JIT + 26} opacity={ease(frame, twoAt + 2, 12)} color={STAT_INK} size={22} bold>
           z-score: {OUTLIERS.zFlags} flagged
         </Tag>
-        <Tag x={(fenceX + zX) / 2} y={strip + JIT + 26} opacity={ease(frame, ordinaryAt - 2, 12)} color={INK} size={21}>
-          {OUTLIERS.tailFlags} from the ordinary tail
+        <Tag x={(fenceX + zX) / 2} y={strip - JIT - 46} opacity={ease(frame, ordinaryAt - 2, 12)} color={INK} size={20}>
+          {OUTLIERS.tailFlags} from the tail
         </Tag>
       </Drift>
 

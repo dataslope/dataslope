@@ -90,6 +90,8 @@ export const SalaryScene: React.FC = () => {
   const fulcrumV = lerp(SALARIES.ceoMean, SALARIES.mean, back);
   const tilt = 3.2 * ease(frame, heavyAt - 2, 14) * (1 - ease(frame, slidesAt + 6, 24));
   const fx = xOf(fulcrumV);
+  /** The plank's labels step back while it tips, so nothing level sits on a tilted line. */
+  const level = 1 - tilt / 3.2;
   const meanLine = 1 - ease(frame, balanceAt - 4, 10) + ease(frame, slidesAt + 26, 12);
   const medianDim = 1 - 0.75 * (ease(frame, balanceAt - 4, 10) - ease(frame, slidesAt + 20, 12));
 
@@ -186,7 +188,7 @@ export const SalaryScene: React.FC = () => {
             })}
           </g>
         </Svg>
-        {room > 0 ? <AxisBreak x={BREAK_X} y={base} opacity={room} /> : null}
+        {room > 0 ? <AxisBreak x={BREAK_X} y={base} opacity={room * level} /> : null}
 
         {/* Each salary's value, while there is room to print it. */}
         {SALARIES.values.map((v, i) => (
@@ -197,14 +199,14 @@ export const SalaryScene: React.FC = () => {
 
         {/* The new axis' ticks, once it has made room. */}
         {[50, 100, 150].map((v) => (
-          <Tag key={v} x={at(FAR, v)} y={base + 14} opacity={ease(frame, ceoAt + 14, 12)} color={INK_SOFT} size={20}>
+          <Tag key={v} x={at(FAR, v)} y={base + 14} opacity={ease(frame, ceoAt + 14, 12) * level} color={INK_SOFT} size={20}>
             {v}
           </Tag>
         ))}
-        <Tag x={CEO_X} y={base + 14} opacity={ease(frame, millionAt + 4, 12)} color={INK_SOFT} size={20}>
+        <Tag x={CEO_X} y={base + 14} opacity={ease(frame, millionAt + 4, 12) * level} color={INK_SOFT} size={20}>
           1,000
         </Tag>
-        <Tag x={CEO_X} y={base - 70} opacity={ease(frame, millionAt + 2, 12)} color={INK} size={22} bold>
+        <Tag x={CEO_X} y={base - 70} opacity={ease(frame, millionAt + 2, 12) * level} color={INK} size={22} bold>
           The CEO
         </Tag>
 
