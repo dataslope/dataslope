@@ -54,13 +54,14 @@ export const HookScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
   const { y, h } = useLayout();
+  const threeAt = n.word("hook", "three distributions");
   const alikeAt = n.word("hook", "alike");
 
   return (
     <AbsoluteFill>
       {/* One line in two inks: the second half follows the first in the flow. */}
       <div style={{ position: "absolute", left: 116, top: y(112), display: "flex", gap: "0.26em", ...headline(72) }}>
-        <Ink at={2} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
+        <Ink at={threeAt - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Three distributions
         </Ink>
         <Ink

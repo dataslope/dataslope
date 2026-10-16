@@ -17,7 +17,7 @@ import {
   label,
   note,
 } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
 import { ANY_N, ANY_SAMPLES, LOPSIDED, peak, STATS } from "./data";
 import { Bracket, POP_FILL, Rule } from "./parts";
 
@@ -54,6 +54,7 @@ export const AnyScene: React.FC = () => {
   const farAt = n.word("own", "far");
   const nameAt = n.word("name", "name");
   const seAt = n.word("name", "standard error");
+  const nextAt = n.word("next", "shape");
 
   const named = ease(frame, seAt - 2, 14);
 
@@ -77,6 +78,9 @@ export const AnyScene: React.FC = () => {
       <Ink at={seAt - 4} dur={20} style={{ left: 1176, top: y(156), ...headline(64, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
         the standard error.
       </Ink>
+      <NextLine at={nextAt} x={1180} y={y(246)} width={620}>
+        the shape of an average.
+      </NextLine>
 
       <FigLabel
         n="7"

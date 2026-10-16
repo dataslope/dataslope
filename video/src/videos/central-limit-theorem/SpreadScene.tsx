@@ -19,7 +19,7 @@ import {
   note,
   label,
 } from "../../editorial/style";
-import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
+import { FigLabel, Ink, Leader, NextLine, Note } from "../../editorial/ui";
 
 const X: XScale = { lo: 0, hi: 25, x0: 120, x1: 1160 };
 const BIN = 0.5;
@@ -57,6 +57,7 @@ export const SpreadScene: React.FC = () => {
   const ruleFrom = n.beat("rule").from;
   const rootAt = n.word("rule", "square root");
   const fourAt = n.word("rule", "Four times");
+  const nextAt = n.word("next", "standard error");
 
   return (
     <AbsoluteFill>
@@ -246,6 +247,9 @@ export const SpreadScene: React.FC = () => {
       <Ink at={fourAt - 2} dur={16} style={{ left: TABLE_X, top: Y(800), width: 530 }}>
         <span style={{ ...body(30, true), color: ACCENT_INK }}>Four times the data, half the spread.</span>
       </Ink>
+      <NextLine at={nextAt} x={TABLE_X} y={Y(858)} width={530}>
+        the standard error.
+      </NextLine>
     </AbsoluteFill>
   );
 };

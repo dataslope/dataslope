@@ -4,7 +4,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, body, headline, HIGHLIGHT, INK, INK_SOFT, label } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -32,6 +32,7 @@ export const HabitScene: React.FC = () => {
   const askAt = n.word("ask", "ask");
   const missingAt = n.word("ask", "missing");
   const whyAt = n.word("ask", "why");
+  const nextAt = n.word("next", "how far");
   const drawer = pop(frame, start + 4, fps, 16);
   const rowAt = [n.word("habit", "planes"), n.word("habit", "funds"), n.word("habit", "customers")];
 
@@ -93,6 +94,10 @@ export const HabitScene: React.FC = () => {
           and why.
         </Ink>
       </div>
+
+      <NextLine at={nextAt} x={120} y={y(850)} width={1000}>
+        how far a fair sample can miss.
+      </NextLine>
 
       {ILLUSTRATIONS ? (
         <Illustration

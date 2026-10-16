@@ -116,6 +116,14 @@ export const script: NarrationScript = {
       text: "The planes that made it home. The funds still open. The customers who stayed.",
       pauseAfter: 0.35,
     },
-    { id: "ask", text: "When your data is whoever's still here... ask what's missing from it, and why." },
+    {
+      id: "ask",
+      text: "When your data is whoever's still here... ask what's missing from it, and why.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "next",
+      text: "Even a fair sample, drawn from everyone, won't hit the truth exactly. So how far off can it be?",
+    },
   ],
 };

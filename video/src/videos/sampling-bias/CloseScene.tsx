@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
 import { body, fmt, halo, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { CLOSE, shapeOf, TRUE_MEAN, type Spread } from "./data";
 import { Arrow, Bracket, between, EASY, EASY_INK, RANDOM_INK, TruthLine } from "./parts";
@@ -59,6 +59,7 @@ export const CloseScene: React.FC = () => {
   const methodFrom = n.beat("method").from;
   const betterAt = n.word("method", "better");
   const movesAt = n.word("method", "moves");
+  const nextAt = n.word("next", "only kept");
 
   const squeeze = ease(frame, squeezeFrom - 2, 30);
   const move = ease(frame, betterAt - 4, 30);
@@ -106,6 +107,9 @@ export const CloseScene: React.FC = () => {
       <Ink at={movesAt - 2} dur={18} style={{ left: 1000, top: y(216), ...body(36, true), color: RANDOM_INK, whiteSpace: "nowrap" }}>
         Only a better method moves the center.
       </Ink>
+      <NextLine at={nextAt} x={1000} y={y(278)} width={720}>
+        the data that survived.
+      </NextLine>
 
       <FigLabel n="6" title="Where 400 sample averages land" at={twoFrom} x={160} y={y(330)} />
       <Axis scale={X} base={y(BASE)} ticks={[66, 68, 70, 72, 74, 76, 78, 80, 82, 84]} at={twoFrom} />

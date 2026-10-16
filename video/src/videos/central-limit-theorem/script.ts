@@ -88,6 +88,11 @@ export const script: NarrationScript = {
     {
       id: "rule",
       text: "The spread is the population's spread over the square root of n. Four times the data halves it.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "next",
+      text: "That spread is the standard error. And it's not the standard deviation.",
     },
   ],
 };

@@ -139,6 +139,10 @@ export const script: NarrationScript = {
       text: "Bias is where the scatter is centered, and more data leaves it right where it was.",
       pauseAfter: 0.45,
     },
-    { id: "method", text: "Only a better method moves the center." },
+    { id: "method", text: "Only a better method moves the center.", pauseAfter: 0.7 },
+    {
+      id: "next",
+      text: "And some data is biased before you ever sample it... because it only kept what survived.",
+    },
   ],
 };

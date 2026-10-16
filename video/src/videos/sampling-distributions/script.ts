@@ -51,7 +51,7 @@ export const script: NarrationScript = {
   beats: [
     {
       id: "hook",
-      text: "Here are three distributions, each drawn on its own axis. They look alike.",
+      text: "How far can a fair sample miss? Answering that takes three distributions... and side by side, they look alike.",
       pauseAfter: 0.35,
     },
     {
@@ -155,6 +155,11 @@ export const script: NarrationScript = {
     {
       id: "name",
       text: "And that width, how far a statistic moves from one sample to the next, has a name... the standard error.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "next",
+      text: "And the mean's shape? It holds a surprise... even when the data is lopsided.",
     },
   ],
 };

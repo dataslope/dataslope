@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, Img, staticFile, useCurrentFrame } from "remotion";
 import { ease } from "../components/motion";
 import { ds } from "../theme/brand";
-import { ACCENT_INK, INK, PAPER, label } from "./style";
+import { ACCENT_INK, body, HAIRLINE, INK, PAPER, label } from "./style";
 
 export const W = 1920;
 export const H = 1080;
@@ -228,3 +228,30 @@ export const FigLabel: React.FC<{
     <span style={{ ...label(FIG_SIZE, INK), fontWeight: 560 }}>{title}</span>
   </Ink>
 );
+
+/**
+ * The last words on screen of a video in a series: a hairline, then what the
+ * next video takes up, cued to the narration's bridge into it. It sits in the
+ * closing scene, wherever that scene has room, rather than on a card of its
+ * own: the series has no end cards. `y` is a page position, already through
+ * `useLayout().y()`.
+ */
+export const NextLine: React.FC<{
+  at: number;
+  x: number;
+  y: number;
+  width: number;
+  children: React.ReactNode;
+}> = ({ at, x, y, width, children }) => {
+  const frame = useCurrentFrame();
+  return (
+    <>
+      <div
+        style={{ position: "absolute", left: x, top: y, width, height: 1, background: HAIRLINE, opacity: ease(frame, at - 4, 12) }}
+      />
+      <Ink at={at} dur={18} style={{ left: x, top: y + 20, ...body(34, true), color: INK, whiteSpace: "nowrap" }}>
+        Next: {children}
+      </Ink>
+    </>
+  );
+};

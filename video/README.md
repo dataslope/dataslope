@@ -234,6 +234,13 @@ npm run narrate -- c-pointers --recut     # cut the kept take again, no API call
 npm run cues -- c-pointers                # the timing it produced
 ```
 
+**Voicing is billed per character, so an edit re-voices only what changed.**
+A plain run sends just the new or edited beats, each on its own. That is
+the default after an edit, and it costs only those beats' characters.
+`--force` sends the whole script again, about 1,300 to 2,300 characters for a
+two-minute video, so ask before using it. "The edited beat sounds a little
+apart from the take" is not a reason on its own.
+
 `scripts/narrate.mjs` voices a script with ElevenLabs
 `POST /v1/text-to-speech/{voice_id}/with-timestamps`, on the
 `eleven_v4_turbo` model. The script refuses any response whose alignment
