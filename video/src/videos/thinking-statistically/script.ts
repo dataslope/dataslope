@@ -53,6 +53,8 @@ import type { NarrationScript } from "../../narration/types";
  *     decides which tests are valid"). The population as "every checkout a
  *     design will ever see" is populations-and-samples' "all checkout sessions
  *     this flow could ever produce".
+ *   - There are no historical or real-world claims to source: every example
+ *     is one of the lessons' own, and every number is one of their outputs.
  *
  * Written for the ear: short spoken sentences, no symbols or parentheses,
  * numbers as words, contractions, questions the next sentence answers, an
