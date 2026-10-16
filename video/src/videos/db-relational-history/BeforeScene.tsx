@@ -158,7 +158,6 @@ export const BeforeScene: React.FC = () => {
   const first = CUSTOMERS[0];
   const last = CUSTOMERS[2];
   const firstOrders = ORDERS_OF(first.id).map((o) => String(o.id));
-  const lastOrders = ORDERS_OF(last.id).map((o) => String(o.id));
   const steps = STEPS(first.name, firstOrders[0], firstOrders[1]);
   const stepAt = [topAt - 4, followsAt, pointersAt, downAt];
 
@@ -233,7 +232,7 @@ export const BeforeScene: React.FC = () => {
       ))}
       <Ink at={everyAt} dur={12} style={{ left: 126, top: y(392 + 4 * 56), whiteSpace: "nowrap" }}>
         <span style={{ ...note(21, ACCENT_INK), fontWeight: 650 }}>
-          child 1 is now {last.name}: orders {lastOrders.join(" and ")}
+          child 1 is now {last.name}
         </span>
       </Ink>
 

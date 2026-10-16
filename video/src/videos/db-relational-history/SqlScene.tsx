@@ -8,8 +8,8 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Card, Headline, KEY_INK, Mark, Spot, Svg, Tick } from "./parts";
 
-const LANE_X0 = 470;
-const LANE_X1 = 1240;
+const LANE_X0 = 520;
+const LANE_X1 = 1280;
 /** The letters SEQUEL takes from the words, as [word, letters taken]. */
 const TAKEN: readonly [string, number][] = [
   ["Structured", 1],

@@ -22,6 +22,7 @@ import { Sfx } from "../../sound/Sfx";
 import { AGE_DOTS, AGES } from "./data";
 import { Rule, Span } from "./parts";
 import { PartName } from "../sampling/PartName";
+import { Marker } from "../sampling/emphasis";
 
 /** One-year bins, so each column of dots is one year of age. */
 const X: XScale = { lo: 10, hi: 80, x0: 160, x1: 1760 };
@@ -51,6 +52,8 @@ export const AgesScene: React.FC = () => {
   // ── Cues ──
   const deviationAt = n.word("hook", "deviation");
   const errorAt = n.word("hook", "error");
+  // "get mixed up": the word the two names share is marked in both.
+  const mixedAt = n.word("hook", "mixed up");
   const spreadAt = n.word("hook", "spread");
   const takeAt = n.word("sd", "Take");
   const dataAt = n.word("sd", "spread of the data");
@@ -89,7 +92,7 @@ export const AgesScene: React.FC = () => {
           follow each other in any face. */}
       <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", alignItems: "baseline", gap: "0.3em", ...headline(64), whiteSpace: "nowrap" }}>
         <Ink at={deviationAt - 6} dur={18} style={{ position: "relative" }}>
-          Standard deviation
+          <Marker at={mixedAt - 2} out={spreadAt - 6}>Standard</Marker> deviation
         </Ink>
         <span style={{ display: "flex", alignItems: "baseline", gap: "0.25em", ...body(36, true), color: BLUE_INK }}>
           <Ink at={spreadAt - 2} dur={14} style={{ position: "relative" }}>
@@ -102,7 +105,7 @@ export const AgesScene: React.FC = () => {
       </div>
       <div style={{ position: "absolute", left: 92, top: y(236), display: "flex", alignItems: "baseline", gap: "0.3em", ...headline(64, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
         <Ink at={errorAt - 6} dur={18} style={{ position: "relative" }}>
-          Standard error
+          <Marker at={mixedAt + 4} out={spreadAt - 4}>Standard</Marker> error
         </Ink>
         <span style={{ display: "flex", alignItems: "baseline", gap: "0.25em", ...body(36, true), color: ACCENT_INK }}>
           <Ink at={spreadAt + 4} dur={14} style={{ position: "relative" }}>

@@ -199,8 +199,8 @@ export const RowsScene: React.FC = () => {
         </Ink>
 
         {/* ── Zoom in: the rows under the line ── */}
-        <Leader points={[[cust.x + cust.width / 2, cust.bottom + 14], [cg.x + cg.width / 2, y(CAPTION_Y) - 10]]} at={zoomAt} dot={false} dash="5 6" color={INK_SOFT} />
-        <Leader points={[[ord.x + ord.width / 2, ord.bottom + 14], [og.x + og.width / 2, y(CAPTION_Y) - 10]]} at={zoomAt + 4} dot={false} dash="5 6" color={INK_SOFT} />
+        <Leader points={[[cust.x + cust.width / 2, cust.bottom + 14], [cg.x + cg.width / 2, y(CAPTION_Y) - 10]]} at={zoomAt} dur={18} dot={false} color={INK_SOFT} width={1.4} />
+        <Leader points={[[ord.x + ord.width / 2, ord.bottom + 14], [og.x + og.width / 2, y(CAPTION_Y) - 10]]} at={zoomAt + 4} dur={18} dot={false} color={INK_SOFT} width={1.4} />
         <AbsoluteFill style={{ opacity: rowsOp }}>
           <Ink at={rowsAt - 2} dur={14} style={{ left: cg.x, top: y(CAPTION_Y) }}>
             <span style={label(24, INK)}>

@@ -98,9 +98,14 @@ export const RulerScene: React.FC = () => {
       <Sfx name="el-pencil" at={testAt - 2} level={-35} />
       <Sfx name="el-tap" at={testingAt - 2} level={-29} />
 
-      <Ink at={rulerFrom - 6} dur={20} style={{ left: 92, top: y(112), ...headline(56), whiteSpace: "nowrap" }}>
-        The standard error is a ruler.
-      </Ink>
+      <div style={{ position: "absolute", left: 92, top: y(112), display: "flex", gap: "0.26em", ...headline(56), whiteSpace: "nowrap" }}>
+        <Ink at={rulerFrom - 6} dur={20} style={{ position: "relative" }}>
+          The standard error
+        </Ink>
+        <Ink at={rulerAt - 4} dur={16} style={{ position: "relative" }}>
+          is a ruler.
+        </Ink>
+      </div>
       <Ink at={inferenceAt - 4} dur={18} style={{ left: 94, top: y(186), ...headline(40, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
         Intervals and tests are measured with it.
       </Ink>

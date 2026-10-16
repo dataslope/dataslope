@@ -164,7 +164,7 @@ export const IngresScene: React.FC = () => {
         color={INK_SOFT}
       />
       <Tag x={SYB.x + 4} y={y(800) - 15} at={industryAt + 8} size={22} color={INK}>
-        and more: Britton Lee, NonStop SQL, <span style={{ color: KEY_INK }}>Relational Technology</span>
+        and more: <span style={{ color: KEY_INK }}>Britton Lee, NonStop SQL</span>
       </Tag>
     </AbsoluteFill>
   );
