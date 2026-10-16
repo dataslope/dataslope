@@ -43,7 +43,13 @@ export type EntitySpec = {
 };
 
 /** Box metrics before the layout's `h()`. */
-export const ENTITY = { head: 56, row: 46, width: 380, pad: 18, badge: 72 };
+export const ENTITY = { head: 56, row: 46, width: 380, pad: 18, gap: 16 };
+
+/** The key column's width: wide enough for the entity's widest key ("PK, FK"
+ *  needs about 66px at 19px bold), and none at all when it has no keys, so
+ *  names never crowd their badge and keyless tables don't indent. */
+const badgeWidth = (columns: readonly EntityColumn[]) =>
+  columns.some((c) => c.key === "PK, FK") ? 74 : columns.some((c) => c.key) ? 32 : 0;
 
 export type EntityLayout = ReturnType<typeof entityLayout>;
 
@@ -125,6 +131,7 @@ export const Entity: React.FC<{
   const filled = rowIn.reduce((n, p, i) => (p > 0 ? Math.max(n, i + p) : n), 0);
   const height = layout.head + filled * layout.row;
   const dimmed = dim === undefined ? 0 : ease(frame, dim, 14) * 0.55;
+  const badge = badgeWidth(layout.columns);
   return (
     <div
       style={{
@@ -176,7 +183,7 @@ export const Entity: React.FC<{
               height: layout.row,
               display: "flex",
               alignItems: "center",
-              gap: 10,
+              gap: ENTITY.gap,
               padding: `0 ${ENTITY.pad}px`,
               opacity: p,
               transform: `translateX(${(1 - p) * -12}px)`,
@@ -186,7 +193,8 @@ export const Entity: React.FC<{
           >
             <span
               style={{
-                width: ENTITY.badge,
+                width: badge,
+                display: badge ? undefined : "none",
                 flex: "none",
                 fontFamily: SANS,
                 fontWeight: 700,

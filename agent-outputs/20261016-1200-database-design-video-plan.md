@@ -2,7 +2,7 @@
 
 **Course:** `content/courses/database-design-postgresql/` (36 lessons in 11 sections)
 **Format:** the editorial style, one video per unit, as the Statistics course's later units (`video/README.md`; the Statistics plan is `agent-outputs/20261016-0300-statistics-course-video-plan.md`).
-**Estimate:** about **33 minutes in 9 videos**, about 26,000 characters of narration (Hope), sized from each unit's explanatory prose at the Statistics course's rate.
+**Estimate:** about **33 minutes in 9 videos**, about 26,000 characters of narration (Drew), sized from each unit's explanatory prose at the Statistics course's rate.
 
 ## Why this course
 
@@ -43,8 +43,9 @@ Each ends on a bridge the next one opens with:
 ## What is shared
 
 - **The ERD kit** (`video/src/editorial/erd.tsx`): `<Entity>`, a table box that builds itself row by row, and `<Relation>`, a relationship line that draws itself with crow's-foot ends (`video/src/components/crowsfoot.ts`: exactly one, zero or one, one or many, zero or many, many). Every unit draws its ERDs with it. `npm run check:frames` fails a marker built across a corner of its line, and the `ErdKit` composition under Assets shows the kit on one page.
-- **The series intro** (`<SeriesIntro course="Database Design with PostgreSQL" unit="Unit N" title="…" />`), the house narrator (Hope), narration in takes on `eleven_v4_turbo`, the ElevenLabs sound set, and every rule in the Statistics plan's "Decisions".
+- **The series intro** (`<SeriesIntro course="Database Design with PostgreSQL" unit="Unit N" title="…" />`), narration in takes on `eleven_v4_turbo`, the ElevenLabs sound set, and every rule in the Statistics plan's "Decisions".
 
 ## Decisions
 
+- **Narrator: Drew** (decided 2026-10-16). One voice for the whole course; the Statistics course has Hope, so each course sounds like its own teacher. Every script sets `voice: "drew"`.
 - **One video per unit, prefixed names** (decided 2026-10-16): `DbDesign-<unit>-<Name>`, in the Studio's `Database-Design` folder in course order.
