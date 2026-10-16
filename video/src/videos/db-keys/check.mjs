@@ -16,8 +16,9 @@
 //     and 102; the "duplicate primary key is rejected" block (customer 1 Ada,
 //     then Grace with id 1); the enrollments roster keyed on
 //     (student_id, course_id), student 7 in course 42 on 2026-01-15.
-//   - natural-vs-surrogate-keys.mdx: users keyed on email, ada@old.example
-//     changing to ada@new.example, with orders and tickets holding it; the
+//   - natural-vs-surrogate-keys.mdx: countries keyed on 'JP'; users keyed on
+//     email, ada@old.example changing to ada@new.example, with an order
+//     holding it (the lesson's diagram also has tickets); the
 //     surrogate users.user_id = 10; the GENERATED ALWAYS AS IDENTITY block
 //     (Ada Lovelace and Grace Hopper) with email UNIQUE.
 //   - foreign-keys.mdx: the "foreign key blocks an order for a missing
@@ -31,8 +32,10 @@
 //     rows for: the employee and ticket rows here are the video's own.
 //
 // Rows the lessons do not give, and the video adds to show a rule at work:
-// student 8 and course 43 (so each id repeats in the roster), Ada's second
-// email for the UNIQUE test, and the employees and tickets.
+// the order's table for the coffee beans (the lesson draws it as a diagram),
+// student 8 and course 43 (so each id repeats in the roster), the student
+// and course names, 'US' beside 'JP', Ada's second account for the UNIQUE
+// test, and the employee and ticket.
 /* global console, URL */
 import { PGlite } from "@electric-sql/pglite";
 import { writeFileSync } from "node:fs";
@@ -72,11 +75,19 @@ const FIGURES = {
     setup: `CREATE TABLE customers (
   name TEXT,
   city TEXT
+);
+CREATE TABLE orders (
+  item          TEXT,
+  customer_name TEXT
 );`,
     steps: [
       "INSERT INTO customers VALUES ('Taylor Kim', 'Portland');",
       "INSERT INTO customers VALUES ('Taylor Kim', 'Portland');",
       "SELECT * FROM customers;",
+      "INSERT INTO orders VALUES ('coffee beans', 'Taylor Kim');",
+      "SELECT * FROM orders;",
+      // Which customer owns the order? Matching on the name finds both.
+      "SELECT o.item, c.name, c.city FROM orders o JOIN customers c ON c.name = o.customer_name;",
     ],
   },
   /** The lesson's table: the same two Taylors, told apart by a key. */
@@ -88,8 +99,18 @@ const FIGURES = {
 );
 INSERT INTO customers VALUES
   (101, 'Taylor Kim', 'Portland'),
-  (102, 'Taylor Kim', 'Portland');`,
-    steps: ["SELECT * FROM customers ORDER BY customer_id;"],
+  (102, 'Taylor Kim', 'Portland');
+CREATE TABLE orders (
+  item        TEXT,
+  customer_id INTEGER REFERENCES customers
+);
+INSERT INTO orders VALUES ('coffee beans', 101);`,
+    steps: [
+      "SELECT * FROM customers ORDER BY customer_id;",
+      "SELECT * FROM orders;",
+      // Matching on the key finds exactly one.
+      "SELECT o.item, c.customer_id, c.name FROM orders o JOIN customers c USING (customer_id);",
+    ],
   },
   /** primary-keys.mdx, "A duplicate primary key is rejected", and the
    *  second guarantee: a row with no key at all. */
@@ -101,8 +122,8 @@ INSERT INTO customers VALUES
 INSERT INTO customers (customer_id, name)
 VALUES (1, 'Ada');`,
     steps: [
-      "INSERT INTO customers (customer_id, name)\nVALUES (1, 'Grace');",
-      "INSERT INTO customers (name)\nVALUES ('Grace');",
+      "INSERT INTO customers VALUES (1, 'Grace');",
+      "INSERT INTO customers (name) VALUES ('Grace');",
       "SELECT * FROM customers;",
     ],
   },
@@ -134,6 +155,16 @@ INSERT INTO courses VALUES (42, 'Databases'), (43, 'Statistics');`,
   },
 
   // ── Part 2. Natural or surrogate ──────────────────────────────────────
+  /** natural-vs-surrogate-keys.mdx, "Natural keys: meaningful but
+   *  fragile": countries keyed on their code. */
+  countries: {
+    setup: `CREATE TABLE countries (
+  code TEXT PRIMARY KEY,
+  name TEXT NOT NULL
+);
+INSERT INTO countries VALUES ('JP', 'Japan'), ('US', 'United States');`,
+    steps: ["SELECT * FROM countries ORDER BY code;"],
+  },
   /** A natural key that changes: email as the key, held by orders and
    *  tickets. With no ON UPDATE rule, Postgres refuses the change. */
   natural: {
@@ -145,14 +176,11 @@ CREATE TABLE orders (
   order_id   INTEGER PRIMARY KEY,
   user_email TEXT NOT NULL REFERENCES users
 );
-CREATE TABLE tickets (
-  ticket_id  INTEGER PRIMARY KEY,
-  user_email TEXT NOT NULL REFERENCES users
-);
 INSERT INTO users VALUES ('ada@old.example', 'Ada');
-INSERT INTO orders VALUES (1, 'ada@old.example');
-INSERT INTO tickets VALUES (1, 'ada@old.example');`,
+INSERT INTO orders VALUES (1, 'ada@old.example');`,
     steps: [
+      "SELECT * FROM users;",
+      "SELECT * FROM orders;",
       "UPDATE users\nSET email = 'ada@new.example'\nWHERE email = 'ada@old.example';",
       "SELECT * FROM users;",
     ],
@@ -168,18 +196,14 @@ CREATE TABLE orders (
   order_id INTEGER PRIMARY KEY,
   user_id  INTEGER NOT NULL REFERENCES users
 );
-CREATE TABLE tickets (
-  ticket_id INTEGER PRIMARY KEY,
-  user_id   INTEGER NOT NULL REFERENCES users
-);
 INSERT INTO users VALUES (10, 'ada@old.example', 'Ada');
-INSERT INTO orders VALUES (1, 10);
-INSERT INTO tickets VALUES (1, 10);`,
+INSERT INTO orders VALUES (1, 10);`,
     steps: [
+      "SELECT * FROM users;",
+      "SELECT * FROM orders;",
       "UPDATE users\nSET email = 'ada@new.example'\nWHERE user_id = 10;",
       "SELECT * FROM users;",
       "SELECT * FROM orders;",
-      "SELECT * FROM tickets;",
     ],
   },
   /** natural-vs-surrogate-keys.mdx, "PostgreSQL can generate surrogate
@@ -194,7 +218,7 @@ INSERT INTO tickets VALUES (1, 10);`,
       "INSERT INTO customers (email, full_name) VALUES\n  ('ada@example.com', 'Ada Lovelace'),\n  ('grace@example.com', 'Grace Hopper');",
       "SELECT * FROM customers ORDER BY customer_id;",
       "INSERT INTO customers (email, full_name) VALUES\n  ('ada@example.com', 'Ada King');",
-      "SELECT * FROM customers ORDER BY customer_id;",
+      "SELECT customer_id, full_name FROM customers ORDER BY customer_id;",
     ],
   },
 
@@ -215,8 +239,8 @@ INSERT INTO customers (customer_id, name)
 VALUES (1, 'Ada'), (2, 'Grace');`,
     steps: [
       "SELECT * FROM customers ORDER BY customer_id;",
-      "INSERT INTO orders (order_id, customer_id, total)\nVALUES (101, 1, 25.00);",
-      "INSERT INTO orders (order_id, customer_id, total)\nVALUES (102, 99, 18.00);",
+      "INSERT INTO orders VALUES (101, 1, 25.00);",
+      "INSERT INTO orders VALUES (102, 99, 18.00);",
       "SELECT * FROM orders;",
     ],
   },
@@ -237,6 +261,8 @@ CREATE TABLE invoices (
 INSERT INTO accounts VALUES (1, 'Ada Co');
 INSERT INTO invoices VALUES (100, 1, 250.00);`,
     steps: [
+      "SELECT * FROM accounts;",
+      "SELECT * FROM invoices;",
       "DELETE FROM accounts WHERE account_id = 1;",
       "SELECT * FROM accounts;",
       "SELECT * FROM invoices;",
@@ -277,6 +303,7 @@ INSERT INTO comments VALUES
   (11, 1, 'Spam comment two'),
   (12, 2, 'A real comment');`,
     steps: [
+      "SELECT * FROM posts ORDER BY id;",
       "SELECT id, post_id FROM comments ORDER BY id;",
       "DELETE FROM posts WHERE id = 1;",
       "SELECT * FROM posts ORDER BY id;",
@@ -298,7 +325,10 @@ CREATE TABLE tickets (
 INSERT INTO employees VALUES (3, 'Sam');
 INSERT INTO tickets VALUES (500, 'open', 3);`,
     steps: [
+      "SELECT * FROM employees;",
+      "SELECT ticket_id, assigned_employee_id FROM tickets;",
       "DELETE FROM employees WHERE employee_id = 3;",
+      "SELECT ticket_id, assigned_employee_id FROM tickets;",
       "SELECT * FROM tickets;",
     ],
   },

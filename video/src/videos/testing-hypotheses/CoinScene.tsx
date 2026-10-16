@@ -34,6 +34,7 @@ export const CoinScene: React.FC = () => {
   const flipsAt = n.word("coin", "flips");
   const fairAt = n.word("fair", "fair");
   const pValueAt = n.word("area", "p-value");
+  const themAt = n.word("area", "them");
   const simulateAt = n.word("fair", "simulate");
   const thousandAt = n.word("fair", "thousand");
   const pileAt = n.word("fair", "pile");
@@ -181,7 +182,19 @@ export const CoinScene: React.FC = () => {
             </span>
           </Note>
           <Note at={twoAt - 2} x={X.x1} y={y(BASE) - h(TALL * 0.4) + 40} align="right">
-            <span style={{ ...note(40, STAT_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>p = {pct(COIN.p)}</span>
+            <span
+              style={{
+                ...note(40, STAT_INK),
+                fontWeight: 700,
+                ...halo,
+                whiteSpace: "nowrap",
+                display: "inline-block",
+                transform: `scale(${1 + 0.1 * pulse(frame, themAt, 24)})`,
+                transformOrigin: "100% 50%",
+              }}
+            >
+              p = {pct(COIN.p)}
+            </span>
           </Note>
         </Drift>
         <Ink at={shareAt - 4} dur={18} style={{ left: 160, top: y(870), whiteSpace: "nowrap" }}>

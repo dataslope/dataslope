@@ -46,6 +46,7 @@ export const OpenScene: React.FC = () => {
   const noiseAt = n.word("free", "noise");
   const soAt = n.word("free", "So");
   const chanceAt = n.word("free", "chance");
+  const ifAt = n.word("free", "If");
   const noDiffAt = n.word("free", "no difference");
   const howAt = n.word("free", "how often");
   const bigAt = n.word("free", "this big");
@@ -63,7 +64,7 @@ export const OpenScene: React.FC = () => {
 
   const oldW = sx(C, CHECKOUT.oldRate * ease(frame, tenAt - 4, 18)) - C.x0;
   const newW = sx(C, CHECKOUT.newRate * ease(frame, elevenAt - 4, 30)) - C.x0;
-  const ghost = ease(frame, noDiffAt - 4, 14);
+  const ghost = ease(frame, ifAt - 2, 18);
   const gapGlow = ease(frame, bigAt - 6, 10);
   const gapPulse = pulse(frame, bigAt + 4, 24);
   const oldEnd = sx(C, CHECKOUT.oldRate);
@@ -76,7 +77,7 @@ export const OpenScene: React.FC = () => {
       <Sfx name="el-pop" at={oneAt - 4} level={-30} />
       <Sfx name="el-tap" at={elevenAt - 4} level={-28} />
       <Sfx name="el-tap" at={tenAt - 4} level={-29} />
-      <Sfx name="el-pencil" at={noDiffAt - 4} level={-35} />
+      <Sfx name="el-pencil" at={ifAt - 2} level={-35} />
 
       <Kicker at={hookFrom - 10}>The logic of a test</Kicker>
       <Head a="One value in particular." b="Could it be zero?" at={hookFrom - 6} bAt={zeroAt - 6} out={noiseAt - 8} />

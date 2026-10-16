@@ -85,7 +85,7 @@ export const script: NarrationScript = {
     {
       id: "shapes",
       scene: true,
-      text: "With keys, one row can point at another. And those links only come in a few shapes.",
+      text: "So, with keys, one row can point at another. And it turns out those links only come in a few shapes.",
       pauseAfter: 0.35,
     },
     {
@@ -198,7 +198,7 @@ export const script: NarrationScript = {
     },
     {
       id: "split",
-      text: "So the profile moves to its own table. Each user has zero or one, and each profile belongs to exactly one user.",
+      text: "So the profile moves to its own table. Each user has zero or one profile, and each profile belongs to exactly one user.",
       pauseAfter: 0.35,
     },
     { id: "side", text: "The foreign key goes on the profile, the side that can't exist alone." },

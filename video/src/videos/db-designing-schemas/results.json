@@ -649,6 +649,188 @@
         }
       ],
       "affected": 0
+    },
+    "trackerV1": {
+      "ok": true,
+      "fields": [
+        "column_name",
+        "is_nullable"
+      ],
+      "rows": [
+        {
+          "column_name": "id",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "title",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "status",
+          "is_nullable": "NO"
+        }
+      ],
+      "affected": 0
+    },
+    "trackerDue": {
+      "ok": true,
+      "fields": [],
+      "rows": [],
+      "affected": 0
+    },
+    "trackerProjects": {
+      "ok": true,
+      "fields": [],
+      "rows": [],
+      "affected": 0
+    },
+    "trackerLink": {
+      "ok": true,
+      "fields": [],
+      "rows": [],
+      "affected": 0
+    },
+    "trackerFill": {
+      "ok": true,
+      "fields": [],
+      "rows": [],
+      "affected": 2
+    },
+    "trackerJoin": {
+      "ok": true,
+      "fields": [
+        "title",
+        "project"
+      ],
+      "rows": [
+        {
+          "title": "Draft schema",
+          "project": "Database course"
+        },
+        {
+          "title": "Review constraints",
+          "project": "Database course"
+        }
+      ],
+      "affected": 0
+    },
+    "trackerV3": {
+      "ok": true,
+      "fields": [
+        "column_name",
+        "is_nullable"
+      ],
+      "rows": [
+        {
+          "column_name": "id",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "title",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "status",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "due_on",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "project_id",
+          "is_nullable": "YES"
+        }
+      ],
+      "affected": 0
+    },
+    "trackerV3Projects": {
+      "ok": true,
+      "fields": [
+        "column_name",
+        "is_nullable"
+      ],
+      "rows": [
+        {
+          "column_name": "id",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "name",
+          "is_nullable": "NO"
+        }
+      ],
+      "affected": 0
+    },
+    "lessonWaiting": {
+      "ok": false,
+      "error": {
+        "message": "new row for relation \"registrations\" violates check constraint \"registrations_status_check\"",
+        "code": "23514",
+        "detail": "Failing row contains (1, 2, waiting, 2025-04-02 10:00:00).",
+        "constraint": "registrations_status_check"
+      }
+    },
+    "lessonDuplicateTag": {
+      "ok": false,
+      "error": {
+        "message": "duplicate key value violates unique constraint \"post_tags_pkey\"",
+        "code": "23505",
+        "detail": "Key (post_id, tag_id)=(1, 1) already exists.",
+        "constraint": "post_tags_pkey"
+      }
+    },
+    "lessonCommentCounts": {
+      "ok": true,
+      "fields": [
+        "title",
+        "comment_count"
+      ],
+      "rows": [
+        {
+          "title": "Designing Tables",
+          "comment_count": 2
+        },
+        {
+          "title": "Draft Notes",
+          "comment_count": 0
+        }
+      ],
+      "affected": 0
+    },
+    "lessonPublished": {
+      "ok": true,
+      "fields": [
+        "title",
+        "author",
+        "tags"
+      ],
+      "rows": [
+        {
+          "title": "Designing Tables",
+          "author": "Ana",
+          "tags": "beginner, design, postgres"
+        }
+      ],
+      "affected": 0
+    },
+    "lessonCategory": {
+      "ok": true,
+      "fields": [],
+      "rows": [],
+      "affected": 0
+    },
+    "lessonCategoryCount": {
+      "ok": true,
+      "fields": [
+        "n"
+      ],
+      "rows": [
+        {
+          "n": 2
+        }
+      ],
+      "affected": 0
     }
   },
   "version": "PostgreSQL 18.3 (PGlite 0.5.8) on wasm32-unknown-emscripten, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 3.1.74 (1092ec30a3fb1d46b1782ff1b4db5094d3d06ae5), 32-bit"

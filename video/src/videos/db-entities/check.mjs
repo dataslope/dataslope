@@ -29,14 +29,15 @@
 //     diagram's columns, types and keys are what Postgres stored; plus the
 //     three facts the line's two ends claim.
 /* global console, URL */
-import { PGlite } from "@electric-sql/pglite";
+import { PGlite, types } from "@electric-sql/pglite";
 import { writeFileSync } from "node:fs";
 
 const out = { version: "", figures: {} };
 
 /** A fresh database with `setup` run in it. */
 const fresh = async (setup) => {
-  const db = new PGlite();
+  // Dates as Postgres prints them ("2025-01-10"), not as JS Date objects.
+  const db = new PGlite({ parsers: { [types.DATE]: (v) => v } });
   await db.exec(setup);
   return db;
 };

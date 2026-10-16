@@ -52,6 +52,7 @@ export const OddsScene: React.FC = () => {
   const everyTestAt = n.word("bonferroni", "every test");
   const errorsFrom = n.beat("errors-in").from;
   const twoWaysAt = n.word("errors-in", "two ways");
+  const wrongAt = n.word("errors-in", "wrong");
 
   const py = (p: number) => y(BASE) - h(TALL) * (p / TOP);
   const pts = AT_LEAST.k.map((k, i) => [sx(X, k), py(AT_LEAST.p[i])] as const);
@@ -76,7 +77,7 @@ export const OddsScene: React.FC = () => {
   const bar = lerp(0.05, AT_LEAST.bonferroni, fall);
   const hitP = TWENTY.p[HIT];
   const passes = hitP <= bar;
-  const dim = 1 - 0.3 * ease(frame, errorsFrom - 4, 14) - 0.3 * ease(frame, twoWaysAt - 4, 14);
+  const dim = 1 - 0.2 * ease(frame, errorsFrom - 4, 14) - 0.2 * ease(frame, wrongAt - 4, 14) - 0.2 * ease(frame, twoWaysAt - 4, 14);
   const barGlow = pulse(frame, everyTestAt - 2, 24);
 
   return (

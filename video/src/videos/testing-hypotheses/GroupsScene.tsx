@@ -44,6 +44,7 @@ export const GroupsScene: React.FC = () => {
   const thirtyAt = n.word("groups", "thirty-two");
   const significantAt = n.word("groups", "significant");
   const manyAt = n.word("once", "many-looks");
+  const trialsAt = n.word("groups", "trials");
   const againAt = n.word("once", "again");
   const anovaAt = n.word("once", "ANOVA");
   const anyAt = n.word("once", "any");
@@ -142,7 +143,16 @@ export const GroupsScene: React.FC = () => {
           </Label>
         </Note>
         <Note at={thirtyAt - 4} x={160} y={ry(RING.y + RING.r + 110) + 40}>
-          <span style={{ ...note(26, STAT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span
+            style={{
+              ...note(26, STAT_INK),
+              fontWeight: 700,
+              whiteSpace: "nowrap",
+              display: "inline-block",
+              transform: `scale(${1 + 0.06 * pulse(frame, trialsAt, 24)})`,
+              transformOrigin: "0 50%",
+            }}
+          >
             some pair fires in <Count at={thirtyAt - 4} to={PAIRWISE.rate} dur={20} format={(v) => pct(v, 0)} /> of{" "}
             {fmt(PAIRWISE.trials, 0)} trials
           </span>

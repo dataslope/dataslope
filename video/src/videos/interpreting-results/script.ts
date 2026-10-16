@@ -38,7 +38,7 @@ import type { NarrationScript } from "../../narration/types";
  *   - effect-sizes, "Cohen's d" and the effect-size-overlap chart: d is the
  *     gap in standard deviations; 0.2, 0.5 and 0.8 are small, medium and
  *     large; at 0.8 the curves share 69% of their area, "more than two
- *     thirds". "What counts as big depends on what's at stake" is the
+ *     thirds of their area". "What counts as big depends on what's at stake" is the
  *     callout "Context defines 'big', not a table".
  *   - effect-sizes, "Effect size does NOT depend on sample size" (seed 123):
  *     a true d of 0.30 at n = 20, 100, 500, 5,000 and 50,000 per group; p
@@ -138,7 +138,7 @@ export const script: NarrationScript = {
     },
     {
       id: "overlap",
-      text: "Even large leaves a lot of overlap. At zero point eight, the groups still share more than two thirds of their range.",
+      text: "Even large leaves a lot of overlap. At zero point eight, the two curves still share more than two thirds of their area.",
       pauseAfter: 0.4,
     },
     { id: "stake", text: "The labels are only a start. What counts as big depends on what's at stake." },

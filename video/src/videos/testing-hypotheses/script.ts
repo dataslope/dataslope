@@ -85,7 +85,7 @@ export const script: NarrationScript = {
   voice: "hope",
   // Room for the series intro (SeriesIntro, INTRO_SECONDS) before the first word.
   leadIn: 4.6,
-  tail: 2.6,
+  tail: 2.2,
   beats: [
     // ── Part 1. The logic of a test ───────────────────────────────────────
     {

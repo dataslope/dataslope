@@ -48,6 +48,7 @@ export const ChiScene: React.FC = () => {
   const churnedAt = n.word("expected", "churned");
   const expectedAt = n.word("related", "expected");
   const corrFrom = n.beat("corr-in").from;
+  const bothNumbersAt = n.word("corr-in", "numbers");
   const togetherAt = n.word("corr-in", "together");
 
   const rowY = (i: number) => y(ROW_Y0 + i * ROW_DY);
@@ -62,7 +63,7 @@ export const ChiScene: React.FC = () => {
   const expIn = (k: number) => ease(frame, noDiffAt - 2 + k * 3, 12);
   const mobileGlow = pulse(frame, eightyAt - 2, 26);
   const total = ease(frame, twelveAt - 8, 20);
-  const dim = 1 - 0.25 * ease(frame, corrFrom - 4, 14) - 0.3 * ease(frame, togetherAt - 4, 14);
+  const dim = 1 - 0.2 * ease(frame, corrFrom - 4, 14) - 0.15 * ease(frame, bothNumbersAt - 4, 14) - 0.2 * ease(frame, togetherAt - 4, 14);
   const churnGlow = pulse(frame, churnedAt - 2, 24);
   const expGlow = pulse(frame, expectedAt - 2, 24);
 

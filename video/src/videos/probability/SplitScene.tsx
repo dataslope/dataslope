@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { num, pct, STREAK, TABLE } from "./data";
-import { DATA_INK, Headline, lerp, SOFT, STAT, STAT_INK, Svg, Sweep, VBracket } from "./parts";
+import { DATA_INK, Headline, lerp, Pulse, SOFT, STAT, STAT_INK, Svg, Sweep, VBracket } from "./parts";
 
 /** Two bars, one per plan, equally wide because both plans have 500 users. */
 const BARS = { x: [200, 600], w: 280, top: 384, base: 812 } as const;
@@ -31,20 +31,26 @@ export const SplitScene: React.FC = () => {
   const barAt = n.word("split", "a bar");
   const splitAt = n.word("split", "split");
   const sameAt = n.word("flat", "same height");
+  const knowingAt = n.word("flat", "knowing the plan");
+  const nothingAt = n.word("flat", "told you nothing");
   const fifteenAt = n.word("flat", "Fifteen percent");
   const indepAt = n.word("indep", "independence");
   const givenAt = n.word("indep", "given the plan");
   const withoutAt = n.word("indep", "without it");
   const jumpsAt = n.word("step", "jumps");
+  const sixAt = n.word("step", "six percent");
+  const twentyFourAt = n.word("step", "twenty-four");
   const dependentAt = n.word("step", "dependent");
   const gapAt = n.word("step", "gap");
   const actAt = n.word("step", "act on");
   const multiplyAt = n.word("multiply", "multiply");
+  const indepWordAt = n.word("multiply", "Independence");
   const tenAt = n.word("multiply", "Ten heads");
   const halfAt = n.word("multiply", "ten halves");
   const timesAt = n.word("multiply", "multiplied together");
   const oneInAt = n.word("multiply", "one in a thousand");
   const roundAt = n.word("test-in", "which way round");
+  const testInFrom = n.beat("test-in").from;
   const conditionalAt = n.word("test-in", "conditional");
   const mattersAt = n.word("test-in", "matters");
 
@@ -59,7 +65,9 @@ export const SplitScene: React.FC = () => {
   const grow = (i: number) => ease(frame, barAt - 6 + i * 6, 18);
   const split = ease(frame, splitAt - 2, 16);
   const overall = ease(frame, fifteenAt - 6, 16);
-  const indepTag = ease(frame, sameAt + 6, 12) * (1 - ease(frame, jumpsAt - 4, 10));
+  const indepTag = ease(frame, nothingAt - 2, 12) * (1 - ease(frame, jumpsAt - 4, 10));
+  // The real splits' labels set back while the bars show the what-if.
+  const whatIf = ease(frame, knowingAt - 2, 10) * (1 - ease(frame, jumpsAt - 4, 10));
   const depTag = ease(frame, dependentAt - 4, 12);
   const splitY = (i: number) => top + H * rates[i];
 
@@ -74,7 +82,8 @@ export const SplitScene: React.FC = () => {
       <Sfx name="el-tap" at={oneInAt - 4} level={-28} />
 
       <Headline top={y(150)} first="Does the plan" second="change the chance?" firstAt={splitFrom - 6} secondAt={barAt + 2} out={jumpsAt - 8} />
-      <Headline top={y(150)} first="Plan and churn" second="are dependent." firstAt={jumpsAt - 2} secondAt={dependentAt - 4} />
+      <Headline top={y(150)} first="Plan and churn" second="are dependent." firstAt={jumpsAt - 2} secondAt={dependentAt - 4} out={testInFrom - 6} />
+      <Headline top={y(150)} first="Now read it" second="the other way round." firstAt={testInFrom - 2} secondAt={roundAt + 4} />
       <FigLabel n="3" title="Each plan's users, split where they churned" at={splitFrom} x={BARS.x[0]} y={y(268)} />
 
       {/* ── The bars ── */}
@@ -131,7 +140,7 @@ export const SplitScene: React.FC = () => {
               left: i === 0 ? undefined : x + BARS.w + 16,
               right: i === 0 ? 1920 - x + 16 : undefined,
               top: top + (splitY(i) - top) * split - 38,
-              opacity: ease(frame, splitAt + 6, 10),
+              opacity: ease(frame, splitAt + 6, 10) * (1 - whatIf * 0.6),
               ...note(28, STAT_INK),
               fontWeight: 700,
               whiteSpace: "nowrap",
@@ -167,6 +176,8 @@ export const SplitScene: React.FC = () => {
       <div style={{ position: "absolute", left: BARS.x[0], top: top - 52, opacity: depTag, ...label(24, STAT_INK) }}>
         Dependent: the split steps
       </div>
+      <Pulse x={BARS.x[0] - 44} y={splitY(0) - 22} at={sixAt - 2} r={34} />
+      <Pulse x={BARS.x[1] + BARS.w + 48} y={splitY(1) - 22} at={twentyFourAt - 2} r={34} />
       <VBracket x={STEP_X} y0={splitY(0)} y1={splitY(1)} at={gapAt - 4} color={INK} right />
       <Note at={gapAt} x={STEP_X + 24} y={(splitY(0) + splitY(1)) / 2 - 15}>
         <span style={{ ...note(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
@@ -179,10 +190,12 @@ export const SplitScene: React.FC = () => {
         <span style={label(23, INK_SOFT)}>Independent means</span>
       </Ink>
       <Ink at={givenAt - 4} dur={16} style={{ left: RIGHT, top: y(386), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(36, INK), fontWeight: 600 }}>
-          P(churn <span style={{ color: INK_SOFT }}>| plan</span>)
-        </span>
-        <span style={{ ...note(36, INK), fontWeight: 600, opacity: ease(frame, withoutAt - 4, 12) }}> = P(churn)</span>
+        <Sweep at={indepWordAt - 2} dur={16}>
+          <span style={{ ...note(42, INK), fontWeight: 600 }}>
+            P(churn <span style={{ color: INK_SOFT }}>| plan</span>)
+          </span>
+          <span style={{ ...note(42, INK), fontWeight: 600, opacity: ease(frame, withoutAt - 4, 12) }}> = P(churn)</span>
+        </Sweep>
       </Ink>
       <Note at={actAt} x={RIGHT} y={y(450)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Here it isn&apos;t: the gap is information.</span>

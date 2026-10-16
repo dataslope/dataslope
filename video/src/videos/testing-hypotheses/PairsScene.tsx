@@ -61,7 +61,7 @@ export const PairsScene: React.FC = () => {
 
   const vy = (v: number) => y(BOTTOM) - ((v - V_LO) / (V_HI - V_LO)) * (y(BOTTOM) - y(TOP));
   const colX = (c: number, i: number) => COL[c] + (JX[i] - 0.5) * SPREAD;
-  const lines = (i: number) => ease(frame, ownAt - 4 + i * 1.2, 12);
+  const lines = (i: number) => ease(frame, n.beat("paired").from - 2 + i * 1.6, 12);
   const toDiffs = ease(frame, collapsesAt - 6, 22);
   const oneGlow = ease(frame, eachAt - 2, 12);
   const sameGlow = pulse(frame, sameAt, 26);

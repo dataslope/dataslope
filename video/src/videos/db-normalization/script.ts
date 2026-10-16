@@ -89,7 +89,7 @@ export const script: NarrationScript = {
     { id: "twice", text: "But look closer. Ada's email is stored twice, and so is the notebook's price.", pauseAfter: 0.5 },
     {
       id: "rushed",
-      text: "So Ada changes her email, and a rushed update fixes only order one. Postgres says update one. No complaints.",
+      text: "So Ada changes her email, and a rushed update fixes only order one. Postgres says, update one. No complaints.",
       pauseAfter: 0.4,
     },
     {
@@ -100,12 +100,12 @@ export const script: NarrationScript = {
     { id: "siblings", scene: true, text: "That's the update anomaly, and it has two siblings.", pauseAfter: 0.3 },
     {
       id: "insert",
-      text: "Add a new mug before anyone's ordered it? Refused. Every row here is an order, and this one has no order ID.",
+      text: "Add a mug nobody's ordered yet? Refused, because every row here has to be an order.",
       pauseAfter: 0.5,
     },
     {
       id: "delete",
-      text: "And when Grace cancels her only order, deleting it deletes Grace. Her email only lived in that row.",
+      text: "And when Grace cancels her only order, deleting it deletes Grace too.",
       pauseAfter: 0.6,
     },
     { id: "home", scene: true, text: "The cure is one rule. Every fact gets exactly one home.", pauseAfter: 0.35 },
@@ -126,17 +126,17 @@ export const script: NarrationScript = {
     {
       id: "cell",
       scene: true,
-      text: "First normal form means one value per cell. So here's Ada, with two phone numbers squeezed into one.",
+      text: "First normal form means one value per cell. Here's Ada, with two phone numbers in one.",
       pauseAfter: 0.35,
     },
     {
       id: "search",
-      text: "Ask who has five five five, two thousand... and Postgres finds nobody. The number's buried inside a string.",
+      text: "Ask who has five five five, two thousand... and Postgres finds nobody. It's buried in a string.",
       pauseAfter: 0.45,
     },
     {
       id: "columns",
-      text: "Phone one, two and three instead? That's a repeating group, and it has a ceiling. A fourth number won't fit.",
+      text: "Phone one, two and three instead? That's a repeating group, with a ceiling. A fourth number won't fit.",
       pauseAfter: 0.6,
     },
     {
@@ -147,21 +147,21 @@ export const script: NarrationScript = {
     },
     {
       id: "plain",
-      text: "Now a search is a plain equals, Linus can have no phone at all, and a unique constraint sees every number. List Ada's twice? Refused.",
+      text: "Now a search is a plain equals, Linus can have none at all, and a unique constraint stops Ada's number going in twice.",
       pauseAfter: 0.6,
     },
-    { id: "depend-in", text: "So each cell holds one value. Next question: what does each value depend on?" },
+    { id: "depend-in", text: "So each cell holds one value. But what does each value depend on?" },
 
     // ── Part 3. Second normal form ────────────────────────────────────────
     {
       id: "pair",
       scene: true,
-      text: "Second normal form is for keys made of two columns or more. Here, each order line is named by a pair, order and product.",
+      text: "Second normal form is about keys with two parts. Each order line here is named by a pair, order and product.",
       pauseAfter: 0.35,
     },
     {
       id: "whole",
-      text: "Quantity needs the whole pair. Order one hundred took two notebooks, and order one oh one took one.",
+      text: "Quantity needs the whole pair. Order one hundred took two notebooks, order one oh one took one.",
       pauseAfter: 0.4,
     },
     { id: "part", text: "But the product name only needs half. Product ten is Notebook on every order.", pauseAfter: 0.45 },
@@ -172,7 +172,7 @@ export const script: NarrationScript = {
     },
     {
       id: "move",
-      text: "So the name moves to products, where a rename is one row, and order items keeps only what needs the whole pair.",
+      text: "So the name moves to products, where a rename is one row, and order items keeps what needs the whole pair.",
       pauseAfter: 0.6,
     },
     { id: "chain-in", text: "Third normal form catches something sneakier." },
@@ -181,12 +181,12 @@ export const script: NarrationScript = {
     {
       id: "chain",
       scene: true,
-      text: "These orders carry each customer's name and city. The key is the order ID... but a city isn't about an ORDER. It's about the customer.",
+      text: "These orders carry each customer's city. The key is the order ID... but a city isn't about an ORDER. It's about the customer.",
       pauseAfter: 0.4,
     },
     {
       id: "detour",
-      text: "Order ID gives you the customer ID, and that gives you the city. A dependency with a detour, called transitive.",
+      text: "Order ID gives you customer ID, which gives you the city. A dependency with a detour: transitive.",
       pauseAfter: 0.45,
     },
     {
@@ -198,7 +198,7 @@ export const script: NarrationScript = {
     {
       id: "oath",
       scene: true,
-      text: "There's an old oath for all of this. Every non-key column depends on the key, the whole key, and nothing but the key.",
+      text: "There's an old oath for this. Every non-key column depends on the key, the whole key, and nothing but the key.",
       pauseAfter: 0.4,
     },
     { id: "halves", text: "The whole key is second normal form. Nothing but the key is third.", pauseAfter: 0.4 },
@@ -213,18 +213,18 @@ export const script: NarrationScript = {
     {
       id: "summary",
       scene: true,
-      text: "Say a report keeps asking what sold each day. So you store the answer, in a summary table built from the orders.",
+      text: "Say a report keeps asking what sold each day. You could store the answer, in a summary table.",
       pauseAfter: 0.35,
     },
     {
       id: "days",
-      text: "Two orders on January tenth, thirty-two fifty in all. One on the eleventh, twelve dollars.",
+      text: "Two orders on January tenth, thirty-two fifty. One on the eleventh, twelve dollars.",
       pauseAfter: 0.4,
     },
     { id: "denorm", text: "That's denormalization. Duplicating on purpose, so a read gets simpler.", pauseAfter: 0.45 },
     {
       id: "stale",
-      text: "But add four dollars to that last order, and the summary still says twelve. The copy's gone stale.",
+      text: "But add four dollars to that last order, and the summary still says twelve. It's gone stale.",
       pauseAfter: 0.45,
     },
     {
@@ -235,12 +235,12 @@ export const script: NarrationScript = {
     {
       id: "prices",
       scene: true,
-      text: "And some copies aren't copies at all. Northwind's products store today's price, and every order line stores a price too.",
+      text: "And some copies aren't copies. Northwind stores a price on each product, and another on every order line.",
       pauseAfter: 0.35,
     },
     {
       id: "history",
-      text: "Six hundred sixty-two lines disagree with the catalog, and they're RIGHT. Prices rose, and each line kept what the customer actually paid.",
+      text: "Six hundred sixty-two lines disagree, and they're RIGHT. Prices rose, and each line kept what the customer paid.",
       pauseAfter: 0.45,
     },
     {
@@ -256,7 +256,7 @@ export const script: NarrationScript = {
     },
     {
       id: "next",
-      text: "Knowing the rules is half of it, though. The other half is a process for using them, and for changing a design once it's live.",
+      text: "Knowing the rules is half of it. The other half is a process for using them, and for changing a design once it's live.",
     },
   ],
 };

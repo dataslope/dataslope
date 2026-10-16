@@ -68,6 +68,7 @@ export const StepsScene: React.FC = () => {
   const eightAgainAt = n.word("set", "eight thousand");
   const computedAt = n.word("set", "computed");
   const trueMeanAt = n.word("reject", "true mean");
+  const claimAt = n.word("reject", "claim");
   const noticeAt = n.word("sides-in", "notice");
   const alphaAt = n.word("set", "Alpha");
   const fixedAt = n.word("set", "fixed");
@@ -105,6 +106,7 @@ export const StepsScene: React.FC = () => {
   const tails = ease(frame, leastAt - 2, 14);
   const both = pulse(frame, eitherAt - 2, 28) + pulse(frame, noticeAt - 2, 24);
   const meanGlow = pulse(frame, fiftyAt, 24);
+  const verdictGlow = pulse(frame, claimAt, 24);
   const claimGlow = pulse(frame, eightAgainAt, 24);
   const rulerIn = ease(frame, noiseAt - 6, 16);
   const tCount = ease(frame, tAt - 6, 22);
@@ -300,9 +302,11 @@ export const StepsScene: React.FC = () => {
         </Label>
       </Note>
       <Ink at={underAt - 4} dur={14} style={{ left: STEP_X + 44, top: y(STEP_Y0 + 4 * STEP_DY) + 40, whiteSpace: "nowrap" }}>
-        <Label size={22} color={STAT_INK}>
-          {fmt(STEPS.p, 3)} is under {STEPS.alpha}: reject <H0 />
-        </Label>
+        <div style={{ transform: `scale(${1 + 0.06 * verdictGlow})`, transformOrigin: "0 50%" }}>
+          <Label size={22} color={STAT_INK}>
+            {fmt(STEPS.p, 3)} is under {STEPS.alpha}: reject <H0 />
+          </Label>
+        </div>
       </Ink>
     </AbsoluteFill>
   );
