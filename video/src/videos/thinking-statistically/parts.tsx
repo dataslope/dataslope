@@ -134,21 +134,22 @@ export const Bracket: React.FC<{
  * A line struck through the words it wraps, drawn left to right on `at`.
  * Sized in em and to the words, so it fits in any face.
  */
-export const Strike: React.FC<{ at: number; color?: string; children: React.ReactNode }> = ({
+export const Strike: React.FC<{ at: number; color?: string; top?: string; children: React.ReactNode }> = ({
   at,
   color = ACCENT,
+  top = "0.52em",
   children,
 }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   return (
-    <span style={{ position: "relative", display: "inline-block" }}>
+    <span style={{ position: "relative", display: "inline-block", lineHeight: 1 }}>
       {children}
       <span
         style={{
           position: "absolute",
           left: "-0.06em",
-          top: "0.52em",
+          top,
           width: `calc((100% + 0.12em) * ${p})`,
           height: "0.07em",
           minHeight: 3,

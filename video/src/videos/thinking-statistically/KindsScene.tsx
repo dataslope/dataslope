@@ -10,7 +10,7 @@ import { RAW, STAT_INK, Svg } from "./parts";
 const PARENT_Y = 310;
 const RULE_Y = 446;
 const LEAF_Y = 494;
-const PICTURE_Y = 726;
+const PICTURE_Y = 690;
 const LEAF_W = 330;
 /** Two parents, two leaves each. */
 const PARENTS = [

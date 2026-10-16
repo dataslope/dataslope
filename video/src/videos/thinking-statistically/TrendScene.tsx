@@ -43,7 +43,8 @@ export const TrendScene: React.FC = () => {
   const noiseAt = n.word("signal", "noise");
 
   const pts = TREND.metric.map((v, i) => [sx(X, TREND.months[i]), py(v)] as const);
-  const draw = ease(frame, yearsAt - 4, 44) * (pts.length - 1);
+  const drawn = ease(frame, yearsAt - 4, 44);
+  const draw = drawn * (pts.length - 1);
   const shown = Math.floor(draw);
   const part = draw - shown;
   const line = pts.slice(0, shown + 1).map(([x, v]) => [x, v] as [number, number]);
@@ -166,7 +167,8 @@ export const TrendScene: React.FC = () => {
       <Svg>
         <path d={lineD} fill="none" stroke={BAR} strokeWidth={3} strokeLinejoin="round" strokeLinecap="round" />
         {pts.map(([x, v], i) => {
-          const a = Math.max(0, Math.min(1, (draw - i + 1) * 1.5));
+          // No dot before the line starts drawing, not even the first.
+          const a = drawn > 0 ? Math.max(0, Math.min(1, (draw - i + 1) * 1.5)) : 0;
           if (a <= 0) return null;
           return <circle key={i} cx={x} cy={v} r={R * a} fill={BAR} stroke={PAPER} strokeWidth={1.6} />;
         })}

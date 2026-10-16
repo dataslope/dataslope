@@ -9,7 +9,7 @@ import { FLAVORS } from "./data";
 import { Kicker, lerp, RAW, Spot, STAT_INK, Strike } from "./parts";
 
 const CHIP = 96;
-const CHIP_PITCH = 128;
+const CHIP_PITCH = 132;
 const CHIP_X = 160;
 const CHIP_Y = 440;
 /** The tally: one block per answer, stacked by flavor. */

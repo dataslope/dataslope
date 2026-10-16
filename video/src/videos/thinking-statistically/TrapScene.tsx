@@ -143,7 +143,9 @@ export const TrapScene: React.FC = () => {
       </Ink>
       <Ink at={fortyAt - 4} dur={16} style={{ left: COL[0], top: y(MEAN_Y + 40), whiteSpace: "nowrap" }}>
         <span style={mono(40, STAT_INK, 700)}>
-          <Strike at={placeAt - 2}>{ZIPS.zipMean.toFixed(2)}</Strike>
+          <Strike at={placeAt - 2} top="0.62em">
+            {ZIPS.zipMean.toFixed(2)}
+          </Strike>
         </span>
       </Ink>
       <Note at={placeAt} x={COL[0]} y={y(MEAN_Y + 108)}>
