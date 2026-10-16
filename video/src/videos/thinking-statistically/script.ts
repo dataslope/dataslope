@@ -64,12 +64,14 @@ import type { NarrationScript } from "../../narration/types";
 export const script: NarrationScript = {
   id: "thinking-statistically",
   voice: "hope",
-  leadIn: 0.5,
+  // Room for the series intro (SeriesIntro, INTRO_SECONDS) before the first word.
+  leadIn: 4.6,
   tail: 2.6,
   beats: [
     // ── Part 1. Signal and noise ──────────────────────────────────────────
     {
       id: "hook",
+      scene: true,
       text: "Here are two groups of forty people, and group B scores more than three and a half points higher.",
       pauseAfter: 0.3,
     },
@@ -91,6 +93,7 @@ export const script: NarrationScript = {
       pauseAfter: 0.4,
     },
     { id: "luck", text: "So before you believe any gap, ask one question... could this just be luck?" },
+    { id: "trend-in", text: "And it isn't only gaps between groups." },
     {
       id: "trend",
       scene: true,
@@ -146,6 +149,7 @@ export const script: NarrationScript = {
       id: "list",
       text: "And often, the population isn't even a list. It's every checkout a design will ever see, and most of them haven't happened yet.",
     },
+    { id: "parameter-in", text: "So it helps to name the numbers on each side." },
     {
       id: "parameter",
       scene: true,
@@ -169,6 +173,7 @@ export const script: NarrationScript = {
     },
     { id: "miss", text: "Their average is a hundred and one point four. Close, but not on it.", pauseAfter: 0.35 },
     { id: "price", text: "That miss isn't a mistake. It's the price of seeing only part." },
+    { id: "twenty-in", text: "So how big is that miss, usually? One sample can't tell you." },
     {
       id: "twenty",
       scene: true,
@@ -190,6 +195,7 @@ export const script: NarrationScript = {
       id: "kind",
       text: "But before you summarize a sample at all... you need to know what KIND of number you're holding.",
     },
+    { id: "flavors-in", text: "Here's what goes wrong when you don't." },
 
     // ── Part 3. What kind of data ─────────────────────────────────────────
     {
@@ -205,6 +211,7 @@ export const script: NarrationScript = {
       pauseAfter: 0.4,
     },
     { id: "mode", text: "The honest summary is the most common answer. Vanilla." },
+    { id: "kinds-in", text: "The computer couldn't tell a label from a quantity. That part is up to you." },
     {
       id: "kinds",
       scene: true,
@@ -217,6 +224,7 @@ export const script: NarrationScript = {
       pauseAfter: 0.4,
     },
     { id: "numbers", text: "Numbers split into counts, like logins, and measurements, like price." },
+    { id: "trap-in", text: "Most columns tell you plainly which kind they are. A few don't." },
     {
       id: "trap",
       scene: true,

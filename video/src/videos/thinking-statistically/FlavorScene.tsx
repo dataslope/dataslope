@@ -5,6 +5,7 @@ import { useLayout } from "../../editorial/layout";
 import { body, fmt, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { FLAVORS } from "./data";
 import { Kicker, lerp, RAW, Spot, STAT_INK, Strike } from "./parts";
 
@@ -58,6 +59,13 @@ export const FlavorScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: the cones, ten answers, the average, struck out, the tally ── */}
+      <Sfx name="el-pop" at={creamAt - 6} level={-29} />
+      <Sfx name="el-sprinkle" at={tenAt - 2} level={-33} />
+      <Sfx name="el-tap" at={eightAt - 6} level={-27} />
+      <Sfx name="el-scratch" at={noAt} level={-30} />
+      <Sfx name="el-whoosh" at={commonAt - 10} level={-32} />
+
       <Kicker at={flavorsFrom - 4}>What kind of data</Kicker>
 
       <Ink at={flavorsFrom - 2} dur={20} out={noAt - 8} style={{ left: 92, top: y(150), ...headline(80), whiteSpace: "nowrap" }}>

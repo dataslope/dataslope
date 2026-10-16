@@ -6,6 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { body, fmt, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { jitter, KNOWN } from "./data";
 import { Bracket, DOT, Mu, STAT, STAT_INK, Svg, TruthLine, XBar } from "./parts";
 
@@ -82,6 +83,13 @@ export const ParameterScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: the two symbols, fifty values, their average, the miss ── */}
+      <Sfx name="el-tap" at={muAt - 4} level={-28} />
+      <Sfx name="el-tap" at={xBarAt - 4} level={-28} />
+      <Sfx name="el-sprinkle" at={fiftyAt - 6} level={-32} />
+      <Sfx name="el-tap" at={averageAt - 4} level={-27} />
+      <Sfx name="el-pencil" at={closeAt - 2} level={-34} />
+
       <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
         <Ink at={parameterAt - 6} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Parameters stay put.

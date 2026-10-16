@@ -6,6 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { fmt, halo, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { jitter, KNOWN, ROWS } from "./data";
 import { DOT, lerp, Mu, STAT, STAT_INK, Svg, TruthLine, XBar } from "./parts";
 
@@ -63,6 +64,7 @@ export const TwentyScene: React.FC = () => {
   const spreadAt = n.word("variable", "spread");
   const thinkAt = n.word("points", "think");
   const drawAt = n.word("points", "single draw");
+  const spreadEndAt = n.word("points", "that spread", { edge: "end" });
 
   const rowY = (i: number) => y(ROW0) + h(i * PITCH);
   // Row 1 is the sample of the figure before; the others arrive one by one.
@@ -85,6 +87,16 @@ export const TwentyScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: nineteen rows arriving, the line through their averages,
+           the averages flying over, the last one landing on top, Part 2's close ── */}
+      <Sfx name="el-sprinkle" at={rowAt(1)} level={-34} />
+      <Sfx name="el-sprinkle" at={rowAt(10)} level={-35} />
+      <Sfx name="el-pencil" at={statisticAt - 4} level={-32} />
+      <Sfx name="el-whoosh" at={variableAt - 6} level={-32} />
+      <Sfx name="el-tap" at={variableAt - 6 + SLOTS[0].turn * 1.6 + 12} level={-27} />
+      {/* In the pause after "spread", where Part 2 ends. */}
+      <Sfx name="el-chime" at={spreadEndAt + 4} level={-32} />
+
       <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
         <Ink at={twentyFrom - 4} dur={20} out={thinkAt - 8} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Twenty samples,

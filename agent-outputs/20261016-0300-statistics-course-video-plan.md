@@ -3,7 +3,7 @@
 **Course:** `content/courses/statistics-for-data-science-python/` (32 lessons in 9 sections)
 **Format:** the editorial style (`video/src/editorial/`): warm paper, Source Serif 4 headlines, watercolor spot illustrations, no burned-in captions. See `video/README.md`.
 **Estimate:** about **80 minutes (75 to 95) in 35 videos**, grouped into 9 units: most are 2 to 3 minutes, and Unit 1 is one video of about 5.
-**Pilot:** Unit 5, Sampling: all five videos built, voiced and illustrated (2026-10-16). Unit 1 is done too, as a single video of 5:04.
+**Pilot:** Unit 5, Sampling: all five videos built, voiced and illustrated (2026-10-16). Unit 1 is done too, as a single video of about 5:34 with the series intro and transitions.
 
 ## How the videos are cut
 
@@ -43,7 +43,7 @@ The user asked for Unit 1 as one video rather than three (2026-10-16). It keeps 
 
 | # | Video | Min | Covers | Status |
 | --- | --- | --- | --- | --- |
-| 1 | Thinking statistically (`ThinkingStatistically`) | 5 | 1. signal and noise: why-statistics-matters; statistical-thinking (variation, signal vs. noise, the data-generating process, thinking in distributions). 2. population, sample, parameter, statistic: populations-and-samples. 3. what kind of data it is, and the encoding trap: types-of-data | done, voiced, 5:04 |
+| 1 | Thinking statistically (`ThinkingStatistically`) | 5 | 1. signal and noise: why-statistics-matters; statistical-thinking (variation, signal vs. noise, the data-generating process, thinking in distributions). 2. population, sample, parameter, statistic: populations-and-samples. 3. what kind of data it is, and the encoding trap: types-of-data | done, voiced, with the series intro, transitions and sound effects |
 
 ### Unit 2. Describing data (9 min, 4 videos)
 
@@ -146,6 +146,9 @@ The process is the one in `video/README.md`; in short:
   - 5.5 → 6.1: building the confidence interval.
 - **Illustrations: generate directly when a batch stalls** (decided 2026-10-16). If a batch is still in progress an hour after it was submitted, cancel it and generate the same prompts directly. That costs about a cent for two images. `video/README.md`, "Images", has the commands.
 - **Voicing costs characters.** Write each video's bridge into its script before the first recording. After an edit, re-voice only the beats that changed. Record a whole take again only when asked.
+- **Every unit video opens on the series intro** (decided 2026-10-16). The Dataslope mark assembles, the wordmark writes itself in the site header's weight, then the course, unit and title (`SeriesIntro` in `video/src/editorial/SeriesIntro.tsx`, 4.4 s, with its own `el-logo` sound). The script's `leadIn` makes room for it. Unit 1 has it; Unit 5's five videos do not yet.
+- **Sound effects come from ElevenLabs** (decided 2026-10-16), the `el-*` set in `video/sfx/elevenlabs.json`, generated once and reused by every video. SamplingBias keeps its synthesized set from the first experiment. Each new sound costs a few credits; placing existing ones costs nothing.
+- **Long videos turn between ideas out loud.** Unit 1 has a one-sentence transition beat before each new concept (six in all), voiced alone after the take for 325 characters.
 
 ## Open decisions
 

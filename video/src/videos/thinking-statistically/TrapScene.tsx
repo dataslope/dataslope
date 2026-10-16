@@ -6,6 +6,7 @@ import { body, fmt, headline, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note } 
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { MONO } from "../../theme/fonts";
+import { Sfx } from "../../sound/Sfx";
 import { ZIPS } from "./data";
 import { STAT_INK, Strike } from "./parts";
 
@@ -81,6 +82,13 @@ export const TrapScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: the table, the zip codes' average, struck out, the doublings ── */}
+      <Sfx name="el-whoosh" at={zipAt - 8} level={-34} />
+      <Sfx name="el-tap" at={fortyAt - 4} level={-27} />
+      <Sfx name="el-scratch" at={placeAt - 2} level={-30} />
+      <Sfx name="el-pop" at={priceAt - 2} level={-30} />
+      <Sfx name="el-pop" at={zipCodeAt - 6} level={-30} />
+
       <Ink at={trapFrom - 4} dur={20} style={{ left: 92, top: y(150), ...headline(80), whiteSpace: "nowrap" }}>
         Numbers that aren&apos;t quantities.
       </Ink>

@@ -5,6 +5,7 @@ import { useLayout } from "../../editorial/layout";
 import { BAR, BLUE_INK, body, headline, INK, INK_SOFT, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { SURVEY } from "./data";
 import { Kicker, RAW, Spot, STAT_INK, Svg } from "./parts";
 
@@ -61,6 +62,12 @@ export const SurveyScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: the ten picked dots, the barrel, the field sweeping in, the rings ── */}
+      <Sfx name="el-sprinkle" at={fiveAt - 4} level={-33} />
+      <Sfx name="el-pop" at={customersAt - 4} level={-29} />
+      <Sfx name="el-whoosh" at={threeAt - 4} level={-32} />
+      <Sfx name="el-pencil" at={sampleAt - 4} level={-34} />
+
       <Kicker at={surveyFrom - 4}>Population and sample</Kicker>
 
       <Ink at={fiveAt - 6} dur={20} style={{ left: 92, top: y(150), ...headline(80), whiteSpace: "nowrap" }}>

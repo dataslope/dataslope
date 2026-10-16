@@ -5,6 +5,7 @@ import { useLayout } from "../../editorial/layout";
 import { body, fmt, headline, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { FLAVORS, ZIPS } from "./data";
 import { STAT_INK } from "./parts";
 
@@ -49,6 +50,12 @@ export const DecideScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: one tap per kind of column, and the line to the next video ── */}
+      {ROWS.map((r) => (
+        <Sfx key={r.at} name="el-tap" at={r.at - 4} level={-30} />
+      ))}
+      <Sfx name="el-pencil" at={skewAt - 10} level={-34} />
+
       <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
         <Ink at={decidesFrom - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           The type decides

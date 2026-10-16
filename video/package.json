@@ -19,7 +19,8 @@
     "test": "node --test src/narration/timeline.test.ts src/narration/scenes.test.ts src/narration/voices.test.ts src/components/arrow.test.ts src/sound/sfx.test.ts",
     "render:fhd": "remotion render --scale=1",
     "check:frames": "node scripts/check-frames.mjs",
-    "sfx": "node scripts/sfx.mjs"
+    "sfx": "node scripts/sfx.mjs",
+    "sfx:elevenlabs": "node scripts/sfx-elevenlabs.mjs"
   },
   "dependencies": {
     "@fontsource-variable/fraunces": "5.3.0",

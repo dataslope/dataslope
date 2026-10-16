@@ -5,6 +5,7 @@ import { useLayout } from "../../editorial/layout";
 import { BAR, body, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { RAW, STAT_INK, Svg } from "./parts";
 
 const PARENT_Y = 310;
@@ -66,6 +67,12 @@ export const KindsScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: the two branches, the sizes sliding apart, the counts ── */}
+      <Sfx name="el-pencil" at={parentAt[0]} level={-35} />
+      <Sfx name="el-pencil" at={parentAt[1]} level={-35} />
+      <Sfx name="el-whoosh" at={unevenAt - 4} level={-33} />
+      <Sfx name="el-sprinkle" at={leafAt[2] + 4} level={-34} />
+
       <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
         <Ink at={kindsFrom - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Which group,

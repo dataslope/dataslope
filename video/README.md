@@ -140,7 +140,9 @@ narration.
 Every video follows these rules.
 
 - **Content only.** No running head or masthead, and no branded end card. The
-  video starts on its first idea and stops on its last.
+  video stops on its last idea. The one brand moment is the series intro
+  below, at the very start of a course video, and nothing else carries the
+  logo.
 - **No tracked capitals.** Kickers, figure numbers and axis titles are set in
   sentence case. All caps with wide letter spacing shouts, and it blurs at
   small sizes.
@@ -222,6 +224,29 @@ longer `pauseAfter` on the beat before it, which the gap never shortens.
 before a marked beat. Mark beats the same way when a scene opens on a beat
 some other way, such as a wipe or an eraser keyed to `beat("…").from`.
 
+### A course video opens on the series intro
+
+A course's unit video opens with `<SeriesIntro>` (`src/editorial/SeriesIntro.tsx`):
+the Dataslope mark assembles from its two slopes, tilts the way the site's
+logo tilts on hover, and the wordmark writes itself beside it, set as the
+site header sets it (Inter 600, tracked tight, at 1.38 times the mark's
+height). The course and unit, then the unit's title, arrive under a hairline.
+ThinkingStatistically is the worked example.
+
+- **The mark is the site's own file.** Its two paths and radial gradients are
+  copied from `public/dataslope-logo-blue.svg` (the copy in
+  `public/brand/` is the same file), drawn inline so each half can move, with
+  the blue as a brand token.
+- **The intro is its own scene from frame 0**, ending where the first
+  content scene's cut begins, and the script's `leadIn` is at least
+  `INTRO_SECONDS` (4.4 s) so the first word waits for it. Anything the first
+  scene used to show at fixed frames is re-cued to its first beat
+  (`n.beat(id).from`), or it plays under the logo. The first beat is
+  `scene: true`, since a cut is cued from it.
+- **It has its own sound**: `el-logo`, an airy rise into a bell, peaking at
+  -21 dBFS with nothing under it but paper, and a pencil stroke for the
+  hairline.
+
 ### A video in a series leads into the next
 
 A course's videos play in order, so each one ends on the question the next
@@ -240,6 +265,15 @@ SurvivorshipBias opens on the bombers that made it home.
   the one before it.
 - **Write the bridge before the first recording.** Added afterwards, it is
   voiced on its own, and the beat can sound slightly apart from the take.
+
+**Inside a video, the same applies between ideas.** A long video moves
+through several concepts, and a short spoken turn at each change keeps it one
+argument instead of a list of scenes: "So it helps to name the numbers on
+each side." ThinkingStatistically's six are the `*-in` beats at the end of
+the scene before each turn (`trend-in`, `parameter-in`, …). Each was added
+after the take and voiced alone, 325 characters in all, so a new transition
+costs only its own words. Keep them to one sentence that names what the next
+scene is for, never a recap of the one just finished.
 
 ### Adding the voice-over later
 
@@ -339,14 +373,14 @@ script text exactly as written.
 Captions are off by default (`EDITORIAL_DEFAULTS`). Switch them on in the
 Studio's props panel, or with `--props='{"captions":true}'`.
 
-## Sound effects (an experiment, in SamplingBias)
+## Sound effects (SamplingBias, ThinkingStatistically)
 
 Sound effects are small, soft sounds tied to what moves on screen: a block
 knocking into place, dots appearing in a sprinkle, a pen stroke under a word.
 They make a video feel made by hand without competing with the narrator.
-They are off unless a composition turns them on: SamplingBias sets
-`sfx: true` in its `defaultProps`, and `--props='{"sfx":false}'` renders it
-dry.
+They are off unless a composition turns them on: SamplingBias and
+ThinkingStatistically set `sfx: true` in their `defaultProps`, and
+`--props='{"sfx":false}'` renders either one dry.
 
 ```tsx
 <Sfx name="tock-mid" at={steps.random.d + DROP - 1} level={-23} />
@@ -369,16 +403,47 @@ dry.
   pip at most every 2.5 frames, and each pip is quieter as they come faster.
   The fall then reads as a patter that holds a steady level.
 
-**The sounds are synthesized, not recorded or generated.**
-`npm run sfx` (`scripts/sfx.mjs`) builds all 21 from damped sines and
-filtered noise into `public/sfx/`, with `sounds.json` listing each length.
-That makes them free, unlicensed and byte-identical on every run.
-`src/sound/sfx.test.ts` keeps the list and the files in step.
+**There are two palettes, and a video uses one of them.** Both live in
+`public/sfx/`, with `sounds.json` listing every file's length;
+`src/sound/sfx.test.ts` keeps the list and the files in step, and either
+script rewrites the list from what is in the folder.
 
-The palette is wooden knocks (`tock-*`, `pip-*`), pen strokes (`swish*`),
-grains (`sprinkle-*`, `riffle`), paper taps (`fill-roll`), sweeps (`gather`,
-`slide`, `tighten`) and two bells (`chime`, `chime-low`). Most of the energy
-sits above 2 kHz or in short transients, out of the way of the voice.
+- **Synthesized** (SamplingBias): `npm run sfx` (`scripts/sfx.mjs`) builds 21
+  sounds from damped sines and filtered noise. They are free, unlicensed and
+  byte-identical on every run.
+- **Generated by ElevenLabs** (ThinkingStatistically and the logo intro):
+  `npm run sfx:elevenlabs` (`scripts/sfx-elevenlabs.mjs`) sends each prompt in
+  `sfx/elevenlabs.json` to the sound-generation API and writes
+  `public/sfx/el-<name>.wav`. They sound recorded rather than built, which is
+  the point of having them.
+
+```bash
+npm run sfx:elevenlabs -- --dry-run        # what would be generated, no calls
+npm run sfx:elevenlabs                     # only the sounds not yet generated
+npm run sfx:elevenlabs -- --only tap,pop   # these again, even if present
+```
+
+Generation costs credits from the same ElevenLabs pool as the narration,
+though very few: a 2.5 s sound measured 14, so the eight in the file (8.3 s
+asked for in all) come to roughly 50. So the script generates only what is missing, and a
+prompt edited since its sound was generated is reported (from
+`sfx/elevenlabs.lock.json`) rather than silently regenerated: pass `--only`
+to pay for it. The raw MP3s stay in `.generated/sfx/` (gitignored), and the
+committed WAV is trimmed to the sound (5 ms before its onset, 30 ms after it
+dies away) and normalized to the same 0 dBFS peak as the synthesized set, so
+`level` means the same thing in both.
+
+The synthesized palette is wooden knocks (`tock-*`, `pip-*`), pen strokes
+(`swish*`), grains (`sprinkle-*`, `riffle`), paper taps (`fill-roll`), sweeps
+(`gather`, `slide`, `tighten`) and two bells (`chime`, `chime-low`). Most of
+the energy sits above 2 kHz or in short transients, out of the way of the
+voice. The ElevenLabs set is smaller and covers the same jobs: `el-tap` for a
+value landing, `el-pop` for an illustration or a bar, `el-sprinkle` for many
+dots at once, `el-pencil` for a line drawn, `el-scratch` for a strike-through,
+`el-whoosh` for something sliding or sweeping in, `el-chime` for a
+conclusion, and `el-logo` for the intro. `el-chime` is the one to watch: it
+centres near 320 Hz, inside the voice, so it goes in a pause and stays at
+about -32.
 
 **Measure the mix rather than guess it.** Render the audio twice, with and
 without the effects, and subtract the two to get the effects alone:

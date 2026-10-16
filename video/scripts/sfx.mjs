@@ -19,9 +19,9 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { encodeWav, indexSounds, SR } from "./lib/wav.mjs";
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), "..", "public", "sfx");
-const SR = 44100;
 
 const mulberry32 = (seed) => () => {
   seed = (seed + 0x6d2b79f5) | 0;
@@ -231,41 +231,6 @@ const SOUNDS = {
 
 // ── Write ────────────────────────────────────────────────────────────────────
 
-const wav = ([l, r]) => {
-  const n = Math.max(l.length, r.length);
-  const fadeIn = Math.round(0.001 * SR);
-  const fadeOut = Math.round(0.012 * SR);
-  let peak = 0;
-  for (let i = 0; i < n; i++) peak = Math.max(peak, Math.abs(l[i] ?? 0), Math.abs(r[i] ?? 0));
-  const k = 0.99 / (peak || 1);
-  const data = Buffer.alloc(n * 4);
-  for (let i = 0; i < n; i++) {
-    const g = k * Math.min(1, i / fadeIn, (n - 1 - i) / fadeOut);
-    data.writeInt16LE(Math.round((l[i] ?? 0) * g * 32767), i * 4);
-    data.writeInt16LE(Math.round((r[i] ?? 0) * g * 32767), i * 4 + 2);
-  }
-  const head = Buffer.alloc(44);
-  head.write("RIFF", 0);
-  head.writeUInt32LE(36 + data.length, 4);
-  head.write("WAVEfmt ", 8);
-  head.writeUInt32LE(16, 16);
-  head.writeUInt16LE(1, 20);
-  head.writeUInt16LE(2, 22);
-  head.writeUInt32LE(SR, 24);
-  head.writeUInt32LE(SR * 4, 28);
-  head.writeUInt16LE(4, 32);
-  head.writeUInt16LE(16, 34);
-  head.write("data", 36);
-  head.writeUInt32LE(data.length, 40);
-  return { bytes: Buffer.concat([head, data]), seconds: n / SR };
-};
-
 mkdirSync(OUT, { recursive: true });
-const lengths = {};
-for (const [name, pair] of Object.entries(SOUNDS)) {
-  const { bytes, seconds } = wav(pair);
-  writeFileSync(join(OUT, `${name}.wav`), bytes);
-  lengths[name] = Math.round(seconds * 1000) / 1000;
-}
-writeFileSync(join(OUT, "sounds.json"), JSON.stringify(lengths, null, 2) + "\n");
-console.log(`${Object.keys(lengths).length} sounds in public/sfx/`);
+for (const [name, pair] of Object.entries(SOUNDS)) writeFileSync(join(OUT, `${name}.wav`), encodeWav(pair).bytes);
+console.log(`${Object.keys(SOUNDS).length} synthesized, ${Object.keys(indexSounds(OUT)).length} sounds in public/sfx/`);

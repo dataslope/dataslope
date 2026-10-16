@@ -6,6 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { body, fmt, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { GAPS, jitter } from "./data";
 import { DOT, Kicker, lerp, STAT, STAT_INK, Svg, TruthLine } from "./parts";
 
@@ -34,6 +35,8 @@ const signed = (v: number) => `${v < 0 ? "−" : "+"}${fmt(Math.abs(v))}`;
 export const GapScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
+  // The series intro holds the page until the first word, so the headline waits for it.
+  const hookFrom = n.beat("hook").from;
   const { y, h } = useLayout();
 
   // ── Cues ──
@@ -98,11 +101,19 @@ export const GapScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Kicker at={2}>Signal and noise</Kicker>
+      {/* ── Sound: the first eighty scores, the averages, each draw's gap ── */}
+      <Sfx name="el-sprinkle" at={draws[0].s} level={-32} />
+      <Sfx name="el-tap" at={higherAt - 6} level={-27} />
+      {draws.map((d, k) => (
+        <Sfx key={k} name="el-pop" at={d.bar} level={-29} />
+      ))}
+      <Sfx name="el-pencil" at={processAt - 4} level={-33} />
+
+      <Kicker at={hookFrom - 10}>Signal and noise</Kicker>
 
       {/* ── Headlines: one line in two inks, the second following the first ── */}
       <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
-        <Ink at={4} dur={20} out={sameFrom - 6} style={{ position: "relative", whiteSpace: "nowrap" }}>
+        <Ink at={hookFrom - 8} dur={20} out={sameFrom - 6} style={{ position: "relative", whiteSpace: "nowrap" }}>
           B scores higher.
         </Ink>
         <Ink

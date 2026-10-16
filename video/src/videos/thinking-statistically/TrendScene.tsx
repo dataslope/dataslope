@@ -6,6 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { BAR, fmt, halo, headline, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { TREND } from "./data";
 import { Arrow, lerp, Spot, STAT, STAT_INK, Svg } from "./parts";
 
@@ -78,6 +79,12 @@ export const TrendScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: the months arriving, the story's arrow, the flat line ── */}
+      <Sfx name="el-sprinkle" at={yearsAt - 4} level={-34} />
+      <Sfx name="el-pencil" at={fellAt - 6} level={-32} />
+      <Sfx name="el-pop" at={processAt - 6} level={-29} />
+      <Sfx name="el-pencil" at={hundredAt - 6} level={-34} />
+
       {/* ── Headlines ── */}
       <Ink at={trendFrom - 4} dur={20} out={comesAt - 8} style={{ left: 92, top: y(150), ...headline(80), whiteSpace: "nowrap" }}>
         Noise makes trends, too.
