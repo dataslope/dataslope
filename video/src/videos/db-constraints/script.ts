@@ -1,4 +1,5 @@
 import type { NarrationScript } from "../../narration/types";
+import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
 
 /**
  * Narration for "Constraints" (16:9), Unit 6 of Database Design with
@@ -67,8 +68,8 @@ import type { NarrationScript } from "../../narration/types";
 export const script: NarrationScript = {
   id: "db-constraints",
   voice: "drew",
-  // Room for the series intro (SeriesIntro, INTRO_SECONDS) before the first word.
-  leadIn: 4.6,
+  // The series intro plays first; its lead-in lives in editorial/intro.ts.
+  leadIn: INTRO_LEAD_IN,
   tail: 2.6,
   beats: [
     // ── Part 1. Why constraints ───────────────────────────────────────────

@@ -1,4 +1,5 @@
 import type { NarrationScript } from "../../narration/types";
+import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
 
 /**
  * Narration for "Probability" (16:9), Unit 3 of the Statistics course: one
@@ -68,8 +69,8 @@ import type { NarrationScript } from "../../narration/types";
 export const script: NarrationScript = {
   id: "probability",
   voice: "hope",
-  // Room for the series intro (SeriesIntro, INTRO_SECONDS) before the first word.
-  leadIn: 4.6,
+  // The series intro plays first; its lead-in lives in editorial/intro.ts.
+  leadIn: INTRO_LEAD_IN,
   tail: 3,
   // A little more than the default 1.6 s before each scene, so each finished
   // figure holds a moment longer before the cut.

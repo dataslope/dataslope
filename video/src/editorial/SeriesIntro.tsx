@@ -49,9 +49,9 @@ const WORDMARK: React.CSSProperties = {
 /** "Dataslope" in that face is 4.61 em wide (measured in a render). */
 const WORD_EM = 4.61;
 
-/** Frames the intro needs before the first narrated word: a script that opens
- *  with it sets `leadIn` to at least INTRO_SECONDS. */
-export const INTRO_SECONDS = 4.4;
+/** How long the intro runs. It lives in intro.ts with INTRO_LEAD_IN, which
+ *  every script that opens on this intro uses as its `leadIn`. */
+export { INTRO_SECONDS } from "./intro";
 
 /**
  * A course video's opening: the Dataslope mark assembles from its two slopes

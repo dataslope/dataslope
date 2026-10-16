@@ -1,3 +1,4 @@
+import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
 import type { TimedBeat, Timeline } from "../../narration/types";
 
 /**
@@ -10,7 +11,7 @@ import type { TimedBeat, Timeline } from "../../narration/types";
  * where each part starts:
  *
  *   - the first part's first word lands where a course video's first word
- *     lands after the series intro (Unit 1's leadIn, 4.6 s);
+ *     lands after the series intro (INTRO_LEAD_IN, as every course script);
  *   - every later part starts HOLD seconds after the last word of the part
  *     before it (its spoken bridge), and cross-fades in over CROSSFADE
  *     frames, so the silence between two parts is HOLD plus the next part's
@@ -19,7 +20,7 @@ import type { TimedBeat, Timeline } from "../../narration/types";
  */
 
 /** Where the first part's first word lands, in seconds: after the intro. */
-export const FIRST_WORD = 4.6;
+export const FIRST_WORD = INTRO_LEAD_IN;
 /** Seconds between a part's last word and the next part's first frame. */
 export const HOLD = 1.4;
 /** Frames over which one part (or the intro) cross-fades into the next. */

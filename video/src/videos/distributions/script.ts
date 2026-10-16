@@ -1,4 +1,5 @@
 import type { NarrationScript } from "../../narration/types";
+import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
 
 /**
  * Narration for "Distributions" (16:9), Unit 4 of the Statistics course. It
@@ -86,8 +87,8 @@ import type { NarrationScript } from "../../narration/types";
 export const script: NarrationScript = {
   id: "distributions",
   voice: "hope",
-  // Room for the series intro (SeriesIntro, INTRO_SECONDS) before the first word.
-  leadIn: 4.6,
+  // The series intro plays first; its lead-in lives in editorial/intro.ts.
+  leadIn: INTRO_LEAD_IN,
   tail: 2.6,
   beats: [
     // ── Part 1. Counting distributions, and choosing one ─────────────────
