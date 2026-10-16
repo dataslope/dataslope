@@ -43,8 +43,9 @@ const COUNTRIES = [
   ["MX", 214, 24],
 ] as const;
 const SHUFFLED = [2, 0, 1];
-/** How far each label arcs on its way, so no two cross at one height. */
-const ARC = [-34, 10, 30];
+/** How far each label dips on its way. US crosses both others (CA early,
+ *  MX late), so it alone passes underneath, clear of them both. */
+const ARC = [46, 0, 0];
 const EVEN_X = SIZES.map((_, k) => (k * LAST_X) / (SIZES.length - 1));
 
 /**
@@ -96,7 +97,9 @@ export const KindsScene: React.FC = () => {
   const sizeX = (k: number) => EVEN_X[k] + (SIZES[k].x - EVEN_X[k]) * gaps;
   // The sizes arrive one at a time, from "do" to "shirt sizes".
   const sizeIn = (k: number) => ease(frame, lerp(doAt - 2, sizesAt + 4, k / (SIZES.length - 1)), 10);
-  const shuffle = ease(frame, noOrderAt - 2, 22);
+  // Symmetric timing, so US is at the bottom of its dip as it passes the others.
+  const st = Math.min(1, Math.max(0, (frame - (noOrderAt - 2)) / 24));
+  const shuffle = st * st * (3 - 2 * st);
   // "A few don't": a zip code, undecided between the two sides.
   const zipIn = ease(frame, fewAt - 4, 16);
   const sway = Math.sin(((frame - fewAt) / 72) * Math.PI * 2) * 34 * ease(frame, fewAt + 6, 30);
