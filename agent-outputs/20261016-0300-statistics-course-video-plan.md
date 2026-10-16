@@ -3,7 +3,7 @@
 **Course:** `content/courses/statistics-for-data-science-python/` (32 lessons in 9 sections)
 **Format:** the editorial style (`video/src/editorial/`): warm paper, Source Serif 4 headlines, watercolor spot illustrations, no burned-in captions. See `video/README.md`.
 **Estimate:** about **80 minutes (75 to 95) in 35 videos**, grouped into 9 units: most are 2 to 3 minutes, and Unit 1 is one video of about 5.
-**Pilot:** Unit 5, Sampling: all five videos built, voiced and illustrated (2026-10-16). Unit 1 is next, as a single video.
+**Pilot:** Unit 5, Sampling: all five videos built, voiced and illustrated (2026-10-16). Unit 1 is done too, as a single video of 5:04.
 
 ## How the videos are cut
 
@@ -43,7 +43,7 @@ The user asked for Unit 1 as one video rather than three (2026-10-16). It keeps 
 
 | # | Video | Min | Covers | Status |
 | --- | --- | --- | --- | --- |
-| 1 | Thinking statistically (`ThinkingStatistically`) | 5 | 1. signal and noise: why-statistics-matters; statistical-thinking (variation, signal vs. noise, the data-generating process, thinking in distributions). 2. population, sample, parameter, statistic: populations-and-samples. 3. what kind of data it is, and the encoding trap: types-of-data | in progress |
+| 1 | Thinking statistically (`ThinkingStatistically`) | 5 | 1. signal and noise: why-statistics-matters; statistical-thinking (variation, signal vs. noise, the data-generating process, thinking in distributions). 2. population, sample, parameter, statistic: populations-and-samples. 3. what kind of data it is, and the encoding trap: types-of-data | done, voiced, 5:04 |
 
 ### Unit 2. Describing data (9 min, 4 videos)
 
