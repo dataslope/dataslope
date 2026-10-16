@@ -22,11 +22,16 @@
  * Sending a million invitations and getting fifty thousand replies does not
  * help, because the fifty thousand are still the kind of people who reply.
  *
- * This is the Literary Digest lesson, restated. In 1936 they polled 2.4 million
- * people and got the election wrong; Gallup polled 50,000 and got it right.
- * The 2.4 million were drawn from telephone and car-registration lists in a
- * year when owning either correlated with how you voted, and no sample size
- * fixes a frame like that.
+ * This is the Literary Digest lesson, restated. In 1936 the magazine mailed
+ * about ten million straw ballots, got nearly 2.4 million back, and called the
+ * election for Landon; Gallup called it for Roosevelt from a far smaller quota
+ * sample. The popular story blames the Digest's list, drawn largely from
+ * telephone and car registrations, but phone and car owners as a group backed
+ * Roosevelt. Most of the miss came from who chose to reply: Landon's
+ * supporters returned nearly a third of their ballots, Roosevelt's about a
+ * fifth (Squire, Public Opinion Quarterly 52(1), 1988; Lusinchi, Social
+ * Science History 36(1), 2012). That is this chart's strong-bias curve, and
+ * no number of replies fixes it.
  */
 import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, PRIMARY, linspace } from "./_theme.mjs";
 

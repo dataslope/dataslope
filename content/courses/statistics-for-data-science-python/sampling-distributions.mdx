@@ -103,7 +103,9 @@ import plotly.express as px
 
 rng = np.random.default_rng(42)
 
-# A known population of customer spend (right-ish, but shape doesn't matter here).
+# A known population of customer spend: normal, so symmetric. Its left tail
+# even dips below zero (about 0.3% of values, which real spend can't do), but
+# the shape doesn't matter here.
 MU, SIGMA = 50.0, 18.0
 population = rng.normal(MU, SIGMA, size=1_000_000)
 
@@ -136,21 +138,26 @@ print(
   ]}
 />
 
-Two facts jump out, and they are the two pillars of inference:
-
-<Chart slug="sampling-distribution-build" />
+Two facts jump out of the printout, and they are the two pillars of
+inference:
 
 - **The sampling distribution is centered on μ.** The mean of all the
   sample means lands right on the population mean. The sample mean is
   *unbiased*, aimed at the truth.
 - **The sampling distribution is much narrower than the population.** Its
-  spread (here ~3) is far smaller than σ (here 18). Averaging `n`
-  values cancels out a lot of individual noise, so the *estimate* is much
-  more stable than any single data point.
+  spread (about 2.85 in the printout) is far smaller than σ (18). Averaging
+  `n` values cancels out a lot of individual noise, so the *estimate* is
+  much more stable than any single data point.
 
 That second spread, the standard deviation of the sampling distribution,
 is so important it gets its own name, the **standard error**, and its
 own page (*Standard Error*).
+
+Neither fact depends on the population being a bell. Below, the population
+is exponential with a mean of 2, piled up near zero with a long right tail,
+and the means come from samples of 30:
+
+<Chart slug="sampling-distribution-build" />
 
 ## Comparing the three side by side
 
@@ -376,7 +383,8 @@ The size of each sample drives precision; the number of samples is just how clea
 />
 
 Those are two different things people both call "more data", and it is worth
-seeing them side by side:
+seeing them side by side. Here are both levers from the code above, each at a
+low and a high setting:
 
 <Chart slug="more-samples-vs-bigger-samples" />
 
