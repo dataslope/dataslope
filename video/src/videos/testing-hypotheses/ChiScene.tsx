@@ -34,7 +34,6 @@ export const ChiScene: React.FC = () => {
   const categoriesAt = n.word("chi", "categories");
   const countsAt = n.word("chi", "counts");
   const deviceAt = n.word("chi", "device");
-  const sixAt = n.word("chi", "six hundred");
   const noDiffAt = n.word("expected", "no difference");
   const usersAt = n.word("chi", "users");
   const ifAt = n.word("expected", "If");
