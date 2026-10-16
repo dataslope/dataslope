@@ -50,6 +50,8 @@ export const LimitsScene: React.FC = () => {
   const largestAt = n.word("edge", "largest value");
   const maximumAt = n.word("edge", "maximum");
   const sayAt = n.word("edge", "say");
+  const haveAt = n.word("limits", "have");
+  const failsAt = n.word("edge", "fails");
   const nextFrom = n.beat("next").from;
   const precisionFrom = n.beat("precision").from;
   const whichAt = n.word("next", "which");
@@ -88,8 +90,10 @@ export const LimitsScene: React.FC = () => {
         :
       </Headline>
 
+      {/* The two figures step back once the bridge has asked its question. */}
+      <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.65 * ease(frame, zeroEndAt + 4, 30) }}>
       {/* ── Fig. 11: a biased sample ── */}
-      <FigLabel n="11" title={`${BIASED.n} waits, kept only under ${BIASED.cutoff} minutes`} at={biasedAt - 8} x={160} y={y(272)} />
+      <FigLabel n="11" title={`${BIASED.n} waits, kept only under ${BIASED.cutoff} minutes`} at={haveAt - 6} x={160} y={y(272)} />
       <Svg>
         <rect
           x={sx(XL, BIASED.cutoff)}
@@ -104,7 +108,7 @@ export const LimitsScene: React.FC = () => {
           return <circle key={j} cx={sx(XL, v)} cy={y(L_STRIP) + h((JIT[j] - 0.5) * 30)} r={5.5 * a} fill={DATA} stroke={PAPER} strokeWidth={1} opacity={0.85} />;
         })}
       </Svg>
-      <Axis scale={XL} base={y(L_AXIS)} ticks={[0, 2, 4, 6, 8, 10, 12, 14]} at={biasedAt - 6} />
+      <Axis scale={XL} base={y(L_AXIS)} ticks={[0, 2, 4, 6, 8, 10, 12, 14]} at={haveAt - 4} />
       <Note at={biasedAt + 8} x={sx(XL, BIASED.cutoff) + 12} y={y(L_STRIP - 30)}>
         <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>never recorded</span>
       </Note>
@@ -129,7 +133,7 @@ export const LimitsScene: React.FC = () => {
       </Svg>
 
       {/* ── Fig. 12: the maximum ── */}
-      <FigLabel n="12" title={`The largest of each resample of the ${BOOT.n} waits`} at={edgesAt - 8} x={XR.x0} y={y(272)} />
+      <FigLabel n="12" title={`The largest of each resample of the ${BOOT.n} waits`} at={failsAt - 4} x={XR.x0} y={y(272)} />
       <Axis scale={XR} base={y(R_BASE)} ticks={[10, 12, 14, 16, 18, 20, 22]} at={edgesAt - 6} />
       <Svg>
         {MAXIMUM.top.map((v, j) => {
@@ -179,6 +183,8 @@ export const LimitsScene: React.FC = () => {
           {Math.round(MAXIMUM.atTop * 100)}% of resamples: exactly {fmt(MAXIMUM.sampleMax)}
         </span>
       </Note>
+
+      </div>
 
       {/* ── Precision, not accuracy ── */}
       <div style={{ position: "absolute", left: 160, top: y(744), display: "flex", gap: "0.3em", whiteSpace: "nowrap", ...body(36, true) }}>

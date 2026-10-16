@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { BOOT, histogram, jitter } from "./data";
-import { Bracket, DATA, EST, EST_INK, Headline, IntervalBar, Kicker, lerp, Marked, pulse, Rule, Spot, Svg } from "./parts";
+import { Bracket, DATA, EST, EST_INK, Headline, IntervalBar, Kicker, lerp, Marked, pulse, Rule, Spot, Strike, Svg } from "./parts";
 
 /** Fig. 7: the sixty waits, and one resample of them stacked below. */
 const X: XScale = { lo: 0, hi: 20, x0: 160, x1: 1760 };
@@ -56,6 +56,8 @@ export const ResampleScene: React.FC = () => {
   const medianAt = n.word("bootstrap", "median");
   const correlationAt = n.word("bootstrap", "correlation");
   const uglyAt = n.word("bootstrap", "ugly");
+  const formulaWordAt = n.word("bootstrap", "formula");
+  const existAt = n.word("bootstrap", "exist");
   const bootstrapsAt = n.word("trick", "bootstrap's");
   const treatAt = n.word("trick", "treat");
   const populationAt = n.word("trick", "population");
@@ -132,6 +134,14 @@ export const ResampleScene: React.FC = () => {
           <span style={{ opacity: ease(frame, uglyAt - 4, 12) }}>The formula is ugly, or there isn’t one.</span>
         </span>
       </Note>
+
+      {/* The mean's own formula, which a median does not get. */}
+      <Ink at={formulaWordAt - 4} dur={14} out={treatAt - 8} style={{ left: 1100, top: y(206), whiteSpace: "nowrap" }}>
+        <div style={label(20, INK_SOFT)}>a mean’s standard error</div>
+        <div style={{ ...headline(48), marginTop: 6, opacity: 1 - 0.6 * ease(frame, existAt - 2, 12) }}>
+          <Strike at={existAt - 2}>s ÷ √n</Strike>
+        </div>
+      </Ink>
 
       {/* ── Fig. 7: the waits, and a resample ── */}
       <FigLabel n="7" title={`${BOOT.n} customer wait times, in minutes`} at={sixtyAt - 8} x={160} y={y(262)} />

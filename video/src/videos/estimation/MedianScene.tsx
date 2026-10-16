@@ -51,7 +51,8 @@ export const MedianScene: React.FC = () => {
   const medianWordAt = n.word("word", "median");
   const pileAt = n.word("lumpy", "pile");
   const lumpyAt = n.word("lumpy", "lumpy");
-  const sawAt = n.word("lumpy", "values you actually saw");
+  const onlyAt = n.word("lumpy", "only");
+  const valuesAt = n.word("lumpy", "values you actually saw");
   const middleAt = n.word("range", "middle");
   const meanWordAt = n.word("word", "mean");
   const eightHundredAt = n.word("range", "eight hundred");
@@ -138,12 +139,12 @@ export const MedianScene: React.FC = () => {
         />
       ) : null}
       {/* The real incomes in this stretch, under the spikes. */}
-      <Svg opacity={ease(frame, sawAt - 4, 14)}>
+      <Svg opacity={ease(frame, valuesAt - 4, 14)}>
         {near.map((v, i) => (
           <line key={i} x1={sx(XZ, v)} x2={sx(XZ, v)} y1={y(HIST_BASE) + 36} y2={y(HIST_BASE) + 50} stroke={DATA} strokeWidth={2.4} />
         ))}
       </Svg>
-      <Note at={sawAt} x={sx(XZ, 37.6)} y={y(HIST_BASE) - h(HIST_H * 0.62)}>
+      <Note at={onlyAt - 2} x={sx(XZ, 37.6)} y={y(HIST_BASE) - h(HIST_H * 0.62)}>
         <span style={{ ...note(22, INK), ...halo, whiteSpace: "nowrap" }}>
           only {MEDIAN.distinct} different values
           <br />

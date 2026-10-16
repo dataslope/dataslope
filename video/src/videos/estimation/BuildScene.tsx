@@ -54,6 +54,9 @@ export const BuildScene: React.FC = () => {
   const monthAt = n.word("users", "month");
   const thirtyThreeAt = n.word("interval", "thirty-three");
   const intervalWordAt = n.word("interval", "interval");
+  const multiplyAt = n.word("margin", "Multiply");
+  const whyAt = n.word("why", "Why");
+  const buildingAt = n.word("means-in", "Building");
   const tDistAt = n.word("why", "t-distribution");
   const slipEndAt = n.word("means-in", "slip", { edge: "end" });
   const criticalAt = n.word("margin", "critical value");
@@ -141,7 +144,7 @@ export const BuildScene: React.FC = () => {
         {term(estimateAt - 4, "estimate", money(USERS.xBar), EST_INK, fortyNineAt - 2, thatsAt - 2, anotherAt + 4)}
         {op(criticalAt - 6, "±")}
         {term(criticalAt - 4, "critical value", fmt(USERS.tCrit), INK, twoOhOneAt - 2, payAt - 4)}
-        {op(criticalAt + 2, "×")}
+        {op(multiplyAt - 4, "×")}
         {term(seWordAt - 4, "standard error", money(USERS.se), INK, dollarFiftyAt - 2, seWobbleAt - 2, criticalAt)}
         {op(intervalWordAt - 6, "=")}
         <div style={{ display: "flex", flexDirection: "column", gap: 10, position: "relative" }}>
@@ -247,7 +250,16 @@ export const BuildScene: React.FC = () => {
       </Note>
 
       {/* The interval itself, on both figures. */}
-      <IntervalBar x0={zx(lo)} x1={zx(hi)} y={y(BAR_Y)} at={stepAt - 2} dur={22} color={INK} width={4} tick={14} />
+      <IntervalBar
+        x0={zx(lo)}
+        x1={zx(hi)}
+        y={y(BAR_Y)}
+        at={stepAt - 2}
+        dur={22}
+        color={INK}
+        width={4 + 4 * pulse(frame, buildingAt - 2, 20)}
+        tick={14}
+      />
       <IntervalBar
         x0={zx(USERS.zLo)}
         x1={zx(USERS.zHi)}
@@ -273,7 +285,7 @@ export const BuildScene: React.FC = () => {
       </Svg>
 
       {/* ── The inset: why 2.01 and not 1.96 ── */}
-      <Ink at={usualAt - 4} dur={14} out={meansAt - 8} style={{ left: C.x0, top: y(C_Y - 100), whiteSpace: "nowrap" }}>
+      <Ink at={whyAt - 4} dur={14} out={meansAt - 8} style={{ left: C.x0, top: y(C_Y - 100), whiteSpace: "nowrap" }}>
         <span style={label(21, INK_SOFT)}>Critical value for 95%</span>
       </Ink>
       <Axis scale={C} base={y(C_Y)} ticks={[1.9, 2.0, 2.1]} format={(v) => fmt(v, 1)} at={usualAt - 2} opacity={1 - ease(frame, meansAt - 8, 10)} />

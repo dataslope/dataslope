@@ -40,11 +40,11 @@ export const TestScene: React.FC = () => {
   const levelAt = n.word("test", "level");
   const noEffectAt = n.word("straddle", "no effect");
   const eitherAt = n.word("eight", "either");
+  const butIncludesAt = n.word("eight", "includes");
   const viewsFrom = n.beat("views").from;
   const minusAt = n.word("straddle", "minus a half");
   const eightAt = n.word("straddle", "eight");
   const includesAt = n.word("straddle", "includes zero");
-  const ruleOutAt = n.word("straddle", "rule out");
   const eightAgainAt = n.word("eight", "eight");
   const bigAt = n.word("eight", "big effect");
   const proofAt = n.word("eight", "proof");
@@ -105,7 +105,7 @@ export const TestScene: React.FC = () => {
           width={32}
           height={120}
           fill={ds("red", 100)}
-          opacity={ease(frame, eightAgainAt - 4, 12)}
+          opacity={ease(frame, butIncludesAt - 2, 12)}
         />
       </Svg>
 
@@ -139,7 +139,16 @@ export const TestScene: React.FC = () => {
       </Note>
 
       {/* ── Row 2: the lesson's −0.5 to 8.0 ── */}
-      <IntervalBar x0={sx(X, straddle.lo)} x1={sx(X, straddle.hi)} y={y(ROW2)} at={thisAt - 2} dur={20} color={INK} width={4} tick={14} />
+      <IntervalBar
+        x0={sx(X, straddle.lo)}
+        x1={sx(X, straddle.hi)}
+        y={y(ROW2)}
+        at={thisAt - 2}
+        dur={Math.max(20, eightAt - thisAt)}
+        color={INK}
+        width={4}
+        tick={14}
+      />
       <Svg>
         <circle
           cx={sx(X, (straddle.lo + straddle.hi) / 2)}
@@ -167,7 +176,7 @@ export const TestScene: React.FC = () => {
       <Note at={eightAt - 4} x={sx(X, straddle.hi) + 26} y={y(ROW2) - 16}>
         <span style={{ ...note(24, INK), fontWeight: 700, ...halo }}>{signed(straddle.hi)}</span>
       </Note>
-      <Note at={ruleOutAt - 4} x={zeroX + 26} y={y(ROW2) + 30}>
+      <Note at={noEffectAt - 6} x={zeroX + 26} y={y(ROW2) + 30}>
         <span style={{ ...note(23, EST_INK), fontWeight: 650, ...halo, whiteSpace: "nowrap" }}>includes zero: can’t rule out no effect</span>
       </Note>
       <Note at={bigAt - 2} x={zeroX + 26} y={y(ROW2) + 64}>
