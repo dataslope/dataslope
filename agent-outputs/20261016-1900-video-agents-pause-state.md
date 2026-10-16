@@ -121,3 +121,10 @@ fresh container.
   - statistical-fallacies, Datasaurus: "standard deviations around 17 and 26" (code prints 26.9); "to two decimal places" but the code's rounding shows 16.76 vs 16.77, −0.06 vs −0.07 (agree within 0.01).
   - shape-and-outliers, two-group heights: mean "describes nobody", "no actual person is near it"; 83 of 3,000 heights within 1 cm of 175.0.
   - shape-and-outliers, z-score quiz explanation: extremes inflate the SD "so those very points fall short of it"; in the lesson's own example the z rule flags exactly the two planted extremes (120, 200); it misses 54.6 and 61.7.
+- Stats Unit 7 `TestingHypotheses` (10:00): voiced (5 takes, ~8,032 chars), check:motion (2.5 s), check:sync (+0.08 s), check:mix (21.3 LU under), check:frames all pass.
+  Lesson discrepancies:
+  - anova-and-chi-square.mdx lines 79, 89, 662 send the reader to Errors and Power for multiple comparisons, which that lesson doesn't cover.
+  - hypothesis-testing.mdx:60 "a 1935 afternoon" is the year of Fisher's book; the tea tasting was at Rothamsted in the 1920s (Box 1978).
+  - t-tests, latency block (seed 7): loc 212 gives sample mean 200.3, p = 0.954; prose "a bit above 200" undersells it.
+  - t-tests, Welch block: "the two p-values differ" but they are 0.7871 and 0.7804.
+  - errors-and-power: effect 0 prints power 0.06 where the prose says "near 0.05". Minor.

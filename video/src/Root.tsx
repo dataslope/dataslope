@@ -99,16 +99,6 @@ export const RemotionRoot: React.FC = () => (
   <>
     <Folder name="Landscape">
       <Composition
-        id="CentralLimitTheorem"
-        component={CentralLimitTheorem}
-        width={1920}
-        height={1080}
-        fps={FPS}
-        durationInFrames={FPS * 60}
-        defaultProps={EDITORIAL_DEFAULTS}
-        calculateMetadata={narratedMetadata<EditorialProps>(centralLimitTheoremScript)}
-      />
-      <Composition
         id="ListVsSet"
         component={ListVsSet}
         width={1920}
@@ -278,48 +268,11 @@ export const RemotionRoot: React.FC = () => (
         defaultProps={EDITORIAL_DEFAULTS}
         calculateMetadata={narratedMetadata<EditorialProps>(simpsonsParadoxScript)}
       />
+    </Folder>
+    <Folder name="Statistics">
+      {/* Statistics course: one video per unit, in course order; Stats-<unit>- ids sort that way too. */}
       <Composition
-        id="SamplingBias"
-        component={SamplingBias}
-        width={1920}
-        height={1080}
-        fps={FPS}
-        durationInFrames={FPS * 60}
-        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
-        calculateMetadata={narratedMetadata<EditorialProps>(samplingBiasScript)}
-      />
-      <Composition
-        id="SurvivorshipBias"
-        component={SurvivorshipBias}
-        width={1920}
-        height={1080}
-        fps={FPS}
-        durationInFrames={FPS * 60}
-        defaultProps={EDITORIAL_DEFAULTS}
-        calculateMetadata={narratedMetadata<EditorialProps>(survivorshipBiasScript)}
-      />
-      <Composition
-        id="SamplingDistributions"
-        component={SamplingDistributions}
-        width={1920}
-        height={1080}
-        fps={FPS}
-        durationInFrames={FPS * 60}
-        defaultProps={EDITORIAL_DEFAULTS}
-        calculateMetadata={narratedMetadata<EditorialProps>(samplingDistributionsScript)}
-      />
-      <Composition
-        id="StandardError"
-        component={StandardError}
-        width={1920}
-        height={1080}
-        fps={FPS}
-        durationInFrames={FPS * 60}
-        defaultProps={EDITORIAL_DEFAULTS}
-        calculateMetadata={narratedMetadata<EditorialProps>(standardErrorScript)}
-      />
-      <Composition
-        id="ThinkingStatistically"
+        id="Stats-1-ThinkingStatistically"
         component={ThinkingStatistically}
         width={1920}
         height={1080}
@@ -328,9 +281,8 @@ export const RemotionRoot: React.FC = () => (
         defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(thinkingStatisticallyScript)}
       />
-      {/* Statistics course: Units 2 to 4 and 6 to 9, one video each, in course order. */}
       <Composition
-        id="DescribingData"
+        id="Stats-2-DescribingData"
         component={DescribingData}
         width={1920}
         height={1080}
@@ -340,7 +292,7 @@ export const RemotionRoot: React.FC = () => (
         calculateMetadata={narratedMetadata<EditorialProps>(describingDataScript)}
       />
       <Composition
-        id="Probability"
+        id="Stats-3-Probability"
         component={Probability}
         width={1920}
         height={1080}
@@ -350,7 +302,7 @@ export const RemotionRoot: React.FC = () => (
         calculateMetadata={narratedMetadata<EditorialProps>(probabilityScript)}
       />
       <Composition
-        id="Distributions"
+        id="Stats-4-Distributions"
         component={Distributions}
         width={1920}
         height={1080}
@@ -359,9 +311,9 @@ export const RemotionRoot: React.FC = () => (
         defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(distributionsScript)}
       />
-      {/* Unit 5 as one video, from the five above (src/videos/sampling/). */}
+      {/* Unit 5 as one video, from its five parts below (src/videos/sampling/). */}
       <Composition
-        id="Sampling"
+        id="Stats-5-Sampling"
         component={Sampling}
         width={1920}
         height={1080}
@@ -370,8 +322,59 @@ export const RemotionRoot: React.FC = () => (
         defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={samplingMetadata}
       />
+      {/* Unit 5's five parts, each also a video on its own. */}
       <Composition
-        id="Estimation"
+        id="Stats-5-1-SamplingBias"
+        component={SamplingBias}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(samplingBiasScript)}
+      />
+      <Composition
+        id="Stats-5-2-SurvivorshipBias"
+        component={SurvivorshipBias}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={EDITORIAL_DEFAULTS}
+        calculateMetadata={narratedMetadata<EditorialProps>(survivorshipBiasScript)}
+      />
+      <Composition
+        id="Stats-5-3-SamplingDistributions"
+        component={SamplingDistributions}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={EDITORIAL_DEFAULTS}
+        calculateMetadata={narratedMetadata<EditorialProps>(samplingDistributionsScript)}
+      />
+      <Composition
+        id="Stats-5-4-CentralLimitTheorem"
+        component={CentralLimitTheorem}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={EDITORIAL_DEFAULTS}
+        calculateMetadata={narratedMetadata<EditorialProps>(centralLimitTheoremScript)}
+      />
+      <Composition
+        id="Stats-5-5-StandardError"
+        component={StandardError}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={EDITORIAL_DEFAULTS}
+        calculateMetadata={narratedMetadata<EditorialProps>(standardErrorScript)}
+      />
+      <Composition
+        id="Stats-6-Estimation"
         component={Estimation}
         width={1920}
         height={1080}
@@ -381,7 +384,7 @@ export const RemotionRoot: React.FC = () => (
         calculateMetadata={narratedMetadata<EditorialProps>(estimationScript)}
       />
       <Composition
-        id="TestingHypotheses"
+        id="Stats-7-TestingHypotheses"
         component={TestingHypotheses}
         width={1920}
         height={1080}
@@ -391,7 +394,7 @@ export const RemotionRoot: React.FC = () => (
         calculateMetadata={narratedMetadata<EditorialProps>(testingHypothesesScript)}
       />
       <Composition
-        id="InterpretingResults"
+        id="Stats-8-InterpretingResults"
         component={InterpretingResults}
         width={1920}
         height={1080}
@@ -401,7 +404,7 @@ export const RemotionRoot: React.FC = () => (
         calculateMetadata={narratedMetadata<EditorialProps>(interpretingResultsScript)}
       />
       <Composition
-        id="StatisticsInPractice"
+        id="Stats-9-StatisticsInPractice"
         component={StatisticsInPractice}
         width={1920}
         height={1080}

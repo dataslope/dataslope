@@ -66,7 +66,7 @@ test("a WAV written at its own level reads back the same", () => {
 
 test("a video is named by its composition or its folder, either way round", () => {
   for (const [id, folder] of [
-    ["ThinkingStatistically", "thinking-statistically"],
+    ["WhyNormalization", "why-normalization"],
     ["CPointers", "c-pointers"],
     ["TfIdf", "tf-idf"],
     ["LlmTemperature", "llm-temperature"],
