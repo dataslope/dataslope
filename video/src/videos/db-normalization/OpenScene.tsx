@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -28,6 +28,7 @@ const RIGHT = 1250;
 const CHECKS_Y = 650;
 const LISTING_Y = 496;
 const LISTING_SIZE = 22;
+const SCAN = `color-mix(in srgb, ${BAR} 16%, transparent)`;
 
 /** How many rows hold a value in a column. */
 const copies = (col: number, value: string | null) => FLAT.rows.filter((r) => r[col] === value).length;
@@ -124,6 +125,8 @@ export const OpenScene: React.FC = () => {
             ...emailRows.map((row, k) => ({ row, col: F.email, at: twoAt + k * 6, color: MARK_BAD })),
           ]}
           swaps={[{ row: 0, col: F.email, at: orderOneAt + 4, value: NEW_EMAIL, color: ACCENT_INK }]}
+          // "look closer": a pale wash runs down the rows before the copies are marked.
+          bands={FLAT.rows.map((_, i) => ({ row: i, at: closerAt + i * 5, out: closerAt + 18 + i * 5, color: SCAN }))}
         />
         {/* A tick at the end of every row: each one satisfies every constraint. */}
         {FLAT.rows.map((_, i) => (

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -27,6 +27,8 @@ import {
 import { DepArrow, Drift, Fade, Reply, Svg } from "./parts";
 
 const TABLE_Y = 430;
+/** A line of the table being read aloud: a pale wash under its whole row. */
+const MARK_ROW = `color-mix(in srgb, ${BAR} 16%, transparent)`;
 const RIGHT = 980;
 const LIST_SIZE = 22;
 const ERD_Y = 400;
@@ -51,6 +53,8 @@ export const PairScene: React.FC = () => {
   const productAt = n.word("pair", "product");
   const quantityAt = n.word("whole", "Quantity");
   const wholeAt = n.word("whole", "whole pair");
+  const order100At = n.word("whole", "Order one hundred");
+  const order101At = n.word("whole", "order one oh one");
   const twoAt = n.word("whole", "two notebooks");
   const tookOneAt = n.word("whole", "took one");
   const nameAt = n.word("part", "product name");
@@ -162,6 +166,11 @@ export const PairScene: React.FC = () => {
               ...tenRows.map((row, k) => ({ row, col: I.name, at: copiesAt + k * 6, color: MARK_BAD })),
             ]}
             swaps={tenRows.map((row, k) => ({ row, col: I.name, at: changesAt + k * 6, value: RENAMED, color: ACCENT_INK }))}
+            bands={[
+              // "Order one hundred took two, order one oh one took one": each line as it is read.
+              { row: 0, at: order100At - 2, out: order101At - 2, color: MARK_ROW },
+              { row: 2, at: order101At - 2, out: nameAt - 4, color: MARK_ROW },
+            ]}
           />
           {/* The key: both columns, together. */}
           <Svg opacity={bracketIn}>

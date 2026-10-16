@@ -151,7 +151,7 @@ export const SchemaScene: React.FC = () => {
         nameAt={namingAt}
         dim={neverAt + 6}
       />
-      <Spot id="db-constraints-door" at={doorAt - 4} left={1560} top={y(700)} width={220} height={350} />
+      <Spot id="db-constraints-door" at={doorAt - 4} left={770} top={y(600)} width={200} height={320} />
     </AbsoluteFill>
   );
 };

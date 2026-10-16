@@ -58,7 +58,7 @@ const Gloss: React.FC<{ at: number; form: string; gist: string; color: string }>
 export const OathScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
-  const { y } = useLayout();
+  const { y, h } = useLayout();
 
   const from = n.beat("oath").from;
   const oathAt = n.word("oath", "old oath");
@@ -76,6 +76,7 @@ export const OathScene: React.FC = () => {
   const coddAt = n.word("kent", "so help me Codd");
   const soAt = n.word("denorm-in", "So should");
   const everyTableAt = n.word("denorm-in", "every table");
+  const foreverAt = n.word("denorm-in", "forever");
   const almostAt = n.word("denorm-in", "Almost");
   const end = n.beat("denorm-in").to;
 
@@ -104,6 +105,7 @@ export const OathScene: React.FC = () => {
       <Spot id="db-normalization-keys" at={oathAt - 6} out={soAt} left={1520} top={y(300)} width={280} height={392} />
 
       <Drift from={from} to={end + 40} amount={0.015} origin="25% 50%">
+        <div style={{ position: "absolute", inset: 0, transform: `translateY(${-ease(frame, foreverAt - 4, 22) * h(34)}px)` }}>
         <Fade dimAt={everyTableAt} dim={0.35}>
           <Ink at={everyAt - 4} dur={18} style={{ left: X0, top: y(240), whiteSpace: "nowrap" }}>
             <span style={{ ...body(42, true), color: INK_SOFT }}>Every non-key column depends on</span>
@@ -137,6 +139,7 @@ export const OathScene: React.FC = () => {
             <span style={{ ...body(40, true), color: ACCENT_INK }}>…so help me Codd.</span>
           </Ink>
         </Fade>
+        </div>
         <Ink at={almostAt - 4} dur={18} style={{ left: X0 - 4, top: y(800), whiteSpace: "nowrap" }}>
           <span style={{ ...headline(76, true), color: INK }}>Almost.</span>
         </Ink>

@@ -139,7 +139,10 @@ export const Sweep: React.FC<{ at: number; dur?: number; color?: string; out?: n
           opacity: 1 - o,
         }}
       />
-      <span style={{ position: "relative" }}>{children}</span>
+      {/* The words lift a touch as the stroke passes under them. */}
+      <span style={{ position: "relative", display: "inline-block", transform: p > 0 && p < 1 ? `scale(${1 + 0.07 * Math.sin(Math.PI * p)})` : undefined }}>
+        {children}
+      </span>
     </span>
   );
 };

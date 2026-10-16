@@ -67,7 +67,8 @@ export const TestScene: React.FC = () => {
   const nineAt = n.word("gut", "about nine");
   const walkFrom = n.beat("walk").from;
   const walkAt = n.word("walk", "a hundred thousand");
-  const hundredAt = n.word("walk", "A hundred");
+  // The second "a hundred": the first is "a hundred thousand".
+  const hundredAt = n.word("walk", "A hundred", { nth: 2 });
   const ninetyNineKAt = n.word("walk", "Ninety-nine thousand");
   const catchesAt = n.word("caught", "catches");
   const caughtAt = n.word("caught", "ninety-nine");

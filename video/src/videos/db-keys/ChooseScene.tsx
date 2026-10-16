@@ -58,7 +58,8 @@ export const ChooseScene: React.FC = () => {
       <Sfx name="el-pencil" at={aloneAt - 4} level={-34} />
       <Sfx name="el-pencil" at={recordAt - 6} level={-34} />
       <Sfx name="el-tap" at={sameAt} level={-29} />
-      <Sfx name="el-chime" at={n.beat("update").to + 4} level={-32} />
+      {/* The conclusion's bell, in the silence after the last word. */}
+      <Sfx name="el-chime" at={end + 6} level={-32} />
 
       <Drift from={from} to={end + 80}>
         <Headline lead="What is the child" turn="without its parent?" at={askAt - 6} turnAt={withoutAt - 4} />

@@ -24,7 +24,8 @@ export const RvScene: React.FC = () => {
   const numberAt = n.word("rv", "a number");
   const flipAt = n.word("rv", "Flip two coins");
   const countAt = n.word("rv", "count the heads");
-  const twoAt = n.word("rv", "Two");
+  // The second "two": the first is "Flip two coins".
+  const twoAt = n.word("rv", "Two", { nth: 2 });
   const oneAt = n.word("rv", "one");
   const one2At = n.word("rv", "one", { nth: 2 });
   const zeroAt = n.word("rv", "zero");

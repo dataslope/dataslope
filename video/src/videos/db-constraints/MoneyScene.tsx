@@ -218,7 +218,7 @@ export const MoneyScene: React.FC = () => {
         <span style={{ ...note(26, INK), fontStyle: "italic", whiteSpace: "nowrap" }}>And if there's no value at all?</span>
       </Ink>
 
-      <Spot id="db-constraints-coins" at={open - 6} left={1440} top={y(750)} width={330} height={300} dim={kindAt} />
+      <Spot id="db-constraints-coins" at={open - 6} left={1460} top={y(700)} width={300} height={260} dim={kindAt} />
     </AbsoluteFill>
   );
 };

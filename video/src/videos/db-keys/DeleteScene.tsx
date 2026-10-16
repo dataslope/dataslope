@@ -118,7 +118,8 @@ export const DeleteScene: React.FC = () => {
   const keptPost = CASCADE.posts.rows.findIndex((_, i) => !gonePosts.includes(i));
   const postOf = (row: number) => CASCADE.posts.rows.findIndex((p) => p[0] === CASCADE.comments.rows[row][1]);
   const collapseAt = tooAt + 4;
-  const closed = (goneComments.length + gonePosts.length) * h(ROW_H) * ease(frame, collapseAt + 4, 12);
+  // Only the comments' closing rows sit above the statement.
+  const closed = goneComments.length * h(ROW_H) * ease(frame, collapseAt + 4, 12);
   const rightLoop = (crow: number, prow: number) =>
     [
       [k.c.right + 6, k.c.rowMid(crow)],

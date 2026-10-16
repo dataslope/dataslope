@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -43,6 +43,7 @@ export const ChainScene: React.FC = () => {
   const ordersAt = n.word("chain", "These orders");
   const cityAt = n.word("chain", "city");
   const keyAt = n.word("chain", "The key");
+  const orderIdAt = n.word("chain", "order ID");
   const orderAt = n.word("chain", "ORDER");
   const customerAt = n.word("chain", "customer");
   const givesAt = n.word("detour", "gives");
@@ -77,7 +78,7 @@ export const ChainScene: React.FC = () => {
   const tg = tableGeometry({ x: RIGHT, top: y(TWO_Y), cols: CITY_TWO.cols, rows: CITY_TWO.rows, headH: h(HEAD_H), rowH: h(ROW_H) });
   const twoAda = CITY_TWO.rows.map((r, i) => (r[1] === "Ada" ? i : -1)).filter((i) => i >= 0);
   const oxfordOrders = CITY_JOIN.rows.filter((r) => r[2] === NEW_CITY).length;
-  const orderSwell = pulse(frame, orderAt, 24);
+  const orderSwell = Math.max(pulse(frame, orderIdAt, 24), pulse(frame, orderAt, 24));
   const sameSwell = pulse(frame, sameAt, 24);
 
   const customers = useEntityLayout({
@@ -157,6 +158,9 @@ export const ChainScene: React.FC = () => {
               }}
             />
           ))}
+          <Ink at={orderIdAt - 2} dur={12} style={{ left: g.x + 4, top: g.top - 46, whiteSpace: "nowrap" }}>
+            <span style={label(21, BLUE_INK)}>the key</span>
+          </Ink>
           <Note at={customerAt + 6} x={g.x} y={bottom + 92}>
             <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
               <Mono>customer_city</Mono> is a fact about the customer

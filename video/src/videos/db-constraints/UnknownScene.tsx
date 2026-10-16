@@ -121,8 +121,8 @@ export const UnknownScene: React.FC = () => {
         <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>The test on that row:</span>
         <Code size={28}>{"null >= 0"}</Code>
       </Ink>
-      <Arrow from={[TABLE_X + 520, below + 22]} to={[TABLE_X + 600, below + 22]} at={unknownAt - 6} dur={10} color={INK_SOFT} out={testOut} />
-      <Ink at={unknownAt - 2} dur={14} out={testOut} style={{ left: TABLE_X + 620, top: below, whiteSpace: "nowrap" }}>
+      <Arrow from={[TABLE_X + 420, below + 22]} to={[TABLE_X + 490, below + 22]} at={unknownAt - 6} dur={10} color={INK_SOFT} out={testOut} />
+      <Ink at={unknownAt - 2} dur={14} out={testOut} style={{ left: TABLE_X + 510, top: below, whiteSpace: "nowrap" }}>
         <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 700, color: ACCENT_INK }}>{String(CHECK_ONLY.test)}</span>
         <span style={{ ...note(23, INK), marginLeft: 16 }}>unknown, not false</span>
       </Ink>
