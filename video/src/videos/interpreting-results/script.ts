@@ -56,8 +56,10 @@ import type { NarrationScript } from "../../narration/types";
  *     and "thirty-three".
  *   - statistical-fallacies, "Confounding" and the simpsons-paradox-trend
  *     chart (seed 9021): 104 people in four age bands; the pooled line rises
- *     8.9 mmHg per weekly hour, "about nine points"; within a band it falls
- *     2.7, "almost three"; randomizing severs the confounder's link.
+ *     8.9 mmHg per weekly hour, "about nine points"; the line fitted to each
+ *     band falls (by 1.2 to 3.4 a weekly hour; the chart's caption quotes the
+ *     2.7 its data was generated with); randomizing severs the confounder's
+ *     link.
  *   - statistical-fallacies, "Regression to the mean" (seed 3): 500
  *     salespeople, skill Normal(100, 10) plus monthly luck Normal(0, 15);
  *     the top tenth 131.7 then 112.9, "a hundred and thirty-two" and "a
@@ -72,8 +74,7 @@ import type { NarrationScript } from "../../narration/types";
  *     or more, 107 people, correlation -0.56; "among our customers" is the
  *     lesson's list of phrases.
  *   - statistical-fallacies, ecological-fallacy: six districts, means
- *     correlating at 0.93; within a district, 0.07 on average, "close to
- *     zero".
+ *     correlating at 0.93; within a district, 0.07 on average.
  *   - The close is the callout "The thread connecting half of these": the
  *     analysis was shaped by the data instead of decided in advance.
  *
@@ -220,7 +221,7 @@ export const script: NarrationScript = {
     },
     {
       id: "bands",
-      text: "Now color them by age. Inside every age band, the line falls, by almost three points an hour.",
+      text: "Now color them by age. Inside every age band, the line falls.",
       pauseAfter: 0.4,
     },
     {
@@ -299,7 +300,7 @@ export const script: NarrationScript = {
       text: "And a correlation depends on what you're counting. Across six districts, average income and turnout correlate at zero point nine three.",
       pauseAfter: 0.4,
     },
-    { id: "people", text: "But inside each district, person by person, it's close to zero.", pauseAfter: 0.4 },
+    { id: "people", text: "But inside a district, person by person, the correlation averages zero point zero seven.", pauseAfter: 0.4 },
     {
       id: "both-true",
       text: "Both are true. One is about districts, the other about people. Name the unit before you quote a correlation.",

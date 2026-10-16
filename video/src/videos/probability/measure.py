@@ -145,6 +145,9 @@ out["table"] = {
     "pAll": r(p_churn, 3),
     "churnedTotal": int(table["churned"].sum()),
     "ratio": r(ratio, 3),
+    # The same table read the other way round: of the 150 who churned, how
+    # many were on the free plan (the page's quiz names this conditional).
+    "pFreeGivenChurn": r(table.loc["free", "churned"] / table["churned"].sum(), 3),
 }
 
 # ── Part 3. The 99% test (conditional-probability) ──────────────────────────

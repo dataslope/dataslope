@@ -70,6 +70,7 @@ export const TABLE = {
   pPaid: m.table.pPaid,
   pFree: m.table.pFree,
   pAll: m.table.pAll,
+  pFreeGivenChurn: m.table.pFreeGivenChurn,
 };
 
 // ── Part 3. The 99% test (conditional-probability) ──────────────────────────
