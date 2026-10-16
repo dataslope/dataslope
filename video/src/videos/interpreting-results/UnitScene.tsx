@@ -159,7 +159,7 @@ export const UnitScene: React.FC = () => {
           ) : null}
           {DISTRICTS.groups.map((g, k) => {
             const a = pop(frame, dotAt(k), fps, 14);
-            return a > 0.01 ? <circle key={k} cx={means[k][0]} cy={means[k][1]} r={14 * a} fill={HUES[k]} stroke={PAPER} strokeWidth={2} /> : null;
+            return a > 0.01 ? <circle key={k} cx={means[k][0]} cy={means[k][1]} r={20 * a} fill={HUES[k]} stroke={PAPER} strokeWidth={2} /> : null;
           })}
           {/* Each district bursts into its people, on the right. */}
           {DISTRICTS.groups.map((g, k) =>
@@ -192,6 +192,21 @@ export const UnitScene: React.FC = () => {
           })}
         </Svg>
         <Ring x={IND.x0 + 250} y={(top + bottom) / 2} at={averagesAt - 2} r0={40} r1={200} />
+        {means.map(([mx, my], k) => (
+          <Ring key={k} x={mx} y={my} at={dotAt(k) + 2} color={HUES[k]} r0={20} r1={64} />
+        ))}
+        {/* The panel the narration is not about steps back, one and then the other. */}
+        {[
+          { p: IND, dim: ease(frame, districtsAt - 6, 12) * (1 - ease(frame, peopleAt - 6, 12)) },
+          { p: AGG, dim: ease(frame, peopleAt - 6, 12) * (1 - ease(frame, nameAt - 4, 12)) },
+        ].map(({ p, dim }, k) =>
+          dim > 0 ? (
+            <div
+              key={k}
+              style={{ position: "absolute", left: p.x0 - 80, top: top - 56, width: p.x1 - p.x0 + 110, height: bottom - top + 110, background: PAPER, opacity: 0.6 * dim }}
+            />
+          ) : null,
+        )}
         <Ring x={AGG.x0 + 230} y={top - 30} at={quoteAt - 2} color={DATA} r0={20} r1={90} />
         <Ring x={IND.x0 + 330} y={top - 30} at={quoteAt + 4} r0={20} r1={90} />
         <Note at={sevenAt + 4} x={IND.x1 + 24} y={top + 30}>

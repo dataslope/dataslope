@@ -85,6 +85,7 @@ export const SkewScene: React.FC = () => {
   const dragsAt = n.word("mean", "drags");
   const alarmAt = n.word("alarm", "alarm");
   const leadAt = n.word("alarm", "lead");
+  const aboveAt = n.word("alarm", "above");
   const rightFrom = n.beat("right").from;
   const dependsAt = n.word("right", "depends");
   const rowAt = ROWS.map((r) => n.word(r.beat, r.word));
@@ -202,6 +203,8 @@ export const SkewScene: React.FC = () => {
           a gap of ${fmt(ORDERS.gap)}: skew
         </Tag>
         <Pulse x={medX} y={markTop} at={leadAt - 2} color={INK} r={6} />
+        <Pulse x={meanX} y={markTop} at={aboveAt - 6} color={STAT} r={6} />
+        <Pulse x={medX} y={markTop} at={aboveAt + 4} color={INK} r={6} />
         <Pulse x={medX} y={markTop} at={answerAt[1] - 2} color={INK} r={6} />
       </Drift>
 

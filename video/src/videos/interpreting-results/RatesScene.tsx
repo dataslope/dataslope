@@ -8,7 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CI, RATES } from "./data";
-import { DATA, DATA_INK, Drift, Headline, lerp, Marker, Ring, STAT, STAT_INK, Svg } from "./parts";
+import { DATA, DATA_INK, Drift, Headline, Marker, Ring, STAT, STAT_INK, Svg } from "./parts";
 
 /** Conversion, 0 to 5%. */
 const RX: XScale = { lo: 0, hi: 0.05, x0: 420, x1: 1300 };
@@ -17,8 +17,12 @@ const BAR_H = 50;
 /** The two ways to say it, beside the bars. */
 const SAY_X = 1480;
 /** d, 0 to 0.8, for the interval. */
-const DX: XScale = { lo: 0, hi: 0.8, x0: 420, x1: 1300 };
-const CI_Y = 730;
+const DX: XScale = { lo: -0.1, hi: 0.9, x0: 420, x1: 1300 };
+const CI_Y = 744;
+/** The histogram of resampled d's: px per resample, and its tallest bar. */
+const HIST_UNIT = 0.62;
+const HIST_TOP = 96;
+const RAW_BAR = `color-mix(in srgb, ${INK_SOFT} 38%, ${PAPER})`;
 const TRIO_Y = 838;
 
 /**
@@ -43,7 +47,6 @@ export const RatesScene: React.FC = () => {
   const everyAt = n.word("interval", "every");
   const sizeAt = n.word("interval", "effect size");
   const plausiblyAt = n.word("interval", "plausibly");
-  const anywhereAt = n.word("interval", "anywhere");
   const biggerAt = n.word("both", "bigger");
   const bothAt = n.word("both", "Report both");
   const intervalAt = n.word("interval", "interval");
@@ -61,7 +64,6 @@ export const RatesScene: React.FC = () => {
   const rates = [RATES.pControl, RATES.pTreatment];
   const grow = [ease(frame, threeAt - 6, 16), ease(frame, fourAt - 6, 16)];
   const extra = ease(frame, pointsAt - 4, 12);
-  const ci = ease(frame, plausiblyAt - 4, Math.max(10, oneAt - plausiblyAt + 4));
   const ciY = y(CI_Y);
   const trio = [
     { q: "How big", a: `d = ${fmt(CI.d, 2)}`, at: bigAt },
@@ -187,13 +189,21 @@ export const RatesScene: React.FC = () => {
           </div>
         </Note>
         <Ring x={SAY_X + 50} y={y(BAR_Y[0]) + 22} at={firstAt - 2} r0={30} r1={100} />
-        <Svg opacity={ease(frame, readerAt - 4, 12)}>
-          <path
-            d={`M${SAY_X - 22},${y(BAR_Y[0]) - 24} L${SAY_X - 34},${y(BAR_Y[0]) - 24} L${SAY_X - 34},${y(BAR_Y[1]) + 76} L${SAY_X - 22},${y(BAR_Y[1]) + 76}`}
-            fill="none"
-            stroke={INK}
-            strokeWidth={2.2}
-          />
+        <Svg>
+          {ease(frame, readerAt - 4, 14) > 0 ? (
+            <rect
+              x={SAY_X - 28}
+              y={y(BAR_Y[0]) - 46}
+              width={380}
+              height={y(BAR_Y[1]) + 96 - (y(BAR_Y[0]) - 46)}
+              rx={10}
+              fill="none"
+              stroke={INK}
+              strokeWidth={2.6}
+              pathLength={1}
+              strokeDasharray={`${ease(frame, readerAt - 4, 14)} 1`}
+            />
+          ) : null}
         </Svg>
         <Note at={bothAt - 2} x={SAY_X} y={y(BAR_Y[1]) + 104}>
           <span style={{ ...body(32, true), color: INK, whiteSpace: "nowrap" }}>
@@ -205,7 +215,7 @@ export const RatesScene: React.FC = () => {
       {/* ── The effect size with its interval ── */}
       <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.45 * ease(frame, butAt - 4, 18) }}>
       <Drift from={reportAt} to={n.beat("part2-in").to + 40} amount={0.02} origin={[960, 760]}>
-        <FigLabel n="5" title="An effect size and its 95% interval" at={sizeAt - 4} x={160} y={y(612)} />
+        <FigLabel n="5" title="An effect size and its 95% interval" at={sizeAt - 4} x={160} y={y(596)} />
         <Svg opacity={ease(frame, intervalAt, 14)}>
           <line x1={DX.x0} x2={DX.x1} y1={ciY + 0.5} y2={ciY + 0.5} stroke={INK} strokeWidth={1.6} />
           {[0, 0.2, 0.4, 0.6, 0.8].map((v) => (
@@ -230,34 +240,60 @@ export const RatesScene: React.FC = () => {
         <Ink at={intervalAt} dur={12} style={{ left: 160, top: ciY - 22, whiteSpace: "nowrap" }}>
           <span style={label(24, INK)}>Cohen&apos;s d</span>
         </Ink>
+        {/* The 2,000 resampled d's, the interval read off their middle 95%. */}
         <Svg>
-          {ci > 0 ? (
-            <line
-              x1={lerp(sx(DX, CI.d), sx(DX, CI.lo), ci)}
-              x2={lerp(sx(DX, CI.d), sx(DX, CI.hi), ease(frame, anywhereAt - 4, Math.max(10, sixAt - anywhereAt + 4)))}
-              y1={ciY - 34}
-              y2={ciY - 34}
-              stroke={STAT}
-              strokeWidth={6}
-              strokeLinecap="round"
-              opacity={0.55}
-            />
-          ) : null}
-          {ease(frame, dAt - 4, 8) > 0 ? (
-            <circle cx={sx(DX, CI.d)} cy={ciY - 34} r={12 * ease(frame, dAt - 4, 8)} fill={STAT} stroke={PAPER} strokeWidth={2} />
+          {CI.counts.map((c, i) => {
+            const lo = CI.binLo + i * CI.bin;
+            const hi = lo + CI.bin;
+            const g = ease(frame, plausiblyAt - 6 + i * 0.5, 10);
+            if (c <= 0 || g <= 0) return null;
+            const mid = (lo + hi) / 2;
+            const left = ease(frame, oneAt - 6, 14);
+            const right = ease(frame, sixAt - 6, 14);
+            const inside = mid >= CI.lo && mid <= CI.hi;
+            const lit = inside ? (mid < CI.d ? left : right) : 0;
+            const hh = c * HIST_UNIT * g;
+            return (
+              <rect
+                key={i}
+                x={sx(DX, lo) + 1}
+                y={ciY - hh}
+                width={sx(DX, hi) - sx(DX, lo) - 2}
+                height={hh}
+                fill={`color-mix(in srgb, ${STAT} ${Math.round(lit * 70)}%, ${RAW_BAR})`}
+              />
+            );
+          })}
+          {[
+            { v: CI.lo, at: oneAt },
+            { v: CI.hi, at: sixAt },
+          ].map((e) => {
+            const p = ease(frame, e.at - 6, 12);
+            return p > 0 ? (
+              <line key={e.v} x1={sx(DX, e.v)} x2={sx(DX, e.v)} y1={ciY} y2={ciY - HIST_TOP * p} stroke={STAT} strokeWidth={3} strokeDasharray="6 5" />
+            ) : null;
+          })}
+          {ease(frame, dAt - 4, 12) > 0 ? (
+            <line x1={sx(DX, CI.d)} x2={sx(DX, CI.d)} y1={ciY} y2={ciY - HIST_TOP * ease(frame, dAt - 4, 12)} stroke={STAT} strokeWidth={4} />
           ) : null}
         </Svg>
-        <Note at={dAt} x={sx(DX, CI.d)} y={ciY - 92} from="up">
+        <Note at={dAt} x={sx(DX, CI.d)} y={ciY - HIST_TOP - 34} from="up">
           <span style={{ ...note(24, STAT_INK), fontWeight: 700, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
-            {fmt(CI.d, 2)}
+            d = {fmt(CI.d, 2)}
           </span>
+        </Note>
+        <Note at={plausiblyAt + 4} x={DX.x1 + 30} y={ciY - 70}>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>{CI.resamples.toLocaleString("en-US")} resampled d&apos;s</span>
+          <div style={{ ...note(21, STAT_INK), fontWeight: 600, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, sixAt, 10) }}>
+            the middle 95%
+          </div>
         </Note>
         {[
           { v: CI.lo, at: oneAt },
           { v: CI.hi, at: sixAt },
         ].map((e) => (
-          <Note key={e.v} at={e.at} x={sx(DX, e.v)} y={ciY - 84} from="up">
-            <span style={{ ...note(21, STAT_INK), fontWeight: 600, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+          <Note key={e.v} at={e.at} x={sx(DX, e.v)} y={ciY + 40} from="up">
+            <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", background: PAPER, padding: "0 6px" }}>
               {fmt(e.v, 2)}
             </span>
           </Note>

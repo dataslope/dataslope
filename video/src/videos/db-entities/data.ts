@@ -12,7 +12,7 @@ export const VIDEO = "db-entities";
  * Whether public/images/db-entities/ holds the watercolors from
  * illustrations.json. Every frame is laid out with room for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 /** A value as PGlite hands it back: numeric and date arrive as strings. */
 type Value = string | number | boolean | null;

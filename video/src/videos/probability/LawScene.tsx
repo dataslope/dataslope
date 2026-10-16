@@ -61,6 +61,8 @@ export const LawScene: React.FC = () => {
   const afterEnd = n.word("swamp", "after it", { edge: "end" });
   const tableInFrom = n.beat("table-in").from;
   const learnAt = n.word("table-in", "learn something");
+  const changeAt = n.word("table-in", "change");
+  const memoryFrom = n.beat("memory").from;
 
   // How far along the flips the line has been drawn, in log10 of the flip count.
   const stages: [number, number, number][] = [
@@ -104,6 +106,7 @@ export const LawScene: React.FC = () => {
   const late = ease(frame, pointAt - 4, 14);
   const fly = ease(frame, paidAt - 4, 22);
   const dimLine = ease(frame, swampedAt - 6, 12);
+  const chartBack = ease(frame, memoryFrom - 2, 14) * 0.3 * (1 - ease(frame, paidAt - 4, 12)) + ease(frame, changeAt - 2, 14) * 0.55;
 
   return (
     <AbsoluteFill>
@@ -123,7 +126,7 @@ export const LawScene: React.FC = () => {
       <FigLabel n="1" title={`Heads so far, over ${LLN.n.toLocaleString("en-US")} flips of a fair coin`} at={llnFrom} x={CH.x0} y={y(268)} />
 
       {/* ── Axes ── */}
-      <Svg>
+      <Svg opacity={1 - chartBack}>
         <line x1={CH.x0} x2={lerp(CH.x0, CH.x1, axis)} y1={y(CH.base) + 0.5} y2={y(CH.base) + 0.5} stroke={INK} strokeWidth={1.6} />
         <g opacity={ticks}>
           {TICKS.map((k) => (

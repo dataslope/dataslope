@@ -67,6 +67,13 @@ export const AnyScene: React.FC = () => {
   const surpriseAt = n.word("next", "surprise");
   const tailAt = n.word("next", "lopsided");
   const meanRow = ease(frame, meanShapeAt - 2, 16);
+  // Built and pointed at as the narration names each part.
+  const sixtyAt = n.word("kinds", "samples of sixty");
+  const incomesAt = n.word("kinds", "incomes");
+  const wideAt = n.word("own", "wide");
+  const thatWidthAt = n.word("name", "that width");
+  const movesAt = n.word("name", "moves");
+  const widthLit = ease(frame, thatWidthAt - 2, 12);
 
   const named = ease(frame, seAt - 2, 14);
 
@@ -107,7 +114,7 @@ export const AnyScene: React.FC = () => {
       <FigLabel
         n="7"
         title={`Samples of ${ANY_N} from a lopsided population, ${ANY_SAMPLES.toLocaleString("en-US")} of each`}
-        at={meanFirstAt}
+        at={sixtyAt - 4}
         x={X.x0}
         y={y(290)}
       />
@@ -148,14 +155,15 @@ export const AnyScene: React.FC = () => {
         bin={LOPSIDED.hist.bin}
         scale={X}
         base={y(POP_ROW.base)}
-        unit={h(POP_ROW.height / peak(LOPSIDED.hist))}
+        unit={h(POP_ROW.height / peak(LOPSIDED.hist)) * swell(frame, tailAt - 2, 0.14, 22)}
         color={POP_FILL}
         grow={(i) => ease(frame, lopsidedAt - 4 + i * 0.4, 12)}
       />
       <Axis scale={X} base={y(POP_ROW.base)} ticks={[]} at={meanFirstAt + 2} />
       <Note at={lopsidedAt + 6} x={sx(X, 120)} y={y(POP_ROW.base - 62)}>
         <span style={{ ...note(22, INK_SOFT), ...halo }}>
-          <Marker at={tailAt - 2}>a long tail to the right</Marker>, like incomes
+          <Marker at={tailAt - 2}>a long tail to the right</Marker>
+          <span style={{ opacity: ease(frame, incomesAt - 2, 12) }}>, like incomes</span>
         </span>
       </Note>
 
@@ -163,7 +171,8 @@ export const AnyScene: React.FC = () => {
         const base = STAT_ROWS[r];
         const at = statAt[r];
         const last = r === STATS.length - 1;
-        const unit = (STAT_H / peak(s.hist)) * (r === 0 ? swell(frame, surpriseAt - 2, 0.12, 22) : 1);
+        const unit =
+          (STAT_H / peak(s.hist)) * (r === 0 ? swell(frame, surpriseAt - 2, 0.12, 22) : last ? swell(frame, wideAt - 2, 0.14, 22) : 1);
         const mid = s.center;
         const bracketY = y(base - STAT_H * AT_SD);
         return (
@@ -210,15 +219,25 @@ export const AnyScene: React.FC = () => {
               x1={sx(X, s.center + s.sd)}
               y={bracketY}
               at={widthAt - 2 + r * 3}
-              color={named > 0 ? ACCENT_INK : INK}
-              width={2.4 + named}
+              color={named > 0 || widthLit > 0 ? ACCENT_INK : INK}
+              width={2.4 + named + 1.2 * widthLit * (1 - named)}
               tick={8}
             />
             <Note at={centerAt + r * 3} x={COL_CENTER} y={y(base - 58)}>
               <span style={{ ...note(26, INK), fontWeight: 600 }}>{fmt(s.center, 1)}</span>
             </Note>
             <Note at={widthAt + r * 3} x={COL_SPREAD} y={y(base - 58)}>
-              <span style={{ ...note(26, ACCENT_INK), fontWeight: 700 }}>{fmt(s.sd)}</span>
+              <span
+                style={{
+                  ...note(26, ACCENT_INK),
+                  fontWeight: 700,
+                  display: "inline-block",
+                  transformOrigin: "left center",
+                  transform: `scale(${swell(frame, movesAt - 2 + r * 5, 0.16, 20)})`,
+                }}
+              >
+                {fmt(s.sd)}
+              </span>
             </Note>
             <div
               style={{

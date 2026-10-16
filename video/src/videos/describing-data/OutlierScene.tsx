@@ -56,6 +56,7 @@ export const OutlierScene: React.FC = () => {
   const fourAt = n.word("ordinary", "Four");
   const verdictFrom = n.beat("verdict").from;
   const questionAt = n.word("verdict", "question");
+  const notVerdictAt = n.word("verdict", "not a verdict");
   const whyAt = n.word("verdict", "why");
   const decideAt = n.word("verdict", "decide");
   const lookAt = n.word("plot-in", "look");
@@ -93,9 +94,14 @@ export const OutlierScene: React.FC = () => {
           Nothing more.
         </Ink>
       </div>
-      <Ink at={verdictFrom - 2} dur={20} style={{ left: 92, top: y(150), ...headline(80), whiteSpace: "nowrap" }}>
-        A flag is a <Mark at={questionAt - 2}>question</Mark>.
-      </Ink>
+      <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
+        <Ink at={verdictFrom - 2} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
+          A flag is a <Mark at={questionAt - 2}>question</Mark>,
+        </Ink>
+        <Ink at={notVerdictAt - 4} dur={18} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+          not a verdict.
+        </Ink>
+      </div>
 
       <Spot id="describing-data-magnifier" at={lookAt - 6} left={1620} top={y(100)} width={200} height={203} />
 

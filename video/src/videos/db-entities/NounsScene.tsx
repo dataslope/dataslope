@@ -197,7 +197,7 @@ export const NounsScene: React.FC = () => {
             strokeDasharray="5 5"
           />
         </Svg>
-        <Spot id="db-entities-crates" at={candidateAt} left={1290} top={y(650)} width={480} height={320} />
+        <Spot id="db-entities-crates" at={candidateAt} left={1240} top={y(660)} width={560} height={290} />
       </Drift>
     </AbsoluteFill>
   );

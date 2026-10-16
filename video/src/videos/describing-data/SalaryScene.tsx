@@ -39,6 +39,9 @@ export const SalaryScene: React.FC = () => {
   const takeAt = n.word("hook", "So take");
   const tenAt = n.word("hook", "ten salaries");
   const fortyAt = n.word("hook", "forty-two");
+  const sixtyAt = n.word("hook", "sixty-five");
+  const jumpSevenAt = n.word("jump", "seven");
+  const roomAt = n.word("nobody", "room");
   const meanAt = n.word("centers", "mean");
   const sevenAt = n.word("centers", "seven");
   const middleValueAt = n.word("centers", "middle value");
@@ -212,6 +215,10 @@ export const SalaryScene: React.FC = () => {
         ))}
 
         <Pulse x={xOf(meanV)} y={base - h(118)} at={sevenAt} color={STAT} r={6} />
+        <Pulse x={xOf(meanV)} y={base - h(118)} at={jumpSevenAt} color={STAT} r={6} />
+        <Pulse x={xOf(meanV)} y={base - h(118)} at={roomAt - 2} color={STAT} r={6} />
+        <Pulse x={xs[0]} y={base - r - 1.5} at={fortyAt} color={DATA} r={r} />
+        <Pulse x={xs[SALARIES.values.length - 1]} y={base - r - 1.5} at={sixtyAt} color={DATA} r={r} />
         {[4, 5].map((i) => {
           const ring = ease(frame, middleValueAt - 4, 10) * (1 - ease(frame, ceoAt - 6, 10));
           return ring > 0 ? (

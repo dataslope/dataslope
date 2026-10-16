@@ -50,11 +50,17 @@ export const WhichScene: React.FC = () => {
   const seenAt = n.word("next", "haven't seen");
   const probAt = n.word("next", "probability");
   const meansAt = n.word("next", "means");
+  const eachAt = n.word("ecdf", "each point");
+  const summarizeAt = n.word("habit", "summarize");
+  const summaryAt = n.word("next", "summary");
+  const plotWordAt = n.word("next", "plot");
+  const whatAt = n.word("next", "what a probability");
+  const evenAt = n.word("next", "even");
 
   const fade = 1 - ease(frame, seenAt - 4, 20) * 0.6;
   /** After the last word, the four figures clear away one at a time. */
-  const clear = (i: number) => 1 - ease(frame, meansAt + 18 + i * 14, 14);
-  const glow = ease(frame, haveAt - 2, 8) * (1 - ease(frame, haveAt + 12, 14));
+  const clear = (i: number) => 1 - ease(frame, evenAt + 6 + i * 14, 14);
+  const glow = ease(frame, plotWordAt - 2, 8) * (1 - ease(frame, plotWordAt + 12, 14));
 
   // ── Histogram: twenty bins, flicked to eighty and back on "a few bin widths" ──
   const hs = scaleAt(COL[0]);
@@ -124,7 +130,7 @@ export const WhichScene: React.FC = () => {
         <Ink at={firstAt - 6} dur={18} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
           Plot first.
         </Ink>
-        <Ink at={firstAt + 10} dur={18} style={{ position: "relative", whiteSpace: "nowrap" }}>
+        <Ink at={summarizeAt - 4} dur={18} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Summarize second.
         </Ink>
       </div>
@@ -165,6 +171,8 @@ export const WhichScene: React.FC = () => {
               <circle cx={readX} cy={readY} r={5} fill={STAT} />
             </Svg>
           ) : null}
+          <Pulse x={readX} y={readY} at={eachAt - 2} color={STAT} r={6} />
+          <Pulse x={readX} y={readY} at={haveAt} color={STAT} r={6} />
           <Tag x={es.x0 - 8} y={readY - 14} opacity={read} color={STAT_INK} size={21} bold align="right">
             half
           </Tag>
@@ -191,6 +199,7 @@ export const WhichScene: React.FC = () => {
             </Svg>
           ) : null}
           <Pulse x={q1} y={mid2 - h(BOX_H) / 2} at={quartilesAt - 2} color={INK} r={5} />
+          <Pulse x={med} y={mid2 - h(BOX_H) / 2} at={summaryAt - 2} color={INK} r={6} />
           <Pulse x={q3} y={mid2 - h(BOX_H) / 2} at={quartilesAt + 4} color={INK} r={5} />
           {ease(frame, secondAt - 4, 14) > 0 ? (
             <Svg opacity={ease(frame, secondAt - 4, 14)}>
@@ -236,7 +245,7 @@ export const WhichScene: React.FC = () => {
       </div>
 
       <NextLine at={probAt} x={160} y={y(850)} width={1000}>
-        <Mark at={meansAt - 4}>what a probability means</Mark>.
+        <Mark at={whatAt}>what a probability means</Mark>.
       </NextLine>
     </AbsoluteFill>
   );

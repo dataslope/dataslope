@@ -43,7 +43,7 @@ export const AdmitScene: React.FC = () => {
   const twoAt = n.word("admit", "two departments");
   const admissionsAt = n.word("admit", "admissions");
   const fiftyFiveAt = n.word("overall", "fifty-five");
-  const thirtyThreeAt = n.word("overall", "thirty-three");
+  const onlyAt = n.word("overall", "only");
   const flipAt = n.word("confound-in", "flip");
   const overallAt = n.word("overall", "Overall");
   const splitAt = n.word("split", "split");
@@ -71,7 +71,7 @@ export const AdmitScene: React.FC = () => {
 
   const rowY = (i: number) => y(ROW_Y[i]);
   const rows = [
-    { name: "Overall", sub: "both departments", cells: POOLED, at: { men: fiftyFiveAt, women: thirtyThreeAt }, gapAt: behindAt },
+    { name: "Overall", sub: "both departments", cells: POOLED, at: { men: fiftyFiveAt, women: onlyAt }, gapAt: behindAt },
     { name: "Easy", sub: "department", cells: DEPTS[0], at: { men: easyAt + 2, women: sixtyFiveAt - 4 }, gapAt: bothAt - 2 },
     { name: "Hard", sub: "department", cells: DEPTS[1], at: { men: hardAt + 2, women: againAt - 4 }, gapAt: bothAt + 4 },
   ];
@@ -140,7 +140,15 @@ export const AdmitScene: React.FC = () => {
               strokeDasharray={s === 0 ? undefined : "2 5"}
             />
           ))}
-          <line x1={140} x2={1780} y1={(rowY(0) + rowY(1)) / 2 + 6} y2={(rowY(0) + rowY(1)) / 2 + 6} stroke={HAIRLINE} strokeWidth={1} opacity={ease(frame, splitAt - 4, 12) * 0.6} />
+          <line
+            x1={140}
+            x2={140 + 1640 * ease(frame, splitAt - 4, 16)}
+            y1={(rowY(0) + rowY(1)) / 2 + 6}
+            y2={(rowY(0) + rowY(1)) / 2 + 6}
+            stroke={INK}
+            strokeWidth={1.8}
+            opacity={0.7}
+          />
         </Svg>
         {[0, 0.25, 0.5, 0.75, 1].map((s) => (
           <div key={s} style={{ position: "absolute", left: px(s), top: y(810), transform: "translateX(-50%)", opacity: grid, ...note(20, INK_SOFT) }}>
@@ -180,7 +188,7 @@ export const AdmitScene: React.FC = () => {
           const order: Group[] = r.cells.men.applied >= r.cells.women.applied ? ["men", "women"] : ["women", "men"];
           return (
             <React.Fragment key={r.name}>
-              <Ink at={i === 0 ? overallAt - 4 : Math.min(r.at.men, r.at.women) - 10} dur={12} style={{ left: 160, top: cy - 34, whiteSpace: "nowrap" }}>
+              <Ink at={i === 0 ? overallAt - 4 : splitAt + 2 + (i - 1) * 8} dur={12} style={{ left: 160, top: cy - 34, whiteSpace: "nowrap" }}>
                 <div style={{ ...body(38, true), color: INK }}>
                   <Marker at={i === 0 ? totalAt - 4 : deptAt - 4 + i * 4}>{r.name}</Marker>
                 </div>
@@ -255,6 +263,25 @@ export const AdmitScene: React.FC = () => {
             </React.Fragment>
           );
         })}
+
+        {/* The lurking variable, boxed as it is named. */}
+        {ease(frame, deptAt - 4, 14) > 0 ? (
+          <Svg>
+            <rect
+              x={140}
+              y={rowY(1) - 56}
+              width={260}
+              height={rowY(2) - rowY(1) + 110}
+              rx={10}
+              fill="none"
+              stroke={INK}
+              strokeWidth={2.6}
+              pathLength={1}
+              strokeDasharray={`${ease(frame, deptAt - 4, 14)} 1`}
+              opacity={1 - ease(frame, totalAt - 6, 12)}
+            />
+          </Svg>
+        ) : null}
 
         {/* What the narration is reading, ringed as it is read. */}
         <Ring x={px(DEPTS[1].men.rate)} y={rowY(2)} at={twentyFiveAt - 2} color={GROUP_COLOR.men} r0={radius(100)} r1={radius(100) + 36} />

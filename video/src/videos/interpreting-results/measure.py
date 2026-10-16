@@ -207,7 +207,22 @@ for _ in range(2000):
 lo, hi = np.percentile(boot, [2.5, 97.5])
 say(f"Cohen's d        : {dci:.3f}")
 say(f"95% bootstrap CI : [{lo:.3f}, {hi:.3f}]")
-out["ci"] = {"seed": 11, "d": r(dci, 3), "lo": r(lo, 3), "hi": r(hi, 3)}
+# The 2,000 resampled d's themselves, binned 0.02 wide from -0.1, for the
+# histogram the interval is read off.
+edges = np.round(np.arange(-0.1, 0.9 + 1e-9, 0.02), 2)
+counts, _ = np.histogram(boot, bins=edges)
+out["ci"] = {
+    "seed": 11,
+    "d": r(dci, 3),
+    "lo": r(lo, 3),
+    "hi": r(hi, 3),
+    "resamples": len(boot),
+    "binLo": float(edges[0]),
+    "bin": 0.02,
+    "counts": [int(c) for c in counts],
+    "outside": int(len(boot) - counts.sum()),
+}
+say(f"  ci: {len(boot)} resamples, {int(len(boot) - counts.sum())} outside the histogram's range")
 
 # ── Part 2. Simpson's paradox (statistical-fallacies) ──────────────────────
 data = pd.DataFrame(

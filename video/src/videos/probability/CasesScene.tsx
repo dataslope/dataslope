@@ -49,6 +49,7 @@ export const CasesScene: React.FC = () => {
   const randomAt = n.word("knows", "isn't random");
   const dependsAt = n.word("knows", "depends");
   const infoAt = n.word("knows", "information");
+  const whereAt = n.word("knows", "where the car");
   const playAt = n.word("games", "a hundred thousand games");
   const stayAt = n.word("games", "Staying");
   const thirtyAt = n.word("games", "thirty-three percent");
@@ -62,6 +63,8 @@ export const CasesScene: React.FC = () => {
   const rvInFrom = n.beat("rv-in").from;
 
   const rowAt = [pickAt - 4, otherAt - 2, otherAt + 8];
+  // Where the car is, flashed in every case as the narration says it decides the host's door.
+  const carFlash = ease(frame, whereAt - 2, 6) * (1 - ease(frame, whereAt + 12, 14));
   const opensAt = [hasToAt - 2, hasToAt + 2, hasToAt + 6];
 
   // The lines: drawn out along the games as the narration names the run.
@@ -121,6 +124,7 @@ export const CasesScene: React.FC = () => {
                       stroke={d === shutDoor ? `color-mix(in srgb, ${GOLD} ${Math.round(glow * 100)}%, ${INK})` : INK}
                       strokeWidth={d === shutDoor ? lerp(1.6, 4, glow) : 1.6}
                     />
+                    {d === c.car && carFlash > 0 ? <rect x={x} y={ry} width={leaf} height={h(MINI.h)} rx={3} fill={GOLD} opacity={carFlash * 0.75} /> : null}
                     {d === 0 ? <rect x={x - 7} y={ry - 7} width={MINI.w + 14} height={h(MINI.h) + 14} rx={8} fill="none" stroke={STAT} strokeWidth={2.6} /> : null}
                   </g>
                 );

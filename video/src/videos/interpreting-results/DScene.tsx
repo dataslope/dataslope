@@ -8,7 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { OVERLAP } from "./data";
-import { Bracket, Drift, GROUP_COLOR, Headline, lerp, Marker, Ring, Spot, STAT_INK, Svg } from "./parts";
+import { Bracket, Drift, GROUP_COLOR, Headline, lerp, Marker, Ring, Spot, STAT, STAT_INK, Svg } from "./parts";
 
 /** Standard deviations: group A sits at 0, group B at d. */
 const X: XScale = { lo: -3.5, hi: 4.5, x0: 160, x1: 1180 };
@@ -48,11 +48,12 @@ export const DScene: React.FC = () => {
   const unitsAt = n.word("one", "no units");
   const oneAt = n.word("one", "d of one");
   const fullAt = n.word("one", "one full");
+  const averagesAt = n.word("one", "averages");
   const apartAt = n.word("one", "apart");
   const at = [n.word("labels", "zero point two"), n.word("labels", "zero point five"), n.word("labels", "zero point eight")];
   const evenAt = n.word("overlap", "Even large");
   const overlapAt = n.word("overlap", "overlap");
-  const shareAt = n.word("overlap", "share");
+  const shareAt = n.word("overlap", "two curves");
   const eightAt = n.word("overlap", "zero point eight");
   const thirdsAt = n.word("overlap", "two thirds");
   const labelsAt = n.word("stake", "labels");
@@ -110,6 +111,14 @@ export const DScene: React.FC = () => {
         <FigLabel n="2" title="Two groups, d standard deviations apart" at={from - 4} x={160} y={y(270)} />
 
         <Svg>
+          {/* Each group's curve filled as the narration names a d of one. */}
+          {[
+            { mu: 0, color: GROUP_COLOR.men, at: oneAt - 4 },
+            { mu: d, color: GROUP_COLOR.women, at: averagesAt - 4 },
+          ].map((c, k) => {
+            const f = ease(frame, c.at, 12) * (1 - ease(frame, overlapAt - 6, 14));
+            return f > 0 ? <path key={k} d={`${curve(c.mu, 1)} L${X.x1},${base} L${X.x0},${base} Z`} fill={c.color} opacity={0.18 * f} /> : null;
+          })}
           {shade > 0 ? <path d={shared(d, base, unit)} fill={HIGHLIGHT} opacity={0.75 * shade} /> : null}
           {drawA > 0 ? <path d={curve(0, drawA)} fill="none" stroke={GROUP_COLOR.men} strokeWidth={4} strokeLinejoin="round" /> : null}
           {drawB > 0 ? <path d={curve(d, drawB)} fill="none" stroke={GROUP_COLOR.women} strokeWidth={4} strokeLinejoin="round" /> : null}
@@ -126,7 +135,7 @@ export const DScene: React.FC = () => {
             return t > 0 ? <line key={v} x1={sx(X, v)} x2={sx(X, v)} y1={base} y2={base + 12 * t} stroke={INK} strokeWidth={1.4} /> : null;
           })}
           {oneBold > 0 ? (
-            <rect x={sx(X, 0)} y={base + 2} width={sx(X, 1) - sx(X, 0)} height={10} fill={HIGHLIGHT} opacity={oneBold} />
+            <rect x={sx(X, 0)} y={base + 2} width={(sx(X, 1) - sx(X, 0)) * Math.min(1, oneBold * 1.4)} height={14} fill={STAT} opacity={0.8 * oneBold} />
           ) : null}
         </Svg>
         {[-3, -2, -1, 0, 1, 2, 3, 4].map((v, i) => (

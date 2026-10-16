@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { WANDER } from "./data";
-import { DATA, Dashed, Drift, Headline, Kicker, lerp, Marker, partial, Ring, STAT, STAT_INK, Svg } from "./parts";
+import { Bracket, DATA, Dashed, Drift, Headline, Kicker, lerp, Marker, partial, Ring, STAT, STAT_INK, Svg } from "./parts";
 
 const X0 = 200;
 const X1 = 1740;
@@ -38,6 +38,7 @@ export const CherryScene: React.FC = () => {
   const endedAt = n.word("cherry", "ended");
   const startedAt = n.word("cherry", "started");
   const steepAt = n.word("window", "steep stretch");
+  const tenYearsAt = n.word("window", "ten years");
   const fourAt = n.word("window", "four months");
   const pctAt = n.word("window", "twenty-five percent");
   const showAt = n.word("crop", "Show");
@@ -122,10 +123,13 @@ export const CherryScene: React.FC = () => {
               height={y(BOTTOM) - py(HI) + 6}
               fill={HIGHLIGHT}
               opacity={lerp(0.45, 0.75, settle)}
+              stroke={STAT}
+              strokeWidth={3}
             />
           </Svg>
         ) : null}
         <Dashed x0={X0} y0={py(S[0])} x1={X1} y1={py(S[0])} at={startedAt - 6} dur={22} color={INK_SOFT} width={2} />
+        <Bracket x0={X0} x1={X1} y={py(HI) - 16} at={tenYearsAt - 4} up={false} tick={12} />
         <Svg>
           {draw > 0 ? <path d={partial(pts, draw)} fill="none" stroke={DATA} strokeWidth={3} strokeLinejoin="round" /> : null}
           {lit > 0 ? <path d={partial(winPts, lit)} fill="none" stroke={STAT} strokeWidth={6} strokeLinejoin="round" strokeLinecap="round" /> : null}

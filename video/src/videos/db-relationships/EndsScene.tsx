@@ -12,13 +12,17 @@ import { Sfx } from "../../sound/Sfx";
 import { Fig } from "./kit";
 import { Drift, endSymbols, Glow, Headline, Kicker, Link, Svg } from "./parts";
 
-/** How much the two ends are magnified in the first half. */
-const S = 2.2;
-const VIEW_Y = 400;
+/** The first half draws the two ends large: the marker at this size and
+ *  stroke, on header-only boxes, so each symbol can be pointed at. */
+const BIG = 58;
+const BIG_STROKE = 4.2;
+const VIEW_Y = 470;
 const LEFT_O = 150;
 const RIGHT_O = 1770;
-const BOX_W = 200;
-const STUB = 130;
+const BOX_W = 300;
+/** The boxes are drawn larger too, about the edge the line meets. */
+const BOX_SCALE = 1.6;
+const STUB = 260;
 
 /** The table of ends: one row per end, the lesson's own example beside it. */
 const ROW_Y = 320;
@@ -117,7 +121,7 @@ const Callout: React.FC<{
   value: string;
   valueAt: number;
 }> = ({ x, lineY, above, title, titleAt, value, valueAt }) => {
-  const top = above ? lineY - 132 : lineY + 52;
+  const top = above ? lineY - 168 : lineY + 92;
   const titleEl = (
     <Ink at={titleAt} dur={12} style={{ position: "relative" }}>
       <span style={label(22, INK_SOFT)}>{title}</span>
@@ -131,13 +135,25 @@ const Callout: React.FC<{
   return (
     <>
       <Leader
-        points={above ? [[x, lineY - 60], [x, lineY - 30]] : [[x, lineY + 50], [x, lineY + 30]]}
+        points={above ? [[x, lineY - 84], [x, lineY - 40]] : [[x, lineY + 84], [x, lineY + 40]]}
         at={titleAt}
         dur={10}
         dot={false}
         color={INK_SOFT}
       />
-      <div style={{ position: "absolute", left: x, top, transform: "translateX(-50%)", textAlign: "center", whiteSpace: "nowrap" }}>
+      <div
+        style={{
+          position: "absolute",
+          left: x,
+          top,
+          transform: "translateX(-50%)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 2,
+          whiteSpace: "nowrap",
+        }}
+      >
         {above ? valueEl : titleEl}
         {above ? titleEl : valueEl}
       </div>
@@ -174,19 +190,19 @@ export const EndsScene: React.FC = () => {
 
   // ── Part one: the two ends, magnified ──
   const Y0 = y(VIEW_Y);
-  const custL = useEntityLayout({ x: LEFT_O, y: Y0, width: BOX_W, name: "customers", columns: [] });
-  const ordR = useEntityLayout({ x: RIGHT_O - BOX_W, y: Y0, width: BOX_W, name: "orders", columns: [] });
+  // Laid out so that, scaled about the edge the line meets, each box spans
+  // LEFT_O (or RIGHT_O) to that edge.
+  const custL = useEntityLayout({ x: LEFT_O + BOX_W * BOX_SCALE - BOX_W, y: Y0, width: BOX_W, name: "customers", columns: [] });
+  const ordR = useEntityLayout({ x: RIGHT_O - BOX_W * BOX_SCALE, y: Y0, width: BOX_W, name: "orders", columns: [] });
   const ly = custL.anchor("right")[1];
   const lTip = custL.anchor("right");
   const lBack: Pt = [lTip[0] + STUB, ly];
   const rTip = ordR.anchor("left");
   const rBack: Pt = [rTip[0] - STUB, ly];
-  const toL = (p: Pt): Pt => [LEFT_O + (p[0] - LEFT_O) * S, Y0 + (p[1] - Y0) * S];
-  const toR = (p: Pt): Pt => [RIGHT_O + (p[0] - RIGHT_O) * S, Y0 + (p[1] - Y0) * S];
-  const lSym = endSymbols(lTip, lBack, "exactly-one");
-  const rSym = endSymbols(rTip, rBack, "zero-or-many");
-  const lineY = toL(lTip)[1];
-  const glowR = 30;
+  const lSym = endSymbols(lTip, lBack, "exactly-one", BIG);
+  const rSym = endSymbols(rTip, rBack, "zero-or-many", BIG);
+  const lineY = ly;
+  const glowR = 34;
   const partOne = 1 - ease(frame, oneFrom - 8, 14);
   const viewIn = ease(frame, endsFrom - 6, 14);
 
@@ -232,35 +248,51 @@ export const EndsScene: React.FC = () => {
         </Fig>
         {/* The washes go under the marks they light. */}
         {[
-          { c: toL(lSym.near), at: twoMarksAt, out: twoMarksAt + 16 },
-          { c: toL(lSym.far), at: twoMarksAt + 5, out: twoMarksAt + 21 },
-          { c: toR(rSym.near), at: twoMarksAt + 10, out: twoMarksAt + 26 },
-          { c: toR(rSym.far), at: twoMarksAt + 15, out: twoMarksAt + 31 },
-          { c: toL(lSym.near), at: nextToAt, out: fartherAt },
-          { c: toR(rSym.near), at: nextToAt + 4, out: fartherAt },
-          { c: toL(lSym.far), at: fartherAt, out: oneFrom },
-          { c: toR(rSym.far), at: fartherAt + 4, out: oneFrom },
+          { c: (lSym.near), at: twoMarksAt, out: twoMarksAt + 16 },
+          { c: (lSym.far), at: twoMarksAt + 5, out: twoMarksAt + 21 },
+          { c: (rSym.near), at: twoMarksAt + 10, out: twoMarksAt + 26 },
+          { c: (rSym.far), at: twoMarksAt + 15, out: twoMarksAt + 31 },
+          { c: (lSym.near), at: nextToAt, out: fartherAt },
+          { c: (rSym.near), at: nextToAt + 4, out: fartherAt },
+          { c: (lSym.far), at: fartherAt, out: oneFrom },
+          { c: (rSym.far), at: fartherAt + 4, out: oneFrom },
         ].map((g, i) => (
           <Glow key={i} c={g.c} r={glowR} at={g.at} out={g.out} />
         ))}
 
-        <div style={{ position: "absolute", inset: 0, transform: `scale(${S})`, transformOrigin: `${LEFT_O}px ${Y0}px` }}>
+        <div style={{ position: "absolute", inset: 0, transform: `scale(${BOX_SCALE})`, transformOrigin: `${lTip[0]}px ${lTip[1]}px` }}>
           <Entity layout={custL} at={endsFrom - 6} />
-          <Link name="magnified customers end" points={[lTip, lBack]} at={endsFrom} dur={14} from={{ kind: "exactly-one", at: drawsAt }} />
         </div>
-        <div style={{ position: "absolute", inset: 0, transform: `scale(${S})`, transformOrigin: `${RIGHT_O}px ${Y0}px` }}>
+        <Link
+          name="magnified customers end"
+          points={[lTip, lBack]}
+          at={endsFrom}
+          dur={14}
+          size={BIG}
+          width={BIG_STROKE}
+          from={{ kind: "exactly-one", at: drawsAt }}
+        />
+        <div style={{ position: "absolute", inset: 0, transform: `scale(${BOX_SCALE})`, transformOrigin: `${rTip[0]}px ${rTip[1]}px` }}>
           <Entity layout={ordR} at={endsFrom - 2} />
-          <Link name="magnified orders end" points={[rBack, rTip]} at={endsFrom + 4} dur={14} to={{ kind: "zero-or-many", at: answersAt }} />
         </div>
+        <Link
+          name="magnified orders end"
+          points={[rBack, rTip]}
+          at={endsFrom + 4}
+          dur={14}
+          size={BIG}
+          width={BIG_STROKE}
+          to={{ kind: "zero-or-many", at: answersAt }}
+        />
         {/* The same line runs on between the two. */}
         <Svg opacity={viewIn}>
-          <line x1={toL(lBack)[0] + 14} x2={toR(rBack)[0] - 14} y1={lineY} y2={lineY} stroke={HAIRLINE} strokeWidth={3} strokeDasharray="4 10" />
+          <line x1={lBack[0] + 16} x2={rBack[0] - 16} y1={lineY} y2={lineY} stroke={HAIRLINE} strokeWidth={3} strokeDasharray="4 10" />
         </Svg>
 
-        <Callout lineY={lineY} x={toL(lSym.near)[0]} above={false} title="the most" titleAt={mostAt} value="one" valueAt={barOneAt + 4} />
-        <Callout lineY={lineY} x={toR(rSym.near)[0]} above={false} title="the most" titleAt={mostAt + 4} value="many" valueAt={footManyAt + 4} />
-        <Callout lineY={lineY} x={toL(lSym.far)[0]} above title="the least" titleAt={leastAt} value="one" valueAt={barOne2At + 4} />
-        <Callout lineY={lineY} x={toR(rSym.far)[0]} above title="the least" titleAt={leastAt + 4} value="zero" valueAt={circleZeroAt + 4} />
+        <Callout lineY={lineY} x={(lSym.near)[0]} above={false} title="the most" titleAt={mostAt} value="one" valueAt={barOneAt + 4} />
+        <Callout lineY={lineY} x={(rSym.near)[0]} above={false} title="the most" titleAt={mostAt + 4} value="many" valueAt={footManyAt + 4} />
+        <Callout lineY={lineY} x={(lSym.far)[0]} above title="the least" titleAt={leastAt} value="one" valueAt={barOne2At + 4} />
+        <Callout lineY={lineY} x={(rSym.far)[0]} above title="the least" titleAt={leastAt + 4} value="zero" valueAt={circleZeroAt + 4} />
         </Drift>
       </AbsoluteFill>
 

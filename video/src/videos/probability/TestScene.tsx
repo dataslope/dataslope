@@ -8,7 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { mulberry32, num, pct, TEST } from "./data";
-import { Big, Count, DATA, DATA_INK, Headline, Kicker, lerp, Pulse, SOFT, STAT, STAT_INK, Strike, Svg, VBracket } from "./parts";
+import { Big, Count, DATA, DATA_INK, Headline, Kicker, lerp, Pulse, SOFT, STAT, STAT_INK, Strike, Svg, Sweep, VBracket } from "./parts";
 
 /** The tree: where each node's label is centred. */
 const NODE = {
@@ -56,6 +56,9 @@ export const TestScene: React.FC = () => {
   const testFrom = n.beat("test").from;
   const thousandAt = n.word("test", "one person in a thousand");
   const accurateAt = n.word("test", "accurate");
+  const aTestAt = n.word("test", "A test");
+  const dontAt = n.word("walk", "don't");
+  const theTestAt = n.word("caught", "The test");
   const bothAt = n.word("test", "both ways");
   const positiveAt = n.word("test", "You test positive");
   const chancesAt = n.word("gut", "chances");
@@ -119,12 +122,12 @@ export const TestScene: React.FC = () => {
         {(
           [
             [thousandAt - 4, `1 in ${num(TEST.oneIn)}`, "people have the disease", INK],
-            [accurateAt - 2, pct(TEST.sensitivity), "of sick people test positive", DATA_INK],
-            [bothAt - 2, pct(TEST.specificity), "of healthy people test negative", INK_SOFT],
+            [aTestAt - 2, pct(TEST.sensitivity), "of sick people test positive", DATA_INK],
+            [accurateAt - 2, pct(TEST.specificity), "of healthy people test negative", INK_SOFT],
           ] as const
         ).map(([cue, big, text, color], i) => (
           <Ink key={i} at={cue} dur={16} style={{ left: 160, top: y(330 + i * 120), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 22 }}>
-            <span style={{ ...headline(76), color }}>{big}</span>
+            <span style={{ ...headline(76), color }}>{i === 0 ? big : <Sweep at={bothAt - 2 + (i - 1) * 6}>{big}</Sweep>}</span>
             <span style={note(30, INK)}>{text}</span>
           </Ink>
         ))}
@@ -235,7 +238,8 @@ export const TestScene: React.FC = () => {
           );
         })}
         <Pulse x={NODE.healthy[0]} y={y(NODE.healthy[1])} at={mistakeAt - 2} r={70} />
-        <Pulse x={NODE.sick[0]} y={y(NODE.sick[1])} at={catchesAt - 2} r={70} color={DATA} />
+        <Pulse x={NODE.sick[0]} y={y(NODE.sick[1])} at={theTestAt - 2} r={70} color={DATA} />
+        <Pulse x={NODE.healthy[0]} y={y(NODE.healthy[1])} at={dontAt - 2} r={80} color={INK_SOFT} />
         {/* The two rates, on the branches they decide. */}
         <Note at={catchesAt} x={(NODE.sick[0] + NODE.sickPos[0]) / 2 - 16} y={y((NODE.sick[1] + NODE.sickPos[1]) / 2) - 14} align="right">
           <span style={{ ...note(21, DATA_INK), fontWeight: 650, whiteSpace: "nowrap" }}>99%</span>

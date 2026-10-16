@@ -36,6 +36,11 @@ export const BayesScene: React.FC = () => {
   const baseAt = n.word("bayes", "base rate");
   const beforeAt = n.word("bayes", "before anyone");
   const outnumberAt = n.word("neglect", "outnumber");
+  const healthyAt = n.word("neglect", "Healthy");
+  const falseAt = n.word("neglect", "false alarms");
+  const realAt = n.word("neglect", "real cases");
+  const testedAt = n.word("bayes", "tested");
+  const stayAt = n.word("retest", "stay positive");
   const thousandAt = n.word("neglect", "a thousand to one");
   const swampAt = n.word("neglect", "ten to one");
   const neglectAt = n.word("neglect", "base-rate neglect");
@@ -62,8 +67,15 @@ export const BayesScene: React.FC = () => {
   const first = ease(frame, retestFrom - 2, 20);
   const secondBar = ease(frame, ninetyEightAt - 6, 20);
   const realShare2 = TEST.retestTp / (TEST.retestTp + TEST.retestFp);
-  // The second bar starts at the first one's split and moves to its own.
-  const split2 = lerp(TEST.treePpv, realShare2, ease(frame, tenAt - 4, 26));
+  // The second test, drawn first at the first bar's scale (one unit a
+  // person): the real cases stay, the false alarms shrink from 999 to about
+  // ten, and then the survivors are stretched to the whole bar.
+  const shrink = ease(frame, tenAt - 4, 24);
+  const renorm = ease(frame, nineInTenAt - 6, 22);
+  const unit = SHARE.w / TEST.positives;
+  const scale2 = lerp(unit, SHARE.w / (TEST.retestTp + TEST.retestFp), renorm);
+  const red2 = lerp(TEST.fp, TEST.retestFp, shrink);
+  const stayFlash = ease(frame, stayAt - 2, 6) * (1 - ease(frame, stayAt + 10, 12));
 
   return (
     <AbsoluteFill>
@@ -146,27 +158,30 @@ export const BayesScene: React.FC = () => {
         </Ink>
         <Note at={beforeAt} x={160} y={y(624)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-            = {TEST.sensitivity} × {TEST.baseRate} ÷ {fmt(TEST.pPos, 5)} = <b style={{ color: STAT_INK }}>{fmt(TEST.ppv, 3)}</b>
+            = {TEST.sensitivity} × {TEST.baseRate} ÷ {fmt(TEST.pPos, 5)} ={" "}
+            <b style={{ color: STAT_INK }}>
+              <Sweep at={testedAt - 2}>{fmt(TEST.ppv, 3)}</Sweep>
+            </b>
           </span>
         </Note>
 
         {/* ── Who takes the test ── */}
-        <FigLabel n="5" title={`Who takes the test, of ${num(TEST.population)}`} at={outnumberAt - 6} x={160} y={y(690)} />
+        <FigLabel n="5" title={`Who takes the test, of ${num(TEST.population)}`} at={healthyAt - 6} x={160} y={y(690)} />
         {(
           [
             ["Don't have it", TEST.healthy, healthyW, SOFT, INK_SOFT],
             ["Have it", TEST.sick, sickW, DATA, DATA_INK],
           ] as const
         ).map(([name, count, w, color, ink], i) => {
-          const g = ease(frame, outnumberAt - 2 + i * 6, 22);
+          const g = ease(frame, healthyAt - 2 + i * 6, 22);
           const top = y(BAR.y[i]);
           return (
             <React.Fragment key={name}>
-              <Ink at={outnumberAt + i * 4} dur={12} style={{ left: 160, top: top + h(BAR.h) / 2 - 15 }}>
+              <Ink at={healthyAt + i * 4} dur={12} style={{ left: 160, top: top + h(BAR.h) / 2 - 15 }}>
                 <span style={note(22, INK)}>{name}</span>
               </Ink>
               <div style={{ position: "absolute", left: BAR.x0, top, width: w * g, height: h(BAR.h), background: color }} />
-              <Note at={outnumberAt + 10 + i * 6} x={BAR.x0 + w * g + 14} y={top + h(BAR.h) / 2 - 15}>
+              <Note at={outnumberAt + i * 6} x={BAR.x0 + w * g + 14} y={top + h(BAR.h) / 2 - 15}>
                 <span style={{ ...label(24, ink), whiteSpace: "nowrap" }}>{num(count)}</span>
               </Note>
             </React.Fragment>
@@ -177,10 +192,18 @@ export const BayesScene: React.FC = () => {
             <b>{num(TEST.healthy / TEST.sick)}</b> to 1
           </span>
         </Note>
-        <Ink at={swampAt - 4} dur={14} style={{ left: 1100, top: y(624), whiteSpace: "nowrap" }}>
+        <Ink at={falseAt - 4} dur={14} style={{ left: 1100, top: y(560), whiteSpace: "nowrap" }}>
           <span style={{ ...note(24, INK) }}>
-            1% of {num(TEST.healthy)} is <b style={{ color: STAT_INK }}>{num(TEST.fp)}</b>, against <b style={{ color: DATA_INK }}>{TEST.tp}</b> real cases
+            1% of {num(TEST.healthy)} is <b style={{ color: STAT_INK }}>{num(TEST.fp)}</b> false alarms
+            <span style={{ opacity: ease(frame, realAt - 4, 10) }}>
+              , against <b style={{ color: DATA_INK }}>{TEST.tp}</b> real cases
+            </span>
           </span>
+        </Ink>
+        <Ink at={swampAt - 4} dur={14} style={{ left: 1100, top: y(604), whiteSpace: "nowrap" }}>
+          <Big size={72} color={STAT_INK} italic>
+            {Math.round(TEST.fp / TEST.tp)} to 1
+          </Big>
         </Ink>
         <Ink at={neglectAt - 4} dur={16} style={{ left: 160, top: y(866), whiteSpace: "nowrap" }}>
           <span style={{ ...body(34), color: INK }}>
@@ -196,10 +219,9 @@ export const BayesScene: React.FC = () => {
       {SHARE.y.map((rowY, i) => {
         const g = i === 0 ? first : secondBar;
         if (g <= 0) return null;
-        const s = i === 0 ? TEST.treePpv : split2;
         const top = y(rowY);
-        const blueW = SHARE.w * s * g;
-        const redW = SHARE.w * (1 - s) * g;
+        const blueW = (i === 0 ? SHARE.w * TEST.treePpv : TEST.retestTp * scale2) * g;
+        const redW = (i === 0 ? SHARE.w * (1 - TEST.treePpv) : red2 * scale2) * g;
         return (
           <React.Fragment key={i}>
             <Ink at={(i === 0 ? retestFrom : secondAt) - 4} dur={14} style={{ left: SHARE.x0, top: top - 52, whiteSpace: "nowrap" }}>
@@ -208,13 +230,14 @@ export const BayesScene: React.FC = () => {
             <Svg>
               <rect x={SHARE.x0} y={top} width={blueW} height={h(SHARE.h)} fill={DATA} />
               <rect x={SHARE.x0 + blueW} y={top} width={redW} height={h(SHARE.h)} fill={STAT} opacity={0.8} />
+              {i === 1 && stayFlash > 0 ? <rect x={SHARE.x0} y={top} width={blueW} height={h(SHARE.h)} fill={HIGHLIGHT} opacity={stayFlash} /> : null}
             </Svg>
             <div
               style={{
                 position: "absolute",
                 left: SHARE.x0,
                 top: top + h(SHARE.h) + 12,
-                width: SHARE.w,
+                width: Math.max(360, blueW + redW),
                 display: "flex",
                 justifyContent: "space-between",
                 opacity: ease(frame, (i === 0 ? retestFrom + 10 : tenAt + 4), 12),

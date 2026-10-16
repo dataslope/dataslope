@@ -53,6 +53,7 @@ export const TailScene: React.FC = () => {
   const routineAt = n.word("routine", "routine");
   const examples = [n.word("routine", "Financial"), n.word("routine", "insurance"), n.word("routine", "network")];
   const mistakeAt = n.word("outlier-in", "mistake");
+  const outThereAt = n.word("routine", "out there");
   const farAt = n.word("outlier-in", "far out");
 
   const peak = Math.max(...TAILS.heavy.counts);
@@ -154,6 +155,8 @@ export const TailScene: React.FC = () => {
         {row("heavy", TAILS.heavy, "Heavy-tailed", heavyAt - 4, hundredAt - 4, 34)}
         <Pulse x={sx(X, 4.125)} y={y(ROWS.normal) - DOT_R - 1.5} at={oneAt + 4} color={STAT} r={DOT_R + 2} />
         <Pulse x={sx(X, -EDGE + COL / 2)} y={y(ROWS.heavy) - DOT_R - 1.5} at={farAt - 2} color={STAT} r={8} />
+        <Pulse x={sx(X, -EDGE + COL / 2)} y={y(ROWS.heavy) - DOT_R - 1.5} at={outThereAt} color={STAT} r={8} />
+        <Pulse x={sx(X, EDGE - COL / 2)} y={y(ROWS.heavy) - DOT_R - 1.5} at={outThereAt + 6} color={STAT} r={8} />
       </Drift>
 
       {/* Where heavy tails live: the lesson's examples. */}

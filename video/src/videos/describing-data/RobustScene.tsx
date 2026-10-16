@@ -54,6 +54,7 @@ export const RobustScene: React.FC = () => {
   const madAt = n.word("mad", "median absolute deviation");
   const typicalAt = n.word("mad", "typical distance");
   const eightAt = n.word("mad", "eight");
+  const fromMedianAt = n.word("mad", "median", { nth: 2 });
   const meanGoesAt = n.word("pair", "mean goes");
   const medianGoesAt = n.word("pair", "median goes");
   const stillAt = n.word("shape-in", "center");
@@ -243,6 +244,7 @@ export const RobustScene: React.FC = () => {
         })}
       </div>
       <Pulse x={medX} y={strip - BOX_H / 2 - 20} at={stillAt - 2} color={INK} r={6} />
+      <Pulse x={medX} y={strip - BOX_H / 2 - 20} at={fromMedianAt - 2} color={INK} r={6} />
       <Ink at={looksAt - 2} dur={18} style={{ left: 160, top: y(915), whiteSpace: "nowrap" }}>
         <span style={{ ...note(26, INK), ...halo }}>Neither one shows a shape.</span>
       </Ink>

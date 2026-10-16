@@ -18,6 +18,8 @@ const COLS = [500, 980];
 const HALF = 110;
 const JIT = [jitter(801, RTM.n), jitter(802, RTM.n)];
 const NOTE_X = 1340;
+/** The lowest month-1 number in the top tenth: where the cut falls. */
+const TOP_CUT = Math.min(...RTM.top.map((i) => RTM.month1[i]));
 
 /**
  * Part 3: five hundred salespeople over two months. The top tenth falls, the
@@ -35,6 +37,7 @@ export const RtmScene: React.FC = () => {
   const skillAt = n.word("rtm", "skill");
   const luckAt = n.word("rtm", "luck");
   const topAt = n.word("top", "top tenth");
+  const monthOneAt = n.word("top", "month one");
   const avgTopAt = n.word("top", "a hundred and thirty-two");
   const sameAt = n.word("next-month", "same people");
   const nextAt = n.word("next-month", "a hundred and thirteen");
@@ -204,6 +207,9 @@ export const RtmScene: React.FC = () => {
           ))}
           <Ring x={COLS[1]} y={py(RTM.bottomAfter)} at={coachingAt - 2} color={DATA} r0={20} r1={HALF + 30} />
           <Ring x={COLS[0]} y={py(RTM.bottomBefore)} at={groupAt - 2} color={DATA} r0={20} r1={HALF + 30} />
+
+          {/* Where the top tenth starts. */}
+          <Dashed x0={COLS[0] - HALF - 20} y0={py(TOP_CUT)} x1={COLS[0] + HALF + 20} y1={py(TOP_CUT)} at={monthOneAt - 4} dur={12} color={STAT} width={3} />
 
           {/* Where everyone's average sits, both months. */}
           <Dashed x0={240} y0={py(RTM.mean1)} x1={1130} y1={py(RTM.mean1)} at={nobodyAt - 2} dur={20} width={2.4} />

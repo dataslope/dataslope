@@ -39,6 +39,11 @@ export const DeliveryScene: React.FC = () => {
   const twoAt = n.word("delivery", "Two delivery");
   const thirtyAt = n.word("delivery", "thirty");
   const steadyAt = n.word("swing", "twenty-eight");
+  const alwaysAt = n.word("swing", "always");
+  const differentAt = n.word("same", "different");
+  const steadyServiceAt = n.word("deviations", "steady");
+  const countAt = n.word("variance", "count");
+  const erraticWordAt = n.word("erratic", "erratic");
   const swingsAt = n.word("swing", "swings");
   const erraticAt = n.word("swing", "five minutes");
   const sameAt = n.word("same", "Same center");
@@ -204,6 +209,18 @@ export const DeliveryScene: React.FC = () => {
         <Tag x={sx(X, DELIVERY.erraticMax) + 16} y={y(ERRATIC) - 52} opacity={ease(frame, erraticAt, 12) * (1 - ease(frame, devFrom - 6, 10))} size={21} align="left">
           {DELIVERY.erraticMin} to {DELIVERY.erraticMax}
         </Tag>
+        {DELIVERY.steady.map((v, i) => (
+          <React.Fragment key={`s${i}`}>
+            <Pulse x={sx(X, v)} y={y(STEADY) - steadyRows[i] * 2 * (R + 1)} at={alwaysAt + i} color={DATA} r={R} />
+            <Pulse x={sx(X, v)} y={y(STEADY) - steadyRows[i] * 2 * (R + 1)} at={steadyServiceAt + i} color={STAT} r={R} />
+          </React.Fragment>
+        ))}
+        {[DELIVERY.erraticMin, DELIVERY.erraticMax].map((v) => (
+          <Pulse key={`e${v}`} x={sx(X, v)} y={y(ERRATIC)} at={differentAt} color={DATA} r={R} />
+        ))}
+        {DELIVERY.erratic.map((v, i) => (
+          <Pulse key={`w${i}`} x={sx(X, v)} y={y(ERRATIC) - erraticRows[i] * 2 * (R + 1)} at={erraticWordAt + i} color={STAT} r={R} />
+        ))}
         {DELIVERY.erratic.map((v, i) => (
           <Pulse key={i} x={sx(X, v)} y={y(ERRATIC) - erraticRows[i] * 2 * (R + 1)} at={swingsAt + i * 2} color={DATA} r={R} />
         ))}
@@ -269,6 +286,11 @@ export const DeliveryScene: React.FC = () => {
       </div>
 
       {/* Divide, then root. */}
+      <Ink at={countAt - 4} dur={14} style={{ left: 160, top: y(ROW_Y + 80) + 44, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(21, INK_SOFT) }}>
+          {DELIVERY.steady.length} deliveries, minus one
+        </span>
+      </Ink>
       <Ink at={nineAt - 4} dur={16} style={{ left: 160, top: y(ROW_Y + 80), whiteSpace: "nowrap" }}>
         <span style={{ ...note(28, INK), fontWeight: 600 }}>
           {fmt(DELIVERY.sumSquares, 0)} ÷ {DELIVERY.divisor} = {fmt(DELIVERY.variance, 2)}{" "}

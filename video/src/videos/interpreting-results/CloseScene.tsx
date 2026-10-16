@@ -6,7 +6,7 @@ import { body, HIGHLIGHT, INK, INK_SOFT, label, PAPER } from "../../editorial/st
 import { Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Arrow, Bracket, Headline, Marker, STAT, STAT_INK } from "./parts";
+import { Arrow, Bracket, Headline, lerp, Marker, STAT, STAT_INK, Svg } from "./parts";
 
 const TRAPS = ["Simpson's paradox", "Cherry-picking", "The sharpshooter's target"];
 const TAG_X = [160, 640, 1100];
@@ -102,6 +102,16 @@ export const CloseScene: React.FC = () => {
         <span style={{ ...body(28, true), color: INK_SOFT }}>what you&apos;ll test, before you look</span>
       </Ink>
 
+      {(() => {
+        const a = ease(frame, decideAt - 2, 10);
+        if (a <= 0) return null;
+        const m = ease(frame, lookAt + 18, 26);
+        return (
+          <Svg>
+            <rect x={lerp(STEP_X[0], STEP_X[2], m)} y={y(STEP_Y) + 72} width={lerp(170, 210, m) * a} height={6} rx={3} fill={STAT} />
+          </Svg>
+        );
+      })()}
       <NextLine at={lookAt - 2} x={1240} y={y(STEP_Y) + 150} width={560}>
         exploring, then confirming.
       </NextLine>

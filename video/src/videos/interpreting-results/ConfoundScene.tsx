@@ -37,6 +37,7 @@ export const ConfoundScene: React.FC = () => {
   const risesAt = n.word("rises", "rises");
   const nineAt = n.word("rises", "nine points");
   const hourAt = n.word("rises", "extra hour");
+  const weekAt = n.word("rises", "week");
   const colorAt = n.word("bands", "color");
   const bandAt = n.word("bands", "every age band");
   const fallsAt = n.word("bands", "falls");
@@ -162,8 +163,35 @@ export const ConfoundScene: React.FC = () => {
             );
           })}
           {pooled > 0 ? (
-            <line {...seg(CONFOUND.pooled, pooled)} stroke={STAT} strokeWidth={4.5} strokeDasharray="12 7" strokeLinecap="round" opacity={1 - pooledDim} />
+            <line
+              {...seg(CONFOUND.pooled, pooled)}
+              stroke={STAT}
+              strokeWidth={4.5 + 4 * Math.sin(Math.PI * ease(frame, weekAt - 4, 16))}
+              strokeDasharray="12 7"
+              strokeLinecap="round"
+              opacity={1 - pooledDim}
+            />
           ) : null}
+          {/* One weekly hour along, and the 8.9 it climbs. */}
+          {(() => {
+            const t = ease(frame, hourAt - 4, 14) * (1 - pooledDim);
+            if (t <= 0) return null;
+            const l = CONFOUND.pooled;
+            const x0 = 40;
+            const x1 = 100;
+            const y0 = l.intercept + l.slope * x0;
+            const y1 = l.intercept + l.slope * x1;
+            return (
+              <path
+                d={`M${px(x0)},${py(y0)} L${px(x1)},${py(y0)} L${px(x1)},${py(y1)}`}
+                fill="none"
+                stroke={STAT_INK}
+                strokeWidth={3.4}
+                pathLength={1}
+                strokeDasharray={`${t} 1`}
+              />
+            );
+          })()}
           {CONFOUND.fits.map((f, k) => {
             const p = ease(frame, fallsAt - 6 + k * 4, 16);
             return p > 0 ? <line key={k} {...seg(f, p)} stroke={BAND_INK[k]} strokeWidth={4} strokeLinecap="round" /> : null;
@@ -183,6 +211,11 @@ export const ConfoundScene: React.FC = () => {
         <Note at={nineAt - 2} x={px(CONFOUND.pooled.x1) - 10} y={py(CONFOUND.pooled.intercept + CONFOUND.pooled.slope * CONFOUND.pooled.x1) - 62} align="right" dim={fallsAt}>
           <span style={{ ...note(23, STAT_INK), fontWeight: 700, whiteSpace: "nowrap", ...halo }}>
             everyone: +{fmt(CONFOUND.pooledPerHour, 1)} mmHg <Marker at={hourAt - 2}>per weekly hour</Marker>
+          </span>
+        </Note>
+        <Note at={hourAt + 6} x={px(70)} y={py(CONFOUND.pooled.intercept + CONFOUND.pooled.slope * 40) + 8} from="up" dim={fallsAt}>
+          <span style={{ ...note(20, STAT_INK), fontWeight: 650, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
+            one hour
           </span>
         </Note>
         {CONFOUND.fits.map((f, k) => (

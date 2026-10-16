@@ -50,6 +50,8 @@ export const OpenScene: React.FC = () => {
   const codeAt = n.word("flips", "code");
   const hundredAt = n.word("flips", "a hundred thousand");
   const fiftyAt = n.word("flips", "fifty thousand");
+  const comeUpAt = n.word("flips", "come up heads");
+  const evenAt = n.word("share", "even though");
   const pointAt = n.word("share", "Point");
   const closeAt = n.word("share", "Close");
   const sevenAt = n.word("share", "first seven");
@@ -60,6 +62,9 @@ export const OpenScene: React.FC = () => {
   const panelsOut = ease(frame, halfFrom - 8, 14);
   const stripAt = (i: number) => lerp(repeatAt - 4, codeAt + 6, i / (STRIP.count - 1));
   const streakLit = ease(frame, sevenAt - 2, 10);
+  const othersBack = ease(frame, evenAt - 2, 12);
+  // Every head in the strip flashes as the count of heads lands.
+  const headsFlash = ease(frame, comeUpAt - 2, 6) * (1 - ease(frame, comeUpAt + 8, 12));
   // The one-flip row sets back once the frequentist answer arrives.
   const defDim = ease(frame, frequentistAt - 2, 14);
   // The bridge's panels set back as the question takes over.
@@ -209,8 +214,8 @@ export const OpenScene: React.FC = () => {
           heads={f === 1}
           at={stripAt(i)}
           r={STRIP.r}
-          lit={i < COIN.streak ? streakLit : 0}
-          dim={i >= COIN.streak ? streakLit : 0}
+          lit={Math.max(i < COIN.streak ? streakLit : 0, f === 1 ? headsFlash : 0)}
+          dim={i >= COIN.streak ? othersBack : 0}
         />
       ))}
       <Bracket

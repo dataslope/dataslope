@@ -10,11 +10,11 @@ import { Sfx } from "../../sound/Sfx";
 import { Fig } from "./kit";
 import { Drift, Headline, Kicker, Link, Mark, pulse, Spot } from "./parts";
 
-const BOX_Y = 360;
+const BOX_Y = 384;
 const BOX_W = 360;
 const XS = [150, 780, 1410];
-const SENT_Y = 652;
-const SENT_STEP = 92;
+const SENT_Y = 690;
+const SENT_STEP = 96;
 
 /**
  * Part 1 opens on Unit 2's bridge: entities never live alone. Three boxes
@@ -92,7 +92,7 @@ export const VerbsScene: React.FC = () => {
       <Spot id="db-relationships-crates" at={aloneAt - 4} left={1390} top={y(84)} width={430} height={203} />
 
       <Drift from={containAt} to={verbsTo + 50} scale={0.02} origin={[960, y(520)]}>
-        <Fig n="1" at={customersAt - 8} x={XS[0]} y={y(286)}>
+        <Fig n="1" at={customersAt - 8} x={XS[0]} y={y(300)}>
           Three entities, and the lines between them
         </Fig>
 

@@ -78,6 +78,9 @@ export const BinScene: React.FC = () => {
   const eightyAt = n.word("bins", "eighty");
   const wideAt = n.word("wide", "Wide");
   const blocksAt = n.word("wide", "blocks");
+  const blurAt = n.word("wide", "blur");
+  const wobbleAt = n.word("wide", "wobble");
+  const nothingAt = n.word("believe", "Nothing");
   const narrowAt = n.word("wide", "Narrow");
   const peakAt = n.word("wide", "peak");
   const believeAt = n.word("believe", "believe");
@@ -156,10 +159,13 @@ export const BinScene: React.FC = () => {
               {v}
             </Tag>
           ))}
-          <Tag x={sx(BIG, 9)} y={y(BIG_BASE) - h(430)} opacity={ease(frame, blocksAt - 4, 10) * (1 - ease(frame, narrowAt - 6, 10))} color={INK_SOFT} size={22}>
+          <Tag x={sx(BIG, 9)} y={y(BIG_BASE) - h(430)} opacity={ease(frame, blurAt - 2, 10) * (1 - ease(frame, narrowAt - 6, 10))} color={INK_SOFT} size={22}>
             a few blocks
           </Tag>
-          <Pulse x={sx(BIG, 2 + 0.25 * 26.5)} y={y(BIG_BASE) - density("80", 26) * unit} at={peakAt - 4} color={STAT} r={6} />
+          {[1.5, 2.5, 3.5].map((b) => (
+            <Pulse key={b} x={sx(BIG, 2 + 4 * b)} y={y(BIG_BASE) - density("5", Math.floor(b) * 16) * unit} at={blocksAt - 2 + b * 3} color={INK} r={8} />
+          ))}
+          <Pulse x={sx(BIG, 2 + 0.25 * 26.5)} y={y(BIG_BASE) - density("80", 26) * unit} at={wobbleAt - 2} color={STAT} r={6} />
           <Pulse x={sx(BIG, 2 + 0.25 * 37.5)} y={y(BIG_BASE) - density("80", 37) * unit} at={peakAt} color={STAT} r={6} />
           <Pulse x={sx(BIG, 2 + 0.25 * 49.5)} y={y(BIG_BASE) - density("80", 49) * unit} at={peakAt + 4} color={STAT} r={6} />
         </Drift>
@@ -181,7 +187,7 @@ export const BinScene: React.FC = () => {
           })}
         </Drift>
       ) : null}
-      <Ink at={believeAt - 4} dur={16} style={{ left: 160, top: y(910), whiteSpace: "nowrap" }}>
+      <Ink at={nothingAt - 2} dur={16} style={{ left: 160, top: y(910), whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, INK_SOFT) }}>The data doesn't say which one is right</span>
       </Ink>
     </AbsoluteFill>

@@ -21,7 +21,7 @@ const LEAD = 8;
 /** Frames each scene stays up into the next, so cuts cross-fade. */
 const OVERLAP = 6;
 /** Frames before a cut that a scene starts easing out. */
-const EXIT = 20;
+const EXIT = 36;
 
 /**
  * "Probability" (16:9), Unit 3 of the Statistics course, on the editorial

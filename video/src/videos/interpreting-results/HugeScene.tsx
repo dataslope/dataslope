@@ -157,6 +157,17 @@ export const HugeScene: React.FC = () => {
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>score</span>
         </Note>
 
+        {/* One standard deviation either side, shaded under the curves on "spread". */}
+        <Svg opacity={0.2 * ease(frame, spreadAt - 4, 14)}>
+          <path
+            d={`${Array.from({ length: 61 }, (_, i) => {
+              const v = 85 + i * 0.5;
+              return `${i ? "L" : "M"}${sx(X, v).toFixed(1)},${py(v).toFixed(1)}`;
+            }).join(" ")} L${sx(X, 115)},${y(BASE)} L${sx(X, 85)},${y(BASE)} Z`}
+            fill={COLOR[0]}
+          />
+        </Svg>
+
         {/* One standard deviation, under the left half of the curves. */}
         <Bracket x0={sx(X, 100 - 15)} x1={sx(X, 100)} y={y(BASE) + 52} at={fifteenAt - 4} up width={lerp(2.2, 3.6, spreadBold)} />
         <Note at={fifteenAt} x={(sx(X, 85) + sx(X, 100)) / 2} y={y(BASE) + 62} from="up">
@@ -209,6 +220,28 @@ export const HugeScene: React.FC = () => {
       </Drift>
 
       {/* ── The two questions, answered ── */}
+      {(() => {
+        const draw = ease(frame, passesAt - 4, 14);
+        if (draw <= 0) return null;
+        const move = ease(frame, sizeAt - 6, 16);
+        const top = lerp(y(ROW1) - 22, y(ROW2) - 22, move);
+        return (
+          <Svg>
+            <rect
+              x={RIGHT - 26}
+              y={top}
+              width={540}
+              height={lerp(232, 218, move)}
+              rx={10}
+              fill="none"
+              stroke={INK}
+              strokeWidth={2.6}
+              pathLength={1}
+              strokeDasharray={`${draw} 1`}
+            />
+          </Svg>
+        );
+      })()}
       <Ink at={thereAt - 6} dur={14} style={{ left: RIGHT, top: y(ROW1), whiteSpace: "nowrap" }}>
         <span style={label(24, INK)}>Is it there?</span>
       </Ink>

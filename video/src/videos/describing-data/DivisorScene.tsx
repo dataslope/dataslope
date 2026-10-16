@@ -42,6 +42,7 @@ export const DivisorScene: React.FC = () => {
   const otherAt = n.word("closest", "any other number");
   const fiveAt = n.word("truth", "five values");
   const zeroAt = n.word("truth", "zero");
+  const populationAt = n.word("truth", "population");
   const insteadAt = n.word("truth", "truth instead");
   const growAt = n.word("truth", "grow");
   const aroundAt = n.word("small", "around");
@@ -53,8 +54,11 @@ export const DivisorScene: React.FC = () => {
   const lowAt = n.word("measured", "low");
   const byN1At = n.word("measured", "Dividing by n minus one");
   const landsAt = n.word("measured", "lands");
-  const numpyAt = n.word("libs", "numpy", { nth: 2 });
-  const pandasAt = n.word("libs", "pandas", { nth: 2 });
+  const numpyAt = n.word("libs", "numpy");
+  const pandasAt = n.word("libs", "pandas");
+  const numpyNoteAt = n.word("libs", "numpy", { nth: 2 });
+  const pandasNoteAt = n.word("libs", "pandas", { nth: 2 });
+  const minusOneAt = n.word("libs", "minus one");
   const disagreeAt = n.word("libs", "disagree");
   const weaknessAt = n.word("robust-in", "weakness");
   const swampAt = n.word("robust-in", "swamp");
@@ -129,6 +133,28 @@ export const DivisorScene: React.FC = () => {
               })}
             </Svg>
           ) : null}
+
+          {/* The population the five were drawn from: Normal(0, 10). */}
+          {ease(frame, populationAt - 4, 24) > 0 ? (
+            <Svg opacity={0.55}>
+              <path
+                d={Array.from({ length: 121 }, (_, i) => {
+                  const v = X.lo + ((X.hi - X.lo) * i) / 120;
+                  const d = Math.exp(-0.5 * (v / Math.sqrt(DIVISOR.sigma2)) ** 2);
+                  return `${i ? "L" : "M"}${sx(X, v).toFixed(1)},${(base - d * h(150)).toFixed(1)}`;
+                }).join(" ")}
+                fill="none"
+                stroke={INK_SOFT}
+                strokeWidth={2}
+                pathLength={1}
+                style={{ strokeDasharray: `${ease(frame, populationAt - 4, 24)} 1` }}
+              />
+            </Svg>
+          ) : null}
+
+          <Tag x={sx(X, 8)} y={base - h(120)} opacity={ease(frame, populationAt + 6, 12)} color={INK_SOFT} size={20} align="left">
+            the population
+          </Tag>
 
           {/* The truth, dashed. */}
           {truthIn > 0 ? (
@@ -244,8 +270,8 @@ export const DivisorScene: React.FC = () => {
 
           {/* Two libraries, two divisors, one column. */}
           {[
-            { code: "np.std(x)", note: "divides by n", value: DIVISOR.numpyStd, at: numpyAt },
-            { code: "pd.Series(x).std()", note: "divides by n − 1", value: DIVISOR.pandasStd, at: pandasAt },
+            { code: "np.std(x)", note: "divides by n", value: DIVISOR.numpyStd, at: numpyAt, noteAt: numpyNoteAt },
+            { code: "pd.Series(x).std()", note: "divides by n − 1", value: DIVISOR.pandasStd, at: pandasAt, noteAt: pandasNoteAt },
           ].map((c, i) => {
             const p = ease(frame, c.at - 6, 14) * (1 - 0.6 * ease(frame, wildAt - 4, 12));
             if (p <= 0) return null;
@@ -266,7 +292,9 @@ export const DivisorScene: React.FC = () => {
               >
                 <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 600, color: INK }}>{c.code}</span>
                 <span style={{ ...note(30, STAT_INK), fontWeight: 700 }}>{fmt(c.value, 2)}</span>
-                <span style={{ ...note(22, INK_SOFT) }}>{c.note}</span>
+                <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, c.noteAt - 4, 12) }}>
+                  {i === 1 ? <Mark at={minusOneAt - 2}>{c.note}</Mark> : c.note}
+                </span>
               </div>
             );
           })}

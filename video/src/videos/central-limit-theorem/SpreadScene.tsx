@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { useMergedPart } from "../sampling/merged";
-import { Marker } from "../sampling/emphasis";
+import { Marker, swell } from "../sampling/emphasis";
 import { Axis, Bars, sx, type XScale } from "../../editorial/charts";
 import { histogram, SPREADS, WAIT_SD } from "./data";
 import { useLayout } from "../../editorial/layout";
@@ -221,6 +221,9 @@ export const SpreadScene: React.FC = () => {
                 opacity: said,
                 ...headline(40),
                 fontVariantNumeric: "tabular-nums lining-nums",
+                // "That spread": the three, one after another.
+                transformOrigin: "left center",
+                transform: `scale(${swell(frame, thatSpreadAt - 2 + i * 5, 0.14, 20)})`,
               }}
             >
               {fmt(r.spread)}
@@ -258,7 +261,14 @@ export const SpreadScene: React.FC = () => {
         <div style={{ ...headline(76, true), marginTop: 6 }}>
           = σ ÷ √<span style={{ fontStyle: "italic" }}>n</span>
         </div>
-        <div style={{ ...note(21, INK_SOFT), marginTop: 8 }}>
+        <div
+          style={{
+            ...note(21, INK_SOFT),
+            marginTop: 8,
+            transformOrigin: "left center",
+            transform: `scale(${swell(frame, deviationAt - 2, 0.1, 22)})`,
+          }}
+        >
           <Marker at={deviationAt - 2}>σ, the population&apos;s spread</Marker>, is {fmt(WAIT_SD)} min.
         </div>
       </Ink>

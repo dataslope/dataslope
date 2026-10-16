@@ -52,6 +52,8 @@ export const DinoScene: React.FC = () => {
   const cairoAt = n.word("credit", "Alberto");
   const yearAt = n.word("credit", "twenty seventeen");
   const builtAt = n.word("credit", "built");
+  const justinAt = n.word("credit", "Justin");
+  const threwAt = n.word("lossy", "threw");
   const matchAt = n.word("credit", "match");
   const lossyFrom = n.beat("lossy").from;
   const lossyAt = n.word("lossy", "lossy");
@@ -89,7 +91,7 @@ export const DinoScene: React.FC = () => {
   const showing = frame - cur.at < MORPH / 2 && k > 0 ? prev.key : cur.key;
   const stats = DINO.stats[showing];
   const index = DINO.order.indexOf(showing);
-  const tableDim = ease(frame, lossyAt - 4, 14) * 0.55;
+  const tableDim = ease(frame, lossyAt - 4, 14) * 0.4 + ease(frame, threwAt - 2, 14) * 0.25;
   const bump = ease(frame, keepsAt - 2, 8) * (1 - ease(frame, keepsAt + 10, 14));
 
   return (
@@ -201,7 +203,9 @@ export const DinoScene: React.FC = () => {
         <span style={{ ...note(21, INK_SOFT), ...halo }}>The dinosaur: Alberto Cairo.</span>
       </Ink>
       <Ink at={yearAt - 2} dur={16} style={{ left: 1000, top: y(860) + 32, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(21, INK_SOFT), ...halo }}>The other twelve: Justin Matejka and George Fitzmaurice, 2017.</span>
+        <span style={{ ...note(21, INK_SOFT), ...halo }}>
+          The other twelve, 2017: <span style={{ opacity: ease(frame, justinAt - 4, 12) }}>Justin Matejka and George Fitzmaurice.</span>
+        </span>
       </Ink>
       <Ink at={meansAt - 8} dur={16} style={{ left: 1000, top: y(410) - 50, whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, INK_SOFT) }}>Five numbers, the same for all thirteen</span>

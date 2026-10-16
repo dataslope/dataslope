@@ -71,6 +71,7 @@ export const ShopScene: React.FC = () => {
   const notebooksAt = n.word("result", "Two notebooks");
   const pensAt = n.word("result", "three pens");
   const exactlyAt = n.word("next", "exactly one row");
+  const everyRowAt = n.word("next", "every row");
   const nameAt = n.word("next", "name");
   const keyAt = n.word("next", "key");
   const nextTo = n.beat("next").to;
@@ -159,7 +160,8 @@ export const ShopScene: React.FC = () => {
 
       <Kicker at={shopFrom - 10}>Reading a diagram</Kicker>
       <Headline lead="Read each line" at={shopFrom - 4} turn="as a sentence." turnAt={sentenceAt - 4} out={followAt - 8} />
-      <Headline lead="The keys" at={followAt - 2} turn="are the joins." turnAt={joinAt - 4} />
+      <Headline lead="The keys" at={followAt - 2} turn="are the joins." turnAt={joinAt - 4} out={everyRowAt - 8} />
+      <Headline lead="Every row needs" at={everyRowAt - 2} turn="a name of its own." turnAt={nameAt - 4} />
       <Spot id="db-relationships-bag" at={littleShopAt} left={1620} top={y(62)} width={160} height={238} />
 
       <Drift from={s[0].from} to={nextTo + 60} scale={0.016} origin={[960, y(560)]}>

@@ -203,7 +203,7 @@ export const Pulse: React.FC<{ x: number; y: number; at: number; color?: string;
   if (p <= 0 || p >= 1) return null;
   return (
     <Svg>
-      <circle cx={x} cy={y} r={r * (0.4 + p)} fill="none" stroke={color} strokeWidth={3} opacity={1 - p} />
+      <circle cx={x} cy={y} r={r * (0.4 + p)} fill="none" stroke={color} strokeWidth={5} opacity={1 - p} />
     </Svg>
   );
 };
@@ -397,7 +397,7 @@ export const Tag: React.FC<{ size?: number; color?: string; weight?: number; chi
  * up a little and sets back, so the next scene arrives over a page that is
  * already leaving rather than one that has stopped.
  */
-export const Exit: React.FC<{ at: number | null; dur?: number; children: React.ReactNode }> = ({ at, dur = 22, children }) => {
+export const Exit: React.FC<{ at: number | null; dur?: number; children: React.ReactNode }> = ({ at, dur = 30, children }) => {
   const frame = useCurrentFrame();
   const p = at === null ? 0 : ease(frame, at, dur);
   return (

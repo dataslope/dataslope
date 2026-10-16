@@ -195,6 +195,34 @@ export const SweepScene: React.FC = () => {
         {/* p = 0.05, on the p panel: just under the top. */}
         <Dashed x0={P.x0} y0={pY(0.05)} x1={P.x1} y1={pY(0.05)} at={growAt} dur={14} color={INK_SOFT} width={1.4} dash="4 4" />
 
+        {/* Each sample size arrives as a guide down both panels. */}
+        <Svg>
+          {SWEEP.rows.map((r, i) => {
+            const g = ease(frame, rowAt(i) - 2, 8);
+            if (g <= 0) return null;
+            return PANELS.map((p, k) => (
+              <line
+                key={`${r.n}-${k}`}
+                x1={nx(p, r.n)}
+                x2={nx(p, r.n)}
+                y1={bottom}
+                y2={lerp(bottom, top, g)}
+                stroke={INK_SOFT}
+                strokeWidth={2}
+                strokeDasharray="3 5"
+                opacity={0.55}
+              />
+            ));
+          })}
+        </Svg>
+        {SWEEP.rows.map((r, i) => (
+          <Note key={r.n} at={rowAt(i)} x={nx(D, r.n)} y={top - 4} from="up" out={i < SWEEP.rows.length - 1 ? rowAt(i + 1) : plungesAt - 4}>
+            <span style={{ ...note(30, INK), fontWeight: 700, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
+              n = {r.n.toLocaleString("en-US")}
+            </span>
+          </Note>
+        ))}
+
         {/* ── The lines, drawn through the points as the narration follows them ── */}
         <Svg>
           {pLine > 0 ? <path d={partial(pPts.slice(0, -1), pLine)} fill="none" stroke={STAT} strokeWidth={3} strokeLinejoin="round" /> : null}
@@ -204,8 +232,8 @@ export const SweepScene: React.FC = () => {
             if (a <= 0) return null;
             return (
               <g key={r.n}>
-                {r.p > 0 ? <circle cx={pPts[i][0]} cy={pPts[i][1]} r={8 * a} fill={STAT} stroke={PAPER} strokeWidth={2} /> : null}
-                <circle cx={dPts[i][0]} cy={dPts[i][1]} r={8 * a} fill={DATA} stroke={PAPER} strokeWidth={2} />
+                {r.p > 0 ? <circle cx={pPts[i][0]} cy={pPts[i][1]} r={10 * a} fill={STAT} stroke={PAPER} strokeWidth={2} /> : null}
+                <circle cx={dPts[i][0]} cy={dPts[i][1]} r={10 * a} fill={DATA} stroke={PAPER} strokeWidth={2} />
               </g>
             );
           })}
@@ -245,6 +273,18 @@ export const SweepScene: React.FC = () => {
         <Note at={sizeAt - 2} x={D.x0 + 24} y={dY(0.08)}>
           <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>stays put</span>
         </Note>
+        {/* The panel the narration is not about steps back: d on "the world", p on "the p-value". */}
+        {[
+          { p: P, dim: ease(frame, worldAt - 6, 12) * (1 - ease(frame, pWorldAt - 6, 12)) },
+          { p: D, dim: ease(frame, andAt - 6, 12) * (1 - ease(frame, sampleAt + 10, 12)) },
+        ].map(({ p, dim }, k) =>
+          dim > 0 ? (
+            <div
+              key={k}
+              style={{ position: "absolute", left: p.x0 - 90, top: top - 50, width: p.x1 - p.x0 + 120, height: bottom - top + 130, background: PAPER, opacity: 0.6 * dim }}
+            />
+          ) : null,
+        )}
       </Drift>
       </div>
     </AbsoluteFill>
