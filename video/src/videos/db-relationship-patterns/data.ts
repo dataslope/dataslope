@@ -121,7 +121,7 @@ export const JT = {
   again: failed("jtInsertAgain"),
   againCount: one<number>("jtCountAgain", "n"),
   /** The row the challenge adds, as the table holds it: no grade yet. */
-  linusRow: ["3", "10", "2026-02-01", null] as Cell[],
+  linusRow: cells("jtLinus", ["student_id", "course_id", "enrolled_on", "grade"])[0],
 };
 
 // ── 4. One to one (one-to-one.mdx) ──────────────────────────────────────────

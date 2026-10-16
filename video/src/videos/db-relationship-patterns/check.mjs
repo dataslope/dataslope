@@ -167,6 +167,11 @@ ORDER BY e.student_id, e.course_id;`,
   await run(db, "jtCountBefore", "SELECT COUNT(*)::int AS n FROM enrollments;");
   await run(db, "jtInsert", solution);
   await run(db, "jtCountAfter", "SELECT COUNT(*)::int AS n FROM enrollments;");
+  await run(
+    db,
+    "jtLinus",
+    "SELECT student_id, course_id, enrolled_on::text AS enrolled_on, grade FROM enrollments WHERE student_id = 3 AND course_id = 10;",
+  );
   await run(db, "jtInsertAgain", solution);
   await run(db, "jtCountAgain", "SELECT COUNT(*)::int AS n FROM enrollments;");
   await db.close();

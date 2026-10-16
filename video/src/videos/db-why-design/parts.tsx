@@ -524,26 +524,35 @@ const wipe = (p: number): React.CSSProperties => {
   return { WebkitMaskImage: mask, maskImage: mask, filter: `blur(${(1 - p) * 1.4}px)` };
 };
 
-const CellText: React.FC<{ value: TCell; color: string; mark?: CellMark; swap?: CellSwap }> = ({ value, color, mark, swap }) => {
+const CellText: React.FC<{ value: TCell; color: string; marks: readonly CellMark[]; swap?: CellSwap }> = ({
+  value,
+  color,
+  marks,
+  swap,
+}) => {
   const frame = useCurrentFrame();
   const swapped = swap !== undefined && frame >= swap.at;
   const text = swapped ? swap.value : shown(value);
   const fade = swap !== undefined && !swapped ? 1 - ease(frame, swap.at - 6, 6) : 1;
-  const w = mark ? ease(frame, mark.at, 12) : 0;
-  const gone = mark?.out === undefined ? 0 : ease(frame, mark.out, 10);
   return (
     <span style={{ position: "relative", display: "inline-block" }}>
-      {mark && w > 0 && gone < 1 ? (
-        <span
-          style={{
-            position: "absolute",
-            inset: "0.02em -0.28em",
-            background: mark.color ?? MARK,
-            clipPath: `inset(0 ${(1 - w) * 100}% 0 0)`,
-            opacity: 1 - gone,
-          }}
-        />
-      ) : null}
+      {marks.map((mark, k) => {
+        const w = ease(frame, mark.at, 12);
+        const gone = mark.out === undefined ? 0 : ease(frame, mark.out, 10);
+        if (w <= 0 || gone >= 1) return null;
+        return (
+          <span
+            key={k}
+            style={{
+              position: "absolute",
+              inset: "0.02em -0.28em",
+              background: mark.color ?? MARK,
+              clipPath: `inset(0 ${(1 - w) * 100}% 0 0)`,
+              opacity: 1 - gone,
+            }}
+          />
+        );
+      })}
       <span
         style={{
           position: "relative",
@@ -643,7 +652,7 @@ export const DbTable: React.FC<{
                   <CellText
                     value={v}
                     color={colInk[j] ?? INK}
-                    mark={marks.find((m) => m.row === i && m.col === j)}
+                    marks={marks.filter((m) => m.row === i && m.col === j)}
                     swap={swaps.find((s) => s.row === i && s.col === j)}
                   />
                 </div>

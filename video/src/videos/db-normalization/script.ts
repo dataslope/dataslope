@@ -156,7 +156,7 @@ export const script: NarrationScript = {
     {
       id: "pair",
       scene: true,
-      text: "Second normal form is about keys with two parts. Each order line here is named by a pair, order and product.",
+      text: "Second normal form is about keys with two parts, like this pair: order and product.",
       pauseAfter: 0.35,
     },
     {
@@ -167,12 +167,12 @@ export const script: NarrationScript = {
     { id: "part", text: "But the product name only needs half. Product ten is Notebook on every order.", pauseAfter: 0.45 },
     {
       id: "partial",
-      text: "That's a partial dependency, and it copies the name onto every line. Rename the notebook, and two rows change.",
+      text: "That's a partial dependency. It copies the name onto every line, so a rename changes two rows.",
       pauseAfter: 0.5,
     },
     {
       id: "move",
-      text: "So the name moves to products, where a rename is one row, and order items keeps what needs the whole pair.",
+      text: "So the name moves to products, and a rename is one row.",
       pauseAfter: 0.6,
     },
     { id: "chain-in", text: "Third normal form catches something sneakier." },
@@ -229,7 +229,7 @@ export const script: NarrationScript = {
     },
     {
       id: "sync",
-      text: "So every copy needs a sync plan, and everyone has to know which table is the truth.",
+      text: "So every copy needs a sync plan, and a clear source of truth.",
       pauseAfter: 0.6,
     },
     {

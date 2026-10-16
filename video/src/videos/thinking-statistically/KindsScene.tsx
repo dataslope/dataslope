@@ -99,9 +99,9 @@ export const KindsScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      {/* ── Sound: the two branches, the sizes sliding apart, the counts ── */}
-      <Sfx name="el-pencil" at={parentAt[0]} level={-35} />
-      <Sfx name="el-pencil" at={parentAt[1]} level={-35} />
+      {/* ── Sound: the two branches, the sizes sliding apart, the counts, the zip code ── */}
+      <Sfx name="el-pencil" at={twoKindsAt - 2} level={-35} />
+      <Sfx name="el-pencil" at={twoKindsAt + 6} level={-35} />
       <Sfx name="el-whoosh" at={unevenAt - 4} level={-33} />
       <Sfx name="el-sprinkle" at={leafAt[2] + 4} level={-34} />
       <Sfx name="el-pop" at={fewAt - 4} level={-30} />
