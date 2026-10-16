@@ -125,7 +125,8 @@ export const UnitScene: React.FC = () => {
           AGG,
           dependsAt - 4,
           <>
-            <Marker at={districtsAt - 2}>Districts</Marker>: r = {signed(DISTRICTS.rGroup)}
+            <Marker at={districtsAt - 2}>Districts</Marker>
+            <span style={{ opacity: ease(frame, nineAt - 6, 8) }}>: r = {signed(DISTRICTS.rGroup)}</span>
           </>,
           DATA_INK,
           "average income, one dot per district",
