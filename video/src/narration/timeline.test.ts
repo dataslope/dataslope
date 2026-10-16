@@ -101,3 +101,38 @@ test("leaves the scene gap before a beat that opens a scene, and never shortens 
   assert.ok(Math.abs(b.start - (a.end + 1.5)) < 1e-9);
   assert.ok(Math.abs(c.start - (b.end + 2)) < 1e-9);
 });
+
+test("audio tags are neither words nor captions, and words keep their spans", () => {
+  const text = "[curious] So what's a pointer? [low, warm voice]It holds an address.";
+  const estimated = buildTimeline({ id: "s", beats: [{ id: "a", text }] }, null);
+  assert.deepEqual(
+    estimated.beats[0].words.map((w) => w.text),
+    ["So", "what's", "a", "pointer?", "It", "holds", "an", "address."],
+  );
+  assert.ok(estimated.captions.every((c) => !c.text.includes("[")));
+
+  const aligned = buildTimeline(
+    { id: "s", leadIn: 0, beats: [{ id: "a", text }] },
+    { beats: { a: { text, audio: "narration/s/a.mp3", alignment: align(text) } } },
+  );
+  // "So" is characters 10-11; the tag before it is the beat's lead-in.
+  assert.ok(Math.abs(aligned.beats[0].words[0].start - 0) < 1e-9);
+  assert.ok(Math.abs(aligned.beats[0].words[4].start - (text.indexOf("It") - 10) * 0.1) < 1e-9);
+});
+
+test("a beat's audio starts early by its lead-in, so the first word lands on the beat", () => {
+  // A beat cut from a continuous take: 0.4 s of breath before "Second".
+  const text = "Second beat.";
+  const alignment = align(text);
+  alignment.character_start_times_seconds = alignment.character_start_times_seconds.map((s) => s + 0.4);
+  alignment.character_end_times_seconds = alignment.character_end_times_seconds.map((s) => s + 0.4);
+  const t = buildTimeline(script, {
+    beats: { b: { text, audio: "narration/t/b.mp3", alignment } },
+  });
+  const [a, b] = t.beats;
+  assert.ok(Math.abs(b.start - (a.end + 0.5)) < 1e-9);
+  assert.ok(Math.abs(b.words[0].start - b.start) < 1e-9);
+  assert.ok(Math.abs(b.audioStart - (b.start - 0.4)) < 1e-9);
+  assert.ok(Math.abs(b.end - (b.start + 1.2)) < 1e-9);
+  assert.equal(a.audioStart, a.start);
+});

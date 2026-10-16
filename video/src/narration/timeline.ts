@@ -46,10 +46,18 @@ const PAUSE_AFTER: Record<string, number> = {
 export const wordKey = (word: string) =>
   word.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-/** Words of a text with their character spans, split on whitespace. */
+/** An audio tag such as `[curious]` or `[low, gravelly voice]`: a direction
+ *  to the voice, never spoken. ElevenLabs v3 and v4 return its characters in
+ *  the alignment with next to no duration. */
+const AUDIO_TAG = /\[[^\]]*\]/g;
+
+/** Words of a text with their character spans, split on whitespace. Audio
+ *  tags are blanked out first, so they are neither words nor captions, and
+ *  the spans still index the text as written. */
 function splitWords(text: string) {
+  const spoken = text.replace(AUDIO_TAG, (tag) => " ".repeat(tag.length));
   const words: { text: string; from: number; to: number }[] = [];
-  for (const m of text.matchAll(/\S+/g)) {
+  for (const m of spoken.matchAll(/\S+/g)) {
     const from = m.index ?? 0;
     words.push({ text: m[0], from, to: from + m[0].length });
   }
@@ -77,10 +85,14 @@ function estimateBeat(text: string) {
     return { text: w.text, key: wordKey(w.text), start, end };
   });
   // The pause after the final word belongs to `pauseAfter`, not to the beat.
-  return { words, duration: words.length ? words[words.length - 1].end : 0 };
+  return { words, duration: words.length ? words[words.length - 1].end : 0, lead: 0 };
 }
 
-/** Word timings for one beat from real character alignment. */
+/** Word timings for one beat from real character alignment, relative to its
+ *  first word. `lead` is how far into the audio file that word starts: the
+ *  breath and onset before it, which a beat cut from a continuous take keeps
+ *  (scripts/narrate.mjs). The audio starts that much early, so the word
+ *  itself lands on the beat. */
 function alignBeat(text: string, alignment: CharacterAlignment) {
   const starts = alignment.character_start_times_seconds;
   const ends = alignment.character_end_times_seconds;
@@ -98,7 +110,12 @@ function alignBeat(text: string, alignment: CharacterAlignment) {
       end: ends[to],
     };
   });
-  return { words, duration: ends.length ? ends[ends.length - 1] : 0 };
+  const lead = words.length ? words[0].start : 0;
+  return {
+    words: words.map((w) => ({ ...w, start: w.start - lead, end: w.end - lead })),
+    duration: (ends.length ? ends[ends.length - 1] : 0) - lead,
+    lead,
+  };
 }
 
 /** Whether alignment was made from this exact text. */
@@ -141,6 +158,7 @@ export function buildTimeline(
       words,
       source: usable ? "alignment" : entry ? "stale" : "estimate",
       audio: usable ? entry.audio : null,
+      audioStart: start - timed.lead,
     };
   });
 

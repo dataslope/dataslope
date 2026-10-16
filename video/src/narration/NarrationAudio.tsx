@@ -10,7 +10,7 @@ export const NarrationAudio: React.FC = () => {
     <>
       {timeline.beats.map((beat) =>
         beat.audio ? (
-          <Sequence key={beat.id} from={frame(beat.start)} layout="none">
+          <Sequence key={beat.id} from={frame(beat.audioStart)} layout="none">
             <Html5Audio src={staticFile(beat.audio)} />
           </Sequence>
         ) : null,

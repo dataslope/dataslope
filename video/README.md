@@ -208,37 +208,76 @@ some other way, such as a wipe or an eraser keyed to `beat("…").from`.
 
 ```bash
 # needs ELEVENLABS_API_KEY
-npm run narrate -- c-pointers --dry-run   # the beats it would send
-npm run narrate -- c-pointers             # every beat not yet voiced
+npm run narrate -- c-pointers --dry-run   # the text it would send
+npm run narrate -- c-pointers             # a take, or the beats not yet voiced
 npm run narrate -- c-pointers --only star # re-voice one edited beat
+npm run narrate -- c-pointers --force     # a whole new take
 npm run cues -- c-pointers                # the timing it produced
 ```
 
-`scripts/narrate.mjs` voices each beat with ElevenLabs
-`POST /v1/text-to-speech/{voice_id}/with-timestamps`, sending the beat's
-`text` exactly, with the neighbouring beats as `previous_text` and `next_text`
-so the intonation runs on across a cut. It defaults to the `eleven_v4_turbo`
-model and the premade voice Matilda (`XrExE9yKIg1WjnnlVkGX`), and records
-both in the alignment file. A later run reuses that voice, so re-voicing one
-beat never mixes two voices. `--voice` and `--model` change them for the whole
-video. Beats whose text hasn't changed are skipped. The script refuses any
-response whose alignment doesn't spell the beat's text exactly, because the
-timeline would ignore it.
+`scripts/narrate.mjs` voices a script with ElevenLabs
+`POST /v1/text-to-speech/{voice_id}/with-timestamps`. It defaults to the
+`eleven_v4_turbo` model and Drew (`q0IMILNRPxOgtBTS4taI`, "casual, curious
+and fun", made for tutorials), and records both in the alignment file. A later
+run reuses that voice, so a video never mixes two. `--voice` and `--model`
+change them for the whole video. The script refuses any response whose
+alignment doesn't spell the text it sent exactly, because the timeline would
+ignore it.
 
-It saves each response's audio as `public/narration/<script id>/<beat id>.mp3`,
-and its `alignment` (not `normalized_alignment`) into one file:
+**A video is voiced as one take.** When every beat needs voicing (the first
+run, a new voice, or `--force`), the whole script goes in a single request:
+beats joined by a space, and a paragraph break before each beat that opens a
+scene. The take is then cut into beats at the middle of the longest silence
+in each pause between them, so no cut lands in a word. Each beat keeps up to
+0.45 s of breath before its first word and 0.3 s of decay after its last,
+with an 8 ms fade at the cut. The timeline starts a beat's audio early by
+that lead-in, so the first word still lands on the beat.
+
+That is most of the difference between narration and text-to-speech. Voiced
+one request per beat, every sentence started cold, on the same contour, with
+the same energy. In one take, a question lifts and its answer comes down,
+and one sentence runs into the next. The raw take and its alignment stay in
+`.generated/narration/<script id>/` (gitignored), so it can be re-cut without
+paying for it again.
+
+When only some beats changed, just those are re-voiced, one request each,
+with the neighbouring beats as `previous_text` and `next_text`. Use `--force`
+for a fresh take of the whole script.
+
+**Write the script for the ear.** Following ElevenLabs'
+[best practices](https://elevenlabs.io/docs/overview/capabilities/text-to-speech/best-practices)
+for v4:
+
+- Write it the way a person says it: contractions, and a question the next
+  sentence answers ("And ampersand n? That's the address of that box.").
+- An ellipsis is a held pause ("a box in memory... and every box has an
+  address"). Plain punctuation sets the rhythm; v4 has no `<break>` tags.
+- Capitals put the stress on a word ("changes n ITSELF"). Use them once or
+  twice a video. Cues match either case.
+- An audio tag sets the delivery of what follows: `[curious]`, `[excited]`,
+  `[whispers]`. Pick ones that suit the voice, and use them sparingly. The
+  alignment includes the tag's characters at almost no duration, so a tag is
+  written into the beat's `text`. The timeline leaves it out of the words and
+  the captions, so it can't be cued to.
+- Check the take with speech-to-text (`POST /v1/speech-to-text`,
+  `scribe_v1`) before rendering. A v4 voice can change a word, and a misread
+  doesn't break any cue.
+
+The audio goes to `public/narration/<script id>/<beat id>.mp3`, and the
+`alignment` (not `normalized_alignment`) to one file, each beat's times
+counted from the start of its own file:
 
 ```json
 {
-  "meta": { "voice_id": "XrExE9yKIg1WjnnlVkGX", "model_id": "eleven_v4_turbo" },
+  "meta": { "voice_id": "q0IMILNRPxOgtBTS4taI", "model_id": "eleven_v4_turbo" },
   "beats": {
-    "box": {
-      "text": "In C, every variable is a box in memory, and every box has an address.",
-      "audio": "narration/c-pointers/box.mp3",
+    "n": {
+      "text": "Here, n holds forty-two. And ampersand n? That's the address of that box.",
+      "audio": "narration/c-pointers/n.mp3",
       "alignment": {
-        "characters": ["I", "n", " ", "C", "..."],
-        "character_start_times_seconds": [0, 0.12, 0.18, 0.24],
-        "character_end_times_seconds": [0.12, 0.18, 0.24, 0.32]
+        "characters": ["H", "e", "r", "e", "..."],
+        "character_start_times_seconds": [0.219, 0.279, 0.339, 0.399],
+        "character_end_times_seconds": [0.279, 0.339, 0.399, 0.459]
       }
     }
   }
@@ -249,8 +288,8 @@ A beat whose text has changed since its audio was made is reported as `stale`
 by `npm run cues` and falls back to the estimate, so an edited sentence can't
 play the old audio out of sync. Re-generate just that beat.
 
-The real voice is slower than the reading-speed estimate. CPointers went from
-67 s on the estimate to 95 s voiced (about 120 words a minute, pauses
+The real voice runs at its own pace, not the estimate's. CPointers went from
+67 s on the estimate to 85 s in Drew's take (140 words a minute, pauses
 included). Every cue re-times by itself, and the scene gaps still hold.
 
 Words like "SQL" and "Postgres" are better pinned with an ElevenLabs

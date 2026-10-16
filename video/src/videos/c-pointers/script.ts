@@ -26,7 +26,12 @@ import type { NarrationScript } from "../../narration/types";
  *     b equal to &y, and prints "after:  x = 2, y = 1".
  *
  * Written to be spoken: short sentences, no symbols, no parentheses. "&" is
- * said "ampersand" and "*" is said "star".
+ * said "ampersand" and "*" is said "star". It is also written the way a
+ * person talks, for a voice that reads it in one take (scripts/narrate.mjs):
+ * contractions, a question the next sentence answers, an ellipsis where a
+ * speaker would hold, capitals on the one word a line leans on, and a single
+ * [curious] audio tag. Tags and capitals are directions to the voice; the
+ * timeline leaves tags out of the words, and cues match either case.
  */
 export const script: NarrationScript = {
   id: "c-pointers",
@@ -35,52 +40,52 @@ export const script: NarrationScript = {
   beats: [
     {
       id: "box",
-      text: "In C, every variable is a box in memory, and every box has an address.",
+      text: "In C, every variable is a box in memory... and every box has an address.",
       pauseAfter: 0.4,
     },
-    { id: "n", text: "Here, n holds forty-two. Ampersand n is the address of that box.", pauseAfter: 0.35 },
+    { id: "n", text: "Here, n holds forty-two. And ampersand n? That's the address of that box.", pauseAfter: 0.35 },
     {
       id: "pointer",
-      text: "A pointer is a variable that holds an address. Int star p, set to ampersand n, stores where n lives.",
+      text: "[curious] So what's a pointer? It's just a variable that holds an address. Int star p, set to ampersand n, stores where n lives.",
       pauseAfter: 0.4,
     },
     {
       id: "star",
-      text: "Star p goes to that address. Reading star p gives forty-two, and writing one hundred through it changes n itself.",
+      text: "Star p goes to that address. Reading star p gives you forty-two, and writing one hundred through it changes n ITSELF.",
       pauseAfter: 0.5,
     },
     {
       id: "sizes",
-      text: "On this machine, an int takes four bytes and a pointer takes eight. The addresses change on every run, but p always holds the address of n.",
+      text: "On this machine, an int takes four bytes, and a pointer takes eight. The addresses change on every run, but p always holds the address of n.",
       pauseAfter: 0.7,
     },
     {
       id: "trap",
       scene: true,
-      text: "Now the classic trap. This swap takes two ints and trades them.",
+      text: "Now, here's the classic trap. This swap takes two ints and trades them.",
       pauseAfter: 0.35,
     },
     {
       id: "copies",
-      text: "But C passes copies. Swap gets two new boxes, a and b, holding one and two.",
+      text: "But C passes copies. So swap gets two new boxes, a and b, holding one and two.",
       pauseAfter: 0.3,
     },
-    { id: "nothing", text: "The copies trade, and x and y stay exactly as they were.", pauseAfter: 1.0 },
+    { id: "nothing", text: "The copies trade... and x and y? They stay exactly as they were.", pauseAfter: 1.0 },
     {
       id: "fix",
       scene: true,
-      text: "So pass the addresses instead. Call swap with ampersand x and ampersand y, and a and b now hold where x and y live.",
+      text: "So, pass the addresses instead. Call swap with ampersand x and ampersand y, and a and b now hold where x and y live.",
       pauseAfter: 0.35,
     },
     {
       id: "works",
-      text: "Star a and star b reach back into main's boxes, so x and y really trade.",
+      text: "Now star a and star b reach back into main's boxes, so x and y REALLY trade.",
       pauseAfter: 1.5,
     },
     {
       id: "rule",
       scene: true,
-      text: "That is all a pointer is. Ampersand asks where a variable lives, and star goes there.",
+      text: "And that's all a pointer is. Ampersand asks where a variable lives, and star goes there.",
     },
   ],
 };

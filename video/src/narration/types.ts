@@ -5,7 +5,9 @@ export type Beat = {
   /** Stable id. Audio files and alignment are keyed by it, and scenes look
    *  their cues up by it, so renaming one is a re-generation. */
   id: string;
-  /** Exactly what the voice says. Captions show it verbatim. */
+  /** Exactly what the voice is sent, and what captions show. It may carry
+   *  ElevenLabs audio tags (`[curious]`), which are directions rather than
+   *  words: they are left out of the captions and can't be cued to. */
   text: string;
   /** Silence after this beat, in seconds. */
   pauseAfter?: number;
@@ -78,6 +80,11 @@ export type TimedBeat = {
   source: "alignment" | "estimate" | "stale";
   /** Audio file relative to public/, when there is one. */
   audio: string | null;
+  /** Seconds from the start of the video at which `audio` starts playing:
+   *  ahead of `start` by the file's own lead-in (a breath, the onset of the
+   *  first word), so the first word lands on `start`. Equal to `start` for an
+   *  estimated beat. */
+  audioStart: number;
 };
 
 export type Timeline = {
