@@ -1,0 +1,273 @@
+import React from "react";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { ease } from "../../components/motion";
+import { Axis, sx, type XScale } from "../../editorial/charts";
+import { useLayout } from "../../editorial/layout";
+import { body, fmt, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { useNarration } from "../../narration/NarrationContext";
+import { GAPS, jitter } from "./data";
+import { DOT, Kicker, lerp, STAT, STAT_INK, Svg, TruthLine } from "./parts";
+
+/** The raw values: every score in every draw lies inside 10 to 90. */
+const X: XScale = { lo: 10, hi: 90, x0: 300, x1: 1180 };
+const STRIP_A = 500;
+const STRIP_B = 660;
+const AXIS = 800;
+const JIT = 30;
+/** The gaps, A minus B, around a zero line. */
+const ZERO_X = 1560;
+const PER_POINT = 44;
+const ROW_Y = [470, 535, 600, 665, 730];
+const BAR_H = 26;
+
+const JIT_A = jitter(40, GAPS.n);
+const JIT_B = jitter(41, GAPS.n);
+
+/** "+1.72", "−3.62": a gap the way the panel prints it. */
+const signed = (v: number) => `${v < 0 ? "−" : "+"}${fmt(Math.abs(v))}`;
+
+/**
+ * Part 1 opens: two groups of forty, B ahead, then the reveal that both come
+ * from one process, and four more draws whose gaps are never zero.
+ */
+export const GapScene: React.FC = () => {
+  const frame = useCurrentFrame();
+  const n = useNarration();
+  const { y, h } = useLayout();
+
+  // ── Cues ──
+  const groupsAt = n.word("hook", "two groups");
+  const scoresAt = n.word("hook", "scores");
+  const higherAt = n.word("hook", "higher");
+  const halfAt = n.word("hook", "three");
+  const betterAt = n.word("better", "better");
+  const sameFrom = n.beat("same").from;
+  const sameAt = n.word("same", "same");
+  const processAt = n.word("same", "process");
+  const againAt = n.word("again", "again");
+  const sevenAt = n.word("again", "one");
+  const twoAt = n.word("more", "two");
+  const threeAt = n.word("more", "three");
+  const oneAt = n.word("more", "one");
+  const neverAt = n.word("free", "never");
+  const zeroAt = n.word("free", "zero");
+  const couldAt = n.word("luck", "could");
+
+  // When each draw's dots arrive, and when its gap bar grows.
+  const draws = [
+    { s: groupsAt - 4, bar: halfAt - 2 },
+    { s: againAt - 2, bar: sevenAt - 4 },
+    { s: twoAt - 12, bar: twoAt - 2 },
+    { s: threeAt - 12, bar: threeAt - 2 },
+    { s: oneAt - 12, bar: oneAt - 2 },
+  ];
+  const current = Math.max(0, draws.filter((d) => frame >= d.s).length - 1);
+  const prev = current > 0 ? current - 1 : -1;
+  const swap = current > 0 ? ease(frame, draws[current].s, 8) : 1;
+  const moved = current > 0 ? ease(frame, draws[current].s + 6, 12) : 1;
+
+  const trial = GAPS.trials[current];
+  const before = prev >= 0 ? GAPS.trials[prev] : trial;
+  const meanA = lerp(before.meanA, trial.meanA, moved);
+  const meanB = lerp(before.meanB, trial.meanB, moved);
+  const meansIn = ease(frame, higherAt - 6, 12);
+  const panelIn = ease(frame, scoresAt - 4, 14);
+  const zeroBold = ease(frame, zeroAt - 2, 10);
+
+  const strip = (values: readonly number[], jit: readonly number[], base: number, appear: (j: number) => number, op = 1) =>
+    values.map((v, j) => {
+      const a = appear(j);
+      if (a <= 0) return null;
+      return (
+        <circle
+          key={j}
+          cx={sx(X, v)}
+          cy={y(base) + h((jit[j] - 0.5) * 2 * JIT)}
+          r={6.5 * a}
+          fill={DOT}
+          stroke={PAPER}
+          strokeWidth={1.2}
+          opacity={op}
+        />
+      );
+    });
+
+  const appearNew = (offset: number) => (j: number) =>
+    ease(frame, draws[current].s + offset + j * (current === 0 ? 0.5 : 0.18), 6);
+
+  return (
+    <AbsoluteFill>
+      <Kicker at={2}>Signal and noise</Kicker>
+
+      {/* ── Headlines: one line in two inks, the second following the first ── */}
+      <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
+        <Ink at={4} dur={20} out={sameFrom - 6} style={{ position: "relative", whiteSpace: "nowrap" }}>
+          B scores higher.
+        </Ink>
+        <Ink
+          at={betterAt - 6}
+          dur={18}
+          out={sameFrom - 6}
+          style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}
+        >
+          Is B better?
+        </Ink>
+      </div>
+      <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
+        <Ink at={sameAt - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
+          Same process.
+        </Ink>
+        <Ink at={neverAt - 6} dur={18} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+          The gap is never zero.
+        </Ink>
+      </div>
+      <Ink at={couldAt - 4} dur={18} style={{ left: 96, top: y(258), whiteSpace: "nowrap" }}>
+        <span style={{ ...body(38, true), color: INK }}>Could this just be luck?</span>
+      </Ink>
+
+      <FigLabel n="1" title={`Two groups of ${GAPS.n}, and each group's average`} at={groupsAt - 8} x={160} y={y(330)} />
+
+      {/* ── The two groups ── */}
+      {(["A", "B"] as const).map((g, i) => (
+        <Ink key={g} at={groupsAt - 6 + i * 6} dur={12} style={{ left: 160, top: y(i ? STRIP_B : STRIP_A) - 14 }}>
+          <span style={label(22, INK)}>Group {g}</span>
+        </Ink>
+      ))}
+      <Svg>
+        {prev >= 0 && swap < 1 ? (
+          <>
+            {strip(before.a, JIT_A, STRIP_A, () => 1, 1 - swap)}
+            {strip(before.b, JIT_B, STRIP_B, () => 1, 1 - swap)}
+          </>
+        ) : null}
+        {strip(trial.a, JIT_A, STRIP_A, appearNew(0))}
+        {strip(trial.b, JIT_B, STRIP_B, appearNew(current === 0 ? 8 : 2))}
+      </Svg>
+      <Axis scale={X} base={y(AXIS)} ticks={[10, 30, 50, 70, 90]} at={groupsAt - 6} />
+
+      {/* The process both groups come from. */}
+      <TruthLine x={sx(X, GAPS.mu)} bottom={y(AXIS)} top={y(STRIP_A - 56)} at={processAt - 4} />
+      <Note at={processAt} x={sx(X, GAPS.mu)} y={y(AXIS + 44)} from="up">
+        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+          Both from one process, which averages {GAPS.mu}
+        </span>
+      </Note>
+
+      {/* Each group's average, which moves with every draw. */}
+      {meansIn > 0
+        ? ([
+            [meanA, STRIP_A],
+            [meanB, STRIP_B],
+          ] as const).map(([mean, base]) => (
+            <React.Fragment key={base}>
+              <Svg opacity={meansIn}>
+                <line
+                  x1={sx(X, mean)}
+                  x2={sx(X, mean)}
+                  y1={y(base) - h(46)}
+                  y2={y(base) + h(46)}
+                  stroke={STAT}
+                  strokeWidth={4}
+                  strokeLinecap="round"
+                />
+              </Svg>
+              <div
+                style={{
+                  position: "absolute",
+                  left: sx(X, mean),
+                  top: y(base) - h(46) - 34,
+                  transform: "translateX(-50%)",
+                  opacity: meansIn,
+                  whiteSpace: "nowrap",
+                  // A knockout, so the process's dashed line passes behind it.
+                  background: PAPER,
+                  padding: "0 6px",
+                  borderRadius: 4,
+                  ...note(23, STAT_INK),
+                  fontWeight: 700,
+                }}
+              >
+                {fmt(mean)}
+              </div>
+            </React.Fragment>
+          ))
+        : null}
+
+      {/* ── The gaps, A minus B ── */}
+      <Ink at={scoresAt - 4} dur={14} style={{ left: 1290, top: y(330), whiteSpace: "nowrap" }}>
+        <span style={{ ...label(24, INK), fontWeight: 560 }}>The gap, A minus B</span>
+      </Ink>
+      <div
+        style={{
+          position: "absolute",
+          right: 1920 - ZERO_X + 12,
+          top: y(392),
+          opacity: panelIn,
+          ...note(20, INK_SOFT),
+          whiteSpace: "nowrap",
+        }}
+      >
+        B ahead
+      </div>
+      <div style={{ position: "absolute", left: ZERO_X + 12, top: y(392), opacity: panelIn, ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>
+        A ahead
+      </div>
+      <Svg opacity={panelIn}>
+        <line
+          x1={ZERO_X}
+          x2={ZERO_X}
+          y1={y(432)}
+          y2={y(768)}
+          stroke={INK}
+          strokeWidth={lerp(1.6, 2.6, zeroBold)}
+          strokeDasharray="7 6"
+        />
+      </Svg>
+      <Note at={zeroAt - 2} x={ZERO_X} y={y(782)} from="up">
+        <span style={{ ...label(21, INK), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+          zero
+        </span>
+      </Note>
+      {GAPS.trials.map((t, k) => {
+        const g = ease(frame, draws[k].bar, 12);
+        if (g <= 0) return null;
+        const w = t.gap * PER_POINT * g;
+        const rowY = y(ROW_Y[k]);
+        const end = ZERO_X + w;
+        return (
+          <React.Fragment key={k}>
+            <div
+              style={{
+                position: "absolute",
+                left: 1290,
+                top: rowY - 14,
+                opacity: Math.min(1, g * 2),
+                ...note(21, INK_SOFT),
+              }}
+            >
+              {k + 1}
+            </div>
+            <Svg>
+              <rect x={Math.min(ZERO_X, end)} y={rowY - BAR_H / 2} width={Math.abs(w)} height={BAR_H} fill={STAT} />
+            </Svg>
+            <div
+              style={{
+                position: "absolute",
+                left: t.gap > 0 ? end + 10 : undefined,
+                right: t.gap < 0 ? 1920 - end + 10 : undefined,
+                top: rowY - 15,
+                opacity: ease(frame, draws[k].bar + 6, 8),
+                whiteSpace: "nowrap",
+                ...note(23, STAT_INK),
+                fontWeight: 700,
+              }}
+            >
+              {signed(t.gap)}
+            </div>
+          </React.Fragment>
+        );
+      })}
+    </AbsoluteFill>
+  );
+};

@@ -3,6 +3,7 @@ import { useCurrentFrame, useVideoConfig } from "remotion";
 import { arrowHead } from "../../components/arrow";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
+import { SERIF } from "../../editorial/fonts";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, INK, INK_SOFT, PAPER, label } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
@@ -153,7 +154,7 @@ export const Strike: React.FC<{ at: number; color?: string; children: React.Reac
           minHeight: 3,
           background: color,
           borderRadius: 2,
-          transform: "rotate(-4deg)",
+          transform: "rotate(-2.5deg)",
           transformOrigin: "0 50%",
           opacity: p > 0 ? 1 : 0,
         }}
@@ -162,22 +163,17 @@ export const Strike: React.FC<{ at: number; color?: string; children: React.Reac
   );
 };
 
-/** x-bar, the sample mean's symbol: an italic x under a bar, both in em. */
+/**
+ * Symbols, set in the serif whatever face surrounds them: x-bar as an italic
+ * x with a combining macron (the latin subset carries U+0304, so the face
+ * places the bar itself), and mu upright, from the Greek subset fonts.ts
+ * waits for.
+ */
 export const XBar: React.FC<{ color?: string }> = ({ color }) => (
-  <span style={{ position: "relative", display: "inline-block", fontStyle: "italic", color }}>
-    x
-    <span
-      style={{
-        position: "absolute",
-        left: "0.08em",
-        right: "-0.02em",
-        top: "0.08em",
-        height: "0.065em",
-        minHeight: 2,
-        background: "currentColor",
-      }}
-    />
-  </span>
+  <span style={{ fontFamily: SERIF, fontStyle: "italic", color }}>{"x\u0304"}</span>
+);
+export const Mu: React.FC<{ color?: string }> = ({ color }) => (
+  <span style={{ fontFamily: SERIF, fontStyle: "normal", color }}>μ</span>
 );
 
 /**
