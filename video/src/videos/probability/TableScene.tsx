@@ -90,6 +90,7 @@ export const TableScene: React.FC = () => {
   const comparingAt = n.word("split-in", "comparing");
   const fractionsAt = n.word("split-in", "fractions");
   const linkedAt = n.word("split-in", "linked");
+  const tellsAt = n.word("split-in", "tells you");
 
   // Which rows are set back, as the narration conditions on one, then the other.
   const onPaid = ease(frame, conditionAt - 2, 12) * (1 - ease(frame, freeUsersAt - 6, 12));
@@ -113,8 +114,8 @@ export const TableScene: React.FC = () => {
   const lit = (at: number, until: number) => ease(frame, at - 4, 8) * (1 - ease(frame, until, 10));
 
   const chips = [
-    { key: "paid", at: sixAt, given: "paid", top: TABLE.churned[0], bottom: TABLE.rowTotals[0], p: TABLE.pPaid, rowY: ROW_Y.paid, mark: comparingAt },
-    { key: "free", at: twentyFourAt, given: "free", top: TABLE.churned[1], bottom: TABLE.rowTotals[1], p: TABLE.pFree, rowY: ROW_Y.free, mark: fractionsAt },
+    { key: "paid", at: sixAt, given: "paid", top: TABLE.churned[0], bottom: TABLE.rowTotals[0], p: TABLE.pPaid, rowY: ROW_Y.paid, mark: fractionsAt },
+    { key: "free", at: twentyFourAt, given: "free", top: TABLE.churned[1], bottom: TABLE.rowTotals[1], p: TABLE.pFree, rowY: ROW_Y.free, mark: tellsAt },
     { key: "all", at: fifteenAt, given: null, top: TABLE.churnedTotal, bottom: TABLE.total, p: TABLE.pAll, rowY: ROW_Y.all, mark: linkedAt },
   ];
 
@@ -235,7 +236,7 @@ export const TableScene: React.FC = () => {
 
       {/* ── Each rate, on its own row ── */}
       {chips.map((c) => (
-        <Ink key={c.key} at={c.at - 8} dur={16} style={{ left: CHIP_X, top: y(c.rowY) - 36, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 18 }}>
+        <Ink key={c.key} at={c.at - 8} dur={16} style={{ left: CHIP_X, top: y(c.rowY) - 36, opacity: c.key === "all" ? 1 - ease(frame, comparingAt - 4, 12) * 0.6 : 1, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 18 }}>
           <span style={{ ...note(30, INK) }}>
             P(churn{c.given ? <span style={{ color: INK_SOFT }}> | {c.given}</span> : null}) = {num(c.top)} /{" "}
             {c.key === "free" ? (
@@ -247,7 +248,7 @@ export const TableScene: React.FC = () => {
             )}
           </span>
           <span style={{ ...headline(60, true), color: STAT_INK }}>
-            <Sweep at={c.mark}>{pct(c.p)}</Sweep>
+            {c.key === "all" ? pct(c.p) : <Sweep at={c.mark}>{pct(c.p)}</Sweep>}
           </span>
         </Ink>
       ))}
