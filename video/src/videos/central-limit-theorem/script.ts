@@ -16,21 +16,26 @@ import type { NarrationScript } from "../../narration/types";
  *   - the lesson's log-normal (sigma 1.3) has skewness 15.6, so its mean is
  *     still skewed at n = 30 (theory 2.85) and needs n in the hundreds.
  *
- * Written to be spoken: short sentences, no symbols, no parentheses.
+ * Written to be spoken: short sentences, no symbols, no parentheses. It is
+ * also written the way a person talks, for a voice that reads it in one take
+ * (scripts/narrate.mjs): contractions, a question the next sentence answers,
+ * an ellipsis where a speaker would hold, and capitals on the two words the
+ * argument turns on. Cues match either case.
  */
 export const script: NarrationScript = {
   id: "central-limit-theorem",
+  voice: "hope",
   leadIn: 0.5,
   tail: 2.6,
   beats: [
     {
       id: "hook",
-      text: "These are ten thousand coffee shop wait times, and they are lopsided.",
+      text: "These are ten thousand coffee shop wait times... and they're lopsided.",
       pauseAfter: 0.3,
     },
     {
       id: "shape",
-      text: "Most people wait a few minutes. About one in twenty waits half an hour or more.",
+      text: "Most people wait a few minutes. But about one in twenty waits half an hour or more.",
       pauseAfter: 0.35,
     },
     {
@@ -44,11 +49,11 @@ export const script: NarrationScript = {
       text: "That one average becomes one block in a new chart.",
       pauseAfter: 0.3,
     },
-    { id: "repeat", text: "Pick thirty more, and thirty more. After two thousand samples,", pauseAfter: 0.15 },
+    { id: "repeat", text: "Pick thirty more... and thirty more. After two thousand samples,", pauseAfter: 0.15 },
     { id: "bell", text: "the averages have piled up into a bell, centered on ten.", pauseAfter: 0.45 },
     {
       id: "clt",
-      text: "That is the Central Limit Theorem. The waits stay lopsided. Only their averages turn normal.",
+      text: "That's the Central Limit Theorem. The waits stay lopsided. Only their AVERAGES turn normal.",
       pauseAfter: 0.55,
     },
     {
@@ -57,27 +62,27 @@ export const script: NarrationScript = {
       text: "And it isn't about wait times. Die rolls are flat, and this population has two humps.",
       pauseAfter: 0.25,
     },
-    { id: "any-bell", text: "Average thirty from either one, and the same bell appears.", pauseAfter: 0.55 },
+    { id: "any-bell", text: "Average thirty from either one... and the same bell appears.", pauseAfter: 0.55 },
     {
       id: "thumb",
       scene: true,
-      text: "You will hear that thirty is always enough. That is a rule of thumb, not a law.",
+      text: "You'll hear that thirty is always enough. That's a rule of thumb, not a law.",
       pauseAfter: 0.3,
     },
     {
       id: "heavy",
-      text: "A heavy tail, like incomes, is still lopsided at thirty. It can take hundreds before the bell shows.",
+      text: "A heavy tail, like incomes, is still lopsided at thirty. It can take HUNDREDS before the bell shows.",
       pauseAfter: 0.55,
     },
     {
       id: "spread",
       scene: true,
-      text: "What sample size does control is the spread. They all center on ten, but bigger samples pile up tighter.",
+      text: "So what does sample size control? The spread. They all center on ten, but bigger samples pile up tighter.",
       pauseAfter: 0.3,
     },
     {
       id: "numbers",
-      text: "Samples of five spread about four and a half minutes. Thirty, under two. A hundred, about one.",
+      text: "Samples of five spread about four and a half minutes. Thirty, under two. And a hundred, about one.",
       pauseAfter: 0.45,
     },
     {

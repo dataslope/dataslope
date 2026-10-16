@@ -135,7 +135,10 @@ The process is the one in `video/README.md`; in short:
 6. **Voice.** `npm run narrate -- <video>` records the script as one take. Then a speech-to-text check of the take.
 7. **Render.** `npm run render:fhd`, or `npm run render` for 4K.
 
+## Decisions
+
+- **Narrator: Hope** (decided 2026-10-16). One voice for the whole course, so it sounds like one teacher. Every course script sets `voice: "hope"`.
+
 ## Open decisions
 
-- **Narrator.** One voice for the whole course, so it sounds like one teacher: Drew or Hope (`video/src/narration/voices.ts`).
 - **Embedding.** The site has no video component yet. Where the files are hosted, and how a lesson section embeds one, is still to decide.

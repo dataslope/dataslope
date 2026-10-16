@@ -11,6 +11,8 @@ its beats:
 
 - `c-pointers/`: Drew (`q0IMILNRPxOgtBTS4taI`), eleven beats.
 - `llm-temperature/`: Hope (`tnSpp4vdxKPjI9w0GnoV`), thirteen beats.
+- `central-limit-theorem/`: Hope, fifteen beats. The Statistics course is
+  narrated by Hope throughout.
 
 Each script names its narrator (`voice` in its `script.ts`), and the take
 each folder was cut from is committed in `video/takes/<script id>/`.
