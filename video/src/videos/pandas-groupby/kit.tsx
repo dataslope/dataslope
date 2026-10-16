@@ -1,5 +1,6 @@
 import React from "react";
 import { useCurrentFrame } from "remotion";
+import { arrowHead } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink, type Pt } from "../../editorial/ui";
@@ -311,17 +312,15 @@ export const Arrow: React.FC<{
   const p = ease(frame, at, dur);
   if (p <= 0) return null;
   const [dx, dy] = [to[0] - from[0], to[1] - from[1]];
-  const len = Math.hypot(dx, dy);
-  const [ux, uy] = [dx / len, dy / len];
   const tip: Pt = [from[0] + dx * p, from[1] + dy * p];
   const back = 13;
   const half = 7;
-  const wing = (side: 1 | -1) => `${tip[0] - ux * back - side * uy * half},${tip[1] - uy * back + side * ux * half}`;
+
   return (
     <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity }}>
       <path d={`M${from[0]},${from[1]} L${tip[0]},${tip[1]}`} stroke={color} strokeWidth={width} fill="none" />
       <path
-        d={`M${wing(1)} L${tip[0]},${tip[1]} L${wing(-1)}`}
+        d={arrowHead([from, tip], back, half)}
         stroke={color}
         strokeWidth={width}
         fill="none"

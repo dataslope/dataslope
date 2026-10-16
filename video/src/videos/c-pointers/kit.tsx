@@ -1,5 +1,6 @@
 import React from "react";
 import { useCurrentFrame } from "remotion";
+import { arrowHead, cubicAt, cubicPath, type Cubic, sampleCubic } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
@@ -430,24 +431,13 @@ export const AddrLabel: React.FC<{
   );
 };
 
-export type Pt = readonly [number, number];
+export type { Pt } from "../../components/arrow";
 /** A cubic Bézier: start, two controls, end. */
-export type Curve = readonly [Pt, Pt, Pt, Pt];
+export type Curve = Cubic;
 
-const pointOn = (c: Curve, t: number): Pt => {
-  const u = 1 - t;
-  const a = u * u * u;
-  const b = 3 * u * u * t;
-  const d = 3 * u * t * t;
-  const e = t * t * t;
-  return [a * c[0][0] + b * c[1][0] + d * c[2][0] + e * c[3][0], a * c[0][1] + b * c[1][1] + d * c[2][1] + e * c[3][1]];
-};
-const tangentAt = (c: Curve, t: number): Pt => {
-  const u = 1 - t;
-  const k = (i: 0 | 1) =>
-    3 * u * u * (c[1][i] - c[0][i]) + 6 * u * t * (c[2][i] - c[1][i]) + 3 * t * t * (c[3][i] - c[2][i]);
-  return [k(0), k(1)];
-};
+/** The head's length along its line, and its half-width. */
+const HEAD_LEN = 15;
+const HEAD_HALF = 9;
 
 /** Frames a pulse takes to run the length of an arrow. */
 const PULSE = 20;
@@ -470,15 +460,13 @@ export const PointerArrow: React.FC<{
   const p = ease(frame, at, dur);
   if (p <= 0) return null;
   const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.6;
-  const [s, c1, c2, e] = curve;
-  const path = `M${s[0]},${s[1]} C${c1[0]},${c1[1]} ${c2[0]},${c2[1]} ${e[0]},${e[1]}`;
-  const [tx, ty] = tangentAt(curve, 1);
-  const angle = (Math.atan2(ty, tx) * 180) / Math.PI;
+  const [s] = curve;
+  const head = arrowHead(sampleCubic(curve), HEAD_LEN, HEAD_HALF);
   return (
     <svg width={W} height={H} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: 1 - d }}>
       <circle cx={s[0]} cy={s[1]} r={6.5} fill={color} opacity={ease(frame, at - 2, 6)} />
       <path
-        d={path}
+        d={cubicPath(curve)}
         fill="none"
         stroke={color}
         strokeWidth={width}
@@ -486,20 +474,19 @@ export const PointerArrow: React.FC<{
         pathLength={1}
         strokeDasharray={`${p} 1`}
       />
-      <g transform={`translate(${e[0]},${e[1]}) rotate(${angle})`} opacity={ease(frame, at + dur - 5, 6)}>
-        <path
-          d="M-15,-9 L0,0 L-15,9"
-          fill="none"
-          stroke={color}
-          strokeWidth={width}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </g>
+      <path
+        d={head}
+        fill="none"
+        stroke={color}
+        strokeWidth={width}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity={ease(frame, at + dur - 5, 6)}
+      />
       {pulses.map((cue, i) => {
         const t = ease(frame, cue, PULSE);
         if (t <= 0 || t >= 1) return null;
-        const [px, py] = pointOn(curve, t);
+        const [px, py] = cubicAt(curve, t);
         const glow = Math.sin(t * Math.PI);
         return (
           <g key={i}>
@@ -528,7 +515,7 @@ export const CopyArrow: React.FC<{ x: number; y0: number; y1: number; at: number
     <svg width={W} height={H} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
       <line x1={x} x2={x} y1={y0} y2={end} stroke={color} strokeWidth={2.5} strokeDasharray="7 6" />
       <path
-        d={`M${x - 9},${end - 13} L${x},${end} L${x + 9},${end - 13}`}
+        d={arrowHead([[x, y0], [x, end]], 13, 9)}
         fill="none"
         stroke={color}
         strokeWidth={2.5}

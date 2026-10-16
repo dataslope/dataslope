@@ -321,11 +321,15 @@ export const PointerScene: React.FC = () => {
         </Ink>
       </MemBox>
 
+      {/* Both control points sit in from the ends, so the U has finished
+          turning before the head starts and the line is straight under it
+          (components/arrow.ts). Straight under the ends, it turned 13
+          degrees inside the head. */}
       <PointerArrow
         curve={[
           [arrowX0, boxBottom],
-          [arrowX0, boxBottom + dip],
-          [arrowX1, boxBottom + dip],
+          [arrowX0 - (arrowX0 - arrowX1) * 0.28, boxBottom + dip],
+          [arrowX1 + (arrowX0 - arrowX1) * 0.28, boxBottom + dip],
           [arrowX1, boxBottom + 5],
         ]}
         at={livesAt - 2}

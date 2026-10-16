@@ -442,16 +442,3 @@ export const DimLabel: React.FC<{ value: string; unit?: string; color?: string; 
   </span>
 );
 
-/**
- * Two wings for an arrowhead at `tip`, built from the direction the line is
- * travelling as it arrives there (`from` is a point behind the tip on that
- * direction: a cubic's last control point, a polyline's previous vertex).
- */
-export const arrowHead = (tip: readonly [number, number], from: readonly [number, number], len = 16, half = 9) => {
-  const dx = tip[0] - from[0];
-  const dy = tip[1] - from[1];
-  const l = Math.hypot(dx, dy) || 1;
-  const [ux, uy] = [dx / l, dy / l];
-  const wing = (side: 1 | -1) => `${tip[0] - ux * len + side * uy * half},${tip[1] - uy * len - side * ux * half}`;
-  return `M${wing(1)} L${tip[0]},${tip[1]} L${wing(-1)}`;
-};

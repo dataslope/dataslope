@@ -1,5 +1,6 @@
 import React from "react";
 import { useCurrentFrame } from "remotion";
+import { arrowHead } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
@@ -420,9 +421,8 @@ export const Mono: React.FC<{ children: string; color?: string; weight?: number 
 );
 
 /**
- * A line that draws itself through `points` and ends in an open arrowhead.
- * The head is built from the direction of the last segment, the way the line
- * arrives, so it always points along it.
+ * A line that draws itself through `points` and ends in an open arrowhead,
+ * which follows the last stretch of the line (components/arrow.ts).
  */
 export const Arrow: React.FC<{
   points: readonly Pt[];
@@ -436,16 +436,12 @@ export const Arrow: React.FC<{
   const p = ease(frame, at, dur);
   if (p <= 0) return null;
   const path = points.map(([px, py], i) => `${i ? "L" : "M"}${px},${py}`).join(" ");
-  const [ex, ey] = points[points.length - 1];
-  const [sx, sy] = points[points.length - 2];
-  const len = Math.hypot(ex - sx, ey - sy);
-  const [ux, uy] = [(ex - sx) / len, (ey - sy) / len];
-  const wing = (side: 1 | -1) => `${ex - ux * head + side * uy * head * 0.62},${ey - uy * head - side * ux * head * 0.62}`;
+  const wings = arrowHead(points, head, head * 0.62);
   return (
     <svg width={W} height={H} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
       <path d={path} fill="none" stroke={color} strokeWidth={width} strokeLinecap="round" pathLength={1} strokeDasharray={`${p} 1`} />
       <path
-        d={`M${wing(1)} L${ex},${ey} L${wing(-1)}`}
+        d={wings}
         fill="none"
         stroke={color}
         strokeWidth={width}

@@ -1,5 +1,6 @@
 import React from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig } from "remotion";
+import { arrowHead, type Cubic, cubicPath, sampleCubic } from "../../components/arrow";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
@@ -135,15 +136,12 @@ export const MechanismScene: React.FC = () => {
   const arcFrom: [number, number] = [resultX + 3 * CODE * 0.6, pipeY + 52];
   const arcTo: [number, number] = [TARGET_BUCKET.x + CELL_W / 2, y(B_CELLS) - 42];
   const arcCtrl: [number, number] = [arcTo[0] - 120, arcTo[1] - 110];
-  const arc = `M${arcFrom[0]},${arcFrom[1]} C${arcFrom[0] + 40},${arcFrom[1] + 130} ${arcCtrl[0]},${arcCtrl[1]} ${arcTo[0]},${arcTo[1]}`;
-  // The head points along the curve where it lands: a cubic's end tangent runs
-  // from its last control point to its end. A fixed downward V met the curve
-  // at an angle and read as a tick.
-  const [hx, hy] = [arcTo[0] - arcCtrl[0], arcTo[1] - arcCtrl[1]];
-  const hl = Math.hypot(hx, hy);
-  const [ux, uy] = [hx / hl, hy / hl];
-  const wing = (side: 1 | -1) => `${arcTo[0] - ux * 15 + side * uy * 9},${arcTo[1] - uy * 15 - side * ux * 9}`;
-  const head = `M${wing(1)} L${arcTo[0]},${arcTo[1]} L${wing(-1)}`;
+  const arcCurve: Cubic = [arcFrom, [arcFrom[0] + 40, arcFrom[1] + 130], arcCtrl, arcTo];
+  const arc = cubicPath(arcCurve);
+  // The head follows the last 15 px of the curve where it lands
+  // (components/arrow.ts). A fixed downward V met the curve at an angle and
+  // read as a tick.
+  const head = arrowHead(sampleCubic(arcCurve), 15, 9);
 
   return (
     <AbsoluteFill>
@@ -436,7 +434,7 @@ const Arrow: React.FC<{ x: number; y: number; length: number; at: number }> = ({
   return (
     <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
       <line x1={x} x2={end} y1={y} y2={y} stroke={INK} strokeWidth={2} />
-      <path d={`M${end - 10},${y - 7} L${end},${y} L${end - 10},${y + 7}`} fill="none" stroke={INK} strokeWidth={2} />
+      <path d={arrowHead([[x, y], [end, y]], 10, 7)} fill="none" stroke={INK} strokeWidth={2} />
     </svg>
   );
 };

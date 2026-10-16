@@ -1,5 +1,6 @@
 import React from "react";
 import { useCurrentFrame } from "remotion";
+import { arrowHead } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { ACCENT, ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, PAPER, note } from "../../editorial/style";
 import { ds } from "../../theme/brand";
@@ -107,9 +108,8 @@ export const Struck: React.FC<{ at: number; color?: string; children: React.Reac
 };
 
 /**
- * A straight arrow from `from` to `to`, drawn in on `at`. The head points
- * along the line where it ends: both wings are built from the line's own unit
- * vector, never a fixed V.
+ * A straight arrow from `from` to `to`, drawn in on `at`. Its head is built
+ * along the line (components/arrow.ts).
  */
 export const Arrow: React.FC<{
   from: readonly [number, number];
@@ -126,12 +126,12 @@ export const Arrow: React.FC<{
   const len = Math.hypot(dx, dy);
   const [ux, uy] = [dx / len, dy / len];
   const end: [number, number] = [from[0] + dx * p, from[1] + dy * p];
-  const wing = (side: 1 | -1) => `${end[0] - ux * 16 + side * uy * 9},${end[1] - uy * 16 - side * ux * 9}`;
+
   return (
     <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
       <line x1={from[0]} y1={from[1]} x2={end[0] - ux * 2} y2={end[1] - uy * 2} stroke={color} strokeWidth={width} />
       <path
-        d={`M${wing(1)} L${end[0]},${end[1]} L${wing(-1)}`}
+        d={arrowHead([from, end], 16, 9)}
         fill="none"
         stroke={color}
         strokeWidth={width}

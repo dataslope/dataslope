@@ -1,5 +1,6 @@
 import React, { useId } from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig } from "remotion";
+import { arrowHead, sampleCubic } from "../../components/arrow";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
@@ -7,7 +8,7 @@ import { ACCENT, ACCENT_INK, headline, INK, INK_SOFT, label, note } from "../../
 import { H, Ink, Note, W } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { BOX, CONTENT_BOX, ILLUSTRATIONS, NEED, OVER, ROW, VIDEO } from "./data";
-import { arrowHead, BoxDrawing, Dim, DimLabel, Fig, Listing, Mono } from "./kit";
+import { BoxDrawing, Dim, DimLabel, Fig, Listing, Mono } from "./kit";
 import { CODE, column, Column, LINES, LIST_TOP, LIST_W, ROW_X, RowFrame, rowGeometry, span } from "./row";
 
 const NOTES_X = 1310;
@@ -169,7 +170,7 @@ export const ColumnsScene: React.FC = () => {
             strokeDasharray={`${trail} 1`}
           />
           <path
-            d={arrowHead(p3, k2)}
+            d={arrowHead(sampleCubic([p0, k1, k2, p3]), 16, 9)}
             fill="none"
             stroke={INK_SOFT}
             strokeWidth={2.5}

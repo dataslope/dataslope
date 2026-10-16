@@ -1,5 +1,6 @@
 import React from "react";
 import { useCurrentFrame } from "remotion";
+import { arrowHead, roundedPolyline } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { ds } from "../../theme/brand";
 import { MONO, SANS } from "../../theme/fonts";
@@ -382,8 +383,8 @@ const HEAD_HALF = 9;
 /**
  * A reference: a dot in the variable's cell and a line that draws itself to
  * the object, with an arrowhead there. The line is a polyline with rounded
- * corners, so its last stretch is straight and the head is built along it:
- * both wings come from the unit vector of the last segment, never a fixed V.
+ * corners; the head follows its last 15 px (components/arrow.ts), which is
+ * the last segment unless that is shorter than the head plus its corner.
  */
 export const RefArrow: React.FC<{
   points: readonly Pt[];
@@ -401,27 +402,8 @@ export const RefArrow: React.FC<{
   const p = ease(frame, at, dur);
   if (dot <= 0 && p <= 0) return null;
   const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.65;
-  const n = points.length;
-  let path = `M${points[0][0]},${points[0][1]}`;
-  for (let i = 1; i < n - 1; i++) {
-    const [px, py] = points[i - 1];
-    const [cx, cy] = points[i];
-    const [nx, ny] = points[i + 1];
-    const inLen = Math.hypot(cx - px, cy - py);
-    const outLen = Math.hypot(nx - cx, ny - cy);
-    const r = Math.min(radius, inLen / 2, outLen / 2);
-    const a: Pt = [cx - ((cx - px) / inLen) * r, cy - ((cy - py) / inLen) * r];
-    const b: Pt = [cx + ((nx - cx) / outLen) * r, cy + ((ny - cy) / outLen) * r];
-    path += ` L${a[0]},${a[1]} Q${cx},${cy} ${b[0]},${b[1]}`;
-  }
-  const [ex, ey] = points[n - 1];
-  path += ` L${ex},${ey}`;
-  const [lx, ly] = points[n - 2];
-  const len = Math.hypot(ex - lx, ey - ly);
-  const [ux, uy] = [(ex - lx) / len, (ey - ly) / len];
-  const wing = (side: 1 | -1) =>
-    `${ex - ux * HEAD_LEN + side * uy * HEAD_HALF},${ey - uy * HEAD_LEN - side * ux * HEAD_HALF}`;
-  const head = `M${wing(1)} L${ex},${ey} L${wing(-1)}`;
+  const { d: path, samples } = roundedPolyline(points, radius);
+  const head = arrowHead(samples, HEAD_LEN, HEAD_HALF);
   return (
     <svg
       width={W}

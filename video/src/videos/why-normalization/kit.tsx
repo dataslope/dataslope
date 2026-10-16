@@ -1,5 +1,6 @@
 import React from "react";
 import { useCurrentFrame } from "remotion";
+import { arrowHead, type Cubic, cubicPath, lineLength, sampleCubic } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import {
@@ -730,31 +731,23 @@ export const KeyArrow: React.FC<{ from: Pt; to: Pt; at: number; out?: number; co
   const [tx, ty] = to;
   const bend = (tx - fx) * 0.5;
   const head = 13;
-  // The curve stops where the head's base begins; its last control point
-  // sets the direction it arrives in, and the head is turned to match.
-  const c2: Pt = [tx - head - bend, ty];
-  const angle = Math.atan2(ty - c2[1], tx - c2[0]);
-  const ux = Math.cos(angle);
-  const uy = Math.sin(angle);
-  const end: Pt = [tx - ux * (head - 1), ty - uy * (head - 1)];
-  const baseX = tx - ux * head;
-  const baseY = ty - uy * head;
+  const curve: Cubic = [from, [fx + bend, fy], [tx - head - bend, ty], to];
+  const line = sampleCubic(curve);
+  // The head follows the last 13 px of the curve (components/arrow.ts), and
+  // the line stops a pixel inside its base, so the filled head covers its end.
+  const reach = (lineLength(line) - head + 1) / lineLength(line);
   return (
     <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: 1 - o }}>
       <circle cx={fx} cy={fy} r={4} fill={color} />
       <path
-        d={`M${fx},${fy} C${fx + bend},${fy} ${c2[0]},${c2[1]} ${end[0]},${end[1]}`}
+        d={cubicPath(curve)}
         fill="none"
         stroke={color}
         strokeWidth={2.5}
         pathLength={1}
-        strokeDasharray={`${p} 1`}
+        strokeDasharray={`${p * reach} 1`}
       />
-      <path
-        d={`M${tx},${ty} L${baseX - uy * 7},${baseY + ux * 7} L${baseX + uy * 7},${baseY - ux * 7} Z`}
-        fill={color}
-        opacity={ease(frame, at + 12, 5)}
-      />
+      <path d={arrowHead(line, head, 7, { filled: true })} fill={color} opacity={ease(frame, at + 12, 5)} />
     </svg>
   );
 };

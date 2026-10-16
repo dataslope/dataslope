@@ -616,6 +616,14 @@ over from the rest of this file:
   style is retired" rule above is about the site's lesson art, which must
   hold one style across two page themes; a video has a fixed background and
   its own look.
+- **Arrowheads come from `video/src/components/arrow.ts`.** `arrowHead()`
+  aims a head along the last head-length of its line, never the tangent at
+  the tip, and a curve has to finish turning before its head starts: last
+  control point well back along the arrival direction. CPointers' pointers
+  had theirs straight under the tip, so a vertical head sat on a line that
+  turned 29 degrees under it. `npm run check:frames` fails any arrow that
+  turns more than 10 degrees under its head, and `npm test` fails a head
+  built anywhere else.
 - **Tabbied patterns sparingly.** They are pre-rendered to SVG from each
   video's `patterns.json`, with brand token names as the palette, and only
   ever used as decoration: a band on a title or end card, or one transition.

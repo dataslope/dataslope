@@ -4,7 +4,7 @@ import { Img, staticFile } from "remotion";
 /**
  * How many device pixels each of an image's own pixels is drawn across, at
  * the scale this frame is rendering at. Above 1 the image is being stretched,
- * which a 4K render (--scale=2) shows as soft edges; `npm run check:4k`
+ * which a 4K render (--scale=2) shows as soft edges; `npm run check:frames`
  * collects these from every composition.
  */
 const stretch = (img: HTMLImageElement) =>

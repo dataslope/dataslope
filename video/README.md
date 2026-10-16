@@ -95,9 +95,10 @@ same layout at 1080p (`--scale=1`), and `npm run render:preview` at half that.
 The one thing a scaled-up render can't redraw is a raster image, and every
 illustration is one: the image model returns at most 1536x1024, and trimming
 leaves less. At 4K, an illustration drawn 620 px tall needs 1240 pixels of
-height. `npm run check:4k` walks every composition at `--scale=2`, a frame
-every half second, writing nothing to disk (about a minute for all 18), and
-fails if any illustration is drawn across more device pixels than it has.
+height. `npm run check:frames` walks every composition at `--scale=2`, a
+frame every half second, writing nothing to disk (about a minute for all 18),
+and fails if any illustration is drawn across more device pixels than it has
+(or if an arrowhead sits on a bend; see "What goes on screen").
 `<Illustration>` logs the figure as it loads, so the check sees exactly what a
 render does. All 37 pass. LlmTemperature's thermometer was drawn larger than
 its pixels, and is now drawn at exactly the size they cover. The paper grain has a 2x image of
@@ -159,6 +160,21 @@ Every video follows these rules.
   mask comes off. Give a masked wrapper some padding with a matching negative
   margin, and set `box-sizing: content-box` so a `width` on it still means
   the width of the text.
+- **An arrowhead sits on a straight end.** Build every head with
+  `arrowHead()` from `src/components/arrow.ts`, passing the drawn line
+  sampled densely (`sampleCubic`, `roundedPolyline`). It aims the head along
+  the last head-length of the line, the stretch the eye reads it against,
+  never along a control point or the tangent at the tip. And shape the curve
+  so it has stopped turning before the head starts: put the last control
+  point well back along the direction the line arrives in, at least half the
+  gap it crosses. If a line turns inside its head, no head angle fits: aimed
+  at the tip it crosses the line coming in, aimed at the chord the line
+  leaves its base off centre. CPointers' pointers did both before they were
+  reshaped, with their last control point straight under the tip: a
+  vertical tangent on a line that turned 29 degrees in its last 15 px.
+  `npm run check:frames` measures every head as it renders and fails any line
+  that turns more than 10 degrees under one (CPointers is 5 now, the set's
+  worst is 7), and `npm test` fails any head built outside `arrow.ts`.
 
 ## Narration and timing
 
@@ -377,6 +393,7 @@ stay for a video that does.
 ```bash
 npm run typecheck
 npm run lint
-npm test          # the timing model, and scene cuts against their scripts
-npm run check:4k  # every illustration sharp at --scale=2 (about a minute)
+npm test              # timing, scene cuts, word cues, voices, arrowheads
+npm run check:frames  # a frame every half second at --scale=2 (about a minute):
+                      # illustrations sharp at 4K, arrowheads on straight ends
 ```

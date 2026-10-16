@@ -194,15 +194,23 @@ export const SwapScene: React.FC<{ variant: Variant }> = ({ variant }) => {
     return { value: String(i + 1), x: from.x + (to.x - from.x) * trade, y: from.y + lift };
   });
 
+  // Each pointer leaves its dot and arrives at its box along the same 55
+  // degree slant, with its last control point far back along the arrival, so
+  // the line is straight under its head (components/arrow.ts). With the last
+  // control point straight under the tip, the curve was still swinging round
+  // as it arrived and turned 29 degrees inside the head's 15 px, which no
+  // head angle can sit on.
   const arrowCurve = (i: 0 | 1): Curve => {
     const sx = COL[i] + PTR_W - 70;
     const ex = COL[i] + INT_W / 2;
-    const mid = (swapBoxTop - mainBottom) * 0.55;
+    const gap = swapBoxTop - mainBottom;
+    const tip = mainBottom + 5;
+    const arrive = (55 * Math.PI) / 180;
     return [
       [sx, swapBoxTop],
-      [sx, swapBoxTop - mid],
-      [ex, mainBottom + mid],
-      [ex, mainBottom + 5],
+      [sx - Math.cos(arrive) * gap * 0.45, swapBoxTop - Math.sin(arrive) * gap * 0.45],
+      [ex + Math.cos(arrive) * gap * 0.86, tip + Math.sin(arrive) * gap * 0.86],
+      [ex, tip],
     ];
   };
 
