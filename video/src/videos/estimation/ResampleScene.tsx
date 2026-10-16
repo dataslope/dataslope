@@ -136,7 +136,7 @@ export const ResampleScene: React.FC = () => {
       </Note>
 
       {/* The mean's own formula, which a median does not get. */}
-      <Ink at={formulaWordAt - 4} dur={14} out={treatAt - 8} style={{ left: 1100, top: y(206), whiteSpace: "nowrap" }}>
+      <Ink at={formulaWordAt - 4} dur={14} out={treatAt - 8} style={{ left: 1100, top: y(262), whiteSpace: "nowrap" }}>
         <div style={label(20, INK_SOFT)}>a mean’s standard error</div>
         <div style={{ ...headline(48), marginTop: 6, opacity: 1 - 0.6 * ease(frame, existAt - 2, 12) }}>
           <Strike at={existAt - 2}>s ÷ √n</Strike>

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { headline, HIGHLIGHT, INK, INK_SOFT, note } from "../../editorial/style";
+import { headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Leader, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -28,6 +28,8 @@ export const ErdScene: React.FC = () => {
 
   // ── Cues ──
   const from = n.beat("pieces").from;
+  const diagramAt = n.word("pieces", "diagram");
+  const threeAt = n.word("pieces", "three pieces");
   const boxesAt = n.word("pieces", "Boxes");
   const factsAt = n.word("pieces", "facts");
   const linesAt = n.word("pieces", "lines");
@@ -87,7 +89,7 @@ export const ErdScene: React.FC = () => {
         {/* ── Headline: three pieces, named one by one ── */}
         <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
           <Ink at={from - 6} dur={18} style={{ position: "relative", whiteSpace: "nowrap" }}>
-            Three pieces:
+            <Mark at={threeAt}>Three pieces:</Mark>
           </Ink>
           {(
             [
@@ -136,6 +138,10 @@ export const ErdScene: React.FC = () => {
           labelAt={oneAt + 6}
           labelPos={[midX - 30, lineY - 40]}
         />
+
+        <Ink at={diagramAt - 4} dur={16} style={{ left: CUSTOMERS_X, top: y(330), whiteSpace: "nowrap" }}>
+          <span style={label(22, INK_SOFT)}>The lesson&apos;s diagram: customers and orders</span>
+        </Ink>
 
         {/* The three pieces, tagged as they are named. */}
         <Note at={boxesAt + 2} out={tagsOut} x={CUSTOMERS_X} y={customers.top - 52}>

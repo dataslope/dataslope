@@ -77,6 +77,19 @@ export const TestScene: React.FC = () => {
         A test and an interval: two views of
       </Headline>
 
+      {/* Zero, and eight, lit where the second interval holds them. */}
+      <Svg>
+        <rect x={zeroX - 16} y={y(330)} width={32} height={y(AXIS) - y(330)} fill={ds("red", 100)} opacity={ease(frame, includesAt - 4, 12) * (1 - 0.6 * ease(frame, eightAgainAt, 12))} />
+        <rect
+          x={sx(X, straddle.hi) - 16}
+          y={y(ROW2) - 60}
+          width={32}
+          height={120}
+          fill={ds("red", 100)}
+          opacity={ease(frame, butIncludesAt - 2, 12)}
+        />
+      </Svg>
+
       <FigLabel n="6" title="95% intervals for a difference between two groups" at={testFrom - 2} x={160} y={y(262)} />
       <Axis scale={X} base={y(AXIS)} ticks={[-4, 0, 4, 8, 12, 16, 20]} format={(v) => (v < 0 ? `−${-v}` : String(v))} at={testFrom} />
       <Rule
@@ -95,19 +108,6 @@ export const TestScene: React.FC = () => {
           <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, viewsAt + 8, 12) }}>. The test asks: is it inside?</span>
         </span>
       </Note>
-
-      {/* Zero, and eight, lit where the second interval holds them. */}
-      <Svg>
-        <rect x={zeroX - 16} y={y(330)} width={32} height={y(AXIS) - y(330)} fill={ds("red", 100)} opacity={ease(frame, includesAt - 4, 12) * (1 - 0.6 * ease(frame, eightAgainAt, 12))} />
-        <rect
-          x={sx(X, straddle.hi) - 16}
-          y={y(ROW2) - 60}
-          width={32}
-          height={120}
-          fill={ds("red", 100)}
-          opacity={ease(frame, butIncludesAt - 2, 12)}
-        />
-      </Svg>
 
       {/* ── Row 1: one that leaves out zero ── */}
       <IntervalBar

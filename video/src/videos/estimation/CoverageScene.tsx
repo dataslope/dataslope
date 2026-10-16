@@ -95,6 +95,7 @@ export const CoverageScene: React.FC = () => {
     return pts.join(" ");
   })();
   const popOut = 1 - 0.75 * hidden;
+  const popGrown = ease(frame, populationAt - 6, 20);
 
   return (
     <AbsoluteFill>
@@ -120,8 +121,12 @@ export const CoverageScene: React.FC = () => {
       {/* ── Fig. 3: the population ── */}
       <FigLabel n="3" title={`A population whose true mean is ${COVERAGE.mu}`} at={populationAt - 8} x={160} y={y(250)} />
       <Svg opacity={popOut}>
-        <path d={`${popPath} L${XP.x1},${y(POP_BASE)} L${XP.x0},${y(POP_BASE)} Z`} fill={DATA} opacity={0.12} />
-        <path d={popPath} fill="none" stroke={DATA} strokeWidth={2.6} />
+        {popGrown > 0 ? (
+          <>
+            <path d={`${popPath} L${XP.x1},${y(POP_BASE)} L${XP.x0},${y(POP_BASE)} Z`} fill={DATA} opacity={0.12} />
+            <path d={popPath} fill="none" stroke={DATA} strokeWidth={2.6} opacity={Math.min(1, popGrown * 4)} />
+          </>
+        ) : null}
         <line x1={XP.x0} x2={XP.x1} y1={y(POP_BASE)} y2={y(POP_BASE)} stroke={INK} strokeWidth={1.4} opacity={ease(frame, populationAt - 6, 12)} />
         {/* The first sample: forty values, gathered into one interval. */}
         {COVERAGE.first.map((v, j) => {

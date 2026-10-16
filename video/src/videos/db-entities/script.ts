@@ -147,6 +147,8 @@ export const script: NarrationScript = {
     {
       id: "chen",
       scene: true,
+      // Part 3 is its own take, so each take holds whole parts.
+      take: true,
       text: "In nineteen seventy-six, Peter Chen proposed the entity-relationship model: say what the data means before deciding how to store it.",
     },
     {

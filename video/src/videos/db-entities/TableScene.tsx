@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ADA_ROW, CUSTOMERS, PRICE_COL, PRICE_NAME, PRODUCTS } from "./data";
 import { DbTable, HEAD_H, MARK, ROW_H, tableGeometry } from "./kit";
-import { Bracket, Drift, Headline, pulse, STAT_INK } from "./parts";
+import { Bracket, Drift, Headline, Mark, pulse, STAT_INK } from "./parts";
 
 /** The tables are set larger than a listing's, so two rows read across the room. */
 const S = 1.6;
@@ -28,6 +28,7 @@ export const TableScene: React.FC = () => {
 
   // ── Cues ──
   const typeFrom = n.beat("type").from;
+  const typeAt = n.word("type", "TYPE");
   const tableAt = n.word("type", "a table");
   const realAt = n.word("type", "each real");
   const rowAt = n.word("type", "a row");
@@ -62,7 +63,13 @@ export const TableScene: React.FC = () => {
       <Sfx name="el-pencil" at={priceAt} level={-35} />
 
       <Drift from={doesntAt} to={end + 60} scale={0.018} origin={[700, 560]}>
-        <Headline lead="One type, one table." leadAt={typeFrom - 6} turn="One thing, one row." turnAt={realAt - 4} />
+        <Headline
+          lead={
+            <>
+              One <Mark at={typeAt}>type,</Mark> one table.
+            </>
+          }
+          leadAt={typeFrom - 6} turn="One thing, one row." turnAt={realAt - 4} />
 
         {/* ── customers: the entity type, and one real customer ── */}
         <Ink at={customersAt - 4} dur={14} style={{ left: CUSTOMERS_X, top: top - 52, whiteSpace: "nowrap" }}>

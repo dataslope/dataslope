@@ -33,7 +33,7 @@ export const NounsScene: React.FC = () => {
   // ── Cues ──
   const hookFrom = n.beat("hook").from;
   const thingsAt = n.word("hook", "things");
-  const sentenceAt = n.word("hook", "one sentence");
+  const soAt = n.word("hook", "So take");
   const words = (["Customers", "place", "orders", "for", "products"] as const).map((w) => n.word("hook", w));
   const circleNounsAt = n.word("nouns", "Circle");
   const circleAt = [n.word("nouns", "customers"), n.word("nouns", "orders"), n.word("nouns", "products")];
@@ -97,7 +97,7 @@ export const NounsScene: React.FC = () => {
         />
 
         {/* ── The sentence, word by word as it is read ── */}
-        <Ink at={sentenceAt - 4} dur={12} style={{ left: 122, top: y(292), whiteSpace: "nowrap" }}>
+        <Ink at={soAt} dur={14} style={{ left: 122, top: y(292), whiteSpace: "nowrap" }}>
           <span style={label(22, INK_SOFT)}>One sentence</span>
         </Ink>
         <div style={{ position: "absolute", left: 120, top: y(330), ...body(64, true), color: INK, whiteSpace: "nowrap", wordSpacing: "0.32em" }}>
