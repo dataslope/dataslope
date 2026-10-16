@@ -51,6 +51,21 @@ import { StandardError } from "./videos/standard-error/Video";
 import { script as standardErrorScript } from "./videos/standard-error/script";
 import { ThinkingStatistically } from "./videos/thinking-statistically/Video";
 import { script as thinkingStatisticallyScript } from "./videos/thinking-statistically/script";
+// Statistics course, one video per unit (Units 2 to 4 and 6 to 9).
+import { DescribingData } from "./videos/describing-data/Video";
+import { script as describingDataScript } from "./videos/describing-data/script";
+import { Probability } from "./videos/probability/Video";
+import { script as probabilityScript } from "./videos/probability/script";
+import { Distributions } from "./videos/distributions/Video";
+import { script as distributionsScript } from "./videos/distributions/script";
+import { Estimation } from "./videos/estimation/Video";
+import { script as estimationScript } from "./videos/estimation/script";
+import { TestingHypotheses } from "./videos/testing-hypotheses/Video";
+import { script as testingHypothesesScript } from "./videos/testing-hypotheses/script";
+import { InterpretingResults } from "./videos/interpreting-results/Video";
+import { script as interpretingResultsScript } from "./videos/interpreting-results/script";
+import { StatisticsInPractice } from "./videos/statistics-in-practice/Video";
+import { script as statisticsInPracticeScript } from "./videos/statistics-in-practice/script";
 
 // Every composition is laid out in 1080p CSS pixels and rendered with
 // `--scale=2` for 4K (3840x2160). Duration comes from the narration timeline,
@@ -290,6 +305,77 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 60}
         defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(thinkingStatisticallyScript)}
+      />
+      {/* Statistics course: Units 2 to 4 and 6 to 9, one video each, in course order. */}
+      <Composition
+        id="DescribingData"
+        component={DescribingData}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(describingDataScript)}
+      />
+      <Composition
+        id="Probability"
+        component={Probability}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(probabilityScript)}
+      />
+      <Composition
+        id="Distributions"
+        component={Distributions}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(distributionsScript)}
+      />
+      <Composition
+        id="Estimation"
+        component={Estimation}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(estimationScript)}
+      />
+      <Composition
+        id="TestingHypotheses"
+        component={TestingHypotheses}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(testingHypothesesScript)}
+      />
+      <Composition
+        id="InterpretingResults"
+        component={InterpretingResults}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(interpretingResultsScript)}
+      />
+      <Composition
+        id="StatisticsInPractice"
+        component={StatisticsInPractice}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(statisticsInPracticeScript)}
       />
     </Folder>
     <Folder name="Assets">

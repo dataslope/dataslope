@@ -16,11 +16,12 @@
     "paper": "node scripts/paper.mjs",
     "cues": "node scripts/cues.mjs",
     "narrate": "node scripts/narrate.mjs",
-    "test": "node --test src/narration/timeline.test.ts src/narration/scenes.test.ts src/narration/voices.test.ts src/components/arrow.test.ts src/sound/sfx.test.ts scripts/lib/audio.test.mjs",
+    "test": "node --test src/narration/timeline.test.ts src/narration/scenes.test.ts src/narration/voices.test.ts src/components/arrow.test.ts src/sound/sfx.test.ts scripts/lib/audio.test.mjs scripts/lib/motion.test.mjs",
     "render:fhd": "remotion render --scale=1",
     "check:frames": "node scripts/check-frames.mjs",
     "check:sync": "node scripts/check-sync.mjs",
     "check:mix": "node scripts/check-mix.mjs",
+    "check:motion": "node scripts/check-motion.mjs",
     "sfx": "node scripts/sfx.mjs",
     "sfx:elevenlabs": "node scripts/sfx-elevenlabs.mjs"
   },
