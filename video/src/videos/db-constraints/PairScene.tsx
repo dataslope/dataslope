@@ -239,11 +239,11 @@ export const PairScene: React.FC = () => {
       <Pill x={1250} y={y(850) - 54} at={missingAt - 2}>
         NOT NULL
       </Pill>
-      <Pill x={1400} y={y(850) - 54} at={repeatedAt - 2}>
+      <Pill x={1420} y={y(850) - 54} at={repeatedAt - 2}>
         UNIQUE
       </Pill>
-      <Tick x={1380} y={y(850) - 54} at={missingAt + 6} size={18} />
-      <Tick x={1518} y={y(850) - 54} at={repeatedAt + 6} size={18} />
+      <Tick x={1381} y={y(850) - 54} at={missingAt + 6} size={18} />
+      <Tick x={1528} y={y(850) - 54} at={repeatedAt + 6} size={18} />
       {/* ── What about values that are just wrong? ── */}
       {(
         [
