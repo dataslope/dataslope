@@ -36,6 +36,8 @@ export const ChiScene: React.FC = () => {
   const deviceAt = n.word("chi", "device");
   const sixAt = n.word("chi", "six hundred");
   const noDiffAt = n.word("expected", "no difference");
+  const usersAt = n.word("chi", "users");
+  const ifAt = n.word("expected", "If");
   const eightyAt = n.word("expected", "eighty-seven");
   const hundredAt = n.word("observed", "A hundred and three");
   const desktopAt = n.word("observed", "Desktop");
@@ -63,7 +65,7 @@ export const ChiScene: React.FC = () => {
     const k = rest.findIndex((c) => c.row === row && c.col === col);
     return addsAt - 4 + k * 5;
   };
-  const expIn = (k: number) => ease(frame, noDiffAt - 2 + k * 3, 12);
+  const expIn = (k: number) => ease(frame, ifAt - 2 + k * 4, 12);
   const mobileGlow = pulse(frame, eightyAt - 2, 26);
   const total = ease(frame, twelveAt - 8, 20);
   const dim = 1 - 0.2 * ease(frame, corrFrom - 4, 14) - 0.15 * ease(frame, whetherAt - 4, 14);
@@ -86,7 +88,7 @@ export const ChiScene: React.FC = () => {
 
       <div style={{ position: "absolute", inset: 0, opacity: dim * (1 - 0.6 * away), transform: `translateY(${-50 * away}px)` }}>
         <FigLabel n="18" title={`Device and churn for ${fmt(CHI.n, 0)} users`} at={categoriesAt} x={LABEL_X} y={y(290)} />
-        <Ink at={sixAt - 4} dur={14} style={{ left: LABEL_X, top: y(290) + 40, whiteSpace: "nowrap" }}>
+        <Ink at={usersAt - 2} dur={14} style={{ left: LABEL_X, top: y(290) + 40, whiteSpace: "nowrap" }}>
           <Label size={21} color={INK_SOFT} weight={520}>
             bars: users counted; dashed boxes: what independence predicts
           </Label>

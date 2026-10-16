@@ -35,6 +35,9 @@ export const UniformScene: React.FC = () => {
   // ── Cues ──
   const uniformFrom = n.beat("uniform").from;
   const randomAt = n.word("uniform", "random number");
+  const trueAt = n.word("uniform", "true");
+  const pAt = n.word("uniform", "p-value");
+  const hereAt = n.word("fourteen", "Here");
   const zeroToOneAt = n.word("uniform", "zero to one");
   const equallyAt = n.word("uniform", "equally likely");
   const twentyAt = n.word("twenty", "twenty tests");
@@ -71,8 +74,8 @@ export const UniformScene: React.FC = () => {
       <Head a="Keep the winner:" b="that's p-hacking." at={hackingAt - 4} bAt={hackingAt + 4} />
 
       {/* ── Fig. 8: 5,000 p-values from a world with no effect ── */}
-      <FigLabel n="8" title={`${fmt(NULL_P.runs, 0)} tests with no effect: their p-values`} at={uniformFrom} x={HX.x0} y={y(300)} />
-      <Axis scale={HX} base={y(H_BASE)} ticks={[0, 0.25, 0.5, 0.75, 1]} format={(v) => (v === 0 || v === 1 ? String(v) : fmt(v, 2))} at={uniformFrom + 2} />
+      <FigLabel n="8" title={`${fmt(NULL_P.runs, 0)} tests with no effect: their p-values`} at={trueAt - 4} x={HX.x0} y={y(300)} />
+      <Axis scale={HX} base={y(H_BASE)} ticks={[0, 0.25, 0.5, 0.75, 1]} format={(v) => (v === 0 || v === 1 ? String(v) : fmt(v, 2))} at={pAt - 4} />
       <Svg>
         {NULL_P.bins.map((c, i) => {
           const g = ease(frame, randomAt - 4 + i * 1.6, 12);
@@ -138,6 +141,16 @@ export const UniformScene: React.FC = () => {
             stroke={STAT}
             strokeWidth={2 + 2 * lineGlow}
             strokeDasharray="5 4"
+          />
+        ) : null}
+        {ease(frame, hereAt - 2, 10) > 0 ? (
+          <rect
+            x={TX.x0}
+            y={y(T_ROW0 + HIT * T_DY) - 12}
+            width={(TX.x1 - TX.x0) * ease(frame, hereAt - 2, 10)}
+            height={24}
+            fill={STAT}
+            opacity={0.16}
           />
         ) : null}
         {TWENTY.p.map((p, i) => {

@@ -45,6 +45,7 @@ export const OddsScene: React.FC = () => {
   const lookAt = n.word("peek", "one look");
   const dipsAt = n.word("peek", "dips");
   const cureAt = n.word("cure", "cure");
+  const lookCureAt = n.word("cure", "look");
   const questionAt = n.word("cure", "question");
   const sampleAt = n.word("cure", "sample");
   const analysisAt = n.word("cure", "analysis");
@@ -178,7 +179,9 @@ export const OddsScene: React.FC = () => {
 
         {/* ── The cure: decide before you look ── */}
         <Ink at={cureAt - 4} dur={16} style={{ left: B.x0, top: y(290), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(38, true), color: INK }}>Decide before you look:</span>
+          <span style={{ ...body(38, true), color: INK }}>
+            Decide <Mark at={lookCureAt - 4}>before you look</Mark>:
+          </span>
         </Ink>
         {[
           ["the question", questionAt],

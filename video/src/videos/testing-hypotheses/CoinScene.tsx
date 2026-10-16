@@ -40,6 +40,7 @@ export const CoinScene: React.FC = () => {
   const pileAt = n.word("fair", "pile");
   const nullAt = n.word("fair", "null distribution");
   const twelveAt = n.word("far", "twelve");
+  const sixtyFarAt = n.word("far", "Sixty-two");
   const thirtyAt = n.word("far", "thirty-eight");
   const countAt = n.word("far", "count");
   const farOutAt = n.word("far", "far out");
@@ -140,9 +141,11 @@ export const CoinScene: React.FC = () => {
           </Svg>
           {/* Labels over the thin tails, where no bar comes near them. */}
           <Note at={sixtyAt} x={obsX + 16} y={y(BASE) - h(TALL * 0.56)}>
-            <Label size={24} color={STAT_INK} style={halo}>
-              62, what the coin did
-            </Label>
+            <div style={{ transform: `scale(${1 + 0.14 * pulse(frame, sixtyFarAt - 2, 24)})`, transformOrigin: "0 50%" }}>
+              <Label size={24} color={STAT_INK} style={halo}>
+                62, what the coin did
+              </Label>
+            </div>
           </Note>
           <Note at={thirtyAt} x={mirX - 16} y={y(BASE) - h(TALL * 0.56)} align="right">
             <Label size={24} color={STAT_INK} style={halo}>

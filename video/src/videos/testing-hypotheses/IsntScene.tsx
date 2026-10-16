@@ -7,7 +7,7 @@ import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { TINY } from "./data";
-import { DATA, DATA_INK, H0, Head, Label, MARK, pulse, RAW, STAT, STAT_INK, Strike } from "./parts";
+import { DATA, DATA_INK, H0, Head, Label, Mark, MARK, pulse, RAW, STAT, STAT_INK, Strike } from "./parts";
 
 const LEFT = 160;
 const TABLE_X = 1010;
@@ -45,6 +45,9 @@ export const IsntScene: React.FC = () => {
   const eightAt = n.word("collapse", "point eight three");
   const givenDataAt = n.word("swap", "given", { nth: 2 });
   const holdAt = n.word("size", "Hold");
+  const norAt = n.word("size", "Nor");
+  const fallacyEndAt = n.word("swap", "fallacy");
+  const fourAt = n.word("collapse", "zero zero zero four");
   const tinyAt = n.word("size", "tiny");
   const whichAt = n.word("hack-in", "Which");
   const swapAt = n.word("swap", "Swap");
@@ -65,6 +68,7 @@ export const IsntScene: React.FC = () => {
   const shake = pulse(frame, swapAt, 18);
   const dim = 1 - 0.3 * ease(frame, whichAt - 4, 14) - 0.25 * ease(frame, foolAt - 4, 14);
   const firstGlow = pulse(frame, eightAt, 24);
+  const thirdGlow = pulse(frame, fourAt, 24);
 
   return (
     <AbsoluteFill>
@@ -106,11 +110,13 @@ export const IsntScene: React.FC = () => {
           <span style={{ ...label(22, STAT_INK), marginLeft: 22, opacity: ease(frame, givenDataAt, 12) }}>not the p-value</span>
         </Ink>
         <Ink at={fallacyAt - 4} dur={18} style={{ left: LEFT, top: y(530) + 184, whiteSpace: "nowrap" }}>
-          <span style={{ ...body(32, true), color: INK_SOFT }}>Swapping them: the prosecutor&apos;s fallacy</span>
+          <span style={{ ...body(32, true), color: INK_SOFT }}>
+            Swapping them: <Mark at={fallacyEndAt}>the prosecutor&apos;s fallacy</Mark>
+          </span>
         </Ink>
 
         {/* ── Fig. 7: a tiny fixed effect, a growing sample ── */}
-        <FigLabel n="7" title={`A true effect of ${TINY.effect}, never changed`} at={sizeAt - 6} x={TABLE_X} y={y(310)} />
+        <FigLabel n="7" title={`A true effect of ${TINY.effect}, never changed`} at={Math.min(sizeAt - 6, norAt)} x={TABLE_X} y={y(310)} />
         {["Per group", "Effect", "p-value, as printed"].map((t, i) => (
           <div key={t} style={{ position: "absolute", left: COLS[i], top: y(365), opacity: ease(frame, holdAt - 4 + i * 3, 12), ...label(21, INK_SOFT) }}>
             {t}
@@ -163,7 +169,7 @@ export const IsntScene: React.FC = () => {
                   opacity: a * (loud ? 1 : 0.7),
                   ...note(30, r.p < 0.05 ? STAT_INK : INK),
                   fontWeight: 700,
-                  transform: i === 0 ? `scale(${1 + 0.12 * firstGlow})` : undefined,
+                  transform: i === 0 ? `scale(${1 + 0.12 * firstGlow})` : i === 2 ? `scale(${1 + 0.12 * thirdGlow})` : undefined,
                   transformOrigin: "0 50%",
                 }}
               >

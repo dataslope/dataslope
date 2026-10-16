@@ -73,7 +73,7 @@ export const RanksScene: React.FC = () => {
   const seemsAt = n.word("next", "seems");
 
   const toRanks = (k: number) => ease(frame, ranksAt - 6 + (RANK[k] / ALL.length) * 18, 18);
-  const outGlow = pulse(frame, hoursAt - 4, 26) + pulse(frame, doesntAt - 2, 26) + pulse(frame, standsAt - 2, 30);
+  const outGlow = pulse(frame, hoursAt - 4, 26) + pulse(frame, n.beat("line").from - 2, 26) + pulse(frame, doesntAt + 8, 26) + pulse(frame, standsAt - 2, 30);
   const farGlow = pulse(frame, farAt, 26);
   const meanIn = ease(frame, swellAt - 6, 14);
   const rankMeans = ease(frame, shiftAt - 4, 16);

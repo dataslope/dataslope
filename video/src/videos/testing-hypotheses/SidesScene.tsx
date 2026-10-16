@@ -33,6 +33,8 @@ export const SidesScene: React.FC = () => {
   const exactlyWhyAt = n.word("early", "exactly");
   const halfAt = n.word("sides", "Two and a half");
   const beyondAt = n.word("sides", "beyond");
+  const fiveTestAt = n.word("sides", "five percent");
+  const nineAt = n.word("sides", "nine");
   const oneSidedAt = n.word("onesided", "one-sided");
   const allAt = n.word("onesided", "all five percent");
   const nearerAt = n.word("onesided", "nearer");
@@ -86,7 +88,7 @@ export const SidesScene: React.FC = () => {
             />
             {/* The cutoffs. */}
             {[-1, 1].map((s) => {
-              const a = ease(frame, beyondAt - 2, 12) * (s < 0 ? 1 - lowerGone : 1);
+              const a = ease(frame, fiveTestAt - 2, 12) * (s < 0 ? 1 - lowerGone : 1);
               if (a <= 0) return null;
               const x = sx(X, s < 0 ? -SIDES.two : cut);
               return <line key={s} x1={x} x2={x} y1={y(BASE)} y2={py(phi(1.6)) - 40} stroke={STAT} strokeWidth={2.6} opacity={a} />;
@@ -139,7 +141,7 @@ export const SidesScene: React.FC = () => {
                 left: sx(X, s * SIDES.two),
                 top: py(phi(1.6)) - 76,
                 transform: "translateX(-50%)",
-                opacity: ease(frame, beyondAt + 2, 12) * (s < 0 ? 1 - lowerGone : 1 - slide),
+                opacity: ease(frame, Math.max(beyondAt + 2, nineAt - 4), 12) * (s < 0 ? 1 - lowerGone : 1 - slide),
                 ...note(24, STAT_INK),
                 fontWeight: 700,
                 whiteSpace: "nowrap",

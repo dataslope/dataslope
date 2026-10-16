@@ -81,7 +81,7 @@ export const CorrScene: React.FC = () => {
   const py = (v: number, lo: number, hi: number) => bottom - ((v - lo) / (hi - lo)) * (bottom - top);
 
   const toRank = ease(frame, ranksAt - 4, 24);
-  const curveOut = ease(frame, nearAt - 4, 14);
+  const curveOut = ease(frame, n.beat("ushape").from - 2, 16);
   const uIn = (i: number) => ease(frame, noRelAt - 4 + (i / USHAPE.x.length) * 24, 8);
   const parabola = ease(frame, dependsAt - 4, 24);
   const scaleIn = ease(frame, minusAt - 4, 16);
