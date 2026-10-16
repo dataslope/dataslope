@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
 import { LLN, llnAt, llnRange } from "./data";
-import { Coin, DATA, Headline, lerp, Pulse, STAT, STAT_INK, Svg, Sweep, VBracket } from "./parts";
+import { Coin, DATA, DATA_INK, Headline, lerp, Pulse, STAT, STAT_INK, Svg, Sweep, VBracket } from "./parts";
 
 /** The chart: flips on a log axis, 1 to 5,000; the share of heads, 0 to 1. */
 const CH = { x0: 210, x1: 1380, top: 352, base: 812 } as const;
@@ -39,6 +39,7 @@ export const LawScene: React.FC = () => {
   const fiveAt = n.word("lln", "five thousand flips");
   const everyAt = n.word("lln", "every one");
   const fourAt = n.word("early", "four flips");
+  const afterAt = n.word("early", "After");
   const quartersAt = n.word("early", "three quarters");
   const hundredAt = n.word("early", "a hundred");
   const fortyAt = n.word("early", "forty percent");
@@ -66,7 +67,7 @@ export const LawScene: React.FC = () => {
 
   // How far along the flips the line has been drawn, in log10 of the flip count.
   const stages: [number, number, number][] = [
-    [everyAt - 2, fourAt + 4, Math.log10(4)],
+    [afterAt - 2, fourAt + 6, Math.log10(4)],
     [hundredAt - 4, fortyAt + 2, 2],
     [thousandAt - 4, straysAt + 2, 3],
     [straysAt + 2, halfEnd, LOG_HI],
@@ -79,7 +80,7 @@ export const LawScene: React.FC = () => {
     reach = to;
   }
   const K = 10 ** reach;
-  const drawn = frame >= everyAt - 2;
+  const drawn = frame >= afterAt - 2;
   const pts = LLN.path.filter(([k]) => k <= K);
   const next = LLN.path.find(([k]) => k > K);
   const last = pts[pts.length - 1];
@@ -87,6 +88,7 @@ export const LawScene: React.FC = () => {
     next && last && K > last[0]
       ? [...pts, [K, lerp(last[1], next[1], (K - last[0]) / (next[0] - last[0]))] as const]
       : pts;
+  const head = linePts[linePts.length - 1];
   const d = linePts.map(([k, v], i) => `${i ? "L" : "M"}${fx(k).toFixed(1)},${fy(v).toFixed(1)}`).join(" ");
 
   // The red retrace of everything after the streak, during "swamped".
@@ -128,8 +130,8 @@ export const LawScene: React.FC = () => {
       <Svg opacity={1 - chartBack}>
         <line x1={CH.x0} x2={lerp(CH.x0, CH.x1, axis)} y1={y(CH.base) + 0.5} y2={y(CH.base) + 0.5} stroke={INK} strokeWidth={1.6} />
         <g opacity={ticks}>
-          {TICKS.map((k) => (
-            <g key={k}>
+          {TICKS.map((k, ti) => (
+            <g key={k} opacity={ease(frame, everyAt - 4 + ti * 5, 8)}>
               <line x1={fx(k)} x2={fx(k)} y1={y(CH.base) + 1} y2={y(CH.base) + 7} stroke={INK} strokeWidth={1.2} />
               <text x={fx(k)} y={y(CH.base) + 32} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 21, fontWeight: 500, fill: INK_SOFT }}>
                 {k.toLocaleString("en-US")}
@@ -180,9 +182,11 @@ export const LawScene: React.FC = () => {
           />
         ) : null}
         {drawn ? (
-          <path d={d} fill="none" stroke={DATA} strokeWidth={3} strokeLinejoin="round" strokeLinecap="round" opacity={1 - dimLine * 0.55} />
+          <path d={d} fill="none" stroke={DATA} strokeWidth={4} strokeLinejoin="round" strokeLinecap="round" opacity={1 - dimLine * 0.55} />
         ) : null}
         {swamp > 0 ? <path d={swampD} fill="none" stroke={DATA} strokeWidth={5.5} strokeLinejoin="round" strokeLinecap="round" /> : null}
+        {/* The head of the line, while it is still being drawn. */}
+        {drawn && head && K < LLN.n ? <circle cx={fx(head[0])} cy={fy(head[1])} r={9} fill={DATA} stroke="var(--ds-white)" strokeWidth={2.5} /> : null}
         {/* Four flips in: three quarters. */}
         <circle cx={fx(4)} cy={fy(FOUR)} r={7 * ease(frame, quartersAt - 4, 8)} fill={STAT} />
       </Svg>
@@ -190,6 +194,26 @@ export const LawScene: React.FC = () => {
       <Note at={quartersAt} x={fx(4) + 16} y={fy(FOUR) - 46}>
         <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>4 flips: {fmt(FOUR)}</span>
       </Note>
+      {/* What the line has reached, read out as it is drawn. */}
+      {drawn ? (
+        <div
+          style={{
+            position: "absolute",
+            right: 1920 - CH.x1,
+            top: y(CH.top) - 4,
+            opacity: (1 - ease(frame, lawAt - 8, 12)) * ease(frame, afterAt - 2, 8),
+            whiteSpace: "nowrap",
+            display: "flex",
+            alignItems: "baseline",
+            gap: 12,
+          }}
+        >
+          <span style={note(22, INK_SOFT)}>after</span>
+          <span style={{ ...note(34, INK), fontWeight: 700 }}>{Math.round(K).toLocaleString("en-US")}</span>
+          <span style={note(22, INK_SOFT)}>flips:</span>
+          <span style={{ ...note(34, DATA_INK), fontWeight: 700 }}>{head ? fmt(head[1], 2) : ""}</span>
+        </div>
+      ) : null}
       <Note at={fiveAt} x={CH.x1 + 12} y={fy(0.5) - 15}>
         <span style={{ ...note(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>½</span>
       </Note>
