@@ -115,7 +115,7 @@ export const PairScene: React.FC = () => {
     name: "users",
     columns: [
       { name: "id", type: "integer", key: "PK" },
-      { name: "email", type: "text" },
+      { name: "email", type: "text", key: "UK" },
     ],
   });
   const profiles = useEntityLayout({
@@ -125,7 +125,7 @@ export const PairScene: React.FC = () => {
     name: "profiles",
     columns: [
       { name: "id", type: "integer", key: "PK" },
-      { name: "user_id", type: "integer", key: "FK" },
+      { name: "user_id", type: "integer", key: "FK, UK" },
       { name: "display_name", type: "text" },
     ],
   });

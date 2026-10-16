@@ -136,7 +136,7 @@ export const IsntScene: React.FC = () => {
                 height: (y(ROW_Y0 + 5 * ROW_DY) - y(ROW_Y0)) * p,
                 background: MARK,
                 borderRadius: 8,
-                opacity: 0.75,
+                opacity: 0.6,
               }}
             />
           );

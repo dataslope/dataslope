@@ -21,8 +21,8 @@ const B_BASE = 830;
 const HIT = TWENTY.hits[0];
 /** The peeking panel: one experiment with nothing to find, p after every 100 visitors. */
 const PK: XScale = { lo: 0, hi: PEEK.planned, x0: 1120, x1: 1760 };
-const PK_BASE = 640;
-const PK_TALL = 300;
+const PK_BASE = 690;
+const PK_TALL = 280;
 
 /**
  * Twenty tests of nothing give at least one hit 64% of the time; peeking is
@@ -164,12 +164,12 @@ export const OddsScene: React.FC = () => {
               {v}
             </div>
           ))}
-          <Note at={dipsAt - 2} x={PK.x1} y={pky(0.05) - 40} align="right">
+          <Note at={dipsAt - 2} x={PK.x1} y={y(PK_BASE) + 56} align="right">
             <Label size={22} color={STAT_INK} style={halo}>
               under 0.05: stop and ship?
             </Label>
           </Note>
-          <Note at={lookAt - 4} x={PK.x0} y={y(PK_BASE) + 44}>
+          <Note at={lookAt - 4} x={PK.x1} y={y(PK_BASE) + 94} align="right">
             <span style={{ ...note(24, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
               dips under 0.05: {dips} {dips === 1 ? "time" : "times"}, with nothing there
             </span>

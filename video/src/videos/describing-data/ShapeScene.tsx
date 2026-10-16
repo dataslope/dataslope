@@ -101,6 +101,7 @@ export const ShapeScene: React.FC = () => {
   const neitherAt = n.word("neither", "neither");
   const tailsAt = n.word("tails-in", "tails");
   const middleAt = n.word("tails-in", "middle");
+  const mattersAt = n.word("tails-in", "matter");
 
   const phaseB = ease(frame, peaksFrom - 6, 18);
   const split = ease(frame, groupsAt - 2, 18);
@@ -224,6 +225,15 @@ export const ShapeScene: React.FC = () => {
             </Tag>
             <Pulse x={meanX} y={hb - h(100)} at={neitherAt - 2} color={STAT} r={8} />
             <Pulse x={meanX} y={hb - h(100)} at={middleAt - 2} color={STAT} r={8} />
+            <Tag x={meanX} y={hb + h(44)} opacity={ease(frame, middleAt - 4, 12)} color={STAT_INK} size={21}>
+              the middle
+            </Tag>
+            <Tag x={sx(HX, 146)} y={hb + h(44)} opacity={ease(frame, mattersAt - 2, 12)} color={INK_SOFT} size={21}>
+              a tail
+            </Tag>
+            <Tag x={sx(HX, 204)} y={hb + h(44)} opacity={ease(frame, mattersAt + 6, 12)} color={INK_SOFT} size={21}>
+              a tail
+            </Tag>
             <Tag x={sx(HX, 206)} y={hb - h(60)} opacity={ease(frame, columnAt - 2, 12) * (1 - ease(frame, mixAt - 4, 10))} color={INK_SOFT} size={21} align="right">
               one column
             </Tag>

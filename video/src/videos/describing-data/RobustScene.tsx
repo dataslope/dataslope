@@ -142,12 +142,16 @@ export const RobustScene: React.FC = () => {
           <Tag x={FAR_X} y={strip + 42} opacity={ease(frame, thousandAt, 12)} color={INK_SOFT} size={20}>
             9,000
           </Tag>
+          <Tag x={FAR_X} y={strip - 64} opacity={ease(frame, thousandAt - 2, 12) * (1 - ease(frame, sdAt - 6, 10))} size={23} bold>
+            the tenth
+          </Tag>
+          <Pulse x={FAR_X} y={strip} at={tenthAt + 8} color={DATA} r={R} />
 
           <Svg>
             {ROBUST.values.map((v, i) => {
               const a = dotIn(i);
               if (a <= 0) return null;
-              const drop = i === ROBUST.values.length - 1 ? (1 - a) * -60 : 0;
+              const drop = i === ROBUST.values.length - 1 ? (1 - a) * -180 : 0;
               return <circle key={i} cx={xOf(v)} cy={strip + drop} r={R * a} fill={DATA} stroke={PAPER} strokeWidth={1.6} />;
             })}
           </Svg>

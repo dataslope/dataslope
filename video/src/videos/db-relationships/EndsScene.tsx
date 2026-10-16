@@ -203,7 +203,7 @@ export const EndsScene: React.FC = () => {
   const rSym = endSymbols(rTip, rBack, "zero-or-many", BIG);
   const lineY = ly;
   const glowR = 34;
-  const partOne = 1 - ease(frame, oneFrom - 8, 14);
+  const partOne = 1 - ease(frame, oneFrom - 14, 12);
   const viewIn = ease(frame, endsFrom - 6, 14);
 
   // ── Part two: the table of ends ──
@@ -211,14 +211,16 @@ export const EndsScene: React.FC = () => {
     const top = y(ROW_Y + i * ROW_STEP);
     const left = entityLayout({ x: LEFT_X, y: top, width: LEFT_W, name: r.left, columns: [] });
     const right = entityLayout({ x: RIGHT_X, y: top, width: RIGHT_W, name: r.right, columns: [] });
-    const start = n.beat(r.beat).from;
+    // The first row waits for the magnified ends to clear.
+    const start = i === 0 ? n.beat(r.beat).from + 10 : n.beat(r.beat).from;
     return {
       ...r,
       top,
       left,
       right,
       start,
-      marksAt: n.word(r.beat, r.marks),
+      // Never before its own line has started to draw.
+      marksAt: Math.max(n.word(r.beat, r.marks), start + 8),
       readingAt: n.word(r.beat, r.readAt),
       exAt: n.word(r.beat, r.exampleAt),
       next: i + 1 < ROWS.length ? n.beat(ROWS[i + 1].beat).from : m2mTo + 30,

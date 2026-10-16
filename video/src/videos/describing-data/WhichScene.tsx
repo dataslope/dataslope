@@ -48,7 +48,6 @@ export const WhichScene: React.FC = () => {
   const firstAt = n.word("habit", "FIRST");
   const haveAt = n.word("next", "data you have");
   const seenAt = n.word("next", "haven't seen");
-  const probAt = n.word("next", "probability");
   const meansAt = n.word("next", "means");
   const eachAt = n.word("ecdf", "each point");
   const summarizeAt = n.word("habit", "summarize");
@@ -56,6 +55,8 @@ export const WhichScene: React.FC = () => {
   const plotWordAt = n.word("next", "plot");
   const whatAt = n.word("next", "what a probability");
   const evenAt = n.word("next", "even");
+  const needAt = n.word("next", "need probability");
+  const startingAt = n.word("next", "starting");
 
   const fade = 1 - ease(frame, seenAt - 4, 20) * 0.6;
   /** After the last word, the four figures clear away one at a time. */
@@ -126,7 +127,7 @@ export const WhichScene: React.FC = () => {
       <Ink at={plotsFrom - 4} dur={20} out={habitFrom - 6} style={{ left: 92, top: y(150), ...headline(80), whiteSpace: "nowrap" }}>
         Which plot, when?
       </Ink>
-      <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
+      <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80), opacity: 1 - 0.5 * ease(frame, needAt - 2, 16) }}>
         <Ink at={firstAt - 6} dur={18} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
           Plot first.
         </Ink>
@@ -244,7 +245,7 @@ export const WhichScene: React.FC = () => {
         </Drift>
       </div>
 
-      <NextLine at={probAt} x={160} y={y(850)} width={1000}>
+      <NextLine at={startingAt - 2} x={160} y={y(850)} width={1000}>
         <Mark at={whatAt}>what a probability means</Mark>.
       </NextLine>
     </AbsoluteFill>

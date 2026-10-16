@@ -37,6 +37,8 @@ export const DivisorScene: React.FC = () => {
   const distancesAt = n.word("divisor", "distances");
   const nineAt = n.word("divisor", "nine");
   const wildAt = n.word("robust-in", "single wild value");
+  const tenAt = n.word("divisor", "ten");
+  const growWordAt = n.word("truth", "grow");
   const ownAt = n.word("divisor", "own mean");
   const closerAt = n.word("closest", "closer");
   const otherAt = n.word("closest", "any other number");
@@ -104,6 +106,12 @@ export const DivisorScene: React.FC = () => {
         <Ink at={lowAt - 6} dur={18} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
           and you come up short.
         </Ink>
+      </div>
+
+      {/* The two divisors the headline asks about. */}
+      <div style={{ position: "absolute", left: 1330, top: y(330), opacity: 1 - phaseB, whiteSpace: "nowrap", display: "flex", gap: 22, alignItems: "baseline" }}>
+        <span style={{ ...note(30, STAT_INK), fontWeight: 700, opacity: ease(frame, nineAt - 4, 12) }}>12 ÷ 9</span>
+        <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, tenAt - 4, 12) }}>not 12 ÷ 10</span>
       </div>
 
       {/* ── Phase A: five values and their squares ── */}
@@ -201,6 +209,9 @@ export const DivisorScene: React.FC = () => {
         <Ink at={closerAt - 2} dur={16} style={{ left: 1330, top: y(500), whiteSpace: "nowrap" }}>
           <div style={{ ...label(23, INK), fontWeight: 560 }}>Sum of the squares</div>
           <div style={{ ...note(64, toTruth > 0.5 ? INK : STAT_INK), fontWeight: 700, marginTop: 6 }}>{fmt(ss, 1)}</div>
+          <div style={{ ...note(24, INK), fontWeight: 600, marginTop: 4, opacity: ease(frame, growWordAt - 2, 12) * toTruth }}>
+            {fmt(DIVISOR.ssAroundTruth - DIVISOR.ssAroundMean, 1)} more than around its own mean
+          </div>
           <div style={{ ...note(22, INK_SOFT), marginTop: 2 }}>
             measured from {toTruth > 0.5 ? "the true mean" : "the sample mean"}
           </div>
@@ -221,6 +232,7 @@ export const DivisorScene: React.FC = () => {
         <div style={{ position: "absolute", inset: 0, opacity: phaseB }}>
           <FigLabel n="5" title={`Average variance over ${DIVISOR.trials.toLocaleString("en-US")} samples of five`} at={fourAt - 6} x={160} y={y(330)} />
           <Drift from={measuredFrom} to={swampAt + 30} scale={0.018} origin={[V.x0, y(BAR_N1)]}>
+            <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.55 * ease(frame, wildAt - 2, 14) }}>
             <Svg>
               {[
                 [BAR_N, DIVISOR.byN, nGrow, STAT],
@@ -266,6 +278,7 @@ export const DivisorScene: React.FC = () => {
               {counted(frame, byN1At, 0, DIVISOR.byN1, 1, 22)}
             </Tag>
             <Pulse x={sx(V, DIVISOR.sigma2)} y={y(BAR_N1)} at={landsAt + 4} color={INK} r={8} />
+            </div>
           </Drift>
 
           {/* Two libraries, two divisors, one column. */}

@@ -87,7 +87,8 @@ export const count = (frame: number, at: number, a: number, b: number, dur = 18)
 export const counted = (frame: number, at: number, a: number, b: number, digits = 1, dur = 18) =>
   fmt(count(frame, at, a, b, dur), digits);
 
-/** A ring that swells out of a point and fades: a point being named. */
+/** A ring that swells out of a point and fades, over a soft halo of the same
+ *  color: a point being named. */
 export const Pulse: React.FC<{ x: number; y: number; at: number; r?: number; color?: string; width?: number }> = ({
   x,
   y,
@@ -99,9 +100,11 @@ export const Pulse: React.FC<{ x: number; y: number; at: number; r?: number; col
   const frame = useCurrentFrame();
   const p = interpolate(frame, [at, at + 22], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   if (p <= 0 || p >= 1) return null;
+  const grow = Easing.out(Easing.cubic)(p);
   return (
     <Svg>
-      <circle cx={x} cy={y} r={r + 26 * Easing.out(Easing.cubic)(p)} fill="none" stroke={color} strokeWidth={width} opacity={0.85 * (1 - p)} />
+      <circle cx={x} cy={y} r={r + 30 * grow} fill={color} opacity={0.22 * (1 - p)} />
+      <circle cx={x} cy={y} r={r + 30 * grow} fill="none" stroke={color} strokeWidth={width} opacity={0.85 * (1 - p)} />
     </Svg>
   );
 };

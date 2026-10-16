@@ -45,6 +45,7 @@ export const OutlierScene: React.FC = () => {
   const sixOfAt = n.word("ordinary", "six");
   const longTailAt = n.word("ordinary", "long tail");
   const surestAt = n.word("plot-in", "surest");
+  const missingAt = n.word("kinds", "missing");
   const flagFrom = n.beat("flag").from;
   const twoHundredAt = n.word("flag", "two hundred");
   const genuineAt = n.word("flag", "genuine");
@@ -219,6 +220,9 @@ export const OutlierScene: React.FC = () => {
           </div>
         );
       })}
+      <Pulse x={160 + 560 + 8} y={y(CARDS) + 34} at={missingAt - 2} color={INK} r={6} />
+      <Pulse x={160 + 1120 + 8} y={y(CARDS) + 34} at={fraudAt - 2} color={STAT} r={6} />
+      <Pulse x={sx(X, 200)} y={ySpread(at(200))} at={egAt[2] - 2} color={DATA} r={7} />
       <Ink at={whyAt - 4} dur={16} style={{ left: 160, top: y(CARDS) - 56, whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, INK_SOFT) }}>First find out which it is</span>
       </Ink>

@@ -80,6 +80,8 @@ export const SkewScene: React.FC = () => {
   const incomesAt = n.word("skewed", "incomes");
   const commonAt = n.word("categories", "most common");
   const hidesAt = n.word("spread-in", "hides");
+  const examplesAt = [n.word("skewed", "incomes"), n.word("skewed", "prices"), n.word("skewed", "wait times")];
+  const typicalAt = n.word("skewed", "typical");
   const medianAt = n.word("median", "median");
   const meanAt = n.word("mean", "mean");
   const dragsAt = n.word("mean", "drags");
@@ -206,6 +208,7 @@ export const SkewScene: React.FC = () => {
         <Pulse x={meanX} y={markTop} at={aboveAt - 6} color={STAT} r={6} />
         <Pulse x={medX} y={markTop} at={aboveAt + 4} color={INK} r={6} />
         <Pulse x={medX} y={markTop} at={answerAt[1] - 2} color={INK} r={6} />
+        <Pulse x={medX} y={base - h(60)} at={typicalAt - 2} color={INK} r={8} />
       </Drift>
 
       {/* How far the values spread: the question the next part takes up. */}
@@ -276,7 +279,14 @@ export const SkewScene: React.FC = () => {
                   fontWeight: 500,
                 }}
               >
-                {r.sub}
+                {i === 1
+                  ? ["incomes,", "prices,", "wait times"].map((w, k) => (
+                      <span key={w} style={{ opacity: ease(frame, examplesAt[k] - 4, 10) }}>
+                        {k ? " " : ""}
+                        {w}
+                      </span>
+                    ))
+                  : r.sub}
               </div>
             ) : null}
           </React.Fragment>

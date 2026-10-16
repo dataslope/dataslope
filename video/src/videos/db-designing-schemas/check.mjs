@@ -163,7 +163,7 @@ const uniques = async (db) =>
     await db.query(`SELECT tc.table_name, kcu.column_name
 FROM information_schema.table_constraints tc
 JOIN information_schema.key_column_usage kcu ON kcu.constraint_name = tc.constraint_name
-WHERE tc.constraint_type = 'UNIQUE' ORDER BY 1, 2;`)
+WHERE tc.constraint_type = 'UNIQUE' AND tc.table_schema = 'public' ORDER BY 1, 2;`)
   ).rows.map((r) => `${r.table_name}.${r.column_name}`);
 
 /** The columns of a table, as the catalog lists them. */

@@ -79,6 +79,7 @@ export const ResultScene: React.FC = () => {
   const elevenAt = n.word("lift", "eleven point seven");
   const liftAt = n.word("lift", "A lift");
   const fifthAt = n.word("lift", "fifth");
+  const ninetyFiveAt = n.word("interval", "ninety-five");
   const intervalAt = n.word("interval", "interval");
   const oneAt = n.word("interval", "one point");
   const threeAt = n.word("interval", "to three");
@@ -126,7 +127,7 @@ export const ResultScene: React.FC = () => {
       <Sfx name="el-tap" at={effectAt - 6} level={-30} />
 
       <Headline lead="Six thousand users," turn="in each arm." at={resultFrom - 6} turnAt={eachAt - 6} out={liftAt - 6} />
-      <Headline lead="A lift of two points," turn="with an interval." at={liftAt - 2} turnAt={intervalAt - 6} />
+      <Headline lead="A lift of two points," turn="with an interval." at={liftAt - 2} turnAt={ninetyFiveAt - 6} />
 
       <FigLabel n="4" title="Every user in the test, one square each, the buyers lit" at={resultFrom - 2} x={160} y={y(300)} />
 
@@ -230,6 +231,9 @@ export const ResultScene: React.FC = () => {
         <span style={{ ...note(24, STAT_INK), fontWeight: 700, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
           +{fmt(lift)}
         </span>
+      </Note>
+      <Note at={fifthAt - 4} x={sx(LIFT, lift) + 46} y={rowY - 52}>
+        <span style={{ ...note(24, STAT_INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>about a fifth more sales</span>
       </Note>
       <Note at={oneAt - 4} x={sx(LIFT, pp(EXPERIMENT.ciLow))} y={rowY + 18} from="up">
         <span style={{ ...note(21, STAT_INK), fontWeight: 650, display: "inline-block", transform: "translateX(-50%)", ...halo }}>

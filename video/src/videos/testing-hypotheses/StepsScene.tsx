@@ -278,7 +278,7 @@ export const StepsScene: React.FC = () => {
         style={{
           position: "absolute",
           left: Z.x0,
-          top: y(650),
+          top: y(628),
           opacity: tCount,
           ...note(40, STAT_INK),
           fontWeight: 700,
@@ -333,7 +333,7 @@ export const StepsScene: React.FC = () => {
           both tails count
         </Label>
       </Note>
-      <Note at={trueMeanAt - 2} x={meanX - 14} y={y(STRIP) + h(52) + 8} align="right">
+      <Note at={trueMeanAt - 2} x={meanX - 14} y={y(STRIP) + h(30) + 2} align="right">
         <Label size={21} color={INK_SOFT} weight={520} style={halo}>
           the true mean: still unknown
         </Label>

@@ -45,6 +45,8 @@ export const SalaryScene: React.FC = () => {
   const meanAt = n.word("centers", "mean");
   const sevenAt = n.word("centers", "seven");
   const middleValueAt = n.word("centers", "middle value");
+  const medianWordAt = n.word("centers", "median");
+  const thousandAt = n.word("centers", "thousand");
   const halfAt = n.word("centers", "half");
   const almostAt = n.word("centers", "Almost");
   const ceoAt = n.word("ceo", "CEO");
@@ -74,10 +76,11 @@ export const SalaryScene: React.FC = () => {
   const ceoDrop = ease(frame, millionAt - 8, 14);
 
   // The mean and the median: where they stand, and when they move.
-  const meanV = lerp(lerp(SALARIES.values[0], SALARIES.mean, ease(frame, meanAt - 4, 22)), SALARIES.ceoMean, ease(frame, leapsAt, 30));
+  const meanV = lerp(lerp(SALARIES.values[0], SALARIES.mean, ease(frame, meanAt - 4, 44)), SALARIES.ceoMean, ease(frame, leapsAt, 30));
   const medianV = lerp(SALARIES.median, SALARIES.ceoMedian, ease(frame, fiftyFiveAt - 6, 16));
   const meanIn = ease(frame, meanAt - 4, 12);
-  const medianIn = ease(frame, halfAt - 6, 12);
+  const medianIn = ease(frame, middleValueAt - 4, 12);
+  const medianLabel = ease(frame, halfAt - 6, 12);
 
   // The balance: a fulcrum under the plank. It starts back where the mean
   // was, the plank tips toward the CEO, then the fulcrum slides out to the
@@ -216,11 +219,12 @@ export const SalaryScene: React.FC = () => {
 
         <Pulse x={xOf(meanV)} y={base - h(118)} at={sevenAt} color={STAT} r={6} />
         <Pulse x={xOf(meanV)} y={base - h(118)} at={jumpSevenAt} color={STAT} r={6} />
+        <Pulse x={xOf(meanV)} y={base - h(118)} at={thousandAt} color={STAT} r={6} />
         <Pulse x={xOf(meanV)} y={base - h(118)} at={roomAt - 2} color={STAT} r={6} />
         <Pulse x={xs[0]} y={base - r - 1.5} at={fortyAt} color={DATA} r={r} />
         <Pulse x={xs[SALARIES.values.length - 1]} y={base - r - 1.5} at={sixtyAt} color={DATA} r={r} />
         {[4, 5].map((i) => {
-          const ring = ease(frame, middleValueAt - 4, 10) * (1 - ease(frame, ceoAt - 6, 10));
+          const ring = ease(frame, medianWordAt - 4, 10) * (1 - ease(frame, ceoAt - 6, 10));
           return ring > 0 ? (
             <Svg key={i} opacity={ring}>
               <circle cx={xs[i]} cy={base - r - 1.5} r={r + 6} fill="none" stroke={INK} strokeWidth={2.2} />
@@ -236,7 +240,7 @@ export const SalaryScene: React.FC = () => {
             <line x1={xOf(medianV)} x2={xOf(medianV)} y1={base + 4} y2={base + h(64)} stroke={INK} strokeWidth={3.2} strokeLinecap="round" />
           </Svg>
         ) : null}
-        <Tag x={xOf(medianV)} y={base + h(72)} opacity={medianIn * medianDim} size={23} bold>
+        <Tag x={xOf(medianV)} y={base + h(72)} opacity={medianLabel * medianDim} size={23} bold>
           Median {fmt(medianV, 1)}k
         </Tag>
 

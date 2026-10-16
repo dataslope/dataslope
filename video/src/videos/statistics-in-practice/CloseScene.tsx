@@ -71,9 +71,10 @@ export const CloseScene: React.FC = () => {
           <span style={{ ...body(40, true), color: INK_SOFT }}>Decide the question,</span>
         </Ink>
         <Ink at={onceAt - 2} dur={18} style={{ position: "relative" }}>
-          <span style={{ ...body(40, true), color: INK_SOFT }}>then ask it of</span>
+          <span style={{ ...body(40, true), color: INK_SOFT }}>then ask it</span>
         </Ink>
         <Ink at={hasntAt - 10} dur={18} style={{ position: "relative" }}>
+          <span style={{ ...body(40, true), color: INK_SOFT }}>of </span>
           <span style={{ ...body(40, true), color: STAT_INK, position: "relative", display: "inline-block" }}>
             data that hasn&apos;t answered it yet.
             <span

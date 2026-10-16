@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease, map } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { BAR, body, fmt, halo, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { BAR, body, fmt, halo, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -54,6 +54,7 @@ export const PeekScene: React.FC = () => {
   const nineteenAt = n.word("stop", "point one nine");
   const numberAt = n.word("result-in", "set the number");
   const onceAt = n.word("result-in", "look once");
+  const theEndAt = n.word("result-in", "at the end");
 
   // ── The line: drawn to the end of the second dip by "twice", then on to the plan ──
   const rows = PEEKING.rows;
@@ -186,7 +187,15 @@ export const PeekScene: React.FC = () => {
         <span style={{ ...note(21, INK_SOFT), fontWeight: 600, ...halo }}>no effect anywhere in this data</span>
       </Note>
 
-      {/* The planned size: the one look that counts. */}
+      {/* The planned size: the one look that counts, lit when it is named. */}
+      {ease(frame, theEndAt - 4, 14) > 0 ? (
+        <Svg opacity={ease(frame, theEndAt - 4, 14)}>
+          <rect x={X.x1 - 22} y={py(P_MAX) - 14} width={44} height={y(BASE) - py(P_MAX) + 14} rx={8} fill={HIGHLIGHT} opacity={0.9} />
+        </Svg>
+      ) : null}
+      <Note at={theEndAt} x={X.x1 + 16} y={py(P_MAX) + 24}>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>the one look</span>
+      </Note>
       {planned > 0 ? (
         <Svg>
           <line
