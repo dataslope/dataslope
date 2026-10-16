@@ -176,7 +176,7 @@ export const script: NarrationScript = {
     { id: "again", text: "Enroll student one in course ten a second time, and it bounces.", pauseAfter: 0.4 },
     {
       id: "oneone",
-      text: "Put it on a foreign key, and each user gets at most one profile. That's one to one.",
+      text: "Put unique on a foreign key, and each user gets at most one profile. That's one to one.",
       pauseAfter: 0.5,
     },
     { id: "check-in", text: "That covers missing and repeated. What about values that are just wrong?" },
