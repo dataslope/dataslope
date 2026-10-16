@@ -37,6 +37,15 @@ export const HabitScene: React.FC = () => {
   const missingAt = n.word("ask", "missing");
   const whyAt = n.word("ask", "why");
   const nextAt = n.word("next", "how far");
+  // The bridge turns from missing data to fair samples: the habit eases back
+  // a piece at a time as it is spoken, the table, the drawer, the headline,
+  // the question.
+  const fairAt = n.word("next", "fair sample");
+  const everyoneAt = n.word("next", "drawn from everyone");
+  const truthAt = n.word("next", "truth");
+  const beAt = n.word("next", "can it be");
+  const back = (at: number) => 1 - 0.62 * ease(frame, at, 22);
+  const drawerOut = ease(frame, everyoneAt, 24);
   const drawer = pop(frame, start + 4, fps, 16);
   const rowAt = [n.word("habit", "planes"), n.word("habit", "funds"), n.word("habit", "customers")];
 
@@ -49,55 +58,58 @@ export const HabitScene: React.FC = () => {
       ))}
       <Sfx name="el-pencil" at={missingAt} level={-34} />
 
-      <Ink at={start - 10} dur={20} style={{ left: 116, top: y(104), ...headline(56), whiteSpace: "nowrap" }}>
+      <Ink at={start - 10} dur={20} style={{ left: 116, top: y(104), ...headline(56), whiteSpace: "nowrap", opacity: back(truthAt) }}>
         Survivors make a biased sample.
       </Ink>
 
-      {/* Column heads. */}
-      <Ink at={start - 2} dur={14} style={{ left: HERE_X, top: y(222) }}>
-        <span
-          style={{
-            ...label(22, INK),
-            padding: "2px 8px",
-            marginLeft: -8,
-            background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(ease(frame, hereAt - 2, 10) * 100)}%, transparent)`,
-          }}
-        >
-          In the data
-        </span>
-      </Ink>
-      <Ink at={missingAt - 4} dur={14} style={{ left: GONE_X, top: y(222) }}>
-        <span style={label(22, ACCENT_INK)}>Missing from it</span>
-      </Ink>
+      <div style={{ position: "absolute", inset: 0, opacity: back(fairAt) }}>
+        {/* Column heads. */}
+        <Ink at={start - 2} dur={14} style={{ left: HERE_X, top: y(222) }}>
+          <span
+            style={{
+              ...label(22, INK),
+              padding: "2px 8px",
+              marginLeft: -8,
+              background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(ease(frame, hereAt - 2, 10) * 100)}%, transparent)`,
+            }}
+          >
+            In the data
+          </span>
+        </Ink>
+        <Ink at={missingAt - 4} dur={14} style={{ left: GONE_X, top: y(222) }}>
+          <span style={label(22, ACCENT_INK)}>Missing from it</span>
+        </Ink>
 
-      {ROWS.map((r, i) => {
-        const at = rowAt[i];
-        return (
-          <React.Fragment key={r.key}>
-            <Ink at={at - 4} dur={16} style={{ left: HERE_X, top: y(ROW_Y(i)) }}>
-              <span style={{ ...body(40), color: INK, whiteSpace: "nowrap" }}>{r.here}</span>
-            </Ink>
-            <Ink at={missingAt + i * 5} dur={16} style={{ left: GONE_X - 16, top: y(ROW_Y(i)) - 8 }}>
-              <span
-                style={{
-                  ...body(40, true),
-                  color: INK_SOFT,
-                  whiteSpace: "nowrap",
-                  display: "inline-block",
-                  padding: "4px 14px 8px",
-                  border: `1.6px dashed ${INK_SOFT}`,
-                  borderRadius: 4,
-                }}
-              >
-                {r.gone}
-              </span>
-            </Ink>
-          </React.Fragment>
-        );
-      })}
+        {ROWS.map((r, i) => {
+          const at = rowAt[i];
+          return (
+            <React.Fragment key={r.key}>
+              <Ink at={at - 4} dur={16} style={{ left: HERE_X, top: y(ROW_Y(i)) }}>
+                <span style={{ ...body(40), color: INK, whiteSpace: "nowrap" }}>{r.here}</span>
+              </Ink>
+              <Ink at={missingAt + i * 5} dur={16} style={{ left: GONE_X - 16, top: y(ROW_Y(i)) - 8 }}>
+                <span
+                  style={{
+                    ...body(40, true),
+                    color: INK_SOFT,
+                    whiteSpace: "nowrap",
+                    display: "inline-block",
+                    padding: "4px 14px 8px",
+                    border: `1.6px dashed ${INK_SOFT}`,
+                    borderRadius: 4,
+                  }}
+                >
+                  {r.gone}
+                </span>
+              </Ink>
+            </React.Fragment>
+          );
+        })}
+
+      </div>
 
       {/* The question, in two inks. */}
-      <div style={{ position: "absolute", left: 116, top: y(728), display: "flex", gap: "0.26em", ...headline(84) }}>
+      <div style={{ position: "absolute", left: 116, top: y(728), display: "flex", gap: "0.26em", ...headline(84), opacity: back(beAt) }}>
         <Ink at={askAt - 2} dur={18} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Ask what's missing,
         </Ink>
@@ -122,8 +134,8 @@ export const HabitScene: React.FC = () => {
             top: y(232),
             width: 340,
             height: 483,
-            opacity: drawer,
-            transform: `translateY(${(1 - drawer) * 40 + bob(frame, 5, 130)}px)`,
+            opacity: drawer * (1 - drawerOut),
+            transform: `translateY(${(1 - drawer) * 40 + drawerOut * 24 + bob(frame, 5, 130)}px)`,
           }}
         />
       ) : null}

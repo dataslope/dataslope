@@ -4,6 +4,7 @@ import { ease } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { useMergedPart } from "../sampling/merged";
+import { Marker } from "../sampling/emphasis";
 import { Axis, Bars, sx, type XScale } from "../../editorial/charts";
 import { histogram, SPREADS, WAIT_SD } from "./data";
 import { useLayout } from "../../editorial/layout";
@@ -62,6 +63,11 @@ export const SpreadScene: React.FC = () => {
   const rootAt = n.word("rule", "square root");
   const fourAt = n.word("rule", "Four times");
   const nextAt = n.word("next", "standard error");
+  // The bridge names the rule's quantity: "that spread" is marked, then (in
+  // the merged video, where no "Next" line says it) named, and σ is marked
+  // as the standard deviation it is not.
+  const thatSpreadAt = n.word("next", "That spread");
+  const deviationAt = n.word("next", "standard deviation");
 
   return (
     <AbsoluteFill>
@@ -246,14 +252,17 @@ export const SpreadScene: React.FC = () => {
       <Ink at={ruleFrom - 4} dur={18} style={{ left: TABLE_X, top: Y(548), width: 530 }}>
         <div style={{ height: 1, background: INK, marginBottom: 18 }} />
         <div style={label(20, ACCENT_INK)}>The rule</div>
-        <div style={{ ...body(30), color: INK, marginTop: 10 }}>
-          Spread of the average
+        <div style={{ ...body(30), color: INK, marginTop: 10, whiteSpace: "nowrap" }}>
+          <Marker at={thatSpreadAt - 2}>Spread of the average</Marker>
+          {merged ? (
+            <span style={{ color: ACCENT_INK, opacity: ease(frame, nextAt - 2, 12) }}>, the standard error</span>
+          ) : null}
         </div>
         <div style={{ ...headline(76, true), marginTop: 6 }}>
           = σ ÷ √<span style={{ fontStyle: "italic" }}>n</span>
         </div>
         <div style={{ ...note(21, INK_SOFT), marginTop: 8 }}>
-          σ, the population&apos;s spread, is {fmt(WAIT_SD)} min.
+          <Marker at={deviationAt - 2}>σ, the population&apos;s spread</Marker>, is {fmt(WAIT_SD)} min.
         </div>
       </Ink>
       <Ink at={fourAt - 2} dur={16} style={{ left: TABLE_X, top: Y(800), width: 530 }}>

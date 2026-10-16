@@ -133,7 +133,7 @@ export const SalaryScene: React.FC = () => {
         The median finds the middle.
       </Ink>
 
-      <Spot id="describing-data-seesaw" at={balanceAt - 6} left={1560} top={y(104)} width={270} height={270} />
+      <Spot id="describing-data-seesaw" at={balanceAt - 6} left={1500} top={y(150)} width={330} height={169} />
 
       <FigLabel n="1" title="Salaries at a small company, in thousands" at={takeAt - 4} x={160} y={y(330)} />
 

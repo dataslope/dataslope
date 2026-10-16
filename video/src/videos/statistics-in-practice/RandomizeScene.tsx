@@ -44,6 +44,7 @@ export const RandomizeScene: React.FC = () => {
   const evenAt = n.word("coin", "Even");
   const knowAt = n.word("cause", "doesn't know");
   const everythingAt = n.word("cause", "balances everything");
+  const letsAt = n.word("cause", "That's what lets");
   const causedAt = n.word("cause", "CAUSED");
   const changeAt = n.word("cause", "change");
   const twoAt = n.word("size-in", "Two more");
@@ -55,6 +56,8 @@ export const RandomizeScene: React.FC = () => {
   const randAt = (i: number) => shrinksAt - 10 + i * 2.5;
   const named: Record<string, number> = { Age: ageAt, Income: incomeAt, "Prior use": priorAt };
   const figDim = 1 - 0.6 * ease(frame, twoAt - 4, 16);
+  // Once the point is made, the self-selected gaps step back.
+  const ghost = 1 - 0.8 * ease(frame, letsAt - 4, 16);
 
   return (
     <AbsoluteFill>
@@ -164,8 +167,8 @@ export const RandomizeScene: React.FC = () => {
             const yy = y(rowY(i));
             return (
               <g key={r.key}>
-                {t > 0 ? <line x1={xr} x2={xs} y1={yy} y2={yy} stroke={INK_SOFT} strokeWidth={1.6} opacity={0.35 * t} /> : null}
-                <circle cx={xs} cy={yy} r={9} fill={STAT} opacity={lerp(1, 0.35, t)} stroke={PAPER} strokeWidth={1.5} />
+                {t > 0 ? <line x1={xr} x2={xs} y1={yy} y2={yy} stroke={INK_SOFT} strokeWidth={1.6} opacity={0.35 * t * ghost} /> : null}
+                <circle cx={xs} cy={yy} r={9} fill={STAT} opacity={lerp(1, 0.35, t) * ghost} stroke={PAPER} strokeWidth={1.5} />
                 {t > 0 ? <circle cx={xr} cy={yy} r={9} fill={BAR} stroke={PAPER} strokeWidth={1.5} /> : null}
               </g>
             );

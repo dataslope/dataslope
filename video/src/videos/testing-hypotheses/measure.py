@@ -24,6 +24,11 @@ lessons are in content/courses/statistics-for-data-science-python/:
 - "twenty" is p-values.mdx, "The danger of looking many times" (seed 123):
   twenty tests of pure noise.
 - "atLeast" is the multiple-comparisons chart's curve, 1 - 0.95^k.
+- "peek" is the ab-test-peeking chart in ab-testing.mdx (charts/ab-test-peeking.mjs):
+  two identical arms of 8,000, the p-value recomputed after every hundred
+  visitors, with the chart's own seeded sampler (mulberry32 and Box-Muller,
+  seeds 10 and 10009) and its own normal-CDF approximation, ported line for
+  line. The caption it builds is checked against the chart's below.
 - "power" is errors-and-power.mdx, "Simulating power" (seed 0): a 0.5 effect,
   30 per group, 2,000 experiments.
 - "powerByN" is errors-and-power.mdx, "Power rises with sample size" (seed 1).
@@ -197,6 +202,66 @@ out["atLeast"] = {
     "bonferroni": r(0.05 / 20, 4),
 }
 say(f"  at least one of 20: {1 - 0.95**20:.3f}; Bonferroni 0.05/20 = {0.05 / 20}")
+
+# ── Part 3. Peeking at a running test (charts/ab-test-peeking.mjs) ──────────
+
+
+def mulberry32(seed):
+    """charts/_theme.mjs rng(): 32-bit integer arithmetic, as in JavaScript."""
+    a = seed & 0xFFFFFFFF
+
+    def imul(x, y):
+        return ((x & 0xFFFFFFFF) * (y & 0xFFFFFFFF)) & 0xFFFFFFFF
+
+    def nxt():
+        nonlocal a
+        a = (a + 0x6D2B79F5) & 0xFFFFFFFF
+        t = imul(a ^ (a >> 15), 1 | a)
+        t = ((t + imul(t ^ (t >> 7), 61 | t)) & 0xFFFFFFFF) ^ t
+        return ((t ^ (t >> 14)) & 0xFFFFFFFF) / 4294967296
+
+    return nxt
+
+
+def normal_samples(n, mean, sd, seed):
+    import math
+
+    u = mulberry32(seed)
+    out = []
+    for _ in range(n):
+        a = max(u(), sys.float_info.epsilon)
+        b = u()
+        out.append(mean + sd * math.sqrt(-2 * math.log(a)) * math.cos(2 * math.pi * b))
+    return out
+
+
+def chart_phi_cdf(x):
+    """The chart's own Phi: the same rational approximation, not scipy's."""
+    import math
+
+    t = 1 / (1 + 0.2316419 * abs(x))
+    d = t * (0.31938153 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))))
+    p = 1 - math.exp(-0.5 * x * x) / math.sqrt(2 * math.pi) * d
+    return p if x >= 0 else 1 - p
+
+
+PLANNED, STEP = 8000, 100
+arm_a = normal_samples(PLANNED, 0, 1, 10)
+arm_b = normal_samples(PLANNED, 0, 1, 10009)
+peek_rows = []
+for n_seen in range(STEP, PLANNED + 1, STEP):
+    z = (sum(arm_a[:n_seen]) / n_seen - sum(arm_b[:n_seen]) / n_seen) / (2 / n_seen) ** 0.5
+    peek_rows.append({"n": n_seen, "p": r(2 * (1 - chart_phi_cdf(abs(z))), 4)})
+crossings = sum(1 for i, row in enumerate(peek_rows) if row["p"] < 0.05 and (i == 0 or peek_rows[i - 1]["p"] >= 0.05))
+say(f"  peeking: p dips below 0.05 {crossings} times; at the planned {PLANNED:,} it reads {peek_rows[-1]['p']:.2f}")
+out["peek"] = {
+    "planned": PLANNED,
+    "step": STEP,
+    "rows": peek_rows,
+    "crossings": crossings,
+    "under": sum(1 for row in peek_rows if row["p"] < 0.05),
+    "final": peek_rows[-1]["p"],
+}
 
 # ── Part 4. Simulating power (errors-and-power, seed 0) ─────────────────────
 rng = np.random.default_rng(0)

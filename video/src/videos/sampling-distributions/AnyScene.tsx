@@ -14,6 +14,7 @@ import {
   HAIRLINE,
   halo,
   headline,
+  HIGHLIGHT,
   INK,
   INK_SOFT,
   label,
@@ -22,6 +23,7 @@ import {
 import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
 import { ANY_N, ANY_SAMPLES, LOPSIDED, peak, STATS } from "./data";
 import { Bracket, POP_FILL, Rule } from "./parts";
+import { Marker, swell } from "../sampling/emphasis";
 
 /** One axis for the population and all three statistics. */
 const X: XScale = { lo: 0, hi: 300, x0: 330, x1: 1490 };
@@ -59,6 +61,12 @@ export const AnyScene: React.FC = () => {
   const nameAt = n.word("name", "name");
   const seAt = n.word("name", "standard error");
   const nextAt = n.word("next", "shape");
+  // The bridge asks about the mean's shape: its row lights up, its pile
+  // swells on "surprise", and the population's tail is marked on "lopsided".
+  const meanShapeAt = n.word("next", "mean's shape");
+  const surpriseAt = n.word("next", "surprise");
+  const tailAt = n.word("next", "lopsided");
+  const meanRow = ease(frame, meanShapeAt - 2, 16);
 
   const named = ease(frame, seAt - 2, 14);
 
@@ -115,6 +123,21 @@ export const AnyScene: React.FC = () => {
         <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap" }}>Standard error</span>
       </div>
 
+      {/* The mean's row, as the bridge asks about its shape. */}
+      <div
+        style={{
+          position: "absolute",
+          left: ROW_X - 22,
+          width: COL_SPREAD + 150 - ROW_X,
+          top: y(STAT_ROWS[0] - STAT_H - 22),
+          height: y(STAT_ROWS[0] + 14) - y(STAT_ROWS[0] - STAT_H - 22),
+          background: HIGHLIGHT,
+          opacity: 0.4 * meanRow,
+          transformOrigin: "left center",
+          transform: `scaleX(${0.4 + 0.6 * meanRow})`,
+        }}
+      />
+
       {/* The population. */}
       <Ink at={lopsidedAt - 4} dur={14} style={{ left: ROW_X, top: y(POP_ROW.base - 44) }}>
         <span style={{ ...body(32, true), color: INK }}>Population</span>
@@ -131,14 +154,16 @@ export const AnyScene: React.FC = () => {
       />
       <Axis scale={X} base={y(POP_ROW.base)} ticks={[]} at={meanFirstAt + 2} />
       <Note at={lopsidedAt + 6} x={sx(X, 120)} y={y(POP_ROW.base - 62)}>
-        <span style={{ ...note(22, INK_SOFT), ...halo }}>a long tail to the right, like incomes</span>
+        <span style={{ ...note(22, INK_SOFT), ...halo }}>
+          <Marker at={tailAt - 2}>a long tail to the right</Marker>, like incomes
+        </span>
       </Note>
 
       {STATS.map((s, r) => {
         const base = STAT_ROWS[r];
         const at = statAt[r];
         const last = r === STATS.length - 1;
-        const unit = STAT_H / peak(s.hist);
+        const unit = (STAT_H / peak(s.hist)) * (r === 0 ? swell(frame, surpriseAt - 2, 0.12, 22) : 1);
         const mid = s.center;
         const bracketY = y(base - STAT_H * AT_SD);
         return (

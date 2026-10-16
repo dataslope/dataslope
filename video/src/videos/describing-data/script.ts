@@ -176,7 +176,7 @@ export const script: NarrationScript = {
     { id: "closest", text: "And that mean sits closer to its own points than any other number does.", pauseAfter: 0.4 },
     {
       id: "truth",
-      text: "Here are five values from a population whose true mean is zero. Measure from the truth instead, and the squares grow.",
+      text: "These five values come from a population whose true mean is zero. Measure from the truth instead, and the squares grow.",
       pauseAfter: 0.4,
     },
     {
@@ -266,7 +266,7 @@ export const script: NarrationScript = {
     },
     {
       id: "flag",
-      text: "Here are two hundred skewed incomes, plus two genuine high earners. The box-plot fences flag six points. The z-score rule flags just two.",
+      text: "Now take two hundred skewed incomes, plus two genuine high earners. The box-plot fences flag six points. The z-score rule flags just two.",
       pauseAfter: 0.4,
     },
     { id: "ordinary", text: "Four of those six are simply the long tail of ordinary incomes.", pauseAfter: 0.45 },
@@ -300,7 +300,7 @@ export const script: NarrationScript = {
     {
       id: "bins",
       scene: true,
-      text: "A histogram's bin width is a knob. Here are the SAME thousand values in five bins, then twenty, then eighty.",
+      text: "A histogram's bin width is a knob. These are the SAME thousand values, in five bins, then twenty, then eighty.",
       pauseAfter: 0.45,
     },
     {

@@ -64,6 +64,9 @@ export const NULL_P = { ...m.nullP, bins: m.nullP.bins as readonly number[] };
 /** Twenty tests of pure noise, and which of them came in at or under 0.05. */
 export const TWENTY = { p: m.twenty.p as readonly number[], hits: m.twenty.hits as readonly number[] };
 
+/** The ab-test-peeking chart's run: two identical arms, p after every 100 visitors. */
+export const PEEK = { ...m.peek, rows: m.peek.rows as readonly { n: number; p: number }[] };
+
 /** The chance that at least one of k tests fires: 1 - 0.95^k. */
 export const AT_LEAST = m.atLeast;
 

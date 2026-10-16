@@ -71,7 +71,7 @@ export const CorrScene: React.FC = () => {
   const nineAt = n.word("curve", "Point nine nine");
   const nearAt = n.word("ushape", "near zero");
   const noRelAt = n.word("ushape", "no relationship");
-  const uAt = n.word("ushape", "U");
+  const uAt = n.word("ushape", "U-shape");
   const minusZeroAt = n.word("ushape", "minus point zero three");
   const dependsAt = n.word("ushape", "depends entirely");
 

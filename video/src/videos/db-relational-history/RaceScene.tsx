@@ -77,7 +77,7 @@ export const RaceScene: React.FC = () => {
       <Headline at={twistAt - 6} lead="IBM published." turn="Oracle shipped first." turnAt={oracleAt - 4} out={butAt - 6} />
       <Headline at={butAt - 2} lead="Codd had other readers." />
 
-      <FigLabel n="5" title="Who sold SQL first" at={raceFrom} x={96} y={y(290)} />
+      <FigLabel n="4" title="Who sold SQL first" at={raceFrom} x={96} y={y(290)} />
 
       {/* ── The year axis ── */}
       <Svg opacity={ease(frame, raceFrom + 2, 14)}>

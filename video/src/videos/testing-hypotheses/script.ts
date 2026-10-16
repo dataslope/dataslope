@@ -69,7 +69,8 @@ import type { NarrationScript } from "../../narration/types";
  *   - The claims without a number are the lessons' own: the courtroom
  *     mapping and "not guilty is not innocent"; alpha set in advance; the
  *     one-sided cutoff being nearer; uniform p-values under the null;
- *     peeking; pre-registration; the alpha-beta tradeoff and only more data
+ *     peeking (the ab-test-peeking chart's own seeded run, which dips under
+ *     0.05 twice and ends at 0.19); pre-registration; the alpha-beta tradeoff and only more data
  *     shrinking both; t as gap over standard error; the three designs;
  *     ANOVA's F as between over within and not naming the group; chi-square
  *     on counts; Pearson linear, Spearman on ranks; ranks ignoring how far
@@ -413,7 +414,7 @@ export const script: NarrationScript = {
     },
     {
       id: "ushape",
-      text: "And an r near zero isn't the same as no relationship. On this U, r is minus point zero three, though y depends entirely on x.",
+      text: "And an r near zero isn't the same as no relationship. On this U-shape, r is minus point zero three, though y depends entirely on x.",
     },
     {
       id: "ranks",

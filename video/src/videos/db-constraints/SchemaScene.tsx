@@ -76,7 +76,9 @@ export const SchemaScene: React.FC = () => {
 
   // The writers under the card, each arrow running up into it.
   const wy = card.bottom + h(150);
-  const wx = (i: number) => card.left + 10 + i * 98;
+  const wx = (i: number) => card.left - 4 + i * 128;
+  /** Where each writer's arrow meets the card's bottom edge. */
+  const wt = (i: number) => card.left + 70 + i * 80;
 
   return (
     <AbsoluteFill>
@@ -107,12 +109,12 @@ export const SchemaScene: React.FC = () => {
       {/* Every writer goes through the same rule. */}
       {WRITERS.map((w, i) => (
         <React.Fragment key={w}>
-          <Ink at={everyAt + i * 4} dur={12} out={errorAt} style={{ left: wx(i) - 8, top: wy, whiteSpace: "nowrap" }}>
-            <span style={label(20, INK_SOFT)}>{w}</span>
+          <Ink at={everyAt + i * 4} dur={12} out={errorAt} style={{ left: wx(i), top: wy, width: 120, textAlign: "center" }}>
+            <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>{w}</span>
           </Ink>
           <Arrow
-            from={[wx(i) + 30, wy - 8]}
-            to={[wx(i) + 30, card.bottom + 10]}
+            from={[wx(i) + 60, wy - 8]}
+            to={[wt(i), card.bottom + 10]}
             at={whoeverAt + i * 4}
             dur={12}
             color={INK_SOFT}

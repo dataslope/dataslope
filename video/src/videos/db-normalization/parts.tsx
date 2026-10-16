@@ -235,3 +235,29 @@ export const noteStyle = (size = 22, color: string = INK_SOFT): React.CSSPropert
   ...note(size, color),
   whiteSpace: "nowrap",
 });
+
+/** A short straight arrow that draws itself on `at`, its head from arrowHead(). */
+export const SmallArrow: React.FC<{ from: Pt; to: Pt; at: number; color?: string; width?: number; out?: number }> = ({
+  from,
+  to,
+  at,
+  color = INK_SOFT,
+  width = 2,
+  out,
+}) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 10);
+  const o = out === undefined ? 0 : ease(frame, out, 10);
+  if (p <= 0 || o >= 1) return null;
+  const tip: Pt = [lerp(from[0], to[0], p), lerp(from[1], to[1], p)];
+  const len = Math.hypot(to[0] - from[0], to[1] - from[1]);
+  const head = Math.min(9, len * 0.5);
+  return (
+    <Svg opacity={1 - o}>
+      <line x1={from[0]} y1={from[1]} x2={tip[0]} y2={tip[1]} stroke={color} strokeWidth={width} strokeLinecap="round" />
+      {p >= 1 ? (
+        <path d={arrowHead([from, to], head, head * 0.6)} fill="none" stroke={color} strokeWidth={width} strokeLinecap="round" strokeLinejoin="round" />
+      ) : null}
+    </Svg>
+  );
+};
