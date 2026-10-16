@@ -228,10 +228,10 @@ export const ShapeScene: React.FC = () => {
             <Tag x={meanX} y={hb + h(44)} opacity={ease(frame, middleAt - 4, 12)} color={STAT_INK} size={21}>
               the middle
             </Tag>
-            <Tag x={sx(HX, 146)} y={hb + h(44)} opacity={ease(frame, mattersAt - 2, 12)} color={INK_SOFT} size={21}>
+            <Tag x={sx(HX, 146)} y={hb - h(120) - 32} opacity={ease(frame, mattersAt - 2, 12)} color={INK_SOFT} size={21}>
               a tail
             </Tag>
-            <Tag x={sx(HX, 204)} y={hb + h(44)} opacity={ease(frame, mattersAt + 6, 12)} color={INK_SOFT} size={21}>
+            <Tag x={sx(HX, 204)} y={hb - h(120) - 32} opacity={ease(frame, mattersAt + 6, 12)} color={INK_SOFT} size={21}>
               a tail
             </Tag>
             <Tag x={sx(HX, 206)} y={hb - h(60)} opacity={ease(frame, columnAt - 2, 12) * (1 - ease(frame, mixAt - 4, 10))} color={INK_SOFT} size={21} align="right">
