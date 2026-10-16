@@ -74,6 +74,7 @@ export const GradeScene: React.FC = () => {
       <Head lead="A fact about the pairing" leadAt={from - 6} turn="lives on its row." turnAt={ownRowAt - 6} />
 
       <Drift from={from} to={nextAt + 30} scale={0.016} origin={[960, y(560)]}>
+      <Drift from={nextAt} to={n.beat("wide").from} scale={0.03} origin={[960, y(560)]}>
         <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, nextAt, 16) * 0.55 }}>
           {/* ── The junction's rows, with their grades ── */}
           <Caption at={from - 2} x={jg.x} y={jg.top - 48}>
@@ -140,6 +141,7 @@ export const GradeScene: React.FC = () => {
             </Tag>
           </div>
         </div>
+      </Drift>
       </Drift>
     </AbsoluteFill>
   );

@@ -95,6 +95,7 @@ export const GuardScene: React.FC = () => {
       <Head lead="Ada manages Ada:" leadAt={adaAgainAt} turn="accepted." turnAt={takesAt} />
 
       <Drift from={from} to={constraintsAt + 40} scale={0.014} origin={[960, y(560)]}>
+      <Drift from={constraintsAt - 12} to={n.durationInFrames} scale={0.03} origin={[960, y(560)]}>
         <div style={{ position: "absolute", inset: 0, opacity: settle }}>
           {/* ── e and m: one table, read twice ── */}
           <Caption at={asEmployeeAt - 2} x={eg.x} y={top - 48}>
@@ -165,6 +166,7 @@ export const GuardScene: React.FC = () => {
             no complaint
           </Reply>
         </div>
+      </Drift>
       </Drift>
       <NextLine at={constraintsAt - 2} x={RESULT_X} y={y(820)} width={700}>
         constraints.

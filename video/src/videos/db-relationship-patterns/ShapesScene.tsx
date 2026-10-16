@@ -7,7 +7,7 @@ import type { Cardinality } from "../../components/crowsfoot";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { OTM } from "./data";
-import { Caption, DbTable, Drift, HEAD_H, Head, KEY_INK, KeyArrow, Kicker, Pulse, ROW_H, tableGeometry } from "./parts";
+import { Caption, DbTable, Drift, HEAD_H, Head, KEY_INK, KeyArrow, Kicker, MARK_KEY, Pulse, ROW_H, tableGeometry } from "./parts";
 
 /** The four panels: left edges, each panel PANEL wide. */
 const PANEL_X = [120, 560, 1000, 1440];
@@ -64,6 +64,7 @@ export const ShapesScene: React.FC = () => {
   const keysAt = n.word("shapes", "keys");
   const rowAt = n.word("shapes", "one row");
   const pointAt = n.word("shapes", "point");
+  const linksAt = n.word("shapes", "links");
   const shapesAt = n.word("shapes", "few shapes");
   const otmAt = n.word("names", "One to many");
   const mtmAt = n.word("names", "Many to many");
@@ -92,9 +93,10 @@ export const ShapesScene: React.FC = () => {
       <Sfx name="el-pencil" at={selfAt} level={-33} />
 
       <Kicker at={from - 10}>Four shapes</Kicker>
-      <Head lead="Links come in" leadAt={from - 6} turn="a few shapes." turnAt={shapesAt - 4} />
+      <Head lead="Links come in" leadAt={linksAt - 4} turn="a few shapes." turnAt={shapesAt - 4} />
 
       {/* ── With keys, one row can point at another ── */}
+      <Drift from={rowAt} to={pairOut + 10} scale={0.035} origin={[960, y(520)]}>
       <DbTable g={cg} cols={["id", "name"]} rows={[{ cells: CUSTOMER.slice(0, 2), at: rowAt }]} at={keysAt} numeric={[0]} colInk={{ 0: KEY_INK }} out={pairOut} />
       <DbTable
         g={og}
@@ -103,6 +105,7 @@ export const ShapesScene: React.FC = () => {
         at={keysAt + 6}
         numeric={[0, 1]}
         colInk={{ 1: KEY_INK }}
+        marks={[{ row: 0, col: 1, at: linksAt + 4, color: MARK_KEY }]}
         out={pairOut}
       />
       <Caption at={keysAt} x={cg.x} y={cg.top - 44} out={pairOut}>
@@ -112,6 +115,9 @@ export const ShapesScene: React.FC = () => {
         orders
       </Caption>
       <KeyArrow from={[og.x - 10, og.rowMid(0)]} to={[cg.x + cg.width + 8, cg.rowMid(0)]} at={pointAt} out={pairOut} />
+      <Pulse x={cg.x + cg.width + 8} y={cg.rowMid(0)} at={linksAt} r={10} color={KEY_INK} />
+      <Pulse x={og.x - 10} y={og.rowMid(0)} at={linksAt + 6} r={10} color={KEY_INK} />
+      </Drift>
 
       {/* ── The four shapes ── */}
       <Drift from={otmAt} to={n.beat("names").to + 50} scale={0.018} origin={[960, y(600)]}>

@@ -77,6 +77,7 @@ export const UniqueScene: React.FC = () => {
       <Head lead="A foreign key," leadAt={from - 6} turn="plus unique." turnAt={uniqueAt - 2} />
 
       <Drift from={from} to={lastAt + 30} scale={0.016} origin={[960, y(600)]}>
+      <Drift from={lastAt} to={n.beat("self").from} scale={0.03} origin={[960, y(600)]}>
         <div style={{ position: "absolute", inset: 0, opacity: fade }}>
           <Caption at={from - 2} x={g.x} y={g.top - 84}>
             user_profiles
@@ -123,6 +124,7 @@ export const UniqueScene: React.FC = () => {
             detailMark={oneToOneAt}
           />
         </div>
+      </Drift>
       </Drift>
     </AbsoluteFill>
   );

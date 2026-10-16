@@ -101,6 +101,7 @@ export const ListScene: React.FC = () => {
       <Drift from={fkAt} to={dimAll + 40} scale={0.018} origin={[960, y(600)]}>
         <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, dimAll, 16) * 0.6 }}>
           {/* ── The bad idea, then the same customers without it ── */}
+          <Drift from={from} to={fkAt} scale={0.03} origin={[CUSTOMERS_X, top]}>
           <Caption at={notAt} x={CUSTOMERS_X} y={top - 48}>
             customers
           </Caption>
@@ -126,6 +127,7 @@ export const ListScene: React.FC = () => {
           <Tag at={checkAt + 6} x={CUSTOMERS_X} y={bad.rowTop(2) + 52} italic size={22} out={fkAt - 4}>
             nothing can check what's in it
           </Tag>
+          </Drift>
           <div style={{ position: "absolute", inset: 0, opacity: swapIn }}>
             <DbTable
               g={good}
