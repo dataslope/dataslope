@@ -91,7 +91,7 @@ export const script: NarrationScript = {
     {
       id: "names",
       text: "One to many. Many to many. One to one. And the odd one out... a table that points at itself.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.35,
     },
 
     // ── 1. One to many ────────────────────────────────────────────────────
@@ -103,20 +103,20 @@ export const script: NarrationScript = {
     },
     {
       id: "ends",
-      text: "So the line gets two bars by customers, for exactly one, and a crow's foot and a circle by orders, for zero or many.",
-      pauseAfter: 0.4,
+      text: "Two bars by customers mean exactly one. A crow's foot and a circle by orders mean zero or many.",
+      pauseAfter: 0.35,
     },
     { id: "where-in", text: "So which table holds the link?" },
     {
       id: "list",
       scene: true,
-      text: "Not customers. Ada's orders, one and twenty-five, would have to share a single cell.",
+      text: "Not customers. Ada's orders, one and twenty-five, would have to share one cell.",
       pauseAfter: 0.35,
     },
     {
       id: "cell",
       text: "Nothing can check a list like that, and every new order means editing Ada's row.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.35,
     },
     {
       id: "fk",
@@ -133,11 +133,11 @@ export const script: NarrationScript = {
       text: "A student takes lots of courses, and a course has lots of students. Ada takes Math and History. Grace takes Math and Art.",
       pauseAfter: 0.35,
     },
-    { id: "tangle", text: "See how the links cross? Neither side is the parent.", pauseAfter: 0.4 },
+    { id: "tangle", text: "The links cross, because neither side is the parent.", pauseAfter: 0.4 },
     {
       id: "slot",
       text: "Give students a course ID, and Ada's row has room for one. Math fits... so where does History go?",
-      pauseAfter: 0.4,
+      pauseAfter: 0.35,
     },
     { id: "flip", text: "Flip it, and Math has room for one student. Where does Grace go?", pauseAfter: 0.4 },
     { id: "one-side", text: "One foreign key always forces one side to be one." },
@@ -150,12 +150,12 @@ export const script: NarrationScript = {
     {
       id: "rows",
       text: "Ada in Math is a row, Ada in History another, each with two foreign keys.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.35,
     },
     {
       id: "two",
-      text: "And the tangle turns into two plain one-to-manys, one from each side.",
-      pauseAfter: 0.4,
+      text: "So the tangle becomes two plain one-to-manys.",
+      pauseAfter: 0.35,
     },
     { id: "named", text: "That's a junction table. It's not a hack... it gives the relationship a name." },
 
@@ -174,13 +174,13 @@ export const script: NarrationScript = {
       id: "grade",
       scene: true,
       text: "The row can hold facts of its own, too, like a grade. Not on students, though: Ada got a B in Math and a C in History.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.35,
     },
     { id: "course", text: "Not on courses either: Math gave Ada a B, and Grace a C.", pauseAfter: 0.4 },
     {
       id: "belongs",
       text: "It belongs to Ada in Math, on the pairing's own row.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.35,
     },
     { id: "one-in", text: "The next shape splits one thing in two." },
 
@@ -188,13 +188,13 @@ export const script: NarrationScript = {
     {
       id: "wide",
       scene: true,
-      text: "Picture a users table that starts collecting profile details, like a display name and a bio.",
+      text: "Say a users table starts collecting profile details, like a display name and a bio.",
       pauseAfter: 0.35,
     },
     {
       id: "empty",
       text: "Lots of users, like Linus, never fill them in.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.35,
     },
     {
       id: "split",
@@ -206,7 +206,7 @@ export const script: NarrationScript = {
       id: "unique",
       scene: true,
       text: "But a foreign key alone won't keep it to one. It'll happily take a second profile for Ada.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.35,
     },
     {
       id: "unique-fix",
