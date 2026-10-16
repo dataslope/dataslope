@@ -565,6 +565,8 @@ export const MovingTable: React.FC<{
         style={{ position: "absolute", left: 0, top: headH + nRows * rowH - 1, width: width * p, height: 1.5, background: INK }}
       />
       <Ink at={at + 2} dur={14} style={{ left: 0, top: 0, width, height: headH }}>
+        {/* Ink pads its box, so the titles are placed inside a box of their own. */}
+        <div style={{ position: "relative", width, height: headH }}>
         {cols.map((c, j) => (
           <div
             key={c.title}
@@ -583,6 +585,7 @@ export const MovingTable: React.FC<{
             {c.title}
           </div>
         ))}
+        </div>
       </Ink>
       {rows.map((r, i) => {
         const inP = ease(frame, r.at, 12);
@@ -593,8 +596,11 @@ export const MovingTable: React.FC<{
         const rowTop = headH + slot * rowH;
         const landed = m >= 0.7;
         const washes = (r.bands ?? []).map((b) => ({ o: shown(frame, b.at, b.out), color: b.color ?? HIGHLIGHT }));
-        // A row in flight lifts a little off the page.
+        // A row in flight lifts off the page and steps aside, each by its
+        // own amount, so rows that pass each other do not print over each
+        // other.
         const lift = Math.sin(m * Math.PI);
+        const aside = lift * (40 + 70 * (i % 3));
         return (
           <div
             key={i}
@@ -604,8 +610,8 @@ export const MovingTable: React.FC<{
               top: rowTop,
               width,
               height: rowH,
-              opacity: inP,
-              transform: `translateX(${(1 - inP) * -12 + lift * 14}px)`,
+              opacity: inP * (1 - lift * 0.35),
+              transform: `translateX(${(1 - inP) * -12 + aside}px)`,
               zIndex: lift > 0.01 ? 2 : 1,
             }}
           >

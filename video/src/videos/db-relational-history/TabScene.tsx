@@ -239,7 +239,7 @@ export const TabScene: React.FC = () => {
         Nothing stored: orders still holds {ORDERS_AFTER_BAD} rows.
       </Tag>
       <Tag x={1070} y={y(742)} at={rulesAt + 10} size={22} color={INK_SOFT}>
-        <span style={{ fontFamily: MONO, fontSize: 20, color: BLUE_INK }}>{BAD.code}</span> foreign_key_violation
+        Postgres&apos;s error code: <span style={{ fontFamily: MONO, fontSize: 21, color: BLUE_INK }}>{BAD.code}</span>
       </Tag>
 
       {/* A last stroke under the final words, after the voice ends. */}

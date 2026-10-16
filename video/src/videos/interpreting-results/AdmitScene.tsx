@@ -40,7 +40,6 @@ export const AdmitScene: React.FC = () => {
   // ── Cues ──
   const yearAt = n.word("admit", "nineteen seventy-three");
   const famousAt = n.word("admit", "famous");
-  const twoAt = n.word("admit", "two departments");
   const admissionsAt = n.word("admit", "admissions");
   const fiftyFiveAt = n.word("overall", "fifty-five");
   const onlyAt = n.word("overall", "only");

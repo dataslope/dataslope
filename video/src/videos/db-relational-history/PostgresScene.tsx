@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, INK } from "../../editorial/style";
+import { ACCENT_INK, INK, INK_SOFT } from "../../editorial/style";
 import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -49,8 +49,8 @@ export const PostgresScene: React.FC = () => {
   const mostAt = n.word("rename", "most of us");
   const nickAt = n.word("rename", "Postgres");
 
-  const TOP = y(370);
-  const H = h(250);
+  const TOP = y(400);
+  const H = h(200);
   const W = 520;
   const XS = [96, 700, 1304];
   const mid = TOP + H / 2;
@@ -181,7 +181,7 @@ export const PostgresScene: React.FC = () => {
           {
             at: officiallyAt - 2,
             children: (
-              <span style={{ display: "inline-flex", gap: "0.5em", alignItems: "baseline" }}>
+              <span style={{ display: "inline-flex", gap: "0.45em", alignItems: "baseline" }}>
                 <span>said</span>
                 {SYLLABLES.map((s, i) => {
                   const p = Math.min(1, pop(frame, syllable(i) - 2, fps, 12));
@@ -196,6 +196,7 @@ export const PostgresScene: React.FC = () => {
                         fontWeight: 650,
                       }}
                     >
+                      {i ? <span style={{ color: INK_SOFT, fontWeight: 400, marginRight: "0.45em" }}>·</span> : null}
                       {s}
                     </span>
                   );
@@ -208,7 +209,7 @@ export const PostgresScene: React.FC = () => {
       <Tag x={XS[2] + 28} y={TOP + H + 18} at={mostAt - 2} size={23} color={INK}>
         or, as most of us say it, <Mark at={nickAt - 2}>Postgres</Mark>
       </Tag>
-      <Spot id="db-relational-history-elephant" at={mostAt - 6} left={1500} top={y(700)} width={250} height={200} />
+      <Spot id="db-relational-history-elephant" at={mostAt - 6} left={1560} top={y(680)} width={260} height={230} />
     </AbsoluteFill>
   );
 };

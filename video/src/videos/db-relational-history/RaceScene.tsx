@@ -13,13 +13,22 @@ const X: XScale = { lo: 1972, hi: 1986, x0: 330, x1: 1740 };
 const TICKS = [1972, 1974, 1976, 1978, 1980, 1982, 1984, 1986];
 
 /** A year's dot on a lane, popping in on `at`. */
-const Dot: React.FC<{ x: number; y: number; at: number; color: string; r?: number; swell?: number }> = ({ x, y, at, color, r = 11, swell = 0 }) => {
+const Dot: React.FC<{ x: number; y: number; at: number; color: string; r?: number; swell?: number; dim?: number }> = ({
+  x,
+  y,
+  at,
+  color,
+  r = 11,
+  swell = 0,
+  dim,
+}) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = Math.min(1, pop(frame, at, fps, 12));
   if (p <= 0.001) return null;
+  const d = dim === undefined ? 0 : ease(frame, dim, 16) * 0.55;
   return (
-    <Svg>
+    <Svg opacity={1 - d}>
       <circle cx={x} cy={y} r={r * p * (1 + swell * 0.4)} fill={color} stroke={PAPER} strokeWidth={2} />
     </Svg>
   );
@@ -162,18 +171,18 @@ export const RaceScene: React.FC = () => {
       />
 
       {/* ── The launches ── */}
-      <Dot x={sx(X, 1979)} y={LANE_CO} at={seventyNineAt - 2} color={ACCENT} r={13} swell={pulse(frame, buyAt - 2, 20)} />
+      <Dot x={sx(X, 1979)} y={LANE_CO} at={seventyNineAt - 2} color={ACCENT} r={13} swell={pulse(frame, buyAt - 2, 20)} dim={onlyAt - 4} />
       <Tag x={sx(X, 1979) + 24} y={LANE_CO - 52} at={oracleAt - 2} dim={onlyAt - 4} size={26} color={ACCENT_INK} weight={700}>
         Oracle, 1979
       </Tag>
       <Tag x={sx(X, 1979) + 24} y={LANE_CO + 20} at={firstAt - 2} dim={onlyAt - 4} size={21} color={INK}>
         the first SQL database <Mark at={buyAt - 2}>on sale</Mark>
       </Tag>
-      <Dot x={sx(X, 1981)} y={LANE_IBM} at={eightyOneAt - 2} color={INK} />
+      <Dot x={sx(X, 1981)} y={LANE_IBM} at={eightyOneAt - 2} color={INK} dim={onlyAt - 4} />
       <Tag x={sx(X, 1981)} y={LANE_IBM + 20} at={eightyOneAt} dim={onlyAt - 4} size={21} color={INK} align="center">
         SQL/DS, 1981
       </Tag>
-      <Dot x={sx(X, 1983)} y={LANE_IBM} at={eightyOneAt + 10} color={INK} />
+      <Dot x={sx(X, 1983)} y={LANE_IBM} at={eightyOneAt + 10} color={INK} dim={onlyAt - 4} />
       <Tag x={sx(X, 1983)} y={LANE_IBM + 20} at={eightyOneAt + 12} dim={onlyAt - 4} size={21} color={INK} align="center">
         DB2, 1983
       </Tag>
