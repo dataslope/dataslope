@@ -20,9 +20,9 @@ const JIT_Y = jitter(73, OUTLIERS.values.length);
 
 /** The lesson's three kinds of outlier, and what each one calls for. */
 const KINDS = [
-  { word: "error", title: "An error", eg: "a typo, a unit mix-up", act: "Fix it, or drop it and say why" },
-  { word: "placeholder", title: "A placeholder", eg: "−999 standing for missing", act: "Treat it as missing" },
-  { word: "real", title: "Something real", eg: "your biggest customer, a fraud", act: "Keep it, and use robust statistics" },
+  { word: "error", egWord: "typo", title: "An error", eg: "a typo, a unit mix-up", act: "Fix it, or drop it and say why" },
+  { word: "placeholder", egWord: "minus nine", title: "A placeholder", eg: "−999 standing for missing", act: "Treat it as missing" },
+  { word: "real", egWord: "biggest customer", title: "Something real", eg: "your biggest customer, a fraud", act: "Keep it, and use robust statistics" },
 ] as const;
 
 /**
@@ -40,6 +40,11 @@ export const OutlierScene: React.FC = () => {
   const farAt = n.word("outlier", "far");
   const allAt = n.word("outlier", "all");
   const kindAt = KINDS.map((k) => n.word("kinds", k.word));
+  const egAt = KINDS.map((k) => n.word("kinds", k.egWord));
+  const fraudAt = n.word("kinds", "fraud");
+  const sixOfAt = n.word("ordinary", "six");
+  const longTailAt = n.word("ordinary", "long tail");
+  const surestAt = n.word("plot-in", "surest");
   const flagFrom = n.beat("flag").from;
   const twoHundredAt = n.word("flag", "two hundred");
   const genuineAt = n.word("flag", "genuine");
@@ -62,7 +67,7 @@ export const OutlierScene: React.FC = () => {
   const zX = sx(X, OUTLIERS.zCut);
   const fence = ease(frame, fencesAt - 4, 16);
   const zLine = ease(frame, zAt - 4, 16);
-  const tailBand = ease(frame, fourAt - 4, 16);
+  const tailBand = ease(frame, longTailAt - 4, 16);
   const cardsOut = ease(frame, flagFrom - 6, 14) * (1 - ease(frame, decideAt - 8, 14));
   const acts = ease(frame, decideAt - 6, 16);
 
@@ -141,6 +146,18 @@ export const OutlierScene: React.FC = () => {
         </Svg>
         <Axis scale={X} base={base} ticks={[0, 50, 100, 150, 200]} at={outlierFrom} />
         <Pulse x={sx(X, 200)} y={ySpread(at(200))} at={farAt - 2} color={DATA} r={7} />
+        <Pulse x={sx(X, 200)} y={ySpread(at(200))} at={kindAt[2] - 2} color={DATA} r={7} />
+        {OUTLIERS.iqrFlagged.map((v, k) => (
+          <Pulse key={v} x={sx(X, v)} y={ySpread(at(v))} at={sixOfAt - 2 + k * 2} color={INK} r={R + 6} />
+        ))}
+        {OUTLIERS.iqrFlagged.map((v, k) => (
+          <Pulse key={`s${v}`} x={sx(X, v)} y={ySpread(at(v))} at={surestAt + k * 2} color={STAT} r={R + 6} />
+        ))}
+        {OUTLIERS.iqrFlagged
+          .filter((v) => !planted.has(v))
+          .map((v, k) => (
+            <Pulse key={`f${v}`} x={sx(X, v)} y={ySpread(at(v))} at={fourAt + k * 3} color={INK} r={R + 6} />
+          ))}
 
         {/* The bulk: two hundred draws from one skewed distribution. */}
         <Bracket x0={sx(X, 5)} x1={sx(X, 40)} y={strip - JIT - 14} at={twoHundredAt - 4} out={fencesAt - 4} up />
@@ -181,7 +198,15 @@ export const OutlierScene: React.FC = () => {
             }}
           >
             <div style={{ ...label(26, INK), fontWeight: 700 }}>{k.title}</div>
-            <div style={{ ...body(28), color: INK_SOFT, marginTop: 8, whiteSpace: "nowrap" }}>{k.eg}</div>
+            <div style={{ ...body(28), color: INK_SOFT, marginTop: 8, whiteSpace: "nowrap", opacity: Math.max(ease(frame, egAt[i] - 4, 12), acts) }}>
+              {i === 2 ? (
+                <>
+                  your biggest customer, <Mark at={fraudAt - 2}>a fraud</Mark>
+                </>
+              ) : (
+                k.eg
+              )}
+            </div>
             <div style={{ ...note(24, STAT_INK), fontWeight: 650, marginTop: 14, opacity: ease(frame, decideAt - 6 + i * 6, 12), whiteSpace: "nowrap", ...halo }}>
               {k.act}
             </div>

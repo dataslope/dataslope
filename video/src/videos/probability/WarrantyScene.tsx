@@ -8,7 +8,7 @@ import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BINOM, num, pct, WARRANTY } from "./data";
-import { Big, Count, DATA, Headline, lerp, STAT_INK, Svg, Sweep, VBracket } from "./parts";
+import { Big, Count, DATA, Headline, Held, lerp, STAT_INK, Svg, Sweep, VBracket } from "./parts";
 
 const RIGHT = 1150;
 /** The closing band: three named shapes, small. */
@@ -47,8 +47,13 @@ export const WarrantyScene: React.FC = () => {
   const sumAt = n.word("next", "sum up");
   const shapesAt = n.word("next", "familiar shapes");
   const namedAt = n.word("next", "named distributions");
+  const evAt = n.word("next", "expected value");
+  const varAt = n.word("next", "variance");
+  const manyRvAt = n.word("next", "many random variables");
+  const lastEnd = n.word("next", "distributions", { edge: "end" });
 
-  const dim = ease(frame, nextFrom - 4, 18) * 0.5;
+  // The warranty sets back for the bridge, and further once it has been said.
+  const dim = ease(frame, nextFrom - 4, 18) * 0.5 + ease(frame, lastEnd + 16, 20) * 0.35;
   const rows = [
     { name: "Device fails", p: WARRANTY.pFail, pays: WARRANTY.payout, at: failsAt - 4, pAt: fifteenAt - 2 },
     { name: "Device works", p: 1 - WARRANTY.pFail, pays: 0, at: fifteenAt + 4, pAt: fifteenAt + 8 },
@@ -140,43 +145,58 @@ export const WarrantyScene: React.FC = () => {
             average profit <b style={{ color: STAT_INK }}>${fmt(WARRANTY.simProfit)}</b>
           </span>
         </Ink>
-        <Ink at={storeAt - 4} dur={14} style={{ left: RIGHT, top: y(400), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 650 }}>The store: about +${fmt(WARRANTY.eProfit, 0)} a warranty</span>
+        <Ink at={storeAt - 4} dur={14} style={{ left: RIGHT, top: y(384), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16 }}>
+          <span style={{ ...note(26, INK), width: 130, display: "inline-block" }}>The store</span>
+          <Big size={60} color={OK_INK}>
+            +${fmt(WARRANTY.eProfit, 0)}
+          </Big>
+          <span style={note(22, INK_SOFT)}>a warranty, on average</span>
         </Ink>
-        <Ink at={buyerAt - 4} dur={14} style={{ left: RIGHT, top: y(450), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(26, STAT_INK), fontWeight: 650 }}>The buyer: about −${fmt(WARRANTY.eProfit, 0)}, on average</span>
+        <Ink at={buyerAt - 4} dur={14} style={{ left: RIGHT, top: y(452), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16 }}>
+          <span style={{ ...note(26, INK), width: 130, display: "inline-block" }}>The buyer</span>
+          <Big size={60} color={STAT_INK}>
+            −${fmt(WARRANTY.eProfit, 0)}
+          </Big>
+          <span style={note(22, INK_SOFT)}>a losing bet</span>
         </Ink>
 
         {/* ── When the average isn't the whole story ── */}
         <Ink at={manyAt - 4} dur={14} style={{ left: RIGHT, top: y(560), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(32, true), color: INK }}>Faced many times, the average decides.</span>
+          <span style={{ ...body(34, true), color: INK }}>Faced many times, the average decides.</span>
         </Ink>
         <Ink at={surviveAt - 4} dur={14} style={{ left: RIGHT, top: y(620), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(32, true), color: INK }}>
+          <span style={{ ...body(34, true), color: INK }}>
             Faced once, and ruinous, <Sweep at={moreAt - 2}>the spread</Sweep> does.
           </span>
         </Ink>
         <Note at={insuranceAt - 2} x={RIGHT} y={y(690)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Insurance is paying to avoid the spread.</span>
+          <span style={{ ...body(30), color: INK_SOFT, whiteSpace: "nowrap" }}>Insurance is paying to avoid the spread.</span>
         </Note>
       </div>
 
       {/* ── The bridge: one variable's summary, and the shapes many share ── */}
-      <Ink at={sumAt - 4} dur={14} style={{ left: 160, top: y(796), whiteSpace: "nowrap" }}>
-        <span style={label(23, INK)}>
-          E[X] and Var(X) sum up one variable.
-          <span style={{ opacity: ease(frame, shapesAt - 4, 10), color: INK_SOFT }}> Many share a shape:</span>
-        </span>
-      </Ink>
+      <div style={{ position: "absolute", left: 160, top: y(790), display: "flex", alignItems: "baseline", gap: "0.3em", whiteSpace: "nowrap", ...label(26, INK) }}>
+        <Held at={evAt - 2}>E[X]</Held>
+        <Held at={varAt - 2}>and Var(X)</Held>
+        <Held at={sumAt - 2}>sum up one variable.</Held>
+        <Held at={manyRvAt - 2} style={{ color: INK_SOFT }}>
+          Many share a shape:
+        </Held>
+      </div>
+      {(["binomial", "normal", "exponential"] as const).map((t, k) => (
+        <Note key={t} at={lastEnd + 26 + k * 8} x={SHAPES.x[k]} y={y(SHAPES.base) + 10}>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>{t}</span>
+        </Note>
+      ))}
       <Svg>
-        {shape(0, shapesAt - 4)}
-        {shape(1, shapesAt + 4)}
-        {shape(2, shapesAt + 12)}
+        {shape(0, manyRvAt - 2)}
+        {shape(1, shapesAt - 2)}
+        {shape(2, namedAt - 6)}
         {[0, 1, 2].map((k) => (
           <line
             key={k}
             x1={SHAPES.x[k]}
-            x2={lerp(SHAPES.x[k], SHAPES.x[k] + SHAPES.w, ease(frame, shapesAt - 6 + k * 8, 12))}
+            x2={lerp(SHAPES.x[k], SHAPES.x[k] + SHAPES.w, ease(frame, [manyRvAt - 4, shapesAt - 4, namedAt - 8][k], 12))}
             y1={y(SHAPES.base) + 1}
             y2={y(SHAPES.base) + 1}
             stroke={INK}

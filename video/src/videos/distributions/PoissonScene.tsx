@@ -71,10 +71,11 @@ export const PoissonScene: React.FC = () => {
   const clumpingAt = n.word("same", "clumping");
   const understateAt = n.word("same", "understate");
   const moreAt = n.word("geometric-in", "One more");
+  const nameAt = n.word("geometric-in", "name");
 
   const unit = h(TALL) / Math.max(...POISSON.pmf);
   const base = y(BASE);
-  const dim = ease(frame, moreAt - 4, 16) * 0.55;
+  const dim = ease(frame, moreAt - 4, 16) * 0.35 + ease(frame, nameAt - 4, 16) * 0.3;
   const barAt = (k: number) => poissonAt - 8 + k * 1.6;
   const askAt = (k: number) => eightAt - 2 + (k - POISSON.atLeast) * 1.6;
   const tailX0 = sx(X, POISSON.atLeast) - 20;
@@ -105,7 +106,7 @@ export const PoissonScene: React.FC = () => {
         out={moreAt - 6}
       />
 
-      <Spot id="distributions-desk-bell" at={deskAt - 4} out={moreAt} left={1500} top={y(92)} width={290} height={270} />
+      <Spot id="distributions-desk-bell" at={deskAt - 4} out={nameAt - 2} left={1500} top={y(92)} width={290} height={270} />
 
       <div style={{ position: "absolute", inset: 0, opacity: 1 - dim }}>
         <Drift from={poissonFrom} to={n.beat("geometric-in").to + 30}>

@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { fmt, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
@@ -27,7 +27,7 @@ export const DieScene: React.FC = () => {
   const { y, h } = useLayout();
 
   // ── Cues ──
-  const expectedAt = n.word("die", "expected value");
+  const dieFrom = n.beat("die").from;
   const averageAt = n.word("die", "long-run average");
   const loadedAt = n.word("die", "loaded die");
   const sixAt = n.word("die", "six half the time");
@@ -48,6 +48,8 @@ export const DieScene: React.FC = () => {
   const rootAt = n.word("spread", "square root");
   const sdAt = n.word("spread", "one point eight");
   const weighAt = n.word("decide-in", "weigh a decision");
+  const decideFrom = n.beat("decide-in").from;
+  const stdAt = n.word("spread", "standard deviation");
 
   const base = y(PMF.base);
   const grow = (v: number) => ease(frame, v === 6 ? sixAt - 4 : tenthAt - 10 + (v - 1) * 3, 16);
@@ -55,10 +57,9 @@ export const DieScene: React.FC = () => {
   const fulcrum = ease(frame, balancesAt - 8, 22);
   const eX = fxv(DIE.expected);
   const fulcrumX = lerp(PMF.x0 + 30, eX, fulcrum);
-  const away = ease(frame, weighAt - 6, 18);
 
   return (
-    <AbsoluteFill style={{ opacity: 1 - away * 0.35 }}>
+    <AbsoluteFill>
       {/* ── Sound: the bars, the weighted terms, the fulcrum, the rolls, the spread ── */}
       <Sfx name="el-pop" at={sixAt - 4} level={-30} />
       <Sfx name="el-sprinkle" at={tenthAt - 10} level={-34} />
@@ -68,7 +69,8 @@ export const DieScene: React.FC = () => {
       <Sfx name="el-pencil" at={squaredAt - 4} level={-34} />
       <Sfx name="el-tap" at={sdAt - 4} level={-29} />
 
-      <Headline top={y(150)} first="Expected value:" second="the long-run average." firstAt={expectedAt - 4} secondAt={averageAt - 2} />
+      <Headline top={y(150)} first="Expected value:" second="the long-run average." firstAt={dieFrom - 6} secondAt={averageAt - 2} out={decideFrom - 6} />
+      <Headline top={y(150)} first="Now, a decision" second="worth weighing." firstAt={decideFrom - 2} secondAt={weighAt - 2} />
       <FigLabel n="7" title="A loaded die: the chance of each face" at={loadedAt - 4} x={PMF.x0} y={y(268)} />
 
       {/* ── The pmf ── */}
@@ -77,7 +79,15 @@ export const DieScene: React.FC = () => {
           const g = grow(v);
           if (g <= 0) return null;
           const bh = h(PMF.unit * DIE.probs[i]) * g;
-          return <rect key={v} x={fxv(v) - PMF.barW / 2} y={base - bh} width={PMF.barW} height={bh} fill={v === DIE.mode ? STAT : DATA} opacity={0.78} />;
+          // Each bar flashes as its face is weighted by its chance.
+          const t = multiplyAt - 2 + i * 4;
+          const flash = ease(frame, t, 6) * (1 - ease(frame, t + 8, 10));
+          return (
+            <g key={v}>
+              <rect x={fxv(v) - PMF.barW / 2} y={base - bh} width={PMF.barW} height={bh} fill={v === DIE.mode ? STAT : DATA} opacity={0.78} />
+              {flash > 0 ? <rect x={fxv(v) - PMF.barW / 2} y={base - bh} width={PMF.barW} height={bh} fill={HIGHLIGHT} opacity={flash} /> : null}
+            </g>
+          );
         })}
         {/* The axis, which becomes a beam. */}
         <rect
@@ -96,13 +106,24 @@ export const DieScene: React.FC = () => {
             opacity={Math.min(1, fulcrum * 2)}
           />
         ) : null}
+        {/* One standard deviation either side of the mean, laid on the beam. */}
+        {ease(frame, stdAt - 2, 16) > 0 ? (
+          <rect
+            x={eX - (fxv(1 + DIE.sd) - fxv(1)) * ease(frame, stdAt - 2, 16)}
+            y={base - h(26)}
+            width={2 * (fxv(1 + DIE.sd) - fxv(1)) * ease(frame, stdAt - 2, 16)}
+            height={h(26)}
+            fill={STAT}
+            opacity={0.28}
+          />
+        ) : null}
         {/* The spread: each face's distance from the mean. */}
         {DIE.values.map((v, i) => {
           const p = ease(frame, squaredAt - 6 + i * 3, 12);
           if (p <= 0) return null;
           const yy = base + h(150) + i * 10;
           return (
-            <line key={v} x1={eX} x2={lerp(eX, fxv(v), p)} y1={yy} y2={yy} stroke={v === DIE.mode ? STAT : DATA} strokeWidth={3} strokeLinecap="round" opacity={0.8} />
+            <line key={v} x1={eX} x2={lerp(eX, fxv(v), p)} y1={yy} y2={yy} stroke={v === DIE.mode ? STAT : DATA} strokeWidth={5} strokeLinecap="round" opacity={0.8} />
           );
         })}
       </Svg>
@@ -154,7 +175,7 @@ export const DieScene: React.FC = () => {
           <span style={{ opacity: ease(frame, faceAt - 2, 10), fontWeight: 500, color: INK }}>, not a face</span>
         </span>
       </Note>
-      <Spot id="probability-seesaw" at={beamAt - 2} out={squaredAt - 8} left={1300} top={y(640)} width={480} height={280} />
+      <Spot id="probability-seesaw" at={beamAt - 2} out={squaredAt - 8} left={1280} top={y(650)} width={540} height={220} />
 
       {/* ── The sum ── */}
       <Ink at={addAt - 4} dur={18} style={{ left: RIGHT, top: y(330), whiteSpace: "nowrap" }}>
@@ -175,7 +196,7 @@ export const DieScene: React.FC = () => {
       </Ink>
       <Ink at={rollAt - 4} dur={14} style={{ left: RIGHT, top: y(524), whiteSpace: "nowrap" }}>
         <span style={note(26, INK)}>
-          <Count at={rollAt - 2} dur={26} to={DIE.draws} format={num} /> rolls:{" "}
+          <Count at={rollAt - 2} dur={30} to={DIE.draws} format={num} style={{ ...note(34, INK), fontWeight: 700 }} /> rolls:{" "}
           <span style={{ opacity: ease(frame, comesAt - 2, 10) }}>
             mean <b>{fmt(DIE.simMean, 3)}</b>
           </span>
@@ -203,9 +224,6 @@ export const DieScene: React.FC = () => {
       <Note at={squaredAt + 2} x={PMF.x0} y={base + h(150) + 66}>
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>each face&apos;s distance from 4.5, squared and weighted by its chance</span>
       </Note>
-      <Ink at={weighAt - 4} dur={14} style={{ left: RIGHT, top: y(800), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(30, true), color: INK }}>Now, a decision.</span>
-      </Ink>
       {/* The axis label, once the faces are in. */}
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: ease(frame, loadedAt + 6, 12) * (1 - beam) }}>
         <text x={PMF.x0 + PMF.pitch * 6} y={base + h(28) + 60} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 650, fill: INK_SOFT }}>

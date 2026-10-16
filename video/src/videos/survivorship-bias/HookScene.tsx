@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 import { Plane, SKIN } from "./parts";
-import { PartName } from "../sampling/PartName";
+import { KickerRule, PartName } from "../sampling/PartName";
 
 /** One mission as a strip of planes; the one at LOST never comes home. */
 const STRIP = 10;
@@ -29,6 +29,8 @@ export const HookScene: React.FC = () => {
   const { y } = useLayout();
 
   const yearAt = n.word("hook", "1943");
+  const waldAt = n.word("hook", "Abraham Wald");
+  const wartimeAt = n.word("hook", "wartime");
   const bomberAt = n.word("hook", "bomber");
   const vulnerableAt = n.word("hook", "vulnerable");
   const evidenceAt = n.word("evidence", "evidence");
@@ -41,7 +43,7 @@ export const HookScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound (merged video only; the standalone has sfx off) ── */}
-      <Sfx name="el-pop" at={bomberAt - 8} level={-30} />
+      <Sfx name="el-pop" at={wartimeAt - 4} level={-30} />
       <Sfx name="el-pencil" at={vulnerableAt} level={-33} />
       <Sfx name="el-sprinkle" at={evidenceAt} level={-34} />
       <Sfx name="el-whoosh" at={homeAt} level={-34} />
@@ -50,6 +52,11 @@ export const HookScene: React.FC = () => {
       <Ink at={yearAt - 6} dur={14} style={{ left: 96, top: y(112) }}>
         <span style={label(21, ACCENT_INK)}>
           <PartName />Statistical Research Group, Columbia, 1943
+          {/* The statistician, as he is named. */}
+          <span style={{ display: "inline-block", opacity: ease(frame, waldAt - 2, 14), translate: `${(1 - ease(frame, waldAt - 2, 14)) * -10}px 0` }}>
+            <KickerRule />
+            <span style={{ color: INK }}>Abraham Wald</span>
+          </span>
         </span>
       </Ink>
       <Ink at={yearAt} dur={20} style={{ left: 92, top: y(156), ...headline(84), whiteSpace: "nowrap" }}>
@@ -90,8 +97,8 @@ export const HookScene: React.FC = () => {
             top: y(118),
             width: 660,
             height: 350,
-            opacity: pop(frame, bomberAt - 8, fps, 16),
-            transform: `translate(${(1 - pop(frame, bomberAt - 8, fps, 16)) * 60}px, ${bob(frame, 6, 120)}px)`,
+            opacity: pop(frame, wartimeAt - 4, fps, 16),
+            transform: `translate(${(1 - pop(frame, wartimeAt - 4, fps, 16)) * 60}px, ${bob(frame, 6, 120)}px)`,
           }}
         />
       ) : null}

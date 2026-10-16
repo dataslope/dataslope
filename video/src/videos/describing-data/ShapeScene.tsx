@@ -95,6 +95,9 @@ export const ShapeScene: React.FC = () => {
   const groupsAt = n.word("two-peaks", "two groups");
   const mixAt = n.word("two-peaks", "Mix");
   const valleyAt = n.word("two-peaks", "valley");
+  const columnAt = n.word("two-peaks", "one column");
+  const heightsAt = n.word("two-peaks", "two groups", { nth: 2 });
+  const landsAt = n.word("two-peaks", "lands");
   const neitherAt = n.word("neither", "neither");
   const tailsAt = n.word("tails-in", "tails");
   const middleAt = n.word("tails-in", "middle");
@@ -103,7 +106,7 @@ export const ShapeScene: React.FC = () => {
   const split = ease(frame, groupsAt - 2, 18);
   const hb = y(H_BASE);
   const hUnit = h(1.95);
-  const meanIn = ease(frame, valleyAt - 6, 18);
+  const meanIn = ease(frame, landsAt - 4, 22);
   const meanX = sx(HX, HEIGHTS.mean);
   const peakH = Math.max(...HEIGHTS.counts) * hUnit;
 
@@ -121,7 +124,7 @@ export const ShapeScene: React.FC = () => {
       <Sfx name="el-sprinkle" at={leftAt - 6} level={-35} />
       <Sfx name="el-sprinkle" at={peaksAt - 4} level={-33} />
       <Sfx name="el-whoosh" at={groupsAt - 2} level={-34} />
-      <Sfx name="el-tap" at={valleyAt - 6} level={-28} />
+      <Sfx name="el-tap" at={landsAt - 4} level={-28} />
 
       <Kicker at={shapeFrom - 10}>Shape, tails and outliers</Kicker>
 
@@ -208,7 +211,7 @@ export const ShapeScene: React.FC = () => {
             <Tag x={sx(HX, HEIGHTS.muA)} y={hb - peakH - h(64)} opacity={ease(frame, mixAt - 2, 12)} color={"var(--ds-blue-ink)"} size={23} bold>
               <Mark at={neitherAt - 2}>one group, around {HEIGHTS.muA}</Mark>
             </Tag>
-            <Tag x={sx(HX, HEIGHTS.muB)} y={hb - peakH - h(64)} opacity={ease(frame, mixAt + 6, 12)} color={SECOND_INK} size={23} bold>
+            <Tag x={sx(HX, HEIGHTS.muB)} y={hb - peakH - h(64)} opacity={ease(frame, heightsAt - 2, 12)} color={SECOND_INK} size={23} bold>
               <Mark at={neitherAt + 4}>another, around {HEIGHTS.muB}</Mark>
             </Tag>
             {meanIn > 0 ? (
@@ -220,6 +223,10 @@ export const ShapeScene: React.FC = () => {
               Mean {fmt(HEIGHTS.mean, 1)}
             </Tag>
             <Pulse x={meanX} y={hb - h(100)} at={neitherAt - 2} color={STAT} r={8} />
+            <Pulse x={meanX} y={hb - h(100)} at={middleAt - 2} color={STAT} r={8} />
+            <Tag x={sx(HX, 206)} y={hb - h(60)} opacity={ease(frame, columnAt - 2, 12) * (1 - ease(frame, mixAt - 4, 10))} color={INK_SOFT} size={21} align="right">
+              one column
+            </Tag>
           </Drift>
           <Ink at={tailsAt - 2} dur={16} style={{ left: 160, top: y(910), whiteSpace: "nowrap" }}>
             <span style={label(22, INK_SOFT)}>The tails: how often values land far out</span>

@@ -34,6 +34,7 @@ export const WhichScene: React.FC = () => {
   // ── Cues ──
   const plotsFrom = n.beat("plots").from;
   const histAt = n.word("plots", "histogram");
+  const shapeOfAt = n.word("plots", "shape");
   const fewAt = n.word("plots", "few bin widths");
   const percentilesAt = n.word("ecdf", "percentiles");
   const ecdfAt = n.word("ecdf", "ECDF");
@@ -51,6 +52,8 @@ export const WhichScene: React.FC = () => {
   const meansAt = n.word("next", "means");
 
   const fade = 1 - ease(frame, seenAt - 4, 20) * 0.6;
+  /** After the last word, the four figures clear away one at a time. */
+  const clear = (i: number) => 1 - ease(frame, meansAt + 18 + i * 14, 14);
   const glow = ease(frame, haveAt - 2, 8) * (1 - ease(frame, haveAt + 12, 14));
 
   // ── Histogram: twenty bins, flicked to eighty and back on "a few bin widths" ──
@@ -128,11 +131,9 @@ export const WhichScene: React.FC = () => {
 
       <div style={{ position: "absolute", inset: 0, opacity: fade }}>
         <Drift from={plotsFrom} to={meansAt + 40} scale={0.02} origin={[960, y(640)]}>
-          {panel(COL[0], y(330), "Histogram", "the shape of one variable", histAt)}
-          {panel(COL[1], y(330), "ECDF", "percentiles, with nothing to tune", percentilesAt)}
-          {panel(COL[0], y(600), "Box plot", "groups side by side", boxAt)}
-          {panel(COL[1], y(600), "Violin", "the shape a box leaves out", violinAt)}
 
+          <div style={{ position: "absolute", inset: 0, opacity: clear(0) }}>
+            {panel(COL[0], y(330), "Histogram", "the shape of one variable", shapeOfAt)}
           {/* Histogram. */}
           <Svg>
             {Array.from({ length: 80 }, (_, i) => {
@@ -147,6 +148,10 @@ export const WhichScene: React.FC = () => {
             <line x1={hs.x0} x2={hs.x1} y1={base1 + 0.5} y2={base1 + 0.5} stroke={INK} strokeWidth={1.5} opacity={ease(frame, histAt - 6, 12)} />
           </Svg>
 
+          </div>
+
+          <div style={{ position: "absolute", inset: 0, opacity: clear(1) }}>
+            {panel(COL[1], y(330), "ECDF", "percentiles, with nothing to tune", percentilesAt)}
           {/* ECDF, and one percentile read off it. */}
           <Svg opacity={ease(frame, ecdfAt - 6, 10)}>
             <line x1={es.x0} x2={es.x1} y1={base1 + 0.5} y2={base1 + 0.5} stroke={INK} strokeWidth={1.5} />
@@ -170,6 +175,10 @@ export const WhichScene: React.FC = () => {
             at or below {fmt(BINS.box.median, 1)}
           </Tag>
 
+          </div>
+
+          <div style={{ position: "absolute", inset: 0, opacity: clear(2) }}>
+            {panel(COL[0], y(600), "Box plot", "groups side by side", boxAt)}
           {/* Box plot. */}
           {box > 0 ? (
             <Svg opacity={box}>
@@ -193,6 +202,10 @@ export const WhichScene: React.FC = () => {
             the second peak is in here, unseen
           </Tag>
 
+          </div>
+
+          <div style={{ position: "absolute", inset: 0, opacity: clear(3) }}>
+            {panel(COL[1], y(600), "Violin", "the shape a box leaves out", violinAt)}
           {/* Violin. */}
           <Svg opacity={ease(frame, violinAt - 6, 10)}>
             <path d={`${upper} ${lower} Z`} fill={SOFT_FILL} opacity={violinDraw} />
@@ -217,6 +230,8 @@ export const WhichScene: React.FC = () => {
           >
             the second peak
           </Tag>
+          </div>
+
         </Drift>
       </div>
 

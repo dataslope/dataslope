@@ -212,7 +212,7 @@ export const ResampleScene: React.FC = () => {
       <Ink at={distributionAt - 4} dur={14} style={{ left: sx(XZ, 8.12), top: y(HIST_BASE) - h(HIST_H * 0.55), whiteSpace: "nowrap" }}>
         <span style={{ ...note(22, EST_INK), fontWeight: 650 }}>the bootstrap distribution</span>
       </Ink>
-      <Bracket x0={sx(XZ, center - BOOT.bootSe)} x1={sx(XZ, center + BOOT.bootSe)} y={seY} at={spreadAt - 2} color={INK} />
+      <Bracket x0={sx(XZ, center - BOOT.bootSe)} x1={sx(XZ, center + BOOT.bootSe)} y={seY} at={spreadAt - 2} color={PAPER} width={3} />
       <Rule x={sx(XZ, BOOT.lo)} y0={y(HIST_BASE)} y1={y(HIST_BASE) - h(HIST_H) - 56} at={sixOneAt - 4} color={INK} width={2.2} />
       <Rule x={sx(XZ, BOOT.hi)} y0={y(HIST_BASE)} y1={y(HIST_BASE) - h(HIST_H) - 56} at={eightOhAt - 4} color={INK} width={2.2} />
       <IntervalBar x0={sx(XZ, BOOT.lo)} x1={sx(XZ, BOOT.hi)} y={y(HIST_BASE) - h(HIST_H) - 50} at={sixOneAt} dur={18} color={INK} width={4} tick={10} />

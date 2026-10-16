@@ -35,6 +35,8 @@ export const DivisorScene: React.FC = () => {
   // ── Cues ──
   const divisorFrom = n.beat("divisor").from;
   const distancesAt = n.word("divisor", "distances");
+  const nineAt = n.word("divisor", "nine");
+  const wildAt = n.word("robust-in", "single wild value");
   const ownAt = n.word("divisor", "own mean");
   const closerAt = n.word("closest", "closer");
   const otherAt = n.word("closest", "any other number");
@@ -89,7 +91,7 @@ export const DivisorScene: React.FC = () => {
 
       {/* ── Headlines ── */}
       <Ink at={divisorFrom - 4} dur={20} out={measuredFrom - 6} style={{ left: 92, top: y(150), ...headline(80), whiteSpace: "nowrap" }}>
-        Why nine, and not ten?
+        Why <Mark at={nineAt - 2}>nine</Mark>, and not ten?
       </Ink>
       <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
         <Ink at={measuredFrom - 2} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
@@ -245,7 +247,7 @@ export const DivisorScene: React.FC = () => {
             { code: "np.std(x)", note: "divides by n", value: DIVISOR.numpyStd, at: numpyAt },
             { code: "pd.Series(x).std()", note: "divides by n − 1", value: DIVISOR.pandasStd, at: pandasAt },
           ].map((c, i) => {
-            const p = ease(frame, c.at - 6, 14);
+            const p = ease(frame, c.at - 6, 14) * (1 - 0.6 * ease(frame, wildAt - 4, 12));
             if (p <= 0) return null;
             return (
               <div

@@ -163,7 +163,15 @@ export const CoverageScene: React.FC = () => {
           const dim = yoursOn * (mine ? 0 : 0.7);
           return (
             <g key={i} opacity={1 - dim}>
-              <line x1={a} x2={b} y1={rowY(i)} y2={rowY(i)} stroke={INK} strokeWidth={(mine ? lerp(1.4, 4, yoursOn) : 1.4) * lit} opacity={0.55 + 0.45 * (mine ? yoursOn : 0)} />
+              <line
+                x1={a}
+                x2={b}
+                y1={rowY(i)}
+                y2={rowY(i)}
+                stroke={INK}
+                strokeWidth={(mine ? lerp(1.4, 4, yoursOn) : i === 0 ? lerp(3.4, 1.4, ease(frame, fastFrom, 12)) : 1.4) * lit}
+                opacity={0.55 + 0.45 * (mine ? yoursOn : i === 0 ? 1 - ease(frame, fastFrom, 12) : 0)}
+              />
               {tint > 0 ? <line x1={a} x2={b} y1={rowY(i)} y2={rowY(i)} stroke={EST} strokeWidth={2.6 * lit} opacity={tint} /> : null}
             </g>
           );

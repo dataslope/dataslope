@@ -186,6 +186,9 @@ export const DinoScene: React.FC = () => {
             );
           })}
         </Svg>
+        <Tag x={1000} y={y(760) + 26} opacity={ease(frame, hundredthAt - 2, 12) * (1 - ease(frame, plotAt, 8))} color={STAT_INK} size={21} align="left">
+          all thirteen agree to within 0.01
+        </Tag>
         <Tag x={1000} y={y(760) + 26} opacity={ease(frame, plotAt + 6, 12)} color={INK_SOFT} size={21} align="left">
           dataset {index + 1} of {DINO.order.length}: {showing.replace("_", " ")}
         </Tag>

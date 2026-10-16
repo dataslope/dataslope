@@ -120,9 +120,8 @@ export const KindsScene: React.FC = () => {
         <React.Fragment key={p.name}>
           <Ink at={parentAt[i] - 4} dur={16} style={{ left: p.x, top: y(PARENT_Y), whiteSpace: "nowrap" }}>
             <div style={{ ...body(52, true), color: INK }}>{p.name}</div>
-          </Ink>
-          <Ink at={(i ? muchAt : whichGroupAt) - 4} dur={14} style={{ left: p.x, top: y(PARENT_Y) + 78, whiteSpace: "nowrap" }}>
-            <div style={note(25, INK_SOFT)}>
+            {/* What it says arrives on "which group" and "how much", "or how many". */}
+            <div style={{ ...note(25, INK_SOFT), marginTop: 12, opacity: ease(frame, (i ? muchAt : whichGroupAt) - 4, 12) }}>
               {p.what}
               <span style={{ opacity: ease(frame, manyAt - 2, 10) }}>{p.more}</span>
             </div>

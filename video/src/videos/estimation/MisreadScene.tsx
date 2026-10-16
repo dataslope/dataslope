@@ -140,8 +140,8 @@ export const MisreadScene: React.FC = () => {
         <span style={{ ...note(25, INK) }}>It pins down their average, not any one person.</span>
       </Note>
       <Axis scale={WIDE} base={y(ROWS[1] + 140)} ticks={[10, 30, 50, 70, 90]} format={(v) => `$${v}`} at={dataAt - 6} />
-      <Note at={backAt} x={WIDE.x0} y={y(ROWS[1] + 150) + 6} out={averageAt - 6}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the same {USERS.n} users, in dollars a month</span>
+      <Note at={backAt} x={WIDE.x0} y={y(ROWS[1] + 30)}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the same {USERS.n} users</span>
       </Note>
       <Svg>
         <rect

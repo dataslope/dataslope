@@ -101,7 +101,7 @@ INSERT INTO orders_flat VALUES
     "flatNotNull",
     `SELECT attname FROM pg_attribute WHERE attrelid = 'orders_flat'::regclass AND attnum > 0 AND attnotnull ORDER BY attnum;`,
   );
-  await show(db, "update", "UPDATE orders_flat SET customer_email = 'ada@new.test' WHERE order_id = 1;");
+  await show(db, "update", "UPDATE orders_flat\nSET customer_email = 'ada@new.test'\nWHERE order_id = 1;");
   await show(
     db,
     "emails",
@@ -110,15 +110,11 @@ FROM orders_flat
 GROUP BY customer_name, customer_email
 ORDER BY customer_name, customer_email;`,
   );
-}
-{
-  const db = await fresh(FLAT);
-  await show(db, "insertProduct", "INSERT INTO orders_flat (product_name, product_price) VALUES ('Mug', 6.00);");
-}
-{
-  const db = await fresh(FLAT);
-  await show(db, "deleteGrace", "DELETE FROM orders_flat WHERE order_id = 3;");
-  await show(db, "lookupGrace", "SELECT customer_email FROM orders_flat WHERE customer_name = 'Grace';");
+  // The other two anomalies, on the same table after that update.
+  await show(db, "flatAfterUpdate", "SELECT * FROM orders_flat ORDER BY order_id;");
+  await show(db, "insertProduct", "INSERT INTO orders_flat (product_name, product_price)\nVALUES ('Mug', 6.00);");
+  await show(db, "deleteGrace", "DELETE FROM orders_flat\nWHERE order_id = 3;");
+  await show(db, "lookupGrace", "SELECT customer_email\nFROM orders_flat\nWHERE customer_name = 'Grace';");
 }
 
 // ── Part 1. The cure: each fact one home ─────────────────────────────────────
@@ -177,7 +173,7 @@ INSERT INTO students VALUES
   (1, 'Ada',   '555-1000, 555-2000'),
   (2, 'Grace', '555-3000');`);
   await show(db, "listCell", "SELECT * FROM students ORDER BY student_id;");
-  await show(db, "listSearch", "SELECT name FROM students WHERE phones = '555-2000';");
+  await show(db, "listSearch", "SELECT name FROM students\nWHERE phones = '555-2000';");
   await show(db, "listTwice", "UPDATE students SET phones = '555-1000, 555-2000, 555-1000' WHERE student_id = 1;");
 }
 {
@@ -233,7 +229,7 @@ LEFT JOIN student_phones p ON p.student_id = s.id
 GROUP BY s.id, s.name
 ORDER BY s.id;`,
   );
-  await show(db, "childTwice", "INSERT INTO student_phones VALUES (104, 1, '555-1000');");
+  await show(db, "childTwice", "INSERT INTO student_phones\nVALUES (104, 1, '555-1000');");
 }
 
 // ── Part 3. Second normal form (second-normal-form) ─────────────────────────
@@ -252,7 +248,7 @@ INSERT INTO order_items_bad VALUES
   (100, 20, 'Pencil',   5),
   (101, 10, 'Notebook', 1);`);
   await show(db, "itemsBad", "SELECT * FROM order_items_bad ORDER BY order_id, product_id;");
-  await show(db, "itemsRename", "UPDATE order_items_bad SET product_name = 'Field Notebook' WHERE product_id = 10;");
+  await show(db, "itemsRename", "UPDATE order_items_bad\nSET product_name = 'Field Notebook'\nWHERE product_id = 10;");
   await show(db, "itemsBadAfter", "SELECT * FROM order_items_bad ORDER BY order_id, product_id;");
 }
 {
@@ -276,7 +272,7 @@ INSERT INTO products VALUES (10, 'Notebook'), (20, 'Pencil');
 INSERT INTO order_items VALUES (100, 10, 2), (100, 20, 5), (101, 10, 1);`);
   await show(db, "itemsProducts", "SELECT * FROM products ORDER BY id;");
   await show(db, "itemsGood", "SELECT * FROM order_items ORDER BY order_id, product_id;");
-  await show(db, "itemsGoodRename", "UPDATE products SET name = 'Field Notebook' WHERE id = 10;");
+  await show(db, "itemsGoodRename", "UPDATE products\nSET name = 'Field Notebook'\nWHERE id = 10;");
   await show(
     db,
     "itemsJoin",
@@ -302,7 +298,7 @@ INSERT INTO orders_bad VALUES
   (101, 1, 'Ada',   'London'),
   (102, 2, 'Grace', 'Baltimore');`);
   await show(db, "cityBad", "SELECT * FROM orders_bad ORDER BY order_id;");
-  await show(db, "cityUpdate", "UPDATE orders_bad SET customer_city = 'Oxford' WHERE order_id = 100;");
+  await show(db, "cityUpdate", "UPDATE orders_bad\nSET customer_city = 'Oxford'\nWHERE order_id = 100;");
   await show(
     db,
     "cityTwo",
@@ -331,7 +327,7 @@ INSERT INTO orders VALUES
   (102, 2, DATE '2026-01-12');`);
   await show(db, "cityCustomers", "SELECT * FROM customers ORDER BY id;");
   await show(db, "cityOrders", "SELECT * FROM orders ORDER BY id;");
-  await show(db, "cityGoodUpdate", "UPDATE customers SET city = 'Oxford' WHERE id = 1;");
+  await show(db, "cityGoodUpdate", "UPDATE customers\nSET city = 'Oxford'\nWHERE id = 1;");
   await show(
     db,
     "cityJoin",
@@ -382,7 +378,7 @@ GROUP BY o.order_date;`,
   );
   await show(db, "summary", "SELECT * FROM daily_sales_summary ORDER BY sales_date;");
   // The video's own change: a line added to order 3 after its day was summarized.
-  await show(db, "sumLate", "INSERT INTO order_items VALUES (105, 3, 4.00);");
+  await show(db, "sumLate", "INSERT INTO order_items\nVALUES (105, 3, 4.00);");
   await show(
     db,
     "sumStale",

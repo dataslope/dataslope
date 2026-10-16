@@ -7,7 +7,7 @@ import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SALARIES } from "./data";
-import { Arrow, AxisBreak, Bracket, DATA, Drift, Kicker, lerp, Pulse, Spot, STAT, STAT_INK, Svg, Tag } from "./parts";
+import { Arrow, AxisBreak, Bracket, Mark, DATA, Drift, Kicker, lerp, Pulse, Spot, STAT, STAT_INK, Svg, Tag } from "./parts";
 
 /** Before the CEO: the ten salaries spread across the page. */
 const NEAR = { lo: 38, hi: 70, x0: 220, x1: 1700 };
@@ -35,16 +35,21 @@ export const SalaryScene: React.FC = () => {
 
   // ── Cues ──
   const hookFrom = n.beat("hook").from;
+  const typicalAt = n.word("hook", "typical");
+  const takeAt = n.word("hook", "So take");
   const tenAt = n.word("hook", "ten salaries");
   const fortyAt = n.word("hook", "forty-two");
   const meanAt = n.word("centers", "mean");
-  const medianAt = n.word("centers", "median");
+  const sevenAt = n.word("centers", "seven");
+  const middleValueAt = n.word("centers", "middle value");
+  const halfAt = n.word("centers", "half");
   const almostAt = n.word("centers", "Almost");
   const ceoAt = n.word("ceo", "CEO");
   const millionAt = n.word("ceo", "million");
   const jumpFrom = n.beat("jump").from;
   const leapsAt = n.word("jump", "leaps");
   const fiftyFiveAt = n.word("jump", "fifty-five");
+  const medianMovesAt = n.word("jump", "median");
   const tenOfAt = n.word("nobody", "Ten");
   const lessAt = n.word("nobody", "less");
   const nobodyAt = n.word("nobody", "nobody");
@@ -53,6 +58,7 @@ export const SalaryScene: React.FC = () => {
   const slidesAt = n.word("balance", "slides");
   const middleFrom = n.beat("middle").from;
   const middleAt = n.word("middle", "middle");
+  const medianAsksAt = n.word("middle", "median");
   const ceoSitsAt = n.word("middle", "CEO");
   const moneyAt = n.word("tail-in", "money");
   const tailAt = n.word("tail-in", "tail");
@@ -65,10 +71,10 @@ export const SalaryScene: React.FC = () => {
   const ceoDrop = ease(frame, millionAt - 8, 14);
 
   // The mean and the median: where they stand, and when they move.
-  const meanV = lerp(SALARIES.mean, SALARIES.ceoMean, ease(frame, leapsAt, 30));
+  const meanV = lerp(lerp(SALARIES.values[0], SALARIES.mean, ease(frame, meanAt - 4, 22)), SALARIES.ceoMean, ease(frame, leapsAt, 30));
   const medianV = lerp(SALARIES.median, SALARIES.ceoMedian, ease(frame, fiftyFiveAt - 6, 16));
   const meanIn = ease(frame, meanAt - 4, 12);
-  const medianIn = ease(frame, medianAt - 4, 12);
+  const medianIn = ease(frame, halfAt - 6, 12);
 
   // The balance: a fulcrum under the plank. It starts back where the mean
   // was, the plank tips toward the CEO, then the fulcrum slides out to the
@@ -108,7 +114,7 @@ export const SalaryScene: React.FC = () => {
 
       {/* ── Headlines ── */}
       <Ink at={hookFrom - 8} dur={20} out={jumpFrom - 6} style={{ left: 92, top: y(150), ...headline(80), whiteSpace: "nowrap" }}>
-        Is the average typical?
+        Is the average <Mark at={typicalAt - 2}>typical</Mark>?
       </Ink>
       <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
         <Ink at={jumpFrom - 4} dur={18} out={middleFrom - 6} style={{ position: "relative", whiteSpace: "nowrap" }}>
@@ -129,7 +135,7 @@ export const SalaryScene: React.FC = () => {
 
       <Spot id="describing-data-seesaw" at={balanceAt - 6} left={1560} top={y(104)} width={270} height={270} />
 
-      <FigLabel n="1" title="Salaries at a small company, in thousands" at={tenAt - 6} x={160} y={y(330)} />
+      <FigLabel n="1" title="Salaries at a small company, in thousands" at={takeAt - 4} x={160} y={y(330)} />
 
       <Drift from={tenAt} to={tailAt + 40} scale={0.022} origin={[960, base]}>
         {/* The empty stretch the mean ends up in. */}
@@ -159,7 +165,7 @@ export const SalaryScene: React.FC = () => {
               y2={base}
               stroke={INK}
               strokeWidth={2.4}
-              opacity={ease(frame, tenAt - 6, 14)}
+              opacity={ease(frame, takeAt - 2, 14)}
             />
             {room > 0 ? (
               <line x1={1530} x2={1730} y1={base} y2={base} stroke={INK} strokeWidth={2.4} opacity={room} />
@@ -204,6 +210,18 @@ export const SalaryScene: React.FC = () => {
         {SALARIES.values.map((v, i) => (
           <Pulse key={v} x={xs[i]} y={base - r - 1.5} at={tenOfAt + i * 2} color={DATA} r={r} />
         ))}
+
+        <Pulse x={xOf(meanV)} y={base - h(118)} at={sevenAt} color={STAT} r={6} />
+        {[4, 5].map((i) => {
+          const ring = ease(frame, middleValueAt - 4, 10) * (1 - ease(frame, ceoAt - 6, 10));
+          return ring > 0 ? (
+            <Svg key={i} opacity={ring}>
+              <circle cx={xs[i]} cy={base - r - 1.5} r={r + 6} fill="none" stroke={INK} strokeWidth={2.2} />
+            </Svg>
+          ) : null;
+        })}
+        <Pulse x={xOf(medianV)} y={base + h(64)} at={medianMovesAt} color={INK} r={5} />
+        <Pulse x={xOf(medianV)} y={base + h(64)} at={medianAsksAt} color={INK} r={5} />
 
         {/* The median, in ink, below the plank. */}
         {medianIn > 0 ? (

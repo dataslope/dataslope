@@ -61,6 +61,8 @@ export const ZScene: React.FC = () => {
   const sevenAt = n.word("position", "ninety-seven point seven");
   const belowAt = n.word("position", "fall below");
   const onlyAt = n.word("skew-in", "only works");
+  const reallyAt = n.word("skew-in", "really is normal");
+  const hundredThirtyAt = n.word("z", "a hundred and thirty");
 
   const { mu, sigma, x } = Z;
   const pdf = (v: number) => normalPdf(v, mu, sigma);
@@ -74,6 +76,8 @@ export const ZScene: React.FC = () => {
   const sweep = ease(frame, leftAt - 6, 30);
   const throb = pulse(frame, positionAt - 4, 22);
   const dim = ease(frame, onlyAt - 6, 14) * 0.3;
+  const curveGlow = pulse(frame, reallyAt - 4, 26);
+  const ring = pulse(frame, hundredThirtyAt - 2, 20);
 
   return (
     <AbsoluteFill>
@@ -108,7 +112,7 @@ export const ZScene: React.FC = () => {
               <path d={areaD(pdf, X.lo, lerp(X.lo, x, sweep), X, py)} fill={ASK_FILL} />
             </Svg>
           ) : null}
-          <Curve d={curveD(pdf, X.lo, X.hi, X, py)} at={zFrom - 6} dur={24} />
+          <Curve d={curveD(pdf, X.lo, X.hi, X, py)} at={zFrom - 6} dur={24} width={3.2 + curveGlow * 3} />
 
           {/* The score ruler. */}
           <Svg opacity={ease(frame, zFrom - 4, 14)}>
@@ -119,7 +123,13 @@ export const ZScene: React.FC = () => {
           </Svg>
           <div style={{ position: "absolute", left: 96, top: base + 10, opacity: ease(frame, zFrom, 14), ...label(21, INK_SOFT) }}>Score</div>
           {TICKS.map((k) => (
-            <Centered key={k} x={zx(k)} y={base + 12} opacity={ease(frame, zFrom + 2, 12)} style={{ ...note(22, INK_SOFT) }}>
+            <Centered
+              key={k}
+              x={zx(k)}
+              y={base + 12}
+              opacity={ease(frame, zFrom + 2, 12)}
+              style={k === 2 && frame >= hundredThirtyAt - 2 ? askNote(24) : { ...note(22, INK_SOFT) }}
+            >
               {mu + k * sigma}
             </Centered>
           ))}
@@ -162,6 +172,7 @@ export const ZScene: React.FC = () => {
             <line x1={x130} x2={x130} y1={base} y2={lerp(base, py(pdf(x)), ease(frame, scoreAt, 14))} stroke={ASK} strokeWidth={2.4} />
             {drop > 0 ? <line x1={x130} x2={x130} y1={base} y2={lerp(base, zY, drop)} stroke={ASK} strokeWidth={2} strokeDasharray="5 5" /> : null}
             <circle cx={x130} cy={lerp(base, zY, drop)} r={9 + throb * 5} fill={ASK} stroke={PAPER} strokeWidth={2} />
+            {ring > 0 ? <circle cx={x130} cy={base} r={10 + ring * 16} fill="none" stroke={ASK} strokeWidth={2} opacity={ring} /> : null}
           </Svg>
           <Note at={isTwoEnd - 2} x={x130 + 18} y={zY - 44}>
             <span style={{ ...askNote(26), whiteSpace: "nowrap" }}>z = {fmt(Z.z, 0)}</span>
@@ -183,6 +194,11 @@ export const ZScene: React.FC = () => {
             <span style={code(22, INK)}>norm.cdf({fmt(Z.z, 0)}) = {fmt(Z.below / 100, 3)}</span>
           </Note>
         </div>
+        <Note at={reallyAt - 2} x={x130 + 30} y={y(512)}>
+          <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
+            only if the data <span style={{ color: ASK_INK }}>really is normal</span>
+          </span>
+        </Note>
       </Drift>
     </AbsoluteFill>
   );

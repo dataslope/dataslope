@@ -156,7 +156,7 @@ export const StepsScene: React.FC = () => {
       {/* What each step settled, under its line. */}
       <Ink at={nullAt + 4} dur={14} style={{ left: STEP_X + 44, top: y(STEP_Y0 + STEP_DY) + 40, whiteSpace: "nowrap" }}>
         <Label size={22} color={INK_SOFT} weight={520}>
-          <H0 />: the true mean is {steps(STEPS.claimed)}
+          the null: the true mean is {steps(STEPS.claimed)}
         </Label>
       </Ink>
       <Ink at={fixedAt - 2} dur={14} style={{ left: STEP_X + 44, top: y(STEP_Y0 + 2 * STEP_DY) + 40, whiteSpace: "nowrap" }}>
@@ -304,7 +304,7 @@ export const StepsScene: React.FC = () => {
       <Ink at={underAt - 4} dur={14} style={{ left: STEP_X + 44, top: y(STEP_Y0 + 4 * STEP_DY) + 40, whiteSpace: "nowrap" }}>
         <div style={{ transform: `scale(${1 + 0.06 * verdictGlow})`, transformOrigin: "0 50%" }}>
           <Label size={22} color={STAT_INK}>
-            {fmt(STEPS.p, 3)} is under {STEPS.alpha}: reject <H0 />
+            {fmt(STEPS.p, 3)} is under {STEPS.alpha}: reject the null
           </Label>
         </div>
       </Ink>

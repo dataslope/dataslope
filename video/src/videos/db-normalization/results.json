@@ -3,11 +3,12 @@
     "flat": "SELECT * FROM orders_flat ORDER BY order_id;",
     "flatConstraints": "SELECT conname, contype FROM pg_constraint WHERE conrelid = 'orders_flat'::regclass ORDER BY conname;",
     "flatNotNull": "SELECT attname FROM pg_attribute WHERE attrelid = 'orders_flat'::regclass AND attnum > 0 AND attnotnull ORDER BY attnum;",
-    "update": "UPDATE orders_flat SET customer_email = 'ada@new.test' WHERE order_id = 1;",
+    "update": "UPDATE orders_flat\nSET customer_email = 'ada@new.test'\nWHERE order_id = 1;",
     "emails": "SELECT customer_name, customer_email, COUNT(*) AS rows_with_that_email\nFROM orders_flat\nGROUP BY customer_name, customer_email\nORDER BY customer_name, customer_email;",
-    "insertProduct": "INSERT INTO orders_flat (product_name, product_price) VALUES ('Mug', 6.00);",
-    "deleteGrace": "DELETE FROM orders_flat WHERE order_id = 3;",
-    "lookupGrace": "SELECT customer_email FROM orders_flat WHERE customer_name = 'Grace';",
+    "flatAfterUpdate": "SELECT * FROM orders_flat ORDER BY order_id;",
+    "insertProduct": "INSERT INTO orders_flat (product_name, product_price)\nVALUES ('Mug', 6.00);",
+    "deleteGrace": "DELETE FROM orders_flat\nWHERE order_id = 3;",
+    "lookupGrace": "SELECT customer_email\nFROM orders_flat\nWHERE customer_name = 'Grace';",
     "splitCustomers": "SELECT * FROM customers ORDER BY id;",
     "splitProducts": "SELECT * FROM products ORDER BY id;",
     "splitOrders": "SELECT * FROM orders ORDER BY id;",
@@ -18,7 +19,7 @@
     "splitGraceKept": "SELECT email FROM customers WHERE name = 'Grace';",
     "splitJoin": "SELECT o.id AS order_id, c.name, c.email, p.name AS product, p.price\nFROM orders o\nJOIN customers c ON c.id = o.customer_id\nJOIN products p ON p.id = o.product_id\nORDER BY o.id;",
     "listCell": "SELECT * FROM students ORDER BY student_id;",
-    "listSearch": "SELECT name FROM students WHERE phones = '555-2000';",
+    "listSearch": "SELECT name FROM students\nWHERE phones = '555-2000';",
     "listTwice": "UPDATE students SET phones = '555-1000, 555-2000, 555-1000' WHERE student_id = 1;",
     "columns": "SELECT * FROM students ORDER BY student_id;",
     "fourth": "INSERT INTO students VALUES (2, 'Grace', '555-3000', '555-3100', '555-3200', '555-3300');",
@@ -26,26 +27,26 @@
     "childPhones": "SELECT * FROM student_phones ORDER BY id;",
     "childSearch": "SELECT s.name\nFROM students s\nJOIN student_phones p ON p.student_id = s.id\nWHERE p.phone_number = '555-2000';",
     "childCounts": "SELECT s.name, COUNT(p.id) AS phones\nFROM students s\nLEFT JOIN student_phones p ON p.student_id = s.id\nGROUP BY s.id, s.name\nORDER BY s.id;",
-    "childTwice": "INSERT INTO student_phones VALUES (104, 1, '555-1000');",
+    "childTwice": "INSERT INTO student_phones\nVALUES (104, 1, '555-1000');",
     "itemsBad": "SELECT * FROM order_items_bad ORDER BY order_id, product_id;",
-    "itemsRename": "UPDATE order_items_bad SET product_name = 'Field Notebook' WHERE product_id = 10;",
+    "itemsRename": "UPDATE order_items_bad\nSET product_name = 'Field Notebook'\nWHERE product_id = 10;",
     "itemsBadAfter": "SELECT * FROM order_items_bad ORDER BY order_id, product_id;",
     "itemsProducts": "SELECT * FROM products ORDER BY id;",
     "itemsGood": "SELECT * FROM order_items ORDER BY order_id, product_id;",
-    "itemsGoodRename": "UPDATE products SET name = 'Field Notebook' WHERE id = 10;",
+    "itemsGoodRename": "UPDATE products\nSET name = 'Field Notebook'\nWHERE id = 10;",
     "itemsJoin": "SELECT oi.order_id, p.name AS product_name, oi.quantity\nFROM order_items oi\nJOIN products p ON p.id = oi.product_id\nORDER BY oi.order_id, p.name;",
     "cityBad": "SELECT * FROM orders_bad ORDER BY order_id;",
-    "cityUpdate": "UPDATE orders_bad SET customer_city = 'Oxford' WHERE order_id = 100;",
+    "cityUpdate": "UPDATE orders_bad\nSET customer_city = 'Oxford'\nWHERE order_id = 100;",
     "cityTwo": "SELECT customer_id, customer_name, customer_city, COUNT(*) AS rows\nFROM orders_bad\nGROUP BY customer_id, customer_name, customer_city\nORDER BY customer_id, customer_city;",
     "cityCustomers": "SELECT * FROM customers ORDER BY id;",
     "cityOrders": "SELECT * FROM orders ORDER BY id;",
-    "cityGoodUpdate": "UPDATE customers SET city = 'Oxford' WHERE id = 1;",
+    "cityGoodUpdate": "UPDATE customers\nSET city = 'Oxford'\nWHERE id = 1;",
     "cityJoin": "SELECT o.id AS order_id, c.name, c.city, o.order_date\nFROM orders o\nJOIN customers c ON c.id = o.customer_id\nORDER BY o.id;",
     "sumOrders": "SELECT * FROM orders ORDER BY id;",
     "sumItems": "SELECT * FROM order_items ORDER BY id;",
     "sumBuild": "INSERT INTO daily_sales_summary (sales_date, order_count, total_amount)\nSELECT o.order_date, COUNT(DISTINCT o.id) AS order_count, SUM(oi.amount) AS total_amount\nFROM orders o\nJOIN order_items oi ON oi.order_id = o.id\nGROUP BY o.order_date;",
     "summary": "SELECT * FROM daily_sales_summary ORDER BY sales_date;",
-    "sumLate": "INSERT INTO order_items VALUES (105, 3, 4.00);",
+    "sumLate": "INSERT INTO order_items\nVALUES (105, 3, 4.00);",
     "sumStale": "SELECT s.sales_date, s.total_amount AS stored, SUM(oi.amount) AS live\nFROM daily_sales_summary s\nJOIN orders o ON o.order_date = s.sales_date\nJOIN order_items oi ON oi.order_id = o.id\nGROUP BY s.sales_date, s.total_amount\nORDER BY s.sales_date;",
     "northwind": "SELECT\n  p.product_name,\n  p.unit_price AS catalog_price_now,\n  od.unit_price AS price_charged,\n  COUNT(*) AS order_lines\nFROM\n  order_details od\n  JOIN products p ON p.product_id = od.product_id\nWHERE\n  od.unit_price <> p.unit_price\nGROUP BY\n  p.product_name,\n  p.unit_price,\n  od.unit_price\nORDER BY\n  p.product_name\nLIMIT\n  12;",
     "northwindCounts": "SELECT COUNT(*) AS lines,\n  COUNT(*) FILTER (WHERE od.unit_price <> p.unit_price) AS disagree,\n  COUNT(*) FILTER (WHERE od.unit_price < p.unit_price) AS charged_less,\n  COUNT(DISTINCT od.product_id) FILTER (WHERE od.unit_price <> p.unit_price) AS products\nFROM order_details od\nJOIN products p ON p.product_id = od.product_id;"
@@ -171,6 +172,40 @@
           "Grace",
           "grace@test.test",
           "1"
+        ]
+      ],
+      "affected": 0
+    },
+    "flatAfterUpdate": {
+      "ok": true,
+      "fields": [
+        "order_id",
+        "customer_name",
+        "customer_email",
+        "product_name",
+        "product_price"
+      ],
+      "rows": [
+        [
+          "1",
+          "Ada",
+          "ada@new.test",
+          "Notebook",
+          "8.00"
+        ],
+        [
+          "2",
+          "Ada",
+          "ada@old.test",
+          "Pencil",
+          "1.50"
+        ],
+        [
+          "3",
+          "Grace",
+          "grace@test.test",
+          "Notebook",
+          "8.00"
         ]
       ],
       "affected": 0

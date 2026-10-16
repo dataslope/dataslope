@@ -29,6 +29,8 @@ export const GeometricScene: React.FC = () => {
 
   // ── Cues ──
   const geoFrom = n.beat("geometric").from;
+  const triesAt = n.word("geometric", "tries");
+  const successAt = n.word("geometric", "first success");
   const callAt = n.word("geometric", "sales call");
   const fiveAt = n.word("geometric", "one time in five");
   const untilAt = n.word("geometric", "calls until");
@@ -68,7 +70,7 @@ export const GeometricScene: React.FC = () => {
       />
 
       <Drift from={geoFrom} to={n.beat("five").to + 50}>
-        <FigLabel n="5" title="Calls until the first sale" at={callAt - 6} x={160} y={y(300)} />
+        <FigLabel n="5" title="Calls until the first sale" at={triesAt - 4} x={160} y={y(300)} />
         <Note at={fiveAt + 4} x={1500} y={y(304)} align="right">
           <span style={code(21, INK_SOFT)}>geom({GEOMETRIC.p})</span>
         </Note>
@@ -96,7 +98,7 @@ export const GeometricScene: React.FC = () => {
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>one call in five closes</span>
         </Note>
 
-        <Axis scale={X} base={base} ticks={[1, 5, 10, 15, 20]} at={untilAt - 6} />
+        <Axis scale={X} base={base} ticks={[1, 5, 10, 15, 20]} at={successAt - 4} />
         <KBars
           ks={GEOMETRIC.k}
           values={GEOMETRIC.pmf}

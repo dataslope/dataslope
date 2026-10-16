@@ -17,14 +17,14 @@ const X1_NARROW = 860;
 
 /** A row of the when-to-use table: a small shape, the case, the center. */
 const ROWS = [
-  { beat: "symmetric", word: "Symmetric", center: "mean", what: "Symmetric, no wild values", answer: "Mean", red: true },
-  { beat: "skewed", word: "Skewed", center: "median", what: "Skewed, or outliers", answer: "Median", red: false },
-  { beat: "categories", word: "Categories", center: "mode", what: "Categories", answer: "Mode", red: false },
-  { beat: "peaks", word: "two peaks", center: "single", what: "Two peaks", answer: "No single center", red: false },
+  { beat: "symmetric", word: "Symmetric", center: "mean", what: "Symmetric, no wild values", answer: "Mean", red: true, sub: "uses every value" },
+  { beat: "skewed", word: "Skewed", center: "median", what: "Skewed, or outliers", answer: "Median", red: false, sub: "incomes, prices, wait times" },
+  { beat: "categories", word: "Categories", center: "mode", what: "Categories", answer: "Mode", red: false, sub: "the most common one" },
+  { beat: "peaks", word: "two peaks", center: "single", what: "Two peaks", answer: "No single center", red: false, sub: "" },
 ] as const;
 
 /** The little shape at the start of each row, drawn in as the row arrives. */
-const Glyph: React.FC<{ kind: number; x: number; y: number; p: number }> = ({ kind, x, y, p }) => {
+const Glyph: React.FC<{ kind: number; x: number; y: number; p: number; hot?: number }> = ({ kind, x, y, p, hot = 0 }) => {
   const w = 86;
   const hgt = 46;
   const path = (f: (t: number) => number) =>
@@ -40,7 +40,7 @@ const Glyph: React.FC<{ kind: number; x: number; y: number; p: number }> = ({ ki
       <line x1={x} x2={x + w} y1={y + hgt + 1} y2={y + hgt + 1} stroke={INK_SOFT} strokeWidth={1.4} opacity={p} />
       {kind === 2 ? (
         [0.55, 1, 0.35].map((v, i) => (
-          <rect key={i} x={x + 6 + i * 28} y={y + hgt - v * hgt * p} width={20} height={v * hgt * p} fill={DATA} opacity={0.85} />
+          <rect key={i} x={x + 6 + i * 28} y={y + hgt - v * hgt * p} width={20} height={v * hgt * p} fill={i === 1 && hot > 0.5 ? STAT : DATA} opacity={0.85} />
         ))
       ) : (
         <path
@@ -72,6 +72,14 @@ export const SkewScene: React.FC = () => {
   const fiveAt = n.word("orders", "five hundred");
   const modestAt = n.word("orders", "modest");
   const tailAt = n.word("orders", "long tail");
+  const rightAt = n.word("orders", "right");
+  const twentyThreeAt = n.word("median", "twenty-three");
+  const twentySixAt = n.word("mean", "twenty-six");
+  const widerAt = n.word("alarm", "wider");
+  const everythingAt = n.word("symmetric", "everything");
+  const incomesAt = n.word("skewed", "incomes");
+  const commonAt = n.word("categories", "most common");
+  const hidesAt = n.word("spread-in", "hides");
   const medianAt = n.word("median", "median");
   const meanAt = n.word("mean", "mean");
   const dragsAt = n.word("mean", "drags");
@@ -82,6 +90,7 @@ export const SkewScene: React.FC = () => {
   const rowAt = ROWS.map((r) => n.word(r.beat, r.word));
   const answerAt = ROWS.map((r) => n.word(r.beat, r.center));
   const moveAt = n.word("spread-in", "move");
+  const subAt = [everythingAt, incomesAt, commonAt, 0];
 
   // The histogram narrows to make room for the table.
   const shift = ease(frame, rightFrom - 4, 26);
@@ -94,8 +103,10 @@ export const SkewScene: React.FC = () => {
   const meanX = sx(X, ORDERS.mean);
   const markTop = base - peak * unit - h(30);
   const medIn = ease(frame, medianAt - 4, 12);
+  const medGrow = ease(frame, medianAt - 4, 18);
+  const medLabel = ease(frame, twentyThreeAt - 4, 12);
   const meanIn = ease(frame, meanAt - 4, 12);
-  const meanSlide = ease(frame, dragsAt - 4, 18);
+  const meanSlide = ease(frame, twentySixAt - 4, 24);
   const meanShown = lerp(ORDERS.median, ORDERS.mean, meanSlide);
   const tailDim = ease(frame, rightFrom - 4, 14);
 
@@ -169,10 +180,10 @@ export const SkewScene: React.FC = () => {
         {/* The median, in ink, and the mean, in red, pulled out past it. */}
         {medIn > 0 ? (
           <Svg opacity={medIn}>
-            <line x1={medX} x2={medX} y1={markTop} y2={base} stroke={INK} strokeWidth={3.2} strokeLinecap="round" />
+            <line x1={medX} x2={medX} y1={base - (base - markTop) * medGrow} y2={base} stroke={INK} strokeWidth={3.2} strokeLinecap="round" />
           </Svg>
         ) : null}
-        <Tag x={medX - 12} y={markTop - 34} opacity={medIn} size={23} bold align="right">
+        <Tag x={medX - 12} y={markTop - 34} opacity={medLabel} size={23} bold align="right">
           Median ${fmt(ORDERS.median)}
         </Tag>
         {meanIn > 0 ? (
@@ -181,8 +192,11 @@ export const SkewScene: React.FC = () => {
           </Svg>
         ) : null}
         <Tag x={sx(X, meanShown) + 12} y={markTop - 34} opacity={meanIn} color={STAT_INK} size={23} bold align="left">
-          Mean ${fmt(ORDERS.mean)}
+          Mean ${fmt(meanShown)}
         </Tag>
+        <Pulse x={sx(X, 110)} y={base - h(150)} at={rightAt} color={INK_SOFT} r={6} />
+        <Pulse x={sx(X, 80)} y={base - h(150)} at={dragsAt - 2} color={STAT} r={6} />
+        <Pulse x={(medX + meanX) / 2} y={markTop - 8} at={widerAt - 2} color={STAT} r={8} />
         <Bracket x0={medX} x1={meanX} y={markTop - 8} at={alarmAt - 6} color={STAT} up />
         <Tag x={sx(X, meanShown) + 190} y={markTop - 34} opacity={ease(frame, alarmAt - 2, 12)} color={STAT_INK} size={21} align="left">
           a gap of ${fmt(ORDERS.gap)}: skew
@@ -191,7 +205,14 @@ export const SkewScene: React.FC = () => {
         <Pulse x={medX} y={markTop} at={answerAt[1] - 2} color={INK} r={6} />
       </Drift>
 
+      {/* How far the values spread: the question the next part takes up. */}
+      <Bracket x0={sx(X, 6)} x1={sx(X, 60)} y={base + h(54)} at={moveAt - 6} color={INK} />
+      <Tag x={sx(X, 33)} y={base + h(62)} opacity={ease(frame, moveAt, 12)} size={21}>
+        and how far apart?
+      </Tag>
+
       {/* ── Which center, when: the lesson's rules, a row at a time ── */}
+      <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.55 * ease(frame, hidesAt - 4, 14) }}>
       {ROWS.map((r, i) => {
         const p = ease(frame, rowAt[i] - 6, 16);
         if (p <= 0) return null;
@@ -211,7 +232,7 @@ export const SkewScene: React.FC = () => {
                 borderRadius: 6,
               }}
             />
-            <Glyph kind={i} x={960} y={top} p={ease(frame, rowAt[i] - 4, 20)} />
+            <Glyph kind={i} x={960} y={top} p={ease(frame, rowAt[i] - 4, 20)} hot={i === 2 ? ease(frame, commonAt - 2, 6) : 0} />
             <div
               style={{
                 position: "absolute",
@@ -240,9 +261,25 @@ export const SkewScene: React.FC = () => {
             >
               <Mark at={answerAt[i] - 2}>{r.answer}</Mark>
             </div>
+            {r.sub ? (
+              <div
+                style={{
+                  position: "absolute",
+                  left: 1080,
+                  top: top + 46,
+                  opacity: ease(frame, subAt[i] - 4, 12),
+                  whiteSpace: "nowrap",
+                  ...label(20, INK_SOFT),
+                  fontWeight: 500,
+                }}
+              >
+                {r.sub}
+              </div>
+            ) : null}
           </React.Fragment>
         );
       })}
+      </div>
       <Ink at={dependsAt - 4} dur={16} style={{ left: 960, top: y(330), whiteSpace: "nowrap" }}>
         <span style={{ ...label(24, INK), fontWeight: 560 }}>If the data is…</span>
       </Ink>

@@ -6,22 +6,22 @@ import type { NarrationScript } from "../../narration/types";
  * lesson in content/courses/database-design-postgresql/:
  *
  *   1. Primary keys ("hook" to "kinds-in"), after primary-keys.mdx: the two
- *      Taylor Kims, the key's two guarantees, the composite key of a roster,
- *      and why a key should never change.
+ *      Taylor Kims, the key's two guarantees, the roster's composite key, and
+ *      why a key should almost never change.
  *   2. Natural or surrogate ("kinds" to "fk-in"), after
  *      natural-vs-surrogate-keys.mdx: the two kinds, the 1938 wallet card, a
- *      natural key that changes, and the usual pattern (a generated id, the
- *      natural value kept UNIQUE).
+ *      natural key that has to change, and email kept unique but not the key.
  *   3. Foreign keys ("fk" to "ri-in"), after foreign-keys.mdx: the column
- *      that holds another table's key, parent and child, the many side, and
- *      the order for a customer who doesn't exist.
+ *      that holds another table's key, parent and child, the many side, no
+ *      copied details, and the order for a customer who doesn't exist.
  *   4. Referential integrity ("delete" to "next"), after
  *      referential-integrity.mdx: RESTRICT, CASCADE and SET NULL, how to
  *      choose, and ON UPDATE.
  *
  * It opens on Unit 3's bridge (a line between two rows needs a name nothing
- * else shares) and ends on Unit 5's: with keys, every shape a relationship
- * takes can be built. DDL syntax, practice and quizzes stay on the page.
+ * else shares: "how do you say WHICH row?") and ends on Unit 5's: with keys,
+ * every shape a relationship takes can be built. DDL syntax, practice and
+ * quizzes stay on the page.
  *
  * Every animation in the scenes is cued to a word below, so edit freely: a cue
  * whose word disappears throws in the Studio rather than silently drifting.
@@ -29,63 +29,69 @@ import type { NarrationScript } from "../../narration/types";
  * Facts. Every statement on screen ran in PGlite 0.5.8 (PostgreSQL 18.3 in
  * WASM) from a fresh database per figure, by check.mjs into results.json,
  * which data.ts reads; every error is Postgres's own text:
- *   - "nokey": a customers table with no key stores two identical
- *     ('Taylor Kim', 'Portland') rows without an error ("doesn't blink").
+ *   - "nokey": with no key, two identical ('Taylor Kim', 'Portland') rows
+ *     both go in (INSERT 0 1, twice: "it'll store the same row twice"), and
+ *     the coffee-beans order joined on the name matches 2 customers ("can't
+ *     tell").
  *   - "taylors": the lesson's customers 101 and 102, both Taylor Kim in
- *     Portland.
+ *     Portland; the order holding 101 joined on the key matches 1.
  *   - "duplicate", the lesson's block: Grace as customer 1 fails with 23505,
  *     duplicate key value violates unique constraint "customers_pkey", Key
- *     (customer_id)=(1) already exists; Grace with no id fails with 23502,
- *     null value in column "customer_id" violates not-null constraint; the
- *     table still holds only Ada.
+ *     (customer_id)=(1) already exists ("Key one already exists"); Grace with
+ *     no id fails with 23502, not-null ("refused again"); Ada stays alone.
  *   - "composite": (7, 42), (7, 43) and (8, 42) go in ("student seven takes
  *     two courses, and course forty-two has two students"); (7, 42) again
  *     fails, Key (student_id, course_id)=(7, 42) already exists.
- *   - "natural": with email as the key and an order and a ticket holding
- *     ada@old.example, changing it to ada@new.example fails with 23503,
- *     Key (email)=(ada@old.example) is still referenced from table "orders"
- *     ("won't even let you change it"). The lesson's diagram says every
- *     referencing row must stay in sync; Postgres with no ON UPDATE rule
- *     refuses the change instead, which is what the video shows.
- *   - "surrogate": with user_id 10 (the lesson's users.user_id = 10) the
- *     same change is UPDATE 1, and the order and ticket still hold 10.
+ *   - "countries": the lesson's natural key, 'JP' for Japan.
  *   - "identity", the lesson's GENERATED ALWAYS AS IDENTITY block: Ada
- *     Lovelace and Grace Hopper come back as customer_id 1 and 2; a second
- *     row with ada@example.com fails on "customers_email_key".
- *   - "orphan", the lesson's block: order 101 for customer 1 goes in; order
- *     102 for customer 99 fails with 23503 on "orders_customer_id_fkey", Key
- *     (customer_id)=(99) is not present in table "customers".
+ *     Lovelace and Grace Hopper come back as customer_id 1 and 2 ("a number
+ *     the database makes up").
+ *   - "natural": with email as the key and an order holding
+ *     ada@old.example, changing it fails with 23503, Key
+ *     (email)=(ada@old.example) is still referenced from table "orders"
+ *     ("Postgres refuses: her order still points at the old one").
+ *   - "surrogate": keyed on user_id 10 (the lesson's users.user_id = 10),
+ *     with email UNIQUE, the same change is UPDATE 1 and the order still
+ *     holds 10 ("the change just goes through").
+ *   - "orphan", the lesson's block: order 101 for customer 1 is INSERT 0 1;
+ *     order 102 for customer 99 fails with 23503 on
+ *     "orders_customer_id_fkey", Key (customer_id)=(99) is not present in
+ *     table "customers".
  *   - "restrict", the lesson's block: deleting account 1 (Ada Co, invoice
  *     100 for 250.00) fails with 23001, violates RESTRICT setting of foreign
  *     key constraint "invoices_account_id_fkey"; both rows stay.
- *   - "cascade", the lesson's challenge: deleting post 1 removes comments 10
- *     and 11 and leaves 12 ("both its comments go with it").
- *   - "setnull": a ticket whose employee is deleted keeps its row, open, with
- *     assigned_employee_id NULL; "setnullNotNull": on a NOT NULL column the
- *     same delete fails with 23502 ("only works on a column that can be
- *     empty"). The employee, Sam, and ticket 500 are the video's own rows:
- *     the lesson describes the case without giving any.
- *   - "drafts" (the lesson's CASCADE half) and "noaction" (plain REFERENCES
- *     also refuses the delete) are run for completeness and not shown.
+ *   - "cascade", the lesson's challenge: DELETE 1 on post 1 removes comments
+ *     10 and 11 and leaves 12 ("BOTH its comments go too").
+ *   - "setnull": deleting employee 3, Sam, keeps ticket 500 with
+ *     assigned_employee_id NULL ("assigned to no one"). Sam and ticket 500
+ *     are the video's own rows: the lesson describes this case ("a support
+ *     ticket whose assigned employee left") without giving any.
+ *   - Run and not shown: "setnullNotNull" (on a NOT NULL column the same
+ *     delete fails with 23502, the lesson's quick check), "drafts" (the
+ *     lesson's CASCADE half) and "noaction" (plain REFERENCES refuses the
+ *     delete too).
+ *   - Without a number: the CASCADE, SET NULL and RESTRICT examples in the
+ *     closing scene are the lesson's own (comments on a deleted draft, items
+ *     in a temporary cart; a support ticket whose employee left; invoices,
+ *     payments, orders that keep their customer).
  *
- * History, part 2: the Social Security Administration's own history page,
+ * History, part 2: the Social Security Administration's history page
  * "Social Security Cards Issued by Woolworth"
  * (https://www.ssa.gov/history/ssn/misused.html), and Snopes' summary of it
  * (https://www.snopes.com/business/taxes/woolworth.asp): in 1938 the E. H.
  * Ferree company of Lockport, New York put a sample card in its wallets,
- * printed with the real number of Hilda Schrader Whitcher, secretary to its
- * vice president; the wallets were sold by Woolworth and other department
- * stores; at the peak, in 1943, 5,755 people were using the number ("by
- * nineteen forty-three, over five thousand"); SSA voided it and gave Mrs.
- * Whitcher a new number; over 40,000 people reported it in all. The sample
- * was a printed specimen (half size, in red, marked "specimen"), not a real
- * card, so the video says "a sample card" carrying "a real number".
+ * printed with the real number of Hilda Schrader Whitcher, a secretary at
+ * the company; at the peak, in 1943, 5,755 people were using it ("by
+ * nineteen forty-three, over five thousand"); SSA voided the number and gave
+ * her a new one ("the permanent one got cancelled"). The sample was a
+ * printed specimen (half size, in red, marked "specimen"), not a real card,
+ * so the video says "a sample card" carrying "a real person's number".
  *
  * Written for Drew's ear: casual and curious, short spoken sentences, no
  * symbols or parentheses, numbers as words ("one oh one"), contractions,
  * questions the next sentence answers, an ellipsis where he'd hold, two
- * capitalised stresses and no audio tags. SQL keywords are said as words:
- * "restrict", "cascade", "set null".
+ * capitalised stresses (WHICH, BOTH) and no audio tags. SQL keywords are
+ * said as words: "restrict", "cascade", "set null".
  */
 export const script: NarrationScript = {
   id: "db-keys",

@@ -37,6 +37,7 @@ import {
   VIDEO,
 } from "./data";
 import { Bracket, money, POP_FILL, Rule, SAMPLE_FILL } from "./parts";
+import { countTo, flash } from "../sampling/emphasis";
 
 // ── Layout, in the page's layout coordinates (through y() and h()) ──────────
 
@@ -139,6 +140,13 @@ export const ThreeScene: React.FC = () => {
   const piledAt = n.word("pile", "piled");
   const fiftyAt = n.word("pile", "fifty");
   const underAt = n.word("pile", "under");
+  // Phrases the figure answers as they are spoken, while it is talked about.
+  const snapshotAt = n.word("snapshot", "noisy snapshot");
+  const raggedAt = n.word("snapshot", "Ragged");
+  const rawValuesAt = n.word("data", "Raw values");
+  const eachAt = n.word("data", "one per customer");
+  const dollarsAt = n.word("third", "dollars");
+  const becomesAt = n.word("block", "becomes");
   const pileTo = n.beat("pile").to;
   const compareFrom = n.beat("compare").from;
   const oneAxisAt = n.word("compare", "one axis");
@@ -265,14 +273,20 @@ export const ThreeScene: React.FC = () => {
       <Ink at={pickAt} dur={16} out={p2Out} style={{ left: RX, top: y(236), width: RW }}>
         <span style={{ ...body(32, true), color: INK }}>Forty customers, picked at random.</span>
       </Ink>
+      <Note at={snapshotAt - 2} x={RX} y={y(360)} width={RW} out={histAt - 10}>
+        <div style={{ ...body(30, true), color: INK }}>A noisy snapshot of the population.</div>
+      </Note>
       <Note at={histAt} x={RX} y={y(360)} width={RW} out={p2Out}>
         <div style={{ ...body(30), color: INK }}>What a histogram of your data shows.</div>
-        <div style={{ ...note(22, INK_SOFT), marginTop: 12 }}>Raw values, one block per customer.</div>
+        <div style={{ ...note(22, INK_SOFT), marginTop: 12, opacity: ease(frame, rawValuesAt - 2, 12) }}>
+          Raw values, one block per customer.
+        </div>
       </Note>
 
       <FigLabel n="3" title={`One sample of ${N} customers`} at={sampleFrom} x={150} y={y(SAMPLE_LABEL)} />
       <Axis scale={X} base={y(SAMPLE_BASE)} ticks={TICKS} format={money} at={sampleFrom + 2} />
-      <SampleBlocks pickAt={pickAt} fallAt={randomAt + 2} popBase={y(popBase)} />
+      <SampleBlocks pickAt={pickAt} fallAt={randomAt + 2} popBase={y(popBase)} rippleAt={eachAt} />
+      <Skyline at={raggedAt - 2} out={p2Out} />
       <Bracket
         x0={sx(X, SAMPLE.mean - SAMPLE.sd)}
         x1={sx(X, SAMPLE.mean + SAMPLE.sd)}
@@ -328,7 +342,7 @@ export const ThreeScene: React.FC = () => {
         gap={2}
         overlay={frame < fastTo + 6 ? { counts: recent, color: ds("red", 800) } : undefined}
       />
-      <Averaging averageAt={averageAt} numberAt={numberAt} blockAt={blockAt} />
+      <Averaging averageAt={averageAt} numberAt={numberAt} blockAt={blockAt} dollarsAt={dollarsAt} becomesAt={becomesAt} />
       {steps.map((st, i) => (
         <StripSample key={i} index={i + 1} step={st} popBase={y(popBase)} />
       ))}
@@ -416,7 +430,12 @@ const Basket: React.FC<{ at: number; out: number }> = ({ at, out }) => {
 
 /** The forty customers: lit up on the population, then dropped into row 2 as
  *  one block each. */
-const SampleBlocks: React.FC<{ pickAt: number; fallAt: number; popBase: number }> = ({ pickAt, fallAt, popBase }) => {
+const SampleBlocks: React.FC<{ pickAt: number; fallAt: number; popBase: number; rippleAt: number }> = ({
+  pickAt,
+  fallAt,
+  popBase,
+  rippleAt,
+}) => {
   const frame = useCurrentFrame();
   const { y, h } = useLayout();
   const FALL = 16;
@@ -430,7 +449,10 @@ const SampleBlocks: React.FC<{ pickAt: number; fallAt: number; popBase: number }
         const left = blockLeft(j);
         const top = y(blockTop(s));
         if (t >= 1) {
-          return <rect key={i} x={left} y={top} width={BLOCK_W} height={h(BLOCK)} fill={SAMPLE_FILL} />;
+          // "One per customer": a ripple across the forty, in drawing order.
+          const lit = flash(frame, rippleAt + i * 0.6, 14);
+          const fill = lit > 0 ? `color-mix(in srgb, ${POP_FILL} ${Math.round(lit * 70)}%, ${SAMPLE_FILL})` : SAMPLE_FILL;
+          return <rect key={i} x={left} y={top - lit * 4} width={BLOCK_W} height={h(BLOCK)} fill={fill} />;
         }
         // From the strip on the population to the block's centre, under gravity.
         const x0 = sx(X, v);
@@ -455,10 +477,12 @@ const SampleBlocks: React.FC<{ pickAt: number; fallAt: number; popBase: number }
 
 /** "Average those forty": a red copy of each block slides into the average,
  *  which becomes one block and falls into row 3. */
-const Averaging: React.FC<{ averageAt: number; numberAt: number; blockAt: number }> = ({
+const Averaging: React.FC<{ averageAt: number; numberAt: number; blockAt: number; dollarsAt: number; becomesAt: number }> = ({
   averageAt,
   numberAt,
   blockAt,
+  dollarsAt,
+  becomesAt,
 }) => {
   const frame = useCurrentFrame();
   const { y, h } = useLayout();
@@ -473,6 +497,9 @@ const Averaging: React.FC<{ averageAt: number; numberAt: number; blockAt: number
   // The average is a dot until it drops, then a block in its bin.
   const top = startTop + (endTop - startTop) * t * t;
   const labelIn = ease(frame, numberAt - 2, 10) * (1 - ease(frame, blockAt - 4, 6));
+  const becoming = ease(frame, becomesAt - 2, 12);
+  // The average counts up to its value as the narration reads it.
+  const shown = countTo(frame, numberAt - 2, Math.max(10, dollarsAt - numberAt + 2), 0, SAMPLE.mean);
   return (
     <>
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
@@ -491,7 +518,17 @@ const Averaging: React.FC<{ averageAt: number; numberAt: number; blockAt: number
             ))
           : null}
         {formed > 0 && frame < blockAt ? (
-          <circle cx={mx} cy={y(MERGE_Y)} r={10 * formed} fill={ACCENT} stroke={PAPER} strokeWidth={1.5} />
+          // A dot, until "becomes": then the block it will fall as, over its bin.
+          <rect
+            x={lerp(mx, meanBinLeft(SAMPLE.mean) + MEAN_W / 2, becoming) - lerp(10 * formed, MEAN_W / 2, becoming)}
+            y={y(MERGE_Y) - lerp(10 * formed, h(EARLY) / 2, becoming)}
+            width={lerp(20 * formed, MEAN_W, becoming)}
+            height={lerp(20 * formed, h(EARLY), becoming)}
+            rx={lerp(10 * formed, 0, becoming)}
+            fill={ACCENT}
+            stroke={PAPER}
+            strokeWidth={1.5 * (1 - becoming)}
+          />
         ) : null}
         {frame >= blockAt ? (
           <rect x={meanBinLeft(SAMPLE.mean)} y={y(top)} width={MEAN_W} height={h(EARLY)} fill={ACCENT} />
@@ -509,9 +546,37 @@ const Averaging: React.FC<{ averageAt: number; numberAt: number; blockAt: number
           ...halo,
         }}
       >
-        ${fmt(SAMPLE.mean)}
+        ${fmt(shown)}
       </div>
     </>
+  );
+};
+
+/** "Ragged": a pencil line along the tops of the forty blocks' stacks. */
+const SKYLINE = (() => {
+  const heights = new Map<number, number>();
+  for (const { j, s } of SLOTS) heights.set(j, Math.max(heights.get(j) ?? 0, s + 1));
+  const bins = [...heights.keys()];
+  const lo = Math.min(...bins);
+  const hi = Math.max(...bins);
+  const pts: [number, number][] = [];
+  for (let j = lo; j <= hi; j++) {
+    const top = SAMPLE_BASE - (heights.get(j) ?? 0) * STEP - 4;
+    pts.push([sx(X, j * SAMPLE_BIN), top], [sx(X, (j + 1) * SAMPLE_BIN), top]);
+  }
+  return pts;
+})();
+const Skyline: React.FC<{ at: number; out: number }> = ({ at, out }) => {
+  const frame = useCurrentFrame();
+  const { y } = useLayout();
+  const p = ease(frame, at, 26);
+  const o = ease(frame, out, 12);
+  if (p <= 0 || o >= 1) return null;
+  const d = SKYLINE.map(([x, v], i) => `${i ? "L" : "M"}${x.toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  return (
+    <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: 1 - o }}>
+      <path d={d} fill="none" stroke={INK} strokeWidth={2} strokeLinejoin="round" pathLength={1} strokeDasharray={`${p} 1`} />
+    </svg>
   );
 };
 

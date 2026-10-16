@@ -41,6 +41,7 @@ export const SkewScene: React.FC = () => {
   const assumeAt = n.word("check", "don't assume");
   const plotAt = n.word("check", "plot");
   const checkingAt = n.word("fit-in", "checking");
+  const fittingAt = n.word("fit-in", "fitting");
 
   const base = y(BASE);
   const unit = h(TALL) / Math.max(...INCOME.counts);
@@ -115,7 +116,13 @@ export const SkewScene: React.FC = () => {
               <line x1={zeroX} x2={zeroX} y1={base} y2={base - h(TALL)} stroke={INK} strokeWidth={2.4} />
             </svg>
           ) : null}
-          <Curve d={curveD(perBin, X.lo, X.hi, X, py)} at={forceAt - 2} dur={sameAt - forceAt + 24} color={ASK} width={3.4} />
+          <Curve
+            d={curveD(perBin, X.lo, X.hi, X, py)}
+            at={forceAt - 2}
+            dur={sameAt - forceAt + 24}
+            color={ASK}
+            width={3.4 + pulse(frame, fittingAt - 4, 26) * 3}
+          />
           <Note at={sameAt + 4} x={sx(X, 80_000)} y={py(perBin(80_000)) - 52}>
             <span style={{ ...askNote(22), whiteSpace: "nowrap", ...halo }}>a normal with the same mean and SD</span>
           </Note>

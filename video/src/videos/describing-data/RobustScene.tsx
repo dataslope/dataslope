@@ -32,7 +32,15 @@ export const RobustScene: React.FC = () => {
 
   // ── Cues ──
   const incomesFrom = n.beat("incomes").from;
+  const takeAt = n.word("incomes", "ten incomes");
   const nineAt = n.word("incomes", "Nine");
+  const betweenAt = n.word("incomes", "between");
+  const hundredAt = n.word("incomes", "hundred and twenty");
+  const eightHundredAt = n.word("sd", "eight hundred");
+  const pairAt = n.word("pair", "pair");
+  const pairSdAt = n.word("pair", "standard deviation");
+  const pairIqrAt = n.word("pair", "IQR");
+  const spreadAt = n.word("shape-in", "spread");
   const tenthAt = n.word("incomes", "tenth");
   const thousandAt = n.word("incomes", "nine thousand");
   const sdAt = n.word("sd", "standard deviation");
@@ -53,7 +61,7 @@ export const RobustScene: React.FC = () => {
 
   const strip = y(STRIP);
   const dotIn = (i: number) =>
-    i === ROBUST.values.length - 1 ? ease(frame, tenthAt - 2, 12) : ease(frame, nineAt - 4 + i * 2.5, 8);
+    i === ROBUST.values.length - 1 ? ease(frame, tenthAt - 2, 12) : ease(frame, takeAt - 2 + i * 2.5, 8);
   const box = ease(frame, halfAt - 4, 16);
   const q1x = xOf(ROBUST.q1);
   const q3x = xOf(ROBUST.q3);
@@ -142,12 +150,22 @@ export const RobustScene: React.FC = () => {
               return <circle key={i} cx={xOf(v)} cy={strip + drop} r={R * a} fill={DATA} stroke={PAPER} strokeWidth={1.6} />;
             })}
           </Svg>
+          <Bracket x0={xOf(38) - 12} x1={xOf(120) + 12} y={strip - 34} at={betweenAt - 4} out={halfAt - 6} up />
+          <Tag x={(xOf(38) + xOf(120)) / 2} y={strip - 80} opacity={ease(frame, betweenAt, 12) * (1 - ease(frame, halfAt - 6, 10))} size={21}>
+            nine between 38 and 120
+          </Tag>
+          <Pulse x={xOf(120)} y={strip} at={hundredAt + 4} color={DATA} r={R} />
+          <Pulse x={FAR_X} y={strip - 108} at={eightHundredAt - 2} color={STAT} r={10} />
+          <Pulse x={FAR_X} y={strip - 108} at={pairSdAt - 2} color={STAT} r={10} />
+          <Pulse x={(q1x + q3x) / 2} y={strip - BOX_H / 2} at={pairIqrAt - 2} color={INK} r={8} />
+          <Pulse x={(q1x + q3x) / 2} y={strip - BOX_H / 2} at={spreadAt - 2} color={INK} r={8} />
+          <Pulse x={medX} y={strip - BOX_H / 2 - 20} at={pairAt - 2} color={INK} r={6} />
           <Pulse x={FAR_X} y={strip} at={topAt - 2} color={DATA} r={R} />
           <Pulse x={FAR_X} y={strip} at={topAt + 10} color={DATA} r={R} />
 
           {/* The standard deviation, wrecked. */}
           <Tag x={FAR_X} y={strip - 120} opacity={ease(frame, sdAt - 4, 12)} color={STAT_INK} size={24} bold>
-            SD {counted(frame, leapsAt - 4, 0, ROBUST.sd, 1, 26)}
+            SD {counted(frame, leapsAt - 4, 0, ROBUST.sd, 1, 44)}
           </Tag>
 
           {/* The quartiles and their range. */}

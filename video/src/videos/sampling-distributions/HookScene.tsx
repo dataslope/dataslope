@@ -5,12 +5,13 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Axis, Bars, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, body, headline, INK } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, body, headline, INK, INK_SOFT, note } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { histogram, peak, PILE, POPULATION, SAMPLE } from "./data";
 import { money, POP_FILL, SAMPLE_FILL } from "./parts";
 import { useMergedPart } from "../sampling/merged";
 import { PartName } from "../sampling/PartName";
+import { Marker } from "../sampling/emphasis";
 
 const BASE = 840;
 const HEIGHT = 380;
@@ -59,6 +60,15 @@ export const HookScene: React.FC = () => {
   const { y, h } = useLayout();
   const threeAt = n.word("hook", "three distributions");
   const alikeAt = n.word("hook", "alike");
+  const mixingAt = n.word("apart", "mixing");
+  const intervalsAt = n.word("apart", "confidence intervals");
+  const misreadAt = n.word("apart", "misread");
+  const pullAt = n.word("apart", "pull them apart");
+  // "Side by side, they look alike": an equals sign between the panels,
+  // struck through when the narration pulls them apart, as they part.
+  const same = ease(frame, alikeAt - 4, 12);
+  const strike = ease(frame, pullAt, 14);
+  const part = ease(frame, pullAt + 2, 24);
   // In the merged Unit 5 video the part's name takes the kicker's place, and
   // the headline and figure label step down under it.
   const merged = useMergedPart();
@@ -96,7 +106,7 @@ export const HookScene: React.FC = () => {
         const at = 8 + c * 8;
         const mid = (p.lo + p.hi) / 2;
         return (
-          <React.Fragment key={p.title}>
+          <div key={p.title} style={{ position: "absolute", inset: 0, transform: `translateX(${(c - 1) * 34 * part}px)` }}>
             <Ink at={at - 2} dur={14} style={{ left: colX(c), top: y(360) }}>
               <span style={{ ...body(34, true), color: INK, whiteSpace: "nowrap" }}>{p.title}</span>
             </Ink>
@@ -120,9 +130,55 @@ export const HookScene: React.FC = () => {
               format={money}
               at={at - 2}
             />
-          </React.Fragment>
+          </div>
         );
       })}
+
+      {/* "They look alike", and then "pull them apart". */}
+      {[0, 1].map((c) => {
+        const cx = colX(c) + COL_W + (570 - COL_W) / 2;
+        const cy = y(BASE - HEIGHT * 0.42);
+        return same > 0 ? (
+          <div
+            key={c}
+            style={{
+              position: "absolute",
+              left: cx - 40,
+              top: cy - 40,
+              width: 80,
+              height: 80,
+              opacity: same,
+              transform: `scale(${0.7 + 0.3 * same})`,
+            }}
+          >
+            <span style={{ ...headline(64), color: INK_SOFT, position: "absolute", left: 0, right: 0, top: 4, textAlign: "center" }}>=</span>
+            <svg width={80} height={80} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
+              <line
+                x1={56}
+                y1={14}
+                x2={24}
+                y2={70}
+                stroke={ACCENT}
+                strokeWidth={4}
+                strokeLinecap="round"
+                pathLength={1}
+                strokeDasharray={`${strike} 1`}
+                opacity={strike > 0 ? 1 : 0}
+              />
+            </svg>
+          </div>
+        ) : null;
+      })}
+
+      {/* Why it matters, at the right end of the figure's label row. */}
+      <Ink at={mixingAt - 2} dur={14} style={{ right: 1920 - 1800, top: y(figY), whiteSpace: "nowrap" }}>
+        <span style={note(22, INK_SOFT)}>
+          Mix them up,{" "}
+          <span style={{ opacity: ease(frame, intervalsAt - 2, 12) }}>
+            and confidence intervals get <Marker at={misreadAt}>misread</Marker>.
+          </span>
+        </span>
+      </Ink>
     </AbsoluteFill>
   );
 };

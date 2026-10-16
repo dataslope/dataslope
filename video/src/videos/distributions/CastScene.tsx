@@ -75,6 +75,9 @@ export const CastScene: React.FC = () => {
   const hookFrom = n.beat("hook").from;
   const meanAt = n.word("hook", "mean");
   const varianceAt = n.word("hook", "variance");
+  const sumAt = n.word("hook", "sum up");
+  const oneVarAt = n.word("hook", "one random variable");
+  const meetAt = n.word("hook", "you'll meet");
   const shapesAt = n.word("hook", "same few shapes");
   const namesAt = n.word("hook", "names");
   const startAt = n.word("bernoulli", "Start");
@@ -104,7 +107,8 @@ export const CastScene: React.FC = () => {
 
   // ── The cast ──
   const solo = ease(frame, hookFrom - 6, 18);
-  const settle = ease(frame, shapesAt - 8, 22);
+  const settle = ease(frame, meetAt - 4, 26);
+  const sumGlow = pulse(frame, sumAt - 2, 20);
   const castOut = ease(frame, startAt - 6, 14);
   const soloBox = {
     x: lerp(SOLO.x, slotX(1), settle),
@@ -115,7 +119,7 @@ export const CastScene: React.FC = () => {
   const soloStep = soloBox.w / 17;
   const soloMeanX = soloBox.x + (BINOMIAL.mean + 0.5) * soloStep;
   const soloSd = BINOMIAL.sd * soloStep;
-  const soloMarks = ease(frame, meanAt - 4, 12) * (1 - ease(frame, shapesAt - 10, 8));
+  const soloMarks = ease(frame, meanAt - 4, 12) * (1 - ease(frame, meetAt - 6, 8));
 
   // ── The binomial ──
   const unit = h(TALL) / Math.max(...BINOMIAL.pmf);
@@ -127,6 +131,7 @@ export const CastScene: React.FC = () => {
   const tailX1 = sx(X, 17) + 18;
   const tailTop = base - BINOMIAL.pmf[BINOMIAL.atLeast] * unit - h(46);
   const bernoulliOut = holdsAt - 10;
+  const soloWave = pulse(frame, oneVarAt - 2, 30);
   const dimBinomial = ease(frame, rateAt - 6, 14);
 
   // ── The Bernoulli ──
@@ -149,7 +154,13 @@ export const CastScene: React.FC = () => {
       <Kicker at={hookFrom - 10}>Counting distributions</Kicker>
 
       {/* ── Headlines ── */}
-      <Head parts={[{ text: "One variable, two numbers.", at: hookFrom - 6 }]} out={shapesAt - 10} />
+      <Head
+        parts={[
+          { text: "One variable,", at: hookFrom - 6 },
+          { text: "two numbers.", at: varianceAt - 4, italic: true },
+        ]}
+        out={shapesAt - 10}
+      />
       <Head
         parts={[
           { text: "The same few shapes,", at: shapesAt - 4 },
@@ -174,7 +185,15 @@ export const CastScene: React.FC = () => {
       {/* ── The cast: one variable's summary, then the seven shapes ── */}
       <div style={{ position: "absolute", inset: 0, opacity: 1 - castOut, transform: `translateY(${-castOut * 30}px)` }}>
         <Svg opacity={solo}>
-          <Mini kind="binomial" x={soloBox.x} top={soloBox.top} w={soloBox.w} h={soloBox.h} p={ease(frame, hookFrom - 6, 26)} />
+          <Mini
+            kind="binomial"
+            x={soloBox.x}
+            top={soloBox.top}
+            w={soloBox.w}
+            h={soloBox.h}
+            p={ease(frame, hookFrom - 6, 26)}
+            color={soloWave > 0 ? `color-mix(in srgb, ${DIST} ${100 - soloWave * 40}%, ${PAPER})` : DIST}
+          />
           {soloMarks > 0 ? (
             <g opacity={soloMarks}>
               <line
@@ -183,14 +202,14 @@ export const CastScene: React.FC = () => {
                 y1={soloBox.top + soloBox.h}
                 y2={soloBox.top - h(30)}
                 stroke={INK}
-                strokeWidth={2.4}
+                strokeWidth={2.4 + sumGlow * 2}
                 strokeDasharray="7 6"
               />
               <path
                 d={`M${soloMeanX - soloSd},${soloBox.top + soloBox.h + h(40)} l0,-10 L${soloMeanX + soloSd},${soloBox.top + soloBox.h + h(30)} l0,10`}
                 fill="none"
                 stroke={INK}
-                strokeWidth={2.2}
+                strokeWidth={2.2 + sumGlow * 2}
                 opacity={ease(frame, varianceAt - 4, 12)}
               />
             </g>
@@ -234,7 +253,7 @@ export const CastScene: React.FC = () => {
                 top={y(SLOT_TOP)}
                 w={SLOT_W}
                 h={h(SLOT_H)}
-                p={ease(frame, shapesAt - 2 + i * 4, 16)}
+                p={ease(frame, meetAt + 8 + i * 4, 16)}
               />
             ),
           )}

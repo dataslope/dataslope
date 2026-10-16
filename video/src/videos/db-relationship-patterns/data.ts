@@ -140,6 +140,8 @@ export const OTO = {
   second: failed("otoSecond"),
   /** The same insert with only the foreign key: accepted. */
   secondLoose: tag("otoSecondLoose"),
+  /** The row it added (id, user_id, display_name), Ada's second profile. */
+  looseRow: cells("otoSecondLoose")[0],
   looseAda: one<number>("otoLooseAda", "n"),
 };
 
@@ -159,7 +161,12 @@ export const SR = {
   depth: depth.depth as number,
   joinCols: ok("srJoin").fields,
   joinRows: cells("srJoin"),
+  /** The first four rows as the self-join reads them: id, name, manager_id. */
+  aliasCols: ["id", "name", "manager_id"] as const,
+  firstRows: EMPLOYEES.slice(0, 4).map((e): Cell[] => [String(e.id), e.name, e.managerId === null ? null : String(e.managerId)]),
   updateSql: sqlLines("srSelf"),
+  /** Ada's manager_id once the update has run. */
+  adaAfter: cells("srAdaAfter", ["manager_id"])[0][0] as string,
   updateTag: tag("srSelf"),
   joinAfter: cells("srJoinAfter"),
 };

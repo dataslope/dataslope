@@ -3,11 +3,12 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { fmt, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ds } from "../../theme/brand";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { mulberry32, num, pct, TEST } from "./data";
-import { Big, Count, DATA, DATA_INK, Headline, Kicker, lerp, STAT, STAT_INK, Strike, Svg, VBracket } from "./parts";
+import { Big, Count, DATA, DATA_INK, Headline, Kicker, lerp, Pulse, SOFT, STAT, STAT_INK, Strike, Svg, VBracket } from "./parts";
 
 /** The tree: where each node's label is centred. */
 const NODE = {
@@ -19,8 +20,21 @@ const NODE = {
   healthyPos: [650, 700],
   healthyNeg: [870, 700],
 } as const;
+/** Each node's pill: the two sick branches tinted blue, the false alarms red. */
+const PILL = [
+  `color-mix(in srgb, ${INK_SOFT} 14%, transparent)`,
+  ds("blue", 100),
+  `color-mix(in srgb, ${INK_SOFT} 14%, transparent)`,
+  ds("blue", 100),
+  `color-mix(in srgb, ${INK_SOFT} 8%, transparent)`,
+  ds("red", 100),
+  `color-mix(in srgb, ${INK_SOFT} 8%, transparent)`,
+];
 /** Everyone who tested positive, 61 to a row: 61 x 18 is 1,098 exactly. */
 const GRID = { x0: 1060, top: 372, pitch: 12.8, r: 4.7, cols: 61 } as const;
+
+/** A thousand people as 50 by 20 dots; the one with the disease sits here. */
+const FIELD = { x0: 1100, top: 340, pitch: 13, cols: 50, one: 637 } as const;
 
 const JIT = (() => {
   const r = mulberry32(3);
@@ -55,6 +69,7 @@ export const TestScene: React.FC = () => {
   const catchesAt = n.word("caught", "catches");
   const caughtAt = n.word("caught", "ninety-nine");
   const flagsAt = n.word("flagged", "flags");
+  const mistakeAt = n.word("flagged", "by mistake");
   const alarmsAt = n.word("flagged", "nine hundred and ninety-nine");
   const lineupAt = n.word("lineup", "line up");
   const peopleAt = n.word("lineup", "One thousand and ninety-eight");
@@ -132,21 +147,43 @@ export const TestScene: React.FC = () => {
           </span>
           <span style={{ ...note(30, INK), fontWeight: 600 }}>You test positive.</span>
         </Ink>
-        <Ink at={chancesAt - 4} dur={14} style={{ left: 1100, top: y(330), whiteSpace: "nowrap" }}>
+        {/* A thousand people, one of whom has it. */}
+        <Ink at={thousandAt - 4} dur={12} style={{ left: FIELD.x0, top: y(FIELD.top) - 40, whiteSpace: "nowrap" }}>
+          <span style={label(22, INK_SOFT)}>
+            A thousand people, <span style={{ color: DATA_INK }}>one with the disease</span>
+          </span>
+        </Ink>
+        <Svg>
+          {Array.from({ length: 1000 }, (_, i) => {
+            const one = i === FIELD.one;
+            const p = one ? pop(frame, thousandAt + 10, fps, 12) : ease(frame, thousandAt - 4 + JIT[i] * 14, 8);
+            if (p <= 0) return null;
+            const cx = FIELD.x0 + FIELD.pitch * ((i % FIELD.cols) + 0.5);
+            const cy = y(FIELD.top) + h(FIELD.pitch * (Math.floor(i / FIELD.cols) + 0.5));
+            return <circle key={i} cx={cx} cy={cy} r={(one ? 6.5 : 3.6) * Math.min(1.1, p)} fill={one ? DATA : SOFT} />;
+          })}
+        </Svg>
+        <Pulse
+          x={FIELD.x0 + FIELD.pitch * ((FIELD.one % FIELD.cols) + 0.5)}
+          y={y(FIELD.top) + h(FIELD.pitch * (Math.floor(FIELD.one / FIELD.cols) + 0.5))}
+          at={positiveAt - 2}
+          color={DATA}
+        />
+        <Ink at={chancesAt - 4} dur={14} style={{ left: 1100, top: y(616), whiteSpace: "nowrap" }}>
           <span style={label(24, INK)}>The chance you have it</span>
         </Ink>
-        <Ink at={gutAt - 2} dur={14} style={{ left: 1100, top: y(388), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 20 }}>
+        <Ink at={gutAt - 2} dur={14} style={{ left: 1100, top: y(654), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 20 }}>
           <span style={note(26, INK_SOFT)}>Your gut</span>
-          <Big size={110} color={INK_SOFT}>
+          <Big size={96} color={INK_SOFT}>
             <Strike at={answerAt - 2} top="0.5em">
               {pct(TEST.sensitivity)}
             </Strike>
           </Big>
         </Ink>
-        <Ink at={answerAt + 2} dur={14} style={{ left: 1100, top: y(560), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 20 }}>
+        <Ink at={answerAt + 2} dur={14} style={{ left: 1100, top: y(768), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 20 }}>
           <span style={note(26, INK)}>The answer</span>
           <span style={{ opacity: ease(frame, nineAt - 4, 12) }}>
-            <Big size={130} color={STAT_INK} italic>
+            <Big size={110} color={STAT_INK} italic>
               about {pct(TEST.treePpv)}
             </Big>
           </span>
@@ -183,18 +220,22 @@ export const TestScene: React.FC = () => {
               style={{
                 position: "absolute",
                 left: p[0],
-                top: y(p[1]) - 34,
-                transform: `translate(-50%, ${(1 - a) * 10}px)`,
+                top: y(p[1]) - 40,
+                transform: `translate(-50%, ${(1 - a) * 10}px) scale(${lerp(0.85, 1, a)})`,
                 opacity: a,
                 textAlign: "center",
                 whiteSpace: "nowrap",
               }}
             >
-              <div style={{ ...note(i === 0 ? 40 : 34, color), fontWeight: 700, lineHeight: 1.05 }}>{big}</div>
-              <div style={{ ...note(21, INK_SOFT) }}>{small}</div>
+              <div style={{ padding: "6px 20px 8px", borderRadius: 16, background: PILL[i] }}>
+                <div style={{ ...note(i === 0 ? 40 : 34, color), fontWeight: 700, lineHeight: 1.05 }}>{big}</div>
+                <div style={{ ...note(21, INK_SOFT) }}>{small}</div>
+              </div>
             </div>
           );
         })}
+        <Pulse x={NODE.healthy[0]} y={y(NODE.healthy[1])} at={mistakeAt - 2} r={70} />
+        <Pulse x={NODE.sick[0]} y={y(NODE.sick[1])} at={catchesAt - 2} r={70} color={DATA} />
         {/* The two rates, on the branches they decide. */}
         <Note at={catchesAt} x={(NODE.sick[0] + NODE.sickPos[0]) / 2 - 16} y={y((NODE.sick[1] + NODE.sickPos[1]) / 2) - 14} align="right">
           <span style={{ ...note(21, DATA_INK), fontWeight: 650, whiteSpace: "nowrap" }}>99%</span>
@@ -243,14 +284,20 @@ export const TestScene: React.FC = () => {
           = {TEST.tp} / {num(TEST.positives)}
         </span>
       </Ink>
-      <Note at={simAt - 2} x={GRID.x0} y={gridBottom + 250}>
-        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-          Simulated, <Count at={simAt} dur={22} to={TEST.simN} format={num} /> people:{" "}
-          <span style={{ opacity: ease(frame, simAt + 14, 10) }}>
-            {num(TEST.simSickPositive)} sick of {num(TEST.simPositives)} positives,{" "}
+      <Note at={simAt - 2} x={GRID.x0} y={gridBottom + 236}>
+        <div style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          Simulated, <Count at={simAt} dur={30} to={TEST.simN} format={num} style={{ fontWeight: 700 }} /> people
+        </div>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 18, marginTop: 6, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, simAt + 14, 10) }}>
+            {num(TEST.simSickPositive)} sick of {num(TEST.simPositives)} positives
           </span>
-          <b style={{ color: STAT_INK, opacity: ease(frame, pointOneAt - 4, 10) }}>{fmt(TEST.simPpv * 100, 1)}%</b>
-        </span>
+          <span style={{ opacity: ease(frame, pointOneAt - 4, 10) }}>
+            <Big size={64} color={STAT_INK} italic>
+              {fmt(TEST.simPpv * 100, 1)}%
+            </Big>
+          </span>
+        </div>
       </Note>
     </AbsoluteFill>
   );

@@ -149,11 +149,11 @@ export const DoorsScene: React.FC = () => {
       </Note>
 
       {/* ── The column, and the letters ── */}
-      <Spot id="probability-goat" at={goatAt - 2} left={1250} top={y(250)} width={560} height={374} />
-      <Ink at={ninetyAt - 4} dur={16} style={{ left: 1250, top: y(600), whiteSpace: "nowrap" }}>
+      <Spot id="probability-goat" at={goatAt - 2} left={1420} top={y(226)} width={260} height={420} />
+      <Ink at={ninetyAt - 4} dur={16} style={{ left: 1250, top: y(618), whiteSpace: "nowrap" }}>
         <span style={label(23, INK_SOFT)}>Parade magazine, 1990</span>
       </Ink>
-      <Ink at={yesAt - 2} dur={16} style={{ left: 1250, top: y(640), whiteSpace: "nowrap" }}>
+      <Ink at={yesAt - 2} dur={16} style={{ left: 1250, top: y(658), whiteSpace: "nowrap" }}>
         <span style={{ ...body(36, true), color: INK }}>
           &ldquo;Switch.<span style={{ opacity: ease(frame, twoAt - 4, 12) }}> It wins two times in three.&rdquo;</span>
         </span>

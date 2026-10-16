@@ -64,6 +64,7 @@ export const ExtentScene: React.FC = () => {
   const shapeAt = n.word("shape", "assumed shape");
   const goodAt = n.word("next", "as good as");
   const drawnAt = n.word("next", "how the sample");
+  const settle = ease(frame, n.beat("next").to + 8, 30) * 0.45;
 
   const pdf = (v: number) => normalPdf(v, RANGE.loc, RANGE.scale);
   const base = y(BASE);
@@ -100,6 +101,7 @@ export const ExtentScene: React.FC = () => {
       />
 
       <Drift from={extentFrom} to={n.beat("next").to + 60} amount={0.02}>
+        <div style={{ position: "absolute", inset: 0, opacity: 1 - settle }}>
         <FigLabel n="14" title={`${RANGE.n} values, and the normal fitted to them`} at={extentFrom} x={160} y={y(300)} />
 
         {/* Where there is no data. */}
@@ -203,6 +205,7 @@ export const ExtentScene: React.FC = () => {
           </span>
         </Note>
 
+        </div>
         <NextLine at={drawnAt - 6} x={1140} y={y(866)} width={620}>
           how the sample was drawn.
         </NextLine>

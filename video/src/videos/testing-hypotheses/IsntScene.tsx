@@ -85,7 +85,7 @@ export const IsntScene: React.FC = () => {
         </Ink>
         <Ink at={assumingAt - 4} dur={16} style={{ left: LEFT, top: y(310) + 70, whiteSpace: "nowrap" }}>
           <Label size={24} color={INK_SOFT} weight={520}>
-            It was computed by assuming <H0 />.
+            It was computed by assuming the null.
           </Label>
         </Ink>
 

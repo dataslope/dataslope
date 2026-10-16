@@ -133,7 +133,7 @@ export const RateScene: React.FC = () => {
         </Ink>
       </div>
 
-      <Axis scale={X} base={y(AXIS)} ticks={[15, 16, 17, 18, 19, 20, 21]} format={(v) => `${v}%`} at={stepAt - 10} />
+      <Axis scale={X} base={y(AXIS)} ticks={[15, 16, 17, 18, 19, 20, 21]} format={(v) => `${v}%`} at={eighteenAt - 8} />
       <Rule x={px(RATE.pHat)} y0={y(AXIS)} y1={y(BAR_Y) - 30} at={eighteenAt - 2} color={EST} width={3.4} />
       <Note at={eighteenAt} x={px(RATE.pHat) + 12} y={y(BAR_Y) - 70}>
         <span style={{ ...note(22, EST_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>

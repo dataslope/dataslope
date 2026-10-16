@@ -59,6 +59,7 @@ export const CasesScene: React.FC = () => {
   const aGoatAt = n.word("rv-in", "a goat");
   const positiveAt = n.word("rv-in", "a positive");
   const numbersAt = n.word("rv-in", "numbers");
+  const rvInFrom = n.beat("rv-in").from;
 
   const rowAt = [pickAt - 4, otherAt - 2, otherAt + 8];
   const opensAt = [hasToAt - 2, hasToAt + 2, hasToAt + 6];
@@ -70,6 +71,8 @@ export const CasesScene: React.FC = () => {
   const stayD = pts.map(([k, v], i) => `${i ? "L" : "M"}${gx(k).toFixed(1)},${fy(v).toFixed(1)}`).join(" ");
   const switchD = pts.map(([k, v], i) => `${i ? "L" : "M"}${gx(k).toFixed(1)},${fy(1 - v).toFixed(1)}`).join(" ");
   const axis = ease(frame, randomAt - 6, 16);
+  // The running rate at the newest game drawn, for the labels at the lines' ends.
+  const liveStay = pts.length ? pts[pts.length - 1][1] : MONTY.stay;
 
   return (
     <AbsoluteFill>
@@ -82,7 +85,8 @@ export const CasesScene: React.FC = () => {
       <Sfx name="el-pencil" at={playAt - 4} level={-34} />
       <Sfx name="el-tap" at={sixtyAt - 2} level={-28} />
 
-      <Headline top={y(150)} first="She was right:" second="switching wins two in three." firstAt={casesFrom - 6} secondAt={hasCarAt - 2} />
+      <Headline top={y(150)} first="She was right:" second="switching wins two in three." firstAt={casesFrom - 6} secondAt={hasCarAt - 2} out={rvInFrom - 6} />
+      <Headline top={y(150)} first="Outcomes so far:" second="labels, not numbers." firstAt={rvInFrom - 2} secondAt={numbersAt - 6} />
       <FigLabel n="6" title="You pick door 1. Where the car can be" at={casesFrom} x={160} y={y(268)} />
 
       {/* ── The three cases ── */}
@@ -181,21 +185,26 @@ export const CasesScene: React.FC = () => {
       <Svg>
         {pts.length > 1 ? (
           <>
-            <path d={stayD} fill="none" stroke={STAT} strokeWidth={2.6} strokeLinejoin="round" />
-            <path d={switchD} fill="none" stroke={DATA} strokeWidth={2.6} strokeLinejoin="round" />
+            <path d={stayD} fill="none" stroke={STAT} strokeWidth={3.2} strokeLinejoin="round" />
+            <path d={switchD} fill="none" stroke={DATA} strokeWidth={3.2} strokeLinejoin="round" />
           </>
         ) : null}
       </Svg>
       <Note at={stayAt - 2} x={CH.x1 - 4} y={fy(MONTY.stay) + 12} align="right">
-        <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-          stay <span style={{ opacity: ease(frame, thirtyAt - 4, 10) }}>{fmt(MONTY.stay * 100, 1)}%</span>
+        <span style={{ ...note(24, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          stay <span style={{ opacity: ease(frame, thirtyAt - 4, 10) }}>{fmt(liveStay * 100, 1)}%</span>
         </span>
       </Note>
-      <Note at={switchAt - 2} x={CH.x1 - 4} y={fy(MONTY.switch) - 44} align="right">
-        <span style={{ ...note(22, DATA_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-          switch <span style={{ opacity: ease(frame, sixtyAt - 4, 10) }}>{fmt(MONTY.switch * 100, 1)}%</span>
+      <Note at={switchAt - 2} x={CH.x1 - 4} y={fy(MONTY.switch) - 46} align="right">
+        <span style={{ ...note(24, DATA_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          switch <span style={{ opacity: ease(frame, sixtyAt - 4, 10) }}>{fmt((1 - liveStay) * 100, 1)}%</span>
         </span>
       </Note>
+      {/* How many games have been played, counting up as the lines run. */}
+      <div style={{ position: "absolute", right: 1920 - CH.x1, top: y(CH.top) - 6, opacity: ease(frame, playAt - 4, 10), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK_SOFT) }}>games </span>
+        <span style={{ ...note(34, INK), fontWeight: 700 }}>{Math.round(K).toLocaleString("en-US")}</span>
+      </div>
 
       {/* ── The turn: outcomes so far were labels ── */}
       {(

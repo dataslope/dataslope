@@ -9,6 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { H, ILLUSTRATIONS, PER_SQUARE, RETURNED_SQUARES, SQUARES, VIDEO } from "./data";
 import { Bracket, DOT, EASY, EASY_INK, RANDOM, RANDOM_INK, RAW, Underline } from "./parts";
+import { Marker } from "../sampling/emphasis";
 
 /** The ballot grid: ten rows of ten squares. */
 const GRID = { x: 160, y: 452, cell: 31, gap: 6 };
@@ -31,6 +32,7 @@ export const DigestScene: React.FC = () => {
   const { y } = useLayout();
 
   const digestFrom = n.beat("digest").from;
+  const yearAt = n.word("digest", "nineteen thirty-six");
   const mailedAt = n.word("digest", "mailed");
   const tenAt = n.word("digest", "ten million");
   const backFrom = n.beat("back").from;
@@ -63,7 +65,9 @@ export const DigestScene: React.FC = () => {
       <Sfx name="swish" at={lessonFrom - 2} level={-34} />
 
       <Ink at={digestFrom - 4} dur={14} style={{ left: 96, top: y(112) }}>
-        <span style={label(20, INK_SOFT)}>The 1936 presidential race</span>
+        <span style={label(20, INK_SOFT)}>
+          The <Marker at={yearAt - 2}>1936</Marker> presidential race
+        </span>
       </Ink>
       <Ink at={digestFrom - 2} dur={20} style={{ left: 92, top: y(150), ...headline(84), whiteSpace: "nowrap" }}>
         Ten million ballots.

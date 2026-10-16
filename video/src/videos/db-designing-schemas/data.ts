@@ -72,6 +72,10 @@ export const WIDE_COLUMNS: readonly { table: string; name: string }[] = (
   ["customers", "orders", "order_items", "products", "categories"] as const
 ).flatMap((t) => ok(`columns_${t}`).rows.map((r) => ({ table: t, name: r.column_name as string })));
 
+/** The first line of the lesson's own DDL for the store: what typing tables
+ *  straight away starts with. */
+export const FIRST_DDL_LINE = results.sql.store.split("\n").find((l) => l.startsWith("CREATE TABLE")) as string;
+
 // ── Ana's order: the price charged and the price now ────────────────────────
 
 const lines = ok("lines");
@@ -86,6 +90,13 @@ export const L = { product: 0, quantity: 1, unitPrice: 2, currentPrice: 3, lineT
 export const MUG = LINES.findIndex((r) => (r[L.product] ?? "").includes("Mug"));
 export const TOTAL_CHARGED = ok("totalCharged").rows[0].order_total as string;
 export const TOTAL_CATALOG = ok("totalCatalog").rows[0].order_total as string;
+
+/** The two tables that hold a price, as stored: order_items' lines of
+ *  order 1, and the products they point at. */
+export const ITEM_COLS = ["order_id", "product_id", "quantity", "unit_price"] as const;
+export const ITEM_ROWS: readonly (readonly Cell[])[] = cells(ok("orderItems"), [...ITEM_COLS]);
+export const PRODUCT_COLS = ["id", "name", "current_price"] as const;
+export const PRODUCT_ROWS: readonly (readonly Cell[])[] = cells(ok("products"), [...PRODUCT_COLS]);
 
 // ── What Postgres refused ───────────────────────────────────────────────────
 
@@ -120,6 +131,17 @@ export const PRIORITY_REQUIRED =
 /** That the tightening statements ran. */
 ok("tighten");
 ok("check");
+
+// ── The task tracker grows (why-schemas-change) ─────────────────────────────
+
+const tracker = new Set(ok("trackerV3").rows.map((r) => r.column_name as string));
+const trackerProjects = new Set(ok("trackerV3Projects").rows.map((r) => r.column_name as string));
+export const TRACKER = {
+  tasks: { name: "tasks", columns: [{ name: "id", key: "PK" }, { name: "title" }, { name: "status" }, { name: "due_on" }, { name: "project_id", key: "FK" }] as Column[] },
+  projects: { name: "projects", columns: [{ name: "id", key: "PK" }, { name: "name" }] as Column[] },
+};
+for (const c of TRACKER.tasks.columns) if (!tracker.has(c.name)) throw new Error(`tracker tasks has no ${c.name}`);
+for (const c of TRACKER.projects.columns) if (!trackerProjects.has(c.name)) throw new Error(`projects has no ${c.name}`);
 
 // ── One owner becomes many assignees: expand and contract ───────────────────
 

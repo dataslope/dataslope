@@ -29,6 +29,7 @@ export const QuantileScene: React.FC = () => {
   const quantileFrom = n.beat("quantile").from;
   const responseAt = n.word("quantile", "response times");
   const timeAt = n.word("quantile", "the time");
+  const avgAt = n.word("quantile", "two hundred milliseconds");
   const ninetyAt = n.word("quantile", "ninety-five percent");
   const plotAt = n.word("across", "Plot");
   const momentEnd = n.word("across", "moment", { edge: "end" });
@@ -77,6 +78,14 @@ export const QuantileScene: React.FC = () => {
           </Note>
           <YTicks ticks={[0.25, 0.5, 0.75]} py={py} x0={X.x0} x1={X.x1} at={responseAt} format={(v) => `${Math.round(v * 100)}%`} />
           <Axis scale={X} base={base} ticks={[0, 200, 400, 600, 800, 1000]} at={responseAt} format={(v) => (v === 1000 ? "1,000 ms" : String(v))} />
+
+          {/* The average, for scale. */}
+          <Svg opacity={ease(frame, avgAt - 2, 12) * 0.7}>
+            <line x1={sx(X, scale)} x2={sx(X, scale)} y1={base} y2={py(f(scale))} stroke={INK} strokeWidth={2} strokeDasharray="6 6" />
+          </Svg>
+          <Note at={avgAt + 4} x={sx(X, scale) + 12} y={base - h(60)}>
+            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", ...halo }}>average {scale} ms</span>
+          </Note>
 
           {/* What's asked: the time ninety-five percent beat. */}
           <Svg opacity={ease(frame, ninetyAt - 2, 12) * (1 - across)}>

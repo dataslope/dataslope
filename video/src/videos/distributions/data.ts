@@ -13,7 +13,7 @@ export const VIDEO = "distributions";
  * Whether public/images/distributions/ holds the four watercolors from
  * illustrations.json. Every frame is laid out with room for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 /** mulberry32: a tiny, well-mixed 32-bit PRNG, for layout jitter only. */
 export function mulberry32(seed: number) {

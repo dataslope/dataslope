@@ -59,20 +59,22 @@
     "jtCountBefore": "SELECT COUNT(*)::int AS n FROM enrollments;",
     "jtInsert": "INSERT INTO\n  enrollments (student_id, course_id, enrolled_on)\nVALUES\n  (3, 10, DATE '2026-02-01');",
     "jtCountAfter": "SELECT COUNT(*)::int AS n FROM enrollments;",
+    "jtLinus": "SELECT student_id, course_id, enrolled_on::text AS enrolled_on, grade FROM enrollments WHERE student_id = 3 AND course_id = 10;",
     "jtInsertAgain": "INSERT INTO\n  enrollments (student_id, course_id, enrolled_on)\nVALUES\n  (3, 10, DATE '2026-02-01');",
     "jtCountAgain": "SELECT COUNT(*)::int AS n FROM enrollments;",
     "otoCounts": "SELECT (SELECT count(*) FROM users)::int AS users,\n       (SELECT count(*) FROM user_profiles)::int AS profiles,\n       (SELECT count(*) FROM users u WHERE NOT EXISTS (SELECT 1 FROM user_profiles p WHERE p.user_id = u.id))::int AS without;",
     "otoWide": "SELECT u.id, u.email, p.display_name, p.bio FROM users u LEFT JOIN user_profiles p ON p.user_id = u.id WHERE u.id <= 4 ORDER BY u.id;",
     "otoProfiles": "SELECT id, user_id, display_name FROM user_profiles ORDER BY id LIMIT 3;",
     "otoJoin": "SELECT\n  u.email,\n  p.display_name,\n  p.bio\nFROM\n  users u\n  LEFT JOIN user_profiles p ON p.user_id = u.id\nORDER BY\n  u.id;",
-    "otoSecond": "INSERT INTO user_profiles (user_id, display_name) VALUES (1, 'Ada');",
-    "otoSecondLoose": "INSERT INTO loose_profiles (user_id, display_name) VALUES (1, 'Ada');",
+    "otoSecond": "INSERT INTO user_profiles\n  (user_id, display_name)\nVALUES (1, 'Ada');",
+    "otoSecondLoose": "INSERT INTO loose_profiles\n  (user_id, display_name)\nVALUES (1, 'Ada')\nRETURNING id, user_id, display_name;",
     "otoLooseAda": "SELECT count(*)::int AS n FROM loose_profiles WHERE user_id = 1;",
     "srRows": "SELECT id, name, title, manager_id FROM employees ORDER BY id;",
     "srJoin": "SELECT\n  e.name AS employee,\n  e.title,\n  m.name AS manager\nFROM\n  employees e\n  LEFT JOIN employees m ON m.id = e.manager_id\nORDER BY\n  e.id;",
     "srDepth": "WITH RECURSIVE chain AS (\n  SELECT id, name, title, ARRAY[name] AS path, 1 AS depth FROM employees WHERE manager_id IS NULL\n  UNION ALL\n  SELECT e.id, e.name, e.title, c.path || e.name, c.depth + 1 FROM employees e JOIN chain c ON e.manager_id = c.id\n)\nSELECT id, name, title, path, depth FROM chain ORDER BY depth DESC, id LIMIT 1;",
     "srReports": "SELECT name FROM employees WHERE manager_id = 1 ORDER BY id;",
     "srSelf": "UPDATE employees SET manager_id = 1 WHERE id = 1;",
+    "srAdaAfter": "SELECT id, name, manager_id FROM employees WHERE id = 1;",
     "srJoinAfter": "SELECT\n  e.name AS employee,\n  e.title,\n  m.name AS manager\nFROM\n  employees e\n  LEFT JOIN employees m ON m.id = e.manager_id\nORDER BY\n  e.id;",
     "srCycle": "UPDATE employees SET manager_id = 4 WHERE id = 2;"
   },
@@ -1174,6 +1176,24 @@
         }
       ]
     },
+    "jtLinus": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "student_id",
+        "course_id",
+        "enrolled_on",
+        "grade"
+      ],
+      "rows": [
+        {
+          "student_id": 3,
+          "course_id": 10,
+          "enrolled_on": "2026-02-01",
+          "grade": null
+        }
+      ]
+    },
     "jtInsertAgain": {
       "error": {
         "message": "duplicate key value violates unique constraint \"enrollments_pkey\"",
@@ -1414,8 +1434,18 @@
     "otoSecondLoose": {
       "command": "INSERT",
       "affectedRows": 1,
-      "fields": [],
-      "rows": []
+      "fields": [
+        "id",
+        "user_id",
+        "display_name"
+      ],
+      "rows": [
+        {
+          "id": 16,
+          "user_id": 1,
+          "display_name": "Ada"
+        }
+      ]
     },
     "otoLooseAda": {
       "command": "SELECT",
@@ -1768,6 +1798,22 @@
       "affectedRows": 1,
       "fields": [],
       "rows": []
+    },
+    "srAdaAfter": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "id",
+        "name",
+        "manager_id"
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "name": "Ada",
+          "manager_id": 1
+        }
+      ]
     },
     "srJoinAfter": {
       "command": "SELECT",

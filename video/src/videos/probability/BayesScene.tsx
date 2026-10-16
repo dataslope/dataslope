@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { num, pct, TEST } from "./data";
-import { Big, DATA, DATA_INK, Headline, lerp, SOFT, STAT, STAT_INK, Strike, Svg, Sweep } from "./parts";
+import { Arrow, Big, DATA, DATA_INK, Headline, lerp, SOFT, STAT, STAT_INK, Strike, Svg, Sweep } from "./parts";
 
 /** The two-bar comparison: the share of positives who are sick, once and
  *  twice tested. Both bars are the whole of their positives. */
@@ -48,9 +48,10 @@ export const BayesScene: React.FC = () => {
   const trustAt = n.word("rule", "trust");
   const rareAt = n.word("rule", "how rare");
   const fooledAt = n.word("doors-in", "fooled");
+  const doorsInFrom = n.beat("doors-in").from;
 
   const phaseOut = ease(frame, retestFrom - 8, 14);
-  const closing = ease(frame, fooledAt - 4, 18) * 0.4;
+  const closing = ease(frame, doorsInFrom - 4, 18) * 0.45;
 
   // The neglect bars: who takes the test.
   const BAR = { x0: 420, w: 1300, h: 40, y: [742, 800] } as const;
@@ -65,7 +66,9 @@ export const BayesScene: React.FC = () => {
   const split2 = lerp(TEST.treePpv, realShare2, ease(frame, tenAt - 4, 26));
 
   return (
-    <AbsoluteFill style={{ opacity: 1 - closing }}>
+    <AbsoluteFill>
+      <Headline top={y(150)} first="Conditioning fools" second="experts, too." firstAt={doorsInFrom - 2} secondAt={fooledAt + 2} />
+      <div style={{ position: "absolute", inset: 0, opacity: 1 - closing }}>
       {/* ── Sound: the swapped conditional, the base rate, the bars, the flip ── */}
       <Sfx name="el-scratch" at={areSickEnd} level={-30} />
       <Sfx name="el-pencil" at={baseAt - 2} level={-34} />
@@ -76,7 +79,7 @@ export const BayesScene: React.FC = () => {
       <Sfx name="el-pencil" at={rareAt - 2} level={-34} />
 
       <Headline top={y(150)} first="The gut reads it" second="backwards." firstAt={inverseFrom - 6} secondAt={backwardsAt - 4} out={retestFrom - 8} />
-      <Headline top={y(150)} first="Test the positives again," second="and it flips." firstAt={retestFrom - 2} secondAt={nineInTenAt - 4} />
+      <Headline top={y(150)} first="Test the positives again," second="and it flips." firstAt={retestFrom - 2} secondAt={nineInTenAt - 4} out={doorsInFrom - 6} />
 
       <div style={{ opacity: 1 - phaseOut }}>
         {/* ── Two conditionals ── */}
@@ -111,6 +114,8 @@ export const BayesScene: React.FC = () => {
           </div>
         </Ink>
 
+        {/* Bayes' rule takes you from one to the other. */}
+        <Arrow from={[200, y(490)]} to={[1080, y(490)]} at={oneAt - 4} dur={18} color={STAT} width={3.4} />
         {/* ── Bayes' rule, and the base rate ── */}
         <Ink at={bayesAt - 4} dur={18} style={{ left: 160, top: y(560), whiteSpace: "nowrap" }}>
           <span style={{ ...note(34, INK) }}>
@@ -252,6 +257,7 @@ export const BayesScene: React.FC = () => {
           Before you trust a positive, ask <Sweep at={rareAt}>how rare</Sweep> the thing is.
         </span>
       </Ink>
+      </div>
     </AbsoluteFill>
   );
 };

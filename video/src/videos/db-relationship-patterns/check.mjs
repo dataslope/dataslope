@@ -200,7 +200,7 @@ ORDER BY e.student_id, e.course_id;`,
   out.lessons.oneToOne.starterCode = join;
   await run(db, "otoJoin", join);
   // A second profile for Ada, against the lesson's table (UNIQUE on user_id)...
-  const second = "INSERT INTO user_profiles (user_id, display_name) VALUES (1, 'Ada');";
+  const second = "INSERT INTO user_profiles\n  (user_id, display_name)\nVALUES (1, 'Ada');";
   await run(db, "otoSecond", second);
   // ...and against the same table with only the foreign key.
   await db.exec(`CREATE TABLE loose_profiles (
@@ -210,7 +210,7 @@ ORDER BY e.student_id, e.course_id;`,
   bio          TEXT
 );
 INSERT INTO loose_profiles (user_id, display_name, bio) SELECT user_id, display_name, bio FROM user_profiles ORDER BY id;`);
-  await run(db, "otoSecondLoose", second.replace("user_profiles", "loose_profiles"));
+  await run(db, "otoSecondLoose", second.replace("user_profiles", "loose_profiles").replace(";", "\nRETURNING id, user_id, display_name;"));
   await run(db, "otoLooseAda", "SELECT count(*)::int AS n FROM loose_profiles WHERE user_id = 1;");
   await db.close();
 }
@@ -238,6 +238,7 @@ SELECT id, name, title, path, depth FROM chain ORDER BY depth DESC, id LIMIT 1;`
   await run(db, "srReports", "SELECT name FROM employees WHERE manager_id = 1 ORDER BY id;");
   // What the foreign key does not stop: a row managing itself, and a cycle.
   await run(db, "srSelf", "UPDATE employees SET manager_id = 1 WHERE id = 1;");
+  await run(db, "srAdaAfter", "SELECT id, name, manager_id FROM employees WHERE id = 1;");
   await run(db, "srJoinAfter", join);
   await run(db, "srCycle", "UPDATE employees SET manager_id = 4 WHERE id = 2;");
   await db.close();

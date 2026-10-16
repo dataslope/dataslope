@@ -92,7 +92,8 @@ INSERT INTO orders VALUES
 const db = new PGlite();
 await db.exec(SETUP);
 
-const version = (await db.query("SELECT version();")).rows[0].version;
+const VERSION = "SELECT version();";
+const version = (await db.query(VERSION)).rows[0].version;
 
 // The lesson's query, exactly as its starterCode prints it.
 const ADA = `-- No pointers, no navigation: rows connect because values match.
@@ -105,13 +106,20 @@ FROM
 WHERE
   c.name = 'Ada';`;
 
+// The same query as the video sets it, four lines without the comment: it
+// must return exactly what the lesson's formatting does.
+const LISTING = `SELECT o.id AS order_id, o.total
+FROM orders o
+JOIN customers c ON c.id = o.customer_id
+WHERE c.name = 'Ada';`;
+
 const rows = async (q) => {
   const r = await db.query(q);
   return { fields: r.fields.map((f) => f.name), rows: r.rows };
 };
 
 const SHOWN = "WHERE customer_id IN (1, 2, 3)";
-const out = { version, setup: SETUP, sql: {}, results: {} };
+const out = { version, setup: SETUP, sql: { version: VERSION }, results: {} };
 const run = async (key, q) => {
   out.sql[key] = q;
   out.results[key] = await rows(q);
@@ -123,6 +131,7 @@ await run("counts", "SELECT (SELECT count(*) FROM customers) AS customers, (SELE
 // Where each row sits on disk, in the order a scan meets them.
 await run("before", `SELECT ctid::text AS ctid, id, customer_id, total FROM orders ${SHOWN};`);
 await run("ada", ADA);
+await run("listing", LISTING);
 
 // "Reorganize the file": rewrite orders in a new physical order.
 const REORGANIZE = `CREATE INDEX orders_by_total ON orders (total DESC);
@@ -131,6 +140,7 @@ out.sql.reorganize = REORGANIZE;
 await db.exec(REORGANIZE);
 await run("after", `SELECT ctid::text AS ctid, id, customer_id, total FROM orders ${SHOWN};`);
 await run("adaAgain", ADA);
+await run("listingAgain", LISTING);
 
 // A row that breaks a declared rule: no customer 25.
 const BAD = "INSERT INTO orders VALUES (131, 25, 40.00);";
@@ -145,6 +155,10 @@ await run("countAfterBad", "SELECT count(*) AS orders FROM orders;");
 
 const key = (r) => JSON.stringify([...r.rows].sort((a, b) => a.order_id - b.order_id));
 out.sameAnswer = key(out.results.ada) === key(out.results.adaAgain);
+// Same rows in the same order, before and after, in both spellings.
+const exact = (k) => JSON.stringify(out.results[k].rows);
+out.sameOrder = exact("ada") === exact("adaAgain");
+out.listingMatches = exact("listing") === exact("ada") && exact("listingAgain") === exact("adaAgain");
 const placeOf = (r) => Object.fromEntries(r.rows.map((x) => [x.id, x.ctid]));
 const was = placeOf(out.results.before);
 const now = placeOf(out.results.after);
@@ -156,6 +170,6 @@ console.log("before", out.results.before.rows.map((r) => `${r.id}@${r.ctid}`).jo
 console.log("after ", out.results.after.rows.map((r) => `${r.id}@${r.ctid}`).join(" "));
 console.log("ada   ", JSON.stringify(out.results.ada.rows));
 console.log("again ", JSON.stringify(out.results.adaAgain.rows));
-console.log("same answer:", out.sameAnswer, "moved:", out.moved.join(", "));
+console.log("same answer:", out.sameAnswer, "same order:", out.sameOrder, "listing matches:", out.listingMatches, "moved:", out.moved.join(", "));
 console.log("bad   ", JSON.stringify(out.badError), "orders after:", out.results.countAfterBad.rows[0].orders);
 writeFileSync(new URL("./results.json", import.meta.url), JSON.stringify(out, null, 2) + "\n");

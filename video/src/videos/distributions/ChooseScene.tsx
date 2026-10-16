@@ -37,6 +37,7 @@ export const ChooseScene: React.FC = () => {
   // ── Cues ──
   const chooseFrom = n.beat("choose").from;
   const countingAt = n.word("choose", "counting");
+  const modelAt = n.word("choose", "model");
   const ROWS: readonly { q: string; name: string; kind: MiniKind; qAt: number; nameAt: number }[] = [
     { q: "One yes or no", name: "Bernoulli", kind: "bernoulli", qAt: n.word("leaves", "One yes or no"), nameAt: n.word("leaves", "Bernoulli") },
     {
@@ -89,7 +90,7 @@ export const ChooseScene: React.FC = () => {
         <Ink at={countingAt - 4} dur={14} style={{ left: Q_X, top: y(ROW_Y0 - 50), whiteSpace: "nowrap" }}>
           <span style={label(22, INK_SOFT)}>What you count</span>
         </Ink>
-        <Ink at={countingAt} dur={14} style={{ left: NAME_X, top: y(ROW_Y0 - 50), whiteSpace: "nowrap" }}>
+        <Ink at={modelAt - 2} dur={14} style={{ left: NAME_X, top: y(ROW_Y0 - 50), whiteSpace: "nowrap" }}>
           <span style={label(22, INK_SOFT)}>The model</span>
         </Ink>
         <div style={{ position: "absolute", inset: 0, opacity: 1 - rowsDim }}>

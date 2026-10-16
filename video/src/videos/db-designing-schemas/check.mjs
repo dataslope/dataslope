@@ -164,7 +164,7 @@ const columns = (db, table) =>
     `SELECT column_name, is_nullable FROM information_schema.columns WHERE table_name = '${table}' ORDER BY ordinal_position;`,
   );
 
-const out = { results: {} };
+const out = { sql: { store: STORE_SETUP.trim() }, results: {} };
 const R = out.results;
 
 // ── The store (case-study-ecommerce) ───────────────────────────────────────
