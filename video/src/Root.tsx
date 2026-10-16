@@ -51,6 +51,8 @@ import { StandardError } from "./videos/standard-error/Video";
 import { script as standardErrorScript } from "./videos/standard-error/script";
 import { ThinkingStatistically } from "./videos/thinking-statistically/Video";
 import { script as thinkingStatisticallyScript } from "./videos/thinking-statistically/script";
+import { Sampling } from "./videos/sampling/Video";
+import { samplingMetadata } from "./videos/sampling/metadata";
 // Statistics course, one video per unit (Units 2 to 4 and 6 to 9).
 import { DescribingData } from "./videos/describing-data/Video";
 import { script as describingDataScript } from "./videos/describing-data/script";
@@ -336,6 +338,17 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 60}
         defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(distributionsScript)}
+      />
+      {/* Unit 5 as one video, from the five above (src/videos/sampling/). */}
+      <Composition
+        id="Sampling"
+        component={Sampling}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={samplingMetadata}
       />
       <Composition
         id="Estimation"
