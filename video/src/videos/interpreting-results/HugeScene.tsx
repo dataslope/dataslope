@@ -50,6 +50,7 @@ export const HugeScene: React.FC = () => {
   const seventhAt = n.word("p", "seventh");
   const pAtWord = n.word("p", "p-value");
   const sigAt = n.word("p", "highly significant");
+  const thousandAt = n.word("p", "ten thousand");
   const seventh2At = n.word("tiny", "seventh");
   const spreadAt = n.word("tiny", "spread");
   const percentAt = n.word("tiny", "one percent");
@@ -257,7 +258,7 @@ export const HugeScene: React.FC = () => {
         }}
       >
         p ={" "}
-        <Count from={0} to={1} at={pAtWord} dur={sigAt - pAtWord} format={(t) => pText(pAt(t))} />
+        <Count from={0} to={1} at={pAtWord} dur={Math.max(8, thousandAt + 6 - pAtWord)} format={(t) => pText(pAt(t))} />
       </div>
       <Ring x={RIGHT + 170} y={y(ROW1) + 78} at={passingAt - 2} r0={40} r1={130} />
       <Note at={sigAt - 2} x={RIGHT} y={y(ROW1) + 126}>
