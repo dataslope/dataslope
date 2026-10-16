@@ -7,8 +7,8 @@ import { body, fmt, HAIRLINE, halo, INK, INK_SOFT, note, PAPER } from "../../edi
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { AT_LEAST, TWENTY } from "./data";
-import { Count, DOT, Head, Label, lerp, Mark, pct, pulse, RAW, STAT, STAT_INK, Svg, Tick } from "./parts";
+import { AT_LEAST, PEEK, TWENTY } from "./data";
+import { Count, DATA, DATA_WASH, DOT, Head, Label, lerp, Mark, pct, pulse, RAW, STAT, STAT_INK, Svg, Tick } from "./parts";
 
 /** The chance that at least one of k tests fires. */
 const X: XScale = { lo: 0, hi: 20.5, x0: 220, x1: 980 };
@@ -19,8 +19,10 @@ const TOP = 0.8;
 const B: XScale = { lo: 0, hi: 0.06, x0: 1120, x1: 1760 };
 const B_BASE = 830;
 const HIT = TWENTY.hits[0];
-const PEEK_X0 = 260;
-const PEEK_X1 = 700;
+/** The peeking panel: one experiment with nothing to find, p after every 100 visitors. */
+const PK: XScale = { lo: 0, hi: PEEK.planned, x0: 1120, x1: 1760 };
+const PK_BASE = 640;
+const PK_TALL = 300;
 
 /**
  * Twenty tests of nothing give at least one hit 64% of the time; peeking is
@@ -41,6 +43,7 @@ export const OddsScene: React.FC = () => {
   const peekEnd = n.beat("peek").to;
   const stopAt = n.word("peek", "stopping");
   const lookAt = n.word("peek", "one look");
+  const dipsAt = n.word("peek", "dips");
   const cureAt = n.word("cure", "cure");
   const questionAt = n.word("cure", "question");
   const sampleAt = n.word("cure", "sample");
@@ -67,11 +70,14 @@ export const OddsScene: React.FC = () => {
   }
   const last = pts[pts.length - 1];
   const lastGlow = pulse(frame, sixtyAt - 2, 26);
-  // Peeking: one look after another, each a test of its own. No claim about
-  // the rate: the looks share their data, so they are not the curve's
-  // independent tests.
-  const walk = ease(frame, stopAt - 6, Math.max(30, peekEnd - stopAt + 6));
-  const looks = walk > 0 ? Math.max(1, Math.round(1 + walk * 15)) : 0;
+  // Peeking: the lesson's run, revealed look by look as the narration says it.
+  const walk = ease(frame, peekAt + 4, Math.max(40, peekEnd - peekAt));
+  const shownRows = PEEK.rows.filter((r) => r.n <= walk * PEEK.planned);
+  const peekOut = ease(frame, cureAt - 8, 14);
+  const pkx = (v: number) => sx(PK, v);
+  const pky = (p: number) => y(PK_BASE) - h(PK_TALL) * p;
+  const dipGlow = pulse(frame, dipsAt - 2, 26);
+  const dips = shownRows.filter((r, i) => r.p < 0.05 && (i === 0 || shownRows[i - 1].p >= 0.05)).length;
   // The bar falls from 0.05 to 0.0025.
   const fall = ease(frame, needsAt - 8, 22);
   const bar = lerp(0.05, AT_LEAST.bonferroni, fall);
@@ -108,16 +114,6 @@ export const OddsScene: React.FC = () => {
           ))}
           {draw > 0 ? <polyline points={line.join(" ")} fill="none" stroke={STAT} strokeWidth={3.2} strokeLinejoin="round" /> : null}
           {draw >= 1 ? <circle cx={last[0]} cy={last[1]} r={8 + 5 * lastGlow} fill={STAT} stroke={PAPER} strokeWidth={2} /> : null}
-          {/* The running experiment: a look after every batch of data. */}
-          {looks > 0 ? (
-            <>
-              <line x1={PEEK_X0} x2={PEEK_X1} y1={py(0.66)} y2={py(0.66)} stroke={INK} strokeWidth={1.6} />
-              {Array.from({ length: looks }, (_, i) => {
-                const x = lerp(PEEK_X0 + 18, PEEK_X1 - 18, i / 15);
-                return <circle key={i} cx={x} cy={py(0.66)} r={7} fill={INK} stroke={PAPER} strokeWidth={1.5} />;
-              })}
-            </>
-          ) : null}
         </Svg>
         {[0.2, 0.4, 0.6].map((v) => (
           <div
@@ -137,17 +133,48 @@ export const OddsScene: React.FC = () => {
             <Count at={sixtyAt - 2} from={0.05} to={AT_LEAST.p[19]} dur={22} format={(v) => pct(v, 0)} />
           </span>
         </Note>
-        {/* A running experiment, looked at again and again. */}
-        <Note at={peekAt - 2} x={PEEK_X0} y={py(0.66) - 76}>
-          <Label size={24} style={halo}>
-            A running experiment, looks so far: <span style={{ ...note(24, INK), fontWeight: 700 }}>{Math.max(1, looks)}</span>
-          </Label>
-        </Note>
-        <Note at={lookAt - 2} x={PEEK_X0} y={py(0.66) + 22}>
-          <Label size={21} color={INK_SOFT} weight={520} style={halo}>
-            every peek is another test
-          </Label>
-        </Note>
+        {/* ── Fig. 11: peeking, the lesson's own run of two identical arms ── */}
+        <div style={{ position: "absolute", inset: 0, opacity: 1 - peekOut }}>
+          <FigLabel n="11" title="One test with nothing to find, peeked at" at={peekAt - 4} x={PK.x0} y={y(290)} />
+          <Ink at={peekAt} dur={14} style={{ left: PK.x0, top: y(290) + 40, whiteSpace: "nowrap" }}>
+            <Label size={21} color={INK_SOFT} weight={520}>
+              p after every {PEEK.step} visitors, two identical arms
+            </Label>
+          </Ink>
+          <Axis scale={PK} base={y(PK_BASE)} ticks={[0, 2000, 4000, 6000, 8000]} format={(v) => fmt(v, 0)} at={peekAt} />
+          <Svg>
+            <rect x={PK.x0} y={pky(0.05)} width={(PK.x1 - PK.x0) * ease(frame, peekAt, 14)} height={y(PK_BASE) - pky(0.05)} fill={STAT} opacity={0.18 + 0.25 * dipGlow} />
+            {shownRows.length > 1 ? (
+              <>
+                <path
+                  d={`M${pkx(shownRows[0].n)},${y(PK_BASE)} ${shownRows.map((r) => `L${pkx(r.n).toFixed(1)},${pky(r.p).toFixed(1)}`).join(" ")} L${pkx(shownRows[shownRows.length - 1].n)},${y(PK_BASE)}Z`}
+                  fill={DATA_WASH}
+                />
+                <polyline points={shownRows.map((r) => `${pkx(r.n).toFixed(1)},${pky(r.p).toFixed(1)}`).join(" ")} fill="none" stroke={DATA} strokeWidth={2.4} strokeLinejoin="round" />
+              </>
+            ) : null}
+            {shownRows
+              .filter((r) => r.p < 0.05)
+              .map((r) => (
+                <circle key={r.n} cx={pkx(r.n)} cy={pky(r.p)} r={6} fill={STAT} stroke={PAPER} strokeWidth={1.5} />
+              ))}
+          </Svg>
+          {[0, 0.5, 1].map((v) => (
+            <div key={v} style={{ position: "absolute", right: 1920 - PK.x0 + 12, top: pky(v) - 13, opacity: ease(frame, peekAt, 12), ...note(20, INK_SOFT) }}>
+              {v}
+            </div>
+          ))}
+          <Note at={dipsAt - 2} x={PK.x1} y={pky(0.05) - 40} align="right">
+            <Label size={22} color={STAT_INK} style={halo}>
+              under 0.05: stop and ship?
+            </Label>
+          </Note>
+          <Note at={lookAt - 4} x={PK.x0} y={y(PK_BASE) + 44}>
+            <span style={{ ...note(24, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+              dips under 0.05: {dips} {dips === 1 ? "time" : "times"}, with nothing there
+            </span>
+          </Note>
+        </div>
 
         {/* ── The cure: decide before you look ── */}
         <Ink at={cureAt - 4} dur={16} style={{ left: B.x0, top: y(290), whiteSpace: "nowrap" }}>

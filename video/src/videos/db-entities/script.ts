@@ -18,9 +18,8 @@ import type { NarrationScript } from "../../narration/types";
  *      cell, and when a fact is an entity of its own.
  *   3. Entity-relationship diagrams ("chen" to "next"), after
  *      entity-relationship-diagrams.mdx: Chen's 1976 model, the three pieces,
- *      the PK and FK markers, reading the customers-orders line, and a
- *      diagram as a model. It ends on Unit 3's question: the lines carry as
- *      much meaning as the boxes.
+ *      the PK and FK markers, and reading the customers-orders line. It ends
+ *      on Unit 3's question: the lines carry as much meaning as the boxes.
  *
  * Every animation in the scenes is cued to a word below, so edit freely: a cue
  * whose word disappears throws in the Studio rather than silently drifting.
@@ -52,15 +51,18 @@ import type { NarrationScript } from "../../narration/types";
  *     refused (exactly one).
  *   - Historical: Peter Pin-Shan Chen, "The Entity-Relationship Model:
  *     Toward a Unified View of Data", ACM Transactions on Database Systems
- *     1(1), March 1976, pp. 9 to 36 (doi:10.1145/320434.320440). The
- *     lesson's "describe a system's meaning ... before committing to any
- *     particular database structure" is the paper's own argument.
+ *     1(1), March 1976, pp. 9 to 36 (doi:10.1145/320434.320440), as the
+ *     lesson dates it. "Say what the data means before deciding how to store
+ *     it" is the lesson's summary of the paper, whose abstract proposes a
+ *     model that "incorporates some of the important semantic information
+ *     about the real world".
  *   - The claims without a number are the lessons' own: nouns are candidate
- *     entities and verbs hint at relationships; a status describes an order;
+ *     entities; can there be many of these; a status describes an order;
  *     constrain what you control (statuses, roles, codes) and be humble about
  *     what the outside world sends (names, addresses); atomic values; an
- *     address becomes an entity when a customer has many; a diagram may omit
- *     indexes, seed data and rarely used columns.
+ *     address becomes an entity when a customer has many. What each type
+ *     holds ("whole numbers", "any text at all", "calendar dates") is the
+ *     video's own gloss on integer, text and date.
  *
  * Written for Drew, the course's narrator: casual and curious, short spoken
  * sentences, questions the next line answers, contractions, numbers as words,
