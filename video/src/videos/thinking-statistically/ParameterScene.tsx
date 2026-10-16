@@ -110,6 +110,7 @@ export const ParameterScene: React.FC = () => {
   const partAt = n.word("price", "seeing only part");
   const turnAt = n.beat("twenty-in").from;
   const missAgainAt = n.word("twenty-in", "miss");
+  const usuallyAt = n.word("twenty-in", "usually");
   const oneSampleAt = n.word("twenty-in", "One sample");
 
   // "In code": the definitions step back for the demonstration, and leave on
@@ -209,10 +210,10 @@ export const ParameterScene: React.FC = () => {
         base={base}
         height={y(BASE) - y(LABEL_Y + 66)}
         at={partAt - 4}
-        out={oneSampleAt - 4}
+        out={usuallyAt - 2}
         dur={30}
       />
-      <Note at={partAt + 14} x={sx(X, 70) - 18} y={y(BASE - 64)} align="right" out={oneSampleAt - 4}>
+      <Note at={partAt + 14} x={sx(X, 70) - 18} y={y(BASE - 64)} align="right" out={usuallyAt - 2}>
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", ...halo }}>the whole population</span>
       </Note>
       <TruthLine x={muX} bottom={base} top={lerp(y(LABEL_Y + 34), y(ROW_ONE.ROW0 - 16), m)} at={hundredAt - 4} />
@@ -257,7 +258,17 @@ export const ParameterScene: React.FC = () => {
         ) : null}
       </Svg>
       <Note at={averageAt} x={barX + 14} y={y(LABEL_Y)} out={oneSampleAt - 4}>
-        <span style={{ ...note(25, STAT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        {/* "how big is that miss": the average it is measured from swells. */}
+        <span
+          style={{
+            ...note(25, STAT_INK),
+            fontWeight: 700,
+            whiteSpace: "nowrap",
+            display: "inline-block",
+            transform: `scale(${1 + pulse(frame, missAgainAt - 4, 20) * 0.16})`,
+            transformOrigin: "0 100%",
+          }}
+        >
           <XBar /> ={" "}
           <Mark at={pointFourAt - 2} out={closeAt + 6}>
             {fmt(KNOWN.xBar)}
@@ -280,7 +291,11 @@ export const ParameterScene: React.FC = () => {
         {/* It makes way for the population on "the price of seeing only part". */}
         <Note at={closeAt + 2} x={barX + 16} y={stripY + h(44)} out={partAt - 6}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-            off by <b style={{ color: STAT_INK }}>{fmt(KNOWN.error)}</b>,{" "}
+            off by{" "}
+            <b style={{ color: STAT_INK }}>
+              <Mark at={missAt - 2}>{fmt(KNOWN.error)}</Mark>
+            </b>
+            ,{" "}
             <Mark at={mistakeAt - 2}>
               the estimation error
             </Mark>

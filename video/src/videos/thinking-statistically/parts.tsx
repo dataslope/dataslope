@@ -175,8 +175,8 @@ export const Strike: React.FC<{ at: number; color?: string; top?: string; childr
 
 /**
  * A highlighter stroke laid under the words it wraps, swept left to right on
- * `at` and lifted again on `out`: the phrase the narrator is reading, made
- * visible. Sized in em and to the words, like Strike.
+ * `at` and wiped away the same way on `out`: the phrase the narrator is
+ * reading, made visible. Sized in em and to the words, like Strike.
  */
 export const Mark: React.FC<{ at: number; out?: number; dur?: number; color?: string; children: React.ReactNode }> = ({
   at,
@@ -187,19 +187,19 @@ export const Mark: React.FC<{ at: number; out?: number; dur?: number; color?: st
 }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, dur);
-  const o = out === undefined ? 0 : ease(frame, out, 14);
+  const o = out === undefined ? 0 : ease(frame, out, 12);
   return (
     <span style={{ position: "relative", display: "inline-block" }}>
       <span
         style={{
           position: "absolute",
-          left: "-0.14em",
+          left: `calc(-0.14em + (100% + 0.28em) * ${o})`,
           top: "0.04em",
           bottom: "-0.06em",
-          width: `calc((100% + 0.28em) * ${p})`,
+          width: `calc((100% + 0.28em) * ${Math.max(0, p - o)})`,
           background: color,
           borderRadius: "0.14em",
-          opacity: p > 0 ? 1 - o : 0,
+          opacity: p > 0 && o < 1 ? 1 : 0,
         }}
       />
       <span style={{ position: "relative" }}>{children}</span>
@@ -294,7 +294,7 @@ export const Spot: React.FC<{
         width,
         height,
         opacity: Math.min(1, p) * (1 - o) * (1 - d),
-        transform: `translateY(${0 * bob(frame, 5, 110) + (1 - p) * 30}px)`,
+        transform: `translateY(${bob(frame, 5, 110) + (1 - p) * 30}px)`,
       }}
     />
   );

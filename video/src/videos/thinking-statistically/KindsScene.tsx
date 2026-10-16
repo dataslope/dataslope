@@ -43,6 +43,8 @@ const COUNTRIES = [
   ["MX", 214, 24],
 ] as const;
 const SHUFFLED = [2, 0, 1];
+/** How far each label arcs on its way, so no two cross at one height. */
+const ARC = [-34, 10, 30];
 const EVEN_X = SIZES.map((_, k) => (k * LAST_X) / (SIZES.length - 1));
 
 /**
@@ -78,6 +80,8 @@ export const KindsScene: React.FC = () => {
     n.word("numbers", "like logins"),
     n.word("numbers", "like price"),
   ];
+  // "Labels split again", "Numbers split": the parent named swells first.
+  const parentAgainAt = [n.beat("labels").from, n.beat("numbers").from];
   const plainlyAt = n.word("trap-in", "plainly");
   const fewAt = n.word("trap-in", "A few");
   const dontAt = n.word("trap-in", "don't");
@@ -119,7 +123,16 @@ export const KindsScene: React.FC = () => {
       {PARENTS.map((p, i) => (
         <React.Fragment key={p.name}>
           <Ink at={parentAt[i] - 4} dur={16} style={{ left: p.x, top: y(PARENT_Y), whiteSpace: "nowrap" }}>
-            <div style={{ ...body(52, true), color: INK }}>{p.name}</div>
+            <div
+              style={{
+                ...body(52, true),
+                color: INK,
+                transform: `scale(${1 + pulse(frame, parentAgainAt[i] - 2, 20) * 0.08})`,
+                transformOrigin: "0 70%",
+              }}
+            >
+              {p.name}
+            </div>
             {/* What it says arrives on "which group" and "how much", "or how many". */}
             <div style={{ ...note(25, INK_SOFT), marginTop: 12, opacity: ease(frame, (i ? muchAt : whichGroupAt) - 4, 12) }}>
               {p.what}
@@ -184,7 +197,7 @@ export const KindsScene: React.FC = () => {
           style={{
             position: "absolute",
             left: LEAVES[0].x + lerp(COUNTRIES[k][1], COUNTRIES[SHUFFLED[k]][1], shuffle),
-            top: y(PICTURE_Y) + lerp(COUNTRIES[k][2], COUNTRIES[SHUFFLED[k]][2], shuffle) - Math.sin(shuffle * Math.PI) * 22,
+            top: y(PICTURE_Y) + lerp(COUNTRIES[k][2], COUNTRIES[SHUFFLED[k]][2], shuffle) + Math.sin(shuffle * Math.PI) * ARC[k],
             opacity: ease(frame, leafAt[0] + 4 + k * 4, 10),
             border: `2px solid ${INK}`,
             borderRadius: 8,

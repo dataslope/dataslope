@@ -94,7 +94,7 @@ export const AgesScene: React.FC = () => {
           follow each other in any face. */}
       <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", alignItems: "baseline", gap: "0.3em", ...headline(64), whiteSpace: "nowrap" }}>
         <Ink at={deviationAt - 6} dur={18} style={{ position: "relative" }}>
-          <span style={{ display: "inline-block", transformOrigin: "center 80%", transform: `scale(${swell(frame, mixedAt - 2, 0.08, 20)})` }}>
+          <span style={{ display: "inline-block", transformOrigin: "right 80%", transform: `scale(${swell(frame, mixedAt - 2, 0.06, 20)})` }}>
             <Marker at={mixedAt - 2} out={spreadAt - 6}>Standard</Marker>
           </span>{" "}
           deviation
@@ -110,7 +110,7 @@ export const AgesScene: React.FC = () => {
       </div>
       <div style={{ position: "absolute", left: 92, top: y(236), display: "flex", alignItems: "baseline", gap: "0.3em", ...headline(64, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
         <Ink at={errorAt - 6} dur={18} style={{ position: "relative" }}>
-          <span style={{ display: "inline-block", transformOrigin: "center 80%", transform: `scale(${swell(frame, mixedAt + 4, 0.08, 20)})` }}>
+          <span style={{ display: "inline-block", transformOrigin: "right 80%", transform: `scale(${swell(frame, mixedAt + 4, 0.06, 20)})` }}>
             <Marker at={mixedAt + 4} out={spreadAt - 4}>Standard</Marker>
           </span>{" "}
           error

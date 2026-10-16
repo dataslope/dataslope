@@ -46,7 +46,7 @@ export const SurveyScene: React.FC = () => {
   const populationAt = n.word("names", "population");
   const sampleAt = n.word("names", "sample");
   const sixAt = n.word("names", "six hundred");
-  const listPopAt = n.word("list", "population");
+  const listPopAt = n.word("list", "the population");
   const listAt = n.word("list", "list");
   const checkoutAt = n.word("list", "checkout");
   const everSeeAt = n.word("list", "will ever see");

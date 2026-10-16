@@ -29,8 +29,8 @@ export const OpenScene: React.FC = () => {
   const beforeAt = n.word("paper", "before");
 
   const customers = useEntityLayout({
-    x: 300,
-    y: y(390),
+    x: 380,
+    y: y(480),
     width: 330,
     name: "customers",
     columns: [
@@ -39,8 +39,8 @@ export const OpenScene: React.FC = () => {
     ],
   });
   const orders = useEntityLayout({
-    x: 790,
-    y: y(350),
+    x: 870,
+    y: y(440),
     width: 400,
     name: "orders",
     columns: [
@@ -75,8 +75,8 @@ export const OpenScene: React.FC = () => {
 
       <AbsoluteFill
         style={{
-          transform: `translateX(${-room * 120}px) scale(${1 - room * 0.06})`,
-          transformOrigin: `300px ${y(560)}px`,
+          transform: `translateX(${-room * 200}px) scale(${1.2 * (1 - room * 0.08)})`,
+          transformOrigin: `380px ${y(560)}px`,
           opacity: 1 - back * 0.45,
         }}
       >

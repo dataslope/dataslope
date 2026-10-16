@@ -192,7 +192,7 @@ export const TrendScene: React.FC = () => {
             {/* In page units: a horizontal line's own box has no height to scale a gradient by. */}
             {(
               [
-                ["l", X.x0 - 10, X.x0 - 340],
+                ["l", X.x0 - 74, X.x0 - 340],
                 ["r", X.x1 + 10, X.x1 + 340],
               ] as const
             ).map(([side, from, to]) => (
@@ -213,9 +213,10 @@ export const TrendScene: React.FC = () => {
           />
           {runOn > 0 ? (
             <>
+              {/* The left run starts past the "100" tick label, so it never crosses it. */}
               <line
-                x1={X.x0 - 10}
-                x2={X.x0 - 10 - 330 * runOn}
+                x1={X.x0 - 74}
+                x2={X.x0 - 74 - 266 * runOn}
                 y1={py(TREND.level)}
                 y2={py(TREND.level)}
                 stroke="url(#ts-run-l)"

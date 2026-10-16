@@ -6,7 +6,7 @@ import { ACCENT, ACCENT_INK, BAR, body, HAIRLINE, headline, INK, INK_SOFT, label
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Card, Headline, KEY_INK, Mark, Spot, Svg, Tick } from "./parts";
+import { Card, Headline, KEY_INK, Mark, pulse, Spot, Svg, Tick } from "./parts";
 
 const LANE_X0 = 520;
 const LANE_X1 = 1280;
@@ -58,6 +58,8 @@ export const SqlScene: React.FC = () => {
   const twentiesAt = n.word("boyce", "twenties");
   const livesAt = n.word("boyce", "lives on");
   const normalAt = n.word("boyce", "Boyce-Codd");
+  // The three letters that stayed swell once more as the scene closes.
+  const lastSwell = pulse(frame, n.beat("boyce").to - 6, 24);
 
   const lanesOut = alongAt - 4;
   const LANE_A = y(410);
@@ -184,7 +186,8 @@ export const SqlScene: React.FC = () => {
                 whiteSpace: "nowrap",
                 marginRight: "0.03em",
                 opacity: p * (1 - d),
-                transform: `translateY(${(1 - p) * 30 + d * 120}px) rotate(${d * (i % 2 ? 18 : -14)}deg)`,
+                transform: `translateY(${(1 - p) * 30 + d * 120}px) rotate(${d * (i % 2 ? 18 : -14)}deg) scale(${VOWEL[i] ? 1 : 1 + lastSwell * 0.07})`,
+                transformOrigin: "50% 80%",
                 color: VOWEL[i] ? INK : sqlInk > 0.5 ? ACCENT_INK : INK,
               }}
             >

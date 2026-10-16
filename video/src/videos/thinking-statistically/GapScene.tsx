@@ -64,6 +64,7 @@ export const GapScene: React.FC = () => {
   const believeAt = n.word("luck", "believe");
   const askAt = n.word("luck", "ask");
   const couldAt = n.word("luck", "could");
+  const turnAt = n.beat("trend-in").from;
   const onlyAt = n.word("trend-in", "only gaps");
 
   // When each draw's dots arrive, and when its gap bar grows. The third draw
@@ -91,7 +92,7 @@ export const GapScene: React.FC = () => {
   const aSwell = pulse(frame, aheadAt, 20);
   // "ask one question": the groups step back, and the gaps go after them on
   // the turn to trends.
-  const groupsOp = (1 - ease(frame, askAt, 20) * 0.62) * (1 - ease(frame, onlyAt, 22));
+  const groupsOp = (1 - ease(frame, askAt, 20) * 0.62) * (1 - ease(frame, turnAt, 22));
   const panelOp = 1 - ease(frame, onlyAt + 8, 22);
 
   const strip = (values: readonly number[], jit: readonly number[], base: number, appear: (j: number) => number, op = 1) =>

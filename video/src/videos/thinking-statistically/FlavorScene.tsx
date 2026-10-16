@@ -59,6 +59,7 @@ export const FlavorScene: React.FC = () => {
   const vanillaAt = n.word("mode", "Vanilla");
   const computerAt = n.word("kinds-in", "computer");
   const labelAt = n.word("kinds-in", "label");
+  const quantityAt = n.word("kinds-in", "quantity");
   const upToYouAt = n.word("kinds-in", "up to you");
 
   const asLabels = ease(frame, labelsAt - 2, 14);
@@ -113,8 +114,8 @@ export const FlavorScene: React.FC = () => {
       {FLAVORS.answers.map((code, i) => {
         const a = ease(frame, tenAt - 2 + i * 2.5, 10);
         if (a <= 0) return null;
-        // "those numbers": each code swells in turn.
-        const read = pulse(frame, numbersAt - 2 + i * 1.4, 14);
+        // "those numbers", and "a quantity": each code swells in turn.
+        const read = pulse(frame, numbersAt - 2 + i * 1.4, 14) + pulse(frame, quantityAt - 2 + i * 1.4, 14);
         return (
           <div
             key={i}
