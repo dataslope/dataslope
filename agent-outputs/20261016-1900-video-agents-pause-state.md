@@ -136,3 +136,4 @@ when restoring.
 - DB Unit 7 `DbDesign-7-Normalization` (4:33): FINISHED after resume. check:motion (2.5 s), check:sync (+0.03 s), check:mix (24.4 LU under), check:frames pass.
 - DB Unit 6 `DbDesign-6-Constraints` (4:07): FINISHED after resume. check:motion (2.3 s), check:sync (+0.06 s), check:mix (23.7 LU under), check:frames pass. One position tweak in PairScene after the last render (UNIQUE recap tag 20 px right).
 - DB Unit 3 `DbDesign-3-Relationships` (3:08): FINISHED after resume. check:motion (2.0 s), check:sync (+0.02 s), check:mix (21.5 LU under), check:frames pass.
+- DB Unit 8 `DbDesign-8-DesigningSchemas` (4:33): FINISHED after resume. check:motion (2.8 s), check:sync (+0.02 s), check:mix (24.7 LU under), check:frames pass.
