@@ -101,7 +101,7 @@ export const script: NarrationScript = {
     },
     {
       id: "huge",
-      text: "Take two groups of three hundred thousand people, on a score that varies by about fifteen points.",
+      text: "Take two groups of three hundred thousand, on a score that varies by about fifteen points.",
       pauseAfter: 0.3,
     },
     {
@@ -138,10 +138,10 @@ export const script: NarrationScript = {
     },
     {
       id: "overlap",
-      text: "But even large leaves a lot of overlap. At zero point eight, the two groups still share more than two thirds of their range.",
+      text: "Even large leaves a lot of overlap. At zero point eight, the groups still share more than two thirds of their range.",
       pauseAfter: 0.4,
     },
-    { id: "stake", text: "So the labels are only a start. What counts as big depends on what's at stake." },
+    { id: "stake", text: "The labels are only a start. What counts as big depends on what's at stake." },
     { id: "sweep-in", text: "And unlike a p-value, a size doesn't depend on how much data you have." },
     {
       id: "sweep",
@@ -181,7 +181,7 @@ export const script: NarrationScript = {
       id: "admit",
       scene: true,
       take: true,
-      text: "Berkeley's graduate admissions in 1973 are the famous case. Here's the same pattern, in two departments.",
+      text: "Berkeley's 1973 graduate admissions are the famous case. Here's the pattern in two departments.",
       pauseAfter: 0.35,
     },
     {
@@ -198,7 +198,7 @@ export const script: NarrationScript = {
     { id: "how", text: "Ahead in both departments... and behind overall. How?", pauseAfter: 0.5 },
     {
       id: "mix",
-      text: "Six hundred of the seven hundred women applied to the hard department. Six hundred of the men applied to the easy one.",
+      text: "Six hundred of the seven hundred women applied to the hard one. Six hundred of the men, to the easy one.",
       pauseAfter: 0.45,
     },
     {
@@ -216,7 +216,7 @@ export const script: NarrationScript = {
     },
     {
       id: "rises",
-      text: "One line through everyone rises. About nine points higher for every extra hour of exercise a week.",
+      text: "One line through everyone rises, about nine points for every extra hour of exercise a week.",
       pauseAfter: 0.45,
     },
     {
@@ -250,7 +250,7 @@ export const script: NarrationScript = {
     },
     {
       id: "coach",
-      text: "Now picture a coaching program for that bottom group. They'd improve anyway, and the program would get the credit.",
+      text: "Coach that bottom group, and they'd improve anyway... and the coaching would get the credit.",
       pauseAfter: 0.4,
     },
     { id: "control", text: "To credit it, you'd need a control group, just as extreme, and left alone." },
@@ -266,7 +266,7 @@ export const script: NarrationScript = {
     },
     {
       id: "window",
-      text: "But somewhere in ten years, there's always a steep stretch. These four months rose twenty-five percent.",
+      text: "But ten years always hold a steep stretch. These four months rose twenty-five percent.",
       pauseAfter: 0.4,
     },
     { id: "crop", text: "Show just those months, and every number is real... and the story is false." },
@@ -292,7 +292,7 @@ export const script: NarrationScript = {
     },
     {
       id: "why-in",
-      text: "Nothing changed anyone. A weak interview just means you got in on ability. So whenever you hear among our customers, ask what got someone into the data.",
+      text: "Nothing changed anyone. A weak interview just means you got in on ability. So when you hear among our customers, ask what got them in.",
     },
     {
       id: "unit",

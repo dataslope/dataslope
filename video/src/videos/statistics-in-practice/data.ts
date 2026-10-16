@@ -41,7 +41,9 @@ export const DAY_NAMES: Record<Day, string> = { Thur: "Thursday", Fri: "Friday",
 
 export const TIPS = {
   rows: m.tips.rows,
-  byDay: m.tips.byDay as Record<Day, { mean: number; median: number; count: number }>,
+  /** Mean, median and count of tip percentage by day, and the half-width of
+   *  each mean's 95% interval. */
+  byDay: m.tips.byDay as Record<Day, { mean: number; median: number; count: number; half: number }>,
   bestMean: m.tips.bestMean as Day,
   bestMedian: m.tips.bestMedian as Day,
   worstMean: m.tips.worstMean as Day,
@@ -50,6 +52,18 @@ export const TIPS = {
   /** Each bill's tip, as a percentage of the bill. */
   billPct: m.tips.billPct as readonly number[],
   max: m.tips.max,
+};
+
+/** The other slices an explorer reaches for: mean tip percentage by each
+ *  categorical column, and the lesson's correlation matrix. */
+export type Slice = readonly { key: string; mean: number }[];
+export const SLICES = {
+  day: m.slices.day as Slice,
+  time: m.slices.time as Slice,
+  size: m.slices.size as Slice,
+  smoker: m.slices.smoker as Slice,
+  sex: m.slices.sex as Slice,
+  corr: m.slices.corr as { cols: readonly string[]; r: readonly (readonly number[])[] },
 };
 
 /** The hold-out split: which bills are locked away (layout only). */

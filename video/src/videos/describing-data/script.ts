@@ -43,7 +43,7 @@ import type { NarrationScript } from "../../narration/types";
  *     Node: over 4,000 samples of five from a population of variance 100,
  *     dividing by n averages 80.5, "about twenty percent low", and n minus
  *     one 100.6. Its first sample of five, true mean 0, has squared
- *     distances summing to 404.7 around its own mean and 543.5 around the
+ *     distances summing to 404.6 around its own mean and 543.5 around the
  *     truth. The "ddof" block: numpy's default std 7.20, pandas' 7.59.
  *   - measures-of-spread, "IQR" and "MAD": incomes 38 to 120 and 9,000; std
  *     2,828.4, "over two thousand eight hundred"; Q1 44.75, Q3 58.75, IQR
@@ -80,6 +80,8 @@ export const script: NarrationScript = {
   // Room for the series intro (SeriesIntro, INTRO_SECONDS) before the first word.
   leadIn: 4.6,
   tail: 2.6,
+  // One take per part: Part 2 is just over the default 1,800 characters.
+  takeChars: 1900,
   beats: [
     // ── Part 1. Mean and median ──────────────────────────────────────────
     {

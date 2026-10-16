@@ -71,7 +71,7 @@ export type Line = { slope: number; intercept: number; x0: number; x1: number };
 export const CONFOUND = {
   bands: m.confound.bands,
   /** [exercise minutes a week, systolic mmHg, age band] */
-  points: m.confound.points as readonly (readonly [number, number, number])[],
+  points: m.confound.points as unknown as readonly (readonly [number, number, number])[],
   pooled: m.confound.pooled as Line,
   fits: m.confound.fits as readonly Line[],
   pooledPerHour: m.confound.pooledPerHour,
@@ -90,8 +90,8 @@ export const RTM = {
 export const WANDER = m.wander;
 export const SHOTS = {
   ...m.shots,
-  first: m.shots.first as readonly (readonly [number, number])[],
-  second: m.shots.second as readonly (readonly [number, number])[],
+  first: m.shots.first as unknown as readonly (readonly [number, number])[],
+  second: m.shots.second as unknown as readonly (readonly [number, number])[],
 };
 export const BERKSON = { ...m.berkson, admittedSet: new Set(m.berkson.admitted) };
 export const DISTRICTS = m.districts;

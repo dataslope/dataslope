@@ -79,7 +79,7 @@ export const script: NarrationScript = {
     {
       id: "hook",
       scene: true,
-      text: "Decide what you'll test before you look at the data. But how do you know what to test... without looking?",
+      text: "Decide what you'll test before you look at the data. Good advice... but how do you know what to test, without looking?",
       pauseAfter: 0.5,
     },
     {

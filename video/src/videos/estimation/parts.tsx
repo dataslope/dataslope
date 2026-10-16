@@ -354,3 +354,22 @@ export const Headline: React.FC<{
   );
 };
 
+
+/**
+ * Text that inks in on `at` but holds its place in a flex row from the first
+ * frame, so the words after it never shift when it arrives.
+ */
+export const Slot: React.FC<{ at: number; dur?: number; out?: number; style?: React.CSSProperties; children: React.ReactNode }> = ({
+  at,
+  dur = 16,
+  out,
+  style,
+  children,
+}) => (
+  <span style={{ position: "relative", display: "inline-block", whiteSpace: "nowrap", ...style }}>
+    <span style={{ visibility: "hidden" }}>{children}</span>
+    <Ink at={at} dur={dur} out={out} style={{ left: 0, top: 0, whiteSpace: "nowrap" }}>
+      {children}
+    </Ink>
+  </span>
+);

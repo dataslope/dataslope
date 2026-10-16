@@ -28,7 +28,8 @@ page prints. The lessons are in content/courses/statistics-for-data-science-pyth
 - "die", "spread" and "warranty" are random-variables.mdx: the weighted die
   and its simulation (seed 0), its variance and SD (seed 1), and the extended
   warranty (seed 3). "heads" is the page's first figure, two flips mapped to
-  a number of heads.
+  a number of heads. "binom" is the same page's frozen binomial, n = 10 and
+  p = 0.3, drawn small in the closing scene as one of the named shapes.
 
 Printed checks (the lessons' own output lines) go to stderr.
 """
@@ -320,6 +321,21 @@ out["warranty"] = {
     # What one sale does to the seller: keep $80, or pay out $220 net.
     "lose": price - payout,
 }
+
+# ── The bridge: the lesson's frozen binomial (random-variables, "Let
+# scipy.stats do the bookkeeping"), drawn as one of the named shapes. The pmf
+# is written out with math.comb, which is what stats.binom(10, 0.3).pmf
+# returns, so the script still runs under `python3 -I` without scipy.
+from math import comb
+
+pmf = [comb(10, k) * 0.3**k * 0.7 ** (10 - k) for k in range(11)]
+mean = sum(k * q for k, q in enumerate(pmf))
+var = sum((k - mean) ** 2 * q for k, q in enumerate(pmf))
+say(f"E[X]   = {mean:.3f}")
+say(f"Var(X) = {var:.3f}")
+say(f"SD(X)  = {var ** 0.5:.3f}")
+say(f"P(X = 3) = {pmf[3]:.3f}")
+out["binom"] = {"n": 10, "p": 0.3, "pmf": [r(q, 4) for q in pmf]}
 
 json.dump(out, sys.stdout, separators=(",", ":"))
 sys.stdout.write("\n")

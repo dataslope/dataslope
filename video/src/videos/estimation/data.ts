@@ -46,6 +46,7 @@ export function histogram(xs: readonly number[], lo: number, hi: number, width: 
 // ── Part 1. Fifty users (confidence-intervals, seed 42) ─────────────────────
 
 export const USERS = {
+  mu: m.users.mu,
   n: m.users.n,
   values: m.users.values as readonly number[],
   xBar: m.users.xBar,
@@ -58,6 +59,8 @@ export const USERS = {
   margin: m.users.margin,
   zLo: m.users.zLo,
   zHi: m.users.zHi,
+  vagueLo: m.users.vagueLo,
+  vagueHi: m.users.vagueHi,
   twoSdLo: m.users.twoSdLo,
   twoSdHi: m.users.twoSdHi,
   insideTwoSd: m.users.insideTwoSd,

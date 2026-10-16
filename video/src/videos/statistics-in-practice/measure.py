@@ -92,6 +92,34 @@ best_mean = stats_by_day["mean"].idxmax()
 best_median = stats_by_day["median"].idxmax()
 worst_mean = stats_by_day["mean"].idxmin()
 say(f"  best by mean: {best_mean}, best by median: {best_median}, lowest mean: {worst_mean}")
+# How far each day's average could wobble: its 95% interval, mean +/- 1.96
+# standard errors. Not printed by the lesson; it is the "small groups wobble a
+# lot" its comment names, measured with Unit 6's interval.
+sd_by_day = tips.groupby("day")["tip_pct"].std(ddof=1)
+half_by_day = {d: float(1.96 * sd_by_day[d] / math.sqrt(stats_by_day.loc[d, "count"])) for d in DAYS}
+say("  95% interval half-widths by day:", {d: round(v, 2) for d, v in half_by_day.items()})
+
+
+# The other slices an explorer reaches for: the same tip percentage by every
+# categorical column, and the lesson's correlation matrix of the numeric
+# columns (its own block, before tip_pct exists).
+def slice_by(col):
+    g = tips.groupby(col, observed=True)["tip_pct"].mean()
+    return [{"key": str(k), "mean": r(v, 2)} for k, v in g.items()]
+
+
+num = px.data.tips().select_dtypes("number")
+corr = num.corr().round(3)
+say("Correlation matrix:")
+say(corr)
+out["slices"] = {
+    "day": [{"key": d, "mean": r(stats_by_day.loc[d, "mean"], 2)} for d in DAYS],
+    "time": slice_by("time"),
+    "size": slice_by("size"),
+    "smoker": slice_by("smoker"),
+    "sex": slice_by("sex"),
+    "corr": {"cols": list(corr.columns), "r": [[float(v) for v in row] for row in corr.to_numpy()]},
+}
 out["tips"] = {
     "rows": len(tips),
     "days": DAYS,
@@ -100,6 +128,7 @@ out["tips"] = {
             "mean": r(stats_by_day.loc[d, "mean"]),
             "median": r(stats_by_day.loc[d, "median"]),
             "count": int(stats_by_day.loc[d, "count"]),
+            "half": r(half_by_day[d]),
         }
         for d in DAYS
     },

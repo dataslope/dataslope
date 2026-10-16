@@ -11,7 +11,8 @@ content/courses/statistics-for-data-science-python/:
 - "users" is confidence-intervals.mdx, "Building a confidence interval for a
   mean" (seed 42): 50 users' monthly spend, Normal(48, 14), and its 95%
   t-interval. The video also marks x-bar +/- 2 s on the same sample, the
-  lesson's "range that holds ~95% of individual values".
+  lesson's "range that holds ~95% of individual values", and the same
+  sample's 99.99% interval, after the lesson's "a 99.99% interval so vague".
 - "coverage" is confidence-intervals.mdx, "The canonical simulation" (seed 7):
   100 samples of 40 from Normal(100, 15), a 95% t-interval from each.
 - "levels" and "sizes" are confidence-intervals.mdx, "What controls the
@@ -93,8 +94,13 @@ two_lo, two_hi = x_bar - 2 * s, x_bar + 2 * s
 inside = int(((sample >= two_lo) & (sample <= two_hi)).sum())
 in_ci = int(((sample >= low) & (sample <= high)).sum())
 say(f"  users: s {s:.2f}, t crit {t_crit:.4f} vs z {z_crit:.4f}; x-bar +/- 2s = {two_lo:.2f}..{two_hi:.2f} holds {inside} of {n}; the CI holds {in_ci}")
+# The lesson's 99.99% aside ("a 99.99% interval so vague...") on this sample.
+v_lo, v_hi = stats.t.interval(0.9999, df=n - 1, loc=x_bar, scale=se)
+say(f"  users: 99.99% interval {v_lo:.2f}..{v_hi:.2f}; the population mean is the block's loc=48, inside the 95% interval")
 out["users"] = {
     "seed": 42,
+    # The block draws from Normal(loc=48, scale=14): the mean we know here.
+    "mu": 48.0,
     "n": n,
     "values": rs(sample),
     "xBar": r(x_bar),
@@ -108,6 +114,8 @@ out["users"] = {
     # The same margin with the normal's 1.96, for the t against z comparison.
     "zLo": r(x_bar - z_crit * se),
     "zHi": r(x_bar + z_crit * se),
+    "vagueLo": r(v_lo),
+    "vagueHi": r(v_hi),
     "twoSdLo": r(two_lo),
     "twoSdHi": r(two_hi),
     "insideTwoSd": inside,

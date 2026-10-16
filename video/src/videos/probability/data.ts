@@ -12,7 +12,7 @@ export const VIDEO = "probability";
  * Whether public/images/probability/ holds the three watercolors from
  * illustrations.json. Every frame is laid out with room for them either way.
  */
-export const ILLUSTRATIONS = true;
+export const ILLUSTRATIONS = false;
 
 /** mulberry32: a tiny, well-mixed 32-bit PRNG, for layout jitter only. */
 export function mulberry32(seed: number) {
@@ -42,7 +42,7 @@ export const COIN = {
 /** The running share of heads over 5,000 flips, seed 1. */
 export const LLN = {
   n: m.lln.n,
-  path: m.lln.path as readonly (readonly [number, number])[],
+  path: m.lln.path as unknown as readonly (readonly [number, number])[],
   after10: m.lln.after10,
   after100: m.lln.after100,
   after5000: m.lln.after5000,
@@ -85,7 +85,7 @@ export const MONTY = {
   switch: m.monty.switch,
   /** The running share of games that staying has won; switching wins the
    *  rest of each game, so its share is one minus this. */
-  path: m.monty.path as readonly (readonly [number, number])[],
+  path: m.monty.path as unknown as readonly (readonly [number, number])[],
 };
 
 // ── Part 5. Random variables (random-variables) ─────────────────────────────
@@ -111,3 +111,7 @@ export const WARRANTY = m.warranty;
 export const pct = (x: number, digits = 0) => `${(x * 100).toFixed(digits)}%`;
 /** "1,098" */
 export const num = (x: number) => Math.round(x).toLocaleString("en-US");
+
+/** The lesson's frozen binomial, n = 10 and p = 0.3: one of the shapes the
+ *  closing scene sketches. */
+export const BINOM = m.binom.pmf as readonly number[];
