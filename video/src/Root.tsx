@@ -41,6 +41,14 @@ import { JavaEquality } from "./videos/java-equality/Video";
 import { script as javaEqualityScript } from "./videos/java-equality/script";
 import { SimpsonsParadox } from "./videos/simpsons-paradox/Video";
 import { script as simpsonsParadoxScript } from "./videos/simpsons-paradox/script";
+import { SamplingBias } from "./videos/sampling-bias/Video";
+import { script as samplingBiasScript } from "./videos/sampling-bias/script";
+import { SurvivorshipBias } from "./videos/survivorship-bias/Video";
+import { script as survivorshipBiasScript } from "./videos/survivorship-bias/script";
+import { SamplingDistributions } from "./videos/sampling-distributions/Video";
+import { script as samplingDistributionsScript } from "./videos/sampling-distributions/script";
+import { StandardError } from "./videos/standard-error/Video";
+import { script as standardErrorScript } from "./videos/standard-error/script";
 
 // Every composition is laid out in 1080p CSS pixels and rendered with
 // `--scale=2` for 4K (3840x2160). Duration comes from the narration timeline,
@@ -230,6 +238,46 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 60}
         defaultProps={EDITORIAL_DEFAULTS}
         calculateMetadata={narratedMetadata<EditorialProps>(simpsonsParadoxScript)}
+      />
+      <Composition
+        id="SamplingBias"
+        component={SamplingBias}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={EDITORIAL_DEFAULTS}
+        calculateMetadata={narratedMetadata<EditorialProps>(samplingBiasScript)}
+      />
+      <Composition
+        id="SurvivorshipBias"
+        component={SurvivorshipBias}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={EDITORIAL_DEFAULTS}
+        calculateMetadata={narratedMetadata<EditorialProps>(survivorshipBiasScript)}
+      />
+      <Composition
+        id="SamplingDistributions"
+        component={SamplingDistributions}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={EDITORIAL_DEFAULTS}
+        calculateMetadata={narratedMetadata<EditorialProps>(samplingDistributionsScript)}
+      />
+      <Composition
+        id="StandardError"
+        component={StandardError}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={EDITORIAL_DEFAULTS}
+        calculateMetadata={narratedMetadata<EditorialProps>(standardErrorScript)}
       />
     </Folder>
     <Folder name="Assets">
