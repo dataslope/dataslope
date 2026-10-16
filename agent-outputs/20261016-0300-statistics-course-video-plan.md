@@ -3,7 +3,7 @@
 **Course:** `content/courses/statistics-for-data-science-python/` (32 lessons in 9 sections)
 **Format:** the editorial style (`video/src/editorial/`): warm paper, Source Serif 4 headlines, watercolor spot illustrations, no burned-in captions. See `video/README.md`.
 **Estimate:** about **80 minutes (75 to 95) in 37 videos of 2 to 3 minutes**, grouped into 9 units.
-**Pilot:** Unit 5, Sampling. In progress, started 2026-10-16.
+**Pilot:** Unit 5, Sampling. All five videos are built and voiced. Two still need their illustrations (2026-10-16).
 
 ## How the videos are cut
 
@@ -77,10 +77,10 @@ A video per page, narrating about 40% of each page, came to 34 videos and 123 mi
 
 | # | Video | Min | Covers | Embeds at | Status |
 | --- | --- | --- | --- | --- | --- |
-| 5.1 | Bigger and biased is still biased | 2.5 | sampling-and-bias: why the method is everything, convenience sampling, the punchline, bias vs. variance | sampling-and-bias, "The punchline: a bigger biased sample does not help" | in progress (`SamplingBias`) |
-| 5.2 | Survivorship bias | 1.5 | sampling-and-bias and statistical-fallacies: survivorship bias | both lessons' "Survivorship bias" sections | done, voiced, 1:37 (`SurvivorshipBias`) |
-| 5.3 | The three distributions to keep apart | 2.5 | sampling-distributions: the three distributions, building one by hand, more samples vs. larger samples, any statistic | sampling-distributions, "The three distributions you must keep separate" | in progress (`SamplingDistributions`) |
-| 5.4 | ★ The central limit theorem | 1.5 | central-limit-theorem | central-limit-theorem, "Watch it happen from a skewed population" | done, voiced, 1:27 (`CentralLimitTheorem`) |
+| 5.1 | Bigger and biased is still biased | 2.5 | sampling-and-bias: why the method is everything, convenience sampling, the punchline, bias vs. variance | sampling-and-bias, "The punchline: a bigger biased sample does not help" | done, voiced, 2:35; illustrations pending (`SamplingBias`) |
+| 5.2 | Survivorship bias | 1.5 | sampling-and-bias and statistical-fallacies: survivorship bias | both lessons' "Survivorship bias" sections | done, voiced, 1:48 (`SurvivorshipBias`) |
+| 5.3 | The three distributions to keep apart | 2.5 | sampling-distributions: the three distributions, building one by hand, more samples vs. larger samples, any statistic | sampling-distributions, "The three distributions you must keep separate" | done, voiced, 2:49; illustrations pending (`SamplingDistributions`) |
+| 5.4 | ★ The central limit theorem | 1.5 | central-limit-theorem | central-limit-theorem, "Watch it happen from a skewed population" | done, voiced, 1:32 (`CentralLimitTheorem`) |
 | 5.5 | Standard error and the √n law | 2 | standard-error; the √n sections of populations-and-samples and sampling-distributions | standard-error, "Standard deviation vs. standard error" | done, voiced, 2:10 (`StandardError`) |
 
 The CLT video already ends on "four times the data, half the spread", so 5.5 starts from there rather than repeating it: SD against SE, estimating SE from one sample and checking it against the simulated spread, what diminishing returns cost, and SE as the ruler every interval and test is built from.
@@ -138,6 +138,13 @@ The process is the one in `video/README.md`; in short:
 ## Decisions
 
 - **Narrator: Hope** (decided 2026-10-16). One voice for the whole course, so it sounds like one teacher. Every course script sets `voice: "hope"`.
+- **Each video leads into the next** (decided 2026-10-16). The last beat of a video poses the question the next one answers. A "Next: …" line (`NextLine` in `video/src/editorial/ui.tsx`) shows it in the closing scene, and the next video opens on the same idea. No video says "in the last video", because each one is also embedded on its own in a lesson. Unit 5's links:
+  - 5.1 → 5.2: data that only kept what survived.
+  - 5.2 → 5.3: how far a fair sample can miss.
+  - 5.3 → 5.4: the mean's shape, even when the data is lopsided.
+  - 5.4 → 5.5: the standard error is not the standard deviation.
+  - 5.5 → 6.1: building the confidence interval.
+- **Voicing costs characters.** Write each video's bridge into its script before the first recording. After an edit, re-voice only the beats that changed. Record a whole take again only when asked.
 
 ## Open decisions
 

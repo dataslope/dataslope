@@ -222,6 +222,25 @@ longer `pauseAfter` on the beat before it, which the gap never shortens.
 before a marked beat. Mark beats the same way when a scene opens on a beat
 some other way, such as a wipe or an eraser keyed to `beat("…").from`.
 
+### A video in a series leads into the next
+
+A course's videos play in order, so each one ends on the question the next
+one answers, and the next one opens on that idea. Statistics Unit 5 is the
+worked example: SamplingBias ends on data that only kept what survived, and
+SurvivorshipBias opens on the bombers that made it home.
+
+- **The bridge is the script's last beat**, after a pause of about 0.7 s, so
+  the video's own conclusion lands first.
+- **On screen, the closing scene adds `<NextLine>`** from
+  `src/editorial/ui.tsx`: a hairline and "Next: …", cued to a word of the
+  bridge. Put it wherever the scene has room. It is part of the scene, not an
+  end card.
+- **Never say "in the last video".** Every video is also embedded on its
+  own, in the lesson section it teaches, so its opening has to work without
+  the one before it.
+- **Write the bridge before the first recording.** Added afterwards, it is
+  voiced on its own, and the beat can sound slightly apart from the take.
+
 ### Adding the voice-over later
 
 ```bash
