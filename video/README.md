@@ -129,6 +129,13 @@ Shared building blocks:
   its fonts (Inter, JetBrains Mono).
 - `src/editorial/`: the editorial look (page, typefaces, layout, figure
   labels, reveals, histogram and axis primitives) shared by the videos in it.
+- `src/editorial/erd.tsx`: entity-relationship diagrams. `<Entity>` is a
+  table box that builds itself row by row, keys marked; `<Relation>` is a
+  relationship line that draws itself with crow's-foot ends
+  (`src/components/crowsfoot.ts`: exactly one, zero or one, one or many, zero
+  or many, many). Every ERD is drawn with them, so the notation reads the
+  same in every video, and `npm run check:frames` fails an end built across
+  a corner of its line. The `ErdKit` composition under Assets shows the kit.
 
 Register a new composition in `src/Root.tsx` with
 `defaultProps={EDITORIAL_DEFAULTS}` and

@@ -10,11 +10,15 @@
  *   (arrowHead() in src/components/arrow.ts). A head can only sit on a line
  *   that is nearly straight under it; past MAX_HEAD_BEND degrees no angle
  *   fits, and the head reads as crooked.
+ * - Every ERD relationship end (<Relation> in src/editorial/erd.tsx) that is
+ *   built across a corner reports it: a crow's foot needs its line straight
+ *   for its whole length, or it points nowhere.
  *
  *   npm run check:frames                    # every composition
  *   npm run check:frames -- BaseRate,TfIdf  # just these
  *
- * Exits non-zero if any image is stretched or any arrowhead sits on a bend.
+ * Exits non-zero if any image is stretched, any arrowhead sits on a bend, or
+ * any relationship end sits on too short a straight stretch.
  */
 import { bundle } from "@remotion/bundler";
 import { getCompositions, renderFrames } from "@remotion/renderer";
@@ -31,6 +35,7 @@ const compositions = (await getCompositions(serveUrl, { browserExecutable, input
 const SCALE = 2;
 const images = new Map(); // "video/id" -> { stretch, report, comp }
 const arrows = new Map(); // "Comp: from to tip" -> { bend, report, comp }
+const relations = new Map(); // "Comp: relation end" -> report
 for (const composition of compositions) {
   await renderFrames({
     serveUrl,
@@ -51,6 +56,8 @@ for (const composition of compositions) {
         const stretch = Number(img[2]);
         if (!prev || stretch > prev.stretch) images.set(img[1], { stretch, report: text, comp: composition.id });
       }
+      const relation = text.match(/^\[relation\] (.*)$/);
+      if (relation) relations.set(`${composition.id}: ${relation[1].replace(/ sits on .*/, "")}`, `${composition.id}: ${relation[1]}`);
       const arrow = text.match(/^\[arrowhead\] (.*) turns ([0-9.]+)°/);
       if (arrow) {
         const key = `${composition.id}: ${arrow[1]}`;
@@ -78,4 +85,6 @@ const heads = new Set([...arrows.values()].map((a) => a.report.replace(/ to \S+ 
 console.log(`${heads.size} arrows checked, each at every tip it drew to.`);
 for (const a of bent) console.log(`  ✗ ${a.report}`);
 if (!bent.length) console.log(`  ✓ every line is within ${MAX_HEAD_BEND}° of straight under its head`);
-if (stretched.length || bent.length) process.exit(1);
+for (const r of relations.values()) console.log(`  ✗ ${r}`);
+if (!relations.size) console.log("  ✓ every ERD relationship end sits on a straight stretch of its line");
+if (stretched.length || bent.length || relations.size) process.exit(1);

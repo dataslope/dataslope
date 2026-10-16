@@ -5,6 +5,26 @@ import "./theme/fonts";
 import { narratedMetadata } from "./narration/metadata";
 import { EDITORIAL_DEFAULTS, type EditorialProps } from "./editorial/Page";
 import { H as PAGE_H, PaperSource, W as PAGE_W } from "./editorial/ui";
+import { ErdKit } from "./editorial/ErdKit";
+// Database Design with PostgreSQL, one video per unit.
+import { DbWhyDesign } from "./videos/db-why-design/Video";
+import { script as dbWhyDesignScript } from "./videos/db-why-design/script";
+import { DbEntities } from "./videos/db-entities/Video";
+import { script as dbEntitiesScript } from "./videos/db-entities/script";
+import { DbRelationships } from "./videos/db-relationships/Video";
+import { script as dbRelationshipsScript } from "./videos/db-relationships/script";
+import { DbKeys } from "./videos/db-keys/Video";
+import { script as dbKeysScript } from "./videos/db-keys/script";
+import { DbRelationshipPatterns } from "./videos/db-relationship-patterns/Video";
+import { script as dbRelationshipPatternsScript } from "./videos/db-relationship-patterns/script";
+import { DbConstraints } from "./videos/db-constraints/Video";
+import { script as dbConstraintsScript } from "./videos/db-constraints/script";
+import { DbNormalization } from "./videos/db-normalization/Video";
+import { script as dbNormalizationScript } from "./videos/db-normalization/script";
+import { DbDesigningSchemas } from "./videos/db-designing-schemas/Video";
+import { script as dbDesigningSchemasScript } from "./videos/db-designing-schemas/script";
+import { DbRelationalHistory } from "./videos/db-relational-history/Video";
+import { script as dbRelationalHistoryScript } from "./videos/db-relational-history/script";
 import { CentralLimitTheorem } from "./videos/central-limit-theorem/Video";
 import { script as centralLimitTheoremScript } from "./videos/central-limit-theorem/script";
 import { ListVsSet } from "./videos/list-vs-set/Video";
@@ -391,7 +411,102 @@ export const RemotionRoot: React.FC = () => (
         calculateMetadata={narratedMetadata<EditorialProps>(statisticsInPracticeScript)}
       />
     </Folder>
+    <Folder name="Database-Design">
+      {/* Database Design with PostgreSQL: one video per unit, in course order. */}
+      <Composition
+        id="DbDesign-1-WhyDesign"
+        component={DbWhyDesign}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dbWhyDesignScript)}
+      />
+      <Composition
+        id="DbDesign-2-Entities"
+        component={DbEntities}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dbEntitiesScript)}
+      />
+      <Composition
+        id="DbDesign-3-Relationships"
+        component={DbRelationships}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dbRelationshipsScript)}
+      />
+      <Composition
+        id="DbDesign-4-Keys"
+        component={DbKeys}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dbKeysScript)}
+      />
+      <Composition
+        id="DbDesign-5-RelationshipPatterns"
+        component={DbRelationshipPatterns}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dbRelationshipPatternsScript)}
+      />
+      <Composition
+        id="DbDesign-6-Constraints"
+        component={DbConstraints}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dbConstraintsScript)}
+      />
+      <Composition
+        id="DbDesign-7-Normalization"
+        component={DbNormalization}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dbNormalizationScript)}
+      />
+      <Composition
+        id="DbDesign-8-DesigningSchemas"
+        component={DbDesigningSchemas}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dbDesigningSchemasScript)}
+      />
+      <Composition
+        id="DbDesign-9-RelationalHistory"
+        component={DbRelationalHistory}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dbRelationalHistoryScript)}
+      />
+    </Folder>
     <Folder name="Assets">
+      {/* The ERD kit (editorial/erd.tsx) on one page, for review. */}
+      <Composition id="ErdKit" component={ErdKit} width={1920} height={1080} fps={FPS} durationInFrames={150} />
       {/* The editorial page's grain, rendered to public/editorial/ by `npm run paper`. */}
       <Still id="PaperTexture" component={PaperSource} width={PAGE_W} height={PAGE_H} />
     </Folder>
