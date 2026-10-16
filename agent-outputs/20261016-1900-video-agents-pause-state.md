@@ -100,3 +100,10 @@ fresh container.
   - probability-basics.mdx, law of large numbers block (seed 1) prints 0.500, 0.500, 0.496 at 10, 100, 5,000 flips: the checkpoints don't show the convergence the prose describes.
   - statistical-fallacies.mdx base-rate block uses sensitivity 1.00 (9.1%) while conditional-probability uses 0.99 (9.0%) for the same "99% accurate" test.
   Tooling: n.word() silently takes the first case-insensitive match ("A hundred" matched "Walk a hundred thousand"); warn when a phrase matches more than once without nth.
+- Stats Unit 8 `InterpretingResults` (6:32): voiced (4 takes, 5,111 chars), check:motion (2.0 s), check:sync (+0.04 s), check:mix (20.5 LU under), check:frames all pass.
+  Lesson discrepancies:
+  - effect-sizes.mdx, "Demonstrating significance ≠ importance" block (seed 0, n=100,000, means 100.0/100.1, sd 15) prints `p-value : 5.08e-02 <- 'highly significant'!` and the prose says "The p-value is microscopic". p = 0.0508 is not significant; expected z for a 0.1 gap is 1.49 (p ≈ 0.14), so it isn't the seed. READER-VISIBLE.
+  - statistical-fallacies.mdx, Berkeley: "department by department, women were admitted at equal or higher rates than men". UCBAdmissions: men ahead in C (36.9 vs 34.1%) and E (27.7 vs 23.9%); women lead in 4 of 6.
+  - charts/simpsons-paradox-trend.mjs caption: "falls by about 2.7 mmHg per extra hour" is the generating constant; the fitted lines fall 1.4, 1.2, 1.5, 3.4.
+  - charts/ecological-fallacy.mjs comment: within-district lines said to show "about flat" but are drawn flat by construction (district r: 0.06, 0.05, −0.04, 0.01, 0.03, 0.33).
+  - effect-sizes.mdx, correlation block (seed 5): comment "moderate real relationship" but r = 0.59 is "strong" by the lesson's own table.
