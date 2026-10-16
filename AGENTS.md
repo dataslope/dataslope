@@ -591,8 +591,11 @@ that fails one theme is what the "mark for regeneration" button is for.
 Short tutorial videos live in `video/`, a separate Remotion package with its
 own `npm install`, `typecheck`, `lint` and `test`. The site's `tsconfig.json`
 and ESLint config ignore it, so nothing there reaches the site's build.
-`video/README.md` is the runbook. Four rules carry over from the rest of this
-file:
+`video/README.md` is the runbook. Every video is drawn in one look, the
+**editorial** style in `video/src/editorial/` (warm paper, numbered figures,
+ink-wipe reveals, watercolor spot art): a new one wraps its scenes in
+`<EditorialPage>` and registers with `EDITORIAL_DEFAULTS`. Four rules carry
+over from the rest of this file:
 
 - **Cue to words, never to frames.** Every animation asks the narration when a
   word is spoken (`useNarration().word(beat, phrase)`). Timing is estimated
@@ -604,18 +607,18 @@ file:
   -- <video>` from `video/`. It calls `scripts/generate-illustrations.mjs
   --prompts` (Batch API, quality `low`, transparent background, the alpha
   check) on the video's own `illustrations.json`, never on
-  `data/illustration-prompts.json`. A video may draw in a style of its own
-  (pixel art, chalk, watercolor…) by defining it in that file's
-  `meta.styles`. The "Every other style is retired" rule above is about the
-  site's lesson art, which must hold one style across two page themes; a
-  video has a fixed background and its own look.
+  `data/illustration-prompts.json`. The editorial videos paint in a
+  watercolor style defined in that file's `meta.styles`. The "Every other
+  style is retired" rule above is about the site's lesson art, which must
+  hold one style across two page themes; a video has a fixed background and
+  its own look.
 - **Tabbied patterns sparingly.** They are pre-rendered to SVG from each
   video's `patterns.json`, with brand token names as the palette, and only
   ever used as decoration: a band on a title or end card, or one transition.
 
 Narration is prose a viewer hears, so the prose rules apply to it: no em
 dashes, no filler, and a fact checked against the lesson and against a real
-run (the SQL video's numbers come from PGlite).
+run (the SQL videos' tables come from PGlite).
 
 ---
 
