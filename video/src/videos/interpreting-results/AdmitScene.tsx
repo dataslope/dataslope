@@ -46,8 +46,6 @@ export const AdmitScene: React.FC = () => {
   const thirtyThreeAt = n.word("overall", "thirty-three");
   const flipAt = n.word("confound-in", "flip");
   const overallAt = n.word("overall", "Overall");
-  const menAt = n.word("overall", "men");
-  const womenAt = n.word("overall", "women");
   const splitAt = n.word("split", "split");
   const easyAt = n.word("split", "easy");
   const sixtyFiveAt = n.word("split", "sixty-five");

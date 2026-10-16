@@ -40,7 +40,9 @@ export const UniformScene: React.FC = () => {
   const twentyAt = n.word("twenty", "twenty tests");
   const nothingAt = n.word("twenty", "nothing");
   const oneUnderAt = n.word("twenty", "one under");
+  const fiveAt = n.word("twenty", "point zero five");
   const fourteenAt = n.word("fourteen", "fourteen");
+  const luckAt = n.word("hacked", "luck");
   const pointAt = n.word("fourteen", "point");
   const onlyAt = n.word("hacked", "only");
   const discoveryAt = n.word("hacked", "discovery");
@@ -51,7 +53,8 @@ export const UniformScene: React.FC = () => {
   const firstBin = ease(frame, oneUnderAt - 4, 12);
   const rowAt = (i: number) => twentyAt + 2 + i * 3.2;
   const others = 1 - 0.8 * ease(frame, onlyAt - 2, 14);
-  const hitGlow = pulse(frame, fourteenAt - 2, 24);
+  const hitGlow = pulse(frame, fourteenAt - 2, 24) + pulse(frame, luckAt - 2, 24);
+  const lineGlow = pulse(frame, fiveAt - 2, 24);
   const hitBig = ease(frame, onlyAt, 14);
 
   return (
@@ -133,7 +136,7 @@ export const UniformScene: React.FC = () => {
             y1={y(T_BASE)}
             y2={y(T_BASE) - (y(T_BASE) - y(T_ROW0 - 18)) * ease(frame, twentyAt - 2, 16)}
             stroke={STAT}
-            strokeWidth={2}
+            strokeWidth={2 + 2 * lineGlow}
             strokeDasharray="5 4"
           />
         ) : null}

@@ -17,6 +17,7 @@ import {
 } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { PARTS, pct, type PartKey, WALD } from "./data";
 import { PART_HI, Plane, SKIN, Swatch } from "./parts";
 
@@ -81,6 +82,14 @@ export const WaldScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: the plane, the two sets of bars, the missing hits, the estimate ── */}
+      <Sfx name="el-pop" at={start} level={-30} />
+      <Sfx name="el-pop" at={enginesAt + 4} level={-30} />
+      <Sfx name="el-pop" at={fewerAt} level={-30} />
+      <Sfx name="el-pencil" at={missingAt} level={-33} />
+      <Sfx name="el-tap" at={thirtyNineAt} level={-28} />
+      <Sfx name="el-pencil" at={arentAt - 6} level={-34} />
+
       {/* One line in two inks; the second half follows the first in the flow. */}
       <div style={{ position: "absolute", left: 116, top: y(104), display: "flex", gap: "0.26em", ...headline(56) }}>
         <Ink at={fourAt - 4} dur={18} style={{ position: "relative", whiteSpace: "nowrap" }}>

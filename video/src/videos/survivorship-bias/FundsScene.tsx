@@ -6,6 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, body, fmt, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { BIN_HI, BIN_LO, BIN_W, COUNTS, countBelow, FUNDS, meanAbove } from "./data";
 import { Swatch } from "./parts";
 
@@ -59,6 +60,14 @@ export const FundsScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: the funds, the two lines, the sweep, the count, the new average ── */}
+      <Sfx name="el-pop" at={start + 4} level={-30} />
+      <Sfx name="el-pencil" at={averagingAt - 2} level={-34} />
+      <Sfx name="el-pencil" at={closeAt - 2} level={-34} />
+      <Sfx name="el-whoosh" at={sweepFrom} level={-34} />
+      <Sfx name="el-tap" at={fifteenAt} level={-28} />
+      <Sfx name="el-tap" at={sevenAt - 2} level={-29} />
+
       <div style={{ position: "absolute", left: 116, top: y(104), display: "flex", gap: "0.26em", ...headline(56) }}>
         <Ink at={start - 10} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Close the funds that lost,

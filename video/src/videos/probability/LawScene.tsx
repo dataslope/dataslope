@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, fmt, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
@@ -37,6 +37,7 @@ export const LawScene: React.FC = () => {
   const llnFrom = n.beat("lln").from;
   const shareAt = n.word("lln", "share of heads");
   const fiveAt = n.word("lln", "five thousand flips");
+  const everyAt = n.word("lln", "every one");
   const fourAt = n.word("early", "four flips");
   const quartersAt = n.word("early", "three quarters");
   const hundredAt = n.word("early", "a hundred");
@@ -49,6 +50,8 @@ export const LawScene: React.FC = () => {
   const lawAt = n.word("law", "law of large numbers");
   const noisyAt = n.word("law", "noisy");
   const stableAt = n.word("law", "stable");
+  const shortAt = n.word("law", "short run");
+  const longAt = n.word("law", "long run");
   const balanceAt = n.word("memory", "balancing out");
   const rowAt = n.word("memory", "five heads");
   const fiftyAt = n.word("memory", "fifty-fifty");
@@ -56,11 +59,12 @@ export const LawScene: React.FC = () => {
   const paidAt = n.word("swamp", "paid back");
   const swampedAt = n.word("swamp", "swamped");
   const afterEnd = n.word("swamp", "after it", { edge: "end" });
-  const learnEnd = n.word("table-in", "learn something", { edge: "end" });
+  const tableInFrom = n.beat("table-in").from;
+  const learnAt = n.word("table-in", "learn something");
 
   // How far along the flips the line has been drawn, in log10 of the flip count.
   const stages: [number, number, number][] = [
-    [fourAt - 14, fourAt + 4, Math.log10(4)],
+    [everyAt - 2, fourAt + 4, Math.log10(4)],
     [hundredAt - 4, fortyAt + 2, 2],
     [thousandAt - 4, straysAt + 2, 3],
     [straysAt + 2, halfEnd, LOG_HI],
@@ -73,7 +77,7 @@ export const LawScene: React.FC = () => {
     reach = to;
   }
   const K = 10 ** reach;
-  const drawn = frame >= fourAt - 14;
+  const drawn = frame >= everyAt - 2;
   const pts = LLN.path.filter(([k]) => k <= K);
   const next = LLN.path.find(([k]) => k > K);
   const last = pts[pts.length - 1];
@@ -84,7 +88,10 @@ export const LawScene: React.FC = () => {
   const d = linePts.map(([k, v], i) => `${i ? "L" : "M"}${fx(k).toFixed(1)},${fy(v).toFixed(1)}`).join(" ");
 
   // The red retrace of everything after the streak, during "swamped".
-  const swamp = ease(frame, swampedAt - 6, Math.max(20, learnEnd - swampedAt + 6));
+  const swamp = interpolate(frame, [swampedAt - 6, Math.max(swampedAt + 14, tableInFrom)], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
   const swampK = 10 ** lerp(Math.log10(5), LOG_HI, swamp);
   const swampD = LLN.path
     .filter(([k]) => k >= 5 && k <= swampK)
@@ -110,7 +117,8 @@ export const LawScene: React.FC = () => {
       <Sfx name="el-whoosh" at={paidAt - 4} level={-33} />
 
       <Headline top={y(150)} first="The share of heads," second="flip by flip." firstAt={llnFrom - 6} secondAt={shareAt + 4} out={lawAt - 8} />
-      <Headline top={y(150)} first="The law of" second="large numbers." firstAt={lawAt - 4} secondAt={lawAt + 6} />
+      <Headline top={y(150)} first="The law of" second="large numbers." firstAt={lawAt - 4} secondAt={lawAt + 6} out={tableInFrom - 6} />
+      <Headline top={y(150)} first="Most chances change" second="once you know more." firstAt={tableInFrom - 2} secondAt={learnAt - 4} />
 
       <FigLabel n="1" title={`Heads so far, over ${LLN.n.toLocaleString("en-US")} flips of a fair coin`} at={llnFrom} x={CH.x0} y={y(268)} />
 
@@ -156,7 +164,7 @@ export const LawScene: React.FC = () => {
             width={(fx(100) - fx(10)) * early}
             height={fy(EARLY.lo) - fy(EARLY.hi)}
             fill={STAT}
-            opacity={0.12}
+            opacity={0.12 + 0.22 * ease(frame, shortAt - 2, 8) * (1 - ease(frame, shortAt + 16, 14))}
           />
         ) : null}
         {late > 0 ? (
@@ -166,7 +174,7 @@ export const LawScene: React.FC = () => {
             width={(fx(LLN.n) - fx(1000)) * late}
             height={fy(LATE.lo) - fy(LATE.hi)}
             fill={STAT}
-            opacity={0.16}
+            opacity={0.16 + 0.22 * ease(frame, longAt - 2, 8) * (1 - ease(frame, longAt + 16, 14))}
           />
         ) : null}
         {drawn ? (

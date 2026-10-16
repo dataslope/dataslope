@@ -6,6 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, body, headline, HIGHLIGHT, INK, INK_SOFT, label } from "../../editorial/style";
 import { Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { useMergedPart } from "../sampling/merged";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -41,6 +42,13 @@ export const HabitScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: the drawer, each row, the column of what is missing ── */}
+      <Sfx name="el-pop" at={start + 4} level={-30} />
+      {rowAt.map((at, i) => (
+        <Sfx key={i} name="el-tap" at={at - 4} level={-29} />
+      ))}
+      <Sfx name="el-pencil" at={missingAt} level={-34} />
+
       <Ink at={start - 10} dur={20} style={{ left: 116, top: y(104), ...headline(56), whiteSpace: "nowrap" }}>
         Survivors make a biased sample.
       </Ink>

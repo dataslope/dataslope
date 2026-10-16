@@ -60,6 +60,7 @@ export const RateScene: React.FC = () => {
   const answerAt = n.word("test-in", "answer");
   const testInFrom = n.beat("test-in").from;
   const percentAt = n.word("rate-ci", "percent");
+  const eitherAt = n.word("rate-ci", "either way");
   const testAt = n.word("test-in", "test");
 
   const pct = (v: number) => `${fmt(v * 100, 1)}%`;
@@ -140,7 +141,7 @@ export const RateScene: React.FC = () => {
         </span>
       </Note>
       {/* One standard error at a time, out to 1.96 of them. */}
-      <Svg opacity={ease(frame, nineSixAt - 4, 12)}>
+      <Svg opacity={ease(frame, stepAt - 2, 12)}>
         {[-1, 1].map((s) => (
           <line
             key={s}
@@ -158,9 +159,9 @@ export const RateScene: React.FC = () => {
           {fmt(RATE.z)} standard errors either way
         </span>
       </Note>
-      <IntervalBar x0={px(RATE.lo)} x1={px(RATE.hi)} y={y(BAR_Y)} at={stepAt} dur={22} color={INK} width={4} tick={14} />
+      <IntervalBar x0={px(RATE.lo)} x1={px(RATE.hi)} y={y(BAR_Y)} at={eitherAt - 4} dur={22} color={INK} width={4} tick={14} />
       <Svg>
-        <circle cx={px(RATE.pHat)} cy={y(BAR_Y)} r={6.5 * ease(frame, stepAt, 10)} fill={EST} stroke={PAPER} strokeWidth={1.4} />
+        <circle cx={px(RATE.pHat)} cy={y(BAR_Y)} r={6.5 * ease(frame, eitherAt - 4, 10)} fill={EST} stroke={PAPER} strokeWidth={1.4} />
       </Svg>
       <Note at={sixteenAt - 2} x={px(RATE.lo) - 14} y={y(BAR_Y) - 16} align="right" from="right">
         <span style={{ ...note(26, INK), fontWeight: 700, ...halo }}>{pct(RATE.lo)}</span>

@@ -81,6 +81,7 @@ export const SURVEY = {
 /** One sample of fifty from Normal(100, 15), seed 42. */
 export const KNOWN = {
   mu: m.known.mu,
+  sigma: m.known.sigma,
   n: m.known.n,
   values: m.known.values as readonly number[],
   xBar: m.known.xBar,

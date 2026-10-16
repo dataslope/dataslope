@@ -2,6 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { useMergedPart } from "../sampling/merged";
 import { Axis, Bars, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
@@ -63,6 +64,14 @@ export const AnyScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: the population, each statistic's pile, the widths, the name ── */}
+      <Sfx name="el-pop" at={lopsidedAt - 4} level={-30} />
+      {statAt.map((at, r) => (
+        <Sfx key={r} name="el-pop" at={at - 2} level={-30} />
+      ))}
+      <Sfx name="el-tap" at={widthAt} level={-29} />
+      <Sfx name="el-pencil" at={seAt - 2} level={-34} />
+
       <Ink at={anyFrom - 12} dur={20} style={{ left: 112, top: y(112), ...headline(64), whiteSpace: "nowrap" }}>
         Every statistic has
       </Ink>

@@ -18,6 +18,8 @@ const FINE = 80;
 const BIG: XScale = { lo: 2, hi: 22, x0: 260, x1: 1660 };
 const BIG_BASE = 840;
 const SMALL_BASE = 800;
+/** The tallest bar any binning draws: the paper between bars goes no higher. */
+const TALLEST = Math.max(...LEVELS.flatMap((l) => BINS.sets[l].density));
 /** The density at fine bin i, as level L draws it. */
 const density = (level: Level, i: number) => BINS.sets[level].density[Math.floor(i / PER[level])];
 
@@ -48,7 +50,7 @@ const Histogram: React.FC<{
         if (o <= 0) return null;
         const w = Number(level) > 40 ? 1 : 2.5;
         return bounds(level).map((x, j) => (
-          <rect key={`${level}-${j}`} x={x - w / 2} y={base - 0.42 * unit} width={w} height={0.42 * unit} fill={PAPER} opacity={o} />
+          <rect key={`${level}-${j}`} x={x - w / 2} y={base - TALLEST * unit - 2} width={w} height={TALLEST * unit + 2} fill={PAPER} opacity={o} />
         ));
       })}
       <line x1={scale.x0} x2={scale.x1} y1={base + 0.5} y2={base + 0.5} stroke={INK} strokeWidth={1.6} />

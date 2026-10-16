@@ -391,3 +391,18 @@ export const Tag: React.FC<{ size?: number; color?: string; weight?: number; chi
   weight = 600,
   children,
 }) => <span style={{ ...note(size, color), fontWeight: weight, whiteSpace: "nowrap" }}>{children}</span>;
+
+/**
+ * A scene's way out: in the last moments before its cut, the whole page eases
+ * up a little and sets back, so the next scene arrives over a page that is
+ * already leaving rather than one that has stopped.
+ */
+export const Exit: React.FC<{ at: number | null; dur?: number; children: React.ReactNode }> = ({ at, dur = 22, children }) => {
+  const frame = useCurrentFrame();
+  const p = at === null ? 0 : ease(frame, at, dur);
+  return (
+    <div style={{ position: "absolute", inset: 0, opacity: 1 - p * 0.55, transform: p > 0 ? `translateY(${-p * 14}px)` : undefined }}>
+      {children}
+    </div>
+  );
+};

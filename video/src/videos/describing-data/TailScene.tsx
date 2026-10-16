@@ -14,8 +14,8 @@ import { Drift, Mark, Pulse, STAT, STAT_INK, Svg, Tag, count } from "./parts";
 const X: XScale = { lo: -12, hi: 12, x0: 300, x1: 1500 };
 const EDGE = 12;
 const COL = 0.25;
-const ROWS = { normal: 560, heavy: 830 } as const;
-const BODY_H = 190;
+const ROWS = { normal: 585, heavy: 835 } as const;
+const BODY_H = 165;
 const DOT_R = 4.6;
 const DOT_STEP = 10.5;
 

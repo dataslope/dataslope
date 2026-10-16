@@ -61,6 +61,8 @@ export const CorrScene: React.FC = () => {
   const minusAt = n.word("corr", "minus one");
   const pearsonAt = n.word("corr", "Pearson's");
   const straightAt = n.word("corr", "straight line");
+  const closeAt = n.word("corr", "how close");
+  const thoughAt = n.word("ushape", "though");
   const curveAt = n.word("curve", "curve");
   const eightAt = n.word("curve", "point eight seven");
   const spearmanAt = n.word("curve", "Spearman's");
@@ -87,7 +89,7 @@ export const CorrScene: React.FC = () => {
   const marker = frame < nineAt - 4 ? CURVE.pearson : frame < minusZeroAt - 6 ? lerp(CURVE.pearson, CURVE.spearman, ease(frame, nineAt - 4, 16)) : lerp(CURVE.spearman, USHAPE.r, ease(frame, minusZeroAt - 6, 20));
   const markerIn = ease(frame, eightAt - 4, 12);
   const markGlow = pulse(frame, eightAt, 24) + pulse(frame, nineAt, 24) + pulse(frame, minusZeroAt, 24);
-  const fitIn = ease(frame, straightAt - 2, 18) * (1 - toRank);
+  const fitIn = ease(frame, closeAt - 2, 24) * (1 - toRank);
   const uFitIn = ease(frame, minusZeroAt - 4, 16);
 
   return (
@@ -219,6 +221,11 @@ export const CorrScene: React.FC = () => {
       <Note at={risingAt - 4} x={BOX.x0} y={top - 44} out={nearAt - 4}>
         <Label size={21} color={DATA_INK} style={halo}>
           the same points, as ranks
+        </Label>
+      </Note>
+      <Note at={thoughAt - 2} x={BOX.x1 - 10} y={py(U_FIT.a + U_FIT.b * 4.8, U.ylo, U.yhi) + 10} align="right">
+        <Label size={21} color={STAT_INK} style={halo}>
+          the best straight line: flat
         </Label>
       </Note>
       <Note at={uAt} x={BOX.x0} y={top - 44}>

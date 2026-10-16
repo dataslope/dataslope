@@ -39,6 +39,10 @@ export const PowerScene: React.FC = () => {
   const repeatAt = n.word("sim", "repeat");
   const fortySevenAt = n.word("coinflip", "Forty-seven");
   const flipAt = n.word("coinflip", "coin flip");
+  const runsRejectAt = n.word("coinflip", "reject");
+  const reallyAt = n.word("coinflip", "really there");
+  const fixedAt = n.word("trade", "sample fixed");
+  const designedAt = n.word("target", "designed");
   const lowerAt = n.word("trade", "Lower");
   const missAt = n.word("trade", "miss");
   const pushingAt = n.word("trade", "pushing");
@@ -54,7 +58,7 @@ export const PowerScene: React.FC = () => {
   const fill = ease(frame, repeatAt - 2, 70);
   const done = Math.round(fill * POWER.runs);
   const caught = POWER.flags.slice(0, done).filter(Boolean).length;
-  const reveal = ease(frame, fortySevenAt - 6, 14);
+  const reveal = ease(frame, runsRejectAt - 4, 14);
   const flipGlow = pulse(frame, flipAt, 26);
 
   // The seesaw: alpha falls, beta rises.
@@ -71,7 +75,7 @@ export const PowerScene: React.FC = () => {
   const py = (p: number) => y(P_BASE) - h(P_TALL) * p;
   const at40 = pulse(frame, sixtyAt - 2, 26);
   const at80 = pulse(frame, ninetyAt - 2, 26);
-  const target = ease(frame, targetAt - 4, 16);
+  const target = ease(frame, designedAt - 4, 20);
 
   return (
     <AbsoluteFill>
@@ -122,13 +126,15 @@ export const PowerScene: React.FC = () => {
           <Count at={fortySevenAt - 4} to={POWER.power} dur={20} format={(v) => pct(v, 1)} />
         </span>
         <span style={{ ...body(34, true), color: INK, marginLeft: 18, display: "inline-block", transform: `scale(${1 + 0.06 * flipGlow})` }}>
-          <span style={{ opacity: ease(frame, flipAt - 4, 12) }}>caught it: a coin flip</span>
+          <span style={{ opacity: ease(frame, reallyAt - 4, 12) }}>
+            caught it<span style={{ opacity: ease(frame, flipAt - 4, 12) }}>: a coin flip</span>
+          </span>
         </span>
       </Note>
 
       {/* ── The seesaw: alpha down, beta up ── */}
       <div style={{ position: "absolute", inset: 0, opacity: schematic }}>
-        <Ink at={lowerAt - 6} dur={14} style={{ left: 1150, top: y(330), whiteSpace: "nowrap" }}>
+        <Ink at={fixedAt - 4} dur={14} style={{ left: 1150, top: y(330), whiteSpace: "nowrap" }}>
           <Label size={22} color={INK_SOFT}>
             With the sample fixed
           </Label>

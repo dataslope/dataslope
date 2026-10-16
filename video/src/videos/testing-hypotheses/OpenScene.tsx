@@ -35,12 +35,17 @@ export const OpenScene: React.FC = () => {
   const intervalAt = n.word("hook", "interval");
   const plausibleAt = n.word("hook", "plausible");
   const oneAt = n.word("hook", "one value");
+  const particularAt = n.word("hook", "particular");
+  const usuallyAt = n.word("hook", "usually");
+  const effectAt = n.word("hook", "effect");
   const zeroAt = n.word("hook", "zero");
   const checkoutFrom = n.beat("checkout").from;
   const elevenAt = n.word("checkout", "eleven");
+  const oldAt = n.word("checkout", "old");
   const tenAt = n.word("checkout", "ten");
   const noiseAt = n.word("free", "noise");
-  const questionAt = n.word("free", "question");
+  const soAt = n.word("free", "So");
+  const chanceAt = n.word("free", "chance");
   const noDiffAt = n.word("free", "no difference");
   const howAt = n.word("free", "how often");
   const bigAt = n.word("free", "this big");
@@ -49,13 +54,15 @@ export const OpenScene: React.FC = () => {
   const leave = ease(frame, checkoutFrom - 10, 16);
   // The pin: it lands inside the interval on "one value", then slides to zero.
   const pinIn = ease(frame, oneAt - 4, 12);
-  const toZero = ease(frame, zeroAt - 10, 18);
+  const toZero = ease(frame, usuallyAt - 4, Math.max(18, zeroAt - usuallyAt + 2));
+  const pinGlow = pulse(frame, particularAt, 22);
+  const effectGlow = pulse(frame, effectAt - 2, 24);
   const pinV = lerp(1.6, 0, toZero);
   const pinX = sx(E, pinV);
   const zeroGlow = pulse(frame, zeroAt, 26);
 
   const oldW = sx(C, CHECKOUT.oldRate * ease(frame, tenAt - 4, 18)) - C.x0;
-  const newW = sx(C, CHECKOUT.newRate * ease(frame, elevenAt - 4, 18)) - C.x0;
+  const newW = sx(C, CHECKOUT.newRate * ease(frame, elevenAt - 4, 30)) - C.x0;
   const ghost = ease(frame, noDiffAt - 4, 14);
   const gapGlow = ease(frame, bigAt - 6, 10);
   const gapPulse = pulse(frame, bigAt + 4, 24);
@@ -82,7 +89,7 @@ export const OpenScene: React.FC = () => {
           <line x1={E.x0} x2={E.x1} y1={y(E_BASE)} y2={y(E_BASE)} stroke={INK} strokeWidth={1.6} />
         </Svg>
         <Note at={hookFrom + 6} x={E.x1} y={y(E_BASE) + 18} align="right">
-          <Label size={21} color={INK_SOFT}>
+          <Label size={21 + 3 * effectGlow} color={effectGlow > 0.1 ? INK : INK_SOFT}>
             the effect
           </Label>
         </Note>
@@ -132,7 +139,7 @@ export const OpenScene: React.FC = () => {
               strokeWidth={4}
               strokeLinecap="round"
             />
-            <circle cx={pinX} cy={y(E_BASE) - h(150) * pinIn} r={11 + 4 * zeroGlow} fill={STAT} stroke={PAPER} strokeWidth={2} />
+            <circle cx={pinX} cy={y(E_BASE) - h(150) * pinIn} r={11 + 4 * zeroGlow + 4 * pinGlow} fill={STAT} stroke={PAPER} strokeWidth={2} />
           </Svg>
         ) : null}
         <Note at={zeroAt + 4} x={sx(E, 0) - 24} y={y(E_BASE) - h(150) - 18} align="right">
@@ -144,7 +151,7 @@ export const OpenScene: React.FC = () => {
 
       {/* ── Fig. 2: the checkout, old and new ── */}
       <FigLabel n="2" title="Conversion rate, old checkout and new" at={checkoutFrom - 4} x={160} y={y(330)} />
-      <Ink at={tenAt - 6} dur={12} style={{ left: 160, top: y(OLD_Y) - 16, whiteSpace: "nowrap" }}>
+      <Ink at={oldAt - 4} dur={12} style={{ left: 160, top: y(OLD_Y) - 16, whiteSpace: "nowrap" }}>
         <Label size={26}>Old checkout</Label>
       </Ink>
       <Ink at={elevenAt - 6} dur={12} style={{ left: 160, top: y(NEW_Y) - 16, whiteSpace: "nowrap" }}>
@@ -181,7 +188,7 @@ export const OpenScene: React.FC = () => {
         { at: tenAt, rate: CHECKOUT.oldRate, yy: OLD_Y, color: INK },
         { at: elevenAt, rate: CHECKOUT.newRate, yy: NEW_Y, color: "var(--ds-blue-ink)" },
       ].map((b) => {
-        const g = ease(frame, b.at - 4, 18);
+        const g = ease(frame, b.at - 4, b.yy === NEW_Y ? 30 : 18);
         if (g <= 0) return null;
         return (
           <div
@@ -216,12 +223,12 @@ export const OpenScene: React.FC = () => {
       </Note>
 
       {/* The question, as the lesson puts it. */}
-      <Ink at={questionAt - 2} dur={16} style={{ left: 160, top: y(780), whiteSpace: "nowrap" }}>
+      <Ink at={soAt - 2} dur={16} style={{ left: 160, top: y(780), whiteSpace: "nowrap" }}>
         <span style={{ ...body(36, true), color: INK_SOFT }}>The real question:</span>
       </Ink>
       <Ink at={howAt - 4} dur={22} style={{ left: 160, top: y(836), whiteSpace: "nowrap" }}>
         <span style={{ ...body(38, true), color: INK }}>
-          how often would chance alone hand you <Mark at={bigAt}>a gap this big?</Mark>
+          how often would <Mark at={chanceAt}>chance alone</Mark> hand you <Mark at={bigAt}>a gap this big?</Mark>
         </span>
       </Ink>
     </AbsoluteFill>

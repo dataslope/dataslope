@@ -3,12 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { BAR, fmt, halo, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { BAR, fmt, halo, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EXPERIMENT } from "./data";
-import { Count, Headline, lerp, Marker, STAT, STAT_INK, Svg } from "./parts";
+import { Count, Headline, lerp, STAT, STAT_INK, Svg } from "./parts";
 
 /** Every user as one square: 100 to a row, 60 rows, per arm. */
 const COLS = 100;
@@ -74,6 +74,7 @@ export const ResultScene: React.FC = () => {
   const oldAt = n.word("counts", "Five hundred");
   const oldButtonAt = n.word("counts", "old button");
   const newAt = n.word("counts", "Seven hundred");
+  const newButtonAt = n.word("counts", "new");
   const nineAt = n.word("lift", "nine point six five");
   const elevenAt = n.word("lift", "eleven point seven");
   const liftAt = n.word("lift", "A lift");
@@ -109,7 +110,7 @@ export const ResultScene: React.FC = () => {
 
   const CARD = [
     { name: "Lift", value: `+${fmt(lift)} points`, extra: `+${Math.round(EXPERIMENT.relLift * 100)}% relative`, at: liftAt, mark: theLiftAt },
-    { name: "95% interval", value: `${fmt(pp(EXPERIMENT.ciLow))} to ${fmt(pp(EXPERIMENT.ciHigh))} points`, extra: "", at: intervalAt, mark: itsIntervalAt },
+    { name: "95% interval", value: `${fmt(pp(EXPERIMENT.ciLow))} to ${fmt(pp(EXPERIMENT.ciHigh))} points`, extra: "", at: oneAt, mark: itsIntervalAt },
     { name: "p-value", value: fmt(EXPERIMENT.p, 4), extra: "", at: pAt, mark: thePAt },
     { name: "Effect size", value: `Cohen's h = ${fmt(EXPERIMENT.h)}`, extra: "", at: effectAt - 6, mark: effectAt },
   ];
@@ -149,6 +150,31 @@ export const ResultScene: React.FC = () => {
           </Ink>
         </React.Fragment>
       ))}
+      {arms.map((a, i) => {
+        const at = i ? newButtonAt - 4 : oldButtonAt - 4;
+        const p = ease(frame, at, 12);
+        if (p <= 0) return null;
+        return (
+          <div
+            key={a.g}
+            style={{
+              position: "absolute",
+              left: a.x + 228,
+              top: top + gridH + 8,
+              opacity: p,
+              transform: `translateY(${(1 - p) * 10}px)`,
+              ...label(20, i ? PAPER : INK),
+              padding: "4px 16px",
+              borderRadius: i ? 20 : 5,
+              background: i ? BAR : `color-mix(in srgb, ${INK_SOFT} 22%, ${PAPER})`,
+              border: i ? "none" : `1.6px solid ${HAIRLINE}`,
+              whiteSpace: "nowrap",
+            }}
+          >
+            Buy now
+          </div>
+        );
+      })}
       <Ink at={oldButtonAt} dur={10} style={{ left: (GRID_X[0] + COLS * CELL + GRID_X[1]) / 2 - 10, top: top + gridH / 2 - 14, whiteSpace: "nowrap" }}>
         <span style={{ ...note(20, INK_SOFT) }}>vs</span>
       </Ink>
@@ -175,6 +201,19 @@ export const ResultScene: React.FC = () => {
           strokeDasharray="6 5"
         />
       </Svg>
+      {ease(frame, oneAt - 6, 14) > 0 ? (
+        <Svg opacity={ease(frame, oneAt - 6, 14) * (1 - 0.6 * ease(frame, fourAt - 6, 14))}>
+          <rect
+            x={sx(LIFT, pp(EXPERIMENT.ciLow))}
+            y={rowY - 40}
+            width={sx(LIFT, pp(EXPERIMENT.ciHigh)) - sx(LIFT, pp(EXPERIMENT.ciLow))}
+            height={80}
+            rx={8}
+            fill={STAT}
+            opacity={0.12}
+          />
+        </Svg>
+      ) : null}
       {ci > 0 ? (
         <Svg>
           <line x1={sx(LIFT, lo)} x2={sx(LIFT, hi)} y1={rowY} y2={rowY} stroke={STAT} strokeWidth={6} strokeLinecap="round" />
@@ -213,14 +252,22 @@ export const ResultScene: React.FC = () => {
       <Svg opacity={ease(frame, liftAt - 2, 14)}>
         <line x1={CARD_X} x2={CARD_X + 400} y1={y(336)} y2={y(336)} stroke={INK} strokeWidth={2} />
       </Svg>
+      <Svg>
+        {CARD.map((c, i) => {
+          const p = ease(frame, c.mark - 6, 12);
+          const off = ease(frame, c.mark + 20, 14);
+          if (p <= 0 || off >= 1) return null;
+          const top = y(CARD_Y[i]) - 10;
+          const bottom = y((CARD_Y[i + 1] ?? CARD_Y[i] + 100) - 14);
+          return (
+            <rect key={c.name} x={CARD_X - 14} y={top} width={428 * p} height={bottom - top} rx={8} fill={HIGHLIGHT} opacity={0.9 * (1 - off * 0.75)} />
+          );
+        })}
+      </Svg>
       {CARD.map((c, i) => (
         <React.Fragment key={c.name}>
           <Ink at={c.at - 2} dur={14} style={{ left: CARD_X, top: y(CARD_Y[i]), whiteSpace: "nowrap" }}>
-            <span style={{ ...label(21, INK_SOFT) }}>
-              <Marker at={c.mark - 4} off={c.mark + 26}>
-                {c.name}
-              </Marker>
-            </span>
+            <span style={{ ...label(21, INK_SOFT) }}>{c.name}</span>
           </Ink>
           <Ink at={c.at + 4} dur={14} style={{ left: CARD_X, top: y(CARD_Y[i]) + 32, whiteSpace: "nowrap" }}>
             <span style={{ ...note(28, i === 2 ? INK : STAT_INK), fontWeight: 700 }}>{c.value}</span>
@@ -239,10 +286,10 @@ export const ResultScene: React.FC = () => {
         <span style={{ ...note(21, INK_SOFT) }}>three in ten thousand</span>
       </Ink>
       <Ink at={fourAt - 4} dur={14} out={aloneAt - 8} style={{ left: CARD_X, top: y(CARD_Y[3] + 104), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, INK) }}>Report all four together.</span>
+        <span style={{ ...note(26, INK), fontWeight: 600 }}>Report all four together.</span>
       </Ink>
       <Ink at={aloneAt - 4} dur={14} style={{ left: CARD_X, top: y(CARD_Y[3] + 104), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, STAT_INK), fontWeight: 650 }}>Never the p-value alone.</span>
+        <span style={{ ...note(26, STAT_INK), fontWeight: 700 }}>Never the p-value alone.</span>
       </Ink>
     </AbsoluteFill>
   );

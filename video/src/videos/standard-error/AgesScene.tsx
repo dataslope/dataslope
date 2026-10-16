@@ -18,8 +18,10 @@ import {
 } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { AGE_DOTS, AGES } from "./data";
 import { Rule, Span } from "./parts";
+import { PartName } from "../sampling/PartName";
 
 /** One-year bins, so each column of dots is one year of age. */
 const X: XScale = { lo: 10, hi: 80, x0: 160, x1: 1760 };
@@ -66,9 +68,20 @@ export const AgesScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound (merged video only; the standalone has sfx off): the ages, the
+          standard deviation, the other samples' averages, the standard error,
+          its bell ── */}
+      <Sfx name="el-sprinkle" at={takeAt} level={-34} />
+      <Sfx name="el-pencil" at={dataAt} level={-34} />
+      <Sfx name="el-sprinkle" at={differentAt} level={-35} />
+      <Sfx name="el-pencil" at={howFarAt} level={-34} />
+      <Sfx name="el-pop" at={widthAt - 4} level={-30} />
+
       {/* ── The two names, each with what it is the spread of ── */}
       <Ink at={2} dur={14} style={{ left: 96, top: y(112) }}>
-        <span style={label(20, ACCENT_INK)}>Two spreads, easily confused</span>
+        <span style={label(20, ACCENT_INK)}>
+          <PartName />Two spreads, easily confused
+        </span>
       </Ink>
       {/* Each name, then what it is the spread of: "the spread of" on both
           lines when the narration says they both measure one, and the

@@ -1,0 +1,405 @@
+{
+  "version": "PostgreSQL 18.3 (PGlite 0.5.8) on wasm32-unknown-emscripten, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 3.1.74 (1092ec30a3fb1d46b1782ff1b4db5094d3d06ae5), 32-bit",
+  "flat": {
+    "before": {
+      "fields": [
+        "order_id",
+        "customer_name",
+        "customer_email",
+        "product_name",
+        "quantity"
+      ],
+      "rows": [
+        [
+          101,
+          "Ada Lovelace",
+          "ada@old.example",
+          "Notebook",
+          2
+        ],
+        [
+          102,
+          "Ada Lovelace",
+          "ada@old.example",
+          "Pen",
+          5
+        ],
+        [
+          103,
+          "Grace Hopper",
+          "grace@example.com",
+          "Notebook",
+          1
+        ]
+      ]
+    },
+    "update": {
+      "sql": "UPDATE order_spreadsheet\nSET customer_email = 'ada@new.example'\nWHERE order_id = 101;",
+      "affectedRows": 1
+    },
+    "after": {
+      "fields": [
+        "order_id",
+        "customer_name",
+        "customer_email",
+        "product_name",
+        "quantity"
+      ],
+      "rows": [
+        [
+          101,
+          "Ada Lovelace",
+          "ada@new.example",
+          "Notebook",
+          2
+        ],
+        [
+          102,
+          "Ada Lovelace",
+          "ada@old.example",
+          "Pen",
+          5
+        ],
+        [
+          103,
+          "Grace Hopper",
+          "grace@example.com",
+          "Notebook",
+          1
+        ]
+      ]
+    },
+    "grouped": {
+      "sql": "SELECT\n  customer_name,\n  customer_email,\n  COUNT(*) AS rows_with_that_email\nFROM\n  order_spreadsheet\nGROUP BY\n  customer_name,\n  customer_email\nORDER BY\n  customer_name;",
+      "fields": [
+        "customer_name",
+        "customer_email",
+        "rows_with_that_email"
+      ],
+      "rows": [
+        [
+          "Ada Lovelace",
+          "ada@new.example",
+          1
+        ],
+        [
+          "Ada Lovelace",
+          "ada@old.example",
+          1
+        ],
+        [
+          "Grace Hopper",
+          "grace@example.com",
+          1
+        ]
+      ]
+    },
+    "adaEmails": 2
+  },
+  "shop": {
+    "notebook": {
+      "sql": "SELECT DISTINCT\n  customers.name,\n  customers.email\nFROM\n  customers\n  JOIN orders ON orders.customer_id = customers.id\n  JOIN order_items ON order_items.order_id = orders.id\n  JOIN products ON products.id = order_items.product_id\nWHERE\n  products.name = 'Notebook'\nORDER BY\n  customers.name;",
+      "fields": [
+        "name",
+        "email"
+      ],
+      "rows": [
+        [
+          "Ada Lovelace",
+          "ada@example.com"
+        ]
+      ]
+    },
+    "notebookLines": {
+      "fields": [
+        "order_id",
+        "name",
+        "quantity"
+      ],
+      "rows": [
+        [
+          101,
+          "Ada Lovelace",
+          2
+        ],
+        [
+          103,
+          "Ada Lovelace",
+          1
+        ]
+      ]
+    },
+    "columns": {
+      "customers": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "name",
+          "data_type": "text"
+        },
+        {
+          "column_name": "email",
+          "data_type": "text"
+        }
+      ],
+      "orders": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "customer_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "ordered_on",
+          "data_type": "date"
+        }
+      ],
+      "order_items": [
+        {
+          "column_name": "order_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "product_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "quantity",
+          "data_type": "integer"
+        }
+      ],
+      "products": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "name",
+          "data_type": "text"
+        }
+      ]
+    },
+    "keys": [
+      {
+        "table_name": "customers",
+        "column_name": "id",
+        "constraint_type": "PRIMARY KEY",
+        "constraint_name": "customers_pkey"
+      },
+      {
+        "table_name": "customers",
+        "column_name": "email",
+        "constraint_type": "UNIQUE",
+        "constraint_name": "customers_email_key"
+      },
+      {
+        "table_name": "order_items",
+        "column_name": "product_id",
+        "constraint_type": "FOREIGN KEY",
+        "constraint_name": "order_items_product_id_fkey"
+      },
+      {
+        "table_name": "order_items",
+        "column_name": "order_id",
+        "constraint_type": "FOREIGN KEY",
+        "constraint_name": "order_items_order_id_fkey"
+      },
+      {
+        "table_name": "order_items",
+        "column_name": "order_id",
+        "constraint_type": "PRIMARY KEY",
+        "constraint_name": "order_items_pkey"
+      },
+      {
+        "table_name": "order_items",
+        "column_name": "product_id",
+        "constraint_type": "PRIMARY KEY",
+        "constraint_name": "order_items_pkey"
+      },
+      {
+        "table_name": "orders",
+        "column_name": "customer_id",
+        "constraint_type": "FOREIGN KEY",
+        "constraint_name": "orders_customer_id_fkey"
+      },
+      {
+        "table_name": "orders",
+        "column_name": "id",
+        "constraint_type": "PRIMARY KEY",
+        "constraint_name": "orders_pkey"
+      },
+      {
+        "table_name": "products",
+        "column_name": "id",
+        "constraint_type": "PRIMARY KEY",
+        "constraint_name": "products_pkey"
+      },
+      {
+        "table_name": "products",
+        "column_name": "name",
+        "constraint_type": "UNIQUE",
+        "constraint_name": "products_name_key"
+      }
+    ],
+    "refused": {
+      "duplicate": {
+        "sql": "INSERT INTO customers VALUES (4, 'Ada L.', 'ada@example.com');",
+        "code": "23505",
+        "message": "duplicate key value violates unique constraint \"customers_email_key\"",
+        "detail": "Key (email)=(ada@example.com) already exists.",
+        "constraint": "customers_email_key",
+        "table": "customers"
+      },
+      "zero": {
+        "sql": "INSERT INTO order_items VALUES (102, 10, 0);",
+        "code": "23514",
+        "message": "new row for relation \"order_items\" violates check constraint \"order_items_quantity_check\"",
+        "detail": "Failing row contains (102, 10, 0).",
+        "constraint": "order_items_quantity_check",
+        "table": "order_items"
+      },
+      "orphan": {
+        "sql": "INSERT INTO orders VALUES (104, 99, DATE '2025-03-04');",
+        "code": "23503",
+        "message": "insert or update on table \"orders\" violates foreign key constraint \"orders_customer_id_fkey\"",
+        "detail": "Key (customer_id)=(99) is not present in table \"customers\".",
+        "constraint": "orders_customer_id_fkey",
+        "table": "orders"
+      }
+    },
+    "countsAfter": {
+      "customers": 3,
+      "orders": 3,
+      "order_items": 4
+    }
+  },
+  "library": {
+    "columns": {
+      "books": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "title",
+          "data_type": "text"
+        },
+        {
+          "column_name": "author",
+          "data_type": "text"
+        }
+      ],
+      "book_copies": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "book_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "barcode",
+          "data_type": "text"
+        }
+      ],
+      "borrowers": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "name",
+          "data_type": "text"
+        }
+      ],
+      "loans": [
+        {
+          "column_name": "id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "borrower_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "copy_id",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "loaned_on",
+          "data_type": "date"
+        },
+        {
+          "column_name": "due_on",
+          "data_type": "date"
+        }
+      ]
+    },
+    "keys": [
+      {
+        "table_name": "book_copies",
+        "column_name": "book_id",
+        "constraint_type": "FOREIGN KEY",
+        "points_at": "books"
+      },
+      {
+        "table_name": "book_copies",
+        "column_name": "id",
+        "constraint_type": "PRIMARY KEY",
+        "points_at": null
+      },
+      {
+        "table_name": "book_copies",
+        "column_name": "barcode",
+        "constraint_type": "UNIQUE",
+        "points_at": null
+      },
+      {
+        "table_name": "books",
+        "column_name": "id",
+        "constraint_type": "PRIMARY KEY",
+        "points_at": null
+      },
+      {
+        "table_name": "borrowers",
+        "column_name": "id",
+        "constraint_type": "PRIMARY KEY",
+        "points_at": null
+      },
+      {
+        "table_name": "loans",
+        "column_name": "borrower_id",
+        "constraint_type": "FOREIGN KEY",
+        "points_at": "borrowers"
+      },
+      {
+        "table_name": "loans",
+        "column_name": "copy_id",
+        "constraint_type": "FOREIGN KEY",
+        "points_at": "book_copies"
+      },
+      {
+        "table_name": "loans",
+        "column_name": "id",
+        "constraint_type": "PRIMARY KEY",
+        "points_at": null
+      }
+    ]
+  },
+  "ana": {
+    "sql": "INSERT INTO\n  customers (email, full_name)\nVALUES\n  ('ana@example.com', 'Ana R.');",
+    "code": "23505",
+    "message": "duplicate key value violates unique constraint \"customers_email_key\"",
+    "detail": "Key (email)=(ana@example.com) already exists.",
+    "constraint": "customers_email_key",
+    "table": "customers"
+  },
+  "units": {
+    "lbfSecondInNewtonSeconds": 4.4482216152605
+  }
+}

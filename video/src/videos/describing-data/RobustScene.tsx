@@ -107,9 +107,9 @@ export const RobustScene: React.FC = () => {
           {/* The median, and every income's distance from it. */}
           {sticks > 0 ? (
             <Svg>
-              <line x1={medX} x2={medX} y1={strip - BOX_H / 2 - 20} y2={strip + 110} stroke={INK} strokeWidth={3} />
+              <line x1={medX} x2={medX} y1={strip - BOX_H / 2 - 20} y2={strip + 132} stroke={INK} strokeWidth={3} />
               {ROBUST.values.map((v, i) => {
-                const yy = strip + 34 + i * 7;
+                const yy = strip + 52 + i * 8;
                 const x1 = Math.min(xOf(v), NEAR.x1 + 30);
                 return <line key={i} x1={medX} x2={medX + (x1 - medX) * sticks} y1={yy} y2={yy} stroke={STAT} strokeWidth={2.4} opacity={0.7} />;
               })}
@@ -207,8 +207,8 @@ export const RobustScene: React.FC = () => {
               key={c.text}
               style={{
                 position: "absolute",
-                left: 1180 + i * 0,
-                top: y(380) + i * 52,
+                left: 1180,
+                top: y(870) + i * 46,
                 opacity: p,
                 transform: `translateX(${(1 - p) * 20}px)`,
                 whiteSpace: "nowrap",
@@ -225,7 +225,7 @@ export const RobustScene: React.FC = () => {
         })}
       </div>
       <Pulse x={medX} y={strip - BOX_H / 2 - 20} at={stillAt - 2} color={INK} r={6} />
-      <Ink at={looksAt - 2} dur={18} style={{ left: 1180, top: y(500), whiteSpace: "nowrap" }}>
+      <Ink at={looksAt - 2} dur={18} style={{ left: 160, top: y(915), whiteSpace: "nowrap" }}>
         <span style={{ ...note(26, INK), ...halo }}>Neither one shows a shape.</span>
       </Ink>
     </AbsoluteFill>

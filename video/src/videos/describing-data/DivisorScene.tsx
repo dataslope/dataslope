@@ -141,7 +141,7 @@ export const DivisorScene: React.FC = () => {
           {/* Where the distances are measured from. */}
           {sticks > 0 ? (
             <Svg>
-              <line x1={cx} x2={cx} y1={base + 18} y2={base - (base - y(470)) * sticks} stroke={STAT} strokeWidth={3.4} strokeLinecap="round" />
+              <line x1={cx} x2={cx} y1={base + 18} y2={base - (base - y(470)) * sticks} stroke={toTruth > 0.5 ? INK : STAT} strokeWidth={3.4} strokeLinecap="round" />
               {DIVISOR.five.map((v, i) => (
                 <line key={i} x1={cx} x2={lerp(cx, sx(X, v), sticks)} y1={base - R - 1} y2={base - R - 1} stroke={STAT} strokeWidth={2} opacity={0.6} />
               ))}
@@ -230,7 +230,7 @@ export const DivisorScene: React.FC = () => {
             <Tag x={V.x0 - 18} y={y(BAR_N1) - 15} opacity={ease(frame, byN1At - 4, 12)} size={23} bold align="right">
               by n − 1
             </Tag>
-            <Tag x={sx(V, DIVISOR.byN * nGrow) + 16} y={y(BAR_N) - 15} opacity={ease(frame, byNAt, 10)} color={STAT_INK} size={24} bold align="left">
+            <Tag x={sx(V, DIVISOR.byN * nGrow) + 16} y={y(BAR_N) - 15} opacity={ease(frame, byNAt, 10)} color={STAT_INK} size={24} bold align="left" knockout>
               {counted(frame, byNAt - 2, 0, DIVISOR.byN, 1, 22)}
               <span style={{ fontWeight: 500, color: INK_SOFT, opacity: ease(frame, lowAt - 4, 10) }}>, about {Math.round(DIVISOR.lowPct)}% low</span>
             </Tag>
@@ -253,7 +253,7 @@ export const DivisorScene: React.FC = () => {
                 style={{
                   position: "absolute",
                   left: 260 + i * 720,
-                  top: y(800),
+                  top: y(850),
                   opacity: p,
                   transform: `translateY(${(1 - p) * 14}px)`,
                   whiteSpace: "nowrap",
@@ -268,10 +268,10 @@ export const DivisorScene: React.FC = () => {
               </div>
             );
           })}
-          <Ink at={disagreeAt - 4} dur={16} style={{ left: 260, top: y(760), whiteSpace: "nowrap" }}>
+          <Ink at={disagreeAt - 4} dur={16} style={{ left: 260, top: y(800), whiteSpace: "nowrap" }}>
             <span style={{ ...label(22, INK_SOFT) }}>The same ten values, two answers</span>
           </Ink>
-          <Ink at={weaknessAt - 4} dur={16} style={{ left: 260, top: y(880), whiteSpace: "nowrap" }}>
+          <Ink at={weaknessAt - 4} dur={16} style={{ left: 260, top: y(915), whiteSpace: "nowrap" }}>
             <span style={{ ...note(24, INK), ...halo }}>
               Squaring makes the <Mark at={swampAt - 4}>farthest values</Mark> count the most.
             </span>

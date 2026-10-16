@@ -62,19 +62,24 @@ export const RanksScene: React.FC = () => {
   const p033At = n.word("mwu", "point zero three three");
   const farAt = n.word("line", "how far out");
   const standsAt = n.word("line", "stands in line");
+  const doesntAt = n.word("line", "doesn't");
   const everyAt = n.word("next", "Every test");
+  const answersAt = n.word("next", "answers");
+  const couldAt = n.word("next", "could");
+  const meansAt = n.word("next", "means");
   const zeroAt = n.word("next", "zero");
   const bigAt = n.word("next", "how big");
   const seemsAt = n.word("next", "seems");
 
   const toRanks = (k: number) => ease(frame, ranksAt - 6 + (RANK[k] / ALL.length) * 18, 18);
-  const outGlow = pulse(frame, hoursAt - 4, 26) + pulse(frame, standsAt - 2, 30);
+  const outGlow = pulse(frame, hoursAt - 4, 26) + pulse(frame, doesntAt - 2, 26) + pulse(frame, standsAt - 2, 30);
   const farGlow = pulse(frame, farAt, 26);
   const meanIn = ease(frame, swellAt - 6, 14);
   const rankMeans = ease(frame, shiftAt - 4, 16);
   const close = ease(frame, everyAt - 6, 18);
   const fade = 1 - close;
   const pin = ease(frame, zeroAt - 6, 14);
+  const axisIn = ease(frame, answersAt - 4, 18);
   const zeroGlow = pulse(frame, zeroAt, 26);
 
   return (
@@ -85,11 +90,11 @@ export const RanksScene: React.FC = () => {
       <Sfx name="el-tap" at={sevenAt - 4} level={-29} />
       <Sfx name="el-whoosh" at={ranksAt - 6} level={-33} />
       <Sfx name="el-tap" at={p033At - 4} level={-28} />
-      <Sfx name="el-pencil" at={bigAt - 10} level={-34} />
+      <Sfx name="el-pencil" at={seemsAt - 8} level={-34} />
 
       <Head a="Outliers" b="swell the noise." at={ranksFrom - 6} bAt={swellAt - 4} out={mannAt - 8} />
       <Head a="Ranks" b="see the shift." at={mannAt - 4} bAt={shiftAt - 6} out={everyAt - 8} />
-      <Head a="Could the effect be zero?" at={everyAt - 2} />
+      <Head a="Could the effect be zero?" at={couldAt - 6} />
 
       <div style={{ position: "absolute", inset: 0, opacity: fade }}>
         <FigLabel n="19" title="Two support queues: minutes to resolve each ticket" at={ranksFrom} x={160} y={y(290)} />
@@ -211,8 +216,8 @@ export const RanksScene: React.FC = () => {
 
       {/* ── The close: the question every test asks, and the one it can't ── */}
       {close > 0 ? (
-        <Svg opacity={close}>
-          <line x1={E.x0} x2={E.x1} y1={y(E_BASE)} y2={y(E_BASE)} stroke={INK} strokeWidth={1.6} />
+        <Svg opacity={close * axisIn}>
+          <line x1={E.x0} x2={E.x0 + (E.x1 - E.x0) * axisIn} y1={y(E_BASE)} y2={y(E_BASE)} stroke={INK} strokeWidth={1.6} />
           <line x1={sx(E, 0)} x2={sx(E, 0)} y1={y(E_BASE) - 6} y2={y(E_BASE) + 8} stroke={INK} strokeWidth={2} />
           {pin > 0 ? (
             <>
@@ -222,10 +227,10 @@ export const RanksScene: React.FC = () => {
           ) : null}
         </Svg>
       ) : null}
-      <div style={{ position: "absolute", left: sx(E, 0), top: y(E_BASE) + 18, transform: "translateX(-50%)", opacity: close }}>
+      <div style={{ position: "absolute", left: sx(E, 0), top: y(E_BASE) + 18, transform: "translateX(-50%)", opacity: close * axisIn }}>
         <Label size={26}>0</Label>
       </div>
-      <Note at={everyAt + 2} x={E.x1} y={y(E_BASE) + 18} align="right">
+      <Note at={answersAt + 2} x={E.x1} y={y(E_BASE) + 18} align="right">
         <Label size={21} color={INK_SOFT}>
           the effect
         </Label>
@@ -243,7 +248,7 @@ export const RanksScene: React.FC = () => {
           </Label>
         </span>
       </Note>
-      <Note at={seemsAt - 6} x={sx(E, 2.4)} y={y(E_BASE) - h(60) - 50}>
+      <Note at={meansAt - 4} x={sx(E, 2.4)} y={y(E_BASE) - h(60) - 50}>
         <Label size={24} color={INK_SOFT}>
           and what does it mean?
         </Label>
@@ -251,7 +256,7 @@ export const RanksScene: React.FC = () => {
       <Ink at={everyAt + 4} dur={18} style={{ left: 160, top: y(300), whiteSpace: "nowrap" }}>
         <span style={{ ...body(36, true), color: INK_SOFT }}>The one narrow question every test here answers.</span>
       </Ink>
-      <NextLine at={bigAt - 4} x={160} y={y(780)} width={640}>
+      <NextLine at={seemsAt - 4} x={160} y={y(780)} width={640}>
         how big is the effect?
       </NextLine>
     </AbsoluteFill>

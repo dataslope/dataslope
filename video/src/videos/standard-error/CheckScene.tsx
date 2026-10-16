@@ -22,6 +22,7 @@ import {
 } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { CHECK, histogram, mulberry32 } from "./data";
 import { Marked, Span } from "./parts";
@@ -108,6 +109,15 @@ export const CheckScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: the population, a sample, the first average landing, the
+          thousands, the two spreads ── */}
+      <Sfx name="el-pop" at={popAt - 4} level={-30} />
+      <Sfx name="el-sprinkle" at={drawAt} level={-34} />
+      <Sfx name="el-tap" at={steps[0].d + DROP} level={-28} />
+      <Sfx name="el-sprinkle" at={fastFrom} level={-33} />
+      <Sfx name="el-tap" at={fiveAt - 2} level={-29} />
+      <Sfx name="el-tap" at={sevenAt - 2} level={-29} />
+
       <div style={{ position: "absolute", left: 92, top: y(112), display: "flex", gap: "0.26em", ...headline(56), whiteSpace: "nowrap" }}>
         <Ink at={checkFrom - 6} dur={20} style={{ position: "relative" }}>
           Check it the long way:

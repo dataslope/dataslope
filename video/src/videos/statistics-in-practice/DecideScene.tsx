@@ -115,12 +115,19 @@ export const DecideScene: React.FC = () => {
       {/* ── The lesson's huge test ── */}
       <Ink at={testAt - 4} dur={14} style={{ left: 320, top: y(HUGE) - 62, whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, INK), fontWeight: 600 }}>A huge test</span>
-        <span style={{ ...note(21, INK_SOFT), marginLeft: 12 }}>
+      </Ink>
+      <Ink at={eightAt - 4} dur={18} style={{ left: 470, top: y(HUGE) - 66, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(26, INK), fontWeight: 600 }}>
           {fmt(pp(TINY.pA))}% to {fmt(pp(TINY.pB))}%
         </span>
       </Ink>
+      {ease(frame, eightAt - 6, 16) > 0 ? (
+        <Svg opacity={ease(frame, eightAt - 6, 16)}>
+          <rect x={150} y={y(HUGE) - 74} width={(COL[1] + 300 - 150) * ease(frame, eightAt - 6, 22)} height={110} rx={10} fill={STAT} opacity={0.1} />
+        </Svg>
+      ) : null}
       <Interval lo={pp(TINY.ciLow)} hi={pp(TINY.ciHigh)} mid={pp(TINY.pB - TINY.pA)} y={y(HUGE)} t={huge} min={8} />
-      <Ring x={sx(X, pp(TINY.pB - TINY.pA))} y={y(HUGE)} at={ohTwoAt - 4} r1={40} />
+      <Ring x={sx(X, pp(TINY.pB - TINY.pA))} y={y(HUGE)} at={ohTwoAt - 4} r1={70} />
       <Leader
         points={[
           [sx(X, 0.5), y(HUGE) + 4],

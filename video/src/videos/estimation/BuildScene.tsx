@@ -53,6 +53,7 @@ export const BuildScene: React.FC = () => {
   const seWobbleAt = n.word("wobble", "standard error");
   const monthAt = n.word("users", "month");
   const thirtyThreeAt = n.word("interval", "thirty-three");
+  const intervalWordAt = n.word("interval", "interval");
   const tDistAt = n.word("why", "t-distribution");
   const slipEndAt = n.word("means-in", "slip", { edge: "end" });
   const criticalAt = n.word("margin", "critical value");
@@ -142,9 +143,9 @@ export const BuildScene: React.FC = () => {
         {term(criticalAt - 4, "critical value", fmt(USERS.tCrit), INK, twoOhOneAt - 2, payAt - 4)}
         {op(criticalAt + 2, "×")}
         {term(seWordAt - 4, "standard error", money(USERS.se), INK, dollarFiftyAt - 2, seWobbleAt - 2, criticalAt)}
-        {op(stepAt - 4, "=")}
+        {op(intervalWordAt - 6, "=")}
         <div style={{ display: "flex", flexDirection: "column", gap: 10, position: "relative" }}>
-          <Slot at={stepAt - 2} style={headline(50)}>
+          <Slot at={intervalWordAt - 4} style={headline(50)}>
             <Marked at={meansAt - 4} color={HIGHLIGHT}>
               95%
             </Marked>{" "}

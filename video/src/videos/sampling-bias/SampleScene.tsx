@@ -25,6 +25,7 @@ import {
   type Sample,
 } from "./data";
 import { Bracket, DOT, EASY, EASY_INK, RANDOM, RANDOM_INK, RAW, TruthLine, Underline } from "./parts";
+import { PartName } from "../sampling/PartName";
 
 /** Fig. 1: every score from 0 to 100, across the page. */
 const X1: XScale = { lo: 0, hi: 100, x0: 160, x1: 1760 };
@@ -136,7 +137,9 @@ export const SampleScene: React.FC = () => {
 
       {/* ── P1: the question, over the population at full size ── */}
       <Ink at={2} dur={14} out={p1Out} style={{ left: 96, top: y(112) }}>
-        <span style={label(20, INK_SOFT)}>A satisfaction survey</span>
+        <span style={label(20, INK_SOFT)}>
+          <PartName />A satisfaction survey
+        </span>
       </Ink>
       <Ink at={askAt - 4} dur={20} out={p1Out} style={{ left: 92, top: y(150), ...headline(84), whiteSpace: "nowrap" }}>
         Ask five hundred of them.

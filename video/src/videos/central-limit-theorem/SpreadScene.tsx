@@ -2,6 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { useMergedPart } from "../sampling/merged";
 import { Axis, Bars, sx, type XScale } from "../../editorial/charts";
 import { histogram, SPREADS, WAIT_SD } from "./data";
@@ -64,6 +65,14 @@ export const SpreadScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: the three piles, their spreads, each size read off, the rule ── */}
+      <Sfx name="el-pop" at={start - 4} level={-30} />
+      <Sfx name="el-pencil" at={tighterAt - 2} level={-34} />
+      {sayAt.map((at, i) => (
+        <Sfx key={i} name="el-tap" at={at - 2} level={-29} />
+      ))}
+      <Sfx name="el-pencil" at={rootAt} level={-34} />
+
       {/* One line in two inks: the second half follows the first in the flow,
           so it sits a word space after it in any face. */}
       <div style={{ position: "absolute", left: 116, top: Y(104), display: "flex", gap: "0.26em", ...headline(56) }}>

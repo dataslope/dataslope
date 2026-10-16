@@ -1,0 +1,735 @@
+{
+  "version": "PostgreSQL 18.3 (PGlite 0.5.8) on wasm32-unknown-emscripten, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 3.1.74 (1092ec30a3fb1d46b1782ff1b4db5094d3d06ae5), 32-bit",
+  "figures": {
+    "entities": {
+      "setup": "CREATE TABLE customers (\n  id   INTEGER PRIMARY KEY,\n  name TEXT NOT NULL\n);\nCREATE TABLE products (\n  id    INTEGER PRIMARY KEY,\n  name  TEXT NOT NULL,\n  price NUMERIC NOT NULL\n);\nINSERT INTO customers VALUES (1, 'Ada'), (2, 'Grace');\nINSERT INTO products VALUES (10, 'Notebook', 8.50), (11, 'Pen', 1.25);",
+      "sql": {
+        "customers": "SELECT id, name FROM customers ORDER BY id;",
+        "products": "SELECT id, name, price FROM products ORDER BY id;"
+      },
+      "results": {
+        "customers": {
+          "ok": true,
+          "fields": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            {
+              "id": 1,
+              "name": "Ada"
+            },
+            {
+              "id": 2,
+              "name": "Grace"
+            }
+          ],
+          "affected": 0
+        },
+        "products": {
+          "ok": true,
+          "fields": [
+            "id",
+            "name",
+            "price"
+          ],
+          "rows": [
+            {
+              "id": 10,
+              "name": "Notebook",
+              "price": "8.50"
+            },
+            {
+              "id": 11,
+              "name": "Pen",
+              "price": "1.25"
+            }
+          ],
+          "affected": 0
+        }
+      },
+      "columns": {
+        "customers": [
+          {
+            "column_name": "id",
+            "data_type": "integer",
+            "is_nullable": "NO",
+            "character_maximum_length": null
+          },
+          {
+            "column_name": "name",
+            "data_type": "text",
+            "is_nullable": "NO",
+            "character_maximum_length": null
+          }
+        ],
+        "products": [
+          {
+            "column_name": "id",
+            "data_type": "integer",
+            "is_nullable": "NO",
+            "character_maximum_length": null
+          },
+          {
+            "column_name": "name",
+            "data_type": "text",
+            "is_nullable": "NO",
+            "character_maximum_length": null
+          },
+          {
+            "column_name": "price",
+            "data_type": "numeric",
+            "is_nullable": "NO",
+            "character_maximum_length": null
+          }
+        ]
+      }
+    },
+    "orders": {
+      "ddl": "CREATE TABLE orders (\n  id          INTEGER PRIMARY KEY,\n  status      TEXT NOT NULL\n    CHECK (status IN ('pending', 'paid', 'shipped', 'cancelled')),\n  total_cents INTEGER NOT NULL\n    CHECK (total_cents >= 0),\n  placed_on   DATE NOT NULL\n);",
+      "rowsSql": "INSERT INTO orders VALUES\n  (1, 'pending', 2599, DATE '2025-01-10'),\n  (2, 'paid',    1200, DATE '2025-01-11');",
+      "sql": {
+        "rows": "SELECT * FROM orders ORDER BY id;",
+        "shipped": "INSERT INTO orders VALUES (3, 'shipped', 3499, DATE '2025-01-12');",
+        "banana": "INSERT INTO orders VALUES (3, 'banana', 3499, DATE '2025-01-12');",
+        "negative": "INSERT INTO orders VALUES (3, 'shipped', -5, DATE '2025-01-12');"
+      },
+      "results": {
+        "rows": {
+          "ok": true,
+          "fields": [
+            "id",
+            "status",
+            "total_cents",
+            "placed_on"
+          ],
+          "rows": [
+            {
+              "id": 1,
+              "status": "pending",
+              "total_cents": 2599,
+              "placed_on": "2025-01-10T00:00:00.000Z"
+            },
+            {
+              "id": 2,
+              "status": "paid",
+              "total_cents": 1200,
+              "placed_on": "2025-01-11T00:00:00.000Z"
+            }
+          ],
+          "affected": 0
+        },
+        "banana": {
+          "ok": false,
+          "message": "new row for relation \"orders\" violates check constraint \"orders_status_check\"",
+          "detail": "Failing row contains (3, banana, 3499, 2025-01-12).",
+          "code": "23514",
+          "constraint": "orders_status_check"
+        },
+        "negative": {
+          "ok": false,
+          "message": "new row for relation \"orders\" violates check constraint \"orders_total_cents_check\"",
+          "detail": "Failing row contains (3, shipped, -5, 2025-01-12).",
+          "code": "23514",
+          "constraint": "orders_total_cents_check"
+        },
+        "shipped": {
+          "ok": true,
+          "fields": [],
+          "rows": [],
+          "affected": 1
+        },
+        "after": {
+          "ok": true,
+          "fields": [
+            "id",
+            "status",
+            "total_cents",
+            "placed_on"
+          ],
+          "rows": [
+            {
+              "id": 1,
+              "status": "pending",
+              "total_cents": 2599,
+              "placed_on": "2025-01-10T00:00:00.000Z"
+            },
+            {
+              "id": 2,
+              "status": "paid",
+              "total_cents": 1200,
+              "placed_on": "2025-01-11T00:00:00.000Z"
+            },
+            {
+              "id": 3,
+              "status": "shipped",
+              "total_cents": 3499,
+              "placed_on": "2025-01-12T00:00:00.000Z"
+            }
+          ],
+          "affected": 0
+        }
+      },
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer",
+          "is_nullable": "NO",
+          "character_maximum_length": null
+        },
+        {
+          "column_name": "status",
+          "data_type": "text",
+          "is_nullable": "NO",
+          "character_maximum_length": null
+        },
+        {
+          "column_name": "total_cents",
+          "data_type": "integer",
+          "is_nullable": "NO",
+          "character_maximum_length": null
+        },
+        {
+          "column_name": "placed_on",
+          "data_type": "date",
+          "is_nullable": "NO",
+          "character_maximum_length": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "orders_id_not_null",
+          "kind": "n",
+          "def": "NOT NULL id",
+          "cols": [
+            "id"
+          ],
+          "ref_table": "-",
+          "ref_cols": []
+        },
+        {
+          "name": "orders_pkey",
+          "kind": "p",
+          "def": "PRIMARY KEY (id)",
+          "cols": [
+            "id"
+          ],
+          "ref_table": "-",
+          "ref_cols": []
+        },
+        {
+          "name": "orders_placed_on_not_null",
+          "kind": "n",
+          "def": "NOT NULL placed_on",
+          "cols": [
+            "placed_on"
+          ],
+          "ref_table": "-",
+          "ref_cols": []
+        },
+        {
+          "name": "orders_status_check",
+          "kind": "c",
+          "def": "CHECK ((status = ANY (ARRAY['pending'::text, 'paid'::text, 'shipped'::text, 'cancelled'::text])))",
+          "cols": [
+            "status"
+          ],
+          "ref_table": "-",
+          "ref_cols": []
+        },
+        {
+          "name": "orders_status_not_null",
+          "kind": "n",
+          "def": "NOT NULL status",
+          "cols": [
+            "status"
+          ],
+          "ref_table": "-",
+          "ref_cols": []
+        },
+        {
+          "name": "orders_total_cents_check",
+          "kind": "c",
+          "def": "CHECK ((total_cents >= 0))",
+          "cols": [
+            "total_cents"
+          ],
+          "ref_table": "-",
+          "ref_cols": []
+        },
+        {
+          "name": "orders_total_cents_not_null",
+          "kind": "n",
+          "def": "NOT NULL total_cents",
+          "cols": [
+            "total_cents"
+          ],
+          "ref_table": "-",
+          "ref_cols": []
+        }
+      ]
+    },
+    "loose": {
+      "setup": "CREATE TABLE orders (\n  id     INTEGER PRIMARY KEY,\n  status TEXT NOT NULL\n);",
+      "spellings": [
+        "sent",
+        "shipped",
+        "SHIP",
+        "done"
+      ],
+      "inserts": [
+        "INSERT INTO orders VALUES (1, 'sent');",
+        "INSERT INTO orders VALUES (2, 'shipped');",
+        "INSERT INTO orders VALUES (3, 'SHIP');",
+        "INSERT INTO orders VALUES (4, 'done');"
+      ],
+      "results": {
+        "inserts": [
+          {
+            "ok": true,
+            "fields": [],
+            "rows": [],
+            "affected": 1
+          },
+          {
+            "ok": true,
+            "fields": [],
+            "rows": [],
+            "affected": 1
+          },
+          {
+            "ok": true,
+            "fields": [],
+            "rows": [],
+            "affected": 1
+          },
+          {
+            "ok": true,
+            "fields": [],
+            "rows": [],
+            "affected": 1
+          }
+        ],
+        "rows": {
+          "ok": true,
+          "fields": [
+            "id",
+            "status"
+          ],
+          "rows": [
+            {
+              "id": 1,
+              "status": "sent"
+            },
+            {
+              "id": 2,
+              "status": "shipped"
+            },
+            {
+              "id": 3,
+              "status": "SHIP"
+            },
+            {
+              "id": 4,
+              "status": "done"
+            }
+          ],
+          "affected": 0
+        },
+        "distinct": {
+          "ok": true,
+          "fields": [
+            "n"
+          ],
+          "rows": [
+            {
+              "n": 4
+            }
+          ],
+          "affected": 0
+        },
+        "narrow": [
+          {
+            "status": "sent",
+            "ok": false,
+            "message": "new row for relation \"orders\" violates check constraint \"orders_status_check\"",
+            "detail": "Failing row contains (3, sent, 3499, 2025-01-12).",
+            "code": "23514",
+            "constraint": "orders_status_check"
+          },
+          {
+            "status": "shipped",
+            "ok": true,
+            "fields": [],
+            "rows": [],
+            "affected": 1
+          },
+          {
+            "status": "SHIP",
+            "ok": false,
+            "message": "new row for relation \"orders\" violates check constraint \"orders_status_check\"",
+            "detail": "Failing row contains (3, SHIP, 3499, 2025-01-12).",
+            "code": "23514",
+            "constraint": "orders_status_check"
+          },
+          {
+            "status": "done",
+            "ok": false,
+            "message": "new row for relation \"orders\" violates check constraint \"orders_status_check\"",
+            "detail": "Failing row contains (3, done, 3499, 2025-01-12).",
+            "code": "23514",
+            "constraint": "orders_status_check"
+          }
+        ]
+      }
+    },
+    "name": {
+      "setup": "CREATE TABLE people (\n  id   INTEGER PRIMARY KEY,\n  name VARCHAR(20) NOT NULL\n);",
+      "name": "Johann Sebastian Bach",
+      "sql": {
+        "length": "SELECT char_length('Johann Sebastian Bach')::int AS n;",
+        "insert": "INSERT INTO people VALUES (1, 'Johann Sebastian Bach');"
+      },
+      "results": {
+        "length": {
+          "ok": true,
+          "fields": [
+            "n"
+          ],
+          "rows": [
+            {
+              "n": 21
+            }
+          ],
+          "affected": 0
+        },
+        "insert": {
+          "ok": false,
+          "message": "value too long for type character varying(20)",
+          "detail": null,
+          "code": "22001",
+          "constraint": null
+        }
+      },
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "integer",
+          "is_nullable": "NO",
+          "character_maximum_length": null
+        },
+        {
+          "column_name": "name",
+          "data_type": "character varying",
+          "is_nullable": "NO",
+          "character_maximum_length": 20
+        }
+      ]
+    },
+    "phones": {
+      "packedSetup": "CREATE TABLE customers (\n  id            INTEGER PRIMARY KEY,\n  name          TEXT NOT NULL,\n  phone_numbers TEXT\n);\nINSERT INTO customers VALUES (1, 'Ada', '555-1111, 555-2222');",
+      "splitSetup": "CREATE TABLE customer_phones (\n  customer_id INTEGER NOT NULL,\n  phone       TEXT NOT NULL\n);\nINSERT INTO customer_phones VALUES (1, '555-1111'), (1, '555-2222');",
+      "sql": {
+        "packed": "SELECT * FROM customers;",
+        "search": "SELECT name FROM customers WHERE phone_numbers = '555-2222';",
+        "split": "SELECT * FROM customer_phones;",
+        "splitSearch": "SELECT customer_id FROM customer_phones WHERE phone = '555-2222';"
+      },
+      "results": {
+        "packed": {
+          "ok": true,
+          "fields": [
+            "id",
+            "name",
+            "phone_numbers"
+          ],
+          "rows": [
+            {
+              "id": 1,
+              "name": "Ada",
+              "phone_numbers": "555-1111, 555-2222"
+            }
+          ],
+          "affected": 0
+        },
+        "search": {
+          "ok": true,
+          "fields": [
+            "name"
+          ],
+          "rows": [],
+          "affected": 0
+        },
+        "split": {
+          "ok": true,
+          "fields": [
+            "customer_id",
+            "phone"
+          ],
+          "rows": [
+            {
+              "customer_id": 1,
+              "phone": "555-1111"
+            },
+            {
+              "customer_id": 1,
+              "phone": "555-2222"
+            }
+          ],
+          "affected": 0
+        },
+        "splitSearch": {
+          "ok": true,
+          "fields": [
+            "customer_id"
+          ],
+          "rows": [
+            {
+              "customer_id": 1
+            }
+          ],
+          "affected": 0
+        }
+      }
+    },
+    "erd": {
+      "setup": "CREATE TABLE customers (\n  id    INTEGER PRIMARY KEY,\n  name  TEXT NOT NULL,\n  email TEXT NOT NULL UNIQUE\n);\nCREATE TABLE orders (\n  id          INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL REFERENCES customers(id),\n  placed_on   DATE NOT NULL,\n  status      TEXT NOT NULL\n);\nINSERT INTO customers VALUES (1, 'Ada', 'ada@example.com');\nINSERT INTO orders VALUES (101, 1, DATE '2025-02-01', 'placed');",
+      "sql": {
+        "join": "SELECT c.name, o.id AS order_id, o.status\nFROM customers c\nJOIN orders o ON o.customer_id = c.id;",
+        "zero": "INSERT INTO customers VALUES (2, 'Grace', 'grace@example.com');",
+        "many": "INSERT INTO orders VALUES (102, 1, DATE '2025-02-02', 'placed');",
+        "none": "INSERT INTO orders VALUES (103, NULL, DATE '2025-02-03', 'placed');",
+        "stray": "INSERT INTO orders VALUES (104, 9, DATE '2025-02-04', 'placed');",
+        "perCustomer": "SELECT c.name, count(o.id)::int AS orders\nFROM customers c LEFT JOIN orders o ON o.customer_id = c.id\nGROUP BY c.name ORDER BY c.name;"
+      },
+      "results": {
+        "join": {
+          "ok": true,
+          "fields": [
+            "name",
+            "order_id",
+            "status"
+          ],
+          "rows": [
+            {
+              "name": "Ada",
+              "order_id": 101,
+              "status": "placed"
+            }
+          ],
+          "affected": 0
+        },
+        "zero": {
+          "ok": true,
+          "fields": [],
+          "rows": [],
+          "affected": 1
+        },
+        "many": {
+          "ok": true,
+          "fields": [],
+          "rows": [],
+          "affected": 1
+        },
+        "none": {
+          "ok": false,
+          "message": "null value in column \"customer_id\" of relation \"orders\" violates not-null constraint",
+          "detail": "Failing row contains (103, null, 2025-02-03, placed).",
+          "code": "23502",
+          "constraint": null
+        },
+        "stray": {
+          "ok": false,
+          "message": "insert or update on table \"orders\" violates foreign key constraint \"orders_customer_id_fkey\"",
+          "detail": "Key (customer_id)=(9) is not present in table \"customers\".",
+          "code": "23503",
+          "constraint": "orders_customer_id_fkey"
+        },
+        "perCustomer": {
+          "ok": true,
+          "fields": [
+            "name",
+            "orders"
+          ],
+          "rows": [
+            {
+              "name": "Ada",
+              "orders": 2
+            },
+            {
+              "name": "Grace",
+              "orders": 0
+            }
+          ],
+          "affected": 0
+        }
+      },
+      "columns": {
+        "customers": [
+          {
+            "column_name": "id",
+            "data_type": "integer",
+            "is_nullable": "NO",
+            "character_maximum_length": null
+          },
+          {
+            "column_name": "name",
+            "data_type": "text",
+            "is_nullable": "NO",
+            "character_maximum_length": null
+          },
+          {
+            "column_name": "email",
+            "data_type": "text",
+            "is_nullable": "NO",
+            "character_maximum_length": null
+          }
+        ],
+        "orders": [
+          {
+            "column_name": "id",
+            "data_type": "integer",
+            "is_nullable": "NO",
+            "character_maximum_length": null
+          },
+          {
+            "column_name": "customer_id",
+            "data_type": "integer",
+            "is_nullable": "NO",
+            "character_maximum_length": null
+          },
+          {
+            "column_name": "placed_on",
+            "data_type": "date",
+            "is_nullable": "NO",
+            "character_maximum_length": null
+          },
+          {
+            "column_name": "status",
+            "data_type": "text",
+            "is_nullable": "NO",
+            "character_maximum_length": null
+          }
+        ]
+      },
+      "constraints": {
+        "customers": [
+          {
+            "name": "customers_email_key",
+            "kind": "u",
+            "def": "UNIQUE (email)",
+            "cols": [
+              "email"
+            ],
+            "ref_table": "-",
+            "ref_cols": []
+          },
+          {
+            "name": "customers_email_not_null",
+            "kind": "n",
+            "def": "NOT NULL email",
+            "cols": [
+              "email"
+            ],
+            "ref_table": "-",
+            "ref_cols": []
+          },
+          {
+            "name": "customers_id_not_null",
+            "kind": "n",
+            "def": "NOT NULL id",
+            "cols": [
+              "id"
+            ],
+            "ref_table": "-",
+            "ref_cols": []
+          },
+          {
+            "name": "customers_name_not_null",
+            "kind": "n",
+            "def": "NOT NULL name",
+            "cols": [
+              "name"
+            ],
+            "ref_table": "-",
+            "ref_cols": []
+          },
+          {
+            "name": "customers_pkey",
+            "kind": "p",
+            "def": "PRIMARY KEY (id)",
+            "cols": [
+              "id"
+            ],
+            "ref_table": "-",
+            "ref_cols": []
+          }
+        ],
+        "orders": [
+          {
+            "name": "orders_customer_id_fkey",
+            "kind": "f",
+            "def": "FOREIGN KEY (customer_id) REFERENCES customers(id)",
+            "cols": [
+              "customer_id"
+            ],
+            "ref_table": "customers",
+            "ref_cols": [
+              "id"
+            ]
+          },
+          {
+            "name": "orders_customer_id_not_null",
+            "kind": "n",
+            "def": "NOT NULL customer_id",
+            "cols": [
+              "customer_id"
+            ],
+            "ref_table": "-",
+            "ref_cols": []
+          },
+          {
+            "name": "orders_id_not_null",
+            "kind": "n",
+            "def": "NOT NULL id",
+            "cols": [
+              "id"
+            ],
+            "ref_table": "-",
+            "ref_cols": []
+          },
+          {
+            "name": "orders_pkey",
+            "kind": "p",
+            "def": "PRIMARY KEY (id)",
+            "cols": [
+              "id"
+            ],
+            "ref_table": "-",
+            "ref_cols": []
+          },
+          {
+            "name": "orders_placed_on_not_null",
+            "kind": "n",
+            "def": "NOT NULL placed_on",
+            "cols": [
+              "placed_on"
+            ],
+            "ref_table": "-",
+            "ref_cols": []
+          },
+          {
+            "name": "orders_status_not_null",
+            "kind": "n",
+            "def": "NOT NULL status",
+            "cols": [
+              "status"
+            ],
+            "ref_table": "-",
+            "ref_cols": []
+          }
+        ]
+      }
+    }
+  }
+}

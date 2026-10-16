@@ -49,7 +49,9 @@ export const OddsScene: React.FC = () => {
   const raiseAt = n.word("bonferroni", "raise");
   const sharingAt = n.word("bonferroni", "sharing");
   const needsAt = n.word("bonferroni", "point zero zero two five");
-  const fairlyAt = n.word("errors-in", "fairly");
+  const everyTestAt = n.word("bonferroni", "every test");
+  const errorsFrom = n.beat("errors-in").from;
+  const twoWaysAt = n.word("errors-in", "two ways");
 
   const py = (p: number) => y(BASE) - h(TALL) * (p / TOP);
   const pts = AT_LEAST.k.map((k, i) => [sx(X, k), py(AT_LEAST.p[i])] as const);
@@ -74,7 +76,8 @@ export const OddsScene: React.FC = () => {
   const bar = lerp(0.05, AT_LEAST.bonferroni, fall);
   const hitP = TWENTY.p[HIT];
   const passes = hitP <= bar;
-  const dim = 1 - 0.5 * ease(frame, fairlyAt - 10, 16);
+  const dim = 1 - 0.3 * ease(frame, errorsFrom - 4, 14) - 0.3 * ease(frame, twoWaysAt - 4, 14);
+  const barGlow = pulse(frame, everyTestAt - 2, 24);
 
   return (
     <AbsoluteFill>
@@ -176,7 +179,7 @@ export const OddsScene: React.FC = () => {
         </Ink>
         <Axis scale={B} base={y(B_BASE)} ticks={[0, 0.02, 0.04, 0.06]} format={(v) => (v === 0 ? "0" : fmt(v, 2))} at={raiseAt - 2} />
         <Svg opacity={ease(frame, raiseAt - 2, 14)}>
-          <line x1={sx(B, bar)} x2={sx(B, bar)} y1={y(B_BASE)} y2={y(B_BASE) - h(86)} stroke={STAT} strokeWidth={2.6} strokeDasharray="5 4" />
+          <line x1={sx(B, bar)} x2={sx(B, bar)} y1={y(B_BASE)} y2={y(B_BASE) - h(86)} stroke={STAT} strokeWidth={2.6 + 2.4 * barGlow} strokeDasharray="5 4" />
           <rect x={B.x0} y={y(B_BASE) - h(86)} width={sx(B, bar) - B.x0} height={h(86)} fill={STAT} opacity={0.12} />
           <circle cx={sx(B, hitP)} cy={y(B_BASE) - h(40)} r={10} fill={passes ? STAT : RAW} stroke={passes ? PAPER : DOT} strokeWidth={2} />
         </Svg>

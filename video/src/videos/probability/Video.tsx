@@ -14,11 +14,14 @@ import { SplitScene } from "./SplitScene";
 import { TableScene } from "./TableScene";
 import { TestScene } from "./TestScene";
 import { WarrantyScene } from "./WarrantyScene";
+import { Exit } from "./parts";
 
 /** Frames a scene is up before its beat's first word. */
 const LEAD = 8;
 /** Frames each scene stays up into the next, so cuts cross-fade. */
 const OVERLAP = 6;
+/** Frames before a cut that a scene starts easing out. */
+const EXIT = 20;
 
 /**
  * "Probability" (16:9), Unit 3 of the Statistics course, on the editorial
@@ -60,7 +63,9 @@ const Scenes: React.FC = () => {
         const next = scenes[i + 1];
         return (
           <Scene key={id} from={cut(id)} to={next ? until(cut(next[0])) : durationInFrames + OVERLAP} fade={6}>
-            <Body />
+            <Exit at={next ? cut(next[0]) - EXIT : null}>
+              <Body />
+            </Exit>
           </Scene>
         );
       })}

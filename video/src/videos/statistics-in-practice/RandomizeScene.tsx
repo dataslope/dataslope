@@ -3,12 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { BAR, BLUE_INK, body, fmt, halo, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { BAR, BLUE_INK, body, fmt, halo, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BALANCE } from "./data";
-import { Arrow, Headline, lerp, Marker, Ring, Spot, STAT, STAT_INK, Svg } from "./parts";
+import { Arrow, Headline, lerp, Ring, Spot, STAT, STAT_INK, Svg } from "./parts";
 
 /** How far apart the arms sit on a trait, in standard deviations. */
 const X: XScale = { lo: 0, hi: 1, x0: 560, x1: 1380 };
@@ -32,6 +32,7 @@ export const RandomizeScene: React.FC = () => {
   const whoFrom = n.beat("who").from;
   const chooseAt = n.word("who", "choose");
   const differAt = n.word("who", "differ");
+  const startsAt = n.word("who", "even starts");
   const apartAt = n.word("traits", "far apart");
   const ageAt = n.word("traits", "Age");
   const incomeAt = n.word("traits", "income");
@@ -73,6 +74,32 @@ export const RandomizeScene: React.FC = () => {
       <div style={{ position: "absolute", inset: 0, opacity: figDim }}>
         <FigLabel n="2" title="How far apart the two groups sit, on ten traits" at={whoFrom} x={160} y={y(300)} />
 
+        {/* A band along each trait as the narration names it: the three it reads
+            out, then the two nobody recorded. */}
+        <Svg>
+          {rows.map((r, i) => {
+            const at = named[r.key] ?? (r.unmeasured ? nobodyAt - 4 + (i - 8) * 6 : undefined);
+            if (at === undefined) return null;
+            const p = ease(frame, at - 4, 14);
+            const off = ease(frame, coinAt - 6, 14);
+            if (p <= 0 || off >= 1) return null;
+            const x0 = LABEL_RIGHT - 150;
+            const x1 = sx(X, r.selected) + 18;
+            return (
+              <rect
+                key={r.key}
+                x={x0}
+                y={y(rowY(i)) - 19}
+                width={(x1 - x0) * p}
+                height={38}
+                rx={8}
+                fill={r.unmeasured ? STAT : HIGHLIGHT}
+                opacity={(r.unmeasured ? 0.16 : 0.85) * (1 - off)}
+              />
+            );
+          })}
+        </Svg>
+
         {/* The usual line below which two groups count as balanced. */}
         <Svg opacity={ease(frame, apartAt - 8, 14)}>
           <line
@@ -98,7 +125,7 @@ export const RandomizeScene: React.FC = () => {
           format={(v) => String(v)}
           at={whoFrom + 2}
         />
-        <Ink at={apartAt} dur={14} style={{ left: X.x1, top: y(AXIS) + 40, whiteSpace: "nowrap", transform: "translateX(-100%)" }}>
+        <Ink at={startsAt - 4} dur={14} style={{ left: X.x1, top: y(AXIS) + 40, whiteSpace: "nowrap", transform: "translateX(-100%)" }}>
           <span style={{ ...note(20, INK_SOFT) }}>gap between the groups, in standard deviations</span>
         </Ink>
 
@@ -113,13 +140,7 @@ export const RandomizeScene: React.FC = () => {
               style={{ left: LABEL_RIGHT, top: y(rowY(i)) - 15, whiteSpace: "nowrap", transform: "translateX(-100%)" }}
             >
               <span style={{ ...label(22, r.unmeasured ? STAT_INK : INK), fontStyle: r.unmeasured ? "italic" : "normal", fontWeight: 600 }}>
-                {named[r.key] !== undefined ? (
-                  <Marker at={named[r.key] - 4} off={coinAt - 4}>
-                    {r.key}
-                  </Marker>
-                ) : (
-                  r.key
-                )}
+{r.key}
               </span>
             </Ink>
           );

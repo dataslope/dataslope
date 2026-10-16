@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { num, pct, TABLE } from "./data";
-import { Headline, Kicker, STAT, STAT_INK, Svg, Sweep } from "./parts";
+import { Headline, Kicker, lerp, STAT, STAT_INK, Svg, Sweep } from "./parts";
 
 /** Column centres: row label, churned, stayed, total. */
 const COL = { label: 160, churned: 530, stayed: 750, total: 970 } as const;
@@ -84,6 +84,8 @@ export const TableScene: React.FC = () => {
   const twentyFourAt = n.word("free", "Twenty-four percent");
   const allAt = n.word("zoom", "all conditioning");
   const keepAt = n.word("zoom", "Keep only");
+  const holdsAt = n.word("zoom", "condition holds");
+  const splitInFrom = n.beat("split-in").from;
   const fractionAt = n.word("zoom", "fraction");
   const comparingAt = n.word("split-in", "comparing");
   const fractionsAt = n.word("split-in", "fractions");
@@ -92,10 +94,17 @@ export const TableScene: React.FC = () => {
   // Which rows are set back, as the narration conditions on one, then the other.
   const onPaid = ease(frame, conditionAt - 2, 12) * (1 - ease(frame, freeUsersAt - 6, 12));
   const onFree = ease(frame, freeUsersAt - 6, 12) * (1 - ease(frame, comparingAt - 4, 14));
-  const dimPaid = onFree;
+  // "Where the condition holds": everything else all but goes.
+  const gone = ease(frame, holdsAt - 4, 12) * (1 - ease(frame, comparingAt - 4, 14));
+  const dimPaid = Math.min(1, onFree + gone * 0.4);
   const dimFree = onPaid;
-  const dimAll = Math.max(onPaid, onFree);
-  const fence = ease(frame, keepAt - 4, 16) * (1 - ease(frame, comparingAt - 4, 14));
+  const dimAll = Math.min(1, Math.max(onPaid, onFree) + gone * 0.4);
+  // The fence goes round the row being conditioned on, then moves to the next.
+  const fence = ease(frame, conditionAt - 2, 16) * (1 - ease(frame, comparingAt - 4, 14));
+  const fenceY = lerp(y(ROW_Y.paid), y(ROW_Y.free), ease(frame, freeUsersAt - 6, 16));
+  const fenceBold = ease(frame, keepAt - 4, 10);
+  // Comparing the fractions: the table sets back so the three rates stand out.
+  const tableBack = ease(frame, comparingAt - 4, 14) * 0.5;
 
   const rows = [
     { key: "paid" as const, name: "Paid", i: 0, dim: dimPaid },
@@ -121,10 +130,12 @@ export const TableScene: React.FC = () => {
 
       <Kicker at={tableFrom - 10}>Conditioning and independence</Kicker>
       <Headline top={y(150)} first="A thousand users," second="by plan and churn." firstAt={tableFrom - 6} secondAt={usersAt + 6} out={allAt - 8} />
-      <Headline top={y(150)} first="Conditioning" second="zooms into the rows." firstAt={allAt - 4} secondAt={keepAt - 2} />
+      <Headline top={y(150)} first="Conditioning" second="zooms into the rows." firstAt={allAt - 4} secondAt={keepAt - 2} out={splitInFrom - 6} />
+      <Headline top={y(150)} first={`${pct(TABLE.pPaid)} against ${pct(TABLE.pFree)}:`} second="linked?" firstAt={splitInFrom - 2} secondAt={linkedAt - 4} />
       <FigLabel n="2" title="Users by plan, and whether they churned this quarter" at={tableFrom} x={COL.label} y={y(268)} />
 
       {/* ── The table ── */}
+      <div style={{ position: "absolute", inset: 0, opacity: 1 - tableBack }}>
       {(
         [
           ["Churned", COL.churned, churnedAt - 2],
@@ -209,16 +220,18 @@ export const TableScene: React.FC = () => {
       <Svg opacity={fence}>
         <rect
           x={COL.label - 24}
-          y={y(ROW_Y.free) - 50}
+          y={fenceY - 50}
           width={(COL.total + CELL_W / 2 - COL.label + 48) * Math.min(1, fence * 1.2)}
           height={100}
           rx={12}
-          fill="none"
+          fill={`color-mix(in srgb, ${STAT} ${Math.round(fenceBold * 8)}%, transparent)`}
           stroke={STAT}
-          strokeWidth={3}
+          strokeWidth={lerp(3, 5, fenceBold)}
           strokeDasharray="10 7"
         />
       </Svg>
+
+      </div>
 
       {/* ── Each rate, on its own row ── */}
       {chips.map((c) => (

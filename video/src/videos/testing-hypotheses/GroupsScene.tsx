@@ -42,6 +42,8 @@ export const GroupsScene: React.FC = () => {
   const tenAt = n.word("groups", "ten pairs");
   const sameAt = n.word("groups", "same process");
   const thirtyAt = n.word("groups", "thirty-two");
+  const significantAt = n.word("groups", "significant");
+  const manyAt = n.word("once", "many-looks");
   const againAt = n.word("once", "again");
   const anovaAt = n.word("once", "ANOVA");
   const anyAt = n.word("once", "any");
@@ -50,19 +52,19 @@ export const GroupsScene: React.FC = () => {
   const withinAt = n.word("ftest", "within");
   const wareAt = n.word("warehouses", "warehouses'");
   const twelveAt = n.word("warehouses", "twelve");
-  const slowerAt = n.word("warehouses", "slower");
+  const differsAt = n.word("warehouses", "differs");
   const whichAt = n.word("warehouses", "which");
 
   const ry = (yy: number) => y(yy);
   const nodeIn = (i: number) => ease(frame, fiveAt - 4 + i * 3, 10);
   const edgeAt = (k: number) => tenAt - 2 + k * 3.2;
-  const flash = pulse(frame, againAt - 2, 26);
+  const flash = pulse(frame, againAt - 2, 26) + pulse(frame, significantAt - 2, 26);
   const edgesOut = ease(frame, anovaAt - 2, 16);
   const ring = ease(frame, anyAt - 6, 20);
   const ringLeave = ease(frame, wareAt - 8, 16);
   const same = ease(frame, sameAt - 4, 14);
   const stripIn = (k: number) => ease(frame, wareAt - 2 + k * 6, 14);
-  const south = pulse(frame, slowerAt - 2, 30);
+  const south = pulse(frame, differsAt - 2, 30);
   const means = WAREHOUSES.map((g) => sx(W, g.mean));
   const between = ease(frame, twelveAt - 18, 14);
 
@@ -145,6 +147,11 @@ export const GroupsScene: React.FC = () => {
             {fmt(PAIRWISE.trials, 0)} trials
           </span>
         </Note>
+        <Note at={manyAt - 2} x={160} y={ry(RING.y + RING.r + 110) + 84}>
+          <Label size={21} color={INK_SOFT} weight={520}>
+            the many-looks problem, again
+          </Label>
+        </Note>
         <Note at={anyAt + 6} x={RING.x} y={ry(RING.y - RING.r - 130)} from="up">
           <span style={{ display: "inline-block", transform: "translateX(-50%)" }}>
             <Label size={24}>one test of all five</Label>
@@ -176,11 +183,12 @@ export const GroupsScene: React.FC = () => {
           const a = stripIn(k);
           if (a <= 0) return null;
           const yy = y(ROW_Y[k]);
-          const glow = k === 2 ? south : 0;
+          // All three swell together: ANOVA says something differs, not which.
+          const glow = south;
           return (
             <g key={g.name}>
               {g.values.map((v, j) => (
-                <circle key={j} cx={sx(W, v)} cy={yy + h((JIT[k][j] - 0.5) * 36)} r={5.5 * a} fill={k === 2 ? DATA : DOT} opacity={0.7 + 0.3 * glow} />
+                <circle key={j} cx={sx(W, v)} cy={yy + h((JIT[k][j] - 0.5) * 36)} r={5.5 * a} fill={DOT} opacity={0.7 + 0.3 * glow} />
               ))}
               {/* Within: one standard deviation either side of the group's mean. */}
               <line
@@ -211,7 +219,7 @@ export const GroupsScene: React.FC = () => {
       {WAREHOUSES.map((g, k) => (
         <div
           key={g.name}
-          style={{ position: "absolute", right: 1920 - W.x0 + 20, top: y(ROW_Y[k]) - 15, opacity: stripIn(k), ...label(24, k === 2 && south > 0.1 ? STAT_INK : INK) }}
+          style={{ position: "absolute", right: 1920 - W.x0 + 20, top: y(ROW_Y[k]) - 15, opacity: stripIn(k), ...label(24, INK) }}
         >
           {g.name}
         </div>

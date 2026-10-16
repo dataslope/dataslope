@@ -31,7 +31,9 @@ export const CoinScene: React.FC = () => {
   const coinFrom = n.beat("coin").from;
   const coinAt = n.word("coin", "coin");
   const sixtyAt = n.word("coin", "sixty-two");
+  const flipsAt = n.word("coin", "flips");
   const fairAt = n.word("fair", "fair");
+  const pValueAt = n.word("area", "p-value");
   const simulateAt = n.word("fair", "simulate");
   const thousandAt = n.word("fair", "thousand");
   const pileAt = n.word("fair", "pile");
@@ -54,7 +56,7 @@ export const CoinScene: React.FC = () => {
     // Outside in: the farthest bars turn first.
     return ease(frame, countAt + (HI - 50 - d) * 1.2, 10);
   };
-  const tailPulse = pulse(frame, extremeAt - 2, 26) + pulse(frame, areaAt - 2, 26);
+  const tailPulse = pulse(frame, extremeAt - 2, 26) + pulse(frame, areaAt - 2, 26) + pulse(frame, pValueAt - 2, 26);
   const obsX = sx(X, COIN.observed);
   const mirX = sx(X, COIN.mirror);
   const midX = sx(X, 50);
@@ -95,6 +97,11 @@ export const CoinScene: React.FC = () => {
             </Label>
           </Ink>
           <Axis scale={X} base={y(BASE)} ticks={[30, 38, 50, 62, 70]} at={coinFrom + 2} />
+          <Note at={flipsAt - 2} x={X.x1} y={y(BASE) + 40} align="right">
+            <Label size={21} color={INK_SOFT} weight={520}>
+              heads in 100 flips
+            </Label>
+          </Note>
           <Svg>
             {COIN.counts.map((c, k) => {
               if (k < LO || k > HI || c <= 0 || grow <= 0) return null;

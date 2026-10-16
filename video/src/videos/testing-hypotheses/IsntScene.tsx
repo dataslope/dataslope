@@ -40,7 +40,10 @@ export const IsntScene: React.FC = () => {
   const trueAt = n.word("isnt", "true");
   const assumingAt = n.word("isnt", "assuming");
   const dataAt = n.word("swap", "chance of the data");
+  const givenAt = n.word("swap", "given");
   const nullGivenAt = n.word("swap", "chance of the null");
+  const eightAt = n.word("collapse", "point eight three");
+  const whichAt = n.word("hack-in", "Which");
   const swapAt = n.word("swap", "Swap");
   const fallacyAt = n.word("swap", "prosecutor's");
   const sizeAt = n.word("size", "size");
@@ -57,7 +60,8 @@ export const IsntScene: React.FC = () => {
   const rowAt = [twentyAt - 4, twentyAt + 22, thousandAt - 4, hundredAt - 18, hundredAt - 4];
   const spoken = [0, 2, 4];
   const shake = pulse(frame, swapAt, 18);
-  const dim = 1 - 0.5 * ease(frame, foolAt - 10, 16);
+  const dim = 1 - 0.3 * ease(frame, whichAt - 4, 14) - 0.25 * ease(frame, foolAt - 4, 14);
+  const firstGlow = pulse(frame, eightAt, 24);
 
   return (
     <AbsoluteFill>
@@ -88,7 +92,7 @@ export const IsntScene: React.FC = () => {
         {/* ── The swapped conditional ── */}
         <Ink at={dataAt - 4} dur={16} style={{ left: LEFT, top: y(530), whiteSpace: "nowrap" }}>
           <Cond a="data" b={<H0 />} color={DATA_INK} />
-          <span style={{ ...label(22, DATA_INK), marginLeft: 22 }}>the p-value</span>
+          <span style={{ ...label(22, DATA_INK), marginLeft: 22, opacity: ease(frame, givenAt, 12) }}>the p-value</span>
         </Ink>
         <Ink
           at={nullGivenAt - 4}
@@ -134,6 +138,8 @@ export const IsntScene: React.FC = () => {
                   opacity: a * (loud ? 1 : 0.7),
                   ...note(30, r.p < 0.05 ? STAT_INK : INK),
                   fontWeight: 700,
+                  transform: i === 0 ? `scale(${1 + 0.12 * firstGlow})` : undefined,
+                  transformOrigin: "0 50%",
                 }}
               >
                 {r.printed}

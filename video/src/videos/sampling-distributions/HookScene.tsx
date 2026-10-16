@@ -2,12 +2,15 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { Axis, Bars, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, body, headline, INK } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { histogram, peak, PILE, POPULATION, SAMPLE } from "./data";
 import { money, POP_FILL, SAMPLE_FILL } from "./parts";
+import { useMergedPart } from "../sampling/merged";
+import { PartName } from "../sampling/PartName";
 
 const BASE = 840;
 const HEIGHT = 380;
@@ -56,11 +59,26 @@ export const HookScene: React.FC = () => {
   const { y, h } = useLayout();
   const threeAt = n.word("hook", "three distributions");
   const alikeAt = n.word("hook", "alike");
+  // In the merged Unit 5 video the part's name takes the kicker's place, and
+  // the headline and figure label step down under it.
+  const merged = useMergedPart();
+  const headY = merged ? 150 : 112;
+  const figY = merged ? 266 : 244;
 
   return (
     <AbsoluteFill>
+      {/* ── Sound (merged video only; the standalone has sfx off): each panel's bars ── */}
+      {PANELS.map((p, c) => (
+        <Sfx key={p.title} name="el-pop" at={8 + c * 8} level={-30} />
+      ))}
+
+      {merged ? (
+        <Ink at={2} dur={14} style={{ left: 120, top: y(112) }}>
+          <PartName alone />
+        </Ink>
+      ) : null}
       {/* One line in two inks: the second half follows the first in the flow. */}
-      <div style={{ position: "absolute", left: 116, top: y(112), display: "flex", gap: "0.26em", ...headline(72) }}>
+      <div style={{ position: "absolute", left: 116, top: y(headY), display: "flex", gap: "0.26em", ...headline(72) }}>
         <Ink at={threeAt - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Three distributions
         </Ink>
@@ -72,7 +90,7 @@ export const HookScene: React.FC = () => {
           that look alike.
         </Ink>
       </div>
-      <FigLabel n="1" title="Three distributions, each drawn on its own axis" at={10} x={150} y={y(244)} />
+      <FigLabel n="1" title="Three distributions, each drawn on its own axis" at={10} x={150} y={y(figY)} />
 
       {PANELS.map((p, c) => {
         const at = 8 + c * 8;

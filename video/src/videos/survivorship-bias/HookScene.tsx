@@ -6,8 +6,10 @@ import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, body, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 import { Plane, SKIN } from "./parts";
+import { PartName } from "../sampling/PartName";
 
 /** One mission as a strip of planes; the one at LOST never comes home. */
 const STRIP = 10;
@@ -38,8 +40,17 @@ export const HookScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound (merged video only; the standalone has sfx off) ── */}
+      <Sfx name="el-pop" at={bomberAt - 8} level={-30} />
+      <Sfx name="el-pencil" at={vulnerableAt} level={-33} />
+      <Sfx name="el-sprinkle" at={evidenceAt} level={-34} />
+      <Sfx name="el-whoosh" at={homeAt} level={-34} />
+      <Sfx name="el-pencil" at={homeAt + 6} level={-35} />
+
       <Ink at={yearAt - 6} dur={14} style={{ left: 96, top: y(112) }}>
-        <span style={label(21, ACCENT_INK)}>Statistical Research Group, Columbia, 1943</span>
+        <span style={label(21, ACCENT_INK)}>
+          <PartName />Statistical Research Group, Columbia, 1943
+        </span>
       </Ink>
       <Ink at={yearAt} dur={20} style={{ left: 92, top: y(156), ...headline(84), whiteSpace: "nowrap" }}>
         Which parts of a bomber

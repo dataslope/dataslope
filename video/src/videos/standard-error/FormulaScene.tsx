@@ -19,6 +19,7 @@ import {
 } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { AGES, mulberry32 } from "./data";
 import { Marked, Span } from "./parts";
 
@@ -65,6 +66,14 @@ export const FormulaScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: the one average, the shortcut, its result, the ages, the band ── */}
+      <Sfx name="el-whoosh" at={seenAt - 4} level={-34} />
+      <Sfx name="el-tap" at={seenAt + 8} level={-28} />
+      <Sfx name="el-pencil" at={divideAt} level={-35} />
+      <Sfx name="el-tap" at={zeroAt - 2} level={-28} />
+      <Sfx name="el-sprinkle" at={contrastFrom - 6} level={-34} />
+      <Sfx name="el-pencil" at={averageAt - 2} level={-34} />
+
       {/* One line in two inks, the second following the first in the flow. */}
       <div style={{ position: "absolute", left: 92, top: y(112), display: "flex", gap: "0.26em", ...headline(56), whiteSpace: "nowrap" }}>
         <Ink at={oneFrom - 8} dur={20} style={{ position: "relative" }}>

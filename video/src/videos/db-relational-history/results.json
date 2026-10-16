@@ -1,0 +1,238 @@
+{
+  "version": "PostgreSQL 18.3 (PGlite 0.5.8) on wasm32-unknown-emscripten, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 3.1.74 (1092ec30a3fb1d46b1782ff1b4db5094d3d06ae5), 32-bit",
+  "setup": "CREATE TABLE customers (\n  id   INTEGER PRIMARY KEY,\n  name TEXT NOT NULL\n);\nCREATE TABLE orders (\n  id          INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL REFERENCES customers(id),\n  total       NUMERIC NOT NULL\n);\nINSERT INTO customers VALUES\n  (1, 'Ada'),\n  (2, 'Grace'),\n  (3, 'Linus'),\n  (4, 'Mae'),\n  (5, 'Rosa'),\n  (6, 'Ivan'),\n  (7, 'Nadia'),\n  (8, 'Omar'),\n  (9, 'Priya'),\n  (10, 'Quinn'),\n  (11, 'Ruth'),\n  (12, 'Sam'),\n  (13, 'Tariq'),\n  (14, 'Uma'),\n  (15, 'Viktor'),\n  (16, 'Wen'),\n  (17, 'Xenia'),\n  (18, 'Yusuf'),\n  (19, 'Zara'),\n  (20, 'Bruno'),\n  (21, 'Chidi'),\n  (22, 'Dara'),\n  (23, 'Elif'),\n  (24, 'Farid');\nINSERT INTO orders VALUES\n  (101, 1, 15.00),\n  (102, 2, 44.00),\n  (103, 3, 73.00),\n  (104, 4, 17.00),\n  (105, 5, 46.00),\n  (106, 6, 75.00),\n  (107, 7, 19.00),\n  (108, 8, 48.00),\n  (109, 9, 77.00),\n  (110, 10, 21.00),\n  (111, 11, 50.00),\n  (112, 12, 79.00),\n  (113, 13, 23.00),\n  (114, 14, 52.00),\n  (115, 15, 81.00),\n  (116, 16, 25.00),\n  (117, 17, 54.00),\n  (118, 18, 83.00),\n  (119, 19, 27.00),\n  (120, 20, 56.00),\n  (121, 21, 85.00),\n  (122, 22, 29.00),\n  (123, 23, 58.00),\n  (124, 24, 87.00),\n  (125, 1, 31.00),\n  (126, 2, 60.00),\n  (127, 3, 89.00),\n  (128, 4, 33.00),\n  (129, 5, 62.00),\n  (130, 6, 91.00);",
+  "sql": {
+    "customers": "SELECT id, name FROM customers WHERE id IN (1, 2, 3) ORDER BY id;",
+    "orders": "SELECT id, customer_id, total FROM orders WHERE customer_id IN (1, 2, 3) ORDER BY id;",
+    "counts": "SELECT (SELECT count(*) FROM customers) AS customers, (SELECT count(*) FROM orders) AS orders;",
+    "before": "SELECT ctid::text AS ctid, id, customer_id, total FROM orders WHERE customer_id IN (1, 2, 3);",
+    "ada": "-- No pointers, no navigation: rows connect because values match.\nSELECT\n  o.id AS order_id,\n  o.total\nFROM\n  orders o\n  JOIN customers c ON c.id = o.customer_id\nWHERE\n  c.name = 'Ada';",
+    "reorganize": "CREATE INDEX orders_by_total ON orders (total DESC);\nCLUSTER orders USING orders_by_total;",
+    "after": "SELECT ctid::text AS ctid, id, customer_id, total FROM orders WHERE customer_id IN (1, 2, 3);",
+    "adaAgain": "-- No pointers, no navigation: rows connect because values match.\nSELECT\n  o.id AS order_id,\n  o.total\nFROM\n  orders o\n  JOIN customers c ON c.id = o.customer_id\nWHERE\n  c.name = 'Ada';",
+    "bad": "INSERT INTO orders VALUES (131, 25, 40.00);",
+    "countAfterBad": "SELECT count(*) AS orders FROM orders;"
+  },
+  "results": {
+    "customers": {
+      "fields": [
+        "id",
+        "name"
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "name": "Ada"
+        },
+        {
+          "id": 2,
+          "name": "Grace"
+        },
+        {
+          "id": 3,
+          "name": "Linus"
+        }
+      ]
+    },
+    "orders": {
+      "fields": [
+        "id",
+        "customer_id",
+        "total"
+      ],
+      "rows": [
+        {
+          "id": 101,
+          "customer_id": 1,
+          "total": "15.00"
+        },
+        {
+          "id": 102,
+          "customer_id": 2,
+          "total": "44.00"
+        },
+        {
+          "id": 103,
+          "customer_id": 3,
+          "total": "73.00"
+        },
+        {
+          "id": 125,
+          "customer_id": 1,
+          "total": "31.00"
+        },
+        {
+          "id": 126,
+          "customer_id": 2,
+          "total": "60.00"
+        },
+        {
+          "id": 127,
+          "customer_id": 3,
+          "total": "89.00"
+        }
+      ]
+    },
+    "counts": {
+      "fields": [
+        "customers",
+        "orders"
+      ],
+      "rows": [
+        {
+          "customers": 24,
+          "orders": 30
+        }
+      ]
+    },
+    "before": {
+      "fields": [
+        "ctid",
+        "id",
+        "customer_id",
+        "total"
+      ],
+      "rows": [
+        {
+          "ctid": "(0,1)",
+          "id": 101,
+          "customer_id": 1,
+          "total": "15.00"
+        },
+        {
+          "ctid": "(0,2)",
+          "id": 102,
+          "customer_id": 2,
+          "total": "44.00"
+        },
+        {
+          "ctid": "(0,3)",
+          "id": 103,
+          "customer_id": 3,
+          "total": "73.00"
+        },
+        {
+          "ctid": "(0,25)",
+          "id": 125,
+          "customer_id": 1,
+          "total": "31.00"
+        },
+        {
+          "ctid": "(0,26)",
+          "id": 126,
+          "customer_id": 2,
+          "total": "60.00"
+        },
+        {
+          "ctid": "(0,27)",
+          "id": 127,
+          "customer_id": 3,
+          "total": "89.00"
+        }
+      ]
+    },
+    "ada": {
+      "fields": [
+        "order_id",
+        "total"
+      ],
+      "rows": [
+        {
+          "order_id": 101,
+          "total": "15.00"
+        },
+        {
+          "order_id": 125,
+          "total": "31.00"
+        }
+      ]
+    },
+    "after": {
+      "fields": [
+        "ctid",
+        "id",
+        "customer_id",
+        "total"
+      ],
+      "rows": [
+        {
+          "ctid": "(0,2)",
+          "id": 127,
+          "customer_id": 3,
+          "total": "89.00"
+        },
+        {
+          "ctid": "(0,10)",
+          "id": 103,
+          "customer_id": 3,
+          "total": "73.00"
+        },
+        {
+          "ctid": "(0,12)",
+          "id": 126,
+          "customer_id": 2,
+          "total": "60.00"
+        },
+        {
+          "ctid": "(0,20)",
+          "id": 102,
+          "customer_id": 2,
+          "total": "44.00"
+        },
+        {
+          "ctid": "(0,22)",
+          "id": 125,
+          "customer_id": 1,
+          "total": "31.00"
+        },
+        {
+          "ctid": "(0,30)",
+          "id": 101,
+          "customer_id": 1,
+          "total": "15.00"
+        }
+      ]
+    },
+    "adaAgain": {
+      "fields": [
+        "order_id",
+        "total"
+      ],
+      "rows": [
+        {
+          "order_id": 101,
+          "total": "15.00"
+        },
+        {
+          "order_id": 125,
+          "total": "31.00"
+        }
+      ]
+    },
+    "countAfterBad": {
+      "fields": [
+        "orders"
+      ],
+      "rows": [
+        {
+          "orders": 30
+        }
+      ]
+    }
+  },
+  "badError": {
+    "message": "insert or update on table \"orders\" violates foreign key constraint \"orders_customer_id_fkey\"",
+    "code": "23503",
+    "detail": "Key (customer_id)=(25) is not present in table \"customers\".",
+    "constraint": "orders_customer_id_fkey"
+  },
+  "sameAnswer": true,
+  "moved": [
+    101,
+    102,
+    103,
+    125,
+    126,
+    127
+  ]
+}

@@ -34,19 +34,20 @@ export const AbScene: React.FC = () => {
   const powerAt = n.word("ab", "eighty percent power");
   const threeAt = n.word("ab", "three thousand");
   const armAt = n.word("ab", "each arm");
+  const usersAt = n.word("ab", "users");
   const halveAt = n.word("halve", "Halve");
   const elevenAt = n.word("halve", "eleven");
   const fourteenAt = n.word("halve", "fourteen thousand");
   const nearlyAt = n.word("halve", "Nearly");
   const manyAt = n.word("halve", "as many");
 
-  const g1 = ease(frame, threeAt - 4, 30);
-  const g2 = ease(frame, fourteenAt - 4, 40);
+  const g1 = ease(frame, threeAt - 4, Math.max(30, usersAt - threeAt + 4));
+  const g2 = ease(frame, fourteenAt - 4, Math.max(40, nearlyAt - fourteenAt));
   const end1 = sx(X, TWELVE);
   const end2 = sx(X, ELEVEN);
   const bars = [
-    { at: twelveAt, label: "10% to 12%", value: TWELVE, grow: g1, countAt: threeAt - 4, dur: 30 },
-    { at: elevenAt, label: "10% to 11%", value: ELEVEN, grow: g2, countAt: fourteenAt - 4, dur: 40 },
+    { at: twelveAt, label: "10% to 12%", value: TWELVE, grow: g1, countAt: threeAt - 4, dur: Math.max(30, usersAt - threeAt + 4) },
+    { at: elevenAt, label: "10% to 11%", value: ELEVEN, grow: g2, countAt: fourteenAt - 4, dur: Math.max(40, nearlyAt - fourteenAt) },
   ];
   const copies = Math.ceil(AB.ratio);
   const manyGlow = pulse(frame, manyAt, 26);

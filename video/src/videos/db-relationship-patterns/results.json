@@ -1,0 +1,1910 @@
+{
+  "version": "PostgreSQL 18.3 (PGlite 0.5.8) on wasm32-unknown-emscripten, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 3.1.74 (1092ec30a3fb1d46b1782ff1b4db5094d3d06ae5), 32-bit",
+  "lessons": {
+    "oneToMany": {
+      "file": "one-to-many.mdx",
+      "title": "Customers and their orders",
+      "initSql": "CREATE TABLE customers (\n  id    SERIAL PRIMARY KEY,\n  name  TEXT NOT NULL,\n  email TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE orders (\n  id          SERIAL PRIMARY KEY,\n  customer_id INTEGER NOT NULL REFERENCES customers(id),\n  placed_on   DATE NOT NULL,\n  total       NUMERIC NOT NULL CHECK (total >= 0)\n);\n\nINSERT INTO customers (name, email) VALUES\n  ('Ada', 'ada@example.com'),\n  ('Grace', 'grace@example.com'),\n  ('Linus', 'linus@example.com'),\n  ('Mae', 'mae@example.com'),\n  ('Rosa', 'rosa@example.com'),\n  ('Ivan', 'ivan@example.com'),\n  ('Nadia', 'nadia@example.com'),\n  ('Omar', 'omar@example.com'),\n  ('Priya', 'priya@example.com'),\n  ('Quinn', 'quinn@example.com'),\n  ('Ruth', 'ruth@example.com'),\n  ('Sam', 'sam@example.com'),\n  ('Tariq', 'tariq@example.com'),\n  ('Uma', 'uma@example.com'),\n  ('Viktor', 'viktor@example.com'),\n  ('Wen', 'wen@example.com'),\n  ('Xenia', 'xenia@example.com'),\n  ('Yusuf', 'yusuf@example.com'),\n  ('Zara', 'zara@example.com'),\n  ('Bruno', 'bruno@example.com'),\n  ('Chidi', 'chidi@example.com'),\n  ('Dara', 'dara@example.com'),\n  ('Elif', 'elif@example.com'),\n  ('Farid', 'farid@example.com');\n\nINSERT INTO orders (customer_id, placed_on, total) VALUES\n  (1, DATE '2025-01-10', 12.00),\n  (2, DATE '2025-01-11', 49.00),\n  (3, DATE '2025-01-12', 86.00),\n  (4, DATE '2025-01-13', 33.00),\n  (5, DATE '2025-01-14', 70.00),\n  (6, DATE '2025-01-15', 17.00),\n  (7, DATE '2025-01-16', 54.00),\n  (8, DATE '2025-01-17', 91.00),\n  (9, DATE '2025-01-18', 38.00),\n  (10, DATE '2025-01-19', 75.00),\n  (11, DATE '2025-01-20', 22.00),\n  (12, DATE '2025-01-21', 59.00),\n  (13, DATE '2025-01-22', 96.00),\n  (14, DATE '2025-01-23', 43.00),\n  (15, DATE '2025-01-24', 80.00),\n  (16, DATE '2025-01-25', 27.00),\n  (17, DATE '2025-01-26', 64.00),\n  (18, DATE '2025-01-27', 101.00),\n  (19, DATE '2025-01-28', 48.00),\n  (20, DATE '2025-01-29', 85.00),\n  (21, DATE '2025-01-30', 32.00),\n  (22, DATE '2025-01-31', 69.00),\n  (23, DATE '2025-02-01', 16.00),\n  (24, DATE '2025-02-02', 53.00),\n  (1, DATE '2025-02-03', 90.00),\n  (2, DATE '2025-02-04', 37.00),\n  (3, DATE '2025-02-05', 74.00),\n  (4, DATE '2025-02-06', 21.00),\n  (5, DATE '2025-02-07', 58.00),\n  (6, DATE '2025-02-08', 95.00);",
+      "starterCode": "SELECT\n  c.name,\n  o.id AS order_id,\n  o.placed_on,\n  o.total\nFROM\n  customers c\n  JOIN orders o ON o.customer_id = c.id\nORDER BY\n  c.name,\n  o.placed_on;"
+    },
+    "manyToMany": {
+      "file": "many-to-many.mdx",
+      "title": "Resolving students and courses",
+      "initSql": "CREATE TABLE students (\n  id   INTEGER PRIMARY KEY,\n  name TEXT NOT NULL\n);\n\nCREATE TABLE courses (\n  id    INTEGER PRIMARY KEY,\n  title TEXT NOT NULL\n);\n\nCREATE TABLE enrollments (\n  student_id INTEGER NOT NULL REFERENCES students(id),\n  course_id  INTEGER NOT NULL REFERENCES courses(id),\n  PRIMARY KEY (student_id, course_id)\n);\n\nINSERT INTO students (id, name) VALUES\n  (1, 'Ada'),\n  (2, 'Grace'),\n  (3, 'Linus'),\n  (4, 'Mae'),\n  (5, 'Rosa'),\n  (6, 'Ivan'),\n  (7, 'Nadia'),\n  (8, 'Omar'),\n  (9, 'Priya'),\n  (10, 'Quinn'),\n  (11, 'Ruth'),\n  (12, 'Sam'),\n  (13, 'Tariq'),\n  (14, 'Uma'),\n  (15, 'Viktor'),\n  (16, 'Wen'),\n  (17, 'Xenia'),\n  (18, 'Yusuf'),\n  (19, 'Zara'),\n  (20, 'Bruno'),\n  (21, 'Chidi'),\n  (22, 'Dara'),\n  (23, 'Elif'),\n  (24, 'Farid');\n\nINSERT INTO courses (id, title) VALUES\n  (10, 'Math'),\n  (11, 'History'),\n  (12, 'Art'),\n  (13, 'Biology'),\n  (14, 'Physics'),\n  (15, 'Music');\n\nINSERT INTO enrollments (student_id, course_id) VALUES\n  (1, 10),\n  (1, 11),\n  (2, 10),\n  (2, 12),\n  (3, 11),\n  (3, 13),\n  (4, 10),\n  (4, 14),\n  (5, 11),\n  (5, 15),\n  (6, 10),\n  (6, 12),\n  (7, 11),\n  (7, 13),\n  (8, 12),\n  (8, 14),\n  (9, 13),\n  (9, 15),\n  (10, 10),\n  (10, 14),\n  (11, 11),\n  (11, 15),\n  (12, 10),\n  (12, 12),\n  (13, 11),\n  (13, 13),\n  (14, 12),\n  (14, 14),\n  (15, 13),\n  (15, 15),\n  (16, 10),\n  (16, 14),\n  (17, 11),\n  (17, 15),\n  (18, 10),\n  (18, 12),\n  (19, 11),\n  (19, 13),\n  (20, 12),\n  (20, 14),\n  (21, 13),\n  (21, 15),\n  (22, 10),\n  (22, 14),\n  (23, 11),\n  (23, 15),\n  (24, 10),\n  (24, 12);",
+      "starterCode": "SELECT\n  s.name AS student,\n  c.title AS course\nFROM\n  enrollments e\n  JOIN students s ON s.id = e.student_id\n  JOIN courses c ON c.id = e.course_id\nORDER BY\n  s.name,\n  c.title;"
+    },
+    "junction": {
+      "file": "junction-tables.mdx",
+      "title": "A junction table with relationship attributes",
+      "initSql": "CREATE TABLE students (\n  id   INTEGER PRIMARY KEY,\n  name TEXT NOT NULL\n);\n\nCREATE TABLE courses (\n  id    INTEGER PRIMARY KEY,\n  title TEXT NOT NULL\n);\n\nCREATE TABLE enrollments (\n  student_id  INTEGER NOT NULL REFERENCES students(id),\n  course_id   INTEGER NOT NULL REFERENCES courses(id),\n  enrolled_on DATE NOT NULL,\n  grade       TEXT CHECK (grade IN ('A', 'B', 'C', 'D', 'F')),\n  PRIMARY KEY (student_id, course_id)\n);\n\nINSERT INTO students (id, name) VALUES\n  (1, 'Ada'),\n  (2, 'Grace'),\n  (3, 'Linus'),\n  (4, 'Mae'),\n  (5, 'Rosa'),\n  (6, 'Ivan'),\n  (7, 'Nadia'),\n  (8, 'Omar'),\n  (9, 'Priya'),\n  (10, 'Quinn'),\n  (11, 'Ruth'),\n  (12, 'Sam'),\n  (13, 'Tariq'),\n  (14, 'Uma'),\n  (15, 'Viktor'),\n  (16, 'Wen'),\n  (17, 'Xenia'),\n  (18, 'Yusuf'),\n  (19, 'Zara'),\n  (20, 'Bruno'),\n  (21, 'Chidi'),\n  (22, 'Dara'),\n  (23, 'Elif'),\n  (24, 'Farid');\n\nINSERT INTO courses (id, title) VALUES\n  (10, 'Math'),\n  (11, 'History'),\n  (12, 'Art'),\n  (13, 'Biology'),\n  (14, 'Physics'),\n  (15, 'Music');\n\nINSERT INTO enrollments (student_id, course_id, enrolled_on, grade) VALUES\n  (1, 10, DATE '2025-01-01', 'B'),\n  (1, 11, DATE '2025-01-02', 'C'),\n  (2, 10, DATE '2025-01-03', 'C'),\n  (2, 12, DATE '2025-01-04', 'B'),\n  (3, 11, DATE '2025-01-05', 'B'),\n  (3, 13, DATE '2025-01-06', 'B'),\n  (4, 10, DATE '2025-01-07', 'B'),\n  (4, 14, DATE '2025-01-08', 'A'),\n  (5, 11, DATE '2025-01-09', 'B'),\n  (5, 15, DATE '2025-01-10', 'A'),\n  (6, 10, DATE '2025-01-11', 'B'),\n  (6, 12, DATE '2025-01-12', 'A'),\n  (7, 11, DATE '2025-01-13', 'A'),\n  (7, 13, DATE '2025-01-14', 'A'),\n  (8, 12, DATE '2025-01-15', 'A'),\n  (8, 14, DATE '2025-01-16', 'C'),\n  (9, 13, DATE '2025-01-17', 'C'),\n  (9, 15, DATE '2025-01-18', 'B'),\n  (10, 10, DATE '2025-01-19', 'A'),\n  (10, 14, DATE '2025-01-20', 'B'),\n  (11, 11, DATE '2025-01-21', 'C'),\n  (11, 15, DATE '2025-01-22', 'B'),\n  (12, 10, DATE '2025-01-23', 'C'),\n  (12, 12, DATE '2025-01-24', 'B'),\n  (13, 11, DATE '2025-01-25', 'B'),\n  (13, 13, DATE '2025-01-26', 'B'),\n  (14, 12, DATE '2025-01-27', 'B'),\n  (14, 14, DATE '2025-01-28', 'A'),\n  (15, 13, DATE '2025-01-01', 'A'),\n  (15, 15, DATE '2025-01-02', 'A'),\n  (16, 10, DATE '2025-01-03', 'B'),\n  (16, 14, DATE '2025-01-04', 'A'),\n  (17, 11, DATE '2025-01-05', 'A'),\n  (17, 15, DATE '2025-01-06', 'C'),\n  (18, 10, DATE '2025-01-07', 'A'),\n  (18, 12, DATE '2025-01-08', 'A'),\n  (19, 11, DATE '2025-01-09', 'A'),\n  (19, 13, DATE '2025-01-10', 'C'),\n  (20, 12, DATE '2025-01-11', 'C'),\n  (20, 14, DATE '2025-01-12', 'B'),\n  (21, 13, DATE '2025-01-13', 'B'),\n  (21, 15, DATE '2025-01-14', 'B'),\n  (22, 10, DATE '2025-01-15', 'C'),\n  (22, 14, DATE '2025-01-16', 'B'),\n  (23, 11, DATE '2025-01-17', 'B'),\n  (23, 15, DATE '2025-01-18', 'A'),\n  (24, 10, DATE '2025-01-19', 'B'),\n  (24, 12, DATE '2025-01-20', 'B');",
+      "starterCode": "SELECT\n  s.name,\n  c.title,\n  e.enrolled_on,\n  e.grade\nFROM\n  enrollments e\n  JOIN students s ON s.id = e.student_id\n  JOIN courses c ON c.id = e.course_id\nORDER BY\n  s.name,\n  c.title;"
+    },
+    "junctionChallenge": {
+      "title": "Enroll Linus in Math",
+      "solutionSql": "INSERT INTO\n  enrollments (student_id, course_id, enrolled_on)\nVALUES\n  (3, 10, DATE '2026-02-01');"
+    },
+    "oneToOne": {
+      "file": "one-to-one.mdx",
+      "title": "A unique foreign key enforces one-to-one",
+      "initSql": "CREATE TABLE users (\n  id    SERIAL PRIMARY KEY,\n  email TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE user_profiles (\n  id           SERIAL PRIMARY KEY,\n  user_id      INTEGER NOT NULL UNIQUE REFERENCES users(id),\n  display_name TEXT NOT NULL,\n  bio          TEXT\n);\n\nINSERT INTO users (email) VALUES\n  ('ada@example.com'),\n  ('grace@example.com'),\n  ('linus@example.com'),\n  ('mae@example.com'),\n  ('rosa@example.com'),\n  ('ivan@example.com'),\n  ('nadia@example.com'),\n  ('omar@example.com'),\n  ('priya@example.com'),\n  ('quinn@example.com'),\n  ('ruth@example.com'),\n  ('sam@example.com'),\n  ('tariq@example.com'),\n  ('uma@example.com'),\n  ('viktor@example.com'),\n  ('wen@example.com'),\n  ('xenia@example.com'),\n  ('yusuf@example.com'),\n  ('zara@example.com'),\n  ('bruno@example.com'),\n  ('chidi@example.com'),\n  ('dara@example.com'),\n  ('elif@example.com'),\n  ('farid@example.com');\n\n-- Only some users have filled in a profile, which is exactly why the\n-- optional side lives in its own table.\nINSERT INTO user_profiles (user_id, display_name, bio) VALUES\n  (1, 'Ada', 'Profile for Ada.'),\n  (2, 'Grace', 'Profile for Grace.'),\n  (4, 'Mae', 'Profile for Mae.'),\n  (5, 'Rosa', 'Profile for Rosa.'),\n  (7, 'Nadia', 'Profile for Nadia.'),\n  (9, 'Priya', 'Profile for Priya.'),\n  (10, 'Quinn', 'Profile for Quinn.'),\n  (12, 'Sam', 'Profile for Sam.'),\n  (14, 'Uma', 'Profile for Uma.'),\n  (15, 'Viktor', 'Profile for Viktor.'),\n  (17, 'Xenia', 'Profile for Xenia.'),\n  (19, 'Zara', 'Profile for Zara.'),\n  (20, 'Bruno', 'Profile for Bruno.'),\n  (22, 'Dara', 'Profile for Dara.'),\n  (24, 'Farid', 'Profile for Farid.');",
+      "starterCode": "SELECT\n  u.email,\n  p.display_name,\n  p.bio\nFROM\n  users u\n  LEFT JOIN user_profiles p ON p.user_id = u.id\nORDER BY\n  u.id;"
+    },
+    "selfRef": {
+      "file": "self-referencing-relationships.mdx",
+      "title": "Employees and their managers",
+      "initSql": "CREATE TABLE employees (\n  id         INTEGER PRIMARY KEY,\n  name       TEXT NOT NULL,\n  title      TEXT NOT NULL,\n  manager_id INTEGER REFERENCES employees(id)\n);\n\nINSERT INTO employees (id, name, title, manager_id) VALUES\n  (1, 'Ada', 'CEO', NULL),\n  (2, 'Grace', 'Engineering Manager', 1),\n  (3, 'Linus', 'Operations Manager', 1),\n  (4, 'Mina', 'Developer', 2),\n  (5, 'Noor', 'Developer', 2),\n  (6, 'Rosa', 'Finance Manager', 1),\n  (7, 'Omar', 'Developer', 2),\n  (8, 'Priya', 'Senior Developer', 2),\n  (9, 'Quinn', 'Site Reliability Engineer', 2),\n  (10, 'Ruth', 'Support Lead', 3),\n  (11, 'Sam', 'Support Engineer', 10),\n  (12, 'Tariq', 'Support Engineer', 10),\n  (13, 'Uma', 'Logistics Coordinator', 3),\n  (14, 'Viktor', 'Logistics Coordinator', 3),\n  (15, 'Wen', 'Accountant', 6),\n  (16, 'Xenia', 'Accountant', 6),\n  (17, 'Yusuf', 'Payroll Officer', 6),\n  (18, 'Zara', 'Junior Developer', 8),\n  (19, 'Bruno', 'Junior Developer', 8),\n  (20, 'Chidi', 'Intern', 18),\n  (21, 'Dara', 'Intern', 19),\n  (22, 'Elif', 'QA Engineer', 9),\n  (23, 'Farid', 'QA Engineer', 9),\n  (24, 'Nadia', 'Office Manager', 1);",
+      "starterCode": "SELECT\n  e.name AS employee,\n  e.title,\n  m.name AS manager\nFROM\n  employees e\n  LEFT JOIN employees m ON m.id = e.manager_id\nORDER BY\n  e.id;"
+    }
+  },
+  "sql": {
+    "otmCounts": "SELECT (SELECT count(*) FROM customers)::int AS customers, (SELECT count(*) FROM orders)::int AS orders;",
+    "otmOrdersPer": "SELECT n AS orders_each, count(*)::int AS customers\nFROM (SELECT c.id, count(o.id)::int AS n FROM customers c LEFT JOIN orders o ON o.customer_id = c.id GROUP BY c.id) t\nGROUP BY n ORDER BY n;",
+    "otmList": "SELECT c.id, c.name, string_agg(o.id::text, ', ' ORDER BY o.id) AS order_ids\nFROM customers c JOIN orders o ON o.customer_id = c.id\nWHERE c.id IN (1, 2)\nGROUP BY c.id, c.name\nORDER BY c.id;",
+    "otmOrders": "SELECT id, customer_id, placed_on::text AS placed_on, total::text AS total FROM orders WHERE customer_id IN (1, 2) ORDER BY id;",
+    "otmJoin": "SELECT\n  c.name,\n  o.id AS order_id,\n  o.placed_on::text AS placed_on,\n  o.total::text AS total\nFROM\n  customers c\n  JOIN orders o ON o.customer_id = c.id\nORDER BY\n  c.name,\n  o.placed_on;",
+    "otmJoinAsWritten": "SELECT\n  c.name,\n  o.id AS order_id,\n  o.placed_on,\n  o.total\nFROM\n  customers c\n  JOIN orders o ON o.customer_id = c.id\nORDER BY\n  c.name,\n  o.placed_on;",
+    "otmNewOrder": "INSERT INTO orders (customer_id, placed_on, total) VALUES (1, DATE '2025-02-09', 25.00) RETURNING id;",
+    "otmListAfter": "SELECT c.id, c.name, string_agg(o.id::text, ', ' ORDER BY o.id) AS order_ids\nFROM customers c JOIN orders o ON o.customer_id = c.id\nWHERE c.id = 1\nGROUP BY c.id, c.name;",
+    "otmOrphan": "INSERT INTO orders (customer_id, placed_on, total) VALUES (99, DATE '2025-02-09', 25.00);",
+    "mtmCounts": "SELECT (SELECT count(*) FROM students)::int AS students, (SELECT count(*) FROM courses)::int AS courses, (SELECT count(*) FROM enrollments)::int AS enrollments;",
+    "mtmStudents": "SELECT id, name FROM students WHERE id IN (1, 2, 3) ORDER BY id;",
+    "mtmCourses": "SELECT id, title FROM courses WHERE id IN (10, 11, 12, 13) ORDER BY id;",
+    "mtmPairs": "SELECT e.student_id, e.course_id, s.name, c.title\nFROM enrollments e JOIN students s ON s.id = e.student_id JOIN courses c ON c.id = e.course_id\nWHERE e.student_id IN (1, 2, 3)\nORDER BY e.student_id, e.course_id;",
+    "mtmPerCourse": "SELECT c.title, count(*)::int AS students FROM enrollments e JOIN courses c ON c.id = e.course_id GROUP BY c.id, c.title ORDER BY c.id;",
+    "mtmPerStudent": "SELECT count(DISTINCT n)::int AS distinct_counts, min(n)::int AS fewest, max(n)::int AS most FROM (SELECT count(*) AS n FROM enrollments GROUP BY student_id) t;",
+    "mtmJoin": "SELECT\n  s.name AS student,\n  c.title AS course\nFROM\n  enrollments e\n  JOIN students s ON s.id = e.student_id\n  JOIN courses c ON c.id = e.course_id\nORDER BY\n  s.name,\n  c.title;",
+    "jtJoin": "SELECT\n  s.name,\n  c.title,\n  e.enrolled_on::text AS enrolled_on,\n  e.grade\nFROM\n  enrollments e\n  JOIN students s ON s.id = e.student_id\n  JOIN courses c ON c.id = e.course_id\nORDER BY\n  s.name,\n  c.title;",
+    "jtRows": "SELECT student_id, course_id, enrolled_on::text AS enrolled_on, grade FROM enrollments WHERE student_id IN (1, 2) ORDER BY student_id, course_id;",
+    "jtMath": "SELECT s.name, e.grade FROM enrollments e JOIN students s ON s.id = e.student_id WHERE e.course_id = 10 ORDER BY s.id;",
+    "jtCountBefore": "SELECT COUNT(*)::int AS n FROM enrollments;",
+    "jtInsert": "INSERT INTO\n  enrollments (student_id, course_id, enrolled_on)\nVALUES\n  (3, 10, DATE '2026-02-01');",
+    "jtCountAfter": "SELECT COUNT(*)::int AS n FROM enrollments;",
+    "jtInsertAgain": "INSERT INTO\n  enrollments (student_id, course_id, enrolled_on)\nVALUES\n  (3, 10, DATE '2026-02-01');",
+    "jtCountAgain": "SELECT COUNT(*)::int AS n FROM enrollments;",
+    "otoCounts": "SELECT (SELECT count(*) FROM users)::int AS users,\n       (SELECT count(*) FROM user_profiles)::int AS profiles,\n       (SELECT count(*) FROM users u WHERE NOT EXISTS (SELECT 1 FROM user_profiles p WHERE p.user_id = u.id))::int AS without;",
+    "otoWide": "SELECT u.id, u.email, p.display_name, p.bio FROM users u LEFT JOIN user_profiles p ON p.user_id = u.id WHERE u.id <= 4 ORDER BY u.id;",
+    "otoProfiles": "SELECT id, user_id, display_name FROM user_profiles ORDER BY id LIMIT 3;",
+    "otoJoin": "SELECT\n  u.email,\n  p.display_name,\n  p.bio\nFROM\n  users u\n  LEFT JOIN user_profiles p ON p.user_id = u.id\nORDER BY\n  u.id;",
+    "otoSecond": "INSERT INTO user_profiles (user_id, display_name) VALUES (1, 'Ada');",
+    "otoSecondLoose": "INSERT INTO loose_profiles (user_id, display_name) VALUES (1, 'Ada');",
+    "otoLooseAda": "SELECT count(*)::int AS n FROM loose_profiles WHERE user_id = 1;",
+    "srRows": "SELECT id, name, title, manager_id FROM employees ORDER BY id;",
+    "srJoin": "SELECT\n  e.name AS employee,\n  e.title,\n  m.name AS manager\nFROM\n  employees e\n  LEFT JOIN employees m ON m.id = e.manager_id\nORDER BY\n  e.id;",
+    "srDepth": "WITH RECURSIVE chain AS (\n  SELECT id, name, title, ARRAY[name] AS path, 1 AS depth FROM employees WHERE manager_id IS NULL\n  UNION ALL\n  SELECT e.id, e.name, e.title, c.path || e.name, c.depth + 1 FROM employees e JOIN chain c ON e.manager_id = c.id\n)\nSELECT id, name, title, path, depth FROM chain ORDER BY depth DESC, id LIMIT 1;",
+    "srReports": "SELECT name FROM employees WHERE manager_id = 1 ORDER BY id;",
+    "srSelf": "UPDATE employees SET manager_id = 1 WHERE id = 1;",
+    "srJoinAfter": "SELECT\n  e.name AS employee,\n  e.title,\n  m.name AS manager\nFROM\n  employees e\n  LEFT JOIN employees m ON m.id = e.manager_id\nORDER BY\n  e.id;",
+    "srCycle": "UPDATE employees SET manager_id = 4 WHERE id = 2;"
+  },
+  "results": {
+    "otmCounts": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "customers",
+        "orders"
+      ],
+      "rows": [
+        {
+          "customers": 24,
+          "orders": 30
+        }
+      ]
+    },
+    "otmOrdersPer": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "orders_each",
+        "customers"
+      ],
+      "rows": [
+        {
+          "orders_each": 1,
+          "customers": 18
+        },
+        {
+          "orders_each": 2,
+          "customers": 6
+        }
+      ]
+    },
+    "otmList": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "id",
+        "name",
+        "order_ids"
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "name": "Ada",
+          "order_ids": "1, 25"
+        },
+        {
+          "id": 2,
+          "name": "Grace",
+          "order_ids": "2, 26"
+        }
+      ]
+    },
+    "otmOrders": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "id",
+        "customer_id",
+        "placed_on",
+        "total"
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "customer_id": 1,
+          "placed_on": "2025-01-10",
+          "total": "12.00"
+        },
+        {
+          "id": 2,
+          "customer_id": 2,
+          "placed_on": "2025-01-11",
+          "total": "49.00"
+        },
+        {
+          "id": 25,
+          "customer_id": 1,
+          "placed_on": "2025-02-03",
+          "total": "90.00"
+        },
+        {
+          "id": 26,
+          "customer_id": 2,
+          "placed_on": "2025-02-04",
+          "total": "37.00"
+        }
+      ]
+    },
+    "otmJoin": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "name",
+        "order_id",
+        "placed_on",
+        "total"
+      ],
+      "rows": [
+        {
+          "name": "Ada",
+          "order_id": 1,
+          "placed_on": "2025-01-10",
+          "total": "12.00"
+        },
+        {
+          "name": "Ada",
+          "order_id": 25,
+          "placed_on": "2025-02-03",
+          "total": "90.00"
+        },
+        {
+          "name": "Bruno",
+          "order_id": 20,
+          "placed_on": "2025-01-29",
+          "total": "85.00"
+        },
+        {
+          "name": "Chidi",
+          "order_id": 21,
+          "placed_on": "2025-01-30",
+          "total": "32.00"
+        },
+        {
+          "name": "Dara",
+          "order_id": 22,
+          "placed_on": "2025-01-31",
+          "total": "69.00"
+        },
+        {
+          "name": "Elif",
+          "order_id": 23,
+          "placed_on": "2025-02-01",
+          "total": "16.00"
+        },
+        {
+          "name": "Farid",
+          "order_id": 24,
+          "placed_on": "2025-02-02",
+          "total": "53.00"
+        },
+        {
+          "name": "Grace",
+          "order_id": 2,
+          "placed_on": "2025-01-11",
+          "total": "49.00"
+        },
+        {
+          "name": "Grace",
+          "order_id": 26,
+          "placed_on": "2025-02-04",
+          "total": "37.00"
+        },
+        {
+          "name": "Ivan",
+          "order_id": 6,
+          "placed_on": "2025-01-15",
+          "total": "17.00"
+        },
+        {
+          "name": "Ivan",
+          "order_id": 30,
+          "placed_on": "2025-02-08",
+          "total": "95.00"
+        },
+        {
+          "name": "Linus",
+          "order_id": 3,
+          "placed_on": "2025-01-12",
+          "total": "86.00"
+        },
+        {
+          "name": "Linus",
+          "order_id": 27,
+          "placed_on": "2025-02-05",
+          "total": "74.00"
+        },
+        {
+          "name": "Mae",
+          "order_id": 4,
+          "placed_on": "2025-01-13",
+          "total": "33.00"
+        },
+        {
+          "name": "Mae",
+          "order_id": 28,
+          "placed_on": "2025-02-06",
+          "total": "21.00"
+        },
+        {
+          "name": "Nadia",
+          "order_id": 7,
+          "placed_on": "2025-01-16",
+          "total": "54.00"
+        },
+        {
+          "name": "Omar",
+          "order_id": 8,
+          "placed_on": "2025-01-17",
+          "total": "91.00"
+        },
+        {
+          "name": "Priya",
+          "order_id": 9,
+          "placed_on": "2025-01-18",
+          "total": "38.00"
+        },
+        {
+          "name": "Quinn",
+          "order_id": 10,
+          "placed_on": "2025-01-19",
+          "total": "75.00"
+        },
+        {
+          "name": "Rosa",
+          "order_id": 5,
+          "placed_on": "2025-01-14",
+          "total": "70.00"
+        },
+        {
+          "name": "Rosa",
+          "order_id": 29,
+          "placed_on": "2025-02-07",
+          "total": "58.00"
+        },
+        {
+          "name": "Ruth",
+          "order_id": 11,
+          "placed_on": "2025-01-20",
+          "total": "22.00"
+        },
+        {
+          "name": "Sam",
+          "order_id": 12,
+          "placed_on": "2025-01-21",
+          "total": "59.00"
+        },
+        {
+          "name": "Tariq",
+          "order_id": 13,
+          "placed_on": "2025-01-22",
+          "total": "96.00"
+        },
+        {
+          "name": "Uma",
+          "order_id": 14,
+          "placed_on": "2025-01-23",
+          "total": "43.00"
+        },
+        {
+          "name": "Viktor",
+          "order_id": 15,
+          "placed_on": "2025-01-24",
+          "total": "80.00"
+        },
+        {
+          "name": "Wen",
+          "order_id": 16,
+          "placed_on": "2025-01-25",
+          "total": "27.00"
+        },
+        {
+          "name": "Xenia",
+          "order_id": 17,
+          "placed_on": "2025-01-26",
+          "total": "64.00"
+        },
+        {
+          "name": "Yusuf",
+          "order_id": 18,
+          "placed_on": "2025-01-27",
+          "total": "101.00"
+        },
+        {
+          "name": "Zara",
+          "order_id": 19,
+          "placed_on": "2025-01-28",
+          "total": "48.00"
+        }
+      ]
+    },
+    "otmNewOrder": {
+      "command": "INSERT",
+      "affectedRows": 1,
+      "fields": [
+        "id"
+      ],
+      "rows": [
+        {
+          "id": 31
+        }
+      ]
+    },
+    "otmListAfter": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "id",
+        "name",
+        "order_ids"
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "name": "Ada",
+          "order_ids": "1, 25, 31"
+        }
+      ]
+    },
+    "otmOrphan": {
+      "error": {
+        "message": "insert or update on table \"orders\" violates foreign key constraint \"orders_customer_id_fkey\"",
+        "detail": "Key (customer_id)=(99) is not present in table \"customers\".",
+        "code": "23503",
+        "constraint": "orders_customer_id_fkey"
+      }
+    },
+    "mtmCounts": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "students",
+        "courses",
+        "enrollments"
+      ],
+      "rows": [
+        {
+          "students": 24,
+          "courses": 6,
+          "enrollments": 48
+        }
+      ]
+    },
+    "mtmStudents": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "id",
+        "name"
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "name": "Ada"
+        },
+        {
+          "id": 2,
+          "name": "Grace"
+        },
+        {
+          "id": 3,
+          "name": "Linus"
+        }
+      ]
+    },
+    "mtmCourses": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "id",
+        "title"
+      ],
+      "rows": [
+        {
+          "id": 10,
+          "title": "Math"
+        },
+        {
+          "id": 11,
+          "title": "History"
+        },
+        {
+          "id": 12,
+          "title": "Art"
+        },
+        {
+          "id": 13,
+          "title": "Biology"
+        }
+      ]
+    },
+    "mtmPairs": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "student_id",
+        "course_id",
+        "name",
+        "title"
+      ],
+      "rows": [
+        {
+          "student_id": 1,
+          "course_id": 10,
+          "name": "Ada",
+          "title": "Math"
+        },
+        {
+          "student_id": 1,
+          "course_id": 11,
+          "name": "Ada",
+          "title": "History"
+        },
+        {
+          "student_id": 2,
+          "course_id": 10,
+          "name": "Grace",
+          "title": "Math"
+        },
+        {
+          "student_id": 2,
+          "course_id": 12,
+          "name": "Grace",
+          "title": "Art"
+        },
+        {
+          "student_id": 3,
+          "course_id": 11,
+          "name": "Linus",
+          "title": "History"
+        },
+        {
+          "student_id": 3,
+          "course_id": 13,
+          "name": "Linus",
+          "title": "Biology"
+        }
+      ]
+    },
+    "mtmPerCourse": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "title",
+        "students"
+      ],
+      "rows": [
+        {
+          "title": "Math",
+          "students": 10
+        },
+        {
+          "title": "History",
+          "students": 9
+        },
+        {
+          "title": "Art",
+          "students": 8
+        },
+        {
+          "title": "Biology",
+          "students": 7
+        },
+        {
+          "title": "Physics",
+          "students": 7
+        },
+        {
+          "title": "Music",
+          "students": 7
+        }
+      ]
+    },
+    "mtmPerStudent": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "distinct_counts",
+        "fewest",
+        "most"
+      ],
+      "rows": [
+        {
+          "distinct_counts": 1,
+          "fewest": 2,
+          "most": 2
+        }
+      ]
+    },
+    "mtmJoin": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "student",
+        "course"
+      ],
+      "rows": [
+        {
+          "student": "Ada",
+          "course": "History"
+        },
+        {
+          "student": "Ada",
+          "course": "Math"
+        },
+        {
+          "student": "Bruno",
+          "course": "Art"
+        },
+        {
+          "student": "Bruno",
+          "course": "Physics"
+        },
+        {
+          "student": "Chidi",
+          "course": "Biology"
+        },
+        {
+          "student": "Chidi",
+          "course": "Music"
+        },
+        {
+          "student": "Dara",
+          "course": "Math"
+        },
+        {
+          "student": "Dara",
+          "course": "Physics"
+        },
+        {
+          "student": "Elif",
+          "course": "History"
+        },
+        {
+          "student": "Elif",
+          "course": "Music"
+        },
+        {
+          "student": "Farid",
+          "course": "Art"
+        },
+        {
+          "student": "Farid",
+          "course": "Math"
+        },
+        {
+          "student": "Grace",
+          "course": "Art"
+        },
+        {
+          "student": "Grace",
+          "course": "Math"
+        },
+        {
+          "student": "Ivan",
+          "course": "Art"
+        },
+        {
+          "student": "Ivan",
+          "course": "Math"
+        },
+        {
+          "student": "Linus",
+          "course": "Biology"
+        },
+        {
+          "student": "Linus",
+          "course": "History"
+        },
+        {
+          "student": "Mae",
+          "course": "Math"
+        },
+        {
+          "student": "Mae",
+          "course": "Physics"
+        },
+        {
+          "student": "Nadia",
+          "course": "Biology"
+        },
+        {
+          "student": "Nadia",
+          "course": "History"
+        },
+        {
+          "student": "Omar",
+          "course": "Art"
+        },
+        {
+          "student": "Omar",
+          "course": "Physics"
+        },
+        {
+          "student": "Priya",
+          "course": "Biology"
+        },
+        {
+          "student": "Priya",
+          "course": "Music"
+        },
+        {
+          "student": "Quinn",
+          "course": "Math"
+        },
+        {
+          "student": "Quinn",
+          "course": "Physics"
+        },
+        {
+          "student": "Rosa",
+          "course": "History"
+        },
+        {
+          "student": "Rosa",
+          "course": "Music"
+        },
+        {
+          "student": "Ruth",
+          "course": "History"
+        },
+        {
+          "student": "Ruth",
+          "course": "Music"
+        },
+        {
+          "student": "Sam",
+          "course": "Art"
+        },
+        {
+          "student": "Sam",
+          "course": "Math"
+        },
+        {
+          "student": "Tariq",
+          "course": "Biology"
+        },
+        {
+          "student": "Tariq",
+          "course": "History"
+        },
+        {
+          "student": "Uma",
+          "course": "Art"
+        },
+        {
+          "student": "Uma",
+          "course": "Physics"
+        },
+        {
+          "student": "Viktor",
+          "course": "Biology"
+        },
+        {
+          "student": "Viktor",
+          "course": "Music"
+        },
+        {
+          "student": "Wen",
+          "course": "Math"
+        },
+        {
+          "student": "Wen",
+          "course": "Physics"
+        },
+        {
+          "student": "Xenia",
+          "course": "History"
+        },
+        {
+          "student": "Xenia",
+          "course": "Music"
+        },
+        {
+          "student": "Yusuf",
+          "course": "Art"
+        },
+        {
+          "student": "Yusuf",
+          "course": "Math"
+        },
+        {
+          "student": "Zara",
+          "course": "Biology"
+        },
+        {
+          "student": "Zara",
+          "course": "History"
+        }
+      ]
+    },
+    "jtJoin": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "name",
+        "title",
+        "enrolled_on",
+        "grade"
+      ],
+      "rows": [
+        {
+          "name": "Ada",
+          "title": "History",
+          "enrolled_on": "2025-01-02",
+          "grade": "C"
+        },
+        {
+          "name": "Ada",
+          "title": "Math",
+          "enrolled_on": "2025-01-01",
+          "grade": "B"
+        },
+        {
+          "name": "Bruno",
+          "title": "Art",
+          "enrolled_on": "2025-01-11",
+          "grade": "C"
+        },
+        {
+          "name": "Bruno",
+          "title": "Physics",
+          "enrolled_on": "2025-01-12",
+          "grade": "B"
+        },
+        {
+          "name": "Chidi",
+          "title": "Biology",
+          "enrolled_on": "2025-01-13",
+          "grade": "B"
+        },
+        {
+          "name": "Chidi",
+          "title": "Music",
+          "enrolled_on": "2025-01-14",
+          "grade": "B"
+        },
+        {
+          "name": "Dara",
+          "title": "Math",
+          "enrolled_on": "2025-01-15",
+          "grade": "C"
+        },
+        {
+          "name": "Dara",
+          "title": "Physics",
+          "enrolled_on": "2025-01-16",
+          "grade": "B"
+        },
+        {
+          "name": "Elif",
+          "title": "History",
+          "enrolled_on": "2025-01-17",
+          "grade": "B"
+        },
+        {
+          "name": "Elif",
+          "title": "Music",
+          "enrolled_on": "2025-01-18",
+          "grade": "A"
+        },
+        {
+          "name": "Farid",
+          "title": "Art",
+          "enrolled_on": "2025-01-20",
+          "grade": "B"
+        },
+        {
+          "name": "Farid",
+          "title": "Math",
+          "enrolled_on": "2025-01-19",
+          "grade": "B"
+        },
+        {
+          "name": "Grace",
+          "title": "Art",
+          "enrolled_on": "2025-01-04",
+          "grade": "B"
+        },
+        {
+          "name": "Grace",
+          "title": "Math",
+          "enrolled_on": "2025-01-03",
+          "grade": "C"
+        },
+        {
+          "name": "Ivan",
+          "title": "Art",
+          "enrolled_on": "2025-01-12",
+          "grade": "A"
+        },
+        {
+          "name": "Ivan",
+          "title": "Math",
+          "enrolled_on": "2025-01-11",
+          "grade": "B"
+        },
+        {
+          "name": "Linus",
+          "title": "Biology",
+          "enrolled_on": "2025-01-06",
+          "grade": "B"
+        },
+        {
+          "name": "Linus",
+          "title": "History",
+          "enrolled_on": "2025-01-05",
+          "grade": "B"
+        },
+        {
+          "name": "Mae",
+          "title": "Math",
+          "enrolled_on": "2025-01-07",
+          "grade": "B"
+        },
+        {
+          "name": "Mae",
+          "title": "Physics",
+          "enrolled_on": "2025-01-08",
+          "grade": "A"
+        },
+        {
+          "name": "Nadia",
+          "title": "Biology",
+          "enrolled_on": "2025-01-14",
+          "grade": "A"
+        },
+        {
+          "name": "Nadia",
+          "title": "History",
+          "enrolled_on": "2025-01-13",
+          "grade": "A"
+        },
+        {
+          "name": "Omar",
+          "title": "Art",
+          "enrolled_on": "2025-01-15",
+          "grade": "A"
+        },
+        {
+          "name": "Omar",
+          "title": "Physics",
+          "enrolled_on": "2025-01-16",
+          "grade": "C"
+        },
+        {
+          "name": "Priya",
+          "title": "Biology",
+          "enrolled_on": "2025-01-17",
+          "grade": "C"
+        },
+        {
+          "name": "Priya",
+          "title": "Music",
+          "enrolled_on": "2025-01-18",
+          "grade": "B"
+        },
+        {
+          "name": "Quinn",
+          "title": "Math",
+          "enrolled_on": "2025-01-19",
+          "grade": "A"
+        },
+        {
+          "name": "Quinn",
+          "title": "Physics",
+          "enrolled_on": "2025-01-20",
+          "grade": "B"
+        },
+        {
+          "name": "Rosa",
+          "title": "History",
+          "enrolled_on": "2025-01-09",
+          "grade": "B"
+        },
+        {
+          "name": "Rosa",
+          "title": "Music",
+          "enrolled_on": "2025-01-10",
+          "grade": "A"
+        },
+        {
+          "name": "Ruth",
+          "title": "History",
+          "enrolled_on": "2025-01-21",
+          "grade": "C"
+        },
+        {
+          "name": "Ruth",
+          "title": "Music",
+          "enrolled_on": "2025-01-22",
+          "grade": "B"
+        },
+        {
+          "name": "Sam",
+          "title": "Art",
+          "enrolled_on": "2025-01-24",
+          "grade": "B"
+        },
+        {
+          "name": "Sam",
+          "title": "Math",
+          "enrolled_on": "2025-01-23",
+          "grade": "C"
+        },
+        {
+          "name": "Tariq",
+          "title": "Biology",
+          "enrolled_on": "2025-01-26",
+          "grade": "B"
+        },
+        {
+          "name": "Tariq",
+          "title": "History",
+          "enrolled_on": "2025-01-25",
+          "grade": "B"
+        },
+        {
+          "name": "Uma",
+          "title": "Art",
+          "enrolled_on": "2025-01-27",
+          "grade": "B"
+        },
+        {
+          "name": "Uma",
+          "title": "Physics",
+          "enrolled_on": "2025-01-28",
+          "grade": "A"
+        },
+        {
+          "name": "Viktor",
+          "title": "Biology",
+          "enrolled_on": "2025-01-01",
+          "grade": "A"
+        },
+        {
+          "name": "Viktor",
+          "title": "Music",
+          "enrolled_on": "2025-01-02",
+          "grade": "A"
+        },
+        {
+          "name": "Wen",
+          "title": "Math",
+          "enrolled_on": "2025-01-03",
+          "grade": "B"
+        },
+        {
+          "name": "Wen",
+          "title": "Physics",
+          "enrolled_on": "2025-01-04",
+          "grade": "A"
+        },
+        {
+          "name": "Xenia",
+          "title": "History",
+          "enrolled_on": "2025-01-05",
+          "grade": "A"
+        },
+        {
+          "name": "Xenia",
+          "title": "Music",
+          "enrolled_on": "2025-01-06",
+          "grade": "C"
+        },
+        {
+          "name": "Yusuf",
+          "title": "Art",
+          "enrolled_on": "2025-01-08",
+          "grade": "A"
+        },
+        {
+          "name": "Yusuf",
+          "title": "Math",
+          "enrolled_on": "2025-01-07",
+          "grade": "A"
+        },
+        {
+          "name": "Zara",
+          "title": "Biology",
+          "enrolled_on": "2025-01-10",
+          "grade": "C"
+        },
+        {
+          "name": "Zara",
+          "title": "History",
+          "enrolled_on": "2025-01-09",
+          "grade": "A"
+        }
+      ]
+    },
+    "jtRows": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "student_id",
+        "course_id",
+        "enrolled_on",
+        "grade"
+      ],
+      "rows": [
+        {
+          "student_id": 1,
+          "course_id": 10,
+          "enrolled_on": "2025-01-01",
+          "grade": "B"
+        },
+        {
+          "student_id": 1,
+          "course_id": 11,
+          "enrolled_on": "2025-01-02",
+          "grade": "C"
+        },
+        {
+          "student_id": 2,
+          "course_id": 10,
+          "enrolled_on": "2025-01-03",
+          "grade": "C"
+        },
+        {
+          "student_id": 2,
+          "course_id": 12,
+          "enrolled_on": "2025-01-04",
+          "grade": "B"
+        }
+      ]
+    },
+    "jtMath": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "name",
+        "grade"
+      ],
+      "rows": [
+        {
+          "name": "Ada",
+          "grade": "B"
+        },
+        {
+          "name": "Grace",
+          "grade": "C"
+        },
+        {
+          "name": "Mae",
+          "grade": "B"
+        },
+        {
+          "name": "Ivan",
+          "grade": "B"
+        },
+        {
+          "name": "Quinn",
+          "grade": "A"
+        },
+        {
+          "name": "Sam",
+          "grade": "C"
+        },
+        {
+          "name": "Wen",
+          "grade": "B"
+        },
+        {
+          "name": "Yusuf",
+          "grade": "A"
+        },
+        {
+          "name": "Dara",
+          "grade": "C"
+        },
+        {
+          "name": "Farid",
+          "grade": "B"
+        }
+      ]
+    },
+    "jtCountBefore": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "n"
+      ],
+      "rows": [
+        {
+          "n": 48
+        }
+      ]
+    },
+    "jtInsert": {
+      "command": "INSERT",
+      "affectedRows": 1,
+      "fields": [],
+      "rows": []
+    },
+    "jtCountAfter": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "n"
+      ],
+      "rows": [
+        {
+          "n": 49
+        }
+      ]
+    },
+    "jtInsertAgain": {
+      "error": {
+        "message": "duplicate key value violates unique constraint \"enrollments_pkey\"",
+        "detail": "Key (student_id, course_id)=(3, 10) already exists.",
+        "code": "23505",
+        "constraint": "enrollments_pkey"
+      }
+    },
+    "jtCountAgain": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "n"
+      ],
+      "rows": [
+        {
+          "n": 49
+        }
+      ]
+    },
+    "otoCounts": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "users",
+        "profiles",
+        "without"
+      ],
+      "rows": [
+        {
+          "users": 24,
+          "profiles": 15,
+          "without": 9
+        }
+      ]
+    },
+    "otoWide": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "id",
+        "email",
+        "display_name",
+        "bio"
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "email": "ada@example.com",
+          "display_name": "Ada",
+          "bio": "Profile for Ada."
+        },
+        {
+          "id": 2,
+          "email": "grace@example.com",
+          "display_name": "Grace",
+          "bio": "Profile for Grace."
+        },
+        {
+          "id": 3,
+          "email": "linus@example.com",
+          "display_name": null,
+          "bio": null
+        },
+        {
+          "id": 4,
+          "email": "mae@example.com",
+          "display_name": "Mae",
+          "bio": "Profile for Mae."
+        }
+      ]
+    },
+    "otoProfiles": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "id",
+        "user_id",
+        "display_name"
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "user_id": 1,
+          "display_name": "Ada"
+        },
+        {
+          "id": 2,
+          "user_id": 2,
+          "display_name": "Grace"
+        },
+        {
+          "id": 3,
+          "user_id": 4,
+          "display_name": "Mae"
+        }
+      ]
+    },
+    "otoJoin": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "email",
+        "display_name",
+        "bio"
+      ],
+      "rows": [
+        {
+          "email": "ada@example.com",
+          "display_name": "Ada",
+          "bio": "Profile for Ada."
+        },
+        {
+          "email": "grace@example.com",
+          "display_name": "Grace",
+          "bio": "Profile for Grace."
+        },
+        {
+          "email": "linus@example.com",
+          "display_name": null,
+          "bio": null
+        },
+        {
+          "email": "mae@example.com",
+          "display_name": "Mae",
+          "bio": "Profile for Mae."
+        },
+        {
+          "email": "rosa@example.com",
+          "display_name": "Rosa",
+          "bio": "Profile for Rosa."
+        },
+        {
+          "email": "ivan@example.com",
+          "display_name": null,
+          "bio": null
+        },
+        {
+          "email": "nadia@example.com",
+          "display_name": "Nadia",
+          "bio": "Profile for Nadia."
+        },
+        {
+          "email": "omar@example.com",
+          "display_name": null,
+          "bio": null
+        },
+        {
+          "email": "priya@example.com",
+          "display_name": "Priya",
+          "bio": "Profile for Priya."
+        },
+        {
+          "email": "quinn@example.com",
+          "display_name": "Quinn",
+          "bio": "Profile for Quinn."
+        },
+        {
+          "email": "ruth@example.com",
+          "display_name": null,
+          "bio": null
+        },
+        {
+          "email": "sam@example.com",
+          "display_name": "Sam",
+          "bio": "Profile for Sam."
+        },
+        {
+          "email": "tariq@example.com",
+          "display_name": null,
+          "bio": null
+        },
+        {
+          "email": "uma@example.com",
+          "display_name": "Uma",
+          "bio": "Profile for Uma."
+        },
+        {
+          "email": "viktor@example.com",
+          "display_name": "Viktor",
+          "bio": "Profile for Viktor."
+        },
+        {
+          "email": "wen@example.com",
+          "display_name": null,
+          "bio": null
+        },
+        {
+          "email": "xenia@example.com",
+          "display_name": "Xenia",
+          "bio": "Profile for Xenia."
+        },
+        {
+          "email": "yusuf@example.com",
+          "display_name": null,
+          "bio": null
+        },
+        {
+          "email": "zara@example.com",
+          "display_name": "Zara",
+          "bio": "Profile for Zara."
+        },
+        {
+          "email": "bruno@example.com",
+          "display_name": "Bruno",
+          "bio": "Profile for Bruno."
+        },
+        {
+          "email": "chidi@example.com",
+          "display_name": null,
+          "bio": null
+        },
+        {
+          "email": "dara@example.com",
+          "display_name": "Dara",
+          "bio": "Profile for Dara."
+        },
+        {
+          "email": "elif@example.com",
+          "display_name": null,
+          "bio": null
+        },
+        {
+          "email": "farid@example.com",
+          "display_name": "Farid",
+          "bio": "Profile for Farid."
+        }
+      ]
+    },
+    "otoSecond": {
+      "error": {
+        "message": "duplicate key value violates unique constraint \"user_profiles_user_id_key\"",
+        "detail": "Key (user_id)=(1) already exists.",
+        "code": "23505",
+        "constraint": "user_profiles_user_id_key"
+      }
+    },
+    "otoSecondLoose": {
+      "command": "INSERT",
+      "affectedRows": 1,
+      "fields": [],
+      "rows": []
+    },
+    "otoLooseAda": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "n"
+      ],
+      "rows": [
+        {
+          "n": 2
+        }
+      ]
+    },
+    "srRows": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "id",
+        "name",
+        "title",
+        "manager_id"
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "name": "Ada",
+          "title": "CEO",
+          "manager_id": null
+        },
+        {
+          "id": 2,
+          "name": "Grace",
+          "title": "Engineering Manager",
+          "manager_id": 1
+        },
+        {
+          "id": 3,
+          "name": "Linus",
+          "title": "Operations Manager",
+          "manager_id": 1
+        },
+        {
+          "id": 4,
+          "name": "Mina",
+          "title": "Developer",
+          "manager_id": 2
+        },
+        {
+          "id": 5,
+          "name": "Noor",
+          "title": "Developer",
+          "manager_id": 2
+        },
+        {
+          "id": 6,
+          "name": "Rosa",
+          "title": "Finance Manager",
+          "manager_id": 1
+        },
+        {
+          "id": 7,
+          "name": "Omar",
+          "title": "Developer",
+          "manager_id": 2
+        },
+        {
+          "id": 8,
+          "name": "Priya",
+          "title": "Senior Developer",
+          "manager_id": 2
+        },
+        {
+          "id": 9,
+          "name": "Quinn",
+          "title": "Site Reliability Engineer",
+          "manager_id": 2
+        },
+        {
+          "id": 10,
+          "name": "Ruth",
+          "title": "Support Lead",
+          "manager_id": 3
+        },
+        {
+          "id": 11,
+          "name": "Sam",
+          "title": "Support Engineer",
+          "manager_id": 10
+        },
+        {
+          "id": 12,
+          "name": "Tariq",
+          "title": "Support Engineer",
+          "manager_id": 10
+        },
+        {
+          "id": 13,
+          "name": "Uma",
+          "title": "Logistics Coordinator",
+          "manager_id": 3
+        },
+        {
+          "id": 14,
+          "name": "Viktor",
+          "title": "Logistics Coordinator",
+          "manager_id": 3
+        },
+        {
+          "id": 15,
+          "name": "Wen",
+          "title": "Accountant",
+          "manager_id": 6
+        },
+        {
+          "id": 16,
+          "name": "Xenia",
+          "title": "Accountant",
+          "manager_id": 6
+        },
+        {
+          "id": 17,
+          "name": "Yusuf",
+          "title": "Payroll Officer",
+          "manager_id": 6
+        },
+        {
+          "id": 18,
+          "name": "Zara",
+          "title": "Junior Developer",
+          "manager_id": 8
+        },
+        {
+          "id": 19,
+          "name": "Bruno",
+          "title": "Junior Developer",
+          "manager_id": 8
+        },
+        {
+          "id": 20,
+          "name": "Chidi",
+          "title": "Intern",
+          "manager_id": 18
+        },
+        {
+          "id": 21,
+          "name": "Dara",
+          "title": "Intern",
+          "manager_id": 19
+        },
+        {
+          "id": 22,
+          "name": "Elif",
+          "title": "QA Engineer",
+          "manager_id": 9
+        },
+        {
+          "id": 23,
+          "name": "Farid",
+          "title": "QA Engineer",
+          "manager_id": 9
+        },
+        {
+          "id": 24,
+          "name": "Nadia",
+          "title": "Office Manager",
+          "manager_id": 1
+        }
+      ]
+    },
+    "srJoin": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "employee",
+        "title",
+        "manager"
+      ],
+      "rows": [
+        {
+          "employee": "Ada",
+          "title": "CEO",
+          "manager": null
+        },
+        {
+          "employee": "Grace",
+          "title": "Engineering Manager",
+          "manager": "Ada"
+        },
+        {
+          "employee": "Linus",
+          "title": "Operations Manager",
+          "manager": "Ada"
+        },
+        {
+          "employee": "Mina",
+          "title": "Developer",
+          "manager": "Grace"
+        },
+        {
+          "employee": "Noor",
+          "title": "Developer",
+          "manager": "Grace"
+        },
+        {
+          "employee": "Rosa",
+          "title": "Finance Manager",
+          "manager": "Ada"
+        },
+        {
+          "employee": "Omar",
+          "title": "Developer",
+          "manager": "Grace"
+        },
+        {
+          "employee": "Priya",
+          "title": "Senior Developer",
+          "manager": "Grace"
+        },
+        {
+          "employee": "Quinn",
+          "title": "Site Reliability Engineer",
+          "manager": "Grace"
+        },
+        {
+          "employee": "Ruth",
+          "title": "Support Lead",
+          "manager": "Linus"
+        },
+        {
+          "employee": "Sam",
+          "title": "Support Engineer",
+          "manager": "Ruth"
+        },
+        {
+          "employee": "Tariq",
+          "title": "Support Engineer",
+          "manager": "Ruth"
+        },
+        {
+          "employee": "Uma",
+          "title": "Logistics Coordinator",
+          "manager": "Linus"
+        },
+        {
+          "employee": "Viktor",
+          "title": "Logistics Coordinator",
+          "manager": "Linus"
+        },
+        {
+          "employee": "Wen",
+          "title": "Accountant",
+          "manager": "Rosa"
+        },
+        {
+          "employee": "Xenia",
+          "title": "Accountant",
+          "manager": "Rosa"
+        },
+        {
+          "employee": "Yusuf",
+          "title": "Payroll Officer",
+          "manager": "Rosa"
+        },
+        {
+          "employee": "Zara",
+          "title": "Junior Developer",
+          "manager": "Priya"
+        },
+        {
+          "employee": "Bruno",
+          "title": "Junior Developer",
+          "manager": "Priya"
+        },
+        {
+          "employee": "Chidi",
+          "title": "Intern",
+          "manager": "Zara"
+        },
+        {
+          "employee": "Dara",
+          "title": "Intern",
+          "manager": "Bruno"
+        },
+        {
+          "employee": "Elif",
+          "title": "QA Engineer",
+          "manager": "Quinn"
+        },
+        {
+          "employee": "Farid",
+          "title": "QA Engineer",
+          "manager": "Quinn"
+        },
+        {
+          "employee": "Nadia",
+          "title": "Office Manager",
+          "manager": "Ada"
+        }
+      ]
+    },
+    "srDepth": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "id",
+        "name",
+        "title",
+        "path",
+        "depth"
+      ],
+      "rows": [
+        {
+          "id": 20,
+          "name": "Chidi",
+          "title": "Intern",
+          "path": [
+            "Ada",
+            "Grace",
+            "Priya",
+            "Zara",
+            "Chidi"
+          ],
+          "depth": 5
+        }
+      ]
+    },
+    "srReports": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "name"
+      ],
+      "rows": [
+        {
+          "name": "Grace"
+        },
+        {
+          "name": "Linus"
+        },
+        {
+          "name": "Rosa"
+        },
+        {
+          "name": "Nadia"
+        }
+      ]
+    },
+    "srSelf": {
+      "command": "UPDATE",
+      "affectedRows": 1,
+      "fields": [],
+      "rows": []
+    },
+    "srJoinAfter": {
+      "command": "SELECT",
+      "affectedRows": 0,
+      "fields": [
+        "employee",
+        "title",
+        "manager"
+      ],
+      "rows": [
+        {
+          "employee": "Ada",
+          "title": "CEO",
+          "manager": "Ada"
+        },
+        {
+          "employee": "Grace",
+          "title": "Engineering Manager",
+          "manager": "Ada"
+        },
+        {
+          "employee": "Linus",
+          "title": "Operations Manager",
+          "manager": "Ada"
+        },
+        {
+          "employee": "Mina",
+          "title": "Developer",
+          "manager": "Grace"
+        },
+        {
+          "employee": "Noor",
+          "title": "Developer",
+          "manager": "Grace"
+        },
+        {
+          "employee": "Rosa",
+          "title": "Finance Manager",
+          "manager": "Ada"
+        },
+        {
+          "employee": "Omar",
+          "title": "Developer",
+          "manager": "Grace"
+        },
+        {
+          "employee": "Priya",
+          "title": "Senior Developer",
+          "manager": "Grace"
+        },
+        {
+          "employee": "Quinn",
+          "title": "Site Reliability Engineer",
+          "manager": "Grace"
+        },
+        {
+          "employee": "Ruth",
+          "title": "Support Lead",
+          "manager": "Linus"
+        },
+        {
+          "employee": "Sam",
+          "title": "Support Engineer",
+          "manager": "Ruth"
+        },
+        {
+          "employee": "Tariq",
+          "title": "Support Engineer",
+          "manager": "Ruth"
+        },
+        {
+          "employee": "Uma",
+          "title": "Logistics Coordinator",
+          "manager": "Linus"
+        },
+        {
+          "employee": "Viktor",
+          "title": "Logistics Coordinator",
+          "manager": "Linus"
+        },
+        {
+          "employee": "Wen",
+          "title": "Accountant",
+          "manager": "Rosa"
+        },
+        {
+          "employee": "Xenia",
+          "title": "Accountant",
+          "manager": "Rosa"
+        },
+        {
+          "employee": "Yusuf",
+          "title": "Payroll Officer",
+          "manager": "Rosa"
+        },
+        {
+          "employee": "Zara",
+          "title": "Junior Developer",
+          "manager": "Priya"
+        },
+        {
+          "employee": "Bruno",
+          "title": "Junior Developer",
+          "manager": "Priya"
+        },
+        {
+          "employee": "Chidi",
+          "title": "Intern",
+          "manager": "Zara"
+        },
+        {
+          "employee": "Dara",
+          "title": "Intern",
+          "manager": "Bruno"
+        },
+        {
+          "employee": "Elif",
+          "title": "QA Engineer",
+          "manager": "Quinn"
+        },
+        {
+          "employee": "Farid",
+          "title": "QA Engineer",
+          "manager": "Quinn"
+        },
+        {
+          "employee": "Nadia",
+          "title": "Office Manager",
+          "manager": "Ada"
+        }
+      ]
+    },
+    "srCycle": {
+      "command": "UPDATE",
+      "affectedRows": 1,
+      "fields": [],
+      "rows": []
+    }
+  }
+}

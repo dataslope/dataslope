@@ -21,6 +21,7 @@ import {
 } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { SANS } from "../../theme/fonts";
 import { ILLUSTRATIONS, mulberry32, TIMES, VIDEO } from "./data";
@@ -84,6 +85,14 @@ export const RulerScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: the ruler, the times, the zoom, the interval, the test ── */}
+      <Sfx name="el-pop" at={rulerAt - 6} level={-30} />
+      <Sfx name="el-sprinkle" at={timesFrom - 4} level={-34} />
+      <Sfx name="el-whoosh" at={seAt} level={-34} />
+      <Sfx name="el-pencil" at={stepAt} level={-33} />
+      <Sfx name="el-pencil" at={testAt - 2} level={-35} />
+      <Sfx name="el-tap" at={testingAt - 2} level={-29} />
+
       <Ink at={rulerFrom - 6} dur={20} style={{ left: 92, top: y(112), ...headline(56), whiteSpace: "nowrap" }}>
         The standard error is a ruler.
       </Ink>

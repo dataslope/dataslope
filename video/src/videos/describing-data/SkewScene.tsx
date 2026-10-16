@@ -10,7 +10,7 @@ import { Sfx } from "../../sound/Sfx";
 import { ORDERS } from "./data";
 import { Arrow, Bracket, DATA, Drift, lerp, Mark, Pulse, STAT, STAT_INK, Svg, Tag } from "./parts";
 
-const BASE = 800;
+const BASE = 830;
 const X0 = 160;
 const X1_WIDE = 1720;
 const X1_NARROW = 860;
@@ -86,7 +86,7 @@ export const SkewScene: React.FC = () => {
   // The histogram narrows to make room for the table.
   const shift = ease(frame, rightFrom - 4, 26);
   const X: XScale = { lo: 0, hi: 114, x0: X0, x1: lerp(X1_WIDE, X1_NARROW, shift) };
-  const unit = h(lerp(8, 6, shift));
+  const unit = h(lerp(6.2, 5, shift));
   const base = y(BASE);
   const peak = Math.max(...ORDERS.counts);
 
@@ -183,8 +183,8 @@ export const SkewScene: React.FC = () => {
         <Tag x={sx(X, meanShown) + 12} y={markTop - 34} opacity={meanIn} color={STAT_INK} size={23} bold align="left">
           Mean ${fmt(ORDERS.mean)}
         </Tag>
-        <Bracket x0={medX} x1={meanX} y={markTop - h(52)} at={alarmAt - 6} color={STAT} up />
-        <Tag x={meanX + 14} y={markTop - h(52) - 46} opacity={ease(frame, alarmAt - 2, 12)} color={STAT_INK} size={21} align="left">
+        <Bracket x0={medX} x1={meanX} y={markTop - 8} at={alarmAt - 6} color={STAT} up />
+        <Tag x={sx(X, meanShown) + 190} y={markTop - 34} opacity={ease(frame, alarmAt - 2, 12)} color={STAT_INK} size={21} align="left">
           a gap of ${fmt(ORDERS.gap)}: skew
         </Tag>
         <Pulse x={medX} y={markTop} at={leadAt - 2} color={INK} r={6} />

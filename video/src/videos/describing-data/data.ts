@@ -54,6 +54,16 @@ export function swarm(values: readonly number[], gap: number): number[] {
   return rows;
 }
 
+/** A dot plot: each value's row, counting up from 0 for every repeat of it. */
+export function stack(values: readonly number[]): number[] {
+  const seen = new Map<number, number>();
+  return values.map((v) => {
+    const k = seen.get(v) ?? 0;
+    seen.set(v, k + 1);
+    return k;
+  });
+}
+
 // ── Part 1. Ten salaries and a CEO (measures-of-center) ─────────────────────
 
 export const SALARIES = {

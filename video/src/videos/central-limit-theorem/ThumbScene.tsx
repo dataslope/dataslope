@@ -2,6 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { Axis, Bars, NormalCurve, sx, type XScale } from "../../editorial/charts";
 import { histogram, INCOME_MEANS, MEANS_30, mean, SAMPLE_COUNT, sd, skew } from "./data";
 import { useLayout } from "../../editorial/layout";
@@ -85,6 +86,13 @@ export const ThumbScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: "always" struck out, each row's bars, the last bell ── */}
+      <Sfx name="el-scratch" at={thumbAt} level={-30} />
+      {cues.map((c, i) => (
+        <Sfx key={i} name="el-pop" at={c.at} level={-30} />
+      ))}
+      <Sfx name="el-pencil" at={cues[2].curve} level={-34} />
+
       {/* The pull quote, and its correction. */}
       <Ink at={start - 14} dur={14} style={{ left: 196, top: y(112) }}>
         <span style={label(20, ACCENT_INK)}>What you will hear</span>

@@ -168,7 +168,7 @@ export const script: NarrationScript = {
     {
       id: "sides",
       scene: true,
-      text: "Higher or lower would both count, so surprise lives in both tails. Two and a half percent in each, beyond one point nine six.",
+      text: "Higher or lower would both count, so surprise lives in both tails. A five percent test puts two and a half percent in each, beyond one point nine six.",
       pauseAfter: 0.35,
     },
     {
@@ -301,7 +301,7 @@ export const script: NarrationScript = {
       text: "Only more data shrinks both. Forty per group catches this effect sixty-one percent of the time. Eighty catches ninety.",
       pauseAfter: 0.35,
     },
-    { id: "target", text: "Studies are usually designed for at least eighty." },
+    { id: "target", text: "Studies are usually designed for at least eighty percent." },
     {
       id: "ab",
       scene: true,
@@ -379,7 +379,7 @@ export const script: NarrationScript = {
     },
     {
       id: "warehouses",
-      text: "Three warehouses' delivery times give an F of twelve. One of them is slower... but ANOVA won't say which.",
+      text: "Three warehouses' delivery times give an F of twelve. At least one of them differs... but ANOVA won't say which.",
     },
     {
       id: "chi",
@@ -395,7 +395,7 @@ export const script: NarrationScript = {
     { id: "observed", text: "A hundred and three did. Desktop came in well under its share.", pauseAfter: 0.35 },
     {
       id: "related",
-      text: "Chi-square adds up those gaps between observed and expected. Here it's about twelve, with a p of point zero zero three.",
+      text: "Chi-square adds up how far every cell strays from what was expected. Here it's about twelve, with a p of point zero zero three.",
     },
     { id: "corr-in", text: "And when both columns are numbers, you ask whether they move together." },
 

@@ -19,6 +19,7 @@ import {
 } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { SANS } from "../../theme/fonts";
 import { ILLUSTRATIONS, LAW, seAt, VIDEO } from "./data";
 import { Rule } from "./parts";
@@ -87,6 +88,14 @@ export const CostScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: the coins, the curve, each size marked, the hundred squares ── */}
+      <Sfx name="el-pop" at={costAt - 6} level={-30} />
+      <Sfx name="el-pencil" at={curveFrom - 4} level={-33} />
+      {marks.map((mk) => (
+        <Sfx key={mk.n} name="el-tap" at={mk.at} level={-29} />
+      ))}
+      <Sfx name="el-sprinkle" at={tenthAt} level={-34} />
+
       <Ink at={costFrom - 6} dur={20} style={{ left: 92, top: y(112), ...headline(56), whiteSpace: "nowrap" }}>
         What the square root costs.
       </Ink>

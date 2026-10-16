@@ -205,18 +205,18 @@ export const ShapeScene: React.FC = () => {
                 {v}
               </Tag>
             ))}
-            <Tag x={sx(HX, HEIGHTS.muA)} y={hb - peakH - h(56)} opacity={ease(frame, mixAt - 2, 12)} color={"var(--ds-blue-ink)"} size={23} bold>
+            <Tag x={sx(HX, HEIGHTS.muA)} y={hb - peakH - h(64)} opacity={ease(frame, mixAt - 2, 12)} color={"var(--ds-blue-ink)"} size={23} bold>
               <Mark at={neitherAt - 2}>one group, around {HEIGHTS.muA}</Mark>
             </Tag>
-            <Tag x={sx(HX, HEIGHTS.muB)} y={hb - peakH - h(56)} opacity={ease(frame, mixAt + 6, 12)} color={SECOND_INK} size={23} bold>
+            <Tag x={sx(HX, HEIGHTS.muB)} y={hb - peakH - h(64)} opacity={ease(frame, mixAt + 6, 12)} color={SECOND_INK} size={23} bold>
               <Mark at={neitherAt + 4}>another, around {HEIGHTS.muB}</Mark>
             </Tag>
             {meanIn > 0 ? (
               <Svg>
-                <line x1={meanX} x2={meanX} y1={hb} y2={hb - (peakH + h(10)) * meanIn} stroke={STAT} strokeWidth={3.6} strokeLinecap="round" />
+                <line x1={meanX} x2={meanX} y1={hb} y2={hb - (peakH - h(30)) * meanIn} stroke={STAT} strokeWidth={3.6} strokeLinecap="round" />
               </Svg>
             ) : null}
-            <Tag x={meanX} y={hb - peakH - h(10) - 34} opacity={ease(frame, valleyAt + 4, 12)} color={STAT_INK} size={23} bold knockout>
+            <Tag x={meanX} y={hb - peakH + h(30) - 34} opacity={ease(frame, valleyAt + 4, 12)} color={STAT_INK} size={23} bold knockout>
               Mean {fmt(HEIGHTS.mean, 1)}
             </Tag>
             <Pulse x={meanX} y={hb - h(100)} at={neitherAt - 2} color={STAT} r={8} />

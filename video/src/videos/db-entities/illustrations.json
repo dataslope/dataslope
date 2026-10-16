@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "model": "gpt-image-2.5-flare",
+    "brandColors": {
+      "blue": "#148cff",
+      "green": "#20c621",
+      "red": "#ff4f59",
+      "yellow": "#ffdd6c"
+    },
+    "sizes": {
+      "video-hero": "1536x1024",
+      "video-icon": "1024x1024"
+    },
+    "styles": {
+      "watercolor illustration": {
+        "constraints": "Paint it in loose, transparent watercolor: soft washes that feather and bleed at their edges, darker pigment pooling where a wash has dried, gentle blooms inside each shape, and the tooth of cold-press paper visible only inside the paint. Build the scene from a few large, simple shapes rather than many small pieces, and let the washes define the forms instead of hard outlines. Lay every wash in the brand colors below and let two overlapping washes mix into a third; never outline in black, never shade with grey or black, and never paint the whole subject in one hue. An animal keeps its own natural coloring, painted in warm earthy washes with soft fur texture. Draw any person as an anonymous stylized figure with no facial features and no resemblance to a real individual. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no paper texture outside the paint, no floor, no ground shadow, no frame or border, no soft glow and no vignette, so the whole subject lifts off the page in one piece.",
+        "softAlphaWarn": 0.3
+      }
+    }
+  },
+  "prompts": [
+    {
+      "id": "db-entities-crates",
+      "category": "video-hero",
+      "style": "watercolor illustration",
+      "subject": "three sturdy open wooden crates standing side by side, the first holding a few large red apples, the second holding three thick closed books lying flat, the third holding a bundle of long yellow pencils, each crate holding only its own kind of thing"
+    },
+    {
+      "id": "db-entities-ribbon",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small open wooden box, far too short for the long blue ribbon laid inside it, so one end of the ribbon spills out over the rim and curls in the air"
+    },
+    {
+      "id": "db-entities-plan",
+      "category": "video-hero",
+      "style": "watercolor illustration",
+      "subject": "a large sheet of paper pinned to a wooden easel, painted with three plain rectangles joined by two straight lines, and beside the easel a half-built wooden cabinet that is only an open frame with one shelf"
+    }
+  ]
+}

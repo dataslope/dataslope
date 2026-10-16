@@ -42,7 +42,9 @@ export const LookScene: React.FC = () => {
 
   // ── Cues ──
   const hookFrom = n.beat("hook").from;
+  const beforeAt = n.word("hook", "before");
   const adviceAt = n.word("hook", "Good advice");
+  const lookingAt = n.word("hook", "without looking");
   const howAt = n.word("hook", "how");
   const billsFrom = n.beat("bills").from;
   const countAt = n.word("bills", "two hundred");
@@ -92,9 +94,17 @@ export const LookScene: React.FC = () => {
       <Kicker at={hookFrom - 10}>Exploring, then confirming</Kicker>
 
       {/* ── Headlines ── */}
-      <Headline lead={<Marker at={adviceAt - 4}>Decide what to test before you look.</Marker>} at={hookFrom - 8} out={billsFrom - 6} />
+      <Headline
+        lead={<Marker at={adviceAt - 4}>Decide what to test</Marker>}
+        turn={<Marker at={adviceAt + 4}>before you look.</Marker>}
+        at={hookFrom - 8}
+        turnAt={beforeAt - 4}
+        out={billsFrom - 6}
+      />
       <Ink at={howAt - 4} dur={18} out={billsFrom - 6} style={{ left: 96, top: y(262), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(40, true), color: STAT_INK }}>But how do you know what to test, without looking?</span>
+        <span style={{ ...body(40, true), color: STAT_INK }}>
+          But how do you know what to test, <Marker at={lookingAt - 2}>without looking?</Marker>
+        </span>
       </Ink>
       <Headline lead="Friday tips best." turn="Or does it?" at={fridayAt - 4} turnAt={nineteenAt - 4} out={findingAt - 8} />
       <Headline lead="Not a finding." turn="A lead." at={findingAt - 4} turnAt={leadAt - 4} out={hereAt - 2} />

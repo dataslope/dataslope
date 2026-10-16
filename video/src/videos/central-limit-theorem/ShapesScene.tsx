@@ -3,6 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { Axis, Bars, NormalCurve, type XScale } from "../../editorial/charts";
 import {
   DIE_MEANS_30,
@@ -151,6 +152,12 @@ export const ShapesScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: the dice, the third population, the averages, the curves ── */}
+      <Sfx name="el-pop" at={appear[1] - 4} level={-30} />
+      <Sfx name="el-pop" at={appear[2]} level={-30} />
+      <Sfx name="el-pop" at={averageAt} level={-30} />
+      <Sfx name="el-pencil" at={sameAt - 4} level={-34} />
+
       <FigLabel n="3" title="Three populations, each averaged thirty at a time" at={open} x={120} y={y(LABEL_Y)} />
       {/* The legend for the red curves, at the right end of the label row. */}
       <Note at={sameAt + 12} x={1780} y={y(LABEL_Y) + 2} align="right" from="right">

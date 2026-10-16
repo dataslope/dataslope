@@ -54,6 +54,8 @@ export const MedianScene: React.FC = () => {
   const sawAt = n.word("lumpy", "values you actually saw");
   const middleAt = n.word("range", "middle");
   const meanWordAt = n.word("word", "mean");
+  const eightHundredAt = n.word("range", "eight hundred");
+  const oneHundredAt = n.word("range", "one hundred");
   const rangeFiveAt = n.word("range", "ninety-five");
   const neededEndAt = n.word("range", "needed", { edge: "end" });
   const thirtyAt = n.word("range", "thirty thousand");
@@ -154,7 +156,7 @@ export const MedianScene: React.FC = () => {
         x0={sx(XZ, K(MEDIAN.lo))}
         x1={sx(XZ, K(MEDIAN.hi))}
         y={y(HIST_BASE) - h(HIST_H) - 30}
-        at={thirtyAt}
+        at={thirtySevenAt}
         dur={22}
         color={INK}
         width={4}
@@ -173,8 +175,8 @@ export const MedianScene: React.FC = () => {
         <div style={label(21, INK_SOFT)}>95% interval for the median</div>
       </Ink>
       <div style={{ position: "absolute", left: COL, top: y(748), display: "flex", gap: "0.3em", whiteSpace: "nowrap", ...headline(44) }}>
-        <Slot at={thirtyAt - 2}>{dollars(MEDIAN.lo)}</Slot>
-        <Slot at={thirtySevenAt - 4}>to {dollars(MEDIAN.hi)}</Slot>
+        <Slot at={eightHundredAt - 4}>{dollars(MEDIAN.lo)}</Slot>
+        <Slot at={oneHundredAt - 4}>to {dollars(MEDIAN.hi)}</Slot>
       </div>
       <Ink at={formulaAt - 4} dur={16} style={{ left: COL, top: y(818), whiteSpace: "nowrap" }}>
         <span style={{ ...body(30, true), color: EST_INK }}>No formula needed.</span>

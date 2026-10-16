@@ -51,6 +51,9 @@ export const LimitsScene: React.FC = () => {
   const maximumAt = n.word("edge", "maximum");
   const sayAt = n.word("edge", "say");
   const nextFrom = n.beat("next").from;
+  const precisionFrom = n.beat("precision").from;
+  const whichAt = n.word("next", "which");
+  const particularAt = n.word("next", "particular");
   const zeroEndAt = n.word("next", "zero", { edge: "end" });
   const wobblesAt = n.word("precision", "wobbles");
   const aimedAt = n.word("precision", "aimed");
@@ -179,7 +182,7 @@ export const LimitsScene: React.FC = () => {
 
       {/* ── Precision, not accuracy ── */}
       <div style={{ position: "absolute", left: 160, top: y(744), display: "flex", gap: "0.3em", whiteSpace: "nowrap", ...body(36, true) }}>
-        <Slot at={wobblesAt - 8} style={{ color: INK }}>
+        <Slot at={precisionFrom - 2} style={{ color: INK }}>
           It measures how much an estimate{" "}
           <Marked at={wobblesAt - 2} color={HIGHLIGHT}>
             wobbles
@@ -195,16 +198,20 @@ export const LimitsScene: React.FC = () => {
       {/* ── The bridge ── */}
       <Ink at={nextFrom - 2} dur={18} style={{ left: 160, top: y(818), whiteSpace: "nowrap" }}>
         <span style={{ ...note(26, INK_SOFT) }}>
-          An interval: which values are{" "}
-          <Marked at={plausibleAt - 2} color={HIGHLIGHT}>
-            plausible
-          </Marked>
-          .
+          An interval:{" "}
+          <span style={{ opacity: ease(frame, whichAt - 2, 12) }}>
+            which values are{" "}
+            <Marked at={plausibleAt - 2} color={HIGHLIGHT}>
+              plausible
+            </Marked>
+            .
+          </span>
         </span>
       </Ink>
       <Ink at={oneValueAt - 4} dur={18} style={{ left: 160, top: y(862), whiteSpace: "nowrap" }}>
         <span style={{ ...note(26, INK_SOFT) }}>
-          A test: one value in particular.
+          A test: one value
+          <span style={{ opacity: ease(frame, particularAt - 2, 12) }}> in particular.</span>
           <span style={{ position: "relative", color: EST_INK, fontWeight: 650, opacity: ease(frame, zeroAt - 6, 12) }}>
             {" "}
             Could it be zero?

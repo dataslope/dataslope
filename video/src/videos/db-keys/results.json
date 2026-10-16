@@ -1,0 +1,603 @@
+{
+  "version": "PostgreSQL 18.3 (PGlite 0.5.8) on wasm32-unknown-emscripten, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 3.1.74 (1092ec30a3fb1d46b1782ff1b4db5094d3d06ae5), 32-bit",
+  "figures": {
+    "nokey": {
+      "setup": "CREATE TABLE customers (\n  name TEXT,\n  city TEXT\n);",
+      "steps": [
+        {
+          "sql": "INSERT INTO customers VALUES ('Taylor Kim', 'Portland');",
+          "ok": true,
+          "fields": [],
+          "rows": [],
+          "affectedRows": 1
+        },
+        {
+          "sql": "INSERT INTO customers VALUES ('Taylor Kim', 'Portland');",
+          "ok": true,
+          "fields": [],
+          "rows": [],
+          "affectedRows": 1
+        },
+        {
+          "sql": "SELECT * FROM customers;",
+          "ok": true,
+          "fields": [
+            "name",
+            "city"
+          ],
+          "rows": [
+            {
+              "name": "Taylor Kim",
+              "city": "Portland"
+            },
+            {
+              "name": "Taylor Kim",
+              "city": "Portland"
+            }
+          ],
+          "affectedRows": 0
+        }
+      ]
+    },
+    "taylors": {
+      "setup": "CREATE TABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name        TEXT NOT NULL,\n  city        TEXT NOT NULL\n);\nINSERT INTO customers VALUES\n  (101, 'Taylor Kim', 'Portland'),\n  (102, 'Taylor Kim', 'Portland');",
+      "steps": [
+        {
+          "sql": "SELECT * FROM customers ORDER BY customer_id;",
+          "ok": true,
+          "fields": [
+            "customer_id",
+            "name",
+            "city"
+          ],
+          "rows": [
+            {
+              "customer_id": 101,
+              "name": "Taylor Kim",
+              "city": "Portland"
+            },
+            {
+              "customer_id": 102,
+              "name": "Taylor Kim",
+              "city": "Portland"
+            }
+          ],
+          "affectedRows": 0
+        }
+      ]
+    },
+    "duplicate": {
+      "setup": "CREATE TABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name        TEXT NOT NULL\n);\nINSERT INTO customers (customer_id, name)\nVALUES (1, 'Ada');",
+      "steps": [
+        {
+          "sql": "INSERT INTO customers (customer_id, name)\nVALUES (1, 'Grace');",
+          "ok": false,
+          "error": {
+            "severity": "ERROR",
+            "code": "23505",
+            "message": "duplicate key value violates unique constraint \"customers_pkey\"",
+            "detail": "Key (customer_id)=(1) already exists.",
+            "constraint": "customers_pkey",
+            "table": "customers",
+            "column": null
+          }
+        },
+        {
+          "sql": "INSERT INTO customers (name)\nVALUES ('Grace');",
+          "ok": false,
+          "error": {
+            "severity": "ERROR",
+            "code": "23502",
+            "message": "null value in column \"customer_id\" of relation \"customers\" violates not-null constraint",
+            "detail": "Failing row contains (null, Grace).",
+            "constraint": null,
+            "table": "customers",
+            "column": "customer_id"
+          }
+        },
+        {
+          "sql": "SELECT * FROM customers;",
+          "ok": true,
+          "fields": [
+            "customer_id",
+            "name"
+          ],
+          "rows": [
+            {
+              "customer_id": 1,
+              "name": "Ada"
+            }
+          ],
+          "affectedRows": 0
+        }
+      ]
+    },
+    "composite": {
+      "setup": "CREATE TABLE students (\n  student_id INTEGER PRIMARY KEY,\n  name       TEXT NOT NULL\n);\nCREATE TABLE courses (\n  course_id INTEGER PRIMARY KEY,\n  title     TEXT NOT NULL\n);\nCREATE TABLE enrollments (\n  student_id  INTEGER REFERENCES students,\n  course_id   INTEGER REFERENCES courses,\n  enrolled_on DATE NOT NULL,\n  PRIMARY KEY (student_id, course_id)\n);\nINSERT INTO students VALUES (7, 'Ada'), (8, 'Grace');\nINSERT INTO courses VALUES (42, 'Databases'), (43, 'Statistics');",
+      "steps": [
+        {
+          "sql": "INSERT INTO enrollments VALUES (7, 42, '2026-01-15');",
+          "ok": true,
+          "fields": [],
+          "rows": [],
+          "affectedRows": 1
+        },
+        {
+          "sql": "INSERT INTO enrollments VALUES (7, 43, '2026-01-15');",
+          "ok": true,
+          "fields": [],
+          "rows": [],
+          "affectedRows": 1
+        },
+        {
+          "sql": "INSERT INTO enrollments VALUES (8, 42, '2026-01-15');",
+          "ok": true,
+          "fields": [],
+          "rows": [],
+          "affectedRows": 1
+        },
+        {
+          "sql": "INSERT INTO enrollments VALUES (7, 42, '2026-01-20');",
+          "ok": false,
+          "error": {
+            "severity": "ERROR",
+            "code": "23505",
+            "message": "duplicate key value violates unique constraint \"enrollments_pkey\"",
+            "detail": "Key (student_id, course_id)=(7, 42) already exists.",
+            "constraint": "enrollments_pkey",
+            "table": "enrollments",
+            "column": null
+          }
+        },
+        {
+          "sql": "SELECT student_id, course_id FROM enrollments ORDER BY student_id, course_id;",
+          "ok": true,
+          "fields": [
+            "student_id",
+            "course_id"
+          ],
+          "rows": [
+            {
+              "student_id": 7,
+              "course_id": 42
+            },
+            {
+              "student_id": 7,
+              "course_id": 43
+            },
+            {
+              "student_id": 8,
+              "course_id": 42
+            }
+          ],
+          "affectedRows": 0
+        }
+      ]
+    },
+    "natural": {
+      "setup": "CREATE TABLE users (\n  email TEXT PRIMARY KEY,\n  name  TEXT NOT NULL\n);\nCREATE TABLE orders (\n  order_id   INTEGER PRIMARY KEY,\n  user_email TEXT NOT NULL REFERENCES users\n);\nCREATE TABLE tickets (\n  ticket_id  INTEGER PRIMARY KEY,\n  user_email TEXT NOT NULL REFERENCES users\n);\nINSERT INTO users VALUES ('ada@old.example', 'Ada');\nINSERT INTO orders VALUES (1, 'ada@old.example');\nINSERT INTO tickets VALUES (1, 'ada@old.example');",
+      "steps": [
+        {
+          "sql": "UPDATE users\nSET email = 'ada@new.example'\nWHERE email = 'ada@old.example';",
+          "ok": false,
+          "error": {
+            "severity": "ERROR",
+            "code": "23503",
+            "message": "update or delete on table \"users\" violates foreign key constraint \"orders_user_email_fkey\" on table \"orders\"",
+            "detail": "Key (email)=(ada@old.example) is still referenced from table \"orders\".",
+            "constraint": "orders_user_email_fkey",
+            "table": "orders",
+            "column": null
+          }
+        },
+        {
+          "sql": "SELECT * FROM users;",
+          "ok": true,
+          "fields": [
+            "email",
+            "name"
+          ],
+          "rows": [
+            {
+              "email": "ada@old.example",
+              "name": "Ada"
+            }
+          ],
+          "affectedRows": 0
+        }
+      ]
+    },
+    "surrogate": {
+      "setup": "CREATE TABLE users (\n  user_id INTEGER PRIMARY KEY,\n  email   TEXT NOT NULL UNIQUE,\n  name    TEXT NOT NULL\n);\nCREATE TABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  user_id  INTEGER NOT NULL REFERENCES users\n);\nCREATE TABLE tickets (\n  ticket_id INTEGER PRIMARY KEY,\n  user_id   INTEGER NOT NULL REFERENCES users\n);\nINSERT INTO users VALUES (10, 'ada@old.example', 'Ada');\nINSERT INTO orders VALUES (1, 10);\nINSERT INTO tickets VALUES (1, 10);",
+      "steps": [
+        {
+          "sql": "UPDATE users\nSET email = 'ada@new.example'\nWHERE user_id = 10;",
+          "ok": true,
+          "fields": [],
+          "rows": [],
+          "affectedRows": 1
+        },
+        {
+          "sql": "SELECT * FROM users;",
+          "ok": true,
+          "fields": [
+            "user_id",
+            "email",
+            "name"
+          ],
+          "rows": [
+            {
+              "user_id": 10,
+              "email": "ada@new.example",
+              "name": "Ada"
+            }
+          ],
+          "affectedRows": 0
+        },
+        {
+          "sql": "SELECT * FROM orders;",
+          "ok": true,
+          "fields": [
+            "order_id",
+            "user_id"
+          ],
+          "rows": [
+            {
+              "order_id": 1,
+              "user_id": 10
+            }
+          ],
+          "affectedRows": 0
+        },
+        {
+          "sql": "SELECT * FROM tickets;",
+          "ok": true,
+          "fields": [
+            "ticket_id",
+            "user_id"
+          ],
+          "rows": [
+            {
+              "ticket_id": 1,
+              "user_id": 10
+            }
+          ],
+          "affectedRows": 0
+        }
+      ]
+    },
+    "identity": {
+      "setup": "CREATE TABLE customers (\n  customer_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,\n  email       TEXT NOT NULL UNIQUE,\n  full_name   TEXT NOT NULL\n);",
+      "steps": [
+        {
+          "sql": "INSERT INTO customers (email, full_name) VALUES\n  ('ada@example.com', 'Ada Lovelace'),\n  ('grace@example.com', 'Grace Hopper');",
+          "ok": true,
+          "fields": [],
+          "rows": [],
+          "affectedRows": 2
+        },
+        {
+          "sql": "SELECT * FROM customers ORDER BY customer_id;",
+          "ok": true,
+          "fields": [
+            "customer_id",
+            "email",
+            "full_name"
+          ],
+          "rows": [
+            {
+              "customer_id": 1,
+              "email": "ada@example.com",
+              "full_name": "Ada Lovelace"
+            },
+            {
+              "customer_id": 2,
+              "email": "grace@example.com",
+              "full_name": "Grace Hopper"
+            }
+          ],
+          "affectedRows": 0
+        },
+        {
+          "sql": "INSERT INTO customers (email, full_name) VALUES\n  ('ada@example.com', 'Ada King');",
+          "ok": false,
+          "error": {
+            "severity": "ERROR",
+            "code": "23505",
+            "message": "duplicate key value violates unique constraint \"customers_email_key\"",
+            "detail": "Key (email)=(ada@example.com) already exists.",
+            "constraint": "customers_email_key",
+            "table": "customers",
+            "column": null
+          }
+        },
+        {
+          "sql": "SELECT * FROM customers ORDER BY customer_id;",
+          "ok": true,
+          "fields": [
+            "customer_id",
+            "email",
+            "full_name"
+          ],
+          "rows": [
+            {
+              "customer_id": 1,
+              "email": "ada@example.com",
+              "full_name": "Ada Lovelace"
+            },
+            {
+              "customer_id": 2,
+              "email": "grace@example.com",
+              "full_name": "Grace Hopper"
+            }
+          ],
+          "affectedRows": 0
+        }
+      ]
+    },
+    "orphan": {
+      "setup": "CREATE TABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name        TEXT NOT NULL\n);\nCREATE TABLE orders (\n  order_id    INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL REFERENCES customers(customer_id),\n  total       NUMERIC NOT NULL\n);\nINSERT INTO customers (customer_id, name)\nVALUES (1, 'Ada'), (2, 'Grace');",
+      "steps": [
+        {
+          "sql": "SELECT * FROM customers ORDER BY customer_id;",
+          "ok": true,
+          "fields": [
+            "customer_id",
+            "name"
+          ],
+          "rows": [
+            {
+              "customer_id": 1,
+              "name": "Ada"
+            },
+            {
+              "customer_id": 2,
+              "name": "Grace"
+            }
+          ],
+          "affectedRows": 0
+        },
+        {
+          "sql": "INSERT INTO orders (order_id, customer_id, total)\nVALUES (101, 1, 25.00);",
+          "ok": true,
+          "fields": [],
+          "rows": [],
+          "affectedRows": 1
+        },
+        {
+          "sql": "INSERT INTO orders (order_id, customer_id, total)\nVALUES (102, 99, 18.00);",
+          "ok": false,
+          "error": {
+            "severity": "ERROR",
+            "code": "23503",
+            "message": "insert or update on table \"orders\" violates foreign key constraint \"orders_customer_id_fkey\"",
+            "detail": "Key (customer_id)=(99) is not present in table \"customers\".",
+            "constraint": "orders_customer_id_fkey",
+            "table": "orders",
+            "column": null
+          }
+        },
+        {
+          "sql": "SELECT * FROM orders;",
+          "ok": true,
+          "fields": [
+            "order_id",
+            "customer_id",
+            "total"
+          ],
+          "rows": [
+            {
+              "order_id": 101,
+              "customer_id": 1,
+              "total": "25.00"
+            }
+          ],
+          "affectedRows": 0
+        }
+      ]
+    },
+    "restrict": {
+      "setup": "CREATE TABLE accounts (\n  account_id INTEGER PRIMARY KEY,\n  name       TEXT NOT NULL\n);\nCREATE TABLE invoices (\n  invoice_id INTEGER PRIMARY KEY,\n  account_id INTEGER NOT NULL REFERENCES accounts(account_id) ON DELETE RESTRICT,\n  total      NUMERIC NOT NULL\n);\nINSERT INTO accounts VALUES (1, 'Ada Co');\nINSERT INTO invoices VALUES (100, 1, 250.00);",
+      "steps": [
+        {
+          "sql": "DELETE FROM accounts WHERE account_id = 1;",
+          "ok": false,
+          "error": {
+            "severity": "ERROR",
+            "code": "23001",
+            "message": "update or delete on table \"accounts\" violates RESTRICT setting of foreign key constraint \"invoices_account_id_fkey\" on table \"invoices\"",
+            "detail": "Key (account_id)=(1) is referenced from table \"invoices\".",
+            "constraint": "invoices_account_id_fkey",
+            "table": "invoices",
+            "column": null
+          }
+        },
+        {
+          "sql": "SELECT * FROM accounts;",
+          "ok": true,
+          "fields": [
+            "account_id",
+            "name"
+          ],
+          "rows": [
+            {
+              "account_id": 1,
+              "name": "Ada Co"
+            }
+          ],
+          "affectedRows": 0
+        },
+        {
+          "sql": "SELECT * FROM invoices;",
+          "ok": true,
+          "fields": [
+            "invoice_id",
+            "account_id",
+            "total"
+          ],
+          "rows": [
+            {
+              "invoice_id": 100,
+              "account_id": 1,
+              "total": "250.00"
+            }
+          ],
+          "affectedRows": 0
+        }
+      ]
+    },
+    "drafts": {
+      "setup": "CREATE TABLE drafts (\n  draft_id INTEGER PRIMARY KEY,\n  title    TEXT NOT NULL\n);\nCREATE TABLE draft_comments (\n  comment_id INTEGER PRIMARY KEY,\n  draft_id   INTEGER NOT NULL REFERENCES drafts(draft_id) ON DELETE CASCADE,\n  body       TEXT NOT NULL\n);\nINSERT INTO drafts VALUES (1, 'Temporary plan');\nINSERT INTO draft_comments VALUES (10, 1, 'Needs revision');",
+      "steps": [
+        {
+          "sql": "DELETE FROM drafts WHERE draft_id = 1;",
+          "ok": true,
+          "fields": [],
+          "rows": [],
+          "affectedRows": 1
+        },
+        {
+          "sql": "SELECT * FROM draft_comments;",
+          "ok": true,
+          "fields": [
+            "comment_id",
+            "draft_id",
+            "body"
+          ],
+          "rows": [],
+          "affectedRows": 0
+        }
+      ]
+    },
+    "cascade": {
+      "setup": "CREATE TABLE posts (\n  id    INTEGER PRIMARY KEY,\n  title TEXT NOT NULL\n);\nCREATE TABLE comments (\n  id      INTEGER PRIMARY KEY,\n  post_id INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,\n  body    TEXT NOT NULL\n);\nINSERT INTO posts VALUES\n  (1, 'Spam post'),\n  (2, 'Keep this post');\nINSERT INTO comments VALUES\n  (10, 1, 'Spam comment one'),\n  (11, 1, 'Spam comment two'),\n  (12, 2, 'A real comment');",
+      "steps": [
+        {
+          "sql": "SELECT id, post_id FROM comments ORDER BY id;",
+          "ok": true,
+          "fields": [
+            "id",
+            "post_id"
+          ],
+          "rows": [
+            {
+              "id": 10,
+              "post_id": 1
+            },
+            {
+              "id": 11,
+              "post_id": 1
+            },
+            {
+              "id": 12,
+              "post_id": 2
+            }
+          ],
+          "affectedRows": 0
+        },
+        {
+          "sql": "DELETE FROM posts WHERE id = 1;",
+          "ok": true,
+          "fields": [],
+          "rows": [],
+          "affectedRows": 1
+        },
+        {
+          "sql": "SELECT * FROM posts ORDER BY id;",
+          "ok": true,
+          "fields": [
+            "id",
+            "title"
+          ],
+          "rows": [
+            {
+              "id": 2,
+              "title": "Keep this post"
+            }
+          ],
+          "affectedRows": 0
+        },
+        {
+          "sql": "SELECT id, post_id FROM comments ORDER BY id;",
+          "ok": true,
+          "fields": [
+            "id",
+            "post_id"
+          ],
+          "rows": [
+            {
+              "id": 12,
+              "post_id": 2
+            }
+          ],
+          "affectedRows": 0
+        }
+      ]
+    },
+    "setnull": {
+      "setup": "CREATE TABLE employees (\n  employee_id INTEGER PRIMARY KEY,\n  name        TEXT NOT NULL\n);\nCREATE TABLE tickets (\n  ticket_id            INTEGER PRIMARY KEY,\n  status               TEXT NOT NULL,\n  assigned_employee_id INTEGER REFERENCES employees ON DELETE SET NULL\n);\nINSERT INTO employees VALUES (3, 'Sam');\nINSERT INTO tickets VALUES (500, 'open', 3);",
+      "steps": [
+        {
+          "sql": "DELETE FROM employees WHERE employee_id = 3;",
+          "ok": true,
+          "fields": [],
+          "rows": [],
+          "affectedRows": 1
+        },
+        {
+          "sql": "SELECT * FROM tickets;",
+          "ok": true,
+          "fields": [
+            "ticket_id",
+            "status",
+            "assigned_employee_id"
+          ],
+          "rows": [
+            {
+              "ticket_id": 500,
+              "status": "open",
+              "assigned_employee_id": null
+            }
+          ],
+          "affectedRows": 0
+        }
+      ]
+    },
+    "setnullNotNull": {
+      "setup": "CREATE TABLE employees (\n  employee_id INTEGER PRIMARY KEY,\n  name        TEXT NOT NULL\n);\nCREATE TABLE tickets (\n  ticket_id            INTEGER PRIMARY KEY,\n  status               TEXT NOT NULL,\n  assigned_employee_id INTEGER NOT NULL REFERENCES employees ON DELETE SET NULL\n);\nINSERT INTO employees VALUES (3, 'Sam');\nINSERT INTO tickets VALUES (500, 'open', 3);",
+      "steps": [
+        {
+          "sql": "DELETE FROM employees WHERE employee_id = 3;",
+          "ok": false,
+          "error": {
+            "severity": "ERROR",
+            "code": "23502",
+            "message": "null value in column \"assigned_employee_id\" of relation \"tickets\" violates not-null constraint",
+            "detail": "Failing row contains (500, open, null).",
+            "constraint": null,
+            "table": "tickets",
+            "column": "assigned_employee_id"
+          }
+        }
+      ]
+    },
+    "noaction": {
+      "setup": "CREATE TABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name        TEXT NOT NULL\n);\nCREATE TABLE orders (\n  order_id    INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL REFERENCES customers(customer_id),\n  total       NUMERIC NOT NULL\n);\nINSERT INTO customers VALUES (1, 'Ada');\nINSERT INTO orders VALUES (101, 1, 25.00);",
+      "steps": [
+        {
+          "sql": "DELETE FROM customers WHERE customer_id = 1;",
+          "ok": false,
+          "error": {
+            "severity": "ERROR",
+            "code": "23503",
+            "message": "update or delete on table \"customers\" violates foreign key constraint \"orders_customer_id_fkey\" on table \"orders\"",
+            "detail": "Key (customer_id)=(1) is still referenced from table \"orders\".",
+            "constraint": "orders_customer_id_fkey",
+            "table": "orders",
+            "column": null
+          }
+        }
+      ]
+    }
+  }
+}

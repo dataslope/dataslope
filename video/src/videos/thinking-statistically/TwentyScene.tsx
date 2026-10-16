@@ -8,7 +8,7 @@ import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { jitter, KNOWN, ROWS } from "./data";
-import { DOT, lerp, Mu, STAT, STAT_INK, Svg, TruthLine, XBar } from "./parts";
+import { Bracket, DOT, lerp, Mu, pulse, STAT, STAT_INK, Svg, TruthLine, XBar } from "./parts";
 
 /** The rows: every value of every sample, 50 to 150. */
 const X: XScale = { lo: 50, hi: 150, x0: 160, x1: 1240 };
@@ -19,8 +19,18 @@ const PITCH = 23.5;
 const BASE = 852;
 const BLOCK = 64;
 const TICK = 10;
+const ROW_JIT = 6;
+const ROW_R = 3.4;
+const ROW_OP = 0.75;
 
 const JITTERS = ROWS.map((_, i) => jitter(200 + i, KNOWN.n));
+
+/**
+ * Row 1 of Fig. 5 is Fig. 4's sample, and ParameterScene carries that sample
+ * here before the cut: its dots, its average, the axis and mu all end where
+ * this scene draws them, so the cross-fade has nothing to move.
+ */
+export const ROW_ONE = { X, ROW0, BASE, TICK, JIT: JITTERS[0], ROW_JIT, ROW_R, ROW_OP };
 
 /** The order the averages fly into the panel: row 1, the sample of the
  *  figure before, goes last, so it lands on top of its stack. */
@@ -65,10 +75,25 @@ export const TwentyScene: React.FC = () => {
   const thinkAt = n.word("points", "think");
   const drawAt = n.word("points", "single draw");
   const spreadEndAt = n.word("points", "that spread", { edge: "end" });
+  const varStatAt = n.word("variable", "statistic");
+  const centerAt = n.word("variable", "center");
+  const notPointsAt = n.word("points", "not points");
+  const oneAvgAt = n.word("points", "Any one average");
+  const summarizeAt = n.word("kind", "summarize");
+  const kindAt = n.word("kind", "KIND");
+  const wrongAt = n.word("flavors-in", "goes wrong");
 
   const rowY = (i: number) => y(ROW0) + h(i * PITCH);
-  // Row 1 is the sample of the figure before; the others arrive one by one.
-  const rowAt = (i: number) => (i === 0 ? twentyFrom - 6 : lerp(moreAt - 4, answersAt - 10, (i - 1) / (ROWS.length - 2)));
+  // Row 1 is the sample of the figure before, already in place when the
+  // scene cuts in; the others arrive one by one.
+  const rowAt = (i: number) => (i === 0 ? twentyFrom - 40 : lerp(moreAt - 4, answersAt - 10, (i - 1) / (ROWS.length - 2)));
+  // "not points": every average steps back; "Any one average": row 1 comes
+  // forward again, dots and all. "summarize": the summaries go, leaving the
+  // raw values; "goes wrong": the rest.
+  const pointsDim = ease(frame, notPointsAt - 2, 16) * 0.65;
+  const oneLit = ease(frame, oneAvgAt - 2, 12);
+  const summaries = 1 - ease(frame, summarizeAt - 2, 18);
+  const figureOp = 1 - ease(frame, wrongAt, 24);
   const muBold = ease(frame, parameterAt - 2, 10);
   const zig = ease(frame, statisticAt - 4, 22);
   const panel = ease(frame, variableAt - 16, 14);
@@ -111,17 +136,28 @@ export const TwentyScene: React.FC = () => {
         </Ink>
       </div>
       <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
-        <Ink at={thinkAt - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
+        <Ink at={thinkAt - 4} dur={20} out={kindAt - 10} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Think in distributions,
         </Ink>
-        <Ink at={thinkAt + 14} dur={18} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+        <Ink
+          at={thinkAt + 14}
+          dur={18}
+          out={kindAt - 10}
+          style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}
+        >
           not points.
         </Ink>
       </div>
+      {/* The turn to Part 3: what kind of number a sample holds. */}
+      <Ink at={kindAt - 4} dur={20} style={{ left: 92, top: y(150), ...headline(80), whiteSpace: "nowrap" }}>
+        But what kind of number is it?
+      </Ink>
+
+      <AbsoluteFill style={{ opacity: figureOp }}>
 
       <FigLabel n="5" title={`Twenty samples of ${KNOWN.n} from the same population`} at={twentyFrom - 4} x={160} y={y(270)} />
-      <Axis scale={X} base={y(BASE)} ticks={[50, 75, 100, 125, 150]} at={twentyFrom - 4} />
-      <TruthLine x={muX} bottom={y(BASE)} top={y(ROW0 - 16)} at={twentyFrom - 2} width={lerp(2, 3.2, muBold)} />
+      <Axis scale={X} base={y(BASE)} ticks={[50, 75, 100, 125, 150]} at={twentyFrom - 40} />
+      <TruthLine x={muX} bottom={y(BASE)} top={y(ROW0 - 16)} at={twentyFrom - 40} width={lerp(2, 3.2, muBold)} />
       <Note at={twentyFrom} x={muX + 12} y={y(ROW0 - 50)}>
         <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
           <Mu /> = {KNOWN.mu}
@@ -133,6 +169,9 @@ export const TwentyScene: React.FC = () => {
       <Svg>
         {ROWS.map((r, i) => {
           const at = rowAt(i);
+          // Row 1, "any one average", stands out from the rest.
+          const op = i === 0 ? lerp(ROW_OP, 1, oneLit) : lerp(ROW_OP, 0.42, oneLit);
+          const rr = i === 0 ? lerp(ROW_R, 4.3, oneLit) : ROW_R;
           return (
             <g key={i}>
               {r.values.map((v, j) => {
@@ -142,10 +181,10 @@ export const TwentyScene: React.FC = () => {
                   <circle
                     key={j}
                     cx={sx(X, v)}
-                    cy={rowY(i) + h((JITTERS[i][j] - 0.5) * 2 * 6)}
-                    r={3.4 * a}
+                    cy={rowY(i) + h((JITTERS[i][j] - 0.5) * 2 * ROW_JIT)}
+                    r={rr * a}
                     fill={DOT}
-                    opacity={0.75}
+                    opacity={op}
                   />
                 );
               })}
@@ -159,39 +198,50 @@ export const TwentyScene: React.FC = () => {
             stroke={STAT}
             strokeWidth={2}
             strokeLinejoin="round"
-            opacity={0.85}
+            opacity={0.85 * (1 - pointsDim) * summaries}
           />
         ) : null}
         {ROWS.map((r, i) => {
           const a = ease(frame, rowAt(i) + 6, 8);
           if (a <= 0) return null;
           const x = sx(X, r.mean);
+          // "That makes a statistic…": every average swells in turn.
+          const named = pulse(frame, varStatAt - 2 + i * 0.7, 16);
+          const lit = i === 0 ? oneLit : 0;
           return (
             <line
               key={i}
               x1={x}
               x2={x}
-              y1={rowY(i) - h(TICK) * a}
-              y2={rowY(i) + h(TICK) * a}
+              y1={rowY(i) - h(TICK) * a * (1 + lit * 0.3)}
+              y2={rowY(i) + h(TICK) * a * (1 + lit * 0.3)}
               stroke={STAT}
-              strokeWidth={4}
+              strokeWidth={4 + named * 3 + lit * 2}
               strokeLinecap="round"
+              opacity={(1 - pointsDim * (1 - lit)) * summaries}
             />
           );
         })}
       </Svg>
-      <Note at={statisticAt} x={muX - 14} y={y(ROW0 - 50)} align="right">
+      <Note at={statisticAt} x={muX - 14} y={y(ROW0 - 50)} align="right" out={summarizeAt - 2}>
         <span style={{ ...note(23, STAT_INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
           <XBar />: different every time
         </span>
       </Note>
 
       {/* ── The averages, gathered: a distribution of their own ── */}
+      <AbsoluteFill style={{ opacity: summaries }}>
       <Ink at={variableAt - 16} dur={14} style={{ left: X2.x0, top: y(270), whiteSpace: "nowrap" }}>
         <span style={{ ...label(24, INK), fontWeight: 560 }}>Where the twenty averages land</span>
       </Ink>
       <Axis scale={X2} base={y(BASE)} ticks={[94, 96, 98, 100, 102, 104]} at={variableAt - 16} opacity={panel} />
-      <TruthLine x={sx(X2, KNOWN.mu)} bottom={y(BASE)} top={y(BASE - TALLEST * BLOCK - 20)} at={variableAt - 12} />
+      <TruthLine
+        x={sx(X2, KNOWN.mu)}
+        bottom={y(BASE)}
+        top={y(BASE - TALLEST * BLOCK - 20)}
+        at={variableAt - 12}
+        width={2 + pulse(frame, centerAt - 2, 22) * 2}
+      />
       <Svg>
         {ROWS.map((r, i) => {
           const s = SLOTS[i];
@@ -219,6 +269,7 @@ export const TwentyScene: React.FC = () => {
           );
         })}
       </Svg>
+      <Bracket x0={sx(X2, LO)} x1={sx(X2, HI)} y={y(BASE) + 50} at={spreadAt - 2} up color={STAT} tick={10} width={2.4} />
       <Note at={spreadAt} x={X2.x0} y={y(322)}>
         <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
           from {fmt(LO)} to {fmt(HI)}
@@ -237,6 +288,8 @@ export const TwentyScene: React.FC = () => {
           one draw
         </span>
       </Note>
+      </AbsoluteFill>
+      </AbsoluteFill>
     </AbsoluteFill>
   );
 };

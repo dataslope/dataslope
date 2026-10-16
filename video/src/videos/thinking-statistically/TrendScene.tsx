@@ -7,7 +7,7 @@ import { BAR, body, fmt, halo, headline, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, lab
 import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { TREND } from "./data";
+import { jitter, TREND } from "./data";
 import { Arrow, Bracket, lerp, Mark, pulse, Spot, STAT, STAT_INK, Strike, Svg } from "./parts";
 
 const X: XScale = { lo: 1, hi: 24, x0: 230, x1: 1690 };
@@ -18,6 +18,8 @@ const PER = 8;
 const TOP_VALUE = 130;
 const Y_TICKS = [80, 100, 120];
 const R = 6;
+/** A fixed random delay per month, for "plus random noise". */
+const SHUFFLE = jitter(30, 24);
 
 /**
  * Part 1, second scene: two years of a metric that is pure noise around a
@@ -101,8 +103,10 @@ export const TrendScene: React.FC = () => {
   const sticksQuiet = ease(frame, findAt - 2, 16) * 0.65;
   // Each month swells in turn: the last six as they are named, then every
   // month on "every dataset" and on "the numbers you get".
+  // On "plus random noise" they swell in a random order instead.
   const swell = (i: number) =>
     (i >= first && i <= last ? pulse(frame, lastAt - 2 + (i - first) * 3, 16) * 0.5 : 0) +
+    pulse(frame, plusNoiseAt - 2 + SHUFFLE[i] * 22, 12) * 0.5 +
     pulse(frame, datasetAt + i * 1.2, 14) * 0.5 +
     pulse(frame, numbersAt + i * 1.2, 14) * 0.5;
   // "A slice... of something much bigger": the frame pulls back, and the
@@ -185,9 +189,15 @@ export const TrendScene: React.FC = () => {
       {flat > 0 ? (
         <Svg>
           <defs>
-            {(["l", "r"] as const).map((side) => (
-              <linearGradient key={side} id={`ts-run-${side}`} x1={side === "l" ? "1" : "0"} x2={side === "l" ? "0" : "1"} y1="0" y2="0">
-                <stop offset="0" style={{ stopColor: INK, stopOpacity: 0.9 }} />
+            {/* In page units: a horizontal line's own box has no height to scale a gradient by. */}
+            {(
+              [
+                ["l", X.x0 - 10, X.x0 - 340],
+                ["r", X.x1 + 10, X.x1 + 340],
+              ] as const
+            ).map(([side, from, to]) => (
+              <linearGradient key={side} id={`ts-run-${side}`} gradientUnits="userSpaceOnUse" x1={from} x2={to} y1={0} y2={0}>
+                <stop offset="0" style={{ stopColor: INK, stopOpacity: 1 }} />
                 <stop offset="1" style={{ stopColor: INK, stopOpacity: 0 }} />
               </linearGradient>
             ))}
@@ -203,8 +213,24 @@ export const TrendScene: React.FC = () => {
           />
           {runOn > 0 ? (
             <>
-              <rect x={X.x0 - 10 - 330 * runOn} y={py(TREND.level) - 1.6} width={330 * runOn} height={3.2} fill="url(#ts-run-l)" />
-              <rect x={X.x1 + 10} y={py(TREND.level) - 1.6} width={330 * runOn} height={3.2} fill="url(#ts-run-r)" />
+              <line
+                x1={X.x0 - 10}
+                x2={X.x0 - 10 - 330 * runOn}
+                y1={py(TREND.level)}
+                y2={py(TREND.level)}
+                stroke="url(#ts-run-l)"
+                strokeWidth={lerp(2.2, 3.4, Math.min(1, signalBold))}
+                strokeDasharray="10 7"
+              />
+              <line
+                x1={X.x1 + 10}
+                x2={X.x1 + 10 + 330 * runOn}
+                y1={py(TREND.level)}
+                y2={py(TREND.level)}
+                stroke="url(#ts-run-r)"
+                strokeWidth={lerp(2.2, 3.4, Math.min(1, signalBold))}
+                strokeDasharray="10 7"
+              />
             </>
           ) : null}
         </Svg>
@@ -287,7 +313,6 @@ export const TrendScene: React.FC = () => {
           <Mark at={flatHundredAt - 2} out={wobblesAt}>
             the process: a flat {TREND.level}
           </Mark>
-          <span style={{ opacity: ease(frame, plusNoiseAt - 2, 10) }}>, plus noise</span>
         </span>
       </Note>
       <Note at={noiseAt} x={pts[TREND.months.indexOf(10)][0] + 18} y={pts[TREND.months.indexOf(10)][1] - 12}>

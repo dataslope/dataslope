@@ -41,9 +41,13 @@ export const ChiScene: React.FC = () => {
   const desktopAt = n.word("observed", "Desktop");
   const shareAt = n.word("observed", "share");
   const addsAt = n.word("related", "adds up");
-  const gapsAt = n.word("related", "gaps");
+  const straysAt = n.word("related", "strays");
   const twelveAt = n.word("related", "twelve");
   const pAt = n.word("related", "point zero zero three");
+  const numbersAt = n.word("chi", "numbers");
+  const churnedAt = n.word("expected", "churned");
+  const expectedAt = n.word("related", "expected");
+  const corrFrom = n.beat("corr-in").from;
   const togetherAt = n.word("corr-in", "together");
 
   const rowY = (i: number) => y(ROW_Y0 + i * ROW_DY);
@@ -58,7 +62,9 @@ export const ChiScene: React.FC = () => {
   const expIn = (k: number) => ease(frame, noDiffAt - 2 + k * 3, 12);
   const mobileGlow = pulse(frame, eightyAt - 2, 26);
   const total = ease(frame, twelveAt - 8, 20);
-  const dim = 1 - 0.5 * ease(frame, togetherAt - 12, 16);
+  const dim = 1 - 0.25 * ease(frame, corrFrom - 4, 14) - 0.3 * ease(frame, togetherAt - 4, 14);
+  const churnGlow = pulse(frame, churnedAt - 2, 24);
+  const expGlow = pulse(frame, expectedAt - 2, 24);
 
   return (
     <AbsoluteFill>
@@ -79,7 +85,18 @@ export const ChiScene: React.FC = () => {
           </Label>
         </Ink>
         {(["stayed", "churned"] as Col[]).map((c) => (
-          <div key={c} style={{ position: "absolute", left: COL_X[c], top: y(372), opacity: ease(frame, deviceAt - 2, 12), ...label(24, INK_SOFT) }}>
+          <div
+            key={c}
+            style={{
+              position: "absolute",
+              left: COL_X[c],
+              top: y(372),
+              opacity: ease(frame, numbersAt - 2, 12),
+              ...label(24, c === "churned" && churnGlow > 0.1 ? STAT_INK : INK_SOFT),
+              transform: c === "churned" ? `scale(${1 + 0.1 * churnGlow})` : undefined,
+              transformOrigin: "0 50%",
+            }}
+          >
             {c === "stayed" ? "Stayed" : "Churned"}
           </div>
         ))}
@@ -115,7 +132,7 @@ export const ChiScene: React.FC = () => {
           const isMobile = row === "mobile" && col === "churned";
           const glow = isMobile ? mobileGlow : 0;
           const gap = obs - exp;
-          const showGap = ease(frame, row === "mobile" && col === "churned" ? hundredAt + 8 : row === "desktop" && col === "churned" ? shareAt - 4 : gapsAt - 4 + k * 2, 12);
+          const showGap = ease(frame, row === "mobile" && col === "churned" ? hundredAt + 8 : row === "desktop" && col === "churned" ? shareAt - 4 : straysAt - 4 + k * 2, 12);
           return (
             <React.Fragment key={`${row}-${col}`}>
               <Svg>
@@ -131,7 +148,7 @@ export const ChiScene: React.FC = () => {
                   />
                 ) : null}
                 {e > 0 ? (
-                  <line x1={x0 + exp * PER} x2={x0 + exp * PER} y1={top - 12 - 4 * glow} y2={top + barH + 12 + 4 * glow} stroke={INK} strokeWidth={3 + 2 * glow} opacity={e} />
+                  <line x1={x0 + exp * PER} x2={x0 + exp * PER} y1={top - 12 - 4 * (glow + expGlow)} y2={top + barH + 12 + 4 * (glow + expGlow)} stroke={INK} strokeWidth={3 + 2 * (glow + expGlow)} opacity={e} />
                 ) : null}
               </Svg>
               <div

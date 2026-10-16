@@ -6,6 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { body, fmt, halo, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { ds } from "../../theme/brand";
 import { Sfx } from "../../sound/Sfx";
 import { DIFFERENCE } from "./data";
 import { Bracket, EST, EST_INK, Headline, IntervalBar, Marked, pulse, Rule, Svg } from "./parts";
@@ -94,6 +95,19 @@ export const TestScene: React.FC = () => {
           <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, viewsAt + 8, 12) }}>. The test asks: is it inside?</span>
         </span>
       </Note>
+
+      {/* Zero, and eight, lit where the second interval holds them. */}
+      <Svg>
+        <rect x={zeroX - 16} y={y(330)} width={32} height={y(AXIS) - y(330)} fill={ds("red", 100)} opacity={ease(frame, includesAt - 4, 12) * (1 - 0.6 * ease(frame, eightAgainAt, 12))} />
+        <rect
+          x={sx(X, straddle.hi) - 16}
+          y={y(ROW2) - 60}
+          width={32}
+          height={120}
+          fill={ds("red", 100)}
+          opacity={ease(frame, eightAgainAt - 4, 12)}
+        />
+      </Svg>
 
       {/* ── Row 1: one that leaves out zero ── */}
       <IntervalBar

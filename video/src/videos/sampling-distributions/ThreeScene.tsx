@@ -3,6 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { Axis, Bars, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
@@ -187,6 +188,18 @@ export const ThreeScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: the population, the basket, the forty customers, the first
+          averages landing by hand, the thousands, the shared axis ── */}
+      <Sfx name="el-pop" at={popFrom - 6} level={-30} />
+      <Sfx name="el-pop" at={millionAt - 6} level={-30} />
+      <Sfx name="el-sprinkle" at={pickAt} level={-34} />
+      <Sfx name="el-tap" at={blockAt + DROP} level={-28} />
+      {steps.map((st, i) => (
+        <Sfx key={i} name="el-tap" at={st.d + DROP} level={-29} />
+      ))}
+      <Sfx name="el-sprinkle" at={fastFrom} level={-33} />
+      <Sfx name="el-pencil" at={oneAxisAt - 4} level={-34} />
+
       {/* ══ Phase 1: the population, at full size ══ */}
       <Ink at={popFrom - 12} dur={14} out={p1Out} style={{ left: 96, top: y(112) }}>
         <span style={label(22, INK_SOFT)}>The first distribution</span>

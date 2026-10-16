@@ -7,7 +7,7 @@ import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { COIN, num } from "./data";
-import { Bracket, Coin, Count, DATA, Headline, Kicker, lerp, Spot, STAT, STAT_INK, Strike, Svg, Sweep } from "./parts";
+import { Arrow, Bracket, Coin, Count, DATA, Headline, Kicker, lerp, Spot, STAT, STAT_INK, Strike, Svg, Sweep } from "./parts";
 
 /** The two little panels of the bridge: data you have, data you haven't. */
 const SHAPE = [0.18, 0.42, 0.74, 1, 0.86, 0.62, 0.4, 0.22, 0.1];
@@ -34,6 +34,8 @@ export const OpenScene: React.FC = () => {
   const seenAt = n.word("hook", "haven't seen");
   const needAt = n.word("hook", "probability");
   const meansAt = n.word("hook", "even means");
+  const reasonAt = n.word("hook", "reason");
+  const startingAt = n.word("hook", "starting");
   const halfFrom = n.beat("half").from;
   const coinAt = n.word("half", "coin");
   const oneHalfAt = n.word("half", "one half");
@@ -41,6 +43,7 @@ export const OpenScene: React.FC = () => {
   const tailsAt = n.word("half", "tails");
   const noHalfAt = n.word("half", "no half");
   const longRunAt = n.word("longrun", "long run");
+  const frequentistAt = n.word("longrun", "frequentist");
   const fractionAt = n.word("longrun", "fraction");
   const repeatAt = n.word("longrun", "repeat");
   const overAt = n.word("longrun", "over and over");
@@ -57,7 +60,10 @@ export const OpenScene: React.FC = () => {
   const panelsOut = ease(frame, halfFrom - 8, 14);
   const stripAt = (i: number) => lerp(repeatAt - 4, codeAt + 6, i / (STRIP.count - 1));
   const streakLit = ease(frame, sevenAt - 2, 10);
-  const defDim = ease(frame, hundredAt - 4, 14);
+  // The one-flip row sets back once the frequentist answer arrives.
+  const defDim = ease(frame, frequentistAt - 2, 14);
+  // The bridge's panels set back as the question takes over.
+  const panelsBack = ease(frame, startingAt - 4, 14);
 
   return (
     <AbsoluteFill>
@@ -78,7 +84,7 @@ export const OpenScene: React.FC = () => {
         top={y(150)}
         first="What does a probability"
         second="even mean?"
-        firstAt={needAt + 2}
+        firstAt={startingAt - 2}
         secondAt={meansAt - 4}
         out={llnInFrom - 6}
       />
@@ -94,9 +100,9 @@ export const OpenScene: React.FC = () => {
             <Ink at={seen ? haveAt - 4 : seenAt - 2} dur={14} out={halfFrom - 8} style={{ left: x0, top: y(300), whiteSpace: "nowrap" }}>
               <span style={label(24, seen ? INK : INK_SOFT)}>{seen ? "The data you have" : "Data you haven't seen"}</span>
             </Ink>
-            <Svg opacity={1 - panelsOut}>
+            <Svg opacity={(1 - panelsOut) * (1 - panelsBack * 0.45)}>
               {SHAPE.map((s, i) => {
-                const g = ease(frame, at + i * 1.5, 14);
+                const g = ease(frame, at + i * 4, 14);
                 if (g <= 0) return null;
                 const bh = h(PANEL.tall * s) * g;
                 return seen ? (
@@ -150,6 +156,8 @@ export const OpenScene: React.FC = () => {
           </React.Fragment>
         );
       })}
+      {/* From what you have to what you haven't seen. */}
+      <Arrow from={[PANEL.x[0] + PANEL.w + 30, y(PANEL.base - PANEL.tall * 0.5)]} to={[PANEL.x[1] - 40, y(PANEL.base - PANEL.tall * 0.5)]} at={reasonAt - 4} dur={14} out={halfFrom - 8} color={INK_SOFT} width={3} />
       <Note at={needAt - 2} x={PANEL.x[1]} y={y(PANEL.base + 24)} out={halfFrom - 8}>
         <span style={{ ...body(30, true), color: INK, whiteSpace: "nowrap" }}>Reasoning about it takes probability.</span>
       </Note>

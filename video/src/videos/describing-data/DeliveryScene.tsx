@@ -7,7 +7,7 @@ import { fmt, headline, INK, INK_SOFT, label, note, PAPER } from "../../editoria
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { DELIVERY, swarm } from "./data";
+import { DELIVERY, stack } from "./data";
 import { Bracket, DATA, Drift, Kicker, Mark, Pulse, Spot, STAT, STAT_INK, Svg, Tag, counted } from "./parts";
 
 const X: XScale = { lo: 0, hi: 60, x0: 330, x1: 1700 };
@@ -57,13 +57,13 @@ export const DeliveryScene: React.FC = () => {
   const onePointAt = n.word("variance", "one point two");
   const eighteenAt = n.word("erratic", "eighteen");
 
-  const steadyRows = swarm(DELIVERY.steady, 1.2);
-  const erraticRows = swarm(DELIVERY.erratic, 1.2);
+  const steadyRows = stack(DELIVERY.steady);
+  const erraticRows = stack(DELIVERY.erratic);
   const meanX = sx(X, DELIVERY.mean);
 
   const dot = (v: number, row: number, base: number, a: number, key: number, color = DATA) =>
     a > 0 ? (
-      <circle key={key} cx={sx(X, v)} cy={y(base) + row * 2 * (R + 1)} r={R * a} fill={color} stroke={PAPER} strokeWidth={1.6} />
+      <circle key={key} cx={sx(X, v)} cy={y(base) - row * 2 * (R + 1)} r={R * a} fill={color} stroke={PAPER} strokeWidth={1.6} />
     ) : null;
 
   // The working: each distance arrives with its stick, then turns into its square.
@@ -114,9 +114,9 @@ export const DeliveryScene: React.FC = () => {
           <Svg opacity={steadyBand * 0.9}>
             <rect
               x={sx(X, DELIVERY.mean - DELIVERY.steadySd)}
-              y={y(STEADY) - 30}
+              y={y(STEADY) - 80}
               width={sx(X, DELIVERY.mean + DELIVERY.steadySd) - sx(X, DELIVERY.mean - DELIVERY.steadySd)}
-              height={88}
+              height={104}
               fill={STAT}
               opacity={0.18}
             />
@@ -126,9 +126,9 @@ export const DeliveryScene: React.FC = () => {
           <Svg>
             <rect
               x={meanX - (meanX - sx(X, DELIVERY.mean - DELIVERY.erraticSd)) * erraticBand}
-              y={y(ERRATIC) - 30}
+              y={y(ERRATIC) - 40}
               width={(sx(X, DELIVERY.mean + DELIVERY.erraticSd) - sx(X, DELIVERY.mean - DELIVERY.erraticSd)) * erraticBand}
-              height={66}
+              height={64}
               fill={STAT}
               opacity={0.16}
             />
@@ -148,7 +148,7 @@ export const DeliveryScene: React.FC = () => {
               x1={meanX}
               x2={meanX}
               y1={y(AXIS)}
-              y2={y(AXIS) - (y(AXIS) - y(STEADY - 60)) * ease(frame, thirtyAt - 4, 16)}
+              y2={y(AXIS) - (y(AXIS) - y(STEADY - 80)) * ease(frame, thirtyAt - 4, 16)}
               stroke={INK}
               strokeWidth={2}
               strokeDasharray="7 6"
@@ -161,7 +161,7 @@ export const DeliveryScene: React.FC = () => {
           {DELIVERY.steady.map((v, i) => {
             const a = devIn(i);
             if (a <= 0 || v === DELIVERY.mean) return null;
-            const cy = y(STEADY) + steadyRows[i] * 2 * (R + 1);
+            const cy = y(STEADY) - steadyRows[i] * 2 * (R + 1);
             const x0 = meanX;
             const x1 = meanX + (sx(X, v) - meanX) * a;
             const side = Math.abs(sx(X, v) - meanX) * sqIn(i) * sq;
@@ -191,13 +191,13 @@ export const DeliveryScene: React.FC = () => {
           {DELIVERY.erratic.map((v, i) => dot(v, erraticRows[i], ERRATIC, ease(frame, twoAt + 8 + i * 1.5, 8), 100 + i))}
         </Svg>
         <Axis scale={X} base={y(AXIS)} ticks={[0, 10, 20, 30, 40, 50, 60]} at={twoAt - 4} />
-        <Tag x={meanX} y={y(STEADY - 60) - 34} opacity={ease(frame, thirtyAt, 12)} size={21}>
+        <Tag x={meanX} y={y(STEADY - 80) - 34} opacity={ease(frame, thirtyAt, 12)} size={21}>
           both average {fmt(DELIVERY.mean, 1)}
         </Tag>
 
         {/* The ranges. */}
-        <Bracket x0={sx(X, DELIVERY.steadyMin)} x1={sx(X, DELIVERY.steadyMax)} y={y(STEADY) - 34} at={steadyAt - 4} out={devFrom - 6} up />
-        <Tag x={sx(X, DELIVERY.steadyMax) + 16} y={y(STEADY) - 52} opacity={ease(frame, steadyAt, 12) * (1 - ease(frame, devFrom - 6, 10))} size={21} align="left">
+        <Bracket x0={sx(X, DELIVERY.steadyMin)} x1={sx(X, DELIVERY.steadyMax)} y={y(STEADY) + 26} at={steadyAt - 4} out={devFrom - 6} up />
+        <Tag x={sx(X, DELIVERY.steadyMax) + 16} y={y(STEADY) + 30} opacity={ease(frame, steadyAt, 12) * (1 - ease(frame, devFrom - 6, 10))} size={21} align="left">
           {DELIVERY.steadyMin} to {DELIVERY.steadyMax}
         </Tag>
         <Bracket x0={sx(X, DELIVERY.erraticMin)} x1={sx(X, DELIVERY.erraticMax)} y={y(ERRATIC) - 34} at={erraticAt - 4} out={devFrom - 6} up />
@@ -205,17 +205,17 @@ export const DeliveryScene: React.FC = () => {
           {DELIVERY.erraticMin} to {DELIVERY.erraticMax}
         </Tag>
         {DELIVERY.erratic.map((v, i) => (
-          <Pulse key={i} x={sx(X, v)} y={y(ERRATIC) + erraticRows[i] * 2 * (R + 1)} at={swingsAt + i * 2} color={DATA} r={R} />
+          <Pulse key={i} x={sx(X, v)} y={y(ERRATIC) - erraticRows[i] * 2 * (R + 1)} at={swingsAt + i * 2} color={DATA} r={R} />
         ))}
 
-        <Pulse x={meanX} y={y(STEADY - 60)} at={sameAt - 2} color={INK} r={6} />
+        <Pulse x={meanX} y={y(STEADY - 80)} at={sameAt - 2} color={INK} r={6} />
 
         {/* The standard deviations, beside their bands. */}
-        <Tag x={sx(X, DELIVERY.mean + DELIVERY.steadySd) + 18} y={y(STEADY) - 14} opacity={ease(frame, onePointAt + 2, 12)} color={STAT_INK} size={22} bold align="left">
+        <Tag x={sx(X, DELIVERY.steadyMax) + 22} y={y(STEADY) - 14} opacity={ease(frame, onePointAt + 2, 12)} color={STAT_INK} size={22} bold align="left">
           SD {fmt(DELIVERY.steadySd, 2)} min
         </Tag>
-        <Tag x={sx(X, DELIVERY.mean + DELIVERY.erraticSd) + 18} y={y(ERRATIC) - 14} opacity={ease(frame, eighteenAt, 12)} color={STAT_INK} size={22} bold align="left">
-          SD {counted(frame, eighteenAt - 6, 0, DELIVERY.erraticSd, 1, 20)} min
+        <Tag x={sx(X, DELIVERY.mean + DELIVERY.erraticSd)} y={y(ERRATIC) - 76} opacity={ease(frame, eighteenAt, 12)} color={STAT_INK} size={22} bold align="right">
+          SD {counted(frame, eighteenAt - 6, 0, DELIVERY.erraticSd, 1, 14)} min
         </Tag>
       </Drift>
 

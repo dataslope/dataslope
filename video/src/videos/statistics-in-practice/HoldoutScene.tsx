@@ -82,7 +82,7 @@ export const HoldoutScene: React.FC = () => {
 
       <Headline lead="Split first," turn="then explore." at={splitFrom - 6} turnAt={exploreAt - 4} out={betterAt - 6} />
       <Headline lead="Better still," turn="make fresh data." at={betterAt - 2} turnAt={purposeAt - 14} />
-      <Wall x={WALL_X} top={y(WALL_TOP)} bottom={y(WALL_BOTTOM)} at={splitFrom - 60} />
+      <Wall x={WALL_X} top={y(WALL_TOP)} bottom={y(WALL_BOTTOM)} at={splitFrom - 60} width={15} />
 
       <Spot id="statistics-in-practice-chest" at={lockedAt - 6} left={1440} top={y(372)} width={330} height={300} />
 

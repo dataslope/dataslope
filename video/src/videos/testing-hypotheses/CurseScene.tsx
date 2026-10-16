@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { fmt, halo, INK, INK_SOFT, note } from "../../editorial/style";
+import { body, fmt, halo, INK, INK_SOFT, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -38,19 +38,21 @@ export const CurseScene: React.FC = () => {
   const winnersAt = n.word("inflate", "winners");
   const eightyAt = n.word("inflate", "point eight five");
   const threeAt = n.word("inflate", "three times");
-  const exaggeratedAt = n.word("inflate", "exaggerated");
+  const onlyAt = n.word("inflate", "Only");
+  const noiseAt = n.word("inflate", "noise");
+  const tFrom = n.beat("t-in").from;
   const throughAt = n.word("inflate", "through");
   const everyAt = n.word("t-in", "t-test");
 
   const bh = (c: number) => h(TALL) * (c / MAX);
   const grow = ease(frame, effectAt - 4, 36);
   const red = ease(frame, twelveAt - 4, 16);
-  const dimRest = ease(frame, exaggeratedAt - 4, 16);
+  const dimRest = ease(frame, onlyAt - 2, 16);
   const truthX = sx(X, CURSE.effect);
   const sigX = sx(X, CURSE.meanSig);
   const sigGlow = pulse(frame, eightyAt + 4, 26);
-  const winGlow = pulse(frame, winnersAt - 2, 24);
-  const outDim = 1 - 0.5 * ease(frame, everyAt - 14, 16);
+  const winGlow = pulse(frame, winnersAt - 2, 24) + pulse(frame, noiseAt - 2, 24);
+  const outDim = 1 - 0.3 * ease(frame, tFrom - 4, 14) - 0.25 * ease(frame, everyAt - 4, 14);
 
   return (
     <AbsoluteFill>
@@ -141,6 +143,9 @@ export const CurseScene: React.FC = () => {
           </Note>
         </Drift>
       </div>
+      <Ink at={everyAt - 2} dur={16} style={{ left: 160, top: y(870), whiteSpace: "nowrap" }}>
+        <span style={{ ...body(34, true), color: INK }}>Every one of these runs was tested with a t-test.</span>
+      </Ink>
     </AbsoluteFill>
   );
 };

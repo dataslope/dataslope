@@ -3,6 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { Axis, Bars, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
 import {
@@ -91,6 +92,15 @@ export const LeversScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: the levers, each panel's bars, and each step of the one that narrows ── */}
+      <Sfx name="el-pop" at={waysAt - 6} level={-30} />
+      <Sfx name="el-pop" at={more.times[0] - 2} level={-30} />
+      <Sfx name="el-tap" at={more.times[3]} level={-30} />
+      <Sfx name="el-pop" at={bigger.times[0] - 2} level={-30} />
+      {bigger.times.slice(1).map((at) => (
+        <Sfx key={at} name="el-tap" at={at} level={-29} />
+      ))}
+
       <Ink at={trapFrom - 12} dur={20} style={{ left: 112, top: y(112), ...headline(64), whiteSpace: "nowrap" }}>
         Two ways to get more data.
       </Ink>

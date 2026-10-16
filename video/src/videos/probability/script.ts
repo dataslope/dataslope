@@ -70,7 +70,10 @@ export const script: NarrationScript = {
   voice: "hope",
   // Room for the series intro (SeriesIntro, INTRO_SECONDS) before the first word.
   leadIn: 4.6,
-  tail: 2.6,
+  tail: 3,
+  // A little more than the default 1.6 s before each scene, so each finished
+  // figure holds a moment longer before the cut.
+  sceneGap: 2.2,
   beats: [
     // ── Part 1. Long-run frequency ────────────────────────────────────────
     {
@@ -96,7 +99,7 @@ export const script: NarrationScript = {
     },
     {
       id: "share",
-      text: "Point five zero one. Close to a half... even though the first seven flips were all heads.",
+      text: "Point five zero one. Close to a half... even though the first seven flips were all heads.", pauseAfter: 0.6,
     },
     { id: "lln-in", text: "So how long does the long run take?" },
     {
@@ -173,7 +176,7 @@ export const script: NarrationScript = {
     },
     {
       id: "multiply",
-      text: "Independence is also what lets you multiply. Ten heads in a row is ten halves multiplied together... about one in a thousand.",
+      text: "Independence is also what lets you multiply. Ten heads in a row is ten halves multiplied together... about one in a thousand.", pauseAfter: 0.6,
     },
     { id: "test-in", text: "And which way round you read a conditional matters more than it looks." },
 
@@ -187,7 +190,7 @@ export const script: NarrationScript = {
     {
       id: "gut",
       text: "What are the chances you have it? Your gut says ninety-nine percent. The answer is about nine.",
-      pauseAfter: 0.5,
+      pauseAfter: 0.7,
     },
     {
       id: "walk",
@@ -198,12 +201,12 @@ export const script: NarrationScript = {
     {
       id: "flagged",
       text: "But it also flags one percent of the healthy by mistake. That's nine hundred and ninety-nine false alarms.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.6,
     },
     {
       id: "lineup",
       text: "Now line up everyone who tested positive. One thousand and ninety-eight people... and only ninety-nine of them are sick.",
-      pauseAfter: 0.35,
+      pauseAfter: 0.5,
     },
     { id: "nine", text: "That's nine percent.", pauseAfter: 0.3 },
     { id: "sim", text: "Simulate two million people instead, and you get nine point one." },
@@ -229,7 +232,7 @@ export const script: NarrationScript = {
       pauseAfter: 0.4,
     },
     { id: "ninety", text: "Now nine positives in ten are real. Ninety-one percent.", pauseAfter: 0.5 },
-    { id: "rule", text: "So before you trust a positive, ask how rare the thing is." },
+    { id: "rule", text: "So before you trust a positive, ask how rare the thing is.", pauseAfter: 0.6 },
     { id: "doors-in", text: "Conditioning has fooled experts, too." },
 
     // ── Part 4. Monty Hall ────────────────────────────────────────────────
@@ -242,7 +245,7 @@ export const script: NarrationScript = {
     {
       id: "host",
       text: "Then the host, who knows where the car is, opens another door... and shows you a goat. Do you switch?",
-      pauseAfter: 0.5,
+      pauseAfter: 0.7,
     },
     {
       id: "column",
@@ -266,7 +269,7 @@ export const script: NarrationScript = {
     },
     {
       id: "games",
-      text: "Play a hundred thousand games in code. Staying wins thirty-three percent of them. Switching wins sixty-seven.",
+      text: "Play a hundred thousand games in code. Staying wins thirty-three percent of them. Switching wins sixty-seven.", pauseAfter: 0.6,
     },
     {
       id: "rv-in",
@@ -290,7 +293,7 @@ export const script: NarrationScript = {
     {
       id: "balance",
       text: "Picture the chances as weights on a beam. It balances at four and a half... which isn't a face on the die, and isn't the likeliest roll, either. That's six.",
-      pauseAfter: 0.35,
+      pauseAfter: 0.5,
     },
     {
       id: "rolls",
@@ -299,7 +302,7 @@ export const script: NarrationScript = {
     },
     {
       id: "spread",
-      text: "Its spread is the variance, the average squared distance from that mean. Three point two five. Its square root, the standard deviation, is about one point eight.",
+      text: "Its spread is the variance, the average squared distance from that mean. Three point two five. Its square root, the standard deviation, is about one point eight.", pauseAfter: 0.6,
     },
     { id: "decide-in", text: "And that long-run average is how you weigh a decision." },
     {

@@ -44,6 +44,7 @@ export const RatioScene: React.FC = () => {
   const designsAt = n.word("designs", "three designs");
   const targetAt = n.word("designs", "target");
   const separateAt = n.word("designs", "two separate groups");
+  const sameUnitsAt = n.word("designs", "same units");
   const twiceAt = n.word("designs", "twice");
 
   // The mounds: as drawn, then apart and narrow (big t), then together and wide (small t).
@@ -98,7 +99,7 @@ export const RatioScene: React.FC = () => {
       <Sfx name="el-tap" at={seAt - 4} level={-30} />
       <Sfx name="el-whoosh" at={bigAt - 4} level={-34} />
       <Sfx name="el-whoosh" at={smallAt - 4} level={-34} />
-      {[targetAt, separateAt, twiceAt].map((at) => (
+      {[targetAt, separateAt, sameUnitsAt].map((at) => (
         <Sfx key={at} name="el-pop" at={at - 4} level={-30} />
       ))}
 
@@ -183,7 +184,7 @@ export const RatioScene: React.FC = () => {
       )}
       {card(
         2,
-        twiceAt,
+        sameUnitsAt,
         "The same units, measured twice",
         <>
           {J1.slice(0, 6).map((v, k) => {
@@ -192,9 +193,9 @@ export const RatioScene: React.FC = () => {
             const x1 = x0 + 150 + J2[k] * 40;
             return (
               <g key={k}>
-                <line x1={x0} x2={x1} y1={yy} y2={yy} stroke={STAT} strokeWidth={2} opacity={0.7} />
+                <line x1={x0} x2={lerp(x0, x1, ease(frame, twiceAt - 4 + k * 2, 10))} y1={yy} y2={yy} stroke={STAT} strokeWidth={2} opacity={0.7} />
                 <circle cx={x0} cy={yy} r={6} fill={RAW} stroke={PAPER} strokeWidth={1.2} />
-                <circle cx={x1} cy={yy} r={6} fill={DATA} stroke={PAPER} strokeWidth={1.2} />
+                <circle cx={x1} cy={yy} r={6 * ease(frame, twiceAt + 4 + k * 2, 8)} fill={DATA} stroke={PAPER} strokeWidth={1.2} />
               </g>
             );
           })}

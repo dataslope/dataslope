@@ -7,11 +7,11 @@ import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { jitter, SLICES, type Slice } from "./data";
-import { Arrow, Check, Cross, Headline, lerp, Ring, STAT, STAT_INK, Strike, Svg, Wall } from "./parts";
+import { Arrow, Check, Cross, Headline, lerp, Marker, Ring, STAT, STAT_INK, Strike, Svg, Wall } from "./parts";
 
 export const WALL_X = 960;
 export const WALL_TOP = 300;
-export const WALL_BOTTOM = 760;
+export const WALL_BOTTOM = 790;
 /** Where the lead's card sits at the end of LookScene, and where it settles. */
 export const CARD_FROM = { x: 1410, y: 846 };
 const CARD_TO = { x: 1060, y: 398 };
@@ -19,7 +19,7 @@ const CARD_TO = { x: 1060, y: 398 };
 const THUMB_W = 210;
 const THUMB_H = 120;
 const THUMB_X = [160, 395, 630];
-const THUMB_Y = [400, 560];
+const THUMB_Y = [400, 596];
 /** The "by day" slice sits nearest the wall, where the trap's arrow lands. */
 const THUMBS: { title: string; slice?: Slice; corr?: boolean }[] = [
   { title: "by time", slice: SLICES.time },
@@ -145,9 +145,11 @@ export const WallScene: React.FC = () => {
   const crossingAt = n.word("sin", "crossing");
   const suggestedAt = n.word("sin", "suggested");
   const pickedAt = n.word("sin", "picked");
+  const veryAt = n.word("sin", "very bills");
   const tiltedAt = n.word("sin", "tilted");
   const pValueAt = n.word("lie", "p-value");
   const lieAt = n.word("lie", "lie");
+  const liePhraseAt = n.word("lie", "suggested");
   const freshAt = n.word("split-in", "fresh data");
   const fromAt = n.word("split-in", "from");
 
@@ -159,6 +161,7 @@ export const WallScene: React.FC = () => {
     y: lerp(y(CARD_FROM.y), y(CARD_TO.y), slide),
   };
   const hot = ease(frame, pickedAt - 4, 12);
+  const suggested = ease(frame, suggestedAt - 4, 14);
   const leftDim = 1 - 0.45 * ease(frame, freshAt - 6, 14);
   const sealed = ease(frame, testingAt - 6, 16);
 
@@ -195,14 +198,19 @@ export const WallScene: React.FC = () => {
             />
           );
         })}
-        <Ink at={questionsAt - 4} dur={16} style={{ left: 160, top: y(712), whiteSpace: "nowrap" }}>
+        <Ink at={questionsAt - 4} dur={16} style={{ left: 160, top: y(742), whiteSpace: "nowrap" }}>
           <span style={{ ...note(28, INK), fontWeight: 600 }}>Out come questions.</span>
         </Ink>
-        <Ink at={conclusionsAt - 10} dur={14} style={{ left: 480, top: y(712), whiteSpace: "nowrap" }}>
+        <Ink at={conclusionsAt - 10} dur={14} style={{ left: 480, top: y(742), whiteSpace: "nowrap" }}>
           <span style={{ ...note(28, INK_SOFT) }}>
             <Strike at={conclusionsAt - 2}>Conclusions</Strike>
           </span>
         </Ink>
+        {suggested > 0 ? (
+          <Svg opacity={suggested}>
+            <rect x={THUMB_X[DAY_THUMB] - 12} y={y(THUMB_Y[0]) - 10} width={THUMB_W + 24} height={h(THUMB_H) + 20} rx={10} fill={STAT} opacity={0.14} />
+          </Svg>
+        ) : null}
         <Ring x={FRI_X} y={y(THUMB_Y[0]) + h(THUMB_H) - 18} at={pickedAt} r0={16} r1={70} />
       </div>
 
@@ -244,10 +252,10 @@ export const WallScene: React.FC = () => {
         <span style={{ ...note(22, INK_SOFT) }}>on data nobody has seen</span>
       </Ink>
       <Ring x={(SEALED.x0 + SEALED.x1) / 2} y={(y(SEALED.y0) + y(SEALED.y1)) / 2} at={freshAt - 2} r0={60} r1={190} color={BAR} dur={26} />
-      <Ink at={claimAt - 6} dur={16} style={{ left: 1060, top: y(712), whiteSpace: "nowrap" }}>
+      <Ink at={claimAt - 6} dur={16} style={{ left: 1060, top: y(742), whiteSpace: "nowrap" }}>
         <span style={{ ...note(28, INK), fontWeight: 600 }}>Out comes a claim,</span>
       </Ink>
-      <Ink at={claimAt + 4} dur={16} style={{ left: 1060, top: y(712) + 42, whiteSpace: "nowrap" }}>
+      <Ink at={claimAt + 4} dur={16} style={{ left: 1060, top: y(742) + 40, whiteSpace: "nowrap" }}>
         <span style={{ ...note(22, INK_SOFT) }}>with a p-value, an effect size and an interval.</span>
       </Ink>
 
@@ -258,16 +266,24 @@ export const WallScene: React.FC = () => {
         at={crossingAt - 4}
         dur={18}
         color={STAT}
-        width={3.2}
+        width={4.4}
       />
       <Ink at={suggestedAt - 4} dur={14} style={{ left: THUMB_X[DAY_THUMB], top: y(THUMB_Y[0]) + h(THUMB_H) + 8, whiteSpace: "nowrap" }}>
         <span style={{ ...note(20, STAT_INK), fontWeight: 650 }}>the same data</span>
       </Ink>
-      <Cross x={WALL_X} y={y(CARD_TO.y) + 32} at={tiltedAt - 4} size={40} />
+      <Cross x={WALL_X} y={y(CARD_TO.y) + 32} at={tiltedAt - 4} size={56} />
+      <Ink at={veryAt - 4} dur={14} style={{ left: THUMB_X[DAY_THUMB], top: y(THUMB_Y[0]) + h(THUMB_H) + 36, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, STAT_INK), fontWeight: 650 }}>picked for looking best</span>
+      </Ink>
+      <Ink at={tiltedAt - 4} dur={14} style={{ left: 990, top: y(CARD_TO.y) + 60, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, STAT_INK), fontWeight: 650 }}>tilted before it runs</span>
+      </Ink>
 
-      <div style={{ position: "absolute", left: 160, top: y(808), display: "flex", gap: "0.36em", whiteSpace: "nowrap", opacity: 1 - 0.6 * ease(frame, fromAt - 4, 14) }}>
+      <div style={{ position: "absolute", left: 160, top: y(830), display: "flex", gap: "0.36em", whiteSpace: "nowrap", opacity: 1 - 0.6 * ease(frame, fromAt - 4, 14) }}>
         <Ink at={pValueAt - 6} dur={18} style={{ position: "relative" }}>
-          <span style={{ ...body(38), color: INK }}>A p-value from the data that suggested the question</span>
+          <span style={{ ...body(38), color: INK }}>
+            A p-value from the data that <Marker at={liePhraseAt - 4}>suggested the question</Marker>
+          </span>
         </Ink>
         <Ink at={lieAt - 6} dur={14} style={{ position: "relative" }}>
           <span style={{ ...body(38, true), color: STAT_INK }}>is a lie.</span>

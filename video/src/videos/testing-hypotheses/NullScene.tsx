@@ -34,6 +34,8 @@ export const NullScene: React.FC = () => {
   const surpriseFrom = n.beat("surprise").from;
   const ifAt = n.word("surprise", "If");
   const surprisingAt = n.word("surprise", "surprising");
+  const nullAgainAt = n.word("surprise", "null");
+  const soundsAt = n.word("court-in", "sounds");
   const veryAt = n.word("verdict", "Very");
   const rejectAt = n.word("verdict", "reject");
   const ordinaryAt = n.word("verdict", "Ordinary");
@@ -56,7 +58,7 @@ export const NullScene: React.FC = () => {
           border: `2px solid ${HAIRLINE}`,
           borderRadius: 10,
           background: PAPER,
-          opacity: p * (1 - 0.45 * ease(frame, trialAt - 6, 14)),
+          opacity: p * (1 - 0.45 * ease(frame, soundsAt - 4, 14)),
           transform: `translateY(${(1 - p) * 16}px) scale(${1 + 0.015 * g})`,
           transformOrigin: "0 50%",
         }}
@@ -91,7 +93,7 @@ export const NullScene: React.FC = () => {
       {card(
         330,
         nothingAt,
-        nullAt,
+        nullAgainAt,
         <>
           <H0 />, the null hypothesis
         </>,
@@ -121,7 +123,7 @@ export const NullScene: React.FC = () => {
           border: `2px solid ${INK}`,
           borderRadius: 10,
           background: PAPER,
-          opacity: ease(frame, surpriseFrom - 2, 14) * (1 - 0.45 * ease(frame, trialAt - 6, 14)),
+          opacity: ease(frame, surpriseFrom - 2, 14) * (1 - 0.45 * ease(frame, soundsAt - 4, 14)),
         }}
       >
         <div style={{ opacity: ease(frame, ifAt - 4, 12) }}>

@@ -1,0 +1,520 @@
+{
+  "version": "PostgreSQL 18.3 (PGlite 0.5.8) on wasm32-unknown-emscripten, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 3.1.74 (1092ec30a3fb1d46b1782ff1b4db5094d3d06ae5), 32-bit",
+  "figures": {
+    "price": {
+      "setup": "CREATE TABLE products (\n  id    SERIAL PRIMARY KEY,\n  name  TEXT NOT NULL,\n  price NUMERIC NOT NULL CHECK (price >= 0)\n);\nINSERT INTO products (name, price) VALUES ('Notebook', 4.50);",
+      "steps": {
+        "bad": {
+          "sql": "INSERT INTO products (name, price) VALUES ('Broken price', -3.00);",
+          "ok": false,
+          "error": {
+            "severity": "ERROR",
+            "code": "23514",
+            "message": "new row for relation \"products\" violates check constraint \"products_price_check\"",
+            "detail": "Failing row contains (2, Broken price, -3.00).",
+            "table": "products",
+            "column": null,
+            "constraint": "products_price_check"
+          }
+        },
+        "after": {
+          "sql": "SELECT id, name, price FROM products;",
+          "ok": true,
+          "command": "SELECT",
+          "affectedRows": 0,
+          "fields": [
+            "id",
+            "name",
+            "price"
+          ],
+          "rows": [
+            {
+              "id": 1,
+              "name": "Notebook",
+              "price": "4.50"
+            }
+          ]
+        }
+      }
+    },
+    "type": {
+      "setup": "CREATE TABLE order_items (\n  id       SERIAL PRIMARY KEY,\n  sku      TEXT NOT NULL,\n  quantity INTEGER NOT NULL CHECK (quantity > 0)\n);\nINSERT INTO order_items (sku, quantity) VALUES ('PEN-1', 3);",
+      "steps": {
+        "bad": {
+          "sql": "INSERT INTO order_items (sku, quantity) VALUES ('BOOK-1', 'many');",
+          "ok": false,
+          "error": {
+            "severity": "ERROR",
+            "code": "22P02",
+            "message": "invalid input syntax for type integer: \"many\"",
+            "detail": null,
+            "table": null,
+            "column": null,
+            "constraint": null
+          }
+        },
+        "after": {
+          "sql": "SELECT id, sku, quantity FROM order_items;",
+          "ok": true,
+          "command": "SELECT",
+          "affectedRows": 0,
+          "fields": [
+            "id",
+            "sku",
+            "quantity"
+          ],
+          "rows": [
+            {
+              "id": 1,
+              "sku": "PEN-1",
+              "quantity": 3
+            }
+          ]
+        }
+      }
+    },
+    "money": {
+      "setup": "CREATE TABLE money_demo (\n  id SERIAL PRIMARY KEY,\n  exact_amount NUMERIC,\n  approximate_amount DOUBLE PRECISION\n);\nINSERT INTO money_demo (exact_amount, approximate_amount)\nVALUES (0.1 + 0.2, 0.1::double precision + 0.2::double precision);",
+      "steps": {
+        "compare": {
+          "sql": "SELECT\n  exact_amount,\n  approximate_amount,\n  exact_amount = 0.3 AS numeric_is_exact,\n  approximate_amount = 0.3::double precision AS float_equals_point_three\nFROM money_demo;",
+          "ok": true,
+          "command": "SELECT",
+          "affectedRows": 0,
+          "fields": [
+            "exact_amount",
+            "approximate_amount",
+            "numeric_is_exact",
+            "float_equals_point_three"
+          ],
+          "rows": [
+            {
+              "exact_amount": "0.3",
+              "approximate_amount": 0.30000000000000004,
+              "numeric_is_exact": true,
+              "float_equals_point_three": false
+            }
+          ]
+        },
+        "text": {
+          "sql": "SELECT exact_amount::text AS exact, approximate_amount::text AS approximate FROM money_demo;",
+          "ok": true,
+          "command": "SELECT",
+          "affectedRows": 0,
+          "fields": [
+            "exact",
+            "approximate"
+          ],
+          "rows": [
+            {
+              "exact": "0.3",
+              "approximate": "0.30000000000000004"
+            }
+          ]
+        }
+      }
+    },
+    "notNull": {
+      "setup": "CREATE TABLE accounts (\n  id     SERIAL PRIMARY KEY,\n  email  TEXT NOT NULL,\n  status TEXT NOT NULL DEFAULT 'active'\n);",
+      "steps": {
+        "fills": {
+          "sql": "INSERT INTO accounts (email) VALUES ('ada@example.com');",
+          "ok": true,
+          "command": "INSERT",
+          "affectedRows": 1,
+          "fields": [],
+          "rows": []
+        },
+        "missing": {
+          "sql": "INSERT INTO accounts (status) VALUES ('active');",
+          "ok": false,
+          "error": {
+            "severity": "ERROR",
+            "code": "23502",
+            "message": "null value in column \"email\" of relation \"accounts\" violates not-null constraint",
+            "detail": "Failing row contains (2, null, active).",
+            "table": "accounts",
+            "column": "email",
+            "constraint": null
+          }
+        },
+        "after": {
+          "sql": "SELECT id, email, status FROM accounts;",
+          "ok": true,
+          "command": "SELECT",
+          "affectedRows": 0,
+          "fields": [
+            "id",
+            "email",
+            "status"
+          ],
+          "rows": [
+            {
+              "id": 1,
+              "email": "ada@example.com",
+              "status": "active"
+            }
+          ]
+        }
+      }
+    },
+    "unique": {
+      "setup": "CREATE TABLE accounts (\n  id       SERIAL PRIMARY KEY,\n  email    TEXT NOT NULL UNIQUE,\n  username TEXT NOT NULL UNIQUE\n);\nINSERT INTO accounts (email, username)\nVALUES ('ada@example.com', 'ada');",
+      "steps": {
+        "dup": {
+          "sql": "INSERT INTO accounts (email, username) VALUES ('ada@example.com', 'ada_2');",
+          "ok": false,
+          "error": {
+            "severity": "ERROR",
+            "code": "23505",
+            "message": "duplicate key value violates unique constraint \"accounts_email_key\"",
+            "detail": "Key (email)=(ada@example.com) already exists.",
+            "table": "accounts",
+            "column": null,
+            "constraint": "accounts_email_key"
+          }
+        },
+        "after": {
+          "sql": "SELECT id, email, username FROM accounts;",
+          "ok": true,
+          "command": "SELECT",
+          "affectedRows": 0,
+          "fields": [
+            "id",
+            "email",
+            "username"
+          ],
+          "rows": [
+            {
+              "id": 1,
+              "email": "ada@example.com",
+              "username": "ada"
+            }
+          ]
+        }
+      }
+    },
+    "pair": {
+      "setup": "CREATE TABLE enrollments (\n  student_id INTEGER NOT NULL,\n  course_id  INTEGER NOT NULL,\n  enrolled_on DATE NOT NULL DEFAULT CURRENT_DATE,\n  UNIQUE (student_id, course_id)\n);\nINSERT INTO enrollments (student_id, course_id) VALUES (1, 10);",
+      "steps": {
+        "otherCourse": {
+          "sql": "INSERT INTO enrollments (student_id, course_id) VALUES (1, 20);",
+          "ok": true,
+          "command": "INSERT",
+          "affectedRows": 1,
+          "fields": [],
+          "rows": []
+        },
+        "otherStudent": {
+          "sql": "INSERT INTO enrollments (student_id, course_id) VALUES (2, 10);",
+          "ok": true,
+          "command": "INSERT",
+          "affectedRows": 1,
+          "fields": [],
+          "rows": []
+        },
+        "dup": {
+          "sql": "INSERT INTO enrollments (student_id, course_id) VALUES (1, 10);",
+          "ok": false,
+          "error": {
+            "severity": "ERROR",
+            "code": "23505",
+            "message": "duplicate key value violates unique constraint \"enrollments_student_id_course_id_key\"",
+            "detail": "Key (student_id, course_id)=(1, 10) already exists.",
+            "table": "enrollments",
+            "column": null,
+            "constraint": "enrollments_student_id_course_id_key"
+          }
+        },
+        "after": {
+          "sql": "SELECT student_id, course_id FROM enrollments ORDER BY student_id, course_id;",
+          "ok": true,
+          "command": "SELECT",
+          "affectedRows": 0,
+          "fields": [
+            "student_id",
+            "course_id"
+          ],
+          "rows": [
+            {
+              "student_id": 1,
+              "course_id": 10
+            },
+            {
+              "student_id": 1,
+              "course_id": 20
+            },
+            {
+              "student_id": 2,
+              "course_id": 10
+            }
+          ]
+        }
+      }
+    },
+    "oneToOne": {
+      "setup": "CREATE TABLE users (\n  id    SERIAL PRIMARY KEY,\n  email TEXT NOT NULL UNIQUE\n);\nCREATE TABLE profiles (\n  id           SERIAL PRIMARY KEY,\n  user_id      INTEGER NOT NULL UNIQUE REFERENCES users (id),\n  display_name TEXT NOT NULL\n);\nINSERT INTO users (email) VALUES ('ada@example.com');\nINSERT INTO profiles (user_id, display_name) VALUES (1, 'Ada');",
+      "steps": {
+        "second": {
+          "sql": "INSERT INTO profiles (user_id, display_name) VALUES (1, 'Ada again');",
+          "ok": false,
+          "error": {
+            "severity": "ERROR",
+            "code": "23505",
+            "message": "duplicate key value violates unique constraint \"profiles_user_id_key\"",
+            "detail": "Key (user_id)=(1) already exists.",
+            "table": "profiles",
+            "column": null,
+            "constraint": "profiles_user_id_key"
+          }
+        }
+      }
+    },
+    "status": {
+      "setup": "CREATE TABLE products (\n  id     SERIAL PRIMARY KEY,\n  name   TEXT NOT NULL,\n  price  NUMERIC NOT NULL CHECK (price >= 0),\n  status TEXT NOT NULL CHECK (status IN ('draft', 'active', 'archived'))\n);\nINSERT INTO products (name, price, status)\nVALUES ('Notebook', 4.50, 'active');",
+      "steps": {
+        "banana": {
+          "sql": "INSERT INTO products (name, price, status) VALUES ('Mystery item', 5.00, 'banana');",
+          "ok": false,
+          "error": {
+            "severity": "ERROR",
+            "code": "23514",
+            "message": "new row for relation \"products\" violates check constraint \"products_status_check\"",
+            "detail": "Failing row contains (2, Mystery item, 5.00, banana).",
+            "table": "products",
+            "column": null,
+            "constraint": "products_status_check"
+          }
+        },
+        "after": {
+          "sql": "SELECT id, name, price, status FROM products;",
+          "ok": true,
+          "command": "SELECT",
+          "affectedRows": 0,
+          "fields": [
+            "id",
+            "name",
+            "price",
+            "status"
+          ],
+          "rows": [
+            {
+              "id": 1,
+              "name": "Notebook",
+              "price": "4.50",
+              "status": "active"
+            }
+          ]
+        }
+      }
+    },
+    "dates": {
+      "setup": "CREATE TABLE events (\n  id         SERIAL PRIMARY KEY,\n  name       TEXT NOT NULL,\n  start_date DATE NOT NULL,\n  end_date   DATE NOT NULL,\n  CHECK (end_date > start_date)\n);",
+      "steps": {
+        "backwards": {
+          "sql": "INSERT INTO events (name, start_date, end_date) VALUES ('Backwards conference', '2026-06-10', '2026-06-08');",
+          "ok": false,
+          "error": {
+            "severity": "ERROR",
+            "code": "23514",
+            "message": "new row for relation \"events\" violates check constraint \"events_check\"",
+            "detail": "Failing row contains (1, Backwards conference, 2026-06-10, 2026-06-08).",
+            "table": "events",
+            "column": null,
+            "constraint": "events_check"
+          }
+        },
+        "after": {
+          "sql": "SELECT * FROM events;",
+          "ok": true,
+          "command": "SELECT",
+          "affectedRows": 0,
+          "fields": [
+            "id",
+            "name",
+            "start_date",
+            "end_date"
+          ],
+          "rows": []
+        }
+      }
+    },
+    "checkOnly": {
+      "setup": "CREATE TABLE products (\n  id    SERIAL PRIMARY KEY,\n  name  TEXT NOT NULL,\n  price NUMERIC CHECK (price >= 0)\n);\nINSERT INTO products (name, price) VALUES ('Notebook', 4.50);",
+      "steps": {
+        "unknown": {
+          "sql": "SELECT NULL::numeric >= 0 AS test;",
+          "ok": true,
+          "command": "SELECT",
+          "affectedRows": 0,
+          "fields": [
+            "test"
+          ],
+          "rows": [
+            {
+              "test": null
+            }
+          ]
+        },
+        "noPrice": {
+          "sql": "INSERT INTO products (name) VALUES ('Pen');",
+          "ok": true,
+          "command": "INSERT",
+          "affectedRows": 1,
+          "fields": [],
+          "rows": []
+        },
+        "after": {
+          "sql": "SELECT id, name, price FROM products ORDER BY id;",
+          "ok": true,
+          "command": "SELECT",
+          "affectedRows": 0,
+          "fields": [
+            "id",
+            "name",
+            "price"
+          ],
+          "rows": [
+            {
+              "id": 1,
+              "name": "Notebook",
+              "price": "4.50"
+            },
+            {
+              "id": 2,
+              "name": "Pen",
+              "price": null
+            }
+          ]
+        }
+      }
+    },
+    "checkAndNotNull": {
+      "setup": "CREATE TABLE products (\n  id    SERIAL PRIMARY KEY,\n  name  TEXT NOT NULL,\n  price NUMERIC NOT NULL CHECK (price >= 0)\n);\nINSERT INTO products (name, price) VALUES ('Notebook', 4.50);",
+      "steps": {
+        "noPrice": {
+          "sql": "INSERT INTO products (name) VALUES ('Pen');",
+          "ok": false,
+          "error": {
+            "severity": "ERROR",
+            "code": "23502",
+            "message": "null value in column \"price\" of relation \"products\" violates not-null constraint",
+            "detail": "Failing row contains (2, Pen, null).",
+            "table": "products",
+            "column": "price",
+            "constraint": null
+          }
+        },
+        "after": {
+          "sql": "SELECT id, name, price FROM products ORDER BY id;",
+          "ok": true,
+          "command": "SELECT",
+          "affectedRows": 0,
+          "fields": [
+            "id",
+            "name",
+            "price"
+          ],
+          "rows": [
+            {
+              "id": 1,
+              "name": "Notebook",
+              "price": "4.50"
+            }
+          ]
+        }
+      }
+    },
+    "flat": {
+      "setup": "CREATE TABLE orders_flat (\n  order_id       INTEGER PRIMARY KEY,\n  product_name   TEXT NOT NULL,\n  customer_name  TEXT NOT NULL,\n  customer_email TEXT NOT NULL\n);\nINSERT INTO orders_flat VALUES\n  (1, 'Notebook', 'Ada',   'ada@old.test'),\n  (2, 'Pencil',   'Ada',   'ada@old.test'),\n  (3, 'Notebook', 'Grace', 'grace@test.test');",
+      "steps": {
+        "before": {
+          "sql": "SELECT * FROM orders_flat ORDER BY order_id;",
+          "ok": true,
+          "command": "SELECT",
+          "affectedRows": 0,
+          "fields": [
+            "order_id",
+            "product_name",
+            "customer_name",
+            "customer_email"
+          ],
+          "rows": [
+            {
+              "order_id": 1,
+              "product_name": "Notebook",
+              "customer_name": "Ada",
+              "customer_email": "ada@old.test"
+            },
+            {
+              "order_id": 2,
+              "product_name": "Pencil",
+              "customer_name": "Ada",
+              "customer_email": "ada@old.test"
+            },
+            {
+              "order_id": 3,
+              "product_name": "Notebook",
+              "customer_name": "Grace",
+              "customer_email": "grace@test.test"
+            }
+          ]
+        },
+        "update": {
+          "sql": "UPDATE orders_flat SET customer_email = 'ada@new.test' WHERE order_id = 1;",
+          "ok": true,
+          "command": "UPDATE",
+          "affectedRows": 1,
+          "fields": [],
+          "rows": []
+        },
+        "after": {
+          "sql": "SELECT * FROM orders_flat ORDER BY order_id;",
+          "ok": true,
+          "command": "SELECT",
+          "affectedRows": 0,
+          "fields": [
+            "order_id",
+            "product_name",
+            "customer_name",
+            "customer_email"
+          ],
+          "rows": [
+            {
+              "order_id": 1,
+              "product_name": "Notebook",
+              "customer_name": "Ada",
+              "customer_email": "ada@new.test"
+            },
+            {
+              "order_id": 2,
+              "product_name": "Pencil",
+              "customer_name": "Ada",
+              "customer_email": "ada@old.test"
+            },
+            {
+              "order_id": 3,
+              "product_name": "Notebook",
+              "customer_name": "Grace",
+              "customer_email": "grace@test.test"
+            }
+          ]
+        },
+        "emails": {
+          "sql": "SELECT count(DISTINCT customer_email) AS emails FROM orders_flat WHERE customer_name = 'Ada';",
+          "ok": true,
+          "command": "SELECT",
+          "affectedRows": 0,
+          "fields": [
+            "emails"
+          ],
+          "rows": [
+            {
+              "emails": 2
+            }
+          ]
+        }
+      }
+    }
+  }
+}

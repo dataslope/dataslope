@@ -27,7 +27,10 @@ export const SidesScene: React.FC = () => {
   const sidesFrom = n.beat("sides").from;
   const higherAt = n.word("sides", "Higher");
   const lowerAt = n.word("sides", "lower");
+  const countAt = n.word("sides", "count");
   const tailsAt = n.word("sides", "both tails");
+  const oneTailAt = n.word("onesided", "one tail");
+  const exactlyWhyAt = n.word("early", "exactly");
   const halfAt = n.word("sides", "Two and a half");
   const beyondAt = n.word("sides", "beyond");
   const oneSidedAt = n.word("onesided", "one-sided");
@@ -47,7 +50,8 @@ export const SidesScene: React.FC = () => {
   // The upper cutoff slides in from 1.96 to 1.645.
   const slide = ease(frame, allAt - 2, 22);
   const cut = lerp(SIDES.two, SIDES.one, slide);
-  const glowUp = pulse(frame, nearerAt - 2, 24);
+  const glowUp = pulse(frame, nearerAt - 2, 24) + pulse(frame, exactlyWhyAt, 24);
+  const arrowsGlow = pulse(frame, countAt - 2, 22);
   const dim = 1 - 0.55 * ease(frame, coinInFrom - 2, 16);
 
   return (
@@ -102,8 +106,8 @@ export const SidesScene: React.FC = () => {
             ) : null}
           </Svg>
           {/* Higher or lower: both directions count. */}
-          <Arrow from={[sx(X, 0.5), y(BASE) - h(PEAK) - 20]} to={[sx(X, 2.6), y(BASE) - h(PEAK) - 20]} at={higherAt - 4} color={INK_SOFT} width={2.4} out={oneSidedAt} />
-          <Arrow from={[sx(X, -0.5), y(BASE) - h(PEAK) - 20]} to={[sx(X, -2.6), y(BASE) - h(PEAK) - 20]} at={lowerAt - 4} color={INK_SOFT} width={2.4} out={oneSidedAt} />
+          <Arrow from={[sx(X, 0.5), y(BASE) - h(PEAK) - 20]} to={[sx(X, 2.6), y(BASE) - h(PEAK) - 20]} at={higherAt - 4} color={INK_SOFT} width={2.4 + 1.6 * arrowsGlow} out={oneSidedAt} />
+          <Arrow from={[sx(X, -0.5), y(BASE) - h(PEAK) - 20]} to={[sx(X, -2.6), y(BASE) - h(PEAK) - 20]} at={lowerAt - 4} color={INK_SOFT} width={2.4 + 1.6 * arrowsGlow} out={oneSidedAt} />
           <Note at={higherAt} x={sx(X, 2.7)} y={y(BASE) - h(PEAK) - 36} out={oneSidedAt}>
             <Label size={22} color={INK_SOFT}>
               higher
@@ -148,7 +152,7 @@ export const SidesScene: React.FC = () => {
           ))}
 
           {/* The one-sided reading. */}
-          <Note at={allAt + 6} x={sx(X, 3.05)} y={py(phi(2.4)) - 70}>
+          <Note at={oneTailAt - 2} x={sx(X, 3.05)} y={py(phi(2.4)) - 70}>
             <span style={{ ...note(30, STAT_INK), fontWeight: 700, ...halo, display: "inline-block", transform: "translateX(-50%)" }}>5%</span>
           </Note>
           <div

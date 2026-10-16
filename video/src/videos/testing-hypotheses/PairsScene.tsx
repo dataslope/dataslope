@@ -53,16 +53,20 @@ export const PairsScene: React.FC = () => {
   const billionAt = n.word("paired", "billion");
   const sameAt = n.word("own", "Same data");
   const controlAt = n.word("own", "own control");
+  const looksAt = n.word("pairs", "looks");
+  const eachAt = n.word("own", "Each patient");
+  const groupsFrom = n.beat("groups-in").from;
+  const temptingAt = n.word("groups-in", "tempting");
   const groupsInAt = n.word("groups-in", "every pair");
 
   const vy = (v: number) => y(BOTTOM) - ((v - V_LO) / (V_HI - V_LO)) * (y(BOTTOM) - y(TOP));
   const colX = (c: number, i: number) => COL[c] + (JX[i] - 0.5) * SPREAD;
   const lines = (i: number) => ease(frame, ownAt - 4 + i * 1.2, 12);
   const toDiffs = ease(frame, collapsesAt - 6, 22);
-  const oneGlow = ease(frame, controlAt - 4, 12);
+  const oneGlow = ease(frame, eachAt - 2, 12);
   const sameGlow = pulse(frame, sameAt, 26);
   const dimCols = 1 - 0.35 * ease(frame, ownAt - 4, 16);
-  const outDim = 1 - 0.5 * ease(frame, groupsInAt - 30, 16);
+  const outDim = 1 - 0.25 * ease(frame, groupsFrom - 4, 14) - 0.2 * ease(frame, temptingAt - 4, 14) - 0.2 * ease(frame, groupsInAt - 4, 14);
 
   return (
     <AbsoluteFill>
@@ -77,7 +81,7 @@ export const PairsScene: React.FC = () => {
       <Head a="Pair" b="what's paired." at={pairsFrom - 6} bAt={ownAt - 6} />
 
       <div style={{ position: "absolute", inset: 0, opacity: outDim }}>
-        <FigLabel n="15" title={`Blood pressure of ${PAIRED.n} patients, before and after`} at={pairsFrom} x={160} y={y(280)} />
+        <FigLabel n="15" title={`Blood pressure of ${PAIRED.n} patients, before and after`} at={looksAt - 4} x={160} y={y(280)} />
 
         {/* ── Two columns of the same people ── */}
         <Svg opacity={ease(frame, patientsAt - 4, 14)}>
