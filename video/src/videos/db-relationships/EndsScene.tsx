@@ -226,6 +226,7 @@ export const EndsScene: React.FC = () => {
 
       {/* ── Part one ── */}
       <AbsoluteFill style={{ opacity: partOne }}>
+        <Drift from={drawsAt} to={oneFrom} scale={0.02} origin={[960, lineY]}>
         <Fig n="3" at={endsFrom} x={LEFT_O} y={y(268)}>
           The two ends of one line, magnified
         </Fig>
@@ -260,6 +261,7 @@ export const EndsScene: React.FC = () => {
         <Callout lineY={lineY} x={toR(rSym.near)[0]} above={false} title="the most" titleAt={mostAt + 4} value="many" valueAt={footManyAt + 4} />
         <Callout lineY={lineY} x={toL(lSym.far)[0]} above title="the least" titleAt={leastAt} value="one" valueAt={barOne2At + 4} />
         <Callout lineY={lineY} x={toR(rSym.far)[0]} above title="the least" titleAt={leastAt + 4} value="zero" valueAt={circleZeroAt + 4} />
+        </Drift>
       </AbsoluteFill>
 
       {/* ── Part two: every end, with the lesson's example ── */}

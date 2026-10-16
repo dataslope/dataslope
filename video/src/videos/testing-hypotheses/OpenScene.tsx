@@ -64,7 +64,7 @@ export const OpenScene: React.FC = () => {
 
   const oldW = sx(C, CHECKOUT.oldRate * ease(frame, tenAt - 4, 18)) - C.x0;
   const newW = sx(C, CHECKOUT.newRate * ease(frame, elevenAt - 4, 30)) - C.x0;
-  const ghost = ease(frame, ifAt - 2, 18);
+  const ghost = ease(frame, noDiffAt - 4, 16);
   const gapGlow = ease(frame, bigAt - 6, 10);
   const gapPulse = pulse(frame, bigAt + 4, 24);
   const oldEnd = sx(C, CHECKOUT.oldRate);
@@ -77,7 +77,7 @@ export const OpenScene: React.FC = () => {
       <Sfx name="el-pop" at={oneAt - 4} level={-30} />
       <Sfx name="el-tap" at={elevenAt - 4} level={-28} />
       <Sfx name="el-tap" at={tenAt - 4} level={-29} />
-      <Sfx name="el-pencil" at={ifAt - 2} level={-35} />
+      <Sfx name="el-pencil" at={noDiffAt - 4} level={-35} />
 
       <Kicker at={hookFrom - 10}>The logic of a test</Kicker>
       <Head a="One value in particular." b="Could it be zero?" at={hookFrom - 6} bAt={zeroAt - 6} out={noiseAt - 8} />
@@ -218,16 +218,19 @@ export const OpenScene: React.FC = () => {
       <Note at={noDiffAt + 2} x={oldEnd} y={y(OLD_Y) - h(BAR_H) / 2 - 46} from="up">
         <span style={{ display: "inline-block", transform: "translateX(-50%)" }}>
           <Label size={21} color={INK_SOFT}>
-            if there were no difference
+            no difference
           </Label>
         </span>
       </Note>
 
       {/* The question, as the lesson puts it. */}
-      <Ink at={soAt - 2} dur={16} style={{ left: 160, top: y(780), whiteSpace: "nowrap" }}>
+      <Ink at={soAt - 2} dur={16} style={{ left: 160, top: y(756), whiteSpace: "nowrap" }}>
         <span style={{ ...body(36, true), color: INK_SOFT }}>The real question:</span>
       </Ink>
-      <Ink at={howAt - 4} dur={22} style={{ left: 160, top: y(836), whiteSpace: "nowrap" }}>
+      <Ink at={ifAt - 2} dur={18} style={{ left: 160, top: y(756) + 54, whiteSpace: "nowrap" }}>
+        <span style={{ ...body(38, true), color: INK }}>if there were no difference at all,</span>
+      </Ink>
+      <Ink at={howAt - 4} dur={22} style={{ left: 160, top: y(756) + 108, whiteSpace: "nowrap" }}>
         <span style={{ ...body(38, true), color: INK }}>
           how often would <Mark at={chanceAt}>chance alone</Mark> hand you <Mark at={bigAt}>a gap this big?</Mark>
         </span>

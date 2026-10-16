@@ -10,7 +10,6 @@ import { Card, Headline, KEY_INK, Mark, Spot, Svg, Tick } from "./parts";
 
 const LANE_X0 = 470;
 const LANE_X1 = 1240;
-const WORD = "Structured English Query Language";
 /** The letters SEQUEL takes from the words, as [word, letters taken]. */
 const TAKEN: readonly [string, number][] = [
   ["Structured", 1],
@@ -153,7 +152,7 @@ export const SqlScene: React.FC = () => {
           {TAKEN.map(([w, k], i) => (
             <React.Fragment key={w}>
               {i ? " " : ""}
-              <span style={{ color: frame >= englishAt + i * 4 ? ACCENT_INK : INK, transition: "none" }}>{w.slice(0, k)}</span>
+              <span style={{ color: frame >= englishAt + i * 4 ? ACCENT_INK : INK }}>{w.slice(0, k)}</span>
               <span>{w.slice(k)}</span>
             </React.Fragment>
           ))}

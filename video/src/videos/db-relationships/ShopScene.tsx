@@ -46,6 +46,7 @@ export const ShopScene: React.FC = () => {
 
   // ── Cues ──
   const shopFrom = n.beat("shop").from;
+  const littleShopAt = n.word("shop", "little shop");
   const customersAt = n.word("shop", "customers");
   const ordersAt = n.word("shop", "orders");
   const itemsAt = n.word("shop", "order items");
@@ -159,10 +160,10 @@ export const ShopScene: React.FC = () => {
       <Kicker at={shopFrom - 10}>Reading a diagram</Kicker>
       <Headline lead="Read each line" at={shopFrom - 4} turn="as a sentence." turnAt={sentenceAt - 4} out={followAt - 8} />
       <Headline lead="The keys" at={followAt - 2} turn="are the joins." turnAt={joinAt - 4} />
-      <Spot id="db-relationships-bag" at={productsAt - 2} left={1620} top={y(62)} width={160} height={238} />
+      <Spot id="db-relationships-bag" at={littleShopAt} left={1620} top={y(62)} width={160} height={238} />
 
       <Drift from={s[0].from} to={nextTo + 60} scale={0.016} origin={[960, y(560)]}>
-        <Fig n="6" at={shopFrom} x={LEFT_X} y={y(268)}>
+        <Fig n="6" at={littleShopAt - 4} x={LEFT_X} y={y(268)}>
           A small shop
         </Fig>
 

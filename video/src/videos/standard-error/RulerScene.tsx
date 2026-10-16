@@ -76,6 +76,11 @@ export const RulerScene: React.FC = () => {
   const manyAt = n.word("test", "how many");
   const testingAt = n.word("test", "testing");
   const nextAt = n.word("next", "Next");
+  // "that interval": the interval lights up on the ruler as it is named, and
+  // the line under it finishes on "properly".
+  const thatIntervalAt = n.word("next", "that interval");
+  const properlyAt = n.word("next", "properly");
+  const named = ease(frame, thatIntervalAt - 2, 16);
 
   const mx = sx(X, TIMES.mean);
   const rx = (v: number) => sx(R, v);
@@ -208,6 +213,19 @@ export const RulerScene: React.FC = () => {
         <span style={label(19, INK_SOFT)}>standard errors from the average</span>
       </Note>
 
+      {/* The interval, lit on the ruler when the bridge names it. */}
+      {named > 0 ? (
+        <div
+          style={{
+            position: "absolute",
+            left: rx(TIMES.lo),
+            width: (rx(TIMES.hi) - rx(TIMES.lo)) * named,
+            top: y(RULER_TOP),
+            height: y(RULER_TOP + RULER_H) - y(RULER_TOP),
+            background: `color-mix(in srgb, ${ACCENT} 16%, transparent)`,
+          }}
+        />
+      ) : null}
       {/* The rough interval: about two standard errors either way. */}
       <Span x0={rx(TIMES.lo)} x1={rx(TIMES.hi)} y={y(RULER_TOP - 22)} at={stepAt} dur={26} color={ACCENT} width={3.2} tick={10} />
       <div style={{ position: "absolute", left: rx(TIMES.lo), top: y(RULER_TOP - 72), display: "flex", alignItems: "baseline", gap: "0.4em", whiteSpace: "nowrap" }}>
@@ -259,7 +277,7 @@ export const RulerScene: React.FC = () => {
 
       <div style={{ position: "absolute", left: R.x0, right: 1920 - R.x1, top: y(838), height: 1, background: HAIRLINE, opacity: ease(frame, nextAt - 6, 12) }} />
       <Ink at={nextAt - 2} dur={18} style={{ left: R.x0, top: y(856), ...body(34, true), color: INK, whiteSpace: "nowrap" }}>
-        Next: that interval, built properly.
+        Next: that interval, <span style={{ opacity: ease(frame, properlyAt - 2, 12) }}>built properly.</span>
       </Ink>
     </AbsoluteFill>
   );

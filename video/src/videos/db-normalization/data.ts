@@ -102,7 +102,7 @@ export const FOURTH = {
 };
 export const CHILD_STUDENTS = table("childStudents");
 export const CHILD_PHONES = table("childPhones");
-export const CHILD_FOUND = ok("childSearch").rows.map((r) => r[0] as string);
+export const CHILD_SEARCH = { lines: lines("childSearch"), found: ok("childSearch").rows.map((r) => r[0] as string) };
 export const CHILD_COUNTS = table("childCounts");
 export const CHILD_TWICE = {
   row: SQL.childTwice.match(/\((.*)\)/)![1].split(", ").map((v) => v.replace(/'/g, "")) as readonly Cell[],

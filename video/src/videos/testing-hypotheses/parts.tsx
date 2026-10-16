@@ -5,7 +5,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { SERIF } from "../../editorial/fonts";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, fmt, headline, HIGHLIGHT, INK, INK_SOFT, PAPER, label } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, fmt, headline, INK, INK_SOFT, PAPER, label } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { SANS, waitForFonts } from "../../theme/fonts";
@@ -33,6 +33,8 @@ export const DATA_INK = BLUE_INK;
 export const DATA_WASH = `color-mix(in srgb, ${ds("blue", 200)} 55%, transparent)`;
 export const STAT_WASH = `color-mix(in srgb, ${ds("red", 200)} 60%, transparent)`;
 export const OK_INK = "var(--ds-green-ink)";
+/** The highlighter: the brand yellow, strong enough to read as a mark. */
+export const MARK = `color-mix(in srgb, ${ds("yellow", 500)} 88%, transparent)`;
 
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 export const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
@@ -124,11 +126,12 @@ export const Count: React.FC<{
 export const Mark: React.FC<{ at: number; out?: number; color?: string; children: React.ReactNode }> = ({
   at,
   out,
-  color = HIGHLIGHT,
+  color = MARK,
   children,
 }) => {
   const frame = useCurrentFrame();
-  const p = ease(frame, at, 14);
+  // A quick stroke, the way a highlighter is drawn.
+  const p = ease(frame, at, 8);
   const o = out === undefined ? 0 : ease(frame, out, 12);
   return (
     <span style={{ position: "relative", display: "inline-block" }}>
@@ -141,7 +144,7 @@ export const Mark: React.FC<{ at: number; out?: number; color?: string; children
           width: `calc((100% + 0.24em) * ${p})`,
           background: color,
           borderRadius: "0.12em",
-          opacity: p > 0 ? 0.85 * (1 - o) : 0,
+          opacity: p > 0 ? 1 - o : 0,
           zIndex: 0,
         }}
       />

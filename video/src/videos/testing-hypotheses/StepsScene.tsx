@@ -11,6 +11,8 @@ import { jitter, STEPS } from "./data";
 import {
   Bracket,
   Count,
+  Mark,
+  RAW,
   curvePath,
   DOT,
   Greek,
@@ -69,6 +71,11 @@ export const StepsScene: React.FC = () => {
   const computedAt = n.word("set", "computed");
   const trueMeanAt = n.word("reject", "true mean");
   const claimAt = n.word("reject", "claim");
+  const fiveAt = n.word("set", "five percent");
+  const trueAt = n.word("pval", "true");
+  const bigAt = n.word("pval", "this big");
+  const eightRejectAt = n.word("reject", "eight thousand");
+  const bigSidesAt = n.word("sides-in", "this big");
   const noticeAt = n.word("sides-in", "notice");
   const alphaAt = n.word("set", "Alpha");
   const fixedAt = n.word("set", "fixed");
@@ -102,7 +109,11 @@ export const StepsScene: React.FC = () => {
   const zMirror = sx(Z, 2 * STEPS.claimed - STEPS.mean);
   const zy = (v: number) => y(Z_BASE) - h(Z_PEAK) * (v / phi(0));
   const dens = (v: number) => phi((v - STEPS.claimed) / se);
-  const curveIn = ease(frame, ifAt - 4, 22);
+  const curveIn = ease(frame, ifAt - 4, 30);
+  const washIn = ease(frame, trueAt - 2, 12);
+  const gapGlow = pulse(frame, bigAt - 2, 24) + pulse(frame, bigSidesAt - 2, 24);
+  const band = ease(frame, eightRejectAt - 4, 12);
+  const tailFlash = pulse(frame, noticeAt - 2, 30);
   const tails = ease(frame, leastAt - 2, 14);
   const both = pulse(frame, eitherAt - 2, 28) + pulse(frame, noticeAt - 2, 24);
   const meanGlow = pulse(frame, fiftyAt, 24);
@@ -159,15 +170,23 @@ export const StepsScene: React.FC = () => {
           the null: the true mean is {steps(STEPS.claimed)}
         </Label>
       </Ink>
-      <Ink at={fixedAt - 2} dur={14} style={{ left: STEP_X + 44, top: y(STEP_Y0 + 2 * STEP_DY) + 40, whiteSpace: "nowrap" }}>
+      <Ink at={fiveAt - 2} dur={12} style={{ left: STEP_X + 44, top: y(STEP_Y0 + 2 * STEP_DY) + 40, whiteSpace: "nowrap" }}>
         <Label size={22} color={INK_SOFT} weight={520}>
-          <Greek>α</Greek> = {STEPS.alpha}, fixed now
+          <Mark at={computedAt - 2}>
+            <Greek>α</Greek> = {STEPS.alpha}
+            <span style={{ opacity: ease(frame, fixedAt - 2, 12) }}>, fixed before anything is computed</span>
+          </Mark>
         </Label>
       </Ink>
 
       {/* ── Fig. 3: the forty users ── */}
       <FigLabel n="3" title={`Daily steps of ${STEPS.n} users`} at={stepsFrom} x={X.x0} y={y(300)} />
       <Axis scale={X} base={y(AXIS)} ticks={[4000, 6000, 8000, 10000]} format={(v) => fmt(v, 0)} at={stepsFrom + 2} />
+      {band > 0 ? (
+        <Svg>
+          <rect x={claimX - 34} y={y(STRIP) - h(64)} width={68} height={y(AXIS) - y(STRIP) + h(64)} fill={STAT_WASH} opacity={0.7 * band} />
+        </Svg>
+      ) : null}
       <Svg>
         {STEPS.values.map((v, j) => {
           const a = ease(frame, fortyAt - 4 + j * 0.45, 6);
@@ -198,9 +217,11 @@ export const StepsScene: React.FC = () => {
         ) : null}
       </Svg>
       <Note at={eightAt} x={claimX + 12} y={y(STRIP) - h(70) - 8}>
-        <Label size={22} style={halo}>
-          <Strike at={hardAt}>claimed: {steps(STEPS.claimed)}</Strike>
-        </Label>
+        <div style={{ transform: `scale(${1 + 0.16 * claimGlow})`, transformOrigin: "0 50%" }}>
+          <Label size={22} color={ease(frame, hardAt, 10) > 0.5 ? STAT_INK : INK} style={halo}>
+            <Strike at={hardAt}>claimed: {steps(STEPS.claimed)}</Strike>
+          </Label>
+        </div>
       </Note>
       <Note at={sevenAt - 2} x={meanX - 14} y={y(STRIP) - h(70) - 8} align="right">
         <span style={{ ...note(23, STAT_INK), fontWeight: 700, ...halo }}>
@@ -212,7 +233,15 @@ export const StepsScene: React.FC = () => {
       <FigLabel n="4" title="The gap, measured in units of noise" at={statAt - 4} x={Z.x0} y={y(600)} />
       <Bracket x0={zMean} x1={zClaim} y={y(Z_BASE) + 30} at={gapAt - 2} color={STAT} width={3} />
       <Note at={gapAt + 4} x={(zMean + zClaim) / 2} y={y(Z_BASE) + 44} from="up">
-        <span style={{ display: "inline-block", transform: "translateX(-50%)", ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span
+          style={{
+            display: "inline-block",
+            transform: `translateX(-50%) scale(${1 + 0.18 * Math.min(1, gapGlow)})`,
+            ...note(22, STAT_INK),
+            fontWeight: 650,
+            whiteSpace: "nowrap",
+          }}
+        >
           gap {fmt(STEPS.gap, 0).replace("-", "−")} steps
         </span>
       </Note>
@@ -262,17 +291,25 @@ export const StepsScene: React.FC = () => {
       {/* If the claim held: the averages a test expects, and the two tails beyond this one. */}
       {curveIn > 0 ? (
         <Svg>
+          <path d={curvePath(dens, Z.lo, Z.hi, (v) => sx(Z, v), zy, y(Z_BASE))} fill={RAW} opacity={0.35 * washIn} />
+          {/* "At least this big, in either direction": both tails lit at once. */}
+          {tailFlash > 0 ? (
+            <>
+              <rect x={Z.x0} y={y(Z_BASE) - h(Z_PEAK)} width={zMean - Z.x0} height={h(Z_PEAK)} fill={STAT_WASH} opacity={0.8 * tailFlash} />
+              <rect x={zMirror} y={y(Z_BASE) - h(Z_PEAK)} width={Z.x1 - zMirror} height={h(Z_PEAK)} fill={STAT_WASH} opacity={0.8 * tailFlash} />
+            </>
+          ) : null}
           {tails > 0 ? (
             <>
               <path
                 d={curvePath(dens, Z.lo, STEPS.mean, (v) => sx(Z, v), zy, y(Z_BASE))}
-                fill={STAT_WASH}
-                opacity={tails * (0.75 + 0.25 * Math.min(1, both))}
+                fill={STAT}
+                opacity={tails * (0.55 + 0.3 * Math.min(1, both))}
               />
               <path
                 d={curvePath(dens, 2 * STEPS.claimed - STEPS.mean, Z.hi, (v) => sx(Z, v), zy, y(Z_BASE))}
-                fill={STAT_WASH}
-                opacity={tails * (0.75 + 0.25 * both)}
+                fill={STAT}
+                opacity={tails * (0.55 + 0.3 * Math.min(1, both))}
               />
             </>
           ) : null}
@@ -284,8 +321,8 @@ export const StepsScene: React.FC = () => {
             pathLength={1}
             strokeDasharray={`${curveIn} 1`}
           />
-          <line x1={zMirror} x2={zMirror} y1={y(Z_BASE)} y2={zy(dens(2 * STEPS.claimed - STEPS.mean)) - 30} stroke={STAT} strokeWidth={2} strokeDasharray="5 4" opacity={tails} />
-          <line x1={zMean} x2={zMean} y1={y(Z_BASE)} y2={zy(dens(STEPS.mean)) - 30} stroke={STAT} strokeWidth={3} opacity={tails} />
+          <line x1={zMirror} x2={zMirror} y1={y(Z_BASE)} y2={y(Z_BASE) - h(110) * tails} stroke={STAT} strokeWidth={2.5} strokeDasharray="5 4" />
+          <line x1={zMean} x2={zMean} y1={y(Z_BASE)} y2={y(Z_BASE) - h(110) * tails} stroke={STAT} strokeWidth={3.5} />
         </Svg>
       ) : null}
       <Note at={threeAt - 2} x={zMirror + 16} y={y(Z_BASE) - h(110)}>

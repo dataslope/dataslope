@@ -22,7 +22,6 @@ export const TabScene: React.FC = () => {
   const { y, h } = useLayout();
 
   // ── Cues ──
-  const tabFrom = n.beat("tab").from;
   const compileAt = n.word("tab", "Compile");
   const wasmAt = n.word("tab", "WebAssembly");
   const pgliteAt = n.word("tab", "PGlite");

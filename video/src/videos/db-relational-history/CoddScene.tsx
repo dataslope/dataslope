@@ -46,7 +46,6 @@ export const CoddScene: React.FC = () => {
   const { y, h } = useLayout();
 
   // ── Cues ──
-  const coddFrom = n.beat("codd").from;
   const juneAt = n.word("codd", "June");
   const seventyAt = n.word("codd", "nineteen seventy");
   const tedAt = n.word("codd", "Ted Codd");
@@ -66,7 +65,6 @@ export const CoddScene: React.FC = () => {
   const storeAt = n.word("shuffle", "store rows");
   const likesAt = n.word("shuffle", "likes");
   const shuffleAt = n.word("shuffle", "Shuffle");
-  const diskAt = n.word("shuffle", "disk");
   const againAt = n.word("shuffle", "again");
   const sameAt = n.word("shuffle", "SAME");
   const independenceAt = n.word("independence", "data independence");
@@ -171,7 +169,7 @@ export const CoddScene: React.FC = () => {
         }))}
         marks={[
           ...CUSTOMERS.map((_, i) => ({ row: i, col: 0, at: valueAt + i * 3, out: orderAt, color: KEY_WASH })),
-          { row: adaRow, col: 0, at: oneAt - 2, out: storeAt, color: KEY_WASH },
+          { row: adaRow, col: 0, at: numberAt, out: storeAt, color: KEY_WASH },
         ]}
       />
       <MovingTable

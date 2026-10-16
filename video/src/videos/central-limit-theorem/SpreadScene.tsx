@@ -252,11 +252,8 @@ export const SpreadScene: React.FC = () => {
       <Ink at={ruleFrom - 4} dur={18} style={{ left: TABLE_X, top: Y(548), width: 530 }}>
         <div style={{ height: 1, background: INK, marginBottom: 18 }} />
         <div style={label(20, ACCENT_INK)}>The rule</div>
-        <div style={{ ...body(30), color: INK, marginTop: 10, whiteSpace: "nowrap" }}>
+        <div style={{ ...body(30), color: INK, marginTop: 10 }}>
           <Marker at={thatSpreadAt - 2}>Spread of the average</Marker>
-          {merged ? (
-            <span style={{ color: ACCENT_INK, opacity: ease(frame, nextAt - 2, 12) }}>, the standard error</span>
-          ) : null}
         </div>
         <div style={{ ...headline(76, true), marginTop: 6 }}>
           = σ ÷ √<span style={{ fontStyle: "italic" }}>n</span>
@@ -268,7 +265,12 @@ export const SpreadScene: React.FC = () => {
       <Ink at={fourAt - 2} dur={16} style={{ left: TABLE_X, top: Y(800), width: 530 }}>
         <span style={{ ...body(30, true), color: ACCENT_INK }}>Four times the data, half the spread.</span>
       </Ink>
-      {merged ? null : (
+      {merged ? (
+        // Where the standalone video says "Next", the merged one names it.
+        <Ink at={nextAt - 2} dur={16} style={{ left: TABLE_X, top: Y(858), width: 530 }}>
+          <span style={{ ...body(30, true), color: INK }}>That spread is the standard error.</span>
+        </Ink>
+      ) : (
         <NextLine at={nextAt} x={TABLE_X} y={Y(858)} width={530}>
           the standard error.
         </NextLine>

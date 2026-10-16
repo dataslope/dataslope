@@ -49,7 +49,6 @@ export const BeforeScene: React.FC = () => {
   const saturnAt = n.word("trees", "Saturn Five");
   const filedAt = n.word("trees", "filed");
   const parentAt = n.word("trees", "parent");
-  const wantAt = n.word("walk", "Want");
   const adasAt = n.word("walk", "Ada's");
   const startsAt = n.word("walk", "starts");
   const topAt = n.word("walk", "top");
@@ -62,7 +61,6 @@ export const BeforeScene: React.FC = () => {
   const knowAt = n.word("route", "had to know");
   const routeAt = n.word("route", "ROUTE");
   const reorgAt = n.word("broke", "reorganize");
-  const fileAt = n.word("broke", "file");
   const everyAt = n.word("broke", "every program");
   const walkedAt = n.word("broke", "walked");
   const breaksAt = n.word("broke", "breaks");
@@ -233,7 +231,7 @@ export const BeforeScene: React.FC = () => {
           </span>
         </Ink>
       ))}
-      <Ink at={walkedAt + 6} dur={12} style={{ left: 126, top: y(392 + 4 * 56), whiteSpace: "nowrap" }}>
+      <Ink at={everyAt} dur={12} style={{ left: 126, top: y(392 + 4 * 56), whiteSpace: "nowrap" }}>
         <span style={{ ...note(21, ACCENT_INK), fontWeight: 650 }}>
           child 1 is now {last.name}: orders {lastOrders.join(" and ")}
         </span>

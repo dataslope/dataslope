@@ -137,7 +137,7 @@ export const Reply: React.FC<{
           color,
           padding: "4px 12px",
           borderRadius: 4,
-          background: `color-mix(in srgb, ${color === BLUE_INK ? BAR : ACCENT} ${10 + swell * 14}%, ${PAPER})`,
+          background: `color-mix(in srgb, ${color === BLUE_INK ? BAR : color === INK ? INK_SOFT : ACCENT} ${10 + swell * 14}%, ${PAPER})`,
         }}
       >
         {children}
