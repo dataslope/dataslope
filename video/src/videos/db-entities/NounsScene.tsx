@@ -3,12 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { ENTITY, Entity, entityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { body, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
-import { Drift, Headline, Kicker, lerp, Mark, Spot, Stack, Svg, Word } from "./parts";
+import { Drift, Kicker, lerp, Mark, Spot, Stack, STAT_INK, Svg, Word } from "./parts";
 
 const BOX_Y = 500;
 const BOX_W = 340;
@@ -85,16 +85,18 @@ export const NounsScene: React.FC = () => {
 
       <Drift from={trackingAt} to={end + 50} scale={0.02} origin={[960, 560]}>
         <Kicker at={hookFrom - 10}>Entities</Kicker>
-        <Headline
-          lead={
-            <>
-              Start with the <Mark at={thingsAt}>things.</Mark>
-            </>
-          }
-          leadAt={hookFrom - 8}
-          turn="Circle the nouns."
-          turnAt={circleNounsAt - 4}
-        />
+        {/* The headline arrives as it is said: "the things" on its word. */}
+        <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
+          <Ink at={hookFrom - 8} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
+            Start with the
+          </Ink>
+          <Ink at={thingsAt - 2} dur={14} style={{ position: "relative", whiteSpace: "nowrap" }}>
+            <Mark at={thingsAt + 8}>things.</Mark>
+          </Ink>
+          <Ink at={circleNounsAt - 4} dur={18} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+            Circle the nouns.
+          </Ink>
+        </div>
 
         {/* ── The sentence, word by word as it is read ── */}
         <Ink at={soAt} dur={14} style={{ left: 122, top: y(292), whiteSpace: "nowrap" }}>

@@ -28,7 +28,7 @@ import {
 
 const COL_X = [150, 735, 1320];
 const COL_W = 500;
-const TAG_Y = 296;
+const TAG_Y = 288;
 const PARENT_Y = 372;
 const HEAD_H = 40;
 const ROW_H = 48;
@@ -270,7 +270,7 @@ export const DeleteScene: React.FC = () => {
           rows={[{ cells: SETNULL.tickets.rows[0], at: tablesAt[2] + 10 }]}
           bands={[{ row: 0, at: keepsAt, color: MARK }]}
           marks={[{ row: 0, col: ptrCol, at: clearsAt, color: MARK_KEY }]}
-          swaps={[{ row: 0, col: ptrCol, at: noOneAt - 2, value: SETNULL.ticketsAfter.rows[0][ptrCol] }]}
+          swaps={[{ row: 0, col: ptrCol, at: noOneAt - 2, value: SETNULL.ticketsAfter.rows[0][ptrCol], color: ACCENT_INK }]}
         />
         <ElbowArrow points={leftLoop(s.c, 0, s.p, 0)} at={arrowsAt[2]} out={samGoneAt - 4} />
         <Ink at={samAt - 4} dur={12} style={{ left: COL_X[2], top: s.below, whiteSpace: "nowrap" }}>

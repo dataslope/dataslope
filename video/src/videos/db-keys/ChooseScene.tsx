@@ -12,7 +12,7 @@ import { Drift, ElbowArrow, Headline, Mark, Tag } from "./parts";
 const ROOT_X = 120;
 const ROOT_W = 300;
 const ROOT_H = 92;
-const BRANCH_Y = [380, 520, 660];
+const BRANCH_Y = [362, 496, 630];
 const ANSWER_X = 660;
 
 /**
@@ -125,8 +125,8 @@ export const ChooseScene: React.FC = () => {
           })}
 
           {/* ── ON UPDATE: the same question ── */}
-          <div style={{ position: "absolute", left: ROOT_X, top: y(752) - 12, width: 1700, height: 1, background: HAIRLINE, opacity: ease(frame, changingAt - 4, 12) * 0.6 }} />
-          <Ink at={changingAt - 2} dur={16} style={{ left: ROOT_X, top: y(752), whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={{ position: "absolute", left: ROOT_X, top: y(766) - 14, width: 1700, height: 1, background: HAIRLINE, opacity: ease(frame, changingAt - 4, 12) * 0.6 }} />
+          <Ink at={changingAt - 2} dur={16} style={{ left: ROOT_X, top: y(766), whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 16 }}>
             <Tag color={INK} size={22} mono>
               ON UPDATE
             </Tag>
@@ -140,7 +140,7 @@ export const ChooseScene: React.FC = () => {
           </Ink>
         </div>
 
-        <NextLine at={shapeAt - 4} x={ROOT_X} y={y(830)} width={760}>
+        <NextLine at={shapeAt - 4} x={ROOT_X} y={y(842)} width={760}>
           the shapes relationships take.
         </NextLine>
       </Drift>

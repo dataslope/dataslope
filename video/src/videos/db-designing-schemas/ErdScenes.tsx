@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, fmt, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, body, fmt, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -18,7 +18,8 @@ import {
   TOTAL_CHARGED,
   ZERO_QUANTITY,
 } from "./data";
-import { DbTable, ErrorBox, Head, Mark, MARK_BAD, Strike, tableGeometry } from "./parts";
+import { MONO } from "../../theme/fonts";
+import { DbTable, ErrorBox, Head, Mark, MARK_BAD, Mono, Strike, tableGeometry } from "./parts";
 import { STORE_BOTTOM, STORE_TOP, STORE_X } from "./StoreErd";
 
 /** Where Postgres's answers sit: under the diagram, across its width. */
@@ -81,10 +82,13 @@ export const RulesScene: React.FC = () => {
   const twiceAt = n.word("keys", "twice");
   const rulesFrom = n.beat("rules").from;
   const refusedAt = n.word("rules", "refused");
+  const lineAt = n.word("rules", "a line");
+  const zeroAt = n.word("rules", "zero mugs");
   return (
     <AbsoluteFill>
       <Sfx name="el-tap" at={twiceAt - 2} level={-28} />
       <Sfx name="el-tap" at={refusedAt - 2} level={-27} />
+      <Sfx name="el-pencil" at={lineAt - 4} level={-35} />
       <Head at={keysFrom - 6} second={rulesFrom - 2} italic="then rules.">
         Keys first,
       </Head>
@@ -97,10 +101,26 @@ export const RulesScene: React.FC = () => {
         message={DUPLICATE_LINE.message}
         detail={DUPLICATE_LINE.detail}
       />
+      {/* "A line for zero mugs": the row tried, as Postgres's DETAIL spells it, until it is refused. */}
+      <Ink at={lineAt - 4} dur={16} out={refusedAt - 4} style={{ left: STORE_X[0], top: y(ERROR_Y) + 10, display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
+        <span style={{ ...label(22, INK_SOFT) }}>A new line for order_items</span>
+        <span style={{ fontFamily: MONO, fontSize: 28, color: INK }}>
+          {TRIED.map((v, i) => (
+            <React.Fragment key={i}>
+              {i ? ", " : "("}
+              {i === 2 ? <Mark at={zeroAt - 2} color={MARK_BAD}>{v}</Mark> : v}
+            </React.Fragment>
+          ))}
+          )
+        </span>
+      </Ink>
       <ErrorBox x={STORE_X[0]} top={y(ERROR_Y)} width={ERROR_W} at={refusedAt - 2} message={ZERO_QUANTITY.message} detail={ZERO_QUANTITY.detail} />
     </AbsoluteFill>
   );
 };
+
+/** The row the zero-quantity insert tried, read back out of Postgres's DETAIL line. */
+const TRIED = (ZERO_QUANTITY.detail?.match(/\((.*)\)/)?.[1] ?? "").split(", ");
 
 /** "2 × 10.00 + 1 × 24.00": an order's lines, priced one way or the other. */
 const sumOf = (price: (row: readonly (string | null)[]) => string) =>
@@ -147,7 +167,11 @@ export const PriceScene: React.FC = () => {
   const charged = sumOf((r) => r[3] as string);
   const catalog = sumOf((r) => productOf(r)[2] as string);
   // "Walk real rows through the design": each stored row lit in turn.
-  const walk = (k: number) => walkAt + k * 6;
+  const walk = (k: number) => walkAt + k * 7;
+  const breaksAt = n.word("review", "breaks");
+  const nowAt = n.word("then", "today");
+  const thenAt = n.word("then", "charged");
+  const tagsOut = mugFrom - 6;
 
   return (
     <AbsoluteFill>
@@ -175,7 +199,6 @@ export const PriceScene: React.FC = () => {
         marks={[
           { row: MUG, col: 2, at: tenAt - 6, out: twelveAt - 2 },
           { row: MUG, col: 3, at: tenAt, color: undefined },
-          ...ITEM_ROWS.map((_, i) => ({ row: i, col: 0, at: walk(i), out: walk(i) + 20 })),
         ]}
       />
       <DbTable
@@ -186,9 +209,56 @@ export const PriceScene: React.FC = () => {
         numeric={[0, 2]}
         marks={[
           { row: mugProduct, col: 2, at: twelveAt - 2, color: MARK_BAD },
-          ...PRODUCT_ROWS.map((_, i) => ({ row: i, col: 0, at: walk(2 + i), out: walk(2 + i) + 20 })),
         ]}
       />
+
+      {/* "Products holds the price today. Order items holds the price charged." */}
+      <Ink at={nowAt - 4} dur={16} out={tagsOut} style={{ left: STORE_X[0], top: y(800), whiteSpace: "nowrap" }}>
+        <span style={{ ...body(32), color: INK }}>
+          <Mono>products.current_price</Mono> is the price <Mark at={nowAt + 6}>today</Mark>
+        </span>
+      </Ink>
+      <Ink at={thenAt - 4} dur={16} out={tagsOut} style={{ left: STORE_X[0], top: y(856), whiteSpace: "nowrap" }}>
+        <span style={{ ...body(32), color: INK }}>
+          <Mono>order_items.unit_price</Mono> is the price charged, <Mark at={thenAt + 10}>back then</Mark>
+        </span>
+      </Ink>
+      {/* "Walk real rows through the design": each stored row lit across, in turn. */}
+      {[...ITEM_ROWS.map((_, i) => ({ g: items, i })), ...PRODUCT_ROWS.map((_, i) => ({ g: products, i }))].map(({ g, i }, k) => {
+        const w = ease(frame, walk(k), 10);
+        const o = ease(frame, walk(k) + 22, 12);
+        if (w <= 0 || o >= 1) return null;
+        return (
+          <div
+            key={k}
+            style={{
+              position: "absolute",
+              left: g.x,
+              top: g.rowTop(i) + 4,
+              width: g.width * w,
+              height: g.rowH - 8,
+              background: HIGHLIGHT,
+              mixBlendMode: "multiply",
+              opacity: 1 - o,
+            }}
+          />
+        );
+      })}
+      {/* "See what breaks": the total from today's prices, lit in the accent. */}
+      {frame >= breaksAt - 4 ? (
+        <div
+          style={{
+            position: "absolute",
+            left: STORE_X[0] - 10,
+            top: y(856) - 6,
+            width: 1000 * ease(frame, breaksAt - 4, 14),
+            height: 52,
+            background: MARK_BAD,
+            mixBlendMode: "multiply",
+            borderRadius: 4,
+          }}
+        />
+      ) : null}
 
       {/* The two totals, from the price charged and from today's. */}
       <Ink at={linesAt - 4} dur={16} style={{ left: STORE_X[0], top: y(800), display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>

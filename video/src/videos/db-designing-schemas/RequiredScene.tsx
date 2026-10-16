@@ -2,13 +2,13 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
 import { AFTER_ADD, BACKFILL_VALUE, BACKFILLED, MISSING, ONE_STEP, PRIORITY_REQUIRED, TASKS } from "./data";
-import { DbTable, ErrorBox, Head, KEY, Kicker, Mark, MARK_BAD, Ping, tableGeometry } from "./parts";
+import { DbTable, ErrorBox, Head, KEY, Kicker, Mark, MARK_BAD, Ping, type TableGeometry, tableGeometry } from "./parts";
 
 const X = 120;
 const STEPS_X = 900;
@@ -42,6 +42,7 @@ export const RequiredScene: React.FC = () => {
   const makeAt = n.word("safe", "required");
   const decisionAt = n.word("means", "design decision");
   const meanAt = n.word("means", "MEAN");
+  const oldRowsAt = n.word("means", "old rows");
 
   // Columns 3 and 4 share one place: the priority Postgres refuses, then the
   // one added nullable.
@@ -92,11 +93,17 @@ export const RequiredScene: React.FC = () => {
         badges={[{ col: 4, at: makeAt, text: "NOT NULL" }]}
         marks={[
           ...TASKS.map((_, i) => ({ row: i, col: 3, at: noPriorityAt + i * 4, color: MARK_BAD })),
-          ...TASKS.map((_, i) => ({ row: i, col: 0, at: alreadyAt + i * 4, out: brokenAt })),
           ...TASKS.map((_, i) => ({ row: i, col: 4, at: decisionAt + i * 4 })),
         ]}
         swaps={TASKS.map((_, i) => ({ row: i, col: 4, at: normalAt + i * 4, value: BACKFILL_VALUE }))}
       />
+      {/* "The tasks already there", and later "what the old rows mean": the rows lit across. */}
+      {TASKS.map((_, i) => (
+        <React.Fragment key={i}>
+          <Band g={g} row={i} at={alreadyAt + i * 5} out={noPriorityAt + 10} />
+          <Band g={g} row={i} at={oldRowsAt + i * 5} />
+        </React.Fragment>
+      ))}
       {/* "Priority": the new requirement, beside the table it lands on. */}
       <Ink at={priorityAt - 2} dur={14} out={stepsAt - 4} style={{ left: g.x + g.width + 30, top: g.top + 8, whiteSpace: "nowrap" }}>
         <span style={{ ...body(30, true), color: INK_SOFT }}>every task needs one</span>
@@ -110,6 +117,7 @@ export const RequiredScene: React.FC = () => {
       {steps.map((s, i) => {
         const top = y(330) + i * h(86);
         const done = ease(frame, s.at + 8, 10);
+        const lit = i === 1 ? ease(frame, decisionAt - 2, 12) : 0;
         return (
           <Ink key={s.title} at={s.at - 4} dur={14} style={{ left: STEPS_X, top, display: "flex", alignItems: "center", gap: 16, whiteSpace: "nowrap" }}>
             <span
@@ -131,7 +139,10 @@ export const RequiredScene: React.FC = () => {
             >
               {i + 1}
             </span>
-            <span style={{ ...label(26, INK), fontWeight: 600 }}>{s.title}</span>
+            <span style={{ ...label(26, INK), fontWeight: 600, position: "relative" }}>
+              <span style={{ position: "absolute", left: "-0.2em", right: "-0.2em", top: "0.05em", bottom: "-0.05em", background: HIGHLIGHT, borderRadius: "0.14em", opacity: lit }} />
+              <span style={{ position: "relative" }}>{s.title}</span>
+            </span>
             <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, (s.detailAt ?? s.at) + 4, 12) }}>{s.detail}</span>
           </Ink>
         );
@@ -144,5 +155,27 @@ export const RequiredScene: React.FC = () => {
         </span>
       </Ink>
     </AbsoluteFill>
+  );
+};
+
+/** A highlighter wash across one row of a table, multiplied in so its text stays dark. */
+const Band: React.FC<{ g: TableGeometry; row: number; at: number; out?: number }> = ({ g, row, at, out }) => {
+  const frame = useCurrentFrame();
+  const w = ease(frame, at, 12);
+  const o = out === undefined ? 0 : ease(frame, out, 12);
+  if (w <= 0 || o >= 1) return null;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: g.x,
+        top: g.rowTop(row) + 4,
+        width: g.widths.slice(0, 4).reduce((a, b) => a + b, 0) * w,
+        height: g.rowH - 8,
+        background: HIGHLIGHT,
+        mixBlendMode: "multiply",
+        opacity: 1 - o,
+      }}
+    />
   );
 };

@@ -28,6 +28,7 @@ export const ChangeScene: React.FC = () => {
   const { y } = useLayout();
 
   const changeFrom = n.beat("change").from;
+  const trackerAt = n.word("change", "task tracker");
   const tasksAt = n.word("change", "just tasks");
   const dueAt = n.word("change", "due dates");
   const projectsAt = n.word("change", "projects");
@@ -52,7 +53,7 @@ export const ChangeScene: React.FC = () => {
   const bend = (tasks.right + projects.left) / 2;
 
   const versions = [
-    { at: tasksAt, text: "v1 tasks only" },
+    { at: trackerAt, text: "v1 tasks only" },
     { at: dueAt, text: "v2 due date" },
     { at: projectsAt, text: "v3 projects" },
     { at: labelsAt, text: "v4 labels" },

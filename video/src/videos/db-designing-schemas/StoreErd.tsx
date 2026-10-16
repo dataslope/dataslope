@@ -104,6 +104,14 @@ export const StoreErd: React.FC = () => {
   const todayAt = n.word("then", "today");
   const chargedAt = n.word("then", "charged");
   const leaveAt = n.beat("mug").from - 4;
+  const rowAtCue = n.word("pointer", "customer's row");
+  const howManyA = n.word("relate", "how many");
+  const howManyB = n.word("relate", "how many", { nth: 2 });
+  const meetAt = n.word("pairs", "meet");
+  const itselfAt = n.word("rules", "itself");
+  const all = (e: { columns: readonly unknown[] }) => e.columns.map((_, i) => i);
+  const KEY_WASH = `color-mix(in srgb, var(--ds-blue-300) 55%, ${PAPER})`;
+  const BAD_WASH = `color-mix(in srgb, var(--ds-red-300) 55%, ${PAPER})`;
 
   // The boxes that hold no price set back on "copies", and leave for the figure.
   const setBack = copiesAt;
@@ -250,6 +258,17 @@ export const StoreErd: React.FC = () => {
       <RowWash e={L.orderItems} rows={[3]} at={copiesAt + 8} />
       <Relation name="orders contain order_items" points={lines.contains} from="exactly-one" to="zero-or-many" at={itemsAt + 10} {...fx(2)} />
       <Relation name="products sold as order_items" points={lines.sold} from="exactly-one" to="zero-or-many" at={itemsAt + 16} />
+
+      {/* "It points at the customer's row". */}
+      <RowWash e={L.customers} rows={[0]} at={rowAtCue - 2} out={placesAt - 6} color={KEY_WASH} />
+      {/* "How many connect to how many?": each side lit as it is asked. */}
+      <RowWash e={L.customers} rows={all(L.customers)} at={howManyA - 2} out={howManyA + 22} />
+      <RowWash e={L.orders} rows={all(L.orders)} at={howManyB - 2} out={howManyB + 22} />
+      {/* "So they meet in a table": the two sides lit before the table arrives between them. */}
+      <RowWash e={L.products} rows={all(L.products)} at={meetAt - 4} out={pcAt + 10} />
+      <RowWash e={L.categories} rows={all(L.categories)} at={meetAt} out={pcAt + 10} />
+      {/* "Refused by Postgres itself": the rule's row, struck in the accent. */}
+      <RowWash e={L.orderItems} rows={[2]} at={itselfAt - 4} out={copiesAt} color={BAD_WASH} />
 
       {/* "Every fact in one place": each box's facts lit in turn. */}
       {[L.customers, L.orders, L.categories, L.products].map((e, k) => (

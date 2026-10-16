@@ -9,10 +9,12 @@ import { useNarration } from "../../narration/NarrationContext";
 import { MONO } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
 import { WIDE_COLUMNS } from "./data";
-import { clamp01, Drift, Head, Kicker, MARK_BAD, RowWash, Spot } from "./parts";
+import { Chip, clamp01, Drift, Head, Kicker, MARK_BAD, RowWash, Spot } from "./parts";
 import { useStoreLayout } from "./StoreErd";
 
 const HEAD_SIZE = 22;
+/** The store's tables, in the order the wide table lays their columns out. */
+const TABLES = [...new Set(WIDE_COLUMNS.map((c) => c.table))];
 const PAD = 18;
 const cellW = (name: string) => Math.ceil(name.length * 0.6 * HEAD_SIZE + 2 * PAD);
 
@@ -30,6 +32,8 @@ export const ScaleScene: React.FC = () => {
   const L = useStoreLayout();
 
   const scaleFrom = n.beat("scale").from;
+  const growAt = n.word("scale", "grow");
+  const crammAt = n.word("scale", "Cram");
   const wideAt = n.word("scale", "one wide table");
   const tangledAt = n.word("scale", "tangled");
   const apartFrom = n.beat("apart").from;
@@ -79,6 +83,20 @@ export const ScaleScene: React.FC = () => {
         A clear model is
       </Head>
 
+      {/* "As you grow": the store's tables named, then crammed together into one row. */}
+      {TABLES.map((t, k) => {
+        const inP = ease(frame, growAt - 4 + k * 4, 12);
+        const cram = ease(frame, crammAt - 2, 18);
+        const gone = ease(frame, wideAt - 6, 10);
+        if (inP <= 0 || gone >= 1) return null;
+        const x0 = 120 + k * 330;
+        const x = x0 + (120 + k * 60 - x0) * cram;
+        return (
+          <div key={t} style={{ position: "absolute", left: x, top: stripTop + 6, opacity: inP * (1 - gone), transform: `translateY(${(1 - inP) * 12}px)` }}>
+            <Chip>{t}</Chip>
+          </div>
+        );
+      })}
       {stripIn > 0 && stripOut < 1 ? (
         <div style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 1080, opacity: stripIn * (1 - stripOut), overflow: "hidden" }}>
           <div style={{ position: "absolute", left: panX, top: stripTop, width: stripW, height: 150 }}>

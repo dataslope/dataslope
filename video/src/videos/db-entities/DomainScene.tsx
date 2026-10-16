@@ -62,8 +62,8 @@ export const DomainScene: React.FC = () => {
       <Sfx name="el-tap" at={spellAt[0]} level={-29} />
       <Sfx name="el-tap" at={spellAt[3]} level={-30} />
       <Sfx name="el-pencil" at={sameAt - 2} level={-34} />
-      <Sfx name="el-scratch" at={getsAt} level={-30} />
-      <Sfx name="el-pop" at={refusedAt - 2} level={-30} />
+      <Sfx name="el-scratch" at={getsAt} level={-32} />
+      <Sfx name="el-pop" at={refusedAt - 2} level={-32} />
       <Sfx name="el-pencil" at={ruleAt} level={-35} />
 
       <Drift from={ruleAt + 10} to={end + 70} scale={0.018} origin={[960, 560]}>

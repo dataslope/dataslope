@@ -106,7 +106,7 @@ export const EmailScene: React.FC = () => {
       <Sfx name="el-pencil" at={pointAt - 2} level={-34} />
 
       <Drift from={from} to={n.beat("fk-in").to + 50}>
-        <Headline lead="When the key itself" turn="has to change" at={from - 6} turnAt={changesAt - 4} />
+        <Headline lead="When the key itself" turn="has to change." at={from - 6} turnAt={changesAt - 4} />
 
         {/* ── Email as the key ── */}
         <Ink at={keyAt - 6} dur={12} out={swapAt} style={{ left: X0, top: y(300), whiteSpace: "nowrap" }}>

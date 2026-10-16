@@ -20,7 +20,7 @@ const Diagram: React.FC = () => {
     columns: [
       { name: "id", type: "integer", key: "PK" },
       { name: "name", type: "text" },
-      { name: "email", type: "text" },
+      { name: "email", type: "text", key: "UK" },
     ],
   });
   const orders = useEntityLayout({

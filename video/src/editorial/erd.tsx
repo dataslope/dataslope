@@ -28,8 +28,9 @@ export type EntityColumn = {
   name: string;
   /** The column's type, as the lesson's DDL spells it (`integer`, `text`). */
   type?: string;
-  /** Its role in a key. */
-  key?: "PK" | "FK" | "PK, FK";
+  /** Its role in a key: primary, foreign, unique (an alternate key, as the
+   *  lessons' ER diagrams mark `email UK`), or two at once. */
+  key?: "PK" | "FK" | "UK" | "PK, FK" | "FK, UK";
 };
 
 export type EntitySpec = {
@@ -45,11 +46,11 @@ export type EntitySpec = {
 /** Box metrics before the layout's `h()`. */
 export const ENTITY = { head: 56, row: 46, width: 380, pad: 18, gap: 16 };
 
-/** The key column's width: wide enough for the entity's widest key ("PK, FK"
- *  needs about 66px at 19px bold), and none at all when it has no keys, so
- *  names never crowd their badge and keyless tables don't indent. */
+/** The key column's width: wide enough for the entity's widest key (a pair
+ *  like "PK, FK" needs about 66px at 19px bold), and none at all when it has
+ *  no keys, so names never crowd their badge and keyless tables don't indent. */
 const badgeWidth = (columns: readonly EntityColumn[]) =>
-  columns.some((c) => c.key === "PK, FK") ? 74 : columns.some((c) => c.key) ? 32 : 0;
+  columns.some((c) => c.key?.includes(",")) ? 74 : columns.some((c) => c.key) ? 32 : 0;
 
 export type EntityLayout = ReturnType<typeof entityLayout>;
 

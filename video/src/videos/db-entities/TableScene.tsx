@@ -72,11 +72,14 @@ export const TableScene: React.FC = () => {
           leadAt={typeFrom - 6} turn="One thing, one row." turnAt={realAt - 4} />
 
         {/* ── customers: the entity type, and one real customer ── */}
-        <Ink at={customersAt - 4} dur={14} style={{ left: CUSTOMERS_X, top: top - 52, whiteSpace: "nowrap" }}>
-          <span style={label(23, INK)}>
-            customers <span style={{ color: INK_SOFT, fontWeight: 500 }}>is the table: every customer</span>
-          </span>
-        </Ink>
+        <div style={{ position: "absolute", left: CUSTOMERS_X, top: top - 52, display: "flex", gap: "0.3em", whiteSpace: "nowrap" }}>
+          <Ink at={tableAt - 4} dur={12} style={{ position: "relative" }}>
+            <span style={label(23, INK)}>customers</span>
+          </Ink>
+          <Ink at={customersAt - 4} dur={14} style={{ position: "relative" }}>
+            <span style={{ ...label(23, INK_SOFT), fontWeight: 500 }}>is the table: every customer</span>
+          </Ink>
+        </div>
         <Bracket x={CUSTOMERS_X - 18} y0={top} y1={cBottom} at={theTableAt} left color={INK_SOFT} />
         <div
           style={{
@@ -91,7 +94,7 @@ export const TableScene: React.FC = () => {
             g={gC}
             cols={CUSTOMERS.cols}
             rows={CUSTOMERS.rows.map((cells, i) => ({ cells, at: rowAt + i * 5 }))}
-            at={tableAt - 4}
+            at={typeAt}
             numeric={[0]}
             bands={[{ row: ADA_ROW, at: oneRowAt - 2 }]}
           />
