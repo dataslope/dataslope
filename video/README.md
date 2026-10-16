@@ -259,7 +259,12 @@ id; to keep the result, set `voice` in the script (or add the voice to
 run, a new voice, or `--force`), the whole script goes in a single request:
 beats joined by a space, and a paragraph break before each beat that opens a
 scene. The take is then cut into beats at the middle of the longest silence
-in each pause between them, so no cut lands in a word. Each beat keeps up to
+between the start of one beat's last word and the end of the next beat's
+first word, so no cut lands in a word. The window is that wide because the
+character times can be well off at a sentence end: StandardError's stretched
+"testing." 0.45 s across the pause after it, and a narrower window missed the
+pause and cut into "Next". `npm run narrate` warns when a boundary has no
+pause of at least 0.15 s, where a cut could clip a word. Each beat keeps up to
 0.45 s of breath before its first word and 0.3 s of decay after its last,
 with an 8 ms fade at the cut. The timeline starts a beat's audio early by
 that lead-in, so the first word still lands on the beat, and never starts it

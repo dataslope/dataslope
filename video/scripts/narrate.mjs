@@ -49,6 +49,9 @@ const MAX_LEAD = 0.45;
 const MAX_TAIL = 0.3;
 /** A short fade at every cut, so no slice starts or ends on a click. */
 const FADE = 0.008;
+/** The shortest pause a cut is trusted to sit in. Below it, the longest
+ *  quiet stretch may be the closure of a "t" inside a word. */
+const MIN_PAUSE = 0.15;
 
 const VIDEO_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const args = process.argv.slice(2);
@@ -230,8 +233,10 @@ function cutPoint(samples, lo, hi, loudest) {
       if (!best || run.to - run.from > best.to - best.from) best = run;
     } else run = null;
   }
-  return best ? (best.from + best.to) / 2 / SAMPLE_RATE : (lo + hi) / 2;
+  if (!best) return { at: (lo + hi) / 2, quiet: 0 };
+  return { at: (best.from + best.to) / 2 / SAMPLE_RATE, quiet: (best.to - best.from) / SAMPLE_RATE };
 }
+
 
 function rms(samples, from, n) {
   let e = 0;
@@ -241,6 +246,16 @@ function rms(samples, from, n) {
 
 /** Index of the first or last letter in [s, e) that is spoken, skipping any
  *  audio tag such as [curious]. */
+/** The index of the first letter of the last spoken word in [s, e), or of
+ *  the last letter of the first one. */
+function wordEdge(text, s, e, last) {
+  const inWord = (c) => /[a-z0-9'’-]/i.test(c ?? "");
+  let i = letterAt(text, s, e, last);
+  if (last) while (i > s && inWord(text[i - 1])) i--;
+  else while (i < e - 1 && inWord(text[i + 1])) i++;
+  return i;
+}
+
 function letterAt(text, s, e, last) {
   let depth = 0;
   const found = [];
@@ -290,16 +305,25 @@ function cutTake(take) {
   const sounding = (t) => rms(samples, Math.round(t * SAMPLE_RATE), frame) >= 0.03 * loudest;
 
   const first = spans.map(([s, e]) => letterAt(text, s, e, false));
-  const lastLetter = spans.map(([s, e]) => starts[letterAt(text, s, e, true)]);
   const end = spans.map(([, e]) => ends[e - 1]);
-  // Each cut sits in the longest quiet stretch of the pause between two
-  // beats: from just after the last letter starts to just after the next one
-  // starts, which covers the pause even where the character times are off.
-  const cuts = spans
-    .slice(1)
-    .map((_, i) =>
-      cutPoint(samples, lastLetter[i] + 0.06, Math.max(starts[first[i + 1]] + 0.06, lastLetter[i] + 0.1), loudest),
-    );
+  // Each cut sits in the longest quiet stretch between the start of one
+  // beat's last word and the end of the next beat's first word. The pause
+  // between them is in there even where the character times are well off:
+  // StandardError's alignment stretched "testing." 0.45 s across the pause
+  // after it, and a window that started at its last letter missed the pause
+  // and cut into "Next". A sentence pause runs 0.3 to 0.6 s, longer than any
+  // gap inside a word, so the longest quiet stretch is the pause.
+  const cuts = spans.slice(1).map((_, i) => {
+    const lo = starts[wordEdge(text, ...spans[i], true)];
+    const hi = ends[wordEdge(text, ...spans[i + 1], false)];
+    const { at, quiet } = cutPoint(samples, lo, Math.max(hi, lo + 0.1), loudest);
+    if (quiet < MIN_PAUSE) {
+      console.warn(
+        `  ! ${script.beats[i].id} → ${script.beats[i + 1].id}: no clear pause (longest quiet ${quiet.toFixed(2)} s); the cut may clip a word`,
+      );
+    }
+    return at;
+  });
   // Where each beat's first word really starts: the first sound after the
   // cut. The character times put it up to 0.3 s late after an audio tag
   // (the tag is given time the voice spends on the word), so the sound
