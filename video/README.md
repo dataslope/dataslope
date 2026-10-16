@@ -285,7 +285,18 @@ npm run narrate -- c-pointers --only star # re-voice one edited beat
 npm run narrate -- c-pointers --force     # a whole new take
 npm run narrate -- c-pointers --recut     # cut the kept take again, no API call
 npm run cues -- c-pointers                # the timing it produced
+npm run check:sync -- c-pointers          # and that the voice really starts there
 ```
+
+**Check the sync after every voicing.** `npm run check:sync` renders the
+soundtrack with the effects off, finds where speech starts after each pause,
+and compares it with the timeline's cue for every beat. Animations are cued
+from those times, so a beat on time means everything cued to it is too. It
+fails a beat more than 0.12 s out (`--tolerance` changes that); the voiced
+videos all sit within 0.09 s, the worst being a beat voiced on its own after
+the take. `--audio <file.wav>` checks a dry render you already have. A
+drifting beat usually means its audio and `alignment.json` disagree: re-voice
+that beat, or `--recut` if a whole run drifts.
 
 **Voicing is billed per character, so an edit re-voices only what changed.**
 A plain run sends just the new or edited beats, each on its own. That is
@@ -445,17 +456,31 @@ conclusion, and `el-logo` for the intro. `el-chime` is the one to watch: it
 centres near 320 Hz, inside the voice, so it goes in a pause and stays at
 about -32.
 
-**Measure the mix rather than guess it.** Render the audio twice, with and
-without the effects, and subtract the two to get the effects alone:
+**Measure the mix rather than guess it.** `npm run check:mix` renders the
+soundtrack twice, as the video plays it and with `sfx: false`, and subtracts
+the two to get the effects alone:
 
 ```bash
-npx remotion render SamplingBias wet.wav --codec=wav
-npx remotion render SamplingBias dry.wav --codec=wav --props='{"sfx":false}'
+npm run check:mix -- SamplingBias           # renders both (a few minutes for a long video)
+npm run check:mix -- SamplingBias --reuse   # measure the WAVs already in out/
 ```
 
-SamplingBias's effects layer measures -42.4 LUFS against the narration's
--24.8, which is 17.6 LU under it, with peaks at -23 dBFS. Wherever both are
-sounding, the speech is a median 20 dB above the effects (in 50 ms windows).
+It reports both layers' integrated loudness (LUFS, measured to ITU-R
+BS.1770 in the script itself, since Remotion's ffmpeg has no `ebur128`), the
+effects' peak and when it happens, how far the speech stays above the
+effects wherever both sound, and the five moments an effect comes closest to
+the voice. `out/<id>-fx.wav` is the effects on their own, at their real
+level, for listening.
+
+| Video | Effects under the narration | Effects' peak | Speech over effects (median, 50 ms) |
+| --- | --- | --- | --- |
+| SamplingBias | 17.5 LU (-42.3 against -24.8 LUFS) | -23 dBFS | 19.9 dB |
+| ThinkingStatistically | 18.9 LU (-43.6 against -24.7 LUFS) | -21 dBFS, the logo, with nothing under it | 22.5 dB |
+
+About 15 LU under or more reads as subtle. The "closest" moments are 50 ms
+readings, so a knock that lands in the gap between two words can briefly
+match the voice there without masking a word: listen before turning one
+down.
 
 ## Images
 
@@ -560,4 +585,14 @@ npm run lint
 npm test              # timing, scene cuts, word cues, voices, arrowheads
 npm run check:frames  # a frame every half second at --scale=2 (about a minute):
                       # illustrations sharp at 4K, arrowheads on straight ends
+npm run check:sync -- <video>   # a voiced video: every beat starts where its cue says
+npm run check:mix -- <video>    # a video with sound effects: how far under the voice they sit
 ```
+
+Both audio checks take the composition (`ThinkingStatistically`) or the
+folder name that `narrate` and `cues` take (`thinking-statistically`), and
+write their renders to `out/`. They are plain Node (`scripts/lib/audio.mjs`),
+with no ffmpeg filters and no Python, so they run the same on Windows. The
+loudness and pause detection are checked against ffmpeg's `ebur128` and
+`silencedetect` (the same pauses to 1 ms) and pinned by
+`scripts/lib/audio.test.mjs` under `npm test`.
