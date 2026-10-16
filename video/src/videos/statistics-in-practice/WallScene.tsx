@@ -141,6 +141,7 @@ export const WallScene: React.FC = () => {
   const onceAt = n.word("confirm", "once");
   const nobodyAt = n.word("confirm", "nobody");
   const claimAt = n.word("confirm", "claim");
+  const keepAt = n.word("sin", "Keep a wall");
   const crossingAt = n.word("sin", "crossing");
   const suggestedAt = n.word("sin", "suggested");
   const pickedAt = n.word("sin", "picked");
@@ -171,7 +172,7 @@ export const WallScene: React.FC = () => {
       <Sfx name="el-tap" at={tiltedAt - 2} level={-28} />
 
       <Headline lead="Two jobs," turn="with a wall between." at={jobsFrom - 6} turnAt={confirmFrom - 6} />
-      <Wall x={WALL_X} top={y(WALL_TOP)} bottom={y(WALL_BOTTOM)} at={jobsFrom - 8} />
+      <Wall x={WALL_X} top={y(WALL_TOP)} bottom={y(WALL_BOTTOM)} at={jobsFrom - 8} width={lerp(9, 15, ease(frame, keepAt - 4, 12))} />
 
       {/* ── Exploring ── */}
       <div style={{ position: "absolute", inset: 0, opacity: leftDim }}>
@@ -209,7 +210,7 @@ export const WallScene: React.FC = () => {
         <span style={{ ...body(44, true), color: INK }}>Confirming</span>
       </Ink>
       <LeadCard x={card.x} y={card.y} />
-      <Ink at={advanceAt - 4} dur={14} style={{ left: 1490, top: y(398) + 14, whiteSpace: "nowrap" }}>
+      <Ink at={advanceAt - 4} dur={14} style={{ left: 1428, top: y(CARD_TO.y) + 16, whiteSpace: "nowrap" }}>
         <span style={{ ...note(22, INK_SOFT) }}>stated in advance</span>
       </Ink>
 
@@ -244,7 +245,9 @@ export const WallScene: React.FC = () => {
       <Ring x={(SEALED.x0 + SEALED.x1) / 2} y={(y(SEALED.y0) + y(SEALED.y1)) / 2} at={freshAt - 2} r0={60} r1={190} color={BAR} dur={26} />
       <Ink at={claimAt - 6} dur={16} style={{ left: 1060, top: y(712), whiteSpace: "nowrap" }}>
         <span style={{ ...note(28, INK), fontWeight: 600 }}>Out comes a claim,</span>
-        <span style={{ ...note(22, INK_SOFT), marginLeft: 12 }}>with a p-value, an effect size and an interval.</span>
+      </Ink>
+      <Ink at={claimAt + 4} dur={16} style={{ left: 1060, top: y(712) + 42, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK_SOFT) }}>with a p-value, an effect size and an interval.</span>
       </Ink>
 
       {/* ── The trap: the test carried back across the wall ── */}
@@ -259,9 +262,9 @@ export const WallScene: React.FC = () => {
       <Ink at={suggestedAt - 4} dur={14} style={{ left: THUMB_X[DAY_THUMB], top: y(THUMB_Y[0]) + h(THUMB_H) + 8, whiteSpace: "nowrap" }}>
         <span style={{ ...note(20, STAT_INK), fontWeight: 650 }}>the same data</span>
       </Ink>
-      <Cross x={WALL_X} y={y(CARD_TO.y) + 32} at={tiltedAt - 4} size={30} />
+      <Cross x={WALL_X} y={y(CARD_TO.y) + 32} at={tiltedAt - 4} size={40} />
 
-      <div style={{ position: "absolute", left: 160, top: y(808), display: "flex", gap: "0.3em", whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: 160, top: y(808), display: "flex", gap: "0.36em", whiteSpace: "nowrap" }}>
         <Ink at={pValueAt - 6} dur={18} style={{ position: "relative" }}>
           <span style={{ ...body(38), color: INK }}>A p-value from the data that suggested the question</span>
         </Ink>

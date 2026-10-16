@@ -216,7 +216,7 @@ d = stats.expon(scale=200)
 p95 = d.ppf(0.95)
 say(f"95th percentile response time = {p95:.1f} ms")
 say(f"Check: cdf(p95) = {d.cdf(p95):.4f}")
-out["quantile"] = {"scale": 200, "p": 0.95, "ppf": r(p95, 2)}
+out["quantile"] = {"scale": 200, "p": 0.95, "ppf": r(p95, 3)}
 
 # ── Part 3. Adelie flipper lengths (the-normal-distribution) ────────────────
 penguins = pd.read_csv(ROOT / ".dataset-cache" / "palmer-penguins.csv")
@@ -268,6 +268,10 @@ say(f"median income = {np.median(income):,.0f}  (well below the mean -> right sk
 mu, sigma = income.mean(), income.std()
 fitted = stats.norm(loc=mu, scale=sigma)
 say(f"Fitted normal says P(income < 0) = {fitted.cdf(0):.3f}, impossible for income!")
+# norm.fit on the same incomes: the maximum-likelihood normal is that same
+# mean and (population) SD, numbers back for the wrong shape.
+fit_loc, fit_scale = stats.norm.fit(income)
+say(f"  norm.fit(income) = ({fit_loc:,.0f}, {fit_scale:,.0f})")
 out["income"] = {
     "n": int(income.size),
     "mean": r(mu, 0),
@@ -275,6 +279,8 @@ out["income"] = {
     "sd": r(sigma, 0),
     "max": r(income.max(), 0),
     "belowZero": r(fitted.cdf(0) * 100, 2),
+    "fitLoc": r(fit_loc, 0),
+    "fitScale": r(fit_scale, 0),
     # Five-thousand-dollar bins from 0 to 150,000, and how many lie beyond.
     "lo": 0,
     "bin": 5000,

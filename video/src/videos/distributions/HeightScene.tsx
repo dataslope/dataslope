@@ -184,4 +184,6 @@ export const HeightScene: React.FC = () => {
 };
 
 /** A number moving from `from` to `to` as `t` goes 0 to 1, set to two places. */
-const Count2: React.FC<{ from: number; to: number; t: number }> = ({ from, to, t }) => <>{fmt(lerp(from, to, t), t > 0 && t < 1 ? 2 : 1)}</>;
+const Count2: React.FC<{ from: number; to: number; t: number }> = ({ from, to, t }) => (
+  <>{t <= 0 ? String(from) : t >= 1 ? String(to) : fmt(lerp(from, to, t), 2)}</>
+);

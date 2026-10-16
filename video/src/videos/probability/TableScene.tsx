@@ -10,11 +10,11 @@ import { num, pct, TABLE } from "./data";
 import { Headline, Kicker, STAT, STAT_INK, Svg, Sweep } from "./parts";
 
 /** Column centres: row label, churned, stayed, total. */
-const COL = { label: 160, churned: 520, stayed: 720, total: 920 } as const;
-const CELL_W = 170;
-const HEAD_Y = 352;
-const ROW_Y = { paid: 440, free: 520, all: 620 } as const;
-const CHIP_X = 1110;
+const COL = { label: 160, churned: 530, stayed: 750, total: 970 } as const;
+const CELL_W = 190;
+const HEAD_Y = 370;
+const ROW_Y = { paid: 480, free: 590, all: 730 } as const;
+const CHIP_X = 1170;
 
 /** One cell of the table, lit by a highlighter behind it. */
 const Cell: React.FC<{ x: number; y: number; at: number; lit?: number; dim?: number; bold?: boolean; children: React.ReactNode }> = ({
@@ -34,7 +34,7 @@ const Cell: React.FC<{ x: number; y: number; at: number; lit?: number; dim?: num
       style={{
         position: "absolute",
         left: x - CELL_W / 2,
-        top: y - 26,
+        top: y - 30,
         width: CELL_W,
         textAlign: "center",
         opacity: p * (1 - dim * 0.7),
@@ -43,7 +43,7 @@ const Cell: React.FC<{ x: number; y: number; at: number; lit?: number; dim?: num
     >
       <span
         style={{
-          ...note(36, INK),
+          ...note(42, INK),
           fontWeight: bold ? 700 : 500,
           padding: "0 10px",
           borderRadius: 6,
@@ -148,8 +148,8 @@ export const TableScene: React.FC = () => {
       />
       {rows.map((r) => (
         <React.Fragment key={r.key}>
-          <Ink at={planAt + r.i * 5} dur={12} style={{ left: COL.label, top: y(ROW_Y[r.key]) - 24, opacity: 1 - r.dim * 0.7 }}>
-            <span style={{ ...headline(42), color: INK }}>{r.name}</span>
+          <Ink at={planAt + r.i * 5} dur={12} style={{ left: COL.label, top: y(ROW_Y[r.key]) - 28, opacity: 1 - r.dim * 0.7 }}>
+            <span style={{ ...headline(48), color: INK }}>{r.name}</span>
           </Ink>
           <Cell x={COL.churned} y={y(ROW_Y[r.key])} at={quarterAt - 4 + r.i * 4} dim={r.dim} lit={r.i === 0 ? lit(thirtyAt, freeUsersAt - 6) : lit(oneTwentyAt, comparingAt - 4)}>
             {num(TABLE.churned[r.i])}
@@ -171,7 +171,7 @@ export const TableScene: React.FC = () => {
             style={{
               position: "absolute",
               left: COL.label,
-              top: y(ROW_Y[r.key]) + 36,
+              top: y(ROW_Y[r.key]) + 46,
               width: COL.total + CELL_W / 2 - COL.label,
               height: 1,
               background: HAIRLINE,
@@ -185,15 +185,15 @@ export const TableScene: React.FC = () => {
         style={{
           position: "absolute",
           left: COL.label,
-          top: y(ROW_Y.all) - 44,
+          top: y(ROW_Y.all) - 56,
           width: (COL.total + CELL_W / 2 - COL.label) * ease(frame, everyoneAt - 4, 14),
           height: 2,
           background: INK,
           opacity: 1 - dimAll * 0.7,
         }}
       />
-      <Ink at={everyoneAt - 2} dur={12} style={{ left: COL.label, top: y(ROW_Y.all) - 24, opacity: 1 - dimAll * 0.7 }}>
-        <span style={{ ...headline(42), color: INK }}>All</span>
+      <Ink at={everyoneAt - 2} dur={12} style={{ left: COL.label, top: y(ROW_Y.all) - 28, opacity: 1 - dimAll * 0.7 }}>
+        <span style={{ ...headline(48), color: INK }}>All</span>
       </Ink>
       <Cell x={COL.churned} y={y(ROW_Y.all)} at={everyoneAt} dim={dimAll} bold lit={lit(oneFiftyAt, conditionAt - 2)}>
         {num(TABLE.churnedTotal)}
@@ -209,9 +209,9 @@ export const TableScene: React.FC = () => {
       <Svg opacity={fence}>
         <rect
           x={COL.label - 24}
-          y={y(ROW_Y.free) - 40}
+          y={y(ROW_Y.free) - 50}
           width={(COL.total + CELL_W / 2 - COL.label + 48) * Math.min(1, fence * 1.2)}
-          height={80}
+          height={100}
           rx={12}
           fill="none"
           stroke={STAT}
@@ -222,8 +222,8 @@ export const TableScene: React.FC = () => {
 
       {/* ── Each rate, on its own row ── */}
       {chips.map((c) => (
-        <Ink key={c.key} at={c.at - 8} dur={16} style={{ left: CHIP_X, top: y(c.rowY) - 30, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 18 }}>
-          <span style={{ ...note(28, INK) }}>
+        <Ink key={c.key} at={c.at - 8} dur={16} style={{ left: CHIP_X, top: y(c.rowY) - 36, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 18 }}>
+          <span style={{ ...note(30, INK) }}>
             P(churn{c.given ? <span style={{ color: INK_SOFT }}> | {c.given}</span> : null}) = {num(c.top)} /{" "}
             {c.key === "free" ? (
               <Sweep at={fractionAt} dur={14}>
@@ -233,17 +233,17 @@ export const TableScene: React.FC = () => {
               num(c.bottom)
             )}
           </span>
-          <span style={{ ...headline(52, true), color: STAT_INK }}>
+          <span style={{ ...headline(60, true), color: STAT_INK }}>
             <Sweep at={c.mark}>{pct(c.p)}</Sweep>
           </span>
         </Ink>
       ))}
-      <Note at={conditionAt + 4} x={CHIP_X} y={y(ROW_Y.paid) - 86}>
+      <Note at={conditionAt + 4} x={CHIP_X} y={y(ROW_Y.paid) - 96}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           The bar reads &ldquo;given&rdquo;: churn, given a paid plan.
         </span>
       </Note>
-      <Note at={fractionAt + 4} x={CHIP_X} y={y(ROW_Y.all) + 70}>
+      <Note at={fractionAt + 4} x={CHIP_X} y={y(ROW_Y.all) + 64}>
         <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
           Divide by the free users only,
           <span style={{ color: INK_SOFT }}> not by all {num(TABLE.total)}.</span>

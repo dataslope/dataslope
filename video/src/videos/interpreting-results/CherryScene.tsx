@@ -127,7 +127,7 @@ export const CherryScene: React.FC = () => {
           {draw > 0 ? <path d={partial(pts, draw)} fill="none" stroke={DATA} strokeWidth={3} strokeLinejoin="round" /> : null}
           {lit > 0 ? <path d={partial(winPts, lit)} fill="none" stroke={STAT} strokeWidth={6} strokeLinejoin="round" strokeLinecap="round" /> : null}
         </Svg>
-        <Note at={startedAt - 2} x={X1} y={py(S[0]) - 44} align="right">
+        <Note at={startedAt - 2} x={X1} y={py(S[0]) + 14} align="right">
           <span style={{ ...note(21, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>
             started at {fmt(S[0], 0)}, ended at {fmt(S[S.length - 1], 0)}
           </span>

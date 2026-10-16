@@ -65,7 +65,7 @@ export const TestScene: React.FC = () => {
       <Sfx name="el-tap" at={eightAgainAt - 2} level={-29} />
       <Sfx name="el-pencil" at={howBigAt - 4} level={-34} />
 
-      <Headline at={testFrom - 4} second={leavesAt - 4} out={viewsAt - 6} size={64} italic="Does it leave out zero?">
+      <Headline at={testFrom - 4} second={leavesAt - 4} out={viewsAt - 6} size={64} italic="does it leave out zero?">
         A difference:
       </Headline>
       <Headline at={viewsAt - 2} second={oneThingAt - 4} size={64} italic="one thing.">
@@ -73,7 +73,7 @@ export const TestScene: React.FC = () => {
       </Headline>
 
       <FigLabel n="6" title="95% intervals for a difference between two groups" at={testFrom - 2} x={160} y={y(262)} />
-      <Axis scale={X} base={y(AXIS)} ticks={[-4, 0, 4, 8, 12, 16, 20]} format={signed} at={testFrom} />
+      <Axis scale={X} base={y(AXIS)} ticks={[-4, 0, 4, 8, 12, 16, 20]} format={(v) => (v < 0 ? `−${-v}` : String(v))} at={testFrom} />
       <Rule
         x={zeroX}
         y0={y(AXIS)}

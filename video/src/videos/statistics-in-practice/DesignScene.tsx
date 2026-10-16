@@ -27,12 +27,6 @@ const METRICS = [
   "Page views",
 ];
 const MOVER = METRICS.indexOf("Scroll depth");
-const CHIP_X = [1010, 1210, 1380, 1560];
-const CHIP_ROWS = [
-  [0, 1, 2],
-  [3, 4, 5],
-  [6, 7, 8, 9],
-];
 
 /**
  * Part 2 opens: the A/B test's arc, nearly all of it decided before the first
@@ -177,21 +171,19 @@ export const DesignScene: React.FC = () => {
         </Ink>
 
         {/* Ten metrics, and the one that happened to move. */}
-        {CHIP_ROWS.map((row, r) =>
-          row.map((m, c) => {
-            const k = r * 3 + c;
+        <Ink at={tenAt - 6} dur={14} style={{ left: 1010, top: y(690), whiteSpace: "nowrap" }}>
+          <span style={label(22, INK_SOFT)}>Or track ten</span>
+        </Ink>
+        <div style={{ position: "absolute", left: 1010, top: y(726), width: 780, display: "flex", flexWrap: "wrap", gap: "12px 14px" }}>
+          {METRICS.map((m, k) => {
             const p = Math.min(1.06, pop(frame, tenAt - 4 + k * 3, fps, 14));
-            if (p <= 0.001) return null;
-            const mover = m === MOVER;
+            const mover = k === MOVER;
             return (
               <div
                 key={m}
                 style={{
-                  position: "absolute",
-                  left: CHIP_X[c] + (r === 2 ? -40 : 0),
-                  top: y(690 + r * 62),
-                  opacity: Math.min(1, p) * (mover ? 1 : 1 - 0.45 * hot),
-                  transform: `scale(${0.8 + 0.2 * p})`,
+                  opacity: Math.min(1, Math.max(0, p)) * (mover ? 1 : 1 - 0.45 * hot),
+                  transform: `scale(${0.8 + 0.2 * Math.max(0, p)})`,
                   whiteSpace: "nowrap",
                 }}
               >
@@ -206,13 +198,13 @@ export const DesignScene: React.FC = () => {
                     background: mover ? `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(hot * 100)}%, ${PAPER})` : PAPER,
                   }}
                 >
-                  {mover ? <Strike at={forkingAt - 4}>{METRICS[m]}</Strike> : METRICS[m]}
+                  {mover ? <Strike at={forkingAt - 4}>{m}</Strike> : m}
                 </span>
               </div>
             );
-          }),
-        )}
-        <Ink at={movesAt - 2} dur={14} style={{ left: 1010, top: y(874), whiteSpace: "nowrap" }}>
+          })}
+        </div>
+        <Ink at={movesAt - 2} dur={14} style={{ left: 1010, top: y(870), whiteSpace: "nowrap" }}>
           <span style={{ ...note(22, STAT_INK), fontWeight: 650 }}>and cheer the one that moved</span>
         </Ink>
       </div>

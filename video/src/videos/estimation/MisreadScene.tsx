@@ -11,7 +11,6 @@ import { jitter, USERS } from "./data";
 import { Bracket, DATA, EST, FADED, IntervalBar, Marked, Mu, pulse, Rule, Strike, Svg, XBar } from "./parts";
 
 const LEFT = 160;
-const QUOTE_W = 760;
 /** The mini figures, right of the quotes. */
 const NARROW: XScale = { lo: 40, hi: 60, x0: 1000, x1: 1760 };
 const WIDE: XScale = { lo: 10, hi: 90, x0: 1000, x1: 1760 };
@@ -52,8 +51,8 @@ export const MisreadScene: React.FC = () => {
   const preciseAt = n.word("safer", "precise");
 
   const quote = (at: number, strike: number, text: React.ReactNode, top: number) => (
-    <Ink at={at} dur={20} style={{ left: LEFT, top: y(top), width: QUOTE_W }}>
-      <span style={{ ...body(38, true), color: INK, lineHeight: 1.3 }}>
+    <Ink at={at} dur={20} style={{ left: LEFT, top: y(top), whiteSpace: "nowrap" }}>
+      <span style={{ ...body(34, true), color: INK, lineHeight: 1.3 }}>
         <Strike at={strike} top="0.62em">
           {text}
         </Strike>
@@ -82,7 +81,7 @@ export const MisreadScene: React.FC = () => {
         misreadFrom - 4,
         neverAt - 2,
         <>
-          “There’s a 95%{" "}
+          “A 95%{" "}
           <Marked at={chanceAt - 2} color={HIGHLIGHT} out={neverAt}>
             chance
           </Marked>{" "}
@@ -90,9 +89,12 @@ export const MisreadScene: React.FC = () => {
         </>,
         ROWS[0],
       )}
-      <Note at={movesAt - 2} x={LEFT} y={y(ROWS[0] + 108)}>
+      <Note at={movesAt - 2} x={LEFT} y={y(ROWS[0] + 64)}>
+        <span style={{ ...note(25, INK) }}>The true mean never moves.</span>
+      </Note>
+      <Note at={drawnAt - 2} x={LEFT} y={y(ROWS[0] + 102)}>
         <span style={{ ...note(25, INK) }}>
-          The true mean never moves. Once the interval is drawn,{" "}
+          Once the interval is drawn,{" "}
           <span style={{ opacity: ease(frame, inAt - 2, 10) }}>it’s in</span>
           <span style={{ opacity: ease(frame, outAt - 2, 10) }}>, or it’s out.</span>
         </span>
@@ -105,7 +107,7 @@ export const MisreadScene: React.FC = () => {
       <Rule x={muX} y0={y(ROWS[0] + 130)} y1={y(ROWS[0] + 20)} at={neverAt} dur={16} color={INK} width={2.4} dash="7 6" />
       <Note at={movesAt} x={muX - 12} y={y(ROWS[0] + 2)} align="right" from="right">
         <span style={{ ...note(22, INK), fontWeight: 650, ...halo, whiteSpace: "nowrap" }}>
-          here <Mu /> is {money(USERS.mu)}: fixed
+          here <Mu /> is ${USERS.mu}: fixed
         </span>
       </Note>
       <Note at={randomAt - 2} x={sx(NARROW, USERS.hi) + 18} y={y(ROWS[0] + 56)}>
@@ -122,12 +124,12 @@ export const MisreadScene: React.FC = () => {
         <span style={label(21, INK_SOFT)}>Misreading 2</span>
       </Ink>
       {quote(dataFrom - 2, onlyAt - 2, <>“95% of the {<Marked at={dataAt - 2} color={HIGHLIGHT} out={onlyAt}>data</Marked>} falls inside.”</>, ROWS[1] + 6)}
-      <Note at={elevenAt - 2} x={LEFT} y={y(ROWS[1] + 72)}>
+      <Note at={elevenAt - 2} x={LEFT} y={y(ROWS[1] + 70)}>
         <span style={{ ...note(25, INK) }}>
           Only <b>{USERS.insideCi}</b> of the {USERS.n} users spend inside it.
         </span>
       </Note>
-      <Note at={averageAt - 2} x={LEFT} y={y(ROWS[1] + 112)}>
+      <Note at={averageAt - 2} x={LEFT} y={y(ROWS[1] + 108)}>
         <span style={{ ...note(25, INK) }}>It pins down their average, not any one person.</span>
       </Note>
       <Axis scale={WIDE} base={y(ROWS[1] + 140)} ticks={[10, 30, 50, 70, 90]} format={(v) => `$${v}`} at={backAt - 6} />
@@ -178,7 +180,7 @@ export const MisreadScene: React.FC = () => {
         <span style={label(21, INK_SOFT)}>Misreading 3</span>
       </Ink>
       {quote(saferFrom - 2, isntAt - 2, <>“A wider interval is safer.”</>, ROWS[2] + 30)}
-      <Note at={preciseAt - 6} x={LEFT} y={y(ROWS[2] + 96)}>
+      <Note at={preciseAt - 6} x={LEFT} y={y(ROWS[2] + 92)}>
         <span style={{ ...note(25, INK) }}>Wider just means less precise.</span>
       </Note>
       <Axis scale={NARROW} base={y(ROWS[2] + 140)} ticks={[40, 45, 50, 55, 60]} format={(v) => `$${v}`} at={saferFrom} />

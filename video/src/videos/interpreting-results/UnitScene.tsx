@@ -8,10 +8,10 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { DISTRICTS, signed } from "./data";
-import { Count, DATA, DATA_INK, Drift, Headline, lerp, Marker, STAT_INK, Svg } from "./parts";
+import { Count, DATA, DATA_INK, Drift, Headline, lerp, Marker, partial, STAT_INK, Svg } from "./parts";
 
-const XD = [16, 80] as const;
-const YD = [30, 92] as const;
+const XD = [10, 86] as const;
+const YD = [24, 94] as const;
 const TOP = 350;
 const BOTTOM = 800;
 const AGG = { x0: 200, x1: 700 };
@@ -119,7 +119,7 @@ export const UnitScene: React.FC = () => {
         <FigLabel n="12" title="Income and turnout in six districts" at={from - 4} x={160} y={y(262)} />
         {panel(
           AGG,
-          sixAt - 8,
+          from - 4,
           <>
             <Marker at={districtsAt - 2}>Districts</Marker>: r = {signed(DISTRICTS.rGroup)}
           </>,
@@ -130,8 +130,10 @@ export const UnitScene: React.FC = () => {
           IND,
           insideAt - 10,
           <>
-            <Marker at={peopleAt - 2}>People</Marker>, within a district: r ={" "}
-            <Count from={DISTRICTS.rGroup} to={DISTRICTS.rWithin} at={sevenAt - 6} dur={18} format={(v) => signed(v)} />
+            <Marker at={peopleAt - 2}>People</Marker>, within a district
+            <span style={{ opacity: ease(frame, sevenAt - 6, 8) }}>
+              : r = <Count from={0} to={DISTRICTS.rWithin} at={sevenAt - 6} dur={16} format={(v) => signed(v)} />
+            </span>
           </>,
           STAT_INK,
           "income, one dot per person",
@@ -143,11 +145,8 @@ export const UnitScene: React.FC = () => {
         <Svg>
           {/* The districts' line, through their averages. */}
           {groupLine > 0 ? (
-            <polyline
-              points={means
-                .slice(0, Math.max(1, Math.ceil(groupLine * means.length)))
-                .map(([a, b]) => `${a},${b}`)
-                .join(" ")}
+            <path
+              d={partial(means, groupLine)}
               fill="none"
               stroke={DATA}
               strokeWidth={2.4}

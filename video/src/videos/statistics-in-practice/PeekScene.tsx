@@ -13,6 +13,8 @@ import { Count, Headline, lerp, partial, Ring, STAT, STAT_INK, Svg } from "./par
 const X: XScale = { lo: 0, hi: PEEKING.planned, x0: 260, x1: 1640 };
 const BASE = 864;
 const TOP = 548;
+/** The p-value scale tops out here: the run never climbs past 0.56. */
+const P_MAX = 0.6;
 const BAR_X0 = 1120;
 const BAR_W = 560;
 const num = (v: number) => Math.round(v).toLocaleString("en-US");
@@ -31,7 +33,7 @@ export const PeekScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
   const { y, h } = useLayout();
-  const py = (p: number) => y(BASE) - h((BASE - TOP) * p);
+  const py = (p: number) => y(BASE) - h(((BASE - TOP) * p) / P_MAX);
 
   // ── Cues ──
   const sizeFrom = n.beat("size").from;
@@ -63,6 +65,8 @@ export const PeekScene: React.FC = () => {
   const shownN = rows[Math.min(last, Math.floor(reach))].n;
   const dimBefore = ease(frame, onceAt - 4, 14);
   const sizeDim = 1 - 0.55 * ease(frame, peekAt - 6, 14);
+  // The size panel holds the middle of the page alone, then rises to make room.
+  const rise = ease(frame, peekAt - 10, 24);
   const filled = ease(frame, threeAt - 4, 30);
   const band = ease(frame, identicalAt - 4, 14);
   const flash = ease(frame, ohFiveAt - 4, 8) * (1 - ease(frame, ohFiveAt + 10, 14));
@@ -81,7 +85,7 @@ export const PeekScene: React.FC = () => {
       <Headline lead="And no peeking." turn="Look once." at={peekAt - 2} turnAt={onceAt - 6} />
 
       {/* ── The sample size, from the smallest lift worth catching ── */}
-      <div style={{ position: "absolute", inset: 0, opacity: sizeDim }}>
+      <div style={{ position: "absolute", inset: 0, opacity: sizeDim, transform: `translateY(${(1 - rise) * h(190)}px)` }}>
         <Ink at={catchAt - 6} dur={14} style={{ left: 160, top: y(292), whiteSpace: "nowrap" }}>
           <span style={label(21, INK_SOFT)}>To catch</span>
         </Ink>
@@ -140,20 +144,20 @@ export const PeekScene: React.FC = () => {
       />
       {/* The p-value scale, and the band where it reads "significant". */}
       <Svg opacity={ease(frame, hereAt, 14)}>
-        {[0.5, 1].map((p) => (
+        {[0.25, 0.5].map((p) => (
           <line key={p} x1={X.x0} x2={X.x1} y1={py(p)} y2={py(p)} stroke={INK_SOFT} strokeWidth={1} opacity={0.25} />
         ))}
       </Svg>
-      {[0.5, 1].map((p) => (
+      {[0.25, 0.5].map((p) => (
         <div
           key={p}
           style={{ position: "absolute", right: 1920 - X.x0 + 16, top: py(p) - 14, opacity: ease(frame, hereAt + 2, 14), ...note(20, INK_SOFT) }}
         >
-          {fmt(p, 1)}
+          {fmt(p, 2)}
         </div>
       ))}
       <div
-        style={{ position: "absolute", right: 1920 - X.x0 + 16, top: py(0.5) + 34, opacity: ease(frame, hereAt + 2, 14), ...label(20, INK_SOFT) }}
+        style={{ position: "absolute", right: 1920 - X.x0 + 16, top: py(0.375) - 14, opacity: ease(frame, hereAt + 2, 14), ...label(20, INK_SOFT) }}
       >
         p
       </div>
@@ -171,10 +175,10 @@ export const PeekScene: React.FC = () => {
           />
         </Svg>
       ) : null}
-      <Note at={identicalAt} x={X.x0 + 14} y={py(PEEKING.alpha) - 34}>
-        <span style={{ ...note(20, STAT_INK), fontWeight: 650, ...halo }}>under {PEEKING.alpha}: &ldquo;significant&rdquo;</span>
+      <Note at={identicalAt} x={X.x1 - 12} y={py(PEEKING.alpha) + 4} align="right">
+        <span style={{ ...note(20, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>under {PEEKING.alpha}: &ldquo;significant&rdquo;</span>
       </Note>
-      <Note at={nothingAt - 2} x={X.x1 - 10} y={py(1) + 8} align="right">
+      <Note at={nothingAt - 2} x={X.x1 - 10} y={py(P_MAX) + 8} align="right">
         <span style={{ ...note(21, INK_SOFT), fontWeight: 600, ...halo }}>no effect anywhere in this data</span>
       </Note>
 
@@ -185,13 +189,13 @@ export const PeekScene: React.FC = () => {
             x1={X.x1}
             x2={X.x1}
             y1={y(BASE)}
-            y2={lerp(y(BASE), py(1) - 10, planned)}
+            y2={lerp(y(BASE), py(P_MAX) - 10, planned)}
             stroke={INK}
             strokeWidth={lerp(2, 4, dimBefore)}
           />
         </Svg>
       ) : null}
-      <Note at={plannedAt} x={X.x1 + 16} y={py(1) - 8}>
+      <Note at={plannedAt} x={X.x1 + 16} y={py(P_MAX) - 8}>
         <span style={{ ...note(21, INK), fontWeight: 650, whiteSpace: "nowrap" }}>planned</span>
       </Note>
 
@@ -213,19 +217,19 @@ export const PeekScene: React.FC = () => {
       <Ring x={pts[SECOND][0]} y={pts[SECOND][1]} at={twiceAt - 6} r1={56} />
       <Leader
         points={[
-          [pts[FIRST][0] + 40, py(0.42)],
-          [pts[FIRST][0] + 4, pts[FIRST][1] - 10],
+          [pts[FIRST][0], py(0.47)],
+          [pts[FIRST][0], pts[FIRST][1] - 10],
         ]}
         at={firstDipAt}
         dur={10}
         color={STAT}
       />
-      <Note at={firstDipAt + 2} x={pts[FIRST][0] + 46} y={py(0.42) - 40}>
+      <Note at={firstDipAt + 2} x={pts[FIRST][0] + 12} y={py(0.47) - 30}>
         <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
           stop here at {num(rows[FIRST].n)}
         </span>
       </Note>
-      <Note at={noiseAt - 4} x={pts[FIRST][0] + 46} y={py(0.42) - 10}>
+      <Note at={noiseAt - 4} x={pts[FIRST][0] + 12} y={py(0.47)}>
         <span style={{ ...note(22, STAT_INK), whiteSpace: "nowrap", ...halo }}>and you ship noise</span>
       </Note>
       <Note at={nineteenAt - 4} x={pts[last][0] - 18} y={pts[last][1] - 48} align="right">

@@ -21,7 +21,7 @@ export const LIFT: XScale = { lo: -1, hi: 4, x0: 160, x1: 1260 };
 export const LIFT_BASE = 852;
 export const LIFT_ROW = 800;
 const CARD_X = 1390;
-const CARD_Y = [352, 452, 552, 652];
+const CARD_Y = [352, 478, 578, 678];
 
 const pp = (v: number) => v * 100;
 const num = (v: number) => Math.round(v).toLocaleString("en-US");
@@ -103,7 +103,7 @@ export const ResultScene: React.FC = () => {
   const top = y(GRID_TOP);
 
   const arms = [
-    { g: "A", name: "the old button", x: GRID_X[0], set: EXPERIMENT.convertedA, lit: litA, at: oldAt, k: EXPERIMENT.xA, rate: EXPERIMENT.pA, rateAt: nineAt, color: INK_SOFT },
+    { g: "A", name: "the old button", x: GRID_X[0], set: EXPERIMENT.convertedA, lit: litA, at: oldAt, k: EXPERIMENT.xA, rate: EXPERIMENT.pA, rateAt: nineAt, color: BAR },
     { g: "B", name: "the new button", x: GRID_X[1], set: EXPERIMENT.convertedB, lit: litB, at: newAt, k: EXPERIMENT.xB, rate: EXPERIMENT.pB, rateAt: elevenAt, color: BAR },
   ] as const;
 
@@ -139,7 +139,7 @@ export const ResultScene: React.FC = () => {
             </span>
           </Ink>
           <Ink at={a.at - 4} dur={12} style={{ left: a.x, top: top + gridH + 50, whiteSpace: "nowrap" }}>
-            <span style={{ ...note(28, a.g === "B" ? "var(--ds-blue-ink)" : INK), fontWeight: 700 }}>
+            <span style={{ ...note(28, INK), fontWeight: 700 }}>
               <Count to={a.k} at={a.at - 4} dur={26} format={num} />
             </span>
             <span style={{ ...note(22, INK_SOFT), marginLeft: 10 }}>of {num(EXPERIMENT.n)} bought</span>
@@ -231,7 +231,7 @@ export const ResultScene: React.FC = () => {
             </Ink>
           ) : null}
           <Svg opacity={0.5 * ease(frame, c.at + 6, 12)}>
-            <line x1={CARD_X} x2={CARD_X + 400} y1={y(CARD_Y[i] + 92)} y2={y(CARD_Y[i] + 92)} stroke={HAIRLINE} strokeWidth={1} />
+            <line x1={CARD_X} x2={CARD_X + 400} y1={y((CARD_Y[i + 1] ?? CARD_Y[i] + 100) - 10)} y2={y((CARD_Y[i + 1] ?? CARD_Y[i] + 100) - 10)} stroke={HAIRLINE} strokeWidth={1} />
           </Svg>
         </React.Fragment>
       ))}

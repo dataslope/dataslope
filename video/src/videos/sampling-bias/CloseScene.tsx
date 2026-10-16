@@ -6,6 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { body, fmt, halo, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { useMergedPart } from "../sampling/merged";
 import { Sfx } from "../../sound/Sfx";
 import { CLOSE, shapeOf, TRUE_MEAN, type Spread } from "./data";
 import { Arrow, Bracket, between, EASY, EASY_INK, RANDOM_INK, TruthLine } from "./parts";
@@ -47,6 +48,8 @@ const MOVED = stateOf(CLOSE.moved, SHAPES.moved);
 export const CloseScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
+  // In the merged Unit 5 video the spoken bridge leads straight on: no "Next" line.
+  const merged = useMergedPart();
   const { y } = useLayout();
 
   const twoFrom = n.beat("two").from;
@@ -117,9 +120,11 @@ export const CloseScene: React.FC = () => {
       <Ink at={movesAt - 2} dur={18} style={{ left: 1000, top: y(216), ...body(36, true), color: RANDOM_INK, whiteSpace: "nowrap" }}>
         Only a better method moves the center.
       </Ink>
-      <NextLine at={nextAt} x={1000} y={y(278)} width={720}>
-        the data that survived.
-      </NextLine>
+      {merged ? null : (
+        <NextLine at={nextAt} x={1000} y={y(278)} width={720}>
+          the data that survived.
+        </NextLine>
+      )}
 
       <FigLabel n="6" title="Where 400 sample averages land" at={twoFrom} x={160} y={y(330)} />
       <Axis scale={X} base={y(BASE)} ticks={[66, 68, 70, 72, 74, 76, 78, 80, 82, 84]} at={twoFrom} />

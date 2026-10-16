@@ -8,8 +8,8 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Arrow, Bracket, Headline, Marker, STAT, STAT_INK } from "./parts";
 
-const TRAPS = ["Simpson's paradox", "Cherry-picking", "The sharpshooter", "P-hacking"];
-const TAG_X = [160, 560, 940, 1340];
+const TRAPS = ["Simpson's paradox", "Cherry-picking", "The sharpshooter's target"];
+const TAG_X = [160, 640, 1100];
 const TAG_Y = 360;
 const STEPS = ["Decide", "Look", "Confirm"];
 const STEP_X = [160, 560, 960];
@@ -73,7 +73,7 @@ export const CloseScene: React.FC = () => {
           </div>
         </Ink>
       ))}
-      <Bracket x0={TAG_X[0]} x1={TAG_X[3] + 300} y={y(TAG_Y) + 96} at={flawAt - 4} up tick={14} color={STAT} width={2.6} />
+      <Bracket x0={TAG_X[0]} x1={TAG_X[2] + 420} y={y(TAG_Y) + 96} at={flawAt - 4} up tick={14} color={STAT} width={2.6} />
       <Ink at={dataAt - 6} dur={14} style={{ left: TAG_X[0], top: y(TAG_Y) + 118, whiteSpace: "nowrap" }}>
         <span style={label(26, STAT_INK)}>
           one flaw: the data chose the analysis, <Marker at={advanceAt - 4}>not the plan</Marker>

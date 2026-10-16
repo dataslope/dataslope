@@ -6,6 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, body, headline, HIGHLIGHT, INK, INK_SOFT, label } from "../../editorial/style";
 import { Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { useMergedPart } from "../sampling/merged";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 const ROWS = [
@@ -25,6 +26,8 @@ export const HabitScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const n = useNarration();
+  // In the merged Unit 5 video the spoken bridge leads straight on: no "Next" line.
+  const merged = useMergedPart();
   const { y } = useLayout();
 
   const start = n.beat("habit").from;
@@ -95,9 +98,13 @@ export const HabitScene: React.FC = () => {
         </Ink>
       </div>
 
-      <NextLine at={nextAt} x={120} y={y(850)} width={1000}>
-        how far a fair sample can miss.
-      </NextLine>
+      {merged ? null : (
+  
+        <NextLine at={nextAt} x={120} y={y(850)} width={1000}>
+          how far a fair sample can miss.
+        </NextLine>
+
+      )}
 
       {ILLUSTRATIONS ? (
         <Illustration

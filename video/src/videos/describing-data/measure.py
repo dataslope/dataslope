@@ -307,11 +307,13 @@ say(f"IQR fence:  [{lo:.1f}, {hi:.1f}]")
 say(f"IQR rule flags {len(iqr_flags)} points: {sorted(iqr_flags.round(1).tolist())}")
 say(f"z>3 rule flags {len(z_flags)} points: {sorted(z_flags.round(1).tolist())}")
 out["outliers"] = {
-    "values": rs(flagged, 2),
+    "values": rs(flagged, 4),
     "planted": [120, 200],
-    "lower": r(lo, 2),
-    "upper": r(hi, 2),
-    "zCut": r(flagged.mean() + 3 * flagged.std(ddof=0), 2),
+    "lower": r(lo, 4),
+    "upper": r(hi, 4),
+    "iqrFlagged": sorted(rs(iqr_flags, 4)),
+    "zFlagged": sorted(rs(z_flags, 4)),
+    "zCut": r(flagged.mean() + 3 * flagged.std(ddof=0), 4),
     "iqrFlags": len(iqr_flags),
     "zFlags": len(z_flags),
     "tailFlags": int(len(iqr_flags) - len(z_flags)),

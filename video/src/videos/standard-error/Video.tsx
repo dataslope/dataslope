@@ -23,7 +23,7 @@ const OVERLAP = 6;
  * Every scene boundary is a narration cue, so new audio re-times the cuts
  * along with every animation inside them.
  */
-const Scenes: React.FC = () => {
+export const Scenes: React.FC = () => {
   const { beat, durationInFrames } = useNarration();
   const cut = (id: string) => beat(id).from - LEAD;
   const until = (frame: number) => frame + OVERLAP;

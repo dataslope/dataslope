@@ -9,7 +9,7 @@ import { Sfx } from "../../sound/Sfx";
 import { BERKSON, signed } from "./data";
 import { Count, DATA_INK, Dashed, DOT, Drift, Headline, lerp, Marker, RAW, Spot, STAT, STAT_INK, Svg } from "./parts";
 
-const DOM = [12, 88] as const;
+const DOM = [6, 94] as const;
 const TOP = 350;
 const BOTTOM = 790;
 const ALL = { x0: 180, x1: 640 };
@@ -74,9 +74,11 @@ export const BerksonScene: React.FC = () => {
       <Note at={abilityAt} x={(p.x0 + p.x1) / 2} y={bottom + 14} from="up">
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>ability</span>
       </Note>
-      <Note at={abilityAt + 6} x={p.x0 - 14} y={(top + bottom) / 2 - 14} align="right">
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>interview</span>
-      </Note>
+      {p === ALL ? (
+        <Note at={abilityAt + 6} x={p.x0 - 14} y={(top + bottom) / 2 - 14} align="right">
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>interview</span>
+        </Note>
+      ) : null}
     </>
   );
 
@@ -108,14 +110,16 @@ export const BerksonScene: React.FC = () => {
 
       <Drift from={customersAt} to={end + 30} amount={0.02} origin={[870, 580]}>
         <FigLabel n="11" title="Applicants' ability and interview scores" at={from - 4} x={160} y={y(262)} />
-        {axes(ALL, populationAt - 6, "Everyone", DATA_INK, unrelatedAt - 4, <>r = {signed(BERKSON.rAll)}</>)}
+        {axes(ALL, from - 4, "Everyone", DATA_INK, unrelatedAt - 4, <>r = {signed(BERKSON.rAll)}</>)}
         {axes(
           IN,
           getInAt - 10,
           "Admitted only",
           STAT_INK,
           getInAt - 4,
-          <Count from={BERKSON.rAll} to={BERKSON.rIn} at={minusAt - 6} dur={18} format={(v) => `r = ${signed(v)}`} />,
+          <span style={{ opacity: ease(frame, correlationAt - 2, 8) }}>
+            <Count from={BERKSON.rAll} to={BERKSON.rIn} at={minusAt - 6} dur={18} format={(v) => `r = ${signed(v)}`} />
+          </span>,
         )}
         <Spot id="interpreting-results-rope" at={admitAt - 6} left={700} top={y(490)} width={340} height={194} />
 
@@ -129,7 +133,7 @@ export const BerksonScene: React.FC = () => {
         {/* Weak interview, strong ability: the corner that remains. */}
         {weak > 0 ? (
           <Svg opacity={weak}>
-            <ellipse cx={px(IN, 72)} cy={py(36)} rx={90} ry={52} fill={HIGHLIGHT} opacity={0.6} />
+            <ellipse cx={px(IN, 82)} cy={py(36)} rx={70} ry={46} fill={HIGHLIGHT} opacity={0.6} />
           </Svg>
         ) : null}
 

@@ -32,7 +32,6 @@ export const SharpScene: React.FC = () => {
 
   // ── Cues ──
   const purposeAt = n.word("sharp", "on purpose");
-  const fireAt = n.word("sharp", "Fire");
   const wallAt = n.word("sharp", "barn wall");
   const paintAt = n.word("sharp", "paint");
   const clusterAt = n.word("sharp", "tightest cluster");
@@ -49,7 +48,7 @@ export const SharpScene: React.FC = () => {
   const pos = ([sx_, sy_]: readonly [number, number]) => [WX0 + sx_ * scale, top + sy_ * scale] as const;
   const [cx, cy] = pos(SHOTS.target as unknown as readonly [number, number]);
   const R = SHOTS.radius * scale;
-  const wall = ease(frame, fireAt - 10, 14);
+  const wall = ease(frame, from - 4, 14);
   const firstDim = ease(frame, againAt - 2, 12) * 0.6;
   const targetDim = ease(frame, aimedAt - 2, 14) * 0.45;
   const volley = (k: number, at: number) => at + k * 0.9;

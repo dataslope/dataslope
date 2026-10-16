@@ -12,7 +12,7 @@ import { Arrow, DATA, DATA_INK, Dashed, DOT, Drift, Headline, Kicker, lerp, Mark
 /** Sales, 40 to 170, up the page. */
 const LO = 40;
 const HI = 170;
-const TOP = 330;
+const TOP = 372;
 const BOTTOM = 860;
 const COLS = [500, 980];
 const HALF = 110;
@@ -57,7 +57,7 @@ export const RtmScene: React.FC = () => {
   const xOf = (col: number, i: number) => COLS[col] + (JIT[col][i] - 0.5) * 2 * HALF;
   const months = [RTM.month1, RTM.month2];
   const lit = (i: number) => (RTM.topSet.has(i) ? ease(frame, topAt - 2, 10) : RTM.bottomSet.has(i) ? ease(frame, bottomAt - 2, 10) : 0);
-  const linkAt = (i: number) => (RTM.topSet.has(i) ? sameAt - 4 : RTM.bottomSet.has(i) ? bottomAt + 4 : Infinity);
+  const linkAt = (i: number) => (RTM.topSet.has(i) ? sameAt - 4 : RTM.bottomSet.has(i) ? bottomAt + 4 : 1e9);
   const groups = [
     { set: RTM.topSet, color: STAT, ink: STAT_INK, before: RTM.topBefore, after: RTM.topAfter, beforeAt: avgTopAt - 4, afterAt: nextAt - 4 },
     { set: RTM.bottomSet, color: DATA, ink: DATA_INK, before: RTM.bottomBefore, after: RTM.bottomAfter, beforeAt: seventyAt - 4, afterAt: ninetyAt - 4 },
@@ -77,10 +77,18 @@ export const RtmScene: React.FC = () => {
       <Kicker at={from - 10}>Regression to the mean</Kicker>
       <Headline
         top={y(150)}
+        out={topAt - 8}
+        parts={[
+          { text: "Each month:", at: from - 4 },
+          { text: "skill, plus luck.", at: skillAt - 6, italic: true },
+        ]}
+      />
+      <Headline
+        top={y(150)}
         out={nobodyAt - 8}
         parts={[
-          { text: "The best fall,", at: nextAt - 8 },
-          { text: "the worst rise.", at: ninetyAt - 8, italic: true },
+          { text: "The best fall,", at: topAt - 4 },
+          { text: "the worst rise.", at: bottomAt - 6, italic: true },
         ]}
       />
       <Headline
@@ -182,16 +190,17 @@ export const RtmScene: React.FC = () => {
 
           {/* Where everyone's average sits, both months. */}
           <Dashed x0={240} y0={py(RTM.mean1)} x1={1130} y1={py(RTM.mean1)} at={nobodyAt - 2} dur={20} width={2.4} />
-          <Note at={nobodyAt + 8} x={1130} y={py(RTM.mean1) + 10} align="right">
+          <Note at={nobodyAt + 8} x={COLS[1] + HALF + 30} y={py(RTM.mean1) - 12}>
             <span style={{ ...note(21, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>everyone, about {Math.round(RTM.mean1)}</span>
           </Note>
         </Drift>
 
         {/* ── The note beside it ── */}
-        <Note at={skillAt - 4} x={NOTE_X + 60} y={y(330)}>
+        <Note at={skillAt - 4} x={NOTE_X + 60} y={y(372)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            each month&apos;s number = <Marker at={skillAt}>skill</Marker> + <Marker at={luckAt - 2}>luck</Marker>
+            sales = <Marker at={skillAt}>skill</Marker> + <Marker at={luckAt - 2}>luck</Marker>
           </span>
+          <div style={{ ...note(21, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>new luck every month</div>
         </Note>
         <Note at={coachAt - 4} x={NOTE_X + 60} y={y(640)}>
           <span style={{ ...body(34, true), color: INK, whiteSpace: "nowrap" }}>

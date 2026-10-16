@@ -62,13 +62,13 @@ export const RateScene: React.FC = () => {
 
   const pct = (v: number) => `${fmt(v * 100, 1)}%`;
   const px = (v: number) => sx(X, v * 100);
-  const gridIn = (i: number) => ease(frame, rateFrom - 2 + (i % COLS) * 0.28 + Math.floor(i / COLS) * 0.12, 8);
+  const gridIn = (i: number) => ease(frame, visitorsAt - 14 + (i % COLS) * 0.28 + Math.floor(i / COLS) * 0.12, 8);
   const tinted = (i: number) => ease(frame, convertAt - 6 + (i % COLS) * 0.2, 8);
 
   return (
     <AbsoluteFill>
       {/* ── Sound: the visitors, the conversions, the rate, the interval ── */}
-      <Sfx name="el-sprinkle" at={rateFrom - 2} level={-34} />
+      <Sfx name="el-sprinkle" at={visitorsAt - 14} level={-34} />
       <Sfx name="el-sprinkle" at={convertAt - 6} level={-33} />
       <Sfx name="el-tap" at={eighteenAt - 4} level={-28} />
       <Sfx name="el-pencil" at={itselfAt - 4} level={-34} />
@@ -82,7 +82,7 @@ export const RateScene: React.FC = () => {
       </Headline>
 
       {/* ── Fig. 5: the visitors ── */}
-      <FigLabel n="5" title={`${RATE.n.toLocaleString("en-US")} visitors, one square each`} at={rateFrom - 6} x={GRID_X} y={y(262)} />
+      <FigLabel n="5" title={`${RATE.n.toLocaleString("en-US")} visitors, one square each`} at={visitorsAt - 16} x={GRID_X} y={y(262)} />
       <Svg>
         {Array.from({ length: RATE.n }, (_, i) => {
           const a = gridIn(i);

@@ -12,9 +12,9 @@ import { MONTY } from "./data";
 import { DATA, DATA_INK, FAINT, GOLD, GOLD_INK, Headline, lerp, STAT, STAT_INK, Svg } from "./parts";
 
 /** The three cases, one row each: where the car is, given you picked door 1. */
-const ROWS = [352, 512, 672];
-const MINI = { x: [430, 540, 650], w: 84, h: 112 } as const;
-const RESULT_X = 790;
+const ROWS = [350, 530, 710];
+const MINI = { x: [430, 545, 660], w: 88, h: 104 } as const;
+const RESULT_X = 810;
 /** Which door the host opens in each case, and where the car is. */
 const CASES = [
   { car: 0, opens: 1 },
@@ -22,7 +22,7 @@ const CASES = [
   { car: 2, opens: 1 },
 ];
 /** The running win rates, on a log axis of games. */
-const CH = { x0: 1160, x1: 1780, top: 352, base: 760 } as const;
+const CH = { x0: 1180, x1: 1790, top: 352, base: 740 } as const;
 const LOG_HI = Math.log10(MONTY.trials);
 const gx = (k: number) => CH.x0 + (Math.log10(k) / LOG_HI) * (CH.x1 - CH.x0);
 
@@ -147,7 +147,7 @@ export const CasesScene: React.FC = () => {
           </React.Fragment>
         );
       })}
-      <Note at={randomAt} x={160} y={y(836)}>
+      <Note at={randomAt} x={160} y={y(868)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
           The host&apos;s door <b>depends</b>
           <span style={{ opacity: ease(frame, dependsAt + 6, 10) }}> on where the car is</span>
@@ -205,7 +205,7 @@ export const CasesScene: React.FC = () => {
           ["a positive", positiveAt],
         ] as const
       ).map(([t, at], i) => (
-        <Ink key={t} at={at - 4} dur={12} style={{ left: CH.x0 + i * 200, top: y(860), whiteSpace: "nowrap" }}>
+        <Ink key={t} at={at - 4} dur={12} style={{ left: CH.x0 + i * 200, top: y(872), whiteSpace: "nowrap" }}>
           <span
             style={{
               ...note(24, INK),
@@ -219,7 +219,7 @@ export const CasesScene: React.FC = () => {
           </span>
         </Ink>
       ))}
-      <Ink at={labelsAt - 4} dur={12} style={{ left: CH.x0, top: y(818), whiteSpace: "nowrap" }}>
+      <Ink at={labelsAt - 4} dur={12} style={{ left: CH.x0, top: y(826), whiteSpace: "nowrap" }}>
         <span style={label(22, INK_SOFT)}>
           Outcomes so far
           <span style={{ opacity: ease(frame, numbersAt - 2, 10), color: STAT_INK }}>: no average of these</span>
@@ -235,10 +235,10 @@ const SwitchArrow: React.FC<{ from: number; to: number; top: number; at: number 
   const p = ease(frame, at, 14);
   if (p <= 0) return null;
   const arc: Cubic = [
-    [from + 10, top - 4],
-    [from + 20, top - 46],
-    [to - 46, top - 58],
-    [to - 6, top - 6],
+    [from + 8, top - 2],
+    [from + 30, top - 40],
+    [to - 60, top - 44],
+    [to - 10, top - 4],
   ];
   const samples = sampleCubic(arc);
   const shown = samples.slice(0, Math.max(2, Math.round(samples.length * p)));

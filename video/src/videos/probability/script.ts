@@ -42,7 +42,8 @@ import type { NarrationScript } from "../../narration/types";
  *   - conditional-probability, the 99% test: 1 in 1,000, 99% sensitivity and
  *     specificity; the page's tree on 100,000 people gives 100 sick (99
  *     caught), 99,900 healthy (999 flagged), 1,098 positives and
- *     99/1,098 = 9.0%; its simulation of 2,000,000 people (seed 7) gives
+ *     99/1,098 = 9.0%; 999 false alarms against 99 real cases is "ten to
+ *     one", and 99,900 against 100 "nearly a thousand to one"; its simulation of 2,000,000 people (seed 7) gives
  *     2,008 of 22,000, 9.1%. A second, independent test (the page's
  *     callout) keeps 98.0 real cases and 10.0 false alarms: 90.75%,
  *     "ninety-one". statistical-fallacies runs the same people with a
@@ -90,7 +91,7 @@ export const script: NarrationScript = {
     },
     {
       id: "flips",
-      text: "That's easy to repeat in code. Flip a hundred thousand coins, and fifty thousand, one hundred and twenty-one land heads.",
+      text: "That's easy to repeat in code. Flip a coin a hundred thousand times, and fifty thousand, one hundred and twenty-one come up heads.",
       pauseAfter: 0.3,
     },
     {
@@ -172,7 +173,7 @@ export const script: NarrationScript = {
     },
     {
       id: "multiply",
-      text: "Independence is also what lets you multiply. Ten fair heads in a row is a half, ten times over... about one in a thousand.",
+      text: "Independence is also what lets you multiply. Ten heads in a row is ten halves multiplied together... about one in a thousand.",
     },
     { id: "test-in", text: "And which way round you read a conditional matters more than it looks." },
 
@@ -219,7 +220,7 @@ export const script: NarrationScript = {
     },
     {
       id: "neglect",
-      text: "Healthy people outnumber the sick nearly a thousand to one, so their false alarms swamp the real cases. Forgetting that is base-rate neglect.",
+      text: "Healthy people outnumber the sick nearly a thousand to one, so their false alarms beat the real cases ten to one. Forgetting that is base-rate neglect.",
       pauseAfter: 0.5,
     },
     {

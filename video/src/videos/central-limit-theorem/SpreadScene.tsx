@@ -2,6 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
+import { useMergedPart } from "../sampling/merged";
 import { Axis, Bars, sx, type XScale } from "../../editorial/charts";
 import { histogram, SPREADS, WAIT_SD } from "./data";
 import { useLayout } from "../../editorial/layout";
@@ -47,6 +48,8 @@ const ROW_STEP = 64;
 export const SpreadScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
+  // In the merged Unit 5 video the spoken bridge leads straight on: no "Next" line.
+  const merged = useMergedPart();
   const { y: Y, h, pts } = useLayout();
   const start = n.beat("spread").from;
   const spreadAt = n.word("spread", "spread");
@@ -247,9 +250,11 @@ export const SpreadScene: React.FC = () => {
       <Ink at={fourAt - 2} dur={16} style={{ left: TABLE_X, top: Y(800), width: 530 }}>
         <span style={{ ...body(30, true), color: ACCENT_INK }}>Four times the data, half the spread.</span>
       </Ink>
-      <NextLine at={nextAt} x={TABLE_X} y={Y(858)} width={530}>
-        the standard error.
-      </NextLine>
+      {merged ? null : (
+        <NextLine at={nextAt} x={TABLE_X} y={Y(858)} width={530}>
+          the standard error.
+        </NextLine>
+      )}
     </AbsoluteFill>
   );
 };

@@ -10,7 +10,7 @@ import { Sfx } from "../../sound/Sfx";
 import { mulberry32 } from "./data";
 import { FAINT, GOLD_INK, Headline, Kicker, lerp, Spot, STAT, STAT_INK, Svg } from "./parts";
 
-const DOOR = { x: [200, 520, 840], w: 240, top: 340, h: 400 } as const;
+const DOOR = { x: [200, 520, 840], w: 240, top: 410, h: 360 } as const;
 /** The letters that poured in, as a small heap of envelopes. */
 const LETTERS = (() => {
   const r = mulberry32(1990);
@@ -88,12 +88,13 @@ export const DoorsScene: React.FC = () => {
   // The switch arrow, door 1 to door 2, over the top.
   const x1 = DOOR.x[0] + DOOR.w / 2;
   const x2 = DOOR.x[1] + DOOR.w / 2;
-  const ay = top - 104;
+  // From above door 1's number to above door 2's, clear of the headline.
+  const ay = top - 96;
   const arc: Cubic = [
-    [x1 + 30, ay + 30],
-    [x1 + 60, ay - 60],
-    [x2 - 60, ay - 80],
-    [x2 - 10, ay + 34],
+    [x1 + 34, ay + 8],
+    [x1 + 80, ay - 70],
+    [x2 - 90, ay - 74],
+    [x2 - 30, ay + 8],
   ];
   const draw = ease(frame, switchAt - 4, 16);
   const samples = sampleCubic(arc);
@@ -143,7 +144,7 @@ export const DoorsScene: React.FC = () => {
           </>
         ) : null}
       </Svg>
-      <Note at={switchAt} x={(x1 + x2) / 2} y={ay - 108} from="up">
+      <Note at={switchAt} x={(x1 + x2) / 2} y={ay - 30} from="up">
         <span style={{ ...body(32, true), color: STAT_INK, display: "inline-block", transform: "translateX(-50%)", whiteSpace: "nowrap" }}>switch?</span>
       </Note>
 

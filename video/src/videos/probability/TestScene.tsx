@@ -11,16 +11,16 @@ import { Big, Count, DATA, DATA_INK, Headline, Kicker, lerp, STAT, STAT_INK, Str
 
 /** The tree: where each node's label is centred. */
 const NODE = {
-  root: [520, 352],
-  sick: [250, 500],
-  healthy: [790, 500],
-  sickPos: [160, 668],
-  sickNeg: [340, 668],
-  healthyPos: [690, 668],
-  healthyNeg: [900, 668],
+  root: [500, 360],
+  sick: [250, 520],
+  healthy: [750, 520],
+  sickPos: [170, 700],
+  sickNeg: [330, 700],
+  healthyPos: [650, 700],
+  healthyNeg: [870, 700],
 } as const;
 /** Everyone who tested positive, 61 to a row: 61 x 18 is 1,098 exactly. */
-const GRID = { x0: 1080, top: 352, pitch: 12.6, r: 4.6, cols: 61 } as const;
+const GRID = { x0: 1060, top: 372, pitch: 12.8, r: 4.7, cols: 61 } as const;
 
 const JIT = (() => {
   const r = mulberry32(3);
@@ -108,12 +108,12 @@ export const TestScene: React.FC = () => {
             [bothAt - 2, pct(TEST.specificity), "of healthy people test negative", INK_SOFT],
           ] as const
         ).map(([cue, big, text, color], i) => (
-          <Ink key={i} at={cue} dur={16} style={{ left: 160, top: y(330 + i * 108), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 22 }}>
-            <span style={{ ...headline(64), color }}>{big}</span>
-            <span style={note(26, INK)}>{text}</span>
+          <Ink key={i} at={cue} dur={16} style={{ left: 160, top: y(330 + i * 120), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 22 }}>
+            <span style={{ ...headline(76), color }}>{big}</span>
+            <span style={note(30, INK)}>{text}</span>
           </Ink>
         ))}
-        <Ink at={positiveAt - 2} dur={14} style={{ left: 160, top: y(668), whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 18 }}>
+        <Ink at={positiveAt - 2} dur={14} style={{ left: 160, top: y(712), whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 18 }}>
           <span
             style={{
               width: 56,
@@ -146,7 +146,7 @@ export const TestScene: React.FC = () => {
         <Ink at={answerAt + 2} dur={14} style={{ left: 1100, top: y(560), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 20 }}>
           <span style={note(26, INK)}>The answer</span>
           <span style={{ opacity: ease(frame, nineAt - 4, 12) }}>
-            <Big size={150} color={STAT_INK} italic>
+            <Big size={130} color={STAT_INK} italic>
               about {pct(TEST.treePpv)}
             </Big>
           </span>
@@ -169,10 +169,10 @@ export const TestScene: React.FC = () => {
             [NODE.root, walkAt - 2, num(TEST.population), "people", INK],
             [NODE.sick, hundredAt - 2, num(TEST.sick), "have it", DATA_INK],
             [NODE.healthy, ninetyNineKAt - 2, num(TEST.healthy), "don't", INK],
-            [NODE.sickPos, caughtAt - 2, num(TEST.tp), "test +", DATA_INK],
-            [NODE.sickNeg, caughtAt + 4, num(TEST.fn), "test −", INK_SOFT],
-            [NODE.healthyPos, alarmsAt - 2, num(TEST.fp), "test +", STAT_INK],
-            [NODE.healthyNeg, alarmsAt + 6, num(TEST.tn), "test −", INK_SOFT],
+            [NODE.sickPos, caughtAt - 2, num(TEST.tp), "caught", DATA_INK],
+            [NODE.sickNeg, caughtAt + 4, num(TEST.fn), "missed", INK_SOFT],
+            [NODE.healthyPos, alarmsAt - 2, num(TEST.fp), "false alarms", STAT_INK],
+            [NODE.healthyNeg, alarmsAt + 6, num(TEST.tn), "cleared", INK_SOFT],
           ] as const
         ).map(([p, cue, big, small, color], i) => {
           const a = ease(frame, cue, 12);
@@ -195,11 +195,12 @@ export const TestScene: React.FC = () => {
             </div>
           );
         })}
-        <Note at={flagsAt + 2} x={NODE.healthy[0] + 90} y={y(NODE.healthy[1]) - 20}>
-          <span style={{ ...note(21, STAT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>1% flagged by mistake</span>
+        {/* The two rates, on the branches they decide. */}
+        <Note at={catchesAt} x={(NODE.sick[0] + NODE.sickPos[0]) / 2 - 16} y={y((NODE.sick[1] + NODE.sickPos[1]) / 2) - 14} align="right">
+          <span style={{ ...note(21, DATA_INK), fontWeight: 650, whiteSpace: "nowrap" }}>99%</span>
         </Note>
-        <Note at={catchesAt} x={NODE.sick[0] - 210} y={y(NODE.sick[1]) - 20}>
-          <span style={{ ...note(21, DATA_INK), fontWeight: 600, whiteSpace: "nowrap" }}>99% caught</span>
+        <Note at={flagsAt + 2} x={(NODE.healthy[0] + NODE.healthyPos[0]) / 2 - 16} y={y((NODE.healthy[1] + NODE.healthyPos[1]) / 2) - 14} align="right">
+          <span style={{ ...note(21, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>1%</span>
         </Note>
       </div>
 

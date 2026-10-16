@@ -8,10 +8,10 @@ import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BIASED, BOOT, histogram, jitter, MAXIMUM } from "./data";
-import { DATA, EST, EST_INK, Headline, IntervalBar, Marked, pulse, Rule, Svg } from "./parts";
+import { DATA, EST, EST_INK, Headline, IntervalBar, Marked, pulse, Rule, Slot, Svg } from "./parts";
 
 /** Fig. 11: waits recorded only under ten minutes, and their bootstrap. */
-const XL: XScale = { lo: 0, hi: 20, x0: 160, x1: 860 };
+const XL: XScale = { lo: 0, hi: 14, x0: 160, x1: 860 };
 const L_STRIP = 360;
 const L_AXIS = 410;
 const L_HIST = 620;
@@ -19,7 +19,7 @@ const L_HIST_H = 120;
 const L_BAR = 648;
 const BIN = 0.1;
 /** Fig. 12: the maximum of each resample of the lesson's sixty waits. */
-const XR: XScale = { lo: 10, hi: 20, x0: 1020, x1: 1760 };
+const XR: XScale = { lo: 10, hi: 22, x0: 1020, x1: 1760 };
 const R_STRIP = 360;
 const R_BASE = 648;
 const R_H = 210;
@@ -97,13 +97,15 @@ export const LimitsScene: React.FC = () => {
           return <circle key={j} cx={sx(XL, v)} cy={y(L_STRIP) + h((JIT[j] - 0.5) * 30)} r={5.5 * a} fill={DATA} stroke={PAPER} strokeWidth={1} opacity={0.85} />;
         })}
       </Svg>
-      <Axis scale={XL} base={y(L_AXIS)} ticks={[0, 5, 10, 15, 20]} at={biasedAt - 6} />
+      <Axis scale={XL} base={y(L_AXIS)} ticks={[0, 2, 4, 6, 8, 10, 12, 14]} at={biasedAt - 6} />
       <Note at={biasedAt + 8} x={sx(XL, BIASED.cutoff) + 12} y={y(L_STRIP - 30)}>
         <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>never recorded</span>
       </Note>
       <Bars counts={lCounts} lo={XL.lo} bin={BIN} scale={XL} base={y(L_HIST)} unit={h(Math.min(8, L_HIST_H / Math.max(1, ...lCounts)))} color={EST} gap={0.5} />
-      <Note at={carriesAt + 4} x={sx(XL, 6.4)} y={y(L_HIST) - h(L_HIST_H * 0.7)}>
-        <span style={{ ...note(20, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>{BIASED.means.length.toLocaleString("en-US")} resampled averages</span>
+      <Note at={carriesAt + 4} x={sx(XL, BIASED.mean)} y={y(L_HIST) - h(L_HIST_H) - 34} from="up">
+        <span style={{ ...note(20, INK_SOFT), ...halo, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+          {BIASED.means.length.toLocaleString("en-US")} resampled averages
+        </span>
       </Note>
       <IntervalBar x0={sx(XL, BIASED.lo)} x1={sx(XL, BIASED.hi)} y={y(L_BAR)} at={confidentAt - 2} dur={14} color={INK} width={4} tick={10} />
       <Note at={confidentAt + 4} x={sx(XL, BIASED.lo) - 12} y={y(L_BAR) + 18} align="right">
@@ -121,7 +123,7 @@ export const LimitsScene: React.FC = () => {
 
       {/* ── Fig. 12: the maximum ── */}
       <FigLabel n="12" title={`The largest of each resample of the ${BOOT.n} waits`} at={edgesAt - 8} x={XR.x0} y={y(272)} />
-      <Axis scale={XR} base={y(R_BASE)} ticks={[10, 12, 14, 16, 18, 20]} at={edgesAt - 6} />
+      <Axis scale={XR} base={y(R_BASE)} ticks={[10, 12, 14, 16, 18, 20, 22]} at={edgesAt - 6} />
       <Svg>
         {MAXIMUM.top.map((v, j) => {
           const a = ease(frame, edgesAt - 4 + j * 1.2, 8);
@@ -147,8 +149,14 @@ export const LimitsScene: React.FC = () => {
         <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>the sample’s largest values</span>
       </Note>
       <Rule x={sx(XR, MAXIMUM.sampleMax)} y0={y(R_BASE)} y1={y(R_STRIP - 34)} at={neverAt - 2} dur={14} color={INK} width={2.4} dash="7 6" />
-      <Note at={neverAt + 2} x={sx(XR, MAXIMUM.sampleMax) - 12} y={y(R_STRIP - 60)} align="right" from="right">
-        <span style={{ ...note(21, INK), fontWeight: 650, ...halo, whiteSpace: "nowrap" }}>never past {fmt(MAXIMUM.sampleMax)}</span>
+      <Note at={neverAt + 2} x={sx(XR, MAXIMUM.sampleMax) + 14} y={y(R_STRIP + 60)}>
+        <span style={{ ...note(21, INK), fontWeight: 650, whiteSpace: "nowrap", lineHeight: 1.35 }}>
+          a resample
+          <br />
+          never gets
+          <br />
+          past {fmt(MAXIMUM.sampleMax)}
+        </span>
       </Note>
       <Note at={maximumAt - 4} x={sx(XR, top.v) - 14} y={y(R_BASE) - h(R_H) - 4} align="right" from="right">
         <span style={{ ...note(21, EST_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>
@@ -157,18 +165,18 @@ export const LimitsScene: React.FC = () => {
       </Note>
 
       {/* ── Precision, not accuracy ── */}
-      <Ink at={wobblesAt - 6} dur={16} style={{ left: 160, top: y(744), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(34, true), color: INK }}>
+      <div style={{ position: "absolute", left: 160, top: y(744), display: "flex", gap: "0.3em", whiteSpace: "nowrap", ...body(36, true) }}>
+        <Slot at={wobblesAt - 8} style={{ color: INK }}>
           It measures how much an estimate{" "}
           <Marked at={wobblesAt - 2} color={HIGHLIGHT}>
             wobbles
           </Marked>
           ,
-        </span>
-      </Ink>
-      <Ink at={aimedAt - 6} dur={16} style={{ left: 1020, top: y(744), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(34, true), color: EST_INK }}>not whether it’s aimed at the truth.</span>
-      </Ink>
+        </Slot>
+        <Slot at={aimedAt - 6} style={{ color: EST_INK }}>
+          not whether it’s aimed at the truth.
+        </Slot>
+      </div>
 
       {/* ── The bridge ── */}
       <Ink at={plausibleAt - 6} dur={18} style={{ left: 160, top: y(818), whiteSpace: "nowrap" }}>

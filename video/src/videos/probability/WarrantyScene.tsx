@@ -12,7 +12,7 @@ import { Big, Count, DATA, Headline, lerp, STAT_INK, Svg, Sweep, VBracket } from
 
 const RIGHT = 1150;
 /** The closing band: three named shapes, small. */
-const SHAPES = { x: [160, 470, 780], w: 250, base: 900, h: 96 } as const;
+const SHAPES = { x: [160, 470, 780], w: 250, base: 910, h: 88 } as const;
 const OK_INK = "var(--ds-green-ink)";
 
 /**
@@ -48,7 +48,7 @@ export const WarrantyScene: React.FC = () => {
   const shapesAt = n.word("next", "familiar shapes");
   const namedAt = n.word("next", "named distributions");
 
-  const dim = ease(frame, nextFrom - 4, 18) * 0.62;
+  const dim = ease(frame, nextFrom - 4, 18) * 0.5;
   const rows = [
     { name: "Device fails", p: WARRANTY.pFail, pays: WARRANTY.payout, at: failsAt - 4, pAt: fifteenAt - 2 },
     { name: "Device works", p: 1 - WARRANTY.pFail, pays: 0, at: fifteenAt + 4, pAt: fifteenAt + 8 },
@@ -112,7 +112,7 @@ export const WarrantyScene: React.FC = () => {
         ))}
 
         {/* ── The expected payout, and what the store keeps ── */}
-        <Ink at={payoutAt - 4} dur={16} style={{ left: 160, top: y(620), whiteSpace: "nowrap" }}>
+        <Ink at={payoutAt - 4} dur={16} style={{ left: 160, top: y(596), whiteSpace: "nowrap" }}>
           <span style={note(28, INK)}>
             Expected payout = <span style={{ opacity: ease(frame, ofAt - 6, 10) }}>{WARRANTY.pFail} × ${WARRANTY.payout}</span>
             <span style={{ opacity: ease(frame, fortyFiveAt - 4, 10) }}>
@@ -121,7 +121,7 @@ export const WarrantyScene: React.FC = () => {
             </span>
           </span>
         </Ink>
-        <Ink at={keepAt - 4} dur={16} style={{ left: 160, top: y(690), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 20 }}>
+        <Ink at={keepAt - 4} dur={16} style={{ left: 160, top: y(652), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 20 }}>
           <span style={note(28, INK)}>
             Expected profit = ${WARRANTY.price} − ${fmt(WARRANTY.ePayout, 0)} =
           </span>
@@ -162,7 +162,7 @@ export const WarrantyScene: React.FC = () => {
       </div>
 
       {/* ── The bridge: one variable's summary, and the shapes many share ── */}
-      <Ink at={sumAt - 4} dur={14} style={{ left: 160, top: y(780), whiteSpace: "nowrap" }}>
+      <Ink at={sumAt - 4} dur={14} style={{ left: 160, top: y(796), whiteSpace: "nowrap" }}>
         <span style={label(23, INK)}>
           E[X] and Var(X) sum up one variable.
           <span style={{ opacity: ease(frame, shapesAt - 4, 10), color: INK_SOFT }}> Many share a shape:</span>
@@ -184,7 +184,7 @@ export const WarrantyScene: React.FC = () => {
           />
         ))}
       </Svg>
-      <NextLine at={namedAt - 4} x={RIGHT} y={y(800)} width={620}>
+      <NextLine at={namedAt - 4} x={RIGHT} y={y(810)} width={620}>
         the shapes randomness takes.
       </NextLine>
     </AbsoluteFill>

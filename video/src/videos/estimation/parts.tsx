@@ -341,7 +341,7 @@ export const Headline: React.FC<{
 }> = ({ at, second, out, size = 72, top = 150, children, italic }) => {
   const { y } = useLayout();
   return (
-    <div style={{ position: "absolute", left: 92, top: y(top), display: "flex", gap: "0.26em", whiteSpace: "nowrap" }}>
+    <div style={{ position: "absolute", left: 92, top: y(top), display: "flex", gap: "0.32em", whiteSpace: "nowrap" }}>
       <Ink at={at} dur={20} out={out} style={{ position: "relative", ...headlineStyle(size) }}>
         {children}
       </Ink>

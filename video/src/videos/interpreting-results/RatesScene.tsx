@@ -3,21 +3,23 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, halo, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, fmt, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CI, RATES } from "./data";
-import { Bracket, DATA, DATA_INK, Drift, Headline, lerp, Marker, Ring, STAT, STAT_INK, Svg } from "./parts";
+import { DATA, DATA_INK, Drift, Headline, lerp, Marker, STAT, STAT_INK, Svg } from "./parts";
 
 /** Conversion, 0 to 5%. */
-const RX: XScale = { lo: 0, hi: 0.05, x0: 420, x1: 1500 };
-const BAR_Y = [370, 470];
-const BAR_H = 54;
+const RX: XScale = { lo: 0, hi: 0.05, x0: 420, x1: 1300 };
+const BAR_Y = [330, 410];
+const BAR_H = 50;
+/** The two ways to say it, beside the bars. */
+const SAY_X = 1480;
 /** d, 0 to 0.8, for the interval. */
-const DX: XScale = { lo: 0, hi: 0.8, x0: 420, x1: 1500 };
-const CI_Y = 720;
-const TRIO_Y = 840;
+const DX: XScale = { lo: 0, hi: 0.8, x0: 420, x1: 1300 };
+const CI_Y = 730;
+const TRIO_Y = 838;
 
 /**
  * Two ways to say the size of a lift in a rate, then an effect size with its
@@ -71,8 +73,8 @@ export const RatesScene: React.FC = () => {
         top={y(150)}
         out={intervalAt - 6}
         parts={[
-          { text: "Forty percent more,", at: fortyAt - 6 },
-          { text: "or 1.2 points.", at: pointsAt - 4, italic: true },
+          { text: "One lift,", at: from - 6 },
+          { text: "two ways to say it.", at: fortyAt - 6, italic: true },
         ]}
       />
       <Headline
@@ -152,28 +154,30 @@ export const RatesScene: React.FC = () => {
             />
           ) : null}
         </Svg>
-        <Bracket x0={RX.x0} x1={sx(RX, RATES.pControl)} y={y(BAR_Y[0]) - 18} at={fortyAt - 4} up={false} tick={10} />
-        <Note at={fortyAt} x={(RX.x0 + sx(RX, RATES.pControl)) / 2} y={y(BAR_Y[0]) - 58} from="up">
-          <span
-            style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}
-          >
-            ×{fmt(RATES.ratio, 1)}: relative, <Marker at={biggerAt - 2}>+{Math.round(RATES.uplift * 100)}%</Marker>
+        <Note at={fortyAt - 2} x={SAY_X} y={y(BAR_Y[0]) - 30}>
+          <div style={label(21, INK_SOFT)}>relative</div>
+          <div style={{ ...note(32, INK), fontWeight: 700, marginTop: 6, whiteSpace: "nowrap" }}>
+            <Marker at={biggerAt - 2}>+{Math.round(RATES.uplift * 100)}%</Marker>
+            <span style={{ ...note(21, INK_SOFT), fontWeight: 500, marginLeft: 12 }}>{fmt(RATES.ratio, 1)} times the rate</span>
+          </div>
+        </Note>
+        <Note at={pointsAt - 2} x={SAY_X} y={y(BAR_Y[1]) - 2}>
+          <div style={label(21, INK_SOFT)}>absolute</div>
+          <div style={{ ...note(32, STAT_INK), fontWeight: 700, marginTop: 6, whiteSpace: "nowrap" }}>
+            +{fmt(RATES.difference * 100, 1)} points
+          </div>
+        </Note>
+        <Note at={bothAt - 2} x={SAY_X} y={y(BAR_Y[1]) + 104}>
+          <span style={{ ...body(32, true), color: INK, whiteSpace: "nowrap" }}>
+            <Marker at={bothAt + 4}>report both</Marker>
           </span>
         </Note>
-        <Note at={pointsAt} x={sx(RX, RATES.pTreatment) + 6} y={y(BAR_Y[1]) + BAR_H + 52} align="right" from="up">
-          <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-            absolute, +{fmt(RATES.difference * 100, 1)} points
-          </span>
-        </Note>
-        <Note at={bothAt - 2} x={1560} y={y(BAR_Y[0]) + 4}>
-          <span style={{ ...body(32, true), color: INK, whiteSpace: "nowrap" }}>report both</span>
-        </Note>
-        <Ring x={1630} y={y(BAR_Y[0]) + 24} at={bothAt} r1={90} />
       </div>
 
       {/* ── The effect size with its interval ── */}
+      <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.45 * ease(frame, seemsAt - 8, 18) }}>
       <Drift from={reportAt} to={n.beat("part2-in").to + 40} amount={0.02} origin={[960, 760]}>
-        <FigLabel n="5" title="An effect size and its 95% interval" at={intervalAt - 4} x={160} y={y(600)} />
+        <FigLabel n="5" title="An effect size and its 95% interval" at={intervalAt - 4} x={160} y={y(612)} />
         <Svg opacity={ease(frame, intervalAt, 14)}>
           <line x1={DX.x0} x2={DX.x1} y1={ciY + 0.5} y2={ciY + 0.5} stroke={INK} strokeWidth={1.6} />
           {[0, 0.2, 0.4, 0.6, 0.8].map((v) => (
@@ -250,10 +254,8 @@ export const RatesScene: React.FC = () => {
             background: HIGHLIGHT,
           }}
         />
-        <Note at={seemsAt - 6} x={1760} y={y(TRIO_Y) + 100} align="right">
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>and then: what does it mean?</span>
-        </Note>
       </Drift>
+      </div>
     </AbsoluteFill>
   );
 };

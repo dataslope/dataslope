@@ -150,7 +150,7 @@ export const CoverageScene: React.FC = () => {
           const b = lerp(mid, sx(XI, iv.hi), p);
           const miss = !iv.covers;
           const mine = i === YOURS;
-          const lit = miss ? 1 + 0.8 * pulse(frame, sameAt - 2, 20) : 1;
+          const lit = miss ? 1 + 0.8 * pulse(frame, sameAt - 2, 20) : mine ? 1 + 0.6 * pulse(frame, oneAt - 2, 20) : 1;
           // Before "miss" every line is ink; after, the misses take the accent.
           // Once the truth is hidden, every line goes back to ink: you can't
           // see which yours is.
@@ -158,8 +158,8 @@ export const CoverageScene: React.FC = () => {
           const dim = yoursOn * (mine ? 0 : 0.7);
           return (
             <g key={i} opacity={1 - dim}>
-              <line x1={a} x2={b} y1={rowY(i)} y2={rowY(i)} stroke={INK} strokeWidth={(mine ? lerp(2, 4, yoursOn) : 2) * lit} opacity={0.62 + 0.38 * (mine ? yoursOn : 0)} />
-              {tint > 0 ? <line x1={a} x2={b} y1={rowY(i)} y2={rowY(i)} stroke={EST} strokeWidth={3.2 * lit} opacity={tint} /> : null}
+              <line x1={a} x2={b} y1={rowY(i)} y2={rowY(i)} stroke={INK} strokeWidth={(mine ? lerp(1.4, 4, yoursOn) : 1.4) * lit} opacity={0.55 + 0.45 * (mine ? yoursOn : 0)} />
+              {tint > 0 ? <line x1={a} x2={b} y1={rowY(i)} y2={rowY(i)} stroke={EST} strokeWidth={2.6 * lit} opacity={tint} /> : null}
             </g>
           );
         })}
@@ -189,8 +189,8 @@ export const CoverageScene: React.FC = () => {
           opacity={1 - hidden}
         />
       </Svg>
-      <Note at={hundredAt} x={truthX + 12} y={y(POP_BASE - POP_H - 30)} out={seeAt - 4}>
-        <span style={{ ...note(22, INK), fontWeight: 650, ...halo, whiteSpace: "nowrap" }}>true mean, {COVERAGE.mu}</span>
+      <Note at={hundredAt} x={truthX + 12} y={y(POP_BASE - POP_H * 0.45)} out={seeAt - 4}>
+        <span style={{ ...note(22, INK), fontWeight: 650, ...halo, whiteSpace: "nowrap" }}>true mean</span>
       </Note>
       <Note at={yourAt} x={sx(XI, COVERAGE.intervals[YOURS].hi) + 16} y={rowY(YOURS) - 15}>
         <span style={{ ...note(22, INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>
@@ -198,7 +198,7 @@ export const CoverageScene: React.FC = () => {
           <span style={{ fontWeight: 500, color: INK_SOFT, opacity: ease(frame, seeAt, 12) }}>: in, or out?</span>
         </span>
       </Note>
-      <Note at={seeAt + 6} x={truthX} y={y(POP_BASE - POP_H - 30)} from="up">
+      <Note at={seeAt + 6} x={truthX} y={y(POP_BASE + 14)} from="up">
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
           in real life, the true mean is hidden
         </span>

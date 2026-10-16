@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, halo, INK, INK_SOFT, note } from "../../editorial/style";
+import { body, halo, INK, INK_SOFT, note } from "../../editorial/style";
 import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -60,6 +60,7 @@ export const CoinScene: React.FC = () => {
   const midX = sx(X, 50);
   const barTop = (k: number) => y(BASE) - h(TALL) * (COIN.counts[k] / MAX) * grow;
   const dim = 1 - 0.5 * ease(frame, cantAt - 10, 16);
+  const runsGlow = pulse(frame, thousandAt, 24);
 
   return (
     <AbsoluteFill>
@@ -83,7 +84,12 @@ export const CoinScene: React.FC = () => {
           <Ink at={fairAt - 4} dur={14} style={{ left: 1100, top: y(300), whiteSpace: "nowrap" }}>
             <Label size={22} color={INK_SOFT} weight={520}>
               simulated runs:{" "}
-              <Count at={simulateAt - 2} to={COIN.runs} dur={64} style={{ ...note(24, INK), fontWeight: 700 }} />
+              <Count
+                at={simulateAt - 2}
+                to={COIN.runs}
+                dur={64}
+                style={{ ...note(24, INK), fontWeight: 700, display: "inline-block", transform: `scale(${1 + 0.12 * runsGlow})` }}
+              />
             </Label>
           </Ink>
           <Axis scale={X} base={y(BASE)} ticks={[30, 38, 40, 50, 60, 62, 70]} at={coinFrom + 2} />

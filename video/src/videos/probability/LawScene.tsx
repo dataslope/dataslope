@@ -172,7 +172,7 @@ export const LawScene: React.FC = () => {
         {drawn ? (
           <path d={d} fill="none" stroke={DATA} strokeWidth={3} strokeLinejoin="round" strokeLinecap="round" opacity={1 - dimLine * 0.55} />
         ) : null}
-        {swamp > 0 ? <path d={swampD} fill="none" stroke={DATA} strokeWidth={4.5} strokeLinejoin="round" strokeLinecap="round" /> : null}
+        {swamp > 0 ? <path d={swampD} fill="none" stroke={DATA} strokeWidth={5.5} strokeLinejoin="round" strokeLinecap="round" /> : null}
         {/* Four flips in: three quarters. */}
         <circle cx={fx(4)} cy={fy(FOUR)} r={7 * ease(frame, quartersAt - 4, 8)} fill={STAT} />
       </Svg>
@@ -211,7 +211,7 @@ export const LawScene: React.FC = () => {
       </Ink>
 
       {/* ── The gambler's fallacy, beside the chart ── */}
-      <Ink at={balanceAt - 4} dur={14} style={{ left: MEM.x0 - MEM.r, top: y(MEM.y - 92), whiteSpace: "nowrap" }}>
+      <Ink at={balanceAt - 4} dur={14} out={paidAt + 8} style={{ left: MEM.x0 - MEM.r, top: y(MEM.y - 92), whiteSpace: "nowrap" }}>
         <span style={label(22, INK)}>Five heads in a row</span>
       </Ink>
       {Array.from({ length: 5 }, (_, i) => {
@@ -228,10 +228,9 @@ export const LawScene: React.FC = () => {
               left: 0,
               top: 0,
               transform: `translate(${lerp(0, tx - x0, fly)}px, ${lerp(0, ty - y0, fly)}px)`,
-              opacity: 1 - ease(frame, paidAt + 14, 10),
             }}
           >
-            <Coin x={x0} y={y0} heads at={rowAt - 4 + i * 3} r={lerp(MEM.r, 8, fly)} />
+            <Coin x={x0} y={y0} heads at={rowAt - 4 + i * 3} r={lerp(MEM.r, 9, fly)} />
           </div>
         );
       })}
@@ -242,10 +241,8 @@ export const LawScene: React.FC = () => {
       <Ink at={memoryAt - 2} dur={14} style={{ left: MEM.x0 - MEM.r, top: y(MEM.y + 208), whiteSpace: "nowrap" }}>
         <span style={{ ...body(32, true), color: INK }}>No memory.</span>
       </Ink>
-      <Note at={swampedAt} x={MEM.x0 - MEM.r} y={y(MEM.y + 290)} width={300}>
-        <span style={{ ...note(22, INK), lineHeight: 1.35 }}>
-          A streak isn&apos;t paid back. It&apos;s swamped by the flips after it.
-        </span>
+      <Note at={swampedAt} x={MEM.x0 - MEM.r} y={y(MEM.y + 290)} width={320}>
+        <span style={{ ...note(22, INK), lineHeight: 1.35 }}>A streak is never paid back, only swamped.</span>
       </Note>
       <Note at={afterEnd - 6} x={fx(30)} y={y(CH.base) - h(60)}>
         <span style={{ ...note(21, DATA), fontWeight: 650, whiteSpace: "nowrap" }}>everything after the streak</span>

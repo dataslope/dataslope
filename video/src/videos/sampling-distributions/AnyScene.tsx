@@ -2,6 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
+import { useMergedPart } from "../sampling/merged";
 import { Axis, Bars, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
 import {
@@ -42,6 +43,8 @@ const AT_SD = Math.exp(-0.5);
 export const AnyScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
+  // In the merged Unit 5 video the spoken bridge leads straight on: no "Next" line.
+  const merged = useMergedPart();
   const { y, h } = useLayout();
 
   const anyFrom = n.beat("any").from;
@@ -78,9 +81,11 @@ export const AnyScene: React.FC = () => {
       <Ink at={seAt - 4} dur={20} style={{ left: 1176, top: y(156), ...headline(64, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
         the standard error.
       </Ink>
-      <NextLine at={nextAt} x={1180} y={y(246)} width={620}>
-        the shape of an average.
-      </NextLine>
+      {merged ? null : (
+        <NextLine at={nextAt} x={1180} y={y(246)} width={620}>
+          the shape of an average.
+        </NextLine>
+      )}
 
       <FigLabel
         n="7"

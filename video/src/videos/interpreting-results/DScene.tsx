@@ -180,15 +180,21 @@ export const DScene: React.FC = () => {
       </Drift>
 
       {/* ── Cohen's guideposts, row by row ── */}
-      <Ink at={at[0] - 10} dur={14} style={{ left: TABLE_X, top: y(TABLE_Y), whiteSpace: "nowrap" }}>
-        <span style={{ display: "flex" }}>
-          {["d", "Cohen's label", "shared"].map((t, i) => (
-            <span key={t} style={{ ...label(21, INK_SOFT), position: "absolute", left: COLS[i], opacity: i === 2 ? ease(frame, overlapAt - 4, 10) : 1 }}>
-              {t}
-            </span>
-          ))}
-        </span>
-      </Ink>
+      {["d", "Cohen's label", "shared"].map((t, i) => (
+        <div
+          key={t}
+          style={{
+            position: "absolute",
+            left: TABLE_X + COLS[i],
+            top: y(TABLE_Y),
+            whiteSpace: "nowrap",
+            opacity: ease(frame, i === 2 ? overlapAt - 4 : at[0] - 10, 12),
+            ...label(21, INK_SOFT),
+          }}
+        >
+          {t}
+        </div>
+      ))}
       <div
         style={{
           position: "absolute",
@@ -248,13 +254,13 @@ export const DScene: React.FC = () => {
       <Ring x={TABLE_X + COLS[2] + 34} y={y(TABLE_Y) + 56 + 2 * ROW + 24} at={thirdsAt - 2} r1={64} />
       <Note at={startAt - 2} x={TABLE_X} y={y(TABLE_Y) + 56 + 3 * ROW + 6}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-          a start: <Marker at={stakeAt - 2}>what&apos;s at stake</Marker> decides big
+          only a start: <Marker at={stakeAt - 2}>what&apos;s at stake</Marker> decides big
         </span>
       </Note>
       <Spot id="interpreting-results-caliper" at={startAt} left={1620} top={y(640)} width={140} height={360} />
       <Note at={sizeAt - 2} x={TABLE_X} y={y(TABLE_Y) + 56 + 3 * ROW + 46}>
         <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
-          and no <Marker at={dataAt - 2}>sample size</Marker> in it
+          and no <Marker at={dataAt - 2}>sample size</Marker> in the formula
         </span>
       </Note>
     </AbsoluteFill>

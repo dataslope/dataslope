@@ -10,8 +10,10 @@ import { num, pct, STREAK, TABLE } from "./data";
 import { DATA_INK, Headline, lerp, SOFT, STAT, STAT_INK, Svg, Sweep, VBracket } from "./parts";
 
 /** Two bars, one per plan, equally wide because both plans have 500 users. */
-const BARS = { x: [230, 610], w: 300, top: 352, base: 800 } as const;
-const RIGHT = 1080;
+const BARS = { x: [200, 600], w: 280, top: 384, base: 812 } as const;
+const RIGHT = 1160;
+/** Where the step between the two splits is measured, right of the free bar. */
+const STEP_X = 980;
 
 /**
  * Part 2, independence: each plan as a bar split at its churn rate. If plan
@@ -38,9 +40,9 @@ export const SplitScene: React.FC = () => {
   const gapAt = n.word("step", "gap");
   const actAt = n.word("step", "act on");
   const multiplyAt = n.word("multiply", "multiply");
-  const tenAt = n.word("multiply", "Ten fair heads");
-  const halfAt = n.word("multiply", "a half");
-  const timesAt = n.word("multiply", "ten times");
+  const tenAt = n.word("multiply", "Ten heads");
+  const halfAt = n.word("multiply", "ten halves");
+  const timesAt = n.word("multiply", "multiplied together");
   const oneInAt = n.word("multiply", "one in a thousand");
   const roundAt = n.word("test-in", "which way round");
   const conditionalAt = n.word("test-in", "conditional");
@@ -104,6 +106,17 @@ export const SplitScene: React.FC = () => {
           strokeDasharray="7 6"
           opacity={overall}
         />
+        {/* Paid's level, carried across to the step. */}
+        <line
+          x1={BARS.x[0] + BARS.w}
+          x2={lerp(BARS.x[0] + BARS.w, STEP_X, ease(frame, gapAt - 6, 14))}
+          y1={splitY(0)}
+          y2={splitY(0)}
+          stroke={INK}
+          strokeWidth={1.6}
+          strokeDasharray="2 5"
+          opacity={ease(frame, gapAt - 6, 8)}
+        />
       </Svg>
       {BARS.x.map((x, i) => (
         <React.Fragment key={i}>
@@ -111,12 +124,13 @@ export const SplitScene: React.FC = () => {
             <span style={{ ...headline(40), color: INK }}>{i === 0 ? "Paid" : "Free"}</span>
             <span style={{ ...note(21, INK_SOFT), marginLeft: 12 }}>{num(TABLE.rowTotals[i])} users</span>
           </Ink>
-          {/* The split's label rides on the split. */}
+          {/* The split's label rides above the split, outside its bar. */}
           <div
             style={{
               position: "absolute",
-              left: x + BARS.w + 22,
-              top: top + (splitY(i) - top) * split - 20,
+              left: i === 0 ? undefined : x + BARS.w + 16,
+              right: i === 0 ? 1920 - x + 16 : undefined,
+              top: top + (splitY(i) - top) * split - 38,
               opacity: ease(frame, splitAt + 6, 10),
               ...note(28, STAT_INK),
               fontWeight: 700,
@@ -125,32 +139,36 @@ export const SplitScene: React.FC = () => {
           >
             {pct(rates[i])}
           </div>
-          <div
-            style={{
-              position: "absolute",
-              left: x + 18,
-              top: top + 14,
-              opacity: ease(frame, splitAt + 8, 10),
-              ...note(21, "var(--ds-white)"),
-              fontWeight: 650,
-              whiteSpace: "nowrap",
-            }}
-          >
-            {i === 1 ? "churned" : ""}
-          </div>
         </React.Fragment>
       ))}
-      <Note at={fifteenAt} x={BARS.x[0] - 20} y={top + H * TABLE.pAll + 10} from="up">
-        <span style={{ ...note(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>everyone: {pct(TABLE.pAll)}</span>
+      <div
+        style={{
+          position: "absolute",
+          left: BARS.x[1] + 16,
+          top: top + 12,
+          opacity: ease(frame, splitAt + 8, 10),
+          ...note(21, "var(--ds-white)"),
+          fontWeight: 650,
+          whiteSpace: "nowrap",
+        }}
+      >
+        churned
+      </div>
+      <Note at={fifteenAt} x={(BARS.x[0] + BARS.w + BARS.x[1]) / 2} y={top + H * TABLE.pAll + 10} from="up">
+        <span style={{ ...note(21, INK), fontWeight: 600, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", textAlign: "center" }}>
+          everyone
+          <br />
+          {pct(TABLE.pAll)}
+        </span>
       </Note>
-      <div style={{ position: "absolute", left: BARS.x[0], top: y(BARS.top) - 52, opacity: indepTag, ...label(24, DATA_INK) }}>
+      <div style={{ position: "absolute", left: BARS.x[0], top: top - 52, opacity: indepTag, ...label(24, DATA_INK) }}>
         If independent: one level
       </div>
-      <div style={{ position: "absolute", left: BARS.x[0], top: y(BARS.top) - 52, opacity: depTag, ...label(24, STAT_INK) }}>
+      <div style={{ position: "absolute", left: BARS.x[0], top: top - 52, opacity: depTag, ...label(24, STAT_INK) }}>
         Dependent: the split steps
       </div>
-      <VBracket x={BARS.x[1] - 24} y0={splitY(0)} y1={splitY(1)} at={gapAt - 4} color={INK} />
-      <Note at={gapAt} x={BARS.x[1] - 48} y={(splitY(0) + splitY(1)) / 2 - 15} align="right">
+      <VBracket x={STEP_X} y0={splitY(0)} y1={splitY(1)} at={gapAt - 4} color={INK} right />
+      <Note at={gapAt} x={STEP_X + 24} y={(splitY(0) + splitY(1)) / 2 - 15}>
         <span style={{ ...note(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
           {Math.round((TABLE.pFree - TABLE.pPaid) * 100)} points
         </span>
@@ -177,13 +195,13 @@ export const SplitScene: React.FC = () => {
       <Ink at={tenAt - 2} dur={12} style={{ left: RIGHT, top: y(580), whiteSpace: "nowrap" }}>
         <span style={{ ...note(24, INK) }}>Ten heads in a row</span>
       </Ink>
-      <div style={{ position: "absolute", left: RIGHT, top: y(626), display: "flex", gap: 10, ...note(34, INK), whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: RIGHT, top: y(626), display: "flex", gap: 8, ...note(30, INK), whiteSpace: "nowrap" }}>
         {Array.from({ length: 10 }, (_, i) => {
           const at = lerp(halfAt - 2, timesAt + 6, i / 9);
           const p = ease(frame, at, 8);
           return (
             <span key={i} style={{ opacity: p, transform: `translateY(${(1 - p) * 10}px)`, display: "inline-block" }}>
-              ½{i < 9 ? <span style={{ color: INK_SOFT, marginLeft: 10 }}>×</span> : null}
+              ½{i < 9 ? <span style={{ color: INK_SOFT, marginLeft: 8 }}>×</span> : null}
             </span>
           );
         })}
@@ -196,14 +214,14 @@ export const SplitScene: React.FC = () => {
       </Ink>
 
       {/* ── The turn: which way round ── */}
-      <div style={{ position: "absolute", left: RIGHT, top: y(808), height: 1, width: 700 * ease(frame, roundAt - 6, 14), background: INK, opacity: 0.5 }} />
+      <div style={{ position: "absolute", left: RIGHT, top: y(808), height: 1, width: 660 * ease(frame, roundAt - 6, 14), background: INK, opacity: 0.5 }} />
       <Ink at={roundAt - 2} dur={14} style={{ left: RIGHT, top: y(830), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(28, INK) }}>
+        <span style={{ ...note(26, INK) }}>
           P(churn <span style={{ color: INK_SOFT }}>| free</span>) = <b>{pct(TABLE.pFree)}</b>
         </span>
       </Ink>
-      <Ink at={conditionalAt - 2} dur={14} style={{ left: RIGHT + 360, top: y(830), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(28, INK) }}>
+      <Ink at={conditionalAt - 2} dur={14} style={{ left: RIGHT + 330, top: y(830), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(26, INK) }}>
           P(free <span style={{ color: INK_SOFT }}>| churn</span>) = <b style={{ color: STAT_INK }}>{pct(TABLE.pFreeGivenChurn)}</b>
         </span>
       </Ink>

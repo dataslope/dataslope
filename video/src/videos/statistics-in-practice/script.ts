@@ -113,7 +113,7 @@ export const script: NarrationScript = {
     },
     {
       id: "sin",
-      text: "The trap is crossing that wall, by testing a lead on the data that suggested it. Friday was picked because it looked best in these very bills... so the test is tilted its way before it runs.",
+      text: "Keep a wall between them. The trap is crossing it, by testing a lead on the data that suggested it. Friday was picked because it looked best in these very bills... so the test is tilted its way before it runs.",
       pauseAfter: 0.35,
     },
     { id: "lie", text: "A p-value from the data that suggested the question is a lie." },

@@ -66,7 +66,7 @@ export const CloseScene: React.FC = () => {
 
       <Headline lead="Two groups," turn="one question." at={beganFrom - 6} turnAt={questionAt - 6} out={lookAt - 8} />
       <Headline lead="Look all you like." turn="Then ask once." at={lookAt - 4} turnAt={onceAt - 6} />
-      <div style={{ position: "absolute", left: 96, top: y(262), display: "flex", gap: "0.28em", whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: 96, top: y(262), display: "flex", gap: "0.36em", whiteSpace: "nowrap" }}>
         <Ink at={decideAt - 4} dur={18} style={{ position: "relative" }}>
           <span style={{ ...body(40, true), color: INK_SOFT }}>Decide the question,</span>
         </Ink>

@@ -37,7 +37,7 @@ export const BayesScene: React.FC = () => {
   const beforeAt = n.word("bayes", "before anyone");
   const outnumberAt = n.word("neglect", "outnumber");
   const thousandAt = n.word("neglect", "a thousand to one");
-  const swampAt = n.word("neglect", "swamp");
+  const swampAt = n.word("neglect", "ten to one");
   const neglectAt = n.word("neglect", "base-rate neglect");
   const retestFrom = n.beat("retest").from;
   const secondAt = n.word("retest", "second");
@@ -116,15 +116,29 @@ export const BayesScene: React.FC = () => {
           <span style={{ ...note(34, INK) }}>
             <Sweep at={oneAt - 2}>P(sick | +)</Sweep> ={" "}
             <Sweep at={otherAt - 2}>P(+ | sick)</Sweep> ×{" "}
-            <Sweep at={baseAt - 2} color={`color-mix(in srgb, ${DATA} 35%, transparent)`}>
-              P(sick)
-            </Sweep>{" "}
+            <span style={{ position: "relative", display: "inline-block" }}>
+              <Sweep at={baseAt - 2} color={`color-mix(in srgb, ${DATA} 35%, transparent)`}>
+                P(sick)
+              </Sweep>
+              {/* The base rate, named right above the term it is. */}
+              <span
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  bottom: "100%",
+                  marginBottom: 6,
+                  ...note(22, DATA_INK),
+                  fontWeight: 650,
+                  whiteSpace: "nowrap",
+                  opacity: ease(frame, baseAt + 2, 12),
+                }}
+              >
+                the base rate, 1 in {num(TEST.oneIn)}
+              </span>
+            </span>{" "}
             ÷ P(+)
           </span>
         </Ink>
-        <Note at={baseAt + 2} x={1100} y={y(556)}>
-          <span style={{ ...note(24, DATA_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the base rate: 1 in {num(TEST.oneIn)}</span>
-        </Note>
         <Note at={beforeAt} x={160} y={y(624)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             = {TEST.sensitivity} × {TEST.baseRate} ÷ {fmt(TEST.pPos, 5)} = <b style={{ color: STAT_INK }}>{fmt(TEST.ppv, 3)}</b>
@@ -163,11 +177,12 @@ export const BayesScene: React.FC = () => {
             1% of {num(TEST.healthy)} is <b style={{ color: STAT_INK }}>{num(TEST.fp)}</b>, against <b style={{ color: DATA_INK }}>{TEST.tp}</b> real cases
           </span>
         </Ink>
-        <Ink at={neglectAt - 4} dur={16} style={{ left: 1100, top: y(470), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(36), color: INK }}>
+        <Ink at={neglectAt - 4} dur={16} style={{ left: 160, top: y(866), whiteSpace: "nowrap" }}>
+          <span style={{ ...body(34), color: INK }}>
             <span style={{ background: `linear-gradient(transparent 55%, ${HIGHLIGHT} 55%, ${HIGHLIGHT} 92%, transparent 92%)` }}>
               Base-rate neglect
-            </span>
+            </span>{" "}
+            is forgetting this ratio.
           </span>
         </Ink>
       </div>
@@ -224,8 +239,8 @@ export const BayesScene: React.FC = () => {
           </React.Fragment>
         );
       })}
-      <Note at={retestFrom + 16} x={SHARE.x0 + SHARE.w * TEST.treePpv + 18} y={y(SHARE.y[0]) + h(SHARE.h) / 2 - 18}>
-        <span style={{ ...note(28, "var(--ds-white)"), fontWeight: 700, whiteSpace: "nowrap" }}>{pct(TEST.treePpv)} real</span>
+      <Note at={retestFrom + 16} x={SHARE.x0 + 14} y={y(SHARE.y[0]) + h(SHARE.h) / 2 - 18}>
+        <span style={{ ...note(26, "var(--ds-white)"), fontWeight: 700, whiteSpace: "nowrap" }}>{pct(TEST.treePpv)} real</span>
       </Note>
       <Ink at={ninetyOneAt - 4} dur={16} style={{ left: SHARE.x0, top: y(770), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 22 }}>
         <Big size={96} color={DATA_INK} italic>

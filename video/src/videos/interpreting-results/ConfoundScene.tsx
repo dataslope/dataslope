@@ -186,7 +186,7 @@ export const ConfoundScene: React.FC = () => {
             <span style={{ ...note(20, BAND_INK[k]), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>{BAND_NAME[k]}</span>
           </Note>
         ))}
-        <Note at={higherAt - 2} x={X.x0 + 20} y={top + 8}>
+        <Note at={higherAt - 2} x={X.x1 - 10} y={bottom - 56} align="right">
           <span style={{ ...note(21, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>older bands: more exercise, higher pressure</span>
         </Note>
       </Drift>

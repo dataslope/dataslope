@@ -75,7 +75,7 @@ export const QuantileScene: React.FC = () => {
           <Note at={responseAt + 4} x={X.x1} y={y(346)} align="right">
             <span style={code(21, INK_SOFT)}>expon(scale={scale})</span>
           </Note>
-          <YTicks ticks={[0.25, 0.5, 0.75, 1]} py={py} x0={X.x0} x1={X.x1} at={responseAt} format={(v) => `${Math.round(v * 100)}%`} />
+          <YTicks ticks={[0.25, 0.5, 0.75]} py={py} x0={X.x0} x1={X.x1} at={responseAt} format={(v) => `${Math.round(v * 100)}%`} />
           <Axis scale={X} base={base} ticks={[0, 200, 400, 600, 800, 1000]} at={responseAt} format={(v) => (v === 1000 ? "1,000 ms" : String(v))} />
 
           {/* What's asked: the time ninety-five percent beat. */}

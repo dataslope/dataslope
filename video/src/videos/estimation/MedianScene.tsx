@@ -133,7 +133,7 @@ export const MedianScene: React.FC = () => {
       {/* The real incomes in this stretch, under the spikes. */}
       <Svg opacity={ease(frame, sawAt - 4, 14)}>
         {near.map((v, i) => (
-          <line key={i} x1={sx(XZ, v)} x2={sx(XZ, v)} y1={y(HIST_BASE) + 4} y2={y(HIST_BASE) + 16} stroke={DATA} strokeWidth={2.4} />
+          <line key={i} x1={sx(XZ, v)} x2={sx(XZ, v)} y1={y(HIST_BASE) + 36} y2={y(HIST_BASE) + 50} stroke={DATA} strokeWidth={2.4} />
         ))}
       </Svg>
       <Note at={sawAt} x={sx(XZ, 37.6)} y={y(HIST_BASE) - h(HIST_H * 0.62)}>

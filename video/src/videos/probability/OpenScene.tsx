@@ -11,7 +11,7 @@ import { Bracket, Coin, Count, DATA, Headline, Kicker, lerp, Spot, STAT, STAT_IN
 
 /** The two little panels of the bridge: data you have, data you haven't. */
 const SHAPE = [0.18, 0.42, 0.74, 1, 0.86, 0.62, 0.4, 0.22, 0.1];
-const PANEL = { w: 520, base: 640, tall: 250, x: [160, 1000] } as const;
+const PANEL = { w: 640, base: 700, tall: 330, x: [160, 1000] } as const;
 /** The strip of the first flips. */
 const STRIP = { x0: 186, y: 712, pitch: 56, r: 22, count: 24 } as const;
 
@@ -91,7 +91,7 @@ export const OpenScene: React.FC = () => {
         const barW = PANEL.w / SHAPE.length;
         return (
           <React.Fragment key={k}>
-            <Ink at={seen ? haveAt - 4 : seenAt - 2} dur={14} out={halfFrom - 8} style={{ left: x0, top: y(330), whiteSpace: "nowrap" }}>
+            <Ink at={seen ? haveAt - 4 : seenAt - 2} dur={14} out={halfFrom - 8} style={{ left: x0, top: y(300), whiteSpace: "nowrap" }}>
               <span style={label(24, seen ? INK : INK_SOFT)}>{seen ? "The data you have" : "Data you haven't seen"}</span>
             </Ink>
             <Svg opacity={1 - panelsOut}>
@@ -155,14 +155,14 @@ export const OpenScene: React.FC = () => {
       </Note>
 
       {/* ── One half, for one flip ── */}
-      <Ink at={oneHalfAt - 4} dur={18} out={hundredAt - 6} style={{ left: 160, top: y(300), whiteSpace: "nowrap" }}>
+      <Ink at={oneHalfAt - 4} dur={18} style={{ left: 160, top: y(290), whiteSpace: "nowrap", opacity: 1 - defDim * 0.4 }}>
         <span style={{ ...note(24, INK_SOFT), display: "block", marginBottom: 8 }}>Probability of heads</span>
         <span style={{ ...headline(128), color: INK }}>½</span>
       </Ink>
-      <Ink at={singleAt - 4} dur={14} out={hundredAt - 6} style={{ left: 640, top: y(300), whiteSpace: "nowrap" }}>
+      <Ink at={singleAt - 4} dur={14} style={{ left: 640, top: y(300), whiteSpace: "nowrap", opacity: 1 - defDim * 0.4 }}>
         <span style={note(24, INK_SOFT)}>One flip</span>
       </Ink>
-      <div style={{ opacity: 1 - ease(frame, hundredAt - 6, 10) }}>
+      <div style={{ opacity: 1 - defDim * 0.4 }}>
         <Coin x={680} y={y(420)} heads at={singleAt} r={38} />
         <Ink at={tailsAt - 8} dur={12} style={{ left: 742, top: y(420) - 20, whiteSpace: "nowrap" }}>
           <span style={note(26, INK_SOFT)}>or</span>
@@ -179,7 +179,7 @@ export const OpenScene: React.FC = () => {
           </span>
         </Note>
       </div>
-      <Spot id="probability-coin" at={coinAt - 4} out={hundredAt - 6} left={1450} top={y(250)} width={340} height={340} />
+      <Spot id="probability-coin" at={coinAt - 4} left={1470} top={y(236)} width={320} height={320} />
 
       {/* ── The long run ── */}
       <Ink at={longRunAt - 6} dur={20} style={{ left: 160, top: y(560), whiteSpace: "nowrap" }}>
@@ -233,17 +233,17 @@ export const OpenScene: React.FC = () => {
           <span style={{ ...note(24, INK_SOFT), marginRight: 14 }}>Share</span>
           <span style={{ ...headline(64, true), color: STAT_INK }}>{fmt(COIN.pHeads, 4)}</span>
         </Ink>
+        <Ink at={closeAt - 2} dur={14} style={{ position: "relative", whiteSpace: "nowrap" }}>
+          <span style={note(22, INK_SOFT)}>close to the true 0.5, not on it</span>
+        </Ink>
       </div>
-      <Note at={closeAt} x={1260} y={y(808) + 76}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>close to the true 0.5, not on it</span>
-      </Note>
       {/* A hairline under the count, drawn as the share lands. */}
       <div
         style={{
           position: "absolute",
           left: 160,
           top: y(808) + 70,
-          width: 1080 * ease(frame, pointAt, 18),
+          width: 1560 * ease(frame, pointAt, 18),
           height: 1,
           background: HAIRLINE,
           opacity: 0.6,

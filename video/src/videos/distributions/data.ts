@@ -156,6 +156,9 @@ export const INCOME = {
   sd: m.income.sd,
   max: m.income.max,
   belowZero: m.income.belowZero,
+  /** norm.fit on the same incomes. */
+  fitLoc: m.income.fitLoc,
+  fitScale: m.income.fitScale,
   lo: m.income.lo,
   bin: m.income.bin,
   counts: m.income.counts as readonly number[],

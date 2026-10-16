@@ -158,13 +158,13 @@ export const AreaScene: React.FC = () => {
             <line x1={px5} x2={px5} y1={base} y2={lerp(base, py(f(5)), lineIn)} stroke={ASK} strokeWidth={2.4} />
             <circle cx={px5} cy={py(f(5))} r={5} fill={ASK} />
           </Svg>
-          <Note at={exactlyAt} x={px5 + 16} y={py(f(5)) - 48} out={rangesAt - 4}>
+          <Note at={exactlyAt} x={px5 + 16} y={py(f(5)) - h(150)} out={rangesAt - 4}>
             <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>exactly 5</span>
           </Note>
-          <Note at={zeroAt - 2} x={px5 + 16} y={py(f(5)) + 8} out={rangesAt - 4}>
+          <Note at={zeroAt - 2} x={px5 + 16} y={py(f(5)) - h(150) + 34} out={rangesAt - 4}>
             <span style={{ ...askNote(30), whiteSpace: "nowrap" }}>P(wait = 5) = 0</span>
           </Note>
-          <Note at={widthAt - 2} x={px5 + 16} y={py(f(5)) + 52} out={rangesAt - 4}>
+          <Note at={widthAt - 2} x={px5 + 16} y={py(f(5)) - h(150) + 80} out={rangesAt - 4}>
             <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>no width, so no area</span>
           </Note>
 

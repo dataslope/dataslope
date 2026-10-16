@@ -67,7 +67,7 @@ export const LookScene: React.FC = () => {
   const split = (i: number) => ease(frame, splitAt - 4 + (i % 61) * 0.25, 18);
   const medianT = ease(frame, medianAt - 2, 20);
   const meansIn = ease(frame, standsAt - 6, 12);
-  const band = ease(frame, fridayAt - 6, 12);
+  const band = ease(frame, fridayAt - 6, 12) * (1 - ease(frame, findingAt - 6, 14));
   const bandRow = lerp(ROW_Y[FRI], ROW_Y[SUN], ease(frame, sundayAt - 6, 16));
   const whisk = ease(frame, wobblesAt - 6, 16) * (1 - ease(frame, medianAt - 6, 12));
   const dimRows = ease(frame, nineteenAt - 4, 12) * (1 - ease(frame, medianAt - 6, 12));

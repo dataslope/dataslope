@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { BOOT, histogram, jitter } from "./data";
-import { Bracket, DATA, EST, EST_INK, FADED, Headline, IntervalBar, Kicker, lerp, Marked, pulse, Rule, Spot, Svg } from "./parts";
+import { Bracket, DATA, EST, EST_INK, Headline, IntervalBar, Kicker, lerp, Marked, pulse, Rule, Spot, Svg } from "./parts";
 
 /** Fig. 7: the sixty waits, and one resample of them stacked below. */
 const X: XScale = { lo: 0, hi: 20, x0: 160, x1: 1760 };
@@ -86,10 +86,10 @@ export const ResampleScene: React.FC = () => {
   // ── The three resamples drawn one by one, then the rest at once ──
   const draws = [
     { s: drawAt, stagger: 1.05, c: averageAt - 2, fall: averageAt + 12 },
-    { s: againAt + 2, stagger: 0.22, c: againAt + 18, fall: againAt + 28 },
-    { s: againAt + 30, stagger: 0.18, c: againAt + 44, fall: againAt + 52 },
+    { s: againAt + 2, stagger: 0.2, c: againAt + 16, fall: againAt + 24 },
+    { s: againAt + 26, stagger: 0.16, c: againAt + 38, fall: againAt + 44 },
   ];
-  const fastFrom = draws[2].fall + 14;
+  const fastFrom = Math.max(draws[2].fall + 10, thousandAt + 6);
   const fastTo = Math.max(fastFrom + 30, pileAt + 4);
   const landed = (f: number) => {
     let k = draws.filter((d) => f >= d.fall + 12).length;
@@ -209,20 +209,20 @@ export const ResampleScene: React.FC = () => {
       {draws.map((d, i) => (
         <FallingAverage key={i} index={i} at={d.fall} />
       ))}
-      <Ink at={distributionAt - 4} dur={14} style={{ left: sx(XZ, 8.25), top: y(HIST_BASE) - h(HIST_H * 0.85), whiteSpace: "nowrap" }}>
+      <Ink at={distributionAt - 4} dur={14} style={{ left: sx(XZ, 8.12), top: y(HIST_BASE) - h(HIST_H * 0.55), whiteSpace: "nowrap" }}>
         <span style={{ ...note(22, EST_INK), fontWeight: 650 }}>the bootstrap distribution</span>
       </Ink>
       <Bracket x0={sx(XZ, center - BOOT.bootSe)} x1={sx(XZ, center + BOOT.bootSe)} y={seY} at={spreadAt - 2} color={INK} />
-      <Rule x={sx(XZ, BOOT.lo)} y0={y(HIST_BASE)} y1={y(HIST_BASE) - h(HIST_H) - 40} at={sixOneAt - 4} color={INK} width={2.2} />
-      <Rule x={sx(XZ, BOOT.hi)} y0={y(HIST_BASE)} y1={y(HIST_BASE) - h(HIST_H) - 40} at={eightOhAt - 4} color={INK} width={2.2} />
-      <IntervalBar x0={sx(XZ, BOOT.lo)} x1={sx(XZ, BOOT.hi)} y={y(HIST_BASE) - h(HIST_H) - 30} at={sixOneAt} dur={18} color={INK} width={4} tick={10} />
-      <Note at={eightOhAt} x={sx(XZ, BOOT.hi) + 14} y={y(HIST_BASE) - h(HIST_H) - 46}>
+      <Rule x={sx(XZ, BOOT.lo)} y0={y(HIST_BASE)} y1={y(HIST_BASE) - h(HIST_H) - 56} at={sixOneAt - 4} color={INK} width={2.2} />
+      <Rule x={sx(XZ, BOOT.hi)} y0={y(HIST_BASE)} y1={y(HIST_BASE) - h(HIST_H) - 56} at={eightOhAt - 4} color={INK} width={2.2} />
+      <IntervalBar x0={sx(XZ, BOOT.lo)} x1={sx(XZ, BOOT.hi)} y={y(HIST_BASE) - h(HIST_H) - 50} at={sixOneAt} dur={18} color={INK} width={4} tick={10} />
+      <Note at={eightOhAt} x={sx(XZ, BOOT.hi) + 14} y={y(HIST_BASE) - h(HIST_H) - 66}>
         <span style={{ ...note(22, INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>
           middle 95%: {fmt(BOOT.lo)} to {fmt(BOOT.hi)}
         </span>
       </Note>
-      <IntervalBar x0={sx(XZ, BOOT.tLo)} x1={sx(XZ, BOOT.tHi)} y={y(HIST_BASE) - h(HIST_H) + 2} at={tAt - 4} dur={16} color={INK_SOFT} width={2.4} tick={8} dash="6 5" />
-      <Note at={tAt} x={sx(XZ, BOOT.tHi) + 14} y={y(HIST_BASE) - h(HIST_H) - 12}>
+      <IntervalBar x0={sx(XZ, BOOT.tLo)} x1={sx(XZ, BOOT.tHi)} y={y(HIST_BASE) - h(HIST_H) - 18} at={tAt - 4} dur={16} color={INK_SOFT} width={2.4} tick={8} dash="6 5" />
+      <Note at={tAt} x={sx(XZ, BOOT.tHi) + 14} y={y(HIST_BASE) - h(HIST_H) - 32}>
         <span style={{ ...note(21, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>
           t-interval: {fmt(BOOT.tLo)} to {fmt(BOOT.tHi)}
         </span>

@@ -116,15 +116,15 @@ export const HugeScene: React.FC = () => {
         {/* ── The two curves, one over the other ── */}
         <Svg>
           {drawA > 0 ? (
-            <path d={curve(HUGE.meanA, drawA)} fill="none" stroke={COLOR[0]} strokeWidth={4} strokeLinejoin="round" />
+            <path d={curve(HUGE.meanA, drawA)} fill="none" stroke={COLOR[0]} strokeWidth={7} strokeLinejoin="round" opacity={0.75} />
           ) : null}
           {drawB > 0 ? (
             <path
               d={curve(HUGE.meanB, drawB)}
               fill="none"
               stroke={COLOR[1]}
-              strokeWidth={3}
-              strokeDasharray="10 7"
+              strokeWidth={3.5}
+              strokeDasharray="14 9"
               strokeLinejoin="round"
             />
           ) : null}
@@ -145,7 +145,7 @@ export const HugeScene: React.FC = () => {
         </Svg>
         <Axis scale={X} base={y(BASE)} ticks={[40, 70, 100, 130, 160]} at={groupsAt - 6} />
         {(["A", "B"] as const).map((g, i) => (
-          <Note key={g} at={(i ? peopleAt : groupsAt) + 4} x={i ? 700 : 260} y={i ? py(118) - 20 : py(82) - 20} align={i ? "left" : "right"}>
+          <Note key={g} at={(i ? peopleAt : groupsAt) + 4} x={i ? sx(X, 121) + 18 : sx(X, 79) - 18} y={i ? py(121) - 30 : py(79) - 30} align={i ? "left" : "right"}>
             <span style={{ ...label(22, COLOR_INK[i]), ...halo, whiteSpace: "nowrap" }}>Group {g}</span>
           </Note>
         ))}

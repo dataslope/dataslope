@@ -166,6 +166,8 @@ export const OUTLIERS = {
   planted: m.outliers.planted as readonly number[],
   upper: m.outliers.upper,
   zCut: m.outliers.zCut,
+  iqrFlagged: m.outliers.iqrFlagged as readonly number[],
+  zFlagged: m.outliers.zFlagged as readonly number[],
   iqrFlags: m.outliers.iqrFlags,
   zFlags: m.outliers.zFlags,
   tailFlags: m.outliers.tailFlags,

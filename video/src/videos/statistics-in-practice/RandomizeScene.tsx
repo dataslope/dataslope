@@ -111,7 +111,13 @@ export const RandomizeScene: React.FC = () => {
               style={{ left: LABEL_RIGHT, top: y(rowY(i)) - 15, whiteSpace: "nowrap", transform: "translateX(-100%)" }}
             >
               <span style={{ ...label(22, r.unmeasured ? STAT_INK : INK), fontStyle: r.unmeasured ? "italic" : "normal", fontWeight: 600 }}>
-                {named[r.key] !== undefined ? <Marker at={named[r.key] - 4}>{r.key}</Marker> : r.key}
+                {named[r.key] !== undefined ? (
+                  <Marker at={named[r.key] - 4} off={coinAt - 4}>
+                    {r.key}
+                  </Marker>
+                ) : (
+                  r.key
+                )}
               </span>
             </Ink>
           );
@@ -146,13 +152,17 @@ export const RandomizeScene: React.FC = () => {
         <Ring x={sx(X, rows[8].randomised)} y={y(rowY(8))} at={evenAt - 2} color={BAR} />
         <Ring x={sx(X, rows[9].randomised)} y={y(rowY(9))} at={evenAt + 6} color={BAR} />
 
-        {/* Which dot is which, beside the first row. */}
-        <Ink at={apartAt + 2} dur={12} style={{ left: sx(X, rows[0].selected) + 16, top: y(rowY(0)) - 14, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(20, STAT_INK), fontWeight: 650, ...halo }}>users chose</span>
-        </Ink>
-        <Ink at={shrinksAt + 2} dur={12} style={{ left: sx(X, rows[1].randomised) + 16, top: y(rowY(1)) - 14, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(20, BLUE_INK), fontWeight: 650, ...halo }}>a coin chose</span>
-        </Ink>
+        {/* Which dot is which: the legend, at the right end of the figure's label. */}
+        <div style={{ position: "absolute", left: X.x1, top: y(300), transform: "translateX(-100%)", display: "flex", gap: 26, whiteSpace: "nowrap" }}>
+          <Ink at={apartAt + 2} dur={12} style={{ position: "relative", display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ width: 16, height: 16, borderRadius: 8, background: STAT, display: "inline-block" }} />
+            <span style={{ ...note(21, STAT_INK), fontWeight: 650 }}>users chose</span>
+          </Ink>
+          <Ink at={shrinksAt + 2} dur={12} style={{ position: "relative", display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ width: 16, height: 16, borderRadius: 8, background: BAR, display: "inline-block" }} />
+            <span style={{ ...note(21, BLUE_INK), fontWeight: 650 }}>a coin chose</span>
+          </Ink>
+        </div>
       </div>
 
       {/* ── So the button is the only difference left ── */}

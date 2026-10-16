@@ -142,8 +142,8 @@ export const DieScene: React.FC = () => {
           </div>
         </React.Fragment>
       ))}
-      <Pulse x={fxv(DIE.mode)} y={base - h(PMF.unit * 0.5) - 60} at={thatsSixAt - 4} r={34} />
-      <Note at={likeliestAt} x={fxv(DIE.mode) - 70} y={base - h(PMF.unit * 0.5) - 92} align="right">
+      <Pulse x={fxv(DIE.mode)} y={base - h(PMF.unit * 0.25)} at={thatsSixAt - 4} r={40} />
+      <Note at={likeliestAt} x={fxv(DIE.mode) - PMF.barW / 2 - 18} y={base - h(PMF.unit * 0.25) - 15} align="right">
         <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
           the likeliest roll<span style={{ opacity: ease(frame, thatsSixAt - 4, 10) }}>: six</span>
         </span>

@@ -212,7 +212,12 @@ export const SweepScene: React.FC = () => {
           const last = i === SWEEP.rows.length - 1;
           return (
             <React.Fragment key={r.n}>
-              <Note at={pAt} x={last ? finalP[0] - 14 : pPts[i][0] + 14} y={last ? bottom - 60 : pPts[i][1] - 34} align={last ? "right" : "left"}>
+              <Note
+                at={pAt}
+                x={last ? finalP[0] + 6 : i === 3 ? pPts[i][0] - 14 : pPts[i][0] + 14}
+                y={last ? bottom - 78 : i === 3 ? pPts[i][1] - 12 : pPts[i][1] - 34}
+                align={i === 3 ? "right" : "left"}
+              >
                 <span style={{ ...note(21, STAT_INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>{pLabel(r.p)}</span>
               </Note>
               <Note at={dAt + 4 + i * 3} x={dPts[i][0]} y={dPts[i][1] + (r.d > SWEEP.trueD ? -44 : 16)} from="up">

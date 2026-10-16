@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DEPTS, type Group, POOLED } from "./data";
-import { Drift, GROUP_COLOR, GROUP_INK, Headline, Kicker, Marker, Ring, STAT_INK, Svg } from "./parts";
+import { Drift, GROUP_COLOR, GROUP_INK, Headline, Kicker, Marker, Ring, Svg } from "./parts";
 
 const PX0 = 520;
 const PX1 = 1420;
@@ -93,14 +93,15 @@ export const AdmitScene: React.FC = () => {
         ]}
       />
       <Note at={from - 4} x={92} y={y(176)}>
-        <span style={{ ...body(44, true), color: INK, whiteSpace: "nowrap", opacity: 1 - ease(frame, bothAt - 10, 8) }}>
+        <span style={{ ...body(52, true), color: INK, whiteSpace: "nowrap", opacity: 1 - ease(frame, bothAt - 10, 8) }}>
           Who gets in?
-          <span style={{ ...note(22, INK_SOFT), marginLeft: 20, opacity: ease(frame, famousAt - 2, 10) }}>
-            the famous case: Berkeley, 1973
+          <span style={{ ...label(24, INK_SOFT), marginLeft: 24, opacity: ease(frame, famousAt - 2, 10) }}>
+            The famous case: Berkeley, 1973
           </span>
         </span>
       </Note>
 
+      <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.45 * ease(frame, slopeAt - 8, 18) }}>
       <Drift from={totalAt} to={end + 30} amount={0.02} origin={[960, 600]}>
         <FigLabel n="6" title="Share admitted, in two departments" at={twoAt - 6} x={160} y={y(262)} />
         <Note at={twoAt} x={1760} y={y(262) + 2} align="right" from="right">
@@ -246,20 +247,18 @@ export const AdmitScene: React.FC = () => {
         })}
 
         {/* Where each group applied. */}
-        <Note at={sevenAt - 2} x={px(DEPTS[1].women.rate) + radius(600) + 76} y={rowY(2) + 26}>
+        <Note at={sevenAt - 2} out={overAt - 8} x={px(DEPTS[1].women.rate) + radius(600) + 76} y={rowY(2) + 26}>
           <span style={{ ...note(22, GROUP_INK.women), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
             {DEPTS[1].women.applied} of {POOLED.women.applied} women applied here
           </span>
         </Note>
-        <Note at={menMixAt - 2} x={px(DEPTS[0].men.rate) - radius(600) - 24} y={rowY(1) + 34} align="right">
+        <Note at={menMixAt - 2} out={overAt - 8} x={px(DEPTS[0].men.rate) - radius(600) - 24} y={rowY(1) + 34} align="right">
           <span style={{ ...note(22, GROUP_INK.men), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
             {DEPTS[0].men.applied} of {POOLED.men.applied} men applied here
           </span>
         </Note>
-        <Note at={slopeAt - 4} x={GAP_X} y={y(860)}>
-          <span style={{ ...note(22, STAT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>and slopes?</span>
-        </Note>
       </Drift>
+      </div>
     </AbsoluteFill>
   );
 };

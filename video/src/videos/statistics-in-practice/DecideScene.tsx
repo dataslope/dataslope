@@ -160,7 +160,7 @@ export const DecideScene: React.FC = () => {
         <span style={{ ...note(22, INK) }}>a call about money,</span>
       </Ink>
       <Ink at={moneyAt + 6} dur={16} style={{ left: COL[1], top: y(OURS) + 16, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, INK_SOFT) }}>not math: {`+${Math.round(EXPERIMENT.relLift * 100)}%`} sales</span>
+        <span style={{ ...note(22, INK_SOFT) }}>not math</span>
       </Ink>
       <Cross x={COL[1] + 16} y={y(HUGE)} at={worthlessAt - 4} />
       <Ink at={worthlessAt - 2} dur={12} style={{ left: COL[1] + 46, top: y(HUGE) - 16, whiteSpace: "nowrap" }}>
