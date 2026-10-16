@@ -41,6 +41,9 @@ export const AdmitScene: React.FC = () => {
   const yearAt = n.word("admit", "nineteen seventy-three");
   const famousAt = n.word("admit", "famous");
   const admissionsAt = n.word("admit", "admissions");
+  const twoDeptsAt = n.word("admit", "two departments");
+  const womenWordAt = n.word("overall", "women");
+  const sixtyAt = n.word("split", "sixty");
   const fiftyFiveAt = n.word("overall", "fifty-five");
   const onlyAt = n.word("overall", "only");
   const flipAt = n.word("confound-in", "flip");
@@ -157,6 +160,16 @@ export const AdmitScene: React.FC = () => {
         <Ink at={bothAt - 6} dur={12} style={{ left: GAP_X, top: y(330) - 30 }}>
           <span style={label(20, INK_SOFT)}>Women minus men</span>
         </Ink>
+
+        {/* A guide for each row, drawn as the narration names the departments. */}
+        <Svg>
+          {[0, 1, 2].map((i) => {
+            const g = ease(frame, twoDeptsAt - 6 + i * 5, 16);
+            return g > 0 ? (
+              <line key={i} x1={px(0)} x2={px(0) + (px(1) - px(0)) * g} y1={rowY(i)} y2={rowY(i)} stroke={INK_SOFT} strokeWidth={2} strokeDasharray="2 6" opacity={0.6} />
+            ) : null;
+          })}
+        </Svg>
 
         {/* The total, drawn from the departments it averages over. */}
         <Svg opacity={ease(frame, overAt - 4, 14) * 0.7}>
@@ -283,6 +296,8 @@ export const AdmitScene: React.FC = () => {
         ) : null}
 
         {/* What the narration is reading, ringed as it is read. */}
+        <Ring x={px(POOLED.women.rate)} y={rowY(0)} at={womenWordAt - 2} color={GROUP_COLOR.women} r0={radius(700)} r1={radius(700) + 44} />
+        <Ring x={px(DEPTS[0].men.rate)} y={rowY(1)} at={sixtyAt - 2} color={GROUP_COLOR.men} r0={radius(600)} r1={radius(600) + 44} />
         <Ring x={px(DEPTS[1].men.rate)} y={rowY(2)} at={twentyFiveAt - 2} color={GROUP_COLOR.men} r0={radius(100)} r1={radius(100) + 36} />
         <Ring x={px(POOLED.men.rate)} y={rowY(0)} at={howAt - 2} color={GROUP_COLOR.men} r0={radius(700)} r1={radius(700) + 40} />
         <Ring x={px(DEPTS[1].women.rate)} y={rowY(2)} at={hardOneAt - 2} color={GROUP_COLOR.women} r0={radius(600)} r1={radius(600) + 40} />

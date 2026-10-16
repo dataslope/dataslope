@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CONFOUND, type Line } from "./data";
-import { Arrow, BAND_COLOR, BAND_INK, DOT, Drift, Headline, lerp, Marker, partial, Spot, STAT, STAT_INK, Svg } from "./parts";
+import { Arrow, BAND_COLOR, BAND_INK, DOT, Drift, Headline, lerp, Marker, partial, Ring, Spot, STAT, STAT_INK, Svg } from "./parts";
 
 const X = { lo: 0, hi: 280, x0: 230, x1: 1150 };
 const Y = { lo: 100, hi: 150 };
@@ -46,6 +46,7 @@ export const ConfoundScene: React.FC = () => {
   const drivesAt = n.word("age", "drives both");
   const confounderAt = n.word("age", "confounder");
   const randomAt = n.word("coin", "randomized");
+  const cureAt = n.word("coin", "cure");
   const coinAt = n.word("coin", "coin");
   const cantAt = n.word("coin", "can't");
   const thirdAt = n.word("rtm-in", "third variable");
@@ -239,6 +240,7 @@ export const ConfoundScene: React.FC = () => {
       {box("Age", AGE[0], ageY, drivesAt - 8)}
       {box("Exercise", EXERCISE[0], lowY, drivesAt - 6, BAND_INK[0])}
       {box("Blood pressure", PRESSURE[0], lowY, drivesAt - 4, BAND_INK[3])}
+      <Ring x={AGE[0]} y={ageY} at={cureAt - 2} r0={40} r1={110} />
       <Note at={confounderAt - 2} x={AGE[0]} y={ageY - 76} from="up">
         <span style={{ ...label(22, STAT_INK), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
           <Marker at={confounderAt}>the confounder</Marker>

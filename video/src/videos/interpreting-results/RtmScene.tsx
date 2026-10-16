@@ -55,6 +55,7 @@ export const RtmScene: React.FC = () => {
   const groupAt = n.word("coach", "bottom group");
   const lookWordAt = n.word("look-in", "look at");
   const controlAt = n.word("control", "control group");
+  const creditItAt = n.word("control", "credit it");
   const aloneAt = n.word("control", "left alone");
   const lookAt = n.word("look-in", "choosing");
   const trapsAt = n.word("look-in", "traps");
@@ -235,6 +236,7 @@ export const RtmScene: React.FC = () => {
             +{fmt(RTM.bottomAfter - RTM.bottomBefore, 1)} with no program at all
           </span>
         </Note>
+        <Ring x={NOTE_X + 230} y={y(640) + 50} at={creditItAt - 2} color={DATA} r0={40} r1={150} />
         <Note at={controlAt - 2} x={NOTE_X + 60} y={y(780)}>
           <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>The fair comparison</span>
         </Note>
