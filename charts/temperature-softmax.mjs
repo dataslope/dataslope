@@ -13,32 +13,41 @@
  * uniform distribution, which is why turning it up far enough produces noise
  * rather than creativity.
  *
- * Faceted legitimately: every panel is a probability over the same six tokens.
+ * The tokens, logits and temperatures are the ones the temperature code block
+ * in how-llms-work/sampling uses, so every bar is a number that block prints.
+ * Change them together.
+ *
+ * Faceted legitimately: every panel is a probability over the same four tokens.
  */
 import { Plot, plot, HALO, MUTED, PRIMARY, SERIES } from "./_theme.mjs";
 
 export const title =
-  "The same four token scores turned into probabilities at three temperatures. At 0.3 the top token takes almost all the mass; at 1.0 the distribution is uneven but spread; at 2.0 all four are close to equal.";
+  "The scores for cat, dog, bird and rock turned into probabilities at four temperatures. At 0.2 cat takes almost all the mass; at 0.7 and 1.0 it still leads while the others keep a share; at 2.0 the distribution is flatter and even rock gets a real chance.";
 
 export const caption =
-  "The scores never change; temperature only changes how they are turned into probabilities. Low temperature magnifies the gaps until the top token wins every time, and high temperature flattens them until the choice is nearly a coin toss.";
+  "The scores never change; temperature only changes how they are turned into probabilities. Low temperature magnifies the gaps until the top token wins nearly every time, and high temperature shrinks them so the long tail gets a real chance.";
 
-const TOKENS = ["the", "a", "this", "some"];
-const LOGITS = [3.2, 2.4, 1.6, 0.5];
+const TOKENS = ["cat", "dog", "bird", "rock"];
+const LOGITS = [3.2, 2.1, 1.5, -0.4];
 
-const TEMPERATURES = [0.3, 1.0, 2.0];
+const TEMPERATURES = [0.2, 0.7, 1.0, 2.0];
 
-/** Softmax at a given temperature: exp(logit / T), normalised. */
+/** Softmax at a given temperature: exp(logit / T), normalised, with the
+ *  maximum subtracted first exactly as the lesson's `softmax` does. */
 function softmax(logits, t) {
-  const scaled = logits.map((l) => Math.exp(l / t));
-  const total = scaled.reduce((s, v) => s + v, 0);
-  return scaled.map((v) => v / total);
+  const scaled = logits.map((l) => l / t);
+  const max = Math.max(...scaled);
+  const exps = scaled.map((v) => Math.exp(v - max));
+  const total = exps.reduce((s, v) => s + v, 0);
+  return exps.map((v) => v / total);
 }
+
+const panel = (t) => `T = ${t.toFixed(1)}`;
 
 const bars = TEMPERATURES.flatMap((t) => {
   const probs = softmax(LOGITS, t);
   return TOKENS.map((token, i) => ({
-    panel: `T = ${t.toFixed(1)}`,
+    panel: panel(t),
     token,
     p: probs[i],
     top: i === 0,
@@ -48,6 +57,12 @@ const bars = TEMPERATURES.flatMap((t) => {
 // Quoted in the annotations, so the numbers can never disagree with the bars.
 const topShare = (t) => softmax(LOGITS, t)[0];
 
+// 99.6% rounds to 100%, which would claim a certainty the bar does not have.
+const percent = (p) => {
+  const whole = Math.round(p * 100);
+  return whole === 100 && p < 1 ? `${(p * 100).toFixed(1)}%` : `${whole}%`;
+};
+
 export function render() {
   return plot({
     height: 300,
@@ -55,7 +70,7 @@ export function render() {
     marginLeft: 50,
     marginBottom: 52,
     ariaLabel: title,
-    fx: { label: null, domain: TEMPERATURES.map((t) => `T = ${t.toFixed(1)}`) },
+    fx: { label: null, domain: TEMPERATURES.map(panel) },
     x: { label: null, domain: TOKENS, padding: 0.22 },
     y: { label: "Probability", domain: [0, 1], ticks: 4, tickFormat: "%" },
     marks: [
@@ -68,7 +83,7 @@ export function render() {
       }),
       Plot.text(
         TEMPERATURES.map((t) => ({
-          panel: `T = ${t.toFixed(1)}`,
+          panel: panel(t),
           share: topShare(t),
           // The band value has to be a field on the datum: a literal string in
           // `x` is read as a field name, resolves to undefined, and the mark
@@ -79,7 +94,10 @@ export function render() {
           x: "token",
           y: 0.95,
           fx: "panel",
-          text: (d) => `top token: ${Math.round(d.share * 100)}%`,
+          // Start just clear of the top bar: at T = 0.2 it reaches 99.6%, so a
+          // label anchored on its centre would sit on the bar itself.
+          dx: 16,
+          text: (d) => `top token: ${percent(d.share)}`,
           fill: MUTED,
           fontSize: 11.5,
           fontWeight: 600,

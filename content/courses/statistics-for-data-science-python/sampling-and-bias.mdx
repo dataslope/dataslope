@@ -54,10 +54,9 @@ representativeness the expected outcome and, crucially, lets you quantify
 how far off you might be. That quantification is the entire game.
 </Callout>
 
-Bias and variance are different failures, and only one of them is fixed by
-collecting more data:
-
-<Chart slug="bias-variance" />
+A badly chosen sample gives you bias, and a small one gives you variance.
+They are different failures, and only one of them is fixed by collecting
+more data.
 
 ## Probability sampling methods
 
@@ -140,7 +139,7 @@ random_sample = rng.choice(population, size=500, replace=False)
 # --- A CONVENIENCE SAMPLE of 500 ---
 # Suppose the people easiest to reach are happier customers: we
 # preferentially draw from the high-satisfaction end of the population.
-weights = (population > 75).astype(float) + 0.1  # happy folks ~10x likelier
+weights = (population > 75).astype(float) + 0.1  # happy folks 11x likelier (1.1 vs 0.1)
 weights /= weights.sum()
 convenience_sample = rng.choice(population, size=500, replace=False, p=weights)
 
@@ -172,11 +171,21 @@ replies come from the same self-selecting pool.
 With mild bias the error falls steadily, because what is left is small and
 sampling noise dominates. With strong bias the curve flattens almost at once,
 so a survey with a 70% response rate and mild bias, at 1.1 points, beats the
-strongly biased one at any size. This is the Literary Digest lesson restated:
-in 1936 they polled 2.4 million people and called the election wrong while
-Gallup polled fifty thousand and called it right, because the 2.4 million came
-from telephone and car-registration lists in a year when owning either
-predicted how you voted. No sample size fixes a frame.
+strongly biased one at any size.
+
+This is the Literary Digest lesson restated. In 1936 the magazine mailed
+about ten million straw ballots, got nearly 2.4 million back, and forecast a
+win for Alf Landon. Its own final tally gave Franklin Roosevelt 42.9% of the
+two-party vote; he won 62.5%[^lusinchi] and every state but Maine and Vermont.
+George Gallup called the winner from a far smaller sample, chosen by quota to
+match the electorate. The popular explanation blames the Digest's mailing
+list, drawn largely from telephone directories and car registrations, which in
+the Depression meant the better-off. The studies that went back to the voters
+found that phone and car owners, taken together, backed Roosevelt, and that
+the Digest would have called the winner had everyone on its list
+replied.[^squire] What sank it was mostly who chose to reply: Landon's
+supporters mailed back nearly a third of their ballots, Roosevelt's about a
+fifth.[^lusinchi] No number of replies fixes who chose to send them.
 
 ## The punchline: a bigger biased sample does not help
 
@@ -208,7 +217,9 @@ true_mean = population.mean()
 weights = (population > 75).astype(float) + 0.1
 weights /= weights.sum()
 
-sizes = [50, 200, 1_000, 5_000, 20_000, 100_000]
+# Up to one customer in 25. Much further and a weighted draw without
+# replacement starts running out of happy customers to pick.
+sizes = [50, 200, 1_000, 5_000, 20_000]
 rows = []
 for n in sizes:
     rand = rng.choice(population, size=n, replace=False).mean()
@@ -244,17 +255,18 @@ print("Convenience estimate converges to a WRONG value and stays there.")
 
 Watch the two lines. The random estimate homes in on the dashed truth
 line as `n` grows. The convenience estimate also *stabilizes*, but on the
-wrong value. At `n = 100,000` the biased estimate is rock-steady and
+wrong value. At `n = 20,000` the biased estimate is rock-steady and
 badly wrong. It looks precise; it is precisely misleading.
 
 <Callout type="danger" title="Misconception: 'we have tons of data, so it must be accurate'">
 Sample **size** controls *noise* (variance); sampling **method** controls
 *bias*. A huge sample with a biased method is a high-confidence wrong
 answer, arguably worse than a small honest one, because its size *feels*
-authoritative. The famous 1936 *Literary Digest* poll mailed **2.4
-million** responses and still called the U.S. presidential election
-wrong, because its list (car and telephone owners during the Depression)
-oversampled the wealthy. Size did not save it. Method sinks it.
+authoritative. The famous 1936 *Literary Digest* poll got back nearly
+**2.4 million** of the ten million ballots it mailed and still called the
+U.S. presidential election for Alf Landon, who lost in a landslide, mostly
+because the people who chose to send a ballot back leaned his way. Size did
+not save it. Method sinks it.
 </Callout>
 
 ## Bias vs. variance: the central distinction
@@ -438,29 +450,40 @@ ends*, because they are the only ones with the variance to reach either.
 
 ## Survivorship bias: the most famous trap
 
-In World War II, the statistician Abraham Wald was asked where to add
-armor to bombers. The military had data on returning planes and mapped
-where they were riddled with bullet holes, concentrated on the wings and
-fuselage. The obvious move: armor the spots with the most holes.
+In 1943 the statistician Abraham Wald took on a wartime question: which
+parts of a bomber are the most vulnerable? The only evidence was the damage
+on the planes that made it home, and the military's instinct, as W. Allen
+Wallis, who ran Wald's research group, later recalled, was to protect the
+parts that showed the most hits.[^wallis]
 
 <Figure
   slug="stat-sampling-and-bias-survivorship-bias-most-famous-inline-cutout"
   alt="An aircraft outline marked only where the returning ones were hit, the ones that never came back absent from the bench"
-  caption="Wald, 1943: armour the parts with no holes, because those planes never came back."
+  caption="Wald, 1943: the holes on returning planes mark the hits a plane can survive."
 />
 
-Wald saw the trap. The data came *only from planes that returned*. The
-planes hit in the engines and cockpit weren't in the dataset, they
-**didn't come back**. The holes showed where a plane could be hit and
-*survive*. The armor belonged on the *undamaged* areas, the places that,
-when hit, were fatal.
+Wald saw the trap. The data came *only from planes that returned*. A
+plane hit somewhere fatal **didn't come back**, so its hit never reached
+the dataset, and the holes on the survivors showed where a plane could be
+hit and *survive*. Wald turned that into a method for estimating, from the
+survivors' damage alone, how likely a hit on each part was to bring a plane
+down.[^wald] In the worked example in his memos, with illustrative numbers,
+400 planes fly and 359 return. The engines make up 26.9% of the plane's
+area but carry only 19.3% of the hits on the returners: the missing engine
+hits are on the missing planes. By his estimate a single engine hit downs a
+plane about 39 times in 100, against about 5 for the fuselage. The parts
+with *few* holes on the survivors are the dangerous ones.
+
+The familiar version, in which Wald looks at a diagram of bullet holes and
+tells the military to armor the clean spots, is a later retelling. The
+memos are estimation work and recommend no armor placement.[^wald]
 
 ```mermaid
 flowchart TD
     ALL["All planes sent out"] --> RET["Planes that RETURNED<br/>(the data you see)"]
     ALL --> LOST["Planes that were LOST<br/>(missing from the data)"]
-    RET -->|"holes here = survivable"| WRONG["Armor the holes?<br/>(wrong)"]
-    LOST -.->|"hits here = fatal"| RIGHT["Armor the clean spots<br/>(right)"]
+    RET -->|"holes here = survivable"| WRONG["Armor the most-hit parts?<br/>(wrong)"]
+    LOST -.->|"hits here = fatal"| RIGHT["Armor where holes are scarce<br/>(right)"]
 ```
 
 Survivorship bias is everywhere in business data. Mutual-fund
@@ -552,7 +575,7 @@ rng = np.random.default_rng(2024)
 population = rng.normal(70, 12, size=200_000).clip(0, 100)
 true_mean = float(population.mean())
 
-# Convenience scheme: high scorers (>75) are ~10x more likely to be sampled.
+# Convenience scheme: high scorers (>75) are 11x as likely to be sampled (1.1 vs 0.1).
 conv_weights = (population > 75).astype(float) + 0.1
 conv_weights /= conv_weights.sum()`,
       starterCode: `# TODO: draw each method 300 times at n=800, record sample means,
@@ -830,3 +853,40 @@ With an honest sample in hand, we can finally study how a *statistic*
 behaves across many such samples. That's *Sampling Distributions*, the
 single most important idea in the course, and the bridge to the *Central
 Limit Theorem*, *Standard Error*, and *Confidence Intervals*.
+
+[^lusinchi]:
+    Dominic Lusinchi, "'President' Landon and the 1936 *Literary Digest*
+    Poll: Were Automobile and Telephone Owners to Blame?",
+    [*Social Science History* 36(1)](https://doi.org/10.1017/S014555320001035X),
+    2012, pp. 23–54. The ten million ballots mailed and the nearly 2.4
+    million returned are on p. 26. The return rates by candidate, and the
+    split of the Digest's 19.6-point miss into 13.7 points of nonresponse
+    and 5.9 of sample, are on p. 38.
+
+[^squire]:
+    Peverill Squire, "Why the 1936 *Literary Digest* Poll Failed",
+    [*Public Opinion Quarterly* 52(1)](https://doi.org/10.1086/269085),
+    1988, pp. 125–133. The evidence is a 1937 Gallup survey that asked
+    voters whether they had received and returned a Digest ballot.
+    Squire's own rough split of the error put more of it on the list than
+    on nonresponse; Lusinchi's reweighting of the same survey reverses
+    that, and agrees that phone and car owners backed Roosevelt.
+
+[^wallis]:
+    W. Allen Wallis, rejoinder to the discussion of "The Statistical
+    Research Group, 1942–1945",
+    [*Journal of the American Statistical Association* 75(370)](https://doi.org/10.1080/01621459.1980.10477472),
+    1980, pp. 334–335, as quoted by Bill Casselman, "The Legend of Abraham
+    Wald", AMS Feature Column, June 2016.
+
+[^wald]:
+    Abraham Wald, *A Method of Estimating Plane Vulnerability Based on
+    Damage of Survivors*, Statistical Research Group, Columbia University
+    (1943), eight memoranda reprinted by the Center for Naval Analyses as
+    CRC 432 (July 1980); the worked example is in Part V. Marc Mangel and
+    Francisco Samaniego,
+    ["Abraham Wald's Work on Aircraft Survivability"](https://doi.org/10.1080/01621459.1984.10478038),
+    *Journal of the American Statistical Association* 79(386), 1984,
+    pp. 259–267, is the published guide to them. The memos are estimation
+    work: they recommend no armor placement, and the cockpit appears
+    nowhere in them.

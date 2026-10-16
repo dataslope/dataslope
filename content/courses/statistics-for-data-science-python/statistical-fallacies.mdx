@@ -214,7 +214,7 @@ reported noise as signal. Let's watch it happen.
       starterCode: `import numpy as np
 from scipy import stats
 
-rng = np.random.default_rng(1)
+rng = np.random.default_rng(3)
 
 # An outcome with NO real relationship to anything.
 n = 200
@@ -326,7 +326,7 @@ print("A 99%-accurate test, yet a positive means only ~9% chance of disease.")
   ]}
 />
 
-The 1,000 false positives drown out the 100 true ones. We derived this
+The 999 false positives drown out the 100 true ones. We derived this
 formally with Bayes' rule in *Conditional Probability*; the *fallacy*
 here is forgetting to do it at all.
 
@@ -363,22 +363,25 @@ silently dropped from your data. The survivors are a biased sample, so
 any pattern you find in them may be an artifact of *what got filtered
 out*, not a real effect.
 
-**Concrete example.**[^wald] In WWII, analysts examined returning
-bombers to
-decide where to add armor, and found bullet holes concentrated on the
-wings and tail. The instinct was to armor those spots. The
-statistician Abraham Wald pointed out the opposite: armor the
-*untouched* areas (engines, cockpit). The planes hit *there* never came
-back, so the holes you *see* mark the survivable hits. The data was
-literally the survivors.
+**Concrete example.** In 1943 the statistician Abraham Wald was asked
+which parts of a bomber were the most vulnerable, with only the damage on
+returning planes to go on, and the military's instinct was to protect the
+parts with the most hits.[^wallis] Wald's point was that the data was
+literally the survivors: a hit that brought a plane down never got
+counted, so the holes you *see* mark the hits a plane can survive. In the
+worked example in his memos, the engines are over a quarter of the plane's
+area but carry under a fifth of the hits on the returning planes, and he
+estimates that a single engine hit downs a plane about 39 times in 100,
+against about 5 for the fuselage.[^wald] The places with few holes are the
+ones that matter.
 
 ```mermaid
 flowchart TD
   A["All planes hit"] --> B{"Survived?"}
-  B -->|"yes"| C["In your data<br/>(holes on wings/tail)"]
-  B -->|"no"| D["NOT in your data<br/>(holes on engine)"]
-  C --> E["Naive: armor wings"]
-  D --> F["Correct: armor engine"]
+  B -->|"yes"| C["In your data<br/>(hits a plane can survive)"]
+  B -->|"no"| D["NOT in your data<br/>(hits that bring it down)"]
+  C --> E["Naive: protect where<br/>the holes are"]
+  D --> F["Better: protect where<br/>the holes are scarce"]
 ```
 
 **How to avoid it.** Ask "what's *missing* from this dataset, and why?"
@@ -922,10 +925,24 @@ Patterns found by searching must be confirmed on fresh, independent data before 
     one: the researcher need not have run multiple tests, or intended
     anything, for the error rate to be inflated.
 
+[^wallis]:
+    W. Allen Wallis, rejoinder to the discussion of "The Statistical
+    Research Group, 1942–1945",
+    [*Journal of the American Statistical Association* 75(370)](https://doi.org/10.1080/01621459.1980.10477472),
+    1980, pp. 334–335, as quoted by Bill Casselman, "The Legend of Abraham
+    Wald", AMS Feature Column, June 2016.
+
 [^wald]:
     Abraham Wald, *A Method of Estimating Plane Vulnerability Based on
-    Damage of Survivors Returning*, Statistical Research Group,
-    Columbia University (1943). Worth knowing that the memoranda are
-    dry estimation work: the vivid "armour where the holes are not"
-    telling, including the anecdote's usual dialogue, is a later
+    Damage of Survivors*, Statistical Research Group, Columbia University
+    (1943), eight memoranda reprinted by the Center for Naval Analyses as
+    CRC 432 (July 1980); the worked example, with illustrative numbers
+    (400 planes out, 359 back), is in Part V. Marc Mangel and Francisco
+    Samaniego,
+    ["Abraham Wald's Work on Aircraft Survivability"](https://doi.org/10.1080/01621459.1984.10478038),
+    *Journal of the American Statistical Association* 79(386), 1984,
+    pp. 259–267, is the published guide to them. Worth knowing that the
+    memoranda are dry estimation work and recommend no armor placement:
+    the vivid "armor where the holes are not" telling, including the
+    anecdote's usual dialogue and its bullet-hole diagram, is a later
     retelling rather than anything Wald wrote.

@@ -104,6 +104,21 @@ describe("generator / library prompt parity", () => {
       );
     }
   });
+
+  // A video's own prompt file (`--prompts`) may define a style the site does
+  // not use; the shared rules still come first and nothing else changes.
+  it("uses a prompt file's own style constraints, keeping the shared rules", async () => {
+    const { buildPrompt } = await import("../scripts/generate-illustrations.mjs");
+    const styles = { "pixel art": { constraints: "Draw it as chunky pixel art." } };
+    const prompt = buildPrompt({ subject: "a marmot", style: "pixel art" }, BRAND_COLORS, styles);
+    expect(prompt.startsWith("A pixel art of a marmot. No text.")).toBe(true);
+    expect(prompt).toContain("Draw it as chunky pixel art.");
+    expect(prompt).not.toContain("solid three-dimensional form");
+    // Styles it does not define are built exactly as before.
+    expect(buildPrompt({ subject: "a marmot" }, BRAND_COLORS, styles)).toBe(
+      buildIllustrationPrompt({ subject: "a marmot" }, BRAND_COLORS),
+    );
+  });
 });
 
 describe("authored subjects", () => {

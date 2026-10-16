@@ -1,0 +1,161 @@
+{
+  "postgres": "PostgreSQL 18.3 (PGlite 0.5.8) on wasm32-unknown-emscripten, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 3.1.74 (1092ec30a3fb1d46b1782ff1b4db5094d3d06ae5), 32-bit",
+  "rows": {
+    "sql": "SELECT region, day, amount\nFROM sales\nORDER BY region, day;",
+    "columns": [
+      "region",
+      "day",
+      "amount"
+    ],
+    "rows": [
+      [
+        "North",
+        "2025-03-01",
+        "120"
+      ],
+      [
+        "North",
+        "2025-03-02",
+        "95"
+      ],
+      [
+        "North",
+        "2025-03-03",
+        "140"
+      ],
+      [
+        "South",
+        "2025-03-01",
+        "175"
+      ],
+      [
+        "South",
+        "2025-03-02",
+        "130"
+      ],
+      [
+        "South",
+        "2025-03-03",
+        "90"
+      ]
+    ]
+  },
+  "group": {
+    "sql": "SELECT region, SUM(amount) AS total\nFROM sales\nGROUP BY region\nORDER BY region;",
+    "columns": [
+      "region",
+      "total"
+    ],
+    "rows": [
+      [
+        "North",
+        "355"
+      ],
+      [
+        "South",
+        "395"
+      ]
+    ]
+  },
+  "over": {
+    "sql": "SELECT region, day, amount,\n  SUM(amount) OVER (\n    PARTITION BY region\n  ) AS region_total\nFROM sales\nORDER BY region, day;",
+    "columns": [
+      "region",
+      "day",
+      "amount",
+      "region_total"
+    ],
+    "rows": [
+      [
+        "North",
+        "2025-03-01",
+        "120",
+        "355"
+      ],
+      [
+        "North",
+        "2025-03-02",
+        "95",
+        "355"
+      ],
+      [
+        "North",
+        "2025-03-03",
+        "140",
+        "355"
+      ],
+      [
+        "South",
+        "2025-03-01",
+        "175",
+        "395"
+      ],
+      [
+        "South",
+        "2025-03-02",
+        "130",
+        "395"
+      ],
+      [
+        "South",
+        "2025-03-03",
+        "90",
+        "395"
+      ]
+    ]
+  },
+  "payoff": {
+    "sql": "SELECT region, day, amount,\n  ROUND(100 * amount / SUM(amount)\n    OVER (PARTITION BY region), 1) AS pct,\n  SUM(amount) OVER (\n    PARTITION BY region ORDER BY day\n  ) AS running_total\nFROM sales\nORDER BY region, day;",
+    "columns": [
+      "region",
+      "day",
+      "amount",
+      "pct",
+      "running_total"
+    ],
+    "rows": [
+      [
+        "North",
+        "2025-03-01",
+        "120",
+        "33.8",
+        "120"
+      ],
+      [
+        "North",
+        "2025-03-02",
+        "95",
+        "26.8",
+        "215"
+      ],
+      [
+        "North",
+        "2025-03-03",
+        "140",
+        "39.4",
+        "355"
+      ],
+      [
+        "South",
+        "2025-03-01",
+        "175",
+        "44.3",
+        "175"
+      ],
+      [
+        "South",
+        "2025-03-02",
+        "130",
+        "32.9",
+        "305"
+      ],
+      [
+        "South",
+        "2025-03-03",
+        "90",
+        "22.8",
+        "395"
+      ]
+    ]
+  }
+}

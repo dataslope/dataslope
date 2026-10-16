@@ -1,0 +1,105 @@
+{
+  "tsc": "Version 5.9.3",
+  "node": "v22.22.0",
+  "target": "es2022",
+  "jsonParse": "parse(text: string, reviver?: (this: any, key: string, value: any) => any): any;",
+  "responseJson": "json(): Promise<any>;",
+  "files": {
+    "user": {
+      "marked": [
+        "\u00abinterface User { id: number; name: string }\u00bb",
+        "",
+        "function first\u00ab<T>\u00bb(items\u00ab: T[]\u00bb)\u00ab: T\u00bb {",
+        "  return items[0];",
+        "}",
+        "",
+        "const users\u00ab: User[]\u00bb = [{ id: 7, name: \"ada\" }];",
+        "const user\u00ab: User\u00bb = first(users);",
+        "console.log(user.name.toUpperCase());"
+      ],
+      "source": "interface User { id: number; name: string }\n\nfunction first<T>(items: T[]): T {\n  return items[0];\n}\n\nconst users: User[] = [{ id: 7, name: \"ada\" }];\nconst user: User = first(users);\nconsole.log(user.name.toUpperCase());\n",
+      "tscExit": 0,
+      "tscOut": "",
+      "emitted": "function first(items) {\n    return items[0];\n}\nconst users = [{ id: 7, name: \"ada\" }];\nconst user = first(users);\nconsole.log(user.name.toUpperCase());\n",
+      "nodeExit": 0,
+      "nodeOut": "ADA\n",
+      "nodeErr": ""
+    },
+    "check": {
+      "marked": [
+        "interface User { id: number; name: string }",
+        "",
+        "function isUser(x: unknown) {",
+        "  return x instanceof User;",
+        "}",
+        "",
+        "isUser({});"
+      ],
+      "source": "interface User { id: number; name: string }\n\nfunction isUser(x: unknown) {\n  return x instanceof User;\n}\n\nisUser({});\n",
+      "tscExit": 2,
+      "tscOut": "check.ts(4,23): error TS2693: 'User' only refers to a type, but is being used as a value here.\n",
+      "emitted": "function isUser(x) {\n    return x instanceof User;\n}\nisUser({});\n",
+      "nodeExit": 1,
+      "nodeOut": "",
+      "nodeErr": "check.js:2\n    return x instanceof User;\n                        ^\n\nReferenceError: User is not defined\n    at isUser (check.js:2:25)\n    at Object.<anonymous> (check.js:4:1)\n    at Module._compile (node:internal/modules/cjs/loader:1706:14)\n    at Object..js (node:internal/modules/cjs/loader:1839:10)\n    at Module.load (node:internal/modules/cjs/loader:1441:32)\n    at Function._load (node:internal/modules/cjs/loader:1263:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49\n\nNode.js v22.22.0\n"
+    },
+    "crash": {
+      "marked": [
+        "interface User { id: number; name: string }",
+        "",
+        "const text = '{\"id\": 7, \"name\": null}';",
+        "const user: User = JSON.parse(text);",
+        "console.log(user.name.toUpperCase());"
+      ],
+      "source": "interface User { id: number; name: string }\n\nconst text = '{\"id\": 7, \"name\": null}';\nconst user: User = JSON.parse(text);\nconsole.log(user.name.toUpperCase());\n",
+      "tscExit": 0,
+      "tscOut": "",
+      "emitted": "const text = '{\"id\": 7, \"name\": null}';\nconst user = JSON.parse(text);\nconsole.log(user.name.toUpperCase());\n",
+      "nodeExit": 1,
+      "nodeOut": "",
+      "nodeErr": "crash.js:3\nconsole.log(user.name.toUpperCase());\n                      ^\n\nTypeError: Cannot read properties of null (reading 'toUpperCase')\n    at Object.<anonymous> (crash.js:3:23)\n    at Module._compile (node:internal/modules/cjs/loader:1706:14)\n    at Object..js (node:internal/modules/cjs/loader:1839:10)\n    at Module.load (node:internal/modules/cjs/loader:1441:32)\n    at Function._load (node:internal/modules/cjs/loader:1263:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49\n\nNode.js v22.22.0\n"
+    },
+    "guard": {
+      "marked": [
+        "interface User { id: number; name: string }",
+        "",
+        "function isUser(x: unknown): x is User {",
+        "  return typeof x === \"object\" && x !== null",
+        "    && \"id\" in x && typeof x.id === \"number\"",
+        "    && \"name\" in x && typeof x.name === \"string\";",
+        "}",
+        "",
+        "const text = '{\"id\": 7, \"name\": null}';",
+        "const data: unknown = JSON.parse(text);",
+        "if (isUser(data)) {",
+        "  console.log(data.name.toUpperCase());",
+        "} else {",
+        "  console.log(\"Not a user:\", text);",
+        "}"
+      ],
+      "source": "interface User { id: number; name: string }\n\nfunction isUser(x: unknown): x is User {\n  return typeof x === \"object\" && x !== null\n    && \"id\" in x && typeof x.id === \"number\"\n    && \"name\" in x && typeof x.name === \"string\";\n}\n\nconst text = '{\"id\": 7, \"name\": null}';\nconst data: unknown = JSON.parse(text);\nif (isUser(data)) {\n  console.log(data.name.toUpperCase());\n} else {\n  console.log(\"Not a user:\", text);\n}\n",
+      "tscExit": 0,
+      "tscOut": "",
+      "emitted": "function isUser(x) {\n    return typeof x === \"object\" && x !== null\n        && \"id\" in x && typeof x.id === \"number\"\n        && \"name\" in x && typeof x.name === \"string\";\n}\nconst text = '{\"id\": 7, \"name\": null}';\nconst data = JSON.parse(text);\nif (isUser(data)) {\n    console.log(data.name.toUpperCase());\n}\nelse {\n    console.log(\"Not a user:\", text);\n}\n",
+      "nodeExit": 0,
+      "nodeOut": "Not a user: {\"id\": 7, \"name\": null}\n",
+      "nodeErr": ""
+    },
+    "unguarded": {
+      "marked": [
+        "interface User { id: number; name: string }",
+        "",
+        "const text = '{\"id\": 7, \"name\": null}';",
+        "const data: unknown = JSON.parse(text);",
+        "console.log(data.name.toUpperCase());"
+      ],
+      "source": "interface User { id: number; name: string }\n\nconst text = '{\"id\": 7, \"name\": null}';\nconst data: unknown = JSON.parse(text);\nconsole.log(data.name.toUpperCase());\n",
+      "tscExit": 2,
+      "tscOut": "unguarded.ts(5,18): error TS2339: Property 'name' does not exist on type 'unknown'.\n",
+      "emitted": "const text = '{\"id\": 7, \"name\": null}';\nconst data = JSON.parse(text);\nconsole.log(data.name.toUpperCase());\n",
+      "nodeExit": 1,
+      "nodeOut": "",
+      "nodeErr": "unguarded.js:3\nconsole.log(data.name.toUpperCase());\n                      ^\n\nTypeError: Cannot read properties of null (reading 'toUpperCase')\n    at Object.<anonymous> (unguarded.js:3:23)\n    at Module._compile (node:internal/modules/cjs/loader:1706:14)\n    at Object..js (node:internal/modules/cjs/loader:1839:10)\n    at Module.load (node:internal/modules/cjs/loader:1441:32)\n    at Function._load (node:internal/modules/cjs/loader:1263:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49\n\nNode.js v22.22.0\n"
+    }
+  }
+}

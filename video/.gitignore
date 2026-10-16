@@ -1,0 +1,6 @@
+node_modules/
+# Rendered videos and stills (npm run render / still).
+out/
+# Raw PNGs straight from the image model; only the trimmed WebPs under
+# public/images/ are committed (npm run illustrations).
+.generated/

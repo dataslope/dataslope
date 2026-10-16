@@ -1,0 +1,213 @@
+import React from "react";
+import { useCurrentFrame, useVideoConfig } from "remotion";
+import { arrowHead } from "../../components/arrow";
+import { Illustration } from "../../components/Illustration";
+import { bob, ease, pop } from "../../components/motion";
+import { SERIF } from "../../editorial/fonts";
+import { useLayout } from "../../editorial/layout";
+import { ACCENT, ACCENT_INK, INK, INK_SOFT, PAPER, label } from "../../editorial/style";
+import { Ink } from "../../editorial/ui";
+import { ILLUSTRATIONS, VIDEO } from "./data";
+
+/**
+ * The unit's color roles, as the Central Limit Theorem video sets them: raw
+ * data (each person, each month, each answer) in ink and neutral tones or the
+ * kit's data blue; a statistic computed from it (an average, a gap) in the red
+ * accent; the truth (a process's level, a parameter) in dashed ink.
+ */
+export const DOT = `color-mix(in srgb, ${INK} 62%, transparent)`;
+/** A crowd of raw values, set back from what the narration points at. */
+export const RAW = `color-mix(in srgb, ${INK_SOFT} 34%, ${PAPER})`;
+export const STAT = ACCENT;
+export const STAT_INK = ACCENT_INK;
+
+export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+export const Svg: React.FC<{ opacity?: number; children: React.ReactNode }> = ({ opacity = 1, children }) => (
+  <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity }}>
+    {children}
+  </svg>
+);
+
+/** A part's kicker, top left, in sentence case: the only marker a part gets. */
+export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactNode }> = ({ at, out, children }) => {
+  const { y } = useLayout();
+  return (
+    <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
+      <span style={label(22, INK_SOFT)}>{children}</span>
+    </Ink>
+  );
+};
+
+/** A dashed vertical rule that draws itself upward: where the truth is. */
+export const TruthLine: React.FC<{
+  x: number;
+  bottom: number;
+  top: number;
+  at: number;
+  out?: number;
+  color?: string;
+  width?: number;
+}> = ({ x, bottom, top, at, out, color = INK, width = 2 }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 16);
+  const o = out === undefined ? 0 : ease(frame, out, 10);
+  if (p <= 0 || o >= 1) return null;
+  return (
+    <Svg opacity={1 - o}>
+      <line x1={x} x2={x} y1={bottom} y2={bottom + (top - bottom) * p} stroke={color} strokeWidth={width} strokeDasharray="7 6" />
+    </Svg>
+  );
+};
+
+/** A straight arrow that draws from `from` to `to`, its head built by
+ *  arrowHead() on the drawn line. */
+export const Arrow: React.FC<{
+  from: readonly [number, number];
+  to: readonly [number, number];
+  at: number;
+  dur?: number;
+  out?: number;
+  dim?: number;
+  color?: string;
+  width?: number;
+}> = ({ from, to, at, dur = 16, out, dim, color = INK, width = 2.4 }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, dur);
+  const o = out === undefined ? 0 : ease(frame, out, 10);
+  const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.7;
+  if (p <= 0 || o >= 1) return null;
+  const tip: [number, number] = [from[0] + (to[0] - from[0]) * p, from[1] + (to[1] - from[1]) * p];
+  const len = Math.hypot(tip[0] - from[0], tip[1] - from[1]);
+  if (len < 4) return null;
+  const headLen = Math.min(18, len * 0.6);
+  return (
+    <Svg opacity={(1 - o) * (1 - d)}>
+      <line x1={from[0]} y1={from[1]} x2={tip[0]} y2={tip[1]} stroke={color} strokeWidth={width} strokeLinecap="round" />
+      <path
+        d={arrowHead([from, tip], headLen, headLen * 0.6)}
+        fill="none"
+        stroke={color}
+        strokeWidth={width}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+};
+
+/** A horizontal bracket from x0 to x1, its end ticks pointing at what it
+ *  measures (down, or up with `up`). It opens from its middle. */
+export const Bracket: React.FC<{
+  x0: number;
+  x1: number;
+  y: number;
+  at: number;
+  out?: number;
+  color?: string;
+  tick?: number;
+  width?: number;
+  up?: boolean;
+}> = ({ x0, x1, y, at, out, color = INK, tick = 12, width = 2.2, up = false }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 14);
+  const o = out === undefined ? 0 : ease(frame, out, 10);
+  if (p <= 0 || o >= 1) return null;
+  const mid = (x0 + x1) / 2;
+  const a = mid + (x0 - mid) * p;
+  const b = mid + (x1 - mid) * p;
+  const t = up ? -tick : tick;
+  return (
+    <Svg opacity={1 - o}>
+      <path
+        d={`M${a},${y + t} L${a},${y} L${b},${y} L${b},${y + t}`}
+        fill="none"
+        stroke={color}
+        strokeWidth={width}
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+};
+
+/**
+ * A line struck through the words it wraps, drawn left to right on `at`.
+ * Sized in em and to the words, so it fits in any face.
+ */
+export const Strike: React.FC<{ at: number; color?: string; top?: string; children: React.ReactNode }> = ({
+  at,
+  color = ACCENT,
+  top = "0.52em",
+  children,
+}) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 12);
+  return (
+    <span style={{ position: "relative", display: "inline-block", lineHeight: 1 }}>
+      {children}
+      <span
+        style={{
+          position: "absolute",
+          left: "-0.06em",
+          top,
+          width: `calc((100% + 0.12em) * ${p})`,
+          height: "0.07em",
+          minHeight: 3,
+          background: color,
+          borderRadius: 2,
+          transform: "rotate(-2.5deg)",
+          transformOrigin: "0 50%",
+          opacity: p > 0 ? 1 : 0,
+        }}
+      />
+    </span>
+  );
+};
+
+/**
+ * Symbols, set in the serif whatever face surrounds them: x-bar as an italic
+ * x with a combining macron (the latin subset carries U+0304, so the face
+ * places the bar itself), and mu upright, from the Greek subset fonts.ts
+ * waits for.
+ */
+export const XBar: React.FC<{ color?: string }> = ({ color }) => (
+  <span style={{ fontFamily: SERIF, fontStyle: "italic", color }}>{"x\u0304"}</span>
+);
+export const Mu: React.FC<{ color?: string }> = ({ color }) => (
+  <span style={{ fontFamily: SERIF, fontStyle: "normal", color }}>μ</span>
+);
+
+/**
+ * A watercolor spot from illustrations.json: it pops in on `at`, bobs gently,
+ * and fades on `out`. Nothing is drawn while the art is not in.
+ */
+export const Spot: React.FC<{
+  id: string;
+  at: number;
+  out?: number;
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}> = ({ id, at, out, left, top, width, height }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const p = pop(frame, at, fps, 16);
+  const o = out === undefined ? 0 : ease(frame, out, 12);
+  if (!ILLUSTRATIONS || p <= 0.001 || o >= 1) return null;
+  return (
+    <Illustration
+      video={VIDEO}
+      id={id}
+      style={{
+        position: "absolute",
+        left,
+        top,
+        width,
+        height,
+        opacity: Math.min(1, p) * (1 - o),
+        transform: `translateY(${bob(frame, 5, 110) + (1 - p) * 30}px)`,
+      }}
+    />
+  );
+};

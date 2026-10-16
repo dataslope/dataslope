@@ -18,11 +18,12 @@ recognize the disease.
 
 The diagnosis is older than you might expect. E. F. Codd, the IBM
 mathematician whose 1970 paper invented the relational model, did
-not stop at proposing tables. In a follow-up paper published in 1971
-he worked out, with mathematical precision, *which table shapes go
-wrong and how*, and defined the first **normal forms**: structural
-rules a table can satisfy that make whole categories of data
-corruption impossible. The next four pages walk that same path, in
+not stop at proposing tables. That same paper introduced the first of
+the **normal forms**: structural rules a table can satisfy that make
+whole categories of data corruption impossible.[^codd70] In a
+follow-up paper published in 1971 he worked out, with mathematical
+precision, *which table shapes go wrong and how*, and defined the
+second and third.[^codd71] The next four pages walk that same path, in
 the same order Codd laid it out, just with less set theory and more
 running SQL. This page covers the part that comes first: what
 actually goes wrong.
@@ -34,9 +35,9 @@ Imagine a shop stores orders in one flat table:
 ```mermaid
 flowchart LR
     T["<code>orders_flat<br/>order_id | customer_name | customer_email | product_name | product_price</code>"]
-    T --> R1["1 | Ada | ada@<code>old.test</code> | Notebook | 8.00"]
-    T --> R2["2 | Ada | ada@<code>old.test</code> | Pencil | 1.50"]
-    T --> R3["3 | Grace | grace@<code>test.test</code> | Notebook | 8.00"]
+    T --> R1["1 | Ada | <code>ada@old.test</code> | Notebook | 8.00"]
+    T --> R2["2 | Ada | <code>ada@old.test</code> | Pencil | 1.50"]
+    T --> R3["3 | Grace | <code>grace@test.test</code> | Notebook | 8.00"]
 ```
 
 The table is easy to read, but look carefully. Ada's email appears in
@@ -306,3 +307,18 @@ A normalized schema stores clean facts; queries can still present a wide view.`}
 
 Update anomalies are the everyday warning sign that a fact is duplicated.`}
 />
+
+[^codd70]:
+    E. F. Codd,
+    ["A Relational Model of Data for Large Shared Data Banks"](https://doi.org/10.1145/362384.362685),
+    *Communications of the ACM* 13(6), June 1970. Section 1.4, "Normal
+    Form", calls the step *normalization*: eliminating nonsimple
+    domains, whose values are themselves relations.
+
+[^codd71]:
+    E. F. Codd, "Further Normalization of the Data Base Relational
+    Model", presented at Courant Computer Science Symposium 6 in May
+    1971 and issued as IBM Research Report RJ909 that August; reprinted
+    in Randall J. Rustin (ed.), *Data Base Systems* (Prentice-Hall,
+    1972). This is the paper that names first, second and third normal
+    form.

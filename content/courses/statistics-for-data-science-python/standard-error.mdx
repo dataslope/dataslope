@@ -129,11 +129,13 @@ print("The DATA is wide; the ESTIMATE of its mean is precise.")
   ]}
 />
 
-The SD is around 12, that's how much ages genuinely differ from person
-to person, and it would stay near 12 no matter how many people you
-surveyed. The SE is around 0.85, roughly √200 ≈ 14 times
-smaller, because the *mean* of 200 people is far more stable than any one
-person's age. Same sample, two completely different messages.
+The SD comes out at 10.58: that's how much ages genuinely differ from
+person to person. It isn't exactly the 12 the code drew the ages from,
+because a sample's SD is itself an estimate and this sample happens to run
+narrow; survey more people and it would settle near 12, never shrink toward
+zero. The SE is 0.75, √200 ≈ 14.1 times smaller, because the *mean* of 200
+people is far more stable than any one person's age. Same sample, two
+completely different messages.
 
 <Callout type="warn" title="Misconception: a small SE means the data is less variable">
 A shrinking SE does **not** mean your data became less spread out. The

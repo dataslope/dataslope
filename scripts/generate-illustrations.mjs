@@ -46,6 +46,11 @@
  *                        jpeg has no alpha channel and is refused with a
  *                        transparent background.
  *   --model <name>       Override the model (default: JSON meta.model)
+ *   --prompts <file>     Read prompts from this JSON instead of
+ *                        data/illustration-prompts.json. Same {meta, prompts}
+ *                        shape; the video project keeps its art here
+ *                        (video/src/videos/<id>/illustrations.json) so it never
+ *                        enters the site's gallery or manifest.
  *   --completion-window  Batch window: 24h (default)
  *   --batch-size <n>     Prompts per batch job (default: 100)
  *   --max-in-flight <n>  Batches submitted at once during `run` (default: 4)
@@ -72,13 +77,15 @@ import {
   mkdirSync,
   existsSync,
 } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import sharp from "sharp";
 import { createR2Client, credentialsFromEnv } from "./lib/r2.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
-const DATA_FILE = join(ROOT, "data", "illustration-prompts.json");
+const DEFAULT_DATA_FILE = join(ROOT, "data", "illustration-prompts.json");
+// The prompt corpus this run reads; `--prompts` points it elsewhere.
+let dataFile = DEFAULT_DATA_FILE;
 const API_BASE = "https://api.openai.com/v1";
 // Two spellings, not interchangeable: `api()` joins IMAGES_PATH onto
 // API_BASE (which already carries /v1), while a Batch JSONL line names the
@@ -114,6 +121,7 @@ function parseArgs(argv) {
     background: "transparent",
     outputFormat: "png",
     model: null,
+    prompts: null,
     completionWindow: "24h",
     batchSize: 100,
     maxInFlight: 4,
@@ -138,6 +146,7 @@ function parseArgs(argv) {
       case "--background": opts.background = next(); break;
       case "--output-format": opts.outputFormat = next(); break;
       case "--model": opts.model = next(); break;
+      case "--prompts": opts.prompts = next(); break;
       case "--completion-window": opts.completionWindow = next(); break;
       case "--batch-size": opts.batchSize = Math.max(1, Number(next()) || 100); break;
       case "--max-in-flight": opts.maxInFlight = Math.max(1, Number(next()) || 4); break;
@@ -167,8 +176,13 @@ function printHelp() {
 
 // ── Prompt building (mirror of lib/illustrationPrompt.ts) ────────────────────
 /** Exported so `__tests__/illustrationPrompt.test.ts` can assert this stays
- *  byte-identical to the TypeScript `buildIllustrationPrompt`. */
-export function buildPrompt(spec, colors) {
+ *  byte-identical to the TypeScript `buildIllustrationPrompt`.
+ *
+ *  `styles` is a prompt file's own `meta.styles`, `{ "<style>": { constraints,
+ *  softAlphaWarn? } }`: a video can define an image style the site never uses
+ *  (pixel art, chalk, watercolor…) without adding it to the house set. The
+ *  site's corpus has none, so its prompts are unchanged. */
+export function buildPrompt(spec, colors, styles = {}) {
   // Mirror of DEFAULT_STYLE in lib/illustrationPrompt.ts (pinned by a parity test).
   const style = (spec.style && spec.style.trim()) || "isometric illustration";
   const article = /^[aeiou]/i.test(style) ? "An" : "A";
@@ -209,7 +223,8 @@ export function buildPrompt(spec, colors) {
     "rather than centered in the middle. Draw any person as a small stylized " +
     "figure with minimal facial detail and no resemblance to a real individual.";
   const byStyle = { "isometric illustration": isometric, risograph };
-  const constraints = `${shared} ${byStyle[style] ?? isometric}`;
+  const own = Object.hasOwn(styles, style) ? styles[style].constraints : null;
+  const constraints = `${shared} ${own ?? byStyle[style] ?? isometric}`;
   return (
     `${article} ${style} of ${spec.subject}. ${constraints}\n\n` +
     `Blue: ${colors.blue}\n` +
@@ -356,7 +371,7 @@ function selectEntries(data, opts) {
     id: p.id,
     category: p.category,
     size: (meta.sizes && meta.sizes[p.category]) || "1024x1024",
-    prompt: buildPrompt(p, meta.brandColors),
+    prompt: buildPrompt(p, meta.brandColors, meta.styles),
   }));
 }
 
@@ -427,18 +442,24 @@ const SOFT_ALPHA_WARN = { "isometric illustration": 0.05, risograph: 0.15 };
 /** Prompt styles by id, read once. `writeImage` needs the style to pick a
  *  soft-alpha limit, and the batch download path has only a custom_id. */
 let styleById = null;
+let fileStyles = {};
 function softLimitFor(id) {
   if (!styleById) {
+    const data = JSON.parse(readFileSync(dataFile, "utf8"));
+    fileStyles = data.meta?.styles ?? {};
     styleById = new Map(
-      JSON.parse(readFileSync(DATA_FILE, "utf8")).prompts.map((p) => [
-        p.id,
-        (p.style && p.style.trim()) || "isometric illustration",
-      ]),
+      data.prompts.map((p) => [p.id, (p.style && p.style.trim()) || "isometric illustration"]),
     );
   }
-  // An unknown id (or a style with no constraint block of its own) is drawn
-  // with the isometric constraints, so it gets the isometric limit too.
-  return SOFT_ALPHA_WARN[styleById.get(id)] ?? SOFT_ALPHA_WARN["isometric illustration"];
+  // A style a prompt file defines brings its own limit (watercolor and chalk
+  // are soft by nature). An unknown id, or a style with no constraint block
+  // of its own, is drawn with the isometric constraints and gets their limit.
+  const style = styleById.get(id);
+  return (
+    (Object.hasOwn(fileStyles, style) ? fileStyles[style].softAlphaWarn : undefined) ??
+    SOFT_ALPHA_WARN[style] ??
+    SOFT_ALPHA_WARN["isometric illustration"]
+  );
 }
 
 /** R2 key for one candidate image. Mirrors promote-illustrations.mjs. */
@@ -858,7 +879,8 @@ async function main() {
     console.log(`No --run given; using run id ${opts.run}`);
   }
 
-  const data = JSON.parse(readFileSync(DATA_FILE, "utf8"));
+  if (opts.prompts) dataFile = resolve(process.cwd(), opts.prompts);
+  const data = JSON.parse(readFileSync(dataFile, "utf8"));
   const model = opts.model || data.meta.model;
 
   // Commands that operate on an existing batch don't need the prompt set.

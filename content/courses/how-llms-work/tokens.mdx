@@ -76,9 +76,13 @@ whether they end with a space.
 
 Ask a model how many `r`s are in "strawberry" and it may get it wrong.
 Not because it cannot count to three, but because it never received
-the letters. It received two opaque ids. Answering requires it to
-recall facts *about* the spelling, which is a different and less
-reliable operation than looking.
+the letters. It received opaque ids. In OpenAI's `o200k_base` tokenizer
+(GPT-4o's), `" strawberry"` with the leading space it has inside a
+sentence is a single id, and the bare word is three: `st`, `raw`,
+`berry`. The older `cl100k_base`, `p50k_base` and `r50k_base` give the
+same counts. Answering requires it to recall facts *about* the
+spelling, which is a different and less reliable operation than
+looking.
 
 ### Arithmetic being uneven
 
@@ -179,7 +183,7 @@ depending on the script it is written in.
 - Because counting is a mathematical operation they cannot perform.
   > They perform small counting tasks reliably in other contexts.
 - [o] Because they receive tokens, not characters, so the letters are not visible.
-  > The word arrives as one or two opaque ids, so answering requires recalling facts about the spelling rather than inspecting it.
+  > The word arrives as one or a few opaque ids, so answering requires recalling facts about the spelling rather than inspecting it.
 
 The information needed to answer directly is destroyed before the model
 sees anything.`}

@@ -1,0 +1,42 @@
+{
+  "logo": {
+    "prompt": "A soft, elegant logo reveal: a gentle airy whoosh rising into a warm, clean bell chime that rings out. Minimal, calm, premium, not loud.",
+    "seconds": 2.5,
+    "influence": 0.5
+  },
+  "tap": {
+    "prompt": "A single soft, muted wooden tap on a desk. Very short, dry and subtle, no echo.",
+    "seconds": 0.5,
+    "influence": 0.6
+  },
+  "pop": {
+    "prompt": "A tiny, soft, rounded pop, like a small dot appearing on a page. Gentle and quiet interface sound.",
+    "seconds": 0.5,
+    "influence": 0.6
+  },
+  "pencil": {
+    "prompt": "A quick pencil stroke on paper, a short soft scratch as if underlining a word. Close and quiet.",
+    "seconds": 0.7,
+    "influence": 0.6
+  },
+  "scratch": {
+    "prompt": "A quick pencil scribble crossing out a word on paper. Short, soft and dry.",
+    "seconds": 0.6,
+    "influence": 0.6
+  },
+  "whoosh": {
+    "prompt": "A very soft, airy paper whoosh, like a sheet of paper sliding past. Subtle, short and smooth.",
+    "seconds": 0.8,
+    "influence": 0.6
+  },
+  "sprinkle": {
+    "prompt": "A light patter of tiny dry grains scattering onto paper, soft and quick, fading away.",
+    "seconds": 1.2,
+    "influence": 0.6
+  },
+  "chime": {
+    "prompt": "A single soft glass bell note with a gentle warm decay. Calm, quiet and clear.",
+    "seconds": 1.5,
+    "influence": 0.6
+  }
+}

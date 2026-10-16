@@ -77,7 +77,7 @@ function greet(name) {
 
 The `: string` annotations vanish. There's no runtime type-checking of the `name` parameter. If you call `greet(42)` from JavaScript (or from untyped legacy code), the function will happily return `"Hello, 42!"`. TypeScript can't protect you from code it doesn't type-check.
 
-This is by design. Type erasure keeps TypeScript's output clean and fast. It also means TypeScript can compile to older JavaScript versions (ES5, ES3) while using modern syntax (classes, async/await). The tradeoff is that TypeScript assumes you've type-checked your whole program, it doesn't add runtime guards.
+This is by design. Type erasure keeps TypeScript's output clean and fast. It also means TypeScript can compile to older JavaScript versions (as far back as ES5) while using modern syntax (classes, async/await). The tradeoff is that TypeScript assumes you've type-checked your whole program, it doesn't add runtime guards.
 
 <Callout type="warning" title="TypeScript is not a runtime guard">
 If you're writing a public API or receiving data from an external source (like a REST endpoint), TypeScript alone won't validate it. You'll need runtime validation libraries (like Zod, io-ts, or Yup) to check incoming data at runtime. TypeScript's types are a *compile-time contract*, not a runtime fence.
@@ -139,13 +139,9 @@ flowchart TD
     G --> H{Type Errors?}
     H -->|Yes| I[Report Errors]
     H -->|No| J[Emitter]
+    I -. "unless <code>noEmitOnError</code>" .-> J
     J --> K[JavaScript .js files]
     J --> L[Declaration Files .d.ts]
-    
-    style A fill:#e1f5ff
-    style K fill:#d4edda
-    style L fill:#d4edda
-    style I fill:#f8d7da
 ```
 
 Let's walk through each stage:
@@ -207,11 +203,11 @@ If the type checker finds a violation, it reports an error. But it doesn't stop,
 
 ### 5. Emitter
 
-If type checking succeeds (or if you've allowed errors with `--noEmitOnError false`), the **emitter** generates JavaScript. It walks the AST one more time, translating TypeScript syntax (like `let x: number = 42`) into equivalent JavaScript (`let x = 42`).
+Next, the **emitter** generates JavaScript, and by default it does so even when the checker found errors: `tsc` reports them, exits with a non-zero code, and still writes the `.js` files. Setting `noEmitOnError: true` in `tsconfig.json` is the opt-in that stops emit while errors remain. The emitter walks the AST one more time, translating TypeScript syntax (like `let x: number = 42`) into equivalent JavaScript (`let x = 42`).
 
 The emitter also:
 
-- **Downlevels** modern syntax (like `async`/`await` or classes) to older JavaScript (like ES5 generators or prototype chains) based on your `target` setting.
+- **Downlevels** modern syntax (like `async`/`await` or classes) to older JavaScript (for ES5, a `switch`-based state machine or prototype assignments) based on your `target` setting.
 - Generates **declaration files** (`.d.ts`) that describe the types of your exports, so other TypeScript projects can import and type-check against your code.
 - Applies transformations (like JSX → `React.createElement` or decorators → metadata).
 

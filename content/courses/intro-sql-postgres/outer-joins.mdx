@@ -36,13 +36,13 @@ flowchart TB
         L2["Linus (no orders)"]
     end
     L1 -->|"matched"| R1["Ada + her orders"]
-    L2 -->|"no match → NULLs"| R2["Linus + <code>NULL</code> order"]
+    L2 -->|"no match gives NULLs"| R2["Linus + <code>NULL</code> order"]
     R1 --> Out["<code>LEFT JOIN</code> result"]
     R2 --> Out
 ```
 
 The key insight: the left table is **fully preserved**. The right
-table is "optional", it contributes data when it can and `NULL`s
+table is "optional": it contributes data when it can and `NULL`s
 when it cannot.
 
 <SqlCodeBlock
@@ -145,13 +145,71 @@ students who enrolled in nothing, invoices with no payment.
   caption="Outer join, then test for `NULL`, is how you find what has no match."
 />
 
+`IS NULL` works there because it is a test an unmatched row passes.
+Most tests on a right-table column are never true of `NULL`, so
+putting one in `WHERE` quietly turns the outer join back into an
+inner one:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="A WHERE on the right table"
+  initSql={`CREATE TABLE customers (
+  id   INTEGER PRIMARY KEY,
+  name TEXT
+);
+CREATE TABLE orders (
+  id          INTEGER PRIMARY KEY,
+  customer_id INTEGER,
+  amount      NUMERIC
+);
+-- Linus, Mae, Quinn and Zara have no orders.
+INSERT INTO customers (id, name) VALUES
+  (1,'Ada'), (2,'Grace'), (3,'Linus'), (4,'Mae'),
+  (5,'Rosa'), (6,'Ivan'), (7,'Nadia'), (8,'Omar'),
+  (9,'Priya'), (10,'Quinn'), (11,'Ruth'), (12,'Sam'),
+  (13,'Tariq'), (14,'Uma'), (15,'Viktor'), (16,'Wen'),
+  (17,'Xenia'), (18,'Yusuf'), (19,'Zara'), (20,'Bruno'),
+  (21,'Chidi'), (22,'Dara'), (23,'Elif'), (24,'Farid');
+INSERT INTO orders (id, customer_id, amount) VALUES
+  (101,1,42), (102,1,18), (103,2,99), (104,2,15),
+  (105,5,30), (106,5,76), (107,6,22), (108,7,64),
+  (109,8,12), (110,8,48), (111,9,91), (112,11,27),
+  (113,11,55), (114,12,38), (115,13,19), (116,13,83),
+  (117,14,45), (118,15,61), (119,16,24), (120,16,70),
+  (121,17,33), (122,18,88), (123,20,16), (124,20,52),
+  (125,21,29), (126,22,74), (127,22,21), (128,23,95),
+  (129,24,36), (130,1,57), (131,9,40), (132,17,68);`}
+  starterCode={`-- Meant: every customer, with any order over 50.
+SELECT
+  c.name,
+  o.id AS order_id,
+  o.amount
+FROM
+  customers c
+  LEFT JOIN orders o ON o.customer_id = c.id
+WHERE
+  o.amount > 50
+ORDER BY
+  c.name;`}
+/>
+
+<Callout type="warn" title="Filter the right table in ON, not in WHERE">
+Linus is gone, and so are Mae, Quinn and Zara. Their `o.amount` is
+`NULL`, and `NULL > 50` is unknown rather than true, so `WHERE` drops
+them: 14 rows come back, exactly what an inner join with the same
+filter returns. Move the test into the join instead, as
+`ON o.customer_id = c.id AND o.amount > 50`. Now it decides which
+orders match, not which customers survive, and all 24 customers come
+back, with `NULL`s for the 10 who have no order over 50.
+</Callout>
+
 ## RIGHT and FULL joins
 
 Once `LEFT JOIN` makes sense, its siblings are easy:
 
 - **`RIGHT JOIN`** keeps every row from the **right** table instead
   of the left. It is just a `LEFT JOIN` with the tables mentally
-  swapped, most people simply reorder the tables and use `LEFT`.
+  swapped; most people simply reorder the tables and use `LEFT`.
 - **`FULL JOIN`** keeps **every row from both** tables, filling
   `NULL`s on whichever side lacks a match.
 
@@ -246,7 +304,7 @@ A full join keeps all rows from both tables, using NULLs where either side is un
 <SqlChallengeCard
   dialect="postgres"
   title="Customers who never ordered"
-  instructions={`Return the \`name\` of every customer who has **never** placed an order, sorted alphabetically (A to Z). The starter already LEFT JOINs \`orders\` onto \`customers\`, add the filter that keeps only the unmatched customers.`}
+  instructions={`Return the \`name\` of every customer who has **never** placed an order, sorted alphabetically (A to Z). The starter already LEFT JOINs \`orders\` onto \`customers\`; add the filter that keeps only the unmatched customers.`}
   initSql={`CREATE TABLE customers (
   id   SERIAL PRIMARY KEY,
   name TEXT NOT NULL
