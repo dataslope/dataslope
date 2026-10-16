@@ -32,6 +32,8 @@ const SIZES = [
   { s: "L", x: 176 },
   { s: "XL", x: 226 },
 ];
+const LAST_X = SIZES[SIZES.length - 1].x;
+const EVEN_X = SIZES.map((_, k) => (k * LAST_X) / (SIZES.length - 1));
 
 /**
  * Part 3: every column is categorical or numerical, and each splits once
@@ -56,7 +58,11 @@ export const KindsScene: React.FC = () => {
   const parentAt = [categoricalAt, numericalAt];
   const leafAt = [nominalAt, ordinalAt, countsAt, measurementsAt];
   const pic = leafAt.map((at) => ease(frame, at + 4, 14));
+  // The sizes arrive evenly spaced on "Ordinal" and slide to their uneven
+  // gaps on "uneven". (Scaling the positions from zero instead stacked all
+  // four labels on one spot until then.)
   const gaps = ease(frame, unevenAt - 4, 16);
+  const sizeX = (k: number) => EVEN_X[k] + (SIZES[k].x - EVEN_X[k]) * gaps;
 
   return (
     <AbsoluteFill>
@@ -129,22 +135,22 @@ export const KindsScene: React.FC = () => {
       <Svg opacity={pic[1]}>
         <line
           x1={LEAVES[1].x}
-          x2={LEAVES[1].x + SIZES[SIZES.length - 1].x * gaps + 20}
+          x2={LEAVES[1].x + LAST_X + 20}
           y1={y(PICTURE_Y) + 44}
           y2={y(PICTURE_Y) + 44}
           stroke={INK}
           strokeWidth={1.6}
         />
-        {SIZES.map(({ x }, k) => (
-          <circle key={k} cx={LEAVES[1].x + 10 + x * gaps} cy={y(PICTURE_Y) + 44} r={7} fill={INK} />
+        {SIZES.map((_, k) => (
+          <circle key={k} cx={LEAVES[1].x + 10 + sizeX(k)} cy={y(PICTURE_Y) + 44} r={7} fill={INK} />
         ))}
       </Svg>
-      {SIZES.map(({ s, x }) => (
+      {SIZES.map(({ s }, k) => (
         <div
           key={s}
           style={{
             position: "absolute",
-            left: LEAVES[1].x + 10 + x * gaps,
+            left: LEAVES[1].x + 10 + sizeX(k),
             top: y(PICTURE_Y) - 4,
             opacity: pic[1],
             whiteSpace: "nowrap",
