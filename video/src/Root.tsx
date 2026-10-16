@@ -163,7 +163,7 @@ export const RemotionRoot: React.FC = () => (
         height={1080}
         fps={FPS}
         durationInFrames={FPS * 60}
-        defaultProps={EDITORIAL_DEFAULTS}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(baseRateScript)}
       />
       <Composition
@@ -293,7 +293,7 @@ export const RemotionRoot: React.FC = () => (
         height={1080}
         fps={FPS}
         durationInFrames={FPS * 60}
-        defaultProps={EDITORIAL_DEFAULTS}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(simpsonsParadoxScript)}
       />
       <Composition
