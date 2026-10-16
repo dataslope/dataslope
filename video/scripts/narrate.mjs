@@ -17,16 +17,18 @@
  * reading a page: one breath runs into the next sentence, a question lifts
  * and the answer comes down, and the energy holds from start to finish. Beats
  * voiced one request at a time each start cold, with the same contour, which
- * is most of what makes narration sound synthetic. The raw take is kept in
- * .generated/narration/<script id>/.
+ * is most of what makes narration sound synthetic. The raw take is the master
+ * and is committed, in takes/<script id>/.
  *
  * When only some beats changed, those are re-voiced one at a time, each sent
  * with its neighbours as context, so a one-line edit doesn't re-record the
  * rest. Use --force for a fresh take of the lot.
  *
- * Options: --voice <voice_id>, --model <model_id>. Both default to what the
- * video was last voiced with (recorded in alignment.json), then to the
- * defaults below, so re-voicing one edited beat keeps the same voice.
+ * The narrator is the script's `voice`, one of the house voices in
+ * src/narration/voices.ts (Drew when it names none). --voice overrides it
+ * for a trial, with a house name or any ElevenLabs voice id, and --model
+ * overrides the model. A video is never left with two voices: a change of
+ * either re-voices every beat.
  *
  * Reads ELEVENLABS_API_KEY from the environment and never writes it anywhere.
  * Cuts audio with the ffmpeg Remotion ships. Imports the TypeScript script
@@ -37,9 +39,6 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-/** Drew (casual, curious, fun): a professional voice made for tutorials. */
-const DEFAULT_VOICE = "q0IMILNRPxOgtBTS4taI";
-const DEFAULT_MODEL = "eleven_v4_turbo";
 const OUTPUT_FORMAT = "mp3_44100_128";
 const API = "https://api.elevenlabs.io/v1";
 const SAMPLE_RATE = 44100;
@@ -65,17 +64,22 @@ function isOptionValue(a) {
 }
 
 if (!video) {
-  console.error("Usage: node scripts/narrate.mjs <video> [--only ids] [--force] [--recut] [--dry-run] [--voice id] [--model id]");
+  console.error("Usage: node scripts/narrate.mjs <video> [--only ids] [--force] [--recut] [--dry-run] [--voice drew|hope|id] [--model id]");
   process.exit(1);
 }
 
 const { script } = await import(pathToFileURL(join(VIDEO_ROOT, "src", "videos", video, "script.ts")).href);
+const { VOICES, NARRATION_MODEL, voiceId } = await import(
+  pathToFileURL(join(VIDEO_ROOT, "src", "narration", "voices.ts")).href
+);
 const outDir = join(VIDEO_ROOT, "public", "narration", script.id);
-const takeDir = join(VIDEO_ROOT, ".generated", "narration", script.id);
+const takeDir = join(VIDEO_ROOT, "takes", script.id);
 const alignmentPath = join(outDir, "alignment.json");
 const existing = existsSync(alignmentPath) ? JSON.parse(readFileSync(alignmentPath, "utf8")) : { beats: {} };
-const voice = value("--voice") ?? existing.meta?.voice_id ?? DEFAULT_VOICE;
-const model = value("--model") ?? existing.meta?.model_id ?? DEFAULT_MODEL;
+const asked = value("--voice");
+const voice = asked ? (VOICES[asked]?.id ?? asked) : voiceId(script.voice);
+const voiceName = Object.keys(VOICES).find((name) => VOICES[name].id === voice) ?? voice;
+const model = value("--model") ?? NARRATION_MODEL;
 const voiceChanged = existing.meta && (existing.meta.voice_id !== voice || existing.meta.model_id !== model);
 
 const only = value("--only")?.split(",");
@@ -126,7 +130,7 @@ if (flag("--recut")) {
     process.exit(1);
   }
   mkdirSync(outDir, { recursive: true });
-  console.log(`${video}: re-cutting the kept take (voice ${voice}, model ${model})`);
+  console.log(`${video}: re-cutting the kept take (voice ${voiceName}, model ${model})`);
   cutTake(take);
   console.log(`Done. Check the new timing with: npm run cues -- ${video}`);
   process.exit(0);
@@ -134,7 +138,7 @@ if (flag("--recut")) {
 
 console.log(
   `${video}: ${todo.length} of ${script.beats.length} beats to voice ` +
-    `${asTake ? "as one take" : "one at a time"} (voice ${voice}, model ${model})`,
+    `${asTake ? "as one take" : "one at a time"} (voice ${voiceName}, model ${model})`,
 );
 if (flag("--dry-run") || todo.length === 0) {
   if (asTake) console.log(`\n${takeText().text}\n`);

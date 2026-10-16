@@ -1,4 +1,5 @@
 import type { Caption } from "@remotion/captions";
+import type { VoiceName } from "./voices";
 
 /** One sentence or phrase of narration: the unit audio is generated in. */
 export type Beat = {
@@ -21,6 +22,8 @@ export type Beat = {
 export type NarrationScript = {
   /** Folder under public/narration/ that holds this script's audio. */
   id: string;
+  /** The house narrator who reads it (voices.ts). Defaults to Drew. */
+  voice?: VoiceName;
   /** Silence before the first beat, in seconds. */
   leadIn?: number;
   /** Time after the last beat, in seconds, for the end card to breathe. */

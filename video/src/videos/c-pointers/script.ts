@@ -35,6 +35,7 @@ import type { NarrationScript } from "../../narration/types";
  */
 export const script: NarrationScript = {
   id: "c-pointers",
+  voice: "drew",
   leadIn: 0.5,
   tail: 2.4,
   beats: [

@@ -41,6 +41,7 @@ import type { NarrationScript } from "../../narration/types";
  */
 export const script: NarrationScript = {
   id: "llm-temperature",
+  voice: "hope",
   leadIn: 0.5,
   tail: 2.4,
   beats: [

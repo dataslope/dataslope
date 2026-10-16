@@ -17,7 +17,7 @@
     "cues": "node scripts/cues.mjs",
     "narrate": "node scripts/narrate.mjs",
     "check:4k": "node scripts/check-4k.mjs",
-    "test": "node --test src/narration/timeline.test.ts src/narration/scenes.test.ts",
+    "test": "node --test src/narration/timeline.test.ts src/narration/scenes.test.ts src/narration/voices.test.ts",
     "render:fhd": "remotion render --scale=1"
   },
   "dependencies": {

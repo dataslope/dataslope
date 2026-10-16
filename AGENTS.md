@@ -594,13 +594,17 @@ and ESLint config ignore it, so nothing there reaches the site's build.
 `video/README.md` is the runbook. Every video is drawn in one look, the
 **editorial** style in `video/src/editorial/` (warm paper, numbered figures,
 ink-wipe reveals, watercolor spot art): a new one wraps its scenes in
-`<EditorialPage>` and registers with `EDITORIAL_DEFAULTS`. Four rules carry
+`<EditorialPage>` and registers with `EDITORIAL_DEFAULTS`. These rules carry
 over from the rest of this file:
 
 - **Cue to words, never to frames.** Every animation asks the narration when a
   word is spoken (`useNarration().word(beat, phrase)`). Timing is estimated
   until there is audio, then comes from ElevenLabs alignment in
   `public/narration/<id>/alignment.json`, with no change to the scenes.
+- **Two house narrators.** A script names its voice, `"drew"` or `"hope"`
+  (`video/src/narration/voices.ts`), and `npm run narrate -- <video>` records
+  the whole script as one take on `eleven_v4_turbo` and cuts it into beats.
+  Both the beats and the raw take are committed.
 - **Brand tokens only.** Scenes import `video/src/theme/brand.ts`, which loads
   `app/brand.css`; no hex values in a scene.
 - **Images go through the illustration pipeline.** Run `npm run illustrations
