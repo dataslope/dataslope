@@ -108,13 +108,14 @@ export const DieScene: React.FC = () => {
             opacity={Math.min(1, fulcrum * 2)}
           />
         ) : null}
-        {/* One standard deviation either side of the mean, laid on the beam. */}
+        {/* One standard deviation either side of the mean, under the beam. */}
         {ease(frame, stdAt - 2, 16) > 0 ? (
           <rect
             x={eX - (fxv(1 + DIE.sd) - fxv(1)) * ease(frame, stdAt - 2, 16)}
-            y={base - h(26)}
+            y={base + h(108)}
             width={2 * (fxv(1 + DIE.sd) - fxv(1)) * ease(frame, stdAt - 2, 16)}
-            height={h(26)}
+            height={h(22)}
+            rx={4}
             fill={STAT}
             opacity={0.28 + 0.25 * ease(frame, sdAt - 2, 8) * (1 - ease(frame, sdAt + 14, 14))}
           />
@@ -229,7 +230,7 @@ export const DieScene: React.FC = () => {
           </b>
         </span>
       </Ink>
-      <Note at={sdAt - 2} x={eX + (fxv(1 + DIE.sd) - fxv(1)) + 14} y={base - h(26) - 8}>
+      <Note at={sdAt - 2} x={eX + (fxv(1 + DIE.sd) - fxv(1)) + 14} y={base + h(108) - 6}>
         <span style={{ ...note(28, STAT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>±{fmt(DIE.sd, 1)}</span>
       </Note>
       <Note at={squaredAt + 2} x={PMF.x0} y={base + h(150) + 66}>

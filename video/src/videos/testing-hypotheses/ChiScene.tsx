@@ -50,6 +50,7 @@ export const ChiScene: React.FC = () => {
   const corrFrom = n.beat("corr-in").from;
   const bothNumbersAt = n.word("corr-in", "numbers");
   const whetherAt = n.word("corr-in", "whether");
+  const bothAt = n.word("corr-in", "both columns");
   const mobileAt = n.word("expected", "mobile");
   const togetherAt = n.word("corr-in", "together");
 
@@ -65,12 +66,9 @@ export const ChiScene: React.FC = () => {
   const expIn = (k: number) => ease(frame, noDiffAt - 2 + k * 3, 12);
   const mobileGlow = pulse(frame, eightyAt - 2, 26);
   const total = ease(frame, twelveAt - 8, 20);
-  const dim =
-    1 -
-    0.15 * ease(frame, corrFrom - 4, 14) -
-    0.12 * ease(frame, bothNumbersAt - 4, 14) -
-    0.12 * ease(frame, whetherAt - 4, 14) -
-    0.15 * ease(frame, togetherAt - 4, 14);
+  const dim = 1 - 0.2 * ease(frame, corrFrom - 4, 14) - 0.15 * ease(frame, whetherAt - 4, 14);
+  // On "together" the table slides away, making room for the next scene's question.
+  const away = ease(frame, togetherAt - 6, 20);
   const mobileGlowRow = pulse(frame, mobileAt - 2, 26);
   const churnGlow = pulse(frame, churnedAt - 2, 24);
   const expGlow = pulse(frame, expectedAt - 2, 24);
@@ -86,7 +84,7 @@ export const ChiScene: React.FC = () => {
 
       <Head a="Categories:" b="compare counts." at={chiFrom - 6} bAt={countsAt - 6} />
 
-      <div style={{ position: "absolute", inset: 0, opacity: dim }}>
+      <div style={{ position: "absolute", inset: 0, opacity: dim * (1 - 0.6 * away), transform: `translateY(${-50 * away}px)` }}>
         <FigLabel n="18" title={`Device and churn for ${fmt(CHI.n, 0)} users`} at={categoriesAt} x={LABEL_X} y={y(290)} />
         <Ink at={sixAt - 4} dur={14} style={{ left: LABEL_X, top: y(290) + 40, whiteSpace: "nowrap" }}>
           <Label size={21} color={INK_SOFT} weight={520}>
@@ -224,6 +222,11 @@ export const ChiScene: React.FC = () => {
           </Label>
         </Note>
       </div>
+      <Ink at={bothAt - 4} dur={18} style={{ left: 160, top: y(880), whiteSpace: "nowrap" }}>
+        <span style={{ ...body(36, true), color: INK }}>
+          Two columns of <Mark at={bothNumbersAt - 2}>numbers</Mark>: do they move together?
+        </span>
+      </Ink>
     </AbsoluteFill>
   );
 };
