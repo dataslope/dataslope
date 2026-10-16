@@ -48,6 +48,9 @@ export type CharacterAlignment = {
  * audio file relative to public/, and its alignment.
  */
 export type NarrationAlignmentFile = {
+  /** The ElevenLabs voice and model the beats were generated with
+   *  (scripts/narrate.mjs), so re-voicing one beat keeps the same voice. */
+  meta?: { voice_id: string; model_id: string };
   beats: Record<
     string,
     { text: string; audio: string; alignment: CharacterAlignment }

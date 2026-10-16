@@ -193,15 +193,31 @@ some other way, such as a wipe or an eraser keyed to `beat("…").from`.
 
 ### Adding the voice-over later
 
-Generate one audio file per beat with ElevenLabs
+```bash
+# needs ELEVENLABS_API_KEY
+npm run narrate -- c-pointers --dry-run   # the beats it would send
+npm run narrate -- c-pointers             # every beat not yet voiced
+npm run narrate -- c-pointers --only star # re-voice one edited beat
+npm run cues -- c-pointers                # the timing it produced
+```
+
+`scripts/narrate.mjs` voices each beat with ElevenLabs
 `POST /v1/text-to-speech/{voice_id}/with-timestamps`, sending the beat's
-`text` exactly. You can send the neighbouring beats as `previous_text` and
-`next_text` so the intonation runs on. Save each response's audio as
-`public/narration/<script id>/<beat id>.mp3`, and its `alignment` (not
-`normalized_alignment`) into one file:
+`text` exactly, with the neighbouring beats as `previous_text` and `next_text`
+so the intonation runs on across a cut. It defaults to the `eleven_v4_turbo`
+model and the premade voice Matilda (`XrExE9yKIg1WjnnlVkGX`), and records
+both in the alignment file. A later run reuses that voice, so re-voicing one
+beat never mixes two voices. `--voice` and `--model` change them for the whole
+video. Beats whose text hasn't changed are skipped. The script refuses any
+response whose alignment doesn't spell the beat's text exactly, because the
+timeline would ignore it.
+
+It saves each response's audio as `public/narration/<script id>/<beat id>.mp3`,
+and its `alignment` (not `normalized_alignment`) into one file:
 
 ```json
 {
+  "meta": { "voice_id": "XrExE9yKIg1WjnnlVkGX", "model_id": "eleven_v4_turbo" },
   "beats": {
     "hook": {
       "text": "Here's a SQL fact that trips up almost everyone.",
@@ -219,6 +235,10 @@ Generate one audio file per beat with ElevenLabs
 A beat whose text has changed since its audio was made is reported as `stale`
 by `npm run cues` and falls back to the estimate, so an edited sentence can't
 play the old audio out of sync. Re-generate just that beat.
+
+The real voice is slower than the reading-speed estimate. CPointers went from
+67 s on the estimate to 95 s voiced (about 120 words a minute, pauses
+included). Every cue re-times by itself, and the scene gaps still hold.
 
 Words like "SQL" and "Postgres" are better pinned with an ElevenLabs
 pronunciation dictionary than respelled in the script: the captions show the
