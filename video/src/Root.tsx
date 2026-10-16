@@ -51,6 +51,61 @@ import { StandardError } from "./videos/standard-error/Video";
 import { script as standardErrorScript } from "./videos/standard-error/script";
 import { ThinkingStatistically } from "./videos/thinking-statistically/Video";
 import { script as thinkingStatisticallyScript } from "./videos/thinking-statistically/script";
+// Statistics course, Units 2 to 9 (Unit 1 and Unit 5 are above).
+import { MeanVsMedian } from "./videos/mean-vs-median/Video";
+import { script as meanVsMedianScript } from "./videos/mean-vs-median/script";
+import { MeasuringSpread } from "./videos/measuring-spread/Video";
+import { script as measuringSpreadScript } from "./videos/measuring-spread/script";
+import { ShapeAndOutliers } from "./videos/shape-and-outliers/Video";
+import { script as shapeAndOutliersScript } from "./videos/shape-and-outliers/script";
+import { PlotFirst } from "./videos/plot-first/Video";
+import { script as plotFirstScript } from "./videos/plot-first/script";
+import { LongRunFrequency } from "./videos/long-run-frequency/Video";
+import { script as longRunFrequencyScript } from "./videos/long-run-frequency/script";
+import { ConditioningIndependence } from "./videos/conditioning-independence/Video";
+import { script as conditioningIndependenceScript } from "./videos/conditioning-independence/script";
+import { MontyHall } from "./videos/monty-hall/Video";
+import { script as montyHallScript } from "./videos/monty-hall/script";
+import { ExpectedValue } from "./videos/expected-value/Video";
+import { script as expectedValueScript } from "./videos/expected-value/script";
+import { CountingDistributions } from "./videos/counting-distributions/Video";
+import { script as countingDistributionsScript } from "./videos/counting-distributions/script";
+import { ProbabilityIsArea } from "./videos/probability-is-area/Video";
+import { script as probabilityIsAreaScript } from "./videos/probability-is-area/script";
+import { NormalDistribution } from "./videos/normal-distribution/Video";
+import { script as normalDistributionScript } from "./videos/normal-distribution/script";
+import { FittingDistributions } from "./videos/fitting-distributions/Video";
+import { script as fittingDistributionsScript } from "./videos/fitting-distributions/script";
+import { ConfidenceIntervals } from "./videos/confidence-intervals/Video";
+import { script as confidenceIntervalsScript } from "./videos/confidence-intervals/script";
+import { IntervalWidth } from "./videos/interval-width/Video";
+import { script as intervalWidthScript } from "./videos/interval-width/script";
+import { Bootstrap } from "./videos/bootstrap/Video";
+import { script as bootstrapScript } from "./videos/bootstrap/script";
+import { TestLogic } from "./videos/test-logic/Video";
+import { script as testLogicScript } from "./videos/test-logic/script";
+import { PValues } from "./videos/p-values/Video";
+import { script as pValuesScript } from "./videos/p-values/script";
+import { PHacking } from "./videos/p-hacking/Video";
+import { script as pHackingScript } from "./videos/p-hacking/script";
+import { ErrorsAndPower } from "./videos/errors-and-power/Video";
+import { script as errorsAndPowerScript } from "./videos/errors-and-power/script";
+import { TTests } from "./videos/t-tests/Video";
+import { script as tTestsScript } from "./videos/t-tests/script";
+import { AnovaChiSquare } from "./videos/anova-chi-square/Video";
+import { script as anovaChiSquareScript } from "./videos/anova-chi-square/script";
+import { CorrelationNonparametric } from "./videos/correlation-nonparametric/Video";
+import { script as correlationNonparametricScript } from "./videos/correlation-nonparametric/script";
+import { EffectSizes } from "./videos/effect-sizes/Video";
+import { script as effectSizesScript } from "./videos/effect-sizes/script";
+import { RegressionToMean } from "./videos/regression-to-mean/Video";
+import { script as regressionToMeanScript } from "./videos/regression-to-mean/script";
+import { SelectionTraps } from "./videos/selection-traps/Video";
+import { script as selectionTrapsScript } from "./videos/selection-traps/script";
+import { ExploratoryConfirmatory } from "./videos/exploratory-confirmatory/Video";
+import { script as exploratoryConfirmatoryScript } from "./videos/exploratory-confirmatory/script";
+import { AbTest } from "./videos/ab-test/Video";
+import { script as abTestScript } from "./videos/ab-test/script";
 
 // Every composition is laid out in 1080p CSS pixels and rendered with
 // `--scale=2` for 4K (3840x2160). Duration comes from the narration timeline,
@@ -290,6 +345,277 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 60}
         defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(thinkingStatisticallyScript)}
+      />
+      {/* Statistics course, Units 2 to 9, in course order. */}
+      <Composition
+        id="MeanVsMedian"
+        component={MeanVsMedian}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(meanVsMedianScript)}
+      />
+      <Composition
+        id="MeasuringSpread"
+        component={MeasuringSpread}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(measuringSpreadScript)}
+      />
+      <Composition
+        id="ShapeAndOutliers"
+        component={ShapeAndOutliers}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(shapeAndOutliersScript)}
+      />
+      <Composition
+        id="PlotFirst"
+        component={PlotFirst}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(plotFirstScript)}
+      />
+      <Composition
+        id="LongRunFrequency"
+        component={LongRunFrequency}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(longRunFrequencyScript)}
+      />
+      <Composition
+        id="ConditioningIndependence"
+        component={ConditioningIndependence}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(conditioningIndependenceScript)}
+      />
+      <Composition
+        id="MontyHall"
+        component={MontyHall}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(montyHallScript)}
+      />
+      <Composition
+        id="ExpectedValue"
+        component={ExpectedValue}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(expectedValueScript)}
+      />
+      <Composition
+        id="CountingDistributions"
+        component={CountingDistributions}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(countingDistributionsScript)}
+      />
+      <Composition
+        id="ProbabilityIsArea"
+        component={ProbabilityIsArea}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(probabilityIsAreaScript)}
+      />
+      <Composition
+        id="NormalDistribution"
+        component={NormalDistribution}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(normalDistributionScript)}
+      />
+      <Composition
+        id="FittingDistributions"
+        component={FittingDistributions}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(fittingDistributionsScript)}
+      />
+      <Composition
+        id="ConfidenceIntervals"
+        component={ConfidenceIntervals}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(confidenceIntervalsScript)}
+      />
+      <Composition
+        id="IntervalWidth"
+        component={IntervalWidth}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(intervalWidthScript)}
+      />
+      <Composition
+        id="Bootstrap"
+        component={Bootstrap}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(bootstrapScript)}
+      />
+      <Composition
+        id="TestLogic"
+        component={TestLogic}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(testLogicScript)}
+      />
+      <Composition
+        id="PValues"
+        component={PValues}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(pValuesScript)}
+      />
+      <Composition
+        id="PHacking"
+        component={PHacking}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(pHackingScript)}
+      />
+      <Composition
+        id="ErrorsAndPower"
+        component={ErrorsAndPower}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(errorsAndPowerScript)}
+      />
+      <Composition
+        id="TTests"
+        component={TTests}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(tTestsScript)}
+      />
+      <Composition
+        id="AnovaChiSquare"
+        component={AnovaChiSquare}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(anovaChiSquareScript)}
+      />
+      <Composition
+        id="CorrelationNonparametric"
+        component={CorrelationNonparametric}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(correlationNonparametricScript)}
+      />
+      <Composition
+        id="EffectSizes"
+        component={EffectSizes}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(effectSizesScript)}
+      />
+      <Composition
+        id="RegressionToMean"
+        component={RegressionToMean}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(regressionToMeanScript)}
+      />
+      <Composition
+        id="SelectionTraps"
+        component={SelectionTraps}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(selectionTrapsScript)}
+      />
+      <Composition
+        id="ExploratoryConfirmatory"
+        component={ExploratoryConfirmatory}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(exploratoryConfirmatoryScript)}
+      />
+      <Composition
+        id="AbTest"
+        component={AbTest}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(abTestScript)}
       />
     </Folder>
     <Folder name="Assets">
