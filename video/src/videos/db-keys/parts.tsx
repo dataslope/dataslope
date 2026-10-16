@@ -133,7 +133,7 @@ export const Headline: React.FC<{
 
 /** Code set inside running text or a label, at the text's own size. */
 export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: weight ?? 600, color, fontVariantLigatures: "none" }}>
+  <span style={{ fontFamily: MONO, fontSize: "0.88em", fontStyle: "normal", fontWeight: weight ?? 600, color, fontVariantLigatures: "none" }}>
     {children}
   </span>
 );
@@ -504,7 +504,7 @@ export type TableGeometry = ReturnType<typeof tableGeometry>;
  * monospace advance, plus padding. `top`, `headH` and `rowH` are page values
  * (through `y()` and `h()`).
  */
-export const tableGeometry = ({ x, top, cols, rows, extra = [], headH, rowH, headSize = 21, bodySize = 25, pad = 18 }: TableSpec) => {
+export const tableGeometry = ({ x, top, cols, rows, extra = [], headH, rowH, headSize = 22, bodySize = 28, pad = 20 }: TableSpec) => {
   const all = [...rows, ...extra];
   const widths = cols.map((c, i) =>
     Math.ceil(
@@ -663,6 +663,10 @@ export const DataTable: React.FC<{
       <div style={{ position: "absolute", left: g.x, top: g.top + g.headH - 1, width: ruleW, height: 1, background: HAIRLINE }} />
       <div style={{ position: "absolute", left: g.x, top: bottom - 1, width: ruleW, height: 1.5, background: INK }} />
       <Ink at={at + 2} dur={14} style={{ left: g.x, top: g.top, width, height: g.headH }}>
+        {/* Ink pads its box to leave room for the wipe's bleed, which would
+            move absolutely placed cells up and left by that much; this box
+            puts their origin back on the table's own corner. */}
+        <div style={{ position: "relative", width, height: g.headH }}>
         {cols.map((c, j) => (
           <div
             key={c.name}
@@ -690,6 +694,7 @@ export const DataTable: React.FC<{
             ) : null}
           </div>
         ))}
+        </div>
       </Ink>
 
       {rows.map((r, i) => {
@@ -765,16 +770,28 @@ export const DataTable: React.FC<{
                 fontVariantLigatures: "none",
               }}
             >
-              {r.cells.map((v, j) => (
-                <div key={j} style={{ ...cellBox(j), top: 0, height: hgt, display: "flex", alignItems: "center", justifyContent: cols[j].numeric ? "flex-end" : "flex-start" }}>
-                  <CellText
-                    value={v}
-                    color={cols[j].ink ?? INK}
-                    mark={marks.find((m) => m.row === i && m.col === j)}
-                    swap={swaps.find((s) => s.row === i && s.col === j)}
-                  />
-                </div>
-              ))}
+              <div style={{ position: "relative", width, height: hgt }}>
+                {r.cells.map((v, j) => (
+                  <div
+                    key={j}
+                    style={{
+                      ...cellBox(j),
+                      top: 0,
+                      height: hgt,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: cols[j].numeric ? "flex-end" : "flex-start",
+                    }}
+                  >
+                    <CellText
+                      value={v}
+                      color={cols[j].ink ?? INK}
+                      mark={marks.find((m) => m.row === i && m.col === j)}
+                      swap={swaps.find((s) => s.row === i && s.col === j)}
+                    />
+                  </div>
+                ))}
+              </div>
             </Ink>
             {strike > 0 ? (
               <div
