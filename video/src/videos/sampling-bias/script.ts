@@ -55,6 +55,7 @@ import type { NarrationScript } from "../../narration/types";
  */
 export const script: NarrationScript = {
   id: "sampling-bias",
+  voice: "hope",
   leadIn: 0.5,
   tail: 2.6,
   beats: [
