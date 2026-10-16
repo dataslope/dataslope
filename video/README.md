@@ -25,7 +25,7 @@ Every video is 16:9 and drawn in the **editorial** style described below.
 | `RecursionFib` | Why naive `fib(50)` takes so long, and the memo that fixes it |
 | `TypeErasure` | TypeScript's types are gone at runtime, and what checks a value instead |
 | `BoxSizing` | `content-box` against `border-box`, and the two columns that stop fitting |
-| `LlmTemperature` | What temperature does to a model's next-token choice |
+| `LlmTemperature` | What temperature does to a model's next-token choice (voiced) |
 | `TfIdf` | Term frequency, inverse document frequency, and the word that scores zero |
 | `JavaEquality` | `==` or `.equals()`, with the stack, the heap and the `Integer` cache |
 | `SimpsonsParadox` | Berkeley's 1973 admissions: women ahead in most departments, behind overall |

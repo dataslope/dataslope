@@ -6,5 +6,8 @@ character timestamps. When a folder exists, its video is timed from the audio
 instead of the reading-speed estimate. `npm run narrate -- <video>` writes it;
 the format is in `video/README.md`, under "Adding the voice-over later".
 
-`c-pointers/` is the one voiced so far: Drew on `eleven_v4_turbo`, recorded
-as one take and cut into its eleven beats.
+Voiced so far, each on `eleven_v4_turbo`, recorded as one take and cut into
+its beats:
+
+- `c-pointers/`: Drew (`q0IMILNRPxOgtBTS4taI`), eleven beats.
+- `llm-temperature/`: Hope (`tnSpp4vdxKPjI9w0GnoV`), thirteen beats.
