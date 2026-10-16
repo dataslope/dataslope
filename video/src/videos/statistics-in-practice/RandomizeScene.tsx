@@ -46,6 +46,8 @@ export const RandomizeScene: React.FC = () => {
   const causedAt = n.word("cause", "CAUSED");
   const changeAt = n.word("cause", "change");
   const twoAt = n.word("size-in", "Two more");
+  const decisionsAt = n.word("size-in", "decisions");
+  const clicksAt = n.word("size-in", "clicks");
 
   const rows = BALANCE.rows;
   const selfAt = (i: number) => apartAt - 4 + i * 3;
@@ -64,9 +66,9 @@ export const RandomizeScene: React.FC = () => {
 
       <Headline lead="Let users choose," turn="and the groups differ." at={whoFrom - 6} turnAt={differAt - 6} out={coinAt - 6} />
       <Headline lead="Flip a coin," turn="and the gaps shrink." at={coinAt - 2} turnAt={shrinksAt - 6} out={knowAt - 6} />
-      <Headline lead="The coin" turn="balances everything." at={knowAt - 2} turnAt={everythingAt - 6} />
+      <Headline lead="The coin" turn="balances everything." at={knowAt - 2} turnAt={everythingAt - 6} out={decisionsAt - 4} />
 
-      <Spot id="statistics-in-practice-coin" at={coinAt - 6} left={1470} top={y(300)} width={290} height={270} />
+      <Spot id="statistics-in-practice-coin" at={coinAt - 6} out={clicksAt - 6} left={1470} top={y(300)} width={290} height={270} />
 
       <div style={{ position: "absolute", inset: 0, opacity: figDim }}>
         <FigLabel n="2" title="How far apart the two groups sit, on ten traits" at={whoFrom} x={160} y={y(300)} />

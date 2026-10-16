@@ -36,6 +36,10 @@ export const TestScene: React.FC = () => {
   const significantAt = n.word("test", "significant");
   const fiveAt = n.word("test", "five percent");
   const thisAt = n.word("straddle", "This one");
+  const levelAt = n.word("test", "level");
+  const noEffectAt = n.word("straddle", "no effect");
+  const eitherAt = n.word("eight", "either");
+  const viewsFrom = n.beat("views").from;
   const minusAt = n.word("straddle", "minus a half");
   const eightAt = n.word("straddle", "eight");
   const includesAt = n.word("straddle", "includes zero");
@@ -65,7 +69,7 @@ export const TestScene: React.FC = () => {
       <Sfx name="el-tap" at={eightAgainAt - 2} level={-29} />
       <Sfx name="el-pencil" at={howBigAt - 4} level={-34} />
 
-      <Headline at={testFrom - 4} second={leavesAt - 4} out={viewsAt - 6} size={64} italic="does it leave out zero?">
+      <Headline at={testFrom - 4} second={leavesAt - 4} out={viewsFrom - 4} size={64} italic="does it leave out zero?">
         A difference:
       </Headline>
       <Headline at={viewsAt - 2} second={oneThingAt - 4} size={64} italic="one thing.">
@@ -81,7 +85,7 @@ export const TestScene: React.FC = () => {
         at={leavesAt - 4}
         dur={18}
         color={INK}
-        width={2.4 + 1.6 * pulse(frame, includesAt - 2, 18)}
+        width={2.4 + 1.6 * (pulse(frame, includesAt - 2, 18) + pulse(frame, noEffectAt - 2, 18))}
         dash="7 6"
       />
       <Note at={leavesAt} x={zeroX + 12} y={y(318)}>
@@ -92,7 +96,16 @@ export const TestScene: React.FC = () => {
       </Note>
 
       {/* ── Row 1: one that leaves out zero ── */}
-      <IntervalBar x0={sx(X, clear.lo)} x1={sx(X, clear.hi)} y={y(ROW1)} at={differenceAt - 2} dur={20} color={INK} width={4} tick={14} />
+      <IntervalBar
+        x0={sx(X, clear.lo)}
+        x1={sx(X, clear.hi)}
+        y={y(ROW1)}
+        at={differenceAt - 2}
+        dur={20}
+        color={INK}
+        width={4 + 3 * pulse(frame, levelAt - 2, 18)}
+        tick={14}
+      />
       <Svg>
         <circle cx={sx(X, clear.estimate)} cy={y(ROW1)} r={6.5 * ease(frame, differenceAt + 4, 10)} fill={EST} stroke={PAPER} strokeWidth={1.4} />
       </Svg>
@@ -127,7 +140,7 @@ export const TestScene: React.FC = () => {
         <circle
           cx={sx(X, straddle.hi)}
           cy={y(ROW2)}
-          r={17 + 4 * pulse(frame, bigAt - 2, 16)}
+          r={17 + 4 * pulse(frame, bigAt - 2, 16) + 5 * pulse(frame, eitherAt - 2, 18)}
           fill="none"
           stroke={EST}
           strokeWidth={3}

@@ -99,11 +99,9 @@ export const HabitScene: React.FC = () => {
       </div>
 
       {merged ? null : (
-  
         <NextLine at={nextAt} x={120} y={y(850)} width={1000}>
           how far a fair sample can miss.
         </NextLine>
-
       )}
 
       {ILLUSTRATIONS ? (

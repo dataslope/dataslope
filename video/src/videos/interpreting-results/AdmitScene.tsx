@@ -38,8 +38,14 @@ export const AdmitScene: React.FC = () => {
   const from = n.beat("admit").from;
 
   // ── Cues ──
+  const yearAt = n.word("admit", "nineteen seventy-three");
   const famousAt = n.word("admit", "famous");
   const twoAt = n.word("admit", "two departments");
+  const admissionsAt = n.word("admit", "admissions");
+  const fiftyFiveAt = n.word("overall", "fifty-five");
+  const thirtyThreeAt = n.word("overall", "thirty-three");
+  const flipAt = n.word("confound-in", "flip");
+  const overallAt = n.word("overall", "Overall");
   const menAt = n.word("overall", "men");
   const womenAt = n.word("overall", "women");
   const splitAt = n.word("split", "split");
@@ -47,13 +53,19 @@ export const AdmitScene: React.FC = () => {
   const sixtyFiveAt = n.word("split", "sixty-five");
   const hardAt = n.word("hard", "hard");
   const againAt = n.word("hard", "twenty-seven");
+  const twentyFiveAt = n.word("hard", "twenty-five");
   const bothAt = n.word("how", "both");
   const behindAt = n.word("how", "behind");
+  const howAt = n.word("how", "How");
   const sevenAt = n.word("mix", "seven hundred women");
+  const hardOneAt = n.word("mix", "hard one");
   const menMixAt = n.word("mix", "Six hundred of the men");
+  const easyOneAt = n.word("mix", "easy one");
   const nameAt = n.word("name", "Simpson's paradox");
   const lurkAt = n.word("name", "lurking");
+  const deptAt = n.word("name", "department");
   const unevenAt = n.word("name", "unevenly");
+  const groupsAt = n.word("name", "groups");
   const totalAt = n.word("ask", "total");
   const overAt = n.word("ask", "averaging over");
   const slopeAt = n.word("confound-in", "slope");
@@ -61,11 +73,11 @@ export const AdmitScene: React.FC = () => {
 
   const rowY = (i: number) => y(ROW_Y[i]);
   const rows = [
-    { name: "Overall", sub: "both departments", cells: POOLED, at: { men: menAt, women: womenAt }, gapAt: behindAt },
+    { name: "Overall", sub: "both departments", cells: POOLED, at: { men: fiftyFiveAt, women: thirtyThreeAt }, gapAt: behindAt },
     { name: "Easy", sub: "department", cells: DEPTS[0], at: { men: easyAt + 2, women: sixtyFiveAt - 4 }, gapAt: bothAt - 2 },
     { name: "Hard", sub: "department", cells: DEPTS[1], at: { men: hardAt + 2, women: againAt - 4 }, gapAt: bothAt + 4 },
   ];
-  const grid = ease(frame, menAt - 10, 16);
+  const grid = ease(frame, twoAt - 2, 16);
   const mixLit = (g: Group) => ease(frame, g === "women" ? sevenAt - 6 : menMixAt - 6, 10) * (1 - ease(frame, nameAt - 6, 12) * 0.5);
 
   return (
@@ -95,7 +107,7 @@ export const AdmitScene: React.FC = () => {
       <Note at={from - 4} x={92} y={y(176)}>
         <span style={{ ...body(52, true), color: INK, whiteSpace: "nowrap", opacity: 1 - ease(frame, bothAt - 10, 8) }}>
           Who gets in?
-          <span style={{ ...label(24, INK_SOFT), marginLeft: 24, opacity: ease(frame, famousAt - 2, 10) }}>
+          <span style={{ ...label(24, INK_SOFT), marginLeft: 24, opacity: ease(frame, yearAt - 2, 10) }}>
             The famous case: Berkeley, 1973
           </span>
         </span>
@@ -103,8 +115,8 @@ export const AdmitScene: React.FC = () => {
 
       <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.45 * ease(frame, slopeAt - 8, 18) }}>
       <Drift from={totalAt} to={end + 30} amount={0.02} origin={[960, 600]}>
-        <FigLabel n="6" title="Share admitted, in two departments" at={twoAt - 6} x={160} y={y(262)} />
-        <Note at={twoAt} x={1760} y={y(262) + 2} align="right" from="right">
+        <FigLabel n="6" title="Share admitted, in two departments" at={famousAt - 4} x={160} y={y(262)} />
+        <Note at={admissionsAt - 2} x={1760} y={y(262) + 2} align="right" from="right">
           <span style={{ ...note(21, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10, whiteSpace: "nowrap" }}>
             {(["men", "women"] as const).map((g) => (
               <React.Fragment key={g}>
@@ -170,9 +182,9 @@ export const AdmitScene: React.FC = () => {
           const order: Group[] = r.cells.men.applied >= r.cells.women.applied ? ["men", "women"] : ["women", "men"];
           return (
             <React.Fragment key={r.name}>
-              <Ink at={Math.min(r.at.men, r.at.women) - 10} dur={12} style={{ left: 160, top: cy - 34, whiteSpace: "nowrap" }}>
+              <Ink at={i === 0 ? overallAt - 4 : Math.min(r.at.men, r.at.women) - 10} dur={12} style={{ left: 160, top: cy - 34, whiteSpace: "nowrap" }}>
                 <div style={{ ...body(38, true), color: INK }}>
-                  {i === 0 ? <Marker at={totalAt - 4}>{r.name}</Marker> : r.name}
+                  <Marker at={i === 0 ? totalAt - 4 : deptAt - 4 + i * 4}>{r.name}</Marker>
                 </div>
                 <div style={note(20, INK_SOFT)}>{r.sub}</div>
               </Ink>
@@ -245,6 +257,16 @@ export const AdmitScene: React.FC = () => {
             </React.Fragment>
           );
         })}
+
+        {/* What the narration is reading, ringed as it is read. */}
+        <Ring x={px(DEPTS[1].men.rate)} y={rowY(2)} at={twentyFiveAt - 2} color={GROUP_COLOR.men} r0={radius(100)} r1={radius(100) + 36} />
+        <Ring x={px(POOLED.men.rate)} y={rowY(0)} at={howAt - 2} color={GROUP_COLOR.men} r0={radius(700)} r1={radius(700) + 40} />
+        <Ring x={px(DEPTS[1].women.rate)} y={rowY(2)} at={hardOneAt - 2} color={GROUP_COLOR.women} r0={radius(600)} r1={radius(600) + 40} />
+        <Ring x={px(DEPTS[0].men.rate)} y={rowY(1)} at={easyOneAt - 2} color={GROUP_COLOR.men} r0={radius(600)} r1={radius(600) + 40} />
+        <Ring x={GAP_X + 50} y={rowY(0)} at={flipAt - 2} r0={30} r1={90} />
+        {(["men", "women"] as const).map((g) => (
+          <Ring key={g} x={px(POOLED[g].rate)} y={rowY(0)} at={groupsAt - 2} color={GROUP_COLOR[g]} r0={radius(700)} r1={radius(700) + 40} />
+        ))}
 
         {/* Where each group applied. */}
         <Note at={sevenAt - 2} out={overAt - 8} x={px(DEPTS[1].women.rate) + radius(600) + 76} y={rowY(2) + 26}>

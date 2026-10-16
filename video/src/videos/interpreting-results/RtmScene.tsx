@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { jitter, RTM } from "./data";
-import { Arrow, DATA, DATA_INK, Dashed, DOT, Drift, Headline, Kicker, lerp, Marker, RAW, STAT, STAT_INK, Strike, Svg } from "./parts";
+import { Arrow, DATA, DATA_INK, Dashed, DOT, Drift, Headline, Kicker, lerp, Marker, RAW, Ring, STAT, STAT_INK, Strike, Svg } from "./parts";
 
 /** Sales, 40 to 170, up the page. */
 const LO = 40;
@@ -43,12 +43,18 @@ export const RtmScene: React.FC = () => {
   const ninetyAt = n.word("bottom", "ninety-five");
   const nobodyAt = n.word("nothing", "Nobody");
   const repeatAt = n.word("nothing", "doesn't repeat");
+  const extremeAt = n.word("nothing", "extreme score");
+  const luckAgainAt = n.word("nothing", "luck");
   const coachAt = n.word("coach", "Coach");
   const anywayAt = n.word("coach", "anyway");
   const creditAt = n.word("coach", "credit");
+  const coachingAt = n.word("coach", "coaching");
+  const groupAt = n.word("coach", "bottom group");
+  const lookWordAt = n.word("look-in", "look at");
   const controlAt = n.word("control", "control group");
   const aloneAt = n.word("control", "left alone");
   const lookAt = n.word("look-in", "choosing");
+  const trapsAt = n.word("look-in", "traps");
   const end = n.beat("look-in").to;
 
   const top = y(TOP);
@@ -93,13 +99,14 @@ export const RtmScene: React.FC = () => {
       />
       <Headline
         top={y(150)}
+        out={trapsAt - 4}
         parts={[
           { text: "Nobody did anything.", at: nobodyAt - 4 },
           { text: "Luck doesn't repeat.", at: repeatAt - 8, italic: true },
         ]}
       />
 
-      <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.45 * ease(frame, lookAt - 8, 18) }}>
+      <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.3 * ease(frame, lookAt - 8, 14) - 0.25 * ease(frame, lookWordAt - 4, 14) }}>
         <Drift from={aloneAt} to={end + 30} amount={0.02} origin={[820, 600]}>
           <FigLabel n="8" title={`${RTM.n} salespeople, two months running`} at={from - 6} x={160} y={y(262)} />
           {["Month 1", "Month 2"].map((t, k) => (
@@ -187,6 +194,16 @@ export const RtmScene: React.FC = () => {
           <Note at={bottomAt} x={COLS[0] - HALF - 30} y={py(RTM.bottomBefore) + 18} align="right">
             <span style={{ ...note(21, DATA_INK), fontWeight: 600, whiteSpace: "nowrap" }}>bottom tenth</span>
           </Note>
+
+          {/* The averages, ringed as the narration explains them. */}
+          {groups.map((g, k) => (
+            <React.Fragment key={k}>
+              <Ring x={COLS[0]} y={py(g.before)} at={extremeAt - 2 + k * 6} color={g.color} r0={20} r1={HALF + 20} />
+              <Ring x={COLS[1]} y={py(g.after)} at={luckAgainAt - 2 + k * 6} color={g.color} r0={20} r1={HALF + 20} />
+            </React.Fragment>
+          ))}
+          <Ring x={COLS[1]} y={py(RTM.bottomAfter)} at={coachingAt - 2} color={DATA} r0={20} r1={HALF + 30} />
+          <Ring x={COLS[0]} y={py(RTM.bottomBefore)} at={groupAt - 2} color={DATA} r0={20} r1={HALF + 30} />
 
           {/* Where everyone's average sits, both months. */}
           <Dashed x0={240} y0={py(RTM.mean1)} x1={1130} y1={py(RTM.mean1)} at={nobodyAt - 2} dur={20} width={2.4} />

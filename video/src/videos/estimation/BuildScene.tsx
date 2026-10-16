@@ -8,7 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { jitter, USERS } from "./data";
-import { Bracket, DATA, EST, EST_INK, IntervalBar, Kicker, lerp, Marked, pulse, Rule, Slot, Svg } from "./parts";
+import { Bracket, DATA, EST, EST_INK, Headline, IntervalBar, Kicker, lerp, Marked, pulse, Rule, Slot, Svg, XBar } from "./parts";
 
 /** Fig. 1: every user's monthly spend. */
 const X: XScale = { lo: 10, hi: 90, x0: 160, x1: 1240 };
@@ -39,6 +39,7 @@ export const BuildScene: React.FC = () => {
 
   // ── Cues ──
   const hookFrom = n.beat("hook").from;
+  const twoNumbersAt = n.word("hook", "two numbers");
   const estimateAt = n.word("hook", "estimate");
   const seWordAt = n.word("hook", "standard error");
   const fiftyAt = n.word("users", "Fifty users");
@@ -49,6 +50,11 @@ export const BuildScene: React.FC = () => {
   const elseAt = n.word("wobble", "something else");
   const howMuchAt = n.word("wobble", "how much");
   const dollarFiftyAt = n.word("wobble", "dollar fifty");
+  const seWobbleAt = n.word("wobble", "standard error");
+  const monthAt = n.word("users", "month");
+  const thirtyThreeAt = n.word("interval", "thirty-three");
+  const tDistAt = n.word("why", "t-distribution");
+  const slipEndAt = n.word("means-in", "slip", { edge: "end" });
   const criticalAt = n.word("margin", "critical value");
   const twoOhOneAt = n.word("margin", "two point oh one");
   const marginAt = n.word("margin", "margin of error");
@@ -125,6 +131,9 @@ export const BuildScene: React.FC = () => {
       <Sfx name="el-tap" at={nineSixAt} level={-29} />
 
       <Kicker at={hookFrom - 10}>What 95% confident means</Kicker>
+      <Headline at={hookFrom - 4} second={twoNumbersAt - 4} out={estimateAt - 10} size={64} italic="two numbers.">
+        An interval needs
+      </Headline>
 
       {/* ── The formula: estimate ± critical value × standard error ── */}
       <div style={{ position: "absolute", left: 96, top: y(150), display: "flex", alignItems: "flex-start", gap: 26 }}>
@@ -132,7 +141,7 @@ export const BuildScene: React.FC = () => {
         {op(criticalAt - 6, "±")}
         {term(criticalAt - 4, "critical value", fmt(USERS.tCrit), INK, twoOhOneAt - 2, payAt - 4)}
         {op(criticalAt + 2, "×")}
-        {term(seWordAt - 4, "standard error", money(USERS.se), INK, dollarFiftyAt - 2)}
+        {term(seWordAt - 4, "standard error", money(USERS.se), INK, dollarFiftyAt - 2, seWobbleAt - 2, criticalAt)}
         {op(stepAt - 4, "=")}
         <div style={{ display: "flex", flexDirection: "column", gap: 10, position: "relative" }}>
           <Slot at={stepAt - 2} style={headline(50)}>
@@ -178,7 +187,20 @@ export const BuildScene: React.FC = () => {
         })}
       </Svg>
       <Axis scale={X} base={y(AXIS1)} ticks={[10, 30, 50, 70, 90]} at={fiftyAt - 6} format={(v) => `$${v}`} />
-      <Rule x={sx(X, USERS.xBar)} y0={y(STRIP) + h(38)} y1={y(STRIP) - h(40)} at={averageAt - 2} color={EST} width={4} />
+      <Rule
+        x={sx(X, USERS.xBar)}
+        y0={y(STRIP) + h(38)}
+        y1={y(STRIP) - h(40)}
+        at={averageAt - 2}
+        color={EST}
+        width={4 + 3 * pulse(frame, thatsAt - 4, 16)}
+      />
+      <Note at={monthAt - 4} x={sx(X, USERS.xBar) + 12} y={y(STRIP) - h(44) - 18} out={spreadAt - 6}>
+        <span style={{ ...note(22, EST_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>
+          <XBar /> = {money(USERS.xBar)} a month
+        </span>
+      </Note>
+      <IntervalBar x0={sx(X, USERS.lo)} x1={sx(X, USERS.hi)} y={y(STRIP) + h(36)} at={thirtyThreeAt} dur={12} color={INK} width={3} tick={7} />
       {/* The spread the t pays for: one s either side, from the same fifty. */}
       <Bracket
         x0={sx(X, USERS.xBar - USERS.s)}
@@ -260,14 +282,15 @@ export const BuildScene: React.FC = () => {
           normal {fmt(USERS.zCrit)}
         </span>
       </Note>
-      <Rule x={sx(C, USERS.tCrit)} y0={y(C_Y)} y1={y(C_Y) - h(40)} at={widensAt - 2} color={EST} width={4} out={meansAt - 8} />
-      <Note at={widensAt} x={sx(C, USERS.tCrit) + 8} y={y(C_Y) - h(40) - 30} from="up" out={meansAt - 8}>
+      <Rule x={sx(C, USERS.tCrit)} y0={y(C_Y)} y1={y(C_Y) - h(40)} at={tDistAt - 2} color={EST} width={4} out={meansAt - 8} />
+      <Note at={tDistAt} x={sx(C, USERS.tCrit) + 8} y={y(C_Y) - h(40) - 30} from="up" out={meansAt - 8}>
         <span style={{ ...note(20, EST_INK), fontWeight: 700, whiteSpace: "nowrap" }}>t, {USERS.n - 1} df: {fmt(USERS.tCrit)}</span>
       </Note>
 
       {/* The turn: what the 95% means. */}
       <Ink at={meansAt - 2} dur={18} style={{ left: 1340, top: y(400), whiteSpace: "nowrap" }}>
         <span style={{ ...body(34, true), color: INK }}>But what does the 95% mean?</span>
+        <div style={{ height: 3, marginTop: 6, background: EST, width: `${100 * ease(frame, slipEndAt - 4, 16)}%`, borderRadius: 2 }} />
       </Ink>
     </AbsoluteFill>
   );

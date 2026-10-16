@@ -86,7 +86,7 @@ export const script: NarrationScript = {
     },
     {
       id: "longrun",
-      text: "So read it as the long run. A probability is the fraction of times something happens, when you repeat it over and over.",
+      text: "So read it the frequentist way, as the long run. A probability is the fraction of times something happens, when you repeat it over and over.",
       pauseAfter: 0.35,
     },
     {

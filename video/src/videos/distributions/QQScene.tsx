@@ -147,7 +147,7 @@ export const QQScene: React.FC = () => {
         <Ink at={modelsAt - 2} dur={14} style={{ left: 220, top: bottom + h(52), whiteSpace: "nowrap" }}>
           <span style={label(21, INK_SOFT)}>across: where the fitted model puts each quantile</span>
         </Ink>
-        <Ink at={quantilesAt} dur={14} style={{ left: 220, top: y(TOP) - h(40), whiteSpace: "nowrap" }}>
+        <Ink at={quantilesAt} dur={14} style={{ left: 220 + 18, top: y(TOP) + 6, whiteSpace: "nowrap" }}>
           <span style={label(21, INK_SOFT)}>up: the data's own, sorted</span>
         </Ink>
         <Note at={lineEnd - 6} x={sx(scaleFor(PANELS[0]), 52)} y={yFor(PANELS[0])(36)}>
@@ -155,13 +155,13 @@ export const QQScene: React.FC = () => {
         </Note>
 
         {/* The skewed panel's ends. */}
-        <Note at={tailsAt - 4} x={sx(scaleFor(PANELS[1]), 66)} y={yFor(PANELS[1])(112)}>
+        <Note at={tailsAt - 4} x={sx(scaleFor(PANELS[1]), 62)} y={yFor(PANELS[1])(112)} align="right">
           <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>the upper tail runs away</span>
         </Note>
-        <Note at={tailsAt + 4} x={sx(scaleFor(PANELS[1]), 8)} y={yFor(PANELS[1])(-4)}>
-          <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>the lower tail, too</span>
+        <Note at={tailsAt + 4} x={sx(scaleFor(PANELS[1]), 50)} y={yFor(PANELS[1])(12)}>
+          <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>and the lower tail, too</span>
         </Note>
-        <Note at={costlyAt - 2} x={sx(scaleFor(PANELS[1]), 40)} y={yFor(PANELS[1])(-4) + 38}>
+        <Note at={costlyAt - 2} x={sx(scaleFor(PANELS[1]), 50)} y={yFor(PANELS[1])(12) + 36}>
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>where the costly mistakes live</span>
         </Note>
       </Drift>

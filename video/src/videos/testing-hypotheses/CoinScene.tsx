@@ -8,13 +8,13 @@ import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { COIN } from "./data";
-import { Bracket, Count, DATA, Drift, Head, Kicker, Label, Mark, pct, pulse, Spot, STAT, STAT_INK, Svg } from "./parts";
+import { Bracket, Count, DATA, Drift, Head, Kicker, Label, lerp, Mark, pct, pulse, Spot, STAT, STAT_INK, Svg } from "./parts";
 
 const LO = 30;
 const HI = 70;
 const X: XScale = { lo: LO - 0.5, hi: HI + 0.5, x0: 220, x1: 1700 };
 const BASE = 790;
-const TALL = 430;
+const TALL = 380;
 const MAX = Math.max(...COIN.counts);
 
 /**
@@ -60,6 +60,8 @@ export const CoinScene: React.FC = () => {
   const midX = sx(X, 50);
   const barTop = (k: number) => y(BASE) - h(TALL) * (COIN.counts[k] / MAX) * grow;
   const dim = 1 - 0.5 * ease(frame, cantAt - 10, 16);
+  // The two marks rise above the tallest bar, so the brackets clear the pile.
+  const LINE_TOP = y(BASE) - h(TALL) - 46;
   const runsGlow = pulse(frame, thousandAt, 24);
 
   return (
@@ -92,7 +94,7 @@ export const CoinScene: React.FC = () => {
               />
             </Label>
           </Ink>
-          <Axis scale={X} base={y(BASE)} ticks={[30, 38, 40, 50, 60, 62, 70]} at={coinFrom + 2} />
+          <Axis scale={X} base={y(BASE)} ticks={[30, 38, 50, 62, 70]} at={coinFrom + 2} />
           <Svg>
             {COIN.counts.map((c, k) => {
               if (k < LO || k > HI || c <= 0 || grow <= 0) return null;
@@ -112,39 +114,40 @@ export const CoinScene: React.FC = () => {
                 />
               );
             })}
-            {/* The observed 62, and its mirror on the other side of fifty. */}
+            {/* The observed 62, and its mirror on the other side of fifty, rising above the pile. */}
             {ease(frame, sixtyAt - 2, 12) > 0 ? (
-              <line x1={obsX} x2={obsX} y1={y(BASE)} y2={y(BASE) - h(TALL * 0.62) * ease(frame, sixtyAt - 2, 14)} stroke={STAT} strokeWidth={3.5} />
+              <line x1={obsX} x2={obsX} y1={y(BASE)} y2={lerp(y(BASE), LINE_TOP, ease(frame, sixtyAt - 2, 14))} stroke={STAT} strokeWidth={3.5} />
             ) : null}
             {ease(frame, thirtyAt - 2, 12) > 0 ? (
               <line
                 x1={mirX}
                 x2={mirX}
                 y1={y(BASE)}
-                y2={y(BASE) - h(TALL * 0.62) * ease(frame, thirtyAt - 2, 14)}
+                y2={lerp(y(BASE), LINE_TOP, ease(frame, thirtyAt - 2, 14))}
                 stroke={STAT}
                 strokeWidth={3}
                 strokeDasharray="7 6"
               />
             ) : null}
           </Svg>
-          <Note at={sixtyAt} x={obsX + 14} y={y(BASE) - h(TALL * 0.62)}>
+          {/* Labels over the thin tails, where no bar comes near them. */}
+          <Note at={sixtyAt} x={obsX + 16} y={y(BASE) - h(TALL * 0.56)}>
             <Label size={24} color={STAT_INK} style={halo}>
               62, what the coin did
             </Label>
           </Note>
-          <Note at={thirtyAt} x={mirX - 14} y={y(BASE) - h(TALL * 0.62)} align="right">
+          <Note at={thirtyAt} x={mirX - 16} y={y(BASE) - h(TALL * 0.56)} align="right">
             <Label size={24} color={STAT_INK} style={halo}>
               38, just as far
             </Label>
           </Note>
-          <Bracket x0={midX} x1={obsX} y={y(BASE) - h(TALL * 0.62) - 40} at={twelveAt - 4} color={INK} up />
-          <Bracket x0={mirX} x1={midX} y={y(BASE) - h(TALL * 0.62) - 40} at={thirtyAt + 4} color={INK} up />
+          <Bracket x0={midX} x1={obsX} y={LINE_TOP + 14} at={twelveAt - 4} color={INK} up />
+          <Bracket x0={mirX} x1={midX} y={LINE_TOP + 14} at={thirtyAt + 4} color={INK} up />
           {[
             [(midX + obsX) / 2, twelveAt],
             [(mirX + midX) / 2, thirtyAt + 8],
           ].map(([x, at]) => (
-            <Note key={at} at={at} x={x} y={y(BASE) - h(TALL * 0.62) - 84} from="up">
+            <Note key={at} at={at} x={x} y={LINE_TOP - 30} from="up">
               <span style={{ display: "inline-block", transform: "translateX(-50%)" }}>
                 <Label size={24}>{COIN.distance}</Label>
               </span>
@@ -152,25 +155,25 @@ export const CoinScene: React.FC = () => {
           ))}
           <Leader
             points={[
-              [midX - 230, y(BASE) - h(TALL) + 10],
-              [midX - 60, y(BASE) - h(TALL * 0.7)],
+              [midX - 300, y(BASE) - h(TALL * 0.78) + 30],
+              [midX - 80, y(BASE) - h(TALL * 0.6)],
             ]}
             at={nullAt}
             dur={12}
           />
-          <Note at={nullAt - 2} x={midX - 240} y={y(BASE) - h(TALL) - 24} align="right">
+          <Note at={nullAt - 2} x={midX - 300} y={y(BASE) - h(TALL * 0.78)} align="right">
             <Label size={24} style={halo}>
               the null distribution
             </Label>
           </Note>
 
           {/* The count of runs at least that far out, and the share they make. */}
-          <Note at={farOutAt} x={X.x1} y={y(BASE) - h(260)} align="right">
+          <Note at={farOutAt} x={X.x1} y={y(BASE) - h(TALL * 0.4)} align="right">
             <span style={{ ...note(24, STAT_INK), fontWeight: 650, ...halo, whiteSpace: "nowrap" }}>
               <Count at={farOutAt} to={COIN.upper + COIN.lower} dur={26} /> runs at least 12 out
             </span>
           </Note>
-          <Note at={twoAt - 2} x={X.x1} y={y(BASE) - h(260) + 44} align="right">
+          <Note at={twoAt - 2} x={X.x1} y={y(BASE) - h(TALL * 0.4) + 40} align="right">
             <span style={{ ...note(40, STAT_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>p = {pct(COIN.p)}</span>
           </Note>
         </Drift>

@@ -149,6 +149,7 @@ export const WallScene: React.FC = () => {
   const pValueAt = n.word("lie", "p-value");
   const lieAt = n.word("lie", "lie");
   const freshAt = n.word("split-in", "fresh data");
+  const fromAt = n.word("split-in", "from");
 
   // When each slice pops in, across "roaming the data, slicing it every way you can".
   const thumbAt = (i: number) => lerp(roamingAt - 6, canAt - 8, i / (THUMBS.length - 1));
@@ -264,7 +265,7 @@ export const WallScene: React.FC = () => {
       </Ink>
       <Cross x={WALL_X} y={y(CARD_TO.y) + 32} at={tiltedAt - 4} size={40} />
 
-      <div style={{ position: "absolute", left: 160, top: y(808), display: "flex", gap: "0.36em", whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: 160, top: y(808), display: "flex", gap: "0.36em", whiteSpace: "nowrap", opacity: 1 - 0.6 * ease(frame, fromAt - 4, 14) }}>
         <Ink at={pValueAt - 6} dur={18} style={{ position: "relative" }}>
           <span style={{ ...body(38), color: INK }}>A p-value from the data that suggested the question</span>
         </Ink>

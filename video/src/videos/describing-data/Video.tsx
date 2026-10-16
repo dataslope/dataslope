@@ -33,20 +33,6 @@ const OVERLAP = 6;
  * Every scene boundary is a narration cue, so new audio re-times the cuts
  * along with every animation inside them.
  */
-const SCENES: { beat: string; Component: React.FC }[] = [
-  { beat: "hook", Component: SalaryScene },
-  { beat: "orders", Component: SkewScene },
-  { beat: "delivery", Component: DeliveryScene },
-  { beat: "divisor", Component: DivisorScene },
-  { beat: "incomes", Component: RobustScene },
-  { beat: "shape", Component: ShapeScene },
-  { beat: "tails", Component: TailScene },
-  { beat: "outlier", Component: OutlierScene },
-  { beat: "dino", Component: DinoScene },
-  { beat: "bins", Component: BinScene },
-  { beat: "plots", Component: WhichScene },
-];
-
 const Scenes: React.FC = () => {
   const { beat, durationInFrames } = useNarration();
   const cut = (id: string) => beat(id).from - LEAD;
@@ -56,11 +42,39 @@ const Scenes: React.FC = () => {
       <Scene from={0} to={until(cut("hook"))} fade={8}>
         <SeriesIntro course="Statistics for Data Science with Python" unit="Unit 2" title="Describing data" />
       </Scene>
-      {SCENES.map(({ beat: id, Component }, i) => (
-        <Scene key={id} from={cut(id)} to={i + 1 < SCENES.length ? until(cut(SCENES[i + 1].beat)) : durationInFrames + OVERLAP} fade={6}>
-          <Component />
-        </Scene>
-      ))}
+      <Scene from={cut("hook")} to={until(cut("orders"))} fade={6}>
+        <SalaryScene />
+      </Scene>
+      <Scene from={cut("orders")} to={until(cut("delivery"))} fade={6}>
+        <SkewScene />
+      </Scene>
+      <Scene from={cut("delivery")} to={until(cut("divisor"))} fade={6}>
+        <DeliveryScene />
+      </Scene>
+      <Scene from={cut("divisor")} to={until(cut("incomes"))} fade={6}>
+        <DivisorScene />
+      </Scene>
+      <Scene from={cut("incomes")} to={until(cut("shape"))} fade={6}>
+        <RobustScene />
+      </Scene>
+      <Scene from={cut("shape")} to={until(cut("tails"))} fade={6}>
+        <ShapeScene />
+      </Scene>
+      <Scene from={cut("tails")} to={until(cut("outlier"))} fade={6}>
+        <TailScene />
+      </Scene>
+      <Scene from={cut("outlier")} to={until(cut("dino"))} fade={6}>
+        <OutlierScene />
+      </Scene>
+      <Scene from={cut("dino")} to={until(cut("bins"))} fade={6}>
+        <DinoScene />
+      </Scene>
+      <Scene from={cut("bins")} to={until(cut("plots"))} fade={6}>
+        <BinScene />
+      </Scene>
+      <Scene from={cut("plots")} to={durationInFrames + OVERLAP} fade={6}>
+        <WhichScene />
+      </Scene>
     </>
   );
 };

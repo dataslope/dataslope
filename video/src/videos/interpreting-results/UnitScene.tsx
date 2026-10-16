@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { DISTRICTS, signed } from "./data";
-import { Count, DATA, DATA_INK, Drift, Headline, lerp, Marker, partial, STAT_INK, Svg } from "./parts";
+import { Count, DATA, DATA_INK, Drift, Headline, lerp, Marker, partial, Ring, STAT_INK, Svg } from "./parts";
 
 const XD = [10, 86] as const;
 const YD = [24, 94] as const;
@@ -45,16 +45,20 @@ export const UnitScene: React.FC = () => {
   const from = n.beat("unit").from;
 
   // ── Cues ──
+  const dependsAt = n.word("unit", "depends");
+  const countingAt = n.word("unit", "counting");
   const sixAt = n.word("unit", "six districts");
   const incomeAt = n.word("unit", "average income");
   const nineAt = n.word("unit", "zero point nine three");
   const insideAt = n.word("people", "inside a district");
   const personAt = n.word("people", "person by person");
   const sevenAt = n.word("people", "zero point zero seven");
+  const averagesAt = n.word("people", "averages");
   const bothAt = n.word("both-true", "Both");
   const districtsAt = n.word("both-true", "districts");
   const peopleAt = n.word("both-true", "people");
   const nameAt = n.word("both-true", "Name the unit");
+  const quoteAt = n.word("both-true", "quote");
   const end = n.beat("both-true").to;
 
   const top = y(TOP);
@@ -119,7 +123,7 @@ export const UnitScene: React.FC = () => {
         <FigLabel n="12" title="Income and turnout in six districts" at={from - 4} x={160} y={y(262)} />
         {panel(
           AGG,
-          from - 4,
+          dependsAt - 4,
           <>
             <Marker at={districtsAt - 2}>Districts</Marker>: r = {signed(DISTRICTS.rGroup)}
           </>,
@@ -138,7 +142,7 @@ export const UnitScene: React.FC = () => {
           STAT_INK,
           "income, one dot per person",
         )}
-        <Note at={incomeAt} x={AGG.x0 + 12} y={top + 6}>
+        <Note at={countingAt - 2} x={AGG.x0 + 12} y={top + 6}>
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>average turnout</span>
         </Note>
 
@@ -187,6 +191,9 @@ export const UnitScene: React.FC = () => {
             );
           })}
         </Svg>
+        <Ring x={IND.x0 + 250} y={(top + bottom) / 2} at={averagesAt - 2} r0={40} r1={200} />
+        <Ring x={AGG.x0 + 230} y={top - 30} at={quoteAt - 2} color={DATA} r0={20} r1={90} />
+        <Ring x={IND.x0 + 330} y={top - 30} at={quoteAt + 4} r0={20} r1={90} />
         <Note at={sevenAt + 4} x={IND.x1 + 24} y={top + 30}>
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>on average,</span>
           <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>across the six</div>

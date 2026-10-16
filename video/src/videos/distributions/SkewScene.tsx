@@ -116,7 +116,7 @@ export const SkewScene: React.FC = () => {
             </svg>
           ) : null}
           <Curve d={curveD(perBin, X.lo, X.hi, X, py)} at={forceAt - 2} dur={sameAt - forceAt + 24} color={ASK} width={3.4} />
-          <Note at={sameAt + 4} x={sx(X, 95_000)} y={py(perBin(95_000)) - 50}>
+          <Note at={sameAt + 4} x={sx(X, 80_000)} y={py(perBin(80_000)) - 52}>
             <span style={{ ...askNote(22), whiteSpace: "nowrap", ...halo }}>a normal with the same mean and SD</span>
           </Note>
           <Note at={sixAt - 6} x={zeroX - 16} y={base - h(250)} align="right">

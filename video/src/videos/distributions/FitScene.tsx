@@ -98,7 +98,7 @@ export const FitScene: React.FC = () => {
           <div style={{ ...askNote(24), whiteSpace: "nowrap", ...halo }}>95th percentile: {fmt(FIT.ppf95, 1)}</div>
           <div style={{ ...code(20, INK_SOFT), marginTop: 6 }}>.ppf(0.95)</div>
         </Note>
-        <Note at={pctAt + 6} x={qx + 14} y={base - h(110)}>
+        <Note at={pctAt + 6} x={qx + 14} y={base - h(150)}>
           <span style={{ ...askNote(21), whiteSpace: "nowrap", ...halo }}>5% above it</span>
         </Note>
 

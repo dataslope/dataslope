@@ -36,6 +36,7 @@ export const ConfoundScene: React.FC = () => {
   const lineAt = n.word("rises", "One line");
   const risesAt = n.word("rises", "rises");
   const nineAt = n.word("rises", "nine points");
+  const hourAt = n.word("rises", "extra hour");
   const colorAt = n.word("bands", "color");
   const bandAt = n.word("bands", "every age band");
   const fallsAt = n.word("bands", "falls");
@@ -46,6 +47,8 @@ export const ConfoundScene: React.FC = () => {
   const randomAt = n.word("coin", "randomized");
   const coinAt = n.word("coin", "coin");
   const cantAt = n.word("coin", "can't");
+  const thirdAt = n.word("rtm-in", "third variable");
+  const sometimesAt = n.word("rtm-in", "Sometimes");
   const luckAt = n.word("rtm-in", "luck");
   const end = n.beat("rtm-in").to;
 
@@ -100,6 +103,7 @@ export const ConfoundScene: React.FC = () => {
       />
       <Headline
         top={y(150)}
+        out={sometimesAt - 2}
         parts={[
           { text: "Age drives both:", at: drivesAt - 4 },
           { text: "a confounder.", at: confounderAt - 6, italic: true },
@@ -178,7 +182,7 @@ export const ConfoundScene: React.FC = () => {
         </Svg>
         <Note at={nineAt - 2} x={px(CONFOUND.pooled.x1) - 10} y={py(CONFOUND.pooled.intercept + CONFOUND.pooled.slope * CONFOUND.pooled.x1) - 62} align="right" dim={fallsAt}>
           <span style={{ ...note(23, STAT_INK), fontWeight: 700, whiteSpace: "nowrap", ...halo }}>
-            everyone: +{fmt(CONFOUND.pooledPerHour, 1)} mmHg per weekly hour
+            everyone: +{fmt(CONFOUND.pooledPerHour, 1)} mmHg <Marker at={hourAt - 2}>per weekly hour</Marker>
           </span>
         </Note>
         {CONFOUND.fits.map((f, k) => (
@@ -192,7 +196,8 @@ export const ConfoundScene: React.FC = () => {
       </Drift>
       </div>
 
-      {/* ── Why: age behind both ── */}
+      {/* ── Why: age behind both (set back once the narration drops the third variable) ── */}
+      <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.5 * ease(frame, thirdAt - 4, 16) }}>
       <Svg opacity={diagram}>
         <line x1={EXERCISE[0] + 72} x2={PRESSURE[0] - 106} y1={lowY} y2={lowY} stroke={INK_SOFT} strokeWidth={2} strokeDasharray="3 6" />
       </Svg>
@@ -233,6 +238,7 @@ export const ConfoundScene: React.FC = () => {
       <Note at={cantAt} x={1440} y={y(842)}>
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>and age can&apos;t decide it</span>
       </Note>
+      </div>
     </AbsoluteFill>
   );
 };

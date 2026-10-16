@@ -87,7 +87,7 @@ export const CloseScene: React.FC = () => {
             style={{
               padding: "12px 26px",
               borderRadius: 8,
-              background: i === 0 ? HIGHLIGHT : PAPER,
+              background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(100 * (i === 0 ? 1 - ease(frame, lookAt + 24, 20) : i === 2 ? ease(frame, lookAt + 24, 20) : 0))}%, ${PAPER})`,
               border: `2px solid ${INK}`,
               ...label(30, INK),
             }}

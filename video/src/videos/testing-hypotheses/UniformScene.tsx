@@ -17,7 +17,7 @@ const H_TALL = 220;
 const H_MAX = 300;
 /** The twenty tests, one row each. */
 const TX: XScale = { lo: 0, hi: 1, x0: 1080, x1: 1760 };
-const T_ROW0 = 352;
+const T_ROW0 = 372;
 const T_DY = 23;
 const T_BASE = T_ROW0 + 20 * T_DY;
 const HIT = TWENTY.hits[0];
@@ -122,7 +122,7 @@ export const UniformScene: React.FC = () => {
       <Spot id="testing-hypotheses-jellybeans" at={twentyAt - 6} left={330} top={y(690)} width={230} height={230} />
 
       {/* ── Fig. 9: twenty tests of pure noise ── */}
-      <FigLabel n="9" title="Twenty tests where nothing is real" at={twentyAt - 6} x={TX.x0 - 60} y={y(300)} />
+      <FigLabel n="9" title="Twenty tests of nothing, and the 0.05 line" at={twentyAt - 6} x={TX.x0 - 60} y={y(300)} />
       <Axis scale={TX} base={y(T_BASE)} ticks={[0, 0.25, 0.5, 0.75, 1]} format={(v) => (v === 0 || v === 1 ? String(v) : fmt(v, 2))} at={twentyAt - 4} />
       <Svg>
         {/* The 0.05 line. */}
@@ -185,11 +185,6 @@ export const UniformScene: React.FC = () => {
       <Note at={discoveryAt - 4} x={sx(TX, TWENTY.p[HIT]) + 22} y={y(T_ROW0 + HIT * T_DY) + 18}>
         <Label size={22} color={STAT_INK} weight={520} style={halo}>
           reported as a discovery
-        </Label>
-      </Note>
-      <Note at={twentyAt + 8} x={sx(TX, 0.05) + 10} y={y(T_ROW0 - 18) - 34}>
-        <Label size={21} color={STAT_INK} style={halo}>
-          0.05
         </Label>
       </Note>
       <Note at={nothingAt} x={TX.x1} y={y(T_BASE) + 44} align="right">

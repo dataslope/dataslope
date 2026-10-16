@@ -206,22 +206,22 @@ export const CorrScene: React.FC = () => {
           />
         ) : null}
       </Svg>
-      <Note at={straightAt + 4} x={BOX.x1 - 10} y={top + 40} align="right" out={ranksAt - 4}>
+      <Note at={straightAt + 4} x={BOX.x1 - 10} y={bottom - 50} align="right" out={ranksAt - 4}>
         <Label size={21} color={STAT_INK} style={halo}>
           Pearson&apos;s straight line
         </Label>
       </Note>
-      <Note at={curveAt} x={BOX.x0 + 24} y={top + 10} out={ranksAt - 4}>
+      <Note at={curveAt} x={BOX.x0} y={top - 44} out={ranksAt - 4}>
         <Label size={21} color={INK_SOFT} weight={520} style={halo}>
           a curve that always rises
         </Label>
       </Note>
-      <Note at={risingAt - 4} x={BOX.x0 + 24} y={top + 10} out={nearAt - 4}>
+      <Note at={risingAt - 4} x={BOX.x0} y={top - 44} out={nearAt - 4}>
         <Label size={21} color={DATA_INK} style={halo}>
           the same points, as ranks
         </Label>
       </Note>
-      <Note at={uAt} x={BOX.x0 + 24} y={top + 10}>
+      <Note at={uAt} x={BOX.x0} y={top - 44}>
         <Label size={21} color={INK_SOFT} weight={520} style={halo}>
           a U: y is x squared, plus a little noise
         </Label>

@@ -62,6 +62,7 @@ export const LookScene: React.FC = () => {
   const leadAt = n.word("lead", "lead");
   const questionAt = n.word("lead", "question");
   const jobsAt = n.word("jobs-in", "two different jobs");
+  const hereAt = n.word("jobs-in", "here");
 
   // ── State ──
   const split = (i: number) => ease(frame, splitAt - 4 + (i % 61) * 0.25, 18);
@@ -96,7 +97,7 @@ export const LookScene: React.FC = () => {
         <span style={{ ...body(40, true), color: STAT_INK }}>But how do you know what to test, without looking?</span>
       </Ink>
       <Headline lead="Friday tips best." turn="Or does it?" at={fridayAt - 4} turnAt={nineteenAt - 4} out={findingAt - 8} />
-      <Headline lead="Not a finding." turn="A lead." at={findingAt - 4} turnAt={leadAt - 4} />
+      <Headline lead="Not a finding." turn="A lead." at={findingAt - 4} turnAt={leadAt - 4} out={hereAt - 2} />
 
       <Spot id="statistics-in-practice-bill" at={restaurantAt - 6} left={1560} top={y(92)} width={250} height={232} />
 

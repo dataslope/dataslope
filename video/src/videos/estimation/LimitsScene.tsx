@@ -49,6 +49,9 @@ export const LimitsScene: React.FC = () => {
   const neverAt = n.word("edge", "never beat");
   const largestAt = n.word("edge", "largest value");
   const maximumAt = n.word("edge", "maximum");
+  const sayAt = n.word("edge", "say");
+  const nextFrom = n.beat("next").from;
+  const zeroEndAt = n.word("next", "zero", { edge: "end" });
   const wobblesAt = n.word("precision", "wobbles");
   const aimedAt = n.word("precision", "aimed");
   const truthAt = n.word("precision", "truth", { edge: "end" });
@@ -75,11 +78,12 @@ export const LimitsScene: React.FC = () => {
       <Sfx name="el-chime" at={truthAt + 4} level={-32} />
 
       <Headline at={limitsFrom - 4} second={reusesAt - 4} size={60} italic="it only reuses the data.">
-        No new information:
+        No new{" "}
+        <Marked at={informationAt - 4} color={HIGHLIGHT}>
+          information
+        </Marked>
+        :
       </Headline>
-      <Svg opacity={pulse(frame, informationAt - 4, 20) * 0.6}>
-        <line x1={92} x2={720} y1={y(232)} y2={y(232)} stroke={HIGHLIGHT} strokeWidth={6} />
-      </Svg>
 
       {/* ── Fig. 11: a biased sample ── */}
       <FigLabel n="11" title={`${BIASED.n} waits, kept only under ${BIASED.cutoff} minutes`} at={biasedAt - 8} x={160} y={y(272)} />
@@ -148,7 +152,16 @@ export const LimitsScene: React.FC = () => {
       <Note at={edgesAt + 4} x={XR.x0} y={y(R_STRIP) + 18}>
         <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>the sample’s largest values</span>
       </Note>
-      <Rule x={sx(XR, MAXIMUM.sampleMax)} y0={y(R_BASE)} y1={y(R_STRIP - 34)} at={neverAt - 2} dur={14} color={INK} width={2.4} dash="7 6" />
+      <Rule
+        x={sx(XR, MAXIMUM.sampleMax)}
+        y0={y(R_BASE)}
+        y1={y(R_STRIP - 34)}
+        at={neverAt - 2}
+        dur={14}
+        color={INK}
+        width={2.4 + 2.6 * pulse(frame, sayAt - 2, 18)}
+        dash="7 6"
+      />
       <Note at={neverAt + 2} x={sx(XR, MAXIMUM.sampleMax) + 14} y={y(R_STRIP + 60)}>
         <span style={{ ...note(21, INK), fontWeight: 650, whiteSpace: "nowrap", lineHeight: 1.35 }}>
           a resample
@@ -175,17 +188,40 @@ export const LimitsScene: React.FC = () => {
         </Slot>
         <Slot at={aimedAt - 6} style={{ color: EST_INK }}>
           not whether it’s aimed at the truth.
+          <div style={{ height: 3, marginTop: 2, background: EST, width: `${100 * ease(frame, truthAt - 10, 18)}%`, borderRadius: 2 }} />
         </Slot>
       </div>
 
       {/* ── The bridge ── */}
-      <Ink at={plausibleAt - 6} dur={18} style={{ left: 160, top: y(818), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(26, INK_SOFT) }}>An interval: which values are plausible.</span>
+      <Ink at={nextFrom - 2} dur={18} style={{ left: 160, top: y(818), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(26, INK_SOFT) }}>
+          An interval: which values are{" "}
+          <Marked at={plausibleAt - 2} color={HIGHLIGHT}>
+            plausible
+          </Marked>
+          .
+        </span>
       </Ink>
       <Ink at={oneValueAt - 4} dur={18} style={{ left: 160, top: y(862), whiteSpace: "nowrap" }}>
         <span style={{ ...note(26, INK_SOFT) }}>
           A test: one value in particular.
-          <span style={{ color: EST_INK, fontWeight: 650, opacity: ease(frame, zeroAt - 6, 12) }}> Could it be zero?</span>
+          <span style={{ position: "relative", color: EST_INK, fontWeight: 650, opacity: ease(frame, zeroAt - 6, 12) }}>
+            {" "}
+            Could it be zero?
+            <span
+              style={{
+                position: "absolute",
+                left: "0.3em",
+                right: 0,
+                bottom: -6,
+                height: 3,
+                background: EST,
+                borderRadius: 2,
+                transformOrigin: "left center",
+                transform: `scaleX(${ease(frame, zeroEndAt + 10, 20)})`,
+              }}
+            />
+          </span>
         </span>
       </Ink>
       <NextLine at={testAt - 2} x={1020} y={y(818)} width={600}>

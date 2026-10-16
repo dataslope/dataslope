@@ -44,6 +44,7 @@ export const HugeScene: React.FC = () => {
   const bigAt = n.word("hook", "how big");
   const groupsAt = n.word("huge", "two groups");
   const peopleAt = n.word("huge", "thousand");
+  const scoreAt = n.word("huge", "score");
   const fifteenAt = n.word("huge", "fifteen");
   const averageAt = n.word("p", "average");
   const seventhAt = n.word("p", "seventh");
@@ -52,10 +53,12 @@ export const HugeScene: React.FC = () => {
   const seventh2At = n.word("tiny", "seventh");
   const spreadAt = n.word("tiny", "spread");
   const percentAt = n.word("tiny", "one percent");
+  const deviationAt = n.word("tiny", "standard deviation");
   const realAt = n.word("real", "real");
   const smallAt = n.word("real", "too small");
   const dataAt = n.word("why", "enough data");
   const passesAt = n.word("why", "passes");
+  const passingAt = n.word("why", "passing");
   const careAt = n.word("why", "care");
   const sizeAt = n.word("d-in", "measure of size");
   const end = n.beat("d-in").to;
@@ -150,6 +153,10 @@ export const HugeScene: React.FC = () => {
           </Note>
         ))}
 
+        <Note at={scoreAt - 2} x={X.x1} y={y(BASE) + 40} align="right">
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>score</span>
+        </Note>
+
         {/* One standard deviation, under the left half of the curves. */}
         <Bracket x0={sx(X, 100 - 15)} x1={sx(X, 100)} y={y(BASE) + 52} at={fifteenAt - 4} up width={lerp(2.2, 3.6, spreadBold)} />
         <Note at={fifteenAt} x={(sx(X, 85) + sx(X, 100)) / 2} y={y(BASE) + 62} from="up">
@@ -219,6 +226,7 @@ export const HugeScene: React.FC = () => {
         p ={" "}
         <Count from={0} to={1} at={pAtWord} dur={sigAt - pAtWord} format={(t) => pText(pAt(t))} />
       </div>
+      <Ring x={RIGHT + 170} y={y(ROW1) + 78} at={passingAt - 2} r0={40} r1={130} />
       <Note at={sigAt - 2} x={RIGHT} y={y(ROW1) + 126}>
         <span style={{ ...note(26, STAT_INK), fontWeight: 650, whiteSpace: "nowrap", opacity: 1 - pDim }}>
           <Marker at={realAt - 2}>yes: significant</Marker>
@@ -250,7 +258,7 @@ export const HugeScene: React.FC = () => {
       </div>
       <Note at={percentAt + 6} x={RIGHT} y={y(ROW2) + 126}>
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-          the gap, {fmt(HUGE.gap, 2)}, over the spread, {fmt(HUGE.sd, 1)}
+          the gap, {fmt(HUGE.gap, 2)}, over the spread, <Marker at={deviationAt - 2}>{fmt(HUGE.sd, 1)}</Marker>
         </span>
       </Note>
       <Note at={smallAt - 2} x={RIGHT} y={y(ROW2) + 166}>

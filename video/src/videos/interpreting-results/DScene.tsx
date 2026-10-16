@@ -48,14 +48,21 @@ export const DScene: React.FC = () => {
   const unitsAt = n.word("one", "no units");
   const oneAt = n.word("one", "d of one");
   const fullAt = n.word("one", "one full");
+  const apartAt = n.word("one", "apart");
   const at = [n.word("labels", "zero point two"), n.word("labels", "zero point five"), n.word("labels", "zero point eight")];
+  const evenAt = n.word("overlap", "Even large");
   const overlapAt = n.word("overlap", "overlap");
+  const shareAt = n.word("overlap", "share");
   const eightAt = n.word("overlap", "zero point eight");
   const thirdsAt = n.word("overlap", "two thirds");
+  const labelsAt = n.word("stake", "labels");
   const startAt = n.word("stake", "only a start");
+  const bigAt = n.word("stake", "big");
   const stakeAt = n.word("stake", "at stake");
+  const unlikeAt = n.word("sweep-in", "unlike");
   const sizeAt = n.word("sweep-in", "size");
   const dataAt = n.word("sweep-in", "how much data");
+  const haveAt = n.word("sweep-in", "have");
   const end = n.beat("sweep-in").to;
 
   // Where B's average sits: 1, then 0.2, 0.5 and 0.8 on their words.
@@ -141,6 +148,21 @@ export const DScene: React.FC = () => {
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>standard deviations from group A&apos;s average</span>
         </Note>
 
+        <Ring x={(sx(X, 0) + sx(X, d)) / 2} y={peakY - 18} at={apartAt - 2} r0={20} r1={80} />
+        <Svg>
+          {ease(frame, shareAt - 4, 24) > 0 ? (
+            <path
+              d={shared(d, base, unit)}
+              fill="none"
+              stroke={INK}
+              strokeWidth={2.4}
+              pathLength={1}
+              strokeDasharray={`${ease(frame, shareAt - 4, 24)} 1`}
+              opacity={1 - ease(frame, startAt, 12) * 0.7}
+            />
+          ) : null}
+        </Svg>
+
         {/* The gap, and its size in the ruler's units. */}
         <Bracket x0={sx(X, 0)} x1={sx(X, d)} y={peakY - 18} at={gapAt + 2} up={false} tick={10} />
         <div
@@ -208,7 +230,7 @@ export const DScene: React.FC = () => {
       {OVERLAP.map((o, i) => {
         const rowY = y(TABLE_Y) + 56 + i * ROW;
         const lit = ease(frame, at[i] - 4, 8) * (1 - (i < 2 ? ease(frame, at[i + 1] - 4, 8) : 0));
-        const startDim = ease(frame, startAt - 4, 12) * 0.6;
+        const startDim = ease(frame, labelsAt - 4, 12) * 0.6;
         return (
           <React.Fragment key={o.d}>
             <div
@@ -252,13 +274,16 @@ export const DScene: React.FC = () => {
         );
       })}
       <Ring x={TABLE_X + COLS[2] + 34} y={y(TABLE_Y) + 56 + 2 * ROW + 24} at={thirdsAt - 2} r1={64} />
+      <Ring x={TABLE_X + COLS[1] + 50} y={y(TABLE_Y) + 56 + 2 * ROW + 24} at={evenAt - 2} r1={70} />
       <Note at={startAt - 2} x={TABLE_X} y={y(TABLE_Y) + 56 + 3 * ROW + 6}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           only a start: <Marker at={stakeAt - 2}>what&apos;s at stake</Marker> decides big
         </span>
       </Note>
-      <Spot id="interpreting-results-caliper" at={startAt} left={1620} top={y(640)} width={140} height={360} />
-      <Note at={sizeAt - 2} x={TABLE_X} y={y(TABLE_Y) + 56 + 3 * ROW + 46}>
+      <Spot id="interpreting-results-caliper" at={bigAt - 4} left={1620} top={y(640)} width={140} height={360} />
+      <Ring x={(sx(X, 0) + sx(X, d)) / 2} y={peakY - 52} at={sizeAt - 2} r0={30} r1={90} />
+      <Ring x={TABLE_X + 200} y={y(TABLE_Y) + 56 + 3 * ROW + 60} at={haveAt - 2} r0={30} r1={120} />
+      <Note at={unlikeAt - 2} x={TABLE_X} y={y(TABLE_Y) + 56 + 3 * ROW + 46}>
         <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
           and no <Marker at={dataAt - 2}>sample size</Marker> in the formula
         </span>

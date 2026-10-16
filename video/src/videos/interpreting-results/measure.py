@@ -335,8 +335,9 @@ say(f"  wander: steepest {L} months start at month {best}, {series[best]:.1f} â†
 # Forty holes, uniform over a wall 1 wide and 0.6 tall; the target is the
 # circle of radius 0.11 holding the most of them, its center searched on a
 # fine grid. Then forty more holes from the same gun, counted inside it.
-# Seed 1, the first one tried: the second volley puts 3 in the target, about
-# what chance alone predicts (2.5), so the picture is the typical case.
+# Seed 1: counting up from 1, the first seed whose second volley lands about
+# as chance predicts (3 in the target against 2.5 expected), so the picture
+# shows the typical case. Seed 1836, tried before that search, put 5 there.
 WALL = (1.0, 0.6)
 RADIUS = 0.11
 shots_rng = np.random.default_rng(1)

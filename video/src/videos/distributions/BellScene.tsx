@@ -60,7 +60,9 @@ export const BellScene: React.FC = () => {
   const py = (rows: number) => base - rows * pitch - R * 0.2;
   const curve = curveD(rowsAt, 172, 210, X, py);
   const mx = sx(X, PENGUINS.mean);
-  const sdY = py(rowsAt(PENGUINS.mean + PENGUINS.sd)) - h(26);
+  const topRow = Math.ceil(Math.max(...PENGUINS.counts) / PER_ROW);
+  const labelY = base - topRow * pitch - h(50);
+  const sdY = base + h(64);
   const glow = pulse(frame, everyAt - 4, 26);
 
   return (
@@ -112,19 +114,19 @@ export const BellScene: React.FC = () => {
         </Note>
 
         <Curve d={curve} at={bellAt - 6} dur={30} color={ASK} width={lerp(3.2, 5, glow)} />
-        <Note at={bellAt + 6} x={sx(X, 199)} y={py(rowsAt(199)) - 46}>
+        <Note at={bellAt + 6} x={sx(X, 203.5)} y={base - h(150)}>
           <span style={{ ...note(23, ASK), fontWeight: 700, whiteSpace: "nowrap", ...halo }}>a normal, fitted to them</span>
         </Note>
 
-        <VRule x={mx} bottom={base} top={py(rowsAt(PENGUINS.mean)) - h(70)} at={meanAt - 4} />
-        <Note at={ninetyAt - 2} x={mx + 14} y={py(rowsAt(PENGUINS.mean)) - h(76)}>
+        <VRule x={mx} bottom={base} top={labelY - 6} at={meanAt - 4} />
+        <Note at={ninetyAt - 2} x={mx + 14} y={labelY - 10}>
           <span style={{ ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap", ...halo }}>mean {fmt(PENGUINS.mean, 1)} mm</span>
         </Note>
-        <Note at={twoAt} x={mx - 14} y={py(rowsAt(PENGUINS.mean)) - h(76)} align="right">
+        <Note at={twoAt} x={mx - 14} y={labelY - 10} align="right">
           <span style={{ ...note(22, INK), whiteSpace: "nowrap", ...halo }}>two numbers set it:</span>
         </Note>
-        <Bracket x0={sx(X, PENGUINS.mean)} x1={sx(X, PENGUINS.mean + PENGUINS.sd)} y={sdY} at={sdAt - 2} color={INK} />
-        <Note at={halfAt - 4} x={sx(X, PENGUINS.mean + PENGUINS.sd) + 16} y={sdY - 16}>
+        <Bracket x0={sx(X, PENGUINS.mean)} x1={sx(X, PENGUINS.mean + PENGUINS.sd)} y={sdY} at={sdAt - 2} color={INK} up />
+        <Note at={halfAt - 4} x={sx(X, PENGUINS.mean + PENGUINS.sd) + 16} y={sdY - 14}>
           <span style={{ ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap", ...halo }}>standard deviation {fmt(PENGUINS.sd, 1)} mm</span>
         </Note>
       </Drift>

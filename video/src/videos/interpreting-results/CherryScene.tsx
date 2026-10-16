@@ -35,11 +35,14 @@ export const CherryScene: React.FC = () => {
 
   // ── Cues ──
   const yearsAt = n.word("cherry", "ten years");
+  const endedAt = n.word("cherry", "ended");
   const startedAt = n.word("cherry", "started");
   const steepAt = n.word("window", "steep stretch");
   const fourAt = n.word("window", "four months");
   const pctAt = n.word("window", "twenty-five percent");
   const showAt = n.word("crop", "Show");
+  const thoseAt = n.word("crop", "those months");
+  const everyAt = n.word("crop", "every number");
   const realAt = n.word("crop", "real");
   const falseAt = n.word("crop", "false");
   const end = n.beat("crop").to;
@@ -138,9 +141,10 @@ export const CherryScene: React.FC = () => {
           </span>
         </Note>
         <Ring x={px(WANDER.end)} y={py(S[WANDER.end])} at={pctAt - 2} />
+        <Ring x={px(S.length - 1)} y={py(S[S.length - 1])} at={endedAt - 2} color={DATA} />
 
         {/* ── The four months alone, from zero ── */}
-        <Ink at={showAt - 6} dur={12} style={{ left: 160, top: y(640), whiteSpace: "nowrap" }}>
+        <Ink at={thoseAt - 4} dur={12} style={{ left: 160, top: y(640), whiteSpace: "nowrap" }}>
           <span style={label(24, INK)}>The same four months, on their own</span>
         </Ink>
         <Svg opacity={ease(frame, showAt - 4, 10)}>
@@ -169,7 +173,7 @@ export const CherryScene: React.FC = () => {
             >
               {MONTH[(WANDER.start + i) % 12]}
             </div>
-            <Note at={realAt - 6 + i * 3} x={ZX[i] + ZW / 2} y={zbase - h(S[WANDER.start + i] * ZUNIT) - 36} from="up">
+            <Note at={everyAt - 4 + i * 4} x={ZX[i] + ZW / 2} y={zbase - h(S[WANDER.start + i] * ZUNIT) - 36} from="up">
               <span style={{ ...note(22, INK), fontWeight: 650, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
                 {fmt(S[WANDER.start + i], 0)}
               </span>

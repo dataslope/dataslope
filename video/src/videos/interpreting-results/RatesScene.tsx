@@ -8,7 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CI, RATES } from "./data";
-import { DATA, DATA_INK, Drift, Headline, lerp, Marker, STAT, STAT_INK, Svg } from "./parts";
+import { DATA, DATA_INK, Drift, Headline, lerp, Marker, Ring, STAT, STAT_INK, Svg } from "./parts";
 
 /** Conversion, 0 to 5%. */
 const RX: XScale = { lo: 0, hi: 0.05, x0: 420, x1: 1300 };
@@ -32,10 +32,18 @@ export const RatesScene: React.FC = () => {
   const from = n.beat("rates").from;
 
   // ── Cues ──
+  const buttonAt = n.word("rates", "button");
   const threeAt = n.word("rates", "three percent");
   const fourAt = n.word("rates", "four point two");
   const fortyAt = n.word("relative", "forty percent");
   const pointsAt = n.word("relative", "one point two");
+  const ppAt = n.word("relative", "percentage points");
+  const firstAt = n.word("both", "The first");
+  const readerAt = n.word("both", "reader");
+  const everyAt = n.word("interval", "every");
+  const sizeAt = n.word("interval", "effect size");
+  const plausiblyAt = n.word("interval", "plausibly");
+  const anywhereAt = n.word("interval", "anywhere");
   const biggerAt = n.word("both", "bigger");
   const bothAt = n.word("both", "Report both");
   const intervalAt = n.word("interval", "interval");
@@ -46,12 +54,14 @@ export const RatesScene: React.FC = () => {
   const preciseAt = n.word("trio", "how precise");
   const allAt = n.word("trio", "there at all");
   const reportAt = n.word("trio", "all three");
+  const butAt = n.word("part2-in", "But");
+  const meanAt = n.word("part2-in", "mean");
   const seemsAt = n.word("part2-in", "seems");
 
   const rates = [RATES.pControl, RATES.pTreatment];
   const grow = [ease(frame, threeAt - 6, 16), ease(frame, fourAt - 6, 16)];
   const extra = ease(frame, pointsAt - 4, 12);
-  const ci = ease(frame, oneAt - 6, 26);
+  const ci = ease(frame, plausiblyAt - 4, Math.max(10, oneAt - plausiblyAt + 4));
   const ciY = y(CI_Y);
   const trio = [
     { q: "How big", a: `d = ${fmt(CI.d, 2)}`, at: bigAt },
@@ -79,13 +89,22 @@ export const RatesScene: React.FC = () => {
       />
       <Headline
         top={y(150)}
+        out={meanAt - 6}
         parts={[
           { text: "Size, with an interval,", at: intervalAt - 2 },
           { text: "and the p-value.", at: allAt - 4, italic: true },
         ]}
       />
 
-      <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.5 * ease(frame, intervalAt - 6, 16) }}>
+      <Headline
+        top={y(150)}
+        parts={[
+          { text: "But what does it", at: meanAt - 4 },
+          { text: "mean?", at: seemsAt - 4, italic: true },
+        ]}
+      />
+
+      <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.5 * ease(frame, everyAt - 4, 16) }}>
         <FigLabel n="4" title="Conversion, old checkout button and new" at={from - 4} x={160} y={y(268)} />
         {/* Gridlines at each percent. */}
         <Svg opacity={ease(frame, from, 14)}>
@@ -123,7 +142,7 @@ export const RatesScene: React.FC = () => {
           const counts = i ? RATES.treatment : RATES.control;
           return (
             <React.Fragment key={t}>
-              <Ink at={(i ? fourAt : threeAt) - 8} dur={12} style={{ left: 160, top: top + 10, whiteSpace: "nowrap" }}>
+              <Ink at={buttonAt - 4 + i * 5} dur={12} style={{ left: 160, top: top + 10, whiteSpace: "nowrap" }}>
                 <span style={label(24, INK)}>{t}</span>
               </Ink>
               <Svg>
@@ -164,9 +183,18 @@ export const RatesScene: React.FC = () => {
         <Note at={pointsAt - 2} x={SAY_X} y={y(BAR_Y[1]) - 2}>
           <div style={label(21, INK_SOFT)}>absolute</div>
           <div style={{ ...note(32, STAT_INK), fontWeight: 700, marginTop: 6, whiteSpace: "nowrap" }}>
-            +{fmt(RATES.difference * 100, 1)} points
+            <Marker at={ppAt + 4}>+{fmt(RATES.difference * 100, 1)} points</Marker>
           </div>
         </Note>
+        <Ring x={SAY_X + 50} y={y(BAR_Y[0]) + 22} at={firstAt - 2} r0={30} r1={100} />
+        <Svg opacity={ease(frame, readerAt - 4, 12)}>
+          <path
+            d={`M${SAY_X - 22},${y(BAR_Y[0]) - 24} L${SAY_X - 34},${y(BAR_Y[0]) - 24} L${SAY_X - 34},${y(BAR_Y[1]) + 76} L${SAY_X - 22},${y(BAR_Y[1]) + 76}`}
+            fill="none"
+            stroke={INK}
+            strokeWidth={2.2}
+          />
+        </Svg>
         <Note at={bothAt - 2} x={SAY_X} y={y(BAR_Y[1]) + 104}>
           <span style={{ ...body(32, true), color: INK, whiteSpace: "nowrap" }}>
             <Marker at={bothAt + 4}>report both</Marker>
@@ -175,9 +203,9 @@ export const RatesScene: React.FC = () => {
       </div>
 
       {/* ── The effect size with its interval ── */}
-      <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.45 * ease(frame, seemsAt - 8, 18) }}>
+      <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.45 * ease(frame, butAt - 4, 18) }}>
       <Drift from={reportAt} to={n.beat("part2-in").to + 40} amount={0.02} origin={[960, 760]}>
-        <FigLabel n="5" title="An effect size and its 95% interval" at={intervalAt - 4} x={160} y={y(612)} />
+        <FigLabel n="5" title="An effect size and its 95% interval" at={sizeAt - 4} x={160} y={y(612)} />
         <Svg opacity={ease(frame, intervalAt, 14)}>
           <line x1={DX.x0} x2={DX.x1} y1={ciY + 0.5} y2={ciY + 0.5} stroke={INK} strokeWidth={1.6} />
           {[0, 0.2, 0.4, 0.6, 0.8].map((v) => (
@@ -206,7 +234,7 @@ export const RatesScene: React.FC = () => {
           {ci > 0 ? (
             <line
               x1={lerp(sx(DX, CI.d), sx(DX, CI.lo), ci)}
-              x2={lerp(sx(DX, CI.d), sx(DX, CI.hi), ease(frame, sixAt - 6, 18))}
+              x2={lerp(sx(DX, CI.d), sx(DX, CI.hi), ease(frame, anywhereAt - 4, Math.max(10, sixAt - anywhereAt + 4)))}
               y1={ciY - 34}
               y2={ciY - 34}
               stroke={STAT}

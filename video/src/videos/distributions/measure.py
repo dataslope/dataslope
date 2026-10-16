@@ -354,7 +354,7 @@ out["range"] = {
     "loc": r(loc),
     "scale": r(scale),
     "near": 100,
-    "sfNear": r(fitted.sf(100)),
+    "sfNear": r(fitted.sf(100), 5),
     "dataAboveNear": int(np.sum(data > 100)),
     "far": 200,
     "sfFar": float(f"{far:.3e}"),

@@ -181,7 +181,7 @@ export const script: NarrationScript = {
       id: "admit",
       scene: true,
       take: true,
-      text: "Berkeley's 1973 graduate admissions are the famous case. Here's the pattern in two departments.",
+      text: "Berkeley's nineteen seventy-three graduate admissions are the famous case. Here's the pattern in two departments.",
       pauseAfter: 0.35,
     },
     {

@@ -54,6 +54,11 @@ export const SweepScene: React.FC = () => {
   const zeroAt = n.word("plunge", "prints as zero");
   const dAt = n.word("settle", "d");
   const nearAt = n.word("settle", "near");
+  const threeAt = n.word("settle", "zero point three");
+  const sizeAt = n.word("world", "effect size");
+  const pWorldAt = n.word("world", "p-value");
+  const outcomeAt = n.word("rates-in", "outcome");
+  const sizeEndAt = n.word("rates-in", "size");
   const worldAt = n.word("world", "the world");
   const andAt = n.word("world", "AND");
   const sampleAt = n.word("world", "sample");
@@ -86,6 +91,7 @@ export const SweepScene: React.FC = () => {
 
       <Headline
         top={y(150)}
+        out={twoAt - 4}
         parts={[
           { text: "More data:", at: from - 6 },
           { text: "the p-value falls, d holds.", at: plungesAt - 8, italic: true },
@@ -93,7 +99,7 @@ export const SweepScene: React.FC = () => {
       />
 
       {/* The figure steps back as the narration turns to rates. */}
-      <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.45 * ease(frame, twoAt - 6, 18) }}>
+      <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.45 * ease(frame, outcomeAt - 4, 18) }}>
       <Drift from={sampleAt} to={end + 30} amount={0.02} origin={[960, 620]}>
         <FigLabel n="3" title={`A true d of ${fmt(SWEEP.trueD, 1)}, at five sample sizes`} at={from - 4} x={160} y={y(258)} />
 
@@ -229,11 +235,14 @@ export const SweepScene: React.FC = () => {
           );
         })}
         <Ring x={dPts[4][0]} y={dPts[4][1]} at={nearAt - 2} color={DATA} r1={52} />
+        <Ring x={pPts[2][0]} y={pPts[2][1]} at={andAt - 2} r1={60} />
+        <Ring x={dPts[4][0]} y={dPts[4][1]} at={sizeEndAt - 2} color={DATA} r1={70} />
         <Ring x={finalP[0]} y={bottom - 6} at={zeroAt + 4} r1={44} />
-        <Note at={andAt - 2} x={P.x0 + 24} y={bottom - 50}>
+        <Dashed x0={D.x0} y0={dY(SWEEP.trueD)} x1={D.x1} y1={dY(SWEEP.trueD)} at={threeAt - 4} dur={16} width={4.4} color={DATA} />
+        <Note at={pWorldAt - 2} x={P.x0 + 24} y={bottom - 50}>
           <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>moves with n</span>
         </Note>
-        <Note at={worldAt} x={D.x0 + 24} y={dY(0.08)}>
+        <Note at={sizeAt - 2} x={D.x0 + 24} y={dY(0.08)}>
           <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>stays put</span>
         </Note>
       </Drift>

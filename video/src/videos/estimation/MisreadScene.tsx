@@ -32,6 +32,10 @@ export const MisreadScene: React.FC = () => {
   // ── Cues ──
   const misreadFrom = n.beat("misread").from;
   const chanceAt = n.word("misread", "chance");
+  const ninetyFiveAt = n.word("misread", "ninety-five");
+  const insideAt = n.word("data", "inside");
+  const spendInsideAt = n.word("eleven", "inside");
+  const pinsAt = n.word("eleven", "pins");
   const thisAt = n.word("misread", "this interval");
   const neverAt = n.word("fixed", "never");
   const movesAt = n.word("fixed", "moves");
@@ -81,7 +85,10 @@ export const MisreadScene: React.FC = () => {
         misreadFrom - 4,
         neverAt - 2,
         <>
-          “A 95%{" "}
+          “A{" "}
+          <Marked at={ninetyFiveAt - 2} color={HIGHLIGHT} out={neverAt}>
+            95%
+          </Marked>{" "}
           <Marked at={chanceAt - 2} color={HIGHLIGHT} out={neverAt}>
             chance
           </Marked>{" "}
@@ -159,8 +166,23 @@ export const MisreadScene: React.FC = () => {
             />
           );
         })}
+        {USERS.values.map((v, j) => {
+          const ring = inside(v) ? pulse(frame, spendInsideAt - 4 + j * 0.3, 18) : 0;
+          if (ring <= 0) return null;
+          return (
+            <circle key={`r${j}`} cx={sx(WIDE, v)} cy={y(ROWS[1] + 90) + (JIT[j] - 0.5) * 50} r={12} fill="none" stroke={EST} strokeWidth={2.2} opacity={ring} />
+          );
+        })}
       </Svg>
-      <IntervalBar x0={sx(WIDE, USERS.lo)} x1={sx(WIDE, USERS.hi)} y={y(ROWS[1] + 36)} at={dataAt - 4} color={INK} width={3.4} tick={10} />
+      <IntervalBar
+        x0={sx(WIDE, USERS.lo)}
+        x1={sx(WIDE, USERS.hi)}
+        y={y(ROWS[1] + 36)}
+        at={insideAt - 4}
+        color={INK}
+        width={3.4 + 2.4 * pulse(frame, pinsAt - 2, 18)}
+        tick={10}
+      />
       <Note at={elevenAt} x={sx(WIDE, USERS.hi) + 16} y={y(ROWS[1] + 20)}>
         <span style={{ ...note(22, INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>
           the interval: {USERS.insideCi} of {USERS.n} inside

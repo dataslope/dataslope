@@ -58,6 +58,8 @@ export const RateScene: React.FC = () => {
   const sixteenAt = n.word("rate-ci", "sixteen");
   const nineteenAt = n.word("rate-ci", "nineteen");
   const answerAt = n.word("test-in", "answer");
+  const testInFrom = n.beat("test-in").from;
+  const percentAt = n.word("rate-ci", "percent");
   const testAt = n.word("test-in", "test");
 
   const pct = (v: number) => `${fmt(v * 100, 1)}%`;
@@ -74,7 +76,7 @@ export const RateScene: React.FC = () => {
       <Sfx name="el-pencil" at={itselfAt - 4} level={-34} />
       <Sfx name="el-whoosh" at={stepAt} level={-33} />
 
-      <Headline at={rateFrom - 4} second={convertAt - 4} out={answerAt - 6} size={64} italic="an interval too.">
+      <Headline at={rateFrom - 4} second={convertAt - 4} out={testInFrom - 4} size={64} italic="an interval too.">
         A rate gets
       </Headline>
       <Headline at={answerAt - 2} second={testAt - 6} size={64} italic="a test.">
@@ -162,6 +164,11 @@ export const RateScene: React.FC = () => {
       </Svg>
       <Note at={sixteenAt - 2} x={px(RATE.lo) - 14} y={y(BAR_Y) - 16} align="right" from="right">
         <span style={{ ...note(26, INK), fontWeight: 700, ...halo }}>{pct(RATE.lo)}</span>
+      </Note>
+      <Note at={percentAt - 2} x={(COL + 1760) / 2} y={y(AXIS) + 84} from="up">
+        <span style={{ ...note(22, INK), fontWeight: 650, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+          a 95% interval for the true rate
+        </span>
       </Note>
       <Note at={nineteenAt - 2} x={px(RATE.hi) + 14} y={y(BAR_Y) - 16}>
         <span style={{ ...note(26, INK), fontWeight: 700, ...halo }}>{pct(RATE.hi)}</span>

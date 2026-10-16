@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, Bars, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, HAIRLINE, halo, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, HAIRLINE, halo, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { histogram, jitter, MEDIAN } from "./data";
-import { DATA, EST, EST_INK, Headline, IntervalBar, Rule, Slot, Strike, Svg } from "./parts";
+import { DATA, EST, EST_INK, Headline, IntervalBar, Marked, Rule, Slot, Strike, Svg } from "./parts";
 
 /** Fig. 9: the incomes, in thousands of dollars. */
 const X: XScale = { lo: 0, hi: 140, x0: 160, x1: 1760 };
@@ -53,6 +53,9 @@ export const MedianScene: React.FC = () => {
   const lumpyAt = n.word("lumpy", "lumpy");
   const sawAt = n.word("lumpy", "values you actually saw");
   const middleAt = n.word("range", "middle");
+  const meanWordAt = n.word("word", "mean");
+  const rangeFiveAt = n.word("range", "ninety-five");
+  const neededEndAt = n.word("range", "needed", { edge: "end" });
   const thirtyAt = n.word("range", "thirty thousand");
   const thirtySevenAt = n.word("range", "thirty-seven");
   const formulaAt = n.word("range", "No formula");
@@ -106,7 +109,9 @@ export const MedianScene: React.FC = () => {
           </Strike>
         </Slot>
         <Slot at={medianWordAt - 4} style={{ color: EST_INK, fontWeight: 700 }}>
-          median
+          <Marked at={meanWordAt - 2} color={HIGHLIGHT}>
+            median
+          </Marked>
         </Slot>
       </div>
 
@@ -173,7 +178,13 @@ export const MedianScene: React.FC = () => {
       </div>
       <Ink at={formulaAt - 4} dur={16} style={{ left: COL, top: y(818), whiteSpace: "nowrap" }}>
         <span style={{ ...body(30, true), color: EST_INK }}>No formula needed.</span>
+        <div style={{ height: 3, marginTop: 4, background: EST, width: `${100 * ease(frame, neededEndAt - 2, 18)}%`, borderRadius: 2 }} />
       </Ink>
+      <Note at={rangeFiveAt - 2} x={(sx(XZ, K(MEDIAN.lo)) + sx(XZ, K(MEDIAN.hi))) / 2} y={y(HIST_BASE) - h(HIST_H) - 76} from="up">
+        <span style={{ ...note(22, INK), fontWeight: 650, ...halo, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+          the middle 95%
+        </span>
+      </Note>
     </AbsoluteFill>
   );
 };

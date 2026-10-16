@@ -162,7 +162,7 @@ export const ExtentScene: React.FC = () => {
         {/* Above a hundred: an answer the data can check. */}
         <Note at={fourAt - 6} x={nearX + 14} y={base - h(TALL - 30)}>
           <div style={{ ...askNote(26), whiteSpace: "nowrap", ...halo }}>
-            above {RANGE.near}: <Count at={fourAt - 6} dur={14} to={RANGE.sfNear * 100} suffix="%" />
+            above {RANGE.near}: <Count at={fourAt - 6} dur={14} to={RANGE.sfNear * 100} digits={2} suffix="%" />
           </div>
           <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, backAt - 2, 10), ...halo }}>
             {RANGE.dataAboveNear} of the {RANGE.n} values are up there

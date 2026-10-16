@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { ease } from "../../components/motion";
+import { ease, map } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
 import { BAR, body, fmt, halo, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
@@ -59,8 +59,12 @@ export const PeekScene: React.FC = () => {
   const rows = PEEKING.rows;
   const pts = rows.map((r) => [sx(X, r.n), py(r.p)] as const);
   const last = rows.length - 1;
-  const firstLeg = ease(frame, recomputeAt - 2, Math.max(20, twiceAt - recomputeAt - 4));
-  const secondLeg = ease(frame, plannedAt - 10, Math.max(16, nineteenAt - plannedAt + 6));
+  // Visitors arrive at a steady rate, so the line draws linearly.
+  const legOne = Math.max(20, twiceAt - recomputeAt - 4);
+  const firstLeg = map(frame, [recomputeAt - 2, recomputeAt - 2 + legOne], [0, 1]);
+  const secondLeg = map(frame, [plannedAt - 10, plannedAt - 10 + Math.max(16, nineteenAt - plannedAt + 6)], [0, 1]);
+  /** The frame the drawn line reaches row `i` on its first leg. */
+  const reachAt = (i: number) => recomputeAt - 2 + (i / (LAST_UNDER + 2)) * legOne;
   const reach = lerp(0, LAST_UNDER + 2, firstLeg) + (last - LAST_UNDER - 2) * secondLeg;
   const shownN = rows[Math.min(last, Math.floor(reach))].n;
   const dimBefore = ease(frame, onceAt - 4, 14);
@@ -77,8 +81,8 @@ export const PeekScene: React.FC = () => {
       {/* ── Sound: the users counting up, the line wandering, each dip, the plan ── */}
       <Sfx name="el-sprinkle" at={threeAt - 4} level={-34} />
       <Sfx name="el-pencil" at={recomputeAt - 2} level={-34} />
-      <Sfx name="el-tap" at={recomputeAt - 2 + (FIRST / (LAST_UNDER + 2)) * Math.max(20, twiceAt - recomputeAt - 4)} level={-28} />
-      <Sfx name="el-tap" at={recomputeAt - 2 + (SECOND / (LAST_UNDER + 2)) * Math.max(20, twiceAt - recomputeAt - 4)} level={-29} />
+      <Sfx name="el-tap" at={reachAt(FIRST)} level={-28} />
+      <Sfx name="el-tap" at={reachAt(SECOND)} level={-29} />
       <Sfx name="el-pop" at={nineteenAt - 2} level={-30} />
 
       <Headline lead="How many users?" turn="Decide now." at={sizeFrom - 6} turnAt={perArmAt - 4} out={peekAt - 6} />
@@ -213,8 +217,10 @@ export const PeekScene: React.FC = () => {
           {secondLeg >= 1 ? <circle cx={pts[last][0]} cy={pts[last][1]} r={8} fill={INK} stroke={PAPER} strokeWidth={2} /> : null}
         </Svg>
       ) : null}
+      {/* Each dip, as the line first reaches it, and the first again when it is named. */}
+      <Ring x={pts[FIRST][0]} y={pts[FIRST][1]} at={reachAt(FIRST)} r1={40} />
+      <Ring x={pts[SECOND][0]} y={pts[SECOND][1]} at={reachAt(SECOND)} r1={40} />
       <Ring x={pts[FIRST][0]} y={pts[FIRST][1]} at={firstDipAt - 2} r1={56} />
-      <Ring x={pts[SECOND][0]} y={pts[SECOND][1]} at={twiceAt - 6} r1={56} />
       <Leader
         points={[
           [pts[FIRST][0], py(0.47)],

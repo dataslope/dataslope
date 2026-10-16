@@ -145,15 +145,15 @@ export const ZScene: React.FC = () => {
           <div style={{ position: "absolute", left: 96, top: zY + 10, opacity: ease(frame, zScoreAt, 14), ...label(21, INK_SOFT) }}>z</div>
 
           {/* Thirty points: two steps of fifteen. */}
-          <Bracket x0={zx(0)} x1={x130} y={py(pdf(x)) - h(54)} at={thirtyAt - 4} color={ASK} up />
-          <Note at={thirtyAt} x={(zx(0) + x130) / 2} y={py(pdf(x)) - h(54) - 40} style={{ transform: "translateX(-50%)" }}>
+          <Bracket x0={zx(0)} x1={x130} y={py(pdf(mu)) - h(30)} at={thirtyAt - 4} color={ASK} up />
+          <Note at={thirtyAt} x={(zx(0) + x130) / 2} y={py(pdf(mu)) - h(30) - 40} style={{ transform: "translateX(-50%)" }}>
             <span style={{ ...askNote(23), whiteSpace: "nowrap", ...halo }}>
               {x - mu} points<span style={{ opacity: ease(frame, twoSdAt - 4, 10) }}>, two steps of {sigma}</span>
             </span>
           </Note>
           <Svg opacity={ease(frame, twoSdAt - 4, 12)}>
             {[0, 1, 2].map((k) => (
-              <line key={k} x1={zx(k)} x2={zx(k)} y1={py(pdf(x)) - h(54)} y2={py(pdf(x)) - h(54) + 14} stroke={ASK} strokeWidth={2.2} />
+              <line key={k} x1={zx(k)} x2={zx(k)} y1={py(pdf(mu)) - h(30)} y2={py(pdf(mu)) - h(30) + 14} stroke={ASK} strokeWidth={2.2} />
             ))}
           </Svg>
 

@@ -28,7 +28,9 @@ export const BerksonScene: React.FC = () => {
 
   // ── Cues ──
   const populationAt = n.word("berkson", "population");
+  const relationshipAt = n.word("berkson", "relationship");
   const abilityAt = n.word("berkson", "ability");
+  const addAt = n.word("rule", "add up");
   const unrelatedAt = n.word("berkson", "unrelated");
   const admitAt = n.word("rule", "admit");
   const barAt = n.word("rule", "bar");
@@ -113,7 +115,7 @@ export const BerksonScene: React.FC = () => {
         {axes(ALL, from - 4, "Everyone", DATA_INK, unrelatedAt - 4, <>r = {signed(BERKSON.rAll)}</>)}
         {axes(
           IN,
-          getInAt - 10,
+          relationshipAt - 4,
           "Admitted only",
           STAT_INK,
           getInAt - 4,
@@ -126,7 +128,7 @@ export const BerksonScene: React.FC = () => {
         {/* The bar: ability plus interview of 112 or more gets in. */}
         <Dashed x0={c0[0]} y0={c0[1]} x1={c1[0]} y1={c1[1]} at={barAt - 6} dur={16} color={INK} width={2.4} />
         <Dashed x0={d0[0]} y0={d0[1]} x1={d1[0]} y1={d1[1]} at={getInAt - 6} dur={12} color={INK_SOFT} width={1.6} />
-        <Note at={barAt} x={c1[0] - 10} y={c1[1] + 18} align="right">
+        <Note at={addAt - 2} x={c1[0] - 10} y={c1[1] + 18} align="right">
           <span style={{ ...note(20, INK), fontWeight: 600, whiteSpace: "nowrap", background: PAPER, padding: "0 4px" }}>sum ≥ {BERKSON.bar}</span>
         </Note>
 

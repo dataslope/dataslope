@@ -53,6 +53,11 @@ export const CoverageScene: React.FC = () => {
   const sameAt = n.word("unlucky", "same");
   const unluckyAt = n.word("unlucky", "unlucky");
   const recipeAt = n.word("recipe", "recipe");
+  const recipeFrom = n.beat("recipe").from;
+  const firstNinetyFiveAt = n.word("recipe", "ninety-five");
+  const drewAt = n.word("unlucky", "drew");
+  const everyoneAt = n.word("wrong-in", "everyone");
+  const wrongEndAt = n.word("wrong-in", "wrong", { edge: "end" });
   const againAndAt = n.word("recipe", "again and again");
   const ninetyFiveAt = n.word("recipe", "ninety-five", { nth: 2 });
   const truthAt = n.word("recipe", "truth");
@@ -105,10 +110,10 @@ export const CoverageScene: React.FC = () => {
       <Headline at={coverageFrom - 4} second={godAt + 6} out={ninetyFourAt - 8} size={64} italic="the truth is known.">
         Play god:
       </Headline>
-      <Headline at={ninetyFourAt - 4} second={sixAt - 4} out={recipeAt - 8} size={64} italic="Six miss.">
+      <Headline at={ninetyFourAt - 4} second={sixAt - 4} out={recipeFrom - 6} size={64} italic="Six miss.">
         Ninety-four catch it.
       </Headline>
-      <Headline at={recipeAt - 4} second={recipeAt + 8} size={64} italic="the recipe.">
+      <Headline at={firstNinetyFiveAt - 4} second={recipeAt - 4} size={64} italic="the recipe.">
         The 95% describes
       </Headline>
 
@@ -150,7 +155,7 @@ export const CoverageScene: React.FC = () => {
           const b = lerp(mid, sx(XI, iv.hi), p);
           const miss = !iv.covers;
           const mine = i === YOURS;
-          const lit = miss ? 1 + 0.8 * pulse(frame, sameAt - 2, 20) : mine ? 1 + 0.6 * pulse(frame, oneAt - 2, 20) : 1;
+          const lit = miss ? 1 + 0.8 * (pulse(frame, sameAt - 2, 20) + pulse(frame, drewAt - 2, 20)) : mine ? 1 + 0.6 * pulse(frame, oneAt - 2, 20) : 1;
           // Before "miss" every line is ink; after, the misses take the accent.
           // Once the truth is hidden, every line goes back to ink: you can't
           // see which yours is.
@@ -232,8 +237,9 @@ export const CoverageScene: React.FC = () => {
       <Ink at={sentenceAt - 4} dur={18} style={{ left: COL, top: y(700), width: 430 }}>
         <span style={{ ...body(32, true), color: INK }}>
           “A 95% chance it’s in{" "}
-          <span style={{ color: EST_INK, opacity: ease(frame, wrongAt - 2, 10) }}>this</span> one”?
+          <span style={{ color: EST_INK, opacity: ease(frame, everyoneAt - 2, 10) }}>this</span> one”?
         </span>
+        <div style={{ height: 3, marginTop: 4, background: EST, width: `${100 * ease(frame, wrongEndAt - 2, 18)}%`, borderRadius: 2, opacity: ease(frame, wrongAt - 2, 4) }} />
       </Ink>
       {/* Keep the stack from going still while "truth" lands. */}
       <Svg opacity={pulse(frame, truthAt - 2, 22) * (1 - hidden)}>

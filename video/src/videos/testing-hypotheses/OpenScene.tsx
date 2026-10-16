@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, HIGHLIGHT, INK, INK_SOFT, note, PAPER } from "../../editorial/style";
+import { body, fmt, INK, INK_SOFT, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -160,7 +160,7 @@ export const OpenScene: React.FC = () => {
             y={y(NEW_Y) - h(BAR_H) / 2 - 4 * gapPulse}
             width={newEnd - oldEnd}
             height={h(BAR_H) + 8 * gapPulse}
-            fill={HIGHLIGHT}
+            fill={STAT}
             opacity={gapGlow}
           />
         ) : null}
@@ -207,10 +207,12 @@ export const OpenScene: React.FC = () => {
           </Label>
         </span>
       </Note>
-      <Note at={noDiffAt + 2} x={oldEnd - 14} y={y(NEW_Y) + h(BAR_H) / 2 + 40} align="right">
-        <Label size={21} color={INK_SOFT}>
-          if there were no difference
-        </Label>
+      <Note at={noDiffAt + 2} x={oldEnd} y={y(OLD_Y) - h(BAR_H) / 2 - 46} from="up">
+        <span style={{ display: "inline-block", transform: "translateX(-50%)" }}>
+          <Label size={21} color={INK_SOFT}>
+            if there were no difference
+          </Label>
+        </span>
       </Note>
 
       {/* The question, as the lesson puts it. */}

@@ -33,7 +33,8 @@ const X: XScale = { lo: 4000, hi: 11000, x0: 800, x1: 1760 };
 const STRIP = 440;
 const AXIS = 520;
 /** Zoomed in on the claim: where an average of forty would land if it held. */
-const Z: XScale = { lo: 7100, hi: 8900, x0: 800, x1: 1760 };
+/** Centred on the same x as Fig. 3's 8,000, so the claim lines up across the two. */
+const Z: XScale = { lo: 7100, hi: 8900, x0: 909, x1: 1789 };
 const Z_BASE = 800;
 const Z_PEAK = 150;
 

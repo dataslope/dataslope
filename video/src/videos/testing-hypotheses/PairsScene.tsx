@@ -17,8 +17,8 @@ const TOP = 340;
 const BOTTOM = 820;
 const COL = [360, 700];
 const SPREAD = 110;
-/** The changes, before minus after: 0 to 16 mmHg. */
-const D: XScale = { lo: 0, hi: 16, x0: 1080, x1: 1740 };
+/** The changes, before minus after: 0 to 20 mmHg (the largest is 16.7). */
+const D: XScale = { lo: 0, hi: 20, x0: 1080, x1: 1740 };
 const D_STRIP = 560;
 const D_AXIS = 640;
 
@@ -162,7 +162,7 @@ export const PairsScene: React.FC = () => {
 
         {/* ── Fig. 16: the changes alone ── */}
         <FigLabel n="16" title="Each patient's own change, before minus after" at={ownAt + 4} x={D.x0} y={y(400)} />
-        <Axis scale={D} base={y(D_AXIS)} ticks={[0, 4, 8, 12, 16]} at={ownAt + 6} />
+        <Axis scale={D} base={y(D_AXIS)} ticks={[0, 5, 10, 15, 20]} at={ownAt + 6} />
         <Note at={ownAt + 10} x={D.x1} y={y(D_AXIS) + 40} align="right">
           <Label size={21} color={INK_SOFT} weight={520}>
             mmHg

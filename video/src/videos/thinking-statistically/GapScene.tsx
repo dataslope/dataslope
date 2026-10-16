@@ -8,7 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { GAPS, jitter } from "./data";
-import { DOT, Kicker, lerp, STAT, STAT_INK, Svg, TruthLine } from "./parts";
+import { Bell, DOT, Kicker, lerp, Mark, pulse, STAT, STAT_INK, Svg, TruthLine } from "./parts";
 
 /** The raw values: every score in every draw lies inside 10 to 90. */
 const X: XScale = { lo: 10, hi: 90, x0: 300, x1: 1180 };
@@ -47,21 +47,31 @@ export const GapScene: React.FC = () => {
   const betterAt = n.word("better", "better");
   const sameFrom = n.beat("same").from;
   const sameAt = n.word("same", "same");
+  const bothAt = n.word("same", "Both groups");
   const processAt = n.word("same", "process");
+  const noRealAt = n.word("same", "no real");
   const againAt = n.word("again", "again");
+  const aheadAt = n.word("again", "A comes");
   const sevenAt = n.word("again", "one");
+  const againMoreAt = n.word("more", "Again");
   const twoAt = n.word("more", "two");
   const threeAt = n.word("more", "three");
   const oneAt = n.word("more", "one");
+  const fiveAt = n.word("free", "Five draws");
   const neverAt = n.word("free", "never");
   const zeroAt = n.word("free", "zero");
+  const diffsAt = n.word("free", "differences");
+  const believeAt = n.word("luck", "believe");
+  const askAt = n.word("luck", "ask");
   const couldAt = n.word("luck", "could");
+  const onlyAt = n.word("trend-in", "only gaps");
 
-  // When each draw's dots arrive, and when its gap bar grows.
+  // When each draw's dots arrive, and when its gap bar grows. The third draw
+  // is made on "Again", and its gap read out on "two".
   const draws = [
     { s: groupsAt - 4, bar: halfAt - 2 },
     { s: againAt - 2, bar: sevenAt - 4 },
-    { s: twoAt - 12, bar: twoAt - 2 },
+    { s: againMoreAt - 2, bar: twoAt - 2 },
     { s: threeAt - 12, bar: threeAt - 2 },
     { s: oneAt - 12, bar: oneAt - 2 },
   ];
@@ -77,6 +87,12 @@ export const GapScene: React.FC = () => {
   const meansIn = ease(frame, higherAt - 6, 12);
   const panelIn = ease(frame, scoresAt - 4, 14);
   const zeroBold = ease(frame, zeroAt - 2, 10);
+  // A comes out ahead: its average swells as it is named.
+  const aSwell = pulse(frame, aheadAt, 20);
+  // "ask one question": the groups step back, and the gaps go after them on
+  // the turn to trends.
+  const groupsOp = (1 - ease(frame, askAt, 20) * 0.62) * (1 - ease(frame, onlyAt, 22));
+  const panelOp = 1 - ease(frame, onlyAt + 8, 22);
 
   const strip = (values: readonly number[], jit: readonly number[], base: number, appear: (j: number) => number, op = 1) =>
     values.map((v, j) => {
@@ -108,6 +124,7 @@ export const GapScene: React.FC = () => {
         <Sfx key={k} name="el-pop" at={d.bar} level={-29} />
       ))}
       <Sfx name="el-pencil" at={processAt - 4} level={-33} />
+      <Sfx name="el-pencil" at={noRealAt} level={-35} />
 
       <Kicker at={hookFrom - 10}>Signal and noise</Kicker>
 
@@ -137,13 +154,30 @@ export const GapScene: React.FC = () => {
         <span style={{ ...body(38, true), color: INK }}>Could this just be luck?</span>
       </Ink>
 
+      <AbsoluteFill style={{ opacity: groupsOp }}>
       <FigLabel n="1" title={`Two groups of ${GAPS.n}, and each group's average`} at={groupsAt - 8} x={160} y={y(330)} />
 
       {/* ── The two groups ── */}
       {(["A", "B"] as const).map((g, i) => (
         <Ink key={g} at={groupsAt - 6 + i * 6} dur={12} style={{ left: 160, top: y(i ? STRIP_B : STRIP_A) - 14 }}>
-          <span style={label(22, INK)}>Group {g}</span>
+          <span style={label(22, INK)}>
+            <Mark at={bothAt + i * 6} out={noRealAt + 10}>
+              Group {g}
+            </Mark>
+          </span>
         </Ink>
+      ))}
+      {/* "No real difference": the one shape both groups are drawn from, the same under each. */}
+      {[STRIP_A, STRIP_B].map((base, i) => (
+        <Bell
+          key={base}
+          x={(v) => sx(X, v)}
+          mu={GAPS.mu}
+          sd={GAPS.sigma}
+          base={y(base) + h(40)}
+          height={h(74)}
+          at={noRealAt + i * 8}
+        />
       ))}
       <Svg>
         {prev >= 0 && swap < 1 ? (
@@ -179,7 +213,7 @@ export const GapScene: React.FC = () => {
                   y1={y(base) - h(46)}
                   y2={y(base) + h(46)}
                   stroke={STAT}
-                  strokeWidth={4}
+                  strokeWidth={4 + (base === STRIP_A ? aSwell * 3 : 0)}
                   strokeLinecap="round"
                 />
               </Svg>
@@ -188,7 +222,8 @@ export const GapScene: React.FC = () => {
                   position: "absolute",
                   left: sx(X, mean),
                   top: y(base) - h(46) - 34,
-                  transform: "translateX(-50%)",
+                  transform: `translateX(-50%) scale(${1 + (base === STRIP_A ? aSwell * 0.14 : 0)})`,
+                  transformOrigin: "50% 100%",
                   opacity: meansIn,
                   whiteSpace: "nowrap",
                   // A knockout, so the process's dashed line passes behind it.
@@ -204,8 +239,10 @@ export const GapScene: React.FC = () => {
             </React.Fragment>
           ))
         : null}
+      </AbsoluteFill>
 
       {/* ── The gaps, A minus B ── */}
+      <AbsoluteFill style={{ opacity: panelOp }}>
       <Ink at={scoresAt - 4} dur={14} style={{ left: 1290, top: y(330), whiteSpace: "nowrap" }}>
         <span style={{ ...label(24, INK), fontWeight: 560 }}>The gap, A minus B</span>
       </Ink>
@@ -222,7 +259,9 @@ export const GapScene: React.FC = () => {
         B ahead
       </div>
       <div style={{ position: "absolute", left: ZERO_X + 12, top: y(392), opacity: panelIn, ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>
-        A ahead
+        <Mark at={aheadAt + 4} out={againMoreAt}>
+          A ahead
+        </Mark>
       </div>
       <Svg opacity={panelIn}>
         <line
@@ -246,6 +285,8 @@ export const GapScene: React.FC = () => {
         const w = t.gap * PER_POINT * g;
         const rowY = y(ROW_Y[k]);
         const end = ZERO_X + w;
+        // "Five draws": counted off, one bar after another.
+        const counted = pulse(frame, fiveAt + k * 4, 14);
         return (
           <React.Fragment key={k}>
             <div
@@ -260,7 +301,13 @@ export const GapScene: React.FC = () => {
               {k + 1}
             </div>
             <Svg>
-              <rect x={Math.min(ZERO_X, end)} y={rowY - BAR_H / 2} width={Math.abs(w)} height={BAR_H} fill={STAT} />
+              <rect
+                x={Math.min(ZERO_X, end)}
+                y={rowY - BAR_H / 2}
+                width={Math.abs(w)}
+                height={BAR_H}
+                fill={`color-mix(in srgb, ${STAT_INK} ${Math.round(counted * 100)}%, ${STAT})`}
+              />
             </Svg>
             <div
               style={{
@@ -274,11 +321,15 @@ export const GapScene: React.FC = () => {
                 fontWeight: 700,
               }}
             >
-              {signed(t.gap)}
+              {/* "Randomness makes differences": each gap lit as the word lands. */}
+              <Mark at={diffsAt + k * 5} out={believeAt}>
+                {signed(t.gap)}
+              </Mark>
             </div>
           </React.Fragment>
         );
       })}
+      </AbsoluteFill>
     </AbsoluteFill>
   );
 };
