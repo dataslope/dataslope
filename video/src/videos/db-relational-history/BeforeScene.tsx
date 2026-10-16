@@ -11,13 +11,14 @@ import { MONO } from "../../theme/fonts";
 import { ADA, CUSTOMERS, ORDERS_OF } from "./data";
 import { Cross, Headline, lerp, Mark, pulse, RecordNode, Spot, Strike, Svg, Wire } from "./parts";
 
-const NODE_H = 54;
-const ROOT = { x: 1040, w: 210 };
-const PARENT_W = 140;
-const CHILD_W = 104;
+const NODE_H = 62;
+const NODE_TEXT = 26;
+const ROOT = { x: 1080, w: 240 };
+const PARENT_W = 170;
+const CHILD_W = 120;
 /** The customers' slots, left to right, and how far each child sits from its parent. */
-const SLOT_X = [700, 1040, 1380];
-const CHILD_DX = [-85, 85];
+const SLOT_X = [720, 1080, 1440];
+const CHILD_DX = [-95, 95];
 
 /** A program's route through the tree, as the program card spells it. */
 const STEPS = (first: string, child: string, next: string) => [
@@ -38,9 +39,9 @@ export const BeforeScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
   const { y } = useLayout();
-  const ROOT_Y = y(380);
-  const PARENT_Y = y(510);
-  const CHILD_Y = y(650);
+  const ROOT_Y = y(390);
+  const PARENT_Y = y(540);
+  const CHILD_Y = y(690);
 
   // ── Cues ──
   const treesFrom = n.beat("trees").from;
@@ -200,20 +201,20 @@ export const BeforeScene: React.FC = () => {
       <Headline at={knowAt - 2} lead="The program had to know" turn="the route." turnAt={routeAt - 4} out={reorgAt - 6} />
       <Headline at={reorgAt} lead="Reorganize the file," turn="and it breaks." turnAt={breaksAt - 4} />
 
-      <FigLabel n="1" title="Every record filed under its parent, as IMS stored them" at={treesAt - 2} x={560} y={y(290)} />
+      <FigLabel n="1" title="Every record filed under its parent, as IMS stored them" at={treesAt - 2} x={600} y={y(290)} />
 
       {/* ── The rocket IMS was built for, then the program that walks the tree ── */}
-      <Spot id="db-relational-history-rocket" at={saturnAt - 6} out={startsAt - 4} left={180} top={y(300)} width={170} height={400} />
-      <Ink at={imsAt - 2} dur={14} out={startsAt - 4} style={{ left: 96, top: y(740), whiteSpace: "nowrap" }}>
+      <Spot id="db-relational-history-rocket" at={saturnAt - 6} out={startsAt - 4} left={170} top={y(320)} width={180} height={430} />
+      <Ink at={imsAt - 2} dur={14} out={startsAt - 4} style={{ left: 96, top: y(724), whiteSpace: "nowrap" }}>
         <div style={{ ...label(22, INK) }}>IBM&apos;s IMS, first shipped 1967</div>
         <div style={{ ...body(23, true), marginTop: 6 }}>built to track Saturn V parts</div>
       </Ink>
 
-      <Ink at={startsAt - 2} dur={14} style={{ left: 96, top: y(340), whiteSpace: "nowrap" }}>
+      <Ink at={startsAt - 2} dur={14} style={{ left: 96, top: y(390), whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, ACCENT_INK) }}>The program</span>
       </Ink>
       {steps.map((s, i) => (
-        <Ink key={i} at={stepAt[i]} dur={12} style={{ left: 96, top: y(392 + i * 56), whiteSpace: "nowrap" }}>
+        <Ink key={i} at={stepAt[i]} dur={12} style={{ left: 96, top: y(444 + i * 58), whiteSpace: "nowrap" }}>
           <span style={{ ...note(21, INK), fontFamily: MONO }}>
             <span style={{ color: INK_SOFT }}>{i + 1}&nbsp;&nbsp;</span>
             {i === 1 ? (
@@ -230,7 +231,7 @@ export const BeforeScene: React.FC = () => {
           </span>
         </Ink>
       ))}
-      <Ink at={everyAt} dur={12} style={{ left: 126, top: y(392 + 4 * 56), whiteSpace: "nowrap" }}>
+      <Ink at={everyAt} dur={12} style={{ left: 126, top: y(444 + 4 * 58), whiteSpace: "nowrap" }}>
         <span style={{ ...note(21, ACCENT_INK), fontWeight: 650 }}>
           child 1 is now {last.name}
         </span>
@@ -267,7 +268,8 @@ export const BeforeScene: React.FC = () => {
       ) : null}
 
       {/* ── The records ── */}
-      <RecordNode x={ROOT.x} y={ROOT_Y} w={ROOT.w} h={NODE_H} text="customers" at={treesAt - 2} swell={pulse(frame, topAt - 4, 18)} />
+      <RecordNode x={ROOT.x} y={ROOT_Y} w={ROOT.w} h={NODE_H}
+            size={NODE_TEXT} text="customers" at={treesAt - 2} swell={pulse(frame, topAt - 4, 18)} />
       {CUSTOMERS.map((c, i) => (
         <React.Fragment key={c.id}>
           <RecordNode
@@ -277,6 +279,7 @@ export const BeforeScene: React.FC = () => {
             dy={shift(i)[1]}
             w={PARENT_W}
             h={NODE_H}
+            size={NODE_TEXT}
             text={c.name}
             at={treesAt + 4 + i * 4}
             swell={pulse(frame, parentAt + i * 4, 16)}
@@ -291,6 +294,7 @@ export const BeforeScene: React.FC = () => {
               dy={shift(i)[1]}
               w={CHILD_W}
               h={NODE_H}
+            size={NODE_TEXT}
               text={String(o.id)}
               at={filedAt + i * 6 + k * 3 + 4}
               wash={
@@ -314,7 +318,7 @@ export const BeforeScene: React.FC = () => {
       <Cross x={nx} y={childTopY - 26} at={breaksAt - 2} />
 
       {/* The web of extra pointers, and the rule that held. */}
-      <div style={{ position: "absolute", left: 560, top: y(818), display: "flex", gap: "0.3em", ...note(22, INK_SOFT) }}>
+      <div style={{ position: "absolute", left: 600, top: y(842), display: "flex", gap: "0.3em", ...note(22, INK_SOFT) }}>
         <Ink at={networkAt - 2} dur={14} out={reorgAt - 6} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Network databases: more pointers,
         </Ink>
