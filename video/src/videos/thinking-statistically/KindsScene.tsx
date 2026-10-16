@@ -295,13 +295,13 @@ export const KindsScene: React.FC = () => {
               padding: "6px 14px",
               background: PAPER,
               fontFamily: MONO,
-              fontSize: 26,
+              fontSize: 30,
               color: INK,
             }}
           >
             {ZIPS.zip}
           </span>
-          <span style={{ ...body(40, true), color: STAT_INK, opacity: ease(frame, dontAt - 2, 10) }}>?</span>
+          <span style={{ ...body(52, true), color: STAT_INK, opacity: ease(frame, dontAt - 2, 10) }}>?</span>
         </div>
       ) : null}
     </AbsoluteFill>

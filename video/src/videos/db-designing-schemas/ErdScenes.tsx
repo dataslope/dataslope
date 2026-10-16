@@ -126,7 +126,6 @@ export const PriceScene: React.FC = () => {
   const rewriteAt = n.word("history", "rewrite");
   const reviewFrom = n.beat("review").from;
   const walkAt = n.word("review", "walk");
-  const breaksAt = n.word("review", "breaks");
 
   const tableAt = mugFrom + 6;
   const items = tableGeometry({ x: STORE_X[0], top: y(STORE_TOP + 8), cols: ITEM_COLS, rows: ITEM_ROWS, headH: h(52), rowH: h(62) });
@@ -207,9 +206,6 @@ export const PriceScene: React.FC = () => {
           <Strike at={rewriteAt + 4}>{count(fortyEightAt - 6, TOTAL_CATALOG)}</Strike>
         </span>
         <span style={{ ...body(28, true), color: ACCENT_INK, opacity: ease(frame, rewriteAt - 2, 12) }}>history, rewritten</span>
-      </Ink>
-      <Ink at={breaksAt - 4} dur={16} style={{ left: 1000, top: y(262), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(28, true), color: INK }}>and see what breaks</span>
       </Ink>
     </AbsoluteFill>
   );

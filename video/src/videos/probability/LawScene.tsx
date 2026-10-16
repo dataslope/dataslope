@@ -112,7 +112,6 @@ export const LawScene: React.FC = () => {
     <AbsoluteFill>
       {/* ── Sound: the line drawing, the two bands, the streak, the retrace ── */}
       <Sfx name="el-pencil" at={fourAt - 14} level={-34} />
-      <Sfx name="el-pencil" at={hundredAt - 4} level={-35} />
       <Sfx name="el-tap" at={fortyAt - 2} level={-29} />
       <Sfx name="el-pencil" at={thousandAt - 4} level={-35} />
       <Sfx name="el-tap" at={pointAt - 4} level={-29} />

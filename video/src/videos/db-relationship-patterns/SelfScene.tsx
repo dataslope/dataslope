@@ -80,7 +80,7 @@ export const SelfScene: React.FC = () => {
     <AbsoluteFill>
       {/* ── Sound: the loop, each chip, the chain, the five levels ── */}
       <Sfx name="el-pencil" at={pointsAt} level={-33} />
-      {nodes.map((nd, k) => (
+      {[nodes[0], nodes[1], last].map((nd, k) => (
         <Sfx key={k} name="el-tap" at={nd.at + 2} level={-30} />
       ))}
       <Sfx name="el-pencil" at={fiveAt} level={-34} />

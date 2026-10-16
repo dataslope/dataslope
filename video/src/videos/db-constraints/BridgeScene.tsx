@@ -152,7 +152,7 @@ export const BridgeScene: React.FC = () => {
         </span>
       </Note>
 
-      <Spot id="db-constraints-watches" at={twoAt - 4} left={1420} top={y(700)} width={300} height={300} />
+      <Spot id="db-constraints-watches" at={twoAt - 4} left={1340} top={y(730)} width={440} height={310} />
       <NextLine at={disagreeAt} x={X0} y={y(820)} width={760}>
         normalization.
       </NextLine>

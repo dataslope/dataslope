@@ -29,7 +29,7 @@ export const OneManyScene: React.FC = () => {
 
   const customers = useEntityLayout({
     x: 200,
-    y: y(400),
+    y: y(450),
     width: 380,
     name: "customers",
     columns: [
@@ -40,7 +40,7 @@ export const OneManyScene: React.FC = () => {
   });
   const orders = useEntityLayout({
     x: 1060,
-    y: y(380),
+    y: y(430),
     width: 420,
     name: "orders",
     columns: [
@@ -67,7 +67,7 @@ export const OneManyScene: React.FC = () => {
       <Head lead="One customer," leadAt={from - 6} turn="many orders." turnAt={ordersAt - 2} />
       <Spot id="db-relationship-patterns-basket" at={ordersAt + 4} left={1560} top={y(66)} width={270} height={270} />
 
-      <Drift from={belongsAt} to={holdsAt + 60} scale={0.02} origin={[midX, y(560)]}>
+      <Drift from={belongsAt} to={holdsAt + 60} scale={0.02} origin={[midX, y(600)]}>
         <Entity layout={customers} at={customerAt - 4} />
         <Entity layout={orders} at={ordersAt - 2} marks={{ customer_id: { at: justOneAt, tone: "key" } }} />
         <Relation
@@ -94,7 +94,7 @@ export const OneManyScene: React.FC = () => {
         {/* "Which table holds the link?": both boxes asked in turn. */}
         <Pulse x={customers.x + customers.width / 2} y={customers.top + customers.head / 2} at={whichAt} r={40} />
         <Pulse x={orders.x + orders.width / 2} y={orders.top + orders.head / 2} at={holdsAt} r={40} />
-        <Tag at={whichAt + 4} x={midX} y={y(700)} italic size={24} align="center">
+        <Tag at={whichAt + 4} x={midX} y={y(750)} italic size={24} align="center">
           which side stores it?
         </Tag>
       </Drift>

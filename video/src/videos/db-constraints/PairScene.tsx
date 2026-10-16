@@ -60,7 +60,7 @@ export const PairScene: React.FC = () => {
   // ── Students and courses, many to many through enrollments ──
   const students = useEntityLayout({
     x: X0,
-    y: y(330),
+    y: y(370),
     width: 300,
     name: "students",
     columns: [
@@ -70,7 +70,7 @@ export const PairScene: React.FC = () => {
   });
   const courses = useEntityLayout({
     x: X0,
-    y: y(560),
+    y: y(600),
     width: 300,
     name: "courses",
     columns: [
@@ -80,7 +80,7 @@ export const PairScene: React.FC = () => {
   });
   const enrollments = useEntityLayout({
     x: 560,
-    y: y(420),
+    y: y(460),
     width: 390,
     name: "enrollments",
     columns: [
@@ -95,7 +95,7 @@ export const PairScene: React.FC = () => {
   const c1 = enrollments.anchor("left", "course_id");
 
   const rows = [...PAIR.rows, PAIR.attempt];
-  const g = tableGeometry({ x: TABLE_AT, top: y(330), cols: PAIR.cols, rows, headH: h(HEAD_H), rowH: h(ROW_H) });
+  const g = tableGeometry({ x: TABLE_AT, top: y(370), cols: PAIR.cols, rows, headH: h(HEAD_H), rowH: h(ROW_H) });
   const ghost = PAIR.rows.length;
   // Rows that hold student 1, and rows that hold course 10.
   const s1Rows = PAIR.rows.map((r, i) => (r[0] === PAIR.attempt[0] ? i : -1)).filter((i) => i >= 0);
@@ -105,7 +105,7 @@ export const PairScene: React.FC = () => {
   // ── Users and profiles, one to one ──
   const users = useEntityLayout({
     x: X0,
-    y: y(430),
+    y: y(480),
     width: 340,
     name: "users",
     columns: [
@@ -115,7 +115,7 @@ export const PairScene: React.FC = () => {
   });
   const profiles = useEntityLayout({
     x: 720,
-    y: y(430) - h(46),
+    y: y(480) - h(46),
     width: 420,
     name: "profiles",
     columns: [

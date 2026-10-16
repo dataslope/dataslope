@@ -81,7 +81,7 @@ export const UniqueScene: React.FC = () => {
           <Caption at={from - 2} x={g.x} y={g.top - 84}>
             user_profiles
           </Caption>
-          <ColTag g={g} col={U} at={fkAt} out={uniqueAt - 2}>
+          <ColTag g={g} col={U} at={fkAt} out={uniqueAt - 12}>
             FK
           </ColTag>
           <ColTag g={g} col={U} at={uniqueAt} color={ACCENT_INK}>
@@ -110,7 +110,7 @@ export const UniqueScene: React.FC = () => {
             A second profile for Ada
           </Caption>
           <Listing lines={OTO.secondSql} x={LIST_X} top={listTop} width={LIST_W} size={LIST_SIZE} at={secondAt - 10} lineAt={lineAt} />
-          <Reply x={LIST_X} y={listTop + listH + 20} at={happilyAt} text={OTO.secondLoose} out={makeAt}>
+          <Reply x={LIST_X} y={listTop + listH + 20} at={secondAt + 10} text={OTO.secondLoose} out={uniqueAt - 4}>
             with only the foreign key: {OTO.looseAda} profiles for Ada
           </Reply>
           <ErrorBox

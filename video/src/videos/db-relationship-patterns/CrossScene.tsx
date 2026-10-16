@@ -33,11 +33,11 @@ const STUDENT_X = 160;
 const STUDENT_W = 170;
 const COURSE_X = 580;
 const COURSE_W = 190;
-const STUDENT_Y: Record<string, number> = { Ada: 440, Grace: 590 };
-const COURSE_Y: Record<string, number> = { Math: 410, History: 515, Art: 620 };
+const STUDENT_Y: Record<string, number> = { Ada: 480, Grace: 650 };
+const COURSE_Y: Record<string, number> = { Math: 450, History: 565, Art: 680 };
 const RIGHT_X = 980;
-const SLOT_Y = 400;
-const FLIP_Y = 640;
+const SLOT_Y = 440;
+const FLIP_Y = 690;
 
 /** Where segments a-b and c-d cross. */
 const cross = (a: Pt, b: Pt, c: Pt, d: Pt): Pt => {
@@ -102,13 +102,11 @@ export const CrossScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: each link drawn, the knot, the slots, the two that don't fit ── */}
-      {pairs.map((p) => (
-        <Sfx key={`${p.name}${p.title}`} name="el-pencil" at={linkAt(p.name, p.title)} level={-35} />
-      ))}
+      <Sfx name="el-pencil" at={math1At} level={-35} />
+      <Sfx name="el-pencil" at={math2At} level={-35} />
       <Sfx name="el-pop" at={crossAt} level={-30} />
       <Sfx name="el-tap" at={fitsAt} level={-28} />
       <Sfx name="el-whoosh" at={whereAt} level={-34} />
-      <Sfx name="el-whoosh" at={graceGoAt - 8} level={-34} />
       <Sfx name="el-scratch" at={forcesAt} level={-31} />
 
       <Kicker at={from - 10}>Many to many</Kicker>
@@ -116,12 +114,12 @@ export const CrossScene: React.FC = () => {
       <Spot id="db-relationship-patterns-books" at={coursesAt} left={1570} top={y(66)} width={250} height={250} />
 
       {/* ── Students and courses, linked as they are named ── */}
-      <Drift from={from} to={giveAt} scale={0.02} origin={[480, y(520)]}>
+      <Drift from={from} to={giveAt} scale={0.02} origin={[480, y(560)]}>
         <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, leftDim, 16) * 0.45 }}>
-          <Caption at={studentAt} x={STUDENT_X} y={y(350)}>
+          <Caption at={studentAt} x={STUDENT_X} y={y(380)}>
             students
           </Caption>
-          <Caption at={coursesAt - 2} x={COURSE_X} y={y(350)}>
+          <Caption at={coursesAt - 2} x={COURSE_X} y={y(380)}>
             courses
           </Caption>
           {pairs.map((p) => (

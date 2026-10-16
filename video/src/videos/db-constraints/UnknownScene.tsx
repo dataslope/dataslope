@@ -73,7 +73,7 @@ export const UnknownScene: React.FC = () => {
     { code: "CHECK (price >= 0)", what: "zero or more", at: rangeAt - 6 },
     { code: "NOT NULL", what: "and always there", at: notNullAt },
   ] as const;
-  const layerY = (i: number) => y(650) + i * h(66);
+  const layerY = (i: number) => y(720) + i * h(70);
 
   return (
     <AbsoluteFill>

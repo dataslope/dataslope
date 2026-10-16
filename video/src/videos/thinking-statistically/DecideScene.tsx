@@ -119,7 +119,9 @@ export const DecideScene: React.FC = () => {
             <span style={{ ...body(40, true), color: INK }}>
               {i === 2 ? (
                 <Mark at={aNumberAt - 2} out={tAt + 24}>
-                  <Mark at={realAt - 2}>{r.kind}</Mark>
+                  <Mark at={realAt - 2} out={centerAt - 2}>
+                    {r.kind}
+                  </Mark>
                 </Mark>
               ) : i === 0 ? (
                 <Mark at={twoCatAt} out={chiAt + 24}>

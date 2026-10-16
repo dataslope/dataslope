@@ -102,7 +102,7 @@ export const GateScene: React.FC = () => {
         </div>
         <div style={{ ...note(21, INK_SOFT), marginTop: 12, whiteSpace: "nowrap" }}>Not one bad row got in.</div>
       </Note>
-      <Spot id="db-why-design-building" at={schemaAt - 4} left={RIGHT_X + 10} top={y(296)} width={310} height={290} />
+      <Spot id="db-why-design-building" at={schemaAt - 4} left={RIGHT_X} top={y(300)} width={340} height={200} />
       {PROGRAMS.map((p, i) => {
         const lit = i === 0 ? ease(frame, doorAt - 4, 10) : wholeIn;
         return (

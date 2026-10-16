@@ -87,13 +87,10 @@ export const ListScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: the list struck, the new id, the keys, the arrows ── */}
-      <Sfx name="el-tap" at={idsAt} level={-29} />
       <Sfx name="el-scratch" at={checkAt + 2} level={-31} />
       <Sfx name="el-tap" at={newAt + 4} level={-28} />
       <Sfx name="el-whoosh" at={fkAt - 4} level={-34} />
-      {OTM.orderRows.map((_, i) => (
-        <Sfx key={i} name="el-pencil" at={storesAt + i * 5} level={-36} />
-      ))}
+      <Sfx name="el-pencil" at={storesAt} level={-35} />
       <Sfx name="el-pop" at={twiceAt} level={-30} />
       <Sfx name="el-pencil" at={crossManyAt} level={-34} />
 
@@ -162,7 +159,7 @@ export const ListScene: React.FC = () => {
             <Pulse key={row} x={og.xs[FK] + og.widths[FK] - 30} y={og.rowMid(row)} at={repAt + k * 6} r={16} />
           ))}
           <Tag at={isAt} x={og.x + og.width + 26} y={og.rowMid(adaRows[0]) - 14} color={KEY_INK} size={22}>
-            Ada, once per order
+            Ada's id, on each of her orders
           </Tag>
         </div>
       </Drift>

@@ -108,8 +108,6 @@ export const TestScene: React.FC = () => {
       <Sfx name="el-scratch" at={answerAt - 2} level={-30} />
       <Sfx name="el-tap" at={nineAt - 4} level={-28} />
       <Sfx name="el-pencil" at={hundredAt - 4} level={-34} />
-      <Sfx name="el-pencil" at={catchesAt - 2} level={-35} />
-      <Sfx name="el-pencil" at={flagsAt - 2} level={-35} />
       <Sfx name="el-sprinkle" at={lineupAt} level={-32} />
       <Sfx name="el-tap" at={percentAt - 4} level={-28} />
 

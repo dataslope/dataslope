@@ -37,6 +37,7 @@ export const ScaleScene: React.FC = () => {
   const ownRulesAt = n.word("apart", "own rules");
   const rescueFrom = n.beat("rescue").from;
   const easyAt = n.word("rescue", "EASY");
+  const clearAt = n.word("rescue", "clear one");
   const nextFrom = n.beat("next").from;
   const paperAt = n.word("next", "paper");
   const seventyAt = n.word("next", "nineteen seventy");
@@ -152,6 +153,21 @@ export const ScaleScene: React.FC = () => {
         {own.map((e, k) => (
           <RowWash key={k} e={e} rows={e.columns.map((_, i) => i)} at={ownRulesAt - 6 + k * 5} out={ownRulesAt + 12 + k * 5} />
         ))}
+        {/* "A clear one": the whole store, framed as one model. */}
+        <div
+          style={{
+            position: "absolute",
+            left: L.customers.left - 24,
+            top: L.customers.top - 24,
+            width: L.lines.sold[1][0] + 24 - (L.customers.left - 24),
+            height: L.products.bottom + 24 - (L.customers.top - 24),
+            boxSizing: "border-box",
+            border: `2px dashed ${INK_SOFT}`,
+            borderRadius: 12,
+            clipPath: `inset(0 ${(1 - ease(frame, clearAt - 4, 18)) * 100}% 0 0)`,
+            opacity: ease(frame, clearAt - 4, 6),
+          }}
+        />
       </Drift>
 
       <Spot id="db-designing-schemas-blueprint" at={paperAt - 6} left={1480} top={y(330)} width={330} height={330} />

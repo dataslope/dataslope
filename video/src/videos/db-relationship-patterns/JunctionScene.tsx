@@ -8,9 +8,9 @@ import { MTM } from "./data";
 import { Caption, DbTable, Drift, HEAD_H, Head, KEY_INK, Kicker, MARK, MARK_KEY, Pulse, Tag, tableGeometry } from "./parts";
 
 const ERD_Y = 330;
-const ROWS_Y = 590;
+const ROWS_Y = 572;
 /** The rows' height here, before `h()`: a little tighter, so four fit under the diagram. */
-const ROW_H = 56;
+const ROW_H = 50;
 
 /**
  * The resolution: a third table, one row per pairing, its two foreign keys
@@ -81,7 +81,7 @@ export const JunctionScene: React.FC = () => {
     <AbsoluteFill>
       {/* ── Sound: the third box, each row, the two lines ── */}
       <Sfx name="el-tap" at={thirdAt} level={-28} />
-      {rowAt.map((at, i) => (
+      {rowAt.slice(0, 2).map((at, i) => (
         <Sfx key={i} name="el-tap" at={at + 2} level={-30} />
       ))}
       <Sfx name="el-pencil" at={twoAt} level={-33} />

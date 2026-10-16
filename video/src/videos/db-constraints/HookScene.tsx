@@ -62,7 +62,7 @@ export const HookScene: React.FC = () => {
   const slide = ease(frame, rarelyAt - 4, 26);
   const products = useEntityLayout({
     x: lerp(470, 1210, slide),
-    y: y(390),
+    y: y(440),
     width: 380,
     name: "products",
     columns: [
@@ -73,7 +73,7 @@ export const HookScene: React.FC = () => {
   });
   const items = useEntityLayout({
     x: 1010,
-    y: y(390) - h(46),
+    y: y(440) - h(46),
     width: 410,
     name: "order_items",
     columns: [
@@ -86,7 +86,7 @@ export const HookScene: React.FC = () => {
 
   // The writers, spread level with the card once it has arrived.
   const boxMid = (products.top + products.bottom) / 2;
-  const rowY = (i: number) => boxMid + (i - 1.5) * h(64);
+  const rowY = (i: number) => boxMid + (i - 1.5) * h(76);
   const targetY = (i: number) => boxMid + (i - 1.5) * h(40);
   const writerAt = (i: number) => (i === 0 ? catchAt - 2 : named[i] - 2);
   const arrowAt = (i: number) => (i === 0 ? oneWriterAt : named[i] + 4);
@@ -116,7 +116,7 @@ export const HookScene: React.FC = () => {
       <Kicker at={open - 10}>Why constraints</Kicker>
       <Head lead="Keys guard the links." at={open - 8} turn="What guards the rest?" turnAt={intoAt - 4} />
 
-      <FigLabel n="1" title="Two tables, and the key between them" at={open - 4} x={470} y={y(300)} out={appAt} />
+      <FigLabel n="1" title="Two tables, and the key between them" at={open - 4} x={470} y={y(350)} out={appAt} />
 
       {/* ── The ERD from Unit 5: two tables and their key ── */}
       <Entity

@@ -171,6 +171,7 @@ export const StoreErd: React.FC = () => {
         to="zero-or-many"
         at={placesAt - 2}
         label="places"
+        labelPos={[L.customers.right + 10, lines.places[0][1] - 38]}
         {...fx(0)}
       />
       <Ping x={lines.places[3][0] - 18} y={lines.places[3][1]} at={manyOrdersAt} />
@@ -202,7 +203,7 @@ export const StoreErd: React.FC = () => {
         from="many"
         to="many"
         at={manyTooAt - 4}
-        out={itemsAt}
+        out={ownAt - 4}
       />
       {ownIn > 0 ? (
         <div

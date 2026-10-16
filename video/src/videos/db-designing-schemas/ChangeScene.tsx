@@ -13,6 +13,8 @@ import { Chip, Drift, Head, Kicker, PathArrow, Ping } from "./parts";
 const CHIP_Y = 292;
 const CHIP_X = [120, 360, 600, 840, 1080, 1320];
 const CHIP_W = 196;
+/** How far the schema grows while the versions arrive. */
+const DRIFT = 0.025;
 
 /**
  * Part 3 opens (why-schemas-change): a task tracker that starts with tasks
@@ -60,7 +62,17 @@ export const ChangeScene: React.FC = () => {
   const dependents = ["Existing data", "Application code", "Reports and queries", "Tests and fixtures", "People's workflows"];
   const depX = 1240;
   const depY = (i: number) => y(432 + i * 92);
-  const from: [number, number] = [projects.right + 6, y(520)];
+  // The schema as one thing: a frame round both boxes, which the dependents lean on.
+  // Drawn round the boxes as the drift leaves them, about the tasks box's corner.
+  const grown = (v: number, o: number) => o + (v - o) * (1 + DRIFT);
+  const frameBox = {
+    left: tasks.left - 22,
+    top: tasks.top - 22,
+    right: grown(projects.right, tasks.left) + 26,
+    bottom: grown(tasks.bottom, tasks.top) + 22,
+  };
+  const from: [number, number] = [frameBox.right, (frameBox.top + frameBox.bottom) / 2];
+  const schemaAt = n.word("risky", "live schema");
 
   return (
     <AbsoluteFill>
@@ -86,7 +98,7 @@ export const ChangeScene: React.FC = () => {
       {/* ── The versions, one per request ── */}
       {versions.map((v, i) => (
         <Ink key={v.text} at={v.at - 4} dur={14} style={{ left: CHIP_X[i], top: y(CHIP_Y), whiteSpace: "nowrap" }}>
-          <Chip tone={i === 0 ? "soft" : "ink"} size={21}>
+          <Chip tone={i === 0 ? "soft" : "ink"} size={21} width={CHIP_W - 24}>
             {v.text}
           </Chip>
         </Ink>
@@ -95,8 +107,8 @@ export const ChangeScene: React.FC = () => {
         <PathArrow
           key={i}
           points={[
-            [CHIP_X[i] + CHIP_W - 24, y(CHIP_Y) + 22],
-            [CHIP_X[i + 1] - 10, y(CHIP_Y) + 22],
+            [CHIP_X[i] + CHIP_W - 20, y(CHIP_Y) + 22],
+            [CHIP_X[i + 1] - 6, y(CHIP_Y) + 22],
           ]}
           at={v.at - 8}
           dur={8}
@@ -107,8 +119,8 @@ export const ChangeScene: React.FC = () => {
       {/* "Learning about the world": the run goes on past v5. */}
       <PathArrow
         points={[
-          [CHIP_X[4] + CHIP_W - 24, y(CHIP_Y) + 22],
-          [CHIP_X[5] - 10, y(CHIP_Y) + 22],
+          [CHIP_X[4] + CHIP_W - 20, y(CHIP_Y) + 22],
+          [CHIP_X[5] - 6, y(CHIP_Y) + 22],
         ]}
         at={learningAt - 6}
         dur={10}
@@ -123,6 +135,9 @@ export const ChangeScene: React.FC = () => {
             padding: "6px 14px",
             borderRadius: 8,
             border: `2px dashed ${HAIRLINE}`,
+            width: CHIP_W - 24,
+            boxSizing: "border-box",
+            justifyContent: "center",
             ...label(21, INK_SOFT),
           }}
         >
@@ -131,7 +146,7 @@ export const ChangeScene: React.FC = () => {
       </Ink>
 
       {/* ── The schema, growing with them ── */}
-      <Drift from={historyAt} to={riskyFrom + 120} amount={0.025} origin={`${tasks.left}px ${tasks.top}px`}>
+      <Drift from={historyAt} to={riskyFrom - 4} amount={DRIFT} origin={`${tasks.left}px ${tasks.top}px`}>
         <Entity layout={tasks} at={tasksAt - 4} rowAt={{ due_on: dueAt, project_id: projectsAt + 10 }} rowGap={4} />
         <Entity layout={projects} at={projectsAt - 2} />
         <Relation
@@ -161,7 +176,23 @@ export const ChangeScene: React.FC = () => {
           <Ping x={depX + 90} y={depY(i) + 22} at={shapeAt + i * 3} color={INK} r={40} dur={20} />
         </React.Fragment>
       ))}
-      <div style={{ position: "absolute", left: from[0] - 4, top: from[1] - 4, width: 8, height: 8, borderRadius: 4, background: INK, opacity: ease(frame, leanAt[0] - 6, 8) }} />
+      <div
+        style={{
+          position: "absolute",
+          left: frameBox.left,
+          top: frameBox.top,
+          width: frameBox.right - frameBox.left,
+          height: frameBox.bottom - frameBox.top,
+          boxSizing: "border-box",
+          border: `2px dashed ${INK_SOFT}`,
+          borderRadius: 10,
+          opacity: ease(frame, schemaAt - 4, 14),
+        }}
+      />
+      <Ink at={schemaAt - 2} dur={14} style={{ left: frameBox.right - 210, top: frameBox.bottom + 12, whiteSpace: "nowrap" }}>
+        <span style={{ ...label(21, INK_SOFT) }}>the live schema</span>
+      </Ink>
+      <div style={{ position: "absolute", left: from[0] - 5, top: from[1] - 5, width: 10, height: 10, borderRadius: 5, background: INK, opacity: ease(frame, leanAt[0] - 6, 8) }} />
     </AbsoluteFill>
   );
 };

@@ -41,8 +41,8 @@ export const MoneyScene: React.FC = () => {
   const kindAt = n.word("null-in", "right kind");
   const thereAt = n.word("null-in", "there");
 
-  const rowA = y(470);
-  const rowB = y(600);
+  const rowA = y(530);
+  const rowB = y(670);
   const lineH = h(100);
 
   // The float's digits, typed as they are read out: "point three", the run
@@ -99,7 +99,7 @@ export const MoneyScene: React.FC = () => {
 
       <Kicker at={open - 10}>The first constraint</Kicker>
       <Head lead="Ten cents plus twenty." at={open - 6} turn="Thirty?" turnAt={thirtyAt - 2} />
-      <FigLabel n="2" title="The same sum in two types, and Postgres's answers" at={tenAt - 6} x={X0} y={y(300)} />
+      <FigLabel n="2" title="The same sum in two types, and Postgres's answers" at={tenAt - 6} x={X0} y={y(340)} />
 
       {/* Column titles. */}
       {(
@@ -110,7 +110,7 @@ export const MoneyScene: React.FC = () => {
           [COL.test, "equals 0.3?", thirtyAt - 4],
         ] as const
       ).map(([x, t, at]) => (
-        <Ink key={t} at={at} dur={12} style={{ left: x, top: y(372), whiteSpace: "nowrap", opacity: 1 - dimAll }}>
+        <Ink key={t} at={at} dur={12} style={{ left: x, top: y(420), whiteSpace: "nowrap", opacity: 1 - dimAll }}>
           <span style={label(22, INK_SOFT)}>{t}</span>
         </Ink>
       ))}
@@ -118,7 +118,7 @@ export const MoneyScene: React.FC = () => {
         style={{
           position: "absolute",
           left: X0,
-          top: y(372) + 40,
+          top: y(420) + 40,
           width: (1700 - X0) * ease(frame, tenAt - 4, 20),
           height: 1,
           background: HAIRLINE,
@@ -205,7 +205,7 @@ export const MoneyScene: React.FC = () => {
       </Note>
 
       {/* "Does it have to be there at all?": an empty cell, held open. */}
-      <Ink at={thereAt - 8} dur={16} style={{ left: X0, top: y(760), display: "flex", alignItems: "center", gap: 22 }}>
+      <Ink at={thereAt - 8} dur={16} style={{ left: X0, top: y(830), display: "flex", alignItems: "center", gap: 22 }}>
         <span
           style={{
             display: "inline-block",
@@ -218,7 +218,7 @@ export const MoneyScene: React.FC = () => {
         <span style={{ ...note(26, INK), fontStyle: "italic", whiteSpace: "nowrap" }}>And if there's no value at all?</span>
       </Ink>
 
-      <Spot id="db-constraints-coins" at={open - 6} left={1460} top={y(690)} width={300} height={300} dim={kindAt} />
+      <Spot id="db-constraints-coins" at={open - 6} left={1440} top={y(750)} width={330} height={300} dim={kindAt} />
     </AbsoluteFill>
   );
 };

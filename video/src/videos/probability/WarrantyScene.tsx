@@ -39,6 +39,8 @@ export const WarrantyScene: React.FC = () => {
   const profitAt = n.word("million", "thirty-five dollars and five cents");
   const storeAt = n.word("million", "Good for the store");
   const buyerAt = n.word("million", "losing bet");
+  const onAverageAt = n.word("million", "on average");
+  const anAverageAt = n.word("once", "an average");
   const manyAt = n.word("once", "many times");
   const surviveAt = n.word("once", "couldn't survive");
   const moreAt = n.word("once", "MORE");
@@ -66,11 +68,12 @@ export const WarrantyScene: React.FC = () => {
     const x0 = SHAPES.x[k];
     const base = y(SHAPES.base);
     const H = h(SHAPES.h);
+    const fill = ease(frame, lastEnd + 48 + k * 6, 12);
     if (k === 0) {
       const max = Math.max(...BINOM);
       const bw = SHAPES.w / BINOM.length;
       return BINOM.map((q, i) => (
-        <rect key={i} x={x0 + i * bw + 2} y={base - (H * q * ease(frame, at + i, 10)) / max} width={bw - 4} height={(H * q * ease(frame, at + i, 10)) / max} fill={DATA} opacity={0.8} />
+        <rect key={i} x={x0 + i * bw + 2} y={base - (H * q * ease(frame, at + i, 10)) / max} width={bw - 4} height={(H * q * ease(frame, at + i, 10)) / max} fill={DATA} opacity={lerp(0.8, 0.45, fill)} />
       ));
     }
     const pts = Array.from({ length: 81 }, (_, i) => {
@@ -78,7 +81,13 @@ export const WarrantyScene: React.FC = () => {
       const v = k === 1 ? normalPdf(t, 0.5, 0.14) / normalPdf(0.5, 0.5, 0.14) : Math.exp(-t * 4.5);
       return [x0 + t * SHAPES.w, base - H * v] as const;
     }).slice(0, Math.max(2, Math.round(81 * p)));
-    return <path d={pts.map(([a, b], i) => `${i ? "L" : "M"}${a.toFixed(1)},${b.toFixed(1)}`).join(" ")} fill="none" stroke={DATA} strokeWidth={3.5} strokeLinecap="round" />;
+    const d = pts.map(([a, b], i) => `${i ? "L" : "M"}${a.toFixed(1)},${b.toFixed(1)}`).join(" ");
+    return (
+      <g>
+        {fill > 0 ? <path d={`${d} L${pts[pts.length - 1][0]},${base} L${x0},${base} Z`} fill={DATA} opacity={fill * 0.3} /> : null}
+        <path d={d} fill="none" stroke={DATA} strokeWidth={3.5} strokeLinecap="round" />
+      </g>
+    );
   };
 
   return (
@@ -152,17 +161,19 @@ export const WarrantyScene: React.FC = () => {
           </Big>
           <span style={note(22, INK_SOFT)}>a warranty, on average</span>
         </Ink>
-        <Ink at={buyerAt - 4} dur={14} style={{ left: RIGHT, top: y(452), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16 }}>
+        <Ink at={onAverageAt - 4} dur={14} style={{ left: RIGHT, top: y(452), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16 }}>
           <span style={{ ...note(26, INK), width: 130, display: "inline-block" }}>The buyer</span>
           <Big size={60} color={STAT_INK}>
-            −${fmt(WARRANTY.eProfit, 0)}
+            <Sweep at={buyerAt - 2}>−${fmt(WARRANTY.eProfit, 0)}</Sweep>
           </Big>
           <span style={note(22, INK_SOFT)}>a losing bet</span>
         </Ink>
 
         {/* ── When the average isn't the whole story ── */}
-        <Ink at={manyAt - 4} dur={14} style={{ left: RIGHT, top: y(560), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(34, true), color: INK }}>Faced many times, the average decides.</span>
+        <Ink at={anAverageAt - 4} dur={14} style={{ left: RIGHT, top: y(560), whiteSpace: "nowrap" }}>
+          <span style={{ ...body(34, true), color: INK }}>
+            Faced <Sweep at={manyAt - 2}>many times</Sweep>, the average decides.
+          </span>
         </Ink>
         <Ink at={surviveAt - 4} dur={14} style={{ left: RIGHT, top: y(620), whiteSpace: "nowrap" }}>
           <span style={{ ...body(34, true), color: INK }}>

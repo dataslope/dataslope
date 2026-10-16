@@ -13,12 +13,12 @@ import { Caption, DbTable, Drift, HEAD_H, Head, KEY_INK, KeyArrow, Kicker, Pulse
 const PANEL_X = [120, 560, 1000, 1440];
 const PANEL = 360;
 const BOX_W = 300;
-const TITLE_Y = 372;
-const TOP_Y = 440;
-const BOTTOM_Y = 660;
-const SELF_Y = 540;
+const TITLE_Y = 400;
+const TOP_Y = 470;
+const BOTTOM_Y = 720;
+const SELF_Y = 570;
 /** How far the self-reference's loop runs out from its box. */
-const LOOP = 58;
+const LOOP = 72;
 
 /** One panel: two header-only entities, one above the other, and the line between. */
 const Pair: React.FC<{
@@ -114,7 +114,7 @@ export const ShapesScene: React.FC = () => {
       <KeyArrow from={[og.x - 10, og.rowMid(0)]} to={[cg.x + cg.width + 8, cg.rowMid(0)]} at={pointAt} out={pairOut} />
 
       {/* ── The four shapes ── */}
-      <Drift from={otmAt} to={n.beat("names").to + 50} scale={0.018} origin={[960, y(560)]}>
+      <Drift from={otmAt} to={n.beat("names").to + 50} scale={0.018} origin={[960, y(600)]}>
         {(
           [
             ["One to many", otmAt],

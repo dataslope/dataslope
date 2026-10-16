@@ -28,6 +28,7 @@ export const OpenScene: React.FC = () => {
   const changingAt = n.word("open", "changing");
   const liveAt = n.word("open", "live");
   const storeAt = n.word("guess", "online store");
+  const couldAt = n.word("guess", "could");
   const typingAt = n.word("guess", "typing");
   const guessAt = n.word("guess", "first guess");
   const insteadAt = n.word("steps", "Instead");
@@ -35,7 +36,7 @@ export const OpenScene: React.FC = () => {
   // The table typed straight away: the lesson's own first line, a key at a time.
   const typed = Math.floor(Math.max(0, Math.min(1, (frame - typingAt + 2) / 26)) * FIRST_DDL_LINE.length);
   const shown = FIRST_DDL_LINE.slice(0, typed);
-  const caret = frame >= typingAt - 2 && frame < guessAt + 4 && Math.floor(frame / 8) % 2 === 0;
+  const caret = frame >= couldAt + 4 && frame < guessAt + 4 && Math.floor(frame / 8) % 2 === 0;
   // "Instead": the first guess steps back while the steps build.
   const back = 1 - ease(frame, insteadAt - 4, 18) * 0.7;
 
@@ -61,7 +62,7 @@ export const OpenScene: React.FC = () => {
       </Ink>
       {halves.map((h, i) => (
         <Ink key={h.text} at={h.at - 4} dur={16} style={{ left: 96, top: y(350 + i * 52), display: "flex", alignItems: "center", gap: 18, whiteSpace: "nowrap" }}>
-          <span style={{ width: 34, height: 2, background: HAIRLINE, display: "inline-block" }} />
+          <span style={{ width: 9, height: 9, borderRadius: "50%", background: ACCENT_INK, display: "inline-block" }} />
           <span style={{ ...body(34, true), color: INK }}>
             for{" "}
             {i === 1 ? (
@@ -77,7 +78,7 @@ export const OpenScene: React.FC = () => {
 
       <div style={{ position: "absolute", inset: 0, opacity: back }}>
         <Spot id="db-designing-schemas-goods" at={storeAt - 4} left={110} top={y(500)} width={330} height={330} />
-        {frame >= typingAt - 6 ? (
+        {frame >= couldAt - 6 ? (
           <div
             style={{
               position: "absolute",
@@ -87,7 +88,8 @@ export const OpenScene: React.FC = () => {
               borderTop: `2px solid ${INK}`,
               borderBottom: `1px solid ${HAIRLINE}`,
               background: `color-mix(in srgb, ${ds("yellow", 200)} 34%, transparent)`,
-              opacity: ease(frame, typingAt - 6, 10),
+              opacity: ease(frame, couldAt - 6, 12),
+              clipPath: `inset(0 ${(1 - ease(frame, couldAt - 6, 16)) * 100}% 0 0)`,
               fontFamily: MONO,
               fontSize: 30,
               whiteSpace: "pre",
@@ -106,7 +108,7 @@ export const OpenScene: React.FC = () => {
         <Ink at={guessAt - 2} dur={16} style={{ left: 484, top: y(690), whiteSpace: "nowrap" }}>
           <span style={{ ...body(32, true), color: ACCENT_INK }}>a first guess</span>
         </Ink>
-        <Ink at={storeAt - 2} dur={14} style={{ left: 120, top: y(860), whiteSpace: "nowrap" }}>
+        <Ink at={storeAt - 2} dur={14} style={{ left: 150, top: y(786), whiteSpace: "nowrap" }}>
           <span style={{ ...body(26, true), color: INK_SOFT }}>an online store</span>
         </Ink>
       </div>

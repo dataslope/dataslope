@@ -259,7 +259,7 @@ export const script: NarrationScript = {
     {
       id: "incomes",
       scene: true,
-      text: "Here are five thousand incomes, with a long tail of high earners. The mean is forty-three thousand, but the median is under thirty-six.",
+      text: "Here are five thousand incomes, with a long tail of high earners. The mean is forty-three thousand, but the median is under thirty-six thousand.",
       pauseAfter: 0.35,
     },
     { id: "force", text: "Force a normal onto them anyway, with the same mean and spread...", pauseAfter: 0.2 },

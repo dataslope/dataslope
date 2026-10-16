@@ -75,7 +75,7 @@ export const LibraryScene: React.FC = () => {
       <Headline lead="A book:" turn="the title, or the copy?" at={libFrom - 6} turnAt={copyAt - 4} out={manualAt - 4} size={72} />
       <Headline lead="Not syntax," turn="meaning." at={manualAt + 2} turnAt={meansAt - 2} size={72} />
 
-      <Spot id="db-why-design-books" at={libraryAt - 4} dim={payAt} left={X0 + 10} top={y(640)} width={540} height={300} />
+      <Spot id="db-why-design-books" at={libraryAt - 4} dim={payAt} left={X0 + 10} top={y(625)} width={316} height={300} />
 
       <Drift from={libFrom} to={end} amount={0.02} origin="60% 50%">
         <div style={{ position: "absolute", inset: 0, opacity: fade }}>

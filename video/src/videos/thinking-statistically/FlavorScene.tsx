@@ -193,7 +193,7 @@ export const FlavorScene: React.FC = () => {
       </Note>
       {/* "The math ran fine": the sum it did, in full. */}
       <Ink at={mathAt - 2} dur={26} out={honestAt - 2} style={{ left: 384, top: y(706), whiteSpace: "nowrap" }}>
-        <span style={{ fontFamily: MONO, fontSize: 22, color: INK_SOFT }}>
+        <span style={{ fontFamily: MONO, fontSize: 25, color: INK }}>
           ({FLAVORS.answers.join(" + ")}) ÷ {FLAVORS.answers.length}
         </span>
       </Ink>

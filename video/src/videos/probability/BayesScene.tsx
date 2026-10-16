@@ -84,7 +84,6 @@ export const BayesScene: React.FC = () => {
       {/* ── Sound: the swapped conditional, the base rate, the bars, the flip ── */}
       <Sfx name="el-scratch" at={areSickEnd} level={-30} />
       <Sfx name="el-pencil" at={baseAt - 2} level={-34} />
-      <Sfx name="el-whoosh" at={outnumberAt - 4} level={-34} />
       <Sfx name="el-whoosh" at={retestFrom - 2} level={-34} />
       <Sfx name="el-whoosh" at={tenAt - 4} level={-33} />
       <Sfx name="el-tap" at={ninetyOneAt - 4} level={-28} />

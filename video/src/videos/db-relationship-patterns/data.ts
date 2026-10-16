@@ -23,7 +23,7 @@ export const VIDEO = "db-relationship-patterns";
  * from illustrations.json. Every frame is laid out with room for them either
  * way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 /** A value as PGlite hands it back (dates and numerics cast to text). */
 export type Value = string | number | null;

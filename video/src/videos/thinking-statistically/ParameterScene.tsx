@@ -207,7 +207,7 @@ export const ParameterScene: React.FC = () => {
         mu={KNOWN.mu}
         sd={KNOWN.sigma}
         base={base}
-        height={y(BASE) - y(LABEL_Y + 44)}
+        height={y(BASE) - y(LABEL_Y + 66)}
         at={partAt - 4}
         out={oneSampleAt - 4}
         dur={30}
@@ -277,10 +277,11 @@ export const ParameterScene: React.FC = () => {
           tick={10 + missSwell * 6}
           width={2.6 + missSwell * 2.4}
         />
-        <Note at={closeAt + 2} x={barX + 16} y={stripY + h(44)}>
+        {/* It makes way for the population on "the price of seeing only part". */}
+        <Note at={closeAt + 2} x={barX + 16} y={stripY + h(44)} out={partAt - 6}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
             off by <b style={{ color: STAT_INK }}>{fmt(KNOWN.error)}</b>,{" "}
-            <Mark at={mistakeAt - 2} out={partAt + 10}>
+            <Mark at={mistakeAt - 2}>
               the estimation error
             </Mark>
           </span>

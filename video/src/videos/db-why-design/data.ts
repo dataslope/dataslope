@@ -18,7 +18,7 @@ export const VIDEO = "db-why-design";
  * Whether public/images/db-why-design/ holds the three watercolors from
  * illustrations.json. Every frame is laid out with room for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 /** A value as PGlite hands it back. */
 export type Cell = string | number | null;

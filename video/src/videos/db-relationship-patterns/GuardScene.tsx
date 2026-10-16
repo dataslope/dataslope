@@ -29,7 +29,7 @@ import {
 const TABLES_Y = 410;
 const E_X = 120;
 const M_X = 640;
-const RESULT_X = 960;
+const RESULT_X = 1010;
 const LIST_Y = 720;
 const LIST_SIZE = 24;
 
@@ -83,24 +83,22 @@ export const GuardScene: React.FC = () => {
     <AbsoluteFill>
       {/* ── Sound: the two roles, the result, the update, the reply ── */}
       <Sfx name="el-whoosh" at={asEmployeeAt} level={-34} />
-      {withManager.map((i, k) => (
-        <Sfx key={i} name="el-pencil" at={asManagerAt + k * 5} level={-36} />
-      ))}
+      <Sfx name="el-pencil" at={asManagerAt + 4} level={-35} />
       <Sfx name="el-tap" at={leftAt} level={-29} />
-      <Sfx name="el-tap" at={whatIfAt} level={-29} />
       <Sfx name="el-pencil" at={adaAgainAt} level={-33} />
       <Sfx name="el-pop" at={takesAt} level={-29} />
-      <Sfx name="el-chime" at={n.beat("accepted").to + 4} level={-32} />
+      {/* The chime rings out in the tail, after the last word. */}
+      <Sfx name="el-chime" at={n.beat("next").to + 8} level={-32} />
 
       <Kicker at={from - 10}>Self-reference</Kicker>
-      <Head lead="One table, two roles." leadAt={from - 6} out={checksAt - 6} />
+      <Head lead="One table, two roles." leadAt={from - 6} out={adaAgainAt - 10} />
       <Head lead="Ada manages Ada:" leadAt={adaAgainAt} turn="accepted." turnAt={takesAt} />
 
       <Drift from={from} to={constraintsAt + 40} scale={0.014} origin={[960, y(560)]}>
         <div style={{ position: "absolute", inset: 0, opacity: settle }}>
           {/* ── e and m: one table, read twice ── */}
           <Caption at={asEmployeeAt - 2} x={eg.x} y={top - 48}>
-            employees e, the employee
+            e, the employee
           </Caption>
           <DbTable
             g={eg}
@@ -116,7 +114,7 @@ export const GuardScene: React.FC = () => {
             swaps={[{ row: ada, col: MGR, at: adaAgainAt, value: SR.adaAfter, color: ACCENT_INK }]}
           />
           <Caption at={asManagerAt - 2} x={mg.x} y={top - 48}>
-            employees m, the manager
+            m, the manager
           </Caption>
           <DbTable
             g={mg}
@@ -137,7 +135,7 @@ export const GuardScene: React.FC = () => {
 
           {/* ── The self-join's result: a left join keeps Ada ── */}
           <Caption at={leftAt - 4} x={rg.x} y={top - 48}>
-            the self-join, a left join
+            the self-join, as a left join
           </Caption>
           <DbTable
             g={rg}

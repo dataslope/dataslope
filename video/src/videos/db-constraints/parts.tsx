@@ -41,13 +41,13 @@ export const X0 = 120;
 export const KICKER_Y = 112;
 export const HEAD_Y = 150;
 /** The schema card's top, on the left. */
-export const CARD_Y = 330;
+export const CARD_Y = 370;
 /** The data table's left edge and top, on the right. */
 export const TABLE_X = 1000;
-export const TABLE_Y = 330;
+export const TABLE_Y = 370;
 /** Table heights before `h()`. */
 export const HEAD_H = 52;
-export const ROW_H = 60;
+export const ROW_H = 64;
 
 export const MARK = HIGHLIGHT;
 export const MARK_BAD = `color-mix(in srgb, ${ACCENT} 26%, transparent)`;
@@ -508,7 +508,7 @@ export const TypeMark: React.FC<{ layout: EntityLayout; row: string; at: number;
 // ── The data table (after WhyNormalization's kit) ────────────────────────────
 
 export const HEAD_SIZE = 22;
-export const BODY_SIZE = 26;
+export const BODY_SIZE = 28;
 const PAD = 20;
 const ADVANCE = 0.6;
 const shown = (v: Cell) => (v === null ? "null" : v);
@@ -833,7 +833,7 @@ export const ErrorBox: React.FC<{
           background: `color-mix(in srgb, ${ACCENT} 9%, ${PAPER})`,
           padding: "14px 22px 16px",
           fontFamily: MONO,
-          fontSize: 21,
+          fontSize: 22,
           lineHeight: 1.45,
           whiteSpace: "pre-wrap",
           color: INK,

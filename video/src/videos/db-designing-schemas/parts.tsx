@@ -838,9 +838,10 @@ export const Aside: React.FC<{ size?: number; color?: string; children: React.Re
 );
 
 /** A chip: a few words of Inter in a soft rounded box. */
-export const Chip: React.FC<{ tone?: "ink" | "key" | "warn" | "soft"; size?: number; children: React.ReactNode }> = ({
+export const Chip: React.FC<{ tone?: "ink" | "key" | "warn" | "soft"; size?: number; width?: number; children: React.ReactNode }> = ({
   tone = "ink",
   size = 22,
+  width,
   children,
 }) => {
   const bg =
@@ -857,6 +858,9 @@ export const Chip: React.FC<{ tone?: "ink" | "key" | "warn" | "soft"; size?: num
       style={{
         display: "inline-flex",
         alignItems: "center",
+        justifyContent: "center",
+        width,
+        boxSizing: "border-box",
         padding: "6px 14px",
         borderRadius: 8,
         border: `2px solid ${border}`,

@@ -79,7 +79,7 @@ export const TypeScene: React.FC = () => {
   const errTop = g.rowTop(2) + h(36);
 
   // The number line under the error.
-  const lineY = y(760);
+  const lineY = y(800);
   const lineIn = ease(frame, bigAt - 10, 16);
   const lineDim = 1 - ease(frame, moneyAt, 14) * 0.55;
   const ticks = Array.from({ length: HI - LO + 1 }, (_, i) => LO + i);
@@ -205,8 +205,8 @@ export const TypeScene: React.FC = () => {
         </Ink>
       ) : null}
 
-      <Spot id="db-constraints-coins" at={moneyAt - 2} left={140} top={y(640)} width={300} height={300} />
-      <Note at={thinkAt - 6} x={460} y={y(800)}>
+      <Spot id="db-constraints-coins" at={moneyAt - 2} left={140} top={y(680)} width={290} height={290} />
+      <Note at={thinkAt - 6} x={450} y={y(820)}>
         <span style={{ ...note(24, INK), fontStyle: "italic", whiteSpace: "nowrap" }}>And for money?</span>
       </Note>
     </AbsoluteFill>

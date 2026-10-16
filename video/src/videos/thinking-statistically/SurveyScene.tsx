@@ -18,10 +18,10 @@ const PITCH_Y = 8.6;
 const R = 2.6;
 /** "Every checkout a design will ever see": a run of checkouts in time, the
  *  few that have happened, then the many that haven't. */
-const RUN = 25;
+const RUN = 23;
 const RUN_DONE = 5;
 const RUN_X = 1318;
-const RUN_PITCH = 18.5;
+const RUN_PITCH = 20;
 
 const fmtInt = (v: number) => v.toLocaleString("en-US");
 
@@ -82,7 +82,7 @@ export const SurveyScene: React.FC = () => {
           cx={cx}
           cy={cy}
           r={R * (1 + wave * 0.3)}
-          fill={wave > 0 ? `color-mix(in srgb, ${INK} ${Math.round(wave * 62)}%, ${RAW})` : RAW}
+          fill={wave > 0 ? `color-mix(in srgb, ${INK} ${Math.round(wave * 45)}%, ${RAW})` : RAW}
           opacity={a}
         />,
       );
@@ -202,7 +202,7 @@ export const SurveyScene: React.FC = () => {
               key={k}
               cx={RUN_X + k * RUN_PITCH}
               cy={y(890)}
-              r={6.5 * a}
+              r={6 * a}
               fill={done ? DOT : "none"}
               stroke={DOT}
               strokeWidth={done ? 0 : 1.8}

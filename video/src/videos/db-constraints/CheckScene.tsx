@@ -82,7 +82,7 @@ export const CheckScene: React.FC = () => {
       { name: "end_date", type: "date" },
     ],
   });
-  const gd = tableGeometry({ x: TABLE_X - 20, top: y(TABLE_Y), cols: DATES.cols, rows: [DATES.failing], headH: h(HEAD_H), rowH: h(ROW_H) });
+  const gd = tableGeometry({ x: TABLE_X - 40, top: y(TABLE_Y), cols: DATES.cols, rows: [DATES.failing], headH: h(HEAD_H), rowH: h(ROW_H) });
 
   const outA = datesFrom - 2;
 

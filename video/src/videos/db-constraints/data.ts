@@ -13,7 +13,7 @@ export const VIDEO = "db-constraints";
  * Whether public/images/db-constraints/ holds the three watercolors from
  * illustrations.json. Every frame is laid out with room for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 /** A value as the video prints it; null is SQL NULL. */
 export type Cell = string | null;

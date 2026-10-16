@@ -82,7 +82,6 @@ export const CasesScene: React.FC = () => {
       {/* ── Sound: each case, the host's forced doors, the tally, the games ── */}
       <Sfx name="el-tap" at={rowAt[0]} level={-30} />
       <Sfx name="el-tap" at={rowAt[1]} level={-30} />
-      <Sfx name="el-tap" at={rowAt[2]} level={-30} />
       <Sfx name="el-whoosh" at={hasToAt - 2} level={-34} />
       <Sfx name="el-pop" at={hasCarAt - 4} level={-30} />
       <Sfx name="el-pencil" at={playAt - 4} level={-34} />

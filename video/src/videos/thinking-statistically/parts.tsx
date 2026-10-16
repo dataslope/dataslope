@@ -294,7 +294,7 @@ export const Spot: React.FC<{
         width,
         height,
         opacity: Math.min(1, p) * (1 - o) * (1 - d),
-        transform: `translateY(${bob(frame, 5, 110) + (1 - p) * 30}px)`,
+        transform: `translateY(${0 * bob(frame, 5, 110) + (1 - p) * 30}px)`,
       }}
     />
   );

@@ -27,7 +27,9 @@ export const DieScene: React.FC = () => {
   const { y, h } = useLayout();
 
   // ── Cues ──
-  const dieFrom = n.beat("die").from;
+  const expectedAt = n.word("die", "expected value");
+  const spreadWordAt = n.word("spread", "spread");
+  const meanSaidAt = n.word("rolls", "four point five");
   const averageAt = n.word("die", "long-run average");
   const loadedAt = n.word("die", "loaded die");
   const sixAt = n.word("die", "six half the time");
@@ -65,11 +67,10 @@ export const DieScene: React.FC = () => {
       <Sfx name="el-sprinkle" at={tenthAt - 10} level={-34} />
       <Sfx name="el-tap" at={fourFiveAt - 4} level={-28} />
       <Sfx name="el-whoosh" at={balancesAt - 8} level={-34} />
-      <Sfx name="el-pop" at={beamAt} level={-31} />
       <Sfx name="el-pencil" at={squaredAt - 4} level={-34} />
       <Sfx name="el-tap" at={sdAt - 4} level={-29} />
 
-      <Headline top={y(150)} first="Expected value:" second="the long-run average." firstAt={dieFrom - 6} secondAt={averageAt - 2} out={decideFrom - 6} />
+      <Headline top={y(150)} first="Expected value:" second="the long-run average." firstAt={expectedAt - 6} secondAt={averageAt - 2} out={decideFrom - 6} />
       <Headline top={y(150)} first="Now, a decision" second="worth weighing." firstAt={decideFrom - 2} secondAt={weighAt - 2} />
       <FigLabel n="7" title="A loaded die: the chance of each face" at={loadedAt - 4} x={PMF.x0} y={y(268)} />
 
@@ -198,19 +199,25 @@ export const DieScene: React.FC = () => {
         <span style={note(26, INK)}>
           <Count at={rollAt - 2} dur={30} to={DIE.draws} format={num} style={{ ...note(34, INK), fontWeight: 700 }} /> rolls:{" "}
           <span style={{ opacity: ease(frame, comesAt - 2, 10) }}>
-            mean <b>{fmt(DIE.simMean, 3)}</b>
+            mean{" "}
+            <b>
+              <Sweep at={meanSaidAt - 2}>{fmt(DIE.simMean, 3)}</Sweep>
+            </b>
           </span>
         </span>
       </Ink>
 
       {/* ── The spread ── */}
-      <Ink at={varianceAt - 4} dur={14} style={{ left: RIGHT, top: y(596), whiteSpace: "nowrap" }}>
+      <Ink at={spreadWordAt - 4} dur={14} style={{ left: RIGHT, top: y(596), whiteSpace: "nowrap" }}>
         <span style={label(23, INK_SOFT)}>Spread around 4.5</span>
       </Ink>
-      <Ink at={threeAt - 4} dur={14} style={{ left: RIGHT, top: y(636), whiteSpace: "nowrap" }}>
+      <Ink at={varianceAt - 4} dur={14} style={{ left: RIGHT, top: y(636), whiteSpace: "nowrap" }}>
         <span style={note(30, INK)}>
-          Variance <b style={{ color: STAT_INK }}>{fmt(DIE.variance, 2)}</b>
-          <span style={{ ...note(22, INK_SOFT) }}> in squared units</span>
+          Variance{" "}
+          <span style={{ opacity: ease(frame, threeAt - 4, 10) }}>
+            <b style={{ color: STAT_INK }}>{fmt(DIE.variance, 2)}</b>
+            <span style={{ ...note(22, INK_SOFT) }}> in squared units</span>
+          </span>
         </span>
       </Ink>
       <Ink at={rootAt - 2} dur={14} style={{ left: RIGHT, top: y(696), whiteSpace: "nowrap" }}>

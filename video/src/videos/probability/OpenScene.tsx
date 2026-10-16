@@ -75,9 +75,8 @@ export const OpenScene: React.FC = () => {
       {/* ── Sound: the plot's bars, the coin, the strip of flips, the count,
            the streak ── */}
       <Sfx name="el-pop" at={plotAt - 2} level={-30} />
-      <Sfx name="el-pencil" at={seenAt - 2} level={-34} />
       <Sfx name="el-pop" at={coinAt - 2} level={-30} />
-      <Sfx name="el-scratch" at={noHalfAt + 4} level={-31} />
+      <Sfx name="el-scratch" at={noHalfAt + 4} level={-30} />
       <Sfx name="el-sprinkle" at={stripAt(0)} level={-34} />
       <Sfx name="el-tap" at={fiftyAt - 2} level={-28} />
       <Sfx name="el-pencil" at={sevenAt - 2} level={-34} />

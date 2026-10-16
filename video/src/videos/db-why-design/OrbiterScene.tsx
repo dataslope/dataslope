@@ -93,7 +93,7 @@ export const OrbiterScene: React.FC = () => {
 
       <Headline lead="Even a type" turn="is a rule." at={orbFrom - 6} turnAt={ruleAt - 4} size={72} />
 
-      <Spot id="db-why-design-orbiter" at={marsAt - 6} dim={whereAt} left={1010} top={y(300)} width={780} height={520} drift={-40} driftDur={end - marsAt} />
+      <Spot id="db-why-design-orbiter" at={marsAt - 6} dim={whereAt} left={1030} top={y(380)} width={740} height={374} drift={-40} driftDur={end - marsAt} />
 
       <Drift from={orbFrom} to={end} amount={0.018} origin="20% 55%">
         <div style={{ position: "absolute", inset: 0, opacity: 1 - settle }}>

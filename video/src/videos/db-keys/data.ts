@@ -13,7 +13,7 @@ export const VIDEO = "db-keys";
  * Whether public/images/db-keys/ holds the three watercolors from
  * illustrations.json. Every frame is laid out with room for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 export type Value = string | number | boolean | null;
 
