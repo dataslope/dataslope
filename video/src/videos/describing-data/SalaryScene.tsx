@@ -47,6 +47,7 @@ export const SalaryScene: React.FC = () => {
   const middleValueAt = n.word("centers", "middle value");
   const medianWordAt = n.word("centers", "median");
   const thousandAt = n.word("centers", "thousand");
+  const medianFiftyAt = n.word("centers", "fifty-three", { nth: 2 });
   const halfAt = n.word("centers", "half");
   const almostAt = n.word("centers", "Almost");
   const ceoAt = n.word("ceo", "CEO");
@@ -234,6 +235,7 @@ export const SalaryScene: React.FC = () => {
           ) : null;
         })}
         <Pulse x={xOf(medianV)} y={base + h(64)} at={medianMovesAt} color={INK} r={5} />
+        <Pulse x={xOf(medianV)} y={base + h(64)} at={medianFiftyAt} color={INK} r={5} />
         <Pulse x={xOf(medianV)} y={base + h(64)} at={medianAsksAt} color={INK} r={5} />
 
         {/* The median, in ink, below the plank. */}

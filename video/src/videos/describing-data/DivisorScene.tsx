@@ -100,10 +100,10 @@ export const DivisorScene: React.FC = () => {
         Why <Mark at={nineAt - 2}>nine</Mark>, and not ten?
       </Ink>
       <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
-        <Ink at={measuredFrom - 2} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
+        <Ink at={measuredFrom - 2} dur={20} out={swampAt + 4} outDur={14} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Divide by n,
         </Ink>
-        <Ink at={lowAt - 6} dur={18} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={lowAt - 6} dur={18} out={swampAt + 4} outDur={14} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
           and you come up short.
         </Ink>
       </div>

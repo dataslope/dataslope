@@ -56,6 +56,7 @@ export const WhichScene: React.FC = () => {
   const whatAt = n.word("next", "what a probability");
   const evenAt = n.word("next", "even");
   const startingAt = n.word("next", "starting");
+  const needAt = n.word("next", "need");
 
   const fade = 1 - ease(frame, seenAt - 4, 20) * 0.6;
   /** After the last word, the four figures clear away one at a time. */
@@ -200,6 +201,8 @@ export const WhichScene: React.FC = () => {
           ) : null}
           <Pulse x={q1} y={mid2 - h(BOX_H) / 2} at={quartilesAt - 2} color={INK} r={5} />
           <Pulse x={med} y={mid2 - h(BOX_H) / 2} at={summaryAt - 2} color={INK} r={6} />
+          <Pulse x={med} y={mid2 - h(BOX_H) / 2} at={needAt - 2} color={STAT} r={6} />
+          <Pulse x={readX} y={readY} at={needAt + 4} color={STAT} r={6} />
           <Pulse x={q3} y={mid2 - h(BOX_H) / 2} at={quartilesAt + 4} color={INK} r={5} />
           {ease(frame, secondAt - 4, 14) > 0 ? (
             <Svg opacity={ease(frame, secondAt - 4, 14)}>
