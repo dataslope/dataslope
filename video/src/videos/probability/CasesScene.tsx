@@ -61,6 +61,7 @@ export const CasesScene: React.FC = () => {
   const positiveAt = n.word("rv-in", "a positive");
   const numbersAt = n.word("rv-in", "numbers");
   const rvInFrom = n.beat("rv-in").from;
+  const averageAt = n.word("rv-in", "average them");
 
   const rowAt = [pickAt - 4, otherAt - 2, otherAt + 8];
   // Where the car is, flashed in every case as the narration says it decides the host's door.
@@ -90,6 +91,8 @@ export const CasesScene: React.FC = () => {
       <Headline top={y(150)} first="She was right:" second="switching wins two in three." firstAt={casesFrom - 6} secondAt={hasCarAt - 2} out={rvInFrom - 6} />
       <Headline top={y(150)} first="Outcomes so far:" second="labels, not numbers." firstAt={rvInFrom - 2} secondAt={numbersAt - 6} />
       <FigLabel n="6" title="You pick door 1. Where the car can be" at={casesFrom} x={160} y={y(268)} />
+      {/* The cases and the games set back once the outcomes themselves are the point. */}
+      <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, averageAt - 4, 14) * 0.6 }}>
 
       {/* ── The three cases ── */}
       {CASES.map((c, r) => {
@@ -207,6 +210,8 @@ export const CasesScene: React.FC = () => {
       <div style={{ position: "absolute", right: 1920 - CH.x1, top: y(CH.top) - 6, opacity: ease(frame, playAt - 4, 10), whiteSpace: "nowrap" }}>
         <span style={{ ...note(22, INK_SOFT) }}>games </span>
         <span style={{ ...note(34, INK), fontWeight: 700 }}>{Math.round(K).toLocaleString("en-US")}</span>
+      </div>
+
       </div>
 
       {/* ── The turn: outcomes so far were labels ── */}

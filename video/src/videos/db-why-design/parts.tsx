@@ -65,8 +65,8 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
  * the whole line away, so the next headline can take its place.
  */
 export const Headline: React.FC<{
-  lead: string;
-  turn?: string;
+  lead: React.ReactNode;
+  turn?: React.ReactNode;
   at: number;
   turnAt?: number;
   out?: number;

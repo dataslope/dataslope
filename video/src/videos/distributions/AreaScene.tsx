@@ -194,7 +194,7 @@ export const AreaScene: React.FC = () => {
 
         {/* The height, which is not a probability. */}
         <Arrow from={[sx(X, 0.45), base - 4]} to={[sx(X, 0.45), py(f(0.45)) + 4]} at={heightAt - 6} dur={14} color={INK} width={2.4} />
-        <Note at={heightAt} x={sx(X, 0.45) + 18} y={py(f(0.45)) + h(40)}>
+        <Note at={heightAt} x={sx(X, 2.6)} y={py(0.19)}>
           <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap", background: PAPER, padding: "0 6px" }}>
             the height <span style={{ opacity: ease(frame, cantAt - 2, 10) }}>is not a probability</span>
           </span>

@@ -81,7 +81,7 @@ export const QuantileScene: React.FC = () => {
 
           {/* The average, for scale. */}
           <Svg opacity={ease(frame, avgAt - 2, 12) * 0.7}>
-            <line x1={sx(X, scale)} x2={sx(X, scale)} y1={base} y2={py(f(scale))} stroke={INK} strokeWidth={2} strokeDasharray="6 6" />
+            <line x1={sx(X, scale)} x2={sx(X, scale)} y1={base} y2={base - h(70)} stroke={INK} strokeWidth={2} strokeDasharray="6 6" />
           </Svg>
           <Note at={avgAt + 4} x={sx(X, scale) + 12} y={base - h(60)}>
             <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", ...halo }}>average {scale} ms</span>

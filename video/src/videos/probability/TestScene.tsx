@@ -234,9 +234,9 @@ export const TestScene: React.FC = () => {
               <div style={{ padding: "6px 20px 8px", borderRadius: 16, background: PILL[i] }}>
                 <div style={{ ...note(i === 0 ? 40 : 34, color), fontWeight: 700, lineHeight: 1.05, fontVariantNumeric: "tabular-nums" }}>
                   {big === "count:tp" ? (
-                    <Count at={catchesAt} dur={Math.max(12, caughtAt - catchesAt + 6)} to={TEST.tp} format={num} />
+                    <Count at={catchesAt} dur={Math.max(12, caughtAt - catchesAt + 6)} to={TEST.tp} format={num} steady />
                   ) : big === "count:fp" ? (
-                    <Count at={onePctAt} dur={Math.max(12, alarmsAt - onePctAt + 10)} to={TEST.fp} format={num} />
+                    <Count at={onePctAt} dur={Math.max(12, alarmsAt - onePctAt + 10)} to={TEST.fp} format={num} steady />
                   ) : (
                     big
                   )}

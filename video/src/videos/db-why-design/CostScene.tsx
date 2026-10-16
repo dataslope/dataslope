@@ -16,12 +16,12 @@ import { Chip, Drift, Headline, lerp, Mark, MARK_BAD, pulse, X0 } from "./parts"
 const PROGRAMS = ["web app", "admin dashboard", "import job", "reporting script"] as const;
 const CHIP_X = 1300;
 const CHIP_W = 330;
-const CHIP_Y = [392, 482, 572, 662];
+const CHIP_Y = [404, 504, 604, 704];
 const CARD_W = 560;
 const CARD_H = 96;
 /** The one fact, and the two copies it became. */
-const ONE_Y = 520;
-const COPY_Y = [458, 588];
+const ONE_Y = 548;
+const COPY_Y = [474, 622];
 
 /**
  * Why the anomaly is the design's fault: the update was legal and Postgres
@@ -159,14 +159,14 @@ export const CostScene: React.FC = () => {
           </Note>
 
           {/* Its name. */}
-          <Ink at={anomalyAt - 2} dur={18} style={{ left: X0, top: y(740), whiteSpace: "nowrap" }}>
+          <Ink at={anomalyAt - 2} dur={18} style={{ left: X0, top: y(790), whiteSpace: "nowrap" }}>
             <span style={{ ...headline(54, true), color: ACCENT_INK }}>The update anomaly</span>
           </Ink>
           <div
             style={{
               position: "absolute",
               left: X0,
-              top: y(740) + 70,
+              top: y(790) + 70,
               width: 520 * ease(frame, anomalyAt + 8, 16),
               height: 4,
               borderRadius: 2,

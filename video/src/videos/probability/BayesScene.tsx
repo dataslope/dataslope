@@ -51,6 +51,7 @@ export const BayesScene: React.FC = () => {
   const nineInTenAt = n.word("ninety", "nine positives in ten");
   const ninetyOneAt = n.word("ninety", "Ninety-one percent");
   const trustAt = n.word("rule", "trust");
+  const ruleFrom = n.beat("rule").from;
   const rareAt = n.word("rule", "how rare");
   const fooledAt = n.word("doors-in", "fooled");
   const doorsInFrom = n.beat("doors-in").from;
@@ -65,7 +66,10 @@ export const BayesScene: React.FC = () => {
 
   // The share bars.
   const first = ease(frame, retestFrom - 2, 20);
-  const secondBar = ease(frame, ninetyEightAt - 6, 20);
+  // The positives go to a second test: a copy of the first bar slides down.
+  const secondBar = ease(frame, secondAt - 4, 1);
+  const slide = ease(frame, secondAt - 4, 22);
+  const barsBack = ease(frame, ruleFrom - 2, 14) * 0.5;
   const realShare2 = TEST.retestTp / (TEST.retestTp + TEST.retestFp);
   // The second test, drawn first at the first bar's scale (one unit a
   // person): the real cases stay, the false alarms shrink from 999 to about
@@ -218,7 +222,7 @@ export const BayesScene: React.FC = () => {
       {SHARE.y.map((rowY, i) => {
         const g = i === 0 ? first : secondBar;
         if (g <= 0) return null;
-        const top = y(rowY);
+        const top = i === 0 ? y(rowY) : lerp(y(SHARE.y[0]), y(rowY), slide);
         const blueW = (i === 0 ? SHARE.w * TEST.treePpv : TEST.retestTp * scale2) * g;
         const redW = (i === 0 ? SHARE.w * (1 - TEST.treePpv) : red2 * scale2) * g;
         return (
@@ -226,7 +230,7 @@ export const BayesScene: React.FC = () => {
             <Ink at={(i === 0 ? retestFrom : secondAt) - 4} dur={14} style={{ left: SHARE.x0, top: top - 52, whiteSpace: "nowrap" }}>
               <span style={label(24, INK)}>{i === 0 ? "Positive once" : "Positive on a second, independent test too"}</span>
             </Ink>
-            <Svg>
+            <Svg opacity={1 - barsBack}>
               <rect x={SHARE.x0} y={top} width={blueW} height={h(SHARE.h)} fill={DATA} />
               <rect x={SHARE.x0 + blueW} y={top} width={redW} height={h(SHARE.h)} fill={STAT} opacity={0.8} />
               {i === 1 && stayFlash > 0 ? <rect x={SHARE.x0} y={top} width={blueW} height={h(SHARE.h)} fill={HIGHLIGHT} opacity={stayFlash} /> : null}
@@ -239,14 +243,14 @@ export const BayesScene: React.FC = () => {
                 width: Math.max(360, blueW + redW),
                 display: "flex",
                 justifyContent: "space-between",
-                opacity: ease(frame, (i === 0 ? retestFrom + 10 : tenAt + 4), 12),
+                opacity: ease(frame, i === 0 ? retestFrom + 10 : ninetyEightAt - 2, 12),
                 whiteSpace: "nowrap",
               }}
             >
               <span style={{ ...note(24, DATA_INK), fontWeight: 700 }}>
                 {i === 0 ? num(TEST.tp) : num(TEST.retestTp)} sick
               </span>
-              <span style={{ ...note(24, STAT_INK), fontWeight: 700 }}>
+              <span style={{ ...note(24, STAT_INK), fontWeight: 700, opacity: i === 0 ? 1 : ease(frame, tenAt + 4, 12) }}>
                 {i === 0 ? num(TEST.fp) : num(TEST.retestFp)} false alarms
               </span>
             </div>
@@ -274,10 +278,16 @@ export const BayesScene: React.FC = () => {
           {pct(TEST.treePpv)} to {pct(TEST.ppv2)}
         </Big>
       </Ink>
-      <Ink at={trustAt - 4} dur={18} style={{ left: 900, top: y(800), whiteSpace: "nowrap" }}>
+      <Ink at={trustAt - 4} dur={18} style={{ left: 900, top: y(790), whiteSpace: "nowrap" }}>
         <span style={{ ...body(36, true), color: INK }}>
           Before you trust a positive, ask <Sweep at={rareAt}>how rare</Sweep> the thing is.
         </span>
+      </Ink>
+      <Ink at={rareAt + 2} dur={16} style={{ left: 900, top: y(842), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16 }}>
+        <span style={note(24, INK_SOFT)}>Here,</span>
+        <Big size={56} color={DATA_INK} italic>
+          1 in {num(TEST.oneIn)}
+        </Big>
       </Ink>
       </div>
     </AbsoluteFill>

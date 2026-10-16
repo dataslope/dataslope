@@ -38,6 +38,7 @@ export const DieScene: React.FC = () => {
   const addAt = n.word("weight", "add");
   const fourFiveAt = n.word("weight", "Four point five");
   const beamAt = n.word("balance", "weights on a beam");
+  const pictureAt = n.word("balance", "Picture");
   const balancesAt = n.word("balance", "balances");
   const faceAt = n.word("balance", "isn't a face");
   const likeliestAt = n.word("balance", "likeliest");
@@ -115,7 +116,7 @@ export const DieScene: React.FC = () => {
             width={2 * (fxv(1 + DIE.sd) - fxv(1)) * ease(frame, stdAt - 2, 16)}
             height={h(26)}
             fill={STAT}
-            opacity={0.28}
+            opacity={0.28 + 0.25 * ease(frame, sdAt - 2, 8) * (1 - ease(frame, sdAt + 14, 14))}
           />
         ) : null}
         {/* The spread: each face's distance from the mean. */}
@@ -176,7 +177,7 @@ export const DieScene: React.FC = () => {
           <span style={{ opacity: ease(frame, faceAt - 2, 10), fontWeight: 500, color: INK }}>, not a face</span>
         </span>
       </Note>
-      <Spot id="probability-seesaw" at={beamAt - 2} out={squaredAt - 8} left={1280} top={y(650)} width={540} height={220} />
+      <Spot id="probability-seesaw" at={pictureAt - 2} out={squaredAt - 8} left={1280} top={y(650)} width={540} height={220} />
 
       {/* ── The sum ── */}
       <Ink at={addAt - 4} dur={18} style={{ left: RIGHT, top: y(330), whiteSpace: "nowrap" }}>
@@ -228,6 +229,11 @@ export const DieScene: React.FC = () => {
           </b>
         </span>
       </Ink>
+      <Note at={sdAt - 2} x={eX} y={base - h(26) - 40} from="up">
+        <span style={{ ...note(28, STAT_INK), fontWeight: 700, display: "inline-block", transform: "translateX(-50%)", whiteSpace: "nowrap" }}>
+          ±{fmt(DIE.sd, 1)}
+        </span>
+      </Note>
       <Note at={squaredAt + 2} x={PMF.x0} y={base + h(150) + 66}>
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>each face&apos;s distance from 4.5, squared and weighted by its chance</span>
       </Note>

@@ -136,10 +136,10 @@ export const GeometricScene: React.FC = () => {
         <Note at={likeliestAt} x={meanX + 12} y={base - h(TALL - 146)}>
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>but not the likeliest</span>
         </Note>
-        <Bracket x0={tailX0} x1={tailX1} y={tailY} at={elevenAt - 2} color={ASK} />
+        <Bracket x0={tailX0} x1={tailX1} y={tailY} at={tenAt - 4} color={ASK} />
         <Note at={elevenAt} x={(tailX0 + tailX1) / 2 - 130} y={tailY - h(50)}>
           <span style={{ ...askNote(26), whiteSpace: "nowrap" }}>
-            more than {GEOMETRIC.moreThan}: <Count at={tenAt - 8} dur={16} to={GEOMETRIC.sfMoreThan * 100} suffix="%" />
+            more than {GEOMETRIC.moreThan}: <Count at={elevenAt - 4} dur={16} to={GEOMETRIC.sfMoreThan * 100} suffix="%" />
           </span>
         </Note>
       </Drift>

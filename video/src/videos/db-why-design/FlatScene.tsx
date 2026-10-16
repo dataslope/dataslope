@@ -16,6 +16,7 @@ import {
   Listing,
   listingHeight,
   MARK,
+  Mark,
   MARK_BAD,
   RowBracket,
   tableGeometry,
@@ -42,6 +43,7 @@ export const FlatScene: React.FC = () => {
   // ── Cues ──
   const hookFrom = n.beat("hook").from;
   const rarelyAt = n.word("hook", "rarely");
+  const dayAt = n.word("hook", "day");
   const oneTableAt = n.word("table", "One");
   const fieldAt = n.word("table", "every");
   const ordersAt = n.word("table", "orders");
@@ -87,7 +89,7 @@ export const FlatScene: React.FC = () => {
       <Sfx name="el-scratch" at={twoAt + 4} level={-31} />
 
       <Kicker at={hookFrom - 10}>What a shortcut costs</Kicker>
-      <Headline lead="Day one:" turn="it works." at={rarelyAt - 4} turnAt={worksAt - 4} out={twoAt - 8} />
+      <Headline lead={<Mark at={dayAt - 2} dur={14}>Day one:</Mark>} turn="it works." at={rarelyAt - 4} turnAt={worksAt - 4} out={twoAt - 8} />
       <Headline lead="One person," turn="two emails." at={twoAt - 2} turnAt={twoAt + 8} />
 
       <Drift from={hookFrom} to={end} amount={0.016} origin="40% 60%">

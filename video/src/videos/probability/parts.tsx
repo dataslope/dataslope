@@ -185,10 +185,12 @@ export const Count: React.FC<{
   from?: number;
   to: number;
   format: (v: number) => string;
+  /** Count at an even pace, for a count that runs under a whole phrase. */
+  steady?: boolean;
   style?: React.CSSProperties;
-}> = ({ at, dur = 24, from = 0, to, format, style }) => {
+}> = ({ at, dur = 24, from = 0, to, format, steady = false, style }) => {
   const frame = useCurrentFrame();
-  const p = ease(frame, at, dur);
+  const p = steady ? Math.min(1, Math.max(0, (frame - at) / dur)) : ease(frame, at, dur);
   return <span style={{ fontVariantNumeric: "tabular-nums lining-nums", ...style }}>{format(lerp(from, to, p))}</span>;
 };
 
