@@ -49,6 +49,8 @@ import { SamplingDistributions } from "./videos/sampling-distributions/Video";
 import { script as samplingDistributionsScript } from "./videos/sampling-distributions/script";
 import { StandardError } from "./videos/standard-error/Video";
 import { script as standardErrorScript } from "./videos/standard-error/script";
+import { ThinkingStatistically } from "./videos/thinking-statistically/Video";
+import { script as thinkingStatisticallyScript } from "./videos/thinking-statistically/script";
 
 // Every composition is laid out in 1080p CSS pixels and rendered with
 // `--scale=2` for 4K (3840x2160). Duration comes from the narration timeline,
@@ -278,6 +280,16 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 60}
         defaultProps={EDITORIAL_DEFAULTS}
         calculateMetadata={narratedMetadata<EditorialProps>(standardErrorScript)}
+      />
+      <Composition
+        id="ThinkingStatistically"
+        component={ThinkingStatistically}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={EDITORIAL_DEFAULTS}
+        calculateMetadata={narratedMetadata<EditorialProps>(thinkingStatisticallyScript)}
       />
     </Folder>
     <Folder name="Assets">

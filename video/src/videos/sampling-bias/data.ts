@@ -12,7 +12,7 @@ export const VIDEO = "sampling-bias";
  * sampling-bias` has written both WebPs. Every frame is laid out with room
  * for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 // ── The population ──────────────────────────────────────────────────────────
 
