@@ -78,3 +78,16 @@ Every command runs from `video/`. Render jobs go through `out/render-slot.sh`
 - DB Unit 9 (soft), SEQUEL renamed after colliding with "an aircraft company": Chamberlin's own account says only "a trademark issue"; Hawker Siddeley is from secondary sources.
 - DB Unit 3, what-are-relationships.mdx, "A relationship connects rows" diagram: Ada 101 and 102, Grace 103; the lesson's own SQL block gives 102 to Grace, 103 to Linus, Ada 101 and 125.
 - DB Unit 3 (diagram vs schema), reading-er-diagrams.mdx: orders ||--|{ order_items ("one or more") isn't enforced by the DDL; an order with no items is accepted.
+
+## Paused after the notes above
+- Stats Unit 5 merged (`Sampling`), agent af8dc730635440cd5: merge, motion work and el-* sounds done; check:motion passes (29 stretches of 3 s+ before, 0 now, longest 2.8 s); check:sync passes on the five standalone videos (worst +0.09 s). Still to do: check:mix -- sampling, the merged sync check (out/Sampling-sync.mjs), standalone stills, check:frames on all six compositions. Resume: S=<scratchpad>/unit-5-merged; $S/snap.sh v5-tree; cd $S/v5-tree && /home/user/dataslope/video/out/render-slot.sh bash -c "$S/audio-job.sh $S/v5-tree > $S/audio-v5.log 2>&1".
+- Stats Unit 1 motion fix (`ThinkingStatistically`), agent aad79d5afd22124d5: check:motion PASSES on the voiced preview (longest 2.5 s, from 22 failures, longest 13 s); check:frames, check:sync (+0.09 s), check:mix (19.3 LU under) pass. One edit after that preview (KindsScene.tsx: US label dips under the other two in the shuffle) not yet seen. Resume: out/render-slot.sh bash -c "node out/variants.mjs <scratchpad>/unit-1-motion/sh ThinkingStatistically 7552 7556 7560 7564 7568 7576; npm run check:motion -- thinking-statistically", then report.
+
+## Scratch tools the resume commands depend on
+`video/out/` is gitignored and `<scratchpad>` is
+`/tmp/claude-0/-home-user-dataslope/834a6b33-2c34-57ca-a82d-74ab40ec3f23/scratchpad/`,
+which does not survive the container. Copies of every small script in both
+(the render queue `render-slot.sh`, `variants.mjs`, Unit 5's
+`Sampling-motion.mjs` / `Sampling-sync.mjs`, the agents' job scripts) are in
+`agent-outputs/20261016-video-scratch/`; copy them back before resuming in a
+fresh container.

@@ -190,7 +190,7 @@ export const PeekScene: React.FC = () => {
       {/* The planned size: the one look that counts, lit when it is named. */}
       {ease(frame, theEndAt - 4, 14) > 0 ? (
         <Svg opacity={ease(frame, theEndAt - 4, 14)}>
-          <rect x={X.x1 - 22} y={py(P_MAX) - 14} width={44} height={y(BASE) - py(P_MAX) + 14} rx={8} fill={HIGHLIGHT} opacity={0.9} />
+          <rect x={X.x1 - 7} y={py(P_MAX) - 14} width={34} height={y(BASE) - py(P_MAX) + 14} rx={8} fill={HIGHLIGHT} opacity={0.9} />
         </Svg>
       ) : null}
       <Note at={theEndAt} x={X.x1 + 16} y={py(P_MAX) + 24}>

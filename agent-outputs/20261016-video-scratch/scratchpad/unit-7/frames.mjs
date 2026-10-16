@@ -1,0 +1,20 @@
+import { pathToFileURL } from "node:url";
+import { existsSync, readFileSync } from "node:fs";
+const root = "/home/user/dataslope/video";
+const { script } = await import(pathToFileURL(`${root}/src/videos/testing-hypotheses/script.ts`).href);
+const { buildTimeline } = await import(pathToFileURL(`${root}/src/narration/timeline.ts`).href);
+const ap = `${root}/public/narration/testing-hypotheses/alignment.json`;
+const t = buildTimeline(script, existsSync(ap) ? JSON.parse(readFileSync(ap, "utf8")) : null);
+const fps = 30;
+const scenes = script.beats.map((b, i) => (b.scene ? i : -1)).filter((i) => i >= 0);
+const out = [];
+scenes.forEach((s, k) => {
+  const first = t.beats[s];
+  const lastIdx = (scenes[k + 1] ?? t.beats.length) - 1;
+  const last = t.beats[lastIdx];
+  const mid = (first.start + last.end) / 2;
+  out.push({ id: first.id, mid: Math.round(mid * fps), end: Math.round((last.end + 0.5) * fps) });
+});
+const mode = process.argv[2] ?? "end";
+console.log(out.map((o) => (mode === "mid" ? o.mid : mode === "both" ? `${o.mid} ${o.end}` : o.end)).join(" "));
+console.error(out.map((o) => `${o.id}:${o.mid}/${o.end}`).join(" "), "total", Math.round(t.duration * fps));
