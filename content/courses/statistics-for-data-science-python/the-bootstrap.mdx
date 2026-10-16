@@ -217,9 +217,14 @@ fig = px.histogram(
     title="Bootstrap distribution of the median",
     template="simple_white",
 )
-fig.add_vline(x=np.median(data), line_dash="dash", annotation_text="observed median")
-fig.add_vline(x=ci_low, line_color="red")
-fig.add_vline(x=ci_high, line_color="red")
+fig.add_vline(
+    x=np.median(data),
+    line_dash="dash",
+    line_width=2,
+    annotation_text="observed median",
+)
+fig.add_vline(x=ci_low, line_color="red", line_width=2)
+fig.add_vline(x=ci_high, line_color="red", line_width=2)
 fig.show()
 
 print(f"observed median  = {np.median(data):,.0f}")

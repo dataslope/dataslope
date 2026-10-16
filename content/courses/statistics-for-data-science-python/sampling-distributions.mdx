@@ -124,7 +124,7 @@ fig = px.histogram(
     labels={"value": "Sample mean (x-bar)"},
     template="simple_white",
 )
-fig.add_vline(x=MU, line_dash="dash", annotation_text="true mu = 50")
+fig.add_vline(x=MU, line_dash="dash", line_width=2, annotation_text="true mu = 50")
 fig.show()
 
 print(f"Population mean mu               = {MU:.2f}")
@@ -208,7 +208,7 @@ fig = px.histogram(
     title="Three different distributions on the same axis",
     template="simple_white",
 )
-fig.add_vline(x=MU, line_dash="dash")
+fig.add_vline(x=MU, line_dash="dash", line_width=2)
 fig.show()
 
 print(f"(a) population raw values   -> sd = {pop_vals.std():5.2f}")
@@ -286,7 +286,7 @@ fig = px.histogram(
     labels={"x_bar": "Sample mean (x-bar)"},
     template="simple_white",
 )
-fig.add_vline(x=MU, line_dash="dash", annotation_text="mu = 50")
+fig.add_vline(x=MU, line_dash="dash", line_width=2, annotation_text="mu = 50")
 fig.show()
 
 print()

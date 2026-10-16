@@ -228,7 +228,7 @@ fig = px.histogram(
     title="x-bar is a random variable: 1000 samples, 1000 means",
     template="simple_white",
 )
-fig.add_vline(x=MU_TRUE, line_dash="dash", annotation_text="true mu = 100")
+fig.add_vline(x=MU_TRUE, line_dash="dash", line_width=2, annotation_text="true mu = 100")
 fig.show()
 
 print(f"The sample means scatter around the true mu = {MU_TRUE}.")

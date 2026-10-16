@@ -271,7 +271,7 @@ fig = px.line(
     title="Law of Large Numbers: running proportion converges to 0.5",
     template="simple_white",
 )
-fig.add_hline(y=0.5, line_dash="dash", line_color="red")
+fig.add_hline(y=0.5, line_dash="dash", line_color="red", line_width=2)
 fig.show()
 
 print(f"After 10 flips:    {running_prop[9]:.3f}")

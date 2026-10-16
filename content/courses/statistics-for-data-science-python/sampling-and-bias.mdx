@@ -242,7 +242,7 @@ fig = px.line(
     labels={"n": "Sample size n (log scale)", "estimate": "Estimated mean"},
     template="simple_white",
 )
-fig.add_hline(y=true_mean, line_dash="dash", annotation_text="true mean")
+fig.add_hline(y=true_mean, line_dash="dash", line_width=2, annotation_text="true mean")
 fig.show()
 
 print(f"True mean: {true_mean:.2f}")
