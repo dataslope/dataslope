@@ -2,8 +2,8 @@
 
 **Course:** `content/courses/statistics-for-data-science-python/` (32 lessons in 9 sections)
 **Format:** the editorial style (`video/src/editorial/`): warm paper, Source Serif 4 headlines, watercolor spot illustrations, no burned-in captions. See `video/README.md`.
-**Estimate:** about **80 minutes (75 to 95) in 37 videos of 2 to 3 minutes**, grouped into 9 units.
-**Pilot:** Unit 5, Sampling. All five videos are built and voiced. Two still need their illustrations (2026-10-16).
+**Estimate:** about **80 minutes (75 to 95) in 35 videos**, grouped into 9 units: most are 2 to 3 minutes, and Unit 1 is one video of about 5.
+**Pilot:** Unit 5, Sampling: all five videos built, voiced and illustrated (2026-10-16). Unit 1 is next, as a single video.
 
 ## How the videos are cut
 
@@ -37,13 +37,13 @@ A video per page, narrating about 40% of each page, came to 34 videos and 123 mi
 
 ★ marks an existing video, which needs extending or only a voice-over. Minutes are estimates.
 
-### Unit 1. Thinking statistically (7 min, 3 videos)
+### Unit 1. Thinking statistically (about 5 min, 1 video)
 
-| # | Video | Min | Covers |
-| --- | --- | --- | --- |
-| 1.1 | Signal and noise: why one number isn't enough | 2.5 | why-statistics-matters; statistical-thinking: variation, signal vs. noise, the data-generating process, thinking in distributions |
-| 1.2 | Population, sample, parameter, statistic | 2.5 | populations-and-samples: population vs. sample, parameters vs. statistics, a statistic is a random variable |
-| 1.3 | What kind of data is it, and the encoding trap | 2 | types-of-data: categorical vs. numerical, encoding traps, why type decides which tests are valid |
+The user asked for Unit 1 as one video rather than three (2026-10-16). It keeps the three ideas as three parts of one argument, each part ending on the question the next one answers.
+
+| # | Video | Min | Covers | Status |
+| --- | --- | --- | --- | --- |
+| 1 | Thinking statistically (`ThinkingStatistically`) | 5 | 1. signal and noise: why-statistics-matters; statistical-thinking (variation, signal vs. noise, the data-generating process, thinking in distributions). 2. population, sample, parameter, statistic: populations-and-samples. 3. what kind of data it is, and the encoding trap: types-of-data | in progress |
 
 ### Unit 2. Describing data (9 min, 4 videos)
 
@@ -77,9 +77,9 @@ A video per page, narrating about 40% of each page, came to 34 videos and 123 mi
 
 | # | Video | Min | Covers | Embeds at | Status |
 | --- | --- | --- | --- | --- | --- |
-| 5.1 | Bigger and biased is still biased | 2.5 | sampling-and-bias: why the method is everything, convenience sampling, the punchline, bias vs. variance | sampling-and-bias, "The punchline: a bigger biased sample does not help" | done, voiced, 2:35; illustrations pending (`SamplingBias`) |
+| 5.1 | Bigger and biased is still biased | 2.5 | sampling-and-bias: why the method is everything, convenience sampling, the punchline, bias vs. variance | sampling-and-bias, "The punchline: a bigger biased sample does not help" | done, voiced, 2:35 (`SamplingBias`) |
 | 5.2 | Survivorship bias | 1.5 | sampling-and-bias and statistical-fallacies: survivorship bias | both lessons' "Survivorship bias" sections | done, voiced, 1:48 (`SurvivorshipBias`) |
-| 5.3 | The three distributions to keep apart | 2.5 | sampling-distributions: the three distributions, building one by hand, more samples vs. larger samples, any statistic | sampling-distributions, "The three distributions you must keep separate" | done, voiced, 2:49; illustrations pending (`SamplingDistributions`) |
+| 5.3 | The three distributions to keep apart | 2.5 | sampling-distributions: the three distributions, building one by hand, more samples vs. larger samples, any statistic | sampling-distributions, "The three distributions you must keep separate" | done, voiced, 2:49 (`SamplingDistributions`) |
 | 5.4 | ★ The central limit theorem | 1.5 | central-limit-theorem | central-limit-theorem, "Watch it happen from a skewed population" | done, voiced, 1:32 (`CentralLimitTheorem`) |
 | 5.5 | Standard error and the √n law | 2 | standard-error; the √n sections of populations-and-samples and sampling-distributions | standard-error, "Standard deviation vs. standard error" | done, voiced, 2:10 (`StandardError`) |
 
