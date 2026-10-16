@@ -9,6 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BIN_HI, BIN_LO, BIN_W, COUNTS, countBelow, FUNDS, meanAbove } from "./data";
 import { Swatch } from "./parts";
+import { countTo, flash } from "../sampling/emphasis";
 
 const X: XScale = { lo: BIN_LO, hi: BIN_HI, x0: 160, x1: 1760 };
 const BASE = 860;
@@ -41,6 +42,15 @@ export const FundsScene: React.FC = () => {
   const sevenAt = n.word("left", "seven");
   const deletedAt = n.word("deleted", "deleted");
   const betterAt = n.word("deleted", "better");
+  // The funds build as they are named; the new average counts up as it is
+  // read; the deleted funds are pointed at as "the losers".
+  const takeAt = n.word("funds", "Take");
+  const fundsAt = n.word("funds", "funds", { nth: 1 });
+  const notOneAt = n.word("deleted", "Not one");
+  const losersAt = n.word("deleted", "losers");
+  const sixFiveEnd = n.word("left", "six five", { edge: "end" });
+  const perBin = Math.max(0.4, (fundsAt - takeAt) / COUNTS.length);
+  const losers = flash(frame, losersAt - 2, 30);
 
   // The sweep: one bin at a time, from the far left up to the cutoff.
   const sweepFrom = closeAt + 10;
@@ -53,7 +63,7 @@ export const FundsScene: React.FC = () => {
 
   const unit = h(TALLEST) / MAX;
   const base = y(BASE);
-  const ghost = 1 - 0.45 * ease(frame, deletedAt, 14);
+  const ghost = 1 - 0.7 * ease(frame, deletedAt, 14);
   const allX = sx(X, FUNDS.trueAvg);
   const survX = sx(X, live.mean);
   const cutX = sx(X, FUNDS.closedAt);
@@ -61,7 +71,7 @@ export const FundsScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: the funds, the two lines, the sweep, the count, the new average ── */}
-      <Sfx name="el-pop" at={start + 4} level={-30} />
+      <Sfx name="el-pop" at={takeAt} level={-30} />
       <Sfx name="el-pencil" at={averagingAt - 2} level={-34} />
       <Sfx name="el-pencil" at={closeAt - 2} level={-34} />
       <Sfx name="el-whoosh" at={sweepFrom} level={-34} />
@@ -98,7 +108,7 @@ export const FundsScene: React.FC = () => {
       {/* ── The histogram ── */}
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
         {COUNTS.map((c, i) => {
-          const grow = ease(frame, start + 4 + i * 0.6, 16);
+          const grow = ease(frame, takeAt + i * perBin, 16);
           if (c <= 0 || grow <= 0) return null;
           const x = sx(X, BIN_LO + i * BIN_W) + 1;
           const w = sx(X, BIN_LO + (i + 1) * BIN_W) - sx(X, BIN_LO + i * BIN_W) - 2;
@@ -116,8 +126,8 @@ export const FundsScene: React.FC = () => {
               width={w - 1.6}
               height={hh - 1.6}
               fill="none"
-              stroke={INK_SOFT}
-              strokeWidth={1.4}
+              stroke={losers > 0 ? `color-mix(in srgb, ${ACCENT} ${Math.round(losers * 100)}%, ${INK_SOFT})` : INK_SOFT}
+              strokeWidth={1.4 + 1.2 * losers}
               strokeDasharray="4 3"
               opacity={ghost}
             />
@@ -192,12 +202,13 @@ export const FundsScene: React.FC = () => {
             opacity: ease(frame, sevenAt - 2, 10),
           }}
         >
-          {fmt(FUNDS.survivorAvg)}%
+          {fmt(countTo(frame, sevenAt - 2, Math.max(10, sixFiveEnd - sevenAt + 2), FUNDS.trueAvg, FUNDS.survivorAvg))}%
         </div>
       </Note>
-      <Note at={betterAt} x={sx(X, FUNDS.survivorAvg) + 16} y={y(LINE_TOP + 86)}>
+      <Note at={notOneAt - 2} x={sx(X, FUNDS.survivorAvg) + 16} y={y(LINE_TOP + 86)}>
         <span style={note(21, INK_SOFT)}>
-          <b style={{ color: ACCENT_INK }}>+{fmt(FUNDS.inflation)} points</b>, and not one fund did better
+          <b style={{ color: ACCENT_INK }}>+{fmt(FUNDS.inflation)} points</b>
+          <span style={{ opacity: ease(frame, betterAt - 2, 12) }}>, and not one fund did better</span>
         </span>
       </Note>
     </AbsoluteFill>

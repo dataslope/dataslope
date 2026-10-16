@@ -46,8 +46,8 @@ export const LibraryScene: React.FC = () => {
   const payAt = n.word("buys-in", "pay");
   const end = n.beat("ask").from;
 
-  const books = useEntityLayout({ x: X0, y: y(TOP), width: 330, name: "books", columns: cols(LIBRARY.books) });
-  const copies = useEntityLayout({ x: 560, y: y(TOP), width: 360, name: "book_copies", columns: cols(LIBRARY.copies) });
+  const books = useEntityLayout({ x: X0, y: y(TOP), width: 300, name: "books", columns: cols(LIBRARY.books) });
+  const copies = useEntityLayout({ x: 580, y: y(TOP), width: 340, name: "book_copies", columns: cols(LIBRARY.copies) });
   const loans = useEntityLayout({ x: 1040, y: y(LOANS_Y), width: 400, name: "loans", columns: cols(LIBRARY.loans) });
   const borrowers = useEntityLayout({ x: 1520, y: y(TOP), width: 300, name: "borrowers", columns: cols(LIBRARY.borrowers) });
 

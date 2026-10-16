@@ -89,6 +89,7 @@ export const OrbiterScene: React.FC = () => {
       <Sfx name="el-tap" at={readAt - 4} level={-30} />
       <Sfx name="el-pencil" at={numbersAt - 4} level={-34} />
       <Sfx name="el-pencil" at={namingAt - 6} level={-34} />
+      <Sfx name="el-chime" at={n.beat("next").to + 8} level={-33} />
 
       <Headline lead="Even a type" turn="is a rule." at={orbFrom - 6} turnAt={ruleAt - 4} size={72} />
 
@@ -122,18 +123,24 @@ export const OrbiterScene: React.FC = () => {
           <Arrow from={[mid, fileTop + fileH + 6]} to={[mid, bTop - 6]} at={readAt + 2} dur={10} />
           {card(bTop, readAt, "Another read", "newton-seconds", "N·s", newtonAt)}
 
-          {/* The unit nobody wrote down. */}
-          <Note at={nothingAt - 2} x={X0 + CARD_W + 36} y={fileTop + 8}>
+          {/* The unit nobody wrote down: an empty slot beside the file. */}
+          <Note at={nothingAt - 2} x={X0 + CARD_W + 30} y={fileTop + fileH / 2 - 24}>
             <div
               style={{
-                ...label(24, ACCENT_INK),
-                fontWeight: 700,
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                height: 48,
+                padding: "0 16px",
+                borderRadius: 6,
+                border: `2px dashed ${ACCENT}`,
                 whiteSpace: "nowrap",
                 transform: `scale(${1 + unknown * 0.08})`,
                 transformOrigin: "0 50%",
               }}
             >
-              unit: none
+              <span style={{ ...label(22, INK_SOFT) }}>unit</span>
+              <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>none</span>
             </div>
           </Note>
           <Note at={numbersAt + 2} x={X0} y={bTop + h(96) + 26}>
@@ -142,17 +149,6 @@ export const OrbiterScene: React.FC = () => {
               {fmt(LBF_S)} times too small
             </span>
           </Note>
-          <div
-            style={{
-              position: "absolute",
-              left: X0 + CARD_W + 36,
-              top: fileTop + fileH - 6,
-              width: 180 * ease(frame, nothingAt + 4, 14),
-              height: 3,
-              borderRadius: 2,
-              background: ACCENT,
-            }}
-          />
         </div>
       </Drift>
 

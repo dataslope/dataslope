@@ -60,7 +60,6 @@ export const QuestionsScene: React.FC = () => {
         <Sfx key={r.at} name="el-tap" at={r.at - 4} level={-30} />
       ))}
       <Sfx name="el-pencil" at={writeAt - 2} level={-34} />
-      <Sfx name="el-pencil" at={isntAt} level={-35} />
 
       <Kicker at={whatFrom - 10}>What design is</Kicker>
       <Headline lead="Design is answering" turn="the hard questions." at={whatFrom - 6} turnAt={hardAt - 4} size={72} />

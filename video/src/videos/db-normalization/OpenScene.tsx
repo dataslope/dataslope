@@ -26,7 +26,7 @@ import { Drift, pulse, Reply, Spot, Tick } from "./parts";
 /** The right-hand column: notes, the statement, Postgres's reply. */
 const RIGHT = 1250;
 const CHECKS_Y = 650;
-const LISTING_Y = 470;
+const LISTING_Y = 496;
 const LISTING_SIZE = 22;
 
 /** How many rows hold a value in a column. */

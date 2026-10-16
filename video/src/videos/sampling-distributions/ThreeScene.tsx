@@ -37,7 +37,7 @@ import {
   VIDEO,
 } from "./data";
 import { Bracket, money, POP_FILL, Rule, SAMPLE_FILL } from "./parts";
-import { countTo, flash } from "../sampling/emphasis";
+import { countTo, flash, swell } from "../sampling/emphasis";
 
 // ── Layout, in the page's layout coordinates (through y() and h()) ──────────
 
@@ -112,6 +112,7 @@ const AT_SD = Math.exp(-0.5);
  */
 export const ThreeScene: React.FC = () => {
   const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
   const n = useNarration();
   const { y, h } = useLayout();
 
@@ -147,6 +148,21 @@ export const ThreeScene: React.FC = () => {
   const eachAt = n.word("data", "one per customer");
   const dollarsAt = n.word("third", "dollars");
   const becomesAt = n.word("block", "becomes");
+  const theseAt = n.word("compare", "these three");
+  const rawPopAt = n.word("raw", "population");
+  const rawSampleAt = n.word("raw", "sample");
+  const tensAt = n.word("raw", "tens of dollars");
+  const oneAverageAt = n.word("statistic", "one average");
+  const barelyAt = n.word("statistic", "barely moves");
+  const pinAt = n.word("why", "pin down");
+  const millionWhyAt = n.word("why", "million");
+  const yourDataAt = n.word("why", "histogram");
+  /** A FigLabel that swells in place, from its own left end. */
+  const swelling = (x: number, top: number, at: number, children: React.ReactNode) => (
+    <div style={{ position: "absolute", inset: 0, transformOrigin: `${x}px ${top + 12}px`, transform: `scale(${swell(frame, at, 0.07, 18)})` }}>
+      {children}
+    </div>
+  );
   const pileTo = n.beat("pile").to;
   const compareFrom = n.beat("compare").from;
   const oneAxisAt = n.word("compare", "one axis");
@@ -220,13 +236,18 @@ export const ThreeScene: React.FC = () => {
       </Ink>
       {ILLUSTRATIONS ? <Basket at={millionAt} out={p1Out} /> : null}
 
-      <FigLabel
-        n="2"
-        title="The population: a million customers' spend"
-        at={popFrom - 6}
-        x={150}
-        y={y(lerp(POP_BIG.label, POP_ROW.label, m))}
-      />
+      {swelling(
+        150,
+        y(lerp(POP_BIG.label, POP_ROW.label, m)),
+        theseAt - 2,
+        <FigLabel
+          n="2"
+          title="The population: a million customers' spend"
+          at={popFrom - 6}
+          x={150}
+          y={y(lerp(POP_BIG.label, POP_ROW.label, m))}
+        />,
+      )}
       <Bars
         counts={POPULATION.hist.counts}
         lo={POPULATION.hist.lo}
@@ -260,7 +281,18 @@ export const ThreeScene: React.FC = () => {
         width={2.4 + emphasis}
       />
       <Note at={eighteenAt - 2} x={sx(X, POPULATION.mean + POPULATION.sd) + 14} y={y(popBase - popH * AT_SD) - 15}>
-        <span style={{ ...note(24, INK), fontWeight: 650, ...halo }}>± ${fmt(POPULATION.sd)}</span>
+        <span
+          style={{
+            ...note(24, INK),
+            fontWeight: 650,
+            ...halo,
+            display: "inline-block",
+            transformOrigin: "left center",
+            transform: `scale(${swell(frame, rawPopAt - 2, 0.18, 20)})`,
+          }}
+        >
+          ± ${fmt(POPULATION.sd)}
+        </span>
       </Note>
 
       {/* ══ Phase 2: one sample ══ */}
@@ -283,9 +315,14 @@ export const ThreeScene: React.FC = () => {
         </div>
       </Note>
 
-      <FigLabel n="3" title={`One sample of ${N} customers`} at={sampleFrom} x={150} y={y(SAMPLE_LABEL)} />
+      {swelling(
+        150,
+        y(SAMPLE_LABEL),
+        theseAt + 4,
+        <FigLabel n="3" title={`One sample of ${N} customers`} at={sampleFrom} x={150} y={y(SAMPLE_LABEL)} />,
+      )}
       <Axis scale={X} base={y(SAMPLE_BASE)} ticks={TICKS} format={money} at={sampleFrom + 2} />
-      <SampleBlocks pickAt={pickAt} fallAt={randomAt + 2} popBase={y(popBase)} rippleAt={eachAt} />
+      <SampleBlocks pickAt={pickAt} fallAt={randomAt + 2} popBase={y(popBase)} rippleAt={[eachAt, yourDataAt]} />
       <Skyline at={raggedAt - 2} out={p2Out} />
       <Bracket
         x0={sx(X, SAMPLE.mean - SAMPLE.sd)}
@@ -295,7 +332,18 @@ export const ThreeScene: React.FC = () => {
         width={2.4 + emphasis}
       />
       <Note at={twentyAt - 2} x={sx(X, SAMPLE.mean + SAMPLE.sd) + 14} y={y(SAMPLE_BASE - STACK * STEP * AT_SD) - 15}>
-        <span style={{ ...note(24, INK), fontWeight: 650, ...halo }}>± ${fmt(SAMPLE.sd)}</span>
+        <span
+          style={{
+            ...note(24, INK),
+            fontWeight: 650,
+            ...halo,
+            display: "inline-block",
+            transformOrigin: "left center",
+            transform: `scale(${swell(frame, rawSampleAt - 2, 0.18, 20)})`,
+          }}
+        >
+          ± ${fmt(SAMPLE.sd)}
+        </span>
       </Note>
 
       {/* ══ Phase 3: the sampling distribution ══ */}
@@ -329,7 +377,12 @@ export const ThreeScene: React.FC = () => {
         <div style={{ ...note(21, INK_SOFT), marginTop: 6 }}>The population&apos;s average is ${fmt(POPULATION.mean)}.</div>
       </Note>
 
-      <FigLabel n="4" title={`The average of each sample of ${N}`} at={thirdFrom} x={150} y={y(MEANS_LABEL)} />
+      {swelling(
+        150,
+        y(MEANS_LABEL),
+        theseAt + 10,
+        <FigLabel n="4" title={`The average of each sample of ${N}`} at={thirdFrom} x={150} y={y(MEANS_LABEL)} />,
+      )}
       <Axis scale={X} base={y(MEANS_BASE)} ticks={TICKS} format={money} at={thirdFrom + 2} />
       <Bars
         counts={counts}
@@ -337,7 +390,7 @@ export const ThreeScene: React.FC = () => {
         bin={MEAN_BIN}
         scale={X}
         base={y(MEANS_BASE)}
-        unit={h(unit)}
+        unit={h(unit) * swell(frame, oneAverageAt - 2, 0.12, 22)}
         color={ACCENT}
         gap={2}
         overlay={frame < fastTo + 6 ? { counts: recent, color: ds("red", 800) } : undefined}
@@ -395,7 +448,29 @@ export const ThreeScene: React.FC = () => {
           three widths.
         </Ink>
       </div>
-      <WidthTable rawAt={rawAt} statAt={statAt} middleAt={middleAt} />
+      <WidthTable rawAt={rawAt} statAt={statAt} middleAt={middleAt} tensAt={tensAt} barelyAt={barelyAt} />
+      {/* "pin down the average of a million": the pile's center, up through
+          every row to the population's own average. */}
+      <Rule
+        x={sx(X, PILE.mean)}
+        y0={y(MEANS_BASE - MEANS_H - 14)}
+        y1={y(POP_ROW.base - POP_ROW.height - 14)}
+        at={pinAt - 2}
+        dur={20}
+        color={ACCENT}
+        width={2.2}
+        dash="6 6"
+      />
+      <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
+        <circle
+          cx={sx(X, POPULATION.mean)}
+          cy={y(POP_ROW.base - POP_ROW.height - 14)}
+          r={8 * pop(frame, millionWhyAt - 2, fps, 12)}
+          fill={ACCENT}
+          stroke={PAPER}
+          strokeWidth={1.5}
+        />
+      </svg>
       <Note at={gapAt} x={RX} y={y(640)} width={RW}>
         <span style={{ ...body(30, true), color: INK }}>
           That gap is why {N} customers can pin down the average of a million.
@@ -430,7 +505,7 @@ const Basket: React.FC<{ at: number; out: number }> = ({ at, out }) => {
 
 /** The forty customers: lit up on the population, then dropped into row 2 as
  *  one block each. */
-const SampleBlocks: React.FC<{ pickAt: number; fallAt: number; popBase: number; rippleAt: number }> = ({
+const SampleBlocks: React.FC<{ pickAt: number; fallAt: number; popBase: number; rippleAt: readonly number[] }> = ({
   pickAt,
   fallAt,
   popBase,
@@ -450,7 +525,7 @@ const SampleBlocks: React.FC<{ pickAt: number; fallAt: number; popBase: number; 
         const top = y(blockTop(s));
         if (t >= 1) {
           // "One per customer": a ripple across the forty, in drawing order.
-          const lit = flash(frame, rippleAt + i * 0.6, 14);
+          const lit = Math.max(...rippleAt.map((at) => flash(frame, at + i * 0.6, 14)));
           const fill = lit > 0 ? `color-mix(in srgb, ${POP_FILL} ${Math.round(lit * 70)}%, ${SAMPLE_FILL})` : SAMPLE_FILL;
           return <rect key={i} x={left} y={top - lit * 4} width={BLOCK_W} height={h(BLOCK)} fill={fill} />;
         }
@@ -666,12 +741,20 @@ const Gridlines: React.FC<{ at: number; top: number; bottom: number }> = ({ at, 
 };
 
 /** The three spreads, grouped by what they describe. */
-const WidthTable: React.FC<{ rawAt: number; statAt: number; middleAt: number }> = ({ rawAt, statAt, middleAt }) => {
+const WidthTable: React.FC<{ rawAt: number; statAt: number; middleAt: number; tensAt: number; barelyAt: number }> = ({
+  rawAt,
+  statAt,
+  middleAt,
+  tensAt,
+  barelyAt,
+}) => {
   const frame = useCurrentFrame();
   const { y } = useLayout();
   const mark = ease(frame, middleAt - 2, 12);
-  const row = (name: string, value: string, color: string, top: number, at: number, highlight = 0) => {
+  const row = (name: string, value: string, color: string, top: number, at: number, highlight = 0, pulse?: number, namePulse?: number) => {
     const p = ease(frame, at, 12);
+    const grow = pulse === undefined ? 1 : swell(frame, pulse, 0.16, 20);
+    const nameGrow = namePulse === undefined ? 1 : swell(frame, namePulse, 0.08, 20);
     return (
       <div
         style={{
@@ -700,9 +783,13 @@ const WidthTable: React.FC<{ rawAt: number; statAt: number; middleAt: number }> 
               opacity: highlight > 0 ? 1 : 0,
             }}
           />
-          <span style={{ position: "relative", ...body(32), color: INK }}>{name}</span>
+          <span style={{ position: "relative", display: "inline-block", transformOrigin: "left center", transform: `scale(${nameGrow})`, ...body(32), color: INK }}>
+            {name}
+          </span>
         </span>
-        <span style={{ ...note(28, color), fontWeight: 700 }}>{value}</span>
+        <span style={{ ...note(28, color), fontWeight: 700, display: "inline-block", transformOrigin: "right center", transform: `scale(${grow})` }}>
+          {value}
+        </span>
       </div>
     );
   };
@@ -711,12 +798,12 @@ const WidthTable: React.FC<{ rawAt: number; statAt: number; middleAt: number }> 
       <Note at={rawAt - 4} x={RX} y={y(282)} width={RW}>
         <span style={label(21, INK_SOFT)}>Raw values, one per customer</span>
       </Note>
-      {row("The population", `± $${fmt(POPULATION.sd)}`, INK, 322, rawAt - 2)}
-      {row("One sample", `± $${fmt(SAMPLE.sd)}`, INK, 382, rawAt + 2, mark)}
+      {row("The population", `± $${fmt(POPULATION.sd)}`, INK, 322, rawAt - 2, 0, tensAt - 2)}
+      {row("One sample", `± $${fmt(SAMPLE.sd)}`, INK, 382, rawAt + 2, mark, tensAt + 4, middleAt - 2)}
       <Note at={statAt - 4} x={RX} y={y(466)} width={RW}>
         <span style={label(21, ACCENT_INK)}>A statistic, one per sample</span>
       </Note>
-      {row("Sample averages", `± $${fmt(PILE.sd)}`, ACCENT_INK, 506, statAt)}
+      {row("Sample averages", `± $${fmt(PILE.sd)}`, ACCENT_INK, 506, statAt, 0, barelyAt - 2)}
     </>
   );
 };

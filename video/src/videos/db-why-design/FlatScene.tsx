@@ -27,6 +27,8 @@ const TABLE_Y = 345;
 const GROUP_FIG_Y = 612;
 const GROUP_Y = 658;
 const SQL_SIZE = 22;
+/** A small count, set as the narration says it. */
+const WORDS = ["No", "One", "Two", "Three", "Four"];
 
 /**
  * Part 1 opens: the lesson's flat table, every field in one place, works on
@@ -77,13 +79,11 @@ export const FlatScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: the rows, the update's listing and its one changed cell, the answer ── */}
-      <Sfx name="el-pencil" at={fieldAt} level={-34} />
       {rowAts.map((t, i) => (
         <Sfx key={i} name="el-tap" at={t} level={-29} />
       ))}
       <Sfx name="el-pencil" at={changesAt - 4} level={-34} />
       <Sfx name="el-pop" at={swapAt} level={-29} />
-      <Sfx name="el-tap" at={groupAts[0]} level={-30} />
       <Sfx name="el-scratch" at={twoAt + 4} level={-31} />
 
       <Kicker at={hookFrom - 10}>What a shortcut costs</Kicker>
@@ -155,7 +155,7 @@ export const FlatScene: React.FC = () => {
         />
         <Note at={twoAt + 8} x={gg.x + gg.width + 54} y={gg.rowTop(GROUPED_ADA[0]) + 10}>
           <div style={{ ...body(36), color: ACCENT_INK, whiteSpace: "nowrap" }}>
-            {FLAT.adaEmails} emails for {ADA.split(" ")[0]}.
+            {WORDS[FLAT.adaEmails]} emails for {ADA.split(" ")[0]}.
           </div>
           <div style={{ ...note(22, INK_SOFT), marginTop: 10, whiteSpace: "nowrap" }}>Which is right? The table can&apos;t say.</div>
         </Note>

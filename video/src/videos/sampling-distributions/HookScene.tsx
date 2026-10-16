@@ -11,7 +11,7 @@ import { histogram, peak, PILE, POPULATION, SAMPLE } from "./data";
 import { money, POP_FILL, SAMPLE_FILL } from "./parts";
 import { useMergedPart } from "../sampling/merged";
 import { PartName } from "../sampling/PartName";
-import { Marker } from "../sampling/emphasis";
+import { Marker, swell } from "../sampling/emphasis";
 
 const BASE = 840;
 const HEIGHT = 380;
@@ -60,6 +60,7 @@ export const HookScene: React.FC = () => {
   const { y, h } = useLayout();
   const threeAt = n.word("hook", "three distributions");
   const alikeAt = n.word("hook", "alike");
+  const sideAt = n.word("hook", "side by side");
   const mixingAt = n.word("apart", "mixing");
   const intervalsAt = n.word("apart", "confidence intervals");
   const misreadAt = n.word("apart", "misread");
@@ -108,7 +109,18 @@ export const HookScene: React.FC = () => {
         return (
           <div key={p.title} style={{ position: "absolute", inset: 0, transform: `translateX(${(c - 1) * 34 * part}px)` }}>
             <Ink at={at - 2} dur={14} style={{ left: colX(c), top: y(360) }}>
-              <span style={{ ...body(34, true), color: INK, whiteSpace: "nowrap" }}>{p.title}</span>
+              <span
+                style={{
+                  ...body(34, true),
+                  color: INK,
+                  whiteSpace: "nowrap",
+                  display: "inline-block",
+                  transformOrigin: "left center",
+                  transform: `scale(${swell(frame, sideAt - 2 + c * 5, 0.1, 18)})`,
+                }}
+              >
+                {p.title}
+              </span>
             </Ink>
             <Bars
               counts={p.hist.counts}

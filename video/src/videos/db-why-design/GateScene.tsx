@@ -53,14 +53,10 @@ export const GateScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: each bad row offered, each refusal, the building ── */}
-      {kinds.map((k) => (
-        <Sfx key={k.at} name="el-tap" at={k.at - 4} level={-30} />
-      ))}
       {[0, 1, 2].map((i) => (
         <Sfx key={i} name="el-scratch" at={errAt(i) + 2} level={-32} />
       ))}
       <Sfx name="el-pop" at={schemaAt - 4} level={-30} />
-      <Sfx name="el-chime" at={n.beat("building").to + 6} level={-33} />
 
       <Headline lead="Bad data starts small." turn="It bounces." at={gateFrom - 6} turnAt={bouncesAt - 4} size={72} />
       <Ink at={getsAt - 4} dur={16} out={badAt + 4} style={{ left: 96, top: y(248), whiteSpace: "nowrap" }}>
@@ -75,7 +71,7 @@ export const GateScene: React.FC = () => {
             </Ink>
             <Ink at={kinds[i].at} dur={16} style={{ left: X0, top: blockY(i) + 38, width: BOX_W }}>
               <div style={{ background: LISTING_PAPER, borderTop: `2px solid ${INK}`, padding: "6px 20px", whiteSpace: "nowrap", fontSize: 22 }}>
-                <Strike at={errAt(i) + 4}>
+                <Strike at={errAt(i) + 4} tilt={-0.3}>
                   <Code line={r.sql} size={22} />
                 </Strike>
               </div>

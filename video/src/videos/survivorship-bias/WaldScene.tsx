@@ -20,6 +20,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { PARTS, pct, type PartKey, WALD } from "./data";
 import { PART_HI, Plane, SKIN, Swatch } from "./parts";
+import { swell } from "../sampling/emphasis";
 
 /** Rows of the table, one per part, in the memo's order. */
 const ROW_Y = (i: number) => 380 + i * 122;
@@ -65,6 +66,10 @@ export const WaldScene: React.FC = () => {
   const holesAt = n.word("holes", "holes");
   const protectAt = n.word("holes", "protection");
   const arentAt = n.word("holes", "AREN'T");
+  // While the table is talked about: the fuselage's holes "more than its
+  // share", and every part's holes as "where a plane can be hit".
+  const shareAt = n.word("fuselage", "more than its share");
+  const hitAt = n.word("holes", "hit");
 
   // Which part the narration is on: engines, then the fuselage, then the
   // engines again from "missing" on.
@@ -122,7 +127,8 @@ export const WaldScene: React.FC = () => {
           style={(key) => ({
             fill: focus(key) > 0 ? `color-mix(in srgb, ${PART_HI} ${Math.round(focus(key) * 100)}%, ${SKIN})` : SKIN,
             stroke: key === "engines" && guard > 0 ? ACCENT : INK,
-            width: key === "engines" ? 1.6 + guard * 3 : 1.6,
+            // The part the narration is on is drawn heavier, as well as lit.
+            width: (key === "engines" ? 1.6 + guard * 3 : 1.6) + 1.8 * focus(key),
           })}
         />
       </svg>
@@ -144,6 +150,8 @@ export const WaldScene: React.FC = () => {
         const areaGrow = ease(frame, enginesAt + 4 + i * 4, 16);
         const holesGrow = ease(frame, fewerAt + i * 4, 16);
         const estAt = i === 0 ? thirtyNineAt : i === 1 ? fuselage2At : fiveAt + 8 + (i - 2) * 5;
+        const holesSwell =
+          (p.key === "fuselage" ? swell(frame, shareAt - 2, 0.35, 22) : 1) * swell(frame, hitAt - 2 + i * 4, 0.3, 22);
         return (
           <React.Fragment key={p.key}>
             <div
@@ -173,7 +181,13 @@ export const WaldScene: React.FC = () => {
                 />
               ) : null}
               {holesGrow > 0 ? (
-                <rect x={BX0} y={c + GAP} width={p.hitShare * 100 * PX * holesGrow} height={THICK} fill={BAR} />
+                <rect
+                  x={BX0}
+                  y={c + GAP - (THICK * (holesSwell - 1)) / 2}
+                  width={p.hitShare * 100 * PX * holesGrow}
+                  height={THICK * holesSwell}
+                  fill={BAR}
+                />
               ) : null}
             </svg>
             <Note at={quarterAt + i * 3} x={VALUE_X} y={c - GAP - THICK / 2 - 13}>

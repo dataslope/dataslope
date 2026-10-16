@@ -74,9 +74,7 @@ export const JoinScene: React.FC = () => {
       {/* ── Sound: the entities, each link, the one row, the sentence and its chores ── */}
       <Sfx name="el-tap" at={customersAt - 2} level={-30} />
       <Sfx name="el-tap" at={notebookAt - 2} level={-30} />
-      {[0, 1, 2].map((k) => (
-        <Sfx key={k} name="el-pencil" at={link(k)} level={-35} />
-      ))}
+      <Sfx name="el-pencil" at={link(0)} level={-35} />
       <Sfx name="el-pop" at={adaAt - 4} level={-29} />
       <Sfx name="el-whoosh" at={sentenceAt - 6} level={-34} />
       <Sfx name="el-tap" at={questionAt} level={-30} />

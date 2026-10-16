@@ -9,6 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { LARGEST, mulberry32, POP_SIZE, SIZES, SWEEP, TIGHTENING, TRUE_MEAN, type Spread } from "./data";
 import { EASY, EASY_INK, RANDOM, RANDOM_INK, Underline } from "./parts";
+import { swell } from "../sampling/emphasis";
 
 /** Sample size on a log axis, average score on a linear one. */
 const LOG_LO = Math.log10(SIZES[0]);
@@ -46,6 +47,14 @@ export const BiggerScene: React.FC = () => {
   const wrongAt = n.word("wrong", "wrong");
   const steadyFrom = n.beat("steady").from;
   const highAt = n.word("steady", "ten points high");
+  // What the narration points at while the finished figure is talked about:
+  // each method's line as it is named, the largest size, its steadiness.
+  const randomOneAt = n.word("closing", "random one");
+  const easySampleAt = n.word("wrong", "easy sample");
+  const oneInTenAt = n.word("steady", "one customer in ten");
+  const rockAt = n.word("steady", "rock steady");
+  const randomLine = ease(frame, randomOneAt - 2, 12) * (1 - ease(frame, easySampleAt - 2, 12));
+  const easyLine = ease(frame, easySampleAt - 2, 12) * (1 - ease(frame, steadyFrom, 16));
 
   // Columns arrive from "fifty" to "twenty thousand", one after another.
   const columnAt = (i: number) => fiftyAt + ((twentyAt - fiftyAt) * i) / (SIZES.length - 1);
@@ -145,11 +154,18 @@ export const BiggerScene: React.FC = () => {
       </Note>
 
       {/* Where 95 in 100 averages fall, by method. */}
-      <Band rows={SWEEP.map((r) => r.random)} color={RANDOM} p={bands} />
-      <Band rows={SWEEP.map((r) => r.convenience)} color={EASY} p={bands} />
+      <Band rows={SWEEP.map((r) => r.random)} color={RANDOM} p={bands} emph={randomLine} />
+      <Band rows={SWEEP.map((r) => r.convenience)} color={EASY} p={bands} emph={easyLine} />
 
       {SWEEP.map((r, i) => (
-        <Column key={r.n} x={lx(r.n)} random={r.random} easy={r.convenience} at={columnAt(i)} />
+        <Column
+          key={r.n}
+          x={lx(r.n)}
+          random={r.random}
+          easy={r.convenience}
+          at={columnAt(i)}
+          steadyAt={i === SWEEP.length - 1 ? rockAt : undefined}
+        />
       ))}
 
       <Note at={steadierAt + 6} x={930} y={y(668)}>
@@ -173,6 +189,13 @@ export const BiggerScene: React.FC = () => {
         </span>
       </Note>
 
+      {/* "One customer in ten", over the largest size. */}
+      <Note at={oneInTenAt - 2} x={last} y={y(ly(85.2))} from="up">
+        <span style={{ display: "inline-block", transform: "translateX(-50%)", whiteSpace: "nowrap", ...note(21, INK_SOFT), ...halo }}>
+          1 customer in {Math.round(POP_SIZE / LARGEST.n)}
+        </span>
+      </Note>
+
       {/* "Still almost ten points high", at the largest size. */}
       <VBracket x={last + 34} y0={y(truthY)} y1={y(ly(LARGEST.convenience.center))} at={steadyFrom + 4} />
       <Note at={highAt - 4} x={last + 56} y={y(ly((TRUE_MEAN + LARGEST.convenience.center) / 2)) - 30}>
@@ -189,7 +212,13 @@ export const BiggerScene: React.FC = () => {
 
 /** One sample size: the first 60 of its 400 averages by each method,
  *  jittered sideways, popping in over a few frames. */
-const Column: React.FC<{ x: number; random: Spread; easy: Spread; at: number }> = ({ x, random, easy, at }) => {
+const Column: React.FC<{ x: number; random: Spread; easy: Spread; at: number; steadyAt?: number }> = ({
+  x,
+  random,
+  easy,
+  at,
+  steadyAt,
+}) => {
   const frame = useCurrentFrame();
   const { y } = useLayout();
   if (frame < at - 1) return null;
@@ -202,7 +231,7 @@ const Column: React.FC<{ x: number; random: Spread; easy: Spread; at: number }> 
           key={`${off}-${j}`}
           cx={x + JITTER[off + j] * JITTER_W}
           cy={y(ly(v))}
-          r={4.2 * p}
+          r={4.2 * p * (steadyAt !== undefined && off > 0 ? swell(frame, steadyAt - 2 + j * 0.2, 0.5, 20) : 1)}
           fill={color}
           opacity={0.72}
         />
@@ -218,7 +247,7 @@ const Column: React.FC<{ x: number; random: Spread; easy: Spread; at: number }> 
 
 /** The band where 95 in 100 averages fell (2.5th to 97.5th percentile),
  *  joined straight between the measured sizes. */
-const Band: React.FC<{ rows: readonly Spread[]; color: string; p: number }> = ({ rows, color, p }) => {
+const Band: React.FC<{ rows: readonly Spread[]; color: string; p: number; emph?: number }> = ({ rows, color, p, emph = 0 }) => {
   const { y } = useLayout();
   if (p <= 0) return null;
   const xs = SIZES.map(lx);
@@ -227,7 +256,13 @@ const Band: React.FC<{ rows: readonly Spread[]; color: string; p: number }> = ({
   return (
     <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: p }}>
       <polygon points={[...top, ...bottom].join(" ")} fill={color} opacity={0.16} />
-      <polyline points={rows.map((r, i) => `${xs[i]},${y(ly(r.center))}`).join(" ")} fill="none" stroke={color} strokeWidth={2} opacity={0.6} />
+      <polyline
+        points={rows.map((r, i) => `${xs[i]},${y(ly(r.center))}`).join(" ")}
+        fill="none"
+        stroke={color}
+        strokeWidth={2 + 2.5 * emph}
+        opacity={0.6 + 0.4 * emph}
+      />
     </svg>
   );
 };

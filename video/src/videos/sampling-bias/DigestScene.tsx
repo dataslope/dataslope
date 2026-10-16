@@ -48,7 +48,9 @@ export const DigestScene: React.FC = () => {
   const lessonFrom = n.beat("lesson").from;
   const whoAt = n.word("lesson", "who");
 
-  const sack = ILLUSTRATIONS ? pop(frame, mailedAt - 6, fps, 16) : 0;
+  // The sack arrives with the poll's name, the ballots with "mailed".
+  const digestNameAt = n.word("digest", "Literary Digest");
+  const sack = ILLUSTRATIONS ? pop(frame, digestNameAt - 4, fps, 16) : 0;
   const scaleIn = ease(frame, callFrom - 6, 16);
 
   return (

@@ -196,6 +196,9 @@ export const SampleScene: React.FC = () => {
         </svg>
       ) : null}
 
+      {/* "anyone above seventy-five": the line the easy way favours. */}
+      <TruthLine x={sx(X1, THRESHOLD)} bottom={y(base)} top={y(popTop - 34)} at={aboveAt - 2} color={EASY} width={2.4} />
+
       {/* The window Fig. 2 enlarges. */}
       <ZoomFan at={fig2At} base={base} />
 

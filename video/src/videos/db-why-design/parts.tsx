@@ -125,7 +125,12 @@ export const Mark: React.FC<{ at: number; out?: number; dur?: number; color?: st
 };
 
 /** A line struck through the words it wraps, drawn left to right on `at`. */
-export const Strike: React.FC<{ at: number; color?: string; children: React.ReactNode }> = ({ at, color = ACCENT, children }) => {
+export const Strike: React.FC<{ at: number; color?: string; tilt?: number; children: React.ReactNode }> = ({
+  at,
+  color = ACCENT,
+  tilt = -2,
+  children,
+}) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   return (
@@ -141,7 +146,7 @@ export const Strike: React.FC<{ at: number; color?: string; children: React.Reac
           minHeight: 3,
           background: color,
           borderRadius: 2,
-          transform: "rotate(-2deg)",
+          transform: `rotate(${tilt}deg)`,
           transformOrigin: "0 50%",
           opacity: p > 0 ? 1 : 0,
         }}
