@@ -144,6 +144,7 @@ The process is the one in `video/README.md`; in short:
   - 5.3 → 5.4: the mean's shape, even when the data is lopsided.
   - 5.4 → 5.5: the standard error is not the standard deviation.
   - 5.5 → 6.1: building the confidence interval.
+- **Illustrations: generate directly when a batch stalls** (decided 2026-10-16). If a batch is still in progress an hour after it was submitted, cancel it and generate the same prompts directly. That costs about a cent for two images. `video/README.md`, "Images", has the commands.
 - **Voicing costs characters.** Write each video's bridge into its script before the first recording. After an edit, re-voice only the beats that changed. Record a whole take again only when asked.
 
 ## Open decisions

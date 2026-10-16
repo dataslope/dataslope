@@ -404,6 +404,21 @@ house style and checks:
 - the Batch API
 - an alpha check that rejects an image painted on an opaque background
 
+**When a batch stalls, generate directly.** OpenAI batches usually finish
+within the hour but have sat at "0 of 2 done" for three to six hours. The
+user has approved this fallback for the video art: if a video's batch is
+still `in_progress` an hour after it was submitted, cancel it and run the
+generator's `sync` command on the same prompt file. That costs about twice
+the batch price, roughly a cent for two images at `quality: low`.
+
+```bash
+node ../scripts/generate-illustrations.mjs sync --prompts src/videos/<video>/illustrations.json --out .generated/<video>
+npm run illustrations -- <video> --import
+```
+
+Cancel the stalled batch (`POST /v1/batches/<id>/cancel`), so it can't
+deliver and bill a second set later.
+
 The prompts stay in `src/videos/<video>/illustrations.json`, never in
 `data/illustration-prompts.json`, so video art doesn't show up in the site's
 gallery.
