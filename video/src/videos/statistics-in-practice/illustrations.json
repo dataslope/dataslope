@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "model": "gpt-image-2.5-flare",
+    "brandColors": {
+      "blue": "#148cff",
+      "green": "#20c621",
+      "red": "#ff4f59",
+      "yellow": "#ffdd6c"
+    },
+    "sizes": {
+      "video-hero": "1536x1024",
+      "video-icon": "1024x1024"
+    },
+    "styles": {
+      "watercolor illustration": {
+        "constraints": "Paint it in loose, transparent watercolor: soft washes that feather and bleed at their edges, darker pigment pooling where a wash has dried, gentle blooms inside each shape, and the tooth of cold-press paper visible only inside the paint. Build the scene from a few large, simple shapes rather than many small pieces, and let the washes define the forms instead of hard outlines. Lay every wash in the brand colors below and let two overlapping washes mix into a third; never outline in black, never shade with grey or black, and never paint the whole subject in one hue. An animal keeps its own natural coloring, painted in warm earthy washes with soft fur texture. Draw any person as an anonymous stylized figure with no facial features and no resemblance to a real individual. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no paper texture outside the paint, no floor, no ground shadow, no frame or border, no soft glow and no vignette, so the whole subject lifts off the page in one piece.",
+        "softAlphaWarn": 0.3
+      }
+    }
+  },
+  "prompts": [
+    {
+      "id": "statistics-in-practice-bill",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small round cafe table seen from slightly above, holding a white saucer with a folded paper bill and three round coins left on it, and an empty coffee cup beside the saucer"
+    },
+    {
+      "id": "statistics-in-practice-chest",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a sturdy wooden chest bound with dark iron straps, its lid shut tight and locked with one large iron padlock hanging at the front"
+    },
+    {
+      "id": "statistics-in-practice-coin",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "one large gold coin spinning in mid-air, tilted on its edge, above an open hand held palm up"
+    }
+  ]
+}
