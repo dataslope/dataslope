@@ -212,6 +212,7 @@ npm run narrate -- c-pointers --dry-run   # the text it would send
 npm run narrate -- c-pointers             # a take, or the beats not yet voiced
 npm run narrate -- c-pointers --only star # re-voice one edited beat
 npm run narrate -- c-pointers --force     # a whole new take
+npm run narrate -- c-pointers --recut     # cut the kept take again, no API call
 npm run cues -- c-pointers                # the timing it produced
 ```
 
@@ -231,14 +232,24 @@ scene. The take is then cut into beats at the middle of the longest silence
 in each pause between them, so no cut lands in a word. Each beat keeps up to
 0.45 s of breath before its first word and 0.3 s of decay after its last,
 with an 8 ms fade at the cut. The timeline starts a beat's audio early by
-that lead-in, so the first word still lands on the beat.
+that lead-in, so the first word still lands on the beat, and never starts it
+over the end of the beat before.
+
+Where each beat's first word starts is read from the sound, not the
+character times. Those are only good to about 80 ms, and an audio tag makes
+the word after it worse: in CPointers the alignment gave `[curious]` the
+first 0.26 s of "So", and the beat's audio started over the end of the
+previous sentence. The cut finds the first sound after the pause and moves
+the first letter's time there, and `npm run narrate` prints each beat it
+moved by more than 80 ms.
 
 That is most of the difference between narration and text-to-speech. Voiced
 one request per beat, every sentence started cold, on the same contour, with
 the same energy. In one take, a question lifts and its answer comes down,
 and one sentence runs into the next. The raw take and its alignment stay in
-`.generated/narration/<script id>/` (gitignored), so it can be re-cut without
-paying for it again.
+`.generated/narration/<script id>/` (gitignored), so `--recut` can cut it
+again without paying for it twice. A plain run reuses it too, when its text
+and voice still match.
 
 When only some beats changed, just those are re-voiced, one request each,
 with the neighbouring beats as `previous_text` and `next_text`. Use `--force`

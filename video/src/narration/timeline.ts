@@ -142,6 +142,10 @@ export function buildTimeline(
     const timed = usable
       ? alignBeat(beat.text, entry.alignment)
       : estimateBeat(beat.text);
+    // A beat's lead-in (breath, onset) plays before its first word, and never
+    // over the end of the beat before: a pause shorter than the lead-in
+    // would put both voices on at once.
+    if (previousEnd !== null) cursor = Math.max(cursor, previousEnd + timed.lead);
     const start = cursor;
     const words: TimedWord[] = timed.words.map((w) => ({
       ...w,

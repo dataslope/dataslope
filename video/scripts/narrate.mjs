@@ -8,6 +8,7 @@
  *   node scripts/narrate.mjs <video>                 voice what is missing
  *   node scripts/narrate.mjs <video> --only n,star   just these beats
  *   node scripts/narrate.mjs <video> --force         a whole new take
+ *   node scripts/narrate.mjs <video> --recut         re-cut the kept take
  *   node scripts/narrate.mjs <video> --dry-run       show what would be sent
  *
  * When every beat needs voicing (a first run, a new voice, or --force), the
@@ -64,7 +65,7 @@ function isOptionValue(a) {
 }
 
 if (!video) {
-  console.error("Usage: node scripts/narrate.mjs <video> [--only ids] [--force] [--dry-run] [--voice id] [--model id]");
+  console.error("Usage: node scripts/narrate.mjs <video> [--only ids] [--force] [--recut] [--dry-run] [--voice id] [--model id]");
   process.exit(1);
 }
 
@@ -116,6 +117,19 @@ function takeText() {
     text += beat.text;
   });
   return { text, spans };
+}
+
+if (flag("--recut")) {
+  const take = keptTake();
+  if (!take) {
+    console.error(`No kept take of this text in this voice in ${takeDir}. Record one with --force.`);
+    process.exit(1);
+  }
+  mkdirSync(outDir, { recursive: true });
+  console.log(`${video}: re-cutting the kept take (voice ${voice}, model ${model})`);
+  cutTake(take);
+  console.log(`Done. Check the new timing with: npm run cues -- ${video}`);
+  process.exit(0);
 }
 
 console.log(
@@ -234,30 +248,72 @@ function letterAt(text, s, e, last) {
   return last ? found.at(-1) : found[0];
 }
 
-async function voiceTake() {
-  const { text, spans } = takeText();
+/** Records a new take, keeping the raw audio and alignment so it can be
+ *  re-cut later without paying for it again (--recut). */
+async function recordTake() {
+  const { text } = takeText();
   const r = await tts({ text }, "take");
   mkdirSync(takeDir, { recursive: true });
-  const takePath = join(takeDir, "take.mp3");
-  writeFileSync(takePath, Buffer.from(r.audio_base64, "base64"));
-  writeFileSync(join(takeDir, "take.json"), JSON.stringify({ voice_id: voice, model_id: model, text, alignment: r.alignment }, null, 2) + "\n");
-  const { character_start_times_seconds: starts, character_end_times_seconds: ends } = r.alignment;
-  const samples = decode(takePath);
+  writeFileSync(join(takeDir, "take.mp3"), Buffer.from(r.audio_base64, "base64"));
+  const take = { voice_id: voice, model_id: model, text, alignment: r.alignment };
+  writeFileSync(join(takeDir, "take.json"), JSON.stringify(take, null, 2) + "\n");
+  return take;
+}
+
+/** The kept take, if it was recorded from this script's text in this voice. */
+function keptTake() {
+  const path = join(takeDir, "take.json");
+  if (!existsSync(path)) return null;
+  const take = JSON.parse(readFileSync(path, "utf8"));
+  const same = take.text === takeText().text && take.voice_id === voice && take.model_id === model;
+  return same ? take : null;
+}
+
+/** Cuts a take into one MP3 per beat, with each beat's alignment counted
+ *  from the start of its own file. */
+function cutTake(take) {
+  const { text, spans } = takeText();
+  const { characters } = take.alignment;
+  const starts = [...take.alignment.character_start_times_seconds];
+  const ends = [...take.alignment.character_end_times_seconds];
+  const samples = decode(join(takeDir, "take.mp3"));
   const length = samples.length / SAMPLE_RATE;
   console.log(`  take: ${length.toFixed(2)} s, ${text.length} characters`);
 
-  const onset = spans.map(([s, e]) => starts[letterAt(text, s, e, false)]);
-  const lastLetter = spans.map(([s, e]) => starts[letterAt(text, s, e, true)]);
-  const end = spans.map(([, e]) => ends[e - 1]);
-  // Each cut sits in the quietest part of the pause between two beats: from
-  // just after the last letter starts to just after the next one starts,
-  // which covers the pause even where the character times are off.
   const frame = Math.round(0.01 * SAMPLE_RATE);
   let loudest = 0;
   for (let t = 0; t + frame <= samples.length; t += frame) loudest = Math.max(loudest, rms(samples, t, frame));
+  const sounding = (t) => rms(samples, Math.round(t * SAMPLE_RATE), frame) >= 0.03 * loudest;
+
+  const first = spans.map(([s, e]) => letterAt(text, s, e, false));
+  const lastLetter = spans.map(([s, e]) => starts[letterAt(text, s, e, true)]);
+  const end = spans.map(([, e]) => ends[e - 1]);
+  // Each cut sits in the longest quiet stretch of the pause between two
+  // beats: from just after the last letter starts to just after the next one
+  // starts, which covers the pause even where the character times are off.
   const cuts = spans
     .slice(1)
-    .map((_, i) => cutPoint(samples, lastLetter[i] + 0.06, Math.max(onset[i + 1] + 0.06, lastLetter[i] + 0.1), loudest));
+    .map((_, i) =>
+      cutPoint(samples, lastLetter[i] + 0.06, Math.max(starts[first[i + 1]] + 0.06, lastLetter[i] + 0.1), loudest),
+    );
+  // Where each beat's first word really starts: the first sound after the
+  // cut. The character times put it up to 0.3 s late after an audio tag
+  // (the tag is given time the voice spends on the word), so the sound
+  // decides, and the first letter is moved to it.
+  const onset = spans.map((_, i) => {
+    const from = i === 0 ? 0 : cuts[i - 1];
+    for (let t = from; t < starts[first[i]] + 0.3; t += 0.01) if (sounding(t)) return t;
+    return starts[first[i]];
+  });
+  spans.forEach(([s], i) => {
+    const moved = onset[i] - starts[first[i]];
+    if (Math.abs(moved) > 0.08) console.log(`  · ${script.beats[i].id}: first word starts ${moved.toFixed(2)} s from its character time`);
+    starts[first[i]] = Math.min(onset[i], ends[first[i]]);
+    for (let j = s; j < first[i]; j++) {
+      starts[j] = Math.min(starts[j], onset[i]);
+      ends[j] = Math.min(ends[j], onset[i]);
+    }
+  });
   const leadIn = script.leadIn ?? 0.6;
 
   const beats = {};
@@ -272,7 +328,7 @@ async function voiceTake() {
       text: beat.text,
       audio,
       alignment: {
-        characters: r.alignment.characters.slice(s, e),
+        characters: characters.slice(s, e),
         character_start_times_seconds: starts.slice(s, e).map(rebase),
         character_end_times_seconds: ends.slice(s, e).map(rebase),
       },
@@ -307,7 +363,10 @@ async function voiceBeats() {
 }
 
 mkdirSync(outDir, { recursive: true });
-const beats = asTake ? await voiceTake() : await voiceBeats();
+// --force asks for a new performance; otherwise a kept take of this exact
+// text is cut again rather than paid for twice.
+const kept = flag("--force") ? null : keptTake();
+const beats = asTake ? cutTake(kept ?? (await recordTake())) : await voiceBeats();
 
 const stale = script.beats.filter((b) => beats[b.id]?.text !== b.text).map((b) => b.id);
 if (stale.length) console.log(`Still on estimated timing: ${stale.join(", ")}`);

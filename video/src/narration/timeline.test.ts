@@ -136,3 +136,15 @@ test("a beat's audio starts early by its lead-in, so the first word lands on the
   assert.ok(Math.abs(b.end - (b.start + 1.2)) < 1e-9);
   assert.equal(a.audioStart, a.start);
 });
+
+test("a lead-in longer than the pause before it pushes the beat back, never overlapping", () => {
+  const text = "Second beat.";
+  const alignment = align(text);
+  alignment.character_start_times_seconds = alignment.character_start_times_seconds.map((s) => s + 0.8);
+  alignment.character_end_times_seconds = alignment.character_end_times_seconds.map((s) => s + 0.8);
+  const t = buildTimeline(script, { beats: { b: { text, audio: "narration/t/b.mp3", alignment } } });
+  const [a, b] = t.beats;
+  // pauseAfter is 0.5, the lead-in 0.8: the audio starts as "a" ends.
+  assert.ok(Math.abs(b.audioStart - a.end) < 1e-9);
+  assert.ok(Math.abs(b.start - (a.end + 0.8)) < 1e-9);
+});
