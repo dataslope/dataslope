@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, INK, INK_SOFT } from "../../editorial/style";
+import { ACCENT_INK, headline, INK, INK_SOFT } from "../../editorial/style";
 import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -187,34 +187,42 @@ export const PostgresScene: React.FC = () => {
         lines={[
           { at: goingAt - 2, children: "kept going by volunteers" },
           { at: ninetySixAt - 2, children: "renamed in 1996" },
-          {
-            at: officiallyAt - 2,
-            children: (
-              <span style={{ display: "inline-flex", gap: "0.45em", alignItems: "baseline" }}>
-                <span>said</span>
-                {SYLLABLES.map((s, i) => {
-                  const p = Math.min(1, pop(frame, syllable(i) - 2, fps, 12));
-                  return (
-                    <span
-                      key={s}
-                      style={{
-                        display: "inline-block",
-                        opacity: p,
-                        transform: `translateY(${(1 - p) * 10}px)`,
-                        color: INK,
-                        fontWeight: 650,
-                      }}
-                    >
-                      {i ? <span style={{ color: INK_SOFT, fontWeight: 400, marginRight: "0.45em" }}>·</span> : null}
-                      {s}
-                    </span>
-                  );
-                })}
-              </span>
-            ),
-          },
+          { at: officiallyAt - 2, children: "officially said:" },
         ]}
       />
+      {/* The official name, said a syllable at a time, large enough to read. */}
+      <div
+        style={{
+          position: "absolute",
+          left: XS[1] + 28,
+          top: TOP + H + h(96),
+          display: "flex",
+          alignItems: "baseline",
+          gap: "0.32em",
+          ...headline(58, true),
+          color: INK,
+          whiteSpace: "nowrap",
+        }}
+      >
+        {SYLLABLES.map((s, i) => {
+          const p = Math.min(1, pop(frame, syllable(i) - 2, fps, 12));
+          const dim = ease(frame, mostAt - 2, 14) * 0.5;
+          return (
+            <span
+              key={s}
+              style={{
+                display: "inline-block",
+                opacity: p * (1 - dim),
+                transform: `translateY(${(1 - p) * 24}px)`,
+                color: i === SYLLABLES.length - 1 || i === SYLLABLES.length - 2 ? ACCENT_INK : INK,
+              }}
+            >
+              {i ? <span style={{ color: INK_SOFT, marginRight: "0.32em" }}>·</span> : null}
+              {s}
+            </span>
+          );
+        })}
+      </div>
       <Tag x={XS[2] + 28} y={TOP + H + 18} at={mostAt - 2} size={23} color={INK}>
         or, as most of us say it, <Mark at={nickAt - 2}>Postgres</Mark>
       </Tag>
