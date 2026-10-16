@@ -54,7 +54,7 @@ export const GateScene: React.FC = () => {
     <AbsoluteFill>
       {/* ── Sound: each bad row offered, each refusal, the building ── */}
       {[0, 1, 2].map((i) => (
-        <Sfx key={i} name="el-scratch" at={errAt(i) + 2} level={-32} />
+        <Sfx key={i} name="el-scratch" at={errAt(i) + 2} level={-34} />
       ))}
       <Sfx name="el-pop" at={schemaAt - 4} level={-30} />
 

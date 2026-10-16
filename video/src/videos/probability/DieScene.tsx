@@ -229,10 +229,8 @@ export const DieScene: React.FC = () => {
           </b>
         </span>
       </Ink>
-      <Note at={sdAt - 2} x={eX} y={base - h(26) - 40} from="up">
-        <span style={{ ...note(28, STAT_INK), fontWeight: 700, display: "inline-block", transform: "translateX(-50%)", whiteSpace: "nowrap" }}>
-          ±{fmt(DIE.sd, 1)}
-        </span>
+      <Note at={sdAt - 2} x={eX + (fxv(1 + DIE.sd) - fxv(1)) + 14} y={base - h(26) - 8}>
+        <span style={{ ...note(28, STAT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>±{fmt(DIE.sd, 1)}</span>
       </Note>
       <Note at={squaredAt + 2} x={PMF.x0} y={base + h(150) + 66}>
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>each face&apos;s distance from 4.5, squared and weighted by its chance</span>

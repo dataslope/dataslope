@@ -41,6 +41,9 @@ export const WarrantyScene: React.FC = () => {
   const buyerAt = n.word("million", "losing bet");
   const onAverageAt = n.word("million", "on average");
   const anAverageAt = n.word("once", "an average");
+  const onceFrom = n.beat("once").from;
+  const oneLossAt = n.word("once", "one loss");
+  const spreadAt = n.word("once", "spread matters");
   const manyAt = n.word("once", "many times");
   const surviveAt = n.word("once", "couldn't survive");
   const moreAt = n.word("once", "MORE");
@@ -105,6 +108,7 @@ export const WarrantyScene: React.FC = () => {
         <FigLabel n="8" title="One warranty, from the store's side" at={eightyAt - 6} x={160} y={y(268)} />
 
         {/* ── The two outcomes ── */}
+        <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, onceFrom - 2, 14) * 0.5 }}>
         <Ink at={eightyAt - 2} dur={14} style={{ left: 160, top: y(330), whiteSpace: "nowrap" }}>
           <span style={note(28, INK)}>
             The store takes <b>${WARRANTY.price}</b> up front.
@@ -144,6 +148,8 @@ export const WarrantyScene: React.FC = () => {
           </Big>
         </Ink>
 
+        </div>
+
         {/* ── A million in code ── */}
         <Ink at={millionAt - 4} dur={14} style={{ left: RIGHT, top: y(330), whiteSpace: "nowrap" }}>
           <span style={note(26, INK)}>
@@ -166,20 +172,19 @@ export const WarrantyScene: React.FC = () => {
           <Big size={60} color={STAT_INK}>
             <Sweep at={buyerAt - 2}>−${fmt(WARRANTY.eProfit, 0)}</Sweep>
           </Big>
-          <span style={note(22, INK_SOFT)}>a losing bet</span>
+          <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, buyerAt - 2, 10) }}>a losing bet</span>
         </Ink>
 
         {/* ── When the average isn't the whole story ── */}
-        <Ink at={anAverageAt - 4} dur={14} style={{ left: RIGHT, top: y(560), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(34, true), color: INK }}>
-            Faced <Sweep at={manyAt - 2}>many times</Sweep>, the average decides.
-          </span>
-        </Ink>
-        <Ink at={surviveAt - 4} dur={14} style={{ left: RIGHT, top: y(620), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(34, true), color: INK }}>
-            Faced once, and ruinous, <Sweep at={moreAt - 2}>the spread</Sweep> does.
-          </span>
-        </Ink>
+        <div style={{ position: "absolute", left: RIGHT, top: y(560), whiteSpace: "nowrap", ...body(34, true), color: INK }}>
+          <Held at={anAverageAt - 4}>Faced many times,</Held> <Held at={manyAt - 2}>the average decides.</Held>
+        </div>
+        <div style={{ position: "absolute", left: RIGHT, top: y(620), whiteSpace: "nowrap", ...body(34, true), color: INK }}>
+          <Held at={oneLossAt - 4}>Faced once, and ruinous,</Held>{" "}
+          <Held at={spreadAt - 4}>
+            <Sweep at={moreAt - 2}>the spread</Sweep> does.
+          </Held>
+        </div>
         <Note at={insuranceAt - 2} x={RIGHT} y={y(690)}>
           <span style={{ ...body(30), color: INK_SOFT, whiteSpace: "nowrap" }}>Insurance is paying to avoid the spread.</span>
         </Note>
