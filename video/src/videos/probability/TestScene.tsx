@@ -74,6 +74,8 @@ export const TestScene: React.FC = () => {
   const caughtAt = n.word("caught", "ninety-nine");
   const flagsAt = n.word("flagged", "flags");
   const mistakeAt = n.word("flagged", "by mistake");
+  const onePctAt = n.word("flagged", "one percent");
+  const areSickAt = n.word("lineup", "are sick");
   const alarmsAt = n.word("flagged", "nine hundred and ninety-nine");
   const lineupAt = n.word("lineup", "line up");
   const peopleAt = n.word("lineup", "One thousand and ninety-eight");
@@ -198,9 +200,9 @@ export const TestScene: React.FC = () => {
         <Svg>
           {edge(NODE.root, NODE.sick, hundredAt - 6, DATA)}
           {edge(NODE.root, NODE.healthy, ninetyNineKAt - 6)}
-          {edge(NODE.sick, NODE.sickPos, caughtAt - 6, DATA)}
+          {edge(NODE.sick, NODE.sickPos, catchesAt - 6, DATA)}
           {edge(NODE.sick, NODE.sickNeg, caughtAt, INK_SOFT)}
-          {edge(NODE.healthy, NODE.healthyPos, alarmsAt - 6, STAT)}
+          {edge(NODE.healthy, NODE.healthyPos, onePctAt - 6, STAT)}
           {edge(NODE.healthy, NODE.healthyNeg, alarmsAt + 2, INK_SOFT)}
         </Svg>
         {(
@@ -208,9 +210,9 @@ export const TestScene: React.FC = () => {
             [NODE.root, walkAt - 2, num(TEST.population), "people", INK],
             [NODE.sick, hundredAt - 2, num(TEST.sick), "have it", DATA_INK],
             [NODE.healthy, ninetyNineKAt - 2, num(TEST.healthy), "don't", INK],
-            [NODE.sickPos, caughtAt - 2, num(TEST.tp), "caught", DATA_INK],
+            [NODE.sickPos, catchesAt - 2, "count:tp", "caught", DATA_INK],
             [NODE.sickNeg, caughtAt + 4, num(TEST.fn), "missed", INK_SOFT],
-            [NODE.healthyPos, alarmsAt - 2, num(TEST.fp), "false alarms", STAT_INK],
+            [NODE.healthyPos, onePctAt - 2, "count:fp", "false alarms", STAT_INK],
             [NODE.healthyNeg, alarmsAt + 6, num(TEST.tn), "cleared", INK_SOFT],
           ] as const
         ).map(([p, cue, big, small, color], i) => {
@@ -230,7 +232,15 @@ export const TestScene: React.FC = () => {
               }}
             >
               <div style={{ padding: "6px 20px 8px", borderRadius: 16, background: PILL[i] }}>
-                <div style={{ ...note(i === 0 ? 40 : 34, color), fontWeight: 700, lineHeight: 1.05 }}>{big}</div>
+                <div style={{ ...note(i === 0 ? 40 : 34, color), fontWeight: 700, lineHeight: 1.05, fontVariantNumeric: "tabular-nums" }}>
+                  {big === "count:tp" ? (
+                    <Count at={catchesAt} dur={Math.max(12, caughtAt - catchesAt + 6)} to={TEST.tp} format={num} />
+                  ) : big === "count:fp" ? (
+                    <Count at={onePctAt} dur={Math.max(12, alarmsAt - onePctAt + 10)} to={TEST.fp} format={num} />
+                  ) : (
+                    big
+                  )}
+                </div>
                 <div style={{ ...note(21, INK_SOFT) }}>{small}</div>
               </div>
             </div>
@@ -264,7 +274,7 @@ export const TestScene: React.FC = () => {
               cy={lerp(from[1], ty, go)}
               r={GRID.r * (sick ? 1 + 0.25 * Math.min(1, lit) : 1)}
               fill={sick ? DATA : STAT}
-              opacity={sick ? 1 : lerp(1, 0.55, sickLit)}
+              opacity={sick ? 1 : lerp(1, 0.55, sickLit) * lerp(1, 0.6, ease(frame, areSickAt - 2, 12))}
             />
           );
         })}
