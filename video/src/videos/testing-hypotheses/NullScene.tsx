@@ -37,7 +37,7 @@ export const NullScene: React.FC = () => {
   const nullAgainAt = n.word("surprise", "null");
   const soundsAt = n.word("court-in", "sounds");
   const veryAt = n.word("verdict", "Very");
-  const rejectAt = n.word("verdict", "reject");
+  const rejectAt = n.word("verdict", "reject", { nth: 1 });
   const ordinaryAt = n.word("verdict", "Ordinary");
   const failAt = n.word("verdict", "fail");
   const trialAt = n.word("court-in", "trial");

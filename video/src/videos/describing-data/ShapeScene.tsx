@@ -92,7 +92,7 @@ export const ShapeScene: React.FC = () => {
   const togetherAt = n.word("left-tail", "together");
   const peaksFrom = n.beat("two-peaks").from;
   const peaksAt = n.word("two-peaks", "Two peaks");
-  const groupsAt = n.word("two-peaks", "two groups");
+  const groupsAt = n.word("two-peaks", "two groups", { nth: 1 });
   const mixAt = n.word("two-peaks", "Mix");
   const valleyAt = n.word("two-peaks", "valley");
   const columnAt = n.word("two-peaks", "one column");

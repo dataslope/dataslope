@@ -71,7 +71,7 @@ export const SplitScene: React.FC = () => {
   const open = Math.max(0, n.beat("hook").from - 13);
   const sevenAt = n.word("hook", "seven employees");
   const payAt = n.word("hook", "pay in all");
-  const groupbyAt = n.word("steps", "groupby");
+  const groupbyAt = n.word("steps", "groupby", { nth: 1 });
   const splitAt = n.word("split", "split");
   const breakAt = n.word("split", "break apart");
   const engAt = n.word("split", "Engineering");

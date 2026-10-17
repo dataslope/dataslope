@@ -41,12 +41,12 @@ export const ChainScene: React.FC = () => {
 
   const from = n.beat("chain").from;
   const ordersAt = n.word("chain", "These orders");
-  const cityAt = n.word("chain", "city");
+  const cityAt = n.word("chain", "city", { nth: 1 });
   const keyAt = n.word("chain", "The key");
   const orderIdAt = n.word("chain", "order ID");
-  const orderAt = n.word("chain", "ORDER");
+  const orderAt = n.word("chain", "ORDER", { nth: 2 });
   const customerAt = n.word("chain", "customer");
-  const givesAt = n.word("detour", "gives");
+  const givesAt = n.word("detour", "gives", { nth: 1 });
   const cityToo = n.word("detour", "city");
   const detourAt = n.word("detour", "detour");
   const transitiveAt = n.word("detour", "transitive");

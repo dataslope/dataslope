@@ -31,7 +31,7 @@ export const GateScene: React.FC = () => {
   const getsAt = n.word("gate", "gets");
   const badAt = n.word("gate", "Bad");
   const kinds = [
-    { label: "A customer entered twice", at: n.word("gate", "customer") },
+    { label: "A customer entered twice", at: n.word("gate", "customer", { nth: 1 }) },
     { label: "A quantity of zero", at: n.word("gate", "quantity") },
     { label: "An order for a customer who isn't there", at: n.word("gate", "order") },
   ];

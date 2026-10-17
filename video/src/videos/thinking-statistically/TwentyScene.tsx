@@ -66,7 +66,7 @@ export const TwentyScene: React.FC = () => {
 
   // ── Cues ──
   const twentyFrom = n.beat("twenty").from;
-  const moreAt = n.word("twenty", "fifty more");
+  const moreAt = n.word("twenty", "fifty more", { nth: 1 });
   const answersAt = n.word("twenty", "answers");
   const parameterAt = n.word("moves", "parameter");
   const statisticAt = n.word("moves", "statistic");

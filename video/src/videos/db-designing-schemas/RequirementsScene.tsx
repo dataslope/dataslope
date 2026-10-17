@@ -25,7 +25,7 @@ export const RequirementsScene: React.FC = () => {
   const reqsFrom = n.beat("reqs").from;
   const sentenceAt = [
     n.word("reqs", "A customer"),
-    n.word("reqs", "A product"),
+    n.word("reqs", "A product", { nth: 1 }),
     n.word("reqs", "Categories"),
     n.word("contains", "an order"),
   ];

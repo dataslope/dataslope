@@ -106,7 +106,7 @@ export const StoreErd: React.FC = () => {
   const chargedAt = n.word("then", "charged");
   const leaveAt = n.beat("mug").from - 4;
   const rowAtCue = n.word("pointer", "customer's row");
-  const howManyA = n.word("relate", "how many");
+  const howManyA = n.word("relate", "how many", { nth: 1 });
   const howManyB = n.word("relate", "how many", { nth: 2 });
   const meetAt = n.word("pairs", "meet");
   const itselfAt = n.word("rules", "itself");

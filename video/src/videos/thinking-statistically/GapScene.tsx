@@ -53,7 +53,7 @@ export const GapScene: React.FC = () => {
   const againAt = n.word("again", "again");
   const aheadAt = n.word("again", "A comes");
   const sevenAt = n.word("again", "one");
-  const againMoreAt = n.word("more", "Again");
+  const againMoreAt = n.word("more", "Again", { nth: 1 });
   const twoAt = n.word("more", "two");
   const threeAt = n.word("more", "three");
   const oneAt = n.word("more", "one");

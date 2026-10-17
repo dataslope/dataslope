@@ -60,7 +60,7 @@ export const CrossScene: React.FC = () => {
   const studentAt = n.word("cross", "A student");
   const coursesAt = n.word("cross", "courses");
   const adaAt = n.word("cross", "Ada");
-  const math1At = n.word("cross", "Math");
+  const math1At = n.word("cross", "Math", { nth: 1 });
   const historyAt = n.word("cross", "History");
   const graceAt = n.word("cross", "Grace");
   const math2At = n.word("cross", "Math", { nth: 2 });

@@ -63,9 +63,9 @@ export const SumScene: React.FC = () => {
   const sidePadAt = n.word("default", "padding");
   const sideBorderAt = n.word("default", "border");
   const termAt = [
-    n.word("sum", "Five"),
-    n.word("sum", "twenty"),
-    n.word("sum", "three hundred"),
+    n.word("sum", "Five", { nth: 1 }),
+    n.word("sum", "twenty", { nth: 1 }),
+    n.word("sum", "three hundred", { nth: 1 }),
     n.word("sum", "twenty", { nth: 2 }),
     n.word("sum", "five", { nth: 2 }),
   ];

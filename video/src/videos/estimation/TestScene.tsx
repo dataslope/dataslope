@@ -32,7 +32,7 @@ export const TestScene: React.FC = () => {
 
   // ── Cues ──
   const testFrom = n.beat("test").from;
-  const differenceAt = n.word("test", "difference");
+  const differenceAt = n.word("test", "difference", { nth: 1 });
   const leavesAt = n.word("test", "leaves out zero");
   const significantAt = n.word("test", "significant");
   const fiveAt = n.word("test", "five percent");

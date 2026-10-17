@@ -59,7 +59,7 @@ export const SweepScene: React.FC = () => {
   const pWorldAt = n.word("world", "p-value");
   const outcomeAt = n.word("rates-in", "outcome");
   const sizeEndAt = n.word("rates-in", "size");
-  const worldAt = n.word("world", "the world");
+  const worldAt = n.word("world", "the world", { nth: 1 });
   const andAt = n.word("world", "AND");
   const sampleAt = n.word("world", "sample");
   const twoAt = n.word("rates-in", "two ways");

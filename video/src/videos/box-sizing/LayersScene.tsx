@@ -35,7 +35,7 @@ export const LayersScene: React.FC = () => {
   const at: Record<Layer, number> = {
     content: n.word("layers", "content"),
     padding: n.word("layers", "padding"),
-    border: n.word("layers", "border"),
+    border: n.word("layers", "border", { nth: 1 }),
     margin: n.word("layers", "margin"),
   };
   const awayAt = n.word("layers", "keeps other boxes away");

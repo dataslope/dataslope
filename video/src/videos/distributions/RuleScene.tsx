@@ -40,7 +40,7 @@ export const RuleScene: React.FC = () => {
   const ninetyNineAt = n.word("two", "ninety-nine point seven");
   const threeAt = n.word("two", "three");
   const scoresAt = n.word("scores", "test scores");
-  const hundredAt = n.word("scores", "a hundred");
+  const hundredAt = n.word("scores", "a hundred", { nth: 1 });
   const fifteenAt = n.word("scores", "fifteen");
   const landAt = n.word("scores", "ninety-five percent");
   const seventyAt = n.word("scores", "seventy");

@@ -88,7 +88,7 @@ export const ResultScene: React.FC = () => {
   const fourAt = n.word("four", "all four");
   const theLiftAt = n.word("four", "the lift");
   const itsIntervalAt = n.word("four", "its interval");
-  const thePAt = n.word("four", "the p-value");
+  const thePAt = n.word("four", "the p-value", { nth: 1 });
   const effectAt = n.word("four", "effect size");
   const aloneAt = n.word("four", "alone");
 

@@ -59,7 +59,7 @@ export const SalaryScene: React.FC = () => {
   const tenOfAt = n.word("nobody", "Ten");
   const lessAt = n.word("nobody", "less");
   const nobodyAt = n.word("nobody", "nobody");
-  const balanceAt = n.word("balance", "balance point");
+  const balanceAt = n.word("balance", "balance point", { nth: 1 });
   const heavyAt = n.word("balance", "heavy");
   const slidesAt = n.word("balance", "slides");
   const middleFrom = n.beat("middle").from;

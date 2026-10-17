@@ -26,7 +26,7 @@ export const RvScene: React.FC = () => {
   const countAt = n.word("rv", "count the heads");
   // The second "two": the first is "Flip two coins".
   const twoAt = n.word("rv", "Two", { nth: 2 });
-  const oneAt = n.word("rv", "one");
+  const oneAt = n.word("rv", "one", { nth: 1 });
   const one2At = n.word("rv", "one", { nth: 2 });
   const zeroAt = n.word("rv", "zero");
   const outcomes = Object.keys(HEADS);

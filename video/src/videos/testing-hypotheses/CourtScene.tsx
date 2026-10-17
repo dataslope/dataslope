@@ -40,7 +40,7 @@ export const CourtScene: React.FC = () => {
   const alphaAt = n.word("bar", "alpha");
   const fiveAt = n.word("bar", "five percent");
   const beforeAt = n.word("bar", "before");
-  const guiltyAt = n.word("guilty", "guilty");
+  const guiltyAt = n.word("guilty", "guilty", { nth: 1 });
   const rejectAt = n.word("guilty", "reject");
   const notGuiltyAt = n.word("guilty", "not guilty");
   const neverAt = n.word("innocent", "never");

@@ -32,7 +32,7 @@ export const OpenScene: React.FC = () => {
   const plotAt = n.word("hook", "plot");
   const haveAt = n.word("hook", "already have");
   const seenAt = n.word("hook", "haven't seen");
-  const needAt = n.word("hook", "probability");
+  const needAt = n.word("hook", "probability", { nth: 1 });
   const meansAt = n.word("hook", "even means");
   const reasonAt = n.word("hook", "reason");
   const startingAt = n.word("hook", "starting");

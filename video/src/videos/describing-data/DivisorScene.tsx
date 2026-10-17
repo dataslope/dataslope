@@ -52,12 +52,12 @@ export const DivisorScene: React.FC = () => {
   const underAt = n.word("small", "underestimate");
   const measuredFrom = n.beat("measured").from;
   const fourAt = n.word("measured", "four thousand");
-  const byNAt = n.word("measured", "dividing by n");
+  const byNAt = n.word("measured", "dividing by n", { nth: 1 });
   const lowAt = n.word("measured", "low");
   const byN1At = n.word("measured", "Dividing by n minus one");
   const landsAt = n.word("measured", "lands");
-  const numpyAt = n.word("libs", "numpy");
-  const pandasAt = n.word("libs", "pandas");
+  const numpyAt = n.word("libs", "numpy", { nth: 1 });
+  const pandasAt = n.word("libs", "pandas", { nth: 1 });
   const numpyNoteAt = n.word("libs", "numpy", { nth: 2 });
   const pandasNoteAt = n.word("libs", "pandas", { nth: 2 });
   const minusOneAt = n.word("libs", "minus one");

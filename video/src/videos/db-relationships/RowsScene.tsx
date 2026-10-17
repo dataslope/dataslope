@@ -35,7 +35,7 @@ export const RowsScene: React.FC = () => {
   // ── Cues ──
   const rowsFrom = n.beat("rows").from;
   const zoomAt = n.word("rows", "Zoom in");
-  const rowsAt = n.word("rows", "rows");
+  const rowsAt = n.word("rows", "rows", { nth: 1 });
   const linkingAt = n.word("rows", "linking");
   const adaAt = n.word("rows", "Ada's");
   const o101At = n.word("rows", "one oh one");

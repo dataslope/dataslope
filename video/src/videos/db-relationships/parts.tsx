@@ -1,7 +1,7 @@
 import React from "react";
 import { Easing, interpolate, useCurrentFrame, useVideoConfig } from "remotion";
 import type { Pt } from "../../components/arrow";
-import { type Cardinality, endSegment, MARKER, markerLength, relationEnd } from "../../components/crowsfoot";
+import { type Cardinality, endSegment, endSymbols as kitEndSymbols, MARKER, markerLength, relationEnd } from "../../components/crowsfoot";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
@@ -282,20 +282,13 @@ export const Link: React.FC<{
 };
 
 /**
- * Where an end's two symbols sit, from crowsfoot.ts's own geometry: the one
- * nearer the entity (the maximum: a bar, or the foot) and the one farther
- * out (the minimum: a bar, or a circle). For washing a symbol as it is read.
+ * Where an end's two symbols sit: crowsfoot.ts's endSymbols(), the kit's
+ * own geometry, for washing a symbol as it is read. Both ends this unit reads
+ * have a minimum, so `far` is always a point here.
  */
 export function endSymbols(tip: Pt, back: Pt, kind: Cardinality, size = MARKER) {
-  const m = relationEnd(tip, back, kind, size);
-  const midOf = ([p, q]: [Pt, Pt]): Pt => [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
-  const hasFoot = kind === "one-or-many" || kind === "zero-or-many" || kind === "many";
-  const foot = hasFoot ? m.lines.slice(0, 3) : [];
-  const bars = m.lines.slice(foot.length).map(midOf);
-  const footC: Pt | undefined = foot.length ? [(foot[0][0][0] + tip[0]) / 2, (foot[0][0][1] + tip[1]) / 2] : undefined;
-  const near = footC ?? bars[0];
-  const far = m.rings[0]?.c ?? (hasFoot ? bars[0] : bars[1]);
-  return { near, far };
+  const s = kitEndSymbols(tip, back, kind, size);
+  return { near: s.near, far: s.far ?? s.near };
 }
 
 /** A soft wash behind one symbol of an end, swept in on `at`, lifted on `out`. */

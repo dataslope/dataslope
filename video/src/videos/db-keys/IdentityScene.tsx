@@ -46,7 +46,7 @@ export const IdentityScene: React.FC = () => {
   const hookFrom = n.beat("hook").from;
   const whichRowAt = n.word("hook", "WHICH");
   const customersAt = n.word("taylors", "customers");
-  const taylorAt = n.word("taylors", "Taylor Kim");
+  const taylorAt = n.word("taylors", "Taylor Kim", { nth: 1 });
   const portlandAt = n.word("taylors", "Portland");
   const orderAt = n.word("taylors", "order");
   const beansAt = n.word("taylors", "coffee beans");

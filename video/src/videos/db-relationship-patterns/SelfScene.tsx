@@ -28,7 +28,7 @@ export const SelfScene: React.FC = () => {
 
   // ── Cues ──
   const from = n.beat("self").from;
-  const employeeAt = n.word("self", "An employee");
+  const employeeAt = n.word("self", "An employee", { nth: 1 });
   const managerAt = n.word("self", "manager");
   const tooAt = n.word("self", "employee too");
   const pointsAt = n.word("self", "points back");

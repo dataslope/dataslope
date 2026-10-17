@@ -40,7 +40,7 @@ export const IsntScene: React.FC = () => {
   const trueAt = n.word("isnt", "true");
   const assumingAt = n.word("isnt", "assuming");
   const dataAt = n.word("swap", "chance of the data");
-  const givenAt = n.word("swap", "given");
+  const givenAt = n.word("swap", "given", { nth: 1 });
   const nullGivenAt = n.word("swap", "chance of the null");
   const eightAt = n.word("collapse", "point eight three");
   const givenDataAt = n.word("swap", "given", { nth: 2 });

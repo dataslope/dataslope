@@ -53,7 +53,7 @@ export const AnomalyScene: React.FC = () => {
   const everyAt = n.word("insert", "every row");
   const orderAt = n.word("insert", "an order");
   const deleteFrom = n.beat("delete").from;
-  const graceAt = n.word("delete", "Grace");
+  const graceAt = n.word("delete", "Grace", { nth: 1 });
   const deletingAt = n.word("delete", "deleting");
   const tooAt = n.word("delete", "Grace", { nth: 2 });
   const end = n.beat("delete").to;

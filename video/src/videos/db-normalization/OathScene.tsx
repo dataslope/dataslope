@@ -63,7 +63,7 @@ export const OathScene: React.FC = () => {
   const from = n.beat("oath").from;
   const oathAt = n.word("oath", "old oath");
   const everyAt = n.word("oath", "Every non-key column");
-  const keyAt = n.word("oath", "the key");
+  const keyAt = n.word("oath", "the key", { nth: 1 });
   const wholeAt = n.word("oath", "whole key");
   const nothingAt = n.word("oath", "nothing but");
   const wholeIsAt = n.word("halves", "whole key");

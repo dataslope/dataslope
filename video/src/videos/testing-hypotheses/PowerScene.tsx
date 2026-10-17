@@ -45,7 +45,7 @@ export const PowerScene: React.FC = () => {
   const fixedAt = n.word("trade", "sample fixed");
   const designedAt = n.word("target", "designed");
   const countingAt = n.word("sim", "counting");
-  const catchesAt = n.word("more", "catches");
+  const catchesAt = n.word("more", "catches", { nth: 1 });
   const timeAt = n.word("more", "time");
   const studiesAt = n.word("target", "Studies");
   const lowerAt = n.word("trade", "Lower");

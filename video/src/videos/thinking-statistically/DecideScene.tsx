@@ -35,7 +35,7 @@ export const DecideScene: React.FC = () => {
   const commonAt = n.word("decides", "most common value");
   const medianAt = n.word("decides", "median");
   const meanAt = n.word("decides", "mean");
-  const testAt = n.word("tests", "test");
+  const testAt = n.word("tests", "test", { nth: 1 });
   const twoCatAt = n.word("tests", "Two categorical");
   const chiAt = n.word("tests", "chi-square");
   const aNumberAt = n.word("tests", "A number");

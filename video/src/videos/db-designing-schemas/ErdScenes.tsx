@@ -44,7 +44,7 @@ export const EntitiesScene: React.FC = () => {
       <Head at={n.beat("entities").from - 6} out={factsFrom - 6}>
         One table per noun.
       </Head>
-      <Head at={factsFrom - 2} second={n.word("facts", "describes")} out={pointerFrom - 6} italic="where it belongs.">
+      <Head at={factsFrom - 2} second={n.word("facts", "describes", { nth: 1 })} out={pointerFrom - 6} italic="where it belongs.">
         Each fact
       </Head>
       <Head at={pointerFrom - 2} second={pointsAt} italic="not a copy.">
@@ -61,7 +61,7 @@ export const RelateScene: React.FC = () => {
   const hiddenFrom = n.beat("hidden").from;
   return (
     <AbsoluteFill>
-      <Head at={n.beat("relate").from - 6} second={n.word("relate", "One customer")} out={pairsFrom - 6} italic="Both ways.">
+      <Head at={n.beat("relate").from - 6} second={n.word("relate", "One customer", { nth: 1 })} out={pairsFrom - 6} italic="Both ways.">
         How many to how many?
       </Head>
       <Head at={pairsFrom - 2} second={n.word("pairs", "pairs")} out={hiddenFrom - 6} italic="a table of pairs.">

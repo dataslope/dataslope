@@ -37,7 +37,7 @@ export const OrbiterScene: React.FC = () => {
   const poundAt = n.word("orbiter", "pound-force");
   const readAt = n.word("orbiter", "read");
   const newtonAt = n.word("orbiter", "newton-seconds");
-  const numbersAt = n.word("factor", "numbers");
+  const numbersAt = n.word("factor", "numbers", { nth: 1 });
   const justAt = n.word("factor", "just");
   const nothingAt = n.word("factor", "Nothing");
   const whichAt = n.word("factor", "which");

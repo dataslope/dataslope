@@ -31,7 +31,7 @@ export const VerbsScene: React.FC = () => {
   const aloneAt = n.word("hook", "alone");
   const customersAt = n.word("hook", "Customers");
   const placeAt = n.word("hook", "place");
-  const ordersAt = n.word("hook", "orders");
+  const ordersAt = n.word("hook", "orders", { nth: 1 });
   const orders2At = n.word("hook", "orders", { nth: 2 });
   const containAt = n.word("hook", "contain");
   const productsAt = n.word("hook", "products");

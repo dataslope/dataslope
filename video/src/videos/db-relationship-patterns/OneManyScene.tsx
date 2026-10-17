@@ -16,7 +16,7 @@ export const OneManyScene: React.FC = () => {
 
   // ── Cues ──
   const from = n.beat("many").from;
-  const customerAt = n.word("many", "customer");
+  const customerAt = n.word("many", "customer", { nth: 1 });
   const ordersAt = n.word("many", "lots of orders");
   const belongsAt = n.word("many", "belongs");
   const justOneAt = n.word("many", "just one");

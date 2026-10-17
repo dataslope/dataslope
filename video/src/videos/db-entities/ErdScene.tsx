@@ -39,7 +39,7 @@ export const ErdScene: React.FC = () => {
   const fkAt = n.word("keys", "FK");
   const foreignAt = n.word("keys", "foreign key");
   const readAt = n.word("line", "read the line");
-  const oneAt = n.word("line", "One customer");
+  const oneAt = n.word("line", "One customer", { nth: 1 });
   const zeroAt = n.word("line", "zero or many");
   const eachAt = n.word("line", "each order");
   const exactlyAt = n.word("line", "exactly one");

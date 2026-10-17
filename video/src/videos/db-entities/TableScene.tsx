@@ -28,7 +28,7 @@ export const TableScene: React.FC = () => {
 
   // ── Cues ──
   const typeFrom = n.beat("type").from;
-  const typeAt = n.word("type", "TYPE");
+  const typeAt = n.word("type", "TYPE", { nth: 1 });
   const tableAt = n.word("type", "a table");
   const realAt = n.word("type", "each real");
   const rowAt = n.word("type", "a row");

@@ -33,7 +33,7 @@ export const RobustScene: React.FC = () => {
   // ── Cues ──
   const incomesFrom = n.beat("incomes").from;
   const takeAt = n.word("incomes", "ten incomes");
-  const nineAt = n.word("incomes", "Nine");
+  const nineAt = n.word("incomes", "Nine", { nth: 1 });
   const betweenAt = n.word("incomes", "between");
   const hundredAt = n.word("incomes", "hundred and twenty");
   const eightHundredAt = n.word("sd", "eight hundred");

@@ -54,7 +54,7 @@ export const CoverageScene: React.FC = () => {
   const unluckyAt = n.word("unlucky", "unlucky");
   const recipeAt = n.word("recipe", "recipe");
   const recipeFrom = n.beat("recipe").from;
-  const firstNinetyFiveAt = n.word("recipe", "ninety-five");
+  const firstNinetyFiveAt = n.word("recipe", "ninety-five", { nth: 1 });
   const drewAt = n.word("unlucky", "drew");
   const everyoneAt = n.word("wrong-in", "everyone");
   const wrongEndAt = n.word("wrong-in", "wrong", { edge: "end" });

@@ -58,7 +58,7 @@ export const PointerScene: React.FC = () => {
   const { y, h } = useLayout();
 
   const open = Math.max(0, n.beat("box").from - 13);
-  const boxAt = n.word("box", "box");
+  const boxAt = n.word("box", "box", { nth: 1 });
   const memoryAt = n.word("box", "memory");
   const addressAt = n.word("box", "address");
 

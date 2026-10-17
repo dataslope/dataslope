@@ -35,7 +35,7 @@ export const GrowthScene: React.FC = () => {
   const { y, h } = useLayout();
   const start = n.beat("grow").from;
   const growAt = n.word("grow", "grow");
-  const doublesAt = n.word("grow", "doubles");
+  const doublesAt = n.word("grow", "doubles", { nth: 1 });
   const tooAt = n.word("grow", "doubles too");
   const flatAt = n.word("flat", "flat");
   const nearAt = n.word("flat", "twenty-three");

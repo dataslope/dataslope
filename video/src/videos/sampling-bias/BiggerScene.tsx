@@ -43,7 +43,7 @@ export const BiggerScene: React.FC = () => {
   const steadierAt = n.word("steadier", "steadier");
   const paceAt = n.word("steadier", "same pace");
   const closingAt = n.word("closing", "closing");
-  const sharperAt = n.word("wrong", "sharper");
+  const sharperAt = n.word("wrong", "sharper", { nth: 1 });
   const wrongAt = n.word("wrong", "wrong");
   const steadyFrom = n.beat("steady").from;
   const highAt = n.word("steady", "ten points high");

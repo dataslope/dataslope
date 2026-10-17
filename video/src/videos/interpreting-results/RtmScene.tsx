@@ -47,7 +47,7 @@ export const RtmScene: React.FC = () => {
   const nobodyAt = n.word("nothing", "Nobody");
   const repeatAt = n.word("nothing", "doesn't repeat");
   const extremeAt = n.word("nothing", "extreme score");
-  const luckAgainAt = n.word("nothing", "luck");
+  const luckAgainAt = n.word("nothing", "luck", { nth: 1 });
   const coachAt = n.word("coach", "Coach");
   const anywayAt = n.word("coach", "anyway");
   const creditAt = n.word("coach", "credit");
