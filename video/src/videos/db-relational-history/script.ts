@@ -58,9 +58,10 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     designed SEQUEL ("SEQUEL: A Structured English Query Language", ACM
  *     SIGFIDET workshop, Ann Arbor, May 1974); "because of a trademark
  *     issue, the name Sequel was shortened to SQL" (Chamberlin 2012). The
- *     mark's holder, the British aircraft maker Hawker Siddeley, is the
- *     lesson's "aircraft company" and the usual account; Chamberlin's own
- *     text does not name it. System R proved the model could be fast
+ *     mark's holder is the lesson's "aircraft company": Chamberlin names
+ *     "the Hawker Siddeley Aircraft Company in Great Britain" in "The 1995
+ *     SQL Reunion" (SRC Technical Note 1997-018, System R section), though
+ *     his 2012 article does not. System R proved the model could be fast
  *     (Chamberlin et al., "A History and Evaluation of System R", CACM
  *     24(10), 1981).
  *   - Boyce died in June 1974 of a brain aneurysm, about a month after

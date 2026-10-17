@@ -44,7 +44,7 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *   - split three ways (the lesson's erDiagram), Ada's email is on one row,
  *     the update, the mug and the delete each touch one row, Grace's email
  *     survives, and the join rebuilds the wide view;
- *   - "555-1000, 555-2000" = '555-2000' finds no row; a fourth phone in a
+ *   - "555-1000, 555-2200" = '555-2200' finds no row; a fourth phone in a
  *     three-column design fails with 42601, INSERT has more expressions than
  *     target columns; in student_phones the same search finds Ada, Linus has
  *     zero phones, and listing 555-1000 twice for Ada fails with 23505 on

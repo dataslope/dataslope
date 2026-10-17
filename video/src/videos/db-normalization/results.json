@@ -19,13 +19,13 @@
     "splitGraceKept": "SELECT email FROM customers WHERE name = 'Grace';",
     "splitJoin": "SELECT o.id AS order_id, c.name, c.email, p.name AS product, p.price\nFROM orders o\nJOIN customers c ON c.id = o.customer_id\nJOIN products p ON p.id = o.product_id\nORDER BY o.id;",
     "listCell": "SELECT * FROM students ORDER BY student_id;",
-    "listSearch": "SELECT name FROM students\nWHERE phones = '555-2000';",
-    "listTwice": "UPDATE students SET phones = '555-1000, 555-2000, 555-1000' WHERE student_id = 1;",
+    "listSearch": "SELECT name FROM students\nWHERE phones = '555-2200';",
+    "listTwice": "UPDATE students SET phones = '555-1000, 555-2200, 555-1000' WHERE student_id = 1;",
     "columns": "SELECT * FROM students ORDER BY student_id;",
-    "fourth": "INSERT INTO students VALUES (2, 'Grace', '555-3000', '555-3100', '555-3200', '555-3300');",
+    "fourth": "INSERT INTO students VALUES (2, 'Grace', '555-1100', '555-2300', '555-3400', '555-3500');",
     "childStudents": "SELECT * FROM students ORDER BY id;",
     "childPhones": "SELECT * FROM student_phones ORDER BY id;",
-    "childSearch": "SELECT s.name\nFROM students s\nJOIN student_phones p ON p.student_id = s.id\nWHERE p.phone_number = '555-2000';",
+    "childSearch": "SELECT s.name\nFROM students s\nJOIN student_phones p ON p.student_id = s.id\nWHERE p.phone_number = '555-2200';",
     "childCounts": "SELECT s.name, COUNT(p.id) AS phones\nFROM students s\nLEFT JOIN student_phones p ON p.student_id = s.id\nGROUP BY s.id, s.name\nORDER BY s.id;",
     "childTwice": "INSERT INTO student_phones\nVALUES (104, 1, '555-1000');",
     "itemsBad": "SELECT * FROM order_items_bad ORDER BY order_id, product_id;",
@@ -378,12 +378,12 @@
         [
           "1",
           "Ada",
-          "555-1000, 555-2000"
+          "555-1000, 555-2200"
         ],
         [
           "2",
           "Grace",
-          "555-3000"
+          "555-1100"
         ]
       ],
       "affected": 0
@@ -416,7 +416,7 @@
           "1",
           "Ada",
           "555-1000",
-          "555-2000",
+          "555-2200",
           null
         ]
       ],
@@ -466,12 +466,12 @@
         [
           "102",
           "1",
-          "555-2000"
+          "555-2200"
         ],
         [
           "103",
           "2",
-          "555-3000"
+          "555-1100"
         ]
       ],
       "affected": 0

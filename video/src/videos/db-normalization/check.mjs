@@ -12,7 +12,7 @@
 //   split    why-normalization.mdx's cure (its erDiagram: customers,
 //            products, orders), filled with the same three orders
 //   phones   first-normal-form.mdx: its students example (Ada with
-//            555-1000 and 555-2000 in one cell, Grace with 555-3000), as a
+//            555-1000 and 555-2200 in one cell, Grace with 555-1100), as a
 //            list cell, as numbered columns, and in the lesson's own
 //            students / student_phones DDL
 //   items    second-normal-form.mdx: order_items_bad's three rows, and the
@@ -170,11 +170,11 @@ CREATE TABLE students (
   phones     TEXT
 );
 INSERT INTO students VALUES
-  (1, 'Ada',   '555-1000, 555-2000'),
-  (2, 'Grace', '555-3000');`);
+  (1, 'Ada',   '555-1000, 555-2200'),
+  (2, 'Grace', '555-1100');`);
   await show(db, "listCell", "SELECT * FROM students ORDER BY student_id;");
-  await show(db, "listSearch", "SELECT name FROM students\nWHERE phones = '555-2000';");
-  await show(db, "listTwice", "UPDATE students SET phones = '555-1000, 555-2000, 555-1000' WHERE student_id = 1;");
+  await show(db, "listSearch", "SELECT name FROM students\nWHERE phones = '555-2200';");
+  await show(db, "listTwice", "UPDATE students SET phones = '555-1000, 555-2200, 555-1000' WHERE student_id = 1;");
 }
 {
   const db = await fresh(`
@@ -185,12 +185,12 @@ CREATE TABLE students (
   phone2     TEXT,
   phone3     TEXT
 );
-INSERT INTO students VALUES (1, 'Ada', '555-1000', '555-2000', NULL);`);
+INSERT INTO students VALUES (1, 'Ada', '555-1000', '555-2200', NULL);`);
   await show(db, "columns", "SELECT * FROM students ORDER BY student_id;");
   await show(
     db,
     "fourth",
-    "INSERT INTO students VALUES (2, 'Grace', '555-3000', '555-3100', '555-3200', '555-3300');",
+    "INSERT INTO students VALUES (2, 'Grace', '555-1100', '555-2300', '555-3400', '555-3500');",
   );
 }
 {
@@ -208,8 +208,8 @@ CREATE TABLE student_phones (
 INSERT INTO students VALUES (1, 'Ada'), (2, 'Grace'), (3, 'Linus');
 INSERT INTO student_phones VALUES
   (101, 1, '555-1000'),
-  (102, 1, '555-2000'),
-  (103, 2, '555-3000');`);
+  (102, 1, '555-2200'),
+  (103, 2, '555-1100');`);
   await show(db, "childStudents", "SELECT * FROM students ORDER BY id;");
   await show(db, "childPhones", "SELECT * FROM student_phones ORDER BY id;");
   await show(
@@ -218,7 +218,7 @@ INSERT INTO student_phones VALUES
     `SELECT s.name
 FROM students s
 JOIN student_phones p ON p.student_id = s.id
-WHERE p.phone_number = '555-2000';`,
+WHERE p.phone_number = '555-2200';`,
   );
   await show(
     db,
