@@ -240,9 +240,11 @@ print(f"~95% of scores fall between {mu - 2 * sigma} and {mu + 2 * sigma}.")
 
 <Callout type="danger" title="Misconception: the empirical rule applies to all data">
 68–95–99.7 is a fact about the **normal** distribution **only**. Apply
-it to skewed income data and you'll badly miscount the tails, "within
-2σ" might capture far less than 95%, and the mean ± 2σ can even dip below
-zero for a strictly positive quantity. Before invoking the empirical
+it to skewed income data and you'll badly miscount the tails. On the
+lognormal incomes later in this lesson, "within 2σ" happens to hold 95%,
+but every value outside the band is above it and none below, "within 1σ"
+holds about 80% rather than 68%, and the mean − 2σ dips below zero for a
+strictly positive quantity. Before invoking the empirical
 rule, confirm the data is actually roughly normal. On non-normal data it
 simply isn't true.
 </Callout>
@@ -600,13 +602,13 @@ A z-score locates the value; the CDF converts that location into a probability.`
 <MultipleChoice
   markdown={`You have **right-skewed income** data and a colleague applies the 68–95–99.7 rule, reporting "95% of incomes fall within mean ± 2 standard deviations." Why is this unreliable here?
 
-- The rule requires the data to be in dollars
+- The rule requires every income to be recorded in the same currency unit
   > Units are irrelevant; the rule's validity depends on the distribution being approximately normal.
-- The rule only works for small samples
+- The rule only holds for samples small enough to inspect by hand
   > Sample size isn't the issue; the empirical rule is about the *shape* of the distribution, not how much data you have.
-- [o] The empirical rule holds for the normal distribution, and skewed income data violates that assumption, the actual coverage will differ and mean − 2σ may even be negative
-  > Because the rule is a property of the symmetric normal curve, applying it to a long-tailed, strictly positive variable misstates the tail coverage and can produce an impossible (negative) lower bound.
-- The standard deviation can't be computed for skewed data
+- [o] The rule is a property of the normal curve, which skewed income is not
+  > Applied to a long-tailed, strictly positive variable, the rule guarantees nothing: the values outside the band pile into the upper tail, and mean − 2σ can be an impossible negative income. On this lesson's simulated incomes the band does hold about 95%, which is coincidence rather than the rule.
+- A standard deviation cannot be computed for a skewed variable at all
   > A standard deviation is perfectly computable for skewed data; the problem is that the 68–95–99.7 *coverage* no longer applies.
 
 The empirical rule is a normal-distribution fact, not a universal one.`}

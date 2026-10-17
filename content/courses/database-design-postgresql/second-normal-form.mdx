@@ -41,8 +41,8 @@ erDiagram
         text name
     }
     order_items {
-        int order_id PK
-        int product_id PK
+        int order_id PK, FK
+        int product_id PK, FK
         int quantity
     }
 ```
@@ -146,8 +146,8 @@ erDiagram
         text name
     }
     order_items {
-        int order_id PK
-        int product_id PK
+        int order_id PK, FK
+        int product_id PK, FK
         int quantity
     }
 ```

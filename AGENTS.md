@@ -605,8 +605,9 @@ over from the rest of this file:
   confirms every beat's speech starts where its cue says.
 - **Two house narrators.** A script names its voice, `"drew"` or `"hope"`
   (`video/src/narration/voices.ts`), and `npm run narrate -- <video>` records
-  the whole script as one take on `eleven_v4_turbo` and cuts it into beats.
-  Both the beats and the raw take are committed.
+  the script on `eleven_v4_turbo` (never the plain `eleven_v4`) in takes, one
+  request per part of about 1,800 characters split at scene changes, and cuts
+  each take into beats. Both the beats and the raw takes are committed.
 - **Brand tokens only.** Scenes import `video/src/theme/brand.ts`, which loads
   `app/brand.css`; no hex values in a scene.
 - **Images go through the illustration pipeline.** Run `npm run illustrations

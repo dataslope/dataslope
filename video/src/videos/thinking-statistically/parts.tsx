@@ -5,7 +5,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { SERIF } from "../../editorial/fonts";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, INK, INK_SOFT, PAPER, label } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -22,6 +22,15 @@ export const STAT = ACCENT;
 export const STAT_INK = ACCENT_INK;
 
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+/**
+ * 0 → 1 → 0 over `dur` frames from `at`: a brief swell for a mark that is
+ * named again once it is already on the page (a bar, a dot, a line).
+ */
+export const pulse = (frame: number, at: number, dur = 18) => {
+  const t = (frame - at) / dur;
+  return t <= 0 || t >= 1 ? 0 : Math.sin(t * Math.PI) ** 2;
+};
 
 export const Svg: React.FC<{ opacity?: number; children: React.ReactNode }> = ({ opacity = 1, children }) => (
   <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity }}>
@@ -165,6 +174,81 @@ export const Strike: React.FC<{ at: number; color?: string; top?: string; childr
 };
 
 /**
+ * A highlighter stroke laid under the words it wraps, swept left to right on
+ * `at` and wiped away the same way on `out`: the phrase the narrator is
+ * reading, made visible. Sized in em and to the words, like Strike.
+ */
+export const Mark: React.FC<{ at: number; out?: number; dur?: number; color?: string; children: React.ReactNode }> = ({
+  at,
+  out,
+  dur = 12,
+  color = HIGHLIGHT,
+  children,
+}) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, dur);
+  const o = out === undefined ? 0 : ease(frame, out, 12);
+  return (
+    <span style={{ position: "relative", display: "inline-block" }}>
+      <span
+        style={{
+          position: "absolute",
+          left: `calc(-0.14em + (100% + 0.28em) * ${o})`,
+          top: "0.04em",
+          bottom: "-0.06em",
+          width: `calc((100% + 0.28em) * ${Math.max(0, p - o)})`,
+          background: color,
+          borderRadius: "0.14em",
+          opacity: p > 0 && o < 1 ? 1 : 0,
+        }}
+      />
+      <span style={{ position: "relative" }}>{children}</span>
+    </span>
+  );
+};
+
+/**
+ * A normal curve's outline over a baseline, dashed like every other truth in
+ * the video, drawn left to right on `at` with a faint wash under it: the
+ * shape a process draws its values from. `height` is the peak in px.
+ */
+export const Bell: React.FC<{
+  x: (v: number) => number;
+  mu: number;
+  sd: number;
+  base: number;
+  height: number;
+  at: number;
+  out?: number;
+  dur?: number;
+  opacity?: number;
+}> = ({ x, mu, sd, base, height, at, out, dur = 26, opacity = 1 }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, dur);
+  const o = out === undefined ? 0 : ease(frame, out, 12);
+  if (p <= 0 || o >= 1) return null;
+  const steps = 120;
+  const lo = mu - 3.4 * sd;
+  const hi = mu + 3.4 * sd;
+  const pts = Array.from({ length: steps + 1 }, (_, i) => {
+    const v = lo + ((hi - lo) * i) / steps;
+    return [x(v), base - height * Math.exp(-0.5 * ((v - mu) / sd) ** 2)] as const;
+  });
+  const line = pts.map(([a, b], i) => `${i ? "L" : "M"}${a.toFixed(1)},${b.toFixed(1)}`).join(" ");
+  const x0 = x(lo);
+  const x1 = x(hi);
+  return (
+    <Svg opacity={(1 - o) * opacity}>
+      {/* An inset on a group is measured against its own box, which spans x0 to x1. */}
+      <g style={{ clipPath: `inset(-4px ${(1 - p) * 100}% -4px -4px)` }}>
+        <path d={`${line} L${x1},${base} L${x0},${base} Z`} fill={`color-mix(in srgb, ${INK} 6%, transparent)`} />
+        <path d={line} fill="none" stroke={`color-mix(in srgb, ${INK} 52%, transparent)`} strokeWidth={1.8} strokeDasharray="6 5" />
+      </g>
+    </Svg>
+  );
+};
+
+/**
  * Symbols, set in the serif whatever face surrounds them: x-bar as an italic
  * x with a combining macron (the latin subset carries U+0304, so the face
  * places the bar itself), and mu upright, from the Greek subset fonts.ts
@@ -185,15 +269,19 @@ export const Spot: React.FC<{
   id: string;
   at: number;
   out?: number;
+  /** Set the spot back (to 30%) from this frame on: the thing it pictures is
+   *  what the narration says you cannot see. */
+  dim?: number;
   left: number;
   top: number;
   width: number;
   height: number;
-}> = ({ id, at, out, left, top, width, height }) => {
+}> = ({ id, at, out, dim, left, top, width, height }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = pop(frame, at, fps, 16);
   const o = out === undefined ? 0 : ease(frame, out, 12);
+  const d = dim === undefined ? 0 : ease(frame, dim, 20) * 0.7;
   if (!ILLUSTRATIONS || p <= 0.001 || o >= 1) return null;
   return (
     <Illustration
@@ -205,7 +293,7 @@ export const Spot: React.FC<{
         top,
         width,
         height,
-        opacity: Math.min(1, p) * (1 - o),
+        opacity: Math.min(1, p) * (1 - o) * (1 - d),
         transform: `translateY(${bob(frame, 5, 110) + (1 - p) * 30}px)`,
       }}
     />

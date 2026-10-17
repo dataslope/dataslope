@@ -182,6 +182,13 @@ ORDER BY
 The joins follow the foreign keys from the diagram. Reading the diagram
 helps you predict the query path.
 
+Not every end of a line becomes a constraint, though. The foreign key
+on `order_items.order_id` enforces the `||` end: every item belongs to
+exactly one existing order. The `|{` end, at least one item per order,
+has no key to carry it, and these tables accept an order with no items
+at all. A minimum like that is kept by the application, or by a
+trigger, rather than by the keys.
+
 ## Step 5: notice composite keys
 
 `order_items` uses `(order_id, line_number)` as its primary key. That

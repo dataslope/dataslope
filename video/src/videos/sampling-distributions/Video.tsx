@@ -23,7 +23,7 @@ const OVERLAP = 6;
  * scene, so their rows never move; "third" and "compare" open its later
  * phases after a scene's pause, without a cut.
  */
-const Scenes: React.FC = () => {
+export const Scenes: React.FC = () => {
   const { beat, durationInFrames } = useNarration();
   const cut = (id: string) => beat(id).from - LEAD;
   const until = (frame: number) => frame + OVERLAP;

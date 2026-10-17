@@ -26,8 +26,10 @@ export const caption =
 const DATA = [...normalSamples(600, 8, 1.5, 314), ...normalSamples(400, 15, 1.8, 271)];
 
 const DOMAIN = [2, 22];
+// At 4 the wide panel still showed both humps (a dip of 174 between 499 and
+// 256); at 5 the bins straddle the gap between the peaks and fuse them.
 const PANELS = [
-  { key: "Too wide", width: 4 },
+  { key: "Too wide", width: 5 },
   { key: "About right", width: 1 },
   { key: "Too narrow", width: 0.25 },
 ];

@@ -6,6 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { body, fmt, halo, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { useMergedPart } from "../sampling/merged";
 import { Sfx } from "../../sound/Sfx";
 import { CLOSE, shapeOf, TRUE_MEAN, type Spread } from "./data";
 import { Arrow, Bracket, between, EASY, EASY_INK, RANDOM_INK, TruthLine } from "./parts";
@@ -47,6 +48,8 @@ const MOVED = stateOf(CLOSE.moved, SHAPES.moved);
 export const CloseScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
+  // In the merged Unit 5 video the spoken bridge leads straight on: no "Next" line.
+  const merged = useMergedPart();
   const { y } = useLayout();
 
   const twoFrom = n.beat("two").from;
@@ -61,6 +64,12 @@ export const CloseScene: React.FC = () => {
   const betterAt = n.word("method", "better");
   const movesAt = n.word("method", "moves");
   const nextAt = n.word("next", "only kept");
+  // The bridge: as it turns to data biased before it is sampled, the finished
+  // figure eases back, then the rule beside it, then the headline.
+  const someAt = n.word("next", "some data");
+  const sampleItAt = n.word("next", "sample it");
+  const survivedAt = n.word("next", "survived");
+  const back = (at: number) => 1 - 0.62 * ease(frame, at, 22);
 
   const squeeze = ease(frame, squeezeFrom - 2, 30);
   const move = ease(frame, betterAt - 4, 30);
@@ -101,131 +110,139 @@ export const CloseScene: React.FC = () => {
       <Sfx name="slide" at={betterAt - 4} level={-33} />
       <Sfx name="chime" at={movesAt - 2} level={-29} />
 
-      <Ink at={twoFrom - 4} dur={18} style={{ left: 92, top: y(150), ...headline(84), whiteSpace: "nowrap" }}>
-        Two ways to miss.
-      </Ink>
-      <Note at={twoFrom + 10} x={96} y={y(258)}>
-        <span style={{ ...body(32, true), color: INK }}>
-          Each sample: <span key={perSample}>{perSample}</span>
-        </span>
-      </Note>
+      <div style={{ position: "absolute", inset: 0, opacity: back(survivedAt) }}>
+        <Ink at={twoFrom - 4} dur={18} style={{ left: 92, top: y(150), ...headline(84), whiteSpace: "nowrap" }}>
+          Two ways to miss.
+        </Ink>
+        <Note at={twoFrom + 10} x={96} y={y(258)}>
+          <span style={{ ...body(32, true), color: INK }}>
+            Each sample: <span key={perSample}>{perSample}</span>
+          </span>
+        </Note>
+      </div>
 
       {/* The rule, top right, a line at a time. */}
-      <Ink at={shrinksAt + 4} dur={18} style={{ left: 1000, top: y(160), ...body(36), color: INK, whiteSpace: "nowrap" }}>
-        More data shrinks the scatter.
-      </Ink>
-      <Ink at={movesAt - 2} dur={18} style={{ left: 1000, top: y(216), ...body(36, true), color: RANDOM_INK, whiteSpace: "nowrap" }}>
-        Only a better method moves the center.
-      </Ink>
-      <NextLine at={nextAt} x={1000} y={y(278)} width={720}>
-        the data that survived.
-      </NextLine>
-
-      <FigLabel n="6" title="Where 400 sample averages land" at={twoFrom} x={160} y={y(330)} />
-      <Axis scale={X} base={y(BASE)} ticks={[66, 68, 70, 72, 74, 76, 78, 80, 82, 84]} at={twoFrom} />
-      <TruthLine x={truthX} bottom={y(BASE)} top={y(BIAS_Y + 6)} at={twoFrom + 4} />
-      <div
-        style={{
-          position: "absolute",
-          right: 1920 - truthX + 12,
-          top: y(BIAS_Y + 8),
-          whiteSpace: "nowrap",
-          opacity: ease(frame, twoFrom + 10, 12),
-          ...halo,
-        }}
-      >
-        <span style={note(21, INK_SOFT)}>true average </span>
-        <span style={{ ...note(22, INK), fontWeight: 700 }}>{fmt(TRUE_MEAN)}</span>
+      <div style={{ position: "absolute", inset: 0, opacity: back(sampleItAt) }}>
+        <Ink at={shrinksAt + 4} dur={18} style={{ left: 1000, top: y(160), ...body(36), color: INK, whiteSpace: "nowrap" }}>
+          More data shrinks the scatter.
+        </Ink>
+        <Ink at={movesAt - 2} dur={18} style={{ left: 1000, top: y(216), ...body(36, true), color: RANDOM_INK, whiteSpace: "nowrap" }}>
+          Only a better method moves the center.
+        </Ink>
       </div>
+      {merged ? null : (
+        <NextLine at={nextAt} x={1000} y={y(278)} width={720}>
+          the data that survived.
+        </NextLine>
+      )}
 
-      {/* The pile, and once it has moved, where the easy way left it. */}
-      <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
-        {move > 0 ? (
-          <path
-            d={ghost}
-            fill="none"
-            stroke={EASY}
+      <div style={{ position: "absolute", inset: 0, opacity: back(someAt) }}>
+        <FigLabel n="6" title="Where 400 sample averages land" at={twoFrom} x={160} y={y(330)} />
+        <Axis scale={X} base={y(BASE)} ticks={[66, 68, 70, 72, 74, 76, 78, 80, 82, 84]} at={twoFrom} />
+        <TruthLine x={truthX} bottom={y(BASE)} top={y(BIAS_Y + 6)} at={twoFrom + 4} />
+        <div
+          style={{
+            position: "absolute",
+            right: 1920 - truthX + 12,
+            top: y(BIAS_Y + 8),
+            whiteSpace: "nowrap",
+            opacity: ease(frame, twoFrom + 10, 12),
+            ...halo,
+          }}
+        >
+          <span style={note(21, INK_SOFT)}>true average </span>
+          <span style={{ ...note(22, INK), fontWeight: 700 }}>{fmt(TRUE_MEAN)}</span>
+        </div>
+
+        {/* The pile, and once it has moved, where the easy way left it. */}
+        <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
+          {move > 0 ? (
+            <path
+              d={ghost}
+              fill="none"
+              stroke={EASY}
+              strokeWidth={2}
+              strokeDasharray="5 5"
+              opacity={0.7 * ease(frame, betterAt + 6, 14)}
+            />
+          ) : null}
+          <g style={{ transformOrigin: `${centerX}px ${y(BASE)}px`, transform: `scaleY(${grow})` }}>
+            <path d={pile} fill={color} fillOpacity={0.85} stroke={color} strokeWidth={1.5} />
+          </g>
+          {/* Its center, once bias is named. */}
+          <line
+            x1={centerX}
+            x2={centerX}
+            y1={y(BIAS_Y)}
+            y2={y(top) - 6}
+            stroke={color}
             strokeWidth={2}
-            strokeDasharray="5 5"
-            opacity={0.7 * ease(frame, betterAt + 6, 14)}
+            strokeDasharray="5 6"
+            opacity={ease(frame, centeredAt - 2, 12) * (centerX - truthX > 14 ? 1 : 0)}
           />
-        ) : null}
-        <g style={{ transformOrigin: `${centerX}px ${y(BASE)}px`, transform: `scaleY(${grow})` }}>
-          <path d={pile} fill={color} fillOpacity={0.85} stroke={color} strokeWidth={1.5} />
-        </g>
-        {/* Its center, once bias is named. */}
-        <line
-          x1={centerX}
-          x2={centerX}
-          y1={y(BIAS_Y)}
-          y2={y(top) - 6}
-          stroke={color}
-          strokeWidth={2}
-          strokeDasharray="5 6"
-          opacity={ease(frame, centeredAt - 2, 12) * (centerX - truthX > 14 ? 1 : 0)}
+        </svg>
+
+        {/* Variance: the width. */}
+        <Bracket x0={loX} x1={hiX} y={y(bracketY)} at={scatterAt - 4} color={INK} />
+        <div
+          style={{
+            position: "absolute",
+            left: hiX + 18,
+            top: y(bracketY) - 30,
+            whiteSpace: "nowrap",
+            opacity: ease(frame, scatterAt, 12),
+            ...halo,
+          }}
+        >
+          <div style={label(21, INK)}>Variance</div>
+          <div style={note(22, INK_SOFT)}>
+            spread <b style={{ color: INK }}>{fmt(shownSpread)}</b>
+          </div>
+          <div style={{ ...note(22, RANDOM_INK), marginTop: 4, opacity: ease(frame, betterAt + 18, 12) }}>
+            bias <b>+{fmt(MOVED.center - TRUE_MEAN)}</b>
+          </div>
+        </div>
+        <Note at={varianceAt} x={640} y={y(600)} out={biasAt}>
+          <div style={{ ...body(30, true), color: INK }}>how far one sample&rsquo;s</div>
+          <div style={{ ...body(30, true), color: INK }}>average strays from the next</div>
+        </Note>
+
+        {/* Bias: the offset. */}
+        <Arrow
+          from={[truthX, y(BIAS_Y)]}
+          to={[centerX - 2, y(BIAS_Y)]}
+          at={biasAt + 2}
+          dur={18}
+          color={color}
+          width={3}
+          opacity={centerX - truthX > 30 ? 1 : 0}
         />
-      </svg>
-
-      {/* Variance: the width. */}
-      <Bracket x0={loX} x1={hiX} y={y(bracketY)} at={scatterAt - 4} color={INK} />
-      <div
-        style={{
-          position: "absolute",
-          left: hiX + 18,
-          top: y(bracketY) - 30,
-          whiteSpace: "nowrap",
-          opacity: ease(frame, scatterAt, 12),
-          ...halo,
-        }}
-      >
-        <div style={label(21, INK)}>Variance</div>
-        <div style={note(22, INK_SOFT)}>
-          spread <b style={{ color: INK }}>{fmt(shownSpread)}</b>
+        <div
+          style={{
+            position: "absolute",
+            left: Math.max(640, (truthX + centerX) / 2 - 220),
+            width: 440,
+            top: y(BIAS_Y) - 52,
+            textAlign: "center",
+            whiteSpace: "nowrap",
+            opacity: ease(frame, biasAt + 4, 12) * (1 - ease(frame, betterAt + 8, 10)),
+            ...halo,
+          }}
+        >
+          <span style={{ ...label(24, ink) }}>Bias </span>
+          <span style={{ ...note(24, ink), fontWeight: 700 }}>
+            +{fmt(bias)} points
+          </span>
         </div>
-        <div style={{ ...note(22, RANDOM_INK), marginTop: 4, opacity: ease(frame, betterAt + 18, 12) }}>
-          bias <b>+{fmt(MOVED.center - TRUE_MEAN)}</b>
-        </div>
+        <Note at={movesAt + 2} x={sx(X, NARROW.hi) + 20} y={y(BASE - 140)}>
+          <div style={{ ...note(21, EASY_INK), ...halo }}>the easy way,</div>
+          <div style={{ ...note(21, EASY_INK), ...halo }}>still at {fmt(NARROW.center)}</div>
+        </Note>
+        <Note at={leavesAt} x={640} y={y(600)} out={methodFrom}>
+          <div style={{ ...body(30, true), color: INK }}>where the averages</div>
+          <div style={{ ...body(30, true), color: EASY_INK }}>center, right or wrong</div>
+        </Note>
       </div>
-      <Note at={varianceAt} x={640} y={y(600)} out={biasAt}>
-        <div style={{ ...body(30, true), color: INK }}>how far one sample&rsquo;s</div>
-        <div style={{ ...body(30, true), color: INK }}>average strays from the next</div>
-      </Note>
-
-      {/* Bias: the offset. */}
-      <Arrow
-        from={[truthX, y(BIAS_Y)]}
-        to={[centerX - 2, y(BIAS_Y)]}
-        at={biasAt + 2}
-        dur={18}
-        color={color}
-        width={3}
-        opacity={centerX - truthX > 30 ? 1 : 0}
-      />
-      <div
-        style={{
-          position: "absolute",
-          left: Math.max(640, (truthX + centerX) / 2 - 220),
-          width: 440,
-          top: y(BIAS_Y) - 52,
-          textAlign: "center",
-          whiteSpace: "nowrap",
-          opacity: ease(frame, biasAt + 4, 12) * (1 - ease(frame, betterAt + 8, 10)),
-          ...halo,
-        }}
-      >
-        <span style={{ ...label(24, ink) }}>Bias </span>
-        <span style={{ ...note(24, ink), fontWeight: 700 }}>
-          +{fmt(bias)} points
-        </span>
-      </div>
-      <Note at={movesAt + 2} x={sx(X, NARROW.hi) + 20} y={y(BASE - 140)}>
-        <div style={{ ...note(21, EASY_INK), ...halo }}>the easy way,</div>
-        <div style={{ ...note(21, EASY_INK), ...halo }}>still at {fmt(NARROW.center)}</div>
-      </Note>
-      <Note at={leavesAt} x={640} y={y(600)} out={methodFrom}>
-        <div style={{ ...body(30, true), color: INK }}>where the averages</div>
-        <div style={{ ...body(30, true), color: EASY_INK }}>center, right or wrong</div>
-      </Note>
     </AbsoluteFill>
   );
 };

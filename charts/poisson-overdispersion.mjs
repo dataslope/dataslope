@@ -6,14 +6,14 @@
  * will match the average exactly and then be wrong about the spread by whatever
  * factor the real data disagrees by.
  *
- * These observed counts have a mean of about 8 and a variance about four times
- * that. The fitted Poisson, with the same mean, is far too narrow. It is short
- * in the middle, where it piles up probability the data does not have, and
- * short again in the tail, where the data has days the model says are nearly
+ * These observed counts have a mean of about 8 and a variance about five times
+ * that. The fitted Poisson, with the same mean, is far too narrow. It is too
+ * tall in the middle, where it piles up probability the data does not have, and
+ * short in the tail, where the data has days the model says are nearly
  * impossible.
  *
  * The tail is where this costs money. Under the fitted Poisson a day past
- * twenty is a once-in-years event; in the data it happens several times a year.
+ * twenty is a once-in-years event; in the data it is about one day in twenty.
  * Every capacity plan, alerting threshold and staffing model built on the fit
  * is calibrated for a world with less variance than the one it runs in.
  *
@@ -30,7 +30,7 @@
 import { Plot, plot, ACCENT, HALO, MUTED, mean, rng } from "./_theme.mjs";
 
 export const title =
-  "Observed daily counts against a Poisson fitted to the same mean. The fit is far too narrow: it puts too much probability in the middle and almost none past twenty, where the data has several days a year.";
+  "Observed daily counts against a Poisson fitted to the same mean. The fit is far too narrow: it puts too much probability in the middle and almost none past twenty, where the data has about one day in twenty.";
 
 const LAMBDA = 8;
 /** Counts drawn from a gamma-mixed Poisson, which is the negative binomial and
@@ -38,7 +38,7 @@ const LAMBDA = 8;
 const u = rng(6_263);
 const DAYS = 700;
 const OBSERVED = Array.from({ length: DAYS }, () => {
-  // Gamma(shape 1.5) by summing exponentials, scaled to mean 1.
+  // Gamma(shape 2) by summing two exponentials, scaled to mean 1.
   const g = (-Math.log(Math.max(u(), 1e-12)) - Math.log(Math.max(u(), 1e-12))) / 2;
   const rate = LAMBDA * g;
   // Poisson by Knuth's method at the day's own rate.

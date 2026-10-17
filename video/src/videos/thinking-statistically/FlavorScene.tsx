@@ -2,12 +2,13 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, fmt, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { MONO } from "../../theme/fonts";
 import { FLAVORS } from "./data";
-import { Kicker, lerp, RAW, Spot, STAT_INK, Strike } from "./parts";
+import { Kicker, lerp, Mark, pulse, RAW, Spot, STAT, STAT_INK, Strike } from "./parts";
 
 const CHIP = 96;
 const CHIP_PITCH = 132;
@@ -49,13 +50,25 @@ export const FlavorScene: React.FC = () => {
   const avgAt = n.word("average", "Average");
   const eightAt = n.word("average", "one point eight");
   const noAt = n.word("none", "no flavor");
+  const mathAt = n.word("none", "math");
+  const numbersAt = n.word("none", "numbers");
   const labelsAt = n.word("none", "labels");
+  const quantitiesAt = n.word("none", "not quantities");
+  const honestAt = n.word("mode", "honest summary");
   const commonAt = n.word("mode", "most common");
   const vanillaAt = n.word("mode", "Vanilla");
+  const computerAt = n.word("kinds-in", "computer");
+  const labelAt = n.word("kinds-in", "label");
+  const quantityAt = n.word("kinds-in", "quantity");
+  const upToYouAt = n.word("kinds-in", "up to you");
 
   const asLabels = ease(frame, labelsAt - 2, 14);
   const tallyIn = ease(frame, commonAt - 14, 12);
   const mean = fmt(FLAVORS.mean, 1);
+  // "The honest summary": the mean of the codes steps back for the tally.
+  const meanOp = 1 - ease(frame, honestAt - 2, 18) * 0.6;
+  const vanilla = ease(frame, vanillaAt - 2, 12);
+  const stored = ease(frame, labelAt - 2, 12);
 
   return (
     <AbsoluteFill>
@@ -65,6 +78,7 @@ export const FlavorScene: React.FC = () => {
       <Sfx name="el-tap" at={eightAt - 6} level={-27} />
       <Sfx name="el-scratch" at={noAt} level={-30} />
       <Sfx name="el-whoosh" at={commonAt - 10} level={-32} />
+      <Sfx name="el-pop" at={computerAt - 4} level={-30} />
 
       <Kicker at={flavorsFrom - 4}>What kind of data</Kicker>
 
@@ -84,8 +98,10 @@ export const FlavorScene: React.FC = () => {
       <div style={{ position: "absolute", left: 96, top: y(264), display: "flex", gap: 48 }}>
         {NAMES.map((name, i) => (
           <Ink key={name} at={codeAt[i] - 4} dur={14} style={{ position: "relative", whiteSpace: "nowrap" }}>
-            <span style={{ ...note(30, INK), fontWeight: 700 }}>{i + 1}</span>
-            <span style={note(30, INK_SOFT)}> = {name}</span>
+            <Mark at={quantitiesAt - 2 + i * 5} out={honestAt + i * 3}>
+              <span style={{ ...note(30, INK), fontWeight: 700 }}>{i + 1}</span>
+              <span style={note(30, INK_SOFT)}> = {name}</span>
+            </Mark>
           </Ink>
         ))}
       </div>
@@ -98,6 +114,8 @@ export const FlavorScene: React.FC = () => {
       {FLAVORS.answers.map((code, i) => {
         const a = ease(frame, tenAt - 2 + i * 2.5, 10);
         if (a <= 0) return null;
+        // "those numbers", and "a quantity": each code swells in turn.
+        const read = pulse(frame, numbersAt - 2 + i * 1.4, 14) + pulse(frame, quantityAt - 2 + i * 1.4, 14);
         return (
           <div
             key={i}
@@ -107,7 +125,8 @@ export const FlavorScene: React.FC = () => {
               top: y(CHIP_Y),
               width: CHIP,
               opacity: a,
-              transform: `translateY(${(1 - a) * 16}px)`,
+              transform: `translateY(${(1 - a) * 16}px) scale(${1 + read * 0.12})`,
+              transformOrigin: "50% 40%",
             }}
           >
             <div
@@ -135,13 +154,35 @@ export const FlavorScene: React.FC = () => {
                 fontWeight: lerp(500, 600, asLabels),
               }}
             >
-              {FLAVORS.codes[String(code)]}
+              {/* "That part is up to you": the reading only a person brings. */}
+              <Mark at={upToYouAt - 2 + i * 2}>{FLAVORS.codes[String(code)]}</Mark>
             </div>
           </div>
         );
       })}
 
+      {/* The computer's view of the column: integers, as pandas stores them. */}
+      <Ink at={computerAt - 4} dur={14} style={{ left: 1478, top: y(CHIP_Y) + 4, whiteSpace: "nowrap" }}>
+        <div style={label(20, INK_SOFT)}>stored as</div>
+        <div
+          style={{
+            marginTop: 8,
+            display: "inline-block",
+            padding: "2px 12px",
+            border: `1.5px solid ${HAIRLINE}`,
+            borderRadius: 14,
+            fontFamily: MONO,
+            fontSize: 22,
+            color: INK_SOFT,
+            background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(stored * 100)}%, transparent)`,
+          }}
+        >
+          {FLAVORS.dtype}
+        </div>
+      </Ink>
+
       {/* ── The mean of the codes ── */}
+      <div style={{ position: "absolute", inset: 0, opacity: meanOp }}>
       <Ink at={avgAt - 4} dur={14} style={{ left: 160, top: y(624), whiteSpace: "nowrap" }}>
         <span style={label(22, INK_SOFT)}>Mean of the column</span>
       </Ink>
@@ -151,6 +192,13 @@ export const FlavorScene: React.FC = () => {
       <Note at={noAt + 6} x={160} y={y(826)}>
         <span style={{ ...body(32, true), color: INK, whiteSpace: "nowrap" }}>names no flavor at all</span>
       </Note>
+      {/* "The math ran fine": the sum it did, in full. */}
+      <Ink at={mathAt - 2} dur={26} out={honestAt - 2} style={{ left: 384, top: y(706), whiteSpace: "nowrap" }}>
+        <span style={{ fontFamily: MONO, fontSize: 25, color: INK }}>
+          ({FLAVORS.answers.join(" + ")}) ÷ {FLAVORS.answers.length}
+        </span>
+      </Ink>
+      </div>
 
       {/* ── The tally ── */}
       {STACK_X.map((x, col) => (
@@ -199,7 +247,7 @@ export const FlavorScene: React.FC = () => {
               width: lerp(CHIP, STACK_W, t),
               height: lerp(CHIP, h(BLOCK) - 4, t),
               borderRadius: lerp(10, 3, t),
-              background: RAW,
+              background: s.col === 0 ? `color-mix(in srgb, ${STAT} ${Math.round(vanilla * 70)}%, ${RAW})` : RAW,
               border: `2px solid color-mix(in srgb, ${INK} ${Math.round(t * 40)}%, transparent)`,
               boxSizing: "border-box",
               opacity: Math.min(1, t * 3),

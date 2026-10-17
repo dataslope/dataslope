@@ -97,8 +97,8 @@ We'll take them one at a time.
 from some fixed value you care about?
 
 A cloud team promises a **200 ms** average API response time. You pull a
-random sample of 50 real requests. The sample averages a bit above 200,
-but is that a genuine breach of the promise, or just a slow afternoon?
+random sample of 50 real requests. The sample averages 200.3 ms, a hair
+above 200: is that a genuine breach of the promise, or just noise?
 
 <CodeBlock
   adapter="python"
@@ -138,8 +138,10 @@ the probability of a sample mean at least this far from 200 if the true
 average really were 200. Below 0.05 and you doubt the 200 ms claim; above
 and you can't distinguish the data from that claim.
 
-But "significant" doesn't tell you *how far off* the promise is. For
-that, pair the test with a **confidence interval** for the mean.
+Here p is about 0.95, so the data sits comfortably with the promise. But
+a verdict, significant or not, doesn't tell you *how far off* the promise
+could be. For that, pair the test with a **confidence interval** for the
+mean.
 
 <CodeBlock
   adapter="python"
@@ -256,9 +258,11 @@ print(f"Using Welch: {decision}")
   ]}
 />
 
-Notice the two p-values differ. When the spreads and group sizes are
-unequal, Student's test can be *miscalibrated*, its p-value is not quite
-the error rate it claims. Welch's stays honest. The cost of using Welch
+Here the two p-values barely differ (0.7871 and 0.7804), because groups
+of 180 and 160 are close enough in size for Student's test to cope. It
+goes wrong when unequal spreads meet unequal group sizes: then it is
+*miscalibrated*, and its p-value is not quite the error rate it claims.
+Welch's stays honest either way. The cost of using Welch
 when variances really are equal is negligible, which is why it's the
 sensible default.
 

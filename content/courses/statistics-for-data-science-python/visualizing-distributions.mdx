@@ -50,7 +50,11 @@ rng = np.random.default_rng(0)
 # but with totally different shapes.
 n = 3000
 bell = rng.normal(50, 15, size=n)
-bimodal = np.concatenate([rng.normal(30, 6, n // 2), rng.normal(70, 6, n // 2)])
+# Two humps of sd 6, set just far enough apart that the whole sample's sd is 15.
+gap = np.sqrt(15**2 - 6**2)
+bimodal = np.concatenate(
+    [rng.normal(50 - gap, 6, n // 2), rng.normal(50 + gap, 6, n // 2)]
+)
 uniform = rng.uniform(50 - 15 * np.sqrt(3), 50 + 15 * np.sqrt(3), size=n)
 
 for name, x in [("bell", bell), ("bimodal", bimodal), ("uniform", uniform)]:
@@ -316,7 +320,7 @@ data and walk upward from 0 to 1. Its superpower: it has **no bins and
 no bandwidth**, nothing to tune, nothing to accidentally hide. Every
 data point is shown exactly. It's less intuitive at a glance than a
 histogram, but it's the honest choice for reading off **percentiles**
-("90% of orders are under \\$40"), comparing groups, and spotting
+("90% of orders are under \$40"), comparing groups, and spotting
 features without worrying you've smoothed them away.
 
 <CodeBlock

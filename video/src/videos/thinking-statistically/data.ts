@@ -81,6 +81,7 @@ export const SURVEY = {
 /** One sample of fifty from Normal(100, 15), seed 42. */
 export const KNOWN = {
   mu: m.known.mu,
+  sigma: m.known.sigma,
   n: m.known.n,
   values: m.known.values as readonly number[],
   xBar: m.known.xBar,
@@ -99,6 +100,8 @@ export const ROWS: readonly { values: readonly number[]; mean: number }[] = m.ma
 export const FLAVORS = {
   codes: m.flavors.codes as Record<string, string>,
   answers: m.flavors.answers as readonly number[],
+  /** How pandas stores the column of codes. */
+  dtype: m.flavors.dtype,
   mean: m.flavors.mean,
   mode: m.flavors.mode,
   counts: m.flavors.counts as Record<string, number>,

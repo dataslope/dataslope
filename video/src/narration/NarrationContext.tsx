@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useMemo } from "react";
 import { useVideoConfig } from "remotion";
 import type { TimedBeat, Timeline } from "./types";
-import { wordKey } from "./timeline";
+import { phraseStarts, wordKey } from "./timeline";
 
 export type WordCueOptions = {
   /** Which occurrence of the phrase within the beat, from 1. */
@@ -30,6 +30,16 @@ export type Narration = {
 
 const NarrationContext = createContext<Narration | null>(null);
 
+/** Each ambiguous cue is reported once per page, not once per frame.
+ *  check:frames collects the `[cue]` lines from the render's console. */
+const warned = new Set<string>();
+function warnAmbiguous(beatId: string, phrase: string, times: number) {
+  const key = `${beatId}\u0000${phrase}`;
+  if (warned.has(key)) return;
+  warned.add(key);
+  console.warn(`[cue] Beat "${beatId}" says "${phrase}" ${times} times; the cue takes the first. Pass { nth } to choose.`);
+}
+
 function findBeat(timeline: Timeline, id: string): TimedBeat {
   const beat = timeline.beats.find((b) => b.id === id);
   if (!beat) throw new Error(`No narration beat "${id}"`);
@@ -51,20 +61,19 @@ export const NarrationProvider: React.FC<{
         const b = findBeat(timeline, id);
         return { from: frame(b.start), to: frame(b.end) };
       },
-      word: (beatId, phrase, { nth = 1, edge = "start" } = {}) => {
+      word: (beatId, phrase, { nth, edge = "start" } = {}) => {
         const b = findBeat(timeline, beatId);
-        const keys = phrase.split(/\s+/).map(wordKey).filter(Boolean);
-        let seen = 0;
-        for (let i = 0; i + keys.length <= b.words.length; i++) {
-          if (keys.every((k, j) => b.words[i + j].key === k) && ++seen === nth) {
-            const w =
-              edge === "start" ? b.words[i] : b.words[i + keys.length - 1];
-            return frame(edge === "start" ? w.start : w.end);
-          }
+        const starts = phraseStarts(b.words, phrase);
+        const i = starts[(nth ?? 1) - 1];
+        if (i === undefined) {
+          throw new Error(
+            `Beat "${beatId}" does not say "${phrase}"${(nth ?? 1) > 1 ? ` ${nth} times` : ""}: "${b.text}"`,
+          );
         }
-        throw new Error(
-          `Beat "${beatId}" does not say "${phrase}"${nth > 1 ? ` ${nth} times` : ""}: "${b.text}"`,
-        );
+        if (nth === undefined && starts.length > 1) warnAmbiguous(beatId, phrase, starts.length);
+        const length = phrase.split(/\s+/).map(wordKey).filter(Boolean).length;
+        const w = edge === "start" ? b.words[i] : b.words[i + length - 1];
+        return frame(edge === "start" ? w.start : w.end);
       },
     };
   }, [timeline, fps]);

@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "model": "gpt-image-2.5-flare",
+    "brandColors": {
+      "blue": "#148cff",
+      "green": "#20c621",
+      "red": "#ff4f59",
+      "yellow": "#ffdd6c"
+    },
+    "sizes": {
+      "video-hero": "1536x1024",
+      "video-icon": "1024x1024"
+    },
+    "styles": {
+      "watercolor illustration": {
+        "constraints": "Paint it in loose, transparent watercolor: soft washes that feather and bleed at their edges, darker pigment pooling where a wash has dried, gentle blooms inside each shape, and the tooth of cold-press paper visible only inside the paint. Build the scene from a few large, simple shapes rather than many small pieces, and let the washes define the forms instead of hard outlines. Lay every wash in the brand colors below and let two overlapping washes mix into a third; never outline in black, never shade with grey or black, and never paint the whole subject in one hue. An animal keeps its own natural coloring, painted in warm earthy washes with soft fur texture. Draw any person as an anonymous stylized figure with no facial features and no resemblance to a real individual. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no paper texture outside the paint, no floor, no ground shadow, no frame or border, no soft glow and no vignette, so the whole subject lifts off the page in one piece.",
+        "softAlphaWarn": 0.3
+      }
+    }
+  },
+  "prompts": [
+    {
+      "id": "describing-data-seesaw",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a long wooden plank lying perfectly level on a chunky triangular wooden block that sits close to the plank's right end, with one big heavy iron weight on the short right end of the plank and three small wooden cubes spread along its long left end"
+    },
+    {
+      "id": "describing-data-scooter",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small round delivery scooter seen from the side, with a cardboard box strapped to a rack behind its seat"
+    },
+    {
+      "id": "describing-data-magnifier",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a large brass magnifying glass with a thick wooden handle, tilted at an angle"
+    },
+    {
+      "id": "describing-data-dinosaur",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a friendly green toy tyrannosaurus standing on its two back legs, seen from the side, with tiny front arms and a long tail"
+    }
+  ]
+}

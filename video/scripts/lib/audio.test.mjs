@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { test } from "node:test";
-import { compositionOf, folderOf, loudness, readWav, silences, videoNames, writeWav } from "./audio.mjs";
+import { compositionOf, folderOf, loudness, readWav, registry, silences, videoNames, writeWav } from "./audio.mjs";
 
 const RATE = 48000;
 const sine = (seconds, dbfs, hz = 997) => {
@@ -66,7 +66,7 @@ test("a WAV written at its own level reads back the same", () => {
 
 test("a video is named by its composition or its folder, either way round", () => {
   for (const [id, folder] of [
-    ["ThinkingStatistically", "thinking-statistically"],
+    ["WhyNormalization", "why-normalization"],
     ["CPointers", "c-pointers"],
     ["TfIdf", "tf-idf"],
     ["LlmTemperature", "llm-temperature"],
@@ -76,4 +76,28 @@ test("a video is named by its composition or its folder, either way round", () =
     assert.deepEqual(videoNames(id), { id, folder });
     assert.deepEqual(videoNames(folder), { id, folder });
   }
+});
+
+test("every registered video resolves from its id and from its folder", () => {
+  const videos = registry();
+  assert.ok(videos.length > 20, `only ${videos.length} videos found in Root.tsx`);
+  for (const { id, folder } of videos) {
+    assert.ok(existsSync(new URL(`../../src/videos/${folder}/Video.tsx`, import.meta.url)), `${id}: no ${folder}/Video.tsx`);
+    assert.deepEqual(videoNames(id), { id, folder });
+    assert.deepEqual(videoNames(folder), { id, folder });
+  }
+  // An id that does not follow its folder's name is found through the registry.
+  assert.deepEqual(videoNames("Stats-1-ThinkingStatistically", [{ id: "Stats-1-ThinkingStatistically", folder: "thinking-statistically" }]), {
+    id: "Stats-1-ThinkingStatistically",
+    folder: "thinking-statistically",
+  });
+  // So is the name the id was before it was prefixed.
+  assert.deepEqual(videoNames("ThinkingStatistically", [{ id: "Stats-1-ThinkingStatistically", folder: "thinking-statistically" }]), {
+    id: "Stats-1-ThinkingStatistically",
+    folder: "thinking-statistically",
+  });
+  assert.deepEqual(videoNames("thinking-statistically", [{ id: "Stats-1-ThinkingStatistically", folder: "thinking-statistically" }]), {
+    id: "Stats-1-ThinkingStatistically",
+    folder: "thinking-statistically",
+  });
 });

@@ -119,6 +119,13 @@ erDiagram
     }
 ```
 
+One requirement is not on the diagram. An order "contains one or more
+products", but `orders ||--o{ order_items` allows an order with no
+lines, because that is what the schema below can enforce: the foreign
+key on `order_items` makes every line belong to an order, and nothing
+in `orders` can require a line to exist. Keeping every order to at
+least one line is the application's job.
+
 The model has two many-to-many relationships, but they are different.
 `product_categories` is a pure classification relationship.
 `order_items` is a line-item table because it stores facts about each

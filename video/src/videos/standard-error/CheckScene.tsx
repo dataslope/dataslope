@@ -22,9 +22,11 @@ import {
 } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { CHECK, histogram, mulberry32 } from "./data";
 import { Marked, Span } from "./parts";
+import { Marker } from "../sampling/emphasis";
 
 /** One x-axis for both figures, so an average falls straight down from the
  *  population to the place it lands, and the pile's width compares with the
@@ -79,6 +81,11 @@ export const CheckScene: React.FC = () => {
   const oneAt = n.word("match", "one sample");
   const sevenAt = n.word("match", "three point seven");
   const closeAt = n.word("match", "Close");
+  // The stage is set as the check is announced; and once one sample's
+  // shortcut lands close, the ten thousand repeats ease back.
+  const checkItAt = n.word("check", "check it");
+  const repeatingAt = n.word("match", "repeating");
+  const notNeeded = 1 - 0.6 * ease(frame, repeatingAt - 2, 22);
 
   // ── The first two samples, choreographed; then ten thousand ──
   const steps: Step[] = [
@@ -108,6 +115,15 @@ export const CheckScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: the population, a sample, the first average landing, the
+          thousands, the two spreads ── */}
+      <Sfx name="el-pop" at={popAt - 4} level={-30} />
+      <Sfx name="el-sprinkle" at={drawAt} level={-34} />
+      <Sfx name="el-tap" at={steps[0].d + DROP} level={-28} />
+      <Sfx name="el-sprinkle" at={fastFrom} level={-33} />
+      <Sfx name="el-tap" at={fiveAt - 2} level={-29} />
+      <Sfx name="el-tap" at={sevenAt - 2} level={-29} />
+
       <div style={{ position: "absolute", left: 92, top: y(112), display: "flex", gap: "0.26em", ...headline(56), whiteSpace: "nowrap" }}>
         <Ink at={checkFrom - 6} dur={20} style={{ position: "relative" }}>
           Check it the long way:
@@ -118,7 +134,7 @@ export const CheckScene: React.FC = () => {
       </div>
 
       {/* ── Fig. 3: the population ── */}
-      <FigLabel n="3" title={`A population of ${CHECK.popSize.toLocaleString("en-US")} values, centered on ${CHECK.mu}`} at={popAt - 10} x={160} y={y(200)} />
+      <FigLabel n="3" title={`A population of ${CHECK.popSize.toLocaleString("en-US")} values, centered on ${CHECK.mu}`} at={checkItAt - 4} x={160} y={y(200)} />
       <Bars
         counts={CHECK.popHist.counts}
         lo={CHECK.popHist.lo}
@@ -128,7 +144,7 @@ export const CheckScene: React.FC = () => {
         unit={h(POP_UNIT)}
         grow={(i) => ease(frame, popAt - 4 + Math.abs(i - 25) * 0.6, 14)}
       />
-      <Axis scale={X} base={y(POP_BASE)} ticks={TICKS} at={popAt - 6} />
+      <Axis scale={X} base={y(POP_BASE)} ticks={TICKS} at={checkItAt} />
       <Span
         x0={sx(X, CHECK.mu - CHECK.sigma)}
         x1={sx(X, CHECK.mu + CHECK.sigma)}
@@ -151,16 +167,18 @@ export const CheckScene: React.FC = () => {
       {/* ── Fig. 4: the averages ── */}
       <FigLabel n="4" title={`The average of each sample of ${CHECK.n}`} at={drawAt - 4} x={160} y={y(568)} />
       <Axis scale={X} base={y(MEANS_BASE)} ticks={TICKS} at={drawAt - 2} />
-      <Bars
-        counts={counts}
-        lo={0}
-        bin={MEAN_BIN}
-        scale={X}
-        base={y(MEANS_BASE)}
-        unit={h(unit)}
-        color={ACCENT}
-        overlay={frame < fastTo + 6 ? { counts: recent, color: ds("red", 700) } : undefined}
-      />
+      <div style={{ position: "absolute", inset: 0, opacity: notNeeded }}>
+        <Bars
+          counts={counts}
+          lo={0}
+          bin={MEAN_BIN}
+          scale={X}
+          base={y(MEANS_BASE)}
+          unit={h(unit)}
+          color={ACCENT}
+          overlay={frame < fastTo + 6 ? { counts: recent, color: ds("red", 700) } : undefined}
+        />
+      </div>
       {steps.map((st, i) => (
         <FallingBlock key={i} step={st} index={i} />
       ))}
@@ -178,7 +196,7 @@ export const CheckScene: React.FC = () => {
       </Note>
 
       {/* ── Right column: the count, then the two spreads side by side ── */}
-      <div style={{ position: "absolute", left: COL, top: y(214), opacity: counter }}>
+      <div style={{ position: "absolute", left: COL, top: y(214), opacity: counter * notNeeded }}>
         <div style={label(20, INK_SOFT)}>Samples drawn</div>
         <div
           style={{
@@ -210,7 +228,9 @@ export const CheckScene: React.FC = () => {
         <div style={label(20, INK_SOFT)}>From one sample, s ÷ √{CHECK.n}</div>
       </Ink>
       <Ink at={sevenAt - 2} dur={14} style={{ left: COL, top: y(772), display: "flex", alignItems: "baseline", gap: 16 }}>
-        <span style={{ ...headline(64), fontVariantNumeric: "tabular-nums lining-nums" }}>{fmt(CHECK.estimated)}</span>
+        <span style={{ ...headline(64), fontVariantNumeric: "tabular-nums lining-nums" }}>
+          <Marker at={closeAt - 2}>{fmt(CHECK.estimated)}</Marker>
+        </span>
         <span style={{ ...body(28, true) }}>estimated</span>
       </Ink>
       <Note at={closeAt + 2} x={COL} y={y(862)}>

@@ -46,6 +46,23 @@ const PAUSE_AFTER: Record<string, number> = {
 export const wordKey = (word: string) =>
   word.toLowerCase().replace(/[^a-z0-9]/g, "");
 
+/**
+ * Where a phrase starts among a beat's words: the index of each word that
+ * begins an occurrence, in order. Matching is by wordKey, so case and
+ * punctuation don't count, and "a hundred" is found inside "walk a hundred
+ * thousand". A cue picks one with `nth`; a phrase found more than once with
+ * no `nth` is ambiguous (useNarration warns, `npm run check:cues` fails it).
+ */
+export function phraseStarts(words: readonly { key: string }[], phrase: string): number[] {
+  const keys = phrase.split(/\s+/).map(wordKey).filter(Boolean);
+  const starts: number[] = [];
+  if (!keys.length) return starts;
+  for (let i = 0; i + keys.length <= words.length; i++) {
+    if (keys.every((k, j) => words[i + j].key === k)) starts.push(i);
+  }
+  return starts;
+}
+
 /** An audio tag such as `[curious]` or `[low, gravelly voice]`: a direction
  *  to the voice, never spoken. ElevenLabs v3 and v4 return its characters in
  *  the alignment with next to no duration. */

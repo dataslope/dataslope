@@ -4,7 +4,7 @@ description: What a confidence interval really is, a point estimate plus a margi
 ---
 
 A single number is a confident-sounding lie. When you report "average
-revenue per user is \$48.20," you've collapsed a noisy estimate into a
+revenue per user is \$49.28," you've collapsed a noisy estimate into a
 point that looks exact, but a different sample would have given \$46.10
 or \$50.05. In *Populations and Samples* we named that wobble
 *estimation error*, and in *Standard Error* we measured its size. A
@@ -26,7 +26,7 @@ confidence" actually means.
 
 ## A point estimate alone hides its own uncertainty
 
-You sample 50 users, the mean is \$48.20. That's your **point
+You sample 50 users, the mean is \$49.28. That's your **point
 estimate**, your single best guess for the population mean μ. But
 you already know x̄ is a random variable: it has a *standard
 error*, a typical sample-to-sample wobble. The point estimate throws
@@ -203,7 +203,7 @@ probability statement about the one interval in your notebook.
 
 <Callout type="danger" title="The #1 misinterpretation (read this twice)">
 "There is a 95% probability that the true mean lies in **this**
-interval (48.2, 53.9)" is **wrong** under the standard (frequentist)
+interval (46.22, 52.33)" is **wrong** under the standard (frequentist)
 reading. Once the interval is computed, the true mean is either in it
 or not, there's no probability left to assign, because nothing is
 random anymore. The 95% describes how often the *method* succeeds
@@ -293,9 +293,9 @@ precisely why you can't say "this interval has a 95% chance." The 95%
 is the fraction of green bars across the whole forest.
 
 <Callout type="success" title="Say it the right way">
-Correct: "We are 95% confident the true mean is between 48 and 54,"
+Correct: "We are 95% confident the true mean is between 46 and 52,"
 understood as *the procedure that produced this range captures the truth
-95% of the time*. Also fine in plain English: "our best estimate is 51,
+95% of the time*. Also fine in plain English: "our best estimate is 49,
 give or take about 3." **Avoid**: "there's a 95% probability the mean is
 in this interval", it sounds identical but means something the
 frequentist framework can't deliver.

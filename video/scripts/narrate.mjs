@@ -7,28 +7,39 @@
  *
  *   node scripts/narrate.mjs <video>                 voice what is missing
  *   node scripts/narrate.mjs <video> --only n,star   just these beats
- *   node scripts/narrate.mjs <video> --force         a whole new take
- *   node scripts/narrate.mjs <video> --recut         re-cut the kept take
+ *   node scripts/narrate.mjs <video> --force         new takes of the lot
+ *   node scripts/narrate.mjs <video> --recut         re-cut the kept takes
  *   node scripts/narrate.mjs <video> --dry-run       show what would be sent
  *
- * When every beat needs voicing (a first run, a new voice, or --force), the
- * whole script goes to the voice as ONE take and is cut into beats afterwards,
- * at the quietest point of each pause between them. A take reads like a person
- * reading a page: one breath runs into the next sentence, a question lifts
- * and the answer comes down, and the energy holds from start to finish. Beats
+ * A script is recorded in TAKES, one request each, and every take is cut into
+ * beats afterwards at the quietest point of each pause between them. A take
+ * reads like a person reading a page: one breath runs into the next sentence,
+ * a question lifts and the answer comes down, and the energy holds. Beats
  * voiced one request at a time each start cold, with the same contour, which
- * is most of what makes narration sound synthetic. The raw take is the master
- * and is committed, in takes/<script id>/.
+ * is most of what makes narration sound synthetic. The raw takes are the
+ * master and are committed, in takes/<script id>/take-<n>.{mp3,json}.
  *
- * When only some beats changed, those are re-voiced one at a time, each sent
- * with its neighbours as context, so a one-line edit doesn't re-record the
- * rest. Use --force for a fresh take of the lot.
+ * planTakes() (src/narration/takes.ts) decides the takes: each starts at a
+ * scene, and scenes share one until it holds about TAKE_CHARS characters, so
+ * a unit video is three or four takes rather than one. Each take is sent with
+ * the beats on either side of it as context, so the voice runs on across the
+ * seam, and the seam sits in a scene change, the longest pause in the video.
+ * One long take would hit the API's 10,000-character cap, drift out of
+ * alignment as it goes, and cost the whole video to redo.
+ *
+ * When a whole take's beats need voicing (a first run, a part rewritten, or
+ * --force), that take is recorded. When only some beats of a take changed,
+ * those are re-voiced one at a time, each with its neighbours as context, so
+ * a one-line edit doesn't re-record the rest.
+ *
+ * Videos voiced before takes were split keep their single takes/<id>/take.*,
+ * which --recut still cuts while it matches the script.
  *
  * The narrator is the script's `voice`, one of the house voices in
  * src/narration/voices.ts (Drew when it names none). --voice overrides it
- * for a trial, with a house name or any ElevenLabs voice id, and --model
- * overrides the model. A video is never left with two voices: a change of
- * either re-voices every beat.
+ * for a trial, with a house name or any ElevenLabs voice id. A video is never
+ * left with two voices: a change of voice re-voices every beat. The model is
+ * always NARRATION_MODEL (eleven_v4_turbo); any other is refused.
  *
  * Reads ELEVENLABS_API_KEY from the environment and never writes it anywhere.
  * Cuts audio with the ffmpeg Remotion ships. Imports the TypeScript script
@@ -38,6 +49,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { speechOnset } from "./lib/onset.mjs";
 
 const OUTPUT_FORMAT = "mp3_44100_128";
 const API = "https://api.elevenlabs.io/v1";
@@ -69,7 +81,7 @@ function isOptionValue(a) {
 }
 
 if (!video) {
-  console.error("Usage: node scripts/narrate.mjs <video> [--only ids] [--force] [--recut] [--dry-run] [--voice drew|hope|id] [--model id]");
+  console.error("Usage: node scripts/narrate.mjs <video> [--only ids] [--force] [--recut] [--dry-run] [--voice drew|hope|id]");
   process.exit(1);
 }
 
@@ -77,6 +89,7 @@ const { script } = await import(pathToFileURL(join(VIDEO_ROOT, "src", "videos", 
 const { VOICES, NARRATION_MODEL, voiceId } = await import(
   pathToFileURL(join(VIDEO_ROOT, "src", "narration", "voices.ts")).href
 );
+const { planTakes } = await import(pathToFileURL(join(VIDEO_ROOT, "src", "narration", "takes.ts")).href);
 const outDir = join(VIDEO_ROOT, "public", "narration", script.id);
 const takeDir = join(VIDEO_ROOT, "takes", script.id);
 const alignmentPath = join(outDir, "alignment.json");
@@ -84,7 +97,13 @@ const existing = existsSync(alignmentPath) ? JSON.parse(readFileSync(alignmentPa
 const asked = value("--voice");
 const voice = asked ? (VOICES[asked]?.id ?? asked) : voiceId(script.voice);
 const voiceName = Object.keys(VOICES).find((name) => VOICES[name].id === voice) ?? voice;
-const model = value("--model") ?? NARRATION_MODEL;
+// Every narration is eleven_v4_turbo. The plain eleven_v4 (and anything else)
+// is refused rather than offered as a trial, so no video ends up on it.
+const model = NARRATION_MODEL;
+if (value("--model") && value("--model") !== NARRATION_MODEL) {
+  console.error(`Narration is recorded on ${NARRATION_MODEL} only; --model ${value("--model")} is refused.`);
+  process.exit(1);
+}
 const voiceChanged = existing.meta && (existing.meta.voice_id !== voice || existing.meta.model_id !== model);
 
 const only = value("--only")?.split(",");
@@ -112,44 +131,69 @@ const todo = script.beats.filter((beat) => {
     !existsSync(join(VIDEO_ROOT, "public", entry.audio))
   );
 });
-const asTake = !only && todo.length === script.beats.length;
 
-/** The take: beats run on with a space, and a beat that opens a scene starts
- *  a new paragraph, which the voice reads as a bigger turn. `spans` are each
- *  beat's characters in it. */
-function takeText() {
+/** A take's text: its beats run on with a space, and a beat that opens a
+ *  scene starts a new paragraph, which the voice reads as a bigger turn.
+ *  `spans` are each beat's characters in it. */
+function takeText(indices) {
   let text = "";
   const spans = [];
-  script.beats.forEach((beat, i) => {
-    if (i) text += beat.scene ? "\n\n" : " ";
+  indices.forEach((b, k) => {
+    const beat = script.beats[b];
+    if (k) text += beat.scene ? "\n\n" : " ";
     spans.push([text.length, text.length + beat.text.length]);
     text += beat.text;
   });
   return { text, spans };
 }
 
+const everyBeat = script.beats.map((_, i) => i);
+/** A video voiced before scripts were split into takes keeps its one
+ *  whole-script take (takes/<id>/take.*): while that still matches the
+ *  script, the script stays one take, so --recut can cut it for free. */
+const legacyPath = join(takeDir, "take.json");
+const legacy =
+  existsSync(legacyPath) && JSON.parse(readFileSync(legacyPath, "utf8")).text === takeText(everyBeat).text;
+const plan = legacy ? [everyBeat] : planTakes(script);
+const takeName = (k) => (legacy ? "take" : `take-${k + 1}`);
+const describe = (k) => {
+  const ids = plan[k].map((b) => script.beats[b].id);
+  return `take ${k + 1} of ${plan.length} (${ids[0]} … ${ids.at(-1)}, ${plan[k].length} beats, ${takeText(plan[k]).text.length} characters)`;
+};
+
+/** The takes to record whole: every beat in them needs voicing. The rest of
+ *  what needs voicing is voiced a beat at a time. */
+const whole = only ? [] : plan.map((_, k) => k).filter((k) => plan[k].every((b) => todo.includes(script.beats[b])));
+const single = todo.filter((beat) => !whole.some((k) => plan[k].includes(script.beats.indexOf(beat))));
+
 if (flag("--recut")) {
-  const take = keptTake();
-  if (!take) {
-    console.error(`No kept take of this text in this voice in ${takeDir}. Record one with --force.`);
+  const missing = plan.map((_, k) => k).filter((k) => !keptTake(k));
+  if (missing.length) {
+    console.error(`No kept take of this text in this voice for ${missing.map(describe).join("; ")}, in ${takeDir}.`);
     process.exit(1);
   }
   mkdirSync(outDir, { recursive: true });
-  console.log(`${video}: re-cutting the kept take (voice ${voiceName}, model ${model})`);
-  cutTake(take);
+  console.log(`${video}: re-cutting ${plan.length} kept take${plan.length > 1 ? "s" : ""} (voice ${voiceName}, model ${model})`);
+  const beats = { ...existing.beats };
+  for (let k = 0; k < plan.length; k++) Object.assign(beats, cutTake(keptTake(k), k));
+  saveAlignment(beats);
   console.log(`Done. Check the new timing with: npm run cues -- ${video}`);
   process.exit(0);
 }
 
+const kept = (k) => (flag("--force") ? null : keptTake(k));
+const sent =
+  whole.reduce((n, k) => n + (kept(k) ? 0 : takeText(plan[k]).text.length), 0) + single.reduce((n, b) => n + b.text.length, 0);
 console.log(
-  `${video}: ${todo.length} of ${script.beats.length} beats to voice ` +
-    `${asTake ? "as one take" : "one at a time"} (voice ${voiceName}, model ${model})`,
+  `${video}: ${todo.length} of ${script.beats.length} beats to voice, in ${plan.length} take${plan.length > 1 ? "s" : ""} ` +
+    `(voice ${voiceName}, model ${model}); about ${sent} characters to send`,
 );
-if (flag("--dry-run") || todo.length === 0) {
-  if (asTake) console.log(`\n${takeText().text}\n`);
-  else for (const b of todo) console.log(`  · ${b.id.padEnd(14)} ${b.text}`);
-  process.exit(0);
+for (let k = 0; k < plan.length; k++) {
+  const state = whole.includes(k) ? (kept(k) ? "kept, will be re-cut" : "to record") : "voiced";
+  console.log(`  ${describe(k)}: ${state}`);
 }
+for (const b of single) console.log(`  · ${b.id.padEnd(14)} on its own: ${b.text}`);
+if (flag("--dry-run") || todo.length === 0) process.exit(0);
 
 const key = process.env.ELEVENLABS_API_KEY;
 if (!key) {
@@ -294,42 +338,62 @@ function letterAt(text, s, e, last) {
   return last ? found.at(-1) : found[0];
 }
 
-/** Records a new take, keeping the raw audio and alignment so it can be
- *  re-cut later without paying for it again (--recut). */
-async function recordTake() {
-  const { text } = takeText();
-  const r = await tts({ text }, "take");
+/** The text either side of a take, two beats each way, so the voice carries
+ *  on from where the last take left off and into the next. */
+function context(k) {
+  const first = plan[k][0];
+  const last = plan[k].at(-1);
+  const around = (from, to) =>
+    script.beats
+      .slice(Math.max(0, from), Math.max(0, to))
+      .map((b) => b.text)
+      .join(" ") || undefined;
+  return { previous_text: around(first - 2, first), next_text: around(last + 1, last + 3) };
+}
+
+/** Records take k, keeping its raw audio and alignment so it can be re-cut
+ *  later without paying for it again (--recut). */
+async function recordTake(k) {
+  const { text } = takeText(plan[k]);
+  console.log(`  recording ${describe(k)}`);
+  const r = await tts({ text, ...context(k) }, `take ${k + 1}`);
   mkdirSync(takeDir, { recursive: true });
-  writeFileSync(join(takeDir, "take.mp3"), Buffer.from(r.audio_base64, "base64"));
-  const take = { voice_id: voice, model_id: model, text, alignment: r.alignment };
-  writeFileSync(join(takeDir, "take.json"), JSON.stringify(take, null, 2) + "\n");
+  writeFileSync(join(takeDir, `${takeName(k)}.mp3`), Buffer.from(r.audio_base64, "base64"));
+  const beats = plan[k].map((b) => script.beats[b].id);
+  const take = { voice_id: voice, model_id: model, beats, text, alignment: r.alignment };
+  writeFileSync(join(takeDir, `${takeName(k)}.json`), JSON.stringify(take, null, 2) + "\n");
   return take;
 }
 
-/** The kept take, if it was recorded from this script's text in this voice. */
-function keptTake() {
-  const path = join(takeDir, "take.json");
+/** Take k as kept on disk, if it was recorded from this text in this voice. */
+function keptTake(k) {
+  const path = join(takeDir, `${takeName(k)}.json`);
   if (!existsSync(path)) return null;
   const take = JSON.parse(readFileSync(path, "utf8"));
-  const same = take.text === takeText().text && take.voice_id === voice && take.model_id === model;
+  const same = take.text === takeText(plan[k]).text && take.voice_id === voice && take.model_id === model;
   return same ? take : null;
 }
 
-/** Cuts a take into one MP3 per beat, with each beat's alignment counted
- *  from the start of its own file. */
-function cutTake(take) {
-  const { text, spans } = takeText();
+function saveAlignment(beats) {
+  writeFileSync(alignmentPath, JSON.stringify({ meta: { voice_id: voice, model_id: model }, beats }, null, 2) + "\n");
+}
+
+/** Cuts take k into one MP3 per beat, with each beat's alignment counted
+ *  from the start of its own file, and returns those beats' entries. */
+function cutTake(take, k) {
+  const indices = plan[k];
+  const beatAt = (i) => script.beats[indices[i]];
+  const { text, spans } = takeText(indices);
   const { characters } = take.alignment;
   const starts = [...take.alignment.character_start_times_seconds];
   const ends = [...take.alignment.character_end_times_seconds];
-  const samples = decode(join(takeDir, "take.mp3"));
+  const samples = decode(join(takeDir, `${takeName(k)}.mp3`));
   const length = samples.length / SAMPLE_RATE;
-  console.log(`  take: ${length.toFixed(2)} s, ${text.length} characters`);
+  console.log(`  ${describe(k)}: ${length.toFixed(2)} s`);
 
   const frame = Math.round(0.01 * SAMPLE_RATE);
   let loudest = 0;
   for (let t = 0; t + frame <= samples.length; t += frame) loudest = Math.max(loudest, rms(samples, t, frame));
-  const sounding = (t) => rms(samples, Math.round(t * SAMPLE_RATE), frame) >= 0.03 * loudest;
 
   const first = spans.map(([s, e]) => letterAt(text, s, e, false));
   const end = spans.map(([, e]) => ends[e - 1]);
@@ -361,33 +425,36 @@ function cutTake(take) {
     }
     if (quiet < MIN_PAUSE) {
       console.warn(
-        `  ! ${script.beats[i].id} → ${script.beats[i + 1].id}: no clear pause (longest quiet ${quiet.toFixed(2)} s); the cut may clip a word`,
+        `  ! ${beatAt(i).id} → ${beatAt(i + 1).id}: no clear pause (longest quiet ${quiet.toFixed(2)} s); the cut may clip a word`,
       );
     }
     return at;
   });
-  // Where each beat's first word really starts: the first sound after the
+  // Where each beat's first word really starts: the first speech after the
   // cut. The character times put it up to 0.3 s late after an audio tag
   // (the tag is given time the voice spends on the word), so the sound
-  // decides, and the first letter is moved to it.
+  // decides, and the first letter is moved to it. "Speech", not "sound": a
+  // breath before the word clears a plain loudness bar (lib/onset.mjs).
   const onset = spans.map((_, i) => {
     const from = i === 0 ? 0 : cuts[i - 1];
-    for (let t = from; t < starts[first[i]] + 0.3; t += 0.01) if (sounding(t)) return t;
-    return starts[first[i]];
+    return speechOnset(samples, SAMPLE_RATE, from, starts[first[i]] + 0.3, loudest) ?? starts[first[i]];
   });
   spans.forEach(([s], i) => {
     const moved = onset[i] - starts[first[i]];
-    if (Math.abs(moved) > 0.08) console.log(`  · ${script.beats[i].id}: first word starts ${moved.toFixed(2)} s from its character time`);
+    if (Math.abs(moved) > 0.08) console.log(`  · ${beatAt(i).id}: first word starts ${moved.toFixed(2)} s from its character time`);
     starts[first[i]] = Math.min(onset[i], ends[first[i]]);
     for (let j = s; j < first[i]; j++) {
       starts[j] = Math.min(starts[j], onset[i]);
       ends[j] = Math.min(ends[j], onset[i]);
     }
   });
-  const leadIn = script.leadIn ?? 0.6;
+  // The video's first beat keeps no more lead than the script's lead-in; a
+  // later take's first beat follows a scene change, which has room for it.
+  const leadIn = indices[0] === 0 ? (script.leadIn ?? 0.6) : MAX_LEAD;
 
   const beats = {};
-  script.beats.forEach((beat, i) => {
+  indices.forEach((b, i) => {
+    const beat = script.beats[b];
     const from = i === 0 ? Math.max(0, onset[0] - Math.min(MAX_LEAD, leadIn)) : Math.max(cuts[i - 1], onset[i] - MAX_LEAD);
     const to = i === spans.length - 1 ? Math.min(length, end[i] + MAX_TAIL) : Math.min(cuts[i], end[i] + MAX_TAIL);
     const audio = `narration/${script.id}/${beat.id}.mp3`;
@@ -405,13 +472,11 @@ function cutTake(take) {
     };
     console.log(`  ✓ ${beat.id.padEnd(14)} ${from.toFixed(2)} → ${to.toFixed(2)} s of the take`);
   });
-  writeFileSync(alignmentPath, JSON.stringify({ meta: { voice_id: voice, model_id: model }, beats }, null, 2) + "\n");
   return beats;
 }
 
-async function voiceBeats() {
-  const beats = { ...existing.beats };
-  for (const beat of todo) {
+async function voiceBeats(beats) {
+  for (const beat of single) {
     const i = script.beats.indexOf(beat);
     const r = await tts(
       {
@@ -427,16 +492,22 @@ async function voiceBeats() {
     beats[beat.id] = { text: beat.text, audio, alignment: r.alignment };
     console.log(`  ✓ ${beat.id.padEnd(14)} ${r.alignment.character_end_times_seconds.at(-1).toFixed(2)} s`);
     // Saved after every beat, so an interrupted run keeps what it paid for.
-    writeFileSync(alignmentPath, JSON.stringify({ meta: { voice_id: voice, model_id: model }, beats }, null, 2) + "\n");
+    saveAlignment(beats);
   }
   return beats;
 }
 
 mkdirSync(outDir, { recursive: true });
-// --force asks for a new performance; otherwise a kept take of this exact
-// text is cut again rather than paid for twice.
-const kept = flag("--force") ? null : keptTake();
-const beats = asTake ? cutTake(kept ?? (await recordTake())) : await voiceBeats();
+// A new voice replaces every beat, so nothing of the old one is carried over.
+const beats = voiceChanged ? {} : { ...existing.beats };
+for (const k of whole) {
+  // --force asks for a new performance; otherwise a kept take of this exact
+  // text is cut again rather than paid for twice.
+  Object.assign(beats, cutTake(kept(k) ?? (await recordTake(k)), k));
+  // Saved after every take, so an interrupted run keeps what it paid for.
+  saveAlignment(beats);
+}
+await voiceBeats(beats);
 
 const stale = script.beats.filter((b) => beats[b.id]?.text !== b.text).map((b) => b.id);
 if (stale.length) console.log(`Still on estimated timing: ${stale.join(", ")}`);

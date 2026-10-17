@@ -2,6 +2,9 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
+import { useMergedPart } from "../sampling/merged";
+import { Marker, swell } from "../sampling/emphasis";
 import { Axis, Bars, sx, type XScale } from "../../editorial/charts";
 import { histogram, SPREADS, WAIT_SD } from "./data";
 import { useLayout } from "../../editorial/layout";
@@ -47,6 +50,8 @@ const ROW_STEP = 64;
 export const SpreadScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
+  // In the merged Unit 5 video the spoken bridge leads straight on: no "Next" line.
+  const merged = useMergedPart();
   const { y: Y, h, pts } = useLayout();
   const start = n.beat("spread").from;
   const spreadAt = n.word("spread", "spread");
@@ -58,9 +63,22 @@ export const SpreadScene: React.FC = () => {
   const rootAt = n.word("rule", "square root");
   const fourAt = n.word("rule", "Four times");
   const nextAt = n.word("next", "standard error");
+  // The bridge names the rule's quantity: "that spread" is marked, then (in
+  // the merged video, where no "Next" line says it) named, and σ is marked
+  // as the standard deviation it is not.
+  const thatSpreadAt = n.word("next", "That spread");
+  const deviationAt = n.word("next", "standard deviation");
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: the three piles, their spreads, each size read off, the rule ── */}
+      <Sfx name="el-pop" at={start - 4} level={-30} />
+      <Sfx name="el-pencil" at={tighterAt - 2} level={-34} />
+      {sayAt.map((at, i) => (
+        <Sfx key={i} name="el-tap" at={at - 2} level={-29} />
+      ))}
+      <Sfx name="el-pencil" at={rootAt} level={-34} />
+
       {/* One line in two inks: the second half follows the first in the flow,
           so it sits a word space after it in any face. */}
       <div style={{ position: "absolute", left: 116, top: Y(104), display: "flex", gap: "0.26em", ...headline(56) }}>
@@ -203,6 +221,9 @@ export const SpreadScene: React.FC = () => {
                 opacity: said,
                 ...headline(40),
                 fontVariantNumeric: "tabular-nums lining-nums",
+                // "That spread": the three, one after another.
+                transformOrigin: "left center",
+                transform: `scale(${swell(frame, thatSpreadAt - 2 + i * 5, 0.14, 20)})`,
               }}
             >
               {fmt(r.spread)}
@@ -235,21 +256,35 @@ export const SpreadScene: React.FC = () => {
         <div style={{ height: 1, background: INK, marginBottom: 18 }} />
         <div style={label(20, ACCENT_INK)}>The rule</div>
         <div style={{ ...body(30), color: INK, marginTop: 10 }}>
-          Spread of the average
+          <Marker at={thatSpreadAt - 2}>Spread of the average</Marker>
         </div>
         <div style={{ ...headline(76, true), marginTop: 6 }}>
           = σ ÷ √<span style={{ fontStyle: "italic" }}>n</span>
         </div>
-        <div style={{ ...note(21, INK_SOFT), marginTop: 8 }}>
-          σ, the population&apos;s spread, is {fmt(WAIT_SD)} min.
+        <div
+          style={{
+            ...note(21, INK_SOFT),
+            marginTop: 8,
+            transformOrigin: "left center",
+            transform: `scale(${swell(frame, deviationAt - 2, 0.1, 22)})`,
+          }}
+        >
+          <Marker at={deviationAt - 2}>σ, the population&apos;s spread</Marker>, is {fmt(WAIT_SD)} min.
         </div>
       </Ink>
       <Ink at={fourAt - 2} dur={16} style={{ left: TABLE_X, top: Y(800), width: 530 }}>
         <span style={{ ...body(30, true), color: ACCENT_INK }}>Four times the data, half the spread.</span>
       </Ink>
-      <NextLine at={nextAt} x={TABLE_X} y={Y(858)} width={530}>
-        the standard error.
-      </NextLine>
+      {merged ? (
+        // Where the standalone video says "Next", the merged one names it.
+        <Ink at={nextAt - 2} dur={16} style={{ left: TABLE_X, top: Y(858), width: 530 }}>
+          <span style={{ ...body(30, true), color: INK }}>That spread is the standard error.</span>
+        </Ink>
+      ) : (
+        <NextLine at={nextAt} x={TABLE_X} y={Y(858)} width={530}>
+          the standard error.
+        </NextLine>
+      )}
     </AbsoluteFill>
   );
 };

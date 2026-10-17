@@ -25,6 +25,7 @@ import {
   type Sample,
 } from "./data";
 import { Bracket, DOT, EASY, EASY_INK, RANDOM, RANDOM_INK, RAW, TruthLine, Underline } from "./parts";
+import { PartName } from "../sampling/PartName";
 
 /** Fig. 1: every score from 0 to 100, across the page. */
 const X1: XScale = { lo: 0, hi: 100, x0: 160, x1: 1760 };
@@ -88,6 +89,7 @@ export const SampleScene: React.FC = () => {
   const pickAt = n.word("random", "Pick");
   const avgAt = n.word("random", "average");
   const sixtyAt = n.word("random", "sixty-nine");
+  const littleAt = n.word("random", "little");
   const closeAt = n.word("random", "close");
   const easyFrom = n.beat("easy").from;
   const takeAt = n.word("easy", "take");
@@ -97,6 +99,11 @@ export const SampleScene: React.FC = () => {
   const highFrom = n.beat("high").from;
   const eightyAt = n.word("high", "eighty");
   const tenAt = n.word("high", "ten points");
+  // Things the figure shows while it is talked about: the score's range as
+  // it is named, and the happy customers the easy way finds.
+  const scoreAt = n.word("hook", "score");
+  const outOfAt = n.word("hook", "out of a hundred", { edge: "end" });
+  const happyAt = n.word("easy", "Happy customers");
 
   // ── Layout morph: the population shrinks to the top of the page ──
   const morphAt = randomFrom - 16;
@@ -112,7 +119,7 @@ export const SampleScene: React.FC = () => {
   const truth2X = sx(X2, TRUE_MEAN);
   const steps = {
     random: { sample: FIRST_RANDOM, s: pickAt - 2, c: avgAt - 2, d: avgAt + 14, out: easyFrom },
-    easy: { sample: FIRST_EASY, s: takeAt, c: highFrom, d: highFrom + 16, out: Number.POSITIVE_INFINITY },
+    easy: { sample: FIRST_EASY, s: takeAt, c: highFrom, d: highFrom + 16, out: Number.POSITIVE_INFINITY, tint: happyAt },
   };
   const randomSlot = slotOf(FIRST_RANDOM.mean);
   const easySlot = slotOf(FIRST_EASY.mean);
@@ -136,7 +143,9 @@ export const SampleScene: React.FC = () => {
 
       {/* ── P1: the question, over the population at full size ── */}
       <Ink at={2} dur={14} out={p1Out} style={{ left: 96, top: y(112) }}>
-        <span style={label(20, INK_SOFT)}>A satisfaction survey</span>
+        <span style={label(20, INK_SOFT)}>
+          <PartName />A satisfaction survey
+        </span>
       </Ink>
       <Ink at={askAt - 4} dur={20} out={p1Out} style={{ left: 92, top: y(150), ...headline(84), whiteSpace: "nowrap" }}>
         Ask five hundred of them.
@@ -187,6 +196,9 @@ export const SampleScene: React.FC = () => {
         </svg>
       ) : null}
 
+      {/* "anyone above seventy-five": the line the easy way favours. */}
+      <TruthLine x={sx(X1, THRESHOLD)} bottom={y(base)} top={y(popTop - 34)} at={aboveAt - 2} color={EASY} width={2.4} />
+
       {/* The window Fig. 2 enlarges. */}
       <ZoomFan at={fig2At} base={base} />
 
@@ -201,6 +213,20 @@ export const SampleScene: React.FC = () => {
         grow={(i) => ease(frame, 4 + i * 0.7, 16)}
       />
       <Axis scale={X1} base={y(base)} ticks={[0, 25, 50, 75, 100]} at={4} />
+      {/* "a satisfaction score out of a hundred": the scale drawn over in the
+          accent as it is named, then handed back to the ink. */}
+      <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, averageAt - 16, 16) }}>
+        <line
+          x1={X1.x0}
+          x2={X1.x0 + (X1.x1 - X1.x0) * ease(frame, scoreAt - 2, Math.max(8, outOfAt - scoreAt))}
+          y1={y(base)}
+          y2={y(base)}
+          stroke={EASY}
+          strokeWidth={3.5}
+          strokeLinecap="round"
+          opacity={ease(frame, scoreAt - 2, 4)}
+        />
+      </svg>
 
       {/* The truth. */}
       <TruthLine x={truthX} bottom={y(base)} top={y(popTop - 22)} at={averageAt - 4} />
@@ -218,9 +244,11 @@ export const SampleScene: React.FC = () => {
         <span style={{ ...note(24, INK), fontWeight: 700 }}>{SHOWN.truth}</span>
       </div>
 
-      <Note at={elevenAt - 4} x={sx(X1, THRESHOLD) + 14} y={y(popTop - 76)}>
+      {/* "anyone above seventy-five", then "eleven times as likely". */}
+      <Note at={aboveAt - 2} x={sx(X1, THRESHOLD) + 14} y={y(popTop - 76)}>
         <span style={{ ...label(21, INK), ...halo }}>
-          Above {THRESHOLD}: picked {LIKELIER} times as often
+          Above {THRESHOLD}:{" "}
+          <span style={{ opacity: ease(frame, elevenAt - 4, 12) }}>picked {LIKELIER} times as often</span>
         </span>
       </Note>
 
@@ -267,9 +295,14 @@ export const SampleScene: React.FC = () => {
         <div style={{ ...note(30, RANDOM_INK), fontWeight: 700 }}>{SHOWN.random}</div>
         <div style={note(20, INK_SOFT)}>at random</div>
       </div>
-      <Note at={closeAt} x={160} y={y(690)} out={takeAt}>
-        <div style={{ ...body(32, true), color: INK }}>A little low, but close.</div>
-        <div style={{ ...note(22, INK_SOFT), marginTop: 6 }}>{SHOWN.under} under the true average</div>
+      <Note at={littleAt - 2} x={160} y={y(690)} out={takeAt}>
+        <div style={{ ...body(32, true), color: INK }}>
+          A little low,{" "}
+          <span style={{ opacity: ease(frame, closeAt - 2, 12) }}>but close.</span>
+        </div>
+        <div style={{ ...note(22, INK_SOFT), marginTop: 6, opacity: ease(frame, closeAt + 6, 12) }}>
+          {SHOWN.under} under the true average
+        </div>
       </Note>
 
       {/* The easy one: far over it. */}
@@ -332,11 +365,13 @@ const ZoomFan: React.FC<{ at: number; base: number }> = ({ at, base }) => {
   );
 };
 
-type Step = { sample: Sample; s: number; c: number; d: number; out: number };
+/** `tint`: from when the sample's happy customers (above THRESHOLD) take the
+ *  easy way's color, a sweep from the threshold up. */
+type Step = { sample: Sample; s: number; c: number; d: number; out: number; tint?: number };
 
 /** One sample of 500 as dots under the population, which then slide together
  *  into their average. */
-const SampleDots: React.FC<Step> = ({ sample, s, c, out }) => {
+const SampleDots: React.FC<Step> = ({ sample, s, c, out, tint }) => {
   const frame = useCurrentFrame();
   const { y } = useLayout();
   if (frame < s) return null;
@@ -351,7 +386,9 @@ const SampleDots: React.FC<Step> = ({ sample, s, c, out }) => {
         if (appear <= 0) return null;
         const x = lerp(sx(X1, v), mx, collapse);
         const cy = lerp(STRIP_Y + JITTER[j] * STRIP_H, STRIP_Y + STRIP_H / 2, collapse);
-        return <circle key={j} cx={x} cy={y(cy)} r={3.6 * appear} fill={DOT} opacity={1 - collapse * 0.6} />;
+        const warm = tint !== undefined && v > THRESHOLD ? ease(frame, tint + (v - THRESHOLD) * 0.7, 10) : 0;
+        const fill = warm > 0 ? `color-mix(in srgb, ${EASY} ${Math.round(warm * 85)}%, ${DOT})` : DOT;
+        return <circle key={j} cx={x} cy={y(cy)} r={3.6 * appear} fill={fill} opacity={1 - collapse * 0.6} />;
       })}
     </svg>
   );

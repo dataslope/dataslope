@@ -10,20 +10,28 @@
  *   (arrowHead() in src/components/arrow.ts). A head can only sit on a line
  *   that is nearly straight under it; past MAX_HEAD_BEND degrees no angle
  *   fits, and the head reads as crooked.
+ * - Every ERD relationship end (<Relation> in src/editorial/erd.tsx) that is
+ *   built across a corner reports it: a crow's foot needs its line straight
+ *   for its whole length, or it points nowhere.
+ * - Every word cue a beat says more than once with no `nth` reports it
+ *   (useNarration in src/narration/NarrationContext.tsx). `npm run
+ *   check:cues` finds the literal ones without a render; this catches a cue
+ *   built from a variable. Listed, not failed: the cue still lands on a word.
  *
  *   npm run check:frames                    # every composition
  *   npm run check:frames -- BaseRate,TfIdf  # just these
  *
- * Exits non-zero if any image is stretched or any arrowhead sits on a bend.
+ * Exits non-zero if any image is stretched, any arrowhead sits on a bend, or
+ * any relationship end sits on too short a straight stretch.
  */
-import { bundle } from "@remotion/bundler";
 import { getCompositions, renderFrames } from "@remotion/renderer";
 import path from "node:path";
 import { MAX_HEAD_BEND } from "../src/components/arrow.ts";
+import { bundleVideo } from "./lib/bundle.mjs";
 
 const only = process.argv[2]?.split(",");
 const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE ?? null;
-const serveUrl = await bundle({ entryPoint: path.resolve("src/index.ts") });
+const serveUrl = await bundleVideo(path.resolve("src/index.ts"));
 const compositions = (await getCompositions(serveUrl, { browserExecutable, inputProps: {} })).filter(
   (c) => c.durationInFrames > 1 && (!only || only.includes(c.id)),
 );
@@ -31,6 +39,8 @@ const compositions = (await getCompositions(serveUrl, { browserExecutable, input
 const SCALE = 2;
 const images = new Map(); // "video/id" -> { stretch, report, comp }
 const arrows = new Map(); // "Comp: from to tip" -> { bend, report, comp }
+const relations = new Map(); // "Comp: relation end" -> report
+const cues = new Map(); // "Comp: beat phrase" -> report
 for (const composition of compositions) {
   await renderFrames({
     serveUrl,
@@ -51,6 +61,10 @@ for (const composition of compositions) {
         const stretch = Number(img[2]);
         if (!prev || stretch > prev.stretch) images.set(img[1], { stretch, report: text, comp: composition.id });
       }
+      const cue = text.match(/^\[cue\] (.*)$/);
+      if (cue) cues.set(`${composition.id}: ${cue[1]}`, `${composition.id}: ${cue[1]}`);
+      const relation = text.match(/^\[relation\] (.*)$/);
+      if (relation) relations.set(`${composition.id}: ${relation[1].replace(/ sits on .*/, "")}`, `${composition.id}: ${relation[1]}`);
       const arrow = text.match(/^\[arrowhead\] (.*) turns ([0-9.]+)°/);
       if (arrow) {
         const key = `${composition.id}: ${arrow[1]}`;
@@ -78,4 +92,8 @@ const heads = new Set([...arrows.values()].map((a) => a.report.replace(/ to \S+ 
 console.log(`${heads.size} arrows checked, each at every tip it drew to.`);
 for (const a of bent) console.log(`  ✗ ${a.report}`);
 if (!bent.length) console.log(`  ✓ every line is within ${MAX_HEAD_BEND}° of straight under its head`);
-if (stretched.length || bent.length) process.exit(1);
+for (const r of relations.values()) console.log(`  ✗ ${r}`);
+if (!relations.size) console.log("  ✓ every ERD relationship end sits on a straight stretch of its line");
+for (const c of cues.values()) console.log(`  ! ${c}`);
+if (!cues.size) console.log("  ✓ every word cue the render took names which occurrence it means");
+if (stretched.length || bent.length || relations.size) process.exit(1);

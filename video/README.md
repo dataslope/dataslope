@@ -11,7 +11,6 @@ Every video is 16:9 and drawn in the **editorial** style described below.
 
 | Composition | About |
 | --- | --- |
-| `CentralLimitTheorem` | Lopsided wait times whose averages still pile up into a bell |
 | `ListVsSet` | `999_999 in big_list` against the same lookup in a set |
 | `SqlNullTrap` | Three-valued logic, and `NOT IN` over a subquery that yields a `NULL` |
 | `WhyNormalization` | The three anomalies of one wide table, and the split that fixes them |
@@ -29,6 +28,18 @@ Every video is 16:9 and drawn in the **editorial** style described below.
 | `TfIdf` | Term frequency, inverse document frequency, and the word that scores zero |
 | `JavaEquality` | `==` or `.equals()`, with the stack, the heap and the `Integer` cache |
 | `SimpsonsParadox` | Berkeley's 1973 admissions: women ahead in most departments, behind overall |
+
+Two courses have one video per unit, each in its own Studio folder, with
+ids that sort in course order:
+
+| Folder | Compositions |
+| --- | --- |
+| `Statistics` | `Stats-1-ThinkingStatistically` to `Stats-9-StatisticsInPractice`. Unit 5 is `Stats-5-Sampling`, one video made of its five parts, `Stats-5-1-SamplingBias` to `Stats-5-5-StandardError`, which also render on their own |
+| `Database-Design` | `DbDesign-1-WhyDesign` to `DbDesign-9-RelationalHistory` |
+
+A course video's id is not its folder name (`Stats-2-DescribingData` lives in
+`src/videos/describing-data/`). The check scripts take either; `remotion
+render` and `check:frames` take the id.
 
 Each follows the lesson it is named after (the header of its `script.ts` says
 which), and each renders at 4K: 3840x2160.
@@ -129,6 +140,17 @@ Shared building blocks:
   its fonts (Inter, JetBrains Mono).
 - `src/editorial/`: the editorial look (page, typefaces, layout, figure
   labels, reveals, histogram and axis primitives) shared by the videos in it.
+- `src/editorial/erd.tsx`: entity-relationship diagrams. `<Entity>` is a
+  table box that builds itself row by row, keys marked; `<Relation>` is a
+  relationship line that draws itself with crow's-foot ends
+  (`src/components/crowsfoot.ts`: exactly one, zero or one, one or many, zero
+  or many, many). Every ERD is drawn with them, so the notation reads the
+  same in every video, and `npm run check:frames` fails an end built across
+  a corner of its line. Keys are `PK`, `FK`, `UK` (an alternate key) or a
+  pair. A scene that reads each end aloud cues it with `fromAt`/`toAt`, an
+  end given `null` stays bare (a line whose cardinality is the question), and
+  `endSymbols()` says where an end's maximum and minimum sit, to point at one
+  as it is read. The `ErdKit` composition under Assets shows the kit.
 
 Register a new composition in `src/Root.tsx` with
 `defaultProps={EDITORIAL_DEFAULTS}` and
@@ -238,8 +260,11 @@ ThinkingStatistically is the worked example.
   `public/brand/` is the same file), drawn inline so each half can move, with
   the blue as a brand token.
 - **The intro is its own scene from frame 0**, ending where the first
-  content scene's cut begins, and the script's `leadIn` is at least
-  `INTRO_SECONDS` (4.4 s) so the first word waits for it. Anything the first
+  content scene's cut begins, and the script sets `leadIn: INTRO_LEAD_IN`
+  (4.6 s, just past the intro's 4.4) so the first word waits for it. Both
+  numbers live in `src/editorial/intro.ts`, so a change to the intro's length
+  is one edit that moves every course video, and `src/editorial/intro.test.ts`
+  fails any course script that types its own lead-in. Anything the first
   scene used to show at fixed frames is re-cued to its first beat
   (`n.beat(id).from`), or it plays under the logo. The first beat is
   `scene: true`, since a cut is cued from it.
@@ -282,7 +307,7 @@ scene is for, never a recap of the one just finished.
 npm run narrate -- c-pointers --dry-run   # the text it would send
 npm run narrate -- c-pointers             # a take, or the beats not yet voiced
 npm run narrate -- c-pointers --only star # re-voice one edited beat
-npm run narrate -- c-pointers --force     # a whole new take
+npm run narrate -- c-pointers --force     # new takes of everything (ask first)
 npm run narrate -- c-pointers --recut     # cut the kept take again, no API call
 npm run cues -- c-pointers                # the timing it produced
 npm run check:sync -- c-pointers          # and that the voice really starts there
@@ -326,10 +351,26 @@ committed audio is in a different voice from the one its script names.
 id; to keep the result, set `voice` in the script (or add the voice to
 `voices.ts` first).
 
-**A video is voiced as one take.** When every beat needs voicing (the first
-run, a new voice, or `--force`), the whole script goes in a single request:
-beats joined by a space, and a paragraph break before each beat that opens a
-scene. The take is then cut into beats at the middle of the longest silence
+**A video is voiced in takes, one request per part.** `planTakes()`
+(`src/narration/takes.ts`) splits the script at scene beats, grouping scenes
+until a take holds about 1,800 characters (`takeChars` in the script changes
+that; a beat marked `take: true` always starts one). A two-minute video is one
+take; a unit video like ThinkingStatistically is three. Each take is one
+request, its beats joined by a space with a paragraph break before each beat
+that opens a scene, and it carries the two beats on either side as
+`previous_text` and `next_text`, so the voice runs on across the seam. The
+seam always falls at a scene change, the longest pause in the video. Several
+takes rather than one because a request is capped at 10,000 characters, the
+character times drift over a long take (ThinkingStatistically's single take
+ran half a second late by 2:30), and a part that needs redoing then costs that
+part, not the video.
+
+`npm run narrate -- <video> --dry-run` prints the plan: each take, its beats
+and characters, and whether it will be recorded, re-cut from the kept copy or
+left alone. A take whose beats all need voicing (the first run, a part
+rewritten, a new voice, or `--force`) is recorded; a take with only some
+beats changed has just those re-voiced, one at a time. Every take is then cut
+into beats at the middle of the longest silence
 between the start of one beat's last word and the end of the next beat's
 first word, so no cut lands in a word. The window is that wide because the
 character times can be well off at a sentence end: StandardError's stretched
@@ -343,30 +384,42 @@ over the end of the beat before.
 
 That is most of the difference between narration and text-to-speech. Voiced
 one request per beat, every sentence started cold, on the same contour, with
-the same energy. In one take, a question lifts and its answer comes down,
+the same energy. Within a take, a question lifts and its answer comes down,
 and one sentence runs into the next.
+
+**The model is always `eleven_v4_turbo`** (`NARRATION_MODEL` in
+`src/narration/voices.ts`). `narrate` refuses any other, the plain
+`eleven_v4` included, and `npm test` fails if any committed narration or take
+was recorded on another.
 
 Where each beat's first word starts is read from the sound, not the
 character times. Those are only good to about 80 ms, and worse in two
 places: an audio tag takes time from the word after it (in CPointers the
 alignment gave `[curious]` the first 0.26 s of "So", and the beat's audio
 started over the end of the previous sentence), and a word that opens on
-"t", "f" or "s" is timed from its vowel, up to 0.17 s late. The cut finds the
-first sound after the pause and moves the first letter's time there, and
-`npm run narrate` prints each beat it moved by more than 80 ms.
+"t", "f" or "s" is timed from its vowel, up to 0.17 s late. The cut finds
+where speech starts after the pause and moves the first letter's time there,
+and `npm run narrate` prints each beat it moved by more than 80 ms. "Speech",
+not the first sound: a breath clears a plain loudness bar, and Estimation's
+`rate-se` once cued 0.23 s early on one. So `scripts/lib/onset.mjs` finds the
+first voiced frame (-27 dB from the take's loudest, set against all 906
+recorded beats) and walks back over the
+word's own soft attack (-30 dB) for at most 120 ms.
 
 **What is committed.** Everything a render needs, and the master it came
 from:
 
 - `public/narration/<script id>/`: one MP3 per beat and `alignment.json`.
   This is what a video plays, about 1.1 MB a video.
-- `takes/<script id>/`: the raw take (`take.mp3`) and its alignment
-  (`take.json`), about 1.3 MB. The beats are cut from it, so `--recut` can
-  cut them again, for instance after a change to the cutting, without paying
-  for another take, and a plain run reuses it when its text and voice still
-  match. A re-cut is deterministic: cutting an unchanged take reproduces the
-  committed beats byte for byte. `npm test` fails if a voiced video has lost
-  its take.
+- `takes/<script id>/`: the raw takes (`take-1.mp3`, `take-2.mp3`, …) and
+  their alignment (`take-1.json`, …), about 1.3 MB for two minutes of speech.
+  The beats are cut from them, so `--recut` can cut them again, for instance
+  after a change to the cutting, without paying for another take, and a plain
+  run reuses a take when its text and voice still match. A re-cut is
+  deterministic: cutting an unchanged take reproduces the committed beats
+  byte for byte. Videos voiced before takes were split keep a single
+  `take.mp3`/`take.json`, which `--recut` still cuts while it matches the
+  script. `npm test` fails if a voiced video has lost its takes.
 
 A beat whose text has changed since its audio was made is reported as `stale`
 by `npm run cues` and falls back to the estimate, so an edited sentence can't
@@ -583,15 +636,40 @@ stay for a video that does.
 npm run typecheck
 npm run lint
 npm test              # timing, scene cuts, word cues, voices, arrowheads
+npm run check:cues    # every word cue says which occurrence it means (no render)
 npm run check:frames  # a frame every half second at --scale=2 (about a minute):
                       # illustrations sharp at 4K, arrowheads on straight ends
 npm run check:sync -- <video>   # a voiced video: every beat starts where its cue says
 npm run check:mix -- <video>    # a video with sound effects: how far under the voice they sit
+npm run check:motion -- <video> # the picture never holds still for 3 s (renders a half-size preview)
 ```
 
-Both audio checks take the composition (`ThinkingStatistically`) or the
-folder name that `narrate` and `cues` take (`thinking-statistically`), and
-write their renders to `out/`. They are plain Node (`scripts/lib/audio.mjs`),
+`check:cues` reads every `n.word(beat, phrase)` in the scenes and fails one
+whose beat says the phrase more than once with no `nth`: the cue takes the
+first, which is not always the one meant (Probability's "a hundred" landed on
+"Walk a hundred thousand", three seconds early). Give `{ nth: 1 }` when the
+first is right. It also fails a cue whose beat never says its phrase. A cue
+built from a variable is not visible to it, so `useNarration` also warns at
+render time and `check:frames` lists those warnings.
+
+`check:motion` and `check:sync` read a video's timeline the way its
+composition plays it (`scripts/lib/video-timeline.mjs`), so the merged Unit 5
+(`sampling`) is checked against its five parts' own cues, placed where it
+plays them, and its still stretches are labelled `<part>/<beat>`.
+
+`check:motion` keeps the half-size preview it renders, with sound, as
+`out/<id>-preview.mp4`; `--file` checks one already rendered. A frame is still
+when under 0.05% of its pixels change and under 0.01% change a lot, compared
+in colour (`scripts/lib/motion.mjs`): a pale highlight sweep moves hue more
+than brightness, and a thin line drawing on changes few pixels but each by a
+lot, so both count as motion. Each still stretch it lists comes with the beats
+spoken over it, which is where to add the next part of a figure, a highlight
+on the phrase, a value counting or an annotation arriving.
+
+The three render checks take the composition (`Stats-1-ThinkingStatistically`),
+its old name (`ThinkingStatistically`), or the folder name that `narrate` and
+`cues` take (`thinking-statistically`), and write their renders to `out/`. The
+audio checks are plain Node (`scripts/lib/audio.mjs`),
 with no ffmpeg filters and no Python, so they run the same on Windows. The
 loudness and pause detection are checked against ffmpeg's `ebur128` and
 `silencedetect` (the same pauses to 1 ms) and pinned by

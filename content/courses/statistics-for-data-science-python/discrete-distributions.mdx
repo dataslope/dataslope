@@ -143,10 +143,11 @@ print(f"same via 1 - cdf(9)           = {1 - d.cdf(9):.4f}")
 For a discrete distribution, `.sf(k)` computes $P(X > k)$, which equals
 $P(X \ge k+1)$. So $P(X \ge 10)$ is `.sf(9)`, and $P(X \le 4)$ is
 `.cdf(4)`. Mixing up $>$ and $\ge$ here is the single most common
-discrete-distribution bug. When in doubt, sanity-check that
-`d.cdf(k) + d.sf(k)` is *not* 1 (it double-counts) but
-`d.cdf(k) + d.sf(k-1)` *is* 1 only if you account for the value at `k`.
-The safe habit: write the inequality out, then translate.
+discrete-distribution bug. When in doubt, sanity-check the split:
+`d.cdf(k) + d.sf(k)` is exactly 1, because the value at `k` sits on the
+`cdf` side only, while `d.cdf(k) + d.sf(k-1)` comes to 1 plus
+`d.pmf(k)`, because both of them count it. The safe habit: write the
+inequality out, then translate.
 </Callout>
 
 ### Plotting a binomial PMF

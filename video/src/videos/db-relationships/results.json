@@ -1,0 +1,249 @@
+{
+  "version": "PostgreSQL 18.3 (PGlite 0.5.8) on wasm32-unknown-emscripten, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 3.1.74 (1092ec30a3fb1d46b1782ff1b4db5094d3d06ae5), 32-bit",
+  "runs": {
+    "customers": {
+      "sql": "SELECT id, name FROM customers ORDER BY id;",
+      "ok": true,
+      "fields": [
+        "id",
+        "name"
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "name": "Ada"
+        },
+        {
+          "id": 2,
+          "name": "Grace"
+        }
+      ],
+      "affected": 0
+    },
+    "orders": {
+      "sql": "SELECT id, customer_id FROM orders ORDER BY id;",
+      "ok": true,
+      "fields": [
+        "id",
+        "customer_id"
+      ],
+      "rows": [
+        {
+          "id": 101,
+          "customer_id": 1
+        },
+        {
+          "id": 102,
+          "customer_id": 1
+        },
+        {
+          "id": 103,
+          "customer_id": 2
+        }
+      ],
+      "affected": 0
+    },
+    "orderCount": {
+      "sql": "SELECT\n  c.name,\n  COUNT(o.id) AS order_count\nFROM\n  customers c\n  LEFT JOIN orders o ON o.customer_id = c.id\nGROUP BY\n  c.id,\n  c.name\nORDER BY\n  c.id;",
+      "ok": true,
+      "fields": [
+        "name",
+        "order_count"
+      ],
+      "rows": [
+        {
+          "name": "Ada",
+          "order_count": 2
+        },
+        {
+          "name": "Grace",
+          "order_count": 1
+        }
+      ],
+      "affected": 0
+    },
+    "orderWithoutCustomer": {
+      "sql": "INSERT INTO orders VALUES (104, NULL);",
+      "ok": false,
+      "error": {
+        "message": "null value in column \"customer_id\" of relation \"orders\" violates not-null constraint",
+        "detail": "Failing row contains (104, null).",
+        "code": "23502",
+        "constraint": null
+      }
+    },
+    "orderWithMissingCustomer": {
+      "sql": "INSERT INTO orders VALUES (104, 3);",
+      "ok": false,
+      "error": {
+        "message": "insert or update on table \"orders\" violates foreign key constraint \"orders_customer_id_fkey\"",
+        "detail": "Key (customer_id)=(3) is not present in table \"customers\".",
+        "code": "23503",
+        "constraint": "orders_customer_id_fkey"
+      }
+    },
+    "wideFirstOrders": {
+      "sql": "SELECT c.name, o.id AS order_id FROM customers c JOIN orders o ON o.customer_id = c.id WHERE o.id IN (101, 102, 103) ORDER BY o.id;",
+      "ok": true,
+      "fields": [
+        "name",
+        "order_id"
+      ],
+      "rows": [
+        {
+          "name": "Ada",
+          "order_id": 101
+        },
+        {
+          "name": "Grace",
+          "order_id": 102
+        },
+        {
+          "name": "Linus",
+          "order_id": 103
+        }
+      ],
+      "affected": 0
+    },
+    "wideAda": {
+      "sql": "SELECT c.name, o.id AS order_id FROM customers c JOIN orders o ON o.customer_id = c.id WHERE c.name = 'Ada' ORDER BY o.id;",
+      "ok": true,
+      "fields": [
+        "name",
+        "order_id"
+      ],
+      "rows": [
+        {
+          "name": "Ada",
+          "order_id": 101
+        },
+        {
+          "name": "Ada",
+          "order_id": 125
+        }
+      ],
+      "affected": 0
+    },
+    "employees": {
+      "sql": "SELECT id, name FROM employees ORDER BY id;",
+      "ok": true,
+      "fields": [
+        "id",
+        "name"
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "name": "Ada"
+        }
+      ],
+      "affected": 0
+    },
+    "badgesBefore": {
+      "sql": "SELECT id, employee_id FROM badges ORDER BY id;",
+      "ok": true,
+      "fields": [
+        "id",
+        "employee_id"
+      ],
+      "rows": [
+        {
+          "id": 10,
+          "employee_id": 1
+        }
+      ],
+      "affected": 0
+    },
+    "secondBadge": {
+      "sql": "INSERT INTO badges VALUES (11, 1);",
+      "ok": false,
+      "error": {
+        "message": "duplicate key value violates unique constraint \"badges_employee_id_key\"",
+        "detail": "Key (employee_id)=(1) already exists.",
+        "code": "23505",
+        "constraint": "badges_employee_id_key"
+      }
+    },
+    "badgesAfter": {
+      "sql": "SELECT * FROM badges;",
+      "ok": true,
+      "fields": [
+        "id",
+        "employee_id"
+      ],
+      "rows": [
+        {
+          "id": 10,
+          "employee_id": 1
+        }
+      ],
+      "affected": 0
+    },
+    "path": {
+      "sql": "SELECT\n  c.name AS customer,\n  o.id AS order_id,\n  oi.line_number,\n  p.name AS product,\n  oi.quantity\nFROM\n  customers c\n  JOIN orders o ON o.customer_id = c.id\n  JOIN order_items oi ON oi.order_id = o.id\n  JOIN products p ON p.id = oi.product_id\nORDER BY\n  o.id,\n  oi.line_number;",
+      "ok": true,
+      "fields": [
+        "customer",
+        "order_id",
+        "line_number",
+        "product",
+        "quantity"
+      ],
+      "rows": [
+        {
+          "customer": "Ada",
+          "order_id": 101,
+          "line_number": 1,
+          "product": "Notebook",
+          "quantity": 2
+        },
+        {
+          "customer": "Ada",
+          "order_id": 101,
+          "line_number": 2,
+          "product": "Pen",
+          "quantity": 3
+        }
+      ],
+      "affected": 0
+    },
+    "foreignKeys": {
+      "sql": "SELECT conrelid::regclass::text AS from_table,\n       a.attname AS from_column,\n       confrelid::regclass::text AS to_table,\n       af.attname AS to_column\nFROM pg_constraint c\nJOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = c.conkey[1]\nJOIN pg_attribute af ON af.attrelid = c.confrelid AND af.attnum = c.confkey[1]\nWHERE c.contype = 'f'\nORDER BY from_table, from_column;",
+      "ok": true,
+      "fields": [
+        "from_table",
+        "from_column",
+        "to_table",
+        "to_column"
+      ],
+      "rows": [
+        {
+          "from_table": "order_items",
+          "from_column": "order_id",
+          "to_table": "orders",
+          "to_column": "id"
+        },
+        {
+          "from_table": "order_items",
+          "from_column": "product_id",
+          "to_table": "products",
+          "to_column": "id"
+        },
+        {
+          "from_table": "orders",
+          "from_column": "customer_id",
+          "to_table": "customers",
+          "to_column": "id"
+        }
+      ],
+      "affected": 0
+    },
+    "emptyOrder": {
+      "sql": "INSERT INTO orders VALUES (102, 1, DATE '2025-04-02', 'placed');",
+      "ok": true,
+      "fields": [],
+      "rows": [],
+      "affected": 1
+    }
+  }
+}

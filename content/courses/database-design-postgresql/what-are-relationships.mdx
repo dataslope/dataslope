@@ -38,8 +38,9 @@ level, a specific customer row is connected to specific order rows.
 ```mermaid
 flowchart TB
     C["customers row<br/><code>id = 1</code><br/>Ada"] -->|places| O1["orders row<br/><code>id = 101</code>"]
-    C -->|places| O2["orders row<br/><code>id = 102</code>"]
-    G["customers row<br/><code>id = 2</code><br/>Grace"] -->|places| O3["orders row<br/><code>id = 103</code>"]
+    C -->|places| O2["orders row<br/><code>id = 125</code>"]
+    G["customers row<br/><code>id = 2</code><br/>Grace"] -->|places| O3["orders row<br/><code>id = 102</code>"]
+    G -->|places| O4["orders row<br/><code>id = 126</code>"]
 ```
 
 That is why relationships are central to relational design. They make

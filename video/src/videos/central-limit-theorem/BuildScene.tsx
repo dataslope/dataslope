@@ -3,6 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { Axis, Bars, NormalCurve, sx, type XScale } from "../../editorial/charts";
 import {
   histogram,
@@ -33,6 +34,7 @@ import {
   label,
 } from "../../editorial/style";
 import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
+import { PartName } from "../sampling/PartName";
 
 /** One x-axis for both figures, so an average falls straight down from the
  *  population to the place it lands. */
@@ -143,9 +145,22 @@ export const BuildScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound (merged video only; the standalone has sfx off): the underline,
+          the queue, a sample's dots, the first averages landing, the thousands,
+          the bell ── */}
+      <Sfx name="el-pencil" at={lopsidedAt} level={-33} />
+      <Sfx name="el-pop" at={coffeeAt - 6} level={-30} />
+      <Sfx name="el-sprinkle" at={pickAt} level={-34} />
+      <Sfx name="el-tap" at={blockAt + DROP} level={-28} />
+      <Sfx name="el-tap" at={steps[1].d + DROP} level={-29} />
+      <Sfx name="el-sprinkle" at={fastFrom} level={-33} />
+      <Sfx name="el-pop" at={bellAt} level={-30} />
+
       {/* ── P1: headline, deck and the population at full size ── */}
       <Ink at={2} dur={14} out={p1Out} style={{ left: 96, top: y(112) }}>
-        <span style={label(20, ACCENT_INK)}>Waiting in line</span>
+        <span style={label(20, ACCENT_INK)}>
+          <PartName />Waiting in line
+        </span>
       </Ink>
       <Ink at={4} dur={20} out={p1Out} style={{ left: 92, top: y(150), ...headline(92), whiteSpace: "nowrap" }}>
         Waiting for coffee

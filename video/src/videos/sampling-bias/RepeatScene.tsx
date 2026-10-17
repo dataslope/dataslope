@@ -78,6 +78,8 @@ export const RepeatScene: React.FC = () => {
   const timeAt = n.word("every", "every single");
   const nameFrom = n.beat("name").from;
   const biasAt = n.word("name", "bias");
+  // The arrow draws for as long as "always points the same way" is said.
+  const sameWayEnd = n.word("name", "same way", { edge: "end" });
 
   // Sample i (both methods at once) lands at land[i]: the first is already
   // down, the next few slowly, then faster and faster.
@@ -161,7 +163,14 @@ export const RepeatScene: React.FC = () => {
       </Note>
 
       {/* The name for it. */}
-      <Arrow from={[truthX, y(500)]} to={[easyX - 2, y(500)]} at={nameFrom + 6} dur={22} color={EASY} width={3} />
+      <Arrow
+        from={[truthX, y(500)]}
+        to={[easyX - 2, y(500)]}
+        at={nameFrom + 6}
+        dur={Math.max(22, sameWayEnd - nameFrom - 6)}
+        color={EASY}
+        width={3}
+      />
       <Ink at={biasAt - 6} dur={16} style={{ left: (truthX + easyX) / 2 - 200, top: y(426), width: 400, textAlign: "center" }}>
         <span style={{ ...headline(56, true), color: EASY_INK, ...halo }}>Bias</span>
         <span style={{ ...note(24, EASY_INK), fontWeight: 700, marginLeft: 16, ...halo }}>

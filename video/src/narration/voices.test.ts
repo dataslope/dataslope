@@ -9,7 +9,7 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import type { NarrationAlignmentFile, NarrationScript } from "./types.ts";
-import { VOICES, voiceId } from "./voices.ts";
+import { NARRATION_MODEL, VOICES, voiceId } from "./voices.ts";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const VIDEOS = join(ROOT, "src", "videos");
@@ -41,11 +41,30 @@ test("every voiced video is in the voice its script names", async () => {
   }
 });
 
-test("every voiced video keeps the take its beats were cut from", async () => {
+/** A voiced video's kept takes: take.json from before scripts were split
+ *  into takes, or take-1.json, take-2.json … (scripts/narrate.mjs). */
+function takes(id: string) {
+  const dir = join(ROOT, "takes", id);
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir)
+    .filter((f) => /^take(-\d+)?\.json$/.test(f))
+    .map((f) => ({ file: f, mp3: existsSync(join(dir, f.replace(/\.json$/, ".mp3"))), ...JSON.parse(readFileSync(join(dir, f), "utf8")) }));
+}
+
+test("every voiced video keeps the takes its beats were cut from", async () => {
   for (const { video, script } of await voiced()) {
-    const dir = join(ROOT, "takes", script.id);
-    assert.ok(existsSync(join(dir, "take.mp3")), `${video}: no takes/${script.id}/take.mp3`);
-    const take = JSON.parse(readFileSync(join(dir, "take.json"), "utf8"));
-    assert.equal(take.voice_id, voiceId(script.voice), `${video}: the take is in another voice`);
+    const kept = takes(script.id);
+    assert.ok(kept.length, `${video}: no takes in takes/${script.id}/`);
+    for (const take of kept) {
+      assert.ok(take.mp3, `${video}: takes/${script.id}/${take.file} has no audio beside it`);
+      assert.equal(take.voice_id, voiceId(script.voice), `${video}: ${take.file} is in another voice`);
+    }
+  }
+});
+
+test("every narration is recorded on the house model (eleven_v4_turbo)", async () => {
+  for (const { video, script, alignment } of await voiced()) {
+    assert.equal(alignment.meta?.model_id, NARRATION_MODEL, `${video}: its audio is on ${alignment.meta?.model_id}`);
+    for (const take of takes(script.id)) assert.equal(take.model_id, NARRATION_MODEL, `${video}: ${take.file} is on ${take.model_id}`);
   }
 });

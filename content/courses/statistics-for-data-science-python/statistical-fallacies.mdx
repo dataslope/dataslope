@@ -51,9 +51,10 @@ groups you're comparing.
 **Concrete example.** A classic real case: the 1973 UC Berkeley
 graduate admissions.[^berkeley] Overall, men were admitted at a higher
 rate than women, which looked like bias against women. But department
-by department, women were admitted at *equal or higher* rates than
-men. The catch: women
-applied disproportionately to the most competitive departments (low
+by department the picture changed: in four of the six largest departments
+women were admitted at a *higher* rate than men, and in the other two
+they trailed by under four points. The catch: women applied
+disproportionately to the most competitive departments (low
 admit rates for everyone), while men applied to easier ones. The
 department was the lurking variable.
 
@@ -291,7 +292,7 @@ positives to begin with. Forgetting the base rate makes a positive
 result feel far more conclusive than it is.
 
 **Concrete example.** A disease affects 1 in 1,000 people. A test is 99%
-accurate (1% false-positive rate, catches all true cases). You test
+accurate (catches 99% of true cases, 1% false-positive rate). You test
 positive. Your chance of actually having the disease is *not* 99%, it's
 about **9%**. Run the numbers on 100,000 people:
 
@@ -303,7 +304,7 @@ about **9%**. Run the numbers on 100,000 people:
       starterCode: `# Disease prevalence and test accuracy.
 prevalence = 1 / 1000  # 0.1% of people have it
 false_pos_rate = 0.01  # 1% of healthy people test positive
-sensitivity = 1.00  # catches every true case
+sensitivity = 0.99  # catches 99% of true cases
 
 population = 100_000
 sick = population * prevalence
@@ -326,7 +327,7 @@ print("A 99%-accurate test, yet a positive means only ~9% chance of disease.")
   ]}
 />
 
-The 999 false positives drown out the 100 true ones. We derived this
+The 999 false positives drown out the 99 true ones. We derived this
 formally with Bayes' rule in *Conditional Probability*; the *fallacy*
 here is forgetting to do it at all.
 
@@ -590,14 +591,14 @@ different shapes. In 2017, Justin Matejka and George Fitzmaurice at
 Autodesk pushed the joke to its limit. Starting from Alberto Cairo's
 "Datasaurus", a scatter of points that forms a cartoon dinosaur yet has
 unremarkable summary statistics, they generated **twelve more**
-datasets that share the *same* mean, standard deviation, and correlation
-to two decimal places, while looking like stars, circles, lines, and
+datasets whose mean, standard deviation, and correlation all agree with
+the dinosaur's to within 0.01, while looking like stars, circles, lines, and
 slanted clouds.
 
 <Figure
   slug="stat-fallacies-datasaurus-cutout"
   alt="Three framed panels holding a dinosaur, a star and a ring, with one identical tile beneath each frame"
-  caption="Matejka and Fitzmaurice, 2017: twelve datasets sharing summary statistics to two decimal places, all shaped differently."
+  caption="Matejka and Fitzmaurice, 2017: twelve datasets whose summary statistics agree to within 0.01, all shaped differently."
 />
 
 Run this on the real **Datasaurus Dozen**: thirteen datasets, one set of
@@ -627,7 +628,7 @@ print("\\n13 datasets. The summary statistics are essentially identical.")
 />
 
 The means hover around 54 and 48, the standard deviations around 17 and
-26, the correlation near −0.06, for every single one, including the
+27, the correlation at −0.06 or −0.07, for every single one, including the
 dinosaur. Now plot them and the summaries fall apart completely:
 
 <CodeBlock

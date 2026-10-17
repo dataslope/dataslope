@@ -77,12 +77,10 @@ the **many** side.
 
 ```mermaid
 flowchart LR
-    C["<code>customers.id = 1</code><br/>Ada"] --> O1["<code>orders.id = 101<br/>customer_id = 1</code>"]
-    C --> O2["<code>orders.id = 102<br/>customer_id = 1</code>"]
-    C --> O3["<code>orders.id = 103<br/>customer_id = 1</code>"]
+    C["<code>customers.id = 1</code><br/>Ada"] --> O1["<code>orders.id = 1<br/>customer_id = 1</code>"]
+    C --> O2["<code>orders.id = 25<br/>customer_id = 1</code>"]
     O1 -->|"FK → PK"| C
     O2 -->|"FK → PK"| C
-    O3 -->|"FK → PK"| C
 ```
 
 Each order needs only one `customer_id`, because each order belongs to
@@ -92,7 +90,7 @@ values, and every new order would require editing the parent row.
 
 | Approach | Where the link lives | Result |
 | --- | --- | --- |
-| Bad idea | `customers.order_ids = 101, 102, 103` | One cell stores a list; hard to validate, query, and update. |
+| Bad idea | `customers.order_ids = 1, 25` | One cell stores a list; hard to validate, query, and update. |
 | Good idea | `orders.customer_id` | One child row stores one parent id; a join rebuilds the full picture. |
 
 The many side can repeat the same parent id safely. That repetition is
@@ -218,12 +216,10 @@ Designers often call the one side the **parent** and the many side the
 
 ```mermaid
 flowchart TD
-    Parent["Parent row<br/><code>customers.id = 1</code>"] --> ChildA["Child row<br/>order 101"]
-    Parent --> ChildB["Child row<br/>order 102"]
-    Parent --> ChildC["Child row<br/>order 103"]
+    Parent["Parent row<br/><code>customers.id = 1</code>"] --> ChildA["Child row<br/>order 1"]
+    Parent --> ChildB["Child row<br/>order 25"]
     ChildA -->|"stores <code>customer_id</code>"| Parent
     ChildB -->|"stores <code>customer_id</code>"| Parent
-    ChildC -->|"stores <code>customer_id</code>"| Parent
 ```
 
 The parent can exist without children: a new customer may not have

@@ -53,7 +53,7 @@ export const ChainScene: React.FC = () => {
     n.word("expand", "two is not three"),
     n.word("expand", "two is not NULL"),
   ];
-  const valueAt = [n.word("chain", "True"), n.word("chain", "true", { nth: 2 }), n.word("chain", "unknown")];
+  const valueAt = [n.word("chain", "True", { nth: 1 }), n.word("chain", "true", { nth: 2 }), n.word("chain", "unknown", { nth: 1 })];
   const oneUnknownAt = n.word("chain", "one unknown");
   const resultAt = n.word("chain", "the result");
   const neverAt = n.word("chain", "never be true");

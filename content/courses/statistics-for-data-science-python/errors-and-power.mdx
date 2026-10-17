@@ -306,8 +306,9 @@ print("so the 'power' there is just the Type I error rate ≈ alpha = 0.05.")
 The two punchlines: big effects are easy to detect (high power even at
 modest `n`), tiny effects need either lots of data or they slip through.
 And the leftmost point of the second chart is a gift, when the effect is
-*zero*, H₀ is true, so "rejecting" is a Type I error. That point sits
-near 0.05, which is exactly α. Let's verify that directly.
+*zero*, H₀ is true, so "rejecting" is a Type I error. That point should
+sit at α = 0.05; it prints 0.06 here, which is within the noise of 800
+simulated experiments. Let's verify it directly, with more of them.
 
 ## The Type I error rate really is α
 

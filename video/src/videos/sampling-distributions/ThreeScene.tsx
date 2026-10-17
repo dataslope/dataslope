@@ -3,6 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { Axis, Bars, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
@@ -36,6 +37,7 @@ import {
   VIDEO,
 } from "./data";
 import { Bracket, money, POP_FILL, Rule, SAMPLE_FILL } from "./parts";
+import { flash, swell } from "../sampling/emphasis";
 
 // ── Layout, in the page's layout coordinates (through y() and h()) ──────────
 
@@ -110,6 +112,7 @@ const AT_SD = Math.exp(-0.5);
  */
 export const ThreeScene: React.FC = () => {
   const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
   const n = useNarration();
   const { y, h } = useLayout();
 
@@ -138,6 +141,29 @@ export const ThreeScene: React.FC = () => {
   const piledAt = n.word("pile", "piled");
   const fiftyAt = n.word("pile", "fifty");
   const underAt = n.word("pile", "under");
+  // Phrases the figure answers as they are spoken, while it is talked about.
+  const snapshotAt = n.word("snapshot", "noisy snapshot");
+  const raggedAt = n.word("snapshot", "Ragged");
+  const rawValuesAt = n.word("data", "Raw values");
+  const eachAt = n.word("data", "one per customer");
+  const dollarsAt = n.word("third", "dollars");
+  const becomesAt = n.word("block", "becomes");
+  const thatAverageAt = n.word("block", "That average");
+  const theseAt = n.word("compare", "these three");
+  const rawPopAt = n.word("raw", "population");
+  const rawSampleAt = n.word("raw", "sample");
+  const tensAt = n.word("raw", "tens of dollars");
+  const oneAverageAt = n.word("statistic", "one average");
+  const barelyAt = n.word("statistic", "barely moves");
+  const pinAt = n.word("why", "pin down");
+  const millionWhyAt = n.word("why", "million");
+  const yourDataAt = n.word("why", "histogram");
+  /** A FigLabel that swells in place, from its own left end. */
+  const swelling = (x: number, top: number, at: number, children: React.ReactNode) => (
+    <div style={{ position: "absolute", inset: 0, transformOrigin: `${x}px ${top + 12}px`, transform: `scale(${swell(frame, at, 0.07, 18)})` }}>
+      {children}
+    </div>
+  );
   const pileTo = n.beat("pile").to;
   const compareFrom = n.beat("compare").from;
   const oneAxisAt = n.word("compare", "one axis");
@@ -187,6 +213,18 @@ export const ThreeScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── Sound: the population, the basket, the forty customers, the first
+          averages landing by hand, the thousands, the shared axis ── */}
+      <Sfx name="el-pop" at={popFrom - 6} level={-30} />
+      <Sfx name="el-pop" at={millionAt - 6} level={-30} />
+      <Sfx name="el-sprinkle" at={pickAt} level={-34} />
+      <Sfx name="el-tap" at={blockAt + DROP} level={-28} />
+      {steps.map((st, i) => (
+        <Sfx key={i} name="el-tap" at={st.d + DROP} level={-29} />
+      ))}
+      <Sfx name="el-sprinkle" at={fastFrom} level={-33} />
+      <Sfx name="el-pencil" at={oneAxisAt - 4} level={-34} />
+
       {/* ══ Phase 1: the population, at full size ══ */}
       <Ink at={popFrom - 12} dur={14} out={p1Out} style={{ left: 96, top: y(112) }}>
         <span style={label(22, INK_SOFT)}>The first distribution</span>
@@ -199,13 +237,18 @@ export const ThreeScene: React.FC = () => {
       </Ink>
       {ILLUSTRATIONS ? <Basket at={millionAt} out={p1Out} /> : null}
 
-      <FigLabel
-        n="2"
-        title="The population: a million customers' spend"
-        at={popFrom - 6}
-        x={150}
-        y={y(lerp(POP_BIG.label, POP_ROW.label, m))}
-      />
+      {swelling(
+        150,
+        y(lerp(POP_BIG.label, POP_ROW.label, m)),
+        theseAt - 2,
+        <FigLabel
+          n="2"
+          title="The population: a million customers' spend"
+          at={popFrom - 6}
+          x={150}
+          y={y(lerp(POP_BIG.label, POP_ROW.label, m))}
+        />,
+      )}
       <Bars
         counts={POPULATION.hist.counts}
         lo={POPULATION.hist.lo}
@@ -239,7 +282,18 @@ export const ThreeScene: React.FC = () => {
         width={2.4 + emphasis}
       />
       <Note at={eighteenAt - 2} x={sx(X, POPULATION.mean + POPULATION.sd) + 14} y={y(popBase - popH * AT_SD) - 15}>
-        <span style={{ ...note(24, INK), fontWeight: 650, ...halo }}>± ${fmt(POPULATION.sd)}</span>
+        <span
+          style={{
+            ...note(24, INK),
+            fontWeight: 650,
+            ...halo,
+            display: "inline-block",
+            transformOrigin: "left center",
+            transform: `scale(${swell(frame, rawPopAt - 2, 0.18, 20)})`,
+          }}
+        >
+          ± ${fmt(POPULATION.sd)}
+        </span>
       </Note>
 
       {/* ══ Phase 2: one sample ══ */}
@@ -252,14 +306,25 @@ export const ThreeScene: React.FC = () => {
       <Ink at={pickAt} dur={16} out={p2Out} style={{ left: RX, top: y(236), width: RW }}>
         <span style={{ ...body(32, true), color: INK }}>Forty customers, picked at random.</span>
       </Ink>
+      <Note at={snapshotAt - 2} x={RX} y={y(360)} width={RW} out={histAt - 10}>
+        <div style={{ ...body(30, true), color: INK }}>A noisy snapshot of the population.</div>
+      </Note>
       <Note at={histAt} x={RX} y={y(360)} width={RW} out={p2Out}>
         <div style={{ ...body(30), color: INK }}>What a histogram of your data shows.</div>
-        <div style={{ ...note(22, INK_SOFT), marginTop: 12 }}>Raw values, one block per customer.</div>
+        <div style={{ ...note(22, INK_SOFT), marginTop: 12, opacity: ease(frame, rawValuesAt - 2, 12) }}>
+          Raw values, one block per customer.
+        </div>
       </Note>
 
-      <FigLabel n="3" title={`One sample of ${N} customers`} at={sampleFrom} x={150} y={y(SAMPLE_LABEL)} />
+      {swelling(
+        150,
+        y(SAMPLE_LABEL),
+        theseAt + 4,
+        <FigLabel n="3" title={`One sample of ${N} customers`} at={sampleFrom} x={150} y={y(SAMPLE_LABEL)} />,
+      )}
       <Axis scale={X} base={y(SAMPLE_BASE)} ticks={TICKS} format={money} at={sampleFrom + 2} />
-      <SampleBlocks pickAt={pickAt} fallAt={randomAt + 2} popBase={y(popBase)} />
+      <SampleBlocks pickAt={pickAt} fallAt={randomAt + 2} popBase={y(popBase)} rippleAt={[eachAt, yourDataAt]} />
+      <Skyline at={raggedAt - 2} out={p2Out} />
       <Bracket
         x0={sx(X, SAMPLE.mean - SAMPLE.sd)}
         x1={sx(X, SAMPLE.mean + SAMPLE.sd)}
@@ -268,7 +333,18 @@ export const ThreeScene: React.FC = () => {
         width={2.4 + emphasis}
       />
       <Note at={twentyAt - 2} x={sx(X, SAMPLE.mean + SAMPLE.sd) + 14} y={y(SAMPLE_BASE - STACK * STEP * AT_SD) - 15}>
-        <span style={{ ...note(24, INK), fontWeight: 650, ...halo }}>± ${fmt(SAMPLE.sd)}</span>
+        <span
+          style={{
+            ...note(24, INK),
+            fontWeight: 650,
+            ...halo,
+            display: "inline-block",
+            transformOrigin: "left center",
+            transform: `scale(${swell(frame, rawSampleAt - 2, 0.18, 20)})`,
+          }}
+        >
+          ± ${fmt(SAMPLE.sd)}
+        </span>
       </Note>
 
       {/* ══ Phase 3: the sampling distribution ══ */}
@@ -302,7 +378,12 @@ export const ThreeScene: React.FC = () => {
         <div style={{ ...note(21, INK_SOFT), marginTop: 6 }}>The population&apos;s average is ${fmt(POPULATION.mean)}.</div>
       </Note>
 
-      <FigLabel n="4" title={`The average of each sample of ${N}`} at={thirdFrom} x={150} y={y(MEANS_LABEL)} />
+      {swelling(
+        150,
+        y(MEANS_LABEL),
+        theseAt + 10,
+        <FigLabel n="4" title={`The average of each sample of ${N}`} at={thirdFrom} x={150} y={y(MEANS_LABEL)} />,
+      )}
       <Axis scale={X} base={y(MEANS_BASE)} ticks={TICKS} format={money} at={thirdFrom + 2} />
       <Bars
         counts={counts}
@@ -310,12 +391,19 @@ export const ThreeScene: React.FC = () => {
         bin={MEAN_BIN}
         scale={X}
         base={y(MEANS_BASE)}
-        unit={h(unit)}
+        unit={h(unit) * swell(frame, oneAverageAt - 2, 0.12, 22)}
         color={ACCENT}
         gap={2}
         overlay={frame < fastTo + 6 ? { counts: recent, color: ds("red", 800) } : undefined}
       />
-      <Averaging averageAt={averageAt} numberAt={numberAt} blockAt={blockAt} />
+      <Averaging
+        averageAt={averageAt}
+        numberAt={numberAt}
+        blockAt={blockAt}
+        dollarsAt={dollarsAt}
+        becomesAt={becomesAt}
+        thatAverageAt={thatAverageAt}
+      />
       {steps.map((st, i) => (
         <StripSample key={i} index={i + 1} step={st} popBase={y(popBase)} />
       ))}
@@ -368,7 +456,29 @@ export const ThreeScene: React.FC = () => {
           three widths.
         </Ink>
       </div>
-      <WidthTable rawAt={rawAt} statAt={statAt} middleAt={middleAt} />
+      <WidthTable rawAt={rawAt} statAt={statAt} middleAt={middleAt} tensAt={tensAt} barelyAt={barelyAt} />
+      {/* "pin down the average of a million": the pile's center, up through
+          every row to the population's own average. */}
+      <Rule
+        x={sx(X, PILE.mean)}
+        y0={y(MEANS_BASE - MEANS_H - 14)}
+        y1={y(POP_ROW.base - POP_ROW.height - 14)}
+        at={pinAt - 2}
+        dur={20}
+        color={ACCENT}
+        width={2.2}
+        dash="6 6"
+      />
+      <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
+        <circle
+          cx={sx(X, POPULATION.mean)}
+          cy={y(POP_ROW.base - POP_ROW.height - 14)}
+          r={8 * pop(frame, millionWhyAt - 2, fps, 12)}
+          fill={ACCENT}
+          stroke={PAPER}
+          strokeWidth={1.5}
+        />
+      </svg>
       <Note at={gapAt} x={RX} y={y(640)} width={RW}>
         <span style={{ ...body(30, true), color: INK }}>
           That gap is why {N} customers can pin down the average of a million.
@@ -403,7 +513,12 @@ const Basket: React.FC<{ at: number; out: number }> = ({ at, out }) => {
 
 /** The forty customers: lit up on the population, then dropped into row 2 as
  *  one block each. */
-const SampleBlocks: React.FC<{ pickAt: number; fallAt: number; popBase: number }> = ({ pickAt, fallAt, popBase }) => {
+const SampleBlocks: React.FC<{ pickAt: number; fallAt: number; popBase: number; rippleAt: readonly number[] }> = ({
+  pickAt,
+  fallAt,
+  popBase,
+  rippleAt,
+}) => {
   const frame = useCurrentFrame();
   const { y, h } = useLayout();
   const FALL = 16;
@@ -417,7 +532,10 @@ const SampleBlocks: React.FC<{ pickAt: number; fallAt: number; popBase: number }
         const left = blockLeft(j);
         const top = y(blockTop(s));
         if (t >= 1) {
-          return <rect key={i} x={left} y={top} width={BLOCK_W} height={h(BLOCK)} fill={SAMPLE_FILL} />;
+          // "One per customer": a ripple across the forty, in drawing order.
+          const lit = Math.max(...rippleAt.map((at) => flash(frame, at + i * 0.6, 14)));
+          const fill = lit > 0 ? `color-mix(in srgb, ${POP_FILL} ${Math.round(lit * 70)}%, ${SAMPLE_FILL})` : SAMPLE_FILL;
+          return <rect key={i} x={left} y={top - lit * 4} width={BLOCK_W} height={h(BLOCK)} fill={fill} />;
         }
         // From the strip on the population to the block's centre, under gravity.
         const x0 = sx(X, v);
@@ -442,11 +560,14 @@ const SampleBlocks: React.FC<{ pickAt: number; fallAt: number; popBase: number }
 
 /** "Average those forty": a red copy of each block slides into the average,
  *  which becomes one block and falls into row 3. */
-const Averaging: React.FC<{ averageAt: number; numberAt: number; blockAt: number }> = ({
-  averageAt,
-  numberAt,
-  blockAt,
-}) => {
+const Averaging: React.FC<{
+  averageAt: number;
+  numberAt: number;
+  blockAt: number;
+  dollarsAt: number;
+  becomesAt: number;
+  thatAverageAt: number;
+}> = ({ averageAt, numberAt, blockAt, dollarsAt, becomesAt, thatAverageAt }) => {
   const frame = useCurrentFrame();
   const { y, h } = useLayout();
   const c = ease(frame, averageAt, 18);
@@ -460,6 +581,12 @@ const Averaging: React.FC<{ averageAt: number; numberAt: number; blockAt: number
   // The average is a dot until it drops, then a block in its bin.
   const top = startTop + (endTop - startTop) * t * t;
   const labelIn = ease(frame, numberAt - 2, 10) * (1 - ease(frame, blockAt - 4, 6));
+  const becoming = ease(frame, becomesAt - 2, 12);
+  // The average counts up to its value as the narration reads it.
+  // Linear, so it is still counting when "forty-seven" is said.
+  const span = Math.max(10, dollarsAt - numberAt + 2);
+  const shown = SAMPLE.mean * Math.max(0, Math.min(1, (frame - numberAt + 2) / span));
+  const named = swell(frame, thatAverageAt - 2, 0.22, 22);
   return (
     <>
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
@@ -478,7 +605,17 @@ const Averaging: React.FC<{ averageAt: number; numberAt: number; blockAt: number
             ))
           : null}
         {formed > 0 && frame < blockAt ? (
-          <circle cx={mx} cy={y(MERGE_Y)} r={10 * formed} fill={ACCENT} stroke={PAPER} strokeWidth={1.5} />
+          // A dot, until "becomes": then the block it will fall as, over its bin.
+          <rect
+            x={lerp(mx, meanBinLeft(SAMPLE.mean) + MEAN_W / 2, becoming) - lerp(10 * formed, MEAN_W / 2, becoming)}
+            y={y(MERGE_Y) - lerp(10 * formed, h(EARLY) / 2, becoming)}
+            width={lerp(20 * formed, MEAN_W, becoming)}
+            height={lerp(20 * formed, h(EARLY), becoming)}
+            rx={lerp(10 * formed, 0, becoming)}
+            fill={ACCENT}
+            stroke={PAPER}
+            strokeWidth={1.5 * (1 - becoming)}
+          />
         ) : null}
         {frame >= blockAt ? (
           <rect x={meanBinLeft(SAMPLE.mean)} y={y(top)} width={MEAN_W} height={h(EARLY)} fill={ACCENT} />
@@ -494,11 +631,41 @@ const Averaging: React.FC<{ averageAt: number; numberAt: number; blockAt: number
           ...note(26, ACCENT_INK),
           fontWeight: 700,
           ...halo,
+          transformOrigin: "left center",
+          transform: `scale(${named})`,
         }}
       >
-        ${fmt(SAMPLE.mean)}
+        ${fmt(shown)}
       </div>
     </>
+  );
+};
+
+/** "Ragged": a pencil line along the tops of the forty blocks' stacks. */
+const SKYLINE = (() => {
+  const heights = new Map<number, number>();
+  for (const { j, s } of SLOTS) heights.set(j, Math.max(heights.get(j) ?? 0, s + 1));
+  const bins = [...heights.keys()];
+  const lo = Math.min(...bins);
+  const hi = Math.max(...bins);
+  const pts: [number, number][] = [];
+  for (let j = lo; j <= hi; j++) {
+    const top = SAMPLE_BASE - (heights.get(j) ?? 0) * STEP - 4;
+    pts.push([sx(X, j * SAMPLE_BIN), top], [sx(X, (j + 1) * SAMPLE_BIN), top]);
+  }
+  return pts;
+})();
+const Skyline: React.FC<{ at: number; out: number }> = ({ at, out }) => {
+  const frame = useCurrentFrame();
+  const { y } = useLayout();
+  const p = ease(frame, at, 26);
+  const o = ease(frame, out, 12);
+  if (p <= 0 || o >= 1) return null;
+  const d = SKYLINE.map(([x, v], i) => `${i ? "L" : "M"}${x.toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  return (
+    <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: 1 - o }}>
+      <path d={d} fill="none" stroke={INK} strokeWidth={2} strokeLinejoin="round" pathLength={1} strokeDasharray={`${p} 1`} />
+    </svg>
   );
 };
 
@@ -588,12 +755,20 @@ const Gridlines: React.FC<{ at: number; top: number; bottom: number }> = ({ at, 
 };
 
 /** The three spreads, grouped by what they describe. */
-const WidthTable: React.FC<{ rawAt: number; statAt: number; middleAt: number }> = ({ rawAt, statAt, middleAt }) => {
+const WidthTable: React.FC<{ rawAt: number; statAt: number; middleAt: number; tensAt: number; barelyAt: number }> = ({
+  rawAt,
+  statAt,
+  middleAt,
+  tensAt,
+  barelyAt,
+}) => {
   const frame = useCurrentFrame();
   const { y } = useLayout();
   const mark = ease(frame, middleAt - 2, 12);
-  const row = (name: string, value: string, color: string, top: number, at: number, highlight = 0) => {
+  const row = (name: string, value: string, color: string, top: number, at: number, highlight = 0, pulse?: number, namePulse?: number) => {
     const p = ease(frame, at, 12);
+    const grow = pulse === undefined ? 1 : swell(frame, pulse, 0.16, 20);
+    const nameGrow = namePulse === undefined ? 1 : swell(frame, namePulse, 0.08, 20);
     return (
       <div
         style={{
@@ -622,9 +797,13 @@ const WidthTable: React.FC<{ rawAt: number; statAt: number; middleAt: number }> 
               opacity: highlight > 0 ? 1 : 0,
             }}
           />
-          <span style={{ position: "relative", ...body(32), color: INK }}>{name}</span>
+          <span style={{ position: "relative", display: "inline-block", transformOrigin: "left center", transform: `scale(${nameGrow})`, ...body(32), color: INK }}>
+            {name}
+          </span>
         </span>
-        <span style={{ ...note(28, color), fontWeight: 700 }}>{value}</span>
+        <span style={{ ...note(28, color), fontWeight: 700, display: "inline-block", transformOrigin: "right center", transform: `scale(${grow})` }}>
+          {value}
+        </span>
       </div>
     );
   };
@@ -633,12 +812,12 @@ const WidthTable: React.FC<{ rawAt: number; statAt: number; middleAt: number }> 
       <Note at={rawAt - 4} x={RX} y={y(282)} width={RW}>
         <span style={label(21, INK_SOFT)}>Raw values, one per customer</span>
       </Note>
-      {row("The population", `± $${fmt(POPULATION.sd)}`, INK, 322, rawAt - 2)}
-      {row("One sample", `± $${fmt(SAMPLE.sd)}`, INK, 382, rawAt + 2, mark)}
+      {row("The population", `± $${fmt(POPULATION.sd)}`, INK, 322, rawAt - 2, 0, tensAt - 2)}
+      {row("One sample", `± $${fmt(SAMPLE.sd)}`, INK, 382, rawAt + 2, mark, tensAt + 4, middleAt - 2)}
       <Note at={statAt - 4} x={RX} y={y(466)} width={RW}>
         <span style={label(21, ACCENT_INK)}>A statistic, one per sample</span>
       </Note>
-      {row("Sample averages", `± $${fmt(PILE.sd)}`, ACCENT_INK, 506, statAt)}
+      {row("Sample averages", `± $${fmt(PILE.sd)}`, ACCENT_INK, 506, statAt, 0, barelyAt - 2)}
     </>
   );
 };

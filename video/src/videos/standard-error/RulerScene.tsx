@@ -21,6 +21,7 @@ import {
 } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { SANS } from "../../theme/fonts";
 import { ILLUSTRATIONS, mulberry32, TIMES, VIDEO } from "./data";
@@ -75,6 +76,11 @@ export const RulerScene: React.FC = () => {
   const manyAt = n.word("test", "how many");
   const testingAt = n.word("test", "testing");
   const nextAt = n.word("next", "Next");
+  // "that interval": the interval lights up on the ruler as it is named, and
+  // the line under it finishes on "properly".
+  const thatIntervalAt = n.word("next", "that interval");
+  const properlyAt = n.word("next", "properly");
+  const named = ease(frame, thatIntervalAt - 2, 16);
 
   const mx = sx(X, TIMES.mean);
   const rx = (v: number) => sx(R, v);
@@ -84,9 +90,22 @@ export const RulerScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Ink at={rulerFrom - 6} dur={20} style={{ left: 92, top: y(112), ...headline(56), whiteSpace: "nowrap" }}>
-        The standard error is a ruler.
-      </Ink>
+      {/* ── Sound: the ruler, the times, the zoom, the interval, the test ── */}
+      <Sfx name="el-pop" at={rulerAt - 6} level={-30} />
+      <Sfx name="el-sprinkle" at={timesFrom - 4} level={-34} />
+      <Sfx name="el-whoosh" at={seAt} level={-34} />
+      <Sfx name="el-pencil" at={stepAt} level={-33} />
+      <Sfx name="el-pencil" at={testAt - 2} level={-35} />
+      <Sfx name="el-tap" at={testingAt - 2} level={-29} />
+
+      <div style={{ position: "absolute", left: 92, top: y(112), display: "flex", gap: "0.26em", ...headline(56), whiteSpace: "nowrap" }}>
+        <Ink at={rulerFrom - 6} dur={20} style={{ position: "relative" }}>
+          The standard error
+        </Ink>
+        <Ink at={rulerAt - 4} dur={16} style={{ position: "relative" }}>
+          is a ruler.
+        </Ink>
+      </div>
       <Ink at={inferenceAt - 4} dur={18} style={{ left: 94, top: y(186), ...headline(40, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
         Intervals and tests are measured with it.
       </Ink>
@@ -199,6 +218,19 @@ export const RulerScene: React.FC = () => {
         <span style={label(19, INK_SOFT)}>standard errors from the average</span>
       </Note>
 
+      {/* The interval, lit on the ruler when the bridge names it. */}
+      {named > 0 ? (
+        <div
+          style={{
+            position: "absolute",
+            left: rx(TIMES.lo),
+            width: (rx(TIMES.hi) - rx(TIMES.lo)) * named,
+            top: y(RULER_TOP),
+            height: y(RULER_TOP + RULER_H) - y(RULER_TOP),
+            background: `color-mix(in srgb, ${ACCENT} 16%, transparent)`,
+          }}
+        />
+      ) : null}
       {/* The rough interval: about two standard errors either way. */}
       <Span x0={rx(TIMES.lo)} x1={rx(TIMES.hi)} y={y(RULER_TOP - 22)} at={stepAt} dur={26} color={ACCENT} width={3.2} tick={10} />
       <div style={{ position: "absolute", left: rx(TIMES.lo), top: y(RULER_TOP - 72), display: "flex", alignItems: "baseline", gap: "0.4em", whiteSpace: "nowrap" }}>
@@ -250,7 +282,7 @@ export const RulerScene: React.FC = () => {
 
       <div style={{ position: "absolute", left: R.x0, right: 1920 - R.x1, top: y(838), height: 1, background: HAIRLINE, opacity: ease(frame, nextAt - 6, 12) }} />
       <Ink at={nextAt - 2} dur={18} style={{ left: R.x0, top: y(856), ...body(34, true), color: INK, whiteSpace: "nowrap" }}>
-        Next: that interval, built properly.
+        Next: that interval, <span style={{ opacity: ease(frame, properlyAt - 2, 12) }}>built properly.</span>
       </Ink>
     </AbsoluteFill>
   );

@@ -22,7 +22,7 @@ once as the parent row it points to.
 
 ```mermaid
 erDiagram
-    employees ||--o{ employees : manages
+    employees |o--o{ employees : manages
     employees {
         int id PK
         int manager_id FK
@@ -136,9 +136,9 @@ The same pattern models many structures:
 
 ```mermaid
 erDiagram
-    categories ||--o{ categories : contains
-    comments ||--o{ comments : replies
-    folders ||--o{ folders : contains
+    categories |o--o{ categories : contains
+    comments |o--o{ comments : replies
+    folders |o--o{ folders : contains
 ```
 
 ```mermaid

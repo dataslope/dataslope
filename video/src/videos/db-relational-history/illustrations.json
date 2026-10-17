@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "model": "gpt-image-2.5-flare",
+    "brandColors": {
+      "blue": "#148cff",
+      "green": "#20c621",
+      "red": "#ff4f59",
+      "yellow": "#ffdd6c"
+    },
+    "sizes": {
+      "video-hero": "1536x1024",
+      "video-icon": "1024x1024"
+    },
+    "styles": {
+      "watercolor illustration": {
+        "constraints": "Paint it in loose, transparent watercolor: soft washes that feather and bleed at their edges, darker pigment pooling where a wash has dried, gentle blooms inside each shape, and the tooth of cold-press paper visible only inside the paint. Build the scene from a few large, simple shapes rather than many small pieces, and let the washes define the forms instead of hard outlines. Lay every wash in the brand colors below and let two overlapping washes mix into a third; never outline in black, never shade with grey or black, and never paint the whole subject in one hue. An animal keeps its own natural coloring, painted in warm earthy washes with soft fur texture. Draw any person as an anonymous stylized figure with no facial features and no resemblance to a real individual. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no paper texture outside the paint, no floor, no ground shadow, no frame or border, no soft glow and no vignette, so the whole subject lifts off the page in one piece.",
+        "softAlphaWarn": 0.3
+      }
+    }
+  },
+  "prompts": [
+    {
+      "id": "db-relational-history-rocket",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a tall, slender three-stage moon rocket standing upright on its own, seen from the side: a long white body banded in broad blue and red washes between its stages, four small fins at its base and a narrow pointed tip, with no flags, markings or lettering"
+    },
+    {
+      "id": "db-relational-history-plane",
+      "category": "video-hero",
+      "style": "watercolor illustration",
+      "subject": "a small vintage propeller airplane flying level, seen from the side: a rounded blue nose with a two-bladed propeller, long straight yellow wings, a red tail fin and a round cockpit window, with no markings or lettering"
+    },
+    {
+      "id": "db-relational-history-tape",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "one large open reel of old computer magnetic tape, seen face on: a round blue reel with three wide cut-outs between its spokes, a thick ring of dark brown tape wound around its hub, and a loose end of tape trailing off in one gentle curve"
+    },
+    {
+      "id": "db-relational-history-elephant",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small friendly elephant standing in profile on all four legs, its trunk raised in a gentle curve and its big ears spread, painted in soft natural grey-brown washes with a hint of blue in the shadows"
+    }
+  ]
+}

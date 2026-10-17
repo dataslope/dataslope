@@ -10,12 +10,12 @@
  * how many successes you expect. The clustered one is far wider, because when
  * outcomes come in correlated groups the effective number of independent
  * observations is smaller than the number of rows. Here forty clusters of ten
- * behave like about fifteen independent trials rather than four hundred.
+ * behave like about ninety independent trials rather than four hundred.
  *
  * The consequence lands on every interval. A binomial confidence interval
- * computed with n = 400 is about a third the width it should be, so an A/B test
- * on clustered data will find significance at roughly the rate you would get by
- * running the test three times and keeping the best one.
+ * computed with n = 400 is about half the width it should be, so an A/B test on
+ * clustered data will find significance at roughly the rate you would get by
+ * running the test eight times and keeping the best one.
  *
  * The multiplier has a name: the **design effect**, and it is `1 + (m - 1)ρ`
  * for clusters of size m with intra-cluster correlation ρ. It is worth knowing
@@ -31,7 +31,7 @@
 import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, PRIMARY, mean, rng } from "./_theme.mjs";
 
 export const title =
-  "Two distributions of the number of successes in four hundred trials at the same success rate. Independent trials give a narrow binomial; forty clusters of ten give the same mean and roughly five times the spread.";
+  "Two distributions of the number of successes in four hundred trials at the same success rate. Independent trials give a narrow binomial; forty clusters of ten give the same mean and roughly twice the spread.";
 
 const CLUSTERS = 40;
 const PER_CLUSTER = 10;

@@ -352,7 +352,7 @@ print(
     .sort_values("total_bill")
     .to_string(index=False)
 )
-print("\\nThese look like genuine big-party bills, not errors -- KEEP them,")
+print("\\nThese look like genuine big bills, not errors: KEEP them,")
 print("but be aware they'll pull the mean around.")
 `,
     },
@@ -362,8 +362,8 @@ print("but be aware they'll pull the mean around.")
 <Callout type="danger" title="Don't delete outliers reflexively">
 "Removing outliers" to make a chart prettier is a classic way to lie
 with data. A high value is only an *error* if it's actually impossible
-or mis-entered. A genuine \\$50 bill from a big party is real signal,
-deleting it distorts the truth. Investigate first; delete only with a
+or mis-entered. A genuine \$50 bill, even from a table of three, is real
+signal, deleting it distorts the truth. Investigate first; delete only with a
 documented reason.
 </Callout>
 

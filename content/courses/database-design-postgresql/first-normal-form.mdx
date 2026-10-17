@@ -43,15 +43,15 @@ Suppose a school stores student phone numbers like this:
 ```mermaid
 flowchart TB
     T["students<br/><code>student_id</code> | name | phones"]
-    T --> R1["1 | Ada | 555-1000, 555-2000"]
-    T --> R2["2 | Grace | 555-3000"]
+    T --> R1["1 | Ada | 555-1000, 555-2200"]
+    T --> R2["2 | Grace | 555-1100, 555-2300"]
 ```
 
 That `phones` cell is not atomic. **Atomic** means the value is treated
 as one indivisible value for the purpose of the design. A phone number
 is atomic here; a comma-separated list of phone numbers is not.
 
-If you want to find the student with phone `555-2000`, the database has
+If you want to find the student with phone `555-2200`, the database has
 to search inside a string. If you want to prevent duplicate phone
 numbers, a normal `UNIQUE` constraint cannot see the separate values.
 
@@ -62,7 +62,7 @@ Some designs avoid comma-separated lists by adding more columns:
 ```mermaid
 flowchart TB
     S["students<br/><code>student_id</code> | name | phone1 | phone2 | phone3"]
-    S --> R["1 | Ada | 555-1000 | 555-2000 | null"]
+    S --> R["1 | Ada | 555-1000 | 555-2200 | null"]
 ```
 
 This also violates the spirit of 1NF. The columns `phone1`, `phone2`,
@@ -80,7 +80,7 @@ column.
 
 - \`students(student_id, name)\` with one row per student.
   > Each listed column stores one value about one student.
-- [o] \`students(student_id, name, phones)\` where \`phones\` contains \`555-1000, 555-2000\`.
+- [o] \`students(student_id, name, phones)\` where \`phones\` contains \`555-1000, 555-2200\`.
   > The phones cell contains multiple values hidden inside one string.
 - \`products(product_id, name, price)\` with one price per product.
   > One price value per row does not create a repeating group.
