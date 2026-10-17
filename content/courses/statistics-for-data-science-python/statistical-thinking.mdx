@@ -156,7 +156,12 @@ fig = px.line(
     title="A 'trend' that is 100% noise",
     template="simple_white",
 )
-fig.add_hline(y=100, line_dash="dash", annotation_text="the actual truth (flat)")
+fig.add_hline(
+    y=100,
+    line_dash="dash",
+    line_width=2,
+    annotation_text="the actual truth (flat)",
+)
 fig.show()
 
 # It is trivially easy to find a "rising stretch" or "decline" in here.
@@ -340,7 +345,10 @@ fig = px.histogram(
     template="simple_white",
 )
 fig.add_vline(
-    x=point_estimate, line_dash="dash", annotation_text="your one sample's mean"
+    x=point_estimate,
+    line_dash="dash",
+    line_width=2,
+    annotation_text="your one sample's mean",
 )
 fig.show()
 
