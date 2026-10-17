@@ -14,7 +14,7 @@ a picture of the main things in your system and how they connect.
 
 The idea has a precise birthday: computer scientist Peter Chen
 introduced the entity-relationship model in a 1976 paper, "The
-Entity-Relationship Model, Toward a Unified View of Data," arguing
+Entity-Relationship Model: Toward a Unified View of Data," arguing
 that designers should describe a system's *meaning*, its entities
 and relationships, before committing to any particular database
 structure. Half a century later, his diagrams (in various visual
@@ -116,7 +116,7 @@ erDiagram
     customers {
         int id PK
         text name
-        text email
+        text email UK
     }
     orders {
         int id PK
@@ -144,7 +144,7 @@ CREATE TABLE orders (
   status      TEXT NOT NULL
 );
 INSERT INTO customers VALUES (1, 'Ada', 'ada@example.com');
-INSERT INTO orders VALUES (101, 1, DATE '2025-02-01', 'placed');`}
+INSERT INTO orders VALUES (101, 1, DATE '2025-02-01', 'pending');`}
   starterCode={`SELECT
   c.name,
   o.id AS order_id,

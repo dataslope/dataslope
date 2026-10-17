@@ -71,7 +71,7 @@ const Q_P = cdf(Q_X);
 const P_TARGET = 0.9;
 const P_X = ppf(P_TARGET);
 
-export const caption = `Two questions that turn out to be one object. "What fraction of values fall below ${Q_X}?" is the CDF, and the answer is ${P_X.toFixed(0)}%; "what value has ${P_TARGET * 100}% below it?" is the PPF, and the answer is ${(Q_P * 100).toFixed(0)}. The right panel is the left one reflected about the diagonal.`;
+export const caption = `Two questions that turn out to be one object. "What fraction of values fall below ${Q_X}?" is the CDF, and the answer is ${(Q_P * 100).toFixed(0)}%; "what value has ${P_TARGET * 100}% below it?" is the PPF, and the answer is ${P_X.toFixed(0)}. The right panel is the left one reflected about the diagonal.`;
 
 export function render() {
   return plot({

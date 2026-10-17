@@ -46,7 +46,7 @@ const GROUPS = Array.from({ length: DISTRICTS }, (_, g) => {
   const income = 26 + g * 8.5 + WOBBLE_X[g];
   const turnout = 44 + g * 6.2 + WOBBLE_Y[g];
   const xs = normalSamples(PER, income, 4.4, 1000 + g * 53);
-  const ys = normalSamples(PER, turnout, 4.6, 5000 + g * 71);
+  const ys = normalSamples(PER, turnout, 4.6, 5013 + g * 71);
   return {
     g,
     color: SERIES[g % SERIES.length],
@@ -70,6 +70,19 @@ const corr = (rows, kx, ky) => {
     dy += (d[ky] - my) ** 2;
   }
   return n / Math.sqrt(dx * dy);
+};
+
+/** Least-squares slope of turnout on income inside one district. */
+const slopeWithin = (rows) => {
+  const mx = mean(rows.map((d) => d.x));
+  const my = mean(rows.map((d) => d.y));
+  let sxy = 0;
+  let sxx = 0;
+  for (const d of rows) {
+    sxy += (d.x - mx) * (d.y - my);
+    sxx += (d.x - mx) ** 2;
+  }
+  return sxy / sxx;
 };
 
 const R_GROUP = corr(GROUPS.map((d) => ({ x: d.meanX, y: d.meanY })), "x", "y");
@@ -117,18 +130,19 @@ export function render() {
           fillOpacity: 0.45,
         },
       ),
-      // The flat within-district slopes, drawn so "about flat" is visible
+      // Each district's own fitted slope, drawn so "about flat" is visible
       // rather than asserted.
-      ...GROUPS.map((d) =>
-        Plot.link([{}], {
+      ...GROUPS.map((d) => {
+        const b = slopeWithin(d.people);
+        return Plot.link([{}], {
           x1: IND.px(d.meanX - 7),
           x2: IND.px(d.meanX + 7),
-          y1: IND.py(d.meanY),
-          y2: IND.py(d.meanY),
+          y1: IND.py(d.meanY - 7 * b),
+          y2: IND.py(d.meanY + 7 * b),
           stroke: d.color,
           strokeWidth: 2,
-        }),
-      ),
+        });
+      }),
       ...[AGG, IND].map((p, k) =>
         Plot.text([{}], {
           x: (p.left + p.right) / 2,

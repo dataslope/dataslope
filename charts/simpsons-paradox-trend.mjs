@@ -76,8 +76,9 @@ const segment = ({ slope, intercept }, x1, x2) => [
 const BAND_FITS = BANDS.map((band) => {
   const rows = POINTS.filter((p) => p.key === band.key);
   const xs = rows.map((r) => r.x);
-  const line = segment(fit(rows), Math.min(...xs), Math.max(...xs));
-  return { band, line: line.map((p) => ({ ...p, key: band.key, color: band.color })) };
+  const bandFit = fit(rows);
+  const line = segment(bandFit, Math.min(...xs), Math.max(...xs));
+  return { band, slope: bandFit.slope, line: line.map((p) => ({ ...p, key: band.key, color: band.color })) };
 });
 
 const X_MIN = Math.min(...POINTS.map((p) => p.x));
@@ -85,10 +86,15 @@ const X_MAX = Math.max(...POINTS.map((p) => p.x));
 const POOLED = fit(POINTS);
 const POOLED_LINE = segment(POOLED, X_MIN, X_MAX);
 
-const WITHIN_PER_HOUR = (WITHIN_SLOPE * 60).toFixed(1);
+/** The caption quotes the fitted band lines, not WITHIN_SLOPE: 26 noisy points
+ *  a band recover the generating slope only roughly, and the reader is looking
+ *  at the fits. */
+const BAND_FALLS = BAND_FITS.map((b) => -b.slope * 60);
+const FALL_LO = Math.min(...BAND_FALLS).toFixed(1);
+const FALL_HI = Math.max(...BAND_FALLS).toFixed(1);
 const POOLED_PER_HOUR = (POOLED.slope * 60).toFixed(1);
 
-export const caption = `Same rows, two fits, opposite signs. Inside every age band the line falls by about ${Math.abs(Number(WITHIN_PER_HOUR))} mmHg per extra hour of weekly exercise; fit one line to all of them and it *rises* by about ${POOLED_PER_HOUR}. Nothing is wrong with either calculation. Age drives both variables, so the pooled line is mostly measuring the staircase the bands sit on rather than the effect of exercise. A single slope over pooled groups is only a causal claim if you can rule out a variable that moves the groups apart, and here you cannot.`;
+export const caption = `Same rows, two fits, opposite signs. Inside every age band the line falls, by between ${FALL_LO} and ${FALL_HI} mmHg per extra hour of weekly exercise; fit one line to all of them and it *rises* by about ${POOLED_PER_HOUR}. Nothing is wrong with either calculation. Age drives both variables, so the pooled line is mostly measuring the staircase the bands sit on rather than the effect of exercise. A single slope over pooled groups is only a causal claim if you can rule out a variable that moves the groups apart, and here you cannot.`;
 
 export function render() {
   return plot({

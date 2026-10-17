@@ -117,7 +117,7 @@ erDiagram
     users ||--o{ posts : writes
     users ||--o{ comments : writes
     posts ||--o{ comments : receives
-    comments ||--o{ comments : replies
+    comments |o--o{ comments : replies
     posts ||--o{ post_tags : has
     tags ||--o{ post_tags : labels
     users {

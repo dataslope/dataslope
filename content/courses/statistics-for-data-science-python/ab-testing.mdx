@@ -591,14 +591,14 @@ Pre-commit to a sample size or use a method designed for continuous monitoring.`
 />
 
 <MultipleChoice
-  markdown={`With 5 million users, a new layout shows a statistically significant lift in conversion of 0.02 percentage points (from 8.00% to 8.02%). The 95% CI is [0.005pp, 0.035pp]. Should you ship?
+  markdown={`With 50 million users, 25 million per arm, a new layout shows a statistically significant lift in conversion of 0.02 percentage points (from 8.00% to 8.02%). The 95% CI is [0.005pp, 0.035pp]. Should you ship?
 
-- No, because the result must be a false positive
-  > With 5 million users a 0.02pp effect can be entirely real; it is just too small to matter, which is different from being a false positive.
+- No, because a lift this small on this many users must be a false positive
+  > With 50 million users a 0.02pp effect can be entirely real; it is just too small to matter, which is different from being a false positive.
 - Yes, it's statistically significant, and significance means ship
   > Significance only certifies the effect is distinguishable from zero. The magnitude here is tiny, and significance alone is not a shipping criterion.
-- [o] Probably not on this alone, the effect is real but so small it likely isn't worth the cost; weigh the tiny effect size against the rollout cost
-  > A huge sample makes microscopic effects significant; the CI confirms the lift is real but trivially small, so practical importance should drive the decision.
+- [o] Probably not: the lift is real but likely too small to be worth it
+  > A huge sample makes microscopic effects significant; the CI confirms the lift is real but trivially small, so weigh it against the rollout cost and let practical importance drive the decision.
 - Yes, because the confidence interval excludes zero
   > Excluding zero confirms significance, but the entire interval sits at a trivially small magnitude, so it does not justify shipping by itself.
 

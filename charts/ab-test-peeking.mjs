@@ -14,9 +14,6 @@
  */
 import { Plot, plot, normalSamples, ACCENT, GUIDE, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 
-export const title =
-  "A p-value recomputed after every hundred visitors in a test where both arms are identical. It wanders across the whole range and dips below the 0.05 line several times before the planned sample size is reached.";
-
 const PLANNED = 8000;
 const STEP = 100;
 const ALPHA = 0.05;
@@ -48,9 +45,13 @@ for (let n = STEP; n <= PLANNED; n += STEP) {
  *  team watching the dashboard would have stopped and declared a winner. */
 const CROSSINGS = rows.filter((r, i) => r.p < ALPHA && (i === 0 || rows[i - 1].p >= ALPHA)).length;
 const FINAL = rows.at(-1);
+const P_MAX = Math.max(...rows.map((r) => r.p));
+const TIMES = ["once", "twice", "three times", "four times"][CROSSINGS - 1] ?? `${CROSSINGS} times`;
+
+export const title = `A p-value recomputed after every hundred visitors in a test where both arms are identical. It wanders between nearly zero and ${P_MAX.toFixed(2)} and dips below the ${ALPHA} line ${TIMES} before the planned sample size is reached.`;
 
 export const caption =
-  `Both arms are identical: there is nothing to find. The p-value still dips below ${ALPHA} ${CROSSINGS} ${CROSSINGS === 1 ? "time" : "times"} on the way, and each dip is a moment someone watching the dashboard would have stopped and shipped. At the planned ${PLANNED.toLocaleString()} visitors it reads ${FINAL.p.toFixed(2)}. Looking once is a 5% error rate; looking continuously is not a 5% error rate.`;
+  `Both arms are identical: there is nothing to find. The p-value still dips below ${ALPHA} ${TIMES} on the way, and each dip is a moment someone watching the dashboard would have stopped and shipped. At the planned ${PLANNED.toLocaleString()} visitors it reads ${FINAL.p.toFixed(2)}. Looking once is a 5% error rate; looking continuously is not a 5% error rate.`;
 
 export function render() {
   return plot({
