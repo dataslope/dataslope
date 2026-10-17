@@ -264,7 +264,11 @@ for i in range(n_intervals):
         )
     )
 fig.add_vline(
-    x=MU_TRUE, line_dash="dash", line_color="black", annotation_text="true mu = 100"
+    x=MU_TRUE,
+    line_dash="dash",
+    line_color="black",
+    line_width=2,
+    annotation_text="true mu = 100",
 )
 fig.update_layout(
     title=f"100 separate 95% CIs, {n_miss} missed the true mu (red)",

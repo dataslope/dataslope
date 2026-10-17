@@ -206,6 +206,7 @@ fig.add_hline(
     y=70,
     line_dash="dash",
     line_color="gray",
+    line_width=2,
     annotation_text="70 years",
     annotation_position="top right",
 )
@@ -213,6 +214,7 @@ fig.add_vline(
     x=10000,
     line_dash="dash",
     line_color="gray",
+    line_width=2,
     annotation_text="$10k GDP",
     annotation_position="top",
 )
@@ -226,6 +228,11 @@ fig.show()
 Reference lines split the chart into *meaningful regions*, in this
 case, four quadrants of "rich/poor × high/low life expectancy."
 The eye instantly reads which quadrant each country falls in.
+
+Keep the `line_width` whenever the chart uses `template="simple_white"`.
+That template draws shapes with no outline by default, which suits the
+shaded bands of `add_hrect()` and `add_vrect()` but leaves a reference
+line invisible: you get its annotation floating over nothing.
 
 ## Captions: the fine print
 
