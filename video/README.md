@@ -402,7 +402,8 @@ where speech starts after the pause and moves the first letter's time there,
 and `npm run narrate` prints each beat it moved by more than 80 ms. "Speech",
 not the first sound: a breath clears a plain loudness bar, and Estimation's
 `rate-se` once cued 0.23 s early on one. So `scripts/lib/onset.mjs` finds the
-first voiced frame (-20 dB from the take's loudest) and walks back over the
+first voiced frame (-27 dB from the take's loudest, set against all 906
+recorded beats) and walks back over the
 word's own soft attack (-30 dB) for at most 120 ms.
 
 **What is committed.** Everything a render needs, and the master it came
