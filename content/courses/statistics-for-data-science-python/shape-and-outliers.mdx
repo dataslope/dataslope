@@ -125,16 +125,17 @@ fig.update_layout(showlegend=False)
 fig.show()
 
 print(f"Mean of the mixed column: {mixed.mean():.1f} cm")
-print("...which lands in the VALLEY between the peaks, describing nobody.")
+print("...which lands in the VALLEY between the peaks, where heights are sparse.")
 `,
     },
   ]}
 />
 
 <Callout type="danger" title="A single center can describe nobody">
-The mean of that bimodal column falls in the empty valley *between* the
-two humps, no actual person is near it, exactly like the "average of a
-teacher and a billionaire." Bimodality is the clearest case where
+The mean of that bimodal column falls in the valley *between* the two
+humps, where people are sparse: 83 of the 3,000 heights sit within 1 cm
+of it, against about 200 within 1 cm of either peak. It is a milder
+version of the "average of a teacher and a billionaire." Bimodality is the clearest case where
 summarizing before plotting misleads you. When a mean lands where the
 data is sparse, suspect mixed groups.
 </Callout>
@@ -560,10 +561,10 @@ Skew is named for the tail's direction, and the mean always gets dragged toward 
   > The IQR rule is built on the quartiles (Q1 and Q3); the explanation is the std-inflation affecting the z-rule, not anything about the median.
 - The z-score rule only works on integer data
   > The z-score is defined for any numeric data regardless of whether it's integer or continuous; data type isn't the issue.
-- The IQR rule is simply more sensitive by design and always flags more
+- The IQR rule is simply more sensitive by design and always flags more points
   > It isn't a fixed "always more" relationship; the difference here comes specifically from how skew affects each rule's inputs.
-- [o] The extreme high values inflate the mean and standard deviation that the z-score uses, raising the |z| > 3 threshold so those very points fall short of it
-  > Because the outliers pull up the std the z-rule depends on, the cutoff stretches outward and can fail to flag the points that created the stretch, while the quartile-based IQR fences stay put.
+- [o] The extremes inflate the std, so the cutoff moves past milder outliers
+  > In this lesson's example the two planted extremes, 120 and 200, pull the std from about 9 to about 17, which moves the |z| > 3 cutoff from about 48 to about 73. The z-rule still catches those two, but 54.6 and 61.7, which the IQR fences flag, now fall short of it. The quartile-based fences stay put.
 
 This is why the robust, quartile-based fences are preferred for skewed data.`}
 />

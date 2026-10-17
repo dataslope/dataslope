@@ -76,7 +76,8 @@ print(f"That is FAR above the 5% you thought you were risking.")
 />
 
 That inflation is the heart of the **multiple comparisons problem**,
-we'll formalize it in *Errors and Power*. ANOVA's job is to ask the
+which we met in *P-values* and return to in *Statistical Fallacies*.
+ANOVA's job is to ask the
 **single, global** question first, *"is there any difference among these
 groups at all?"*, with one test at one α, so your false-positive rate
 stays where you set it.
@@ -85,8 +86,8 @@ stays where you set it.
 Testing every pair separately quietly inflates your overall false-positive
 rate above α. With enough groups you're almost *guaranteed* a spurious
 "significant" result. Run **one** ANOVA for the overall question; only if
-it's significant do you drill into pairs (with a correction). More on
-controlling this in *Errors and Power*.
+it's significant do you drill into pairs (with a correction). The two
+standard corrections, Bonferroni and Benjamini-Hochberg, are in *P-values*.
 </Callout>
 
 ### The F-statistic: between-group vs within-group variance
@@ -659,7 +660,7 @@ A significant ANOVA is the start of the investigation, not the end; post-hoc com
   signal over noise, and a large F (small p) means at least one group
   differs.
 - Don't replace ANOVA with **many t-tests**, that inflates false
-  positives (*Errors and Power*). And ANOVA is an **omnibus** test: it
+  positives (*P-values*). And ANOVA is an **omnibus** test: it
   says *something* differs, not *which* (use post-hoc tests).
 - **Chi-square** handles **categorical** data: **independence** (two
   variables, via a `crosstab()` + `chi2_contingency()`) and **goodness-of-fit**
