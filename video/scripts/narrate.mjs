@@ -49,6 +49,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { speechOnset } from "./lib/onset.mjs";
 
 const OUTPUT_FORMAT = "mp3_44100_128";
 const API = "https://api.elevenlabs.io/v1";
@@ -393,7 +394,6 @@ function cutTake(take, k) {
   const frame = Math.round(0.01 * SAMPLE_RATE);
   let loudest = 0;
   for (let t = 0; t + frame <= samples.length; t += frame) loudest = Math.max(loudest, rms(samples, t, frame));
-  const sounding = (t) => rms(samples, Math.round(t * SAMPLE_RATE), frame) >= 0.03 * loudest;
 
   const first = spans.map(([s, e]) => letterAt(text, s, e, false));
   const end = spans.map(([, e]) => ends[e - 1]);
@@ -430,14 +430,14 @@ function cutTake(take, k) {
     }
     return at;
   });
-  // Where each beat's first word really starts: the first sound after the
+  // Where each beat's first word really starts: the first speech after the
   // cut. The character times put it up to 0.3 s late after an audio tag
   // (the tag is given time the voice spends on the word), so the sound
-  // decides, and the first letter is moved to it.
+  // decides, and the first letter is moved to it. "Speech", not "sound": a
+  // breath before the word clears a plain loudness bar (lib/onset.mjs).
   const onset = spans.map((_, i) => {
     const from = i === 0 ? 0 : cuts[i - 1];
-    for (let t = from; t < starts[first[i]] + 0.3; t += 0.01) if (sounding(t)) return t;
-    return starts[first[i]];
+    return speechOnset(samples, SAMPLE_RATE, from, starts[first[i]] + 0.3, loudest) ?? starts[first[i]];
   });
   spans.forEach(([s], i) => {
     const moved = onset[i] - starts[first[i]];

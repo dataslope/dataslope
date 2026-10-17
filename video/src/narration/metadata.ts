@@ -12,8 +12,9 @@ export type NarratedProps = {
 };
 
 /** The alignment file for a script, or null when no audio exists yet. Until
- *  there is audio, the browser logs this fetch as a 404; that is expected. */
-async function loadAlignment(
+ *  there is audio, the browser logs this fetch as a 404; that is expected.
+ *  Exported for a video that times several scripts (the merged Unit 5). */
+export async function loadAlignment(
   scriptId: string,
 ): Promise<NarrationAlignmentFile | null> {
   const res = await fetch(staticFile(`narration/${scriptId}/alignment.json`));

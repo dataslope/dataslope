@@ -11,8 +11,10 @@
  *   npm run check:motion -- describing-data --max 2.5       # stricter
  *
  * A frame counts as still when under 0.05% of its pixels change from the one
- * before (sampled at 4 fps, at 480x270 in grey), which a spot illustration's
- * gentle bob stays under: it is not motion anyone notices. Each still stretch
+ * before and under 0.01% change a lot (sampled at 4 fps, at 480x270, in
+ * colour; lib/motion.mjs says why both). A pale highlight sweep and a thin
+ * line drawing on both count as motion; a spot illustration's gentle bob
+ * mostly does not, and is not motion anyone notices. Each still stretch
  * is listed with what the narrator is saying over it, so you know where to
  * add something: the next part of a figure, a highlight on the phrase being
  * spoken, a value counting, an annotation arriving, a slow drift.
@@ -24,11 +26,12 @@
  *
  * Needs a Node that strips TypeScript types (22.18 or later), like cues.mjs.
  */
-import { existsSync, mkdirSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 import { videoNames } from "./lib/audio.mjs";
 import { bundleVideo } from "./lib/bundle.mjs";
+import { videoTimeline } from "./lib/video-timeline.mjs";
 import { frameChanges, staticSpans } from "./lib/motion.mjs";
 
 const VIDEO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -74,16 +77,9 @@ if (!existsSync(file)) {
   process.exit(1);
 }
 
-// What the narrator is saying when, to say where each still stretch falls.
-let beats = [];
-const scriptFile = path.join(VIDEO_ROOT, "src", "videos", folder, "script.ts");
-if (existsSync(scriptFile)) {
-  const { script } = await import(pathToFileURL(scriptFile).href);
-  const { buildTimeline } = await import(pathToFileURL(path.join(VIDEO_ROOT, "src", "narration", "timeline.ts")).href);
-  const alignmentPath = path.join(VIDEO_ROOT, "public", "narration", script.id, "alignment.json");
-  const alignment = existsSync(alignmentPath) ? JSON.parse(readFileSync(alignmentPath, "utf8")) : null;
-  beats = buildTimeline(script, alignment).beats;
-}
+// What the narrator is saying when, to say where each still stretch falls
+// (a merged video's beats are "<part>/<beat>").
+const beats = (await videoTimeline(folder))?.timeline.beats ?? [];
 const saying = (from, to) => {
   const over = beats.filter((b) => b.end > from && b.start < to);
   if (!over.length) return "(no narration)";

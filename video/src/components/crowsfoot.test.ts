@@ -1,7 +1,7 @@
 // Run with `npm test` (node --test; Node strips the types).
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { CARDINALITIES, endSegment, MARKER, markerLength, relationEnd } from "./crowsfoot.ts";
+import { CARDINALITIES, endSegment, endSymbols, MARKER, markerLength, relationEnd } from "./crowsfoot.ts";
 
 const close = (a: number, b: number) => Math.abs(a - b) < 1e-9;
 
@@ -47,4 +47,23 @@ test("endSegment measures the straight stretch each marker sits on", () => {
   const pts = [[0, 0], [40, 0], [40, 100], [300, 100]] as const;
   assert.equal(endSegment(pts, "start"), 40);
   assert.equal(endSegment(pts, "end"), 260);
+});
+
+test("endSymbols points at the symbols the marker drew", () => {
+  const tip: [number, number] = [500, 200];
+  const from: [number, number] = [100, 200];
+  for (const kind of CARDINALITIES) {
+    const m = relationEnd(tip, from, kind);
+    const s = endSymbols(tip, from, kind);
+    // Every symbol centre is on the line, inside the marker's reach.
+    for (const p of [s.near, s.far].filter((p) => p !== undefined)) {
+      assert.ok(close(p[1], 200), `${kind}: off the line`);
+      assert.ok(p[0] <= 500 && p[0] >= 500 - markerLength(kind), `${kind}: outside the marker`);
+    }
+    if (s.far) assert.ok(s.far[0] < s.near[0], `${kind}: the minimum sits farther out than the maximum`);
+    // A circle's centre is the far symbol whenever there is one.
+    if (m.rings.length) assert.deepEqual(s.far, m.rings[0].c);
+  }
+  assert.equal(endSymbols(tip, from, "many").far, undefined);
+  assert.ok(close(endSymbols(tip, from, "exactly-one").near[0], 500 - 0.55 * MARKER));
 });

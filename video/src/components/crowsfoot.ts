@@ -82,6 +82,23 @@ export function relationEnd(tip: Pt, from: Pt, kind: Cardinality, size = MARKER)
   return { lines, rings };
 }
 
+/**
+ * Where an end's two symbols sit, for a scene that points at one as it is
+ * read ("nearest the box is the most, farther out the least"): `near`, the
+ * maximum (the foot's middle, or the inner bar), and `far`, the minimum (the
+ * circle, or the outer bar). A bare "many" has no minimum, so no `far`.
+ * Same arguments as relationEnd(), from the same layout, so a highlight lands
+ * on the symbol the marker drew.
+ */
+export function endSymbols(tip: Pt, from: Pt, kind: Cardinality, size = MARKER): { near: Pt; far?: Pt } {
+  const len = Math.hypot(tip[0] - from[0], tip[1] - from[1]) || 1;
+  const back = (d: number): Pt => [tip[0] - ((tip[0] - from[0]) / len) * d * size, tip[1] - ((tip[1] - from[1]) / len) * d * size];
+  const l = LAYOUT[kind];
+  const near = back(l.foot ? 0.5 : l.bars[0]);
+  const farAt = l.ring ?? (l.foot ? l.bars[0] : l.bars[1]);
+  return farAt === undefined ? { near } : { near, far: back(farAt) };
+}
+
 /** The length of a polyline's first or last straight segment. */
 export function endSegment(points: readonly Pt[], end: "start" | "end"): number {
   const [a, b] = end === "start" ? [points[0], points[1]] : [points[points.length - 1], points[points.length - 2]];

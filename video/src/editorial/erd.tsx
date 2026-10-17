@@ -226,17 +226,23 @@ const pointsAttr = (pts: readonly Pt[]) => pts.map(([x, y]) => `${x.toFixed(1)},
  * A relationship: a line through `points`, from one entity's edge (the first
  * point) to another's (the last), with a crow's-foot marker at each end. The
  * line draws itself over `dur` frames from `at`; the `from` marker arrives
- * with it and the `to` marker as the line reaches it. Keep the line
+ * with it and the `to` marker as the line reaches it, unless `fromAt` or
+ * `toAt` cue an end to its own word (a scene that reads each end aloud). An
+ * end given `null` stays bare: a line whose cardinality is the question. Keep the line
  * orthogonal, and its first and last segments straight for at least the
  * marker's length: a marker built across a corner is reported, and fails
  * `npm run check:frames`.
  */
 export const Relation: React.FC<{
   points: readonly Pt[];
-  from: Cardinality;
-  to: Cardinality;
+  /** Each end's marker, or null for a bare end. */
+  from: Cardinality | null;
+  to: Cardinality | null;
   at: number;
   dur?: number;
+  /** When each end's marker builds, if not with the line. */
+  fromAt?: number;
+  toAt?: number;
   /** The line's ink: INK by default, or the key blue for a key link. */
   color?: string;
   width?: number;
@@ -250,13 +256,14 @@ export const Relation: React.FC<{
   name?: string;
   dim?: number;
   out?: number;
-}> = ({ points, from, to, at, dur = 18, color = INK, width = 2.4, size = MARKER, label, labelAt, labelPos, name, dim, out }) => {
+}> = ({ points, from, to, at, dur = 18, fromAt, toAt, color = INK, width = 2.4, size = MARKER, label, labelAt, labelPos, name, dim, out }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, dur);
   const gone = out === undefined ? 0 : ease(frame, out, 10);
   if (p <= 0 || gone >= 1 || points.length < 2) return null;
 
   for (const [end, kind] of [["start", from], ["end", to]] as const) {
+    if (kind === null) continue;
     const have = endSegment(points, end);
     const need = markerLength(kind, size) + 6;
     if (have < need) {
@@ -267,10 +274,10 @@ export const Relation: React.FC<{
   }
 
   const dimmed = dim === undefined ? 0 : ease(frame, dim, 14) * 0.55;
-  const fromIn = ease(frame, at, 8);
-  const toIn = ease(frame, at + dur * 0.8, 8);
-  const marker = (tip: Pt, back: Pt, kind: Cardinality, o: number) => {
-    if (o <= 0) return null;
+  const fromIn = ease(frame, fromAt ?? at, 8);
+  const toIn = ease(frame, toAt ?? at + dur * 0.8, 8);
+  const marker = (tip: Pt, back: Pt, kind: Cardinality | null, o: number) => {
+    if (o <= 0 || kind === null) return null;
     const m = relationEnd(tip, back, kind, size);
     return (
       <g opacity={o}>

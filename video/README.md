@@ -146,7 +146,11 @@ Shared building blocks:
   (`src/components/crowsfoot.ts`: exactly one, zero or one, one or many, zero
   or many, many). Every ERD is drawn with them, so the notation reads the
   same in every video, and `npm run check:frames` fails an end built across
-  a corner of its line. The `ErdKit` composition under Assets shows the kit.
+  a corner of its line. Keys are `PK`, `FK`, `UK` (an alternate key) or a
+  pair. A scene that reads each end aloud cues it with `fromAt`/`toAt`, an
+  end given `null` stays bare (a line whose cardinality is the question), and
+  `endSymbols()` says where an end's maximum and minimum sit, to point at one
+  as it is read. The `ErdKit` composition under Assets shows the kit.
 
 Register a new composition in `src/Root.tsx` with
 `defaultProps={EDITORIAL_DEFAULTS}` and
@@ -393,9 +397,13 @@ character times. Those are only good to about 80 ms, and worse in two
 places: an audio tag takes time from the word after it (in CPointers the
 alignment gave `[curious]` the first 0.26 s of "So", and the beat's audio
 started over the end of the previous sentence), and a word that opens on
-"t", "f" or "s" is timed from its vowel, up to 0.17 s late. The cut finds the
-first sound after the pause and moves the first letter's time there, and
-`npm run narrate` prints each beat it moved by more than 80 ms.
+"t", "f" or "s" is timed from its vowel, up to 0.17 s late. The cut finds
+where speech starts after the pause and moves the first letter's time there,
+and `npm run narrate` prints each beat it moved by more than 80 ms. "Speech",
+not the first sound: a breath clears a plain loudness bar, and Estimation's
+`rate-se` once cued 0.23 s early on one. So `scripts/lib/onset.mjs` finds the
+first voiced frame (-20 dB from the take's loudest) and walks back over the
+word's own soft attack (-30 dB) for at most 120 ms.
 
 **What is committed.** Everything a render needs, and the master it came
 from:
@@ -627,15 +635,40 @@ stay for a video that does.
 npm run typecheck
 npm run lint
 npm test              # timing, scene cuts, word cues, voices, arrowheads
+npm run check:cues    # every word cue says which occurrence it means (no render)
 npm run check:frames  # a frame every half second at --scale=2 (about a minute):
                       # illustrations sharp at 4K, arrowheads on straight ends
 npm run check:sync -- <video>   # a voiced video: every beat starts where its cue says
 npm run check:mix -- <video>    # a video with sound effects: how far under the voice they sit
+npm run check:motion -- <video> # the picture never holds still for 3 s (renders a half-size preview)
 ```
 
-Both audio checks take the composition (`ThinkingStatistically`) or the
-folder name that `narrate` and `cues` take (`thinking-statistically`), and
-write their renders to `out/`. They are plain Node (`scripts/lib/audio.mjs`),
+`check:cues` reads every `n.word(beat, phrase)` in the scenes and fails one
+whose beat says the phrase more than once with no `nth`: the cue takes the
+first, which is not always the one meant (Probability's "a hundred" landed on
+"Walk a hundred thousand", three seconds early). Give `{ nth: 1 }` when the
+first is right. It also fails a cue whose beat never says its phrase. A cue
+built from a variable is not visible to it, so `useNarration` also warns at
+render time and `check:frames` lists those warnings.
+
+`check:motion` and `check:sync` read a video's timeline the way its
+composition plays it (`scripts/lib/video-timeline.mjs`), so the merged Unit 5
+(`sampling`) is checked against its five parts' own cues, placed where it
+plays them, and its still stretches are labelled `<part>/<beat>`.
+
+`check:motion` keeps the half-size preview it renders, with sound, as
+`out/<id>-preview.mp4`; `--file` checks one already rendered. A frame is still
+when under 0.05% of its pixels change and under 0.01% change a lot, compared
+in colour (`scripts/lib/motion.mjs`): a pale highlight sweep moves hue more
+than brightness, and a thin line drawing on changes few pixels but each by a
+lot, so both count as motion. Each still stretch it lists comes with the beats
+spoken over it, which is where to add the next part of a figure, a highlight
+on the phrase, a value counting or an annotation arriving.
+
+The three render checks take the composition (`Stats-1-ThinkingStatistically`),
+its old name (`ThinkingStatistically`), or the folder name that `narrate` and
+`cues` take (`thinking-statistically`), and write their renders to `out/`. The
+audio checks are plain Node (`scripts/lib/audio.mjs`),
 with no ffmpeg filters and no Python, so they run the same on Windows. The
 loudness and pause detection are checked against ffmpeg's `ebur128` and
 `silencedetect` (the same pauses to 1 ms) and pinned by

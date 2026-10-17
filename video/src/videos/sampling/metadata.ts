@@ -1,8 +1,8 @@
 import type { CalculateMetadataFunction } from "remotion";
-import { staticFile } from "remotion";
 import type { EditorialProps } from "../../editorial/Page";
+import { loadAlignment } from "../../narration/metadata";
 import { assertUniqueBeatIds, buildTimeline } from "../../narration/timeline";
-import type { NarrationAlignmentFile, Timeline } from "../../narration/types";
+import type { Timeline } from "../../narration/types";
 import { mergeTimelines, planParts } from "./plan";
 import { PARTS } from "./script";
 
@@ -12,14 +12,6 @@ export type SamplingProps = EditorialProps & {
   /** Filled in by samplingMetadata; leave it out of defaultProps. */
   parts?: Timeline[] | null;
 };
-
-/** A part's alignment file, as narratedMetadata loads it (null before any
- *  audio exists, when the part falls back to estimated timing). */
-async function loadAlignment(scriptId: string): Promise<NarrationAlignmentFile | null> {
-  const res = await fetch(staticFile(`narration/${scriptId}/alignment.json`));
-  if (!res.ok) return null;
-  return (await res.json()) as NarrationAlignmentFile;
-}
 
 /**
  * `calculateMetadata` for the merged video: times each part exactly as its

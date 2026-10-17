@@ -22,12 +22,10 @@
  *
  * Needs a Node that strips TypeScript types (22.18 or later), like cues.mjs.
  */
-import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
 import { readWav, renderAudio, silences, videoNames } from "./lib/audio.mjs";
+import { videoTimeline } from "./lib/video-timeline.mjs";
 
-const VIDEO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const args = process.argv.slice(2);
 const flag = (name) => {
   const i = args.indexOf(name);
@@ -40,19 +38,18 @@ if (!args[0]) {
   process.exit(1);
 }
 const { id, folder: name } = videoNames(args[0]);
-const folder = path.join(VIDEO_ROOT, "src", "videos", name);
-if (!existsSync(path.join(folder, "script.ts"))) {
-  console.error(`No script for ${id} (looked in ${path.relative(VIDEO_ROOT, folder)}).`);
+// A merged video (Unit 5) is checked against its parts' own cues, placed
+// where it plays them; its beats are "<part>/<beat>".
+const video = await videoTimeline(name);
+if (!video) {
+  console.error(`No script for ${id} (looked in src/videos/${name}).`);
   process.exit(1);
 }
-const { script } = await import(pathToFileURL(path.join(folder, "script.ts")).href);
-const { buildTimeline } = await import(pathToFileURL(path.join(VIDEO_ROOT, "src", "narration", "timeline.ts")).href);
-const alignmentPath = path.join(VIDEO_ROOT, "public", "narration", script.id, "alignment.json");
-if (!existsSync(alignmentPath)) {
-  console.log(`${id} has no voice-over yet (no ${path.relative(VIDEO_ROOT, alignmentPath)}), so there is nothing to line up.`);
+if (!video.voiced) {
+  console.log(`${id} has no voice-over yet (no public/narration/${video.scripts[0].id}/alignment.json), so there is nothing to line up.`);
   process.exit(0);
 }
-const timeline = buildTimeline(script, JSON.parse(readFileSync(alignmentPath, "utf8")));
+const { timeline } = video;
 const stale = timeline.beats.filter((b) => b.source !== "alignment").map((b) => b.id);
 if (stale.length) console.log(`Not voiced (timed from the estimate, skipped): ${stale.join(", ")}`);
 
