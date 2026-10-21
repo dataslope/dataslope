@@ -2150,6 +2150,13 @@
       "matchDb": 55,
       "servedSha": "34ffde607589f82a9d005d04c1526f7076f65f45987481327ebc18d65a9255d6"
     },
+    "interview-analytics-engineer-ai-and-the-semantic-layer": {
+      "run": "2026-10-ai-interview-v2",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-ai-interview-v2/interview-analytics-engineer-ai-and-the-semantic-layer/v1/cutout.png",
+      "matchDb": 55,
+      "servedSha": "0030cc01f5e895074d7cf30eac61b9585219b3418c3ec5135df5ca2d7c8768f1"
+    },
     "interview-analytics-engineer-data-warehousing": {
       "run": "2026-08-unify-v1",
       "variant": 1,
@@ -2205,6 +2212,13 @@
       "original": "illustrations/2026-08-animals-v2/interview-analytics-engineer-thumbnail/v1/original.png",
       "matchDb": 54,
       "servedSha": "bd6da3e500c4b2ebaa5701e20d62fa5a6026b18c43d6850334941ddf5ed7b143"
+    },
+    "interview-backend-engineer-ai-assisted-coding": {
+      "run": "2026-10-ai-interview-v2",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-ai-interview-v2/interview-backend-engineer-ai-assisted-coding/v1/cutout.png",
+      "matchDb": 53,
+      "servedSha": "8947cb2c1e4d1990af3d330fcadc75b2226e5e0cfe28571465861f99dc89281e"
     },
     "interview-backend-engineer-algorithms": {
       "run": "2026-08-animals-v1",
@@ -2293,6 +2307,13 @@
       "original": "illustrations/2026-08-unify-v1/interview-data-analyst-advanced-sql/v1/original.png",
       "matchDb": 54,
       "servedSha": "4adbae12c0735fb43774d7e4a42fcbc43cc99fc92cee6cd3a4e8a06ccca4fbff"
+    },
+    "interview-data-analyst-ai-assisted-analysis": {
+      "run": "2026-10-ai-interview-v2",
+      "variant": 2,
+      "cutout": "illustrations/2026-10-ai-interview-v2/interview-data-analyst-ai-assisted-analysis/v2/cutout.png",
+      "matchDb": 54,
+      "servedSha": "c4400d81d0c0af8fafa4eebafb31ca9210c48a9820e0917e40279f672da48e9c"
     },
     "interview-data-analyst-data-visualization": {
       "run": "2026-08-unify-v1",
@@ -2398,6 +2419,13 @@
       "matchDb": 55,
       "servedSha": "84305ec100ec39439b6d1c4b22a21bcbd9bb6e3816bd6471301d945f55aa6ca6"
     },
+    "interview-data-engineer-pipelines-for-ai": {
+      "run": "2026-10-ai-interview-v2",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-ai-interview-v2/interview-data-engineer-pipelines-for-ai/v1/cutout.png",
+      "matchDb": 55,
+      "servedSha": "625b9169af7b4d38ebf6765c59475ebae80961633109ddf5be40aaf78209e157"
+    },
     "interview-data-engineer-python": {
       "run": "2026-08-animals-v1",
       "variant": 1,
@@ -2445,6 +2473,13 @@
       "original": "illustrations/2026-08-animals-v1/interview-data-scientist-experimentation/v1/original.png",
       "matchDb": 55,
       "servedSha": "045d644f3e7e02d28b0f35ae71967784415d03a3a28ade27051a349d0c391d19"
+    },
+    "interview-data-scientist-llm-evaluation": {
+      "run": "2026-10-ai-interview-v2",
+      "variant": 2,
+      "cutout": "illustrations/2026-10-ai-interview-v2/interview-data-scientist-llm-evaluation/v2/cutout.png",
+      "matchDb": 55,
+      "servedSha": "cbdca58ea32d5baa905ade7e09428523b2ef1398b4482f753f827260c79e8561"
     },
     "interview-data-scientist-machine-learning": {
       "run": "2026-08-animals-v2",
@@ -2525,6 +2560,13 @@
       "original": "illustrations/2026-08-animals-v2/interview-machine-learning-engineer-deep-learning/v1/original.png",
       "matchDb": 54,
       "servedSha": "d17d9a74d6765565dedfb066dc85cf80f740bbbb0212ebba2b3b8e474ad6cf61"
+    },
+    "interview-machine-learning-engineer-llm-systems-and-evals": {
+      "run": "2026-10-ai-interview-v2",
+      "variant": 1,
+      "cutout": "illustrations/2026-10-ai-interview-v2/interview-machine-learning-engineer-llm-systems-and-evals/v1/cutout.png",
+      "matchDb": 54,
+      "servedSha": "e4ae97eba596a73519cf51c43506eec5de25762f01bd161e9f9e67b7a1050442"
     },
     "interview-machine-learning-engineer-ml-fundamentals": {
       "run": "2026-08-batch75",

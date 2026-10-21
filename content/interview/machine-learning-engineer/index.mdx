@@ -21,6 +21,15 @@ recommendation / fraud / ranking system").
 - **ML system design**, training/serving pipelines, feature stores, batch vs online inference, monitoring & drift.
 - **MLOps**, reproducibility, versioning data & models, CI/CD, latency and cost trade-offs.
 
+## How AI has changed this interview
+
+- **LLM application design** sits beside the classic "design a recommender" round: retrieval, tool use, guardrails, and fallbacks under latency and cost budgets.
+- **Inference economics**: why generation is slow, where GPU memory goes (the KV cache), and what batching, quantization, and speculative decoding buy.
+- **Evaluation without a single right answer**: eval sets, LLM-as-judge biases, retrieval metrics, and agents measured by outcomes.
+- **Judgment about when not to use an LLM**, plus AI-on coding rounds at some companies. Ask the recruiter about each round.
+
+[LLM systems & evals](/interview-prep/machine-learning-engineer/llm-systems-and-evals) covers these questions in depth.
+
 ## Topics
 
 Each topic page mixes **Q&A**, **concept-check MCQs**, and (where it fits) **runnable challenges**.
@@ -32,7 +41,8 @@ Each topic page mixes **Q&A**, **concept-check MCQs**, and (where it fits) **run
 - **[NLP & LLMs](/interview-prep/machine-learning-engineer/nlp-and-llms)**, tokenization, embeddings, self-attention, transformers, pretraining vs fine-tuning, prompting, and RAG.
 - **[ML system design](/interview-prep/machine-learning-engineer/ml-system-design)**, batch vs online inference, feature stores, training–serving skew, and drift.
 - **[MLOps & deployment](/interview-prep/machine-learning-engineer/mlops)**, model registries, CI/CD for models, monitoring, drift, and safe rollouts (shadow, canary, rollback).
-- **[Multiple choice questions](/interview-prep/machine-learning-engineer/multiple-choice-questions)**, 100 rapid-fire questions spanning every topic above, each option explained.
+- **[LLM systems & evals](/interview-prep/machine-learning-engineer/llm-systems-and-evals)**, prefill and decode, KV-cache sizing, batching and quantization, eval sets and LLM judges, retrieval metrics, and agents.
+- **[Multiple choice questions](/interview-prep/machine-learning-engineer/multiple-choice-questions)**, 110 rapid-fire questions spanning every topic above, each option explained.
 
 For more coding/DSA practice, see the **[Backend track](/interview-prep/backend-engineer)**.
 
@@ -56,3 +66,4 @@ For more coding/DSA practice, see the **[Backend track](/interview-prep/backend-
 - [Machine Learning with scikit-learn](/courses/machine-learning-scikit-learn)
 - [Scientific Computing with Python](/courses/scientific-computing-python)
 - [Statistics for Data Science with Python](/courses/statistics-for-data-science-python)
+- [How Large Language Models Work](/courses/how-llms-work)

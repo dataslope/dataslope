@@ -1,6 +1,6 @@
 {
   "meta": {
-    "model": "gpt-image-2",
+    "model": "gpt-image-2.5-flare",
     "defaultStyle": "isometric illustration",
     "mascot": "the Dataslope marmot mascot, a friendly round alpine marmot with a cream belly, rosy cheeks, and small rounded ears",
     "brandColors": {
@@ -31082,6 +31082,18 @@
       "subject": "a grey rabbit on a pale grey platform between one tall blue column and one slightly shorter red column"
     },
     {
+      "id": "interview-data-analyst-ai-assisted-analysis",
+      "collection": "interview",
+      "course": "data-analyst",
+      "courseTitle": "Data Analyst",
+      "lesson": "ai-assisted-analysis",
+      "category": "interview-illustration",
+      "style": "isometric illustration",
+      "title": "AI-assisted analysis interview questions",
+      "mascot": true,
+      "subject": "a grey rabbit on a pale grey platform holding a large magnifying lens over one thick blue block that a corgi has just set down beside it, one red block turned aside next to them"
+    },
+    {
       "id": "interview-data-analyst-multiple-choice-questions",
       "collection": "interview",
       "course": "data-analyst",
@@ -31164,6 +31176,18 @@
       "title": "Testing and data quality interview questions",
       "mascot": true,
       "subject": "a small yellow duck on a pale grey platform beside duck beside a wide gate letting one green block through and turning back one red block"
+    },
+    {
+      "id": "interview-analytics-engineer-ai-and-the-semantic-layer",
+      "collection": "interview",
+      "course": "analytics-engineer",
+      "courseTitle": "Analytics Engineer",
+      "lesson": "ai-and-the-semantic-layer",
+      "category": "interview-illustration",
+      "style": "isometric illustration",
+      "title": "AI and the semantic layer interview questions",
+      "mascot": true,
+      "subject": "a small yellow duck on a pale grey platform watching a raccoon pull one of three thick levers on a solid console block, one blue block sliding out of the console along a short rail"
     },
     {
       "id": "interview-analytics-engineer-multiple-choice-questions",
@@ -31260,6 +31284,18 @@
       "title": "System design interview questions",
       "mascot": true,
       "subject": "a brown bear on a pale grey platform joining three tall colored blocks with two thick pipes"
+    },
+    {
+      "id": "interview-backend-engineer-ai-assisted-coding",
+      "collection": "interview",
+      "course": "backend-engineer",
+      "courseTitle": "Backend / Software Engineer",
+      "lesson": "ai-assisted-coding",
+      "category": "interview-illustration",
+      "style": "isometric illustration",
+      "title": "AI-assisted coding interview questions",
+      "mascot": true,
+      "subject": "a brown bear on a pale grey platform inspecting one thick blue block held up by a corgi, the bear pointing at a single red corner on the block"
     },
     {
       "id": "interview-backend-engineer-multiple-choice-questions",
@@ -31370,6 +31406,18 @@
       "subject": "a brown beaver on a pale grey platform beside a continuous belt of cubes flowing across a platform through three fixed-width window gates, one late cube arriving behind the others through a side chute"
     },
     {
+      "id": "interview-data-engineer-pipelines-for-ai",
+      "collection": "interview",
+      "course": "data-engineer",
+      "courseTitle": "Data Engineer",
+      "lesson": "pipelines-for-ai",
+      "category": "interview-illustration",
+      "style": "isometric illustration",
+      "title": "Pipelines for AI interview questions",
+      "mascot": true,
+      "subject": "a brown beaver on a pale grey platform feeding one long blue block into a chunky cutting machine that drops three shorter blue blocks into the deep drawers of one sturdy green cabinet"
+    },
+    {
       "id": "interview-data-engineer-multiple-choice-questions",
       "collection": "interview",
       "course": "data-engineer",
@@ -31478,6 +31526,18 @@
       "subject": "a round brown owl perched on a pale grey platform beside one broad smooth mound and one tall narrow column"
     },
     {
+      "id": "interview-data-scientist-llm-evaluation",
+      "collection": "interview",
+      "course": "data-scientist",
+      "courseTitle": "Data Scientist",
+      "lesson": "llm-evaluation",
+      "category": "interview-illustration",
+      "style": "isometric illustration",
+      "title": "LLM evaluation interview questions",
+      "mascot": true,
+      "subject": "a round brown owl and a raccoon on a pale grey platform on either side of a large balance scale, one thick blue block resting on each pan"
+    },
+    {
       "id": "interview-data-scientist-multiple-choice-questions",
       "collection": "interview",
       "course": "data-scientist",
@@ -31572,6 +31632,18 @@
       "title": "Statistics and probability interview questions",
       "mascot": true,
       "subject": "the Dataslope marmot mascot on a pale grey platform beside one broad smooth mound and one tall narrow column"
+    },
+    {
+      "id": "interview-machine-learning-engineer-llm-systems-and-evals",
+      "collection": "interview",
+      "course": "machine-learning-engineer",
+      "courseTitle": "Machine Learning Engineer",
+      "lesson": "llm-systems-and-evals",
+      "category": "interview-illustration",
+      "style": "isometric illustration",
+      "title": "LLM systems and evals interview questions",
+      "mascot": true,
+      "subject": "the Dataslope marmot mascot on a pale grey platform beside a deep server cabinet with one thick drawer pulled open, a raccoon sliding one blue block into the drawer"
     },
     {
       "id": "interview-machine-learning-engineer-multiple-choice-questions",

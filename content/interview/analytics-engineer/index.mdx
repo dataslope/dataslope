@@ -21,6 +21,15 @@ dimensional modeling, and software practices applied to analytics.
 - **Software practice**, version control, CI, modularity (staging → intermediate → marts), and DRY SQL.
 - **Trade-offs**, when to materialize as a table vs view vs incremental model, and cost/freshness balance.
 
+## How AI has changed this interview
+
+- **Text-to-SQL versus a semantic layer.** "Ask your data" assistants are only as reliable as the metric definitions underneath them, and those are an analytics engineer's work.
+- **AI-ready modeling**: documentation, tests, and access rules written for a reader that is a language model.
+- **Evaluating an analytics assistant** by comparing result sets with verified answers, including questions it should decline.
+- **AI-written dbt models** reviewed for grain, incremental logic, and duplicate metrics; some coding rounds now allow an assistant. Ask the recruiter about each round.
+
+[AI & the semantic layer](/interview-prep/analytics-engineer/ai-and-the-semantic-layer) covers these questions in depth.
+
 ## Topics
 
 Each topic page mixes **Q&A**, **concept-check MCQs**, and (where it fits) **runnable challenges**.
@@ -31,7 +40,8 @@ Each topic page mixes **Q&A**, **concept-check MCQs**, and (where it fits) **run
 - **[Data warehousing](/interview-prep/analytics-engineer/data-warehousing)**, cloud warehouses, columnar storage, partitioning/clustering, materializations, cost, and idempotent rebuilds.
 - **[Testing & data quality](/interview-prep/analytics-engineer/testing-and-data-quality)**, dbt tests, generic vs singular, source freshness, contracts, and CI for analytics.
 - **[Metrics & the semantic layer](/interview-prep/analytics-engineer/metrics-and-semantic-layer)**, single source of truth, metric definitions, fan-out/chasm traps, additive metrics, and governance.
-- **[Multiple choice questions](/interview-prep/analytics-engineer/multiple-choice-questions)**, 100 rapid-fire questions spanning every topic above, each option explained.
+- **[AI & the semantic layer](/interview-prep/analytics-engineer/ai-and-the-semantic-layer)**, why text-to-SQL gives confident wrong answers, AI-ready dbt projects, evaluating an analytics assistant, and reviewing AI-written models.
+- **[Multiple choice questions](/interview-prep/analytics-engineer/multiple-choice-questions)**, 110 rapid-fire questions spanning every topic above, each option explained.
 
 ## Sample concept check
 
@@ -52,3 +62,4 @@ Each topic page mixes **Q&A**, **concept-check MCQs**, and (where it fits) **run
 
 - [Database Design with PostgreSQL](/courses/database-design-postgresql)
 - [SQL Analytics with DuckDB](/courses/sql-analytics-duckdb)
+- [How Large Language Models Work](/courses/how-llms-work)

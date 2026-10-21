@@ -21,9 +21,18 @@ dimensions), plus "design a pipeline for X" discussions.
 - **Pipelines & orchestration**, batch vs streaming, idempotency, backfills, partitioning, scheduling (Airflow/Dagster).
 - **Systems & formats**, columnar formats (Parquet), partitioning/file sizing, warehouse vs lakehouse, cost.
 
+## How AI has changed this interview
+
+- **RAG ingestion is now a system design prompt**: parse, chunk, embed, index, and keep it fresh with the same incremental patterns as any other pipeline.
+- **Vector search trade-offs**: exact versus approximate search, pgvector versus a dedicated store, metadata filtering, and hybrid keyword search.
+- **Governance for AI data**: permissions enforced at query time, deletions that reach the vectors, and personal data kept away from external embedding APIs.
+- **AI-written pipeline code** has to be reviewed for idempotency, time zones, and schema drift, and some coding rounds now allow an assistant. Ask the recruiter about each round.
+
+[Pipelines for AI](/interview-prep/data-engineer/pipelines-for-ai) covers these questions in depth.
+
 ## Topics
 
-Each topic page mixes **Q&A**, **concept-check MCQs**, and **runnable challenges**.
+Each topic page mixes **Q&A**, **concept-check MCQs**, and (where it fits) **runnable challenges**.
 
 - **[SQL](/interview-prep/data-engineer/sql)**, window functions, ranking, deduplication, CTEs, and optimization.
 - **[Data modeling](/interview-prep/data-engineer/data-modeling)**, normalization, star vs snowflake, grain, and slowly-changing dimensions.
@@ -33,9 +42,11 @@ Each topic page mixes **Q&A**, **concept-check MCQs**, and **runnable challenges
 - **[Streaming & messaging](/interview-prep/data-engineer/streaming)**, Kafka topics and consumer groups, delivery semantics, windowing, watermarks, and idempotent consumers.
 - **[Data warehousing & storage](/interview-prep/data-engineer/data-warehousing)**, OLTP vs OLAP, columnar storage, partitioning, file formats, compression, and cost tradeoffs.
 - **[Orchestration & reliability](/interview-prep/data-engineer/orchestration-and-reliability)**, DAGs, backfills, retries, data-quality checks, SLAs, freshness, and dead-letter handling.
-- **[Multiple choice questions](/interview-prep/data-engineer/multiple-choice-questions)**, 100 rapid-fire questions spanning every topic above, each option explained.
+- **[Pipelines for AI](/interview-prep/data-engineer/pipelines-for-ai)**, RAG ingestion, chunking, incremental re-embedding, vector index trade-offs, hybrid search, and access control and deletion.
+- **[Multiple choice questions](/interview-prep/data-engineer/multiple-choice-questions)**, 110 rapid-fire questions spanning every topic above, each option explained.
 
 ## Go deeper
 
 - [SQL Analytics with DuckDB](/courses/sql-analytics-duckdb)
 - [Database Design with PostgreSQL](/courses/database-design-postgresql)
+- [How Large Language Models Work](/courses/how-llms-work)

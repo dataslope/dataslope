@@ -1,7 +1,7 @@
 {
   "root": true,
   "title": "Backend / Software Engineer",
-  "description": "Interview prep for backend and software engineering roles: data structures & algorithms, Python, object-oriented and API design, concurrency, databases, and system design.",
+  "description": "Interview prep for backend and software engineering roles: data structures & algorithms, Python, object-oriented and API design, concurrency, databases, system design, and AI-assisted coding rounds.",
   "pages": [
     "index",
     "algorithms",
@@ -11,6 +11,7 @@
     "databases",
     "api-design",
     "system-design",
+    "ai-assisted-coding",
     "multiple-choice-questions"
   ]
 }

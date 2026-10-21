@@ -1,9 +1,9 @@
 ---
 title: Multiple Choice Questions
-description: 100 Backend and Software Engineer interview multiple choice questions covering data structures and algorithms, API design, concurrency, databases, object-oriented design, Python, and system design, each with an explanation for every option.
+description: 110 Backend and Software Engineer interview multiple choice questions covering data structures and algorithms, API design, concurrency, databases, object-oriented design, Python, system design, and AI-assisted coding, each with an explanation for every option.
 ---
 
-A rapid-fire bank of **100 multiple choice questions** drawn from every topic
+A rapid-fire bank of **110 multiple choice questions** drawn from every topic
 on this track. Each one mirrors a decision a backend engineer actually makes
 on the job, and every option carries an explanation, so a wrong answer tells
 you exactly which idea to revisit.
@@ -1328,6 +1328,138 @@ reasoning and runnable code.
   > Memory reads in nanoseconds, SSD in tens of microseconds, a cross-region round trip in the tens or hundreds of milliseconds, and how those turn into QPS and storage per day. The numbers only need to be right to an order of magnitude, enough to say whether something fits in memory or needs a different design.`}
 />
 
+## AI-assisted coding
+
+<MultipleChoice
+  markdown={`In an AI-allowed coding round, what is the interviewer mainly grading?
+
+- [o] How you steer, check, and explain the assistant's work.
+  > Planning, decomposition, verification, and catching its mistakes are the signal; working code alone is not.
+- How quickly the assistant produces a fully working solution.
+  > The assistant's speed says nothing about you.
+- Whether you manage to avoid the assistant.
+  > The format expects you to use it well.
+- How many prompts you send in the hour.
+  > Volume is not a signal; judgment is.`}
+/>
+
+<MultipleChoice
+  markdown={`Why have take-home projects lost much of their hiring signal?
+
+- They take reviewers too long to grade consistently.
+  > Grading cost existed long before assistants.
+- [o] An assistant can complete them and the reviewer cannot see how.
+  > Without the process, a polished submission no longer shows the candidate's own ability.
+- Candidates now refuse to complete unpaid take-homes.
+  > Some do, but that is not why the signal fell.
+- New hiring regulations have restricted their use in most countries.
+  > No such regulation exists; the issue is signal.`}
+/>
+
+<MultipleChoice
+  markdown={`An assistant's function passes every example in your prompt. Where are its remaining bugs most likely to be?
+
+- In the variable names.
+  > Cosmetic, not behavioral.
+- [o] At boundaries and unstated assumptions.
+  > Empty input, exact edges, unsorted or duplicate data: the cases an obvious example does not exercise.
+- In the language's standard library functions it calls.
+  > Library bugs are rare compared with misuse of the library.
+- In the code comments.
+  > Comments can mislead but do not change behavior.`}
+/>
+
+<MultipleChoice
+  markdown={`An assistant's code imports a package you have never heard of. Why check it before installing?
+
+- It may noticeably slow down the build and test run.
+  > A minor concern next to the security risk.
+- [o] It may not exist, and an attacker could register that name.
+  > Hallucinated package names are a supply-chain risk: installing whatever answers to the name runs a stranger's code.
+- It may be released under a license your company forbids.
+  > Worth checking, but the larger risk is a package that is not what it claims.
+- It may require a newer Python version than production runs today.
+  > An install error would surface that immediately.`}
+/>
+
+<MultipleChoice
+  markdown={`What is indirect prompt injection?
+
+- A user typing "ignore your previous instructions" into the chat box.
+  > That is direct injection.
+- A SQL injection that targets the vector database.
+  > A classic injection, not a prompt injection.
+- A prompt too long to fit in the context window.
+  > That is truncation, not an attack.
+- [o] Instructions hidden in content the model reads, like an email.
+  > The attacker never talks to the model; the payload arrives through data the application retrieves.`}
+/>
+
+<MultipleChoice
+  markdown={`What is the most effective defense against prompt injection in an agent that can send email?
+
+- [o] Limit its tools and require confirmation before sending.
+  > No filter catches every injection, so limit what a successful one can do.
+- A system prompt that forbids following embedded instructions.
+  > Helps a little, but a prompt is not a security boundary.
+- A larger, more capable model.
+  > Capability does not create a boundary between data and instructions.
+- Running the model at temperature zero.
+  > Determinism does not stop it from following injected text.`}
+/>
+
+<MultipleChoice
+  markdown={`Your LLM feature averages 8,000 input tokens and 150 output tokens per request. Where should you look first to cut cost?
+
+- The length of the answers the model writes.
+  > Output is under 2% of the tokens, so even at a higher price per token it is a small share of the bill.
+- The retry policy for failed requests.
+  > Retries matter only if failures are frequent.
+- [o] The size of the prompt and what can be cached.
+  > Input dominates the token count, so trimming or caching it moves the bill.
+- Whether responses are streamed to the client or not.
+  > Streaming changes latency, not the tokens billed.`}
+/>
+
+<MultipleChoice
+  markdown={`Why stream an LLM's response to the client?
+
+- It lowers the number of tokens the provider bills you for.
+  > Billing is the same either way.
+- It makes the model's outputs deterministic.
+  > Streaming does not affect sampling.
+- It removes the need for request timeouts.
+  > Long generations still need timeouts and cancellation.
+- [o] Users see text as soon as the first token is ready.
+  > Total time is unchanged, but perceived latency drops sharply.`}
+/>
+
+<MultipleChoice
+  markdown={`An LLM is asked to return JSON for an order form. What should the server do with the response?
+
+- [o] Validate it against a schema, and retry or fail cleanly if invalid.
+  > Treat model output as untrusted input with a known expected shape.
+- Pass it straight to the database, since the prompt explicitly asked for JSON.
+  > Models sometimes return malformed or incomplete JSON whatever the prompt says.
+- Ask the model whether its JSON is valid.
+  > Self-assessment is not validation.
+- Strip any text outside the outermost braces.
+  > Repairs one failure mode and hides the rest.`}
+/>
+
+<MultipleChoice
+  markdown={`Which answer to "How do you use AI tools in your work?" is strongest?
+
+- "I use it for almost everything now."
+  > Vague, and suggests you may not check its output.
+- "I avoid AI tools entirely, because they still make too many mistakes."
+  > Reads as unwilling to adapt, and every tool makes mistakes.
+- "I mostly use it to write my tests for me."
+  > Narrow, and generated tests can encode the bug they should catch.
+- [o] A concrete workflow, how you verify it, and one time it was wrong.
+  > Specifics and a verification habit are what the question is probing.`}
+/>
+
 ## Keep practicing
 
 Missed a few? Each section maps to a topic page with the long-form reasoning
@@ -1340,3 +1472,4 @@ and runnable code:
 - [Object-oriented design](/interview-prep/backend-engineer/object-oriented-design)
 - [Python fundamentals](/interview-prep/backend-engineer/python)
 - [System design](/interview-prep/backend-engineer/system-design)
+- [AI-assisted coding](/interview-prep/backend-engineer/ai-assisted-coding)

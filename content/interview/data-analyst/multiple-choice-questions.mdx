@@ -1,9 +1,9 @@
 ---
 title: Multiple Choice Questions
-description: 100 Data Analyst interview multiple choice questions covering SQL, window functions, pandas, statistics, A/B testing and metrics, data visualization, and spreadsheets, each with an explanation for every option.
+description: 110 Data Analyst interview multiple choice questions covering SQL, window functions, pandas, statistics, A/B testing and metrics, data visualization, spreadsheets, and AI-assisted analysis, each with an explanation for every option.
 ---
 
-A rapid-fire bank of **100 multiple choice questions** drawn from every topic
+A rapid-fire bank of **110 multiple choice questions** drawn from every topic
 on this track. Each one mirrors a decision a Data Analyst actually makes on
 the job, and every option carries an explanation, so a wrong answer tells you
 exactly which idea to revisit.
@@ -1332,6 +1332,138 @@ says otherwise.
   > It usually costs more, since it evaluates arrays element by element.`}
 />
 
+## AI-assisted analysis
+
+<MultipleChoice
+  markdown={`An assistant's query joins \`orders\` to \`order_items\` and returns \`SUM(orders.amount)\`. The total is 40% above the finance report. What should you check first?
+
+- The SQL dialect the assistant was told to use.
+  > A dialect mismatch usually fails with an error; it does not inflate a total.
+- [o] Whether the join changed the grain to one row per item.
+  > Each order's amount repeats once per item after the join, so the sum fans out. Compare row counts before and after the join.
+- Whether the finance report itself is out of date or incomplete.
+  > Possible, but a large gap right after a one-to-many join points at the query first.
+- Whether the amounts are stored as floats.
+  > Floating-point error is tiny; it cannot add 40%.`}
+/>
+
+<MultipleChoice
+  markdown={`Which filter returns every order placed in March 2026 from a \`TIMESTAMP\` column?
+
+- \`order_ts BETWEEN '2026-03-01' AND '2026-03-31'\`
+  > The upper bound becomes midnight at the start of March 31, so that whole day is dropped.
+- \`order_ts BETWEEN '2026-03-01' AND '2026-03-31 23:59'\`
+  > Misses the final minute of the month and any fractional seconds.
+- [o] \`order_ts >= '2026-03-01' AND order_ts < '2026-04-01'\`
+  > A half-open range is correct at any timestamp precision, which is why it is the habit to check for in generated SQL.
+- \`MONTH(order_ts) = 3\`
+  > Also matches March of every other year in the table, and prevents partition pruning.`}
+/>
+
+<MultipleChoice
+  markdown={`An assistant computes a channel's monthly conversion rate as \`AVG(conversions / sessions)\` over daily rows. Why is that misleading?
+
+- It leaves out the days that had zero conversions.
+  > Those days are included as rates of zero; the problem is the weighting.
+- [o] A day with 15 sessions counts as much as one with 1,500.
+  > The overall rate is total conversions over total sessions. Averaging daily rates weights every day equally.
+- Integer division truncates every daily rate down to zero first.
+  > That depends on the dialect, and even exact division leaves the weighting wrong.
+- AVG cannot be applied to a computed expression.
+  > AVG accepts any numeric expression.`}
+/>
+
+<MultipleChoice
+  markdown={`An auto-generated weekly summary says revenue rose 8% "driven by the new pricing page". Your query confirms the 8%. What is the problem?
+
+- The percentage should be reported with a confidence interval.
+  > Useful context, but not what is wrong with the sentence.
+- Weekly summaries should never mention a cause.
+  > Causes are fine when an analysis supports them.
+- [o] The cause is asserted without any analysis behind it.
+  > A measured change plus a plausible story is how hallucinated insights reach reports. Test the claim or label it a hypothesis.
+- The number should be rounded to a whole percent.
+  > Precision is not the issue; the unsupported claim is.`}
+/>
+
+<MultipleChoice
+  markdown={`You want an assistant's help with a query over patient records, and the tool is not approved for health data. What should you share with it?
+
+- A random sample of 20 real rows from the table.
+  > Still real health data in an unapproved tool.
+- The real rows, with names and patient ID numbers removed first.
+  > Records without direct identifiers are often still re-identifiable, and the policy still applies.
+- Nothing, because analysts should not use assistants.
+  > Assistants are fine within policy; the question is what data goes in.
+- [o] The schema and a few invented rows that show the problem.
+  > Structure plus a synthetic example is what the assistant needs to help.`}
+/>
+
+<MultipleChoice
+  markdown={`Which addition to a prompt most improves the SQL an assistant writes for "monthly active users"?
+
+- [o] Your company's definition of an active user, and the grain.
+  > Business definitions are the part the assistant cannot infer. Without them it picks a plausible one.
+- A request to write the most efficient query it possibly can.
+  > Efficiency does not help if the definition is wrong.
+- A note asking it to double-check its own work.
+  > A model reviewing its own answer tends to agree with itself.
+- A longer explanation of why the metric matters.
+  > Motivation does not say which events count as active.`}
+/>
+
+<MultipleChoice
+  markdown={`A BI tool's natural-language feature returns different "revenue" figures depending on how the question is phrased. What is the most durable fix?
+
+- Train business users to always phrase questions identically.
+  > Fragile; the next phrasing breaks it again.
+- Turn off natural-language querying for everyone.
+  > Removes the problem by removing the feature.
+- Switch the tool to a larger language model.
+  > A larger model still has to guess a definition that is not written down.
+- [o] Define revenue once in the semantic model the tool queries.
+  > With one governed definition, every phrasing resolves to the same calculation.`}
+/>
+
+<MultipleChoice
+  markdown={`In a take-home review, the interviewer asks how you used AI. Which answer is strongest?
+
+- "I didn't use any AI tools at all."
+  > Fine if true, but if AI was allowed it says nothing about your judgment.
+- "I used it for nearly everything, so the analysis is mostly its own work."
+  > Suggests you may not be able to defend the submission.
+- [o] Name what you delegated, what you did yourself, and how you checked it.
+  > Transparency plus a verification story shows you own the result.
+- Skip the question and move on to the findings.
+  > Evasion reads worse than any honest answer.`}
+/>
+
+<MultipleChoice
+  markdown={`You use an LLM to tag 5,000 survey comments into six themes. What should you do before reporting the share of each theme?
+
+- [o] Compare its tags with your own on a hand-labeled sample.
+  > That gives an accuracy and shows which themes it confuses, so the shares can be reported with honest caveats.
+- Ask it to report a confidence score alongside each tag it assigns.
+  > Self-reported confidence is poorly calibrated.
+- Rerun the whole set at a higher temperature.
+  > More randomness makes the labels less consistent, not more accurate.
+- Let it add new themes whenever it finds one.
+  > Categories that drift mid-run make the shares incomparable.`}
+/>
+
+<MultipleChoice
+  markdown={`Why do many interviewers now follow a SQL take-home with a live walkthrough of the candidate's own query?
+
+- To test the query's performance on a larger dataset.
+  > Performance can be tested without the candidate present.
+- To give the candidate a chance to fix mistakes.
+  > A side benefit at most.
+- To test knowledge of one specific SQL dialect.
+  > The walkthrough is about reasoning, not dialect trivia.
+- [o] An assistant can write the code, but not your reasons for it.
+  > Explaining grain, filters, and trade-offs on the spot shows the work is understood, whoever typed it.`}
+/>
+
 ## Keep practicing
 
 Missed a few? Each section maps to a topic page with the long-form reasoning
@@ -1343,3 +1475,4 @@ and runnable examples:
 - [A/B testing & metrics](/interview-prep/data-analyst/ab-testing-and-metrics)
 - [Data visualization & storytelling](/interview-prep/data-analyst/data-visualization)
 - [Excel & spreadsheets](/interview-prep/data-analyst/excel-and-spreadsheets)
+- [AI-assisted analysis](/interview-prep/data-analyst/ai-assisted-analysis)

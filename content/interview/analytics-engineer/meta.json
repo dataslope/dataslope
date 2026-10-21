@@ -1,7 +1,7 @@
 {
   "root": true,
   "title": "Analytics Engineer",
-  "description": "Interview prep for Analytics Engineer roles: dimensional modeling and dbt.",
+  "description": "Interview prep for Analytics Engineer roles: dimensional modeling, dbt, and the semantic layer that AI analytics assistants query.",
   "pages": [
     "index",
     "dimensional-modeling",
@@ -10,6 +10,7 @@
     "data-warehousing",
     "testing-and-data-quality",
     "metrics-and-semantic-layer",
+    "ai-and-the-semantic-layer",
     "multiple-choice-questions"
   ]
 }

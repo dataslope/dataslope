@@ -1,7 +1,7 @@
 {
   "root": true,
   "title": "Data Analyst",
-  "description": "Interview prep for Data Analyst roles: SQL, pandas, statistics, and communicating insight.",
+  "description": "Interview prep for Data Analyst roles: SQL, pandas, statistics, communicating insight, and checking AI-assisted analysis.",
   "pages": [
     "index",
     "sql",
@@ -11,6 +11,7 @@
     "excel-and-spreadsheets",
     "data-visualization",
     "ab-testing-and-metrics",
+    "ai-assisted-analysis",
     "multiple-choice-questions"
   ]
 }

@@ -1,0 +1,228 @@
+---
+title: LLM Evaluation
+description: Data Scientist interview questions on measuring AI features. Eval-set design and sample size, validating an LLM judge with Cohen's kappa, A/B testing nondeterministic features, LLMs as classifiers and prevalence correction, and checking analysis an assistant wrote.
+---
+
+When a company ships features built on large language models, someone has to
+answer "is it any good, and is the new version better?". That is a measurement
+problem, which makes it a data scientist's problem, and interviews now ask it
+directly. The statistics are the ones you already know (sampling error,
+agreement, power, bias); what is new is applying them to outputs that are text,
+vary run to run, and are often graded by another model.
+
+<Figure
+  slug="interview-data-scientist-llm-evaluation-cutout"
+  alt="A round brown owl and a raccoon on pale grey pedestals on either side of a grey balance scale, one thick blue block resting on each pan"
+/>
+
+## Q&A
+
+### How have Data Scientist interviews changed with AI?
+
+The core loop is the same: statistics, experimentation, SQL, product sense.
+What has been layered on top, especially at mid and senior levels:
+
+- **Evaluating LLM features**: designing an eval set, choosing metrics for
+  open-ended output, and deciding whether an automated judge can be trusted.
+- **Experimenting on AI features**, where the treatment is itself random.
+- **LLM-assisted workflow questions**: how you would validate SQL or Python an
+  assistant wrote, and how you would stop hallucinated "insights" from
+  reaching an automated report.
+- **AI-on and AI-off rounds.** Some companies allow an assistant in coding
+  rounds and grade how you verify its output; others prohibit it. Ask the
+  recruiter, round by round. The [AI-assisted coding](/interview-prep/backend-engineer/ai-assisted-coding)
+  page covers both formats.
+
+### How would you measure the quality of an LLM feature, such as drafted support replies?
+
+Start from the decision, not the metric. Agree with stakeholders on what a good
+reply is (correct, complete, on-policy, right tone) and turn that into a
+rubric with pass/fail criteria. Then:
+
+1. **Sample inputs from real traffic**, stratified by intent and difficulty so
+   rare but important cases are present. A synthetic set written by the team
+   tends to be easier than production.
+2. **Get expert labels** on a subset against the rubric, with two raters on
+   some items so you can measure how much humans agree with each other.
+3. **Score candidate versions on the same items**, which makes the comparison
+   paired and far more sensitive than comparing two separate samples.
+4. **Report uncertainty**: a pass rate without a confidence interval invites
+   people to ship noise.
+
+### How large does an eval set need to be?
+
+Large enough that the difference you care about exceeds the sampling error.
+A pass rate is a proportion, so its 95% interval is roughly
+$\pm 1.96\sqrt{p(1-p)/n}$:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import math
+
+p = 0.80  # observed pass rate
+for n in [50, 100, 200, 500, 1000, 2000]:
+    half = 1.96 * math.sqrt(p * (1 - p) / n)
+    print(f"n={n:>5}: {p:.0%} plus or minus {half:.1%}")`,
+    },
+  ]}
+/>
+
+With 100 items, 80% means "somewhere between about 72% and 88%", so a
+prompt change that moves the score by three points is invisible. Two habits
+help more than brute size. **Pair the comparison**: run both versions on the
+same items and test only the items where they disagree (McNemar's test), which
+removes the item-to-item variance. And **stratify**, so a regression on a small
+but important slice is not averaged away.
+
+### How do you know whether an LLM judge can be trusted?
+
+Treat the judge as a measurement instrument and calibrate it. Have experts
+label a sample, run the judge on the same items, and measure agreement,
+**corrected for chance**. Raw agreement flatters a judge when one label
+dominates. Cohen's kappa corrects for that:
+
+$$
+\kappa = \frac{p_o - p_e}{1 - p_e}
+$$
+
+where $p_o$ is observed agreement and $p_e$ is the agreement expected if both
+raters labeled at random with their own label frequencies. Suppose judge and
+expert each mark 90% of replies "pass" and agree on 90% of items. Then
+$p_e = 0.9^2 + 0.1^2 = 0.82$ and $\kappa = 0.08 / 0.18 \approx 0.44$: moderate
+agreement, and far less impressive than "90%" sounds. Most of that agreement
+comes from both saying "pass" by default.
+
+Also test for the known biases (preference for the first answer shown, for
+longer answers, and for the judge's own model family) and compare the judge's
+agreement with the experts to the experts' agreement with each other. A judge
+cannot be expected to beat the humans it imitates.
+
+### How do you A/B test an LLM feature?
+
+The usual machinery applies, with four adjustments:
+
+- **Randomize by user, and keep it sticky** across sessions and conversations.
+  If one user sees both arms, their experiences contaminate each other.
+- **Expect more variance.** The same input can produce different outputs, so
+  the treatment is a distribution, not a fixed change. Estimate variance from
+  an A/A test or a pilot, and size the test from that rather than from a
+  textbook formula with a guessed variance.
+- **Pin the model version.** A provider can update a model under the same name
+  during your test, which changes the treatment midway. Log the model version on
+  every request.
+- **Guardrails beyond the usual**: latency at the 95th percentile, cost per
+  active user, refusal rate, and escalations to a human. An answer that is
+  better but twice as slow, or twice as expensive, can be a net loss.
+
+Offline evals and online tests answer different questions. The eval says
+whether the output is better by your rubric; the experiment says whether users
+are better off. Use the first to decide what is worth testing with the second.
+
+### Why is a thumbs-up rate a weak primary metric?
+
+Few users click either button, and the ones who do are not representative, so
+the rate is dominated by selection bias. It also rewards what feels good in the
+moment: confident tone and agreement with the user, not correctness. Prefer
+**downstream behavior**: the ticket was resolved without reopening, the
+suggested code was still in the file a week later, the user did not rephrase
+and ask again. Keep explicit feedback as a diagnostic, not the target.
+
+### You use an LLM to classify a million support tickets. How do you report the share that are complaints?
+
+Not as the raw share the model labels "complaint", because the classifier's
+errors bias it. Validate it on a hand-labeled sample to estimate its
+**sensitivity** (share of true complaints it catches) and **specificity**
+(share of non-complaints it correctly leaves alone). The observed rate is then
+
+$$
+p_{\text{obs}} = \text{sens} \cdot \pi + (1 - \text{spec})(1 - \pi)
+$$
+
+for true prevalence $\pi$, which solves to
+
+$$
+\pi = \frac{p_{\text{obs}} + \text{spec} - 1}{\text{sens} + \text{spec} - 1}
+$$
+
+(the Rogan–Gladen estimator). With sensitivity 0.90, specificity 0.95, and 20%
+of tickets labeled complaints, the corrected estimate is about 17.6%: the
+false positives from the large non-complaint majority had inflated the count.
+Report the interval too, since sensitivity and specificity are themselves
+estimated from a sample.
+
+### How do you check an analysis an AI assistant wrote for you?
+
+As you would check a junior colleague's notebook, with extra suspicion in the
+places assistants tend to slip:
+
+- **Silent data loss**: a `dropna()` or an inner join that quietly removed a
+  third of the rows. Compare row counts at each step.
+- **Leakage**: a scaler or encoder fit on the full dataset before the split,
+  or a feature computed from the future.
+- **Test choice**: a t-test on heavily skewed revenue, or twenty segment
+  comparisons with no correction for multiple testing.
+- **Invented fields or functions**: a column that does not exist, or a library
+  call with the wrong arguments.
+- **The narrative**: causal language ("the redesign drove growth") that the
+  analysis cannot support.
+
+Then reproduce the headline number by an independent route, such as a second
+query, a different tool, or a total someone else already trusts.
+
+### What is benchmark contamination, and why does it matter to you?
+
+If a public benchmark's test items appeared in a model's training data, its
+score measures memory rather than skill. It is data leakage at the scale of the
+internet. The practical consequences: do not choose a model on public leaderboard
+numbers alone, keep your own eval set private, refresh it with recent real cases,
+and never feed it into fine-tuning or few-shot prompts.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`Version B of a prompt scores 82% on a 100-item eval set; version A scored 79% on the same items. What is the most defensible conclusion?
+
+- B is better and should ship, because it scored higher.
+  > With 100 items, the uncertainty on each score is around 8 points, which swamps a 3-point gap.
+- A is better, because small eval sets favor the older version.
+  > There is no such systematic effect; the data simply cannot separate them.
+- [o] The difference is within sampling noise; test the items where they disagree, or add items.
+  > A paired test on the discordant items (McNemar) is the sensitive comparison, and more items narrow the interval.
+- The eval set is useless and should be replaced with a public benchmark.
+  > Public benchmarks measure a different task and may be contaminated; a larger private set is the fix.`}
+/>
+
+<MultipleChoice
+  markdown={`An LLM judge agrees with expert raters on 92% of items, but both mark about 95% of items "pass". What should you compute before trusting the judge?
+
+- The judge's average score across all items.
+  > The average says nothing about whether it agrees with experts on the items that matter.
+- [o] A chance-corrected agreement such as Cohen's kappa.
+  > When one label dominates, two raters agree often by chance. Kappa subtracts that and here would be low.
+- The judge's accuracy on a public benchmark.
+  > General capability does not show agreement with your experts on your rubric.
+- Nothing more, since 92% agreement is already high.
+  > With 95% of items "pass", two raters labeling at random would already agree about 90% of the time, so 92% is barely better than chance.`}
+/>
+
+<MultipleChoice
+  markdown={`Midway through an A/B test of an AI assistant, the provider silently updates the model behind the same API name. What is the main threat to the experiment?
+
+- The sample ratio between arms will become unbalanced.
+  > Assignment is unchanged; users stay in their arms.
+- Users will notice and churn, causing a novelty effect.
+  > Possible, but secondary to the treatment itself changing.
+- The control group is contaminated by the new model.
+  > The control arm does not use the assistant, so it is unaffected.
+- [o] The treatment changed during the test, so the estimate blends two different treatments.
+  > Pin model versions, log the version per request, and analyze or restart around the change.`}
+/>
+
+## Go deeper
+
+- [How Large Language Models Work](/courses/how-llms-work), especially [what benchmarks measure](/courses/how-llms-work/what-benchmarks-measure), [benchmark pitfalls](/courses/how-llms-work/benchmark-pitfalls), and [evaluating for your task](/courses/how-llms-work/evaluating-for-your-task)
+- [Experimentation](/interview-prep/data-scientist/experimentation) on this track, for power, A/A tests, and guardrail metrics
+- [LLM systems & evals](/interview-prep/machine-learning-engineer/llm-systems-and-evals) on the ML Engineer track, for judges, retrieval metrics, and agents
