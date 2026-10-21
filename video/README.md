@@ -399,6 +399,21 @@ first voiced frame (-27 dB from the take's loudest, set against all 906
 recorded beats) and walks back over the
 word's own soft attack (-30 dB) for at most 120 ms.
 
+A beat voiced on its own gets the same placement, from its own file. Before
+it did, a beat that opened on an audio tag cued early by the time the tag
+had taken: Estimation's `[slowly]` beats ran up to 0.25 s out in
+`check:sync`. `npm run narrate -- <video> --onsets --only a,b` places the
+first word of beats already voiced, from the files on disk, with no API
+call.
+
+**Slowing a beat down.** `eleven_v4_turbo` ignores the API's `speed` voice
+setting (0.7 and 0.85 both came back at normal pace). The `[slowly]` audio
+tag works: the same sentence went from about 3.0 to about 2.4 words a
+second, and `[calmly]` or `[thoughtfully]` barely changed it. A tag is never
+spoken and is left out of the captions, so it changes the delivery and not
+the words. Stats-6's rate-to-test stretch and Stats-9's "keep a wall" beats
+are voiced this way.
+
 **What is committed.** Everything a render needs, and the master it came
 from:
 
