@@ -55,7 +55,7 @@ export const AnyScene: React.FC = () => {
   const { y, h } = useLayout();
   const fig = useFigNumber();
 
-  const anyFrom = n.beat("any").from;
+  const meanAt = n.word("any", "The mean");
   const everyAt = n.word("any", "Every statistic");
   const takeAt = n.word("kinds", "Take");
   const lopsidedAt = n.word("kinds", "lopsided");
@@ -97,7 +97,9 @@ export const AnyScene: React.FC = () => {
       <Sfx name="el-tap" at={widthAt} level={-29} />
       <Sfx name="el-pencil" at={seAt - 2} level={-34} />
 
-      <Ink at={anyFrom - 12} dur={20} style={{ left: 112, top: y(112), ...headline(64), whiteSpace: "nowrap" }}>
+      {/* After "One last thing.", with "The mean isn't special": the claim the
+          heading makes, and no stretch of a finished page while it is said. */}
+      <Ink at={meanAt - 6} dur={20} style={{ left: 112, top: y(112), ...headline(64), whiteSpace: "nowrap" }}>
         Every statistic has
       </Ink>
       <Ink
