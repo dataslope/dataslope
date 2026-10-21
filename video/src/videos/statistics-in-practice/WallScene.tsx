@@ -145,7 +145,9 @@ export const WallScene: React.FC = () => {
   const onceAt = n.word("confirm", "once");
   const nobodyAt = n.word("confirm", "nobody");
   const claimAt = n.word("confirm", "claim");
-  const keepAt = n.word("sin", "Keep a wall");
+  // The wall thickens on what it is for, "between them", which also breaks
+  // the slowed beat's still before "crossing".
+  const betweenAt = n.word("sin", "between them");
   const crossingAt = n.word("sin", "crossing");
   const suggestedAt = n.word("sin", "suggested");
   const pickedAt = n.word("tilt", "picked");
@@ -184,7 +186,7 @@ export const WallScene: React.FC = () => {
       <Sfx name="el-pencil" at={luckFrom - 2} level={-35} />
 
       <Headline lead="Two jobs," turn="with a wall between." at={jobsFrom - 6} turnAt={confirmFrom - 6} />
-      <Wall x={WALL_X} top={y(WALL_TOP)} bottom={y(WALL_BOTTOM)} at={jobsFrom - 8} width={lerp(9, 15, ease(frame, keepAt - 4, 12))} />
+      <Wall x={WALL_X} top={y(WALL_TOP)} bottom={y(WALL_BOTTOM)} at={jobsFrom - 8} width={lerp(9, 15, ease(frame, betweenAt - 4, 12))} />
 
       {/* ── Exploring ── */}
       <div style={{ position: "absolute", inset: 0, opacity: leftDim }}>

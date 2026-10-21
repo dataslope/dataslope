@@ -3,7 +3,7 @@ import { AbsoluteFill } from "remotion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, INK_SOFT, note } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
@@ -29,6 +29,10 @@ const TABLE_AT = 1400;
 const PROFILES_AT = 1300;
 /** The closing recap's left edge: the group centred on the page. */
 const RECAP_X = 760;
+/** Each figure's "Fig. N" line, 50px over its highest box: students for the
+ *  first, profiles (y 480 less a row) for the second. */
+const FIG_A_Y = 320;
+const FIG_B_Y = 384;
 
 /**
  * Part 4, pairs: enrollments between students and courses, where each id
@@ -169,7 +173,8 @@ export const PairScene: React.FC = () => {
       <Head lead="Unique on a foreign key." at={fkAt - 4} turn="One to one." turnAt={oneToOneAt - 4} out={outB} />
       <Head lead="Missing and repeated: covered." at={outB + 8} turn="Wrong values?" turnAt={valuesAt - 4} />
 
-      {/* ── Fig. A: many to many ── */}
+      {/* ── Fig. 9: many to many ── */}
+      <FigLabel n="9" title="Students and courses, each pair enrolled once" at={studentAt - 6} x={X0} y={y(FIG_A_Y)} out={outA} />
       <Entity layout={students} at={studentAt - 4} out={outA} />
       <Entity
         layout={enrollments}
@@ -231,7 +236,8 @@ export const PairScene: React.FC = () => {
         out={outA}
       />
 
-      {/* ── Fig. B: one to one ── */}
+      {/* ── Fig. 10: one to one ── */}
+      <FigLabel n="10" title="Users and profiles, one to one" at={fkAt - 10} x={X0} y={y(FIG_B_Y)} out={outB} />
       <Entity layout={users} at={fkAt - 8} out={outB} />
       <Entity layout={profiles} at={fkAt - 4} marks={{ user_id: { at: fkAt + 2, tone: "key" } }} out={outB} />
       <RuleTags

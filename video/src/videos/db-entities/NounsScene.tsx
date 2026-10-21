@@ -8,6 +8,7 @@ import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
+import { Fig, FIG_GAP } from "./kit";
 import { Drift, Kicker, lerp, Mark, Spot, Stack, STAT_INK, Svg, Word } from "./parts";
 
 const BOX_Y = 500;
@@ -117,6 +118,9 @@ export const NounsScene: React.FC = () => {
         </div>
 
         {/* ── The candidates: one box per noun, each on its circle ── */}
+        <Fig n="1" at={circleAt[0] + 2} x={BOXES[0].x} y={y(BOX_Y) - FIG_GAP}>
+          The three nouns, drawn as boxes
+        </Fig>
         {layouts.map((l, i) => (
           <Stack key={`s${l.name}`} layout={l} at={lotsAt[i] - 2} out={thoughAt} />
         ))}

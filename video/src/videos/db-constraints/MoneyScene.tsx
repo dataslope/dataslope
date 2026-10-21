@@ -3,12 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease, map } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { MONEY } from "./data";
-import { Head, Kicker, Mark, MARK, MARK_BAD, OK_INK, pulse, Spot, X0 } from "./parts";
+import { FIG_Y, Head, Kicker, Mark, MARK, MARK_BAD, OK_INK, pulse, Spot, X0 } from "./parts";
 
 const SIZE = 40;
 /** Columns. Postgres's answer to "= 0.3" sits under its own header, so the
@@ -103,6 +103,7 @@ export const MoneyScene: React.FC = () => {
 
       <Kicker at={open - 10}>The first constraint</Kicker>
       <Head lead="Ten cents plus twenty." at={open - 6} turn="Thirty?" turnAt={thirtyAt - 2} />
+      <FigLabel n="5" title="The same sum in two types, and Postgres's answers" at={tenAt - 6} x={X0} y={y(FIG_Y)} />
 
       {/* Column titles. */}
       {(

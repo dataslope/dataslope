@@ -43,6 +43,9 @@ export const HEAD_Y = 150;
 /** The schema card's top, on the left: low enough that a scene's figure
  *  sits in the middle of the page rather than under the headline. */
 export const CARD_Y = 420;
+/** A figure's "Fig. N" line: on its own row, 50px over the card and table
+ *  tops, so its descenders clear them by about 25px. */
+export const FIG_Y = CARD_Y - 50;
 /** The data table's left edge and top, on the right. */
 export const TABLE_X = 1000;
 export const TABLE_Y = 420;

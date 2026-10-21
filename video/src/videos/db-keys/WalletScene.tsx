@@ -3,16 +3,22 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, body, headline, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { WALLET } from "./data";
-import { Drift, Headline, Mark, Spot, Strike, Svg } from "./parts";
+import { Drift, FIG_Y, Headline, Mark, Spot, Strike, Svg } from "./parts";
 
-/** The timeline, 1938 to 1943, on the right of the wallet. */
+/** The timeline, 1938 to 1943, on the right of the wallet: Fig. 6, its
+ *  label at FIG_Y and the top of its dot cloud clear of it. */
 const T0 = 900;
 const T1 = 1640;
-const LINE_Y = 400;
+const LINE_Y = 474;
+/** Under the chart: its credit, then what broke, then the moral. */
+const SOURCE_Y = 668;
+const UNIQUE_Y = 690;
+const PERMANENT_Y = 762;
+const MORAL_Y = 836;
 const DOTS = 64;
 
 /** mulberry32: a tiny seeded PRNG, for laying the dots out. */
@@ -83,6 +89,7 @@ export const WalletScene: React.FC = () => {
         <Spot id="db-keys-wallet" at={yearAt - 4} left={100} top={y(300)} width={640} height={427} />
 
         {/* ── 1938 to 1943 ── */}
+        <FigLabel n="6" title="One Social Security number, 1938 to 1943" at={yearAt - 6} x={T0} y={y(FIG_Y)} />
         <Svg>
           <line
             x1={T0}
@@ -144,24 +151,24 @@ export const WalletScene: React.FC = () => {
         </Note>
 
         {/* ── What broke ── */}
-        <Note at={uniqueAt - 4} x={T0} y={y(662)}>
+        <Note at={uniqueAt - 4} x={T0} y={y(UNIQUE_Y)}>
           <div style={{ ...body(36), color: INK, whiteSpace: "nowrap" }}>
             <Strike at={uniqueAt + 2}>Unique</Strike>
             <span style={{ opacity: ease(frame, sharedAt - 2, 10), color: ACCENT_INK, fontStyle: "italic" }}> shared by thousands</span>
           </div>
         </Note>
-        <Note at={permanentAt - 4} x={T0} y={y(734)}>
+        <Note at={permanentAt - 4} x={T0} y={y(PERMANENT_Y)}>
           <div style={{ ...body(36), color: INK, whiteSpace: "nowrap" }}>
             <Strike at={permanentAt + 2}>Permanent</Strike>
             <span style={{ opacity: ease(frame, cancelledAt - 2, 10), color: ACCENT_INK, fontStyle: "italic" }}> cancelled</span>
           </div>
         </Note>
-        <Ink at={betsAt - 6} dur={20} style={{ left: 120, top: y(818), whiteSpace: "nowrap" }}>
+        <Ink at={betsAt - 6} dur={20} style={{ left: 120, top: y(MORAL_Y), whiteSpace: "nowrap" }}>
           <span style={{ ...body(40, true), color: INK }}>
             A natural key bets on <Mark at={controlAt - 6}>promises you don&apos;t control.</Mark>
           </span>
         </Ink>
-        <Ink at={fiveAt + 10} dur={14} style={{ right: 1920 - 1824, top: y(610), whiteSpace: "nowrap" }}>
+        <Ink at={fiveAt + 10} dur={14} style={{ right: 1920 - 1824, top: y(SOURCE_Y), whiteSpace: "nowrap" }}>
           <span style={{ ...label(19, INK_SOFT), fontWeight: 500 }}>Figures: {WALLET.source}</span>
         </Ink>
       </Drift>

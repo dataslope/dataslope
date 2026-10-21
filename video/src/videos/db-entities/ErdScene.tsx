@@ -4,17 +4,19 @@ import { ease } from "../../components/motion";
 import { endSymbols, MARKER } from "../../components/crowsfoot";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { headline, HIGHLIGHT, INK, INK_SOFT, note } from "../../editorial/style";
 import { Ink, Leader, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ERD } from "./data";
-import { KEY_INK } from "./kit";
+import { Fig, KEY_INK } from "./kit";
 import { BoxPulse, Drift, Mark, pulse, Pulse, STAT_INK, Svg } from "./parts";
 
 const CUSTOMERS_X = 220;
 const ORDERS_X = 1180;
 const TOP = 470;
+/** Fig. 12's label: its own line over "an entity", well under the headline. */
+const FIG_Y = 350;
 
 /**
  * The lesson's customers-and-orders diagram, built as it is named: the boxes,
@@ -32,7 +34,6 @@ export const ErdScene: React.FC = () => {
 
   // ── Cues ──
   const from = n.beat("pieces").from;
-  const diagramAt = n.word("pieces", "diagram");
   const threeAt = n.word("pieces", "three pieces");
   const boxesAt = n.word("pieces", "Boxes");
   const factsAt = n.word("pieces", "facts");
@@ -167,9 +168,9 @@ export const ErdScene: React.FC = () => {
           labelPos={[midX - 30, lineY - 40]}
         />
 
-        <Ink at={diagramAt - 4} dur={16} style={{ left: CUSTOMERS_X, top: y(330), whiteSpace: "nowrap" }}>
-          <span style={label(22, INK_SOFT)}>The lesson&apos;s diagram: customers and orders</span>
-        </Ink>
+        <Fig n="12" at={boxesAt - 6} x={CUSTOMERS_X} y={y(FIG_Y)}>
+          The lesson&apos;s diagram: customers and orders
+        </Fig>
 
         {/* The three pieces, tagged as they are named. */}
         <Note at={boxesAt + 2} out={tagsOut} x={CUSTOMERS_X} y={customers.top - 52}>

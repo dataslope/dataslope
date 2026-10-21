@@ -8,12 +8,14 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { NAME } from "./data";
-import { ErrorBox, Listing } from "./kit";
+import { ErrorBox, Fig, FIG_GAP, Listing, Mono } from "./kit";
 import { Drift, Headline, Mark, pulse, Spot, STAT_INK, Svg } from "./parts";
 
 const X = 120;
 const SLOT = 44;
 const SLOTS_Y = 470;
+/** Low enough that Fig. 9's label has its own line under the headline. */
+const LISTING_Y = 330;
 
 /** The two sides of the lesson's callout, "When in doubt, constrain what you control". */
 const SIDES = [
@@ -83,8 +85,11 @@ export const ClaimsScene: React.FC = () => {
           leadAt={from - 6}
         />
 
-        <Listing lines={[NAME.sql]} x={X} top={y(312)} width={660} size={28} at={capAt - 6} lineAt={[capAt - 2]} />
-        <Note at={claimingAt - 2} x={X + 700} y={y(318)}>
+        <Fig n="9" at={capAt - 8} x={X} y={y(LISTING_Y) - FIG_GAP}>
+          {NAME.value} in a <Mono>{`VARCHAR(${NAME.limit})`}</Mono> column
+        </Fig>
+        <Listing lines={[NAME.sql]} x={X} top={y(LISTING_Y)} width={660} size={28} at={capAt - 6} lineAt={[capAt - 2]} />
+        <Note at={claimingAt - 2} x={X + 700} y={y(LISTING_Y + 6)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             claims <span style={{ color: STAT_INK, fontWeight: 650 }}>no name is longer than {NAME.limit} characters</span>
           </span>

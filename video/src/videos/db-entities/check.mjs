@@ -81,7 +81,7 @@ const constraints = async (db, table) =>
     )
   ).rows;
 
-// ── Fig. 1 and 2: separate entities, separate tables ─────────────────────────
+// ── Figs. 2 and 3: separate entities, separate tables ────────────────────────
 
 const ENTITIES_SETUP = `CREATE TABLE customers (
   id   INTEGER PRIMARY KEY,
@@ -106,7 +106,7 @@ INSERT INTO products VALUES (10, 'Notebook', 8.50), (11, 'Pen', 1.25);`;
   out.figures.entities.columns = { customers: await columns(db, "customers"), products: await columns(db, "products") };
 }
 
-// ── Figs. 3 to 5: attributes, and the domain that narrows them ──────────────
+// ── Figs. 4 to 8: attributes, and the domain that narrows them ──────────────
 
 const ORDERS_DDL = `CREATE TABLE orders (
   id          INTEGER PRIMARY KEY,
@@ -165,7 +165,7 @@ const SPELLINGS = ["sent", "shipped", "SHIP", "done"];
   out.figures.loose = { setup: LOOSE_SETUP, spellings: SPELLINGS, inserts, results };
 }
 
-// ── Fig. 6: a domain is a claim ──────────────────────────────────────────────
+// ── Fig. 9: a domain is a claim ──────────────────────────────────────────────
 
 const NAME_SETUP = `CREATE TABLE people (
   id   INTEGER PRIMARY KEY,
@@ -187,7 +187,7 @@ const LONG_NAME = "Johann Sebastian Bach";
   };
 }
 
-// ── Fig. 7: one value per cell ───────────────────────────────────────────────
+// ── Fig. 10: one value per cell ──────────────────────────────────────────────
 
 const PACKED_SETUP = `CREATE TABLE customers (
   id            INTEGER PRIMARY KEY,
@@ -222,7 +222,7 @@ INSERT INTO customer_phones VALUES (1, '555-1111'), (1, '555-2222');`;
   };
 }
 
-// ── Fig. 9: the ER diagram, and the tables it stands for ────────────────────
+// ── Fig. 12: the ER diagram, and the tables it stands for ───────────────────
 
 const ERD_SETUP = `CREATE TABLE customers (
   id    INTEGER PRIMARY KEY,

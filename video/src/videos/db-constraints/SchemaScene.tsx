@@ -3,7 +3,7 @@ import { AbsoluteFill } from "remotion";
 import { Entity, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { body, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { PRICE } from "./data";
@@ -12,6 +12,7 @@ import {
   CARD_Y,
   DbTable,
   ErrorBox,
+  FIG_Y,
   Head,
   HEAD_H,
   Kicker,
@@ -100,6 +101,7 @@ export const SchemaScene: React.FC = () => {
         <span style={{ ...body(34, true), color: INK }}>while the mistake is still cheap to fix</span>
       </Ink>
 
+      <FigLabel n="3" title="The rule in the schema, and the row it refuses" at={schemaAt - 8} x={X0} y={y(FIG_Y)} />
       <Entity layout={card} at={schemaAt - 6} marks={{ price: { at: thatsAt, out: zeroAt } }} />
       <RuleTags
         layout={card}

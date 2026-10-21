@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { useLayout } from "../../editorial/layout";
 import { INK, INK_SOFT, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DUPLICATE } from "./data";
@@ -10,6 +10,7 @@ import {
   DataTable,
   Drift,
   ErrorBox,
+  FIG_Y,
   Headline,
   KEY_INK,
   Listing,
@@ -78,6 +79,9 @@ export const RulesScene: React.FC = () => {
 
       <Drift from={from} to={end + 50}>
         <Headline lead="Unique," turn="and never null." at={uniqueAt - 6} turnAt={neverAt - 4} />
+
+        {/* The table, the two statements and Postgres's answers: one figure. */}
+        <FigLabel n="2" title="Two inserts the primary key refuses" at={from - 4} x={X0} y={y(FIG_Y)} />
 
         <TableName g={g} at={from - 2}>
           customers

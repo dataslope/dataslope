@@ -4,11 +4,11 @@ import { ease } from "../../components/motion";
 import { Entity, ENTITY, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, BAR, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { MONO } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Headline, Kicker, KEY_INK, Mark, Mono, pulse, Spot, Strike, Svg, Tag } from "./parts";
+import { Drift, FIG_Y, Headline, Kicker, KEY_INK, Mark, Mono, pulse, Spot, Strike, Svg, Tag } from "./parts";
 
 const ERD_Y = 400;
 
@@ -83,6 +83,7 @@ export const PointScene: React.FC = () => {
       <Drift from={from} to={end + 50}>
         <Headline lead="Another table's key," turn="stored here." at={from - 6} turnAt={storesAt - 2} />
 
+        <FigLabel n="9" title="Customers and orders, linked by the customer's key" at={orderAt - 6} x={customers.x} y={y(FIG_Y)} />
         <Entity
           layout={orders}
           at={orderAt - 4}

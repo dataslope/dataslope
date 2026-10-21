@@ -3,7 +3,7 @@ import { AbsoluteFill } from "remotion";
 import { Entity, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, INK, INK_SOFT, note } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
@@ -14,6 +14,7 @@ import {
   Code,
   DbTable,
   ErrorBox,
+  FIG_Y,
   Head,
   HEAD_H,
   Kicker,
@@ -97,6 +98,7 @@ export const UnknownScene: React.FC = () => {
       <Head lead="One catch:" at={open - 6} turn="a check only refuses false." turnAt={refusesAt - 4} out={requiredAt - 4} />
       <Head lead="A required price gets three rules." at={requiredAt - 2} />
 
+      <FigLabel n="13" title="A missing price, and what stops it" at={open - 4} x={X0} y={y(FIG_Y)} />
       <Entity layout={card} at={open - 2} marks={{ price: { at: outAt, out: testOut } }} />
       <TypeMark layout={card} row="price" at={numericAt - 2} />
       <RuleTags

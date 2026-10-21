@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { Entity, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, INK, INK_SOFT, note } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
@@ -13,6 +13,7 @@ import {
   CARD_Y,
   DbTable,
   ErrorBox,
+  FIG_Y,
   Head,
   HEAD_H,
   Kicker,
@@ -100,6 +101,7 @@ export const TypeScene: React.FC = () => {
       <Kicker at={open - 10}>The first constraint</Kicker>
       <Head lead="Every column has a type." at={open - 6} turn="That's a rule." turnAt={integerAt} />
 
+      <FigLabel n="4" title="What an integer column lets in" at={open - 4} x={X0} y={y(FIG_Y)} />
       <Entity layout={card} at={open - 2} marks={{ quantity: { at: meansAt, out: moneyAt } }} dim={moneyAt} />
       <TypeMark layout={card} row="quantity" at={integerAt - 2} />
       {/* What each type lets in, beside its row. */}

@@ -3,16 +3,17 @@ import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, body, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { Ink, NextLine } from "../../editorial/ui";
+import { FigLabel, Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { MONO } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, ElbowArrow, Headline, Mark, Tag } from "./parts";
+import { Drift, ElbowArrow, FIG_Y, Headline, Mark, Tag } from "./parts";
 
 const ROOT_X = 120;
 const ROOT_W = 300;
 const ROOT_H = 92;
-const BRANCH_Y = [362, 496, 630];
+/** The three answers, the top one clear of Fig. 12's label at FIG_Y. */
+const BRANCH_Y = [376, 510, 644];
 const ANSWER_X = 660;
 
 /**
@@ -65,6 +66,8 @@ export const ChooseScene: React.FC = () => {
         <Headline lead="What is the child" turn="without its parent?" at={from - 6} turnAt={withoutAt - 4} />
 
         <div style={{ position: "absolute", inset: 0, opacity: 1 - settle }}>
+          <FigLabel n="12" title="Choosing what happens to the children" at={from + 2} x={ROOT_X} y={y(FIG_Y)} />
+
           {/* ── The root: a parent row goes ── */}
           <Ink at={from + 6} dur={14} style={{ left: ROOT_X, top: rootMid - ROOT_H / 2 }}>
             <div

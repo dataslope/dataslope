@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, INK, INK_SOFT } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { MONO } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
@@ -15,6 +15,7 @@ import {
   Drift,
   ElbowArrow,
   ErrorBox,
+  FIG_Y,
   Headline,
   KEY_INK,
   Kicker,
@@ -28,8 +29,10 @@ import {
 
 const COL_X = [150, 735, 1320];
 const COL_W = 500;
-const TAG_Y = 288;
-const PARENT_Y = 372;
+/** One figure in three columns: its label at FIG_Y, each column's heading
+ *  under it, then the parent table over its child. */
+const TAG_Y = 338;
+const PARENT_Y = 422;
 const HEAD_H = 40;
 const ROW_H = 48;
 const SIZES = { headSize: 20, bodySize: 24, pad: 14 };
@@ -148,6 +151,10 @@ export const DeleteScene: React.FC = () => {
       <Kicker at={from - 10}>Referential integrity</Kicker>
       <Drift from={from} to={end + 50}>
         <Headline lead="Delete a parent," turn="and then?" at={from - 6} turnAt={choiceAt - 4} />
+
+        {/* One label for the three columns: they are one comparison, and their
+            headings arrive together on "deleting". */}
+        <FigLabel n="11" title="Deleting a parent, three ways" at={from} x={COL_X[0]} y={y(FIG_Y)} />
 
         {/* ── The three columns' headings: ON DELETE, then which ── */}
         {kinds.map((kind, i) => (

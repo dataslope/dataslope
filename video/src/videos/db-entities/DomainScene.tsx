@@ -1,12 +1,12 @@
 import React from "react";
 import { AbsoluteFill, Easing, interpolate, useCurrentFrame } from "remotion";
 import { useLayout } from "../../editorial/layout";
-import { INK_SOFT, label, note } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { INK_SOFT, note } from "../../editorial/style";
+import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BANANA, CHECK_SQL, LOOSE, LOOSE_IN, LOOSE_OUT } from "./data";
-import { DbTable, ErrorBox, HEAD_H, Listing, ROW_H, tableGeometry } from "./kit";
+import { DbTable, ErrorBox, Fig, FIG_GAP, HEAD_H, Listing, Mono, ROW_H, tableGeometry } from "./kit";
 import { Bracket, Drift, Headline, OK_INK, OK_WASH, STAT_INK } from "./parts";
 
 const S = 1.3;
@@ -58,8 +58,9 @@ export const DomainScene: React.FC = () => {
   const statusLine = CHECK_SQL.findIndex((l) => l.includes("status IN"));
   const totalLine = CHECK_SQL.findIndex((l) => l.includes("total_cents >="));
   const listTop = y(372);
-  const bananaTop = y(640);
-  const errorTop = y(718);
+  // Low enough for Fig. 8's label to sit on its own line under the CHECKs.
+  const bananaTop = y(664);
+  const errorTop = y(742);
   /** The error box's height: its padding and two lines of 21px mono. */
   const errorBottom = errorTop + 34 + 2 * 21 * 1.5 + 8;
   // "So narrow it": the table moves aside, then the listing comes in on "Four statuses".
@@ -85,9 +86,9 @@ export const DomainScene: React.FC = () => {
 
         {/* ── status as plain text ── */}
         <div style={{ position: "absolute", inset: 0, transform: `translateX(${glide}px)` }}>
-          <Ink at={textAt - 4} dur={14} style={{ left: LOOSE_X, top: top - 46, whiteSpace: "nowrap" }}>
-            <span style={label(22, INK_SOFT)}>status as plain text</span>
-          </Ink>
+          <Fig n="6" at={textAt - 4} x={LOOSE_X} y={top - FIG_GAP}>
+            <Mono>status</Mono> as plain text
+          </Fig>
           <div style={{ position: "absolute", left: LOOSE_X, top, transform: `scale(${S})`, transformOrigin: "0 0" }}>
             <DbTable
               g={g}
@@ -123,6 +124,9 @@ export const DomainScene: React.FC = () => {
         </div>
 
         {/* ── The narrow domain: the lesson's two CHECKs ── */}
+        <Fig n="7" at={listAt - 2} x={RIGHT_X} y={listTop - FIG_GAP}>
+          <Mono>status</Mono> and <Mono>total_cents</Mono>, narrowed by <Mono>CHECK</Mono>
+        </Fig>
         <Listing
           lines={CHECK_SQL}
           x={RIGHT_X}
@@ -140,6 +144,9 @@ export const DomainScene: React.FC = () => {
         />
 
         {/* ── banana, and the rule it broke ── */}
+        <Fig n="8" at={bananaAt - 10} x={RIGHT_X} y={bananaTop - FIG_GAP}>
+          Inserting the status banana, and Postgres&apos;s answer
+        </Fig>
         <Listing
           lines={[BANANA.sql]}
           x={RIGHT_X}

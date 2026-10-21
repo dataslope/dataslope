@@ -3,7 +3,7 @@ import { AbsoluteFill } from "remotion";
 import { Entity, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { BLUE_INK, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { UNIQUE } from "./data";
@@ -11,6 +11,7 @@ import {
   CARD_Y,
   DbTable,
   ErrorBox,
+  FIG_Y,
   Head,
   HEAD_H,
   Kicker,
@@ -78,6 +79,7 @@ export const UniqueScene: React.FC = () => {
       <Head lead="Two accounts, one email?" at={open - 6} out={oneEmailAt - 10} />
       <Head lead="One email," at={oneEmailAt - 4} turn="one account." turnAt={oneAccountAt - 4} />
 
+      <FigLabel n="8" title="A second account with Ada's email" at={open - 4} x={X0} y={y(FIG_Y)} />
       <Entity
         layout={card}
         at={open - 2}

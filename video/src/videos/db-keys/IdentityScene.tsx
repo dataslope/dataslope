@@ -2,14 +2,15 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { ACCENT, ACCENT_INK, INK_SOFT, note } from "../../editorial/style";
+import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { NOKEY, TAYLORS } from "./data";
 import {
   DataTable,
   Drift,
+  FIG_Y,
   Headline,
   KEY_INK,
   KeyArrow,
@@ -49,7 +50,6 @@ export const IdentityScene: React.FC = () => {
   const tablesAt = Math.max(hookFrom + 4, n.word("hook", "two tables") - 8);
   const endsAt = n.word("hook", "ends on a row");
   const whichRowAt = n.word("hook", "WHICH");
-  const customersAt = n.word("taylors", "customers");
   const taylorAt = n.word("taylors", "Taylor Kim", { nth: 1 });
   const portlandAt = n.word("taylors", "Portland");
   const beansAt = n.word("taylors", "coffee beans");
@@ -123,9 +123,8 @@ export const IdentityScene: React.FC = () => {
       <Drift from={hookFrom} to={end + 60}>
         <Headline lead="Every line ends on a row." turn="Which row?" at={hookFrom - 6} turnAt={whichRowAt - 4} />
 
-        <Ink at={customersAt - 10} style={{ left: X0, top: y(300), whiteSpace: "nowrap" }}>
-          <span style={{ ...label(24, INK), fontWeight: 560 }}>An order, and two customers named Taylor Kim</span>
-        </Ink>
+        {/* Arrives with the two empty tables, on the hook. */}
+        <FigLabel n="1" title="An order, and two customers named Taylor Kim" at={tablesAt - 4} x={X0} y={y(FIG_Y)} />
 
         {/* ── The customers: empty on the hook, first with no key, then with one ── */}
         <TableName g={customers} at={tablesAt}>

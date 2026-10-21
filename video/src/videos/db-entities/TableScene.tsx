@@ -1,12 +1,12 @@
 import React from "react";
 import { AbsoluteFill, Easing, interpolate, useCurrentFrame } from "remotion";
 import { useLayout } from "../../editorial/layout";
-import { body, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { body, INK, INK_SOFT, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ADA_ROW, CUSTOMERS, PRICE_COL, PRICE_NAME, PRODUCTS } from "./data";
-import { DbTable, HEAD_H, MARK, ROW_H, tableGeometry } from "./kit";
+import { DbTable, Fig, FIG_GAP, HEAD_H, MARK, Mono, ROW_H, tableGeometry } from "./kit";
 import { BoxPulse, Bracket, Drift, Headline, Mark, pulse, STAT_INK } from "./parts";
 
 /** The tables are set larger than a listing's, so two rows read across the room. */
@@ -31,10 +31,8 @@ export const TableScene: React.FC = () => {
   // ── Cues ──
   const typeFrom = n.beat("type").from;
   const typeAt = n.word("type", "TYPE", { nth: 1 });
-  const tableAt = n.word("type", "a table");
   const realAt = n.word("type", "each real");
   const rowAt = n.word("type", "a row");
-  const customersAt = n.word("ada", "Customers");
   const theTableAt = n.word("ada", "the table");
   const adaAt = n.word("ada", "Ada");
   const oneRowAt = n.word("ada", "one row");
@@ -81,14 +79,9 @@ export const TableScene: React.FC = () => {
 
         {/* ── customers: the entity type, and one real customer ── */}
         <div style={{ position: "absolute", inset: 0, transform: `translateX(${glide}px)` }}>
-          <div style={{ position: "absolute", left: CUSTOMERS_X, top: top - 52, display: "flex", gap: "0.3em", whiteSpace: "nowrap" }}>
-            <Ink at={tableAt - 4} dur={12} style={{ position: "relative" }}>
-              <span style={label(23, INK)}>customers</span>
-            </Ink>
-            <Ink at={customersAt - 4} dur={14} style={{ position: "relative" }}>
-              <span style={{ ...label(23, INK_SOFT), fontWeight: 500 }}>is the table: every customer</span>
-            </Ink>
-          </div>
+          <Fig n="2" at={typeAt - 4} x={CUSTOMERS_X} y={top - FIG_GAP}>
+            <Mono>customers</Mono> is the table: every customer
+          </Fig>
           <Bracket x={CUSTOMERS_X - 18} y0={top} y1={cBottom} at={theTableAt} left color={INK_SOFT} />
           <div
             style={{
@@ -120,11 +113,9 @@ export const TableScene: React.FC = () => {
 
         {/* ── products: another type, another table ── */}
         <div style={{ position: "absolute", inset: 0 }}>
-          <Ink at={productsAt - 4} dur={14} style={{ left: PRODUCTS_X, top: top - 52, whiteSpace: "nowrap" }}>
-            <span style={label(23, INK)}>
-              products <span style={{ color: INK_SOFT, fontWeight: 500 }}>gets a table of its own</span>
-            </span>
-          </Ink>
+          <Fig n="3" at={productsAt - 4} x={PRODUCTS_X} y={top - FIG_GAP}>
+            <Mono>products</Mono> gets a table of its own
+          </Fig>
           <div style={{ position: "absolute", left: PRODUCTS_X, top, transform: `scale(${S})`, transformOrigin: "0 0" }}>
             <DbTable
               g={gP}

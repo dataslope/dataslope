@@ -3,16 +3,17 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, INK, INK_SOFT, label } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { COUNTRIES, IDENTITY } from "./data";
-import { DataTable, Drift, Headline, KEY_INK, Kicker, MARK, MARK_KEY, Mark, Mono, TableName, tableGeometry } from "./parts";
+import { DataTable, Drift, FIG_Y, Headline, KEY_INK, Kicker, MARK, MARK_KEY, Mark, Mono, TableName, tableGeometry } from "./parts";
 
 const LEFT_X = 120;
 const RIGHT_X = 1000;
-const PANEL_Y = 318;
-const TABLE_Y = 486;
+/** The two panels sit under Fig. 5's label, at FIG_Y. */
+const PANEL_Y = 340;
+const TABLE_Y = 508;
 const HEAD_H = 52;
 const ROW_H = 70;
 /** Two short tables on a half page each: set large. */
@@ -67,6 +68,10 @@ export const KindsScene: React.FC = () => {
       <Drift from={from} to={end + 50}>
         <Headline lead="A value it has," turn="or a number the database makes up." at={from - 6} turnAt={surrogateAt - 4} />
 
+        {/* One figure, two panels: a table keyed on a value it has, and one
+            keyed on a number the database made up. */}
+        <FigLabel n="5" title="Countries and customers, keyed two ways" at={naturalAt - 6} x={LEFT_X} y={y(FIG_Y)} />
+
         {/* ── Natural ── */}
         <Ink at={naturalAt - 4} dur={14} style={{ left: LEFT_X, top: y(PANEL_Y), whiteSpace: "nowrap" }}>
           <span style={{ ...label(30, INK) }}>
@@ -103,7 +108,7 @@ export const KindsScene: React.FC = () => {
             left: 900,
             top: y(PANEL_Y),
             width: 1.5,
-            height: (y(830) - y(PANEL_Y)) * divider,
+            height: (y(852) - y(PANEL_Y)) * divider,
             background: `color-mix(in srgb, ${INK} 30%, transparent)`,
           }}
         />

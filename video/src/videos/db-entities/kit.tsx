@@ -232,15 +232,20 @@ export const Listing: React.FC<{
 
 // ── Figure labels and inline code ────────────────────────────────────────────
 
+/** How far a figure label's top sits above its figure's: its own line, and
+ *  about 27px of air between the two. */
+export const FIG_GAP = 56;
+
 /** "Fig. 2" and a title that may hold code: the shared FigLabel, widened. */
-export const Fig: React.FC<{ n: string; at: number; x?: number; y: number; children: React.ReactNode }> = ({
+export const Fig: React.FC<{ n: string; at: number; out?: number; x?: number; y: number; children: React.ReactNode }> = ({
   n,
   at,
+  out,
   x = X0,
   y,
   children,
 }) => (
-  <Ink at={at} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
+  <Ink at={at} out={out} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
     <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>Fig. {n}</span>
     <span style={{ ...label(24, INK), fontWeight: 560 }}>{children}</span>
   </Ink>

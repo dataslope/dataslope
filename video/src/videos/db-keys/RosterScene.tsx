@@ -1,9 +1,10 @@
 import React from "react";
-import { AbsoluteFill } from "remotion";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { body, INK } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ROSTER } from "./data";
@@ -11,6 +12,7 @@ import {
   DataTable,
   Drift,
   ErrorBox,
+  FIG_Y,
   Headline,
   KEY,
   KEY_INK,
@@ -19,13 +21,15 @@ import {
   MARK_KEY,
   noteStyle,
   RIGHT,
-  TableName,
   tableGeometry,
 } from "./parts";
 
-const ERD_Y = 296;
+/** Fig. 3, the diagram, under its label at FIG_Y. */
+const ERD_Y = 340;
 const TABLE_X = 560;
-const TABLE_Y = 588;
+/** Fig. 4, the rows: its label clear of the diagram, the table under it. */
+const ROWS_FIG_Y = 566;
+const TABLE_Y = 614;
 const HEAD_H = 46;
 const ROW_H = 52;
 const ERR_X = 960;
@@ -37,6 +41,7 @@ const ERR_X = 960;
  * should almost never change, because other tables point at it.
  */
 export const RosterScene: React.FC = () => {
+  const frame = useCurrentFrame();
   const n = useNarration();
   const { y, h } = useLayout();
 
@@ -124,7 +129,11 @@ export const RosterScene: React.FC = () => {
           <span style={{ ...body(60, true), color: INK }}>So what should a key be?</span>
         </Ink>
 
-        {/* ── The roster's diagram: its two key columns on "two columns" ── */}
+        {/* ── Fig. 3, the roster's diagram: its two key columns on "two columns" ──
+            Each label steps back with its figure. */}
+        <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, whatAt, 14) * 0.55 }}>
+          <FigLabel n="3" title="A roster, keyed on two columns" at={twoColsAt - 6} x={students.x} y={y(FIG_Y)} />
+        </div>
         <Entity
           layout={enrollments}
           at={twoColsAt - 4}
@@ -152,10 +161,10 @@ export const RosterScene: React.FC = () => {
         <Relation name="students to enrollments, key" points={studentLine} from="exactly-one" to="zero-or-many" at={pointAt - 4} color={KEY} dim={whatAt} />
         <Relation name="courses to enrollments, key" points={courseLine} from="exactly-one" to="zero-or-many" at={pointAt + 2} color={KEY} dim={whatAt} />
 
-        {/* ── The rows of enrollments ── */}
-        <TableName g={g} at={sevenAt - 2} dim={pointAt - 4}>
-          enrollments (the roster): its key columns
-        </TableName>
+        {/* ── Fig. 4, the rows of enrollments ── */}
+        <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, pointAt - 4, 14) * 0.55 }}>
+          <FigLabel n="4" title="enrollments (the roster): its key columns" at={sevenAt - 4} x={TABLE_X} y={y(ROWS_FIG_Y)} />
+        </div>
         <DataTable
           g={g}
           cols={cols}

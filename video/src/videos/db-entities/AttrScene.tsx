@@ -2,12 +2,12 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { Entity, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { INK, INK_SOFT, note } from "../../editorial/style";
+import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ORDER_COLUMNS, ORDER_ROWS, STATUS_COL, TYPE_HOLDS } from "./data";
-import { DbTable, HEAD_H, MARK, Mono, ROW_H, tableGeometry } from "./kit";
+import { DbTable, Fig, FIG_GAP, HEAD_H, MARK, Mono, ROW_H, tableGeometry } from "./kit";
 import { Arrow, Drift, Headline, Kicker, Mark, RowType } from "./parts";
 
 const S = 1.2;
@@ -46,7 +46,7 @@ export const AttrScene: React.FC = () => {
 
   // No key badge yet: the video names PK when it draws the diagram.
   const orders = useEntityLayout({ x: BOX_X, y: y(350), width: BOX_W, name: "orders", columns: ORDER_COLUMNS.map(({ name }) => ({ name })) });
-  // The table's top rule level with the box's top, and both labels on one line.
+  // The table's top rule level with the box's top, and both figure labels on one line.
   const top = orders.top;
   const g = tableGeometry({ x: 0, top: 0, cols: ORDER_ROWS.cols, rows: ORDER_ROWS.rows, headH: h(HEAD_H), rowH: h(ROW_H) });
   const headMid = top + (g.headH / 2) * S;
@@ -65,9 +65,9 @@ export const AttrScene: React.FC = () => {
         <Kicker at={from - 10}>Attributes and domains</Kicker>
         <Headline lead="Facts become columns." leadAt={attributesAt - 6} turn="Each has a domain." turnAt={domainAt - 4} />
 
-        <Ink at={orderAt - 6} dur={14} style={{ left: BOX_X, top: orders.top - 46, whiteSpace: "nowrap" }}>
-          <span style={label(22, INK_SOFT)}>The entity, its attributes</span>
-        </Ink>
+        <Fig n="4" at={orderAt - 6} x={BOX_X} y={orders.top - FIG_GAP}>
+          The entity, its attributes
+        </Fig>
         <Entity layout={orders} at={orderAt - 4} rowAt={{ id: orderAt + 6, ...rowAt }} />
         {ORDER_COLUMNS.map((c, i) => (
           <RowType key={c.name} layout={orders} row={i} at={domainAt + 2 + i * 5}>
@@ -76,9 +76,9 @@ export const AttrScene: React.FC = () => {
         ))}
 
         <Arrow from={[orders.right + 22, headMid]} to={[TABLE_X - 26, headMid]} at={columnAt - 8} dur={14} color={INK_SOFT} />
-        <Ink at={columnAt - 6} dur={14} style={{ left: TABLE_X, top: orders.top - 46, whiteSpace: "nowrap" }}>
-          <span style={label(22, INK_SOFT)}>The table, a column each</span>
-        </Ink>
+        <Fig n="5" at={columnAt - 6} x={TABLE_X} y={orders.top - FIG_GAP}>
+          The table, a column each
+        </Fig>
         <div style={{ position: "absolute", left: TABLE_X, top, transform: `scale(${S})`, transformOrigin: "0 0" }}>
           <DbTable
             g={g}

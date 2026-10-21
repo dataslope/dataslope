@@ -3,13 +3,13 @@ import { AbsoluteFill, Easing, interpolate, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Entity, ENTITY, entityLayout, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { INK, INK_SOFT, note, PAPER } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { PACKED, PHONES_COL } from "./data";
-import { DbTable, HEAD_H, Listing, MARK_BAD, ROW_H, tableGeometry } from "./kit";
+import { DbTable, Fig, FIG_GAP, HEAD_H, Listing, MARK_BAD, ROW_H, tableGeometry } from "./kit";
 import { BoxPulse, Drift, Headline, lerp, Pulse, Stack, STAT_INK, Svg } from "./parts";
 
 const S = 1.2;
@@ -89,6 +89,9 @@ export const AtomicScene: React.FC = () => {
 
         {/* ── A packed cell ── */}
         <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, leftOut, 16) }}>
+          <Fig n="10" at={cellAt - 6} x={X} y={top - FIG_GAP}>
+            Two phone numbers in one cell, and a search for one
+          </Fig>
           <div style={{ position: "absolute", left: X, top, transform: `scale(${S})`, transformOrigin: "0 0" }}>
             <DbTable
               g={g}
@@ -111,9 +114,9 @@ export const AtomicScene: React.FC = () => {
 
         {/* ── A fact with details of its own becomes an entity ── */}
         <div style={{ position: "absolute", inset: 0, transform: `translateX(${-glide}px)` }}>
-          <Ink at={factAt - 6} dur={14} style={{ left: BOX_X, top: customers.top - 46, whiteSpace: "nowrap" }}>
-            <span style={label(22, INK_SOFT)}>Attribute, or entity?</span>
-          </Ink>
+          <Fig n="11" at={factAt - 6} x={BOX_X} y={customers.top - FIG_GAP}>
+            Attribute, or entity?
+          </Fig>
           <Entity
             layout={customers}
             at={factAt - 4}

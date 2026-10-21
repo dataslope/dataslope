@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { Entity, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, HAIRLINE, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
@@ -13,6 +13,7 @@ import {
   CARD_Y,
   DbTable,
   ErrorBox,
+  FIG_Y,
   Head,
   HEAD_H,
   Kicker,
@@ -33,6 +34,8 @@ const KINDS = [
   { show: "''", says: "a string, empty", word: "empty string" },
 ] as const;
 const NULL_KIND = 0;
+/** The three cells' columns start here; each 200px cell is centred in 240. */
+const KINDS_X = 470;
 
 /**
  * Part 3: null is no value; must every row know this? A default fills in an
@@ -104,6 +107,7 @@ export const NullScene: React.FC = () => {
       <Head lead="Must every row know this?" at={askFrom + 2} />
 
       {/* ── Three things that look empty, only one of which is ── */}
+      <FigLabel n="6" title="Null, zero and the empty string" at={kindAt[NULL_KIND] - 6} x={KINDS_X + 20} y={y(FIG_Y)} out={chipsOut} />
       {KINDS.map((k, i) => {
         const at = kindAt[i] - 4;
         const p = ease(frame, at, 12);
@@ -111,7 +115,7 @@ export const NullScene: React.FC = () => {
         const isNull = i === NULL_KIND;
         const dim = isNull ? 0 : ease(frame, noValueAt, 14) * 0.6;
         if (p <= 0 || o >= 1) return null;
-        const x = 470 + i * 360;
+        const x = KINDS_X + i * 360;
         return (
           <div
             key={k.word}
@@ -155,6 +159,7 @@ export const NullScene: React.FC = () => {
       })}
 
       {/* ── The accounts card and its rows ── */}
+      <FigLabel n="7" title="A default for status, a required email" at={everyColAt - 6} x={X0} y={y(FIG_Y)} />
       <Entity
         layout={card}
         at={everyColAt - 4}
