@@ -7,6 +7,7 @@ import { body, fmt, halo, headline, INK, INK_SOFT, label, note } from "../../edi
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Bridge } from "../sampling/Bridge";
+import { Marker, swell } from "../sampling/emphasis";
 import { useFigNumber } from "../sampling/merged";
 import { Sfx } from "../../sound/Sfx";
 import { CLOSE, shapeOf, TRUE_MEAN, type Spread } from "./data";
@@ -56,6 +57,12 @@ export const CloseScene: React.FC = () => {
   const shrinksAt = n.word("squeeze", "shrinks");
   const biasAt = n.word("bias", "Bias");
   const centeredAt = n.word("bias", "centered");
+  // While each definition is said, the words it turns on: "the next" sample,
+  // the "more data" each sample now has, and the bias left "right where it was".
+  const theNextAt = n.word("variance", "the next");
+  const moreDataAt = n.word("bias", "more data");
+  const whereItWasAt = n.word("bias", "right where it was");
+  const methodFrom = n.beat("method").from;
   const betterAt = n.word("method", "better");
   const movesAt = n.word("method", "moves");
   const nextAt = n.word("next", "only kept");
@@ -98,7 +105,8 @@ export const CloseScene: React.FC = () => {
   // To the nearest point, as RepeatScene prints it: the bias is the same "about
   // ten" at every size, and 10.03 against 9.94 read as if it were shrinking.
   const bias = NARROW.center - TRUE_MEAN;
-  const perSample = move > 0.5 ? "5,000 customers, at random" : squeeze > 0.5 ? "5,000 customers, the easy way" : "200 customers, the easy way";
+  const perSample = move > 0.5 || squeeze > 0.5 ? "5,000 customers" : "200 customers";
+  const method = move > 0.5 ? "at random" : "the easy way";
 
   return (
     <AbsoluteFill>
@@ -117,7 +125,11 @@ export const CloseScene: React.FC = () => {
         </Ink>
         <Note at={twoFrom + 10} x={96} y={y(258)}>
           <span style={{ ...body(32, true), color: INK }}>
-            Each sample: <span key={perSample}>{perSample}</span>
+            Each sample:{" "}
+            <Marker at={moreDataAt} out={methodFrom}>
+              {perSample}
+            </Marker>
+            , {method}
           </span>
         </Note>
       </div>
@@ -206,7 +218,9 @@ export const CloseScene: React.FC = () => {
         </div>
         <Note at={varianceAt} x={640} y={y(600)} out={biasAt}>
           <div style={{ ...body(30, true), color: INK }}>how far one sample&rsquo;s</div>
-          <div style={{ ...body(30, true), color: INK }}>average strays from the next</div>
+          <div style={{ ...body(30, true), color: INK }}>
+            average <Marker at={theNextAt - 2}>strays from the next</Marker>
+          </div>
         </Note>
 
         {/* Bias: the offset. */}
@@ -228,6 +242,7 @@ export const CloseScene: React.FC = () => {
             textAlign: "center",
             whiteSpace: "nowrap",
             opacity: ease(frame, biasAt + 4, 12) * (1 - ease(frame, betterAt + 8, 10)),
+            transform: `scale(${swell(frame, whereItWasAt - 2, 0.1, 20)})`,
             ...halo,
           }}
         >

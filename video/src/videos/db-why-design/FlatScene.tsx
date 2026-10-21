@@ -84,6 +84,7 @@ export const FlatScene: React.FC = () => {
       {rowAts.map((t, i) => (
         <Sfx key={i} name="el-tap" at={t} level={-29} />
       ))}
+      <Sfx name="el-pencil" at={everyAt - 4} level={-37} />
       <Sfx name="el-pencil" at={changesAt - 4} level={-34} />
       <Sfx name="el-pop" at={swapAt} level={-29} />
       <Sfx name="el-scratch" at={twoAt + 4} level={-31} />

@@ -45,9 +45,10 @@ export const HabitScene: React.FC = () => {
   const fairAt = n.word("next", "fair sample");
   const everyoneAt = n.word("next", "drawn from everyone");
   const truthAt = n.word("next", "truth");
-  // The question eases back as the next one is asked, or, in the merged
+  // The question eases back as the next one has been asked, so the page is
+  // still settling into its last frame as the voice ends; in the merged
   // video, which never asks it, as the statement ends.
-  const beAt = merged ? n.word("next", "exactly") : n.word("far", "can it be");
+  const beAt = merged ? n.word("next", "exactly") : n.beat("far").to;
   const back = (at: number) => 1 - 0.62 * ease(frame, at, 22);
   const drawerOut = ease(frame, everyoneAt, 24);
   const drawer = pop(frame, start + 4, fps, 16);
