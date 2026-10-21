@@ -3844,108 +3844,104 @@ function PostgresPlaygroundInner() {
 
   // ─── Import handlers ─────────────────────────────────────────────────
   const handleCsvFile = useCallback(
-    (file: File) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const text = e.target?.result as string;
-          const { headers, rows } = parseCsv(text);
-          if (headers.length === 0) {
-            showToast("CSV file appears to be empty.", "warn");
-            return;
-          }
-          setImportCsvState({
-            tableName: tableNameFromFilename(file.name),
-            headers,
-            rows,
-            rawText: text,
-            targetMode: "new",
-            targetTable: tables[0] ?? "",
-            colCompare: null,
-            columnTypes: inferCsvColumnTypes(headers, rows),
-          });
-        } catch (err) {
-          showToast(
-            `Could not parse CSV: ${err instanceof Error ? err.message : String(err)}`,
-            "warn",
-          );
+    async (file: File): Promise<boolean> => {
+      try {
+        const text = await file.text();
+        const { headers, rows } = parseCsv(text);
+        if (headers.length === 0) {
+          showToast("CSV file appears to be empty.", "warn");
+          return false;
         }
-      };
-      reader.readAsText(file);
+        setImportCsvState({
+          tableName: tableNameFromFilename(file.name),
+          headers,
+          rows,
+          rawText: text,
+          targetMode: "new",
+          targetTable: tables[0] ?? "",
+          colCompare: null,
+          columnTypes: inferCsvColumnTypes(headers, rows),
+        });
+        return true;
+      } catch (err) {
+        showToast(
+          `Could not parse CSV: ${err instanceof Error ? err.message : String(err)}`,
+          "warn",
+        );
+        return false;
+      }
     },
     [showToast, tables],
   );
 
   const handleJsonFile = useCallback(
-    (file: File) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const text = e.target?.result as string;
-          const parsed = JSON.parse(text) as unknown;
-          if (!Array.isArray(parsed)) {
-            showToast(
-              "JSON must be an array of objects (e.g. [{...}, {...}]).",
-              "warn",
-            );
-            return;
-          }
-          if (parsed.length === 0) {
-            showToast("JSON array is empty.", "warn");
-            return;
-          }
-          const keySet = new Set<string>();
-          for (const obj of parsed) {
-            if (obj && typeof obj === "object" && !Array.isArray(obj)) {
-              for (const k of Object.keys(obj as Record<string, unknown>)) {
-                keySet.add(k);
-              }
-            }
-          }
-          const headers = Array.from(keySet);
-          if (headers.length === 0) {
-            showToast("JSON objects appear to have no keys.", "warn");
-            return;
-          }
-          const rows = parsed.map((obj) => {
-            const record = obj as Record<string, unknown>;
-            return headers.map((h) => {
-              const v = record[h];
-              if (v === null || v === undefined) return "";
-              if (typeof v === "object") return JSON.stringify(v);
-              return String(v);
-            });
-          });
-          setImportJsonState({
-            tableName: tableNameFromFilename(file.name),
-            headers,
-            rows,
-            rawText: text,
-            targetMode: "new",
-            targetTable: tables[0] ?? "",
-            colCompare: null,
-            columnTypes: inferCsvColumnTypes(headers, rows),
-          });
-        } catch (err) {
+    async (file: File): Promise<boolean> => {
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text) as unknown;
+        if (!Array.isArray(parsed)) {
           showToast(
-            `Could not parse JSON: ${err instanceof Error ? err.message : String(err)}`,
+            "JSON must be an array of objects (e.g. [{...}, {...}]).",
             "warn",
           );
+          return false;
         }
-      };
-      reader.readAsText(file);
+        if (parsed.length === 0) {
+          showToast("JSON array is empty.", "warn");
+          return false;
+        }
+        const keySet = new Set<string>();
+        for (const obj of parsed) {
+          if (obj && typeof obj === "object" && !Array.isArray(obj)) {
+            for (const k of Object.keys(obj as Record<string, unknown>)) {
+              keySet.add(k);
+            }
+          }
+        }
+        const headers = Array.from(keySet);
+        if (headers.length === 0) {
+          showToast("JSON objects appear to have no keys.", "warn");
+          return false;
+        }
+        const rows = parsed.map((obj) => {
+          const record = obj as Record<string, unknown>;
+          return headers.map((h) => {
+            const v = record[h];
+            if (v === null || v === undefined) return "";
+            if (typeof v === "object") return JSON.stringify(v);
+            return String(v);
+          });
+        });
+        setImportJsonState({
+          tableName: tableNameFromFilename(file.name),
+          headers,
+          rows,
+          rawText: text,
+          targetMode: "new",
+          targetTable: tables[0] ?? "",
+          colCompare: null,
+          columnTypes: inferCsvColumnTypes(headers, rows),
+        });
+        return true;
+      } catch (err) {
+        showToast(
+          `Could not parse JSON: ${err instanceof Error ? err.message : String(err)}`,
+          "warn",
+        );
+        return false;
+      }
     },
     [showToast, tables],
   );
 
   const handleParquetFile = useCallback(
-    async (file: File) => {
+    async (file: File): Promise<boolean> => {
       try {
         showToast("Reading parquet file…");
         const { columns, rows } = await readParquetFile(file);
         if (columns.length === 0) {
           showToast("Parquet file appears to have no columns.", "warn");
-          return;
+          return false;
         }
         setImportParquetState({
           tableName: tableNameFromFilename(file.name),
@@ -3955,11 +3951,13 @@ function PostgresPlaygroundInner() {
           targetTable: tables[0] ?? "",
           colCompare: null,
         });
+        return true;
       } catch (err) {
         showToast(
           `Parquet import failed: ${err instanceof Error ? err.message : String(err)}`,
           "warn",
         );
+        return false;
       }
     },
     [showToast, tables],
@@ -4286,19 +4284,16 @@ function PostgresPlaygroundInner() {
       performImportSqlDump(sql, filename, report),
     importSqlScriptInNewWorkspace: (sql, filename, report) =>
       performImportSqlDumpInNewWorkspace(sql, filename, report),
-    openCsvImport: (file) => {
-      setImportCsvState(null);
-      setImportCsvOpen(true);
-      handleCsvFile(file);
+    // Each dialog opens only once its preview is parsed: opened first, it
+    // shows its empty dropzone for as long as the read takes.
+    openCsvImport: async (file) => {
+      if (await handleCsvFile(file)) setImportCsvOpen(true);
     },
-    openJsonImport: (file) => {
-      setImportJsonState(null);
-      setImportJsonOpen(true);
-      handleJsonFile(file);
+    openJsonImport: async (file) => {
+      if (await handleJsonFile(file)) setImportJsonOpen(true);
     },
-    openParquetImport: (file) => {
-      setImportParquetOpen(true);
-      void handleParquetFile(file);
+    openParquetImport: async (file) => {
+      if (await handleParquetFile(file)) setImportParquetOpen(true);
     },
     openWorksheetImport: (sheet: XlsxSheet) => {
       // The worksheet arrives shaped exactly like a parsed CSV, so it goes

@@ -2060,19 +2060,16 @@ function SqlPlaygroundInner() {
       performImportDatabaseFile(bytes, filename, report),
     importSqlScript: (sql, filename, report) =>
       performImportSqlDump(sql, filename, report),
-    openCsvImport: (file) => {
-      setImportCsvState(null);
-      setImportCsvOpen(true);
-      handleCsvFile(file);
+    // Each dialog opens only once its preview is parsed: opened first, it
+    // shows its empty dropzone for as long as the read takes.
+    openCsvImport: async (file) => {
+      if (await handleCsvFile(file)) setImportCsvOpen(true);
     },
-    openJsonImport: (file) => {
-      setImportJsonState(null);
-      setImportJsonOpen(true);
-      handleJsonFile(file);
+    openJsonImport: async (file) => {
+      if (await handleJsonFile(file)) setImportJsonOpen(true);
     },
-    openParquetImport: (file) => {
-      setImportParquetOpen(true);
-      void handleParquetFile(file);
+    openParquetImport: async (file) => {
+      if (await handleParquetFile(file)) setImportParquetOpen(true);
     },
     openWorksheetImport: (sheet: XlsxSheet) => {
       // The worksheet arrives shaped exactly like a parsed CSV, so it goes
