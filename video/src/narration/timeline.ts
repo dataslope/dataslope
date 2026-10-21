@@ -169,7 +169,7 @@ export function buildTimeline(
       start: start + w.start,
       end: start + w.end,
     }));
-    cursor = start + timed.duration + (beat.pauseAfter ?? DEFAULT_PAUSE);
+    cursor = start + timed.duration + Math.max(beat.pauseAfter ?? DEFAULT_PAUSE, script.minPause ?? 0);
     previousEnd = start + timed.duration;
     return {
       id: beat.id,

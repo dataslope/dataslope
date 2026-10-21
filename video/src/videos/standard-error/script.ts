@@ -1,4 +1,5 @@
 import type { NarrationScript } from "../../narration/types";
+import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
 
 /**
  * Narration for "Standard error and the square-root-of-n law" (16:9), after
@@ -46,6 +47,7 @@ export const script: NarrationScript = {
   id: "standard-error",
   voice: "hope",
   leadIn: 0.5,
+  minPause: COURSE_MIN_PAUSE,
   tail: 2.4,
   beats: [
     {

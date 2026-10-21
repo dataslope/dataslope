@@ -1,4 +1,5 @@
 import type { NarrationScript } from "../../narration/types";
+import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
 
 /**
  * Narration for "Survivorship bias" (16:9), after
@@ -56,6 +57,7 @@ export const script: NarrationScript = {
   id: "survivorship-bias",
   voice: "hope",
   leadIn: 0.5,
+  minPause: COURSE_MIN_PAUSE,
   tail: 2.6,
   beats: [
     {

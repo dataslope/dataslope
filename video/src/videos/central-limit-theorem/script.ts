@@ -1,4 +1,5 @@
 import type { NarrationScript } from "../../narration/types";
+import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
 
 /**
  * Narration for "The Central Limit Theorem" (16:9), after
@@ -26,6 +27,7 @@ export const script: NarrationScript = {
   id: "central-limit-theorem",
   voice: "hope",
   leadIn: 0.5,
+  minPause: COURSE_MIN_PAUSE,
   tail: 2.6,
   beats: [
     {

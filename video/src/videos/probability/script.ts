@@ -1,4 +1,5 @@
 import type { NarrationScript } from "../../narration/types";
+import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
 import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
 
 /**
@@ -71,6 +72,7 @@ export const script: NarrationScript = {
   voice: "hope",
   // The series intro plays first; its lead-in lives in editorial/intro.ts.
   leadIn: INTRO_LEAD_IN,
+  minPause: COURSE_MIN_PAUSE,
   tail: 3,
   // A little more than the default 1.6 s before each scene, so each finished
   // figure holds a moment longer before the cut.
