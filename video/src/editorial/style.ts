@@ -57,15 +57,22 @@ export const label = (size = 21, color: string = INK_SOFT): React.CSSProperties 
   color,
 });
 
-/** Inter for annotations and numbers on the charts. */
+/** Inter for annotations and numbers on the charts. Proportional figures:
+ *  Inter's tabular feature also sets the hyphen in a digit-wide slot, so
+ *  "p-value" read "p - value" in every note while it was on. Give a number
+ *  that must not shift as it changes (a counter, a column) TABULAR. */
 export const note = (size = 21, color: string = INK): React.CSSProperties => ({
   fontFamily: SANS,
   fontSize: size,
   fontWeight: 500,
   lineHeight: 1.3,
-  fontVariantNumeric: "tabular-nums lining-nums",
+  fontVariantNumeric: "lining-nums",
   color,
 });
+
+/** Digits of one width, for a number that counts or a column of numbers.
+ *  Only on the digits: it spaces out a hyphen in Inter (see note()). */
+export const TABULAR: React.CSSProperties = { fontVariantNumeric: "tabular-nums lining-nums" };
 
 /** A paper-colored halo, for a label that sits close to bars or a curve. */
 export const halo: React.CSSProperties = {
