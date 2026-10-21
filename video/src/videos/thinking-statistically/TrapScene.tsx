@@ -86,10 +86,6 @@ export const TrapScene: React.FC = () => {
   const lit = ease(frame, typeAt - 4, 12);
   const storedLit = ease(frame, storedAt - 2, 12);
   const shift = SHIFT * (1 - ease(frame, slideAt, 20));
-  // The mean as pandas prints it, written out as it is read: the thousands
-  // on "Forty-eight", the rest on "seven hundred", the cents after. No
-  // count-up through values pandas never printed.
-  const meanText = ZIPS.zipMean.toFixed(2);
   const priceIn = ease(frame, priceAt - 8, 14);
   const columns = [
     { name: "zip_code", dtype: ZIPS.dtypes.zip_code, values: ZIPS.zips.map(String), at: zipAt - 6, step: 4 },
@@ -186,9 +182,12 @@ export const TrapScene: React.FC = () => {
       <Ink at={fortyAt - 4} dur={16} style={{ left: COL[0] + shift, top: y(MEAN_Y + 40), whiteSpace: "nowrap" }}>
         <span style={mono(40, STAT_INK, 700)}>
           <Strike at={placeAt - 2} top="0.62em">
-            {meanText.slice(0, -6)}
-            <span style={{ opacity: ease(frame, sevenAt - 4, 10) }}>{meanText.slice(-6, -3)}</span>
-            <span style={{ opacity: ease(frame, fiftyFiveAt + 10, 10) }}>{meanText.slice(-3)}</span>
+            {/* The mean as pandas prints it, whole on "Forty-eight" (no count-up
+                through values pandas never printed), then underlined as the
+                rest of it is read out. */}
+            <Mark at={sevenAt - 2} dur={fiftyFiveAt - sevenAt + 12} out={placeAt - 6}>
+              {ZIPS.zipMean.toFixed(2)}
+            </Mark>
           </Strike>
         </span>
       </Ink>
