@@ -89,6 +89,9 @@ Each report in [`20261021-course-video-review/`](20261021-course-video-review/) 
 
 ## Sound effects
 
-Agents added and moved effects beside the animations they belong to. `check:mix` (informational) reported the following:
+Agents added and moved effects beside the animations they belong to, each cued from the same frame as its animation. `check:mix` (informational; about 15 LU under the narration reads as subtle) measured every video after the fixes:
 
-(filled in below once the run finishes)
+- **Statistics:** effects 19.2 to 21.4 LU under the narration; speech a median 22 to 25 dB above them where both sound.
+- **Database Design:** 21.7 to 24.8 LU under; speech a median 25 to 28 dB above.
+
+No video's effects are louder than the series' subtle bar. The quietest margin, the 5th percentile of speech over effects, is 6.0 dB, in the merged Unit 5 video.
