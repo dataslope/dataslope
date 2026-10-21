@@ -66,7 +66,7 @@ const SHARED_CONSTRAINTS =
  *
  * The empty-background clause is the transparency rule, and it replaced a
  * "white background" that had become a contradiction: generation now asks
- * gpt-image-2 for `background: "transparent"` directly, so there is no white
+ * the image model for `background: "transparent"` directly, so there is no white
  * field to stage on. Asking for one anyway got a soft grey ground shadow
  * painted at partial alpha, which is invisible on the white page and a grey
  * smudge on the near-black one. Measured on the same subject: 9.3% of the

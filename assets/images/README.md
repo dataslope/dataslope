@@ -3,7 +3,8 @@
 **This folder is currently empty of sources, and that is the expected state.**
 
 Every image the site serves is now produced by the illustration pipeline
-(`gpt-image-2` → Recraft background removal → `promote-illustrations.mjs`),
+(the latest OpenAI image model, drawing on a transparent background →
+`promote-illustrations.mjs`),
 which encodes once at quality 92 and writes the served file **straight into
 `public/images/<slug>.webp`**. Nothing is committed twice. See the
 "Illustrations" section of `AGENTS.md` for that workflow.

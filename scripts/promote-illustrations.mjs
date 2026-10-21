@@ -24,8 +24,8 @@
  * Ids are prompt ids (e.g. `python-basics-loops`). An id with a cut-out
  * promotes the cut-out and nothing else: every surface on the site asks for
  * the `-cutout` slug, so an opaque original beside it is git weight nothing
- * serves. Generation writes the cut-out directly (gpt-image-2 returns a real
- * alpha channel), so most runs have nothing else to promote.
+ * serves. Generation writes the cut-out directly (the image model returns a
+ * real alpha channel), so most runs have nothing else to promote.
  *
  * Options:
  *   --from <dir|r2>   Source of candidates (default: ./generated-illustrations)

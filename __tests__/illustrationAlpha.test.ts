@@ -1,5 +1,5 @@
 // Pins the alpha check that replaced the background-removal step. Generation
-// now asks gpt-image-2 for `background: "transparent"`, so the generated file
+// now asks the image model for `background: "transparent"`, so the generated file
 // IS the cut-out every page serves — and the two ways that goes wrong are
 // silent. A fully opaque frame gets promoted as a `-cutout` and serves a white
 // rectangle; a frame carrying a partial-alpha ground shadow looks perfect on

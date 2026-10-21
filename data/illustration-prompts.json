@@ -1,6 +1,6 @@
 {
   "meta": {
-    "model": "gpt-image-2",
+    "model": "gpt-image-2.5-flare",
     "defaultStyle": "isometric illustration",
     "mascot": "the Dataslope marmot mascot, a friendly round alpine marmot with a cream belly, rosy cheeks, and small rounded ears",
     "brandColors": {

@@ -62,11 +62,13 @@ without bound.
 
 Violating any of these has already been tried and rejected. Don't re-litigate.
 
-- `gpt-image-2`, **quality `low`**, **size `1536x1024`**, **always the Batch API**.
+- **The latest OpenAI image model** (`gpt-image-2.5-flare` since 2026-10-21, pinned in
+  `meta.model`; the generator warns when `/v1/models` lists a newer one), **quality
+  `low`**, **size `1536x1024`**, **always the Batch API**.
   Low is the default in the script for a reason: image output tokens dominate the bill
   and the tiers are 158 vs 1372 vs 5488 tokens.
-  One course departs from the model on request: `working-with-coding-agents`
-  (2026-10-13) was generated with `gpt-image-2.5-flare` via `--model`. At `low` and
+  The first set drawn with 2.5 was `working-with-coding-agents` (2026-10-13), via
+  `--model` before it became the default. At `low` and
   1536x1024 it bills the same 158 output tokens, accepts `background: "transparent"`,
   and draws solid pixels at alpha 253 rather than 255, which `alphaStats` already
   counts as solid (its cut-off is 250). The Batch API accepted a 19-request job for
@@ -499,7 +501,9 @@ JSONL is parsed as a **stream** and prompts are chunked into `--batch-size` jobs
 
 **8. `gpt-image-2` has no transparent background.** `background: "transparent"` is a
 400, and asking for transparency in the prompt makes the model *paint a fake
-checkerboard* (verified: opaque RGB, zero alpha). Removal is always a separate step.
+checkerboard* (verified: opaque RGB, zero alpha). It accepted the option for a while
+(2026-09) and then stopped (a 400 again on 2026-10-21). The 2.5 models accept it, which
+is why the default moved to `gpt-image-2.5-flare`.
 `output_format: "svg"` is also a 400 — png/webp/jpeg only.
 
 **9. The R2 sink never skips.** `--force` matters only for the disk sink

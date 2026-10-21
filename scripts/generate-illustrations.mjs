@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Batch-generate the Dataslope course/interview illustrations with OpenAI's
- * GPT Image 2. Reads prompt definitions from `data/illustration-prompts.json`
+ * Batch-generate the Dataslope course/interview illustrations with the latest
+ * OpenAI image model (`meta.model`; it warns when a newer one exists). Reads prompt definitions from `data/illustration-prompts.json`
  * (the same source the admin gallery renders), builds each prompt in the house
  * style, and writes one PNG per prompt.
  *
@@ -36,7 +36,7 @@
  *   --size <WxH|auto>    Override the per-category size for every prompt
  *   --quality <q>        auto | low | medium | high (default: low — see above)
  *   --background <mode>  transparent | opaque | auto (default: transparent)
- *                        gpt-image-2 emits a real alpha channel, so a run is
+ *                        The model emits a real alpha channel, so a run is
  *                        already the cut-out the site serves and there is no
  *                        background-removal step. A transparent image is
  *                        written as the run's `cutout` artifact and checked
@@ -61,7 +61,7 @@
  *   -h, --help           Show this help
  *
  * Notes:
- *   - GPT Image 2 returns base64 image data (no URL); it is decoded and written.
+ *   - The API returns base64 image data (no URL); it is decoded and written.
  *   - Transparency comes from the API, not from a second service. An image
  *     that comes back with no transparent pixels at all is a failed cut-out
  *     (the model painted a background anyway), and is reported rather than
@@ -77,7 +77,7 @@ import {
   mkdirSync,
   existsSync,
 } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import sharp from "sharp";
 import { createR2Client, credentialsFromEnv } from "./lib/r2.mjs";
@@ -236,6 +236,7 @@ export function buildPrompt(spec, colors, styles = {}) {
 
 // ── Cost estimation ──────────────────────────────────────────────────────────
 // Image output tokens per request, measured against gpt-image-2 on 2026-07-28.
+// gpt-image-2.5-flare matched it at low 1536x1024 (158) on 2026-10-21.
 // Keyed "<size>/<quality>". `auto` is not listed because the model picks a tier
 // per prompt, so its cost is not predictable up front.
 const COST_TOKENS = {
@@ -356,6 +357,44 @@ export const __testing = { api };
 
 const BATCH_STATE_FILE = (out) => join(out, "last-batch.json");
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// ── Newest image model ───────────────────────────────────────────────────────
+// Art is drawn with the latest OpenAI image model (AGENTS.md, "Illustrations").
+// The model stays pinned in `meta.model` so a run is reproducible, which means
+// a newer release would go unnoticed; before anything is billed, say so when
+// /v1/models lists one.
+
+/** Ids of `gpt-image-*` models released after `model`, newest first. Dated
+ *  snapshots (`gpt-image-2-2026-04-21`) alias an undated id and are skipped.
+ *  So are variants launched alongside `model`: `gpt-image-2.5-sunburst` was
+ *  created seconds after `-flare`, and is a sibling rather than a successor. */
+const SAME_RELEASE_S = 24 * 60 * 60;
+
+export function newerImageModels(models, model) {
+  const current = models.find((m) => m.id === model);
+  if (!current) return [];
+  return models
+    .filter((m) => /^gpt-image-/.test(m.id) && !/-\d{4}-\d{2}-\d{2}$/.test(m.id))
+    .filter((m) => m.created > current.created + SAME_RELEASE_S)
+    .sort((a, b) => b.created - a.created)
+    .map((m) => m.id);
+}
+
+/** Advisory only: a failed lookup never blocks a run. */
+async function warnIfNewerModel(model, key) {
+  try {
+    const res = await api("/models", { key, retries: 1 });
+    const newer = newerImageModels((await res.json()).data ?? [], model);
+    if (newer.length) {
+      console.warn(
+        `! ${model} is not the latest OpenAI image model; newer: ${newer.join(", ")}.\n` +
+          `  Update meta.model in ${relative(ROOT, dataFile)} (or pass --model) to use it.\n`,
+      );
+    }
+  } catch {
+    // The run itself will surface a real API problem.
+  }
+}
 
 // ── Entry selection ──────────────────────────────────────────────────────────
 function selectEntries(data, opts) {
@@ -899,6 +938,7 @@ async function main() {
       `${describeCost(entries, opts, mode)}\n`,
   );
   const key = requireKey();
+  await warnIfNewerModel(model, key);
   if (opts.command === "sync") return cmdSync(entries, opts, model, key);
   if (opts.command === "submit") { await cmdSubmit(entries, opts, model, key); return; }
   if (opts.command === "run") return cmdRun(entries, opts, model, key);
