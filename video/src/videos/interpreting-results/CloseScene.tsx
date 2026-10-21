@@ -6,7 +6,7 @@ import { body, HIGHLIGHT, INK, INK_SOFT, label, PAPER } from "../../editorial/st
 import { Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Arrow, Bracket, Headline, lerp, Marker, STAT, STAT_INK, Svg } from "./parts";
+import { Arrow, Bracket, Drift, Headline, lerp, Marker, STAT, STAT_INK, Svg } from "./parts";
 
 const TRAPS = ["Simpson's paradox", "Cherry-picking", "The sharpshooter's target"];
 const TAG_X = [160, 640, 1100];
@@ -62,6 +62,8 @@ export const CloseScene: React.FC = () => {
         ]}
       />
 
+      {/* The finished close eases in over the last words and the hold after them. */}
+      <Drift from={freshAt} to={n.durationInFrames} amount={0.025} origin={[960, 560]}>
       {TRAPS.map((t, i) => (
         <Ink key={t} at={tagAt(i)} dur={12} style={{ left: TAG_X[i], top: y(TAG_Y), whiteSpace: "nowrap" }}>
           <div
@@ -126,6 +128,7 @@ export const CloseScene: React.FC = () => {
       <NextLine at={freshAt + 8} x={1240} y={y(STEP_Y) + 170} width={560}>
         exploring, then confirming.
       </NextLine>
+      </Drift>
     </AbsoluteFill>
   );
 };

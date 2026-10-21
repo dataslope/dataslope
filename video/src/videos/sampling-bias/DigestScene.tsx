@@ -175,8 +175,17 @@ export const DigestScene: React.FC = () => {
         at={callFrom}
         dotAt={fortyAt - 4}
         name="Literary Digest"
-        sub={`${fmt(H.digestReturned / 1e6, 1)} million replies: Landon ${fmt(H.digestLandonShare, 1)}%`}
-        subAt={fiftySevenAt - 4}
+        sub={
+          <>
+            {fmt(H.digestReturned / 1e6, 1)} million replies,
+            {/* The share the Digest called, as "fifty-seven" is said: the dot
+                is Roosevelt's 42.9, which is the scale's. */}
+            <br />
+            <span style={{ opacity: ease(frame, fiftySevenAt - 4, 12) }}>
+              Landon <b style={{ color: EASY_INK }}>{fmt(H.digestLandonShare, 1)}%</b>
+            </span>
+          </>
+        }
         value={H.digestRooseveltShare}
         color={EASY}
         ink={EASY_INK}
@@ -283,7 +292,7 @@ const Row: React.FC<{
   at: number;
   dotAt: number;
   name: string;
-  sub: string;
+  sub: React.ReactNode;
   subAt?: number;
   value: number;
   color: string;

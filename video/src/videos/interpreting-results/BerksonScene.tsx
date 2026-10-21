@@ -27,6 +27,7 @@ export const BerksonScene: React.FC = () => {
   const from = n.beat("berkson").from;
 
   // ── Cues ──
+  const relationshipAt = n.word("berkson", "relationship");
   const populationAt = n.word("berkson", "population");
   const abilityAt = n.word("berkson", "ability");
   const addAt = n.word("rule", "add up");
@@ -48,6 +49,7 @@ export const BerksonScene: React.FC = () => {
   const px = (p: { x0: number; x1: number }, v: number) => p.x0 + ((v - DOM[0]) / (DOM[1] - DOM[0])) * (p.x1 - p.x0);
   const py = (v: number) => bottom - ((v - DOM[0]) / (DOM[1] - DOM[0])) * (bottom - top);
   const pick = ease(frame, barAt + 4, 12);
+  const stream = Math.max(0.4, (populationAt + 4 - (relationshipAt - 4)) / 60);
   const admittedAbility = BERKSON.admitted.map((i) => BERKSON.ability[i]);
   const fx0 = Math.min(...admittedAbility);
   const fx1 = Math.max(...admittedAbility);
@@ -86,7 +88,7 @@ export const BerksonScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: the applicants, the bar, the admitted crossing over, the line ── */}
-      <Sfx name="el-sprinkle" at={populationAt - 6} level={-33} />
+      <Sfx name="el-sprinkle" at={relationshipAt - 4} level={-33} />
       <Sfx name="el-pop" at={admitAt - 6} level={-30} />
       <Sfx name="el-pencil" at={barAt - 6} level={-33} />
       <Sfx name="el-whoosh" at={getInAt - 8} level={-33} />
@@ -141,7 +143,8 @@ export const BerksonScene: React.FC = () => {
         <Svg>
           {BERKSON.ability.map((a, i) => {
             const b = BERKSON.interview[i];
-            const appear = ease(frame, populationAt - 6 + (i % 60) * 0.4, 8);
+            // The applicants stream in from "relationship" through "population".
+            const appear = ease(frame, relationshipAt - 4 + (i % 60) * stream, 8);
             if (appear <= 0) return null;
             const inside = BERKSON.admittedSet.has(i);
             const order = inside ? BERKSON.admitted.indexOf(i) : 0;
