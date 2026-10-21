@@ -4,18 +4,20 @@ import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK } from "../../editorial/style";
+import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { courseId, JT, studentId } from "./data";
-import { Caption, DbTable, Drift, HEAD_H, Head, KEY_INK, Kicker, MARK, MARK_BAD, ROW_H, Tag, tableGeometry } from "./parts";
+import { Caption, DbTable, Drift, FIG_ABOVE, HEAD_H, Head, KEY_INK, Kicker, MARK, MARK_BAD, ROW_H, Tag, tableGeometry } from "./parts";
 
 const LEFT_X = 120;
 const RIGHT_X = 820;
 const STUDENTS_Y = 400;
 const COURSES_Y = 640;
-/** The next shape, glimpsed under the junction rows: one table split in two. */
+/** The next shape, glimpsed under the junction rows: one table split in two,
+ *  Fig. 2's one-to-one panel again, low enough to leave its label room. */
 const PREVIEW_X = 820;
-const PREVIEW_Y = 780;
+const PREVIEW_Y = 800;
 const PREVIEW_W = 280;
 const PREVIEW_GAP = 280;
 
@@ -67,6 +69,8 @@ export const GradeScene: React.FC = () => {
   const cRow = [String(courseId("Math")), "Math", gradeOf("Ada", "Math")];
   const cg = tableGeometry({ x: LEFT_X, top: y(COURSES_Y), cols: cCols, rows: [cRow], extra: [["", "", mathGrades]], headH: h(HEAD_H), rowH: h(ROW_H) });
   const leftDim = 1 - ease(frame, belongsAt, 14) * 0.5;
+  // Both figures' labels share one line, over the tables' names.
+  const figY = jg.top - 48 - FIG_ABOVE;
 
   // "Splits one thing in two": a users box, and a second box sliding out
   // from under it, the line between them drawn with the next part's ends.
@@ -93,6 +97,7 @@ export const GradeScene: React.FC = () => {
       <Drift from={nextAt} to={n.beat("wide").from} scale={0.03} origin={[960, y(560)]}>
         <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, nextAt, 16) * 0.55 }}>
           {/* ── The junction's rows, with their grades ── */}
+          <FigLabel n="11" title="Grades on the junction rows" at={from - 4} x={jg.x} y={figY} />
           <Caption at={from - 2} x={jg.x} y={jg.top - 48}>
             enrollments, joined to students and courses
           </Caption>
@@ -115,6 +120,7 @@ export const GradeScene: React.FC = () => {
 
           {/* ── Not on students ── */}
           <div style={{ position: "absolute", inset: 0, opacity: leftDim }}>
+            <FigLabel n="12" title="A grade column on students, then on courses" at={notStudentsAt - 6} x={sg.x} y={figY} />
             <Caption at={notStudentsAt - 4} x={sg.x} y={sg.top - 48}>
               students
             </Caption>
@@ -161,6 +167,7 @@ export const GradeScene: React.FC = () => {
       </Drift>
 
       {/* ── The next shape, glimpsed: one table splitting in two ── */}
+      <FigLabel n="2" title="One to one" at={splitsAt - 6} x={whole.x} y={whole.top - FIG_ABOVE} />
       <div style={{ position: "absolute", inset: 0, transform: `translateX(${(apart - 1) * (PREVIEW_W + PREVIEW_GAP)}px)` }}>
         <Entity layout={part} at={inTwoAt - 6} />
       </div>

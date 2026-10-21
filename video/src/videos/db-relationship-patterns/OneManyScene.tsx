@@ -2,9 +2,10 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
+import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Head, KEY_INK, Kicker, Pulse, Spot, Tag } from "./parts";
+import { Drift, FIG_ABOVE, Head, KEY_INK, Kicker, Pulse, Spot, Tag } from "./parts";
 
 /**
  * Part 1 opens: one customer, many orders, as the lesson's own ER diagram
@@ -67,6 +68,7 @@ export const OneManyScene: React.FC = () => {
       <Spot id="db-relationship-patterns-basket" at={ordersAt + 4} left={1560} top={y(66)} width={270} height={270} />
 
       <Drift from={belongsAt} to={holdsAt + 60} scale={0.02} origin={[midX, y(600)]}>
+        <FigLabel n="3" title="Customers and orders, as an ER diagram" at={customerAt - 6} x={customers.x} y={customers.top - FIG_ABOVE} />
         <Entity layout={customers} at={customerAt - 4} />
         {/* No wash on customer_id here: "which table holds the link?" is
             asked at the end of this scene and answered in the next. */}

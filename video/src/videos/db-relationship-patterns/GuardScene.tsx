@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK } from "../../editorial/style";
-import { Ink, NextLine } from "../../editorial/ui";
+import { FigLabel, Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SR } from "./data";
@@ -12,6 +12,7 @@ import {
   Code,
   DbTable,
   Drift,
+  FIG_ABOVE,
   HEAD_H,
   Head,
   KEY_INK,
@@ -33,11 +34,13 @@ const TABLES_Y = 410;
 const E_X = 120;
 const M_X = 640;
 const RESULT_X = 1010;
-/** The UPDATE sits well clear of the tables above it, so it reads as a
- *  statement of its own rather than as their footer. */
-const LIST_Y = 752;
+/** The UPDATE sits well clear of the tables above it, with its own figure
+ *  label between, so it reads as a statement of its own rather than as
+ *  their footer. */
+const LIST_Y = 790;
 const LIST_SIZE = 24;
-const NEXT_Y = 832;
+/** The bridge, under the command tag that answers the UPDATE. */
+const NEXT_Y = 870;
 /** The join itself, in the mono face, over the two tables it reads. */
 const JOIN_SIZE = 21;
 
@@ -85,6 +88,8 @@ export const GuardScene: React.FC = () => {
   const ada = 0;
 
   const listTop = y(LIST_Y);
+  // The join's label sits over the join itself, the line of SQL above the tables.
+  const joinY = top - 104;
   const settle = 1 - ease(frame, linksAt, 18) * 0.35;
   // "employees e LEFT JOIN employees m ON …", with LEFT JOIN marked when it is said.
   const [eSide, mSide] = SR.joinFrom.split(" LEFT JOIN ");
@@ -107,8 +112,10 @@ export const GuardScene: React.FC = () => {
       <Drift from={from} to={constraintsAt + 40} scale={0.014} origin={[960, y(560)]}>
       <Drift from={constraintsAt - 12} to={n.durationInFrames} scale={0.03} origin={[960, y(560)]}>
         <div style={{ position: "absolute", inset: 0, opacity: settle }}>
-          {/* ── The join: one table, named twice, and the match ── */}
-          <Ink at={joinAt + 2} dur={18} style={{ left: E_X, top: top - 104, whiteSpace: "nowrap", display: "flex" }}>
+          {/* ── The join: one table, named twice, and the match. One figure:
+              the SQL, both readings of the table, and what the join returns. ── */}
+          <FigLabel n="19" title="Employees joined to themselves" at={from - 4} x={E_X} y={joinY - FIG_ABOVE} />
+          <Ink at={joinAt + 2} dur={18} style={{ left: E_X, top: joinY, whiteSpace: "nowrap", display: "flex" }}>
             <Code line={`${eSide} `} size={JOIN_SIZE} />
             <Mark at={leftAt}>
               <Code line="LEFT JOIN" size={JOIN_SIZE} />
@@ -178,6 +185,7 @@ export const GuardScene: React.FC = () => {
           </Tag>
 
           {/* ── What the key does not check ── */}
+          <FigLabel n="20" title="The update the foreign key lets through" at={whatIfAt - 6} x={E_X} y={listTop - FIG_ABOVE} />
           <Listing
             lines={SR.updateSql}
             x={E_X}

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, INK, label, TABULAR } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { JT } from "./data";
@@ -12,6 +12,7 @@ import {
   DbTable,
   Drift,
   ErrorBox,
+  FIG_ABOVE,
   HEAD_H,
   Head,
   KEY,
@@ -83,6 +84,10 @@ export const PairScene: React.FC = () => {
   const by = g.top - 14;
   const mid = (bx0 + bx1) / 2;
   const count = frame >= rowAt ? JT.after : JT.before;
+  // The table's name sits over its "primary key" tag; both figures' labels
+  // share one line above it.
+  const nameY = g.top - 100;
+  const figY = nameY - FIG_ABOVE;
 
   return (
     <AbsoluteFill>
@@ -116,7 +121,8 @@ export const PairScene: React.FC = () => {
             primary key
           </span>
         </Ink>
-        <Caption at={from - 2} x={g.x} y={g.top - 100}>
+        <FigLabel n="9" title="Two columns, one primary key" at={from - 4} x={g.x} y={figY} />
+        <Caption at={from - 2} x={g.x} y={nameY}>
           enrollments
         </Caption>
         <DbTable
@@ -152,6 +158,7 @@ export const PairScene: React.FC = () => {
         </Ink>
 
         {/* ── The lesson's challenge, run twice ── */}
+        <FigLabel n="10" title="The lesson's challenge, run twice" at={enrollAt - 8} x={LIST_X} y={figY} />
         <Caption at={enrollAt - 6} x={LIST_X} y={listTop - 48}>
           Enroll Linus in Math
         </Caption>

@@ -43,6 +43,10 @@ export const HEAD_Y = 150;
 /** Table heights before `h()`. */
 export const HEAD_H = 52;
 export const ROW_H = 62;
+/** How far above a figure's top edge (a page value) its FigLabel is set:
+ *  the label's own 24px line and about 30px of air under it. Two figures
+ *  side by side share one label line, set above the higher of the two. */
+export const FIG_ABOVE = 62;
 
 // ── Colors: brand ink steps and the editorial palette only ───────────────────
 

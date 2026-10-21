@@ -2,18 +2,19 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import type { Pt } from "../../editorial/ui";
+import { FigLabel, type Pt } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { employee, type Employee, SR } from "./data";
-import { Chip, CHIP_H, Drift, Edge, Head, KEY_INK, Kicker, MARK, MARK_KEY, RowBracket, Spot, Tag } from "./parts";
+import { Chip, CHIP_H, Drift, Edge, FIG_ABOVE, Head, KEY_INK, Kicker, MARK, MARK_KEY, RowBracket, Spot, Tag } from "./parts";
 
 /** How far the self-reference's loop runs out to the left of the box. */
 const LOOP = 110;
 /** Wide enough for a chip's second line, "id 20 · manager_id 18". */
 const CHIP_W = 280;
-/** Each level of the org chart, before `y()`. */
-const LEVEL_Y = [350, 462, 574, 686, 798];
+/** Each level of the org chart, before `y()`: low enough that its figure
+ *  label clears the headline. */
+const LEVEL_Y = [374, 486, 598, 710, 822];
 const TREE_X = 1240;
 const SIDE_X = 920;
 /** The "5 levels" bracket, clear of the role tags beside the chips. */
@@ -79,6 +80,8 @@ export const SelfScene: React.FC = () => {
   const bottom = (nd: Node): Pt => [nd.x + CHIP_W / 2, y(LEVEL_Y[nd.level]) + (CHIP_H + 26) / 2];
   const last = nodes[chain.length - 1];
   const root = nodes[0];
+  // The diagram's label and the chart's share one line, over the chart's top.
+  const figY = Math.min(table.top, top(root)[1]) - FIG_ABOVE;
 
   return (
     <AbsoluteFill>
@@ -94,6 +97,7 @@ export const SelfScene: React.FC = () => {
       <Spot id="db-relationship-patterns-dolls" at={chainAt} left={1590} top={y(70)} width={250} height={170} />
 
       <Drift from={from} to={internAt + 60} scale={0.016} origin={[960, y(580)]}>
+        <FigLabel n="17" title="Employees and their managers, in one table" at={employeeAt - 6} x={a[0] - LOOP} y={figY} />
         <Entity
           layout={table}
           at={employeeAt - 4}
@@ -115,6 +119,7 @@ export const SelfScene: React.FC = () => {
         </Tag>
 
         {/* ── The rows, as the hierarchy they make ── */}
+        <FigLabel n="18" title="The rows, as the hierarchy they make" at={ceoAt - 6} x={SIDE_X} y={figY} />
         {nodes.slice(1).map((nd) => {
           const parent = nodeOf(nd.e.managerId)!;
           return <Edge key={nd.e.id} from={bottom(parent)} to={top(nd)} at={nd.at - 2} />;

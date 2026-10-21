@@ -2,12 +2,12 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { Entity, Relation, useEntityLayout, type EntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import type { Pt } from "../../editorial/ui";
+import { FigLabel, type Pt } from "../../editorial/ui";
 import type { Cardinality } from "../../components/crowsfoot";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { OTM } from "./data";
-import { Caption, DbTable, Drift, HEAD_H, Head, KEY_INK, KeyArrow, Kicker, MARK_KEY, Pulse, ROW_H, tableGeometry } from "./parts";
+import { Caption, DbTable, Drift, FIG_ABOVE, HEAD_H, Head, KEY_INK, KeyArrow, Kicker, MARK_KEY, Pulse, ROW_H, tableGeometry } from "./parts";
 
 /** The four panels: left edges, each panel PANEL wide. */
 const PANEL_X = [120, 560, 1000, 1440];
@@ -99,6 +99,7 @@ export const ShapesScene: React.FC = () => {
 
       {/* ── With keys, one row can point at another ── */}
       <Drift from={rowAt} to={pairOut + 10} scale={0.035} origin={[960, y(520)]}>
+      <FigLabel n="1" title="An order pointing at its customer" at={keysAt - 4} x={cg.x} y={cg.top - 44 - FIG_ABOVE} out={pairOut} />
       <DbTable g={cg} cols={["id", "name"]} rows={[{ cells: CUSTOMER.slice(0, 2), at: rowAt }]} at={keysAt} numeric={[0]} colInk={{ 0: KEY_INK }} out={pairOut} />
       <DbTable
         g={og}
@@ -123,6 +124,14 @@ export const ShapesScene: React.FC = () => {
 
       {/* ── The four shapes ── */}
       <Drift from={otmAt} to={n.beat("names").to + 50} scale={0.018} origin={[960, y(600)]}>
+        {/* One figure in four panels; each panel keeps its own title. */}
+        <FigLabel
+          n="2"
+          title="The four shapes a relationship takes"
+          at={otmAt - 8}
+          x={PANEL_X[0] + (PANEL - BOX_W) / 2}
+          y={y(TITLE_Y) - FIG_ABOVE}
+        />
         {(
           [
             ["One to many", otmAt],

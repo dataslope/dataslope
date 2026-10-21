@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK } from "../../editorial/style";
-import type { Pt } from "../../editorial/ui";
+import { FigLabel, type Pt } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { courseId, MTM, studentId } from "./data";
@@ -12,6 +12,7 @@ import {
   Chip,
   DbTable,
   Drift,
+  FIG_ABOVE,
   HEAD_H,
   Head,
   KEY_INK,
@@ -35,6 +36,8 @@ const COURSE_X = 580;
 const COURSE_W = 190;
 const STUDENT_Y: Record<string, number> = { Ada: 480, Grace: 650 };
 const COURSE_Y: Record<string, number> = { Math: 450, History: 565, Art: 680 };
+/** The column titles over the chips, before `y()`. */
+const NAMES_Y = 380;
 const RIGHT_X = 980;
 const SLOT_Y = 440;
 const FLIP_Y = 690;
@@ -97,6 +100,8 @@ export const CrossScene: React.FC = () => {
   const fg = tableGeometry({ x: RIGHT_X, top: y(FLIP_Y), cols: flipCols, rows: [flipRow], headH: h(HEAD_H), rowH: h(ROW_H) });
 
   const leftDim = giveAt - 6;
+  // Fig. 6 and Fig. 7 share one label line, over the higher of the two.
+  const figY = Math.min(y(NAMES_Y), sg.top - 48) - FIG_ABOVE;
   const bounce = (at: number) => Math.sin(Math.min(1, Math.max(0, (frame - at - 14) / 16)) * Math.PI) * -10;
 
   return (
@@ -113,13 +118,17 @@ export const CrossScene: React.FC = () => {
       <Head lead="Many on both sides," leadAt={from - 6} turn="so no parent." turnAt={neitherAt - 2} />
       <Spot id="db-relationship-patterns-books" at={coursesAt} left={1570} top={y(66)} width={250} height={250} />
 
-      {/* ── Students and courses, linked as they are named ── */}
+      {/* ── Students and courses, linked as they are named. The label stays
+          out of the drift, level with Fig. 7's, and steps back with its figure. ── */}
+      <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, leftDim, 16) * 0.45 }}>
+        <FigLabel n="6" title="Students linked to the courses they take" at={studentAt - 4} x={STUDENT_X} y={figY} />
+      </div>
       <Drift from={from} to={giveAt} scale={0.02} origin={[480, y(560)]}>
         <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, leftDim, 16) * 0.45 }}>
-          <Caption at={studentAt} x={STUDENT_X} y={y(380)}>
+          <Caption at={studentAt} x={STUDENT_X} y={y(NAMES_Y)}>
             students
           </Caption>
-          <Caption at={coursesAt - 2} x={COURSE_X} y={y(380)}>
+          <Caption at={coursesAt - 2} x={COURSE_X} y={y(NAMES_Y)}>
             courses
           </Caption>
           {pairs.map((p) => (
@@ -155,6 +164,7 @@ export const CrossScene: React.FC = () => {
       </Drift>
 
       {/* ── A course id on students: one slot ── */}
+      <FigLabel n="7" title="One foreign key, tried from each side" at={giveAt - 2} x={RIGHT_X} y={figY} />
       <Caption at={giveAt} x={RIGHT_X} y={sg.top - 48}>
         students, with a course_id
       </Caption>

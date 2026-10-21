@@ -4,6 +4,7 @@ import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK } from "../../editorial/style";
+import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { OTM } from "./data";
@@ -11,6 +12,7 @@ import {
   Caption,
   DbTable,
   Drift,
+  FIG_ABOVE,
   HEAD_H,
   Head,
   KEY_INK,
@@ -31,6 +33,9 @@ const ORDERS_X = 760;
 /** How far right the list-in-a-cell table sits while it is the only thing
  *  on the page, before it slides back to make room for orders. */
 const SOLO_DX = 420;
+/** The next shape, glimpsed under the dimmed tables: Fig. 2's many-to-many
+ *  panel again, low enough to leave its label room under the orders. */
+const NEXT_Y = 800;
 
 /**
  * Where the link lives: not as a list in the customer's row (the lesson's
@@ -86,10 +91,13 @@ export const ListScene: React.FC = () => {
   // pause before "foreign key", so the good table swaps in where it ends.
   const soloDx = SOLO_DX * (1 - ease(frame, n.beat("cell").to - 2, 20));
   const after = OTM.listAfter.split(",").length;
+  // Fig. 4 and Fig. 5 share one label line, over the customers caption:
+  // Fig. 4's slides back with its table, and lifts before Fig. 5 inks in.
+  const figY = top - 48 - FIG_ABOVE;
 
   // The next shape, glimpsed: many on both ends.
-  const students = useEntityLayout({ x: 760, y: y(780), width: 260, name: "students", columns: [] });
-  const courses = useEntityLayout({ x: 1300, y: y(780), width: 260, name: "courses", columns: [] });
+  const students = useEntityLayout({ x: 760, y: y(NEXT_Y), width: 260, name: "students", columns: [] });
+  const courses = useEntityLayout({ x: 1300, y: y(NEXT_Y), width: 260, name: "courses", columns: [] });
 
   return (
     <AbsoluteFill>
@@ -110,6 +118,7 @@ export const ListScene: React.FC = () => {
           {/* ── The bad idea, then the same customers without it ── */}
           <div style={{ position: "absolute", inset: 0, transform: `translateX(${soloDx}px)` }}>
           <Drift from={from} to={fkAt} scale={0.03} origin={[CUSTOMERS_X, top]}>
+          <FigLabel n="4" title="Ada's orders as a list in one cell" at={notAt - 2} x={CUSTOMERS_X} y={figY} out={fkAt - 12} />
           <Caption at={notAt} x={CUSTOMERS_X} y={top - 48}>
             customers
           </Caption>
@@ -153,6 +162,7 @@ export const ListScene: React.FC = () => {
           </div>
 
           {/* ── The good idea: the key on the many side ── */}
+          <FigLabel n="5" title="Each order naming its customer" at={fkAt - 2} x={CUSTOMERS_X} y={figY} />
           <Caption at={manyAt - 4} x={ORDERS_X} y={top - 48}>
             orders
           </Caption>
@@ -179,7 +189,8 @@ export const ListScene: React.FC = () => {
         </div>
       </Drift>
 
-      {/* ── And if both sides can be many? ── */}
+      {/* ── And if both sides can be many? Fig. 2's panel, back ── */}
+      <FigLabel n="2" title="Many to many" at={bothAt - 4} x={students.x} y={students.top - FIG_ABOVE} />
       <Entity layout={students} at={bothAt - 2} />
       <Entity layout={courses} at={bothAt + 4} />
       <Relation

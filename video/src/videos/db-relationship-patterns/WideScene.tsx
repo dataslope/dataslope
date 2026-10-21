@@ -4,10 +4,11 @@ import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK } from "../../editorial/style";
+import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { OTO } from "./data";
-import { Caption, DbTable, Drift, HEAD_H, Head, KEY_INK, Kicker, MARK, MARK_BAD, Pulse, ROW_H, Spot, Tag, tableGeometry } from "./parts";
+import { Caption, DbTable, Drift, FIG_ABOVE, HEAD_H, Head, KEY_INK, Kicker, MARK, MARK_BAD, Pulse, ROW_H, Spot, Tag, tableGeometry } from "./parts";
 
 const TABLE_Y = 400;
 const ERD_Y = 400;
@@ -66,6 +67,9 @@ export const WideScene: React.FC = () => {
   // zero-or-one end lands on "zero or one".
   const tablesOut = zeroAt - 8;
   const erdAt = tablesOut + 6;
+  // The tables' label and the diagram's share one line, over the tables'
+  // names; the first has lifted by the time the second inks in.
+  const figY = ug.top - 48 - FIG_ABOVE;
 
   // ── The split, as an ER diagram ──
   const users = useEntityLayout({
@@ -110,6 +114,7 @@ export const WideScene: React.FC = () => {
 
       {/* ── A users table that grew profile columns ── */}
       <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, tablesOut, 14) }}>
+        <FigLabel n="13" title="Profile columns on users, then in their own table" at={usersAt - 6} x={ug.x} y={figY} out={tablesOut - 6} />
         <Caption at={usersAt - 4} x={ug.x} y={ug.top - 48}>
           users
         </Caption>
@@ -164,6 +169,7 @@ export const WideScene: React.FC = () => {
 
       {/* ── The split: users, and an optional profile each ── */}
       <Drift from={erdAt} to={aloneAt + 60} scale={0.018} origin={[midX, y(560)]}>
+        <FigLabel n="14" title="Users and their optional profiles" at={erdAt - 2} x={users.x} y={figY} />
         <Entity layout={users} at={erdAt} />
         <Entity layout={profiles} at={erdAt + 6} marks={{ user_id: { at: fkAt, tone: "key" } }} />
         <Relation

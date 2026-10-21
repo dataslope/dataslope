@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK } from "../../editorial/style";
-import type { Pt } from "../../editorial/ui";
+import { FigLabel, type Pt } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { OTO } from "./data";
@@ -14,6 +14,7 @@ import {
   DbTable,
   Drift,
   ErrorBox,
+  FIG_ABOVE,
   HEAD_H,
   Head,
   KEY_INK,
@@ -74,6 +75,10 @@ export const UniqueScene: React.FC = () => {
   const listH = listingHeight(OTO.secondSql.length, LIST_SIZE);
   const lineAt = OTO.secondSql.map((_, i) => secondAt - 6 + i * 4);
   const fade = 1 - ease(frame, lastAt, 16) * 0.55;
+  // The table's name sits over its column tag; both figures' labels share
+  // one line above it.
+  const nameY = g.top - 84;
+  const figY = nameY - FIG_ABOVE;
 
   const preview = useEntityLayout({ x: PREVIEW_X, y: y(PREVIEW_Y), width: 280, name: "employees", columns: [] });
   const loopFrom = preview.anchor("right");
@@ -101,7 +106,8 @@ export const UniqueScene: React.FC = () => {
       <Drift from={from} to={lastAt + 30} scale={0.016} origin={[960, y(600)]}>
       <Drift from={lastAt} to={n.beat("self").from} scale={0.03} origin={[960, y(600)]}>
         <div style={{ position: "absolute", inset: 0, opacity: fade }}>
-          <Caption at={from - 2} x={g.x} y={g.top - 84}>
+          <FigLabel n="15" title="Ada's two profile rows" at={from - 4} x={g.x} y={figY} />
+          <Caption at={from - 2} x={g.x} y={nameY}>
             user_profiles
           </Caption>
           <ColTag g={g} col={U} at={fkAt} out={uniqueAt - 12}>
@@ -132,6 +138,7 @@ export const UniqueScene: React.FC = () => {
           />
 
           {/* ── The same insert, with and without UNIQUE ── */}
+          <FigLabel n="16" title="One insert, two answers" at={secondAt - 12} x={LIST_X} y={figY} />
           <Caption at={secondAt - 10} x={LIST_X} y={listTop - 48}>
             A second profile for Ada
           </Caption>
@@ -152,7 +159,9 @@ export const UniqueScene: React.FC = () => {
       </Drift>
       </Drift>
 
-      {/* ── The last shape, glimpsed: one table pointing at itself ── */}
+      {/* ── The last shape, glimpsed: one table pointing at itself, Fig. 2's
+          self-reference panel again ── */}
+      <FigLabel n="2" title="Self-reference" at={oneTableAt - 8} x={preview.x} y={preview.top - FIG_ABOVE} />
       <Entity layout={preview} at={oneTableAt - 6} />
       <Relation name="employees manages employees" points={loop} from="zero-or-one" to="zero-or-many" at={oneTableAt + 6} dur={20} />
     </AbsoluteFill>
