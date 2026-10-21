@@ -18,7 +18,7 @@ import {
   label,
 } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
+import { inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { type Cell, ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -56,10 +56,10 @@ export const ROW_H = 64;
 export const MARK = HIGHLIGHT;
 export const MARK_BAD = `color-mix(in srgb, ${ACCENT} 26%, transparent)`;
 export const MARK_KEY = `color-mix(in srgb, ${BAR} 18%, transparent)`;
-export const OK_INK = "var(--ds-green-ink)";
-export const KEYWORD_INK = ds("purple", 700);
-export const STRING_INK = ds("green", 800);
-export const NUMBER_INK = ds("orange", 700);
+export const OK_INK = inkOf.green;
+export const KEYWORD_INK = inkOf.purple;
+export const STRING_INK = inkOf.green;
+export const NUMBER_INK = inkOf.orange;
 
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 

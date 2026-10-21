@@ -3,7 +3,7 @@ import { useCurrentFrame } from "remotion";
 import { arrowHead } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { ACCENT, ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, PAPER, note } from "../../editorial/style";
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { TOKENS } from "./data";
 
@@ -16,8 +16,8 @@ import { TOKENS } from "./data";
 /** Each token keeps one color through every figure. The unlikely one, rock,
  *  takes the page's red accent, because it is what the narration points at. */
 export const FILL = [ds("blue", 500), ds("green", 500), ds("yellow", 600), ACCENT] as const;
-/** The same hues at their ink steps, for type on paper. */
-export const TEXT = [BLUE_INK, ds("green", 800), ds("yellow", 800), ACCENT_INK] as const;
+/** The same hues as type on the page (`inkOf`, theme/brand.ts). */
+export const TEXT = [BLUE_INK, inkOf.green, inkOf.yellow, ACCENT_INK] as const;
 /** A pale wash of each, for tiles and segments that carry type. */
 export const TINT = FILL.map((c) => `color-mix(in srgb, ${c} 26%, ${PAPER})`);
 

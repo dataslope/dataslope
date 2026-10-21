@@ -885,7 +885,7 @@ export const Chip: React.FC<{ tone?: "ink" | "key" | "warn" | "soft"; size?: num
         ? MARK_BAD
         : tone === "soft"
           ? `color-mix(in srgb, ${INK} 5%, ${PAPER})`
-          : `color-mix(in srgb, ${ds("yellow", 50)} 60%, ${PAPER})`;
+          : PAPER;
   const border = tone === "key" ? KEY : tone === "warn" ? ACCENT : tone === "soft" ? HAIRLINE : INK;
   return (
     <span

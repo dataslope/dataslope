@@ -1,4 +1,4 @@
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK } from "../../editorial/style";
 import m from "./measurements.json";
 
@@ -67,13 +67,13 @@ export const RATIO = m.ratio11to3;
 /** The fits keep one color each: purple too stiff, green about right, the
  *  page's red accent for the one that memorized the points. */
 export const FIT_COLOR: Record<Shown, string> = { 1: ds("purple", 500), 3: ds("green", 600), 11: ACCENT };
-export const FIT_INK: Record<Shown, string> = { 1: ds("purple", 700), 3: "var(--ds-green-ink)", 11: ACCENT_INK };
+export const FIT_INK: Record<Shown, string> = { 1: inkOf.purple, 3: inkOf.green, 11: ACCENT_INK };
 
 /** Blue is data a model trains on; orange is data it is scored on. */
 export const TRAIN_COLOR = BAR;
 export const TRAIN_INK = BLUE_INK;
 export const NEW_COLOR = ds("orange", 500);
-export const NEW_INK = ds("orange", 700);
+export const NEW_INK = inkOf.orange;
 
 /** "−1": numbers on the page take a real minus sign. */
 export const signed = (v: number, digits = 0) => `${v < 0 ? "−" : ""}${Math.abs(v).toFixed(digits)}`;

@@ -18,7 +18,7 @@ import {
   PAPER,
 } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
@@ -40,7 +40,7 @@ export const ROOM = `color-mix(in srgb, ${INK} 60%, ${PAPER})`;
 /** Part 4's car, in the brand's "look here" yellow. */
 export const GOLD = ds("yellow", 500);
 export const GOLD_DEEP = ds("yellow", 700);
-export const GOLD_INK = "var(--ds-amber-ink)";
+export const GOLD_INK = inkOf.yellow;
 
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 

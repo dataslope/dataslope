@@ -2,7 +2,7 @@ import React from "react";
 import { useCurrentFrame } from "remotion";
 import { arrowHead, roundedPolyline } from "../../components/arrow";
 import { ease } from "../../components/motion";
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
 import { MONO, SANS } from "../../theme/fonts";
 import {
   ACCENT,
@@ -36,13 +36,13 @@ export const boolInk = (v: boolean) => (v ? TRUE_INK : FALSE_INK);
 export const SHARED_TINT = BAR;
 export const FRESH_TINT = ACCENT;
 
-/** The listing's tinted paper and the token inks: brand ink steps only. */
-export const LISTING_PAPER = `color-mix(in srgb, ${ds("yellow", 200)} 34%, ${PAPER})`;
-export const STRING_INK = ds("green", 800);
-export const NUMBER_INK = ds("orange", 700);
+/** The listing's grey card, and the token inks from `inkOf` (theme/brand.ts). */
+export const LISTING_PAPER = ds("gray", 50);
+export const STRING_INK = inkOf.green;
+export const NUMBER_INK = inkOf.orange;
 const TOKEN_INK = {
-  keyword: ds("purple", 700),
-  type: ds("teal", 700),
+  keyword: inkOf.purple,
+  type: inkOf.teal,
   number: NUMBER_INK,
   string: STRING_INK,
   comment: INK_SOFT,

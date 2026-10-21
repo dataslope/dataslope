@@ -35,6 +35,24 @@ export type Step =
   | 950;
 
 /**
+ * Each hue as type on the white page: its brand 500 wherever that clears 3:1
+ * on white, the WCAG bar for large text, which every label in a video meets.
+ * Blue, red, purple and orange do. Green, teal and yellow fall short at 500
+ * (2.3, 2.8 and 1.3:1) and take the nearest step that clears it. The site's
+ * `--ds-*-ink` anchors are darker still, because they are set for 4.5:1 body
+ * text; on a video's page they read as off-brand shades of the hue.
+ */
+export const inkOf = {
+  blue: ds("blue"),
+  red: ds("red"),
+  purple: ds("purple"),
+  orange: ds("orange"),
+  green: ds("green", 600),
+  teal: ds("teal", 600),
+  yellow: ds("yellow", 700),
+} as const;
+
+/**
  * The roles the videos share. Green, red and yellow keep their site meaning
  * (works, fails, look here); teal, purple and orange are non-semantic and only
  * tell categories apart.
@@ -47,11 +65,11 @@ export const colors = {
   inkSoft: ds("gray", 600),
   inkFaint: ds("gray", 400),
   accent: ds("blue"),
-  accentInk: "var(--ds-blue-ink)",
+  accentInk: inkOf.blue,
   ok: ds("green"),
-  okInk: "var(--ds-green-ink)",
+  okInk: inkOf.green,
   bad: ds("red"),
-  badInk: "var(--ds-red-ink)",
+  badInk: inkOf.red,
   highlight: ds("yellow"),
   /** Code panels: the site's dark surface, so code reads like the editor. */
   codeBg: ds("gray", 900),

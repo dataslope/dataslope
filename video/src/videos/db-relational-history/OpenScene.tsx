@@ -3,6 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
+import { BLUE_INK } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Headline, Kicker, Mark, PaperPage } from "./parts";
@@ -108,7 +109,7 @@ export const OpenScene: React.FC = () => {
           to="zero-or-many"
           at={joinAt - 4}
           dim={noneAt + 4}
-          color="var(--ds-blue-ink)"
+          color={BLUE_INK}
         />
       </AbsoluteFill>
 

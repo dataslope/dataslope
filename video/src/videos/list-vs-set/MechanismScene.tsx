@@ -7,6 +7,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { useLayout } from "../../editorial/layout";
 import { body, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
+import { inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, TABLE_SLOTS, VIDEO } from "./data";
 import { Code, commas, Fig, LIST, LIST_INK, Mono, SET, SET_INK } from "./kit";
@@ -194,7 +195,7 @@ export const MechanismScene: React.FC = () => {
         <Code line="-1 in big_list" size={CODE} />
         <span style={note(24, INK_SOFT)}>
           not there: all <b style={{ color: LIST_INK, opacity: ease(frame, allAt - 2, 8) }}>1,000,000</b> compared, then{" "}
-          <Mono color="var(--ds-purple-700)">False</Mono>
+          <Mono color={inkOf.purple}>False</Mono>
         </span>
       </Ink>
 
@@ -393,7 +394,7 @@ const Cell: React.FC<{
         justifyContent: "center",
         fontFamily: MONO,
         fontSize: 26,
-        color: "var(--ds-orange-700)",
+        color: inkOf.orange,
       }}
     >
       {value === null ? "" : literal(value)}

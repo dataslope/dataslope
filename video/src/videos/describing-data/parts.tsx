@@ -6,7 +6,7 @@ import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, HIGHLIGHT, INK, INK_SOFT, PAPER, fmt, label } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
@@ -22,7 +22,7 @@ export const STAT = ACCENT;
 export const STAT_INK = ACCENT_INK;
 export const DATA = BAR;
 export const SECOND = ds("teal", 500);
-export const SECOND_INK = "var(--ds-teal-ink)";
+export const SECOND_INK = inkOf.teal;
 export const SOFT_FILL = `color-mix(in srgb, ${BAR} 18%, transparent)`;
 
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;

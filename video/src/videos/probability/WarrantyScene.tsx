@@ -7,13 +7,14 @@ import { body, fmt, headline, INK, INK_SOFT, label, note } from "../../editorial
 import { Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { inkOf } from "../../theme/brand";
 import { BINOM, num, pct, WARRANTY } from "./data";
 import { Big, Count, DATA, Headline, Held, lerp, STAT_INK, Svg, Sweep, VBracket } from "./parts";
 
 const RIGHT = 1150;
 /** The closing band: three named shapes, small. */
 const SHAPES = { x: [160, 470, 780], w: 250, base: 910, h: 88 } as const;
-const OK_INK = "var(--ds-green-ink)";
+const OK_INK = inkOf.green;
 
 /**
  * Part 5's close: the lesson's $80 warranty, its expected payout and the

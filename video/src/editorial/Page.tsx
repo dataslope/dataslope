@@ -5,10 +5,9 @@ import type { NarratedProps } from "../narration/metadata";
 import { NarrationAudio } from "../narration/NarrationAudio";
 import { NarrationProvider } from "../narration/NarrationContext";
 import { SfxContext } from "../sound/Sfx";
-import { ds } from "../theme/brand";
 import { SERIF } from "./fonts";
 import { LayoutContext, layoutFor } from "./layout";
-import { INK, PAPER } from "./style";
+import { BLUE_INK, INK, PAPER } from "./style";
 import { type TypefaceId, TYPEFACES, typefaceVars } from "./typefaces";
 
 /** Props of every editorial video. */
@@ -63,7 +62,7 @@ export const EditorialPage: React.FC<EditorialProps & { children: React.ReactNod
                   fontWeight: face.captionWeight,
                   fontSize: Math.round(36 * face.bodyScale),
                   color: INK,
-                  highlight: "var(--ds-blue-ink)",
+                  highlight: BLUE_INK,
                   background: `color-mix(in srgb, ${PAPER} 94%, transparent)`,
                   radius: 0,
                   bottom: 52,
@@ -73,7 +72,7 @@ export const EditorialPage: React.FC<EditorialProps & { children: React.ReactNod
                     borderTop: `2px solid ${INK}`,
                     borderBottom: `1px solid color-mix(in srgb, ${INK} 45%, transparent)`,
                     fontVariationSettings: face.bodyAxes,
-                    boxShadow: `0 -18px 30px -24px color-mix(in srgb, ${ds("yellow", 900)} 30%, transparent)`,
+                    boxShadow: `0 -18px 30px -24px color-mix(in srgb, ${INK} 30%, transparent)`,
                   },
                 }}
               />

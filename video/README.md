@@ -71,6 +71,14 @@ The page is plain white (`PAPER` in `src/editorial/style.ts`, the brand's
 (text halos, masks, cards that hide what is behind them, ERD boxes) uses
 `PAPER`, so a change of page is that one token.
 
+On white, the brand colors are used as they are. Ink is the site's gray-900
+and gray-600, and type in a hue reads `inkOf` (`src/theme/brand.ts`): the
+brand 500 itself for blue, red, purple and orange, and the nearest step that
+still clears 3:1 on white (the large-text bar every label meets) for green,
+teal and yellow, whose 500s do not. The site's own `--ds-*-ink` anchors are
+set for 4.5:1 body text, and are darker than a video needs. Code listings sit
+on gray-50.
+
 ## Quick start
 
 ```bash

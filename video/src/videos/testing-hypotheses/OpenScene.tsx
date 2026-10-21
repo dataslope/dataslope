@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, INK, INK_SOFT, note, PAPER } from "../../editorial/style";
+import { BLUE_INK, body, fmt, INK, INK_SOFT, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -116,7 +116,7 @@ export const OpenScene: React.FC = () => {
         <Bracket x0={sx(E, CI[0])} x1={sx(E, CI[1])} y={y(E_BASE) - h(92)} at={intervalAt} color={DATA} width={3} />
         <Note at={plausibleAt - 2} x={(sx(E, CI[0]) + sx(E, CI[1])) / 2} y={y(E_BASE) - h(92) - 50} from="up">
           <span style={{ display: "inline-block", transform: "translateX(-50%)" }}>
-            <Label size={24} color="var(--ds-blue-ink)">
+            <Label size={24} color={BLUE_INK}>
               plausible values
             </Label>
           </span>
@@ -196,7 +196,7 @@ export const OpenScene: React.FC = () => {
       </Svg>
       {[
         { at: tenAt, rate: CHECKOUT.oldRate, yy: OLD_Y, color: INK },
-        { at: elevenAt, rate: CHECKOUT.newRate, yy: NEW_Y, color: "var(--ds-blue-ink)" },
+        { at: elevenAt, rate: CHECKOUT.newRate, yy: NEW_Y, color: BLUE_INK },
       ].map((b) => {
         const g = ease(frame, b.at - 4, b.yy === NEW_Y ? 30 : 18);
         if (g <= 0) return null;

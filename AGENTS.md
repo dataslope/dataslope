@@ -609,7 +609,9 @@ over from the rest of this file:
   request per part of about 1,800 characters split at scene changes, and cuts
   each take into beats. Both the beats and the raw takes are committed.
 - **Brand tokens only.** Scenes import `video/src/theme/brand.ts`, which loads
-  `app/brand.css`; no hex values in a scene.
+  `app/brand.css`; no hex values in a scene. Type in a hue reads `inkOf`
+  there (the brand 500 itself, except green, teal and yellow, whose 500s are
+  too pale for type on white), never the site's darker `--ds-*-ink` anchors.
 - **Images go through the illustration pipeline.** Run `npm run illustrations
   -- <video>` from `video/`. It calls `scripts/generate-illustrations.mjs
   --prompts` (Batch API, quality `low`, transparent background, the alpha

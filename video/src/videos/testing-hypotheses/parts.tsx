@@ -7,7 +7,7 @@ import { SERIF } from "../../editorial/fonts";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, fmt, headline, INK, INK_SOFT, PAPER, label, TABULAR } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
 import { SANS, waitForFonts } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -32,7 +32,7 @@ export const DATA_INK = BLUE_INK;
 /** A pale wash of the data blue, for cells and bands. */
 export const DATA_WASH = `color-mix(in srgb, ${ds("blue", 200)} 55%, transparent)`;
 export const STAT_WASH = `color-mix(in srgb, ${ds("red", 200)} 60%, transparent)`;
-export const OK_INK = "var(--ds-green-ink)";
+export const OK_INK = inkOf.green;
 /** The highlighter: the brand yellow, strong enough to read as a mark. */
 export const MARK = `color-mix(in srgb, ${ds("yellow", 500)} 88%, transparent)`;
 

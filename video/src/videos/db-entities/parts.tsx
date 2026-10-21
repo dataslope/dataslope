@@ -7,7 +7,7 @@ import { ENTITY, type EntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, headline, label } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -23,7 +23,7 @@ export const STAT = ACCENT;
 export const STAT_INK = ACCENT_INK;
 /** Accepted: a row the narrow domain lets in. */
 export const OK_WASH = `color-mix(in srgb, ${ds("green", 500)} 20%, transparent)`;
-export const OK_INK = "var(--ds-green-ink)";
+export const OK_INK = inkOf.green;
 
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 

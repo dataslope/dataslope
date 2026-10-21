@@ -17,7 +17,7 @@ import {
   label,
 } from "../../editorial/style";
 import { Ink, type Pt } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import type { Cell } from "./data";
 
@@ -46,7 +46,7 @@ export const RIGHT_X = 1004;
 export const HEAD_H = 52;
 export const ROW_H = 62;
 
-// ── Colors: brand ink steps and the editorial palette only ───────────────────
+// ── Colors: inkOf (theme/brand.ts) and the editorial palette only ────────────
 
 /** A cell marked for attention: the page's yellow, or a wash of the accent. */
 export const MARK = HIGHLIGHT;
@@ -57,11 +57,11 @@ export const KEY_INK = BLUE_INK;
 export const MARK_KEY = `color-mix(in srgb, ${BAR} 18%, transparent)`;
 
 /** The listing's tinted paper and the SQL token inks. */
-export const LISTING_PAPER = `color-mix(in srgb, ${ds("yellow", 200)} 34%, ${PAPER})`;
+export const LISTING_PAPER = ds("gray", 50);
 const TOKEN_INK = {
-  keyword: ds("purple", 700),
-  string: ds("green", 800),
-  number: ds("orange", 700),
+  keyword: inkOf.purple,
+  string: inkOf.green,
+  number: inkOf.orange,
   comment: INK_SOFT,
   punct: INK_SOFT,
   name: INK,

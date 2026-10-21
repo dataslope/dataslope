@@ -2,7 +2,7 @@ import React from "react";
 import { useCurrentFrame } from "remotion";
 import { arrowHead } from "../../components/arrow";
 import { ease } from "../../components/motion";
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { ACCENT, ACCENT_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { H, Ink, type Pt, W } from "../../editorial/ui";
@@ -16,16 +16,16 @@ import { segments, type Span } from "./data";
  */
 
 /** Red marks what is erased or what fails; green, a clean compile. */
-export const OK_INK = "var(--ds-green-ink)";
+export const OK_INK = inkOf.green;
 
-/** The listing's tinted paper and the token inks: brand ink steps only. */
-export const LISTING_PAPER = `color-mix(in srgb, ${ds("yellow", 200)} 34%, ${PAPER})`;
+/** The listing's grey card, and the token inks from `inkOf` (theme/brand.ts). */
+export const LISTING_PAPER = ds("gray", 50);
 export const TERMINAL_PAPER = `color-mix(in srgb, ${INK} 6%, ${PAPER})`;
 const TOKEN_INK = {
-  keyword: ds("purple", 700),
-  type: ds("teal", 700),
-  string: ds("orange", 700),
-  number: ds("blue", 700),
+  keyword: inkOf.purple,
+  type: inkOf.teal,
+  string: inkOf.orange,
+  number: inkOf.blue,
   comment: INK_SOFT,
   punct: INK_SOFT,
   name: INK,

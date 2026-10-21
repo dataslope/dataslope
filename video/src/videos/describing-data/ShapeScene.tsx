@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Bars, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { fmt, headline, HIGHLIGHT, INK, INK_SOFT, label } from "../../editorial/style";
+import { BLUE_INK, fmt, headline, HIGHLIGHT, INK, INK_SOFT, label } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -218,7 +218,7 @@ export const ShapeScene: React.FC = () => {
                 {v}
               </Tag>
             ))}
-            <Tag x={sx(HX, HEIGHTS.muA)} y={hb - peakH - h(64)} opacity={ease(frame, mixAt - 2, 12)} color={"var(--ds-blue-ink)"} size={23} bold>
+            <Tag x={sx(HX, HEIGHTS.muA)} y={hb - peakH - h(64)} opacity={ease(frame, mixAt - 2, 12)} color={BLUE_INK} size={23} bold>
               <Mark at={neitherAt - 2}>one group, around {HEIGHTS.muA}</Mark>
             </Tag>
             <Tag x={sx(HX, HEIGHTS.muB)} y={hb - peakH - h(64)} opacity={ease(frame, heightsAt - 2, 12)} color={SECOND_INK} size={23} bold>

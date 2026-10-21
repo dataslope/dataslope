@@ -10,12 +10,11 @@ import {
   HIGHLIGHT,
   INK,
   INK_SOFT,
-  PAPER,
   headline,
   label,
 } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import type { Region } from "./data";
 
@@ -61,7 +60,7 @@ export const NUMERIC = new Set(["amount", "total", "region_total", "pct", "runni
 /** North and South keep one ink each through every figure: blue, and orange
  *  (never the page's red accent, which marks what the narration points at). */
 export const REGION_COLOR: Record<Region, string> = { North: ds("blue", 500), South: ds("orange", 500) };
-export const REGION_INK: Record<Region, string> = { North: BLUE_INK, South: "var(--ds-orange-ink)" };
+export const REGION_INK: Record<Region, string> = { North: BLUE_INK, South: inkOf.orange };
 export const REGION_WASH: Record<Region, string> = {
   North: `color-mix(in srgb, ${ds("blue", 500)} 11%, transparent)`,
   South: `color-mix(in srgb, ${ds("orange", 500)} 13%, transparent)`,
@@ -69,11 +68,11 @@ export const REGION_WASH: Record<Region, string> = {
 export const MARK = HIGHLIGHT;
 
 /** The listing's tinted paper and the SQL token inks. */
-export const LISTING_PAPER = `color-mix(in srgb, ${ds("yellow", 200)} 34%, ${PAPER})`;
+export const LISTING_PAPER = ds("gray", 50);
 const TOKEN_INK = {
-  keyword: ds("purple", 700),
-  fn: ds("teal", 700),
-  number: ds("orange", 700),
+  keyword: inkOf.purple,
+  fn: inkOf.teal,
+  number: inkOf.orange,
   punct: INK_SOFT,
   name: INK,
 } as const;

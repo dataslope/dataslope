@@ -4,7 +4,7 @@ import { arrowHead, type Cubic, cubicPath, lineLength, sampleCubic } from "../..
 import { ease } from "../../components/motion";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label } from "../../editorial/style";
 import { Ink, type Pt } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import type { Cell } from "./data";
 
@@ -15,7 +15,7 @@ import type { Cell } from "./data";
  * shop's five-column result fits beside its diagram.
  */
 
-// ── Colors: brand ink steps and the editorial palette only ───────────────────
+// ── Colors: inkOf (theme/brand.ts) and the editorial palette only ────────────
 
 export const MARK = HIGHLIGHT;
 export const KEY = BAR;
@@ -23,11 +23,11 @@ export const KEY_INK = BLUE_INK;
 export const MARK_KEY = `color-mix(in srgb, ${BAR} 18%, transparent)`;
 export const MARK_BAD = `color-mix(in srgb, ${ACCENT} 24%, transparent)`;
 
-export const LISTING_PAPER = `color-mix(in srgb, ${ds("yellow", 200)} 34%, ${PAPER})`;
+export const LISTING_PAPER = ds("gray", 50);
 const TOKEN_INK = {
-  keyword: ds("purple", 700),
-  string: ds("green", 800),
-  number: ds("orange", 700),
+  keyword: inkOf.purple,
+  string: inkOf.green,
+  number: inkOf.orange,
   punct: INK_SOFT,
   name: INK,
 } as const;

@@ -1,4 +1,5 @@
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
+import { BLUE_INK } from "../../editorial/style";
 
 export const VIDEO = "simpsons-paradox";
 
@@ -67,7 +68,7 @@ export const WOMEN_AT_MEN_MIX = sum(DEPTS.map((d) => share(d, "men") * d.women.r
 /** Two series, told apart by hue: blue and orange, neither of them the
  *  page's red accent. The ink steps are for text. */
 export const COLOR = { men: ds("blue", 500), women: ds("orange", 500) } as const;
-export const COLOR_INK = { men: "var(--ds-blue-ink)", women: ds("orange", 700) } as const;
+export const COLOR_INK = { men: BLUE_INK, women: inkOf.orange } as const;
 export const NAME = { men: "Men", women: "Women" } as const;
 
 /** "44.5%" */

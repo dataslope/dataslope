@@ -1,4 +1,5 @@
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
+import { BLUE_INK } from "../../editorial/style";
 import m from "./measurements.json";
 
 // Every table and number the video shows. Computed, not typed: measure.py
@@ -62,9 +63,9 @@ export const DEPT_COLOR: Record<Dept, string> = {
   Sales: ds("orange", 500),
 };
 export const DEPT_INK: Record<Dept, string> = {
-  Eng: "var(--ds-blue-ink)",
-  Ops: ds("teal", 700),
-  Sales: ds("orange", 700),
+  Eng: BLUE_INK,
+  Ops: inkOf.teal,
+  Sales: inkOf.orange,
 };
 
 /** "36%" */

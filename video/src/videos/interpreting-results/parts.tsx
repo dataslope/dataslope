@@ -6,7 +6,7 @@ import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, headline, HIGHLIGHT, INK, INK_SOFT, PAPER, label } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
@@ -25,9 +25,9 @@ export const STAT_INK = ACCENT_INK;
 export const DATA = BAR;
 export const DATA_INK = BLUE_INK;
 export const GROUP_COLOR = { men: ds("blue", 500), women: ds("orange", 500) } as const;
-export const GROUP_INK = { men: BLUE_INK, women: ds("orange", 700) } as const;
+export const GROUP_INK = { men: BLUE_INK, women: inkOf.orange } as const;
 export const BAND_COLOR = [ds("blue", 500), ds("green", 600), ds("orange", 500), ds("purple", 500)] as const;
-export const BAND_INK = [BLUE_INK, ds("green", 800), ds("orange", 700), ds("purple", 700)] as const;
+export const BAND_INK = [BLUE_INK, inkOf.green, inkOf.orange, inkOf.purple] as const;
 
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 export const clamp01 = (t: number) => Math.max(0, Math.min(1, t));

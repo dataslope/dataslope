@@ -3,7 +3,7 @@ import { useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { ACCENT_INK, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { H, Ink, W } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 
 /**
@@ -21,7 +21,7 @@ export const CONTENT_INK = BLUE_INK;
 const CONTENT_EDGE = `color-mix(in srgb, ${ds("blue", 500)} 60%, ${PAPER})`;
 /** Padding: green, the box's own background, set apart from the content. */
 export const PADDING_FILL = `color-mix(in srgb, ${ds("green", 500)} 26%, ${PAPER})`;
-export const PADDING_INK = ds("green", 800);
+export const PADDING_INK = inkOf.green;
 /** Border: solid ink, the one layer that is a line. */
 export const BORDER_FILL = INK;
 export const BORDER_INK = INK;
@@ -30,12 +30,12 @@ export const MARGIN_INK = INK_SOFT;
 
 // ── CSS listing ──
 
-/** The listing's tinted paper and the token inks: brand ink steps only. */
-export const LISTING_PAPER = `color-mix(in srgb, ${ds("yellow", 200)} 34%, ${PAPER})`;
+/** The listing's grey card, and the token inks from `inkOf` (theme/brand.ts). */
+export const LISTING_PAPER = ds("gray", 50);
 const TOKEN_INK = {
-  selector: ds("purple", 700),
-  property: ds("teal", 700),
-  number: ds("orange", 700),
+  selector: inkOf.purple,
+  property: inkOf.teal,
+  number: inkOf.orange,
   value: INK,
   comment: INK_SOFT,
   punct: INK_SOFT,
