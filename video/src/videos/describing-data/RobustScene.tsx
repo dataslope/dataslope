@@ -232,10 +232,10 @@ export const RobustScene: React.FC = () => {
           </Tag>
           {/* What a quartile is: how far up the sorted incomes it sits. */}
           <Tag x={q1x} y={strip + BOX_H / 2 + 78} opacity={ease(frame, quarterAt - 4, 12) * (1 - sticks)} color={INK_SOFT} size={20}>
-            ¼ of the way up
+            a quarter up
           </Tag>
           <Tag x={q3x} y={strip + BOX_H / 2 + 78} opacity={ease(frame, threeQuartersAt - 4, 12) * (1 - sticks)} color={INK_SOFT} size={20}>
-            ¾ of the way up
+            three quarters up
           </Tag>
           <Pulse x={q1x} y={strip} at={quarterAt - 2} color={INK} r={8} />
           <Pulse x={q3x} y={strip} at={threeQuartersAt - 2} color={INK} r={8} />
