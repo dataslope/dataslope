@@ -80,7 +80,9 @@ export const Arrow: React.FC<{
   dim?: number;
   color?: string;
   width?: number;
-}> = ({ from, to, at, dur = 16, out, dim, color = INK, width = 2.4 }) => {
+  /** The longest the head may be, in px. */
+  head?: number;
+}> = ({ from, to, at, dur = 16, out, dim, color = INK, width = 2.4, head = 18 }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, dur);
   const o = out === undefined ? 0 : ease(frame, out, 10);
@@ -89,7 +91,7 @@ export const Arrow: React.FC<{
   const tip: [number, number] = [from[0] + (to[0] - from[0]) * p, from[1] + (to[1] - from[1]) * p];
   const len = Math.hypot(tip[0] - from[0], tip[1] - from[1]);
   if (len < 4) return null;
-  const headLen = Math.min(18, len * 0.6);
+  const headLen = Math.min(head, len * 0.6);
   return (
     <Svg opacity={(1 - o) * (1 - d)}>
       <line x1={from[0]} y1={from[1]} x2={tip[0]} y2={tip[1]} stroke={color} strokeWidth={width} strokeLinecap="round" />

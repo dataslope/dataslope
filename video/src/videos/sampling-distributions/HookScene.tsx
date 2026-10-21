@@ -9,7 +9,7 @@ import { ACCENT, ACCENT_INK, body, headline, INK, INK_SOFT, note } from "../../e
 import { FigLabel, Ink } from "../../editorial/ui";
 import { histogram, peak, PILE, POPULATION, SAMPLE } from "./data";
 import { money, POP_FILL, SAMPLE_FILL } from "./parts";
-import { useMergedPart } from "../sampling/merged";
+import { useFigNumber, useMergedPart } from "../sampling/merged";
 import { PartName } from "../sampling/PartName";
 import { Marker, swell } from "../sampling/emphasis";
 
@@ -74,6 +74,7 @@ export const HookScene: React.FC = () => {
   // In the merged Unit 5 video the part's name takes the kicker's place, and
   // the headline and figure label step down under it.
   const merged = useMergedPart();
+  const fig = useFigNumber();
   const headY = merged ? 150 : 112;
   const figY = merged ? 266 : 244;
 
@@ -102,7 +103,7 @@ export const HookScene: React.FC = () => {
           that look alike.
         </Ink>
       </div>
-      <FigLabel n="1" title="Three distributions, each drawn on its own axis" at={answeringAt - 4} x={150} y={y(figY)} />
+      <FigLabel n={fig(1)} title="Three distributions, each drawn on its own axis" at={answeringAt - 4} x={150} y={y(figY)} />
 
       {PANELS.map((p, c) => {
         const at = 8 + c * 8;

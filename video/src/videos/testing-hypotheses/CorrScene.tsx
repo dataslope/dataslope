@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { fmt, halo, INK, INK_SOFT, note, PAPER } from "../../editorial/style";
+import { fmt, halo, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -43,6 +43,9 @@ const CURVE_FIT = fit(CURVE.x, CURVE.y);
 const U_FIT = fit(USHAPE.x, USHAPE.y);
 
 const C = { xlo: 0.5, xhi: 10.5, ylo: -10, yhi: 155 };
+/** Pearson's line, kept inside the box: it starts where it rises through the floor. */
+const FIT_X0 = Math.max(C.xlo, (C.ylo - CURVE_FIT.a) / CURVE_FIT.b);
+const FIT_X1 = Math.min(C.xhi, (C.yhi - CURVE_FIT.a) / CURVE_FIT.b);
 const U = { xlo: -5.3, xhi: 5.3, ylo: -4, yhi: 28 };
 const R = { lo: 0, hi: 61 };
 
@@ -108,7 +111,7 @@ export const CorrScene: React.FC = () => {
       <Sfx name="el-sprinkle" at={noRelAt - 4} level={-33} />
       <Sfx name="el-pencil" at={dependsAt - 4} level={-34} />
 
-      <Kicker at={corrFrom - 10}>Correlation, and when to go nonparametric</Kicker>
+      <Kicker at={corrFrom - 10}>Correlation, and tests on ranks</Kicker>
       <Head a="Do they move" b="together?" at={corrFrom - 6} bAt={pearsonAt - 6} />
 
       {/* ── The scale, minus one to one ── */}
@@ -142,7 +145,7 @@ export const CorrScene: React.FC = () => {
           color: DATA_INK,
           note: "on its ranks",
         },
-        { at: minusZeroAt - 2, node: <>r on the U: {fmt(USHAPE.r, 2).replace("-", "−")}</>, color: STAT_INK, note: "yet y follows x exactly" },
+        { at: minusZeroAt - 2, node: <>r on the U: {fmt(USHAPE.r, 2).replace("-", "−")}</>, color: STAT_INK, note: "yet y follows x closely" },
       ].map((r, i) => (
         <React.Fragment key={i}>
           <Ink at={r.at} dur={14} style={{ left: S.x0, top: y(S_Y) + 90 + i * 100, whiteSpace: "nowrap" }}>
@@ -156,11 +159,18 @@ export const CorrScene: React.FC = () => {
         </React.Fragment>
       ))}
 
-      {/* ── Fig. 18: the scatter ── */}
-      <FigLabel n="19" title="Two numbers, one point per row" at={corrFrom} x={160} y={y(300)} />
+      {/* ── Fig. 21: the scatter ── */}
+      <FigLabel n="21" title="Two numbers, one point per row" at={corrFrom} x={160} y={y(300)} />
       <Svg>
         <line x1={BOX.x0} x2={BOX.x1} y1={bottom} y2={bottom} stroke={INK} strokeWidth={1.6} opacity={ease(frame, corrFrom + 2, 12)} />
         <line x1={BOX.x0} x2={BOX.x0} y1={bottom} y2={top} stroke={INK} strokeWidth={1.6} opacity={ease(frame, corrFrom + 2, 12)} />
+        {/* The two axes' names, at their ends. */}
+        <text x={BOX.x1 + 14} y={bottom + 7} style={{ ...label(21, INK_SOFT), fontStyle: "italic" }} fill={INK_SOFT} opacity={ease(frame, corrFrom + 6, 12)}>
+          x
+        </text>
+        <text x={BOX.x0 - 14} y={top + 7} textAnchor="end" style={{ ...label(21, INK_SOFT), fontStyle: "italic" }} fill={INK_SOFT} opacity={ease(frame, corrFrom + 6, 12)}>
+          y
+        </text>
         {/* The rising curve, sliding into its ranks. */}
         {curveOut < 1
           ? CURVE.x.map((xv, i) => {
@@ -173,10 +183,10 @@ export const CorrScene: React.FC = () => {
           : null}
         {fitIn > 0 && curveOut < 1 ? (
           <line
-            x1={px(C.xlo, C.xlo, C.xhi)}
-            y1={py(CURVE_FIT.a + CURVE_FIT.b * C.xlo, C.ylo, C.yhi)}
-            x2={px(lerp(C.xlo, C.xhi, fitIn), C.xlo, C.xhi)}
-            y2={py(CURVE_FIT.a + CURVE_FIT.b * lerp(C.xlo, C.xhi, fitIn), C.ylo, C.yhi)}
+            x1={px(FIT_X0, C.xlo, C.xhi)}
+            y1={py(CURVE_FIT.a + CURVE_FIT.b * FIT_X0, C.ylo, C.yhi)}
+            x2={px(lerp(FIT_X0, FIT_X1, fitIn), C.xlo, C.xhi)}
+            y2={py(CURVE_FIT.a + CURVE_FIT.b * lerp(FIT_X0, FIT_X1, fitIn), C.ylo, C.yhi)}
             stroke={STAT}
             strokeWidth={2.6}
             strokeDasharray="8 6"

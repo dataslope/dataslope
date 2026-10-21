@@ -53,6 +53,16 @@ const table = (figure: string, i: number): Table => {
   return { cols: s.fields, rows: s.rows.map((r) => s.fields!.map((f) => shown(r[f]))) };
 };
 
+/** Some of a result's columns, in the order given: the cells as they ran. */
+const project = (t: Table, cols: readonly string[]): Table => {
+  const at = cols.map((c) => {
+    const i = t.cols.indexOf(c);
+    if (i < 0) throw new Error(`No column ${c} in ${t.cols.join(", ")}`);
+    return i;
+  });
+  return { cols: [...cols], rows: t.rows.map((r) => at.map((i) => r[i])) };
+};
+
 /** The row a one-row INSERT's VALUES spells out, as printed cells. */
 const valuesOf = (sql: string): string[] => {
   const m = /VALUES\s*\(([^)]*)\)/i.exec(sql);
@@ -184,7 +194,9 @@ export const ORPHAN = {
 
 export const RESTRICT = {
   accounts: table("restrict", 0),
-  invoices: table("restrict", 1),
+  /** The id and the pointer, as comments and tickets are selected: the
+   *  foreign key last, so its arrow leaves from beside its value. */
+  invoices: project(table("restrict", 1), ["invoice_id", "account_id"]),
   del: refused("restrict", 2),
   accountsAfter: table("restrict", 3),
   invoicesAfter: table("restrict", 4),

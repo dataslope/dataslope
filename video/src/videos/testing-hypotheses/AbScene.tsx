@@ -30,7 +30,6 @@ export const AbScene: React.FC = () => {
   const abFrom = n.beat("ab").from;
   const sizedAt = n.word("ab", "sized");
   const liftAt = n.word("ab", "lift");
-  const twelveAt = n.word("ab", "twelve");
   const powerAt = n.word("ab", "eighty percent power");
   const threeAt = n.word("ab", "three thousand");
   const armAt = n.word("ab", "each arm");
@@ -46,7 +45,7 @@ export const AbScene: React.FC = () => {
   const end1 = sx(X, TWELVE);
   const end2 = sx(X, ELEVEN);
   const bars = [
-    { at: twelveAt, label: "10% to 12%", value: TWELVE, grow: g1, countAt: threeAt - 4, dur: Math.max(30, usersAt - threeAt + 4) },
+    { at: liftAt, label: "10% to 12%", value: TWELVE, grow: g1, countAt: threeAt - 4, dur: Math.max(30, usersAt - threeAt + 4) },
     { at: elevenAt, label: "10% to 11%", value: ELEVEN, grow: g2, countAt: fourteenAt - 4, dur: Math.max(40, nearlyAt - fourteenAt) },
   ];
   const copies = Math.ceil(AB.ratio);
@@ -64,15 +63,17 @@ export const AbScene: React.FC = () => {
       <Head a="Size it" b="before it starts." at={abFrom - 6} bAt={sizedAt - 2} />
 
       <Drift from={abFrom} to={n.beat("halve").to + 40} scale={0.02} origin="30% 60%">
-        <FigLabel n="14" title="Users needed in each arm, from a 10% baseline" at={abFrom} x={160} y={y(300)} />
+        <FigLabel n="15" title="Users needed in each arm, from a 10% baseline" at={abFrom} x={160} y={y(300)} />
         <Ink at={powerAt - 4} dur={14} style={{ left: 160, top: y(300) + 44, whiteSpace: "nowrap" }}>
           <Label size={22} color={INK_SOFT} weight={520}>
             for 80% power at <Greek>α</Greek> = 0.05
           </Label>
         </Ink>
-        <Axis scale={X} base={y(ROW_Y[1]) + h(BAR_H) / 2 + 40} ticks={[0, 4000, 8000, 12000, 16000]} format={(v) => fmt(v, 0)} at={liftAt} />
+        {/* The chart is up on "sized", the first row named on "lift". */}
+        <Axis scale={X} base={y(ROW_Y[1]) + h(BAR_H) / 2 + 40} ticks={[0, 4000, 8000, 12000, 16000]} format={(v) => fmt(v, 0)} at={sizedAt} />
         <Svg>
-          {[4000, 8000, 12000, 16000].map((v) => (
+          {/* No gridline at 16,000: it would run through the 14,751 printed at the end of the second bar. */}
+          {[4000, 8000, 12000].map((v) => (
             <line
               key={v}
               x1={sx(X, v)}
@@ -81,7 +82,7 @@ export const AbScene: React.FC = () => {
               y2={y(ROW_Y[1]) + h(BAR_H) / 2 + 40}
               stroke={HAIRLINE}
               strokeWidth={1}
-              opacity={0.3 * ease(frame, liftAt, 12)}
+              opacity={0.3 * ease(frame, sizedAt, 12)}
             />
           ))}
           {bars.map((b, i) =>
@@ -140,7 +141,7 @@ export const AbScene: React.FC = () => {
         ))}
         <Note at={armAt - 2} x={end1 + 16} y={y(ROW_Y[0]) + 26}>
           <Label size={21} color={INK_SOFT} weight={520}>
-            users per arm
+            users in each arm
           </Label>
         </Note>
         {Array.from({ length: copies - 1 }, (_, k) => {

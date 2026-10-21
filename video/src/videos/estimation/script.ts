@@ -90,7 +90,7 @@ export const script: NarrationScript = {
     {
       id: "hook",
       scene: true,
-      text: "An interval needs just two numbers: an estimate, and its standard error.",
+      text: "An interval needs just two numbers from the data: an estimate, and its standard error.",
       pauseAfter: 0.35,
     },
     {
@@ -113,10 +113,11 @@ export const script: NarrationScript = {
       text: "Step that far either way, and the interval runs from forty-six twenty-two to fifty-two thirty-three.",
       pauseAfter: 0.45,
     },
+    { id: "why", text: "Why not the usual one point nine six?", pauseAfter: 0.8 },
     {
-      id: "why",
-      text: "Why not the usual one point nine six? The spread was estimated from the same fifty people, and the t-distribution widens the band a little to pay for that.",
-      pauseAfter: 0.6,
+      id: "why-t",
+      text: "The spread was estimated from the same fifty people, and the t-distribution widens the band a little to pay for that.",
+      pauseAfter: 0.7,
     },
     { id: "means-in", text: "Building one is easy. Saying what it means is where people slip." },
     {
@@ -184,7 +185,7 @@ export const script: NarrationScript = {
       text: "Each time the data quadruples, the width roughly halves: eleven, five, two point three, one point two.",
       pauseAfter: 0.45,
     },
-    { id: "noise", text: "And third, the spread of the data. Double it, and the width doubles too.", pauseAfter: 0.5 },
+    { id: "noise", text: "And third, the spread of the data. Double it, and the width doubles too.", pauseAfter: 1.2 },
     { id: "rate-in", text: "The same recipe works for a rate." },
     {
       id: "rate",
@@ -195,7 +196,12 @@ export const script: NarrationScript = {
     {
       id: "rate-se",
       text: "A rate's standard error comes from the rate itself, and here it's seven tenths of a point.",
-      pauseAfter: 0.35,
+      pauseAfter: 0.7,
+    },
+    {
+      id: "rate-z",
+      text: "There's no separate spread to estimate, so there's no t to pay for: the usual choice is the normal's value.",
+      pauseAfter: 0.6,
     },
     {
       id: "rate-ci",
@@ -207,22 +213,24 @@ export const script: NarrationScript = {
       id: "test",
       scene: true,
       text: "Build an interval for a difference. If it leaves out zero, the difference is significant at the five percent level.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.6,
+    },
+    {
+      id: "pair",
+      text: "Ninety-five and five go together: a test at the five percent level rejects exactly the values a ninety-five percent interval leaves out.",
+      pauseAfter: 0.8,
     },
     {
       id: "straddle",
       text: "This one runs from minus a half to eight. It includes zero, so you can't rule out no effect.",
-      pauseAfter: 0.35,
+      pauseAfter: 0.7,
     },
-    {
-      id: "eight",
-      text: "But it includes eight as well, a big effect you can't rule out either. That isn't proof of nothing. It's a call for more data.",
-      pauseAfter: 0.45,
-    },
+    { id: "eight", text: "But it includes eight as well, a big effect you can't rule out either.", pauseAfter: 0.7 },
+    { id: "proof", text: "That isn't proof of nothing. It's a call for more data.", pauseAfter: 0.6 },
     {
       id: "views",
       text: "An interval and a test are two views of one thing, and only the interval shows how big the effect might be.",
-      pauseAfter: 0.6,
+      pauseAfter: 0.8,
     },
     { id: "formula-in", text: "Every interval so far leaned on a formula for the standard error." },
 

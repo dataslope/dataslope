@@ -2,8 +2,8 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, INK_SOFT, note } from "../../editorial/style";
-import { FigLabel, Note } from "../../editorial/ui";
+import { ACCENT, ACCENT_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { NOKEY, TAYLORS } from "./data";
@@ -33,9 +33,11 @@ const ROW_H = 60;
 
 /**
  * Part 1 opens on Unit 3's bridge: a line between tables lands on one row.
- * Two customers named Taylor Kim, an order for one of them, and a table with
- * no key that cannot say which; then the key column opens, 101 and 102, and
- * the order's line lands on one row.
+ * The two empty tables and the order's line arrive with the hook, and the
+ * line forks on "WHICH". Then the rows fill in: two customers named Taylor
+ * Kim, an order for one of them, and a table with no key that cannot say
+ * which; then the key column opens, 101 and 102, and the order's line lands
+ * on one row.
  */
 export const IdentityScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -44,11 +46,12 @@ export const IdentityScene: React.FC = () => {
 
   // ── Cues ──
   const hookFrom = n.beat("hook").from;
+  const tablesAt = Math.max(hookFrom + 4, n.word("hook", "two tables") - 8);
+  const endsAt = n.word("hook", "ends on a row");
   const whichRowAt = n.word("hook", "WHICH");
   const customersAt = n.word("taylors", "customers");
   const taylorAt = n.word("taylors", "Taylor Kim", { nth: 1 });
   const portlandAt = n.word("taylors", "Portland");
-  const orderAt = n.word("taylors", "order");
   const beansAt = n.word("taylors", "coffee beans");
   const saysAt = n.word("taylors", "says");
   const whichAt = n.word("taylors", "Which one");
@@ -108,9 +111,10 @@ export const IdentityScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: the tables, the forked lines, the two inserts, the key ── */}
-      <Sfx name="el-whoosh" at={customersAt - 6} level={-34} />
+      <Sfx name="el-whoosh" at={tablesAt} level={-34} />
+      <Sfx name="el-pencil" at={endsAt - 2} level={-35} />
+      <Sfx name="el-pencil" at={whichRowAt - 2} level={-34} />
       <Sfx name="el-pop" at={beansAt - 2} level={-30} />
-      <Sfx name="el-pencil" at={whichAt - 2} level={-34} />
       <Sfx name="el-tap" at={twiceAt - 2} level={-29} />
       <Sfx name="el-whoosh" at={pkAt + 2} level={-34} />
       <Sfx name="el-pencil" at={oneOhOneAt + 2} level={-33} />
@@ -119,16 +123,18 @@ export const IdentityScene: React.FC = () => {
       <Drift from={hookFrom} to={end + 60}>
         <Headline lead="Every line ends on a row." turn="Which row?" at={hookFrom - 6} turnAt={whichRowAt - 4} />
 
-        <FigLabel n="1" title="An order, and two customers named Taylor Kim" at={customersAt - 10} x={X0} y={y(300)} />
+        <Ink at={customersAt - 10} style={{ left: X0, top: y(300), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(24, INK), fontWeight: 560 }}>An order, and two customers named Taylor Kim</span>
+        </Ink>
 
-        {/* ── The customers: first with no key, then with one ── */}
-        <TableName g={customers} at={customersAt - 6}>
+        {/* ── The customers: empty on the hook, first with no key, then with one ── */}
+        <TableName g={customers} at={tablesAt}>
           customers
         </TableName>
         <DataTable
           g={customers}
           cols={keyedCols}
-          at={customersAt - 6}
+          at={tablesAt}
           rows={TAYLORS.customers.rows.map((cells, i) => ({ cells, at: rowsAt[i] }))}
           bands={[
             { row: 0, at: twiceAt - 6, out: clearAt, color: MARK_BAD },
@@ -149,17 +155,19 @@ export const IdentityScene: React.FC = () => {
             tag={r.tag}
             size={20}
             out={repliesOut}
+            gloss={i === 0 ? "1 row in" : "and the same row again"}
+            glossAt={storeAt + i * 8 + 8}
           />
         ))}
 
         {/* ── The order ── */}
-        <TableName g={ordersNoKey} at={orderAt - 4}>
+        <TableName g={ordersNoKey} at={tablesAt + 6}>
           orders
         </TableName>
         <DataTable
           g={ordersNoKey}
           cols={NOKEY.orders.cols.map((name) => ({ name }))}
-          at={orderAt - 4}
+          at={tablesAt + 6}
           rows={[{ cells: NOKEY.orders.rows[0], at: beansAt - 2 }]}
           marks={[{ row: 0, col: 1, at: saysAt + 2, out: fixesAt }]}
           out={swapOrders}
@@ -176,11 +184,13 @@ export const IdentityScene: React.FC = () => {
         />
         <Spot id="db-keys-beans" at={beansAt - 4} left={X0 + 40} top={y(640)} width={250} height={250} />
 
-        {/* "Which one?": the line forks to both, and neither is the answer. */}
+        {/* The hook's line lands on a row; on "WHICH" it forks to both, and
+            on "Which one?" neither is the answer. */}
         {[0, 1].map((i) => (
-          <KeyArrow key={i} from={fromNoKey} to={toRow(i)} at={whichAt - 2 + i * 6} color={ACCENT} dash out={clearAt} />
+          <KeyArrow key={i} from={fromNoKey} to={toRow(i)} at={i ? whichRowAt - 2 : endsAt - 2} color={ACCENT} dash out={clearAt} />
         ))}
-        <Note at={whichAt + 8} x={(fromNoKey[0] + CUSTOMERS_X) / 2 - 14} y={customers.rowMid(0) + h(ROW_H) / 2 - 26} from="up" out={clearAt}>
+        {/* Above both curves, clear of the upper one. */}
+        <Note at={whichAt + 8} x={(fromNoKey[0] + CUSTOMERS_X) / 2 - 14} y={customers.rowMid(0) + h(ROW_H) / 2 - 60} from="up" out={clearAt}>
           <span style={{ ...note(40, ACCENT_INK), fontWeight: 700 }}>?</span>
         </Note>
         <Note at={tellAt - 2} x={CUSTOMERS_X} y={customers.rowTop(2) + 22} out={clearAt}>

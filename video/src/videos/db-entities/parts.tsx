@@ -152,11 +152,12 @@ export const Mark: React.FC<{ at: number; out?: number; color?: string; children
 };
 
 /** A ring that swells out of a point and fades: a point being named. */
-export const Pulse: React.FC<{ x: number; y: number; at: number; r?: number; color?: string; width?: number }> = ({
+export const Pulse: React.FC<{ x: number; y: number; at: number; r?: number; grow?: number; color?: string; width?: number }> = ({
   x,
   y,
   at,
   r = 12,
+  grow = 30,
   color = STAT,
   width = 2.4,
 }) => {
@@ -168,7 +169,7 @@ export const Pulse: React.FC<{ x: number; y: number; at: number; r?: number; col
       <circle
         cx={x}
         cy={y}
-        r={r + 30 * Easing.out(Easing.cubic)(p)}
+        r={r + grow * Easing.out(Easing.cubic)(p)}
         fill="none"
         stroke={color}
         strokeWidth={width}

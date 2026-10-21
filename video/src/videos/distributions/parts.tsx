@@ -5,7 +5,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, fmt, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, fmt, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
@@ -110,7 +110,7 @@ export const Count: React.FC<{
   return (
     <span style={{ opacity: ease(frame, at - 3, 5) }}>
       {prefix}
-      {fmt(v, digits)}
+      <span style={TABULAR}>{fmt(v, digits)}</span>
       {suffix}
     </span>
   );
@@ -346,6 +346,18 @@ export const areaD = (f: (x: number) => number, a: number, b: number, X: XScale,
   if (b <= a) return "";
   const top = curveD(f, a, b, X, py, steps);
   return `${top} L${sx(X, b).toFixed(1)},${py(0).toFixed(1)} L${sx(X, a).toFixed(1)},${py(0).toFixed(1)} Z`;
+};
+
+/** A histogram's outline over whole numbers 0, 1, 2…: a step at each k's
+ *  height, from k - 0.5 to k + 0.5, down to the axis at both ends. */
+export const stepD = (values: readonly number[], scale: XScale, py: (v: number) => number) => {
+  const pts = values.flatMap((v, k) => [
+    [sx(scale, k - 0.5), py(v)],
+    [sx(scale, k + 0.5), py(v)],
+  ]);
+  const first = [sx(scale, -0.5), py(0)];
+  const last = [sx(scale, values.length - 0.5), py(0)];
+  return [first, ...pts, last].map(([a, b], i) => `${i ? "L" : "M"}${a.toFixed(1)},${b.toFixed(1)}`).join(" ");
 };
 
 /** A curve that draws itself from left to right on `at`. */

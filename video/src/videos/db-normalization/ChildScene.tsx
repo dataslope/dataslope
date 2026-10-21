@@ -101,6 +101,10 @@ export const ChildScene: React.FC = () => {
   const first = CHILD_PHONES.rows.findIndex((r) => r[1] === CHILD_TWICE.row[1] && r[2] === CHILD_TWICE.row[2]);
   const ghost = CHILD_PHONES.rows.length;
   const listH = listingHeight(CHILD_SEARCH.lines.length, LIST_SIZE);
+  // "a plain equals": the comparison in the WHERE line, not the whole line.
+  const last = CHILD_SEARCH.lines.length - 1;
+  const equalsFrom = CHILD_SEARCH.lines[last].indexOf("p.phone_number");
+  const equalsTo = CHILD_SEARCH.lines[last].lastIndexOf("'") + 1;
 
   return (
     <AbsoluteFill>
@@ -135,14 +139,15 @@ export const ChildScene: React.FC = () => {
           at={childAt}
           numeric={[0]}
           colInk={{ 0: KEY_INK }}
-          bands={[{ row: linus, at: linusAt }]}
+          bands={[{ row: linus, at: linusAt, out: dependFrom }]}
         />
         <DbTable
           g={pg}
           cols={CHILD_PHONES.cols}
           rows={[
             ...CHILD_PHONES.rows.map((cells, i) => ({ cells, at: ownAt - 4 + i * 6 })),
-            { cells: CHILD_TWICE.row, at: adaAt + 2, ghost: true, grow: true, collapseAt: dependFrom - 6 },
+            // The refused row stays as long as its error does.
+            { cells: CHILD_TWICE.row, at: adaAt + 2, ghost: true, grow: true, collapseAt: dependAt - 4 },
           ]}
           at={ownAt - 8}
           numeric={[0, 1]}
@@ -163,8 +168,8 @@ export const ChildScene: React.FC = () => {
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>{linusPhones} phones</span>
         </Note>
 
-        {/* A plain equality finds Ada now. */}
-        <Fade out={dependFrom}>
+        {/* A plain equality finds Ada now: the wash marks just the comparison. */}
+        <Fade out={valueAt - 6}>
           <Listing
             lines={CHILD_SEARCH.lines}
             x={RIGHT}
@@ -173,24 +178,29 @@ export const ChildScene: React.FC = () => {
             size={LIST_SIZE}
             at={searchAt - 6}
             lineAt={CHILD_SEARCH.lines.map((_, i) => searchAt - 2 + i * 4)}
-            marks={[{ line: CHILD_SEARCH.lines.length - 1, at: equalsAt }]}
+            marks={[{ line: last, at: equalsAt, from: equalsFrom, to: equalsTo }]}
             dim={uniqueAt}
           />
           <Reply at={equalsAt + 10} x={RIGHT} y={y(BODY_Y) + listH + 16} color={INK}>
             {CHILD_SEARCH.found.join(", ")}
           </Reply>
-          <ErrorBox
-            x={RIGHT}
-            top={y(BODY_Y) + listH + 90}
-            width={640}
-            at={twiceAt - 2}
-            message={CHILD_TWICE.message}
-            detail={CHILD_TWICE.detail}
-          />
         </Fade>
-        <Note at={dependAt + 4} x={RIGHT} y={y(BODY_Y) + 40}>
+        {/* The refusal stays up through "one value", until the new question. */}
+        <ErrorBox
+          x={RIGHT}
+          top={y(BODY_Y) + listH + 90}
+          width={640}
+          at={twiceAt - 2}
+          out={dependAt}
+          message={CHILD_TWICE.message}
+          detail={CHILD_TWICE.detail}
+        />
+        {/* In the listing's place once it has gone. */}
+        <Note at={valueAt + 8} x={RIGHT} y={y(BODY_Y) + 40}>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Every cell holds one value.</div>
-          <div style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap", marginTop: 8 }}>What does each one depend on?</div>
+        </Note>
+        <Note at={dependAt + 4} x={RIGHT} y={y(BODY_Y) + 82}>
+          <div style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>What does each one depend on?</div>
         </Note>
       </Drift>
     </AbsoluteFill>

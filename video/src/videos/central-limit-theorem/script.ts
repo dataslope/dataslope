@@ -15,7 +15,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - the spread of the mean is sigma / root n: 4.47, 1.83 and 1.00 minutes
  *     at n = 5, 30 and 100 (simulated: see data.ts);
  *   - the lesson's log-normal (sigma 1.3) has skewness 15.6, so its mean is
- *     still skewed at n = 30 (theory 2.85) and needs n in the hundreds.
+ *     still skewed at n = 30 (theory 2.85) and needs n in the hundreds; in
+ *     data.ts the skewness of the mean is 4.4 at 30 and 0.7 at 300 (a bell
+ *     is 0), "much closer to a bell".
  *
  * Written to be spoken: short sentences, no symbols, no parentheses. It is
  * also written the way a person talks, for a voice that reads it in one take
@@ -43,7 +45,9 @@ export const script: NarrationScript = {
     {
       id: "center",
       text: "The average wait is ten minutes, and the spread is about ten minutes too.",
-      pauseAfter: 0.5,
+      // The population's spread is what the square-root rule is built on:
+      // the finished figure holds about a second before the page changes.
+      pauseAfter: 1.6,
     },
     { id: "sample", text: "Now pick thirty people at random, and average their waits." },
     {
@@ -76,6 +80,9 @@ export const script: NarrationScript = {
       text: "A heavy tail, like incomes, is still lopsided at thirty. It can take HUNDREDS before the bell shows.",
       pauseAfter: 0.55,
     },
+    // Voiced on its own after the take: the samples-of-300 row is the scene's
+    // resolution, and it was on screen for less time than it takes to read.
+    { id: "closer", text: "At three hundred, it's much closer to a bell.", pauseAfter: 0.8 },
     {
       id: "spread",
       scene: true,

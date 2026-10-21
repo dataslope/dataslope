@@ -4,9 +4,10 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, body, headline, HIGHLIGHT, INK, INK_SOFT, label } from "../../editorial/style";
-import { Ink, NextLine } from "../../editorial/ui";
+import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { Bridge } from "../sampling/Bridge";
 import { useMergedPart } from "../sampling/merged";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -27,7 +28,8 @@ export const HabitScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const n = useNarration();
-  // In the merged Unit 5 video the spoken bridge leads straight on: no "Next" line.
+  // In the merged Unit 5 video the bridge's question is left out (the next
+  // part opens by asking it), so the page shows the bridge's statement.
   const merged = useMergedPart();
   const { y } = useLayout();
 
@@ -36,14 +38,16 @@ export const HabitScene: React.FC = () => {
   const askAt = n.word("ask", "ask");
   const missingAt = n.word("ask", "missing");
   const whyAt = n.word("ask", "why");
-  const nextAt = n.word("next", "how far");
+  const nextAt = n.word("far", "how far");
   // The bridge turns from missing data to fair samples: the habit eases back
   // a piece at a time as it is spoken, the table, the drawer, the headline,
   // the question.
   const fairAt = n.word("next", "fair sample");
   const everyoneAt = n.word("next", "drawn from everyone");
   const truthAt = n.word("next", "truth");
-  const beAt = n.word("next", "can it be");
+  // The question eases back as the next one is asked, or, in the merged
+  // video, which never asks it, as the statement ends.
+  const beAt = merged ? n.word("next", "exactly") : n.word("far", "can it be");
   const back = (at: number) => 1 - 0.62 * ease(frame, at, 22);
   const drawerOut = ease(frame, everyoneAt, 24);
   const drawer = pop(frame, start + 4, fps, 16);
@@ -118,11 +122,13 @@ export const HabitScene: React.FC = () => {
         </Ink>
       </div>
 
-      {merged ? null : (
-        <NextLine at={nextAt} x={120} y={y(850)} width={1000}>
-          how far a fair sample can miss.
-        </NextLine>
-      )}
+      <Bridge
+        x={120}
+        y={y(850)}
+        width={1000}
+        next={{ at: nextAt, text: "how far a fair sample can miss." }}
+        merged={[{ at: fairAt - 4, text: "Even a fair sample won't hit the truth exactly." }]}
+      />
 
       {ILLUSTRATIONS ? (
         <Illustration

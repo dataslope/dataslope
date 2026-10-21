@@ -122,18 +122,25 @@ export const script: NarrationScript = {
       text: "Crow's-foot notation draws those answers right onto the line. Every end gets two marks.",
       pauseAfter: 0.35,
     },
-    { id: "max", text: "Next to the box is the most. A bar means one, and a crow's foot means many.", pauseAfter: 0.3 },
-    { id: "min", text: "Farther out is the least. A circle means zero, and a bar means one.", pauseAfter: 0.5 },
-    { id: "one", text: "Two bars, exactly one. A profile belongs to one user.", pauseAfter: 0.3 },
-    { id: "zero-or-one", text: "A bar and a circle, zero or one. An employee gets one parking pass, at most.", pauseAfter: 0.3 },
-    { id: "one-or-many", text: "A foot and a bar, one or many. An order holds at least one item.", pauseAfter: 0.3 },
-    { id: "zero-or-many", text: "A foot and a circle, zero or many. A customer might not have ordered yet.", pauseAfter: 0.4 },
+    // The key is new notation: a breath after each half, and a longer one to
+    // read the finished Fig. 3 before the table of ends replaces it.
+    { id: "max", text: "Next to the box is the most. A bar means one, and a crow's foot means many.", pauseAfter: 1.0 },
+    { id: "min", text: "Farther out is the least. A circle means zero, and a bar means one.", pauseAfter: 1.6 },
+    {
+      id: "one",
+      text: "Start at one box, and read the end at the other box. Two bars, exactly one. A profile belongs to one user.",
+      pauseAfter: 0.7,
+    },
+    { id: "zero-or-one", text: "A bar and a circle, zero or one. An employee gets one parking pass, at most.", pauseAfter: 0.7 },
+    { id: "one-or-many", text: "A foot and a bar, one or many. An order holds at least one item.", pauseAfter: 0.7 },
+    { id: "zero-or-many", text: "A foot and a circle, zero or many. A customer might not have ordered yet.", pauseAfter: 0.7 },
     { id: "m2m", text: "And feet at both ends? That's many-to-many, like students and courses." },
     {
       id: "schema",
       scene: true,
       text: "And those marks change the schema. Many devices per employee? Then device rows can share an employee id.",
-      pauseAfter: 0.35,
+      // Holds Ada's two devices, both employee 1, before the badges replace them.
+      pauseAfter: 0.9,
     },
     { id: "badge", text: "But one badge, at most? Then no employee id can show up twice.", pauseAfter: 0.35 },
     { id: "reject", text: "Give Ada a second badge... and Postgres says NO.", pauseAfter: 0.5 },
@@ -143,7 +150,7 @@ export const script: NarrationScript = {
     {
       id: "shop",
       scene: true,
-      text: "So let's read one, properly. A little shop: customers, orders, order items, products. Read each line as a sentence.",
+      text: "So let's read one, properly. A little shop: customers, orders, products, and order items, which tie each order to its products. Read each line as a sentence.",
       pauseAfter: 0.4,
     },
     { id: "s1", text: "One customer places zero or many orders.", pauseAfter: 0.3 },
@@ -153,7 +160,7 @@ export const script: NarrationScript = {
     {
       id: "joins",
       text: "Then follow the keys. Each one is a join, so the diagram maps out the query. Ada, her order, its lines, their products.",
-      pauseAfter: 0.3,
+      pauseAfter: 0.8,
     },
     { id: "result", text: "Two notebooks and three pens.", pauseAfter: 0.7 },
     {

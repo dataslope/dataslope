@@ -43,10 +43,10 @@ export const OVERLAP = m.overlap as readonly { d: number; label: string; shared:
  *  where it underflows and the lesson prints 0.0e+00. */
 export const SWEEP = m.sweep;
 
+/** The checkout test: 90 and 126 conversions of 3,000, and the lift's 95%
+ *  interval (`lo`, `hi`, from the unpooled standard error `se`) and p-value
+ *  (pooled two-proportion z-test), as ab-testing.mdx computes them. */
 export const RATES = m.rates;
-
-/** d with its 95% bootstrap interval (seed 11). */
-export const CI = m.ci;
 
 // ── Part 2. Simpson's paradox (statistical-fallacies) ───────────────────────
 

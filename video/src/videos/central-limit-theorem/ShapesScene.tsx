@@ -19,8 +19,9 @@ import {
   WAITS,
 } from "./data";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, body, fmt, HAIRLINE, headline, INK_SOFT, note, label } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, body, fmt, HAIRLINE, headline, INK, INK_SOFT, note, label } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { useFigNumber } from "../sampling/merged";
 
 /** The figure label's row; the column heads start well clear of it. */
 const LABEL_Y = 104;
@@ -128,6 +129,8 @@ const PREPARED = COLUMNS.map((c, i) => {
     mu,
     spread,
     simSpread: sd(c.means),
+    /** How much wider each average's axis is drawn than its population's. */
+    zoom: (c.popHi - c.popLo) / (c.mHi - c.mLo),
   };
 });
 
@@ -140,6 +143,7 @@ export const ShapesScene: React.FC = () => {
   const { fps } = useVideoConfig();
   const n = useNarration();
   const { y, h } = useLayout();
+  const fig = useFigNumber();
   const start = n.beat("any-shape").from;
   // The scene window opens 8 frames before the beat; its first marks start
   // inking a little before that, so the cut is a true cross-fade.
@@ -158,12 +162,12 @@ export const ShapesScene: React.FC = () => {
       <Sfx name="el-pop" at={averageAt} level={-30} />
       <Sfx name="el-pencil" at={sameAt - 4} level={-34} />
 
-      <FigLabel n="3" title="Three populations, each averaged thirty at a time" at={open} x={120} y={y(LABEL_Y)} />
-      {/* The legend for the red curves, at the right end of the label row. */}
+      <FigLabel n={fig(3)} title="Three populations, each averaged thirty at a time" at={open} x={120} y={y(LABEL_Y)} />
+      {/* The legend for the curves, at the right end of the label row. */}
       <Note at={sameAt + 12} x={1780} y={y(LABEL_Y) + 2} align="right" from="right">
         <span style={{ ...note(22, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 12 }}>
           <svg width={36} height={10} style={{ overflow: "visible" }}>
-            <line x1={2} x2={34} y1={5} y2={5} stroke={ACCENT} strokeWidth={3} strokeLinecap="round" />
+            <line x1={2} x2={34} y1={5} y2={5} stroke={INK} strokeWidth={2.4} strokeLinecap="round" />
           </svg>
           the normal curve the theorem predicts
         </span>
@@ -204,6 +208,9 @@ export const ShapesScene: React.FC = () => {
                   spread <b style={{ color: ACCENT_INK }}>{fmt(c.simSpread)}</b>
                 </span>
               </div>
+              {/* Each pile fills its panel: say how far it is magnified, so
+                  its width is not read against the population's. */}
+              <div style={{ ...note(19, INK_SOFT), marginTop: 2 }}>axis zoomed in {fmt(c.zoom, 1)}×</div>
             </Ink>
             <Bars
               counts={c.mCounts}
@@ -212,7 +219,7 @@ export const ShapesScene: React.FC = () => {
               scale={c.mScale}
               base={y(MEANS_BASE)}
               unit={h(c.mUnit)}
-              color={BAR}
+              color={ACCENT}
               grow={(b) => ease(frame, mAt + Math.abs(b - centre) * 0.7, 12)}
             />
             <Axis scale={c.mScale} base={y(MEANS_BASE)} ticks={c.mTicks} format={c.mFmt} at={mAt - 4} size={20} />
@@ -225,8 +232,8 @@ export const ShapesScene: React.FC = () => {
               count={SAMPLE_COUNT}
               bin={c.mBin}
               at={i === 0 ? open + 12 : sameAt - 4 + (i - 1) * 6}
-              color={ACCENT}
-              width={2.6}
+              color={INK}
+              width={2.4}
             />
           </React.Fragment>
         );

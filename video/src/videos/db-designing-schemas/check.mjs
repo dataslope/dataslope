@@ -9,7 +9,10 @@
 //   - store: case-study-ecommerce.mdx, "Create an online store schema"
 //     (customers, products, categories, product_categories, orders,
 //     order_items, and their sample rows, unchanged);
-//   - quantity: the same lesson's "A line item must have positive quantity";
+//   - quantity: the same lesson's "A line item must have positive quantity",
+//     checked as the lesson writes it and again in the store, on a new order
+//     for Ben, so the line the video shows refuses for its zero alone (order
+//     1 already holds every product, so any line on it would be a duplicate);
 //   - tasks: evolving-schemas-safely.mdx, "Add a required column in safe
 //     steps" (two tasks, then add, backfill, verify, tighten);
 //   - assignees: the same lesson's "Before and after a relationship change",
@@ -145,9 +148,9 @@ const fresh = async (setup) => {
 };
 
 /** What one statement returned: its rows, or Postgres's error. */
-const run = async (db, sql) => {
+const run = async (db, sql, options) => {
   try {
-    const r = await db.query(sql);
+    const r = await db.query(sql, [], options);
     return { ok: true, fields: r.fields.map((f) => f.name), rows: r.rows, affected: r.affectedRows ?? null };
   } catch (e) {
     return {
@@ -173,7 +176,15 @@ const columns = (db, table) =>
     `SELECT column_name, is_nullable FROM information_schema.columns WHERE table_name = '${table}' ORDER BY ordinal_position;`,
   );
 
-const out = { sql: { store: STORE_SETUP.trim() }, results: {} };
+/** Adding priority as required in one step, the statement the video shows. */
+const ONE_STEP_SQL = "ALTER TABLE tasks ADD COLUMN priority TEXT NOT NULL;";
+
+/** The order lines the video tries and Postgres refuses, as order_items
+ *  values: the same product on order 1 again, and zero mugs on Ben's order. */
+const TRIED = { duplicateLine: ["1", "1", "1", "12.00"], zeroQuantity: ["2", "1", "0", "12.00"] };
+const insertLine = (v) => `INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES (${v.join(", ")});`;
+
+const out = { sql: { store: STORE_SETUP.trim(), oneStep: ONE_STEP_SQL }, tried: TRIED, results: {} };
 const R = out.results;
 
 // ── The store (case-study-ecommerce) ───────────────────────────────────────
@@ -218,16 +229,48 @@ GROUP BY o.id ORDER BY order_id;`,
   );
   // The order's customer, and the same product on one order twice.
   R.orderCustomer = await run(db, "SELECT c.full_name FROM orders o JOIN customers c ON c.id = o.customer_id WHERE o.id = 1;");
-  R.duplicateLine = await run(db, "INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES (1, 1, 1, 12.00);");
+  R.duplicateLine = await run(db, insertLine(TRIED.duplicateLine));
   // A status the design doesn't know.
   R.badStatus = await run(db, "INSERT INTO orders (customer_id, ordered_at, status) VALUES (1, '2025-04-11 09:00', 'lost');");
+  await db.close();
+}
+{
+  // The whole store crammed into one wide table: every column of the five
+  // tables side by side, one row per order line and category, and a row for
+  // a customer with no order. Arrays, since four of the columns are "id".
+  const db = await fresh(STORE_SETUP);
+  R.wide = await run(
+    db,
+    `SELECT c.id, c.email, c.full_name,
+       o.id, o.customer_id, o.ordered_at::text AS ordered_at, o.status,
+       oi.order_id, oi.product_id, oi.quantity, oi.unit_price,
+       p.id, p.sku, p.name, p.current_price, p.active::text AS active,
+       cat.id, cat.name
+FROM customers AS c
+LEFT JOIN orders AS o ON o.customer_id = c.id
+LEFT JOIN order_items AS oi ON oi.order_id = o.id
+LEFT JOIN products AS p ON p.id = oi.product_id
+LEFT JOIN product_categories AS pc ON pc.product_id = p.id
+LEFT JOIN categories AS cat ON cat.id = pc.category_id
+ORDER BY c.id, p.id, cat.id;`,
+    { rowMode: "array" },
+  );
   await db.close();
 }
 
 // ── A line item must have positive quantity (case-study-ecommerce) ─────────
 {
+  // As the lesson writes it.
   const db = await fresh(QUANTITY_SETUP);
-  R.zeroQuantity = await run(db, "INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES (1, 1, 0, 12.00);");
+  R.lessonZeroQuantity = await run(db, "INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES (1, 1, 0, 12.00);");
+  await db.close();
+}
+{
+  // In the store the video draws: a new order for Ben, and a line on it for
+  // zero mugs. The pair (2, 1) is new, so only the CHECK can refuse it.
+  const db = await fresh(STORE_SETUP);
+  R.benOrder = await run(db, "INSERT INTO orders (customer_id, ordered_at, status) VALUES (2, '2025-04-11 09:00', 'placed') RETURNING id;");
+  R.zeroQuantity = await run(db, insertLine(TRIED.zeroQuantity));
   await db.close();
 }
 
@@ -236,7 +279,7 @@ GROUP BY o.id ORDER BY order_id;`,
   const db = await fresh(TASKS_SETUP);
   R.tasksBefore = await run(db, "SELECT id, title, status FROM tasks ORDER BY id;");
   // The common mistake: required in one step, with old rows that have no value.
-  R.oneStep = await run(db, "ALTER TABLE tasks ADD COLUMN priority TEXT NOT NULL;");
+  R.oneStep = await run(db, ONE_STEP_SQL);
   R.oneStepColumns = await columns(db, "tasks");
   await db.close();
 }
@@ -303,6 +346,30 @@ INSERT INTO tasks (title, status) VALUES ('Draft schema', 'open'), ('Review cons
   R.trackerJoin = await run(db, "SELECT t.title, p.name AS project FROM tasks AS t JOIN projects AS p ON p.id = t.project_id ORDER BY t.id;");
   R.trackerV3 = await columns(db, "tasks");
   R.trackerV3Projects = await columns(db, "projects");
+  // v4 and v5, which the lesson lists without SQL: labels (many to many with
+  // tasks, through a table of pairs) and a history of each task's changes.
+  R.trackerLabels = await run(db, "CREATE TABLE labels (id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, name TEXT NOT NULL UNIQUE);");
+  R.trackerTaskLabels = await run(
+    db,
+    `CREATE TABLE task_labels (
+    task_id INT NOT NULL REFERENCES tasks (id),
+    label_id INT NOT NULL REFERENCES labels (id),
+    PRIMARY KEY (task_id, label_id)
+);`,
+  );
+  R.trackerHistory = await run(
+    db,
+    `CREATE TABLE task_history (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    task_id INT NOT NULL REFERENCES tasks (id),
+    changed_at TIMESTAMP NOT NULL,
+    status TEXT NOT NULL
+);`,
+  );
+  R.trackerV5Tables = await run(
+    db,
+    "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name;",
+  );
   await db.close();
 }
 

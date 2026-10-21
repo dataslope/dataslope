@@ -1,11 +1,11 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import type { Pt } from "../../components/arrow";
-import type { Cardinality } from "../../components/crowsfoot";
+import { type Cardinality, endSymbols as kitEndSymbols, relationEnd } from "../../components/crowsfoot";
 import { ease } from "../../components/motion";
 import { Entity, entityLayout, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, body, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink, Leader } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -32,6 +32,10 @@ const LEFT_W = 240;
 const RIGHT_X = 600;
 const RIGHT_W = 270;
 const TEXT_X = 950;
+/** The key, kept beside the table: the four definitions Fig. 3 gave. */
+const KEY_X = 1530;
+const KEY_SIZE = 26;
+const KEY_EDGE = 64;
 
 type EndRow = {
   beat: string;
@@ -161,6 +165,99 @@ const Callout: React.FC<{
   );
 };
 
+type Glyph = "bar" | "foot" | "circle";
+const GLYPHS: { glyph: Glyph; value: string }[] = [
+  { glyph: "bar", value: "one" },
+  { glyph: "foot", value: "many" },
+  { glyph: "circle", value: "zero" },
+];
+/** Where each row of the table names a mark: the key lights that glyph. */
+const KEY_HITS: { beat: string; word: string; glyph: Glyph }[] = [
+  { beat: "one", word: "bars", glyph: "bar" },
+  { beat: "zero-or-one", word: "bar", glyph: "bar" },
+  { beat: "zero-or-one", word: "circle", glyph: "circle" },
+  { beat: "one-or-many", word: "foot", glyph: "foot" },
+  { beat: "one-or-many", word: "bar", glyph: "bar" },
+  { beat: "zero-or-many", word: "foot", glyph: "foot" },
+  { beat: "zero-or-many", word: "circle", glyph: "circle" },
+  { beat: "m2m", word: "feet", glyph: "foot" },
+];
+
+/** One glyph of the key against a box's edge: its strokes and its centre. */
+const glyphMarks = (glyph: Glyph, tip: Pt) => {
+  const back: Pt = [tip[0] - KEY_EDGE, tip[1]];
+  if (glyph === "bar") {
+    const m = relationEnd(tip, back, "exactly-one", KEY_SIZE);
+    return { lines: m.lines.slice(0, 1), rings: [], c: kitEndSymbols(tip, back, "exactly-one", KEY_SIZE).near };
+  }
+  if (glyph === "foot") return { ...relationEnd(tip, back, "many", KEY_SIZE), c: kitEndSymbols(tip, back, "many", KEY_SIZE).near };
+  const m = relationEnd(tip, back, "zero-or-one", KEY_SIZE);
+  return { lines: [], rings: m.rings, c: m.rings[0].c };
+};
+
+/**
+ * Fig. 3's key, kept beside the table of ends while it is applied: where the
+ * most and the least sit, then what each glyph means. Each glyph lights as a
+ * row of the table names it.
+ */
+const EndKey: React.FC<{ top: number; at: number; hits: readonly { glyph: Glyph; at: number }[] }> = ({ top, at, hits }) => {
+  const frame = useCurrentFrame();
+  const rows = GLYPHS.map((g, i) => {
+    const rowTop = top + 160 + i * 52;
+    const tip: Pt = [KEY_X + KEY_EDGE, rowTop + 22];
+    return { ...g, rowTop, tip, at: at + 10 + i * 3, ...glyphMarks(g.glyph, tip) };
+  });
+  const rules = [
+    { lead: "Next to the box:", value: "the most" },
+    { lead: "Farther out:", value: "the least" },
+  ];
+  return (
+    <>
+      {hits.map((hit, k) => {
+        const r = rows.find((row) => row.glyph === hit.glyph)!;
+        return <Glow key={k} c={r.c} r={22} at={hit.at - 2} out={hit.at + 30} />;
+      })}
+      <Ink at={at} dur={14} style={{ left: KEY_X, top, whiteSpace: "nowrap" }}>
+        <span style={label(22, INK_SOFT)}>Reading an end</span>
+      </Ink>
+      {rules.map((r, i) => (
+        <Ink
+          key={r.lead}
+          at={at + 4 + i * 3}
+          dur={14}
+          style={{ left: KEY_X, top: top + 46 + i * 48, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 10 }}
+        >
+          <span style={note(22, INK)}>{r.lead}</span>
+          <span style={{ ...body(28, true), color: ACCENT_INK }}>{r.value}</span>
+        </Ink>
+      ))}
+      <Svg>
+        {rows.map((r) => {
+          const [x, cy] = r.tip;
+          return (
+            <g key={r.glyph} opacity={ease(frame, r.at, 10)}>
+              {/* The box's edge, then the line coming in to it. */}
+              <path d={`M ${x + 12} ${cy - 17} H ${x} V ${cy + 17} H ${x + 12}`} fill="none" stroke={INK} strokeWidth={2.4} strokeLinejoin="round" />
+              <line x1={x - KEY_EDGE} y1={cy} x2={x} y2={cy} stroke={INK} strokeWidth={2.4} strokeLinecap="round" />
+              {r.lines.map(([a, b], i) => (
+                <line key={i} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke={INK} strokeWidth={2.4} strokeLinecap="round" />
+              ))}
+              {r.rings.map((ring, i) => (
+                <circle key={i} cx={ring.c[0]} cy={ring.c[1]} r={ring.r} fill={PAPER} stroke={INK} strokeWidth={2.4} />
+              ))}
+            </g>
+          );
+        })}
+      </Svg>
+      {rows.map((r) => (
+        <Ink key={r.glyph} at={r.at + 2} dur={12} style={{ left: KEY_X + KEY_EDGE + 28, top: r.rowTop, height: 44, display: "flex", alignItems: "center" }}>
+          <span style={{ ...body(30, true), color: ACCENT_INK }}>{r.value}</span>
+        </Ink>
+      ))}
+    </>
+  );
+};
+
 /**
  * Crow's feet, read. First the two ends of the customers and orders line,
  * magnified: next to the box is the most (a bar for one, a foot for many),
@@ -186,7 +283,9 @@ export const EndsScene: React.FC = () => {
   const circleZeroAt = n.word("min", "circle means zero");
   const barOne2At = n.word("min", "bar means one");
   const oneFrom = n.beat("one").from;
+  const otherAt = n.word("one", "other box");
   const m2mTo = n.beat("m2m").to;
+  const keyHits = KEY_HITS.map((k) => ({ glyph: k.glyph, at: n.word(k.beat, k.word) }));
 
   // ── Part one: the two ends, magnified ──
   const Y0 = y(VIEW_Y);
@@ -219,8 +318,9 @@ export const EndsScene: React.FC = () => {
       left,
       right,
       start,
-      // Never before its own line has started to draw.
-      marksAt: Math.max(n.word(r.beat, r.marks), start + 8),
+      // Never before its own line has started to draw. The first row's far
+      // end arrives as the narration points at it ("the other box").
+      marksAt: Math.max(i === 0 ? otherAt : n.word(r.beat, r.marks), start + 8),
       readingAt: n.word(r.beat, r.readAt),
       exAt: n.word(r.beat, r.exampleAt),
       next: i + 1 < ROWS.length ? n.beat(ROWS[i + 1].beat).from : m2mTo + 30,
@@ -240,7 +340,7 @@ export const EndsScene: React.FC = () => {
 
       <Kicker at={endsFrom - 40}>Cardinality</Kicker>
       <Headline lead="Every end makes" at={endsFrom - 4} turn="two marks." turnAt={twoMarksAt - 4} out={oneFrom - 10} />
-      <Headline lead="Read the far end" at={oneFrom - 2} turn="as a count." turnAt={oneFrom + 10} />
+      <Headline lead="Start at one box." at={oneFrom - 2} turn="Read the other end." turnAt={otherAt - 4} />
 
       {/* ── Part one ── */}
       <AbsoluteFill style={{ opacity: partOne }}>
@@ -303,6 +403,8 @@ export const EndsScene: React.FC = () => {
         <Fig n="4" at={oneFrom} x={LEFT_X} y={y(268)}>
           The four ends, and feet at both
         </Fig>
+        {/* Fig. 3's key stays on as the legend, from the moment Fig. 3 lifts. */}
+        <EndKey top={y(ROW_Y) - 6} at={oneFrom - 12} hits={keyHits} />
         {rows.map((r) => {
           const a = r.left.anchor("right");
           const b = r.right.anchor("left");

@@ -77,7 +77,7 @@ export const SkewScene: React.FC = () => {
 
       <Drift from={incomesFrom} to={n.beat("fit-in").to + 40}>
         <div style={{ position: "absolute", inset: 0, opacity: 1 - dim }}>
-          <FigLabel n="10" title={`${fmt(INCOME.n, 0)} incomes, in dollars`} at={thousandAt - 6} x={160} y={y(300)} />
+          <FigLabel n="12" title={`${fmt(INCOME.n, 0)} incomes, in dollars`} at={thousandAt - 6} x={160} y={y(300)} />
           <Axis scale={X} base={base} ticks={[-50_000, 0, 50_000, 100_000, 150_000]} format={money} at={thousandAt - 6} />
           <KBars
             ks={ks.map((v) => v / INCOME.bin)}
@@ -100,12 +100,12 @@ export const SkewScene: React.FC = () => {
           </Note>
 
           {/* Mean and median. */}
-          <VRule x={sx(X, INCOME.mean)} bottom={base} top={base - h(TALL + 20)} at={meanAt - 4} />
-          <Note at={meanAt} x={sx(X, INCOME.mean) + 12} y={base - h(TALL + 24)}>
+          <VRule x={sx(X, INCOME.mean)} bottom={base} top={base - h(TALL + 50)} at={meanAt - 4} />
+          <Note at={meanAt} x={sx(X, INCOME.mean) + 12} y={base - h(TALL + 54)}>
             <span style={{ ...note(23, INK), fontWeight: 700, whiteSpace: "nowrap", ...halo }}>mean {fmt(INCOME.mean, 0)}</span>
           </Note>
-          <VRule x={sx(X, INCOME.median)} bottom={base} top={base - h(TALL + 20)} at={medianAt - 4} color={INK_SOFT} dash="3 5" />
-          <Note at={medianAt} x={sx(X, INCOME.median) - 12} y={base - h(TALL + 24)} align="right">
+          <VRule x={sx(X, INCOME.median)} bottom={base} top={base - h(TALL + 50)} at={medianAt - 4} color={INK_SOFT} dash="3 5" />
+          <Note at={medianAt} x={sx(X, INCOME.median) - 12} y={base - h(TALL + 54)} align="right">
             <span style={{ ...note(23, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap", ...halo }}>median {fmt(INCOME.median, 0)}</span>
           </Note>
 

@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
@@ -43,7 +43,6 @@ export const HookScene: React.FC = () => {
   const linksAt = n.word("hook", "links");
   const betweenAt = n.word("hook", "between");
   const intoAt = n.word("hook", "INTO");
-  const tablesAt = n.word("hook", "tables");
   const productAt = n.word("bad", "product");
   const minusAt = n.word("bad", "minus");
   const dollarsAt = n.word("bad", "dollars");
@@ -68,7 +67,7 @@ export const HookScene: React.FC = () => {
     width: 380,
     name: "products",
     columns: [
-      { name: "id", type: "integer", key: "PK" },
+      { name: "id", type: "serial", key: "PK" },
       { name: "name", type: "text" },
       { name: "price", type: "numeric" },
     ],
@@ -79,7 +78,7 @@ export const HookScene: React.FC = () => {
     width: 410,
     name: "order_items",
     columns: [
-      { name: "id", type: "integer", key: "PK" },
+      { name: "id", type: "serial", key: "PK" },
       { name: "product_id", type: "integer", key: "FK" },
       { name: "quantity", type: "integer" },
     ],
@@ -89,7 +88,16 @@ export const HookScene: React.FC = () => {
   // The writers, spread level with the card once it has arrived.
   const boxMid = (products.top + products.bottom) / 2;
   const rowY = (i: number) => boxMid + (i - 1.5) * h(76);
-  const targetY = (i: number) => boxMid + (i - 1.5) * h(40);
+  // Where each writer's arrow meets the card, top to bottom so no two cross.
+  // The import that forgets lands on price, the column the note says it
+  // broke; the writer below it shares the price row's lower half.
+  const targets = [
+    products.rows[0].mid,
+    products.rows[1].mid - h(6),
+    products.rows[2].mid - h(6),
+    products.rows[2].mid + h(16),
+  ];
+  const targetY = (i: number) => targets[i];
   const writerAt = (i: number) => (i === 0 ? catchAt - 2 : named[i] - 2);
   const arrowAt = (i: number) => (i === 0 ? oneWriterAt : named[i] + 4);
 
@@ -117,8 +125,6 @@ export const HookScene: React.FC = () => {
 
       <Kicker at={open - 10}>Why constraints</Kicker>
       <Head lead="Keys guard the links." at={open - 8} turn="What guards the rest?" turnAt={intoAt - 4} />
-
-      <FigLabel n="1" title="Two tables, and the key between them" at={tablesAt - 2} x={470} y={y(350)} out={appAt} />
 
       {/* ── The ERD from Unit 5: two tables and their key ── */}
       <Entity

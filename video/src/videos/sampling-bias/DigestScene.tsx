@@ -10,6 +10,7 @@ import { Sfx } from "../../sound/Sfx";
 import { H, ILLUSTRATIONS, PER_SQUARE, RETURNED_SQUARES, SQUARES, VIDEO } from "./data";
 import { Bracket, DOT, EASY, EASY_INK, RANDOM, RANDOM_INK, RAW, Underline } from "./parts";
 import { Marker } from "../sampling/emphasis";
+import { useFigNumber } from "../sampling/merged";
 
 /** The ballot grid: ten rows of ten squares. */
 const GRID = { x: 160, y: 452, cell: 31, gap: 6 };
@@ -29,6 +30,7 @@ export const DigestScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const n = useNarration();
+  const fig = useFigNumber();
   const { y } = useLayout();
 
   const digestFrom = n.beat("digest").from;
@@ -40,6 +42,7 @@ export const DigestScene: React.FC = () => {
   const leanedAt = n.word("back", "leaned");
   const callFrom = n.beat("call").from;
   const fortyAt = n.word("call", "forty-three");
+  const fiftySevenAt = n.word("call", "fifty-seven");
   const gallupFrom = n.beat("gallup").from;
   const fiftyAt = n.word("gallup", "fifty-six");
   const resultFrom = n.beat("result").from;
@@ -95,7 +98,7 @@ export const DigestScene: React.FC = () => {
       ) : null}
 
       {/* ── Fig. 4: the ballots ── */}
-      <FigLabel n="4" title="The Literary Digest's poll" at={mailedAt - 6} x={160} y={y(384)} />
+      <FigLabel n={fig(4)} title="The Literary Digest's poll" at={mailedAt - 6} x={160} y={y(384)} />
       <Ballots mailedAt={tenAt - 4} backAt={backFrom} />
       <Note at={tenAt + 6} x={GRID.x} y={y(GRID.y + COLS * (GRID.cell + GRID.gap) + 12)}>
         <div style={note(21, INK_SOFT)}>Each square: {PER_SQUARE.toLocaleString("en-US")} ballots mailed</div>
@@ -113,7 +116,7 @@ export const DigestScene: React.FC = () => {
       </Note>
 
       {/* ── Fig. 5: the forecasts and the result ── */}
-      <FigLabel n="5" title="Roosevelt's share of the votes for him and Landon" at={callFrom - 6} x={LABEL_X} y={y(384)} />
+      <FigLabel n={fig(5)} title="Roosevelt's share of the votes for him and Landon" at={callFrom - 6} x={LABEL_X} y={y(384)} />
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: scaleIn }}>
         <line x1={SHARE.x0} x2={SHARE.x1} y1={y(SCALE_Y)} y2={y(SCALE_Y)} stroke={INK} strokeWidth={1.6} />
         {[40, 50, 60, 70].map((v) => (
@@ -158,7 +161,7 @@ export const DigestScene: React.FC = () => {
           ...note(20, INK_SOFT),
         }}
       >
-        Roosevelt&apos;s share of the two-party vote
+        Roosevelt&apos;s share
       </div>
       <Note at={callFrom + 6} x={px(50) + 10} y={y(ROWS.digest - 62)} out={lessonFrom - 6}>
         <span style={{ ...note(20, INK_SOFT), ...halo }}>Roosevelt wins</span>
@@ -172,7 +175,8 @@ export const DigestScene: React.FC = () => {
         at={callFrom}
         dotAt={fortyAt - 4}
         name="Literary Digest"
-        sub="2.4 million replies"
+        sub={`${fmt(H.digestReturned / 1e6, 1)} million replies: Landon ${fmt(H.digestLandonShare, 1)}%`}
+        subAt={fiftySevenAt - 4}
         value={H.digestRooseveltShare}
         color={EASY}
         ink={EASY_INK}

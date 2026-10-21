@@ -325,8 +325,25 @@ export const Ping: React.FC<{ x: number; y: number; at: number; color?: string; 
 
 // ── Rows drawn over an ERD entity box ────────────────────────────────────────
 
-/** Where row `i` of an entity box sits, whether or not the box has it. */
-export const rowBox = (e: EntityLayout, i: number) => ({ top: e.top + e.head + i * e.row, mid: e.top + e.head + i * e.row + e.row / 2 });
+/** Where row `i` of an entity box sits, whether or not the box has it: inside
+ *  the box's outline, as erd.tsx lays its rows out. */
+export const rowBox = (e: EntityLayout, i: number) => {
+  const top = e.rows[i]?.top ?? e.top + ENTITY.border + e.head + i * e.row;
+  return { top, mid: top + e.row / 2 };
+};
+
+/** Fades what it holds on `out`, lifting it a little, as Ink's `out` does:
+ *  for a figure drawn from parts that have no `out` of their own. */
+export const Leave: React.FC<{ out?: number; children: React.ReactNode }> = ({ out, children }) => {
+  const frame = useCurrentFrame();
+  const gone = out === undefined ? 0 : ease(frame, out, 10);
+  if (gone >= 1) return null;
+  return (
+    <div style={{ position: "absolute", inset: 0, opacity: 1 - gone, transform: gone > 0 ? `translateY(${-gone * 10}px)` : undefined }}>
+      {children}
+    </div>
+  );
+};
 
 /**
  * A row an entity box does not have, drawn where its next row would go: a
@@ -793,6 +810,16 @@ export const DbTable: React.FC<{
       })}
     </>
   );
+};
+
+/** The same table with its last column widened to `width` in all, so a table
+ *  set under a wider one ends on the same edge (a number column then lines
+ *  its figures up with the one above). */
+export const widenTo = (g: TableGeometry, width: number): TableGeometry => {
+  if (g.width >= width) return g;
+  const widths = [...g.widths];
+  widths[widths.length - 1] += width - g.width;
+  return { ...g, widths, width };
 };
 
 // ── Postgres's answers ───────────────────────────────────────────────────────

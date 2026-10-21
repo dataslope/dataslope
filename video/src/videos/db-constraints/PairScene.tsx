@@ -25,11 +25,17 @@ import {
 
 const MID_X = 490;
 const TABLE_AT = 1400;
+/** Profiles' rows, right of the profiles card and its UNIQUE tag. */
+const PROFILES_AT = 1300;
+/** The closing recap's left edge: the group centred on the page. */
+const RECAP_X = 760;
 
 /**
  * Part 4, pairs: enrollments between students and courses, where each id
  * repeats but the pair may not; then UNIQUE on profiles' foreign key, which
- * is how one to one is built (Unit 5's pattern).
+ * is how one to one is built (Unit 5's pattern), and a second profile for
+ * user 1 refused. The figure then clears for the recap: missing and repeated
+ * are covered, wrong values are next.
  */
 export const PairScene: React.FC = () => {
   const n = useNarration();
@@ -55,7 +61,10 @@ export const PairScene: React.FC = () => {
   const fkAt = n.word("oneone", "foreign key");
   const eachUserAt = n.word("oneone", "each user");
   const mostAt = n.word("oneone", "at most");
-  const oneToOneAt = n.word("oneone", "one to one");
+  const profileAt = n.word("second", "second profile");
+  const userOneAt = n.word("second", "user one");
+  const bouncedAt = n.word("second", "bounces");
+  const oneToOneAt = n.word("second", "one to one");
   const coversAt = n.word("check-in", "covers");
   const missingAt = n.word("check-in", "missing");
   const repeatedAt = n.word("check-in", "repeated");
@@ -115,7 +124,7 @@ export const PairScene: React.FC = () => {
     name: "users",
     columns: [
       { name: "id", type: "integer", key: "PK" },
-      { name: "email", type: "text", key: "UK" },
+      { name: "email", type: "text" },
     ],
   });
   const profiles = useEntityLayout({
@@ -125,12 +134,22 @@ export const PairScene: React.FC = () => {
     name: "profiles",
     columns: [
       { name: "id", type: "integer", key: "PK" },
-      { name: "user_id", type: "integer", key: "FK, UK" },
+      { name: "user_id", type: "integer", key: "FK" },
       { name: "display_name", type: "text" },
     ],
   });
 
+  const gp = tableGeometry({
+    x: PROFILES_AT,
+    top: profiles.top,
+    cols: ONE_TO_ONE.cols,
+    rows: [...ONE_TO_ONE.rows, ONE_TO_ONE.attempt],
+    headH: h(HEAD_H),
+    rowH: h(ROW_H),
+  });
+
   const outA = putAt - 2;
+  const outB = coversAt;
 
   return (
     <AbsoluteFill>
@@ -141,10 +160,14 @@ export const PairScene: React.FC = () => {
       <Sfx name="el-scratch" at={bouncesAt + 2} level={-30} />
       <Sfx name="el-whoosh" at={outA} level={-34} />
       <Sfx name="el-pencil" at={eachUserAt} level={-34} />
+      <Sfx name="el-tap" at={profileAt - 2} level={-28} />
+      <Sfx name="el-scratch" at={bouncedAt + 2} level={-30} />
+      <Sfx name="el-whoosh" at={outB} level={-34} />
 
       <Kicker at={open - 10}>No repeats</Kicker>
-      <Head lead="Each pair, only once." at={eachPairAt - 4} out={outA} />
-      <Head lead="Unique on a foreign key:" at={fkAt - 4} turn="one to one." turnAt={oneToOneAt - 4} />
+      <Head lead="Many to many." at={open - 6} turn="Each pair, only once." turnAt={eachPairAt - 4} out={outA} />
+      <Head lead="Unique on a foreign key." at={fkAt - 4} turn="One to one." turnAt={oneToOneAt - 4} out={outB} />
+      <Head lead="Missing and repeated: covered." at={outB + 8} turn="Wrong values?" turnAt={valuesAt - 4} />
 
       {/* ── Fig. A: many to many ── */}
       <Entity layout={students} at={studentAt - 4} out={outA} />
@@ -209,9 +232,14 @@ export const PairScene: React.FC = () => {
       />
 
       {/* ── Fig. B: one to one ── */}
-      <Entity layout={users} at={fkAt - 8} dim={coversAt} />
-      <Entity layout={profiles} at={fkAt - 4} marks={{ user_id: { at: fkAt + 2, tone: "key" } }} dim={coversAt} />
-      <RuleTags layout={profiles} row="user_id" chips={[{ code: "UNIQUE", at: fkAt + 4, pulses: [mostAt] }]} dim={coversAt} />
+      <Entity layout={users} at={fkAt - 8} out={outB} />
+      <Entity layout={profiles} at={fkAt - 4} marks={{ user_id: { at: fkAt + 2, tone: "key" } }} out={outB} />
+      <RuleTags
+        layout={profiles}
+        row="user_id"
+        chips={[{ code: "UNIQUE", at: fkAt + 4, pulses: [mostAt, bouncedAt + 4] }]}
+        out={outB}
+      />
       <Relation
         name="users have profiles"
         points={[users.anchor("right", "id"), profiles.anchor("left", "user_id")]}
@@ -221,29 +249,44 @@ export const PairScene: React.FC = () => {
         label="at most one"
         labelAt={mostAt}
         labelPos={[users.right + 40, users.anchor("right", "id")[1] - 40]}
-        dim={coversAt}
+        out={outB}
+      />
+      <DbTable
+        g={gp}
+        cols={ONE_TO_ONE.cols}
+        at={eachUserAt - 6}
+        numeric={[0, 1]}
+        rows={[
+          ...ONE_TO_ONE.rows.map((cells) => ({ cells, at: eachUserAt })),
+          { cells: ONE_TO_ONE.attempt, at: profileAt - 2, ghost: true, grow: true, strikeAt: bouncedAt + 2 },
+        ]}
+        marks={[
+          { row: 0, col: 1, at: userOneAt, out: outB },
+          { row: ONE_TO_ONE.rows.length, col: 1, at: userOneAt + 4, color: MARK_BAD },
+        ]}
+        out={outB}
       />
       <ErrorBox
         x={720}
         top={profiles.bottom + h(36)}
         width={1824 - 720}
-        at={mostAt + 6}
+        at={bouncedAt}
         message={ONE_TO_ONE.refusal.message}
         detail={ONE_TO_ONE.refusal.detail}
         name={ONE_TO_ONE.refusal.constraint}
-        nameAt={oneToOneAt}
-        dim={coversAt}
+        nameAt={bouncedAt + 10}
+        out={outB}
       />
 
       {/* ── Missing and repeated are covered; wrong values are next ── */}
-      <Pill x={1250} y={y(850) - 54} at={missingAt - 2}>
+      <Pill x={RECAP_X} y={y(480)} at={missingAt - 2} size={26}>
         NOT NULL
       </Pill>
-      <Pill x={1420} y={y(850) - 54} at={repeatedAt - 2}>
+      <Pill x={RECAP_X + 250} y={y(480)} at={repeatedAt - 2} size={26}>
         UNIQUE
       </Pill>
-      <Tick x={1381} y={y(850) - 54} at={missingAt + 6} size={18} />
-      <Tick x={1528} y={y(850) - 54} at={repeatedAt + 6} size={18} />
+      <Tick x={RECAP_X + 170} y={y(480)} at={missingAt + 6} size={22} />
+      <Tick x={RECAP_X + 386} y={y(480)} at={repeatedAt + 6} size={22} />
       {/* ── What about values that are just wrong? ── */}
       {(
         [
@@ -251,19 +294,15 @@ export const PairScene: React.FC = () => {
           [`'${STATUS.failing[3]}'`, wrongAt],
         ] as const
       ).map(([v, at], i) => (
-        <Ink key={String(v)} at={at - 2} dur={12} style={{ left: 1250 + i * 230, top: y(850), whiteSpace: "nowrap" }}>
+        <Ink key={String(v)} at={at - 2} dur={12} style={{ left: RECAP_X + i * 250, top: y(560), whiteSpace: "nowrap" }}>
           <span
             style={{
+              ...note(34, ACCENT_INK),
               display: "inline-block",
               padding: "4px 14px",
               borderRadius: 8,
               border: `2px dashed ${INK_SOFT}`,
-              fontFamily: MONO,
-              fontSize: 30,
               fontWeight: 600,
-              color: ACCENT_INK,
-              ...note(30, ACCENT_INK),
-              fontVariantNumeric: "normal",
             }}
           >
             <span style={{ fontFamily: MONO }}>{v}</span>

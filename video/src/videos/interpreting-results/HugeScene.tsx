@@ -3,12 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, normalPdf, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { fmt, halo, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { fmt, halo, HAIRLINE, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HUGE } from "./data";
-import { Bracket, Count, Drift, GROUP_COLOR, GROUP_INK, Headline, Kicker, lerp, Marker, Ring, STAT_INK, Svg } from "./parts";
+import { Bracket, Drift, GROUP_COLOR, GROUP_INK, Headline, Kicker, lerp, Marker, Ring, STAT_INK, Svg } from "./parts";
 
 /** The scores: 40 to 160, about four standard deviations either side. */
 const X: XScale = { lo: 40, hi: 160, x0: 160, x1: 1000 };
@@ -24,9 +24,6 @@ const ROW2 = 590;
 const COLOR = [GROUP_COLOR.men, GROUP_COLOR.women] as const;
 const COLOR_INK = [GROUP_INK.men, GROUP_INK.women] as const;
 
-/** p on a log scale, so the count runs down through the decades evenly. */
-const pAt = (t: number) => 10 ** lerp(0, Math.log10(HUGE.p), t);
-const pText = (v: number) => (v >= 0.01 ? fmt(v, 2) : v >= 0.001 ? fmt(v, 4) : fmt(v, 5));
 
 /**
  * Part 1 opens: a test says whether, not how big. Two groups of 300,000
@@ -50,7 +47,6 @@ export const HugeScene: React.FC = () => {
   const seventhAt = n.word("p", "seventh");
   const pAtWord = n.word("p", "p-value");
   const sigAt = n.word("p", "highly significant");
-  const thousandAt = n.word("p", "ten thousand");
   const seventh2At = n.word("tiny", "seventh");
   const spreadAt = n.word("tiny", "spread");
   const percentAt = n.word("tiny", "one percent");
@@ -147,7 +143,8 @@ export const HugeScene: React.FC = () => {
               ))
             : null}
         </Svg>
-        <Axis scale={X} base={y(BASE)} ticks={[40, 70, 100, 130, 160]} at={groupsAt - 6} />
+        {/* The scale arrives with the first question, before the groups do. */}
+        <Axis scale={X} base={y(BASE)} ticks={[40, 70, 100, 130, 160]} at={thereAt - 4} />
         {(["A", "B"] as const).map((g, i) => (
           <Note key={g} at={(i ? peopleAt : groupsAt) + 4} x={i ? sx(X, 121) + 18 : sx(X, 79) - 18} y={i ? py(121) - 30 : py(79) - 30} align={i ? "left" : "right"}>
             <span style={{ ...label(22, COLOR_INK[i]), ...halo, whiteSpace: "nowrap" }}>Group {g}</span>
@@ -157,17 +154,6 @@ export const HugeScene: React.FC = () => {
         <Note at={scoreAt - 2} x={X.x1} y={y(BASE) + 40} align="right">
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>score</span>
         </Note>
-
-        {/* One standard deviation either side, shaded under the curves on "spread". */}
-        <Svg opacity={0.2 * ease(frame, spreadAt - 4, 14)}>
-          <path
-            d={`${Array.from({ length: 61 }, (_, i) => {
-              const v = 85 + i * 0.5;
-              return `${i ? "L" : "M"}${sx(X, v).toFixed(1)},${py(v).toFixed(1)}`;
-            }).join(" ")} L${sx(X, 115)},${y(BASE)} L${sx(X, 85)},${y(BASE)} Z`}
-            fill={COLOR[0]}
-          />
-        </Svg>
 
         {/* One standard deviation, under the left half of the curves. */}
         <Bracket x0={sx(X, 100 - 15)} x1={sx(X, 100)} y={y(BASE) + 52} at={fifteenAt - 4} up width={lerp(2.2, 3.6, spreadBold)} />
@@ -251,14 +237,14 @@ export const HugeScene: React.FC = () => {
           position: "absolute",
           left: RIGHT,
           top: y(ROW1) + 46,
-          opacity: ease(frame, pAtWord - 4, 10) * (1 - pDim),
+          opacity: ease(frame, pAtWord - 2, 12) * (1 - pDim),
           ...note(52, INK),
+          ...TABULAR,
           fontWeight: 700,
           whiteSpace: "nowrap",
         }}
       >
-        p ={" "}
-        <Count from={0} to={1} at={pAtWord} dur={Math.max(8, thousandAt + 6 - pAtWord)} format={(t) => pText(pAt(t))} />
+        p = {fmt(HUGE.p, 5)}
       </div>
       <Ring x={RIGHT + 170} y={y(ROW1) + 78} at={passingAt - 2} r0={40} r1={130} />
       <Note at={sigAt - 2} x={RIGHT} y={y(ROW1) + 126}>
@@ -282,13 +268,14 @@ export const HugeScene: React.FC = () => {
           position: "absolute",
           left: RIGHT,
           top: y(ROW2) + 46,
-          opacity: ease(frame, percentAt - 6, 10),
+          opacity: ease(frame, percentAt - 6, 12),
           ...note(52, INK),
+          ...TABULAR,
           fontWeight: 700,
           whiteSpace: "nowrap",
         }}
       >
-        d = <Count from={0} to={HUGE.d} at={percentAt - 4} dur={20} format={(v) => fmt(v, 3)} />
+        d = {fmt(HUGE.d, 3)}
       </div>
       <Note at={percentAt + 6} x={RIGHT} y={y(ROW2) + 126}>
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>

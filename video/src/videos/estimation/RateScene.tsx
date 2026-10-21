@@ -53,6 +53,8 @@ export const RateScene: React.FC = () => {
   const seAt = n.word("rate-se", "standard error");
   const itselfAt = n.word("rate-se", "itself");
   const tenthsAt = n.word("rate-se", "seven tenths");
+  const noSpreadAt = n.word("rate-z", "no separate spread");
+  const normalAt = n.word("rate-z", "normal's value");
   const stepAt = n.word("rate-ci", "Step");
   const nineSixAt = n.word("rate-ci", "one point nine six");
   const sixteenAt = n.word("rate-ci", "sixteen");
@@ -81,7 +83,7 @@ export const RateScene: React.FC = () => {
         A rate gets
       </Headline>
       <Headline at={answerAt - 2} second={testAt - 6} size={64} italic="a test.">
-        An interval can answer
+        An interval can do the job of
       </Headline>
 
       {/* ── Fig. 5: the visitors ── */}
@@ -113,6 +115,11 @@ export const RateScene: React.FC = () => {
       </Note>
 
       {/* ── Right column: the rate, its standard error, its interval ── */}
+      <Ink at={fiveFortyAt - 6} dur={14} style={{ left: COL, top: y(240), whiteSpace: "nowrap" }}>
+        <span style={label(22, INK_SOFT)}>
+          The observed rate, <PHat />
+        </span>
+      </Ink>
       <div style={{ position: "absolute", left: COL, top: y(282), display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
         <Ink at={fiveFortyAt - 4} dur={16} style={{ position: "relative", ...headline(52) }}>
           <PHat /> = {RATE.successes} ÷ {RATE.n.toLocaleString("en-US")}
@@ -132,6 +139,15 @@ export const RateScene: React.FC = () => {
           = <Count at={tenthsAt - 4} to={RATE.se * 100} dur={14} digits={2} /> points
         </Ink>
       </div>
+      {/* Why 1.96 here and not a t: nothing separate was estimated. */}
+      <Note at={noSpreadAt - 4} x={COL} y={y(500)}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          No separate spread to estimate
+          <span style={{ opacity: ease(frame, normalAt - 4, 10) }}>
+            , so no t: the normal’s <b style={{ color: INK }}>{fmt(RATE.z)}</b>
+          </span>
+        </span>
+      </Note>
 
       <Axis scale={X} base={y(AXIS)} ticks={[15, 16, 17, 18, 19, 20, 21]} format={(v) => `${v}%`} at={eighteenAt - 8} />
       <Rule x={px(RATE.pHat)} y0={y(AXIS)} y1={y(BAR_Y) - 30} at={eighteenAt - 2} color={EST} width={3.4} />
@@ -141,6 +157,9 @@ export const RateScene: React.FC = () => {
         </span>
       </Note>
       {/* One standard error at a time, out to 1.96 of them. */}
+      <Note at={stepAt} x={px(RATE.pHat + RATE.se)} y={y(AXIS) - 46} from="up">
+        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>1 SE</span>
+      </Note>
       <Svg opacity={ease(frame, stepAt - 2, 12)}>
         {[-1, 1].map((s) => (
           <line

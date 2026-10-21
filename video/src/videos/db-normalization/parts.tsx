@@ -236,6 +236,78 @@ export const noteStyle = (size = 22, color: string = INK_SOFT): React.CSSPropert
   whiteSpace: "nowrap",
 });
 
+/**
+ * A short arrow set in a line of text, as a flex item, so it sits wherever
+ * the words around it end. It draws itself on `at`; its head is arrowHead()'s.
+ */
+export const InlineArrow: React.FC<{ at: number; width?: number; color?: string; stroke?: number }> = ({
+  at,
+  width = 34,
+  color = INK_SOFT,
+  stroke = 2,
+}) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 10);
+  const tall = 16;
+  const from: Pt = [1, tall / 2];
+  const to: Pt = [width - 1, tall / 2];
+  const head = 9;
+  return (
+    <svg width={width} height={tall} style={{ flex: "none", overflow: "visible", opacity: p > 0 ? 1 : 0 }}>
+      <line x1={from[0]} y1={from[1]} x2={lerp(from[0], to[0], p)} y2={to[1]} stroke={color} strokeWidth={stroke} strokeLinecap="round" />
+      {p >= 1 ? (
+        <path d={arrowHead([from, to], head, head * 0.6)} fill="none" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
+      ) : null}
+    </svg>
+  );
+};
+
+/**
+ * A dependency written out the way the lessons write it, `a → b → c`: column
+ * names in mono, arrows between them, each piece inking in on its own cue.
+ * The pieces are flex items, so every arrow sits where the name before it
+ * ends, in any face.
+ */
+export const Notation: React.FC<{
+  x: number;
+  y: number;
+  size?: number;
+  out?: number;
+  parts: readonly ({ text: string; at: number } | { arrow: string; at: number })[];
+}> = ({ x, y, size = 24, out, parts }) => {
+  const frame = useCurrentFrame();
+  const o = out === undefined ? 0 : ease(frame, out, 10);
+  if (o >= 1) return null;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: x,
+        top: y,
+        display: "flex",
+        alignItems: "center",
+        gap: "0.5em",
+        whiteSpace: "nowrap",
+        fontFamily: MONO,
+        fontSize: size,
+        fontWeight: 600,
+        color: INK,
+        opacity: 1 - o,
+      }}
+    >
+      {parts.map((part, i) =>
+        "arrow" in part ? (
+          <InlineArrow key={i} at={part.at} width={Math.round(size * 1.6)} color={part.arrow} stroke={2.4} />
+        ) : (
+          <Ink key={i} at={part.at} dur={12} style={{ position: "relative" }}>
+            {part.text}
+          </Ink>
+        ),
+      )}
+    </div>
+  );
+};
+
 /** A short straight arrow that draws itself on `at`, its head from arrowHead(). */
 export const SmallArrow: React.FC<{ from: Pt; to: Pt; at: number; color?: string; width?: number; out?: number }> = ({
   from,

@@ -153,6 +153,10 @@ try {
 }
 await run("countAfterBad", "SELECT count(*) AS orders FROM orders;");
 
+// Fig. 6's SQL, set beside the same question in POSTQUEL (which cannot run):
+// Ada's orders, by her customer number.
+await run("twin", "SELECT * FROM orders WHERE customer_id = 1;");
+
 const key = (r) => JSON.stringify([...r.rows].sort((a, b) => a.order_id - b.order_id));
 out.sameAnswer = key(out.results.ada) === key(out.results.adaAgain);
 // Same rows in the same order, before and after, in both spellings.
@@ -172,4 +176,5 @@ console.log("ada   ", JSON.stringify(out.results.ada.rows));
 console.log("again ", JSON.stringify(out.results.adaAgain.rows));
 console.log("same answer:", out.sameAnswer, "same order:", out.sameOrder, "listing matches:", out.listingMatches, "moved:", out.moved.join(", "));
 console.log("bad   ", JSON.stringify(out.badError), "orders after:", out.results.countAfterBad.rows[0].orders);
+console.log("twin  ", JSON.stringify(out.results.twin.rows));
 writeFileSync(new URL("./results.json", import.meta.url), JSON.stringify(out, null, 2) + "\n");

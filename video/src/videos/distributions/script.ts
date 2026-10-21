@@ -98,16 +98,18 @@ export const script: NarrationScript = {
       id: "hook",
       scene: true,
       text: "A mean and a variance sum up one random variable. But the random variables you'll meet keep taking the same few shapes... and those shapes have names.",
-      pauseAfter: 0.5,
+      // Holds the finished row of seven named shapes long enough to read.
+      pauseAfter: 2.5,
     },
     {
       id: "bernoulli",
       text: "Start with the smallest. One visitor either signs up or doesn't, with a chance of, say, point three. One yes or no is a Bernoulli trial.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.7,
     },
     {
       id: "binomial",
-      text: "Now show the page to two hundred visitors, who each sign up with a chance of three in a hundred, and count the yeses.",
+      // The lesson's binomial runs at 0.03, not the Bernoulli's 0.3: say so.
+      text: "Now make the yes rarer. Show the page to two hundred visitors, who each sign up with a chance of three in a hundred, and count the yeses.",
       pauseAfter: 0.3,
     },
     { id: "six", text: "That count is binomial. Six is the likeliest number, and the chances fall away on either side.", pauseAfter: 0.35 },
@@ -182,17 +184,17 @@ export const script: NarrationScript = {
       id: "uniform",
       scene: true,
       text: "Spread a value evenly from zero to ten, and its curve is flat, a uniform, at a height of point one.",
-      pauseAfter: 0.3,
+      pauseAfter: 0.8,
     },
     {
       id: "slice",
       text: "Three to seven covers four tenths of the width, so it holds four tenths of the probability.",
-      pauseAfter: 0.4,
+      pauseAfter: 1.0,
     },
     {
       id: "squeeze",
       text: "Now squeeze all of it into half a unit. To keep the area at one, the height has to climb to two.",
-      pauseAfter: 0.45,
+      pauseAfter: 0.8,
     },
     {
       id: "density",
@@ -208,7 +210,7 @@ export const script: NarrationScript = {
     },
     {
       id: "across",
-      text: "Plot the share finished by each moment. Go across from ninety-five percent, then down... five hundred and ninety-nine milliseconds.",
+      text: "Plot the share finished by each moment, which is the area to its left under the density. Go across from ninety-five percent, then down... five hundred and ninety-nine milliseconds.",
       pauseAfter: 0.45,
     },
     {
@@ -295,7 +297,7 @@ export const script: NarrationScript = {
       id: "qq",
       scene: true,
       text: "So look. A Q-Q plot lines up the data's quantiles against the model's. When the model is right, the points fall on the line.",
-      pauseAfter: 0.4,
+      pauseAfter: 1.2,
     },
     {
       id: "bend",

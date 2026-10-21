@@ -210,6 +210,14 @@ export const DScene: React.FC = () => {
         </div>
       </Drift>
 
+      {/* The formula the narration just spoke, which the table's last note
+          comes back to: no sample size in it. */}
+      <Note at={sdAt - 2} x={TABLE_X} y={y(258)}>
+        <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          d = gap <span style={{ color: INK_SOFT }}>÷</span> standard deviation
+        </span>
+      </Note>
+
       {/* ── Cohen's guideposts, row by row ── */}
       {["d", "Cohen's label", "shared"].map((t, i) => (
         <div
@@ -289,7 +297,7 @@ export const DScene: React.FC = () => {
           only a start: <Marker at={stakeAt - 2}>what&apos;s at stake</Marker> decides big
         </span>
       </Note>
-      <Spot id="interpreting-results-caliper" at={bigAt - 4} left={1700} top={y(600)} width={120} height={310} />
+      <Spot id="interpreting-results-caliper" at={bigAt - 4} left={1600} top={y(662)} width={100} height={258} />
       <Ring x={(sx(X, 0) + sx(X, d)) / 2} y={peakY - 52} at={sizeAt - 2} r0={30} r1={90} />
       <Ring x={TABLE_X + 200} y={y(TABLE_Y) + 56 + 3 * ROW + 60} at={haveAt - 2} r0={30} r1={120} />
       <Note at={unlikeAt - 2} x={TABLE_X} y={y(TABLE_Y) + 56 + 3 * ROW + 46}>

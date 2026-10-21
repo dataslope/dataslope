@@ -3,12 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, fmt, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { GAPS, jitter } from "./data";
-import { Bell, DOT, Kicker, lerp, Mark, pulse, STAT, STAT_INK, Svg, TruthLine } from "./parts";
+import { Arrow, Bell, DOT, Kicker, lerp, Mark, pulse, STAT, STAT_INK, Svg, TruthLine } from "./parts";
 
 /** The raw values: every score in every draw lies inside 10 to 90. */
 const X: XScale = { lo: 10, hi: 90, x0: 300, x1: 1180 };
@@ -45,7 +45,6 @@ export const GapScene: React.FC = () => {
   const higherAt = n.word("hook", "higher");
   const halfAt = n.word("hook", "three");
   const betterAt = n.word("better", "better");
-  const sameFrom = n.beat("same").from;
   const sameAt = n.word("same", "same");
   const bothAt = n.word("same", "Both groups");
   const processAt = n.word("same", "process");
@@ -64,8 +63,11 @@ export const GapScene: React.FC = () => {
   const believeAt = n.word("luck", "believe");
   const askAt = n.word("luck", "ask");
   const couldAt = n.word("luck", "could");
-  const turnAt = n.beat("trend-in").from;
-  const onlyAt = n.word("trend-in", "only gaps");
+  const gapsAt = n.word("trend-in", "gaps");
+  const betweenAt = n.word("trend-in", "groups");
+  // The figure holds through "gaps between groups", which names it, and
+  // leaves with the cut.
+  const exitAt = n.beat("trend").from - 20;
 
   // When each draw's dots arrive, and when its gap bar grows. The third draw
   // is made on "Again", and its gap read out on "two".
@@ -90,10 +92,10 @@ export const GapScene: React.FC = () => {
   const zeroBold = ease(frame, zeroAt - 2, 10);
   // A comes out ahead: its average swells as it is named.
   const aSwell = pulse(frame, aheadAt, 20);
-  // "ask one question": the groups step back, and the gaps go after them on
-  // the turn to trends.
-  const groupsOp = (1 - ease(frame, askAt, 20) * 0.62) * (1 - ease(frame, turnAt, 22));
-  const panelOp = 1 - ease(frame, onlyAt + 8, 22);
+  // "ask one question": the groups step back, and come forward again as
+  // "gaps between groups" names them; the figure goes with the cut.
+  const groupsOp = (1 - (ease(frame, askAt, 20) - ease(frame, betweenAt - 4, 16)) * 0.62) * (1 - ease(frame, exitAt, 14));
+  const panelOp = 1 - ease(frame, exitAt, 14);
 
   const strip = (values: readonly number[], jit: readonly number[], base: number, appear: (j: number) => number, op = 1) =>
     values.map((v, j) => {
@@ -131,13 +133,13 @@ export const GapScene: React.FC = () => {
 
       {/* ── Headlines: one line in two inks, the second following the first ── */}
       <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
-        <Ink at={hookFrom - 8} dur={20} out={sameFrom - 6} style={{ position: "relative", whiteSpace: "nowrap" }}>
+        <Ink at={hookFrom - 8} dur={20} out={sameAt - 14} style={{ position: "relative", whiteSpace: "nowrap" }}>
           B scores higher.
         </Ink>
         <Ink
           at={betterAt - 6}
           dur={18}
-          out={sameFrom - 6}
+          out={sameAt - 14}
           style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}
         >
           Is B better?
@@ -191,6 +193,10 @@ export const GapScene: React.FC = () => {
         {strip(trial.b, JIT_B, STRIP_B, appearNew(current === 0 ? 8 : 2))}
       </Svg>
       <Axis scale={X} base={y(AXIS)} ticks={[10, 30, 50, 70, 90]} at={groupsAt - 6} />
+      {/* What the axis measures, in the column the group names use. */}
+      <Ink at={groupsAt} dur={12} style={{ left: 160, top: y(AXIS) + 5, whiteSpace: "nowrap" }}>
+        <span style={label(22, INK)}>Score</span>
+      </Ink>
 
       {/* The process both groups come from. */}
       <TruthLine x={sx(X, GAPS.mu)} bottom={y(AXIS)} top={y(STRIP_A - 56)} at={processAt - 4} />
@@ -232,6 +238,7 @@ export const GapScene: React.FC = () => {
                   padding: "0 6px",
                   borderRadius: 4,
                   ...note(23, STAT_INK),
+                  ...TABULAR,
                   fontWeight: 700,
                 }}
               >
@@ -253,17 +260,30 @@ export const GapScene: React.FC = () => {
           right: 1920 - ZERO_X + 12,
           top: y(392),
           opacity: panelIn,
-          ...note(20, INK_SOFT),
+          ...note(22, INK_SOFT),
           whiteSpace: "nowrap",
         }}
       >
         B ahead
       </div>
-      <div style={{ position: "absolute", left: ZERO_X + 12, top: y(392), opacity: panelIn, ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: ZERO_X + 12, top: y(392), opacity: panelIn, ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
         <Mark at={aheadAt + 4} out={againMoreAt}>
           A ahead
         </Mark>
       </div>
+      {/* Which way is which: a bar to the left is B ahead, to the right A ahead. */}
+      {[-1, 1].map((side) => (
+        <Arrow
+          key={side}
+          from={[ZERO_X + side * 14, y(392) + 44]}
+          to={[ZERO_X + side * 66, y(392) + 44]}
+          at={scoresAt + 4}
+          dur={12}
+          color={INK_SOFT}
+          width={2}
+          head={11}
+        />
+      ))}
       <Svg opacity={panelIn}>
         <line
           x1={ZERO_X}
@@ -287,7 +307,7 @@ export const GapScene: React.FC = () => {
         const rowY = y(ROW_Y[k]);
         const end = ZERO_X + w;
         // "Five draws": counted off, one bar after another.
-        const counted = pulse(frame, fiveAt + k * 4, 14);
+        const counted = Math.min(1, pulse(frame, fiveAt + k * 4, 14) + pulse(frame, gapsAt - 2 + k * 3, 14));
         return (
           <React.Fragment key={k}>
             <div

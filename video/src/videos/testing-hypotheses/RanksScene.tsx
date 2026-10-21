@@ -10,12 +10,18 @@ import { Sfx } from "../../sound/Sfx";
 import { jitter, MWU } from "./data";
 import { Bracket, DATA, DATA_INK, DOT, Head, Label, lerp, Mark, pulse, STAT, STAT_INK, STAT_WASH, Svg } from "./parts";
 
-/** Minutes to resolve a ticket. */
-const X: XScale = { lo: 0, hi: 420, x0: 260, x1: 1740 };
+/**
+ * Minutes to resolve a ticket, on a broken axis: the ordinary tickets get
+ * most of the width, so the shift between the queues shows, and the six
+ * monsters a short stretch past the break. No ticket falls in the gap.
+ */
+const XA: XScale = { lo: 0, hi: 80, x0: 260, x1: 1240 };
+const XB: XScale = { lo: 270, hi: 420, x0: 1340, x1: 1740 };
+const mx = (v: number) => (v <= XA.hi ? sx(XA, v) : sx(XB, v));
 const ROWS = [420, 520];
 const AXIS = 590;
-/** The rank line: 1 to 80, evenly spaced. */
-const RANK_Y = 760;
+/** The rank line: 1 to 80, evenly spaced. Low enough that its result clears Welch's. */
+const RANK_Y = 800;
 const RX0 = 260;
 const RX1 = 1740;
 
@@ -29,6 +35,8 @@ const meanRank = (g: number) => {
 };
 const MEAN_RANK = [meanRank(0), meanRank(1)];
 const JIT = [jitter(611, 40), jitter(612, 40)];
+/** Where Welch's result is printed, under the minutes axis. */
+const WELCH_X = 647;
 const isOutlier = (d: { i: number }) => d.i < MWU.outliers;
 const rankX = (r: number) => RX0 + ((r - 1) / (ALL.length - 1)) * (RX1 - RX0);
 const OUT_RANKS = ALL.map((d, k) => (isOutlier(d) ? RANK[k] : 0)).filter(Boolean);
@@ -66,7 +74,6 @@ export const RanksScene: React.FC = () => {
   const onlyWhereAt = n.word("line", "only where");
   const everyAt = n.word("next", "Every test");
   const answersAt = n.word("next", "answers");
-  const couldAt = n.word("next", "could");
   const meansAt = n.word("next", "means");
   const zeroAt = n.word("next", "zero");
   const bigAt = n.word("next", "how big");
@@ -78,6 +85,7 @@ export const RanksScene: React.FC = () => {
   const meanIn = ease(frame, swellAt - 6, 14);
   const rankMeans = ease(frame, shiftAt - 4, 16);
   const close = ease(frame, everyAt - 6, 18);
+  const axisFade = 1 - 0.6 * ease(frame, ranksAt - 6, 16);
   const fade = 1 - close;
   const pin = ease(frame, zeroAt - 6, 14);
   const axisIn = ease(frame, answersAt - 4, 18);
@@ -95,11 +103,19 @@ export const RanksScene: React.FC = () => {
 
       <Head a="Outliers" b="swell the noise." at={ranksFrom - 6} bAt={swellAt - 4} out={mannAt - 8} />
       <Head a="Ranks" b="see the shift." at={mannAt - 4} bAt={shiftAt - 6} out={everyAt - 8} />
-      <Head a="Could the effect be zero?" at={couldAt - 6} />
+      {/* The close arrives as the figure leaves, so the page is never left with only its subtitle. */}
+      <Head a="Could the effect be zero?" at={everyAt + 4} />
 
       <div style={{ position: "absolute", inset: 0, opacity: fade }}>
-        <FigLabel n="20" title="Two support queues: minutes to resolve each ticket" at={ranksFrom} x={160} y={y(290)} />
-        <Axis scale={X} base={y(AXIS)} ticks={[0, 60, 120, 180, 240, 300, 360, 420]} at={ranksFrom + 2} opacity={1 - 0.6 * ease(frame, ranksAt - 6, 16)} />
+        <FigLabel n="22" title="Two support queues: minutes to resolve each ticket" at={ranksFrom} x={160} y={y(290)} />
+        <Axis scale={XA} base={y(AXIS)} ticks={[0, 20, 40, 60, 80]} at={ranksFrom + 2} opacity={axisFade} />
+        <Axis scale={XB} base={y(AXIS)} ticks={[300, 360, 420]} at={ranksFrom + 6} opacity={axisFade} />
+        {/* The break between them. */}
+        <Svg opacity={axisFade * ease(frame, ranksFrom + 10, 10)}>
+          {[XA.x1 + 34, XA.x1 + 52].map((x) => (
+            <line key={x} x1={x - 6} x2={x + 6} y1={y(AXIS) + 9} y2={y(AXIS) - 9} stroke={INK} strokeWidth={1.8} />
+          ))}
+        </Svg>
         {["Queue A", "Queue B"].map((t, g) => (
           <div key={t} style={{ position: "absolute", left: 120, top: y(ROWS[g]) - 15, opacity: ease(frame, queuesAt - 4 + g * 6, 12), ...label(22, g ? DATA_INK : INK) }}>
             {t}
@@ -109,9 +125,9 @@ export const RanksScene: React.FC = () => {
           {/* However far out on the minutes, only the last places on the rank line. */}
           {ease(frame, farAt - 2, 12) > 0 ? (
             <rect
-              x={sx(X, 270)}
+              x={XB.x0}
               y={y(ROWS[0]) - h(30)}
-              width={(sx(X, 420) - sx(X, 270)) * ease(frame, farAt - 2, 12)}
+              width={(XB.x1 - XB.x0) * ease(frame, farAt - 2, 12)}
               height={y(ROWS[1]) - y(ROWS[0]) + h(60)}
               fill={STAT_WASH}
               opacity={0.8}
@@ -135,8 +151,8 @@ export const RanksScene: React.FC = () => {
             meanIn > 0 ? (
               <line
                 key={g}
-                x1={sx(X, m)}
-                x2={sx(X, m)}
+                x1={mx(m)}
+                x2={mx(m)}
                 y1={y(ROWS[g]) - h(34) * meanIn}
                 y2={y(ROWS[g]) + h(34) * meanIn}
                 stroke={STAT}
@@ -153,7 +169,7 @@ export const RanksScene: React.FC = () => {
             return (
               <circle
                 key={`g${k}`}
-                cx={sx(X, d.v)}
+                cx={mx(d.v)}
                 cy={y(ROWS[d.g]) + h((JIT[d.g][d.i] - 0.5) * 36)}
                 r={isOutlier(d) ? 8 : 6.5}
                 fill={d.g ? DATA : DOT}
@@ -165,7 +181,7 @@ export const RanksScene: React.FC = () => {
             const a = ease(frame, queuesAt - 4 + d.g * 6 + d.i * 0.25, 6);
             if (a <= 0) return null;
             const t = toRanks(k);
-            const fx = sx(X, d.v);
+            const fx = mx(d.v);
             const fy = y(ROWS[d.g]) + h((JIT[d.g][d.i] - 0.5) * 36);
             const tx = rankX(RANK[k]);
             const ty = y(RANK_Y) + (d.g ? 14 : -14);
@@ -222,17 +238,18 @@ export const RanksScene: React.FC = () => {
             rank, shortest to longest
           </Label>
         </Note>
-        <Note at={monsterAt + 4} x={sx(X, 280) - 16} y={y(ROWS[0]) - 76} align="right">
+        <Note at={monsterAt + 4} x={XB.x0 + 4} y={y(ROWS[0]) - 76} align="right">
           <Label size={22} color={STAT_INK} style={halo}>
             three tickets each that ran for hours
           </Label>
         </Note>
-        <Note at={nothingAt - 4} x={sx(X, 110)} y={y(AXIS) + 46}>
+        <Note at={nothingAt - 4} x={WELCH_X} y={y(AXIS) + 46}>
           <span style={{ ...note(26, INK), fontWeight: 650, ...halo, whiteSpace: "nowrap" }}>
             means {fmt(MWU.meanA, 0)} and {fmt(MWU.meanB, 0)}: Welch&apos;s t-test, p = <Mark at={sevenAt - 2}>{fmt(MWU.welchP, 2)}</Mark>
           </span>
         </Note>
-        <Note at={welchAt - 2} x={sx(X, MWU.meanB) + 12} y={y(ROWS[0]) - 24}>
+        {/* Gone with the mean lines it names. */}
+        <Note at={welchAt - 2} x={mx(MWU.meanB) + 12} y={y(ROWS[0]) - 24} out={ranksAt - 6}>
           <Label size={21} color={STAT_INK} style={halo}>
             the means
           </Label>
@@ -293,7 +310,7 @@ export const RanksScene: React.FC = () => {
           and what does it mean?
         </Label>
       </Note>
-      <Ink at={everyAt + 4} dur={18} style={{ left: 160, top: y(300), whiteSpace: "nowrap" }}>
+      <Ink at={everyAt + 14} dur={18} style={{ left: 160, top: y(300), whiteSpace: "nowrap" }}>
         <span style={{ ...body(36, true), color: INK_SOFT }}>The one narrow question every test here answers.</span>
       </Ink>
       <NextLine at={seemsAt - 4} x={160} y={y(780)} width={640}>

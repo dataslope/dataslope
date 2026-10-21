@@ -13,6 +13,8 @@ const COL_W = 560;
 const ROW_Y = [400, 610];
 const ROW_H = 190;
 const ROW_LABEL_X = 160;
+/** Where a cell's tick sits, from the cell's left edge: just past its word. */
+const TICK_AFTER = { correct: 230, power: 196 };
 
 /**
  * The truth crossed with the decision: four outcomes, a false alarm at rate
@@ -87,7 +89,8 @@ export const GridScene: React.FC = () => {
       <Head a="Two ways" b="to be wrong." at={gridFrom - 6} bAt={rejectAt - 4} />
 
       {/* ── The axes: what's true, what you decide ── */}
-      <Ink at={trueAt - 4} dur={14} style={{ left: ROW_LABEL_X, top: y(330), whiteSpace: "nowrap" }}>
+      {/* On the column headers' baseline: 22px set 6px lower than their 28px. */}
+      <Ink at={trueAt - 4} dur={14} style={{ left: ROW_LABEL_X, top: y(340) + 6, whiteSpace: "nowrap" }}>
         <span style={label(22, INK_SOFT)}>What&apos;s true</span>
       </Ink>
       <Ink at={decideAt - 4} dur={14} style={{ left: COL_X[0] + 8, top: y(290), whiteSpace: "nowrap" }}>
@@ -159,8 +162,9 @@ export const GridScene: React.FC = () => {
       )}
 
       {text(0, 0, 0, thereAt - 2, <span style={{ ...body(40, true), color: INK_SOFT }}>Correct</span>)}
-      <Tick x={COL_X[0] + 60} y={cellY(0) + 36 + 52 + 22} at={thereAt + 2} size={30} />
-      <Tick x={COL_X[1] + 340} y={cellY(1) + 36 + 22} at={thereAt + 8} size={30} color={DATA_INK} />
+      {/* Each tick just after its cell's word, the same way in both cells. */}
+      <Tick x={COL_X[0] + TICK_AFTER.correct} y={cellY(0) + 36 + 26} at={thereAt + 2} size={30} />
+      <Tick x={COL_X[1] + TICK_AFTER.power} y={cellY(1) + 36 + 26} at={thereAt + 8} size={30} color={DATA_INK} />
     </AbsoluteFill>
   );
 };

@@ -7,7 +7,7 @@ import { body, fmt, halo, INK, INK_SOFT, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { SIDES } from "./data";
+import { SIDES, STEPS } from "./data";
 import { Arrow, curvePath, Drift, Head, Label, lerp, Mark, phi, pulse, STAT, STAT_INK, STAT_WASH, Svg } from "./parts";
 
 const X: XScale = { lo: -4, hi: 4, x0: 300, x1: 1620 };
@@ -55,6 +55,7 @@ export const SidesScene: React.FC = () => {
   const glowUp = pulse(frame, nearerAt - 2, 24) + pulse(frame, exactlyWhyAt, 24);
   const arrowsGlow = pulse(frame, countAt - 2, 22);
   const dim = 1 - 0.55 * ease(frame, coinInFrom - 2, 16);
+  const ourT = ease(frame, tailsAt + 4, 12);
 
   return (
     <AbsoluteFill>
@@ -65,11 +66,13 @@ export const SidesScene: React.FC = () => {
       <Sfx name="el-tap" at={sixAt - 2} level={-29} />
       <Sfx name="el-pencil" at={chosenAt - 2} level={-35} />
 
-      <Head a="Two tails," b="or one?" at={sidesFrom - 4} bAt={oneSidedAt - 6} />
+      {/* A whole sentence until the one-sided test arrives; then the question it raises. */}
+      <Head a="Surprise lives in both tails." at={sidesFrom - 4} out={oneSidedAt - 8} />
+      <Head a="Two tails," b="or one?" at={oneSidedAt - 4} bAt={oneSidedAt + 8} />
 
       <div style={{ position: "absolute", inset: 0, opacity: dim }}>
         <Drift from={sidesFrom} to={coinInFrom + 40} scale={0.02} origin="50% 70%">
-          <FigLabel n="5" title="The test statistic, if the null is true" at={sidesFrom} x={160} y={y(262)} />
+          <FigLabel n="5" title="The test statistic, if the null is true" at={sidesFrom} x={160} y={y(276)} />
           <Axis scale={X} base={y(BASE)} ticks={[-3, -2, -1, 0, 1, 2, 3]} format={(v) => (v < 0 ? `−${-v}` : String(v))} at={sidesFrom} />
           <Svg>
             {twoIn > 0 && lowerGone < 1 ? (
@@ -93,6 +96,19 @@ export const SidesScene: React.FC = () => {
               const x = sx(X, s < 0 ? -SIDES.two : cut);
               return <line key={s} x1={x} x2={x} y1={y(BASE)} y2={py(phi(1.6)) - 40} stroke={STAT} strokeWidth={2.6} opacity={a} />;
             })}
+            {/* The worked example's own t, beyond the two-sided cutoff: rejected. */}
+            {ourT > 0 ? (
+              <line
+                x1={sx(X, STEPS.t)}
+                x2={sx(X, STEPS.t)}
+                y1={y(BASE) + 30}
+                y2={lerp(y(BASE) + 30, py(phi(STEPS.t)) - 26, ourT)}
+                stroke={STAT_INK}
+                strokeWidth={3.5}
+                strokeLinecap="round"
+                opacity={1 - lowerGone}
+              />
+            ) : null}
             {/* Where the two-sided cutoff was, once it has moved. */}
             {slide > 0 ? (
               <line
@@ -152,6 +168,23 @@ export const SidesScene: React.FC = () => {
               {fmt(SIDES.two, 2)}
             </div>
           ))}
+
+          {/* "our t", under the row of tick numbers (gone before the text below arrives). */}
+          <div
+            style={{
+              position: "absolute",
+              left: sx(X, STEPS.t),
+              top: y(BASE) + 32,
+              transform: "translateX(-50%)",
+              opacity: ourT * (1 - lowerGone),
+              ...note(21, STAT_INK),
+              fontWeight: 700,
+              whiteSpace: "nowrap",
+              ...halo,
+            }}
+          >
+            our <span style={{ fontStyle: "italic" }}>t</span>
+          </div>
 
           {/* The one-sided reading. */}
           <Note at={oneTailAt - 2} x={sx(X, 3.05)} y={py(phi(2.4)) - 70}>

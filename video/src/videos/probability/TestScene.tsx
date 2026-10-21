@@ -97,6 +97,14 @@ export const TestScene: React.FC = () => {
     return <line x1={ax} y1={y0} x2={lerp(ax, bx, p)} y2={lerp(y0, y1, p)} stroke={color} strokeWidth={2} opacity={0.8} />;
   };
   const treeDim = ease(frame, lineupAt - 4, 16) * 0.35;
+  // While the tree is the only figure it is drawn larger, in the middle of
+  // the page; it moves to the left half as the positives line up beside it.
+  const zoom = 1 - ease(frame, lineupAt - 22, 18);
+  const ZOOM = 1.3;
+  const treeBox = { x: [100, 950], y: [y(NODE.root[1]) - 40, y(NODE.sickPos[1]) + 40] } as const;
+  const tx = (960 - ZOOM * (treeBox.x[0] + treeBox.x[1]) / 2) * zoom;
+  const ty = (y(600) - ZOOM * (treeBox.y[0] + treeBox.y[1]) / 2) * zoom;
+  const treeScale = lerp(1, ZOOM, zoom);
 
   // Where each positive sits in the grid, and where it flies from.
   const slot = (i: number) => [GRID.x0 + GRID.pitch * ((i % GRID.cols) + 0.5), y(GRID.top) + h(GRID.pitch * (Math.floor(i / GRID.cols) + 0.5))] as const;
@@ -195,8 +203,16 @@ export const TestScene: React.FC = () => {
       </div>
 
       {/* ── The tree, on 100,000 people ── */}
-      <FigLabel n="4" title={`The lesson's tree, on ${num(TEST.population)} people`} at={walkAt - 6} x={160} y={y(268)} />
-      <div style={{ opacity: 1 - treeDim }}>
+      <FigLabel n="4" title={`${num(TEST.population)} people through the test`} at={walkAt - 6} x={160} y={y(268)} />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          opacity: 1 - treeDim,
+          transformOrigin: "0 0",
+          transform: zoom > 0 ? `translate(${tx}px, ${ty}px) scale(${treeScale})` : undefined,
+        }}
+      >
         <Svg>
           {edge(NODE.root, NODE.sick, hundredAt - 6, DATA)}
           {edge(NODE.root, NODE.healthy, ninetyNineKAt - 6)}

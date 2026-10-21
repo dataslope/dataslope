@@ -3,6 +3,7 @@ import { useCurrentFrame } from "remotion";
 import { arrowHead } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER } from "../../editorial/style";
+import { ds } from "../../theme/brand";
 
 /**
  * The video's color roles, the unit's: raw data (the population, one
@@ -18,6 +19,10 @@ export const EASY_INK = ACCENT_INK;
 export const RAW = `color-mix(in srgb, ${INK_SOFT} 34%, ${PAPER})`;
 /** One customer in a sample, drawn as a dot. */
 export const DOT = `color-mix(in srgb, ${INK} 72%, transparent)`;
+/** A happy customer (above the threshold) in a sample: raw data, so not an
+ *  estimate's color, but the yellow of the band that marks them in Fig. 1,
+ *  deep enough to read as a dot. */
+export const HAPPY = ds("yellow", 600);
 
 /** An estimate's color, part way from the easy sample's red to the random
  *  sample's blue (0 is red, 1 is blue). */

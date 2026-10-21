@@ -34,6 +34,9 @@ export const STAT = ACCENT;
 export const STAT_INK = ACCENT_INK;
 export const SOFT = `color-mix(in srgb, ${INK_SOFT} 42%, transparent)`;
 export const FAINT = `color-mix(in srgb, ${INK_SOFT} 24%, ${PAPER})`;
+/** Part 4's doorway, the room behind a door that has swung open: dark, so an
+ *  open door reads as open, with a white label on it. */
+export const ROOM = `color-mix(in srgb, ${INK} 60%, ${PAPER})`;
 /** Part 4's car, in the brand's "look here" yellow. */
 export const GOLD = ds("yellow", 500);
 export const GOLD_DEEP = ds("yellow", 700);

@@ -17,6 +17,8 @@ import {
   Head,
   HEAD_H,
   Kicker,
+  MARK_BAD,
+  Mono,
   ROW_H,
   RuleTags,
   TABLE_X,
@@ -30,7 +32,10 @@ import {
 /**
  * Part 5's catch: a CHECK refuses only false, and NULL >= 0 is null, so a
  * product with no price is stored. A required price takes all three rules:
- * the type, the CHECK, and NOT NULL, which refuses the same row.
+ * the type, the CHECK, and NOT NULL. The stored Pen clears first, and the
+ * same insert is tried again against a table that has NOT NULL too (its own
+ * fresh database in check.mjs), which refuses it: adding a rule never reaches
+ * back to a row already stored.
  */
 export const UnknownScene: React.FC = () => {
   const n = useNarration();
@@ -64,6 +69,8 @@ export const UnknownScene: React.FC = () => {
   });
   const g = tableGeometry({ x: TABLE_X, top: y(TABLE_Y), cols: CHECK_ONLY.cols, rows: CHECK_ONLY.rows, headH: h(HEAD_H), rowH: h(ROW_H) });
   const pen = 1;
+  /** The same insert, tried again with NOT NULL: it opens where Pen was. */
+  const again = 2;
   const below = g.rowTop(2) + h(40);
   const testOut = requiredAt - 2;
 
@@ -83,6 +90,7 @@ export const UnknownScene: React.FC = () => {
       {LAYERS.map((l) => (
         <Sfx key={l.code} name="el-tap" at={l.at + 8} level={-30} />
       ))}
+      <Sfx name="el-whoosh" at={requiredAt} level={-36} />
       <Sfx name="el-scratch" at={thereAt + 2} level={-30} />
 
       <Kicker at={open - 10}>Rules about values</Kicker>
@@ -107,13 +115,23 @@ export const UnknownScene: React.FC = () => {
         numeric={[0, 2]}
         rows={[
           { cells: CHECK_ONLY.rows[0], at: open + 8 },
-          { cells: CHECK_ONLY.rows[pen], at: leaveAt, grow: true, ghostAt: thereAt - 2, strikeAt: thereAt + 2 },
+          { cells: CHECK_ONLY.rows[pen], at: leaveAt, grow: true, collapseAt: requiredAt },
+          { cells: CHECK_AND_NOT_NULL.failing, at: notNullAt - 2, ghost: true, grow: true, strikeAt: thereAt + 2 },
         ]}
-        marks={[{ row: pen, col: 2, at: outAt + 2 }]}
+        marks={[
+          { row: pen, col: 2, at: outAt + 2 },
+          { row: again, col: 2, at: notNullAt + 6, color: MARK_BAD },
+        ]}
         bands={[{ row: pen, at: slipsAt, out: requiredAt }]}
       />
-      <Note at={throughAt - 2} x={g.x + g.width + 18} y={g.rowMid(pen) - 15} out={thereAt - 4}>
+      <Note at={throughAt - 2} x={g.x + g.width + 18} y={g.rowMid(pen) - 15} out={requiredAt - 4}>
         <span style={{ ...note(22, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>stored</span>
+      </Note>
+      {/* Where Pen was: the same insert, against a price that is NOT NULL too. */}
+      <Note at={notNullAt + 2} x={g.x + g.width + 18} y={g.rowMid(1) - 15}>
+        <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          same insert, with <Mono>NOT NULL</Mono>
+        </span>
       </Note>
 
       {/* The test, as Postgres evaluates it on the row with no price. */}

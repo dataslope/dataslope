@@ -14,8 +14,9 @@ type Part = string | { t: string; kind: "noun" | "verb" | "fact" };
  * Part 2 opens: step one, the store's requirements as plain sentences, after
  * case-study-ecommerce's list. They ink in as they are read; then the nouns
  * are washed in the key blue (the entities to come) and the verbs underlined
- * (the relationships), and the two facts of an order line are marked as the
- * narration names them.
+ * (the relationships), and the facts (a product's name and price, an order
+ * line's quantity and price charged) are marked in yellow as the narration
+ * names them. The key under the sentences gives each mark one meaning.
  */
 export const RequirementsScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -36,10 +37,12 @@ export const RequirementsScene: React.FC = () => {
   const nounsAt = n.word("nouns", "nouns");
   const verbsAt = n.word("nouns", "verbs");
   const connectAt = n.word("nouns", "connect");
+  const nameAt = n.word("reqs", "a name");
+  const priceAt = n.word("reqs", "a price");
 
   const sentences: Part[][] = [
     ["A ", { t: "customer", kind: "noun" }, " ", { t: "places", kind: "verb" }, " orders."],
-    ["A ", { t: "product", kind: "noun" }, " ", { t: "has", kind: "verb" }, " a name and a price."],
+    ["A ", { t: "product", kind: "noun" }, " ", { t: "has", kind: "verb" }, " a ", { t: "name", kind: "fact" }, " and a ", { t: "price", kind: "fact" }, "."],
     [{ t: "Categories", kind: "noun" }, " ", { t: "group", kind: "verb" }, " products,", " and a product can ", { t: "sit in", kind: "verb" }, " several."],
     ["An ", { t: "order", kind: "noun" }, " ", { t: "contains", kind: "verb" }, " products, each with a ", { t: "quantity", kind: "fact" }, " and ", { t: "the price charged", kind: "fact" }, "."],
   ];
@@ -47,7 +50,7 @@ export const RequirementsScene: React.FC = () => {
   let noun = 0;
   let verb = 0;
   let fact = 0;
-  const factAt = [quantityAt - 2, chargedAt - 2];
+  const factAt = [nameAt + 2, priceAt + 2, quantityAt - 2, chargedAt - 2];
 
   const part = (p: Part, k: number) => {
     if (typeof p === "string") return <React.Fragment key={k}>{p}</React.Fragment>;
@@ -116,7 +119,13 @@ export const RequirementsScene: React.FC = () => {
       </Ink>
       <Ink at={verbsAt + 2} dur={16} style={{ left: 580, top: y(720), whiteSpace: "nowrap" }}>
         <span style={{ ...body(30, true), color: INK }}>
-          <Underline at={verbsAt + 2}>verbs</Underline> become how they <Mark at={connectAt}>connect</Mark>
+          <Underline at={verbsAt + 2}>verbs</Underline> become how they connect
+        </span>
+      </Ink>
+      {/* The third mark's meaning, unspoken, so it gets the pause before the cut to read in. */}
+      <Ink at={connectAt - 4} dur={16} style={{ left: 1080, top: y(720), whiteSpace: "nowrap" }}>
+        <span style={{ ...body(30, true), color: INK }}>
+          <Mark at={connectAt - 2}>facts</Mark> become columns
         </span>
       </Ink>
     </AbsoluteFill>

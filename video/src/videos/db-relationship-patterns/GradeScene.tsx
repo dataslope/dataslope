@@ -1,6 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
+import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
@@ -12,6 +13,11 @@ const LEFT_X = 120;
 const RIGHT_X = 820;
 const STUDENTS_Y = 400;
 const COURSES_Y = 640;
+/** The next shape, glimpsed under the junction rows: one table split in two. */
+const PREVIEW_X = 820;
+const PREVIEW_Y = 780;
+const PREVIEW_W = 280;
+const PREVIEW_GAP = 280;
 
 /**
  * A grade is a fact about the pairing: it cannot sit on students (Ada has a
@@ -27,9 +33,9 @@ export const GradeScene: React.FC = () => {
   const from = n.beat("grade").from;
   const factsAt = n.word("grade", "facts");
   const gradeAt = n.word("grade", "a grade");
-  const notStudentsAt = n.word("grade", "Not on students");
-  const bMathAt = n.word("grade", "B in Math");
-  const cHistAt = n.word("grade", "C in History");
+  const notStudentsAt = n.word("not-students", "Not on students");
+  const bMathAt = n.word("not-students", "B in Math");
+  const cHistAt = n.word("not-students", "C in History");
   const notCoursesAt = n.word("course", "Not on courses");
   const adaBAt = n.word("course", "Ada a B");
   const graceCAt = n.word("course", "Grace a C");
@@ -37,6 +43,8 @@ export const GradeScene: React.FC = () => {
   const adaMathAt = n.word("belongs", "Ada in Math");
   const ownRowAt = n.word("belongs", "own row");
   const nextAt = n.word("one-in", "next shape");
+  const splitsAt = n.word("one-in", "splits");
+  const inTwoAt = n.word("one-in", "in two");
 
   // The junction's rows, joined to both parents (the lesson's own query).
   const COLS = JT.joinCols;
@@ -60,6 +68,12 @@ export const GradeScene: React.FC = () => {
   const cg = tableGeometry({ x: LEFT_X, top: y(COURSES_Y), cols: cCols, rows: [cRow], extra: [["", "", mathGrades]], headH: h(HEAD_H), rowH: h(ROW_H) });
   const leftDim = 1 - ease(frame, belongsAt, 14) * 0.5;
 
+  // "Splits one thing in two": a users box, and a second box sliding out
+  // from under it, the line between them drawn with the next part's ends.
+  const whole = useEntityLayout({ x: PREVIEW_X, y: y(PREVIEW_Y), width: PREVIEW_W, name: "users", columns: [] });
+  const part = useEntityLayout({ x: PREVIEW_X + PREVIEW_W + PREVIEW_GAP, y: y(PREVIEW_Y), width: PREVIEW_W, name: "user_profiles", columns: [] });
+  const apart = ease(frame, inTwoAt - 6, 18);
+
   return (
     <AbsoluteFill>
       {/* ── Sound: each grade read, each parent that cannot hold it ── */}
@@ -69,6 +83,8 @@ export const GradeScene: React.FC = () => {
       <Sfx name="el-tap" at={adaBAt} level={-29} />
       <Sfx name="el-scratch" at={graceCAt + 10} level={-31} />
       <Sfx name="el-pop" at={adaMathAt} level={-29} />
+      <Sfx name="el-whoosh" at={inTwoAt - 6} level={-35} />
+      <Sfx name="el-pencil" at={inTwoAt + 10} level={-34} />
 
       <Kicker at={from - 10}>Junction tables</Kicker>
       <Head lead="A fact about the pairing" leadAt={from - 6} turn="lives on its row." turnAt={ownRowAt - 6} />
@@ -143,6 +159,20 @@ export const GradeScene: React.FC = () => {
         </div>
       </Drift>
       </Drift>
+
+      {/* ── The next shape, glimpsed: one table splitting in two ── */}
+      <div style={{ position: "absolute", inset: 0, transform: `translateX(${(apart - 1) * (PREVIEW_W + PREVIEW_GAP)}px)` }}>
+        <Entity layout={part} at={inTwoAt - 6} />
+      </div>
+      <Entity layout={whole} at={splitsAt - 4} />
+      <Relation
+        name="users to user_profiles"
+        points={[whole.anchor("right"), part.anchor("left")]}
+        from="exactly-one"
+        to="zero-or-one"
+        at={inTwoAt + 10}
+        dur={14}
+      />
     </AbsoluteFill>
   );
 };

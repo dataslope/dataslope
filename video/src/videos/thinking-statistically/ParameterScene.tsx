@@ -3,12 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, halo, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { BAR, body, fmt, halo, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { jitter, KNOWN } from "./data";
-import { Bell, Bracket, DOT, lerp, Mark, Mu, pulse, STAT, STAT_INK, Svg, TruthLine, XBar } from "./parts";
+import { jitter, KNOWN, mulberry32 } from "./data";
+import { Bell, Bracket, DOT, lerp, Mark, Mu, pulse, RAW, STAT, STAT_INK, Svg, TruthLine, XBar } from "./parts";
 import { ROW_ONE } from "./TwentyScene";
 
 const X: XScale = { lo: 50, hi: 150, x0: 160, x1: 1760 };
@@ -19,6 +19,33 @@ const STRIP = 722;
 const JIT = 26;
 const BASE = 830;
 const JITTER = jitter(50, KNOWN.n);
+
+/**
+ * Fig. 3 again, small, under the two cards while they are read: the whole
+ * field under "the population", and under "the sample" the few dots you saw,
+ * which move to a new sample on "it moves". They leave on "In code", before
+ * Fig. 4 takes their place.
+ */
+const ECHO_COLS = 56;
+const ECHO_ROWS = 20;
+const ECHO_PITCH = 12;
+const ECHO_TOP = 512;
+const ECHO_N = 10;
+/** Ten cells at random, clear of the edge and of each other, so no two dots
+ *  read as one. */
+const pickSample = (seed: number) => {
+  const r = mulberry32(seed);
+  const picked: number[] = [];
+  while (picked.length < ECHO_N) {
+    const c = 1 + Math.floor(r() * (ECHO_COLS - 2));
+    const w = 1 + Math.floor(r() * (ECHO_ROWS - 2));
+    const near = picked.some((i) => Math.abs((i % ECHO_COLS) - c) < 5 && Math.abs(Math.floor(i / ECHO_COLS) - w) < 4);
+    if (!near) picked.push(w * ECHO_COLS + c);
+  }
+  return picked;
+};
+const SAMPLE_A = pickSample(11);
+const SAMPLE_B = pickSample(12);
 
 /** One card: a name, what it describes, and its symbol, each arriving on
  *  the words that introduce it. */
@@ -97,6 +124,7 @@ export const ParameterScene: React.FC = () => {
   const meanAt = n.word("letters", "mean");
   const statisticsAt = n.word("letters", "Statistics");
   const xBarAt = n.word("letters", "x-bar");
+  const parameterFrom = n.beat("parameter").from;
   const codeAt = n.word("cheat", "In code");
   const cheatAt = n.word("cheat", "cheat");
   const buildAt = n.word("cheat", "Build");
@@ -106,20 +134,22 @@ export const ParameterScene: React.FC = () => {
   const pointFourAt = n.word("miss", "one point four");
   const closeAt = n.word("miss", "Close");
   const missAt = n.word("price", "miss");
-  const mistakeAt = n.word("price", "mistake");
+  const errorAt = n.word("price", "estimation error");
   const partAt = n.word("price", "seeing only part");
   const turnAt = n.beat("twenty-in").from;
   const missAgainAt = n.word("twenty-in", "miss");
   const usuallyAt = n.word("twenty-in", "usually");
-  const oneSampleAt = n.word("twenty-in", "One sample");
+  // The labelled Fig. 4 holds through "One sample can't tell you"; the morph
+  // into row 1 of Fig. 5 fills the pause before the cut and ends on it.
+  const morphAt = n.beat("twenty").from - 48;
 
-  // "In code": the definitions step back for the demonstration, and leave on
-  // the turn to the next figure.
-  const cardsOp = (1 - ease(frame, codeAt - 2, 20) * 0.55) * (1 - ease(frame, turnAt, 18));
-  // "One sample can't tell you": the sample, its average, the axis and mu
-  // slide into row 1 of Fig. 5; everything else about it fades first.
-  const fade = ease(frame, oneSampleAt - 4, 12);
-  const m = ease(frame, oneSampleAt - 2, 40);
+  // "Build a population": the definitions step back for the demonstration,
+  // and leave on the turn to the next figure.
+  const cardsOp = (1 - ease(frame, buildAt, 20) * 0.55) * (1 - ease(frame, turnAt, 18));
+  // The sample, its average, the axis and mu slide into row 1 of Fig. 5;
+  // the labels and the miss fade just before.
+  const fade = ease(frame, morphAt - 2, 12);
+  const m = ease(frame, morphAt, 40);
   const XS: XScale = { ...X, x1: lerp(X.x1, ROW_ONE.X.x1, m) };
   const stripY = lerp(y(STRIP), y(ROW_ONE.ROW0), m);
   const base = lerp(y(BASE), y(ROW_ONE.BASE), m);
@@ -140,10 +170,12 @@ export const ParameterScene: React.FC = () => {
       <Sfx name="el-tap" at={averageAt - 4} level={-27} />
       <Sfx name="el-pencil" at={closeAt - 2} level={-34} />
       <Sfx name="el-pencil" at={partAt - 2} level={-35} />
-      <Sfx name="el-whoosh" at={oneSampleAt - 2} level={-34} />
+      <Sfx name="el-whoosh" at={morphAt} level={-34} />
+      <Sfx name="el-sprinkle" at={describesAt - 2} level={-35} />
+      <Sfx name="el-sprinkle" at={computeAt + 6} level={-35} />
 
       <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
-        <Ink at={parameterAt - 6} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
+        <Ink at={parameterFrom - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Parameters stay put.
         </Ink>
         <Ink at={movesAt - 6} dur={18} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
@@ -187,17 +219,28 @@ export const ParameterScene: React.FC = () => {
           symbol={<XBar />}
           symbolAt={xBarAt - 4}
           symbolNote="x-bar, its mean"
-          symbolNoteAt={xBarAt + 10}
+          symbolNoteAt={xBarAt - 2}
           color={STAT_INK}
         />
       </AbsoluteFill>
+
+      {/* ── Fig. 3, echoed under the cards ── */}
+      <Echo
+        x={[160, 1000]}
+        fieldAt={describesAt - 2}
+        hideAt={cantAt - 2}
+        sampleAt={computeAt + 6}
+        seeAt={canSeeAt}
+        movesAt={movesAt - 4}
+        out={codeAt - 2}
+      />
 
       {/* ── Fig. 4: a population we know, and one sample from it ── */}
       <FigLabel
         n="4"
         title={`One sample of ${KNOWN.n}, from a population whose mean is ${KNOWN.mu}`}
         at={cheatAt - 4}
-        out={oneSampleAt - 4}
+        out={morphAt - 2}
         x={160}
         y={y(FIG_Y)}
       />
@@ -217,11 +260,22 @@ export const ParameterScene: React.FC = () => {
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", ...halo }}>the whole population</span>
       </Note>
       <TruthLine x={muX} bottom={base} top={lerp(y(LABEL_Y + 34), y(ROW_ONE.ROW0 - 16), m)} at={hundredAt - 4} />
-      <Note at={hundredAt} x={muX - 14} y={y(LABEL_Y)} align="right" out={oneSampleAt - 4}>
-        <span style={{ ...note(25, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-          <Mu /> = {KNOWN.mu}
-        </span>
-      </Note>
+      {/* mu rides with its line into Fig. 5, to where that figure labels it. */}
+      <div
+        style={{
+          position: "absolute",
+          left: muX + lerp(-14, 12, m),
+          top: lerp(y(LABEL_Y), y(ROW_ONE.ROW0 - 50), m),
+          opacity: ease(frame, hundredAt, 14),
+          transform: `translateX(${lerp(-100, 0, m)}%)`,
+          ...note(lerp(25, 23, m), INK),
+          fontWeight: 650,
+          whiteSpace: "nowrap",
+          ...halo,
+        }}
+      >
+        <Mu /> = {KNOWN.mu}
+      </div>
 
       <Svg>
         {KNOWN.values.map((v, j) => {
@@ -257,7 +311,7 @@ export const ParameterScene: React.FC = () => {
           />
         ) : null}
       </Svg>
-      <Note at={averageAt} x={barX + 14} y={y(LABEL_Y)} out={oneSampleAt - 4}>
+      <Note at={averageAt} x={barX + 14} y={y(LABEL_Y)} out={morphAt - 2}>
         {/* "how big is that miss": the average it is measured from swells. */}
         <span
           style={{
@@ -296,12 +350,86 @@ export const ParameterScene: React.FC = () => {
               <Mark at={missAt - 2}>{fmt(KNOWN.error)}</Mark>
             </b>
             ,{" "}
-            <Mark at={mistakeAt - 2}>
-              the estimation error
-            </Mark>
+            <Mark at={errorAt - 2}>the estimation error</Mark>
           </span>
         </Note>
       </AbsoluteFill>
     </AbsoluteFill>
+  );
+};
+
+/** The echo of Fig. 3: two small fields, the population and the sample. */
+const Echo: React.FC<{
+  x: readonly [number, number];
+  fieldAt: number;
+  hideAt: number;
+  sampleAt: number;
+  seeAt: number;
+  movesAt: number;
+  out: number;
+}> = ({ x, fieldAt, hideAt, sampleAt, seeAt, movesAt, out }) => {
+  const frame = useCurrentFrame();
+  const { y, h } = useLayout();
+  const gone = ease(frame, out, 14);
+  if (frame < fieldAt || gone >= 1) return null;
+  const top = y(ECHO_TOP);
+  const w = (ECHO_COLS - 1) * ECHO_PITCH;
+  const fh = h((ECHO_ROWS - 1) * ECHO_PITCH);
+  const at = (i: number) => [i % ECHO_COLS, Math.floor(i / ECHO_COLS)] as const;
+  const px = (x0: number, i: number) => x0 + at(i)[0] * ECHO_PITCH;
+  const py = (i: number) => top + h(at(i)[1] * ECHO_PITCH);
+  // "you can't see it": the population fades to its outline.
+  const hidden = 1 - ease(frame, hideAt, 16) * 0.72;
+  const sampleField = ease(frame, sampleAt - 8, 12);
+  const moved = (k: number) => ease(frame, movesAt + k * 1.5, 16);
+  const outline = (x0: number, p: number) =>
+    p > 0 ? (
+      <rect
+        x={x0 - 12}
+        y={top - 12}
+        width={w + 24}
+        height={fh + 24}
+        rx={8}
+        fill="none"
+        stroke={INK}
+        strokeWidth={1.4}
+        opacity={0.7}
+        pathLength={1}
+        strokeDasharray={`${p} 1`}
+      />
+    ) : null;
+  return (
+    <Svg opacity={1 - gone}>
+      {outline(x[0], ease(frame, fieldAt, 24))}
+      {Array.from({ length: ECHO_COLS * ECHO_ROWS }, (_, i) => {
+        const a = ease(frame, fieldAt + at(i)[0] * 0.35, 8);
+        return a > 0 ? <circle key={i} cx={px(x[0], i)} cy={py(i)} r={2.3} fill={RAW} opacity={a * hidden} /> : null;
+      })}
+      {outline(x[1], ease(frame, sampleAt - 8, 20))}
+      {sampleField > 0
+        ? Array.from({ length: ECHO_COLS * ECHO_ROWS }, (_, i) => (
+            <circle key={i} cx={px(x[1], i)} cy={py(i)} r={2.3} fill={RAW} opacity={sampleField * 0.32} />
+          ))
+        : null}
+      {SAMPLE_A.map((from, k) => {
+        const a = ease(frame, sampleAt + k * 1.5, 10);
+        if (a <= 0) return null;
+        const t = moved(k);
+        const to = SAMPLE_B[k];
+        // "You can see it": each answer swells in turn.
+        const seen = pulse(frame, seeAt - 2 + k * 1.6, 16);
+        return (
+          <circle
+            key={k}
+            cx={lerp(px(x[1], from), px(x[1], to), t)}
+            cy={lerp(py(from), py(to), t)}
+            r={7 * a * (1 + seen * 0.45)}
+            fill={BAR}
+            stroke={PAPER}
+            strokeWidth={2}
+          />
+        );
+      })}
+    </Svg>
   );
 };

@@ -50,7 +50,6 @@ export const LimitsScene: React.FC = () => {
   const largestAt = n.word("edge", "largest value");
   const maximumAt = n.word("edge", "maximum");
   const sayAt = n.word("edge", "say");
-  const haveAt = n.word("limits", "have");
   const failsAt = n.word("edge", "fails");
   const nextFrom = n.beat("next").from;
   const precisionFrom = n.beat("precision").from;
@@ -93,7 +92,7 @@ export const LimitsScene: React.FC = () => {
       {/* The two figures step back once the bridge has asked its question. */}
       <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.65 * ease(frame, zeroEndAt + 4, 30) }}>
       {/* ── Fig. 11: a biased sample ── */}
-      <FigLabel n="11" title={`${BIASED.n} waits, kept only under ${BIASED.cutoff} minutes`} at={haveAt - 6} x={160} y={y(272)} />
+      <FigLabel n="11" title={`${BIASED.n} waits, kept only under ${BIASED.cutoff} minutes`} at={informationAt} x={160} y={y(272)} />
       <Svg>
         <rect
           x={sx(XL, BIASED.cutoff)}
@@ -108,7 +107,7 @@ export const LimitsScene: React.FC = () => {
           return <circle key={j} cx={sx(XL, v)} cy={y(L_STRIP) + h((JIT[j] - 0.5) * 30)} r={5.5 * a} fill={DATA} stroke={PAPER} strokeWidth={1} opacity={0.85} />;
         })}
       </Svg>
-      <Axis scale={XL} base={y(L_AXIS)} ticks={[0, 2, 4, 6, 8, 10, 12, 14]} at={haveAt - 4} />
+      <Axis scale={XL} base={y(L_AXIS)} ticks={[0, 2, 4, 6, 8, 10, 12, 14]} at={informationAt + 2} />
       <Note at={biasedAt + 8} x={sx(XL, BIASED.cutoff) + 12} y={y(L_STRIP - 30)}>
         <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>never recorded</span>
       </Note>

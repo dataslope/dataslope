@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, fmt, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, body, fmt, HIGHLIGHT, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -16,16 +16,16 @@ import {
   PRODUCT_ROWS,
   TOTAL_CATALOG,
   TOTAL_CHARGED,
+  TRIED,
   ZERO_QUANTITY,
 } from "./data";
-import { MONO } from "../../theme/fonts";
-import { DbTable, ErrorBox, Head, Mark, MARK_BAD, Mono, Strike, tableGeometry } from "./parts";
+import { DbTable, ErrorBox, Head, Leave, Mark, MARK_BAD, MARK_KEY, Mono, Strike, tableGeometry, widenTo } from "./parts";
 import { STORE_BOTTOM, STORE_TOP, STORE_X } from "./StoreErd";
 
-/** Where Postgres's answers sit: under the diagram, across its width. */
+/** Where the rows tried and Postgres's answers sit: under the diagram. */
 const ERROR_Y = 806;
-/** Out to the page margin: the rail ends above this band. */
-const ERROR_W = 1824 - STORE_X[0];
+/** The page margin: the rail ends above this band. */
+const RIGHT = 1824;
 
 /**
  * The foreground of Part 2's diagram scenes. The diagram itself and the step
@@ -77,50 +77,71 @@ export const RelateScene: React.FC = () => {
 /** Steps five and six: the pair as a key, the quantity rule, and what Postgres says to each. */
 export const RulesScene: React.FC = () => {
   const n = useNarration();
-  const { y } = useLayout();
+  const { y, h } = useLayout();
   const keysFrom = n.beat("keys").from;
-  const twiceAt = n.word("keys", "twice");
+  const sameAt = n.word("keys", "same product");
+  const cantAt = n.word("keys", "can't");
+  const oneOrderAt = n.word("keys", "one order");
   const rulesFrom = n.beat("rules").from;
   const refusedAt = n.word("rules", "refused");
   const lineAt = n.word("rules", "a line");
   const zeroAt = n.word("rules", "zero mugs");
+
+  // Each tried line drawn as the one-row table it would have been, with
+  // Postgres's answer beside it.
+  const tried = (row: readonly (string | null)[]) =>
+    tableGeometry({ x: STORE_X[0], top: y(ERROR_Y), cols: ITEM_COLS, rows: [row], headH: h(44), rowH: h(52) });
+  const dup = tried(TRIED.duplicate);
+  const zero = tried(TRIED.zero);
+  const errorX = (g: { x: number; width: number }) => g.x + g.width + 36;
+  const dupOut = rulesFrom - 6;
   return (
     <AbsoluteFill>
-      <Sfx name="el-tap" at={twiceAt - 2} level={-28} />
+      <Sfx name="el-pencil" at={sameAt - 4} level={-35} />
+      <Sfx name="el-tap" at={cantAt - 2} level={-28} />
       <Sfx name="el-tap" at={refusedAt - 2} level={-27} />
       <Sfx name="el-pencil" at={lineAt - 4} level={-35} />
       <Head at={keysFrom - 6} second={rulesFrom - 2} italic="then rules.">
         Keys first,
       </Head>
+
+      {/* "The same product can't land on one order twice": the line tried, and the refusal. */}
+      <Leave out={dupOut}>
+        <DbTable
+          g={dup}
+          cols={ITEM_COLS}
+          rows={[{ cells: TRIED.duplicate, at: sameAt }]}
+          at={sameAt - 4}
+          numeric={[0, 1, 2, 3]}
+          marks={[
+            { row: 0, col: 1, at: sameAt + 4, color: MARK_KEY },
+            { row: 0, col: 0, at: oneOrderAt - 2, color: MARK_KEY },
+          ]}
+        />
+      </Leave>
       <ErrorBox
-        x={STORE_X[0]}
+        x={errorX(dup)}
         top={y(ERROR_Y)}
-        width={ERROR_W}
-        at={twiceAt - 2}
-        out={n.word("rules", "quantity") - 4}
+        width={RIGHT - errorX(dup)}
+        at={cantAt - 2}
+        out={dupOut}
         message={DUPLICATE_LINE.message}
         detail={DUPLICATE_LINE.detail}
       />
-      {/* "A line for zero mugs": the row tried, as Postgres's DETAIL spells it, until it is refused. */}
-      <Ink at={lineAt - 4} dur={16} out={refusedAt - 4} style={{ left: STORE_X[0], top: y(ERROR_Y) + 10, display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, INK_SOFT) }}>A new line for order_items</span>
-        <span style={{ fontFamily: MONO, fontSize: 28, color: INK }}>
-          {TRIED.map((v, i) => (
-            <React.Fragment key={i}>
-              {i ? ", " : "("}
-              {i === 2 ? <Mark at={zeroAt - 2} color={MARK_BAD}>{v}</Mark> : v}
-            </React.Fragment>
-          ))}
-          )
-        </span>
-      </Ink>
-      <ErrorBox x={STORE_X[0]} top={y(ERROR_Y)} width={ERROR_W} at={refusedAt - 2} message={ZERO_QUANTITY.message} detail={ZERO_QUANTITY.detail} />
+
+      {/* "A line for zero mugs": the row tried, until Postgres refuses it. */}
+      <DbTable
+        g={zero}
+        cols={ITEM_COLS}
+        rows={[{ cells: TRIED.zero, at: lineAt }]}
+        at={lineAt - 4}
+        numeric={[0, 1, 2, 3]}
+        marks={[{ row: 0, col: 2, at: zeroAt - 2, color: MARK_BAD }]}
+      />
+      <ErrorBox x={errorX(zero)} top={y(ERROR_Y)} width={RIGHT - errorX(zero)} at={refusedAt - 2} message={ZERO_QUANTITY.message} detail={ZERO_QUANTITY.detail} />
     </AbsoluteFill>
   );
 };
-
-/** The row the zero-quantity insert tried, read back out of Postgres's DETAIL line. */
-const TRIED = (ZERO_QUANTITY.detail?.match(/\((.*)\)/)?.[1] ?? "").split(", ");
 
 /** "2 × 10.00 + 1 × 24.00": an order's lines, priced one way or the other. */
 const sumOf = (price: (row: readonly (string | null)[]) => string) =>
@@ -144,26 +165,27 @@ export const PriceScene: React.FC = () => {
   const todayAt = n.word("history", "today's prices");
   const fortyEightAt = n.word("history", "forty-eight");
   const rewriteAt = n.word("history", "rewrite");
+  const withoutAt = n.word("without", "Without that copy");
   const reviewFrom = n.beat("review").from;
   const walkAt = n.word("review", "walk");
 
   const tableAt = mugFrom + 6;
   const items = tableGeometry({ x: STORE_X[0], top: y(STORE_TOP + 8), cols: ITEM_COLS, rows: ITEM_ROWS, headH: h(52), rowH: h(62) });
-  const products = tableGeometry({
-    x: STORE_X[0],
-    top: y(STORE_BOTTOM + 8),
-    cols: PRODUCT_COLS,
-    rows: PRODUCT_ROWS,
-    headH: h(52),
-    rowH: h(62),
-  });
+  // Both tables end on one edge, so the two price columns line up.
+  const products = widenTo(
+    tableGeometry({ x: STORE_X[0], top: y(STORE_BOTTOM + 8), cols: PRODUCT_COLS, rows: PRODUCT_ROWS, headH: h(52), rowH: h(62) }),
+    items.width,
+  );
   const mugProduct = PRODUCT_ROWS.findIndex((p) => p[0] === ITEM_ROWS[MUG][1]);
 
-  // The totals count up to what the database returns.
-  const count = (at: number, to: string) => {
-    const p = ease(frame, at, 22);
-    return fmt(Number(to) * p, 2);
+  // Each total lands on its word, as the database returns it: nothing shows
+  // in its place before then.
+  const lands = (at: number): React.CSSProperties => {
+    const p = ease(frame, at - 4, 8);
+    return { display: "inline-block", opacity: p, transform: `translateY(${(1 - p) * 6}px)` };
   };
+  // "Without that copy": the second line's label says what it stands for.
+  const swap = ease(frame, withoutAt - 2, 10);
   const charged = sumOf((r) => r[3] as string);
   const catalog = sumOf((r) => productOf(r)[2] as string);
   // "Walk real rows through the design": each stored row lit in turn.
@@ -181,6 +203,7 @@ export const PriceScene: React.FC = () => {
       <Sfx name="el-tap" at={tenAt} level={-29} />
       <Sfx name="el-tap" at={twelveAt} level={-29} />
       <Sfx name="el-pop" at={fortyFourAt - 4} level={-29} />
+      <Sfx name="el-pop" at={fortyEightAt - 4} level={-30} />
       <Sfx name="el-scratch" at={rewriteAt} level={-30} />
       <Sfx name="el-chime" at={reviewFrom - 14} level={-33} />
 
@@ -266,18 +289,23 @@ export const PriceScene: React.FC = () => {
       <Ink at={linesAt - 4} dur={16} style={{ left: STORE_X[0], top: y(800), display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, INK_SOFT), width: 250 }}>From its lines</span>
         <span style={{ ...note(28, INK) }}>{charged} =</span>
-        <span style={{ ...note(30, INK), fontWeight: 700 }}>
-          <Mark at={paidAt - 2}>{count(fortyFourAt - 6, TOTAL_CHARGED)}</Mark>
+        <span style={{ ...note(30, INK), ...TABULAR, fontWeight: 700, ...lands(fortyFourAt) }}>
+          <Mark at={paidAt - 2}>{fmt(Number(TOTAL_CHARGED), 2)}</Mark>
         </span>
         <span style={{ ...body(28, true), color: INK_SOFT, opacity: ease(frame, paidAt - 2, 12) }}>what she paid</span>
       </Ink>
       <Ink at={todayAt - 4} dur={16} style={{ left: STORE_X[0], top: y(856), display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, INK_SOFT), width: 250 }}>From today&rsquo;s prices</span>
-        <span style={{ ...note(28, INK) }}>{catalog} =</span>
-        <span style={{ ...note(30, ACCENT_INK), fontWeight: 700 }}>
-          <Strike at={rewriteAt + 4}>{count(fortyEightAt - 6, TOTAL_CATALOG)}</Strike>
+        <span style={{ ...label(22, INK_SOFT), width: 250, display: "grid" }}>
+          <span style={{ gridArea: "1 / 1", opacity: 1 - swap }}>From today&rsquo;s prices</span>
+          <span style={{ gridArea: "1 / 1", opacity: swap, color: ACCENT_INK, fontWeight: 650 }}>Without the copy</span>
         </span>
-        <span style={{ ...body(28, true), color: ACCENT_INK, opacity: ease(frame, rewriteAt - 2, 12) }}>history, rewritten</span>
+        <span style={{ ...note(28, INK) }}>{catalog} =</span>
+        <span style={{ ...note(30, ACCENT_INK), ...TABULAR, fontWeight: 700, ...lands(fortyEightAt) }}>
+          <Mark at={n.word("without", "all it could say") - 2} color={MARK_BAD}>
+            <Strike at={rewriteAt + 4}>{fmt(Number(TOTAL_CATALOG), 2)}</Strike>
+          </Mark>
+        </span>
+        <span style={{ ...body(28, true), color: ACCENT_INK, opacity: ease(frame, rewriteAt - 2, 12) }}>would rewrite history</span>
       </Ink>
     </AbsoluteFill>
   );

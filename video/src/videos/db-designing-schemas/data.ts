@@ -79,6 +79,15 @@ export const WIDE_COLUMNS: readonly { table: string; name: string }[] = (
   ["customers", "orders", "order_items", "products", "categories"] as const
 ).flatMap((t) => ok(`columns_${t}`).rows.map((r) => ({ table: t, name: r.column_name as string })));
 
+/**
+ * The one wide table's rows: every store column for each order line and
+ * category, and a row for a customer with no order (a LEFT JOIN across the
+ * five tables), in WIDE_COLUMNS' order. Values as psql prints them.
+ */
+const wide = ok("wide") as unknown as { fields: string[]; rows: Value[][] };
+if (wide.fields.join() !== WIDE_COLUMNS.map((c) => c.name).join()) throw new Error("the wide query's columns are not the store's");
+export const WIDE_ROWS: readonly (readonly Cell[])[] = wide.rows.map((r) => r.map((v) => (v === null ? null : String(v))));
+
 /** The first line of the lesson's own DDL for the store: what typing tables
  *  straight away starts with. */
 export const FIRST_DDL_LINE = results.sql.store.split("\n").find((l) => l.startsWith("CREATE TABLE")) as string;
@@ -116,8 +125,16 @@ const pg = (k: string): PgError => {
 export const DUPLICATE_LINE = pg("duplicateLine");
 /** A line for zero mugs. */
 export const ZERO_QUANTITY = pg("zeroQuantity");
+/** The two lines tried, as order_items values (ITEM_COLS). */
+export const TRIED: { duplicate: readonly Cell[]; zero: readonly Cell[] } = {
+  duplicate: results.tried.duplicateLine,
+  zero: results.tried.zeroQuantity,
+};
+if (ZERO_QUANTITY.detail !== `Failing row contains (${TRIED.zero.join(", ")}).`) throw new Error("the zero line is not the row refused");
+if (!DUPLICATE_LINE.detail?.includes(`=(${TRIED.duplicate.slice(0, 2).join(", ")})`)) throw new Error("the duplicate is not the key refused");
 /** priority TEXT NOT NULL, added in one step to a table with rows. */
 export const ONE_STEP = pg("oneStep");
+export const ONE_STEP_SQL = results.sql.oneStep;
 
 // ── tasks: a required column in safe steps (evolving-schemas-safely) ───────
 
@@ -146,7 +163,12 @@ const trackerProjects = new Set(ok("trackerV3Projects").rows.map((r) => r.column
 export const TRACKER = {
   tasks: { name: "tasks", columns: [{ name: "id", key: "PK" }, { name: "title" }, { name: "status" }, { name: "due_on" }, { name: "project_id", key: "FK" }] as Column[] },
   projects: { name: "projects", columns: [{ name: "id", key: "PK" }, { name: "name" }] as Column[] },
+  /** v4 and v5, drawn as their names only. */
+  labels: { name: "labels", columns: [] as Column[] },
+  history: { name: "task_history", columns: [] as Column[] },
 };
+const trackerTables = new Set(ok("trackerV5Tables").rows.map((r) => r.table_name as string));
+for (const t of [TRACKER.labels, TRACKER.history]) if (!trackerTables.has(t.name)) throw new Error(`the tracker has no ${t.name}`);
 for (const c of TRACKER.tasks.columns) if (!tracker.has(c.name)) throw new Error(`tracker tasks has no ${c.name}`);
 for (const c of TRACKER.projects.columns) if (!trackerProjects.has(c.name)) throw new Error(`projects has no ${c.name}`);
 

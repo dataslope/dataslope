@@ -1,5 +1,6 @@
 import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
 import type { TimedBeat, Timeline } from "../../narration/types";
+import { PARTS } from "./script.ts";
 
 /**
  * Where each part of the merged Unit 5 video sits. Pure (no Remotion, no
@@ -12,8 +13,9 @@ import type { TimedBeat, Timeline } from "../../narration/types";
  *
  *   - the first part's first word lands where a course video's first word
  *     lands after the series intro (INTRO_LEAD_IN, as every course script);
- *   - every later part starts HOLD seconds after the last word of the part
- *     before it (its spoken bridge), and cross-fades in over CROSSFADE
+ *   - every later part starts HOLD seconds after the last word the part
+ *     before it plays (its spoken bridge, less any beats its PARTS entry
+ *     skips: see `asPlayed`), and cross-fades in over CROSSFADE
  *     frames, so the silence between two parts is HOLD plus the next part's
  *     own 0.5 s lead-in;
  *   - the last part runs to the end of its own timeline, tail included.
@@ -35,12 +37,34 @@ export type PartSpan = {
 
 export type PartPlan = { spans: PartSpan[]; durationInFrames: number };
 
+/**
+ * A part's timeline as the merged video plays it: without the beats its
+ * PARTS entry skips, or the captions spoken in them. Everything else keeps
+ * its time, so the part's scenes, which are given the whole timeline, cue
+ * exactly as they do in the standalone video.
+ */
+export function asPlayed(timeline: Timeline, skip: readonly string[] = []): Timeline {
+  if (skip.length === 0) return timeline;
+  const gone = timeline.beats.filter((b) => skip.includes(b.id));
+  const spokenIn = (ms: number) => gone.some((b) => ms >= b.start * 1000 - 1 && ms <= b.end * 1000 + 1);
+  return {
+    ...timeline,
+    beats: timeline.beats.filter((b) => !skip.includes(b.id)),
+    captions: timeline.captions.filter((c) => !spokenIn(c.startMs)),
+  };
+}
+
+/** What the merged video skips of a part, by its script id. */
+export const skipOf = (id: string) => PARTS.find((p) => p.script.id === id)?.skip ?? [];
+
+/** `timelines` are the parts' own, in PARTS order. */
 export function planParts(timelines: readonly Timeline[], fps: number): PartPlan {
   const spans: PartSpan[] = [];
   let from = Math.round(FIRST_WORD * fps) - Math.round((timelines[0]?.beats[0]?.start ?? 0) * fps);
   timelines.forEach((t, k) => {
     const last = k === timelines.length - 1;
-    const lastWord = t.beats[t.beats.length - 1]?.end ?? t.duration;
+    const played = asPlayed(t, PARTS[k]?.skip);
+    const lastWord = played.beats[played.beats.length - 1]?.end ?? t.duration;
     const next = from + Math.round((lastWord + HOLD) * fps);
     spans.push({ from, to: last ? from + Math.ceil(t.duration * fps) : next + CROSSFADE });
     from = next;
@@ -63,7 +87,8 @@ export function mergeTimelines(
 ): Timeline {
   const beats: TimedBeat[] = [];
   const captions: Timeline["captions"] = [];
-  parts.forEach(({ id, timeline }, k) => {
+  parts.forEach(({ id, timeline: whole }, k) => {
+    const timeline = asPlayed(whole, skipOf(id));
     const dt = spans[k].from / fps;
     for (const b of timeline.beats) {
       beats.push({

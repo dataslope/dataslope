@@ -68,6 +68,14 @@ export const VERSION_SHORT = VERSION.split(" (")[0];
 /** "(PGlite 0.5.8) on wasm32-unknown-emscripten": the rest of the reply's first clause. */
 export const VERSION_REST = VERSION.slice(VERSION_SHORT.length + 1).split(",")[0];
 
+/** Fig. 6: one question in POSTGRES's own language and in SQL, Ada's orders by
+ *  her customer number. The SQL ran in check.mjs. The POSTQUEL is the form
+ *  of the POSTGRES design memo's own "retrieve (POLYGON.all) where
+ *  POLYGON.id = 10" (Stonebraker and Rowe, ERL M85/95), written against the
+ *  lesson's orders table; nothing runs it today. */
+export const TWIN_SQL = results.sql.twin;
+export const TWIN_POSTQUEL = "retrieve (orders.all) where orders.customer_id = 1";
+
 /** The row that breaks a declared rule, and Postgres's refusal. */
 export const BAD_SQL = results.sql.bad;
 export const BAD = results.badError!;

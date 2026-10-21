@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BAR, BLUE_INK, body, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { BAR, BLUE_INK, body, halo, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -17,11 +17,13 @@ const TOP = 440;
 const PITCH_Y = 8.6;
 const R = 2.6;
 /** "Every checkout a design will ever see": a run of checkouts in time, the
- *  few that have happened, then the many that haven't. */
-const RUN = 23;
-const RUN_DONE = 5;
-const RUN_X = 1318;
-const RUN_PITCH = 20;
+ *  few that have happened, then the many that haven't. It is drawn across
+ *  the field, which steps back on "isn't even a list". */
+const RUN = 27;
+const RUN_DONE = 6;
+const RUN_X = 214;
+const RUN_PITCH = 37;
+const RUN_R = 9;
 
 const fmtInt = (v: number) => v.toLocaleString("en-US");
 
@@ -92,6 +94,12 @@ export const SurveyScene: React.FC = () => {
   const outline = ease(frame, everyoneAt - 2, 30);
   const fieldW = (COLS - 1) * PITCH;
   const fieldH = h((Math.ceil(SURVEY.dots / COLS) - 1) * PITCH_Y);
+  // "isn't even a list": the list of customers steps back, and the run of
+  // checkouts takes its place, through the middle of it.
+  const listBack = 1 - ease(frame, listAt - 2, 18) * 0.8;
+  const sampleBack = 1 - ease(frame, listAt - 2, 18) * 0.92;
+  const runY = y(TOP) + fieldH / 2;
+  const nowX = RUN_X + (RUN_DONE - 0.5) * RUN_PITCH;
 
   return (
     <AbsoluteFill>
@@ -126,7 +134,7 @@ export const SurveyScene: React.FC = () => {
         y={y(380)}
       />
 
-      <Svg>
+      <Svg opacity={listBack}>
         {outline > 0 ? (
           <rect
             x={X0 - 16}
@@ -143,6 +151,8 @@ export const SurveyScene: React.FC = () => {
           />
         ) : null}
         {dots}
+      </Svg>
+      <Svg opacity={sampleBack}>
         {/* The sample, drawn over the field, ringed once it is named. */}
         {ring > 0
           ? [...SURVEY.picked].map((i) => (
@@ -188,43 +198,54 @@ export const SurveyScene: React.FC = () => {
         </div>
       </Note>
 
-      {/* The checkouts: a few that have happened, then the many that haven't. */}
+      {/* The checkouts: a few that have happened, then the many that haven't,
+          on a lane cleared through the field. */}
       <Svg>
+        <rect
+          x={X0 - 10}
+          y={runY - 24}
+          width={fieldW + 20}
+          height={96}
+          fill={PAPER}
+          opacity={ease(frame, checkoutAt - 8, 12) * 0.85}
+        />
         {Array.from({ length: RUN }, (_, k) => {
           const done = k < RUN_DONE;
           const a = done
             ? ease(frame, checkoutAt - 2 + k * 2, 8)
-            : ease(frame, everSeeAt - 4 + (k - RUN_DONE) * 1.4, 10);
+            : ease(frame, everSeeAt - 4 + (k - RUN_DONE) * 1.2, 10);
           if (a <= 0) return null;
-          const fade = done ? 1 : 1 - ((k - RUN_DONE) / (RUN - RUN_DONE)) * 0.82;
+          const fade = done ? 1 : 1 - ((k - RUN_DONE) / (RUN - RUN_DONE)) * 0.8;
           return (
             <circle
               key={k}
               cx={RUN_X + k * RUN_PITCH}
-              cy={y(890)}
-              r={6 * a}
-              fill={done ? DOT : "none"}
+              cy={runY}
+              r={RUN_R * a}
+              fill={done ? DOT : PAPER}
               stroke={DOT}
-              strokeWidth={done ? 0 : 1.8}
+              strokeWidth={done ? 0 : 2.2}
               opacity={fade}
             />
           );
         })}
         <line
-          x1={RUN_X + (RUN_DONE - 0.5) * RUN_PITCH}
-          x2={RUN_X + (RUN_DONE - 0.5) * RUN_PITCH}
-          y1={y(890) - 20}
-          y2={lerp(y(890) - 20, y(890) + 18, ease(frame, happenedAt - 4, 12))}
+          x1={nowX}
+          x2={nowX}
+          y1={runY - 30}
+          y2={lerp(runY - 30, runY + 28, ease(frame, happenedAt - 4, 12))}
           stroke={INK}
-          strokeWidth={1.6}
+          strokeWidth={2}
           opacity={ease(frame, happenedAt - 4, 6)}
         />
       </Svg>
-      <Note at={happenedAt + 2} x={RUN_X + (RUN_DONE - 0.5) * RUN_PITCH} y={y(890) + 24} from="up">
-        <span style={{ ...label(20, INK), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>now</span>
+      <Note at={happenedAt + 2} x={nowX} y={runY + 38} from="up">
+        <span style={{ ...label(22, INK), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
+          now
+        </span>
       </Note>
-      <Note at={happenedAt + 8} x={RUN_X + (RUN_DONE + 2) * RUN_PITCH} y={y(890) + 24}>
-        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>still to happen</span>
+      <Note at={happenedAt + 8} x={nowX + RUN_PITCH * 1.5} y={runY + 38}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...halo }}>still to happen</span>
       </Note>
     </AbsoluteFill>
   );

@@ -53,7 +53,6 @@ export const ChiScene: React.FC = () => {
   const whetherAt = n.word("corr-in", "whether");
   const bothAt = n.word("corr-in", "both columns");
   const mobileAt = n.word("expected", "mobile");
-  const togetherAt = n.word("corr-in", "together");
 
   const rowY = (i: number) => y(ROW_Y0 + i * ROW_DY);
   /** When each cell's observed count arrives: the two spoken first, the rest on "adds up". */
@@ -68,11 +67,13 @@ export const ChiScene: React.FC = () => {
   const mobileGlow = pulse(frame, eightyAt - 2, 26);
   const total = ease(frame, twelveAt - 8, 20);
   const dim = 1 - 0.2 * ease(frame, corrFrom - 4, 14) - 0.15 * ease(frame, whetherAt - 4, 14);
-  // On "together" the table slides away, making room for the next scene's question.
-  const away = ease(frame, togetherAt - 6, 20);
+  // As the bridge line arrives the table slides up, making room for the next scene's question.
+  const away = ease(frame, bothAt - 8, 20);
   const mobileGlowRow = pulse(frame, mobileAt - 2, 26);
   const churnGlow = pulse(frame, churnedAt - 2, 24);
   const expGlow = pulse(frame, expectedAt - 2, 24);
+  // On "expected" every signed gap becomes its share of chi-square, gap² ÷ expected.
+  const toShare = ease(frame, expectedAt + 2, 12);
 
   return (
     <AbsoluteFill>
@@ -85,11 +86,11 @@ export const ChiScene: React.FC = () => {
 
       <Head a="Categories:" b="compare counts." at={chiFrom - 6} bAt={countsAt - 6} />
 
-      <div style={{ position: "absolute", inset: 0, opacity: dim * (1 - 0.6 * away), transform: `translateY(${-50 * away}px)` }}>
-        <FigLabel n="18" title={`Device and churn for ${fmt(CHI.n, 0)} users`} at={categoriesAt} x={LABEL_X} y={y(290)} />
+      <div style={{ position: "absolute", inset: 0, opacity: dim * (1 - 0.6 * away), transform: `translateY(${-36 * away}px)` }}>
+        <FigLabel n="20" title={`Device and churn for ${fmt(CHI.n, 0)} users`} at={categoriesAt} x={LABEL_X} y={y(290)} />
         <Ink at={usersAt - 2} dur={14} style={{ left: LABEL_X, top: y(290) + 40, whiteSpace: "nowrap" }}>
           <Label size={21} color={INK_SOFT} weight={520}>
-            bars: users counted; dashed boxes: what independence predicts
+            bars: users counted; dashed boxes: expected if device made no difference
           </Label>
         </Ink>
         {(["stayed", "churned"] as Col[]).map((c) => (
@@ -199,9 +200,14 @@ export const ChiScene: React.FC = () => {
                 >
                   <Count at={at} to={obs} dur={16} />
                   {showGap > 0 ? (
-                    <span style={{ ...note(22, STAT_INK), fontWeight: 650, marginLeft: 12, opacity: showGap }}>
-                      {gap > 0 ? "+" : "−"}
-                      {fmt(Math.abs(gap), 1)}
+                    <span style={{ position: "relative", display: "inline-block", marginLeft: 12, ...note(22, STAT_INK), fontWeight: 650 }}>
+                      <span style={{ opacity: showGap * (1 - toShare) }}>
+                        {gap > 0 ? "+" : "−"}
+                        {fmt(Math.abs(gap), 1)}
+                      </span>
+                      <span style={{ position: "absolute", left: 0, top: 0, opacity: toShare, whiteSpace: "nowrap" }}>
+                        adds {fmt((gap * gap) / exp, 1)}
+                      </span>
                     </span>
                   ) : null}
                 </div>
@@ -210,7 +216,13 @@ export const ChiScene: React.FC = () => {
           );
         })}
 
-        {/* The statistic: every gap, added up. */}
+        <Note at={expectedAt + 4} x={1720} y={y(372)} align="right">
+          <Label size={21} color={STAT_INK} weight={520}>
+            each cell adds gap² ÷ expected
+          </Label>
+        </Note>
+
+        {/* The statistic: every cell's share, added up. */}
         <div style={{ position: "absolute", left: LABEL_X, top: y(830), opacity: total, whiteSpace: "nowrap" }}>
           <span style={{ ...note(38, STAT_INK), fontWeight: 700 }}>
             <Greek>χ</Greek>² = <Count at={twelveAt - 8} to={CHI.chi2} dur={20} format={(v) => fmt(v, 1)} />
@@ -223,7 +235,7 @@ export const ChiScene: React.FC = () => {
           </Label>
         </Note>
       </div>
-      <Ink at={bothAt - 4} dur={18} style={{ left: 160, top: y(880), whiteSpace: "nowrap" }}>
+      <Ink at={bothAt - 4} dur={18} style={{ left: 160, top: y(892), whiteSpace: "nowrap" }}>
         <span style={{ ...body(36, true), color: INK }}>
           Two columns of <Mark at={bothNumbersAt - 2}>numbers</Mark>: do they move together?
         </span>

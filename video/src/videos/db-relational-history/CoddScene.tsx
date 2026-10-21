@@ -8,6 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ADA, ANSWER, COUNTS, CUSTOMERS, LISTING, ON_DISK, ORDERS, SAME_ANSWER } from "./data";
 import {
+  ASIDE,
   cellCenter,
   columnWidths,
   type Column,
@@ -75,7 +76,7 @@ export const CoddScene: React.FC = () => {
   const HEAD_H = h(48);
   const ROW_H = h(54);
   const TOP = y(350);
-  const CX = 150;
+  const CX = 96;
   const custRows = CUSTOMERS.map((c) => [String(c.id), c.name]);
   const custW = columnWidths(CUST_COLS, custRows);
   const OX = CX + custW.reduce((a, b) => a + b, 0) + 110;
@@ -88,8 +89,9 @@ export const CoddScene: React.FC = () => {
   const adaOrder = placed.findIndex((o) => o.customerId === ADA.id);
   const adaRow = CUSTOMERS.findIndex((c) => c.id === ADA.id);
 
-  // ── The query and its answer, on the right ──
-  const LX = OX + orderW.reduce((a, b) => a + b, 0) + 90;
+  // ── The query and its answer, on the right, far enough from the orders
+  // that a row stepping aside as it moves stays clear of them ──
+  const LX = OX + orderW.reduce((a, b) => a + b, 0) + ASIDE + 50;
   const LTOP = y(346);
   const listingH = listingHeight(LISTING.length, 22);
   const ATOP = LTOP + listingH + h(64);
@@ -110,19 +112,20 @@ export const CoddScene: React.FC = () => {
       {/* ── Sound: the paper, the rows, the match, the shuffle, the answer ── */}
       <Sfx name="el-whoosh" at={juneAt - 10} level={-33} />
       <Sfx name="el-tap" at={seventyAt} level={-29} />
-      <Sfx name="el-sprinkle" at={tablesAt - 4} level={-34} />
+      <Sfx name="el-sprinkle" at={keepAt + 2} level={-34} />
       <Sfx name="el-tap" at={oneAt - 2} level={-28} />
       <Sfx name="el-whoosh" at={shuffleAt - 2} level={-32} />
       <Sfx name="el-pop" at={againAt + 2} level={-30} />
       <Sfx name="el-pencil" at={sameAt - 2} level={-34} />
 
-      <Headline at={plainAt - 6} lead="An idea almost too plain." out={keepAt - 4} />
+      <Headline at={juneAt - 4} lead="Ted Codd, 1970." out={plainAt - 8} />
+      <Headline at={plainAt - 6} lead="An idea almost too plain." out={linkAt - 6} />
       <Headline at={linkAt - 4} lead="Link rows by value," turn="not by pointer." turnAt={pointerAt - 6} out={independenceAt - 6} />
       <Headline at={independenceAt - 2} lead="Data independence." />
 
       {/* ── The paper, and who wrote it ── */}
       <PaperPage
-        x={120}
+        x={96}
         top={y(310)}
         width={540}
         height={500}
@@ -132,16 +135,16 @@ export const CoddScene: React.FC = () => {
         dateAt={seventyAt}
         textAt={plainAt}
         authorMark={tedAt + 4}
-        out={keepAt - 6}
+        out={keepAt - 14}
       />
-      <Ink at={britishAt - 2} dur={14} out={keepAt - 6} style={{ left: 730, top: y(360), whiteSpace: "nowrap" }}>
+      <Ink at={britishAt - 2} dur={14} out={keepAt - 14} style={{ left: 730, top: y(360), whiteSpace: "nowrap" }}>
         <div style={{ ...label(24, INK) }}>Ted Codd</div>
         <div style={{ ...body(28, true), marginTop: 8 }}>a British-born mathematician</div>
       </Ink>
-      <Ink at={ibmAt - 2} dur={14} out={keepAt - 6} style={{ left: 730, top: y(470), whiteSpace: "nowrap" }}>
+      <Ink at={ibmAt - 2} dur={14} out={keepAt - 14} style={{ left: 730, top: y(470), whiteSpace: "nowrap" }}>
         <div style={{ ...body(28, true) }}>at IBM&apos;s lab in San Jose</div>
       </Ink>
-      <Ink at={publishedAt - 2} dur={14} out={keepAt - 6} style={{ left: 730, top: y(560), whiteSpace: "nowrap" }}>
+      <Ink at={publishedAt - 2} dur={14} out={keepAt - 14} style={{ left: 730, top: y(560), whiteSpace: "nowrap" }}>
         <div style={{ ...note(21, INK_SOFT) }}>Communications of the ACM 13(6), pp. 377–387</div>
       </Ink>
 
@@ -149,7 +152,7 @@ export const CoddScene: React.FC = () => {
       <FigLabel
         n="2"
         title={`Three of the lesson's ${COUNTS.customers} customers, and their orders`}
-        at={tablesAt - 6}
+        at={keepAt - 2}
         x={CX}
         y={y(290)}
       />
@@ -160,10 +163,10 @@ export const CoddScene: React.FC = () => {
         widths={custW}
         headH={HEAD_H}
         rowH={ROW_H}
-        at={tablesAt - 6}
+        at={keepAt - 2}
         rows={custRows.map((cells, i) => ({
           cells,
-          at: tablesAt + i * 4,
+          at: keepAt + 2 + i * 4,
           slot: i,
           bands: i === adaRow ? [{ at: adasAt - 2, out: storeAt }] : undefined,
         }))}
@@ -179,13 +182,13 @@ export const CoddScene: React.FC = () => {
         widths={orderW}
         headH={HEAD_H}
         rowH={ROW_H}
-        at={tablesAt}
+        at={tablesAt - 4}
         moveAt={shuffleAt - 2}
         colAt={{ 3: storeAt - 4 }}
         colDim={{ 3: whereAt }}
         rows={placed.map((o, i) => ({
           cells: orderRows[i],
-          at: tablesAt + 6 + i * 3,
+          at: tablesAt + 2 + i * 3,
           slot: before.get(o.id)!.slot,
           to: after.get(o.id)!.slot,
           after: { 3: after.get(o.id)!.ctid },
@@ -264,11 +267,12 @@ export const CoddScene: React.FC = () => {
         </>
       ) : null}
 
-      {/* ── What Codd's paper opens with ── */}
-      <Ink at={independenceAt + 6} dur={22} style={{ left: LX, top: ATOP + HEAD_H + 2 * ROW_H + h(44), width: 720 }}>
+      {/* ── What Codd's paper opens with: its first sentence, up to where it
+          adds "(the internal representation)" ── */}
+      <Ink at={independenceAt - 4} dur={22} style={{ left: LX, top: ATOP + HEAD_H + 2 * ROW_H + h(44), width: 720 }}>
         <div style={{ ...body(27, true), color: INK, lineHeight: 1.3 }}>
           Future users of large data banks must be protected from having to know{" "}
-          <Mark at={whereAt - 2}>how the data is organized</Mark> in the machine.
+          <Mark at={whereAt - 2}>how the data is organized</Mark> in the machine&nbsp;…
         </div>
         <div style={{ ...note(20, INK_SOFT), marginTop: 10 }}>Codd, 1970, the paper&apos;s first sentence</div>
       </Ink>

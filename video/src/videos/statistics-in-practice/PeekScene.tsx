@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease, map } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { BAR, body, fmt, halo, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { BAR, body, fmt, halo, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -12,11 +12,16 @@ import { Count, Headline, lerp, partial, Ring, STAT, STAT_INK, Svg } from "./par
 
 const X: XScale = { lo: 0, hi: PEEKING.planned, x0: 260, x1: 1640 };
 const BASE = 864;
-const TOP = 548;
+/** The p-value scale's top. The figure takes the room the size panel leaves. */
+const TOP = 470;
+const FIG_Y = 390;
 /** The p-value scale tops out here: the run never climbs past 0.56. */
 const P_MAX = 0.6;
 const BAR_X0 = 1120;
 const BAR_W = 560;
+/** Where the labels at the planned line start: clear of its highlight band,
+ *  which runs from X.x1 - 7 to X.x1 + 27. */
+const PLAN_X = X.x1 + 38;
 const num = (v: number) => Math.round(v).toLocaleString("en-US");
 /** The index of the row where the second dip ends: the line has shown both by "twice". */
 const LAST_UNDER = PEEKING.rows.reduce((k, r, i) => (r.p < PEEKING.alpha ? i : k), 0);
@@ -25,9 +30,11 @@ const SECOND = PEEKING.rows.findIndex((r) => r.n === PEEKING.crossingAt[1]);
 
 /**
  * The two decisions left before anyone clicks: the sample size, from the
- * smallest lift worth catching, and running to it. A test of two identical
- * arms, its p-value recomputed every hundred visitors, dips under 0.05 twice
- * and ends at 0.19.
+ * smallest lift worth catching, and running to it. Another test, of two
+ * identical arms planned at 8,000 users each, its p-value recomputed every
+ * hundred visitors per arm (the chart's n counts one arm), dips under 0.05
+ * twice and ends at 0.19. The size panel leaves before that test arrives, so
+ * its 3,841 never sits over the other test's 8,000.
  */
 export const PeekScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -42,7 +49,7 @@ export const PeekScene: React.FC = () => {
   const threeAt = n.word("size", "three thousand");
   const perArmAt = n.word("size", "per arm");
   const peekAt = n.word("peek", "no peeking");
-  const hereAt = n.word("peek", "Here's a test");
+  const hereAt = n.word("peek", "Here's another test");
   const identicalAt = n.word("peek", "identical");
   const nothingAt = n.word("peek", "nothing to find");
   const recomputeAt = n.word("wander", "Recompute");
@@ -69,7 +76,8 @@ export const PeekScene: React.FC = () => {
   const reach = lerp(0, LAST_UNDER + 2, firstLeg) + (last - LAST_UNDER - 2) * secondLeg;
   const shownN = rows[Math.min(last, Math.floor(reach))].n;
   const dimBefore = ease(frame, onceAt - 4, 14);
-  const sizeDim = 1 - 0.55 * ease(frame, peekAt - 6, 14);
+  // The size panel steps back on "no peeking", then leaves for the other test.
+  const sizeDim = (1 - 0.55 * ease(frame, peekAt - 6, 14)) * (1 - ease(frame, hereAt - 8, 12));
   // The size panel holds the middle of the page alone, then rises to make room.
   const rise = ease(frame, peekAt - 10, 24);
   const filled = ease(frame, threeAt - 4, 30);
@@ -91,7 +99,7 @@ export const PeekScene: React.FC = () => {
 
       {/* ── The sample size, from the smallest lift worth catching ── */}
       <div style={{ position: "absolute", inset: 0, opacity: sizeDim, transform: `translateY(${(1 - rise) * h(190)}px)` }}>
-        <Ink at={catchAt - 6} dur={14} style={{ left: 160, top: y(292), whiteSpace: "nowrap" }}>
+        <Ink at={sizeFrom + 4} dur={14} style={{ left: 160, top: y(292), whiteSpace: "nowrap" }}>
           <span style={label(21, INK_SOFT)}>To catch</span>
         </Ink>
         <Ink at={catchAt - 2} dur={18} style={{ left: 160, top: y(322), whiteSpace: "nowrap" }}>
@@ -105,7 +113,7 @@ export const PeekScene: React.FC = () => {
           </span>
         </Ink>
         <Ink at={threeAt - 6} dur={12} style={{ left: 680, top: y(300), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(64, STAT_INK), fontWeight: 700 }}>
+          <span style={{ ...note(64, STAT_INK), ...TABULAR, fontWeight: 700 }}>
             <Count to={DESIGN.perArm} at={threeAt - 4} dur={30} format={num} />
           </span>
         </Ink>
@@ -115,10 +123,14 @@ export const PeekScene: React.FC = () => {
         {(["A", "B"] as const).map((g, i) => (
           <React.Fragment key={g}>
             <div
-              style={{ position: "absolute", left: BAR_X0 - 36, top: y(316 + i * 46) - 2, opacity: filled > 0 ? 1 : 0, ...label(22, INK) }}
+              style={{ position: "absolute", left: BAR_X0 - 36, top: y(316 + i * 46) - 2, opacity: ease(frame, sizeFrom + 8 + i * 4, 12), ...label(22, INK) }}
             >
               {g}
             </div>
+            {/* Each arm's track, empty until the number fills it. */}
+            <Svg opacity={ease(frame, sizeFrom + 8 + i * 4, 12)}>
+              <rect x={BAR_X0} y={y(316 + i * 46)} width={BAR_W} height={h(26)} rx={4} fill="none" stroke={HAIRLINE} strokeWidth={1.2} />
+            </Svg>
             <Svg>
               <rect
                 x={BAR_X0}
@@ -134,10 +146,11 @@ export const PeekScene: React.FC = () => {
       </div>
 
       {/* ── A test with nothing to find ── */}
-      <FigLabel n="3" title="Two identical arms: the p-value, after every hundred visitors" at={hereAt - 4} x={160} y={y(470)} />
-      <Ink at={recomputeAt} dur={10} style={{ left: X.x1, top: y(470), whiteSpace: "nowrap", transform: "translateX(-100%)" }}>
+      {/* In where the size panel was, once it has gone. */}
+      <FigLabel n="3" title="Two identical arms: the p-value, after every hundred visitors" at={hereAt + 4} x={160} y={y(FIG_Y)} />
+      <Ink at={recomputeAt} dur={10} style={{ left: X.x1, top: y(FIG_Y), whiteSpace: "nowrap", transform: "translateX(-100%)" }}>
         <span style={{ ...note(22, INK_SOFT) }}>
-          visitors so far: <span style={{ color: INK, fontWeight: 650 }}>{num(reach > 0 ? shownN : 0)}</span>
+          visitors per arm so far: <span style={{ ...TABULAR, color: INK, fontWeight: 650 }}>{num(reach > 0 ? shownN : 0)}</span>
         </span>
       </Ink>
       <Axis
@@ -145,10 +158,10 @@ export const PeekScene: React.FC = () => {
         base={y(BASE)}
         ticks={[0, 2000, 4000, 6000, 8000]}
         format={(v) => num(v)}
-        at={hereAt - 2}
+        at={hereAt + 2}
       />
       {/* The p-value scale, and the band where it reads "significant". */}
-      <Svg opacity={ease(frame, hereAt, 14)}>
+      <Svg opacity={ease(frame, hereAt + 4, 14)}>
         {[0.25, 0.5].map((p) => (
           <line key={p} x1={X.x0} x2={X.x1} y1={py(p)} y2={py(p)} stroke={INK_SOFT} strokeWidth={1} opacity={0.25} />
         ))}
@@ -156,13 +169,13 @@ export const PeekScene: React.FC = () => {
       {[0.25, 0.5].map((p) => (
         <div
           key={p}
-          style={{ position: "absolute", right: 1920 - X.x0 + 16, top: py(p) - 14, opacity: ease(frame, hereAt + 2, 14), ...note(20, INK_SOFT) }}
+          style={{ position: "absolute", right: 1920 - X.x0 + 16, top: py(p) - 14, opacity: ease(frame, hereAt + 6, 14), ...note(20, INK_SOFT) }}
         >
           {fmt(p, 2)}
         </div>
       ))}
       <div
-        style={{ position: "absolute", right: 1920 - X.x0 + 16, top: py(0.375) - 14, opacity: ease(frame, hereAt + 2, 14), ...label(20, INK_SOFT) }}
+        style={{ position: "absolute", right: 1920 - X.x0 + 16, top: py(0.375) - 14, opacity: ease(frame, hereAt + 6, 14), ...label(20, INK_SOFT) }}
       >
         p
       </div>
@@ -183,7 +196,7 @@ export const PeekScene: React.FC = () => {
       <Note at={identicalAt} x={X.x1 - 12} y={py(PEEKING.alpha) + 4} align="right">
         <span style={{ ...note(20, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>under {PEEKING.alpha}: &ldquo;significant&rdquo;</span>
       </Note>
-      <Note at={nothingAt - 2} x={X.x1 - 10} y={py(P_MAX) + 8} align="right">
+      <Note at={nothingAt - 2} x={X.x1 - 44} y={py(P_MAX) + 8} align="right">
         <span style={{ ...note(21, INK_SOFT), fontWeight: 600, ...halo }}>no effect anywhere in this data</span>
       </Note>
 
@@ -193,7 +206,7 @@ export const PeekScene: React.FC = () => {
           <rect x={X.x1 - 7} y={py(P_MAX) - 14} width={34} height={y(BASE) - py(P_MAX) + 14} rx={8} fill={HIGHLIGHT} opacity={0.9} />
         </Svg>
       ) : null}
-      <Note at={theEndAt} x={X.x1 + 16} y={py(P_MAX) + 24}>
+      <Note at={theEndAt} x={PLAN_X} y={py(P_MAX) + 66}>
         <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>the one look</span>
       </Note>
       {planned > 0 ? (
@@ -208,8 +221,11 @@ export const PeekScene: React.FC = () => {
           />
         </Svg>
       ) : null}
-      <Note at={plannedAt} x={X.x1 + 16} y={py(P_MAX) - 8}>
+      <Note at={plannedAt} x={PLAN_X} y={py(P_MAX) - 8}>
         <span style={{ ...note(21, INK), fontWeight: 650, whiteSpace: "nowrap" }}>planned</span>
+      </Note>
+      <Note at={plannedAt + 4} x={PLAN_X} y={py(P_MAX) + 26}>
+        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>{num(PEEKING.planned)} per arm</span>
       </Note>
 
       {/* ── The wandering p-value ── */}

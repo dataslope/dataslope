@@ -7,14 +7,15 @@ import { ACCENT, BLUE_INK, HAIRLINE, INK, INK_SOFT, label, PAPER } from "../../e
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { MONO } from "../../theme/fonts";
+import { MONO, SANS } from "../../theme/fonts";
 import { BAD, BAD_SQL, LISTING, ORDERS_AFTER_BAD, VERSION_REST, VERSION_SHORT, VERSION_SQL } from "./data";
-import { Code, ErrorBox, Headline, LISTING_PAPER, Listing, Mark, pulse, Svg, Tag, Wire } from "./parts";
+import { Code, ErrorBox, Headline, InlineArrow, LISTING_PAPER, Listing, Mark, pulse, Svg, Tag } from "./parts";
 
 /**
  * Part 2 closes the course in the reader's own tab: PostgreSQL compiled to
- * WebAssembly as PGlite, asked who it is, and refusing a row that breaks the
- * lesson's foreign key, under the same two tables the video opened on.
+ * WebAssembly as PGlite, asked who it is, and, in a beat of its own,
+ * refusing an order for a customer who does not exist, under the same two
+ * tables the video opened on.
  */
 export const TabScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -25,8 +26,6 @@ export const TabScene: React.FC = () => {
   const compileAt = n.word("tab", "Compile");
   const wasmAt = n.word("tab", "WebAssembly");
   const pgliteAt = n.word("tab", "PGlite");
-  const runningAt = n.word("tab", "running");
-  const browserAt = n.word("tab", "browser");
   const everyAt = n.word("tab", "every query");
   const courseAt = n.word("tab", "course");
   const askAt = n.word("version", "Ask");
@@ -37,9 +36,12 @@ export const TabScene: React.FC = () => {
   const labAt = n.word("upbringing", "lab");
   const volunteersAt = n.word("upbringing", "volunteers");
   const salesAt = n.word("upbringing", "sales team");
-  const noAt = n.word("upbringing", "says no");
   const rowsAt = n.word("upbringing", "rows");
   const rulesAt = n.word("upbringing", "rules");
+  const storeAt = n.word("refuse", "store an order");
+  const twentyFiveAt = n.word("refuse", "twenty-five");
+  const existAt = n.word("refuse", "doesn't exist");
+  const refusesAt = n.word("refuse", "refuses");
   const easierAt = n.word("close", "easier");
   const takesAt = n.word("close", "takes your rules");
   const seriouslyAt = n.word("close", "seriously");
@@ -52,7 +54,7 @@ export const TabScene: React.FC = () => {
   const FTOP = y(340);
   const FH = h(300);
   const BAR_H = 50;
-  const frameIn = ease(frame, runningAt - 6, 18);
+  const frameIn = ease(frame, compileAt - 4, 18);
   const frameDim = ease(frame, easierAt - 2, 16) * 0.5;
 
   // ── The two tables, as the video opened on them ──
@@ -93,43 +95,57 @@ export const TabScene: React.FC = () => {
       <Sfx name="el-pop" at={compileAt - 4} level={-30} />
       <Sfx name="el-pencil" at={wasmAt - 2} level={-34} />
       <Sfx name="el-pop" at={pgliteAt - 2} level={-29} />
-      <Sfx name="el-whoosh" at={runningAt - 6} level={-33} />
+      <Sfx name="el-whoosh" at={compileAt - 4} level={-33} />
       <Sfx name="el-sprinkle" at={everyAt - 2} level={-35} />
       <Sfx name="el-tap" at={tellsAt} level={-28} />
       <Sfx name="el-pop" at={upbringingAt - 4} level={-30} />
-      <Sfx name="el-scratch" at={noAt + 2} level={-30} />
+      <Sfx name="el-pop" at={storeAt - 6} level={-31} />
+      <Sfx name="el-scratch" at={refusesAt - 2} level={-30} />
       <Sfx name="el-chime" at={doesAt + 8} level={-32} />
 
-      <Headline at={browserAt - 6} lead="Postgres, in your browser." out={keptAt - 6} />
+      <Headline at={compileAt - 4} lead="Postgres, in your browser." out={keptAt - 6} />
       <Headline at={keptAt - 2} lead="It kept its upbringing." out={takesAt - 6} />
       <Headline at={takesAt - 2} lead="It takes your rules" turn="seriously." turnAt={seriouslyAt - 4} out={knowAt - 6} />
       <Headline at={knowAt - 2} lead="Now you know" turn="why this one does." turnAt={knowAt + 8} />
 
-      {/* ── C, then WebAssembly, then PGlite ── */}
-      {(
-        [
-          ["portable C", compileAt - 4, 1070],
-          ["WebAssembly", wasmAt - 2, 1330],
-          ["PGlite", pgliteAt - 2, 1620],
-        ] as const
-      ).map(([t, at, x], i) => (
-        <React.Fragment key={t}>
-          <Tag x={x} y={y(330)} at={at} dim={upbringingAt - 4} size={i === 2 ? 26 : 23} color={i === 2 ? BLUE_INK : INK} weight={650}>
-            {t}
-          </Tag>
-          {i > 0 ? (
-            <Wire
-              points={[
-                [x - (i === 1 ? 84 : 58), y(330) + 15],
-                [x - 14, y(330) + 15],
-              ]}
-              at={at - 6}
-              dur={10}
-              dim={upbringingAt - 4}
-            />
-          ) : null}
-        </React.Fragment>
-      ))}
+      {/* ── PostgreSQL, compiled to WebAssembly, is PGlite: one row of
+          words, so the two arrows between them are the same length ── */}
+      <div
+        style={{
+          position: "absolute",
+          left: 1070,
+          top: y(330),
+          display: "flex",
+          alignItems: "center",
+          gap: 18,
+          opacity: 1 - ease(frame, upbringingAt - 4, 12) * 0.6,
+        }}
+      >
+        {(
+          [
+            ["PostgreSQL", compileAt - 4],
+            ["WebAssembly", wasmAt - 2],
+            ["PGlite", pgliteAt - 2],
+          ] as const
+        ).map(([t, at], i) => (
+          <React.Fragment key={t}>
+            {i ? <InlineArrow at={at - 6} /> : null}
+            <span
+              style={{
+                opacity: ease(frame, at, 12),
+                transform: `translateY(${(1 - ease(frame, at, 12)) * 8}px)`,
+                fontFamily: SANS,
+                fontSize: i === 2 ? 26 : 23,
+                fontWeight: 650,
+                color: i === 2 ? BLUE_INK : INK,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {t}
+            </span>
+          </React.Fragment>
+        ))}
+      </div>
 
       {/* ── The tab ── */}
       {frameIn > 0 ? (
@@ -202,7 +218,7 @@ export const TabScene: React.FC = () => {
       <Entity
         layout={customers}
         at={upbringingAt - 4}
-        marks={{ id: { at: rulesAt - 2, tone: "note", out: knowAt } }}
+        marks={{ id: { at: existAt - 2, tone: "note", out: knowAt } }}
       />
       <Entity
         layout={orders}
@@ -218,29 +234,37 @@ export const TabScene: React.FC = () => {
         color="var(--ds-blue-ink)"
         width={2.4 + refuse * 2}
       />
-      <Tag x={1070} y={y(700)} at={labAt - 2} out={noAt - 4} size={23} color={INK}>
+      <Tag x={1070} y={y(700)} at={labAt - 2} out={refusesAt + 4} size={23} color={INK}>
         raised in a Berkeley <Mark at={labAt}>lab</Mark>, then by <Mark at={volunteersAt}>volunteers</Mark>
       </Tag>
-      <Tag x={1070} y={y(742)} at={salesAt - 2} out={noAt - 4} size={23} color={INK_SOFT}>
+      <Tag x={1070} y={y(742)} at={salesAt - 2} out={refusesAt + 4} size={23} color={INK_SOFT}>
         not by a sales team
       </Tag>
 
-      <Listing lines={[BAD_SQL]} x={FX} top={ITOP} width={FW} size={22} at={noAt - 8} lineAt={[noAt - 4]} dim={knowAt} />
+      {/* ── Its own beat: an order for customer 25, who does not exist ── */}
+      <Listing
+        lines={[BAD_SQL]}
+        x={FX}
+        top={ITOP}
+        width={FW}
+        size={22}
+        at={storeAt - 6}
+        lineAt={[storeAt - 2]}
+        marks={[{ line: 0, at: twentyFiveAt - 2, out: refusesAt }]}
+        dim={doesAt}
+      />
       <ErrorBox
         x={FX}
         top={ETOP}
         width={FW}
-        at={noAt + 2}
-        detailAt={rowsAt + 4}
+        at={refusesAt - 2}
+        detailAt={refusesAt + 10}
         message={BAD.message}
         detail={BAD.detail ?? ""}
-        dim={knowAt}
+        dim={doesAt}
       />
-      <Tag x={1070} y={y(700)} at={rulesAt + 4} size={22} color={INK_SOFT}>
+      <Tag x={1070} y={y(700)} at={refusesAt + 14} size={23} color={INK}>
         Nothing stored: orders still holds {ORDERS_AFTER_BAD} rows.
-      </Tag>
-      <Tag x={1070} y={y(742)} at={rulesAt + 10} size={22} color={INK_SOFT}>
-        Postgres&apos;s error code: <span style={{ fontFamily: MONO, fontSize: 21, color: BLUE_INK }}>{BAD.code}</span>
       </Tag>
 
       {/* A last stroke under the final words, after the voice ends. */}

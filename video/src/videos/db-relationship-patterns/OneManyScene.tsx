@@ -19,7 +19,6 @@ export const OneManyScene: React.FC = () => {
   const customerAt = n.word("many", "customer", { nth: 1 });
   const ordersAt = n.word("many", "lots of orders");
   const belongsAt = n.word("many", "belongs");
-  const justOneAt = n.word("many", "just one");
   const barsAt = n.word("ends", "Two bars");
   const exactlyAt = n.word("ends", "exactly one");
   const footAt = n.word("ends", "crow's foot");
@@ -29,7 +28,7 @@ export const OneManyScene: React.FC = () => {
 
   const customers = useEntityLayout({
     x: 200,
-    y: y(450),
+    y: y(440),
     width: 380,
     name: "customers",
     columns: [
@@ -40,7 +39,7 @@ export const OneManyScene: React.FC = () => {
   });
   const orders = useEntityLayout({
     x: 1060,
-    y: y(430),
+    y: y(440),
     width: 420,
     name: "orders",
     columns: [
@@ -69,7 +68,9 @@ export const OneManyScene: React.FC = () => {
 
       <Drift from={belongsAt} to={holdsAt + 60} scale={0.02} origin={[midX, y(600)]}>
         <Entity layout={customers} at={customerAt - 4} />
-        <Entity layout={orders} at={ordersAt - 2} marks={{ customer_id: { at: justOneAt, tone: "key" } }} />
+        {/* No wash on customer_id here: "which table holds the link?" is
+            asked at the end of this scene and answered in the next. */}
+        <Entity layout={orders} at={ordersAt - 2} />
         <Relation
           name="customers places orders"
           points={[c, [midX, c[1]], [midX, o[1]], o]}

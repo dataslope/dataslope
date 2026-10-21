@@ -8,10 +8,13 @@ import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HEIGHTS, SKEW, type Shape } from "./data";
-import { Arrow, DATA, Drift, Kicker, Mark, Pulse, SECOND, SECOND_INK, STAT, STAT_INK, Svg, Tag } from "./parts";
+import { Arrow, DATA, Drift, Kicker, lerp, Mark, Pulse, SECOND, SECOND_INK, STAT, STAT_INK, Svg, Tag } from "./parts";
 
 const PANEL_W = 480;
 const PANEL_X = { left: 170, symmetric: 720, right: 1270 } as const;
+/** The right-skewed panel while it is taught alone: large, and centered. */
+const SOLO_W = 1000;
+const SOLO_X = 960 - SOLO_W / 2;
 const PANEL_BASE = 720;
 const PANEL_TOP = 420;
 /** The two height groups. */
@@ -24,16 +27,17 @@ const signed = (v: number) => `${v < 0 ? "−" : "+"}${fmt(Math.abs(v), 1)}`;
 const Panel: React.FC<{
   shape: Shape;
   x: number;
+  w?: number;
   name: string;
   at: number;
   marks: number;
   gapAt: number;
   tail?: "left" | "right";
   tailAt?: number;
-}> = ({ shape, x, name, at, marks, gapAt, tail, tailAt = 0 }) => {
+}> = ({ shape, x, w = PANEL_W, name, at, marks, gapAt, tail, tailAt = 0 }) => {
   const frame = useCurrentFrame();
   const { y, h } = useLayout();
-  const X: XScale = { lo: shape.lo, hi: shape.hi, x0: x, x1: x + PANEL_W };
+  const X: XScale = { lo: shape.lo, hi: shape.hi, x0: x, x1: x + w };
   const base = y(PANEL_BASE);
   const peak = Math.max(...shape.counts);
   const unit = (base - y(PANEL_TOP) - h(40)) / peak;
@@ -47,7 +51,7 @@ const Panel: React.FC<{
   const tailTo = tail === "right" ? sx(X, shape.hi - 1) : sx(X, shape.lo + 1);
   return (
     <>
-      <Tag x={x} y={y(PANEL_TOP) - h(46)} opacity={p} size={23} bold align="left">
+      <Tag x={x} y={y(PANEL_TOP) - h(40)} opacity={p} size={23} bold align="left">
         {name}
       </Tag>
       <Bars counts={shape.counts} lo={shape.lo} bin={shape.bin} scale={X} base={base} unit={unit} gap={2} grow={(i) => ease(frame, at + i * 0.6, 12)} />
@@ -63,7 +67,7 @@ const Panel: React.FC<{
       {tail ? (
         <Arrow from={[tailFrom, base - h(150)]} to={[tailTo, base - h(150)]} at={tailAt} dur={18} color={INK_SOFT} width={2.2} />
       ) : null}
-      <Tag x={x + PANEL_W / 2} y={base + h(16)} opacity={ease(frame, gapAt - 4, 12)} size={22}>
+      <Tag x={x + w / 2} y={base + h(16)} opacity={ease(frame, gapAt - 4, 12)} size={22}>
         mean − median <span style={{ color: STAT_INK, fontWeight: 700 }}>{signed(shape.gap)}</span>
       </Tag>
     </>
@@ -104,6 +108,10 @@ export const ShapeScene: React.FC = () => {
   const mattersAt = n.word("tails-in", "matter");
 
   const phaseB = ease(frame, peaksFrom - 6, 18);
+  /** The right-skewed panel shrinks into its slot as the other two arrive. */
+  const shrink = ease(frame, leftAt - 10, 24);
+  const rightX = lerp(SOLO_X, PANEL_X.right, shrink);
+  const rightW = lerp(SOLO_W, PANEL_W, shrink);
   const split = ease(frame, groupsAt - 2, 18);
   const hb = y(H_BASE);
   const hUnit = h(1.95);
@@ -114,7 +122,7 @@ export const ShapeScene: React.FC = () => {
   // The right-skewed panel's peak, for "not for the peak".
   const right = SKEW.right;
   const rightPeak = right.counts.indexOf(Math.max(...right.counts));
-  const rX: XScale = { lo: right.lo, hi: right.hi, x0: PANEL_X.right, x1: PANEL_X.right + PANEL_W };
+  const rX: XScale = { lo: right.lo, hi: right.hi, x0: rightX, x1: rightX + rightW };
   const rUnit = (y(PANEL_BASE) - y(PANEL_TOP) - h(40)) / Math.max(...right.counts);
 
   return (
@@ -139,13 +147,14 @@ export const ShapeScene: React.FC = () => {
 
       {/* ── Phase A: three samples of five thousand ── */}
       <div style={{ position: "absolute", inset: 0, opacity: 1 - phaseB, transform: `translateY(${-phaseB * 40}px)` }}>
-        <FigLabel n="7" title="Three samples of 5,000, with each one's median and mean" at={shapeAt - 6} x={160} y={y(320)} />
+        <FigLabel n="7" title="Three samples of 5,000, with each one's median and mean" at={shapeAt - 6} x={160} y={y(330)} />
         <Drift from={shapeFrom} to={peaksFrom} scale={0.02} origin={[960, y(PANEL_BASE)]}>
           <Panel shape={SKEW.left} x={PANEL_X.left} name="Left-skewed" at={leftAt - 6} marks={belowAt} gapAt={belowAt + 8} tail="left" tailAt={leftAt} />
           <Panel shape={SKEW.symmetric} x={PANEL_X.symmetric} name="Symmetric" at={symAt - 6} marks={togetherAt} gapAt={togetherAt + 6} />
           <Panel
             shape={SKEW.right}
-            x={PANEL_X.right}
+            x={rightX}
+            w={rightW}
             name="Right-skewed"
             at={shapeAt - 2}
             marks={aboveAt}
@@ -169,10 +178,10 @@ export const ShapeScene: React.FC = () => {
           >
             the peak
           </Tag>
-          <Tag x={PANEL_X.right + PANEL_W} y={y(PANEL_BASE) - h(190)} opacity={ease(frame, tailAt + 6, 10) * (1 - ease(frame, aboveAt - 4, 10))} color={INK_SOFT} size={21} align="right">
+          <Tag x={rightX + rightW} y={y(PANEL_BASE) - h(190)} opacity={ease(frame, tailAt + 6, 10) * (1 - ease(frame, aboveAt - 4, 10))} color={INK_SOFT} size={21} align="right">
             the tail
           </Tag>
-          <Tag x={PANEL_X.right + PANEL_W / 2 + 40} y={y(PANEL_TOP) - h(8)} opacity={ease(frame, aboveAt, 12)} size={21} align="left">
+          <Tag x={rightX + rightW / 2 + 40} y={y(PANEL_TOP) - h(8)} opacity={ease(frame, aboveAt, 12)} size={21} align="left">
             <span style={{ color: INK }}>median</span> · <span style={{ color: STAT_INK }}>mean</span>
           </Tag>
         </Drift>

@@ -49,7 +49,8 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     truth. The "ddof" block: numpy's default std 7.20, pandas' 7.59.
  *   - measures-of-spread, "IQR" and "MAD": incomes 38 to 120 and 9,000; std
  *     2,828.4, "over two thousand eight hundred"; Q1 44.75, Q3 58.75, IQR
- *     14.0; MAD 8.0.
+ *     14.0; MAD 8.0. The scene first shows the tenth at 130, where the std
+ *     is 33.1 (robustSd in data.ts) and the IQR and MAD are the same.
  *   - shape-and-outliers (seeds 0, 1, 3, 7): mean minus median is -3.0, +0.2
  *     and +3.9 for the left-skewed, symmetric and right-skewed samples; the
  *     two height groups center on 165 and 185 and the mixed mean is 175.0;
@@ -57,7 +58,8 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     Student's t with 3 degrees of freedom; on 200 lognormal incomes plus
  *     120 and 200, the 1.5 IQR fences flag 6 points and the z-score rule 2
  *     (the planted pair), so 4 of the 6 are draws from the lognormal's own
- *     tail. "Financial returns, insurance losses, network delays" are the
+ *     tail. The lesson's rules: flag past Q1 - 1.5 IQR or Q3 + 1.5 IQR, and
+ *     flag |z| > 3. "Financial returns, insurance losses, network delays" are the
  *     lesson's examples of heavy tails; error, placeholder and genuine
  *     extreme are its three kinds of outlier, -999 its sentinel.
  *   - statistical-fallacies, "Trusting a summary without looking": the
@@ -96,23 +98,23 @@ export const script: NarrationScript = {
     {
       id: "centers",
       text: "Their mean is fifty-three point seven thousand. Their median, the middle value, is fifty-three and a half. Almost the same.",
-      pauseAfter: 0.5,
+      pauseAfter: 0.8,
     },
     { id: "ceo", text: "Now the CEO walks in, earning a million.", pauseAfter: 0.45 },
     {
       id: "jump",
       text: "The mean leaps to a hundred and thirty-nine point seven thousand. The median just moves to fifty-five.",
-      pauseAfter: 0.45,
+      pauseAfter: 0.8,
     },
     {
       id: "nobody",
       text: "Ten of the eleven people earn less than the mean. It describes almost nobody in the room.",
-      pauseAfter: 0.45,
+      pauseAfter: 0.7,
     },
     {
       id: "balance",
       text: "That's because the mean is a balance point. Put one heavy value far out, and the balance point slides toward it.",
-      pauseAfter: 0.35,
+      pauseAfter: 0.7,
     },
     {
       id: "middle",
@@ -127,11 +129,11 @@ export const script: NarrationScript = {
       pauseAfter: 0.35,
     },
     { id: "median", text: "The median order is about twenty-three dollars.", pauseAfter: 0.3 },
-    { id: "mean", text: "The mean is twenty-six fifty-eight. The tail drags it up.", pauseAfter: 0.45 },
+    { id: "mean", text: "The mean is twenty-six fifty-eight. The tail drags it up.", pauseAfter: 0.7 },
     {
       id: "alarm",
       text: "So a mean above the median is a free alarm for skew. The wider the gap, the more you should lead with the median.",
-      pauseAfter: 0.5,
+      pauseAfter: 0.8,
     },
     { id: "right", text: "Which center is right? That depends on the data.", pauseAfter: 0.35 },
     { id: "symmetric", text: "Symmetric, with no wild values? The mean uses everything, and works well.", pauseAfter: 0.3 },
@@ -161,13 +163,18 @@ export const script: NarrationScript = {
     {
       id: "deviations",
       text: "To measure it, take each delivery's distance from the mean. For the steady service, they run from minus two to plus two, and they cancel out to zero.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.7,
     },
-    { id: "square", text: "So square them first. Now they add up to twelve.", pauseAfter: 0.35 },
+    { id: "square", text: "So square them first. Now they add up to twelve.", pauseAfter: 0.8 },
     {
       id: "variance",
-      text: "Divide by nine, one less than the count, and that's the variance. Its square root, back in minutes, is the standard deviation... about one point two.",
-      pauseAfter: 0.4,
+      text: "Divide by nine, one less than the count, and that's the variance.",
+      pauseAfter: 0.9,
+    },
+    {
+      id: "root",
+      text: "Its square root, back in minutes, is the standard deviation... about one point two.",
+      pauseAfter: 0.8,
     },
     { id: "erratic", text: "For the erratic service, it's almost eighteen." },
     {
@@ -176,26 +183,26 @@ export const script: NarrationScript = {
       text: "So why nine, and not ten? Because the distances are measured from the sample's own mean.",
       pauseAfter: 0.3,
     },
-    { id: "closest", text: "And that mean sits closer to its own points than any other number does.", pauseAfter: 0.4 },
+    { id: "closest", text: "And that mean sits closer to its own points than any other number does.", pauseAfter: 1.0 },
     {
       id: "truth",
       text: "These five values come from a population whose true mean is zero. Measure from the truth instead, and the squares grow.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.8,
     },
     {
       id: "small",
-      text: "So around the sample's mean, the squares run small. Divide by n, and you'd underestimate the spread.",
-      pauseAfter: 0.4,
+      text: "So around the sample's mean, the squares run small. Divide by n, the number of values, and you'd underestimate the spread.",
+      pauseAfter: 0.7,
     },
     {
       id: "measured",
       text: "Over four thousand samples of five, dividing by n comes out about twenty percent low. Dividing by n minus one lands on the truth.",
-      pauseAfter: 0.45,
+      pauseAfter: 0.9,
     },
     {
       id: "libs",
       text: "That's why numpy and pandas disagree. numpy divides by n unless you ask, and pandas by n minus one.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.7,
     },
     { id: "robust-in", text: "Squares have one more weakness. A single wild value can swamp them." },
     {
@@ -204,21 +211,21 @@ export const script: NarrationScript = {
       text: "Take ten incomes. Nine fall between thirty-eight and a hundred and twenty. The tenth is nine thousand.",
       pauseAfter: 0.4,
     },
-    { id: "sd", text: "The standard deviation leaps to over two thousand eight hundred.", pauseAfter: 0.45 },
+    { id: "sd", text: "The standard deviation leaps to over two thousand eight hundred.", pauseAfter: 0.8 },
     {
       id: "iqr",
-      text: "The interquartile range only measures the middle half, from the first quartile to the third. It's fourteen, whatever the top earner makes.",
-      pauseAfter: 0.4,
+      text: "The interquartile range only measures the middle half, from the first quartile to the third, a quarter and three quarters of the way up. It's fourteen, whatever the top earner makes.",
+      pauseAfter: 1.0,
     },
     {
       id: "mad",
       text: "Its cousin, the median absolute deviation, takes the typical distance from the median. Here, eight.",
-      pauseAfter: 0.45,
+      pauseAfter: 0.8,
     },
     {
       id: "pair",
       text: "So pair them. A mean goes with a standard deviation, and a median goes with the IQR.",
-      pauseAfter: 0.45,
+      pauseAfter: 0.8,
     },
     { id: "shape-in", text: "Still, a center and a spread can't tell you what the data looks like." },
 
@@ -230,53 +237,58 @@ export const script: NarrationScript = {
       text: "For that, you need its shape. And skew is named for the long tail, not for the peak.",
       pauseAfter: 0.35,
     },
-    { id: "right-tail", text: "A tail to the right drags the mean above the median.", pauseAfter: 0.3 },
+    { id: "right-tail", text: "A tail to the right drags the mean above the median.", pauseAfter: 0.7 },
     {
       id: "left-tail",
       text: "A tail to the left drags it below. Symmetric data keeps the two together.",
-      pauseAfter: 0.45,
+      pauseAfter: 0.7,
     },
     {
       id: "two-peaks",
       text: "Two peaks usually mean two groups in one column. Mix the heights of two groups, and the mean lands in the valley between them.",
-      pauseAfter: 0.35,
+      pauseAfter: 0.7,
     },
-    { id: "neither", text: "It describes neither group.", pauseAfter: 0.5 },
+    { id: "neither", text: "It describes neither group.", pauseAfter: 0.8 },
     { id: "tails-in", text: "And the tails matter as much as the middle." },
     {
       id: "tails",
       scene: true,
       text: "Draw twenty thousand values from a normal distribution, and just one lands beyond four standard deviations.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.7,
     },
-    { id: "heavy", text: "From a heavy-tailed one, a hundred and twenty-seven do.", pauseAfter: 0.45 },
+    { id: "heavy", text: "From a heavy-tailed one, a hundred and twenty-seven do.", pauseAfter: 0.8 },
     {
       id: "routine",
       text: "Heavy tails make rare events routine. Financial returns, insurance losses and network delays all live out there.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.7,
     },
     { id: "outlier-in", text: "So a value far out isn't automatically a mistake." },
     {
       id: "outlier",
       scene: true,
       text: "An outlier is a value far from the rest. That's all the word means.",
-      pauseAfter: 0.35,
+      pauseAfter: 0.8,
     },
     {
       id: "kinds",
       text: "It might be an error, like a typo. It might be a placeholder, like minus nine ninety-nine for missing. Or it might be real... your biggest customer, or a fraud.",
-      pauseAfter: 0.45,
+      pauseAfter: 0.8,
     },
     {
       id: "flag",
       text: "Now take two hundred skewed incomes, plus two genuine high earners. The box-plot fences flag six points. The z-score rule flags just two.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.6,
     },
-    { id: "ordinary", text: "Four of those six are simply the long tail of ordinary incomes.", pauseAfter: 0.45 },
+    {
+      id: "rules",
+      text: "The fences sit one and a half times the IQR past the quartiles. The z-score rule flags anything three standard deviations from the mean.",
+      pauseAfter: 0.8,
+    },
+    { id: "ordinary", text: "Four of those six are simply the long tail of ordinary incomes.", pauseAfter: 0.8 },
     {
       id: "verdict",
-      text: "So a flag is a question, not a verdict. Find out why a point is out there, and then decide.",
-      pauseAfter: 0.45,
+      text: "So a flag is a question, not a verdict. Find out why a point is out there, and then decide: fix an error, treat a placeholder as missing, keep what's real.",
+      pauseAfter: 0.9,
     },
     { id: "plot-in", text: "And the surest way to find out is to look." },
 
@@ -286,30 +298,30 @@ export const script: NarrationScript = {
       scene: true,
       take: true,
       text: "Here are thirteen datasets. They share their means, their standard deviations and their correlation, to within a hundredth.",
-      pauseAfter: 0.45,
+      pauseAfter: 0.8,
     },
     {
       id: "plot",
       text: "Now plot them. One is a dinosaur. Others are a star, a circle, and a set of lines.",
-      pauseAfter: 0.45,
+      pauseAfter: 0.8,
     },
     {
       id: "credit",
       text: "Alberto Cairo drew the dinosaur. In twenty seventeen, Justin Matejka and George Fitzmaurice built the other twelve to match its numbers.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.7,
     },
-    { id: "lossy", text: "A summary is a lossy copy. The plot keeps what it threw away.", pauseAfter: 0.4 },
+    { id: "lossy", text: "A summary is a lossy copy. The plot keeps what it threw away.", pauseAfter: 0.8 },
     { id: "bins-in", text: "But a plot makes choices too." },
     {
       id: "bins",
       scene: true,
       text: "A histogram's bin width is a knob. These are the SAME thousand values, in five bins, then twenty, then eighty.",
-      pauseAfter: 0.45,
+      pauseAfter: 0.7,
     },
     {
       id: "wide",
       text: "Wide bins blur the shape into a few blocks. Narrow ones turn every wobble into a peak.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.7,
     },
     { id: "believe", text: "Nothing in the data says which to believe. So look at more than one." },
     {
@@ -321,14 +333,14 @@ export const script: NarrationScript = {
     {
       id: "ecdf",
       text: "To read off percentiles with nothing to tune, an ECDF: the share of values at or below each point.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.8,
     },
     {
       id: "box",
       text: "To compare groups, box plots. But a box only knows its quartiles, so it can't show a second peak.",
       pauseAfter: 0.35,
     },
-    { id: "violin", text: "A violin can. It draws the shape the box leaves out.", pauseAfter: 0.45 },
+    { id: "violin", text: "A violin can. It draws the shape the box leaves out.", pauseAfter: 0.7 },
     { id: "habit", text: "Whatever you pick, plot FIRST, and summarize second.", pauseAfter: 0.7 },
     {
       id: "next",

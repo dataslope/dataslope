@@ -3,10 +3,11 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, halo, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { body, fmt, halo, headline, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx, type SoundName } from "../../sound/Sfx";
+import { useFigNumber } from "../sampling/merged";
 import {
   binsOf,
   EASY_MAX,
@@ -65,6 +66,7 @@ const pipsFor = (hits: readonly number[]) => {
 export const RepeatScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
+  const fig = useFigNumber();
   const { y } = useLayout();
 
   const againFrom = n.beat("again").from;
@@ -110,14 +112,15 @@ export const RepeatScene: React.FC = () => {
         Draw again, <Underline at={hundredAt}>a hundred times.</Underline>
       </Ink>
 
-      {/* Counter, top right. */}
+      {/* Counter, top right. The line under the number says what each sample
+          is, not what it is out of: "of 500" read as 47 of 500 customers. */}
       <div style={{ position: "absolute", left: 1400, top: y(120), opacity: ease(frame, drawAt, 12) }}>
         <div style={label(20, INK_SOFT)}>Samples drawn, each way</div>
-        <div style={{ ...headline(108), fontVariantNumeric: "tabular-nums lining-nums", marginTop: 6 }}>{k}</div>
-        <div style={{ ...body(26, true), marginTop: 4 }}>of {SAMPLE_N} customers</div>
+        <div style={{ ...headline(108), ...TABULAR, marginTop: 6 }}>{k}</div>
+        <div style={{ ...body(26, true), marginTop: 4 }}>each of {SAMPLE_N} customers</div>
       </div>
 
-      <FigLabel n="2" title={`The average of each sample of ${SAMPLE_N}`} at={againFrom} x={160} y={y(384)} />
+      <FigLabel n={fig(2)} title={`The average of each sample of ${SAMPLE_N}`} at={againFrom} x={160} y={y(384)} />
       <Axis scale={X} base={y(BASE)} ticks={[66, 68, 70, 72, 74, 76, 78, 80, 82, 84]} at={againFrom} />
       <TruthLine x={truthX} bottom={y(BASE)} top={y(452)} at={againFrom} />
       <div
@@ -173,8 +176,11 @@ export const RepeatScene: React.FC = () => {
       />
       <Ink at={biasAt - 6} dur={16} style={{ left: (truthX + easyX) / 2 - 200, top: y(426), width: 400, textAlign: "center" }}>
         <span style={{ ...headline(56, true), color: EASY_INK, ...halo }}>Bias</span>
+        {/* To the nearest point: the bias is "about ten" at every sample size,
+            and 10.03 here against 9.94 in the closing figure read as if it
+            shrank with more data. */}
         <span style={{ ...note(24, EASY_INK), fontWeight: 700, marginLeft: 16, ...halo }}>
-          +{fmt(EASY_CENTER - TRUE_MEAN)}
+          +{fmt(EASY_CENTER - TRUE_MEAN, 0)} points
         </span>
       </Ink>
     </AbsoluteFill>

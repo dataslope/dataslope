@@ -39,7 +39,8 @@ export const UniqueScene: React.FC = () => {
   const herAt = n.word("unique", "her email");
   const usernameAt = n.word("unique", "new username");
   const dupFrom = n.beat("dup").from;
-  const refusedAt = n.word("dup", "refused");
+  const refusedAt = n.word("dup", "Refused");
+  const markedAt = n.word("dup", "unique");
   const oneEmailAt = n.word("dup", "One email");
   const oneAccountAt = n.word("dup", "one account");
   const primaryAt = n.word("many", "primary key");
@@ -70,7 +71,7 @@ export const UniqueScene: React.FC = () => {
       <Sfx name="el-pop" at={open - 4} level={-30} />
       <Sfx name="el-tap" at={secondAt - 2} level={-28} />
       <Sfx name="el-scratch" at={refusedAt + 2} level={-30} />
-      <Sfx name="el-pencil" at={dupFrom - 2} level={-33} />
+      <Sfx name="el-pencil" at={open + 16} level={-34} />
       <Sfx name="el-pencil" at={everythingAt - 2} level={-34} />
 
       <Kicker at={open - 10}>No repeats</Kicker>
@@ -88,7 +89,8 @@ export const UniqueScene: React.FC = () => {
         row="email"
         chips={[
           { code: "NOT NULL", at: open + 8 },
-          { code: "UNIQUE", at: dupFrom - 2, pulses: [oneEmailAt, uniqueAt] },
+          // On the card before the attempt, so the refusal has its cause.
+          { code: "UNIQUE", at: open + 16, pulses: [markedAt, oneEmailAt, uniqueAt] },
         ]}
         dim={evenAt}
       />
@@ -130,7 +132,7 @@ export const UniqueScene: React.FC = () => {
         message={UNIQUE.refusal.message}
         detail={UNIQUE.refusal.detail}
         name={UNIQUE.refusal.constraint}
-        nameAt={refusedAt + 8}
+        nameAt={markedAt}
         dim={primaryAt}
       />
     </AbsoluteFill>

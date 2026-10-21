@@ -26,6 +26,7 @@ import { ds } from "../../theme/brand";
 import { SANS } from "../../theme/fonts";
 import { ILLUSTRATIONS, mulberry32, TIMES, VIDEO } from "./data";
 import { Rule, Span } from "./parts";
+import { useFigNumber } from "../sampling/merged";
 
 /** The 120 times, on their own axis. */
 const X: XScale = { lo: 0, hi: 16, x0: 160, x1: 1760 };
@@ -60,12 +61,16 @@ export const RulerScene: React.FC = () => {
   const { fps } = useVideoConfig();
   const n = useNarration();
   const { y } = useLayout();
+  const fig = useFigNumber();
 
   // ── Cues ──
   const rulerFrom = n.beat("ruler").from;
   const rulerAt = n.word("ruler", "ruler");
   const inferenceAt = n.word("ruler", "inference");
-  const timesFrom = n.beat("times").from;
+  // The 120 times are on the page while the ruler is announced, not after.
+  const dotsAt = rulerFrom + 10;
+  // Their label arrives as the narration names them.
+  const namedAt = n.word("times", "hundred and twenty");
   const eightAt = n.word("times", "eight point two");
   const seAt = n.word("times", "zero point two two");
   const stepAt = n.word("interval", "Step");
@@ -74,7 +79,7 @@ export const RulerScene: React.FC = () => {
   const intervalAt = n.word("interval", "confidence interval");
   const testAt = n.word("test", "test");
   const manyAt = n.word("test", "how many");
-  const testingAt = n.word("test", "testing");
+  const lessAt = n.word("eight", "less than one");
   const nextAt = n.word("next", "Next");
   // "that interval": the interval lights up on the ruler as it is named, and
   // the line under it finishes on "properly".
@@ -92,11 +97,11 @@ export const RulerScene: React.FC = () => {
     <AbsoluteFill>
       {/* ── Sound: the ruler, the times, the zoom, the interval, the test ── */}
       <Sfx name="el-pop" at={rulerAt - 6} level={-30} />
-      <Sfx name="el-sprinkle" at={timesFrom - 4} level={-34} />
+      <Sfx name="el-sprinkle" at={dotsAt} level={-34} />
       <Sfx name="el-whoosh" at={seAt} level={-34} />
       <Sfx name="el-pencil" at={stepAt} level={-33} />
       <Sfx name="el-pencil" at={testAt - 2} level={-35} />
-      <Sfx name="el-tap" at={testingAt - 2} level={-29} />
+      <Sfx name="el-tap" at={lessAt - 2} level={-29} />
 
       <div style={{ position: "absolute", left: 92, top: y(112), display: "flex", gap: "0.26em", ...headline(56), whiteSpace: "nowrap" }}>
         <Ink at={rulerFrom - 6} dur={20} style={{ position: "relative" }}>
@@ -126,7 +131,7 @@ export const RulerScene: React.FC = () => {
       ) : null}
 
       {/* ── Fig. 6: the times ── */}
-      <FigLabel n="6" title={`${TIMES.n} conversion times, in seconds`} at={timesFrom - 8} x={160} y={y(282)} />
+      <FigLabel n={fig(6)} title={`${TIMES.n} conversion times, in seconds`} at={namedAt - 6} x={160} y={y(282)} />
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
         <rect
           x={sx(X, ZOOM[0])}
@@ -137,14 +142,14 @@ export const RulerScene: React.FC = () => {
           opacity={0.55}
         />
         {TIMES.values.map((v, i) => {
-          const p = pop(frame, timesFrom - 4 + i * 0.12, fps, 16);
+          const p = pop(frame, dotsAt + i * 0.12, fps, 16);
           if (p <= 0.01) return null;
           return (
             <circle key={i} cx={sx(X, v)} cy={y(STRIP_TOP + JITTER[i] * STRIP_H)} r={6 * Math.min(1.15, p)} fill={BAR} opacity={0.85} />
           );
         })}
       </svg>
-      <Axis scale={X} base={y(BASE)} ticks={TICKS} at={timesFrom - 6} format={seconds} />
+      <Axis scale={X} base={y(BASE)} ticks={TICKS} at={dotsAt - 4} format={seconds} />
       <Rule x={mx} y0={y(BASE)} y1={y(STRIP_TOP - 22)} at={eightAt - 4} dur={12} color={ACCENT} width={2.8} />
       <Note at={eightAt} x={mx + 14} y={y(STRIP_TOP - 40)}>
         <span style={{ ...note(23, ACCENT_INK), fontWeight: 700 }}>average {fmt(TIMES.mean)} s</span>
@@ -152,7 +157,7 @@ export const RulerScene: React.FC = () => {
 
       {/* ── Fig. 7: the ruler ── */}
       <FigLabel
-        n="7"
+        n={fig(7)}
         title={`Zoomed in, and marked in standard errors of ${fmt(TIMES.se)} s`}
         at={seAt - 2}
         x={R.x0}
@@ -218,16 +223,17 @@ export const RulerScene: React.FC = () => {
         <span style={label(19, INK_SOFT)}>standard errors from the average</span>
       </Note>
 
-      {/* The interval, lit on the ruler when the bridge names it. */}
+      {/* The interval, lit on the ruler when the bridge names it: in the
+          ticks' band only, so it never cuts through the step labels under it. */}
       {named > 0 ? (
         <div
           style={{
             position: "absolute",
             left: rx(TIMES.lo),
             width: (rx(TIMES.hi) - rx(TIMES.lo)) * named,
-            top: y(RULER_TOP),
-            height: y(RULER_TOP + RULER_H) - y(RULER_TOP),
-            background: `color-mix(in srgb, ${ACCENT} 16%, transparent)`,
+            top: y(RULER_TOP) + 1,
+            height: 30,
+            background: `color-mix(in srgb, ${ACCENT} 18%, transparent)`,
           }}
         />
       ) : null}
@@ -242,24 +248,15 @@ export const RulerScene: React.FC = () => {
         </Ink>
       </div>
 
-      {/* A test: the gap from a tested value, in standard errors. */}
-      {/* In two pieces, so it marks the ruler's edge without striking
-          through the step labels printed inside it. */}
+      {/* A test: the gap from a tested value, in standard errors. Drawn up
+          to the ruler's lower edge only: inside it, a line 9px from the -1
+          tick read as a doubled tick. */}
       <Rule
         x={rx(TIMES.tested)}
         y0={y(RULER_TOP + RULER_H + 54)}
         y1={y(RULER_TOP + RULER_H)}
         at={testAt - 2}
         dur={10}
-        color={ds("gray", 700)}
-        width={2.4}
-      />
-      <Rule
-        x={rx(TIMES.tested)}
-        y0={y(RULER_TOP) + 30}
-        y1={y(RULER_TOP) - 10}
-        at={testAt + 4}
-        dur={8}
         color={ds("gray", 700)}
         width={2.4}
       />
@@ -276,7 +273,7 @@ export const RulerScene: React.FC = () => {
       <Note at={testAt + 4} x={rx(TIMES.tested) - 16} y={y(RULER_TOP + RULER_H + 26)} align="right" from="right">
         <span style={note(22, INK)}>tested value, {fmt(TIMES.tested, 1)} s</span>
       </Note>
-      <Note at={testingAt - 2} x={rx(TIMES.mean) + 16} y={y(RULER_TOP + RULER_H + 26)}>
+      <Note at={lessAt - 2} x={rx(TIMES.mean) + 16} y={y(RULER_TOP + RULER_H + 26)}>
         <span style={{ ...note(22, ACCENT_INK), fontWeight: 700 }}>{fmt(TIMES.gapInSe)} standard errors away</span>
       </Note>
 

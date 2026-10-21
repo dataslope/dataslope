@@ -2,27 +2,32 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, body, HAIRLINE, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, body, HAIRLINE, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Card, Headline, KEY_INK, Mark, pulse, Spot, Svg, Tick } from "./parts";
+import { Card, Headline, KEY, KEY_INK, Mark, pulse, Spot, Svg, Tick } from "./parts";
 
 const LANE_X0 = 520;
 const LANE_X1 = 1280;
-/** The letters SEQUEL takes from the words, as [word, letters taken]. */
-const TAKEN: readonly [string, number][] = [
-  ["Structured", 1],
-  ["English", 1],
-  ["Query", 3],
-  ["Language", 1],
+/** The letters SEQUEL takes from the words, as [word, letters taken, of
+ *  which the first `kept` stay in SQL]. */
+const TAKEN: readonly [string, number, number][] = [
+  ["Structured", 1, 1],
+  ["English", 1, 0],
+  ["Query", 3, 1],
+  ["Language", 1, 1],
 ];
+/** How far the matching-values bar runs once System R answers: short of the
+ *  pointer bar, since the claim is "fast enough", not "as fast". The bars
+ *  have no scale and stand for no measured speed. */
+const ENOUGH = 0.86;
 const SEQUEL = ["S", "E", "Q", "U", "E", "L"];
 const VOWEL = [false, true, false, true, true, false];
 
 /**
- * Part 1, IBM's doubt and System R: could matching values ever be as fast
- * as following a pointer? System R said yes. Chamberlin and Boyce's
+ * Part 1, IBM's doubt and System R: could matching values be fast enough to
+ * compete with following a pointer? System R said yes. Chamberlin and Boyce's
  * Structured English Query Language, SEQUEL, loses its vowels to a
  * trademark and becomes SQL; and Boyce, who did not live to see it.
  */
@@ -43,7 +48,6 @@ export const SqlScene: React.FC = () => {
   const systemRAt = n.word("systemr", "System R");
   const findAt = n.word("systemr", "find out");
   const couldAt = n.word("systemr", "It could");
-  const alongAt = n.word("sequel", "Along");
   const namesAt = n.word("sequel", "Donald Chamberlin");
   const boyceNameAt = n.word("sequel", "Raymond Boyce");
   const languageAt = n.word("sequel", "query language");
@@ -62,20 +66,25 @@ export const SqlScene: React.FC = () => {
   // The three letters that stayed swell once more as the scene closes.
   const lastSwell = pulse(frame, n.beat("boyce").to - 6, 24);
 
-  const lanesOut = alongAt - 4;
+  // Fig. 3 stays until the two names arrive with the next headline.
+  const lanesOut = namesAt - 6;
   const LANE_A = y(410);
   const LANE_B = y(520);
   const pointerBar = ease(frame, imsAt - 2, 12);
-  // Matching values creeps along while the critics doubt it, then runs the
-  // whole way once System R answers.
-  const valueBar = 0.42 * ease(frame, matchingAt - 4, 34) + 0.58 * ease(frame, couldAt - 2, 16);
+  // Matching values is an open question while the critics doubt it, an
+  // outline with a question mark, and fills in once System R answers.
+  const outline = ease(frame, matchingAt - 4, 20);
+  const valueBar = ENOUGH * ease(frame, couldAt - 2, 16);
   const question = ease(frame, fastAt - 2, 10) * (1 - ease(frame, couldAt - 2, 8));
+  const enoughX = LANE_X0 + (LANE_X1 - LANE_X0) * ENOUGH;
 
   // ── The letters ──
   const letterSize = 170;
   const drop = (i: number) => (VOWEL[i] ? ease(frame, vowelsAt - 4 + [0, 0, 0, 5, 10][Math.min(4, i)] * 1, 18) : 0);
   const close = ease(frame, sqlAt - 6, 18);
   const sqlInk = ease(frame, sqlAt - 2, 12);
+  // The letters SQL did not keep go back to the words' own ink.
+  const lost = ease(frame, sqlAt - 2, 12);
 
   return (
     <AbsoluteFill>
@@ -90,14 +99,17 @@ export const SqlScene: React.FC = () => {
       <Sfx name="el-tap" at={vowelsAt + 6} level={-30} />
       <Sfx name="el-pop" at={sqlAt - 4} level={-29} />
 
-      <Headline at={doubtFrom - 4} lead="IBM wasn't sold." out={alongAt - 6} />
-      <Headline at={languageAt - 4} lead="A query language" turn="almost like English." turnAt={englishAt - 4} out={diedAt - 6} />
+      <Headline at={doubtFrom - 4} lead="IBM wasn't sold." out={namesAt - 8} />
+      <Headline at={namesAt - 4} lead="A query language" turn="almost like English." turnAt={englishAt - 4} out={diedAt - 6} />
       <Headline at={diedAt - 2} lead="Boyce never saw" turn="what it became." turnAt={twentiesAt - 4} />
 
       {/* ── Fig. 3: could matching values be fast? ── */}
-      <FigLabel n="3" title="Could matching values ever be as fast as following a pointer?" at={doubtedAt - 6} x={96} y={y(290)} out={lanesOut} />
+      <FigLabel n="3" title="Could matching values be fast enough?" at={doubtedAt - 6} x={96} y={y(290)} out={lanesOut} />
       <Ink at={imsAt - 4} dur={14} out={lanesOut} style={{ left: 96, top: LANE_A - 16, whiteSpace: "nowrap" }}>
         <span style={{ ...label(23, INK) }}>Follow a pointer, as IMS does</span>
+      </Ink>
+      <Ink at={fortuneAt - 2} dur={14} out={lanesOut} style={{ left: 96, top: LANE_A + 18, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(21, INK_SOFT) }}>IBM&apos;s big earner</span>
       </Ink>
       <Ink at={matchingAt - 6} dur={14} out={lanesOut} style={{ left: 96, top: LANE_B - 16, whiteSpace: "nowrap" }}>
         <span style={{ ...label(23, INK) }}>Match a value</span>
@@ -106,17 +118,28 @@ export const SqlScene: React.FC = () => {
         {[LANE_A, LANE_B].map((ly, i) => (
           <line key={i} x1={LANE_X0} x2={LANE_X1} y1={ly} y2={ly} stroke={HAIRLINE} strokeWidth={1} strokeDasharray="3 6" opacity={ease(frame, (i ? matchingAt : imsAt) - 6, 10)} />
         ))}
-        {pointerBar > 0 ? <rect x={LANE_X0} y={LANE_A - 13} width={(LANE_X1 - LANE_X0) * pointerBar} height={26} rx={3} fill={BAR} /> : null}
-        {valueBar > 0 ? <rect x={LANE_X0} y={LANE_B - 13} width={(LANE_X1 - LANE_X0) * valueBar} height={26} rx={3} fill={ACCENT} /> : null}
+        {pointerBar > 0 ? <rect x={LANE_X0} y={LANE_A - 13} width={(LANE_X1 - LANE_X0) * pointerBar} height={26} rx={3} fill={INK_SOFT} /> : null}
+        {outline > 0 && valueBar < ENOUGH ? (
+          <rect
+            opacity={1 - valueBar / ENOUGH}
+            x={LANE_X0}
+            y={LANE_B - 13}
+            width={(enoughX - LANE_X0) * outline}
+            height={26}
+            rx={3}
+            fill="none"
+            stroke={KEY}
+            strokeWidth={2}
+            strokeDasharray="7 6"
+          />
+        ) : null}
+        {valueBar > 0 ? <rect x={LANE_X0} y={LANE_B - 13} width={(LANE_X1 - LANE_X0) * valueBar} height={26} rx={3} fill={KEY} /> : null}
       </Svg>
-      <Ink at={fortuneAt - 2} dur={14} out={lanesOut} style={{ left: LANE_X1 + 24, top: LANE_A - 16, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, INK_SOFT) }}>IBM&apos;s big earner</span>
-      </Ink>
       {question > 0 ? (
         <div
           style={{
             position: "absolute",
-            left: LANE_X0 + (LANE_X1 - LANE_X0) * valueBar + 18,
+            left: enoughX + 18,
             top: LANE_B - 30,
             opacity: question * (1 - ease(frame, lanesOut, 10)),
             transform: `scale(${0.6 + 0.4 * Math.min(1, pop(frame, fastAt - 2, fps, 12))})`,
@@ -127,12 +150,12 @@ export const SqlScene: React.FC = () => {
           ?
         </div>
       ) : null}
-      <Tick x={LANE_X1 + 40} y={LANE_B} at={couldAt + 8} out={lanesOut} />
-      <Ink at={couldAt + 10} dur={12} out={lanesOut} style={{ left: LANE_X1 + 72, top: LANE_B - 16, whiteSpace: "nowrap" }}>
+      <Tick x={enoughX + 40} y={LANE_B} at={couldAt + 8} out={lanesOut} />
+      <Ink at={couldAt + 10} dur={12} out={lanesOut} style={{ left: enoughX + 72, top: LANE_B - 16, whiteSpace: "nowrap" }}>
         <span style={{ ...note(23, KEY_INK), fontWeight: 650 }}>It could.</span>
       </Ink>
       <Card
-        x={470}
+        x={LANE_X0}
         top={y(600)}
         width={560}
         height={150}
@@ -152,13 +175,19 @@ export const SqlScene: React.FC = () => {
       </Ink>
       <Ink at={languageAt - 2} dur={22} style={{ left: 96, top: y(380), whiteSpace: "nowrap" }}>
         <div style={{ ...headline(52), color: INK_SOFT }}>
-          {TAKEN.map(([w, k], i) => (
-            <React.Fragment key={w}>
-              {i ? " " : ""}
-              <span style={{ color: frame >= englishAt + i * 4 ? ACCENT_INK : INK }}>{w.slice(0, k)}</span>
-              <span>{w.slice(k)}</span>
-            </React.Fragment>
-          ))}
+          {TAKEN.map(([w, k, kept], i) => {
+            const taken = frame >= englishAt + i * 4 ? ACCENT_INK : INK;
+            return (
+              <React.Fragment key={w}>
+                {i ? " " : ""}
+                <span style={{ color: taken }}>{w.slice(0, kept)}</span>
+                <span style={{ color: lost > 0 ? `color-mix(in srgb, ${INK_SOFT} ${lost * 100}%, ${taken})` : taken }}>
+                  {w.slice(kept, k)}
+                </span>
+                <span>{w.slice(k)}</span>
+              </React.Fragment>
+            );
+          })}
         </div>
       </Ink>
       <div
@@ -197,7 +226,7 @@ export const SqlScene: React.FC = () => {
           );
         })}
       </div>
-      <Ink at={ownedAt - 2} dur={14} out={diedAt - 6} style={{ left: 880, top: y(520), whiteSpace: "nowrap" }}>
+      <Ink at={ownedAt - 2} dur={14} out={sqlAt - 6} style={{ left: 880, top: y(520), whiteSpace: "nowrap" }}>
         <div style={{ transform: "rotate(-5deg)", border: `3px solid ${ACCENT}`, borderRadius: 6, padding: "6px 16px" }}>
           <span style={{ ...label(26, ACCENT_INK) }}>That name is taken</span>
         </div>

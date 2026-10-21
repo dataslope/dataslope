@@ -6,9 +6,9 @@ import { INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ORDER_COLUMNS, ORDER_ROWS, TYPE_HOLDS } from "./data";
+import { ORDER_COLUMNS, ORDER_ROWS, STATUS_COL, TYPE_HOLDS } from "./data";
 import { DbTable, HEAD_H, MARK, Mono, ROW_H, tableGeometry } from "./kit";
-import { Arrow, Drift, Headline, Kicker, RowType } from "./parts";
+import { Arrow, Drift, Headline, Kicker, Mark, RowType } from "./parts";
 
 const S = 1.2;
 const BOX_X = 150;
@@ -36,10 +36,18 @@ export const AttrScene: React.FC = () => {
   const columnAt = n.word("attributes", "a column");
   const domainAt = n.word("domain", "domain");
   const valuesAt = n.word("domain", "values");
+  // Each type's domain, in words, as it is spoken.
+  const holdsAt: Record<string, number> = {
+    integer: n.word("domain", "whole numbers"),
+    date: n.word("domain", "calendar dates"),
+    text: n.word("domain", "any text"),
+  };
   const end = n.beat("domain").to;
 
-  const orders = useEntityLayout({ x: BOX_X, y: y(350), width: BOX_W, name: "orders", columns: ORDER_COLUMNS.map(({ name, key }) => ({ name, key })) });
-  const top = y(364);
+  // No key badge yet: the video names PK when it draws the diagram.
+  const orders = useEntityLayout({ x: BOX_X, y: y(350), width: BOX_W, name: "orders", columns: ORDER_COLUMNS.map(({ name }) => ({ name })) });
+  // The table's top rule level with the box's top, and both labels on one line.
+  const top = orders.top;
   const g = tableGeometry({ x: 0, top: 0, cols: ORDER_ROWS.cols, rows: ORDER_ROWS.rows, headH: h(HEAD_H), rowH: h(ROW_H) });
   const headMid = top + (g.headH / 2) * S;
   const holdsTop = top + g.bottom(ORDER_ROWS.rows.length) * S + 40;
@@ -51,7 +59,7 @@ export const AttrScene: React.FC = () => {
       <Sfx name="el-tap" at={rowAt.total_cents} level={-30} />
       <Sfx name="el-tap" at={rowAt.placed_on} level={-30} />
       <Sfx name="el-pencil" at={columnAt - 6} level={-34} />
-      <Sfx name="el-sprinkle" at={valuesAt} level={-35} />
+      <Sfx name="el-sprinkle" at={holdsAt.integer + 2} level={-35} />
 
       <Drift from={valuesAt + 10} to={end + 70} scale={0.02} origin={[900, 560]}>
         <Kicker at={from - 10}>Attributes and domains</Kicker>
@@ -68,7 +76,7 @@ export const AttrScene: React.FC = () => {
         ))}
 
         <Arrow from={[orders.right + 22, headMid]} to={[TABLE_X - 26, headMid]} at={columnAt - 8} dur={14} color={INK_SOFT} />
-        <Ink at={columnAt - 6} dur={14} style={{ left: TABLE_X, top: top - 46, whiteSpace: "nowrap" }}>
+        <Ink at={columnAt - 6} dur={14} style={{ left: TABLE_X, top: orders.top - 46, whiteSpace: "nowrap" }}>
           <span style={label(22, INK_SOFT)}>The table, a column each</span>
         </Ink>
         <div style={{ position: "absolute", left: TABLE_X, top, transform: `scale(${S})`, transformOrigin: "0 0" }}>
@@ -78,23 +86,30 @@ export const AttrScene: React.FC = () => {
             rows={ORDER_ROWS.rows.map((cells, i) => ({ cells, at: columnAt + 6 + i * 5 }))}
             at={columnAt - 4}
             numeric={[0, 2]}
-            marks={ORDER_ROWS.cols.flatMap((_, j) =>
-              ORDER_ROWS.rows.map((__, i) => ({ row: i, col: j, at: valuesAt + j * 5 + i * 2, color: MARK })),
-            )}
+            // Only status is marked: "any text at all" is what the next scene tries.
+            marks={ORDER_ROWS.rows.map((_, i) => ({ row: i, col: STATUS_COL, at: holdsAt.text + 4 + i * 3, color: MARK }))}
           />
         </div>
 
-        {/* "The values it's allowed to hold": each column's domain, in words. */}
-        {ORDER_COLUMNS.map((c, i) => (
-          <Note key={c.name} at={valuesAt + 2 + i * 6} x={TABLE_X} y={holdsTop + i * 42}>
-            <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", display: "flex", gap: 14 }}>
-              <span style={{ width: 170, color: INK }}>
-                <Mono weight={500}>{c.name}</Mono>
+        {/* "The values it's allowed to hold": each column's domain, in words,
+            arriving as its type's is spoken (both integers together). */}
+        {ORDER_COLUMNS.map((c, i) => {
+          const sameType = ORDER_COLUMNS.slice(0, i).filter((d) => d.type === c.type).length;
+          const at = (holdsAt[c.type] ?? valuesAt) + 2 + sameType * 6;
+          const holds = TYPE_HOLDS[c.type] ?? c.type;
+          return (
+            <Note key={c.name} at={at} x={TABLE_X} y={holdsTop + i * 42}>
+              <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", display: "flex", gap: 14 }}>
+                <span style={{ width: 170, color: INK }}>
+                  <Mono weight={500}>{c.name}</Mono>
+                </span>
+                <span>
+                  holds {c.name === ORDER_ROWS.cols[STATUS_COL] ? <Mark at={at + 4}>{holds}</Mark> : holds}
+                </span>
               </span>
-              holds {TYPE_HOLDS[c.type] ?? c.type}
-            </span>
-          </Note>
-        ))}
+            </Note>
+          );
+        })}
       </Drift>
     </AbsoluteFill>
   );

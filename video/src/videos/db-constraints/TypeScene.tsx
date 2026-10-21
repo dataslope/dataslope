@@ -19,7 +19,6 @@ import {
   MARK_BAD,
   pulse,
   ROW_H,
-  Spot,
   Strike,
   Svg,
   TABLE_X,
@@ -83,8 +82,11 @@ export const TypeScene: React.FC = () => {
   const lineIn = ease(frame, bigAt - 10, 16);
   const lineDim = 1 - ease(frame, moneyAt, 14) * 0.55;
   const ticks = Array.from({ length: HI - LO + 1 }, (_, i) => LO + i);
-  const big = pulse(frame, bigAt, 24);
-  const small = pulse(frame, smallAt, 24);
+  // "Too big" and "too small" point past the ends, where integer goes on
+  // (to about 2.1 billion either way): each "…" swells on its word, in ink,
+  // since nothing out there is refused here.
+  const big = pulse(frame, bigAt, 26);
+  const small = pulse(frame, smallAt, 26);
   // "many" lifts off above the line: it has no place on it.
   const manyIn = ease(frame, numberAt - 8, 14);
 
@@ -94,7 +96,6 @@ export const TypeScene: React.FC = () => {
       <Sfx name="el-tap" at={sendsAt} level={-28} />
       <Sfx name="el-scratch" at={refusedAt + 2} level={-30} />
       <Sfx name="el-pencil" at={bigAt - 10} level={-34} />
-      <Sfx name="el-pop" at={moneyAt - 2} level={-30} />
 
       <Kicker at={open - 10}>The first constraint</Kicker>
       <Head lead="Every column has a type." at={open - 6} turn="That's a rule." turnAt={integerAt} />
@@ -153,10 +154,9 @@ export const TypeScene: React.FC = () => {
           {ticks.map((v, i) => {
             const t = ease(frame, bigAt - 8 + i * 1.5, 8);
             const swell = pulse(frame, existAt + i * 2, 16);
-            const end = v === HI ? big : v === LO ? small : 0;
             return (
               <g key={v} opacity={t}>
-                <circle cx={sxi(v)} cy={lineY} r={6 + swell * 4 + end * 5} fill={end > 0.02 ? ACCENT : INK} />
+                <circle cx={sxi(v)} cy={lineY} r={6 + swell * 4} fill={INK} />
                 <text
                   x={sxi(v)}
                   y={lineY + 40}
@@ -170,24 +170,27 @@ export const TypeScene: React.FC = () => {
             );
           })}
           {/* ...and on past both ends. */}
-          {[-1, 1].map((s) => (
-            <text
-              key={s}
-              x={s < 0 ? LINE_X0 - 56 : LINE_X1 + 40}
-              y={lineY + 8}
-              textAnchor="middle"
-              style={note(26, INK_SOFT)}
-              fill={INK_SOFT}
-              opacity={ease(frame, bigAt + 4, 10)}
-            >
-              …
-            </text>
-          ))}
+          {[-1, 1].map((s) => {
+            const k = s < 0 ? small : big;
+            return (
+              <text
+                key={s}
+                x={s < 0 ? LINE_X0 - 56 : LINE_X1 + 40}
+                y={lineY + 8}
+                textAnchor="middle"
+                style={{ ...note(26 + k * 16, k > 0.05 ? INK : INK_SOFT), fontWeight: 500 + Math.round(k * 200) }}
+                fill={k > 0.05 ? INK : INK_SOFT}
+                opacity={ease(frame, bigAt - 8, 10)}
+              >
+                …
+              </text>
+            );
+          })}
         </Svg>
       ) : null}
       <Note at={valuesAt} x={LINE_X0 - 30} y={lineY + 64} from="up" dim={moneyAt}>
         <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-          <span style={{ fontFamily: MONO, fontWeight: 600 }}>integer</span>: every whole number, and nothing else
+          <span style={{ fontFamily: MONO, fontWeight: 600 }}>integer</span>: whole numbers only (about ±2.1 billion)
         </span>
       </Note>
       {manyIn > 0 ? (
@@ -205,9 +208,9 @@ export const TypeScene: React.FC = () => {
         </Ink>
       ) : null}
 
-      <Spot id="db-constraints-coins" at={moneyAt - 2} left={140} top={y(680)} width={290} height={290} />
-      <Note at={thinkAt - 6} x={450} y={y(820)}>
-        <span style={{ ...note(24, INK), fontStyle: "italic", whiteSpace: "nowrap" }}>And for money?</span>
+      {/* The coins wait for the money scene, so they never jump sides at the cut. */}
+      <Note at={thinkAt - 6} x={X0} y={y(760)}>
+        <span style={{ ...note(28, INK), fontStyle: "italic", whiteSpace: "nowrap" }}>And for money?</span>
       </Note>
     </AbsoluteFill>
   );

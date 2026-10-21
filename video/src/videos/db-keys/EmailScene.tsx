@@ -98,7 +98,7 @@ export const EmailScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: the tables, the refusal, the swap, the update going through ── */}
-      <Sfx name="el-whoosh" at={keyAt - 6} level={-34} />
+      <Sfx name="el-whoosh" at={from} level={-34} />
       <Sfx name="el-pencil" at={orderAt} level={-34} />
       <Sfx name="el-tap" at={refusesAt} level={-28} />
       <Sfx name="el-whoosh" at={swapAt + 4} level={-34} />
@@ -112,24 +112,25 @@ export const EmailScene: React.FC = () => {
         <Ink at={keyAt - 6} dur={12} out={swapAt} style={{ left: X0, top: y(300), whiteSpace: "nowrap" }}>
           <span style={label(26, INK_SOFT)}>Email as the key</span>
         </Ink>
-        <TableName g={natUsers} at={keyAt - 6} out={swapAt}>
+        {/* The two empty tables open the scene; the rows come with "email the key". */}
+        <TableName g={natUsers} at={from} out={swapAt}>
           users
         </TableName>
         <DataTable
           g={natUsers}
           cols={natUserCols}
-          at={keyAt - 6}
+          at={from}
           rows={[{ cells: NATURAL.users.rows[0], at: keyAt }]}
           marks={[{ row: 0, col: 0, at: oldAt - 4, color: MARK }]}
           out={swapAt}
         />
-        <TableName g={natOrders} at={keyAt + 4} out={swapAt}>
+        <TableName g={natOrders} at={from + 6} out={swapAt}>
           orders
         </TableName>
         <DataTable
           g={natOrders}
           cols={natOrderCols}
-          at={keyAt + 4}
+          at={from + 6}
           rows={[{ cells: NATURAL.orders.rows[0], at: keyAt + 10 }]}
           marks={[{ row: 0, col: 1, at: orderAt, color: MARK_KEY }]}
           out={swapAt}
@@ -144,6 +145,9 @@ export const EmailScene: React.FC = () => {
           message={NATURAL.change.message}
           detail={NATURAL.change.detail}
           mark={{ text: NATURAL.change.detail.slice(NATURAL.change.detail.indexOf("is still")), at: orderAt + 4 }}
+          // The message names a foreign key constraint, a term Part 3 teaches:
+          // set back, so the DETAIL line carries the point.
+          quiet
           out={swapAt}
         />
 

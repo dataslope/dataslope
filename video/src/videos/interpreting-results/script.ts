@@ -48,14 +48,20 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     0.284, 0.298, "settles near zero point three".
  *   - effect-sizes, risk difference and relative risk: 90 and 126 of 3,000,
  *     3.0% and 4.2%, "forty percent more" and "one point two percentage
- *     points"; the bootstrap block (seed 11): d = 0.364, 95% CI 0.101 to
- *     0.619, "zero point three six, from zero point one to zero point six";
- *     the reporting trio is the callout "The reporting standard to adopt".
+ *     points". Its interval is the one ab-testing.mdx computes for a
+ *     conversion test, from the unpooled standard error: +0.26 to +2.14
+ *     points, "zero point three to two point one"; its pooled z-test gives p
+ *     = 0.013. (effect-sizes' own interval block, d = 0.364 with seed 11, is
+ *     a different experiment, and under these bars it read as the button's
+ *     effect size.) The reporting trio is the callout "The reporting
+ *     standard to adopt".
  *   - statistical-fallacies, "Simpson's paradox": Berkeley 1973 is the
- *     lesson's real case; the numbers are its code block's two departments:
+ *     lesson's real case (six large departments, women ahead in four); the
+ *     numbers on screen are its code block's two made-up departments, and
+ *     the narration and the figure both say so:
  *     men 360 of 600 and 25 of 100, women 65 of 100 and 165 of 600; easy
- *     65% to 60%, hard 27.5% to 25%; pooled 55.0% and 32.9%, "fifty-five"
- *     and "thirty-three".
+ *     65% to 60%, hard 27.5% to 25%, so the hard one turns "about three in four
+ *     away"; pooled 55.0% and 32.9%, "fifty-five" and "thirty-three".
  *   - statistical-fallacies, "Confounding" and the simpsons-paradox-trend
  *     chart (seed 9021): 104 people in four age bands; the pooled line rises
  *     8.9 mmHg per weekly hour, "about nine points"; the line fitted to each
@@ -66,7 +72,8 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     salespeople, skill Normal(100, 10) plus monthly luck Normal(0, 15);
  *     the top tenth 131.7 then 112.9, "a hundred and thirty-two" and "a
  *     hundred and thirteen"; the bottom tenth 69.7 then 94.6; the coaching
- *     program and the control group are the lesson's own.
+ *     program, the control group and the name "regression to the mean" are
+ *     the lesson's own.
  *   - statistical-fallacies, cherry-picked-window (seed 2800): 120 months,
  *     no net change; the steepest four months rise 25%. The Texas
  *     sharpshooter is the lesson's; the shots on screen are a seeded layout,
@@ -76,9 +83,14 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     or more, 107 people, correlation -0.56; "among our customers" is the
  *     lesson's list of phrases.
  *   - statistical-fallacies, ecological-fallacy: six districts, means
- *     correlating at 0.93; within a district, 0.07 on average.
+ *     correlating at 0.93; within a district, 0.07 on average; "an older
+ *     district can be richer and vote more" is the lesson's reason the two
+ *     differ.
  *   - The close is the callout "The thread connecting half of these": the
- *     analysis was shaped by the data instead of decided in advance.
+ *     analysis was shaped by the data instead of decided in advance. It
+ *     names five traps, three of them in this video, hence "three of these
+ *     traps"; the cure is "decide first, then look, then confirm on fresh
+ *     data".
  *
  * Written for the ear: short spoken sentences, no symbols or parentheses,
  * numbers as words, contractions, an ellipsis where a speaker would hold, and
@@ -90,7 +102,7 @@ export const script: NarrationScript = {
   // The series intro plays first; its lead-in lives in editorial/intro.ts.
   leadIn: INTRO_LEAD_IN,
   minPause: COURSE_MIN_PAUSE,
-  tail: 2.2,
+  tail: 3.0,
   // One take per part: Part 1 runs a little over the default 1,800, and each
   // later part starts its own take (`take: true`).
   takeChars: 2200,
@@ -150,7 +162,8 @@ export const script: NarrationScript = {
       id: "sweep",
       scene: true,
       text: "Here the true effect is fixed at zero point three. Now grow the sample, from twenty per group to fifty thousand.",
-      pauseAfter: 0.35,
+      // The five sample sizes are read across this beat and its pause.
+      pauseAfter: 0.9,
     },
     {
       id: "plunge",
@@ -173,8 +186,8 @@ export const script: NarrationScript = {
     { id: "both", text: "The first sounds bigger. Report both, so a reader can judge.", pauseAfter: 0.4 },
     {
       id: "interval",
-      text: "And give every effect size an interval. Here, a d of zero point three six, plausibly anywhere from zero point one to zero point six.",
-      pauseAfter: 0.35,
+      text: "And give every effect size an interval. Here, that lift of one point two points is plausibly anywhere from zero point three to two point one.",
+      pauseAfter: 0.8,
     },
     { id: "trio", text: "How big, how precise, and whether it's there at all. Report all three." },
     { id: "part2-in", text: "But even a well measured effect can mean something other than it seems." },
@@ -184,7 +197,7 @@ export const script: NarrationScript = {
       id: "admit",
       scene: true,
       take: true,
-      text: "Berkeley's nineteen seventy-three graduate admissions are the famous case. Here's the pattern in two departments.",
+      text: "Berkeley's nineteen seventy-three graduate admissions are the famous case. Here's the same pattern, in two made-up departments.",
       pauseAfter: 0.3,
     },
     {
@@ -203,6 +216,11 @@ export const script: NarrationScript = {
       id: "mix",
       text: "Six hundred of the seven hundred women applied to the hard one. Six hundred of the men, to the easy one.",
       pauseAfter: 0.4,
+    },
+    {
+      id: "drag",
+      text: "The hard one turns about three in four away, so it drags the women's total down.",
+      pauseAfter: 0.8,
     },
     {
       id: "name",
@@ -252,6 +270,11 @@ export const script: NarrationScript = {
       pauseAfter: 0.45,
     },
     {
+      id: "rtm-name",
+      text: "That's regression to the mean: both groups slid back toward the average.",
+      pauseAfter: 0.8,
+    },
+    {
       id: "coach",
       text: "Coach that bottom group, and they'd improve anyway... and the coaching would get the credit.",
       pauseAfter: 0.35,
@@ -272,7 +295,8 @@ export const script: NarrationScript = {
       text: "But ten years always hold a steep stretch. These four months rose twenty-five percent.",
       pauseAfter: 0.35,
     },
-    { id: "crop", text: "Show just those months, and every number is real... and the story is false." },
+    // The scene's caption is read in the pause before the cut.
+    { id: "crop", text: "Show just those months, and every number is real... and the story is false.", pauseAfter: 2.2 },
     {
       id: "sharp",
       scene: true,
@@ -287,7 +311,7 @@ export const script: NarrationScript = {
       text: "Selection can manufacture a relationship, too. In this population, ability and interview score are unrelated.",
       pauseAfter: 0.3,
     },
-    { id: "rule", text: "Now admit anyone whose two scores add up past a bar.", pauseAfter: 0.3 },
+    { id: "rule", text: "Now admit anyone whose two scores add up past a bar.", pauseAfter: 0.8 },
     {
       id: "inside",
       text: "Among the hundred and seven who get in, the correlation is minus zero point five six.",
@@ -305,15 +329,21 @@ export const script: NarrationScript = {
     },
     { id: "people", text: "But inside a district, person by person, the correlation averages zero point zero seven.", pauseAfter: 0.35 },
     {
+      id: "older",
+      text: "An older district can be richer and vote more, without its richer people voting much more than the rest.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "both-true",
       text: "Both are true. One is about districts, the other about people. Name the unit before you quote a correlation.",
     },
     {
       id: "close",
       scene: true,
-      text: "Most of these traps share one flaw. The analysis was shaped by the data, instead of decided in advance.",
+      text: "Three of these traps share one flaw. The analysis was shaped by the data, instead of decided in advance.",
       pauseAfter: 0.7,
     },
     { id: "next", text: "The cure is the same each time... decide what you'll test, before you look." },
+    { id: "confirm", text: "Then confirm what you find, on fresh data." },
   ],
 };

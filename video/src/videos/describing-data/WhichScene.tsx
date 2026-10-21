@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
 import { fmt, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { Ink, NextLine } from "../../editorial/ui";
+import { FigLabel, Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BINS } from "./data";
@@ -12,9 +12,12 @@ import { Bracket, DATA, Drift, lerp, Mark, Pulse, SOFT_FILL, STAT, STAT_INK, Svg
 
 const W = 680;
 const COL = [160, 1060] as const;
-const ROW1_BASE = 540;
+const ROW1_BASE = 586;
 const ROW1_H = 150;
-const ROW2_MID = 735;
+const ROW2_MID = 781;
+/** Each row's panel titles, under the figure label. */
+const ROW1_TITLE = 376;
+const ROW2_TITLE = 646;
 const BOX_H = 56;
 const VIOLIN_H = 62;
 
@@ -70,7 +73,8 @@ export const WhichScene: React.FC = () => {
   const coarse = BINS.sets["20"];
   const fine = BINS.sets["80"];
   const histUnit = h(ROW1_H) / Math.max(...fine.density);
-  const histIn = (i: number) => ease(frame, histAt - 4 + i * 0.3, 12);
+  // The histogram rises as the scene opens, so it never opens on an empty page.
+  const histIn = (i: number) => ease(frame, plotsFrom + 10 + i * 0.3, 12);
 
   // ── ECDF ──
   const es = scaleAt(COL[1]);
@@ -137,10 +141,11 @@ export const WhichScene: React.FC = () => {
       </div>
 
       <div style={{ position: "absolute", inset: 0, opacity: fade }}>
+        <FigLabel n="13" title="The same thousand values, four ways" at={plotsFrom + 4} x={160} y={y(330)} out={evenAt + 6} />
         <Drift from={plotsFrom} to={meansAt + 40} scale={0.02} origin={[960, y(640)]}>
 
           <div style={{ position: "absolute", inset: 0, opacity: clear(0) }}>
-            {panel(COL[0], y(330), "Histogram", "the shape of one variable", shapeOfAt)}
+            {panel(COL[0], y(ROW1_TITLE), "Histogram", "the shape of one variable", shapeOfAt)}
           {/* Histogram. */}
           <Svg>
             {Array.from({ length: 80 }, (_, i) => {
@@ -152,13 +157,13 @@ export const WhichScene: React.FC = () => {
             {Array.from({ length: 19 }, (_, j) => (
               <rect key={j} x={hs.x0 + ((j + 1) * W) / 20 - 1} y={base1 - h(ROW1_H) - 4} width={2} height={h(ROW1_H) + 4} fill={PAPER} opacity={1 - flick} />
             ))}
-            <line x1={hs.x0} x2={hs.x1} y1={base1 + 0.5} y2={base1 + 0.5} stroke={INK} strokeWidth={1.5} opacity={ease(frame, histAt - 6, 12)} />
+            <line x1={hs.x0} x2={hs.x1} y1={base1 + 0.5} y2={base1 + 0.5} stroke={INK} strokeWidth={1.5} opacity={ease(frame, plotsFrom + 6, 12)} />
           </Svg>
 
           </div>
 
           <div style={{ position: "absolute", inset: 0, opacity: clear(1) }}>
-            {panel(COL[1], y(330), "ECDF", "percentiles, with nothing to tune", percentilesAt)}
+            {panel(COL[1], y(ROW1_TITLE), "ECDF", "empirical cumulative distribution", percentilesAt)}
           {/* ECDF, and one percentile read off it. */}
           <Svg opacity={ease(frame, ecdfAt - 6, 10)}>
             <line x1={es.x0} x2={es.x1} y1={base1 + 0.5} y2={base1 + 0.5} stroke={INK} strokeWidth={1.5} />
@@ -187,7 +192,7 @@ export const WhichScene: React.FC = () => {
           </div>
 
           <div style={{ position: "absolute", inset: 0, opacity: clear(2) }}>
-            {panel(COL[0], y(600), "Box plot", "groups side by side", boxAt)}
+            {panel(COL[0], y(ROW2_TITLE), "Box plot", "a five-number summary", boxAt)}
           {/* Box plot. */}
           {box > 0 ? (
             <Svg opacity={box}>
@@ -217,7 +222,7 @@ export const WhichScene: React.FC = () => {
           </div>
 
           <div style={{ position: "absolute", inset: 0, opacity: clear(3) }}>
-            {panel(COL[1], y(600), "Violin", "the shape a box leaves out", violinAt)}
+            {panel(COL[1], y(ROW2_TITLE), "Violin", "the shape a box leaves out", violinAt)}
           {/* Violin. */}
           <Svg opacity={ease(frame, violinAt - 6, 10)}>
             <path d={`${upper} ${lower} Z`} fill={SOFT_FILL} opacity={violinDraw} />
@@ -247,7 +252,7 @@ export const WhichScene: React.FC = () => {
         </Drift>
       </div>
 
-      <NextLine at={startingAt - 2} x={160} y={y(850)} width={1000}>
+      <NextLine at={startingAt - 2} x={160} y={y(878)} width={1000}>
         <Mark at={whatAt}>what a probability means</Mark>.
       </NextLine>
     </AbsoluteFill>

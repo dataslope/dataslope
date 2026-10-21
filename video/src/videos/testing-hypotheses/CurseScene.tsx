@@ -41,7 +41,6 @@ export const CurseScene: React.FC = () => {
   const onlyAt = n.word("inflate", "Only");
   const noiseAt = n.word("inflate", "noise");
   const tFrom = n.beat("t-in").from;
-  const throughAt = n.word("inflate", "through");
   const everyAt = n.word("t-in", "t-test");
 
   const bh = (c: number) => h(TALL) * (c / MAX);
@@ -67,7 +66,7 @@ export const CurseScene: React.FC = () => {
 
       <div style={{ position: "absolute", inset: 0, opacity: outDim }}>
         <Drift from={twelveAt} to={n.beat("t-in").to + 30} scale={0.02} origin="40% 80%">
-          <FigLabel n="15" title={`${fmt(CURSE.runs, 0)} estimates of one real effect`} at={curseFrom} x={160} y={y(290)} />
+          <FigLabel n="16" title={`${fmt(CURSE.runs, 0)} estimates of one real effect`} at={curseFrom} x={160} y={y(290)} />
           <Ink at={fifteenAt - 4} dur={14} style={{ left: 160, top: y(290) + 40, whiteSpace: "nowrap" }}>
             <Label size={21} color={INK_SOFT} weight={520}>
               true effect {CURSE.effect}, {CURSE.n} per group, the estimate from each run
@@ -136,9 +135,15 @@ export const CurseScene: React.FC = () => {
               in red, the runs that reached it
             </Label>
           </Note>
-          <Note at={throughAt - 6} x={X.x0} y={y(BASE) - h(240)}>
+          {/* At the left shoulder of the pale bars it names, on "Only". */}
+          <Note at={onlyAt + 2} x={sx(X, -0.35)} y={y(BASE) - h(200)} align="right">
             <Label size={22} color={INK_SOFT} style={halo}>
               the rest never got through
+            </Label>
+          </Note>
+          <Note at={curseFrom + 8} x={X.x1} y={y(BASE) + 40} align="right">
+            <Label size={21} color={INK_SOFT} weight={520}>
+              estimated effect (SD)
             </Label>
           </Note>
         </Drift>

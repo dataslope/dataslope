@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { fmt, halo, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { fmt, halo, HAIRLINE, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -18,8 +18,12 @@ const TOP = 360;
 const BOTTOM = 820;
 const N_TICKS = [10, 100, 1000, 10000, 100000];
 const nx = (p: { x0: number; x1: number }, n: number) => p.x0 + ((Math.log10(n) - 1) / 4) * (p.x1 - p.x0);
-/** The p-value axis runs from 1 at the top down to 10⁻⁵⁰. */
+/** The p-value axis runs from 1 at the top down to 10⁻⁵⁰, with its first two
+ *  decades (1 to 0.01) stretched to this many px, so the two p-values above
+ *  0.05 sit visibly above that line instead of on it. */
 const P_DECADES = 50;
+const P_BAND = 120;
+const P_TICKS = [0, 2, 10, 20, 30, 40, 50];
 const D_MAX = 0.6;
 
 const SUP: Record<string, string> = { "-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
@@ -41,7 +45,7 @@ const pLabel = (p: number) => {
 export const SweepScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
-  const { y } = useLayout();
+  const { y, h } = useLayout();
   const from = n.beat("sweep").from;
 
   // ── Cues ──
@@ -67,10 +71,13 @@ export const SweepScene: React.FC = () => {
 
   const top = y(TOP);
   const bottom = y(BOTTOM);
-  const pY = (p: number) => (p <= 0 ? bottom + 70 : lerp(top, bottom, -Math.log10(p) / P_DECADES));
+  const band = h(P_BAND);
+  const decadeY = (e: number) => (e <= 2 ? top + (e / 2) * band : lerp(top + band, bottom, (e - 2) / (P_DECADES - 2)));
+  const pY = (p: number) => (p <= 0 ? bottom + 70 : decadeY(-Math.log10(p)));
   const dY = (d: number) => lerp(bottom, top, d / D_MAX);
-  // Each sample size arrives on its own beat of the sweep.
-  const rowAt = (i: number) => (i === 0 ? twentyAt - 2 : lerp(twentyAt + 10, fiftyAt + 2, (i - 1) / (SWEEP.rows.length - 2)));
+  // Each sample size arrives on its own beat of the sweep, the last ones in
+  // the pause after it.
+  const rowAt = (i: number) => (i === 0 ? twentyAt - 2 : lerp(twentyAt + 12, fiftyAt + 16, (i - 1) / (SWEEP.rows.length - 2)));
   const pLine = ease(frame, plungesAt - 4, 34);
   const dLine = ease(frame, dAt - 4, 26);
   const P = PANELS[0];
@@ -126,8 +133,8 @@ export const SweepScene: React.FC = () => {
               ))}
             </g>
           ))}
-          {[0, 10, 20, 30, 40, 50].map((e) => (
-            <line key={e} x1={P.x0} x2={P.x1} y1={lerp(top, bottom, e / P_DECADES)} y2={lerp(top, bottom, e / P_DECADES)} stroke={HAIRLINE} strokeWidth={1} opacity={0.35} />
+          {P_TICKS.map((e) => (
+            <line key={e} x1={P.x0} x2={P.x1} y1={decadeY(e)} y2={decadeY(e)} stroke={HAIRLINE} strokeWidth={1} opacity={0.35} />
           ))}
           {[0, 0.2, 0.4, 0.6].map((v) => (
             <line key={v} x1={D.x0} x2={D.x1} y1={dY(v)} y2={dY(v)} stroke={HAIRLINE} strokeWidth={1} opacity={0.35} />
@@ -157,13 +164,13 @@ export const SweepScene: React.FC = () => {
             </span>
           </Note>
         ))}
-        {[0, 10, 20, 30, 40, 50].map((e) => (
+        {P_TICKS.map((e) => (
           <div
             key={e}
             style={{
               position: "absolute",
               right: 1920 - P.x0 + 12,
-              top: lerp(top, bottom, e / P_DECADES) - 13,
+              top: decadeY(e) - 13,
               opacity: ease(frame, from, 12),
               ...note(20, INK_SOFT),
               whiteSpace: "nowrap",
@@ -181,6 +188,7 @@ export const SweepScene: React.FC = () => {
               top: dY(v) - 13,
               opacity: ease(frame, from, 12),
               ...note(20, INK_SOFT),
+              ...TABULAR,
             }}
           >
             {fmt(v, 1)}
@@ -192,8 +200,11 @@ export const SweepScene: React.FC = () => {
         <Note at={fixedAt} x={D.x1} y={dY(SWEEP.trueD) - 40} align="right">
           <span style={{ ...note(21, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>the true effect, {fmt(SWEEP.trueD, 1)}</span>
         </Note>
-        {/* p = 0.05, on the p panel: just under the top. */}
+        {/* p = 0.05, on the p panel, in the stretched top band. */}
         <Dashed x0={P.x0} y0={pY(0.05)} x1={P.x1} y1={pY(0.05)} at={growAt} dur={14} color={INK_SOFT} width={1.4} dash="4 4" />
+        <Note at={growAt + 6} x={P.x1} y={pY(0.05) - 30} align="right">
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap", ...halo }}>p = 0.05</span>
+        </Note>
 
         {/* Each sample size arrives as a guide down both panels. */}
         <Svg>
@@ -215,10 +226,11 @@ export const SweepScene: React.FC = () => {
             ));
           })}
         </Svg>
+        {/* Each guide keeps its sample size at its top. */}
         {SWEEP.rows.map((r, i) => (
-          <Note key={r.n} at={rowAt(i)} x={nx(D, r.n)} y={top - 4} from="up" out={i < SWEEP.rows.length - 1 ? rowAt(i + 1) : plungesAt - 4}>
-            <span style={{ ...note(30, INK), fontWeight: 700, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
-              n = {r.n.toLocaleString("en-US")}
+          <Note key={r.n} at={rowAt(i)} x={nx(D, r.n)} y={top + 6} from="up">
+            <span style={{ ...note(22, INK), ...TABULAR, fontWeight: 650, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
+              {r.n.toLocaleString("en-US")}
             </span>
           </Note>
         ))}
@@ -268,7 +280,7 @@ export const SweepScene: React.FC = () => {
         <Ring x={finalP[0]} y={bottom - 6} at={zeroAt + 4} r1={44} />
         <Dashed x0={D.x0} y0={dY(SWEEP.trueD)} x1={D.x1} y1={dY(SWEEP.trueD)} at={threeAt - 4} dur={16} width={4.4} color={DATA} />
         <Note at={pWorldAt - 2} x={P.x0 + 24} y={bottom - 50}>
-          <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>moves with n</span>
+          <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>moves with sample size</span>
         </Note>
         <Note at={sizeAt - 2} x={D.x0 + 24} y={dY(0.08)}>
           <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>stays put</span>

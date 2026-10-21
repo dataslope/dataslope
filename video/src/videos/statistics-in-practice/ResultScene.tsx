@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { BAR, fmt, halo, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { BAR, fmt, halo, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -22,6 +22,8 @@ export const LIFT_BASE = 852;
 export const LIFT_ROW = 800;
 const CARD_X = 1390;
 const CARD_Y = [352, 478, 578, 678];
+/** Where the last row ends: as deep as the first, since both carry a gloss. */
+const CARD_END = 804;
 
 const pp = (v: number) => v * 100;
 const num = (v: number) => Math.round(v).toLocaleString("en-US");
@@ -110,10 +112,12 @@ export const ResultScene: React.FC = () => {
   ] as const;
 
   const CARD = [
-    { name: "Lift", value: `+${fmt(lift)} points`, extra: `+${Math.round(EXPERIMENT.relLift * 100)}% relative`, at: liftAt, mark: theLiftAt },
-    { name: "95% interval", value: `${fmt(pp(EXPERIMENT.ciLow))} to ${fmt(pp(EXPERIMENT.ciHigh))} points`, extra: "", at: oneAt, mark: itsIntervalAt },
-    { name: "p-value", value: fmt(EXPERIMENT.p, 4), extra: "", at: pAt, mark: thePAt },
-    { name: "Effect size", value: `Cohen's h = ${fmt(EXPERIMENT.h)}`, extra: "", at: effectAt - 6, mark: effectAt },
+    { name: "Lift", value: `+${fmt(lift)} points`, extra: `+${Math.round(EXPERIMENT.relLift * 100)}% relative`, extraAt: fifthAt - 4, at: liftAt, mark: theLiftAt },
+    { name: "95% interval", value: `${fmt(pp(EXPERIMENT.ciLow))} to ${fmt(pp(EXPERIMENT.ciHigh))} points`, extra: "", extraAt: 0, at: oneAt, mark: itsIntervalAt },
+    { name: "p-value", value: fmt(EXPERIMENT.p, 4), extra: "", extraAt: 0, at: pAt, mark: thePAt },
+    // Cohen's h is Unit 8's d for two rates; by the scale that unit gave (0.2
+    // small), 0.07 is very small, however much "a fifth more sales" sounds.
+    { name: "Effect size", value: `Cohen's h = ${fmt(EXPERIMENT.h)}`, extra: "like d, for rates: under 0.2, very small", extraAt: effectAt + 8, at: effectAt - 6, mark: effectAt },
   ];
 
   return (
@@ -141,7 +145,7 @@ export const ResultScene: React.FC = () => {
             </span>
           </Ink>
           <Ink at={a.at - 4} dur={12} style={{ left: a.x, top: top + gridH + 50, whiteSpace: "nowrap" }}>
-            <span style={{ ...note(28, INK), fontWeight: 700 }}>
+            <span style={{ ...note(28, INK), ...TABULAR, fontWeight: 700 }}>
               <Count to={a.k} at={a.at - 4} dur={26} format={num} />
             </span>
             <span style={{ ...note(22, INK_SOFT), marginLeft: 10 }}>of {num(EXPERIMENT.n)} bought</span>
@@ -262,7 +266,7 @@ export const ResultScene: React.FC = () => {
           const off = ease(frame, c.mark + 20, 14);
           if (p <= 0 || off >= 1) return null;
           const top = y(CARD_Y[i]) - 10;
-          const bottom = y((CARD_Y[i + 1] ?? CARD_Y[i] + 100) - 14);
+          const bottom = y((CARD_Y[i + 1] ?? CARD_END) - 14);
           return (
             <rect key={c.name} x={CARD_X - 14} y={top} width={428 * p} height={bottom - top} rx={8} fill={HIGHLIGHT} opacity={0.9 * (1 - off * 0.75)} />
           );
@@ -277,22 +281,22 @@ export const ResultScene: React.FC = () => {
             <span style={{ ...note(28, i === 2 ? INK : STAT_INK), fontWeight: 700 }}>{c.value}</span>
           </Ink>
           {c.extra ? (
-            <Ink at={fifthAt - 4} dur={14} style={{ left: CARD_X, top: y(CARD_Y[i]) + 72, whiteSpace: "nowrap" }}>
+            <Ink at={c.extraAt} dur={14} style={{ left: CARD_X, top: y(CARD_Y[i]) + 72, whiteSpace: "nowrap" }}>
               <span style={{ ...note(21, INK_SOFT) }}>{c.extra}</span>
             </Ink>
           ) : null}
           <Svg opacity={0.5 * ease(frame, c.at + 6, 12)}>
-            <line x1={CARD_X} x2={CARD_X + 400} y1={y((CARD_Y[i + 1] ?? CARD_Y[i] + 100) - 10)} y2={y((CARD_Y[i + 1] ?? CARD_Y[i] + 100) - 10)} stroke={HAIRLINE} strokeWidth={1} />
+            <line x1={CARD_X} x2={CARD_X + 400} y1={y((CARD_Y[i + 1] ?? CARD_END) - 10)} y2={y((CARD_Y[i + 1] ?? CARD_END) - 10)} stroke={HAIRLINE} strokeWidth={1} />
           </Svg>
         </React.Fragment>
       ))}
       <Ink at={tenThousandAt - 2} dur={12} style={{ left: CARD_X + 140, top: y(CARD_Y[2]) + 38, whiteSpace: "nowrap" }}>
         <span style={{ ...note(21, INK_SOFT) }}>three in ten thousand</span>
       </Ink>
-      <Ink at={fourAt - 4} dur={14} out={aloneAt - 8} style={{ left: CARD_X, top: y(CARD_Y[3] + 104), whiteSpace: "nowrap" }}>
+      <Ink at={fourAt - 4} dur={14} out={aloneAt - 8} style={{ left: CARD_X, top: y(CARD_END + 14), whiteSpace: "nowrap" }}>
         <span style={{ ...note(26, INK), fontWeight: 600 }}>Report all four together.</span>
       </Ink>
-      <Ink at={aloneAt - 4} dur={14} style={{ left: CARD_X, top: y(CARD_Y[3] + 104), whiteSpace: "nowrap" }}>
+      <Ink at={aloneAt - 4} dur={14} style={{ left: CARD_X, top: y(CARD_END + 14), whiteSpace: "nowrap" }}>
         <span style={{ ...note(26, STAT_INK), fontWeight: 700 }}>Never the p-value alone.</span>
       </Ink>
     </AbsoluteFill>

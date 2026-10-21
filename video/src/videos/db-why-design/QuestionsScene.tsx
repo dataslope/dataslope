@@ -6,17 +6,20 @@ import { ACCENT_INK, body, HAIRLINE, INK, INK_SOFT, label } from "../../editoria
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Code, Drift, Headline, Kicker, Mark, X0 } from "./parts";
+import { Badge, Code, Drift, Headline, Kicker, Mark, X0 } from "./parts";
 
 const ROW_Y0 = 372;
 const ROW_STEP = 90;
 const Q_X = X0 + 54;
-const R_X = 1210;
+/** What each question decides, then how SQL writes it down, side by side. */
+const R_X = 1050;
+const S_X = 1350;
 
 /**
  * Part 2 opens: what database design is. The lesson's five questions, each
- * with the part of a schema it decides, then the same answers as SQL writes
- * them down; the questions are the design.
+ * with the part of a schema it decides (keys and relationships carry the PK
+ * and FK badges every diagram after this uses), then, beside them, the same
+ * answers as SQL writes them down; the questions are the design.
  */
 export const QuestionsScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -26,6 +29,7 @@ export const QuestionsScene: React.FC = () => {
   // ── Cues ──
   const whatFrom = n.beat("what").from;
   const hardAt = n.word("what", "hard");
+  const questionsAt = n.word("what", "questions");
   const softwareAt = n.word("what", "software");
   const inconsistentlyAt = n.word("what", "inconsistently");
   const writeAt = n.word("sql", "write");
@@ -37,8 +41,22 @@ export const QuestionsScene: React.FC = () => {
   const ROWS = [
     { q: "Which things become tables?", decides: "tables", sql: "CREATE TABLE", at: n.word("questions", "things"), key: n.word("questions", "tables", { nth: 1 }) },
     { q: "Which facts become columns?", decides: "columns", sql: "email text", at: n.word("questions", "facts"), key: n.word("questions", "columns") },
-    { q: "Which rows need an identity?", decides: "keys", sql: "PRIMARY KEY", at: n.word("questions", "rows"), key: n.word("questions", "identity") },
-    { q: "Which tables point to which?", decides: "relationships", sql: "REFERENCES", at: n.word("questions", "tables", { nth: 2 }), key: n.word("questions", "point") },
+    {
+      q: "Which rows need an identity?",
+      decides: "keys",
+      badge: "PK",
+      sql: "PRIMARY KEY",
+      at: n.word("questions", "rows"),
+      key: n.word("questions", "identity"),
+    },
+    {
+      q: "Which tables point to which?",
+      decides: "relationships",
+      badge: "FK",
+      sql: "REFERENCES",
+      at: n.word("questions", "tables", { nth: 2 }),
+      key: n.word("questions", "point"),
+    },
     {
       q: "Which values must be present, unique, or limited?",
       decides: "constraints",
@@ -49,7 +67,8 @@ export const QuestionsScene: React.FC = () => {
   ];
   const rowY = (i: number) => y(ROW_Y0 + i * ROW_STEP);
   const toSql = (i: number) => writeAt - 2 + i * 4;
-  const heads = ease(frame, ROWS[0].at - 10, 12);
+  // The table's frame arrives with "the hard questions", so the page is not bare while they are promised.
+  const heads = ease(frame, questionsAt - 4, 12);
   // The heading turns with the first answer, not before it.
   const sqlHead = ease(frame, writeAt - 2, 12);
 
@@ -76,17 +95,16 @@ export const QuestionsScene: React.FC = () => {
       <Drift from={whatFrom} to={end} amount={0.018} origin="40% 60%">
         {/* Column heads, and a rule under them. */}
         <div style={{ position: "absolute", left: Q_X, top: rowY(0) - 64, opacity: heads, ...label(21, INK_SOFT) }}>The question</div>
-        <div style={{ position: "absolute", left: R_X, top: rowY(0) - 64, opacity: heads * (1 - sqlHead), ...label(21, INK_SOFT) }}>
+        <div style={{ position: "absolute", left: R_X, top: rowY(0) - 64, opacity: heads, ...label(21, INK_SOFT) }}>
           What it decides
         </div>
-        <div style={{ position: "absolute", left: R_X, top: rowY(0) - 64, opacity: sqlHead, ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+        <div style={{ position: "absolute", left: S_X, top: rowY(0) - 64, opacity: sqlHead, ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
           How SQL writes it down
         </div>
         <div style={{ position: "absolute", left: X0, top: rowY(0) - 26, width: 1680 * heads, height: 2, background: INK }} />
 
         {ROWS.map((r, i) => {
-          const gone = ease(frame, toSql(i), 8);
-          const sw = ease(frame, toSql(i) + 6, 12);
+          const sw = ease(frame, toSql(i), 12);
           return (
             <React.Fragment key={r.q}>
               <Ink at={r.at - 6} dur={14} style={{ left: X0, top: rowY(i) + 4, whiteSpace: "nowrap" }}>
@@ -97,14 +115,15 @@ export const QuestionsScene: React.FC = () => {
                   <Mark at={designAt - 4 + i * 4}>{r.q}</Mark>
                 </span>
               </Ink>
-              <Ink at={r.key - 2} dur={14} style={{ left: R_X, top: rowY(i) + 2, whiteSpace: "nowrap", opacity: 1 - gone }}>
+              <Ink at={r.key - 2} dur={14} style={{ left: R_X, top: rowY(i) + 2, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
                 <span style={{ ...label(28, INK), fontWeight: 600 }}>{r.decides}</span>
+                {"badge" in r ? <Badge size={24}>{r.badge}</Badge> : null}
               </Ink>
               {sw > 0 ? (
                 <div
                   style={{
                     position: "absolute",
-                    left: R_X,
+                    left: S_X,
                     top: rowY(i) + 4,
                     opacity: sw * (1 - ease(frame, isntAt, 16) * 0.5),
                     transform: `translateX(${(1 - sw) * 14}px)`,
@@ -128,7 +147,7 @@ export const QuestionsScene: React.FC = () => {
             </React.Fragment>
           );
         })}
-        <Ink at={downAt} dur={16} style={{ left: R_X, top: rowY(5) - 2, whiteSpace: "nowrap" }}>
+        <Ink at={downAt} dur={16} style={{ left: S_X, top: rowY(5) - 2, whiteSpace: "nowrap" }}>
           <span style={{ ...body(30, true), color: INK_SOFT }}>The answers, written down.</span>
         </Ink>
         <Ink at={designAt} dur={16} style={{ left: Q_X, top: rowY(5) - 2, whiteSpace: "nowrap" }}>

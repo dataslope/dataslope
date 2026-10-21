@@ -70,6 +70,9 @@ export const BINOMIAL = {
   atLeast: m.binomial.atLeast,
   /** P(10 or more), the lesson's sf(9). */
   sfAtLeast: m.binomial.sfAtLeast,
+  /** The video's illustration, not the lesson's: the same mean with three
+   *  times the variance, the count if visitors clump. */
+  clumped: m.binomial.clumped as readonly number[],
 };
 
 export const POISSON = {
@@ -87,8 +90,11 @@ export const POISSON = {
   /** Share of the 100,000 simulated hours with each count. */
   simulated: m.poisson.simulated as readonly number[],
   simulatedAtLeast: m.poisson.simulatedAtLeast,
-  /** The first 24 of those hours. */
-  firstHours: m.poisson.firstHours as readonly number[],
+  /** One typical simulated day: 24 of those hours, from hour `dayFrom`. */
+  dayHours: m.poisson.dayHours as readonly number[],
+  dayFrom: m.poisson.dayFrom,
+  /** The video's illustration: mean 3 with three times the variance. */
+  clumped: m.poisson.clumped as readonly number[],
 };
 
 export const GEOMETRIC = {
@@ -169,6 +175,9 @@ export const INCOME = {
 
 export const FIT = {
   n: m.fit.n,
+  /** What the sample was drawn from, so the fit can be checked. */
+  trueLoc: m.fit.trueLoc,
+  trueScale: m.fit.trueScale,
   loc: m.fit.loc,
   scale: m.fit.scale,
   ppf95: m.fit.ppf95,

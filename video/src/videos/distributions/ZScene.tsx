@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
 import { body, fmt, halo, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
@@ -91,13 +91,13 @@ export const ZScene: React.FC = () => {
 
       <Head
         parts={[
-          { text: "A z-score is", at: zFrom - 4 },
+          { text: "A z-score:", at: zFrom - 4 },
           { text: "a position.", at: positionAt - 6, italic: true },
         ]}
       />
       <Ink at={zScoreAt - 2} dur={16} style={{ left: 96, top: y(252), whiteSpace: "nowrap" }}>
         <span style={{ ...body(40, true), color: INK }}>
-          z = (x − μ) / σ
+          z = (score − mean) / SD
           <span style={{ color: ASK_INK, opacity: ease(frame, isTwoAt - 6, 14), marginLeft: "0.4em" }}>
             = ({x} − {mu}) / {sigma} = {fmt(Z.z, 0)}
           </span>
@@ -106,6 +106,7 @@ export const ZScene: React.FC = () => {
 
       <Drift from={zFrom} to={n.beat("skew-in").to + 40}>
         <div style={{ position: "absolute", inset: 0, opacity: 1 - dim }}>
+          <FigLabel n="11" title={`Test scores, mean ${mu}, SD ${sigma}`} at={zFrom} x={160} y={y(326)} />
           {/* The area to the left of 130. */}
           {sweep > 0 ? (
             <Svg>

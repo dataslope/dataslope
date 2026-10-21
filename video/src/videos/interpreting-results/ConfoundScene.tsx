@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { fmt, halo, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { fmt, halo, HAIRLINE, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -13,7 +13,7 @@ const X = { lo: 0, hi: 280, x0: 230, x1: 1150 };
 const Y = { lo: 100, hi: 150 };
 const TOP = 330;
 const BOTTOM = 840;
-const BAND_NAME = ["around 30", "around 45", "around 60", "around 75"];
+const BAND_NAME = ["age around 30", "around 45", "around 60", "around 75"];
 /** The causal sketch: three boxes. */
 const AGE = [1560, 420] as const;
 const EXERCISE = [1395, 690] as const;
@@ -141,7 +141,7 @@ export const ConfoundScene: React.FC = () => {
         {[110, 120, 130, 140, 150].map((v) => (
           <div
             key={v}
-            style={{ position: "absolute", right: 1920 - X.x0 + 12, top: py(v) - 13, opacity: ease(frame, pressureAt, 12), ...note(20, INK_SOFT) }}
+            style={{ position: "absolute", right: 1920 - X.x0 + 12, top: py(v) - 13, opacity: ease(frame, pressureAt, 12), ...note(20, INK_SOFT), ...TABULAR }}
           >
             {v}
           </div>
@@ -173,9 +173,10 @@ export const ConfoundScene: React.FC = () => {
               opacity={1 - pooledDim}
             />
           ) : null}
-          {/* One weekly hour along, and the 8.9 it climbs. */}
+          {/* One weekly hour along, and the 8.9 it climbs: gone once the
+              bands are colored, so it can't read as a fifth fitted line. */}
           {(() => {
-            const t = ease(frame, hourAt - 4, 14) * (1 - pooledDim);
+            const t = ease(frame, hourAt - 4, 14) * (1 - ease(frame, colorAt, 12));
             if (t <= 0) return null;
             const l = CONFOUND.pooled;
             const x0 = 40;
@@ -209,12 +210,12 @@ export const ConfoundScene: React.FC = () => {
             </>
           ) : null}
         </Svg>
-        <Note at={nineAt - 2} x={px(CONFOUND.pooled.x1) - 10} y={py(CONFOUND.pooled.intercept + CONFOUND.pooled.slope * CONFOUND.pooled.x1) - 62} align="right" dim={fallsAt}>
+        <Note at={nineAt - 2} x={px(CONFOUND.pooled.x1) - 10} y={py(CONFOUND.pooled.intercept + CONFOUND.pooled.slope * CONFOUND.pooled.x1) - 80} align="right" dim={fallsAt}>
           <span style={{ ...note(23, STAT_INK), fontWeight: 700, whiteSpace: "nowrap", ...halo }}>
             everyone: +{fmt(CONFOUND.pooledPerHour, 1)} mmHg <Marker at={hourAt - 2}>per weekly hour</Marker>
           </span>
         </Note>
-        <Note at={hourAt + 6} x={px(70)} y={py(CONFOUND.pooled.intercept + CONFOUND.pooled.slope * 40) + 8} from="up" dim={fallsAt}>
+        <Note at={hourAt + 6} x={px(70)} y={py(CONFOUND.pooled.intercept + CONFOUND.pooled.slope * 40) + 8} from="up" out={colorAt}>
           <span style={{ ...note(20, STAT_INK), fontWeight: 650, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
             one hour
           </span>
@@ -238,8 +239,8 @@ export const ConfoundScene: React.FC = () => {
       <Arrow from={[AGE[0] - 30, ageY + 34]} to={[EXERCISE[0] + 20, lowY - 34]} at={drivesAt - 4} dur={14} dim={coinAt + 6} />
       <Arrow from={[AGE[0] + 30, ageY + 34]} to={[PRESSURE[0] - 20, lowY - 34]} at={drivesAt + 2} dur={14} />
       {box("Age", AGE[0], ageY, drivesAt - 8)}
-      {box("Exercise", EXERCISE[0], lowY, drivesAt - 6, BAND_INK[0])}
-      {box("Blood pressure", PRESSURE[0], lowY, drivesAt - 4, BAND_INK[3])}
+      {box("Exercise", EXERCISE[0], lowY, drivesAt - 6)}
+      {box("Blood pressure", PRESSURE[0], lowY, drivesAt - 4)}
       <Ring x={AGE[0]} y={ageY} at={cureAt - 2} r0={40} r1={110} />
       <Note at={confounderAt - 2} x={AGE[0]} y={ageY - 76} from="up">
         <span style={{ ...label(22, STAT_INK), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>

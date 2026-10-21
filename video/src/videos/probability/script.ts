@@ -37,10 +37,13 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     within 0.014 of a half after a thousand, "a point and a half". The page
  *     prints 0.500, 0.500 and 0.496 at 10, 100 and 5,000. The gambler's
  *     fallacy, "five heads in a row" and "swamped", is the page's own callout.
+ *     The run's first five heads in a row are flips 21 to 25, which lift it
+ *     to its high of 0.56; that is where the video puts the streak.
  *   - probability-basics, the multiplication rule: ten fair heads in a row is
  *     0.5 to the tenth, about 0.001, "one in a thousand".
  *   - conditional-probability, the table: 1,000 users; 30 of 500 paid and
- *     120 of 500 free users churned, 6% and 24%; 150 in all, 15%.
+ *     120 of 500 free users churned, 6% and 24%; 150 in all, 15%; and of
+ *     those 150, the 120 free users are 80%, the reversed conditional.
  *   - conditional-probability, the 99% test: 1 in 1,000, 99% sensitivity and
  *     specificity; the page's tree on 100,000 people gives 100 sick (99
  *     caught), 99,900 healthy (999 flagged), 1,098 positives and
@@ -73,7 +76,8 @@ export const script: NarrationScript = {
   // The series intro plays first; its lead-in lives in editorial/intro.ts.
   leadIn: INTRO_LEAD_IN,
   minPause: COURSE_MIN_PAUSE,
-  tail: 3,
+  // Room after the last word for the three named shapes to be read.
+  tail: 4,
   // A little more than the default 1.6 s before each scene, so each finished
   // figure holds a moment longer before the cut.
   sceneGap: 2.2,
@@ -119,7 +123,7 @@ export const script: NarrationScript = {
     {
       id: "late",
       text: "After a thousand, it never strays more than a point and a half from one half.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.8,
     },
     {
       id: "law",
@@ -181,7 +185,14 @@ export const script: NarrationScript = {
       id: "multiply",
       text: "Independence is also what lets you multiply. Ten heads in a row is ten halves multiplied together... about one in a thousand.", pauseAfter: 0.6,
     },
-    { id: "test-in", text: "And which way round you read a conditional matters more than it looks." },
+    { id: "test-in", text: "And which way round you read a conditional matters more than it looks.", pauseAfter: 0.6 },
+    {
+      // The first reversed conditional, said aloud on the same table; the
+      // long pause holds both rows on screen before the cut.
+      id: "reverse",
+      text: "Twenty-four percent of free users churned. But of everyone who churned, eighty percent were free.",
+      pauseAfter: 2.8,
+    },
 
     // ── Part 3. Bayes and the 99% test ────────────────────────────────────
     {
@@ -204,7 +215,7 @@ export const script: NarrationScript = {
     {
       id: "flagged",
       text: "But it also flags one percent of the healthy by mistake. That's nine hundred and ninety-nine false alarms.",
-      pauseAfter: 0.6,
+      pauseAfter: 1.0,
     },
     {
       id: "lineup",
@@ -222,7 +233,8 @@ export const script: NarrationScript = {
     {
       id: "bayes",
       text: "Bayes' rule turns one into the other, and it can't work without the base rate: how common the disease was before anyone was tested.",
-      pauseAfter: 0.4,
+      // Time to read the rule and its arithmetic, which are on screen unsaid.
+      pauseAfter: 1.2,
     },
     {
       id: "neglect",
@@ -260,10 +272,18 @@ export const script: NarrationScript = {
       text: "She was right. Your first pick hides the car one time in three.",
       pauseAfter: 0.35,
     },
+    // The crux, in two beats so it gets a breath in the middle. Cut from the
+    // take as it was recorded, which is why the second starts in lower case:
+    // run together, they are the take's text exactly.
     {
       id: "goat",
-      text: "The other two times, you've picked a goat... so the host has to open the other goat. The door he leaves shut has the car.",
-      pauseAfter: 0.4,
+      text: "The other two times, you've picked a goat...",
+      pauseAfter: 0.8,
+    },
+    {
+      id: "forced",
+      text: "so the host has to open the other goat. The door he leaves shut has the car.",
+      pauseAfter: 0.8,
     },
     {
       id: "knows",
@@ -305,7 +325,8 @@ export const script: NarrationScript = {
     },
     {
       id: "spread",
-      text: "Its spread is the variance, the average squared distance from that mean. Three point two five. Its square root, the standard deviation, is about one point eight.", pauseAfter: 0.6,
+      text: "Its spread is the variance, the average squared distance from that mean. Three point two five. Its square root, the standard deviation, is about one point eight.",
+      pauseAfter: 1.0,
     },
     { id: "decide-in", text: "And that long-run average is how you weigh a decision." },
     {
@@ -327,7 +348,7 @@ export const script: NarrationScript = {
     {
       id: "once",
       text: "But an average is for a gamble you face many times. For one loss you couldn't survive, the spread matters MORE... which is why people buy insurance at all.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.2,
     },
     {
       id: "next",

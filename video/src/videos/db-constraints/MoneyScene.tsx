@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease, map } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
@@ -11,7 +11,9 @@ import { MONEY } from "./data";
 import { Head, Kicker, Mark, MARK, MARK_BAD, OK_INK, pulse, Spot, X0 } from "./parts";
 
 const SIZE = 40;
-const COL = { type: X0, sum: 520, eq: 800, result: 860, test: 1366, verdict: 1546 } as const;
+/** Columns. Postgres's answer to "= 0.3" sits under its own header, so the
+ *  row never reads as a chain of equals signs. */
+const COL = { type: X0, sum: 520, eq: 800, result: 860, test: 1440 } as const;
 
 /**
  * Part 2, money: 0.1 + 0.2 as a float is 0.30000000000000004 and not equal
@@ -43,7 +45,9 @@ export const MoneyScene: React.FC = () => {
 
   const rowA = y(530);
   const rowB = y(670);
-  const lineH = h(100);
+  // numeric's band holds its row and the note under it.
+  const bandTop = rowB - h(50);
+  const bandH = h(124);
 
   // The float's digits, typed as they are read out: "point three", the run
   // of zeros, then the four.
@@ -99,14 +103,13 @@ export const MoneyScene: React.FC = () => {
 
       <Kicker at={open - 10}>The first constraint</Kicker>
       <Head lead="Ten cents plus twenty." at={open - 6} turn="Thirty?" turnAt={thirtyAt - 2} />
-      <FigLabel n="2" title="The same sum in two types, and Postgres's answers" at={tenAt - 6} x={X0} y={y(340)} />
 
       {/* Column titles. */}
       {(
         [
           [COL.type, "type", tenAt - 4],
           [COL.sum, "sum", tenAt - 2],
-          [COL.result, "result", falseAt - 4],
+          [COL.result, "result", approxAt - 4],
           [COL.test, "equals 0.3?", thirtyAt - 4],
         ] as const
       ).map(([x, t, at]) => (
@@ -130,9 +133,9 @@ export const MoneyScene: React.FC = () => {
         style={{
           position: "absolute",
           left: X0 - 16,
-          top: rowB - lineH / 2,
+          top: bandTop,
           width: (1680 - X0 + 32) * bandB,
-          height: lineH,
+          height: bandH,
           background: MARK,
           opacity: bandB > 0 ? 0.8 : 0,
           borderRadius: 6,
@@ -143,7 +146,7 @@ export const MoneyScene: React.FC = () => {
       {cell(COL.type, rowA, floatsAt - 2, <span style={{ fontSize: 30, color: INK_SOFT }}>double precision</span>, dimAll)}
       {cell(COL.sum, rowA, tenAt, "0.1", dimAll)}
       {cell(COL.sum + 96, rowA, twentyAt, "+ 0.2", dimAll)}
-      {cell(COL.eq, rowA, falseAt - 4, "=", dimAll)}
+      {cell(COL.eq, rowA, approxAt - 4, "=", dimAll)}
       {typed > 0 ? (
         <div
           style={{
@@ -182,8 +185,7 @@ export const MoneyScene: React.FC = () => {
           ) : null}
         </div>
       ) : null}
-      {cell(COL.test, rowA, thirtyAt - 2, "= 0.3", dimAll)}
-      <div style={{ position: "absolute", left: COL.verdict, top: rowA - SIZE * 0.7, opacity: 1 - dimAll }}>
+      <div style={{ position: "absolute", left: COL.test, top: rowA - SIZE * 0.7, opacity: 1 - dimAll }}>
         {verdict(String(MONEY.floatEquals), falseAt, MONEY.floatEquals)}
       </div>
       <Note at={approxAt - 4} x={COL.result} y={rowA + h(34)} dim={trueAt}>
@@ -196,8 +198,7 @@ export const MoneyScene: React.FC = () => {
       {cell(COL.sum + 96, rowB, numericAt + 5, "+ 0.2", dimAll)}
       {cell(COL.eq, rowB, exactAt - 4, "=", dimAll)}
       {cell(COL.result, rowB, exactAt - 2, MONEY.exact, dimAll)}
-      {cell(COL.test, rowB, exactAt + 6, "= 0.3", dimAll)}
-      <div style={{ position: "absolute", left: COL.verdict, top: rowB - SIZE * 0.7, opacity: 1 - dimAll }}>
+      <div style={{ position: "absolute", left: COL.test, top: rowB - SIZE * 0.7, opacity: 1 - dimAll }}>
         {verdict(String(MONEY.exactEquals), trueAt, MONEY.exactEquals)}
       </div>
       <Note at={priceAt - 6} x={COL.result} y={rowB + h(34)}>
@@ -218,7 +219,7 @@ export const MoneyScene: React.FC = () => {
         <span style={{ ...note(26, INK), fontStyle: "italic", whiteSpace: "nowrap" }}>And if there's no value at all?</span>
       </Ink>
 
-      <Spot id="db-constraints-coins" at={open - 6} left={1470} top={y(730)} width={270} height={230} dim={kindAt} />
+      <Spot id="db-constraints-coins" at={open - 6} left={1470} top={y(748)} width={270} height={230} dim={kindAt} />
     </AbsoluteFill>
   );
 };

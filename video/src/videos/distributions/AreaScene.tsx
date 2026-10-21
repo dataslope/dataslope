@@ -119,7 +119,7 @@ export const AreaScene: React.FC = () => {
           </Note>
           <YTicks ticks={[0.1, 0.2]} py={py} x0={X.x0} x1={X.x1} at={waitingAt} format={(v) => fmt(v, 1)} />
           <Ink at={waitingAt + 4} dur={12} style={{ left: X.x0 - 60, top: py(EXPONENTIAL.pdf0) - h(56), whiteSpace: "nowrap" }}>
-            <span style={label(20, INK_SOFT)}>density</span>
+            <span style={label(20, INK_SOFT)}>height</span>
           </Ink>
           <Axis scale={X} base={base} ticks={[0, 5, 10, 15, 20]} at={waitingAt - 4} />
 
@@ -128,7 +128,8 @@ export const AreaScene: React.FC = () => {
             <path d={areaD(f, 0, 3, X, py)} fill={DIST_FILL} opacity={hint} />
             <path d={areaD(f, 11, 20, X, py)} fill={DIST_FILL} opacity={tail} />
           </Svg>
-          <Note at={commonAt - 2} x={sx(X, 0.8)} y={py(f(0.8)) - 10} out={rangesAt}>
+          {/* Clear of the curve, to its right, over the short waits it names. */}
+          <Note at={commonAt - 2} x={sx(X, 1.5)} y={py(f(0.8)) - 40} out={rangesAt}>
             <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>short waits, common</span>
           </Note>
           <Note at={rareAt - 2} x={sx(X, 12.5)} y={py(f(12.5)) - 54} out={rangesAt}>

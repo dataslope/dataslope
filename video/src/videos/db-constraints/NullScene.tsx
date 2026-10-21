@@ -25,12 +25,14 @@ import {
   X0,
 } from "./parts";
 
-/** Zero and the empty string are values; null is the absence of one. */
+/** Null is the absence of a value; zero and the empty string are values.
+ *  Null comes first, on "missing", so the scene opens on what it defines. */
 const KINDS = [
+  { show: "", says: "no value", word: "missing" },
   { show: "0", says: "a number", word: "zero" },
   { show: "''", says: "a string, empty", word: "empty string" },
-  { show: "", says: "no value", word: "no value" },
 ] as const;
+const NULL_KIND = 0;
 
 /**
  * Part 3: null is no value; must every row know this? A default fills in an
@@ -43,8 +45,9 @@ export const NullScene: React.FC = () => {
   const { y, h } = useLayout();
 
   const open = n.beat("null").from;
-  const nullAt = n.word("null", "null");
   const kindAt = KINDS.map((k) => n.word("null", k.word));
+  /** "...no value at all": the two values step back. */
+  const noValueAt = n.word("null", "no value");
   const askFrom = n.beat("ask").from;
   const everyColAt = n.word("ask", "every column");
   const everyRowAt = n.word("ask", "every row");
@@ -84,7 +87,7 @@ export const NullScene: React.FC = () => {
   const g = tableGeometry({ x: TABLE_X, top: y(TABLE_Y), cols: NOT_NULL.cols, rows, headH: h(HEAD_H), rowH: h(ROW_H) });
   const ghost = 1;
 
-  const chipsOut = askFrom - 2;
+  const chipsOut = askFrom - 6;
 
   return (
     <AbsoluteFill>
@@ -97,18 +100,18 @@ export const NullScene: React.FC = () => {
       <Sfx name="el-scratch" at={refusedAt + 2} level={-30} />
 
       <Kicker at={open - 10}>Required or optional</Kicker>
-      <Head lead="Null means no value." at={nullAt - 6} out={chipsOut} />
-      <Head lead="Must every row know this?" at={everyRowAt - 4} />
+      <Head lead="Null means no value." at={open - 6} out={askFrom - 8} />
+      <Head lead="Must every row know this?" at={askFrom + 2} />
 
       {/* ── Three things that look empty, only one of which is ── */}
       {KINDS.map((k, i) => {
         const at = kindAt[i] - 4;
         const p = ease(frame, at, 12);
         const o = ease(frame, chipsOut, 12);
-        const dim = i < 2 ? ease(frame, kindAt[2], 14) * 0.6 : 0;
+        const isNull = i === NULL_KIND;
+        const dim = isNull ? 0 : ease(frame, noValueAt, 14) * 0.6;
         if (p <= 0 || o >= 1) return null;
         const x = 470 + i * 360;
-        const isNull = i === 2;
         return (
           <div
             key={k.word}
@@ -167,7 +170,6 @@ export const NullScene: React.FC = () => {
         row="status"
         chips={[
           { code: "DEFAULT 'active'", at: fallbackAt - 2, pulses: [defaultAt, activeAt] },
-          { code: "NOT NULL", at: notNullAt + 8 },
         ]}
       />
 

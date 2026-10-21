@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { BAR, body, fmt, halo, headline, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { BAR, body, fmt, halo, headline, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -168,6 +168,7 @@ export const TrendScene: React.FC = () => {
             top: py(v) - 13,
             opacity: ease(frame, trendFrom + 4, 14),
             ...note(20, INK_SOFT),
+            ...TABULAR,
           }}
         >
           {v}
@@ -198,7 +199,8 @@ export const TrendScene: React.FC = () => {
             ).map(([side, from, to]) => (
               <linearGradient key={side} id={`ts-run-${side}`} gradientUnits="userSpaceOnUse" x1={from} x2={to} y1={0} y2={0}>
                 <stop offset="0" style={{ stopColor: INK, stopOpacity: 1 }} />
-                <stop offset="1" style={{ stopColor: INK, stopOpacity: 0 }} />
+                <stop offset="0.6" style={{ stopColor: INK, stopOpacity: 0.6 }} />
+                <stop offset="1" style={{ stopColor: INK, stopOpacity: 0.12 }} />
               </linearGradient>
             ))}
           </defs>
@@ -298,8 +300,21 @@ export const TrendScene: React.FC = () => {
 
       {/* "Only ever a slice": the two years, bracketed under the axis. */}
       <Bracket x0={X.x0} x1={X.x1} y={y(BASE) + 50} at={sliceAt - 4} up color={INK_SOFT} tick={10} width={2} />
+      <Note at={sliceAt + 4} x={(X.x0 + X.x1) / 2} y={y(BASE) + 58} from="up">
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+          the {TREND.months.length} months you saw
+        </span>
+      </Note>
+      {/* "Of something much bigger": the level runs on, and says so. */}
+      <Note at={biggerAt + 10} x={X.x1 + 18} y={py(TREND.level) - 70}>
+        <div style={{ ...note(22, INK), whiteSpace: "nowrap", ...halo }}>
+          the process
+          <br />
+          keeps going
+        </div>
+      </Note>
 
-      <Note at={twelveAt - 4} x={bandX1 - 6} y={py(TOP_VALUE) + 22} align="right" dim={dimStory} out={neverAt + 2}>
+      <Note at={twelveAt - 4} x={bandX1 - 18} y={py(TOP_VALUE) + 22} align="right" dim={dimStory} out={neverAt + 2}>
         <span style={{ ...note(23, STAT_INK), fontWeight: 700, ...halo }}>
           The last six months: down {fmt(Math.abs(TREND.change), 1)}
         </span>

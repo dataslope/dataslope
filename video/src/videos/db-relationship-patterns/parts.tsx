@@ -426,7 +426,8 @@ const tokenize = (line: string): Token[] => {
   return out;
 };
 
-const Code: React.FC<{ line: string; size?: number }> = ({ line, size }) => (
+/** One line of SQL in the mono face, colored as the listings color it. */
+export const Code: React.FC<{ line: string; size?: number }> = ({ line, size }) => (
   <span style={{ fontFamily: MONO, fontSize: size, whiteSpace: "pre", fontVariantLigatures: "none" }}>
     {tokenize(line).map((t, i) => (
       <span key={i} style={{ color: t.color, fontWeight: t.weight ?? 400 }}>
@@ -669,8 +670,11 @@ export type TableRow = {
   grow?: boolean;
   strikeAt?: number;
   dimAt?: number;
-  /** The row fades and closes up (only ever the last rows). */
+  /** The row fades and closes up, and the rows under it move up. */
   collapseAt?: number;
+  /** Rows left out of the picture: the row holds this note, in Inter's
+   *  italic soft ink, instead of cells ("… 44 more rows"). */
+  note?: string;
 };
 export type CellMark = { row: number; col: number; at: number; out?: number; color?: string };
 export type RowBand = { row: number; at: number; out?: number; color?: string };
@@ -871,16 +875,20 @@ export const DbTable: React.FC<{
                 opacity: (1 - collapse) * (1 - dim),
               }}
             >
-              {r.cells.map((v, j) => (
-                <div key={j} style={cellBox(j)}>
-                  <CellText
-                    value={v}
-                    color={v === null ? ACCENT_INK : (colInk[j] ?? INK)}
-                    marks={marks.filter((m) => m.row === i && m.col === j)}
-                    swap={swaps.find((s) => s.row === i && s.col === j)}
-                  />
-                </div>
-              ))}
+              {r.note !== undefined ? (
+                <div style={{ padding: `0 ${PAD}px`, ...note(21, INK_SOFT), fontStyle: "italic", whiteSpace: "nowrap" }}>{r.note}</div>
+              ) : (
+                r.cells.map((v, j) => (
+                  <div key={j} style={cellBox(j)}>
+                    <CellText
+                      value={v}
+                      color={v === null ? ACCENT_INK : (colInk[j] ?? INK)}
+                      marks={marks.filter((m) => m.row === i && m.col === j)}
+                      swap={swaps.find((s) => s.row === i && s.col === j)}
+                    />
+                  </div>
+                ))
+              )}
             </Ink>
             {strike > 0 ? (
               <div

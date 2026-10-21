@@ -60,7 +60,6 @@ export const OpenScene: React.FC = () => {
   const complaintsAt = n.word("rushed", "complaints");
   const twoAt = n.word("disagree", "two emails");
   const brokeAt = n.word("disagree", "broke");
-  const designAt = n.word("disagree", "design");
   const placesAt = n.word("disagree", "two places");
   const end = n.beat("disagree").to;
 
@@ -86,7 +85,8 @@ export const OpenScene: React.FC = () => {
   const checks = [
     { at: keyAt, text: <>Primary key on <Mono>order_id</Mono></> },
     { at: nullAt, text: <><Mono>NOT NULL</Mono> on all {FLAT_NOT_NULL} columns</> },
-    { at: passesAt, text: <>{FLAT_CONSTRAINTS} constraints, every row passes</> },
+    // Short enough to end well clear of Postgres's reply on the same line.
+    { at: passesAt, text: <>{FLAT_CONSTRAINTS} constraints, all pass</> },
   ];
 
   return (
@@ -102,7 +102,7 @@ export const OpenScene: React.FC = () => {
         lead="Valid rows,"
         turn="wrong data."
         at={open - 6}
-        turnAt={designAt - 4}
+        turnAt={closerAt - 2}
         underlineAt={placesAt}
       />
       <Spot id="db-normalization-drawer" at={twiceAt - 6} left={1500} top={36} width={300} height={298} />
@@ -145,13 +145,15 @@ export const OpenScene: React.FC = () => {
           </Ink>
         ))}
 
-        {/* Two copies of each fact. */}
-        <Note at={twiceAt} x={RIGHT} y={g.rowMid(0) - 18}>
+        {/* Two copies of each fact. The email's goes when the update makes it
+            false (one row is new), and the price's steps back as the talk
+            moves to the update. */}
+        <Note at={twiceAt} out={orderOneAt + 4} x={RIGHT} y={g.rowMid(0) - 18}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
             <Mono>{email ?? ""}</Mono>, on {copies(F.email, email)} rows
           </span>
         </Note>
-        <Note at={priceAt + 4} x={RIGHT} y={g.rowMid(0) + 22}>
+        <Note at={priceAt + 4} dim={rushedAt} x={RIGHT} y={g.rowMid(0) + 22}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
             {FLAT.rows[0][F.product]} at <Mono>{price ?? ""}</Mono>, on {priceRows.length} rows
           </span>

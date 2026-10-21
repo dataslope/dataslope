@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { normalPdf } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
 import { body, fmt, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
+import { Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BINOM, num, pct, WARRANTY } from "./data";
@@ -105,7 +105,11 @@ export const WarrantyScene: React.FC = () => {
 
       <div style={{ opacity: 1 - dim }}>
         <Headline top={y(150)} first="An $80 warranty." second="Who comes out ahead?" firstAt={warrantyFrom - 6} secondAt={paysAt - 4} />
-        <FigLabel n="8" title="One warranty, from the store's side" at={eightyAt - 6} x={160} y={y(268)} />
+        {/* A list of outcomes rather than a chart, so a plain label, not a
+            numbered figure. */}
+        <Ink at={eightyAt - 6} dur={14} style={{ left: 160, top: y(268), whiteSpace: "nowrap" }}>
+          <span style={label(24, INK_SOFT)}>One warranty, from the store&apos;s side</span>
+        </Ink>
 
         {/* ── The two outcomes ── */}
         <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, onceFrom - 2, 14) * 0.5 }}>
@@ -143,7 +147,8 @@ export const WarrantyScene: React.FC = () => {
           <span style={note(28, INK)}>
             Expected profit = ${WARRANTY.price} − ${fmt(WARRANTY.ePayout, 0)} =
           </span>
-          <Big size={84} color={STAT_INK} italic>
+          {/* The store's gain, in the green it has on the right too. */}
+          <Big size={84} color={OK_INK} italic>
             ${fmt(WARRANTY.eProfit, 0)}
           </Big>
         </Ink>
@@ -176,22 +181,58 @@ export const WarrantyScene: React.FC = () => {
         </Ink>
 
         {/* ── When the average isn't the whole story ── */}
-        <div style={{ position: "absolute", left: RIGHT, top: y(560), whiteSpace: "nowrap", ...body(34, true), color: INK }}>
+        <div style={{ position: "absolute", left: RIGHT, top: y(548), whiteSpace: "nowrap", ...body(34, true), color: INK }}>
           <Held at={anAverageAt - 4}>Faced many times,</Held> <Held at={manyAt - 2}>the average decides.</Held>
         </div>
-        <div style={{ position: "absolute", left: RIGHT, top: y(620), whiteSpace: "nowrap", ...body(34, true), color: INK }}>
+        <div style={{ position: "absolute", left: RIGHT, top: y(604), whiteSpace: "nowrap", ...body(34, true), color: INK }}>
           <Held at={oneLossAt - 4}>Faced once, and ruinous,</Held>{" "}
           <Held at={spreadAt - 4}>
             <Sweep at={moreAt - 2}>the spread</Sweep> does.
           </Held>
         </div>
-        <Note at={insuranceAt - 2} x={RIGHT} y={y(690)}>
-          <span style={{ ...body(30), color: INK_SOFT, whiteSpace: "nowrap" }}>Insurance is paying to avoid the spread.</span>
+        {/* The spread itself, from the buyer's side: a 15% chance of paying
+            $300, or $80 for certain. */}
+        <div
+          style={{
+            position: "absolute",
+            left: RIGHT,
+            top: y(672),
+            display: "grid",
+            gridTemplateColumns: "auto auto auto auto auto",
+            columnGap: 16,
+            rowGap: h(14),
+            alignItems: "baseline",
+            whiteSpace: "nowrap",
+            ...note(26, INK),
+          }}
+        >
+          <Held at={oneLossAt + 2}>No warranty</Held>
+          <Held at={oneLossAt + 6}>
+            <b>{pct(1 - WARRANTY.pFail)}</b>
+          </Held>
+          <Held at={oneLossAt + 6}>pay $0,</Held>
+          <Held at={oneLossAt + 10}>
+            <b style={{ color: STAT_INK }}>{pct(WARRANTY.pFail)}</b>
+          </Held>
+          <Held at={oneLossAt + 10}>
+            pay{" "}
+            <b style={{ color: STAT_INK }}>
+              <Sweep at={surviveAt - 2}>${WARRANTY.payout}</Sweep>
+            </b>
+          </Held>
+          <Held at={oneLossAt + 16}>Warranty</Held>
+          <Held at={oneLossAt + 20}>
+            <b>{pct(1)}</b>
+          </Held>
+          <Held at={oneLossAt + 20}>pay ${WARRANTY.price}</Held>
+        </div>
+        <Note at={insuranceAt - 2} x={RIGHT} y={y(772)}>
+          <span style={{ ...body(28), color: INK_SOFT, whiteSpace: "nowrap" }}>Insurance is paying to avoid the spread.</span>
         </Note>
       </div>
 
       {/* ── The bridge: one variable's summary, and the shapes many share ── */}
-      <div style={{ position: "absolute", left: 160, top: y(790), display: "flex", alignItems: "baseline", gap: "0.3em", whiteSpace: "nowrap", ...label(26, INK) }}>
+      <div style={{ position: "absolute", left: 160, top: y(770), display: "flex", alignItems: "baseline", gap: "0.3em", whiteSpace: "nowrap", ...label(26, INK) }}>
         <Held at={evAt - 2}>E[X]</Held>
         <Held at={varAt - 2}>and Var(X)</Held>
         <Held at={sumAt - 2}>sum up one variable.</Held>
@@ -199,8 +240,9 @@ export const WarrantyScene: React.FC = () => {
           Many share a shape:
         </Held>
       </div>
+      {/* Each name as its shape is drawn, while the bridge is still speaking. */}
       {(["binomial", "normal", "exponential"] as const).map((t, k) => (
-        <Note key={t} at={lastEnd + 26 + k * 8} x={SHAPES.x[k]} y={y(SHAPES.base) + 10}>
+        <Note key={t} at={[manyRvAt + 8, shapesAt + 8, namedAt + 4][k]} x={SHAPES.x[k]} y={y(SHAPES.base) + 10}>
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>{t}</span>
         </Note>
       ))}
@@ -220,7 +262,7 @@ export const WarrantyScene: React.FC = () => {
           />
         ))}
       </Svg>
-      <NextLine at={namedAt - 4} x={RIGHT} y={y(810)} width={620}>
+      <NextLine at={namedAt - 4} x={RIGHT} y={y(846)} width={620}>
         the shapes randomness takes.
       </NextLine>
     </AbsoluteFill>

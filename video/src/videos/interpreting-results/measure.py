@@ -20,9 +20,13 @@ lessons are in content/courses/statistics-for-data-science-python/:
 - "sweep" is effect-sizes.mdx, "Effect size does NOT depend on sample size"
   (seed 123): a true d of 0.30 at five sample sizes.
 - "rates" is effect-sizes.mdx, "risk difference and relative risk": 90 and
-  126 conversions of 3,000.
-- "ci" is effect-sizes.mdx, "Always pair an effect size with a confidence
-  interval" (seed 11): d and its 2,000-resample bootstrap interval.
+  126 conversions of 3,000. Its interval and p-value are the ones
+  ab-testing.mdx computes for a conversion test (its "95% CI on diff" from
+  the unpooled standard error, and the pooled two-proportion z-test), so the
+  interval drawn under the checkout bars belongs to the checkout lift.
+  effect-sizes.mdx's own interval block (seed 11: d = 0.364, 0.101 to 0.619)
+  measures a different experiment, two groups of 120, and drawn under the
+  bars it read as the button's effect size, so the video no longer uses it.
 - "simpson" is statistical-fallacies.mdx, "Simpson's paradox", its
   two-department code block, run in pandas as the block builds it.
 - "confound" is the simpsons-paradox-trend chart the page places under
@@ -194,35 +198,18 @@ say(f"Risk difference      : {p_treatment - p_control:+.4f}  ({(p_treatment - p_
 say(f"Relative risk (ratio): {p_treatment / p_control:.3f}x")
 say(f"Relative uplift      : {(p_treatment - p_control) / p_control * 100:+.1f}%")
 
-# ── Part 1. An effect size with its interval (effect-sizes, seed 11) ───────
-rng_np = np.random.default_rng(11)
-control = rng_np.normal(100, 15, size=120)
-treatment = rng_np.normal(106, 15, size=120)
-dci = cohens_d(control, treatment)
-boot = []
-for _ in range(2000):
-    ra = rng_np.choice(control, size=len(control), replace=True)
-    rb = rng_np.choice(treatment, size=len(treatment), replace=True)
-    boot.append(cohens_d(ra, rb))
-lo, hi = np.percentile(boot, [2.5, 97.5])
-say(f"Cohen's d        : {dci:.3f}")
-say(f"95% bootstrap CI : [{lo:.3f}, {hi:.3f}]")
-# The 2,000 resampled d's themselves, binned 0.02 wide from -0.1, for the
-# histogram the interval is read off.
-edges = np.round(np.arange(-0.1, 0.9 + 1e-9, 0.02), 2)
-counts, _ = np.histogram(boot, bins=edges)
-out["ci"] = {
-    "seed": 11,
-    "d": r(dci, 3),
-    "lo": r(lo, 3),
-    "hi": r(hi, 3),
-    "resamples": len(boot),
-    "binLo": float(edges[0]),
-    "bin": 0.02,
-    "counts": [int(c) for c in counts],
-    "outside": int(len(boot) - counts.sum()),
-}
-say(f"  ci: {len(boot)} resamples, {int(len(boot) - counts.sum())} outside the histogram's range")
+# ── Part 1. The same lift with its interval (ab-testing's method) ─────────
+diff = p_treatment - p_control
+se_diff = np.sqrt(p_control * (1 - p_control) / n_control + p_treatment * (1 - p_treatment) / n_treatment)
+zc = stats.norm.ppf(0.975)
+lo, hi = diff - zc * se_diff, diff + zc * se_diff
+p_pool = (conv_control + conv_treatment) / (n_control + n_treatment)
+se_pool = np.sqrt(p_pool * (1 - p_pool) * (1 / n_control + 1 / n_treatment))
+z = diff / se_pool
+p_lift = 2 * (1 - stats.norm.cdf(abs(z)))
+say(f"z-test:        z = {z:.2f},  p = {p_lift:.4f}")
+say(f"95% CI on diff:[{lo:+.4f}, {hi:+.4f}]")
+out["rates"].update({"se": r(se_diff, 5), "lo": r(lo), "hi": r(hi), "z": r(z, 3), "p": float(f"{p_lift:.3g}")})
 
 # ── Part 2. Simpson's paradox (statistical-fallacies) ──────────────────────
 data = pd.DataFrame(

@@ -28,6 +28,9 @@ import {
 const TABLES_Y = 410;
 const CUSTOMERS_X = 160;
 const ORDERS_X = 760;
+/** How far right the list-in-a-cell table sits while it is the only thing
+ *  on the page, before it slides back to make room for orders. */
+const SOLO_DX = 420;
 
 /**
  * Where the link lives: not as a list in the customer's row (the lesson's
@@ -79,6 +82,10 @@ export const ListScene: React.FC = () => {
 
   const swapIn = ease(frame, fkAt - 4, 14);
   const dimAll = bothAt - 4;
+  // Centred while it is alone, then back to the customers' place in the
+  // pause before "foreign key", so the good table swaps in where it ends.
+  const soloDx = SOLO_DX * (1 - ease(frame, n.beat("cell").to - 2, 20));
+  const after = OTM.listAfter.split(",").length;
 
   // The next shape, glimpsed: many on both ends.
   const students = useEntityLayout({ x: 760, y: y(780), width: 260, name: "students", columns: [] });
@@ -101,6 +108,7 @@ export const ListScene: React.FC = () => {
       <Drift from={fkAt} to={dimAll + 40} scale={0.018} origin={[960, y(600)]}>
         <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, dimAll, 16) * 0.6 }}>
           {/* ── The bad idea, then the same customers without it ── */}
+          <div style={{ position: "absolute", inset: 0, transform: `translateX(${soloDx}px)` }}>
           <Drift from={from} to={fkAt} scale={0.03} origin={[CUSTOMERS_X, top]}>
           <Caption at={notAt} x={CUSTOMERS_X} y={top - 48}>
             customers
@@ -121,13 +129,17 @@ export const ListScene: React.FC = () => {
             bands={[{ row: 0, at: editAt, color: MARK_BAD }]}
             out={fkAt - 4}
           />
-          <Tag at={cellAt} x={CUSTOMERS_X} y={bad.rowTop(2) + 18} color={ACCENT_INK} size={22} out={fkAt - 4}>
+          <Tag at={cellAt} x={CUSTOMERS_X} y={bad.rowTop(2) + 18} color={ACCENT_INK} size={22} out={newAt + 2}>
             {OTM.adaOrders.length} orders in one cell
+          </Tag>
+          <Tag at={newAt + 6} x={CUSTOMERS_X} y={bad.rowTop(2) + 18} color={ACCENT_INK} size={22} out={fkAt - 4}>
+            {after} orders, and Ada's row edited
           </Tag>
           <Tag at={checkAt + 6} x={CUSTOMERS_X} y={bad.rowTop(2) + 52} italic size={22} out={fkAt - 4}>
             nothing can check what's in it
           </Tag>
           </Drift>
+          </div>
           <div style={{ position: "absolute", inset: 0, opacity: swapIn }}>
             <DbTable
               g={good}
@@ -151,6 +163,7 @@ export const ListScene: React.FC = () => {
             at={manyAt - 4}
             numeric={[0, FK]}
             colInk={{ [FK]: KEY_INK }}
+            headMarks={[{ col: FK, at: manyAt + 4, color: MARK_KEY }]}
             marks={OTM.orderRows.map((_, i) => ({ row: i, col: FK, at: idAt + i * 4, color: MARK_KEY }))}
             bands={adaRows.map((row, k) => ({ row, at: twiceAt + k * 6 }))}
           />

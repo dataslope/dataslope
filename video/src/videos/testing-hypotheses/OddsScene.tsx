@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, HAIRLINE, halo, INK, INK_SOFT, note, PAPER } from "../../editorial/style";
+import { body, fmt, HAIRLINE, halo, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -40,8 +40,8 @@ export const OddsScene: React.FC = () => {
   const atLeastAt = n.word("odds", "at least one");
   const sixtyAt = n.word("odds", "sixty-four");
   const peekAt = n.word("peek", "Peeking");
-  const peekEnd = n.beat("peek").to;
   const stopAt = n.word("peek", "stopping");
+  const sameAt = n.word("peek", "same thing");
   const lookAt = n.word("peek", "one look");
   const dipsAt = n.word("peek", "dips");
   const cureAt = n.word("cure", "cure");
@@ -71,13 +71,15 @@ export const OddsScene: React.FC = () => {
   }
   const last = pts[pts.length - 1];
   const lastGlow = pulse(frame, sixtyAt - 2, 26);
-  // Peeking: the lesson's run, revealed look by look as the narration says it.
-  const walk = ease(frame, peekAt + 4, Math.max(40, peekEnd - peekAt));
+  // Peeking: the lesson's run, revealed look by look. It finishes on "dips",
+  // so the count of dips and the finished run hold for the rest of the beat.
+  const walk = ease(frame, peekAt + 4, Math.max(30, dipsAt + 6 - (peekAt + 4)));
   const shownRows = PEEK.rows.filter((r) => r.n <= walk * PEEK.planned);
   const peekOut = ease(frame, cureAt - 8, 14);
   const pkx = (v: number) => sx(PK, v);
   const pky = (p: number) => y(PK_BASE) - h(PK_TALL) * p;
-  const dipGlow = pulse(frame, dipsAt - 2, 26);
+  // The under-0.05 band lights on "dips", and again as the two dips are named "the same thing, one look at a time".
+  const dipGlow = pulse(frame, dipsAt - 2, 26) + pulse(frame, sameAt - 2, 26) + pulse(frame, lookAt - 2, 26);
   const dips = shownRows.filter((r, i) => r.p < 0.05 && (i === 0 || shownRows[i - 1].p >= 0.05)).length;
   // The bar falls from 0.05 to 0.0025.
   const fall = ease(frame, needsAt - 8, 22);
@@ -124,7 +126,7 @@ export const OddsScene: React.FC = () => {
             {pct(v, 0)}
           </div>
         ))}
-        <Note at={atLeastAt - 2} x={sx(X, 1) + 14} y={py(AT_LEAST.p[0]) - 34}>
+        <Note at={atLeastAt - 2} x={sx(X, 1) - 12} y={py(AT_LEAST.p[0]) - 14} align="right">
           <Label size={21} color={STAT_INK} style={halo}>
             one test: 5%
           </Label>
@@ -157,7 +159,7 @@ export const OddsScene: React.FC = () => {
             {shownRows
               .filter((r) => r.p < 0.05)
               .map((r) => (
-                <circle key={r.n} cx={pkx(r.n)} cy={pky(r.p)} r={6} fill={STAT} stroke={PAPER} strokeWidth={1.5} />
+                <circle key={r.n} cx={pkx(r.n)} cy={pky(r.p)} r={6 + 3 * Math.min(1, dipGlow)} fill={STAT} stroke={PAPER} strokeWidth={1.5} />
               ))}
           </Svg>
           {[0, 0.5, 1].map((v) => (
@@ -165,12 +167,12 @@ export const OddsScene: React.FC = () => {
               {v}
             </div>
           ))}
-          <Note at={dipsAt - 2} x={PK.x1} y={y(PK_BASE) + 56} align="right">
+          <Note at={stopAt - 2} x={PK.x1} y={y(PK_BASE) + 56} align="right">
             <Label size={22} color={STAT_INK} style={halo}>
               under 0.05: stop and ship?
             </Label>
           </Note>
-          <Note at={lookAt - 4} x={PK.x1} y={y(PK_BASE) + 94} align="right">
+          <Note at={dipsAt + 10} x={PK.x1} y={y(PK_BASE) + 94} align="right">
             <span style={{ ...note(24, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
               dips under 0.05: {dips} {dips === 1 ? "time" : "times"}, with nothing there
             </span>
@@ -201,13 +203,20 @@ export const OddsScene: React.FC = () => {
           </Label>
         </Ink>
 
-        {/* ── Or raise the bar: 0.05 shared by twenty tests ── */}
-        <Ink at={raiseAt - 4} dur={14} style={{ left: B.x0, top: y(650), whiteSpace: "nowrap" }}>
+        {/* ── Fig. 12, or raise the bar: 0.05 shared by twenty tests (Bonferroni) ── */}
+        <FigLabel n="12" title="The same test, against a raised bar" at={raiseAt - 4} x={B.x0} y={y(640)} />
+        <Ink at={raiseAt - 2} dur={14} style={{ left: B.x0, top: y(640) + 44, whiteSpace: "nowrap" }}>
           <Label size={24}>Or raise the bar:</Label>
           <span style={{ ...note(26, STAT_INK), fontWeight: 700, marginLeft: 14, opacity: ease(frame, sharingAt - 4, 12) }}>
             0.05 ÷ 20 = {AT_LEAST.bonferroni}
           </span>
+          <span style={{ ...label(21, INK_SOFT), marginLeft: 12, opacity: ease(frame, sharingAt + 4, 12) }}>(Bonferroni)</span>
         </Ink>
+        <Note at={raiseAt + 2} x={B.x1} y={y(B_BASE) + 40} align="right">
+          <Label size={21} color={INK_SOFT} weight={520}>
+            p-value
+          </Label>
+        </Note>
         <Axis scale={B} base={y(B_BASE)} ticks={[0, 0.02, 0.04, 0.06]} format={(v) => (v === 0 ? "0" : fmt(v, 2))} at={raiseAt - 2} />
         <Svg opacity={ease(frame, raiseAt - 2, 14)}>
           <line x1={sx(B, bar)} x2={sx(B, bar)} y1={y(B_BASE)} y2={y(B_BASE) - h(86)} stroke={STAT} strokeWidth={2.6 + 2.4 * barGlow} strokeDasharray="5 4" />

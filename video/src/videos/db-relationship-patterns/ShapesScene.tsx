@@ -16,7 +16,9 @@ const BOX_W = 300;
 const TITLE_Y = 400;
 const TOP_Y = 470;
 const BOTTOM_Y = 720;
-const SELF_Y = 570;
+/** The self-reference's box sits level with the other panels' top boxes,
+ *  the same distance under its caption. */
+const SELF_Y = TOP_Y;
 /** How far the self-reference's loop runs out from its box. */
 const LOOP = 72;
 
@@ -92,7 +94,7 @@ export const ShapesScene: React.FC = () => {
       ))}
       <Sfx name="el-pencil" at={selfAt} level={-33} />
 
-      <Kicker at={from - 10}>Four shapes</Kicker>
+      <Kicker at={from - 10}>The shapes</Kicker>
       <Head lead="Links come in" leadAt={linksAt - 4} turn="a few shapes." turnAt={shapesAt - 4} />
 
       {/* ── With keys, one row can point at another ── */}

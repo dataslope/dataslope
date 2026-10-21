@@ -1,14 +1,14 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { sx, type XScale } from "../../editorial/charts";
+import { normalPdf, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, fmt, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { CI, RATES } from "./data";
-import { DATA, DATA_INK, Drift, Headline, Marker, Ring, STAT, STAT_INK, Svg } from "./parts";
+import { RATES } from "./data";
+import { DATA, DATA_INK, Dashed, Drift, Headline, Marker, Ring, STAT, STAT_INK, Svg } from "./parts";
 
 /** Conversion, 0 to 5%. */
 const RX: XScale = { lo: 0, hi: 0.05, x0: 420, x1: 1300 };
@@ -16,14 +16,23 @@ const BAR_Y = [330, 410];
 const BAR_H = 50;
 /** The two ways to say it, beside the bars. */
 const SAY_X = 1480;
-/** d, 0 to 0.8, for the interval. */
-const DX: XScale = { lo: -0.1, hi: 0.9, x0: 420, x1: 1300 };
+/** The lift in percentage points, −1 to +3, for its interval. */
+const DX: XScale = { lo: -1, hi: 3, x0: 420, x1: 1300 };
+const DX_TICKS = [-1, 0, 1, 2, 3];
 const CI_Y = 744;
-/** The histogram of resampled d's: px per resample, and its tallest bar. */
-const HIST_UNIT = 0.62;
+/** The curve of plausible lifts: its peak, and the markers' height. */
+const CURVE_TOP = 88;
 const HIST_TOP = 96;
 const RAW_BAR = `color-mix(in srgb, ${INK_SOFT} 38%, ${PAPER})`;
 const TRIO_Y = 838;
+/** Fig. 4 sits this far down the page until Fig. 5 needs the room. */
+const LOWER = 110;
+/** The lift and its interval in points, as the narration says them. */
+const LIFT = RATES.difference * 100;
+const LO = RATES.lo * 100;
+const HI = RATES.hi * 100;
+const SE = RATES.se * 100;
+const pts = (v: number) => `${v < 0 ? "−" : "+"}${fmt(Math.abs(v), 1)}`;
 
 /**
  * Two ways to say the size of a lift in a rate, then an effect size with its
@@ -32,7 +41,7 @@ const TRIO_Y = 838;
 export const RatesScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
-  const { y } = useLayout();
+  const { y, h } = useLayout();
   const from = n.beat("rates").from;
 
   // ── Cues ──
@@ -46,13 +55,14 @@ export const RatesScene: React.FC = () => {
   const readerAt = n.word("both", "reader");
   const everyAt = n.word("interval", "every");
   const sizeAt = n.word("interval", "effect size");
+  const liftAt = n.word("interval", "that lift");
   const plausiblyAt = n.word("interval", "plausibly");
   const biggerAt = n.word("both", "bigger");
   const bothAt = n.word("both", "Report both");
   const intervalAt = n.word("interval", "interval");
-  const dAt = n.word("interval", "zero point three six");
-  const oneAt = n.word("interval", "zero point one");
-  const sixAt = n.word("interval", "zero point six");
+  const dAt = n.word("interval", "one point two");
+  const oneAt = n.word("interval", "zero point three");
+  const sixAt = n.word("interval", "two point one");
   const bigAt = n.word("trio", "How big");
   const preciseAt = n.word("trio", "how precise");
   const allAt = n.word("trio", "there at all");
@@ -66,10 +76,25 @@ export const RatesScene: React.FC = () => {
   const extra = ease(frame, pointsAt - 4, 12);
   const ciY = y(CI_Y);
   const trio = [
-    { q: "How big", a: `d = ${fmt(CI.d, 2)}`, at: bigAt },
-    { q: "How precise", a: `${fmt(CI.lo, 2)} to ${fmt(CI.hi, 2)}`, at: preciseAt },
-    { q: "Is it there at all", a: "the p-value", at: allAt },
+    { q: "How big", a: `${pts(LIFT)} points`, at: bigAt },
+    { q: "How precise", a: `${pts(LO)} to ${pts(HI)}`, at: preciseAt },
+    { q: "Is it there at all", a: `p = ${fmt(RATES.p, 3)}`, at: allAt },
   ];
+  // Fig. 4 rises into place as Fig. 5 arrives under it.
+  const lower = h(LOWER) * (1 - ease(frame, everyAt - 12, 24));
+  // The curve of plausible lifts, and the middle 95% of it.
+  const curvePath = (a: number, b: number, k: number) => {
+    const steps = 80;
+    const line = Array.from({ length: steps + 1 }, (_, i) => {
+      const v = a + ((b - a) * i) / steps;
+      const yy = ciY - CURVE_TOP * k * (normalPdf(v, LIFT, SE) / normalPdf(LIFT, LIFT, SE));
+      return `L${sx(DX, v).toFixed(1)},${yy.toFixed(1)}`;
+    });
+    return `M${sx(DX, a).toFixed(1)},${ciY} ${line.join(" ")} L${sx(DX, b).toFixed(1)},${ciY} Z`;
+  };
+  const rise = ease(frame, plausiblyAt - 6, 16);
+  const leftLit = ease(frame, oneAt - 6, 14);
+  const rightLit = ease(frame, sixAt - 6, 14);
 
   return (
     <AbsoluteFill>
@@ -106,7 +131,7 @@ export const RatesScene: React.FC = () => {
         ]}
       />
 
-      <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.5 * ease(frame, everyAt - 4, 16) }}>
+      <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.5 * ease(frame, everyAt - 4, 16), transform: `translateY(${lower}px)` }}>
         <FigLabel n="4" title="Conversion, old checkout button and new" at={from - 4} x={160} y={y(268)} />
         {/* Gridlines at each percent. */}
         <Svg opacity={ease(frame, from, 14)}>
@@ -212,17 +237,20 @@ export const RatesScene: React.FC = () => {
         </Note>
       </div>
 
-      {/* ── The effect size with its interval ── */}
+      {/* The lift Fig. 5 measures is Fig. 4's absolute one. */}
+      <Ring x={SAY_X + 90} y={y(BAR_Y[1]) + 50} at={liftAt - 2} r0={30} r1={100} />
+
+      {/* ── The same lift with its interval ── */}
       <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.45 * ease(frame, butAt - 4, 18) }}>
       <Drift from={reportAt} to={n.beat("part2-in").to + 40} amount={0.02} origin={[960, 760]}>
-        <FigLabel n="5" title="An effect size and its 95% interval" at={sizeAt - 4} x={160} y={y(596)} />
+        <FigLabel n="5" title="The same lift, with its 95% interval" at={sizeAt - 4} x={160} y={y(596)} />
         <Svg opacity={ease(frame, intervalAt, 14)}>
           <line x1={DX.x0} x2={DX.x1} y1={ciY + 0.5} y2={ciY + 0.5} stroke={INK} strokeWidth={1.6} />
-          {[0, 0.2, 0.4, 0.6, 0.8].map((v) => (
+          {DX_TICKS.map((v) => (
             <line key={v} x1={sx(DX, v)} x2={sx(DX, v)} y1={ciY} y2={ciY + 7} stroke={INK} strokeWidth={1.2} />
           ))}
         </Svg>
-        {[0, 0.2, 0.4, 0.6, 0.8].map((v) => (
+        {DX_TICKS.map((v) => (
           <div
             key={v}
             style={{
@@ -234,39 +262,24 @@ export const RatesScene: React.FC = () => {
               ...note(20, INK_SOFT),
             }}
           >
-            {fmt(v, 1)}
+            {v === 0 ? "0" : `${v < 0 ? "−" : "+"}${Math.abs(v)}`}
           </div>
         ))}
         <Ink at={intervalAt} dur={12} style={{ left: 160, top: ciY - 22, whiteSpace: "nowrap" }}>
-          <span style={label(24, INK)}>Cohen&apos;s d</span>
+          <span style={label(24, INK)}>Lift, in points</span>
         </Ink>
-        {/* The 2,000 resampled d's, the interval read off their middle 95%. */}
+        {/* The plausible lifts, and the interval read off their middle 95%. */}
+        {rise > 0 ? (
+          <Svg>
+            <path d={curvePath(DX.lo, DX.hi, rise)} fill={RAW_BAR} />
+            {leftLit > 0 ? <path d={curvePath(LO, LIFT, rise)} fill={STAT} opacity={0.7 * leftLit} /> : null}
+            {rightLit > 0 ? <path d={curvePath(LIFT, HI, rise)} fill={STAT} opacity={0.7 * rightLit} /> : null}
+          </Svg>
+        ) : null}
         <Svg>
-          {CI.counts.map((c, i) => {
-            const lo = CI.binLo + i * CI.bin;
-            const hi = lo + CI.bin;
-            const g = ease(frame, plausiblyAt - 6 + i * 0.5, 10);
-            if (c <= 0 || g <= 0) return null;
-            const mid = (lo + hi) / 2;
-            const left = ease(frame, oneAt - 6, 14);
-            const right = ease(frame, sixAt - 6, 14);
-            const inside = mid >= CI.lo && mid <= CI.hi;
-            const lit = inside ? (mid < CI.d ? left : right) : 0;
-            const hh = c * HIST_UNIT * g;
-            return (
-              <rect
-                key={i}
-                x={sx(DX, lo) + 1}
-                y={ciY - hh}
-                width={sx(DX, hi) - sx(DX, lo) - 2}
-                height={hh}
-                fill={`color-mix(in srgb, ${STAT} ${Math.round(lit * 70)}%, ${RAW_BAR})`}
-              />
-            );
-          })}
           {[
-            { v: CI.lo, at: oneAt },
-            { v: CI.hi, at: sixAt },
+            { v: LO, at: oneAt },
+            { v: HI, at: sixAt },
           ].map((e) => {
             const p = ease(frame, e.at - 6, 12);
             return p > 0 ? (
@@ -274,36 +287,42 @@ export const RatesScene: React.FC = () => {
             ) : null;
           })}
           {ease(frame, dAt - 4, 12) > 0 ? (
-            <line x1={sx(DX, CI.d)} x2={sx(DX, CI.d)} y1={ciY} y2={ciY - HIST_TOP * ease(frame, dAt - 4, 12)} stroke={STAT} strokeWidth={4} />
+            <line x1={sx(DX, LIFT)} x2={sx(DX, LIFT)} y1={ciY} y2={ciY - HIST_TOP * ease(frame, dAt - 4, 12)} stroke={STAT} strokeWidth={4} />
           ) : null}
         </Svg>
-        <Note at={dAt} x={sx(DX, CI.d)} y={ciY - HIST_TOP - 34} from="up">
+        <Note at={dAt} x={sx(DX, LIFT)} y={ciY - HIST_TOP - 34} from="up">
           <span style={{ ...note(24, STAT_INK), fontWeight: 700, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
-            d = {fmt(CI.d, 2)}
+            {pts(LIFT)} points
           </span>
         </Note>
         <Note at={plausiblyAt + 4} x={DX.x1 + 30} y={ciY - 70}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>{CI.resamples.toLocaleString("en-US")} resampled d&apos;s</span>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>plausible lifts</span>
           <div style={{ ...note(21, STAT_INK), fontWeight: 600, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, sixAt, 10) }}>
             the middle 95%
           </div>
         </Note>
         {[
-          { v: CI.lo, at: oneAt },
-          { v: CI.hi, at: sixAt },
+          { v: LO, at: oneAt },
+          { v: HI, at: sixAt },
         ].map((e) => (
           <Note key={e.v} at={e.at} x={sx(DX, e.v)} y={ciY + 40} from="up">
             <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", background: PAPER, padding: "0 6px" }}>
-              {fmt(e.v, 2)}
+              {pts(e.v)}
             </span>
           </Note>
         ))}
+        {/* No lift at all: outside the interval, which is what the p-value says. */}
+        <Dashed x0={sx(DX, 0)} y0={ciY} x1={sx(DX, 0)} y1={ciY - HIST_TOP} at={allAt - 6} dur={12} color={INK} width={2.4} />
+        <Note at={allAt - 2} x={sx(DX, 0)} y={ciY - HIST_TOP - 34} from="up">
+          <span style={{ ...note(21, INK), fontWeight: 600, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>no lift</span>
+        </Note>
+        <Ring x={sx(DX, 0)} y={ciY - HIST_TOP / 2} at={allAt + 2} r0={20} r1={64} />
 
         {/* ── The three to report ── */}
         {trio.map((t, i) => (
           <Ink key={t.q} at={t.at - 4} dur={14} style={{ left: 160 + i * 560, top: y(TRIO_Y), whiteSpace: "nowrap" }}>
             <div style={label(22, INK_SOFT)}>{t.q}</div>
-            <div style={{ ...note(30, INK), fontWeight: 700, marginTop: 8 }}>
+            <div style={{ ...note(30, INK), ...TABULAR, fontWeight: 700, marginTop: 8 }}>
               {t.a}
             </div>
           </Ink>

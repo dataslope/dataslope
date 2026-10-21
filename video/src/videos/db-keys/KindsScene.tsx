@@ -57,7 +57,7 @@ export const KindsScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: each table, the marked code, the made-up ids ── */}
-      <Sfx name="el-whoosh" at={codeAt - 6} level={-34} />
+      <Sfx name="el-whoosh" at={naturalAt + 10} level={-34} />
       <Sfx name="el-pencil" at={jpAt - 2} level={-35} />
       <Sfx name="el-whoosh" at={makesAt - 8} level={-34} />
       <Sfx name="el-tap" at={nameAt} level={-28} />
@@ -65,7 +65,7 @@ export const KindsScene: React.FC = () => {
 
       <Kicker at={from - 10}>Natural or surrogate</Kicker>
       <Drift from={from} to={end + 50}>
-        <Headline lead="A value it has," turn="or a number we make up." at={from - 6} turnAt={surrogateAt - 4} />
+        <Headline lead="A value it has," turn="or a number the database makes up." at={from - 6} turnAt={surrogateAt - 4} />
 
         {/* ── Natural ── */}
         <Ink at={naturalAt - 4} dur={14} style={{ left: LEFT_X, top: y(PANEL_Y), whiteSpace: "nowrap" }}>
@@ -76,13 +76,14 @@ export const KindsScene: React.FC = () => {
         <Note at={alreadyAt - 2} x={LEFT_X} y={y(PANEL_Y) + 50}>
           <span style={{ ...body(30, true), color: INK_SOFT, whiteSpace: "nowrap" }}>a real-world value the thing already has</span>
         </Note>
-        <TableName g={countries} at={codeAt - 6}>
+        {/* The table's frame arrives with "natural key"; its rows with "country code". */}
+        <TableName g={countries} at={naturalAt + 10}>
           countries
         </TableName>
         <DataTable
           g={countries}
           cols={countryCols}
-          at={codeAt - 6}
+          at={naturalAt + 10}
           rows={COUNTRIES.rows.map((cells, i) => ({ cells, at: codeAt + i * 6 }))}
           marks={[
             { row: jp, col: 0, at: jpAt - 2, color: MARK_KEY },
@@ -133,7 +134,7 @@ export const KindsScene: React.FC = () => {
             <Mono>1</Mono> and <Mono>2</Mono> say nothing about Ada or Grace,
             <span style={{ opacity: ease(frame, purposeAt - 2, 10) }}>
               {" "}
-              <span style={{ background: MARK, padding: "0 4px" }}>on purpose</span>.
+              <span style={{ background: MARK, padding: "0 4px" }}>on purpose.</span>
             </span>
           </span>
         </Note>

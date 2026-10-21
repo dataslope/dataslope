@@ -38,6 +38,8 @@ const COURSE_Y: Record<string, number> = { Math: 450, History: 565, Art: 680 };
 const RIGHT_X = 980;
 const SLOT_Y = 440;
 const FLIP_Y = 690;
+/** A table cell's side padding (parts.tsx), to set a tag flush with a number. */
+const CELL_PAD = 20;
 
 /** Where segments a-b and c-d cross. */
 const cross = (a: Pt, b: Pt, c: Pt, d: Pt): Pt => {
@@ -59,10 +61,8 @@ export const CrossScene: React.FC = () => {
   const from = n.beat("cross").from;
   const studentAt = n.word("cross", "A student");
   const coursesAt = n.word("cross", "courses");
-  const adaAt = n.word("cross", "Ada");
   const math1At = n.word("cross", "Math", { nth: 1 });
   const historyAt = n.word("cross", "History");
-  const graceAt = n.word("cross", "Grace");
   const math2At = n.word("cross", "Math", { nth: 2 });
   const artAt = n.word("cross", "Art");
   const crossAt = n.word("tangle", "cross");
@@ -125,24 +125,26 @@ export const CrossScene: React.FC = () => {
           {pairs.map((p) => (
             <Link key={`${p.name}${p.title}`} a={stud(p.name)} b={course(p.title)} at={linkAt(p.name, p.title)} dur={12} />
           ))}
-          {Object.keys(STUDENT_Y).map((name) => (
+          {/* The chips arrive with the general claim; the links wait for
+              the names, so the specific pairings still land on their words. */}
+          {Object.keys(STUDENT_Y).map((name, k) => (
             <Chip
               key={name}
               x={STUDENT_X}
               y={y(STUDENT_Y[name])}
               width={STUDENT_W}
-              at={name === "Ada" ? adaAt - 4 : graceAt - 4}
+              at={studentAt + 6 + k * 5}
               name={name}
               tone={{ at: neitherAt, color: MARK }}
             />
           ))}
-          {Object.keys(COURSE_Y).map((title) => (
+          {Object.keys(COURSE_Y).map((title, k) => (
             <Chip
               key={title}
               x={COURSE_X}
               y={y(COURSE_Y[title])}
               width={COURSE_W}
-              at={(title === "Math" ? math1At : title === "History" ? historyAt : artAt) - 6}
+              at={coursesAt + 6 + k * 5}
               name={title}
               tone={{ at: neitherAt + 6, color: MARK }}
             />
@@ -169,7 +171,8 @@ export const CrossScene: React.FC = () => {
         ]}
         dim={beOneAt + 10}
       />
-      <Tag at={fitsAt} x={sg.xs[2] + sg.widths[2] / 2} y={sg.rowTop(1) + 12} color={OK_INK} size={22} align="center">
+      {/* What the key names, set under the number it names (right-aligned, as the column is). */}
+      <Tag at={fitsAt} x={sg.xs[2] + sg.widths[2] - CELL_PAD} y={sg.rowTop(1) + 12} color={OK_INK} size={22} align="right">
         Math
       </Tag>
       <div style={{ position: "absolute", inset: 0, transform: `translateY(${bounce(whereAt)}px)` }}>
@@ -198,9 +201,15 @@ export const CrossScene: React.FC = () => {
         at={flipAt + 2}
         numeric={[0, 2]}
         colInk={{ 0: KEY_INK, 2: KEY_INK }}
-        marks={[{ row: 0, col: 2, at: flipRoomAt, color: MARK }]}
+        marks={[
+          { row: 0, col: 2, at: flipRoomAt, color: MARK },
+          { row: 0, col: 2, at: flipRoomAt + 8, color: MARK_OK },
+        ]}
         dim={beOneAt + 10}
       />
+      <Tag at={flipRoomAt + 4} x={fg.xs[2] + fg.widths[2] - CELL_PAD} y={fg.rowTop(1) + 12} color={OK_INK} size={22} align="right">
+        Ada
+      </Tag>
       <div style={{ position: "absolute", inset: 0, transform: `translateY(${bounce(graceGoAt - 8)}px)` }}>
         <Chip
           x={fg.x + fg.width + 34}
@@ -216,7 +225,7 @@ export const CrossScene: React.FC = () => {
         />
       </div>
 
-      <Tag at={forcesAt - 2} x={RIGHT_X} y={fg.rowTop(1) + 40} color={ACCENT_INK} size={24}>
+      <Tag at={forcesAt - 2} x={RIGHT_X} y={fg.rowTop(1) + 62} color={ACCENT_INK} size={24}>
         <Mark at={beOneAt} color={MARK_BAD}>one column, one value</Mark>
       </Tag>
     </AbsoluteFill>

@@ -10,7 +10,6 @@ import { Sfx } from "../../sound/Sfx";
 import { BERNOULLI, BINOMIAL } from "./data";
 import { Mini, type MiniKind } from "./Mini";
 import {
-  Arrow,
   ASK,
   askNote,
   Bracket,
@@ -24,6 +23,7 @@ import {
   Kicker,
   lerp,
   pulse,
+  stepD,
   Strike,
   Svg,
   Sweep,
@@ -53,11 +53,13 @@ const SOLO = { x: 660, top: 330, w: 600, h: 330 };
 const X: XScale = { lo: -0.5, hi: 20.5, x0: 740, x1: 1740 };
 const BASE = 780;
 const TALL = 360;
-/** The Bernoulli figure. */
+/** The Bernoulli figure, laid out in the left column. */
 const NO_X = 270;
 const YES_X = 480;
 const BAR_W = 130;
 const DOTS_Y = 372;
+/** How far right it stands while it is the only figure: centred on the page. */
+const CENTER_DX = 960 - (NO_X + YES_X) / 2;
 
 /**
  * Part 1 opens on Unit 3's bridge: one random variable summed up by a mean
@@ -85,8 +87,8 @@ export const CastScene: React.FC = () => {
   const signsAt = n.word("bernoulli", "signs up");
   const chanceAt = n.word("bernoulli", "chance");
   const threeAt = n.word("bernoulli", "point three");
-  const yesNoAt = n.word("bernoulli", "One yes or no");
   const bernoulliAt = n.word("bernoulli", "Bernoulli");
+  const rarerAt = n.word("binomial", "rarer");
   const hundredAt = n.word("binomial", "two hundred visitors");
   const inHundredAt = n.word("binomial", "three in a hundred");
   const countAt = n.word("binomial", "count the yeses");
@@ -133,10 +135,18 @@ export const CastScene: React.FC = () => {
   const bernoulliOut = holdsAt - 10;
   const soloWave = pulse(frame, oneVarAt - 2, 30);
   const dimBinomial = ease(frame, rateAt - 6, 14);
+  const clumpIn = ease(frame, widerAt - 6, 18) * (1 - dimBinomial * 0.5);
 
   // ── The Bernoulli ──
-  const bUnit = h(420);
+  // Centred while it is the only figure; at "rarer" it moves into the left
+  // column, drops its ten simulated visitors (drawn at 0.3), and its yes falls
+  // to the 0.03 the binomial is built on, so the two figures agree.
+  const bUnit = h(380);
   const bBase = y(BASE);
+  const bDx = CENTER_DX * (1 - ease(frame, rarerAt - 4, 26));
+  const rare = ease(frame, inHundredAt - 4, 18);
+  const visitorsOut = ease(frame, rarerAt - 2, 12);
+  const bP = [lerp(BERNOULLI.pmf[0], 1 - BINOMIAL.p, rare), lerp(BERNOULLI.pmf[1], BINOMIAL.p, rare)];
 
   return (
     <AbsoluteFill>
@@ -146,10 +156,12 @@ export const CastScene: React.FC = () => {
       <Sfx name="el-whoosh" at={shapesAt - 8} level={-33} />
       <Sfx name="el-sprinkle" at={visitorAt - 2} level={-34} />
       <Sfx name="el-pop" at={chanceAt - 2} level={-30} />
+      <Sfx name="el-whoosh" at={rarerAt - 4} level={-35} />
       <Sfx name="el-sprinkle" at={hundredAt + 4} level={-34} />
       <Sfx name="el-tap" at={sixAt - 4} level={-28} />
       <Sfx name="el-pop" at={tenAt - 2} level={-30} />
       <Sfx name="el-scratch" at={crowdAt - 2} level={-30} />
+      <Sfx name="el-pencil" at={widerAt - 6} level={-35} />
 
       <Kicker at={hookFrom - 10}>Counting distributions</Kicker>
 
@@ -170,7 +182,7 @@ export const CastScene: React.FC = () => {
       />
       <Head
         parts={[
-          { text: "One yes or no:", at: yesNoAt - 6 },
+          { text: "One yes or no:", at: startAt + 2 },
           { text: "Bernoulli.", at: bernoulliAt - 6, italic: true },
         ]}
         out={countAt - 8}
@@ -219,7 +231,7 @@ export const CastScene: React.FC = () => {
           <span style={{ ...note(23, INK), fontWeight: 650 }}>a mean</span>
         </Centered>
         <Centered x={soloMeanX} y={soloBox.top + soloBox.h + h(52)} opacity={soloMarks * ease(frame, varianceAt - 4, 12)}>
-          <span style={{ ...note(23, INK), fontWeight: 650 }}>a variance, its spread</span>
+          <span style={{ ...note(23, INK), fontWeight: 650 }}>a variance: how widely it spreads</span>
         </Centered>
 
         {/* The row: counts, then measurements. */}
@@ -266,62 +278,73 @@ export const CastScene: React.FC = () => {
       </div>
 
       <Drift from={startAt} to={n.beat("poisson-in").to + 30}>
-        {/* ── Fig. 1: one visitor, then ten ── */}
-        <FigLabel n="1" title="One visitor, yes or no" at={visitorAt - 6} x={160} y={y(300)} out={bernoulliOut} />
-        <Svg opacity={1 - ease(frame, bernoulliOut, 12)}>
-          {BERNOULLI.sample.map((s, i) => {
-            const a = ease(frame, visitorAt + i * 1.6, 8);
-            if (a <= 0) return null;
-            const red = s === 1 ? ease(frame, signsAt - 2 + i, 8) : 0;
+        {/* ── Fig. 1: ten visitors, then the one the binomial counts ── */}
+        <div style={{ position: "absolute", inset: 0, transform: `translateX(${bDx}px)` }}>
+          <FigLabel n="1" title="Each visitor, yes or no" at={startAt} x={160} y={y(300)} out={bernoulliOut} />
+          <Svg opacity={(1 - ease(frame, bernoulliOut, 12)) * (1 - visitorsOut)}>
+            {BERNOULLI.sample.map((s, i) => {
+              const a = ease(frame, visitorAt + i * 1.6, 8);
+              if (a <= 0) return null;
+              const red = s === 1 ? ease(frame, signsAt - 2 + i, 8) : 0;
+              return (
+                <circle
+                  key={i}
+                  cx={182 + i * 40}
+                  cy={y(DOTS_Y)}
+                  r={12 * a}
+                  fill={red > 0 ? `color-mix(in srgb, ${ASK} ${red * 100}%, ${PAPER})` : PAPER}
+                  stroke={red > 0.5 ? ASK : INK_SOFT}
+                  strokeWidth={2.2}
+                />
+              );
+            })}
+          </Svg>
+          <Note at={signsAt + 6} x={160} y={y(DOTS_Y + 24)} out={rarerAt - 2}>
+            <span style={note(20, INK_SOFT)}>ten simulated visitors: the red ones signed up</span>
+          </Note>
+          <Svg opacity={1 - ease(frame, bernoulliOut, 12)}>
+            {[NO_X, YES_X].map((x, i) => {
+              const g = ease(frame, chanceAt - 2 + i * 6, 16);
+              if (g <= 0) return null;
+              const v = bP[i] * bUnit * g;
+              const red = i === 1 ? ease(frame, threeAt - 4, 10) : 0;
+              return (
+                <rect
+                  key={x}
+                  x={x - BAR_W / 2}
+                  y={bBase - v}
+                  width={BAR_W}
+                  height={v}
+                  fill={red > 0 ? `color-mix(in srgb, ${ASK} ${red * 100}%, ${DIST})` : DIST}
+                  rx={2}
+                />
+              );
+            })}
+            <line x1={NO_X - 100} x2={YES_X + 100} y1={bBase + 0.5} y2={bBase + 0.5} stroke={INK} strokeWidth={1.6} opacity={ease(frame, startAt + 4, 14)} />
+          </Svg>
+          {[
+            { x: NO_X, word: "no", i: 0, at: chanceAt + 4 },
+            { x: YES_X, word: "yes", i: 1, at: threeAt },
+          ].map((b) => {
+            const shown = 1 - ease(frame, bernoulliOut, 12);
+            const top = bBase - bP[b.i] * bUnit - 38;
+            const style = b.word === "yes" ? askNote(24) : { ...note(24, INK), fontWeight: 650 };
             return (
-              <circle
-                key={i}
-                cx={182 + i * 40}
-                cy={y(DOTS_Y)}
-                r={12 * a}
-                fill={red > 0 ? `color-mix(in srgb, ${ASK} ${red * 100}%, ${PAPER})` : PAPER}
-                stroke={red > 0.5 ? ASK : INK_SOFT}
-                strokeWidth={2.2}
-              />
+              <React.Fragment key={b.word}>
+                <Centered x={b.x} y={bBase + 12} opacity={ease(frame, startAt + 6, 12) * shown}>
+                  <span style={label(22, INK)}>{b.word}</span>
+                </Centered>
+                {/* The lesson's 0.3, then the binomial's 0.03, never a number in between. */}
+                <Centered x={b.x} y={top} opacity={ease(frame, b.at, 10) * (1 - ease(frame, inHundredAt - 6, 8)) * shown}>
+                  <span style={style}>{fmt(BERNOULLI.pmf[b.i], 1)}</span>
+                </Centered>
+                <Centered x={b.x} y={top} opacity={ease(frame, inHundredAt + 6, 10) * shown}>
+                  <span style={style}>{fmt(b.i ? BINOMIAL.p : 1 - BINOMIAL.p, 2)}</span>
+                </Centered>
+              </React.Fragment>
             );
           })}
-        </Svg>
-        <Note at={signsAt + 6} x={160} y={y(DOTS_Y + 24)} out={bernoulliOut}>
-          <span style={note(20, INK_SOFT)}>ten simulated visitors: the red ones signed up</span>
-        </Note>
-        <Svg opacity={1 - ease(frame, bernoulliOut, 12)}>
-          {[NO_X, YES_X].map((x, i) => {
-            const g = ease(frame, chanceAt - 2 + i * 6, 16);
-            if (g <= 0) return null;
-            const v = BERNOULLI.pmf[i] * bUnit * g;
-            const red = i === 1 ? ease(frame, threeAt - 4, 10) : 0;
-            return (
-              <rect
-                key={x}
-                x={x - BAR_W / 2}
-                y={bBase - v}
-                width={BAR_W}
-                height={v}
-                fill={red > 0 ? `color-mix(in srgb, ${ASK} ${red * 100}%, ${DIST})` : DIST}
-                rx={2}
-              />
-            );
-          })}
-          <line x1={NO_X - 100} x2={YES_X + 100} y1={bBase + 0.5} y2={bBase + 0.5} stroke={INK} strokeWidth={1.6} opacity={ease(frame, chanceAt - 4, 12)} />
-        </Svg>
-        {[
-          { x: NO_X, word: "no", v: BERNOULLI.pmf[0], at: chanceAt + 4 },
-          { x: YES_X, word: "yes", v: BERNOULLI.pmf[1], at: threeAt },
-        ].map((b) => (
-          <React.Fragment key={b.word}>
-            <Centered x={b.x} y={bBase + 12} opacity={ease(frame, chanceAt, 12) * (1 - ease(frame, bernoulliOut, 12))}>
-              <span style={label(22, INK)}>{b.word}</span>
-            </Centered>
-            <Centered x={b.x} y={bBase - b.v * bUnit - 38} opacity={ease(frame, b.at, 10) * (1 - ease(frame, bernoulliOut, 12))}>
-              <span style={b.word === "yes" ? askNote(24) : { ...note(24, INK), fontWeight: 650 }}>{fmt(b.v, 1)}</span>
-            </Centered>
-          </React.Fragment>
-        ))}
+        </div>
 
         {/* ── The binomial's rules, once the Bernoulli has made way ── */}
         <Ink at={holdsAt - 4} dur={14} style={{ left: 160, top: y(330), whiteSpace: "nowrap" }}>
@@ -383,18 +406,28 @@ export const CastScene: React.FC = () => {
           <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{BINOMIAL.mode}, the likeliest</span>
         </Note>
         <Bracket x0={tailX0} x1={tailX1} y={tailTop} at={tenAt + 2} color={ASK} />
-        <Note at={tenAt + 4} x={(tailX0 + tailX1) / 2 - 120} y={tailTop - h(86)}>
+        <Note at={tenAt + 4} x={(tailX0 + tailX1) / 2 - 120} y={tailTop - h(56)}>
           <div style={{ ...askNote(26), whiteSpace: "nowrap" }}>
             {BINOMIAL.atLeast} or more: <Count at={eightAt - 6} dur={18} to={BINOMIAL.sfAtLeast * 100} suffix="%" />
           </div>
-          <div style={{ ...code(20, INK_SOFT), marginTop: 6, opacity: ease(frame, eightAt + 6, 12) }}>.sf({BINOMIAL.atLeast - 1})</div>
         </Note>
 
-        {/* Real counts swing wider than the binomial's spread. */}
-        <Arrow from={[sixX - 8, base + h(64)]} to={[sx(X, 0.5), base + h(64)]} at={widerAt - 6} color={ASK} />
-        <Arrow from={[sixX + 8, base + h(64)]} to={[sx(X, 11.5), base + h(64)]} at={widerAt - 6} color={ASK} />
-        <Note at={widerAt} x={sx(X, 11.5) + 18} y={base + h(64) - 15}>
-          <span style={{ ...askNote(22), whiteSpace: "nowrap" }}>real counts swing wider</span>
+        {/* Real counts swing wider: a count with the same mean that clumps,
+            outlined over the binomial it outgrows. */}
+        <Svg opacity={clumpIn}>
+          <path
+            d={stepD(BINOMIAL.clumped, X, (v) => base - v * unit)}
+            fill="none"
+            stroke={ASK}
+            strokeWidth={2.6}
+            strokeDasharray="8 6"
+            strokeLinejoin="round"
+            style={{ clipPath: `inset(-20px ${(1 - ease(frame, widerAt - 6, 22)) * 100}% -20px -20px)` }}
+          />
+          <line x1={X.x0} x2={X.x0 + 44} y1={base + h(70)} y2={base + h(70)} stroke={ASK} strokeWidth={2.6} strokeDasharray="8 6" />
+        </Svg>
+        <Note at={widerAt} x={X.x0 + 58} y={base + h(70) - 15}>
+          <span style={{ ...askNote(22), whiteSpace: "nowrap" }}>if visitors clump: the same average, far wider swings</span>
         </Note>
       </Drift>
     </AbsoluteFill>

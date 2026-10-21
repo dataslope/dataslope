@@ -48,6 +48,10 @@ export const GRACE_ORDERS = ORDERS.rows.filter((o) => o[1] === GRACE[0]).map((o)
 
 // ── One badge at most (cardinality.mdx) ──────────────────────────────────────
 
+/** Ada as an employee: (1, Ada). */
+export const EMPLOYEES = rowsOf("employees");
+/** Two of Ada's devices, sharing her id: the many end of the same diagram. */
+export const DEVICES = rowsOf("devices");
 export const BADGES = rowsOf("badgesBefore");
 export const BADGES_AFTER = rowsOf("badgesAfter");
 export const SECOND_BADGE = errorOf("secondBadge");
@@ -59,6 +63,12 @@ export const SECOND_BADGE_SQL = ["INSERT INTO badges", `VALUES (${SECOND_BADGE_R
 // ── The shop, queried through its keys (reading-er-diagrams.mdx) ────────────
 
 export const PATH = rowsOf("path");
+/** The query's FROM and its three joins, as the lesson prints them, one per line. */
+export const PATH_JOINS = RUNS.path.sql
+  .split("\n")
+  .map((l) => l.trim())
+  .filter((l) => /^(customers c$|JOIN )/.test(l))
+  .map((l) => (l.startsWith("JOIN") ? l : `FROM ${l}`));
 /** The foreign keys Postgres lists: one per line of the diagram. */
 export const FOREIGN_KEYS = rowsOf("foreignKeys").rows.map(([fromTable, fromColumn, toTable, toColumn]) => ({
   fromTable,
@@ -74,8 +84,11 @@ const expect = (ok: boolean, what: string) => {
 expect(ADA[1] === "Ada" && GRACE[1] === "Grace", "the customers are Ada and Grace");
 expect(ADA_ORDERS.join() === "101,102" && GRACE_ORDERS.join() === "103", "Ada has 101 and 102, Grace 103");
 expect(SECOND_BADGE.code === "23505" && BADGES_AFTER.rows.length === 1, "the second badge is refused");
+expect(EMPLOYEES.rows.length === 1 && EMPLOYEES.rows[0][1] === "Ada" && BADGES.rows[0][1] === EMPLOYEES.rows[0][0], "badge 10 is Ada's");
+expect(DEVICES.rows.length === 2 && DEVICES.rows.every((r) => r[1] === EMPLOYEES.rows[0][0]), "two devices share Ada's id");
 expect(
   PATH.rows.map((r) => `${r[3]} ${r[4]}`).join() === "Notebook 2,Pen 3",
   "the order holds two notebooks and three pens",
 );
 expect(FOREIGN_KEYS.length === 3, "three foreign keys");
+expect(PATH_JOINS.length === 4 && PATH_JOINS.filter((l) => l.startsWith("JOIN")).length === 3, "the query's three joins");

@@ -28,7 +28,6 @@ export const ChooseScene: React.FC = () => {
 
   // ── Cues ──
   const from = n.beat("choose").from;
-  const askAt = n.word("choose", "Ask");
   const withoutAt = n.word("choose", "without its parent");
   const nothingAt = n.word("choose", "Nothing");
   const cascadeAt = n.word("choose", "Cascade");
@@ -62,11 +61,12 @@ export const ChooseScene: React.FC = () => {
       <Sfx name="el-chime" at={end + 6} level={-32} />
 
       <Drift from={from} to={end + 80}>
-        <Headline lead="What is the child" turn="without its parent?" at={askAt - 6} turnAt={withoutAt - 4} />
+        {/* The question and its root open the scene, on "So which?". */}
+        <Headline lead="What is the child" turn="without its parent?" at={from - 6} turnAt={withoutAt - 4} />
 
         <div style={{ position: "absolute", inset: 0, opacity: 1 - settle }}>
           {/* ── The root: a parent row goes ── */}
-          <Ink at={askAt} dur={14} style={{ left: ROOT_X, top: rootMid - ROOT_H / 2 }}>
+          <Ink at={from + 6} dur={14} style={{ left: ROOT_X, top: rootMid - ROOT_H / 2 }}>
             <div
               style={{
                 width: ROOT_W,

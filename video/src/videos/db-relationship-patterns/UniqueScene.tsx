@@ -1,8 +1,10 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
+import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK } from "../../editorial/style";
+import type { Pt } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { OTO } from "./data";
@@ -30,6 +32,10 @@ const TABLE_Y = 410;
 const LIST_X = 640;
 const LIST_W = 760;
 const LIST_SIZE = 24;
+/** The next shape, glimpsed under the error: one table, its line coming back. */
+const PREVIEW_X = 860;
+const PREVIEW_Y = 760;
+const LOOP = 72;
 
 /**
  * What makes it one to one: the foreign key alone takes a second profile for
@@ -53,17 +59,32 @@ export const UniqueScene: React.FC = () => {
   const bouncesAt = n.word("unique-fix", "bounces");
   const oneToOneAt = n.word("unique-fix", "one to one");
   const lastAt = n.word("self-in", "last shape");
+  const oneTableAt = n.word("self-in", "one table");
 
   const COLS = OTO.profileCols;
   const U = COLS.indexOf("user_id");
   const g = tableGeometry({ x: X, top: y(TABLE_Y), cols: COLS, rows: [...OTO.profileRows, OTO.looseRow], headH: h(HEAD_H), rowH: h(ROW_H) });
   const ada = OTO.looseRow[U];
   const adaRows = OTO.profileRows.flatMap((r, i) => (r[U] === ada ? [i] : []));
-  const second = OTO.profileRows.length;
+  // The profiles the table leaves out sit in one row between the first
+  // three and Ada's second.
+  const elided = OTO.profileRows.length;
+  const second = elided + 1;
   const listTop = y(TABLE_Y);
   const listH = listingHeight(OTO.secondSql.length, LIST_SIZE);
   const lineAt = OTO.secondSql.map((_, i) => secondAt - 6 + i * 4);
   const fade = 1 - ease(frame, lastAt, 16) * 0.55;
+
+  const preview = useEntityLayout({ x: PREVIEW_X, y: y(PREVIEW_Y), width: 280, name: "employees", columns: [] });
+  const loopFrom = preview.anchor("right");
+  const loopTo = preview.anchor("bottom");
+  const loop: Pt[] = [
+    loopFrom,
+    [loopFrom[0] + LOOP, loopFrom[1]],
+    [loopFrom[0] + LOOP, preview.bottom + LOOP],
+    [loopTo[0], preview.bottom + LOOP],
+    loopTo,
+  ];
 
   return (
     <AbsoluteFill>
@@ -72,6 +93,7 @@ export const UniqueScene: React.FC = () => {
       <Sfx name="el-pop" at={happilyAt + 2} level={-30} />
       <Sfx name="el-pencil" at={uniqueAt} level={-33} />
       <Sfx name="el-scratch" at={bouncesAt} level={-30} />
+      <Sfx name="el-pencil" at={oneTableAt + 6} level={-34} />
 
       <Kicker at={from - 10}>One to one</Kicker>
       <Head lead="A foreign key," leadAt={from - 6} turn="plus unique." turnAt={uniqueAt - 2} />
@@ -93,7 +115,10 @@ export const UniqueScene: React.FC = () => {
             cols={COLS}
             rows={[
               ...OTO.profileRows.map((cells, i) => ({ cells, at: from + 2 + i * 4 })),
-              { cells: OTO.looseRow, at: secondAt + 4, grow: true, ghostAt: bouncesAt, strikeAt: bouncesAt + 8 },
+              { cells: [], note: `… ${OTO.profiles - OTO.profileRows.length} more rows`, at: from + 2 + elided * 4 },
+              // Accepted while the column is only a foreign key; refused
+              // (the dashed outline) as soon as it is unique.
+              { cells: OTO.looseRow, at: secondAt + 4, grow: true, ghostAt: uniqueAt + 4, strikeAt: bouncesAt + 8 },
             ]}
             at={from - 2}
             numeric={[0, U]}
@@ -103,7 +128,7 @@ export const UniqueScene: React.FC = () => {
               ...adaRows.map((row) => ({ row, col: U, at: forAdaAt, color: MARK_BAD })),
               { row: second, col: U, at: forAdaAt + 4, color: MARK_BAD },
             ]}
-            bands={[{ row: second, at: secondAt + 8, out: bouncesAt, color: MARK }]}
+            bands={[{ row: second, at: secondAt + 8, out: uniqueAt - 4, color: MARK }]}
           />
 
           {/* ── The same insert, with and without UNIQUE ── */}
@@ -126,6 +151,10 @@ export const UniqueScene: React.FC = () => {
         </div>
       </Drift>
       </Drift>
+
+      {/* ── The last shape, glimpsed: one table pointing at itself ── */}
+      <Entity layout={preview} at={oneTableAt - 6} />
+      <Relation name="employees manages employees" points={loop} from="zero-or-one" to="zero-or-many" at={oneTableAt + 6} dur={20} />
     </AbsoluteFill>
   );
 };

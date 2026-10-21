@@ -5,7 +5,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { SERIF } from "../../editorial/fonts";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, fmt, headline, INK, INK_SOFT, PAPER, label } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, fmt, headline, INK, INK_SOFT, PAPER, label, TABULAR } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { SANS, waitForFonts } from "../../theme/fonts";
@@ -115,7 +115,7 @@ export const Count: React.FC<{
 }> = ({ at, to, from = 0, dur = 24, format = (v) => fmt(v, 0), style }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, dur);
-  return <span style={{ fontVariantNumeric: "tabular-nums lining-nums", ...style }}>{format(lerp(from, to, p))}</span>;
+  return <span style={{ ...TABULAR, ...style }}>{format(lerp(from, to, p))}</span>;
 };
 
 /**

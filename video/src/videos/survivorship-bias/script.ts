@@ -80,13 +80,13 @@ export const script: NarrationScript = {
     {
       id: "engines",
       text: "The two engines are more than a quarter of the plane. But they carry fewer than one in five of the holes.",
-      pauseAfter: 0.3,
+      pauseAfter: 0.8,
     },
-    { id: "fuselage", text: "The fuselage carries more than its share.", pauseAfter: 0.45 },
+    { id: "fuselage", text: "The fuselage carries more than its share.", pauseAfter: 0.7 },
     {
       id: "missing",
       text: "So where are the missing engine hits? On the planes that never came back.",
-      pauseAfter: 0.5,
+      pauseAfter: 0.8,
     },
     {
       id: "estimate",
@@ -123,9 +123,13 @@ export const script: NarrationScript = {
       text: "When your data is whoever's still here... ask what's missing from it, and why.",
       pauseAfter: 0.7,
     },
+    // The bridge is two beats so the merged Unit 5 video can leave out the
+    // question (sampling/script.ts, `skip`): the next part opens by asking it.
+    // Split at the sentence the take already had, so both are cut from it.
     {
       id: "next",
-      text: "Even a fair sample, drawn from everyone, won't hit the truth exactly. So how far off can it be?",
+      text: "Even a fair sample, drawn from everyone, won't hit the truth exactly.",
     },
+    { id: "far", text: "So how far off can it be?" },
   ],
 };

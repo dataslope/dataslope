@@ -14,7 +14,9 @@ page prints. The lessons are in content/courses/statistics-for-data-science-pyth
   block) and its sf(9), "P(10 or more convert)".
 - "poisson" is "Worked example: support tickets per hour" (lambda = 3, sf(7)
   and its "1 hour out of 84") and "Simulation as a sanity check" (seed 0,
-  100,000 simulated hours).
+  100,000 simulated hours). The strip of 24 hours on screen is one simulated
+  day picked as typical (see "dayHours"), so it doesn't make a 7 look routine
+  right before 8 or more is called a 1-in-84 spike.
 - "geometric" is "Geometric: how many trials until the first success?":
   p = 0.2 per sales call.
 - "exponential" is continuous-distributions.mdx, "Exponential: waiting time
@@ -38,6 +40,11 @@ page prints. The lessons are in content/courses/statistics-for-data-science-pyth
   values from Normal(80, 12), the fitted sf(100) and sf(200).
 
 The histograms' bins are the video's own (the lessons leave them to plotly).
+Two outlines are the video's own illustration rather than a lesson's output,
+and are labelled as such on screen: "clumped" under "binomial" and "poisson",
+a count with the same mean and three times the variance (a negative
+binomial), which is what "real counts vary far more than the model says"
+looks like.
 Printed checks (the lessons' own output lines) go to stderr.
 """
 
@@ -65,6 +72,12 @@ def rs(values, d=3):
 
 def say(*args):
     print(*args, file=sys.stderr)
+
+
+def clumped(mean, var):
+    """The negative binomial with this mean and a larger variance: a count
+    whose events clump, for drawing beside a model that assumes they don't."""
+    return stats.nbinom(n=mean**2 / (var - mean), p=mean / var)
 
 
 def hist(values, lo, width, bins):
@@ -124,6 +137,8 @@ out["binomial"] = {
     "pmfMode": r(pmf.max()),
     "atLeast": 10,
     "sfAtLeast": r(d.sf(9)),
+    # Same mean, three times the variance: the count if visitors clump.
+    "clumped": rs(clumped(d.mean(), 3 * d.var()).pmf(k), 5),
 }
 
 # ── Part 1. Poisson: support tickets per hour ───────────────────────────────
@@ -144,6 +159,19 @@ empirical = np.mean(hours >= 8)
 say(f"Analytic  P(X >= 8) = {analytic:.4f}")
 say(f"Simulated P(X >= 8) = {empirical:.4f}")
 kp = np.arange(0, 13)
+# One day of the simulation to draw: the first 24 consecutive hours, on a day
+# boundary, whose counts sit close to the pmf (a chi-square distance under 3
+# over 0 to 7 and 8 or more). The first day held three hours of 7, an hour
+# the pmf gives 2.2%, right beside the claim that 8 is rare.
+expected = np.append(d.pmf(np.arange(0, 8)), d.sf(7)) * 24
+day = 0
+while True:
+    w = hours[24 * day : 24 * day + 24]
+    seen = np.append(np.bincount(np.minimum(w, 8), minlength=9)[:8], np.sum(w >= 8))
+    if np.sum((seen - expected) ** 2 / expected) < 3:
+        break
+    day += 1
+say(f"Typical day drawn: hours {24 * day} to {24 * day + 23}, counts {list(map(int, w))}")
 out["poisson"] = {
     "lambda": lam,
     "k": [int(v) for v in kp],
@@ -156,7 +184,10 @@ out["poisson"] = {
     "hours": int(hours.size),
     "simulated": [r(np.mean(hours == v), 5) for v in kp],
     "simulatedAtLeast": r(empirical, 5),
-    "firstHours": [int(v) for v in hours[:24]],
+    "dayFrom": 24 * day,
+    "dayHours": [int(v) for v in w],
+    # Same mean, three times the variance: the count if tickets clump.
+    "clumped": rs(clumped(lam, 3 * d.var()).pmf(kp), 5),
 }
 
 # ── Part 1. Geometric: calls until the first sale ───────────────────────────
@@ -299,6 +330,9 @@ say(f"Model says P(X > 85)      = {fitted.sf(85):.4f}")
 say(f"Model says 95th pct cutoff = {fitted.ppf(0.95):.2f}")
 out["fit"] = {
     "n": int(sample.size),
+    # What it was drawn from: "we generated it so we can check".
+    "trueLoc": 72,
+    "trueScale": 6,
     "loc": r(loc),
     "scale": r(scale),
     "ppf95": r(fitted.ppf(0.95), 2),

@@ -26,13 +26,17 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     (the six on screen run from 40.18 to 41.24), "it moves";
  *   - a population of a million, mean 100 and spread 25, seed 7: the means of
  *     10,000 samples of 50 have a standard deviation of 3.504 ("three point
- *     five"), and one sample's s / root 50 is 3.673 ("three point seven");
+ *     five"), and one sample's s / root 50 is 25.97 / 7.07 = 3.673 ("three
+ *     point seven"); the lesson calls that s "your estimate of sigma", which
+ *     is the "standing in for the population's" of the beat "divide";
  *   - spread 20: the standard error is 20 / root n, so 2 at n = 100, 1 at 400,
  *     0.5 at 1,600, and 0.2 (a tenth of 2) at 10,000, a hundred times 100;
  *   - 120 conversion times, normal(8, 2.5), seed 0: mean 8.203 s, standard
  *     error 0.219 ("zero point two two"), and the lesson's rough interval,
  *     mean plus or minus 1.96 standard errors ("about two"), is 7.774 to
- *     8.632 ("seven point eight to eight point six").
+ *     8.632 ("seven point eight to eight point six"); the value the test
+ *     on screen tries, 8 s (the lesson draws its sample around it), is
+ *     (8.203 - 8) / 0.219 = 0.93 standard errors away, "less than one".
  *
  * The lesson's prose under its first block says the SD comes out "around 12"
  * and the SE "around 0.85"; its code prints 10.58 and 0.75, which is what the
@@ -76,7 +80,13 @@ export const script: NarrationScript = {
       text: "[curious] So how can you measure that, when you've only ever seen one average?",
       pauseAfter: 0.35,
     },
-    { id: "divide", text: "Divide the standard deviation by the square root of the sample size.", pauseAfter: 0.35 },
+    {
+      id: "divide",
+      // The sample's s stands in for the population's sigma, which is never
+      // seen: that is what makes the one-sample shortcut work.
+      text: "Divide the sample's standard deviation, standing in for the population's, by the square root of the sample size.",
+      pauseAfter: 0.35,
+    },
     {
       id: "numbers",
       text: "Ten point five eight, over the square root of two hundred, gives zero point seven five.",
@@ -126,18 +136,20 @@ export const script: NarrationScript = {
     {
       id: "times",
       text: "A hundred and twenty conversion times average eight point two seconds, with a standard error of zero point two two.",
-      pauseAfter: 0.35,
+      pauseAfter: 0.9,
     },
     {
       id: "interval",
       text: "Step about two standard errors either way, and you get seven point eight to eight point six. That's a confidence interval.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.9,
     },
     {
       id: "test",
       text: "And a test counts how many standard errors an estimate sits from the value it's testing.",
-      pauseAfter: 0.45,
+      pauseAfter: 0.55,
     },
+    // Voiced on its own after the take: the tested value on screen, spoken.
+    { id: "eight", text: "Test eight seconds, and it's less than one standard error away.", pauseAfter: 1.0 },
     { id: "next", text: "Next, we'll build that interval properly." },
   ],
 };

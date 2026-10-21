@@ -3,12 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { fmt, halo, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { body, fmt, halo, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { jitter, KNOWN, ROWS } from "./data";
-import { Bracket, DOT, lerp, Mu, pulse, STAT, STAT_INK, Svg, TruthLine, XBar } from "./parts";
+import { Bracket, DOT, lerp, Mark, Mu, pulse, STAT, STAT_INK, Svg, TruthLine, XBar } from "./parts";
 
 /** The rows: every value of every sample, 50 to 150. */
 const X: XScale = { lo: 50, hi: 150, x0: 160, x1: 1240 };
@@ -17,6 +17,9 @@ const X2: XScale = { lo: 94, hi: 104, x0: 1340, x1: 1760 };
 const ROW0 = 372;
 const PITCH = 23.5;
 const BASE = 852;
+/** The averages' panel sits higher than the rows' axis, so its tick numbers
+ *  never read as one row with the rows' ("…125 150 94 96…"). */
+const BASE2 = BASE - 60;
 const BLOCK = 64;
 const TICK = 10;
 const ROW_JIT = 6;
@@ -50,6 +53,8 @@ const SLOTS = (() => {
 })();
 const LO = Math.min(...ROWS.map((r) => r.mean));
 const HI = Math.max(...ROWS.map((r) => r.mean));
+/** The twenty averages' own center: the mean of the averages. */
+const CENTER = ROWS.reduce((t, r) => t + r.mean, 0) / ROWS.length;
 const TALLEST = Math.max(...SLOTS.map((s) => s.k)) + 1;
 /** The middle of the first row's block, once it has landed. */
 const MINE_X = (sx(X2, SLOTS[0].bin) + sx(X2, SLOTS[0].bin + 1)) / 2;
@@ -66,7 +71,9 @@ export const TwentyScene: React.FC = () => {
 
   // ── Cues ──
   const twentyFrom = n.beat("twenty").from;
+  const flavorsFrom = n.beat("flavors").from;
   const moreAt = n.word("twenty", "fifty more", { nth: 1 });
+  const samplesAt = n.word("twenty", "Twenty samples");
   const answersAt = n.word("twenty", "answers");
   const parameterAt = n.word("moves", "parameter");
   const statisticAt = n.word("moves", "statistic");
@@ -81,6 +88,7 @@ export const TwentyScene: React.FC = () => {
   const oneAvgAt = n.word("points", "Any one average");
   const summarizeAt = n.word("kind", "summarize");
   const kindAt = n.word("kind", "KIND");
+  const holdingAt = n.word("kind", "holding");
   const wrongAt = n.word("flavors-in", "goes wrong");
 
   const rowY = (i: number) => y(ROW0) + h(i * PITCH);
@@ -89,26 +97,18 @@ export const TwentyScene: React.FC = () => {
   const rowAt = (i: number) => (i === 0 ? twentyFrom - 40 : lerp(moreAt - 4, answersAt - 10, (i - 1) / (ROWS.length - 2)));
   // "not points": every average steps back; "Any one average": row 1 comes
   // forward again, dots and all. "summarize": the summaries go, leaving the
-  // raw values; "goes wrong": the rest.
+  // raw values, every one of them a number "you're holding". "goes wrong":
+  // the figure steps back for the turn, and leaves with the cut.
   const pointsDim = ease(frame, notPointsAt - 2, 16) * 0.65;
   const oneLit = ease(frame, oneAvgAt - 2, 12);
   const summaries = 1 - ease(frame, summarizeAt - 2, 18);
-  const figureOp = 1 - ease(frame, wrongAt, 24);
+  const figureOp = (1 - ease(frame, wrongAt, 20) * 0.5) * (1 - ease(frame, flavorsFrom - 20, 14));
   const muBold = ease(frame, parameterAt - 2, 10);
-  const zig = ease(frame, statisticAt - 4, 22);
   const panel = ease(frame, variableAt - 16, 14);
   const muX = sx(X, KNOWN.mu);
-
-  // The red line that joins the twenty averages, top to bottom.
-  const zigPts = ROWS.map((r, i) => [sx(X, r.mean), rowY(i)] as const);
-  const zigLen = zig * (zigPts.length - 1);
-  const zigShown = zigPts.slice(0, Math.floor(zigLen) + 1).map(([a, b]) => [a, b] as [number, number]);
-  const zf = zigLen - Math.floor(zigLen);
-  if (Math.floor(zigLen) < zigPts.length - 1 && zf > 0) {
-    const [ax, ay] = zigPts[Math.floor(zigLen)];
-    const [bx, by] = zigPts[Math.floor(zigLen) + 1];
-    zigShown.push([lerp(ax, bx, zf), lerp(ay, by, zf)]);
-  }
+  const centerX = sx(X2, CENTER);
+  const centerIn = ease(frame, centerAt - 4, 12);
+  const centerSwell = pulse(frame, centerAt - 2, 22);
 
   return (
     <AbsoluteFill>
@@ -116,14 +116,29 @@ export const TwentyScene: React.FC = () => {
            the averages flying over, the last one landing on top, Part 2's close ── */}
       <Sfx name="el-sprinkle" at={rowAt(1)} level={-34} />
       <Sfx name="el-sprinkle" at={rowAt(10)} level={-35} />
-      <Sfx name="el-pencil" at={statisticAt - 4} level={-32} />
       <Sfx name="el-whoosh" at={variableAt - 6} level={-32} />
       <Sfx name="el-tap" at={variableAt - 6 + SLOTS[0].turn * 1.6 + 12} level={-27} />
       {/* In the pause after "spread", where Part 2 ends. */}
       <Sfx name="el-chime" at={spreadEndAt + 4} level={-32} />
 
+      {/* ParameterScene's headline, carried over the cut: it is what the rows
+          arriving show. It gives way to the next on "Twenty samples". */}
       <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
-        <Ink at={twentyFrom - 4} dur={20} out={thinkAt - 8} style={{ position: "relative", whiteSpace: "nowrap" }}>
+        <Ink at={twentyFrom - 40} dur={1} out={samplesAt - 16} style={{ position: "relative", whiteSpace: "nowrap" }}>
+          Parameters stay put.
+        </Ink>
+        <Ink
+          at={twentyFrom - 40}
+          dur={1}
+          out={samplesAt - 16}
+          style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}
+        >
+          Statistics move.
+        </Ink>
+      </div>
+      <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
+        {/* Each half on the words that say it, so the first never waits alone. */}
+        <Ink at={samplesAt - 6} dur={20} out={thinkAt - 8} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Twenty samples,
         </Ink>
         <Ink
@@ -158,7 +173,8 @@ export const TwentyScene: React.FC = () => {
       <FigLabel n="5" title={`Twenty samples of ${KNOWN.n} from the same population`} at={twentyFrom - 4} x={160} y={y(270)} />
       <Axis scale={X} base={y(BASE)} ticks={[50, 75, 100, 125, 150]} at={twentyFrom - 40} />
       <TruthLine x={muX} bottom={y(BASE)} top={y(ROW0 - 16)} at={twentyFrom - 40} width={lerp(2, 3.2, muBold)} />
-      <Note at={twentyFrom} x={muX + 12} y={y(ROW0 - 50)}>
+      {/* Already up at the cut, where ParameterScene's mu ends its ride. */}
+      <Note at={twentyFrom - 30} x={muX + 12} y={y(ROW0 - 50)}>
         <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
           <Mu /> = {KNOWN.mu}
           <span style={{ ...note(21, INK_SOFT), marginLeft: 12, opacity: ease(frame, parameterAt + 4, 10) }}>never moves</span>
@@ -171,7 +187,9 @@ export const TwentyScene: React.FC = () => {
           const at = rowAt(i);
           // Row 1, "any one average", stands out from the rest.
           const op = i === 0 ? lerp(ROW_OP, 1, oneLit) : lerp(ROW_OP, 0.42, oneLit);
-          const rr = i === 0 ? lerp(ROW_R, 4.3, oneLit) : ROW_R;
+          // "the number you're holding": every row of values swells in turn.
+          const held = pulse(frame, holdingAt - 2 + i * 1.2, 14) * 0.5;
+          const rr = (i === 0 ? lerp(ROW_R, 4.3, oneLit) : ROW_R) * (1 + held);
           return (
             <g key={i}>
               {r.values.map((v, j) => {
@@ -191,22 +209,13 @@ export const TwentyScene: React.FC = () => {
             </g>
           );
         })}
-        {zig > 0 ? (
-          <polyline
-            points={zigShown.map(([a, b]) => `${a.toFixed(1)},${b.toFixed(1)}`).join(" ")}
-            fill="none"
-            stroke={STAT}
-            strokeWidth={2}
-            strokeLinejoin="round"
-            opacity={0.85 * (1 - pointsDim) * summaries}
-          />
-        ) : null}
         {ROWS.map((r, i) => {
           const a = ease(frame, rowAt(i) + 6, 8);
           if (a <= 0) return null;
           const x = sx(X, r.mean);
-          // "That makes a statistic…": every average swells in turn.
-          const named = pulse(frame, varStatAt - 2 + i * 0.7, 16);
+          // "Only the statistic did", "That makes a statistic…": every
+          // average swells in turn.
+          const named = Math.min(1, pulse(frame, statisticAt - 2 + i * 0.9, 16) + pulse(frame, varStatAt - 2 + i * 0.7, 16));
           const lit = i === 0 ? oneLit : 0;
           return (
             <line
@@ -234,14 +243,16 @@ export const TwentyScene: React.FC = () => {
       <Ink at={variableAt - 16} dur={14} style={{ left: X2.x0, top: y(270), whiteSpace: "nowrap" }}>
         <span style={{ ...label(24, INK), fontWeight: 560 }}>Where the twenty averages land</span>
       </Ink>
-      <Axis scale={X2} base={y(BASE)} ticks={[94, 96, 98, 100, 102, 104]} at={variableAt - 16} opacity={panel} />
-      <TruthLine
-        x={sx(X2, KNOWN.mu)}
-        bottom={y(BASE)}
-        top={y(BASE - TALLEST * BLOCK - 20)}
-        at={variableAt - 12}
-        width={2 + pulse(frame, centerAt - 2, 22) * 2}
-      />
+      {/* The name the narration gives what the panel shows. */}
+      <Ink at={variableAt - 4} dur={16} style={{ left: X2.x0, top: y(318), whiteSpace: "nowrap" }}>
+        <span style={{ ...body(34, true), color: STAT_INK }}>
+          <XBar /> is a <Mark at={variableAt} out={thinkAt}>
+            random variable
+          </Mark>
+        </span>
+      </Ink>
+      <Axis scale={X2} base={y(BASE2)} ticks={[94, 96, 98, 100, 102, 104]} at={variableAt - 16} opacity={panel} />
+      <TruthLine x={sx(X2, KNOWN.mu)} bottom={y(BASE2)} top={y(BASE2 - TALLEST * BLOCK - 20)} at={variableAt - 12} />
       <Svg>
         {ROWS.map((r, i) => {
           const s = SLOTS[i];
@@ -251,7 +262,7 @@ export const TwentyScene: React.FC = () => {
           const fromY = rowY(i);
           const toX = sx(X2, s.bin) + 2;
           const w = sx(X2, s.bin + 1) - sx(X2, s.bin) - 4;
-          const toY = y(BASE) - h((s.k + 1) * BLOCK);
+          const toY = y(BASE2) - h((s.k + 1) * BLOCK);
           const bw = lerp(4, w, t);
           const bh = lerp(h(TICK * 2), h(BLOCK) - 3, t);
           const mine = i === 0 ? ease(frame, drawAt - 4, 10) : 0;
@@ -269,21 +280,47 @@ export const TwentyScene: React.FC = () => {
           );
         })}
       </Svg>
-      <Bracket x0={sx(X2, LO)} x1={sx(X2, HI)} y={y(BASE) + 50} at={spreadAt - 2} up color={STAT} tick={10} width={2.4} />
-      <Note at={spreadAt} x={X2.x0} y={y(322)}>
-        <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-          from {fmt(LO)} to {fmt(HI)}
+      {/* "a center": the averages' own, a red tick like each row's, at the
+          middle of the bracket that "a spread" then opens around it. */}
+      {centerIn > 0 ? (
+        <Svg opacity={centerIn}>
+          <line
+            x1={centerX}
+            x2={centerX}
+            y1={y(BASE2) + 6}
+            y2={y(BASE2) + 40}
+            stroke={STAT}
+            strokeWidth={4 + centerSwell * 3}
+            strokeLinecap="round"
+          />
+        </Svg>
+      ) : null}
+      <Bracket x0={sx(X2, LO)} x1={sx(X2, HI)} y={y(BASE2) + 50} at={spreadAt - 2} up color={STAT} tick={10} width={2.4} />
+      <div
+        style={{
+          position: "absolute",
+          left: (sx(X2, LO) + sx(X2, HI)) / 2,
+          top: y(BASE2) + 62,
+          transform: "translateX(-50%)",
+          whiteSpace: "nowrap",
+          ...note(22, STAT_INK),
+          fontWeight: 650,
+        }}
+      >
+        <span style={{ opacity: centerIn }}>center {fmt(CENTER)}</span>
+        <span style={{ opacity: ease(frame, spreadAt, 12) }}>
+          , from {fmt(LO)} to {fmt(HI)}
         </span>
-      </Note>
+      </div>
       <Leader
         points={[
-          [MINE_X, y(BASE - (SLOTS[0].k + 1) * BLOCK - 52)],
-          [MINE_X, y(BASE - (SLOTS[0].k + 1) * BLOCK) - 6],
+          [MINE_X, y(BASE2 - (SLOTS[0].k + 1) * BLOCK - 52)],
+          [MINE_X, y(BASE2 - (SLOTS[0].k + 1) * BLOCK) - 6],
         ]}
         at={drawAt - 2}
         dur={10}
       />
-      <Note at={drawAt} x={MINE_X} y={y(BASE - (SLOTS[0].k + 1) * BLOCK - 86)} from="up">
+      <Note at={drawAt} x={MINE_X} y={y(BASE2 - (SLOTS[0].k + 1) * BLOCK - 86)} from="up">
         <span style={{ ...note(21, INK), fontWeight: 650, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
           one draw
         </span>

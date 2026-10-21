@@ -137,6 +137,17 @@ export const ROBUST = {
   mad: m.robust.mad,
 };
 
+/**
+ * The sample standard deviation (ddof=1, as pandas prints it) of the ten
+ * incomes with the tenth set to `tenth`: 2,828.4 at the lesson's 9,000, 33.1
+ * at 130. The IQR (14.0) and MAD (8.0) are the same for any tenth above 60.
+ */
+export const robustSd = (tenth: number) => {
+  const xs = [...ROBUST.values.slice(0, -1), tenth];
+  const mean = xs.reduce((s, x) => s + x, 0) / xs.length;
+  return Math.sqrt(xs.reduce((s, x) => s + (x - mean) ** 2, 0) / (xs.length - 1));
+};
+
 // ── Part 3. Shape, tails and outliers (shape-and-outliers) ──────────────────
 
 export type Shape = {

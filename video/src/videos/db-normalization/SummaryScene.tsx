@@ -84,7 +84,7 @@ export const SummaryScene: React.FC = () => {
       <Sfx name="el-tap" at={saysAt + 4} level={-28} />
       <Sfx name="el-pencil" at={truthAt - 2} level={-34} />
 
-      <Headline kicker="Denormalization" lead="A copy," turn="on purpose." at={from - 6} turnAt={denormAt - 4} underlineAt={purposeAt} />
+      <Headline kicker="Denormalization" lead="A copy," turn="on purpose." at={from - 6} turnAt={storeAt - 4} underlineAt={purposeAt} />
 
       <Drift from={from} to={end + 40} amount={0.012} origin="40% 50%">
         <Fig n="10" at={reportAt - 6} y={y(FIG_Y)}>
@@ -127,7 +127,7 @@ export const SummaryScene: React.FC = () => {
         {/* The derived copy. */}
         <SmallArrow from={[ig.x + ig.width + 24, arrowY]} to={[sg.x - 24, arrowY]} at={storeAt - 2} color={INK} width={2.4} />
         <Ink at={storeAt + 4} dur={12} style={{ left: ig.x + ig.width + 34, top: arrowY - 42, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(21, INK_SOFT), fontStyle: "italic" }}>derived</span>
+          <span style={{ ...note(21, INK_SOFT), fontStyle: "italic" }}>summed per day</span>
         </Ink>
         {name(sg.x, "daily_sales_summary", storeAt + 2)}
         <DbTable

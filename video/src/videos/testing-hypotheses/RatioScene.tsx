@@ -115,7 +115,7 @@ export const RatioScene: React.FC = () => {
           <span style={{ ...body(40, true), color: INK, opacity: noi, whiteSpace: "nowrap" }}>its standard error</span>
         </div>
       </div>
-      <Note at={gapAt + 6} x={160 + 140} y={y(330) + 200}>
+      <Note at={bigAt} x={160 + 140} y={y(330) + 200}>
         <Label size={22} color={INK_SOFT} weight={520}>
           <Mark at={dwarfsAt}>big t: the gap dwarfs the noise</Mark>
         </Label>
@@ -152,10 +152,16 @@ export const RatioScene: React.FC = () => {
           </Label>
         </span>
       </Note>
-      {/* The noise: the spread inside one group. */}
+      {/* The noise: each mound is where a group's average could land, so its
+          width is the standard error, not the spread of the raw values. */}
       <Bracket x0={mx(b) - sd * UNIT} x1={mx(b) + sd * UNIT} y={widthY} at={seAt - 4} color={INK} width={2.4} />
       <Note at={seAt} x={mx(b) + sd * UNIT + 14} y={widthY - 16}>
         <Label size={22}>noise</Label>
+      </Note>
+      <Note at={noiseAt} x={CX + 420} y={y(M_BASE) + 12} align="right">
+        <Label size={21} color={INK_SOFT} weight={520}>
+          each mound: where a group&apos;s average could land
+        </Label>
       </Note>
 
       {/* ── The three designs ── */}

@@ -182,13 +182,29 @@ WHERE tc.table_schema = 'public'
 ORDER BY tc.table_name, kcu.ordinal_position, tc.constraint_type`)
   ).rows;
 
+  // Every order line, with its customer and product: what each customer
+  // bought in this shop (Grace's one order is a backpack, not a notebook).
+  out.shop.orderLines = table(
+    await db.query(`SELECT orders.id AS order_id, customers.name AS customer, products.name AS product, order_items.quantity
+FROM order_items
+JOIN orders ON orders.id = order_items.order_id
+JOIN customers ON customers.id = orders.customer_id
+JOIN products ON products.id = order_items.product_id
+ORDER BY orders.id, products.id;`),
+  );
+
   // The three kinds of bad data design-and-data-quality opens on, one row
-  // each, against this schema's own rules.
+  // each, against this schema's own rules. Each names its columns, so the
+  // listing says which value is the quantity and which the customer.
   out.shop.refused = {
-    duplicate: await refused(db, "INSERT INTO customers VALUES (4, 'Ada L.', 'ada@example.com');"),
-    zero: await refused(db, "INSERT INTO order_items VALUES (102, 10, 0);"),
-    orphan: await refused(db, "INSERT INTO orders VALUES (104, 99, DATE '2025-03-04');"),
+    duplicate: await refused(db, "INSERT INTO customers (id, name, email) VALUES (4, 'Ada L.', 'ada@example.com');"),
+    zero: await refused(db, "INSERT INTO order_items (order_id, product_id, quantity) VALUES (102, 10, 0);"),
+    orphan: await refused(db, "INSERT INTO orders (id, customer_id, ordered_on) VALUES (104, 99, DATE '2025-03-04');"),
   };
+  // Each broken rule as the catalog defines it, for the tag beside each block.
+  for (const r of Object.values(out.shop.refused)) {
+    r.def = (await db.query("SELECT pg_get_constraintdef(oid) AS def FROM pg_constraint WHERE conname = $1", [r.constraint])).rows[0].def;
+  }
   // Nothing got in: the tables hold what they held.
   out.shop.countsAfter = (
     await db.query(`SELECT (SELECT COUNT(*) FROM customers)::int AS customers,
@@ -277,7 +293,7 @@ console.log(out.version);
 console.log("update affected", out.flat.update.affectedRows, "row; Ada's emails:", out.flat.adaEmails);
 console.log("grouped:", JSON.stringify(out.flat.grouped.rows));
 console.log("notebook:", JSON.stringify(out.shop.notebook.rows));
-for (const [k, v] of Object.entries(out.shop.refused)) console.log(k, v.code, v.message, "|", v.detail);
+for (const [k, v] of Object.entries(out.shop.refused)) console.log(k, v.code, v.message, "|", v.detail, "|", v.def);
 console.log("ana", out.ana.code, out.ana.message, "|", out.ana.detail);
 console.log("after:", JSON.stringify(out.shop.countsAfter));
 console.log("1 lbf·s =", out.units.lbfSecondInNewtonSeconds, "N·s");

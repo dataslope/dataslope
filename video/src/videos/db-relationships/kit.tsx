@@ -31,8 +31,8 @@ const TOKEN_INK = {
   punct: INK_SOFT,
   name: INK,
 } as const;
-const KEYWORDS = new Set(["INSERT", "INTO", "VALUES"]);
-const TABLES = new Set(["badges"]);
+const KEYWORDS = new Set(["INSERT", "INTO", "VALUES", "FROM", "JOIN", "ON"]);
+const TABLES = new Set(["badges", "customers", "orders", "order_items", "products"]);
 
 type Token = { text: string; color: string; weight?: number };
 

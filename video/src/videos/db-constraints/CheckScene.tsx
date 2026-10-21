@@ -95,6 +95,7 @@ export const CheckScene: React.FC = () => {
       <Sfx name="el-tap" at={soAt - 2} level={-28} />
       <Sfx name="el-scratch" at={nopeAt + 2} level={-30} />
       <Sfx name="el-whoosh" at={outA} level={-34} />
+      <Sfx name="el-pencil" at={columnsAt + 12} level={-34} />
       <Sfx name="el-scratch" at={neverAt + 2} level={-30} />
 
       <Kicker at={open - 10}>Rules about values</Kicker>
@@ -148,12 +149,14 @@ export const CheckScene: React.FC = () => {
       />
 
       {/* ── events: two columns, one test ── */}
-      <Entity layout={events} at={compareAt - 2} />
+      {/* The two date rows arrive on "columns", and the rule over them once
+          both are drawn, so the bracket never spans empty paper. */}
+      <Entity layout={events} at={compareAt - 2} rowAt={{ start_date: columnsAt - 2, end_date: columnsAt + 3 }} />
       <RuleTags
         layout={events}
         row="start_date"
         span="end_date"
-        chips={[{ code: "CHECK (end_date > start_date)", at: columnsAt - 2, pulses: [neverAt + 4] }]}
+        chips={[{ code: "CHECK (end_date > start_date)", at: columnsAt + 12, pulses: [endAt, neverAt + 4] }]}
       />
       <DbTable
         g={gd}

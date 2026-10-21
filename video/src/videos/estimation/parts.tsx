@@ -5,7 +5,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { SERIF } from "../../editorial/fonts";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, fmt, headline as headlineStyle, INK, INK_SOFT, PAPER, label } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, fmt, headline as headlineStyle, INK, INK_SOFT, PAPER, label, TABULAR } from "../../editorial/style";
 import { H, Ink, W } from "../../editorial/ui";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -276,7 +276,7 @@ export const Count: React.FC<{
   return (
     <>
       {prefix}
-      {fmt(v, digits)}
+      <span style={TABULAR}>{fmt(v, digits)}</span>
       {suffix}
     </>
   );
@@ -329,7 +329,9 @@ export const Spot: React.FC<{
 };
 
 /** A two-ink headline line: the first phrase in ink, the second following it
- *  in italic accent, each on its own cue; both leave on `out`. */
+ *  in italic accent, each on its own cue; both leave on `out`. The row takes
+ *  the headline's own size, so the word space between the halves (an `em`
+ *  gap) is measured in that face rather than in the page's 16px. */
 export const Headline: React.FC<{
   at: number;
   second?: number;
@@ -341,7 +343,7 @@ export const Headline: React.FC<{
 }> = ({ at, second, out, size = 72, top = 150, children, italic }) => {
   const { y } = useLayout();
   return (
-    <div style={{ position: "absolute", left: 92, top: y(top), display: "flex", gap: "0.32em", whiteSpace: "nowrap" }}>
+    <div style={{ position: "absolute", left: 92, top: y(top), display: "flex", gap: "0.28em", whiteSpace: "nowrap", fontSize: headlineStyle(size).fontSize }}>
       <Ink at={at} dur={20} out={out} style={{ position: "relative", ...headlineStyle(size) }}>
         {children}
       </Ink>

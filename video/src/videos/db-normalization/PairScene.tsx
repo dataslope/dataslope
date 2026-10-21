@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -24,12 +24,14 @@ import {
   tableGeometry,
   X0,
 } from "./kit";
-import { DepArrow, Drift, Fade, Reply, Svg } from "./parts";
+import { DepArrow, Drift, Fade, Notation, Reply, Svg } from "./parts";
 
 const TABLE_Y = 430;
 /** A line of the table being read aloud: a pale wash under its whole row. */
 const MARK_ROW = `color-mix(in srgb, ${BAR} 16%, transparent)`;
 const RIGHT = 980;
+/** The rename's listing, below the two dependencies written out above it. */
+const LIST_DROP = 124;
 const LIST_SIZE = 22;
 const ERD_Y = 400;
 const FIX_Y = 640;
@@ -142,7 +144,7 @@ export const PairScene: React.FC = () => {
       <Sfx name="el-pop" at={productsAt - 4} level={-30} />
       <Sfx name="el-tap" at={oneRowAt - 2} level={-28} />
 
-      <Headline kicker="Second normal form" lead="The whole key," turn="not half." at={from - 6} turnAt={halfAt - 4} underlineAt={partialAt} />
+      <Headline kicker="Second normal form" lead="The whole key," turn="not half." at={from - 6} turnAt={wholeAt - 4} underlineAt={partialAt} />
 
       <Drift from={from} to={end + 40} amount={0.012} origin="35% 55%">
         {/* ── The table with a composite key ── */}
@@ -159,8 +161,9 @@ export const PairScene: React.FC = () => {
             marks={[
               ...ITEMS_BAD.rows.map((_, i) => ({ row: i, col: I.order, at: orderAt + i * 3, color: MARK_KEY })),
               ...ITEMS_BAD.rows.map((_, i) => ({ row: i, col: I.product, at: productAt + i * 3, color: MARK_KEY })),
-              { row: 0, col: I.qty, at: twoAt },
-              { row: 2, col: I.qty, at: tookOneAt },
+              // Cleared before the name is read, so yellow means one thing at a time.
+              { row: 0, col: I.qty, at: twoAt, out: nameAt },
+              { row: 2, col: I.qty, at: tookOneAt, out: nameAt },
               ...tenRows.map((row, k) => ({ row, col: I.product, at: tenAt + k * 5 })),
               ...tenRows.map((row, k) => ({ row, col: I.name, at: notebookAt + k * 5 })),
               ...tenRows.map((row, k) => ({ row, col: I.name, at: copiesAt + k * 6, color: MARK_BAD })),
@@ -198,21 +201,41 @@ export const PairScene: React.FC = () => {
             <span style={{ ...note(23, ACCENT_INK), fontWeight: 600 }}>a partial dependency</span>
           </Ink>
 
+          {/* The two dependencies, written out as they are said. */}
+          <Notation
+            x={RIGHT}
+            y={g.top}
+            parts={[
+              { text: `(${ITEMS_BAD.cols[I.order]}, ${ITEMS_BAD.cols[I.product]})`, at: wholeAt - 2 },
+              { arrow: BLUE_INK, at: wholeAt + 6 },
+              { text: ITEMS_BAD.cols[I.qty], at: wholeAt + 12 },
+            ]}
+          />
+          <Notation
+            x={RIGHT}
+            y={g.top + 50}
+            parts={[
+              { text: ITEMS_BAD.cols[I.product], at: halfAt - 4 },
+              { arrow: ACCENT, at: halfAt + 4 },
+              { text: ITEMS_BAD.cols[I.name], at: halfAt + 10 },
+            ]}
+          />
+
           {/* The rename that has to find every line. */}
           <Listing
             lines={RENAME_BAD.lines}
             x={RIGHT}
-            top={g.top}
+            top={g.top + LIST_DROP}
             width={600}
             size={LIST_SIZE}
             at={renameAt - 8}
             lineAt={[renameAt - 4, renameAt + 2, changesAt - 6]}
             marks={[{ line: 1, at: changesAt }]}
           />
-          <Reply at={rowsAt - 2} x={RIGHT} y={g.top + listH + 18}>
+          <Reply at={rowsAt - 2} x={RIGHT} y={g.top + LIST_DROP + listH + 18}>
             {RENAME_BAD.tag}
           </Reply>
-          <Note at={rowsAt + 6} x={RIGHT + 150} y={g.top + listH + 24}>
+          <Note at={rowsAt + 6} x={RIGHT + 150} y={g.top + LIST_DROP + listH + 24}>
             <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>one name, {tenRows.length} rows</span>
           </Note>
         </Fade>
@@ -254,6 +277,13 @@ export const PairScene: React.FC = () => {
           <Reply at={oneRowAt - 2} x={products.x} y={y(FIX_Y) + listH + 18}>
             {RENAME_GOOD.tag}
           </Reply>
+          {/* The same rename on Fig. 6's table, carried over for the comparison. */}
+          <Reply at={oneRowAt + 8} x={products.x} y={y(FIX_Y) + listH + 76} color={INK}>
+            {RENAME_BAD.tag}
+          </Reply>
+          <Note at={oneRowAt + 14} x={products.x + 150} y={y(FIX_Y) + listH + 82}>
+            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>before the split</span>
+          </Note>
           <Note at={inFrom} x={items.x} y={items.bottom + 24}>
             <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>keeps only what needs the whole pair</span>
           </Note>

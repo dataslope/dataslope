@@ -1,18 +1,20 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { sx, type XScale } from "../../editorial/charts";
+import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
 import { body, fmt, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CALLBACK, jitter } from "./data";
 import { Bracket, DOT, Headline, STAT, STAT_INK, Svg } from "./parts";
 
 const X: XScale = { lo: 20, hi: 80, x0: 330, x1: 1290 };
-const ROW_A = 430;
-const ROW_B = 540;
+const ROW_A = 410;
+const ROW_B = 510;
+const BRACKET = ROW_B + 60;
+const AXIS = 616;
 const JIT = 26;
 const JIT_A = jitter(140, CALLBACK.n);
 const JIT_B = jitter(141, CALLBACK.n);
@@ -21,8 +23,9 @@ const TOOLS = ["distributions", "standard errors", "intervals", "tests", "effect
 
 /**
  * The close, for the whole course: its first picture (two groups of forty
- * from one process, B ahead by 3.62) and its first question, could this
- * just be luck?, then what every unit since has been for.
+ * from one process, B ahead by 3.62, on the scale they were drawn on) and its
+ * first question, could this just be luck? It was: both came from the same
+ * process. Then what every unit since has been for.
  */
 export const CloseScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -35,6 +38,7 @@ export const CloseScene: React.FC = () => {
   const gapAt = n.word("began", "a gap");
   const questionAt = n.word("began", "one question");
   const couldAt = n.word("began", "Could");
+  const answerFrom = n.beat("answer").from;
   const everythingAt = n.word("since", "Everything");
   const honestlyAt = n.word("since", "honestly", { edge: "end" });
   const lookAt = n.word("last", "look all you like");
@@ -60,6 +64,7 @@ export const CloseScene: React.FC = () => {
       {/* ── Sound: the two groups, the gap, the tools, the last line ── */}
       <Sfx name="el-sprinkle" at={groupsAt - 4} level={-34} />
       <Sfx name="el-tap" at={gapAt - 6} level={-29} />
+      <Sfx name="el-pencil" at={answerFrom - 2} level={-35} />
       <Sfx name="el-pencil" at={everythingAt - 2} level={-35} />
       <Sfx name="el-pencil" at={hasntAt - 4} level={-34} />
       <Sfx name="el-chime" at={endAt + 10} level={-32} />
@@ -93,6 +98,7 @@ export const CloseScene: React.FC = () => {
       </div>
 
       <div style={{ position: "absolute", inset: 0, opacity: settle * rest }}>
+        <Axis scale={X} base={y(AXIS)} ticks={[20, 30, 40, 50, 60, 70, 80]} at={groupsAt - 6} />
         {(["A", "B"] as const).map((g, i) => (
           <Ink key={g} at={groupsAt - 4 + i * 6} dur={12} style={{ left: 160, top: y(i ? ROW_B : ROW_A) - 14 }}>
             <span style={label(22, INK)}>Group {g}</span>
@@ -121,13 +127,23 @@ export const CloseScene: React.FC = () => {
             ))}
           </Svg>
         ) : null}
-        <Bracket x0={sx(X, CALLBACK.meanA)} x1={sx(X, CALLBACK.meanB)} y={y(ROW_B + 64)} at={gapAt - 2} color={STAT} up />
-        <Ink at={gapAt + 4} dur={14} style={{ left: sx(X, CALLBACK.meanB) + 18, top: y(ROW_B + 64) - 6, whiteSpace: "nowrap" }}>
+        <Bracket x0={sx(X, CALLBACK.meanA)} x1={sx(X, CALLBACK.meanB)} y={y(BRACKET)} at={gapAt - 2} color={STAT} up />
+        <Ink at={gapAt + 4} dur={14} style={{ left: sx(X, CALLBACK.meanB) + 18, top: y(BRACKET) - 6, whiteSpace: "nowrap" }}>
           <span style={{ ...note(23, STAT_INK), fontWeight: 700 }}>B ahead by {fmt(Math.abs(CALLBACK.gap))}</span>
         </Ink>
-        <Ink at={couldAt - 6} dur={20} style={{ left: 160, top: y(668), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(48, true), color: INK }}>Could this just be luck?</span>
-        </Ink>
+        {/* The course's first answer: the two groups were one process. */}
+        <Note at={answerFrom + 4} x={X.x1 + 50} y={y((ROW_A + ROW_B) / 2) - 28}>
+          <span style={{ ...note(21, INK_SOFT), display: "block", whiteSpace: "nowrap" }}>both drawn from</span>
+          <span style={{ ...note(21, INK_SOFT), display: "block", whiteSpace: "nowrap" }}>the same process</span>
+        </Note>
+        <div style={{ position: "absolute", left: 160, top: y(668), display: "flex", gap: "0.3em", whiteSpace: "nowrap", ...body(48, true) }}>
+          <Ink at={couldAt - 6} dur={20} style={{ position: "relative" }}>
+            <span style={{ ...body(48, true), color: INK }}>Could this just be luck?</span>
+          </Ink>
+          <Ink at={answerFrom - 2} dur={18} style={{ position: "relative" }}>
+            <span style={{ ...body(48, true), color: STAT_INK }}>Back then, it was.</span>
+          </Ink>
+        </div>
 
         {/* Every tool the course built to answer it. */}
         <Svg opacity={ease(frame, everythingAt - 4, 12)}>

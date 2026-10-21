@@ -1,16 +1,16 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
+import { Entity, ENTITY, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { HAIRLINE, INK, INK_SOFT, label } from "../../editorial/style";
-import { Ink, Leader } from "../../editorial/ui";
+import { FigLabel, Ink, Leader } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { TRACKER } from "./data";
 import { Chip, Drift, Head, Kicker, PathArrow, Ping } from "./parts";
 
-const CHIP_Y = 292;
+const CHIP_Y = 310;
 const CHIP_X = [120, 360, 600, 840, 1080, 1320];
 const CHIP_W = 196;
 /** How far the schema grows while the versions arrive. */
@@ -19,13 +19,14 @@ const DRIFT = 0.025;
 /**
  * Part 3 opens (why-schemas-change): a task tracker that starts with tasks
  * alone and keeps being asked for more (v1 to v5), drawn as a run of
- * versions over the schema that grows with them; then the five things that
+ * versions over the schema that grows with them (a table for each of v3, v4
+ * and v5, each line straight off the tasks box); then the five things that
  * lean on a live schema, each named as the narration reaches it.
  */
 export const ChangeScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
-  const { y } = useLayout();
+  const { y, h } = useLayout();
 
   const changeFrom = n.beat("change").from;
   const trackerAt = n.word("change", "task tracker");
@@ -46,11 +47,18 @@ export const ChangeScene: React.FC = () => {
   ];
   const shapeAt = n.word("risky", "shape");
 
+  // The new tables stack beside tasks, each level with the row its line
+  // leaves from, so every line runs straight across: labels by the header,
+  // task_history by title, projects' id by project_id.
   const tasks = useEntityLayout({ x: 120, y: y(400), width: 330, ...TRACKER.tasks });
-  const projects = useEntityLayout({ x: 640, y: y(400), width: 300, ...TRACKER.projects });
+  const besideX = 640;
+  const levelHead = (rowMid: number) => rowMid - h(ENTITY.head) / 2;
+  const labels = useEntityLayout({ x: besideX, y: tasks.y, width: 300, ...TRACKER.labels });
+  const history = useEntityLayout({ x: besideX, y: levelHead(tasks.anchor("right", "title")[1]), width: 300, ...TRACKER.history });
+  const projectsY = tasks.anchor("right", "project_id")[1] - (ENTITY.border + h(ENTITY.head) + h(ENTITY.row) / 2);
+  const projects = useEntityLayout({ x: besideX, y: projectsY, width: 300, ...TRACKER.projects });
   const pId = projects.anchor("left", "id");
   const tP = tasks.anchor("right", "project_id");
-  const bend = (tasks.right + projects.left) / 2;
 
   const versions = [
     { at: trackerAt, text: "v1 tasks only" },
@@ -70,7 +78,7 @@ export const ChangeScene: React.FC = () => {
     left: tasks.left - 22,
     top: tasks.top - 22,
     right: grown(projects.right, tasks.left) + 26,
-    bottom: grown(tasks.bottom, tasks.top) + 22,
+    bottom: grown(Math.max(tasks.bottom, projects.bottom), tasks.top) + 22,
   };
   const from: [number, number] = [frameBox.right, (frameBox.top + frameBox.bottom) / 2];
   const schemaAt = n.word("risky", "live schema");
@@ -81,6 +89,8 @@ export const ChangeScene: React.FC = () => {
         <Sfx key={i} name="el-tap" at={v.at - 2} level={-29 - (i % 2)} />
       ))}
       <Sfx name="el-pop" at={projectsAt} level={-30} />
+      <Sfx name="el-pop" at={labelsAt} level={-31} />
+      <Sfx name="el-pop" at={historyAt} level={-30} />
       {leanAt.map((t, i) => (
         <Sfx key={`d${i}`} name="el-pencil" at={t - 4} level={-35} />
       ))}
@@ -95,6 +105,8 @@ export const ChangeScene: React.FC = () => {
       <Head at={riskyFrom - 2} second={shapeAt - 6} italic="leans on its shape.">
         Everything live
       </Head>
+
+      <FigLabel n="3" title="A task tracker, version by version" at={changeFrom + 4} x={120} y={y(262)} />
 
       {/* ── The versions, one per request ── */}
       {versions.map((v, i) => (
@@ -152,12 +164,23 @@ export const ChangeScene: React.FC = () => {
         <Entity layout={projects} at={projectsAt - 2} />
         <Relation
           name="projects contain tasks"
-          points={[pId, [bend, pId[1]], [bend, tP[1]], tP]}
+          points={[pId, tP]}
           from="exactly-one"
           to="zero-or-many"
           at={projectsAt + 12}
           label="contains"
-          labelPos={[bend + 10, (pId[1] + tP[1]) / 2 - 14]}
+          labelPos={[tasks.right + 48, tP[1] - 36]}
+        />
+        {/* v4: labels, many to many with tasks; v5: each task's history. */}
+        <Entity layout={labels} at={labelsAt - 2} />
+        <Relation name="tasks have labels" points={[tasks.anchor("right"), labels.anchor("left")]} from="many" to="many" at={labelsAt + 6} />
+        <Entity layout={history} at={historyAt - 2} />
+        <Relation
+          name="tasks have history"
+          points={[tasks.anchor("right", "title"), history.anchor("left")]}
+          from="exactly-one"
+          to="zero-or-many"
+          at={historyAt + 6}
         />
       </Drift>
 
@@ -174,7 +197,8 @@ export const ChangeScene: React.FC = () => {
           <Ink at={leanAt[i] - 4} dur={14} style={{ left: depX, top: depY(i), whiteSpace: "nowrap" }}>
             <Chip tone="soft">{d}</Chip>
           </Ink>
-          <Ping x={depX + 90} y={depY(i) + 22} at={shapeAt + i * 3} color={INK} r={40} dur={20} />
+          {/* "Leaning on its shape": each dependent's end of its line, the last once it has arrived. */}
+          <Ping x={depX - 12} y={depY(i) + 22} at={i < 4 ? shapeAt + i * 3 : leanAt[4] + 8} color={INK} r={22} dur={20} />
         </React.Fragment>
       ))}
       <div

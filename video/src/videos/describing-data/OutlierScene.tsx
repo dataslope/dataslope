@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, halo, headline, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, fmt, halo, headline, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -20,9 +20,9 @@ const JIT_Y = jitter(73, OUTLIERS.values.length);
 
 /** The lesson's three kinds of outlier, and what each one calls for. */
 const KINDS = [
-  { word: "error", egWord: "typo", title: "An error", eg: "a typo, a unit mix-up", act: "Fix it, or drop it and say why" },
-  { word: "placeholder", egWord: "minus nine", title: "A placeholder", eg: "−999 standing for missing", act: "Treat it as missing" },
-  { word: "real", egWord: "biggest customer", title: "Something real", eg: "your biggest customer, a fraud", act: "Keep it, and use robust statistics" },
+  { word: "error", egWord: "typo", actWord: "fix", title: "An error", eg: "a typo, a unit mix-up", act: "Fix it, or drop it and say why" },
+  { word: "placeholder", egWord: "minus nine", actWord: "treat", title: "A placeholder", eg: "−999 standing for missing", act: "Treat it as missing" },
+  { word: "real", egWord: "biggest customer", actWord: "keep", title: "Something real", eg: "your biggest customer, a fraud", act: "Keep it, and use robust statistics" },
 ] as const;
 
 /**
@@ -60,6 +60,9 @@ export const OutlierScene: React.FC = () => {
   const notVerdictAt = n.word("verdict", "not a verdict");
   const whyAt = n.word("verdict", "why");
   const decideAt = n.word("verdict", "decide");
+  const actAt = KINDS.map((k) => n.word("verdict", k.actWord));
+  const fencesSitAt = n.word("rules", "quartiles");
+  const zRuleAt = n.word("rules", "three standard deviations");
   const lookAt = n.word("plot-in", "look");
 
   const strip = y(STRIP);
@@ -72,6 +75,8 @@ export const OutlierScene: React.FC = () => {
   const tailBand = ease(frame, longTailAt - 4, 16);
   const cardsOut = ease(frame, flagFrom - 6, 14) * (1 - ease(frame, decideAt - 8, 14));
   const acts = ease(frame, decideAt - 6, 16);
+  /** The two planted earners arrive with the rest: the definition needs its far points. */
+  const plantedIn = ease(frame, outlierFrom + 28, 10);
 
   const ySpread = (i: number) => strip + (JIT_Y[i] - 0.5) * 2 * JIT;
   const at = (v: number) => OUTLIERS.values.indexOf(v);
@@ -84,7 +89,9 @@ export const OutlierScene: React.FC = () => {
       <Sfx name="el-pencil" at={fencesAt - 4} level={-33} />
       <Sfx name="el-pencil" at={zAt - 4} level={-33} />
       <Sfx name="el-tap" at={twoAt - 2} level={-28} />
-      <Sfx name="el-pop" at={decideAt - 6} level={-30} />
+      {actAt.map((a, i) => (
+        <Sfx key={i} name="el-pop" at={a - 4} level={-31} />
+      ))}
 
       {/* ── Headlines ── */}
       <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
@@ -122,22 +129,30 @@ export const OutlierScene: React.FC = () => {
             <line x1={fenceX} x2={fenceX} y1={base} y2={base - (base - (strip - JIT - 40)) * fence} stroke={INK} strokeWidth={2.4} strokeDasharray="8 6" />
           </Svg>
         ) : null}
-        <Tag x={fenceX} y={strip - JIT - 76} opacity={ease(frame, fencesAt, 12)} size={21} bold>
-          box-plot fence, {fmt(OUTLIERS.upper, 1)}
+        <Tag x={fenceX - 10} y={strip - JIT - 100} opacity={ease(frame, fencesAt, 12)} size={21} bold align="right">
+          <div style={{ textAlign: "right" }}>
+            <div>box-plot fence</div>
+            <div style={{ fontWeight: 500, opacity: ease(frame, fencesSitAt - 6, 12) }}>
+              Q3 + 1.5 × IQR = <span style={TABULAR}>{fmt(OUTLIERS.upper, 1)}</span>
+            </div>
+          </div>
         </Tag>
         {zLine > 0 ? (
           <Svg>
             <line x1={zX} x2={zX} y1={base} y2={base - (base - (strip - JIT - 40)) * zLine} stroke={STAT} strokeWidth={2.4} strokeDasharray="8 6" />
           </Svg>
         ) : null}
-        <Tag x={zX + 6} y={strip - JIT - 76} opacity={ease(frame, zAt, 12)} color={STAT_INK} size={21} bold align="left">
-          z of 3, at {fmt(OUTLIERS.zCut, 1)}
+        <Tag x={zX + 10} y={strip - JIT - 100} opacity={ease(frame, zAt, 12)} color={STAT_INK} size={21} bold align="left">
+          <div>z-score cut</div>
+          <div style={{ fontWeight: 500, opacity: ease(frame, zRuleAt - 4, 12) }}>
+            mean + 3 SD = <span style={TABULAR}>{fmt(OUTLIERS.zCut, 1)}</span>
+          </div>
         </Tag>
 
         {/* The incomes. */}
         <Svg>
           {OUTLIERS.values.map((v, i) => {
-            const a = planted.has(v) ? ease(frame, genuineAt - 4 + (v === 200 ? 4 : 0), 10) : ease(frame, outlierFrom + (i / OUTLIERS.values.length) * 26, 8);
+            const a = planted.has(v) ? plantedIn : ease(frame, outlierFrom + (i / OUTLIERS.values.length) * 26, 8);
             if (a <= 0) return null;
             return <circle key={i} cx={sx(X, v)} cy={ySpread(i)} r={R * (planted.has(v) ? 1.3 : 1)} fill={DATA} opacity={0.78 * a} stroke={PAPER} strokeWidth={1} />;
           })}
@@ -152,7 +167,12 @@ export const OutlierScene: React.FC = () => {
           })}
         </Svg>
         <Axis scale={X} base={base} ticks={[0, 50, 100, 150, 200]} at={outlierFrom} />
-        <Pulse x={sx(X, 200)} y={ySpread(at(200))} at={farAt - 2} color={DATA} r={7} />
+        {OUTLIERS.planted.map((v, k) => (
+          <React.Fragment key={`p${v}`}>
+            <Pulse x={sx(X, v)} y={ySpread(at(v))} at={farAt - 2 + k * 4} color={DATA} r={7} />
+            <Pulse x={sx(X, v)} y={ySpread(at(v))} at={genuineAt - 2 + k * 4} color={DATA} r={7} />
+          </React.Fragment>
+        ))}
         <Pulse x={sx(X, 200)} y={ySpread(at(200))} at={kindAt[2] - 2} color={DATA} r={7} />
         {OUTLIERS.iqrFlagged.map((v, k) => (
           <Pulse key={v} x={sx(X, v)} y={ySpread(at(v))} at={sixOfAt - 2 + k * 2} color={INK} r={R + 6} />
@@ -214,7 +234,7 @@ export const OutlierScene: React.FC = () => {
                 k.eg
               )}
             </div>
-            <div style={{ ...note(24, STAT_INK), fontWeight: 650, marginTop: 14, opacity: ease(frame, decideAt - 6 + i * 6, 12), whiteSpace: "nowrap", ...halo }}>
+            <div style={{ ...note(24, STAT_INK), fontWeight: 650, marginTop: 14, opacity: ease(frame, actAt[i] - 4, 12), whiteSpace: "nowrap", ...halo }}>
               {k.act}
             </div>
           </div>

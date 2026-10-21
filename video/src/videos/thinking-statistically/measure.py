@@ -23,8 +23,13 @@ page prints. The lessons are in content/courses/statistics-for-data-science-pyth
   2 = chocolate, 3 = strawberry. Average them and you might get 1.8." The
   lesson gives no responses, so the video uses ten of its own, chosen to give
   the lesson's 1.8; their mean and mode are computed here like any column's.
+  The first three answers are 1, 2 and 3, so the codebook can be shown as
+  the first three chips while the narrator reads it out.
 - "zips" is types-of-data.mdx, "Encoding traps: when numbers aren't
   quantities", run in pandas exactly as the block builds its frame.
+- "plans" is types-of-data.mdx's ordered-categorical block: the plan column
+  S/L/M/M/L/S/M made an ordered category, and its median taken the way the
+  lesson takes it, as the middle category.
 
 Printed checks (the lessons' own output lines) go to stderr.
 """
@@ -35,6 +40,7 @@ import sys
 
 import numpy as np
 import pandas as pd
+from pandas.api.types import CategoricalDtype
 
 
 def r(x, d=4):
@@ -188,7 +194,7 @@ say(
 
 # ── Part 3. Flavor codes (types-of-data, opening example) ───────────────────
 FLAVORS = {1: "vanilla", 2: "chocolate", 3: "strawberry"}
-answers = pd.Series([1, 3, 1, 2, 3, 1, 1, 3, 2, 1], name="flavor")
+answers = pd.Series([1, 2, 3, 1, 3, 1, 1, 3, 2, 1], name="flavor")
 flavor_mean = answers.mean()
 flavor_mode = answers.map(FLAVORS).mode()[0]
 counts = answers.value_counts().sort_index()
@@ -225,6 +231,9 @@ out["zips"] = {
     "ratingMedian": r(df["rating_1to5"].median()),
     "prices": [r(v, 2) for v in df["price_usd"]],
     "priceMean": round(float(df["price_usd"].mean()), 2),
+    # The typical price the mean misses: the close's "skew can pull it off
+    # center", shown beside the mean.
+    "priceMedian": round(float(df["price_usd"].median()), 2),
     # Doubling a price means something; doubling a zip code does not. The
     # video doubles one of each from the lesson's frame.
     "price": r(df["price_usd"].iloc[2], 2),
@@ -236,6 +245,18 @@ say(
     f"  dtypes {out['zips']['dtypes']}; ${df['price_usd'].iloc[2]:.2f} doubled is ${df['price_usd'].iloc[2] * 2:.2f}; "
     f"{df['zip_code'].iloc[2]} doubled is {df['zip_code'].iloc[2] * 2}"
 )
+
+# ── Part 3. An ordered categorical (types-of-data, the plan block) ─────────
+plans = pd.DataFrame({"plan": ["S", "L", "M", "M", "L", "S", "M"]})
+plan_order = CategoricalDtype(categories=["S", "M", "L"], ordered=True)
+plans["plan"] = plans["plan"].astype(plan_order)
+median_plan = plans["plan"].cat.categories[int(plans["plan"].cat.codes.median())]
+say("Median plan (valid because ordinal+ordered):", median_plan)
+out["plans"] = {
+    "plans": [str(p) for p in plans["plan"]],
+    "order": [str(c) for c in plan_order.categories],
+    "median": str(median_plan),
+}
 
 json.dump(out, sys.stdout, separators=(",", ":"))
 sys.stdout.write("\n")

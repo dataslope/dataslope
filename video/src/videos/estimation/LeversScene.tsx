@@ -59,8 +59,7 @@ export const LeversScene: React.FC = () => {
   const spreadAt = n.word("noise", "spread");
   const doubleAt = n.word("noise", "Double");
   const doublesAt = n.word("noise", "doubles");
-  const recipeAt = n.word("rate-in", "recipe");
-  const rateAt = n.word("rate-in", "rate");
+  const noiseEnd = n.beat("noise").to;
 
   const levelAt = [eightyAt, ninetyAt, ninetyFiveAt, ninetyNineAt];
   const levelLit = [twoOneAt, -1, -1, fourAt];
@@ -70,7 +69,7 @@ export const LeversScene: React.FC = () => {
   const panels: { title: string; sub: string; at: number; rows: Row[]; lesson: string; lessonAt: number }[] = [
     {
       title: "Confidence level",
-      sub: `one sample of ${LEVELS.n}`,
+      sub: `one simulated sample of ${LEVELS.n}, values near 50`,
       at: confidenceAt - 4,
       rows: LEVELS.rows.map((r, i) => ({ name: `${r.level}%`, lo: r.lo, hi: r.hi, width: r.width, at: levelAt[i] - 4, lit: levelLit[i] })),
       lesson: "More confidence: wider",
@@ -96,8 +95,8 @@ export const LeversScene: React.FC = () => {
       sub: `the same ${LEVELS.n}, at 95%`,
       at: spreadAt - 6,
       rows: [
-        { name: `s = ${fmt(SPREAD.s, 1)}`, lo: SPREAD.lo, hi: SPREAD.hi, width: SPREAD.width, at: spreadAt - 2, lit: -1 },
-        { name: `s = ${fmt(SPREAD.sWide, 1)}`, lo: SPREAD.wideLo, hi: SPREAD.wideHi, width: SPREAD.wideWidth, at: doubleAt - 2, lit: doublesAt },
+        { name: `spread ${fmt(SPREAD.s, 1)}`, lo: SPREAD.lo, hi: SPREAD.hi, width: SPREAD.width, at: spreadAt - 2, lit: -1 },
+        { name: `spread ${fmt(SPREAD.sWide, 1)}`, lo: SPREAD.wideLo, hi: SPREAD.wideHi, width: SPREAD.wideWidth, at: doubleAt - 2, lit: doublesAt },
       ],
       lesson: "Twice the spread: twice the width",
       lessonAt: doublesAt + 4,
@@ -171,12 +170,11 @@ export const LeversScene: React.FC = () => {
         <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>each row has four times the data</span>
       </Note>
 
-      {/* The recipe the next scene reuses. */}
-      <Ink at={recipeAt - 6} dur={18} style={{ left: PANELS[0], top: y(852), whiteSpace: "nowrap" }}>
+      {/* The recipe the next scene reuses: short enough to read in the pause
+          after "doubles too" and the turn into the rate. */}
+      <Ink at={noiseEnd + 4} dur={18} style={{ left: PANELS[0], top: y(852), whiteSpace: "nowrap" }}>
         <span style={{ ...note(26, INK) }}>
-          Every lever moves one part of{" "}
-          <span style={{ fontWeight: 700 }}>estimate ± critical value × standard error</span>
-          <span style={{ color: EST_INK, opacity: ease(frame, rateAt - 4, 10) }}>, for a rate too.</span>
+          The same recipe: <span style={{ fontWeight: 700 }}>estimate ± critical value × standard error</span>
         </span>
       </Ink>
     </AbsoluteFill>

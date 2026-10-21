@@ -283,6 +283,39 @@ export const Wire: React.FC<{
   );
 };
 
+/**
+ * A short arrow that sits in a row of text (a flex item between two words),
+ * so every arrow in the row is the same length wherever the words end. It
+ * draws itself left to right on `at`, head last, like a Wire.
+ */
+export const InlineArrow: React.FC<{ at: number; length?: number; color?: string; width?: number }> = ({
+  at,
+  length = 64,
+  color = INK,
+  width = 2.2,
+}) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 10);
+  const HEAD = 13;
+  const base: Pt = [2, 12];
+  const tip: Pt = [2 + (length - 4) * p, 12];
+  return (
+    <svg width={length} height={24} style={{ flex: "none", overflow: "visible" }}>
+      {p > 0 ? <line x1={base[0]} x2={tip[0]} y1={12} y2={12} stroke={color} strokeWidth={width} strokeLinecap="round" /> : null}
+      {segLen(base, tip) >= HEAD + 3 ? (
+        <path
+          d={arrowHead(along(base, tip), HEAD, 7)}
+          fill="none"
+          stroke={color}
+          strokeWidth={width}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      ) : null}
+    </svg>
+  );
+};
+
 /** A tick drawn as one stroke, centered on (x, y). */
 export const Tick: React.FC<{ x: number; y: number; at: number; size?: number; color?: string; out?: number }> = ({
   x,
@@ -490,6 +523,8 @@ export const PaperPage: React.FC<{
 // ── A table of rows that can move on disk ────────────────────────────────────
 
 export const CELL_SIZE = 25;
+/** How far a row in flight steps right, at most (see MovingTable). */
+export const ASIDE = 100;
 export const HEAD_SIZE = 21;
 /** JetBrains Mono's advance, in em. */
 const ADVANCE = 0.6;
@@ -597,9 +632,9 @@ export const MovingTable: React.FC<{
         const washes = (r.bands ?? []).map((b) => ({ o: shown(frame, b.at, b.out), color: b.color ?? HIGHLIGHT }));
         // A row in flight lifts off the page and steps aside, each by its
         // own amount, so rows that pass each other do not print over each
-        // other.
+        // other. At most ASIDE px, which a table's neighbour leaves room for.
         const lift = Math.sin(m * Math.PI);
-        const aside = lift * (40 + 70 * (i % 3));
+        const aside = lift * ASIDE * (0.3 + (0.7 * i) / Math.max(1, nRows - 1));
         return (
           <div
             key={i}
@@ -688,7 +723,8 @@ const TOKEN_INK = {
   punct: INK_SOFT,
   name: INK,
 } as const;
-const KEYWORDS = new Set(["SELECT", "FROM", "WHERE", "JOIN", "ON", "AS", "INSERT", "INTO", "VALUES"]);
+// SQL's keywords, and the two of POSTQUEL's that Fig. 6 sets.
+const KEYWORDS = new Set(["SELECT", "FROM", "WHERE", "JOIN", "ON", "AS", "INSERT", "INTO", "VALUES", "retrieve", "where"]);
 const TABLES = new Set(["orders", "customers"]);
 
 type Token = { text: string; color: string; weight?: number };

@@ -94,7 +94,7 @@ export const CloseScene: React.FC = () => {
         </Fade>
 
         <NextLine at={processAt} x={X0} y={y(700)} width={980}>
-          designing a schema, start to finish.
+          designing a schema, start to finish,
         </NextLine>
         <Ink at={liveAt - 4} dur={16} style={{ left: X0, top: y(700) + 84, whiteSpace: "nowrap" }}>
           <span style={{ ...note(22, INK_SOFT) }}>and changing it once it&apos;s live</span>

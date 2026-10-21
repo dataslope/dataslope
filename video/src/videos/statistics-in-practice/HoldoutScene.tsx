@@ -7,7 +7,7 @@ import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HOLDOUT, TIPS } from "./data";
-import { Check, Headline, lerp, Spot, Svg, Wall } from "./parts";
+import { Check, Headline, lerp, Marker, Spot, Svg, Wall } from "./parts";
 import { LeadCard, WALL_BOTTOM, WALL_TOP, WALL_X } from "./WallScene";
 
 /** The 244 bills as a grid, 22 to a row, left of the wall. */
@@ -28,7 +28,8 @@ const CARD_RIGHT = { x: 1080, y: 790 };
 /**
  * The hold-out slice: split the bills before exploring, 70% to roam in and
  * 30% locked away; carry the question across the wall, not the data; test
- * once on the bills that never shaped the hunch.
+ * once on the bills that never shaped the hunch, and take what that says as
+ * the answer.
  */
 export const HoldoutScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -47,6 +48,8 @@ export const HoldoutScene: React.FC = () => {
   const dataAt = n.word("carry", "data");
   const onceAt = n.word("once", "once");
   const sayAt = n.word("once", "never had a say");
+  const whateverAt = n.word("once", "Whatever");
+  const answerAt = n.word("once", "the answer");
   const betterAt = n.word("ab-in", "better");
   const purposeAt = n.word("ab-in", "purpose");
 
@@ -79,6 +82,7 @@ export const HoldoutScene: React.FC = () => {
       <Sfx name="el-pop" at={lockedAt - 4} level={-30} />
       <Sfx name="el-whoosh" at={acrossAt - 6} level={-34} />
       <Sfx name="el-tap" at={onceAt - 4} level={-28} />
+      <Sfx name="el-pencil" at={answerAt - 4} level={-35} />
 
       <Headline lead="Split first," turn="then explore." at={splitFrom - 6} turnAt={exploreAt - 4} out={betterAt - 6} />
       <Headline lead="Better still," turn="make fresh data." at={betterAt - 2} turnAt={purposeAt - 14} />
@@ -154,6 +158,11 @@ export const HoldoutScene: React.FC = () => {
       </Ink>
       <Ink at={sayAt - 4} dur={14} style={{ left: box.x0 + 200, top: box.y1 + 58, whiteSpace: "nowrap" }}>
         <span style={{ ...note(22, INK_SOFT) }}>on bills that never shaped the hunch</span>
+      </Ink>
+      <Ink at={whateverAt - 4} dur={14} style={{ left: box.x0 + 44, top: box.y1 + 100, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK), fontWeight: 600 }}>
+          Whatever that says is <Marker at={answerAt - 4}>the answer.</Marker>
+        </span>
       </Ink>
 
       {/* ── The lead, carried over the wall without its data ── */}

@@ -22,6 +22,8 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { AGES, mulberry32 } from "./data";
 import { Marked, Span } from "./parts";
+import { useFigNumber } from "../sampling/merged";
+import { swell } from "../sampling/emphasis";
 
 const X: XScale = { lo: 10, hi: 80, x0: 160, x1: 1760 };
 const TICKS = [10, 20, 30, 40, 50, 60, 70, 80];
@@ -47,6 +49,7 @@ export const FormulaScene: React.FC = () => {
   const { fps } = useVideoConfig();
   const n = useNarration();
   const { y } = useLayout();
+  const fig = useFigNumber();
 
   // ── Cues ──
   const oneFrom = n.beat("one").from;
@@ -54,6 +57,8 @@ export const FormulaScene: React.FC = () => {
   const divideAt = n.word("divide", "Divide");
   const deviationAt = n.word("divide", "standard deviation");
   const sizeAt = n.word("divide", "sample size");
+  const standingAt = n.word("divide", "standing in");
+  const rootWordAt = n.word("divide", "square root");
   const tenAt = n.word("numbers", "Ten point five eight");
   const rootAt = n.word("numbers", "square root");
   const zeroAt = n.word("numbers", "zero point seven five");
@@ -89,10 +94,14 @@ export const FormulaScene: React.FC = () => {
         <span style={label(21, INK_SOFT)}>The standard error of an average</span>
       </Ink>
       <Ink at={divideAt} dur={18} style={{ left: 116, top: y(248), ...headline(124, true), whiteSpace: "nowrap" }}>
-        <span style={{ color: BLUE_INK }}>s</span> ÷ √<span>n</span>
+        <span style={{ color: BLUE_INK }}>s</span> ÷{" "}
+        <span style={{ display: "inline-block", transformOrigin: "50% 70%", transform: `scale(${swell(frame, rootWordAt - 2, 0.14, 20)})` }}>
+          √<span>n</span>
+        </span>
       </Ink>
       <Definition at={deviationAt - 2} top={y(268)} symbol="s" color={BLUE_INK}>
         the standard deviation of the sample
+        <span style={{ opacity: ease(frame, standingAt - 2, 14) }}>, our stand-in for σ</span>
       </Definition>
       <Definition at={sizeAt - 2} top={y(332)} symbol="n" color={INK}>
         the sample size
@@ -135,7 +144,7 @@ export const FormulaScene: React.FC = () => {
       </div>
 
       {/* ── The same ages, and their average's band, to one scale ── */}
-      <FigLabel n="2" title={`The same ${AGES.n} ages, and the band their average wobbles in`} at={contrastFrom - 10} x={160} y={y(592)} />
+      <FigLabel n={fig(2)} title={`The same ${AGES.n} ages, and the band their average wobbles in`} at={contrastFrom - 10} x={160} y={y(592)} />
       <Axis scale={X} base={y(BASE)} ticks={TICKS} at={contrastFrom - 8} format={years} />
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
         {AGES.values.map((v, i) => {
@@ -165,44 +174,44 @@ export const FormulaScene: React.FC = () => {
           Their average: {fmt(AGES.mean)}, give or take {fmt(AGES.se)}.
         </span>
       </Note>
-      <OneAverage from={oneFrom - 4} at={seenAt} />
+      <OneAverage from={oneFrom - 4} at={seenAt} out={contrastFrom - 14} />
     </AbsoluteFill>
   );
 };
 
-/** The right column's small figure: the 200 ages, collapsing into the one
- *  average a study ever gets to see. */
-const MINI: XScale = { lo: 10, hi: 80, x0: 1330, x1: 1800 };
-const OneAverage: React.FC<{ from: number; at: number }> = ({ from, at }) => {
+/** The 200 ages, full width where Fig. 2 will draw them, collapsing into the
+ *  one average a study ever gets to see; they give way to Fig. 2 itself. */
+const OneAverage: React.FC<{ from: number; at: number; out: number }> = ({ from, at, out }) => {
   const frame = useCurrentFrame();
   const { y } = useLayout();
-  const appear = ease(frame, from, 16);
+  const appear = ease(frame, from, 16) * (1 - ease(frame, out, 12));
   const c = ease(frame, at - 4, 18);
-  const mx = sx(MINI, AGES.mean);
+  const mx = sx(X, AGES.mean);
+  const mid = STRIP_TOP + STRIP_H / 2;
   if (appear <= 0) return null;
   return (
     <>
-      <Ink at={from} dur={14} style={{ left: MINI.x0, top: y(214) }}>
-        <span style={label(20, INK_SOFT)}>One sample of {AGES.n} ages</span>
-      </Ink>
-      <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
+      <div style={{ position: "absolute", left: 160, top: y(592), opacity: appear }}>
+        <span style={label(22, INK_SOFT)}>One sample of {AGES.n} ages</span>
+      </div>
+      <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: appear }}>
         {AGES.values.map((v, i) => (
-          <circle key={`at-${i}`} cx={sx(MINI, v)} cy={y(258 + JITTER[i] * 42)} r={3.4} fill={BAR} opacity={appear * 0.22 * c} />
+          <circle key={`at-${i}`} cx={sx(X, v)} cy={y(STRIP_TOP + JITTER[i] * STRIP_H)} r={6} fill={BAR} opacity={0.22 * c} />
         ))}
         {AGES.values.map((v, i) => (
           <circle
             key={i}
-            cx={sx(MINI, v) + (mx - sx(MINI, v)) * c}
-            cy={y(258 + JITTER[i] * 42 + (279 - 258 - JITTER[i] * 42) * c)}
-            r={3.4}
+            cx={sx(X, v) + (mx - sx(X, v)) * c}
+            cy={y(STRIP_TOP + JITTER[i] * STRIP_H + (mid - STRIP_TOP - JITTER[i] * STRIP_H) * c)}
+            r={6}
             fill={BAR}
-            opacity={appear * (1 - c) * 0.85}
+            opacity={(1 - c) * 0.85}
           />
         ))}
-        <circle cx={mx} cy={y(279)} r={11 * ease(frame, at + 8, 10)} fill={ACCENT} />
+        <circle cx={mx} cy={y(mid)} r={13 * ease(frame, at + 8, 10)} fill={ACCENT} />
       </svg>
-      <Note at={at + 12} x={mx - 150} width={300} y={y(318)} from="up" style={{ textAlign: "center" }}>
-        <span style={{ ...note(22, ACCENT_INK), fontWeight: 700 }}>one average, {fmt(AGES.mean)}</span>
+      <Note at={at + 12} x={mx + 26} y={y(mid) - 16} out={out}>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 700 }}>one average, {fmt(AGES.mean)}</span>
       </Note>
     </>
   );

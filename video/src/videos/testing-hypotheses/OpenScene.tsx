@@ -19,6 +19,8 @@ const C: XScale = { lo: 0, hi: 12, x0: 480, x1: 1700 };
 const OLD_Y = 470;
 const NEW_Y = 590;
 const BAR_H = 64;
+/** The schematic "same checkout twice": two bars with no axis, in px. */
+const SELF = { x: 1190, y: 756, long: 480, short: 432 };
 
 /**
  * Part 1 opens on Unit 6's bridge: an interval gives the plausible values, a
@@ -58,7 +60,8 @@ export const OpenScene: React.FC = () => {
   const toZero = ease(frame, usuallyAt - 4, Math.max(18, zeroAt - usuallyAt + 2));
   const pinGlow = pulse(frame, particularAt, 22);
   const effectGlow = pulse(frame, effectAt - 2, 24);
-  const pinV = lerp(1.6, 0, toZero);
+  // It lands right of the "plausible values" label (centred at 1.55), still inside the interval.
+  const pinV = lerp(2.3, 0, toZero);
   const pinX = sx(E, pinV);
   const zeroGlow = pulse(frame, zeroAt, 26);
 
@@ -69,6 +72,11 @@ export const OpenScene: React.FC = () => {
   const gapPulse = pulse(frame, bigAt + 4, 24);
   const oldEnd = sx(C, CHECKOUT.oldRate);
   const newEnd = sx(C, CHECKOUT.newRate);
+  // "Noise makes gaps for free": the old checkout against itself, schematic
+  // (no axis, no numbers), still showing a gap.
+  const selfA = ease(frame, noiseAt + 2, 12);
+  const selfB = ease(frame, noiseAt + 8, 12);
+  const selfGap = ease(frame, noiseAt + 18, 10);
 
   return (
     <AbsoluteFill>
@@ -78,6 +86,7 @@ export const OpenScene: React.FC = () => {
       <Sfx name="el-tap" at={elevenAt - 4} level={-28} />
       <Sfx name="el-tap" at={tenAt - 4} level={-29} />
       <Sfx name="el-pencil" at={noDiffAt - 4} level={-35} />
+      <Sfx name="el-pencil" at={noiseAt + 2} level={-36} />
 
       <Kicker at={hookFrom - 10}>The logic of a test</Kicker>
       <Head a="One value in particular." b="Could it be zero?" at={hookFrom - 6} bAt={zeroAt - 6} out={noiseAt - 8} />
@@ -85,7 +94,7 @@ export const OpenScene: React.FC = () => {
 
       {/* ── Fig. 1: the interval, then the one value a test asks about ── */}
       <div style={{ position: "absolute", inset: 0, opacity: 1 - leave, transform: `translateX(${-leave * 60}px)` }}>
-        <FigLabel n="1" title="What an interval says, and what a test asks" at={hookFrom} x={160} y={y(330)} />
+        <FigLabel n="1" title="What an interval says, and what a test asks" at={hookFrom} x={160} y={y(300)} />
         <Svg opacity={ease(frame, hookFrom + 2, 14)}>
           <line x1={E.x0} x2={E.x1} y1={y(E_BASE)} y2={y(E_BASE)} stroke={INK} strokeWidth={1.6} />
         </Svg>
@@ -151,7 +160,7 @@ export const OpenScene: React.FC = () => {
       </div>
 
       {/* ── Fig. 2: the checkout, old and new ── */}
-      <FigLabel n="2" title="Conversion rate, old checkout and new" at={checkoutFrom - 4} x={160} y={y(330)} />
+      <FigLabel n="2" title="Conversion rate, old checkout and new" at={checkoutFrom - 4} x={160} y={y(300)} />
       <Ink at={oldAt - 4} dur={12} style={{ left: 160, top: y(OLD_Y) - 16, whiteSpace: "nowrap" }}>
         <Label size={26}>Old checkout</Label>
       </Ink>
@@ -221,6 +230,25 @@ export const OpenScene: React.FC = () => {
             no difference
           </Label>
         </span>
+      </Note>
+
+      {/* ── Noise makes gaps for free: the same checkout twice ── */}
+      <Ink at={noiseAt - 2} dur={14} style={{ left: SELF.x, top: y(SELF.y), whiteSpace: "nowrap" }}>
+        <Label size={22} color={INK_SOFT}>
+          Old checkout against itself:
+        </Label>
+      </Ink>
+      <Svg>
+        {selfA > 0 ? <rect x={SELF.x} y={y(SELF.y) + 48} width={SELF.long * selfA} height={22} fill={RAW} /> : null}
+        {selfB > 0 ? <rect x={SELF.x} y={y(SELF.y) + 80} width={SELF.short * selfB} height={22} fill={RAW} /> : null}
+        {selfGap > 0 ? (
+          <rect x={SELF.x + SELF.short} y={y(SELF.y) + 48} width={(SELF.long - SELF.short) * selfGap} height={22} fill={STAT} />
+        ) : null}
+      </Svg>
+      <Note at={noiseAt + 20} x={SELF.x + SELF.long} y={y(SELF.y) + 112} align="right">
+        <Label size={22} color={STAT_INK}>
+          a gap anyway
+        </Label>
       </Note>
 
       {/* The question, as the lesson puts it. */}

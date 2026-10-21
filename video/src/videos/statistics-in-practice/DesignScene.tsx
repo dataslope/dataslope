@@ -31,7 +31,7 @@ const MOVER = METRICS.indexOf("Scroll depth");
 /**
  * Part 2 opens: the A/B test's arc, nearly all of it decided before the first
  * user; one hypothesis (the checkout button), one primary metric, and the
- * forking paths that ten metrics would bring back.
+ * p-hacking that ten metrics would bring back.
  */
 export const DesignScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -52,7 +52,7 @@ export const DesignScene: React.FC = () => {
   const tenAt = n.word("metric", "Track ten");
   const cheerAt = n.word("metric", "cheer");
   const movesAt = n.word("metric", "moves");
-  const forkingAt = n.word("metric", "forking paths");
+  const hackingAt = n.word("metric", "p-hacking");
   const thenAt = n.word("who-in", "Then");
   const experimentInAt = n.word("who-in", "experiment");
 
@@ -67,7 +67,7 @@ export const DesignScene: React.FC = () => {
       <Sfx name="el-pop" at={buttonAt - 4} level={-30} />
       <Sfx name="el-tap" at={metricAt - 4} level={-28} />
       <Sfx name="el-sprinkle" at={tenAt - 4} level={-34} />
-      <Sfx name="el-scratch" at={forkingAt - 4} level={-30} />
+      <Sfx name="el-scratch" at={hackingAt - 4} level={-30} />
 
       <Kicker at={designFrom - 10}>An A/B test, end to end</Kicker>
       <Headline lead="Almost all of it" turn="is decided first." at={designFrom - 6} turnAt={decidedAt - 6} />
@@ -198,7 +198,7 @@ export const DesignScene: React.FC = () => {
                     background: mover ? `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(hot * 100)}%, ${PAPER})` : PAPER,
                   }}
                 >
-                  {mover ? <Strike at={forkingAt - 4}>{m}</Strike> : m}
+                  {mover ? <Strike at={hackingAt - 4}>{m}</Strike> : m}
                 </span>
               </div>
             );

@@ -15,11 +15,16 @@ import { script as survivorshipBias } from "../survivorship-bias/script.ts";
  * recorded beats (Video.tsx). The five already end on spoken bridges into
  * one another, so the parts join without new words. plan.ts places them.
  *
- * `name` is the part's kicker in the merged video.
+ * `name` is the part's kicker in the merged video. `skip` lists beats of the
+ * part that the merged video leaves out (their audio, their captions and their
+ * time), where a standalone bridge would say twice what the next part opens
+ * with: SurvivorshipBias ends on "So how far off can it be?", and
+ * SamplingDistributions begins "How far can a fair sample miss?". The part's
+ * scenes still see the whole script, so their cues hold either way.
  */
-export const PARTS: readonly { name: string; script: NarrationScript }[] = [
+export const PARTS: readonly { name: string; script: NarrationScript; skip?: readonly string[] }[] = [
   { name: "Sampling bias", script: samplingBias },
-  { name: "Survivorship bias", script: survivorshipBias },
+  { name: "Survivorship bias", script: survivorshipBias, skip: ["far"] },
   { name: "Sampling distributions", script: samplingDistributions },
   { name: "The central limit theorem", script: centralLimitTheorem },
   { name: "Standard error", script: standardError },

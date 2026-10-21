@@ -119,11 +119,11 @@ export const PointScene: React.FC = () => {
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>one customer</span>
         </Note>
 
+        {/* The struck copies stay to the end, with "Just customer_id" under them. */}
         {copies.map((name, i) => {
           const top = copyTop + i * h(ENTITY.row);
           const p = ease(frame, copiesAt - 8 + i * 4, 10);
-          const gone = ease(frame, justAt + 6 + i * 3, 12);
-          if (p <= 0 || gone >= 1) return null;
+          if (p <= 0) return null;
           return (
             <div
               key={name}
@@ -141,7 +141,7 @@ export const PointScene: React.FC = () => {
                 alignItems: "center",
                 // Level with the entity's column names: its pad, its PK/FK badge, the gap.
                 paddingLeft: ENTITY.pad + 32 + ENTITY.gap,
-                opacity: p * (1 - gone),
+                opacity: p,
                 transform: `translateY(${(1 - p) * -10}px)`,
               }}
             >
@@ -151,10 +151,13 @@ export const PointScene: React.FC = () => {
             </div>
           );
         })}
-        <Note at={justAt + 8} x={orders.x} y={copyTop + 12}>
-          <span style={{ ...label(24, INK), fontWeight: 560, whiteSpace: "nowrap" }}>
-            Just <Mono color={KEY_INK}>customer_id</Mono>: her details live in one place.
-          </span>
+        <Note at={justAt + 2} x={orders.x} y={copyTop + copies.length * h(ENTITY.row) + 18}>
+          <div style={{ ...label(24, INK), fontWeight: 560, whiteSpace: "nowrap", lineHeight: 1.45 }}>
+            <div>
+              Just <Mono color={KEY_INK}>customer_id</Mono>.
+            </div>
+            <div style={{ color: INK_SOFT }}>The customer&apos;s details live in one place.</div>
+          </div>
         </Note>
         <Spot id="db-keys-tag" at={customerAt + 4} left={260} top={y(680)} width={250} height={250} />
       </Drift>

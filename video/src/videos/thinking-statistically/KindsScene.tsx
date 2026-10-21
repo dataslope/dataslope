@@ -65,8 +65,9 @@ export const KindsScene: React.FC = () => {
   const nominalAt = n.word("labels", "Nominal");
   const ordinalAt = n.word("labels", "Ordinal");
   const unevenAt = n.word("labels", "uneven");
-  const countsAt = n.word("numbers", "counts");
-  const measurementsAt = n.word("numbers", "measurements");
+  // "discrete counts", "continuous measurements": each leaf on its own name.
+  const discreteAt = n.word("numbers", "discrete");
+  const continuousAt = n.word("numbers", "continuous");
   const twoKindsAt = n.word("kinds", "two kinds");
   const whichGroupAt = n.word("kinds", "which group");
   const manyAt = n.word("kinds", "how many");
@@ -88,7 +89,7 @@ export const KindsScene: React.FC = () => {
   const dontAt = n.word("trap-in", "don't");
 
   const parentAt = [categoricalAt, numericalAt];
-  const leafAt = [nominalAt, ordinalAt, countsAt, measurementsAt];
+  const leafAt = [nominalAt, ordinalAt, discreteAt, continuousAt];
   const pic = leafAt.map((at) => ease(frame, at + 4, 14));
   // The sizes arrive evenly spaced on "Ordinal" and slide to their uneven
   // gaps on "uneven". (Scaling the positions from zero instead stacked all
@@ -113,8 +114,13 @@ export const KindsScene: React.FC = () => {
       <Sfx name="el-sprinkle" at={leafAt[2] + 4} level={-34} />
       <Sfx name="el-pop" at={fewAt - 4} level={-30} />
 
+      {/* The scene opens on what it is about, then asks it as two halves, each
+          on the words that say it, so "Which group," never waits alone. */}
+      <Ink at={kindsFrom - 4} dur={20} out={whichGroupAt - 16} style={{ left: 92, top: y(150), ...headline(80), whiteSpace: "nowrap" }}>
+        Every column is one of two kinds.
+      </Ink>
       <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
-        <Ink at={kindsFrom - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
+        <Ink at={whichGroupAt - 6} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Which group,
         </Ink>
         <Ink at={muchAt - 6} dur={18} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>

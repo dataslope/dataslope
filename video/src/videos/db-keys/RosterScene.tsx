@@ -43,7 +43,6 @@ export const RosterScene: React.FC = () => {
   // ── Cues ──
   const from = n.beat("roster").from;
   const twoColsAt = n.word("roster", "two columns");
-  const rosterAt = n.word("roster", "roster");
   const sevenAt = n.word("roster", "student seven");
   const takesAt = n.word("roster", "takes");
   const coursesAt = n.word("roster", "two courses");
@@ -73,8 +72,9 @@ export const RosterScene: React.FC = () => {
     width: 420,
     name: "enrollments",
     columns: [
-      { name: "student_id", type: "integer", key: "PK, FK" },
-      { name: "course_id", type: "integer", key: "PK, FK" },
+      // Only "PK": the video names a foreign key in Part 3, not here.
+      { name: "student_id", type: "integer", key: "PK" },
+      { name: "course_id", type: "integer", key: "PK" },
       { name: "enrolled_on", type: "date" },
     ],
   });
@@ -111,7 +111,7 @@ export const RosterScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: the entities, the two lines, the rows, the refusal ── */}
-      <Sfx name="el-whoosh" at={rosterAt - 6} level={-34} />
+      <Sfx name="el-whoosh" at={twoColsAt - 6} level={-34} />
       <Sfx name="el-pencil" at={takesAt} level={-34} />
       <Sfx name="el-pencil" at={studentsAt - 4} level={-34} />
       <Sfx name="el-tap" at={pairAt} level={-28} />
@@ -119,15 +119,15 @@ export const RosterScene: React.FC = () => {
       <Sfx name="el-pencil" at={pointAt - 2} level={-33} />
 
       <Drift from={from} to={end + 50}>
-        <Headline lead="Two columns," turn="one key." at={twoColsAt - 6} turnAt={pairAt - 4} out={whatAt - 4} />
+        <Headline lead="Two columns," turn="one key." at={from - 6} turnAt={pairAt - 4} out={whatAt - 4} />
         <Ink at={whatAt - 2} dur={18} style={{ left: 92, top: y(150), whiteSpace: "nowrap" }}>
           <span style={{ ...body(60, true), color: INK }}>So what should a key be?</span>
         </Ink>
 
-        {/* ── The roster's diagram ── */}
+        {/* ── The roster's diagram: its two key columns on "two columns" ── */}
         <Entity
           layout={enrollments}
-          at={rosterAt - 4}
+          at={twoColsAt - 4}
           marks={{
             student_id: { at: pairAt, tone: "key", out: neverAt },
             course_id: { at: pairAt + 4, tone: "key", out: neverAt },
@@ -153,8 +153,8 @@ export const RosterScene: React.FC = () => {
         <Relation name="courses to enrollments, key" points={courseLine} from="exactly-one" to="zero-or-many" at={pointAt + 2} color={KEY} dim={whatAt} />
 
         {/* ── The rows of enrollments ── */}
-        <TableName g={g} at={sevenAt - 2} dim={neverAt}>
-          enrollments, its key columns
+        <TableName g={g} at={sevenAt - 2} dim={pointAt - 4}>
+          enrollments (the roster): its key columns
         </TableName>
         <DataTable
           g={g}
@@ -171,9 +171,9 @@ export const RosterScene: React.FC = () => {
             { row: ghost, col: 1, at: onceAt + 3, color: MARK_BAD },
           ]}
           bands={[{ row: pairRow, at: pairAt, color: MARK_KEY }]}
-          dim={neverAt}
+          dim={pointAt - 4}
         />
-        <Note at={neitherAt} x={120} y={g.rowTop(0) + 6} dim={neverAt}>
+        <Note at={neitherAt} x={120} y={g.rowTop(0) + 6} dim={pointAt - 4}>
           <div style={{ ...noteStyle(22), lineHeight: 1.5 }}>
             <div>
               <span style={{ background: MARK, padding: "0 4px" }}>7</span> twice, <span style={{ background: MARK, padding: "0 4px" }}>42</span> twice:
@@ -188,7 +188,7 @@ export const RosterScene: React.FC = () => {
           at={onceAt + 4}
           message={ROSTER.again.message}
           detail={ROSTER.again.detail}
-          dim={neverAt}
+          dim={pointAt - 4}
         />
       </Drift>
     </AbsoluteFill>

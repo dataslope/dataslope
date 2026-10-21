@@ -121,12 +121,12 @@ export const script: NarrationScript = {
     {
       id: "output",
       text: "You never see the process itself. You only see what comes out of it... signal, plus noise.",
-      pauseAfter: 0.35,
+      pauseAfter: 0.7,
     },
     {
       id: "signal",
       text: "The signal is the stable part, here that flat hundred. The noise is everything that wobbles around it.",
-      pauseAfter: 0.35,
+      pauseAfter: 0.7,
     },
     { id: "job", text: "Statistics is how you find the signal through the noise.", pauseAfter: 0.7 },
     { id: "slice", text: "And the numbers you get are only ever a slice... of something much bigger." },
@@ -157,17 +157,17 @@ export const script: NarrationScript = {
       id: "parameter",
       scene: true,
       text: "A number that describes the population is a parameter. It's fixed... but you can't see it.",
-      pauseAfter: 0.35,
+      pauseAfter: 0.7,
     },
     {
       id: "statistic",
       text: "A number you compute from the sample is a statistic. You can see it, but it moves.",
-      pauseAfter: 0.35,
+      pauseAfter: 0.7,
     },
     {
       id: "letters",
       text: "Parameters get Greek letters, like mu for a mean. Statistics get Latin ones, like x-bar.",
-      pauseAfter: 0.45,
+      pauseAfter: 0.6,
     },
     {
       id: "cheat",
@@ -175,7 +175,8 @@ export const script: NarrationScript = {
       pauseAfter: 0.35,
     },
     { id: "miss", text: "Their average is a hundred and one point four. Close, but not on it.", pauseAfter: 0.35 },
-    { id: "price", text: "That miss isn't a mistake. It's the price of seeing only part." },
+    // The lesson's name for the miss, said as the screen shows it.
+    { id: "price", text: "That miss, the estimation error, isn't a mistake. It's the price of seeing only part." },
     { id: "twenty-in", text: "So how big is that miss, usually? One sample can't tell you." },
     {
       id: "twenty",
@@ -187,7 +188,7 @@ export const script: NarrationScript = {
     {
       id: "variable",
       text: "That makes a statistic a random variable, with a center and a spread of its own.",
-      pauseAfter: 0.35,
+      pauseAfter: 0.7,
     },
     {
       id: "points",
@@ -197,6 +198,8 @@ export const script: NarrationScript = {
     {
       id: "kind",
       text: "But before you summarize a sample at all... you need to know what KIND of number you're holding.",
+      // Part 3 turns here: a breath before the bridge into it.
+      pauseAfter: 0.8,
     },
     { id: "flavors-in", text: "Here's what goes wrong when you don't." },
 
@@ -226,7 +229,11 @@ export const script: NarrationScript = {
       text: "Labels split again. Nominal ones have no order, like countries. Ordinal ones do, like shirt sizes, but the gaps between them can be uneven.",
       pauseAfter: 0.4,
     },
-    { id: "numbers", text: "Numbers split into counts, like logins, and measurements, like price." },
+    // The leaves' names, discrete and continuous, said as they appear.
+    {
+      id: "numbers",
+      text: "Numbers split into discrete counts, like logins, and continuous measurements, like price.",
+    },
     { id: "trap-in", text: "Most columns tell you plainly which kind they are. A few don't." },
     {
       id: "trap",

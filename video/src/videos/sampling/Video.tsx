@@ -14,7 +14,7 @@ import { Scenes as StandardErrorScenes } from "../standard-error/Video";
 import { Scenes as SurvivorshipBiasScenes } from "../survivorship-bias/Video";
 import { MergedPartContext } from "./merged";
 import type { SamplingProps } from "./metadata";
-import { CROSSFADE, planParts, type PartSpan } from "./plan";
+import { asPlayed, CROSSFADE, planParts, type PartSpan } from "./plan";
 import { PARTS } from "./script";
 
 /** Each part's scenes, in PARTS order: its standalone video, minus the page. */
@@ -34,17 +34,18 @@ const Fade: React.FC<{ length: number; out: boolean; children: React.ReactNode }
   return <div style={{ position: "absolute", inset: 0, opacity }}>{children}</div>;
 };
 
+/** How many numbered figures each part has, in PARTS order. A part that adds
+ *  or drops a figure changes its count here, or the merged numbering after
+ *  it skips or repeats a number. */
+const FIGURES = [6, 2, 7, 5, 7];
+const figBase = (k: number) => FIGURES.slice(0, k).reduce((a, b) => a + b, 0);
+
 /**
  * One part: its standalone video's scenes under its own narration, exactly
  * as that video times them, plus its own recorded beats. Inside the
  * Sequence, frame 0 is the part's own frame 0, so every cue in its scenes
  * lands where it does in the standalone video.
  */
-/** How many numbered figures each part has, in PARTS order. A part that adds
- *  or drops a figure changes its count here, or the merged numbering after
- *  it skips or repeats a number. */
-const FIGURES = [6, 2, 7, 5, 7];
-const figBase = (k: number) => FIGURES.slice(0, k).reduce((a, b) => a + b, 0);
 
 const Part: React.FC<{ k: number; timeline: Timeline; span: PartSpan }> = ({ k, timeline, span }) => {
   const Scenes = SCENES[k];
@@ -57,7 +58,11 @@ const Part: React.FC<{ k: number; timeline: Timeline; span: PartSpan }> = ({ k, 
           <Fade length={length} out={!last}>
             <Scenes />
           </Fade>
-          <NarrationAudio />
+          {/* The scenes cue from the whole timeline; the audio leaves out the
+              beats the merged video skips. */}
+          <NarrationProvider timeline={asPlayed(timeline, PARTS[k].skip)}>
+            <NarrationAudio />
+          </NarrationProvider>
         </MergedPartContext.Provider>
       </NarrationProvider>
     </Sequence>
@@ -90,8 +95,10 @@ const Parts: React.FC<{ parts: readonly Timeline[] }> = ({ parts }) => {
  * NarrationProvider and NarrationAudio, so its cues, its beats and their
  * audio are the standalone video's, moved to where the part plays
  * (plan.ts). The parts already end on spoken bridges into one another; the
- * first four hide their "Next: …" line here (merged.ts), and each part
- * cross-fades into the next.
+ * first four hide their "Next: …" line here (merged.ts), the first two put
+ * the bridge's own words in its place (Bridge.tsx), a bridge question the
+ * next part opens with is left out (PARTS `skip`), and each part cross-fades
+ * into the next.
  */
 export const Sampling: React.FC<SamplingProps> = ({ parts, ...props }) => (
   <EditorialPage {...props}>{parts ? <Parts parts={parts} /> : null}</EditorialPage>

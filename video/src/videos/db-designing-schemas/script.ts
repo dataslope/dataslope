@@ -41,14 +41,23 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     it is 44.00, "forty-four dollars"; totaled from current_price it is
  *     48.00, "forty-eight", the lesson's "silently rewrite history";
  *   - a line with quantity 0 is refused: new row for relation "order_items"
- *     violates check constraint "order_items_quantity_check" (23514);
+ *     violates check constraint "order_items_quantity_check" (23514). It is
+ *     tried as (2, 1, 0, 12.00), on a new order for Ben, so only the CHECK
+ *     can refuse it;
  *   - the same product twice on one order is refused: duplicate key value
- *     violates unique constraint "order_items_pkey" (23505);
+ *     violates unique constraint "order_items_pkey" (23505), for
+ *     (1, 1, 1, 12.00);
+ *   - the one wide table is the store's five tables LEFT JOINed: Ana's
+ *     order as 4 rows (two lines, each in two categories) carrying her email
+ *     4 times, Ben as a row of 15 nulls, and 4 columns called id;
  *   - tasks (evolving-schemas-safely, "Add a required column in safe steps"):
  *     two existing tasks, "Draft design" and "Review keys". Adding priority
  *     as NOT NULL in one step fails: column "priority" of relation "tasks"
  *     contains null values (23502). Added nullable, backfilled with 'normal'
  *     (UPDATE 2), checked (no row missing one), then SET NOT NULL, it holds;
+ *   - the tracker's v4 and v5, which the lesson lists without SQL, are built
+ *     in check.mjs (labels with task_labels, and task_history) so the two
+ *     tables drawn for them exist;
  *   - the expand and contract of tasks.owner_id into task_assignees, which
  *     the lesson draws without SQL, is built in check.mjs as DDL: the
  *     expanded schema runs with both shapes, the backfill moves both owners
@@ -111,7 +120,8 @@ export const script: NarrationScript = {
       text: "And an order contains products, each with a quantity... and the price charged.",
       pauseAfter: 0.35,
     },
-    { id: "nouns", text: "The nouns are your entities. The verbs say how they connect." },
+    // Longer than the scene gap: the key's third line ("facts become columns") is read, not said.
+    { id: "nouns", text: "The nouns are your entities. The verbs say how they connect.", pauseAfter: 2.0 },
     {
       id: "entities",
       scene: true,
@@ -120,7 +130,7 @@ export const script: NarrationScript = {
     },
     {
       id: "facts",
-      text: "Step three puts each fact on the thing it describes. An email describes a customer. A price describes a product.",
+      text: "Step three, attributes: each fact goes on the thing it describes. An email describes a customer. A price describes a product.",
       pauseAfter: 0.3,
     },
     {
@@ -136,19 +146,20 @@ export const script: NarrationScript = {
     {
       id: "pairs",
       text: "Products and categories are many on both sides, so they meet in a table of pairs, product categories.",
-      pauseAfter: 0.35,
+      pauseAfter: 0.9,
     },
     {
       id: "hidden",
       text: "Orders and products are many to many, too. But that link has facts of its own: how many, and at what price.",
-      pauseAfter: 0.3,
+      pauseAfter: 0.7,
     },
     { id: "items", text: "So it becomes a real table, order items, one row per line on the receipt." },
     {
       id: "keys",
       scene: true,
       text: "Step five, keys. Order items is keyed by the pair, so the same product can't land on one order twice.",
-      pauseAfter: 0.35,
+      // Time to read the refusal before step six turns the rail.
+      pauseAfter: 1.5,
     },
     {
       id: "rules",
@@ -169,8 +180,9 @@ export const script: NarrationScript = {
     {
       id: "history",
       text: "Total her order from its lines, and it's forty-four dollars, what she paid. Total it from today's prices, and it says forty-eight. History would quietly rewrite itself.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.6,
     },
+    { id: "without", text: "Without that copy, forty-eight is all it could say.", pauseAfter: 0.8 },
     { id: "review", text: "That's step eight: walk real rows through the design, and see what breaks." },
 
     // ── Part 3. Changing a live schema ────────────────────────────────────
@@ -178,7 +190,8 @@ export const script: NarrationScript = {
       id: "change",
       scene: true,
       text: "But a design is never done. A task tracker starts with just tasks. Then people want due dates. Then projects, labels, a history.",
-      pauseAfter: 0.35,
+      // The last three tables land within a second; let them settle.
+      pauseAfter: 0.9,
     },
     { id: "kinds", text: "That's not failure. It's the product learning about the world.", pauseAfter: 0.4 },
     {
@@ -211,15 +224,17 @@ export const script: NarrationScript = {
     {
       id: "widen",
       text: "First, expand: add the new table beside the old column, so both shapes work.",
-      pauseAfter: 0.3,
+      pauseAfter: 0.7,
     },
-    { id: "move", text: "Move the data across, then the code.", pauseAfter: 0.3 },
-    { id: "contract", text: "Only once nothing reads the old column... contract, and remove it." },
+    { id: "move", text: "Move the data across, then the code.", pauseAfter: 0.7 },
+    // Longer than the scene gap, so the contracted schema holds before the cut.
+    { id: "contract", text: "Only once nothing reads the old column... contract, and remove it.", pauseAfter: 2.2 },
     {
       id: "scale",
       scene: true,
       text: "And clear design keeps paying off as you grow. Cram the whole store into one wide table, and every rule gets tangled together.",
-      pauseAfter: 0.35,
+      // The wide table pans past in the pause.
+      pauseAfter: 1.6,
     },
     { id: "apart", text: "Kept apart and joined by keys, each table grows by its own rules.", pauseAfter: 0.35 },
     {

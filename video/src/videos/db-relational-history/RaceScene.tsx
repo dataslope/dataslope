@@ -38,7 +38,10 @@ const Dot: React.FC<{ x: number; y: number; at: number; color: string; r?: numbe
  * Part 1, the race IBM lost: System R's work published, a small California
  * company reading it, and Oracle on sale in 1979, two years before IBM's own
  * SQL/DS (1981, the year of Codd's Turing Award) and DB2 (1983). Then a third
- * lane, Berkeley, for the part that follows.
+ * lane, Berkeley, for the part that follows. Berkeley never sold SQL (Ingres
+ * spoke QUEL, and went out on tape), so the figure is retitled as its lane
+ * arrives, from who sold SQL first to who built on Codd's idea, and the lane
+ * says which language it spoke.
  */
 export const RaceScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -86,7 +89,8 @@ export const RaceScene: React.FC = () => {
       <Headline at={twistAt - 6} lead="IBM published." turn="Oracle shipped first." turnAt={oracleAt - 4} out={butAt - 6} />
       <Headline at={butAt - 2} lead="Codd had other readers." />
 
-      <FigLabel n="4" title="Who sold SQL first" at={raceFrom} x={96} y={y(290)} />
+      <FigLabel n="4" title="Who sold SQL first" at={raceFrom} x={96} y={y(290)} out={onlyAt - 8} />
+      <FigLabel n="4" title="Who built on Codd's idea" at={onlyAt - 2} x={96} y={y(290)} />
 
       {/* ── The year axis ── */}
       <Svg opacity={ease(frame, raceFrom + 2, 14)}>
@@ -203,8 +207,8 @@ export const RaceScene: React.FC = () => {
       <Tag x={sx(X, 1981) + 16} y={y(330)} at={turingAt - 4} dim={onlyAt - 4} size={22} color={INK} weight={650}>
         Codd wins the Turing Award
       </Tag>
-      <Tag x={sx(X, 1973) + 26} y={LANE_UCB + 20} at={readingAt + 2} size={21} color={KEY_INK}>
-        1973
+      <Tag x={sx(X, 1973) + 26} y={LANE_UCB + 20} at={readingAt} size={21} color={KEY_INK}>
+        Ingres, 1973: <span style={{ color: INK, fontWeight: 650 }}>spoke QUEL, not SQL</span>
       </Tag>
     </AbsoluteFill>
   );

@@ -267,6 +267,24 @@
             "column": null,
             "constraint": "profiles_user_id_key"
           }
+        },
+        "after": {
+          "sql": "SELECT id, user_id, display_name FROM profiles ORDER BY id;",
+          "ok": true,
+          "command": "SELECT",
+          "affectedRows": 0,
+          "fields": [
+            "id",
+            "user_id",
+            "display_name"
+          ],
+          "rows": [
+            {
+              "id": 1,
+              "user_id": 1,
+              "display_name": "Ada"
+            }
+          ]
         }
       }
     },

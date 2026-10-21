@@ -5,12 +5,13 @@ import { INK, INK_SOFT, note } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Card, Headline, Kicker, KEY_INK, Mark, pulse, Spot, Tag, Wire } from "./parts";
+import { Card, Headline, Kicker, Mark, pulse, Spot, Wire } from "./parts";
 
 /**
  * Part 2 opens at Berkeley: Stonebraker and Wong's Ingres, built from Codd's
  * papers; its source code sent out on tape for a nominal fee; and the
- * industry its people seeded, Sybase and from it Microsoft SQL Server.
+ * industry its people seeded, Sybase and from it Microsoft SQL Server, each
+ * named as it arrives.
  */
 export const IngresScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -28,10 +29,10 @@ export const IngresScene: React.FC = () => {
   const codeAt = n.word("tape", "code");
   const costAt = n.word("tape", "cost");
   const tapeAt = n.word("tape", "tape");
-  const peopleAt = n.word("tape", "people");
-  const seededAt = n.word("tape", "seeded");
-  const industryAt = n.word("tape", "industry");
-  const microsoftAt = n.word("tape", "Microsoft SQL Server");
+  const peopleAt = n.word("industry", "people");
+  const industryAt = n.word("industry", "industry");
+  const sybaseAt = n.word("industry", "Sybase");
+  const microsoftAt = n.word("industry", "Microsoft SQL Server");
 
   const CODD = { x: 96, top: y(420), w: 290, h: h(118) };
   const INGRES = { x: 500, top: y(380), w: 560, h: h(222) };
@@ -47,13 +48,13 @@ export const IngresScene: React.FC = () => {
       <Sfx name="el-pencil" at={relationalAt - 2} level={-34} />
       <Sfx name="el-tap" at={ingresAt - 2} level={-28} />
       <Sfx name="el-pop" at={tapeAt - 6} level={-29} />
-      <Sfx name="el-pencil" at={seededAt - 4} level={-34} />
+      <Sfx name="el-pencil" at={sybaseAt - 8} level={-34} />
       <Sfx name="el-pop" at={microsoftAt - 4} level={-30} />
 
       <Kicker at={ingresFrom - 10}>From Ingres to PostgreSQL</Kicker>
       <Headline at={ingresFrom - 4} lead="Berkeley built its own." out={codeAt - 6} />
-      <Headline at={codeAt - 2} lead="Its code went out" turn="on tape." turnAt={tapeAt - 4} out={seededAt - 6} />
-      <Headline at={seededAt - 2} lead="Its people seeded" turn="an industry." turnAt={industryAt - 4} />
+      <Headline at={codeAt - 2} lead="Its code went out" turn="on tape." turnAt={tapeAt - 4} out={peopleAt - 6} />
+      <Headline at={peopleAt - 2} lead="Its people seeded" turn="an industry." turnAt={industryAt - 4} />
 
       <FigLabel n="5" title="Ingres, and some of what grew from it" at={berkeleyAt - 6} x={96} y={y(290)} />
 
@@ -119,7 +120,7 @@ export const IngresScene: React.FC = () => {
           [INGRES.x + INGRES.w + 6, sybMid],
           [SYB.x - 6, sybMid],
         ]}
-        at={peopleAt - 2}
+        at={sybaseAt - 8}
         dur={14}
       />
       <Card
@@ -127,10 +128,10 @@ export const IngresScene: React.FC = () => {
         top={SYB.top}
         width={SYB.w}
         height={SYB.h}
-        at={seededAt - 4}
+        at={sybaseAt - 4}
         title="Sybase, 1984"
         titleSize={36}
-        lines={[{ at: seededAt + 4, children: "co-founded by an Ingres alum" }]}
+        lines={[{ at: sybaseAt + 4, children: "co-founded by an Ingres alum" }]}
       />
       <Wire
         points={[
@@ -151,21 +152,6 @@ export const IngresScene: React.FC = () => {
         lines={[{ at: microsoftAt + 6, children: "licensed from Sybase, version 1.0 in 1989" }]}
         swell={pulse(frame, microsoftAt + 14, 20)}
       />
-      <Wire
-        points={[
-          [INGRES.x + INGRES.w + 6, INGRES.top + INGRES.h - 30],
-          [INGRES.x + INGRES.w + 60, INGRES.top + INGRES.h - 30],
-          [INGRES.x + INGRES.w + 60, y(800)],
-          [SYB.x - 6, y(800)],
-        ]}
-        at={industryAt - 2}
-        dur={16}
-        dash="5 5"
-        color={INK_SOFT}
-      />
-      <Tag x={SYB.x + 4} y={y(800) - 15} at={industryAt + 8} size={22} color={INK}>
-        and more: <span style={{ color: KEY_INK }}>Britton Lee, NonStop SQL</span>
-      </Tag>
     </AbsoluteFill>
   );
 };

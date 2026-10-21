@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill } from "remotion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, headline, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -10,7 +10,13 @@ import { BODY_Y, DbTable, Fig, FIG_Y, HEAD_H, Headline, MARK, MARK_KEY, ROW_H, t
 import { Count, Drift, Spot, Tick } from "./parts";
 
 const SHOWN = 5;
+/** product_name and the two prices; the lesson's order_lines count is left
+ *  out, since nothing on screen or in the narration reads it. */
+const COLS = 3;
 const RIGHT = 1170;
+/** A price as money, two places, like every other price in the video
+ *  (Northwind stores them as real, which psql prints as 39 and 31.2). */
+const money = (v: string | null) => (v === null ? null : Number(v).toFixed(2));
 
 /**
  * Northwind's two prices (the lesson's own query on its own remoteInitSql):
@@ -31,14 +37,14 @@ export const PriceScene: React.FC = () => {
   const roseAt = n.word("history", "Prices rose");
   const keptAt = n.word("history", "kept");
   const paidAt = n.word("history", "paid");
-  const factsAt = n.word("facts", "Two facts");
   const nameAt = n.word("facts", "share a name");
   const syncAt = n.word("facts", "copy needs syncing");
   const historyAt = n.word("facts", "History");
   const end = n.beat("facts").to;
 
-  const rows = NORTHWIND.rows.slice(0, SHOWN);
-  const g = tableGeometry({ x: X0, top: y(BODY_Y), cols: NORTHWIND.cols, rows, headH: h(HEAD_H), rowH: h(ROW_H) });
+  const cols = NORTHWIND.cols.slice(0, COLS);
+  const rows = NORTHWIND.rows.slice(0, SHOWN).map((r) => [r[0], money(r[1]), money(r[2])]);
+  const g = tableGeometry({ x: X0, top: y(BODY_Y), cols, rows, headH: h(HEAD_H), rowH: h(ROW_H) });
   const bottom = g.bottom(rows.length);
   const { disagree, lines, lower } = NORTHWIND_COUNTS;
 
@@ -50,19 +56,19 @@ export const PriceScene: React.FC = () => {
       <Sfx name="el-pencil" at={nameAt - 2} level={-34} />
       <Sfx name="el-pop" at={lineAt - 4} level={-30} />
 
-      <Headline kicker="Denormalization" lead="Same name," turn="two facts." at={from - 6} turnAt={factsAt - 4} underlineAt={nameAt + 6} />
+      <Headline kicker="Denormalization" lead="Same name," turn="two facts." at={from - 6} turnAt={rightAt - 4} underlineAt={nameAt + 6} />
       <Spot id="db-normalization-receipt" at={lineAt - 4} left={1530} top={40} width={250} height={270} />
 
       <Drift from={from} to={end + 40} amount={0.012} origin="35% 50%">
         <Fig n="11" at={copiesAt - 4} y={y(FIG_Y)}>
-          Northwind, catalog price now against price charged
+          Northwind, Microsoft&apos;s demo store: catalog price now against price charged
         </Fig>
         <DbTable
           g={g}
-          cols={NORTHWIND.cols}
+          cols={cols}
           rows={rows.map((cells, i) => ({ cells, at: northwindAt + 4 + i * 4 }))}
           at={northwindAt - 2}
-          numeric={[1, 2, 3]}
+          numeric={[1, 2]}
           marks={[
             ...rows.map((_, i) => ({ row: i, col: 1, at: productAt + i * 3, color: MARK_KEY })),
             ...rows.map((_, i) => ({ row: i, col: 2, at: lineAt + i * 3, out: keptAt - 4 })),
@@ -72,8 +78,9 @@ export const PriceScene: React.FC = () => {
         />
 
         {/* How many lines disagree with today's catalog. */}
-        <Ink at={countAt - 4} dur={12} style={{ left: RIGHT, top: y(BODY_Y) - 6, whiteSpace: "nowrap" }}>
-          <span style={{ ...headline(96), color: INK }}>
+        {/* Inks in as it starts counting, so it never sits at 0. */}
+        <Ink at={countAt} dur={12} style={{ left: RIGHT, top: y(BODY_Y) - 6, whiteSpace: "nowrap" }}>
+          <span style={{ ...headline(96), ...TABULAR, color: INK }}>
             <Count value={disagree} at={countAt} dur={30} />
           </span>
         </Ink>

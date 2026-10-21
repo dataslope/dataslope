@@ -111,6 +111,8 @@ export const SkewScene: React.FC = () => {
   const meanIn = ease(frame, meanAt - 4, 12);
   const meanSlide = ease(frame, twentySixAt - 4, 24);
   const meanShown = lerp(ORDERS.median, ORDERS.mean, meanSlide);
+  /** The mean's label waits for the slide, so it never prints a value it isn't. */
+  const meanLabel = ease(frame, twentySixAt + 18, 8);
   const tailDim = ease(frame, rightFrom - 4, 14);
 
   return (
@@ -176,7 +178,7 @@ export const SkewScene: React.FC = () => {
         <Tag x={sx(X, 46)} y={base - h(150) - 40} opacity={ease(frame, tailAt, 12) * (1 - tailDim)} color={INK_SOFT} size={21} align="left">
           a long tail of big orders
         </Tag>
-        <Tag x={sx(X, 12)} y={base - h(150) - 70} opacity={ease(frame, modestAt - 2, 12) * (1 - ease(frame, medianAt - 6, 10))} color={INK_SOFT} size={21}>
+        <Tag x={sx(X, 14)} y={base - peak * unit - h(60)} opacity={ease(frame, modestAt - 2, 12) * (1 - ease(frame, medianAt - 6, 10))} color={INK_SOFT} size={21}>
           most orders
         </Tag>
 
@@ -194,8 +196,8 @@ export const SkewScene: React.FC = () => {
             <line x1={sx(X, meanShown)} x2={sx(X, meanShown)} y1={markTop} y2={base} stroke={STAT} strokeWidth={3.6} strokeLinecap="round" />
           </Svg>
         ) : null}
-        <Tag x={sx(X, meanShown) + 12} y={markTop - 34} opacity={meanIn} color={STAT_INK} size={23} bold align="left">
-          Mean ${fmt(meanShown)}
+        <Tag x={sx(X, meanShown) + 12} y={markTop - 34} opacity={meanLabel} color={STAT_INK} size={23} bold align="left">
+          Mean ${fmt(ORDERS.mean)}
         </Tag>
         <Pulse x={sx(X, 110)} y={base - h(150)} at={rightAt} color={INK_SOFT} r={6} />
         <Pulse x={sx(X, 80)} y={base - h(150)} at={dragsAt - 2} color={STAT} r={6} />

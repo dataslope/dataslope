@@ -2,16 +2,22 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { body, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { ds } from "../../theme/brand";
+import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
-import { SANS } from "../../theme/fonts";
+import { MONO, SANS } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
-import { AFTER_ADD, BACKFILL_VALUE, BACKFILLED, MISSING, ONE_STEP, PRIORITY_REQUIRED, TASKS } from "./data";
+import { AFTER_ADD, BACKFILL_VALUE, BACKFILLED, MISSING, ONE_STEP, ONE_STEP_SQL, PRIORITY_REQUIRED, TASKS } from "./data";
 import { DbTable, ErrorBox, Head, KEY, Kicker, Mark, MARK_BAD, Ping, type TableGeometry, tableGeometry } from "./parts";
 
 const X = 120;
 const STEPS_X = 900;
+/** The statement tried in one step, set across the right of the page until the steps take over. */
+const SQL_X = 1200;
+/** ONE_STEP_SQL in two lines, its NOT NULL apart so it can be marked. */
+const SQL = ONE_STEP_SQL.match(/^(ALTER TABLE \S+) (ADD COLUMN .* )(NOT NULL)(;)$/);
+if (!SQL) throw new Error(`unexpected one-step SQL: ${ONE_STEP_SQL}`);
 
 /**
  * A required column, after evolving-schemas-safely's "Add a required column
@@ -80,6 +86,33 @@ export const RequiredScene: React.FC = () => {
       <Head at={safeFrom - 2} second={makeAt - 4} italic="then require it.">
         Add, backfill, check,
       </Head>
+      <FigLabel n="4" title="The tasks table gets a priority" at={priorityFrom + 4} x={X} y={y(262)} />
+
+      {/* "Add it as required, in one step": the statement tried, its NOT NULL marked as Postgres refuses it. */}
+      <Ink at={requiredAt - 4} dur={18} out={ghostOut} style={{ left: SQL_X, top: g.top }}>
+        <div
+          style={{
+            padding: "14px 22px",
+            borderTop: `2px solid ${INK}`,
+            borderBottom: `1px solid ${HAIRLINE}`,
+            background: `color-mix(in srgb, ${ds("yellow", 200)} 34%, transparent)`,
+            fontFamily: MONO,
+            fontSize: 26,
+            lineHeight: 1.5,
+            color: INK,
+            whiteSpace: "pre",
+          }}
+        >
+          <div>{SQL[1]}</div>
+          <div>
+            {SQL[2]}
+            <Mark at={refusesAt - 2} color={MARK_BAD}>
+              {SQL[3]}
+            </Mark>
+            {SQL[4]}
+          </div>
+        </div>
+      </Ink>
 
       <DbTable
         g={g}

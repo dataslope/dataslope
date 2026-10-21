@@ -28,7 +28,8 @@ const Phrase: React.FC<{ at: number; underlineAt: number; color: string; childre
           style={{
             position: "absolute",
             left: 0,
-            top: "1.02em",
+            // Below the descenders of "key," and "nothing", not through them.
+            top: "1.2em",
             width: `${u * 100}%`,
             height: "0.07em",
             borderRadius: 3,

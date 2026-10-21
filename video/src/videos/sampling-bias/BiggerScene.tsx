@@ -10,6 +10,7 @@ import { Sfx } from "../../sound/Sfx";
 import { LARGEST, mulberry32, POP_SIZE, SIZES, SWEEP, TIGHTENING, TRUE_MEAN, type Spread } from "./data";
 import { EASY, EASY_INK, RANDOM, RANDOM_INK, Underline } from "./parts";
 import { swell } from "../sampling/emphasis";
+import { useFigNumber } from "../sampling/merged";
 
 /** Sample size on a log axis, average score on a linear one. */
 const LOG_LO = Math.log10(SIZES[0]);
@@ -34,6 +35,7 @@ const JITTER = (() => {
 export const BiggerScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
+  const fig = useFigNumber();
   const { y } = useLayout();
 
   const biggerFrom = n.beat("bigger").from;
@@ -79,8 +81,8 @@ export const BiggerScene: React.FC = () => {
       </Ink>
 
       <FigLabel
-        n="3"
-        title="The average score of 400 samples at each size, each way"
+        n={fig(3)}
+        title={`The average score of 400 samples at each size, each way (${SHOWN} shown)`}
         at={biggerFrom}
         x={160}
         y={y(358)}
@@ -133,7 +135,7 @@ export const BiggerScene: React.FC = () => {
           opacity: ease(frame, biggerFrom, 14),
         }}
       >
-        <span style={label(19, INK_SOFT)}>Customers in each sample</span>
+        <span style={label(19, INK_SOFT)}>Customers in each sample (log scale)</span>
       </div>
 
       {/* The truth, across every size. */}
@@ -198,8 +200,8 @@ export const BiggerScene: React.FC = () => {
         </span>
       </Note>
 
-      {/* "One customer in ten", over the largest size. */}
-      <Note at={oneInTenAt - 2} x={last} y={y(ly(85.2))} from="up">
+      {/* "One customer in ten", just over the column it describes. */}
+      <Note at={oneInTenAt - 2} x={last} y={y(ly(LARGEST.convenience.max)) - 66} from="up">
         <span style={{ display: "inline-block", transform: "translateX(-50%)", whiteSpace: "nowrap", ...note(21, INK_SOFT), ...halo }}>
           1 customer in {Math.round(POP_SIZE / LARGEST.n)}
         </span>
@@ -207,12 +209,9 @@ export const BiggerScene: React.FC = () => {
 
       {/* "Still almost ten points high", at the largest size. */}
       <VBracket x={last + 34} y0={y(truthY)} y1={y(ly(LARGEST.convenience.center))} at={steadyFrom + 4} />
-      <Note at={highAt - 4} x={last + 56} y={y(ly((TRUE_MEAN + LARGEST.convenience.center) / 2)) - 30}>
+      <Note at={highAt - 4} x={last + 56} y={y(ly((TRUE_MEAN + LARGEST.convenience.center) / 2)) - 17}>
         <div style={{ ...note(26, EASY_INK), fontWeight: 700, ...halo }}>
           {fmt(LARGEST.convenience.center - TRUE_MEAN)} points high
-        </div>
-        <div style={{ ...note(20, INK_SOFT), ...halo }}>
-          with {(LARGEST.n / POP_SIZE).toLocaleString("en-US", { style: "percent" })} of all customers asked
         </div>
       </Note>
     </AbsoluteFill>

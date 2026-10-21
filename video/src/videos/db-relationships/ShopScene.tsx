@@ -9,8 +9,8 @@ import { ACCENT, ACCENT_INK, body, halo, INK, INK_SOFT, label, note } from "../.
 import { Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { PATH } from "./data";
-import { DbTable, Fig, KEY, MARK, tableGeometry } from "./kit";
+import { PATH, PATH_JOINS } from "./data";
+import { DbTable, Fig, KEY, Listing, MARK, tableGeometry } from "./kit";
 import { Drift, Glow, Headline, Kicker, Mark, Spot } from "./parts";
 
 const LEFT_X = 120;
@@ -20,8 +20,12 @@ const LOW_Y = 615;
 const TEXT_X = 1100;
 const SENT_Y = 330;
 const SENT_STEP = 76;
-const RESULT_Y = 370;
+/** The query's FROM and joins, then what it returns, then the bridge. */
+const QUERY_Y = 360;
+const QUERY_SIZE = 22;
+const RESULT_Y = 594;
 const RESULT_SIZE = { head: 19, body: 22 };
+const NEXT_Y = 780;
 
 type Line = {
   name: string;
@@ -50,7 +54,7 @@ export const ShopScene: React.FC = () => {
   const customersAt = n.word("shop", "customers");
   const ordersAt = n.word("shop", "orders");
   const itemsAt = n.word("shop", "order items");
-  const productsAt = n.word("shop", "products");
+  const productsAt = n.word("shop", "products", { nth: 1 });
   const readAt = n.word("shop", "Read each line");
   const sentenceAt = n.word("shop", "sentence");
   const s = ["s1", "s2", "s3"].map((id) => ({ from: n.beat(id).from, to: n.beat(id).to }));
@@ -134,6 +138,9 @@ export const ShopScene: React.FC = () => {
     { points: [...LINES[2].points].reverse(), from: LINES[2].to, to: LINES[2].from, at: productsPathAt - 2 },
   ];
   const textOut = ease(frame, joinsFrom - 4, 14);
+  // Each join line is written as its stretch of the path is traced.
+  const joinLineAt = [adaAt - 2, ...path.map((p) => p.at)];
+  const rowsAt = productsPathAt + 10;
 
   const rg = tableGeometry({
     x: TEXT_X,
@@ -206,6 +213,12 @@ export const ShopScene: React.FC = () => {
             line_number: { at: nameAt + 15, tone: "key" },
           }}
         />
+        {/* The first key on two columns: said in a line, left to Unit 4. */}
+        <Ink at={itemsAt + 24} dur={14} style={{ left: items.x, top: items.bottom + 14, whiteSpace: "nowrap" }}>
+          <span style={note(21, INK_SOFT)}>
+            Two PKs: <Mark at={nameAt + 15}>together, they name each row</Mark>.
+          </span>
+        </Ink>
         <Entity
           layout={prod}
           at={productsAt - 4}
@@ -261,18 +274,30 @@ export const ShopScene: React.FC = () => {
           </Ink>
         </AbsoluteFill>
 
-        {/* ── What the joins return (the lesson's query) ── */}
-        <Ink at={queryAt - 2} dur={14} style={{ left: TEXT_X, top: y(RESULT_Y - 44), whiteSpace: "nowrap" }}>
-          <span style={label(22, INK_SOFT)}>The query, joined along the three keys</span>
+        {/* ── The lesson's query: one join for each line, then its result ── */}
+        <Ink at={queryAt - 2} dur={14} style={{ left: TEXT_X, top: y(QUERY_Y) - 44, whiteSpace: "nowrap" }}>
+          <span style={label(22, INK_SOFT)}>The lesson&apos;s query: one join for each key</span>
+        </Ink>
+        <Listing
+          lines={PATH_JOINS}
+          x={TEXT_X}
+          top={y(QUERY_Y)}
+          width={680}
+          size={QUERY_SIZE}
+          at={queryAt}
+          lineAt={joinLineAt}
+        />
+        <Ink at={rowsAt - 6} dur={14} style={{ left: TEXT_X, top: y(RESULT_Y) - 44, whiteSpace: "nowrap" }}>
+          <span style={label(22, INK_SOFT)}>What it returns</span>
         </Ink>
         <DbTable
           g={rg}
           cols={PATH.cols}
-          rows={PATH.rows.map((cells, i) => ({ cells, at: linesAt + i * 6 }))}
-          at={adaAt - 2}
+          rows={PATH.rows.map((cells, i) => ({ cells, at: rowsAt + i * 6 }))}
+          at={rowsAt - 6}
           numeric={[1, 2, 4]}
           marks={[
-            { row: 0, col: P.customer, at: adaAt, color: MARK },
+            { row: 0, col: P.customer, at: rowsAt + 10, color: MARK },
             { row: 0, col: P.product, at: notebooksAt, color: MARK },
             { row: 0, col: P.quantity, at: notebooksAt + 4, color: MARK },
             { row: 1, col: P.product, at: pensAt, color: MARK },
@@ -280,7 +305,7 @@ export const ShopScene: React.FC = () => {
           ]}
         />
 
-        <NextLine at={keyAt - 6} x={TEXT_X} y={y(640)} width={600}>
+        <NextLine at={keyAt - 6} x={TEXT_X} y={y(NEXT_Y)} width={600}>
           keys.
         </NextLine>
       </Drift>

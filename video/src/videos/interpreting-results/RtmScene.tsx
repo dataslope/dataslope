@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, halo, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, fmt, halo, HAIRLINE, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -48,6 +48,9 @@ export const RtmScene: React.FC = () => {
   const repeatAt = n.word("nothing", "doesn't repeat");
   const extremeAt = n.word("nothing", "extreme score");
   const luckAgainAt = n.word("nothing", "luck", { nth: 1 });
+  const regressionAt = n.word("rtm-name", "regression");
+  const backAt = n.word("rtm-name", "slid back");
+  const averageAt = n.word("rtm-name", "average");
   const coachAt = n.word("coach", "Coach");
   const anywayAt = n.word("coach", "anyway");
   const creditAt = n.word("coach", "credit");
@@ -103,10 +106,18 @@ export const RtmScene: React.FC = () => {
       />
       <Headline
         top={y(150)}
-        out={trapsAt - 4}
+        out={regressionAt - 8}
         parts={[
           { text: "Nobody did anything.", at: nobodyAt - 4 },
           { text: "Luck doesn't repeat.", at: repeatAt - 8, italic: true },
+        ]}
+      />
+      <Headline
+        top={y(150)}
+        out={trapsAt - 4}
+        parts={[
+          { text: "Regression to the mean:", at: regressionAt - 4 },
+          { text: "back toward the average.", at: backAt - 4, italic: true },
         ]}
       />
 
@@ -118,6 +129,9 @@ export const RtmScene: React.FC = () => {
               <span style={{ ...label(24, INK), display: "inline-block", transform: "translateX(-50%)" }}>{t}</span>
             </Ink>
           ))}
+          <Ink at={from - 2} dur={12} style={{ left: 160, top: top - 42, whiteSpace: "nowrap" }}>
+            <span style={note(20, INK_SOFT)}>sales that month</span>
+          </Ink>
           {/* The value axis. */}
           <Svg opacity={ease(frame, from - 2, 14)}>
             {[50, 75, 100, 125, 150].map((v) => (
@@ -125,7 +139,7 @@ export const RtmScene: React.FC = () => {
             ))}
           </Svg>
           {[50, 75, 100, 125, 150].map((v) => (
-            <div key={v} style={{ position: "absolute", right: 1920 - 228, top: py(v) - 13, opacity: ease(frame, from, 12), ...note(20, INK_SOFT) }}>
+            <div key={v} style={{ position: "absolute", right: 1920 - 228, top: py(v) - 13, opacity: ease(frame, from, 12), ...note(20, INK_SOFT), ...TABULAR }}>
               {v}
             </div>
           ))}
@@ -213,8 +227,8 @@ export const RtmScene: React.FC = () => {
           <Dashed x0={COLS[0] - HALF - 20} y0={py(TOP_CUT)} x1={COLS[0] + HALF + 20} y1={py(TOP_CUT)} at={monthOneAt - 4} dur={12} color={STAT} width={3} />
 
           {/* Where everyone's average sits, both months. */}
-          <Dashed x0={240} y0={py(RTM.mean1)} x1={1130} y1={py(RTM.mean1)} at={nobodyAt - 2} dur={20} width={2.4} />
-          <Note at={nobodyAt + 8} x={COLS[1] + HALF + 30} y={py(RTM.mean1) - 12}>
+          <Dashed x0={240} y0={py(RTM.mean1)} x1={1130} y1={py(RTM.mean1)} at={averageAt - 6} dur={20} width={2.4} />
+          <Note at={averageAt + 4} x={COLS[1] + HALF + 30} y={py(RTM.mean1) - 12}>
             <span style={{ ...note(21, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>everyone, about {Math.round(RTM.mean1)}</span>
           </Note>
         </Drift>

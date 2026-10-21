@@ -18,13 +18,15 @@ const ROW_Y0 = 456;
 const ROW_STEP = 58;
 const MEAN_Y = 712;
 const TEST_X = 1080;
+/** Until the doubling test needs the right of the page, the zip codes and
+ *  their mean sit in the middle of it, then slide over to make room. */
+const SHIFT = 520;
 
 const mono = (size: number, color: string = INK, weight = 500): React.CSSProperties => ({
   fontFamily: MONO,
   fontSize: size,
   fontWeight: weight,
   color,
-  fontVariantNumeric: "tabular-nums",
   whiteSpace: "nowrap",
 });
 
@@ -54,8 +56,8 @@ export const TrapScene: React.FC = () => {
   const { y } = useLayout();
 
   // ── Cues ──
-  const trapFrom = n.beat("trap").from;
   const columnsAt = n.word("trap", "columns");
+  const numericalAt = n.word("trap", "numerical");
   const arentAt = n.word("trap", "aren't");
   const zipAt = n.word("trap", "zip codes");
   const integersAt = n.word("pandas", "integers");
@@ -63,6 +65,7 @@ export const TrapScene: React.FC = () => {
   const fortyAt = n.word("pandas", "Forty-eight");
   const placeAt = n.word("place", "place");
   const labelsAt = n.word("place", "labels");
+  const slideAt = n.beat("double").from - 12;
   const testAt = n.word("double", "test");
   const doublingAt = n.word("double", "doubling");
   const priceAt = n.word("double", "price");
@@ -80,9 +83,7 @@ export const TrapScene: React.FC = () => {
   const rowY = (i: number) => y(ROW_Y0 + i * ROW_STEP);
   const lit = ease(frame, typeAt - 4, 12);
   const storedLit = ease(frame, storedAt - 2, 12);
-  // The average, counted up as it is read out: "forty-eight thousand" comes
-  // fast, "seven hundred and fifty-five" settles.
-  const counted = ZIPS.zipMean * ease(frame, fortyAt - 4, 66);
+  const shift = SHIFT * (1 - ease(frame, slideAt, 20));
   const priceIn = ease(frame, priceAt - 8, 14);
   const columns = [
     { name: "zip_code", dtype: ZIPS.dtypes.zip_code, values: ZIPS.zips.map(String), at: zipAt - 6, step: 4 },
@@ -98,11 +99,13 @@ export const TrapScene: React.FC = () => {
       <Sfx name="el-whoosh" at={zipAt - 8} level={-34} />
       <Sfx name="el-tap" at={fortyAt - 4} level={-27} />
       <Sfx name="el-scratch" at={placeAt - 2} level={-30} />
+      <Sfx name="el-whoosh" at={slideAt} level={-37} />
       <Sfx name="el-pop" at={priceAt - 2} level={-30} />
       <Sfx name="el-pop" at={zipCodeAt - 6} level={-30} />
 
       <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
-        <Ink at={trapFrom - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
+        {/* "Numbers" inks on "numerical", so it never waits alone. */}
+        <Ink at={numericalAt - 6} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Numbers
         </Ink>
         <Ink at={arentAt - 6} dur={18} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
@@ -110,14 +113,14 @@ export const TrapScene: React.FC = () => {
         </Ink>
       </div>
 
-      <FigLabel n="7" title="The lesson's table, as pandas stores it" at={columnsAt - 4} x={160} y={y(276)} />
+      <FigLabel n="7" title="Four zip codes and prices, as pandas stores them" at={columnsAt - 4} x={160 + shift} y={y(276)} />
 
       {/* ── The table ── */}
       {columns.map((c, ci) => {
         const a = ease(frame, c.at, 14);
         if (a <= 0) return null;
         return (
-          <div key={c.name} style={{ position: "absolute", left: COL[ci], top: 0, width: COL_W, opacity: a }}>
+          <div key={c.name} style={{ position: "absolute", left: COL[ci] + (ci === 0 ? shift : 0), top: 0, width: COL_W, opacity: a }}>
             <div style={{ position: "absolute", top: y(HEAD_Y), ...mono(26, INK, 700) }}>{c.name}</div>
             <div style={{ position: "absolute", top: y(DTYPE_Y), opacity: ci === 0 ? ease(frame, integersAt - 4, 12) : 1 }}>
               <Dtype lit={ci === 0 ? lit : storedLit}>{c.dtype}</Dtype>
@@ -171,17 +174,19 @@ export const TrapScene: React.FC = () => {
       })}
 
       {/* The zip codes' mean. */}
-      <Ink at={averagesAt - 4} dur={14} style={{ left: COL[0], top: y(MEAN_Y), whiteSpace: "nowrap" }}>
+      <Ink at={averagesAt - 4} dur={14} style={{ left: COL[0] + shift, top: y(MEAN_Y), whiteSpace: "nowrap" }}>
         <span style={mono(22, INK_SOFT)}>.mean()</span>
       </Ink>
-      <Ink at={fortyAt - 4} dur={16} style={{ left: COL[0], top: y(MEAN_Y + 40), whiteSpace: "nowrap" }}>
+      {/* The average, written out as it is read: no count-up through values
+          pandas never printed. */}
+      <Ink at={fortyAt - 4} dur={30} style={{ left: COL[0] + shift, top: y(MEAN_Y + 40), whiteSpace: "nowrap" }}>
         <span style={mono(40, STAT_INK, 700)}>
           <Strike at={placeAt - 2} top="0.62em">
-            {counted.toFixed(2)}
+            {ZIPS.zipMean.toFixed(2)}
           </Strike>
         </span>
       </Ink>
-      <Note at={placeAt} x={COL[0]} y={y(MEAN_Y + 108)}>
+      <Note at={placeAt} x={COL[0] + shift} y={y(MEAN_Y + 108)}>
         <span style={{ ...body(30, true), color: INK, whiteSpace: "nowrap" }}>
           Not a place
           <span style={{ opacity: ease(frame, labelsAt - 2, 10) }}>: the average of four labels.</span>
