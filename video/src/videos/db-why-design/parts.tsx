@@ -521,6 +521,8 @@ export const tableGeometry = ({
 export type TableRow = { cells: readonly TCell[]; at: number; dimAt?: number };
 export type CellMark = { row: number; col: number; at: number; out?: number; color?: string };
 export type CellSwap = { row: number; col: number; at: number; value: string; color?: string };
+/** A wash over a column's title, swept on `at` and lifted on `out`. */
+export type HeadMark = { col: number; at: number; out?: number };
 
 /** A soft left-to-right wipe for inline text, the Ink reveal's mask. */
 const wipe = (p: number): React.CSSProperties => {
@@ -589,7 +591,8 @@ export const DbTable: React.FC<{
   colInk?: Readonly<Record<number, string>>;
   marks?: readonly CellMark[];
   swaps?: readonly CellSwap[];
-}> = ({ g, cols, rows, at, out, dim, numeric = [], colInk = {}, marks = [], swaps = [] }) => {
+  headMarks?: readonly HeadMark[];
+}> = ({ g, cols, rows, at, out, dim, numeric = [], colInk = {}, marks = [], swaps = [], headMarks = [] }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 16);
   const o = out === undefined ? 0 : ease(frame, out, 12);
@@ -614,11 +617,27 @@ export const DbTable: React.FC<{
       <div style={{ position: "absolute", left: g.x, top: g.top + g.headH - 1, width: g.width * p, height: 1, background: HAIRLINE }} />
       <div style={{ position: "absolute", left: g.x, top: bottom - 1, width: g.width * p, height: 1.5, background: INK }} />
       <Ink at={at + 2} dur={14} style={{ left: g.x, top: g.top, width: g.width, height: g.headH, display: "flex", alignItems: "center" }}>
-        {cols.map((c, j) => (
-          <div key={c} style={{ ...cellBox(j), fontFamily: MONO, fontSize: HEAD_SIZE, fontWeight: 600, color: INK_SOFT }}>
-            {c}
-          </div>
-        ))}
+        {cols.map((c, j) => {
+          const hm = headMarks.find((m) => m.col === j);
+          const w = hm ? ease(frame, hm.at, 10) : 0;
+          const lift = hm?.out === undefined ? 0 : ease(frame, hm.out, 12);
+          return (
+            <div key={c} style={{ ...cellBox(j), position: "relative", fontFamily: MONO, fontSize: HEAD_SIZE, fontWeight: 600, color: INK_SOFT }}>
+              {w > 0 && lift < 1 ? (
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: `8px ${PAD - 6}px`,
+                    background: MARK,
+                    clipPath: `inset(0 ${(1 - w) * 100}% 0 0)`,
+                    opacity: 1 - lift,
+                  }}
+                />
+              ) : null}
+              <span style={{ position: "relative" }}>{c}</span>
+            </div>
+          );
+        })}
       </Ink>
       {rows.map((r, i) => {
         const top = g.rowTop(i);

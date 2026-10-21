@@ -45,6 +45,7 @@ export const FlatScene: React.FC = () => {
   const databaseAt = n.word("hook", "database");
   const rarelyAt = n.word("hook", "rarely");
   const dayAt = n.word("hook", "day");
+  const everyAt = n.word("table", "every");
   const ordersAt = n.word("table", "orders");
   const worksAt = n.word("table", "screen");
   const adaAt = n.word("twice", "Ada's");
@@ -103,6 +104,8 @@ export const FlatScene: React.FC = () => {
           rows={FLAT.rows.map((cells, i) => ({ cells, at: rowAts[i] }))}
           at={databaseAt}
           numeric={[F.id, F.qty]}
+          // "every field in it": the column titles light one after another.
+          headMarks={FLAT.cols.map((_, j) => ({ col: j, at: everyAt - 4 + j * 4, out: ordersAt - 6 }))}
           swaps={[{ row: FIXED_ROW, col: F.email, at: swapAt, value: NEW_EMAIL }]}
           marks={[
             ...adaRows.map((r, k) => ({ row: r, col: F.name, at: adaAt + k * 5, out: changesAt })),

@@ -15,8 +15,14 @@ import { Marker, swell } from "../sampling/emphasis";
 
 const BASE = 840;
 const HEIGHT = 380;
-const COL_W = 480;
-const colX = (c: number) => 150 + c * 570;
+const COL_W = 470;
+/** Panel to panel. The first panel starts at the page's left edge (120,
+ *  under the kicker, the headline and Fig. 1's label) and stays there when
+ *  the panels are pulled apart; the other two move right. */
+const GAP = 560;
+const colX = (c: number) => 120 + c * GAP;
+/** How far each panel moves per column on "pull them apart". */
+const PART = 34;
 
 /** Each panel on its own axis, scaled to its own peak: drawn this way, the
  *  three look like one shape three times, which is the confusion. */
@@ -66,7 +72,10 @@ export const HookScene: React.FC = () => {
   const intervalsAt = n.word("apart", "confidence intervals");
   const misreadAt = n.word("apart", "misread");
   const pullAt = n.word("apart", "pull them apart");
-  // "Side by side, they look alike": an equals sign between the panels,
+  // "Side by side, they look alike": an "about equal" sign between the
+  // panels (one sample of forty is ragged, so "=" would claim more than the
+  // picture shows; the likeness is the shared hump and width each has on its
+  // own axis),
   // struck through when the narration pulls them apart, as they part.
   const same = ease(frame, alikeAt - 4, 12);
   const strike = ease(frame, pullAt, 14);
@@ -103,13 +112,13 @@ export const HookScene: React.FC = () => {
           that look alike.
         </Ink>
       </div>
-      <FigLabel n={fig(1)} title="Three distributions, each drawn on its own axis" at={answeringAt - 4} x={150} y={y(figY)} />
+      <FigLabel n={fig(1)} title="Three distributions, each drawn on its own axis" at={answeringAt - 4} x={colX(0)} y={y(figY)} />
 
       {PANELS.map((p, c) => {
         const at = 8 + c * 8;
         const mid = (p.lo + p.hi) / 2;
         return (
-          <div key={p.title} style={{ position: "absolute", inset: 0, transform: `translateX(${(c - 1) * 34 * part}px)` }}>
+          <div key={p.title} style={{ position: "absolute", inset: 0, transform: `translateX(${c * PART * part}px)` }}>
             <Ink at={at - 2} dur={14} style={{ left: colX(c), top: y(360) }}>
               <span
                 style={{
@@ -150,7 +159,8 @@ export const HookScene: React.FC = () => {
 
       {/* "They look alike", and then "pull them apart". */}
       {[0, 1].map((c) => {
-        const cx = colX(c) + COL_W + (570 - COL_W) / 2;
+        // Centered in the gap between two panels, which moves as they part.
+        const cx = colX(c) + COL_W + (GAP - COL_W) / 2 + (c + 0.5) * PART * part;
         const cy = y(BASE - HEIGHT * 0.42);
         return same > 0 ? (
           <div
@@ -165,7 +175,7 @@ export const HookScene: React.FC = () => {
               transform: `scale(${0.7 + 0.3 * same})`,
             }}
           >
-            <span style={{ ...headline(64), color: INK_SOFT, position: "absolute", left: 0, right: 0, top: 4, textAlign: "center" }}>=</span>
+            <span style={{ ...headline(64), color: INK_SOFT, position: "absolute", left: 0, right: 0, top: 4, textAlign: "center" }}>≈</span>
             <svg width={80} height={80} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
               <line
                 x1={56}
