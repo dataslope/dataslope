@@ -40,6 +40,12 @@ const Fade: React.FC<{ length: number; out: boolean; children: React.ReactNode }
  * Sequence, frame 0 is the part's own frame 0, so every cue in its scenes
  * lands where it does in the standalone video.
  */
+/** How many numbered figures each part has, in PARTS order. A part that adds
+ *  or drops a figure changes its count here, or the merged numbering after
+ *  it skips or repeats a number. */
+const FIGURES = [6, 2, 7, 5, 7];
+const figBase = (k: number) => FIGURES.slice(0, k).reduce((a, b) => a + b, 0);
+
 const Part: React.FC<{ k: number; timeline: Timeline; span: PartSpan }> = ({ k, timeline, span }) => {
   const Scenes = SCENES[k];
   const last = k === PARTS.length - 1;
@@ -47,7 +53,7 @@ const Part: React.FC<{ k: number; timeline: Timeline; span: PartSpan }> = ({ k, 
   return (
     <Sequence from={span.from} durationInFrames={length} name={PARTS[k].name}>
       <NarrationProvider timeline={timeline}>
-        <MergedPartContext.Provider value={{ name: PARTS[k].name, index: k, count: PARTS.length }}>
+        <MergedPartContext.Provider value={{ name: PARTS[k].name, index: k, count: PARTS.length, figBase: figBase(k) }}>
           <Fade length={length} out={!last}>
             <Scenes />
           </Fade>
