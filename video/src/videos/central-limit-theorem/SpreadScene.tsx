@@ -276,7 +276,8 @@ export const SpreadScene: React.FC = () => {
             ...note(21, INK_SOFT),
             marginTop: 8,
             transformOrigin: "left center",
-            transform: `scale(${swell(frame, deviationAt - 2, 0.1, 22)})`,
+            // A slow swell, held through the end of the closing sentence.
+            transform: `scale(${swell(frame, deviationAt - 2, 0.1, 44)})`,
           }}
         >
           <Marker at={deviationAt - 2}>σ, the population&apos;s spread</Marker>, is {fmt(WAIT_SD)} min.
