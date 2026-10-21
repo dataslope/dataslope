@@ -1,0 +1,220 @@
+---
+title: AI-Assisted Analysis
+description: Data Analyst interview questions on working with AI tools. Checking SQL an assistant wrote, the mistakes generated queries make, hallucinated insights, prompting for SQL, data privacy, AI features in BI tools, and classifying text with an LLM.
+---
+
+Most analysts now draft queries, formulas, and chart code with an AI assistant,
+and interviewers know it. That has not made SQL questions go away; it has made
+them sharper. The skill being tested has moved from "can you write this query"
+toward "can you tell whether this query is right", because a wrong number that
+looks right is now cheap to produce and expensive to ship.
+
+## Q&A
+
+### How has the Data Analyst interview changed with AI?
+
+The live SQL screen is still the center of the loop, and it is usually
+AI-off, so fluency still matters. Around it, expect:
+
+- **Verification questions**: "an assistant gave you this query; is it
+  right?", or a take-home where you are asked how you checked the AI's work.
+- **Responsible-use questions**: what you would and would not paste into an AI
+  tool, and how you disclose that you used one.
+- **BI tool AI features**: natural-language questions and auto-generated
+  summaries in tools such as Power BI, Tableau, and Looker, and what has to be
+  true of the data for them to answer correctly.
+- **Deeper follow-ups on take-homes.** Since an assistant can produce a
+  plausible take-home, the review call walks through your choices line by line:
+  why this filter, why this grain, what you checked.
+
+Ask the recruiter whether AI is allowed in each round. Policies differ by
+company and change often.
+
+### An assistant wrote a query that returns a number your manager wants today. How do you check it?
+
+Read it as if a new colleague wrote it, then test it against things you
+already know:
+
+1. **State the grain.** What is one row of the result, and one row of each
+   table? Most wrong numbers start with a join that changed the grain.
+2. **Check row counts across joins.** If a table has 10,000 orders before the
+   join and 14,000 rows after, something is fanning out.
+3. **Read every filter against the business definition.** Does "revenue"
+   exclude refunds, cancelled orders, and test accounts? Is the date range
+   inclusive at both ends, and in which time zone?
+4. **Look for NULL traps**: `NOT IN` against a column with NULLs, `COUNT(col)`
+   where `COUNT(*)` was meant, averages that silently drop missing values.
+5. **Reconcile to a trusted total**, such as the finance report or last month's
+   dashboard. A match is strong evidence; a gap is where to dig.
+6. **Spot-check raw rows.** Pick three records and follow them through by hand.
+7. **Sanity-check the range.** A conversion rate above 100% or revenue that
+   tripled overnight is a query bug until proven otherwise.
+
+### What mistakes do AI-generated queries make most often?
+
+The same mistakes people make, delivered with more confidence and less
+context:
+
+- **Date boundaries**: `BETWEEN '2026-01-01' AND '2026-01-31'` on a timestamp
+  column stops at midnight on the 31st and drops that whole day. Use a
+  half-open range: `>= '2026-01-01' AND < '2026-02-01'`.
+- **Fan-out**: summing an order-level amount after joining to order items.
+  See [SQL](/interview-prep/data-analyst/sql).
+- **Averaging ratios**: averaging daily conversion rates instead of dividing
+  total conversions by total sessions, which lets a tiny day count as much as a
+  huge one.
+- **Missing business rules** the assistant could not know: test accounts,
+  internal traffic, the company's definition of an "active" user.
+- **Invented columns** and functions from the wrong SQL dialect, which fail
+  loudly. Those are the harmless kind; the silent ones above are the danger.
+
+The date-boundary bug is easy to see once both versions run side by side.
+The assistant's filter and the half-open one, over the same January orders:
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE orders AS SELECT * FROM (VALUES
+  (1, TIMESTAMP '2025-12-31 23:59:00', 75.00, 'completed'),
+  (2, TIMESTAMP '2026-01-01 00:00:00', 120.00, 'completed'),
+  (3, TIMESTAMP '2026-01-12 19:45:00', 95.50, 'completed'),
+  (4, TIMESTAMP '2026-01-18 11:30:00', 140.00, 'completed'),
+  (5, TIMESTAMP '2026-01-22 16:10:00', 33.25, 'cancelled'),
+  (6, TIMESTAMP '2026-01-31 00:00:00', 50.00, 'completed'),
+  (7, TIMESTAMP '2026-01-31 09:15:00', 310.00, 'completed'),
+  (8, TIMESTAMP '2026-01-31 18:40:00', 125.00, 'completed'),
+  (9, TIMESTAMP '2026-02-01 00:00:00', 99.00, 'completed')
+) AS t(order_id, order_ts, amount, status);`}
+  starterCode={`SELECT
+  SUM(amount) FILTER (
+    WHERE order_ts BETWEEN '2026-01-01' AND '2026-01-31'
+  ) AS assistant_total,   -- stops at 00:00 on Jan 31
+  SUM(amount) FILTER (
+    WHERE order_ts >= '2026-01-01' AND order_ts < '2026-02-01'
+  ) AS half_open_total    -- all of January
+FROM orders
+WHERE status = 'completed';`}
+/>
+
+The assistant's total misses more than half of January's revenue, and nothing
+about the query looks wrong until you test the last day.
+
+### What is a hallucinated insight, and how do you keep one out of a report?
+
+It is a claim about the data that the data does not support: a trend that is
+not there, a number nobody computed, or a cause offered as fact ("the dip was
+caused by the holiday"). It happens when a language model is asked to
+summarize or explain results, because it produces fluent, plausible text
+whether or not the evidence is there.
+
+The defense is a rule: **every number and every claim in the report traces to
+a query or a cell you can point to.** Let the model draft prose around numbers
+you computed, never compute the numbers itself, and strip causal language you
+have not tested. If an automated summary goes out on a schedule, have it quote
+values from the query results rather than generating them.
+
+### How do you prompt an assistant to write good SQL?
+
+Give it what a colleague would need:
+
+```text
+Dialect: DuckDB.
+Tables: orders(order_id, customer_id, order_ts TIMESTAMP, amount, status)
+        customers(customer_id, signup_date, is_test BOOLEAN)
+Grain: one row per order in orders.
+Definitions: revenue = SUM(amount) where status = 'completed',
+             excluding customers with is_test = TRUE.
+Task: monthly revenue for 2026, one row per month, oldest first.
+Also: list any assumptions you made, and give me a second query I can use
+to check the total.
+```
+
+The last line matters most. Asking for assumptions surfaces the guesses it
+made, and a reconciliation query gives you something to check against.
+
+### What data should never go into an AI tool?
+
+Anything your company has not approved for that tool. In practice: customer
+personal data, credentials, confidential financials, and anything under a
+contract or regulation (health, payments) unless it is an enterprise tool your
+security team has cleared. Many tasks do not need real data at all: share the
+schema and a few synthetic rows instead. Interviewers ask this because one
+careless paste can be a reportable data breach.
+
+### How do AI features in BI tools change the analyst's job?
+
+Natural-language querying moves the analyst's work upstream. A business user
+can now ask a question without you, but the tool can only answer correctly on
+top of **well-defined metrics, clean and documented tables, and a semantic
+model** that says how tables join. So the job shifts toward curating trusted
+datasets, writing the definitions, and validating what the tool answers. An
+assistant pointed at messy raw tables produces confidently wrong numbers at
+scale. The [Analytics Engineer track](/interview-prep/analytics-engineer/ai-and-the-semantic-layer)
+covers the modeling side of this.
+
+### "Walk me through how you used AI on this take-home."
+
+Be specific and transparent, and show that you own the result. Name what you
+used it for (boilerplate SQL, a regex, chart code), what you did not (the
+metric definitions, the conclusions), and how you checked its output. A
+candidate who hides AI use and cannot explain a line of their submission does
+far worse than one who used it openly and verified it.
+
+### How would you use an LLM to categorize 5,000 open-ended survey responses?
+
+As a fast first-pass labeler that you measure:
+
+1. **Fix the categories first**, from reading a sample yourself, so the model
+   does not invent new ones as it goes.
+2. **Hand-label 100 to 200 responses** and compare the model's labels to
+   yours. Report its accuracy, and which categories it confuses.
+3. **Make it repeatable**: the same instructions and settings for every batch,
+   and a check that rerunning a sample gives the same labels.
+4. **Report with that uncertainty**, and quote real responses as evidence
+   rather than the model's paraphrases.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`An assistant's query reports January revenue using \`WHERE order_ts BETWEEN '2026-01-01' AND '2026-01-31'\` on a \`TIMESTAMP\` column. What is wrong?
+
+- Nothing; \`BETWEEN\` is inclusive at both ends.
+  > It is inclusive, but '2026-01-31' becomes midnight at the start of the 31st, so the rest of that day is excluded.
+- [o] It drops every order placed on January 31 after midnight.
+  > Use a half-open range, \`order_ts >= '2026-01-01' AND order_ts < '2026-02-01'\`, which is correct for any timestamp precision.
+- It double-counts orders placed exactly at midnight on January 1.
+  > Each row is counted once; the problem is at the other end of the range.
+- \`BETWEEN\` cannot be used with timestamps, so the query errors.
+  > It runs without error, which is exactly what makes the bug dangerous.`}
+/>
+
+<MultipleChoice
+  markdown={`An LLM-written weekly summary says "signups fell 12% because of the competitor's launch". Your query confirms the 12% drop. What should you do with the sentence?
+
+- [o] Keep the number and remove or test the causal claim before it ships.
+  > The drop is measured; the cause is a hypothesis. Present it as one, or check it against timing, segments, and other evidence first.
+- Keep it as written, since the number is correct.
+  > A correct number does not make the explanation correct; that is how hallucinated insights spread.
+- Delete the whole summary, since AI summaries are unreliable.
+  > The measured part is useful; the fix is to separate what you computed from what was guessed.
+- Ask the model to double-check its explanation.
+  > The model has no more evidence the second time; it will usually restate the claim.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of these is the safest way to get an assistant's help debugging a query over the \`customers\` table, which holds names, emails, and addresses?
+
+- Paste 50 real rows so it can see the actual problem.
+  > That shares personal data with a tool that may not be approved for it.
+- Paste the rows but delete the email column first.
+  > Names and addresses are still personal data.
+- Paste the full table export so the assistant has complete context.
+  > That is the largest possible disclosure, for no added debugging value.
+- [o] Share the schema and a few synthetic rows that reproduce the problem.
+  > The structure and a reproducible example are what the assistant needs; real records are not.`}
+/>
+
+## Go deeper
+
+- [Working with Coding Agents](/courses/working-with-coding-agents), especially [staying safe](/courses/working-with-coding-agents/staying-safe) and [reading the diff](/courses/working-with-coding-agents/reading-the-diff)
+- [How Large Language Models Work](/courses/how-llms-work), especially [why models hallucinate](/courses/how-llms-work/why-models-hallucinate)
+- [SQL](/interview-prep/data-analyst/sql) and [Statistics & communication](/interview-prep/data-analyst/statistics-and-communication) on this track

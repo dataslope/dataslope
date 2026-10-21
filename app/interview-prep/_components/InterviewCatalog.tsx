@@ -25,37 +25,37 @@ interface Presentation {
 const PRESENTATION: Record<string, Presentation> = {
   "data-analyst": {
     description:
-      "SQL from joins to window functions, plus pandas, spreadsheets, and the statistics behind an A/B test. Ends on turning a result into a chart and an argument.",
+      "SQL from joins to window functions, plus pandas, spreadsheets, and the statistics behind an A/B test. Ends on turning a result into a chart and an argument, and on checking what an AI assistant wrote.",
     banner: "interview-data-analyst-thumbnail-cutout",
     bannerAlt: "The Dataslope marmot holding a magnifying lens over an isometric dashboard of small charts",
   },
   "data-scientist": {
     description:
-      "Statistics, probability, and experiment design, then machine learning and deep learning. Python, pandas, and SQL throughout, with product-sense metrics questions.",
+      "Statistics, probability, and experiment design, then machine learning and deep learning. Python, pandas, and SQL throughout, with product-sense metrics and LLM evaluation questions.",
     banner: "interview-data-scientist-thumbnail-cutout",
     bannerAlt: "The Dataslope marmot holding a flask beside an isometric scatter plane with a fitted curve",
   },
   "data-engineer": {
     description:
-      "SQL and data modeling at depth, then the systems around them: batch pipelines, distributed processing, streaming, warehousing, and orchestration you can rely on.",
+      "SQL and data modeling at depth, then the systems around them: batch pipelines, distributed processing, streaming, warehousing, orchestration, and the pipelines that feed AI systems.",
     banner: "interview-data-engineer-thumbnail-cutout",
     bannerAlt: "The Dataslope marmot guiding colored cubes along an isometric pipeline into a storage silo",
   },
   "analytics-engineer": {
     description:
-      "The dbt and warehouse layer between engineering and analytics: dimensional modeling, advanced SQL, data-quality testing, and metrics in a semantic layer.",
+      "The dbt and warehouse layer between engineering and analytics: dimensional modeling, advanced SQL, data-quality testing, and metrics in a semantic layer that AI assistants can trust.",
     banner: "interview-analytics-engineer-thumbnail-cutout",
     bannerAlt: "The Dataslope marmot feeding raw tiles into an isometric pipeline that returns tidy modelled tables",
   },
   "machine-learning-engineer": {
     description:
-      "ML fundamentals, coding, and the statistics under them, then deep learning and LLMs. Closes on ML system design and shipping a model to production.",
+      "ML fundamentals, coding, and the statistics under them, then deep learning and LLMs. Closes on ML system design, shipping a model to production, and serving and evaluating LLM systems.",
     banner: "interview-machine-learning-engineer-thumbnail-cutout",
     bannerAlt: "The Dataslope marmot placing an isometric trained-model block into a deployment container",
   },
   "backend-engineer": {
     description:
-      "Data structures and algorithms, Python fundamentals, and object-oriented design, plus concurrency, databases, API design, and system design rounds.",
+      "Data structures and algorithms, Python fundamentals, and object-oriented design, plus concurrency, databases, API design, system design, and AI-assisted coding rounds.",
     banner: "interview-backend-engineer-thumbnail-cutout",
     bannerAlt: "The Dataslope marmot beside an isometric server rack linked to an API gateway block and a database disc",
   },

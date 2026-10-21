@@ -1,7 +1,7 @@
 {
   "root": true,
   "title": "Data Scientist",
-  "description": "Interview prep for Data Scientist roles: statistics, machine learning, and experimentation.",
+  "description": "Interview prep for Data Scientist roles: statistics, machine learning, experimentation, and evaluating LLM features.",
   "pages": [
     "index",
     "statistics",
@@ -12,6 +12,7 @@
     "product-sense-and-metrics",
     "python-and-pandas",
     "sql",
+    "llm-evaluation",
     "multiple-choice-questions"
   ]
 }

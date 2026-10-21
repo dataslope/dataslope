@@ -1,7 +1,7 @@
 {
   "root": true,
   "title": "Data Engineer",
-  "description": "Interview prep for Data Engineer roles: advanced SQL, data modeling, and pipelines.",
+  "description": "Interview prep for Data Engineer roles: advanced SQL, data modeling, pipelines, and the data pipelines behind AI systems.",
   "pages": [
     "index",
     "sql",
@@ -12,6 +12,7 @@
     "streaming",
     "data-warehousing",
     "orchestration-and-reliability",
+    "pipelines-for-ai",
     "multiple-choice-questions"
   ]
 }

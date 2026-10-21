@@ -1,9 +1,9 @@
 ---
 title: Multiple Choice Questions
-description: 100 Data Engineer interview multiple choice questions covering SQL, data modeling, warehousing and storage, pipelines, orchestration and reliability, distributed processing, streaming, and Python, each with an explanation for every option.
+description: 110 Data Engineer interview multiple choice questions covering SQL, data modeling, warehousing and storage, pipelines, orchestration and reliability, distributed processing, streaming, Python, and pipelines for AI systems, each with an explanation for every option.
 ---
 
-A rapid-fire bank of **100 multiple choice questions** drawn from every topic
+A rapid-fire bank of **110 multiple choice questions** drawn from every topic
 on this track. Each one mirrors a decision a Data Engineer actually makes on
 the job, and every option carries an explanation, so a wrong answer tells you
 exactly which idea to revisit.
@@ -1330,6 +1330,138 @@ reasoning and runnable examples.
   > That materializes everything.`}
 />
 
+## Pipelines for AI
+
+<MultipleChoice
+  markdown={`Retrieval returns passages on the right topic that rarely contain the specific answer. Chunks are 2,000 tokens. What is the most likely improvement?
+
+- [o] Smaller chunks, with some overlap between them.
+  > One vector per 2,000 tokens blurs several topics together; smaller chunks match specific questions more precisely.
+- Larger chunks, so that each one holds more surrounding context.
+  > Even larger chunks dilute each embedding further.
+- A higher-dimensional embedding model.
+  > More dimensions do not fix one vector summarizing many topics.
+- Removing the overlap between chunks.
+  > Overlap protects answers split at a boundary; it is not the cause.`}
+/>
+
+<MultipleChoice
+  markdown={`Why must every document be re-embedded when you change embedding models?
+
+- [o] Vectors from different models are not in a comparable space.
+  > A query embedded by the new model cannot be meaningfully compared with documents embedded by the old one.
+- The new model always uses a larger dimension.
+  > Sometimes it does, but even equal dimensions are not comparable.
+- Vector databases reject vectors from two models.
+  > Most store them without complaint, which is why mixed indexes fail silently.
+- Old embeddings expire after a fixed period.
+  > Embeddings do not expire; the incompatibility is the issue.`}
+/>
+
+<MultipleChoice
+  markdown={`A document is deleted at the source. What must the ingestion pipeline do?
+
+- Nothing, since unused vectors are never retrieved.
+  > They are retrieved whenever they match a query, which is the problem.
+- [o] Delete that document's chunks from the vector index.
+  > Otherwise the assistant keeps answering from content that no longer exists, or that users lost access to.
+- Re-embed the remaining documents in the corpus.
+  > Unchanged documents do not need new embeddings.
+- Rebuild the whole index from scratch every night instead.
+  > Works, but pays the full cost every night; incremental deletes do the same job.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you avoid paying to re-embed unchanged chunks on every run?
+
+- Re-embed only chunks modified in the last 24 hours.
+  > Misses changes when a run fails or is delayed, and re-embeds chunks that were touched but not changed.
+- [o] Hash each chunk's content and embed only new or changed hashes.
+  > A content comparison catches exactly what changed, regardless of timing.
+- Cache embeddings keyed by document title.
+  > Titles stay the same while content changes.
+- Embed only the first chunk of each document.
+  > Leaves most of each document unsearchable.`}
+/>
+
+<MultipleChoice
+  markdown={`You have 50,000 vectors, and a tenant filter narrows each query to about 2,000 of them. Which search is simplest and still accurate?
+
+- An HNSW index with a high search breadth.
+  > Works, but adds memory and tuning for no gain at this size.
+- An IVF index with product quantization.
+  > Compression trades away recall for memory you do not need here.
+- [o] Exact search over the filtered vectors.
+  > Comparing a query with 2,000 vectors is fast, and exact search has perfect recall.
+- A GPU cluster for brute-force search.
+  > Far more than 2,000 comparisons per query needs.`}
+/>
+
+<MultipleChoice
+  markdown={`A vector search fetches the top 10 results, then removes those the user may not see. Users on small teams often get only one or two results. Why?
+
+- The embedding model is biased against small teams' documents.
+  > The model is not the cause; the order of filtering is.
+- [o] Filtering after the search discards most of the top 10.
+  > When the filter is selective, few nearest neighbors survive it. Filter during or before the search.
+- The index needs to be rebuilt.
+  > A rebuild would return the same unfiltered neighbors.
+- Small teams write shorter documents.
+  > Document length does not explain a fixed result count shrinking.`}
+/>
+
+<MultipleChoice
+  markdown={`Which query is an embeddings-only search most likely to get wrong?
+
+- [o] "Error ORA-01555 during nightly export"
+  > Rare exact tokens such as error codes get blurred in embeddings; keyword search matches them directly.
+- "How do I reset my password?"
+  > Paraphrased natural-language questions are what embeddings handle best.
+- "Why is my invoice higher this month?"
+  > Also a semantic question that embeddings match well.
+- "Steps to add a new teammate to a shared project"
+  > Embeddings match this phrasing to the relevant how-to page.`}
+/>
+
+<MultipleChoice
+  markdown={`How should a RAG assistant enforce document permissions?
+
+- Tell the model in its system prompt not to reveal restricted documents.
+  > The prompt is not a security boundary, and the content is already in the context.
+- Embed only public documents.
+  > Safe, but it throws away the internal knowledge the assistant exists for.
+- Check permissions in the UI before showing the answer.
+  > The answer was already generated from documents the user may not see.
+- [o] Filter retrieval by the requesting user's permissions.
+  > Restricted chunks never reach the context, so they cannot leak into an answer.`}
+/>
+
+<MultipleChoice
+  markdown={`A backfill must embed 10 million chunks of about 400 tokens each. What is the first number to compute?
+
+- [o] Total tokens, about four billion.
+  > Cost and run time both follow from tokens: divide by the price per million and by the rate limit.
+- The number of source documents.
+  > Embedding is billed by tokens, not documents.
+- The size of the vector index on disk.
+  > Matters for storage, not for the backfill's cost or duration.
+- The number of embedding dimensions.
+  > Affects storage and search speed, not the embedding bill.`}
+/>
+
+<MultipleChoice
+  markdown={`An embedding backfill crashes at 60% and is restarted. What design keeps the restart from creating duplicate vectors?
+
+- Deleting the whole index before each attempt.
+  > Safe, but it throws away the 60% already done.
+- Using larger batch sizes.
+  > Batch size does not prevent duplicates.
+- [o] Upserts keyed by a stable chunk id.
+  > Writing the same chunk twice overwrites one record instead of adding a second.
+- A lower rate limit on the embedding API.
+  > Pacing reduces errors; it does not deduplicate.`}
+/>
+
 ## Keep practicing
 
 Missed a few? Each section maps to a topic page with the long-form reasoning
@@ -1343,3 +1475,4 @@ and runnable examples:
 - [Distributed processing](/interview-prep/data-engineer/distributed-processing)
 - [Streaming & messaging](/interview-prep/data-engineer/streaming)
 - [Python for data engineering](/interview-prep/data-engineer/python)
+- [Pipelines for AI](/interview-prep/data-engineer/pipelines-for-ai)

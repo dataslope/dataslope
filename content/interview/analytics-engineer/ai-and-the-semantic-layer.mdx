@@ -1,0 +1,220 @@
+---
+title: AI & the Semantic Layer
+description: Analytics Engineer interview questions on the layer that AI analytics assistants query. Why text-to-SQL over raw tables gives confident wrong answers, what a semantic layer changes, making a dbt project AI-ready, evaluating a natural-language assistant, connecting assistants to governed metrics, and reviewing AI-written dbt models.
+---
+
+Companies are putting "ask your data" assistants in front of their
+warehouses, and the assistant is only as reliable as the models and metric
+definitions underneath it. Those are an analytics engineer's work. So
+interviews now ask how you would make a dbt project safe for an LLM to query,
+and how you would know whether its answers are right. The skills are familiar
+(grain, tests, documentation, governed metrics); the new part is that a model
+reads them, takes them literally, and answers thousands of questions nobody
+reviews.
+
+## Q&A
+
+### How has the Analytics Engineer interview changed with AI?
+
+Dimensional modeling, dbt, and SQL are still the core. Added on top:
+
+- **Text-to-SQL versus a semantic layer**: why one gives confidently wrong
+  answers and how the other prevents them.
+- **AI-ready modeling**: documentation, tests, and access rules written for a
+  reader that is a language model.
+- **Evaluating an analytics assistant**: what "accuracy" means and how to
+  measure it before and after launch.
+- **AI-written code**: reviewing a dbt model an assistant produced, and AI-on
+  coding rounds at some companies (see
+  [AI-assisted coding](/interview-prep/backend-engineer/ai-assisted-coding)).
+
+### Why does text-to-SQL over raw tables give confident wrong answers?
+
+Because the hard part of most business questions is not SQL syntax; it is
+knowing the definitions the SQL has to encode. Asked "what was revenue last
+month?", a model writing SQL against raw tables has to guess: gross or net of
+refunds? Cancelled orders? Test accounts? Which of three similarly named
+tables? Which join path, and does it fan out? Each guess produces a valid
+query and a plausible number:
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE customers AS SELECT * FROM (VALUES
+  (1, FALSE), (2, FALSE), (3, FALSE), (4, TRUE), (5, FALSE)
+) AS t(customer_id, is_test);
+
+CREATE TABLE orders AS SELECT * FROM (VALUES
+  (101, 1, 120.00, 'completed'), (102, 2, 80.00, 'completed'),
+  (103, 3, 200.00, 'refunded'),  (104, 4, 500.00, 'completed'),
+  (105, 5, 60.00, 'cancelled'),  (106, 1, 150.00, 'completed'),
+  (107, 3, 90.00, 'completed'),  (108, 4, 250.00, 'completed')
+) AS t(order_id, customer_id, amount, status);`}
+  starterCode={`-- Three defensible readings of "revenue", from the same rows.
+SELECT
+  SUM(o.amount) AS every_order,
+  SUM(o.amount) FILTER (WHERE o.status = 'completed') AS completed_orders,
+  SUM(o.amount) FILTER (
+    WHERE o.status = 'completed' AND NOT c.is_test
+  ) AS governed_net_revenue
+FROM orders o
+JOIN customers c USING (customer_id);`}
+/>
+
+The three answers differ by a factor of more than three, and nothing in the
+generated SQL would look wrong to the person who asked. That is the failure
+mode to name in an interview: not an error, but a fluent, plausible, wrong
+number.
+
+### What does a semantic layer change for an AI assistant?
+
+It moves the definitions out of the guess and into code. Metrics, their
+filters, the dimensions they can be sliced by, and the join paths between
+entities are declared once. The assistant's job shrinks from writing SQL to
+**choosing a metric, dimensions, filters, and a time grain**, and the semantic
+layer compiles the SQL. Three consequences worth stating:
+
+- **Consistency**: the assistant, the dashboards, and the finance report all
+  compute "net revenue" the same way.
+- **Explicit failure**: a question the layer does not model returns an error
+  ("no metric matches"), not an invented query. A refusal is far cheaper than a
+  wrong number in a board deck.
+- **A coverage trade-off**: the assistant can only answer what has been
+  modeled. Many teams route modeled questions through the semantic layer and
+  fall back to text-to-SQL, clearly labeled, for exploratory ones.
+
+### What makes a dbt project "AI-ready"?
+
+Everything that helps a new analyst helps a model, with less tolerance for
+gaps, because a model will not ask:
+
+- **Descriptions on every public model and column**, including the grain
+  ("one row per order") and how to use it ("revenue questions should use the
+  `net_revenue` metric").
+- **Tests that encode the facts the description claims**: primary keys
+  `unique` and `not_null`, `relationships` for foreign keys, and
+  `accepted_values` so the model knows the real status values.
+- **Clear access boundaries**: staging and intermediate models marked
+  `private` or `protected` so the assistant only queries public marts, and
+  deprecated models removed or marked as such.
+- **Metrics in the semantic layer** for every number the business argues about.
+- **Freshness**: source freshness checks, so an answer can say "as of" and the
+  assistant can refuse to answer from stale data.
+
+```yaml
+models:
+  - name: fct_orders
+    description: >
+      One row per order. For revenue, use the net_revenue metric,
+      which excludes refunded and cancelled orders and test accounts.
+    access: public
+    columns:
+      - name: order_id
+        description: Primary key.
+        data_tests: [unique, not_null]
+      - name: status
+        description: Lifecycle state at the latest load.
+        data_tests:
+          - accepted_values:
+              values: [completed, refunded, cancelled]
+```
+
+One caution: documentation becomes an input, so a wrong description now
+produces wrong answers rather than just misleading a reader. If you use an
+assistant to draft descriptions from the SQL, review them like code.
+
+### How do you evaluate a natural-language analytics assistant?
+
+With a golden set of real questions whose answers you have verified:
+
+1. **Collect questions** from the people who will use it, across easy lookups,
+   multi-step comparisons, and ambiguous phrasings.
+2. **Store the verified result**, not just a reference query. Many different
+   SQL texts are correct, so compare **result sets** (execution accuracy),
+   not query strings.
+3. **Include questions it should decline**: unmodeled metrics, data the user
+   may not see, nonsense. Measure the refusal rate on those as carefully as
+   accuracy on the rest.
+4. **Slice the results** by difficulty and domain; an average hides the
+   category that fails every time.
+5. **Run it as a regression suite** on every change to the models, the
+   semantic layer, the prompt, or the underlying LLM.
+6. **Log production questions** and grow the set from the ones that went wrong.
+
+### How do AI assistants connect to the warehouse and to governed metrics?
+
+Through the same interfaces BI tools use: a semantic layer API that takes
+metric and dimension names and returns results, and catalog metadata for
+discovery. The Model Context Protocol (MCP) has become a common way to expose
+those to assistants, and dbt Labs publishes an MCP server for project metadata
+and Semantic Layer queries. Design points interviewers look for:
+
+- **The assistant runs as the user**, with the user's row-level and column-level
+  permissions, never a superuser service account.
+- **Read-only credentials** and query cost or timeout limits, since a model can
+  write an expensive cross join as easily as a cheap lookup.
+- **Logging** of every question, generated query, and result for audit and
+  for growing the eval set.
+
+### How do you review a dbt model an assistant wrote?
+
+The checklist you would use for a junior colleague, with attention to what
+models tend to get wrong:
+
+- **Grain**: what is one row, and is there a `unique` test proving it?
+- **References**: `ref()` and `source()` rather than hard-coded schema names,
+  which break across environments and hide lineage.
+- **Incremental logic**: an `is_incremental()` filter that handles late-arriving
+  rows (a lookback window), and a `unique_key` so reruns update rather than
+  duplicate.
+- **Duplication**: does this model, or the metric it computes, already exist
+  under another name? Assistants are good at producing a second, slightly
+  different definition of a number the business already has.
+- **Tests and docs** that come with the model, and tests that would fail
+  without the change.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`An executive asks a text-to-SQL assistant for "active users last week", a metric the semantic layer does not define. What is the best behavior?
+
+- Write the most likely SQL and return the number.
+  > That is exactly how confident wrong numbers reach decision-makers; "active" has several plausible definitions.
+- [o] Say the metric is not defined, and offer the closest governed metrics or a labeled exploratory query.
+  > Explicit failure is the point of a semantic layer. Anything outside it should be clearly marked as unverified.
+- Return weekly logins, since that is the common industry definition.
+  > There is no single industry definition, and the company's own may differ.
+- Ask the LLM to define "active users" and then compute it.
+  > A definition invented on the spot will not match dashboards or finance, which is metric drift by design.`}
+/>
+
+<MultipleChoice
+  markdown={`You are building a golden set to evaluate an analytics assistant. Two correct SQL queries for the same question differ in their joins and aliases. How should you score the assistant's answers?
+
+- Compare the generated SQL text to a single reference query.
+  > Many different queries are correct; string comparison would mark right answers wrong.
+- Ask the assistant to rate its own confidence and trust high scores.
+  > Self-reported confidence is poorly calibrated and is not a measure of correctness.
+- [o] Run the generated SQL and compare its result set with the verified result.
+  > Execution accuracy judges what the user sees, the numbers, regardless of how the query is written.
+- Count an answer correct whenever the SQL runs without errors.
+  > The dangerous failures run fine and return the wrong number.`}
+/>
+
+<MultipleChoice
+  markdown={`Which change most directly reduces the chance that an assistant queries a half-built intermediate model instead of the published mart?
+
+- Adding more columns to the intermediate model.
+  > More columns make it more tempting to query, not less.
+- Raising the LLM's temperature so it explores more models.
+  > More randomness increases the chance of picking the wrong model.
+- Renaming the mart to a longer, more descriptive name.
+  > Helpful at the margin, but the model can still see and query the intermediate one.
+- [o] Restricting the intermediate model's access so only public marts are exposed.
+  > Access boundaries remove the option entirely, which beats hoping the model chooses well.`}
+/>
+
+## Go deeper
+
+- [Metrics & the semantic layer](/interview-prep/analytics-engineer/metrics-and-semantic-layer) and [Testing & data quality](/interview-prep/analytics-engineer/testing-and-data-quality) on this track
+- [How Large Language Models Work](/courses/how-llms-work), especially [why models hallucinate](/courses/how-llms-work/why-models-hallucinate) and [evaluating for your task](/courses/how-llms-work/evaluating-for-your-task)
+- [AI-assisted analysis](/interview-prep/data-analyst/ai-assisted-analysis) on the Data Analyst track, for the analyst's side of the same tools

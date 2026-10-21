@@ -1,9 +1,9 @@
 ---
 title: Multiple Choice Questions
-description: 100 Data Scientist interview multiple choice questions covering statistics, probability, machine learning, deep learning, experimentation, product sense and metrics, SQL, and pandas, each with an explanation for every option.
+description: 110 Data Scientist interview multiple choice questions covering statistics, probability, machine learning, deep learning, experimentation, product sense and metrics, SQL, pandas, and LLM evaluation, each with an explanation for every option.
 ---
 
-A rapid-fire bank of **100 multiple choice questions** drawn from every topic
+A rapid-fire bank of **110 multiple choice questions** drawn from every topic
 on this track. Each one mirrors a judgement a Data Scientist actually makes on
 the job, and every option carries an explanation, so a wrong answer tells you
 exactly which idea to revisit.
@@ -1328,6 +1328,138 @@ reasoning and runnable examples.
   > That returns everyone from both periods.`}
 />
 
+## LLM evaluation
+
+<MultipleChoice
+  markdown={`A prompt change raises an eval pass rate from 76% to 80% on the same 100 items. Roughly how wide is the 95% interval on each rate?
+
+- About ±1 percentage point.
+  > That precision would need tens of thousands of items.
+- [o] About ±8 percentage points.
+  > $1.96\sqrt{0.8 \cdot 0.2 / 100} \approx 0.078$, so the four-point gap sits well inside the noise.
+- About ±20 percentage points.
+  > Too wide; that corresponds to roughly 15 items.
+- It cannot be estimated yet.
+  > A proportion's interval follows directly from $p$ and $n$.`}
+/>
+
+<MultipleChoice
+  markdown={`Two prompt versions are scored pass or fail on the same 300 items. Which test fits the comparison best?
+
+- A two-sample t-test on the two pass rates.
+  > Treats the samples as independent, which wastes the pairing.
+- A chi-square test treating the versions as separate samples.
+  > Same problem: it ignores that each item was scored twice.
+- [o] McNemar's test on the items where the versions disagree.
+  > Items both pass or both fail say nothing about the difference; the discordant pairs carry it.
+- A Kolmogorov–Smirnov test on the score distributions.
+  > Compares distributions of continuous scores, not paired binary outcomes.`}
+/>
+
+<MultipleChoice
+  markdown={`An LLM judge and an expert agree on 90% of items, and each labels 90% of items "pass". What is Cohen's kappa?
+
+- [o] About 0.44
+  > Expected agreement is $0.9^2 + 0.1^2 = 0.82$, so $\kappa = (0.90 - 0.82)/(1 - 0.82) \approx 0.44$.
+- About 0.90
+  > That is raw agreement, before correcting for chance.
+- About 0.82
+  > That is the agreement expected by chance alone.
+- About 0.08
+  > That is the numerator only, before dividing by $1 - p_e$.`}
+/>
+
+<MultipleChoice
+  markdown={`Which result most clearly shows that an LLM judge has position bias?
+
+- It rates long answers higher than short ones.
+  > That is verbosity bias.
+- It prefers answers written by its own model family.
+  > That is self-preference bias.
+- [o] Its verdict flips when the two answers swap places.
+  > Only the order changed, not the content; a stable judge would give the same verdict.
+- It disagrees with human raters on 15% of items.
+  > Disagreement alone does not identify the cause.`}
+/>
+
+<MultipleChoice
+  markdown={`You are A/B testing a chat assistant. What should the randomization unit be?
+
+- [o] Each user, sticky across sessions.
+  > Conversations build on earlier turns; per-user assignment keeps each experience consistent.
+- Each message, to get more samples.
+  > One user would see both variants inside a conversation, contaminating both arms.
+- Each day, alternating the arms.
+  > Confounds the effect with day-of-week patterns and leaves very few units.
+- Each server, to simplify deployment.
+  > Server assignment is not random with respect to users.`}
+/>
+
+<MultipleChoice
+  markdown={`A provider updates the model behind your API name in the middle of an experiment. What should you have logged in order to recover?
+
+- The prompt template that was used for each request.
+  > Useful, but unchanged here; the model changed.
+- Each user's device type.
+  > Unrelated to the change in treatment.
+- The time the experiment started.
+  > Gives the window, not which model served each request.
+- [o] The model version that served each request.
+  > With it you can split the analysis at the change or exclude the affected period.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is thumbs-up rate a weak primary metric for an AI feature?
+
+- It is too expensive to collect at scale.
+  > Collecting it is cheap; the problem is what it measures.
+- It cannot be compared across experiment arms.
+  > It can be compared; the comparison is just biased.
+- [o] Few users click, and those who do are not representative.
+  > Selection bias dominates. Prefer downstream outcomes, such as a ticket resolved without a follow-up.
+- It only works for features that produce text.
+  > Feedback buttons work for any output; that is not the issue.`}
+/>
+
+<MultipleChoice
+  markdown={`An LLM classifier with sensitivity 0.90 and specificity 0.95 labels 20% of tickets as complaints. Which true complaint rate is closest?
+
+- 20%, since the labels come straight from the model.
+  > The raw rate includes false positives from the large non-complaint group.
+- 22%, scaling up to account for the 10% of complaints it missed.
+  > Corrects the misses but ignores the false positives.
+- [o] 18%, after removing false positives and restoring misses.
+  > $(0.20 + 0.95 - 1)/(0.90 + 0.95 - 1) \approx 0.176$, the Rogan–Gladen estimate.
+- 15%, subtracting the 5% false-positive rate.
+  > The 5% applies only to non-complaints, and the misses are never added back.`}
+/>
+
+<MultipleChoice
+  markdown={`Why might a model's high score on a public benchmark overstate how well it will do on your task?
+
+- [o] The benchmark's items may have appeared in its training data.
+  > Then the score measures memory, not skill. Keep a private, fresh eval set built from your own data.
+- Public benchmarks use too many examples to be reliable.
+  > More examples make an estimate more precise, not less.
+- Benchmarks always run at a higher temperature than production.
+  > Benchmark settings vary; this is not a general rule.
+- Benchmark scores are rounded up when they are published.
+  > Not a real effect.`}
+/>
+
+<MultipleChoice
+  markdown={`An assistant's notebook reports an AUC of 0.97 on a churn problem where 0.75 is typical. What should you check first?
+
+- Whether the random seed was set.
+  > Seeds affect reproducibility, not a jump of 0.2 in AUC.
+- Whether a larger model would score even higher on this data.
+  > Investigate before celebrating; a score this far above typical is a warning sign.
+- Whether AUC was the right metric to report.
+  > Worth discussing, but it does not explain an implausible value.
+- [o] Whether information from the outcome leaked into training.
+  > Leakage is the usual reason a score is too good, and generated code often fits a scaler or encoder before splitting.`}
+/>
+
 ## Keep practicing
 
 Missed a few? Each section maps to a topic page with the long-form reasoning
@@ -1341,3 +1473,4 @@ and runnable examples:
 - [Product sense & metrics](/interview-prep/data-scientist/product-sense-and-metrics)
 - [SQL for data science](/interview-prep/data-scientist/sql)
 - [Python & pandas](/interview-prep/data-scientist/python-and-pandas)
+- [LLM evaluation](/interview-prep/data-scientist/llm-evaluation)

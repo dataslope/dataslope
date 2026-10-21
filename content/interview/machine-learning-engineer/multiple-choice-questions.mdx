@@ -1,9 +1,9 @@
 ---
 title: Multiple Choice Questions
-description: 100 Machine Learning Engineer interview multiple choice questions covering ML fundamentals, deep learning, NLP and LLMs, ML system design, MLOps, statistics and probability, and coding for ML, each with an explanation for every option.
+description: 110 Machine Learning Engineer interview multiple choice questions covering ML fundamentals, deep learning, NLP and LLMs, ML system design, MLOps, statistics and probability, coding for ML, and LLM serving and evaluation, each with an explanation for every option.
 ---
 
-A rapid-fire bank of **100 multiple choice questions** drawn from every topic
+A rapid-fire bank of **110 multiple choice questions** drawn from every topic
 on this track. Each one mirrors a decision an ML engineer actually makes on
 the job, and every option carries an explanation, so a wrong answer tells you
 exactly which idea to revisit.
@@ -1328,6 +1328,138 @@ reasoning and runnable code.
   > A fixed order lets the model learn the ordering, particularly if the data is sorted by label.`}
 />
 
+## LLM systems & evals
+
+<MultipleChoice
+  markdown={`Why is the decode phase of LLM inference usually memory-bandwidth-bound?
+
+- It processes the entire prompt at once in one large matrix multiplication.
+  > That describes prefill, which is compute-bound.
+- [o] Each step reads all the weights and the KV cache to make one token.
+  > Little arithmetic happens per byte moved, so bandwidth, not compute, sets the speed.
+- It runs on the CPU while prefill runs on the GPU.
+  > Both phases normally run on the accelerator.
+- The vocabulary softmax dominates the computation.
+  > The output projection is a small part of each step's cost.`}
+/>
+
+<MultipleChoice
+  markdown={`A model has 32 layers, 8 KV heads of dimension 128, and 16-bit values. About how much KV cache does one 32,000-token sequence need?
+
+- About 4 MB
+  > That is roughly the cache for 32 tokens.
+- About 40 MB
+  > That is roughly the cache for 300 tokens.
+- [o] About 4 GB
+  > $2 \times 32 \times 8 \times 128 \times 2$ bytes is 128 KiB per token, times 32,000 tokens.
+- About 400 GB
+  > That would be the cache for about three million tokens.`}
+/>
+
+<MultipleChoice
+  markdown={`What problem does continuous batching solve?
+
+- Requests that arrive with very long prompts.
+  > Prompt length is a prefill cost; a batching policy does not shorten it.
+- Models too large for one GPU's memory.
+  > That calls for tensor or pipeline parallelism, not a batching policy.
+- [o] GPU slots idling while a batch waits for its longest request.
+  > New requests join and finished ones leave at each decode step, which keeps the GPU busy.
+- Nondeterministic outputs at temperature zero.
+  > Unrelated to scheduling.`}
+/>
+
+<MultipleChoice
+  markdown={`A 4-bit quantized model matches the 16-bit original on average perplexity. What should you still check before shipping it?
+
+- That it really fits on fewer GPUs than before.
+  > That is the expected benefit, not the risk.
+- That its tokenizer still matches the original model's exactly.
+  > Quantization does not touch the tokenizer.
+- That its context window has not been reduced.
+  > Quantization does not change the context length.
+- [o] Quality on your own task, especially hard and rare cases.
+  > Average perplexity can hide losses on reasoning and on the long tail.`}
+/>
+
+<MultipleChoice
+  markdown={`What does speculative decoding rely on to speed up generation?
+
+- [o] A small draft model whose guesses the large model verifies in one pass.
+  > When the draft is often right, several tokens are accepted per large-model step, and the output distribution is unchanged.
+- Skipping the KV cache for short sequences.
+  > Skipping the cache would make each step slower.
+- Lowering the precision of the attention scores.
+  > That is a quantization or kernel technique.
+- Generating several candidate answers and keeping the best.
+  > That is best-of-n sampling, which costs more, not less.`}
+/>
+
+<MultipleChoice
+  markdown={`How do you guard an LLM judge against position bias in pairwise comparisons?
+
+- Use a larger judge model from the same provider.
+  > Larger judges still show order effects.
+- Ask the judge for a 1-to-10 score on each answer instead.
+  > Absolute scores carry their own biases and lose resolution.
+- [o] Judge each pair in both orders and count only agreeing verdicts.
+  > Order effects then show up as disagreement instead of a false win.
+- Always show the newer system's answer in the first position, for consistency.
+  > That builds the bias into every comparison.`}
+/>
+
+<MultipleChoice
+  markdown={`Retrieval recall@5 is 0.95, yet answers are often unsupported by the retrieved passages. Where should you look?
+
+- The chunk size and overlap used during ingestion.
+  > Retrieval is already finding the right passages.
+- The vector index type and its search parameters.
+  > Index choice affects recall, which is fine here.
+- The embedding model used to encode the queries and the documents.
+  > Retrieval is not the bottleneck.
+- [o] The generation step: grounding, faithfulness, or the model.
+  > The right context arrives and the answer drifts from it, so the failure is downstream of retrieval.`}
+/>
+
+<MultipleChoice
+  markdown={`Each step of a 10-step agent succeeds independently 95% of the time. About how often does the whole task succeed?
+
+- About 95%
+  > That is the success rate of one step, not ten.
+- [o] About 60%
+  > $0.95^{10} \approx 0.60$. Reliability compounds, so fewer and more reliable steps matter.
+- About 85%
+  > Too high; the compounding is steeper than that.
+- About 10%
+  > Too low; that would need much less reliable steps.`}
+/>
+
+<MultipleChoice
+  markdown={`A customer-facing agent must succeed every time a task is attempted. Which metric fits?
+
+- pass@k: at least one of k attempts succeeds.
+  > Suits tasks where a person can pick the best of several tries.
+- [o] pass^k: all k attempts succeed.
+  > Measures consistency, which falls quickly as k grows for an unreliable agent.
+- Average reward per step.
+  > Partial credit hides failed tasks.
+- Number of tool calls per task.
+  > An efficiency measure, not reliability.`}
+/>
+
+<MultipleChoice
+  markdown={`Which task is the weakest fit for an LLM?
+
+- Drafting replies to free-text customer emails.
+  > Open-ended language is where LLMs fit best.
+- Extracting fields from messy scanned invoices.
+  > A common, effective use, with validation.
+- Summarizing long incident reports.
+  > A strong fit, with review.
+- [o] Real-time fraud scoring on tabular features under 10 ms.
+  > A gradient-boosted model is faster, cheaper, better calibrated, and easier to explain here.`}
+/>
+
 ## Keep practicing
 
 Missed a few? Each section maps to a topic page with the long-form reasoning
@@ -1340,3 +1472,4 @@ and runnable code:
 - [MLOps & deployment](/interview-prep/machine-learning-engineer/mlops)
 - [Statistics & probability](/interview-prep/machine-learning-engineer/statistics-and-probability)
 - [Coding & algorithms for ML](/interview-prep/machine-learning-engineer/coding)
+- [LLM systems & evals](/interview-prep/machine-learning-engineer/llm-systems-and-evals)

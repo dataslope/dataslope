@@ -1,0 +1,283 @@
+---
+title: LLM Systems & Evals
+description: Machine Learning Engineer interview questions on serving and evaluating LLM applications. Prefill and decode, KV-cache sizing, continuous batching, quantization and speculative decoding, eval sets and LLM-as-judge, retrieval metrics, and agents and tool calling.
+---
+
+ML system design rounds used to mean "design a recommender" or "design fraud
+detection". Since generative models went into production, the prompt is just
+as often "design an assistant over our documents" or "this LLM feature is too
+slow and too expensive; fix it". Interviewers probe two areas that classical ML
+prep does not cover: the **economics of inference** and **evaluation when
+there is no single right answer**. The [NLP & LLMs](/interview-prep/machine-learning-engineer/nlp-and-llms)
+page covers how the models work; this one covers running and measuring them.
+
+## Q&A
+
+### How has the ML Engineer interview changed with LLMs?
+
+Classical ML did not leave: expect bias and variance, leakage, metrics, and
+a coding round, sometimes with an AI assistant allowed (see the
+[AI-assisted coding](/interview-prep/backend-engineer/ai-assisted-coding)
+page on the Backend track). What was added:
+
+- **LLM application design**: retrieval, prompting, tool use, guardrails, and
+  fallbacks, drawn as a system with latency and cost budgets.
+- **Inference economics**: why generation is slow, what the GPU memory is
+  spent on, and which lever buys what.
+- **Evaluation design**: building a test set, trusting or distrusting an
+  automated judge, and connecting offline scores to online outcomes.
+- **Judgment about when not to use an LLM**, which is the question that
+  separates candidates who have shipped from those who have only prototyped.
+
+### Why is LLM inference split into prefill and decode?
+
+Generating a response has two phases with different bottlenecks:
+
+- **Prefill** processes the whole prompt in one parallel pass. It is large
+  matrix multiplication, so it is **compute-bound**, and it sets the **time to
+  first token** (TTFT).
+- **Decode** produces one token per step. Each step reads every weight and the
+  whole cached context to do a small amount of arithmetic, so it is
+  **memory-bandwidth-bound**, and it sets the **time per output token**.
+
+The split matters because the levers differ. A chat product cares most about
+TTFT and smooth streaming; an offline summarization job cares about total
+throughput and cost per request. Long prompts make prefill expensive; long
+answers make decode expensive.
+
+### What is the KV cache, and how large does it get?
+
+During decode, each new token attends to every previous token. Recomputing
+their keys and values at every step would be quadratic waste, so they are
+cached. The cache size per sequence is:
+
+$$
+2 \times \text{layers} \times \text{KV heads} \times \text{head dim} \times \text{tokens} \times \text{bytes per value}
+$$
+
+The 2 is one key and one value. For a 70B-class model with 80 layers, 8 KV
+heads of dimension 128, and 16-bit values, that is 320 KiB **per token**, or
+40 GiB for a single 128K-token context, against about 140 GB for the weights.
+Memory, not compute, usually caps how many requests a GPU can serve at once,
+and the KV cache is where that memory goes.
+
+**Grouped-query attention** (GQA) is the main architectural fix: several query
+heads share one key/value head. The same model with a KV head per query head
+(64 instead of 8) would need eight times the cache.
+
+The arithmetic is worth being able to do on a whiteboard, including the last
+step: how many concurrent requests a node can hold once the weights are loaded.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def kv_cache_bytes(layers, kv_heads, head_dim, tokens, bytes_per_value=2):
+    # One key and one value per layer, per KV head, per token.
+    return 2 * layers * kv_heads * head_dim * tokens * bytes_per_value
+
+GiB = 2**30
+print(f"per token:        {kv_cache_bytes(80, 8, 128, 1) / 1024:.0f} KiB")
+print(f"one 128K context: {kv_cache_bytes(80, 8, 128, 131072) / GiB:.0f} GiB")
+print(f"same, no GQA:     {kv_cache_bytes(80, 64, 128, 131072) / GiB:.0f} GiB")
+
+# Eight 80 GB GPUs, minus about 140 GB of 16-bit weights.
+free = 8 * 80e9 - 140e9
+per_request = kv_cache_bytes(80, 8, 128, 8192)
+print(f"8K-token requests that fit: {int(free // per_request)}")`,
+    },
+  ]}
+/>
+
+### What are continuous batching and PagedAttention?
+
+**Static batching** groups requests and waits until the longest one finishes,
+so short requests leave GPU slots idle. **Continuous batching** (also called
+in-flight batching) admits a new request into the batch at any decode step and
+releases a finished one immediately, which keeps the GPU busy under uneven
+output lengths.
+
+**PagedAttention** stores the KV cache in fixed-size blocks, the way an
+operating system pages virtual memory, instead of one contiguous buffer sized
+for the maximum length. That removes most fragmentation and lets sequences
+share blocks for a common prefix. The vLLM paper reported 2–4x higher
+throughput than earlier serving systems at the same latency.[^vllm]
+
+### What do quantization and speculative decoding trade?
+
+**Quantization** stores weights (and sometimes the KV cache) in fewer bits:
+8-bit or 4-bit instead of 16. Because decode is bandwidth-bound, moving fewer
+bytes makes it faster as well as smaller. The risks are quality loss, which
+often shows up on reasoning and rare cases before it shows on average
+perplexity, and missing fast kernels for your hardware. Evaluate on your own
+task, not a generic benchmark.
+
+**Speculative decoding** lets a small draft model propose several tokens that
+the large model then verifies in one forward pass. With the standard acceptance
+rule the output distribution is unchanged; the speedup depends on how often the
+draft is right, so it helps most on predictable text.
+
+Other levers worth naming: prefix caching for a shared system prompt, routing
+easy requests to a smaller model, distilling a large model into a small one for
+a narrow task, and streaming to cut perceived latency.
+
+### How do you evaluate an LLM application?
+
+In layers, from cheap to expensive:
+
+1. **An offline eval set** of realistic inputs, each with a reference answer
+   or a rubric. A hundred or two well-chosen cases beat thousands of synthetic
+   ones; grow the set from real production failures.
+2. **Automated scoring matched to the task**: exact match or execution for
+   structured outputs (JSON, SQL, code), retrieval metrics for search, a
+   rubric-driven LLM judge for open-ended text.
+3. **Human review** of a sample, both to catch what the metrics miss and to
+   check the automated judge.
+4. **Evals as CI**: rerun the suite on every prompt, model, or retrieval change,
+   and block regressions.
+5. **Online measurement**: A/B tests on user outcomes, with guardrails on
+   latency, cost, and refusal rate.
+
+Public benchmarks are a weak guide to your task: many are saturated, and their
+test items may have leaked into training data.
+
+### When can you trust an LLM as a judge?
+
+Only after you have measured it. Zheng et al. documented three systematic
+biases in LLM judges: **position** (favoring the first answer shown),
+**verbosity** (favoring longer answers), and **self-enhancement** (favoring
+text from their own model family).[^judge] Mitigations:
+
+- Score each pair in both orders and count a win only when the verdicts agree.
+- Use a specific rubric with pass/fail criteria rather than a 1-to-10 score.
+- Use a judge from a different model family than the system under test.
+- **Calibrate against humans**: have experts label a sample and report the
+  judge's agreement with them, chance-corrected (Cohen's kappa), before you rely
+  on its scores. The [Data Scientist track](/interview-prep/data-scientist/llm-evaluation)
+  works through that calculation.
+
+### How do you evaluate a RAG system?
+
+Separately for each half, so a failure points at its cause:
+
+- **Retrieval**: over a labeled set of queries and their relevant documents,
+  measure **recall@k** (did the right documents make the top k?) and **MRR**
+  (how high did the first relevant one rank?). If retrieval misses, no prompt
+  fixes it.
+- **Generation**: **faithfulness** (is every claim supported by the retrieved
+  passages?), answer relevance, and citation accuracy.
+
+One finding worth citing: models use information at the start and end of a
+long context better than information in the middle.[^lost-middle] So a few
+well-ranked passages often beat many loosely relevant ones, and a reranker
+earns its latency.
+
+### What is an agent, and how does tool calling work?
+
+Tool calling lets a model request an action instead of answering: it emits a
+structured call (a tool name and JSON arguments), the application runs it, and
+the result goes back into the context for the next step. An **agent** is that
+loop, repeated until the model decides it is done. The Model Context Protocol
+(MCP) is an open standard for exposing tools and data sources to models, so one
+integration serves many clients.
+
+Design concerns interviewers listen for: a step and cost budget; timeouts and
+retries per tool; idempotent tools, since a step may run twice; permissions
+scoped to the user; and a trace of every step for debugging. Reliability
+compounds: if each step succeeds 95% of the time, a ten-step task succeeds
+about $0.95^{10} \approx 60\%$ of the time. Fewer, more reliable steps beat a
+clever long chain.
+
+### How do you evaluate an agent?
+
+Check **outcomes**, not prose: did the ticket get filed, do the tests pass, is
+the database in the expected state? Then inspect **trajectories**: right tool,
+valid arguments, number of steps, cost. Because runs are nondeterministic,
+repeat each task. The τ-bench authors distinguish pass@k (at least one of k
+attempts succeeds) from pass^k (all k succeed); a customer-facing agent needs
+the second, which falls quickly as k grows.[^tau]
+
+### When should you not use an LLM?
+
+When a smaller model or a rule does the job better on the axes that matter:
+tabular prediction, strict latency or cost budgets, a need for calibrated
+probabilities or explanations a regulator will accept, or a task a regular
+expression solves. A common middle path is to use an LLM to **label data** and
+train a small, fast classifier on those labels, after checking the labels
+against a human-labeled sample.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`Users complain that a chat assistant takes several seconds before any text appears, although answers then stream quickly. Which phase should you optimize first?
+
+- Decode, by quantizing the KV cache to 8 bits.
+  > Decode speed governs the streaming rate after the first token, which users say is fine.
+- [o] Prefill, for example by shortening or caching a long shared prompt prefix.
+  > The delay before the first token is time to first token, set by processing the prompt. Prefix caching and shorter prompts cut it directly.
+- Sampling, by lowering the temperature.
+  > Temperature changes which tokens are chosen, not how fast they are produced.
+- Batching, by waiting to fill larger batches before starting.
+  > Waiting to batch adds queueing delay and makes time to first token worse.`}
+/>
+
+<MultipleChoice
+  markdown={`A model has 80 layers and 64 query heads of dimension 128. The architecture team proposes grouped-query attention with 8 KV heads. What happens to the KV cache per token?
+
+- It grows, because more heads need more memory.
+  > GQA reduces the number of key/value heads; queries do not need caching.
+- Nothing, because the query heads are unchanged.
+  > The cache stores keys and values, so it scales with KV heads, not query heads.
+- [o] It shrinks to one eighth of its multi-head size.
+  > Cache size is proportional to the number of KV heads: 8 instead of 64.
+- It halves, because keys and values are stored together.
+  > Keys and values are both still stored; the factor of 2 is unchanged.`}
+/>
+
+<MultipleChoice
+  markdown={`Your LLM judge prefers system A over system B in 70% of pairs. You then rerun every comparison with B shown first, and B now wins 65% of them. What does this indicate?
+
+- System B is better, because it won the second run.
+  > The two runs contradict each other; neither can be taken at face value.
+- The judge is working as intended, since results always vary.
+  > Variation this large and this aligned with order is a bias, not noise.
+- [o] The judge has a strong position bias, so verdicts should count only when both orders agree.
+  > Whichever answer is shown first tends to win. Scoring both orders and requiring agreement is the standard mitigation.
+- The eval set is too small, so you should add more examples.
+  > A larger set would reproduce the same order effect at higher confidence.`}
+/>
+
+<MultipleChoice
+  markdown={`A RAG assistant gives wrong answers. Retrieval recall@5 on your labeled queries is 0.45. What is the most sensible next step?
+
+- Rewrite the generation prompt to forbid wrong answers.
+  > A prompt cannot answer from documents that were never retrieved.
+- Switch to a larger generation model.
+  > The bottleneck is upstream: more than half the time the right passage is not in the context.
+- Lengthen the context window and pass the top 50 results.
+  > More loosely relevant text tends to bury the answer, and it raises cost.
+- [o] Improve retrieval first: chunking, hybrid keyword search, or a reranker.
+  > With the right passage missing most of the time, generation quality is capped. Fix the half that is failing.`}
+/>
+
+## Go deeper
+
+- [How Large Language Models Work](/courses/how-llms-work), especially [context windows](/courses/how-llms-work/context-windows), [controlling cost](/courses/how-llms-work/controlling-cost), and [evaluating for your task](/courses/how-llms-work/evaluating-for-your-task)
+- [NLP & LLMs](/interview-prep/machine-learning-engineer/nlp-and-llms) and [ML system design](/interview-prep/machine-learning-engineer/ml-system-design) on this track
+
+[^vllm]:
+    Kwon et al., ["Efficient Memory Management for Large Language Model Serving with PagedAttention"](https://arxiv.org/abs/2309.06180),
+    SOSP 2023.
+
+[^judge]:
+    Zheng et al., ["Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena"](https://arxiv.org/abs/2306.05685),
+    NeurIPS 2023 Datasets and Benchmarks track.
+
+[^lost-middle]:
+    Liu et al., ["Lost in the Middle: How Language Models Use Long Contexts"](https://arxiv.org/abs/2307.03172),
+    *Transactions of the ACL*, 2024.
+
+[^tau]:
+    Yao et al., ["τ-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains"](https://arxiv.org/abs/2406.12045),
+    2024.
