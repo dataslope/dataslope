@@ -43,7 +43,6 @@ export const KEY_INK = BLUE_INK;
 export const KEY_WASH = `color-mix(in srgb, ${BAR} 18%, transparent)`;
 export const WARN_WASH = `color-mix(in srgb, ${ACCENT} 22%, transparent)`;
 export const SOFT = `color-mix(in srgb, ${INK} 22%, transparent)`;
-const BOX_FILL = `color-mix(in srgb, ${ds("yellow", 50)} 45%, ${PAPER})`;
 
 /** 0 → 1 → 0 over `dur` frames from `at`: a swell for a mark named again. */
 export const pulse = (frame: number, at: number, dur = 18) => {
@@ -376,7 +375,7 @@ export const RecordNode: React.FC<{
         boxSizing: "border-box",
         border: `2px solid ${INK}`,
         borderRadius: 8,
-        background: BOX_FILL,
+        background: PAPER,
         opacity: p * (1 - o) * (1 - d),
         transform: `scale(${(0.85 + 0.15 * p) * (1 + swell * 0.08)})`,
         display: "flex",
@@ -874,7 +873,7 @@ export const Card: React.FC<{
         boxSizing: "border-box",
         border: `2px solid ${accent ? ACCENT : INK}`,
         borderRadius: 10,
-        background: BOX_FILL,
+        background: PAPER,
         opacity: p * (1 - o) * (1 - d),
         transform: `translateY(${(1 - p) * 16}px) scale(${1 + swell * 0.04})`,
       }}

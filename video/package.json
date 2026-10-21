@@ -13,7 +13,6 @@
     "render:preview": "remotion render --scale=0.5",
     "patterns": "node scripts/render-patterns.mjs",
     "illustrations": "node scripts/illustrations.mjs",
-    "paper": "node scripts/paper.mjs",
     "cues": "node scripts/cues.mjs",
     "narrate": "node scripts/narrate.mjs",
     "test": "node --test src/narration/timeline.test.ts src/narration/scenes.test.ts src/narration/voices.test.ts src/narration/takes.test.ts src/editorial/intro.test.ts src/components/arrow.test.ts src/components/crowsfoot.test.ts src/sound/sfx.test.ts scripts/lib/audio.test.mjs scripts/lib/motion.test.mjs scripts/lib/onset.test.mjs scripts/lib/cue-scan.test.mjs",

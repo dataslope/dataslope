@@ -4,7 +4,6 @@ import { CARDINALITIES } from "../components/crowsfoot";
 import { Entity, Relation, useEntityLayout } from "./erd";
 import { LayoutContext, layoutFor } from "./layout";
 import { INK_SOFT, label, PAPER } from "./style";
-import { Paper } from "./ui";
 
 /**
  * The ERD kit (erd.tsx) on one page, for reviewing it: every crow's-foot end,
@@ -76,7 +75,6 @@ const Diagram: React.FC = () => {
 export const ErdKit: React.FC = () => (
   <LayoutContext.Provider value={layoutFor(false)}>
     <AbsoluteFill style={{ background: PAPER }}>
-      <Paper />
       {CARDINALITIES.map((kind, i) => {
         const yy = 300 + i * 120;
         return (

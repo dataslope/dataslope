@@ -5,10 +5,12 @@ import { SERIF } from "./fonts";
 
 /**
  * The palette of a magazine's science pages, built only from brand ramps:
- * warm paper, a warm near-black ink, one brand blue for data and one red
- * accent for whatever the narration is pointing at.
+ * a plain white page, a warm near-black ink, one brand blue for data and one
+ * red accent for whatever the narration is pointing at. Everything drawn in
+ * the page's color (halos, masks, cards that hide what is behind them) reads
+ * PAPER, so the page is this one token.
  */
-export const PAPER = `color-mix(in srgb, ${ds("yellow", 100)} 58%, ${colors.page})`;
+export const PAPER = colors.page;
 export const INK = `color-mix(in srgb, ${ds("gray", 900)} 86%, ${ds("yellow", 900)})`;
 export const INK_SOFT = `color-mix(in srgb, ${ds("gray", 600)} 80%, ${ds("yellow", 800)})`;
 export const HAIRLINE = `color-mix(in srgb, ${INK} 55%, transparent)`;

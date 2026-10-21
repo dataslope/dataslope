@@ -294,7 +294,7 @@ export const Stack: React.FC<{ layout: EntityLayout; at: number; out?: number; c
             boxSizing: "border-box",
             border: `2px solid color-mix(in srgb, ${INK} ${70 - n * 18}%, transparent)`,
             borderRadius: 6,
-            background: `color-mix(in srgb, ${ds("yellow", 50)} 45%, ${PAPER})`,
+            background: PAPER,
             opacity: k,
           }}
         />

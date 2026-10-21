@@ -10,7 +10,6 @@ import { SERIF } from "./fonts";
 import { LayoutContext, layoutFor } from "./layout";
 import { INK, PAPER } from "./style";
 import { type TypefaceId, TYPEFACES, typefaceVars } from "./typefaces";
-import { Paper } from "./ui";
 
 /** Props of every editorial video. */
 export type EditorialProps = NarratedProps & {
@@ -33,7 +32,7 @@ export const EDITORIAL_DEFAULTS = {
 const LIFT = 24;
 
 /**
- * The page an editorial video is printed on: warm paper, the chosen face set
+ * The page an editorial video is printed on: plain white, the chosen face set
  * on the root as custom properties (style.ts reads them), and the vertical
  * layout for the captions setting (layout.ts). With `captions` on, the
  * narration runs as a serif lower third; off, the figures take that space.
@@ -54,7 +53,6 @@ export const EditorialPage: React.FC<EditorialProps & { children: React.ReactNod
       <SfxContext.Provider value={sfx}>
         <LayoutContext.Provider value={layoutFor(captions)}>
           <AbsoluteFill style={{ background: PAPER, ...typefaceVars(face) }}>
-            <Paper />
             <AbsoluteFill style={{ transform: `translateY(${-LIFT}px)` }}>{children}</AbsoluteFill>
             <NarrationAudio />
             {captions ? (

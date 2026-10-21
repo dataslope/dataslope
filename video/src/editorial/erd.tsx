@@ -3,7 +3,6 @@ import { useCurrentFrame } from "remotion";
 import type { Pt } from "../components/arrow";
 import { type Cardinality, endSegment, MARKER, markerLength, relationEnd } from "../components/crowsfoot";
 import { ease } from "../components/motion";
-import { ds } from "../theme/brand";
 import { MONO, SANS } from "../theme/fonts";
 import { useLayout } from "./layout";
 import { BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, ACCENT, halo, note } from "./style";
@@ -105,7 +104,6 @@ const TONES = {
 } as const;
 
 const HEADER_FILL = `color-mix(in srgb, ${INK} 7%, ${PAPER})`;
-const BOX_FILL = `color-mix(in srgb, ${ds("yellow", 50)} 45%, ${PAPER})`;
 
 /**
  * An entity, drawn as a table box. The box and its name arrive on `at`, then
@@ -145,7 +143,7 @@ export const Entity: React.FC<{
         height,
         opacity: shown * (1 - gone) * (1 - dimmed),
         transform: `translateY(${(1 - shown) * 10}px)`,
-        background: BOX_FILL,
+        background: PAPER,
         border: `${ENTITY.border}px solid ${INK}`,
         borderRadius: 6,
         overflow: "hidden",
