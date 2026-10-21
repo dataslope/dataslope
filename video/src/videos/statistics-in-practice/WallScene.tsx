@@ -148,9 +148,9 @@ export const WallScene: React.FC = () => {
   const keepAt = n.word("sin", "Keep a wall");
   const crossingAt = n.word("sin", "crossing");
   const suggestedAt = n.word("sin", "suggested");
-  const pickedAt = n.word("sin", "picked");
-  const veryAt = n.word("sin", "very bills");
-  const tiltedAt = n.word("sin", "tilted");
+  const pickedAt = n.word("tilt", "picked");
+  const veryAt = n.word("tilt", "very bills");
+  const tiltedAt = n.word("tilt", "tilted");
   const luckFrom = n.beat("luck").from;
   const luckAt = n.word("luck", "lead is luck");
   const evidenceAt = n.word("luck", "evidence");

@@ -195,7 +195,7 @@ export const script: NarrationScript = {
     },
     {
       id: "rate-se",
-      text: "A rate's standard error comes from the rate itself, and here it's seven tenths of a point.",
+      text: "[slowly] A rate's standard error comes from the rate itself, and here it's seven tenths of a point.",
       pauseAfter: 0.7,
     },
     {
@@ -205,14 +205,14 @@ export const script: NarrationScript = {
     },
     {
       id: "rate-ci",
-      text: "Step one point nine six of those either way, and you get sixteen point six to nineteen point four percent.",
+      text: "[slowly] Step one point nine six of those either way, and you get sixteen point six to nineteen point four percent.",
       pauseAfter: 0.6,
     },
-    { id: "test-in", text: "And an interval can answer a question you might think needs a test." },
+    { id: "test-in", text: "[slowly] And an interval can answer a question you might think needs a test." },
     {
       id: "test",
       scene: true,
-      text: "Build an interval for a difference. If it leaves out zero, the difference is significant at the five percent level.",
+      text: "[slowly] Build an interval for a difference. If it leaves out zero, the difference is significant at the five percent level.",
       pauseAfter: 0.6,
     },
     {
@@ -222,17 +222,17 @@ export const script: NarrationScript = {
     },
     {
       id: "straddle",
-      text: "This one runs from minus a half to eight. It includes zero, so you can't rule out no effect.",
+      text: "[slowly] This one runs from minus a half to eight. It includes zero, so you can't rule out no effect.",
       pauseAfter: 0.7,
     },
-    { id: "eight", text: "But it includes eight as well, a big effect you can't rule out either.", pauseAfter: 0.7 },
-    { id: "proof", text: "That isn't proof of nothing. It's a call for more data.", pauseAfter: 0.6 },
+    { id: "eight", text: "[slowly] But it includes eight as well, a big effect you can't rule out either.", pauseAfter: 0.7 },
+    { id: "proof", text: "[slowly] That isn't proof of nothing. It's a call for more data.", pauseAfter: 0.6 },
     {
       id: "views",
-      text: "An interval and a test are two views of one thing, and only the interval shows how big the effect might be.",
+      text: "[slowly] An interval and a test are two views of one thing, and only the interval shows how big the effect might be.",
       pauseAfter: 0.8,
     },
-    { id: "formula-in", text: "Every interval so far leaned on a formula for the standard error." },
+    { id: "formula-in", text: "[slowly] Every interval so far leaned on a formula for the standard error." },
 
     // ── Part 3. The bootstrap ─────────────────────────────────────────────
     {

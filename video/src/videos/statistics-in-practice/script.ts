@@ -137,11 +137,16 @@ export const script: NarrationScript = {
     },
     {
       id: "sin",
-      text: "Keep a wall between them. The trap is crossing it, by testing a lead on the data that suggested it. Friday was picked because it looked best in these very bills... so the test is tilted its way before it runs.",
+      text: "[slowly] Keep a wall between them. The trap is crossing it, by testing a lead on the data that suggested it.",
       pauseAfter: 0.8,
     },
-    { id: "luck", text: "Part of its lead is luck, and the test would count that luck as evidence.", pauseAfter: 0.8 },
-    { id: "lie", text: "A p-value from the data that suggested the question is a lie.", pauseAfter: 0.7 },
+    {
+      id: "tilt",
+      text: "[slowly] Friday was picked because it looked best in these very bills... so the test is tilted its way before it runs.",
+      pauseAfter: 0.8,
+    },
+    { id: "luck", text: "[slowly] Part of its lead is luck, and the test would count that luck as evidence.", pauseAfter: 0.8 },
+    { id: "lie", text: "[slowly] A p-value from the data that suggested the question is a lie.", pauseAfter: 0.7 },
     { id: "split-in", text: "So where does the fresh data come from?" },
     {
       id: "split",
