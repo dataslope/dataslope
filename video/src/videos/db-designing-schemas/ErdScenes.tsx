@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, fmt, HIGHLIGHT, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, body, fmt, HIGHLIGHT, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -19,7 +19,7 @@ import {
   TRIED,
   ZERO_QUANTITY,
 } from "./data";
-import { DbTable, ErrorBox, Head, Leave, Mark, MARK_BAD, MARK_KEY, Mono, Strike, tableGeometry, widenTo } from "./parts";
+import { DbTable, ErrorBox, Head, Leave, Mark, MARK_BAD, MARK_KEY, Mono, Strike, type TableGeometry, tableGeometry, widenTo } from "./parts";
 import { STORE_BOTTOM, STORE_TOP, STORE_X } from "./StoreErd";
 
 /** Where the rows tried and Postgres's answers sit: under the diagram. */
@@ -76,12 +76,14 @@ export const RelateScene: React.FC = () => {
 
 /** Steps five and six: the pair as a key, the quantity rule, and what Postgres says to each. */
 export const RulesScene: React.FC = () => {
+  const frame = useCurrentFrame();
   const n = useNarration();
   const { y, h } = useLayout();
   const keysFrom = n.beat("keys").from;
   const sameAt = n.word("keys", "same product");
   const cantAt = n.word("keys", "can't");
   const oneOrderAt = n.word("keys", "one order");
+  const twiceAt = n.word("keys", "twice");
   const rulesFrom = n.beat("rules").from;
   const refusedAt = n.word("rules", "refused");
   const lineAt = n.word("rules", "a line");
@@ -95,12 +97,28 @@ export const RulesScene: React.FC = () => {
   const zero = tried(TRIED.zero);
   const errorX = (g: { x: number; width: number }) => g.x + g.width + 36;
   const dupOut = rulesFrom - 6;
+  // A refused line is struck through in the accent as the refusal is said.
+  const struck = (g: TableGeometry, at: number) => (
+    <div
+      style={{
+        position: "absolute",
+        left: g.x - 6,
+        top: g.rowMid(0) - 1.5,
+        width: (g.width + 12) * ease(frame, at, 12),
+        height: 3,
+        borderRadius: 2,
+        background: ACCENT,
+      }}
+    />
+  );
   return (
     <AbsoluteFill>
       <Sfx name="el-pencil" at={sameAt - 4} level={-35} />
       <Sfx name="el-tap" at={cantAt - 2} level={-28} />
       <Sfx name="el-tap" at={refusedAt - 2} level={-27} />
       <Sfx name="el-pencil" at={lineAt - 4} level={-35} />
+      <Sfx name="el-scratch" at={twiceAt} level={-33} />
+      <Sfx name="el-scratch" at={refusedAt + 2} level={-33} />
       <Head at={keysFrom - 6} second={rulesFrom - 2} italic="then rules.">
         Keys first,
       </Head>
@@ -118,6 +136,7 @@ export const RulesScene: React.FC = () => {
             { row: 0, col: 0, at: oneOrderAt - 2, color: MARK_KEY },
           ]}
         />
+        {struck(dup, twiceAt)}
       </Leave>
       <ErrorBox
         x={errorX(dup)}
@@ -138,6 +157,7 @@ export const RulesScene: React.FC = () => {
         numeric={[0, 1, 2, 3]}
         marks={[{ row: 0, col: 2, at: zeroAt - 2, color: MARK_BAD }]}
       />
+      {struck(zero, refusedAt + 2)}
       <ErrorBox x={errorX(zero)} top={y(ERROR_Y)} width={RIGHT - errorX(zero)} at={refusedAt - 2} message={ZERO_QUANTITY.message} detail={ZERO_QUANTITY.detail} />
     </AbsoluteFill>
   );

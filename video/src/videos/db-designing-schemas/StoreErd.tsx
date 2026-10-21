@@ -95,7 +95,9 @@ export const StoreErd: React.FC = () => {
   const ownAt = n.word("hidden", "facts of its own");
   const howManyAt = n.word("hidden", "how many");
   const whatPriceAt = n.word("hidden", "what price");
-  const itemsAt = n.word("items", "order items");
+  // "It becomes a real table": order_items arrives as it is called real, a
+  // beat before its name, so the link's dashed box does not sit alone.
+  const itemsAt = n.word("items", "real table");
   const receiptAt = n.word("items", "receipt");
   const keysAt = n.word("keys", "keys");
   const pairAt = n.word("keys", "pair");
