@@ -33,7 +33,7 @@ const PX = 9.5;
 const VALUE_X = 1572;
 const EST_X = 1800;
 /** The hairline that keeps Wald's estimates apart from the two shares. */
-const RULE_X = 1662;
+const RULE_X = 1670;
 /** Bars sit this far above and below the row's centre line. */
 const GAP = 10;
 const THICK = 24;

@@ -46,7 +46,6 @@ const figBase = (k: number) => FIGURES.slice(0, k).reduce((a, b) => a + b, 0);
  * Sequence, frame 0 is the part's own frame 0, so every cue in its scenes
  * lands where it does in the standalone video.
  */
-
 const Part: React.FC<{ k: number; timeline: Timeline; span: PartSpan }> = ({ k, timeline, span }) => {
   const Scenes = SCENES[k];
   const last = k === PARTS.length - 1;
