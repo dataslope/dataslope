@@ -1,7 +1,7 @@
 # Course video fixes: Statistics and Database Design
 
 **Follows:** [the review](20261021-0551-course-video-review.md) of the 18 course unit videos (378 findings: 24 P1, 156 P2, 198 P3).
-**Result:** 359 fixed, 18 partly fixed, 1 skipped. Every video passes `check:frames`, `check:motion` and `check:sync`, and the package passes `typecheck`, `lint`, `npm test` (57/57) and `check:cues`.
+**Result:** 362 fixed, 16 partly fixed, none skipped (359, 18 and 1 at the end of the fix pass; the three decisions in [After the fix pass](#after-the-fix-pass) closed the rest). Every video passes `check:frames`, `check:motion` and `check:sync`, and the package passes `typecheck`, `lint`, `npm test` (57/57) and `check:cues`.
 **Voice:** only new or reworded sentences were voiced, at the user's request: 52 beats, about 5,340 characters in all, each sent on its own. No take was recorded again (`takes/` is unchanged). An audit of every course video's `alignment.json` against the pre-fix commit finds no beat whose audio changed while its text stayed the same. Five beat splits were cut from the existing takes with `narrate --recut` and sent nothing.
 
 ## Shared changes
@@ -23,13 +23,13 @@ Made once, in the kit, before the per-video work:
 | Stats-3 Probability | 20 | 20 fixed | 97 chars, 1 beat (one split re-cut) | 7:33 → 7:52 |
 | Stats-4 Distributions | 25 | 23 fixed, 2 partly | 317 chars, 2 beats | 7:32 → 7:47 |
 | Stats-5 Sampling (both halves) | 34 | 32 fixed, 2 partly | 220 chars, 3 beats (one split re-cut) | 10:51 → 11:19 |
-| Stats-6 Estimation | 20 | 19 fixed, 1 partly | 329 chars, 3 beats (two splits re-cut) | 6:00 → 6:27 |
+| Stats-6 Estimation | 20 | 20 fixed | 329 chars, 3 beats (two splits re-cut); 9 more re-voiced slowly | 6:00 → 6:36 |
 | Stats-7 TestingHypotheses | 44 | 41 fixed, 3 partly | 70 chars, 2 beats | 10:01 → 10:24 |
 | Stats-8 InterpretingResults | 18 | 17 fixed, 1 partly | 775 chars, 7 beats | 6:32 → 7:10 |
-| Stats-9 StatisticsInPractice | 17 | 16 fixed, 1 partly | 777 chars, 9 beats | 4:51 → 5:26 |
+| Stats-9 StatisticsInPractice | 17 | 17 fixed | 777 chars, 9 beats; 4 more re-voiced slowly | 4:51 → 5:30 |
 | DbDesign-1 WhyDesign | 20 | 19 fixed, 1 partly | 134 chars, 1 beat | 2:56 → 3:14 |
 | DbDesign-2 Entities | 11 | 11 fixed | 657 chars, 4 beats | 2:54 → 3:23 |
-| DbDesign-3 Relationships | 12 | 11 fixed, 1 skipped | 263 chars, 2 beats | 3:08 → 3:22 |
+| DbDesign-3 Relationships | 12 | 12 fixed | 263 chars, 2 beats | 3:08 → 3:22 |
 | DbDesign-4 Keys | 16 | 15 fixed, 1 partly | none | 3:40 → 3:46 |
 | DbDesign-5 RelationshipPatterns | 16 | 15 fixed, 1 partly | none (one split re-cut) | 4:05 → 4:11 |
 | DbDesign-6 Constraints | 19 | 16 fixed, 3 partly | 298 chars, 4 beats | 4:07 → 4:21 |
@@ -37,7 +37,7 @@ Made once, in the kit, before the per-video work:
 | DbDesign-8 DesigningSchemas | 20 | 19 fixed, 1 partly | 176 chars, 2 beats | 4:33 → 4:49 |
 | DbDesign-9 RelationalHistory | 17 | 17 fixed | 207 chars, 3 beats | 3:38 → 3:52 |
 
-The 18 videos run 105.8 minutes, up from 99.8: pauses after definitions and results, and the beats added to explain what the review found unexplained.
+The 18 videos run 106.0 minutes, up from 99.8: pauses after definitions and results, and the beats added to explain what the review found unexplained.
 
 ## The 24 P1s
 
