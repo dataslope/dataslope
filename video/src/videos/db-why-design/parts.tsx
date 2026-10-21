@@ -622,19 +622,21 @@ export const DbTable: React.FC<{
           const w = hm ? ease(frame, hm.at, 10) : 0;
           const lift = hm?.out === undefined ? 0 : ease(frame, hm.out, 12);
           return (
-            <div key={c} style={{ ...cellBox(j), position: "relative", fontFamily: MONO, fontSize: HEAD_SIZE, fontWeight: 600, color: INK_SOFT }}>
-              {w > 0 && lift < 1 ? (
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: `8px ${PAD - 6}px`,
-                    background: MARK,
-                    clipPath: `inset(0 ${(1 - w) * 100}% 0 0)`,
-                    opacity: 1 - lift,
-                  }}
-                />
-              ) : null}
-              <span style={{ position: "relative" }}>{c}</span>
+            <div key={c} style={{ ...cellBox(j), fontFamily: MONO, fontSize: HEAD_SIZE, fontWeight: 600, color: INK_SOFT }}>
+              <span style={{ position: "relative", display: "inline-block" }}>
+                {w > 0 && lift < 1 ? (
+                  <span
+                    style={{
+                      position: "absolute",
+                      inset: "0.02em -0.28em",
+                      background: MARK,
+                      clipPath: `inset(0 ${(1 - w) * 100}% 0 0)`,
+                      opacity: 1 - lift,
+                    }}
+                  />
+                ) : null}
+                <span style={{ position: "relative" }}>{c}</span>
+              </span>
             </div>
           );
         })}
