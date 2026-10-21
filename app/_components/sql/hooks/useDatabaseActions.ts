@@ -577,32 +577,30 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
 
   // ─── CSV parse helper ─────────────────────────────────────────────
   const handleCsvFile = useCallback(
-    (file: File) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const text = e.target?.result as string;
-          const { headers, rows } = parseCsv(text);
-          if (headers.length === 0) {
-            showToast("CSV file appears to be empty.", "warn");
-            return;
-          }
-          setImportCsvState({
-            tableName: tableNameFromFilename(file.name),
-            headers,
-            rows,
-            rawText: text,
-            targetMode: "new",
-            targetTable: tables[0] ?? "",
-            colCompare: null,
-            columnTypes: inferCsvColumnTypes(headers, rows).map(sqliteAffinityFor),
-          });
-        } catch (err) {
-          const msg = err instanceof Error ? err.message : String(err);
-          showToast(`Could not parse CSV: ${msg}`, "warn");
+    async (file: File): Promise<boolean> => {
+      try {
+        const text = await file.text();
+        const { headers, rows } = parseCsv(text);
+        if (headers.length === 0) {
+          showToast("CSV file appears to be empty.", "warn");
+          return false;
         }
-      };
-      reader.readAsText(file);
+        setImportCsvState({
+          tableName: tableNameFromFilename(file.name),
+          headers,
+          rows,
+          rawText: text,
+          targetMode: "new",
+          targetTable: tables[0] ?? "",
+          colCompare: null,
+          columnTypes: inferCsvColumnTypes(headers, rows).map(sqliteAffinityFor),
+        });
+        return true;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Could not parse CSV: ${msg}`, "warn");
+        return false;
+      }
     },
     [showToast, tables, setImportCsvState],
   );
@@ -672,60 +670,58 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
   }, [engineRef, showToast, setTables, setImportCsvOpen, setImportCsvState]);
 
   const handleJsonFile = useCallback(
-    (file: File) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const text = e.target?.result as string;
-          const parsed = JSON.parse(text) as unknown;
-          if (!Array.isArray(parsed)) {
-            showToast(
-              "JSON must be an array of objects (e.g. [{...}, {...}]).",
-              "warn",
-            );
-            return;
-          }
-          if (parsed.length === 0) {
-            showToast("JSON array is empty.", "warn");
-            return;
-          }
-          const keySet = new Set<string>();
-          for (const obj of parsed) {
-            if (obj && typeof obj === "object" && !Array.isArray(obj)) {
-              for (const k of Object.keys(obj as Record<string, unknown>)) {
-                keySet.add(k);
-              }
+    async (file: File): Promise<boolean> => {
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text) as unknown;
+        if (!Array.isArray(parsed)) {
+          showToast(
+            "JSON must be an array of objects (e.g. [{...}, {...}]).",
+            "warn",
+          );
+          return false;
+        }
+        if (parsed.length === 0) {
+          showToast("JSON array is empty.", "warn");
+          return false;
+        }
+        const keySet = new Set<string>();
+        for (const obj of parsed) {
+          if (obj && typeof obj === "object" && !Array.isArray(obj)) {
+            for (const k of Object.keys(obj as Record<string, unknown>)) {
+              keySet.add(k);
             }
           }
-          const headers = Array.from(keySet);
-          if (headers.length === 0) {
-            showToast("JSON objects appear to have no keys.", "warn");
-            return;
-          }
-          const rows = parsed.map((obj) => {
-            const record = obj as Record<string, unknown>;
-            return headers.map((h) => {
-              const v = record[h];
-              if (v === null || v === undefined) return "";
-              if (typeof v === "object") return JSON.stringify(v);
-              return String(v);
-            });
-          });
-          setImportJsonState({
-            tableName: tableNameFromFilename(file.name),
-            headers,
-            rows,
-            rawText: text,
-            targetMode: "new",
-            targetTable: tables[0] ?? "",
-            colCompare: null,
-          });
-        } catch (err) {
-          const msg = err instanceof Error ? err.message : String(err);
-          showToast(`Could not parse JSON: ${msg}`, "warn");
         }
-      };
-      reader.readAsText(file);
+        const headers = Array.from(keySet);
+        if (headers.length === 0) {
+          showToast("JSON objects appear to have no keys.", "warn");
+          return false;
+        }
+        const rows = parsed.map((obj) => {
+          const record = obj as Record<string, unknown>;
+          return headers.map((h) => {
+            const v = record[h];
+            if (v === null || v === undefined) return "";
+            if (typeof v === "object") return JSON.stringify(v);
+            return String(v);
+          });
+        });
+        setImportJsonState({
+          tableName: tableNameFromFilename(file.name),
+          headers,
+          rows,
+          rawText: text,
+          targetMode: "new",
+          targetTable: tables[0] ?? "",
+          colCompare: null,
+        });
+        return true;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Could not parse JSON: ${msg}`, "warn");
+        return false;
+      }
     },
     [showToast, tables, setImportJsonState],
   );
@@ -789,13 +785,13 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
   }, [engineRef, showToast, setTables, setImportJsonOpen, setImportJsonState]);
 
   const handleParquetFile = useCallback(
-    async (file: File) => {
+    async (file: File): Promise<boolean> => {
       try {
         showToast("Reading parquet file…");
         const { columns, rows } = await readParquetFile(file);
         if (columns.length === 0) {
           showToast("Parquet file appears to have no columns.", "warn");
-          return;
+          return false;
         }
         setImportParquetState({
           tableName: tableNameFromFilename(file.name),
@@ -805,9 +801,11 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
           targetTable: tables[0] ?? "",
           colCompare: null,
         });
+        return true;
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         showToast(`Parquet import failed: ${msg}`, "warn");
+        return false;
       }
     },
     [showToast, tables, setImportParquetState],

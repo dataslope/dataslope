@@ -23,9 +23,9 @@ export interface DroppedFileAction {
   danger?: boolean;
   /** Run the import. `choice` is the selected value when the plan offers a
    *  choice (which worksheet, say), null otherwise. Return a promise to keep
-   *  the dialog's progress panel up until it settles; return nothing when the
-   *  action just opens the playground's own import dialog, which takes over
-   *  from there. */
+   *  the dialog's progress panel up until it settles, including while a file
+   *  is parsed for the playground's own import dialog; return nothing when
+   *  that dialog can open at once and take over from there. */
   run: (
     report: ImportStepReporter,
     choice: string | null,

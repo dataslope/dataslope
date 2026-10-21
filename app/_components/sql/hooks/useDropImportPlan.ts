@@ -39,10 +39,13 @@ export interface DropImportCapabilities {
     filename: string,
     report: ImportStepReporter,
   ) => void | Promise<unknown>;
-  /** Open the playground's own import dialog, pre-loaded with the file. */
-  openCsvImport: (file: File) => void;
-  openJsonImport: (file: File) => void;
-  openParquetImport: (file: File) => void;
+  /** Open the playground's own import dialog, pre-loaded with the file.
+   *  Settles once the file is parsed and the dialog is open on its preview
+   *  (or a toast has said why not), so the drop dialog's progress panel
+   *  covers the read. */
+  openCsvImport: (file: File) => Promise<unknown>;
+  openJsonImport: (file: File) => Promise<unknown>;
+  openParquetImport: (file: File) => Promise<unknown>;
   /** Load one worksheet into the CSV preview, where the reader names the
    *  table and adjusts column types before it is created. */
   openWorksheetImport: (sheet: XlsxSheet, filename: string) => void;
@@ -172,8 +175,9 @@ export function useDropImportPlan(caps: DropImportCapabilities) {
               label: "Add it as a new table",
               description:
                 "Opens the import preview, where you can name the table and check its column types.",
-              run: () => {
-                open(file);
+              run: (report) => {
+                report("Reading file");
+                return open(file);
               },
             },
           ],
