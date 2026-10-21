@@ -2,14 +2,13 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import type { Pt } from "../../components/arrow";
 import { ease } from "../../components/motion";
-import { Relation, useEntityLayout } from "../../editorial/erd";
+import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, body, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { STORE } from "./data";
-import { KeyedEntity } from "./KeyedEntity";
 import { Chip, GhostRow, KEY, PathArrow, Ping, rowBox, RowStrike, RowWash } from "./parts";
 
 /** The store's diagram on the page: two rows of three boxes, in layout units. */
@@ -154,7 +153,7 @@ export const StoreErd: React.FC = () => {
       </Ink>
 
       {/* ── The boxes ── */}
-      <KeyedEntity
+      <Entity
         layout={L.customers}
         at={customersAt - 4}
         rowAt={{ id: customersAt + 4, email: emailAt - 2, full_name: emailAt + 5 }}
@@ -162,14 +161,14 @@ export const StoreErd: React.FC = () => {
         marks={{ id: keyMark(0), email: { ...keyMark(0), at: keyIn(0) + 2 } }}
         {...fx(0)}
       />
-      <KeyedEntity
+      <Entity
         layout={L.products}
         at={productsAt - 4}
         rowAt={{ id: productsAt + 4, name: priceAt - 8, current_price: priceAt }}
         keyAt={{ id: keyIn(3) }}
         marks={{ id: keyMark(3), current_price: { at: copiesAt + 4, tone: "note" } }}
       />
-      <KeyedEntity
+      <Entity
         layout={L.categories}
         at={categoriesAt - 4}
         rowAt={{ id: categoriesAt + 4, name: eachFactAt + 4 }}
@@ -179,7 +178,7 @@ export const StoreErd: React.FC = () => {
       />
       {/* customer_id lands where the email an order does not copy was tried, and
           status after it, so the box never holds an empty row. */}
-      <KeyedEntity
+      <Entity
         layout={L.orders}
         at={ordersAt - 4}
         rowAt={{ id: ordersAt + 4, customer_id: pointsAt - 2, status: pointsAt + 8 }}
@@ -221,7 +220,7 @@ export const StoreErd: React.FC = () => {
         at={bothSidesAt - 4}
         out={pcAt + 4}
       />
-      <KeyedEntity
+      <Entity
         layout={L.productCategories}
         at={pcAt - 2}
         rowGap={6}
@@ -276,7 +275,7 @@ export const StoreErd: React.FC = () => {
           </span>
         </div>
       ) : null}
-      <KeyedEntity
+      <Entity
         layout={L.orderItems}
         at={itemsAt - 2}
         rowGap={6}

@@ -85,7 +85,9 @@ export const QQScene: React.FC = () => {
           const X = scaleFor(p);
           const py = yFor(p);
           const qq = QQ_PLOTS[p.key];
-          const at = pi === 0 ? quantilesAt - 4 : skewedAt - 8;
+          // The first panel's frame arrives as the plot is named, so the
+          // scene doesn't open on its headline alone.
+          const at = pi === 0 ? plotAt - 2 : skewedAt - 8;
           const axes = ease(frame, at, 14);
           const diag = ease(frame, pi === 0 ? rightAt - 4 : skewedAt - 6, 18);
           const reveal = (i: number) => ease(frame, start[p.key] + (i / qq.sample.length) * span[p.key], 6);
@@ -156,7 +158,9 @@ export const QQScene: React.FC = () => {
           const cy = py(qq.sample[ONE]);
           const up = ease(frame, quantilesAt - 2, 14);
           const across = ease(frame, modelsAt - 4, 14);
-          const guides = 1 - ease(frame, lineEnd + 30, 16) * 0.75;
+          // The guides go once every point is in, before "on the line" lands
+          // across the vertical one; the ringed point stays.
+          const guides = 1 - ease(frame, lineEnd - 14, 12);
           return (
             <>
               <Svg opacity={guides}>
@@ -171,10 +175,10 @@ export const QQScene: React.FC = () => {
                 <circle cx={cx} cy={cy} r={7} fill={ASK} />
                 <circle cx={cx} cy={cy} r={12} fill="none" stroke={ASK} strokeWidth={2} />
               </Svg>
-              <Note at={quantilesAt} x={p.x0 + 12} y={cy - 40} dim={lineEnd + 30}>
+              <Note at={quantilesAt} x={p.x0 + 12} y={cy - 40} out={lineEnd - 14}>
                 <span style={{ ...askNote(21), whiteSpace: "nowrap", ...halo }}>data&apos;s 90th percentile: {fmt(qq.sample[ONE], 1)}</span>
               </Note>
-              <Note at={modelsAt} x={cx + 14} y={bottom - 40} dim={lineEnd + 30}>
+              <Note at={modelsAt} x={cx + 14} y={bottom - 40} out={lineEnd - 14}>
                 <span style={{ ...askNote(21), whiteSpace: "nowrap", ...halo }}>the model&apos;s: {fmt(qq.theoretical[ONE], 1)}</span>
               </Note>
             </>
@@ -197,7 +201,7 @@ export const QQScene: React.FC = () => {
           <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>the upper tail runs away</span>
         </Note>
         {/* Just above the lower tail's points, left of the line. */}
-        <Note at={tailsAt + 4} x={sx(scaleFor(PANELS[1]), -17)} y={yFor(PANELS[1])(34)}>
+        <Note at={tailsAt + 4} x={sx(scaleFor(PANELS[1]), -17)} y={yFor(PANELS[1])(46)}>
           <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>the lower tail, too</span>
         </Note>
         <Note at={costlyAt - 2} x={sx(scaleFor(PANELS[1]), 62)} y={yFor(PANELS[1])(112) + 36} align="right">

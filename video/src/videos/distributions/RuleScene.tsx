@@ -17,7 +17,7 @@ const BASE = 680;
 const TALL = 260;
 const SCORE_Y = 780;
 /** Each band's bracket height, widest highest. */
-const BRACKET_Y = [400, 360, 320];
+const BRACKET_Y = [400, 364, 328];
 
 /**
  * Part 3, second scene: the empirical rule as three nested bands, each swept
@@ -83,7 +83,7 @@ export const RuleScene: React.FC = () => {
       />
 
       <Drift from={ruleFrom} to={n.beat("z-in").to + 40} origin="50% 45%">
-        <FigLabel n="10" title="Any normal, in standard deviations" at={ruleFrom - 4} x={160} y={y(270)} />
+        <FigLabel n="10" title="Any normal, in standard deviations" at={ruleFrom - 4} x={160} y={y(262)} />
 
         {/* The bands, widest underneath, each sweeping out from the mean. */}
         <Svg>

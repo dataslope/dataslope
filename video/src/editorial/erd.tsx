@@ -85,7 +85,8 @@ export function entityLayout(spec: EntitySpec, h: (v: number) => number = (v) =>
     anchor(side: "left" | "right" | "top" | "bottom", r?: number | string, along = 0): Pt {
       if (side === "top") return [spec.x + width / 2 + along, spec.y];
       if (side === "bottom") return [spec.x + width / 2 + along, spec.y + height];
-      const yAt = r === undefined ? spec.y + head / 2 : rows[index(r)]?.mid ?? spec.y + head / 2;
+      const headMid = spec.y + ENTITY.border + head / 2;
+      const yAt = r === undefined ? headMid : rows[index(r)]?.mid ?? headMid;
       return [side === "left" ? spec.x : spec.x + width, yAt];
     },
   };
@@ -110,18 +111,24 @@ const HEADER_FILL = `color-mix(in srgb, ${INK} 7%, ${PAPER})`;
  * its rows one after another (`rowGap` frames apart), or each on its own cue
  * in `rowAt` (by column name), and the box grows down to hold them. `marks`
  * washes a row (by column name) from a frame on: `key` blue, `note` the
- * page's yellow, `warn` the accent.
+ * page's yellow, `warn` the accent. `keyAt` holds a column's PK or UK badge
+ * back until its own cue, for a video that names keys after it has drawn
+ * the columns; an FK part arrives with its row, and the key column keeps
+ * its width throughout, so no name shifts when a badge lands.
  */
 export const Entity: React.FC<{
   layout: EntityLayout;
   at: number;
   rowGap?: number;
   rowAt?: Record<string, number>;
+  /** When each column's PK or UK badge inks in (by column name); without
+   *  one, it arrives with its row. */
+  keyAt?: Record<string, number>;
   marks?: Record<string, { at: number; tone?: keyof typeof TONES; out?: number }>;
   /** Fades the whole entity back from this frame, for when the talk moves on. */
   dim?: number;
   out?: number;
-}> = ({ layout, at, rowGap = 5, rowAt = {}, marks = {}, dim, out }) => {
+}> = ({ layout, at, rowGap = 5, rowAt = {}, keyAt = {}, marks = {}, dim, out }) => {
   const frame = useCurrentFrame();
   const shown = ease(frame, at, 12);
   const gone = out === undefined ? 0 : ease(frame, out, 10);
@@ -175,6 +182,10 @@ export const Entity: React.FC<{
         if (p <= 0) return null;
         const mark = marks[c.name];
         const wash = mark ? ease(frame, mark.at, 10) * (1 - (mark.out === undefined ? 0 : ease(frame, mark.out, 10))) : 0;
+        // "PK, FK" as two parts: the FK with its row, the PK or UK on its cue.
+        const parts = (c.key ?? "").split(", ").filter(Boolean);
+        const cue = keyAt[c.name];
+        const partIn = parts.map((k) => (k === "FK" || cue === undefined ? 1 : ease(frame, cue, 10)));
         return (
           <div
             key={c.name}
@@ -204,10 +215,15 @@ export const Entity: React.FC<{
                 fontSize: 19,
                 color: BLUE_INK,
                 whiteSpace: "nowrap",
-                opacity: c.key ? 1 : 0,
               }}
             >
-              {c.key ?? ""}
+              {parts.map((k, j) => (
+                <React.Fragment key={k}>
+                  {/* The comma shows once the parts on both sides of it have. */}
+                  {j ? <span style={{ opacity: Math.min(partIn[j - 1], partIn[j]) }}>, </span> : null}
+                  <span style={{ opacity: partIn[j] }}>{k}</span>
+                </React.Fragment>
+              ))}
             </span>
             <span style={{ fontFamily: MONO, fontSize: 21, color: INK, whiteSpace: "nowrap", flex: "1 1 auto", overflow: "hidden" }}>
               {c.name}
